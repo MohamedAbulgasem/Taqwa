@@ -50,8 +50,6 @@ android {
     namespace = "world.taqwa.app.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

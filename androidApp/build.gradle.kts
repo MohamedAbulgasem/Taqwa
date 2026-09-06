@@ -23,8 +23,6 @@ android {
     namespace = "world.taqwa.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
 
     defaultConfig {
         applicationId = "world.taqwa.app"
