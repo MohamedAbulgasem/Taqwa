@@ -91,7 +91,7 @@
     <string name="sound_notification_detail">Your phone’s default tone</string>
     <string name="sound_takbir_detail">Allahu akbar, Allahu akbar — ~%1$ss</string>
     <string name="sound_adhan_detail">Full call, %1$s seconds</string>
-    <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on both platforms. The complete adhan can be played inside the app.</string>
+    <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on this platform. The complete adhan can be played inside the app.</string>
 
     <!-- Prayer time settings -->
     <string name="prayer_times_method">Calculation method</string>
