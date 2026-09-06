@@ -15,6 +15,7 @@
   <img alt="Android 8.0+" src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white">
   <img alt="iOS 16+" src="https://img.shields.io/badge/iOS-16%2B-000000?logo=apple&logoColor=white">
   <img alt="Works offline" src="https://img.shields.io/badge/works-offline-B5820B">
+  <img alt="GPL-3.0" src="https://img.shields.io/badge/licence-GPL--3.0-blue">
 </p>
 
 <p align="center">
@@ -144,4 +145,6 @@ Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (
 
 ## Licence
 
-The licence for the code is being decided before the first public release. Until a `LICENSE` file lands, please treat the code as all rights reserved and open an issue if you want to use it in something of your own.
+Taqwa is free software under the [GNU General Public License v3.0](LICENSE). You may use, study, share and modify it, and anything you distribute that is built from it must stay under the same licence with its source available. That is deliberate: it keeps a free, ad-free app from being repackaged as neither.
+
+Copyright © 2026 Mohamed Abulgasem.
