@@ -2687,7 +2687,7 @@ object QiblaMath {
 - [ ] **Step 5: Run the tests**
 
 Run: `./gradlew :shared:allTests --tests "*QiblaMathTest*"`
-Expected: PASS, 8 tests.
+Expected: PASS, 9 tests.
 
 - [ ] **Step 6: Commit**
 
@@ -4232,9 +4232,9 @@ or any coroutine machinery of its own.
 - Produces:
   - `enum class WidgetBackground { FOLLOW_THEME, LIGHT, DARK, TRANSLUCENT_OR_FROSTED }`
   - `SettingsRepository.widgetBackground: Flow<WidgetBackground>` and `suspend fun SettingsRepository.setWidgetBackground(WidgetBackground)`
-  - `data class WidgetSnapshot(nextPrayer: Prayer, countdownMinutes: Long, nextClockTime: String, allClockTimes: Map<Prayer, String>, currentPrayer: Prayer?, languageTag: String)`
+  - `data class WidgetSnapshot(nextPrayer: Prayer, countdownMinutes: Long, nextClockTime: String, allClockTimes: Map<Prayer, String>, currentPrayer: Prayer?, languageTag: String, ringProgress: Float)`
   - `object WidgetInputsMirror { fun serialize(snapshot: WidgetSnapshot): String; fun deserialize(raw: String): WidgetSnapshot? }`
-  - `data class WidgetPrayerRow(prayer: Prayer, displayName: String, clockTime: String, isCurrent: Boolean)`, `data class WidgetContent(nextPrayerDisplayName: String, countdownMinutes: Long, nextClockTime: String, rows: List<WidgetPrayerRow>)`, `object WidgetContentBuilder { fun build(snapshot: WidgetSnapshot): WidgetContent }`
+  - `data class WidgetPrayerRow(prayer: Prayer, displayName: String, clockTime: String, isCurrent: Boolean)`, `data class WidgetContent(nextPrayerDisplayName: String, countdownMinutes: Long, nextClockTime: String, rows: List<WidgetPrayerRow>, ringProgress: Float)`, `object WidgetContentBuilder { fun build(snapshot: WidgetSnapshot): WidgetContent }`
   - `data class WidgetPaletteColors(backgroundArgb: Long, textArgb: Long, accentArgb: Long, backgroundAlpha: Float)`, `object WidgetPalette { fun colorsFor(background: WidgetBackground, systemIsDark: Boolean): WidgetPaletteColors }`
   - `interface KeyValueStore { fun putString(key: String, value: String); fun getString(key: String): String? }` and `expect fun createWidgetKeyValueStore(): KeyValueStore`
   - `object WidgetMirrorWriter { fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat); fun read(store: KeyValueStore): WidgetSnapshot? }`
@@ -4282,6 +4282,7 @@ class WidgetInputsMirrorTest {
         ),
         currentPrayer = Prayer.DHUHR,
         languageTag = "en-US",
+        ringProgress = 0.42f,
     )
 
     @Test
@@ -4400,6 +4401,7 @@ class WidgetMirrorWriterTest {
         assertEquals(Prayer.ASR, snapshot.nextPrayer)
         assertEquals(Prayer.DHUHR, snapshot.currentPrayer)
         assertEquals(90L, snapshot.countdownMinutes)
+        assertEquals(0.3f, snapshot.ringProgress)
     }
 
     @Test
@@ -4450,7 +4452,8 @@ import world.taqwa.app.domain.Prayer
 /**
  * The flattened, serialisable snapshot the main app writes every time prayer times or settings
  * change, and both widget processes read. A plain delimited string, not JSON — neither widget
- * target needs a JSON dependency for six fixed fields.
+ * target needs a JSON dependency for seven fixed fields. [ringProgress] exists only for iOS's
+ * lock-screen circular complication, which the spec asks to show as a ring, not just numbers.
  */
 data class WidgetSnapshot(
     val nextPrayer: Prayer,
@@ -4459,6 +4462,7 @@ data class WidgetSnapshot(
     val allClockTimes: Map<Prayer, String>,
     val currentPrayer: Prayer?,
     val languageTag: String,
+    val ringProgress: Float,
 )
 
 object WidgetInputsMirror {
@@ -4475,12 +4479,13 @@ object WidgetInputsMirror {
             times,
             snapshot.currentPrayer?.name.orEmpty(),
             snapshot.languageTag,
+            snapshot.ringProgress.toString(),
         ).joinToString(FIELD_SEP)
     }
 
     fun deserialize(raw: String): WidgetSnapshot? {
         val parts = raw.split(FIELD_SEP)
-        if (parts.size != 6) return null
+        if (parts.size != 7) return null
         return try {
             WidgetSnapshot(
                 nextPrayer = Prayer.valueOf(parts[0]),
@@ -4492,8 +4497,11 @@ object WidgetInputsMirror {
                 },
                 currentPrayer = parts[4].takeIf { it.isNotEmpty() }?.let { Prayer.valueOf(it) },
                 languageTag = parts[5],
+                ringProgress = parts[6].toFloat(),
             )
         } catch (e: IllegalArgumentException) {
+            null
+        } catch (e: NumberFormatException) {
             null
         }
     }
@@ -4540,8 +4548,10 @@ object WidgetPalette {
 - [ ] **Step 4: Run the tests**
 
 Run: `./gradlew :shared:allTests --tests "*WidgetInputsMirrorTest*" --tests "*WidgetPaletteTest*" --tests "*SettingsRepositoryTest*"`
-Expected: PASS — 3, 4 and 7 tests respectively (Plan 1's original `SettingsRepositoryTest` count
-plus the two added here).
+Expected: PASS — 3, 4 and 9 tests respectively. The 9 is Plan 1's original 6, plus Task 10's 2
+location tests, minus the 1 Task 15 removed, plus the 2 added here — 6 + 2 − 1 + 2 = 9. (Task 15's
+own Step 6 says "5 tests" at that point; it should say 7 — a pre-existing miscount, not something
+this task's arithmetic should be made to match.)
 
 - [ ] **Step 5: Write the failing writer test, then implement it**
 
@@ -4591,6 +4601,7 @@ object WidgetMirrorWriter {
             allClockTimes = today.rows.associate { it.prayer to clock(it.instant) },
             currentPrayer = today.rows.firstOrNull { it.status == PrayerStatus.CURRENT }?.prayer,
             languageTag = format.languageTag(),
+            ringProgress = today.ringProgress,
         )
         store.putString(KEY, WidgetInputsMirror.serialize(snapshot))
     }
@@ -4615,6 +4626,9 @@ data class WidgetContent(
     val countdownMinutes: Long,
     val nextClockTime: String,
     val rows: List<WidgetPrayerRow>,
+    /** Only meaningful to iOS's lock-screen circular complication, which draws it as a ring
+     * (spec §4.5) rather than showing plain numbers alone. */
+    val ringProgress: Float,
 )
 
 /** Turns a raw [WidgetSnapshot] into display strings, applying the same Arabic-alone naming
@@ -4632,6 +4646,7 @@ object WidgetContentBuilder {
                 isCurrent = prayer == snapshot.currentPrayer,
             )
         },
+        ringProgress = snapshot.ringProgress,
     )
 
     private fun displayName(prayer: Prayer, languageTag: String) =
@@ -5140,8 +5155,11 @@ struct TaqwaLockScreenWidgetView: View {
         if let content = entry.content {
             switch family {
             case .accessoryCircular:
-                ZStack {
-                    AccessoryWidgetBackground()
+                // The spec's "ring + abbreviation + countdown": a real progress ring, not just
+                // numbers — the same motif CountdownRing (Plan 1 Task 11) uses on Today.
+                Gauge(value: Double(content.ringProgress)) {
+                    EmptyView()
+                } currentValueLabel: {
                     VStack(spacing: 0) {
                         Text(String(content.nextPrayerDisplayName.prefix(3)))
                             .font(.caption2)
@@ -5149,6 +5167,7 @@ struct TaqwaLockScreenWidgetView: View {
                             .font(.caption2.bold())
                     }
                 }
+                .gaugeStyle(.accessoryCircularCapacity)
             default:
                 HStack {
                     Text(content.nextPrayerDisplayName)
@@ -5474,3 +5493,35 @@ git commit -m "feat: widget background setting with a live preview on Appearance
 ```
 
 ---
+
+## Definition of done
+
+Together, both plans satisfy the spec's own definition of done (§15): the app tells you when to
+pray, wakes you for it, points you at Makkah, and does all three offline, in light and dark, on
+both platforms — with every state in the spec's §12 built and tested. Specifically, this plan is
+complete when:
+
+- A user who enables notifications receives one for every prayer at the correct local time, in
+  the sound chosen per prayer, surviving a reboot, a manual clock change and a timezone change.
+- iOS's 64-notification cap never produces a longer gap than its documented rolling window;
+  foreground and `BGAppRefreshTask` both top it up.
+- Changing a prayer's sound never crashes and never plays the previous sound — Android channel
+  identity encodes the sound, so a change always creates a channel Android has never seen.
+- The qibla screen resolves to true north on both platforms, ticks exactly once on entering
+  alignment, and dims to 28% and asks for a figure-eight under low accuracy rather than pointing
+  confidently at the wrong thing.
+- Arabic locale shows every prayer name alone, in the system Arabic face, on the timeline, in
+  widgets and in notification text; every other locale pairs it with the localised name. RTL
+  mirrors the whole app, including the timeline's pip gutter moving to the right.
+- Numerals follow CLDR by default everywhere except the countdown ring, which falls back to
+  Western digits until Arabic-Indic tabular figures are verified on-device.
+- Widgets — small and medium on Android, small/medium/lock-screen circular/rectangular on iOS —
+  show the next prayer and update within their platform's own refresh cadence, in all four
+  background options, with a Settings preview that always matches the real widget.
+- All three of Plan 1's deliberate stubs carry real behaviour: the onboarding notifications
+  button, the Settings → Notifications row, and the Appearance widget-background row.
+- `./gradlew :shared:allTests` is green. `./gradlew :androidApp:assembleDebug` succeeds.
+  `./scripts/ios-build.sh` succeeds.
+
+Widgets (Tasks 23–25) are the only tasks that may be cut under time pressure without leaving
+anything else unfinished — notifications, qibla and localisation stand on their own.

@@ -3240,7 +3240,7 @@ yields an empty map rather than crashing.
 
 Location: a "Use my location" toggle, a card showing city, country and **IANA timezone**, a "Choose a city instead" row, and the privacy note "Coordinates are stored on your device and used only to calculate times. Nothing is sent anywhere."
 
-City search: a text field wired to `cityRepository.search(query)` with results in a `TaqwaCard`, **each row showing the region beneath the name**. Selecting a city writes it as the manual location and pops back.
+City search: a text field wired to `cityRepository.search(query)` with results in a `TaqwaCard`, **each row showing the region and country beneath the name** — there are eleven Londons, and picking the wrong one silently produces wrong times forever with no visible cause. `City` carries `region` and `countryName` as readable strings ("England", "United Kingdom"), so render them as "England, United Kingdom"; when `region` is empty, show `countryName` alone rather than leaving a stray leading comma. Selecting a city writes it as the manual location and pops back.
 
 - [ ] **Step 8: Build appearance and attribution**
 
