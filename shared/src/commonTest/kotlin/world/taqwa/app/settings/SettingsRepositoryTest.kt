@@ -8,8 +8,14 @@ import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.NotificationSettings
+import world.taqwa.app.domain.ObligatoryPrayers
+import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.PrayerSettings
+import world.taqwa.app.domain.PrayerSound
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class SettingsRepositoryTest {
 
@@ -35,11 +41,6 @@ class SettingsRepositoryTest {
         val r = repo("theme-roundtrip")
         r.setThemeMode(ThemeMode.DARK)
         assertEquals(ThemeMode.DARK, r.themeMode.first())
-    }
-
-    @Test
-    fun remindBeforeDefaultsToNever() = runTest {
-        assertEquals(0, repo("remind").prayerSettings.first().remindBeforeMinutes)
     }
 
     @Test
@@ -73,5 +74,65 @@ class SettingsRepositoryTest {
         val got = r.location.first()!!
         assertEquals("Europe/London", got.timeZoneId)
         assertEquals("London", got.cityName)
+    }
+}
+
+class NotificationSettingsStorageTest {
+
+    // See the absolute-path note on SettingsRepositoryTest.repo — DataStore requires an
+    // absolute path on both the JVM and iosSimulatorArm64Test.
+    private fun repo(name: String) = SettingsRepository(
+        PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-test-notif-$name.preferences_pb".toPath() }
+    )
+
+    @Test
+    fun everyPrayerDefaultsToTakbir() = runTest {
+        val s = repo("defaults").notificationSettings.first()
+        ObligatoryPrayers.forEach { assertEquals(PrayerSound.TAKBIR, s.soundFor(it), "$it") }
+    }
+
+    @Test
+    fun notificationsAreOnByDefault() = runTest {
+        assertTrue(repo("enabled").notificationSettings.first().enabled)
+    }
+
+    @Test
+    fun remindBeforeDefaultsToNever() = runTest {
+        assertEquals(0, repo("lead").notificationSettings.first().remindBeforeMinutes)
+    }
+
+    @Test
+    fun soundsRoundTripPerPrayer() = runTest {
+        val r = repo("roundtrip")
+        val s = r.notificationSettings.first()
+        r.setNotificationSettings(
+            s.copy(sounds = s.sounds + mapOf(Prayer.FAJR to PrayerSound.ADHAN,
+                                             Prayer.ISHA to PrayerSound.SILENT)),
+        )
+        val back = r.notificationSettings.first()
+        assertEquals(PrayerSound.ADHAN, back.soundFor(Prayer.FAJR))
+        assertEquals(PrayerSound.SILENT, back.soundFor(Prayer.ISHA))
+        assertEquals(PrayerSound.TAKBIR, back.soundFor(Prayer.ASR))
+    }
+
+    @Test
+    fun writingPrayerSettingsDoesNotResetTheChosenSounds() = runTest {
+        val r = repo("independent")
+        val s = r.notificationSettings.first()
+        r.setNotificationSettings(s.copy(sounds = s.sounds + (Prayer.FAJR to PrayerSound.ADHAN)))
+        r.setPrayerSettings(PrayerSettings(hijriOffsetDays = 1))
+        assertEquals(PrayerSound.ADHAN, r.notificationSettings.first().soundFor(Prayer.FAJR))
+    }
+
+    @Test
+    fun anUnknownStoredSoundFallsBackToTakbirRatherThanCrashing() = runTest {
+        val r = repo("corrupt-sound")
+        r.writeRawSoundForTest(Prayer.MAGHRIB, "TRUMPET")
+        assertEquals(PrayerSound.TAKBIR, r.notificationSettings.first().soundFor(Prayer.MAGHRIB))
+    }
+
+    @Test
+    fun theLeadOptionsStartAtNever() {
+        assertEquals(0, NotificationSettings.LeadOptions.first())
     }
 }
