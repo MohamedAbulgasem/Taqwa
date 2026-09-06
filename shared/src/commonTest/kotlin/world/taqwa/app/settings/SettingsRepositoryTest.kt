@@ -75,6 +75,30 @@ class SettingsRepositoryTest {
         assertEquals("Europe/London", got.timeZoneId)
         assertEquals("London", got.cityName)
     }
+
+    @Test
+    fun minuteAdjustmentsDefaultToEmpty() = runTest {
+        assertEquals(emptyMap(), repo("adj-default").prayerSettings.first().minuteAdjustments)
+    }
+
+    @Test
+    fun minuteAdjustmentsSurviveARoundTrip() = runTest {
+        val r = repo("adj-roundtrip")
+        r.setPrayerSettings(
+            PrayerSettings(minuteAdjustments = mapOf(Prayer.FAJR to 5, Prayer.ISHA to -3)),
+        )
+        assertEquals(
+            mapOf(Prayer.FAJR to 5, Prayer.ISHA to -3),
+            r.prayerSettings.first().minuteAdjustments,
+        )
+    }
+
+    @Test
+    fun aMalformedStoredAdjustmentYieldsAnEmptyMapRatherThanCrashing() = runTest {
+        val r = repo("adj-corrupt")
+        r.writeRawMinuteAdjustmentsForTest("NOON:5,FAJR:later,,:::")
+        assertEquals(emptyMap(), r.prayerSettings.first().minuteAdjustments)
+    }
 }
 
 class NotificationSettingsStorageTest {

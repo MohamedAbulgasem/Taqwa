@@ -13,6 +13,9 @@ internal object SettingsKeys {
     val HIGH_LAT = stringPreferencesKey("high_latitude")
     val HIJRI_OFFSET = intPreferencesKey("hijri_offset_days")
     val SHOW_SUNRISE = booleanPreferencesKey("show_sunrise")
+    // One string rather than a key per prayer: the map is written and read as a unit, and a
+    // single preference keeps the removal of an offset from leaving a stale key behind.
+    val MINUTE_ADJUSTMENTS = stringPreferencesKey("minute_adjustments")
     // Now read/written by notification settings (Task 15); kept under the same preference name
     // so a value stored by Plan 1 keeps working.
     val REMIND_BEFORE = intPreferencesKey("remind_before_minutes")

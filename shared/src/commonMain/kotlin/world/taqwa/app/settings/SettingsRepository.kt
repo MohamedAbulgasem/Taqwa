@@ -20,6 +20,27 @@ import world.taqwa.app.domain.PrayerSound
 private inline fun <reified E : Enum<E>> String?.toEnumOr(fallback: E): E =
     this?.let { name -> enumValues<E>().firstOrNull { it.name == name } } ?: fallback
 
+/**
+ * Per-prayer minute offsets serialise as `"FAJR:5,ISHA:-3"` — one preference, read and written as
+ * a unit. Parsing is deliberately tolerant in the same spirit as [toEnumOr]: an entry naming a
+ * prayer this build does not know, or carrying a value that is not an integer, is skipped rather
+ * than thrown, so a preference file written by another version can never stop the app starting.
+ */
+internal fun encodeMinuteAdjustments(adjustments: Map<Prayer, Int>): String =
+    adjustments.entries
+        .filter { it.value != 0 }
+        .joinToString(",") { "${it.key.name}:${it.value}" }
+
+internal fun decodeMinuteAdjustments(raw: String?): Map<Prayer, Int> {
+    if (raw.isNullOrBlank()) return emptyMap()
+    return raw.split(",").mapNotNull { entry ->
+        val name = entry.substringBefore(':', missingDelimiterValue = "")
+        val prayer = Prayer.entries.firstOrNull { it.name == name } ?: return@mapNotNull null
+        val minutes = entry.substringAfter(':').toIntOrNull() ?: return@mapNotNull null
+        prayer to minutes
+    }.toMap()
+}
+
 class SettingsRepository(private val store: DataStore<Preferences>) {
 
     val themeMode: Flow<ThemeMode> =
@@ -35,6 +56,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             highLatitude = p[SettingsKeys.HIGH_LAT].toEnumOr(HighLatitudePreference.AUTOMATIC),
             hijriOffsetDays = p[SettingsKeys.HIJRI_OFFSET] ?: 0,
             showSunrise = p[SettingsKeys.SHOW_SUNRISE] ?: false,
+            minuteAdjustments = decodeMinuteAdjustments(p[SettingsKeys.MINUTE_ADJUSTMENTS]),
         )
     }
 
@@ -71,6 +93,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             it[SettingsKeys.HIGH_LAT] = settings.highLatitude.name
             it[SettingsKeys.HIJRI_OFFSET] = settings.hijriOffsetDays
             it[SettingsKeys.SHOW_SUNRISE] = settings.showSunrise
+            it[SettingsKeys.MINUTE_ADJUSTMENTS] = encodeMinuteAdjustments(settings.minuteAdjustments)
         }
     }
 
@@ -89,8 +112,13 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             it[SettingsKeys.LOCATION_LAT] = location.latitude
             it[SettingsKeys.LOCATION_LON] = location.longitude
             it[SettingsKeys.LOCATION_TZ] = location.timeZoneId
-            location.cityName?.let { n -> it[SettingsKeys.LOCATION_CITY] = n }
-            location.countryCode?.let { c -> it[SettingsKeys.LOCATION_COUNTRY] = c }
+            // Cleared, not skipped, when absent: a GPS fix has no city name, and leaving the
+            // previously chosen city's label in place would caption the new coordinates with
+            // the old city's name.
+            val city = location.cityName
+            if (city == null) it.remove(SettingsKeys.LOCATION_CITY) else it[SettingsKeys.LOCATION_CITY] = city
+            val country = location.countryCode
+            if (country == null) it.remove(SettingsKeys.LOCATION_COUNTRY) else it[SettingsKeys.LOCATION_COUNTRY] = country
         }
     }
 
@@ -102,5 +130,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     /** Test-only hook for the forward-compatibility case, matching [writeRawThemeForTest]. */
     internal suspend fun writeRawSoundForTest(prayer: Prayer, raw: String) {
         store.edit { it[SettingsKeys.soundKey(prayer)] = raw }
+    }
+
+    /** Test-only hook for the forward-compatibility case, matching [writeRawThemeForTest]. */
+    internal suspend fun writeRawMinuteAdjustmentsForTest(raw: String) {
+        store.edit { it[SettingsKeys.MINUTE_ADJUSTMENTS] = raw }
     }
 }
