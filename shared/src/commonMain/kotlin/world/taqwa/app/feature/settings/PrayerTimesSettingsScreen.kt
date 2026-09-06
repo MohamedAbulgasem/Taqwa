@@ -63,6 +63,7 @@ import world.taqwa.app.resources.hijri_day_before
 import world.taqwa.app.resources.hijri_tabular
 import world.taqwa.app.resources.manual_note
 import world.taqwa.app.resources.method_picker_note
+import world.taqwa.app.resources.method_tehran_maghrib_note
 import world.taqwa.app.resources.prayer_times_high_latitude
 import world.taqwa.app.resources.prayer_times_hijri_label
 import world.taqwa.app.resources.prayer_times_madhab_label
@@ -222,6 +223,15 @@ fun MethodPickerScreen(
                 if (i > 0) CardDivider()
                 TaqwaRow(
                     label = methodDisplayName(id),
+                    // Tehran is reconstructed from its Fajr/Isha angles on top of adhan2's OTHER
+                    // method, which carries no Maghrib angle, so its 4.5° Maghrib is not applied.
+                    // A Shia user choosing this method gets a sunset-based Maghrib and deserves
+                    // to be told here rather than only in a code comment.
+                    subtitle = if (id == CalculationMethodId.TEHRAN) {
+                        stringResource(Res.string.method_tehran_maghrib_note)
+                    } else {
+                        null
+                    },
                     onClick = { onPick(id) },
                     trailing = { if (id == current) CheckMark() },
                 )

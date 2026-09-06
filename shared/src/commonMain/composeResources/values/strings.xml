@@ -171,4 +171,5 @@
     <string name="qibla_cardinal_west">W</string>
     <string name="notifications_exact_alarms_off">Exact alarms are turned off for Taqwa, so notifications may arrive a few minutes late. Turn on “Alarms &amp; reminders” in system settings to fix this.</string>
     <string name="hijri_tabular">Tabular</string>
+    <string name="method_tehran_maghrib_note">Maghrib follows sunset; this method’s 4.5° Maghrib angle is not applied yet.</string>
 </resources>
