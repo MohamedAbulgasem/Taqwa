@@ -10,7 +10,11 @@ import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.HighLatitudePreference
+import world.taqwa.app.domain.NotificationSettings
+import world.taqwa.app.domain.ObligatoryPrayers
+import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
+import world.taqwa.app.domain.PrayerSound
 
 /** Reads a stored enum name, falling back to [fallback] when the value is absent or unrecognised. */
 private inline fun <reified E : Enum<E>> String?.toEnumOr(fallback: E): E =
@@ -31,6 +35,15 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             highLatitude = p[SettingsKeys.HIGH_LAT].toEnumOr(HighLatitudePreference.AUTOMATIC),
             hijriOffsetDays = p[SettingsKeys.HIJRI_OFFSET] ?: 0,
             showSunrise = p[SettingsKeys.SHOW_SUNRISE] ?: false,
+        )
+    }
+
+    val notificationSettings: Flow<NotificationSettings> = store.data.map { p ->
+        NotificationSettings(
+            enabled = p[SettingsKeys.NOTIFICATIONS_ENABLED] ?: true,
+            sounds = ObligatoryPrayers.associateWith { prayer ->
+                p[SettingsKeys.soundKey(prayer)].toEnumOr(PrayerSound.TAKBIR)
+            },
             remindBeforeMinutes = p[SettingsKeys.REMIND_BEFORE] ?: 0,
         )
     }
@@ -58,7 +71,16 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             it[SettingsKeys.HIGH_LAT] = settings.highLatitude.name
             it[SettingsKeys.HIJRI_OFFSET] = settings.hijriOffsetDays
             it[SettingsKeys.SHOW_SUNRISE] = settings.showSunrise
-            it[SettingsKeys.REMIND_BEFORE] = settings.remindBeforeMinutes
+        }
+    }
+
+    suspend fun setNotificationSettings(settings: NotificationSettings) {
+        store.edit { e ->
+            e[SettingsKeys.NOTIFICATIONS_ENABLED] = settings.enabled
+            ObligatoryPrayers.forEach { prayer ->
+                e[SettingsKeys.soundKey(prayer)] = settings.soundFor(prayer).name
+            }
+            e[SettingsKeys.REMIND_BEFORE] = settings.remindBeforeMinutes
         }
     }
 
@@ -75,5 +97,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     /** Test-only hook for the forward-compatibility case. */
     internal suspend fun writeRawThemeForTest(raw: String) {
         store.edit { it[SettingsKeys.THEME] = raw }
+    }
+
+    /** Test-only hook for the forward-compatibility case, matching [writeRawThemeForTest]. */
+    internal suspend fun writeRawSoundForTest(prayer: Prayer, raw: String) {
+        store.edit { it[SettingsKeys.soundKey(prayer)] = raw }
     }
 }

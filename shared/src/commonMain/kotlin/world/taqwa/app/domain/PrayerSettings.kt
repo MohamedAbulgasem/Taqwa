@@ -15,6 +15,5 @@ data class PrayerSettings(
     val highLatitude: HighLatitudePreference = HighLatitudePreference.AUTOMATIC,
     val hijriOffsetDays: Int = 0,
     val showSunrise: Boolean = false,
-    val remindBeforeMinutes: Int = 0,
     val minuteAdjustments: Map<Prayer, Int> = emptyMap(),
 )
