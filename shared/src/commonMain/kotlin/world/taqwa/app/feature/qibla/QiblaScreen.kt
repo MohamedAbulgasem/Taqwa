@@ -2,9 +2,7 @@ package world.taqwa.app.feature.qibla
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,7 +29,6 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.qibla_back
 import world.taqwa.app.resources.qibla_bearing
 import world.taqwa.app.resources.qibla_calibration_help
 import world.taqwa.app.resources.qibla_distance
@@ -60,7 +55,7 @@ internal fun localizedGroupedKm(km: Double, format: PlatformFormat): String {
 }
 
 @Composable
-fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun QiblaScreen(state: QiblaUiState, modifier: Modifier = Modifier) {
     val colors = LocalTaqwaColors.current
     Column(
         modifier
@@ -69,8 +64,9 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        BackLink(onBack, Modifier.align(Alignment.Start))
-
+        // A tab root, so there is nowhere to go "back" to: the bar below is the way out. The
+        // 20 dp stands in for the height the back link used to give the title.
+        Spacer(Modifier.height(20.dp))
         Text(stringResource(Res.string.qibla_title), style = TaqwaText.screenTitle, color = colors.textPrimary)
         Spacer(Modifier.height(4.dp))
         when (state) {
@@ -154,42 +150,6 @@ private fun Readout(bearingDegrees: Double, distanceKm: Double) {
         style = TaqwaText.caption,
         color = colors.textSecondary,
     )
-}
-
-/** A text back link rather than the settings chevron: the mockup names the destination. */
-@Composable
-private fun BackLink(onBack: () -> Unit, modifier: Modifier = Modifier) {
-    val colors = LocalTaqwaColors.current
-    Row(
-        modifier
-            .height(44.dp)
-            .clickable(onClick = onBack)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Canvas(Modifier.size(width = 6.dp, height = 12.dp)) {
-            drawLine(
-                color = colors.textSecondary,
-                start = Offset(size.width, 0f),
-                end = Offset(0f, size.height / 2f),
-                strokeWidth = 1.6.dp.toPx(),
-                cap = StrokeCap.Round,
-            )
-            drawLine(
-                color = colors.textSecondary,
-                start = Offset(0f, size.height / 2f),
-                end = Offset(size.width, size.height),
-                strokeWidth = 1.6.dp.toPx(),
-                cap = StrokeCap.Round,
-            )
-        }
-        Spacer(Modifier.width(8.dp))
-        Text(
-            stringResource(Res.string.qibla_back),
-            style = TaqwaText.caption.copy(fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
-            color = colors.textSecondary,
-        )
-    }
 }
 
 /** Two overlapping ovals — the motion being asked for, drawn rather than described. */

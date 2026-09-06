@@ -5,8 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Slice 1 has a root screen and a handful of pushed children, so a list in a StateFlow is the
- * whole requirement. Revisit when the tab bar arrives in slice 2.
+ * A list in a StateFlow is the whole requirement: three tab roots and a handful of pushed
+ * children. The tab bar arrived early, on the owner's call after seeing Today on a phone, but it
+ * brings no per-tab history with it — [selectTab] replaces the stack rather than juggling three.
  */
 class Navigator(start: Screen) {
 
@@ -29,4 +30,16 @@ class Navigator(start: Screen) {
     fun replaceAll(screen: Screen) {
         _backStack.value = listOf(screen)
     }
+
+    /**
+     * The tab currently showing, read from the bottom of the stack so a pushed sub-screen still
+     * reports the tab it was opened from. Null during onboarding, which has no tab bar.
+     */
+    val currentTab: Tab? get() = tabOf(_backStack.value.first())
+
+    /**
+     * Switches tabs by replacing the stack with [tab]'s root. See [Tab] for why there is no
+     * per-tab history to restore.
+     */
+    fun selectTab(tab: Tab) = replaceAll(tab.root)
 }
