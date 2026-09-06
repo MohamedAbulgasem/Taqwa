@@ -21,7 +21,7 @@ EXT_TARGET    = 'TaqwaWidget'
 EXT_GROUP_DIR = 'TaqwaWidget'                       # relative to SRCROOT (= iosApp/)
 APP_GROUP_ID  = 'group.world.taqwa.app'
 EXT_BUNDLE_ID = 'world.taqwa.app.widget'
-TEAM_ID       = '36383TYK26'
+TEAM_ID       = '5S5P2Q72MV'
 DEPLOYMENT    = '16.0'
 
 # Swift sources that belong to the extension, and whether the *app* compiles them too. The views
