@@ -250,3 +250,72 @@ is `remember`ed so a live locale change without restart desyncs direction from s
 city names are Latin-only in the Arabic UI; iOS returns Western digits for `ar_EG` where Android
 returns Arabic-Indic (each platform's own CLDR answer); the medium and dark Android widgets were
 not visually verified live.
+
+### Final review and fix wave — slice 1 ready for `main`
+
+**Final tree: 247 tests on JVM, 248 on iOS native, zero failures. Both apps build; the iOS widget
+extension is 2 MB against a 15 MB guard; 139 string keys, identical sets in English and Arabic.**
+
+A whole-branch review of all 56 commits found **5 Critical, 12 Important, 14 Minor** and returned
+"ready after Critical + Important". Every finding was then fixed in three parallel waves split by
+file ownership, and two independent closure audits walked each finding's failure scenario through
+the fixed code. Result: **all 31 closed** (26 audited in the first pass — 24 closed outright, one
+deferred to the widget wave, one re-opened and fixed — plus the widget wave's five, audited second).
+
+**The five Criticals, because you should know what would have shipped without the review:**
+
+1. **The compass crashed at the moment it succeeded.** `Vibrator.vibrate()` needs the `VIBRATE`
+   permission, which was declared nowhere. Rotate to within 5° of the qibla → haptic tick →
+   `SecurityException` on the main scope. One manifest line, plus `runCatching` so an OEM
+   restriction degrades to silence rather than a crash.
+2. **iOS notifications ignored the timezone and broke on Islamic calendars.** The
+   `NSDateComponents` handed to the trigger carried no calendar and no zone, so iOS re-read them
+   in the device's zone and the device's region calendar. Pick a city in another zone → every adhan
+   off by the UTC offset. Set your iPhone's region calendar to Umm al-Qura → year 1448 read as
+   Gregorian → no notification ever fires, silently. Now an explicit Gregorian calendar with the
+   entry's zone, proven on device with a Johannesburg phone and a London location: every trigger's
+   fire date matches its instant to the second.
+3. **Android 12 could crash on every launch.** `setExactAndAllowWhileIdle` had no
+   `canScheduleExactAlarms()` guard; revoke "Alarms & reminders" in system settings and the app
+   died at startup, unrecoverable from inside. Now guarded, with a `setWindow` fallback and a note in
+   Notification settings when exact alarms are unavailable.
+4. **Calculation-method auto-detection was fully tested dead code.** `CalculationMethodDefaults`
+   existed, passed eight tests, and was never called. Every user outside Muslim World League —
+   Saudi, Turkish, Egyptian, Pakistani, Indonesian, Gulf — quietly got times a few minutes off. Now
+   wired at both location-persist sites, gated by a "method was user-chosen" flag so relocating
+   never overwrites a deliberate choice. Proven: picking Riyadh selects Umm al-Qura and
+   Maghrib→Isha comes out at exactly 90 minutes, that method's signature.
+5. **A once-per-second widget refresh storm.** `ringProgress` changed every tick, defeating iOS's
+   dedupe and exhausting WidgetKit's daily reload budget in under a minute — after which the widget
+   would freeze for the day — while Android ran `runBlocking` Glance updates on the main thread.
+   Now quantised, deduplicated on the serialised string, and non-blocking. Measured: 4 mirror
+   writes in 90 seconds instead of ~90.
+
+**Two corrections to earlier claims in this log, stated plainly:**
+
+- The Hijri calendar is the **tabular civil** algorithm, not Umm al-Qura. It gives 1448-03-**23**
+  for 6 September 2026 where the Umm al-Qura reference gives **24**, and the original test asserted
+  only year and month — a test fitted to the implementation. The class is now named
+  `TabularHijriCalendar`, the settings copy no longer says "Umm al-Qura", and the day is asserted.
+  Whether to ship the real Umm al-Qura table is a product decision for you; the ±1 day user offset
+  covers the difference meanwhile.
+- The high-latitude "engine memo" I described as fixed was a single slot that never hit once
+  `TodayViewModel` computed three dates per tick; the cost had *risen*. The second audit caught it.
+  Now a bounded map; the three-date pattern repeats with zero additional solves.
+
+**Other things fixed in the wave:** the countdown ring was flat every night between midnight and
+Fajr; location never re-acquired after onboarding (fly Cape Town → Istanbul and it stayed on Cape
+Town forever); the iOS compass delegate could be garbage-collected mid-use; iOS location permission
+could hang forever off the main thread; Android returned no GPS fix on a phone without a cached one;
+the 34,000-city database parsed on the UI thread; notification channels multiplied with identical
+English names; the Android widget showed a confidently stale countdown for hours; two tap targets
+were under 44 pt; the adhan preview was inaudible with the ring switch on silent.
+
+**Known and accepted at slice 1 close:** the Tehran method omits its 4.5° Maghrib angle (now shown
+as a subtitle in the picker); the ar-EG countdown uses Western digits because the system Arabic
+font's digits are not tabular (accepted in the spec); GeoNames city names are Latin-only in the
+Arabic UI; iOS and Android disagree on `ar_EG` digits because each follows its own CLDR.
+
+**What is on your side, unchanged:** enable notifications for Taqwa in your LoopPhone's system
+settings (the OEM forces `importance=NONE` below the permission we hold); and
+`sudo xcode-select -s "/Applications/Xcode 26.app/Contents/Developer"`.
