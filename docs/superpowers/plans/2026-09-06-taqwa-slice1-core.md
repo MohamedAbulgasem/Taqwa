@@ -35,9 +35,9 @@ Every task's requirements implicitly include these. Values are copied verbatim f
 gradle/libs.versions.toml                     version catalog — single source of dependency truth
 settings.gradle.kts                           module registration
 build.gradle.kts                              root plugin declarations
-composeApp/build.gradle.kts                   KMP targets, source sets, Android config
+shared/build.gradle.kts                   KMP targets, source sets, Android config
 
-composeApp/src/commonMain/kotlin/world/taqwa/app/
+shared/src/commonMain/kotlin/world/taqwa/app/
   App.kt                                      root composable; wires container + backstack
   di/AppContainer.kt                          manual dependency graph
   nav/Screen.kt                               sealed navigation destinations
@@ -84,21 +84,21 @@ composeApp/src/commonMain/kotlin/world/taqwa/app/
   feature/settings/CitySearchScreen.kt
   feature/settings/AppearanceSettingsScreen.kt
 
-composeApp/src/commonMain/composeResources/
+shared/src/commonMain/composeResources/
   font/Manrope-{Light,Regular,SemiBold,ExtraBold}.ttf
   files/cities.csv                            generated, bundled
 
-composeApp/src/androidMain/kotlin/world/taqwa/app/
+shared/src/androidMain/kotlin/world/taqwa/app/
   MainActivity.kt
   settings/DataStoreFactory.android.kt
   location/LocationProvider.android.kt
 
-composeApp/src/iosMain/kotlin/world/taqwa/app/
+shared/src/iosMain/kotlin/world/taqwa/app/
   MainViewController.kt
   settings/DataStoreFactory.ios.kt
   location/LocationProvider.ios.kt
 
-composeApp/src/commonTest/kotlin/world/taqwa/app/     mirrors the above
+shared/src/commonTest/kotlin/world/taqwa/app/     mirrors the above
 iosApp/                                                Xcode project
 tools/build-city-db.py                                 GeoNames -> cities.csv
 ```
@@ -111,23 +111,92 @@ Nothing is testable until both platforms build, so scaffolding is one task endin
 
 **Files:**
 - Create: `gradle/libs.versions.toml`, `settings.gradle.kts`, `build.gradle.kts`, `gradle.properties`
-- Create: `composeApp/build.gradle.kts`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/App.kt`
-- Create: `composeApp/src/androidMain/kotlin/world/taqwa/app/MainActivity.kt`
-- Create: `composeApp/src/androidMain/AndroidManifest.xml`
-- Create: `composeApp/src/iosMain/kotlin/world/taqwa/app/MainViewController.kt`
+- Create: `shared/build.gradle.kts`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/App.kt`
+- Create: `androidApp/src/androidMain/kotlin/world/taqwa/app/MainActivity.kt`
+- Create: `androidApp/src/androidMain/AndroidManifest.xml`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/MainViewController.kt`
 - Create: `iosApp/` Xcode project
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/SmokeTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/SmokeTest.kt`
 
 **Interfaces:**
 - Consumes: nothing
 - Produces: `App()` composable entry point; Gradle module `:composeApp`; version catalog aliases used by every later task
 
-- [ ] **Step 1: Generate the project skeleton from the KMP wizard**
+- [ ] **Step 1: Start from the JetBrains template and upgrade it**
 
-Use the JetBrains wizard at https://kmp.jetbrains.com with Android + iOS selected and "Share UI" enabled. Unpack it into the repo so that `composeApp/` and `iosApp/` sit beside the existing `docs/` and `assets/`. Set the package to `world.taqwa.app` and the application name to `Taqwa`.
+The kmp.jetbrains.com wizard endpoint returns 404. Use JetBrains' maintained template instead —
+it ships a working Xcode project and Gradle wrapper, which are the parts that are painful to
+hand-roll:
 
-Do not hand-write the Gradle wrapper or the Xcode project — the wizard's output is the supported configuration and hand-rolling it wastes hours.
+```bash
+git clone --depth 1 https://github.com/JetBrains/compose-multiplatform-ios-android-template /tmp/kmp-tmpl
+cp -R /tmp/kmp-tmpl/{shared,androidApp,iosApp,gradle,gradlew,gradlew.bat,build.gradle.kts,settings.gradle.kts,gradle.properties} .
+rm -rf /tmp/kmp-tmpl
+```
+
+The template pins Kotlin 1.9.21, which **cannot consume adhan2** — a library compiled with
+Kotlin 2.x metadata is unreadable by a 1.9 compiler. Upgrading is mandatory, not cosmetic.
+
+Module layout is the template's three-module split, and the plan's paths assume it:
+`shared/` (the KMP module: all logic, all UI, all tests), `androidApp/` (the Android host and
+`MainActivity`), `iosApp/` (the Xcode project). Do **not** rename `shared` — the Xcode build
+phase invokes `:shared:embedAndSignAppleFrameworkForXcode` by name, and renaming means editing
+`project.pbxproj`.
+
+Set `rootProject.name = "Taqwa"` in `settings.gradle.kts`. Set both namespaces to
+`world.taqwa.app` (use `world.taqwa.app.shared` for the library module) and `applicationId` to
+`world.taqwa.app`.
+
+In `iosApp/Configuration/Config.xcconfig` set:
+
+```
+TEAM_ID=36383TYK26
+BUNDLE_ID=world.taqwa.app
+APP_NAME=Taqwa
+```
+
+- [ ] **Step 1b: Upgrade the toolchain**
+
+In `gradle.properties`, replace the version block:
+
+```properties
+#Versions
+kotlin.version=2.2.20
+agp.version=8.7.3
+compose.version=1.12.0
+
+#Android
+android.useAndroidX=true
+android.targetSdk=35
+android.compileSdk=35
+android.minSdk=26
+```
+
+Bump the wrapper: `./gradlew wrapper --gradle-version 8.11.1`
+
+Kotlin 2.0 and later require the Compose compiler plugin to be applied explicitly. Add to
+`settings.gradle.kts` `pluginManagement.plugins`:
+
+```kotlin
+id("org.jetbrains.kotlin.plugin.compose").version(kotlinVersion)
+```
+
+and apply `id("org.jetbrains.kotlin.plugin.compose")` in both `shared/build.gradle.kts` and
+`androidApp/build.gradle.kts`. Without it the build fails with "Compose Compiler plugin not
+found", which is the single most likely failure in this task.
+
+Also pin the resource package so generated imports are deterministic — add to
+`shared/build.gradle.kts`:
+
+```kotlin
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "world.taqwa.app.resources"
+}
+```
+
+Every later task imports `world.taqwa.app.resources.Res`.
 
 - [ ] **Step 2: Pin the version catalog**
 
@@ -162,11 +231,11 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-mu
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ```
 
-> If Gradle fails to resolve any of these, run `./gradlew :composeApp:dependencies --configuration commonMainCompileClasspath` and bump the failing version to the newest release on Maven Central. The catalog is the single place to change it.
+> If Gradle fails to resolve any of these, run `./gradlew :shared:dependencies --configuration commonMainCompileClasspath` and bump the failing version to the newest release on Maven Central. The catalog is the single place to change it.
 
 - [ ] **Step 3: Declare dependencies in the shared source set**
 
-In `composeApp/build.gradle.kts`, inside `kotlin { sourceSets { ... } }`:
+In `shared/build.gradle.kts`, inside `kotlin { sourceSets { ... } }`:
 
 ```kotlin
 commonMain.dependencies {
@@ -190,7 +259,7 @@ androidMain.dependencies {
 
 - [ ] **Step 4: Write the smoke test**
 
-`composeApp/src/commonTest/kotlin/world/taqwa/app/SmokeTest.kt`:
+`shared/src/commonTest/kotlin/world/taqwa/app/SmokeTest.kt`:
 
 ```kotlin
 package world.taqwa.app
@@ -212,8 +281,8 @@ This proves the multiplatform dependency actually resolves for both targets befo
 
 - [ ] **Step 5: Run the test on both targets**
 
-Run: `./gradlew :composeApp:allTests`
-Expected: PASS. If `Coordinates` cannot be resolved, the adhan2 artifact did not publish for one of your targets — check `./gradlew :composeApp:dependencies` before going further.
+Run: `./gradlew :shared:allTests`
+Expected: PASS. If `Coordinates` cannot be resolved, the adhan2 artifact did not publish for one of your targets — check `./gradlew :shared:dependencies` before going further.
 
 - [ ] **Step 6: Replace App.kt with a placeholder that proves rendering**
 
@@ -243,7 +312,7 @@ fun App() {
 
 - [ ] **Step 7: Build and run on both platforms**
 
-Run: `./gradlew :composeApp:assembleDebug`
+Run: `./gradlew :androidApp:assembleDebug`
 Expected: BUILD SUCCESSFUL.
 
 Then open `iosApp/iosApp.xcodeproj` in Xcode and run on an iOS 16+ simulator. Expected: the word "Taqwa" centred on screen.
@@ -262,9 +331,9 @@ git commit -m "feat: KMP + Compose Multiplatform scaffold building on Android an
 ### Task 2: Colour tokens and theming
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/Palette.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/TaqwaTheme.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/design/PaletteTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/design/Palette.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/design/TaqwaTheme.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/design/PaletteTest.kt`
 
 **Interfaces:**
 - Consumes: nothing
@@ -309,7 +378,7 @@ class PaletteTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*PaletteTest*"`
+Run: `./gradlew :shared:allTests --tests "*PaletteTest*"`
 Expected: FAIL — `Unresolved reference: LightColors`
 
 - [ ] **Step 3: Write Palette.kt**
@@ -410,13 +479,13 @@ fun TaqwaTheme(mode: ThemeMode, content: @Composable () -> Unit) {
 
 - [ ] **Step 5: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*PaletteTest*"`
+Run: `./gradlew :shared:allTests --tests "*PaletteTest*"`
 Expected: PASS, 4 tests.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/design composeApp/src/commonTest/kotlin/world/taqwa/app/design
+git add shared/src/commonMain/kotlin/world/taqwa/app/design shared/src/commonTest/kotlin/world/taqwa/app/design
 git commit -m "feat: colour tokens and light/dark theming"
 ```
 
@@ -425,9 +494,9 @@ git commit -m "feat: colour tokens and light/dark theming"
 ### Task 3: Typography — Manrope and the text scale
 
 **Files:**
-- Create: `composeApp/src/commonMain/composeResources/font/Manrope-Light.ttf`, `-Regular.ttf`, `-SemiBold.ttf`, `-ExtraBold.ttf`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/Type.kt`
-- Modify: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/TaqwaTheme.kt` — restore `TaqwaTypography()`
+- Create: `shared/src/commonMain/composeResources/font/Manrope-Light.ttf`, `-Regular.ttf`, `-SemiBold.ttf`, `-ExtraBold.ttf`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/design/Type.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/design/TaqwaTheme.kt` — restore `TaqwaTypography()`
 
 **Interfaces:**
 - Consumes: `TaqwaColors` from Task 2
@@ -440,7 +509,7 @@ Download Manrope from Google Fonts (OFL) and place the four static weights under
 Record the licence:
 
 ```bash
-mkdir -p composeApp/src/commonMain/composeResources/font
+mkdir -p shared/src/commonMain/composeResources/font
 curl -sL -o /tmp/manrope.zip "https://fonts.google.com/download?family=Manrope"
 # unzip the four static weights into composeResources/font/
 ```
@@ -459,11 +528,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import taqwa.composeapp.generated.resources.Manrope_ExtraBold
-import taqwa.composeapp.generated.resources.Manrope_Light
-import taqwa.composeapp.generated.resources.Manrope_Regular
-import taqwa.composeapp.generated.resources.Manrope_SemiBold
-import taqwa.composeapp.generated.resources.Res
+import world.taqwa.app.resources.Manrope_ExtraBold
+import world.taqwa.app.resources.Manrope_Light
+import world.taqwa.app.resources.Manrope_Regular
+import world.taqwa.app.resources.Manrope_SemiBold
+import world.taqwa.app.resources.Res
 
 @Composable
 fun manropeFamily(): FontFamily = FontFamily(
@@ -507,7 +576,7 @@ In `TaqwaTheme.kt`, change `typography = MaterialTheme.typography` back to `typo
 
 - [ ] **Step 4: Verify tabular figures render without jitter**
 
-Add `composeApp/src/commonTest/kotlin/world/taqwa/app/design/TypeTest.kt`:
+Add `shared/src/commonTest/kotlin/world/taqwa/app/design/TypeTest.kt`:
 
 ```kotlin
 package world.taqwa.app.design
@@ -529,18 +598,18 @@ class TypeTest {
 }
 ```
 
-Run: `./gradlew :composeApp:allTests --tests "*TypeTest*"` — Expected: PASS.
+Run: `./gradlew :shared:allTests --tests "*TypeTest*"` — Expected: PASS.
 
 Tabular alignment itself cannot be unit-tested; verify it visually in Task 11 by watching the countdown tick from `1:12` to `1:11` and confirming nothing shifts horizontally.
 
 - [ ] **Step 5: Build both platforms**
 
-Run: `./gradlew :composeApp:assembleDebug` — Expected: BUILD SUCCESSFUL. Then run the iOS app in Xcode and confirm "Taqwa" now renders in Manrope rather than the system font. If the font does not apply on iOS, the generated `Res.font` accessor name does not match the filename — check `build/generated/compose/resourceGenerator`.
+Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL. Then run the iOS app in Xcode and confirm "Taqwa" now renders in Manrope rather than the system font. If the font does not apply on iOS, the generated `Res.font` accessor name does not match the filename — check `build/generated/compose/resourceGenerator`.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add composeApp/src/commonMain/composeResources composeApp/src/commonMain/kotlin/world/taqwa/app/design composeApp/src/commonTest/kotlin/world/taqwa/app/design
+git add shared/src/commonMain/composeResources shared/src/commonMain/kotlin/world/taqwa/app/design shared/src/commonTest/kotlin/world/taqwa/app/design
 git commit -m "feat: bundle Manrope and define the type scale"
 ```
 
@@ -549,14 +618,14 @@ git commit -m "feat: bundle Manrope and define the type scale"
 ### Task 4: Settings storage
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/settings/DataStoreFactory.kt`
-- Create: `composeApp/src/androidMain/kotlin/world/taqwa/app/settings/DataStoreFactory.android.kt`
-- Create: `composeApp/src/iosMain/kotlin/world/taqwa/app/settings/DataStoreFactory.ios.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/settings/SettingsKeys.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/settings/SettingsRepository.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/domain/Prayer.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/domain/PrayerSettings.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/settings/SettingsRepositoryTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/settings/DataStoreFactory.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/settings/DataStoreFactory.android.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/settings/DataStoreFactory.ios.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/settings/SettingsKeys.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/settings/SettingsRepository.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/domain/Prayer.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/domain/PrayerSettings.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/settings/SettingsRepositoryTest.kt`
 
 **Interfaces:**
 - Consumes: `ThemeMode` from Task 2
@@ -629,7 +698,7 @@ class SettingsRepositoryTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*SettingsRepositoryTest*"`
+Run: `./gradlew :shared:allTests --tests "*SettingsRepositoryTest*"`
 Expected: FAIL — `Unresolved reference: SettingsRepository`
 
 - [ ] **Step 3: Write the domain settings types**
@@ -814,13 +883,13 @@ The `toEnumOr` helper is the point of the last test: a settings file written by 
 
 - [ ] **Step 6: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*SettingsRepositoryTest*"`
+Run: `./gradlew :shared:allTests --tests "*SettingsRepositoryTest*"`
 Expected: PASS, 6 tests. The defaults asserted here are exactly the spec's defaults table.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/settings composeApp/src/commonMain/kotlin/world/taqwa/app/domain composeApp/src/androidMain composeApp/src/iosMain composeApp/src/commonTest
+git add shared/src/commonMain/kotlin/world/taqwa/app/settings shared/src/commonMain/kotlin/world/taqwa/app/domain shared/src/androidMain shared/src/iosMain shared/src/commonTest
 git commit -m "feat: multiplatform settings storage with spec defaults"
 ```
 
@@ -829,10 +898,10 @@ git commit -m "feat: multiplatform settings storage with spec defaults"
 ### Task 5: Prayer times engine
 
 **Files:**
-- Modify: `composeApp/src/commonMain/kotlin/world/taqwa/app/domain/Prayer.kt` (append to Task 4's file)
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/domain/GeoLocation.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/prayer/PrayerTimesEngine.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/prayer/PrayerTimesEngineTest.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/domain/Prayer.kt` (append to Task 4's file)
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/domain/GeoLocation.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/prayer/PrayerTimesEngine.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/prayer/PrayerTimesEngineTest.kt`
 
 **Interfaces:**
 - Consumes: `PrayerSettings`, `AsrMadhab`, `CalculationMethodId`, `HighLatitudePreference` from Task 4
@@ -875,9 +944,9 @@ class AdhanApiProbeTest {
 
 - [ ] **Step 2: Run the probe**
 
-Run: `./gradlew :composeApp:allTests --tests "*AdhanApiProbeTest*"`
+Run: `./gradlew :shared:allTests --tests "*AdhanApiProbeTest*"`
 
-Expected: PASS. If it fails to compile, the property or constructor names differ in 0.0.7 — open the resolved sources (`./gradlew :composeApp:dependencies` then inspect the artifact, or use the IDE's decompiler) and correct the names here and everywhere below **before** continuing. Do not guess.
+Expected: PASS. If it fails to compile, the property or constructor names differ in 0.0.7 — open the resolved sources (`./gradlew :shared:dependencies` then inspect the artifact, or use the IDE's decompiler) and correct the names here and everywhere below **before** continuing. Do not guess.
 
 - [ ] **Step 3: Write the domain types**
 
@@ -1076,13 +1145,13 @@ class PrayerTimesEngineTest {
 
 - [ ] **Step 6: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*PrayerTimes*"`
+Run: `./gradlew :shared:allTests --tests "*PrayerTimes*"`
 Expected: PASS, 6 tests including the probe.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/prayer composeApp/src/commonMain/kotlin/world/taqwa/app/domain composeApp/src/commonTest/kotlin/world/taqwa/app/prayer
+git add shared/src/commonMain/kotlin/world/taqwa/app/prayer shared/src/commonMain/kotlin/world/taqwa/app/domain shared/src/commonTest/kotlin/world/taqwa/app/prayer
 git commit -m "feat: prayer times engine wrapping adhan2"
 ```
 
@@ -1091,8 +1160,8 @@ git commit -m "feat: prayer times engine wrapping adhan2"
 ### Task 6: High-latitude rule selection
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/prayer/HighLatitudeSelector.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/prayer/HighLatitudeSelectorTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/prayer/HighLatitudeSelector.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/prayer/HighLatitudeSelectorTest.kt`
 
 **Interfaces:**
 - Consumes: `HighLatitudePreference` from Task 4
@@ -1161,7 +1230,7 @@ class HighLatitudeSelectorTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*HighLatitudeSelectorTest*"`
+Run: `./gradlew :shared:allTests --tests "*HighLatitudeSelectorTest*"`
 Expected: FAIL — `Unresolved reference: HighLatitudeSelector`
 
 - [ ] **Step 3: Implement**
@@ -1196,7 +1265,7 @@ object HighLatitudeSelector {
 
 - [ ] **Step 4: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*HighLatitudeSelectorTest*"`
+Run: `./gradlew :shared:allTests --tests "*HighLatitudeSelectorTest*"`
 Expected: PASS, 6 tests.
 
 - [ ] **Step 5: Add the Tromsø integration test**
@@ -1216,14 +1285,14 @@ Append to `PrayerTimesEngineTest.kt`:
     }
 ```
 
-Run: `./gradlew :composeApp:allTests --tests "*PrayerTimesEngineTest*"` — Expected: PASS.
+Run: `./gradlew :shared:allTests --tests "*PrayerTimesEngineTest*"` — Expected: PASS.
 
 This is the test that proves the app does not show absurd times to a user in Tromsø on the longest day of the year.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/prayer composeApp/src/commonTest/kotlin/world/taqwa/app/prayer
+git add shared/src/commonMain/kotlin/world/taqwa/app/prayer shared/src/commonTest/kotlin/world/taqwa/app/prayer
 git commit -m "feat: automatic high-latitude rule selection"
 ```
 
@@ -1232,9 +1301,9 @@ git commit -m "feat: automatic high-latitude rule selection"
 ### Task 7: Timeline state and countdown
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/domain/TimelineState.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/prayer/TimelineBuilder.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/prayer/TimelineBuilderTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/domain/TimelineState.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/prayer/TimelineBuilder.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/prayer/TimelineBuilderTest.kt`
 
 **Interfaces:**
 - Consumes: `DayPrayerTimes`, `Prayer`, `PrayerTime` from Task 5
@@ -1355,7 +1424,7 @@ class TimelineBuilderTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*TimelineBuilderTest*"`
+Run: `./gradlew :shared:allTests --tests "*TimelineBuilderTest*"`
 Expected: FAIL — `Unresolved reference: TimelineBuilder`
 
 - [ ] **Step 3: Write the state types**
@@ -1458,13 +1527,13 @@ Note `Duration` is imported for the return type but not referenced directly; rem
 
 - [ ] **Step 5: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*TimelineBuilderTest*"`
+Run: `./gradlew :shared:allTests --tests "*TimelineBuilderTest*"`
 Expected: PASS, 10 tests.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/domain/TimelineState.kt composeApp/src/commonMain/kotlin/world/taqwa/app/prayer/TimelineBuilder.kt composeApp/src/commonTest/kotlin/world/taqwa/app/prayer/TimelineBuilderTest.kt
+git add shared/src/commonMain/kotlin/world/taqwa/app/domain/TimelineState.kt shared/src/commonMain/kotlin/world/taqwa/app/prayer/TimelineBuilder.kt shared/src/commonTest/kotlin/world/taqwa/app/prayer/TimelineBuilderTest.kt
 git commit -m "feat: prayer timeline state and countdown"
 ```
 
@@ -1473,9 +1542,9 @@ git commit -m "feat: prayer timeline state and countdown"
 ### Task 8: Hijri date
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/hijri/UmmAlQuraCalendar.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/hijri/HijriFormatter.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/hijri/UmmAlQuraCalendarTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/hijri/UmmAlQuraCalendar.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/hijri/HijriFormatter.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/hijri/UmmAlQuraCalendarTest.kt`
 
 **Interfaces:**
 - Consumes: nothing
@@ -1549,7 +1618,7 @@ class UmmAlQuraCalendarTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*UmmAlQuraCalendarTest*"`
+Run: `./gradlew :shared:allTests --tests "*UmmAlQuraCalendarTest*"`
 Expected: FAIL — `Unresolved reference: UmmAlQuraCalendar`
 
 - [ ] **Step 3: Implement the conversion**
@@ -1614,13 +1683,13 @@ The user's `hijriOffsetDays` is applied by shifting the **Gregorian** date befor
 
 - [ ] **Step 5: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*UmmAlQura*"`
+Run: `./gradlew :shared:allTests --tests "*UmmAlQura*"`
 Expected: PASS, 5 tests. If `aKnownModernDateConverts` fails, first re-check your reference value from Step 1 before touching the algorithm.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/hijri composeApp/src/commonTest/kotlin/world/taqwa/app/hijri
+git add shared/src/commonMain/kotlin/world/taqwa/app/hijri shared/src/commonTest/kotlin/world/taqwa/app/hijri
 git commit -m "feat: tabular Hijri calendar conversion and formatting"
 ```
 
@@ -1630,10 +1699,10 @@ git commit -m "feat: tabular Hijri calendar conversion and formatting"
 
 **Files:**
 - Create: `tools/build-city-db.py`
-- Create: `composeApp/src/commonMain/composeResources/files/cities.csv`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/city/City.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/city/CityRepository.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/city/CityRepositoryTest.kt`
+- Create: `shared/src/commonMain/composeResources/files/cities.csv`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/city/City.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/city/CityRepository.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/city/CityRepositoryTest.kt`
 
 **Interfaces:**
 - Consumes: `GeoLocation` from Task 5
@@ -1655,7 +1724,7 @@ Output columns: name,region,countryCode,lat,lon,timezone
 import csv, io, sys, urllib.request, zipfile
 
 URL = "https://download.geonames.org/export/dump/cities15000.zip"
-OUT = "composeApp/src/commonMain/composeResources/files/cities.csv"
+OUT = "shared/src/commonMain/composeResources/files/cities.csv"
 
 with urllib.request.urlopen(URL) as resp:
     zf = zipfile.ZipFile(io.BytesIO(resp.read()))
@@ -1746,7 +1815,7 @@ class CityRepositoryTest {
 
 - [ ] **Step 3: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*CityRepositoryTest*"`
+Run: `./gradlew :shared:allTests --tests "*CityRepositoryTest*"`
 Expected: FAIL — `Unresolved reference: CityRepository`
 
 - [ ] **Step 4: Implement**
@@ -1824,7 +1893,7 @@ Injecting `loadCsv` as a lambda is what keeps this testable in `commonTest` with
 
 - [ ] **Step 5: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*CityRepositoryTest*"`
+Run: `./gradlew :shared:allTests --tests "*CityRepositoryTest*"`
 Expected: PASS, 6 tests.
 
 - [ ] **Step 6: Wire the real resource loader**
@@ -1855,7 +1924,7 @@ This file is the source for the in-app Attribution screen built in Task 14. CC B
 - [ ] **Step 8: Commit**
 
 ```bash
-git add tools composeApp/src/commonMain/composeResources/files composeApp/src/commonMain/kotlin/world/taqwa/app/city composeApp/src/commonTest/kotlin/world/taqwa/app/city docs/ATTRIBUTION.md
+git add tools shared/src/commonMain/composeResources/files shared/src/commonMain/kotlin/world/taqwa/app/city shared/src/commonTest/kotlin/world/taqwa/app/city docs/ATTRIBUTION.md
 git commit -m "feat: bundled offline city database with population-ranked search"
 ```
 
@@ -1864,13 +1933,13 @@ git commit -m "feat: bundled offline city database with population-ranked search
 ### Task 10: Location provider
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/location/LocationProvider.kt`
-- Create: `composeApp/src/androidMain/kotlin/world/taqwa/app/location/LocationProvider.android.kt`
-- Create: `composeApp/src/iosMain/kotlin/world/taqwa/app/location/LocationProvider.ios.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/location/LocationRepository.kt`
-- Modify: `composeApp/src/androidMain/AndroidManifest.xml`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/location/LocationProvider.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/location/LocationProvider.android.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/location/LocationProvider.ios.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/location/LocationRepository.kt`
+- Modify: `androidApp/src/androidMain/AndroidManifest.xml`
 - Modify: `iosApp/iosApp/Info.plist`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/location/LocationRepositoryTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/location/LocationRepositoryTest.kt`
 
 **Interfaces:**
 - Consumes: `GeoLocation` from Task 5, `SettingsRepository` from Task 4
@@ -1925,7 +1994,7 @@ class LocationRepositoryTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*LocationRepositoryTest*"`
+Run: `./gradlew :shared:allTests --tests "*LocationRepositoryTest*"`
 Expected: FAIL — `Unresolved reference: LocationRepository`
 
 - [ ] **Step 3: Write the common interface and the distance policy**
@@ -1992,7 +2061,7 @@ class LocationRepository(private val provider: LocationProvider) {
 
 - [ ] **Step 4: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*LocationRepositoryTest*"`
+Run: `./gradlew :shared:allTests --tests "*LocationRepositoryTest*"`
 Expected: PASS, 4 tests.
 
 - [ ] **Step 5: Implement the Android provider**
@@ -2165,18 +2234,18 @@ Add a test to `SettingsRepositoryTest`:
     }
 ```
 
-Run: `./gradlew :composeApp:allTests --tests "*SettingsRepositoryTest*"` — Expected: PASS, 8 tests.
+Run: `./gradlew :shared:allTests --tests "*SettingsRepositoryTest*"` — Expected: PASS, 8 tests.
 
 - [ ] **Step 8: Verify on both devices**
 
 Build and run each platform. On first launch nothing should prompt yet — the prompt belongs to onboarding in Task 13. Confirm the app still starts and that neither manifest change broke the build.
 
-Run: `./gradlew :composeApp:assembleDebug` — Expected: BUILD SUCCESSFUL, plus a successful Xcode run.
+Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL, plus a successful Xcode run.
 
 - [ ] **Step 9: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app composeApp/src/androidMain composeApp/src/iosMain iosApp composeApp/src/commonTest/kotlin/world/taqwa/app
+git add shared/src/commonMain/kotlin/world/taqwa/app shared/src/androidMain shared/src/iosMain iosApp shared/src/commonTest/kotlin/world/taqwa/app
 git commit -m "feat: location provider with when-in-use permission and 5km recompute policy"
 ```
 
@@ -2185,10 +2254,10 @@ git commit -m "feat: location provider with when-in-use permission and 5km recom
 ### Task 11: Shared components — ring, card, button, check
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/components/CountdownRing.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/components/TaqwaCard.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/components/TaqwaButton.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/design/components/CheckMark.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/design/components/CountdownRing.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/design/components/TaqwaCard.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/design/components/TaqwaButton.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/design/components/CheckMark.kt`
 
 **Interfaces:**
 - Consumes: `LocalTaqwaColors`, `TaqwaText` from Tasks 2 and 3
@@ -2444,12 +2513,12 @@ fun TaqwaRow(
 
 - [ ] **Step 5: Build both platforms**
 
-Run: `./gradlew :composeApp:assembleDebug` — Expected: BUILD SUCCESSFUL. Also run in Xcode; Compose Canvas behaves differently on iOS and a drawing bug is cheaper to find now than inside a screen.
+Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL. Also run in Xcode; Compose Canvas behaves differently on iOS and a drawing bug is cheaper to find now than inside a screen.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/design/components
+git add shared/src/commonMain/kotlin/world/taqwa/app/design/components
 git commit -m "feat: shared design system components"
 ```
 
@@ -2458,10 +2527,10 @@ git commit -m "feat: shared design system components"
 ### Task 12: Today screen
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/today/TodayViewModel.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/today/TodayScreen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/today/PrayerTimeline.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/feature/today/TodayViewModelTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/today/TodayViewModel.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/today/TodayScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/today/PrayerTimeline.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/feature/today/TodayViewModelTest.kt`
 
 **Interfaces:**
 - Consumes: `TimelineBuilder`, `PrayerTimesEngine`, `SettingsRepository`, `LocationRepository`, `UmmAlQuraCalendar`, all components from Task 11
@@ -2520,7 +2589,7 @@ Write the three `todayViewModel*` helpers in the same file, constructing a `Toda
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*TodayViewModelTest*"`
+Run: `./gradlew :shared:allTests --tests "*TodayViewModelTest*"`
 Expected: FAIL — `Unresolved reference: TodayViewModel`
 
 - [ ] **Step 3: Write the view model**
@@ -2727,7 +2796,7 @@ Compose the header (location, Hijri date, two icon buttons), `CountdownRing`, `P
 
 - [ ] **Step 6: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*TodayViewModelTest*"`
+Run: `./gradlew :shared:allTests --tests "*TodayViewModelTest*"`
 Expected: PASS, 4 tests.
 
 - [ ] **Step 7: Verify the countdown does not jitter**
@@ -2737,7 +2806,7 @@ Run the app on both platforms with a location set. Watch the countdown tick acro
 - [ ] **Step 8: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app/feature/today composeApp/src/commonTest/kotlin/world/taqwa/app/feature/today
+git add shared/src/commonMain/kotlin/world/taqwa/app/feature/today shared/src/commonTest/kotlin/world/taqwa/app/feature/today
 git commit -m "feat: Today screen with countdown ring and prayer timeline"
 ```
 
@@ -2746,12 +2815,12 @@ git commit -m "feat: Today screen with countdown ring and prayer timeline"
 ### Task 13: Navigation, onboarding and the app container
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/nav/Screen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/nav/Navigator.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/di/AppContainer.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/onboarding/OnboardingScreen.kt`
-- Modify: `composeApp/src/commonMain/kotlin/world/taqwa/app/App.kt`
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/nav/NavigatorTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/nav/Screen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/nav/Navigator.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/di/AppContainer.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/onboarding/OnboardingScreen.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/App.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/nav/NavigatorTest.kt`
 
 **Interfaces:**
 - Consumes: everything from Tasks 2–12
@@ -2807,7 +2876,7 @@ class NavigatorTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*NavigatorTest*"`
+Run: `./gradlew :shared:allTests --tests "*NavigatorTest*"`
 Expected: FAIL — `Unresolved reference: Navigator`
 
 - [ ] **Step 3: Implement navigation**
@@ -2880,7 +2949,7 @@ import world.taqwa.app.location.createLocationProvider
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.createDataStore
-import taqwa.composeapp.generated.resources.Res
+import world.taqwa.app.resources.Res
 
 /** Manual construction. A DI framework earns its place when there is a graph worth managing. */
 class AppContainer {
@@ -2948,13 +3017,13 @@ Fill in each branch with the real composables as they exist; the `else` branch i
 
 - [ ] **Step 7: Run the tests and both apps**
 
-Run: `./gradlew :composeApp:allTests` — Expected: all tests PASS.
+Run: `./gradlew :shared:allTests` — Expected: all tests PASS.
 Then run both platforms. First launch shows onboarding; completing it lands on Today; relaunching goes straight to Today.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app composeApp/src/commonTest/kotlin/world/taqwa/app/nav
+git add shared/src/commonMain/kotlin/world/taqwa/app shared/src/commonTest/kotlin/world/taqwa/app/nav
 git commit -m "feat: navigation backstack, app container and onboarding flow"
 ```
 
@@ -2963,15 +3032,15 @@ git commit -m "feat: navigation backstack, app container and onboarding flow"
 ### Task 14: Settings screens
 
 **Files:**
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/settings/SettingsRootScreen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/settings/PrayerTimesSettingsScreen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/settings/LocationSettingsScreen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/settings/CitySearchScreen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/settings/AppearanceSettingsScreen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/feature/settings/AttributionScreen.kt`
-- Create: `composeApp/src/commonMain/kotlin/world/taqwa/app/prayer/CalculationMethodDefaults.kt`
-- Modify: `composeApp/src/commonMain/kotlin/world/taqwa/app/App.kt` — fill the remaining branches
-- Test: `composeApp/src/commonTest/kotlin/world/taqwa/app/prayer/CalculationMethodDefaultsTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/SettingsRootScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/PrayerTimesSettingsScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/LocationSettingsScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/CitySearchScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/AppearanceSettingsScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/AttributionScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/prayer/CalculationMethodDefaults.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/App.kt` — fill the remaining branches
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/prayer/CalculationMethodDefaultsTest.kt`
 
 **Interfaces:**
 - Consumes: `TaqwaCard`, `TaqwaRow`, `CheckMark`, `SettingsRepository`, `CityRepository`, `Navigator`
@@ -3034,7 +3103,7 @@ class CalculationMethodDefaultsTest {
 
 - [ ] **Step 2: Run it to confirm it fails**
 
-Run: `./gradlew :composeApp:allTests --tests "*CalculationMethodDefaultsTest*"`
+Run: `./gradlew :shared:allTests --tests "*CalculationMethodDefaultsTest*"`
 Expected: FAIL — `Unresolved reference: CalculationMethodDefaults`
 
 - [ ] **Step 3: Implement**
@@ -3071,7 +3140,7 @@ object CalculationMethodDefaults {
 
 - [ ] **Step 4: Run the tests**
 
-Run: `./gradlew :composeApp:allTests --tests "*CalculationMethodDefaultsTest*"`
+Run: `./gradlew :shared:allTests --tests "*CalculationMethodDefaultsTest*"`
 Expected: PASS, 8 tests.
 
 - [ ] **Step 5: Build the settings root**
@@ -3150,14 +3219,14 @@ Attribution: render the contents of `docs/ATTRIBUTION.md` as static text. GeoNam
 
 - [ ] **Step 9: Fill the remaining App.kt branches and verify end to end**
 
-Run: `./gradlew :composeApp:allTests` — Expected: all tests PASS.
+Run: `./gradlew :shared:allTests` — Expected: all tests PASS.
 
 Then walk both platforms through: onboarding → decline location → choose a city → correct times appear → open settings → switch to Hanafi and confirm Asr moves later → switch theme to Dark and confirm the whole app changes → change the Hijri offset and confirm the header date changes → force-quit and relaunch and confirm every setting persisted.
 
 - [ ] **Step 10: Commit**
 
 ```bash
-git add composeApp/src/commonMain/kotlin/world/taqwa/app composeApp/src/commonTest/kotlin/world/taqwa/app/prayer
+git add shared/src/commonMain/kotlin/world/taqwa/app shared/src/commonTest/kotlin/world/taqwa/app/prayer
 git commit -m "feat: settings tree with calculation method, madhab, hijri offset and appearance"
 ```
 
@@ -3165,7 +3234,7 @@ git commit -m "feat: settings tree with calculation method, madhab, hijri offset
 
 ## Definition of done for this plan
 
-Both platforms build and run. A user can complete onboarding, grant location or pick a city, and see correct prayer times on a themed Today screen whose timeline dims prayers as they pass and whose countdown ticks without jitter. Every setting in the spec's defaults table persists across a relaunch. Tromsø in June shows a rule note rather than absurd times. `./gradlew :composeApp:allTests` is green.
+Both platforms build and run. A user can complete onboarding, grant location or pick a city, and see correct prayer times on a themed Today screen whose timeline dims prayers as they pass and whose countdown ticks without jitter. Every setting in the spec's defaults table persists across a relaunch. Tromsø in June shows a rule note rather than absurd times. `./gradlew :shared:allTests` is green.
 
 Not yet present, by design: notifications, the qibla screen, widgets, RTL and localisation. Those are Plan 2.
 

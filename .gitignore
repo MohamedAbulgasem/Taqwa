@@ -18,3 +18,4 @@ DerivedData/
 
 # Brainstorm companion
 .superpowers/
+.build-heartbeat
