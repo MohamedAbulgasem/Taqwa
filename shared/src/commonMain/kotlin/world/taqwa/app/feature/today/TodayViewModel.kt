@@ -15,7 +15,7 @@ import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.hijri.HijriFormatter
-import world.taqwa.app.hijri.UmmAlQuraCalendar
+import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.HighLatitudeCopy
 import world.taqwa.app.i18n.PlatformFormat
@@ -76,7 +76,7 @@ class TodayViewModel(
 
         // The offset is applied to the Gregorian date before conversion, never to the Hijri day
         // number — shifting the Hijri day directly can produce day 0 or day 31.
-        val hijri = UmmAlQuraCalendar.fromGregorian(
+        val hijri = TabularHijriCalendar.fromGregorian(
             localDate.plus(prefs.hijriOffsetDays, DateTimeUnit.DAY),
         )
 

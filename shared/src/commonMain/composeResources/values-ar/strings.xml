@@ -100,7 +100,6 @@
     <string name="madhab_hanafi">الحنفي</string>
     <string name="prayer_times_hijri_label">التاريخ الهجري</string>
     <string name="hijri_day_before">يوم قبل</string>
-    <string name="hijri_umm_al_qura">أم القرى</string>
     <string name="hijri_day_after">يوم بعد</string>
     <string name="prayer_times_show_sunrise">إظهار الشروق</string>
     <string name="adjustments_none">بدون</string>
@@ -168,4 +167,5 @@
     <string name="qibla_cardinal_south">ج</string>
     <string name="qibla_cardinal_west">غ</string>
     <string name="notifications_exact_alarms_off">المنبهات الدقيقة معطّلة لتطبيق تقوى، لذا قد تصل التنبيهات متأخرة بضع دقائق. فعّل «المنبهات والتذكيرات» في إعدادات النظام لإصلاح ذلك.</string>
+    <string name="hijri_tabular">حسابي</string>
 </resources>

@@ -5,11 +5,16 @@ import kotlinx.datetime.LocalDate
 data class HijriDate(val year: Int, val month: Int, val day: Int)
 
 /**
- * Tabular civil ("Kuwaiti") Hijri calendar. An arithmetic approximation of Umm al-Qura that can
- * differ from local moonsighting by a day, which is why the user is given a plus or minus one
- * day offset in settings.
+ * The tabular civil ("Kuwaiti") Hijri calendar: months alternate 30 and 29 days on a fixed
+ * 30-year cycle with no astronomy in it at all.
+ *
+ * It is deliberately **not** Umm al-Qura, and the class used to carry that name. Umm al-Qura is a
+ * published lookup table, and the two disagree — 2026-09-06 is 23 Rabiʿ al-Awwal 1448 here and
+ * 24 by the Umm al-Qura table. Switching to the real table is a product decision, not a bug fix,
+ * so slice 1 ships the arithmetic calendar and says so; the plus or minus one day offset in
+ * settings exists precisely because any arithmetic calendar can differ from a local moonsighting.
  */
-object UmmAlQuraCalendar {
+object TabularHijriCalendar {
 
     private fun gregorianToJulianDay(y: Int, m: Int, d: Int): Long {
         val a = (14 - m) / 12
