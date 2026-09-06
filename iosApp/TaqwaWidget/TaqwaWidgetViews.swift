@@ -28,7 +28,11 @@ let taqwaBackgroundKey = "widget_background"
 enum TaqwaMirror {
     /// The moment `content.countdownMinutes` reaches zero, derived from the write timestamp.
     /// Nil when the app has never written one, in which case the countdown is shown as-is.
-    static func read() -> (content: WidgetContent, deadline: Date?)? {
+    /// `languageTag` is `snapshot.languageTag` verbatim — kept alongside `content` (which does not
+    /// carry it) so the countdown built locally in [TaqwaEntry.countdownText] can use the same
+    /// digit set as `content.nextClockTime`, which `PlatformFormat` already localised before the
+    /// snapshot was written (I9).
+    static func read() -> (content: WidgetContent, deadline: Date?, languageTag: String)? {
         let store = KeyValueStore_iosKt.createWidgetKeyValueStore()
         guard let snapshot = WidgetInputsMirror.shared.read(store: store) else { return nil }
         let content = WidgetContentBuilder.shared.build(snapshot: snapshot)
@@ -37,7 +41,7 @@ enum TaqwaMirror {
         let deadline = writtenAt > 0
             ? Date(timeIntervalSince1970: writtenAt + Double(content.countdownMinutes) * 60)
             : nil
-        return (content, deadline)
+        return (content, deadline, snapshot.languageTag)
     }
 
     static func background() -> WidgetBackground {
@@ -57,10 +61,33 @@ struct TaqwaEntry: TimelineEntry {
     /// Minutes remaining at `date`, already extrapolated forward from the mirror write.
     let countdownMinutes: Int64
     let background: WidgetBackground
+    /// `WidgetSnapshot.languageTag`, or `""` for the placeholder entry (no numbers are shown then).
+    /// Needed here — rather than read off `content`, which does not carry it — because the
+    /// countdown text below is built locally instead of read pre-formatted from the snapshot.
+    let languageTag: String
 
+    /// Built with `NumberFormatter` rather than raw interpolation so the countdown's digits match
+    /// `content.nextClockTime`'s locale-default digit set instead of always being Western (I9).
+    /// Mirrors `WidgetDigits`/`CountdownFormatter`'s convention: this is minute-granular and
+    /// redrawn at most once a minute, so the Today ring's per-second tabular-jitter exception
+    /// (spec §4.2) does not apply.
     var countdownText: String {
         let m = max(0, countdownMinutes)
-        return "\(m / 60):\(String(format: "%02d", m % 60))"
+        let locale = Locale(identifier: languageTag)
+
+        let hourFormatter = NumberFormatter()
+        hourFormatter.locale = locale
+        hourFormatter.usesGroupingSeparator = false
+
+        let minuteFormatter = NumberFormatter()
+        minuteFormatter.locale = locale
+        minuteFormatter.usesGroupingSeparator = false
+        minuteFormatter.minimumIntegerDigits = 2
+
+        let hours = hourFormatter.string(from: NSNumber(value: m / 60)) ?? "\(m / 60)"
+        let minutes = minuteFormatter.string(from: NSNumber(value: m % 60))
+            ?? String(format: "%02d", m % 60)
+        return "\(hours):\(minutes)"
     }
 }
 
@@ -71,7 +98,7 @@ struct TaqwaTimelineProvider: TimelineProvider {
     private static let entryCount = 60
 
     func placeholder(in context: Context) -> TaqwaEntry {
-        TaqwaEntry(date: Date(), content: nil, countdownMinutes: 0, background: .followTheme)
+        TaqwaEntry(date: Date(), content: nil, countdownMinutes: 0, background: .followTheme, languageTag: "")
     }
 
     func getSnapshot(in context: Context, completion: @escaping (TaqwaEntry) -> Void) {
@@ -86,8 +113,8 @@ struct TaqwaTimelineProvider: TimelineProvider {
 
     static func entries(from start: Date) -> [TaqwaEntry] {
         let background = TaqwaMirror.background()
-        guard let (content, deadline) = TaqwaMirror.read() else {
-            return [TaqwaEntry(date: start, content: nil, countdownMinutes: 0, background: background)]
+        guard let (content, deadline, languageTag) = TaqwaMirror.read() else {
+            return [TaqwaEntry(date: start, content: nil, countdownMinutes: 0, background: background, languageTag: "")]
         }
         return (0..<entryCount).map { minute in
             let date = start.addingTimeInterval(Double(minute) * 60)
@@ -95,7 +122,8 @@ struct TaqwaTimelineProvider: TimelineProvider {
                 date: date,
                 content: content,
                 countdownMinutes: remainingMinutes(content: content, deadline: deadline, at: date),
-                background: background
+                background: background,
+                languageTag: languageTag
             )
         }
     }

@@ -102,7 +102,8 @@ struct TaqwaWidget_Previews: PreviewProvider {
             countdownLabel: "Dhuhr in"
         ),
         countdownMinutes: 209,
-        background: WidgetBackground.followTheme
+        background: WidgetBackground.followTheme,
+        languageTag: "en"
     )
 
     static var previews: some View {

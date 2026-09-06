@@ -58,6 +58,7 @@ private class WidgetRender(
     val content: WidgetContent?,
     val remainingMinutes: Long?,
     val colors: WidgetPaletteColors,
+    val languageTag: String,
 )
 
 private fun readWidgetRender(context: Context): WidgetRender {
@@ -77,6 +78,9 @@ private fun readWidgetRender(context: Context): WidgetRender {
             WidgetCountdown.remainingMinutesAt(it, System.currentTimeMillis() / 1_000L)
         },
         colors = WidgetPalette.colorsFor(background, systemIsDark),
+        // Defaults to Western digits (matching `WidgetDigits.localize`'s own fallback) when there
+        // is no snapshot yet — the placeholder card shows no numbers anyway.
+        languageTag = snapshot?.languageTag.orEmpty(),
     )
 }
 
@@ -103,10 +107,17 @@ private fun WidgetPaletteColors.accent() = Color(accentArgb)
 private fun nextPrayerLabel(content: WidgetContent, remainingMinutes: Long?) =
     if (remainingMinutes == null) content.nextPrayerDisplayName.uppercase() else content.countdownLabel.uppercase()
 
-private fun countdownText(remainingMinutes: Long): String {
+/**
+ * Unlike [WidgetContent.nextClockTime] and [WidgetPrayerRow.clockTime], which `PlatformFormat`
+ * already pre-formats with the locale's own digits before the snapshot is written, this string is
+ * built here by raw interpolation — so it needs its own pass through [WidgetDigits.localize], or
+ * an `ar-EG` user sees a Western countdown sitting directly above an Arabic-Indic clock time in
+ * the same card (I9).
+ */
+private fun countdownText(remainingMinutes: Long, languageTag: String): String {
     val hours = remainingMinutes / 60
     val minutes = remainingMinutes % 60
-    return "$hours:${minutes.toString().padStart(2, '0')}"
+    return WidgetDigits.localize("$hours:${minutes.toString().padStart(2, '0')}", languageTag)
 }
 
 /** Rounded card (≈19dp) with a 1dp hairline border, matching the mockup's `.wg` treatment. The
@@ -137,6 +148,7 @@ private fun NextPrayerBlock(
     content: WidgetContent?,
     remainingMinutes: Long?,
     colors: WidgetPaletteColors,
+    languageTag: String,
     labelSize: TextUnit,
     countdownSize: TextUnit,
     clockSize: TextUnit,
@@ -152,7 +164,7 @@ private fun NextPrayerBlock(
             if (remainingMinutes != null) {
                 Spacer(GlanceModifier.height(3.dp))
                 Text(
-                    text = countdownText(remainingMinutes),
+                    text = countdownText(remainingMinutes, languageTag),
                     style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Normal, fontSize = countdownSize),
                 )
             }
@@ -175,6 +187,7 @@ class TaqwaSmallGlanceWidget : GlanceAppWidget() {
                     content = render.content,
                     remainingMinutes = render.remainingMinutes,
                     colors = colors,
+                    languageTag = render.languageTag,
                     labelSize = 11.sp,
                     countdownSize = 34.sp,
                     clockSize = 13.sp,
@@ -200,6 +213,7 @@ class TaqwaMediumGlanceWidget : GlanceAppWidget() {
                             content = content,
                             remainingMinutes = render.remainingMinutes,
                             colors = colors,
+                            languageTag = render.languageTag,
                             labelSize = 10.sp,
                             countdownSize = 28.sp,
                             clockSize = 11.sp,
