@@ -5,7 +5,7 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="1024" android:viewportHeight="1024">
-    <group android:scaleX="0.62" android:scaleY="0.62" android:pivotX="512" android:pivotY="512">
+    <group android:scaleX="0.78" android:scaleY="0.78" android:pivotX="512" android:pivotY="512">
         <path
             android:pathData="M 292 780 L 292 520 C 292 372 380 268 512 216 C 644 268 732 372 732 520 L 732 780"
             android:strokeColor="#16160F" android:strokeWidth="88"
