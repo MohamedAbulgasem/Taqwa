@@ -15,6 +15,7 @@ import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.domain.WidgetBackground
 
 /** Reads a stored enum name, falling back to [fallback] when the value is absent or unrecognised. */
 private inline fun <reified E : Enum<E>> String?.toEnumOr(fallback: E): E =
@@ -70,6 +71,9 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         )
     }
 
+    val widgetBackground: Flow<WidgetBackground> =
+        store.data.map { it[SettingsKeys.WIDGET_BACKGROUND].toEnumOr(WidgetBackground.FOLLOW_THEME) }
+
     val location: Flow<GeoLocation?> = store.data.map { p ->
         val lat = p[SettingsKeys.LOCATION_LAT]
         val lon = p[SettingsKeys.LOCATION_LON]
@@ -105,6 +109,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             }
             e[SettingsKeys.REMIND_BEFORE] = settings.remindBeforeMinutes
         }
+    }
+
+    suspend fun setWidgetBackground(value: WidgetBackground) {
+        store.edit { it[SettingsKeys.WIDGET_BACKGROUND] = value.name }
     }
 
     suspend fun setLocation(location: GeoLocation) {

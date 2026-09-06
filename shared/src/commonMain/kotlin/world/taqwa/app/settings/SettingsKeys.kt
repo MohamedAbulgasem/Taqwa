@@ -26,5 +26,6 @@ internal object SettingsKeys {
     val LOCATION_CITY = stringPreferencesKey("location_city")
     val LOCATION_COUNTRY = stringPreferencesKey("location_country")
     val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+    val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")
     fun soundKey(prayer: Prayer) = stringPreferencesKey("sound_${prayer.name.lowercase()}")
 }
