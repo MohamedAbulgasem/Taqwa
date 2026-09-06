@@ -38,9 +38,23 @@ object WidgetRefreshScheduler {
     /** Target staleness ceiling while the phone is awake. */
     const val INTERVAL_MILLIS: Long = 5L * 60L * 1000L
 
-    /** Slack given to the platform to batch the delivery — one full interval, so a late alarm can
-     * never overtake the one after it. */
-    private const val WINDOW_MILLIS: Long = INTERVAL_MILLIS
+    /**
+     * Latitude given to the platform to batch the delivery.
+     *
+     * A full interval's window is the obvious choice and is wrong. `setWindow` is a promise of
+     * "any time in this range", and with nothing else to batch against the platform spends the
+     * whole range: on a booted device, a `[15:05, 15:10]` alarm was still undelivered at 15:08,
+     * `whenElapsed` 2m20s overdue with `maxWhenElapsed` 2m39s away. Since the receiver re-arms
+     * from the boundary after *its own delivery time*, a delivery at 15:10 arms 15:15 — and if
+     * that one is also delivered at its far edge, redraws land 15:10, 15:20, 15:30: ten minutes
+     * apart, twice the staleness the grid was chosen for.
+     *
+     * A minute is latitude enough to batch with a neighbouring wakeup while bounding the visible
+     * error. It stays fully inexact — `setWindow` never needs `SCHEDULE_EXACT_ALARM` whatever its
+     * window, and Doze still defers it wholesale — and it clears the platform's own floor for
+     * inexact windows, which for a trigger five minutes out is a tenth of that futurity, 30s.
+     */
+    private const val WINDOW_MILLIS: Long = 60L * 1000L
 
     const val ACTION_WIDGET_REFRESH: String = "world.taqwa.app.WIDGET_REFRESH"
 
