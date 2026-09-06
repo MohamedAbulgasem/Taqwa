@@ -16,6 +16,10 @@ import world.taqwa.app.i18n.createPlatformFormat
 
 private const val PREFS_NAME = "taqwa_scheduled_alarms"
 private const val KEY_IDS = "ids"
+
+/** Next unused request code, and the per-id assignments, persisted beside [KEY_IDS]. */
+private const val KEY_NEXT_CODE = "next_request_code"
+private const val KEY_CODE_PREFIX = "request_code_"
 private const val ALARM_ACTION = "world.taqwa.app.PRAYER_ALARM"
 
 /** Slop allowed when exact alarms are unavailable. The window starts at the prayer time, so a
@@ -23,6 +27,7 @@ private const val ALARM_ACTION = "world.taqwa.app.PRAYER_ALARM"
 private const val INEXACT_WINDOW_MILLIS = 5L * 60L * 1000L
 
 const val EXTRA_ID = "id"
+const val EXTRA_REQUEST_CODE = "request_code"
 const val EXTRA_PRAYER = "prayer"
 const val EXTRA_SOUND = "sound"
 const val EXTRA_TITLE = "title"
@@ -46,13 +51,42 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         cancelAll()
         ensureChannels(plan)
         plan.forEach(::schedule)
-        prefs.edit().putStringSet(KEY_IDS, plan.map { it.id }.toSet()).apply()
+        val ids = plan.map { it.id }.toSet()
+        prefs.edit().putStringSet(KEY_IDS, ids).apply()
+        forgetRequestCodesOutside(ids)
     }
 
     override fun cancelAll() {
         val previousIds = prefs.getStringSet(KEY_IDS, emptySet()) ?: emptySet()
         previousIds.forEach { id -> alarmManager.cancel(pendingIntentFor(id)) }
         prefs.edit().remove(KEY_IDS).apply()
+    }
+
+    /**
+     * A stable, collision-free request code per notification id.
+     *
+     * `id.hashCode()` was neither: `String.hashCode` is a 32-bit fold, so two ids can collide,
+     * and a collision means both a shared `AlarmManager` slot — one alarm silently replacing the
+     * other — and, since `PrayerAlarmReceiver` used the same number as the notification id, one
+     * notification overwriting the other when they did fire. Sequential codes cannot collide, and
+     * persisting the assignment is what keeps `cancelAll` able to rebuild the exact
+     * `PendingIntent` a previous process scheduled.
+     */
+    private fun requestCodeFor(id: String): Int {
+        val key = KEY_CODE_PREFIX + id
+        val existing = prefs.getInt(key, -1)
+        if (existing >= 0) return existing
+        val next = prefs.getInt(KEY_NEXT_CODE, 1)
+        prefs.edit().putInt(key, next).putInt(KEY_NEXT_CODE, next + 1).apply()
+        return next
+    }
+
+    /** Ids churn daily, so their codes would otherwise accumulate in the preference file forever. */
+    private fun forgetRequestCodesOutside(ids: Set<String>) {
+        val stale = prefs.all.keys
+            .filter { it.startsWith(KEY_CODE_PREFIX) && it.removePrefix(KEY_CODE_PREFIX) !in ids }
+        if (stale.isEmpty()) return
+        prefs.edit().apply { stale.forEach(::remove) }.apply()
     }
 
     /**
@@ -80,9 +114,13 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
     }
 
     private fun pendingIntentFor(id: String, entry: ScheduledNotification? = null): PendingIntent {
+        val requestCode = requestCodeFor(id)
         val intent = Intent(context, PrayerAlarmReceiver::class.java).apply {
             action = ALARM_ACTION
             putExtra(EXTRA_ID, id)
+            // The receiver posts under this number too, so two notifications can never overwrite
+            // each other for the same reason two alarms can never share a slot.
+            putExtra(EXTRA_REQUEST_CODE, requestCode)
             if (entry != null) {
                 putExtra(EXTRA_PRAYER, entry.prayer.name)
                 putExtra(EXTRA_SOUND, entry.sound.name)
@@ -91,7 +129,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             }
         }
         return PendingIntent.getBroadcast(
-            context, id.hashCode(), intent,
+            context, requestCode, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }

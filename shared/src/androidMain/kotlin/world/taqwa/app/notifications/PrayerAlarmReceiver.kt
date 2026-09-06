@@ -33,6 +33,9 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .build()
 
-        NotificationManagerCompat.from(context).notify(id.hashCode(), notification)
+        // The scheduler's own sequential request code, not id.hashCode(): two ids that folded
+        // to the same 32-bit hash used to overwrite each other's notification.
+        val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 }
