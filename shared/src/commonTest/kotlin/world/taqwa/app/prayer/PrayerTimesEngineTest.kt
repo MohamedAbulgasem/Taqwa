@@ -91,4 +91,27 @@ class PrayerTimesEngineTest {
             d.highLatitudeRuleApplied,
         )
     }
+
+    @Test
+    fun tromsoAtSummerSolsticeReportsNearestLatitudeFallback() {
+        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
+        val d = engine.timesFor(tromso, LocalDate(2026, 6, 21), PrayerSettings())
+        assertTrue(
+            d.nearestLatitudeFallbackApplied,
+            "Expected true polar day at Tromsø on the summer solstice to trigger the nearest-latitude fallback",
+        )
+    }
+
+    @Test
+    fun ordinaryLondonDayDoesNotReportNearestLatitudeFallback() {
+        val d = engine.timesFor(london, LocalDate(2026, 9, 6), PrayerSettings())
+        assertEquals(false, d.nearestLatitudeFallbackApplied)
+    }
+
+    @Test
+    fun tromsoAtEquinoxHasARealSunriseAndDoesNotReportFallback() {
+        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
+        val d = engine.timesFor(tromso, LocalDate(2026, 9, 23), PrayerSettings())
+        assertEquals(false, d.nearestLatitudeFallbackApplied)
+    }
 }

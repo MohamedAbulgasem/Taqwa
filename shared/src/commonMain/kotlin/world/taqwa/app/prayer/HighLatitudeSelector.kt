@@ -16,9 +16,12 @@ object HighLatitudeSelector {
     /**
      * Latitude magnitude [PrayerTimesEngine] substitutes in when adhan2 cannot compute a real
      * sunrise/sunset for the requested coordinates on a given date (true polar day or night).
-     * Reuses the seventh-of-the-night threshold: always low enough for adhan2 to succeed.
+     * This is a distinct concept from [SEVENTH_THRESHOLD] even though it currently shares the
+     * same numeric value: that threshold decides which high-latitude *rule* to apply, while this
+     * one decides which latitude to recompute the *entire day* at when adhan2 cannot produce a
+     * real sunrise/sunset at all. Kept as its own constant so the two can diverge independently.
      */
-    const val NEAREST_LATITUDE_FALLBACK = SEVENTH_THRESHOLD
+    const val NEAREST_LATITUDE_FALLBACK = 48.0
 
     fun select(preference: HighLatitudePreference, latitude: Double): HighLatitudePreference {
         if (preference != HighLatitudePreference.AUTOMATIC) return preference

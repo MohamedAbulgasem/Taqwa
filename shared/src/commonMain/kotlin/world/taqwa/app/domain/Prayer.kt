@@ -14,6 +14,7 @@ data class DayPrayerTimes(
     val date: LocalDate,
     val times: List<PrayerTime>,
     val highLatitudeRuleApplied: HighLatitudePreference?,
+    val nearestLatitudeFallbackApplied: Boolean = false,
 ) {
     fun time(p: Prayer): Instant =
         times.firstOrNull { it.prayer == p }?.instant

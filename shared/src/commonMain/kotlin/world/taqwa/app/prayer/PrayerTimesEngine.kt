@@ -44,6 +44,7 @@ class PrayerTimesEngine {
         // latitude magnitude used as the automatic seventh-of-the-night threshold), keeping the
         // real longitude/date/method — the "nearest latitude" convention used by other prayer-time
         // implementations for the same edge case.
+        var nearestLatitudeFallbackApplied = false
         val computed = try {
             PrayerTimes(
                 coordinates = Coordinates(location.latitude, location.longitude),
@@ -51,6 +52,7 @@ class PrayerTimesEngine {
                 calculationParameters = params,
             )
         } catch (_: IllegalStateException) {
+            nearestLatitudeFallbackApplied = true
             val clampedLatitude = HighLatitudeSelector.NEAREST_LATITUDE_FALLBACK * location.latitude.sign
             PrayerTimes(
                 coordinates = Coordinates(clampedLatitude, location.longitude),
@@ -76,6 +78,7 @@ class PrayerTimesEngine {
                 if (settings.highLatitude == HighLatitudePreference.AUTOMATIC &&
                     effectiveRule != HighLatitudePreference.MIDDLE_OF_NIGHT
                 ) effectiveRule else null,
+            nearestLatitudeFallbackApplied = nearestLatitudeFallbackApplied,
         )
     }
 }
