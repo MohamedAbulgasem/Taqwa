@@ -27,38 +27,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.qibla_back
+import world.taqwa.app.resources.qibla_bearing
+import world.taqwa.app.resources.qibla_calibration_help
+import world.taqwa.app.resources.qibla_distance
+import world.taqwa.app.resources.qibla_facing_qibla
+import world.taqwa.app.resources.qibla_hold_flat
+import world.taqwa.app.resources.qibla_needs_calibrating
+import world.taqwa.app.resources.qibla_no_sensor_body
+import world.taqwa.app.resources.qibla_no_sensor_title
+import world.taqwa.app.resources.qibla_title
 
 /**
- * Every user-facing string on this screen, in one place: a concurrent task is moving the app onto
- * string resources, and a single object makes that a mechanical change.
+ * Thousands separators without `java.text` — commonMain has no number formatter — with digits run
+ * through [PlatformFormat] one at a time (the same trick `CountdownFormatter.padTwo` uses) so
+ * ar-EG reads Arabic-Indic and ar-LY reads Western, matching how Today formats every other number.
  */
-internal object QiblaStrings {
-    const val Title = "Qibla"
-    const val Back = "Today"
-    const val HoldFlat = "Hold your phone flat"
-    const val FacingQibla = "Facing qibla"
-    const val NeedsCalibrating = "Compass needs calibrating"
-    const val NoSensorTitle = "No compass sensor"
-    const val NoSensorBody =
-        "This device has no magnetometer. Use a physical compass together with the bearing below."
-    const val CalibrationHelp =
-        "Move your phone in a figure of eight a few times. Magnetic interference from metal, " +
-            "cases and speakers can throw the reading off."
-
-    fun bearing(degrees: Double): String = "${degrees.toInt()}°"
-
-    fun distance(km: Double): String = "Makkah · ${grouped(km)} km away"
-}
-
-/** Thousands separators without `java.text` — commonMain has no number formatter. */
-internal fun grouped(km: Double): String {
+internal fun localizedGroupedKm(km: Double, format: PlatformFormat): String {
     val digits = km.toLong().toString()
     return buildString {
         digits.forEachIndexed { i, c ->
             if (i > 0 && (digits.length - i) % 3 == 0) append(',')
-            append(c)
+            append(format.localizedDigits(c - '0'))
         }
     }
 }
@@ -75,16 +71,18 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
     ) {
         BackLink(onBack, Modifier.align(Alignment.Start))
 
-        Text(QiblaStrings.Title, style = TaqwaText.screenTitle, color = colors.textPrimary)
+        Text(stringResource(Res.string.qibla_title), style = TaqwaText.screenTitle, color = colors.textPrimary)
         Spacer(Modifier.height(4.dp))
         when (state) {
-            QiblaUiState.NoSensor -> Subtitle(QiblaStrings.NoSensorTitle, colors.textSecondary)
-            is QiblaUiState.Searching -> Subtitle(QiblaStrings.HoldFlat, colors.textSecondary)
+            QiblaUiState.NoSensor ->
+                Subtitle(stringResource(Res.string.qibla_no_sensor_title), colors.textSecondary)
+            is QiblaUiState.Searching ->
+                Subtitle(stringResource(Res.string.qibla_hold_flat), colors.textSecondary)
             is QiblaUiState.Aligned ->
-                Subtitle(QiblaStrings.FacingQibla, colors.accent, FontWeight.SemiBold)
+                Subtitle(stringResource(Res.string.qibla_facing_qibla), colors.accent, FontWeight.SemiBold)
             // Amber, never red: a compass that wants a wiggle is not an error state.
             is QiblaUiState.LowAccuracy ->
-                Subtitle(QiblaStrings.NeedsCalibrating, colors.accent, FontWeight.SemiBold)
+                Subtitle(stringResource(Res.string.qibla_needs_calibrating), colors.accent, FontWeight.SemiBold)
         }
 
         // The dial and its readout sit as one block in the middle of what is left, rather than
@@ -92,7 +90,7 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
         Spacer(Modifier.weight(1f))
         when (state) {
             QiblaUiState.NoSensor -> Text(
-                QiblaStrings.NoSensorBody,
+                stringResource(Res.string.qibla_no_sensor_body),
                 style = TaqwaText.caption,
                 color = colors.textSecondary,
                 textAlign = TextAlign.Center,
@@ -115,7 +113,7 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
                 FigureOfEight()
                 Spacer(Modifier.height(15.dp))
                 Text(
-                    QiblaStrings.CalibrationHelp,
+                    stringResource(Res.string.qibla_calibration_help),
                     style = TaqwaText.caption.copy(fontSize = 15.sp, lineHeight = 24.sp),
                     color = colors.textSecondary,
                     textAlign = TextAlign.Center,
@@ -141,16 +139,21 @@ private fun Subtitle(text: String, color: Color, weight: FontWeight? = null) {
 @Composable
 private fun Readout(bearingDegrees: Double, distanceKm: Double) {
     val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
     Spacer(Modifier.height(24.dp))
     // The mockup sets the bearing at 27px against Today's 29px countdown — the same tier, which
     // in this app's type scale is `countdown` itself.
     Text(
-        QiblaStrings.bearing(bearingDegrees),
+        stringResource(Res.string.qibla_bearing, format.localizedDigits(bearingDegrees.toInt())),
         style = TaqwaText.countdown,
         color = colors.accent,
     )
     Spacer(Modifier.height(4.dp))
-    Text(QiblaStrings.distance(distanceKm), style = TaqwaText.caption, color = colors.textSecondary)
+    Text(
+        stringResource(Res.string.qibla_distance, localizedGroupedKm(distanceKm, format)),
+        style = TaqwaText.caption,
+        color = colors.textSecondary,
+    )
 }
 
 /** A text back link rather than the settings chevron: the mockup names the destination. */
@@ -182,7 +185,7 @@ private fun BackLink(onBack: () -> Unit, modifier: Modifier = Modifier) {
         }
         Spacer(Modifier.width(8.dp))
         Text(
-            QiblaStrings.Back,
+            stringResource(Res.string.qibla_back),
             style = TaqwaText.caption.copy(fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
             color = colors.textSecondary,
         )

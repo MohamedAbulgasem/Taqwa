@@ -154,4 +154,17 @@
     <string name="widget_background_dark">داكن</string>
     <string name="widget_background_translucent">شفاف — تندمج مع خلفية الشاشة</string>
     <string name="widget_background_frosted">زجاجي — تستخدم خامة النظام للودجت</string>
+    <!-- Qibla screen (Task 22 sweep) -->
+    <string name="qibla_title">القبلة</string>
+    <string name="qibla_back">اليوم</string>
+    <string name="qibla_hold_flat">ضع هاتفك بشكل مستوٍ</string>
+    <string name="qibla_facing_qibla">أنت باتجاه القبلة</string>
+    <string name="qibla_needs_calibrating">البوصلة تحتاج إلى معايرة</string>
+    <string name="qibla_calibration_help">حرّك هاتفك على شكل الرقم ثمانية عدة مرات. قد يؤثر التداخل المغناطيسي من المعادن والأغطية ومكبرات الصوت على القراءة.</string>
+    <string name="qibla_distance">مكة · على بُعد %1$s كم</string>
+    <string name="qibla_bearing">%1$s°</string>
+    <string name="qibla_cardinal_north">ش</string>
+    <string name="qibla_cardinal_east">ق</string>
+    <string name="qibla_cardinal_south">ج</string>
+    <string name="qibla_cardinal_west">غ</string>
 </resources>

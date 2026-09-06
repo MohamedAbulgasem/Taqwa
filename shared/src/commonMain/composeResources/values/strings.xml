@@ -156,4 +156,18 @@
     <string name="widget_background_dark">Dark</string>
     <string name="widget_background_translucent">Translucent — blends into your wallpaper</string>
     <string name="widget_background_frosted">Frosted — uses the system widget material</string>
+    <!-- Qibla screen (Task 22 sweep: qibla_no_sensor_title/body above already matched this
+         screen's copy verbatim and are reused there; everything else needed its own string. -->
+    <string name="qibla_title">Qibla</string>
+    <string name="qibla_back">Today</string>
+    <string name="qibla_hold_flat">Hold your phone flat</string>
+    <string name="qibla_facing_qibla">Facing qibla</string>
+    <string name="qibla_needs_calibrating">Compass needs calibrating</string>
+    <string name="qibla_calibration_help">Move your phone in a figure of eight a few times. Magnetic interference from metal, cases and speakers can throw the reading off.</string>
+    <string name="qibla_distance">Makkah · %1$s km away</string>
+    <string name="qibla_bearing">%1$s°</string>
+    <string name="qibla_cardinal_north">N</string>
+    <string name="qibla_cardinal_east">E</string>
+    <string name="qibla_cardinal_south">S</string>
+    <string name="qibla_cardinal_west">W</string>
 </resources>
