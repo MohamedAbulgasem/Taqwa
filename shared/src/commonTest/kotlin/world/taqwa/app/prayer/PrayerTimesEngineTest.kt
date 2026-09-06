@@ -4,8 +4,10 @@ import com.batoulapps.adhan2.CalculationMethod
 import com.batoulapps.adhan2.Coordinates
 import com.batoulapps.adhan2.PrayerTimes
 import com.batoulapps.adhan2.data.DateComponents
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.GeoLocation
@@ -172,6 +174,51 @@ class PrayerTimesEngineTest {
         // correctly disappears — this is the behaviour the fix is actually for.
         val d = engine.timesFor(london, LocalDate(2026, 11, 15), PrayerSettings())
         assertEquals(null, d.highLatitudeRuleApplied)
+    }
+
+    @Test
+    fun theEngagedCacheHitsAcrossTheThreeDateRotationTodayViewModelActuallyUses() {
+        // TodayViewModel.refresh() calls timesFor for yesterday/today/tomorrow every tick, all
+        // sharing one settings object and one location. The M1 regression was a single-slot memo
+        // that a rotation like this thrashed on every call. With a bounded multi-entry cache the
+        // first round of three (all misses) should perform the two extra solves per call, and a
+        // second round over the same three dates should hit the cache every time and perform none.
+        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
+        val settings = PrayerSettings()
+        val today = LocalDate(2026, 6, 21)
+        val yesterday = LocalDate(2026, 6, 20)
+        val tomorrow = LocalDate(2026, 6, 22)
+        val dates = listOf(yesterday, today, tomorrow)
+
+        val freshEngine = PrayerTimesEngine()
+        dates.forEach { freshEngine.timesFor(tromso, it, settings) }
+        val afterFirstRound = freshEngine.solveCount
+        assertTrue(afterFirstRound > 0, "Expected the first round to perform extra solves")
+
+        dates.forEach { freshEngine.timesFor(tromso, it, settings) }
+        val afterSecondRound = freshEngine.solveCount
+        assertEquals(
+            afterFirstRound,
+            afterSecondRound,
+            "Second round over the same yesterday/today/tomorrow rotation should hit the cache " +
+                "and add zero extra solves",
+        )
+    }
+
+    @Test
+    fun theEngagedCacheIsBoundedRegardlessOfHowManyDistinctDatesAreQueried() {
+        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
+        val settings = PrayerSettings()
+        val freshEngine = PrayerTimesEngine()
+        val start = LocalDate(2026, 6, 1)
+        repeat(20) { offset ->
+            freshEngine.timesFor(tromso, start.plus(offset, DateTimeUnit.DAY), settings)
+        }
+        assertTrue(
+            freshEngine.engagedCacheSize() <= 8,
+            "Expected the engaged-rule cache to stay bounded at 8 entries, was " +
+                freshEngine.engagedCacheSize(),
+        )
     }
 
     @Test
