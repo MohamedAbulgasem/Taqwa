@@ -31,7 +31,8 @@ import world.taqwa.app.widget.WidgetContentBuilder
 import world.taqwa.app.widget.WidgetMirrorWriter
 import world.taqwa.app.widget.createWidgetKeyValueStore
 import world.taqwa.app.widget.isIosPlatform
-import world.taqwa.app.widget.translucentOrFrostedLabelKey
+import world.taqwa.app.widget.translucentOrFrostedSubtitleKey
+import world.taqwa.app.widget.translucentOrFrostedTitleKey
 
 @Composable
 internal fun themeDisplayName(mode: ThemeMode): String = stringResource(
@@ -43,16 +44,25 @@ internal fun themeDisplayName(mode: ThemeMode): String = stringResource(
 )
 
 /**
- * Three rows rather than a segmented control: a row with a check reads correctly to a screen
- * reader as a selected option, and it matches every other choice in settings.
+ * Four rows rather than a segmented control: a row with a check reads correctly to a screen
+ * reader as a selected option, and it matches every other choice in settings. Only the fourth
+ * option carries a [widgetBackgroundSubtitle] — its per-platform wording is long enough that it
+ * needs its own line rather than crowding the check mark off the row.
  */
 @Composable
-internal fun widgetBackgroundDisplayName(value: WidgetBackground): String = when (value) {
+internal fun widgetBackgroundTitle(value: WidgetBackground): String = when (value) {
     WidgetBackground.FOLLOW_THEME -> stringResource(Res.string.widget_background_follow_theme)
     WidgetBackground.LIGHT -> stringResource(Res.string.widget_background_light)
     WidgetBackground.DARK -> stringResource(Res.string.widget_background_dark)
     WidgetBackground.TRANSLUCENT_OR_FROSTED ->
-        stringResource(translucentOrFrostedLabelKey(isIosPlatform))
+        stringResource(translucentOrFrostedTitleKey(isIosPlatform))
+}
+
+@Composable
+internal fun widgetBackgroundSubtitle(value: WidgetBackground): String? = when (value) {
+    WidgetBackground.TRANSLUCENT_OR_FROSTED ->
+        stringResource(translucentOrFrostedSubtitleKey(isIosPlatform))
+    else -> null
 }
 
 @Composable
@@ -84,7 +94,8 @@ fun AppearanceSettingsScreen(
             WidgetBackground.entries.forEachIndexed { i, value ->
                 if (i > 0) CardDivider()
                 TaqwaRow(
-                    label = widgetBackgroundDisplayName(value),
+                    label = widgetBackgroundTitle(value),
+                    subtitle = widgetBackgroundSubtitle(value),
                     onClick = { onPickWidgetBackground(value) },
                     trailing = { if (value == widgetBackground) CheckMark() },
                 )

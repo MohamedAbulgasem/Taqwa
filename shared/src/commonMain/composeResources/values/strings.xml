@@ -153,8 +153,10 @@
     <string name="widget_background_follow_theme">Follow theme</string>
     <string name="widget_background_light">Light</string>
     <string name="widget_background_dark">Dark</string>
-    <string name="widget_background_translucent">Translucent — blends into your wallpaper</string>
-    <string name="widget_background_frosted">Frosted — uses the system widget material</string>
+    <string name="widget_background_translucent_title">Translucent</string>
+    <string name="widget_background_translucent_subtitle">Blends into your wallpaper.</string>
+    <string name="widget_background_frosted_title">Frosted</string>
+    <string name="widget_background_frosted_subtitle">Uses the system widget material.</string>
     <!-- Qibla screen (Task 22 sweep: qibla_no_sensor_title/body above already matched this
          screen's copy verbatim and are reused there; everything else needed its own string. -->
     <string name="qibla_title">Qibla</string>

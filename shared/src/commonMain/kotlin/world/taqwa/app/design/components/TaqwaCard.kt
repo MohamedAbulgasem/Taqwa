@@ -69,7 +69,7 @@ fun TaqwaRow(
         } else {
             Column(Modifier.weight(1f, fill = false).padding(end = 12.dp)) {
                 Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
-                Text(subtitle, style = TaqwaText.caption, color = colors.textSecondary)
+                Text(subtitle, style = TaqwaText.caption, color = colors.textTertiary)
             }
         }
         Row(
