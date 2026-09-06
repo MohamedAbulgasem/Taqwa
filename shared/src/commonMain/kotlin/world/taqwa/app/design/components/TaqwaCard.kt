@@ -3,6 +3,7 @@ package world.taqwa.app.design.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.Layout
@@ -76,9 +78,25 @@ fun TaqwaRow(
     value: String? = null,
     subtitle: String? = null,
     onClick: (() -> Unit)? = null,
+    /**
+     * True for a row that *is* an option (a check mark moves to it when tapped). Those rows do
+     * not ripple: the check arriving is the feedback, and a grey wash sweeping across the row a
+     * beat later reads as a second, unrelated event. Navigation rows keep the ripple, because
+     * nothing else acknowledges the tap before the next screen arrives.
+     */
+    selectable: Boolean = false,
     trailing: @Composable (() -> Unit)? = null,
 ) {
     val colors = LocalTaqwaColors.current
+    val clickModifier = when {
+        onClick == null -> Modifier
+        selectable -> Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onClick,
+        )
+        else -> Modifier.clickable(onClick = onClick)
+    }
     Layout(
         content = {
             if (subtitle == null) {
@@ -107,7 +125,7 @@ fun TaqwaRow(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 48.dp)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(clickModifier)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) { measurables, constraints ->
         val width = constraints.maxWidth

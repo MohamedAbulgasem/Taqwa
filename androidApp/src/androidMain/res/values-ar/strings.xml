@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">تقوى</string>
-    <string name="widget_small_description">الصلاة القادمة والوقت المتبقي لها.</string>
+    <string name="widget_small_description">الصلاة القادمة وعد تنازلي مباشر.</string>
     <string name="widget_medium_description">الصلاة القادمة والعد التنازلي ومواقيت اليوم.</string>
 </resources>

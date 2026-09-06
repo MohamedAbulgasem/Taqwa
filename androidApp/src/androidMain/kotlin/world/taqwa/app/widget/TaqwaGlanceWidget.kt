@@ -138,7 +138,10 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
     val leftWidth = (countdown.value * COUNTDOWN_EM + 6f).dp
     val label = (countdown.value * 0.38f).sp(12f, 15f)
     val clock = (countdown.value * 0.36f).sp(12f, 14f)
-    val innerHeight = size.height.value - padV.value * 2
+    // The list sits inside its own vertical inset, so the five rows gather slightly toward the
+    // middle of the card rather than touching the top and bottom padding, as iOS's do.
+    val listInset = 8.dp
+    val innerHeight = size.height.value - (padV.value + listInset.value) * 2
     val rowByHeight = innerHeight / 5f * 0.58f
     // "Maghrib · المغرب" in bold plus its time is about ten em; a row is sized so that fits the
     // list column whole, and the height only ever makes it larger, never the width smaller.
@@ -153,7 +156,7 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
             NextPrayerBlock(render, label, countdown, clock, labelGap = 2.dp, clockGap = 2.dp, centered = false)
         }
         Spacer(GlanceModifier.width(columnGap))
-        Column(modifier = GlanceModifier.defaultWeight().fillMaxHeight()) {
+        Column(modifier = GlanceModifier.defaultWeight().fillMaxHeight().padding(vertical = listInset)) {
             content?.rows?.forEach { row ->
                 val rowColor = ColorProvider(if (row.isCurrent) colors.accent() else colors.primaryText())
                 val rowWeight = if (row.isCurrent) FontWeight.Bold else FontWeight.Normal

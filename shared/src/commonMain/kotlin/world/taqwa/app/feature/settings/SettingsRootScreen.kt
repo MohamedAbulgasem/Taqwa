@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -179,7 +181,12 @@ internal fun TaqwaToggle(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Box(
         Modifier
             .defaultMinSize(minWidth = 48.dp, minHeight = 44.dp)
-            .clickable { onCheckedChange(!checked) },
+            // The knob sliding is the feedback; a rectangular ripple around a pill looked like a
+            // box lighting up behind it.
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) { onCheckedChange(!checked) },
         contentAlignment = Alignment.Center,
     ) {
         Box(

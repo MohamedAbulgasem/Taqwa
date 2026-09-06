@@ -233,6 +233,7 @@ fun MethodPickerScreen(
                         null
                     },
                     onClick = { onPick(id) },
+                    selectable = true,
                     trailing = { if (id == current) CheckMark() },
                 )
             }
@@ -256,6 +257,7 @@ fun HighLatitudePickerScreen(
                 TaqwaRow(
                     label = highLatitudeDisplayName(preference),
                     onClick = { onPick(preference) },
+                    selectable = true,
                     trailing = { if (preference == current) CheckMark() },
                 )
             }

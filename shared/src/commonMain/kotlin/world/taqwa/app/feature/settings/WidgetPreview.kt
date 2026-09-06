@@ -40,7 +40,7 @@ import world.taqwa.app.widget.WidgetPaletteColors
 import world.taqwa.app.widget.WidgetPrayerRow
 
 /** The preview cards' height. Both cards share it; the wide one is what is left of the row. */
-private val CardHeight = 104.dp
+private val CardHeight = 100.dp
 
 /**
  * Both home-screen widgets, small and wide, side by side over a neutral wallpaper swatch, drawn
@@ -115,7 +115,9 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
             Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(Modifier.weight(0.9f)) {
+            // The list gets the larger share: its bilingual names are the longest text on the
+            // card and are shown whole, never clipped, so the preview matches the real widget.
+            Column(Modifier.weight(0.6f)) {
                 Text(
                     content.countdownLabel,
                     style = TaqwaText.caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
@@ -136,8 +138,8 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
                     maxLines = 1,
                 )
             }
-            Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1.1f).fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly) {
+            Spacer(Modifier.width(8.dp))
+            Column(Modifier.weight(1.4f).fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly) {
                 content.rows.forEach { row ->
                     val color = Color(if (row.isCurrent) colors.accentArgb else colors.textArgb)
                     val weight = if (row.isCurrent) FontWeight.Bold else FontWeight.Normal
@@ -147,10 +149,11 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
                             style = TaqwaText.caption.copy(fontSize = 9.sp, fontWeight = weight),
                             color = color,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+                            softWrap = false,
+                            overflow = TextOverflow.Visible,
                             modifier = Modifier.weight(1f),
                         )
-                        Spacer(Modifier.width(6.dp))
+                        Spacer(Modifier.width(4.dp))
                         Text(
                             row.clockTime,
                             style = TaqwaText.caption.copy(fontSize = 9.sp, fontWeight = weight),

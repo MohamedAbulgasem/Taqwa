@@ -17,9 +17,9 @@
     <string name="onboarding_notifications_cta">Enable notifications</string>
     <string name="onboarding_notifications_secondary">Not now</string>
     <string name="onboarding_widget_title">On your home screen</string>
-    <string name="onboarding_widget_body">The Taqwa widget shows the next prayer and the time until it, without opening the app.</string>
-    <string name="onboarding_widget_body_ios">The Taqwa widget shows the next prayer and the time until it, without opening the app. To add it, touch and hold the Taqwa icon on your home screen and choose a widget size.</string>
-    <string name="onboarding_widget_body_ios_legacy">The Taqwa widget shows the next prayer and the time until it, without opening the app. To add it, touch and hold your home screen, tap the plus in the top corner, then search for Taqwa.</string>
+    <string name="onboarding_widget_body">The Taqwa widget shows the next prayer and a live countdown, without opening the app.</string>
+    <string name="onboarding_widget_body_ios">The Taqwa widget shows the next prayer and a live countdown, without opening the app. To add it, touch and hold the Taqwa icon on your home screen and choose a widget size.</string>
+    <string name="onboarding_widget_body_ios_legacy">The Taqwa widget shows the next prayer and a live countdown, without opening the app. To add it, touch and hold your home screen, tap the plus in the top corner, then search for Taqwa.</string>
     <string name="onboarding_widget_cta_add">Add widget</string>
     <string name="onboarding_widget_cta_done">Done</string>
     <string name="onboarding_widget_secondary">Maybe later</string>
@@ -157,7 +157,7 @@
     <!-- Widget background (Appearance) -->
     <string name="appearance_widget_background_label">WIDGET BACKGROUND</string>
     <string name="appearance_widget_preview_label">PREVIEW</string>
-    <string name="widget_background_follow_theme">Follow theme</string>
+    <string name="widget_background_follow_theme">System</string>
     <string name="widget_background_light">Light</string>
     <string name="widget_background_dark">Dark</string>
     <string name="widget_background_translucent_title">Translucent</string>

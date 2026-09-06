@@ -117,6 +117,7 @@ fun NotificationSettingsScreen(
                     TaqwaRow(
                         label = leadLabel(minutes),
                         onClick = { onPickLead(minutes); remindSheetOpen = false },
+                        selectable = true,
                         trailing = { if (minutes == settings.remindBeforeMinutes) CheckMark() },
                     )
                 }

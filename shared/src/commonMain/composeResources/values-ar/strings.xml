@@ -16,9 +16,9 @@
     <string name="onboarding_notifications_cta">تفعيل الإشعارات</string>
     <string name="onboarding_notifications_secondary">ليس الآن</string>
     <string name="onboarding_widget_title">على شاشتك الرئيسية</string>
-    <string name="onboarding_widget_body">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق.</string>
-    <string name="onboarding_widget_body_ios">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق. لإضافتها، اضغط مطولًا على أيقونة تقوى في الشاشة الرئيسية واختر حجم الأداة.</string>
-    <string name="onboarding_widget_body_ios_legacy">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق. لإضافتها، اضغط مطولًا على الشاشة الرئيسية، ثم اضغط علامة الزائد في الزاوية العلوية وابحث عن تقوى.</string>
+    <string name="onboarding_widget_body">تعرض أداة تقوى الصلاة القادمة وعدًّا تنازليًا مباشرًا من دون فتح التطبيق.</string>
+    <string name="onboarding_widget_body_ios">تعرض أداة تقوى الصلاة القادمة وعدًّا تنازليًا مباشرًا من دون فتح التطبيق. لإضافتها، اضغط مطولًا على أيقونة تقوى في الشاشة الرئيسية واختر حجم الأداة.</string>
+    <string name="onboarding_widget_body_ios_legacy">تعرض أداة تقوى الصلاة القادمة وعدًّا تنازليًا مباشرًا من دون فتح التطبيق. لإضافتها، اضغط مطولًا على الشاشة الرئيسية، ثم اضغط علامة الزائد في الزاوية العلوية وابحث عن تقوى.</string>
     <string name="onboarding_widget_cta_add">إضافة الأداة</string>
     <string name="onboarding_widget_cta_done">تم</string>
     <string name="onboarding_widget_secondary">لاحقًا</string>
@@ -155,7 +155,7 @@
     <!-- Widget background (Appearance) -->
     <string name="appearance_widget_background_label">خلفية الودجت</string>
     <string name="appearance_widget_preview_label">معاينة</string>
-    <string name="widget_background_follow_theme">حسب المظهر</string>
+    <string name="widget_background_follow_theme">حسب النظام</string>
     <string name="widget_background_light">فاتح</string>
     <string name="widget_background_dark">داكن</string>
     <string name="widget_background_translucent_title">شفاف</string>

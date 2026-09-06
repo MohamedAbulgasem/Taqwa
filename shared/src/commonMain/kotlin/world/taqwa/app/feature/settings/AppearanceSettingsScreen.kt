@@ -81,6 +81,7 @@ fun AppearanceSettingsScreen(
                 TaqwaRow(
                     label = themeDisplayName(mode),
                     onClick = { onPick(mode) },
+                    selectable = true,
                     trailing = { if (mode == current) CheckMark() },
                 )
             }
@@ -97,6 +98,7 @@ fun AppearanceSettingsScreen(
                     label = widgetBackgroundTitle(value),
                     subtitle = widgetBackgroundSubtitle(value),
                     onClick = { onPickWidgetBackground(value) },
+                    selectable = true,
                     trailing = { if (value == widgetBackground) CheckMark() },
                 )
             }
