@@ -23,7 +23,7 @@ A CC0-labelled adhan on Freesound (`sonically_sound/sounds/639494`) was rejected
 
 Taqwa's own sound for the **Notification** level, so a prayer never sounds like a message
 arriving. Synthesised, not recorded: two soft bell strikes (A4 then E5, 260 ms apart), each four
-inharmonic partials with long independent decays and a hair of detune for warmth, 2.80 s,
+inharmonic partials with long independent decays and a hair of detune for warmth, 2.40 s,
 peak −5 dBFS. Original work, no third-party material, no licence conditions. Regenerate with the
 snippet in `docs/BUILD-LOG.md` (iteration 6) or by ear; `.ogg` for Android, `.caf` (IMA4) for iOS.
 

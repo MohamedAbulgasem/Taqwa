@@ -19,7 +19,7 @@ class SoundAssetsTest {
     // Not the phone's default tone: a prayer must never sound like a message arriving.
     @Test
     fun notificationIsTaqwasOwnChime() {
-        assertEquals(2.80.seconds, SoundAssets.duration(PrayerSound.NOTIFICATION))
+        assertEquals(2.40.seconds, SoundAssets.duration(PrayerSound.NOTIFICATION))
         assertEquals("chime", SoundAssets.androidRawResourceName(PrayerSound.NOTIFICATION))
         assertEquals("chime.caf", SoundAssets.iosResourceFileName(PrayerSound.NOTIFICATION))
     }
