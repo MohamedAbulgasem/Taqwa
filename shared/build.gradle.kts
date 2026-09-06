@@ -33,6 +33,10 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.components.resources)
+            // repeatOnLifecycle + LocalLifecycleOwner for common code: gates TodayViewModel's
+            // tick loop on Lifecycle.State.STARTED so it stops the moment the screen is stopped
+            // (backgrounded, screen off) instead of running for as long as the process lives.
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
             implementation(libs.adhan2)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.coroutines.core)
