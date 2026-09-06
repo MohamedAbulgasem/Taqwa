@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.settings.SettingsRepository
 
@@ -56,6 +57,10 @@ class LocationRefresher(
             countryCode = nearest?.countryCode,
         )
         settings.setLocation(next)
+        // A silent re-resolve is still a fix, and it has just overwritten whatever city the user
+        // picked, so "Use my location" has to say so. Only reached when a fix arrived at all —
+        // the early return above is the manually-chosen-city case.
+        settings.setLocationSource(LocationSource.GPS)
         // A move across a border is exactly when the country default becomes relevant; it is a
         // no-op once the user has picked a method themselves.
         settings.applyCountryDefaultMethod(next.countryCode)

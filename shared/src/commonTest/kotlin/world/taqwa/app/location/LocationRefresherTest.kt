@@ -7,6 +7,7 @@ import okio.Path.Companion.toPath
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.test.Test
@@ -62,6 +63,19 @@ class LocationRefresherTest {
         assertEquals("Europe/Istanbul", stored?.timeZoneId)
         // C4's country default rides along: the method follows the move unless the user chose one.
         assertEquals(CalculationMethodId.TURKEY, settings.prayerSettings.first().method)
+    }
+
+    @Test
+    fun aRefreshThatMovesTheUserRecordsThatTheLocationCameFromAFix() = runTest {
+        val settings = settings("source-gps")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.MANUAL)
+        refresher(settings, 41.0138 to 28.9496, "Europe/Istanbul")
+            .refreshFor(RescheduleTrigger.APP_FOREGROUND)
+
+        // The city the user picked has just been overwritten by a fix, so "Use my location" has
+        // to read ON — otherwise the toggle disagrees with the city shown beneath it.
+        assertEquals(LocationSource.GPS, settings.locationSource.first())
     }
 
     @Test

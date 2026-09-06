@@ -26,6 +26,7 @@ import world.taqwa.app.design.TaqwaTheme
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.onboarding.OnboardingScreen
@@ -74,6 +75,7 @@ fun App(container: AppContainer) {
         initial = world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME,
     )
     val location by settings.location.collectAsState(initial = null)
+    val locationSource by settings.locationSource.collectAsState(initial = LocationSource.MANUAL)
     val navigator = remember { Navigator(Screen.Today) }
     val backStack by navigator.backStack.collectAsState()
     val scope = rememberCoroutineScope()
@@ -129,6 +131,9 @@ fun App(container: AppContainer) {
         scope.launch {
             container.locationRepository.resolveGpsLocation(container.cityRepository)?.let {
                 settings.setLocation(it)
+                // Only on a fix that actually arrived: a granted permission that then fails to
+                // produce coordinates must not leave "Use my location" claiming to be on.
+                settings.setLocationSource(LocationSource.GPS)
                 // Spec §249: method auto-detection from the resolved country. A no-op once the
                 // user has picked a method themselves.
                 settings.applyCountryDefaultMethod(it.countryCode)
@@ -306,6 +311,7 @@ fun App(container: AppContainer) {
 
                         Screen.LocationSettings -> LocationSettingsScreen(
                             location = location,
+                            locationSource = locationSource,
                             locationRepository = container.locationRepository,
                             onLocationPermission = { permission ->
                                 if (permission == LocationPermission.GRANTED) useGpsFix()
@@ -320,6 +326,10 @@ fun App(container: AppContainer) {
                                 scope.launch {
                                     val picked = city.toGeoLocation()
                                     settings.setLocation(picked)
+                                    // The only writer of MANUAL, which is what makes turning the
+                                    // toggle off reversible: back out of the search and the
+                                    // stored source — and so the toggle — is untouched.
+                                    settings.setLocationSource(LocationSource.MANUAL)
                                     settings.applyCountryDefaultMethod(picked.countryCode)
                                 }
                                 // Reached from onboarding, a successful pick answers the location
