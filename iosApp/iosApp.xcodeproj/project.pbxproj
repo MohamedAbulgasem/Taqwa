@@ -10,24 +10,77 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		3856BCD57F75E6B0887D12EE /* TaqwaWidgetPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		85546997F5FF01050B5EF34A /* TaqwaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */; };
+		8EEF72B2D5882940D96711CA /* TaqwaWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A15B1E2D7E8F857B09C3FC37 /* TaqwaWidgetPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */; };
 		A1B2C3D4E5F6A1B2C3D4E502 /* takbir.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E504 /* adhan-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */; };
+		A7CF8ECCACEB4FAB893423B5 /* TaqwaWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */; };
+		C7983528BFE48BBADC014C36 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D563877F07E6BEE4908C30A /* Foundation.framework */; };
+		D44246D1477DD56E7CED694A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E742DE611961B877AB95E6B9 /* SwiftUI.framework */; };
+		DB24BBB0D26B3BD81E0C3701 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C108B61CAA620B3D841285 /* WidgetKit.framework */; };
+		E2A091FCCDAC1469C058AFFC /* TaqwaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E14FD7BAF3F0A5CD5A419D12 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7555FF73242A565900829871 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9C14AFFF33CB50DB42D37CA8;
+			remoteInfo = TaqwaWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3986423AAEE92F67DF624BF2 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8EEF72B2D5882940D96711CA /* TaqwaWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = TaqwaWidget.appex; path = TaqwaWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetPreviews.swift; sourceTree = "<group>"; };
+		5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetViews.swift; sourceTree = "<group>"; };
+		61981D289C5D41637D0E073A /* TaqwaWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = TaqwaWidget.entitlements; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* My application.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My application.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		77C108B61CAA620B3D841285 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		8293053FDA4A6A7B3808978A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetBundle.swift; sourceTree = "<group>"; };
+		8D563877F07E6BEE4908C30A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = takbir.caf; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-30s.caf"; sourceTree = "<group>"; };
+		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		D5D50647620835E92DA37009 /* iosApp.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
+		E742DE611961B877AB95E6B9 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		42D060EB48C0C312E87ABB4A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7983528BFE48BBADC014C36 /* Foundation.framework in Frameworks */,
+				DB24BBB0D26B3BD81E0C3701 /* WidgetKit.framework in Frameworks */,
+				D44246D1477DD56E7CED694A /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F85CB1118929364A9C6EFABC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -46,9 +99,25 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		1035E4AC1373222B52A1183F /* TaqwaWidget */ = {
+			isa = PBXGroup;
+			children = (
+				8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */,
+				5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */,
+				3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */,
+				8293053FDA4A6A7B3808978A /* Info.plist */,
+				61981D289C5D41637D0E073A /* TaqwaWidget.entitlements */,
+			);
+			name = TaqwaWidget;
+			path = TaqwaWidget;
+			sourceTree = "<group>";
+		};
 		42799AB246E5F90AF97AA0EF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8D563877F07E6BEE4908C30A /* Foundation.framework */,
+				77C108B61CAA620B3D841285 /* WidgetKit.framework */,
+				E742DE611961B877AB95E6B9 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -60,6 +129,7 @@
 				7555FF7D242A565900829871 /* iosApp */,
 				7555FF7C242A565900829871 /* Products */,
 				42799AB246E5F90AF97AA0EF /* Frameworks */,
+				1035E4AC1373222B52A1183F /* TaqwaWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -67,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				7555FF7B242A565900829871 /* My application.app */,
+				141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -80,6 +151,7 @@
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				A1B2C3D4E5F6A1B2C3D4E505 /* Resources */,
+				D5D50647620835E92DA37009 /* iosApp.entitlements */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -112,15 +184,35 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF79242A565900829871 /* Resources */,
 				F85CB1118929364A9C6EFABC /* Frameworks */,
+				3986423AAEE92F67DF624BF2 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				71DDCBB786FDAC13159757CF /* PBXTargetDependency */,
 			);
 			name = iosApp;
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* My application.app */;
 			productType = "com.apple.product-type.application";
+		};
+		9C14AFFF33CB50DB42D37CA8 /* TaqwaWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A9ADED71164BB4A1F8BC872 /* Build configuration list for PBXNativeTarget "TaqwaWidget" */;
+			buildPhases = (
+				D70CFD311451404A813042EC /* Compile Kotlin */,
+				556DF3CAC0C46931AEA0B271 /* Sources */,
+				42D060EB48C0C312E87ABB4A /* Frameworks */,
+				D6705F0BD7B0C639106E61FB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TaqwaWidget;
+			productName = TaqwaWidget;
+			productReference = 141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -151,6 +243,7 @@
 			projectRoot = "";
 			targets = (
 				7555FF7A242A565900829871 /* iosApp */,
+				9C14AFFF33CB50DB42D37CA8 /* TaqwaWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -164,6 +257,13 @@
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E502 /* takbir.caf in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E504 /* adhan-30s.caf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D6705F0BD7B0C639106E61FB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,21 +288,133 @@
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 		};
+		D70CFD311451404A813042EC /* Compile Kotlin */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Compile Kotlin";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		556DF3CAC0C46931AEA0B271 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7CF8ECCACEB4FAB893423B5 /* TaqwaWidgetBundle.swift in Sources */,
+				85546997F5FF01050B5EF34A /* TaqwaWidgetViews.swift in Sources */,
+				3856BCD57F75E6B0887D12EE /* TaqwaWidgetPreviews.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7555FF77242A565900829871 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				E2A091FCCDAC1469C058AFFC /* TaqwaWidgetViews.swift in Sources */,
+				A15B1E2D7E8F857B09C3FC37 /* TaqwaWidgetPreviews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		71DDCBB786FDAC13159757CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TaqwaWidget;
+			target = 9C14AFFF33CB50DB42D37CA8 /* TaqwaWidget */;
+			targetProxy = E14FD7BAF3F0A5CD5A419D12 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		518413451CC6045D3DF9D7A6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = TaqwaWidget/TaqwaWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 36383TYK26;
+				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaqwaWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					shared,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = world.taqwa.app.widget;
+				PRODUCT_NAME = TaqwaWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6729C1C2D7EBE76E1EFCB008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = TaqwaWidget/TaqwaWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 36383TYK26;
+				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaqwaWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					shared,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = world.taqwa.app.widget;
+				PRODUCT_NAME = TaqwaWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
 		7555FFA3242A565B00829871 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
@@ -325,6 +537,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
@@ -359,6 +572,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
@@ -392,6 +606,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6A9ADED71164BB4A1F8BC872 /* Build configuration list for PBXNativeTarget "TaqwaWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				518413451CC6045D3DF9D7A6 /* Release */,
+				6729C1C2D7EBE76E1EFCB008 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		7555FF76242A565900829871 /* Build configuration list for PBXProject "iosApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
