@@ -185,3 +185,68 @@ build), so worktrees were the fix, not a nicety. Every merge was clean.
 `./gradlew :shared:allTests` started failing with `framework '_LocationEssentials' not found` —
 same Xcode 16 vs 26 problem as before, same fix. The `sudo xcode-select` command in the first
 section would make both wrappers unnecessary.
+
+### Plan 2 — COMPLETE. Slice 1 is feature-complete on `slice-1-core`.
+
+**203 tests on JVM, 201 on iOS native, zero failures. Both apps build. The iOS widget extension is
+2.9 MB on a clean build.** Final whole-branch review in progress before this merges to `main`.
+
+| Task | What landed | Where |
+|---|---|---|
+| 19 | Audio in both bundles, sound sheet, Notifications screen, both plan-1 stubs wired | `7cf5a3c` |
+| 20 | Qibla bearing (118.99° London→Kaaba) + haversine | merged `6e87f34` |
+| 21 + polish | Compass: true-north sensors, three states, dial to the mockup | merged `f91548a` |
+| 22 | Arabic localisation, RTL mirroring, CLDR numerals, all strings to resources | `9adde15` |
+| 23 | Shared widget model + Android Glance small/medium | merged `923cfb9` |
+| 24 | iOS WidgetKit extension, App Group, idempotent target script | merged `923cfb9` |
+| 25 | Widget background setting with live preview; the missing mirror write | `b50e2e0` |
+| — | GPS resolves to nearest city; high-latitude note only when a rule binds | merged `7790168` |
+| — | Single DataStore instance (crash fix) | merged `75b87f8` |
+| — | `:widgetcore` slim framework: appex 63 MB → 2.9 MB | merged `c94b96f` |
+| — | Compass strings to resources + Arabic; all four cardinal labels | merged `39dd372` |
+| — | Android widget layout to the mockup | merged `f1dc385` |
+
+**How it was built.** From Task 20 onward, up to four agents ran concurrently in isolated git
+worktrees, each merged after landing green on its own branch. Three merges needed hand resolution
+(`App.kt` twice, `TodayViewModel`, the two `strings.xml` unions) — all recorded in the merge
+commits. Every merge was followed by a full test run on the integrated tree before anything built
+on it.
+
+**Findings that outlast slice 1:**
+
+- **Compose Multiplatform shapes Arabic correctly on iOS.** The Quran reader can stay in shared
+  code. But the design's `-0.02em` tracking *breaks Arabic word-joining* in Compose — letter-spacing
+  must be zero for Arabic script. `TaqwaText.forScript` now enforces it. Carry this into the reader.
+- **Arabic-Indic digits are not tabular** in the system Arabic font — measured, a 4 px shift across
+  a minute boundary — so the countdown ring falls back to Western digits for ar-EG/ar-SA, as the
+  spec allowed. Timeline clock times keep the locale's digits.
+- **I had the high-latitude seasons inverted.** The one-seventh rule binds in *summer* (short
+  nights cap an early Fajr), not winter. The agent verified against adhan2 rather than trusting the
+  brief; London in September was correct all along. The real fix was that the card had been
+  permanent above 48° and now disappears in November.
+- **A `createDataStore()` called from three places** (app, boot receiver, iOS refresh bridge) each
+  opened its own instance — androidx forbids that and one crash reset a user's preferences to
+  defaults. Now a lazy process-wide singleton. Ten force-stop/relaunch cycles clean on device.
+- **The iOS app was crashing at launch** on the widget branch — the target-creation script had
+  written `-framework shared` twice into the app's linker flags ("Kotlin runtime injected twice").
+  Found and fixed while slimming the extension.
+- **WidgetKit's ~30 MB memory ceiling** would have killed a 63 MB extension. The widget model now
+  lives in `:widgetcore`, a Compose-free Kotlin/Native framework; the extension links only that.
+
+**On your side:**
+
+- **Your LoopPhone blocks the app's notifications at the OEM level** — `dumpsys notification`
+  shows `importance=NONE`, separate from the runtime permission we hold. Settings → Apps → Taqwa →
+  Notifications → enable. Everything upstream of that gate is proven; only the last-mile delivery
+  on this device is unverified.
+- The home-screen widget was removed from your launcher during testing; re-add it from the picker.
+- `sudo xcode-select -s "/Applications/Xcode 26.app/Contents/Developer"` is still outstanding;
+  `scripts/test.sh` and `scripts/ios-build.sh` exist only because of it.
+
+**Known issues, triaged for the final review:** the Android Glance widget computes its translucency
+alpha but never applies it; the widget label has a hardcoded English "IN" suffix (Today's localised
+countdown label should be reused); the Tehran method omits its Maghrib angle; `LocalPlatformFormat`
+is `remember`ed so a live locale change without restart desyncs direction from strings; GeoNames
+city names are Latin-only in the Arabic UI; iOS returns Western digits for `ar_EG` where Android
+returns Arabic-Indic (each platform's own CLDR answer); the medium and dark Android widgets were
+not visually verified live.
