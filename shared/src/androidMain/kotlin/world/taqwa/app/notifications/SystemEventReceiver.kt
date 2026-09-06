@@ -7,7 +7,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import world.taqwa.app.city.CityRepository
+import world.taqwa.app.location.LocationRefresher
+import world.taqwa.app.location.LocationRepository
+import world.taqwa.app.location.createLocationProvider
 import world.taqwa.app.prayer.PrayerTimesEngine
+import world.taqwa.app.resources.Res
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.createDataStore
 import kotlin.time.Clock
@@ -30,12 +35,21 @@ class SystemEventReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val settingsRepository = SettingsRepository(createDataStore())
+                // A TIMEZONE_CHANGED broadcast is the strongest signal the app ever gets that
+                // the user has moved, and it arrives whether or not the app is running, so the
+                // receiver builds the same refresher the container does.
+                val refresher = LocationRefresher(
+                    LocationRepository(createLocationProvider()),
+                    CityRepository { Res.readBytes("files/cities.csv").decodeToString() },
+                    settingsRepository,
+                )
                 val coordinator = NotificationCoordinator(
                     engine = PrayerTimesEngine(),
                     settingsRepository = settingsRepository,
                     locationOf = { settingsRepository.location.first() },
                     scheduler = createNotificationScheduler(),
                     now = { Clock.System.now() },
+                    locationFor = { refresher.refreshFor(it) },
                 )
                 coordinator.reschedule(trigger)
             } finally {
