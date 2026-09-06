@@ -415,3 +415,23 @@ over without a reload. `WidgetMirrorRefresher` rolls the horizon forward without
 calls it from the prayer alarm and the boot/time-change receiver, iOS from its daily background
 refresh. **293 JVM / 285 iOS tests**, including nine that render one snapshot at later and later
 moments and expect the widget to have moved on by itself.
+
+### Iterations 5 and 6 — polish rounds on the S23 Ultra
+
+Round five: no ripple on option rows, the sound sheet's radio rows or the toggle switches (the
+knob or check moving is the feedback); "Follow theme" became "System" to match the theme list;
+the widget preview shows bilingual names whole; the Android wide widget's rows sit inside an 8 dp
+inset so they gather toward the middle like iOS; "the time until it" became "a live countdown".
+
+Round six:
+
+| # | Report | What was actually wrong | Fix |
+|---|---|---|---|
+| 1 | Wide widget rows clipped at one launcher row | The 8 dp inset and 14 dp padding were taken regardless of height; on a one-row cell that left 11 dp per 15 dp row | Inset is only what the height can spare (0 to 8 dp) and vertical padding drops to 8 dp under 110 dp; two-row cells are unchanged |
+| 2 | About row | "About Taqwa · Version 1.0.0" | "Version · 1.0.0", both locales |
+| 3 | Notification sound was the phone's default tone | Indistinguishable from a message | **Taqwa's own chime**: two synthesised bell strikes (E5, B5), 1.70 s, original work, bundled as `chime.ogg` / `chime.caf`. Android channel id for the Notification level gains a `_chime` suffix (channel sounds are immutable) and the pre-chime id is in the stale set so upgrades drop it; the iOS preview player and the Android preview both play the file. Sheet subtitle: "A short, soft chime" |
+
+The chime generator, for the record (numpy, 44.1 kHz mono): each strike is the sum of partials at
+ratios 1, 2, 2.98, 4.21, 5.4 with amplitudes 1, .40, .16, .07, .03 and decay constants .75, .38,
+.22, .14, .09 s, doubled at ±0.12 % detune, 6 ms attack; second strike 190 ms after the first at
+0.78 of its level; 250 ms fade at the tail; peak −3 dBFS. 295 JVM / 287 iOS tests.

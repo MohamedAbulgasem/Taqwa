@@ -118,6 +118,9 @@ private fun countdownEm(text: String): Float =
 /** The longest prayer row, "Maghrib · المغرب" in bold and "18:32" beside it, in em. */
 private const val LONGEST_ROW_EM = 10.1f
 
+/** One prayer row at the smallest row size (11 sp) with its line height, in dp. */
+private const val MIN_ROW_HEIGHT_DP = 15f
+
 private fun Float.sp(min: Float, max: Float): TextUnit = coerceIn(min, max).sp
 
 /**
@@ -129,7 +132,9 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
     val colors = render.colors
     val content = render.content
     val padH = 16.dp
-    val padV = 14.dp
+    // A single launcher row on a tall-celled phone still clears the strip threshold, and there
+    // the card cannot spare its two-row padding: the rows were clipped at the baseline.
+    val padV = if (size.height < 110.dp) 8.dp else 14.dp
     val columnGap = 12.dp
     val available = size.width - padH * 2 - columnGap
     // The countdown block is exactly as wide as "12:34" needs at its size, no wider: every dp it
@@ -139,9 +144,12 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
     val label = (countdown.value * 0.38f).sp(12f, 15f)
     val clock = (countdown.value * 0.36f).sp(12f, 14f)
     // The list sits inside its own vertical inset, so the five rows gather slightly toward the
-    // middle of the card rather than touching the top and bottom padding, as iOS's do.
-    val listInset = 8.dp
-    val innerHeight = size.height.value - (padV.value + listInset.value) * 2
+    // middle of the card rather than touching the top and bottom padding, as iOS's do. The inset
+    // is only what the height can spare: five rows at the smallest size need about 15 dp each,
+    // and on a one-row cell that leaves nothing, so the rows keep the full height they had.
+    val listHeight = size.height.value - padV.value * 2
+    val listInset = ((listHeight - 5f * MIN_ROW_HEIGHT_DP) / 2f).coerceIn(0f, 8f).dp
+    val innerHeight = listHeight - listInset.value * 2
     val rowByHeight = innerHeight / 5f * 0.58f
     // "Maghrib · المغرب" in bold plus its time is about ten em; a row is sized so that fits the
     // list column whole, and the height only ever makes it larger, never the width smaller.

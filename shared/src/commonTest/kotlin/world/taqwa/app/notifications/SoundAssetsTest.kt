@@ -10,12 +10,18 @@ import kotlin.time.Duration.Companion.seconds
 class SoundAssetsTest {
 
     @Test
-    fun silentAndNotificationHaveNoBundledFileOrDuration() {
-        listOf(PrayerSound.SILENT, PrayerSound.NOTIFICATION).forEach {
-            assertNull(SoundAssets.androidRawResourceName(it), "$it")
-            assertNull(SoundAssets.iosResourceFileName(it), "$it")
-            assertNull(SoundAssets.duration(it), "$it")
-        }
+    fun silentHasNoBundledFileOrDuration() {
+        assertNull(SoundAssets.androidRawResourceName(PrayerSound.SILENT))
+        assertNull(SoundAssets.iosResourceFileName(PrayerSound.SILENT))
+        assertNull(SoundAssets.duration(PrayerSound.SILENT))
+    }
+
+    // Not the phone's default tone: a prayer must never sound like a message arriving.
+    @Test
+    fun notificationIsTaqwasOwnChime() {
+        assertEquals(1.70.seconds, SoundAssets.duration(PrayerSound.NOTIFICATION))
+        assertEquals("chime", SoundAssets.androidRawResourceName(PrayerSound.NOTIFICATION))
+        assertEquals("chime.caf", SoundAssets.iosResourceFileName(PrayerSound.NOTIFICATION))
     }
 
     @Test

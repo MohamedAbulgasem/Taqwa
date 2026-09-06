@@ -19,6 +19,14 @@ Chosen because it is a CC0 dedication by the person who made the recording. That
 
 A CC0-labelled adhan on Freesound (`sonically_sound/sounds/639494`) was rejected. Its own description states it was extracted from YouTube. Someone who did not create a recording cannot validly dedicate it to the public domain, so the CC0 label carries no weight. A licence is only as good as the uploader's right to grant it.
 
+## The chime (`chime.*`)
+
+Taqwa's own sound for the **Notification** level, so a prayer never sounds like a message
+arriving. Synthesised, not recorded: two bell strikes (E5 then B5, 190 ms apart), each five
+inharmonic partials with independent exponential decays and a hair of detune for warmth, 1.70 s,
+peak −3 dBFS. Original work, no third-party material, no licence conditions. Regenerate with the
+snippet in `docs/BUILD-LOG.md` (iteration 6) or by ear; `.ogg` for Android, `.caf` (IMA4) for iOS.
+
 ## Derived clips
 
 Cut on silence-detected phrase boundaries, not arbitrary timestamps, so no clip ends mid-word.

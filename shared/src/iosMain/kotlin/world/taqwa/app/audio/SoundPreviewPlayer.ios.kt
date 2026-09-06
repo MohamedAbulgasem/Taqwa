@@ -6,7 +6,6 @@ import platform.AVFAudio.AVAudioPlayerDelegateProtocol
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.setActive
-import platform.AudioToolbox.AudioServicesPlaySystemSound
 import platform.Foundation.NSBundle
 import platform.Foundation.NSURL
 import platform.darwin.NSObject
@@ -31,11 +30,7 @@ private class IosSoundPreviewPlayer : SoundPreviewPlayer {
         when (sound) {
             // Nothing to audition; the button press itself is the reassurance.
             PrayerSound.SILENT -> return
-            // iOS has no public API to play "the" default notification tone outside a
-            // delivered notification; this system sound is the closest available stand-in.
-            // System sounds always follow the ring switch, so no session category applies.
-            PrayerSound.NOTIFICATION -> AudioServicesPlaySystemSound(1007u)
-            PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
+            PrayerSound.NOTIFICATION, PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
                 val fileName = SoundAssets.iosResourceFileName(sound)!!
                 val path = NSBundle.mainBundle.pathForResource(
                     fileName.substringBeforeLast('.'), fileName.substringAfterLast('.'),

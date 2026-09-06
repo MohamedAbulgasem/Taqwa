@@ -2,7 +2,6 @@ package world.taqwa.app.audio
 
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.RingtoneManager
 import android.net.Uri
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.notifications.SoundAssets
@@ -18,12 +17,8 @@ private class AndroidSoundPreviewPlayer : SoundPreviewPlayer {
         // nothing plays.
         if (sound == PrayerSound.SILENT) return
 
-        val uri = if (sound == PrayerSound.NOTIFICATION) {
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        } else {
-            val name = SoundAssets.androidRawResourceName(sound)!!
-            Uri.parse("android.resource://${appContext.packageName}/raw/$name")
-        }
+        val name = SoundAssets.androidRawResourceName(sound)!!
+        val uri = Uri.parse("android.resource://${appContext.packageName}/raw/$name")
 
         mediaPlayer = MediaPlayer().apply {
             setAudioAttributes(

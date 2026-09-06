@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioAttributes
-import android.media.RingtoneManager
 import android.net.Uri
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
@@ -181,9 +180,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             .build()
         when (sound) {
             PrayerSound.SILENT -> channel.setSound(null, null)
-            PrayerSound.NOTIFICATION ->
-                channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), attrs)
-            PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
+            PrayerSound.NOTIFICATION, PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
                 val name = SoundAssets.androidRawResourceName(sound)!!
                 channel.setSound(Uri.parse("android.resource://${context.packageName}/raw/$name"), attrs)
             }

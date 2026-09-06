@@ -51,12 +51,12 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_appearance">Appearance</string>
     <string name="settings_language">Language</string>
-    <string name="settings_about">About Taqwa</string>
+    <string name="settings_about">Version</string>
     <string name="settings_attribution">Attribution &amp; licences</string>
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">Version 1.0.0</string>
+    <string name="settings_version_value">1.0.0</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">THEME</string>
@@ -95,7 +95,7 @@
     <string name="sound_takbir">Takbir</string>
     <string name="sound_adhan">Adhan</string>
     <string name="sound_silent_detail">Banner only, no sound</string>
-    <string name="sound_notification_detail">Your phone’s default tone</string>
+    <string name="sound_notification_detail">A short, soft chime</string>
     <string name="sound_takbir_detail">Allahu akbar, Allahu akbar, about %1$ss</string>
     <string name="sound_adhan_detail">Full call, %1$s seconds</string>
     <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on this platform. The complete adhan can be played inside the app.</string>
