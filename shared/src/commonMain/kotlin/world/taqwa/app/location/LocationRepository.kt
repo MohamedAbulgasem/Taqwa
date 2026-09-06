@@ -1,5 +1,7 @@
 package world.taqwa.app.location
 
+import kotlinx.datetime.TimeZone
+import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.GeoLocation
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -35,4 +37,22 @@ class LocationRepository(private val provider: LocationProvider) {
      * zone of the manually chosen city.
      */
     suspend fun currentCoordinates(): Pair<Double, Double>? = provider.currentCoordinates()
+
+    /**
+     * Resolves a fresh GPS fix into a [GeoLocation] ready to persist. The coordinates are the
+     * exact fix — prayer times must use where the user actually is, never a city's coordinates —
+     * but the city name and country code (the latter needed for calculation-method
+     * auto-detection) come from the nearest bundled city, since raw GPS carries neither.
+     */
+    suspend fun resolveGpsLocation(cityRepository: CityRepository): GeoLocation? {
+        val (latitude, longitude) = currentCoordinates() ?: return null
+        val nearest = cityRepository.nearest(latitude, longitude)
+        return GeoLocation(
+            latitude = latitude,
+            longitude = longitude,
+            timeZoneId = TimeZone.currentSystemDefault().id,
+            cityName = nearest?.name,
+            countryCode = nearest?.countryCode,
+        )
+    }
 }

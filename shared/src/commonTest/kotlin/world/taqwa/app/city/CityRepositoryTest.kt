@@ -64,4 +64,26 @@ class CityRepositoryTest {
         assertEquals("Freedonia", city.countryName)
         assertEquals("FD", city.countryCode)
     }
+
+    @Test
+    fun nearestPicksLondonUkOverLondonOntario() = runTest {
+        // A GPS fix in central London, UK — much closer to 51.50853,-0.12574 than to the
+        // Ontario London on the other side of the Atlantic.
+        val nearest = repo.nearest(51.5, -0.12)
+        assertEquals("London", nearest?.name)
+        assertEquals("GB", nearest?.countryCode)
+    }
+
+    @Test
+    fun nearestPicksCairoForAPointCloserToCairo() = runTest {
+        val nearest = repo.nearest(30.1, 31.3)
+        assertEquals("Cairo", nearest?.name)
+        assertEquals("EG", nearest?.countryCode)
+    }
+
+    @Test
+    fun nearestOnEmptyDatabaseReturnsNull() = runTest {
+        val empty = CityRepository { "name,region,country,countryCode,lat,lon,tz" }
+        assertEquals(null, empty.nearest(51.5, -0.12))
+    }
 }

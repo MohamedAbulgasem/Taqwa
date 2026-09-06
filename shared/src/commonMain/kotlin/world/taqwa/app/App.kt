@@ -48,17 +48,6 @@ import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.RescheduleTrigger
 import kotlin.time.Clock
 
-/**
- * A GPS fix carries coordinates but no zone. The phone is where the user is, so the device's own
- * timezone is the right one — and it stays right when they travel. A manually chosen city brings
- * its own IANA id from the bundled database instead.
- */
-private fun gpsLocation(coordinates: Pair<Double, Double>) = GeoLocation(
-    latitude = coordinates.first,
-    longitude = coordinates.second,
-    timeZoneId = TimeZone.currentSystemDefault().id,
-)
-
 @Composable
 fun App(container: AppContainer) {
     val settings = container.settingsRepository
@@ -101,8 +90,8 @@ fun App(container: AppContainer) {
 
     fun useGpsFix() {
         scope.launch {
-            container.locationRepository.currentCoordinates()?.let {
-                settings.setLocation(gpsLocation(it))
+            container.locationRepository.resolveGpsLocation(container.cityRepository)?.let {
+                settings.setLocation(it)
             }
         }
     }

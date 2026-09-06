@@ -9,6 +9,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import kotlin.test.Test
@@ -113,5 +114,46 @@ class PrayerTimesEngineTest {
         val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
         val d = engine.timesFor(tromso, LocalDate(2026, 9, 23), PrayerSettings())
         assertEquals(false, d.nearestLatitudeFallbackApplied)
+    }
+
+    @Test
+    fun londonInSeptemberGenuinelyEngagesTheSeventhOfNightRuleUnderMwl() {
+        // Investigated directly against adhan2 (all three HighLatitudeRule values, several
+        // latitudes, every month of 2026) rather than assumed: at London's automatically-selected
+        // SEVENTH_OF_NIGHT rule, the one-seventh-of-the-night bound genuinely moves both Fajr
+        // (03:19 -> 03:49 UTC) and Isha (20:29 -> 20:08 UTC) on 2026-09-06 under the default
+        // Muslim World League method — MIDDLE_OF_THE_NIGHT and TWILIGHT_ANGLE both agree on the
+        // unclamped 03:19/20:29, so the substitution is real, not a no-op. The same seventh-of-
+        // night divergence appears every year from roughly March to September at this latitude
+        // (verified at 40 degrees and even, by a single minute, at 25 degrees near the June
+        // solstice) — it tracks night *length*, not proximity to a pole. So the exact screenshot
+        // date does not go quiet on its own; what the fix actually buys is that the note now only
+        // appears when a rule change is real (see the November/January tests below), instead of
+        // unconditionally for any location north of the 48-degree threshold as it did before.
+        val d = engine.timesFor(london, LocalDate(2026, 9, 6), PrayerSettings())
+        assertEquals(HighLatitudePreference.SEVENTH_OF_NIGHT, d.highLatitudeRuleApplied)
+    }
+
+    @Test
+    fun londonInNovemberHasNoHighLatitudeNoteBecauseNoRuleActuallyBinds() {
+        // An ordinary autumn night: long enough that the raw angle-based Fajr and Isha already
+        // sit inside every rule's bound, so all three HighLatitudeRule values agree and the note
+        // correctly disappears — this is the behaviour the fix is actually for.
+        val d = engine.timesFor(london, LocalDate(2026, 11, 15), PrayerSettings())
+        assertEquals(null, d.highLatitudeRuleApplied)
+    }
+
+    @Test
+    fun londonInDecemberAlsoHasNoHighLatitudeNoteBecauseWinterNightsAreLong() {
+        // Investigated directly: contrary to the assumption that a London winter would engage the
+        // rule, 2026-12-21 (and every mid-winter date checked) has all three HighLatitudeRule
+        // values agreeing exactly (05:59/17:51 UTC for Fajr/Isha) — winter nights here are long
+        // enough that the seventh-of-night bound never binds. The genuine divergence window is
+        // the *shorter*-night half of the year (see the September test above), not the longer-
+        // night half, which is the opposite of what the bug report assumed but consistent with
+        // why high-latitude substitution rules exist in the first place (short nights, not long
+        // ones, are what leave too little room for a full angle-based twilight).
+        val d = engine.timesFor(london, LocalDate(2026, 12, 21), PrayerSettings())
+        assertEquals(null, d.highLatitudeRuleApplied)
     }
 }
