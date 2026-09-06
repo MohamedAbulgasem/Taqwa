@@ -4,11 +4,21 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.PrayerStatus
 import world.taqwa.app.domain.TodayState
+import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.PlatformFormat
 import kotlin.time.Instant
 
 object WidgetMirrorWriter {
     private const val KEY = "snapshot"
+
+    /** Same key `TaqwaGlanceWidget.kt` (Android) and `TaqwaMirror.background()` (iOS) read
+     * literally — the widget processes never see `SettingsRepository`/DataStore, only this
+     * mirror, so the Appearance screen's choice has to be written here too. */
+    private const val BACKGROUND_KEY = "widget_background"
+
+    fun writeBackground(store: KeyValueStore, background: WidgetBackground) {
+        store.putString(BACKGROUND_KEY, background.name)
+    }
 
     fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat) {
         val zone = TimeZone.of(timeZoneId)

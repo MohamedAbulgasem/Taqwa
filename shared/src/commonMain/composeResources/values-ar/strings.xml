@@ -145,4 +145,13 @@
     <string name="qibla_no_sensor_title">لا توجد بوصلة في هذا الجهاز</string>
     <string name="qibla_no_sensor_body">لا يحتوي هذا الجهاز على مقياس مغناطيسي. استعن ببوصلة حقيقية مع الاتجاه الموضّح أدناه.</string>
     <string name="qibla_low_accuracy_body">حرّك هاتفك على هيئة رقم ثمانية. المعادن والأغطية ومكبّرات الصوت قد تشوّش على البوصلة.</string>
+
+    <!-- Widget background (Appearance) -->
+    <string name="appearance_widget_background_label">خلفية الودجت</string>
+    <string name="appearance_widget_preview_label">معاينة</string>
+    <string name="widget_background_follow_theme">حسب المظهر</string>
+    <string name="widget_background_light">فاتح</string>
+    <string name="widget_background_dark">داكن</string>
+    <string name="widget_background_translucent">شفاف — تندمج مع خلفية الشاشة</string>
+    <string name="widget_background_frosted">زجاجي — تستخدم خامة النظام للودجت</string>
 </resources>

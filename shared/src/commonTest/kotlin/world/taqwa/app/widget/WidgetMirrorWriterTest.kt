@@ -5,6 +5,7 @@ import world.taqwa.app.domain.PrayerStatus
 import world.taqwa.app.domain.PrayerTime
 import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.domain.TodayState
+import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.PlatformFormat
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -53,5 +54,26 @@ class WidgetMirrorWriterTest {
     @Test
     fun readingBeforeAnyWriteReturnsNullRatherThanCrashing() {
         assertEquals(null, WidgetMirrorWriter.read(FakeKeyValueStore()))
+    }
+
+    // Nothing wrote `widget_background` into the KeyValueStore until this task — both widgets
+    // were stuck on FOLLOW_THEME forever. This is the one write that closes that gap: the
+    // Appearance screen calls `writeBackground` beside `SettingsRepository.setWidgetBackground`,
+    // under the exact key `TaqwaGlanceWidget.kt` (Android) and `TaqwaMirror.background()` (iOS)
+    // read literally.
+    @Test
+    fun writeBackgroundStoresTheEnumNameUnderTheKeyBothWidgetsRead() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.writeBackground(store, WidgetBackground.TRANSLUCENT_OR_FROSTED)
+        assertEquals("TRANSLUCENT_OR_FROSTED", store.getString("widget_background"))
+    }
+
+    @Test
+    fun writeBackgroundRoundTripsEveryValue() {
+        val store = FakeKeyValueStore()
+        WidgetBackground.entries.forEach { value ->
+            WidgetMirrorWriter.writeBackground(store, value)
+            assertEquals(value.name, store.getString("widget_background"))
+        }
     }
 }

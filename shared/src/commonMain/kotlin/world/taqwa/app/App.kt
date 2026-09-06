@@ -66,6 +66,9 @@ fun App(container: AppContainer) {
     val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val prayerSettings by settings.prayerSettings.collectAsState(initial = PrayerSettings())
     val notificationSettings by settings.notificationSettings.collectAsState(initial = NotificationSettings())
+    val widgetBackground by settings.widgetBackground.collectAsState(
+        initial = world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME,
+    )
     val location by settings.location.collectAsState(initial = null)
     val navigator = remember { Navigator(Screen.Today) }
     val backStack by navigator.backStack.collectAsState()
@@ -308,6 +311,21 @@ fun App(container: AppContainer) {
                         // No pop: the whole app repaints behind this screen, and seeing that happen
                         // is the confirmation the choice took effect.
                         onPick = { scope.launch { settings.setThemeMode(it) } },
+                        widgetBackground = widgetBackground,
+                        onPickWidgetBackground = { value ->
+                            scope.launch {
+                                settings.setWidgetBackground(value)
+                                // The widget processes never see SettingsRepository/DataStore —
+                                // only the mirror — so the choice has to be written there too,
+                                // under the same key TaqwaGlanceWidget.kt (Android) and the iOS
+                                // TimelineProvider (Task 24) read.
+                                world.taqwa.app.widget.WidgetMirrorWriter.writeBackground(
+                                    world.taqwa.app.widget.createWidgetKeyValueStore(),
+                                    value,
+                                )
+                                world.taqwa.app.widget.refreshWidgets()
+                            }
+                        },
                         onBack = { navigator.pop() },
                     )
 
