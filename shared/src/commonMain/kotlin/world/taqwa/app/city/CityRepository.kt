@@ -25,14 +25,15 @@ class CityRepository(private val loadCsv: suspend () -> String) {
             .mapNotNull { line ->
                 if (line.isBlank()) return@mapNotNull null
                 val f = line.split(",")
-                if (f.size < 6) return@mapNotNull null
+                if (f.size < 7) return@mapNotNull null
                 City(
                     name = f[0],
                     region = f[1],
-                    countryCode = f[2],
-                    latitude = f[3].toDoubleOrNull() ?: return@mapNotNull null,
-                    longitude = f[4].toDoubleOrNull() ?: return@mapNotNull null,
-                    timeZoneId = f[5],
+                    countryName = f[2],
+                    countryCode = f[3],
+                    latitude = f[4].toDoubleOrNull() ?: return@mapNotNull null,
+                    longitude = f[5].toDoubleOrNull() ?: return@mapNotNull null,
+                    timeZoneId = f[6],
                 )
             }
             .toList()

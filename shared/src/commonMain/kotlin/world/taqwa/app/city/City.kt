@@ -5,6 +5,7 @@ import world.taqwa.app.domain.GeoLocation
 data class City(
     val name: String,
     val region: String,
+    val countryName: String,
     val countryCode: String,
     val latitude: Double,
     val longitude: Double,

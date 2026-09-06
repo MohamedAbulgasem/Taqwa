@@ -8,12 +8,13 @@ import kotlin.test.assertTrue
 class CityRepositoryTest {
 
     private val csv = """
-        name,region,country,lat,lon,tz
-        London,England,GB,51.50853,-0.12574,Europe/London
-        Londrina,Parana,BR,-23.31028,-51.16278,America/Sao_Paulo
-        London,Ontario,CA,42.98339,-81.23304,America/Toronto
-        Londonderry,Northern Ireland,GB,54.99721,-7.30917,Europe/London
-        Cairo,Cairo,EG,30.06263,31.24967,Africa/Cairo
+        name,region,country,countryCode,lat,lon,tz
+        London,England,United Kingdom,GB,51.50853,-0.12574,Europe/London
+        Londrina,Parana,Brazil,BR,-23.31028,-51.16278,America/Sao_Paulo
+        London,Ontario,Canada,CA,42.98339,-81.23304,America/Toronto
+        Londonderry,Northern Ireland,United Kingdom,GB,54.99721,-7.30917,Europe/London
+        Cairo,Cairo Governorate,Egypt,EG,30.06263,31.24967,Africa/Cairo
+        Nowhereton,,Freedonia,FD,10.0,10.0,Etc/UTC
     """.trimIndent()
 
     private val repo = CityRepository { csv }
@@ -52,5 +53,15 @@ class CityRepositoryTest {
     @Test
     fun limitIsRespected() = runTest {
         assertEquals(2, repo.search("lond", limit = 2).size)
+    }
+
+    @Test
+    fun unmappedAdmin1CodeYieldsEmptyRegionButStillParses() = runTest {
+        val results = repo.search("nowhereton")
+        assertEquals(1, results.size)
+        val city = results.first()
+        assertEquals("", city.region)
+        assertEquals("Freedonia", city.countryName)
+        assertEquals("FD", city.countryCode)
     }
 }
