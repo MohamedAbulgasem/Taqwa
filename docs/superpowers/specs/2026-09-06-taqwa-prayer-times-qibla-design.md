@@ -123,6 +123,10 @@ Each row shows the prayer name in the UI language, the Arabic name in the system
 
 **Localisation rule:** when the UI language is Arabic, the Arabic name is shown alone — never duplicated beside a transliteration. In every other language the pair is shown: localised name plus Arabic. This rule governs the widgets and notification text too.
 
+**Numerals follow platform locale formatting; never hard-code a digit set.** CLDR already resolves this correctly: `ar-LY`, `ar-MA`, `ar-TN` and `ar-DZ` default to Western digits, while `ar-EG` and `ar-SA` default to Arabic-Indic. A Libyan user must see `3:42`, an Egyptian user `٣:٤٢`, with no setting between them.
+
+**Consequence to verify:** Arabic-Indic digits render in the system Arabic font rather than Manrope, and that font's digits may not be tabular — which would make the countdown jitter as it ticks for Egyptian and Gulf users. Verify on device. If they are not tabular, the countdown ring specifically falls back to Western digits (it is a duration, not a clock time, so it carries less locale expectation); the timeline's clock times keep the locale's own digits regardless.
+
 **Requirement:** the timeline is time-dependent, so Today re-renders on a clock tick. When Asr arrives, its pip must fill and its row dim without the user refreshing. A coroutine tick in the view model, cancelled when the screen is not resumed.
 
 **Two states that must be built, not deferred:**
@@ -344,7 +348,7 @@ Audio is sourced from ["Beautiful adhan" by Adam-synagda](https://commons.wikime
 1. **A 6-second takbir is not achievable with a melodic adhan.** This spec originally assumed ~6s. In practice one complete "Allahu akbar, Allahu akbar" pair takes 15.8 seconds, and cutting at 6s truncates the muezzin mid-word. A genuinely 6-second takbir needs a plainly recited, non-melodic source — a different recording, not a different edit.
 2. **A 30-second clip cannot reach the shahada.** At this pace 30 seconds covers the four opening takbirs and no more; reaching "Ashhadu an la ilaha illa Allah" would need roughly 45 seconds, beyond what either platform allows. The two sound options therefore differ in length rather than content: two takbirs versus four.
 
-Both are accepted for development. **This is a placeholder to revisit before release** — including whether a specific muezzin should be chosen deliberately, and whether to offer a choice of muezzin as the established apps do.
+**Both accepted.** Two takbirs versus four is the shipped distinction; the sheet labels them by length rather than implying different content. **This is a placeholder to revisit before release** — including whether a specific muezzin should be chosen deliberately, and whether to offer a choice of muezzin as the established apps do.
 
 ---
 
