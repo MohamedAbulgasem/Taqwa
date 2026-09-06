@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -157,21 +158,29 @@ private fun GroupGap() = Spacer(Modifier.fillMaxWidth().height(28.dp))
 internal fun TaqwaToggle(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val colors = LocalTaqwaColors.current
     val knobStart by animateDpAsState(if (checked) 22.dp else 3.dp, label = "knob")
+    // Spec §92: 44 pt minimum. The switch is still drawn 48×28 — the outer box only widens what
+    // a finger has to hit, so nothing on the screen moves or changes shape.
     Box(
         Modifier
-            .size(width = 48.dp, height = 28.dp)
-            .clip(CircleShape)
-            .background(if (checked) colors.accent else colors.hairline)
+            .defaultMinSize(minWidth = 48.dp, minHeight = 44.dp)
             .clickable { onCheckedChange(!checked) },
-        contentAlignment = Alignment.CenterStart,
+        contentAlignment = Alignment.Center,
     ) {
         Box(
             Modifier
-                .padding(start = knobStart)
-                .size(22.dp)
+                .size(width = 48.dp, height = 28.dp)
                 .clip(CircleShape)
-                .background(if (checked) colors.background else colors.surface),
-        )
+                .background(if (checked) colors.accent else colors.hairline),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Box(
+                Modifier
+                    .padding(start = knobStart)
+                    .size(22.dp)
+                    .clip(CircleShape)
+                    .background(if (checked) colors.background else colors.surface),
+            )
+        }
     }
 }
 
