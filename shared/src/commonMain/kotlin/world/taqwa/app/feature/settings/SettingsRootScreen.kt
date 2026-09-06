@@ -35,6 +35,9 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaRow
+import world.taqwa.app.domain.NotificationSettings
+import world.taqwa.app.domain.ObligatoryPrayers
+import world.taqwa.app.domain.PrayerSound
 
 /** The horizontal inset every settings screen shares with Today's cards. */
 internal val SettingsGutter = 24.dp
@@ -151,12 +154,23 @@ fun SettingsRootScreen(
     cityName: String?,
     methodName: String,
     themeName: String,
+    notificationSettings: NotificationSettings,
     onBack: () -> Unit,
     onOpenLocation: () -> Unit,
     onOpenPrayerTimes: () -> Unit,
+    onOpenNotifications: () -> Unit,
     onOpenAppearance: () -> Unit,
     onOpenAttribution: () -> Unit,
 ) {
+    // "Off" once the master toggle is off; otherwise how many of the five obligatory prayers
+    // still carry a sound, so the row means something before the screen behind it is even open.
+    val notificationValue = if (!notificationSettings.enabled) {
+        "Off"
+    } else {
+        val on = ObligatoryPrayers.count { notificationSettings.soundFor(it) != PrayerSound.SILENT }
+        "$on on"
+    }
+
     SettingsScaffold("Settings", onBack) {
         SectionLabel("PRAYER")
         SettingsCard {
@@ -164,9 +178,7 @@ fun SettingsRootScreen(
             CardDivider()
             TaqwaRow("Prayer times", value = methodName, onClick = onOpenPrayerTimes)
             CardDivider()
-            // Deliberately inert: Task 19 wires the notification screen. A row that opens an
-            // empty screen is worse than one that says what it is waiting for.
-            TaqwaRow("Notifications", value = "Coming soon")
+            TaqwaRow("Notifications", value = notificationValue, onClick = onOpenNotifications)
         }
 
         GroupGap()

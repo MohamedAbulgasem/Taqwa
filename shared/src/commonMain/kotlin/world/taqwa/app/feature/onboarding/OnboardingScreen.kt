@@ -34,6 +34,7 @@ import world.taqwa.app.design.components.TaqwaTextLink
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.rememberLocationPermissionRequester
+import world.taqwa.app.notifications.rememberNotificationPermissionRequester
 
 /**
  * Hoisted out of this composable because "choose a city instead" navigates away to the city
@@ -54,6 +55,8 @@ fun OnboardingScreen(
     locationRepository: LocationRepository,
     onLocationPermission: (LocationPermission) -> Unit,
     onChooseCity: () -> Unit,
+    onNotificationPermission: (Boolean) -> Unit,
+    onDeclineNotifications: () -> Unit,
     onComplete: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
@@ -63,6 +66,13 @@ fun OnboardingScreen(
         // Granted or denied, the flow moves on: the city picker remains available from Today
         // and from Settings, so a refusal is never a dead end.
         onStep(OnboardingStep.NOTIFICATIONS)
+    }
+
+    // Granted or denied, onboarding is over either way — the sound sheet and the master toggle
+    // in Settings remain available afterwards, so a refusal here is never a dead end either.
+    val requestNotifications = rememberNotificationPermissionRequester { granted ->
+        onNotificationPermission(granted)
+        onComplete()
     }
 
     Column(
@@ -120,11 +130,8 @@ fun OnboardingScreen(
                 TaqwaTextLink("Choose a city instead", onClick = onChooseCity)
             }
             OnboardingStep.NOTIFICATIONS -> {
-                // Deliberately a no-op beyond advancing: plan 2 wires the real request once a
-                // scheduler exists. A granted permission that produces no notifications is worse
-                // than not asking.
-                TaqwaPrimaryButton("Enable notifications", onComplete)
-                TaqwaTextLink("Not now", onComplete)
+                TaqwaPrimaryButton("Enable notifications", requestNotifications)
+                TaqwaTextLink("Not now", onClick = { onDeclineNotifications(); onComplete() })
             }
         }
         Spacer(Modifier.height(12.dp))

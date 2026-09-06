@@ -16,11 +16,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.audio.createSoundPreviewPlayer
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaTheme
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
@@ -31,6 +33,7 @@ import world.taqwa.app.feature.settings.HighLatitudePickerScreen
 import world.taqwa.app.feature.settings.LocationSettingsScreen
 import world.taqwa.app.feature.settings.ManualAdjustmentsScreen
 import world.taqwa.app.feature.settings.MethodPickerScreen
+import world.taqwa.app.feature.settings.NotificationSettingsScreen
 import world.taqwa.app.feature.settings.PrayerTimesSettingsScreen
 import world.taqwa.app.feature.settings.SettingsRootScreen
 import world.taqwa.app.feature.settings.methodDisplayName
@@ -41,6 +44,8 @@ import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
+import world.taqwa.app.notifications.NotificationOnboarding
+import world.taqwa.app.notifications.RescheduleTrigger
 import kotlin.time.Clock
 
 /**
@@ -59,10 +64,25 @@ fun App(container: AppContainer) {
     val settings = container.settingsRepository
     val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val prayerSettings by settings.prayerSettings.collectAsState(initial = PrayerSettings())
+    val notificationSettings by settings.notificationSettings.collectAsState(initial = NotificationSettings())
     val location by settings.location.collectAsState(initial = null)
     val navigator = remember { Navigator(Screen.Today) }
     val backStack by navigator.backStack.collectAsState()
     val scope = rememberCoroutineScope()
+    val soundPreviewPlayer = remember { createSoundPreviewPlayer() }
+
+    // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
+    // has already happened by the time this runs, so `requestSystemPermission` just returns the
+    // already-known answer rather than asking again.
+    fun notificationOnboarding(granted: Boolean) = NotificationOnboarding(
+        requestSystemPermission = { granted },
+        setNotificationsEnabled = { enabled ->
+            settings.setNotificationSettings(settings.notificationSettings.first().copy(enabled = enabled))
+        },
+        rescheduleIfEnabled = {
+            container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+        },
+    )
 
     // Onboarding's step lives here rather than inside the screen: "choose a city instead"
     // navigates away to the city search, which would otherwise reset the flow to its first page.
@@ -114,6 +134,12 @@ fun App(container: AppContainer) {
                         if (permission == LocationPermission.GRANTED) useGpsFix()
                     },
                     onChooseCity = { navigator.push(Screen.CitySearch) },
+                    onNotificationPermission = { granted ->
+                        scope.launch { notificationOnboarding(granted).enable() }
+                    },
+                    onDeclineNotifications = {
+                        scope.launch { notificationOnboarding(false).declineForNow() }
+                    },
                     onComplete = {
                         scope.launch {
                             settings.setOnboardingComplete(true)
@@ -154,11 +180,42 @@ fun App(container: AppContainer) {
                     cityName = location?.let { it.cityName ?: "Current location" },
                     methodName = methodDisplayName(prayerSettings.method),
                     themeName = themeDisplayName(themeMode),
+                    notificationSettings = notificationSettings,
                     onBack = { navigator.pop() },
                     onOpenLocation = { navigator.push(Screen.LocationSettings) },
                     onOpenPrayerTimes = { navigator.push(Screen.PrayerTimesSettings) },
+                    onOpenNotifications = { navigator.push(Screen.NotificationSettings) },
                     onOpenAppearance = { navigator.push(Screen.Appearance) },
                     onOpenAttribution = { navigator.push(Screen.Attribution) },
+                )
+
+                Screen.NotificationSettings -> NotificationSettingsScreen(
+                    settings = notificationSettings,
+                    onBack = { navigator.pop() },
+                    onToggleEnabled = { enabled ->
+                        scope.launch {
+                            settings.setNotificationSettings(notificationSettings.copy(enabled = enabled))
+                            container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                        }
+                    },
+                    onPickLead = { minutes ->
+                        scope.launch {
+                            settings.setNotificationSettings(
+                                notificationSettings.copy(remindBeforeMinutes = minutes),
+                            )
+                            container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                        }
+                    },
+                    onPickSound = { prayer, sound ->
+                        scope.launch {
+                            val updated = notificationSettings.copy(
+                                sounds = notificationSettings.sounds + (prayer to sound),
+                            )
+                            settings.setNotificationSettings(updated)
+                            container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                        }
+                    },
+                    onPreviewSound = { soundPreviewPlayer.play(it) },
                 )
 
                 Screen.PrayerTimesSettings -> PrayerTimesSettingsScreen(
