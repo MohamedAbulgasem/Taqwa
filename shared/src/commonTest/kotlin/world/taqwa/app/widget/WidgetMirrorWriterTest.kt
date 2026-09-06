@@ -18,8 +18,8 @@ private class FakeKeyValueStore : KeyValueStore {
     override fun getString(key: String): String? = map[key]
 }
 
-private class FakePlatformFormat : PlatformFormat {
-    override fun languageTag() = "en-US"
+private class FakePlatformFormat(private val tag: String = "en-US") : PlatformFormat {
+    override fun languageTag() = tag
     override fun localizedDigits(number: Int) = number.toString()
     override fun clockTime(hour: Int, minute: Int) =
         "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
@@ -49,6 +49,25 @@ class WidgetMirrorWriterTest {
         assertEquals(Prayer.DHUHR, snapshot.currentPrayer)
         assertEquals(90L, snapshot.countdownMinutes)
         assertEquals(0.3f, snapshot.ringProgress)
+    }
+
+    // The exact phrase `Res.string.today_next_in` renders for Today's ring — "Asr in" in
+    // English, "متبقٍ على العصر" in Arabic — for the next prayer. This is what proves the mirror
+    // writes the localised sentence itself, never a hardcoded English suffix it composes on its
+    // own (that bug is this fix's whole reason to exist), and that it responds to the device's
+    // language rather than being pinned to one.
+    @Test
+    fun countdownLabelIsTheLocalisedNextPrayerInPhraseForTheNextPrayer() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat("en-US"))
+        assertEquals("Asr in", WidgetMirrorWriter.read(store)!!.countdownLabel)
+    }
+
+    @Test
+    fun countdownLabelSwitchesToArabicWithTheDeviceLanguage() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat("ar"))
+        assertEquals("متبقٍ على العصر", WidgetMirrorWriter.read(store)!!.countdownLabel)
     }
 
     @Test

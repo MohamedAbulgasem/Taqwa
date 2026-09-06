@@ -192,7 +192,10 @@ struct TaqwaHomeWidgetView: View {
     /// Spec §4.5 small: next prayer name, countdown, clock time. One question answered.
     private func small(_ content: WidgetContent) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(content.nextPrayerDisplayName)
+            // Already the fully-localised "next prayer in" phrase (e.g. "Dhuhr in" / "متبقٍ على
+            // الظهر") — never compose an "in" suffix here, or a hardcoded English word leaks into
+            // every non-English locale, which is exactly the bug this field exists to close.
+            Text(content.countdownLabel)
                 .font(.system(size: 15, weight: .semibold))
                 .minimumScaleFactor(0.7)
                 .lineLimit(2)
@@ -214,7 +217,8 @@ struct TaqwaHomeWidgetView: View {
     private func medium(_ content: WidgetContent) -> some View {
         HStack(alignment: .center, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(content.nextPrayerDisplayName)
+                // See `small(_:)` — same already-localised "next prayer in" phrase.
+                Text(content.countdownLabel)
                     .font(.system(size: 14, weight: .semibold))
                     .minimumScaleFactor(0.7)
                     .lineLimit(2)
@@ -322,7 +326,8 @@ struct TaqwaLockScreenWidgetView: View {
             default:
                 VStack(alignment: .leading, spacing: 1) {
                     HStack {
-                        Text(content.nextPrayerDisplayName)
+                        // See `TaqwaHomeWidgetView.small(_:)` — same already-localised phrase.
+                        Text(content.countdownLabel)
                             .font(.headline)
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)

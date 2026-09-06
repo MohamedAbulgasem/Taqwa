@@ -5,8 +5,11 @@ import world.taqwa.app.domain.Prayer
 /**
  * The flattened, serialisable snapshot the main app writes every time prayer times or settings
  * change, and both widget processes read. A plain delimited string, not JSON — neither widget
- * target needs a JSON dependency for seven fixed fields. [ringProgress] exists only for iOS's
+ * target needs a JSON dependency for eight fixed fields. [ringProgress] exists only for iOS's
  * lock-screen circular complication, which the spec asks to show as a ring, not just numbers.
+ * [countdownLabel] is the fully-formed, already-localised "next prayer in" phrase (e.g. "Dhuhr
+ * in" / "متبقٍ على الظهر") — written once here so neither widget target has to hardcode an
+ * English "in" suffix or reach into `shared`'s Compose resources itself.
  */
 data class WidgetSnapshot(
     val nextPrayer: Prayer,
@@ -16,6 +19,7 @@ data class WidgetSnapshot(
     val currentPrayer: Prayer?,
     val languageTag: String,
     val ringProgress: Float,
+    val countdownLabel: String,
 )
 
 object WidgetInputsMirror {
@@ -28,6 +32,11 @@ object WidgetInputsMirror {
     private const val PAIR_SEP = ";"
     private const val KV_SEP = "="
 
+    /** Snapshots written before [WidgetSnapshot.countdownLabel] existed serialise seven fields;
+     * [deserialize] still has to read those without throwing. */
+    private const val FIELD_COUNT_BEFORE_COUNTDOWN_LABEL = 7
+    private const val FIELD_COUNT = 8
+
     fun serialize(snapshot: WidgetSnapshot): String {
         val times = snapshot.allClockTimes.entries.joinToString(PAIR_SEP) { (p, t) -> "${p.name}$KV_SEP$t" }
         return listOf(
@@ -38,12 +47,13 @@ object WidgetInputsMirror {
             snapshot.currentPrayer?.name.orEmpty(),
             snapshot.languageTag,
             snapshot.ringProgress.toString(),
+            snapshot.countdownLabel,
         ).joinToString(FIELD_SEP)
     }
 
     fun deserialize(raw: String): WidgetSnapshot? {
         val parts = raw.split(FIELD_SEP)
-        if (parts.size != 7) return null
+        if (parts.size != FIELD_COUNT && parts.size != FIELD_COUNT_BEFORE_COUNTDOWN_LABEL) return null
         return try {
             WidgetSnapshot(
                 nextPrayer = Prayer.valueOf(parts[0]),
@@ -56,6 +66,9 @@ object WidgetInputsMirror {
                 currentPrayer = parts[4].takeIf { it.isNotEmpty() }?.let { Prayer.valueOf(it) },
                 languageTag = parts[5],
                 ringProgress = parts[6].toFloat(),
+                // Absent on a pre-countdownLabel mirror; the empty string tells
+                // WidgetContentBuilder to fall back to the plain prayer name, no suffix.
+                countdownLabel = parts.getOrElse(7) { "" },
             )
         } catch (e: IllegalArgumentException) {
             null

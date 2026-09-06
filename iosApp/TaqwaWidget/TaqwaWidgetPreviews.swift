@@ -98,7 +98,8 @@ struct TaqwaWidget_Previews: PreviewProvider {
                 WidgetPrayerRow(prayer: Prayer.maghrib, displayName: "Maghrib · المغرب", clockTime: "18:31", isCurrent: true),
                 WidgetPrayerRow(prayer: Prayer.isha, displayName: "Isha · العشاء", clockTime: "19:55", isCurrent: false),
             ],
-            ringProgress: 0.42
+            ringProgress: 0.42,
+            countdownLabel: "Dhuhr in"
         ),
         countdownMinutes: 209,
         background: WidgetBackground.followTheme

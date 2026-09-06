@@ -18,12 +18,28 @@ class WidgetInputsMirrorTest {
         currentPrayer = Prayer.DHUHR,
         languageTag = "en-US",
         ringProgress = 0.42f,
+        countdownLabel = "Asr in",
     )
 
     @Test
     fun aSnapshotRoundTripsThroughSerialization() {
         val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(snapshot))
         assertEquals(snapshot, restored)
+    }
+
+    @Test
+    fun countdownLabelRoundTripsThroughSerialization() {
+        val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(snapshot))
+        assertEquals("Asr in", restored?.countdownLabel)
+    }
+
+    @Test
+    fun aPreCountdownLabelSnapshotDeserializesWithTheFallbackRatherThanThrowing() {
+        // The exact seven-field shape `serialize` produced before `countdownLabel` existed.
+        val oldFormat = "ASR|42|15:47|FAJR=05:12;DHUHR=12:34;ASR=15:47;MAGHRIB=18:20;ISHA=19:50|DHUHR|en-US|0.42"
+        val restored = WidgetInputsMirror.deserialize(oldFormat)
+        assertEquals(Prayer.ASR, restored?.nextPrayer)
+        assertEquals("", restored?.countdownLabel)
     }
 
     @Test
