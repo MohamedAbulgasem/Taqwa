@@ -67,16 +67,35 @@ struct iOSApp: App {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
 	}
 
+	/// Only ever read or written on the main thread — see `reloadWidgets()`.
 	private static var lastSnapshot: String?
 
+	/// `reloadWidgets()` is reached from a Kotlin-invoked closure (`TodayViewModel.refresh()` runs
+	/// on whatever dispatcher it is collected on) and from the background-task queue in
+	/// `handleAppRefresh`, so neither the `lastSnapshot` dedupe nor `WidgetCenter` can assume the
+	/// main thread. Everything below therefore runs on it: inline when it already is, and
+	/// synchronously otherwise so callers that sequence work after a reload — `handleAppRefresh`
+	/// calls `task.setTaskCompleted` next — still see it finished. `sync` cannot deadlock here
+	/// because it is never reached from the main thread (that branch runs inline) and the main
+	/// thread never blocks on these callers.
+	private static func onMain(_ work: () -> Void) {
+		if Thread.isMainThread {
+			work()
+		} else {
+			DispatchQueue.main.sync(execute: work)
+		}
+	}
+
 	static func reloadWidgets() {
-		let defaults = UserDefaults(suiteName: taqwaAppGroupId)
-		let snapshot = defaults?.string(forKey: taqwaSnapshotKey)
-		guard snapshot != lastSnapshot else { return }
-		lastSnapshot = snapshot
-		// `WidgetSnapshot` carries no timestamp, so stamp the write here: the extension needs it to
-		// extrapolate the countdown forward between reloads instead of showing a frozen minute.
-		defaults?.set(Date().timeIntervalSince1970, forKey: taqwaWrittenAtKey)
-		WidgetCenter.shared.reloadAllTimelines()
+		onMain {
+			let defaults = UserDefaults(suiteName: taqwaAppGroupId)
+			let snapshot = defaults?.string(forKey: taqwaSnapshotKey)
+			guard snapshot != lastSnapshot else { return }
+			lastSnapshot = snapshot
+			// `WidgetSnapshot` carries no timestamp, so stamp the write here: the extension needs it to
+			// extrapolate the countdown forward between reloads instead of showing a frozen minute.
+			defaults?.set(Date().timeIntervalSince1970, forKey: taqwaWrittenAtKey)
+			WidgetCenter.shared.reloadAllTimelines()
+		}
 	}
 }
