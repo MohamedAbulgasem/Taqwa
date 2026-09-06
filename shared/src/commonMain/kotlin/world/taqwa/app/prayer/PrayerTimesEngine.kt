@@ -29,6 +29,19 @@ private val ALL_HIGH_LATITUDE_RULES = listOf(
 
 class PrayerTimesEngine {
 
+    /**
+     * The last answer [ruleEngaged] gave, and the inputs it gave it for.
+     *
+     * `ruleEngaged` computes two extra full `PrayerTimes` on top of the one the caller wants, and
+     * `TodayViewModel.refresh()` calls `timesFor` three times a second — above 48° latitude that
+     * was nine astronomical solves a second on the Main thread. The inputs are a date, a settings
+     * object and a location, none of which change between ticks, so a single-entry memo removes
+     * all of it. A race between two callers costs one recomputation and no wrong answer, which is
+     * why there is no lock here.
+     */
+    private var engagedKey: Triple<LocalDate, PrayerSettings, GeoLocation>? = null
+    private var engagedValue = false
+
     fun timesFor(location: GeoLocation, date: LocalDate, settings: PrayerSettings): DayPrayerTimes {
         val effectiveRule = HighLatitudeSelector.select(settings.highLatitude, location.latitude)
 
@@ -81,10 +94,15 @@ class PrayerTimesEngine {
         // ordinary day the angle-based Fajr/Isha already fall within every rule's bound, so all
         // three rules agree. The note is only true when they genuinely diverge.
         fun ruleEngaged(): Boolean {
+            val key = Triple(date, settings, location)
+            if (engagedKey == key) return engagedValue
             val otherRules = ALL_HIGH_LATITUDE_RULES.filter { it != effectiveRule.toAdhan() }
             val variants = listOf(computed) + otherRules.map(::compute)
-            return variants.map { it.fajr }.distinct().size > 1 ||
+            val engaged = variants.map { it.fajr }.distinct().size > 1 ||
                 variants.map { it.isha }.distinct().size > 1
+            engagedKey = key
+            engagedValue = engaged
+            return engaged
         }
 
         return DayPrayerTimes(
@@ -97,11 +115,17 @@ class PrayerTimesEngine {
                 adjusted(Prayer.MAGHRIB, computed.maghrib),
                 adjusted(Prayer.ISHA, computed.isha),
             ),
+            // Reported however the rule was arrived at. Suppressing the note whenever the user
+            // had picked a rule by hand meant someone who deliberately chose "Twilight angle"
+            // was never told it was moving their Fajr — the one person who has shown they care.
+            // MIDDLE_OF_NIGHT stays excluded on different grounds: it is adhan2's unclamped
+            // default, so "the three rules disagree" does not imply *it* changed anything.
             highLatitudeRuleApplied =
-                if (settings.highLatitude == HighLatitudePreference.AUTOMATIC &&
-                    effectiveRule != HighLatitudePreference.MIDDLE_OF_NIGHT &&
-                    ruleEngaged()
-                ) effectiveRule else null,
+                if (effectiveRule != HighLatitudePreference.MIDDLE_OF_NIGHT && ruleEngaged()) {
+                    effectiveRule
+                } else {
+                    null
+                },
             nearestLatitudeFallbackApplied = nearestLatitudeFallbackApplied,
         )
     }

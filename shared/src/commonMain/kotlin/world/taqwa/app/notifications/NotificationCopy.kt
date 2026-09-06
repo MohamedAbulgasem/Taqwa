@@ -3,6 +3,7 @@ package world.taqwa.app.notifications
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.PrayerSound
 import kotlin.time.Instant
 
 /**
@@ -13,6 +14,14 @@ import kotlin.time.Instant
 interface NotificationCopy {
     fun title(prayer: Prayer, kind: NotificationKind): String
     fun body(prayer: Prayer, kind: NotificationKind, clockTime: String, minutesBefore: Int): String
+
+    /**
+     * The name Android shows for a notification channel. A channel's sound is immutable, so a
+     * prayer accumulates one channel per sound the user has tried; naming them all after the
+     * prayer alone leaves a list of identical entries the user cannot tell apart. The sound is
+     * therefore part of the name, in the same language as the notification itself.
+     */
+    fun channelName(prayer: Prayer, sound: PrayerSound): String
 }
 
 object EnglishNotificationCopy : NotificationCopy {
@@ -36,6 +45,16 @@ object EnglishNotificationCopy : NotificationCopy {
     ): String = when (kind) {
         NotificationKind.PRAYER -> "It is time for ${name(prayer)} · $clockTime"
         NotificationKind.REMINDER -> "${name(prayer)} in $minutesBefore minutes · $clockTime"
+    }
+
+    override fun channelName(prayer: Prayer, sound: PrayerSound): String {
+        val soundName = when (sound) {
+            PrayerSound.SILENT -> "Silent"
+            PrayerSound.NOTIFICATION -> "Notification"
+            PrayerSound.TAKBIR -> "Takbir"
+            PrayerSound.ADHAN -> "Adhan"
+        }
+        return "${name(prayer)} · $soundName"
     }
 }
 

@@ -1,6 +1,7 @@
 package world.taqwa.app.notifications
 
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.PrayerNaming
 
@@ -39,5 +40,27 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 NotificationKind.REMINDER -> "$n in $minutesBefore minutes · $clockTime"
             }
         }
+    }
+
+    // Not read from string resources: a channel is created from the Android scheduler, which can
+    // be running inside a boot receiver where no Compose resource lookup exists — the same reason
+    // title and body are baked in here.
+    override fun channelName(prayer: Prayer, sound: PrayerSound): String {
+        val soundName = if (isArabic) {
+            when (sound) {
+                PrayerSound.SILENT -> "صامت"
+                PrayerSound.NOTIFICATION -> "نغمة التنبيه"
+                PrayerSound.TAKBIR -> "تكبير"
+                PrayerSound.ADHAN -> "أذان"
+            }
+        } else {
+            when (sound) {
+                PrayerSound.SILENT -> "Silent"
+                PrayerSound.NOTIFICATION -> "Notification"
+                PrayerSound.TAKBIR -> "Takbir"
+                PrayerSound.ADHAN -> "Adhan"
+            }
+        }
+        return "${name(prayer)} · $soundName"
     }
 }

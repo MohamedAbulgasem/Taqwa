@@ -23,6 +23,13 @@ class NotificationCoordinator(
     private val scheduler: NotificationScheduler,
     private val now: () -> Instant,
     private val capacity: Int = NotificationPlanner.IOS_PENDING_LIMIT,
+    /**
+     * Given the chance to re-acquire the device's position before the plan is built. Returns the
+     * location that should be planned against, so a foreground reschedule after a flight plans
+     * the destination's times rather than the origin's. Defaults to [locationOf] for callers
+     * that have no location stack to hand.
+     */
+    private val locationFor: suspend (RescheduleTrigger) -> GeoLocation? = { locationOf() },
 ) {
     companion object {
         /** Below this much runway left in the window, a background task is worth requesting. */
@@ -30,7 +37,7 @@ class NotificationCoordinator(
     }
 
     suspend fun reschedule(trigger: RescheduleTrigger): List<ScheduledNotification> {
-        val location = locationOf()
+        val location = locationFor(trigger)
         if (location == null) {
             // Nothing to schedule against, and nothing stale should be left behind either —
             // this is what happens when a user revokes location after granting it once.

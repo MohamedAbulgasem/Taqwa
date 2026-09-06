@@ -9,6 +9,10 @@ import world.taqwa.app.domain.Prayer
 internal object SettingsKeys {
     val THEME = stringPreferencesKey("theme_mode")
     val METHOD = stringPreferencesKey("calculation_method")
+    // Set only by the method picker. Everything else that writes PrayerSettings — madhab, the
+    // Hijri offset, sunrise, manual adjustments — must leave it alone, because it is the single
+    // signal that stops a later relocation from overwriting a deliberate choice.
+    val METHOD_USER_CHOSEN = booleanPreferencesKey("calculation_method_user_chosen")
     val MADHAB = stringPreferencesKey("asr_madhab")
     val HIGH_LAT = stringPreferencesKey("high_latitude")
     val HIJRI_OFFSET = intPreferencesKey("hijri_offset_days")

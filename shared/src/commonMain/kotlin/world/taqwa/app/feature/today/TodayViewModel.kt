@@ -15,7 +15,7 @@ import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.hijri.HijriFormatter
-import world.taqwa.app.hijri.UmmAlQuraCalendar
+import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.HighLatitudeCopy
 import world.taqwa.app.i18n.PlatformFormat
@@ -70,16 +70,17 @@ class TodayViewModel(
         val instant = now()
         val localDate = instant.toLocalDateTime(zone).date
 
+        val yesterday = engine.timesFor(location, localDate.plus(-1, DateTimeUnit.DAY), prefs)
         val today = engine.timesFor(location, localDate, prefs)
         val tomorrow = engine.timesFor(location, localDate.plus(1, DateTimeUnit.DAY), prefs)
 
         // The offset is applied to the Gregorian date before conversion, never to the Hijri day
         // number — shifting the Hijri day directly can produce day 0 or day 31.
-        val hijri = UmmAlQuraCalendar.fromGregorian(
+        val hijri = TabularHijriCalendar.fromGregorian(
             localDate.plus(prefs.hijriOffsetDays, DateTimeUnit.DAY),
         )
 
-        val timeline = TimelineBuilder.build(today, tomorrow, instant, prefs.showSunrise)
+        val timeline = TimelineBuilder.build(yesterday, today, tomorrow, instant, prefs.showSunrise)
         _state.value = TodayUiState.Ready(
             location = location,
             hijri = HijriFormatter.format(hijri, format),

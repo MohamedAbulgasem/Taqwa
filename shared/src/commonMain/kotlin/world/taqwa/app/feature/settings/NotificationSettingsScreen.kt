@@ -26,6 +26,7 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.i18n.soundDisplayName
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.notifications_exact_alarms_off
 import world.taqwa.app.resources.notifications_master_toggle
 import world.taqwa.app.resources.notifications_prayers_label
 import world.taqwa.app.resources.notifications_remind_before
@@ -50,6 +51,10 @@ private fun leadLabel(minutes: Int): String = if (minutes == 0) {
 @Composable
 fun NotificationSettingsScreen(
     settings: NotificationSettings,
+    // Android only, and only when the user has revoked "Alarms & reminders": the scheduler then
+    // falls back to an inexact window rather than crashing, and this is where that trade-off is
+    // admitted. Always false on iOS.
+    exactAlarmsUnavailable: Boolean = false,
     onBack: () -> Unit,
     onToggleEnabled: (Boolean) -> Unit,
     onPickLead: (Int) -> Unit,
@@ -65,6 +70,11 @@ fun NotificationSettingsScreen(
                 stringResource(Res.string.notifications_master_toggle),
                 trailing = { TaqwaToggle(checked = settings.enabled, onCheckedChange = onToggleEnabled) },
             )
+        }
+
+        if (exactAlarmsUnavailable) {
+            Spacer(Modifier.height(10.dp))
+            SettingsNote(stringResource(Res.string.notifications_exact_alarms_off))
         }
 
         Spacer(Modifier.height(28.dp))

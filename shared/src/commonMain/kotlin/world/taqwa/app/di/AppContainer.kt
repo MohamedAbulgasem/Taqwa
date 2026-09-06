@@ -2,6 +2,7 @@ package world.taqwa.app.di
 
 import kotlinx.coroutines.flow.first
 import world.taqwa.app.city.CityRepository
+import world.taqwa.app.location.LocationRefresher
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.createLocationProvider
 import world.taqwa.app.notifications.NotificationCoordinator
@@ -18,12 +19,14 @@ class AppContainer {
     val cityRepository = CityRepository { Res.readBytes("files/cities.csv").decodeToString() }
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()
+    val locationRefresher = LocationRefresher(locationRepository, cityRepository, settingsRepository)
     val notificationCoordinator = NotificationCoordinator(
         engine = prayerTimesEngine,
         settingsRepository = settingsRepository,
         locationOf = { settingsRepository.location.first() },
         scheduler = createNotificationScheduler(),
         now = { Clock.System.now() },
+        locationFor = { locationRefresher.refreshFor(it) },
     )
 }
 

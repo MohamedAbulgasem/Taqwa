@@ -45,6 +45,10 @@ object NotificationPlanner {
         val lead = notifications.remindBeforeMinutes
         val out = mutableListOf<ScheduledNotification>()
 
+        // Carried across days as well as within one, so the Fajr reminder is measured against
+        // the previous evening's Isha rather than against nothing.
+        var previousPrayerInstant: Instant? = null
+
         for (offset in 0 until windowDays) {
             val date = firstDate.plus(offset, DateTimeUnit.DAY)
             // Recomputing per local date is what makes DST correct: the engine returns instants,
@@ -69,7 +73,12 @@ object NotificationPlanner {
                 }
 
                 if (lead > 0) {
-                    val remindAt = at - lead.minutes
+                    // Clamped to the previous prayer. With the 30-minute lead and a short
+                    // Maghrib->Isha gap — high latitude in summer, or a user's own minute
+                    // adjustments pulling the two together — an unclamped reminder for Isha can
+                    // land before Maghrib has even been called, which reads as a wrong time
+                    // rather than as a nudge.
+                    val remindAt = maxOf(at - lead.minutes, previousPrayerInstant ?: Instant.DISTANT_PAST)
                     if (remindAt > from) {
                         out += ScheduledNotification(
                             id = "${prayer.name}-REMINDER-$date",
@@ -84,6 +93,7 @@ object NotificationPlanner {
                         )
                     }
                 }
+                previousPrayerInstant = at
             }
         }
 

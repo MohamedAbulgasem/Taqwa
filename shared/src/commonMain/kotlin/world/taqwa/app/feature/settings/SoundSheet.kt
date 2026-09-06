@@ -2,6 +2,7 @@ package world.taqwa.app.feature.settings
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,9 @@ import world.taqwa.app.resources.sound_sheet_footnote
 import world.taqwa.app.resources.sound_sheet_title
 import world.taqwa.app.resources.sound_silent_detail
 import world.taqwa.app.resources.sound_takbir_detail
+
+/** Spec §92: all tap targets ≥44 pt. */
+private val MIN_TAP_TARGET = 44.dp
 
 /** The takbir's measured length, and the platform notification-sound cap, in whole seconds. */
 private const val TAKBIR_SECONDS = 16
@@ -101,11 +105,17 @@ fun SoundSheet(
                         Text(subtitle(sound), style = TaqwaText.caption, color = colors.textSecondary)
                     }
                     if (sound != PrayerSound.SILENT) {
-                        PlayTriangle(
-                            Modifier
-                                .clickable { onPreview(sound) }
-                                .padding(10.dp),
-                        )
+                        // Spec §92's 44 pt floor is a hit area, not a drawn size: the triangle
+                        // stays 18 dp and the box around it carries the click. It matters more
+                        // here than anywhere else in the app, because this is a nested clickable
+                        // inside an already-clickable row — a near-miss used to select the sound
+                        // instead of previewing it.
+                        Box(
+                            Modifier.size(MIN_TAP_TARGET).clickable { onPreview(sound) },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            PlayTriangle()
+                        }
                     }
                     RadioMark(selected = sound == current, modifier = Modifier.padding(start = 12.dp))
                 }

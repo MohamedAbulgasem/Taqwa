@@ -44,7 +44,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.today.formatClock
 import world.taqwa.app.hijri.HijriFormatter
-import world.taqwa.app.hijri.UmmAlQuraCalendar
+import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.highLatitudeDisplayName
 import world.taqwa.app.i18n.localizedPrayerName
@@ -60,9 +60,10 @@ import world.taqwa.app.resources.high_lat_auto_note
 import world.taqwa.app.resources.high_lat_picker_note
 import world.taqwa.app.resources.hijri_day_after
 import world.taqwa.app.resources.hijri_day_before
-import world.taqwa.app.resources.hijri_umm_al_qura
+import world.taqwa.app.resources.hijri_tabular
 import world.taqwa.app.resources.manual_note
 import world.taqwa.app.resources.method_picker_note
+import world.taqwa.app.resources.method_tehran_maghrib_note
 import world.taqwa.app.resources.prayer_times_high_latitude
 import world.taqwa.app.resources.prayer_times_hijri_label
 import world.taqwa.app.resources.prayer_times_madhab_label
@@ -127,7 +128,7 @@ fun PrayerTimesSettingsScreen(
         SegmentedControl(
             options = listOf(
                 -1 to stringResource(Res.string.hijri_day_before),
-                0 to stringResource(Res.string.hijri_umm_al_qura),
+                0 to stringResource(Res.string.hijri_tabular),
                 1 to stringResource(Res.string.hijri_day_after),
             ),
             selected = settings.hijriOffsetDays.coerceIn(-1, 1),
@@ -138,7 +139,7 @@ fun PrayerTimesSettingsScreen(
         // never the Hijri day number, which can produce a day 0 or a day 31.
         SettingsNote(
             HijriFormatter.format(
-                UmmAlQuraCalendar.fromGregorian(today.plus(settings.hijriOffsetDays, DateTimeUnit.DAY)),
+                TabularHijriCalendar.fromGregorian(today.plus(settings.hijriOffsetDays, DateTimeUnit.DAY)),
                 LocalPlatformFormat.current,
             ),
         )
@@ -222,6 +223,15 @@ fun MethodPickerScreen(
                 if (i > 0) CardDivider()
                 TaqwaRow(
                     label = methodDisplayName(id),
+                    // Tehran is reconstructed from its Fajr/Isha angles on top of adhan2's OTHER
+                    // method, which carries no Maghrib angle, so its 4.5° Maghrib is not applied.
+                    // A Shia user choosing this method gets a sunset-based Maghrib and deserves
+                    // to be told here rather than only in a code comment.
+                    subtitle = if (id == CalculationMethodId.TEHRAN) {
+                        stringResource(Res.string.method_tehran_maghrib_note)
+                    } else {
+                        null
+                    },
                     onClick = { onPick(id) },
                     trailing = { if (id == current) CheckMark() },
                 )

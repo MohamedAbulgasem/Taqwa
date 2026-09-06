@@ -40,10 +40,15 @@ fun CardDivider() {
     Box(Modifier.fillMaxWidth().height(1.dp).background(LocalTaqwaColors.current.hairline))
 }
 
+/**
+ * [subtitle] is for a caveat the row itself cannot express — a known limitation of the option,
+ * not a restatement of it. Left null, the row is exactly as it was.
+ */
 @Composable
 fun TaqwaRow(
     label: String,
     value: String? = null,
+    subtitle: String? = null,
     onClick: (() -> Unit)? = null,
     trailing: @Composable (() -> Unit)? = null,
 ) {
@@ -57,7 +62,14 @@ fun TaqwaRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
+        if (subtitle == null) {
+            Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
+        } else {
+            Column(Modifier.weight(1f, fill = false).padding(end = 12.dp)) {
+                Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
+                Text(subtitle, style = TaqwaText.caption, color = colors.textSecondary)
+            }
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (value != null) {
                 Text(

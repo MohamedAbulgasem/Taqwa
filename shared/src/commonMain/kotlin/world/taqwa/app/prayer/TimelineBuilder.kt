@@ -11,7 +11,13 @@ import kotlin.time.Instant
 
 object TimelineBuilder {
 
+    /**
+     * [yesterday] and [tomorrow] exist for the same reason: the ring measures the interval the
+     * user is currently inside, and between midnight and Fajr that interval starts on yesterday's
+     * Isha, just as the interval after Isha ends on tomorrow's Fajr.
+     */
     fun build(
+        yesterday: DayPrayerTimes,
         today: DayPrayerTimes,
         tomorrow: DayPrayerTimes,
         now: Instant,
@@ -42,11 +48,15 @@ object TimelineBuilder {
             .firstOrNull { it.instant > now }
             ?: PrayerTime(Prayer.FAJR, tomorrow.time(Prayer.FAJR))
 
+        // Post-midnight, no obligatory prayer today has passed yet, so the interval the user is
+        // inside began at yesterday's Isha. Synthesising it from today's own Fajr (the previous
+        // shape) collapsed to Fajr itself, since `next` is Fajr in exactly that case, leaving
+        // `total` at 0 and the ring flat from midnight until Fajr every night.
         val previous = ObligatoryPrayers
             .map { PrayerTime(it, today.time(it)) }
             .lastOrNull { it.instant <= now }
             ?.instant
-            ?: (today.time(Prayer.FAJR) - (next.instant - today.time(Prayer.FAJR)))
+            ?: yesterday.time(Prayer.ISHA)
 
         val total = (next.instant - previous).inWholeSeconds
         val elapsed = (now - previous).inWholeSeconds

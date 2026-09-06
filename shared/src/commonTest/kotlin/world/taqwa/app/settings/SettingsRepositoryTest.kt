@@ -32,6 +32,45 @@ class SettingsRepositoryTest {
     )
 
     @Test
+    fun aGpsFixInSaudiArabiaSelectsUmmAlQura() = runTest {
+        val repo = repo("method-country-sa")
+        repo.applyCountryDefaultMethod("SA")
+        assertEquals(CalculationMethodId.UMM_AL_QURA, repo.prayerSettings.first().method)
+    }
+
+    @Test
+    fun aCountryWithNoDominantAuthorityFallsBackToMuslimWorldLeague() = runTest {
+        val repo = repo("method-country-za")
+        repo.applyCountryDefaultMethod("ZA")
+        assertEquals(CalculationMethodId.MUSLIM_WORLD_LEAGUE, repo.prayerSettings.first().method)
+    }
+
+    @Test
+    fun relocationNeverOverwritesAMethodTheUserChose() = runTest {
+        val repo = repo("method-user-chosen")
+        repo.setPrayerSettings(PrayerSettings(method = CalculationMethodId.MOONSIGHTING_COMMITTEE))
+        repo.setMethodUserChosen()
+        // Moving to Saudi Arabia would otherwise pull the method to Umm al-Qura.
+        val applied = repo.applyCountryDefaultMethod("SA")
+        assertEquals(CalculationMethodId.MOONSIGHTING_COMMITTEE, applied)
+        assertEquals(
+            CalculationMethodId.MOONSIGHTING_COMMITTEE,
+            repo.prayerSettings.first().method,
+        )
+    }
+
+    @Test
+    fun writingPrayerSettingsDoesNotByItselfCountAsChoosingAMethod() = runTest {
+        val repo = repo("method-not-chosen-by-madhab")
+        // Every control on the prayer-times screen writes the whole PrayerSettings; only the
+        // method picker latches the flag.
+        repo.setPrayerSettings(PrayerSettings(madhab = AsrMadhab.HANAFI))
+        assertEquals(false, repo.methodUserChosen.first())
+        repo.applyCountryDefaultMethod("TR")
+        assertEquals(CalculationMethodId.TURKEY, repo.prayerSettings.first().method)
+    }
+
+    @Test
     fun themeModeDefaultsToSystem() = runTest {
         assertEquals(ThemeMode.SYSTEM, repo("theme-default").themeMode.first())
     }
