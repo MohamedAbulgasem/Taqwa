@@ -126,6 +126,9 @@ fun App(container: AppContainer) {
         scope.launch {
             container.locationRepository.resolveGpsLocation(container.cityRepository)?.let {
                 settings.setLocation(it)
+                // Spec §249: method auto-detection from the resolved country. A no-op once the
+                // user has picked a method themselves.
+                settings.applyCountryDefaultMethod(it.countryCode)
             }
         }
     }
@@ -262,7 +265,11 @@ fun App(container: AppContainer) {
                     Screen.MethodPicker -> MethodPickerScreen(
                         current = prayerSettings.method,
                         onPick = {
-                            write(prayerSettings.copy(method = it))
+                            scope.launch {
+                                settings.setPrayerSettings(prayerSettings.copy(method = it))
+                                // Latches the choice so a later relocation cannot overwrite it.
+                                settings.setMethodUserChosen()
+                            }
                             navigator.pop()
                         },
                         onBack = { navigator.pop() },
@@ -300,7 +307,11 @@ fun App(container: AppContainer) {
                     Screen.CitySearch -> CitySearchScreen(
                         cityRepository = container.cityRepository,
                         onPick = { city ->
-                            scope.launch { settings.setLocation(city.toGeoLocation()) }
+                            scope.launch {
+                                val picked = city.toGeoLocation()
+                                settings.setLocation(picked)
+                                settings.applyCountryDefaultMethod(picked.countryCode)
+                            }
                             // Reached from onboarding, a successful pick answers the location
                             // question, so the flow continues rather than re-asking it.
                             if (backStack.contains(Screen.Onboarding)) {

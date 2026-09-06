@@ -16,6 +16,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.domain.WidgetBackground
+import world.taqwa.app.prayer.CalculationMethodDefaults
 
 /** Reads a stored enum name, falling back to [fallback] when the value is absent or unrecognised. */
 private inline fun <reified E : Enum<E>> String?.toEnumOr(fallback: E): E =
@@ -49,6 +50,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
 
     val onboardingComplete: Flow<Boolean> =
         store.data.map { it[SettingsKeys.ONBOARDED] ?: false }
+
+    /** True once the user has picked a calculation method by hand. See [applyCountryDefaultMethod]. */
+    val methodUserChosen: Flow<Boolean> =
+        store.data.map { it[SettingsKeys.METHOD_USER_CHOSEN] ?: false }
 
     val prayerSettings: Flow<PrayerSettings> = store.data.map { p ->
         PrayerSettings(
@@ -99,6 +104,34 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             it[SettingsKeys.SHOW_SUNRISE] = settings.showSunrise
             it[SettingsKeys.MINUTE_ADJUSTMENTS] = encodeMinuteAdjustments(settings.minuteAdjustments)
         }
+    }
+
+    /**
+     * Records that the method now stored was chosen by the user, not derived from their country.
+     * Written by the method picker alone — [setPrayerSettings] deliberately does not set it, since
+     * every other control on the prayer-times screen also writes the whole [PrayerSettings].
+     */
+    suspend fun setMethodUserChosen() {
+        store.edit { it[SettingsKeys.METHOD_USER_CHOSEN] = true }
+    }
+
+    /**
+     * Applies the calculation method a user in [countryCode] is most likely to expect, unless they
+     * have already chosen one themselves. Called wherever a location is persisted: an unchosen
+     * method should follow the user to Riyadh or Istanbul, but a deliberate choice must survive
+     * the move. Returns the method now in force.
+     */
+    suspend fun applyCountryDefaultMethod(countryCode: String?): CalculationMethodId {
+        val default = CalculationMethodDefaults.forCountry(countryCode)
+        var applied = default
+        store.edit { p ->
+            if (p[SettingsKeys.METHOD_USER_CHOSEN] == true) {
+                applied = p[SettingsKeys.METHOD].toEnumOr(CalculationMethodId.MUSLIM_WORLD_LEAGUE)
+            } else {
+                p[SettingsKeys.METHOD] = default.name
+            }
+        }
+        return applied
     }
 
     suspend fun setNotificationSettings(settings: NotificationSettings) {
