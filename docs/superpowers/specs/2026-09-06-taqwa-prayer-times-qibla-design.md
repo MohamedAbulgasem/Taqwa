@@ -216,7 +216,19 @@ Modules stay small and single-purpose. If a file grows large enough to be hard t
 
 ### Libraries
 
-kotlinx-datetime, kotlinx-coroutines, AndroidX DataStore (KMP), AndroidX Navigation (KMP), Koin for DI. Versions pinned during implementation planning.
+Pinned at planning time:
+
+| Dependency | Version | Note |
+|---|---|---|
+| Kotlin | 2.2.20 | Recommended floor for iOS targets |
+| Compose Multiplatform | 1.12.0 | Latest stable |
+| adhan2 | 0.0.7 | MIT, KMP, prayer times + qibla |
+| kotlinx-datetime | 0.7.1 | |
+| AndroidX DataStore | 1.1.7 | Preferences only; the KMP-supported artifact |
+
+**No navigation library.** Slice 1's navigation is a root screen with a handful of pushed children. A sealed-class backstack in a `StateFlow` is about forty lines, is fully testable in `commonMain`, and avoids taking a dependency on a fast-moving multiplatform navigation API for no benefit. Revisit when the tab bar arrives in slice 2.
+
+**No DI framework.** Manual constructor injection with a single `AppContainer`. Koin earns its place when there is a graph worth managing; there is not one yet.
 
 Package identifier: `world.taqwa.app` (the `taqwa.world` domain is available and should be registered). The name "Taqwa" still needs App Store, Play and trademark checks before release.
 
@@ -224,7 +236,7 @@ Package identifier: `world.taqwa.app` (the `taqwa.world` domain is available and
 
 ## 6. Prayer time calculation
 
-A port of **Adhan** (Batoul Apps, MIT) into `commonMain`. It is the algorithm the serious apps use and it is permissively licensed.
+**`com.batoulapps.adhan:adhan2:0.0.7`** (Batoul Apps, MIT) — already a Kotlin Multiplatform library with JVM and iOS targets, so it is a dependency, not a port. It supplies `PrayerTimes`, `CalculationMethod`, `Madhab`, `HighLatitudeRule`, `PrayerAdjustments`, `SunnahTimes` and `Qibla`. It requires Android API 26+ or core library desugaring, which our minSdk 26 already satisfies.
 
 **Methods:** Muslim World League, ISNA, Egyptian, Umm al-Qura, Karachi, Tehran, Dubai, Kuwait, Qatar, Singapore, Diyanet, Moonsighting Committee.
 
@@ -270,7 +282,7 @@ Full adhan playback is available **inside the app** via a player, on both platfo
 
 ## 10. Qibla
 
-Great-circle bearing to the Kaaba (21.4225° N, 39.8262° E).
+Great-circle bearing to the Kaaba (21.4225° N, 39.8262° E), computed by adhan2's `Qibla` class. Distance to Makkah is our own haversine, which adhan2 does not provide.
 
 - **Android:** `TYPE_ROTATION_VECTOR`, with magnetic declination corrected via `GeomagneticField`. Fall back to accelerometer + magnetometer if unavailable.
 - **iOS:** `CLHeading.trueHeading`, which handles declination and provides the system calibration prompt.
