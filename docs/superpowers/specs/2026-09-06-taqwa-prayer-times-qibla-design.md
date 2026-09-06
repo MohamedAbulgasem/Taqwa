@@ -30,7 +30,7 @@ Slice 1 is first because it front-loads the riskiest platform work (iOS backgrou
 ### In scope
 
 - First-run onboarding (3 screens)
-- Today screen: countdown ring, prayer timeline, adhkar nudge placeholder
+- Today screen: countdown ring, prayer timeline
 - Prayer time calculation with method, madhab and high-latitude handling
 - Hijri date with ±1 day adjustment
 - Location via GPS, with a bundled offline city database as fallback
@@ -46,7 +46,7 @@ Quran, Dhikr content, adhkar text, tasbih, khatm plan, bookmarks, the bottom tab
 
 **No tab bar in slice 1.** Today is the root screen; qibla and settings are reached from header icons. Shipping a four-tab bar with two dead tabs is precisely the unfinished feeling this app exists to avoid, and a two-tab bar reads as a mistake. The tab bar arrives with slice 2 and only ever grows — it never rearranges.
 
-The adhkar nudge card on Today is present as a **static placeholder** in slice 1. It renders and is not tappable. It becomes live in slice 4.
+The adhkar nudge card is **not** in slice 1 in any form. Today ends with the timeline. The nudge arrives in slice 4 alongside the content it points to.
 
 ---
 
@@ -83,7 +83,7 @@ The Arabic decision is deliberate and has a known cost: Android's Arabic face va
 
 - **Ring** — the app's defining motif. Countdown on Today, dial on Qibla. One idea carrying two features.
 - **Timeline rail** — the prayer list on Today. Not used elsewhere.
-- **Card with hairline border and inner dividers** — every settings group, and the adhkar nudge. Radius 18dp, 1px border, no shadow.
+- **Card with hairline border and inner dividers** — every settings group, and the widget preview. Radius 18dp, 1px border, no shadow.
 - **Buttons** — full-width pill, radius 999, ~46pt tall. Secondary action is a plain centred text link, never a second button. There is one obvious action per screen.
 - **Selection mark** — a drawn vector check (stroke 2.6, round caps), accent coloured. Never the `✓` text character, which inherits font weight and sits wrong on the baseline.
 - **Radio** — used only in the sound picker sheet, where showing unselected targets aids the choice.
@@ -119,11 +119,11 @@ Header: location name and Hijri date on the left; compass and settings icon butt
 | Current | larger, accent, with halo | accent, bold |
 | Upcoming | hollow ring, hairline border | normal |
 
-Each row shows the English name, the Arabic name in the system face, and the time. Arabic is shown on every row.
+Each row shows the prayer name in the UI language, the Arabic name in the system face, and the time. Arabic appears on every row.
+
+**Localisation rule:** when the UI language is Arabic, the Arabic name is shown alone — never duplicated beside a transliteration. In every other language the pair is shown: localised name plus Arabic. This rule governs the widgets and notification text too.
 
 **Requirement:** the timeline is time-dependent, so Today re-renders on a clock tick. When Asr arrives, its pip must fill and its row dim without the user refreshing. A coroutine tick in the view model, cancelled when the screen is not resumed.
-
-**Adhkar nudge** — static placeholder card. Live in slice 4.
 
 **Two states that must be built, not deferred:**
 
@@ -177,7 +177,11 @@ A footnote in the sheet states that notification sounds are capped at 30 seconds
 
 **Background is a user setting** with four values: Follow theme (default), Light, Dark, Translucent.
 
-Translucency is genuine on Android — Glance renders a semi-transparent surface over the wallpaper. **iOS cannot do this**: WidgetKit cannot sample the wallpaper for its own blur, and iOS may tint the widget to match the home screen regardless. On iOS, Translucent maps to the system widget material. This limitation is stated in the app on the widget background screen rather than left to be discovered as a bug.
+Translucency is genuine on Android — Glance renders a semi-transparent surface over the wallpaper. **iOS cannot do this**: WidgetKit cannot sample the wallpaper for its own blur, and iOS may tint the widget to match the home screen regardless.
+
+Rather than explain that discrepancy in a footnote, **the fourth option is labelled per platform**: on Android it reads *Translucent — blends into your wallpaper*; on iOS, *Frosted — uses the system widget material*. Each platform describes what it actually does, and neither user reads a caveat about the other's phone.
+
+Beneath the option list sits a **live preview** of the medium widget rendered in the currently selected background, over a neutral wallpaper swatch. It replaces the explanatory note entirely: the user sees the result instead of reading about it, and it updates as the selection changes.
 
 Widgets are the **last work in slice 1** so they can be cut without disturbing anything else.
 
@@ -210,7 +214,7 @@ Modules stay small and single-purpose. If a file grows large enough to be hard t
 
 kotlinx-datetime, kotlinx-coroutines, AndroidX DataStore (KMP), AndroidX Navigation (KMP), Koin for DI. Versions pinned during implementation planning.
 
-Package identifier: `com.taqwa.app` — **confirm availability on both stores before first release.** The name "Taqwa" itself also needs App Store, Play and trademark checks.
+Package identifier: `world.taqwa.app` (the `taqwa.world` domain is available and should be registered). The name "Taqwa" still needs App Store, Play and trademark checks before release.
 
 ---
 
@@ -329,9 +333,18 @@ The mathematics is pure functions in `commonMain`, so it is genuinely testable w
 | Adhan algorithm | MIT | Credit in app |
 | GeoNames cities15000 | CC BY 4.0 | Credit in app |
 | Manrope | OFL | Credit; no restriction on embedding |
-| Adhan and takbir audio | **To be sourced** | Must confirm redistribution rights |
+| Adhan and takbir audio | CC0 1.0 | None required |
 
-**Open item:** the adhan and takbir audio recordings need a verified, redistributable source before release. Do not assume that a widely circulated recording is free to redistribute in an app shipped to millions.
+Audio is sourced from ["Beautiful adhan" by Adam-synagda](https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg) on Wikimedia Commons, under CC0 1.0 — a public domain dedication by the person who made the recording, which is the only kind of free licence worth relying on for this. Two clips are derived from it, cut on silence-detected phrase boundaries so neither ends mid-word: `takbir` (one complete "Allahu akbar, Allahu akbar" pair, 15.80s) and `adhan-30s` (the full four-takbir opening, 29.95s). Both sit under the platform 30-second cap. Provenance, licence and reproduction commands are recorded in `assets/audio/README.md`.
+
+**A CC0-labelled recording on Freesound was rejected**: its own description states it was extracted from YouTube, and someone who did not create a recording cannot validly dedicate it to the public domain.
+
+**Two findings from the actual audio that correct earlier assumptions:**
+
+1. **A 6-second takbir is not achievable with a melodic adhan.** This spec originally assumed ~6s. In practice one complete "Allahu akbar, Allahu akbar" pair takes 15.8 seconds, and cutting at 6s truncates the muezzin mid-word. A genuinely 6-second takbir needs a plainly recited, non-melodic source — a different recording, not a different edit.
+2. **A 30-second clip cannot reach the shahada.** At this pace 30 seconds covers the four opening takbirs and no more; reaching "Ashhadu an la ilaha illa Allah" would need roughly 45 seconds, beyond what either platform allows. The two sound options therefore differ in length rather than content: two takbirs versus four.
+
+Both are accepted for development. **This is a placeholder to revisit before release** — including whether a specific muezzin should be chosen deliberately, and whether to offer a choice of muezzin as the established apps do.
 
 ---
 
@@ -343,8 +356,8 @@ Slice 1 is complete when the app tells you when to pray, wakes you for it, point
 
 ## 16. Known risks
 
-1. **iOS 64-notification cap** — if a user does not open the app for 12 days, notifications stop. `BGAppRefreshTask` is best-effort and iOS may not run it. Mitigation: schedule the maximum window, refresh aggressively on foreground. Accept the residual risk; it is a platform limit, not a defect.
-2. **Android OEM battery optimisation** — aggressive vendors (Xiaomi, Huawei, Samsung) may kill exact alarms. Mitigation: detect and offer a route to the exemption setting, without nagging.
+1. **iOS 64-notification cap** — if a user does not open the app for 12 days, notifications stop. `BGAppRefreshTask` is best-effort and iOS may not run it. **Decided:** schedule the maximum window, refresh on every foreground, and accept the residual risk. It is a platform limit, not a defect, and no amount of engineering removes it.
+2. **Android OEM battery optimisation** — aggressive vendors (Xiaomi, Huawei, Samsung) may kill exact alarms. **Decided:** detect the condition and offer a one-tap route to the battery-optimisation exemption setting. Show it once, never nag.
 3. **Compose Multiplatform Arabic shaping on iOS** — not exercised in slice 1, but slice 2 depends on it entirely. **Validate before committing slice 2's design**, since a failure there could force a native reader.
-4. **Adhan audio licensing** — see section 14.
+4. **Adhan audio is a development placeholder** — CC0 and safe to ship, but chosen for its licence rather than for its recitation. See section 14.
 5. **Name availability** — "Taqwa" is unverified on both stores and for trademark.
