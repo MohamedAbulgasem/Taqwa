@@ -28,8 +28,12 @@ class AppContainer {
 }
 
 /**
- * One graph per process. DataStore refuses two live instances over the same file, so the
- * container must not be rebuilt when an Activity is recreated or a view controller re-created.
- * On Android this is first touched from `MainActivity.onCreate`, after `appContext` is assigned.
+ * One graph per process. DataStore refuses two live instances over the same file; that risk is
+ * now closed in `createDataStore()` itself, which hands out one process-wide, lazily created
+ * instance to every caller (this container, `SystemEventReceiver`, `BackgroundRefreshBridge`).
+ * The container still should not be rebuilt when an Activity is recreated or a view controller
+ * re-created — there is no reason to pay for a second `AppContainer` graph — but doing so would
+ * no longer crash on the DataStore file itself. On Android this is first touched from
+ * `MainActivity.onCreate`, after `appContext` is assigned.
  */
 val appContainer: AppContainer by lazy { AppContainer() }
