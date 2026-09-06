@@ -1,0 +1,62 @@
+package world.taqwa.app.settings
+
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import okio.Path.Companion.toPath
+import world.taqwa.app.design.ThemeMode
+import world.taqwa.app.domain.AsrMadhab
+import world.taqwa.app.domain.CalculationMethodId
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class SettingsRepositoryTest {
+
+    // DataStore's OkioStorage requires an absolute path (it asserts Path.isAbsolute). The
+    // brief's literal "build/test-$name.preferences_pb" is relative, which happens to work on
+    // the JVM (cwd == project dir) but is rejected at runtime on iosSimulatorArm64Test with
+    // "OkioStorage requires absolute paths, but did not get an absolute path". The Kotlin/Native
+    // test binary is a bare executable (not an app-sandboxed .app bundle) that runs directly on
+    // the host Mac, so it shares the same POSIX filesystem as the JVM test process — "/tmp" is
+    // writable and absolute on both. Each test uses a distinct filename, matching the brief's
+    // intent of isolated per-test storage that never ends up committed to the repo.
+    private fun repo(name: String) = SettingsRepository(
+        PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-test-$name.preferences_pb".toPath() }
+    )
+
+    @Test
+    fun themeModeDefaultsToSystem() = runTest {
+        assertEquals(ThemeMode.SYSTEM, repo("theme-default").themeMode.first())
+    }
+
+    @Test
+    fun themeModeRoundTrips() = runTest {
+        val r = repo("theme-roundtrip")
+        r.setThemeMode(ThemeMode.DARK)
+        assertEquals(ThemeMode.DARK, r.themeMode.first())
+    }
+
+    @Test
+    fun remindBeforeDefaultsToNever() = runTest {
+        assertEquals(0, repo("remind").prayerSettings.first().remindBeforeMinutes)
+    }
+
+    @Test
+    fun madhabDefaultsToStandard() = runTest {
+        assertEquals(AsrMadhab.STANDARD, repo("madhab").prayerSettings.first().madhab)
+    }
+
+    @Test
+    fun showSunriseDefaultsToOff() = runTest {
+        assertEquals(false, repo("sunrise").prayerSettings.first().showSunrise)
+    }
+
+    @Test
+    fun unknownStoredValueFallsBackToDefaultRatherThanCrashing() = runTest {
+        val r = repo("corrupt")
+        r.setThemeMode(ThemeMode.DARK)
+        // simulate a value written by a future version
+        r.writeRawThemeForTest("PLAID")
+        assertEquals(ThemeMode.SYSTEM, r.themeMode.first())
+    }
+}
