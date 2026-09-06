@@ -20,6 +20,7 @@ fun TaqwaTheme(mode: ThemeMode, content: @Composable () -> Unit) {
         ThemeMode.DARK -> true
     }
     val colors = if (dark) DarkColors else LightColors
+    SystemBarsAppearance(mode, dark)
     CompositionLocalProvider(LocalTaqwaColors provides colors) {
         MaterialTheme(
             colorScheme = if (dark) {

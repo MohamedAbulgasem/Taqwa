@@ -365,3 +365,31 @@ a SharedPreferences write and two Glance IPC round-trips that nobody was looking
 under `repeatOnLifecycle(STARTED)` via `lifecycle-runtime-compose` 2.9.6 in `commonMain` (it
 resolves on iOS through `ComposeUIViewController`). Measured: four minutes screen-off → one widget
 update, on the widget's own 5-minute grid. 282 JVM / 274 iOS tests.
+
+### Iteration 3 — thirteen items from the second hands-on round (S23 Ultra added)
+
+All thirteen closed, plus two the work surfaced. Verified on the LoopPhone, the Pixel 8 Pro emulator
+(dark mode, for the status bar) and by build on the iPhone.
+
+| # | Report | What was actually wrong | Fix |
+|---|---|---|---|
+| 1 | Welcome screen shows a ring, not the logo | Mark predated the icon | `MihrabMark`: the icon's own path, drawn in the theme's ink with the amber point |
+| 2 | Illustrations for the other two screens | None | `PinMark` and `BellMark` in the same 1024-unit hand, same stroke, one amber element each |
+| 3 | A widget onboarding screen? | Widgets are the surface nobody finds | Fourth step: both widgets previewed live; **Android pins the widget from the button** via `requestPinAppWidget` (launcher sheet), iOS gets the manual steps. Declining is a text link |
+| 4 | Version "1.0" | — | `1.0.0` in Gradle, both Info.plists, both locales' About row |
+| 5 | Status bar vanishes: Light theme on a dark phone | Both platforms styled the bars from the *system* theme | `SystemBarsAppearance(mode, dark)` in `TaqwaTheme`: Android via `WindowInsetsController`, iOS by overriding the window's interface style (lifted under System) |
+| 6 | Today bottom-heavy | Ring sat 20 dp under the header | 52 dp above the ring, 40 dp below |
+| 7 | Tab ripple; square ripple on play | Defaults | Tabs: `indication = null`; play target clipped to a circle first |
+| 8 | Em dashes in copy | Five strings, two placeholders, two iOS labels | Plain punctuation throughout |
+| 9 | Labels wrapping beside empty space | `TaqwaRow` split the width in two *before* measuring | Custom `Layout`: label at natural width first, value takes the rest, 60 % floor for the label only when both cannot fit |
+| 10 | Widget picker shows the app icon | No `previewImage` | Real renders captured from the emulator, rounded and cropped; `description` strings in both locales |
+| 11 | Small widget should shrink to 2×1 and 1×1 | Min resize 110 dp | Min 40 dp both axes; **one adaptive widget** with four layouts chosen from the *measured* cell: tiny, strip, stacked, two-column |
+| 12 | Android 4×2 nothing like iOS | `SizeMode.Responsive` reported the nearest *declared* size, so a 267×150 cell laid out as 250×110 | `SizeMode.Exact`; two-column card sized from the real cell: countdown block exactly as wide as "12:34", rows spread down the full height, row size bounded by the longest bilingual name so nothing truncates; sentence-case label like iOS |
+| 13 | iOS: Maghrib row smaller than the rest | `minimumScaleFactor` on a fixed 130 pt column shrank the longest name alone | Names no longer scale; the column takes the width it needs and the countdown block yields |
+| — | (found) iOS gallery card said "open Taqwa to load…" | Snapshot used the live mirror | `context.isPreview` gets a representative afternoon in the gallery's language |
+| — | (found) a widget drawn before the app had data stayed empty through every refresh | Mirror was read *outside* `provideContent`; Glance re-runs only the content lambda on a live session | Read inside the lambda |
+
+Two-column threshold is derived, not guessed: 61 dp for the smallest countdown block plus the longest
+row at 11.5 sp × 10.1 em plus gutters is about 230 dp. A Pixel's 2×2 (190 dp) stays a stacked card;
+every 3×2 and 4×2 measured clears it. The LoopPhone launcher still drops widgets on every package
+update, so re-add once after the final install.

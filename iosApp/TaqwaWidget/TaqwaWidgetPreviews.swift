@@ -33,7 +33,7 @@ struct TaqwaWidgetPreviewScreen: View {
                 Text("Taqwa widget preview")
                     .font(.headline)
                 Text(entry.content == nil
-                     ? "No mirror data — open Taqwa normally first."
+                     ? "No mirror data. Open Taqwa normally first."
                      : "Live App Group mirror data")
                     .font(.caption)
                     .foregroundColor(.secondary)

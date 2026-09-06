@@ -1,6 +1,8 @@
 package world.taqwa.app.widget
 
 import android.app.Application
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -27,6 +29,18 @@ object TaqwaWidgets {
     suspend fun updateAll(context: Context) {
         TaqwaSmallGlanceWidget().updateAll(context)
         TaqwaMediumGlanceWidget().updateAll(context)
+    }
+
+    /**
+     * Asks the launcher to place the two-column widget, from onboarding's "Add widget" button.
+     * The launcher shows its own confirmation sheet; false means it declined to ask at all (no
+     * pin support, or a work profile that forbids it), and the caller treats that as "done".
+     */
+    fun requestPin(context: Context): Boolean {
+        val manager = AppWidgetManager.getInstance(context) ?: return false
+        if (!manager.isRequestPinAppWidgetSupported) return false
+        val provider = ComponentName(context, TaqwaMediumWidgetReceiver::class.java)
+        return manager.requestPinAppWidget(provider, null, null)
     }
 
     /**

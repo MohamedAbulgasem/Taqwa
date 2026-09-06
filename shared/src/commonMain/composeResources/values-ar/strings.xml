@@ -8,13 +8,19 @@
     <string name="onboarding_welcome_body">مواقيت الصلاة والقبلة والقرآن. مجانًا إلى الأبد. بلا إعلانات ولا حساب، ويعمل دون اتصال.</string>
     <string name="onboarding_welcome_cta">ابدأ</string>
     <string name="onboarding_location_title">أين أنت؟</string>
-    <string name="onboarding_location_body">تعتمد المواقيت على موقعك بالضبط. كل الحساب يجري على جهازك — موقعك لا يغادر هاتفك.</string>
+    <string name="onboarding_location_body">تعتمد المواقيت على موقعك بالضبط. كل الحساب يجري على جهازك، وموقعك لا يغادر هاتفك.</string>
     <string name="onboarding_location_cta">استخدام موقعي</string>
     <string name="onboarding_location_secondary">اختر مدينة بدلًا من ذلك</string>
     <string name="onboarding_notifications_title">لا تفوّت صلاة</string>
     <string name="onboarding_notifications_body">إشعار عند كل صلاة. تختار الصوت لكل صلاة على حدة، ويمكنك تغييره متى شئت.</string>
     <string name="onboarding_notifications_cta">تفعيل الإشعارات</string>
     <string name="onboarding_notifications_secondary">ليس الآن</string>
+    <string name="onboarding_widget_title">على شاشتك الرئيسية</string>
+    <string name="onboarding_widget_body">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق.</string>
+    <string name="onboarding_widget_body_ios">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق. اضغط مطولًا على الشاشة الرئيسية، ثم اضغط علامة الزائد وابحث عن تقوى.</string>
+    <string name="onboarding_widget_cta_add">إضافة الأداة</string>
+    <string name="onboarding_widget_cta_done">تم</string>
+    <string name="onboarding_widget_secondary">لاحقًا</string>
 
     <!-- Prayer names -->
     <string name="prayer_fajr">الفجر</string>
@@ -47,7 +53,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">الإصدار 1.0</string>
+    <string name="settings_version_value">الإصدار 1.0.0</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">السمة</string>
@@ -87,7 +93,7 @@
     <string name="sound_adhan">أذان</string>
     <string name="sound_silent_detail">إشعار فقط بلا صوت</string>
     <string name="sound_notification_detail">نغمة هاتفك الافتراضية</string>
-    <string name="sound_takbir_detail">الله أكبر، الله أكبر — نحو %1$s ثانية</string>
+    <string name="sound_takbir_detail">الله أكبر، الله أكبر، نحو %1$s ثانية</string>
     <string name="sound_adhan_detail">الأذان كاملًا، %1$s ثانية</string>
     <string name="sound_sheet_footnote">صوت الإشعار محدود بـ%1$s ثانية على هذه المنصة. ويمكن سماع الأذان كاملًا داخل التطبيق.</string>
 

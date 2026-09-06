@@ -181,6 +181,7 @@ fun App(container: AppContainer) {
                             step = onboardingStep,
                             onStep = { onboardingStep = it },
                             locationRepository = container.locationRepository,
+                            widgetPinRequester = container.widgetPinRequester,
                             onLocationPermission = { permission ->
                                 if (permission == LocationPermission.GRANTED) useGpsFix()
                             },

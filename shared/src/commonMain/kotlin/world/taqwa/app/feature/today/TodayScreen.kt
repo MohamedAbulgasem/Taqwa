@@ -82,7 +82,7 @@ private fun ReadyBody(state: TodayUiState.Ready) {
             Text(state.hijri, style = TaqwaText.caption, color = colors.textSecondary)
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(52.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             CountdownRing(
                 progress = state.today.ringProgress,
@@ -98,7 +98,7 @@ private fun ReadyBody(state: TodayUiState.Ready) {
                 clockTime = formatClock(state.today.next.instant, zone, format),
             )
         }
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(40.dp))
 
         PrayerTimeline(state.today.rows) { row: TimelineRow -> formatClock(row.instant, zone, format) }
 
