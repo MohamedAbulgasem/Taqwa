@@ -135,6 +135,37 @@ class PrayerTimesEngineTest {
     }
 
     @Test
+    fun anExplicitlyChosenRuleIsStillReportedWhenItEngages() {
+        // Same London date as the test above, where the seventh-of-night bound genuinely moves
+        // Fajr and Isha — but with the rule picked by hand rather than resolved automatically.
+        // The note used to be suppressed for exactly this user, who had shown they care which
+        // rule is in force and was the one person never told it was changing their Fajr.
+        val chosen = PrayerSettings(highLatitude = HighLatitudePreference.SEVENTH_OF_NIGHT)
+        val d = engine.timesFor(london, LocalDate(2026, 9, 6), chosen)
+        assertEquals(HighLatitudePreference.SEVENTH_OF_NIGHT, d.highLatitudeRuleApplied)
+    }
+
+    @Test
+    fun anExplicitlyChosenRuleIsStillSilentWhenNothingBinds() {
+        val chosen = PrayerSettings(highLatitude = HighLatitudePreference.TWILIGHT_ANGLE)
+        val d = engine.timesFor(london, LocalDate(2026, 11, 15), chosen)
+        assertEquals(null, d.highLatitudeRuleApplied)
+    }
+
+    @Test
+    fun repeatedCallsWithTheSameInputsAgreeWithTheFirst() {
+        // The engaged-rule answer is memoised per (date, settings, location); the memo must not
+        // leak an answer across a change of any of the three.
+        val settings = PrayerSettings()
+        val september = engine.timesFor(london, LocalDate(2026, 9, 6), settings)
+        val november = engine.timesFor(london, LocalDate(2026, 11, 15), settings)
+        val septemberAgain = engine.timesFor(london, LocalDate(2026, 9, 6), settings)
+        assertEquals(HighLatitudePreference.SEVENTH_OF_NIGHT, september.highLatitudeRuleApplied)
+        assertEquals(null, november.highLatitudeRuleApplied)
+        assertEquals(september.highLatitudeRuleApplied, septemberAgain.highLatitudeRuleApplied)
+    }
+
+    @Test
     fun londonInNovemberHasNoHighLatitudeNoteBecauseNoRuleActuallyBinds() {
         // An ordinary autumn night: long enough that the raw angle-based Fajr and Isha already
         // sit inside every rule's bound, so all three HighLatitudeRule values agree and the note
