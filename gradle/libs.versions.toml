@@ -11,6 +11,7 @@ kotlinx-coroutines = "1.10.2"
 datastore = "1.1.7"
 androidx-activity = "1.9.3"
 androidx-core = "1.15.0"
+androidx-glance = "1.1.1"
 
 [libraries]
 adhan2 = { module = "com.batoulapps.adhan:adhan2", version.ref = "adhan" }
@@ -20,6 +21,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 datastore-preferences = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidx-glance" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

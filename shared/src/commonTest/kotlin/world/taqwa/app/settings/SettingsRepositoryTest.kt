@@ -99,6 +99,18 @@ class SettingsRepositoryTest {
         r.writeRawMinuteAdjustmentsForTest("NOON:5,FAJR:later,,:::")
         assertEquals(emptyMap(), r.prayerSettings.first().minuteAdjustments)
     }
+
+    @Test
+    fun widgetBackgroundDefaultsToFollowTheme() = runTest {
+        assertEquals(world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME, repo("widget-default").widgetBackground.first())
+    }
+
+    @Test
+    fun widgetBackgroundRoundTrips() = runTest {
+        val r = repo("widget-roundtrip")
+        r.setWidgetBackground(world.taqwa.app.domain.WidgetBackground.DARK)
+        assertEquals(world.taqwa.app.domain.WidgetBackground.DARK, r.widgetBackground.first())
+    }
 }
 
 class NotificationSettingsStorageTest {
