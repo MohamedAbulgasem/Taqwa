@@ -67,11 +67,15 @@ internal val SettingsGutter = 24.dp
 /**
  * Back chevron, large title, scrolling body. Every settings screen is this shape, so it lives in
  * one place rather than being re-typed seven times with drifting paddings.
+ *
+ * [onBack] is null on the settings root, which is a tab root: there is nowhere above it, and the
+ * chevron is replaced by the space it occupied so the title does not jump between this screen and
+ * the sub-screens it opens.
  */
 @Composable
 internal fun SettingsScaffold(
     title: String,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)?,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
@@ -82,32 +86,11 @@ internal fun SettingsScaffold(
             .windowInsetsPadding(WindowInsets.systemBars)
             .verticalScroll(rememberScrollState()),
     ) {
-        Box(
-            Modifier
-                .padding(start = 8.dp, top = 8.dp)
-                .size(44.dp)
-                .clip(CircleShape)
-                .clickable(onClick = onBack),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Drawn from literal coordinates, so unlike every `Row` and `padding(start=)` on
-            // these screens it does not mirror itself: under Arabic "back" is to the right, and
-            // a chevron still pointing left would send the eye the wrong way.
-            val pointsLeft = LocalLayoutDirection.current == LayoutDirection.Ltr
-            Canvas(Modifier.size(20.dp)) {
-                val w = size.width
-                fun x(fraction: Float) = if (pointsLeft) w * fraction else w * (1f - fraction)
-                val path = Path().apply {
-                    moveTo(x(0.62f), w * 0.14f)
-                    lineTo(x(0.30f), w * 0.50f)
-                    lineTo(x(0.62f), w * 0.86f)
-                }
-                drawPath(
-                    path = path,
-                    color = colors.textPrimary,
-                    style = Stroke(width = w * 0.11f, cap = StrokeCap.Round, join = StrokeJoin.Round),
-                )
-            }
+        if (onBack == null) {
+            // 8 dp of top padding plus the 44 dp tap target the chevron would have occupied.
+            Spacer(Modifier.height(52.dp))
+        } else {
+            BackChevron(onBack)
         }
         Text(
             title,
@@ -118,6 +101,39 @@ internal fun SettingsScaffold(
         Spacer(Modifier.height(20.dp))
         content()
         Spacer(Modifier.height(40.dp))
+    }
+}
+
+/** Sub-screens only; the settings root is a tab root and has nothing above it. */
+@Composable
+private fun BackChevron(onBack: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    Box(
+        Modifier
+            .padding(start = 8.dp, top = 8.dp)
+            .size(44.dp)
+            .clip(CircleShape)
+            .clickable(onClick = onBack),
+        contentAlignment = Alignment.Center,
+    ) {
+        // Drawn from literal coordinates, so unlike every `Row` and `padding(start=)` on these
+        // screens it does not mirror itself: under Arabic "back" is to the right, and a chevron
+        // still pointing left would send the eye the wrong way.
+        val pointsLeft = LocalLayoutDirection.current == LayoutDirection.Ltr
+        Canvas(Modifier.size(20.dp)) {
+            val w = size.width
+            fun x(fraction: Float) = if (pointsLeft) w * fraction else w * (1f - fraction)
+            val path = Path().apply {
+                moveTo(x(0.62f), w * 0.14f)
+                lineTo(x(0.30f), w * 0.50f)
+                lineTo(x(0.62f), w * 0.86f)
+            }
+            drawPath(
+                path = path,
+                color = colors.textPrimary,
+                style = Stroke(width = w * 0.11f, cap = StrokeCap.Round, join = StrokeJoin.Round),
+            )
+        }
     }
 }
 
@@ -190,7 +206,6 @@ fun SettingsRootScreen(
     methodName: String,
     themeName: String,
     notificationSettings: NotificationSettings,
-    onBack: () -> Unit,
     onOpenLocation: () -> Unit,
     onOpenPrayerTimes: () -> Unit,
     onOpenNotifications: () -> Unit,
@@ -207,7 +222,7 @@ fun SettingsRootScreen(
         stringResource(Res.string.settings_notifications_on_count, format.localizedDigits(on))
     }
 
-    SettingsScaffold(stringResource(Res.string.settings_title), onBack) {
+    SettingsScaffold(stringResource(Res.string.settings_title), onBack = null) {
         SectionLabel(stringResource(Res.string.settings_group_prayer))
         SettingsCard {
             TaqwaRow(

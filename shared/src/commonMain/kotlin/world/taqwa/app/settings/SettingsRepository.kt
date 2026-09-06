@@ -10,6 +10,7 @@ import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.HighLatitudePreference
+import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
@@ -87,6 +88,13 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         else GeoLocation(lat, lon, tz, p[SettingsKeys.LOCATION_CITY], p[SettingsKeys.LOCATION_COUNTRY])
     }
 
+    /**
+     * Manual until something says otherwise: a user who has never granted the permission, or who
+     * upgrades from a build that did not store this, has not turned "Use my location" on.
+     */
+    val locationSource: Flow<LocationSource> =
+        store.data.map { it[SettingsKeys.LOCATION_SOURCE].toEnumOr(LocationSource.MANUAL) }
+
     suspend fun setThemeMode(mode: ThemeMode) {
         store.edit { it[SettingsKeys.THEME] = mode.name }
     }
@@ -161,6 +169,16 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             val country = location.countryCode
             if (country == null) it.remove(SettingsKeys.LOCATION_COUNTRY) else it[SettingsKeys.LOCATION_COUNTRY] = country
         }
+    }
+
+    /**
+     * Recorded by every path that persists a location: a fix writes [LocationSource.GPS], the
+     * city list writes [LocationSource.MANUAL]. Kept separate from [setLocation] because turning
+     * the toggle off only becomes real once a city is actually picked — a cancelled search must
+     * leave both the location and the source alone.
+     */
+    suspend fun setLocationSource(source: LocationSource) {
+        store.edit { it[SettingsKeys.LOCATION_SOURCE] = source.name }
     }
 
     /** Test-only hook for the forward-compatibility case. */

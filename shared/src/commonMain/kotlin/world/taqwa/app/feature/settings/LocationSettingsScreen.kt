@@ -14,6 +14,7 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.rememberLocationPermissionRequester
@@ -37,6 +38,7 @@ import world.taqwa.app.resources.today_current_location
 @Composable
 fun LocationSettingsScreen(
     location: GeoLocation?,
+    locationSource: LocationSource,
     locationRepository: LocationRepository,
     onLocationPermission: (LocationPermission) -> Unit,
     onChooseCity: () -> Unit,
@@ -50,20 +52,19 @@ fun LocationSettingsScreen(
         onLocationPermission(granted)
     }
 
-    // A stored location carries a city name only when it was chosen by hand; a GPS fix has none.
-    val usingGps = permission == LocationPermission.GRANTED &&
-        location != null &&
-        location.cityName == null
-
     SettingsScaffold(stringResource(Res.string.settings_location), onBack) {
         SettingsCard {
             TaqwaRow(
                 stringResource(Res.string.location_use_my_location),
                 trailing = {
-                    TaqwaToggle(usingGps) { wantsGps ->
+                    // Read from the stored preference, not guessed from the location: a fix taken
+                    // near a bundled city carries that city's name too, which is why the old
+                    // guess ("no city name means GPS") read OFF for almost everyone who had it on.
+                    TaqwaToggle(locationSource == LocationSource.GPS) { wantsGps ->
                         // There is always a location in force, so switching off is not "no
                         // location" — it is "a city I pick myself", which is the same
-                        // destination as the row below.
+                        // destination as the row below. The source flips to MANUAL only when a
+                        // city is actually picked, so backing out of the search leaves this on.
                         if (wantsGps) requestLocation() else onChooseCity()
                     }
                 },
