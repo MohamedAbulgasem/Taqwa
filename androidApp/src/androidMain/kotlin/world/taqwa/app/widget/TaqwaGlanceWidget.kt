@@ -220,15 +220,25 @@ class TaqwaMediumGlanceWidget : GlanceAppWidget() {
                             }
                             val rowColor = if (row.isCurrent) ColorProvider(colors.accent()) else ColorProvider(colors.secondaryText())
                             val rowWeight = if (row.isCurrent) FontWeight.Bold else FontWeight.Normal
+                            // `maxLines = 1` on both, and it is the name that needs it: in a
+                            // non-Arabic locale `PrayerNaming` produces "Maghrib · المغرب", which
+                            // at 12 sp in a weighted column inside a 4x2 cell has no room to wrap.
+                            // Without this the row grew to two lines and five of them stopped
+                            // fitting the widget's height, pushing the last prayers out of view.
+                            // Clipping the tail of a name the reader can still recognise costs
+                            // less than losing whole rows — and the time, which is the row's
+                            // actual payload, is unweighted and so is never the part that gives.
                             Row(modifier = GlanceModifier.fillMaxWidth()) {
                                 Text(
                                     text = row.displayName,
                                     modifier = GlanceModifier.defaultWeight(),
                                     style = TextStyle(color = rowColor, fontWeight = rowWeight, fontSize = 12.sp),
+                                    maxLines = 1,
                                 )
                                 Text(
                                     text = row.clockTime,
                                     style = TextStyle(color = rowColor, fontWeight = rowWeight, fontSize = 12.sp),
+                                    maxLines = 1,
                                 )
                             }
                         }
