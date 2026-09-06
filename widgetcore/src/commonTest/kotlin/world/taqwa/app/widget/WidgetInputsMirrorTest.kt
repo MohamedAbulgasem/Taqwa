@@ -48,6 +48,23 @@ class WidgetInputsMirrorTest {
         assertEquals(null, restored?.currentPrayer)
     }
 
+    // M3: `val (name, time) = pair.split("=")` threw IndexOutOfBoundsException on a pair with no
+    // `=`, and IndexOutOfBoundsException is not among the caught exceptions — so a single corrupt
+    // byte in the mirror crashed the widget process rather than falling back to the placeholder.
+    // Both shapes below reach the parser; neither may throw.
+    @Test
+    fun aClockTimePairWithNoSeparatorDoesNotCrashTheParser() {
+        val noSeparator = "ASR|42|15:47|FAJR;DHUHR=12:34|DHUHR|en-US|0.42|Asr in"
+        val restored = WidgetInputsMirror.deserialize(noSeparator)
+        assertEquals("", restored?.allClockTimes?.get(Prayer.FAJR))
+        assertEquals("12:34", restored?.allClockTimes?.get(Prayer.DHUHR))
+    }
+
+    @Test
+    fun aClockTimePairWhoseNameIsNotAPrayerYieldsNullRatherThanThrowing() {
+        assertNull(WidgetInputsMirror.deserialize("ASR|42|15:47|GARBAGE|DHUHR|en-US|0.42|Asr in"))
+    }
+
     @Test
     fun malformedInputDeserializesToNullRatherThanCrashing() {
         assertNull(WidgetInputsMirror.deserialize("not a valid snapshot"))

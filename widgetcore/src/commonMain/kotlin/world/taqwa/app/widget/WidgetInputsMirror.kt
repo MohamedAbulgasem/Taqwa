@@ -59,9 +59,15 @@ object WidgetInputsMirror {
                 nextPrayer = Prayer.valueOf(parts[0]),
                 countdownMinutes = parts[1].toLong(),
                 nextClockTime = parts[2],
+                // Destructuring `pair.split(KV_SEP)` here would throw IndexOutOfBoundsException on
+                // a pair carrying no `=` at all, and that is not one of the exceptions caught
+                // below — a single corrupt byte in the mirror would take the whole widget process
+                // down instead of falling back to the placeholder. `substringBefore`/
+                // `substringAfter` cannot throw: a pair with no separator yields the whole string
+                // as the name (which `Prayer.valueOf` then rejects, giving a clean null snapshot)
+                // and an empty clock time.
                 allClockTimes = parts[3].split(PAIR_SEP).filter { it.isNotEmpty() }.associate { pair ->
-                    val (name, time) = pair.split(KV_SEP, limit = 2)
-                    Prayer.valueOf(name) to time
+                    Prayer.valueOf(pair.substringBefore(KV_SEP)) to pair.substringAfter(KV_SEP, "")
                 },
                 currentPrayer = parts[4].takeIf { it.isNotEmpty() }?.let { Prayer.valueOf(it) },
                 languageTag = parts[5],
