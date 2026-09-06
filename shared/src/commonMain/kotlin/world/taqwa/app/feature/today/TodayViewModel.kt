@@ -70,6 +70,7 @@ class TodayViewModel(
         val instant = now()
         val localDate = instant.toLocalDateTime(zone).date
 
+        val yesterday = engine.timesFor(location, localDate.plus(-1, DateTimeUnit.DAY), prefs)
         val today = engine.timesFor(location, localDate, prefs)
         val tomorrow = engine.timesFor(location, localDate.plus(1, DateTimeUnit.DAY), prefs)
 
@@ -79,7 +80,7 @@ class TodayViewModel(
             localDate.plus(prefs.hijriOffsetDays, DateTimeUnit.DAY),
         )
 
-        val timeline = TimelineBuilder.build(today, tomorrow, instant, prefs.showSunrise)
+        val timeline = TimelineBuilder.build(yesterday, today, tomorrow, instant, prefs.showSunrise)
         _state.value = TodayUiState.Ready(
             location = location,
             hijri = HijriFormatter.format(hijri, format),
