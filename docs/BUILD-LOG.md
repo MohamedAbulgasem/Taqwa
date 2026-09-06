@@ -324,3 +324,11 @@ settings (the OEM forces `importance=NONE` below the permission we hold); and
 widget extension 2 MB. `SystemEventReceiver` additionally simplified to reuse the container's
 coordinator rather than rebuilding its own — the crash it once caused was already closed by the
 DataStore singleton, and five force-stop/relaunch cycles on the new build were clean.
+
+### Installed on the physical iPhone
+
+Once the iPhone was paired and an Apple ID was signed into Xcode, the app built with automatic
+provisioning under **LOOPDL LIMITED (`5S5P2Q72MV`)** — the org team, because personal teams cannot
+hold the App Groups capability the widget needs and wildcard profiles never carry it — and installed
+and launched via `devicectl`. Both the app and the 2 MB widget extension are signed with
+`group.world.taqwa.app`. Slice 1 is now on both physical devices for hands-on testing.
