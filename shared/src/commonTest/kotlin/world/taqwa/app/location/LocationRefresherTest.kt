@@ -7,6 +7,7 @@ import okio.Path.Companion.toPath
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.test.Test
@@ -14,11 +15,17 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 private class FixedProvider(private val coordinates: Pair<Double, Double>?) : LocationProvider {
+    var callCount = 0
+        private set
+
     override suspend fun permission(): LocationPermission =
         if (coordinates == null) LocationPermission.NOT_REQUESTED else LocationPermission.GRANTED
 
     override suspend fun requestPermission(): LocationPermission = permission()
-    override suspend fun currentCoordinates(): Pair<Double, Double>? = coordinates
+    override suspend fun currentCoordinates(): Pair<Double, Double>? {
+        callCount++
+        return coordinates
+    }
 }
 
 /** Cape Town and Istanbul, the review's own travel scenario, plus Riyadh for the method default. */
@@ -39,8 +46,9 @@ class LocationRefresherTest {
         settings: SettingsRepository,
         coordinates: Pair<Double, Double>?,
         zoneId: String,
+        provider: FixedProvider = FixedProvider(coordinates),
     ) = LocationRefresher(
-        locationRepository = LocationRepository(FixedProvider(coordinates)),
+        locationRepository = LocationRepository(provider),
         cityRepository = CityRepository { CITIES },
         settings = settings,
         currentZoneId = { zoneId },
@@ -52,6 +60,7 @@ class LocationRefresherTest {
     fun flyingToIstanbulReResolvesAndPersistsTheNewLocation() = runTest {
         val settings = settings("flew")
         settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
         val refreshed = refresher(settings, 41.0138 to 28.9496, "Europe/Istanbul")
             .refreshFor(RescheduleTrigger.APP_FOREGROUND)
 
@@ -65,9 +74,23 @@ class LocationRefresherTest {
     }
 
     @Test
+    fun aRefreshThatMovesTheUserRecordsThatTheLocationCameFromAFix() = runTest {
+        val settings = settings("source-gps")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
+        refresher(settings, 41.0138 to 28.9496, "Europe/Istanbul")
+            .refreshFor(RescheduleTrigger.APP_FOREGROUND)
+
+        // A GPS-sourced user who has moved still gets the "Use my location" toggle recorded as
+        // ON — the fix and the toggle must never disagree.
+        assertEquals(LocationSource.GPS, settings.locationSource.first())
+    }
+
+    @Test
     fun walkingAcrossTownLeavesTheStoredLocationAlone() = runTest {
         val settings = settings("walked")
         settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
         // ~2 km away, same zone: below the 5 km threshold.
         val refreshed = refresher(settings, -33.9258 to 18.4448, "Africa/Johannesburg")
             .refreshFor(RescheduleTrigger.APP_FOREGROUND)
@@ -80,6 +103,7 @@ class LocationRefresherTest {
     fun aTimezoneChangeAloneIsEnoughToReResolve() = runTest {
         val settings = settings("zone-only")
         settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
         // Same coordinates, different reported zone — the device crossed a zone boundary or the
         // user corrected the system setting.
         val refreshed = refresher(settings, -33.9258 to 18.4232, "Africa/Maputo")
@@ -93,11 +117,60 @@ class LocationRefresherTest {
     fun aManuallyChosenCityIsNeverOverwrittenWhenLocationWasNeverGranted() = runTest {
         val settings = settings("manual-city")
         settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.MANUAL)
         val refreshed = refresher(settings, coordinates = null, zoneId = "Europe/Istanbul")
             .refreshFor(RescheduleTrigger.APP_FOREGROUND)
 
         assertEquals("Cape Town", refreshed?.cityName)
         assertEquals("Cape Town", settings.location.first()?.cityName)
+    }
+
+    @Test
+    fun aManuallyPickedCityIsNeverSwappedBackOnForeground() = runTest {
+        val settings = settings("manual-foreground")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.MANUAL)
+        // Permission is in fact granted and a GPS fix to Istanbul is sitting right there — the
+        // point of the fix is that a deliberate choice wins even when a fix is available.
+        val provider = FixedProvider(41.0138 to 28.9496)
+        val refreshed = refresher(settings, 41.0138 to 28.9496, "Europe/Istanbul", provider)
+            .refreshFor(RescheduleTrigger.APP_FOREGROUND)
+
+        assertEquals(0, provider.callCount)
+        assertEquals("Cape Town", refreshed?.cityName)
+        assertEquals("Cape Town", settings.location.first()?.cityName)
+        assertEquals(LocationSource.MANUAL, settings.locationSource.first())
+    }
+
+    @Test
+    fun gpsSourceStillReResolvesOnForeground() = runTest {
+        val settings = settings("gps-foreground")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
+        val provider = FixedProvider(41.0138 to 28.9496)
+        val refreshed = refresher(settings, 41.0138 to 28.9496, "Europe/Istanbul", provider)
+            .refreshFor(RescheduleTrigger.APP_FOREGROUND)
+
+        assertEquals(1, provider.callCount)
+        assertEquals("Istanbul", refreshed?.cityName)
+        assertEquals("Istanbul", settings.location.first()?.cityName)
+        assertEquals(LocationSource.GPS, settings.locationSource.first())
+    }
+
+    @Test
+    fun aManuallyPickedCityKeepsItsZoneWhenTheDeviceZoneChanges() = runTest {
+        val settings = settings("manual-timezone")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.MANUAL)
+        // The traveller flew to Istanbul; the device zone follows, but the picked city does not.
+        val provider = FixedProvider(41.0138 to 28.9496)
+        val refreshed = refresher(settings, 41.0138 to 28.9496, "Europe/Istanbul", provider)
+            .refreshFor(RescheduleTrigger.TIMEZONE_CHANGED)
+
+        assertEquals(0, provider.callCount)
+        assertEquals("Cape Town", refreshed?.cityName)
+        assertEquals("Africa/Johannesburg", settings.location.first()?.timeZoneId)
+        assertEquals(LocationSource.MANUAL, settings.locationSource.first())
     }
 
     @Test

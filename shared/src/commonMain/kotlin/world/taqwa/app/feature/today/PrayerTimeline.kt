@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,13 @@ import world.taqwa.app.i18n.localizedPrayerName
 
 /** Gutter holding the pips; the rail runs down its centre. */
 private val GutterWidth = 26.dp
+
+/**
+ * Air between the pip column and the name. The current prayer's halo is 24 dp inside a 26 dp
+ * gutter, so without this the name sits about a dp from it and the two read as one blob. Added
+ * here rather than by widening the gutter, which would carry the rail off the pips' centres.
+ */
+private val PipNameGap = 4.dp
 
 /**
  * Half a row's height. Rows are a ~23dp text line plus 10dp of padding each side, so this puts
@@ -90,6 +98,7 @@ fun PrayerTimeline(rows: List<TimelineRow>, formatTime: (TimelineRow) -> String)
                             )
                         }
                     }
+                    Spacer(Modifier.width(PipNameGap))
                     Row(
                         Modifier.weight(1f),
                         horizontalArrangement = Arrangement.SpaceBetween,

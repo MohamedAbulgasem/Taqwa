@@ -8,6 +8,7 @@ import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
@@ -30,6 +31,30 @@ class SettingsRepositoryTest {
     private fun repo(name: String) = SettingsRepository(
         PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-test-$name.preferences_pb".toPath() }
     )
+
+    @Test
+    fun locationSourceDefaultsToManualSoTheToggleIsOffBeforeAnyoneGrantsAnything() = runTest {
+        assertEquals(LocationSource.MANUAL, repo("location-source-default").locationSource.first())
+    }
+
+    @Test
+    fun locationSourceRoundTripsBothWays() = runTest {
+        val r = repo("location-source-round-trip")
+        r.setLocationSource(LocationSource.GPS)
+        assertEquals(LocationSource.GPS, r.locationSource.first())
+        // And back: turning "Use my location" off is a real, persisted state, not the absence
+        // of one — which was the whole bug.
+        r.setLocationSource(LocationSource.MANUAL)
+        assertEquals(LocationSource.MANUAL, r.locationSource.first())
+    }
+
+    @Test
+    fun storingALocationLeavesTheSourceAloneSoACancelledCitySearchCannotFlipTheToggle() = runTest {
+        val r = repo("location-source-independent")
+        r.setLocationSource(LocationSource.GPS)
+        r.setLocation(GeoLocation(51.5, -0.12, "Europe/London", "London", "GB"))
+        assertEquals(LocationSource.GPS, r.locationSource.first())
+    }
 
     @Test
     fun aGpsFixInSaudiArabiaSelectsUmmAlQura() = runTest {

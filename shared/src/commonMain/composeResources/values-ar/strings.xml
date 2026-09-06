@@ -89,7 +89,7 @@
     <string name="sound_notification_detail">نغمة هاتفك الافتراضية</string>
     <string name="sound_takbir_detail">الله أكبر، الله أكبر — نحو %1$s ثانية</string>
     <string name="sound_adhan_detail">الأذان كاملًا، %1$s ثانية</string>
-    <string name="sound_sheet_footnote">صوت الإشعار محدود بـ%1$s ثانية على النظامين. ويمكن سماع الأذان كاملًا داخل التطبيق.</string>
+    <string name="sound_sheet_footnote">صوت الإشعار محدود بـ%1$s ثانية على هذه المنصة. ويمكن سماع الأذان كاملًا داخل التطبيق.</string>
 
     <!-- Prayer time settings -->
     <string name="prayer_times_method">طريقة الحساب</string>
@@ -151,8 +151,10 @@
     <string name="widget_background_follow_theme">حسب المظهر</string>
     <string name="widget_background_light">فاتح</string>
     <string name="widget_background_dark">داكن</string>
-    <string name="widget_background_translucent">شفاف — تندمج مع خلفية الشاشة</string>
-    <string name="widget_background_frosted">زجاجي — تستخدم خامة النظام للودجت</string>
+    <string name="widget_background_translucent_title">شفاف</string>
+    <string name="widget_background_translucent_subtitle">تندمج مع خلفية الشاشة.</string>
+    <string name="widget_background_frosted_title">زجاجي</string>
+    <string name="widget_background_frosted_subtitle">تستخدم خامة النظام للودجت.</string>
     <!-- Qibla screen (Task 22 sweep) -->
     <string name="qibla_title">القبلة</string>
     <string name="qibla_back">اليوم</string>
@@ -169,4 +171,8 @@
     <string name="notifications_exact_alarms_off">المنبهات الدقيقة معطّلة لتطبيق تقوى، لذا قد تصل التنبيهات متأخرة بضع دقائق. فعّل «المنبهات والتذكيرات» في إعدادات النظام لإصلاح ذلك.</string>
     <string name="hijri_tabular">حسابي</string>
     <string name="method_tehran_maghrib_note">المغرب يتبع غروب الشمس، ولم تُطبّق بعد زاوية المغرب ٤٫٥° الخاصة بهذه الطريقة.</string>
+    <!-- Bottom tab bar (iteration 1) -->
+    <string name="tab_today">اليوم</string>
+    <string name="tab_qibla">القبلة</string>
+    <string name="tab_settings">الإعدادات</string>
 </resources>

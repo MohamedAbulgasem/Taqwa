@@ -91,7 +91,7 @@
     <string name="sound_notification_detail">Your phone’s default tone</string>
     <string name="sound_takbir_detail">Allahu akbar, Allahu akbar — ~%1$ss</string>
     <string name="sound_adhan_detail">Full call, %1$s seconds</string>
-    <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on both platforms. The complete adhan can be played inside the app.</string>
+    <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on this platform. The complete adhan can be played inside the app.</string>
 
     <!-- Prayer time settings -->
     <string name="prayer_times_method">Calculation method</string>
@@ -153,8 +153,10 @@
     <string name="widget_background_follow_theme">Follow theme</string>
     <string name="widget_background_light">Light</string>
     <string name="widget_background_dark">Dark</string>
-    <string name="widget_background_translucent">Translucent — blends into your wallpaper</string>
-    <string name="widget_background_frosted">Frosted — uses the system widget material</string>
+    <string name="widget_background_translucent_title">Translucent</string>
+    <string name="widget_background_translucent_subtitle">Blends into your wallpaper.</string>
+    <string name="widget_background_frosted_title">Frosted</string>
+    <string name="widget_background_frosted_subtitle">Uses the system widget material.</string>
     <!-- Qibla screen (Task 22 sweep: qibla_no_sensor_title/body above already matched this
          screen's copy verbatim and are reused there; everything else needed its own string. -->
     <string name="qibla_title">Qibla</string>
@@ -172,4 +174,8 @@
     <string name="notifications_exact_alarms_off">Exact alarms are turned off for Taqwa, so notifications may arrive a few minutes late. Turn on “Alarms &amp; reminders” in system settings to fix this.</string>
     <string name="hijri_tabular">Tabular</string>
     <string name="method_tehran_maghrib_note">Maghrib follows sunset; this method’s 4.5° Maghrib angle is not applied yet.</string>
+    <!-- Bottom tab bar (iteration 1: the owner asked for it after seeing Today on a phone). -->
+    <string name="tab_today">Today</string>
+    <string name="tab_qibla">Qibla</string>
+    <string name="tab_settings">Settings</string>
 </resources>

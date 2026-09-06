@@ -18,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
@@ -63,20 +65,27 @@ fun TaqwaRow(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         if (subtitle == null) {
-            Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
+            Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary, modifier = Modifier.weight(1f, fill = false))
         } else {
             Column(Modifier.weight(1f, fill = false).padding(end = 12.dp)) {
                 Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
-                Text(subtitle, style = TaqwaText.caption, color = colors.textSecondary)
+                Text(subtitle, style = TaqwaText.caption, color = colors.textTertiary)
             }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.weight(1f, fill = false),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             if (value != null) {
                 Text(
                     value,
                     style = TaqwaText.caption,
                     color = colors.textSecondary,
-                    modifier = Modifier.padding(end = 8.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f, fill = false).padding(start = 12.dp),
                 )
             }
             trailing?.invoke()

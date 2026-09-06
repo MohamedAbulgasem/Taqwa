@@ -29,6 +29,9 @@ internal object SettingsKeys {
     val LOCATION_TZ = stringPreferencesKey("location_timezone")
     val LOCATION_CITY = stringPreferencesKey("location_city")
     val LOCATION_COUNTRY = stringPreferencesKey("location_country")
+    // Whether the stored location came from a fix or from the city list. Not derivable from the
+    // location itself — see LocationSource — and the only thing "Use my location" can read.
+    val LOCATION_SOURCE = stringPreferencesKey("location_source")
     val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")
     fun soundKey(prayer: Prayer) = stringPreferencesKey("sound_${prayer.name.lowercase()}")
