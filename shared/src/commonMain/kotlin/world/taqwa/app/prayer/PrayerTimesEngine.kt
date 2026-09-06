@@ -27,20 +27,47 @@ private val ALL_HIGH_LATITUDE_RULES = listOf(
     HighLatitudeRule.TWILIGHT_ANGLE,
 )
 
+/**
+ * Capacity of [PrayerTimesEngine.engagedCache]: enough to hold the three dates
+ * `TodayViewModel.refresh()` requests every tick (yesterday/today/tomorrow) with headroom to
+ * spare across a midnight rollover or a settings change without evicting a still-relevant entry,
+ * while staying small enough that the map can never grow unbounded.
+ */
+private const val ENGAGED_CACHE_CAPACITY = 8
+
 class PrayerTimesEngine {
 
     /**
-     * The last answer [ruleEngaged] gave, and the inputs it gave it for.
+     * Bounded memo of [ruleEngaged]'s past answers, keyed on the same
+     * `(date, settings, location)` triple that determines the answer.
      *
-     * `ruleEngaged` computes two extra full `PrayerTimes` on top of the one the caller wants, and
-     * `TodayViewModel.refresh()` calls `timesFor` three times a second — above 48° latitude that
-     * was nine astronomical solves a second on the Main thread. The inputs are a date, a settings
-     * object and a location, none of which change between ticks, so a single-entry memo removes
-     * all of it. A race between two callers costs one recomputation and no wrong answer, which is
-     * why there is no lock here.
+     * `ruleEngaged` computes two extra full `PrayerTimes` on top of the one the caller wants.
+     * A previous fix memoised that in a single `var` slot, but `TodayViewModel.refresh()` calls
+     * `timesFor` for three different dates (yesterday, today, tomorrow) every tick, so each call
+     * overwrote the one slot with a different key and the next call was a guaranteed miss —
+     * above 48° latitude that made it nine astronomical solves a second on Main, not fewer. A
+     * `LinkedHashMap` preserves insertion order, so the oldest entry (the first key) is evicted
+     * once the map would grow past [ENGAGED_CACHE_CAPACITY]. This is plain `kotlin.collections`,
+     * not `java.util`, so it compiles for Kotlin/Native too.
+     *
+     * Not synchronized: in practice this engine is driven from a single coroutine at a time (the
+     * Main dispatcher via `TodayViewModel`, or one `NotificationPlanner.plan()` pass). If that
+     * ever changes, guard reads/writes of this map with a lock — unlike the old single-`var`
+     * memo, where a race merely cost a redundant recomputation, concurrent mutation of a plain
+     * `LinkedHashMap` can corrupt its internal structure.
      */
-    private var engagedKey: Triple<LocalDate, PrayerSettings, GeoLocation>? = null
-    private var engagedValue = false
+    private val engagedCache = LinkedHashMap<Triple<LocalDate, PrayerSettings, GeoLocation>, Boolean>()
+
+    /**
+     * Counts the extra `PrayerTimes` solves [ruleEngaged] performs for the *other* two
+     * high-latitude rules (i.e. not counting the one solve every [timesFor] call needs
+     * regardless of caching). Exposed for tests to pin the cache-hit behaviour; not used by
+     * production code.
+     */
+    internal var solveCount: Int = 0
+
+    /** Current size of [engagedCache]. Exposed for tests to pin the eviction bound. */
+    internal fun engagedCacheSize(): Int = engagedCache.size
 
     fun timesFor(location: GeoLocation, date: LocalDate, settings: PrayerSettings): DayPrayerTimes {
         val effectiveRule = HighLatitudeSelector.select(settings.highLatitude, location.latitude)
@@ -95,13 +122,18 @@ class PrayerTimesEngine {
         // three rules agree. The note is only true when they genuinely diverge.
         fun ruleEngaged(): Boolean {
             val key = Triple(date, settings, location)
-            if (engagedKey == key) return engagedValue
+            engagedCache[key]?.let { return it }
             val otherRules = ALL_HIGH_LATITUDE_RULES.filter { it != effectiveRule.toAdhan() }
-            val variants = listOf(computed) + otherRules.map(::compute)
+            val variants = listOf(computed) + otherRules.map {
+                solveCount++
+                compute(it)
+            }
             val engaged = variants.map { it.fajr }.distinct().size > 1 ||
                 variants.map { it.isha }.distinct().size > 1
-            engagedKey = key
-            engagedValue = engaged
+            if (engagedCache.size >= ENGAGED_CACHE_CAPACITY) {
+                engagedCache.remove(engagedCache.keys.first())
+            }
+            engagedCache[key] = engaged
             return engaged
         }
 
