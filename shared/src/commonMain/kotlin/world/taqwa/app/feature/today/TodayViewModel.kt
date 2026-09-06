@@ -74,12 +74,20 @@ class TodayViewModel(
             localDate.plus(prefs.hijriOffsetDays, DateTimeUnit.DAY),
         )
 
+        val timeline = TimelineBuilder.build(today, tomorrow, instant, prefs.showSunrise)
         _state.value = TodayUiState.Ready(
             location = location,
             hijri = HijriFormatter.format(hijri),
-            today = TimelineBuilder.build(today, tomorrow, instant, prefs.showSunrise),
+            today = timeline,
             highLatitudeNote = noteFor(today),
         )
+        world.taqwa.app.widget.WidgetMirrorWriter.write(
+            store = world.taqwa.app.widget.createWidgetKeyValueStore(),
+            today = timeline,
+            timeZoneId = location.timeZoneId,
+            format = world.taqwa.app.i18n.createPlatformFormat(),
+        )
+        world.taqwa.app.widget.refreshWidgets()
     }
 
     /**
