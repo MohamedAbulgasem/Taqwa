@@ -21,11 +21,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.DarkColors
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.manropeFamily
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.qibla_cardinal_east
+import world.taqwa.app.resources.qibla_cardinal_north
+import world.taqwa.app.resources.qibla_cardinal_south
+import world.taqwa.app.resources.qibla_cardinal_west
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -49,12 +54,6 @@ private const val LabelR = 64.5f / 93f
 /** `stroke-dasharray="2 17.6"` around r=75 is 24 slots; this is the inked fraction of each. */
 private const val TickCount = 24
 private const val TickInkedFraction = 2f / 19.6f
-
-/** A cardinal letter this close to the Kaaba marker is dropped rather than drawn under it —
- *  the mockup's aligned frame omits its N for exactly this reason. */
-private const val LabelClearanceDegrees = 20.0
-
-private val Cardinals = listOf("N" to 0.0, "E" to 90.0, "S" to 180.0, "W" to 270.0)
 
 /**
  * The dial rotates under a needle that points at the Kaaba marker, with the marker fixed at
@@ -85,6 +84,19 @@ fun QiblaDial(
     val glow = if (dark) 1f else 0.35f
     val tickAlpha = if (dark) 0.45f else 0.55f
 
+    // Resolved here, in composition, because stringResource needs a @Composable context that the
+    // Canvas draw lambda below does not have.
+    val cardinals = listOf(
+        stringResource(Res.string.qibla_cardinal_north) to 0.0,
+        stringResource(Res.string.qibla_cardinal_east) to 90.0,
+        stringResource(Res.string.qibla_cardinal_south) to 180.0,
+        stringResource(Res.string.qibla_cardinal_west) to 270.0,
+    )
+
+    // This Canvas draws every position (ticks, cardinal labels, needle, Kaaba marker) from literal
+    // x/y coordinates built with sin/cos on the raw compass bearing — it never reads
+    // LocalLayoutDirection, so it is not mirrored under RTL. North stays up and west stays left in
+    // every locale, which is correct: a compass does not flip because the surrounding text does.
     Canvas(modifier.size(DialSize).alpha(if (dimmed) 0.28f else 1f)) {
         val r = size.minDimension / 2f
         val centre = Offset(size.width / 2f, size.height / 2f)
@@ -129,9 +141,12 @@ fun QiblaDial(
             )
 
             // 3 — N/E/S/W ride the dial, so they tilt with it exactly as a physical card does.
+            // All four always draw — dropping the one nearest the Kaaba marker previously made
+            // that letter disappear at bearings common to many real locations (e.g. E). Drawing
+            // the labels here, before the needle and marker below, means a coincidental overlap
+            // simply sits under them instead of hiding the letter.
             if (!dimmed) {
-                Cardinals.forEach { (letter, onDial) ->
-                    if (angularGap(bearingDegrees, onDial) < LabelClearanceDegrees) return@forEach
+                cardinals.forEach { (letter, onDial) ->
                     val a = (onDial - 90.0).toRadians()
                     drawCardinal(measurer, letter, labelStyle, centre, r * LabelR, a)
                 }
@@ -215,10 +230,4 @@ private fun DrawScope.drawCardinal(
         textLayoutResult = measured,
         topLeft = Offset(x - measured.size.width / 2f, y - measured.size.height / 2f),
     )
-}
-
-/** Shortest distance between two compass angles, in degrees. */
-private fun angularGap(a: Double, b: Double): Double {
-    val d = abs((a - b) % 360.0)
-    return if (d > 180.0) 360.0 - d else d
 }
