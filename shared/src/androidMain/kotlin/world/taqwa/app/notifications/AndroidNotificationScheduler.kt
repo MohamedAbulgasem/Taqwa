@@ -12,6 +12,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.i18n.createPlatformFormat
 
 private const val PREFS_NAME = "taqwa_scheduled_alarms"
 private const val KEY_IDS = "ids"
@@ -95,20 +96,45 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         )
     }
 
-    /** One channel per (prayer, sound) actually used by this plan. Never edits an existing
-     * channel — a sound change always shows up as a channel id Android has never seen. */
+    /**
+     * One channel per (prayer, sound) actually used by this plan, and nothing else.
+     *
+     * A channel's sound is immutable, so switching a prayer from Adhan to Takbir to Notification
+     * leaves three channels behind; without the sweep below the user sees a list of entries they
+     * cannot remove and — while every channel was named `"Prayer: Fajr"` in hardcoded English —
+     * could not even tell apart. Names come from the same [LocalizedNotificationCopy] that bakes
+     * the notification text, so the channel reads in the user's own language and says which sound
+     * it carries. An existing channel is re-created deliberately: Android updates the name and
+     * leaves the immutable sound alone, which is what relabels channels after a locale change.
+     */
     private fun ensureChannels(plan: List<ScheduledNotification>) {
-        plan.map { it.prayer to it.sound }.toSet().forEach { (prayer, sound) ->
+        val copy = LocalizedNotificationCopy(createPlatformFormat())
+        val live = plan.map { it.prayer to it.sound }.toSet()
+        live.forEach { (prayer, sound) ->
             val id = NotificationChannels.channelId(prayer, sound)
-            if (notificationManager.getNotificationChannel(id) != null) return@forEach
-            val channel = NotificationChannel(id, channelName(prayer), NotificationManager.IMPORTANCE_HIGH)
-            configureSound(channel, sound)
+            val existing = notificationManager.getNotificationChannel(id)
+            val channel =
+                NotificationChannel(id, copy.channelName(prayer, sound), NotificationManager.IMPORTANCE_HIGH)
+            if (existing == null) configureSound(channel, sound)
             notificationManager.createNotificationChannel(channel)
         }
+        deleteStaleChannels(live)
     }
 
-    private fun channelName(prayer: Prayer) =
-        "Prayer: ${prayer.name.lowercase().replaceFirstChar { it.uppercase() }}"
+    /**
+     * Every channel this app could ever have created for a prayer that the current plan touches,
+     * minus the ones the plan actually uses. Prayers absent from the plan are left alone: their
+     * channels are the record of a sound the user may switch back to, and `scheduleAll` is called
+     * often enough that deleting on absence would churn.
+     */
+    private fun deleteStaleChannels(live: Set<Pair<Prayer, PrayerSound>>) {
+        val liveIds = live.map { (prayer, sound) -> NotificationChannels.channelId(prayer, sound) }.toSet()
+        live.map { it.first }.toSet().forEach { prayer ->
+            NotificationChannels.allChannelIdsFor(prayer)
+                .filterNot { it in liveIds }
+                .forEach { runCatching { notificationManager.deleteNotificationChannel(it) } }
+        }
+    }
 
     private fun configureSound(channel: NotificationChannel, sound: PrayerSound) {
         val attrs = AudioAttributes.Builder()

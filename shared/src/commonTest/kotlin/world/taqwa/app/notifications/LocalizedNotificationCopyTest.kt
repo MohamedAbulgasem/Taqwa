@@ -1,6 +1,7 @@
 package world.taqwa.app.notifications
 
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.i18n.PlatformFormat
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,6 +23,27 @@ private class StubFormat(private val tag: String, private val arabicIndic: Boole
  * is written once at schedule time — days before it fires, with no chance to re-localise it.
  */
 class LocalizedNotificationCopyTest {
+
+    @Test
+    fun channelNamesAreLocalisedAndDistinctPerSound() {
+        val copy = LocalizedNotificationCopy(StubFormat("ar-LY", arabicIndic = false))
+        val names = PrayerSound.entries.map { copy.channelName(Prayer.FAJR, it) }
+        // Four channels can coexist for one prayer, one per sound the user has tried; the whole
+        // point of naming them is that Android's settings list is not four identical rows.
+        assertEquals(names.size, names.distinct().size, names.toString())
+        names.forEach { assertTrue(it.startsWith("الفجر"), it) }
+        assertFalse(names.any { it.contains("Prayer:") })
+        assertTrue(names.any { it.contains("أذان") }, names.toString())
+    }
+
+    @Test
+    fun channelNamesFollowTheDeviceLanguage() {
+        val copy = LocalizedNotificationCopy(StubFormat("en-GB", arabicIndic = false))
+        val name = copy.channelName(Prayer.MAGHRIB, PrayerSound.ADHAN)
+        // Non-Arabic locales get PrayerNaming's paired display, same as the notification title.
+        assertTrue(name.startsWith("Maghrib"), name)
+        assertTrue(name.endsWith("Adhan"), name)
+    }
 
     @Test
     fun anArabicDeviceGetsTheArabicNameAloneInTheTitle() {
