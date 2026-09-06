@@ -1,12 +1,16 @@
 package world.taqwa.app.di
 
+import kotlinx.coroutines.flow.first
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.createLocationProvider
+import world.taqwa.app.notifications.NotificationCoordinator
+import world.taqwa.app.notifications.createNotificationScheduler
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.resources.Res
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.createDataStore
+import kotlin.time.Clock
 
 /** Manual construction. A DI framework earns its place when there is a graph worth managing. */
 class AppContainer {
@@ -14,6 +18,13 @@ class AppContainer {
     val cityRepository = CityRepository { Res.readBytes("files/cities.csv").decodeToString() }
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()
+    val notificationCoordinator = NotificationCoordinator(
+        engine = prayerTimesEngine,
+        settingsRepository = settingsRepository,
+        locationOf = { settingsRepository.location.first() },
+        scheduler = createNotificationScheduler(),
+        now = { Clock.System.now() },
+    )
 }
 
 /**
