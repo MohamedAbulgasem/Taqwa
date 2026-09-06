@@ -15,6 +15,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.launch
@@ -206,9 +209,19 @@ fun App(container: AppContainer) {
                                     format = platformFormat,
                                 )
                             }
-                            // Tied to this composable: the one-second tick starts when Today appears and
-                            // is cancelled the moment it leaves the backstack.
-                            LaunchedEffect(viewModel) { viewModel.start(this) }
+                            // Gated on the *lifecycle*, not just composition: leaving Today for another
+                            // tab cancels this via composition alone, but the activity being merely
+                            // stopped (screen off, Home pressed) does not tear down the composable —
+                            // it stays composed and a plain LaunchedEffect would keep ticking, writing
+                            // the widget mirror once a minute, for as long as the process lives.
+                            // repeatOnLifecycle suspends the block on STOP and restarts it on the next
+                            // START, so the tick truly runs only while Today is on screen.
+                            val lifecycleOwner = LocalLifecycleOwner.current
+                            LaunchedEffect(viewModel, lifecycleOwner) {
+                                lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                    viewModel.tickWhileActive()
+                                }
+                            }
                             val state by viewModel.state.collectAsState()
 
                             val requestLocation = world.taqwa.app.location

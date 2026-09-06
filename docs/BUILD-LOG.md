@@ -355,3 +355,13 @@ zero failures.** Reinstalled on both devices.
 Two facts for the owner's Android testing: the compass on this device needs a figure-of-eight
 first (its magnetometer reports LOW accuracy), and the home-screen widgets were removed by the
 agents' reinstall cycles — re-add them once.
+
+### Iteration 2 — Today ticker was running with the screen off
+
+Found by watching logcat with the phone asleep: a widget redraw on every whole minute,
+indefinitely — `TodayViewModel`'s one-second loop lived in a `LaunchedEffect`, which Compose cancels
+when the composable leaves composition but not when the activity is merely *stopped*. Each tick was
+a SharedPreferences write and two Glance IPC round-trips that nobody was looking at. Now collected
+under `repeatOnLifecycle(STARTED)` via `lifecycle-runtime-compose` 2.9.6 in `commonMain` (it
+resolves on iOS through `ComposeUIViewController`). Measured: four minutes screen-off → one widget
+update, on the widget's own 5-minute grid. 282 JVM / 274 iOS tests.

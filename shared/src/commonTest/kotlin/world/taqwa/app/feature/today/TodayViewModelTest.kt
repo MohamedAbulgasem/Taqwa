@@ -1,8 +1,16 @@
 package world.taqwa.app.feature.today
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import okio.Path.Companion.toPath
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.PrayerSettings
@@ -13,6 +21,7 @@ import world.taqwa.app.widget.KeyValueStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -222,5 +231,76 @@ class TodayViewModelTest {
         val writes = probe.store.writes - writesBefore
         assertTrue(writes in 1..6, "90 ticks produced $writes mirror writes")
         assertEquals(writes, probe.refreshes - refreshesBefore)
+    }
+
+    // -- the lifecycle-gated tick -----------------------------------------------------------
+    //
+    // `tickWhileActive()` replaced `start(scope)`: it owns no scope and no `launch` of its own,
+    // so it runs only for as long as its *caller's* coroutine survives. In `App.kt` that caller is
+    // `repeatOnLifecycle(STARTED) { … }`, which cancels the block the moment the activity is
+    // stopped (screen off, Home pressed) rather than merely leaving composition. This is the
+    // behaviour-level guard for that: drive the loop from a child job, let it tick for real
+    // (through a minute boundary, so the dedupe in `refresh()` doesn't hide a stalled loop),
+    // cancel the job, and prove nothing it does — mirror write or widget nudge — continues.
+
+    @Test
+    fun cancellingTheTickingJobStopsFurtherWidgetActivity() = runTest {
+        val repo = settings("tick-while-active-cancel")
+        repo.setPrayerSettings(PrayerSettings())
+        val store = CountingKeyValueStore()
+        var refreshes = 0
+        val base = Instant.parse("2026-09-06T14:30:00Z")
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { london },
+            // Tied to the test dispatcher's own virtual clock rather than a value advanced by
+            // hand, so `tickWhileActive()`'s real `delay(1_000)` loop is what moves time forward —
+            // exactly what a fake `now` driven manually (as the rest of this file uses) can't
+            // exercise, since nothing here calls `refresh()` directly.
+            now = { base + currentTime.milliseconds },
+            widgetStore = { store },
+            widgetFormat = { EnglishPlatformFormat },
+            onWidgetsChanged = { refreshes++ },
+        )
+
+        val job = launch { vm.tickWhileActive() }
+        // The loop refreshes once immediately, before its first delay — the screen must be
+        // correct the instant Today appears, not a second late. Awaited through the state flow
+        // rather than `runCurrent()`: the settings DataStore's first read is real (non-virtual)
+        // I/O, which a scheduler advance does not wait out, but suspending on the state this
+        // refresh produces does.
+        vm.state.first { it is TodayUiState.Ready }
+        assertEquals(1, store.writes, "entry must write the mirror once before the first tick")
+
+        // Tick through whole-minute boundaries the dedupe cannot collapse into the first write.
+        // Each virtual second only *schedules* the next `refresh()`; running it still crosses
+        // through the settings DataStore's real (non-virtual) read, so a one-shot
+        // `advanceTimeBy(3.minutes)` would race ahead of that real completion and starve the loop
+        // after tick one. Ceding to a real dispatcher between virtual steps gives that read
+        // somewhere to actually finish.
+        repeat(180) {
+            advanceTimeBy(1.seconds)
+            runCurrent()
+            withContext(Dispatchers.Default) { yield() }
+            runCurrent()
+        }
+        val writesWhileActive = store.writes
+        val refreshesWhileActive = refreshes
+        assertTrue(writesWhileActive > 1, "expected minute-boundary writes while active, saw $writesWhileActive")
+
+        job.cancelAndJoin()
+        val writesAtCancel = store.writes
+        val refreshesAtCancel = refreshes
+        assertEquals(refreshesWhileActive, refreshesAtCancel)
+
+        // Five more minutes would produce several more writes if the loop were still running.
+        repeat(300) {
+            advanceTimeBy(1.seconds)
+            runCurrent()
+        }
+
+        assertEquals(writesAtCancel, store.writes, "no further mirror writes once the tick job is cancelled")
+        assertEquals(refreshesAtCancel, refreshes, "no further widget refresh once the tick job is cancelled")
     }
 }
