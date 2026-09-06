@@ -13,6 +13,9 @@ struct ComposeView: UIViewControllerRepresentable {
 struct ContentView: View {
     var body: some View {
         ComposeView()
-            .ignoresSafeArea(.all, edges: .bottom) // Compose has its own keyboard handler
+            // Compose owns the whole screen and applies the safe area itself via
+            // WindowInsets.systemBars. Letting SwiftUI inset the view as well double-counted the
+            // status bar height and pushed the Today header 59pt too far down.
+            .ignoresSafeArea(.all)
     }
 }
