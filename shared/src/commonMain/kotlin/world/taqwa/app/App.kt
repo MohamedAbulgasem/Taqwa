@@ -3,6 +3,7 @@ package world.taqwa.app
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,6 +39,8 @@ import world.taqwa.app.feature.settings.PrayerTimesSettingsScreen
 import world.taqwa.app.feature.settings.SettingsRootScreen
 import world.taqwa.app.feature.settings.methodDisplayName
 import world.taqwa.app.feature.settings.themeDisplayName
+import world.taqwa.app.feature.qibla.QiblaScreen
+import world.taqwa.app.feature.qibla.QiblaViewModel
 import world.taqwa.app.feature.today.TodayScreen
 import world.taqwa.app.feature.today.TodayViewModel
 import world.taqwa.app.location.LocationPermission
@@ -46,6 +49,8 @@ import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
 import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.RescheduleTrigger
+import world.taqwa.app.qibla.createCompassSource
+import world.taqwa.app.qibla.createHaptics
 import kotlin.time.Clock
 
 @Composable
@@ -158,7 +163,7 @@ fun App(container: AppContainer) {
 
                     TodayScreen(
                         state = state,
-                        onOpenQibla = { /* Slice 1, plan 2 */ },
+                        onOpenQibla = { navigator.push(Screen.Qibla) },
                         onOpenSettings = { navigator.push(Screen.Settings) },
                         onChooseCity = { navigator.push(Screen.CitySearch) },
                         onAllowLocation = requestLocation,
@@ -278,6 +283,24 @@ fun App(container: AppContainer) {
                 )
 
                 Screen.Attribution -> AttributionScreen(onBack = { navigator.pop() })
+
+                Screen.Qibla -> {
+                    val loc = location
+                    if (loc == null) {
+                        Text("Set a location on Today first.")
+                    } else {
+                        val vm = remember(loc) {
+                            QiblaViewModel(
+                                location = loc,
+                                compassSource = createCompassSource(),
+                                haptics = createHaptics(),
+                            )
+                        }
+                        LaunchedEffect(vm) { vm.start(this) }
+                        val qiblaState by vm.state.collectAsState()
+                        QiblaScreen(qiblaState)
+                    }
+                }
             }
         }
     }
