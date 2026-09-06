@@ -113,7 +113,15 @@ private val SMALL_2X2 = DpSize(110.dp, 110.dp)
 private val TALL_2X3 = DpSize(110.dp, 180.dp)
 private val MEDIUM_4X2 = DpSize(250.dp, 110.dp)
 
-private val TAQWA_WIDGET_SIZES = setOf(SMALL_2X2, TALL_2X3, MEDIUM_4X2)
+/**
+ * The shape the owner's launcher actually hands a two-by-two: 190 x 247 dp, measured off the
+ * device. Cells are not squares, and this one is generous — which is the whole of the complaint.
+ * Sized against the three named above, a card that large is mostly air; against this bucket the
+ * countdown is half again as tall and the card reads as a deliberate piece of typography.
+ */
+private val ROOMY = DpSize(170.dp, 200.dp)
+
+private val TAQWA_WIDGET_SIZES = setOf(SMALL_2X2, TALL_2X3, MEDIUM_4X2, ROOMY)
 
 /**
  * The mockup's proportions held constant while the absolute sizes move: the label stays the
@@ -140,6 +148,12 @@ private class WidgetTypeScale(
  * card however tall it gets; the extra height goes into the label, the clock time and the gaps.
  */
 private fun typeScaleFor(size: DpSize): WidgetTypeScale = when (size) {
+    // A cell with room in both directions — what a "2x2" comes to on a launcher with tall cells.
+    // 52 sp is what the width will take: "12:34" is 2.51 em, so 130 dp inside 170 dp less padding.
+    ROOMY -> WidgetTypeScale(
+        label = 16.sp, countdown = 52.sp, clock = 22.sp,
+        labelGap = 14.dp, clockGap = 10.dp, cardPadding = 14.dp,
+    )
     // Two cells wide, three tall: take all the width allows and open the gaps up, so the card
     // reads as a deliberately airy layout rather than a small label adrift in one.
     TALL_2X3 -> WidgetTypeScale(
@@ -164,18 +178,22 @@ private fun typeScaleFor(size: DpSize): WidgetTypeScale = when (size) {
  * that column rather than against the whole cell — [typeScaleFor]'s wide scale would clip a
  * two-digit-hour countdown here. It still grows when the card is given extra height.
  */
-private fun mediumBlockScaleFor(size: DpSize): WidgetTypeScale =
-    if (size.height >= TALL_2X3.height) {
-        WidgetTypeScale(
-            label = 12.sp, countdown = 32.sp, clock = 13.sp,
-            labelGap = 6.dp, clockGap = 4.dp, cardPadding = 4.dp,
-        )
-    } else {
-        WidgetTypeScale(
-            label = 10.sp, countdown = 28.sp, clock = 11.sp,
-            labelGap = 3.dp, clockGap = 2.dp, cardPadding = 4.dp,
-        )
-    }
+private fun mediumBlockScaleFor(size: DpSize): WidgetTypeScale {
+    // The block is unweighted, so whatever the countdown takes it takes out of the prayer list
+    // beside it. A third of the card is its fair share: at the declared 250 dp that is 83 dp, and
+    // "12:34" is 2.51 em, which lands on the 28-30 sp the medium card already shipped with. The
+    // floor keeps the anchor an anchor if a launcher squeezes the card narrower than it asked for.
+    val countdown = ((size.width.value / 3f) / 2.51f).coerceIn(22f, 30f)
+    val tall = size.height >= TALL_2X3.height
+    return WidgetTypeScale(
+        label = if (tall) 12.sp else 10.sp,
+        countdown = countdown.sp,
+        clock = if (tall) 13.sp else 11.sp,
+        labelGap = if (tall) 6.dp else 3.dp,
+        clockGap = if (tall) 4.dp else 2.dp,
+        cardPadding = 4.dp,
+    )
+}
 
 /** "Dhuhr in" -> "DHUHR IN" / "متبقٍ على الظهر" -> "متبقٍ على الظهر". Glance text has no
  * letter-spacing, so uppercase + Medium weight + a small size stands in for the mockup's
