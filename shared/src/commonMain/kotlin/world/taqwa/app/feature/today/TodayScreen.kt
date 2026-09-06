@@ -33,9 +33,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CountdownRing
@@ -43,7 +43,18 @@ import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.TaqwaTextLink
 import world.taqwa.app.domain.TimelineRow
-import kotlin.time.Duration
+import world.taqwa.app.i18n.CountdownFormatter
+import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.localizedPrayerName
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.onboarding_location_body
+import world.taqwa.app.resources.today_allow_location
+import world.taqwa.app.resources.today_choose_city
+import world.taqwa.app.resources.today_current_location
+import world.taqwa.app.resources.today_latitude_label
+import world.taqwa.app.resources.today_next_in
+import world.taqwa.app.resources.today_no_location_title
 import kotlin.time.Instant
 
 @Composable
@@ -72,6 +83,7 @@ private fun ReadyBody(
 ) {
     val colors = LocalTaqwaColors.current
     val zone = rememberZone(state.location.timeZoneId)
+    val format = LocalPlatformFormat.current
     Column(
         Modifier
             .fillMaxSize()
@@ -84,7 +96,7 @@ private fun ReadyBody(
         ) {
             Column(Modifier.weight(1f)) {
                 Text(
-                    state.location.cityName ?: "Current location",
+                    state.location.cityName ?: stringResource(Res.string.today_current_location),
                     style = TaqwaText.screenTitle,
                     color = colors.textPrimary,
                 )
@@ -98,21 +110,28 @@ private fun ReadyBody(
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             CountdownRing(
                 progress = state.today.ringProgress,
-                label = "${englishName(state.today.next.prayer)} in",
-                countdown = formatCountdown(state.today.countdown),
-                clockTime = formatClock(state.today.next.instant, zone),
+                label = stringResource(
+                    Res.string.today_next_in,
+                    localizedPrayerName(state.today.next.prayer),
+                ),
+                countdown = CountdownFormatter.countdown(
+                    state.today.countdown,
+                    format,
+                    CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR,
+                ),
+                clockTime = formatClock(state.today.next.instant, zone, format),
             )
         }
         Spacer(Modifier.height(28.dp))
 
-        PrayerTimeline(state.today.rows) { row: TimelineRow -> formatClock(row.instant, zone) }
+        PrayerTimeline(state.today.rows) { row: TimelineRow -> formatClock(row.instant, zone, format) }
 
         if (state.highLatitudeNote != null) {
             Spacer(Modifier.height(20.dp))
             TaqwaCard(Modifier.padding(horizontal = 24.dp)) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        "AT THIS LATITUDE",
+                        stringResource(Res.string.today_latitude_label),
                         style = TaqwaText.sectionLabel,
                         color = colors.accent,
                     )
@@ -140,19 +159,24 @@ private fun NeedsLocationBody(onChooseCity: () -> Unit, onAllowLocation: () -> U
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("No location yet", style = TaqwaText.screenTitle, color = colors.textPrimary)
+        Text(
+            stringResource(Res.string.today_no_location_title),
+            style = TaqwaText.screenTitle,
+            color = colors.textPrimary,
+        )
         Spacer(Modifier.height(10.dp))
         Text(
-            "Prayer times depend on your exact position. Everything is calculated on your " +
-                "device — your location never leaves your phone.",
+            // The same sentence onboarding used to ask the question, because it is the same
+            // question — a user who declined there is reading it a second time, not a new one.
+            stringResource(Res.string.onboarding_location_body),
             style = TaqwaText.caption,
             color = colors.textSecondary,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(28.dp))
-        TaqwaPrimaryButton("Choose a city", onChooseCity)
+        TaqwaPrimaryButton(stringResource(Res.string.today_choose_city), onChooseCity)
         Spacer(Modifier.height(4.dp))
-        TaqwaTextLink("Allow location instead", onAllowLocation)
+        TaqwaTextLink(stringResource(Res.string.today_allow_location), onAllowLocation)
     }
 }
 
@@ -201,15 +225,12 @@ private fun DrawScope.drawSliders(tint: Color) {
 @Composable
 private fun rememberZone(id: String): TimeZone = remember(id) { TimeZone.of(id) }
 
-internal fun formatClock(instant: Instant, zone: TimeZone): String {
+/**
+ * A clock time in the location's zone and the device locale's own digits — "3:42" for a Libyan
+ * reader, "٣:٤٢" for an Egyptian one, with no setting between them (spec §4.2). Unlike the
+ * countdown, a clock time never falls back to Western digits.
+ */
+internal fun formatClock(instant: Instant, zone: TimeZone, format: PlatformFormat): String {
     val t = instant.toLocalDateTime(zone)
-    return "${t.hour}:${t.minute.toString().padStart(2, '0')}"
-}
-
-/** H:MM, per the spec — the ring counts down a duration, not a clock time. */
-internal fun formatCountdown(duration: Duration): String {
-    val total = if (duration.isNegative()) Duration.ZERO else duration
-    val hours = total.inWholeHours
-    val minutes = (total.inWholeMinutes % 60).toString().padStart(2, '0')
-    return "$hours:$minutes"
+    return format.clockTime(t.hour, t.minute)
 }

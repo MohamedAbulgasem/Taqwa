@@ -12,12 +12,22 @@ import android.media.RingtoneManager
 import android.net.Uri
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.i18n.createPlatformFormat
 
 private const val PREFS_NAME = "taqwa_scheduled_alarms"
 private const val KEY_IDS = "ids"
+
+/** Next unused request code, and the per-id assignments, persisted beside [KEY_IDS]. */
+private const val KEY_NEXT_CODE = "next_request_code"
+private const val KEY_CODE_PREFIX = "request_code_"
 private const val ALARM_ACTION = "world.taqwa.app.PRAYER_ALARM"
 
+/** Slop allowed when exact alarms are unavailable. The window starts at the prayer time, so a
+ * notification is never early — only up to this much late. */
+private const val INEXACT_WINDOW_MILLIS = 5L * 60L * 1000L
+
 const val EXTRA_ID = "id"
+const val EXTRA_REQUEST_CODE = "request_code"
 const val EXTRA_PRAYER = "prayer"
 const val EXTRA_SOUND = "sound"
 const val EXTRA_TITLE = "title"
@@ -41,7 +51,9 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         cancelAll()
         ensureChannels(plan)
         plan.forEach(::schedule)
-        prefs.edit().putStringSet(KEY_IDS, plan.map { it.id }.toSet()).apply()
+        val ids = plan.map { it.id }.toSet()
+        prefs.edit().putStringSet(KEY_IDS, ids).apply()
+        forgetRequestCodesOutside(ids)
     }
 
     override fun cancelAll() {
@@ -50,18 +62,65 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         prefs.edit().remove(KEY_IDS).apply()
     }
 
+    /**
+     * A stable, collision-free request code per notification id.
+     *
+     * `id.hashCode()` was neither: `String.hashCode` is a 32-bit fold, so two ids can collide,
+     * and a collision means both a shared `AlarmManager` slot — one alarm silently replacing the
+     * other — and, since `PrayerAlarmReceiver` used the same number as the notification id, one
+     * notification overwriting the other when they did fire. Sequential codes cannot collide, and
+     * persisting the assignment is what keeps `cancelAll` able to rebuild the exact
+     * `PendingIntent` a previous process scheduled.
+     */
+    private fun requestCodeFor(id: String): Int {
+        val key = KEY_CODE_PREFIX + id
+        val existing = prefs.getInt(key, -1)
+        if (existing >= 0) return existing
+        val next = prefs.getInt(KEY_NEXT_CODE, 1)
+        prefs.edit().putInt(key, next).putInt(KEY_NEXT_CODE, next + 1).apply()
+        return next
+    }
+
+    /** Ids churn daily, so their codes would otherwise accumulate in the preference file forever. */
+    private fun forgetRequestCodesOutside(ids: Set<String>) {
+        val stale = prefs.all.keys
+            .filter { it.startsWith(KEY_CODE_PREFIX) && it.removePrefix(KEY_CODE_PREFIX) !in ids }
+        if (stale.isEmpty()) return
+        prefs.edit().apply { stale.forEach(::remove) }.apply()
+    }
+
+    /**
+     * Exact where the platform allows it, an inexact window where it does not.
+     *
+     * `SCHEDULE_EXACT_ALARM` is user-revocable from API 31, and `USE_EXACT_ALARM` — which is
+     * auto-granted but Play-policy-restricted — only exists from API 33, so on API 31–32 a user
+     * who turns off "Alarms & reminders" would otherwise take a `SecurityException` straight out
+     * of `NotificationCoordinator.reschedule` on every cold start. A few minutes' slop on the
+     * adhan is far better than an unrecoverable crash loop, and `runCatching` covers the
+     * remaining race where the permission is revoked between the check and the call.
+     */
     private fun schedule(entry: ScheduledNotification) {
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            entry.instant.toEpochMilliseconds(),
-            pendingIntentFor(entry.id, entry),
-        )
+        val at = entry.instant.toEpochMilliseconds()
+        val pendingIntent = pendingIntentFor(entry.id, entry)
+        runCatching {
+            if (canScheduleExactAlarms()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
+            } else {
+                alarmManager.setWindow(
+                    AlarmManager.RTC_WAKEUP, at, INEXACT_WINDOW_MILLIS, pendingIntent,
+                )
+            }
+        }
     }
 
     private fun pendingIntentFor(id: String, entry: ScheduledNotification? = null): PendingIntent {
+        val requestCode = requestCodeFor(id)
         val intent = Intent(context, PrayerAlarmReceiver::class.java).apply {
             action = ALARM_ACTION
             putExtra(EXTRA_ID, id)
+            // The receiver posts under this number too, so two notifications can never overwrite
+            // each other for the same reason two alarms can never share a slot.
+            putExtra(EXTRA_REQUEST_CODE, requestCode)
             if (entry != null) {
                 putExtra(EXTRA_PRAYER, entry.prayer.name)
                 putExtra(EXTRA_SOUND, entry.sound.name)
@@ -70,25 +129,50 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             }
         }
         return PendingIntent.getBroadcast(
-            context, id.hashCode(), intent,
+            context, requestCode, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 
-    /** One channel per (prayer, sound) actually used by this plan. Never edits an existing
-     * channel — a sound change always shows up as a channel id Android has never seen. */
+    /**
+     * One channel per (prayer, sound) actually used by this plan, and nothing else.
+     *
+     * A channel's sound is immutable, so switching a prayer from Adhan to Takbir to Notification
+     * leaves three channels behind; without the sweep below the user sees a list of entries they
+     * cannot remove and — while every channel was named `"Prayer: Fajr"` in hardcoded English —
+     * could not even tell apart. Names come from the same [LocalizedNotificationCopy] that bakes
+     * the notification text, so the channel reads in the user's own language and says which sound
+     * it carries. An existing channel is re-created deliberately: Android updates the name and
+     * leaves the immutable sound alone, which is what relabels channels after a locale change.
+     */
     private fun ensureChannels(plan: List<ScheduledNotification>) {
-        plan.map { it.prayer to it.sound }.toSet().forEach { (prayer, sound) ->
+        val copy = LocalizedNotificationCopy(createPlatformFormat())
+        val live = plan.map { it.prayer to it.sound }.toSet()
+        live.forEach { (prayer, sound) ->
             val id = NotificationChannels.channelId(prayer, sound)
-            if (notificationManager.getNotificationChannel(id) != null) return@forEach
-            val channel = NotificationChannel(id, channelName(prayer), NotificationManager.IMPORTANCE_HIGH)
-            configureSound(channel, sound)
+            val existing = notificationManager.getNotificationChannel(id)
+            val channel =
+                NotificationChannel(id, copy.channelName(prayer, sound), NotificationManager.IMPORTANCE_HIGH)
+            if (existing == null) configureSound(channel, sound)
             notificationManager.createNotificationChannel(channel)
         }
+        deleteStaleChannels(live)
     }
 
-    private fun channelName(prayer: Prayer) =
-        "Prayer: ${prayer.name.lowercase().replaceFirstChar { it.uppercase() }}"
+    /**
+     * Every channel this app could ever have created for a prayer that the current plan touches,
+     * minus the ones the plan actually uses. Prayers absent from the plan are left alone: their
+     * channels are the record of a sound the user may switch back to, and `scheduleAll` is called
+     * often enough that deleting on absence would churn.
+     */
+    private fun deleteStaleChannels(live: Set<Pair<Prayer, PrayerSound>>) {
+        val liveIds = live.map { (prayer, sound) -> NotificationChannels.channelId(prayer, sound) }.toSet()
+        live.map { it.first }.toSet().forEach { prayer ->
+            NotificationChannels.allChannelIdsFor(prayer)
+                .filterNot { it in liveIds }
+                .forEach { runCatching { notificationManager.deleteNotificationChannel(it) } }
+        }
+    }
 
     private fun configureSound(channel: NotificationChannel, sound: PrayerSound) {
         val attrs = AudioAttributes.Builder()

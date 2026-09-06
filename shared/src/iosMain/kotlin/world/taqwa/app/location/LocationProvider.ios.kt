@@ -3,7 +3,9 @@ package world.taqwa.app.location
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLLocation
@@ -21,7 +23,23 @@ import kotlin.coroutines.resume
 @OptIn(ExperimentalForeignApi::class)
 private class IosLocationProvider : LocationProvider {
 
-    private val manager = CLLocationManager()
+    private var managerOrNull: CLLocationManager? = null
+
+    /**
+     * CoreLocation delivers delegate callbacks on the run loop of the thread that created the
+     * manager. Constructing it in the class initialiser put it on whatever thread first touched
+     * `appContainer` — a `by lazy` reached from a coroutine, so typically a background worker
+     * with no active run loop — and the callbacks then never arrived at all. Building it (and
+     * driving it) on the main dispatcher is what makes the delegate fire; it also keeps the
+     * `pending*` fields below single-threaded, as their KDoc claims.
+     */
+    private suspend fun manager(): CLLocationManager =
+        managerOrNull ?: withContext(Dispatchers.Main) {
+            managerOrNull ?: CLLocationManager().also {
+                it.delegate = delegate
+                managerOrNull = it
+            }
+        }
 
     /** The requests in flight, if any. Only ever touched on the main thread. */
     private var pendingPermission: CancellableContinuation<LocationPermission>? = null
@@ -63,10 +81,6 @@ private class IosLocationProvider : LocationProvider {
         if (continuation.isActive) continuation.resume(value)
     }
 
-    init {
-        manager.delegate = delegate
-    }
-
     private fun map(status: CLAuthorizationStatus): LocationPermission = when (status) {
         kCLAuthorizationStatusAuthorizedWhenInUse,
         kCLAuthorizationStatusAuthorizedAlways -> LocationPermission.GRANTED
@@ -85,15 +99,25 @@ private class IosLocationProvider : LocationProvider {
         val existing = permission()
         if (existing != LocationPermission.NOT_REQUESTED) return existing
 
-        return suspendCancellableCoroutine { cont ->
-            pendingPermission = cont
-            cont.invokeOnCancellation { pendingPermission = null }
-            manager.requestWhenInUseAuthorization()
-        }
+        // The timeout is a wedge-breaker, not a UX deadline: without it a callback that never
+        // arrives leaves onboarding's "Use my location" button pending forever with no recourse
+        // but killing the app. On expiry the status is simply re-read — still NOT_REQUESTED if
+        // the user is genuinely still deciding, which leaves the button tappable again.
+        return withTimeoutOrNull(PERMISSION_TIMEOUT_MILLIS) {
+            withContext(Dispatchers.Main) {
+                val manager = manager()
+                suspendCancellableCoroutine { cont ->
+                    pendingPermission = cont
+                    cont.invokeOnCancellation { pendingPermission = null }
+                    manager.requestWhenInUseAuthorization()
+                }
+            }
+        } ?: permission()
     }
 
     override suspend fun currentCoordinates(): Pair<Double, Double>? {
         if (permission() != LocationPermission.GRANTED) return null
+        val manager = manager()
         manager.location?.let { cached ->
             var lat = 0.0
             var lon = 0.0
@@ -105,16 +129,19 @@ private class IosLocationProvider : LocationProvider {
         // report "no location" on the very screen that just requested it. The timeout keeps a
         // silent GPS from wedging the caller — the UI treats null as "no fix yet".
         return withTimeoutOrNull(FIX_TIMEOUT_MILLIS) {
-            suspendCancellableCoroutine { cont ->
-                pendingFix = cont
-                cont.invokeOnCancellation { pendingFix = null }
-                manager.requestLocation()
+            withContext(Dispatchers.Main) {
+                suspendCancellableCoroutine { cont ->
+                    pendingFix = cont
+                    cont.invokeOnCancellation { pendingFix = null }
+                    manager.requestLocation()
+                }
             }
         }
     }
 
     private companion object {
         const val FIX_TIMEOUT_MILLIS = 8_000L
+        const val PERMISSION_TIMEOUT_MILLIS = 60_000L
     }
 }
 

@@ -24,27 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
-import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerStatus
 import world.taqwa.app.domain.TimelineRow
-
-internal fun englishName(p: Prayer) = when (p) {
-    Prayer.FAJR -> "Fajr"
-    Prayer.SUNRISE -> "Sunrise"
-    Prayer.DHUHR -> "Dhuhr"
-    Prayer.ASR -> "Asr"
-    Prayer.MAGHRIB -> "Maghrib"
-    Prayer.ISHA -> "Isha"
-}
-
-internal fun arabicName(p: Prayer) = when (p) {
-    Prayer.FAJR -> "الفجر"
-    Prayer.SUNRISE -> "الشروق"
-    Prayer.DHUHR -> "الظهر"
-    Prayer.ASR -> "العصر"
-    Prayer.MAGHRIB -> "المغرب"
-    Prayer.ISHA -> "العشاء"
-}
+import world.taqwa.app.i18n.PrayerNaming
+import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.localizedPrayerName
 
 /** Gutter holding the pips; the rail runs down its centre. */
 private val GutterWidth = 26.dp
@@ -55,9 +39,16 @@ private val GutterWidth = 26.dp
  */
 private val RailInset = 22.dp
 
+/**
+ * Nothing here mirrors by hand. The gutter is the first child of a `Row` and the rail is inset
+ * with `padding(start = …)`, both of which resolve against `LocalLayoutDirection` — so under
+ * Arabic the pip column and the rail move to the right edge on their own. Only geometry drawn
+ * into a `Canvas` with literal coordinates needs help, and this file draws none.
+ */
 @Composable
 fun PrayerTimeline(rows: List<TimelineRow>, formatTime: (TimelineRow) -> String) {
     val colors = LocalTaqwaColors.current
+    val arabicAlone = isRtlLocale()
     Box(Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
         // The rail is drawn behind the pips. matchParentSize takes its height from the column of
         // rows, so this stays correct however many prayers are visible.
@@ -105,29 +96,50 @@ fun PrayerTimeline(rows: List<TimelineRow>, formatTime: (TimelineRow) -> String)
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                englishName(row.prayer),
-                                style = TaqwaText.rowLabel,
-                                color = if (row.status == PrayerStatus.CURRENT) {
-                                    colors.accent
-                                } else {
-                                    colors.textPrimary
-                                },
-                                fontWeight = if (row.status == PrayerStatus.CURRENT) {
-                                    FontWeight.ExtraBold
-                                } else {
-                                    FontWeight.SemiBold
-                                },
-                            )
-                            Text(
-                                arabicName(row.prayer),
-                                // Arabic always uses the OS face, never Manrope — Manrope ships
-                                // no Arabic glyphs, so forcing it produces tofu.
-                                fontFamily = FontFamily.Default,
-                                fontSize = 14.sp,
-                                color = colors.textTertiary,
-                                modifier = Modifier.padding(start = 8.dp),
-                            )
+                            if (arabicAlone) {
+                                // The spec's naming rule: in Arabic the Arabic name stands alone,
+                                // never doubled beside a transliteration. It takes the row's full
+                                // weight and size here — it is the name, not a secondary label.
+                                Text(
+                                    PrayerNaming.arabicName(row.prayer),
+                                    fontFamily = FontFamily.Default,
+                                    style = TaqwaText.rowLabel,
+                                    color = if (row.status == PrayerStatus.CURRENT) {
+                                        colors.accent
+                                    } else {
+                                        colors.textPrimary
+                                    },
+                                    fontWeight = if (row.status == PrayerStatus.CURRENT) {
+                                        FontWeight.ExtraBold
+                                    } else {
+                                        FontWeight.SemiBold
+                                    },
+                                )
+                            } else {
+                                Text(
+                                    localizedPrayerName(row.prayer),
+                                    style = TaqwaText.rowLabel,
+                                    color = if (row.status == PrayerStatus.CURRENT) {
+                                        colors.accent
+                                    } else {
+                                        colors.textPrimary
+                                    },
+                                    fontWeight = if (row.status == PrayerStatus.CURRENT) {
+                                        FontWeight.ExtraBold
+                                    } else {
+                                        FontWeight.SemiBold
+                                    },
+                                )
+                                Text(
+                                    PrayerNaming.arabicName(row.prayer),
+                                    // Arabic always uses the OS face, never Manrope — Manrope
+                                    // ships no Arabic glyphs, so forcing it produces tofu.
+                                    fontFamily = FontFamily.Default,
+                                    fontSize = 14.sp,
+                                    color = colors.textTertiary,
+                                    modifier = Modifier.padding(start = 8.dp),
+                                )
+                            }
                         }
                         Text(
                             formatTime(row),

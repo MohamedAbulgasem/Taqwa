@@ -12,6 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 class NotificationPlannerTest {
@@ -36,6 +37,52 @@ class NotificationPlannerTest {
         windowDays = windowDays,
         capacity = capacity,
     )
+
+    @Test
+    fun aReminderIsClampedSoItNeverLandsBeforeThePreviousPrayer() {
+        // London's natural Maghrib->Isha gap on this date is 92 minutes; manual adjustments pull
+        // it to 22, closer than the longest lead the UI offers. High latitude in summer produces
+        // the same shape naturally, but this way the case is exact and season-independent.
+        val squeezed = PrayerSettings(
+            minuteAdjustments = mapOf(Prayer.MAGHRIB to 35, Prayer.ISHA to -35),
+        )
+        val date = kotlinx.datetime.LocalDate(2026, 9, 6)
+        val times = engine.timesFor(london, date, squeezed)
+        val maghrib = times.time(Prayer.MAGHRIB)
+        val isha = times.time(Prayer.ISHA)
+        // Precondition: without this the assertion below would pass for the wrong reason.
+        assertTrue(isha - maghrib < 30.minutes, "gap was ${isha - maghrib}")
+
+        val plan = NotificationPlanner.plan(
+            location = london,
+            settings = squeezed,
+            notifications = defaults.copy(remindBeforeMinutes = 30),
+            engine = engine,
+            from = Instant.parse("2026-09-06T00:30:00Z"),
+            windowDays = 1,
+            capacity = 64,
+        )
+        val reminder = plan.single {
+            it.prayer == Prayer.ISHA && it.kind == NotificationKind.REMINDER
+        }
+        assertEquals(maghrib, reminder.instant)
+        assertTrue(reminder.instant >= maghrib, "reminder for Isha preceded Maghrib")
+    }
+
+    @Test
+    fun noReminderInAWholePlanEverPrecedesThePrayerBeforeIt() {
+        val plan = planFor(notifications = defaults.copy(remindBeforeMinutes = 30))
+        val prayers = plan.filter { it.kind == NotificationKind.PRAYER }.sortedBy { it.instant }
+        plan.filter { it.kind == NotificationKind.REMINDER }.forEach { reminder ->
+            val preceding = prayers.lastOrNull { it.instant < reminder.instant }
+            val following = prayers.first { it.prayer == reminder.prayer && it.instant >= reminder.instant }
+            assertTrue(
+                preceding == null || preceding.instant <= reminder.instant,
+                "${reminder.id} landed before ${preceding?.id}",
+            )
+            assertTrue(reminder.instant <= following.instant, reminder.id)
+        }
+    }
 
     @Test
     fun sixtyFourSlotsAtFiveAPrayerDayIsATwelveDayWindow() {

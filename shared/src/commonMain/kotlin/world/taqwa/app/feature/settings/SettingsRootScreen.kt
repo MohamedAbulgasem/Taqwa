@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,12 +30,36 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaRow
+import world.taqwa.app.domain.NotificationSettings
+import world.taqwa.app.domain.ObligatoryPrayers
+import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.settings_about
+import world.taqwa.app.resources.settings_appearance
+import world.taqwa.app.resources.settings_attribution
+import world.taqwa.app.resources.settings_group_about
+import world.taqwa.app.resources.settings_group_app
+import world.taqwa.app.resources.settings_group_prayer
+import world.taqwa.app.resources.settings_language
+import world.taqwa.app.resources.settings_location
+import world.taqwa.app.resources.settings_not_set
+import world.taqwa.app.resources.settings_notifications
+import world.taqwa.app.resources.settings_notifications_off
+import world.taqwa.app.resources.settings_notifications_on_count
+import world.taqwa.app.resources.settings_prayer_times
+import world.taqwa.app.resources.settings_title
+import world.taqwa.app.resources.settings_version_value
+import world.taqwa.app.resources.language_name
 
 /** The horizontal inset every settings screen shares with Today's cards. */
 internal val SettingsGutter = 24.dp
@@ -65,12 +90,17 @@ internal fun SettingsScaffold(
                 .clickable(onClick = onBack),
             contentAlignment = Alignment.Center,
         ) {
+            // Drawn from literal coordinates, so unlike every `Row` and `padding(start=)` on
+            // these screens it does not mirror itself: under Arabic "back" is to the right, and
+            // a chevron still pointing left would send the eye the wrong way.
+            val pointsLeft = LocalLayoutDirection.current == LayoutDirection.Ltr
             Canvas(Modifier.size(20.dp)) {
                 val w = size.width
+                fun x(fraction: Float) = if (pointsLeft) w * fraction else w * (1f - fraction)
                 val path = Path().apply {
-                    moveTo(w * 0.62f, w * 0.14f)
-                    lineTo(w * 0.30f, w * 0.50f)
-                    lineTo(w * 0.62f, w * 0.86f)
+                    moveTo(x(0.62f), w * 0.14f)
+                    lineTo(x(0.30f), w * 0.50f)
+                    lineTo(x(0.62f), w * 0.86f)
                 }
                 drawPath(
                     path = path,
@@ -128,21 +158,29 @@ private fun GroupGap() = Spacer(Modifier.fillMaxWidth().height(28.dp))
 internal fun TaqwaToggle(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val colors = LocalTaqwaColors.current
     val knobStart by animateDpAsState(if (checked) 22.dp else 3.dp, label = "knob")
+    // Spec §92: 44 pt minimum. The switch is still drawn 48×28 — the outer box only widens what
+    // a finger has to hit, so nothing on the screen moves or changes shape.
     Box(
         Modifier
-            .size(width = 48.dp, height = 28.dp)
-            .clip(CircleShape)
-            .background(if (checked) colors.accent else colors.hairline)
+            .defaultMinSize(minWidth = 48.dp, minHeight = 44.dp)
             .clickable { onCheckedChange(!checked) },
-        contentAlignment = Alignment.CenterStart,
+        contentAlignment = Alignment.Center,
     ) {
         Box(
             Modifier
-                .padding(start = knobStart)
-                .size(22.dp)
+                .size(width = 48.dp, height = 28.dp)
                 .clip(CircleShape)
-                .background(if (checked) colors.background else colors.surface),
-        )
+                .background(if (checked) colors.accent else colors.hairline),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Box(
+                Modifier
+                    .padding(start = knobStart)
+                    .size(22.dp)
+                    .clip(CircleShape)
+                    .background(if (checked) colors.background else colors.surface),
+            )
+        }
     }
 }
 
@@ -151,38 +189,72 @@ fun SettingsRootScreen(
     cityName: String?,
     methodName: String,
     themeName: String,
+    notificationSettings: NotificationSettings,
     onBack: () -> Unit,
     onOpenLocation: () -> Unit,
     onOpenPrayerTimes: () -> Unit,
+    onOpenNotifications: () -> Unit,
     onOpenAppearance: () -> Unit,
     onOpenAttribution: () -> Unit,
 ) {
-    SettingsScaffold("Settings", onBack) {
-        SectionLabel("PRAYER")
+    // "Off" once the master toggle is off; otherwise how many of the five obligatory prayers
+    // still carry a sound, so the row means something before the screen behind it is even open.
+    val format = LocalPlatformFormat.current
+    val notificationValue = if (!notificationSettings.enabled) {
+        stringResource(Res.string.settings_notifications_off)
+    } else {
+        val on = ObligatoryPrayers.count { notificationSettings.soundFor(it) != PrayerSound.SILENT }
+        stringResource(Res.string.settings_notifications_on_count, format.localizedDigits(on))
+    }
+
+    SettingsScaffold(stringResource(Res.string.settings_title), onBack) {
+        SectionLabel(stringResource(Res.string.settings_group_prayer))
         SettingsCard {
-            TaqwaRow("Location", value = cityName ?: "Not set", onClick = onOpenLocation)
+            TaqwaRow(
+                stringResource(Res.string.settings_location),
+                value = cityName ?: stringResource(Res.string.settings_not_set),
+                onClick = onOpenLocation,
+            )
             CardDivider()
-            TaqwaRow("Prayer times", value = methodName, onClick = onOpenPrayerTimes)
+            TaqwaRow(
+                stringResource(Res.string.settings_prayer_times),
+                value = methodName,
+                onClick = onOpenPrayerTimes,
+            )
             CardDivider()
-            // Deliberately inert: Task 19 wires the notification screen. A row that opens an
-            // empty screen is worse than one that says what it is waiting for.
-            TaqwaRow("Notifications", value = "Coming soon")
+            TaqwaRow(
+                stringResource(Res.string.settings_notifications),
+                value = notificationValue,
+                onClick = onOpenNotifications,
+            )
         }
 
         GroupGap()
-        SectionLabel("APP")
+        SectionLabel(stringResource(Res.string.settings_group_app))
         SettingsCard {
-            TaqwaRow("Appearance", value = themeName, onClick = onOpenAppearance)
+            TaqwaRow(
+                stringResource(Res.string.settings_appearance),
+                value = themeName,
+                onClick = onOpenAppearance,
+            )
             CardDivider()
-            TaqwaRow("Language", value = "English")
+            // The language is the device's, not a setting of ours — `language_name` is each
+            // translation naming itself, so this row is right without any code to pick it.
+            TaqwaRow(
+                stringResource(Res.string.settings_language),
+                value = stringResource(Res.string.language_name),
+            )
         }
 
         GroupGap()
-        SectionLabel("ABOUT")
+        SectionLabel(stringResource(Res.string.settings_group_about))
         SettingsCard {
-            TaqwaRow("About Taqwa", value = "Version 1.0")
+            TaqwaRow(
+                stringResource(Res.string.settings_about),
+                value = stringResource(Res.string.settings_version_value),
+            )
             CardDivider()
-            TaqwaRow("Attribution & licences", onClick = onOpenAttribution)
+            TaqwaRow(stringResource(Res.string.settings_attribution), onClick = onOpenAttribution)
         }
     }
 }

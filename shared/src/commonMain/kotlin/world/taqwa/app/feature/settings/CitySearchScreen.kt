@@ -29,11 +29,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.city.City
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.city_search_hint
+import world.taqwa.app.resources.city_search_no_results
+import world.taqwa.app.resources.city_search_placeholder
+import world.taqwa.app.resources.city_search_title
 
 /**
  * Every result shows its region and country beneath the name. There are eleven Londons in the
@@ -59,7 +65,7 @@ fun CitySearchScreen(
     }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
-    SettingsScaffold("Choose a city", onBack) {
+    SettingsScaffold(stringResource(Res.string.city_search_title), onBack) {
         Box(
             Modifier
                 .padding(horizontal = SettingsGutter)
@@ -80,7 +86,7 @@ fun CitySearchScreen(
                 decorationBox = { inner ->
                     if (query.isEmpty()) {
                         Text(
-                            "Search for a city",
+                            stringResource(Res.string.city_search_placeholder),
                             style = TaqwaText.rowLabel,
                             color = colors.textTertiary,
                         )
@@ -93,11 +99,10 @@ fun CitySearchScreen(
         Spacer(Modifier.height(16.dp))
 
         when {
-            query.isBlank() -> SettingsNote(
-                "Start typing a city name. The database is bundled with the app, so search " +
-                    "works offline.",
+            query.isBlank() -> SettingsNote(stringResource(Res.string.city_search_hint))
+            results.isEmpty() -> SettingsNote(
+                stringResource(Res.string.city_search_no_results, query),
             )
-            results.isEmpty() -> SettingsNote("No city matches “$query”.")
             else -> SettingsCard {
                 results.forEachIndexed { i, city ->
                     if (i > 0) CardDivider()

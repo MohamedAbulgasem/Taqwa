@@ -5,12 +5,10 @@ import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
-import world.taqwa.app.prayer.PrayerTimesEngine
-import world.taqwa.app.settings.SettingsRepository
-import world.taqwa.app.settings.createDataStore
-import kotlin.time.Clock
+import kotlinx.coroutines.withTimeout
+import world.taqwa.app.di.appContainer
 
 /**
  * `BOOT_COMPLETED`, `TIME_SET` and `TIMEZONE_CHANGED` all invalidate whatever is currently
@@ -28,19 +26,28 @@ class SystemEventReceiver : BroadcastReceiver() {
         }
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.Default).launch {
+            // goAsync() buys roughly ten seconds before the system may kill the process, and a
+            // reschedule that overruns it can be cut off mid-DataStore-write. Giving up a little
+            // early leaves the store consistent; the next foreground reschedule will catch up.
             try {
-                val settingsRepository = SettingsRepository(createDataStore())
-                val coordinator = NotificationCoordinator(
-                    engine = PrayerTimesEngine(),
-                    settingsRepository = settingsRepository,
-                    locationOf = { settingsRepository.location.first() },
-                    scheduler = createNotificationScheduler(),
-                    now = { Clock.System.now() },
-                )
-                coordinator.reschedule(trigger)
+                withTimeout(WORK_BUDGET_MILLIS) {
+                    // Reuse the process-wide container rather than rebuilding a repository,
+                    // refresher and coordinator here: DataStore permits one instance per file
+                    // (createDataStore() already guarantees that), and one coordinator means one
+                    // plan. appContext is set in TaqwaApplication.onCreate, which always runs
+                    // before any receiver, so forcing the lazy container here is safe.
+                    appContainer.notificationCoordinator.reschedule(trigger)
+                }
+            } catch (_: TimeoutCancellationException) {
+                // Nothing useful to do from a broadcast receiver but stop cleanly.
             } finally {
                 pendingResult.finish()
             }
         }
+    }
+
+    private companion object {
+        /** Comfortably inside goAsync()'s own allowance, with room for finish() to run. */
+        const val WORK_BUDGET_MILLIS = 8_000L
     }
 }

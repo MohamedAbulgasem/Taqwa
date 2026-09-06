@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.TaqwaPrimaryButton
@@ -34,6 +35,19 @@ import world.taqwa.app.design.components.TaqwaTextLink
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.rememberLocationPermissionRequester
+import world.taqwa.app.notifications.rememberNotificationPermissionRequester
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.onboarding_location_body
+import world.taqwa.app.resources.onboarding_location_cta
+import world.taqwa.app.resources.onboarding_location_secondary
+import world.taqwa.app.resources.onboarding_location_title
+import world.taqwa.app.resources.onboarding_notifications_body
+import world.taqwa.app.resources.onboarding_notifications_cta
+import world.taqwa.app.resources.onboarding_notifications_secondary
+import world.taqwa.app.resources.onboarding_notifications_title
+import world.taqwa.app.resources.onboarding_welcome_body
+import world.taqwa.app.resources.onboarding_welcome_cta
+import world.taqwa.app.resources.onboarding_welcome_title
 
 /**
  * Hoisted out of this composable because "choose a city instead" navigates away to the city
@@ -54,6 +68,8 @@ fun OnboardingScreen(
     locationRepository: LocationRepository,
     onLocationPermission: (LocationPermission) -> Unit,
     onChooseCity: () -> Unit,
+    onNotificationPermission: (Boolean) -> Unit,
+    onDeclineNotifications: () -> Unit,
     onComplete: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
@@ -63,6 +79,13 @@ fun OnboardingScreen(
         // Granted or denied, the flow moves on: the city picker remains available from Today
         // and from Settings, so a refusal is never a dead end.
         onStep(OnboardingStep.NOTIFICATIONS)
+    }
+
+    // Granted or denied, onboarding is over either way — the sound sheet and the master toggle
+    // in Settings remain available afterwards, so a refusal here is never a dead end either.
+    val requestNotifications = rememberNotificationPermissionRequester { granted ->
+        onNotificationPermission(granted)
+        onComplete()
     }
 
     Column(
@@ -79,28 +102,19 @@ fun OnboardingScreen(
             OnboardingStep.WELCOME -> {
                 RingMark()
                 Spacer(Modifier.height(28.dp))
-                Headline("Taqwa")
+                Headline(stringResource(Res.string.onboarding_welcome_title))
                 Spacer(Modifier.height(12.dp))
-                Body(
-                    "Prayer times, qibla and the Quran. Free forever. No ads, no account, " +
-                        "works offline.",
-                )
+                Body(stringResource(Res.string.onboarding_welcome_body))
             }
             OnboardingStep.LOCATION -> {
-                Headline("Where are you?")
+                Headline(stringResource(Res.string.onboarding_location_title))
                 Spacer(Modifier.height(12.dp))
-                Body(
-                    "Prayer times depend on your exact position. Everything is calculated on " +
-                        "your device — your location never leaves your phone.",
-                )
+                Body(stringResource(Res.string.onboarding_location_body))
             }
             OnboardingStep.NOTIFICATIONS -> {
-                Headline("Never miss a prayer")
+                Headline(stringResource(Res.string.onboarding_notifications_title))
                 Spacer(Modifier.height(12.dp))
-                Body(
-                    "A notification at each prayer time. You pick the sound for every prayer " +
-                        "separately — and can change it whenever you like.",
-                )
+                Body(stringResource(Res.string.onboarding_notifications_body))
             }
         }
 
@@ -110,21 +124,30 @@ fun OnboardingScreen(
 
         when (step) {
             OnboardingStep.WELCOME -> {
-                TaqwaPrimaryButton("Get started", onClick = { onStep(OnboardingStep.LOCATION) })
+                TaqwaPrimaryButton(
+                    stringResource(Res.string.onboarding_welcome_cta),
+                    onClick = { onStep(OnboardingStep.LOCATION) },
+                )
                 Spacer(Modifier.height(44.dp))
             }
             OnboardingStep.LOCATION -> {
-                TaqwaPrimaryButton("Use my location", requestLocation)
+                TaqwaPrimaryButton(stringResource(Res.string.onboarding_location_cta), requestLocation)
                 // The city search is a pushed screen; it advances the step itself once a city
                 // has actually been chosen, so backing out of it lands here again.
-                TaqwaTextLink("Choose a city instead", onClick = onChooseCity)
+                TaqwaTextLink(
+                    stringResource(Res.string.onboarding_location_secondary),
+                    onClick = onChooseCity,
+                )
             }
             OnboardingStep.NOTIFICATIONS -> {
-                // Deliberately a no-op beyond advancing: plan 2 wires the real request once a
-                // scheduler exists. A granted permission that produces no notifications is worse
-                // than not asking.
-                TaqwaPrimaryButton("Enable notifications", onComplete)
-                TaqwaTextLink("Not now", onComplete)
+                TaqwaPrimaryButton(
+                    stringResource(Res.string.onboarding_notifications_cta),
+                    requestNotifications,
+                )
+                TaqwaTextLink(
+                    stringResource(Res.string.onboarding_notifications_secondary),
+                    onClick = { onDeclineNotifications(); onComplete() },
+                )
             }
         }
         Spacer(Modifier.height(12.dp))

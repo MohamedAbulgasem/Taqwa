@@ -1,0 +1,172 @@
+<resources>
+    <string name="app_name">تقوى</string>
+
+    <string name="language_name">العربية</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">تقوى</string>
+    <string name="onboarding_welcome_body">مواقيت الصلاة والقبلة والقرآن. مجانًا إلى الأبد. بلا إعلانات ولا حساب، ويعمل دون اتصال.</string>
+    <string name="onboarding_welcome_cta">ابدأ</string>
+    <string name="onboarding_location_title">أين أنت؟</string>
+    <string name="onboarding_location_body">تعتمد المواقيت على موقعك بالضبط. كل الحساب يجري على جهازك — موقعك لا يغادر هاتفك.</string>
+    <string name="onboarding_location_cta">استخدام موقعي</string>
+    <string name="onboarding_location_secondary">اختر مدينة بدلًا من ذلك</string>
+    <string name="onboarding_notifications_title">لا تفوّت صلاة</string>
+    <string name="onboarding_notifications_body">إشعار عند كل صلاة. تختار الصوت لكل صلاة على حدة، ويمكنك تغييره متى شئت.</string>
+    <string name="onboarding_notifications_cta">تفعيل الإشعارات</string>
+    <string name="onboarding_notifications_secondary">ليس الآن</string>
+
+    <!-- Prayer names -->
+    <string name="prayer_fajr">الفجر</string>
+    <string name="prayer_sunrise">الشروق</string>
+    <string name="prayer_dhuhr">الظهر</string>
+    <string name="prayer_asr">العصر</string>
+    <string name="prayer_maghrib">المغرب</string>
+    <string name="prayer_isha">العشاء</string>
+
+    <!-- Today -->
+    <string name="today_current_location">الموقع الحالي</string>
+    <string name="today_next_in">متبقٍ على %1$s</string>
+    <string name="today_latitude_label">عند خط العرض هذا</string>
+    <string name="today_no_location_title">لا يوجد موقع بعد</string>
+    <string name="today_choose_city">اختر مدينة</string>
+    <string name="today_allow_location">السماح بالموقع بدلًا من ذلك</string>
+
+    <!-- Settings root -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_group_prayer">الصلاة</string>
+    <string name="settings_group_app">التطبيق</string>
+    <string name="settings_group_about">عن التطبيق</string>
+    <string name="settings_location">الموقع</string>
+    <string name="settings_prayer_times">مواقيت الصلاة</string>
+    <string name="settings_notifications">الإشعارات</string>
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_about">عن تقوى</string>
+    <string name="settings_attribution">الإسناد والتراخيص</string>
+    <string name="settings_not_set">غير محدد</string>
+    <string name="settings_notifications_off">معطّلة</string>
+    <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
+    <string name="settings_version_value">الإصدار 1.0</string>
+
+    <!-- Appearance -->
+    <string name="appearance_theme_label">السمة</string>
+    <string name="theme_system">حسب النظام</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="appearance_note">يتبع خيار «حسب النظام» إعداد الوضع الفاتح والداكن في جهازك.</string>
+
+    <!-- Location settings -->
+    <string name="location_use_my_location">استخدام موقعي</string>
+    <string name="location_in_use">المستخدم حاليًا</string>
+    <string name="location_city">المدينة</string>
+    <string name="location_country">الدولة</string>
+    <string name="location_timezone">المنطقة الزمنية</string>
+    <string name="location_choose_city_instead">اختر مدينة بدلًا من ذلك</string>
+    <string name="location_privacy_note">تُحفظ الإحداثيات على جهازك وتُستخدم لحساب المواقيت فقط. لا يُرسل شيء إلى أي جهة.</string>
+    <string name="location_denied_note">الوصول إلى الموقع مرفوض حاليًا. يمكنك السماح به من إعدادات جهازك، أو اختيار مدينة بدلًا من ذلك.</string>
+
+    <!-- City search -->
+    <string name="city_search_title">اختر مدينة</string>
+    <string name="city_search_placeholder">ابحث عن مدينة</string>
+    <string name="city_search_hint">ابدأ بكتابة اسم المدينة. قاعدة البيانات مضمّنة في التطبيق، فالبحث يعمل دون اتصال.</string>
+    <string name="city_search_no_results">لا توجد مدينة تطابق «%1$s».</string>
+
+    <!-- Notification settings -->
+    <string name="notifications_master_toggle">إشعارات الصلاة</string>
+    <string name="notifications_remind_before">التذكير قبل</string>
+    <string name="notifications_prayers_label">الصلوات</string>
+    <string name="notifications_remind_never">بدون تذكير</string>
+    <string name="unit_minutes">%1$s دقيقة</string>
+
+    <!-- Sound sheet -->
+    <string name="sound_sheet_title">صوت الإشعار</string>
+    <string name="sound_silent">صامت</string>
+    <string name="sound_notification">نغمة التنبيه</string>
+    <string name="sound_takbir">تكبير</string>
+    <string name="sound_adhan">أذان</string>
+    <string name="sound_silent_detail">إشعار فقط بلا صوت</string>
+    <string name="sound_notification_detail">نغمة هاتفك الافتراضية</string>
+    <string name="sound_takbir_detail">الله أكبر، الله أكبر — نحو %1$s ثانية</string>
+    <string name="sound_adhan_detail">الأذان كاملًا، %1$s ثانية</string>
+    <string name="sound_sheet_footnote">صوت الإشعار محدود بـ%1$s ثانية على النظامين. ويمكن سماع الأذان كاملًا داخل التطبيق.</string>
+
+    <!-- Prayer time settings -->
+    <string name="prayer_times_method">طريقة الحساب</string>
+    <string name="prayer_times_high_latitude">قاعدة خطوط العرض العليا</string>
+    <string name="prayer_times_manual">تعديلات يدوية</string>
+    <string name="prayer_times_madhab_label">مذهب العصر</string>
+    <string name="madhab_standard">الجمهور</string>
+    <string name="madhab_hanafi">الحنفي</string>
+    <string name="prayer_times_hijri_label">التاريخ الهجري</string>
+    <string name="hijri_day_before">يوم قبل</string>
+    <string name="hijri_day_after">يوم بعد</string>
+    <string name="prayer_times_show_sunrise">إظهار الشروق</string>
+    <string name="adjustments_none">بدون</string>
+    <string name="adjustments_one">صلاة واحدة</string>
+    <string name="adjustments_many">%1$s صلوات</string>
+
+    <string name="method_muslim_world_league">رابطة العالم الإسلامي</string>
+    <string name="method_isna">الجمعية الإسلامية لأمريكا الشمالية</string>
+    <string name="method_egyptian">الهيئة المصرية العامة للمساحة</string>
+    <string name="method_umm_al_qura">أم القرى (مكة المكرمة)</string>
+    <string name="method_karachi">جامعة العلوم الإسلامية، كراتشي</string>
+    <string name="method_tehran">معهد الجيوفيزياء، طهران</string>
+    <string name="method_dubai">دبي</string>
+    <string name="method_kuwait">الكويت</string>
+    <string name="method_qatar">قطر</string>
+    <string name="method_singapore">سنغافورة</string>
+    <string name="method_turkey">ديانت (تركيا)</string>
+    <string name="method_moonsighting">لجنة تحرّي الهلال</string>
+    <string name="method_picker_note">تختلف الجهات في مقدار انخفاض الشمس تحت الأفق لتحديد الفجر والعشاء. اختر ما يعمل به مسجدك.</string>
+
+    <string name="high_lat_automatic">تلقائي</string>
+    <string name="high_lat_middle">منتصف الليل</string>
+    <string name="high_lat_seventh">سُبع الليل</string>
+    <string name="high_lat_twilight">زاوية الشفق</string>
+    <string name="high_lat_auto_note">عند خط عرضك، يستخدم الوضع التلقائي %1$s.</string>
+    <string name="high_lat_picker_note">فوق %1$s درجة تقريبًا تتوقف الشمس عن الهبوط تحت الأفق بما يكفي لفجر وعشاء حقيقيين، فتحلّ محلّهما قاعدة بديلة.</string>
+
+    <string name="manual_note">يزيح كل وقت بما يصل إلى ساعة، فوق طريقة الحساب. استخدمه فقط إذا اختلف جدول مسجدك عن الوقت المحسوب.</string>
+
+    <!-- Attribution -->
+    <string name="attribution_intro">بُني تقوى على عمل تبرّع به آخرون. تراخيصهم توجب ذكرهم، وهو حقّهم على أي حال.</string>
+    <string name="credit_calculation">حساب مواقيت الصلاة</string>
+    <string name="credit_calculation_detail">مكتبة Adhan من Batoul Apps، رخصة MIT.</string>
+    <string name="credit_cities">قاعدة بيانات المدن</string>
+    <string name="credit_cities_detail">GeoNames cities15000، رخصة CC BY 4.0.</string>
+    <string name="credit_typeface">خط Manrope</string>
+    <string name="credit_typeface_detail">رخصة SIL Open Font 1.1.</string>
+    <string name="credit_audio">تسجيل الأذان والتكبير</string>
+    <string name="credit_audio_detail">«Beautiful adhan» لـ Adam-synagda، رخصة CC0 1.0، عبر ويكيميديا كومنز.</string>
+
+    <!-- Qibla (plan 2) -->
+    <string name="qibla_no_sensor_title">لا توجد بوصلة في هذا الجهاز</string>
+    <string name="qibla_no_sensor_body">لا يحتوي هذا الجهاز على مقياس مغناطيسي. استعن ببوصلة حقيقية مع الاتجاه الموضّح أدناه.</string>
+    <string name="qibla_low_accuracy_body">حرّك هاتفك على هيئة رقم ثمانية. المعادن والأغطية ومكبّرات الصوت قد تشوّش على البوصلة.</string>
+
+    <!-- Widget background (Appearance) -->
+    <string name="appearance_widget_background_label">خلفية الودجت</string>
+    <string name="appearance_widget_preview_label">معاينة</string>
+    <string name="widget_background_follow_theme">حسب المظهر</string>
+    <string name="widget_background_light">فاتح</string>
+    <string name="widget_background_dark">داكن</string>
+    <string name="widget_background_translucent">شفاف — تندمج مع خلفية الشاشة</string>
+    <string name="widget_background_frosted">زجاجي — تستخدم خامة النظام للودجت</string>
+    <!-- Qibla screen (Task 22 sweep) -->
+    <string name="qibla_title">القبلة</string>
+    <string name="qibla_back">اليوم</string>
+    <string name="qibla_hold_flat">ضع هاتفك بشكل مستوٍ</string>
+    <string name="qibla_facing_qibla">أنت باتجاه القبلة</string>
+    <string name="qibla_needs_calibrating">البوصلة تحتاج إلى معايرة</string>
+    <string name="qibla_calibration_help">حرّك هاتفك على شكل الرقم ثمانية عدة مرات. قد يؤثر التداخل المغناطيسي من المعادن والأغطية ومكبرات الصوت على القراءة.</string>
+    <string name="qibla_distance">مكة · على بُعد %1$s كم</string>
+    <string name="qibla_bearing">%1$s°</string>
+    <string name="qibla_cardinal_north">ش</string>
+    <string name="qibla_cardinal_east">ق</string>
+    <string name="qibla_cardinal_south">ج</string>
+    <string name="qibla_cardinal_west">غ</string>
+    <string name="notifications_exact_alarms_off">المنبهات الدقيقة معطّلة لتطبيق تقوى، لذا قد تصل التنبيهات متأخرة بضع دقائق. فعّل «المنبهات والتذكيرات» في إعدادات النظام لإصلاح ذلك.</string>
+    <string name="hijri_tabular">حسابي</string>
+    <string name="method_tehran_maghrib_note">المغرب يتبع غروب الشمس، ولم تُطبّق بعد زاوية المغرب ٤٫٥° الخاصة بهذه الطريقة.</string>
+</resources>

@@ -10,12 +10,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.rememberLocationPermissionRequester
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.location_choose_city_instead
+import world.taqwa.app.resources.location_city
+import world.taqwa.app.resources.location_country
+import world.taqwa.app.resources.location_denied_note
+import world.taqwa.app.resources.location_in_use
+import world.taqwa.app.resources.location_privacy_note
+import world.taqwa.app.resources.location_timezone
+import world.taqwa.app.resources.location_use_my_location
+import world.taqwa.app.resources.settings_location
+import world.taqwa.app.resources.today_current_location
 
 /**
  * The timezone is on screen deliberately: when prayer times look wrong by a whole hour, a city
@@ -43,10 +55,10 @@ fun LocationSettingsScreen(
         location != null &&
         location.cityName == null
 
-    SettingsScaffold("Location", onBack) {
+    SettingsScaffold(stringResource(Res.string.settings_location), onBack) {
         SettingsCard {
             TaqwaRow(
-                "Use my location",
+                stringResource(Res.string.location_use_my_location),
                 trailing = {
                     TaqwaToggle(usingGps) { wantsGps ->
                         // There is always a location in force, so switching off is not "no
@@ -59,32 +71,31 @@ fun LocationSettingsScreen(
         }
 
         Spacer(Modifier.height(28.dp))
-        SectionLabel("IN USE")
+        SectionLabel(stringResource(Res.string.location_in_use))
         SettingsCard {
-            TaqwaRow("City", value = location?.cityName ?: "Current location")
+            // An em dash for "nothing yet" rather than a translated word: it reads the same in
+            // both languages, and a country code or an IANA id is never translated either.
+            TaqwaRow(
+                stringResource(Res.string.location_city),
+                value = location?.cityName ?: stringResource(Res.string.today_current_location),
+            )
             CardDivider()
-            TaqwaRow("Country", value = location?.countryCode ?: "—")
+            TaqwaRow(stringResource(Res.string.location_country), value = location?.countryCode ?: "—")
             CardDivider()
-            TaqwaRow("Time zone", value = location?.timeZoneId ?: "—")
+            TaqwaRow(stringResource(Res.string.location_timezone), value = location?.timeZoneId ?: "—")
         }
 
         Spacer(Modifier.height(16.dp))
         SettingsCard {
-            TaqwaRow("Choose a city instead", onClick = onChooseCity)
+            TaqwaRow(stringResource(Res.string.location_choose_city_instead), onClick = onChooseCity)
         }
 
         Spacer(Modifier.height(16.dp))
-        SettingsNote(
-            "Coordinates are stored on your device and used only to calculate times. " +
-                "Nothing is sent anywhere.",
-        )
+        SettingsNote(stringResource(Res.string.location_privacy_note))
 
         if (permission == LocationPermission.DENIED) {
             Spacer(Modifier.height(12.dp))
-            SettingsNote(
-                "Location access is currently denied. You can grant it in your device settings, " +
-                    "or choose a city instead.",
-            )
+            SettingsNote(stringResource(Res.string.location_denied_note))
         }
     }
 }

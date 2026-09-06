@@ -29,3 +29,22 @@ fun CheckMark(modifier: Modifier = Modifier) {
         )
     }
 }
+
+/**
+ * A radio dot: an empty ring when unselected, filled solid when selected. Used only by the sound
+ * sheet — the one place the spec wants a radio rather than [CheckMark], because seeing the
+ * unselected targets aids the choice among four mutually exclusive options.
+ */
+@Composable
+fun RadioMark(selected: Boolean, modifier: Modifier = Modifier) {
+    val colors = LocalTaqwaColors.current
+    Canvas(modifier.size(20.dp)) {
+        val strokeWidth = size.width * 0.09f
+        val radius = (size.minDimension - strokeWidth) / 2f
+        if (selected) {
+            drawCircle(color = colors.accent, radius = radius)
+        } else {
+            drawCircle(color = colors.hairline, radius = radius, style = Stroke(width = strokeWidth))
+        }
+    }
+}

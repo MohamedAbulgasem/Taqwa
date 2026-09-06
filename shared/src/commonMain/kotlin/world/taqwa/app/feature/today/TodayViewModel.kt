@@ -13,13 +13,20 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
-import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.hijri.HijriFormatter
-import world.taqwa.app.hijri.UmmAlQuraCalendar
+import world.taqwa.app.hijri.TabularHijriCalendar
+import world.taqwa.app.i18n.EnglishPlatformFormat
+import world.taqwa.app.i18n.HighLatitudeCopy
+import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.prayer.TimelineBuilder
 import world.taqwa.app.settings.SettingsRepository
+import world.taqwa.app.widget.KeyValueStore
+import world.taqwa.app.widget.WidgetInputsMirror
+import world.taqwa.app.widget.WidgetMirrorWriter
+import world.taqwa.app.widget.createWidgetKeyValueStore
+import world.taqwa.app.widget.refreshWidgets
 import kotlin.time.Instant
 
 sealed interface TodayUiState {
@@ -38,9 +45,31 @@ class TodayViewModel(
     private val settings: SettingsRepository,
     private val locationOf: suspend () -> GeoLocation?,
     private val now: () -> Instant,
+    // The device's own formatter in the app; the locale-free English one by default, so these
+    // tests read the same on a machine whose system language is Arabic.
+    private val format: PlatformFormat = EnglishPlatformFormat,
+    // Both are called lazily rather than resolved once, so nothing platform-specific is touched
+    // until a refresh actually has something new to publish — and so a test can count the writes
+    // and the refreshes this loop provokes.
+    private val widgetStore: () -> KeyValueStore = { createWidgetKeyValueStore() },
+    private val widgetFormat: () -> PlatformFormat = { world.taqwa.app.i18n.createPlatformFormat() },
+    private val onWidgetsChanged: () -> Unit = { refreshWidgets() },
 ) {
     private val _state = MutableStateFlow<TodayUiState>(TodayUiState.Loading)
     val state: StateFlow<TodayUiState> = _state.asStateFlow()
+
+    /**
+     * The last string actually written to the widget mirror, so [refresh] can tell a tick that
+     * changed something a widget can show from the ~59 ticks a minute that changed nothing.
+     *
+     * Without this, [start]'s one-second loop rewrote the mirror and nudged both widget systems
+     * 60 times a minute. On iOS that outran `WidgetCenter`'s ~40-70 reloads/day budget in under a
+     * minute and the widget then stopped updating for the rest of the day; on Android it put two
+     * Glance recompositions plus `AppWidgetManager` IPC on the caller's dispatcher every second.
+     * Every field in the snapshot is now minute-granular (see `WidgetMirrorWriter.RING_STEPS`),
+     * so comparing the serialised form collapses those 60 ticks to one.
+     */
+    private var lastWrittenMirror: String? = null
 
     fun start(scope: CoroutineScope) {
         scope.launch {
@@ -65,53 +94,46 @@ class TodayViewModel(
         val instant = now()
         val localDate = instant.toLocalDateTime(zone).date
 
+        val yesterday = engine.timesFor(location, localDate.plus(-1, DateTimeUnit.DAY), prefs)
         val today = engine.timesFor(location, localDate, prefs)
         val tomorrow = engine.timesFor(location, localDate.plus(1, DateTimeUnit.DAY), prefs)
 
         // The offset is applied to the Gregorian date before conversion, never to the Hijri day
         // number — shifting the Hijri day directly can produce day 0 or day 31.
-        val hijri = UmmAlQuraCalendar.fromGregorian(
+        val hijri = TabularHijriCalendar.fromGregorian(
             localDate.plus(prefs.hijriOffsetDays, DateTimeUnit.DAY),
         )
 
+        val timeline = TimelineBuilder.build(yesterday, today, tomorrow, instant, prefs.showSunrise)
         _state.value = TodayUiState.Ready(
             location = location,
-            hijri = HijriFormatter.format(hijri),
-            today = TimelineBuilder.build(today, tomorrow, instant, prefs.showSunrise),
+            hijri = HijriFormatter.format(hijri, format),
+            today = timeline,
             highLatitudeNote = noteFor(today),
         )
+        // Serialise first, then compare: the store write and the widget nudge are both skipped
+        // when this tick produced a mirror identical to the last one published.
+        val mirror = WidgetMirrorWriter.serializedSnapshot(
+            today = timeline,
+            timeZoneId = location.timeZoneId,
+            format = widgetFormat(),
+        )
+        if (mirror != lastWrittenMirror) {
+            lastWrittenMirror = mirror
+            widgetStore().putString(WidgetInputsMirror.KEY, mirror)
+            onWidgetsChanged()
+        }
     }
 
     /**
      * Two distinct cases, and conflating them would be the silent fudging the spec exists to
-     * prevent. An ordinary seasonal adjustment substitutes only Fajr and Isha. True polar day or
-     * night means adhan2 could not compute the day at all, so EVERY time on screen — Maghrib
-     * included — came from a different latitude. The polar case therefore leads the sentence.
-     *
-     * It still names the Fajr/Isha rule afterwards, because that rule was selected from the
-     * user's real latitude and is what produced the two times they are most likely to question.
-     * Dropping it would leave a Nordic user unable to tell which substitution they are looking at.
+     * prevent. An ordinary seasonal adjustment substitutes only Fajr and Isha; true polar day or
+     * night means every time on screen came from a different latitude. Both sentences, in both
+     * languages, live in [HighLatitudeCopy] — this only decides which one applies.
      */
-    private fun noteFor(day: DayPrayerTimes): String? = when {
-        day.nearestLatitudeFallbackApplied -> buildString {
-            append("The sun does not rise or set here today. All times are calculated for the ")
-            append("nearest latitude where it does")
-            ruleName(day.highLatitudeRuleApplied)?.let { append(", with Fajr and Isha using $it") }
-            append(".")
-        }
-        day.highLatitudeRuleApplied == HighLatitudePreference.SEVENTH_OF_NIGHT ->
-            "The sun never sets far enough here. Fajr and Isha use the one-seventh rule."
-        day.highLatitudeRuleApplied == HighLatitudePreference.TWILIGHT_ANGLE ->
-            "The sun never sets far enough here. Fajr and Isha use the twilight angle rule."
-        day.highLatitudeRuleApplied != null ->
-            "Fajr and Isha use the middle of the night rule at this latitude."
-        else -> null
-    }
-
-    private fun ruleName(rule: HighLatitudePreference?): String? = when (rule) {
-        HighLatitudePreference.SEVENTH_OF_NIGHT -> "the one-seventh rule"
-        HighLatitudePreference.TWILIGHT_ANGLE -> "the twilight angle rule"
-        HighLatitudePreference.MIDDLE_OF_NIGHT -> "the middle of the night rule"
-        else -> null
-    }
+    private fun noteFor(day: DayPrayerTimes): String? = HighLatitudeCopy.note(
+        languageTag = format.languageTag(),
+        polarFallback = day.nearestLatitudeFallbackApplied,
+        rule = day.highLatitudeRuleApplied,
+    )
 }

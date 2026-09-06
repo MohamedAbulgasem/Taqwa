@@ -11,16 +11,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.coroutines.flow.first
+import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.audio.createSoundPreviewPlayer
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaTheme
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
@@ -31,38 +37,75 @@ import world.taqwa.app.feature.settings.HighLatitudePickerScreen
 import world.taqwa.app.feature.settings.LocationSettingsScreen
 import world.taqwa.app.feature.settings.ManualAdjustmentsScreen
 import world.taqwa.app.feature.settings.MethodPickerScreen
+import world.taqwa.app.feature.settings.NotificationSettingsScreen
 import world.taqwa.app.feature.settings.PrayerTimesSettingsScreen
 import world.taqwa.app.feature.settings.SettingsRootScreen
-import world.taqwa.app.feature.settings.methodDisplayName
 import world.taqwa.app.feature.settings.themeDisplayName
 import world.taqwa.app.feature.today.TodayScreen
 import world.taqwa.app.feature.today.TodayViewModel
+import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.createPlatformFormat
+import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
+import world.taqwa.app.notifications.NotificationOnboarding
+import world.taqwa.app.notifications.canScheduleExactAlarms
+import world.taqwa.app.notifications.RescheduleTrigger
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.today_current_location
+import world.taqwa.app.feature.qibla.QiblaScreen
+import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.qibla.createCompassSource
+import world.taqwa.app.qibla.createHaptics
 import kotlin.time.Clock
-
-/**
- * A GPS fix carries coordinates but no zone. The phone is where the user is, so the device's own
- * timezone is the right one — and it stays right when they travel. A manually chosen city brings
- * its own IANA id from the bundled database instead.
- */
-private fun gpsLocation(coordinates: Pair<Double, Double>) = GeoLocation(
-    latitude = coordinates.first,
-    longitude = coordinates.second,
-    timeZoneId = TimeZone.currentSystemDefault().id,
-)
 
 @Composable
 fun App(container: AppContainer) {
     val settings = container.settingsRepository
     val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val prayerSettings by settings.prayerSettings.collectAsState(initial = PrayerSettings())
+    val notificationSettings by settings.notificationSettings.collectAsState(initial = NotificationSettings())
+    val widgetBackground by settings.widgetBackground.collectAsState(
+        initial = world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME,
+    )
     val location by settings.location.collectAsState(initial = null)
     val navigator = remember { Navigator(Screen.Today) }
     val backStack by navigator.backStack.collectAsState()
     val scope = rememberCoroutineScope()
+    val soundPreviewPlayer = remember { createSoundPreviewPlayer() }
+    // Read once per composition rather than per frame: the user can only change it by leaving
+    // the app for system settings, which recreates this anyway.
+    val exactAlarmsAllowed = remember { canScheduleExactAlarms() }
+
+    // The device locale decides both halves of localisation: which `values-*` strings Compose
+    // resolves, and — through this — whether the whole tree is laid out right-to-left. Compose's
+    // Row, Arrangement and padding(start=/end=) all consult LocalLayoutDirection, which is what
+    // moves the timeline's pip gutter and the header's icon buttons across with no bespoke
+    // mirroring code. Only Canvas geometry drawn from literal coordinates needs help; the
+    // countdown ring's arc and the settings back chevron do that for themselves.
+    val platformFormat = remember { createPlatformFormat() }
+    val layoutDirection = remember(platformFormat) {
+        if (world.taqwa.app.i18n.LayoutDirection.isRtl(platformFormat.languageTag())) {
+            LayoutDirection.Rtl
+        } else {
+            LayoutDirection.Ltr
+        }
+    }
+
+    // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
+    // has already happened by the time this runs, so `requestSystemPermission` just returns the
+    // already-known answer rather than asking again.
+    fun notificationOnboarding(granted: Boolean) = NotificationOnboarding(
+        requestSystemPermission = { granted },
+        setNotificationsEnabled = { enabled ->
+            settings.setNotificationSettings(settings.notificationSettings.first().copy(enabled = enabled))
+        },
+        rescheduleIfEnabled = {
+            container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+        },
+    )
 
     // Onboarding's step lives here rather than inside the screen: "choose a city instead"
     // navigates away to the city search, which would otherwise reset the flow to its first page.
@@ -81,8 +124,11 @@ fun App(container: AppContainer) {
 
     fun useGpsFix() {
         scope.launch {
-            container.locationRepository.currentCoordinates()?.let {
-                settings.setLocation(gpsLocation(it))
+            container.locationRepository.resolveGpsLocation(container.cityRepository)?.let {
+                settings.setLocation(it)
+                // Spec §249: method auto-detection from the resolved country. A no-op once the
+                // user has picked a method themselves.
+                settings.applyCountryDefaultMethod(it.countryCode)
             }
         }
     }
@@ -99,139 +145,228 @@ fun App(container: AppContainer) {
     }
     val today = remember(zone) { Clock.System.now().toLocalDateTime(zone).date }
 
-    TaqwaTheme(themeMode) {
-        Box(Modifier.fillMaxSize().background(LocalTaqwaColors.current.background)) {
-            if (!startResolved) return@Box
-            // Android's back button walks the same stack as the on-screen chevron.
-            SystemBackHandler(enabled = backStack.size > 1) { navigator.pop() }
+    CompositionLocalProvider(
+        LocalLayoutDirection provides layoutDirection,
+        LocalPlatformFormat provides platformFormat,
+    ) {
+        TaqwaTheme(themeMode) {
+            Box(Modifier.fillMaxSize().background(LocalTaqwaColors.current.background)) {
+                if (!startResolved) return@Box
+                // Android's back button walks the same stack as the on-screen chevron.
+                SystemBackHandler(enabled = backStack.size > 1) { navigator.pop() }
 
-            when (backStack.last()) {
-                Screen.Onboarding -> OnboardingScreen(
-                    step = onboardingStep,
-                    onStep = { onboardingStep = it },
-                    locationRepository = container.locationRepository,
-                    onLocationPermission = { permission ->
-                        if (permission == LocationPermission.GRANTED) useGpsFix()
-                    },
-                    onChooseCity = { navigator.push(Screen.CitySearch) },
-                    onComplete = {
-                        scope.launch {
-                            settings.setOnboardingComplete(true)
-                            navigator.replaceAll(Screen.Today)
+                when (backStack.last()) {
+                    Screen.Onboarding -> OnboardingScreen(
+                        step = onboardingStep,
+                        onStep = { onboardingStep = it },
+                        locationRepository = container.locationRepository,
+                        onLocationPermission = { permission ->
+                            if (permission == LocationPermission.GRANTED) useGpsFix()
+                        },
+                        onChooseCity = { navigator.push(Screen.CitySearch) },
+                        onNotificationPermission = { granted ->
+                            scope.launch { notificationOnboarding(granted).enable() }
+                        },
+                        onDeclineNotifications = {
+                            scope.launch { notificationOnboarding(false).declineForNow() }
+                        },
+                        onComplete = {
+                            scope.launch {
+                                settings.setOnboardingComplete(true)
+                                navigator.replaceAll(Screen.Today)
+                            }
+                        },
+                    )
+
+                    Screen.Today -> {
+                        val viewModel = remember {
+                            TodayViewModel(
+                                engine = container.prayerTimesEngine,
+                                settings = settings,
+                                locationOf = { settings.location.first() },
+                                now = { Clock.System.now() },
+                                format = platformFormat,
+                            )
                         }
-                    },
-                )
+                        // Tied to this composable: the one-second tick starts when Today appears and
+                        // is cancelled the moment it leaves the backstack.
+                        LaunchedEffect(viewModel) { viewModel.start(this) }
+                        val state by viewModel.state.collectAsState()
 
-                Screen.Today -> {
-                    val viewModel = remember {
-                        TodayViewModel(
-                            engine = container.prayerTimesEngine,
-                            settings = settings,
-                            locationOf = { settings.location.first() },
-                            now = { Clock.System.now() },
+                        val requestLocation = world.taqwa.app.location
+                            .rememberLocationPermissionRequester(container.locationRepository) {
+                                if (it == LocationPermission.GRANTED) useGpsFix()
+                            }
+
+                        TodayScreen(
+                            state = state,
+                            onOpenQibla = { navigator.push(Screen.Qibla) },
+                            onOpenSettings = { navigator.push(Screen.Settings) },
+                            onChooseCity = { navigator.push(Screen.CitySearch) },
+                            onAllowLocation = requestLocation,
                         )
                     }
-                    // Tied to this composable: the one-second tick starts when Today appears and
-                    // is cancelled the moment it leaves the backstack.
-                    LaunchedEffect(viewModel) { viewModel.start(this) }
-                    val state by viewModel.state.collectAsState()
 
-                    val requestLocation = world.taqwa.app.location
-                        .rememberLocationPermissionRequester(container.locationRepository) {
-                            if (it == LocationPermission.GRANTED) useGpsFix()
-                        }
-
-                    TodayScreen(
-                        state = state,
-                        onOpenQibla = { /* Slice 1, plan 2 */ },
-                        onOpenSettings = { navigator.push(Screen.Settings) },
-                        onChooseCity = { navigator.push(Screen.CitySearch) },
-                        onAllowLocation = requestLocation,
+                    Screen.Settings -> SettingsRootScreen(
+                        cityName = location?.let {
+                            it.cityName ?: stringResource(Res.string.today_current_location)
+                        },
+                        methodName = methodDisplayName(prayerSettings.method),
+                        themeName = themeDisplayName(themeMode),
+                        notificationSettings = notificationSettings,
+                        onBack = { navigator.pop() },
+                        onOpenLocation = { navigator.push(Screen.LocationSettings) },
+                        onOpenPrayerTimes = { navigator.push(Screen.PrayerTimesSettings) },
+                        onOpenNotifications = { navigator.push(Screen.NotificationSettings) },
+                        onOpenAppearance = { navigator.push(Screen.Appearance) },
+                        onOpenAttribution = { navigator.push(Screen.Attribution) },
                     )
-                }
 
-                Screen.Settings -> SettingsRootScreen(
-                    cityName = location?.let { it.cityName ?: "Current location" },
-                    methodName = methodDisplayName(prayerSettings.method),
-                    themeName = themeDisplayName(themeMode),
-                    onBack = { navigator.pop() },
-                    onOpenLocation = { navigator.push(Screen.LocationSettings) },
-                    onOpenPrayerTimes = { navigator.push(Screen.PrayerTimesSettings) },
-                    onOpenAppearance = { navigator.push(Screen.Appearance) },
-                    onOpenAttribution = { navigator.push(Screen.Attribution) },
-                )
+                    Screen.NotificationSettings -> NotificationSettingsScreen(
+                        settings = notificationSettings,
+                        exactAlarmsUnavailable = !exactAlarmsAllowed,
+                        onBack = { navigator.pop() },
+                        onToggleEnabled = { enabled ->
+                            scope.launch {
+                                settings.setNotificationSettings(notificationSettings.copy(enabled = enabled))
+                                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                            }
+                        },
+                        onPickLead = { minutes ->
+                            scope.launch {
+                                settings.setNotificationSettings(
+                                    notificationSettings.copy(remindBeforeMinutes = minutes),
+                                )
+                                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                            }
+                        },
+                        onPickSound = { prayer, sound ->
+                            scope.launch {
+                                val updated = notificationSettings.copy(
+                                    sounds = notificationSettings.sounds + (prayer to sound),
+                                )
+                                settings.setNotificationSettings(updated)
+                                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                            }
+                        },
+                        onPreviewSound = { soundPreviewPlayer.play(it) },
+                    )
 
-                Screen.PrayerTimesSettings -> PrayerTimesSettingsScreen(
-                    settings = prayerSettings,
-                    today = today,
-                    onChange = ::write,
-                    onBack = { navigator.pop() },
-                    onOpenMethodPicker = { navigator.push(Screen.MethodPicker) },
-                    onOpenHighLatitudePicker = { navigator.push(Screen.HighLatitudePicker) },
-                    onOpenManualAdjustments = { navigator.push(Screen.ManualAdjustments) },
-                )
+                    Screen.PrayerTimesSettings -> PrayerTimesSettingsScreen(
+                        settings = prayerSettings,
+                        today = today,
+                        onChange = ::write,
+                        onBack = { navigator.pop() },
+                        onOpenMethodPicker = { navigator.push(Screen.MethodPicker) },
+                        onOpenHighLatitudePicker = { navigator.push(Screen.HighLatitudePicker) },
+                        onOpenManualAdjustments = { navigator.push(Screen.ManualAdjustments) },
+                    )
 
-                Screen.MethodPicker -> MethodPickerScreen(
-                    current = prayerSettings.method,
-                    onPick = {
-                        write(prayerSettings.copy(method = it))
-                        navigator.pop()
-                    },
-                    onBack = { navigator.pop() },
-                )
+                    Screen.MethodPicker -> MethodPickerScreen(
+                        current = prayerSettings.method,
+                        onPick = {
+                            scope.launch {
+                                settings.setPrayerSettings(prayerSettings.copy(method = it))
+                                // Latches the choice so a later relocation cannot overwrite it.
+                                settings.setMethodUserChosen()
+                            }
+                            navigator.pop()
+                        },
+                        onBack = { navigator.pop() },
+                    )
 
-                Screen.HighLatitudePicker -> HighLatitudePickerScreen(
-                    current = prayerSettings.highLatitude,
-                    latitude = location?.latitude ?: 0.0,
-                    onPick = {
-                        write(prayerSettings.copy(highLatitude = it))
-                        navigator.pop()
-                    },
-                    onBack = { navigator.pop() },
-                )
+                    Screen.HighLatitudePicker -> HighLatitudePickerScreen(
+                        current = prayerSettings.highLatitude,
+                        latitude = location?.latitude ?: 0.0,
+                        onPick = {
+                            write(prayerSettings.copy(highLatitude = it))
+                            navigator.pop()
+                        },
+                        onBack = { navigator.pop() },
+                    )
 
-                Screen.ManualAdjustments -> ManualAdjustmentsScreen(
-                    settings = prayerSettings,
-                    location = location,
-                    engine = container.prayerTimesEngine,
-                    today = today,
-                    onChange = ::write,
-                    onBack = { navigator.pop() },
-                )
+                    Screen.ManualAdjustments -> ManualAdjustmentsScreen(
+                        settings = prayerSettings,
+                        location = location,
+                        engine = container.prayerTimesEngine,
+                        today = today,
+                        onChange = ::write,
+                        onBack = { navigator.pop() },
+                    )
 
-                Screen.LocationSettings -> LocationSettingsScreen(
-                    location = location,
-                    locationRepository = container.locationRepository,
-                    onLocationPermission = { permission ->
-                        if (permission == LocationPermission.GRANTED) useGpsFix()
-                    },
-                    onChooseCity = { navigator.push(Screen.CitySearch) },
-                    onBack = { navigator.pop() },
-                )
+                    Screen.LocationSettings -> LocationSettingsScreen(
+                        location = location,
+                        locationRepository = container.locationRepository,
+                        onLocationPermission = { permission ->
+                            if (permission == LocationPermission.GRANTED) useGpsFix()
+                        },
+                        onChooseCity = { navigator.push(Screen.CitySearch) },
+                        onBack = { navigator.pop() },
+                    )
 
-                Screen.CitySearch -> CitySearchScreen(
-                    cityRepository = container.cityRepository,
-                    onPick = { city ->
-                        scope.launch { settings.setLocation(city.toGeoLocation()) }
-                        // Reached from onboarding, a successful pick answers the location
-                        // question, so the flow continues rather than re-asking it.
-                        if (backStack.contains(Screen.Onboarding)) {
-                            onboardingStep = OnboardingStep.NOTIFICATIONS
+                    Screen.CitySearch -> CitySearchScreen(
+                        cityRepository = container.cityRepository,
+                        onPick = { city ->
+                            scope.launch {
+                                val picked = city.toGeoLocation()
+                                settings.setLocation(picked)
+                                settings.applyCountryDefaultMethod(picked.countryCode)
+                            }
+                            // Reached from onboarding, a successful pick answers the location
+                            // question, so the flow continues rather than re-asking it.
+                            if (backStack.contains(Screen.Onboarding)) {
+                                onboardingStep = OnboardingStep.NOTIFICATIONS
+                            }
+                            navigator.pop()
+                        },
+                        onBack = { navigator.pop() },
+                    )
+
+                    Screen.Appearance -> AppearanceSettingsScreen(
+                        current = themeMode,
+                        // No pop: the whole app repaints behind this screen, and seeing that happen
+                        // is the confirmation the choice took effect.
+                        onPick = { scope.launch { settings.setThemeMode(it) } },
+                        widgetBackground = widgetBackground,
+                        onPickWidgetBackground = { value ->
+                            scope.launch {
+                                settings.setWidgetBackground(value)
+                                // The widget processes never see SettingsRepository/DataStore —
+                                // only the mirror — so the choice has to be written there too,
+                                // under the same key TaqwaGlanceWidget.kt (Android) and the iOS
+                                // TimelineProvider (Task 24) read.
+                                world.taqwa.app.widget.WidgetMirrorWriter.writeBackground(
+                                    world.taqwa.app.widget.createWidgetKeyValueStore(),
+                                    value,
+                                )
+                                world.taqwa.app.widget.refreshWidgets()
+                            }
+                        },
+                        onBack = { navigator.pop() },
+                    )
+
+                    Screen.Attribution -> AttributionScreen(onBack = { navigator.pop() })
+
+                    Screen.Qibla -> {
+                        val loc = location
+                        if (loc == null) {
+                            // Only reachable from Today, which already has a location; if we
+                            // somehow arrive without one, go back rather than show an empty dial.
+                            LaunchedEffect(Unit) { navigator.pop() }
+                        } else {
+                            val vm = remember(loc) {
+                                QiblaViewModel(
+                                    location = loc,
+                                    compassSource = createCompassSource(),
+                                    haptics = createHaptics(),
+                                )
+                            }
+                            LaunchedEffect(vm) { vm.start(this) }
+                            val qiblaState by vm.state.collectAsState()
+                            QiblaScreen(qiblaState, onBack = { navigator.pop() })
                         }
-                        navigator.pop()
-                    },
-                    onBack = { navigator.pop() },
-                )
-
-                Screen.Appearance -> AppearanceSettingsScreen(
-                    current = themeMode,
-                    // No pop: the whole app repaints behind this screen, and seeing that happen
-                    // is the confirmation the choice took effect.
-                    onPick = { scope.launch { settings.setThemeMode(it) } },
-                    onBack = { navigator.pop() },
-                )
-
-                Screen.Attribution -> AttributionScreen(onBack = { navigator.pop() })
+                    }
+                }
             }
         }
     }
