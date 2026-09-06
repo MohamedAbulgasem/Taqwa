@@ -30,6 +30,14 @@ object WidgetCountdown {
      * different way of stating something the widget does not actually know.
      */
     fun remainingMinutesAt(snapshot: WidgetSnapshot, nowEpochSeconds: Long): Long? {
+        // With a schedule the answer survives prayer boundaries: the next instant is whichever
+        // entry is first after now. Only a mirror older than its whole two-day horizon has no
+        // honest answer left.
+        if (snapshot.schedule.isNotEmpty()) {
+            val upcoming = snapshot.schedule.filter { it.epochSeconds > nowEpochSeconds }.minOfOrNull { it.epochSeconds }
+                ?: return null
+            return (upcoming - nowEpochSeconds) / 60L
+        }
         val next = snapshot.nextPrayerEpochSeconds
         if (next <= 0L) return null
         val remainingSeconds = next - nowEpochSeconds

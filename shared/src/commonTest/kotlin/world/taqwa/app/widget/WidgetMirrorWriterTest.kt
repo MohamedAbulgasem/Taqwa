@@ -173,3 +173,45 @@ class WidgetMirrorWriterTest {
         }
     }
 }
+
+class WidgetMirrorWriterScheduleTest {
+
+    private fun dayAt(offsetHours: Long) = world.taqwa.app.domain.DayPrayerTimes(
+        date = kotlinx.datetime.LocalDate(2026, 9, 6),
+        times = listOf(
+            PrayerTime(Prayer.FAJR, Instant.fromEpochSeconds((offsetHours + 5) * 3600)),
+            PrayerTime(Prayer.SUNRISE, Instant.fromEpochSeconds((offsetHours + 6) * 3600)),
+            PrayerTime(Prayer.DHUHR, Instant.fromEpochSeconds((offsetHours + 12) * 3600)),
+            PrayerTime(Prayer.ASR, Instant.fromEpochSeconds((offsetHours + 15) * 3600)),
+            PrayerTime(Prayer.MAGHRIB, Instant.fromEpochSeconds((offsetHours + 18) * 3600)),
+            PrayerTime(Prayer.ISHA, Instant.fromEpochSeconds((offsetHours + 20) * 3600)),
+        ),
+        highLatitudeRuleApplied = null,
+    )
+
+    private val today = TodayState(
+        rows = listOf(TimelineRow(Prayer.DHUHR, Instant.fromEpochSeconds(12 * 3600), PrayerStatus.CURRENT)),
+        next = PrayerTime(Prayer.ASR, Instant.fromEpochSeconds(15 * 3600)),
+        countdown = 60.minutes,
+        ringProgress = 0.5f,
+    )
+
+    @Test
+    fun theTwoDaysBecomeTenScheduledObligatoryPrayersWithClockStrings() {
+        val snapshot = WidgetMirrorWriter.snapshotOf(today, "UTC", FakePlatformFormat(), listOf(dayAt(0), dayAt(24)))
+        assertEquals(10, snapshot.schedule.size)
+        // Sunrise is never a widget row.
+        assertTrue(snapshot.schedule.none { it.prayer == Prayer.SUNRISE })
+        val tomorrowsFajr = snapshot.schedule.single { it.prayer == Prayer.FAJR && it.dayIndex == 1 }
+        assertEquals(29 * 3600L, tomorrowsFajr.epochSeconds)
+        assertEquals("05:00", tomorrowsFajr.clockTime)
+        assertEquals(listOf(0, 0, 0, 0, 0, 1, 1, 1, 1, 1), snapshot.schedule.map { it.dayIndex })
+    }
+
+    @Test
+    fun theScheduleSurvivesTheStore() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat(), listOf(dayAt(0), dayAt(24)))
+        assertEquals(10, WidgetMirrorWriter.read(store)!!.schedule.size)
+    }
+}

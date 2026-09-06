@@ -32,16 +32,17 @@ enum TaqwaMirror {
     /// carry it) so the countdown built locally in [TaqwaEntry.countdownText] can use the same
     /// digit set as `content.nextClockTime`, which `PlatformFormat` already localised before the
     /// snapshot was written (I9).
-    static func read() -> (content: WidgetContent, deadline: Date?, languageTag: String)? {
+    static func read() -> (snapshot: WidgetSnapshot, deadline: Date?)? {
         let store = KeyValueStore_iosKt.createWidgetKeyValueStore()
         guard let snapshot = WidgetInputsMirror.shared.read(store: store) else { return nil }
-        let content = WidgetContentBuilder.shared.build(snapshot: snapshot)
+        // Only a mirror from before the two-day schedule existed needs this: with a schedule the
+        // countdown is derived from absolute prayer instants at each entry's own date instead.
         let defaults = UserDefaults(suiteName: taqwaAppGroupId)
         let writtenAt = defaults?.double(forKey: taqwaWrittenAtKey) ?? 0
         let deadline = writtenAt > 0
-            ? Date(timeIntervalSince1970: writtenAt + Double(content.countdownMinutes) * 60)
+            ? Date(timeIntervalSince1970: writtenAt + Double(snapshot.countdownMinutes) * 60)
             : nil
-        return (content, deadline, snapshot.languageTag)
+        return (snapshot, deadline)
     }
 
     static func background() -> WidgetBackground {
@@ -147,21 +148,27 @@ struct TaqwaTimelineProvider: TimelineProvider {
 
     static func entries(from start: Date) -> [TaqwaEntry] {
         let background = TaqwaMirror.background()
-        guard let (content, deadline, languageTag) = TaqwaMirror.read() else {
+        guard let (snapshot, deadline) = TaqwaMirror.read() else {
             return [TaqwaEntry(date: start, content: nil, countdownMinutes: 0, background: background, languageTag: "")]
         }
         return (0..<entryCount).map { minute in
             let date = start.addingTimeInterval(Double(minute) * 60)
+            let epoch = Int64(date.timeIntervalSince1970)
+            // Each entry is the widget as it should read at that minute: past a prayer the next
+            // one takes over, its row lights up and the label changes, with no reload needed.
+            let content = WidgetContentBuilder.shared.build(snapshot: snapshot, nowEpochSeconds: epoch)
+            let derived = WidgetCountdown.shared.remainingMinutesAt(snapshot: snapshot, nowEpochSeconds: epoch)
             return TaqwaEntry(
                 date: date,
                 content: content,
-                countdownMinutes: remainingMinutes(content: content, deadline: deadline, at: date),
+                countdownMinutes: derived?.int64Value ?? remainingMinutes(content: content, deadline: deadline, at: date),
                 background: background,
-                languageTag: languageTag
+                languageTag: snapshot.languageTag
             )
         }
     }
 
+    /// Fallback for a mirror written before the schedule existed.
     static func remainingMinutes(content: WidgetContent, deadline: Date?, at date: Date) -> Int64 {
         guard let deadline else { return content.countdownMinutes }
         let seconds = deadline.timeIntervalSince(date)
@@ -301,14 +308,12 @@ struct TaqwaHomeWidgetView: View {
                 // Sunrise is absent by construction: `rows` comes from `ObligatoryPrayers`.
                 ForEach(content.rows, id: \.prayer) { row in
                     HStack(spacing: 8) {
-                        // No `minimumScaleFactor` here: in a fixed-width column the longest name
-                        // ("Maghrib · المغرب") shrank on its own and read as a different size from
-                        // the four rows around it. The column now takes the width the names need
-                        // and the countdown block yields, so every row is set at the same size.
+                        // No `minimumScaleFactor` here: in the old fixed 130 pt column the longest
+                        // name ("Maghrib · المغرب") shrank on its own and read as a different size
+                        // from the four rows around it. Every row is set at the same size now.
                         Text(row.displayName)
                             .font(.system(size: 12, weight: row.isCurrent ? .semibold : .regular))
                             .lineLimit(1)
-                            .fixedSize(horizontal: true, vertical: false)
                         Spacer(minLength: 8)
                         Text(row.clockTime)
                             .font(.system(size: 12, weight: row.isCurrent ? .semibold : .regular))
@@ -317,7 +322,10 @@ struct TaqwaHomeWidgetView: View {
                     .foregroundColor(Color(argb: row.isCurrent ? colors.accentArgb : colors.textArgb))
                 }
             }
-            .layoutPriority(1)
+            // Exactly as wide as its longest row and no wider, so the countdown block on the
+            // left keeps the rest. (`layoutPriority` here let the spacers inside each row claim
+            // the whole card and pushed the countdown out of existence.)
+            .fixedSize(horizontal: true, vertical: false)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

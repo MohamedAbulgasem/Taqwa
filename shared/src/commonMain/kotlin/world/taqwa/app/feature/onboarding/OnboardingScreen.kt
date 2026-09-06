@@ -49,11 +49,14 @@ import world.taqwa.app.resources.onboarding_welcome_cta
 import world.taqwa.app.resources.onboarding_welcome_title
 import world.taqwa.app.resources.onboarding_widget_body
 import world.taqwa.app.resources.onboarding_widget_body_ios
+import world.taqwa.app.resources.onboarding_widget_body_ios_legacy
 import world.taqwa.app.resources.onboarding_widget_cta_add
 import world.taqwa.app.resources.onboarding_widget_cta_done
 import world.taqwa.app.resources.onboarding_widget_secondary
 import world.taqwa.app.resources.onboarding_widget_title
+import world.taqwa.app.widget.WidgetAddPath
 import world.taqwa.app.widget.WidgetPinRequester
+import world.taqwa.app.widget.widgetAddPath
 
 /**
  * Hoisted out of this composable because "choose a city instead" navigates away to the city
@@ -146,7 +149,11 @@ fun OnboardingScreen(
                 Spacer(Modifier.height(12.dp))
                 Body(
                     stringResource(
-                        if (canPinWidget) Res.string.onboarding_widget_body else Res.string.onboarding_widget_body_ios,
+                        when {
+                            canPinWidget -> Res.string.onboarding_widget_body
+                            widgetAddPath == WidgetAddPath.IOS_HOLD_ICON -> Res.string.onboarding_widget_body_ios
+                            else -> Res.string.onboarding_widget_body_ios_legacy
+                        },
                     ),
                 )
             }

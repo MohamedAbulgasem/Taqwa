@@ -9,11 +9,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
-import androidx.glance.Image
-import androidx.glance.ImageProvider
 import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
@@ -24,7 +21,6 @@ import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
@@ -38,7 +34,6 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import world.taqwa.app.R
 import world.taqwa.app.domain.WidgetBackground
 
 /**
@@ -71,14 +66,14 @@ private fun readWidgetRender(context: Context): WidgetRender {
         ?: WidgetBackground.FOLLOW_THEME
     val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val systemIsDark = nightMode == Configuration.UI_MODE_NIGHT_YES
+    val nowEpochSeconds = System.currentTimeMillis() / 1_000L
     return WidgetRender(
-        content = snapshot?.let(WidgetContentBuilder::build),
-        // `provideGlance` runs on every re-render (the half-hourly APPWIDGET_UPDATE, the rolling
-        // five-minute window alarm, the prayer-boundary alarm and the unlock receiver), so this
-        // reads the clock as it is *now*, not as it was when the app last had Today open.
-        remainingMinutes = snapshot?.let {
-            WidgetCountdown.remainingMinutesAt(it, System.currentTimeMillis() / 1_000L)
-        },
+        // Worked out for *now* from the mirror's two-day schedule (next prayer, current prayer,
+        // the rows), not read as it stood when the app last had Today open: the render runs on
+        // the half-hourly APPWIDGET_UPDATE, the rolling five-minute alarm, the prayer alarm and
+        // the unlock receiver, and after Isha it has to say "Fajr in" without the app's help.
+        content = snapshot?.let { WidgetContentBuilder.build(it, nowEpochSeconds) },
+        remainingMinutes = snapshot?.let { WidgetCountdown.remainingMinutesAt(it, nowEpochSeconds) },
         colors = WidgetPalette.colorsFor(background, systemIsDark),
         languageTag = snapshot?.languageTag.orEmpty(),
     )
@@ -89,7 +84,6 @@ private fun readWidgetRender(context: Context): WidgetRender {
 private fun WidgetPaletteColors.cardBackground() = Color(backgroundArgb).copy(alpha = backgroundAlpha)
 private fun WidgetPaletteColors.primaryText() = Color(textArgb)
 private fun WidgetPaletteColors.secondaryText() = Color(textArgb).copy(alpha = 0.62f)
-private fun WidgetPaletteColors.hairline() = Color(textArgb).copy(alpha = 0.14f)
 private fun WidgetPaletteColors.accent() = Color(accentArgb)
 
 // -- Layout selection --------------------------------------------------------------------------
@@ -108,8 +102,18 @@ private val TINY_MAX_WIDTH = 100.dp
  */
 private val TWO_COLUMN_MIN_WIDTH = 230.dp
 
-/** "12:34" in the widget face: two digits, a colon and two more, in em. */
+/** "12:34" in the widget face: two digits, a colon and two more, in em. The two-column card
+ * sizes its countdown block to this worst case so the prayer list beside it never moves. */
 private const val COUNTDOWN_EM = 2.51f
+
+/**
+ * The width of the countdown actually on screen, in em: a digit is about 0.56 em and the colon
+ * 0.28 em in the system face. "0:08" is 1.96 em, "12:34" is 2.52. The single-block layouts size
+ * the number for the string they have rather than for the worst case, which is why the 2x2 no
+ * longer draws a 56 sp number inside a card that could hold 70.
+ */
+private fun countdownEm(text: String): Float =
+    text.count { it.isDigit() } * 0.56f + text.count { !it.isDigit() } * 0.28f
 
 /** The longest prayer row, "Maghrib · المغرب" in bold and "18:32" beside it, in em. */
 private const val LONGEST_ROW_EM = 10.1f
@@ -182,11 +186,14 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
 /** The 2x2 and everything square-ish: label, countdown, clock time, stacked and centred. */
 @Composable
 private fun StackedCard(render: WidgetRender, size: DpSize) {
-    val pad = 12.dp
-    val countdown = minOf((size.width.value - pad.value * 2) / COUNTDOWN_EM, size.height.value * 0.34f).sp(24f, 56f)
-    val label = (countdown.value * 0.30f).sp(11f, 16f)
-    val clock = (countdown.value * 0.40f).sp(12f, 22f)
-    val gap = (countdown.value * 0.16f).dp
+    val pad = 10.dp
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.languageTag)) } ?: COUNTDOWN_EM
+    // The label and clock line take about 1.3 em of the countdown between them, so the number is
+    // capped at 44% of the height, and by whatever the width allows for its own digits.
+    val countdown = minOf((size.width.value - pad.value * 2) / em, size.height.value * 0.44f).sp(24f, 72f)
+    val label = (countdown.value * 0.27f).sp(11f, 17f)
+    val clock = (countdown.value * 0.34f).sp(12f, 22f)
+    val gap = (countdown.value * 0.10f).dp
     Box(modifier = GlanceModifier.fillMaxSize().padding(pad), contentAlignment = Alignment.Center) {
         NextPrayerBlock(render, label, countdown, clock, labelGap = gap, clockGap = gap * 0.6f, centered = true)
     }
@@ -198,7 +205,8 @@ private fun StackedCard(render: WidgetRender, size: DpSize) {
 private fun StripCard(render: WidgetRender, size: DpSize) {
     val colors = render.colors
     val padH = 14.dp
-    val countdown = minOf(size.height.value * 0.46f, (size.width.value * 0.5f) / COUNTDOWN_EM).sp(18f, 32f)
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.languageTag)) } ?: COUNTDOWN_EM
+    val countdown = minOf(size.height.value * 0.50f, (size.width.value * 0.5f) / em).sp(18f, 36f)
     val small = (countdown.value * 0.45f).sp(11f, 13f)
     Row(
         modifier = GlanceModifier.fillMaxSize().padding(horizontal = padH, vertical = 8.dp),
@@ -233,7 +241,8 @@ private fun StripCard(render: WidgetRender, size: DpSize) {
 @Composable
 private fun TinyCard(render: WidgetRender, size: DpSize) {
     val colors = render.colors
-    val countdown = minOf((size.width.value - 12f) / COUNTDOWN_EM, size.height.value * 0.42f).sp(14f, 26f)
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.languageTag)) } ?: COUNTDOWN_EM
+    val countdown = minOf((size.width.value - 12f) / em, size.height.value * 0.46f).sp(14f, 30f)
     val label = (countdown.value * 0.5f).sp(9f, 12f)
     Column(
         modifier = GlanceModifier.fillMaxSize().padding(4.dp),
@@ -314,8 +323,11 @@ private fun NextPrayerBlock(
     }
 }
 
-/** Rounded card with a 1dp hairline border. The border is a tinted image because Glance 1.1.1
- * has no border modifier. */
+/**
+ * Rounded card, no border. The in-app cards carry a hairline, but on a home screen the launcher
+ * clips the widget to its own corner radius and the stretched 1dp stroke image showed up as a
+ * bright rim around the dark card; iOS never had one, and the card reads as a card without it.
+ */
 @Composable
 private fun WidgetCard(colors: WidgetPaletteColors, content: @Composable () -> Unit) {
     Box(
@@ -326,13 +338,6 @@ private fun WidgetCard(colors: WidgetPaletteColors, content: @Composable () -> U
             .appWidgetBackground(),
         contentAlignment = Alignment.Center,
     ) {
-        Image(
-            provider = ImageProvider(R.drawable.widget_card_hairline),
-            contentDescription = null,
-            modifier = GlanceModifier.fillMaxSize(),
-            contentScale = ContentScale.FillBounds,
-            colorFilter = ColorFilter.tint(ColorProvider(colors.hairline())),
-        )
         content()
     }
 }

@@ -18,7 +18,8 @@
     <string name="onboarding_notifications_secondary">Not now</string>
     <string name="onboarding_widget_title">On your home screen</string>
     <string name="onboarding_widget_body">The Taqwa widget shows the next prayer and the time until it, without opening the app.</string>
-    <string name="onboarding_widget_body_ios">The Taqwa widget shows the next prayer and the time until it, without opening the app. Touch and hold your home screen, tap the plus, then search for Taqwa.</string>
+    <string name="onboarding_widget_body_ios">The Taqwa widget shows the next prayer and the time until it, without opening the app. To add it, touch and hold the Taqwa icon on your home screen and choose a widget size.</string>
+    <string name="onboarding_widget_body_ios_legacy">The Taqwa widget shows the next prayer and the time until it, without opening the app. To add it, touch and hold your home screen, tap the plus in the top corner, then search for Taqwa.</string>
     <string name="onboarding_widget_cta_add">Add widget</string>
     <string name="onboarding_widget_cta_done">Done</string>
     <string name="onboarding_widget_secondary">Maybe later</string>

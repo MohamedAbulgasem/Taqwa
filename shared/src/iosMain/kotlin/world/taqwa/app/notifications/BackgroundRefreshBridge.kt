@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.createDataStore
+import world.taqwa.app.widget.WidgetMirrorRefresher
 import kotlin.time.Clock
 
 /**
@@ -24,6 +25,10 @@ object BackgroundRefreshBridge {
             now = { Clock.System.now() },
         )
         val plan = coordinator.reschedule(RescheduleTrigger.BACKGROUND_REFRESH)
+        // The widget's two-day schedule moves forward with the same stored location, so the
+        // home screen keeps counting even on a day the app is never opened. Swift reloads the
+        // timelines right after this returns.
+        runCatching { WidgetMirrorRefresher.refresh(settingsRepository, PrayerTimesEngine()) }
         // No location is not a failure — there is nothing to schedule and nothing went wrong.
         plan.isNotEmpty() || settingsRepository.location.first() == null
     }

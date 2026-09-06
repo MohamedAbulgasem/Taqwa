@@ -124,6 +124,7 @@ class TodayViewModel(
             today = timeline,
             timeZoneId = location.timeZoneId,
             format = widgetFormat(),
+            days = listOf(today, tomorrow),
         )
         if (mirror != lastWrittenMirror) {
             lastWrittenMirror = mirror

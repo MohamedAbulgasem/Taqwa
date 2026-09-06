@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.di.appContainer
+import world.taqwa.app.widget.WidgetMirrorRefresher
 import world.taqwa.app.widget.androidWidgetUpdateHook
 
 /** Set once from `TaqwaApplication` — `shared` cannot see androidApp's generated `R` class. */
@@ -67,7 +69,16 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                withTimeout(WIDGET_REFRESH_BUDGET_MILLIS) { runCatching { hook() } }
+                withTimeout(WIDGET_REFRESH_BUDGET_MILLIS) {
+                    // A prayer has just arrived, so the mirror's two-day horizon has moved on by
+                    // one prayer: rewrite it from the stored location first, then redraw. This is
+                    // what keeps the widget counting for days on end without the app being
+                    // opened. Same process-wide container and DataStore as the app itself.
+                    runCatching {
+                        WidgetMirrorRefresher.refresh(appContainer.settingsRepository, appContainer.prayerTimesEngine)
+                    }
+                    runCatching { hook() }
+                }
             } catch (_: TimeoutCancellationException) {
                 // The half-hourly update and the next window alarm will both catch up.
             } finally {

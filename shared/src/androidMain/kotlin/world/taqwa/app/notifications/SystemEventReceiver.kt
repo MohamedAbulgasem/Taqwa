@@ -9,6 +9,8 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import world.taqwa.app.di.appContainer
+import world.taqwa.app.widget.WidgetMirrorRefresher
+import world.taqwa.app.widget.androidWidgetUpdateHook
 
 /**
  * `BOOT_COMPLETED`, `TIME_SET` and `TIMEZONE_CHANGED` all invalidate whatever is currently
@@ -37,6 +39,13 @@ class SystemEventReceiver : BroadcastReceiver() {
                     // plan. appContext is set in TaqwaApplication.onCreate, which always runs
                     // before any receiver, so forcing the lazy container here is safe.
                     appContainer.notificationCoordinator.reschedule(trigger)
+                    // The same events stale the widget: a reboot may land days after the mirror
+                    // was written, and a clock or zone change moves every instant in it. Rewrite
+                    // it from the stored location and redraw; neither may fail the reschedule.
+                    runCatching {
+                        WidgetMirrorRefresher.refresh(appContainer.settingsRepository, appContainer.prayerTimesEngine)
+                    }
+                    runCatching { androidWidgetUpdateHook?.invoke() }
                 }
             } catch (_: TimeoutCancellationException) {
                 // Nothing useful to do from a broadcast receiver but stop cleanly.

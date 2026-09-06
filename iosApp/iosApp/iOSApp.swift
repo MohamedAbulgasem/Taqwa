@@ -67,8 +67,11 @@ struct iOSApp: App {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
 	}
 
-	/// Only ever read or written on the main thread — see `reloadWidgets()`.
-	private static var lastSnapshot: String?
+	/// Only ever read or written on the main thread — see `reloadWidgets()`. Covers the snapshot
+	/// *and* the background choice: a change to either must reach the widget, and the background
+	/// used to be left out, which is why picking Light or Dark in Appearance did nothing on the
+	/// home screen until WidgetKit's hourly reload happened to come round.
+	private static var lastMirrorKey: String?
 
 	/// `reloadWidgets()` is reached from a Kotlin-invoked closure (`TodayViewModel.refresh()` runs
 	/// on whatever dispatcher it is collected on) and from the background-task queue in
@@ -90,8 +93,10 @@ struct iOSApp: App {
 		onMain {
 			let defaults = UserDefaults(suiteName: taqwaAppGroupId)
 			let snapshot = defaults?.string(forKey: taqwaSnapshotKey)
-			guard snapshot != lastSnapshot else { return }
-			lastSnapshot = snapshot
+			let background = defaults?.string(forKey: taqwaBackgroundKey)
+			let key = (snapshot ?? "") + "|" + (background ?? "")
+			guard key != lastMirrorKey else { return }
+			lastMirrorKey = key
 			// `WidgetSnapshot` carries no timestamp, so stamp the write here: the extension needs it to
 			// extrapolate the countdown forward between reloads instead of showing a frozen minute.
 			defaults?.set(Date().timeIntervalSince1970, forKey: taqwaWrittenAtKey)

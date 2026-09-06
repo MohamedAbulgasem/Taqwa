@@ -28,3 +28,13 @@ fun translucentOrFrostedSubtitleKey(isIos: Boolean): StringResource =
 
 /** True on iOS, false on Android. */
 expect val isIosPlatform: Boolean
+
+/**
+ * How a widget gets onto this platform's home screen, which decides the last onboarding
+ * screen's copy and button. iOS changed the gesture in iOS 18: the "+" in the top corner became an
+ * Edit menu, and holding the app's own icon started offering its widget sizes directly, which is
+ * the shortest path and the one the copy gives. Older iOS still has the "+".
+ */
+enum class WidgetAddPath { ANDROID_PIN, IOS_HOLD_ICON, IOS_PLUS_BUTTON }
+
+expect val widgetAddPath: WidgetAddPath

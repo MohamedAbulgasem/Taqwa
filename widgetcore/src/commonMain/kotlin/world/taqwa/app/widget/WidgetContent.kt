@@ -44,6 +44,41 @@ object WidgetContentBuilder {
         )
     }
 
+    /**
+     * The content as it stands at [nowEpochSeconds], worked out from the snapshot's two-day
+     * schedule: next is the first entry still ahead, current the last one behind, the rows the
+     * five of the day the current prayer belongs to (or the next one's, before the day's first).
+     * A mirror with no schedule, or one so old that every entry is behind, falls back to
+     * [build], whose fields describe the moment of writing.
+     */
+    fun build(snapshot: WidgetSnapshot, nowEpochSeconds: Long): WidgetContent {
+        val schedule = snapshot.schedule.sortedBy { it.epochSeconds }
+        val next = schedule.firstOrNull { it.epochSeconds > nowEpochSeconds } ?: return build(snapshot)
+        val current = schedule.lastOrNull { it.epochSeconds <= nowEpochSeconds }
+        val rowDay = (current ?: next).dayIndex
+        val rows = schedule.filter { it.dayIndex == rowDay }
+        val languageTag = snapshot.languageTag
+        val progress = current?.let {
+            val total = (next.epochSeconds - it.epochSeconds).toFloat()
+            if (total <= 0f) 0f else ((nowEpochSeconds - it.epochSeconds) / total).coerceIn(0f, 1f)
+        } ?: 0f
+        return WidgetContent(
+            nextPrayerDisplayName = displayName(next.prayer, languageTag),
+            countdownMinutes = (next.epochSeconds - nowEpochSeconds) / 60L,
+            nextClockTime = next.clockTime,
+            rows = rows.map { entry ->
+                WidgetPrayerRow(
+                    prayer = entry.prayer,
+                    displayName = displayName(entry.prayer, languageTag),
+                    clockTime = entry.clockTime,
+                    isCurrent = current != null && entry.prayer == current.prayer && entry.dayIndex == current.dayIndex,
+                )
+            },
+            ringProgress = progress,
+            countdownLabel = PrayerNaming.countdownLabel(next.prayer, languageTag),
+        )
+    }
+
     private fun displayName(prayer: Prayer, languageTag: String) =
         PrayerNaming.display(prayer, languageTag, PrayerNaming.englishName(prayer))
 }

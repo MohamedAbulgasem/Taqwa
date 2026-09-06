@@ -17,7 +17,8 @@
     <string name="onboarding_notifications_secondary">ليس الآن</string>
     <string name="onboarding_widget_title">على شاشتك الرئيسية</string>
     <string name="onboarding_widget_body">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق.</string>
-    <string name="onboarding_widget_body_ios">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق. اضغط مطولًا على الشاشة الرئيسية، ثم اضغط علامة الزائد وابحث عن تقوى.</string>
+    <string name="onboarding_widget_body_ios">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق. لإضافتها، اضغط مطولًا على أيقونة تقوى في الشاشة الرئيسية واختر حجم الأداة.</string>
+    <string name="onboarding_widget_body_ios_legacy">تعرض أداة تقوى الصلاة القادمة والوقت المتبقي لها من دون فتح التطبيق. لإضافتها، اضغط مطولًا على الشاشة الرئيسية، ثم اضغط علامة الزائد في الزاوية العلوية وابحث عن تقوى.</string>
     <string name="onboarding_widget_cta_add">إضافة الأداة</string>
     <string name="onboarding_widget_cta_done">تم</string>
     <string name="onboarding_widget_secondary">لاحقًا</string>

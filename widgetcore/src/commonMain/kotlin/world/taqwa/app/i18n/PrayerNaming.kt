@@ -23,6 +23,18 @@ object PrayerNaming {
 
     fun englishName(prayer: Prayer): String = ENGLISH.getValue(prayer)
 
+    /**
+     * The "next prayer in" phrase Today's ring renders ("%1$s in" / "متبقٍ على %1$s"), as plain
+     * Kotlin rather than a resource lookup, so both widget processes can phrase it for *any*
+     * prayer at render time. Kept in step with `Res.string.today_next_in` by hand.
+     */
+    fun countdownLabel(prayer: Prayer, languageTag: String): String =
+        if (isArabicLanguage(languageTag)) {
+            "متبقٍ على ${arabicName(prayer)}"
+        } else {
+            "${englishName(prayer)} in"
+        }
+
     fun display(prayer: Prayer, languageTag: String, localizedName: String): String =
         if (isArabicLanguage(languageTag)) {
             arabicName(prayer)

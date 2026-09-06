@@ -56,8 +56,16 @@ private class IosLocationProvider : LocationProvider {
     private val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
         override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
             val continuation = pendingPermission ?: return
+            // iOS calls this once when the manager is created, before the user has seen the
+            // dialog, with the status still "not determined". Taking that as the answer sent
+            // onboarding on to the next screen with no location while the dialog was still on
+            // screen, and the Allow the user then tapped reached nobody: Today opened saying
+            // location was off, and only its own button, asked with the permission already
+            // granted, got a fix. The answer is the first status that is *not* undetermined.
+            val status = map(CLLocationManager.authorizationStatus())
+            if (status == LocationPermission.NOT_REQUESTED) return
             pendingPermission = null
-            if (continuation.isActive) continuation.resume(map(CLLocationManager.authorizationStatus()))
+            if (continuation.isActive) continuation.resume(status)
         }
 
         override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
@@ -140,7 +148,7 @@ private class IosLocationProvider : LocationProvider {
     }
 
     private companion object {
-        const val FIX_TIMEOUT_MILLIS = 8_000L
+        const val FIX_TIMEOUT_MILLIS = 15_000L
         const val PERMISSION_TIMEOUT_MILLIS = 60_000L
     }
 }

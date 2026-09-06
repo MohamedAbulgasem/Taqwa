@@ -393,3 +393,25 @@ Two-column threshold is derived, not guessed: 61 dp for the smallest countdown b
 row at 11.5 sp × 10.1 em plus gutters is about 230 dp. A Pixel's 2×2 (190 dp) stays a stacked card;
 every 3×2 and 4×2 measured clears it. The LoopPhone launcher still drops widgets on every package
 update, so re-add once after the final install.
+
+### Iteration 4 — six items from the third round, and the widget learns to count on its own
+
+| # | Report | What was actually wrong | Fix |
+|---|---|---|---|
+| 1 | iOS medium widget lost its countdown block | Iteration 3's `layoutPriority(1)` on the prayer list let its spacers claim the whole card | List column is `fixedSize` horizontally: exactly as wide as its longest row; the countdown block keeps the rest, every row at one size |
+| 2 | White rim around the dark Android widget | The 1dp hairline stroke image, stretched to the cell and clipped again by the launcher | No border on widgets; the card reads as a card without it, as it always has on iOS |
+| 3 | Android 2×2 used under half its cell | Countdown sized for the worst case "12:34" whatever the digits on screen | Single-block layouts size the number for the string they have (0.56 em a digit) and take up to 44 % of the height; cap 72 sp |
+| 4 | iOS widget ignored the background setting | The app only reloaded the widget when the *prayer* snapshot changed; the background key was outside the check | Reload key is snapshot + background. Not a limitation, a bug: the setting stays |
+| 5 | iOS onboarding: "Use my location" then Today says location is off | `CLLocationManager` fires `didChangeAuthorization` once on creation, still *not determined*; onboarding took that as the answer while the dialog was still up | The first status that is not undetermined is the answer; fix timeout 8 s → 15 s |
+| 6 | iOS widget-adding copy was wrong | Written for the iOS 17 "+" button | iOS 18+: hold the Taqwa icon and choose a size; older iOS keeps the "+" wording. Chosen at runtime from the OS version |
+
+**Found while verifying on the emulator, past Isha:** the mirror was only ever written while Today
+was open, so the moment a prayer passed the widget lost its countdown, and after Isha it sat on
+"Isha · 19:50" all night until the app was next opened. On both phones, every night. The mirror now
+carries a **two-day schedule** of absolute prayer instants (field eleven of the wire format, older
+mirrors still read), and both renderers work out next, current, rows and countdown at *render*
+time from it: Android on every redraw, iOS per timeline entry, so past a prayer the next one takes
+over without a reload. `WidgetMirrorRefresher` rolls the horizon forward without a screen: Android
+calls it from the prayer alarm and the boot/time-change receiver, iOS from its daily background
+refresh. **293 JVM / 285 iOS tests**, including nine that render one snapshot at later and later
+moments and expect the widget to have moved on by itself.

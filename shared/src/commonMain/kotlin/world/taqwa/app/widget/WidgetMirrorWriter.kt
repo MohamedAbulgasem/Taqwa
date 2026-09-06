@@ -2,6 +2,7 @@ package world.taqwa.app.widget
 
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerStatus
@@ -39,11 +40,7 @@ object WidgetMirrorWriter {
      * to keep in sync with the resource by hand.
      */
     internal fun countdownLabel(prayer: Prayer, languageTag: String): String =
-        if (PrayerNaming.isArabicLanguage(languageTag)) {
-            "متبقٍ على ${PrayerNaming.arabicName(prayer)}"
-        } else {
-            "${PrayerNaming.englishName(prayer)} in"
-        }
+        PrayerNaming.countdownLabel(prayer, languageTag)
 
     /**
      * How many discrete steps the ring is rounded to before it reaches the mirror.
@@ -66,12 +63,27 @@ object WidgetMirrorWriter {
     private fun quantisedRing(progress: Float): Float =
         round(progress.coerceIn(0f, 1f) * RING_STEPS) / RING_STEPS
 
-    /** Builds the snapshot [write] would store, without storing it. */
-    fun snapshotOf(today: TodayState, timeZoneId: String, format: PlatformFormat): WidgetSnapshot {
+    /**
+     * Builds the snapshot [write] would store, without storing it. [days] is the day of writing
+     * followed by the day after; their obligatory prayers become [WidgetSnapshot.schedule], the
+     * two-day horizon a widget can count across on its own.
+     */
+    fun snapshotOf(
+        today: TodayState,
+        timeZoneId: String,
+        format: PlatformFormat,
+        days: List<DayPrayerTimes> = emptyList(),
+    ): WidgetSnapshot {
         val zone = TimeZone.of(timeZoneId)
         fun clock(instant: Instant): String {
             val t = instant.toLocalDateTime(zone)
             return format.clockTime(t.hour, t.minute)
+        }
+        val schedule = days.flatMapIndexed { dayIndex, day ->
+            ObligatoryPrayers.map { prayer ->
+                val instant = day.time(prayer)
+                ScheduledPrayer(prayer, instant.epochSeconds, clock(instant), dayIndex)
+            }
         }
         return WidgetSnapshot(
             nextPrayer = today.next.prayer,
@@ -87,6 +99,7 @@ object WidgetMirrorWriter {
             // holding the instant can recompute against its own clock whenever it happens to draw.
             nextPrayerEpochSeconds = today.next.instant.epochSeconds,
             previousPrayerEpochSeconds = previousObligatoryInstant(today),
+            schedule = schedule,
         )
     }
 
@@ -113,11 +126,21 @@ object WidgetMirrorWriter {
      * compare it against what it last wrote and skip both the store write and `refreshWidgets()`
      * when nothing a widget could show has actually changed (see `TodayViewModel.refresh`).
      */
-    fun serializedSnapshot(today: TodayState, timeZoneId: String, format: PlatformFormat): String =
-        WidgetInputsMirror.serialize(snapshotOf(today, timeZoneId, format))
+    fun serializedSnapshot(
+        today: TodayState,
+        timeZoneId: String,
+        format: PlatformFormat,
+        days: List<DayPrayerTimes> = emptyList(),
+    ): String = WidgetInputsMirror.serialize(snapshotOf(today, timeZoneId, format, days))
 
-    fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat) {
-        store.putString(WidgetInputsMirror.KEY, serializedSnapshot(today, timeZoneId, format))
+    fun write(
+        store: KeyValueStore,
+        today: TodayState,
+        timeZoneId: String,
+        format: PlatformFormat,
+        days: List<DayPrayerTimes> = emptyList(),
+    ) {
+        store.putString(WidgetInputsMirror.KEY, serializedSnapshot(today, timeZoneId, format, days))
     }
 
     fun read(store: KeyValueStore): WidgetSnapshot? = WidgetInputsMirror.read(store)
