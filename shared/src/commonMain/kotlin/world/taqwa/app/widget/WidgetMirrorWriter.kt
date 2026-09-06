@@ -8,6 +8,7 @@ import world.taqwa.app.domain.TodayState
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.PrayerNaming
+import kotlin.math.round
 import kotlin.time.Instant
 
 /** Stays in `shared`: producing a snapshot needs `TodayState` from the prayer engine. The read
@@ -43,23 +44,56 @@ object WidgetMirrorWriter {
             "${PrayerNaming.englishName(prayer)} in"
         }
 
-    fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat) {
+    /**
+     * How many discrete steps the ring is rounded to before it reaches the mirror.
+     *
+     * Every other field in a [WidgetSnapshot] is minute-granular — `countdownMinutes` is
+     * `inWholeMinutes`, the clock strings are `HH:mm` — but `TodayState.ringProgress` is
+     * elapsed/total in *seconds*, so it takes a different value on every one of
+     * `TodayViewModel`'s 1 Hz ticks. That single field is what made the serialised snapshot
+     * differ every second, which defeated iOS's `lastSnapshot` dedupe and burned WidgetKit's
+     * ~40-70 reloads/day budget in under a minute, after which the widget froze for the day.
+     *
+     * 120 steps is finer than a pixel on the lock-screen circular complication (a ~40 pt ring has
+     * roughly 120 pixels of circumference at 1x), so nothing visible is lost; what is gained is
+     * that the value only moves once per `total / 120` seconds — for a typical two-to-five-hour
+     * gap between prayers, once every one to two and a half minutes, i.e. no more often than
+     * `countdownMinutes` already moves.
+     */
+    private const val RING_STEPS = 120
+
+    private fun quantisedRing(progress: Float): Float =
+        round(progress.coerceIn(0f, 1f) * RING_STEPS) / RING_STEPS
+
+    /** Builds the snapshot [write] would store, without storing it. */
+    fun snapshotOf(today: TodayState, timeZoneId: String, format: PlatformFormat): WidgetSnapshot {
         val zone = TimeZone.of(timeZoneId)
         fun clock(instant: Instant): String {
             val t = instant.toLocalDateTime(zone)
             return format.clockTime(t.hour, t.minute)
         }
-        val snapshot = WidgetSnapshot(
+        return WidgetSnapshot(
             nextPrayer = today.next.prayer,
             countdownMinutes = today.countdown.inWholeMinutes,
             nextClockTime = clock(today.next.instant),
             allClockTimes = today.rows.associate { it.prayer to clock(it.instant) },
             currentPrayer = today.rows.firstOrNull { it.status == PrayerStatus.CURRENT }?.prayer,
             languageTag = format.languageTag(),
-            ringProgress = today.ringProgress,
+            ringProgress = quantisedRing(today.ringProgress),
             countdownLabel = countdownLabel(today.next.prayer, format.languageTag()),
         )
-        store.putString(WidgetInputsMirror.KEY, WidgetInputsMirror.serialize(snapshot))
+    }
+
+    /**
+     * The exact string [write] would store. Exposed so a caller that recomputes once a second can
+     * compare it against what it last wrote and skip both the store write and `refreshWidgets()`
+     * when nothing a widget could show has actually changed (see `TodayViewModel.refresh`).
+     */
+    fun serializedSnapshot(today: TodayState, timeZoneId: String, format: PlatformFormat): String =
+        WidgetInputsMirror.serialize(snapshotOf(today, timeZoneId, format))
+
+    fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat) {
+        store.putString(WidgetInputsMirror.KEY, serializedSnapshot(today, timeZoneId, format))
     }
 
     fun read(store: KeyValueStore): WidgetSnapshot? = WidgetInputsMirror.read(store)

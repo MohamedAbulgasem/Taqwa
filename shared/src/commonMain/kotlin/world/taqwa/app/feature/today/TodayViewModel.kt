@@ -22,6 +22,11 @@ import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.prayer.TimelineBuilder
 import world.taqwa.app.settings.SettingsRepository
+import world.taqwa.app.widget.KeyValueStore
+import world.taqwa.app.widget.WidgetInputsMirror
+import world.taqwa.app.widget.WidgetMirrorWriter
+import world.taqwa.app.widget.createWidgetKeyValueStore
+import world.taqwa.app.widget.refreshWidgets
 import kotlin.time.Instant
 
 sealed interface TodayUiState {
@@ -43,9 +48,28 @@ class TodayViewModel(
     // The device's own formatter in the app; the locale-free English one by default, so these
     // tests read the same on a machine whose system language is Arabic.
     private val format: PlatformFormat = EnglishPlatformFormat,
+    // Both are called lazily rather than resolved once, so nothing platform-specific is touched
+    // until a refresh actually has something new to publish — and so a test can count the writes
+    // and the refreshes this loop provokes.
+    private val widgetStore: () -> KeyValueStore = { createWidgetKeyValueStore() },
+    private val widgetFormat: () -> PlatformFormat = { world.taqwa.app.i18n.createPlatformFormat() },
+    private val onWidgetsChanged: () -> Unit = { refreshWidgets() },
 ) {
     private val _state = MutableStateFlow<TodayUiState>(TodayUiState.Loading)
     val state: StateFlow<TodayUiState> = _state.asStateFlow()
+
+    /**
+     * The last string actually written to the widget mirror, so [refresh] can tell a tick that
+     * changed something a widget can show from the ~59 ticks a minute that changed nothing.
+     *
+     * Without this, [start]'s one-second loop rewrote the mirror and nudged both widget systems
+     * 60 times a minute. On iOS that outran `WidgetCenter`'s ~40-70 reloads/day budget in under a
+     * minute and the widget then stopped updating for the rest of the day; on Android it put two
+     * Glance recompositions plus `AppWidgetManager` IPC on the caller's dispatcher every second.
+     * Every field in the snapshot is now minute-granular (see `WidgetMirrorWriter.RING_STEPS`),
+     * so comparing the serialised form collapses those 60 ticks to one.
+     */
+    private var lastWrittenMirror: String? = null
 
     fun start(scope: CoroutineScope) {
         scope.launch {
@@ -86,13 +110,18 @@ class TodayViewModel(
             today = timeline,
             highLatitudeNote = noteFor(today),
         )
-        world.taqwa.app.widget.WidgetMirrorWriter.write(
-            store = world.taqwa.app.widget.createWidgetKeyValueStore(),
+        // Serialise first, then compare: the store write and the widget nudge are both skipped
+        // when this tick produced a mirror identical to the last one published.
+        val mirror = WidgetMirrorWriter.serializedSnapshot(
             today = timeline,
             timeZoneId = location.timeZoneId,
-            format = world.taqwa.app.i18n.createPlatformFormat(),
+            format = widgetFormat(),
         )
-        world.taqwa.app.widget.refreshWidgets()
+        if (mirror != lastWrittenMirror) {
+            lastWrittenMirror = mirror
+            widgetStore().putString(WidgetInputsMirror.KEY, mirror)
+            onWidgetsChanged()
+        }
     }
 
     /**

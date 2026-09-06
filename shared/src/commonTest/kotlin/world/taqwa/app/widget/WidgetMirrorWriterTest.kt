@@ -7,8 +7,11 @@ import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.PlatformFormat
+import kotlin.math.abs
+import kotlin.math.round
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
@@ -68,6 +71,45 @@ class WidgetMirrorWriterTest {
         val store = FakeKeyValueStore()
         WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat("ar"))
         assertEquals("متبقٍ على العصر", WidgetMirrorWriter.read(store)!!.countdownLabel)
+    }
+
+    // -- C5: the ring is the one field that used to change every second -----------------------
+    //
+    // Every other field here is minute-granular, so `ringProgress` alone made the serialised
+    // snapshot differ on all 60 of a minute's ticks — which is what defeated iOS's `lastSnapshot`
+    // dedupe and exhausted WidgetKit's daily reload budget in under a minute.
+
+    @Test
+    fun theRingIsQuantisedToOneHundredAndTwentiethsBeforeItReachesTheMirror() {
+        val store = FakeKeyValueStore()
+        // 0.5041666 sits between two 1/120 steps; the mirror must carry the nearer step exactly.
+        WidgetMirrorWriter.write(store, today.copy(ringProgress = 0.5041666f), "UTC", FakePlatformFormat())
+        val written = WidgetMirrorWriter.read(store)!!.ringProgress
+        assertEquals(0.5f, written)
+        assertTrue(abs(round(written * 120f) - written * 120f) < 1e-4f, "not a multiple of 1/120: $written")
+    }
+
+    // One second of a three-hour gap moves raw `elapsed / total` by about 1/10800 — far below one
+    // 1/120 step — so the two snapshots must serialise to the identical string. That equality is
+    // exactly what `TodayViewModel` compares to decide whether to write and nudge at all.
+    @Test
+    fun oneSecondOfProgressAcrossATypicalPrayerGapSerialisesIdentically() {
+        val total = 3 * 60 * 60f
+        val atT = today.copy(ringProgress = 4000f / total)
+        val aSecondLater = today.copy(ringProgress = 4001f / total)
+        assertEquals(
+            WidgetMirrorWriter.serializedSnapshot(atT, "UTC", FakePlatformFormat()),
+            WidgetMirrorWriter.serializedSnapshot(aSecondLater, "UTC", FakePlatformFormat()),
+        )
+    }
+
+    // ...but a real move must still get through: quantising may never freeze the ring outright.
+    @Test
+    fun aFullStepOfProgressStillChangesTheSerialisedSnapshot() {
+        assertTrue(
+            WidgetMirrorWriter.serializedSnapshot(today.copy(ringProgress = 0.30f), "UTC", FakePlatformFormat()) !=
+                WidgetMirrorWriter.serializedSnapshot(today.copy(ringProgress = 0.32f), "UTC", FakePlatformFormat()),
+        )
     }
 
     @Test
