@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
+import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.PrayerSettings
 
@@ -34,6 +35,14 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         )
     }
 
+    val location: Flow<GeoLocation?> = store.data.map { p ->
+        val lat = p[SettingsKeys.LOCATION_LAT]
+        val lon = p[SettingsKeys.LOCATION_LON]
+        val tz = p[SettingsKeys.LOCATION_TZ]
+        if (lat == null || lon == null || tz == null) null
+        else GeoLocation(lat, lon, tz, p[SettingsKeys.LOCATION_CITY], p[SettingsKeys.LOCATION_COUNTRY])
+    }
+
     suspend fun setThemeMode(mode: ThemeMode) {
         store.edit { it[SettingsKeys.THEME] = mode.name }
     }
@@ -50,6 +59,16 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             it[SettingsKeys.HIJRI_OFFSET] = settings.hijriOffsetDays
             it[SettingsKeys.SHOW_SUNRISE] = settings.showSunrise
             it[SettingsKeys.REMIND_BEFORE] = settings.remindBeforeMinutes
+        }
+    }
+
+    suspend fun setLocation(location: GeoLocation) {
+        store.edit {
+            it[SettingsKeys.LOCATION_LAT] = location.latitude
+            it[SettingsKeys.LOCATION_LON] = location.longitude
+            it[SettingsKeys.LOCATION_TZ] = location.timeZoneId
+            location.cityName?.let { n -> it[SettingsKeys.LOCATION_CITY] = n }
+            location.countryCode?.let { c -> it[SettingsKeys.LOCATION_COUNTRY] = c }
         }
     }
 

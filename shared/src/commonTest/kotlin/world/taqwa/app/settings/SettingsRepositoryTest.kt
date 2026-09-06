@@ -7,6 +7,7 @@ import okio.Path.Companion.toPath
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
+import world.taqwa.app.domain.GeoLocation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -58,5 +59,19 @@ class SettingsRepositoryTest {
         // simulate a value written by a future version
         r.writeRawThemeForTest("PLAID")
         assertEquals(ThemeMode.SYSTEM, r.themeMode.first())
+    }
+
+    @Test
+    fun locationIsNullUntilOneIsChosen() = runTest {
+        assertEquals(null, repo("loc-empty").location.first())
+    }
+
+    @Test
+    fun locationRoundTripsIncludingTimezone() = runTest {
+        val r = repo("loc-roundtrip")
+        r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB"))
+        val got = r.location.first()!!
+        assertEquals("Europe/London", got.timeZoneId)
+        assertEquals("London", got.cityName)
     }
 }
