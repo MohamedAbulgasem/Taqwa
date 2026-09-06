@@ -121,7 +121,7 @@ Nothing is testable until both platforms build, so scaffolding is one task endin
 
 **Interfaces:**
 - Consumes: nothing
-- Produces: `App()` composable entry point; Gradle module `:composeApp`; version catalog aliases used by every later task
+- Produces: `App()` composable entry point; Gradle modules `:shared` and `:androidApp`; version catalog aliases used by every later task
 
 - [ ] **Step 1: Start from the JetBrains template and upgrade it**
 
@@ -322,7 +322,7 @@ Both must work before continuing. A broken iOS build discovered at Task 12 costs
 - [ ] **Step 8: Commit**
 
 ```bash
-git add gradle settings.gradle.kts build.gradle.kts gradle.properties gradlew gradlew.bat composeApp iosApp
+git add gradle settings.gradle.kts build.gradle.kts gradle.properties gradlew gradlew.bat shared androidApp iosApp
 git commit -m "feat: KMP + Compose Multiplatform scaffold building on Android and iOS"
 ```
 
