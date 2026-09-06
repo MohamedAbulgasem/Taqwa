@@ -16,6 +16,7 @@ import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerTime
+import kotlin.math.sign
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
@@ -32,11 +33,31 @@ class PrayerTimesEngine {
             highLatitudeRule = effectiveRule.toAdhan(),
         )
 
-        val computed = PrayerTimes(
-            coordinates = Coordinates(location.latitude, location.longitude),
-            dateComponents = DateComponents(date.year, date.monthNumber, date.dayOfMonth),
-            calculationParameters = params,
-        )
+        val dateComponents = DateComponents(date.year, date.monthNumber, date.dayOfMonth)
+
+        // adhan2 0.0.7's PrayerTimes throws IllegalStateException outright on a true polar
+        // day/night (no astronomical sunrise or sunset that date) — verified by decompiling the
+        // resolved artifact (see task-5-report.md): the null-check on raw solar components at
+        // PrayerTimes.kt:~168 runs before any HighLatitudeRule seasonal adjustment is applied, so
+        // no HighLatitudeRule choice avoids it. Rather than let that crash reach the UI, fall back
+        // to computing at the nearest latitude where a real sunrise/sunset exists (the same
+        // latitude magnitude used as the automatic seventh-of-the-night threshold), keeping the
+        // real longitude/date/method — the "nearest latitude" convention used by other prayer-time
+        // implementations for the same edge case.
+        val computed = try {
+            PrayerTimes(
+                coordinates = Coordinates(location.latitude, location.longitude),
+                dateComponents = dateComponents,
+                calculationParameters = params,
+            )
+        } catch (_: IllegalStateException) {
+            val clampedLatitude = HighLatitudeSelector.NEAREST_LATITUDE_FALLBACK * location.latitude.sign
+            PrayerTimes(
+                coordinates = Coordinates(clampedLatitude, location.longitude),
+                dateComponents = dateComponents,
+                calculationParameters = params,
+            )
+        }
 
         fun adjusted(p: Prayer, base: Instant) =
             PrayerTime(p, base + (settings.minuteAdjustments[p] ?: 0).minutes)

@@ -80,4 +80,15 @@ class PrayerTimesEngineTest {
         val d = engine.timesFor(auckland, LocalDate(2026, 1, 15), PrayerSettings())
         assertEquals(d.times.map { it.instant }.sorted(), d.times.map { it.instant })
     }
+
+    @Test
+    fun tromsoInJuneStillProducesOrderedTimesAndReportsItsRule() {
+        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
+        val d = engine.timesFor(tromso, LocalDate(2026, 6, 21), PrayerSettings())
+        assertEquals(d.times.map { it.instant }.sorted(), d.times.map { it.instant })
+        assertEquals(
+            world.taqwa.app.domain.HighLatitudePreference.TWILIGHT_ANGLE,
+            d.highLatitudeRuleApplied,
+        )
+    }
 }
