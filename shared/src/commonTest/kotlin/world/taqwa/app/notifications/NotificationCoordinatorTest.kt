@@ -25,8 +25,10 @@ class NotificationCoordinatorTest {
     private val london = GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB")
     private val now = Instant.parse("2026-09-06T00:30:00Z")
 
+    // DataStore's OkioStorage requires an absolute path — see SettingsRepositoryTest for why
+    // "/tmp" (rather than the brief's relative "build/...") is used here too.
     private fun repo(name: String) = SettingsRepository(
-        PreferenceDataStoreFactory.createWithPath { "build/test-coordinator-$name.preferences_pb".toPath() }
+        PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-test-coordinator-$name.preferences_pb".toPath() }
     )
 
     @Test
