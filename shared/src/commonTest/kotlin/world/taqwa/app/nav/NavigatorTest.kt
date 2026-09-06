@@ -33,9 +33,9 @@ class NavigatorTest {
     @Test
     fun selectingATabLandsOnItsRootWithNothingBehindIt() {
         val n = Navigator(Screen.Today)
-        n.selectTab(Tab.QIBLA)
-        assertEquals(Screen.Qibla, n.current)
-        assertEquals(Tab.QIBLA, n.currentTab)
+        n.selectTab(Tab.SETTINGS)
+        assertEquals(Screen.Settings, n.current)
+        assertEquals(Tab.SETTINGS, n.currentTab)
         assertEquals(1, n.backStack.value.size)
         assertFalse(n.pop())
     }
@@ -60,14 +60,14 @@ class NavigatorTest {
         n.selectTab(Tab.SETTINGS)
         n.push(Screen.LocationSettings)
         n.push(Screen.CitySearch)
-        n.selectTab(Tab.TODAY)
+        n.selectTab(Tab.PRAYER)
         assertEquals(Screen.Today, n.current)
         assertEquals(listOf<Screen>(Screen.Today), n.backStack.value)
     }
 
     @Test
-    fun exactlyThreeScreensAreTabRoots() {
-        val roots = listOf(Screen.Today, Screen.Qibla, Screen.Settings)
+    fun exactlyTwoScreensAreTabRoots() {
+        val roots = listOf(Screen.Today, Screen.Settings)
         roots.forEach { assertTrue(isTabRoot(it), "$it should be a tab root") }
         listOf(
             Screen.Onboarding,
@@ -80,6 +80,8 @@ class NavigatorTest {
             Screen.CitySearch,
             Screen.Appearance,
             Screen.Attribution,
+            // Iteration 8: the compass is pushed from the Prayer screen's Qibla card.
+            Screen.Qibla,
         ).forEach { assertFalse(isTabRoot(it), "$it should not be a tab root") }
         assertEquals(roots, Tab.entries.map { it.root })
     }

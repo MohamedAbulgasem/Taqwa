@@ -106,9 +106,12 @@ internal fun SettingsScaffold(
     }
 }
 
-/** Sub-screens only; the settings root is a tab root and has nothing above it. */
+/**
+ * Pushed screens only; a tab root has nothing above it. Shared with the Qibla screen, which is
+ * pushed from the Prayer screen's card and needs the same way back.
+ */
 @Composable
-private fun BackChevron(onBack: () -> Unit) {
+internal fun BackChevron(onBack: () -> Unit) {
     val colors = LocalTaqwaColors.current
     Box(
         Modifier

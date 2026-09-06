@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import world.taqwa.app.design.LocalTaqwaColors
@@ -54,10 +55,16 @@ private val RailInset = 22.dp
  * into a `Canvas` with literal coordinates needs help, and this file draws none.
  */
 @Composable
-fun PrayerTimeline(rows: List<TimelineRow>, formatTime: (TimelineRow) -> String) {
+fun PrayerTimeline(
+    rows: List<TimelineRow>,
+    // 24 dp was the page gutter when the timeline sat on the page; inside a card it is the
+    // card's own inset, and the card already carries the gutter.
+    horizontalPadding: Dp = 24.dp,
+    formatTime: (TimelineRow) -> String,
+) {
     val colors = LocalTaqwaColors.current
     val arabicAlone = isRtlLocale()
-    Box(Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+    Box(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding)) {
         // The rail is drawn behind the pips. matchParentSize takes its height from the column of
         // rows, so this stays correct however many prayers are visible.
         Box(

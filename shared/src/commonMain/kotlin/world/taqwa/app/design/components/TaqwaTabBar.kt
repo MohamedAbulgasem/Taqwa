@@ -25,25 +25,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.nav.Tab
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.tab_qibla
+import world.taqwa.app.resources.tab_prayer
 import world.taqwa.app.resources.tab_settings
-import world.taqwa.app.resources.tab_today
 
 /**
  * [content] with the tab bar beneath it when [current] names a tab root, and [content] alone —
@@ -72,14 +72,13 @@ private val IconSize = 16.dp
 private val BarHeight = 56.dp
 
 /**
- * Today · Qibla · Settings, as the mockup draws them: a hairline top border, the page background
+ * Prayer · Settings, as the mockup draws them: a hairline top border, the page background
  * beneath it (not a raised surface — the bar is the page's own edge, not a card), a 16 dp line
  * icon over a small semibold label, active in accent and inactive in tertiary.
  *
  * Nothing mirrors by hand. The items sit in a `Row`, which resolves against
- * `LocalLayoutDirection`, so under Arabic they run Today · Qibla · Settings from the right. The
- * one exception is the ring mark's arc, drawn from literal angles into a `Canvas` — it follows
- * `CountdownRing`'s rule and sweeps the other way, because an Arabic reader's clock hand does.
+ * `LocalLayoutDirection`, so under Arabic they run from the right; both glyphs are symmetric, so
+ * the `Canvas` needs no help either.
  */
 @Composable
 fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Modifier) {
@@ -105,7 +104,6 @@ fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Mod
 private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val tint = if (selected) colors.accent else colors.textTertiary
-    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     Column(
         // No ripple: a tab switch repaints the whole screen, which is feedback enough, and a
         // grey rectangle flashing across a third of the bar is louder than anything else here.
@@ -119,17 +117,15 @@ private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) 
     ) {
         Canvas(Modifier.size(IconSize)) {
             when (tab) {
-                Tab.TODAY -> drawRingMark(tint, colors.hairline, rtl)
-                Tab.QIBLA -> drawCompass(tint)
-                Tab.SETTINGS -> drawSliders(tint)
+                Tab.PRAYER -> drawMihrab(tint)
+                Tab.SETTINGS -> drawGear(tint)
             }
         }
         Spacer(Modifier.height(4.dp))
         Text(
             stringResource(
                 when (tab) {
-                    Tab.TODAY -> Res.string.tab_today
-                    Tab.QIBLA -> Res.string.tab_qibla
+                    Tab.PRAYER -> Res.string.tab_prayer
                     Tab.SETTINGS -> Res.string.tab_settings
                 },
             ),
@@ -142,55 +138,42 @@ private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) 
     }
 }
 
-/**
- * The app's mark, the same one onboarding shows at 88 dp: a hairline ring with a short arc off
- * the top. The arc carries the tint, so the mark lights amber when Today is the current tab and
- * goes quiet when it is not — the ring behind it stays hairline in both states, which is what
- * keeps a 16 dp circle legible as a circle.
- */
-private fun DrawScope.drawRingMark(tint: Color, ring: Color, rtl: Boolean) {
-    val stroke = size.width * 0.13f
-    drawCircle(color = ring, radius = (size.minDimension - stroke) / 2f, style = Stroke(stroke))
-    drawArc(
-        color = tint,
-        startAngle = -90f,
-        sweepAngle = if (rtl) -108f else 108f,
-        useCenter = false,
-        topLeft = Offset(stroke / 2f, stroke / 2f),
-        size = Size(size.width - stroke, size.height - stroke),
-        style = Stroke(width = stroke, cap = StrokeCap.Round),
-    )
-}
+/** Line weight of every glyph here: the mockup's 1.4 px in a 16 px box. */
+private fun DrawScope.glyphStroke() = Stroke(width = size.width * 0.0875f, cap = StrokeCap.Round, join = StrokeJoin.Round)
 
 /**
- * A ring with a needle — the glyph Today's header used for the qibla button before qibla became
- * a tab. Line work only, to match [CheckMark].
+ * The app's own mark, the one onboarding draws at 116 dp: a prayer niche open at the foot, with
+ * the dot near its crown. The same 1024-unit geometry as `MihrabMark`, scaled to 16. The dot
+ * takes the tint too — an amber dot on a grey arch would keep the inactive tab lit.
  */
-internal fun DrawScope.drawCompass(tint: Color) {
-    val w = size.width
-    drawCircle(color = tint, radius = w * 0.46f, style = Stroke(width = w * 0.09f))
-    // A rhombus along the north-east diagonal: tip, one flank, tail, the other flank.
-    val needle = Path().apply {
-        moveTo(w * 0.712f, w * 0.288f)
-        lineTo(w * 0.575f, w * 0.575f)
-        lineTo(w * 0.288f, w * 0.712f)
-        lineTo(w * 0.425f, w * 0.425f)
-        close()
+private fun DrawScope.drawMihrab(tint: Color) {
+    val u = size.width / 16f
+    val arch = Path().apply {
+        moveTo(4.56f * u, 12.6f * u)
+        lineTo(4.56f * u, 8.13f * u)
+        cubicTo(4.56f * u, 5.81f * u, 5.94f * u, 4.19f * u, 8f * u, 3.38f * u)
+        cubicTo(10.06f * u, 4.19f * u, 11.44f * u, 5.81f * u, 11.44f * u, 8.13f * u)
+        lineTo(11.44f * u, 12.6f * u)
     }
-    drawPath(needle, tint)
+    drawPath(arch, tint, style = glyphStroke())
+    drawCircle(tint, radius = 0.95f * u, center = Offset(8f * u, 6.3f * u))
 }
 
-/** Three sliders — the settings glyph, and less fussy than a gear at this size. */
-internal fun DrawScope.drawSliders(tint: Color) {
-    val w = size.width
-    listOf(0.24f to 0.66f, 0.5f to 0.34f, 0.76f to 0.58f).forEach { (y, knob) ->
+/** A gear: hub, rim, eight teeth. Reads as "settings" with or without its label. */
+private fun DrawScope.drawGear(tint: Color) {
+    val u = size.width / 16f
+    val c = Offset(8f * u, 8f * u)
+    drawCircle(tint, radius = 2.1f * u, center = c, style = glyphStroke())
+    drawCircle(tint, radius = 4.6f * u, center = c, style = glyphStroke())
+    repeat(8) { i ->
+        val a = i * (PI / 4)
+        val (dx, dy) = cos(a).toFloat() to sin(a).toFloat()
         drawLine(
             color = tint,
-            start = Offset(w * 0.1f, w * y),
-            end = Offset(w * 0.9f, w * y),
-            strokeWidth = w * 0.09f,
+            start = Offset(c.x + dx * 4.5f * u, c.y + dy * 4.5f * u),
+            end = Offset(c.x + dx * 6.4f * u, c.y + dy * 6.4f * u),
+            strokeWidth = size.width * 0.0875f,
             cap = StrokeCap.Round,
         )
-        drawCircle(color = tint, radius = w * 0.13f, center = Offset(w * knob, w * y))
     }
 }

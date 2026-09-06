@@ -1,5 +1,11 @@
 package world.taqwa.app.i18n
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
+import platform.Foundation.NSCalendar
+import platform.Foundation.NSCalendarIdentifierGregorian
+import platform.Foundation.NSDateComponents
+import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
 import platform.Foundation.NSLocaleCountryCode
 import platform.Foundation.NSNumber
@@ -43,7 +49,28 @@ private class IosPlatformFormat : PlatformFormat {
         }
     }
 
+    // Explicitly Gregorian on both the components and the formatter: a user who has switched
+    // their iPhone to the Umm al-Qura calendar would otherwise get a Hijri date here, next to the
+    // Hijri date the app already prints.
+    private val gregorian = NSCalendar.calendarWithIdentifier(NSCalendarIdentifierGregorian)
+    private val longDateFormatter = NSDateFormatter().apply {
+        setLocale(currentLocale)
+        gregorian?.let { setCalendar(it) }
+        setLocalizedDateFormatFromTemplate("dMMMMy")
+    }
+
     override fun languageTag(): String = tag
+
+    override fun longDate(date: LocalDate): String {
+        val components = NSDateComponents().apply {
+            setYear(date.year.toLong())
+            setMonth(date.month.number.toLong())
+            setDay(date.day.toLong())
+        }
+        val nsDate = gregorian?.dateFromComponents(components)
+            ?: return EnglishPlatformFormat.longDate(date)
+        return longDateFormatter.stringFromDate(nsDate)
+    }
 
     override fun localizedDigits(number: Int): String =
         plainFormatter.stringFromNumber(NSNumber(int = number)) ?: number.toString()

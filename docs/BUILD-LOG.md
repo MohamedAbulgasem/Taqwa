@@ -445,3 +445,29 @@ the 30-second opening both platforms allow), which is what the sheet's footnote 
 all along. Its subtitle now says "The adhan, first 30 seconds" instead of "Full call". Closing the
 sheet by any route stops whatever is playing, which mattered little for a 16-second takbir and
 matters a great deal for a two-and-a-half-minute adhan.
+
+### Iteration 8 — the Prayer screen
+
+The owner chose a layout from a four-way mockup: Today became **Prayer**, Qibla stopped being a
+tab and became a card at the foot of the Prayer screen, and the bar went to two tabs (Prayer,
+Settings) until the Quran slice adds the third. What changed:
+
+- **Header**: city, then one caption line with both calendars, Hijri first and the Gregorian a
+  step quieter: "23 Rabi' al-Awwal 1448 · 6 September 2026". The Gregorian half is a new
+  `PlatformFormat.longDate`, CLDR's long date in the locale's own order and digits ("September 6,
+  2026" on a US phone, "٦ سبتمبر ٢٠٢٦" on an Egyptian one), with the day never zero-padded. On
+  Android it is pure `java.time` rather than `android.text.format.DateFormat`, which is a stub in
+  JVM unit tests and threw from every test that reached `createPlatformFormat()`; on iOS the
+  formatter is pinned to the Gregorian calendar so a phone set to Umm al-Qura does not print a
+  second Hijri date.
+- **Timeline** in a card; the ring stays free on the page as the hero.
+- **Qibla card**: a 52 dp north-up dial (`QiblaMiniDial`, pure geometry, no sensor while the
+  Prayer screen is open), "Qibla", "23° · 6,558 km to Makkah", a forward chevron that mirrors
+  under Arabic. Tapping pushes the compass, which now has the same back chevron as every other
+  pushed screen; the no-location guard pops instead of switching tab.
+- **Tab glyphs**: the mihrab arch (the app's own mark from the welcome screen, scaled to 16 dp)
+  for Prayer and a gear for Settings. The three-dots glyph is reserved for a future "More" tab.
+
+Verified on the LoopPhone (en-ZA, dark), the Pixel 8 Pro emulator (en-US light and dark, ar-EG),
+including the padded-day case that only en-ZA style locales hit. 265 JVM / 256 iOS shared tests
+plus 37 / 35 widgetcore, zero failures.

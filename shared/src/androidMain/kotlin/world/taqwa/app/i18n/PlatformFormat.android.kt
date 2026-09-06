@@ -1,6 +1,13 @@
 package world.taqwa.app.i18n
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaLocalDate
 import java.text.NumberFormat
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DecimalStyle
+import java.time.format.FormatStyle
 import java.util.Locale
 
 private class AndroidPlatformFormat : PlatformFormat {
@@ -14,7 +21,26 @@ private class AndroidPlatformFormat : PlatformFormat {
         isGroupingUsed = false
     }
 
+    // CLDR's LONG date is "full month, day, year, no weekday" in the locale's own field order
+    // ("6 September 2026" for en-GB, "September 6, 2026" for en-US). Pure java.time rather than
+    // android.text.format.DateFormat, which is a stub under JVM unit tests and would throw from
+    // this constructor in every test that reaches createPlatformFormat(). A few locales (en-ZA,
+    // for one) pad the day in their long format — "06 September" — which is a sibling of the
+    // Hijri "23" here, so the pad is dropped; the skeleton form CLDR offers for this exact
+    // combination is unpadded in those locales anyway. The DecimalStyle makes the digits follow
+    // the same CLDR numbering rule as `clockTime`; DateTimeFormatter defaults to ASCII otherwise.
+    private val longDateFormatter: DateTimeFormatter = DateTimeFormatter
+        .ofPattern(
+            DateTimeFormatterBuilder
+                .getLocalizedDateTimePattern(FormatStyle.LONG, null, IsoChronology.INSTANCE, locale)
+                .replace("dd", "d"),
+            locale,
+        )
+        .withDecimalStyle(DecimalStyle.of(locale))
+
     override fun languageTag(): String = locale.toLanguageTag()
+
+    override fun longDate(date: LocalDate): String = longDateFormatter.format(date.toJavaLocalDate())
 
     override fun localizedDigits(number: Int): String = plainFormat.format(number)
 

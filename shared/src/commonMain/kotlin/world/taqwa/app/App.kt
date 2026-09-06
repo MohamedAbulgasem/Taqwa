@@ -169,10 +169,10 @@ fun App(container: AppContainer) {
                 val tab = tabOf(screen)
 
                 // Android's back button walks the same stack as the on-screen chevron, and then
-                // — the platform convention — falls back from any other tab root to Today. Only
-                // Today itself lets the gesture through to leave the app.
-                SystemBackHandler(enabled = backStack.size > 1 || (tab != null && tab != Tab.TODAY)) {
-                    if (!navigator.pop()) navigator.selectTab(Tab.TODAY)
+                // — the platform convention — falls back from any other tab root to Prayer. Only
+                // the Prayer screen itself lets the gesture through to leave the app.
+                SystemBackHandler(enabled = backStack.size > 1 || (tab != null && tab != Tab.PRAYER)) {
+                    if (!navigator.pop()) navigator.selectTab(Tab.PRAYER)
                 }
 
                 TaqwaTabScaffold(tab, navigator::selectTab) {
@@ -234,6 +234,7 @@ fun App(container: AppContainer) {
                                 state = state,
                                 onChooseCity = { navigator.push(Screen.CitySearch) },
                                 onAllowLocation = requestLocation,
+                                onOpenQibla = { navigator.push(Screen.Qibla) },
                             )
                         }
 
@@ -385,9 +386,9 @@ fun App(container: AppContainer) {
                         Screen.Qibla -> {
                             val loc = location
                             if (loc == null) {
-                                // Someone who declined location and never picked a city can
-                                // reach this tab; Today is where that question is asked.
-                                LaunchedEffect(Unit) { navigator.selectTab(Tab.TODAY) }
+                                // Only reachable from the Prayer screen's Qibla card, which needs
+                                // a location to exist; if it has gone in between, go back.
+                                LaunchedEffect(Unit) { navigator.pop() }
                             } else {
                                 val vm = remember(loc) {
                                     QiblaViewModel(
@@ -398,7 +399,7 @@ fun App(container: AppContainer) {
                                 }
                                 LaunchedEffect(vm) { vm.start(this) }
                                 val qiblaState by vm.state.collectAsState()
-                                QiblaScreen(qiblaState)
+                                QiblaScreen(qiblaState, onBack = { navigator.pop() })
                             }
                         }
                     }

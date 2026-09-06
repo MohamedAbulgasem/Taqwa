@@ -125,6 +125,18 @@ class TodayViewModelTest {
         assertTrue(ready.hijri.isNotBlank())
     }
 
+    // Iteration 8: the Prayer screen shows both calendars on one line and carries a Qibla card,
+    // so the state has to supply the Gregorian date in the location's zone and the geometry.
+    @Test
+    fun readyCarriesTheGregorianDateAndTheQiblaGeometry() = runTest {
+        val vm = todayViewModelForLondon("ready-extras", now = Instant.parse("2026-09-06T14:30:00Z"))
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertEquals("6 September 2026", ready.gregorian)
+        // London to Makkah: roughly 119 degrees and 4,700 km (spec §12 quotes 118.9°).
+        assertTrue(ready.qiblaBearingDegrees in 118.0..120.0, "bearing ${ready.qiblaBearingDegrees}")
+        assertTrue(ready.qiblaDistanceKm in 4_600.0..4_800.0, "distance ${ready.qiblaDistanceKm}")
+    }
+
     @Test
     fun tromsoSurfacesTheHighLatitudeNote() = runTest {
         val vm = todayViewModelForTromso("tromso-rule", Instant.parse("2026-06-21T12:00:00Z"))

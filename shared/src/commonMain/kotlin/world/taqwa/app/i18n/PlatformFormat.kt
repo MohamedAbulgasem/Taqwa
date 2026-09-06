@@ -1,6 +1,8 @@
 package world.taqwa.app.i18n
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 
 interface PlatformFormat {
     fun languageTag(): String
@@ -18,6 +20,17 @@ interface PlatformFormat {
      * "3:42" into "03:42".)
      */
     fun clockTime(hour: Int, minute: Int): String
+
+    /**
+     * A Gregorian calendar date with the month spelled out and no weekday, in the locale's own
+     * order and digits: "6 September 2026" in British English, "September 6, 2026" in American,
+     * "٦ سبتمبر ٢٠٢٦" in Egyptian Arabic. It sits beside the Hijri date on the Prayer screen,
+     * which is why it carries the full month name: the two dates read as a pair, and the Hijri
+     * month is never abbreviated.
+     *
+     * Defaulted so the test fakes, which never show a date, need not implement it.
+     */
+    fun longDate(date: LocalDate): String = EnglishPlatformFormat.longDate(date)
 }
 
 expect fun createPlatformFormat(): PlatformFormat
@@ -39,4 +52,12 @@ object EnglishPlatformFormat : PlatformFormat {
     override fun localizedDigits(number: Int): String = number.toString()
     override fun clockTime(hour: Int, minute: Int): String =
         "$hour:${minute.toString().padStart(2, '0')}"
+
+    override fun longDate(date: LocalDate): String =
+        "${date.day} ${GREGORIAN_MONTHS[date.month.number - 1]} ${date.year}"
 }
+
+private val GREGORIAN_MONTHS = listOf(
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+)

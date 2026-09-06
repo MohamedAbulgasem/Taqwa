@@ -2,7 +2,9 @@ package world.taqwa.app.feature.qibla
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.feature.settings.BackChevron
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.resources.Res
@@ -55,7 +58,7 @@ internal fun localizedGroupedKm(km: Double, format: PlatformFormat): String {
 }
 
 @Composable
-fun QiblaScreen(state: QiblaUiState, modifier: Modifier = Modifier) {
+fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
     val colors = LocalTaqwaColors.current
     Column(
         modifier
@@ -64,9 +67,9 @@ fun QiblaScreen(state: QiblaUiState, modifier: Modifier = Modifier) {
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // A tab root, so there is nowhere to go "back" to: the bar below is the way out. The
-        // 20 dp stands in for the height the back link used to give the title.
-        Spacer(Modifier.height(20.dp))
+        // Pushed from the Prayer screen's Qibla card (iteration 8), so it gets the same chevron
+        // every other pushed screen has, in the same place.
+        Box(Modifier.fillMaxWidth()) { BackChevron(onBack) }
         Text(stringResource(Res.string.qibla_title), style = TaqwaText.screenTitle, color = colors.textPrimary)
         Spacer(Modifier.height(4.dp))
         when (state) {

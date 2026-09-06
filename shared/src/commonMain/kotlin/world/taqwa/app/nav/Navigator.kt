@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * A list in a StateFlow is the whole requirement: three tab roots and a handful of pushed
+ * A list in a StateFlow is the whole requirement: a couple of tab roots and a handful of pushed
  * children. The tab bar arrived early, on the owner's call after seeing Today on a phone, but it
  * brings no per-tab history with it — [selectTab] replaces the stack rather than juggling three.
  */

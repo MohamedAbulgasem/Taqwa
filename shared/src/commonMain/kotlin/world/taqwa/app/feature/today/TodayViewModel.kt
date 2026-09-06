@@ -19,6 +19,7 @@ import world.taqwa.app.i18n.HighLatitudeCopy
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.prayer.TimelineBuilder
+import world.taqwa.app.qibla.QiblaMath
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.KeyValueStore
 import world.taqwa.app.widget.WidgetInputsMirror
@@ -33,8 +34,13 @@ sealed interface TodayUiState {
     data class Ready(
         val location: GeoLocation,
         val hijri: String,
+        /** The same day as [hijri], Gregorian, via [PlatformFormat.longDate]. */
+        val gregorian: String,
         val today: TodayState,
         val highLatitudeNote: String?,
+        /** For the Qibla card: pure geometry from the location, no sensor involved. */
+        val qiblaBearingDegrees: Double,
+        val qiblaDistanceKm: Double,
     ) : TodayUiState
 }
 
@@ -115,8 +121,11 @@ class TodayViewModel(
         _state.value = TodayUiState.Ready(
             location = location,
             hijri = HijriFormatter.format(hijri, format),
+            gregorian = format.longDate(localDate),
             today = timeline,
             highLatitudeNote = noteFor(today),
+            qiblaBearingDegrees = QiblaMath.bearing(location),
+            qiblaDistanceKm = QiblaMath.distanceKm(location),
         )
         // Serialise first, then compare: the store write and the widget nudge are both skipped
         // when this tick produced a mirror identical to the last one published.
