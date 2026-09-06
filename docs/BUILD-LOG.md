@@ -332,3 +332,26 @@ provisioning under **LOOPDL LIMITED (`5S5P2Q72MV`)** — the org team, because p
 hold the App Groups capability the widget needs and wildcard profiles never carry it — and installed
 and launched via `devicectl`. Both the app and the 2 MB widget extension are signed with
 `group.world.taqwa.app`. Slice 1 is now on both physical devices for hands-on testing.
+
+### Iteration 1 — after the owner's first hands-on test on both phones
+
+Ten items reported; all closed, plus one the work surfaced. **281 tests on JVM, 273 on iOS native,
+zero failures.** Reinstalled on both devices.
+
+| # | Report | What was actually wrong | Fix |
+|---|---|---|---|
+| 1 | Home screen felt empty | Tab bar had been deferred to slice 2 | Today · Qibla · Settings tab bar; header icons and back links removed on tab roots; bar shown only on roots |
+| 2 | Pip too close to name | 26dp gutter | +4dp spacer, rail stays centred |
+| 3 | Location toggle always off | Nothing persisted the GPS-vs-manual choice | `LocationSource` persisted; GPS paths write GPS, city picker writes MANUAL |
+| 4 | Value crowds label on iOS | `TaqwaRow` had no weight/ellipsis | Fixed in the component, so every row benefits |
+| 5 | "on both platforms" | Copy | "on this platform", both locales |
+| 6 | iOS check clipped on 4th picker option | One long sentence per row | Title + subtitle rows; check always visible |
+| 7 | Preview truncated under Asr | Five rows in a fixed height | Capped to Fajr/Dhuhr/Asr, intrinsic height |
+| 8 | Android widget stale, too much empty space | Glance only re-rendered every 30 min; launcher gave the small widget 2×3 | Refresh at prayer boundaries, a 5-minute window alarm (60 s window — Android stretched a 5-min window to ~10), refresh on unlock; responsive 2×2/2×3/4×2 layouts. Measured max staleness: 5 min |
+| 9 | Android compass frozen | **The phone's HAL streams a dead identity quaternion for `TYPE_ROTATION_VECTOR` at "HIGH" accuracy**; fallback only ran when the sensor was absent | Both sources register; accel+magnetometer drive until the rotation vector proves it encodes real rotation |
+| 10 | App icon | Template robot | The mihrab: adaptive vector layers + monochrome on Android, opaque 1024 on iOS |
+| — | (found) hand-picked city overwritten on next open | I3's foreground re-resolve ignored the manual choice | `LocationRefresher` respects `MANUAL` |
+
+Two facts for the owner's Android testing: the compass on this device needs a figure-of-eight
+first (its magnetometer reports LOW accuracy), and the home-screen widgets were removed by the
+agents' reinstall cycles — re-add them once.
