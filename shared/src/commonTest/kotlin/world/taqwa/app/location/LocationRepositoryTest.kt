@@ -1,7 +1,10 @@
 package world.taqwa.app.location
 
+import kotlinx.coroutines.test.runTest
+import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.GeoLocation
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -29,5 +32,45 @@ class LocationRepositoryTest {
     @Test
     fun theSamePointNeverTriggersRecomputation() {
         assertFalse(LocationRepository.shouldRecompute(london, 51.5074 to -0.1278))
+    }
+
+    private class FakeLocationProvider(
+        private val coordinates: Pair<Double, Double>?,
+    ) : LocationProvider {
+        override suspend fun permission(): LocationPermission = LocationPermission.GRANTED
+        override suspend fun requestPermission(): LocationPermission = LocationPermission.GRANTED
+        override suspend fun currentCoordinates(): Pair<Double, Double>? = coordinates
+    }
+
+    private val citiesCsv = """
+        name,region,country,countryCode,lat,lon,tz
+        London,England,United Kingdom,GB,51.50853,-0.12574,Europe/London
+        London,Ontario,Canada,CA,42.98339,-81.23304,America/Toronto
+        Cairo,Cairo Governorate,Egypt,EG,30.06263,31.24967,Africa/Cairo
+    """.trimIndent()
+
+    @Test
+    fun resolveGpsLocationKeepsExactCoordinatesButBorrowsNearestCityNameAndCode() = runTest {
+        // A GPS fix a short distance from central London, UK — not exactly on the bundled
+        // city's own coordinates, which is the point: the fix itself must be preserved exactly.
+        val fixLatitude = 51.5
+        val fixLongitude = -0.12
+        val repo = LocationRepository(FakeLocationProvider(fixLatitude to fixLongitude))
+        val cityRepository = CityRepository { citiesCsv }
+
+        val resolved = repo.resolveGpsLocation(cityRepository)
+
+        assertEquals(fixLatitude, resolved?.latitude)
+        assertEquals(fixLongitude, resolved?.longitude)
+        assertEquals("London", resolved?.cityName)
+        assertEquals("GB", resolved?.countryCode)
+    }
+
+    @Test
+    fun resolveGpsLocationReturnsNullWhenNoFixIsAvailable() = runTest {
+        val repo = LocationRepository(FakeLocationProvider(null))
+        val cityRepository = CityRepository { citiesCsv }
+
+        assertEquals(null, repo.resolveGpsLocation(cityRepository))
     }
 }
