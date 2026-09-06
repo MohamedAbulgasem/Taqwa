@@ -298,7 +298,7 @@ fun App(container: AppContainer) {
                         }
                         LaunchedEffect(vm) { vm.start(this) }
                         val qiblaState by vm.state.collectAsState()
-                        QiblaScreen(qiblaState)
+                        QiblaScreen(qiblaState, onBack = { navigator.pop() })
                     }
                 }
             }

@@ -1,17 +1,31 @@
 package world.taqwa.app.feature.qibla
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import world.taqwa.app.design.DarkColors
 import world.taqwa.app.design.LocalTaqwaColors
+import world.taqwa.app.design.manropeFamily
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -20,10 +34,33 @@ import kotlin.math.sin
 private fun Double.toRadians(): Double = this * PI / 180.0
 
 /**
- * The dial rotates under a needle that always points straight up — the same convention every
- * compass app uses — with the Kaaba marker fixed at [bearingDegrees] on the rim. [dimmed] is the
- * low-accuracy state: the whole dial fades to 28% and points at nothing, because "I don't know"
- * is the correct behaviour there.
+ * The mockup's 186px dial on its 250px phone is 74% of the screen's width; on a 420dp screen that
+ * is this box, which keeps the dial the same size relative to the screen as the mockup draws it.
+ */
+private val DialSize = 312.dp
+
+// Radii as fractions of the dial's outer radius, read off the mockup SVG (viewBox 186, centre 93).
+private const val OuterCircleR = 82f / 93f
+private const val TickRingR = 75f / 93f
+private const val MarkerR = 68f / 93f
+private const val CentreDotR = 3.5f / 93f
+private const val LabelR = 64.5f / 93f
+
+/** `stroke-dasharray="2 17.6"` around r=75 is 24 slots; this is the inked fraction of each. */
+private const val TickCount = 24
+private const val TickInkedFraction = 2f / 19.6f
+
+/** A cardinal letter this close to the Kaaba marker is dropped rather than drawn under it —
+ *  the mockup's aligned frame omits its N for exactly this reason. */
+private const val LabelClearanceDegrees = 20.0
+
+private val Cardinals = listOf("N" to 0.0, "E" to 90.0, "S" to 180.0, "W" to 270.0)
+
+/**
+ * The dial rotates under a needle that points at the Kaaba marker, with the marker fixed at
+ * [bearingDegrees] on the rim. [aligned] lights the outer rim amber; [dimmed] is the low-accuracy
+ * state, where the whole dial fades to 28% and drops the marker and the cardinals, because "I
+ * don't know" is the correct behaviour there.
  */
 @Composable
 fun QiblaDial(
@@ -34,51 +71,154 @@ fun QiblaDial(
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalTaqwaColors.current
-    Box(modifier.size(260.dp).alpha(if (dimmed) 0.28f else 1f)) {
-        Canvas(Modifier.size(260.dp)) {
-            val radius = size.minDimension / 2f
-            val center = Offset(size.width / 2f, size.height / 2f)
+    val measurer = rememberTextMeasurer()
+    val labelStyle = TextStyle(
+        fontFamily = manropeFamily(),
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 15.sp,
+        color = colors.textTertiary,
+    )
+    // The amber halo reads as a glow on a near-black ground; on the light ground it would read as
+    // a smudge, so it is pulled well back there. The ticks go the other way: the same alpha that
+    // lands on the mockup's tick grey over black is too faint over the light ground.
+    val dark = colors == DarkColors
+    val glow = if (dark) 1f else 0.35f
+    val tickAlpha = if (dark) 0.45f else 0.55f
 
-            for (tick in 0 until 12) {
-                val angle = ((tick * 30.0) - headingDegrees - 90.0).toRadians()
-                val outer = Offset(
-                    center.x + (radius - 4.dp.toPx()) * cos(angle).toFloat(),
-                    center.y + (radius - 4.dp.toPx()) * sin(angle).toFloat(),
-                )
-                val inner = Offset(
-                    center.x + (radius - 14.dp.toPx()) * cos(angle).toFloat(),
-                    center.y + (radius - 14.dp.toPx()) * sin(angle).toFloat(),
-                )
-                drawLine(colors.hairline, inner, outer, strokeWidth = 2.dp.toPx())
-            }
+    Canvas(modifier.size(DialSize).alpha(if (dimmed) 0.28f else 1f)) {
+        val r = size.minDimension / 2f
+        val centre = Offset(size.width / 2f, size.height / 2f)
 
-            val markerAngle = (bearingDegrees - headingDegrees - 90.0).toRadians()
-            val markerCenter = Offset(
-                center.x + (radius - 20.dp.toPx()) * cos(markerAngle).toFloat(),
-                center.y + (radius - 20.dp.toPx()) * sin(markerAngle).toFloat(),
-            )
+        // 1 — outer hairline, which becomes the lit rim when aligned.
+        if (aligned) {
+            haloCircle(colors.accent, r * OuterCircleR, 3.75.dp.toPx(), glow)
             drawCircle(
-                color = if (aligned) colors.accent else colors.textSecondary,
-                radius = 8.dp.toPx(),
-                center = markerCenter,
+                color = colors.accent.copy(alpha = 0.9f),
+                radius = r * OuterCircleR,
+                center = centre,
+                style = Stroke(width = 3.75.dp.toPx()),
+            )
+        } else {
+            drawCircle(
+                color = colors.hairline,
+                radius = r * OuterCircleR,
+                center = centre,
+                style = Stroke(width = 1.8.dp.toPx()),
+            )
+        }
+
+        // 2 — the 24 ticks: one dashed circle stroke, as the mockup's stroke-dasharray, not 24
+        // separate lines. The whole dial spins under the fixed needle.
+        rotate(degrees = -headingDegrees.toFloat(), pivot = centre) {
+            val ringRadius = r * TickRingR
+            val slot = (2f * PI.toFloat() * ringRadius) / TickCount
+            val inked = slot * TickInkedFraction
+            drawCircle(
+                color = if (aligned) {
+                    colors.accent.copy(alpha = 0.30f)
+                } else {
+                    colors.textTertiary.copy(alpha = tickAlpha)
+                },
+                radius = ringRadius,
+                center = centre,
+                style = Stroke(
+                    width = 7.5.dp.toPx(),
+                    cap = StrokeCap.Round,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(inked, slot - inked)),
+                ),
             )
 
-            drawLine(
-                color = colors.accent,
-                start = center,
-                end = Offset(center.x, center.y - radius + 30.dp.toPx()),
-                strokeWidth = 4.dp.toPx(),
-                cap = StrokeCap.Round,
-            )
-
-            if (aligned) {
-                drawCircle(
-                    color = colors.accent,
-                    radius = radius - 2.dp.toPx(),
-                    center = center,
-                    style = Stroke(width = 4.dp.toPx()),
-                )
+            // 3 — N/E/S/W ride the dial, so they tilt with it exactly as a physical card does.
+            if (!dimmed) {
+                Cardinals.forEach { (letter, onDial) ->
+                    if (angularGap(bearingDegrees, onDial) < LabelClearanceDegrees) return@forEach
+                    val a = (onDial - 90.0).toRadians()
+                    drawCardinal(measurer, letter, labelStyle, centre, r * LabelR, a)
+                }
             }
         }
+
+        // 4 — needle and marker share one angle: the needle points at the Kaaba, not at north.
+        val markerAngle = (bearingDegrees - headingDegrees - 90.0).toRadians()
+        val tip = Offset(
+            centre.x + r * MarkerR * cos(markerAngle).toFloat(),
+            centre.y + r * MarkerR * sin(markerAngle).toFloat(),
+        )
+        val needle = if (dimmed) colors.textSecondary else colors.accent
+        val needleWidth = (if (aligned) 3.9 else 3.3).dp.toPx()
+        if (!dimmed) haloLine(needle, centre, tip, needleWidth, glow)
+        drawLine(needle, centre, tip, strokeWidth = needleWidth, cap = StrokeCap.Round)
+
+        // 5 — centre pin.
+        drawCircle(color = needle, radius = r * CentreDotR, center = centre)
+
+        // 6 — the Kaaba: an amber rounded square with its dark band, sitting on the rim. It stays
+        // upright at every bearing, as in the mockup.
+        if (!dimmed) drawKaaba(colors.accent, tip)
     }
+}
+
+/** Compose has no CSS `drop-shadow`, so the halo is a few progressively wider, fainter passes. */
+private fun DrawScope.haloCircle(color: Color, radius: Float, width: Float, strength: Float) {
+    listOf(4.5f to 0.05f, 3f to 0.08f, 1.9f to 0.13f).forEach { (scale, alpha) ->
+        drawCircle(
+            color = color.copy(alpha = alpha * strength),
+            radius = radius,
+            center = center,
+            style = Stroke(width = width * scale),
+        )
+    }
+}
+
+private fun DrawScope.haloLine(color: Color, from: Offset, to: Offset, width: Float, strength: Float) {
+    listOf(4f to 0.06f, 2.5f to 0.10f, 1.7f to 0.15f).forEach { (scale, alpha) ->
+        drawLine(
+            color = color.copy(alpha = alpha * strength),
+            start = from,
+            end = to,
+            strokeWidth = width * scale,
+            cap = StrokeCap.Round,
+        )
+    }
+}
+
+private fun DrawScope.drawKaaba(accent: Color, at: Offset) {
+    val side = 24.dp.toPx()
+    val half = side / 2f
+    drawRoundRect(
+        color = accent,
+        topLeft = Offset(at.x - half, at.y - half),
+        size = Size(side, side),
+        cornerRadius = CornerRadius(5.25.dp.toPx()),
+    )
+    // The kiswah band: black rather than the background token, so it stays dark in both themes.
+    val bandHeight = 4.5.dp.toPx()
+    drawRect(
+        color = Color.Black.copy(alpha = 0.55f),
+        topLeft = Offset(at.x - half, at.y - 3.75.dp.toPx()),
+        size = Size(side, bandHeight),
+    )
+}
+
+private fun DrawScope.drawCardinal(
+    measurer: TextMeasurer,
+    letter: String,
+    style: TextStyle,
+    centre: Offset,
+    radius: Float,
+    angleRadians: Double,
+) {
+    val measured = measurer.measure(letter, style)
+    val x = centre.x + radius * cos(angleRadians).toFloat()
+    val y = centre.y + radius * sin(angleRadians).toFloat()
+    drawText(
+        textLayoutResult = measured,
+        topLeft = Offset(x - measured.size.width / 2f, y - measured.size.height / 2f),
+    )
+}
+
+/** Shortest distance between two compass angles, in degrees. */
+private fun angularGap(a: Double, b: Double): Double {
+    val d = abs((a - b) % 360.0)
+    return if (d > 180.0) 360.0 - d else d
 }
