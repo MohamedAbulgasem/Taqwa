@@ -1,20 +1,21 @@
-# Gradle / KMP
-build/
-.gradle/
-local.properties
-
-# IDE
-.idea/
-*.iml
-.kotlin/
-
-# Xcode
-xcuserdata/
-*.xcworkspace/xcuserdata/
-DerivedData/
-
-# macOS
-.DS_Store
 
 # Brainstorm companion
+# Gradle / KMP
+# IDE
+# Xcode
+# macOS
+*.iml
+*.xcworkspace/xcuserdata/
+.DS_Store
+.build-heartbeat
+.build-marker
+.gradle/
+.idea/
+.keepalive.sh
+.kotlin/
 .superpowers/
+DerivedData/
+build/
+local.properties
+xcuserdata/
+.claude/
