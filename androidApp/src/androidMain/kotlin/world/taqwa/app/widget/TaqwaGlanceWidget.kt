@@ -70,12 +70,12 @@ private fun WidgetPaletteColors.secondaryText() = Color(textArgb).copy(alpha = 0
 private fun WidgetPaletteColors.hairline() = Color(textArgb).copy(alpha = 0.14f)
 private fun WidgetPaletteColors.accent() = Color(accentArgb)
 
-/** "Asr" -> "ASR IN". Glance text has no letter-spacing, so uppercase + Medium weight + a small
- * size stands in for the mockup's tracked-caps label. The literal "IN" is hardcoded English: the
- * content builder only exposes the already-localized prayer name, not a separate translatable
- * "next prayer in" phrase, and adding one is out of scope for the Glance-only layer this task
- * owns (see report). */
-private fun nextPrayerLabel(content: WidgetContent) = "${content.nextPrayerDisplayName} in".uppercase()
+/** "Dhuhr in" -> "DHUHR IN" / "متبقٍ على الظهر" -> "متبقٍ على الظهر". Glance text has no
+ * letter-spacing, so uppercase + Medium weight + a small size stands in for the mockup's
+ * tracked-caps label. [WidgetContent.countdownLabel] is already the fully-localised "next prayer
+ * in" phrase (written by `WidgetMirrorWriter` in `shared`), so uppercasing it here is purely a
+ * Latin-script stylistic touch — `String.uppercase()` is a no-op on Arabic text. */
+private fun nextPrayerLabel(content: WidgetContent) = content.countdownLabel.uppercase()
 
 private fun countdownText(content: WidgetContent): String {
     val hours = content.countdownMinutes / 60
