@@ -13,4 +13,5 @@ sealed interface Screen {
     data object CitySearch : Screen
     data object Appearance : Screen
     data object Attribution : Screen
+    data object Qibla : Screen
 }

@@ -54,6 +54,10 @@ import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.today_current_location
+import world.taqwa.app.feature.qibla.QiblaScreen
+import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.qibla.createCompassSource
+import world.taqwa.app.qibla.createHaptics
 import kotlin.time.Clock
 
 @Composable
@@ -186,7 +190,7 @@ fun App(container: AppContainer) {
 
                         TodayScreen(
                             state = state,
-                            onOpenQibla = { /* Slice 1, plan 2 */ },
+                            onOpenQibla = { navigator.push(Screen.Qibla) },
                             onOpenSettings = { navigator.push(Screen.Settings) },
                             onChooseCity = { navigator.push(Screen.CitySearch) },
                             onAllowLocation = requestLocation,
@@ -308,6 +312,26 @@ fun App(container: AppContainer) {
                     )
 
                     Screen.Attribution -> AttributionScreen(onBack = { navigator.pop() })
+
+                    Screen.Qibla -> {
+                        val loc = location
+                        if (loc == null) {
+                            // Only reachable from Today, which already has a location; if we
+                            // somehow arrive without one, go back rather than show an empty dial.
+                            LaunchedEffect(Unit) { navigator.pop() }
+                        } else {
+                            val vm = remember(loc) {
+                                QiblaViewModel(
+                                    location = loc,
+                                    compassSource = createCompassSource(),
+                                    haptics = createHaptics(),
+                                )
+                            }
+                            LaunchedEffect(vm) { vm.start(this) }
+                            val qiblaState by vm.state.collectAsState()
+                            QiblaScreen(qiblaState, onBack = { navigator.pop() })
+                        }
+                    }
                 }
             }
         }
