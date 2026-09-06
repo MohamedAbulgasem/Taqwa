@@ -13,10 +13,12 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
-import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.hijri.HijriFormatter
 import world.taqwa.app.hijri.UmmAlQuraCalendar
+import world.taqwa.app.i18n.EnglishPlatformFormat
+import world.taqwa.app.i18n.HighLatitudeCopy
+import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.prayer.TimelineBuilder
 import world.taqwa.app.settings.SettingsRepository
@@ -38,6 +40,9 @@ class TodayViewModel(
     private val settings: SettingsRepository,
     private val locationOf: suspend () -> GeoLocation?,
     private val now: () -> Instant,
+    // The device's own formatter in the app; the locale-free English one by default, so these
+    // tests read the same on a machine whose system language is Arabic.
+    private val format: PlatformFormat = EnglishPlatformFormat,
 ) {
     private val _state = MutableStateFlow<TodayUiState>(TodayUiState.Loading)
     val state: StateFlow<TodayUiState> = _state.asStateFlow()
@@ -76,7 +81,7 @@ class TodayViewModel(
 
         _state.value = TodayUiState.Ready(
             location = location,
-            hijri = HijriFormatter.format(hijri),
+            hijri = HijriFormatter.format(hijri, format),
             today = TimelineBuilder.build(today, tomorrow, instant, prefs.showSunrise),
             highLatitudeNote = noteFor(today),
         )
@@ -84,34 +89,13 @@ class TodayViewModel(
 
     /**
      * Two distinct cases, and conflating them would be the silent fudging the spec exists to
-     * prevent. An ordinary seasonal adjustment substitutes only Fajr and Isha. True polar day or
-     * night means adhan2 could not compute the day at all, so EVERY time on screen — Maghrib
-     * included — came from a different latitude. The polar case therefore leads the sentence.
-     *
-     * It still names the Fajr/Isha rule afterwards, because that rule was selected from the
-     * user's real latitude and is what produced the two times they are most likely to question.
-     * Dropping it would leave a Nordic user unable to tell which substitution they are looking at.
+     * prevent. An ordinary seasonal adjustment substitutes only Fajr and Isha; true polar day or
+     * night means every time on screen came from a different latitude. Both sentences, in both
+     * languages, live in [HighLatitudeCopy] — this only decides which one applies.
      */
-    private fun noteFor(day: DayPrayerTimes): String? = when {
-        day.nearestLatitudeFallbackApplied -> buildString {
-            append("The sun does not rise or set here today. All times are calculated for the ")
-            append("nearest latitude where it does")
-            ruleName(day.highLatitudeRuleApplied)?.let { append(", with Fajr and Isha using $it") }
-            append(".")
-        }
-        day.highLatitudeRuleApplied == HighLatitudePreference.SEVENTH_OF_NIGHT ->
-            "The sun never sets far enough here. Fajr and Isha use the one-seventh rule."
-        day.highLatitudeRuleApplied == HighLatitudePreference.TWILIGHT_ANGLE ->
-            "The sun never sets far enough here. Fajr and Isha use the twilight angle rule."
-        day.highLatitudeRuleApplied != null ->
-            "Fajr and Isha use the middle of the night rule at this latitude."
-        else -> null
-    }
-
-    private fun ruleName(rule: HighLatitudePreference?): String? = when (rule) {
-        HighLatitudePreference.SEVENTH_OF_NIGHT -> "the one-seventh rule"
-        HighLatitudePreference.TWILIGHT_ANGLE -> "the twilight angle rule"
-        HighLatitudePreference.MIDDLE_OF_NIGHT -> "the middle of the night rule"
-        else -> null
-    }
+    private fun noteFor(day: DayPrayerTimes): String? = HighLatitudeCopy.note(
+        languageTag = format.languageTag(),
+        polarFallback = day.nearestLatitudeFallbackApplied,
+        rule = day.highLatitudeRuleApplied,
+    )
 }

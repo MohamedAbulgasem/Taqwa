@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import world.taqwa.app.design.LocalTaqwaColors
@@ -26,6 +28,10 @@ fun CountdownRing(
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalTaqwaColors.current
+    // `drawArc` takes literal angles, so this is one of the few things in the app that does not
+    // mirror itself with the layout direction. Time is read the way text is read: an Arabic
+    // reader's clock hand sweeps from the top towards the left, so the arc fills anticlockwise.
+    val sweepSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
     Box(modifier.size(196.dp), contentAlignment = Alignment.Center) {
         Canvas(Modifier.size(196.dp)) {
             val stroke = 9.dp.toPx()
@@ -43,7 +49,7 @@ fun CountdownRing(
             drawArc(
                 color = colors.ring,
                 startAngle = -90f,
-                sweepAngle = 360f * progress.coerceIn(0f, 1f),
+                sweepAngle = sweepSign * 360f * progress.coerceIn(0f, 1f),
                 useCenter = false,
                 topLeft = androidx.compose.ui.geometry.Offset(inset, inset),
                 size = arcSize,

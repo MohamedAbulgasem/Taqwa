@@ -6,8 +6,9 @@ import world.taqwa.app.domain.Prayer
 import kotlin.time.Instant
 
 /**
- * Supplies notification text. Task 26 replaces [EnglishNotificationCopy] with a localised
- * implementation; the planner never knows which it has.
+ * Supplies notification text. [LocalizedNotificationCopy] is what the app actually schedules
+ * with; [EnglishNotificationCopy] remains the planner's default so the pure planner tests need
+ * no locale. The planner never knows which it has.
  */
 interface NotificationCopy {
     fun title(prayer: Prayer, kind: NotificationKind): String
@@ -38,7 +39,11 @@ object EnglishNotificationCopy : NotificationCopy {
     }
 }
 
-/** A 24-hour HH:MM in the location's own zone. Task 27 replaces this with CLDR formatting. */
+/**
+ * A 24-hour HH:MM in the location's own zone, in Western digits. Only the planner's default —
+ * the app passes a CLDR-formatted `PlatformFormat.clockTime` through `NotificationCoordinator`,
+ * so a real notification carries the locale's own digit set.
+ */
 fun isoClockTime(instant: Instant, timeZoneId: String): String {
     val t = instant.toLocalDateTime(TimeZone.of(timeZoneId))
     return "${t.hour.toString().padStart(2, '0')}:${t.minute.toString().padStart(2, '0')}"

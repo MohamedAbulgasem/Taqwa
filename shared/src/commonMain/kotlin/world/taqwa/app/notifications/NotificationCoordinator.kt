@@ -1,7 +1,11 @@
 package world.taqwa.app.notifications
 
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.time.Duration.Companion.days
@@ -36,6 +40,10 @@ class NotificationCoordinator(
         val prayerSettings = settingsRepository.prayerSettings.first()
         val notificationSettings = settingsRepository.notificationSettings.first()
         val windowDays = NotificationPlanner.windowDaysFor(capacity, notificationSettings)
+        // Resolved here, at schedule time, rather than injected: a reschedule can be triggered
+        // from a boot receiver or a background task, where there is no composition to read a
+        // locale from and the device's own default is the only truth available.
+        val format = createPlatformFormat()
         val plan = NotificationPlanner.plan(
             location = location,
             settings = prayerSettings,
@@ -44,6 +52,8 @@ class NotificationCoordinator(
             from = now(),
             windowDays = windowDays,
             capacity = capacity,
+            copy = LocalizedNotificationCopy(format),
+            formatClockTime = { instant, tz -> localizedClockTime(instant, tz, format) },
         )
         // trigger is not branched on: every reason for waking up resolves to the same correct
         // plan for right now. It exists so callers and logs can say why a reschedule happened.
@@ -53,4 +63,9 @@ class NotificationCoordinator(
 
     fun needsTopUp(plan: List<ScheduledNotification>): Boolean =
         RescheduleDecider.needsTopUp(plan, now(), TOP_UP_HORIZON)
+
+    private fun localizedClockTime(instant: Instant, timeZoneId: String, format: PlatformFormat): String {
+        val t = instant.toLocalDateTime(TimeZone.of(timeZoneId))
+        return format.clockTime(t.hour, t.minute)
+    }
 }

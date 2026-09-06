@@ -5,16 +5,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
 import world.taqwa.app.design.components.TaqwaRow
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.appearance_note
+import world.taqwa.app.resources.appearance_theme_label
+import world.taqwa.app.resources.settings_appearance
+import world.taqwa.app.resources.theme_dark
+import world.taqwa.app.resources.theme_light
+import world.taqwa.app.resources.theme_system
 
-internal fun themeDisplayName(mode: ThemeMode): String = when (mode) {
-    ThemeMode.SYSTEM -> "System"
-    ThemeMode.LIGHT -> "Light"
-    ThemeMode.DARK -> "Dark"
-}
+@Composable
+internal fun themeDisplayName(mode: ThemeMode): String = stringResource(
+    when (mode) {
+        ThemeMode.SYSTEM -> Res.string.theme_system
+        ThemeMode.LIGHT -> Res.string.theme_light
+        ThemeMode.DARK -> Res.string.theme_dark
+    },
+)
 
 /**
  * Three rows rather than a segmented control: a row with a check reads correctly to a screen
@@ -26,8 +37,8 @@ fun AppearanceSettingsScreen(
     onPick: (ThemeMode) -> Unit,
     onBack: () -> Unit,
 ) {
-    SettingsScaffold("Appearance", onBack) {
-        SectionLabel("THEME")
+    SettingsScaffold(stringResource(Res.string.settings_appearance), onBack) {
+        SectionLabel(stringResource(Res.string.appearance_theme_label))
         SettingsCard {
             ThemeMode.entries.forEachIndexed { i, mode ->
                 if (i > 0) CardDivider()
@@ -39,6 +50,6 @@ fun AppearanceSettingsScreen(
             }
         }
         Spacer(Modifier.height(14.dp))
-        SettingsNote("System follows your device's light and dark setting.")
+        SettingsNote(stringResource(Res.string.appearance_note))
     }
 }

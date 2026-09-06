@@ -13,30 +13,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.RadioMark
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.soundDisplayName
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.sound_adhan_detail
+import world.taqwa.app.resources.sound_notification_detail
+import world.taqwa.app.resources.sound_sheet_footnote
+import world.taqwa.app.resources.sound_sheet_title
+import world.taqwa.app.resources.sound_silent_detail
+import world.taqwa.app.resources.sound_takbir_detail
 
-private fun displayName(sound: PrayerSound): String = when (sound) {
-    PrayerSound.SILENT -> "Silent"
-    PrayerSound.NOTIFICATION -> "Notification"
-    PrayerSound.TAKBIR -> "Takbir"
-    PrayerSound.ADHAN -> "Adhan"
-}
+/** The takbir's measured length, and the platform notification-sound cap, in whole seconds. */
+private const val TAKBIR_SECONDS = 16
+private const val SOUND_CAP_SECONDS = 30
 
 /**
  * The measured duration (`SoundAssets`) rounds to whole seconds for display — the spec's original
  * "~6s" assumed a plainly recited takbir; this recording's first complete "Allahu akbar, Allahu
  * akbar" pair actually runs 15.8s, so the subtitle says ~16s rather than repeat that assumption.
+ * The number itself goes through the locale's digits, like every other numeral in the app.
  */
-private fun subtitle(sound: PrayerSound): String = when (sound) {
-    PrayerSound.SILENT -> "Banner only, no sound"
-    PrayerSound.NOTIFICATION -> "Your phone's default tone"
-    PrayerSound.TAKBIR -> "Allahu akbar, Allahu akbar — ~16s"
-    PrayerSound.ADHAN -> "Full call, 30 seconds"
+@Composable
+private fun subtitle(sound: PrayerSound): String {
+    val format = LocalPlatformFormat.current
+    return when (sound) {
+        PrayerSound.SILENT -> stringResource(Res.string.sound_silent_detail)
+        PrayerSound.NOTIFICATION -> stringResource(Res.string.sound_notification_detail)
+        PrayerSound.TAKBIR ->
+            stringResource(Res.string.sound_takbir_detail, format.localizedDigits(TAKBIR_SECONDS))
+        PrayerSound.ADHAN ->
+            stringResource(Res.string.sound_adhan_detail, format.localizedDigits(SOUND_CAP_SECONDS))
+    }
 }
 
 /** A drawn triangle, matching `CheckMark`'s "never a text glyph for a control" rule. */
@@ -67,7 +81,11 @@ fun SoundSheet(
 ) {
     val colors = LocalTaqwaColors.current
     Column(Modifier.padding(horizontal = 24.dp)) {
-        Text("Notification sound", style = TaqwaText.screenTitle, color = colors.textPrimary)
+        Text(
+            stringResource(Res.string.sound_sheet_title),
+            style = TaqwaText.screenTitle,
+            color = colors.textPrimary,
+        )
         TaqwaCard(Modifier.padding(top = 16.dp)) {
             PrayerSound.entries.forEachIndexed { i, sound ->
                 if (i > 0) CardDivider()
@@ -79,7 +97,7 @@ fun SoundSheet(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text(displayName(sound), style = TaqwaText.rowLabel, color = colors.textPrimary)
+                        Text(soundDisplayName(sound), style = TaqwaText.rowLabel, color = colors.textPrimary)
                         Text(subtitle(sound), style = TaqwaText.caption, color = colors.textSecondary)
                     }
                     if (sound != PrayerSound.SILENT) {
@@ -94,8 +112,10 @@ fun SoundSheet(
             }
         }
         Text(
-            "Notification sounds are capped at 30 seconds on both platforms. The complete " +
-                "adhan can be played inside the app.",
+            stringResource(
+                Res.string.sound_sheet_footnote,
+                LocalPlatformFormat.current.localizedDigits(SOUND_CAP_SECONDS),
+            ),
             style = TaqwaText.caption,
             color = colors.textSecondary,
             modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),

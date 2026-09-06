@@ -29,6 +29,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
@@ -41,34 +42,38 @@ import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
-import world.taqwa.app.feature.today.englishName
 import world.taqwa.app.feature.today.formatClock
 import world.taqwa.app.hijri.HijriFormatter
 import world.taqwa.app.hijri.UmmAlQuraCalendar
+import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.highLatitudeDisplayName
+import world.taqwa.app.i18n.localizedPrayerName
+import world.taqwa.app.i18n.madhabDisplayName
+import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.prayer.HighLatitudeSelector
 import world.taqwa.app.prayer.PrayerTimesEngine
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.adjustments_many
+import world.taqwa.app.resources.adjustments_none
+import world.taqwa.app.resources.adjustments_one
+import world.taqwa.app.resources.high_lat_auto_note
+import world.taqwa.app.resources.high_lat_picker_note
+import world.taqwa.app.resources.hijri_day_after
+import world.taqwa.app.resources.hijri_day_before
+import world.taqwa.app.resources.hijri_umm_al_qura
+import world.taqwa.app.resources.manual_note
+import world.taqwa.app.resources.method_picker_note
+import world.taqwa.app.resources.prayer_times_high_latitude
+import world.taqwa.app.resources.prayer_times_hijri_label
+import world.taqwa.app.resources.prayer_times_madhab_label
+import world.taqwa.app.resources.prayer_times_manual
+import world.taqwa.app.resources.prayer_times_method
+import world.taqwa.app.resources.prayer_times_show_sunrise
+import world.taqwa.app.resources.settings_prayer_times
+import world.taqwa.app.resources.unit_minutes
 
-fun methodDisplayName(id: CalculationMethodId): String = when (id) {
-    CalculationMethodId.MUSLIM_WORLD_LEAGUE -> "Muslim World League"
-    CalculationMethodId.ISNA -> "ISNA (North America)"
-    CalculationMethodId.EGYPTIAN -> "Egyptian General Authority"
-    CalculationMethodId.UMM_AL_QURA -> "Umm al-Qura (Makkah)"
-    CalculationMethodId.KARACHI -> "University of Islamic Sciences, Karachi"
-    CalculationMethodId.TEHRAN -> "Institute of Geophysics, Tehran"
-    CalculationMethodId.DUBAI -> "Dubai"
-    CalculationMethodId.KUWAIT -> "Kuwait"
-    CalculationMethodId.QATAR -> "Qatar"
-    CalculationMethodId.SINGAPORE -> "Singapore"
-    CalculationMethodId.TURKEY -> "Diyanet (Türkiye)"
-    CalculationMethodId.MOONSIGHTING_COMMITTEE -> "Moonsighting Committee"
-}
-
-fun highLatitudeDisplayName(preference: HighLatitudePreference): String = when (preference) {
-    HighLatitudePreference.AUTOMATIC -> "Automatic"
-    HighLatitudePreference.MIDDLE_OF_NIGHT -> "Middle of the night"
-    HighLatitudePreference.SEVENTH_OF_NIGHT -> "One-seventh of the night"
-    HighLatitudePreference.TWILIGHT_ANGLE -> "Twilight angle"
-}
+/** Roughly where the sun stops dropping far enough below the horizon for a true Fajr and Isha. */
+private const val HIGH_LATITUDE_DEGREES = 48
 
 /**
  * Two segmented controls, three pushed pickers and a toggle. Every control writes through
@@ -85,39 +90,46 @@ fun PrayerTimesSettingsScreen(
     onOpenHighLatitudePicker: () -> Unit,
     onOpenManualAdjustments: () -> Unit,
 ) {
-    SettingsScaffold("Prayer times", onBack) {
+    SettingsScaffold(stringResource(Res.string.settings_prayer_times), onBack) {
         SettingsCard {
             TaqwaRow(
-                "Calculation method",
+                stringResource(Res.string.prayer_times_method),
                 value = methodDisplayName(settings.method),
                 onClick = onOpenMethodPicker,
             )
             CardDivider()
             TaqwaRow(
-                "High latitude rule",
+                stringResource(Res.string.prayer_times_high_latitude),
                 value = highLatitudeDisplayName(settings.highLatitude),
                 onClick = onOpenHighLatitudePicker,
             )
             CardDivider()
             TaqwaRow(
-                "Manual adjustments",
+                stringResource(Res.string.prayer_times_manual),
                 value = adjustmentsSummary(settings.minuteAdjustments),
                 onClick = onOpenManualAdjustments,
             )
         }
 
         Spacer(Modifier.height(28.dp))
-        SectionLabel("ASR MADHAB")
+        SectionLabel(stringResource(Res.string.prayer_times_madhab_label))
         SegmentedControl(
-            options = listOf(AsrMadhab.STANDARD to "Standard", AsrMadhab.HANAFI to "Hanafi"),
+            options = AsrMadhab.entries.map { it to madhabDisplayName(it) },
             selected = settings.madhab,
             onSelect = { onChange(settings.copy(madhab = it)) },
         )
 
         Spacer(Modifier.height(28.dp))
-        SectionLabel("HIJRI DATE")
+        SectionLabel(stringResource(Res.string.prayer_times_hijri_label))
+        // "A day earlier" rather than "−1 day": a signed numeral inside a segmented control is
+        // the one place a minus sign would have to be mirrored by hand under RTL, and the words
+        // say the same thing without the problem.
         SegmentedControl(
-            options = listOf(-1 to "−1 day", 0 to "Umm al-Qura", 1 to "+1 day"),
+            options = listOf(
+                -1 to stringResource(Res.string.hijri_day_before),
+                0 to stringResource(Res.string.hijri_umm_al_qura),
+                1 to stringResource(Res.string.hijri_day_after),
+            ),
             selected = settings.hijriOffsetDays.coerceIn(-1, 1),
             onSelect = { onChange(settings.copy(hijriOffsetDays = it)) },
         )
@@ -127,13 +139,14 @@ fun PrayerTimesSettingsScreen(
         SettingsNote(
             HijriFormatter.format(
                 UmmAlQuraCalendar.fromGregorian(today.plus(settings.hijriOffsetDays, DateTimeUnit.DAY)),
+                LocalPlatformFormat.current,
             ),
         )
 
         Spacer(Modifier.height(28.dp))
         SettingsCard {
             TaqwaRow(
-                "Show sunrise",
+                stringResource(Res.string.prayer_times_show_sunrise),
                 trailing = {
                     TaqwaToggle(settings.showSunrise) { onChange(settings.copy(showSunrise = it)) }
                 },
@@ -142,12 +155,16 @@ fun PrayerTimesSettingsScreen(
     }
 }
 
+@Composable
 private fun adjustmentsSummary(adjustments: Map<Prayer, Int>): String {
     val active = adjustments.count { it.value != 0 }
     return when (active) {
-        0 -> "None"
-        1 -> "1 prayer"
-        else -> "$active prayers"
+        0 -> stringResource(Res.string.adjustments_none)
+        1 -> stringResource(Res.string.adjustments_one)
+        else -> stringResource(
+            Res.string.adjustments_many,
+            LocalPlatformFormat.current.localizedDigits(active),
+        )
     }
 }
 
@@ -199,7 +216,7 @@ fun MethodPickerScreen(
     onPick: (CalculationMethodId) -> Unit,
     onBack: () -> Unit,
 ) {
-    SettingsScaffold("Calculation method", onBack) {
+    SettingsScaffold(stringResource(Res.string.prayer_times_method), onBack) {
         SettingsCard {
             CalculationMethodId.entries.forEachIndexed { i, id ->
                 if (i > 0) CardDivider()
@@ -211,10 +228,7 @@ fun MethodPickerScreen(
             }
         }
         Spacer(Modifier.height(14.dp))
-        SettingsNote(
-            "Authorities differ on how far below the horizon the sun must be for Fajr and Isha. " +
-                "Pick the one your local mosque follows.",
-        )
+        SettingsNote(stringResource(Res.string.method_picker_note))
     }
 }
 
@@ -225,7 +239,7 @@ fun HighLatitudePickerScreen(
     onPick: (HighLatitudePreference) -> Unit,
     onBack: () -> Unit,
 ) {
-    SettingsScaffold("High latitude rule", onBack) {
+    SettingsScaffold(stringResource(Res.string.prayer_times_high_latitude), onBack) {
         SettingsCard {
             HighLatitudePreference.entries.forEachIndexed { i, preference ->
                 if (i > 0) CardDivider()
@@ -240,11 +254,14 @@ fun HighLatitudePickerScreen(
         // "Automatic" on its own tells the user nothing, so name the rule it resolves to here.
         val note = if (current == HighLatitudePreference.AUTOMATIC) {
             val resolved = HighLatitudeSelector.select(current, latitude)
-            "At your latitude, automatic uses " +
-                highLatitudeDisplayName(resolved).lowercase() + "."
+            // `lowercase()` is a no-op on Arabic, which has no letter case — the sentence reads
+            // correctly there without a second template.
+            stringResource(Res.string.high_lat_auto_note, highLatitudeDisplayName(resolved).lowercase())
         } else {
-            "Above roughly 48 degrees the sun stops dropping far enough below the horizon for a " +
-                "true Fajr and Isha, so a substitution rule takes over."
+            stringResource(
+                Res.string.high_lat_picker_note,
+                LocalPlatformFormat.current.localizedDigits(HIGH_LATITUDE_DEGREES),
+            )
         }
         SettingsNote(note)
     }
@@ -266,14 +283,19 @@ fun ManualAdjustmentsScreen(
     val zone = location?.let { TimeZone.of(it.timeZoneId) }
     val times = location?.let { engine.timesFor(it, today, settings) }
 
-    SettingsScaffold("Manual adjustments", onBack) {
+    val format = LocalPlatformFormat.current
+    SettingsScaffold(stringResource(Res.string.prayer_times_manual), onBack) {
         SettingsCard {
             ObligatoryPrayers.forEachIndexed { i, prayer ->
                 if (i > 0) CardDivider()
                 val minutes = settings.minuteAdjustments[prayer] ?: 0
                 AdjustmentRow(
-                    label = englishName(prayer),
-                    clock = if (times != null && zone != null) formatClock(times.time(prayer), zone) else null,
+                    label = localizedPrayerName(prayer),
+                    clock = if (times != null && zone != null) {
+                        formatClock(times.time(prayer), zone, format)
+                    } else {
+                        null
+                    },
                     minutes = minutes,
                     onChange = { next ->
                         val updated = settings.minuteAdjustments.toMutableMap()
@@ -284,10 +306,7 @@ fun ManualAdjustmentsScreen(
             }
         }
         Spacer(Modifier.height(14.dp))
-        SettingsNote(
-            "Shifts each time by up to an hour, on top of the calculation method. Use it only " +
-                "when your mosque's timetable differs from the calculated time.",
-        )
+        SettingsNote(stringResource(Res.string.manual_note))
     }
 }
 
@@ -328,10 +347,21 @@ private fun AdjustmentRow(
     }
 }
 
-private fun formatOffset(minutes: Int): String = when {
-    minutes == 0 -> "0 min"
-    minutes > 0 -> "+$minutes min"
-    else -> "−${-minutes} min"
+/**
+ * The sign is a prefix on the numeral, not on the phrase, so under RTL the bidi algorithm keeps
+ * it glued to the digits it belongs to rather than flipping it to the far side of the unit.
+ */
+@Composable
+private fun formatOffset(minutes: Int): String {
+    val digits = LocalPlatformFormat.current.localizedDigits(
+        if (minutes < 0) -minutes else minutes,
+    )
+    val signed = when {
+        minutes == 0 -> digits
+        minutes > 0 -> "+$digits"
+        else -> "−$digits"
+    }
+    return stringResource(Res.string.unit_minutes, signed)
 }
 
 @Composable
