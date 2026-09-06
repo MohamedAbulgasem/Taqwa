@@ -1,12 +1,10 @@
 package world.taqwa.app.feature.today
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
@@ -71,15 +69,24 @@ class TodayViewModel(
      */
     private var lastWrittenMirror: String? = null
 
-    fun start(scope: CoroutineScope) {
-        scope.launch {
-            while (true) {
-                refresh()
-                // The timeline is time-dependent: a pip must fill and a row must dim the
-                // moment a prayer arrives, with no pull-to-refresh. The caller passes a scope
-                // tied to the composable, so this loop dies with the screen.
-                delay(1_000)
-            }
+    /**
+     * Runs the one-second tick until the calling coroutine is cancelled. No owned scope and no
+     * `launch` of its own: the caller (`repeatOnLifecycle(STARTED) { … }` in `App.kt`) is what
+     * ties this to the screen actually being on screen, not merely composed.
+     *
+     * `LaunchedEffect` alone was not enough — Android stops an activity (screen off, Home
+     * pressed) without destroying it, so the composable, and the effect, stayed alive and this
+     * loop kept writing the widget mirror once a minute for as long as the process lived.
+     * `repeatOnLifecycle` cancels the block on STOP and restarts it fresh on the next START,
+     * which is why the first thing this does on every (re)entry is an immediate [refresh] rather
+     * than waiting out the first second — the screen must be correct the instant it reappears.
+     */
+    suspend fun tickWhileActive() {
+        while (true) {
+            refresh()
+            // The timeline is time-dependent: a pip must fill and a row must dim the moment a
+            // prayer arrives, with no pull-to-refresh.
+            delay(1_000)
         }
     }
 
