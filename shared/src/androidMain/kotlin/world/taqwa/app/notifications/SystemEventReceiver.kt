@@ -6,18 +6,9 @@ import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
-import world.taqwa.app.city.CityRepository
-import world.taqwa.app.location.LocationRefresher
-import world.taqwa.app.location.LocationRepository
-import world.taqwa.app.location.createLocationProvider
-import world.taqwa.app.prayer.PrayerTimesEngine
-import world.taqwa.app.resources.Res
-import world.taqwa.app.settings.SettingsRepository
-import world.taqwa.app.settings.createDataStore
-import kotlin.time.Clock
+import world.taqwa.app.di.appContainer
 
 /**
  * `BOOT_COMPLETED`, `TIME_SET` and `TIMEZONE_CHANGED` all invalidate whatever is currently
@@ -40,24 +31,12 @@ class SystemEventReceiver : BroadcastReceiver() {
             // early leaves the store consistent; the next foreground reschedule will catch up.
             try {
                 withTimeout(WORK_BUDGET_MILLIS) {
-                    val settingsRepository = SettingsRepository(createDataStore())
-                    // A TIMEZONE_CHANGED broadcast is the strongest signal the app ever gets
-                    // that the user has moved, and it arrives whether or not the app is running,
-                    // so the receiver builds the same refresher the container does.
-                    val refresher = LocationRefresher(
-                        LocationRepository(createLocationProvider()),
-                        CityRepository { Res.readBytes("files/cities.csv").decodeToString() },
-                        settingsRepository,
-                    )
-                    val coordinator = NotificationCoordinator(
-                        engine = PrayerTimesEngine(),
-                        settingsRepository = settingsRepository,
-                        locationOf = { settingsRepository.location.first() },
-                        scheduler = createNotificationScheduler(),
-                        now = { Clock.System.now() },
-                        locationFor = { refresher.refreshFor(it) },
-                    )
-                    coordinator.reschedule(trigger)
+                    // Reuse the process-wide container rather than rebuilding a repository,
+                    // refresher and coordinator here: DataStore permits one instance per file
+                    // (createDataStore() already guarantees that), and one coordinator means one
+                    // plan. appContext is set in TaqwaApplication.onCreate, which always runs
+                    // before any receiver, so forcing the lazy container here is safe.
+                    appContainer.notificationCoordinator.reschedule(trigger)
                 }
             } catch (_: TimeoutCancellationException) {
                 // Nothing useful to do from a broadcast receiver but stop cleanly.
