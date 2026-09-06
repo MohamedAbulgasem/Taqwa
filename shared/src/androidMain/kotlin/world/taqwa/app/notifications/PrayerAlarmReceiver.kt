@@ -5,8 +5,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.widget.androidWidgetUpdateHook
 
 /** Set once from `TaqwaApplication` — `shared` cannot see androidApp's generated `R` class. */
 var notificationSmallIconResId: Int = android.R.drawable.ic_popup_reminder
@@ -37,5 +43,40 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         // to the same 32-bit hash used to overwrite each other's notification.
         val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
         NotificationManagerCompat.from(context).notify(notificationId, notification)
+
+        refreshWidgets(context)
+    }
+
+    /**
+     * The one instant in the day when the home-screen widget is guaranteed to be wrong.
+     *
+     * This alarm is already exact, and it fires precisely when "ASR IN 0:01" has to become
+     * "MAGHRIB IN 3:12" — the moment the widget's rolling five-minute refresh would be most
+     * visibly late. Riding along costs one extra redraw per prayer and needs no alarm of its own.
+     *
+     * `goAsync` rather than [world.taqwa.app.widget.refreshWidgets]: that helper is deliberately
+     * fire-and-forget on a process-lifetime scope, which is right for a running app but not here —
+     * a broadcast receiver's process may be reclaimed the moment `onReceive` returns, killing the
+     * redraw halfway. The budget is well inside `goAsync`'s own ten-second allowance.
+     *
+     * Nothing here may throw: this is the notification path, and a widget that failed to redraw
+     * must never cost the user their adhan.
+     */
+    private fun refreshWidgets(context: Context) {
+        val hook = androidWidgetUpdateHook ?: return
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                withTimeout(WIDGET_REFRESH_BUDGET_MILLIS) { runCatching { hook() } }
+            } catch (_: TimeoutCancellationException) {
+                // The half-hourly update and the next window alarm will both catch up.
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
+
+    private companion object {
+        const val WIDGET_REFRESH_BUDGET_MILLIS = 8_000L
     }
 }

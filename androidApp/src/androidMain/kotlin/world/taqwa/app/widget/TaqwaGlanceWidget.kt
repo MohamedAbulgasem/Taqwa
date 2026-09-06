@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -12,7 +14,9 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -71,9 +75,11 @@ private fun readWidgetRender(context: Context): WidgetRender {
     val systemIsDark = nightMode == Configuration.UI_MODE_NIGHT_YES
     return WidgetRender(
         content = snapshot?.let(WidgetContentBuilder::build),
-        // `provideGlance` runs on every re-render, including the half-hourly APPWIDGET_UPDATE that
-        // hands back the very same mirror — so this reads the clock as it is *now*, not as it was
-        // when the app last had the Today screen open.
+        // `provideGlance` runs on every re-render — the half-hourly APPWIDGET_UPDATE, the rolling
+        // five-minute window alarm, the prayer-boundary alarm and the unlock receiver all hand
+        // back the very same mirror — so this reads the clock as it is *now*, not as it was when
+        // the app last had the Today screen open. See `WidgetRefreshScheduler` for the cadence
+        // that makes "now" mean something.
         remainingMinutes = snapshot?.let {
             WidgetCountdown.remainingMinutesAt(it, System.currentTimeMillis() / 1_000L)
         },
@@ -94,6 +100,82 @@ private fun WidgetPaletteColors.primaryText() = Color(textArgb)
 private fun WidgetPaletteColors.secondaryText() = Color(textArgb).copy(alpha = 0.62f)
 private fun WidgetPaletteColors.hairline() = Color(textArgb).copy(alpha = 0.14f)
 private fun WidgetPaletteColors.accent() = Color(accentArgb)
+
+// -- Responsive sizing ------------------------------------------------------------------------
+// A launcher does not always give a widget the cell it asked for. This one declares 2x2 and was
+// handed 2x3 on the owner's phone, which left a fixed-size card marooned in a tall well of empty
+// space — "text in the middle and most of the rest is empty". Glance builds one layout per
+// declared size and picks the largest that fits, so declaring the three shapes these widgets are
+// actually placed at is what lets the type grow into the cell instead of floating in it.
+// Sizes follow the launcher's 70n-30dp cell formula.
+
+private val SMALL_2X2 = DpSize(110.dp, 110.dp)
+private val TALL_2X3 = DpSize(110.dp, 180.dp)
+private val MEDIUM_4X2 = DpSize(250.dp, 110.dp)
+
+private val TAQWA_WIDGET_SIZES = setOf(SMALL_2X2, TALL_2X3, MEDIUM_4X2)
+
+/**
+ * The mockup's proportions held constant while the absolute sizes move: the label stays the
+ * smallest thing on the card, the countdown stays the anchor at roughly three times it, and the
+ * clock time sits between the two.
+ */
+private class WidgetTypeScale(
+    val label: TextUnit,
+    val countdown: TextUnit,
+    val clock: TextUnit,
+    val labelGap: Dp,
+    val clockGap: Dp,
+    val cardPadding: Dp,
+)
+
+/**
+ * [LocalSize] under [SizeMode.Responsive] reports the *declared* size Glance chose rather than the
+ * raw cell, so this is a three-way match on known shapes rather than arithmetic on an arbitrary
+ * number.
+ *
+ * The countdown is capped by width, never by height. It reads "12:34" when the next prayer is most
+ * of a day away — about 2.5 em of digits and colon — so at 38 sp it needs ~95 dp inside a 110 dp
+ * card. Glance text clips rather than shrinking, so there is no room above that in a two-cell-wide
+ * card however tall it gets; the extra height goes into the label, the clock time and the gaps.
+ */
+private fun typeScaleFor(size: DpSize): WidgetTypeScale = when (size) {
+    // Two cells wide, three tall: take all the width allows and open the gaps up, so the card
+    // reads as a deliberately airy layout rather than a small label adrift in one.
+    TALL_2X3 -> WidgetTypeScale(
+        label = 13.sp, countdown = 38.sp, clock = 17.sp,
+        labelGap = 10.dp, clockGap = 8.dp, cardPadding = 12.dp,
+    )
+    // Four cells wide, two tall — the small widget stretched sideways. Width is no longer the
+    // constraint; height is.
+    MEDIUM_4X2 -> WidgetTypeScale(
+        label = 12.sp, countdown = 40.sp, clock = 15.sp,
+        labelGap = 5.dp, clockGap = 3.dp, cardPadding = 8.dp,
+    )
+    // The design's home ground, unchanged.
+    else -> WidgetTypeScale(
+        label = 11.sp, countdown = 34.sp, clock = 13.sp,
+        labelGap = 3.dp, clockGap = 2.dp, cardPadding = 6.dp,
+    )
+}
+
+/**
+ * The medium widget's countdown block lives in roughly a third of the card, so it is sized against
+ * that column rather than against the whole cell — [typeScaleFor]'s wide scale would clip a
+ * two-digit-hour countdown here. It still grows when the card is given extra height.
+ */
+private fun mediumBlockScaleFor(size: DpSize): WidgetTypeScale =
+    if (size.height >= TALL_2X3.height) {
+        WidgetTypeScale(
+            label = 12.sp, countdown = 32.sp, clock = 13.sp,
+            labelGap = 6.dp, clockGap = 4.dp, cardPadding = 4.dp,
+        )
+    } else {
+        WidgetTypeScale(
+            label = 10.sp, countdown = 28.sp, clock = 11.sp,
+            labelGap = 3.dp, clockGap = 2.dp, cardPadding = 4.dp,
+        )
+    }
 
 /** "Dhuhr in" -> "DHUHR IN" / "متبقٍ على الظهر" -> "متبقٍ على الظهر". Glance text has no
  * letter-spacing, so uppercase + Medium weight + a small size stands in for the mockup's
@@ -149,60 +231,73 @@ private fun NextPrayerBlock(
     remainingMinutes: Long?,
     colors: WidgetPaletteColors,
     languageTag: String,
-    labelSize: TextUnit,
-    countdownSize: TextUnit,
-    clockSize: TextUnit,
+    scale: WidgetTypeScale,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = if (content != null) nextPrayerLabel(content, remainingMinutes) else "TAQWA",
-            style = TextStyle(color = ColorProvider(colors.accent()), fontWeight = FontWeight.Medium, fontSize = labelSize),
+            style = TextStyle(color = ColorProvider(colors.accent()), fontWeight = FontWeight.Medium, fontSize = scale.label),
+            maxLines = 1,
         )
         if (content != null) {
             // Omitted entirely when the mirror is too stale to place the next prayer, rather than
             // shown as a number that was true hours ago (I8).
             if (remainingMinutes != null) {
-                Spacer(GlanceModifier.height(3.dp))
+                Spacer(GlanceModifier.height(scale.labelGap))
                 Text(
                     text = countdownText(remainingMinutes, languageTag),
-                    style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Normal, fontSize = countdownSize),
+                    style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Normal, fontSize = scale.countdown),
+                    maxLines = 1,
                 )
             }
-            Spacer(GlanceModifier.height(2.dp))
+            Spacer(GlanceModifier.height(scale.clockGap))
             Text(
                 text = content.nextClockTime,
-                style = TextStyle(color = ColorProvider(colors.secondaryText()), fontWeight = FontWeight.Normal, fontSize = clockSize),
+                style = TextStyle(color = ColorProvider(colors.secondaryText()), fontWeight = FontWeight.Normal, fontSize = scale.clock),
+                maxLines = 1,
             )
         }
     }
 }
 
 class TaqwaSmallGlanceWidget : GlanceAppWidget() {
+
+    override val sizeMode = SizeMode.Responsive(TAQWA_WIDGET_SIZES)
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val render = readWidgetRender(context)
         val colors = render.colors
         provideContent {
+            val scale = typeScaleFor(LocalSize.current)
             WidgetCard(colors) {
-                NextPrayerBlock(
-                    content = render.content,
-                    remainingMinutes = render.remainingMinutes,
-                    colors = colors,
-                    languageTag = render.languageTag,
-                    labelSize = 11.sp,
-                    countdownSize = 34.sp,
-                    clockSize = 13.sp,
-                )
+                Box(modifier = GlanceModifier.padding(scale.cardPadding)) {
+                    NextPrayerBlock(
+                        content = render.content,
+                        remainingMinutes = render.remainingMinutes,
+                        colors = colors,
+                        languageTag = render.languageTag,
+                        scale = scale,
+                    )
+                }
             }
         }
     }
 }
 
 class TaqwaMediumGlanceWidget : GlanceAppWidget() {
+
+    override val sizeMode = SizeMode.Responsive(TAQWA_WIDGET_SIZES)
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val render = readWidgetRender(context)
         val content = render.content
         val colors = render.colors
         provideContent {
+            val size = LocalSize.current
+            val scale = mediumBlockScaleFor(size)
+            // A taller card can afford a bigger prayer list; the five rows are what extra height
+            // is for here, the same way the countdown is what it is for on the small widget.
+            val rowSize = if (size.height >= TALL_2X3.height) 14.sp else 12.sp
             WidgetCard(colors) {
                 Row(
                     modifier = GlanceModifier.fillMaxSize().padding(4.dp),
@@ -214,9 +309,7 @@ class TaqwaMediumGlanceWidget : GlanceAppWidget() {
                             remainingMinutes = render.remainingMinutes,
                             colors = colors,
                             languageTag = render.languageTag,
-                            labelSize = 10.sp,
-                            countdownSize = 28.sp,
-                            clockSize = 11.sp,
+                            scale = scale,
                         )
                     }
                     Box(
@@ -246,12 +339,12 @@ class TaqwaMediumGlanceWidget : GlanceAppWidget() {
                                 Text(
                                     text = row.displayName,
                                     modifier = GlanceModifier.defaultWeight(),
-                                    style = TextStyle(color = rowColor, fontWeight = rowWeight, fontSize = 12.sp),
+                                    style = TextStyle(color = rowColor, fontWeight = rowWeight, fontSize = rowSize),
                                     maxLines = 1,
                                 )
                                 Text(
                                     text = row.clockTime,
-                                    style = TextStyle(color = rowColor, fontWeight = rowWeight, fontSize = 12.sp),
+                                    style = TextStyle(color = rowColor, fontWeight = rowWeight, fontSize = rowSize),
                                     maxLines = 1,
                                 )
                             }
