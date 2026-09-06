@@ -435,3 +435,13 @@ The chime generator, for the record (numpy, 44.1 kHz mono): each strike is the s
 ratios 1, 2, 2.98, 4.21, 5.4 with amplitudes 1, .40, .16, .07, .03 and decay constants .75, .38,
 .22, .14, .09 s, doubled at ±0.12 % detune, 6 ms attack; second strike 190 ms after the first at
 0.78 of its level; 250 ms fade at the tail; peak −3 dBFS. 295 JVM / 287 iOS tests.
+
+### Iteration 7 — softer chime, the complete adhan from the sheet
+
+The chime is now two soft strikes at A4 and E5, 260 ms apart, four partials with long decays,
+2.80 s at −5 dBFS: warmer and longer than the first. The sound sheet's play button for **Adhan**
+plays the complete 2:34 recording (`adhan-full.ogg` / `.m4a`, preview only; the notification stays
+the 30-second opening both platforms allow), which is what the sheet's footnote had been promising
+all along. Its subtitle now says "The adhan, first 30 seconds" instead of "Full call". Closing the
+sheet by any route stops whatever is playing, which mattered little for a 16-second takbir and
+matters a great deal for a two-and-a-half-minute adhan.

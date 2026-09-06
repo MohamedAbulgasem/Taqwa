@@ -17,6 +17,7 @@
 		A15B1E2D7E8F857B09C3FC37 /* TaqwaWidgetPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */; };
 		A1B2C3D4E5F6A1B2C3D4E502 /* takbir.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E512 /* chime.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E511 /* chime.caf */; };
+		A1B2C3D4E5F6A1B2C3D4E522 /* adhan-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E521 /* adhan-full.m4a */; };
 		A1B2C3D4E5F6A1B2C3D4E504 /* adhan-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */; };
 		A7CF8ECCACEB4FAB893423B5 /* TaqwaWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */; };
 		C7983528BFE48BBADC014C36 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D563877F07E6BEE4908C30A /* Foundation.framework */; };
@@ -66,6 +67,7 @@
 		8D563877F07E6BEE4908C30A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = takbir.caf; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E511 /* chime.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = chime.caf; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A1B2C3D4E521 /* adhan-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-full.m4a"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-30s.caf"; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		D5D50647620835E92DA37009 /* iosApp.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 			children = (
 				A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */,
 				A1B2C3D4E5F6A1B2C3D4E511 /* chime.caf */,
+				A1B2C3D4E5F6A1B2C3D4E521 /* adhan-full.m4a */,
 				A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */,
 			);
 			path = Resources;
@@ -260,6 +263,7 @@
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E502 /* takbir.caf in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E512 /* chime.caf in Resources */,
+				A1B2C3D4E5F6A1B2C3D4E522 /* adhan-full.m4a in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E504 /* adhan-30s.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

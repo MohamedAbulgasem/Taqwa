@@ -17,7 +17,7 @@ private class AndroidSoundPreviewPlayer : SoundPreviewPlayer {
         // nothing plays.
         if (sound == PrayerSound.SILENT) return
 
-        val name = SoundAssets.androidRawResourceName(sound)!!
+        val name = SoundAssets.androidPreviewRawResourceName(sound)!!
         val uri = Uri.parse("android.resource://${appContext.packageName}/raw/$name")
 
         mediaPlayer = MediaPlayer().apply {

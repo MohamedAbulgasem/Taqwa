@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +61,9 @@ fun NotificationSettingsScreen(
     onPickLead: (Int) -> Unit,
     onPickSound: (Prayer, PrayerSound) -> Unit,
     onPreviewSound: (PrayerSound) -> Unit,
+    /** Called whenever the sound sheet goes away, however it goes: the complete adhan previews
+     * for two and a half minutes, and it must not carry on under a closed sheet. */
+    onStopPreview: () -> Unit = {},
 ) {
     var soundSheetFor by remember { mutableStateOf<Prayer?>(null) }
     var remindSheetOpen by remember { mutableStateOf(false) }
@@ -127,6 +131,8 @@ fun NotificationSettingsScreen(
     }
 
     soundSheetFor?.let { prayer ->
+        // Covers every exit at once: swipe, scrim tap, a pick, back, and leaving the screen.
+        DisposableEffect(Unit) { onDispose { onStopPreview() } }
         ModalBottomSheet(onDismissRequest = { soundSheetFor = null }) {
             SoundSheet(
                 current = settings.soundFor(prayer),

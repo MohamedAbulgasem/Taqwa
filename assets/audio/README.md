@@ -22,9 +22,9 @@ A CC0-labelled adhan on Freesound (`sonically_sound/sounds/639494`) was rejected
 ## The chime (`chime.*`)
 
 Taqwa's own sound for the **Notification** level, so a prayer never sounds like a message
-arriving. Synthesised, not recorded: two bell strikes (E5 then B5, 190 ms apart), each five
-inharmonic partials with independent exponential decays and a hair of detune for warmth, 1.70 s,
-peak −3 dBFS. Original work, no third-party material, no licence conditions. Regenerate with the
+arriving. Synthesised, not recorded: two soft bell strikes (A4 then E5, 260 ms apart), each four
+inharmonic partials with long independent decays and a hair of detune for warmth, 2.80 s,
+peak −5 dBFS. Original work, no third-party material, no licence conditions. Regenerate with the
 snippet in `docs/BUILD-LOG.md` (iteration 6) or by ear; `.ogg` for Android, `.caf` (IMA4) for iOS.
 
 ## Derived clips
@@ -35,6 +35,7 @@ Cut on silence-detected phrase boundaries, not arbitrary timestamps, so no clip 
 |---|---|---|
 | `takbir.*` | One complete "Allahu akbar, Allahu akbar" pair | 15.80s |
 | `adhan-30s.*` | The full four-takbir opening sequence | 29.95s |
+| `adhan-full.*` | The complete recording, loudness-matched; **preview only** (the sound sheet's play button), never a notification sound. `.ogg` for Android, AAC `.m4a` for iOS | 154s |
 
 `.ogg` for Android, `.caf` (IMA4 ADPCM) for iOS. Mono 44.1 kHz, loudness-normalised to −16 LUFS with a −1.5 dBTP ceiling so neither clip is jarring at night.
 

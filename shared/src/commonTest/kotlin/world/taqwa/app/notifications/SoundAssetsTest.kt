@@ -19,7 +19,7 @@ class SoundAssetsTest {
     // Not the phone's default tone: a prayer must never sound like a message arriving.
     @Test
     fun notificationIsTaqwasOwnChime() {
-        assertEquals(1.70.seconds, SoundAssets.duration(PrayerSound.NOTIFICATION))
+        assertEquals(2.80.seconds, SoundAssets.duration(PrayerSound.NOTIFICATION))
         assertEquals("chime", SoundAssets.androidRawResourceName(PrayerSound.NOTIFICATION))
         assertEquals("chime.caf", SoundAssets.iosResourceFileName(PrayerSound.NOTIFICATION))
     }
@@ -50,5 +50,16 @@ class SoundAssetsTest {
         PrayerSound.entries.mapNotNull { SoundAssets.androidRawResourceName(it) }.forEach {
             assertTrue(!it.contains("-"), "'$it' would not compile as an Android resource name")
         }
+    }
+
+    // The notification is capped at 30 s, but the sheet says the complete adhan can be heard in
+    // the app; the play button is where that is true.
+    @Test
+    fun theSheetPreviewsTheCompleteAdhanAndTheClipForEverythingElse() {
+        assertEquals("adhan_full", SoundAssets.androidPreviewRawResourceName(PrayerSound.ADHAN))
+        assertEquals("adhan-full.m4a", SoundAssets.iosPreviewResourceFileName(PrayerSound.ADHAN))
+        assertEquals("takbir", SoundAssets.androidPreviewRawResourceName(PrayerSound.TAKBIR))
+        assertEquals("chime.caf", SoundAssets.iosPreviewResourceFileName(PrayerSound.NOTIFICATION))
+        assertNull(SoundAssets.androidPreviewRawResourceName(PrayerSound.SILENT))
     }
 }

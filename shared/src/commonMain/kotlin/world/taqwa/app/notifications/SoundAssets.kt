@@ -28,9 +28,25 @@ object SoundAssets {
         PrayerSound.ADHAN -> "adhan-30s.caf"
     }
 
+    /**
+     * What the sound sheet's play button plays. The notification itself is capped at 30 seconds
+     * on both platforms, so `ADHAN` there is the four-takbir opening; the sheet promises the
+     * complete adhan "inside the app", and this is where that promise is kept: the full 2:34
+     * recording, bundled once for each platform's preview player only.
+     */
+    fun androidPreviewRawResourceName(sound: PrayerSound): String? = when (sound) {
+        PrayerSound.ADHAN -> "adhan_full"
+        else -> androidRawResourceName(sound)
+    }
+
+    fun iosPreviewResourceFileName(sound: PrayerSound): String? = when (sound) {
+        PrayerSound.ADHAN -> "adhan-full.m4a"
+        else -> iosResourceFileName(sound)
+    }
+
     fun duration(sound: PrayerSound): Duration? = when (sound) {
         PrayerSound.SILENT -> null
-        PrayerSound.NOTIFICATION -> 1.70.seconds
+        PrayerSound.NOTIFICATION -> 2.80.seconds
         PrayerSound.TAKBIR -> 15.80.seconds
         PrayerSound.ADHAN -> 29.95.seconds
     }

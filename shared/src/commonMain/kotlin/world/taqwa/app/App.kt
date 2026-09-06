@@ -279,6 +279,7 @@ fun App(container: AppContainer) {
                                 }
                             },
                             onPreviewSound = { soundPreviewPlayer.play(it) },
+                            onStopPreview = { soundPreviewPlayer.stop() },
                         )
 
                         Screen.PrayerTimesSettings -> PrayerTimesSettingsScreen(

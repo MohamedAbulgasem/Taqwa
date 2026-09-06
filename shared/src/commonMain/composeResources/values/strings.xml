@@ -97,7 +97,7 @@
     <string name="sound_silent_detail">Banner only, no sound</string>
     <string name="sound_notification_detail">A short, soft chime</string>
     <string name="sound_takbir_detail">Allahu akbar, Allahu akbar, about %1$ss</string>
-    <string name="sound_adhan_detail">Full call, %1$s seconds</string>
+    <string name="sound_adhan_detail">The adhan, first %1$s seconds</string>
     <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on this platform. The complete adhan can be played inside the app.</string>
 
     <!-- Prayer time settings -->

@@ -31,7 +31,7 @@ private class IosSoundPreviewPlayer : SoundPreviewPlayer {
             // Nothing to audition; the button press itself is the reassurance.
             PrayerSound.SILENT -> return
             PrayerSound.NOTIFICATION, PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
-                val fileName = SoundAssets.iosResourceFileName(sound)!!
+                val fileName = SoundAssets.iosPreviewResourceFileName(sound)!!
                 val path = NSBundle.mainBundle.pathForResource(
                     fileName.substringBeforeLast('.'), fileName.substringAfterLast('.'),
                 ) ?: return
