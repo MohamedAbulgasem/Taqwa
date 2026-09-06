@@ -36,3 +36,16 @@ val DarkColors = TaqwaColors(
     accent = Color(0xFFF0B429),
     ring = Color(0xFFF0B429),
 )
+
+/**
+ * The stand-in wallpaper the widget preview in Appearance sits on — a flat, deliberately
+ * uninteresting neutral, not a photo, so the eye reads the widget card rather than the backdrop.
+ *
+ * It lives here rather than inline at the one call site for a greppable reason: `Palette.kt` and
+ * `widget/WidgetPalette.kt` are meant to be the only two files in the tree holding a colour
+ * literal, which is what keeps "the app uses amber and nothing else" a claim you can verify with
+ * a search instead of a reading. It is not part of [TaqwaColors] because it is not a theme role —
+ * it stands in for the user's wallpaper, which no theme controls, and so is the same in light and
+ * dark.
+ */
+val PreviewWallpaper = Color(0xFF9C8F73)

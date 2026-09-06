@@ -5,17 +5,40 @@ import world.taqwa.app.domain.Prayer
 /**
  * The flattened, serialisable snapshot the main app writes every time prayer times or settings
  * change, and both widget processes read. A plain delimited string, not JSON — neither widget
- * target needs a JSON dependency for seven fixed fields. [ringProgress] exists only for iOS's
+ * target needs a JSON dependency for eight fixed fields. [ringProgress] exists only for iOS's
  * lock-screen circular complication, which the spec asks to show as a ring, not just numbers.
+ * [countdownLabel] is the fully-formed, already-localised "next prayer in" phrase (e.g. "Dhuhr
+ * in" / "متبقٍ على الظهر") — written once here so neither widget target has to hardcode an
+ * English "in" suffix or reach into `shared`'s Compose resources itself.
  */
 data class WidgetSnapshot(
     val nextPrayer: Prayer,
+    /**
+     * The countdown as it stood **when the mirror was written**. Kept for wire compatibility with
+     * mirrors written before [nextPrayerEpochSeconds] existed, and as the value iOS's timeline
+     * extrapolates from; it must never be rendered verbatim, because the mirror is only written
+     * while the Today screen is open and can be hours old by the time a widget draws (I8).
+     */
     val countdownMinutes: Long,
     val nextClockTime: String,
     val allClockTimes: Map<Prayer, String>,
     val currentPrayer: Prayer?,
     val languageTag: String,
     val ringProgress: Float,
+    val countdownLabel: String,
+    /**
+     * When the next prayer actually falls, as epoch seconds — an absolute instant, so a widget can
+     * derive the countdown at *render* time from its own clock instead of trusting a number frozen
+     * at write time. `0` means "not recorded": a mirror written by a build from before this field
+     * existed, in which case no countdown can honestly be shown.
+     */
+    val nextPrayerEpochSeconds: Long = 0L,
+    /**
+     * When the *previous* obligatory prayer fell, as epoch seconds — the other end of the interval
+     * the ring fills. `0` means "not recorded", which also covers the genuine pre-Fajr case where
+     * no obligatory prayer has passed yet today.
+     */
+    val previousPrayerEpochSeconds: Long = 0L,
 )
 
 object WidgetInputsMirror {
@@ -28,6 +51,15 @@ object WidgetInputsMirror {
     private const val PAIR_SEP = ";"
     private const val KV_SEP = "="
 
+    /**
+     * The wire format has only ever grown, and always by appending. Seven fields is the original
+     * shape, eight added [WidgetSnapshot.countdownLabel], ten added the absolute prayer instants.
+     * [deserialize] therefore accepts *at least* the original seven and reads anything beyond that
+     * positionally, defaulting what is absent — a mirror left behind by an older build must keep
+     * rendering something rather than dropping the widget to its placeholder.
+     */
+    private const val MINIMUM_FIELD_COUNT = 7
+
     fun serialize(snapshot: WidgetSnapshot): String {
         val times = snapshot.allClockTimes.entries.joinToString(PAIR_SEP) { (p, t) -> "${p.name}$KV_SEP$t" }
         return listOf(
@@ -38,24 +70,41 @@ object WidgetInputsMirror {
             snapshot.currentPrayer?.name.orEmpty(),
             snapshot.languageTag,
             snapshot.ringProgress.toString(),
+            snapshot.countdownLabel,
+            snapshot.nextPrayerEpochSeconds.toString(),
+            snapshot.previousPrayerEpochSeconds.toString(),
         ).joinToString(FIELD_SEP)
     }
 
     fun deserialize(raw: String): WidgetSnapshot? {
         val parts = raw.split(FIELD_SEP)
-        if (parts.size != 7) return null
+        if (parts.size < MINIMUM_FIELD_COUNT) return null
         return try {
             WidgetSnapshot(
                 nextPrayer = Prayer.valueOf(parts[0]),
                 countdownMinutes = parts[1].toLong(),
                 nextClockTime = parts[2],
+                // Destructuring `pair.split(KV_SEP)` here would throw IndexOutOfBoundsException on
+                // a pair carrying no `=` at all, and that is not one of the exceptions caught
+                // below — a single corrupt byte in the mirror would take the whole widget process
+                // down instead of falling back to the placeholder. `substringBefore`/
+                // `substringAfter` cannot throw: a pair with no separator yields the whole string
+                // as the name (which `Prayer.valueOf` then rejects, giving a clean null snapshot)
+                // and an empty clock time.
                 allClockTimes = parts[3].split(PAIR_SEP).filter { it.isNotEmpty() }.associate { pair ->
-                    val (name, time) = pair.split(KV_SEP, limit = 2)
-                    Prayer.valueOf(name) to time
+                    Prayer.valueOf(pair.substringBefore(KV_SEP)) to pair.substringAfter(KV_SEP, "")
                 },
                 currentPrayer = parts[4].takeIf { it.isNotEmpty() }?.let { Prayer.valueOf(it) },
                 languageTag = parts[5],
                 ringProgress = parts[6].toFloat(),
+                // Absent on a pre-countdownLabel mirror; the empty string tells
+                // WidgetContentBuilder to fall back to the plain prayer name, no suffix.
+                countdownLabel = parts.getOrElse(7) { "" },
+                // Absent on any mirror written before I8. Zero is the "not recorded" sentinel that
+                // tells a widget it cannot derive a countdown and must show the prayer name alone
+                // rather than a stale number.
+                nextPrayerEpochSeconds = parts.getOrElse(8) { "" }.toLongOrNull() ?: 0L,
+                previousPrayerEpochSeconds = parts.getOrElse(9) { "" }.toLongOrNull() ?: 0L,
             )
         } catch (e: IllegalArgumentException) {
             null

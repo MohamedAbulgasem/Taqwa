@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import world.taqwa.app.design.PreviewWallpaper
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.widget.WidgetContent
@@ -38,7 +39,7 @@ fun WidgetPreview(
             .fillMaxWidth()
             .height(140.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(Color(0xFF9C8F73)) // a neutral wallpaper swatch, deliberately not a photo
+            .background(PreviewWallpaper)
             .padding(16.dp),
     ) {
         Row(

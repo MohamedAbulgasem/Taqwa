@@ -7,8 +7,11 @@ import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.PlatformFormat
+import kotlin.math.abs
+import kotlin.math.round
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
@@ -18,8 +21,8 @@ private class FakeKeyValueStore : KeyValueStore {
     override fun getString(key: String): String? = map[key]
 }
 
-private class FakePlatformFormat : PlatformFormat {
-    override fun languageTag() = "en-US"
+private class FakePlatformFormat(private val tag: String = "en-US") : PlatformFormat {
+    override fun languageTag() = tag
     override fun localizedDigits(number: Int) = number.toString()
     override fun clockTime(hour: Int, minute: Int) =
         "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
@@ -49,6 +52,99 @@ class WidgetMirrorWriterTest {
         assertEquals(Prayer.DHUHR, snapshot.currentPrayer)
         assertEquals(90L, snapshot.countdownMinutes)
         assertEquals(0.3f, snapshot.ringProgress)
+    }
+
+    // The exact phrase `Res.string.today_next_in` renders for Today's ring — "Asr in" in
+    // English, "متبقٍ على العصر" in Arabic — for the next prayer. This is what proves the mirror
+    // writes the localised sentence itself, never a hardcoded English suffix it composes on its
+    // own (that bug is this fix's whole reason to exist), and that it responds to the device's
+    // language rather than being pinned to one.
+    @Test
+    fun countdownLabelIsTheLocalisedNextPrayerInPhraseForTheNextPrayer() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat("en-US"))
+        assertEquals("Asr in", WidgetMirrorWriter.read(store)!!.countdownLabel)
+    }
+
+    @Test
+    fun countdownLabelSwitchesToArabicWithTheDeviceLanguage() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat("ar"))
+        assertEquals("متبقٍ على العصر", WidgetMirrorWriter.read(store)!!.countdownLabel)
+    }
+
+    // -- C5: the ring is the one field that used to change every second -----------------------
+    //
+    // Every other field here is minute-granular, so `ringProgress` alone made the serialised
+    // snapshot differ on all 60 of a minute's ticks — which is what defeated iOS's `lastSnapshot`
+    // dedupe and exhausted WidgetKit's daily reload budget in under a minute.
+
+    @Test
+    fun theRingIsQuantisedToOneHundredAndTwentiethsBeforeItReachesTheMirror() {
+        val store = FakeKeyValueStore()
+        // 0.5041666 sits between two 1/120 steps; the mirror must carry the nearer step exactly.
+        WidgetMirrorWriter.write(store, today.copy(ringProgress = 0.5041666f), "UTC", FakePlatformFormat())
+        val written = WidgetMirrorWriter.read(store)!!.ringProgress
+        assertEquals(0.5f, written)
+        assertTrue(abs(round(written * 120f) - written * 120f) < 1e-4f, "not a multiple of 1/120: $written")
+    }
+
+    // One second of a three-hour gap moves raw `elapsed / total` by about 1/10800 — far below one
+    // 1/120 step — so the two snapshots must serialise to the identical string. That equality is
+    // exactly what `TodayViewModel` compares to decide whether to write and nudge at all.
+    @Test
+    fun oneSecondOfProgressAcrossATypicalPrayerGapSerialisesIdentically() {
+        val total = 3 * 60 * 60f
+        val atT = today.copy(ringProgress = 4000f / total)
+        val aSecondLater = today.copy(ringProgress = 4001f / total)
+        assertEquals(
+            WidgetMirrorWriter.serializedSnapshot(atT, "UTC", FakePlatformFormat()),
+            WidgetMirrorWriter.serializedSnapshot(aSecondLater, "UTC", FakePlatformFormat()),
+        )
+    }
+
+    // ...but a real move must still get through: quantising may never freeze the ring outright.
+    @Test
+    fun aFullStepOfProgressStillChangesTheSerialisedSnapshot() {
+        assertTrue(
+            WidgetMirrorWriter.serializedSnapshot(today.copy(ringProgress = 0.30f), "UTC", FakePlatformFormat()) !=
+                WidgetMirrorWriter.serializedSnapshot(today.copy(ringProgress = 0.32f), "UTC", FakePlatformFormat()),
+        )
+    }
+
+    // -- I8: the mirror carries absolute instants, not just a frozen countdown ------------------
+
+    @Test
+    fun theWriterRecordsWhenTheNextPrayerActuallyFallsNotJustHowFarAwayItWas() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat())
+        val snapshot = WidgetMirrorWriter.read(store)!!
+        assertEquals(3600L * 10, snapshot.nextPrayerEpochSeconds)
+        // The DHUHR row, the one the timeline marked CURRENT — the ring's other end.
+        assertEquals(3600L * 7, snapshot.previousPrayerEpochSeconds)
+    }
+
+    // Rendered three hours after it was written, the mirror must not still be claiming the
+    // ninety minutes that were true at write time.
+    @Test
+    fun aMirrorWrittenThreeHoursAgoYieldsNoCountdownRatherThanTheStaleOne() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat())
+        val snapshot = WidgetMirrorWriter.read(store)!!
+        assertEquals(90L, snapshot.countdownMinutes)
+        assertEquals(null, WidgetCountdown.remainingMinutesAt(snapshot, 3600L * 13))
+    }
+
+    // Before the day's Fajr no obligatory prayer has passed, so there is no start point to record.
+    // The sentinel says so plainly instead of synthesising one.
+    @Test
+    fun beforeTheFirstPrayerOfTheDayThePreviousInstantIsTheNotRecordedSentinel() {
+        val beforeFajr = today.copy(
+            rows = today.rows.map { it.copy(status = PrayerStatus.UPCOMING) },
+        )
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, beforeFajr, "UTC", FakePlatformFormat())
+        assertEquals(0L, WidgetMirrorWriter.read(store)!!.previousPrayerEpochSeconds)
     }
 
     @Test
