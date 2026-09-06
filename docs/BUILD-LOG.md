@@ -138,3 +138,50 @@ telling the eleven Londons apart. Being fixed by joining `admin1CodesASCII.txt` 
 task. Under the overnight budget I reviewed mechanical tasks myself from the diffs and reserved
 full scrutiny for the substantive ones. That is a deliberate trade, not an oversight — and it is
 how the polar-day and city-region defects were caught.
+
+### Plan 1 — COMPLETE. Plus notification logic and schedulers, and qibla maths.
+
+**130 tests green on both JVM and iOS native. Both apps build, install and run.** Verified on your
+LoopPhone by tapping through the whole app: onboarding → decline location → search "lond" →
+"London / England, United Kingdom" first → Today with the ring and timeline → Settings →
+Hanafi moves Asr from 16:35 to 17:31 → Dark repaints everything → force-stop and relaunch with
+theme, madhab, city and a +3 min Fajr offset all persisted. Screenshots in `/tmp/taqwa-01…21`.
+
+| Task | What landed | Commit |
+|---|---|---|
+| 10 | Location provider, 5 km policy, persisted location | `31dd8d1` |
+| 11 | Ring, card, pill button, drawn check | `0aa78a7` |
+| 12 | Today screen + view model with 1 s tick | `b9660c9` |
+| 13 | Navigator, AppContainer, onboarding, iOS delegate fix | `f610a60` |
+| 14 | Full settings tree; minuteAdjustments persistence fix | `2ff081f`, `78f285f` |
+| 15–16 | Notification settings + pure planner (64 cap, DST) | merged `629a8d0` |
+| 17–18 | Android + iOS notification schedulers | merged `0ed61ce` |
+| 20 | Qibla bearing (118.99° London→Kaaba) + haversine | merged `6e87f34` |
+
+**The finding that matters most for the whole product:** the timeline is the first place Arabic
+renders on iOS in this project, and **Compose Multiplatform shapes it correctly** — joined
+letterforms, right-to-left, rā' and alif correctly not joining forward. The Quran reader in slice 2
+can stay in shared code. Caveat: this is unvocalised short labels; vocalised paragraph text is
+still to be proven.
+
+**Parallelism, and why it was safe.** From Task 10 onward, independent tasks ran concurrently in
+isolated git worktrees and were merged after each landed green. Sharing one working tree had
+already caused a phantom failure in Task 11 (one agent's half-written file broke another's
+build), so worktrees were the fix, not a nicety. Every merge was clean.
+
+**More defects found by looking rather than trusting:**
+- The high-latitude card on London in *September* says "The sun never sets far enough here" —
+  false that month. The engine reported the rule whenever it was *selected* (all of latitude
+  ≥48°), not only when it actually *changed* a time. Fix in progress: compare the three rules;
+  they only diverge on days they bind.
+- GPS location was persisted with no city name, so Today's header read "Current location" — and
+  worse, no country code, so method auto-detection never fired for GPS users. Fix in progress:
+  nearest city from the bundled database.
+- A `✓` character would have crept into the appearance screen if the brief hadn't forbidden it.
+- Compose 1.12's common `BackHandler` is missing from the Android artifact; a `SystemBackHandler`
+  expect/actual was added.
+
+**New required wrapper:** `scripts/test.sh`. Once `AppContainer` linked CoreLocation, a bare
+`./gradlew :shared:allTests` started failing with `framework '_LocationEssentials' not found` —
+same Xcode 16 vs 26 problem as before, same fix. The `sudo xcode-select` command in the first
+section would make both wrappers unnecessary.
