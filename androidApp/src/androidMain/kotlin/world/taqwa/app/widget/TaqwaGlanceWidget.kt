@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalSize
+import androidx.glance.action.clickable
+import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.appWidgetBackground
@@ -34,6 +36,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import world.taqwa.app.MainActivity
 import world.taqwa.app.domain.WidgetBackground
 
 /**
@@ -346,7 +349,9 @@ private fun WidgetCard(colors: WidgetPaletteColors, content: @Composable () -> U
             .fillMaxSize()
             .background(ColorProvider(colors.cardBackground()))
             .cornerRadius(19.dp)
-            .appWidgetBackground(),
+            .appWidgetBackground()
+            // The whole card is one target: a tap anywhere on it opens Today, as it does on iOS.
+            .clickable(actionStartActivity<MainActivity>()),
         contentAlignment = Alignment.Center,
     ) {
         content()
