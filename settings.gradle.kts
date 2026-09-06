@@ -2,6 +2,7 @@ rootProject.name = "Taqwa"
 
 include(":androidApp")
 include(":shared")
+include(":widgetcore")
 
 pluginManagement {
     repositories {

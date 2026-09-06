@@ -19,6 +19,11 @@ data class WidgetSnapshot(
 )
 
 object WidgetInputsMirror {
+    /** The one key both widget processes read. `WidgetMirrorWriter` (in `shared`, which needs the
+     * prayer engine to produce a snapshot) writes under it; the read side lives here because the
+     * iOS extension links `widgetcore` alone. */
+    const val KEY = "snapshot"
+
     private const val FIELD_SEP = "|"
     private const val PAIR_SEP = ";"
     private const val KV_SEP = "="
@@ -58,4 +63,6 @@ object WidgetInputsMirror {
             null
         }
     }
+
+    fun read(store: KeyValueStore): WidgetSnapshot? = store.getString(KEY)?.let(::deserialize)
 }

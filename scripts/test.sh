@@ -9,4 +9,9 @@
 set -e
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode 26.app/Contents/Developer}"
 cd "$(dirname "$0")/.."
-exec ./gradlew "${@:-:shared:allTests}"
+if [ "$#" -eq 0 ]; then
+  # `:widgetcore` holds the widget model the iOS extension links on its own; its tests have to
+  # run here or nothing covers them.
+  set -- :shared:allTests :widgetcore:allTests
+fi
+exec ./gradlew "$@"

@@ -3,10 +3,9 @@ package world.taqwa.app.domain
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 
-enum class Prayer { FAJR, SUNRISE, DHUHR, ASR, MAGHRIB, ISHA }
-
-/** The five that are prayed. Sunrise marks the end of the Fajr window and is never notified. */
-val ObligatoryPrayers = listOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA)
+// `Prayer` and `ObligatoryPrayers` moved to `:widgetcore` (same package) so the iOS widget
+// extension can link the widget model without linking Compose. `shared` re-exposes them via
+// `api(project(":widgetcore"))`, so every import here is unchanged.
 
 data class PrayerTime(val prayer: Prayer, val instant: Instant)
 
