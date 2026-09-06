@@ -1,11 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A true 2x2. minWidth/minHeight follow the 70n-30dp cell formula (2 cells = 110dp), and
+     targetCellWidth/Height state the same thing directly for API 31+ launchers, which prefer it.
+
+     resizeMode is "horizontal|vertical" rather than "none" for a reason the owner hit: a launcher
+     that placed this widget at 2x3 — because it was placed before the target cells were declared,
+     or because its own grid rounds up — left the card with a band of dead space above and below
+     the text, and with resizeMode="none" there was no way to drag it back down to 2x2. The layout
+     now adapts to whatever cell it lands in (see TaqwaGlanceWidget's SizeMode.Responsive), and
+     this makes the size the user's to choose. maxResize caps it before the type scaling runs out
+     of design. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="110dp"
     android:minHeight="110dp"
     android:minResizeWidth="110dp"
     android:minResizeHeight="110dp"
+    android:maxResizeWidth="250dp"
+    android:maxResizeHeight="250dp"
     android:targetCellWidth="2"
     android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/widget_loading"
-    android:resizeMode="none"
+    android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

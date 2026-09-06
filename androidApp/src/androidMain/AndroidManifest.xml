@@ -36,6 +36,14 @@
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
+        <!-- The rolling five-minute widget refresh. Inexact RTC window alarms, armed by the
+             widget providers and re-armed by this receiver from its own delivery; see
+             WidgetRefreshScheduler. -->
+        <receiver android:name=".widget.TaqwaWidgetRefreshReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="world.taqwa.app.WIDGET_REFRESH" />
+            </intent-filter>
+        </receiver>
         <receiver android:name=".widget.TaqwaSmallWidgetReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
