@@ -35,9 +35,25 @@ class IosNotificationScheduler : NotificationScheduler {
 
     private val center = UNUserNotificationCenter.currentNotificationCenter()
 
+    /**
+     * `removeAllPendingNotificationRequests()` is asynchronous, so tearing everything down and
+     * adding the new plan on the very next line can race the teardown and silently lose entries.
+     * This reads what is genuinely pending instead and removes only the requests the new plan
+     * does not re-use, from inside the query's completion handler. Ids are stable across
+     * identical plans — [NotificationPlanner] guarantees it — and `addNotificationRequest`
+     * replaces a request with the same identifier, so the remove set and the add set are disjoint
+     * by construction and the asynchronous removal cannot reach a request this call just added.
+     */
     override fun scheduleAll(plan: List<ScheduledNotification>) {
-        center.removeAllPendingNotificationRequests()
-        plan.take(NotificationPlanner.IOS_PENDING_LIMIT).forEach(::schedule)
+        val entries = plan.take(NotificationPlanner.IOS_PENDING_LIMIT)
+        val keep = entries.map { it.id }.toSet()
+        center.getPendingNotificationRequestsWithCompletionHandler { pending ->
+            val stale = pending.orEmpty()
+                .mapNotNull { (it as? UNNotificationRequest)?.identifier }
+                .filterNot { it in keep }
+            if (stale.isNotEmpty()) center.removePendingNotificationRequestsWithIdentifiers(stale)
+            entries.forEach(::schedule)
+        }
     }
 
     override fun cancelAll() {
