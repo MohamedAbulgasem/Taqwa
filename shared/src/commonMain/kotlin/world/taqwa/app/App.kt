@@ -58,6 +58,7 @@ fun App(container: AppContainer) {
             navigator.replaceAll(Screen.Onboarding)
         }
         startResolved = true
+        container.notificationCoordinator.reschedule(world.taqwa.app.notifications.RescheduleTrigger.APP_FOREGROUND)
     }
 
     fun useGpsFix() {
