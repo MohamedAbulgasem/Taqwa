@@ -3203,6 +3203,14 @@ nothing.
 from −59 to +59 minutes writing into `PrayerSettings.minuteAdjustments`. Show the adjusted time
 beside each stepper so the effect is visible while adjusting.
 
+**Defect to fix here, found during Task 4:** `SettingsRepository` has no DataStore key for
+`minuteAdjustments`, so offsets are held in memory and silently lost on relaunch. Add persistence
+before building the screen — serialise the map as a single string preference, e.g.
+`"FAJR:5,ISHA:-3"`, parsed back with the same tolerant fallback style as `toEnumOr` (an
+unparseable entry is skipped, never thrown). Add a test asserting a non-empty
+`minuteAdjustments` map survives a round trip, and one asserting a malformed stored value
+yields an empty map rather than crashing.
+
 - [ ] **Step 7: Build the location and city search screens**
 
 Location: a "Use my location" toggle, a card showing city, country and **IANA timezone**, a "Choose a city instead" row, and the privacy note "Coordinates are stored on your device and used only to calculate times. Nothing is sent anywhere."
