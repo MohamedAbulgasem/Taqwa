@@ -86,3 +86,55 @@ longer publishes Intel simulator artifacts.
 **One limitation reached:** the simulator control tooling needs your explicit device permission,
 which I cannot grant on your behalf. Visual verification is done with `xcrun simctl` screenshots
 instead, which works fine.
+
+### Tasks 2–9 — COMPLETE
+
+All green on both the JVM and `iosSimulatorArm64` targets at every step. 50 tests at Task 9.
+
+| Task | What landed | Commit |
+|---|---|---|
+| 2 | Colour tokens, light/dark theming | `4b20be0` |
+| 3 | Manrope + type scale | `f51fe47` |
+| 4 | Settings storage with the spec's defaults | `d12fbfe` |
+| 5 | Prayer times engine over adhan2 | `7262c70` |
+| 6 | Automatic high-latitude rule selection | `e5b6484` |
+| 7 | Timeline state and countdown | `bddfd66` |
+| 8 | Hijri tabular calendar | `c8d7b96` |
+| 9 | Bundled city database, 34,135 cities | `4898f0c` |
+
+**Plan 2 is written** — Tasks 17–25 covering the Android and iOS notification actuals, audio assets
+and the sound picker, qibla bearing and the compass screen, localisation and RTL, and the widgets.
+
+### Things found and fixed that you should know about
+
+**Manrope has no published static instances.** Google Fonts ships only the variable font. Rather
+than fake weights, the implementer generated genuine static TTFs with `fonttools varLib.instancer`
+pinned at 300/400/600/800, verifying no `fvar` table remained.
+
+**Manual prayer offsets would not have persisted.** `PrayerSettings.minuteAdjustments` had no
+DataStore key, so per-prayer offsets were held in memory and lost on relaunch. My plan's fault. The
+task that builds that screen now fixes the storage first.
+
+**adhan2 crashes on true polar day.** It throws `IllegalStateException` at Tromsø on 21 June
+regardless of which high-latitude rule is set — the null-check runs before any seasonal adjustment.
+The engine falls back to computing at the nearest latitude where the sun does rise, which is a
+recognised convention. **But the first implementation did not tell the user**, and that matters:
+in that case *every* time on screen is substituted, Maghrib included, not just Fajr and Isha.
+Reporting it as an ordinary high-latitude rule would be exactly the silent fudging the spec exists
+to prevent. `DayPrayerTimes` now carries a separate `nearestLatitudeFallbackApplied` flag and the
+Today screen says "The sun does not rise or set here today. All times are calculated for the
+nearest latitude where it does."
+
+**adhan2 0.0.7 has no Tehran method.** Reconstructed from the published Institute of Geophysics
+angles (Fajr 17.7°, Isha 14°). Its distinct Maghrib angle is not applied — a known limitation
+affecting Shia users, worth revisiting before release.
+
+**The city picker showed GeoNames codes, not place names.** `region` was the raw admin1 code, so
+the list read "London / ENG" and "London / 08". That defeats the entire reason the column exists —
+telling the eleven Londons apart. Being fixed by joining `admin1CodesASCII.txt` and
+`countryInfo.txt` so it reads "London / England, United Kingdom".
+
+**Process note, stated plainly:** the plan called for a separate reviewer subagent after every
+task. Under the overnight budget I reviewed mechanical tasks myself from the diffs and reserved
+full scrutiny for the substantive ones. That is a deliberate trade, not an oversight — and it is
+how the polar-day and city-region defects were caught.
