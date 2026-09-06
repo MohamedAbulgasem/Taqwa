@@ -38,7 +38,7 @@ object WidgetMirrorWriter {
      * so it throws on every call. Two supported languages, so a plain `when` costs nothing extra
      * to keep in sync with the resource by hand.
      */
-    private fun countdownLabel(prayer: Prayer, languageTag: String): String =
+    internal fun countdownLabel(prayer: Prayer, languageTag: String): String =
         if (PrayerNaming.isArabicLanguage(languageTag)) {
             "متبقٍ على ${PrayerNaming.arabicName(prayer)}"
         } else {

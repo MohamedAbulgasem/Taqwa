@@ -11,6 +11,7 @@ import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.resources.Res
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.createDataStore
+import world.taqwa.app.widget.createWidgetPinRequester
 import kotlin.time.Clock
 
 /** Manual construction. A DI framework earns its place when there is a graph worth managing. */
@@ -19,6 +20,7 @@ class AppContainer {
     val cityRepository = CityRepository { Res.readBytes("files/cities.csv").decodeToString() }
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()
+    val widgetPinRequester = createWidgetPinRequester()
     val locationRefresher = LocationRefresher(locationRepository, cityRepository, settingsRepository)
     val notificationCoordinator = NotificationCoordinator(
         engine = prayerTimesEngine,

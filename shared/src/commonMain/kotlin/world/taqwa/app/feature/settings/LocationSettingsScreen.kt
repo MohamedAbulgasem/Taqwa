@@ -81,9 +81,9 @@ fun LocationSettingsScreen(
                 value = location?.cityName ?: stringResource(Res.string.today_current_location),
             )
             CardDivider()
-            TaqwaRow(stringResource(Res.string.location_country), value = location?.countryCode ?: "—")
+            TaqwaRow(stringResource(Res.string.location_country), value = location?.countryCode ?: "-")
             CardDivider()
-            TaqwaRow(stringResource(Res.string.location_timezone), value = location?.timeZoneId ?: "—")
+            TaqwaRow(stringResource(Res.string.location_timezone), value = location?.timeZoneId ?: "-")
         }
 
         Spacer(Modifier.height(16.dp))

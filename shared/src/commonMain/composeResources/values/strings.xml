@@ -9,13 +9,19 @@
     <string name="onboarding_welcome_body">Prayer times, qibla and the Quran. Free forever. No ads, no account, works offline.</string>
     <string name="onboarding_welcome_cta">Get started</string>
     <string name="onboarding_location_title">Where are you?</string>
-    <string name="onboarding_location_body">Prayer times depend on your exact position. Everything is calculated on your device — your location never leaves your phone.</string>
+    <string name="onboarding_location_body">Prayer times depend on your exact position. Everything is calculated on your device. Your location never leaves your phone.</string>
     <string name="onboarding_location_cta">Use my location</string>
     <string name="onboarding_location_secondary">Choose a city instead</string>
     <string name="onboarding_notifications_title">Never miss a prayer</string>
-    <string name="onboarding_notifications_body">A notification at each prayer time. You pick the sound for every prayer separately — and can change it whenever you like.</string>
+    <string name="onboarding_notifications_body">A notification at each prayer time. You pick the sound for every prayer separately, and can change it whenever you like.</string>
     <string name="onboarding_notifications_cta">Enable notifications</string>
     <string name="onboarding_notifications_secondary">Not now</string>
+    <string name="onboarding_widget_title">On your home screen</string>
+    <string name="onboarding_widget_body">The Taqwa widget shows the next prayer and the time until it, without opening the app.</string>
+    <string name="onboarding_widget_body_ios">The Taqwa widget shows the next prayer and the time until it, without opening the app. Touch and hold your home screen, tap the plus, then search for Taqwa.</string>
+    <string name="onboarding_widget_cta_add">Add widget</string>
+    <string name="onboarding_widget_cta_done">Done</string>
+    <string name="onboarding_widget_secondary">Maybe later</string>
 
     <!-- Prayer names. The Arabic name that sits beside these is never a resource: it is the
          same in every locale, so it lives in PrayerNaming. -->
@@ -49,7 +55,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">Version 1.0</string>
+    <string name="settings_version_value">Version 1.0.0</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">THEME</string>
@@ -89,7 +95,7 @@
     <string name="sound_adhan">Adhan</string>
     <string name="sound_silent_detail">Banner only, no sound</string>
     <string name="sound_notification_detail">Your phone’s default tone</string>
-    <string name="sound_takbir_detail">Allahu akbar, Allahu akbar — ~%1$ss</string>
+    <string name="sound_takbir_detail">Allahu akbar, Allahu akbar, about %1$ss</string>
     <string name="sound_adhan_detail">Full call, %1$s seconds</string>
     <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on this platform. The complete adhan can be played inside the app.</string>
 

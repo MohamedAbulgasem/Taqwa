@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Taqwa</string>
+    <string name="widget_small_description">Next prayer and the time until it.</string>
+    <string name="widget_medium_description">Next prayer, countdown and today\'s times.</string>
 </resources>

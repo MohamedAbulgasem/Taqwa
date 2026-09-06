@@ -102,7 +102,41 @@ struct TaqwaTimelineProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (TaqwaEntry) -> Void) {
-        completion(Self.entries(from: Date()).first!)
+        let entry = Self.entries(from: Date()).first!
+        // The widget gallery asks for a snapshot before the app has necessarily written a mirror.
+        // A gallery card reading "open Taqwa to load your prayer times" sells nothing, so the
+        // preview shows a representative day instead; a real home-screen render never takes
+        // this branch because it is not a preview.
+        if context.isPreview && entry.content == nil {
+            completion(Self.sampleEntry(background: entry.background))
+        } else {
+            completion(entry)
+        }
+    }
+
+    /// A plausible afternoon, in the gallery's own language, for the preview alone.
+    static func sampleEntry(background: WidgetBackground) -> TaqwaEntry {
+        let tag = Locale.current.language.languageCode?.identifier ?? "en"
+        let arabic = tag.hasPrefix("ar")
+        func name(_ prayer: Prayer, _ latin: String) -> String {
+            PrayerNaming.shared.display(prayer: prayer, languageTag: tag, localizedName: latin)
+        }
+        let rows: [WidgetPrayerRow] = [
+            WidgetPrayerRow(prayer: .fajr, displayName: name(.fajr, "Fajr"), clockTime: "5:35", isCurrent: false),
+            WidgetPrayerRow(prayer: .dhuhr, displayName: name(.dhuhr, "Dhuhr"), clockTime: "12:46", isCurrent: false),
+            WidgetPrayerRow(prayer: .asr, displayName: name(.asr, "Asr"), clockTime: "16:03", isCurrent: true),
+            WidgetPrayerRow(prayer: .maghrib, displayName: name(.maghrib, "Maghrib"), clockTime: "18:32", isCurrent: false),
+            WidgetPrayerRow(prayer: .isha, displayName: name(.isha, "Isha"), clockTime: "19:50", isCurrent: false),
+        ]
+        let content = WidgetContent(
+            nextPrayerDisplayName: name(.maghrib, "Maghrib"),
+            countdownMinutes: 21,
+            nextClockTime: "18:32",
+            rows: rows,
+            ringProgress: 0.86,
+            countdownLabel: arabic ? "متبقٍ على المغرب" : "Maghrib in"
+        )
+        return TaqwaEntry(date: Date(), content: content, countdownMinutes: 21, background: background, languageTag: tag)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<TaqwaEntry>) -> Void) {
@@ -267,11 +301,15 @@ struct TaqwaHomeWidgetView: View {
                 // Sunrise is absent by construction: `rows` comes from `ObligatoryPrayers`.
                 ForEach(content.rows, id: \.prayer) { row in
                     HStack(spacing: 8) {
+                        // No `minimumScaleFactor` here: in a fixed-width column the longest name
+                        // ("Maghrib · المغرب") shrank on its own and read as a different size from
+                        // the four rows around it. The column now takes the width the names need
+                        // and the countdown block yields, so every row is set at the same size.
                         Text(row.displayName)
                             .font(.system(size: 12, weight: row.isCurrent ? .semibold : .regular))
                             .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                        Spacer(minLength: 4)
+                            .fixedSize(horizontal: true, vertical: false)
+                        Spacer(minLength: 8)
                         Text(row.clockTime)
                             .font(.system(size: 12, weight: row.isCurrent ? .semibold : .regular))
                             .monospacedDigit()
@@ -279,7 +317,7 @@ struct TaqwaHomeWidgetView: View {
                     .foregroundColor(Color(argb: row.isCurrent ? colors.accentArgb : colors.textArgb))
                 }
             }
-            .frame(width: 130)
+            .layoutPriority(1)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -404,7 +442,7 @@ struct TaqwaLockScreenWidget: Widget {
         StaticConfiguration(kind: kind, provider: TaqwaTimelineProvider()) { entry in
             TaqwaLockScreenWidgetView(entry: entry)
         }
-        .configurationDisplayName("Taqwa — Lock Screen")
+        .configurationDisplayName("Taqwa Lock Screen")
         .description("Next prayer at a glance.")
         .supportedFamilies([.accessoryCircular, .accessoryRectangular])
     }

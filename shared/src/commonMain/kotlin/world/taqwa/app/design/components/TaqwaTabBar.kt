@@ -3,6 +3,7 @@ package world.taqwa.app.design.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -105,7 +107,13 @@ private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) 
     val tint = if (selected) colors.accent else colors.textTertiary
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     Column(
-        Modifier.weight(1f).fillMaxHeight().clickable(onClick = onSelect),
+        // No ripple: a tab switch repaints the whole screen, which is feedback enough, and a
+        // grey rectangle flashing across a third of the bar is louder than anything else here.
+        Modifier.weight(1f).fillMaxHeight().clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onSelect,
+        ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
