@@ -1,8 +1,17 @@
 import WidgetKit
 import SwiftUI
+// The extension links `widgetcore.framework` alone — a slim Kotlin/Native framework with no
+// Compose in it, because a WidgetKit extension runs under a ~30 MB memory ceiling. This file is
+// also a member of the *app* target (for the `-taqwaWidgetPreview 1` debug route), which links
+// `shared`; `shared` re-exports `:widgetcore`, so the Kotlin types below are spelled identically
+// either way.
+#if TAQWA_WIDGET_EXTENSION
+import widgetcore
+#else
 import shared
+#endif
 
-/// Must match `IosKeyValueStore.APP_GROUP_ID` in `shared/src/iosMain/.../KeyValueStore.ios.kt`
+/// Must match `IosKeyValueStore.APP_GROUP_ID` in `widgetcore/src/iosMain/.../KeyValueStore.ios.kt`
 /// and both `.entitlements` files. A mismatch is silent: the widget reads an empty suite and
 /// shows the placeholder state forever.
 let taqwaAppGroupId = "group.world.taqwa.app"
@@ -21,7 +30,7 @@ enum TaqwaMirror {
     /// Nil when the app has never written one, in which case the countdown is shown as-is.
     static func read() -> (content: WidgetContent, deadline: Date?)? {
         let store = KeyValueStore_iosKt.createWidgetKeyValueStore()
-        guard let snapshot = WidgetMirrorWriter.shared.read(store: store) else { return nil }
+        guard let snapshot = WidgetInputsMirror.shared.read(store: store) else { return nil }
         let content = WidgetContentBuilder.shared.build(snapshot: snapshot)
         let defaults = UserDefaults(suiteName: taqwaAppGroupId)
         let writtenAt = defaults?.double(forKey: taqwaWrittenAtKey) ?? 0

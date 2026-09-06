@@ -1,6 +1,15 @@
 import WidgetKit
 import SwiftUI
+// The extension links `widgetcore.framework` alone — a slim Kotlin/Native framework with no
+// Compose in it, because a WidgetKit extension runs under a ~30 MB memory ceiling. This file is
+// also a member of the *app* target (for the `-taqwaWidgetPreview 1` debug route), which links
+// `shared`; `shared` re-exports `:widgetcore`, so the Kotlin types below are spelled identically
+// either way.
+#if TAQWA_WIDGET_EXTENSION
+import widgetcore
+#else
 import shared
+#endif
 
 /// Every widget family at its real point size, over a neutral swatch.
 ///

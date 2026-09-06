@@ -35,11 +35,18 @@ EXT_SOURCES = {
 
 EXT_RESOURCES = ['Info.plist', 'TaqwaWidget.entitlements'].freeze
 
-# Kotlin/Native produces `shared.framework` into shared/build/xcode-frameworks/<config>/<sdk>.
+# The extension links `widgetcore.framework`, NOT `shared.framework`. `shared` is a static
+# Kotlin/Native framework carrying all of Compose and Skia, which made this .appex ~63 MB; a
+# WidgetKit extension runs under a ~30 MB memory ceiling and iOS jetsams one that exceeds it.
+# `:widgetcore` is the same widget model with no Compose anywhere in it.
+#
+# Kotlin/Native produces `widgetcore.framework` into widgetcore/build/xcode-frameworks/<config>/<sdk>.
 # Xcode builds the extension *before* the app that embeds it, so the extension cannot rely on the
 # app's own "Compile Kotlin" phase having run — it needs its own, or a clean build fails to link.
-KOTLIN_SCRIPT = %(cd "$SRCROOT/.."\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n)
-FRAMEWORK_SEARCH_PATH = '$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)'
+KOTLIN_FRAMEWORK = 'widgetcore'
+KOTLIN_SCRIPT = %(cd "$SRCROOT/.."\n./gradlew :#{KOTLIN_FRAMEWORK}:embedAndSignAppleFrameworkForXcode\n)
+FRAMEWORK_SEARCH_PATH =
+  "$(SRCROOT)/../#{KOTLIN_FRAMEWORK}/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"
 
 project = Xcodeproj::Project.open(PROJECT_PATH)
 app = project.targets.find { |t| t.name == APP_TARGET } or abort "No '#{APP_TARGET}' target"
@@ -109,7 +116,7 @@ kotlin_phase = ext.shell_script_build_phases.find { |p| p.name == 'Compile Kotli
 kotlin_phase ||= ext.new_shell_script_build_phase('Compile Kotlin')
 kotlin_phase.shell_path = '/bin/sh'
 kotlin_phase.shell_script = KOTLIN_SCRIPT
-# Must run before Swift compiles against `import shared`. Xcode builds the extension first, so
+# Must run before Swift compiles against `import widgetcore`. Xcode builds the extension first, so
 # waiting for the app's own copy of this phase would be too late.
 ext.build_phases.move(kotlin_phase, 0) unless ext.build_phases.first == kotlin_phase
 
@@ -129,10 +136,10 @@ ext.build_configurations.each do |config|
   s['SKIP_INSTALL'] = 'YES'
   s['GENERATE_INFOPLIST_FILE'] = 'NO'
   s['SWIFT_EMIT_LOC_STRINGS'] = 'YES'
-  # `shared.framework` is a *static* Kotlin/Native framework, so both binaries link their own copy
-  # and nothing is embedded twice; the app still embeds and signs the one it produces.
+  # `widgetcore.framework` is a *static* Kotlin/Native framework, so the extension links its own
+  # copy and nothing is embedded twice; the app links `shared` (which re-exports widgetcore).
   s['FRAMEWORK_SEARCH_PATHS'] = ['$(inherited)', FRAMEWORK_SEARCH_PATH]
-  s['OTHER_LDFLAGS'] = ['$(inherited)', '-framework', 'shared']
+  s['OTHER_LDFLAGS'] = ['$(inherited)', '-framework', KOTLIN_FRAMEWORK]
   s['LD_RUNPATH_SEARCH_PATHS'] = ['$(inherited)', '@executable_path/Frameworks',
                                   '@executable_path/../../Frameworks']
   # Xcode refuses to build an app-extension product type with this set to NO. Nothing the widget
@@ -140,12 +147,24 @@ ext.build_configurations.each do |config|
   # object code, which the extension-safety check does not apply to.
   s['APPLICATION_EXTENSION_API_ONLY'] = 'YES'
   s['ENABLE_PREVIEWS'] = 'YES'
+  # `TaqwaWidgetViews.swift`/`TaqwaWidgetPreviews.swift` are compiled into BOTH this target and
+  # the app, and each needs a different module: `widgetcore` here, `shared` (which re-exports it)
+  # in the app. `#if canImport(widgetcore)` cannot make that distinction — Kotlin/Native drops
+  # `widgetcore.framework` into the shared BUILT_PRODUCTS_DIR, so it is importable from the app
+  # too, and importing it there autolinks a *second* Kotlin/Native runtime into the app binary,
+  # which aborts at launch in `+[KotlinBase load]` ("runtime injected twice", KT-42254).
+  s['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] = ['$(inherited)', 'TAQWA_WIDGET_EXTENSION']
 end
 
 # --- app target: entitlements + embed the extension --------------------------------------------
 
 app.build_configurations.each do |config|
   config.build_settings['CODE_SIGN_ENTITLEMENTS'] = 'iosApp/iosApp.entitlements'
+  # The app had accumulated `-framework "shared\n$(inherited)" -framework "shared\n"` — embedded
+  # newlines from a hand-edit, which the linker word-splits back into TWO `-framework shared`.
+  # Linking a static Kotlin/Native framework twice aborts the process at launch with
+  # "runtime assert: runtime injected twice" (KT-42254). Normalise it here so it stays fixed.
+  config.build_settings['OTHER_LDFLAGS'] = ['$(inherited)', '-framework', 'shared']
 end
 file_ref(project.main_group.find_subpath('iosApp', true), 'iosApp.entitlements')
 

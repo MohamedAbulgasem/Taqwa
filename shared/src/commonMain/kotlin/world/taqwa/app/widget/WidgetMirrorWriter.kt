@@ -7,8 +7,10 @@ import world.taqwa.app.domain.TodayState
 import world.taqwa.app.i18n.PlatformFormat
 import kotlin.time.Instant
 
+/** Stays in `shared`: producing a snapshot needs `TodayState` from the prayer engine. The read
+ * side is `WidgetInputsMirror.read`, in `:widgetcore`, which is all the iOS widget extension
+ * links. */
 object WidgetMirrorWriter {
-    private const val KEY = "snapshot"
 
     fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat) {
         val zone = TimeZone.of(timeZoneId)
@@ -25,8 +27,8 @@ object WidgetMirrorWriter {
             languageTag = format.languageTag(),
             ringProgress = today.ringProgress,
         )
-        store.putString(KEY, WidgetInputsMirror.serialize(snapshot))
+        store.putString(WidgetInputsMirror.KEY, WidgetInputsMirror.serialize(snapshot))
     }
 
-    fun read(store: KeyValueStore): WidgetSnapshot? = store.getString(KEY)?.let(WidgetInputsMirror::deserialize)
+    fun read(store: KeyValueStore): WidgetSnapshot? = WidgetInputsMirror.read(store)
 }

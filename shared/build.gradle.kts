@@ -16,11 +16,19 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
+            // The app's Swift names these types through `import shared`; exporting keeps that
+            // working now that they live in `:widgetcore`. The widget extension links
+            // `widgetcore.framework` directly instead — see tools/add-widget-target.rb.
+            export(project(":widgetcore"))
         }
     }
 
     sourceSets {
         commonMain.dependencies {
+            // `api`, not `implementation`: the widget model's types are part of `shared`'s own
+            // public surface (SettingsRepository, TodayViewModel, androidApp's Glance widgets),
+            // and `export` above requires an `api` dependency.
+            api(project(":widgetcore"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
