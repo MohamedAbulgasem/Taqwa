@@ -167,4 +167,5 @@
     <string name="qibla_cardinal_east">ق</string>
     <string name="qibla_cardinal_south">ج</string>
     <string name="qibla_cardinal_west">غ</string>
+    <string name="notifications_exact_alarms_off">المنبهات الدقيقة معطّلة لتطبيق تقوى، لذا قد تصل التنبيهات متأخرة بضع دقائق. فعّل «المنبهات والتذكيرات» في إعدادات النظام لإصلاح ذلك.</string>
 </resources>

@@ -51,6 +51,7 @@ import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
 import world.taqwa.app.notifications.NotificationOnboarding
+import world.taqwa.app.notifications.canScheduleExactAlarms
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.today_current_location
@@ -74,6 +75,9 @@ fun App(container: AppContainer) {
     val backStack by navigator.backStack.collectAsState()
     val scope = rememberCoroutineScope()
     val soundPreviewPlayer = remember { createSoundPreviewPlayer() }
+    // Read once per composition rather than per frame: the user can only change it by leaving
+    // the app for system settings, which recreates this anyway.
+    val exactAlarmsAllowed = remember { canScheduleExactAlarms() }
 
     // The device locale decides both halves of localisation: which `values-*` strings Compose
     // resolves, and — through this — whether the whole tree is laid out right-to-left. Compose's
@@ -217,6 +221,7 @@ fun App(container: AppContainer) {
 
                     Screen.NotificationSettings -> NotificationSettingsScreen(
                         settings = notificationSettings,
+                        exactAlarmsUnavailable = !exactAlarmsAllowed,
                         onBack = { navigator.pop() },
                         onToggleEnabled = { enabled ->
                             scope.launch {
