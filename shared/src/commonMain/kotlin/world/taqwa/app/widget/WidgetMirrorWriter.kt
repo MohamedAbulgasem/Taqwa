@@ -2,6 +2,7 @@ package world.taqwa.app.widget
 
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerStatus
 import world.taqwa.app.domain.TodayState
@@ -81,8 +82,31 @@ object WidgetMirrorWriter {
             languageTag = format.languageTag(),
             ringProgress = quantisedRing(today.ringProgress),
             countdownLabel = countdownLabel(today.next.prayer, format.languageTag()),
+            // Absolute instants, not elapsed durations. The mirror is only written while Today is
+            // open, so anything relative in it is a lie the moment the screen closes; a widget
+            // holding the instant can recompute against its own clock whenever it happens to draw.
+            nextPrayerEpochSeconds = today.next.instant.epochSeconds,
+            previousPrayerEpochSeconds = previousObligatoryInstant(today),
         )
     }
+
+    /**
+     * The other end of the interval the ring fills: the most recent obligatory prayer that has
+     * already arrived. Read off the timeline's own statuses rather than recomputed, so it cannot
+     * drift from what the screen is showing.
+     *
+     * Returns `0` — the "not recorded" sentinel — before the day's Fajr, when no obligatory prayer
+     * has passed. Deliberately not synthesised: a widget reading `0` knows it has no start point,
+     * which is the truth, and the interval a fabricated one would produce is precisely the flat
+     * overnight ring finding I1 is about.
+     */
+    private fun previousObligatoryInstant(today: TodayState): Long =
+        today.rows
+            .filter { it.prayer in ObligatoryPrayers && it.status != PrayerStatus.UPCOMING }
+            .maxByOrNull { it.instant }
+            ?.instant
+            ?.epochSeconds
+            ?: 0L
 
     /**
      * The exact string [write] would store. Exposed so a caller that recomputes once a second can

@@ -19,6 +19,8 @@ class WidgetInputsMirrorTest {
         languageTag = "en-US",
         ringProgress = 0.42f,
         countdownLabel = "Asr in",
+        nextPrayerEpochSeconds = 1_757_173_200L,
+        previousPrayerEpochSeconds = 1_757_163_600L,
     )
 
     @Test
@@ -40,6 +42,35 @@ class WidgetInputsMirrorTest {
         val restored = WidgetInputsMirror.deserialize(oldFormat)
         assertEquals(Prayer.ASR, restored?.nextPrayer)
         assertEquals("", restored?.countdownLabel)
+    }
+
+    // The eight-field shape, i.e. a mirror left behind by the build immediately before I8. It must
+    // still render — but with the `0` sentinel, so `WidgetCountdown` knows it has no absolute
+    // instant to count towards and the widget shows the prayer name without a stale number.
+    @Test
+    fun aPreEpochSnapshotDeserializesWithTheNotRecordedSentinelRatherThanThrowing() {
+        val eightFields = "ASR|42|15:47|FAJR=05:12;DHUHR=12:34;ASR=15:47;MAGHRIB=18:20;ISHA=19:50|DHUHR|en-US|0.42|Asr in"
+        val restored = WidgetInputsMirror.deserialize(eightFields)
+        assertEquals(Prayer.ASR, restored?.nextPrayer)
+        assertEquals("Asr in", restored?.countdownLabel)
+        assertEquals(0L, restored?.nextPrayerEpochSeconds)
+        assertEquals(0L, restored?.previousPrayerEpochSeconds)
+        assertNull(WidgetCountdown.remainingMinutesAt(restored!!, 1_757_170_800L))
+    }
+
+    @Test
+    fun theAbsolutePrayerInstantsRoundTripThroughSerialization() {
+        val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(snapshot))
+        assertEquals(1_757_173_200L, restored?.nextPrayerEpochSeconds)
+        assertEquals(1_757_163_600L, restored?.previousPrayerEpochSeconds)
+    }
+
+    // A non-numeric epoch is corruption, not version skew: it degrades to the sentinel — no
+    // countdown — rather than throwing NumberFormatException past the widget process.
+    @Test
+    fun aCorruptEpochFieldDegradesToTheSentinelRatherThanThrowing() {
+        val corrupt = "ASR|42|15:47|ASR=15:47|DHUHR|en-US|0.42|Asr in|not-a-number|also-not"
+        assertEquals(0L, WidgetInputsMirror.deserialize(corrupt)?.nextPrayerEpochSeconds)
     }
 
     @Test

@@ -112,6 +112,41 @@ class WidgetMirrorWriterTest {
         )
     }
 
+    // -- I8: the mirror carries absolute instants, not just a frozen countdown ------------------
+
+    @Test
+    fun theWriterRecordsWhenTheNextPrayerActuallyFallsNotJustHowFarAwayItWas() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat())
+        val snapshot = WidgetMirrorWriter.read(store)!!
+        assertEquals(3600L * 10, snapshot.nextPrayerEpochSeconds)
+        // The DHUHR row, the one the timeline marked CURRENT — the ring's other end.
+        assertEquals(3600L * 7, snapshot.previousPrayerEpochSeconds)
+    }
+
+    // Rendered three hours after it was written, the mirror must not still be claiming the
+    // ninety minutes that were true at write time.
+    @Test
+    fun aMirrorWrittenThreeHoursAgoYieldsNoCountdownRatherThanTheStaleOne() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat())
+        val snapshot = WidgetMirrorWriter.read(store)!!
+        assertEquals(90L, snapshot.countdownMinutes)
+        assertEquals(null, WidgetCountdown.remainingMinutesAt(snapshot, 3600L * 13))
+    }
+
+    // Before the day's Fajr no obligatory prayer has passed, so there is no start point to record.
+    // The sentinel says so plainly instead of synthesising one.
+    @Test
+    fun beforeTheFirstPrayerOfTheDayThePreviousInstantIsTheNotRecordedSentinel() {
+        val beforeFajr = today.copy(
+            rows = today.rows.map { it.copy(status = PrayerStatus.UPCOMING) },
+        )
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, beforeFajr, "UTC", FakePlatformFormat())
+        assertEquals(0L, WidgetMirrorWriter.read(store)!!.previousPrayerEpochSeconds)
+    }
+
     @Test
     fun readingBeforeAnyWriteReturnsNullRatherThanCrashing() {
         assertEquals(null, WidgetMirrorWriter.read(FakeKeyValueStore()))
