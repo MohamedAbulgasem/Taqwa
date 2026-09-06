@@ -19,10 +19,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,7 +35,12 @@ import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.rememberLocationPermissionRequester
 
-private enum class Step { WELCOME, LOCATION, NOTIFICATIONS }
+/**
+ * Hoisted out of this composable because "choose a city instead" navigates away to the city
+ * search: the step must survive the round trip, or the user comes back to the welcome screen
+ * having already answered its question.
+ */
+enum class OnboardingStep { WELCOME, LOCATION, NOTIFICATIONS }
 
 /**
  * Three screens, each asking for exactly one thing and saying why *before* the system dialog
@@ -48,19 +49,20 @@ private enum class Step { WELCOME, LOCATION, NOTIFICATIONS }
  */
 @Composable
 fun OnboardingScreen(
+    step: OnboardingStep,
+    onStep: (OnboardingStep) -> Unit,
     locationRepository: LocationRepository,
     onLocationPermission: (LocationPermission) -> Unit,
     onChooseCity: () -> Unit,
     onComplete: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
-    var step by remember { mutableStateOf(Step.WELCOME) }
 
     val requestLocation = rememberLocationPermissionRequester(locationRepository) { permission ->
         onLocationPermission(permission)
         // Granted or denied, the flow moves on: the city picker remains available from Today
         // and from Settings, so a refusal is never a dead end.
-        step = Step.NOTIFICATIONS
+        onStep(OnboardingStep.NOTIFICATIONS)
     }
 
     Column(
@@ -74,7 +76,7 @@ fun OnboardingScreen(
         Spacer(Modifier.weight(1f))
 
         when (step) {
-            Step.WELCOME -> {
+            OnboardingStep.WELCOME -> {
                 RingMark()
                 Spacer(Modifier.height(28.dp))
                 Headline("Taqwa")
@@ -84,7 +86,7 @@ fun OnboardingScreen(
                         "works offline.",
                 )
             }
-            Step.LOCATION -> {
+            OnboardingStep.LOCATION -> {
                 Headline("Where are you?")
                 Spacer(Modifier.height(12.dp))
                 Body(
@@ -92,7 +94,7 @@ fun OnboardingScreen(
                         "your device — your location never leaves your phone.",
                 )
             }
-            Step.NOTIFICATIONS -> {
+            OnboardingStep.NOTIFICATIONS -> {
                 Headline("Never miss a prayer")
                 Spacer(Modifier.height(12.dp))
                 Body(
@@ -107,23 +109,17 @@ fun OnboardingScreen(
         Spacer(Modifier.height(20.dp))
 
         when (step) {
-            Step.WELCOME -> {
-                TaqwaPrimaryButton("Get started", onClick = { step = Step.LOCATION })
+            OnboardingStep.WELCOME -> {
+                TaqwaPrimaryButton("Get started", onClick = { onStep(OnboardingStep.LOCATION) })
                 Spacer(Modifier.height(44.dp))
             }
-            Step.LOCATION -> {
+            OnboardingStep.LOCATION -> {
                 TaqwaPrimaryButton("Use my location", requestLocation)
-                TaqwaTextLink(
-                    "Choose a city instead",
-                    onClick = {
-                        onChooseCity()
-                        // Task 14 replaces this with a push to Screen.CitySearch, which returns
-                        // to this step once a city has been picked.
-                        step = Step.NOTIFICATIONS
-                    },
-                )
+                // The city search is a pushed screen; it advances the step itself once a city
+                // has actually been chosen, so backing out of it lands here again.
+                TaqwaTextLink("Choose a city instead", onClick = onChooseCity)
             }
-            Step.NOTIFICATIONS -> {
+            OnboardingStep.NOTIFICATIONS -> {
                 // Deliberately a no-op beyond advancing: plan 2 wires the real request once a
                 // scheduler exists. A granted permission that produces no notifications is worse
                 // than not asking.
@@ -175,14 +171,14 @@ private fun RingMark() {
 }
 
 @Composable
-private fun StepDots(step: Step) {
+private fun StepDots(step: OnboardingStep) {
     val colors = LocalTaqwaColors.current
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Step.entries.forEach { entry ->
+        OnboardingStep.entries.forEach { entry ->
             Box(
                 Modifier
                     .padding(horizontal = 4.dp)
