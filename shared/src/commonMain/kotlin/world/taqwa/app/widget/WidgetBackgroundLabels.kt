@@ -2,8 +2,10 @@ package world.taqwa.app.widget
 
 import org.jetbrains.compose.resources.StringResource
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.widget_background_frosted
-import world.taqwa.app.resources.widget_background_translucent
+import world.taqwa.app.resources.widget_background_frosted_subtitle
+import world.taqwa.app.resources.widget_background_frosted_title
+import world.taqwa.app.resources.widget_background_translucent_subtitle
+import world.taqwa.app.resources.widget_background_translucent_title
 
 /**
  * The spec's fourth widget background option is labelled per platform because each platform
@@ -16,8 +18,13 @@ import world.taqwa.app.resources.widget_background_translucent
  * platform-specific test source set — only [isIosPlatform] is `expect`/`actual`, and it is a
  * one-line fact no test would meaningfully strengthen.
  */
-fun translucentOrFrostedLabelKey(isIos: Boolean): StringResource =
-    if (isIos) Res.string.widget_background_frosted else Res.string.widget_background_translucent
+fun translucentOrFrostedTitleKey(isIos: Boolean): StringResource =
+    if (isIos) Res.string.widget_background_frosted_title else Res.string.widget_background_translucent_title
+
+/** The one-line description shown beneath the title — split out so it can sit on its own row
+ * line instead of running into the check mark (Task: widget background picker layout). */
+fun translucentOrFrostedSubtitleKey(isIos: Boolean): StringResource =
+    if (isIos) Res.string.widget_background_frosted_subtitle else Res.string.widget_background_translucent_subtitle
 
 /** True on iOS, false on Android. */
 expect val isIosPlatform: Boolean
