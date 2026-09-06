@@ -2536,6 +2536,7 @@ git commit -m "feat: shared design system components"
 - Consumes: `TimelineBuilder`, `PrayerTimesEngine`, `SettingsRepository`, `LocationRepository`, `UmmAlQuraCalendar`, all components from Task 11
 - Produces:
   - `sealed interface TodayUiState { data object Loading; data object NeedsLocation; data class Ready(val location, val hijri: String, val today: TodayState, val highLatitudeNote: String?) }`
+  - `highLatitudeNote` carries whichever of the two high-latitude cases applies; the polar-day wording wins when both are true, because in that case every time was substituted, not only Fajr and Isha.
   - `class TodayViewModel(engine: PrayerTimesEngine, settings: SettingsRepository, locationOf: suspend () -> GeoLocation?, now: () -> Instant)` with `val state: StateFlow<TodayUiState>`, `fun start(scope: CoroutineScope)` and `suspend fun refresh()`
   - `@Composable fun TodayScreen(state: TodayUiState, onOpenQibla: () -> Unit, onOpenSettings: () -> Unit, onChooseCity: () -> Unit, onAllowLocation: () -> Unit)`
 
@@ -2670,18 +2671,42 @@ class TodayViewModel(
             location = location,
             hijri = HijriFormatter.format(hijri),
             today = TimelineBuilder.build(today, tomorrow, instant, prefs.showSunrise),
-            highLatitudeNote = today.highLatitudeRuleApplied?.let(::noteFor),
+            highLatitudeNote = noteFor(today),
         )
     }
 
-    private fun noteFor(rule: HighLatitudePreference): String = when (rule) {
-        HighLatitudePreference.SEVENTH_OF_NIGHT ->
+    /**
+     * Two distinct cases, and conflating them would be the silent fudging the spec exists to
+     * prevent. An ordinary seasonal adjustment substitutes only Fajr and Isha. True polar day or
+     * night means adhan2 could not compute the day at all, so EVERY time on screen — Maghrib
+     * included — came from a different latitude. The polar case therefore wins.
+     */
+    private fun noteFor(day: DayPrayerTimes): String? = when {
+        day.nearestLatitudeFallbackApplied ->
+            "The sun does not rise or set here today. All times are calculated for the " +
+                "nearest latitude where it does."
+        day.highLatitudeRuleApplied == HighLatitudePreference.SEVENTH_OF_NIGHT ->
             "The sun never sets far enough here. Fajr and Isha use the one-seventh rule."
-        HighLatitudePreference.TWILIGHT_ANGLE ->
+        day.highLatitudeRuleApplied == HighLatitudePreference.TWILIGHT_ANGLE ->
             "The sun never sets far enough here. Fajr and Isha use the twilight angle rule."
-        else -> "Fajr and Isha use the middle of the night rule at this latitude."
+        day.highLatitudeRuleApplied != null ->
+            "Fajr and Isha use the middle of the night rule at this latitude."
+        else -> null
     }
 }
+```
+
+**Add a fourth test** to `TodayViewModelTest` covering the polar case, since it is the one a Nordic
+user actually hits in June:
+
+```kotlin
+    @Test
+    fun polarDaySaysEveryTimeWasSubstitutedNotJustFajrAndIsha() = runTest {
+        val vm = todayViewModelForTromso(now = Instant.parse("2026-06-21T12:00:00Z"))
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertTrue(ready.highLatitudeNote!!.contains("does not rise or set"))
+        assertTrue(ready.highLatitudeNote!!.contains("All times"))
+    }
 ```
 
 The Hijri offset is applied to the **Gregorian** date before conversion, never to the Hijri day number — shifting the Hijri day can produce day 0 or day 31.

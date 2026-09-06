@@ -10,7 +10,7 @@
 
 **Depends on Plan 1** (`docs/superpowers/plans/2026-09-06-taqwa-slice1-core.md`), Tasks 1–14. This plan consumes those interfaces by name and does not re-plan any of them.
 
-**Closes Plan 1's three deliberate stubs:** the onboarding notifications button (Task 21), the inert Settings → Notifications row (Task 22), and the missing widget background row on Appearance (Task 28).
+**Closes Plan 1's three deliberate stubs:** the onboarding notifications button (Task 19), the inert Settings → Notifications row (Task 19), and the missing widget background row on Appearance (Task 25).
 
 ## Global Constraints
 
@@ -2463,6 +2463,12 @@ Screen.NotificationSettings -> {
 Every change writes through immediately and reschedules — there is no save button, matching
 `PrayerTimesSettingsScreen`'s existing convention from Plan 1 Task 14.
 
+Add the imports these two steps need wherever they are not already present in `OnboardingScreen.kt`
+and `App.kt`: `world.taqwa.app.notifications.NotificationOnboarding`,
+`world.taqwa.app.notifications.RescheduleTrigger`, `world.taqwa.app.notifications.requestNotificationPermission`,
+`world.taqwa.app.audio.createSoundPreviewPlayer`, `world.taqwa.app.feature.settings.NotificationSettingsScreen`,
+`world.taqwa.app.domain.ObligatoryPrayers` and `world.taqwa.app.domain.PrayerSound`.
+
 - [ ] **Step 10: Build and manually verify both platforms**
 
 Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL.
@@ -2688,6 +2694,2783 @@ Expected: PASS, 8 tests.
 ```bash
 git add shared/src/commonMain/kotlin/world/taqwa/app/qibla shared/src/commonTest/kotlin/world/taqwa/app/qibla
 git commit -m "feat: pure qibla bearing, haversine distance and alignment math"
+```
+
+---
+
+### Task 21: Qibla — sensors `expect`/`actual` and the compass screen
+
+Unlike notifications, both platforms land in this single task: there is no useful intermediate
+state where only one sensor stack exists, since the screen needs both to be reviewable at all.
+
+**Files:**
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/qibla/TrueNorth.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/qibla/CompassAccuracyRules.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/qibla/HeadingFilter.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/qibla/CompassSource.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/qibla/Haptics.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/qibla/QiblaViewModel.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/qibla/QiblaScreen.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/qibla/QiblaDial.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/qibla/TrueNorthTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/qibla/CompassAccuracyRulesTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/qibla/HeadingFilterTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/feature/qibla/QiblaViewModelTest.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/qibla/CompassSource.android.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/qibla/Haptics.android.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/qibla/CompassSource.ios.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/qibla/Haptics.ios.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/nav/Screen.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/App.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/feature/today/TodayScreen.kt`
+
+**Interfaces:**
+- Consumes: `QiblaMath` from Task 20; `GeoLocation` from Plan 1 Task 5; `SettingsRepository`, `appContext` from Plan 1 Task 4; `Screen`, `Navigator`, `AppContainer`, `TaqwaCard` from Plan 1 Task 13/11; `TodayScreen`'s existing `onOpenQibla` callback from Plan 1 Task 12
+- Produces:
+  - `object TrueNorth { fun correct(magneticHeadingDegrees: Double, declinationDegrees: Double): Double }`
+  - `object CompassAccuracyRules { fun androidAccuracyIsLow(sensorAccuracy: Int): Boolean; fun iosAccuracyIsLow(headingAccuracyDegrees: Double): Boolean }`
+  - `class HeadingFilter(smoothing: Double = 0.15)` with `fun update(rawHeadingDegrees: Double): Double` and `fun reset()`
+  - `data class CompassReading(val trueHeadingDegrees: Double, val isLowAccuracy: Boolean)`
+  - `interface CompassSource { val readings: Flow<CompassReading>; fun hasSensor(): Boolean; fun updateLocation(location: GeoLocation?) }` and `expect fun createCompassSource(): CompassSource`
+  - `interface Haptics { fun tick() }` and `expect fun createHaptics(): Haptics`
+  - `sealed interface QiblaUiState` with `NoSensor`, `Searching`, `Aligned`, `LowAccuracy`
+  - `class QiblaViewModel(location: GeoLocation, compassSource: CompassSource, haptics: Haptics, filter: HeadingFilter = HeadingFilter())` with `val state: StateFlow<QiblaUiState>` and `fun start(scope: CoroutineScope)`
+  - `@Composable fun QiblaDial(headingDegrees: Double, bearingDegrees: Double, aligned: Boolean, dimmed: Boolean, modifier: Modifier)`
+  - `@Composable fun QiblaScreen(state: QiblaUiState, modifier: Modifier)`
+  - `Screen.Qibla` added to the sealed interface
+
+- [ ] **Step 1: Write the failing tests for the three pure pieces**
+
+`shared/src/commonTest/kotlin/world/taqwa/app/qibla/TrueNorthTest.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class TrueNorthTest {
+
+    @Test
+    fun positiveDeclinationAddsToTheMagneticHeading() {
+        assertEquals(15.0, TrueNorth.correct(10.0, 5.0), absoluteTolerance = 0.001)
+    }
+
+    @Test
+    fun negativeDeclinationSubtractsFromTheMagneticHeading() {
+        assertEquals(5.0, TrueNorth.correct(10.0, -5.0), absoluteTolerance = 0.001)
+    }
+
+    @Test
+    fun theResultWrapsForwardPastThreeSixty() {
+        assertEquals(5.0, TrueNorth.correct(355.0, 10.0), absoluteTolerance = 0.001)
+    }
+
+    @Test
+    fun theResultWrapsBackwardBelowZero() {
+        assertEquals(355.0, TrueNorth.correct(10.0, -15.0), absoluteTolerance = 0.001)
+    }
+
+    @Test
+    fun zeroDeclinationLeavesTheHeadingUnchanged() {
+        assertEquals(123.0, TrueNorth.correct(123.0, 0.0), absoluteTolerance = 0.001)
+    }
+}
+```
+
+`shared/src/commonTest/kotlin/world/taqwa/app/qibla/CompassAccuracyRulesTest.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class CompassAccuracyRulesTest {
+
+    @Test
+    fun androidHighAndMediumAreNotLow() {
+        assertFalse(CompassAccuracyRules.androidAccuracyIsLow(3)) // SENSOR_STATUS_ACCURACY_HIGH
+        assertFalse(CompassAccuracyRules.androidAccuracyIsLow(2)) // SENSOR_STATUS_ACCURACY_MEDIUM
+    }
+
+    @Test
+    fun androidLowAndUnreliableAreLow() {
+        assertTrue(CompassAccuracyRules.androidAccuracyIsLow(1)) // SENSOR_STATUS_ACCURACY_LOW
+        assertTrue(CompassAccuracyRules.androidAccuracyIsLow(0)) // SENSOR_STATUS_UNRELIABLE
+    }
+
+    @Test
+    fun iosAtOrBelowTwentyDegreesIsNotLow() {
+        assertFalse(CompassAccuracyRules.iosAccuracyIsLow(0.0))
+        assertFalse(CompassAccuracyRules.iosAccuracyIsLow(20.0))
+    }
+
+    @Test
+    fun iosAboveTwentyDegreesIsLow() {
+        assertTrue(CompassAccuracyRules.iosAccuracyIsLow(20.01))
+    }
+
+    @Test
+    fun iosNegativeIsLowRegardlessOfMagnitude() {
+        assertTrue(CompassAccuracyRules.iosAccuracyIsLow(-1.0))
+    }
+}
+```
+
+`shared/src/commonTest/kotlin/world/taqwa/app/qibla/HeadingFilterTest.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+class HeadingFilterTest {
+
+    @Test
+    fun theFirstReadingPassesThroughUnfiltered() {
+        val f = HeadingFilter()
+        assertEquals(90.0, f.update(90.0), absoluteTolerance = 0.001)
+    }
+
+    @Test
+    fun itSmoothsTowardANewReadingRatherThanJumpingToIt() {
+        val f = HeadingFilter(smoothing = 0.2)
+        f.update(0.0)
+        val next = f.update(100.0)
+        assertTrue(next in 15.0..25.0, "was $next")
+    }
+
+    @Test
+    fun itConvergesToASteadyReadingOverRepeatedUpdates() {
+        val f = HeadingFilter(smoothing = 0.3)
+        f.update(0.0)
+        repeat(30) { f.update(90.0) }
+        val result = f.update(90.0)
+        assertTrue(result in 89.0..91.0, "was $result")
+    }
+
+    @Test
+    fun crossingTheZeroThreeSixtySeamNeverJumpsToTheOppositeSide() {
+        val f = HeadingFilter(smoothing = 0.3)
+        f.update(359.0)
+        val next = f.update(1.0)
+        // The short way from 359 to 1 is +2 degrees, not the long way through 180.
+        assertTrue(next in 359.0..360.0 || next in 0.0..1.0, "was $next")
+    }
+
+    @Test
+    fun resetForgetsThePreviousReadingSoTheNextOneAgainPassesThroughUnfiltered() {
+        val f = HeadingFilter()
+        f.update(90.0)
+        f.reset()
+        assertEquals(10.0, f.update(10.0), absoluteTolerance = 0.001)
+    }
+}
+```
+
+- [ ] **Step 2: Run it to confirm it fails**
+
+Run: `./gradlew :shared:allTests --tests "*TrueNorthTest*" --tests "*CompassAccuracyRulesTest*" --tests "*HeadingFilterTest*"`
+Expected: FAIL — `Unresolved reference: TrueNorth`
+
+- [ ] **Step 3: Implement the three pure pieces**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/qibla/TrueNorth.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+/**
+ * Arithmetic only: given a magnetic heading and a declination in degrees (east-positive, the
+ * convention `GeomagneticField.getDeclination()` already returns), produces the true-north
+ * heading. Android supplies both readings separately and calls this; iOS's `CLHeading.trueHeading`
+ * is already true north and never touches this function.
+ */
+object TrueNorth {
+    fun correct(magneticHeadingDegrees: Double, declinationDegrees: Double): Double {
+        val corrected = (magneticHeadingDegrees + declinationDegrees) % 360.0
+        return if (corrected < 0.0) corrected + 360.0 else corrected
+    }
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/qibla/CompassAccuracyRules.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+/**
+ * The spec's low-accuracy thresholds, one function per platform's own accuracy signal. Android
+ * reports a coarse 0-3 enum; iOS reports a confidence angle in degrees.
+ */
+object CompassAccuracyRules {
+    /** `SENSOR_STATUS_ACCURACY_LOW` (1) or `SENSOR_STATUS_ACCURACY_UNRELIABLE` (0). */
+    fun androidAccuracyIsLow(sensorAccuracy: Int): Boolean = sensorAccuracy <= 1
+
+    /** Above 20 degrees, or negative (iOS's "no fix yet" sentinel). */
+    fun iosAccuracyIsLow(headingAccuracyDegrees: Double): Boolean =
+        headingAccuracyDegrees < 0.0 || headingAccuracyDegrees > 20.0
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/qibla/HeadingFilter.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+/**
+ * A low-pass filter on a circular quantity (0-360 degrees). A plain exponential average breaks
+ * across the 0/360 seam — averaging 359 and 1 naively yields 180, the wrong side of the compass
+ * entirely. This averages via the shortest angular delta instead, reusing [QiblaMath.angleDelta].
+ */
+class HeadingFilter(private val smoothing: Double = 0.15) {
+
+    private var current: Double? = null
+
+    fun update(rawHeadingDegrees: Double): Double {
+        val previous = current
+        val next = if (previous == null) {
+            rawHeadingDegrees
+        } else {
+            val delta = QiblaMath.angleDelta(previous, rawHeadingDegrees)
+            (previous + smoothing * delta + 360.0) % 360.0
+        }
+        current = next
+        return next
+    }
+
+    fun reset() { current = null }
+}
+```
+
+- [ ] **Step 4: Run the tests**
+
+Run: `./gradlew :shared:allTests --tests "*TrueNorthTest*" --tests "*CompassAccuracyRulesTest*" --tests "*HeadingFilterTest*"`
+Expected: PASS — 5, 5 and 5 tests respectively.
+
+- [ ] **Step 5: Write the failing view model test**
+
+This references `CompassSource` and `Haptics`, which do not exist until Step 7.
+
+`shared/src/commonTest/kotlin/world/taqwa/app/feature/qibla/QiblaViewModelTest.kt`:
+
+```kotlin
+package world.taqwa.app.feature.qibla
+
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.qibla.CompassReading
+import world.taqwa.app.qibla.CompassSource
+import world.taqwa.app.qibla.Haptics
+import world.taqwa.app.qibla.HeadingFilter
+import world.taqwa.app.qibla.QiblaMath
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+private class FakeCompassSource(private val sensorPresent: Boolean = true) : CompassSource {
+    val readingsFlow = MutableSharedFlow<CompassReading>(replay = 0, extraBufferCapacity = 8)
+    override val readings = readingsFlow
+    override fun hasSensor() = sensorPresent
+    var lastLocation: GeoLocation? = null
+    override fun updateLocation(location: GeoLocation?) { lastLocation = location }
+}
+
+private class FakeHaptics : Haptics {
+    var tickCount = 0
+    override fun tick() { tickCount++ }
+}
+
+class QiblaViewModelTest {
+
+    private val london = GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB")
+    private val bearing = QiblaMath.bearing(london)
+
+    @Test
+    fun withNoSensorTheStateIsNoSensorAndNothingIsCollected() = runTest {
+        val vm = QiblaViewModel(london, FakeCompassSource(sensorPresent = false), FakeHaptics())
+        assertEquals(QiblaUiState.NoSensor, vm.state.first())
+    }
+
+    @Test
+    fun aFarOffHeadingIsSearching() = runTest {
+        val source = FakeCompassSource()
+        val vm = QiblaViewModel(london, source, FakeHaptics())
+        vm.start(backgroundScope)
+        source.readingsFlow.emit(CompassReading(trueHeadingDegrees = 0.0, isLowAccuracy = false))
+        assertTrue(vm.state.first { it is QiblaUiState.Searching } is QiblaUiState.Searching)
+    }
+
+    @Test
+    fun aHeadingWithinFiveDegreesIsAlignedAndTicksExactlyOnce() = runTest {
+        val source = FakeCompassSource()
+        val haptics = FakeHaptics()
+        val vm = QiblaViewModel(london, source, haptics, filter = HeadingFilter(smoothing = 1.0))
+        vm.start(backgroundScope)
+        source.readingsFlow.emit(CompassReading(bearing, isLowAccuracy = false))
+        vm.state.first { it is QiblaUiState.Aligned }
+        source.readingsFlow.emit(CompassReading(bearing, isLowAccuracy = false))
+        vm.state.first { it is QiblaUiState.Aligned }
+        assertEquals(1, haptics.tickCount)
+    }
+
+    @Test
+    fun leavingAlignmentAndReturningTicksAgain() = runTest {
+        val source = FakeCompassSource()
+        val haptics = FakeHaptics()
+        val vm = QiblaViewModel(london, source, haptics, filter = HeadingFilter(smoothing = 1.0))
+        vm.start(backgroundScope)
+        source.readingsFlow.emit(CompassReading(bearing, false))
+        vm.state.first { it is QiblaUiState.Aligned }
+        source.readingsFlow.emit(CompassReading((bearing + 90.0) % 360.0, false))
+        vm.state.first { it is QiblaUiState.Searching }
+        source.readingsFlow.emit(CompassReading(bearing, false))
+        vm.state.first { it is QiblaUiState.Aligned }
+        assertEquals(2, haptics.tickCount)
+    }
+
+    @Test
+    fun lowAccuracyOverridesAlignmentDimsRatherThanPointsAndNeverTicks() = runTest {
+        val source = FakeCompassSource()
+        val haptics = FakeHaptics()
+        val vm = QiblaViewModel(london, source, haptics, filter = HeadingFilter(smoothing = 1.0))
+        vm.start(backgroundScope)
+        source.readingsFlow.emit(CompassReading(bearing, isLowAccuracy = true))
+        assertTrue(vm.state.first { it is QiblaUiState.LowAccuracy } is QiblaUiState.LowAccuracy)
+        assertEquals(0, haptics.tickCount)
+    }
+}
+```
+
+- [ ] **Step 6: Run it to confirm it fails**
+
+Run: `./gradlew :shared:allTests --tests "*QiblaViewModelTest*"`
+Expected: FAIL — `Unresolved reference: CompassSource`
+
+- [ ] **Step 7: Write the sensor interfaces and the view model**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/qibla/CompassSource.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import kotlinx.coroutines.flow.Flow
+import world.taqwa.app.domain.GeoLocation
+
+/** One reading. Heading is already true north: Android applies `GeomagneticField` declination
+ * before emitting; iOS reports `CLHeading.trueHeading` directly. */
+data class CompassReading(val trueHeadingDegrees: Double, val isLowAccuracy: Boolean)
+
+interface CompassSource {
+    /** Never emits when [hasSensor] is false — the "no magnetometer" edge case shows a numeric
+     * bearing instead and never subscribes to this at all. */
+    val readings: Flow<CompassReading>
+    fun hasSensor(): Boolean
+    /** Only meaningful on Android, where declination must be computed from a location; a no-op
+     * on iOS, where `CLHeading.trueHeading` is already true north. */
+    fun updateLocation(location: GeoLocation?)
+}
+
+expect fun createCompassSource(): CompassSource
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/qibla/Haptics.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+interface Haptics {
+    /** One discrete tick. Never a stream — the view model calls this once per alignment entry,
+     * not once per frame while already aligned. */
+    fun tick()
+}
+
+expect fun createHaptics(): Haptics
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/feature/qibla/QiblaViewModel.kt`:
+
+```kotlin
+package world.taqwa.app.feature.qibla
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.qibla.CompassSource
+import world.taqwa.app.qibla.Haptics
+import world.taqwa.app.qibla.HeadingFilter
+import world.taqwa.app.qibla.QiblaMath
+
+sealed interface QiblaUiState {
+    data object NoSensor : QiblaUiState
+    data class Searching(val headingDegrees: Double, val bearingDegrees: Double, val distanceKm: Double) : QiblaUiState
+    data class Aligned(val headingDegrees: Double, val bearingDegrees: Double, val distanceKm: Double) : QiblaUiState
+    data class LowAccuracy(val bearingDegrees: Double, val distanceKm: Double) : QiblaUiState
+}
+
+class QiblaViewModel(
+    location: GeoLocation,
+    private val compassSource: CompassSource,
+    private val haptics: Haptics,
+    private val filter: HeadingFilter = HeadingFilter(),
+) {
+    private val bearing = QiblaMath.bearing(location)
+    private val distance = QiblaMath.distanceKm(location)
+
+    private val _state = MutableStateFlow<QiblaUiState>(
+        if (compassSource.hasSensor()) QiblaUiState.Searching(0.0, bearing, distance) else QiblaUiState.NoSensor,
+    )
+    val state: StateFlow<QiblaUiState> = _state.asStateFlow()
+
+    private var wasAligned = false
+
+    init {
+        if (compassSource.hasSensor()) compassSource.updateLocation(location)
+    }
+
+    fun start(scope: CoroutineScope) {
+        if (!compassSource.hasSensor()) return
+        scope.launch {
+            compassSource.readings.collect { reading ->
+                val smoothed = filter.update(reading.trueHeadingDegrees)
+                _state.value = when {
+                    reading.isLowAccuracy -> {
+                        wasAligned = false
+                        QiblaUiState.LowAccuracy(bearing, distance)
+                    }
+                    QiblaMath.isAligned(smoothed, bearing) -> {
+                        // One tick on entry, never once per frame while already aligned.
+                        if (!wasAligned) haptics.tick()
+                        wasAligned = true
+                        QiblaUiState.Aligned(smoothed, bearing, distance)
+                    }
+                    else -> {
+                        wasAligned = false
+                        QiblaUiState.Searching(smoothed, bearing, distance)
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+- [ ] **Step 8: Run the view model tests**
+
+The `expect` declarations above have no `actual` yet, so — as in Task 17 — run the Android test
+task rather than the aggregate one:
+
+Run: `./gradlew :shared:testDebugUnitTest --tests "*QiblaViewModelTest*"`
+Expected: PASS, 5 tests.
+
+- [ ] **Step 9: Implement the Android sensor stack**
+
+`shared/src/androidMain/kotlin/world/taqwa/app/qibla/CompassSource.android.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import android.content.Context
+import android.hardware.GeomagneticField
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.settings.appContext
+
+/**
+ * `TYPE_ROTATION_VECTOR` gives orientation without the classic accelerometer+magnetometer
+ * jitter; `GeomagneticField` then corrects magnetic heading to true north using whatever
+ * location was last supplied via [updateLocation].
+ */
+class AndroidCompassSource : CompassSource {
+
+    private val sensorManager = appContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+
+    @Volatile private var location: GeoLocation? = null
+
+    override fun hasSensor(): Boolean = rotationSensor != null
+
+    override fun updateLocation(location: GeoLocation?) { this.location = location }
+
+    override val readings: Flow<CompassReading> = callbackFlow {
+        val sensor = rotationSensor ?: run { close(); return@callbackFlow }
+        var lowAccuracy = false
+
+        val listener = object : SensorEventListener {
+            override fun onAccuracyChanged(changedSensor: Sensor?, accuracy: Int) {
+                lowAccuracy = CompassAccuracyRules.androidAccuracyIsLow(accuracy)
+            }
+
+            override fun onSensorChanged(event: SensorEvent) {
+                val rotationMatrix = FloatArray(9)
+                SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+                val orientation = FloatArray(3)
+                SensorManager.getOrientation(rotationMatrix, orientation)
+                val magneticHeading = (Math.toDegrees(orientation[0].toDouble()) + 360.0) % 360.0
+
+                val loc = location
+                val trueHeading = if (loc != null) {
+                    val declination = GeomagneticField(
+                        loc.latitude.toFloat(), loc.longitude.toFloat(), 0f, System.currentTimeMillis(),
+                    ).declination.toDouble()
+                    TrueNorth.correct(magneticHeading, declination)
+                } else {
+                    magneticHeading
+                }
+                trySend(CompassReading(trueHeading, lowAccuracy))
+            }
+        }
+        sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME)
+        awaitClose { sensorManager.unregisterListener(listener) }
+    }
+}
+
+actual fun createCompassSource(): CompassSource = AndroidCompassSource()
+```
+
+`shared/src/androidMain/kotlin/world/taqwa/app/qibla/Haptics.android.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
+import world.taqwa.app.settings.appContext
+
+private class AndroidHaptics : Haptics {
+    private val vibrator = appContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+    override fun tick() {
+        vibrator.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+    }
+}
+
+actual fun createHaptics(): Haptics = AndroidHaptics()
+```
+
+- [ ] **Step 10: Implement the iOS sensor stack**
+
+`shared/src/iosMain/kotlin/world/taqwa/app/qibla/CompassSource.ios.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import platform.CoreLocation.CLHeading
+import platform.CoreLocation.CLLocationManager
+import platform.CoreLocation.CLLocationManagerDelegateProtocol
+import platform.darwin.NSObject
+import world.taqwa.app.domain.GeoLocation
+
+/**
+ * `CLHeading.trueHeading` already applies declination — [updateLocation] is a deliberate no-op,
+ * since only the Android path needs a location to correct magnetic north.
+ */
+@OptIn(ExperimentalForeignApi::class)
+class IosCompassSource : CompassSource {
+
+    private val manager = CLLocationManager()
+
+    override fun hasSensor(): Boolean = CLLocationManager.headingAvailable()
+
+    override fun updateLocation(location: GeoLocation?) { /* no-op: trueHeading needs no correction */ }
+
+    override val readings: Flow<CompassReading> = callbackFlow {
+        if (!CLLocationManager.headingAvailable()) { close(); return@callbackFlow }
+
+        val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
+            override fun locationManager(manager: CLLocationManager, didUpdateHeading: CLHeading) {
+                val accuracy = didUpdateHeading.headingAccuracy
+                trySend(
+                    CompassReading(
+                        trueHeadingDegrees = didUpdateHeading.trueHeading,
+                        isLowAccuracy = CompassAccuracyRules.iosAccuracyIsLow(accuracy),
+                    ),
+                )
+            }
+        }
+        manager.delegate = delegate
+        manager.startUpdatingHeading()
+        awaitClose { manager.stopUpdatingHeading() }
+    }
+}
+
+actual fun createCompassSource(): CompassSource = IosCompassSource()
+```
+
+`shared/src/iosMain/kotlin/world/taqwa/app/qibla/Haptics.ios.kt`:
+
+```kotlin
+package world.taqwa.app.qibla
+
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.UIKit.UIImpactFeedbackGenerator
+import platform.UIKit.UIImpactFeedbackStyle
+
+@OptIn(ExperimentalForeignApi::class)
+private class IosHaptics : Haptics {
+    private val generator = UIImpactFeedbackGenerator(style = UIImpactFeedbackStyle.UIImpactFeedbackStyleMedium)
+
+    override fun tick() {
+        generator.prepare()
+        generator.impactOccurred()
+    }
+}
+
+actual fun createHaptics(): Haptics = IosHaptics()
+```
+
+- [ ] **Step 11: Confirm the full build is green on both platforms**
+
+Run: `./gradlew :shared:allTests` — Expected: all tests PASS, both actuals now present.
+Run: `./scripts/ios-build.sh` — Expected: BUILD SUCCEEDED.
+
+- [ ] **Step 12: Write the dial and the screen**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/feature/qibla/QiblaDial.kt`:
+
+```kotlin
+package world.taqwa.app.feature.qibla
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.dp
+import world.taqwa.app.design.LocalTaqwaColors
+import kotlin.math.cos
+import kotlin.math.sin
+
+/**
+ * The dial rotates under a needle that always points straight up — the same convention every
+ * compass app uses — with the Kaaba marker fixed at [bearingDegrees] on the rim. [dimmed] is the
+ * low-accuracy state: the whole dial fades to 28% and points at nothing, because "I don't know"
+ * is the correct behaviour there.
+ */
+@Composable
+fun QiblaDial(
+    headingDegrees: Double,
+    bearingDegrees: Double,
+    aligned: Boolean,
+    dimmed: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalTaqwaColors.current
+    Box(modifier.size(260.dp).alpha(if (dimmed) 0.28f else 1f)) {
+        Canvas(Modifier.size(260.dp)) {
+            val radius = size.minDimension / 2f
+            val center = Offset(size.width / 2f, size.height / 2f)
+
+            for (tick in 0 until 12) {
+                val angle = Math.toRadians((tick * 30.0) - headingDegrees - 90.0)
+                val outer = Offset(
+                    center.x + (radius - 4.dp.toPx()) * cos(angle).toFloat(),
+                    center.y + (radius - 4.dp.toPx()) * sin(angle).toFloat(),
+                )
+                val inner = Offset(
+                    center.x + (radius - 14.dp.toPx()) * cos(angle).toFloat(),
+                    center.y + (radius - 14.dp.toPx()) * sin(angle).toFloat(),
+                )
+                drawLine(colors.hairline, inner, outer, strokeWidth = 2.dp.toPx())
+            }
+
+            val markerAngle = Math.toRadians(bearingDegrees - headingDegrees - 90.0)
+            val markerCenter = Offset(
+                center.x + (radius - 20.dp.toPx()) * cos(markerAngle).toFloat(),
+                center.y + (radius - 20.dp.toPx()) * sin(markerAngle).toFloat(),
+            )
+            drawCircle(
+                color = if (aligned) colors.accent else colors.textSecondary,
+                radius = 8.dp.toPx(),
+                center = markerCenter,
+            )
+
+            drawLine(
+                color = colors.accent,
+                start = center,
+                end = Offset(center.x, center.y - radius + 30.dp.toPx()),
+                strokeWidth = 4.dp.toPx(),
+                cap = StrokeCap.Round,
+            )
+
+            if (aligned) {
+                drawCircle(
+                    color = colors.accent,
+                    radius = radius - 2.dp.toPx(),
+                    center = center,
+                    style = Stroke(width = 4.dp.toPx()),
+                )
+            }
+        }
+    }
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/feature/qibla/QiblaScreen.kt`:
+
+```kotlin
+package world.taqwa.app.feature.qibla
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import world.taqwa.app.design.LocalTaqwaColors
+import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.components.TaqwaCard
+
+@Composable
+fun QiblaScreen(state: QiblaUiState, modifier: Modifier = Modifier) {
+    val colors = LocalTaqwaColors.current
+    Column(
+        modifier.fillMaxSize().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        when (state) {
+            QiblaUiState.NoSensor -> {
+                Text("No compass sensor", style = TaqwaText.screenTitle, textAlign = TextAlign.Center)
+                Text(
+                    "This device has no magnetometer. Use a physical compass together with the " +
+                        "bearing below.",
+                    style = TaqwaText.caption, color = colors.textSecondary, textAlign = TextAlign.Center,
+                )
+            }
+            is QiblaUiState.Searching -> {
+                QiblaDial(state.headingDegrees, state.bearingDegrees, aligned = false, dimmed = false)
+                BearingAndDistance(state.bearingDegrees, state.distanceKm)
+            }
+            is QiblaUiState.Aligned -> {
+                QiblaDial(state.headingDegrees, state.bearingDegrees, aligned = true, dimmed = false)
+                BearingAndDistance(state.bearingDegrees, state.distanceKm)
+            }
+            is QiblaUiState.LowAccuracy -> {
+                QiblaDial(0.0, state.bearingDegrees, aligned = false, dimmed = true)
+                TaqwaCard(Modifier.padding(top = 16.dp)) {
+                    Text(
+                        "Move your phone in a figure-eight motion. Metal, cases and speakers " +
+                            "can interfere with the compass.",
+                        style = TaqwaText.caption, color = colors.textSecondary,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BearingAndDistance(bearingDegrees: Double, distanceKm: Double) {
+    Text(
+        "${bearingDegrees.toInt()}° · ${distanceKm.toInt()} km to Makkah",
+        style = TaqwaText.caption,
+        color = LocalTaqwaColors.current.textSecondary,
+        modifier = Modifier.padding(top = 16.dp),
+    )
+}
+```
+
+- [ ] **Step 13: Wire the qibla screen into navigation**
+
+Add to `nav/Screen.kt`'s sealed interface: `data object Qibla : Screen`.
+
+In `feature/today/TodayScreen.kt`, the existing `onOpenQibla` callback (Plan 1 Task 12) now has
+somewhere real to go — no change to `TodayScreen` itself, only to what `App.kt` passes it.
+
+In `App.kt`, add the branch:
+
+```kotlin
+Screen.Qibla -> {
+    val location by container.settingsRepository.location.collectAsState(initial = null)
+    val loc = location
+    if (loc == null) {
+        androidx.compose.material3.Text("Set a location on Today first.")
+    } else {
+        val vm = remember(loc) {
+            world.taqwa.app.feature.qibla.QiblaViewModel(
+                location = loc,
+                compassSource = world.taqwa.app.qibla.createCompassSource(),
+                haptics = world.taqwa.app.qibla.createHaptics(),
+            )
+        }
+        LaunchedEffect(vm) { vm.start(this) }
+        val qiblaState by vm.state.collectAsState()
+        world.taqwa.app.feature.qibla.QiblaScreen(qiblaState)
+    }
+}
+```
+
+And wherever `TodayScreen(...)` is called in `App.kt`, pass `onOpenQibla = { navigator.push(Screen.Qibla) }`.
+
+- [ ] **Step 14: Build and manually verify on both platforms**
+
+Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL.
+Run: `./scripts/ios-build.sh` — Expected: BUILD SUCCEEDED.
+
+On device (a simulator has no magnetometer, so this step needs real hardware): open the compass
+icon from Today, rotate the phone toward Makkah's known direction for your location, and confirm
+the rim lights and the phone ticks once on entry — not continuously. Cover the phone's back with
+a hand near the camera bump (common metal interference) and confirm the dial dims to 28% and
+asks for a figure-eight.
+
+- [ ] **Step 15: Commit**
+
+```bash
+git add shared/src/commonMain/kotlin/world/taqwa/app/qibla shared/src/commonMain/kotlin/world/taqwa/app/feature/qibla shared/src/commonTest/kotlin/world/taqwa/app/qibla shared/src/commonTest/kotlin/world/taqwa/app/feature/qibla shared/src/androidMain/kotlin/world/taqwa/app/qibla shared/src/iosMain/kotlin/world/taqwa/app/qibla shared/src/commonMain/kotlin/world/taqwa/app/nav shared/src/commonMain/kotlin/world/taqwa/app/App.kt
+git commit -m "feat: true-north qibla compass with alignment haptics and low-accuracy state"
+```
+
+---
+
+### Task 22: Localisation and RTL
+
+Note on Task 16's `NotificationCopy.kt`: its doc comments say "Task 26 replaces
+`EnglishNotificationCopy` with a localised implementation" and "Task 27 replaces this with CLDR
+formatting" (for `isoClockTime`). Both numbers are leftovers from an earlier draft of this plan's
+task count — this is that task, for both.
+
+**Files:**
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/i18n/PrayerNaming.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/i18n/LayoutDirection.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/i18n/CountdownFormatter.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/i18n/PlatformFormat.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/i18n/PlatformFormat.android.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/i18n/PlatformFormat.ios.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/notifications/LocalizedNotificationCopy.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/notifications/NotificationCoordinator.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/feature/today/PrayerTimeline.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/feature/today/TodayScreen.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/App.kt`
+- Create: `shared/src/commonMain/composeResources/values/strings.xml`
+- Create: `shared/src/commonMain/composeResources/values-ar/strings.xml`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/i18n/PrayerNamingTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/i18n/LayoutDirectionTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/i18n/CountdownFormatterTest.kt`
+
+**Interfaces:**
+- Consumes: `Prayer` from Plan 1 Task 4; `NotificationCopy`, `NotificationKind` from Task 16; `NotificationCoordinator` from Task 17; `TimelineRow`, `PrayerStatus` from Plan 1 Task 7
+- Produces:
+  - `object PrayerNaming { fun arabicName(prayer: Prayer): String; fun englishName(prayer: Prayer): String; fun display(prayer: Prayer, languageTag: String, localizedName: String): String }`
+  - `object LayoutDirection { fun isRtl(languageTag: String): Boolean }`
+  - `interface PlatformFormat { fun languageTag(): String; fun localizedDigits(number: Int): String; fun clockTime(hour: Int, minute: Int): String }` and `expect fun createPlatformFormat(): PlatformFormat`
+  - `object CountdownFormatter { const val ARABIC_INDIC_DIGITS_VERIFIED_TABULAR: Boolean; fun defaultsToArabicIndicDigits(languageTag: String): Boolean; fun countdown(duration: Duration, format: PlatformFormat, tabularDigitsVerified: Boolean): String }`
+  - `class LocalizedNotificationCopy(format: PlatformFormat) : NotificationCopy`
+
+- [ ] **Step 1: Write the failing tests for the three pure pieces**
+
+`shared/src/commonTest/kotlin/world/taqwa/app/i18n/PrayerNamingTest.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+import world.taqwa.app.domain.Prayer
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class PrayerNamingTest {
+
+    @Test
+    fun arabicLocaleShowsTheArabicNameAlone() {
+        val display = PrayerNaming.display(Prayer.FAJR, "ar", "Fajr")
+        assertEquals(PrayerNaming.arabicName(Prayer.FAJR), display)
+        assertFalse(display.contains("Fajr"))
+    }
+
+    @Test
+    fun regionalArabicVariantsStillShowTheArabicNameAlone() {
+        listOf("ar-LY", "ar-EG", "ar-SA", "ar-MA").forEach { tag ->
+            assertEquals(PrayerNaming.arabicName(Prayer.ISHA), PrayerNaming.display(Prayer.ISHA, tag, "Isha"), tag)
+        }
+    }
+
+    @Test
+    fun everyOtherLocalePairsTheLocalisedNameWithArabic() {
+        val display = PrayerNaming.display(Prayer.DHUHR, "fr", "Dohr")
+        assertTrue(display.contains("Dohr"))
+        assertTrue(display.contains(PrayerNaming.arabicName(Prayer.DHUHR)))
+    }
+
+    @Test
+    fun englishIsTreatedAsJustAnotherNonArabicLocale() {
+        val display = PrayerNaming.display(Prayer.ASR, "en", "Asr")
+        assertTrue(display.contains("Asr"))
+        assertTrue(display.contains(PrayerNaming.arabicName(Prayer.ASR)))
+    }
+
+    @Test
+    fun theLanguageTagCheckIsCaseInsensitive() {
+        assertEquals(PrayerNaming.arabicName(Prayer.MAGHRIB), PrayerNaming.display(Prayer.MAGHRIB, "AR", "Maghrib"))
+    }
+}
+```
+
+`shared/src/commonTest/kotlin/world/taqwa/app/i18n/LayoutDirectionTest.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class LayoutDirectionTest {
+
+    @Test
+    fun arabicAndItsRegionalVariantsAreRtl() {
+        listOf("ar", "ar-EG", "ar-LY", "ar-SA").forEach { assertTrue(LayoutDirection.isRtl(it), it) }
+    }
+
+    @Test
+    fun hebrewFarsiAndUrduAreAlsoRtl() {
+        listOf("he", "fa", "ur").forEach { assertTrue(LayoutDirection.isRtl(it), it) }
+    }
+
+    @Test
+    fun englishAndFrenchAreLtr() {
+        listOf("en", "en-US", "fr").forEach { assertFalse(LayoutDirection.isRtl(it), it) }
+    }
+
+    @Test
+    fun theCheckIsCaseInsensitive() {
+        assertTrue(LayoutDirection.isRtl("AR-EG"))
+    }
+}
+```
+
+`shared/src/commonTest/kotlin/world/taqwa/app/i18n/CountdownFormatterTest.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
+
+private const val ARABIC_INDIC = "٠١٢٣٤٥٦٧٨٩"
+
+private class FakePlatformFormat(private val tag: String, private val useArabicIndic: Boolean) : PlatformFormat {
+    override fun languageTag() = tag
+    override fun localizedDigits(number: Int): String =
+        if (useArabicIndic) number.toString().map { ARABIC_INDIC[it - '0'] }.joinToString("") else number.toString()
+    override fun clockTime(hour: Int, minute: Int): String = "${localizedDigits(hour)}:${localizedDigits(minute)}"
+}
+
+class CountdownFormatterTest {
+
+    @Test
+    fun egyptianArabicUsesArabicIndicDigitsWhenTabularIsVerified() {
+        val format = FakePlatformFormat("ar-EG", useArabicIndic = true)
+        assertEquals("١:٠٥", CountdownFormatter.countdown(65.minutes, format, tabularDigitsVerified = true))
+    }
+
+    @Test
+    fun egyptianArabicFallsBackToWesternDigitsWhenTabularIsNotVerified() {
+        val format = FakePlatformFormat("ar-EG", useArabicIndic = true)
+        assertEquals("1:05", CountdownFormatter.countdown(65.minutes, format, tabularDigitsVerified = false))
+    }
+
+    @Test
+    fun libyanArabicNeverFallsBackBecauseItAlreadyDefaultsToWestern() {
+        val format = FakePlatformFormat("ar-LY", useArabicIndic = false)
+        assertEquals("1:05", CountdownFormatter.countdown(65.minutes, format, tabularDigitsVerified = false))
+    }
+
+    @Test
+    fun englishIsUnaffectedByTheFallbackFlagEitherWay() {
+        val format = FakePlatformFormat("en", useArabicIndic = false)
+        assertEquals("1:05", CountdownFormatter.countdown(65.minutes, format, tabularDigitsVerified = false))
+        assertEquals("1:05", CountdownFormatter.countdown(65.minutes, format, tabularDigitsVerified = true))
+    }
+
+    @Test
+    fun minutesAreAlwaysTwoDigitsEvenWhenSingleDigit() {
+        val format = FakePlatformFormat("en", useArabicIndic = false)
+        assertEquals("0:05", CountdownFormatter.countdown(5.minutes, format, tabularDigitsVerified = true))
+    }
+
+    @Test
+    fun defaultsToArabicIndicDigitsIsExactlyTheSpecsTwoLocales() {
+        assertEquals(true, CountdownFormatter.defaultsToArabicIndicDigits("ar-EG"))
+        assertEquals(true, CountdownFormatter.defaultsToArabicIndicDigits("ar-SA"))
+        listOf("ar-LY", "ar-MA", "ar-TN", "ar-DZ", "ar", "en").forEach {
+            assertEquals(false, CountdownFormatter.defaultsToArabicIndicDigits(it), it)
+        }
+    }
+}
+```
+
+- [ ] **Step 2: Run it to confirm it fails**
+
+Run: `./gradlew :shared:allTests --tests "*PrayerNamingTest*" --tests "*LayoutDirectionTest*" --tests "*CountdownFormatterTest*"`
+Expected: FAIL — `Unresolved reference: PrayerNaming`
+
+- [ ] **Step 3: Implement the three pure pieces**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/i18n/PrayerNaming.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+import world.taqwa.app.domain.Prayer
+
+private val ENGLISH = mapOf(
+    Prayer.FAJR to "Fajr", Prayer.SUNRISE to "Sunrise", Prayer.DHUHR to "Dhuhr",
+    Prayer.ASR to "Asr", Prayer.MAGHRIB to "Maghrib", Prayer.ISHA to "Isha",
+)
+
+private val ARABIC = mapOf(
+    Prayer.FAJR to "الفجر", Prayer.SUNRISE to "الشروق", Prayer.DHUHR to "الظهر",
+    Prayer.ASR to "العصر", Prayer.MAGHRIB to "المغرب", Prayer.ISHA to "العشاء",
+)
+
+/**
+ * The spec's one rule for every prayer name shown anywhere — timeline, widgets, notifications:
+ * in Arabic locale the Arabic name stands alone; everywhere else it is paired with the
+ * localised name. `localizedName` is a parameter rather than a lookup so this object never
+ * needs one entry per supported UI language.
+ */
+object PrayerNaming {
+    fun arabicName(prayer: Prayer): String = ARABIC.getValue(prayer)
+
+    fun englishName(prayer: Prayer): String = ENGLISH.getValue(prayer)
+
+    fun display(prayer: Prayer, languageTag: String, localizedName: String): String =
+        if (isArabicLanguage(languageTag)) arabicName(prayer)
+        else "$localizedName · ${arabicName(prayer)}"
+
+    private fun isArabicLanguage(languageTag: String): Boolean =
+        languageTag.substringBefore('-').equals("ar", ignoreCase = true)
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/i18n/LayoutDirection.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+private val RTL_LANGUAGES = setOf("ar", "he", "fa", "ur")
+
+/** Slice 1 only ships Arabic and English UI copy, but the other RTL tags cost nothing to
+ * recognise now and save a bug report the day a device's system language is Urdu or Farsi. */
+object LayoutDirection {
+    fun isRtl(languageTag: String): Boolean =
+        languageTag.substringBefore('-').lowercase() in RTL_LANGUAGES
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/i18n/CountdownFormatter.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+import kotlin.time.Duration
+
+/**
+ * The countdown ring's H:MM text. Unlike the timeline's clock times, which always keep the
+ * locale's own digits, the countdown may fall back to Western digits: it is a duration, not a
+ * clock time, so it carries less locale expectation, and the spec allows trading that off
+ * against the tabular jitter Arabic-Indic glyphs might introduce (spec §4.2, "Consequence to
+ * verify"). Whether the fallback is actually needed is an on-device verification, not something
+ * this pure function can measure — [ARABIC_INDIC_DIGITS_VERIFIED_TABULAR] carries that verdict.
+ */
+object CountdownFormatter {
+
+    /**
+     * Set by the on-device check in this task's Step 8. Defaults to `false` — the conservative,
+     * always-correct choice — until someone confirms Arabic-Indic glyphs are tabular in the
+     * system Arabic face on both a Gulf/Egyptian Android OEM font and iOS's SF Arabic.
+     */
+    const val ARABIC_INDIC_DIGITS_VERIFIED_TABULAR = false
+
+    /** ar-EG and ar-SA default to Arabic-Indic digits; ar-LY, ar-MA, ar-TN and ar-DZ default to
+     * Western already, so the fallback question never arises for them. */
+    fun defaultsToArabicIndicDigits(languageTag: String): Boolean =
+        languageTag.uppercase() in setOf("AR-EG", "AR-SA")
+
+    fun countdown(duration: Duration, format: PlatformFormat, tabularDigitsVerified: Boolean): String {
+        val totalMinutes = duration.inWholeMinutes.coerceAtLeast(0)
+        val hours = (totalMinutes / 60).toInt()
+        val minutes = (totalMinutes % 60).toInt()
+
+        val useWestern = defaultsToArabicIndicDigits(format.languageTag()) && !tabularDigitsVerified
+        return if (useWestern) {
+            "$hours:${minutes.toString().padStart(2, '0')}"
+        } else {
+            "${format.localizedDigits(hours)}:${padTwo(minutes, format)}"
+        }
+    }
+
+    private fun padTwo(value: Int, format: PlatformFormat): String =
+        if (value < 10) "${format.localizedDigits(0)}${format.localizedDigits(value)}" else format.localizedDigits(value)
+}
+```
+
+- [ ] **Step 4: Run the tests**
+
+Run: `./gradlew :shared:allTests --tests "*PrayerNamingTest*" --tests "*LayoutDirectionTest*" --tests "*CountdownFormatterTest*"`
+Expected: PASS — 5, 4 and 6 tests respectively.
+
+- [ ] **Step 5: Write the platform format interface and both actuals**
+
+Nothing left to pure-test here — locale digit and clock formatting is exactly the kind of
+platform behaviour Task 10 and Task 19 already established is verified on-device, not mocked.
+
+`shared/src/commonMain/kotlin/world/taqwa/app/i18n/PlatformFormat.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+interface PlatformFormat {
+    fun languageTag(): String
+    /** Locale-correct digits for a plain non-negative integer, e.g. "42" or "٤٢". */
+    fun localizedDigits(number: Int): String
+    /** A 24-hour clock time using the platform's own locale formatting and digit set. */
+    fun clockTime(hour: Int, minute: Int): String
+}
+
+expect fun createPlatformFormat(): PlatformFormat
+```
+
+`shared/src/androidMain/kotlin/world/taqwa/app/i18n/PlatformFormat.android.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+import java.text.NumberFormat
+import java.util.Locale
+
+private class AndroidPlatformFormat : PlatformFormat {
+    private val locale: Locale = Locale.getDefault()
+    private val twoDigitFormat = NumberFormat.getIntegerInstance(locale).apply {
+        minimumIntegerDigits = 2
+        isGroupingUsed = false
+    }
+
+    override fun languageTag(): String = locale.toLanguageTag()
+
+    override fun localizedDigits(number: Int): String =
+        NumberFormat.getIntegerInstance(locale).apply { isGroupingUsed = false }.format(number)
+
+    override fun clockTime(hour: Int, minute: Int): String =
+        "${twoDigitFormat.format(hour)}:${twoDigitFormat.format(minute)}"
+}
+
+actual fun createPlatformFormat(): PlatformFormat = AndroidPlatformFormat()
+```
+
+`shared/src/iosMain/kotlin/world/taqwa/app/i18n/PlatformFormat.ios.kt`:
+
+```kotlin
+package world.taqwa.app.i18n
+
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.NSLocale
+import platform.Foundation.NSNumber
+import platform.Foundation.NSNumberFormatter
+import platform.Foundation.currentLocale
+import platform.Foundation.preferredLanguages
+
+@OptIn(ExperimentalForeignApi::class)
+private class IosPlatformFormat : PlatformFormat {
+    private val locale = NSLocale.currentLocale
+    private val twoDigitFormatter = NSNumberFormatter().apply {
+        locale = this@IosPlatformFormat.locale
+        minimumIntegerDigits = 2UL
+    }
+    private val plainFormatter = NSNumberFormatter().apply { locale = this@IosPlatformFormat.locale }
+
+    override fun languageTag(): String = (NSLocale.preferredLanguages.firstOrNull() as? String) ?: "en"
+
+    override fun localizedDigits(number: Int): String =
+        plainFormatter.stringFromNumber(NSNumber(int = number)) ?: number.toString()
+
+    override fun clockTime(hour: Int, minute: Int): String {
+        val h = twoDigitFormatter.stringFromNumber(NSNumber(int = hour)) ?: hour.toString()
+        val m = twoDigitFormatter.stringFromNumber(NSNumber(int = minute)) ?: minute.toString()
+        return "$h:$m"
+    }
+}
+
+actual fun createPlatformFormat(): PlatformFormat = IosPlatformFormat()
+```
+
+- [ ] **Step 6: Confirm the full build is green on both platforms**
+
+Run: `./gradlew :shared:allTests` — Expected: all tests PASS.
+Run: `./scripts/ios-build.sh` — Expected: BUILD SUCCEEDED.
+
+- [ ] **Step 7: Apply the Arabic-alone rule to the timeline**
+
+In `feature/today/PrayerTimeline.kt` (Plan 1 Task 12), replace the row's unconditional
+`englishName(row.prayer)` + `arabicName(row.prayer)` pair with:
+
+```kotlin
+val format = remember { world.taqwa.app.i18n.createPlatformFormat() }
+val languageTag = format.languageTag()
+
+Row(verticalAlignment = Alignment.CenterVertically) {
+    if (world.taqwa.app.i18n.LayoutDirection.isRtl(languageTag)) {
+        Text(
+            world.taqwa.app.i18n.PrayerNaming.arabicName(row.prayer),
+            fontFamily = FontFamily.Default,
+            style = TaqwaText.rowLabel,
+            color = if (row.status == PrayerStatus.CURRENT) colors.accent else colors.textPrimary,
+            fontWeight = if (row.status == PrayerStatus.CURRENT) FontWeight.ExtraBold else FontWeight.SemiBold,
+        )
+    } else {
+        Text(
+            englishName(row.prayer),
+            style = TaqwaText.rowLabel,
+            color = if (row.status == PrayerStatus.CURRENT) colors.accent else colors.textPrimary,
+            fontWeight = if (row.status == PrayerStatus.CURRENT) FontWeight.ExtraBold else FontWeight.SemiBold,
+        )
+        Text(
+            world.taqwa.app.i18n.PrayerNaming.arabicName(row.prayer),
+            fontFamily = FontFamily.Default,
+            fontSize = 14.sp,
+            color = colors.textTertiary,
+            modifier = Modifier.padding(start = 8.dp),
+        )
+    }
+}
+```
+
+Arabic gets the row's full-weight, full-size treatment — it is not a secondary label there, the
+same way `PrayerNaming.display` never demotes it to a suffix.
+
+- [ ] **Step 8: Wrap the app in the correct layout direction and verify the Arabic-Indic digit question**
+
+In `App.kt`, wrap `TaqwaTheme(themeMode) { ... }`'s content in:
+
+```kotlin
+val format = remember { world.taqwa.app.i18n.createPlatformFormat() }
+androidx.compose.runtime.CompositionLocalProvider(
+    androidx.compose.ui.platform.LocalLayoutDirection provides
+        if (world.taqwa.app.i18n.LayoutDirection.isRtl(format.languageTag()))
+            androidx.compose.ui.unit.LayoutDirection.Rtl
+        else androidx.compose.ui.unit.LayoutDirection.Ltr,
+) {
+    // existing `when (backStack.last())` content
+}
+```
+
+Compose's `Row`, `Arrangement` and `padding(start=, end=)` all already respect
+`LocalLayoutDirection` — this is what moves the timeline's pip gutter from the left edge to the
+right edge under Arabic with no bespoke mirroring code. `CountdownRing`, `QiblaDial` and
+`CheckMark` draw on a `Canvas` with literal x/y coordinates and do **not** auto-mirror; verify
+by hand in Step 10 that a centred ring and a centred check mark need no mirroring to look
+correct (they do not, being radially symmetric or center-anchored) before assuming every visual
+is covered by the composition local alone.
+
+Set an emulator or simulator to Arabic (Egypt) to reach the digit question the spec leaves open:
+zoom into the Today countdown ring at 2x and watch it tick across a minute boundary. If the
+Arabic-Indic digits visibly jitter — most OEM Arabic faces are not built with tabular figures —
+leave `CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR` at `false`. If they hold steady
+on both a Samsung/Pixel Arabic-Egypt build and iOS's SF Arabic, flip it to `true` and record
+which OS builds were tested in the commit message.
+
+Wire `CountdownFormatter.countdown(...)` and `PlatformFormat.clockTime(...)` into
+`TodayScreen.kt` wherever `CountdownRing`'s `countdown` argument and `PrayerTimeline`'s
+`formatTime` lambda are built, passing `CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR`
+through.
+
+- [ ] **Step 9: Localise notification copy**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/notifications/LocalizedNotificationCopy.kt`:
+
+```kotlin
+package world.taqwa.app.notifications
+
+import world.taqwa.app.domain.Prayer
+import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.PrayerNaming
+
+/**
+ * The localised replacement for [EnglishNotificationCopy]. No platform code ever localises a
+ * notification: this bakes the correct language, and the Arabic-alone naming rule, in at
+ * schedule time.
+ */
+class LocalizedNotificationCopy(private val format: PlatformFormat) : NotificationCopy {
+
+    private val isArabic = format.languageTag().substringBefore('-').equals("ar", ignoreCase = true)
+
+    private fun name(prayer: Prayer) =
+        PrayerNaming.display(prayer, format.languageTag(), PrayerNaming.englishName(prayer))
+
+    override fun title(prayer: Prayer, kind: NotificationKind): String = name(prayer)
+
+    override fun body(prayer: Prayer, kind: NotificationKind, clockTime: String, minutesBefore: Int): String {
+        val n = name(prayer)
+        return if (isArabic) {
+            when (kind) {
+                NotificationKind.PRAYER -> "حان الآن وقت صلاة $n · $clockTime"
+                NotificationKind.REMINDER -> "$n بعد $minutesBefore دقيقة · $clockTime"
+            }
+        } else {
+            when (kind) {
+                NotificationKind.PRAYER -> "It is time for $n · $clockTime"
+                NotificationKind.REMINDER -> "$n in $minutesBefore minutes · $clockTime"
+            }
+        }
+    }
+}
+```
+
+In `NotificationCoordinator.kt`, add a `formatClockTime` helper and pass both it and the new
+copy into the planner call:
+
+```kotlin
+private fun localizedClockTime(instant: Instant, timeZoneId: String, format: PlatformFormat): String {
+    val t = instant.toLocalDateTime(TimeZone.of(timeZoneId))
+    return format.clockTime(t.hour, t.minute)
+}
+```
+
+```kotlin
+val format = createPlatformFormat()
+val plan = NotificationPlanner.plan(
+    location = location,
+    settings = prayerSettings,
+    notifications = notificationSettings,
+    engine = engine,
+    from = now(),
+    windowDays = windowDays,
+    capacity = capacity,
+    copy = LocalizedNotificationCopy(format),
+    formatClockTime = { instant, tz -> localizedClockTime(instant, tz, format) },
+)
+```
+
+Add the imports `kotlinx.datetime.TimeZone`, `kotlinx.datetime.toLocalDateTime`,
+`world.taqwa.app.i18n.PlatformFormat` and `world.taqwa.app.i18n.createPlatformFormat`. This
+changes no test's expectations: `NotificationCoordinatorTest` never inspects `title`/`body`, and
+`NotificationPlannerTest` calls `NotificationPlanner.plan` directly with its own default
+`EnglishNotificationCopy`, untouched by this change.
+
+- [ ] **Step 10: Add the string resources**
+
+`shared/src/commonMain/composeResources/values/strings.xml`:
+
+```xml
+<resources>
+    <string name="onboarding_welcome_title">Taqwa</string>
+    <string name="onboarding_welcome_body">Prayer times, qibla and the Quran. Free forever. No ads, no account, works offline.</string>
+    <string name="onboarding_welcome_cta">Get started</string>
+    <string name="onboarding_location_title">Where are you?</string>
+    <string name="onboarding_location_body">Prayer times depend on your exact position. Everything is calculated on your device — your location never leaves your phone.</string>
+    <string name="onboarding_location_cta">Use my location</string>
+    <string name="onboarding_location_secondary">Choose a city instead</string>
+    <string name="onboarding_notifications_title">Never miss a prayer</string>
+    <string name="onboarding_notifications_body">A notification at each prayer time. You pick the sound for every prayer separately — and can change it whenever you like.</string>
+    <string name="onboarding_notifications_cta">Enable notifications</string>
+    <string name="onboarding_notifications_secondary">Not now</string>
+    <string name="settings_prayer_group">Prayer</string>
+    <string name="settings_app_group">App</string>
+    <string name="settings_about_group">About</string>
+    <string name="settings_location">Location</string>
+    <string name="settings_prayer_times">Prayer times</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_about">About Taqwa</string>
+    <string name="settings_attribution">Attribution &amp; licences</string>
+    <string name="notifications_master_toggle">Prayer notifications</string>
+    <string name="notifications_remind_before">Remind me before</string>
+    <string name="notifications_remind_never">Never</string>
+    <string name="sound_sheet_title">Notification sound</string>
+    <string name="sound_silent">Silent</string>
+    <string name="sound_notification">Notification</string>
+    <string name="sound_takbir">Takbir</string>
+    <string name="sound_adhan">Adhan</string>
+    <string name="sound_sheet_footnote">Notification sounds are capped at 30 seconds on both platforms. The complete adhan can be played inside the app.</string>
+    <string name="qibla_no_sensor_title">No compass sensor</string>
+    <string name="qibla_no_sensor_body">This device has no magnetometer. Use a physical compass together with the bearing below.</string>
+    <string name="qibla_low_accuracy_body">Move your phone in a figure-eight motion. Metal, cases and speakers can interfere with the compass.</string>
+    <string name="today_no_location_title">No location yet</string>
+    <string name="today_choose_city">Choose a city</string>
+    <string name="today_allow_location">Allow location instead</string>
+</resources>
+```
+
+`shared/src/commonMain/composeResources/values-ar/strings.xml`:
+
+```xml
+<resources>
+    <string name="onboarding_welcome_title">تقوى</string>
+    <string name="onboarding_welcome_body">مواقيت الصلاة والقبلة والقرآن. مجانًا للأبد. بلا إعلانات، بلا حساب، ويعمل بلا اتصال.</string>
+    <string name="onboarding_welcome_cta">ابدأ</string>
+    <string name="onboarding_location_title">أين أنت؟</string>
+    <string name="onboarding_location_body">تعتمد مواقيت الصلاة على موقعك الدقيق. كل الحسابات تتم على جهازك — موقعك لا يغادر هاتفك أبدًا.</string>
+    <string name="onboarding_location_cta">استخدم موقعي</string>
+    <string name="onboarding_location_secondary">اختر مدينة بدلاً من ذلك</string>
+    <string name="onboarding_notifications_title">لا تفوّت صلاة أبدًا</string>
+    <string name="onboarding_notifications_body">إشعار عند كل وقت صلاة. تختار الصوت لكل صلاة على حدة — ويمكنك تغييره متى شئت.</string>
+    <string name="onboarding_notifications_cta">تفعيل الإشعارات</string>
+    <string name="onboarding_notifications_secondary">ليس الآن</string>
+    <string name="settings_prayer_group">الصلاة</string>
+    <string name="settings_app_group">التطبيق</string>
+    <string name="settings_about_group">حول</string>
+    <string name="settings_location">الموقع</string>
+    <string name="settings_prayer_times">مواقيت الصلاة</string>
+    <string name="settings_notifications">الإشعارات</string>
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_about">حول تقوى</string>
+    <string name="settings_attribution">الإسناد والتراخيص</string>
+    <string name="notifications_master_toggle">إشعارات الصلاة</string>
+    <string name="notifications_remind_before">التذكير قبل</string>
+    <string name="notifications_remind_never">أبدًا</string>
+    <string name="sound_sheet_title">صوت الإشعار</string>
+    <string name="sound_silent">صامت</string>
+    <string name="sound_notification">تنبيه</string>
+    <string name="sound_takbir">تكبير</string>
+    <string name="sound_adhan">أذان</string>
+    <string name="sound_sheet_footnote">أصوات الإشعارات محدودة بثلاثين ثانية على كلا النظامين. يمكن سماع الأذان كاملاً داخل التطبيق.</string>
+    <string name="qibla_no_sensor_title">لا يوجد مستشعر بوصلة</string>
+    <string name="qibla_no_sensor_body">هذا الجهاز لا يحتوي على مقياس مغناطيسي. استخدم بوصلة حقيقية مع الاتجاه الموضح أدناه.</string>
+    <string name="qibla_low_accuracy_body">حرّك هاتفك برسم رقم ثمانية. المعادن والأغطية ومكبرات الصوت قد تتداخل مع البوصلة.</string>
+    <string name="today_no_location_title">لا يوجد موقع بعد</string>
+    <string name="today_choose_city">اختر مدينة</string>
+    <string name="today_allow_location">السماح بالموقع بدلاً من ذلك</string>
+</resources>
+```
+
+This covers every string introduced by name across both plans' onboarding, settings, sound
+sheet, qibla and Today-empty-state screens. Replacing each screen's remaining literal
+`Text("...")` calls with `stringResource(Res.string.xxx)` is the same one-line substitution
+throughout — Plan 1's Task 3 already established `Res.font.xxx` as the resource-access
+convention this mirrors for strings.
+
+- [ ] **Step 11: Manually verify RTL end to end**
+
+Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL.
+Run: `./scripts/ios-build.sh` — Expected: BUILD SUCCEEDED.
+
+Set the device or simulator's system language to Arabic and relaunch. Confirm: the timeline's
+pip column sits on the right, each row shows the Arabic name alone with no transliteration
+beside it, the header's two icon buttons swap sides, and settings rows read right-to-left with
+the value text and chevron now on the left. Confirm a scheduled notification (force one via the
+Step 13 `adb` command from Task 17) shows Arabic title and body.
+
+- [ ] **Step 12: Commit**
+
+```bash
+git add shared/src/commonMain/kotlin/world/taqwa/app/i18n shared/src/androidMain/kotlin/world/taqwa/app/i18n shared/src/iosMain/kotlin/world/taqwa/app/i18n shared/src/commonMain/kotlin/world/taqwa/app/notifications shared/src/commonMain/kotlin/world/taqwa/app/feature/today shared/src/commonMain/kotlin/world/taqwa/app/App.kt shared/src/commonMain/composeResources shared/src/commonTest/kotlin/world/taqwa/app/i18n
+git commit -m "feat: Arabic-alone naming, RTL mirroring, CLDR numerals and localised notifications"
+```
+
+---
+
+### Task 23: Widgets — Android Glance
+
+Widgets are the last work in slice 1 so they can be cut without disturbing anything else — this
+is the first of the three widget tasks. Both real widget implementations (this task and Task 24)
+share the same cross-platform contract: a small, pre-computed snapshot mirrored into a
+platform key-value store, so neither widget process needs `PrayerTimesEngine`, `SettingsRepository`
+or any coroutine machinery of its own.
+
+**Files:**
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/domain/WidgetSettings.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/settings/SettingsRepository.kt`
+- Modify: `shared/src/commonTest/kotlin/world/taqwa/app/settings/SettingsRepositoryTest.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetInputsMirror.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetContent.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetPalette.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/widget/KeyValueStore.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetMirrorWriter.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetRefresher.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/feature/today/TodayViewModel.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/widget/KeyValueStore.android.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/widget/WidgetRefresher.android.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/widget/KeyValueStore.ios.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/widget/WidgetRefresher.ios.kt`
+- Modify: `androidApp/src/androidMain/kotlin/world/taqwa/app/TaqwaApplication.kt`
+- Create: `androidApp/src/androidMain/kotlin/world/taqwa/app/widget/TaqwaGlanceWidget.kt`
+- Create: `androidApp/src/androidMain/kotlin/world/taqwa/app/widget/TaqwaWidgetReceivers.kt`
+- Create: `androidApp/src/androidMain/res/xml/widget_small_info.xml`
+- Create: `androidApp/src/androidMain/res/xml/widget_medium_info.xml`
+- Create: `androidApp/src/androidMain/res/layout/widget_loading.xml`
+- Modify: `androidApp/src/androidMain/AndroidManifest.xml`
+- Modify: `gradle/libs.versions.toml`
+- Modify: `androidApp/build.gradle.kts`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/widget/WidgetInputsMirrorTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/widget/WidgetPaletteTest.kt`
+- Test: `shared/src/commonTest/kotlin/world/taqwa/app/widget/WidgetMirrorWriterTest.kt`
+
+**Interfaces:**
+- Consumes: `Prayer`, `ObligatoryPrayers` from Plan 1 Task 4; `TodayState`, `PrayerStatus` from Plan 1 Task 7; `PrayerNaming` from Task 22; `PlatformFormat` from Task 22; `SettingsRepository`, `appContext` from Plan 1 Task 4
+- Produces:
+  - `enum class WidgetBackground { FOLLOW_THEME, LIGHT, DARK, TRANSLUCENT_OR_FROSTED }`
+  - `SettingsRepository.widgetBackground: Flow<WidgetBackground>` and `suspend fun SettingsRepository.setWidgetBackground(WidgetBackground)`
+  - `data class WidgetSnapshot(nextPrayer: Prayer, countdownMinutes: Long, nextClockTime: String, allClockTimes: Map<Prayer, String>, currentPrayer: Prayer?, languageTag: String)`
+  - `object WidgetInputsMirror { fun serialize(snapshot: WidgetSnapshot): String; fun deserialize(raw: String): WidgetSnapshot? }`
+  - `data class WidgetPrayerRow(prayer: Prayer, displayName: String, clockTime: String, isCurrent: Boolean)`, `data class WidgetContent(nextPrayerDisplayName: String, countdownMinutes: Long, nextClockTime: String, rows: List<WidgetPrayerRow>)`, `object WidgetContentBuilder { fun build(snapshot: WidgetSnapshot): WidgetContent }`
+  - `data class WidgetPaletteColors(backgroundArgb: Long, textArgb: Long, accentArgb: Long, backgroundAlpha: Float)`, `object WidgetPalette { fun colorsFor(background: WidgetBackground, systemIsDark: Boolean): WidgetPaletteColors }`
+  - `interface KeyValueStore { fun putString(key: String, value: String); fun getString(key: String): String? }` and `expect fun createWidgetKeyValueStore(): KeyValueStore`
+  - `object WidgetMirrorWriter { fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat); fun read(store: KeyValueStore): WidgetSnapshot? }`
+  - `expect fun refreshWidgets()`
+  - Android: `class TaqwaSmallGlanceWidget : GlanceAppWidget`, `class TaqwaMediumGlanceWidget : GlanceAppWidget`, `class TaqwaSmallWidgetReceiver : GlanceAppWidgetReceiver`, `class TaqwaMediumWidgetReceiver : GlanceAppWidgetReceiver`
+
+- [ ] **Step 1: Write the failing tests for the settings addition and the pure widget pieces**
+
+Append to `shared/src/commonTest/kotlin/world/taqwa/app/settings/SettingsRepositoryTest.kt`, following
+Task 15's precedent of extending this file directly rather than creating a parallel one:
+
+```kotlin
+    @Test
+    fun widgetBackgroundDefaultsToFollowTheme() = runTest {
+        assertEquals(world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME, repo("widget-default").widgetBackground.first())
+    }
+
+    @Test
+    fun widgetBackgroundRoundTrips() = runTest {
+        val r = repo("widget-roundtrip")
+        r.setWidgetBackground(world.taqwa.app.domain.WidgetBackground.DARK)
+        assertEquals(world.taqwa.app.domain.WidgetBackground.DARK, r.widgetBackground.first())
+    }
+```
+
+`shared/src/commonTest/kotlin/world/taqwa/app/widget/WidgetInputsMirrorTest.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import world.taqwa.app.domain.Prayer
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+
+class WidgetInputsMirrorTest {
+
+    private val snapshot = WidgetSnapshot(
+        nextPrayer = Prayer.ASR,
+        countdownMinutes = 42,
+        nextClockTime = "15:47",
+        allClockTimes = mapOf(
+            Prayer.FAJR to "05:12", Prayer.DHUHR to "12:34", Prayer.ASR to "15:47",
+            Prayer.MAGHRIB to "18:20", Prayer.ISHA to "19:50",
+        ),
+        currentPrayer = Prayer.DHUHR,
+        languageTag = "en-US",
+    )
+
+    @Test
+    fun aSnapshotRoundTripsThroughSerialization() {
+        val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(snapshot))
+        assertEquals(snapshot, restored)
+    }
+
+    @Test
+    fun aNullCurrentPrayerRoundTripsAsNullRatherThanAStrayValue() {
+        val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(snapshot.copy(currentPrayer = null)))
+        assertEquals(null, restored?.currentPrayer)
+    }
+
+    @Test
+    fun malformedInputDeserializesToNullRatherThanCrashing() {
+        assertNull(WidgetInputsMirror.deserialize("not a valid snapshot"))
+        assertNull(WidgetInputsMirror.deserialize(""))
+        assertNull(WidgetInputsMirror.deserialize("TOO|FEW|FIELDS"))
+    }
+}
+```
+
+`shared/src/commonTest/kotlin/world/taqwa/app/widget/WidgetPaletteTest.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import world.taqwa.app.domain.WidgetBackground
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+
+class WidgetPaletteTest {
+
+    @Test
+    fun followThemeTracksTheSystemSetting() {
+        val light = WidgetPalette.colorsFor(WidgetBackground.FOLLOW_THEME, systemIsDark = false)
+        val dark = WidgetPalette.colorsFor(WidgetBackground.FOLLOW_THEME, systemIsDark = true)
+        assertNotEquals(light.backgroundArgb, dark.backgroundArgb)
+    }
+
+    @Test
+    fun lightIsAlwaysLightRegardlessOfSystemSetting() {
+        val a = WidgetPalette.colorsFor(WidgetBackground.LIGHT, systemIsDark = false)
+        val b = WidgetPalette.colorsFor(WidgetBackground.LIGHT, systemIsDark = true)
+        assertEquals(a.backgroundArgb, b.backgroundArgb)
+    }
+
+    @Test
+    fun darkIsAlwaysDarkRegardlessOfSystemSetting() {
+        val a = WidgetPalette.colorsFor(WidgetBackground.DARK, systemIsDark = false)
+        val b = WidgetPalette.colorsFor(WidgetBackground.DARK, systemIsDark = true)
+        assertEquals(a.backgroundArgb, b.backgroundArgb)
+    }
+
+    @Test
+    fun onlyTranslucentOrFrostedHasReducedAlpha() {
+        assertEquals(1.0f, WidgetPalette.colorsFor(WidgetBackground.LIGHT, false).backgroundAlpha)
+        assertEquals(1.0f, WidgetPalette.colorsFor(WidgetBackground.DARK, false).backgroundAlpha)
+        val translucent = WidgetPalette.colorsFor(WidgetBackground.TRANSLUCENT_OR_FROSTED, false).backgroundAlpha
+        kotlin.test.assertTrue(translucent < 1.0f)
+    }
+}
+```
+
+`shared/src/commonTest/kotlin/world/taqwa/app/widget/WidgetMirrorWriterTest.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import kotlinx.datetime.Instant
+import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.PrayerStatus
+import world.taqwa.app.domain.PrayerTime
+import world.taqwa.app.domain.TimelineRow
+import world.taqwa.app.domain.TodayState
+import world.taqwa.app.i18n.PlatformFormat
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
+
+private class FakeKeyValueStore : KeyValueStore {
+    private val map = mutableMapOf<String, String>()
+    override fun putString(key: String, value: String) { map[key] = value }
+    override fun getString(key: String): String? = map[key]
+}
+
+private class FakePlatformFormat : PlatformFormat {
+    override fun languageTag() = "en-US"
+    override fun localizedDigits(number: Int) = number.toString()
+    override fun clockTime(hour: Int, minute: Int) =
+        "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
+}
+
+class WidgetMirrorWriterTest {
+
+    private val today = TodayState(
+        rows = listOf(
+            TimelineRow(Prayer.FAJR, Instant.fromEpochSeconds(0), PrayerStatus.PASSED),
+            TimelineRow(Prayer.DHUHR, Instant.fromEpochSeconds(3600 * 7), PrayerStatus.CURRENT),
+            TimelineRow(Prayer.ASR, Instant.fromEpochSeconds(3600 * 10), PrayerStatus.UPCOMING),
+            TimelineRow(Prayer.MAGHRIB, Instant.fromEpochSeconds(3600 * 18), PrayerStatus.UPCOMING),
+            TimelineRow(Prayer.ISHA, Instant.fromEpochSeconds(3600 * 20), PrayerStatus.UPCOMING),
+        ),
+        next = PrayerTime(Prayer.ASR, Instant.fromEpochSeconds(3600 * 10)),
+        countdown = 90.minutes,
+        ringProgress = 0.3f,
+    )
+
+    @Test
+    fun writingThenReadingReproducesTheCurrentAndNextPrayer() {
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat())
+        val snapshot = WidgetMirrorWriter.read(store)!!
+        assertEquals(Prayer.ASR, snapshot.nextPrayer)
+        assertEquals(Prayer.DHUHR, snapshot.currentPrayer)
+        assertEquals(90L, snapshot.countdownMinutes)
+    }
+
+    @Test
+    fun readingBeforeAnyWriteReturnsNullRatherThanCrashing() {
+        assertEquals(null, WidgetMirrorWriter.read(FakeKeyValueStore()))
+    }
+}
+```
+
+- [ ] **Step 2: Run it to confirm it fails**
+
+Run: `./gradlew :shared:allTests --tests "*WidgetInputsMirrorTest*" --tests "*WidgetPaletteTest*" --tests "*SettingsRepositoryTest*"`
+Expected: FAIL — `Unresolved reference: WidgetBackground`
+
+- [ ] **Step 3: Implement the setting, the snapshot, and the palette**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/domain/WidgetSettings.kt`:
+
+```kotlin
+package world.taqwa.app.domain
+
+/** The spec's four widget backgrounds. The fourth is labelled per platform at the UI layer —
+ * "Translucent" on Android, "Frosted" on iOS — but is the same stored value either way. */
+enum class WidgetBackground { FOLLOW_THEME, LIGHT, DARK, TRANSLUCENT_OR_FROSTED }
+```
+
+In `settings/SettingsRepository.kt`, add to `Keys`: `val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")`,
+and to the class body:
+
+```kotlin
+    val widgetBackground: Flow<WidgetBackground> =
+        store.data.map { it[Keys.WIDGET_BACKGROUND].toEnumOr(WidgetBackground.FOLLOW_THEME) }
+
+    suspend fun setWidgetBackground(value: WidgetBackground) {
+        store.edit { it[Keys.WIDGET_BACKGROUND] = value.name }
+    }
+```
+
+Add the import `world.taqwa.app.domain.WidgetBackground`.
+
+`shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetInputsMirror.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import world.taqwa.app.domain.Prayer
+
+/**
+ * The flattened, serialisable snapshot the main app writes every time prayer times or settings
+ * change, and both widget processes read. A plain delimited string, not JSON — neither widget
+ * target needs a JSON dependency for six fixed fields.
+ */
+data class WidgetSnapshot(
+    val nextPrayer: Prayer,
+    val countdownMinutes: Long,
+    val nextClockTime: String,
+    val allClockTimes: Map<Prayer, String>,
+    val currentPrayer: Prayer?,
+    val languageTag: String,
+)
+
+object WidgetInputsMirror {
+    private const val FIELD_SEP = "|"
+    private const val PAIR_SEP = ";"
+    private const val KV_SEP = "="
+
+    fun serialize(snapshot: WidgetSnapshot): String {
+        val times = snapshot.allClockTimes.entries.joinToString(PAIR_SEP) { (p, t) -> "${p.name}$KV_SEP$t" }
+        return listOf(
+            snapshot.nextPrayer.name,
+            snapshot.countdownMinutes.toString(),
+            snapshot.nextClockTime,
+            times,
+            snapshot.currentPrayer?.name.orEmpty(),
+            snapshot.languageTag,
+        ).joinToString(FIELD_SEP)
+    }
+
+    fun deserialize(raw: String): WidgetSnapshot? {
+        val parts = raw.split(FIELD_SEP)
+        if (parts.size != 6) return null
+        return try {
+            WidgetSnapshot(
+                nextPrayer = Prayer.valueOf(parts[0]),
+                countdownMinutes = parts[1].toLong(),
+                nextClockTime = parts[2],
+                allClockTimes = parts[3].split(PAIR_SEP).filter { it.isNotEmpty() }.associate { pair ->
+                    val (name, time) = pair.split(KV_SEP, limit = 2)
+                    Prayer.valueOf(name) to time
+                },
+                currentPrayer = parts[4].takeIf { it.isNotEmpty() }?.let { Prayer.valueOf(it) },
+                languageTag = parts[5],
+            )
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+    }
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetPalette.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import world.taqwa.app.domain.WidgetBackground
+
+/**
+ * background -> colour and alpha, decided once here so the live preview in Settings and both
+ * real widgets can never disagree about what a choice looks like. Plain ARGB longs rather than
+ * a UI-framework colour type, so this stays usable from Glance and from a value bridged into
+ * Swift without either platform's widget target needing a Compose dependency.
+ */
+data class WidgetPaletteColors(
+    val backgroundArgb: Long,
+    val textArgb: Long,
+    val accentArgb: Long,
+    val backgroundAlpha: Float,
+)
+
+object WidgetPalette {
+    fun colorsFor(background: WidgetBackground, systemIsDark: Boolean): WidgetPaletteColors {
+        val dark = when (background) {
+            WidgetBackground.FOLLOW_THEME, WidgetBackground.TRANSLUCENT_OR_FROSTED -> systemIsDark
+            WidgetBackground.LIGHT -> false
+            WidgetBackground.DARK -> true
+        }
+        val alpha = if (background == WidgetBackground.TRANSLUCENT_OR_FROSTED) 0.55f else 1.0f
+        return if (dark) {
+            WidgetPaletteColors(0xFF0B0D0CL, 0xFFF1F3F1L, 0xFFF0B429L, alpha)
+        } else {
+            WidgetPaletteColors(0xFFFBFAF7L, 0xFF16160FL, 0xFFB5820BL, alpha)
+        }
+    }
+}
+```
+
+- [ ] **Step 4: Run the tests**
+
+Run: `./gradlew :shared:allTests --tests "*WidgetInputsMirrorTest*" --tests "*WidgetPaletteTest*" --tests "*SettingsRepositoryTest*"`
+Expected: PASS — 3, 4 and 7 tests respectively (Plan 1's original `SettingsRepositoryTest` count
+plus the two added here).
+
+- [ ] **Step 5: Write the failing writer test, then implement it**
+
+`WidgetMirrorWriterTest.kt` above already references `KeyValueStore` and `WidgetMirrorWriter`.
+
+Run: `./gradlew :shared:allTests --tests "*WidgetMirrorWriterTest*"`
+Expected: FAIL — `Unresolved reference: KeyValueStore`
+
+`shared/src/commonMain/kotlin/world/taqwa/app/widget/KeyValueStore.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+interface KeyValueStore {
+    fun putString(key: String, value: String)
+    fun getString(key: String): String?
+}
+
+expect fun createWidgetKeyValueStore(): KeyValueStore
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetMirrorWriter.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.domain.PrayerStatus
+import world.taqwa.app.domain.TodayState
+import world.taqwa.app.i18n.PlatformFormat
+
+object WidgetMirrorWriter {
+    private const val KEY = "snapshot"
+
+    fun write(store: KeyValueStore, today: TodayState, timeZoneId: String, format: PlatformFormat) {
+        val zone = TimeZone.of(timeZoneId)
+        fun clock(instant: Instant): String {
+            val t = instant.toLocalDateTime(zone)
+            return format.clockTime(t.hour, t.minute)
+        }
+        val snapshot = WidgetSnapshot(
+            nextPrayer = today.next.prayer,
+            countdownMinutes = today.countdown.inWholeMinutes,
+            nextClockTime = clock(today.next.instant),
+            allClockTimes = today.rows.associate { it.prayer to clock(it.instant) },
+            currentPrayer = today.rows.firstOrNull { it.status == PrayerStatus.CURRENT }?.prayer,
+            languageTag = format.languageTag(),
+        )
+        store.putString(KEY, WidgetInputsMirror.serialize(snapshot))
+    }
+
+    fun read(store: KeyValueStore): WidgetSnapshot? = store.getString(KEY)?.let(WidgetInputsMirror::deserialize)
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetContent.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import world.taqwa.app.domain.ObligatoryPrayers
+import world.taqwa.app.domain.Prayer
+import world.taqwa.app.i18n.PrayerNaming
+
+data class WidgetPrayerRow(val prayer: Prayer, val displayName: String, val clockTime: String, val isCurrent: Boolean)
+
+data class WidgetContent(
+    val nextPrayerDisplayName: String,
+    val countdownMinutes: Long,
+    val nextClockTime: String,
+    val rows: List<WidgetPrayerRow>,
+)
+
+/** Turns a raw [WidgetSnapshot] into display strings, applying the same Arabic-alone naming
+ * rule (Task 22) the timeline uses — a widget is not exempt from it. */
+object WidgetContentBuilder {
+    fun build(snapshot: WidgetSnapshot): WidgetContent = WidgetContent(
+        nextPrayerDisplayName = displayName(snapshot.nextPrayer, snapshot.languageTag),
+        countdownMinutes = snapshot.countdownMinutes,
+        nextClockTime = snapshot.nextClockTime,
+        rows = ObligatoryPrayers.map { prayer ->
+            WidgetPrayerRow(
+                prayer = prayer,
+                displayName = displayName(prayer, snapshot.languageTag),
+                clockTime = snapshot.allClockTimes[prayer].orEmpty(),
+                isCurrent = prayer == snapshot.currentPrayer,
+            )
+        },
+    )
+
+    private fun displayName(prayer: Prayer, languageTag: String) =
+        PrayerNaming.display(prayer, languageTag, PrayerNaming.englishName(prayer))
+}
+```
+
+`shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetRefresher.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+/** Nudges the platform to redraw its widgets sooner than the next periodic tick, after the
+ * mirror has just been written with fresher data. */
+expect fun refreshWidgets()
+```
+
+- [ ] **Step 6: Run the writer tests**
+
+The `expect` declarations above have no `actual` yet — run the Android test task as in Tasks 17
+and 21:
+
+Run: `./gradlew :shared:testDebugUnitTest --tests "*WidgetMirrorWriterTest*"`
+Expected: PASS, 2 tests.
+
+- [ ] **Step 7: Implement the Android `actual`s and wire the writer into `TodayViewModel`**
+
+`shared/src/androidMain/kotlin/world/taqwa/app/widget/KeyValueStore.android.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import android.content.Context
+import world.taqwa.app.settings.appContext
+
+private const val PREFS_NAME = "taqwa_widget_mirror"
+
+private class AndroidKeyValueStore : KeyValueStore {
+    private val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    override fun putString(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+    override fun getString(key: String): String? = prefs.getString(key, null)
+}
+
+actual fun createWidgetKeyValueStore(): KeyValueStore = AndroidKeyValueStore()
+```
+
+`shared/src/androidMain/kotlin/world/taqwa/app/widget/WidgetRefresher.android.kt` — the actual
+`GlanceAppWidget` classes live in `androidApp` (Step 9), which `shared` cannot see or import, the
+same module-direction constraint Task 17 solved for the notification's small-icon resource. The
+fix is the same shape: a settable hook, wired from `androidApp`.
+
+```kotlin
+package world.taqwa.app.widget
+
+import kotlinx.coroutines.runBlocking
+
+/** Set once from `TaqwaApplication.onCreate` (Step 9) — `shared` cannot reference the Glance
+ * widget classes, which live in `androidApp` alongside the generated `R` class. */
+var androidWidgetUpdateHook: (suspend () -> Unit)? = null
+
+actual fun refreshWidgets() {
+    androidWidgetUpdateHook?.let { hook -> runBlocking { hook() } }
+}
+```
+
+In `feature/today/TodayViewModel.kt`, in `refresh()`, after `_state.value = TodayUiState.Ready(...)`
+is assigned, add:
+
+```kotlin
+world.taqwa.app.widget.WidgetMirrorWriter.write(
+    store = world.taqwa.app.widget.createWidgetKeyValueStore(),
+    today = today,
+    timeZoneId = location.timeZoneId,
+    format = world.taqwa.app.i18n.createPlatformFormat(),
+)
+world.taqwa.app.widget.refreshWidgets()
+```
+
+`today` here is the same `TodayState` already computed a few lines above via `TimelineBuilder.build(...)`.
+This is the only integration point for the mirror: `TodayViewModel` already ticks every second
+while Today is visible (Plan 1 Task 12), so the widget is at most a few hours stale even if the
+app is never opened before its own 30-minute periodic refresh fires — a known, accepted limit of
+Android's `updatePeriodMillis`, not a bug this task tries to engineer around.
+
+- [ ] **Step 8: Implement the widgets themselves**
+
+The exact `androidx.glance` API surface should be checked against the resolved 1.1.1 artifact
+the same way Task 5 checked adhan2 — Glance has moved call shapes between minor versions. If a
+name below does not resolve, open the resolved sources and correct it here before continuing.
+
+Add to `gradle/libs.versions.toml`:
+
+```toml
+androidx-glance = "1.1.1"
+```
+
+```toml
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidx-glance" }
+```
+
+Add to `androidApp/build.gradle.kts`'s `dependencies { }`: `implementation(libs.androidx.glance.appwidget)`.
+
+`androidApp/src/androidMain/kotlin/world/taqwa/app/widget/TaqwaGlanceWidget.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import android.content.Context
+import android.content.res.Configuration
+import androidx.compose.ui.graphics.Color
+import androidx.glance.GlanceId
+import androidx.glance.GlanceModifier
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.provideContent
+import androidx.glance.background
+import androidx.glance.color.ColorProvider
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.padding
+import androidx.glance.text.FontWeight
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
+import androidx.glance.unit.dp
+import world.taqwa.app.domain.WidgetBackground
+
+private fun readSnapshotAndPalette(context: Context): Pair<WidgetContent?, WidgetPaletteColors> {
+    val store = createWidgetKeyValueStore()
+    val content = WidgetMirrorWriter.read(store)?.let(WidgetContentBuilder::build)
+    val background = store.getString("widget_background")
+        ?.let { raw -> WidgetBackground.entries.firstOrNull { it.name == raw } }
+        ?: WidgetBackground.FOLLOW_THEME
+    val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    val systemIsDark = nightMode == Configuration.UI_MODE_NIGHT_YES
+    return content to WidgetPalette.colorsFor(background, systemIsDark)
+}
+
+class TaqwaSmallGlanceWidget : GlanceAppWidget() {
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val (content, colors) = readSnapshotAndPalette(context)
+        provideContent {
+            Column(
+                modifier = GlanceModifier.fillMaxSize()
+                    .background(ColorProvider(Color(colors.backgroundArgb)))
+                    .padding(12.dp),
+                horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+            ) {
+                Text(
+                    content?.nextPrayerDisplayName ?: "Taqwa",
+                    style = TextStyle(color = ColorProvider(Color(colors.accentArgb)), fontWeight = FontWeight.Bold),
+                )
+                if (content != null) {
+                    Text(
+                        "${content.countdownMinutes / 60}:${(content.countdownMinutes % 60).toString().padStart(2, '0')}",
+                        style = TextStyle(color = ColorProvider(Color(colors.textArgb))),
+                    )
+                    Text(content.nextClockTime, style = TextStyle(color = ColorProvider(Color(colors.textArgb))))
+                }
+            }
+        }
+    }
+}
+
+class TaqwaMediumGlanceWidget : GlanceAppWidget() {
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val (content, colors) = readSnapshotAndPalette(context)
+        provideContent {
+            Row(
+                modifier = GlanceModifier.fillMaxSize()
+                    .background(ColorProvider(Color(colors.backgroundArgb)))
+                    .padding(12.dp),
+            ) {
+                Column(modifier = GlanceModifier.defaultWeight()) {
+                    Text(
+                        content?.nextPrayerDisplayName ?: "Taqwa",
+                        style = TextStyle(color = ColorProvider(Color(colors.accentArgb)), fontWeight = FontWeight.Bold),
+                    )
+                    if (content != null) {
+                        Text(content.nextClockTime, style = TextStyle(color = ColorProvider(Color(colors.textArgb))))
+                    }
+                }
+                Column(modifier = GlanceModifier.defaultWeight()) {
+                    content?.rows?.forEach { row ->
+                        Text(
+                            "${row.displayName}  ${row.clockTime}",
+                            style = TextStyle(
+                                color = ColorProvider(Color(if (row.isCurrent) colors.accentArgb else colors.textArgb)),
+                                fontWeight = if (row.isCurrent) FontWeight.Bold else FontWeight.Normal,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+`androidApp/src/androidMain/kotlin/world/taqwa/app/widget/TaqwaWidgetReceivers.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
+
+class TaqwaSmallWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = TaqwaSmallGlanceWidget()
+}
+
+class TaqwaMediumWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = TaqwaMediumGlanceWidget()
+}
+```
+
+`androidApp/src/androidMain/res/xml/widget_small_info.xml`:
+
+```xml
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/widget_loading"
+    android:resizeMode="none"
+    android:widgetCategory="home_screen" />
+```
+
+`androidApp/src/androidMain/res/xml/widget_medium_info.xml` — identical, with
+`android:minWidth="250dp"`, `android:targetCellWidth="4"`.
+
+`androidApp/src/androidMain/res/layout/widget_loading.xml`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:text="Taqwa" />
+```
+
+Add to `androidApp/src/androidMain/AndroidManifest.xml`, inside `<application>`:
+
+```xml
+<receiver android:name=".widget.TaqwaSmallWidgetReceiver" android:exported="false">
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_small_info" />
+</receiver>
+<receiver android:name=".widget.TaqwaMediumWidgetReceiver" android:exported="false">
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_medium_info" />
+</receiver>
+```
+
+In `androidApp/src/androidMain/kotlin/world/taqwa/app/TaqwaApplication.kt` (Task 17), add the
+hook `refreshWidgets()` calls into, alongside the two lines `onCreate` already sets:
+
+```kotlin
+import world.taqwa.app.widget.TaqwaMediumGlanceWidget
+import world.taqwa.app.widget.TaqwaSmallGlanceWidget
+import world.taqwa.app.widget.androidWidgetUpdateHook
+```
+
+```kotlin
+androidWidgetUpdateHook = {
+    TaqwaSmallGlanceWidget().updateAll(applicationContext)
+    TaqwaMediumGlanceWidget().updateAll(applicationContext)
+}
+```
+
+- [ ] **Step 9: Add the iOS side of the two shared `expect`s so the build stays green**
+
+Both `createWidgetKeyValueStore` and `refreshWidgets` need an iOS `actual` before anything
+multiplatform compiles again — Task 24 builds the real WidgetKit surface, but these two small
+files close the gap opened in Step 5, the same way Task 18 closed Task 17's.
+
+`shared/src/iosMain/kotlin/world/taqwa/app/widget/KeyValueStore.ios.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.NSUserDefaults
+
+private const val APP_GROUP_ID = "group.world.taqwa.app"
+
+@OptIn(ExperimentalForeignApi::class)
+private class IosKeyValueStore : KeyValueStore {
+    private val defaults = NSUserDefaults(suiteName = APP_GROUP_ID)
+    override fun putString(key: String, value: String) { defaults.setObject(value, key) }
+    override fun getString(key: String): String? = defaults.stringForKey(key)
+}
+
+actual fun createWidgetKeyValueStore(): KeyValueStore = IosKeyValueStore()
+```
+
+`shared/src/iosMain/kotlin/world/taqwa/app/widget/WidgetRefresher.ios.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+// WidgetKit's `WidgetCenter` is Swift-only and not reachable from Kotlin/Native interop. The
+// real reload call — `WidgetCenter.shared.reloadAllTimelines()` — lives in `iOSApp.swift` and
+// fires on foreground and after `BackgroundRefreshBridge` runs (Task 24). This is intentionally
+// a no-op rather than a fake implementation of something Kotlin cannot actually do.
+actual fun refreshWidgets() { }
+```
+
+- [ ] **Step 10: Confirm the full build is green, then build and verify Android**
+
+Run: `./gradlew :shared:allTests` — Expected: all tests PASS.
+Run: `./scripts/ios-build.sh` — Expected: BUILD SUCCEEDED.
+Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL.
+
+Install the app, open Today at least once so the mirror has something to read, then long-press
+the home screen, add both the small and medium Taqwa widgets, and confirm they show the next
+prayer, its countdown and clock time, with the medium widget also listing all five times and
+highlighting the current one.
+
+- [ ] **Step 11: Commit**
+
+```bash
+git add shared/src/commonMain/kotlin/world/taqwa/app/domain/WidgetSettings.kt shared/src/commonMain/kotlin/world/taqwa/app/settings shared/src/commonTest/kotlin/world/taqwa/app/settings shared/src/commonMain/kotlin/world/taqwa/app/widget shared/src/commonMain/kotlin/world/taqwa/app/feature/today shared/src/commonTest/kotlin/world/taqwa/app/widget shared/src/androidMain/kotlin/world/taqwa/app/widget shared/src/iosMain/kotlin/world/taqwa/app/widget androidApp/src/androidMain gradle/libs.versions.toml
+git commit -m "feat: Android Glance widgets backed by a cross-process settings mirror"
+```
+
+---
+
+### Task 24: Widgets — iOS WidgetKit
+
+WidgetKit is Swift/SwiftUI-only — there is no Kotlin/Native surface for it — so this task is a
+Swift extension target that links the same `shared.framework` Task 23 already produces and calls
+straight into `WidgetInputsMirror`, `WidgetContentBuilder` and `WidgetPalette` rather than
+re-implementing any of that parsing logic in Swift.
+
+**Files:**
+- Create: `iosApp/TaqwaWidget/TaqwaWidgetBundle.swift`
+- Create: `iosApp/TaqwaWidget/TaqwaWidgetViews.swift`
+- Create: `iosApp/TaqwaWidget/Info.plist`
+- Create: `iosApp/TaqwaWidget/TaqwaWidget.entitlements`
+- Create: `iosApp/iosApp/iosApp.entitlements`
+- Modify: `iosApp/iosApp/iOSApp.swift`
+- Modify: `iosApp/iosApp.xcodeproj` (new Widget Extension target, added via Xcode)
+
+**Interfaces:**
+- Consumes: `WidgetInputsMirror`, `WidgetContentBuilder`, `WidgetPalette`, `WidgetContent`, `WidgetPaletteColors`, `WidgetBackground` from Task 23, all reached through the compiled `shared` framework's generated Swift/Obj-C interface
+- Produces: the `TaqwaWidget` app extension target (home screen small/medium, lock screen circular/rectangular); `WidgetCenter.shared.reloadAllTimelines()` call sites in `iOSApp.swift`
+
+- [ ] **Step 1: Create the widget extension target**
+
+In Xcode: **File → New → Target… → Widget Extension**. Name it `TaqwaWidget`, uncheck **Include
+Configuration Intent** (this plan uses `StaticConfiguration`, not `AppIntentConfiguration`), and
+let Xcode generate the default group and scheme. Xcode scaffolds a placeholder
+`TaqwaWidgetBundle.swift`, `Info.plist` and entitlements file inside `iosApp/TaqwaWidget/` —
+Steps 3–4 replace their contents.
+
+In the new `TaqwaWidget` target's **Frameworks and Libraries** build phase, add `shared.framework`
+(already produced by `:shared:embedAndSignAppleFrameworkForXcode`) and set it to **Do Not
+Embed** — the main app target already embeds and signs the one copy both targets share at
+runtime.
+
+- [ ] **Step 2: Add the App Group to both targets**
+
+Select the `iosApp` target → **Signing & Capabilities** → **+ Capability** → **App Groups** → add
+`group.world.taqwa.app`. Repeat for the `TaqwaWidget` target with the same group id — Xcode
+writes both `.entitlements` files for you; their content should match:
+
+`iosApp/iosApp/iosApp.entitlements` and `iosApp/TaqwaWidget/TaqwaWidget.entitlements`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.world.taqwa.app</string>
+    </array>
+</dict>
+</plist>
+```
+
+This must match `IosKeyValueStore`'s `APP_GROUP_ID` from Task 23 exactly, or the widget reads an
+empty suite and shows the placeholder state forever.
+
+- [ ] **Step 3: Write the timeline provider and the views**
+
+`iosApp/TaqwaWidget/TaqwaWidgetViews.swift`:
+
+```swift
+import WidgetKit
+import SwiftUI
+import shared
+
+private let appGroupId = "group.world.taqwa.app"
+
+struct TaqwaEntry: TimelineEntry {
+    let date: Date
+    let content: WidgetContent?
+    let colors: WidgetPaletteColors
+}
+
+struct TaqwaTimelineProvider: TimelineProvider {
+    func placeholder(in context: Context) -> TaqwaEntry {
+        TaqwaEntry(date: Date(), content: nil, colors: paletteColors())
+    }
+
+    func getSnapshot(in context: Context, completion: @escaping (TaqwaEntry) -> Void) {
+        completion(currentEntry())
+    }
+
+    func getTimeline(in context: Context, completion: @escaping (Timeline<TaqwaEntry>) -> Void) {
+        // The app calls WidgetCenter.shared.reloadAllTimelines() whenever the mirror changes
+        // (Step 5); this fifteen-minute fallback only matters if the app is never opened.
+        let nextRefresh = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
+        completion(Timeline(entries: [currentEntry()], policy: .after(nextRefresh)))
+    }
+
+    private func currentEntry() -> TaqwaEntry {
+        let defaults = UserDefaults(suiteName: appGroupId)
+        let content: WidgetContent? = defaults?.string(forKey: "snapshot")
+            .flatMap { WidgetInputsMirror.shared.deserialize(raw: $0) }
+            .map { WidgetContentBuilder.shared.build(snapshot: $0) }
+        return TaqwaEntry(date: Date(), content: content, colors: paletteColors())
+    }
+
+    private func paletteColors() -> WidgetPaletteColors {
+        let defaults = UserDefaults(suiteName: appGroupId)
+        let raw = defaults?.string(forKey: "widget_background") ?? WidgetBackground.followTheme.name
+        let background = WidgetBackground.values().first { $0.name == raw } ?? WidgetBackground.followTheme
+        let systemIsDark = UITraitCollection.current.userInterfaceStyle == .dark
+        return WidgetPalette.shared.colorsFor(background: background, systemIsDark: systemIsDark)
+    }
+}
+
+private extension Color {
+    /// [WidgetPaletteColors] hands over plain ARGB longs precisely so neither platform's widget
+    /// target needs a UI-framework colour type as a shared-code dependency; this is the one
+    /// place iOS converts it to something SwiftUI can paint.
+    init(argb: Int64) {
+        let a = Double((argb >> 24) & 0xFF) / 255.0
+        let r = Double((argb >> 16) & 0xFF) / 255.0
+        let g = Double((argb >> 8) & 0xFF) / 255.0
+        let b = Double(argb & 0xFF) / 255.0
+        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
+    }
+}
+
+struct TaqwaHomeWidgetView: View {
+    @Environment(\.widgetFamily) var family
+    let entry: TaqwaEntry
+
+    var body: some View {
+        ZStack {
+            Color(argb: entry.colors.backgroundArgb).opacity(Double(entry.colors.backgroundAlpha))
+            if let content = entry.content {
+                if family == .systemSmall {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(content.nextPrayerDisplayName)
+                            .font(.headline)
+                            .foregroundColor(Color(argb: entry.colors.accentArgb))
+                        Text("\(content.countdownMinutes / 60):\(String(format: "%02d", content.countdownMinutes % 60))")
+                            .foregroundColor(Color(argb: entry.colors.textArgb))
+                        Text(content.nextClockTime)
+                            .foregroundColor(Color(argb: entry.colors.textArgb))
+                    }
+                    .padding()
+                } else {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(content.nextPrayerDisplayName)
+                                .font(.headline)
+                                .foregroundColor(Color(argb: entry.colors.accentArgb))
+                            Text(content.nextClockTime)
+                                .foregroundColor(Color(argb: entry.colors.textArgb))
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                            ForEach(content.rows, id: \.prayer) { row in
+                                Text("\(row.displayName)  \(row.clockTime)")
+                                    .foregroundColor(Color(argb: row.isCurrent ? entry.colors.accentArgb : entry.colors.textArgb))
+                            }
+                        }
+                    }
+                    .padding()
+                }
+            } else {
+                Text("Taqwa")
+            }
+        }
+    }
+}
+
+struct TaqwaLockScreenWidgetView: View {
+    @Environment(\.widgetFamily) var family
+    let entry: TaqwaEntry
+
+    var body: some View {
+        if let content = entry.content {
+            switch family {
+            case .accessoryCircular:
+                ZStack {
+                    AccessoryWidgetBackground()
+                    VStack(spacing: 0) {
+                        Text(String(content.nextPrayerDisplayName.prefix(3)))
+                            .font(.caption2)
+                        Text("\(content.countdownMinutes / 60):\(String(format: "%02d", content.countdownMinutes % 60))")
+                            .font(.caption2.bold())
+                    }
+                }
+            default:
+                HStack {
+                    Text(content.nextPrayerDisplayName)
+                    Spacer()
+                    Text(content.nextClockTime)
+                }
+            }
+        } else {
+            Text("Taqwa")
+        }
+    }
+}
+
+struct TaqwaHomeWidget: Widget {
+    let kind = "TaqwaHomeWidget"
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: TaqwaTimelineProvider()) { entry in
+            TaqwaHomeWidgetView(entry: entry)
+        }
+        .configurationDisplayName("Taqwa")
+        .description("Next prayer, countdown and today's times.")
+        .supportedFamilies([.systemSmall, .systemMedium])
+    }
+}
+
+struct TaqwaLockScreenWidget: Widget {
+    let kind = "TaqwaLockScreenWidget"
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: TaqwaTimelineProvider()) { entry in
+            TaqwaLockScreenWidgetView(entry: entry)
+        }
+        .configurationDisplayName("Taqwa — Lock Screen")
+        .description("Next prayer at a glance.")
+        .supportedFamilies([.accessoryCircular, .accessoryRectangular])
+    }
+}
+```
+
+`iosApp/TaqwaWidget/TaqwaWidgetBundle.swift`:
+
+```swift
+import WidgetKit
+import SwiftUI
+
+@main
+struct TaqwaWidgetBundle: WidgetBundle {
+    var body: some Widget {
+        TaqwaHomeWidget()
+        TaqwaLockScreenWidget()
+    }
+}
+```
+
+`WidgetInputsMirror.shared`, `WidgetContentBuilder.shared` and `WidgetPalette.shared` are Kotlin
+object singletons reached through Kotlin/Native's generated Swift accessor — the same convention
+Task 18's `BackgroundRefreshBridge.shared` uses. `WidgetBackground.values()` and `.name` are the
+generated Swift-facing forms of the Kotlin enum's `entries` and `.name`.
+
+- [ ] **Step 4: Set the extension's `Info.plist`**
+
+`iosApp/TaqwaWidget/Info.plist` needs the WidgetKit extension point (Xcode's scaffold already
+includes this — verify it, do not duplicate the key):
+
+```xml
+<key>NSExtension</key>
+<dict>
+    <key>NSExtensionPointIdentifier</key>
+    <string>com.apple.widgetkit-extension</string>
+</dict>
+```
+
+- [ ] **Step 5: Reload timelines when the mirror changes**
+
+In `iosApp/iosApp/iOSApp.swift` (Task 18 already added `scheduleNextRefresh()` here), add
+`import WidgetKit` and call `WidgetCenter.shared.reloadAllTimelines()` in the same two places
+that already touch scheduling:
+
+```swift
+var body: some Scene {
+    WindowGroup {
+        ContentView()
+            .onAppear {
+                Self.scheduleNextRefresh()
+                WidgetCenter.shared.reloadAllTimelines()
+            }
+    }
+}
+
+static func handleAppRefresh(task: BGAppRefreshTask) {
+    scheduleNextRefresh()
+    task.expirationHandler = { task.setTaskCompleted(success: false) }
+    DispatchQueue.global(qos: .background).async {
+        let success = BackgroundRefreshBridge.shared.runBackgroundRefresh()
+        WidgetCenter.shared.reloadAllTimelines()
+        task.setTaskCompleted(success: success)
+    }
+}
+```
+
+- [ ] **Step 6: Build and manually verify**
+
+Run: `./scripts/ios-build.sh` — Expected: BUILD SUCCEEDED, now producing both the app and the
+`TaqwaWidget` extension.
+
+On a simulator running iOS 16+: open the app once so the mirror has data, go to the home screen,
+long-press, tap **+**, find **Taqwa**, and add both the small and medium sizes — confirm they
+show the same next-prayer content as the Android widgets in Task 23. Add the lock-screen circular
+and rectangular variants from the lock screen's own widget editor and confirm both render without
+the "Unable to Load" placeholder, which is WidgetKit's signature symptom of an App Group mismatch
+between the two targets.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add iosApp/TaqwaWidget iosApp/iosApp/iosApp.entitlements iosApp/iosApp/iOSApp.swift iosApp/iosApp.xcodeproj
+git commit -m "feat: iOS WidgetKit home screen and lock screen widgets via a shared App Group"
+```
+
+---
+
+### Task 25: Widget background setting
+
+The last of Plan 1's three deliberate stubs closes here: the Appearance screen gets its missing
+row, and — per the spec — a live preview replaces the explanatory footnote entirely.
+
+**Files:**
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetBackgroundLabels.kt`
+- Create: `shared/src/androidMain/kotlin/world/taqwa/app/widget/WidgetBackgroundLabels.android.kt`
+- Create: `shared/src/iosMain/kotlin/world/taqwa/app/widget/WidgetBackgroundLabels.ios.kt`
+- Create: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/WidgetPreview.kt`
+- Modify: `shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/AppearanceSettingsScreen.kt`
+
+**Interfaces:**
+- Consumes: `WidgetBackground` from Task 23; `WidgetContent`, `WidgetContentBuilder`, `WidgetPalette`, `WidgetMirrorWriter`, `createWidgetKeyValueStore`, `refreshWidgets` from Task 23; `SettingsRepository`, `TaqwaCard`, `TaqwaRow`, `CheckMark` from Plan 1
+- Produces:
+  - `expect fun translucentOrFrostedLabel(): String`
+  - `@Composable fun WidgetPreview(background: WidgetBackground, systemIsDark: Boolean, content: WidgetContent?, modifier: Modifier)`
+
+There is nothing new and pure here — every decidable rule behind this screen (`WidgetPalette`,
+`WidgetContentBuilder`) was already tested in Task 23. This is UI wiring, verified the same way
+Plan 1 Task 14 verified its own settings screens: by building and walking through it.
+
+- [ ] **Step 1: Add the per-platform label**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/widget/WidgetBackgroundLabels.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+/** The spec's fourth widget background option is labelled per platform because each platform
+ * describes what it actually does — neither user reads a caveat about the other's phone. */
+expect fun translucentOrFrostedLabel(): String
+```
+
+`shared/src/androidMain/kotlin/world/taqwa/app/widget/WidgetBackgroundLabels.android.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+actual fun translucentOrFrostedLabel(): String = "Translucent — blends into your wallpaper"
+```
+
+`shared/src/iosMain/kotlin/world/taqwa/app/widget/WidgetBackgroundLabels.ios.kt`:
+
+```kotlin
+package world.taqwa.app.widget
+
+actual fun translucentOrFrostedLabel(): String = "Frosted — uses the system widget material"
+```
+
+- [ ] **Step 2: Write the live preview**
+
+`shared/src/commonMain/kotlin/world/taqwa/app/feature/settings/WidgetPreview.kt`:
+
+```kotlin
+package world.taqwa.app.feature.settings
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.WidgetBackground
+import world.taqwa.app.widget.WidgetContent
+import world.taqwa.app.widget.WidgetPalette
+import world.taqwa.app.widget.WidgetPrayerRow
+
+/**
+ * The medium widget, rendered exactly as `TaqwaMediumGlanceWidget` (Task 23) would, over a
+ * neutral wallpaper swatch. This is the spec's live preview: it replaces the explanatory
+ * footnote entirely, and updates the moment [background] changes.
+ */
+@Composable
+fun WidgetPreview(
+    background: WidgetBackground,
+    systemIsDark: Boolean,
+    content: WidgetContent?,
+    modifier: Modifier = Modifier,
+) {
+    val colors = WidgetPalette.colorsFor(background, systemIsDark)
+    Column(
+        modifier
+            .fillMaxWidth()
+            .height(140.dp)
+            .background(Color(0xFF9C8F73)) // a neutral wallpaper swatch, deliberately not a photo
+            .padding(16.dp),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color(colors.backgroundArgb).copy(alpha = colors.backgroundAlpha))
+                .padding(12.dp),
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(content?.nextPrayerDisplayName ?: "Asr", color = Color(colors.accentArgb))
+                Text(content?.nextClockTime ?: "15:47", color = Color(colors.textArgb))
+            }
+            Column(Modifier.weight(1f)) {
+                (content?.rows ?: sampleRows()).forEach { row ->
+                    Text(
+                        "${row.displayName}  ${row.clockTime}",
+                        color = Color(if (row.isCurrent) colors.accentArgb else colors.textArgb),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Shown before the mirror has ever been written — e.g. a fresh install that has not opened
+ * Today yet — so the preview is never blank. */
+private fun sampleRows() = listOf(
+    WidgetPrayerRow(Prayer.FAJR, "Fajr", "05:12", false),
+    WidgetPrayerRow(Prayer.DHUHR, "Dhuhr", "12:34", false),
+    WidgetPrayerRow(Prayer.ASR, "Asr", "15:47", true),
+    WidgetPrayerRow(Prayer.MAGHRIB, "Maghrib", "18:20", false),
+    WidgetPrayerRow(Prayer.ISHA, "Isha", "19:50", false),
+)
+```
+
+- [ ] **Step 3: Add the row and the preview to Appearance**
+
+In `feature/settings/AppearanceSettingsScreen.kt` (Plan 1 Task 14 Step 8), after the existing
+System/Light/Dark theme card, add:
+
+```kotlin
+val widgetBackground by container.settingsRepository.widgetBackground.collectAsState(
+    initial = world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME,
+)
+val mirrorContent = remember {
+    world.taqwa.app.widget.WidgetMirrorWriter.read(world.taqwa.app.widget.createWidgetKeyValueStore())
+        ?.let(world.taqwa.app.widget.WidgetContentBuilder::build)
+}
+val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
+
+Text(
+    "Widget background", style = TaqwaText.sectionLabel,
+    modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
+)
+TaqwaCard {
+    listOf(
+        world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME to "Follow theme",
+        world.taqwa.app.domain.WidgetBackground.LIGHT to "Light",
+        world.taqwa.app.domain.WidgetBackground.DARK to "Dark",
+        world.taqwa.app.domain.WidgetBackground.TRANSLUCENT_OR_FROSTED to world.taqwa.app.widget.translucentOrFrostedLabel(),
+    ).forEachIndexed { i, (value, label) ->
+        if (i > 0) CardDivider()
+        TaqwaRow(
+            label = label,
+            onClick = {
+                scope.launch {
+                    container.settingsRepository.setWidgetBackground(value)
+                    // The widget processes never see SettingsRepository/DataStore — only the
+                    // mirror — so the choice has to be written there too, under the same key
+                    // TaqwaGlanceWidget.kt (Task 23) and the iOS TimelineProvider (Task 24) read.
+                    world.taqwa.app.widget.createWidgetKeyValueStore().putString("widget_background", value.name)
+                    world.taqwa.app.widget.refreshWidgets()
+                }
+            },
+            trailing = { if (value == widgetBackground) CheckMark() },
+        )
+    }
+}
+world.taqwa.app.feature.settings.WidgetPreview(
+    background = widgetBackground,
+    systemIsDark = systemIsDark,
+    content = mirrorContent,
+    modifier = Modifier.padding(top = 16.dp),
+)
+```
+
+Every option writes through immediately and calls `refreshWidgets()` — the same no-save-button
+convention every other settings screen in this app follows, and the reason a real home-screen
+widget updates within the Android's Glance `updateAll` call, or on iOS the next time
+`WidgetCenter.shared.reloadAllTimelines()` fires from foreground.
+
+- [ ] **Step 4: Build and manually verify**
+
+Run: `./gradlew :androidApp:assembleDebug` — Expected: BUILD SUCCESSFUL.
+Run: `./scripts/ios-build.sh` — Expected: BUILD SUCCEEDED.
+
+With a widget already placed on the home screen from Task 23/24, open Appearance and step
+through all four options, confirming the preview and the real widget agree at every step, and
+that the fourth row reads "Translucent — blends into your wallpaper" on Android and "Frosted —
+uses the system widget material" on iOS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add shared/src/commonMain/kotlin/world/taqwa/app/widget shared/src/androidMain/kotlin/world/taqwa/app/widget shared/src/iosMain/kotlin/world/taqwa/app/widget shared/src/commonMain/kotlin/world/taqwa/app/feature/settings
+git commit -m "feat: widget background setting with a live preview on Appearance"
 ```
 
 ---
