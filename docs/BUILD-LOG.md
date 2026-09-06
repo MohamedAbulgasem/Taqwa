@@ -259,7 +259,7 @@ extension is 2 MB against a 15 MB guard; 139 string keys, identical sets in Engl
 A whole-branch review of all 56 commits found **5 Critical, 12 Important, 14 Minor** and returned
 "ready after Critical + Important". Every finding was then fixed in three parallel waves split by
 file ownership, and two independent closure audits walked each finding's failure scenario through
-the fixed code. Result: **all 31 closed** (26 audited in the first pass — 24 closed outright, one
+the fixed code. Result: **all 31 closed** (I9's digits half was the final one — the widget countdown now uses the locale's digit set on both platforms, verified on device in ar-EG) (26 audited in the first pass — 24 closed outright, one
 deferred to the widget wave, one re-opened and fixed — plus the widget wave's five, audited second).
 
 **The five Criticals, because you should know what would have shipped without the review:**
@@ -319,3 +319,8 @@ Arabic UI; iOS and Android disagree on `ar_EG` digits because each follows its o
 **What is on your side, unchanged:** enable notifications for Taqwa in your LoopPhone's system
 settings (the OEM forces `importance=NONE` below the permission we hold); and
 `sudo xcode-select -s "/Applications/Xcode 26.app/Contents/Developer"`.
+
+**Merged to `main`.** Final tree: 254 tests on JVM, 255 on iOS native, zero failures; both apps build;
+widget extension 2 MB. `SystemEventReceiver` additionally simplified to reuse the container's
+coordinator rather than rebuilding its own — the crash it once caused was already closed by the
+DataStore singleton, and five force-stop/relaunch cycles on the new build were clean.
