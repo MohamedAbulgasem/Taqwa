@@ -301,3 +301,15 @@ Answers to §10, recorded so the plan can be written against them.
 Also from the same review: the tab bar icons are too small at 16 dp, and the unselected grey reads as disabled on the light theme. Both are addressed in the Quran tab design round: 22 dp glyphs and the secondary text colour for unselected tabs.
 
 Design round for the tab: https://claude.ai/code/artifact/5748bf9a-e0c0-492f-8205-93604f6efb68
+
+## 12. Font spike result (7 September, evening)
+
+Run on a throwaway branch (`spike/quran-font`, worktree `Taqwa-spike`, not merged) on the Samsung S23 (dark), the Pixel 8 Pro emulator (light), the iPhone 12 (dark) and the iPhone 17 Pro simulator (light and dark), with Tanzil Uthmani text for Al-Fatiha, 2:255, 2:282 and 2:1 to 2:5 at 22, 28 and 36 sp. Full report and about seventy screenshots in the session scratchpad (`font-spike-report.md`, `spike-*.png`).
+
+- **KFGQPC Uthmanic Hafs is confirmed as the reading font.** Every mark sits correctly on all four devices; Android and iOS render identically (Skia plus HarfBuzz on both). Crisp at 36 sp on the 600 dpi S23. The 286-row list scrolls at p99 9 to 10 ms on the S23.
+- **One text fix is required.** Tanzil encodes the silent-alef sign as U+06DF (small high rounded zero); this font draws it as a full-height inline ring that splits the word (visible in 2:282 and 2:5). Mapping U+06DF to U+0652 in the data pipeline renders the correct small circle. This is a pipeline rule, not a renderer hack.
+- **Ayah marker rule for Hafs:** bare Arabic-Indic digits preceded by a non-breaking space (U+00A0), so the roundel never wraps onto a line of its own. Do not use U+2060; neither font has the glyph.
+- **Line height:** 2.0 times the font size is safe for both fonts; Hafs could go to about 1.8. Amiri Quran must not go below 2.0 because its pause marks come within a few pixels of the line above.
+- **Compose defaults were enough:** no `softWrap`, `platformStyle` or `includeFontPadding` changes, no clipping of tall marks.
+- **Amiri Quran** also renders the text correctly as-is on both platforms and remains the tested fallback.
+- **Data note:** the alquran.cloud API prefixes 2:1 with the basmala; the pipeline strips it (Tanzil's own files do not have this issue).
