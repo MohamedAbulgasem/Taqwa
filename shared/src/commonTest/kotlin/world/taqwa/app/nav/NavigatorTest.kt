@@ -66,8 +66,8 @@ class NavigatorTest {
     }
 
     @Test
-    fun exactlyTwoScreensAreTabRoots() {
-        val roots = listOf(Screen.Today, Screen.Settings)
+    fun exactlyThreeScreensAreTabRoots() {
+        val roots = listOf(Screen.Today, Screen.Quran, Screen.Settings)
         roots.forEach { assertTrue(isTabRoot(it), "$it should be a tab root") }
         listOf(
             Screen.Onboarding,
@@ -82,8 +82,19 @@ class NavigatorTest {
             Screen.Attribution,
             // Iteration 8: the compass is pushed from the Prayer screen's Qibla card.
             Screen.Qibla,
+            Screen.Reader(2, 255),
+            Screen.Mushaf(42),
         ).forEach { assertFalse(isTabRoot(it), "$it should not be a tab root") }
         assertEquals(roots, Tab.entries.map { it.root })
+    }
+
+    @Test
+    fun pushingReaderAndMushafOnTheQuranTabKeepsItCurrent() {
+        val n = Navigator(Screen.Today)
+        n.selectTab(Tab.QURAN)
+        n.push(Screen.Reader(2, 1))
+        n.push(Screen.Mushaf(2))
+        assertEquals(Tab.QURAN, n.currentTab)
     }
 
     @Test

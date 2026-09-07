@@ -178,8 +178,9 @@
     <string name="notifications_exact_alarms_off">المنبهات الدقيقة معطّلة لتطبيق تقوى، لذا قد تصل التنبيهات متأخرة بضع دقائق. فعّل «المنبهات والتذكيرات» في إعدادات النظام لإصلاح ذلك.</string>
     <string name="hijri_tabular">حسابي</string>
     <string name="method_tehran_maghrib_note">المغرب يتبع غروب الشمس، ولم تُطبّق بعد زاوية المغرب ٤٫٥° الخاصة بهذه الطريقة.</string>
-    <!-- Bottom tab bar (iteration 1; iteration 8: two tabs) -->
+    <!-- Bottom tab bar (iteration 1; iteration 8: two tabs; slice 2: the Quran tab arrives) -->
     <string name="tab_prayer">الصلاة</string>
+    <string name="tab_quran">القرآن</string>
     <string name="tab_settings">الإعدادات</string>
     <!-- Prayer screen's Qibla card -->
     <string name="today_qibla_detail">%1$s° · %2$s كم إلى مكة</string>

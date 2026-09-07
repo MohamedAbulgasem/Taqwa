@@ -43,6 +43,7 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.nav.Tab
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.tab_prayer
+import world.taqwa.app.resources.tab_quran
 import world.taqwa.app.resources.tab_settings
 
 /**
@@ -65,20 +66,21 @@ fun TaqwaTabScaffold(current: Tab?, onSelect: (Tab) -> Unit, content: @Composabl
     }
 }
 
-/** The mockup's `.tab .ic`: 16 px square above the label, in a phone drawn 288 px wide. */
-private val IconSize = 16.dp
+/** 22 dp square above the label — bigger than the mockup's original 16 px now that the bar
+ * carries three glyphs instead of two and each needs to read clearly on its own. */
+private val IconSize = 22.dp
 
 /** Content height. The navigation-bar inset is added beneath it, never subtracted from it. */
-private val BarHeight = 56.dp
+private val BarHeight = 60.dp
 
 /**
- * Prayer · Settings, as the mockup draws them: a hairline top border, the page background
- * beneath it (not a raised surface — the bar is the page's own edge, not a card), a 16 dp line
- * icon over a small semibold label, active in accent and inactive in tertiary.
+ * Prayer · Quran · Settings, as the mockup draws them: a hairline top border, the page background
+ * beneath it (not a raised surface — the bar is the page's own edge, not a card), a 22 dp line
+ * icon over a small semibold label, active in accent and inactive in secondary.
  *
  * Nothing mirrors by hand. The items sit in a `Row`, which resolves against
- * `LocalLayoutDirection`, so under Arabic they run from the right; both glyphs are symmetric, so
- * the `Canvas` needs no help either.
+ * `LocalLayoutDirection`, so under Arabic they run from the right; all three glyphs are
+ * symmetric, so the `Canvas` needs no help either.
  */
 @Composable
 fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Modifier) {
@@ -103,7 +105,7 @@ fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Mod
 @Composable
 private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) {
     val colors = LocalTaqwaColors.current
-    val tint = if (selected) colors.accent else colors.textTertiary
+    val tint = if (selected) colors.accent else colors.textSecondary
     Column(
         // No ripple: a tab switch repaints the whole screen, which is feedback enough, and a
         // grey rectangle flashing across a third of the bar is louder than anything else here.
@@ -118,21 +120,20 @@ private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) 
         Canvas(Modifier.size(IconSize)) {
             when (tab) {
                 Tab.PRAYER -> drawMihrab(tint)
+                Tab.QURAN -> drawBook(tint)
                 Tab.SETTINGS -> drawGear(tint)
             }
         }
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(5.dp))
         Text(
             stringResource(
                 when (tab) {
                     Tab.PRAYER -> Res.string.tab_prayer
+                    Tab.QURAN -> Res.string.tab_quran
                     Tab.SETTINGS -> Res.string.tab_settings
                 },
             ),
-            // The mockup's 8.5 px of a 288 px phone is 11.5 dp on a real one; 11 sp is the app's
-            // existing smallest size, and unlike `sectionLabel` this one carries no tracking —
-            // these are words, not a legend.
-            style = TaqwaText.caption.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
+            style = TaqwaText.caption.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
             color = tint,
         )
     }
@@ -176,4 +177,22 @@ private fun DrawScope.drawGear(tint: Color) {
             cap = StrokeCap.Round,
         )
     }
+}
+
+/** An open book: two facing pages and the spine between them. Reads as "Quran" the way the
+ * mihrab reads as "prayer" — a shape borrowed from the design mockups, not a generic glyph. */
+private fun DrawScope.drawBook(tint: Color) {
+    val u = size.width / 16f
+    val pages = Path().apply {
+        moveTo(8f * u, 3.2f * u)
+        cubicTo(6.6f * u, 2.1f * u, 4.4f * u, 1.9f * u, 1.8f * u, 2.4f * u)
+        lineTo(1.8f * u, 12.8f * u)
+        cubicTo(4.4f * u, 12.3f * u, 6.6f * u, 12.5f * u, 8f * u, 13.7f * u)
+        cubicTo(9.4f * u, 12.5f * u, 11.6f * u, 12.3f * u, 14.2f * u, 12.8f * u)
+        lineTo(14.2f * u, 2.4f * u)
+        cubicTo(11.6f * u, 1.9f * u, 9.4f * u, 2.1f * u, 8f * u, 3.2f * u)
+        close()
+    }
+    drawPath(pages, tint, style = glyphStroke())
+    drawLine(tint, Offset(8f * u, 3.2f * u), Offset(8f * u, 13.7f * u), strokeWidth = size.width * 0.0875f, cap = StrokeCap.Round)
 }

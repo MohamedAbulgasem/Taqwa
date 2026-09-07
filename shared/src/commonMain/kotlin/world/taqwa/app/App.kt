@@ -238,6 +238,30 @@ fun App(container: AppContainer) {
                             )
                         }
 
+                        // TODO(slice2a task 5/6/8): replace with the real Quran root screen.
+                        Screen.Quran -> Box(
+                            Modifier.fillMaxSize().background(LocalTaqwaColors.current.background),
+                            contentAlignment = androidx.compose.ui.Alignment.Center,
+                        ) {
+                            androidx.compose.material3.Text("Quran")
+                        }
+
+                        // TODO(slice2a task 5/6/8): replace with the real reader screen.
+                        is Screen.Reader -> Box(
+                            Modifier.fillMaxSize().background(LocalTaqwaColors.current.background),
+                            contentAlignment = androidx.compose.ui.Alignment.Center,
+                        ) {
+                            androidx.compose.material3.Text("Reader")
+                        }
+
+                        // TODO(slice2a task 5/6/8): replace with the real mushaf screen.
+                        is Screen.Mushaf -> Box(
+                            Modifier.fillMaxSize().background(LocalTaqwaColors.current.background),
+                            contentAlignment = androidx.compose.ui.Alignment.Center,
+                        ) {
+                            androidx.compose.material3.Text("Mushaf")
+                        }
+
                         Screen.Settings -> SettingsRootScreen(
                             cityName = location?.let {
                                 it.cityName ?: stringResource(Res.string.today_current_location)

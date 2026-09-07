@@ -182,8 +182,9 @@
     <string name="hijri_tabular">Tabular</string>
     <string name="method_tehran_maghrib_note">Maghrib follows sunset; this method’s 4.5° Maghrib angle is not applied yet.</string>
     <!-- Bottom tab bar (iteration 1: the owner asked for it after seeing Today on a phone;
-         iteration 8: Qibla folded into the Prayer screen, so two tabs until the Quran arrives). -->
+         iteration 8: Qibla folded into the Prayer screen; slice 2: the Quran tab arrives). -->
     <string name="tab_prayer">Prayer</string>
+    <string name="tab_quran">Quran</string>
     <string name="tab_settings">Settings</string>
     <!-- Prayer screen's Qibla card: bearing from north, then the great-circle distance. -->
     <string name="today_qibla_detail">%1$s° · %2$s km to Makkah</string>
