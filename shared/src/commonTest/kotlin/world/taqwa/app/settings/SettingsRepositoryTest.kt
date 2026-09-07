@@ -1,6 +1,7 @@
 package world.taqwa.app.settings
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
@@ -202,6 +203,32 @@ class SettingsRepositoryTest {
     @Test
     fun readingPositionIsNullUntilAllThreeKeysAreStored() = runTest {
         assertEquals(null, repo("reading-position-empty").readingPosition.first())
+    }
+
+    // The merge is field by field: a store holding only the size must still hand back the
+    // language's own defaults for the two keys it never saw, not ReadingSettings()'s English ones.
+    @Test
+    fun aPartiallyWrittenStoreFallsBackPerFieldToTheLanguageDefaults() = runTest {
+        val store = PreferenceDataStoreFactory.createWithPath {
+            "/tmp/taqwa-test-reading-partial.preferences_pb".toPath()
+        }
+        store.edit { it.clear(); it[SettingsKeys.QURAN_SIZE] = 34 }
+        val settings = SettingsRepository(store).readingSettings("ar-EG").first()
+        assertEquals(34, settings.arabicSizeSp)
+        assertEquals(ReadingMode.MUSHAF, settings.mode)
+        assertEquals("ar.muyassar", settings.translationId)
+        assertEquals(false, settings.transliteration)
+    }
+
+    @Test
+    fun readingPositionStaysNullWhenOnlyTwoOfTheThreeKeysExist() = runTest {
+        val store = PreferenceDataStoreFactory.createWithPath {
+            "/tmp/taqwa-test-reading-position-partial.preferences_pb".toPath()
+        }
+        store.edit { it.clear(); it[SettingsKeys.QURAN_LAST_SURAH] = 2; it[SettingsKeys.QURAN_LAST_AYAH] = 255 }
+        assertEquals(null, SettingsRepository(store).readingPosition.first())
+        store.edit { it[SettingsKeys.QURAN_LAST_PAGE] = 42 }
+        assertEquals(ReadingPosition(surah = 2, ayah = 255, page = 42), SettingsRepository(store).readingPosition.first())
     }
 
     @Test
