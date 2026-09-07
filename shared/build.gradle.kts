@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -41,6 +42,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.datastore.preferences)
+            implementation(libs.sqldelight.coroutines)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -49,6 +51,26 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core)
+            implementation(libs.sqldelight.android)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native)
+        }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.sqldelight.sqlite)
+            }
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("QuranDatabase") {
+            packageName.set("world.taqwa.app.quran.db")
+            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.2.1")
+            // The database ships prebuilt; the schema below exists for code generation only.
+            deriveSchemaFromMigrations.set(false)
         }
     }
 }
