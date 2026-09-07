@@ -19,3 +19,6 @@ build/
 local.properties
 xcuserdata/
 .claude/
+
+# Quran pipeline downloads
+tools/cache/

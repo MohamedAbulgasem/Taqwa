@@ -1,0 +1,39 @@
+CREATE TABLE surah (
+  number INTEGER PRIMARY KEY, name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
+  meaning_en TEXT NOT NULL, revelation TEXT NOT NULL,   -- 'Makki' | 'Madani'
+  ayah_count INTEGER NOT NULL, start_page INTEGER NOT NULL, start_juz INTEGER NOT NULL
+);
+CREATE TABLE ayah (
+  surah INTEGER NOT NULL, number INTEGER NOT NULL,
+  text_uthmani TEXT NOT NULL, text_search TEXT NOT NULL,
+  page INTEGER NOT NULL, juz INTEGER NOT NULL, hizb_quarter INTEGER NOT NULL,
+  sajdah INTEGER NOT NULL DEFAULT 0,                    -- 0 none, 1 recommended, 2 obligatory
+  PRIMARY KEY (surah, number)
+);
+CREATE TABLE juz (number INTEGER PRIMARY KEY, start_surah INTEGER NOT NULL, start_ayah INTEGER NOT NULL);
+CREATE TABLE translation (
+  id TEXT PRIMARY KEY, language TEXT NOT NULL, name TEXT NOT NULL, translator TEXT NOT NULL,
+  licence TEXT NOT NULL, source_url TEXT NOT NULL, kind TEXT NOT NULL      -- 'translation' | 'tafsir' | 'transliteration'
+);
+CREATE TABLE ayah_translation (
+  translation_id TEXT NOT NULL, surah INTEGER NOT NULL, number INTEGER NOT NULL, text TEXT NOT NULL,
+  PRIMARY KEY (translation_id, surah, number)
+);
+CREATE TABLE page (number INTEGER PRIMARY KEY, first_surah INTEGER NOT NULL, first_ayah INTEGER NOT NULL);
+CREATE TABLE page_line (
+  page INTEGER NOT NULL, line INTEGER NOT NULL,
+  type TEXT NOT NULL,                                   -- 'surah' | 'basmala' | 'text'
+  surah INTEGER,                                        -- for 'surah' lines
+  text TEXT,                                            -- the full line for 'text' lines
+  first_surah INTEGER, first_ayah INTEGER,              -- first word's ayah, for 'text' lines
+  last_surah INTEGER, last_ayah INTEGER,
+  ends_surah INTEGER NOT NULL DEFAULT 0,                -- 1 when the line's last word ends a surah
+  PRIMARY KEY (page, line)
+);
+CREATE TABLE line_word (
+  page INTEGER NOT NULL, line INTEGER NOT NULL, position INTEGER NOT NULL,   -- position within the line, 1-based
+  surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,      -- word index within the ayah
+  text TEXT NOT NULL,
+  PRIMARY KEY (page, line, position)
+);
+CREATE VIRTUAL TABLE ayah_fts USING fts5(text_search, content='ayah', content_rowid='rowid');
