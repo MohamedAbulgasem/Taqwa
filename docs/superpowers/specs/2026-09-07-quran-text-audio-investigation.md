@@ -282,3 +282,22 @@ If these come back answered, the next step is the writing-plans pass for slice 2
 - Compose Multiplatform 1.12 text and Skia notes: https://kotlinlang.org/docs/multiplatform/whats-new-compose-112.html
 - KMP player libraries surveyed: https://github.com/moonggae/KMedia , https://klibs.io/project/RufenKhokhar/KMP-Player , https://github.com/open-ani/mediamp
 - SQLDelight with FTS5 in KMP: https://fedetorresdev.com/mastering-lightning-fast-mobile-searches-in-kmp-apps-a-guide-for-sqlite-and-fts/
+
+---
+
+## 11. Decisions taken on 7 September (morning review)
+
+Answers to §10, recorded so the plan can be written against them.
+
+1. **Translations:** the §3.2 set is confirmed; Urdu is **Junagarhi**. An email to Al-Furqaan about The Clear Quran is to be drafted (see the emails file beside this document).
+2. **Reciters at launch:** **Mishary Alafasy, Abdul Basit (murattal), Maher Al Muaiqly.** Husary drops out of the launch set.
+3. **Font:** **KFGQPC Uthmanic Hafs**, pending the device spike.
+4. **Transliteration:** off by default, switched on from the reader's own sheet.
+5. **Mushaf mode is in slice 2, not later.** A full-Arabic reading mode with no translation, as close to reading from a book as we can make it, is a core requirement for Arabic readers. The design round offers two forms (a justified book scroll and true printed pages); the book scroll ships with the reader and the printed pages follow as soon as the layout data is in.
+6. **Data repository:** a public `taqwa-data` repository for audio and the manifest is fine while the app repository stays private.
+7. **Emails:** yes, draft them for Mohamed to send.
+8. **Tab name:** **"Quran"** (Arabic "القرآن").
+
+Also from the same review: the tab bar icons are too small at 16 dp, and the unselected grey reads as disabled on the light theme. Both are addressed in the Quran tab design round: 22 dp glyphs and the secondary text colour for unselected tabs.
+
+Design round for the tab: https://claude.ai/code/artifact/5748bf9a-e0c0-492f-8205-93604f6efb68
