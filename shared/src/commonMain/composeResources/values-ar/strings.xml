@@ -184,4 +184,16 @@
     <string name="tab_settings">الإعدادات</string>
     <!-- Prayer screen's Qibla card -->
     <string name="today_qibla_detail">%1$s° · %2$s كم إلى مكة</string>
+    <!-- Quran tab root (slice 2a task 5) -->
+    <string name="quran_title">القرآن</string>
+    <string name="quran_search_hint">ابحث عن سورة</string>
+    <string name="quran_continue">متابعة القراءة</string>
+    <string name="quran_continue_detail">الآية %1$s من %2$s · الجزء %3$s</string>
+    <string name="quran_tab_surah">السور</string>
+    <string name="quran_tab_juz">الأجزاء</string>
+    <string name="quran_surah_subtitle">%1$s · %2$s آية · %3$s</string>
+    <string name="quran_makki">مكية</string>
+    <string name="quran_madani">مدنية</string>
+    <string name="quran_juz_n">الجزء %1$s</string>
+    <string name="quran_juz_range">من %1$s %2$s إلى %3$s %4$s</string>
 </resources>

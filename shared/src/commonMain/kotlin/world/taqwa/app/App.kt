@@ -64,6 +64,8 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.feature.quran.QuranRootScreen
+import world.taqwa.app.feature.quran.QuranRootViewModel
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
 import kotlin.time.Clock
@@ -238,12 +240,24 @@ fun App(container: AppContainer) {
                             )
                         }
 
-                        // TODO(slice2a task 5/6/8): replace with the real Quran root screen.
-                        Screen.Quran -> Box(
-                            Modifier.fillMaxSize().background(LocalTaqwaColors.current.background),
-                            contentAlignment = androidx.compose.ui.Alignment.Center,
-                        ) {
-                            androidx.compose.material3.Text("Quran")
+                        Screen.Quran -> {
+                            val viewModel = remember {
+                                QuranRootViewModel(
+                                    source = container.quranRepository,
+                                    settings = settings,
+                                    languageTag = platformFormat.languageTag(),
+                                )
+                            }
+                            LaunchedEffect(viewModel) { viewModel.load() }
+                            val quranState by viewModel.state.collectAsState()
+                            QuranRootScreen(
+                                state = quranState,
+                                onFilterChange = viewModel::setFilter,
+                                onTabChange = viewModel::setTab,
+                                pageFor = viewModel::pageFor,
+                                onOpenReader = { surah, ayah -> navigator.push(Screen.Reader(surah, ayah)) },
+                                onOpenMushaf = { page -> navigator.push(Screen.Mushaf(page)) },
+                            )
                         }
 
                         // TODO(slice2a task 5/6/8): replace with the real reader screen.
