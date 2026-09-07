@@ -41,7 +41,6 @@ TRANSLATIONS = [
     ("en.transliteration", "en", "Transliteration", "Tanzil Project", "transliteration"),
 ]
 TANZIL_LICENCE = "Tanzil Project, non-commercial use, verbatim, credit the translator. tanzil.net/trans"
-TEXT_LICENCE = "Tanzil Quran Text v1.1, CC BY-ND 3.0, tanzil.net"
 
 SILENT_ALEF_SIGN = "۟"   # the Hafs font draws this as an inline ring; see spike §12
 SUKUN = "ْ"
@@ -161,6 +160,105 @@ def load_layout() -> list[dict]:
     return pages
 
 
+def derive_surah_headers(pages_out: list[tuple[int, list[dict]]]):
+    """The upstream layout JSON is unreliable about chapter headers: 17 surahs have no
+    surah-header line anywhere, 13+ surahs have a second surah-header line sitting where the
+    *next* surah begins but mislabelled with the current surah's number, and at least one surah
+    (9, at page 207 line 1) has a spurious header stuck mid-surah that belongs nowhere. Two
+    surahs (81, 85) are also missing their basmala line.
+
+    Rather than trust the layout's `surah` field, headers are derived positionally: for every
+    surah S in 2..114 (S=1's header is already correct on page 1 line 1), the line carrying
+    S:1:1 must be immediately preceded by a basmala (except S==9, which has none) and that, in
+    turn, immediately preceded by a surah-header -- "immediately before" may cross a page
+    boundary. A header found there is relabelled to S regardless of its json value; a missing
+    header/basmala is synthesised; any surah-header line never claimed by this process is
+    spurious and dropped. Mutates `pages_out` in place (insertions, deletions, and a final
+    renumbering of `line` 1..n per page) and returns the logs.
+    """
+    def flatten():
+        flat = []
+        for pi, (pn, lines_out) in enumerate(pages_out):
+            for li, L in enumerate(lines_out):
+                flat.append((pi, li, L))
+        return flat
+
+    flat0 = flatten()
+    first = flat0[0][2]
+    assert first["type"] == "surah" and first["surah"] == 1, "page 1 line 1 must be the Al-Fatiha header"
+    first["_claimed"] = True
+
+    relabelled: list[tuple[int, int, int, int]] = []
+    synth_headers: list[tuple[int, int]] = []
+    synth_basmalas: list[tuple[int, int]] = []
+
+    for s in range(2, 115):
+        flat = flatten()
+        idx = next(i for i, (_, _, L) in enumerate(flat)
+                   if L["type"] == "text" and L["words"][0]["s"] == s
+                   and L["words"][0]["a"] == 1 and L["words"][0]["wi"] == 1)
+        pi_text, li_text, _ = flat[idx]
+        pn_text = pages_out[pi_text][0]
+
+        basmala_entry = None
+        if s != 9 and idx - 1 >= 0 and flat[idx - 1][2]["type"] == "basmala":
+            basmala_entry = flat[idx - 1]
+
+        header_search_i = idx - 2 if basmala_entry else idx - 1
+        header_entry = None
+        if header_search_i >= 0 and flat[header_search_i][2]["type"] == "surah":
+            header_entry = flat[header_search_i]
+
+        insert_pos = li_text
+        if header_entry is not None:
+            hpi, hli, hdict = header_entry
+            if hdict["surah"] != s:
+                relabelled.append((pages_out[hpi][0], hdict.get("line"), hdict["surah"], s))
+                hdict["surah"] = s
+            hdict["_claimed"] = True
+        else:
+            new_header = {"type": "surah", "surah": s, "_claimed": True}
+            if basmala_entry is not None:
+                b_pi, b_li, _ = basmala_entry
+                pages_out[b_pi][1].insert(b_li, new_header)
+                if b_pi == pi_text:
+                    insert_pos += 1
+            else:
+                pages_out[pi_text][1].insert(insert_pos, new_header)
+                insert_pos += 1
+            synth_headers.append((s, pn_text))
+
+        if s != 9 and basmala_entry is None:
+            pages_out[pi_text][1].insert(insert_pos, {"type": "basmala"})
+            synth_basmalas.append((s, pn_text))
+
+    dropped: list[tuple[int, int, int]] = []
+    for pi, (pn, lines_out) in enumerate(pages_out):
+        keep = []
+        for L in lines_out:
+            if L["type"] == "surah" and not L.get("_claimed"):
+                dropped.append((pn, L.get("line"), L["surah"]))
+                continue
+            L.pop("_claimed", None)
+            keep.append(L)
+        pages_out[pi] = (pn, keep)
+
+    for pn, lines_out in pages_out:
+        for li, L in enumerate(lines_out, start=1):
+            L["line"] = li
+
+    for pn, line, json_surah, actual in relabelled:
+        print(f"RELABELLED HEADER page {pn} line {line} json={json_surah} actual={actual}")
+    for s, pn in synth_headers:
+        print(f"SYNTHESISED HEADER surah {s} on page {pn}")
+    for s, pn in synth_basmalas:
+        print(f"SYNTHESISED BASMALA surah {s} on page {pn}")
+    for pn, line, json_surah in dropped:
+        print(f"DROPPED HEADER page {pn} line {line} (json surah={json_surah})")
+
+    return relabelled, synth_headers, synth_basmalas, dropped
+
+
 def build(conn: sqlite3.Connection):
     print("Downloading and parsing")
     uthmani = parse_tanzil_text(fetch(TANZIL_TEXT.format(kind="uthmani"), "uthmani.txt"))
@@ -225,6 +323,11 @@ def build(conn: sqlite3.Connection):
                     rebuilt.setdefault((s, a), []).append(entry)
                 lines_out.append({"type": "text", "line": L["line"], "words": entries})
         pages_out.append((p["page"], lines_out))
+
+    print("Deriving surah headers positionally (layout's surah-header placement is unreliable)")
+    relabelled, synth_headers, synth_basmalas, dropped_headers = derive_surah_headers(pages_out)
+    print(f"  {len(relabelled)} header(s) relabelled, {len(synth_headers)} header(s) synthesised, "
+          f"{len(synth_basmalas)} basmala(s) synthesised, {len(dropped_headers)} spurious header(s) dropped")
 
     print("Cross-checking layout words against Tanzil, applying rule-based corrections")
     # Every surah's ayah 1 except Al-Fatiha (1, itself the basmala) and At-Tawbah (9, which has
@@ -332,16 +435,50 @@ def verify(conn: sqlite3.Connection):
     assert one("SELECT count(*) FROM page") == 604
     assert one("SELECT count(*) FROM translation") == len(TRANSLATIONS)
     assert one("SELECT count(*) FROM ayah_translation") == 6236 * len(TRANSLATIONS)
-    # Pages 586 and 590 have only 12 lines in the upstream zonetecde/mushaf-layout JSON (verified:
-    # all of 81:1-81:29 and 85:1-85:22 are present with no missing or duplicated words -- the
-    # cross-check above already confirms this -- only the printed-line grouping is short by 3 lines
-    # on each page). This is a data gap in the upstream layout, not a pipeline bug; report it
-    # upstream. Every other page must have exactly 15 lines.
-    KNOWN_SHORT_PAGES = (586, 590)
-    short_pages = [r[0] for r in conn.execute(
-        "SELECT page FROM page_line WHERE page > 2 GROUP BY page HAVING count(*) <> 15"
-    )]
-    assert set(short_pages) == set(KNOWN_SHORT_PAGES), f"unexpected short page(s): {short_pages}"
+
+    # Every page from 3 to 604 must have between 13 and 16 lines: the header-derivation pass
+    # (see derive_surah_headers) inserts up to 2 synthetic lines (header + basmala) or drops a
+    # spurious one, so the old fixed "15 lines, with two documented exceptions" assertion no
+    # longer holds. Print the distribution so a real regression (e.g. a page collapsing to 1
+    # line) is easy to spot even though the bound is loose.
+    rows = conn.execute(
+        "SELECT page, count(*) FROM page_line WHERE page BETWEEN 3 AND 604 GROUP BY page"
+    ).fetchall()
+    assert len(rows) == 602, f"expected 602 pages (3..604), got {len(rows)}"
+    dist = {}
+    for _, c in rows:
+        dist[c] = dist.get(c, 0) + 1
+    print(f"  page_line line-count distribution (pages 3-604): {dict(sorted(dist.items()))}")
+    bad_pages = [(p, c) for p, c in rows if not (13 <= c <= 16)]
+    assert not bad_pages, f"page(s) with line count outside [13,16]: {bad_pages}"
+
+    # Exactly one surah-header line per surah, 1..114.
+    surah_rows = conn.execute(
+        "SELECT surah, count(*) FROM page_line WHERE type='surah' GROUP BY surah ORDER BY surah"
+    ).fetchall()
+    assert [r[0] for r in surah_rows] == list(range(1, 115)), \
+        f"surah header numbers wrong: {[r[0] for r in surah_rows]}"
+    assert all(r[1] == 1 for r in surah_rows), f"surah(s) with != 1 header: {surah_rows}"
+
+    # Exactly 112 basmala lines: every surah except Al-Fatiha (1) and At-Tawbah (9).
+    assert one("SELECT count(*) FROM page_line WHERE type='basmala'") == 112
+
+    # For every surah 2..114, the basmala (or, for surah 9, the header itself) is immediately
+    # followed -- in page/line order -- by a text line whose first word is S:1:1.
+    flat = conn.execute("SELECT page, line, type, surah FROM page_line ORDER BY page, line").fetchall()
+    header_pos = {r[3]: i for i, r in enumerate(flat) if r[2] == "surah"}
+    for s in range(2, 115):
+        i = header_pos[s] + 1
+        if s != 9:
+            assert flat[i][2] == "basmala", f"surah {s}: header not immediately followed by basmala"
+            i += 1
+        tpage, tline, ttype, _ = flat[i]
+        assert ttype == "text", f"surah {s}: expected a text line at {(tpage, tline)}, got {ttype}"
+        w = conn.execute(
+            "SELECT surah, ayah, word FROM line_word WHERE page=? AND line=? AND position=1", (tpage, tline)
+        ).fetchone()
+        assert w == (s, 1, 1), f"surah {s}: first word after header/basmala is {w}, expected ({s}, 1, 1)"
+
     assert one("SELECT count(*) FROM ayah WHERE instr(text_uthmani, char(1759)) > 0") == 0, "U+06DF survived"
     assert one("SELECT count(*) FROM line_word WHERE instr(text, char(1759)) > 0") == 0
     assert one("SELECT text_uthmani FROM ayah WHERE surah=1 AND number=1").startswith("بِسْمِ")
