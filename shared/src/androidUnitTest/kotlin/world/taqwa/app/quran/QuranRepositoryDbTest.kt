@@ -52,6 +52,8 @@ class QuranRepositoryDbTest {
     @Test fun pageOneIsFatihaWithHeaderAndSevenTextLines() = runTest {
         val p = repo.page(1)
         assertEquals(LineType.SURAH, p.lines.first().type)
+        assertEquals(8, p.lines.size)
+        assertEquals(7, p.lines.count { it.type == LineType.TEXT })
         assertEquals(1, p.firstSurah)
         assertEquals(1, p.juz)
     }

@@ -18,6 +18,7 @@ import platform.posix.fopen
 import platform.posix.fread
 import platform.posix.fseek
 import platform.posix.fwrite
+import platform.posix.remove
 import platform.posix.rename
 import world.taqwa.app.resources.Res
 
@@ -69,12 +70,21 @@ private fun quranDatabaseDirectory(): String {
 private fun writeAtomically(bytes: ByteArray, path: String) {
     val tempPath = "$path.tmp"
     val file = fopen(tempPath, "wb") ?: error("Could not open $tempPath for writing")
-    try {
-        if (bytes.isNotEmpty()) {
-            bytes.usePinned { pinned -> fwrite(pinned.addressOf(0), 1u, bytes.size.toULong(), file) }
-        }
+    // `fwrite` reports a short write by its return value rather than by failing, and `fclose` is
+    // where a buffered write finally reaches the disk; both are checked, because renaming a
+    // truncated file into place is exactly what the temp-then-rename dance exists to prevent.
+    val written = try {
+        if (bytes.isEmpty()) 0uL else bytes.usePinned { pinned -> fwrite(pinned.addressOf(0), 1u, bytes.size.toULong(), file) }
     } finally {
-        fclose(file)
+        val closed = fclose(file)
+        if (closed != 0) {
+            remove(tempPath)
+            error("Failed to flush $tempPath (fclose returned $closed)")
+        }
+    }
+    if (written != bytes.size.toULong()) {
+        remove(tempPath)
+        error("Short write to $tempPath: $written of ${bytes.size} bytes")
     }
     check(rename(tempPath, path) == 0) { "Failed to install $path from $tempPath" }
 }
