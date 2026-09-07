@@ -18,6 +18,9 @@ import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.prayer.CalculationMethodDefaults
+import world.taqwa.app.quran.ReadingMode
+import world.taqwa.app.quran.ReadingPosition
+import world.taqwa.app.quran.ReadingSettings
 
 /** Reads a stored enum name, falling back to [fallback] when the value is absent or unrecognised. */
 private inline fun <reified E : Enum<E>> String?.toEnumOr(fallback: E): E =
@@ -94,6 +97,46 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
      */
     val locationSource: Flow<LocationSource> =
         store.data.map { it[SettingsKeys.LOCATION_SOURCE].toEnumOr(LocationSource.MANUAL) }
+
+    /**
+     * The reader's preferences: [ReadingSettings.defaultsFor] the device language, with each key
+     * that has actually been stored overriding its own default individually — a user who has
+     * only ever touched the size slider keeps the language-appropriate mode and translation.
+     */
+    fun readingSettings(defaultLanguageTag: String): Flow<ReadingSettings> = store.data.map { p ->
+        val defaults = ReadingSettings.defaultsFor(defaultLanguageTag)
+        ReadingSettings(
+            mode = p[SettingsKeys.QURAN_MODE].toEnumOr(defaults.mode),
+            arabicSizeSp = p[SettingsKeys.QURAN_SIZE] ?: defaults.arabicSizeSp,
+            transliteration = p[SettingsKeys.QURAN_TRANSLITERATION] ?: defaults.transliteration,
+            translationId = p[SettingsKeys.QURAN_TRANSLATION] ?: defaults.translationId,
+        ).clamped()
+    }
+
+    suspend fun setReadingSettings(settings: ReadingSettings) {
+        store.edit {
+            it[SettingsKeys.QURAN_MODE] = settings.mode.name
+            it[SettingsKeys.QURAN_SIZE] = settings.arabicSizeSp
+            it[SettingsKeys.QURAN_TRANSLITERATION] = settings.transliteration
+            it[SettingsKeys.QURAN_TRANSLATION] = settings.translationId
+        }
+    }
+
+    /** Null until all three position keys exist — a fresh install has nowhere to resume to. */
+    val readingPosition: Flow<ReadingPosition?> = store.data.map { p ->
+        val surah = p[SettingsKeys.QURAN_LAST_SURAH]
+        val ayah = p[SettingsKeys.QURAN_LAST_AYAH]
+        val page = p[SettingsKeys.QURAN_LAST_PAGE]
+        if (surah == null || ayah == null || page == null) null else ReadingPosition(surah, ayah, page)
+    }
+
+    suspend fun setReadingPosition(position: ReadingPosition) {
+        store.edit {
+            it[SettingsKeys.QURAN_LAST_SURAH] = position.surah
+            it[SettingsKeys.QURAN_LAST_AYAH] = position.ayah
+            it[SettingsKeys.QURAN_LAST_PAGE] = position.page
+        }
+    }
 
     suspend fun setThemeMode(mode: ThemeMode) {
         store.edit { it[SettingsKeys.THEME] = mode.name }

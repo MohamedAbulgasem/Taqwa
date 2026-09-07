@@ -35,4 +35,12 @@ internal object SettingsKeys {
     val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")
     fun soundKey(prayer: Prayer) = stringPreferencesKey("sound_${prayer.name.lowercase()}")
+
+    val QURAN_MODE = stringPreferencesKey("quran_mode")
+    val QURAN_SIZE = intPreferencesKey("quran_size")
+    val QURAN_TRANSLITERATION = booleanPreferencesKey("quran_transliteration")
+    val QURAN_TRANSLATION = stringPreferencesKey("quran_translation")
+    val QURAN_LAST_SURAH = intPreferencesKey("quran_last_surah")
+    val QURAN_LAST_AYAH = intPreferencesKey("quran_last_ayah")
+    val QURAN_LAST_PAGE = intPreferencesKey("quran_last_page")
 }

@@ -14,6 +14,9 @@ import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.quran.ReadingMode
+import world.taqwa.app.quran.ReadingPosition
+import world.taqwa.app.quran.ReadingSettings
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -174,6 +177,38 @@ class SettingsRepositoryTest {
         val r = repo("widget-roundtrip")
         r.setWidgetBackground(world.taqwa.app.domain.WidgetBackground.DARK)
         assertEquals(world.taqwa.app.domain.WidgetBackground.DARK, r.widgetBackground.first())
+    }
+
+    @Test
+    fun readingSettingsDefaultToTheDeviceLanguageWhenNothingIsStored() = runTest {
+        val d = repo("reading-default").readingSettings("ar-LY").first()
+        assertEquals(ReadingMode.MUSHAF, d.mode)
+        assertEquals("ar.muyassar", d.translationId)
+    }
+
+    @Test
+    fun readingSettingsRoundTripAndOverrideOnlyTheStoredKeys() = runTest {
+        val r = repo("reading-roundtrip")
+        // Only the size is ever written — mode and translation must keep following the
+        // language default, not silently pin to whatever ReadingSettings() defaults to.
+        val current = r.readingSettings("ar-LY").first()
+        r.setReadingSettings(current.copy(arabicSizeSp = 32))
+        val after = r.readingSettings("ar-LY").first()
+        assertEquals(32, after.arabicSizeSp)
+        assertEquals(ReadingMode.MUSHAF, after.mode)
+        assertEquals("ar.muyassar", after.translationId)
+    }
+
+    @Test
+    fun readingPositionIsNullUntilAllThreeKeysAreStored() = runTest {
+        assertEquals(null, repo("reading-position-empty").readingPosition.first())
+    }
+
+    @Test
+    fun readingPositionRoundTrips() = runTest {
+        val r = repo("reading-position-roundtrip")
+        r.setReadingPosition(ReadingPosition(surah = 2, ayah = 255, page = 42))
+        assertEquals(ReadingPosition(surah = 2, ayah = 255, page = 42), r.readingPosition.first())
     }
 }
 
