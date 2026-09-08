@@ -634,3 +634,35 @@ scrolls, clears the gesture bar, and names each translation's language in the de
 Noticed on the way, not changed: filtering the surah list by "Mursalat" finds nothing because
 Tanzil spells it "Al-Mursalaat"; the curated Latin names follow-up would fix that too. Android's
 CLDR name for `bn` under an English UI is "Bangla", so that is what the picker says.
+
+### Slice 2a - second review round (8 September, night)
+
+Four items from the second look at the phone.
+
+**One more meem.** The small meem under 2:41's "كَافِرٍۭ" is the printed Mushaf's own iqlab
+sign: a kasratan before the beh of "بِهِ". The sweep asked for is now a build check,
+`verify_iqlab_marks`: all 609 small meems in the text sit before a beh, in the same word (562),
+the next ayah (11) or, on a surah's last word, the basmala that follows (36). Zero unexplained.
+
+**Settings glyph.** The gear never sat with the arch and the book; it is now three sliders in
+the same stroke, knobs at three heights, checked against the book's ink coverage at 22 dp.
+
+**A chime you can hear at a desk.** Dhuhr and Asr on the Notification level were being missed
+at work: 2.4 s at −5 dBFS is a message tone. The chime is now a six-second ascending bell motif
+(A4, C#5, E5, struck twice) at −1 dBFS, still synthesised, generator in `tools/make-chime.py`.
+Same file names, so iOS needed no project edit; Android's channel id suffix moved to `_chime2`
+(channel sounds are immutable) with the old ids in the stale set, and that level now vibrates
+too. Confirmed on the S23: the old channels read deleted, the new ones carry the sound and a
+vibration pattern.
+
+**Landscape.** One rule, `Modifier.contentWidth()` (600 dp, centred), on every scrolling
+screen and the tab bar; the Prayer screen becomes two panes sideways (header and ring on the
+start side, timeline, Qibla and the latitude note scrolling on the end side); the Mushaf frame
+is capped and its lines scroll inside the frame when the page is taller than the screen; insets
+come from `safeDrawing` so the side navigation bar and the camera cutout are cleared. Seen on the
+Pixel 8 Pro emulator in both themes; the side-inset path is unproven there (gesture navigation
+has none) and iOS landscape could not be rotated in the simulator, only built.
+
+Also this round: release builds are R8-shrunk (10.6 MB against 33 MB debug; WorkManager's Room
+database needed keeping) and unsigned; a chat-deliverable APK is the release build signed with
+the debug key.
