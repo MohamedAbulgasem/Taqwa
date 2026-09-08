@@ -107,6 +107,7 @@ fun ReaderScreen(
         val hasBasmala = ready.basmala != null
         val listState = rememberLazyListState()
         val jumpOffsetPx = with(LocalDensity.current) { 8.dp.roundToPx() }
+        var selectedAyah by remember(ready.surah.number) { mutableStateOf<Int?>(null) }
 
         // Runs once per surah (the reader is re-created — a fresh view model — whenever the
         // surah changes, via App.kt's `remember(screen)`), so a settings change from the sheet
@@ -158,6 +159,10 @@ fun ReaderScreen(
                     translation = ready.translation[ayah.number],
                     translationLanguage = ready.translationLanguage,
                     sizeSp = ready.settings.arabicSizeSp,
+                    selected = selectedAyah == ayah.number,
+                    // One ayah at a time: tapping another moves the selection, tapping the same
+                    // one clears it, which is the model 2b's action row will sit on.
+                    onClick = { selectedAyah = if (selectedAyah == ayah.number) null else ayah.number },
                 )
             }
             ready.nextSurah?.let { next ->

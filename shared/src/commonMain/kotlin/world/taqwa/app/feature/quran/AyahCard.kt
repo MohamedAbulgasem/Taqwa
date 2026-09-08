@@ -63,14 +63,15 @@ fun AyahCard(
     translation: String?,
     translationLanguage: String,
     sizeSp: Int,
+    selected: Boolean,
+    onClick: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
-    var selected by remember(ayahNumber) { mutableStateOf(false) }
     TaqwaCard(
         Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
-            onClick = { selected = !selected },
+            onClick = onClick,
         ),
     ) {
         Column(
