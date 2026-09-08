@@ -666,3 +666,15 @@ has none) and iOS landscape could not be rotated in the simulator, only built.
 Also this round: release builds are R8-shrunk (10.6 MB against 33 MB debug; WorkManager's Room
 database needed keeping) and unsigned; a chat-deliverable APK is the release build signed with
 the debug key.
+
+**Reverted the same night.** The shrunk release build crashed on the phone when a sound was
+previewed, and the widgets stopped rendering. Reproduced on the emulator: `isShrinkResources`
+removed `res/raw/chime` (and the other clips), which nothing references by `R` id, only by
+`android.resource://` URI strings, so `MediaPlayer.prepare` threw and the sound sheet's play
+button took the app down; the notification channels would have been silent for the same reason,
+and Glance's dynamically resolved layouts are the likely widget casualty. The R8 commit is
+reverted (a9ca19c). When the size round comes before launch: keep `raw/` and the Glance
+resources explicitly (`tools:keep` in a `res/raw/keep.xml`), enable code shrinking first without
+resource shrinking, and exercise every sound, both widgets and a real alarm on a device before
+trusting it. Release builds are unshrunk and unsigned again; the debug build is the one on the
+phones.
