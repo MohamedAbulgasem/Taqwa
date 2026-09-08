@@ -36,6 +36,19 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+    buildTypes {
+        release {
+            // Code shrinking only. The first attempt also shrank resources and deleted res/raw
+            // (nothing references the sounds by R id, only by android.resource:// URI), which
+            // crashed the sound sheet and silenced the channels; the Glance widgets went with it.
+            // Resources are kept whole until each is either referenced by id or listed in
+            // res/raw/keep.xml, and every sound, both widgets and a real alarm are checked on a
+            // device before shrinking is trusted again.
+            isMinifyEnabled = true
+            isShrinkResources = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
 }
 
 kotlin {
