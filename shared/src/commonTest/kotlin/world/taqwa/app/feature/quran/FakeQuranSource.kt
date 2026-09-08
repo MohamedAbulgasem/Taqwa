@@ -9,17 +9,21 @@ import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.SearchHit
 import world.taqwa.app.quran.SearchQuery
 import world.taqwa.app.quran.Surah
+import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
 
 /**
  * A hand-built stand-in for [QuranSource], shared by [QuranRootViewModelTest] and
  * [ReaderViewModelTest] rather than duplicated. The default four surahs (1, 2, 18, 114 — matching
  * the real database's numbers, meanings and ayah counts) and juz starts are
- * [QuranRootViewModelTest]'s, which needs no ayah or translation data at all; [ReaderViewModelTest]
- * passes its own surah list plus [ayahsBySurah], [translationsList] and [translationTextsById] so
- * neither test pays for data it does not use. Surah 18's Arabic name carries invented tashkeel
- * deliberately (the real database stores bare consonants) so the harakat-insensitive search test
- * actually exercises [world.taqwa.app.quran.QuranText.normaliseForSearch] rather than trivially
+ * [QuranRootViewModelTest]'s; [ReaderViewModelTest] passes its own surah list plus [ayahsBySurah],
+ * [translationsList] and [translationTextsById] so neither test pays for data it does not use. The
+ * default [translationsList] is the one thing every source carries: the real database bundles
+ * Saheeh International, and [QuranRootViewModel.load] resolves its search translation against the
+ * catalogue on every load. The translation *texts* stay opt-in.
+ *
+ * Surah 18's Arabic name carries invented tashkeel deliberately (the real database stores bare
+ * consonants) so the harakat-insensitive search test actually exercises [world.taqwa.app.quran.QuranText.normaliseForSearch] rather than trivially
  * matching on already-bare text.
  *
  * [MushafViewModelTest] adds [pagesByNumber] — real [MushafPage] rows dumped out of the bundled
@@ -40,7 +44,9 @@ internal class FakeQuranSource(
         Juz(4, 114, 3),
     ),
     private val ayahsBySurah: Map<Int, List<Ayah>> = emptyMap(),
-    private val translationsList: List<TranslationInfo> = emptyList(),
+    private val translationsList: List<TranslationInfo> = listOf(
+        TranslationInfo("en.sahih", "en", "Saheeh International", "Saheeh International", "licence", "url", TextKind.TRANSLATION),
+    ),
     /** id -> surah -> ayah number -> text. */
     private val translationTextsById: Map<String, Map<Int, Map<Int, String>>> = emptyMap(),
     private val pagesByNumber: Map<Int, MushafPage> = emptyMap(),

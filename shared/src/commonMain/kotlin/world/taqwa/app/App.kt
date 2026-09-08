@@ -247,10 +247,14 @@ fun App(container: AppContainer) {
                                 QuranRootViewModel(
                                     source = container.quranRepository,
                                     settings = settings,
+                                    bookmarks = container.bookmarkStore,
                                     languageTag = platformFormat.languageTag(),
                                 )
                             }
-                            LaunchedEffect(viewModel) { viewModel.load() }
+                            LaunchedEffect(viewModel) {
+                                viewModel.load()
+                                viewModel.start(this)
+                            }
                             val quranState by viewModel.state.collectAsState()
                             QuranRootScreen(
                                 state = quranState,
