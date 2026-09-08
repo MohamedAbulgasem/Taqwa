@@ -2,9 +2,16 @@ package world.taqwa.app.feature.quran
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -15,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -62,6 +70,10 @@ private const val FALLBACK_TRANSLATION_ID = "en.sahih"
  * eight steps between the two ends — [Slider]'s own `steps` counts only the stops strictly
  * between [ReadingSettings.MIN_SIZE] and [ReadingSettings.MAX_SIZE]. */
 private val SliderSteps = (ReadingSettings.MAX_SIZE - ReadingSettings.MIN_SIZE) / ReadingSettings.SIZE_STEP - 1
+
+/** [CheckMark]'s own canvas size, reserved on every translation row so the rows' language labels
+ * share one right edge whether or not the row is the selected one. */
+private val CheckMarkSize = 20.dp
 
 /**
  * The reading-settings sheet's picker order (spec §2.5): the tafsir first (there is at most one —
@@ -111,7 +123,16 @@ fun ReadingSheet(
     var translationExpanded by remember { mutableStateOf(false) }
 
     Column(
-        Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp),
+        // Scrollable because material3 caps a ModalBottomSheet at the screen height and then lets
+        // its content overflow silently: with the seven-row translation picker open, the reading
+        // mode row was being drawn on top of the last picker row on a 1080p phone. The navigation
+        // bar inset is the column's own, not the sheet's, so it only costs height once the content
+        // actually reaches the gesture bar.
+        Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 24.dp)
+            .windowInsetsPadding(WindowInsets.navigationBars),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -221,12 +242,25 @@ fun ReadingSheet(
                         TaqwaRow(
                             label = info.name,
                             subtitle = info.translator,
+                            // The translation's own language, named in the reader's UI language:
+                            // the names in the list are the translators' own ("Muhammad Hamidullah"
+                            // says nothing about French to someone who does not read it), so the
+                            // language is the only part of the row a reader can choose by.
+                            value = format.languageName(info.language),
                             selectable = true,
                             onClick = {
                                 onChange(settings.copy(translationId = info.id))
                                 translationExpanded = false
                             },
-                            trailing = { if (info.id == effectiveId) CheckMark() },
+                            // A fixed slot on every row, empty or not: TaqwaRow lays the value out
+                            // against the trailing slot's width, so a missing check mark would let
+                            // each unselected row's language slide 20 dp further out than the
+                            // selected one's and break the column they otherwise line up in.
+                            trailing = {
+                                Box(Modifier.size(CheckMarkSize), contentAlignment = Alignment.Center) {
+                                    if (info.id == effectiveId) CheckMark()
+                                }
+                            },
                         )
                     }
                 }
