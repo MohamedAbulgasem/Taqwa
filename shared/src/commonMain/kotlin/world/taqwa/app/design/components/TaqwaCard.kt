@@ -85,12 +85,19 @@ fun TaqwaRow(
      * nothing else acknowledges the tap before the next screen arrives.
      */
     selectable: Boolean = false,
+    /**
+     * False for a row whose tap is acknowledged by something else on the same screen (a list
+     * expanding beneath it, a sheet section changing) rather than by a new screen or a check
+     * mark. Independent of [selectable], which says what the row *is*; this says only how it
+     * responds.
+     */
+    ripple: Boolean = true,
     trailing: @Composable (() -> Unit)? = null,
 ) {
     val colors = LocalTaqwaColors.current
     val clickModifier = when {
         onClick == null -> Modifier
-        selectable -> Modifier.clickable(
+        selectable || !ripple -> Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
             onClick = onClick,

@@ -18,6 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -52,6 +55,7 @@ import kotlin.math.roundToInt
  * "en.sahih" fallback in [ReaderViewModel], never a translated string, since a translation's name
  * is data, not UI text. */
 private const val FALLBACK_TRANSLATION_NAME = "Saheeh International"
+private const val FALLBACK_TRANSLATION_ID = "en.sahih"
 
 /** The slider's discrete stops between 22 and 40 sp in steps of 2 (spec §2.5): nine values, so
  * eight steps between the two ends — [Slider]'s own `steps` counts only the stops strictly
@@ -170,8 +174,14 @@ fun ReadingSheet(
         Column {
             CardDivider()
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                // The roundel takes the accent here as it does on every ayah card: the preview
+                // must show the size the reader will actually use, colour included.
+                val marker = previewAyah.takeLastWhile { it in '٠'..'٩' }
                 Text(
-                    previewAyah,
+                    buildAnnotatedString {
+                        append(previewAyah.dropLast(marker.length))
+                        withStyle(SpanStyle(color = colors.accent)) { append(marker) }
+                    },
                     fontFamily = mushafFamily(),
                     style = TaqwaText.quran(liveSize.roundToInt()).copy(textAlign = TextAlign.Center),
                     color = colors.textPrimary,
@@ -193,14 +203,15 @@ fun ReadingSheet(
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             val current = translations.firstOrNull { it.id == settings.translationId }
+            // What the reader actually loads when the stored id is not bundled (ReaderViewModel
+            // falls back to Saheeh International), so the check mark agrees with the text shown.
+            val effectiveId = current?.id ?: FALLBACK_TRANSLATION_ID
             TaqwaRow(
                 label = stringResource(Res.string.quran_sheet_translation),
                 value = current?.name ?: FALLBACK_TRANSLATION_NAME,
                 onClick = { translationExpanded = !translationExpanded },
-                // Not an option itself — [selectable] only borrows [TaqwaRow]'s no-ripple click
-                // modifier (spec-wide: no ripples), since the list expanding underneath is
-                // already the tap's own feedback.
-                selectable = true,
+                // The list unfolding beneath is the tap's feedback; a ripple would be a second one.
+                ripple = false,
             )
             if (translationExpanded) {
                 TaqwaCard {
@@ -214,7 +225,7 @@ fun ReadingSheet(
                                 onChange(settings.copy(translationId = info.id))
                                 translationExpanded = false
                             },
-                            trailing = { if (info.id == settings.translationId) CheckMark() },
+                            trailing = { if (info.id == effectiveId) CheckMark() },
                         )
                     }
                 }
