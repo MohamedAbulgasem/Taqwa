@@ -200,9 +200,10 @@ fun ReaderScreen(
 
 /** The reading-settings sheet's grab handle (spec §2.5): a plain 36×4 dp pill in the hairline
  * colour, replacing material3's own default drag handle so it matches the rest of the app's
- * hairline-drawn chrome rather than the library's default grey. */
+ * hairline-drawn chrome rather than the library's default grey. Shared with [MushafScreen], whose
+ * sheet is the same sheet. */
 @Composable
-private fun SheetDragHandle() {
+internal fun SheetDragHandle() {
     val colors = LocalTaqwaColors.current
     Box(
         Modifier

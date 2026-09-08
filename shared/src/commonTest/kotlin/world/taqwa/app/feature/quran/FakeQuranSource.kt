@@ -18,6 +18,10 @@ import world.taqwa.app.quran.TranslationInfo
  * deliberately (the real database stores bare consonants) so the harakat-insensitive search test
  * actually exercises [world.taqwa.app.quran.QuranText.normaliseForSearch] rather than trivially
  * matching on already-bare text.
+ *
+ * [MushafViewModelTest] adds [pagesByNumber] — real [MushafPage] rows dumped out of the bundled
+ * database into [MUSHAF_PAGE_1] and friends — and [pageLoads], which counts how often a page was
+ * actually fetched so the view model's own page cache can be shown to be doing something.
  */
 internal class FakeQuranSource(
     private val surahList: List<Surah> = listOf(
@@ -36,7 +40,11 @@ internal class FakeQuranSource(
     private val translationsList: List<TranslationInfo> = emptyList(),
     /** id -> surah -> ayah number -> text. */
     private val translationTextsById: Map<String, Map<Int, Map<Int, String>>> = emptyMap(),
+    private val pagesByNumber: Map<Int, MushafPage> = emptyMap(),
 ) : QuranSource {
+    /** One entry per [page] call that reached this fake, newest last. */
+    val pageLoads = mutableListOf<Int>()
+
     override suspend fun surahs(): List<Surah> = surahList
     override suspend fun surah(number: Int): Surah = surahList.first { it.number == number }
     override suspend fun juzs(): List<Juz> = juzList
@@ -54,6 +62,9 @@ internal class FakeQuranSource(
             114 -> 604
             else -> error("unknown surah $surah")
         }
-    override suspend fun page(number: Int): MushafPage = error("not needed by these tests")
-    override suspend fun surahOfPage(number: Int): Surah = error("not needed by these tests")
+    override suspend fun page(number: Int): MushafPage {
+        pageLoads += number
+        return pagesByNumber[number] ?: error("no page $number configured in FakeQuranSource")
+    }
+    override suspend fun surahOfPage(number: Int): Surah = surah(page(number).firstSurah)
 }

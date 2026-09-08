@@ -64,6 +64,8 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.feature.quran.MushafScreen
+import world.taqwa.app.feature.quran.MushafViewModel
 import world.taqwa.app.feature.quran.QuranRootScreen
 import world.taqwa.app.feature.quran.QuranRootViewModel
 import world.taqwa.app.feature.quran.ReaderScreen
@@ -289,12 +291,31 @@ fun App(container: AppContainer) {
                             )
                         }
 
-                        // TODO(slice2a task 5/6/8): replace with the real mushaf screen.
-                        is Screen.Mushaf -> Box(
-                            Modifier.fillMaxSize().background(LocalTaqwaColors.current.background),
-                            contentAlignment = androidx.compose.ui.Alignment.Center,
-                        ) {
-                            androidx.compose.material3.Text("Mushaf")
+                        is Screen.Mushaf -> {
+                            val viewModel = remember(screen) {
+                                MushafViewModel(
+                                    source = container.quranRepository,
+                                    settings = settings,
+                                    languageTag = platformFormat.languageTag(),
+                                    startPage = screen.page,
+                                )
+                            }
+                            LaunchedEffect(viewModel) { viewModel.start(this) }
+                            val mushafState by viewModel.state.collectAsState()
+                            MushafScreen(
+                                state = mushafState,
+                                startPage = screen.page,
+                                pageLoader = viewModel::page,
+                                onBack = { navigator.pop() },
+                                onToggleMode = {
+                                    scope.launch {
+                                        val (surah, ayah) = viewModel.switchToReader()
+                                        navigator.replace(Screen.Reader(surah, ayah))
+                                    }
+                                },
+                                onChangeSettings = viewModel::updateSettings,
+                                onPageShown = viewModel::onPageShown,
+                            )
                         }
 
                         Screen.Settings -> SettingsRootScreen(
