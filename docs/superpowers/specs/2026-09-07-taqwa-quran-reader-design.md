@@ -7,7 +7,7 @@ Status: **agreed 7 September 2026** after the investigation (`2026-09-07-quran-t
 A third tab, **Quran** (Arabic: القرآن), holding an offline Quran with two reading modes:
 
 - **Translation mode**: one surah at a time, each ayah a card with the Uthmani Arabic, an optional transliteration line, and the chosen translation.
-- **Mushaf mode**: the 604 pages of the Madinah Mushaf, one page per screen, lines breaking exactly where the printed page breaks, turned by swiping right to left.
+- **Mushaf mode**: the 604 pages of the Madinah Mushaf, one page per screen, lines breaking exactly where the printed page breaks, ordered like an Arabic book: the next page sits to the left, so a swipe from left to right turns forward.
 
 Plus: a tab root with a continue-reading card, the surah and juz lists, and a name filter; a reading-settings sheet; last-read position; attribution for every bundled text; the tab bar fix (bigger glyphs, a non-disabled unselected colour). Everything bundled in the app; no network.
 
