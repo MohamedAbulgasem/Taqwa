@@ -7,8 +7,8 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Bundled sound file names and their measured durations (`assets/audio/README.md`), shared by
  * both schedulers, the Android channel setup and the sound sheet's play button. Silent resolves to
- * nothing: it plays no sound at all. Notification is Taqwa's own two-note chime, not the phone's
- * default tone, so a prayer never sounds like a message arriving.
+ * nothing: it plays no sound at all. Notification is Taqwa's own chime — a three-note bell motif
+ * rung twice — not the phone's default tone, so a prayer never sounds like a message arriving.
  */
 object SoundAssets {
 
@@ -46,7 +46,7 @@ object SoundAssets {
 
     fun duration(sound: PrayerSound): Duration? = when (sound) {
         PrayerSound.SILENT -> null
-        PrayerSound.NOTIFICATION -> 2.40.seconds
+        PrayerSound.NOTIFICATION -> 6.00.seconds
         PrayerSound.TAKBIR -> 15.80.seconds
         PrayerSound.ADHAN -> 29.95.seconds
     }

@@ -93,7 +93,7 @@
     <string name="sound_takbir">تكبير</string>
     <string name="sound_adhan">أذان</string>
     <string name="sound_silent_detail">إشعار فقط بلا صوت</string>
-    <string name="sound_notification_detail">نغمة قصيرة هادئة</string>
+    <string name="sound_notification_detail">نغمة واضحة، %1$s ثوانٍ</string>
     <string name="sound_takbir_detail">الله أكبر، الله أكبر، نحو %1$s ثانية</string>
     <string name="sound_adhan_detail">الأذان، أول %1$s ثانية</string>
     <string name="sound_sheet_footnote">صوت الإشعار محدود بـ%1$s ثانية على هذه المنصة. ويمكن سماع الأذان كاملًا داخل التطبيق.</string>

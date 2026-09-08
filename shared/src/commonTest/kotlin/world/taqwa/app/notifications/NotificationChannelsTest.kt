@@ -5,6 +5,7 @@ import world.taqwa.app.domain.PrayerSound
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class NotificationChannelsTest {
 
@@ -40,15 +41,27 @@ class NotificationChannelsTest {
         }
     }
 
-    // The Notification level used to be the phone's default tone under this id. The scheduler
-    // deletes whatever is not live, so the old id has to be in the set for an upgrade to drop it,
-    // and the chime channel must be a different id or Android would keep the old sound.
+    // The Notification level has carried three sounds under three ids: the phone's default tone,
+    // the 2.4 s chime, and the six-second one. The scheduler deletes whatever is not live, so
+    // every superseded id has to be in the set for an upgrade to drop it, and the live id must
+    // differ from both or Android would keep an old sound under an old channel.
     @Test
-    fun theChimeChannelReplacesThePreChimeNotificationChannel() {
+    fun theLiveChimeChannelReplacesBothSupersededNotificationChannels() {
         val ids = NotificationChannels.allChannelIdsFor(Prayer.MAGHRIB)
-        val chime = NotificationChannels.channelId(Prayer.MAGHRIB, PrayerSound.NOTIFICATION)
-        assertNotEquals("prayer_maghrib_notification", chime)
-        assertEquals(1, ids.count { it == "prayer_maghrib_notification" })
-        assertEquals(PrayerSound.entries.size + 1, ids.toSet().size)
+        val live = NotificationChannels.channelId(Prayer.MAGHRIB, PrayerSound.NOTIFICATION)
+        assertEquals("prayer_maghrib_notification_chime2", live)
+        listOf("prayer_maghrib_notification", "prayer_maghrib_notification_chime").forEach { stale ->
+            assertNotEquals(stale, live)
+            assertEquals(1, ids.count { it == stale }, stale)
+        }
+        assertEquals(PrayerSound.entries.size + 2, ids.toSet().size)
+    }
+
+    @Test
+    fun staleNotificationIdsAreExactlyTheSupersededOnesAndNeverTheLiveOne() {
+        val stale = NotificationChannels.staleNotificationIds(Prayer.FAJR)
+        assertEquals(listOf("prayer_fajr_notification", "prayer_fajr_notification_chime"), stale)
+        assertTrue(NotificationChannels.channelId(Prayer.FAJR, PrayerSound.NOTIFICATION) !in stale)
+        assertTrue(stale.all { it in NotificationChannels.allChannelIdsFor(Prayer.FAJR) })
     }
 }

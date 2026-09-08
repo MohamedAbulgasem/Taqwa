@@ -38,7 +38,9 @@ import world.taqwa.app.resources.sound_takbir_detail
 /** Spec §92: all tap targets ≥44 pt. */
 private val MIN_TAP_TARGET = 44.dp
 
-/** The takbir's measured length, and the platform notification-sound cap, in whole seconds. */
+/** The chime's and the takbir's measured lengths, and the platform notification-sound cap, in
+ * whole seconds. */
+private const val CHIME_SECONDS = 6
 private const val TAKBIR_SECONDS = 16
 private const val SOUND_CAP_SECONDS = 30
 
@@ -53,7 +55,8 @@ private fun subtitle(sound: PrayerSound): String {
     val format = LocalPlatformFormat.current
     return when (sound) {
         PrayerSound.SILENT -> stringResource(Res.string.sound_silent_detail)
-        PrayerSound.NOTIFICATION -> stringResource(Res.string.sound_notification_detail)
+        PrayerSound.NOTIFICATION ->
+            stringResource(Res.string.sound_notification_detail, format.localizedDigits(CHIME_SECONDS))
         PrayerSound.TAKBIR ->
             stringResource(Res.string.sound_takbir_detail, format.localizedDigits(TAKBIR_SECONDS))
         PrayerSound.ADHAN ->

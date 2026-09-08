@@ -10,20 +10,34 @@ import world.taqwa.app.domain.PrayerSound
  */
 object NotificationChannels {
     /**
-     * The Notification level once meant the phone's default tone and now means Taqwa's own
-     * chime. By the same immutability rule, that is a different channel: the suffix makes Android
-     * create it afresh instead of keeping the old sound under the old id.
+     * The Notification level's sound has changed twice: the phone's default tone, then Taqwa's
+     * own 2.4 s chime, and now a longer and brighter six-second one that carries in an office.
+     * Each change needs an id Android has never seen, so the suffix names the generation of the
+     * chime rather than just saying "chime"; the ids left behind are in [staleNotificationIds].
      */
-    private const val CHIME_SUFFIX = "_chime"
+    private const val CHIME_SUFFIX = "_chime2"
+
+    /**
+     * Notification-level suffixes this app has used before [CHIME_SUFFIX]: `""` is the original
+     * default-tone channel and `_chime` the 2.4 s chime. They only ever get added to — an id
+     * dropped from here is an id the scheduler stops deleting, which leaves a user stuck with an
+     * old sound under a channel they cannot remove.
+     */
+    private val RETIRED_CHIME_SUFFIXES = listOf("", "_chime")
 
     fun channelId(prayer: Prayer, sound: PrayerSound): String =
-        "prayer_${prayer.name.lowercase()}_${sound.name.lowercase()}" +
-            if (sound == PrayerSound.NOTIFICATION) CHIME_SUFFIX else ""
+        base(prayer, sound) + if (sound == PrayerSound.NOTIFICATION) CHIME_SUFFIX else ""
 
-    /** Every channel this prayer could ever have had, across all four sounds and including the
-     * pre-chime Notification id, so an upgrade deletes it — the set the Android scheduler checks
-     * when deciding which stale channels it may delete. */
+    /** Every channel id the Notification level has ever used and no longer does. */
+    fun staleNotificationIds(prayer: Prayer): List<String> =
+        RETIRED_CHIME_SUFFIXES.map { base(prayer, PrayerSound.NOTIFICATION) + it }
+
+    /** Every channel this prayer could ever have had, across all four sounds and including every
+     * superseded Notification id, so an upgrade deletes them — the set the Android scheduler
+     * checks when deciding which stale channels it may delete. */
     fun allChannelIdsFor(prayer: Prayer): List<String> =
-        PrayerSound.entries.map { channelId(prayer, it) } +
-            "prayer_${prayer.name.lowercase()}_${PrayerSound.NOTIFICATION.name.lowercase()}"
+        PrayerSound.entries.map { channelId(prayer, it) } + staleNotificationIds(prayer)
+
+    private fun base(prayer: Prayer, sound: PrayerSound): String =
+        "prayer_${prayer.name.lowercase()}_${sound.name.lowercase()}"
 }

@@ -25,6 +25,9 @@ private const val ALARM_ACTION = "world.taqwa.app.PRAYER_ALARM"
  * notification is never early — only up to this much late. */
 private const val INEXACT_WINDOW_MILLIS = 5L * 60L * 1000L
 
+/** Wait, buzz, pause, buzz — two short pulses, the length of a knock rather than an alarm. */
+private val NOTIFICATION_VIBRATION = longArrayOf(0L, 220L, 160L, 220L)
+
 const val EXTRA_ID = "id"
 const val EXTRA_REQUEST_CODE = "request_code"
 const val EXTRA_PRAYER = "prayer"
@@ -184,6 +187,15 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
                 val name = SoundAssets.androidRawResourceName(sound)!!
                 channel.setSound(Uri.parse("android.resource://${context.packageName}/raw/$name"), attrs)
             }
+        }
+        // Notification is the level people pick for the prayers they keep during a working day —
+        // Dhuhr and Asr at a desk — where a chime alone gets lost under a room. A buzz beside the
+        // tone is the whole point of that level, so it is not left to the channel default. Takbir
+        // and Adhan are long and loud enough to stand on their own, and a phone buzzing through
+        // thirty seconds of adhan would be worse than silence.
+        if (sound == PrayerSound.NOTIFICATION) {
+            channel.enableVibration(true)
+            channel.vibrationPattern = NOTIFICATION_VIBRATION
         }
     }
 }
