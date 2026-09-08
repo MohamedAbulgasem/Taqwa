@@ -4,7 +4,7 @@ import app.cash.sqldelight.db.SqlDriver
 
 object QuranDb {
     /** Must equal the pipeline's USER_VERSION; a mismatch on disk triggers a fresh copy. */
-    const val VERSION = 1
+    const val VERSION = 2
     const val FILE = "quran.db"
     const val RESOURCE = "files/quran.db"
 }

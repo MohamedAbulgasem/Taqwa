@@ -1,6 +1,7 @@
 package world.taqwa.app.quran
 
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import java.io.File
@@ -31,11 +32,14 @@ actual fun createQuranDriver(): SqlDriver {
         schema = QuranDatabase.Schema,
         context = appContext,
         name = QuranDb.FILE,
-        callback = object : AndroidSqliteDriver.Callback(QuranDatabase.Schema) {
-            // The bundled file already has the schema; the framework must never create or
-            // migrate it itself.
+        // Opened at the bundled file's own user_version, not SQLDelight's schema version (which
+        // stays 1: the schema never changes, only the text inside it): the framework compares the
+        // two and, with the file ahead, would call onDowngrade and throw. The bundled file already
+        // has the schema, so create, upgrade and downgrade are all deliberately nothing.
+        callback = object : SupportSQLiteOpenHelper.Callback(QuranDb.VERSION) {
             override fun onCreate(db: SupportSQLiteDatabase) = Unit
             override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+            override fun onDowngrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
         },
     )
 }

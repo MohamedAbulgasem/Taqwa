@@ -20,8 +20,6 @@ import kotlin.random.Random
 import kotlin.random.nextULong
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 /**
  * Mushaf mode's view model and the two pure layout rules its page view leans on (spec §2.4).
@@ -220,47 +218,5 @@ class MushafViewModelTest {
         // Page 1's first line is Al-Faatiha's surah band, which needs the full row to draw.
         assertEquals("الفاتحة", ready.surahsByNumber[1]?.nameArabic)
         assertEquals(7, ready.surahsByNumber[1]?.ayahCount)
-    }
-
-    // --- The two pure rules the page view is built on (spec §2.4) ---
-
-    @Test
-    fun wordRangesCoverTheLineTextWordByWord() = runTest {
-        val line = MUSHAF_PAGE_3.lines.first()
-        val ranges = wordRanges(line)
-
-        assertEquals(line.words.size, ranges.size)
-        // Every range names its own word's text exactly where the joined line puts it.
-        ranges.forEach { assertEquals(it.word.text, line.text!!.substring(it.start, it.end)) }
-        assertEquals(0, ranges.first().start)
-        assertEquals(line.text!!.length, ranges.last().end)
-    }
-
-    @Test
-    fun wordRangesMapACharacterOffsetBackToItsOwnAyah() = runTest {
-        // Al-Faatiha's fourth line carries the end of ayah 3 and the start of ayah 4, so a tap
-        // has to resolve to different ayahs at its two ends (spec §2.4).
-        val line = MUSHAF_PAGE_1.lines.first { it.firstAyah == 3 && it.lastAyah == 4 }
-        val ranges = wordRanges(line)
-        val text = line.text!!
-
-        assertEquals(3, wordAt(ranges, 0)?.ayah)
-        assertEquals(4, wordAt(ranges, text.length - 1)?.ayah)
-        // The space between two words belongs to the word it follows, so no tap falls through.
-        assertEquals(ranges.first().word.word, wordAt(ranges, ranges.first().end)?.word)
-        assertEquals(null, wordAt(ranges, text.length + 1))
-    }
-
-    @Test
-    fun onlyOrdinaryLinesBeyondAlFaatihasPagesAreJustified() = runTest {
-        // Pages 1 and 2 keep the printed Mushaf's own centred, unjustified setting.
-        MUSHAF_PAGE_1.lines.forEach { assertFalse(isJustified(MUSHAF_PAGE_1, it)) }
-        MUSHAF_PAGE_2.lines.forEach { assertFalse(isJustified(MUSHAF_PAGE_2, it)) }
-
-        val ordinary = MUSHAF_PAGE_3.lines.first { it.type == LineType.TEXT && !it.endsSurah }
-        assertTrue(isJustified(MUSHAF_PAGE_3, ordinary))
-        // A line that ends a surah is set to the start instead, never stretched to the frame.
-        val ending = MUSHAF_PAGE_1.lines.first { it.endsSurah }
-        assertFalse(isJustified(MUSHAF_PAGE_3, ending))
     }
 }

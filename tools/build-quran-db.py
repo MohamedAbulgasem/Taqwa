@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / "cache"
 OUT = ROOT / "shared" / "src" / "commonMain" / "composeResources" / "files" / "quran.db"
-USER_VERSION = 1
+USER_VERSION = 2
 
 TANZIL_TEXT = "https://tanzil.net/pub/download/index.php?quranType={kind}&marks=true&sajdah=true&rub=true&tatweel=false&outType=txt-2&agree=true"
 TANZIL_TRANS = "https://tanzil.net/trans/?transID={id}&type=txt"
@@ -45,6 +45,8 @@ TANZIL_LICENCE = "Tanzil Project, non-commercial use, verbatim, credit the trans
 SILENT_ALEF_SIGN = "۟"   # the Hafs font draws this as an inline ring; see spike §12
 SUKUN = "ْ"
 SIGN_TOKENS = {"۞", "۩"}          # ۞ rub el hizb, ۩ sajdah, standalone tokens in Tanzil
+RUB_EL_HIZB = "۞"
+NBSP = "\u00a0"                    # QuranText.MARKER_SEPARATOR: glues an ayah's digits to its last word
 PAUSE_MARKS = set("ۖۗۘۙۚۛۜ")
 ARABIC_INDIC = "٠١٢٣٤٥٦٧٨٩"
 # A layout word can carry a trailing ayah-ending digit ("الٓمٓ ١") or a trailing pause mark
@@ -174,6 +176,68 @@ def strip_for_compare(text: str) -> str:
             continue
         tokens.append(t)
     return " ".join(tokens)
+
+
+def fuse_sign_tokens(tokens: list[str]) -> list[str]:
+    """Tanzil writes every pause mark, the sajdah sign and the rub-el-hizb star as a token of
+    its own, space-separated. The Mushaf layout counts them as part of a neighbouring word:
+    a pause mark or sajdah sign belongs to the word before it, the rub-el-hizb star to the
+    word after it. This re-groups Tanzil's tokens the same way -- the space is kept inside the
+    fused word, so the stored text is still character-for-character Tanzil's."""
+    fused: list[str] = []
+    carry = ""
+    for t in tokens:
+        if t == RUB_EL_HIZB:
+            carry = t + " "
+        elif fused and all(c in PAUSE_MARKS or c in SIGN_TOKENS or unicodedata.category(c).startswith("M") for c in t):
+            fused[-1] = fused[-1] + " " + t
+        else:
+            fused.append(carry + t)
+            carry = ""
+    if carry:
+        raise SystemExit(f"rub-el-hizb star with no word after it in {tokens}")
+    return fused
+
+
+DIGIT_SUFFIX = re.compile(r"\s*([" + ARABIC_INDIC + r"]+)$")
+
+
+def retext_from_tanzil(entries: list[dict], tanzil_tokens: list[str], key: tuple[int, int]) -> None:
+    """Replace every layout word's text for one ayah with Tanzil's own words (spec §3.2).
+
+    The layout's word *segmentation* (which word sits on which line) is trusted; its word *text*
+    is not: the layout source encodes the sequential-tanween forms with extra small-meem signs
+    (U+06E2/U+06ED) that the Hafs font draws as a literal small meem, which the printed Mushaf
+    does not show. Tanzil's Uthmani text is what the reader already displays, so after this the
+    two modes show the same characters and every Mushaf word is verifiable against `ayah`.
+
+    Words are aligned by their bare letters: a layout word may span two Tanzil tokens (the
+    layout writes "بَعْدَ مَا" and "إِلْ يَاسِينَ" as one word), so each layout word consumes
+    Tanzil tokens until the letters match exactly. The ayah's trailing digits are re-attached to
+    its last word with a non-breaking space, the separator QuranText.withMarker uses."""
+    tokens = fuse_sign_tokens(tanzil_tokens)
+    i = 0
+    for entry in entries:
+        # The layout attaches a stray U+200F to a few standalone signs (27:26's sajdah mark);
+        # it has no place in the text and would break the letter match below.
+        entry["text"] = entry["text"].replace("\u200e", "").replace("\u200f", "")
+        m = DIGIT_SUFFIX.search(entry["text"])
+        digits = m.group(1) if m else ""
+        # Spaces dropped on both sides: a layout word that spans two Tanzil tokens keeps its own
+        # inner space, and a fused pause mark or sign brings one too.
+        target = bare_letters(entry["text"][: m.start()] if m else entry["text"]).replace(" ", "")
+        taken: list[str] = []
+        got = ""
+        while got != target:
+            if i >= len(tokens) or len(got) >= len(target):
+                raise SystemExit(f"cannot align layout word {entry['s']}:{entry['a']}:{entry['wi']} "
+                                 f"({entry['text']!r}) with Tanzil tokens {tokens}")
+            taken.append(tokens[i])
+            got += bare_letters(tokens[i]).replace(" ", "")
+            i += 1
+        entry["text"] = " ".join(taken) + (NBSP + digits if digits else "")
+    if i != len(tokens):
+        raise SystemExit(f"{key}: {len(tokens) - i} Tanzil token(s) left over after aligning the layout words")
 
 
 def load_layout() -> list[dict]:
@@ -414,6 +478,11 @@ def build(conn: sqlite3.Connection):
     if bad:
         raise SystemExit(f"{bad} ayahs differ between Tanzil and the layout")
 
+    print("Rewriting every Mushaf word from Tanzil's text")
+    for key in order:
+        s, a = key
+        retext_from_tanzil(rebuilt.get(key, []), strip_leading_basmala(uthmani[key], s, a).split(), key)
+
     print("Writing pages, lines, words")
     for pn, lines_out in pages_out:
         first_ayah = None
@@ -514,8 +583,92 @@ def verify(conn: sqlite3.Connection):
     assert one("SELECT page FROM ayah WHERE surah=2 AND number=255") == 42
     assert one("SELECT juz FROM ayah WHERE surah=114 AND number=6") == 30
     assert one("SELECT count(*) FROM ayah_fts WHERE ayah_fts MATCH 'الحمد'") >= 20
+    verify_mushaf_text(conn)
+    verify_glyphs(conn)
     assert one("PRAGMA user_version") == USER_VERSION
     print("verify: ok")
+
+
+# Every code point the stored Quran text may contain: Arabic letters, harakat, the Quranic
+# annotation signs, tatweel, superscript alef, the two spaces and the Arabic-Indic digits.
+ALLOWED_CODEPOINTS = (
+    set(range(0x0621, 0x063B)) | set(range(0x0640, 0x0656)) | {0x0670, 0x0671}
+    | set(range(0x06D6, 0x06EE)) | set(range(0x0660, 0x066A)) | {0x0020, 0x00A0}
+)
+
+
+def verify_mushaf_text(conn: sqlite3.Connection):
+    """The Mushaf shows exactly the reader's text: for every one of the 6,236 ayahs, its words in
+    page/line/position order, digits removed, joined with single spaces, are byte-for-byte the
+    `ayah.text_uthmani` row; word indices run 1..n with no gap; only an ayah's last word carries
+    digits and they spell its own number; and no character outside the Quranic set slipped in."""
+    words: dict[tuple[int, int], list[tuple[int, str]]] = {}
+    for s, a, wi, text in conn.execute(
+        "SELECT surah, ayah, word, text FROM line_word ORDER BY page, line, position"
+    ):
+        words.setdefault((s, a), []).append((wi, text))
+        for ch in text:
+            assert ord(ch) in ALLOWED_CODEPOINTS, f"{s}:{a}:{wi} carries U+{ord(ch):04X}"
+    count = 0
+    for s, a, expected in conn.execute("SELECT surah, number, text_uthmani FROM ayah ORDER BY surah, number"):
+        for ch in expected:
+            assert ord(ch) in ALLOWED_CODEPOINTS, f"ayah {s}:{a} carries U+{ord(ch):04X}"
+        entries = words.get((s, a))
+        assert entries, f"ayah {s}:{a} has no Mushaf words"
+        assert [wi for wi, _ in entries] == list(range(1, len(entries) + 1)), f"{s}:{a} word indices not 1..n in order"
+        texts = [t for _, t in entries]
+        for t in texts[:-1]:
+            assert NBSP not in t and not DIGIT_SUFFIX.search(t), f"{s}:{a}: digits on a word that does not end the ayah"
+        last, sep, digits = texts[-1].rpartition(NBSP)
+        assert sep and digits == "".join(ARABIC_INDIC[int(d)] for d in str(a)), f"{s}:{a}: last word {texts[-1]!r} lacks its own number"
+        joined = " ".join(texts[:-1] + [last])
+        assert joined == expected, f"{s}:{a}: Mushaf words differ from ayah text\n  mushaf: {joined}\n  ayah:   {expected}"
+        count += 1
+    assert count == 6236
+    print(f"  mushaf text: all {count} ayahs match text_uthmani word for word")
+
+
+def verify_glyphs(conn: sqlite3.Connection):
+    """Shape every stored line, word and ayah with the bundled Hafs font and refuse any run that
+    needs a glyph the font lacks (.notdef) or a dotted circle (an orphaned combining mark). This
+    is the same HarfBuzz the app's text stack uses on both platforms. Optional: needs the
+    `uharfbuzz` package (pip install uharfbuzz); skipped with a warning without it."""
+    try:
+        import uharfbuzz as hb  # type: ignore
+    except ImportError:
+        print("  glyphs: uharfbuzz not installed, shaping check skipped (pip install uharfbuzz)")
+        return
+    font_path = ROOT / "shared" / "src" / "commonMain" / "composeResources" / "font" / "uthmanic_hafs.ttf"
+    face = hb.Face(hb.Blob.from_file_path(str(font_path)))
+    font = hb.Font(face)
+    dotted_circle = font.get_nominal_glyph(0x25CC)
+    bad = []
+
+    def check(label: str, text: str, bot: bool):
+        buf = hb.Buffer()
+        buf.add_str(text)
+        buf.guess_segment_properties()
+        if bot:
+            buf.flags = hb.BufferFlags.BOT | hb.BufferFlags.EOT
+        hb.shape(font, buf)
+        for info in buf.glyph_infos:
+            if info.codepoint == 0 or info.codepoint == dotted_circle:
+                bad.append((label, text, info.cluster))
+                return
+
+    n = 0
+    for page, line, text in conn.execute("SELECT page, line, text FROM page_line WHERE type='text'"):
+        check(f"page {page} line {line}", text, bot=True)
+        n += 1
+    for page, line, pos, text in conn.execute("SELECT page, line, position, text FROM line_word"):
+        # Each word is shaped on its own by the Mushaf renderer, so it is checked as a run start.
+        check(f"page {page} line {line} word {pos}", text, bot=True)
+        n += 1
+    for s, a, text in conn.execute("SELECT surah, number, text_uthmani FROM ayah"):
+        check(f"ayah {s}:{a}", text, bot=True)
+        n += 1
+    assert not bad, f"{len(bad)} run(s) shape to a missing glyph or dotted circle, first: {bad[:5]}"
+    print(f"  glyphs: {n} runs shaped with the Hafs font, no missing glyph, no dotted circle")
 
 
 def main():

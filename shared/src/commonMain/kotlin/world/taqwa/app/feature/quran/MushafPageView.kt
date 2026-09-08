@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.quran
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,27 +18,31 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,7 +53,6 @@ import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.quran.LineType
-import world.taqwa.app.quran.LineWord
 import world.taqwa.app.quran.MushafLine
 import world.taqwa.app.quran.MushafPage
 import world.taqwa.app.quran.QuranText
@@ -65,70 +69,22 @@ private const val REFERENCE_BASE_SP = 28f
 private const val MIN_BASE_SP = 20f
 private const val MAX_BASE_SP = 34f
 
-/**
- * The smallest fraction of the page's base size a line may be set at to stay on one line. The
- * spec allows a 30% shrink (spec §2.4); this floor allows 45%, purely as insurance. Once a line
- * cannot fit even at the floor it wraps, and `maxLines = 1` then drops everything after the first
- * line — losing Quran text silently — so the floor is the
- * one number here that must never be reached. The Hafs font sets the densest pages (juz 30, where
- * a line can carry four ayahs and their roundels) noticeably wider than the printed Mushaf's own
- * per-page typesetting does, and no line on the pages checked (1, 2, 3, 42, 586, 604) comes near
- * even 70%.
- */
-private const val MIN_SHRINK = 0.55f
+/** Line box height as a multiple of the font size — the same 1.9× the previous renderer used, a
+ * little tighter than the reader's 2.0× so fifteen lines fit a phone's height. */
+private const val LINE_HEIGHT = 1.9f
 
 /** Arabic-Indic digits — what a word's trailing ayah number is written in, in every layout row. */
 private val ARABIC_INDIC_DIGITS = '٠'..'٩'
-
-/** One word of a line, together with where it sits in the line's own joined text. [end] is
- * exclusive, so `text.substring(start, end)` is exactly [word]'s text. */
-internal data class WordRange(val word: LineWord, val start: Int, val end: Int)
-
-/**
- * Where each of [line]'s words lands in [MushafLine.text]. The pipeline guarantees the line's text
- * is its words joined with a single space (spec §3.2 rule 3 verifies it per ayah), so this is
- * arithmetic on the word lengths rather than a search — which matters, because a word may itself
- * contain a space (a pause mark, or the ayah's trailing digits) and searching would mis-align.
- */
-internal fun wordRanges(line: MushafLine): List<WordRange> {
-    var cursor = 0
-    return line.words.map { word ->
-        val start = cursor
-        cursor += word.text.length
-        val range = WordRange(word, start, cursor)
-        cursor += 1 // the joining space
-        range
-    }
-}
-
-/**
- * The word a tap at character [offset] landed on (spec §2.4). The space that follows a word counts
- * as that word, so no tap between two words falls through; an offset past the end of the line —
- * which a tap in the slack of a short line produces — is nobody's.
- */
-internal fun wordAt(ranges: List<WordRange>, offset: Int): LineWord? =
-    ranges.firstOrNull { offset >= it.start && offset <= it.end }?.word
-
-/**
- * Spec §2.4: text lines are set justified to the frame width, except a line that ends a surah —
- * which is set to the start, as the printed page does — and every line of pages 1 and 2, the two
- * short opening pages, which the printed Mushaf does not fill either.
- */
-internal fun isJustified(page: MushafPage, line: MushafLine): Boolean =
-    line.type == LineType.TEXT && !line.endsSurah && page.number > 2
-
-/** Where a word's trailing Arabic-Indic digit run starts, or -1 when it has none. Only the last
- * word of an ayah carries one (spec §3.2 rule 6). */
-private fun digitsStart(word: String): Int {
-    var i = word.length
-    while (i > 0 && word[i - 1] in ARABIC_INDIC_DIGITS) i--
-    return if (i == word.length) -1 else i
-}
 
 /**
  * One printed page of the Madinah Mushaf (spec §2.4): the juz and surah caption, the double
  * hairline frame holding exactly the page's own lines, and the page number below in Arabic-Indic
  * digits. Everything inside is laid out right-to-left whatever the UI language is (spec §5.3).
+ *
+ * Every line of the page shares one font size — the largest, up to the width-derived base, at
+ * which the page's widest line still fits the frame ([fittedSize]) — and each text line's words are
+ * measured individually and spread across the frame ([placeWords]), so a page reads at one even
+ * size with every line filled to the margin, the way the printed page is.
  *
  * [highlighted] is the tapped ayah as `surah to ayah`; every word of it on this page carries a
  * soft accent field and a reference pill shows at the foot of the frame.
@@ -144,6 +100,8 @@ fun MushafPageView(
 ) {
     val colors = LocalTaqwaColors.current
     val family = mushafFamily()
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
     // The highlight belongs to whichever pages actually carry that ayah's words: the screen keeps
     // one selection across page turns, and a page the ayah is not on must show neither field nor
     // pill.
@@ -157,6 +115,13 @@ fun MushafPageView(
             val frameWidth = maxWidth - 28.dp
             val base = (REFERENCE_BASE_SP * (frameWidth.value / REFERENCE_FRAME_WIDTH_DP))
                 .coerceIn(MIN_BASE_SP, MAX_BASE_SP)
+            val frameWidthPx = with(density) { frameWidth.toPx() }
+            // Keyed on everything the measurements depend on; the highlight is deliberately not
+            // among them, since it only changes what is drawn behind words already placed.
+            val layout = remember(page, base, frameWidthPx, family, colors.accent, density) {
+                layoutPage(page, base, frameWidthPx, family, colors.accent, measurer, density)
+            }
+            val lineHeight: Dp = with(density) { (layout.sizeSp * LINE_HEIGHT).sp.toDp() }
 
             Column(Modifier.fillMaxSize()) {
                 // The caption names the surah the page's first *text* line is in — the same rule
@@ -181,35 +146,32 @@ fun MushafPageView(
                             Arrangement.SpaceEvenly
                         },
                     ) {
-                        page.lines.forEach { line ->
+                        page.lines.forEachIndexed { index, line ->
                             when (line.type) {
-                                LineType.SURAH -> line.surah?.let(surahOf)?.let { SurahBand(it, base, family) }
+                                LineType.SURAH -> line.surah?.let(surahOf)?.let { SurahBand(it, layout.sizeSp, family) }
                                 LineType.BASMALA -> BasicText(
                                     basmala,
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier.fillMaxWidth().height(lineHeight),
                                     style = TextStyle(
                                         fontFamily = family,
-                                        fontSize = base.sp,
-                                        lineHeight = (base * 1.9f).sp,
+                                        fontSize = layout.sizeSp.sp,
+                                        lineHeight = (layout.sizeSp * LINE_HEIGHT).sp,
                                         color = colors.textPrimary,
                                         textAlign = TextAlign.Center,
                                         textDirection = TextDirection.Rtl,
                                     ),
                                     maxLines = 1,
-                                    autoSize = TextAutoSize.StepBased(
-                                        minFontSize = (base * MIN_SHRINK).sp,
-                                        maxFontSize = base.sp,
-                                        stepSize = 0.5.sp,
-                                    ),
+                                    softWrap = false,
                                 )
-                                LineType.TEXT -> MushafTextLine(
-                                    line = line,
-                                    family = family,
-                                    base = base,
-                                    justify = isJustified(page, line),
-                                    highlighted = marked,
-                                    onTapAyah = onTapAyah,
-                                )
+                                LineType.TEXT -> layout.lines[index]?.let { placed ->
+                                    MushafTextLine(
+                                        line = line,
+                                        placed = placed,
+                                        lineHeight = lineHeight,
+                                        highlighted = marked,
+                                        onTapAyah = onTapAyah,
+                                    )
+                                }
                             }
                         }
                     }
@@ -232,6 +194,128 @@ fun MushafPageView(
                     textAlign = TextAlign.Center,
                 )
             }
+        }
+    }
+}
+
+/** One text line, measured and placed: each word's own text layout and where it sits. */
+internal class PlacedLine(val words: List<TextLayoutResult>, val positions: List<PlacedWord>)
+
+/** A whole page, measured: the one font size every line uses and the placed text lines, keyed by
+ * their index in [MushafPage.lines]. */
+internal class PageLayout(val sizeSp: Float, val lines: Map<Int, PlacedLine>)
+
+/**
+ * Measures the page (spec §2.4). Two passes: every text line is measured whole at [base] to find
+ * the widest, which fixes the page's size; then every word is measured at that size and placed.
+ * The natural gap between words is what the same font puts between them when the whole line is
+ * measured as one string, so an unjustified line looks exactly as it would if drawn as one text.
+ */
+private fun layoutPage(
+    page: MushafPage,
+    base: Float,
+    frameWidthPx: Float,
+    family: FontFamily,
+    accent: Color,
+    measurer: TextMeasurer,
+    density: androidx.compose.ui.unit.Density,
+): PageLayout {
+    fun style(sizeSp: Float) = TextStyle(fontFamily = family, fontSize = sizeSp.sp, textDirection = TextDirection.Rtl)
+    fun measure(text: AnnotatedString, sizeSp: Float): TextLayoutResult =
+        measurer.measure(text, style(sizeSp), softWrap = false, maxLines = 1, layoutDirection = LayoutDirection.Rtl, density = density)
+
+    val textLines = page.lines.withIndex().filter { it.value.type == LineType.TEXT }
+    val widestAtBase = textLines.maxOfOrNull { (_, line) ->
+        measure(AnnotatedString(line.text.orEmpty()), base).size.width.toFloat()
+    } ?: 0f
+    val size = fittedSize(base, widestAtBase, frameWidthPx)
+
+    val lines = textLines.associate { (index, line) ->
+        val words = line.words.map { measure(annotateWord(it.text, accent), size) }
+        val widths = words.map { it.size.width.toFloat() }
+        val whole = measure(AnnotatedString(line.text.orEmpty()), size).size.width.toFloat()
+        val gaps = (words.size - 1).coerceAtLeast(1)
+        val naturalGap = ((whole - widths.sum()) / gaps).coerceAtLeast(0f)
+        index to PlacedLine(words, placeWords(widths, frameWidthPx, naturalGap, isJustified(page, line)))
+    }
+    return PageLayout(size, lines)
+}
+
+/** The word's text with its trailing ayah digits, if any, in the accent colour: the Hafs font
+ * itself draws bare Arabic-Indic digits as the roundel (spec §5.2), so nothing is added. */
+internal fun annotateWord(word: String, accent: Color): AnnotatedString = buildAnnotatedString {
+    val digits = digitsStart(word)
+    if (digits < 0) {
+        append(word)
+    } else {
+        append(word.substring(0, digits))
+        pushStyle(SpanStyle(color = accent))
+        append(word.substring(digits))
+        pop()
+    }
+}
+
+/** Where a word's trailing Arabic-Indic digit run starts, or -1 when it has none. Only the last
+ * word of an ayah carries one (spec §3.2 rule 6). */
+internal fun digitsStart(word: String): Int {
+    var i = word.length
+    while (i > 0 && word[i - 1] in ARABIC_INDIC_DIGITS) i--
+    return if (i == word.length) -1 else i
+}
+
+/**
+ * One printed line (spec §2.4), drawn word by word at the positions [placed] holds. The soft
+ * accent field behind a highlighted ayah is one rounded rectangle per run of its words, spanning
+ * the gaps between them; a tap resolves to a word by its horizontal span and reports that word's
+ * ayah.
+ */
+@Composable
+private fun MushafTextLine(
+    line: MushafLine,
+    placed: PlacedLine,
+    lineHeight: Dp,
+    highlighted: Pair<Int, Int>?,
+    onTapAyah: (Int, Int) -> Unit,
+) {
+    val colors = LocalTaqwaColors.current
+    val field = colors.accent.copy(alpha = 0.16f)
+    val runs = remember(line, highlighted) {
+        if (highlighted == null) {
+            emptyList()
+        } else {
+            markedRuns(line.words.size) { i ->
+                line.words[i].surah == highlighted.first && line.words[i].ayah == highlighted.second
+            }
+        }
+    }
+    Canvas(
+        Modifier
+            .fillMaxWidth()
+            .height(lineHeight)
+            .pointerInput(line, placed) {
+                detectTapGestures { position ->
+                    val index = wordAtX(placed.positions, position.x, size.width.toFloat()) ?: return@detectTapGestures
+                    line.words[index].let { onTapAyah(it.surah, it.ayah) }
+                }
+            },
+    ) {
+        runs.forEach { run ->
+            val right = placed.positions[run.first].right
+            val left = placed.positions[run.last].left
+            drawRoundRect(
+                color = field,
+                topLeft = Offset(left - 2.dp.toPx(), 0f),
+                size = Size(right - left + 4.dp.toPx(), size.height),
+                cornerRadius = CornerRadius(6.dp.toPx()),
+            )
+        }
+        placed.words.forEachIndexed { index, word ->
+            val position = placed.positions[index]
+            drawText(
+                word,
+                color = colors.textPrimary,
+                topLeft = Offset(position.left, (size.height - word.size.height) / 2f),
+            )
         }
     }
 }
@@ -281,104 +365,12 @@ private fun PageCaptionSurahName(surah: Surah) {
 }
 
 /**
- * One printed line (spec §2.4): a single [BasicText] that may never wrap, so it auto-shrinks — by
- * as much as [MIN_SHRINK] allows — until it fits. The ayah numbers the layout already carries at the end of a word are drawn
- * in the accent colour — the Hafs font itself makes them roundels (spec §5.2), so nothing is added
- * to the text here.
- */
-@Composable
-private fun MushafTextLine(
-    line: MushafLine,
-    family: FontFamily,
-    base: Float,
-    justify: Boolean,
-    highlighted: Pair<Int, Int>?,
-    onTapAyah: (Int, Int) -> Unit,
-) {
-    val colors = LocalTaqwaColors.current
-    val ranges = remember(line) { wordRanges(line) }
-    val text = remember(line, highlighted, colors.accent) {
-        annotateLine(line.text.orEmpty(), ranges, highlighted, colors.accent)
-    }
-    var layout by remember(line) { mutableStateOf<TextLayoutResult?>(null) }
-    // If a line still overflows at the shrink floor, the second line is the safety net: Quran text
-    // must never be clipped away, and one wrapped line on one page is the lesser failure.
-    var overflowed by remember(line) { mutableStateOf(false) }
-
-    BasicText(
-        text,
-        modifier = Modifier
-            .fillMaxWidth()
-            .pointerInput(ranges) {
-                detectTapGestures { position ->
-                    val offset = layout?.getOffsetForPosition(position) ?: return@detectTapGestures
-                    wordAt(ranges, offset)?.let { onTapAyah(it.surah, it.ayah) }
-                }
-            },
-        style = TextStyle(
-            fontFamily = family,
-            color = colors.textPrimary,
-            textAlign = if (justify) TextAlign.Justify else TextAlign.Start,
-            textDirection = TextDirection.Rtl,
-            lineHeight = (base * 1.9f).sp,
-        ),
-        onTextLayout = {
-            layout = it
-            if (it.didOverflowWidth && !overflowed) overflowed = true
-        },
-        // softWrap stays on with maxLines = 1: with it off the line is measured against unbounded
-        // width, TextAutoSize never sees an overflow, and a line too wide for the frame is simply
-        // clipped at its left end instead of shrinking (page 586 did exactly that). Wrapping on,
-        // capped at one line, is what makes the auto-size loop shrink until the line fits.
-        maxLines = if (overflowed) 2 else 1,
-        autoSize = TextAutoSize.StepBased(
-            minFontSize = (base * MIN_SHRINK).sp,
-            maxFontSize = base.sp,
-            stepSize = 0.5.sp,
-        ),
-    )
-}
-
-/** The line's own text with two kinds of span over it: the accent on every ayah-ending digit run,
- * and the soft accent field behind every word of the highlighted ayah. */
-internal fun annotateLine(
-    text: String,
-    ranges: List<WordRange>,
-    highlighted: Pair<Int, Int>?,
-    accent: Color,
-): AnnotatedString = buildAnnotatedString {
-    append(text)
-    if (highlighted != null) {
-        val field = SpanStyle(background = accent.copy(alpha = 0.16f))
-        fun isMarked(range: WordRange) =
-            range.word.surah == highlighted.first && range.word.ayah == highlighted.second
-        // One span per *run* of the ayah's words, not one per word: spanning the spaces between
-        // them is what makes the field read as a single block behind the ayah rather than stripes.
-        var i = 0
-        while (i < ranges.size) {
-            if (!isMarked(ranges[i])) {
-                i++
-                continue
-            }
-            var last = i
-            while (last + 1 < ranges.size && isMarked(ranges[last + 1])) last++
-            addStyle(field, ranges[i].start, ranges[last].end)
-            i = last + 1
-        }
-    }
-    ranges.forEach { range ->
-        val digits = digitsStart(range.word.text)
-        if (digits >= 0) addStyle(SpanStyle(color = accent), range.start + digits, range.end)
-    }
-}
-
-/**
  * A surah's opening band (spec §2.4): the name in the Mushaf font, framed, with the ayah count and
  * the revelation place on its sides — the printed page's own header ornament, drawn in hairlines
  * rather than as a picture.
  */
 @Composable
-internal fun SurahBand(surah: Surah, base: Float, family: FontFamily) {
+internal fun SurahBand(surah: Surah, sizeSp: Float, family: FontFamily) {
     val colors = LocalTaqwaColors.current
     Row(
         Modifier
@@ -405,7 +397,7 @@ internal fun SurahBand(surah: Surah, base: Float, family: FontFamily) {
             surah.nameArabic,
             style = TextStyle(
                 fontFamily = family,
-                fontSize = (base * 0.85f).sp,
+                fontSize = (sizeSp * 0.85f).sp,
                 color = colors.textPrimary,
                 textAlign = TextAlign.Center,
                 textDirection = TextDirection.Rtl,
