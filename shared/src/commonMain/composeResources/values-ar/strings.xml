@@ -97,7 +97,7 @@
     <string name="sound_notification_detail">نغمة تنبيه واضحة، %1$s ثوانٍ</string>
     <string name="sound_takbir_detail">الله أكبر، الله أكبر، نحو %1$s ثانية</string>
     <string name="sound_adhan_detail">الأذان، أول %1$s ثانية</string>
-    <string name="sound_sheet_footnote">صوت الإشعار محدود بـ%1$s ثانية على هذه المنصة. ويمكن سماع الأذان كاملًا داخل التطبيق.</string>
+    <string name="sound_sheet_footnote">يُشغِّل إشعار الصلاة أول %1$s ثانية من الصوت. ويمكن تشغيل الأذان كاملًا داخل التطبيق.</string>
 
     <!-- Prayer time settings -->
     <string name="prayer_times_method">طريقة الحساب</string>
