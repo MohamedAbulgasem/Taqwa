@@ -36,10 +36,10 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 
 - **Prayer times** for anywhere on Earth, from GPS or a bundled offline database of cities, with the usual calculation methods (Muslim World League, Umm al-Qura, Egyptian, Karachi, ISNA, and more), Hanafi or Standard Asr, high-latitude rules, and per-prayer manual adjustments.
 - **A live countdown** to the next prayer, on the Prayer screen and in home-screen widgets on both platforms. The widgets keep counting across prayers without the app being opened.
-- **Notifications at the exact time**, with a choice per prayer between silence, Taqwa's own short chime, a takbir, or the opening of the adhan. Optional reminder a few minutes before.
+- **Notifications at the exact time**, with a choice per prayer between silence, a clear announcement tone, a takbir, or the opening of the adhan. Optional reminder a few minutes before.
 - **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the compass needs it.
 - **Hijri date** (Umm al-Qura tabular calendar) with a one-day adjustment for local moonsighting, shown beside the Gregorian date.
-- **Quran reader** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, and a page-accurate Mushaf mode; everything offline.
+- **Quran reader** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation, bookmarks, and copy or share of any ayah; everything offline.
 - **Arabic and English**, following the phone's language. Arabic is laid out right to left with the locale's own digits, not translated over an English layout.
 - **Light and dark**, following the system or fixed, in one amber accent.
 
@@ -70,11 +70,10 @@ Taqwa is being built in slices. Each slice ships as a complete, usable app.
 | Slice | Scope | Status |
 |---|---|---|
 | 1 | Prayer times, notifications, qibla, widgets, settings, Arabic | **Done**, in device testing |
-| 2 | Quran reader: Arabic text with translations beneath, bundled offline | **In device testing** |
+| 2 | Quran reader: Arabic text with translations beneath, Mushaf mode, search, bookmarks, share; bundled offline | **Done** |
 | 3 | Quran audio: recitations, per-ayah playback | Planned |
 | 4 | Dhikr: morning and evening adhkar, tasbih, khatm plan | Planned |
 
-Slice 2b (search, bookmarks and share) extends the Quran reader next.
 
 Deliberately out of scope: mosque finder, zakat calculator, hadith collections, community features, anything that needs a server.
 

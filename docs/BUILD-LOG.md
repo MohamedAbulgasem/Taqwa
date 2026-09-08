@@ -679,3 +679,44 @@ resources explicitly (`tools:keep` in a `res/raw/keep.xml`), enable code shrinki
 resource shrinking, and exercise every sound, both widgets and a real alarm on a device before
 trusting it. Release builds are unshrunk and unsigned again; the debug build is the one on the
 phones.
+
+### Slice 2b - search, bookmarks, share (overnight, 9 September)
+
+Built by subagent-driven development from a spec and plan written the same night, on Mohamed's
+standing "you build, I review": `docs/superpowers/specs/2026-09-09-taqwa-quran-search-bookmarks-share-design.md`
+and the plan beside it. Seven implementation tasks, a reviewer per task, two fix passes, then a
+whole-branch review.
+
+**Search.** The root's field now searches the Quran from two letters: Arabic queries match the
+pre-normalised search text, anything else the translation the reader is set to (folded in Kotlin,
+so Turkish and French case works), 250 ms debounce, capped at 100, results grouped as SURAHS
+(up to five) and AYAHS with the matched words emphasised in the translation snippet. Tapping a hit
+opens the ayah in whichever mode is set; the query survives the round trip. The plan's first
+design used the FTS5 table the database had carried since 2a; it turned out Android's framework
+SQLite is built without FTS5 and every Arabic query crashed on a phone (desktop and iOS SQLite
+have it, so the JVM test passed). Bundling a SQLite with FTS5 would have added megabytes, so the
+match moved into Kotlin over `ayah.text_search` and the FTS table left the database (22.5 to
+22.1 MB, `user_version` 4).
+
+**Bookmarks.** A string set in DataStore, newest first. Set from the card's action row or the
+Mushaf pill; listed on a third root tab with a one-tap remove; the reader shows a small badge on
+kept ayahs.
+
+**Copy and share.** One formatter for both: the Arabic with its number in ornate brackets, the
+translation with its name when one is shown, the reference in the UI's digits; the platform share
+sheet behind an `expect fun`.
+
+**Decisions taken without Mohamed**, for his review: the plural forms and wording of the new
+Arabic strings; the bookmark storage in DataStore rather than a table; no undo on remove (re-adding
+is one tap); no search history; substring matching for Arabic (broader than the FTS prefix match
+it replaced).
+
+**Also this night**: the Arabic-UI decision now reads the loaded strings rather than the locale
+tag, so prayer names can never be shown twice; a full localisation sweep (Arabic and English, both
+platforms, every screen, every translation) found and fixed the Arabic plural for 5 and 10
+minutes, the untranslated transliteration credit, a doubled «الجزء» on the Juz tab, the Gregorian
+date reordering under Arabic on iOS (a bidi isolate), and a clipped countdown in the iOS widget
+preview; the release build is R8 code-shrunk to 12.2 MB (from 26.3) with WorkManager keep rules
+that the Glance widgets need, resource shrinking left off after it saved only 0.4 MB and was the
+thing that crashed the app the first time; and the sound-sheet footnote no longer says "on this
+platform".

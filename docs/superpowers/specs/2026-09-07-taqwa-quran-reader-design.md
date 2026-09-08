@@ -17,6 +17,8 @@ Explicitly not in slice 2a: full-text search, bookmarks, sharing and copying, au
 
 ### 2.1 Tab root ("Root A")
 
+> Amended by slice 2b (`2026-09-09-taqwa-quran-search-bookmarks-share-design.md`): search results beneath the field and a Bookmarks tab (§2.1, §2.2 there).
+
 Top to bottom, inside the standard tab scaffold with a large "Quran" title:
 
 1. A **filter field** styled like a search field (hairline card, magnifier glyph, placeholder "Search surah"). In 2a it filters the surah list as you type, matching the Latin name, the Arabic name, the English meaning and the surah number. In 2b it becomes the entry to full search.
@@ -33,6 +35,8 @@ The mode toggle preserves position: translation → Mushaf opens the page contai
 
 ### 2.3 Translation mode ("Reader B")
 
+> Amended by slice 2b (`2026-09-09-taqwa-quran-search-bookmarks-share-design.md`): an action row (bookmark, copy, share) on the selected card and a bookmark badge (§2.2, §2.4 there).
+
 - **Basmala** centred in the Mushaf font (24 sp) above ayah 1 for every surah except Al-Fatiha (where it is ayah 1) and At-Tawbah (which has none).
 - **Ayah cards**: a `TaqwaCard` per ayah, 12 dp vertical gap, inner padding 14 dp. Inside, top to bottom: Arabic (Mushaf font, size from settings, default 28 sp, line height 2.0×, right-aligned, RTL) with the ayah roundel inline (see §5.2); transliteration (13 sp italic tertiary) when enabled; translation (14 sp secondary, line height 1.5). Cards are the whole list; nothing else between them.
 - **End of surah**: a card "Next: Aal-i-Imraan" that opens the next surah; none after An-Nas.
@@ -40,6 +44,8 @@ The mode toggle preserves position: translation → Mushaf opens the page contai
 - **Jump-to-ayah**: opening at a given ayah scrolls that card to the top with 8 dp offset.
 
 ### 2.4 Mushaf mode ("Mushaf B")
+
+> Amended by slice 2b (`2026-09-09-taqwa-quran-search-bookmarks-share-design.md`): the reference pill carries bookmark, copy and share (§2.5 there).
 
 - **Pager** over 604 pages; page N+1 is to the left of page N (a right-to-left book), regardless of UI language.
 - **Page frame**: a hairline rounded rectangle (18 dp) on the surface colour, 16 dp inside the gutter, with a double hairline inset like the printed frame, containing exactly the page's lines. Above the frame, a 12 sp secondary line with the juz on one side and the surah name on the other (mirrored for RTL as the header text direction dictates). Below, the page number in Arabic-Indic digits, centred.
@@ -50,6 +56,8 @@ The mode toggle preserves position: translation → Mushaf opens the page contai
 - **Size**: the reading-sheet slider does not apply in Mushaf mode; the page size is fixed by width so lines keep their breaks. The sheet shows the slider disabled with a one-line note in Mushaf mode.
 
 ### 2.5 Reading settings sheet
+
+> Amended by slice 2b (`2026-09-09-taqwa-quran-search-bookmarks-share-design.md`): unchanged by 2b; the translation-off choice arrived on 8 September.
 
 A modal bottom sheet (`TaqwaBottomSheet`: the app's background colour, no tonal tint, the hairline grab handle; the same component hosts every sheet in the app), opened by Aa:
 
