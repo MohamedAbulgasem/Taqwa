@@ -15,3 +15,9 @@
 # Keep line numbers so a crash report from a release build still points at a source line.
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
+
+# WorkManager instantiates input mergers and workers by class name with a no-argument or
+# (Context, WorkerParameters) constructor; R8 stripped OverwritingInputMerger's constructor and
+# Glance's session worker never ran, leaving both widgets blank ("Could not create Input Merger").
+-keep class * extends androidx.work.InputMerger { <init>(); }
+-keep class * extends androidx.work.ListenableWorker { <init>(...); }
