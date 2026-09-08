@@ -37,4 +37,3 @@ CREATE TABLE line_word (
   text TEXT NOT NULL,
   PRIMARY KEY (page, line, position)
 );
-CREATE VIRTUAL TABLE ayah_fts USING fts5(text_search, content='ayah', content_rowid='rowid');

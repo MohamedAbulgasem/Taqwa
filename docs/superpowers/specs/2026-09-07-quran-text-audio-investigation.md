@@ -20,7 +20,7 @@ Companion page: five candidate Quran fonts rendering Al-Fatiha and Ayat al-Kursi
 | Typeface | **KFGQPC Uthmanic Hafs** (v22) as the reading font; Amiri Quran held as the fallback | It is the Madinah Mushaf hand, free to distribute unmodified; Amiri Quran is OFL and renders the same text beautifully if KFGQPC misbehaves on a device |
 | Layout | Ayah-by-ayah list, translation beneath | Fits translations and transliteration naturally; the page-accurate Mushaf mode is a later addition, not the first release |
 | Translations at launch | English (Saheeh International), Arabic tafsir (Muyassar), Indonesian, Urdu, Bengali, Turkish, French, plus English transliteration | Covers the largest Muslim language groups; all available from Tanzil or QUL for non-commercial use; ~1 to 2 MB each |
-| Storage | One bundled SQLite database via SQLDelight, FTS5 for search | Read-only, ~15 to 25 MB, works identically on both platforms |
+| Storage | One bundled SQLite database via SQLDelight; search scans a normalised column in Kotlin | Read-only, ~15 to 25 MB, works identically on both platforms. (FTS5 was the original plan and was dropped in 2b: Android's framework SQLite has no FTS5 module.) |
 | Audio source | Per-ayah MP3 from the Islamic Network archive (the `alquran.cloud` corpus, which is the everyayah set) | The only source with a written licence that allows free non-commercial redistribution |
 | Audio hosting | Public `taqwa-data` GitHub repository, files attached to Releases | Zero cost, no bandwidth cap, 2 GiB per file; per-surah zips per reciter |
 | Reciters at launch | Two or three: Mahmoud Khalil Al-Husary (murattal), Mishary Alafasy, Abdul Basit (murattal) | Most requested, all in the permitted corpus, one Egyptian classical voice and one contemporary |
@@ -48,7 +48,7 @@ The overnight comparison surfaced one concrete difference between fonts. Tanzil 
 
 ### 1.3 Search text
 
-Searching needs a second, normalised copy of every ayah: no harakat, no small signs, alef variants folded, ta marbuta and ha kept distinct. Tanzil's "Simple Clean" text is very close to this and can be the source column; normalisation of the user's query happens in code. FTS5 over that column gives ranked results on both platforms.
+Searching needs a second, normalised copy of every ayah: no harakat, no small signs, alef variants folded, ta marbuta and ha kept distinct. Tanzil's "Simple Clean" text is very close to this and can be the source column; normalisation of the user's query happens in code. Matching that column happens in Kotlin (see the 2b design): FTS5 was the original plan, but Android's framework SQLite is built without that module.
 
 ---
 
@@ -203,8 +203,8 @@ Own `expect`/`actual`, as with location, sensors and notifications. The KMP play
 ## 6. Data and storage
 
 - **One SQLite database**, built by a script in `tools/` from Tanzil downloads and QUL exports, committed as a build artefact under `shared/src/commonMain/composeResources/files/` (or the platform assets), copied to app storage on first launch. Read-only. Roughly 15 to 25 MB.
-- **Tables:** `surah` (metadata, names in Arabic and Latin, revelation place, page and juz starts), `ayah` (surah, number, Uthmani text, search text, juz, hizb, page, sajdah flag), `translation` (id, language, name, translator, licence, attribution), `ayah_translation` (translation id, surah, ayah, text), `transliteration`, and an FTS5 virtual table over the search text and, optionally, the translations.
-- **SQLDelight 2.x** for typed queries in `commonMain`; it supports FTS5 virtual tables in `.sq` files and runs on Android's bundled SQLite and on iOS's native SQLite.
+- **Tables:** `surah` (metadata, names in Arabic and Latin, revelation place, page and juz starts), `ayah` (surah, number, Uthmani text, search text, juz, hizb, page, sajdah flag), `translation` (id, language, name, translator, licence, attribution), `ayah_translation` (translation id, surah, ayah, text), `transliteration`, and — in the original plan only — an FTS5 virtual table over the search text; that table was dropped in 2b because Android's SQLite has no FTS5.
+- **SQLDelight 2.x** for typed queries in `commonMain`; it runs on Android's bundled SQLite and on iOS's native SQLite. (It also parses FTS5 virtual tables in `.sq` files, but Android's SQLite cannot execute them — see 2b.)
 - **User data** (last read, bookmarks, chosen translation, font size, downloaded audio index) lives beside the existing settings in DataStore, not in the read-only database.
 - **Audio files** in the app's files directory under `quran/audio/<reciter>/<surah>/<ayah>.mp3`, with a small index in DataStore so the UI can show what is available without scanning the disk.
 - **Widget mirror** is untouched by slice 2. Slice 3 might later add "now playing" to the widgets; not planned.

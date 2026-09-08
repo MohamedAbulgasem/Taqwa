@@ -91,7 +91,7 @@ Three tabs: Prayer (mihrab), Quran (open book), Settings (sliders; the gear neve
 8. **Latin surah names are curated, not Tanzil's.** `surah.name_en` carries the spellings most readers meet ("Al-Fatihah", "Ali 'Imran", "Al-Mursalat"; the list is `LATIN_NAMES` in the pipeline), and `surah.aliases_en` keeps Tanzil's own spelling plus common other names ("Yaseen", "Tabarak") for the filter, which folds doubled vowels and a final "h" on both sides so "Mursalat", "Al-Mursalaat", "Baqara" and "Baqarah" all match. Names are metadata, not Quran text; the Arabic names stay exactly as Tanzil gives them.
 ### 3.3 Database
 
-One SQLite file, `shared/src/commonMain/composeResources/files/quran.db`, built by `tools/build-quran-db.py`, `PRAGMA user_version = 3` (1 shipped the layout's own word text; 2 re-texts every Mushaf word from Tanzil, rule 7; 3 curates the Latin surah names, see below), vacuumed, journal off. Schema:
+One SQLite file, `shared/src/commonMain/composeResources/files/quran.db`, built by `tools/build-quran-db.py`, `PRAGMA user_version = 4` (1 shipped the layout's own word text; 2 re-texts every Mushaf word from Tanzil, rule 7; 3 curates the Latin surah names, see below; 4 drops the FTS5 table, see the size note), vacuumed, journal off. Schema:
 
 ```sql
 CREATE TABLE surah (
@@ -133,10 +133,9 @@ CREATE TABLE line_word (
   text TEXT NOT NULL,
   PRIMARY KEY (page, line, position)
 );
-CREATE VIRTUAL TABLE ayah_fts USING fts5(text_search, content='ayah', content_rowid='rowid');
 ```
 
-Size target: under 40 MB uncompressed. The FTS table is filled now so 2b needs no rebuild.
+Size target: under 40 MB uncompressed. There is no FTS5 table: 2b removed it, because Android's framework SQLite is built without the FTS5 module and every Arabic query crashed on a phone with `no such module: fts5`. Arabic search scans the `ayah.text_search` column in Kotlin instead (see the 2b design), so no SQLite extension has to be bundled.
 
 ### 3.4 Access in the app
 

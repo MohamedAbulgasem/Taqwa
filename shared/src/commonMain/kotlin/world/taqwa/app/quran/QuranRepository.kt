@@ -16,7 +16,8 @@ interface QuranSource {
     suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String>
     suspend fun pageOf(surah: Int, ayah: Int): Int
     suspend fun page(number: Int): MushafPage
-    /** Arabic FTS search; [query] is raw user text, folded and quoted by [SearchQuery.fts]. */
+    /** Arabic search; [query] is raw user text, folded into tokens by
+     * [SearchQuery.arabicTokens] and matched as substrings of the normalised ayah text. */
     suspend fun searchArabic(query: String, limit: Int): List<SearchHit>
     /** Case-insensitive substring search over one translation, folded in Kotlin so non-ASCII
      * case (Turkish, French) folds correctly, which SQLite's LIKE and lower() cannot do. */
@@ -59,11 +60,21 @@ class QuranRepository(
         MushafPage(number, header.first_surah.toInt(), header.first_ayah.toInt(), juz, lines)
     }
 
+    // Not FTS5: Android's framework SQLite is built without that module, so `ayah_fts MATCH`
+    // crashed with "no such module: fts5" on every phone even though it worked on desktop and
+    // iOS SQLite. Bundling a SQLite build with FTS5 would add megabytes to the APK, so the
+    // pre-normalised ayah.text_search column is scanned in Kotlin instead -- 6,236 short rows,
+    // a few milliseconds, the same shape as searchTranslation. Matching is plain `contains`,
+    // which is deliberately broader than FTS prefix terms: «رحمن» also finds «الرحمن».
     override suspend fun searchArabic(query: String, limit: Int): List<SearchHit> = withContext(io) {
-        val match = SearchQuery.fts(query) ?: return@withContext emptyList()
-        q.searchArabic(match, limit.toLong()).executeAsList().map {
-            SearchHit(it.surah.toInt(), it.number.toInt(), it.text_uthmani, translation = null)
-        }
+        val tokens = SearchQuery.arabicTokens(query)
+        if (tokens.isEmpty()) return@withContext emptyList()
+        q.ayahSearchRows().executeAsList()
+            .asSequence()
+            .filter { row -> tokens.all { row.text_search.contains(it) } }
+            .take(limit)
+            .map { SearchHit(it.surah.toInt(), it.number.toInt(), it.text_uthmani, translation = null) }
+            .toList()
     }
 
     // The whole translation is read once per search (6,236 short rows, a few milliseconds) and

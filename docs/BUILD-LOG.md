@@ -513,7 +513,8 @@ is shown in the app or claimed as a correction to Tanzil's text itself.
 **The eight tasks.**
 
 Task 1 wrote the pipeline above and the SQLite schema (surahs, ayahs, juzs, translations, pages,
-lines, words, and an FTS5 search table for 2b), plus a `--verify` pass checking counts, the
+lines, words, and an FTS5 search table for 2b -- that table was removed again in 2b, since
+Android's framework SQLite has no FTS5 module), plus a `--verify` pass checking counts, the
 per-ayah cross-check and the U+06DF mapping.
 
 Task 2 wired SQLDelight into `:shared`: `Quran.sq` mirroring the bundled schema for typing only (the

@@ -70,14 +70,15 @@ internal class FakeQuranSource(
         translationLoads += translationId to surah
         return translationTextsById[translationId]?.get(surah) ?: emptyMap()
     }
-    /** Arabic search over the configured ayahs' text, folded the same way the real FTS is (a
-     * whole-word prefix match on the normalised text is close enough for the view-model tests). */
+    /** Mirrors QuranRepository.searchArabic: every folded token must appear as a substring of
+     * the ayah's normalised text, so the view-model tests see the real matching rule. */
     override suspend fun searchArabic(query: String, limit: Int): List<SearchHit> {
-        val tokens = SearchQuery.fts(query)?.split(' ')?.map { it.trim('"', '*') } ?: return emptyList()
+        val tokens = SearchQuery.arabicTokens(query)
+        if (tokens.isEmpty()) return emptyList()
         return ayahsBySurah.values.flatten()
             .filter { ayah ->
-                val words = QuranText.normaliseForSearch(ayah.text).split(' ')
-                tokens.all { token -> words.any { it.startsWith(token) } }
+                val text = QuranText.normaliseForSearch(ayah.text)
+                tokens.all { text.contains(it) }
             }
             .sortedWith(compareBy({ it.surah }, { it.number }))
             .take(limit)

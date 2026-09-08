@@ -50,8 +50,6 @@ CREATE TABLE line_word (
   PRIMARY KEY (page, line, position)
 );
 
-CREATE VIRTUAL TABLE ayah_fts USING fts5(text_search, content='ayah', content_rowid='rowid');
-
 surahs:
 SELECT * FROM surah ORDER BY number;
 
@@ -85,10 +83,10 @@ SELECT * FROM line_word WHERE page = ? ORDER BY line, position;
 pageHeader:
 SELECT page.number, page.first_surah, page.first_ayah FROM page WHERE number = ?;
 
-searchArabic:
-SELECT surah, number, text_uthmani FROM ayah
-WHERE rowid IN (SELECT rowid FROM ayah_fts WHERE ayah_fts MATCH ?)
-ORDER BY surah, number LIMIT ?;
+-- Every ayah's normalised search text, read in one go so QuranRepository.searchArabic can do
+-- the matching in Kotlin: Android's system SQLite has no FTS5 module.
+ayahSearchRows:
+SELECT surah, number, text_uthmani, text_search FROM ayah ORDER BY surah, number;
 
 translationTextsAll:
 SELECT surah, number, text FROM ayah_translation WHERE translation_id = ? ORDER BY surah, number;

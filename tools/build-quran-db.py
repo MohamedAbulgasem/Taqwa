@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / "cache"
 OUT = ROOT / "shared" / "src" / "commonMain" / "composeResources" / "files" / "quran.db"
-USER_VERSION = 3
+USER_VERSION = 4
 
 TANZIL_TEXT = "https://tanzil.net/pub/download/index.php?quranType={kind}&marks=true&sajdah=true&rub=true&tatweel=false&outType=txt-2&agree=true"
 TANZIL_TRANS = "https://tanzil.net/trans/?transID={id}&type=txt"
@@ -547,8 +547,6 @@ def build(conn: sqlite3.Connection):
             raise SystemExit(f"page {pn} has no text line")
         conn.execute("INSERT INTO page VALUES (?,?,?)", (pn, first_ayah[0], first_ayah[1]))
 
-    print("Search index")
-    conn.execute("INSERT INTO ayah_fts(ayah_fts) VALUES ('rebuild')")
     conn.execute(f"PRAGMA user_version = {USER_VERSION}")
     conn.commit()
 
@@ -619,7 +617,10 @@ def verify(conn: sqlite3.Connection):
     assert one("SELECT text_search FROM ayah WHERE surah=2 AND number=1") == "الم"
     assert one("SELECT page FROM ayah WHERE surah=2 AND number=255") == 42
     assert one("SELECT juz FROM ayah WHERE surah=114 AND number=6") == 30
-    assert one("SELECT count(*) FROM ayah_fts WHERE ayah_fts MATCH 'الحمد'") >= 20
+    # Android's system SQLite has no FTS5 module, so search reads ayah.text_search in Kotlin
+    # (see QuranRepository.searchArabic). No FTS shadow table may be left in the file.
+    assert one("SELECT count(*) FROM sqlite_master WHERE name LIKE 'ayah_fts%'") == 0, "FTS table present"
+    assert one("SELECT count(*) FROM ayah WHERE instr(text_search, 'الحمد') > 0") >= 20
     verify_mushaf_text(conn)
     verify_iqlab_marks(conn)
     verify_glyphs(conn)

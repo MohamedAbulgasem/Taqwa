@@ -3,7 +3,6 @@ package world.taqwa.app.quran
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SearchQueryTest {
@@ -16,23 +15,18 @@ class SearchQueryTest {
     }
 
     @Test
-    fun ftsFoldsQuotesAndPrefixesEveryToken() {
-        // Harakat and the alef wasla fold away (QuranText.normaliseForSearch); each token is a
-        // quoted prefix term; tokens are joined by a space, which FTS5 reads as AND.
-        assertEquals("\"الرحمن\"*", SearchQuery.fts("ٱلرَّحْمَٰنِ"))
-        assertEquals("\"رب\"* \"العالمين\"*", SearchQuery.fts("  رَبِّ   ٱلْعَالَمِينَ "))
+    fun arabicTokensFoldHarakatAndSplitOnWhitespace() {
+        // Harakat and the alef wasla fold away (QuranText.normaliseForSearch); runs of spaces
+        // collapse, so each token is a bare word the repository matches as a substring.
+        assertEquals(listOf("الرحمن"), SearchQuery.arabicTokens("ٱلرَّحْمَٰنِ"))
+        assertEquals(listOf("رب", "العالمين"), SearchQuery.arabicTokens("  رَبِّ   ٱلْعَالَمِينَ "))
     }
 
     @Test
-    fun ftsStripsCharactersThatWouldBreakTheMatchSyntax() {
-        // Double quotes, asterisks, parentheses and colons in the raw text never reach FTS5.
-        assertEquals("\"رب\"*", SearchQuery.fts("\"رب\"*():"))
-    }
-
-    @Test
-    fun ftsIsNullWhenNothingSearchableRemains() {
-        assertNull(SearchQuery.fts("   "))
-        assertNull(SearchQuery.fts("\"\"*"))
+    fun arabicTokensAreEmptyWhenNothingSearchableRemains() {
+        // No token, so the caller runs no search at all.
+        assertEquals(emptyList(), SearchQuery.arabicTokens(""))
+        assertEquals(emptyList(), SearchQuery.arabicTokens("   "))
     }
 
     @Test

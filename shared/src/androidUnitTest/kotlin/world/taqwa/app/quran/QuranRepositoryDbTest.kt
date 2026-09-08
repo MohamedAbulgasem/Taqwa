@@ -116,6 +116,12 @@ class QuranRepositoryDbTest {
         assertEquals(hits, hits.sortedWith(compareBy({ it.surah }, { it.ayah })))
     }
 
+    @Test fun arabicSearchMatchesInsideAWordNotOnlyAtItsStart() = runTest {
+        // Substring, not FTS prefix: the definite article in front of the word must not hide it.
+        val hits = repo.searchArabic("رحمن", limit = 100)
+        assertTrue(hits.any { it.surah == 1 && it.ayah == 1 }, "1:1's ٱلرَّحْمَٰنِ contains رحمن")
+    }
+
     @Test fun arabicSearchWithTwoTokensNeedsBoth() = runTest {
         val hits = repo.searchArabic("رب العالمين", limit = 100)
         assertTrue(hits.any { it.surah == 1 && it.ayah == 2 })

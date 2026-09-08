@@ -4,9 +4,9 @@
 
 **Goal:** Full-text search of the Quran from the Quran tab, bookmarks on ayahs with a list of them, and copy/share of an ayah from the card reader and the Mushaf, per `docs/superpowers/specs/2026-09-09-taqwa-quran-search-bookmarks-share-design.md`.
 
-**Architecture:** The bundled `quran.db` already carries an FTS5 table over the Arabic search text; two new SQLDelight queries and two `QuranSource` methods expose Arabic (FTS) and translation (Kotlin substring) search. Bookmarks live in the existing DataStore as a string set behind a small `BookmarkStore`. Copy/share text is one pure formatter; the share sheet is one `expect fun`. The root, reader and Mushaf view models grow state; the screens grow a search section, a Bookmarks tab, an ayah action row and pill actions.
+**Architecture:** Two new SQLDelight queries and two `QuranSource` methods expose Arabic and translation search, both matched in Kotlin. **Correction (applied during 2b):** Task 1 below was written against an FTS5 table (`ayah_fts`) in the bundled `quran.db`. That table is gone: Android's framework SQLite is built without the FTS5 module, so `ayah_fts MATCH` crashed on every phone with `no such module: fts5` (it passed on desktop and iOS SQLite, which do have it), and bundling a SQLite build with FTS5 would add megabytes to the APK. Arabic search now scans the pre-normalised `ayah.text_search` column in Kotlin — `SearchQuery.arabicTokens(raw): List<String>` plus a `contains` check per token — and the database was rebuilt at `user_version`/`QuranDb.VERSION` 4. Every `SearchQuery.fts`, `searchArabic:` SQL and `ayah_fts` snippet in Task 1 below is superseded; read the shipped `SearchQuery.kt`, `QuranRepository.kt` and `Quran.sq` instead. Bookmarks live in the existing DataStore as a string set behind a small `BookmarkStore`. Copy/share text is one pure formatter; the share sheet is one `expect fun`. The root, reader and Mushaf view models grow state; the screens grow a search section, a Bookmarks tab, an ayah action row and pill actions.
 
-**Tech Stack:** Kotlin 2.4 Multiplatform, Compose Multiplatform 1.12, SQLDelight 2.2.1 (sqlite-3-38 dialect, FTS5), DataStore preferences 1.1.7, kotlinx-coroutines-test. Tests via `./scripts/test.sh` (all targets) or `./gradlew :shared:testDebugUnitTest --tests '<pattern>'` (JVM only, faster). Android APK: `./gradlew :androidApp:assembleDebug`. Always use absolute paths in shell commands; the shell cwd resets between calls. Repo: `/Users/mohamedabulgasem/Desktop/Workspace/apps/Taqwa`, branch `slice2b`.
+**Tech Stack:** Kotlin 2.4 Multiplatform, Compose Multiplatform 1.12, SQLDelight 2.2.1 (sqlite-3-38 dialect, no FTS5), DataStore preferences 1.1.7, kotlinx-coroutines-test. Tests via `./scripts/test.sh` (all targets) or `./gradlew :shared:testDebugUnitTest --tests '<pattern>'` (JVM only, faster). Android APK: `./gradlew :androidApp:assembleDebug`. Always use absolute paths in shell commands; the shell cwd resets between calls. Repo: `/Users/mohamedabulgasem/Desktop/Workspace/apps/Taqwa`, branch `slice2b`.
 
 ## Global Constraints
 
@@ -46,7 +46,7 @@
   data class SearchHit(val surah: Int, val ayah: Int, val arabic: String, val translation: String?)
   object SearchQuery {
       fun isArabic(raw: String): Boolean
-      fun fts(raw: String): String?          // null when nothing searchable survives folding
+      fun arabicTokens(raw: String): List<String>  // empty when nothing searchable survives folding
       fun isLongEnough(raw: String): Boolean // at least 2 letters or digits after trim
   }
   interface QuranSource {  // two new members
