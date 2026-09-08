@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaRow
@@ -86,25 +87,32 @@ internal fun SettingsScaffold(
         Modifier
             .fillMaxSize()
             .background(colors.background)
-            .windowInsetsPadding(WindowInsets.systemBars)
+            // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout
+            // move to the edges, and only safeDrawing reports those horizontal insets.
+            .windowInsetsPadding(WindowInsets.safeDrawing)
             .verticalScroll(rememberScrollState()),
     ) {
-        if (onBack == null) {
-            // With the title's own 4 dp on top, this puts the title 24 dp below the status bar,
-            // level with the Prayer tab's — the tab the user has just switched away from.
+        // The scroller stays full-bleed so the background reaches both edges; only the column of
+        // chrome and cards inside it is capped, chevron and title included — a title pinned to
+        // the far left of a 900 dp landscape screen would sit half a hand away from its cards.
+        Column(Modifier.contentWidth()) {
+            if (onBack == null) {
+                // With the title's own 4 dp on top, this puts the title 24 dp below the status bar,
+                // level with the Prayer tab's — the tab the user has just switched away from.
+                Spacer(Modifier.height(20.dp))
+            } else {
+                BackChevron(onBack)
+            }
+            Text(
+                title,
+                style = TaqwaText.screenTitle,
+                color = colors.textPrimary,
+                modifier = Modifier.padding(start = SettingsGutter, end = SettingsGutter, top = 4.dp),
+            )
             Spacer(Modifier.height(20.dp))
-        } else {
-            BackChevron(onBack)
+            content()
+            Spacer(Modifier.height(40.dp))
         }
-        Text(
-            title,
-            style = TaqwaText.screenTitle,
-            color = colors.textPrimary,
-            modifier = Modifier.padding(start = SettingsGutter, end = SettingsGutter, top = 4.dp),
-        )
-        Spacer(Modifier.height(20.dp))
-        content()
-        Spacer(Modifier.height(40.dp))
     }
 }
 

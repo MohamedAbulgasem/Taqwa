@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -55,6 +55,7 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaSegmented
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.feature.settings.SettingsGutter
@@ -130,7 +131,9 @@ fun QuranRootScreen(
         Modifier
             .fillMaxSize()
             .background(colors.background)
-            .windowInsetsPadding(WindowInsets.systemBars),
+            // safeDrawing, not systemBars: sideways the navigation bar and the camera cutout sit
+            // at the left and right edges, which only safeDrawing reports.
+            .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         // A tab root has no back chevron, so it no longer reserves the chevron's 52 dp either:
         // with the title's own 4 dp on top of this, the title lands 24 dp below the status bar,
@@ -142,7 +145,9 @@ fun QuranRootScreen(
                 stringResource(Res.string.quran_title),
                 style = TaqwaText.screenTitle,
                 color = colors.textPrimary,
-                modifier = Modifier.padding(start = SettingsGutter, end = SettingsGutter, top = 4.dp),
+                // Capped like every item below it, so the title stays over its own cards
+                // instead of drifting to the far edge of a landscape screen.
+                modifier = Modifier.contentWidth().padding(start = SettingsGutter, end = SettingsGutter, top = 4.dp),
             )
         }
         item(key = "title-gap") { Spacer(Modifier.height(20.dp)) }
@@ -150,7 +155,7 @@ fun QuranRootScreen(
         if (ready == null) return@LazyColumn
 
         item(key = "filter") {
-            Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+            Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
                 QuranSearchField(fieldValue) { newValue ->
                     fieldValue = newValue
                     onFilterChange(newValue.text)
@@ -161,7 +166,7 @@ fun QuranRootScreen(
 
         ready.continueCard?.let { card ->
             item(key = "continue") {
-                Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+                Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
                     ContinueReadingCard(card) { open(card.surah.number, card.ayah) }
                 }
             }
@@ -169,7 +174,7 @@ fun QuranRootScreen(
         }
 
         item(key = "tabs") {
-            Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+            Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
                 TaqwaSegmented(
                     options = listOf(
                         stringResource(Res.string.quran_tab_surah),
@@ -203,10 +208,10 @@ fun QuranRootScreen(
 private fun LazyListScope.surahListItems(surahs: List<Surah>, onOpen: (Surah) -> Unit) {
     if (surahs.isEmpty()) return
     item(key = "surah-cap-top") {
-        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
     }
     itemsIndexed(surahs, key = { _, surah -> "surah-${surah.number}" }) { index, surah ->
-        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
             Column {
                 CardRow { SurahRow(surah) { onOpen(surah) } }
                 if (index != surahs.lastIndex) CardDivider()
@@ -214,17 +219,17 @@ private fun LazyListScope.surahListItems(surahs: List<Surah>, onOpen: (Surah) ->
         }
     }
     item(key = "surah-cap-bottom") {
-        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
     }
 }
 
 private fun LazyListScope.juzListItems(juzs: List<JuzRow>, onOpen: (JuzRow) -> Unit) {
     if (juzs.isEmpty()) return
     item(key = "juz-cap-top") {
-        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
     }
     itemsIndexed(juzs, key = { _, juz -> "juz-${juz.number}" }) { index, juz ->
-        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
             Column {
                 CardRow { JuzListRow(juz) { onOpen(juz) } }
                 if (index != juzs.lastIndex) CardDivider()
@@ -232,7 +237,7 @@ private fun LazyListScope.juzListItems(juzs: List<JuzRow>, onOpen: (JuzRow) -> U
         }
     }
     item(key = "juz-cap-bottom") {
-        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
     }
 }
 

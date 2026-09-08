@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.TaqwaCard
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
@@ -59,6 +60,9 @@ import world.taqwa.app.quran.displayName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_next_surah
+
+/** The gutter between an ayah card and the edge of the reader's own content column. */
+private val ReaderGutter = 24.dp
 
 /**
  * Translation mode's reader (spec §2.3): the header, the basmala, one [AyahCard] per ayah, and the
@@ -87,7 +91,9 @@ fun ReaderScreen(
     // instance of [ReadingSheet] the same way, since only each screen knows its own [mushafMode].
     var showSheet by remember { mutableStateOf(false) }
 
-    Column(Modifier.fillMaxSize().background(colors.background).windowInsetsPadding(WindowInsets.systemBars)) {
+    // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move
+    // to the left and right edges, and only safeDrawing reports those.
+    Column(Modifier.fillMaxSize().background(colors.background).windowInsetsPadding(WindowInsets.safeDrawing)) {
         ReaderHeader(
             title = ready?.let { if (arabic) it.surah.nameArabic else it.surah.nameLatin } ?: "",
             caption = ready?.let {
@@ -134,7 +140,10 @@ fun ReaderScreen(
 
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 32.dp),
+            // The 24 dp gutters moved off the list and onto each item, because each item is now
+            // capped and centred ([contentWidth]) and the gutter belongs inside that capped
+            // column, not against the screen's own edges.
+            contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.weight(1f),
         ) {
@@ -147,30 +156,34 @@ fun ReaderScreen(
                             fontSize = 24.sp,
                             textAlign = TextAlign.Center,
                             color = colors.textPrimary,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.contentWidth().padding(horizontal = ReaderGutter),
                         )
                     }
                 }
             }
             items(ready.ayahs, key = { it.number }) { ayah ->
-                AyahCard(
-                    text = ayah.text,
-                    ayahNumber = ayah.number,
-                    transliteration = ready.transliteration?.get(ayah.number),
-                    translation = ready.translation[ayah.number],
-                    translationLanguage = ready.translationLanguage,
-                    sizeSp = ready.settings.arabicSizeSp,
-                    selected = selectedAyah == ayah.number,
-                    // One ayah at a time: tapping another moves the selection, tapping the same
-                    // one clears it, which is the model 2b's action row will sit on.
-                    onClick = { selectedAyah = if (selectedAyah == ayah.number) null else ayah.number },
-                )
+                Box(Modifier.contentWidth().padding(horizontal = ReaderGutter)) {
+                    AyahCard(
+                        text = ayah.text,
+                        ayahNumber = ayah.number,
+                        transliteration = ready.transliteration?.get(ayah.number),
+                        translation = ready.translation[ayah.number],
+                        translationLanguage = ready.translationLanguage,
+                        sizeSp = ready.settings.arabicSizeSp,
+                        selected = selectedAyah == ayah.number,
+                        // One ayah at a time: tapping another moves the selection, tapping the same
+                        // one clears it, which is the model 2b's action row will sit on.
+                        onClick = { selectedAyah = if (selectedAyah == ayah.number) null else ayah.number },
+                    )
+                }
             }
             ready.nextSurah?.let { next ->
                 item(key = "next-surah") {
                     // Arabic name under an Arabic UI (spec §5.3): the Mushaf font is not required
                     // inside the format string itself, only when Quran text is drawn directly.
-                    NextSurahCard(next.displayName(arabic)) { onOpenNextSurah(next.number) }
+                    Box(Modifier.contentWidth().padding(horizontal = ReaderGutter)) {
+                        NextSurahCard(next.displayName(arabic)) { onOpenNextSurah(next.number) }
+                    }
                 }
             }
         }

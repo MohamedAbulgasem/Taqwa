@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.nav.Tab
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.tab_prayer
@@ -45,9 +48,13 @@ import world.taqwa.app.resources.tab_settings
  * [content] with the tab bar beneath it when [current] names a tab root, and [content] alone —
  * the whole screen — when it is null.
  *
- * The screens inside pad themselves for `systemBars`. Once the bar is there, the bar is the thing
+ * The screens inside pad themselves for `safeDrawing`. Once the bar is there, the bar is the thing
  * sitting over the gesture area, so that inset is consumed here and the content is left padding
  * for the status bar only. Without this the two would both pad for it and leave a visible gap.
+ *
+ * Only the *bottom* is consumed. Held sideways the navigation bar and the camera cutout move to
+ * the left and right edges, where this bar — which spans the foot of the screen — covers nothing
+ * at all, so the screen above must still pad for them itself.
  */
 @Composable
 fun TaqwaTabScaffold(current: Tab?, onSelect: (Tab) -> Unit, content: @Composable () -> Unit) {
@@ -56,7 +63,11 @@ fun TaqwaTabScaffold(current: Tab?, onSelect: (Tab) -> Unit, content: @Composabl
         return
     }
     Column(Modifier.fillMaxSize()) {
-        Box(Modifier.weight(1f).consumeWindowInsets(WindowInsets.navigationBars)) { content() }
+        Box(
+            Modifier
+                .weight(1f)
+                .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
+        ) { content() }
         TaqwaTabBar(current, onSelect)
     }
 }
@@ -85,10 +96,16 @@ fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Mod
         Box(Modifier.fillMaxWidth().height(1.dp).background(colors.hairline))
         Row(
             Modifier
-                .fillMaxWidth()
+                // Capped and centred like every screen's content: three items spread across a
+                // 900 dp landscape screen would put Prayer and Settings a hand apart, with the
+                // thumb able to reach neither.
+                .contentWidth()
                 // Outside the height, so the bar grows for the gesture bar rather than losing
-                // its own 56 dp to it.
-                .windowInsetsPadding(WindowInsets.navigationBars)
+                // its own 56 dp to it. Sideways it is the horizontal insets that matter — the
+                // navigation bar and the cutout are then at the ends of this row, not under it.
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+                )
                 .height(BarHeight),
         ) {
             Tab.entries.forEach { tab ->

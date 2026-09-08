@@ -31,6 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.drawBook
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.feature.settings.BackChevron
@@ -68,7 +69,10 @@ fun ReaderHeader(
     val arabic = isRtlLocale()
     Row(
         Modifier
-            .fillMaxWidth()
+            // Capped with the cards below it (spec: one content-width rule): on a landscape
+            // screen an uncapped header would put the back chevron and the "Aa" button a whole
+            // hand apart, with the surah name stranded in between.
+            .contentWidth()
             .defaultMinSize(minHeight = 56.dp)
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,

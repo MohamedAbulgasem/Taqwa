@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
@@ -42,7 +43,7 @@ private fun Double.toRadians(): Double = this * PI / 180.0
  * The mockup's 186px dial on its 250px phone is 74% of the screen's width; on a 420dp screen that
  * is this box, which keeps the dial the same size relative to the screen as the mockup draws it.
  */
-private val DialSize = 312.dp
+internal val DialSize = 312.dp
 
 // Radii as fractions of the dial's outer radius, read off the mockup SVG (viewBox 186, centre 93).
 private const val OuterCircleR = 82f / 93f
@@ -68,6 +69,7 @@ fun QiblaDial(
     aligned: Boolean,
     dimmed: Boolean,
     modifier: Modifier = Modifier,
+    diameter: Dp = DialSize,
 ) {
     val colors = LocalTaqwaColors.current
     val measurer = rememberTextMeasurer()
@@ -97,7 +99,10 @@ fun QiblaDial(
     // x/y coordinates built with sin/cos on the raw compass bearing — it never reads
     // LocalLayoutDirection, so it is not mirrored under RTL. North stays up and west stays left in
     // every locale, which is correct: a compass does not flip because the surrounding text does.
-    Canvas(modifier.size(DialSize).alpha(if (dimmed) 0.28f else 1f)) {
+    // Every position below is a fraction of the box, so the dial is the same drawing at any
+    // diameter — [diameter] is only ever smaller than [DialSize], when a sideways screen is too
+    // short to give the full dial its room.
+    Canvas(modifier.size(diameter).alpha(if (dimmed) 0.28f else 1f)) {
         val r = size.minDimension / 2f
         val centre = Offset(size.width / 2f, size.height / 2f)
 

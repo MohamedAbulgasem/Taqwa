@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.TaqwaTextLink
 import world.taqwa.app.domain.WidgetBackground
@@ -104,109 +105,118 @@ fun OnboardingScreen(
 
     val canPinWidget = widgetPinRequester.isSupported
 
-    Column(
+    // The background is full-bleed; the mark, the copy and the buttons sit in a capped, centred
+    // column inside it, so a sideways screen does not stretch a single sentence across 900 dp.
+    // safeDrawing, not systemBars: sideways the navigation bar and the cutout are on the sides.
+    Box(
         Modifier
             .fillMaxSize()
             .background(colors.background)
-            .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
-        Spacer(Modifier.weight(1f))
+        Column(
+            Modifier
+                .fillMaxSize()
+                .contentWidth()
+                .padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(Modifier.weight(1f))
 
-        when (step) {
-            OnboardingStep.WELCOME -> {
-                MihrabMark()
-                Spacer(Modifier.height(28.dp))
-                Headline(stringResource(Res.string.onboarding_welcome_title))
-                Spacer(Modifier.height(12.dp))
-                Body(stringResource(Res.string.onboarding_welcome_body))
-            }
-            OnboardingStep.LOCATION -> {
-                PinMark()
-                Spacer(Modifier.height(28.dp))
-                Headline(stringResource(Res.string.onboarding_location_title))
-                Spacer(Modifier.height(12.dp))
-                Body(stringResource(Res.string.onboarding_location_body))
-            }
-            OnboardingStep.NOTIFICATIONS -> {
-                BellMark()
-                Spacer(Modifier.height(28.dp))
-                Headline(stringResource(Res.string.onboarding_notifications_title))
-                Spacer(Modifier.height(12.dp))
-                Body(stringResource(Res.string.onboarding_notifications_body))
-            }
-            OnboardingStep.WIDGET -> {
-                // The widgets themselves stand in for a mark: the point of the screen is what
-                // they look like. Drawn for the system appearance, since the widget will be.
-                WidgetPreview(
-                    background = WidgetBackground.FOLLOW_THEME,
-                    systemIsDark = isSystemInDarkTheme(),
-                    content = null,
-                )
-                Spacer(Modifier.height(28.dp))
-                Headline(stringResource(Res.string.onboarding_widget_title))
-                Spacer(Modifier.height(12.dp))
-                Body(
-                    stringResource(
-                        when {
-                            canPinWidget -> Res.string.onboarding_widget_body
-                            widgetAddPath == WidgetAddPath.IOS_HOLD_ICON -> Res.string.onboarding_widget_body_ios
-                            else -> Res.string.onboarding_widget_body_ios_legacy
-                        },
-                    ),
-                )
-            }
-        }
-
-        Spacer(Modifier.weight(1f))
-        Spacer(Modifier.height(24.dp))
-        StepDots(step)
-        Spacer(Modifier.height(20.dp))
-
-        when (step) {
-            OnboardingStep.WELCOME -> {
-                TaqwaPrimaryButton(
-                    stringResource(Res.string.onboarding_welcome_cta),
-                    onClick = { onStep(OnboardingStep.LOCATION) },
-                )
-                Spacer(Modifier.height(44.dp))
-            }
-            OnboardingStep.LOCATION -> {
-                TaqwaPrimaryButton(stringResource(Res.string.onboarding_location_cta), requestLocation)
-                // The city search is a pushed screen; it advances the step itself once a city
-                // has actually been chosen, so backing out of it lands here again.
-                TaqwaTextLink(
-                    stringResource(Res.string.onboarding_location_secondary),
-                    onClick = onChooseCity,
-                )
-            }
-            OnboardingStep.NOTIFICATIONS -> {
-                TaqwaPrimaryButton(
-                    stringResource(Res.string.onboarding_notifications_cta),
-                    requestNotifications,
-                )
-                TaqwaTextLink(
-                    stringResource(Res.string.onboarding_notifications_secondary),
-                    onClick = { onDeclineNotifications(); onStep(OnboardingStep.WIDGET) },
-                )
-            }
-            OnboardingStep.WIDGET -> {
-                if (canPinWidget) {
-                    // The launcher's own sheet appears over the app; onboarding finishes
-                    // underneath it either way, because the answer never comes back reliably.
-                    TaqwaPrimaryButton(
-                        stringResource(Res.string.onboarding_widget_cta_add),
-                        onClick = { widgetPinRequester.requestPin(); onComplete() },
+            when (step) {
+                OnboardingStep.WELCOME -> {
+                    MihrabMark()
+                    Spacer(Modifier.height(28.dp))
+                    Headline(stringResource(Res.string.onboarding_welcome_title))
+                    Spacer(Modifier.height(12.dp))
+                    Body(stringResource(Res.string.onboarding_welcome_body))
+                }
+                OnboardingStep.LOCATION -> {
+                    PinMark()
+                    Spacer(Modifier.height(28.dp))
+                    Headline(stringResource(Res.string.onboarding_location_title))
+                    Spacer(Modifier.height(12.dp))
+                    Body(stringResource(Res.string.onboarding_location_body))
+                }
+                OnboardingStep.NOTIFICATIONS -> {
+                    BellMark()
+                    Spacer(Modifier.height(28.dp))
+                    Headline(stringResource(Res.string.onboarding_notifications_title))
+                    Spacer(Modifier.height(12.dp))
+                    Body(stringResource(Res.string.onboarding_notifications_body))
+                }
+                OnboardingStep.WIDGET -> {
+                    // The widgets themselves stand in for a mark: the point of the screen is what
+                    // they look like. Drawn for the system appearance, since the widget will be.
+                    WidgetPreview(
+                        background = WidgetBackground.FOLLOW_THEME,
+                        systemIsDark = isSystemInDarkTheme(),
+                        content = null,
                     )
-                    TaqwaTextLink(stringResource(Res.string.onboarding_widget_secondary), onClick = onComplete)
-                } else {
-                    TaqwaPrimaryButton(stringResource(Res.string.onboarding_widget_cta_done), onClick = onComplete)
-                    Spacer(Modifier.height(44.dp))
+                    Spacer(Modifier.height(28.dp))
+                    Headline(stringResource(Res.string.onboarding_widget_title))
+                    Spacer(Modifier.height(12.dp))
+                    Body(
+                        stringResource(
+                            when {
+                                canPinWidget -> Res.string.onboarding_widget_body
+                                widgetAddPath == WidgetAddPath.IOS_HOLD_ICON -> Res.string.onboarding_widget_body_ios
+                                else -> Res.string.onboarding_widget_body_ios_legacy
+                            },
+                        ),
+                    )
                 }
             }
+
+            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(24.dp))
+            StepDots(step)
+            Spacer(Modifier.height(20.dp))
+
+            when (step) {
+                OnboardingStep.WELCOME -> {
+                    TaqwaPrimaryButton(
+                        stringResource(Res.string.onboarding_welcome_cta),
+                        onClick = { onStep(OnboardingStep.LOCATION) },
+                    )
+                    Spacer(Modifier.height(44.dp))
+                }
+                OnboardingStep.LOCATION -> {
+                    TaqwaPrimaryButton(stringResource(Res.string.onboarding_location_cta), requestLocation)
+                    // The city search is a pushed screen; it advances the step itself once a city
+                    // has actually been chosen, so backing out of it lands here again.
+                    TaqwaTextLink(
+                        stringResource(Res.string.onboarding_location_secondary),
+                        onClick = onChooseCity,
+                    )
+                }
+                OnboardingStep.NOTIFICATIONS -> {
+                    TaqwaPrimaryButton(
+                        stringResource(Res.string.onboarding_notifications_cta),
+                        requestNotifications,
+                    )
+                    TaqwaTextLink(
+                        stringResource(Res.string.onboarding_notifications_secondary),
+                        onClick = { onDeclineNotifications(); onStep(OnboardingStep.WIDGET) },
+                    )
+                }
+                OnboardingStep.WIDGET -> {
+                    if (canPinWidget) {
+                        // The launcher's own sheet appears over the app; onboarding finishes
+                        // underneath it either way, because the answer never comes back reliably.
+                        TaqwaPrimaryButton(
+                            stringResource(Res.string.onboarding_widget_cta_add),
+                            onClick = { widgetPinRequester.requestPin(); onComplete() },
+                        )
+                        TaqwaTextLink(stringResource(Res.string.onboarding_widget_secondary), onClick = onComplete)
+                    } else {
+                        TaqwaPrimaryButton(stringResource(Res.string.onboarding_widget_cta_done), onClick = onComplete)
+                        Spacer(Modifier.height(44.dp))
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
         }
-        Spacer(Modifier.height(12.dp))
     }
 }
 
