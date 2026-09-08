@@ -13,6 +13,7 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.attribution_intro
 import world.taqwa.app.resources.credit_audio
@@ -21,6 +22,14 @@ import world.taqwa.app.resources.credit_calculation
 import world.taqwa.app.resources.credit_calculation_detail
 import world.taqwa.app.resources.credit_cities
 import world.taqwa.app.resources.credit_cities_detail
+import world.taqwa.app.resources.credit_quran_font
+import world.taqwa.app.resources.credit_quran_font_detail
+import world.taqwa.app.resources.credit_quran_layout
+import world.taqwa.app.resources.credit_quran_layout_detail
+import world.taqwa.app.resources.credit_quran_text
+import world.taqwa.app.resources.credit_quran_text_detail
+import world.taqwa.app.resources.credit_translations
+import world.taqwa.app.resources.credit_translations_detail
 import world.taqwa.app.resources.credit_typeface
 import world.taqwa.app.resources.credit_typeface_detail
 import world.taqwa.app.resources.settings_attribution
@@ -33,7 +42,7 @@ private data class Credit(val what: String, val detail: String, val source: Stri
  * one would break the very reference it exists to give.
  */
 @Composable
-private fun credits(): List<Credit> = listOf(
+private fun credits(translations: List<TranslationInfo>): List<Credit> = listOf(
     Credit(
         what = stringResource(Res.string.credit_calculation),
         detail = stringResource(Res.string.credit_calculation_detail),
@@ -52,12 +61,36 @@ private fun credits(): List<Credit> = listOf(
         what = stringResource(Res.string.credit_audio),
         detail = stringResource(Res.string.credit_audio_detail),
     ),
-)
+    Credit(
+        what = stringResource(Res.string.credit_quran_text),
+        detail = stringResource(Res.string.credit_quran_text_detail),
+        source = "tanzil.net",
+    ),
+    Credit(
+        what = stringResource(Res.string.credit_quran_font),
+        detail = stringResource(Res.string.credit_quran_font_detail),
+        source = "qurancomplex.gov.sa",
+    ),
+    Credit(
+        what = stringResource(Res.string.credit_quran_layout),
+        detail = stringResource(Res.string.credit_quran_layout_detail),
+        source = "github.com/zonetecde/mushaf-layout",
+    ),
+    Credit(
+        what = stringResource(Res.string.credit_translations),
+        detail = stringResource(Res.string.credit_translations_detail),
+        source = "tanzil.net/trans",
+    ),
+) + translations.map { translation ->
+    // Read from the database, never hardcoded, so this list can never drift from what is
+    // actually bundled (spec §6).
+    Credit(what = translation.name, detail = translation.translator)
+}
 
 @Composable
-fun AttributionScreen(onBack: () -> Unit) {
+fun AttributionScreen(translations: List<TranslationInfo>, onBack: () -> Unit) {
     val colors = LocalTaqwaColors.current
-    val credits = credits()
+    val credits = credits(translations)
     SettingsScaffold(stringResource(Res.string.settings_attribution), onBack) {
         SettingsNote(stringResource(Res.string.attribution_intro))
         Spacer(Modifier.height(16.dp))

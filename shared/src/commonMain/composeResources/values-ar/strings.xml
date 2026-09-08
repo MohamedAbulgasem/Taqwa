@@ -146,6 +146,14 @@
     <string name="credit_typeface_detail">رخصة SIL Open Font 1.1.</string>
     <string name="credit_audio">تسجيل الأذان والتكبير</string>
     <string name="credit_audio_detail">«Beautiful adhan» لـ Adam-synagda، رخصة CC0 1.0، عبر ويكيميديا كومنز.</string>
+    <string name="credit_quran_text">نص القرآن</string>
+    <string name="credit_quran_text_detail">نص مصحف تنزيل، الإصدار 1.1، رخصة المشاع الإبداعي BY-ND 3.0. منقول دون تغيير.</string>
+    <string name="credit_quran_font">خط المصحف</string>
+    <string name="credit_quran_font_detail">خط مجمع الملك فهد لطباعة المصحف الشريف، حفص. حر الاستخدام والتوزيع دون تعديل.</string>
+    <string name="credit_quran_layout">تخطيط الصفحات</string>
+    <string name="credit_quran_layout_detail">فواصل صفحات وأسطر مصحف المدينة من بيانات المكتبة القرآنية الشاملة.</string>
+    <string name="credit_translations">الترجمات</string>
+    <string name="credit_translations_detail">مضمّنة من مشروع تنزيل للاستخدام غير التجاري. كل مترجم مذكور أدناه.</string>
 
     <!-- Qibla (plan 2) -->
     <string name="qibla_no_sensor_title">لا توجد بوصلة في هذا الجهاز</string>

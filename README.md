@@ -39,6 +39,7 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 - **Notifications at the exact time**, with a choice per prayer between silence, Taqwa's own short chime, a takbir, or the opening of the adhan. Optional reminder a few minutes before.
 - **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the compass needs it.
 - **Hijri date** (Umm al-Qura tabular calendar) with a one-day adjustment for local moonsighting, shown beside the Gregorian date.
+- **Quran reader** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, and a page-accurate Mushaf mode; everything offline.
 - **Arabic and English**, following the phone's language. Arabic is laid out right to left with the locale's own digits, not translated over an English layout.
 - **Light and dark**, following the system or fixed, in one amber accent.
 
@@ -69,9 +70,11 @@ Taqwa is being built in slices. Each slice ships as a complete, usable app.
 | Slice | Scope | Status |
 |---|---|---|
 | 1 | Prayer times, notifications, qibla, widgets, settings, Arabic | **Done**, in device testing |
-| 2 | Quran reader: Arabic text with translations beneath, bundled offline | Next |
+| 2 | Quran reader: Arabic text with translations beneath, bundled offline | **In device testing** |
 | 3 | Quran audio: recitations, per-ayah playback | Planned |
 | 4 | Dhikr: morning and evening adhkar, tasbih, khatm plan | Planned |
+
+Slice 2b (search, bookmarks and share) extends the Quran reader next.
 
 Deliberately out of scope: mosque finder, zakat calculator, hadith collections, community features, anything that needs a server.
 
@@ -118,7 +121,7 @@ iosApp/       iOS entry point (SwiftUI shell), WidgetKit extension
 assets/       Source audio and generators for the bundled sounds
 docs/         Design spec, implementation plans, build log, attribution
 scripts/      Test and build helpers (they pin the Xcode 26 toolchain)
-tools/        City database builder and Xcode project helpers
+tools/        City database builder, Quran database pipeline (build-quran-db.py) and Xcode project helpers
 ```
 
 The design spec that the app is built from is in [`docs/superpowers/specs`](docs/superpowers/specs), and [`docs/BUILD-LOG.md`](docs/BUILD-LOG.md) is the narrative of every iteration since, including what was found on real devices and why things are the way they are.
@@ -141,7 +144,7 @@ Taqwa asks for your location only to compute prayer times and the qibla, and onl
 
 ## Attribution
 
-Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (MIT), city data from [GeoNames](https://www.geonames.org/) (CC BY 4.0), the Manrope typeface (SIL OFL 1.1), and the adhan and takbir recordings from Wikimedia Commons (CC0). Full details in [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) and in the app under Settings, Attribution & licences.
+Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (MIT), city data from [GeoNames](https://www.geonames.org/) (CC BY 4.0), the Manrope typeface (SIL OFL 1.1), and the adhan and takbir recordings from Wikimedia Commons (CC0). The Quran text and its translations are from the [Tanzil Project](https://tanzil.net), the reading font is KFGQPC Uthmanic Script Hafs from the King Fahd Glorious Quran Printing Complex, and the Mushaf page layout comes from the Quranic Universal Library data. Full details in [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) and in the app under Settings, Attribution & licences.
 
 ## Licence
 

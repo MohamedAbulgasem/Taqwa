@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -461,7 +462,16 @@ fun App(container: AppContainer) {
                             onBack = { navigator.pop() },
                         )
 
-                        Screen.Attribution -> AttributionScreen(onBack = { navigator.pop() })
+                        Screen.Attribution -> {
+                            // The translation credits must never drift from what is actually
+                            // bundled (spec §6), so they are read from the database rather than
+                            // hardcoded; an empty list while loading is fine, it fills in a frame
+                            // later.
+                            val translations by produceState(initialValue = emptyList<world.taqwa.app.quran.TranslationInfo>()) {
+                                value = container.quranRepository.translations()
+                            }
+                            AttributionScreen(translations = translations, onBack = { navigator.pop() })
+                        }
 
                         Screen.Qibla -> {
                             val loc = location

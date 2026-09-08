@@ -148,6 +148,14 @@
     <string name="credit_typeface_detail">SIL Open Font Licence 1.1.</string>
     <string name="credit_audio">Adhan and takbir audio</string>
     <string name="credit_audio_detail">“Beautiful adhan” by Adam-synagda, CC0 1.0, via Wikimedia Commons.</string>
+    <string name="credit_quran_text">Quran text</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons BY-ND 3.0. Reproduced verbatim.</string>
+    <string name="credit_quran_font">Quran typeface</string>
+    <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs by the King Fahd Glorious Quran Printing Complex. Free to use and distribute unmodified.</string>
+    <string name="credit_quran_layout">Page layout</string>
+    <string name="credit_quran_layout_detail">Madinah Mushaf page and line breaks from the Quranic Universal Library data.</string>
+    <string name="credit_translations">Translations</string>
+    <string name="credit_translations_detail">Bundled from the Tanzil Project for non-commercial use. Each translator is credited below.</string>
 
     <!-- Qibla (plan 2) -->
     <string name="qibla_no_sensor_title">No compass sensor</string>

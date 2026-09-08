@@ -471,3 +471,104 @@ Settings) until the Quran slice adds the third. What changed:
 Verified on the LoopPhone (en-ZA, dark), the Pixel 8 Pro emulator (en-US light and dark, ar-EG),
 including the padded-day case that only en-ZA style locales hit. 265 JVM / 256 iOS shared tests
 plus 37 / 35 widgetcore, zero failures.
+
+### Slice 2a - Quran reader
+
+**Design round.** A third tab, Quran (Arabic: القرآن), added an offline Quran with two reading
+modes: translation mode, one surah at a time with the Uthmani Arabic, an optional transliteration
+line and the chosen translation per ayah; and Mushaf mode, the 604 pages of the Madinah Mushaf
+turned by swiping. The morning review that preceded the design round also named the seven bundled
+translations (Saheeh International, the Muyassar tafsir, Kemenag Indonesian, Junagarhi Urdu,
+Bengali, Diyanet Turkish, Hamidullah French) plus the Tanzil transliteration, picked KFGQPC
+Uthmanic Hafs as the reading font pending a device spike, and fixed a standing complaint about the
+tab bar: 16 dp glyphs read as too small and the unselected grey read as disabled on the light
+theme. The design round settled both at 22 dp glyphs and the secondary text colour for unselected
+tabs.
+
+**Font spike.** Run on a throwaway branch and worktree (not merged), across the Samsung S23, the
+Pixel 8 Pro emulator and the iPhone 12 and iPhone 17 Pro simulators, with Al-Fatiha, 2:255, 2:282
+and 2:1 to 2:5 at 22, 28 and 36 sp. KFGQPC Uthmanic Hafs was confirmed as the reading font: every
+mark sits correctly on all four devices, Android and iOS render identically, and the 286-row surah
+list scrolls at p99 9 to 10 ms on the S23. One text fix came out of it: Tanzil encodes the silent
+alef sign as U+06DF, which this font draws as a full-height inline ring that splits the word;
+mapping it to U+0652 in the pipeline draws the correct small circle. The ayah marker rule (bare
+Arabic-Indic digits after a non-breaking space, never the ornate ayah-end glyph) and a 2.0x line
+height both came from the same session. Amiri Quran remained the tested fallback throughout.
+
+**Pipeline.** `tools/build-quran-db.py` builds the bundled `quran.db` from the Tanzil Uthmani text
+(v1.1, pause marks and sajdah and rub signs on), the Tanzil `simple-clean` search text, Tanzil's
+`quran-data.xml` metadata, the eight Tanzil translation and transliteration files, and the Madinah
+Mushaf page and line layout from `zonetecde/mushaf-layout` (604 pages, Quranic Universal Library
+data). It applies the text rules from spec section 3.2 (BOM and whitespace stripping, the U+06DF
+mapping, a per-ayah cross-check between the Tanzil text and the layout's words, transliteration tag
+stripping, and stripping Tanzil's own leading basmala from ayah 1 of every surah except Al-Fatiha
+and At-Tawbah, since the app draws the basmala as its own line). Building it surfaced real data
+issues in the upstream layout JSON rather than sign or spacing artifacts: two word-level
+corrections were needed against Tanzil (11:13 word 3 and 80:25 word 1), 18 surah headers were
+relabelled once the pipeline switched to deriving them positionally instead of trusting the
+layout's own header flags, 5 headers and 2 basmala lines the layout omitted outright were
+synthesised, and one spurious header was dropped. All of this is pipeline bookkeeping; none of it
+is shown in the app or claimed as a correction to Tanzil's text itself.
+
+**The eight tasks.**
+
+Task 1 wrote the pipeline above and the SQLite schema (surahs, ayahs, juzs, translations, pages,
+lines, words, and an FTS5 search table for 2b), plus a `--verify` pass checking counts, the
+per-ayah cross-check and the U+06DF mapping.
+
+Task 2 wired SQLDelight into `:shared`: `Quran.sq` mirroring the bundled schema for typing only (the
+driver never executes it, since the file ships pre-built), the `QuranModels.kt` domain types, an
+Android/iOS driver seam that never lets the framework create or migrate the schema, and
+`QuranSource`/`QuranRepository` with JVM tests running against the real bundled database.
+
+Task 3 added the text rules used everywhere after (`QuranText.arabicIndic`, `withMarker` for the
+ayah roundel, `normaliseForSearch` for 2b), the Mushaf font seam, and `ReadingSettings` (mode, text
+size, transliteration on or off, chosen translation) with locale-aware defaults, Arabic devices
+opening in Mushaf mode with the Muyassar tafsir, everyone else in translation mode with Saheeh
+International or their own bundled translation.
+
+Task 4 added the third tab and its navigation (`Screen.Quran`, `Screen.Reader`, `Screen.Mushaf`)
+and carried out the tab bar fix from the design round: 22 dp glyphs, a 60 dp bar, the secondary
+text colour for unselected tabs, and a new book glyph for the Quran tab.
+
+Task 5 built the tab root: a name filter that matches Latin and harakat-insensitive Arabic surah
+names alike, a continue-reading card reading the last saved position, and surah and juz list cards
+behind a segmented control.
+
+Task 6 built translation mode: the ayah cards (Arabic text, transliteration, translation), the
+reader header shared with Mushaf mode, and position tracking that debounces scroll settling before
+writing the last-read position so a fast scroll does not spam the settings store.
+
+Task 7 built the reading settings sheet: a text size slider with a live Mushaf-font preview, the
+transliteration toggle, a translation picker ordered tafsir first then by language, and the
+translation or Mushaf mode switch.
+
+Task 8 built Mushaf mode: a small page cache, the page and line renderer matching the printed
+Mushaf's own breaks, and a horizontal pager turning 604 pages right to left with the same header
+and settings sheet as translation mode.
+
+**Review findings that mattered.** The Surah and Juz segmented control's tap targets were only
+38 dp per option because the inset that shaped the drawn pill was also shrinking the clickable
+area; the clickable now takes the full 44 dp row height and only the drawn pill is inset. The
+reader's settings collector was missing a `distinctUntilChanged`, so every debounced last-read
+position write, going through the same settings store as the reading settings themselves, re-ran
+the whole settings pipeline and refetched the current translation on every scroll stop, and could
+race the caption update; the collector now ignores writes that do not actually change the reading
+settings. The reader header's two icon buttons had only their 36 dp drawn size as their touch
+target; they now sit inside a 44 dp target with the same 36 dp disc drawn at its centre. Tanzil's
+own text already carries the basmala at the front of an ayah 1, and the reader draws its own
+basmala line above it, so ayah 2:1 was showing the basmala twice; the pipeline now strips that
+leading basmala from the stored text (see the pipeline section above). And the reading sheet's
+live size preview drew the ayah roundel in the body text colour instead of the accent colour every
+other roundel uses, while a `selectable` parameter was being reused on a row that was not itself a
+selectable option just to borrow its no-ripple click handling; both were fixed, and the check mark
+in the translation list now follows the same fallback id the reader itself falls back to when the
+stored translation is not one of the bundled ones.
+
+**What remains for the device round.** Task 10 has not run yet: build Android and install on every
+attached device, build iOS for the device and, failing that, the simulator; capture English and
+Arabic, light and dark, screenshots of the tab root with a continue card, the reader at 2:255 with
+transliteration on, the settings sheet, Mushaf pages 1, 3 and 42, and the tab bar; time the iOS
+Quran database copy on first launch (must land under 2 seconds on the iPhone 12) and confirm a
+second launch does not copy again; and fix anything visibly wrong in small follow-up commits on
+the same task.
