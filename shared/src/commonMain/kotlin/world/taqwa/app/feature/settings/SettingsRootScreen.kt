@@ -70,9 +70,10 @@ internal val SettingsGutter = 24.dp
  * Back chevron, large title, scrolling body. Every settings screen is this shape, so it lives in
  * one place rather than being re-typed seven times with drifting paddings.
  *
- * [onBack] is null on the settings root, which is a tab root: there is nowhere above it, and the
- * chevron is replaced by the space it occupied so the title does not jump between this screen and
- * the sub-screens it opens.
+ * [onBack] is null on the settings root, which is a tab root: there is nowhere above it, so it
+ * shows a short spacer instead of the chevron rather than reserving the chevron's full height. A
+ * tab root is reached by switching tabs, not by pushing, so the title it must line up with is the
+ * Prayer tab's — the sub-screens it pushes are allowed to sit their titles lower.
  */
 @Composable
 internal fun SettingsScaffold(
@@ -89,8 +90,9 @@ internal fun SettingsScaffold(
             .verticalScroll(rememberScrollState()),
     ) {
         if (onBack == null) {
-            // 8 dp of top padding plus the 44 dp tap target the chevron would have occupied.
-            Spacer(Modifier.height(52.dp))
+            // With the title's own 4 dp on top, this puts the title 24 dp below the status bar,
+            // level with the Prayer tab's — the tab the user has just switched away from.
+            Spacer(Modifier.height(20.dp))
         } else {
             BackChevron(onBack)
         }

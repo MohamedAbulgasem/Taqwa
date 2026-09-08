@@ -93,7 +93,8 @@ private val CardCorner = 18.dp
  * The whole screen is one [LazyColumn] (rather than a [SettingsScaffold]-style scrolling `Column`)
  * so the up-to-114 surah rows are only ever composed near the viewport, not all at once — the
  * screen otherwise reproduces [world.taqwa.app.feature.settings.SettingsScaffold]'s own tab-root
- * layout (the 52 dp top spacer in place of a back chevron, the title, the 20 dp gap) by hand,
+ * layout (the 20 dp top spacer a tab root uses in place of a back chevron, the title, the 20 dp
+ * gap) by hand,
  * since that helper is built on `verticalScroll` rather than a lazy list.
  */
 @Composable
@@ -131,9 +132,11 @@ fun QuranRootScreen(
             .background(colors.background)
             .windowInsetsPadding(WindowInsets.systemBars),
     ) {
-        // 8 dp of top padding plus the 44 dp tap target a back chevron would have occupied, same
-        // as SettingsScaffold's own tab-root spacer.
-        item(key = "top-spacer") { Spacer(Modifier.height(52.dp)) }
+        // A tab root has no back chevron, so it no longer reserves the chevron's 52 dp either:
+        // with the title's own 4 dp on top of this, the title lands 24 dp below the status bar,
+        // level with the Prayer tab's, so switching tabs no longer drops it by half a chevron.
+        // Same value as SettingsScaffold's own tab-root spacer.
+        item(key = "top-spacer") { Spacer(Modifier.height(20.dp)) }
         item(key = "title") {
             Text(
                 stringResource(Res.string.quran_title),
