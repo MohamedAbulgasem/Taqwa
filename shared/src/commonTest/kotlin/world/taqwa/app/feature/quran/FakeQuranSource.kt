@@ -59,6 +59,11 @@ internal class FakeQuranSource(
      * once rather than re-fetched on every unrelated state change. */
     val translationLoads = mutableListOf<Pair<String, Int>>()
 
+    /** One entry per search — Arabic or translation — that reached this fake, in the order they
+     * ran, so a test can show the debounce let exactly one query out of a burst of keystrokes
+     * through rather than only that the last one won the race. */
+    val searchLoads = mutableListOf<String>()
+
     override suspend fun surahs(): List<Surah> = surahList
     override suspend fun surah(number: Int): Surah = surahList.first { it.number == number }
     override suspend fun juzs(): List<Juz> = juzList
@@ -73,6 +78,7 @@ internal class FakeQuranSource(
     /** Mirrors QuranRepository.searchArabic: every folded token must appear as a substring of
      * the ayah's normalised text, so the view-model tests see the real matching rule. */
     override suspend fun searchArabic(query: String, limit: Int): List<SearchHit> {
+        searchLoads += query
         val tokens = SearchQuery.arabicTokens(query)
         if (tokens.isEmpty()) return emptyList()
         return ayahsBySurah.values.flatten()
@@ -86,6 +92,7 @@ internal class FakeQuranSource(
     }
 
     override suspend fun searchTranslation(translationId: String, query: String, limit: Int): List<SearchHit> {
+        searchLoads += query
         val needle = query.trim().lowercase()
         val texts = translationTextsById[translationId] ?: return emptyList()
         return texts.flatMap { (surah, byAyah) -> byAyah.map { (ayah, text) -> Triple(surah, ayah, text) } }

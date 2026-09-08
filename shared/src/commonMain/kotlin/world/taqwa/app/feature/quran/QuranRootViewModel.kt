@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import world.taqwa.app.quran.Ayah
 import world.taqwa.app.quran.QuranSource
@@ -85,7 +86,10 @@ sealed interface QuranRootUiState {
         val mode: ReadingMode,
         val search: SearchState = SearchState.Idle,
         val bookmarks: List<BookmarkRow> = emptyList(),
-        val translationId: String = FALLBACK_TRANSLATION,
+        /** The translation the ayah search actually runs against, resolved by
+         * [QuranRootViewModel.load]. No default: a `Ready` built without one would silently claim
+         * to be searching Saheeh International whatever the reader had chosen. */
+        val translationId: String,
         /** [translationId]'s own language, for the direction a hit's translation snippet reads in
          * (spec §5.1) — an Urdu translation stays right-to-left under an English UI and an English
          * one left-to-right under an Arabic one. "en" until [QuranRootViewModel.load] resolves it. */
@@ -222,19 +226,23 @@ class QuranRootViewModel(
                 ContinueCard(surah, pos.ayah, juzNumberFor(pos.surah, pos.ayah, juzRows))
             }
         }
-        val previous = _state.value as? QuranRootUiState.Ready
-        _state.value = QuranRootUiState.Ready(
-            surahs = surahs,
-            juzs = juzRows,
-            continueCard = continueCard,
-            filter = previous?.filter ?: "",
-            tab = previous?.tab ?: RootTab.SURAH,
-            mode = reading.mode,
-            search = previous?.search ?: SearchState.Idle,
-            bookmarks = previous?.bookmarks.orEmpty(),
-            translationId = translationId,
-            translationLanguage = translationLanguage,
-        )
+        // A reload keeps whatever the reader had already typed, chosen or been shown: everything
+        // below comes from the freshly loaded database, everything from `previous` from the screen.
+        _state.update { current ->
+            val previous = current as? QuranRootUiState.Ready
+            QuranRootUiState.Ready(
+                surahs = surahs,
+                juzs = juzRows,
+                continueCard = continueCard,
+                filter = previous?.filter ?: "",
+                tab = previous?.tab ?: RootTab.SURAH,
+                mode = reading.mode,
+                search = previous?.search ?: SearchState.Idle,
+                bookmarks = previous?.bookmarks.orEmpty(),
+                translationId = translationId,
+                translationLanguage = translationLanguage,
+            )
+        }
         applyBookmarks(latestBookmarks)
     }
 
@@ -264,20 +272,25 @@ class QuranRootViewModel(
      * narrows synchronously on every keystroke, while the ayah search waits [SEARCH_DEBOUNCE_MS]
      * and is cancelled outright by the next keystroke — like [ReaderViewModel.onFirstVisibleAyah],
      * relaunching one job means only the last query in a burst ever reaches the database.
+     *
+     * [immediate] skips that wait, for the one caller that is not a keystroke: the query restored
+     * into a fresh view model on the way back from a hit (see `App.kt`). Nobody is typing then, so
+     * there is nothing to debounce, and the wait would only blank the ayah section for a quarter
+     * of a second on a screen that had results on it a moment ago.
      */
-    fun setFilter(text: String) {
-        val ready = _state.value as? QuranRootUiState.Ready ?: return
+    fun setFilter(text: String, immediate: Boolean = false) {
+        if (_state.value !is QuranRootUiState.Ready) return
         searchJob?.cancel()
         val activeScope = scope
         // Under two letters — or before start() handed over a scope — the query narrows the surah
         // list only, and no ayah search runs at all.
         if (!SearchQuery.isLongEnough(text) || activeScope == null) {
-            _state.value = ready.copy(filter = text, search = SearchState.Idle)
+            _state.update { (it as? QuranRootUiState.Ready)?.copy(filter = text, search = SearchState.Idle) ?: it }
             return
         }
-        _state.value = ready.copy(filter = text, search = SearchState.Searching)
+        _state.update { (it as? QuranRootUiState.Ready)?.copy(filter = text, search = SearchState.Searching) ?: it }
         searchJob = activeScope.launch {
-            delay(SEARCH_DEBOUNCE_MS)
+            if (!immediate) delay(SEARCH_DEBOUNCE_MS)
             // Arabic in, Arabic searched: someone typing Arabic is quoting the Quran, not their
             // translation (spec 2b §2.1).
             val hits = if (SearchQuery.isArabic(text)) {
@@ -287,15 +300,16 @@ class QuranRootViewModel(
             }
             // A search that lost the race — the query moved on while the database was answering —
             // must never overwrite the newer query's state.
-            val current = _state.value as? QuranRootUiState.Ready ?: return@launch
-            if (current.filter != text) return@launch
-            _state.value = current.copy(
-                search = SearchState.Results(
-                    hits = hits.take(SEARCH_LIMIT),
-                    capped = hits.size > SEARCH_LIMIT,
-                    query = text,
-                ),
-            )
+            _state.update { current ->
+                if (current !is QuranRootUiState.Ready || current.filter != text) return@update current
+                current.copy(
+                    search = SearchState.Results(
+                        hits = hits.take(SEARCH_LIMIT),
+                        capped = hits.size > SEARCH_LIMIT,
+                        query = text,
+                    ),
+                )
+            }
         }
     }
 
@@ -312,17 +326,22 @@ class QuranRootViewModel(
             val ayah = ayahs.firstOrNull { it.number == bookmark.ayah } ?: return@mapNotNull null
             BookmarkRow(bookmark, surah, ayah.text, ayah.juz, ayah.page)
         }
-        (_state.value as? QuranRootUiState.Ready)?.let { _state.value = it.copy(bookmarks = rows) }
+        _state.update { (it as? QuranRootUiState.Ready)?.copy(bookmarks = rows) ?: it }
     }
 
-    /** Removes a bookmark from the store; the collection [start] began is what updates the rows,
-     * so this never touches the state itself. */
+    /**
+     * Removes a bookmark from the store; the collection [start] began is what updates the rows,
+     * so this never touches the state itself. Precondition: [start] has been called — the write
+     * runs on its scope, so a call before that silently does nothing. The screen only ever draws
+     * a remove target once the rows this same scope collects have arrived, so there is no way to
+     * tap one earlier.
+     */
     fun removeBookmark(surah: Int, ayah: Int) {
         scope?.launch { bookmarks.remove(surah, ayah) }
     }
 
     fun setTab(tab: RootTab) {
-        (_state.value as? QuranRootUiState.Ready)?.let { _state.value = it.copy(tab = tab) }
+        _state.update { (it as? QuranRootUiState.Ready)?.copy(tab = tab) ?: it }
     }
 
     /** Resolves the Mushaf page for a surah/ayah, for the composable to call before navigating in Mushaf mode. */

@@ -23,6 +23,17 @@ class SearchQueryTest {
     }
 
     @Test
+    fun arabicTokensDropPunctuationSoAQuotedQueryStillFindsItsAyah() {
+        // Pasted-and-quoted is how a query arrives from another app; the quotes are not in
+        // ayah.text_search, so a token that kept them would match nothing.
+        assertEquals(listOf("رب"), SearchQuery.arabicTokens("\"رَبِّ\""))
+        assertEquals(listOf("رب", "العالمين"), SearchQuery.arabicTokens("(رَبِّ ٱلْعَالَمِينَ)"))
+        // Punctuation between two words separates them rather than welding them into one token.
+        assertEquals(listOf("رب", "العالمين"), SearchQuery.arabicTokens("رب،العالمين"))
+        assertEquals(emptyList(), SearchQuery.arabicTokens("\"\" ()"))
+    }
+
+    @Test
     fun arabicTokensAreEmptyWhenNothingSearchableRemains() {
         // No token, so the caller runs no search at all.
         assertEquals(emptyList(), SearchQuery.arabicTokens(""))

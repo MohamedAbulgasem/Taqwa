@@ -47,13 +47,21 @@ class QuranRootViewModelTest {
      * words (line index 1 is ayah 1, index 2 is ayah 2), never retyped, with the trailing roundel
      * dropped so each ayah is its text alone.
      */
-    private fun fixtureAyah(number: Int, lineIndex: Int) = Ayah(
-        surah = 1,
+    private fun fixtureAyah(
+        number: Int,
+        lineIndex: Int,
+        surah: Int = 1,
+        juz: Int = 1,
+        page: Int = 1,
+    ) = Ayah(
+        surah = surah,
         number = number,
         text = MUSHAF_PAGE_1.lines[lineIndex].words.joinToString(" ") {
             it.text.substringBefore(QuranText.MARKER_SEPARATOR)
         },
-        page = 1, juz = 1, hizbQuarter = 1, sajdah = 0,
+        // Al-Faatiha 1's own juz and page by default; the bookmark-row test borrows this text for
+        // another surah so its row's juz and page are two different numbers and can be told apart.
+        page = page, juz = juz, hizbQuarter = 1, sajdah = 0,
     )
 
     /**
@@ -293,6 +301,20 @@ class QuranRootViewModelTest {
     }
 
     @Test
+    fun theTranslationOfAReaderWhoTurnedTranslationsOffIsStillSearchable() = runTest {
+        // "None" is a reading choice, not a search one: Arabic-only cards must not leave the Latin
+        // search with no translation to run against (resolveTranslationId).
+        val name = "translation-none"
+        val repo = settings(name)
+        repo.setReadingSettings(ReadingSettings(translationId = ReadingSettings.NO_TRANSLATION))
+        val vm = QuranRootViewModel(searchSource(), repo, bookmarkStore(name), "en")
+        vm.load()
+        val ready = vm.state.value as QuranRootUiState.Ready
+        assertEquals("en.sahih", ready.translationId)
+        assertEquals("en", ready.translationLanguage)
+    }
+
+    @Test
     fun pageForDelegatesToTheSource() = runTest {
         val vm = viewModel("page-for")
         assertEquals(293, vm.pageFor(18, 1))
@@ -333,25 +355,53 @@ class QuranRootViewModelTest {
 
     @Test
     fun clearingTheQueryReturnsToIdleAndOnlyTheLastQueryLands() = runTest {
-        val vm = QuranRootViewModel(searchSource(), settings("search-clear"), bookmarkStore("search-clear"), "en")
+        val source = searchSource()
+        val vm = QuranRootViewModel(source, settings("search-clear"), bookmarkStore("search-clear"), "en")
         vm.load(); vm.start(backgroundScope)
         vm.setFilter("mer"); advanceTimeBy(100)
         vm.setFilter("merciful"); advanceTimeBy(300)
         assertEquals("merciful", ((vm.state.value as QuranRootUiState.Ready).search as SearchState.Results).query)
+        // The point of the debounce: the keystroke that was superseded inside 250 ms never reached
+        // the database at all, rather than reaching it and losing the race on the way back.
+        assertEquals(listOf("merciful"), source.searchLoads)
         vm.setFilter(""); advanceTimeBy(300)
         assertEquals(SearchState.Idle, (vm.state.value as QuranRootUiState.Ready).search)
+        assertEquals(listOf("merciful"), source.searchLoads)
+    }
+
+    @Test
+    fun aSearchWithMoreHitsThanTheCapIsCutAtTheCapAndSaysSo() = runTest {
+        // The view model asks for one more than the cap so "capped" is known rather than guessed:
+        // 120 identical ayahs (Al-Faatiha 1's text, numbered 1..120) all match the query.
+        val text = fixtureAyah(1, 1).text
+        val source = FakeQuranSource(ayahsBySurah = mapOf(1 to (1..120).map { fixtureAyah(it, 1) }))
+        val vm = QuranRootViewModel(source, settings("search-capped"), bookmarkStore("search-capped"), "en")
+        vm.load(); vm.start(backgroundScope)
+        vm.setFilter(text.split(' ').last())
+        advanceTimeBy(300)
+        val results = (vm.state.value as QuranRootUiState.Ready).search as SearchState.Results
+        assertTrue(results.capped)
+        assertEquals(100, results.hits.size)
     }
 
     @Test
     fun bookmarksArriveAsRowsNewestFirstAndRemoveDropsOne() = runTest {
         val store = bookmarkStore("rows")
-        store.toggle(1, 1)
-        val vm = QuranRootViewModel(searchSource(), settings("rows"), store, "en")
+        store.toggle(18, 1)
+        // Al-Kahf's own juz and page (15, 293) on the fixture's text, so the two numbers the row
+        // carries are different from each other and from the surah's — a row that had them the
+        // wrong way round, or took them from anywhere but the ayah, could not pass.
+        val source = FakeQuranSource(
+            ayahsBySurah = mapOf(18 to listOf(fixtureAyah(1, 1, surah = 18, juz = 15, page = 293))),
+        )
+        val vm = QuranRootViewModel(source, settings("rows"), store, "en")
         vm.load(); vm.start(backgroundScope)
         val rows = vm.awaitBookmarks { it.isNotEmpty() }
-        assertEquals(listOf(1 to 1), rows.map { it.surah.number to it.bookmark.ayah })
+        assertEquals(listOf(18 to 1), rows.map { it.surah.number to it.bookmark.ayah })
         assertTrue(rows.first().arabic.isNotBlank())
-        vm.removeBookmark(1, 1)
+        assertEquals(15, rows.first().juz)
+        assertEquals(293, rows.first().page)
+        vm.removeBookmark(18, 1)
         assertEquals(emptyList(), vm.awaitBookmarks { it.isEmpty() })
     }
 }
