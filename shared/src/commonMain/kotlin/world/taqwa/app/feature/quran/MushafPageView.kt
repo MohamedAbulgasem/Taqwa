@@ -301,6 +301,9 @@ private fun MushafTextLine(
         annotateLine(line.text.orEmpty(), ranges, highlighted, colors.accent)
     }
     var layout by remember(line) { mutableStateOf<TextLayoutResult?>(null) }
+    // If a line still overflows at the shrink floor, the second line is the safety net: Quran text
+    // must never be clipped away, and one wrapped line on one page is the lesser failure.
+    var overflowed by remember(line) { mutableStateOf(false) }
 
     BasicText(
         text,
@@ -319,12 +322,15 @@ private fun MushafTextLine(
             textDirection = TextDirection.Rtl,
             lineHeight = (base * 1.9f).sp,
         ),
-        onTextLayout = { layout = it },
+        onTextLayout = {
+            layout = it
+            if (it.didOverflowWidth && !overflowed) overflowed = true
+        },
         // softWrap stays on with maxLines = 1: with it off the line is measured against unbounded
         // width, TextAutoSize never sees an overflow, and a line too wide for the frame is simply
         // clipped at its left end instead of shrinking (page 586 did exactly that). Wrapping on,
         // capped at one line, is what makes the auto-size loop shrink until the line fits.
-        maxLines = 1,
+        maxLines = if (overflowed) 2 else 1,
         autoSize = TextAutoSize.StepBased(
             minFontSize = (base * MIN_SHRINK).sp,
             maxFontSize = base.sp,
@@ -374,7 +380,6 @@ internal fun annotateLine(
 @Composable
 internal fun SurahBand(surah: Surah, base: Float, family: FontFamily) {
     val colors = LocalTaqwaColors.current
-    val format = LocalPlatformFormat.current
     Row(
         Modifier
             .fillMaxWidth()
@@ -386,8 +391,10 @@ internal fun SurahBand(surah: Surah, base: Float, family: FontFamily) {
     ) {
         // Both sides weighted so the name sits on the row's true centre rather than wherever two
         // labels of different lengths happen to leave it.
+        // Arabic-Indic in every UI language, like the page number beneath: the band belongs to the
+        // Mushaf, not to the interface.
         Text(
-            format.localizedDigits(surah.ayahCount),
+            QuranText.arabicIndic(surah.ayahCount),
             style = TaqwaText.caption.copy(fontSize = 11.sp),
             color = colors.textSecondary,
             maxLines = 1,
