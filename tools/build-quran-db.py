@@ -129,6 +129,29 @@ def boundary_lookup(order, boundaries):
     return result
 
 
+BASMALA_SIMPLE = "بسم الله الرحمن الرحيم"
+ARABIC_MARKS = set(chr(c) for c in range(0x0610, 0x061B)) | set(chr(c) for c in range(0x064B, 0x0660)) | {chr(0x0670), chr(0x0640)} | set(chr(c) for c in range(0x06D6, 0x06EE))
+
+
+def bare_letters(token: str) -> str:
+    """Letters only: harakat and Quranic signs dropped, the alef variants folded to a plain alef."""
+    t = "".join(c for c in unicodedata.normalize("NFC", token) if c not in ARABIC_MARKS)
+    return t.replace("ٱ", "ا").replace("أ", "ا").replace("إ", "ا").replace("آ", "ا")
+
+
+def strip_leading_basmala(text: str, surah: int, ayah: int) -> str:
+    """Tanzil prefixes the basmala to ayah 1 of every surah except Al-Fatiha (where it IS ayah 1)
+    and At-Tawbah (which has none). The app renders the basmala as its own line above the
+    surah, so the stored ayah text must not carry it. Matched on bare letters because two
+    surahs (95, 97) spell the prefix with a different shadda placement."""
+    if ayah != 1 or surah in (1, 9):
+        return text
+    tokens = text.split()
+    if len(tokens) > 4 and " ".join(bare_letters(t) for t in tokens[:4]) == BASMALA_SIMPLE:
+        return " ".join(tokens[4:])
+    raise SystemExit(f"expected a leading basmala in {surah}:{ayah}, got: {text[:60]}")
+
+
 def strip_for_compare(text: str) -> str:
     """Normalize text for the Tanzil/layout cross-check only. Never applied to stored text.
 
@@ -286,7 +309,8 @@ def build(conn: sqlite3.Connection):
         s, a = key
         conn.execute(
             "INSERT INTO ayah VALUES (?,?,?,?,?,?,?,?)",
-            (s, a, uthmani[key], simple[key], page_of[key], juz_of[key], quarter_of[key], sajdas.get(key, 0)),
+            (s, a, strip_leading_basmala(uthmani[key], s, a), strip_leading_basmala(simple[key], s, a),
+             page_of[key], juz_of[key], quarter_of[key], sajdas.get(key, 0)),
         )
     for idx, s, a in juzs:
         conn.execute("INSERT INTO juz VALUES (?,?,?)", (idx, s, a))
@@ -482,6 +506,11 @@ def verify(conn: sqlite3.Connection):
     assert one("SELECT count(*) FROM ayah WHERE instr(text_uthmani, char(1759)) > 0") == 0, "U+06DF survived"
     assert one("SELECT count(*) FROM line_word WHERE instr(text, char(1759)) > 0") == 0
     assert one("SELECT text_uthmani FROM ayah WHERE surah=1 AND number=1").startswith("بِسْمِ")
+    # The basmala is a line of its own in the app; no stored ayah 1 may still start with it.
+    for s_, t_ in conn.execute("SELECT surah, text_uthmani FROM ayah WHERE number = 1 AND surah NOT IN (1, 9)"):
+        assert " ".join(bare_letters(w) for w in t_.split()[:4]) != BASMALA_SIMPLE, f"basmala still prefixed in {s_}:1"
+    assert one("SELECT text_uthmani FROM ayah WHERE surah=2 AND number=1").startswith("الٓمٓ")
+    assert one("SELECT text_search FROM ayah WHERE surah=2 AND number=1") == "الم"
     assert one("SELECT page FROM ayah WHERE surah=2 AND number=255") == 42
     assert one("SELECT juz FROM ayah WHERE surah=114 AND number=6") == 30
     assert one("SELECT count(*) FROM ayah_fts WHERE ayah_fts MATCH 'الحمد'") >= 20

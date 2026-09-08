@@ -84,7 +84,8 @@ Three tabs: Prayer (mihrab), Quran (open book), Settings (gear). Glyphs 22 dp, l
 2. Map **U+06DF → U+0652** in the Uthmani text and in every layout word (the Hafs font draws U+06DF as an inline ring that splits the word; spike §12).
 3. Verify per ayah that the layout's words, joined with spaces and with the trailing ayah digits removed from the last word, equal the Tanzil Uthmani text with the standalone sign tokens (rub-el-hizb ۞ U+06DE and sajdah ۩ U+06E9, and pause marks U+06D6–U+06DC when they are separate tokens) accounted for. Any mismatch fails the build and prints the ayah.
 4. Transliteration: remove `<u>`, `</u>`, `<b>`, `</b>` (case-insensitive) and collapse double spaces.
-5. Ayah roundels are **not** stored in the ayah text. They are added at render time (§5.2). The layout words keep their trailing digits because the line is rendered as one string.
+5. Tanzil prefixes the basmala to ayah 1 of every surah except Al-Fatiha and At-Tawbah; the pipeline strips that leading basmala (matched on bare letters, since surahs 95 and 97 spell it with a different shadda placement) from `text_uthmani` and `text_search`, because the app renders the basmala as its own line. 27:30, where the basmala sits mid-ayah, is untouched.
+6. Ayah roundels are **not** stored in the ayah text. They are added at render time (§5.2). The layout words keep their trailing digits because the line is rendered as one string.
 
 ### 3.3 Database
 
@@ -140,7 +141,7 @@ SQLDelight 2.2.1 with the `sqlite-3-38` dialect, drivers `android-driver`, `nati
 
 ### 3.5 Preferences (DataStore, beside the existing keys)
 
-`quran.mode` (`TRANSLATION` | `MUSHAF`), `quran.arabicSizeSp` (Int, 28), `quran.transliteration` (Boolean, false), `quran.translationId` (String, locale default), `quran.lastSurah`, `quran.lastAyah`, `quran.lastPage` (Int, absent until first read).
+`quran_mode` (`TRANSLATION` | `MUSHAF`), `quran_size` (Int, 28), `quran_transliteration` (Boolean, false), `quran_translation` (String, locale default), `quran_last_surah`, `quran_last_ayah`, `quran_last_page` (Int, absent until first read). Snake case, matching every other key in `SettingsKeys`.
 
 ## 4. Architecture
 
