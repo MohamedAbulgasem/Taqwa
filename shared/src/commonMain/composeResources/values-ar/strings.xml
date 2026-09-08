@@ -234,6 +234,7 @@
     <string name="quran_search_empty">لا توجد آيات مطابقة</string>
     <string name="quran_tab_bookmarks">المحفوظات</string>
     <string name="quran_bookmarks_empty">لا توجد محفوظات بعد. افتح آية واضغط على علامة الحفظ.</string>
+    <string name="quran_remove_bookmark">إزالة من المحفوظات</string>
     <string name="quran_ayah_n">الآية %1$s</string>
     <string name="quran_action_bookmark">حفظ</string>
     <string name="quran_action_bookmarked">محفوظة</string>

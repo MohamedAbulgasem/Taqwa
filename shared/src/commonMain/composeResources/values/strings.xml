@@ -243,6 +243,7 @@
     <string name="quran_search_empty">No ayahs match</string>
     <string name="quran_tab_bookmarks">Bookmarks</string>
     <string name="quran_bookmarks_empty">No bookmarks yet. Open an ayah and tap the bookmark.</string>
+    <string name="quran_remove_bookmark">Remove bookmark</string>
     <string name="quran_ayah_n">Ayah %1$s</string>
     <string name="quran_action_bookmark">Bookmark</string>
     <string name="quran_action_bookmarked">Bookmarked</string>

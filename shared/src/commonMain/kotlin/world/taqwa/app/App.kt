@@ -264,15 +264,25 @@ fun App(container: AppContainer) {
                                 // The field outlived the screen (see quranQuery); the view model
                                 // did not, so the restored query is searched again on the way back.
                                 // start() first: setFilter needs the scope to run its search.
-                                if (quranQuery.text.isNotEmpty()) viewModel.setFilter(quranQuery.text)
+                                // immediate: nobody is typing, so the debounce would only leave the
+                                // ayah section blank for a quarter of a second on the way back.
+                                if (quranQuery.text.isNotEmpty()) {
+                                    viewModel.setFilter(quranQuery.text, immediate = true)
+                                }
                             }
                             val quranState by viewModel.state.collectAsState()
                             QuranRootScreen(
                                 state = quranState,
                                 query = quranQuery,
                                 onQueryChange = { value ->
+                                    // Only when the text itself changed: a TextFieldValue also
+                                    // changes on a caret move or a selection, and setFilter
+                                    // cancels the running search and re-queries, which would blank
+                                    // the ayah section for the debounce every time the field is
+                                    // tapped.
+                                    val changed = value.text != quranQuery.text
                                     quranQuery = value
-                                    viewModel.setFilter(value.text)
+                                    if (changed) viewModel.setFilter(value.text)
                                 },
                                 onTabChange = viewModel::setTab,
                                 pageFor = viewModel::pageFor,

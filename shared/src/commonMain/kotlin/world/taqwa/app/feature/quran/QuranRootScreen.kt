@@ -42,6 +42,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -82,6 +84,7 @@ import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_juz_range
 import world.taqwa.app.resources.quran_madani
 import world.taqwa.app.resources.quran_makki
+import world.taqwa.app.resources.quran_remove_bookmark
 import world.taqwa.app.resources.quran_search_empty
 import world.taqwa.app.resources.quran_search_hint
 import world.taqwa.app.resources.quran_section_ayahs
@@ -101,6 +104,11 @@ private val CardCorner = 18.dp
 /** How many surah rows the search's Surahs section keeps (spec 2b §2.1). A query of two letters or
  * more is aimed at the ayahs; the surah matches stay as a short shortcut above them. */
 private const val SURAH_RESULTS = 5
+
+/** U+2066 LEFT-TO-RIGHT ISOLATE and U+2069 POP DIRECTIONAL ISOLATE: a number with a trailing "+"
+ * put between them keeps its own left-to-right order inside an Arabic sentence. */
+private const val LRI = "\u2066"
+private const val PDI = "\u2069"
 
 /**
  * The Quran tab root (spec §2.1, "Root A"): a filter field, an optional continue-reading card, a
@@ -236,8 +244,11 @@ fun QuranRootScreen(
             (ready.search as? SearchState.Results)?.let { results ->
                 item(key = "ayah-section") {
                     // "100+" when capped: the hit list itself is cut at the cap, so its size is
-                    // the cap, and the plus is what says there are more.
-                    val count = format.localizedDigits(results.hits.size) + if (results.capped) "+" else ""
+                    // the cap, and the plus is what says there are more. Isolated in LRI…PDI: the
+                    // plus is neutral, so under an Arabic UI the paragraph's right-to-left run
+                    // would otherwise place it before the digits and the label would read "+١٠٠".
+                    val count = LRI + format.localizedDigits(results.hits.size) +
+                        (if (results.capped) "+" else "") + PDI
                     SearchSectionLabel(stringResource(Res.string.quran_section_ayahs, count))
                 }
                 searchHitItems(
@@ -790,13 +801,19 @@ private fun SearchHitRow(
         hit.translation?.let { translation ->
             val direction =
                 if (translationLanguage in RTL_TRANSLATION_LANGUAGES) LayoutDirection.Rtl else LayoutDirection.Ltr
+            // Scanning the snippet for the query builds a whole AnnotatedString; remembered on its
+            // three inputs so it happens once per row rather than on every recomposition of every
+            // row in the results list.
+            val highlighted = remember(translation, query, colors.textPrimary) {
+                highlightMatches(
+                    translation,
+                    query,
+                    SpanStyle(color = colors.textPrimary, fontWeight = FontWeight.SemiBold),
+                )
+            }
             CompositionLocalProvider(LocalLayoutDirection provides direction) {
                 Text(
-                    highlightMatches(
-                        translation,
-                        query,
-                        SpanStyle(color = colors.textPrimary, fontWeight = FontWeight.SemiBold),
-                    ),
+                    highlighted,
                     style = TaqwaText.caption,
                     color = colors.textSecondary,
                     textAlign = TextAlign.Start,
@@ -866,9 +883,11 @@ private fun BookmarkRowView(row: BookmarkRow, onClick: () -> Unit, onRemove: () 
             Spacer(Modifier.height(2.dp))
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Text(
-                    // withMarker, not the bare text: the roundel is what tells the reader which
-                    // ayah of the surah this line is, and the Hafs face draws it as one.
-                    QuranText.withMarker(row.arabic, row.bookmark.ayah),
+                    // The bare text, no roundel: the line is cut at its first line, so the marker
+                    // only survived on the shortest ayahs — and the search hits above show none —
+                    // which made the roundel read as a property of the ayah rather than of the row.
+                    // The reference above the line already says which ayah this is.
+                    row.arabic,
                     fontFamily = mushafFamily(),
                     fontSize = 18.sp,
                     color = colors.textPrimary,
@@ -878,6 +897,9 @@ private fun BookmarkRowView(row: BookmarkRow, onClick: () -> Unit, onRemove: () 
                 )
             }
         }
+        // The target is a bare Canvas glyph, so it has no text of its own for a screen reader to
+        // announce — the same contentDescription the reader header's icon buttons carry.
+        val removeDescription = stringResource(Res.string.quran_remove_bookmark)
         Box(
             Modifier
                 .size(44.dp)
@@ -885,7 +907,8 @@ private fun BookmarkRowView(row: BookmarkRow, onClick: () -> Unit, onRemove: () 
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     onClick = onRemove,
-                ),
+                )
+                .semantics { contentDescription = removeDescription },
             contentAlignment = Alignment.Center,
         ) {
             Canvas(Modifier.size(20.dp)) { drawBookmark(colors.accent, filled = true) }
