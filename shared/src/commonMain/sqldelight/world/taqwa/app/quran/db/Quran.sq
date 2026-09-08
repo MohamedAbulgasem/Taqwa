@@ -84,3 +84,11 @@ SELECT * FROM line_word WHERE page = ? ORDER BY line, position;
 
 pageHeader:
 SELECT page.number, page.first_surah, page.first_ayah FROM page WHERE number = ?;
+
+searchArabic:
+SELECT surah, number, text_uthmani FROM ayah
+WHERE rowid IN (SELECT rowid FROM ayah_fts WHERE ayah_fts MATCH ?)
+ORDER BY surah, number LIMIT ?;
+
+translationTextsAll:
+SELECT surah, number, text FROM ayah_translation WHERE translation_id = ? ORDER BY surah, number;

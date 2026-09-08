@@ -16,6 +16,11 @@ interface QuranSource {
     suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String>
     suspend fun pageOf(surah: Int, ayah: Int): Int
     suspend fun page(number: Int): MushafPage
+    /** Arabic FTS search; [query] is raw user text, folded and quoted by [SearchQuery.fts]. */
+    suspend fun searchArabic(query: String, limit: Int): List<SearchHit>
+    /** Case-insensitive substring search over one translation, folded in Kotlin so non-ASCII
+     * case (Turkish, French) folds correctly, which SQLite's LIKE and lower() cannot do. */
+    suspend fun searchTranslation(translationId: String, query: String, limit: Int): List<SearchHit>
 }
 
 class QuranRepository(
@@ -52,6 +57,30 @@ class QuranRepository(
         }
         val juz = q.juzOfAyah(header.first_surah, header.first_ayah).executeAsOne().toInt()
         MushafPage(number, header.first_surah.toInt(), header.first_ayah.toInt(), juz, lines)
+    }
+
+    override suspend fun searchArabic(query: String, limit: Int): List<SearchHit> = withContext(io) {
+        val match = SearchQuery.fts(query) ?: return@withContext emptyList()
+        q.searchArabic(match, limit.toLong()).executeAsList().map {
+            SearchHit(it.surah.toInt(), it.number.toInt(), it.text_uthmani, translation = null)
+        }
+    }
+
+    // The whole translation is read once per search (6,236 short rows, a few milliseconds) and
+    // the ayah rows for the hits are fetched by surah, so a phrase found in many surahs costs one
+    // query per surah touched, not one per hit.
+    override suspend fun searchTranslation(translationId: String, query: String, limit: Int): List<SearchHit> = withContext(io) {
+        val needle = query.trim().lowercase()
+        if (needle.isEmpty()) return@withContext emptyList()
+        val hits = q.translationTextsAll(translationId).executeAsList()
+            .asSequence()
+            .filter { it.text.lowercase().contains(needle) }
+            .take(limit)
+            .toList()
+        val arabicBySurah = hits.map { it.surah.toInt() }.distinct().associateWith { surah ->
+            q.ayahsOfSurah(surah.toLong()).executeAsList().associate { it.number.toInt() to it.text_uthmani }
+        }
+        hits.map { SearchHit(it.surah.toInt(), it.number.toInt(), arabicBySurah.getValue(it.surah.toInt()).getValue(it.number.toInt()), it.text) }
     }
 }
 

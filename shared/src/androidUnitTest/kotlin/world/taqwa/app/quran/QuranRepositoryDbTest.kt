@@ -108,6 +108,41 @@ class QuranRepositoryDbTest {
         assertEquals(6, last.endAyah)
     }
 
+    @Test fun arabicSearchFindsPrefixesAcrossHarakat() = runTest {
+        val hits = repo.searchArabic("الرحمن", limit = 100)
+        assertTrue(hits.any { it.surah == 1 && it.ayah == 1 }, "1:1 has ٱلرَّحْمَٰنِ")
+        assertTrue(hits.any { it.surah == 1 && it.ayah == 3 })
+        assertTrue(hits.all { it.translation == null })
+        assertEquals(hits, hits.sortedWith(compareBy({ it.surah }, { it.ayah })))
+    }
+
+    @Test fun arabicSearchWithTwoTokensNeedsBoth() = runTest {
+        val hits = repo.searchArabic("رب العالمين", limit = 100)
+        assertTrue(hits.any { it.surah == 1 && it.ayah == 2 })
+        assertTrue(hits.none { it.surah == 1 && it.ayah == 1 })
+    }
+
+    @Test fun arabicSearchNonsenseFindsNothingAndTheCapHolds() = runTest {
+        assertEquals(emptyList(), repo.searchArabic("ذذذذ", limit = 100))
+        assertEquals(5, repo.searchArabic("الله", limit = 5).size)
+    }
+
+    @Test fun translationSearchIsCaseInsensitiveAndCarriesBothTexts() = runTest {
+        val hits = repo.searchTranslation("en.sahih", "MERCIFUL", limit = 100)
+        assertTrue(hits.any { it.surah == 1 && it.ayah == 1 })
+        val first = hits.first()
+        assertTrue(first.translation!!.contains("Merciful"))
+        assertTrue(first.arabic.isNotBlank())
+    }
+
+    @Test fun translationSearchFoldsNonAsciiCase() = runTest {
+        // Turkish "İ" lower-cases to "i̇" in Kotlin; a plain lower-case query must still match.
+        val upper = repo.searchTranslation("tr.diyanet", "ALLAH", limit = 100)
+        val lower = repo.searchTranslation("tr.diyanet", "allah", limit = 100)
+        assertEquals(upper.map { it.surah to it.ayah }, lower.map { it.surah to it.ayah })
+        assertTrue(upper.isNotEmpty())
+    }
+
     companion object {
         /**
          * The Gradle test working directory is the module directory (`shared/`), so the resource

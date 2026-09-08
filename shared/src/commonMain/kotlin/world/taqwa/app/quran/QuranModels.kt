@@ -21,6 +21,10 @@ fun Surah.displayName(rtl: Boolean): String = if (rtl) nameArabic else nameLatin
 
 data class Ayah(val surah: Int, val number: Int, val text: String, val page: Int, val juz: Int, val hizbQuarter: Int, val sajdah: Int)
 
+/** One search result (spec 2b §2.1): the ayah's own Arabic and, for a translation hit, the
+ * translation text the match was found in. */
+data class SearchHit(val surah: Int, val ayah: Int, val arabic: String, val translation: String?)
+
 data class Juz(val number: Int, val startSurah: Int, val startAyah: Int)
 
 enum class TextKind { TRANSLATION, TAFSIR, TRANSLITERATION }

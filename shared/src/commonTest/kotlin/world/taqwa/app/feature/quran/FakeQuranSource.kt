@@ -4,7 +4,10 @@ import world.taqwa.app.quran.Ayah
 import world.taqwa.app.quran.Juz
 import world.taqwa.app.quran.MushafPage
 import world.taqwa.app.quran.QuranSource
+import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.Revelation
+import world.taqwa.app.quran.SearchHit
+import world.taqwa.app.quran.SearchQuery
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.quran.TranslationInfo
 
@@ -60,6 +63,32 @@ internal class FakeQuranSource(
     override suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String> {
         translationLoads += translationId to surah
         return translationTextsById[translationId]?.get(surah) ?: emptyMap()
+    }
+    /** Arabic search over the configured ayahs' text, folded the same way the real FTS is (a
+     * whole-word prefix match on the normalised text is close enough for the view-model tests). */
+    override suspend fun searchArabic(query: String, limit: Int): List<SearchHit> {
+        val tokens = SearchQuery.fts(query)?.split(' ')?.map { it.trim('"', '*') } ?: return emptyList()
+        return ayahsBySurah.values.flatten()
+            .filter { ayah ->
+                val words = QuranText.normaliseForSearch(ayah.text).split(' ')
+                tokens.all { token -> words.any { it.startsWith(token) } }
+            }
+            .sortedWith(compareBy({ it.surah }, { it.number }))
+            .take(limit)
+            .map { SearchHit(it.surah, it.number, it.text, null) }
+    }
+
+    override suspend fun searchTranslation(translationId: String, query: String, limit: Int): List<SearchHit> {
+        val needle = query.trim().lowercase()
+        val texts = translationTextsById[translationId] ?: return emptyList()
+        return texts.flatMap { (surah, byAyah) -> byAyah.map { (ayah, text) -> Triple(surah, ayah, text) } }
+            .filter { (_, _, text) -> text.lowercase().contains(needle) }
+            .sortedWith(compareBy({ it.first }, { it.second }))
+            .take(limit)
+            .map { (surah, ayah, text) ->
+                val arabic = ayahsBySurah[surah]?.firstOrNull { it.number == ayah }?.text ?: ""
+                SearchHit(surah, ayah, arabic, text)
+            }
     }
     override suspend fun pageOf(surah: Int, ayah: Int): Int =
         ayahsBySurah[surah]?.firstOrNull { it.number == ayah }?.page ?: when (surah) {
