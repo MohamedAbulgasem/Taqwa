@@ -183,10 +183,15 @@ class ReaderViewModel(
             nextSurah = nextSurahInfo,
             currentAyah = currentAyah,
             caption = (ayah?.juz ?: surahInfo!!.startJuz) to (ayah?.page ?: surahInfo!!.startPage),
+            // The "en" default is unreachable and only keeps the type non-null: translationId is
+            // either NO_TRANSLATION (and then the language is never read, the cards having no
+            // translation to lay out) or an id this same catalogue was just checked to contain.
             translationLanguage = translations.firstOrNull { it.id == translationId }?.language ?: "en",
             previewAyah = previewAyahText!!,
             translations = sheetTranslations,
             bookmarked = bookmarkedAyahs,
+            // Null exactly when translation is off. Beyond that the lookup cannot miss, for
+            // translationLanguage's reason above: translationId came out of this catalogue.
             translationName = if (translationId == ReadingSettings.NO_TRANSLATION) {
                 null
             } else {

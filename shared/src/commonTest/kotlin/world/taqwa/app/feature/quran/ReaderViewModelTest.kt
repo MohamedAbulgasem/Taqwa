@@ -40,8 +40,13 @@ import kotlin.test.assertNull
  */
 class ReaderViewModelTest {
 
+    /** A fresh file per store, for [bookmarks]' reason and one of its own: a settings file left
+     * behind by an earlier run would hand the next one whatever that run last wrote, so a test
+     * that says nothing about the translation id would silently inherit one. */
     private fun settingsRepo(name: String) = SettingsRepository(
-        PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-reader-test-$name.preferences_pb".toPath() },
+        PreferenceDataStoreFactory.createWithPath {
+            "/tmp/taqwa-reader-test-$name-${Random.nextULong()}.preferences_pb".toPath()
+        },
     )
 
     /** A fresh file per store, as in [QuranRootViewModelTest]: [BookmarkStore.toggle] is a toggle,
@@ -343,8 +348,9 @@ class ReaderViewModelTest {
     @Test
     fun shareTextCarriesTheTranslationOnlyWhenOneIsShown() = runTest {
         val repo = settingsRepo("share-with")
-        // Written explicitly: this file outlives the run, and the test's own last act is to turn
-        // the translation off — so the starting point has to be stated, not inherited.
+        // The store is fresh per run and en.sahih is the default anyway, so this write changes
+        // nothing — it states the starting point the assertions below read against, since the
+        // test's own last act is to turn the translation off.
         repo.setReadingSettings(ReadingSettings(translationId = "en.sahih"))
         val vm = ReaderViewModel(source(), repo, bookmarks("share-with"), "en", surah = 2)
         vm.start(backgroundScope)

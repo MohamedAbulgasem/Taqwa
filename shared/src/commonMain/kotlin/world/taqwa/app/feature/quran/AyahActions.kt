@@ -47,12 +47,16 @@ private const val COPIED_LABEL_MS = 1_500L
  *
  * [bookmarked] comes from [ReaderUiState.Ready.bookmarked], i.e. from the store, so the glyph and
  * the label follow what was actually written rather than an optimistic local flip.
+ *
+ * [onCopy] answers whether text actually reached the clipboard — there is none before the surah
+ * has loaded, or for an ayah it does not hold — and only a true answer turns the label into
+ * "Copied", so the one piece of feedback the row gives is never a lie.
  */
 @Composable
 fun AyahActions(
     bookmarked: Boolean,
     onBookmark: () -> Unit,
-    onCopy: () -> Unit,
+    onCopy: () -> Boolean,
     onShare: () -> Unit,
 ) {
     // Keyed on a tap counter rather than on `copied` itself: a second tap while the label still
@@ -77,24 +81,18 @@ fun AyahActions(
         AyahActionButton(
             glyph = { tint -> drawBookmark(tint, filled = bookmarked) },
             label = bookmarkLabel,
-            contentDescription = bookmarkLabel,
             onClick = onBookmark,
         )
         val copyLabel = stringResource(if (copied) Res.string.quran_action_copied else Res.string.quran_action_copy)
         AyahActionButton(
             glyph = { tint -> drawCopy(tint) },
             label = copyLabel,
-            contentDescription = copyLabel,
-            onClick = {
-                onCopy()
-                copyTaps++
-            },
+            onClick = { if (onCopy()) copyTaps++ },
         )
         val shareLabel = stringResource(Res.string.quran_action_share)
         AyahActionButton(
             glyph = { tint -> drawShare(tint) },
             label = shareLabel,
-            contentDescription = shareLabel,
             onClick = onShare,
         )
     }
@@ -106,19 +104,23 @@ fun AyahActions(
  *
  * Shared with the Mushaf's reference pill (spec 2b §2.5), which passes `label = null`: there the
  * button is a 44 dp square holding the glyph alone, so it says what it is through
- * [contentDescription] instead of through a caption the pill has no room for.
+ * [contentDescription] instead of through a caption the pill has no room for. With a [label] the
+ * Text already carries the same words, so [contentDescription] is not only unnecessary there but
+ * would have a screen reader say them twice — hence it defaults to null and is required, loudly,
+ * only on the glyph-only path.
  */
 @Composable
 internal fun AyahActionButton(
     glyph: DrawScope.(Color) -> Unit,
     label: String?,
-    contentDescription: String,
     onClick: () -> Unit,
+    contentDescription: String? = null,
 ) {
     val colors = LocalTaqwaColors.current
     // Read out here: inside a `semantics` block the name resolves to the write-only semantics
     // property, not to this parameter.
-    val description = contentDescription
+    val description =
+        if (label != null) null else requireNotNull(contentDescription) { "a glyph-only action needs a contentDescription" }
     Row(
         Modifier
             .height(44.dp)
@@ -128,9 +130,7 @@ internal fun AyahActionButton(
                 indication = null,
                 onClick = onClick,
             )
-            // Only without a label: with one, the Text already carries the same words and a
-            // description here would have a screen reader say them twice.
-            .then(if (label == null) Modifier.semantics { this.contentDescription = description } else Modifier),
+            .then(if (description == null) Modifier else Modifier.semantics { this.contentDescription = description }),
         horizontalArrangement = if (label == null) Arrangement.Center else Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -99,6 +97,11 @@ fun ReaderScreen(
     var showSheet by remember { mutableStateOf(false) }
     // The clipboard and the share sheet are the screen's own business (spec 2b §2.3): the view
     // model only produces the text.
+    // LocalClipboardManager is deprecated in Compose MP 1.12 in favour of LocalClipboard, but its
+    // replacement takes a ClipEntry, which has no common constructor — only foundation's own
+    // internal AnnotatedString.toClipEntry() builds a plain-text one. Migrating therefore needs an
+    // expect/actual of our own on both targets; tracked as the clipboard follow-up in slice 2c.
+    @Suppress("DEPRECATION")
     val clipboard = LocalClipboardManager.current
 
     // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move
@@ -191,7 +194,13 @@ fun ReaderScreen(
                                 AyahActions(
                                     bookmarked = ayah.number in ready.bookmarked,
                                     onBookmark = { onToggleBookmark(ayah.number) },
-                                    onCopy = { shareTextFor(ayah.number)?.let { clipboard.setText(AnnotatedString(it)) } },
+                                    // Answers the row, which only says "Copied" when something
+                                    // actually was: null here means the text was not available.
+                                    onCopy = {
+                                        val copy = shareTextFor(ayah.number)
+                                        if (copy != null) clipboard.setText(AnnotatedString(copy))
+                                        copy != null
+                                    },
                                     onShare = { shareTextFor(ayah.number)?.let(::shareText) },
                                 )
                             }
