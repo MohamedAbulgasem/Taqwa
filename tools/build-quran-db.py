@@ -584,6 +584,7 @@ def verify(conn: sqlite3.Connection):
     assert one("SELECT juz FROM ayah WHERE surah=114 AND number=6") == 30
     assert one("SELECT count(*) FROM ayah_fts WHERE ayah_fts MATCH 'الحمد'") >= 20
     verify_mushaf_text(conn)
+    verify_iqlab_marks(conn)
     verify_glyphs(conn)
     assert one("PRAGMA user_version") == USER_VERSION
     print("verify: ok")
@@ -626,6 +627,51 @@ def verify_mushaf_text(conn: sqlite3.Connection):
         count += 1
     assert count == 6236
     print(f"  mushaf text: all {count} ayahs match text_uthmani word for word")
+
+
+ARABIC_LETTERS = set(chr(c) for c in range(0x0621, 0x063B)) | set(chr(c) for c in range(0x0641, 0x064B)) | {"\u0671"}
+SMALL_MEEMS = "\u06e2\u06ed"   # small high meem, small low meem: the printed Mushaf's iqlab sign
+FATHATAN = "\u064b"
+BEH = "\u0628"
+
+
+def verify_iqlab_marks(conn: sqlite3.Connection):
+    """Every small meem in the text is an iqlab sign and sits where the Madinah Mushaf puts one: on
+    a noon sakinah or a tanween whose next sounded letter is a beh -- in the same word, in the next
+    word, at the start of the next ayah, or (at a surah's last ayah) in the basmala that follows
+    when recitation continues. A fathatan's own silent alef is skipped. The review of 8 September
+    2026 asked for exactly this sweep after a stray meem was suspected; the Tanzil text passes it
+    in full, and this keeps it that way."""
+    rows = conn.execute("SELECT surah, number, text_uthmani FROM ayah ORDER BY surah, number").fetchall()
+    last_ayah = {}
+    for s, a, _ in rows:
+        last_ayah[s] = max(last_ayah.get(s, 0), a)
+    text_of = {(s, a): t for s, a, t in rows}
+
+    def first_letter(t: str):
+        return next((c for c in t if c in ARABIC_LETTERS), None)
+
+    total = 0
+    bad = []
+    for s, a, t in rows:
+        for i, c in enumerate(t):
+            if c not in SMALL_MEEMS:
+                continue
+            total += 1
+            letters = [ch for ch in t[i + 1:] if ch in ARABIC_LETTERS]
+            if letters and letters[0] in "\u0627\u0649" and t[i - 1] == FATHATAN:
+                letters = letters[1:]
+            if letters:
+                ok = letters[0] == BEH
+            elif a < last_ayah[s]:
+                ok = first_letter(text_of[(s, a + 1)]) == BEH
+            else:
+                ok = True  # the next surah's basmala begins with beh
+            if not ok:
+                bad.append((s, a, t[max(0, i - 12):i + 8]))
+    assert total == 609, f"expected 609 small meems in the text, found {total}"
+    assert not bad, f"{len(bad)} small meem(s) not before a beh: {bad[:5]}"
+    print(f"  iqlab: all {total} small meems sit before a beh")
 
 
 def verify_glyphs(conn: sqlite3.Connection):
