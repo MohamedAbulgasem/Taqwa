@@ -595,3 +595,42 @@ Left for the morning review: word-spacing justification of Mushaf lines (they fi
 as far as the auto-sized font allows, so short lines leave a ragged left edge); under an Arabic UI
 the surah rows still lead with the transliterated Latin name and English meaning; Tanzil's Latin
 surah spellings (Al-Faatiha, Aal-i-Imraan) may deserve a curated list.
+
+### Slice 2a - morning review round (8 September, evening)
+
+Mohamed's review of the slice on his phone came back with five items. The heavy one was the
+Mushaf page: lines at visibly different sizes, and "strange characters" ringed on page 2.
+
+**The characters.** Two separate things. The `ۛ` (three dots), `ۖ` (صلے) and friends are the
+printed Mushaf's own pause marks; Tanzil writes them as space-separated tokens and the font floats
+them between the words, which is how the Madinah page shows them. The genuinely wrong marks were a
+small meem under "هُدًى": the layout source (quran.com's word data) encodes the sequential tanween
+the printed page uses before idgham and ikhfa letters as tanween plus a small-meem sign
+(U+06E2/U+06ED, 6,642 words across the Quran), which the KFGQPC Hafs font draws as a literal meem.
+Tanzil's text, which the card reader already showed, does not carry them. The pipeline now trusts
+the layout only for segmentation and re-texts every Mushaf word from Tanzil (aligned by bare
+letters; a layout word may span two Tanzil tokens), so both modes show the same characters, and the
+build proves it: all 6,236 ayahs' Mushaf words joined equal `ayah.text_uthmani` byte for byte,
+every character sits in the Quranic code-point set, and with `uharfbuzz` installed every stored
+line, word and ayah (92,485 runs) shapes with the bundled font without a missing glyph or a dotted
+circle. The database is `user_version` 2; the Android driver had to open the file at that version
+rather than SQLDelight's schema version or the framework threw `onDowngrade` (caught on the S23
+on the first install, fixed before the round).
+
+**The sizes.** The per-line auto-shrink was the cause. The page now takes one size: every text
+line is measured at the width-derived base, the page is set at the largest half-step at which its
+widest line fits, and each line's words are measured individually and spread across the frame by
+word spacing, so the page reads at one size with every line filled to the margin like the printed
+one. On the S23 most pages land around 19 to 21 sp; pages 1 and 2 stay at the base. The old
+word-spacing follow-up is closed by the same change.
+
+**The rest**, done by a parallel agent in a worktree and merged: continue card roomier with a gap
+between name and detail; the surah and juz list caps no longer stroke a hairline across the first
+and last rows; Quran and Settings titles sit 24 dp below the status bar (Prayer's is 12) instead
+of 68; the Android status-bar icon is the mihrab silhouette from the app icon; the reading sheet
+scrolls, clears the gesture bar, and names each translation's language in the device's UI language
+(`PlatformFormat.languageName`, CLDR on both platforms, an English map as fallback).
+
+Noticed on the way, not changed: filtering the surah list by "Mursalat" finds nothing because
+Tanzil spells it "Al-Mursalaat"; the curated Latin names follow-up would fix that too. Android's
+CLDR name for `bn` under an English UI is "Bangla", so that is what the picker says.

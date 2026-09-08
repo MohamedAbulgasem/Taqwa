@@ -267,22 +267,23 @@ fun ReadingSheet(
             }
         }
 
-        TaqwaRow(
-            label = stringResource(Res.string.quran_sheet_mode),
-            trailing = {
-                TaqwaSegmented(
-                    options = listOf(
-                        stringResource(Res.string.quran_mode_translation),
-                        stringResource(Res.string.quran_mode_mushaf),
-                    ),
-                    selectedIndex = if (settings.mode == ReadingMode.MUSHAF) 1 else 0,
-                    onSelect = { index ->
-                        val newMode = if (index == 0) ReadingMode.TRANSLATION else ReadingMode.MUSHAF
-                        if (newMode != settings.mode) onChange(settings.copy(mode = newMode))
-                        onDismiss()
-                    },
-                )
-            },
-        )
+        // The switch sits under its label rather than beside it: beside, the two-option pill left
+        // "Reading mode" (and its Arabic) about 120 dp on a phone, which wrapped the label onto
+        // two lines. Under, it is the same full-width control the Quran root's Surah | Juz switch is.
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            TaqwaRow(label = stringResource(Res.string.quran_sheet_mode))
+            TaqwaSegmented(
+                options = listOf(
+                    stringResource(Res.string.quran_mode_translation),
+                    stringResource(Res.string.quran_mode_mushaf),
+                ),
+                selectedIndex = if (settings.mode == ReadingMode.MUSHAF) 1 else 0,
+                onSelect = { index ->
+                    val newMode = if (index == 0) ReadingMode.TRANSLATION else ReadingMode.MUSHAF
+                    if (newMode != settings.mode) onChange(settings.copy(mode = newMode))
+                    onDismiss()
+                },
+            )
+        }
     }
 }
