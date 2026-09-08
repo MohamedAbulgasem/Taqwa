@@ -214,6 +214,8 @@
     <string name="quran_sheet_size">حجم النص العربي</string>
     <string name="quran_sheet_transliteration">النطق بالحروف اللاتينية</string>
     <string name="quran_sheet_translation">الترجمة</string>
+    <string name="quran_translation_off">بدون ترجمة</string>
+    <string name="quran_translation_off_detail">النص العربي فقط، آية في كل بطاقة</string>
     <string name="quran_sheet_mode">وضع القراءة</string>
     <string name="quran_mode_translation">ترجمة</string>
     <string name="quran_mode_mushaf">مصحف</string>

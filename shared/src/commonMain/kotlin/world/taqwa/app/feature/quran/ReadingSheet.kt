@@ -56,6 +56,8 @@ import world.taqwa.app.resources.quran_mode_translation
 import world.taqwa.app.resources.quran_sheet_mode
 import world.taqwa.app.resources.quran_sheet_size
 import world.taqwa.app.resources.quran_sheet_translation
+import world.taqwa.app.resources.quran_translation_off_detail
+import world.taqwa.app.resources.quran_translation_off
 import world.taqwa.app.resources.quran_sheet_transliteration
 import world.taqwa.app.resources.quran_size_mushaf_note
 import kotlin.math.roundToInt
@@ -224,21 +226,39 @@ fun ReadingSheet(
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            val off = settings.translationId == ReadingSettings.NO_TRANSLATION
             val current = translations.firstOrNull { it.id == settings.translationId }
             // What the reader actually loads when the stored id is not bundled (ReaderViewModel
             // falls back to Saheeh International), so the check mark agrees with the text shown.
-            val effectiveId = current?.id ?: FALLBACK_TRANSLATION_ID
+            val effectiveId = if (off) ReadingSettings.NO_TRANSLATION else current?.id ?: FALLBACK_TRANSLATION_ID
             TaqwaRow(
                 label = stringResource(Res.string.quran_sheet_translation),
-                value = current?.name ?: FALLBACK_TRANSLATION_NAME,
+                value = if (off) stringResource(Res.string.quran_translation_off) else current?.name ?: FALLBACK_TRANSLATION_NAME,
                 onClick = { translationExpanded = !translationExpanded },
                 // The list unfolding beneath is the tap's feedback; a ripple would be a second one.
                 ripple = false,
             )
             if (translationExpanded) {
                 TaqwaCard {
-                    translations.forEachIndexed { index, info ->
-                        if (index > 0) CardDivider()
+                    // Translation off comes first: it is the one choice that is not a translation,
+                    // and an Arabic reader who wants the cards without any text beneath should not
+                    // have to scroll past seven languages to find it.
+                    TaqwaRow(
+                        label = stringResource(Res.string.quran_translation_off),
+                        subtitle = stringResource(Res.string.quran_translation_off_detail),
+                        selectable = true,
+                        onClick = {
+                            onChange(settings.copy(translationId = ReadingSettings.NO_TRANSLATION))
+                            translationExpanded = false
+                        },
+                        trailing = {
+                            Box(Modifier.size(CheckMarkSize), contentAlignment = Alignment.Center) {
+                                if (off) CheckMark()
+                            }
+                        },
+                    )
+                    translations.forEach { info ->
+                        CardDivider()
                         TaqwaRow(
                             label = info.name,
                             subtitle = info.translator,

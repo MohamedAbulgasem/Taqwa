@@ -51,18 +51,18 @@ The mode toggle preserves position: translation → Mushaf opens the page contai
 
 ### 2.5 Reading settings sheet
 
-A modal bottom sheet in the app's surface colour with a grab handle, opened by Aa:
+A modal bottom sheet (`TaqwaBottomSheet`: the app's background colour, no tonal tint, the hairline grab handle; the same component hosts every sheet in the app), opened by Aa:
 
 1. **Arabic size**: slider 22 to 40 sp in 2 sp steps, value shown, live preview line (Al-Fatiha ayah 2 in the Mushaf font at that size).
 2. **Transliteration**: `TaqwaToggle`. Off by default.
-3. **Translation**: a row with the current name; tapping expands the list of bundled translations (name, translator, language) with a check mark on the current one.
+3. **Translation**: a row with the current name (or "Off"); tapping expands a list whose first entry is **Off** (Arabic only, every ayah still on its own card; stored as the sentinel id `none`, never fallen back from) followed by the bundled translations (name, translator, language in the UI language) with a check mark on the current one.
 4. **Reading mode**: Translation | Mushaf segmented control; switching applies immediately and closes the sheet.
 
 Defaults: English UI → Saheeh International, Translation mode, transliteration off. Arabic UI → Tafsir al-Muyassar, Mushaf mode, transliteration off. Under other languages the bundled translation for that language if there is one (Indonesian, Urdu, Bengali, Turkish, French), else Saheeh International.
 
 ### 2.6 Tab bar
 
-Three tabs: Prayer (mihrab), Quran (open book), Settings (gear). Glyphs 22 dp, label 12 sp semibold, 5 dp between them, bar content height 60 dp plus the navigation inset. Selected: accent. Unselected: **secondary text colour** (`textSecondary`), not tertiary. Back from Quran or Settings root goes to Prayer, as today.
+Three tabs: Prayer (mihrab), Quran (open book), Settings (sliders; the gear never sat with the other two). Glyphs 22 dp, label 12 sp semibold, 5 dp between them, bar content height 60 dp plus the navigation inset. Selected: accent. Unselected: **secondary text colour** (`textSecondary`), not tertiary. Back from Quran or Settings root goes to Prayer, as today.
 
 ## 3. Data
 

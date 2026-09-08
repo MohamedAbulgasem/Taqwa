@@ -17,6 +17,7 @@ import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.assertNull
 
 /**
@@ -125,6 +126,20 @@ class ReaderViewModelTest {
         vm.start(backgroundScope)
         // The bundled en.sahih text, not an empty map from a translation id nothing provides.
         assertEquals("en 2:1", vm.awaitReady().translation[1])
+    }
+
+    @Test
+    fun translationOffLeavesTheCardsArabicOnlyAndLoadsNoText() = runTest {
+        val repo = settingsRepo("translation-off")
+        repo.setReadingSettings(ReadingSettings(translationId = ReadingSettings.NO_TRANSLATION))
+        val src = source()
+        val vm = ReaderViewModel(src, repo, "en", surah = 2)
+        vm.start(backgroundScope)
+        val ready = vm.awaitReady()
+        // Not the Saheeh fallback: "none" is the one unbundled id that means exactly what it says.
+        assertEquals(emptyMap(), ready.translation)
+        assertEquals(ReadingSettings.NO_TRANSLATION, ready.settings.translationId)
+        assertTrue(src.translationLoads.none { (id, _) -> id != "en.transliteration" })
     }
 
     @Test

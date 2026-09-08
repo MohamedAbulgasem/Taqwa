@@ -220,6 +220,8 @@
     <string name="quran_sheet_size">Arabic size</string>
     <string name="quran_sheet_transliteration">Transliteration</string>
     <string name="quran_sheet_translation">Translation</string>
+    <string name="quran_translation_off">Off</string>
+    <string name="quran_translation_off_detail">Arabic only, one ayah per card</string>
     <string name="quran_sheet_mode">Reading mode</string>
     <string name="quran_mode_translation">Translation</string>
     <string name="quran_mode_mushaf">Mushaf</string>

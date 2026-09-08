@@ -19,6 +19,10 @@ data class ReadingSettings(
     fun clamped() = copy(arabicSizeSp = arabicSizeSp.coerceIn(MIN_SIZE, MAX_SIZE))
 
     companion object {
+        /** The [translationId] meaning "no translation": each ayah keeps its card, Arabic only. A
+         * sentinel rather than an empty string so a blank preference can never be mistaken for it. */
+        const val NO_TRANSLATION = "none"
+
         const val MIN_SIZE = 22
         const val MAX_SIZE = 40
         const val SIZE_STEP = 2

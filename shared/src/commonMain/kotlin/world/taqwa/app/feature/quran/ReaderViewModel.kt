@@ -120,15 +120,16 @@ class ReaderViewModel(
         }
 
         // A translation id the sheet stored that this build no longer bundles (e.g. dropped
-        // between versions) falls back to Saheeh International rather than showing empty cards.
+        // between versions) falls back to Saheeh International rather than showing empty cards;
+        // "none" is the one id that legitimately means empty cards (spec §2.5, translation off).
         val translations = source.translations()
-        val translationId = if (translations.any { it.id == newSettings.translationId }) {
-            newSettings.translationId
-        } else {
-            "en.sahih"
+        val translationId = when {
+            newSettings.translationId == ReadingSettings.NO_TRANSLATION -> ReadingSettings.NO_TRANSLATION
+            translations.any { it.id == newSettings.translationId } -> newSettings.translationId
+            else -> "en.sahih"
         }
         if (translationId != loadedTranslationId) {
-            loadedTranslation = source.translationTexts(translationId, surah)
+            loadedTranslation = if (translationId == ReadingSettings.NO_TRANSLATION) emptyMap() else source.translationTexts(translationId, surah)
             loadedTranslationId = translationId
         }
 
