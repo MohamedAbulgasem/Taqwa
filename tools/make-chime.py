@@ -136,7 +136,7 @@ def main() -> int:
         print("ffmpeg not found; chime.ogg not written", file=sys.stderr)
 
     if shutil.which("afconvert"):
-        if run(["afconvert", "-f", "caff", "-d", "LEI16", str(wav), str(caf)]):
+        if run(["afconvert", "-f", "caff", "-d", "ima4", str(wav), str(caf)]):
             shutil.copyfile(caf, root / "iosApp/iosApp/Resources/chime.caf")
         else:
             ok = False

@@ -31,7 +31,7 @@ Regenerate with `python3 tools/make-chime.py`, which writes all three files and 
 the platform trees. It replaces a 2.40 s chime at −5 dBFS that was too quiet and too brief to be
 noticed at a desk; the Notification channel now vibrates alongside it on Android, and the channel
 id gained a `_chime2` suffix because a channel's sound is immutable once created.
-`.ogg` (Vorbis q6) for Android, `.caf` (16-bit PCM) for iOS.
+`.ogg` (Vorbis q6) for Android, `.caf` (IMA4 ADPCM, like the other clips) for iOS.
 
 ## Derived clips
 

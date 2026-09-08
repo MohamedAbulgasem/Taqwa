@@ -74,8 +74,9 @@ private val BarHeight = 60.dp
  * icon over a small semibold label, active in accent and inactive in secondary.
  *
  * Nothing mirrors by hand. The items sit in a `Row`, which resolves against
- * `LocalLayoutDirection`, so under Arabic they run from the right; all three glyphs are
- * symmetric, so the `Canvas` needs no help either.
+ * `LocalLayoutDirection`, so under Arabic they run from the right; the glyphs themselves are
+ * not mirrored: the arch and the book are symmetric, and a sliders icon reads the same in either
+ * direction, so the `Canvas` needs no help either.
  */
 @Composable
 fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Modifier) {
