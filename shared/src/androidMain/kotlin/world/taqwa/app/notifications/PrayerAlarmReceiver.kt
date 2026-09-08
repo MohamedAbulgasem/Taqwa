@@ -1,5 +1,6 @@
 package world.taqwa.app.notifications
 
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -33,20 +34,37 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val title = intent.getStringExtra(EXTRA_TITLE) ?: return
         val body = intent.getStringExtra(EXTRA_BODY) ?: return
 
+        // The scheduler's own sequential request code, not id.hashCode(): two ids that folded
+        // to the same 32-bit hash used to overwrite each other's notification.
+        val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
+
         val notification = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound))
             .setSmallIcon(notificationSmallIconResId)
             .setContentTitle(title)
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .setContentIntent(openAppIntent(context, notificationId))
             .build()
-
-        // The scheduler's own sequential request code, not id.hashCode(): two ids that folded
-        // to the same 32-bit hash used to overwrite each other's notification.
-        val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
         NotificationManagerCompat.from(context).notify(notificationId, notification)
 
         refreshWidgets(context)
+    }
+
+    /**
+     * Tapping the notification opens the app. The launcher intent rather than `MainActivity`
+     * by name: `shared` cannot see androidApp's classes, and the launcher intent is what the
+     * home screen icon fires, so the result is the same as opening the app by hand.
+     */
+    private fun openAppIntent(context: Context, requestCode: Int): PendingIntent? {
+        val launch = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return null
+        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        return PendingIntent.getActivity(
+            context,
+            requestCode,
+            launch,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
     }
 
     /**
