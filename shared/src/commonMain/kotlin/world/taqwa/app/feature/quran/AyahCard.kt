@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -32,11 +33,22 @@ import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.quran.QuranText
 
+/** Languages whose bundled translation text itself reads right-to-left (spec §5.1) — Arabic (the
+ * Muyassar tafsir), Urdu and Farsi. Everything else, including the UI's own direction, is
+ * irrelevant here: an English translation must read left-to-right even under an Arabic UI, and an
+ * Urdu one right-to-left even under an English UI. */
+private val RTL_TRANSLATION_LANGUAGES = setOf("ar", "ur", "fa")
+
 /**
  * One ayah's card (spec §2.3): the Uthmani Arabic with the ayah roundel inline, an optional
  * transliteration line, then the translation. [text] is the ayah's own database row — never
  * retyped — and the roundel is added here at render time via [QuranText.arabicIndic], per spec
  * §5.2, rather than stored in the text itself.
+ *
+ * [translationLanguage] is [translation]'s own language (spec §5.1) — the transliteration is
+ * always Latin script and so always left-to-right, but the translation paragraph must follow
+ * whatever language it is actually written in, never the surrounding UI's direction: an Arabic UI
+ * showing an English translation still reads that paragraph left-to-right, full stop at the end.
  *
  * A tap toggles a subtle selected background and nothing else yet — 2b adds the action row
  * (bookmark, share, copy) that a real selection is for; the state lives here, locally, so this
@@ -44,7 +56,14 @@ import world.taqwa.app.quran.QuranText
  * yet.
  */
 @Composable
-fun AyahCard(text: String, ayahNumber: Int, transliteration: String?, translation: String?, sizeSp: Int) {
+fun AyahCard(
+    text: String,
+    ayahNumber: Int,
+    transliteration: String?,
+    translation: String?,
+    translationLanguage: String,
+    sizeSp: Int,
+) {
     val colors = LocalTaqwaColors.current
     var selected by remember(ayahNumber) { mutableStateOf(false) }
     TaqwaCard(
@@ -77,15 +96,30 @@ fun AyahCard(text: String, ayahNumber: Int, transliteration: String?, translatio
             }
             if (transliteration != null) {
                 Spacer(Modifier.height(6.dp))
-                Text(
-                    transliteration,
-                    style = TaqwaText.caption.copy(fontSize = 13.sp, fontStyle = FontStyle.Italic),
-                    color = colors.textTertiary,
-                )
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    Text(
+                        transliteration,
+                        style = TaqwaText.caption.copy(fontSize = 13.sp, fontStyle = FontStyle.Italic),
+                        color = colors.textTertiary,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
             if (translation != null) {
                 Spacer(Modifier.height(8.dp))
-                Text(translation, style = TaqwaText.caption, color = colors.textSecondary, lineHeight = 21.sp)
+                val translationDirection =
+                    if (translationLanguage in RTL_TRANSLATION_LANGUAGES) LayoutDirection.Rtl else LayoutDirection.Ltr
+                CompositionLocalProvider(LocalLayoutDirection provides translationDirection) {
+                    Text(
+                        translation,
+                        style = TaqwaText.caption,
+                        color = colors.textSecondary,
+                        lineHeight = 21.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }

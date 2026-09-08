@@ -200,4 +200,11 @@
     <string name="quran_juz_page">الجزء %1$s · صفحة %2$s</string>
     <string name="quran_reader_aa">إعدادات القراءة</string>
     <string name="quran_reader_mushaf">المصحف</string>
+    <string name="quran_sheet_size">حجم النص العربي</string>
+    <string name="quran_sheet_transliteration">النطق بالحروف اللاتينية</string>
+    <string name="quran_sheet_translation">الترجمة</string>
+    <string name="quran_sheet_mode">وضع القراءة</string>
+    <string name="quran_mode_translation">ترجمة</string>
+    <string name="quran_mode_mushaf">مصحف</string>
+    <string name="quran_size_mushaf_note">حجم الصفحة يتبع عرض الشاشة في وضع المصحف.</string>
 </resources>

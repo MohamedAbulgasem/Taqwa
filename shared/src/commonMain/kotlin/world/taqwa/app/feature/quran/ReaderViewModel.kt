@@ -9,10 +9,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import world.taqwa.app.quran.Ayah
 import world.taqwa.app.quran.QuranSource
+import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Surah
+import world.taqwa.app.quran.TextKind
+import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.settings.SettingsRepository
 
 sealed interface ReaderUiState {
@@ -32,6 +35,15 @@ sealed interface ReaderUiState {
         val currentAyah: Int,
         /** Juz, then page — the caption's two numbers (spec §2.2), formatted by the screen. */
         val caption: Pair<Int, Int>,
+        /** The language of [translation]'s current text, for the reading direction the translation
+         * paragraph itself is drawn in (spec §5.1) — never the UI's own direction. */
+        val translationLanguage: String,
+        /** Ayah 1:2 with the ayah marker, read from the database like [basmala] — the reading-settings
+         * sheet's (task 7) live size preview, never a literal. */
+        val previewAyah: String,
+        /** The reading-settings sheet's translation picker (task 7, spec §2.5): every bundled text
+         * except the transliteration, tafsir first then the rest by language. */
+        val translations: List<TranslationInfo>,
     ) : ReaderUiState
 }
 
@@ -75,6 +87,7 @@ class ReaderViewModel(
     private var ayahList: List<Ayah>? = null
     private var basmalaText: String? = null
     private var nextSurahInfo: Surah? = null
+    private var previewAyahText: String? = null
 
     private var loadedTranslationId: String? = null
     private var loadedTranslation: Map<Int, String> = emptyMap()
@@ -94,8 +107,13 @@ class ReaderViewModel(
         if (surahInfo == null) {
             surahInfo = source.surah(surah)
             ayahList = source.ayahs(surah)
-            basmalaText = if (surah in SURAHS_WITHOUT_A_LEADING_BASMALA) null else source.ayahs(1).first().text
             nextSurahInfo = if (surah < 114) source.surah(surah + 1) else null
+            // Al-Faatiha's own ayahs, fetched once regardless of which surah is open: ayah 1 for
+            // the basmala (spec §2.3), ayah 2 for the reading-settings sheet's size preview
+            // (task 7, spec §2.5) — never a literal, either way.
+            val alFatiha = source.ayahs(1)
+            basmalaText = if (surah in SURAHS_WITHOUT_A_LEADING_BASMALA) null else alFatiha.first().text
+            previewAyahText = QuranText.withMarker(alFatiha[1].text, 2)
         }
 
         // A translation id the sheet stored that this build no longer bundles (e.g. dropped
@@ -125,6 +143,7 @@ class ReaderViewModel(
         val ayahs = ayahList.orEmpty()
         val currentAyah = previous?.currentAyah ?: 1
         val ayah = ayahs.firstOrNull { it.number == currentAyah } ?: ayahs.firstOrNull()
+        val sheetTranslations = orderForSheet(translations.filter { it.kind != TextKind.TRANSLITERATION })
         _state.value = ReaderUiState.Ready(
             surah = surahInfo!!,
             basmala = basmalaText,
@@ -135,7 +154,20 @@ class ReaderViewModel(
             nextSurah = nextSurahInfo,
             currentAyah = currentAyah,
             caption = (ayah?.juz ?: surahInfo!!.startJuz) to (ayah?.page ?: surahInfo!!.startPage),
+            translationLanguage = translations.firstOrNull { it.id == translationId }?.language ?: "en",
+            previewAyah = previewAyahText!!,
+            translations = sheetTranslations,
         )
+    }
+
+    /**
+     * Persists a change made in the reading-settings sheet (task 7): writes through
+     * [SettingsRepository.setReadingSettings] on the scope handed to [start], and [applySettings]
+     * picks the change straight back up through the same collection [start] already subscribes
+     * to — this never touches [_state] directly, exactly like [switchToMushaf].
+     */
+    fun updateSettings(newSettings: ReadingSettings) {
+        scope?.launch { settings.setReadingSettings(newSettings) }
     }
 
     /**

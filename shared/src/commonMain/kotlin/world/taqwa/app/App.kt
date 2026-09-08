@@ -283,9 +283,7 @@ fun App(container: AppContainer) {
                                         navigator.replace(Screen.Mushaf(page))
                                     }
                                 },
-                                onOpenSheet = {
-                                    // TODO(slice2a task 7): open the reading-settings sheet.
-                                },
+                                onChangeSettings = viewModel::updateSettings,
                                 onFirstVisibleAyah = viewModel::onFirstVisibleAyah,
                                 onOpenNextSurah = { next -> navigator.replace(Screen.Reader(next, 1)) },
                             )

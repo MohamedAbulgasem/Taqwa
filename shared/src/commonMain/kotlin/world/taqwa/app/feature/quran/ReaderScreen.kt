@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,14 +20,21 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -44,6 +52,8 @@ import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.quran.ReadingMode
+import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_next_surah
@@ -55,13 +65,14 @@ import world.taqwa.app.resources.quran_next_surah
  * there; after that, [ReaderViewModel.onFirstVisibleAyah] tracks whatever the user actually scrolls
  * to, which is why it is a plain constructor-time value here rather than part of [state].
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen(
     state: ReaderUiState,
     initialAyah: Int,
     onBack: () -> Unit,
     onToggleMode: () -> Unit,
-    onOpenSheet: () -> Unit,
+    onChangeSettings: (ReadingSettings) -> Unit,
     onFirstVisibleAyah: (Int) -> Unit,
     onOpenNextSurah: (Int) -> Unit,
 ) {
@@ -69,6 +80,10 @@ fun ReaderScreen(
     val arabic = isRtlLocale()
     val format = LocalPlatformFormat.current
     val ready = state as? ReaderUiState.Ready
+    // The reading-settings sheet (task 7, spec §2.5) is hosted here rather than by the caller: the
+    // Aa button is this screen's own affordance, and the Mushaf screen (task 8) will host its own
+    // instance of [ReadingSheet] the same way, since only each screen knows its own [mushafMode].
+    var showSheet by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize().background(colors.background).windowInsetsPadding(WindowInsets.systemBars)) {
         ReaderHeader(
@@ -83,7 +98,7 @@ fun ReaderScreen(
             mushafSelected = false,
             onBack = onBack,
             onToggleMode = onToggleMode,
-            onOpenSheet = onOpenSheet,
+            onOpenSheet = { showSheet = true },
         )
 
         if (ready == null) return@Column
@@ -138,6 +153,7 @@ fun ReaderScreen(
                     ayahNumber = ayah.number,
                     transliteration = ready.transliteration?.get(ayah.number),
                     translation = ready.translation[ayah.number],
+                    translationLanguage = ready.translationLanguage,
                     sizeSp = ready.settings.arabicSizeSp,
                 )
             }
@@ -147,7 +163,51 @@ fun ReaderScreen(
                 }
             }
         }
+
+        if (showSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showSheet = false },
+                containerColor = colors.surface,
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                dragHandle = { SheetDragHandle() },
+            ) {
+                ReadingSheet(
+                    settings = ready.settings,
+                    translations = ready.translations,
+                    previewAyah = ready.previewAyah,
+                    mushafMode = false,
+                    onChange = { newSettings ->
+                        if (newSettings.mode == ReadingMode.MUSHAF) {
+                            // The reader's own mode-toggle path already persists mode = MUSHAF and
+                            // navigates (App.kt), so this never also writes it through
+                            // [onChangeSettings] — that would be a redundant, and momentarily
+                            // stale, second write.
+                            showSheet = false
+                            onToggleMode()
+                        } else {
+                            onChangeSettings(newSettings)
+                        }
+                    },
+                    onDismiss = { showSheet = false },
+                )
+            }
+        }
     }
+}
+
+/** The reading-settings sheet's grab handle (spec §2.5): a plain 36×4 dp pill in the hairline
+ * colour, replacing material3's own default drag handle so it matches the rest of the app's
+ * hairline-drawn chrome rather than the library's default grey. */
+@Composable
+private fun SheetDragHandle() {
+    val colors = LocalTaqwaColors.current
+    Box(
+        Modifier
+            .padding(vertical = 12.dp)
+            .size(width = 36.dp, height = 4.dp)
+            .clip(RoundedCornerShape(2.dp))
+            .background(colors.hairline),
+    )
 }
 
 /** The "next surah" footer card (spec §2.3): none after An-Nas, since [ReaderUiState.Ready.nextSurah]

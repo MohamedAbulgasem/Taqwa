@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import world.taqwa.app.quran.Ayah
 import world.taqwa.app.quran.Juz
+import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Revelation
@@ -52,6 +53,9 @@ class ReaderViewModelTest {
     )
 
     private val sahih = TranslationInfo("en.sahih", "en", "Saheeh International", "Saheeh International", "licence", "url", TextKind.TRANSLATION)
+    private val tafsir = TranslationInfo("ar.muyassar", "ar", "Tafsir al-Muyassar", "King Fahd Complex", "licence", "url", TextKind.TAFSIR)
+    private val french = TranslationInfo("fr.hamidullah", "fr", "Hamidullah", "Hamidullah", "licence", "url", TextKind.TRANSLATION)
+    private val transliterationInfo = TranslationInfo("en.transliteration", "en", "Transliteration", "-", "licence", "url", TextKind.TRANSLITERATION)
 
     private fun source(
         ayahsBySurah: Map<Int, List<Ayah>> = mapOf(
@@ -106,7 +110,11 @@ class ReaderViewModelTest {
         repo.setReadingSettings(ReadingSettings(translationId = "en.sahih"))
         val vm = ReaderViewModel(source(), repo, "en", surah = 2)
         vm.start(backgroundScope)
-        assertEquals("en 2:1", vm.awaitReady().translation[1])
+        val ready = vm.awaitReady()
+        assertEquals("en 2:1", ready.translation[1])
+        // The exposed translations list carries the same id's own name (spec §2.5's sheet reads
+        // this rather than a literal), not just whatever text was fetched for the cards.
+        assertEquals("Saheeh International", ready.translations.first { it.id == ready.settings.translationId }.name)
     }
 
     @Test
@@ -210,5 +218,53 @@ class ReaderViewModelTest {
         val ready = vm.state.first { (it as? ReaderUiState.Ready)?.currentAyah == 5 } as ReaderUiState.Ready
         val ayah5 = src.ayahs(2).first { it.number == 5 }
         assertEquals(ayah5.juz to ayah5.page, ready.caption)
+    }
+
+    @Test
+    fun orderForSheetPutsTafsirFirstThenSortsTheRestByLanguage() {
+        // The pure function directly, per an already-filtered list (no transliteration) — the
+        // shape [ReaderViewModel] itself feeds it, and the easiest place to pin the grouping rule.
+        val ordered = orderForSheet(listOf(french, sahih, tafsir))
+        assertEquals(listOf(tafsir, sahih, french), ordered)
+    }
+
+    @Test
+    fun previewAyahIsAlFatihaAyahTwoWithTheRoundel() = runTest {
+        val src = source()
+        val vm = ReaderViewModel(src, settingsRepo("preview-ayah"), "en", surah = 2)
+        vm.start(backgroundScope)
+        val expected = QuranText.withMarker(src.ayahs(1)[1].text, 2)
+        assertEquals(expected, vm.awaitReady().previewAyah)
+    }
+
+    @Test
+    fun previewAyahIsTheSameRegardlessOfWhichSurahIsOpen() = runTest {
+        val src = source()
+        val vm = ReaderViewModel(src, settingsRepo("preview-ayah-surah1"), "en", surah = 1)
+        vm.start(backgroundScope)
+        val expected = QuranText.withMarker(src.ayahs(1)[1].text, 2)
+        assertEquals(expected, vm.awaitReady().previewAyah)
+    }
+
+    @Test
+    fun translationsListExcludesTransliterationAndPutsTafsirFirstThenByLanguage() = runTest {
+        val src = source(translationsList = listOf(french, transliterationInfo, sahih, tafsir))
+        val vm = ReaderViewModel(src, settingsRepo("translations-order"), "en", surah = 2)
+        vm.start(backgroundScope)
+        val ids = vm.awaitReady().translations.map { it.id }
+        assertEquals(listOf("ar.muyassar", "en.sahih", "fr.hamidullah"), ids)
+    }
+
+    @Test
+    fun updateSettingsPersistsThroughTheRepositoryAndReEmits() = runTest {
+        val repo = settingsRepo("update-settings")
+        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        vm.start(backgroundScope)
+        val ready = vm.awaitReady()
+
+        vm.updateSettings(ready.settings.copy(arabicSizeSp = 34))
+        val updated = vm.state.first { (it as? ReaderUiState.Ready)?.settings?.arabicSizeSp == 34 } as ReaderUiState.Ready
+        assertEquals(34, updated.settings.arabicSizeSp)
+        assertEquals(34, repo.readingSettings("en").first().arabicSizeSp)
     }
 }
