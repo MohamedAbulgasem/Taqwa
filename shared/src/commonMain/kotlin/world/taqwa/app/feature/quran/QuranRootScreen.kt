@@ -27,11 +27,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,8 +41,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,27 +58,37 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaSegmented
+import world.taqwa.app.design.components.drawBookmark
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
+import world.taqwa.app.feature.settings.SectionLabel
 import world.taqwa.app.feature.settings.SettingsGutter
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.Revelation
+import world.taqwa.app.quran.SearchHit
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.quran.displayName
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.quran_ayah_n
+import world.taqwa.app.resources.quran_bookmarks_empty
 import world.taqwa.app.resources.quran_continue
 import world.taqwa.app.resources.quran_continue_detail
 import world.taqwa.app.resources.quran_juz_n
+import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_juz_range
 import world.taqwa.app.resources.quran_madani
 import world.taqwa.app.resources.quran_makki
+import world.taqwa.app.resources.quran_search_empty
 import world.taqwa.app.resources.quran_search_hint
+import world.taqwa.app.resources.quran_section_ayahs
+import world.taqwa.app.resources.quran_section_surahs
 import world.taqwa.app.resources.quran_surah_subtitle
 import world.taqwa.app.resources.quran_surah_subtitle_arabic_ui
+import world.taqwa.app.resources.quran_tab_bookmarks
 import world.taqwa.app.resources.quran_tab_juz
 import world.taqwa.app.resources.quran_tab_surah
 import world.taqwa.app.resources.quran_title
@@ -85,11 +98,20 @@ import world.taqwa.app.resources.quran_title
  * [TaqwaCard], see [CardTopCap] and [CardBottomCap]. */
 private val CardCorner = 18.dp
 
+/** How many surah rows the search's Surahs section keeps (spec 2b §2.1). A query of two letters or
+ * more is aimed at the ayahs; the surah matches stay as a short shortcut above them. */
+private const val SURAH_RESULTS = 5
+
 /**
  * The Quran tab root (spec §2.1, "Root A"): a filter field, an optional continue-reading card, a
- * Surah | Juz switch, then the matching list. [pageFor] resolves the Mushaf page a tap should
- * open; it is suspend because [world.taqwa.app.quran.QuranSource.pageOf] hits the database, so a
- * tap in Mushaf mode launches its own short-lived coroutine rather than blocking composition.
+ * Surah | Juz | Bookmarks switch, then the matching list — or, while a query is being searched
+ * (spec 2b §2.1), the Surahs and Ayahs result sections in place of all three. [pageFor] resolves
+ * the Mushaf page a tap should open; it is suspend because
+ * [world.taqwa.app.quran.QuranSource.pageOf] hits the database, so a tap in Mushaf mode launches
+ * its own short-lived coroutine rather than blocking composition.
+ *
+ * [query] is the field's text, owned by the caller rather than by this screen: pushing the reader
+ * disposes the whole root, and spec 2b §2.1 wants the query still in the field on the way back.
  *
  * The whole screen is one [LazyColumn] (rather than a [SettingsScaffold]-style scrolling `Column`)
  * so the up-to-114 surah rows are only ever composed near the viewport, not all at once — the
@@ -101,21 +123,22 @@ private val CardCorner = 18.dp
 @Composable
 fun QuranRootScreen(
     state: QuranRootUiState,
-    onFilterChange: (String) -> Unit,
+    query: TextFieldValue,
+    onQueryChange: (TextFieldValue) -> Unit,
     onTabChange: (RootTab) -> Unit,
     pageFor: suspend (surah: Int, ayah: Int) -> Int,
     onOpenReader: (surah: Int, ayah: Int) -> Unit,
     onOpenMushaf: (page: Int) -> Unit,
+    onRemoveBookmark: (surah: Int, ayah: Int) -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
     val ready = state as? QuranRootUiState.Ready
     val scope = rememberCoroutineScope()
 
-    // Hoisted here, above the LazyColumn, rather than declared inside the `item` that draws the
-    // field: a LazyColumn is free to recompose or move item slots around as the row list beneath
-    // it grows and shrinks on every keystroke, and state declared at this level survives that
-    // regardless, so the field keeps both its text and its IME focus while the user types.
-    var fieldValue by remember { mutableStateOf(TextFieldValue(ready?.filter.orEmpty())) }
+    // A search hit carries its surah's number, not the surah itself, so the rows are named through
+    // one map built when the surah list changes — never per row, and never once per keystroke.
+    val surahsByNumber = remember(ready?.surahs) { ready?.surahs.orEmpty().associateBy { it.number } }
 
     // Translation mode opens the reader directly; Mushaf mode needs the page number first,
     // which only the database — through pageFor — knows.
@@ -156,41 +179,74 @@ fun QuranRootScreen(
 
         item(key = "filter") {
             Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
-                QuranSearchField(fieldValue) { newValue ->
-                    fieldValue = newValue
-                    onFilterChange(newValue.text)
-                }
+                QuranSearchField(query, onQueryChange)
             }
         }
         item(key = "filter-gap") { Spacer(Modifier.height(12.dp)) }
 
-        ready.continueCard?.let { card ->
-            item(key = "continue") {
+        if (ready.search is SearchState.Idle) {
+            ready.continueCard?.let { card ->
+                item(key = "continue") {
+                    Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
+                        ContinueReadingCard(card) { open(card.surah.number, card.ayah) }
+                    }
+                }
+                item(key = "continue-gap") { Spacer(Modifier.height(12.dp)) }
+            }
+
+            item(key = "tabs") {
                 Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
-                    ContinueReadingCard(card) { open(card.surah.number, card.ayah) }
+                    TaqwaSegmented(
+                        options = listOf(
+                            stringResource(Res.string.quran_tab_surah),
+                            stringResource(Res.string.quran_tab_juz),
+                            stringResource(Res.string.quran_tab_bookmarks),
+                        ),
+                        // The options are listed in RootTab's own order, so the switch's index is
+                        // the enum's ordinal both ways round (spec 2b §2.2: Surah | Juz | Bookmarks).
+                        selectedIndex = ready.tab.ordinal,
+                        onSelect = { onTabChange(RootTab.entries[it]) },
+                    )
                 }
             }
-            item(key = "continue-gap") { Spacer(Modifier.height(12.dp)) }
-        }
+            item(key = "tabs-gap") { Spacer(Modifier.height(12.dp)) }
 
-        item(key = "tabs") {
-            Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
-                TaqwaSegmented(
-                    options = listOf(
-                        stringResource(Res.string.quran_tab_surah),
-                        stringResource(Res.string.quran_tab_juz),
-                    ),
-                    selectedIndex = if (ready.tab == RootTab.SURAH) 0 else 1,
-                    onSelect = { onTabChange(if (it == 0) RootTab.SURAH else RootTab.JUZ) },
+            when (ready.tab) {
+                RootTab.SURAH -> surahListItems(ready.filteredSurahs) { surah -> open(surah.number, 1) }
+                RootTab.JUZ -> juzListItems(ready.juzs) { juz -> open(juz.startSurah.number, juz.startAyah) }
+                RootTab.BOOKMARKS -> bookmarkListItems(
+                    rows = ready.bookmarks,
+                    onOpen = { row -> open(row.surah.number, row.bookmark.ayah) },
+                    onRemove = onRemoveBookmark,
                 )
             }
-        }
-        item(key = "tabs-gap") { Spacer(Modifier.height(12.dp)) }
-
-        if (ready.tab == RootTab.SURAH) {
-            surahListItems(ready.filteredSurahs) { surah -> open(surah.number, 1) }
         } else {
-            juzListItems(ready.juzs) { juz -> open(juz.startSurah.number, juz.startAyah) }
+            // A query is out (spec 2b §2.1): the two result sections take the place of the
+            // continue card, the switch and whichever list it was showing, so everything under the
+            // field answers what was typed and nothing else.
+            val matches = ready.filteredSurahs
+            if (matches.isNotEmpty()) {
+                item(key = "surah-section") { SearchSectionLabel(stringResource(Res.string.quran_section_surahs)) }
+                surahListItems(matches.take(SURAH_RESULTS)) { surah -> open(surah.number, 1) }
+                item(key = "surah-section-gap") { Spacer(Modifier.height(16.dp)) }
+            }
+            // Nothing at all for the ayah section while the search is still out — a label with no
+            // count, or an empty card, would each read as "no results" for the half-second the
+            // debounce and the query take.
+            (ready.search as? SearchState.Results)?.let { results ->
+                item(key = "ayah-section") {
+                    // "100+" when capped: the hit list itself is cut at the cap, so its size is
+                    // the cap, and the plus is what says there are more.
+                    val count = format.localizedDigits(results.hits.size) + if (results.capped) "+" else ""
+                    SearchSectionLabel(stringResource(Res.string.quran_section_ayahs, count))
+                }
+                searchHitItems(
+                    hits = results.hits,
+                    surahsByNumber = surahsByNumber,
+                    query = results.query,
+                    translationLanguage = ready.translationLanguage,
+                ) { hit -> open(hit.surah, hit.ayah) }
+            }
         }
 
         item(key = "bottom-spacer") { Spacer(Modifier.height(40.dp)) }
@@ -237,6 +293,81 @@ private fun LazyListScope.juzListItems(juzs: List<JuzRow>, onOpen: (JuzRow) -> U
         }
     }
     item(key = "juz-cap-bottom") {
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
+    }
+}
+
+/**
+ * The ayah results (spec 2b §2.1), in [surahListItems]' own card shape. Unlike the surah and juz
+ * lists this one still draws its card when it is empty: "no ayahs match" is an answer to the
+ * query, and an answer belongs inside the card the results would have filled.
+ */
+private fun LazyListScope.searchHitItems(
+    hits: List<SearchHit>,
+    surahsByNumber: Map<Int, Surah>,
+    query: String,
+    translationLanguage: String,
+    onOpen: (SearchHit) -> Unit,
+) {
+    item(key = "hit-cap-top") {
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
+    }
+    if (hits.isEmpty()) {
+        item(key = "hit-empty") {
+            Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
+                CardRow { CardMessageRow(stringResource(Res.string.quran_search_empty)) }
+            }
+        }
+    } else {
+        itemsIndexed(hits, key = { _, hit -> "hit-${hit.surah}-${hit.ayah}" }) { index, hit ->
+            Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
+                Column {
+                    CardRow {
+                        SearchHitRow(hit, surahsByNumber[hit.surah], query, translationLanguage) { onOpen(hit) }
+                    }
+                    if (index != hits.lastIndex) CardDivider()
+                }
+            }
+        }
+    }
+    item(key = "hit-cap-bottom") {
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
+    }
+}
+
+/** The Bookmarks tab's list (spec 2b §2.2), in the same card shape as the two lists above it, and
+ * likewise keeping its card when empty so the "how to make one" line has somewhere to sit. */
+private fun LazyListScope.bookmarkListItems(
+    rows: List<BookmarkRow>,
+    onOpen: (BookmarkRow) -> Unit,
+    onRemove: (surah: Int, ayah: Int) -> Unit,
+) {
+    item(key = "bookmark-cap-top") {
+        Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
+    }
+    if (rows.isEmpty()) {
+        item(key = "bookmark-empty") {
+            Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
+                CardRow { CardMessageRow(stringResource(Res.string.quran_bookmarks_empty)) }
+            }
+        }
+    } else {
+        itemsIndexed(rows, key = { _, row -> "bookmark-${row.bookmark.surah}-${row.bookmark.ayah}" }) { index, row ->
+            Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) {
+                Column {
+                    CardRow {
+                        BookmarkRowView(
+                            row = row,
+                            onClick = { onOpen(row) },
+                            onRemove = { onRemove(row.bookmark.surah, row.bookmark.ayah) },
+                        )
+                    }
+                    if (index != rows.lastIndex) CardDivider()
+                }
+            }
+        }
+    }
+    item(key = "bookmark-cap-bottom") {
         Box(Modifier.contentWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
     }
 }
@@ -327,9 +458,31 @@ private fun CardRow(content: @Composable () -> Unit) {
     ) { content() }
 }
 
+/** A search section's heading (spec 2b §2.1), the same label the settings screens draw above their
+ * cards — same style, same colour, same gutter + 4 dp start inset — capped to the content width so
+ * it stays over its own card on a wide screen. Uppercased here rather than in the string so the
+ * Arabic labels keep the words as written (`uppercase()` is a no-op in Arabic script). */
+@Composable
+private fun SearchSectionLabel(text: String) {
+    Box(Modifier.contentWidth()) { SectionLabel(text.uppercase()) }
+}
+
+/** A card's one-line answer when it has no rows: "no ayahs match", "no bookmarks yet". Caption on
+ * secondary, padded like a row's own content so the text sits where a row's first line would. */
+@Composable
+private fun CardMessageRow(text: String) {
+    Text(
+        text,
+        style = TaqwaText.caption,
+        color = LocalTaqwaColors.current.textSecondary,
+        modifier = Modifier.fillMaxWidth().padding(14.dp),
+    )
+}
+
 /** The filter field (spec §2.1 point 1): a hairline card, a hand-drawn magnifier, and a placeholder.
- * [value] is a [TextFieldValue], not a bare [String] — see [QuranRootScreen]'s own hoisted state —
- * so the field's cursor position and IME composing state survive the list beneath it changing. */
+ * [value] is a [TextFieldValue], not a bare [String] — see [QuranRootScreen]'s [query] — so the
+ * field's cursor position and IME composing state survive the list beneath it changing, and the
+ * caret lands after the restored text rather than before it when the screen comes back. */
 @Composable
 private fun QuranSearchField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Unit) {
     val colors = LocalTaqwaColors.current
@@ -575,6 +728,165 @@ private fun JuzListRow(juz: JuzRow, onClick: () -> Unit) {
             textAlign = TextAlign.Right,
             maxLines = 1,
         )
+    }
+}
+
+/**
+ * One ayah result (spec 2b §2.1): its reference, the ayah itself on one line, and — for a
+ * translation hit — the translation with the query picked out of it.
+ *
+ * [surah] is nullable only because the row is named through a map: the database never returns a
+ * hit for a surah it does not have, so a missing one simply leaves the reference to stand alone
+ * rather than failing the list.
+ *
+ * [translationLanguage] is the translation's own language, not the UI's (spec §5.1) — the snippet
+ * reads in the direction it is written in, whichever way the surrounding screen runs.
+ */
+@Composable
+private fun SearchHitRow(
+    hit: SearchHit,
+    surah: Surah?,
+    query: String,
+    translationLanguage: String,
+    onClick: () -> Unit,
+) {
+    val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+    val arabic = isRtlLocale()
+    val reference = "${format.localizedDigits(hit.surah)}:${format.localizedDigits(hit.ayah)}"
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            )
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+    ) {
+        Text(
+            if (surah != null) "${surah.displayName(arabic)} · $reference" else reference,
+            style = TaqwaText.caption,
+            color = colors.textSecondary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        // The ayah in the Mushaf face, right-to-left whatever the UI's direction is, cut at the
+        // end of the first line: a result row is a pointer to the ayah, not the ayah itself.
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            Text(
+                hit.arabic,
+                fontFamily = mushafFamily(),
+                fontSize = 18.sp,
+                color = colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        hit.translation?.let { translation ->
+            val direction =
+                if (translationLanguage in RTL_TRANSLATION_LANGUAGES) LayoutDirection.Rtl else LayoutDirection.Ltr
+            CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                Text(
+                    highlightMatches(
+                        translation,
+                        query,
+                        SpanStyle(color = colors.textPrimary, fontWeight = FontWeight.SemiBold),
+                    ),
+                    style = TaqwaText.caption,
+                    color = colors.textSecondary,
+                    textAlign = TextAlign.Start,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * One bookmark (spec 2b §2.2): the surah and ayah, where in the Mushaf it falls, the ayah's first
+ * line, and the filled glyph that takes the bookmark away again. The glyph's own tap must not open
+ * the ayah, so it sits in its own 44 dp clickable inside the row's.
+ */
+@Composable
+private fun BookmarkRowView(row: BookmarkRow, onClick: () -> Unit, onRemove: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+    val arabic = isRtlLocale()
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 56.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            )
+            // 2 dp at the end, not the rows' usual 14: the glyph is centred in a 44 dp target that
+            // already carries 12 dp of its own on each side, so this is what lands it level with
+            // the surah rows' trailing badge.
+            .padding(start = 14.dp, end = 2.dp, top = 10.dp, bottom = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    row.surah.displayName(arabic),
+                    style = TaqwaText.rowLabel,
+                    color = colors.textPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                Text(
+                    stringResource(Res.string.quran_ayah_n, format.localizedDigits(row.bookmark.ayah)),
+                    style = TaqwaText.caption.copy(fontSize = 12.sp),
+                    color = colors.textSecondary,
+                    maxLines = 1,
+                )
+            }
+            Text(
+                // The juz-and-page line the reader's own header already uses, one string for both
+                // numbers rather than two glued together here.
+                stringResource(
+                    Res.string.quran_juz_page,
+                    format.localizedDigits(row.juz),
+                    format.localizedDigits(row.page),
+                ),
+                style = TaqwaText.caption.copy(fontSize = 12.sp),
+                color = colors.textSecondary,
+                maxLines = 1,
+            )
+            Spacer(Modifier.height(2.dp))
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Text(
+                    // withMarker, not the bare text: the roundel is what tells the reader which
+                    // ayah of the surah this line is, and the Hafs face draws it as one.
+                    QuranText.withMarker(row.arabic, row.bookmark.ayah),
+                    fontFamily = mushafFamily(),
+                    fontSize = 18.sp,
+                    color = colors.textPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+        Box(
+            Modifier
+                .size(44.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onRemove,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Canvas(Modifier.size(20.dp)) { drawBookmark(colors.accent, filled = true) }
+        }
     }
 }
 

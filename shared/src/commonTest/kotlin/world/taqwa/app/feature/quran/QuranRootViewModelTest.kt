@@ -14,6 +14,8 @@ import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
+import world.taqwa.app.quran.TextKind
+import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.random.Random
@@ -258,6 +260,36 @@ class QuranRootViewModelTest {
         val vm = QuranRootViewModel(searchSource(), repo, bookmarkStore(name), "en")
         vm.load()
         assertEquals(ReadingMode.MUSHAF, (vm.state.value as QuranRootUiState.Ready).mode)
+    }
+
+    @Test
+    fun theTranslationsOwnLanguageTravelsWithTheStateForTheSnippetsDirection() = runTest {
+        val name = "translation-language"
+        val repo = settings(name)
+        repo.setReadingSettings(ReadingSettings(translationId = "ur.junagarhi"))
+        val source = FakeQuranSource(
+            translationsList = listOf(
+                TranslationInfo("en.sahih", "en", "Saheeh International", "Saheeh International", "licence", "url", TextKind.TRANSLATION),
+                TranslationInfo("ur.junagarhi", "ur", "\u062A\u0631\u062C\u0645\u06C1", "Junagarhi", "licence", "url", TextKind.TRANSLATION),
+            ),
+        )
+        val vm = QuranRootViewModel(source, repo, bookmarkStore(name), "en")
+        vm.load()
+        val ready = vm.state.value as QuranRootUiState.Ready
+        assertEquals("ur.junagarhi", ready.translationId)
+        assertEquals("ur", ready.translationLanguage)
+    }
+
+    @Test
+    fun anUnbundledTranslationFallsBackToSaheehAndItsLanguage() = runTest {
+        val name = "translation-language-fallback"
+        val repo = settings(name)
+        repo.setReadingSettings(ReadingSettings(translationId = "xx.gone"))
+        val vm = QuranRootViewModel(searchSource(), repo, bookmarkStore(name), "en")
+        vm.load()
+        val ready = vm.state.value as QuranRootUiState.Ready
+        assertEquals("en.sahih", ready.translationId)
+        assertEquals("en", ready.translationLanguage)
     }
 
     @Test

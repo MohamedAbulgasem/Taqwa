@@ -16,6 +16,7 @@ import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.SearchHit
 import world.taqwa.app.quran.SearchQuery
 import world.taqwa.app.quran.Surah
+import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.settings.Bookmark
 import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
@@ -85,6 +86,10 @@ sealed interface QuranRootUiState {
         val search: SearchState = SearchState.Idle,
         val bookmarks: List<BookmarkRow> = emptyList(),
         val translationId: String = FALLBACK_TRANSLATION,
+        /** [translationId]'s own language, for the direction a hit's translation snippet reads in
+         * (spec §5.1) — an Urdu translation stays right-to-left under an English UI and an English
+         * one left-to-right under an Arabic one. "en" until [QuranRootViewModel.load] resolves it. */
+        val translationLanguage: String = "en",
     ) : QuranRootUiState {
         /**
          * [surahs] narrowed by [filter] (spec §2.1 point 1): case-insensitive against the English
@@ -206,7 +211,11 @@ class QuranRootViewModel(
         val byNumber = surahs.associateBy { it.number }
         val juzRows = computeJuzRows(source.juzs(), surahs)
         val reading = settings.readingSettings(languageTag).first()
-        translationId = resolveTranslationId(reading.translationId)
+        val translations = source.translations()
+        translationId = resolveTranslationId(reading.translationId, translations)
+        // The same resolution ReaderViewModel does for its own cards: the catalogue's language for
+        // the translation actually in use, "en" only if the row somehow has none.
+        val translationLanguage = translations.firstOrNull { it.id == translationId }?.language ?: "en"
         val position = settings.readingPosition.first()
         val continueCard = position?.let { pos ->
             byNumber[pos.surah]?.let { surah ->
@@ -224,6 +233,7 @@ class QuranRootViewModel(
             search = previous?.search ?: SearchState.Idle,
             bookmarks = previous?.bookmarks.orEmpty(),
             translationId = translationId,
+            translationLanguage = translationLanguage,
         )
         applyBookmarks(latestBookmarks)
     }
@@ -233,9 +243,9 @@ class QuranRootViewModel(
      * id this build no longer bundles was dropped between versions — neither can be searched, so
      * both fall back to Saheeh International, the same way [ReaderViewModel] resolves its own.
      */
-    private suspend fun resolveTranslationId(stored: String): String = when {
+    private fun resolveTranslationId(stored: String, translations: List<TranslationInfo>): String = when {
         stored == ReadingSettings.NO_TRANSLATION -> FALLBACK_TRANSLATION
-        source.translations().any { it.id == stored } -> stored
+        translations.any { it.id == stored } -> stored
         else -> FALLBACK_TRANSLATION
     }
 

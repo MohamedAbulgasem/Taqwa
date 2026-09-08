@@ -12,6 +12,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -179,6 +180,12 @@ fun App(container: AppContainer) {
                     if (!navigator.pop()) navigator.selectTab(Tab.PRAYER)
                 }
 
+                // The Quran field's text lives out here, not in QuranRootScreen: opening a hit
+                // pushes the reader, which disposes the root and its view model both, and spec 2b
+                // §2.1 says the query is still in the field when you come back. A TextFieldValue,
+                // so the caret comes back with it rather than jumping to the start of the text.
+                var quranQuery by remember { mutableStateOf(TextFieldValue()) }
+
                 TaqwaTabScaffold(tab, navigator::selectTab) {
                     when (screen) {
                         Screen.Onboarding -> OnboardingScreen(
@@ -254,15 +261,24 @@ fun App(container: AppContainer) {
                             LaunchedEffect(viewModel) {
                                 viewModel.load()
                                 viewModel.start(this)
+                                // The field outlived the screen (see quranQuery); the view model
+                                // did not, so the restored query is searched again on the way back.
+                                // start() first: setFilter needs the scope to run its search.
+                                if (quranQuery.text.isNotEmpty()) viewModel.setFilter(quranQuery.text)
                             }
                             val quranState by viewModel.state.collectAsState()
                             QuranRootScreen(
                                 state = quranState,
-                                onFilterChange = viewModel::setFilter,
+                                query = quranQuery,
+                                onQueryChange = { value ->
+                                    quranQuery = value
+                                    viewModel.setFilter(value.text)
+                                },
                                 onTabChange = viewModel::setTab,
                                 pageFor = viewModel::pageFor,
                                 onOpenReader = { surah, ayah -> navigator.push(Screen.Reader(surah, ayah)) },
                                 onOpenMushaf = { page -> navigator.push(Screen.Mushaf(page)) },
+                                onRemoveBookmark = viewModel::removeBookmark,
                             )
                         }
 
