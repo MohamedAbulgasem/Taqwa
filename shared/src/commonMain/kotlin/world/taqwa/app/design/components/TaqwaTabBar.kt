@@ -18,7 +18,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
@@ -55,6 +58,11 @@ import world.taqwa.app.resources.tab_settings
  * Only the *bottom* is consumed. Held sideways the navigation bar and the camera cutout move to
  * the left and right edges, where this bar — which spans the foot of the screen — covers nothing
  * at all, so the screen above must still pad for them itself.
+ *
+ * The bar itself pads for [BarInsets] rather than `safeDrawing`, because safeDrawing also carries
+ * the keyboard: the bar would climb to sit on top of it. The keyboard covering the bar, and the
+ * list under it, is what a tab root has always done — which is also why the *whole* bottom of
+ * safeDrawing is consumed for the content.
  */
 @Composable
 fun TaqwaTabScaffold(current: Tab?, onSelect: (Tab) -> Unit, content: @Composable () -> Unit) {
@@ -66,11 +74,22 @@ fun TaqwaTabScaffold(current: Tab?, onSelect: (Tab) -> Unit, content: @Composabl
         Box(
             Modifier
                 .weight(1f)
+                // The whole bottom of safeDrawing, keyboard included: the bar covers the bottom
+                // edge, and a tab root has always let the keyboard cover the bar and the list
+                // under it rather than reflowing around it.
                 .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
         ) { content() }
         TaqwaTabBar(current, onSelect)
     }
 }
+
+/**
+ * What the bar and the space it occupies have to clear: the navigation bar, plus the camera cutout,
+ * which sideways is a notch down one side rather than a band along the top. Deliberately not
+ * `safeDrawing` — see [TaqwaTabScaffold].
+ */
+private val BarInsets: WindowInsets
+    @Composable get() = WindowInsets.navigationBars.union(WindowInsets.displayCutout)
 
 /** 22 dp square above the label — bigger than the mockup's original 16 px now that the bar
  * carries three glyphs instead of two and each needs to read clearly on its own. */
@@ -104,7 +123,7 @@ fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Mod
                 // its own 56 dp to it. Sideways it is the horizontal insets that matter — the
                 // navigation bar and the cutout are then at the ends of this row, not under it.
                 .windowInsetsPadding(
-                    WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+                    BarInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
                 )
                 .height(BarHeight),
         ) {
