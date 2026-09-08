@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.TimeZone
@@ -40,7 +43,9 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.CountdownRing
+import world.taqwa.app.design.components.CountdownRingSize
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.TaqwaTextLink
@@ -90,85 +95,183 @@ fun TodayScreen(
 
 @Composable
 private fun ReadyBody(state: TodayUiState.Ready, onOpenQibla: () -> Unit) {
-    val colors = LocalTaqwaColors.current
     val zone = rememberZone(state.location.timeZoneId)
     val format = LocalPlatformFormat.current
-    Column(
+    // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move to
+    // the left and right edges, which systemBars alone does not report.
+    BoxWithConstraints(
         Modifier
             .fillMaxSize()
-            .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.systemBars)
-            .verticalScroll(rememberScrollState()),
+            .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing),
     ) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = Gutter).padding(top = 12.dp, bottom = 4.dp)) {
+        if (maxWidth > maxHeight) {
+            // Two panes rather than one long scroll: upright, the ring sits above the fold and
+            // the timeline below it, which is the right order for a page you read top to bottom.
+            // Sideways there is no room for that order — the ring alone would fill the screen and
+            // push every prayer time off the bottom — so the two halves sit side by side instead.
+            LandscapeBody(state, zone, format, maxWidth, maxHeight, onOpenQibla)
+        } else {
+            PortraitBody(state, zone, format, onOpenQibla)
+        }
+    }
+}
+
+/** Upright: exactly what this screen has always been, now capped to the shared content width. */
+@Composable
+private fun PortraitBody(
+    state: TodayUiState.Ready,
+    zone: TimeZone,
+    format: PlatformFormat,
+    onOpenQibla: () -> Unit,
+) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Column(Modifier.contentWidth()) {
+            CityAndDates(state)
+
+            Spacer(Modifier.height(44.dp))
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Countdown(state, zone, format)
+            }
+            Spacer(Modifier.height(36.dp))
+
+            TimelineCard(state, zone, format)
+
+            Spacer(Modifier.height(14.dp))
+            QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, onOpenQibla)
+
+            if (state.highLatitudeNote != null) {
+                Spacer(Modifier.height(14.dp))
+                HighLatitudeCard(state.highLatitudeNote)
+            }
+            Spacer(Modifier.height(32.dp))
+        }
+    }
+}
+
+/**
+ * Sideways: who and when, with the ring, on the side the eye starts from; everything that is a
+ * list — the timeline, the Qibla card, the high-latitude note — scrolling on the other. Both
+ * halves are capped by the same rule the rest of the app uses, so on a tablet they stay two
+ * columns of readable width rather than two very wide ones.
+ */
+@Composable
+private fun LandscapeBody(
+    state: TodayUiState.Ready,
+    zone: TimeZone,
+    format: PlatformFormat,
+    width: Dp,
+    height: Dp,
+    onOpenQibla: () -> Unit,
+) {
+    // The ring gets whatever its own half can spare: never bigger than upright, and small enough
+    // that the city and the date above it still fit above the fold on a short sideways screen.
+    val ring = minOf(CountdownRingSize, width / 2 - Gutter * 2, height - 120.dp)
+        .coerceAtLeast(96.dp)
+    Row(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.weight(1f).fillMaxHeight().contentWidth().padding(horizontal = Gutter),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            CityAndDates(state, horizontalPadding = 0.dp)
+            Spacer(Modifier.height(20.dp))
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Countdown(state, zone, format, diameter = ring)
+            }
+        }
+        Column(
+            Modifier.weight(1f).fillMaxHeight().contentWidth().verticalScroll(rememberScrollState()),
+        ) {
+            Spacer(Modifier.height(16.dp))
+            TimelineCard(state, zone, format)
+            Spacer(Modifier.height(14.dp))
+            QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, onOpenQibla)
+            if (state.highLatitudeNote != null) {
+                Spacer(Modifier.height(14.dp))
+                HighLatitudeCard(state.highLatitudeNote)
+            }
+            Spacer(Modifier.height(24.dp))
+        }
+    }
+}
+
+/** The city, then both calendars — the same block in either orientation. */
+@Composable
+private fun CityAndDates(state: TodayUiState.Ready, horizontalPadding: Dp = Gutter) {
+    val colors = LocalTaqwaColors.current
+    Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = 12.dp, bottom = 4.dp)) {
+        Text(
+            state.location.cityName ?: stringResource(Res.string.today_current_location),
+            style = TaqwaText.screenTitle,
+            color = colors.textPrimary,
+        )
+        // Hijri first, then the Gregorian a step quieter: one line, the two calendars read
+        // as a pair. The separator is punctuation, not a translated string, so it is the
+        // same in both languages; the bidi algorithm orders the halves under Arabic.
+        Text(
+            buildAnnotatedString {
+                append(state.hijri)
+                withStyle(SpanStyle(color = colors.textTertiary)) {
+                    append(" · ")
+                    append(state.gregorian)
+                }
+            },
+            style = TaqwaText.caption,
+            color = colors.textSecondary,
+        )
+    }
+}
+
+@Composable
+private fun Countdown(
+    state: TodayUiState.Ready,
+    zone: TimeZone,
+    format: PlatformFormat,
+    diameter: Dp = CountdownRingSize,
+) {
+    CountdownRing(
+        progress = state.today.ringProgress,
+        label = stringResource(
+            Res.string.today_next_in,
+            localizedPrayerName(state.today.next.prayer),
+        ),
+        countdown = CountdownFormatter.countdown(
+            state.today.countdown,
+            format,
+            CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR,
+        ),
+        clockTime = formatClock(state.today.next.instant, zone, format),
+        diameter = diameter,
+    )
+}
+
+@Composable
+private fun TimelineCard(state: TodayUiState.Ready, zone: TimeZone, format: PlatformFormat) {
+    TaqwaCard(Modifier.padding(horizontal = Gutter)) {
+        Spacer(Modifier.height(4.dp))
+        PrayerTimeline(state.today.rows, horizontalPadding = 16.dp) { row: TimelineRow ->
+            formatClock(row.instant, zone, format)
+        }
+        Spacer(Modifier.height(4.dp))
+    }
+}
+
+@Composable
+private fun HighLatitudeCard(note: String) {
+    val colors = LocalTaqwaColors.current
+    TaqwaCard(Modifier.padding(horizontal = Gutter)) {
+        Column(Modifier.padding(16.dp)) {
             Text(
-                state.location.cityName ?: stringResource(Res.string.today_current_location),
-                style = TaqwaText.screenTitle,
-                color = colors.textPrimary,
+                stringResource(Res.string.today_latitude_label),
+                style = TaqwaText.sectionLabel,
+                color = colors.accent,
             )
-            // Hijri first, then the Gregorian a step quieter: one line, the two calendars read
-            // as a pair. The separator is punctuation, not a translated string, so it is the
-            // same in both languages; the bidi algorithm orders the halves under Arabic.
+            Spacer(Modifier.height(6.dp))
             Text(
-                buildAnnotatedString {
-                    append(state.hijri)
-                    withStyle(SpanStyle(color = colors.textTertiary)) {
-                        append(" · ")
-                        append(state.gregorian)
-                    }
-                },
+                note,
                 style = TaqwaText.caption,
                 color = colors.textSecondary,
             )
         }
-
-        Spacer(Modifier.height(44.dp))
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            CountdownRing(
-                progress = state.today.ringProgress,
-                label = stringResource(
-                    Res.string.today_next_in,
-                    localizedPrayerName(state.today.next.prayer),
-                ),
-                countdown = CountdownFormatter.countdown(
-                    state.today.countdown,
-                    format,
-                    CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR,
-                ),
-                clockTime = formatClock(state.today.next.instant, zone, format),
-            )
-        }
-        Spacer(Modifier.height(36.dp))
-
-        TaqwaCard(Modifier.padding(horizontal = Gutter)) {
-            Spacer(Modifier.height(4.dp))
-            PrayerTimeline(state.today.rows, horizontalPadding = 16.dp) { row: TimelineRow ->
-                formatClock(row.instant, zone, format)
-            }
-            Spacer(Modifier.height(4.dp))
-        }
-
-        Spacer(Modifier.height(14.dp))
-        QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, onOpenQibla)
-
-        if (state.highLatitudeNote != null) {
-            Spacer(Modifier.height(14.dp))
-            TaqwaCard(Modifier.padding(horizontal = Gutter)) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(
-                        stringResource(Res.string.today_latitude_label),
-                        style = TaqwaText.sectionLabel,
-                        color = colors.accent,
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        state.highLatitudeNote,
-                        style = TaqwaText.caption,
-                        color = colors.textSecondary,
-                    )
-                }
-            }
-        }
-        Spacer(Modifier.height(32.dp))
     }
 }
 
@@ -239,7 +342,8 @@ private fun NeedsLocationBody(onChooseCity: () -> Unit, onAllowLocation: () -> U
     Column(
         Modifier
             .fillMaxSize()
-            .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.systemBars)
+            .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing)
+            .contentWidth()
             .padding(horizontal = 32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

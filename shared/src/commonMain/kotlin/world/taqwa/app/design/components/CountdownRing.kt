@@ -14,10 +14,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+
+/** The ring's own diameter on a phone held upright — the size everything below is drawn against. */
+val CountdownRingSize = 196.dp
 
 @Composable
 fun CountdownRing(
@@ -26,15 +30,19 @@ fun CountdownRing(
     countdown: String,
     clockTime: String,
     modifier: Modifier = Modifier,
+    diameter: Dp = CountdownRingSize,
 ) {
     val colors = LocalTaqwaColors.current
     // `drawArc` takes literal angles, so this is one of the few things in the app that does not
     // mirror itself with the layout direction. Time is read the way text is read: an Arabic
     // reader's clock hand sweeps from the top towards the left, so the arc fills anticlockwise.
     val sweepSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
-    Box(modifier.size(196.dp), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(196.dp)) {
-            val stroke = 9.dp.toPx()
+    // [diameter] is only ever *smaller* than the default, when a sideways screen gives the ring
+    // less than its own half-page to sit in; the stroke keeps its share of the diameter, so a
+    // shrunken ring reads as the same ring rather than as a thicker one.
+    Box(modifier.size(diameter), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.size(diameter)) {
+            val stroke = (diameter * (9f / 196f)).toPx()
             val inset = stroke / 2f
             val arcSize = Size(size.width - stroke, size.height - stroke)
             drawArc(
