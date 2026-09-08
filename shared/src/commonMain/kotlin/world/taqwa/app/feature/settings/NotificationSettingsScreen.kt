@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,6 +33,7 @@ import world.taqwa.app.resources.notifications_remind_before
 import world.taqwa.app.resources.notifications_remind_never
 import world.taqwa.app.resources.settings_notifications
 import world.taqwa.app.resources.unit_minutes
+import world.taqwa.app.design.components.TaqwaBottomSheet
 
 @Composable
 private fun leadLabel(minutes: Int): String = if (minutes == 0) {
@@ -108,7 +108,7 @@ fun NotificationSettingsScreen(
     }
 
     if (remindSheetOpen) {
-        ModalBottomSheet(onDismissRequest = { remindSheetOpen = false }) {
+        TaqwaBottomSheet(onDismissRequest = { remindSheetOpen = false }) {
             Text(
                 stringResource(Res.string.notifications_remind_before),
                 style = TaqwaText.screenTitle,
@@ -133,7 +133,7 @@ fun NotificationSettingsScreen(
     soundSheetFor?.let { prayer ->
         // Covers every exit at once: swipe, scrim tap, a pick, back, and leaving the screen.
         DisposableEffect(Unit) { onDispose { onStopPreview() } }
-        ModalBottomSheet(onDismissRequest = { soundSheetFor = null }) {
+        TaqwaBottomSheet(onDismissRequest = { soundSheetFor = null }) {
             SoundSheet(
                 current = settings.soundFor(prayer),
                 onPick = { sound -> onPickSound(prayer, sound); soundSheetFor = null },

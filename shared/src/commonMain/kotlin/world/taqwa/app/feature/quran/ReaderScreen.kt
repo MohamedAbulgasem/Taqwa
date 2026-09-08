@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -60,6 +59,7 @@ import world.taqwa.app.quran.displayName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_next_surah
+import world.taqwa.app.design.components.TaqwaBottomSheet
 
 /** The gutter between an ayah card and the edge of the reader's own content column. */
 private val ReaderGutter = 24.dp
@@ -189,12 +189,7 @@ fun ReaderScreen(
         }
 
         if (showSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showSheet = false },
-                containerColor = colors.surface,
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                dragHandle = { SheetDragHandle() },
-            ) {
+            TaqwaBottomSheet(onDismissRequest = { showSheet = false }) {
                 ReadingSheet(
                     settings = ready.settings,
                     translations = ready.translations,
@@ -217,22 +212,6 @@ fun ReaderScreen(
             }
         }
     }
-}
-
-/** The reading-settings sheet's grab handle (spec §2.5): a plain 36×4 dp pill in the hairline
- * colour, replacing material3's own default drag handle so it matches the rest of the app's
- * hairline-drawn chrome rather than the library's default grey. Shared with [MushafScreen], whose
- * sheet is the same sheet. */
-@Composable
-internal fun SheetDragHandle() {
-    val colors = LocalTaqwaColors.current
-    Box(
-        Modifier
-            .padding(vertical = 12.dp)
-            .size(width = 36.dp, height = 4.dp)
-            .clip(RoundedCornerShape(2.dp))
-            .background(colors.hairline),
-    )
 }
 
 /** The "next surah" footer card (spec §2.3): none after An-Nas, since [ReaderUiState.Ready.nextSurah]

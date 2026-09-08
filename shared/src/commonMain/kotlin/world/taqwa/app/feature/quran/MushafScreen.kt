@@ -11,7 +11,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +33,7 @@ import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
+import world.taqwa.app.design.components.TaqwaBottomSheet
 
 /** The Madinah Mushaf's own page count (spec §2.4) — the pager's whole extent. */
 private const val MUSHAF_PAGES = 604
@@ -127,12 +127,7 @@ fun MushafScreen(
         }
 
         if (showSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showSheet = false },
-                containerColor = colors.surface,
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                dragHandle = { SheetDragHandle() },
-            ) {
+            TaqwaBottomSheet(onDismissRequest = { showSheet = false }) {
                 ReadingSheet(
                     settings = ready.settings,
                     translations = ready.translations,
