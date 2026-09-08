@@ -88,13 +88,15 @@ Three tabs: Prayer (mihrab), Quran (open book), Settings (gear). Glyphs 22 dp, l
 6. Ayah roundels are **not** stored in the ayah text. They are added at render time (§5.2). The layout words keep their trailing digits, attached with a non-breaking space (the same separator `QuranText.withMarker` uses), because a Mushaf word is drawn as one unit.
 7. **Every Mushaf word's text is Tanzil's, not the layout's.** The layout is trusted only for segmentation (which word sits on which line); its word text encodes the sequential-tanween forms with extra small-meem signs (U+06E2/U+06ED, 6,642 words) that the Hafs font draws as a literal small meem the printed page does not show. After rule 3 passes, each layout word is re-texted from Tanzil's tokens, aligned by bare letters (a layout word may span two tokens: "بَعْدَ مَا", "إِلْ يَاسِينَ"); Tanzil's standalone pause marks and the sajdah sign are fused onto the word before them and the rub-el-hizb star onto the word after, space kept, so the stored string stays character-for-character Tanzil's. The build then verifies, for all 6,236 ayahs, that the Mushaf words joined with spaces equal `ayah.text_uthmani` exactly, that every character is in the Quranic code-point set, and (with `uharfbuzz` installed) that every stored line, word and ayah shapes with the bundled Hafs font without a missing glyph or a dotted circle.
 
+8. **Latin surah names are curated, not Tanzil's.** `surah.name_en` carries the spellings most readers meet ("Al-Fatihah", "Ali 'Imran", "Al-Mursalat"; the list is `LATIN_NAMES` in the pipeline), and `surah.aliases_en` keeps Tanzil's own spelling plus common other names ("Yaseen", "Tabarak") for the filter, which folds doubled vowels and a final "h" on both sides so "Mursalat", "Al-Mursalaat", "Baqara" and "Baqarah" all match. Names are metadata, not Quran text; the Arabic names stay exactly as Tanzil gives them.
 ### 3.3 Database
 
-One SQLite file, `shared/src/commonMain/composeResources/files/quran.db`, built by `tools/build-quran-db.py`, `PRAGMA user_version = 2` (1 shipped the layout's own word text; 2 re-texts every Mushaf word from Tanzil, rule 7), vacuumed, journal off. Schema:
+One SQLite file, `shared/src/commonMain/composeResources/files/quran.db`, built by `tools/build-quran-db.py`, `PRAGMA user_version = 3` (1 shipped the layout's own word text; 2 re-texts every Mushaf word from Tanzil, rule 7; 3 curates the Latin surah names, see below), vacuumed, journal off. Schema:
 
 ```sql
 CREATE TABLE surah (
   number INTEGER PRIMARY KEY, name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
+  aliases_en TEXT NOT NULL,                             -- other Latin spellings, '|'-separated, for the filter only
   meaning_en TEXT NOT NULL, revelation TEXT NOT NULL,   -- 'Makki' | 'Madani'
   ayah_count INTEGER NOT NULL, start_page INTEGER NOT NULL, start_juz INTEGER NOT NULL
 );

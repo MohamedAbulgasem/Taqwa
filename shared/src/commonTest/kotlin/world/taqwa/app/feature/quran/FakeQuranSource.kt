@@ -25,10 +25,10 @@ import world.taqwa.app.quran.TranslationInfo
  */
 internal class FakeQuranSource(
     private val surahList: List<Surah> = listOf(
-        Surah(1, "الفاتحة", "Al-Faatiha", "The Opening", Revelation.MAKKI, 7, 1, 1),
-        Surah(2, "البقرة", "Al-Baqara", "The Cow", Revelation.MADANI, 286, 2, 1),
+        Surah(1, "الفاتحة", "Al-Fatihah", "The Opening", Revelation.MAKKI, 7, 1, 1, aliases = listOf("Al-Faatiha", "Fatiha")),
+        Surah(2, "البقرة", "Al-Baqarah", "The Cow", Revelation.MADANI, 286, 2, 1, aliases = listOf("Al-Baqara", "Baqara")),
         Surah(18, "ٱلۡكَهۡفِ", "Al-Kahf", "The Cave", Revelation.MAKKI, 110, 293, 15),
-        Surah(114, "الناس", "An-Naas", "Mankind", Revelation.MAKKI, 6, 604, 30),
+        Surah(114, "الناس", "An-Nas", "Mankind", Revelation.MAKKI, 6, 604, 30, aliases = listOf("An-Naas")),
     ),
     private val juzList: List<Juz> = listOf(
         Juz(1, 1, 1),

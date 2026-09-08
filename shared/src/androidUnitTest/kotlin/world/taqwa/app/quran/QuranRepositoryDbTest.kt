@@ -25,7 +25,9 @@ class QuranRepositoryDbTest {
     @Test fun hasEverySurahInOrder() = runTest {
         val s = repo.surahs()
         assertEquals(114, s.size)
-        assertEquals("Al-Faatiha", s.first().nameLatin)
+        assertEquals("Al-Fatihah", s.first().nameLatin)
+        assertTrue("Al-Faatiha" in s.first().aliases)
+        assertEquals("Al-Mursalat", s[76].nameLatin)
         assertEquals(6, s.last().ayahCount)
     }
 

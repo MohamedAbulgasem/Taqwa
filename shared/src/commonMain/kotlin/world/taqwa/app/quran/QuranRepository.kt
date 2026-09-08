@@ -64,6 +64,7 @@ private fun world.taqwa.app.quran.db.Surah.toSurah() = Surah(
     ayahCount = ayah_count.toInt(),
     startPage = start_page.toInt(),
     startJuz = start_juz.toInt(),
+    aliases = aliases_en.split('|').filter { it.isNotBlank() },
 )
 
 private fun world.taqwa.app.quran.db.Translation.toInfo() = TranslationInfo(

@@ -5,6 +5,7 @@
 
 CREATE TABLE surah (
   number INTEGER PRIMARY KEY, name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
+  aliases_en TEXT NOT NULL,                             -- other Latin spellings, '|'-separated, for the filter only
   meaning_en TEXT NOT NULL, revelation TEXT NOT NULL,   -- 'Makki' | 'Madani'
   ayah_count INTEGER NOT NULL, start_page INTEGER NOT NULL, start_juz INTEGER NOT NULL
 );

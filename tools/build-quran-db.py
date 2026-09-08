@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / "cache"
 OUT = ROOT / "shared" / "src" / "commonMain" / "composeResources" / "files" / "quran.db"
-USER_VERSION = 2
+USER_VERSION = 3
 
 TANZIL_TEXT = "https://tanzil.net/pub/download/index.php?quranType={kind}&marks=true&sajdah=true&rub=true&tatweel=false&outType=txt-2&agree=true"
 TANZIL_TRANS = "https://tanzil.net/trans/?transID={id}&type=txt"
@@ -41,6 +41,38 @@ TRANSLATIONS = [
     ("en.transliteration", "en", "Transliteration", "Tanzil Project", "transliteration"),
 ]
 TANZIL_LICENCE = "Tanzil Project, non-commercial use, verbatim, credit the translator. tanzil.net/trans"
+
+# The Latin surah names shown in the app: the spellings most readers meet (quran.com's), in place
+# of Tanzil's own ("Al-Faatiha", "Aal-i-Imraan", "Al-Mursalaat"), which read oddly and defeated the
+# filter for anyone typing the usual form. Tanzil's spelling is kept as a filter alias, plus a few
+# other names a surah is commonly known by. Metadata, not Quran text, so curating it is allowed.
+LATIN_NAMES = {
+    1: "Al-Fatihah", 2: "Al-Baqarah", 3: "Ali 'Imran", 4: "An-Nisa", 5: "Al-Ma'idah", 6: "Al-An'am",
+    7: "Al-A'raf", 8: "Al-Anfal", 9: "At-Tawbah", 10: "Yunus", 11: "Hud", 12: "Yusuf", 13: "Ar-Ra'd",
+    14: "Ibrahim", 15: "Al-Hijr", 16: "An-Nahl", 17: "Al-Isra", 18: "Al-Kahf", 19: "Maryam", 20: "Taha",
+    21: "Al-Anbiya", 22: "Al-Hajj", 23: "Al-Mu'minun", 24: "An-Nur", 25: "Al-Furqan", 26: "Ash-Shu'ara",
+    27: "An-Naml", 28: "Al-Qasas", 29: "Al-'Ankabut", 30: "Ar-Rum", 31: "Luqman", 32: "As-Sajdah",
+    33: "Al-Ahzab", 34: "Saba", 35: "Fatir", 36: "Ya-Sin", 37: "As-Saffat", 38: "Sad", 39: "Az-Zumar",
+    40: "Ghafir", 41: "Fussilat", 42: "Ash-Shura", 43: "Az-Zukhruf", 44: "Ad-Dukhan", 45: "Al-Jathiyah",
+    46: "Al-Ahqaf", 47: "Muhammad", 48: "Al-Fath", 49: "Al-Hujurat", 50: "Qaf", 51: "Adh-Dhariyat",
+    52: "At-Tur", 53: "An-Najm", 54: "Al-Qamar", 55: "Ar-Rahman", 56: "Al-Waqi'ah", 57: "Al-Hadid",
+    58: "Al-Mujadilah", 59: "Al-Hashr", 60: "Al-Mumtahanah", 61: "As-Saff", 62: "Al-Jumu'ah",
+    63: "Al-Munafiqun", 64: "At-Taghabun", 65: "At-Talaq", 66: "At-Tahrim", 67: "Al-Mulk", 68: "Al-Qalam",
+    69: "Al-Haqqah", 70: "Al-Ma'arij", 71: "Nuh", 72: "Al-Jinn", 73: "Al-Muzzammil", 74: "Al-Muddaththir",
+    75: "Al-Qiyamah", 76: "Al-Insan", 77: "Al-Mursalat", 78: "An-Naba", 79: "An-Nazi'at", 80: "'Abasa",
+    81: "At-Takwir", 82: "Al-Infitar", 83: "Al-Mutaffifin", 84: "Al-Inshiqaq", 85: "Al-Buruj", 86: "At-Tariq",
+    87: "Al-A'la", 88: "Al-Ghashiyah", 89: "Al-Fajr", 90: "Al-Balad", 91: "Ash-Shams", 92: "Al-Layl",
+    93: "Ad-Duha", 94: "Ash-Sharh", 95: "At-Tin", 96: "Al-'Alaq", 97: "Al-Qadr", 98: "Al-Bayyinah",
+    99: "Az-Zalzalah", 100: "Al-'Adiyat", 101: "Al-Qari'ah", 102: "At-Takathur", 103: "Al-'Asr",
+    104: "Al-Humazah", 105: "Al-Fil", 106: "Quraysh", 107: "Al-Ma'un", 108: "Al-Kawthar", 109: "Al-Kafirun",
+    110: "An-Nasr", 111: "Al-Masad", 112: "Al-Ikhlas", 113: "Al-Falaq", 114: "An-Nas",
+}
+EXTRA_ALIASES = {
+    1: "Fatiha", 2: "Baqara", 3: "Al Imran|Aal Imran|Imran", 9: "Bara'ah", 17: "Bani Isra'il", 20: "Ta-Ha",
+    21: "Al-Anbya", 35: "Al-Mala'ikah", 36: "Yaseen|Yasin", 40: "Al-Mu'min", 41: "Ha-Mim Sajdah",
+    42: "Ash-Shuraa", 55: "Ar-Rahmaan", 67: "Tabarak", 76: "Ad-Dahr", 93: "Ad-Duhaa", 94: "Al-Inshirah",
+    111: "Al-Lahab", 112: "Ikhlaas|Ikhlas",
+}
 
 SILENT_ALEF_SIGN = "۟"   # the Hafs font draws this as an inline ring; see spike §12
 SUKUN = "ْ"
@@ -364,9 +396,11 @@ def build(conn: sqlite3.Connection):
     for s in suras:
         n = int(s["index"])
         first = (n, 1)
+        aliases = [s["tname"]] + EXTRA_ALIASES.get(n, "").split("|")
+        aliases = "|".join(dict.fromkeys(a for a in aliases if a and a != LATIN_NAMES[n]))
         conn.execute(
-            "INSERT INTO surah VALUES (?,?,?,?,?,?,?,?)",
-            (n, s["name"], s["tname"], s["ename"], "Makki" if s["type"] == "Meccan" else "Madani",
+            "INSERT INTO surah VALUES (?,?,?,?,?,?,?,?,?)",
+            (n, s["name"], LATIN_NAMES[n], aliases, s["ename"], "Makki" if s["type"] == "Meccan" else "Madani",
              int(s["ayas"]), page_of[first], juz_of[first]),
         )
     for key in order:
@@ -523,6 +557,9 @@ def verify(conn: sqlite3.Connection):
     def one(sql, *args):
         return conn.execute(sql, args).fetchone()[0]
     assert one("SELECT count(*) FROM surah") == 114
+    assert len(LATIN_NAMES) == 114 and all(LATIN_NAMES[i] for i in range(1, 115))
+    assert one("SELECT name_en FROM surah WHERE number = 77") == "Al-Mursalat"
+    assert "Al-Mursalaat" in one("SELECT aliases_en FROM surah WHERE number = 77").split("|")
     assert one("SELECT count(*) FROM ayah") == 6236
     assert one("SELECT count(*) FROM juz") == 30
     assert one("SELECT count(*) FROM page") == 604

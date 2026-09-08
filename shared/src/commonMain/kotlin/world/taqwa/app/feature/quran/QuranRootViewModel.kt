@@ -42,31 +42,42 @@ sealed interface QuranRootUiState {
         val mode: ReadingMode,
     ) : QuranRootUiState {
         /**
-         * [surahs] narrowed by [filter] (spec §2.1 point 1): case-insensitive against the Latin
-         * name, the English meaning and the surah number, harakat-insensitive against the Arabic
-         * name via [QuranText.normaliseForSearch], and — separately — against the Latin name with
-         * hyphens and apostrophes stripped, so a query typed without them ("annaas") still finds
-         * a name that has them ("An-Naas").
+         * [surahs] narrowed by [filter] (spec §2.1 point 1): case-insensitive against the English
+         * meaning and the surah number, harakat-insensitive against the Arabic name via
+         * [QuranText.normaliseForSearch], and against the Latin name and every alias with
+         * [collapseLatin] applied to both sides, so "mursalat", "Al-Mursalaat", "Yaseen" and
+         * "baqara" all find their surah however the name is spelled.
          */
         val filteredSurahs: List<Surah> get() {
             val query = filter.trim()
             if (query.isEmpty()) return surahs
             val queryLower = query.lowercase()
             val queryArabic = QuranText.normaliseForSearch(query)
-            val queryCollapsed = queryLower.collapseLatin()
+            val queryCollapsed = query.collapseLatin()
             return surahs.filter { surah ->
-                surah.nameLatin.lowercase().contains(queryLower) ||
-                    surah.meaning.lowercase().contains(queryLower) ||
+                surah.meaning.lowercase().contains(queryLower) ||
                     surah.number.toString().contains(query) ||
                     QuranText.normaliseForSearch(surah.nameArabic).contains(queryArabic) ||
-                    surah.nameLatin.lowercase().collapseLatin().contains(queryCollapsed)
+                    (queryCollapsed.isNotEmpty() && (listOf(surah.nameLatin) + surah.aliases).any {
+                        it.collapseLatin().contains(queryCollapsed)
+                    })
             }
         }
     }
 }
 
-/** Strips everything but letters and digits, so "Al-Faatiha" and "alfaatiha" compare equal. */
-private fun String.collapseLatin(): String = filter { it.isLetterOrDigit() }
+/**
+ * Folds a Latin surah name to what people actually type: lower case, letters and digits only (no
+ * hyphens, apostrophes or spaces), doubled vowels collapsed ("Faatiha" → "fatiha") and a final
+ * "h" dropped ("Fatihah" → "fatiha", "Baqarah" → "baqara"), so the same query matches every
+ * common spelling. Applied to both the query and the names, never shown.
+ */
+internal fun String.collapseLatin(): String {
+    val letters = lowercase().filter { it.isLetterOrDigit() }
+    val folded = StringBuilder(letters.length)
+    letters.forEach { c -> if (!(c in "aeiou" && folded.endsWith(c))) folded.append(c) }
+    return folded.toString().removeSuffix("h")
+}
 
 /**
  * Every juz's end, one ayah before [nextStartSurah]:[nextStartAyah] — within the same surah when

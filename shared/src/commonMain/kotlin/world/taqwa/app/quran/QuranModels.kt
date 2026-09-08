@@ -5,6 +5,9 @@ enum class Revelation { MAKKI, MADANI }
 data class Surah(
     val number: Int, val nameArabic: String, val nameLatin: String, val meaning: String,
     val revelation: Revelation, val ayahCount: Int, val startPage: Int, val startJuz: Int,
+    /** Other Latin spellings the surah is known by (Tanzil's own, and common names such as
+     * "Yaseen"); never shown, only matched by the Quran root's filter. */
+    val aliases: List<String> = emptyList(),
 )
 
 /**

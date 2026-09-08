@@ -142,6 +142,31 @@ class QuranRootViewModelTest {
     }
 
     @Test
+    fun filteringMatchesEveryCommonSpellingThroughTheAliasesAndTheFold() = runTest {
+        val vm = viewModel("filter-spellings")
+        vm.load()
+        // Tanzil's doubled vowel, the bare name, the curated name with and without its final h.
+        listOf("faatiha", "fatiha", "Fatihah", "Al-Fatihah", "baqara", "Baqarah").forEach { query ->
+            vm.setFilter(query)
+            val ready = vm.state.value as QuranRootUiState.Ready
+            assertEquals(1, ready.filteredSurahs.size, "query '$query'")
+        }
+        vm.setFilter("annaas")
+        assertEquals(listOf(114), (vm.state.value as QuranRootUiState.Ready).filteredSurahs.map { it.number })
+    }
+
+    @Test
+    fun collapseLatinFoldsSpellingDifferencesThatAreNotDifferentNames() {
+        assertEquals("almursalat", "Al-Mursalaat".collapseLatin())
+        assertEquals("almursalat", "Al-Mursalat".collapseLatin())
+        assertEquals("mursalat", "Mursalat".collapseLatin())
+        assertEquals("alimran", "Ali 'Imran".collapseLatin())
+        assertEquals("yasin", "Ya-Sin".collapseLatin())
+        // Only doubled vowels fold; doubled consonants are kept ("Muzzammil").
+        assertEquals("almuzzammil", "Al-Muzzammil".collapseLatin())
+    }
+
+    @Test
     fun switchingTabsIsReflectedInState() = runTest {
         val vm = viewModel("tabs")
         vm.load()
