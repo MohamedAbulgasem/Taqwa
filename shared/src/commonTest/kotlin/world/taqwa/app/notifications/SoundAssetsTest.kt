@@ -20,7 +20,7 @@ class SoundAssetsTest {
     // seconds rather than the original 2.4 — the short one was missed at a desk.
     @Test
     fun notificationIsTaqwasOwnChime() {
-        assertEquals(6.00.seconds, SoundAssets.duration(PrayerSound.NOTIFICATION))
+        assertEquals(3.79.seconds, SoundAssets.duration(PrayerSound.NOTIFICATION))
         assertEquals("chime", SoundAssets.androidRawResourceName(PrayerSound.NOTIFICATION))
         assertEquals("chime.caf", SoundAssets.iosResourceFileName(PrayerSound.NOTIFICATION))
     }

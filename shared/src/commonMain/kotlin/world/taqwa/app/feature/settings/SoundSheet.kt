@@ -40,7 +40,7 @@ private val MIN_TAP_TARGET = 44.dp
 
 /** The chime's and the takbir's measured lengths, and the platform notification-sound cap, in
  * whole seconds. */
-private const val CHIME_SECONDS = 6
+private const val CHIME_SECONDS = 4
 private const val TAKBIR_SECONDS = 16
 private const val SOUND_CAP_SECONDS = 30
 

@@ -15,7 +15,7 @@ object NotificationChannels {
      * Each change needs an id Android has never seen, so the suffix names the generation of the
      * chime rather than just saying "chime"; the ids left behind are in [staleNotificationIds].
      */
-    private const val CHIME_SUFFIX = "_chime2"
+    private const val CHIME_SUFFIX = "_chime3"
 
     /**
      * Notification-level suffixes this app has used before [CHIME_SUFFIX]: `""` is the original
@@ -23,7 +23,7 @@ object NotificationChannels {
      * dropped from here is an id the scheduler stops deleting, which leaves a user stuck with an
      * old sound under a channel they cannot remove.
      */
-    private val RETIRED_CHIME_SUFFIXES = listOf("", "_chime")
+    private val RETIRED_CHIME_SUFFIXES = listOf("", "_chime", "_chime2")
 
     fun channelId(prayer: Prayer, sound: PrayerSound): String =
         base(prayer, sound) + if (sound == PrayerSound.NOTIFICATION) CHIME_SUFFIX else ""

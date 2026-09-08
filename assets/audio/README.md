@@ -21,17 +21,16 @@ A CC0-labelled adhan on Freesound (`sonically_sound/sounds/639494`) was rejected
 
 ## The chime (`chime.*`)
 
-Taqwa's own sound for the **Notification** level, so a prayer never sounds like a message
-arriving. Synthesised, not recorded: an ascending three-note bell motif (A4, C#5, E5, 260 ms
-apart), each note five inharmonic partials with long independent decays and a hair of detune for
-warmth, struck a second time at 2.60 s and 0.85 of the level, 6.00 s, peak −1 dBFS. Original work,
-no third-party material, no licence conditions.
-
-Regenerate with `python3 tools/make-chime.py`, which writes all three files and copies them into
-the platform trees. It replaces a 2.40 s chime at −5 dBFS that was too quiet and too brief to be
-noticed at a desk; the Notification channel now vibrates alongside it on Android, and the channel
-id gained a `_chime2` suffix because a channel's sound is immutable once created.
-`.ogg` (Vorbis q6) for Android, `.caf` (IMA4 ADPCM, like the other clips) for iOS.
+The **Notification** level's tone, so a prayer never sounds like a message arriving: "Clear
+announce tones" from Mixkit (https://mixkit.co/free-sound-effects/tones/), Mixkit Sound Effects
+Free Licence, which permits use in apps without attribution but not redistribution of the clip on
+its own. Mohamed picked it on 8 September 2026 over the synthesised bell motif that preceded it
+(and the softer chime before that). The source WAV is kept in `source/`; `tools/prepare-chime.py`
+folds it to mono, trims the silence, fades the tail, normalises the peak to −1 dBFS (3.79 s) and
+writes `.ogg` (Vorbis q6) for Android and `.caf` (IMA4 ADPCM, like the other clips) for iOS, copying
+both into the platform trees. Android's Notification channel id suffix is `_chime3` (a channel keeps
+the sound it was created with, so every change of this file bumps the suffix and retires the old id);
+that channel also vibrates.
 
 ## Derived clips
 

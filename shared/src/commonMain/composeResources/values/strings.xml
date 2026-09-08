@@ -95,7 +95,7 @@
     <string name="sound_takbir">Takbir</string>
     <string name="sound_adhan">Adhan</string>
     <string name="sound_silent_detail">Banner only, no sound</string>
-    <string name="sound_notification_detail">A clear chime, %1$s seconds</string>
+    <string name="sound_notification_detail">A clear announcement tone, %1$s seconds</string>
     <string name="sound_takbir_detail">Allahu akbar, Allahu akbar, about %1$ss</string>
     <string name="sound_adhan_detail">The adhan, first %1$s seconds</string>
     <string name="sound_sheet_footnote">Notification sounds are capped at %1$s seconds on this platform. The complete adhan can be played inside the app.</string>
@@ -148,6 +148,8 @@
     <string name="credit_typeface_detail">SIL Open Font Licence 1.1.</string>
     <string name="credit_audio">Adhan and takbir audio</string>
     <string name="credit_audio_detail">“Beautiful adhan” by Adam-synagda, CC0 1.0, via Wikimedia Commons.</string>
+    <string name="credit_chime">Notification tone</string>
+    <string name="credit_chime_detail">“Clear announce tones” from Mixkit, Mixkit Sound Effects Free Licence.</string>
     <string name="credit_quran_text">Quran text</string>
     <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons BY-ND 3.0. Reproduced verbatim.</string>
     <string name="credit_quran_font">Quran typeface</string>

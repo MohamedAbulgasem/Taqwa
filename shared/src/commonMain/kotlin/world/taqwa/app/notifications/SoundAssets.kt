@@ -46,7 +46,7 @@ object SoundAssets {
 
     fun duration(sound: PrayerSound): Duration? = when (sound) {
         PrayerSound.SILENT -> null
-        PrayerSound.NOTIFICATION -> 6.00.seconds
+        PrayerSound.NOTIFICATION -> 3.79.seconds
         PrayerSound.TAKBIR -> 15.80.seconds
         PrayerSound.ADHAN -> 29.95.seconds
     }

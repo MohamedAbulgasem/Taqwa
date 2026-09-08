@@ -18,6 +18,8 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.attribution_intro
 import world.taqwa.app.resources.credit_audio
 import world.taqwa.app.resources.credit_audio_detail
+import world.taqwa.app.resources.credit_chime
+import world.taqwa.app.resources.credit_chime_detail
 import world.taqwa.app.resources.credit_calculation
 import world.taqwa.app.resources.credit_calculation_detail
 import world.taqwa.app.resources.credit_cities
@@ -60,6 +62,11 @@ private fun credits(translations: List<TranslationInfo>): List<Credit> = listOf(
     Credit(
         what = stringResource(Res.string.credit_audio),
         detail = stringResource(Res.string.credit_audio_detail),
+    ),
+    Credit(
+        what = stringResource(Res.string.credit_chime),
+        detail = stringResource(Res.string.credit_chime_detail),
+        source = "mixkit.co",
     ),
     Credit(
         what = stringResource(Res.string.credit_quran_text),

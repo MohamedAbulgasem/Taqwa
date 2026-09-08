@@ -4,6 +4,7 @@
 - **City database**: [GeoNames](https://www.geonames.org/) `cities15000`, CC BY 4.0.
 - **Manrope** typeface: SIL Open Font Licence 1.1.
 - **Adhan and takbir audio**: "Beautiful adhan" by Adam-synagda, CC0 1.0, via Wikimedia Commons.
+- **Notification tone**: "Clear announce tones" from [Mixkit](https://mixkit.co/free-sound-effects/tones/), Mixkit Sound Effects Free Licence (use in apps permitted, not redistributable on its own; the source file is kept in `assets/audio/source/`).
 - **Quran text**: [Tanzil Project](https://tanzil.net) Quran Text v1.1, Creative Commons BY-ND 3.0. Reproduced verbatim.
 - **Quran typeface**: KFGQPC Uthmanic Script Hafs by the King Fahd Glorious Quran Printing Complex, free to use and distribute unmodified.
 - **Page layout**: Madinah Mushaf page and line breaks from the Quranic Universal Library data, via [zonetecde/mushaf-layout](https://github.com/zonetecde/mushaf-layout).
