@@ -35,8 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -230,33 +233,71 @@ private fun LazyListScope.juzListItems(juzs: List<JuzRow>, onOpen: (JuzRow) -> U
     }
 }
 
-/** The rounded top edge a [TaqwaCard] would have drawn as part of its own single border — a
- * plain box shaped and bordered on its top corners only, so it reads as the top of the same card
- * once it sits directly above the first row's own [CardRow] sides. */
+/** The rounded top edge a [TaqwaCard] would have drawn as part of its own single border — the top
+ * slice of one whole rounded rectangle, so it reads as the top of the same card once it sits
+ * directly above the first row's own [CardRow] sides.
+ *
+ * A `border` on a shape rounded at two corners also strokes that shape's straight *inner* edge,
+ * which drew a hairline all the way across the card just above the first row. So the rect is drawn
+ * a full [CardCorner] taller than the cap and clipped to the cap's bounds: its bottom edge lands
+ * outside and is never painted, leaving only the rounded top and the two sides, which continue
+ * into the rows' own sides. */
 @Composable
 private fun CardTopCap() {
     val colors = LocalTaqwaColors.current
-    val shape = RoundedCornerShape(topStart = CardCorner, topEnd = CardCorner)
     Box(
         Modifier
             .fillMaxWidth()
             .height(CardCorner)
-            .background(colors.surface, shape)
-            .border(1.dp, colors.hairline, shape),
+            .clipToBounds()
+            .drawBehind {
+                val stroke = 1.dp.toPx()
+                val radius = CornerRadius(CardCorner.toPx())
+                val height = size.height + CardCorner.toPx()
+                drawRoundRect(colors.surface, size = Size(size.width, height), cornerRadius = radius)
+                // Inset by half the stroke: a stroked outline straddles the path it follows, so an
+                // uninset rect would spend the outer half of each side line on the clipped-away
+                // pixel column and read as a lighter hairline than the rows' own sides.
+                drawRoundRect(
+                    colors.hairline,
+                    topLeft = Offset(stroke / 2, stroke / 2),
+                    size = Size(size.width - stroke, height - stroke),
+                    cornerRadius = radius,
+                    style = Stroke(stroke),
+                )
+            },
     )
 }
 
-/** [CardTopCap]'s mirror for the card's bottom edge. */
+/** [CardTopCap]'s mirror for the card's bottom edge: the same oversized rect, shifted up by
+ * [CardCorner] so it is the straight *top* edge that falls outside the clip. */
 @Composable
 private fun CardBottomCap() {
     val colors = LocalTaqwaColors.current
-    val shape = RoundedCornerShape(bottomStart = CardCorner, bottomEnd = CardCorner)
     Box(
         Modifier
             .fillMaxWidth()
             .height(CardCorner)
-            .background(colors.surface, shape)
-            .border(1.dp, colors.hairline, shape),
+            .clipToBounds()
+            .drawBehind {
+                val stroke = 1.dp.toPx()
+                val corner = CardCorner.toPx()
+                val radius = CornerRadius(corner)
+                val height = size.height + corner
+                drawRoundRect(
+                    colors.surface,
+                    topLeft = Offset(0f, -corner),
+                    size = Size(size.width, height),
+                    cornerRadius = radius,
+                )
+                drawRoundRect(
+                    colors.hairline,
+                    topLeft = Offset(stroke / 2, -corner + stroke / 2),
+                    size = Size(size.width - stroke, height - stroke),
+                    cornerRadius = radius,
+                    style = Stroke(stroke),
+                )
+            },
     )
 }
 
@@ -337,13 +378,13 @@ private fun ContinueReadingCard(card: ContinueCard, onClick: () -> Unit) {
             onClick = onClick,
         ),
     ) {
-        Column(Modifier.padding(14.dp)) {
+        Column(Modifier.padding(18.dp)) {
             Text(
                 stringResource(Res.string.quran_continue),
                 style = TaqwaText.sectionLabel,
                 color = colors.textTertiary,
             )
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(10.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     if (arabic) {
@@ -358,6 +399,10 @@ private fun ContinueReadingCard(card: ContinueCard, onClick: () -> Unit) {
                     } else {
                         Text(card.surah.nameLatin, style = TaqwaText.rowLabel, color = colors.textPrimary)
                     }
+                    // Neither name above carries leading of its own — the Arabic one has its line
+                    // height stripped for the badge, the Latin one is a snug row label — so the
+                    // detail line sits on top of it unless the gap is drawn explicitly.
+                    Spacer(Modifier.height(4.dp))
                     Text(
                         stringResource(
                             Res.string.quran_continue_detail,
@@ -380,7 +425,7 @@ private fun ContinueReadingCard(card: ContinueCard, onClick: () -> Unit) {
                     )
                 }
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
             val fraction = (card.ayah.toFloat() / card.surah.ayahCount).coerceIn(0f, 1f)
             Box(
                 Modifier
