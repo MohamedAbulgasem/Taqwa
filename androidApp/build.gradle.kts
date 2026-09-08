@@ -36,6 +36,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+    buildTypes {
+        release {
+            // R8 and resource shrinking: the unshrunk app is 33 MB, most of it Compose and Kotlin
+            // code the app never calls. No signing config yet: a release key is a pre-release
+            // decision, so the output is unsigned and signed by hand for now.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
 }
 
 kotlin {
