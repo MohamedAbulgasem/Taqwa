@@ -38,21 +38,23 @@ fun TaqwaSegmented(options: List<String>, selectedIndex: Int, onSelect: (Int) ->
             .height(44.dp)
             .clip(RoundedCornerShape(percent = 50))
             .background(colors.surface)
-            .border(1.dp, colors.hairline, RoundedCornerShape(percent = 50))
-            .padding(3.dp),
+            .border(1.dp, colors.hairline, RoundedCornerShape(percent = 50)),
     ) {
         options.forEachIndexed { index, label ->
             val selected = index == selectedIndex
+            // The clickable takes the full 44 dp; only the drawn pill is inset by 3 dp. Putting
+            // the inset on the Row instead would leave each option a 38 dp target.
             Box(
                 Modifier
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(percent = 50))
-                    .background(if (selected) colors.accent else colors.surface)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = { onSelect(index) },
                     )
+                    .padding(3.dp)
+                    .clip(RoundedCornerShape(percent = 50))
+                    .background(if (selected) colors.accent else colors.surface)
                     .padding(horizontal = 14.dp),
                 contentAlignment = Alignment.Center,
             ) {
