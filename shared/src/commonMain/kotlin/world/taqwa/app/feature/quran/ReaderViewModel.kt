@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -99,7 +100,9 @@ class ReaderViewModel(
     fun start(scope: CoroutineScope) {
         this.scope = scope
         scope.launch {
-            settings.readingSettings(languageTag).collect { applySettings(it) }
+            // The same DataStore also receives every debounced reading position, so without the
+            // filter each scroll stop re-ran applySettings and refetched the translations.
+            settings.readingSettings(languageTag).distinctUntilChanged().collect { applySettings(it) }
         }
     }
 

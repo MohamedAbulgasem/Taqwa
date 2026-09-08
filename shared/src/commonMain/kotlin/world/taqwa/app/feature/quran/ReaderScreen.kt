@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -105,6 +106,7 @@ fun ReaderScreen(
 
         val hasBasmala = ready.basmala != null
         val listState = rememberLazyListState()
+        val jumpOffsetPx = with(LocalDensity.current) { 8.dp.roundToPx() }
 
         // Runs once per surah (the reader is re-created — a fresh view model — whenever the
         // surah changes, via App.kt's `remember(screen)`), so a settings change from the sheet
@@ -113,7 +115,8 @@ fun ReaderScreen(
             if (initialAyah > 1) {
                 val ayahIndex = ready.ayahs.indexOfFirst { it.number == initialAyah }
                 if (ayahIndex >= 0) {
-                    listState.scrollToItem((if (hasBasmala) 1 else 0) + ayahIndex)
+                    // Spec §2.3: the card lands 8 dp below the top edge, not flush against it.
+                    listState.scrollToItem((if (hasBasmala) 1 else 0) + ayahIndex, scrollOffset = -jumpOffsetPx)
                 }
             }
         }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -39,6 +40,7 @@ import world.taqwa.app.resources.quran_reader_aa
 import world.taqwa.app.resources.quran_reader_mushaf
 
 /** The 36 dp round icon buttons' size (spec §2.2). */
+private val TouchTargetSize = 44.dp
 private val IconButtonSize = 36.dp
 
 /**
@@ -118,20 +120,27 @@ private fun HeaderIconButton(
 ) {
     val colors = LocalTaqwaColors.current
     val tint = if (selected) colors.accent else colors.textSecondary
-    Column(
+    // The finger gets 44 dp (spec §92); the eye gets the 36 dp disc drawn inside it.
+    Box(
         Modifier
-            .size(IconButtonSize)
-            .clip(CircleShape)
-            .then(if (selected) Modifier.background(colors.accent.copy(alpha = 0.18f), CircleShape) else Modifier)
+            .size(TouchTargetSize)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick,
             )
             .semantics { contentDescription = description },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        contentAlignment = Alignment.Center,
     ) {
-        content(tint)
+        Column(
+            Modifier
+                .size(IconButtonSize)
+                .clip(CircleShape)
+                .then(if (selected) Modifier.background(colors.accent.copy(alpha = 0.18f), CircleShape) else Modifier),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            content(tint)
+        }
     }
 }
