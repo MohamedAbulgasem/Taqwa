@@ -88,7 +88,16 @@
     <string name="notifications_remind_before">Remind me before</string>
     <string name="notifications_prayers_label">PRAYERS</string>
     <string name="notifications_remind_never">Never</string>
-    <string name="unit_minutes">%1$s min</string>
+    <!--
+        A count of minutes. English has one plural break, Arabic six (CLDR): 3-10 take "دقائق"
+        and everything else "دقيقة", which is why this is a plural resource and not a string with
+        a placeholder. Every form keeps %1$s: the callers pass already-localized digits, and one
+        of them prefixes a sign that must stay attached to them.
+    -->
+    <plurals name="minutes_count">
+        <item quantity="one">%1$s min</item>
+        <item quantity="other">%1$s min</item>
+    </plurals>
 
     <!-- Sound sheet -->
     <string name="sound_sheet_title">Notification sound</string>

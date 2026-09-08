@@ -29,6 +29,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
@@ -53,6 +54,7 @@ import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.prayer.HighLatitudeSelector
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.minutes_count
 import world.taqwa.app.resources.adjustments_many
 import world.taqwa.app.resources.adjustments_none
 import world.taqwa.app.resources.adjustments_one
@@ -71,7 +73,6 @@ import world.taqwa.app.resources.prayer_times_manual
 import world.taqwa.app.resources.prayer_times_method
 import world.taqwa.app.resources.prayer_times_show_sunrise
 import world.taqwa.app.resources.settings_prayer_times
-import world.taqwa.app.resources.unit_minutes
 
 /** Roughly where the sun stops dropping far enough below the horizon for a true Fajr and Isha. */
 private const val HIGH_LATITUDE_DEGREES = 48
@@ -351,7 +352,9 @@ private fun AdjustmentRow(
             fontWeight = FontWeight.SemiBold,
             color = if (minutes == 0) colors.textTertiary else colors.accent,
             textAlign = TextAlign.Center,
-            modifier = Modifier.width(64.dp),
+            // Wide enough for the longest form the unit takes: Arabic's dual, "+٢ دقيقتان",
+            // which wrapped to two lines in the 64.dp this column used to be.
+            modifier = Modifier.width(78.dp),
         )
         StepperButton("+", enabled = minutes < ADJUSTMENT_LIMIT) {
             onChange((minutes + 1).coerceAtMost(ADJUSTMENT_LIMIT))
@@ -373,7 +376,13 @@ private fun formatOffset(minutes: Int): String {
         minutes > 0 -> "+$digits"
         else -> "−$digits"
     }
-    return stringResource(Res.string.unit_minutes, signed)
+    // The unit follows the magnitude's own plural rules — Arabic says "دقائق" for 3-10 — so the
+    // sign never reaches the quantity, only the text.
+    return pluralStringResource(
+        Res.plurals.minutes_count,
+        if (minutes < 0) -minutes else minutes,
+        signed,
+    )
 }
 
 @Composable

@@ -85,7 +85,14 @@
     <string name="notifications_remind_before">التذكير قبل</string>
     <string name="notifications_prayers_label">الصلوات</string>
     <string name="notifications_remind_never">بدون تذكير</string>
-    <string name="unit_minutes">%1$s دقيقة</string>
+    <plurals name="minutes_count">
+        <item quantity="zero">%1$s دقيقة</item>
+        <item quantity="one">%1$s دقيقة</item>
+        <item quantity="two">%1$s دقيقتان</item>
+        <item quantity="few">%1$s دقائق</item>
+        <item quantity="many">%1$s دقيقة</item>
+        <item quantity="other">%1$s دقيقة</item>
+    </plurals>
 
     <!-- Sound sheet -->
     <string name="sound_sheet_title">صوت الإشعار</string>

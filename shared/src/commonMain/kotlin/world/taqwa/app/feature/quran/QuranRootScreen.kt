@@ -717,17 +717,20 @@ private fun JuzListRow(juz: JuzRow, onClick: () -> Unit) {
                 color = colors.textSecondary,
             )
         }
-        // "Juz N" in Arabic script regardless of the UI language — the same dual-script badge
-        // the surah rows show — but this label is ours, not the Quran's, so it is drawn in the
-        // ordinary Arabic UI face rather than mushafFamily(), which spec §5 reserves for actual
-        // Quran text.
-        Text(
-            juzArabicLabel(juz.number),
-            fontSize = 20.sp,
-            color = colors.textPrimary,
-            textAlign = TextAlign.Right,
-            maxLines = 1,
-        )
+        // "Juz N" in Arabic script beside an English title — the same dual-script badge the surah
+        // rows show, and dropped for the same reason under an Arabic UI, where the title beside it
+        // already reads "الجزء N" and the badge would only say it twice. This label is ours, not the
+        // Quran's, so it is drawn in the ordinary Arabic UI face rather than mushafFamily(), which
+        // spec §5 reserves for actual Quran text.
+        if (!arabic) {
+            Text(
+                juzArabicLabel(juz.number),
+                fontSize = 20.sp,
+                color = colors.textPrimary,
+                textAlign = TextAlign.Right,
+                maxLines = 1,
+            )
+        }
     }
 }
 

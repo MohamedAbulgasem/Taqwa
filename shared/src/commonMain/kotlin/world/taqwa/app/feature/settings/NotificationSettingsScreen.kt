@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
@@ -26,20 +27,27 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.i18n.soundDisplayName
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.minutes_count
 import world.taqwa.app.resources.notifications_exact_alarms_off
 import world.taqwa.app.resources.notifications_master_toggle
 import world.taqwa.app.resources.notifications_prayers_label
 import world.taqwa.app.resources.notifications_remind_before
 import world.taqwa.app.resources.notifications_remind_never
 import world.taqwa.app.resources.settings_notifications
-import world.taqwa.app.resources.unit_minutes
 import world.taqwa.app.design.components.TaqwaBottomSheet
 
+// A plural, not a formatted string: Arabic reads "5 دقائق" but "15 دقيقة", and only the
+// quantity rules can tell those apart. The digits are localized before they go in, so the
+// resource never sees a Western numeral under an Arabic UI.
 @Composable
 private fun leadLabel(minutes: Int): String = if (minutes == 0) {
     stringResource(Res.string.notifications_remind_never)
 } else {
-    stringResource(Res.string.unit_minutes, LocalPlatformFormat.current.localizedDigits(minutes))
+    pluralStringResource(
+        Res.plurals.minutes_count,
+        minutes,
+        LocalPlatformFormat.current.localizedDigits(minutes),
+    )
 }
 
 /**

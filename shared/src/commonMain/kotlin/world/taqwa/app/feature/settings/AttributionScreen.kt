@@ -13,6 +13,7 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.attribution_intro
@@ -34,6 +35,7 @@ import world.taqwa.app.resources.credit_translations
 import world.taqwa.app.resources.credit_translations_detail
 import world.taqwa.app.resources.credit_typeface
 import world.taqwa.app.resources.credit_typeface_detail
+import world.taqwa.app.resources.quran_sheet_transliteration
 import world.taqwa.app.resources.settings_attribution
 
 private data class Credit(val what: String, val detail: String, val source: String? = null)
@@ -91,7 +93,15 @@ private fun credits(translations: List<TranslationInfo>): List<Credit> = listOf(
 ) + translations.map { translation ->
     // Read from the database, never hardcoded, so this list can never drift from what is
     // actually bundled (spec §6).
-    Credit(what = translation.name, detail = translation.translator)
+    // A translation's name is its own title in its own language and stays as stored; the
+    // transliteration's stored name is the English word for what it is, so that one row takes the
+    // localized label the reading sheet already uses instead.
+    val what = if (translation.kind == TextKind.TRANSLITERATION) {
+        stringResource(Res.string.quran_sheet_transliteration)
+    } else {
+        translation.name
+    }
+    Credit(what = what, detail = translation.translator)
 }
 
 @Composable

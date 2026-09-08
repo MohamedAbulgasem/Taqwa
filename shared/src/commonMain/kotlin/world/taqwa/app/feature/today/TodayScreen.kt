@@ -207,12 +207,17 @@ private fun CityAndDates(state: TodayUiState.Ready, horizontalPadding: Dp = Gutt
         // Hijri first, then the Gregorian a step quieter: one line, the two calendars read
         // as a pair. The separator is punctuation, not a translated string, so it is the
         // same in both languages; the bidi algorithm orders the halves under Arabic.
+        //
+        // The Gregorian half is isolated (FSI…PDI). Without it, an English date that opens with a
+        // digit — "8 September 2026" — has that leading number swallowed by the surrounding
+        // right-to-left run and comes out as "September 2026 8"; inside the isolate the date takes
+        // its own direction from its own first strong character and lays out whole.
         Text(
             buildAnnotatedString {
                 append(state.hijri)
                 withStyle(SpanStyle(color = colors.textTertiary)) {
                     append(" · ")
-                    append(state.gregorian)
+                    append("\u2068" + state.gregorian + "\u2069")
                 }
             },
             style = TaqwaText.caption,

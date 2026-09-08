@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -115,9 +116,12 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
             Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // The list gets the larger share: its bilingual names are the longest text on the
-            // card and are shown whole, never clipped, so the preview matches the real widget.
-            Column(Modifier.weight(0.6f)) {
+            // The countdown column is sized to its own text rather than to a share of the row:
+            // "5:36" is one unbreakable word, so its minimum intrinsic width is exactly what it
+            // needs, whatever face the UI language resolves — the system Arabic digits on iOS are
+            // wider than Manrope's and a fixed share clipped them to "5:3". The list keeps the
+            // rest, which is still the larger share and still shows its bilingual names whole.
+            Column(Modifier.width(IntrinsicSize.Min)) {
                 Text(
                     content.countdownLabel,
                     style = TaqwaText.caption.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold),
@@ -139,7 +143,7 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
                 )
             }
             Spacer(Modifier.width(8.dp))
-            Column(Modifier.weight(1.4f).fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly) {
+            Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly) {
                 content.rows.forEach { row ->
                     val color = Color(if (row.isCurrent) colors.accentArgb else colors.textArgb)
                     val weight = if (row.isCurrent) FontWeight.Bold else FontWeight.Normal
