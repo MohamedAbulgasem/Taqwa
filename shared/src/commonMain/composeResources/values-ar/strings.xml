@@ -197,7 +197,7 @@
     <string name="today_qibla_detail">%1$s° · %2$s كم إلى مكة</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">القرآن</string>
-    <string name="quran_search_hint">ابحث عن سورة</string>
+    <string name="quran_search_hint">ابحث في القرآن</string>
     <string name="quran_continue">متابعة القراءة</string>
     <string name="quran_continue_detail">الآية %1$s من %2$s · الجزء %3$s</string>
     <string name="quran_tab_surah">السور</string>
@@ -221,4 +221,16 @@
     <string name="quran_mode_translation">ترجمة</string>
     <string name="quran_mode_mushaf">مصحف</string>
     <string name="quran_size_mushaf_note">حجم الصفحة يتبع عرض الشاشة في وضع المصحف.</string>
+    <!-- Quran search results and bookmarks (slice 2b) -->
+    <string name="quran_section_surahs">السور</string>
+    <string name="quran_section_ayahs">الآيات · %1$s</string>
+    <string name="quran_search_empty">لا توجد آيات مطابقة</string>
+    <string name="quran_tab_bookmarks">المحفوظات</string>
+    <string name="quran_bookmarks_empty">لا توجد محفوظات بعد. افتح آية واضغط على علامة الحفظ.</string>
+    <string name="quran_ayah_n">الآية %1$s</string>
+    <string name="quran_action_bookmark">حفظ</string>
+    <string name="quran_action_bookmarked">محفوظة</string>
+    <string name="quran_action_copy">نسخ</string>
+    <string name="quran_action_copied">تم النسخ</string>
+    <string name="quran_action_share">مشاركة</string>
 </resources>

@@ -202,7 +202,7 @@
     <string name="today_qibla_detail">%1$s° · %2$s km to Makkah</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">Quran</string>
-    <string name="quran_search_hint">Search surah</string>
+    <string name="quran_search_hint">Search the Quran</string>
     <string name="quran_continue">CONTINUE READING</string>
     <string name="quran_continue_detail">Ayah %1$s of %2$s · Juz %3$s</string>
     <string name="quran_tab_surah">Surah</string>
@@ -228,4 +228,16 @@
     <string name="quran_mode_translation">Translation</string>
     <string name="quran_mode_mushaf">Mushaf</string>
     <string name="quran_size_mushaf_note">Page size follows the width in Mushaf mode.</string>
+    <!-- Quran search results and bookmarks (slice 2b) -->
+    <string name="quran_section_surahs">Surahs</string>
+    <string name="quran_section_ayahs">Ayahs · %1$s</string>
+    <string name="quran_search_empty">No ayahs match</string>
+    <string name="quran_tab_bookmarks">Bookmarks</string>
+    <string name="quran_bookmarks_empty">No bookmarks yet. Open an ayah and tap the bookmark.</string>
+    <string name="quran_ayah_n">Ayah %1$s</string>
+    <string name="quran_action_bookmark">Bookmark</string>
+    <string name="quran_action_bookmarked">Bookmarked</string>
+    <string name="quran_action_copy">Copy</string>
+    <string name="quran_action_copied">Copied</string>
+    <string name="quran_action_share">Share</string>
 </resources>
