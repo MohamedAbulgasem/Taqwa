@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Text
@@ -47,8 +49,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
+import world.taqwa.app.design.ContentMaxWidth
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
@@ -110,9 +114,16 @@ fun MushafPageView(
     }
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+            // Held sideways there is far more width than a page of fifteen lines can use, and the
+            // font size below is derived from the frame's width — uncapped, a landscape page would
+            // be drawn at the maximum size and stretched across the whole screen. So the page
+            // column is capped and centred like every other screen's. A portrait phone is narrower
+            // than the cap, so nothing there moves by a pixel.
+            val landscape = maxWidth > maxHeight
+            val columnWidth = if (maxWidth > ContentMaxWidth) ContentMaxWidth else maxWidth
             // 14 dp per side: the frame's own two hairlines, their 4 dp gap and the 10 dp of inner
             // padding the text actually starts after.
-            val frameWidth = maxWidth - 28.dp
+            val frameWidth = columnWidth - 28.dp
             val base = (REFERENCE_BASE_SP * (frameWidth.value / REFERENCE_FRAME_WIDTH_DP))
                 .coerceIn(MIN_BASE_SP, MAX_BASE_SP)
             val frameWidthPx = with(density) { frameWidth.toPx() }
@@ -123,7 +134,7 @@ fun MushafPageView(
             }
             val lineHeight: Dp = with(density) { (layout.sizeSp * LINE_HEIGHT).sp.toDp() }
 
-            Column(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().contentWidth()) {
                 // The caption names the surah the page's first *text* line is in — the same rule
                 // the header uses, so the two never disagree while a page straddles two surahs.
                 val captionSurah = page.lines.firstOrNull { it.type == LineType.TEXT }
@@ -137,13 +148,25 @@ fun MushafPageView(
                             .padding(4.dp)
                             .background(colors.surface, RoundedCornerShape(15.dp))
                             .border(1.dp, colors.hairline, RoundedCornerShape(15.dp))
-                            .padding(horizontal = 10.dp, vertical = 12.dp),
-                        // Pages 1 and 2 hold eight lines where every other page holds fifteen, so
-                        // spreading them would leave the printed text floating (spec §2.4).
-                        verticalArrangement = if (page.number <= 2) {
-                            Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
-                        } else {
-                            Arrangement.SpaceEvenly
+                            .padding(horizontal = 10.dp, vertical = 12.dp)
+                            // Sideways the frame is much shorter than fifteen lines at the size
+                            // its width earns them, so the lines scroll instead of being squeezed.
+                            // The scroll sits inside the frame's own padding, so the two hairlines
+                            // stay put while the printed page moves under them. A vertical scroll
+                            // inside the horizontal pager is the ordinary nested-scroll case — the
+                            // sideways swipe still turns the page.
+                            .then(
+                                if (landscape) Modifier.verticalScroll(rememberScrollState()) else Modifier,
+                            ),
+                        verticalArrangement = when {
+                            // Scrolling, so the column is as tall as its lines and there is no
+                            // slack left to spread: each line keeps its own fixed height and they
+                            // stack from the top.
+                            landscape -> Arrangement.Top
+                            // Pages 1 and 2 hold eight lines where every other page holds fifteen,
+                            // so spreading them would leave the printed text floating (spec §2.4).
+                            page.number <= 2 -> Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
+                            else -> Arrangement.SpaceEvenly
                         },
                     ) {
                         page.lines.forEachIndexed { index, line ->

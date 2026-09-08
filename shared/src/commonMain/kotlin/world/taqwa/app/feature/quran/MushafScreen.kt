@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -68,7 +68,10 @@ fun MushafScreen(
     // and so tapping the same ayah again clears it. The action row this will grow is slice 2b's.
     var highlighted by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
-    Column(Modifier.fillMaxSize().background(colors.background).windowInsetsPadding(WindowInsets.systemBars)) {
+    // safeDrawing, not systemBars: sideways the navigation bar and the camera cutout sit on the
+    // left and right edges. The pager inside pads nothing of its own, so this is the only place
+    // the page is inset and there is nothing here to double up with.
+    Column(Modifier.fillMaxSize().background(colors.background).windowInsetsPadding(WindowInsets.safeDrawing)) {
         ReaderHeader(
             title = ready?.let { if (arabic) it.surah.nameArabic else it.surah.nameLatin } ?: "",
             caption = ready?.let {
