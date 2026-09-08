@@ -38,7 +38,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.platform.LocalDensity
@@ -59,6 +61,7 @@ import world.taqwa.app.quran.displayName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_next_surah
+import world.taqwa.app.share.shareText
 import world.taqwa.app.design.components.TaqwaBottomSheet
 
 /** The gutter between an ayah card and the edge of the reader's own content column. */
@@ -81,6 +84,10 @@ fun ReaderScreen(
     onChangeSettings: (ReadingSettings) -> Unit,
     onFirstVisibleAyah: (Int) -> Unit,
     onOpenNextSurah: (Int) -> Unit,
+    onToggleBookmark: (Int) -> Unit,
+    /** The copy/share text for one ayah (spec 2b §2.3), null before the surah has loaded — built
+     * by the view model, but with the surah name and digits this screen's own locale decides. */
+    shareTextFor: (Int) -> String?,
 ) {
     val colors = LocalTaqwaColors.current
     val arabic = isRtlLocale()
@@ -90,6 +97,9 @@ fun ReaderScreen(
     // Aa button is this screen's own affordance, and the Mushaf screen (task 8) will host its own
     // instance of [ReadingSheet] the same way, since only each screen knows its own [mushafMode].
     var showSheet by remember { mutableStateOf(false) }
+    // The clipboard and the share sheet are the screen's own business (spec 2b §2.3): the view
+    // model only produces the text.
+    val clipboard = LocalClipboardManager.current
 
     // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move
     // to the left and right edges, and only safeDrawing reports those.
@@ -171,8 +181,23 @@ fun ReaderScreen(
                         translationLanguage = ready.translationLanguage,
                         sizeSp = ready.settings.arabicSizeSp,
                         selected = selectedAyah == ayah.number,
+                        bookmarked = ayah.number in ready.bookmarked,
+                        // Built only for the selected card: every other card would otherwise pay
+                        // for a row it never draws.
+                        actions = if (selectedAyah != ayah.number) {
+                            null
+                        } else {
+                            {
+                                AyahActions(
+                                    bookmarked = ayah.number in ready.bookmarked,
+                                    onBookmark = { onToggleBookmark(ayah.number) },
+                                    onCopy = { shareTextFor(ayah.number)?.let { clipboard.setText(AnnotatedString(it)) } },
+                                    onShare = { shareTextFor(ayah.number)?.let(::shareText) },
+                                )
+                            }
+                        },
                         // One ayah at a time: tapping another moves the selection, tapping the same
-                        // one clears it, which is the model 2b's action row will sit on.
+                        // one clears it, which is what the action row sits on.
                         onClick = { selectedAyah = if (selectedAyah == ayah.number) null else ayah.number },
                     )
                 }

@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.quran
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,7 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
+import world.taqwa.app.design.components.drawBookmark
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.quran.QuranText
@@ -51,10 +55,13 @@ internal val RTL_TRANSLATION_LANGUAGES = setOf("ar", "ur", "fa")
  * whatever language it is actually written in, never the surrounding UI's direction: an Arabic UI
  * showing an English translation still reads that paragraph left-to-right, full stop at the end.
  *
- * A tap toggles a subtle selected background and nothing else yet — 2b adds the action row
- * (bookmark, share, copy) that a real selection is for; the state lives here, locally, so this
- * task's screen does not have to plumb a selection model through for a row that does not exist
- * yet.
+ * A tap toggles a subtle selected background and, through [actions], reveals the ayah's own
+ * action row below the content (spec 2b §2.4). The row is passed in rather than built here so the
+ * card stays a pure rendering of one ayah: the screen owns the selection and the clipboard, share
+ * sheet and bookmark calls those actions make.
+ *
+ * [bookmarked] draws the badge (spec 2b §2.2) whether or not the card is selected — that is what
+ * makes a kept ayah findable by scrolling — while [actions] appears only under the selected one.
  */
 @Composable
 fun AyahCard(
@@ -65,6 +72,8 @@ fun AyahCard(
     translationLanguage: String,
     sizeSp: Int,
     selected: Boolean,
+    bookmarked: Boolean,
+    actions: (@Composable () -> Unit)?,
     onClick: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
@@ -81,6 +90,12 @@ fun AyahCard(
                 .background(if (selected) colors.accent.copy(alpha = 0.08f) else Color.Transparent)
                 .padding(14.dp),
         ) {
+            if (bookmarked) {
+                // Top-start of the content column, so it follows the UI's direction (right under
+                // an Arabic UI) rather than the Arabic text's own.
+                Canvas(Modifier.size(14.dp)) { drawBookmark(colors.accent, filled = true) }
+                Spacer(Modifier.height(4.dp))
+            }
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Text(
                     buildAnnotatedString {
@@ -123,6 +138,11 @@ fun AyahCard(
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
+            }
+            if (selected && actions != null) {
+                Spacer(Modifier.height(8.dp))
+                CardDivider()
+                actions()
             }
         }
     }

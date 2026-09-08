@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import world.taqwa.app.quran.Ayah
+import world.taqwa.app.quran.AyahShareText
 import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
@@ -17,6 +19,7 @@ import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
+import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
 
 sealed interface ReaderUiState {
@@ -45,6 +48,13 @@ sealed interface ReaderUiState {
         /** The reading-settings sheet's translation picker (task 7, spec §2.5): every bundled text
          * except the transliteration, tafsir first then the rest by language. */
         val translations: List<TranslationInfo>,
+        /** The ayah numbers of *this* surah that are bookmarked (spec 2b §2.2) — the card draws
+         * the badge and the action row its label from this, so a bookmark set on another device
+         * or removed in the Bookmarks tab lands here through the store's own flow. */
+        val bookmarked: Set<Int>,
+        /** The name of the translation actually being shown, null with translation off — the
+         * share text names its translation (spec 2b §2.3) and must never invent that name. */
+        val translationName: String?,
     ) : ReaderUiState
 }
 
@@ -72,6 +82,7 @@ private const val POSITION_DEBOUNCE_MS = 500L
 class ReaderViewModel(
     private val source: QuranSource,
     private val settings: SettingsRepository,
+    private val bookmarks: BookmarkStore,
     private val languageTag: String,
     private val surah: Int,
 ) {
@@ -90,6 +101,11 @@ class ReaderViewModel(
     private var nextSurahInfo: Surah? = null
     private var previewAyahText: String? = null
 
+    /** The last set the bookmark collection saw, so [applySettings]'s own re-emission (a slider
+     * tweak, say) carries the bookmarks forward instead of dropping them until the store's flow
+     * happens to emit again. */
+    private var bookmarkedAyahs: Set<Int> = emptySet()
+
     private var loadedTranslationId: String? = null
     private var loadedTranslation: Map<Int, String> = emptyMap()
     private var transliterationLoaded = false
@@ -103,6 +119,15 @@ class ReaderViewModel(
             // The same DataStore also receives every debounced reading position, so without the
             // filter each scroll stop re-ran applySettings and refetched the translations.
             settings.readingSettings(languageTag).distinctUntilChanged().collect { applySettings(it) }
+        }
+        // A second collection rather than a combine: the bookmarks change far more often than the
+        // settings, and folding them together would re-run applySettings — and its translation
+        // lookups — on every toggle.
+        scope.launch {
+            bookmarks.bookmarks.collect { list ->
+                bookmarkedAyahs = list.filter { it.surah == surah }.map { it.ayah }.toSet()
+                _state.update { (it as? ReaderUiState.Ready)?.copy(bookmarked = bookmarkedAyahs) ?: it }
+            }
         }
     }
 
@@ -161,6 +186,12 @@ class ReaderViewModel(
             translationLanguage = translations.firstOrNull { it.id == translationId }?.language ?: "en",
             previewAyah = previewAyahText!!,
             translations = sheetTranslations,
+            bookmarked = bookmarkedAyahs,
+            translationName = if (translationId == ReadingSettings.NO_TRANSLATION) {
+                null
+            } else {
+                translations.firstOrNull { it.id == translationId }?.name
+            },
         )
     }
 
@@ -184,6 +215,38 @@ class ReaderViewModel(
         val ready = _state.value as? ReaderUiState.Ready
         if (ready != null) settings.setReadingSettings(ready.settings.copy(mode = ReadingMode.MUSHAF))
         return source.pageOf(surah, ready?.currentAyah ?: 1)
+    }
+
+    /**
+     * The ayah action row's bookmark (spec 2b §2.2, §2.4): writes through [BookmarkStore], and the
+     * collection [start] began is what puts the change back into [_state] — so the badge and the
+     * label follow the stored truth, never an optimistic local flip that a failed write would
+     * leave lying. Mirrors [QuranRootViewModel.removeBookmark].
+     */
+    fun toggleBookmark(ayah: Int) {
+        scope?.launch { bookmarks.toggle(surah, ayah) }
+    }
+
+    /**
+     * The one text copy and share both put out (spec 2b §2.3), or null before the surah is loaded
+     * or for an ayah this surah does not have. [surahName] and [digits] come from the screen
+     * because both are localisation the view model has no business resolving: the surah's name
+     * follows the UI language and the reference digits the UI's own numerals.
+     */
+    fun shareTextFor(ayah: Int, surahName: String, digits: (Int) -> String): String? {
+        val ready = _state.value as? ReaderUiState.Ready ?: return null
+        val found = ready.ayahs.firstOrNull { it.number == ayah } ?: return null
+        val name = ready.translationName
+        return AyahShareText.format(
+            arabic = found.text,
+            ayahNumber = found.number,
+            // Only when a translation is actually on screen, and then under its own name.
+            translation = if (name == null) null else ready.translation[found.number]?.let { it to name },
+            surahName = surahName,
+            surah = surah,
+            ayah = found.number,
+            digits = digits,
+        )
     }
 
     /**

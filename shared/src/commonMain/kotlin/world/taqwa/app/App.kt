@@ -72,9 +72,11 @@ import world.taqwa.app.feature.quran.MushafViewModel
 import world.taqwa.app.feature.quran.QuranRootScreen
 import world.taqwa.app.feature.quran.QuranRootViewModel
 import world.taqwa.app.feature.quran.ReaderScreen
+import world.taqwa.app.feature.quran.ReaderUiState
 import world.taqwa.app.feature.quran.ReaderViewModel
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
+import world.taqwa.app.quran.displayName
 import kotlin.time.Clock
 
 @Composable
@@ -297,6 +299,7 @@ fun App(container: AppContainer) {
                                 ReaderViewModel(
                                     source = container.quranRepository,
                                     settings = settings,
+                                    bookmarks = container.bookmarkStore,
                                     languageTag = platformFormat.languageTag(),
                                     surah = screen.surah,
                                 )
@@ -316,6 +319,19 @@ fun App(container: AppContainer) {
                                 onChangeSettings = viewModel::updateSettings,
                                 onFirstVisibleAyah = viewModel::onFirstVisibleAyah,
                                 onOpenNextSurah = { next -> navigator.replace(Screen.Reader(next, 1)) },
+                                onToggleBookmark = viewModel::toggleBookmark,
+                                // The surah's name and the reference digits follow the UI's own
+                                // language (spec 2b §2.3), which only this layer knows — so the
+                                // view model is handed both rather than resolving them itself.
+                                shareTextFor = { ayah ->
+                                    (readerState as? ReaderUiState.Ready)?.let { ready ->
+                                        viewModel.shareTextFor(
+                                            ayah = ayah,
+                                            surahName = ready.surah.displayName(layoutDirection == LayoutDirection.Rtl),
+                                            digits = platformFormat::localizedDigits,
+                                        )
+                                    }
+                                },
                             )
                         }
 

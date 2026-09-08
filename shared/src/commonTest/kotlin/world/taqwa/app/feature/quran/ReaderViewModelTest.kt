@@ -14,9 +14,13 @@ import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
+import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
+import kotlin.random.Random
+import kotlin.random.nextULong
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.test.assertNull
 
@@ -39,6 +43,15 @@ class ReaderViewModelTest {
     private fun settingsRepo(name: String) = SettingsRepository(
         PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-reader-test-$name.preferences_pb".toPath() },
     )
+
+    /** A fresh file per store, as in [QuranRootViewModelTest]: [BookmarkStore.toggle] is a toggle,
+     * so a store that outlived an earlier run would start with the bookmark already set and the
+     * toggle would remove it instead of adding it. */
+    private fun bookmarks(name: String) = BookmarkStore(
+        PreferenceDataStoreFactory.createWithPath {
+            "/tmp/taqwa-reader-bm-$name-${Random.nextULong()}.preferences_pb".toPath()
+        },
+    ) { 1L }
 
     private fun ayahsFor(surah: Int, count: Int, page: Int = 2, juz: Int = 1): List<Ayah> =
         (1..count).map { n -> Ayah(surah, n, "$surah:$n uthmani text", page, juz, 1, 0) }
@@ -82,9 +95,15 @@ class ReaderViewModelTest {
     private suspend fun ReaderViewModel.awaitReady(): ReaderUiState.Ready =
         state.first { it is ReaderUiState.Ready } as ReaderUiState.Ready
 
+    /** [BookmarkStore] is real, disk-backed DataStore even in tests, so its emissions arrive on a
+     * dispatcher virtual time cannot advance: every bookmark assertion waits for the state itself
+     * to carry the expected set rather than draining the scheduler. */
+    private suspend fun ReaderViewModel.awaitBookmarked(predicate: (Set<Int>) -> Boolean): Set<Int> =
+        (state.first { it is ReaderUiState.Ready && predicate(it.bookmarked) } as ReaderUiState.Ready).bookmarked
+
     @Test
     fun basmalaIsAbsentForAlFaatihaWhichIsAyahOneItself() = runTest {
-        val vm = ReaderViewModel(source(), settingsRepo("basmala-1"), "en", surah = 1)
+        val vm = ReaderViewModel(source(), settingsRepo("basmala-1"), bookmarks("basmala-1"), "en", surah = 1)
         vm.start(backgroundScope)
         assertNull(vm.awaitReady().basmala)
     }
@@ -92,7 +111,7 @@ class ReaderViewModelTest {
     @Test
     fun basmalaIsShownForOrdinarySurahsReadFromAyahOneOfSurahOne() = runTest {
         val src = source()
-        val vm = ReaderViewModel(src, settingsRepo("basmala-2"), "en", surah = 2)
+        val vm = ReaderViewModel(src, settingsRepo("basmala-2"), bookmarks("basmala-2"), "en", surah = 2)
         vm.start(backgroundScope)
         // Never a literal: it must be exactly the database's own 1:1 text.
         assertEquals(src.ayahs(1).first().text, vm.awaitReady().basmala)
@@ -100,7 +119,7 @@ class ReaderViewModelTest {
 
     @Test
     fun basmalaIsAbsentForAtTawbahWhichHasNoneAtAll() = runTest {
-        val vm = ReaderViewModel(source(), settingsRepo("basmala-9"), "en", surah = 9)
+        val vm = ReaderViewModel(source(), settingsRepo("basmala-9"), bookmarks("basmala-9"), "en", surah = 9)
         vm.start(backgroundScope)
         assertNull(vm.awaitReady().basmala)
     }
@@ -109,7 +128,7 @@ class ReaderViewModelTest {
     fun translationLoadsForTheStoredId() = runTest {
         val repo = settingsRepo("translation-ok")
         repo.setReadingSettings(ReadingSettings(translationId = "en.sahih"))
-        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        val vm = ReaderViewModel(source(), repo, bookmarks("translation-ok"), "en", surah = 2)
         vm.start(backgroundScope)
         val ready = vm.awaitReady()
         assertEquals("en 2:1", ready.translation[1])
@@ -122,7 +141,7 @@ class ReaderViewModelTest {
     fun anUnknownTranslationIdFallsBackToSaheehInternational() = runTest {
         val repo = settingsRepo("translation-fallback")
         repo.setReadingSettings(ReadingSettings(translationId = "xx.unbundled"))
-        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        val vm = ReaderViewModel(source(), repo, bookmarks("translation-fallback"), "en", surah = 2)
         vm.start(backgroundScope)
         // The bundled en.sahih text, not an empty map from a translation id nothing provides.
         assertEquals("en 2:1", vm.awaitReady().translation[1])
@@ -133,7 +152,7 @@ class ReaderViewModelTest {
         val repo = settingsRepo("translation-off")
         repo.setReadingSettings(ReadingSettings(translationId = ReadingSettings.NO_TRANSLATION))
         val src = source()
-        val vm = ReaderViewModel(src, repo, "en", surah = 2)
+        val vm = ReaderViewModel(src, repo, bookmarks("translation-off"), "en", surah = 2)
         vm.start(backgroundScope)
         val ready = vm.awaitReady()
         // Not the Saheeh fallback: "none" is the one unbundled id that means exactly what it says.
@@ -146,7 +165,7 @@ class ReaderViewModelTest {
     fun transliterationIsNullWhenTheSettingIsOff() = runTest {
         val repo = settingsRepo("translit-off")
         repo.setReadingSettings(ReadingSettings(transliteration = false))
-        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        val vm = ReaderViewModel(source(), repo, bookmarks("translit-off"), "en", surah = 2)
         vm.start(backgroundScope)
         assertNull(vm.awaitReady().transliteration)
     }
@@ -155,21 +174,21 @@ class ReaderViewModelTest {
     fun transliterationLoadsWhenTheSettingIsOn() = runTest {
         val repo = settingsRepo("translit-on")
         repo.setReadingSettings(ReadingSettings(transliteration = true))
-        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        val vm = ReaderViewModel(source(), repo, bookmarks("translit-on"), "en", surah = 2)
         vm.start(backgroundScope)
         assertEquals("tl 2:1", vm.awaitReady().transliteration?.get(1))
     }
 
     @Test
     fun nextSurahIsTheFollowingSurahWhenOneExists() = runTest {
-        val vm = ReaderViewModel(source(), settingsRepo("next-exists"), "en", surah = 2)
+        val vm = ReaderViewModel(source(), settingsRepo("next-exists"), bookmarks("next-exists"), "en", surah = 2)
         vm.start(backgroundScope)
         assertEquals(3, vm.awaitReady().nextSurah?.number)
     }
 
     @Test
     fun nextSurahIsNullAfterAnNas() = runTest {
-        val vm = ReaderViewModel(source(), settingsRepo("next-114"), "en", surah = 114)
+        val vm = ReaderViewModel(source(), settingsRepo("next-114"), bookmarks("next-114"), "en", surah = 114)
         vm.start(backgroundScope)
         assertNull(vm.awaitReady().nextSurah)
     }
@@ -177,7 +196,7 @@ class ReaderViewModelTest {
     @Test
     fun theFirstVisibleAyahIsNotWrittenBeforeTheDebounceElapses() = runTest {
         val repo = settingsRepo("debounce-early")
-        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        val vm = ReaderViewModel(source(), repo, bookmarks("debounce-early"), "en", surah = 2)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -192,7 +211,7 @@ class ReaderViewModelTest {
     fun theFirstVisibleAyahIsWrittenOnceAfterTheDebounceElapses() = runTest {
         val repo = settingsRepo("debounce-late")
         val src = source()
-        val vm = ReaderViewModel(src, repo, "en", surah = 2)
+        val vm = ReaderViewModel(src, repo, bookmarks("debounce-late"), "en", surah = 2)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -207,7 +226,7 @@ class ReaderViewModelTest {
     @Test
     fun rapidScrollingCollapsesIntoASingleWriteForTheLatestAyah() = runTest {
         val repo = settingsRepo("debounce-collapse")
-        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        val vm = ReaderViewModel(source(), repo, bookmarks("debounce-collapse"), "en", surah = 2)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -224,7 +243,7 @@ class ReaderViewModelTest {
     fun theCaptionFollowsTheFirstVisibleAyahAfterTheDebounce() = runTest {
         val repo = settingsRepo("caption")
         val src = source()
-        val vm = ReaderViewModel(src, repo, "en", surah = 2)
+        val vm = ReaderViewModel(src, repo, bookmarks("caption"), "en", surah = 2)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -246,7 +265,7 @@ class ReaderViewModelTest {
     @Test
     fun previewAyahIsAlFatihaAyahTwoWithTheRoundel() = runTest {
         val src = source()
-        val vm = ReaderViewModel(src, settingsRepo("preview-ayah"), "en", surah = 2)
+        val vm = ReaderViewModel(src, settingsRepo("preview-ayah"), bookmarks("preview-ayah"), "en", surah = 2)
         vm.start(backgroundScope)
         val expected = QuranText.withMarker(src.ayahs(1)[1].text, 2)
         assertEquals(expected, vm.awaitReady().previewAyah)
@@ -255,7 +274,7 @@ class ReaderViewModelTest {
     @Test
     fun previewAyahIsTheSameRegardlessOfWhichSurahIsOpen() = runTest {
         val src = source()
-        val vm = ReaderViewModel(src, settingsRepo("preview-ayah-surah1"), "en", surah = 1)
+        val vm = ReaderViewModel(src, settingsRepo("preview-ayah-surah1"), bookmarks("preview-ayah-surah1"), "en", surah = 1)
         vm.start(backgroundScope)
         val expected = QuranText.withMarker(src.ayahs(1)[1].text, 2)
         assertEquals(expected, vm.awaitReady().previewAyah)
@@ -264,7 +283,7 @@ class ReaderViewModelTest {
     @Test
     fun translationsListExcludesTransliterationAndPutsTafsirFirstThenByLanguage() = runTest {
         val src = source(translationsList = listOf(french, transliterationInfo, sahih, tafsir))
-        val vm = ReaderViewModel(src, settingsRepo("translations-order"), "en", surah = 2)
+        val vm = ReaderViewModel(src, settingsRepo("translations-order"), bookmarks("translations-order"), "en", surah = 2)
         vm.start(backgroundScope)
         val ids = vm.awaitReady().translations.map { it.id }
         assertEquals(listOf("ar.muyassar", "en.sahih", "fr.hamidullah"), ids)
@@ -279,7 +298,7 @@ class ReaderViewModelTest {
         // re-fetched the translation on every scroll-stop, not just on an actual settings change.
         val repo = settingsRepo("translation-loads-position")
         val src = source()
-        val vm = ReaderViewModel(src, repo, "en", surah = 2)
+        val vm = ReaderViewModel(src, repo, bookmarks("translation-loads-position"), "en", surah = 2)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -294,7 +313,7 @@ class ReaderViewModelTest {
     @Test
     fun updateSettingsPersistsThroughTheRepositoryAndReEmits() = runTest {
         val repo = settingsRepo("update-settings")
-        val vm = ReaderViewModel(source(), repo, "en", surah = 2)
+        val vm = ReaderViewModel(source(), repo, bookmarks("update-settings"), "en", surah = 2)
         vm.start(backgroundScope)
         val ready = vm.awaitReady()
 
@@ -302,5 +321,44 @@ class ReaderViewModelTest {
         val updated = vm.state.first { (it as? ReaderUiState.Ready)?.settings?.arabicSizeSp == 34 } as ReaderUiState.Ready
         assertEquals(34, updated.settings.arabicSizeSp)
         assertEquals(34, repo.readingSettings("en").first().arabicSizeSp)
+    }
+
+    @Test
+    fun bookmarkedAyahsOfThisSurahArriveInStateAndToggleFlips() = runTest {
+        val store = bookmarks("reader-bm")
+        store.toggle(2, 3)
+        // Another surah's bookmark, which this reader must not show (spec 2b §2.2).
+        store.toggle(1, 1)
+        val vm = ReaderViewModel(source(), settingsRepo("reader-bm"), store, "en", surah = 2)
+        vm.start(backgroundScope)
+        assertEquals(setOf(3), vm.awaitBookmarked { it.isNotEmpty() })
+
+        vm.toggleBookmark(3)
+        assertEquals(emptySet(), vm.awaitBookmarked { it.isEmpty() })
+
+        vm.toggleBookmark(5)
+        assertEquals(setOf(5), vm.awaitBookmarked { it.isNotEmpty() })
+    }
+
+    @Test
+    fun shareTextCarriesTheTranslationOnlyWhenOneIsShown() = runTest {
+        val repo = settingsRepo("share-with")
+        // Written explicitly: this file outlives the run, and the test's own last act is to turn
+        // the translation off — so the starting point has to be stated, not inherited.
+        repo.setReadingSettings(ReadingSettings(translationId = "en.sahih"))
+        val vm = ReaderViewModel(source(), repo, bookmarks("share-with"), "en", surah = 2)
+        vm.start(backgroundScope)
+        vm.awaitReady()
+
+        val with = vm.shareTextFor(1, "Al-Baqarah") { it.toString() }!!
+        assertTrue(with.contains("(Saheeh International)"))
+        assertTrue(with.endsWith("Al-Baqarah 2:1"))
+
+        repo.setReadingSettings(ReadingSettings(translationId = ReadingSettings.NO_TRANSLATION))
+        // The write is real disk I/O feeding a real Flow, so the re-emission is awaited rather
+        // than assumed — the same rule the rest of this file follows.
+        vm.state.first { (it as? ReaderUiState.Ready)?.settings?.translationId == ReadingSettings.NO_TRANSLATION }
+        val without = vm.shareTextFor(1, "Al-Baqarah") { it.toString() }!!
+        assertFalse(without.contains("Saheeh"))
     }
 }
