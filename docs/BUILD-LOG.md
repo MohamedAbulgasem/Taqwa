@@ -572,3 +572,26 @@ transliteration on, the settings sheet, Mushaf pages 1, 3 and 42, and the tab ba
 Quran database copy on first launch (must land under 2 seconds on the iPhone 12) and confirm a
 second launch does not copy again; and fix anything visibly wrong in small follow-up commits on
 the same task.
+
+### Slice 2a - device round (8 September, 03:50 to 04:10)
+
+Build f5ceedc on the S23 (dark, en-ZA), the iPhone 12 (installed and launched; the first
+device build failed to link because the SQLDelight native driver needs `-lsqlite3` in the app
+target, now added to the Xcode project), the iPhone 17 Pro simulator (light) and the Pixel 8 Pro
+emulator. Full test run before the round: 334 JVM and 319 iOS tests in `shared`, 37 and 35 in
+`widgetcore`, zero failures.
+
+What was checked and held: the three-tab bar with 22 dp glyphs; the Quran root with the continue
+card after a first read ("Ayah 5 of 286 · Juz 1"); the card reader in English and under an Arabic
+UI (English translation now left to right after the direction fix); the reading sheet in Mushaf
+mode with the disabled slider and its note; Mushaf pages 2 and 3 on the S23, page 2 under Arabic
+UI, page 2 on the iOS simulator through the same Skia path the iPhone uses; the bundled database
+copied and opened on iOS at first launch with no visible delay.
+
+Fixed during the round: the iOS link (sqlite3), ayah cards selecting one at a time instead of
+each card keeping its own toggle, and plain punctuation in the new attribution bullets.
+
+Left for the morning review: word-spacing justification of Mushaf lines (they fill the frame only
+as far as the auto-sized font allows, so short lines leave a ragged left edge); under an Arabic UI
+the surah rows still lead with the transliterated Latin name and English meaning; Tanzil's Latin
+surah spellings (Al-Faatiha, Aal-i-Imraan) may deserve a curated list.
