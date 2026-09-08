@@ -196,4 +196,8 @@
     <string name="quran_madani">مدنية</string>
     <string name="quran_juz_n">الجزء %1$s</string>
     <string name="quran_juz_range">من %1$s %2$s إلى %3$s %4$s</string>
+    <string name="quran_next_surah">التالية: %1$s</string>
+    <string name="quran_juz_page">الجزء %1$s · صفحة %2$s</string>
+    <string name="quran_reader_aa">إعدادات القراءة</string>
+    <string name="quran_reader_mushaf">المصحف</string>
 </resources>

@@ -66,6 +66,8 @@ import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
 import world.taqwa.app.feature.quran.QuranRootScreen
 import world.taqwa.app.feature.quran.QuranRootViewModel
+import world.taqwa.app.feature.quran.ReaderScreen
+import world.taqwa.app.feature.quran.ReaderViewModel
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
 import kotlin.time.Clock
@@ -260,12 +262,33 @@ fun App(container: AppContainer) {
                             )
                         }
 
-                        // TODO(slice2a task 5/6/8): replace with the real reader screen.
-                        is Screen.Reader -> Box(
-                            Modifier.fillMaxSize().background(LocalTaqwaColors.current.background),
-                            contentAlignment = androidx.compose.ui.Alignment.Center,
-                        ) {
-                            androidx.compose.material3.Text("Reader")
+                        is Screen.Reader -> {
+                            val viewModel = remember(screen) {
+                                ReaderViewModel(
+                                    source = container.quranRepository,
+                                    settings = settings,
+                                    languageTag = platformFormat.languageTag(),
+                                    surah = screen.surah,
+                                )
+                            }
+                            LaunchedEffect(viewModel) { viewModel.start(this) }
+                            val readerState by viewModel.state.collectAsState()
+                            ReaderScreen(
+                                state = readerState,
+                                initialAyah = screen.ayah,
+                                onBack = { navigator.pop() },
+                                onToggleMode = {
+                                    scope.launch {
+                                        val page = viewModel.switchToMushaf()
+                                        navigator.replace(Screen.Mushaf(page))
+                                    }
+                                },
+                                onOpenSheet = {
+                                    // TODO(slice2a task 7): open the reading-settings sheet.
+                                },
+                                onFirstVisibleAyah = viewModel::onFirstVisibleAyah,
+                                onOpenNextSurah = { next -> navigator.replace(Screen.Reader(next, 1)) },
+                            )
                         }
 
                         // TODO(slice2a task 5/6/8): replace with the real mushaf screen.

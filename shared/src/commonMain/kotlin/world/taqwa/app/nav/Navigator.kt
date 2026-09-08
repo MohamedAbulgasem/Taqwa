@@ -32,6 +32,16 @@ class Navigator(start: Screen) {
     }
 
     /**
+     * Pop then push: [screen] takes the current screen's place, with whatever was behind it
+     * untouched. Used by the reader's mode toggle (spec §2.2) — translation and Mushaf must not
+     * stack on top of each other, or the back button would bounce between the two modes of the
+     * same reading position instead of leaving the surah.
+     */
+    fun replace(screen: Screen) {
+        _backStack.value = _backStack.value.dropLast(1) + screen
+    }
+
+    /**
      * The tab currently showing, read from the bottom of the stack so a pushed sub-screen still
      * reports the tab it was opened from. Null during onboarding, which has no tab bar.
      */

@@ -200,4 +200,8 @@
     <string name="quran_madani">Madani</string>
     <string name="quran_juz_n">Juz %1$s</string>
     <string name="quran_juz_range">%1$s %2$s to %3$s %4$s</string>
+    <string name="quran_next_surah">Next: %1$s</string>
+    <string name="quran_juz_page">Juz %1$s · Page %2$s</string>
+    <string name="quran_reader_aa">Reading settings</string>
+    <string name="quran_reader_mushaf">Mushaf</string>
 </resources>

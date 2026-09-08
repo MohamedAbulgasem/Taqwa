@@ -4,61 +4,21 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
-import world.taqwa.app.quran.Ayah
 import world.taqwa.app.quran.Juz
-import world.taqwa.app.quran.MushafPage
 import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
-import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-/**
- * A hand-built stand-in for [QuranSource] with four surahs (1, 2, 18, 114 — matching the real
- * database's numbers, meanings and ayah counts) and just enough juz starts to exercise the
- * boundary maths without needing the eleven surahs in between. Surah 18's Arabic name carries
- * invented tashkeel deliberately (the real database stores bare consonants) so the harakat-
- * insensitive search test actually exercises [world.taqwa.app.quran.QuranText.normaliseForSearch]
- * rather than trivially matching on already-bare text.
- */
-private class FakeQuranSource(
-    private val surahList: List<Surah> = listOf(
-        Surah(1, "الفاتحة", "Al-Faatiha", "The Opening", Revelation.MAKKI, 7, 1, 1),
-        Surah(2, "البقرة", "Al-Baqara", "The Cow", Revelation.MADANI, 286, 2, 1),
-        Surah(18, "ٱلۡكَهۡفِ", "Al-Kahf", "The Cave", Revelation.MAKKI, 110, 293, 15),
-        Surah(114, "الناس", "An-Naas", "Mankind", Revelation.MAKKI, 6, 604, 30),
-    ),
-    private val juzList: List<Juz> = listOf(
-        Juz(1, 1, 1),
-        Juz(2, 2, 142),
-        Juz(3, 18, 5),
-        Juz(4, 114, 3),
-    ),
-) : QuranSource {
-    override suspend fun surahs(): List<Surah> = surahList
-    override suspend fun surah(number: Int): Surah = surahList.first { it.number == number }
-    override suspend fun juzs(): List<Juz> = juzList
-    override suspend fun ayahs(surah: Int): List<Ayah> = error("not needed by QuranRootViewModelTest")
-    override suspend fun translations(): List<TranslationInfo> = error("not needed by QuranRootViewModelTest")
-    override suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String> =
-        error("not needed by QuranRootViewModelTest")
-    override suspend fun pageOf(surah: Int, ayah: Int): Int = when (surah) {
-        1 -> 1
-        2 -> 2
-        18 -> 293
-        114 -> 604
-        else -> error("unknown surah $surah")
-    }
-    override suspend fun page(number: Int): MushafPage = error("not needed by QuranRootViewModelTest")
-    override suspend fun surahOfPage(number: Int): Surah = error("not needed by QuranRootViewModelTest")
-}
+// FakeQuranSource lives in its own file now (FakeQuranSource.kt, same package), shared with
+// ReaderViewModelTest.
 
 class QuranRootViewModelTest {
 
@@ -109,6 +69,28 @@ class QuranRootViewModelTest {
         val juzThirty = ready.juzs.single()
         assertEquals(114, juzThirty.endSurah.number)
         assertEquals(6, juzThirty.endAyah)
+    }
+
+    // A quarter of the real juz boundaries fall on the first ayah of a surah (15:1, 17:1, 21:1 …):
+    // the juz before must end on the last ayah of the previous surah, not on "ayah 0".
+    @Test
+    fun aJuzEndingWhereTheNextSurahBeginsEndsOnThePreviousSurahsLastAyah() = runTest {
+        val source = FakeQuranSource(
+            surahList = listOf(
+                Surah(14, "إبراهيم", "Ibrahim", "Abraham", Revelation.MAKKI, 52, 255, 13),
+                Surah(15, "الحجر", "Al-Hijr", "The Rock", Revelation.MAKKI, 99, 262, 14),
+            ),
+            juzList = listOf(Juz(13, 14, 1), Juz(14, 15, 1)),
+        )
+        val vm = viewModel("juz-surah-boundary", source)
+        vm.load()
+        val ready = vm.state.value as QuranRootUiState.Ready
+        val juzThirteen = ready.juzs.first { it.number == 13 }
+        assertEquals(14, juzThirteen.endSurah.number)
+        assertEquals(52, juzThirteen.endAyah)
+        val juzFourteen = ready.juzs.first { it.number == 14 }
+        assertEquals(15, juzFourteen.startSurah.number)
+        assertEquals(99, juzFourteen.endAyah)
     }
 
     @Test

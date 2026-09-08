@@ -28,9 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -139,9 +137,6 @@ private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) 
     }
 }
 
-/** Line weight of every glyph here: the mockup's 1.4 px in a 16 px box. */
-private fun DrawScope.glyphStroke() = Stroke(width = size.width * 0.0875f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-
 /**
  * The app's own mark, the one onboarding draws at 116 dp: a prayer niche open at the foot, with
  * the dot near its crown. The same 1024-unit geometry as `MihrabMark`, scaled to 16. The dot
@@ -177,22 +172,4 @@ private fun DrawScope.drawGear(tint: Color) {
             cap = StrokeCap.Round,
         )
     }
-}
-
-/** An open book: two facing pages and the spine between them. Reads as "Quran" the way the
- * mihrab reads as "prayer" — a shape borrowed from the design mockups, not a generic glyph. */
-private fun DrawScope.drawBook(tint: Color) {
-    val u = size.width / 16f
-    val pages = Path().apply {
-        moveTo(8f * u, 3.2f * u)
-        cubicTo(6.6f * u, 2.1f * u, 4.4f * u, 1.9f * u, 1.8f * u, 2.4f * u)
-        lineTo(1.8f * u, 12.8f * u)
-        cubicTo(4.4f * u, 12.3f * u, 6.6f * u, 12.5f * u, 8f * u, 13.7f * u)
-        cubicTo(9.4f * u, 12.5f * u, 11.6f * u, 12.3f * u, 14.2f * u, 12.8f * u)
-        lineTo(14.2f * u, 2.4f * u)
-        cubicTo(11.6f * u, 1.9f * u, 9.4f * u, 2.1f * u, 8f * u, 3.2f * u)
-        close()
-    }
-    drawPath(pages, tint, style = glyphStroke())
-    drawLine(tint, Offset(8f * u, 3.2f * u), Offset(8f * u, 13.7f * u), strokeWidth = size.width * 0.0875f, cap = StrokeCap.Round)
 }

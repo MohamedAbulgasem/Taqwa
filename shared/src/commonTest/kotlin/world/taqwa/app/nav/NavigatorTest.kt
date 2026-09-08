@@ -113,4 +113,23 @@ class NavigatorTest {
         assertEquals(Screen.Today, n.current)
         assertFalse(n.pop())
     }
+
+    @Test
+    fun replaceSwapsTheTopScreenWithoutTouchingWhatIsBehindIt() {
+        val n = Navigator(Screen.Today)
+        n.selectTab(Tab.QURAN)
+        n.push(Screen.Reader(2, 1))
+        n.replace(Screen.Mushaf(2))
+        assertEquals(Screen.Mushaf(2), n.current)
+        assertEquals(listOf(Screen.Quran, Screen.Mushaf(2)), n.backStack.value)
+        assertTrue(n.pop())
+        assertEquals(Screen.Quran, n.current)
+    }
+
+    @Test
+    fun replaceAtTheRootBehavesLikeReplaceAll() {
+        val n = Navigator(Screen.Today)
+        n.replace(Screen.Settings)
+        assertEquals(listOf<Screen>(Screen.Settings), n.backStack.value)
+    }
 }
