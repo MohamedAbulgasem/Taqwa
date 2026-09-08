@@ -59,6 +59,12 @@ private const val POSITION_DEBOUNCE_MS = 400L
  * direction of travel without holding the whole Mushaf in memory. */
 private const val PAGE_CACHE_SIZE = 5
 
+/** How many surahs' ayah lists to keep for the share text. A surah's whole text is far larger than
+ * a page's lines, and only the tapped ayah's own surah is ever needed, so four covers a reader
+ * moving back and forth across a surah boundary without the Mushaf slowly accumulating the Qur'an
+ * in memory as they turn pages. */
+private const val AYAH_CACHE_SIZE = 4
+
 /**
  * Mushaf mode (spec §2.4): the 604 printed pages, one per pager page. Shaped exactly like
  * [ReaderViewModel] — a plain class over a [MutableStateFlow] with [start] taking the caller's
@@ -96,7 +102,8 @@ class MushafViewModel(
     /** One surah's ayahs per entry, filled on demand: the pages themselves carry the words, so
      * this is only what the share text needs (spec 2b §2.5) — the tapped ayah's whole text in one
      * piece rather than the page's own broken lines. Al-Faatiha lands here from [applySettings]
-     * too, so the basmala and a share of 1:1 never hit the database twice. */
+     * too, so the basmala and a share of 1:1 never hit the database twice. Capped like [pages],
+     * and evicted the same way — insertion-ordered, oldest key first. */
     private val ayahsBySurah = mutableMapOf<Int, List<Ayah>>()
 
     /** The last set the bookmark collection saw, so an unrelated [applySettings] re-emission
@@ -145,9 +152,14 @@ class MushafViewModel(
         )
     }
 
-    /** One surah's ayahs, cached. */
-    private suspend fun ayahsOf(surah: Int): List<Ayah> =
-        ayahsBySurah.getOrPut(surah) { source.ayahs(surah) }
+    /** One surah's ayahs, cached — the last [AYAH_CACHE_SIZE] of them. */
+    private suspend fun ayahsOf(surah: Int): List<Ayah> {
+        ayahsBySurah[surah]?.let { return it }
+        val loaded = source.ayahs(surah)
+        if (ayahsBySurah.size >= AYAH_CACHE_SIZE) ayahsBySurah.remove(ayahsBySurah.keys.first())
+        ayahsBySurah[surah] = loaded
+        return loaded
+    }
 
     /** The page's lines, from the cache when it holds them. Every composed pager page calls this. */
     suspend fun page(number: Int): MushafPage {

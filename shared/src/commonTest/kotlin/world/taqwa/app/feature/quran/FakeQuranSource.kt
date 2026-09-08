@@ -29,6 +29,7 @@ import world.taqwa.app.quran.TranslationInfo
  * [MushafViewModelTest] adds [pagesByNumber] — real [MushafPage] rows dumped out of the bundled
  * database into [MUSHAF_PAGE_1] and friends — and [pageLoads], which counts how often a page was
  * actually fetched so the view model's own page cache can be shown to be doing something.
+ * [ayahLoads] is the same counter for [ayahs], which the Mushaf's share text caches per surah.
  */
 internal class FakeQuranSource(
     private val surahList: List<Surah> = listOf(
@@ -54,6 +55,10 @@ internal class FakeQuranSource(
     /** One entry per [page] call that reached this fake, newest last. */
     val pageLoads = mutableListOf<Int>()
 
+    /** One entry per [ayahs] call that reached this fake, newest last — [MushafViewModel] caches a
+     * surah's ayahs for its share text, and this is how a test sees the second call not arrive. */
+    val ayahLoads = mutableListOf<Int>()
+
     /** One entry per [translationTexts] call that reached this fake, newest last — lets a test
      * (e.g. [ReaderViewModelTest]'s debounce regression) assert a translation was fetched exactly
      * once rather than re-fetched on every unrelated state change. */
@@ -67,8 +72,10 @@ internal class FakeQuranSource(
     override suspend fun surahs(): List<Surah> = surahList
     override suspend fun surah(number: Int): Surah = surahList.first { it.number == number }
     override suspend fun juzs(): List<Juz> = juzList
-    override suspend fun ayahs(surah: Int): List<Ayah> =
-        ayahsBySurah[surah] ?: error("no ayahs configured for surah $surah in FakeQuranSource")
+    override suspend fun ayahs(surah: Int): List<Ayah> {
+        ayahLoads += surah
+        return ayahsBySurah[surah] ?: error("no ayahs configured for surah $surah in FakeQuranSource")
+    }
     override suspend fun translations(): List<TranslationInfo> =
         translationsList.ifEmpty { error("no translations configured in FakeQuranSource") }
     override suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String> {

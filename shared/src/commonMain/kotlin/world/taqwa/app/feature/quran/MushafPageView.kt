@@ -232,7 +232,11 @@ fun MushafPageView(
                     QuranText.arabicIndic(page.number),
                     style = TaqwaText.caption,
                     color = colors.textSecondary,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    // 14 dp above, not 8: the reference pill hangs 16 dp past the frame's bottom
+                    // hairline and its 44 dp buttons would otherwise crowd this number. The extra
+                    // 6 dp is spent whether or not a pill is showing, so the page number sits at
+                    // one height and does not jump when an ayah is tapped.
+                    modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 8.dp),
                     textAlign = TextAlign.Center,
                 )
             }
@@ -506,22 +510,22 @@ private fun ReferencePill(
             AyahActionButton(
                 glyph = { tint -> drawBookmark(tint, filled = bookmarked) },
                 label = null,
+                onClick = onBookmark,
                 contentDescription = stringResource(
                     if (bookmarked) Res.string.quran_action_bookmarked else Res.string.quran_action_bookmark,
                 ),
-                onClick = onBookmark,
             )
             AyahActionButton(
                 glyph = { tint -> drawCopy(tint) },
                 label = null,
-                contentDescription = stringResource(Res.string.quran_action_copy),
                 onClick = onCopy,
+                contentDescription = stringResource(Res.string.quran_action_copy),
             )
             AyahActionButton(
                 glyph = { tint -> drawShare(tint) },
                 label = null,
-                contentDescription = stringResource(Res.string.quran_action_share),
                 onClick = onShare,
+                contentDescription = stringResource(Res.string.quran_action_share),
             )
         }
     }

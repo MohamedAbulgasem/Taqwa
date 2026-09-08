@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -26,7 +25,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
@@ -80,6 +78,10 @@ fun MushafScreen(
     // and so tapping the same ayah again clears it. The pill's three actions (spec 2b §2.5) act on
     // this ayah, which is why they are resolved here and not inside a page.
     var highlighted by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    // LocalClipboardManager is deprecated in Compose MP 1.12, and its replacement takes a
+    // ClipEntry with no common constructor — see [ReaderScreen]'s own note; the migration is one
+    // expect/actual covering both screens, tracked as the clipboard follow-up in slice 2c.
+    @Suppress("DEPRECATION")
     val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
 
@@ -133,12 +135,12 @@ fun MushafScreen(
                             surahOf = ready.surahsByNumber::get,
                             basmala = ready.basmala,
                             highlighted = highlighted,
+                            bookmarked = selected != null && selected in ready.bookmarked,
                             onTapAyah = { surah, ayah ->
                                 // A second tap on the same ayah clears it (spec §2.4).
                                 highlighted = if (highlighted == surah to ayah) null else surah to ayah
                             },
                             onClearHighlight = { highlighted = null },
-                            bookmarked = selected != null && selected in ready.bookmarked,
                             onBookmark = { selected?.let { (surah, ayah) -> onToggleBookmark(surah, ayah) } },
                             onCopy = {
                                 selected?.let { (surah, ayah) ->

@@ -22,6 +22,8 @@ import kotlin.random.Random
 import kotlin.random.nextULong
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 /**
  * Mushaf mode's view model and the two pure layout rules its page view leans on (spec §2.4).
@@ -74,9 +76,19 @@ class MushafViewModelTest {
         .groupBy { it.ayah }
         .map { (number, words) -> Ayah(1, number, words.joinToString(" ") { it.text }, 1, 1, 1, 0) }
 
+    /** Al-Baqarah's ayahs as *page 3* carries them — partial, since the surah runs far past that
+     * page, which is all the share text's own per-surah lookup needs; the point of having a second
+     * surah here is that nothing loads it at startup, unlike Al-Faatiha. */
+    private val alBaqarah = MUSHAF_PAGE_3.lines
+        .filter { it.type == LineType.TEXT }
+        .flatMap { it.words }
+        .filter { it.surah == 2 }
+        .groupBy { it.ayah }
+        .map { (number, words) -> Ayah(2, number, words.joinToString(" ") { it.text }, 3, MUSHAF_PAGE_3.juz, 1, 0) }
+
     private fun source() = FakeQuranSource(
         surahList = surahs,
-        ayahsBySurah = mapOf(1 to alFatiha),
+        ayahsBySurah = mapOf(1 to alFatiha, 2 to alBaqarah),
         translationsList = listOf(sahih),
         translationTextsById = mapOf("en.sahih" to mapOf(1 to alFatiha.associate { it.number to "en 1:${it.number}" })),
         pagesByNumber = mapOf(1 to MUSHAF_PAGE_1, 2 to MUSHAF_PAGE_2, 3 to MUSHAF_PAGE_3),
@@ -266,7 +278,38 @@ class MushafViewModelTest {
         // 1:2's text comes out of the fixture rather than being retyped, and the expectation is
         // the formatter's own no-translation output: the Mushaf shows no translation, so the
         // shared text may never carry one (spec 2b §2.5) whatever the reading settings say.
-        val expected = AyahShareText.format(src.ayahs(1)[1].text, 2, null, "Al-Fatihah", 1, 2) { it.toString() }
-        assertEquals(expected, vm.shareTextFor(1, 2, "Al-Fatihah") { it.toString() })
+        // The name is the one this file's own surah table gives surah 1, so a share text and the
+        // header can never be shown to disagree by the test spelling it a third way.
+        val name = surahs.first { it.number == 1 }.nameLatin
+        val expected = AyahShareText.format(src.ayahs(1)[1].text, 2, null, name, 1, 2) { it.toString() }
+        assertEquals(expected, vm.shareTextFor(1, 2, name) { it.toString() })
+    }
+
+    @Test
+    fun theShareTextIsNullForAnAyahTheSurahDoesNotHave() = runTest {
+        val vm = MushafViewModel(source(), settingsRepo("mushaf-share-miss"), bookmarkStore("mushaf-share-miss"), "en", startPage = 1)
+        vm.start(backgroundScope)
+        vm.awaitReady()
+
+        // Al-Faatiha has seven ayahs, so the lookup inside shareTextFor misses and the pill's copy
+        // and share get nothing to put out rather than a reference to an ayah that does not exist.
+        assertNull(vm.shareTextFor(1, 99, "Al-Faatiha") { it.toString() })
+    }
+
+    @Test
+    fun twoSharesOfTheSameSurahLoadItsAyahsOnce() = runTest {
+        val src = source()
+        val vm = MushafViewModel(src, settingsRepo("mushaf-share-cache"), bookmarkStore("mushaf-share-cache"), "en", startPage = 3)
+        vm.start(backgroundScope)
+        vm.awaitReady()
+        // Al-Faatiha is loaded at startup for the basmala; Al-Baqarah is not, so the counter below
+        // starts empty and every entry in it belongs to a share.
+        src.ayahLoads.clear()
+
+        assertNotNull(vm.shareTextFor(2, 6, "Al-Baqarah") { it.toString() })
+        assertNotNull(vm.shareTextFor(2, 7, "Al-Baqarah") { it.toString() })
+        // A surah's whole text is expensive to fetch and the reader taps several ayahs of the page
+        // they are on, so the second share must come out of the cache.
+        assertEquals(listOf(2), src.ayahLoads)
     }
 }
