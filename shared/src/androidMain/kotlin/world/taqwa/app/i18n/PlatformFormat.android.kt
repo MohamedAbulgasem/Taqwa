@@ -46,6 +46,18 @@ private class AndroidPlatformFormat : PlatformFormat {
 
     override fun clockTime(hour: Int, minute: Int): String =
         "${plainFormat.format(hour)}:${twoDigitFormat.format(minute)}"
+
+    // CLDR returns these lowercase in several locales (French "anglais", Indonesian "inggris"),
+    // and this name is a list label, so the first character is titlecased in the display locale's
+    // own rules rather than with uppercase(), which mis-cases Turkish "i". An unresolvable code
+    // comes back as the code itself, which the English map turns into a real name where it can.
+    override fun languageName(code: String): String {
+        val name = Locale.forLanguageTag(code).getDisplayLanguage(locale)
+        if (name.isBlank() || name.equals(code, ignoreCase = true)) {
+            return EnglishPlatformFormat.languageName(code)
+        }
+        return name.replaceFirstChar { it.titlecase(locale) }
+    }
 }
 
 actual fun createPlatformFormat(): PlatformFormat = AndroidPlatformFormat()

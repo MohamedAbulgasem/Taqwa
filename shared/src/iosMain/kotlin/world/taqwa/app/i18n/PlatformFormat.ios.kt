@@ -12,6 +12,7 @@ import platform.Foundation.NSNumber
 import platform.Foundation.NSNumberFormatter
 import platform.Foundation.NSNumberFormatterDecimalStyle
 import platform.Foundation.currentLocale
+import platform.Foundation.localizedStringForLanguageCode
 import platform.Foundation.preferredLanguages
 
 private class IosPlatformFormat : PlatformFormat {
@@ -74,6 +75,17 @@ private class IosPlatformFormat : PlatformFormat {
 
     override fun localizedDigits(number: Int): String =
         plainFormatter.stringFromNumber(NSNumber(int = number)) ?: number.toString()
+
+    // Foundation already titlecases these for the display locale, so unlike Android's there is no
+    // case to fix up here. A code Foundation does not know returns null or the code itself, which
+    // hands the seven bundled languages to the English map rather than showing a bare "bn".
+    override fun languageName(code: String): String {
+        val name = currentLocale.localizedStringForLanguageCode(code)
+        if (name.isNullOrBlank() || name.equals(code, ignoreCase = true)) {
+            return EnglishPlatformFormat.languageName(code)
+        }
+        return name
+    }
 
     override fun clockTime(hour: Int, minute: Int): String {
         val h = plainFormatter.stringFromNumber(NSNumber(int = hour)) ?: hour.toString()

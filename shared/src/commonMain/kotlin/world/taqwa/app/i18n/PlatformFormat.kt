@@ -31,6 +31,17 @@ interface PlatformFormat {
      * Defaulted so the test fakes, which never show a date, need not implement it.
      */
     fun longDate(date: LocalDate): String = EnglishPlatformFormat.longDate(date)
+
+    /**
+     * The name of the language with ISO 639-1 code [code] ("ar", "ur"...), in the device's UI
+     * language and capitalised the way that language capitalises names.
+     *
+     * The Quran's translation picker labels each row with the language it is in, and the reader is
+     * choosing among languages they may not read — "Bengali" has to be legible to someone whose
+     * phone is in English, so the platform's own CLDR name is the only correct source. Defaulted
+     * to the English map for the fakes, as [longDate] is.
+     */
+    fun languageName(code: String): String = EnglishPlatformFormat.languageName(code)
 }
 
 expect fun createPlatformFormat(): PlatformFormat
@@ -55,7 +66,21 @@ object EnglishPlatformFormat : PlatformFormat {
 
     override fun longDate(date: LocalDate): String =
         "${date.day} ${GREGORIAN_MONTHS[date.month.number - 1]} ${date.year}"
+
+    /** Only the languages the app actually bundles a translation in; anything else falls back to
+     * the bare code, which at least names the row rather than leaving it blank. */
+    override fun languageName(code: String): String = LANGUAGE_NAMES[code.lowercase()] ?: code
 }
+
+private val LANGUAGE_NAMES = mapOf(
+    "en" to "English",
+    "ar" to "Arabic",
+    "id" to "Indonesian",
+    "ur" to "Urdu",
+    "bn" to "Bengali",
+    "tr" to "Turkish",
+    "fr" to "French",
+)
 
 private val GREGORIAN_MONTHS = listOf(
     "January", "February", "March", "April", "May", "June",
