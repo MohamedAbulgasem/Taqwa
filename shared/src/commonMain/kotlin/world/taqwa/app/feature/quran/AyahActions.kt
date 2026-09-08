@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
@@ -68,48 +71,70 @@ fun AyahActions(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ActionButton(
+        val bookmarkLabel = stringResource(
+            if (bookmarked) Res.string.quran_action_bookmarked else Res.string.quran_action_bookmark,
+        )
+        AyahActionButton(
             glyph = { tint -> drawBookmark(tint, filled = bookmarked) },
-            label = stringResource(if (bookmarked) Res.string.quran_action_bookmarked else Res.string.quran_action_bookmark),
+            label = bookmarkLabel,
+            contentDescription = bookmarkLabel,
             onClick = onBookmark,
         )
-        ActionButton(
+        val copyLabel = stringResource(if (copied) Res.string.quran_action_copied else Res.string.quran_action_copy)
+        AyahActionButton(
             glyph = { tint -> drawCopy(tint) },
-            label = stringResource(if (copied) Res.string.quran_action_copied else Res.string.quran_action_copy),
+            label = copyLabel,
+            contentDescription = copyLabel,
             onClick = {
                 onCopy()
                 copyTaps++
             },
         )
-        ActionButton(
+        val shareLabel = stringResource(Res.string.quran_action_share)
+        AyahActionButton(
             glyph = { tint -> drawShare(tint) },
-            label = stringResource(Res.string.quran_action_share),
+            label = shareLabel,
+            contentDescription = shareLabel,
             onClick = onShare,
         )
     }
 }
 
-/** One action: the glyph in the accent, its label beside it, and the whole pair as the target —
- * 44 dp tall and no ripple, like every other tap target in the app. */
+/**
+ * One action: the glyph in the accent, its [label] beside it when there is one, and the whole
+ * thing as the target — 44 dp and no ripple, like every other tap target in the app.
+ *
+ * Shared with the Mushaf's reference pill (spec 2b §2.5), which passes `label = null`: there the
+ * button is a 44 dp square holding the glyph alone, so it says what it is through
+ * [contentDescription] instead of through a caption the pill has no room for.
+ */
 @Composable
-private fun ActionButton(
+internal fun AyahActionButton(
     glyph: DrawScope.(Color) -> Unit,
-    label: String,
+    label: String?,
+    contentDescription: String,
     onClick: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    // Read out here: inside a `semantics` block the name resolves to the write-only semantics
+    // property, not to this parameter.
+    val description = contentDescription
     Row(
         Modifier
             .height(44.dp)
+            .then(if (label == null) Modifier.width(44.dp) else Modifier)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick,
-            ),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+            )
+            // Only without a label: with one, the Text already carries the same words and a
+            // description here would have a screen reader say them twice.
+            .then(if (label == null) Modifier.semantics { this.contentDescription = description } else Modifier),
+        horizontalArrangement = if (label == null) Arrangement.Center else Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Canvas(Modifier.size(18.dp)) { glyph(colors.accent) }
-        Text(label, style = TaqwaText.caption, color = colors.textSecondary)
+        if (label != null) Text(label, style = TaqwaText.caption, color = colors.textSecondary)
     }
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import world.taqwa.app.quran.Ayah
+import world.taqwa.app.quran.AyahShareText
 import world.taqwa.app.quran.LineType
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
@@ -15,6 +16,7 @@ import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
+import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.random.Random
 import kotlin.random.nextULong
@@ -47,6 +49,15 @@ class MushafViewModelTest {
         },
     )
 
+    /** A fresh file per store, for [ReaderViewModelTest]'s reason: [BookmarkStore.toggle] is a
+     * toggle, so a store left behind by an earlier run would start with the bookmark already set
+     * and the first toggle would remove it instead of adding it. */
+    private fun bookmarkStore(name: String) = BookmarkStore(
+        PreferenceDataStoreFactory.createWithPath {
+            "/tmp/taqwa-mushaf-bm-$name-${Random.nextULong()}.preferences_pb".toPath()
+        },
+    ) { 1L }
+
     private val surahs = listOf(
         Surah(1, "الفاتحة", "Al-Faatiha", "The Opening", Revelation.MAKKI, 7, 1, 1),
         Surah(2, "البقرة", "Al-Baqarah", "The Cow", Revelation.MADANI, 286, 2, 1),
@@ -74,9 +85,17 @@ class MushafViewModelTest {
     private suspend fun MushafViewModel.awaitReady(): MushafUiState.Ready =
         state.first { it is MushafUiState.Ready } as MushafUiState.Ready
 
+    /** [BookmarkStore] is real, disk-backed DataStore even here, so its emissions arrive on a
+     * dispatcher virtual time cannot advance: every bookmark assertion waits for the state to say
+     * so rather than reading `.value` and racing the write. */
+    private suspend fun MushafViewModel.awaitBookmarked(
+        predicate: (Set<Pair<Int, Int>>) -> Boolean,
+    ): Set<Pair<Int, Int>> =
+        (state.first { it is MushafUiState.Ready && predicate(it.bookmarked) } as MushafUiState.Ready).bookmarked
+
     @Test
     fun aPageLoadsItsLinesFromTheSource() = runTest {
-        val vm = MushafViewModel(source(), settingsRepo("page-load"), "en", startPage = 3)
+        val vm = MushafViewModel(source(), settingsRepo("page-load"), bookmarkStore("page-load"), "en", startPage = 3)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -89,7 +108,7 @@ class MushafViewModelTest {
     @Test
     fun aPageAlreadyLoadedIsServedFromTheCache() = runTest {
         val src = source()
-        val vm = MushafViewModel(src, settingsRepo("page-cache"), "en", startPage = 3)
+        val vm = MushafViewModel(src, settingsRepo("page-cache"), bookmarkStore("page-cache"), "en", startPage = 3)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -110,7 +129,7 @@ class MushafViewModelTest {
             translationsList = listOf(sahih),
             pagesByNumber = pages,
         )
-        val vm = MushafViewModel(src, settingsRepo("page-evict"), "en", startPage = 1)
+        val vm = MushafViewModel(src, settingsRepo("page-evict"), bookmarkStore("page-evict"), "en", startPage = 1)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -124,7 +143,7 @@ class MushafViewModelTest {
 
     @Test
     fun theHeaderNamesTheSurahAndJuzOfThePageShown() = runTest {
-        val vm = MushafViewModel(source(), settingsRepo("header"), "en", startPage = 3)
+        val vm = MushafViewModel(source(), settingsRepo("header"), bookmarkStore("header"), "en", startPage = 3)
         vm.start(backgroundScope)
         val ready = vm.awaitReady()
 
@@ -135,7 +154,7 @@ class MushafViewModelTest {
 
     @Test
     fun turningThePageRenamesTheHeader() = runTest {
-        val vm = MushafViewModel(source(), settingsRepo("header-turn"), "en", startPage = 3)
+        val vm = MushafViewModel(source(), settingsRepo("header-turn"), bookmarkStore("header-turn"), "en", startPage = 3)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -147,7 +166,7 @@ class MushafViewModelTest {
     @Test
     fun thePageShownIsNotWrittenBeforeTheDebounceElapses() = runTest {
         val repo = settingsRepo("position-early")
-        val vm = MushafViewModel(source(), repo, "en", startPage = 1)
+        val vm = MushafViewModel(source(), repo, bookmarkStore("position-early"), "en", startPage = 1)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -160,7 +179,7 @@ class MushafViewModelTest {
     @Test
     fun thePageShownIsWrittenAsTheFirstTextLinesAyahAfterTheDebounce() = runTest {
         val repo = settingsRepo("position-late")
-        val vm = MushafViewModel(source(), repo, "en", startPage = 1)
+        val vm = MushafViewModel(source(), repo, bookmarkStore("position-late"), "en", startPage = 1)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -173,7 +192,7 @@ class MushafViewModelTest {
     @Test
     fun rapidPageTurnsCollapseIntoASingleWriteForTheLastPage() = runTest {
         val repo = settingsRepo("position-collapse")
-        val vm = MushafViewModel(source(), repo, "en", startPage = 1)
+        val vm = MushafViewModel(source(), repo, bookmarkStore("position-collapse"), "en", startPage = 1)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -190,7 +209,7 @@ class MushafViewModelTest {
     fun switchingToTheReaderReturnsThePagesFirstAyahAndStoresTranslationMode() = runTest {
         val repo = settingsRepo("switch")
         repo.setReadingSettings(ReadingSettings(mode = ReadingMode.MUSHAF))
-        val vm = MushafViewModel(source(), repo, "en", startPage = 3)
+        val vm = MushafViewModel(source(), repo, bookmarkStore("switch"), "en", startPage = 3)
         vm.start(backgroundScope)
         vm.awaitReady()
 
@@ -201,7 +220,7 @@ class MushafViewModelTest {
     @Test
     fun theBasmalaAndSizePreviewComeFromTheDatabase() = runTest {
         val src = source()
-        val vm = MushafViewModel(src, settingsRepo("basmala"), "en", startPage = 2)
+        val vm = MushafViewModel(src, settingsRepo("basmala"), bookmarkStore("basmala"), "en", startPage = 2)
         vm.start(backgroundScope)
         val ready = vm.awaitReady()
 
@@ -211,12 +230,43 @@ class MushafViewModelTest {
 
     @Test
     fun everySurahOnThePageIsAvailableForItsBand() = runTest {
-        val vm = MushafViewModel(source(), settingsRepo("bands"), "en", startPage = 1)
+        val vm = MushafViewModel(source(), settingsRepo("bands"), bookmarkStore("bands"), "en", startPage = 1)
         vm.start(backgroundScope)
         val ready = vm.awaitReady()
 
         // Page 1's first line is Al-Faatiha's surah band, which needs the full row to draw.
         assertEquals("الفاتحة", ready.surahsByNumber[1]?.nameArabic)
         assertEquals(7, ready.surahsByNumber[1]?.ayahCount)
+    }
+
+    @Test
+    fun bookmarksArriveInStateAsSurahAyahPairsAndToggleFlips() = runTest {
+        val store = bookmarkStore("mushaf-bm")
+        store.toggle(2, 6)
+        val vm = MushafViewModel(source(), settingsRepo("mushaf-bm"), store, "en", startPage = 3)
+        vm.start(backgroundScope)
+        // All of them, not only the current page's: a page can hold the end of one surah and the
+        // start of the next, so the pill's own ayah is looked up by the full pair (spec 2b §2.5).
+        assertEquals(setOf(2 to 6), vm.awaitBookmarked { it.isNotEmpty() })
+
+        vm.toggleBookmark(1, 1)
+        assertEquals(setOf(2 to 6, 1 to 1), vm.awaitBookmarked { it.size == 2 })
+
+        vm.toggleBookmark(2, 6)
+        assertEquals(setOf(1 to 1), vm.awaitBookmarked { it.size == 1 })
+    }
+
+    @Test
+    fun theShareTextNeverCarriesATranslation() = runTest {
+        val src = source()
+        val vm = MushafViewModel(src, settingsRepo("mushaf-share"), bookmarkStore("mushaf-share"), "en", startPage = 1)
+        vm.start(backgroundScope)
+        vm.awaitReady()
+
+        // 1:2's text comes out of the fixture rather than being retyped, and the expectation is
+        // the formatter's own no-translation output: the Mushaf shows no translation, so the
+        // shared text may never carry one (spec 2b §2.5) whatever the reading settings say.
+        val expected = AyahShareText.format(src.ayahs(1)[1].text, 2, null, "Al-Fatihah", 1, 2) { it.toString() }
+        assertEquals(expected, vm.shareTextFor(1, 2, "Al-Fatihah") { it.toString() })
     }
 }

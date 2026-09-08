@@ -18,12 +18,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.i18n.LocalPlatformFormat
@@ -33,6 +37,7 @@ import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
+import world.taqwa.app.share.shareText
 import world.taqwa.app.design.components.TaqwaBottomSheet
 
 /** The Madinah Mushaf's own page count (spec §2.4) — the pager's whole extent. */
@@ -47,6 +52,11 @@ private const val MUSHAF_PAGES = 604
  * [pageLoader] is [MushafViewModel.page] — each composed pager page asks for its own lines rather
  * than the state carrying them, because the pager holds three pages at a time and the view model,
  * not this screen, owns the cache that makes that cheap.
+ *
+ * [shareTextFor] is [MushafViewModel.shareTextFor] with the caller's own surah name and digits
+ * already bound (spec 2b §2.3); it suspends because the tapped ayah's text is not on this screen,
+ * so the pill's copy and share run it in [rememberCoroutineScope] and this screen — like the
+ * reader — is what touches the clipboard and the platform share sheet.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +68,8 @@ fun MushafScreen(
     onToggleMode: () -> Unit,
     onChangeSettings: (ReadingSettings) -> Unit,
     onPageShown: (Int) -> Unit,
+    onToggleBookmark: (Int, Int) -> Unit,
+    shareTextFor: suspend (Int, Int) -> String?,
 ) {
     val colors = LocalTaqwaColors.current
     val arabic = isRtlLocale()
@@ -65,8 +77,11 @@ fun MushafScreen(
     val ready = state as? MushafUiState.Ready
     var showSheet by remember { mutableStateOf(false) }
     // The tapped ayah (spec §2.4), hoisted here rather than per page so it survives a page turn
-    // and so tapping the same ayah again clears it. The action row this will grow is slice 2b's.
+    // and so tapping the same ayah again clears it. The pill's three actions (spec 2b §2.5) act on
+    // this ayah, which is why they are resolved here and not inside a page.
     var highlighted by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    val clipboard = LocalClipboardManager.current
+    val scope = rememberCoroutineScope()
 
     // safeDrawing, not systemBars: sideways the navigation bar and the camera cutout sit on the
     // left and right edges. The pager inside pads nothing of its own, so this is the only place
@@ -109,6 +124,9 @@ fun MushafScreen(
                     val page by produceState<MushafPage?>(initialValue = null, number) {
                         value = pageLoader(number)
                     }
+                    // Read into a val: `highlighted` is a delegated property, which Kotlin will
+                    // not smart-cast, and the pill's actions all need the pair non-null.
+                    val selected = highlighted
                     page?.let {
                         MushafPageView(
                             page = it,
@@ -120,6 +138,20 @@ fun MushafScreen(
                                 highlighted = if (highlighted == surah to ayah) null else surah to ayah
                             },
                             onClearHighlight = { highlighted = null },
+                            bookmarked = selected != null && selected in ready.bookmarked,
+                            onBookmark = { selected?.let { (surah, ayah) -> onToggleBookmark(surah, ayah) } },
+                            onCopy = {
+                                selected?.let { (surah, ayah) ->
+                                    scope.launch {
+                                        shareTextFor(surah, ayah)?.let { clipboard.setText(AnnotatedString(it)) }
+                                    }
+                                }
+                            },
+                            onShare = {
+                                selected?.let { (surah, ayah) ->
+                                    scope.launch { shareTextFor(surah, ayah)?.let(::shareText) }
+                                }
+                            },
                         )
                     }
                 }

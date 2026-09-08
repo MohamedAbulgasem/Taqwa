@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +54,9 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.ContentMaxWidth
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.components.drawBookmark
+import world.taqwa.app.design.components.drawCopy
+import world.taqwa.app.design.components.drawShare
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
@@ -63,6 +68,10 @@ import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.quran_action_bookmark
+import world.taqwa.app.resources.quran_action_bookmarked
+import world.taqwa.app.resources.quran_action_copy
+import world.taqwa.app.resources.quran_action_share
 import world.taqwa.app.resources.quran_juz_n
 import world.taqwa.app.resources.quran_madani
 import world.taqwa.app.resources.quran_makki
@@ -91,7 +100,9 @@ private val ARABIC_INDIC_DIGITS = '٠'..'٩'
  * size with every line filled to the margin, the way the printed page is.
  *
  * [highlighted] is the tapped ayah as `surah to ayah`; every word of it on this page carries a
- * soft accent field and a reference pill shows at the foot of the frame.
+ * soft accent field and a reference pill shows at the foot of the frame. [bookmarked] and the
+ * three callbacks are that pill's own actions (spec 2b §2.5), which belong to the highlighted
+ * ayah and are therefore the screen's to resolve, not this page's.
  */
 @Composable
 fun MushafPageView(
@@ -99,8 +110,12 @@ fun MushafPageView(
     surahOf: (Int) -> Surah?,
     basmala: String,
     highlighted: Pair<Int, Int>?,
+    bookmarked: Boolean,
     onTapAyah: (Int, Int) -> Unit,
     onClearHighlight: () -> Unit,
+    onBookmark: () -> Unit,
+    onCopy: () -> Unit,
+    onShare: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
     val family = mushafFamily()
@@ -200,12 +215,16 @@ fun MushafPageView(
                     }
                     if (marked != null) {
                         ReferencePill(
-                            marked,
+                            reference = marked,
                             // Straddling the frame's bottom hairline rather than sitting above it:
                             // the fifteenth line reaches within a few dp of that edge, and a pill
                             // fully inside the frame would cover the end of it.
-                            Modifier.align(Alignment.BottomCenter).offset(y = 16.dp),
-                            onClearHighlight,
+                            modifier = Modifier.align(Alignment.BottomCenter).offset(y = 16.dp),
+                            bookmarked = bookmarked,
+                            onClear = onClearHighlight,
+                            onBookmark = onBookmark,
+                            onCopy = onCopy,
+                            onShare = onShare,
                         )
                     }
                 }
@@ -439,34 +458,70 @@ internal fun SurahBand(surah: Surah, sizeSp: Float, family: FontFamily) {
     }
 }
 
-/** The tapped ayah's reference (spec §2.4), always in Arabic-Indic digits like the roundels
- * themselves; a tap clears the highlight. The action row it will grow arrives in slice 2b. */
+/**
+ * The tapped ayah's reference and what can be done with it (spec 2b §2.5): the reference itself in
+ * Arabic-Indic digits like the roundels, a tap on which still clears the highlight, then a hairline
+ * separator and bookmark, copy and share as glyph-only 44 dp buttons — the reader's own
+ * [AyahActionButton], captionless, since a bar this narrow has no room for three labels.
+ *
+ * The whole bar is one surface, so it is the reference that carries the clear, not the pill: the
+ * buttons sit inside it and a clear behind them would fire on every action.
+ */
 @Composable
-private fun ReferencePill(reference: Pair<Int, Int>, modifier: Modifier, onClear: () -> Unit) {
+private fun ReferencePill(
+    reference: Pair<Int, Int>,
+    modifier: Modifier,
+    bookmarked: Boolean,
+    onClear: () -> Unit,
+    onBookmark: () -> Unit,
+    onCopy: () -> Unit,
+    onShare: () -> Unit,
+) {
     val colors = LocalTaqwaColors.current
-    // The finger gets 44 dp (spec §92) around a pill drawn no taller than it needs to be, the same
-    // split the reader header's own round buttons use.
-    Box(
-        modifier
-            .height(44.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClear,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
+    Box(modifier, contentAlignment = Alignment.Center) {
+        Row(
             Modifier
                 .background(colors.surface, RoundedCornerShape(12.dp))
-                .border(1.dp, colors.hairline, RoundedCornerShape(12.dp))
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .border(1.dp, colors.hairline, RoundedCornerShape(12.dp)),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 "${QuranText.arabicIndic(reference.first)}:${QuranText.arabicIndic(reference.second)}",
                 style = TaqwaText.caption.copy(fontSize = 12.sp),
                 color = colors.accent,
                 maxLines = 1,
+                modifier = Modifier
+                    // The reference is the shortest thing in the bar, so it gets the full height as
+                    // its own target rather than a 12 sp line of text to hit.
+                    .height(44.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClear,
+                    )
+                    .padding(horizontal = 12.dp)
+                    .wrapContentHeight(),
+            )
+            Box(Modifier.width(1.dp).height(16.dp).background(colors.hairline))
+            AyahActionButton(
+                glyph = { tint -> drawBookmark(tint, filled = bookmarked) },
+                label = null,
+                contentDescription = stringResource(
+                    if (bookmarked) Res.string.quran_action_bookmarked else Res.string.quran_action_bookmark,
+                ),
+                onClick = onBookmark,
+            )
+            AyahActionButton(
+                glyph = { tint -> drawCopy(tint) },
+                label = null,
+                contentDescription = stringResource(Res.string.quran_action_copy),
+                onClick = onCopy,
+            )
+            AyahActionButton(
+                glyph = { tint -> drawShare(tint) },
+                label = null,
+                contentDescription = stringResource(Res.string.quran_action_share),
+                onClick = onShare,
             )
         }
     }

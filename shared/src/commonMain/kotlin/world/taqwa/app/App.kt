@@ -68,6 +68,7 @@ import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
 import world.taqwa.app.feature.quran.MushafScreen
+import world.taqwa.app.feature.quran.MushafUiState
 import world.taqwa.app.feature.quran.MushafViewModel
 import world.taqwa.app.feature.quran.QuranRootScreen
 import world.taqwa.app.feature.quran.QuranRootViewModel
@@ -340,6 +341,7 @@ fun App(container: AppContainer) {
                                 MushafViewModel(
                                     source = container.quranRepository,
                                     settings = settings,
+                                    bookmarks = container.bookmarkStore,
                                     languageTag = platformFormat.languageTag(),
                                     startPage = screen.page,
                                 )
@@ -359,6 +361,21 @@ fun App(container: AppContainer) {
                                 },
                                 onChangeSettings = viewModel::updateSettings,
                                 onPageShown = viewModel::onPageShown,
+                                onToggleBookmark = viewModel::toggleBookmark,
+                                // As in the reader's branch: the surah's name and the reference
+                                // digits are the UI language's business, so this layer resolves
+                                // them. A page can straddle two surahs, so the name is looked up
+                                // by the tapped ayah's own surah, never the header's.
+                                shareTextFor = { surah, ayah ->
+                                    (mushafState as? MushafUiState.Ready)?.surahsByNumber?.get(surah)?.let { named ->
+                                        viewModel.shareTextFor(
+                                            surah = surah,
+                                            ayah = ayah,
+                                            surahName = named.displayName(layoutDirection == LayoutDirection.Rtl),
+                                            digits = platformFormat::localizedDigits,
+                                        )
+                                    }
+                                },
                             )
                         }
 

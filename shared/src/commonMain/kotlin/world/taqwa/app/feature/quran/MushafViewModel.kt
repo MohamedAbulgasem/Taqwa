@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import world.taqwa.app.quran.Ayah
+import world.taqwa.app.quran.AyahShareText
 import world.taqwa.app.quran.LineType
 import world.taqwa.app.quran.MushafPage
 import world.taqwa.app.quran.QuranSource
@@ -18,6 +21,7 @@ import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
+import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
 
 sealed interface MushafUiState {
@@ -40,6 +44,10 @@ sealed interface MushafUiState {
         val basmala: String,
         /** Every surah by number, for the surah bands and the header; loaded once. */
         val surahsByNumber: Map<Int, Surah>,
+        /** Every bookmark as `surah to ayah` (spec 2b §2.2), not just the current page's: a page
+         * can hold the end of one surah and the start of the next, and the reference pill asks
+         * about whichever ayah was tapped. */
+        val bookmarked: Set<Pair<Int, Int>>,
     ) : MushafUiState
 }
 
@@ -64,6 +72,7 @@ private const val PAGE_CACHE_SIZE = 5
 class MushafViewModel(
     private val source: QuranSource,
     private val settings: SettingsRepository,
+    private val bookmarks: BookmarkStore,
     private val languageTag: String,
     startPage: Int,
 ) {
@@ -84,6 +93,16 @@ class MushafViewModel(
     private var basmalaText: String? = null
     private var previewAyahText: String? = null
 
+    /** One surah's ayahs per entry, filled on demand: the pages themselves carry the words, so
+     * this is only what the share text needs (spec 2b §2.5) — the tapped ayah's whole text in one
+     * piece rather than the page's own broken lines. Al-Faatiha lands here from [applySettings]
+     * too, so the basmala and a share of 1:1 never hit the database twice. */
+    private val ayahsBySurah = mutableMapOf<Int, List<Ayah>>()
+
+    /** The last set the bookmark collection saw, so an unrelated [applySettings] re-emission
+     * carries the bookmarks forward instead of blanking them — [ReaderViewModel]'s own reason. */
+    private var bookmarkedAyahs: Set<Pair<Int, Int>> = emptySet()
+
     /** Call once, from a `LaunchedEffect(viewModel) { viewModel.start(this) }`. */
     fun start(scope: CoroutineScope) {
         this.scope = scope
@@ -92,6 +111,14 @@ class MushafViewModel(
             // position, and without it every page turn would re-run applySettings.
             settings.readingSettings(languageTag).distinctUntilChanged().collect { applySettings(it) }
         }
+        // A second collection rather than a combine, as in [ReaderViewModel.start]: a bookmark
+        // toggle must not re-run applySettings and its translation-catalogue lookup.
+        scope.launch {
+            bookmarks.bookmarks.collect { list ->
+                bookmarkedAyahs = list.map { it.surah to it.ayah }.toSet()
+                _state.update { (it as? MushafUiState.Ready)?.copy(bookmarked = bookmarkedAyahs) ?: it }
+            }
+        }
     }
 
     private suspend fun applySettings(newSettings: ReadingSettings) {
@@ -99,7 +126,7 @@ class MushafViewModel(
             surahsByNumber = source.surahs().associateBy { it.number }
             // Al-Faatiha's own ayahs: ayah 1 is every page's basmala line (spec §2.4), ayah 2 the
             // reading sheet's size preview (spec §2.5). Both from the database, never literals.
-            val alFatiha = source.ayahs(1)
+            val alFatiha = ayahsOf(1)
             basmalaText = alFatiha.first().text
             previewAyahText = QuranText.withMarker(alFatiha[1].text, 2)
         }
@@ -114,8 +141,13 @@ class MushafViewModel(
             previewAyah = previewAyahText!!,
             basmala = basmalaText!!,
             surahsByNumber = surahsByNumber!!,
+            bookmarked = bookmarkedAyahs,
         )
     }
+
+    /** One surah's ayahs, cached. */
+    private suspend fun ayahsOf(surah: Int): List<Ayah> =
+        ayahsBySurah.getOrPut(surah) { source.ayahs(surah) }
 
     /** The page's lines, from the cache when it holds them. Every composed pager page calls this. */
     suspend fun page(number: Int): MushafPage {
@@ -145,6 +177,37 @@ class MushafViewModel(
             val (surah, ayah) = firstAyahOf(page)
             settings.setReadingPosition(ReadingPosition(surah, ayah, number))
         }
+    }
+
+    /**
+     * The reference pill's bookmark (spec 2b §2.5): writes through [BookmarkStore] and lets the
+     * collection [start] began put the change back into [_state], so the glyph follows what was
+     * actually stored rather than an optimistic flip. Takes the surah as well as the ayah because
+     * the pill's ayah is whichever word was tapped, which need not be the header's surah.
+     */
+    fun toggleBookmark(surah: Int, ayah: Int) {
+        scope?.launch { bookmarks.toggle(surah, ayah) }
+    }
+
+    /**
+     * The one text the pill's copy and share both put out (spec 2b §2.3), or null for an ayah the
+     * source does not have. Never carries a translation: the Mushaf shows the printed page alone,
+     * whatever translation the reader is set to (spec 2b §2.5). Suspending where
+     * [ReaderViewModel.shareTextFor] is not, because the reader already holds its surah's ayahs
+     * and this screen holds pages — the tapped ayah's own text has to be fetched (once per surah).
+     * [surahName] and [digits] come from the caller, which alone knows the UI's language.
+     */
+    suspend fun shareTextFor(surah: Int, ayah: Int, surahName: String, digits: (Int) -> String): String? {
+        val found = ayahsOf(surah).firstOrNull { it.number == ayah } ?: return null
+        return AyahShareText.format(
+            arabic = found.text,
+            ayahNumber = found.number,
+            translation = null,
+            surahName = surahName,
+            surah = surah,
+            ayah = found.number,
+            digits = digits,
+        )
     }
 
     /** Persists a change made in the reading-settings sheet; [start]'s own collection picks it
