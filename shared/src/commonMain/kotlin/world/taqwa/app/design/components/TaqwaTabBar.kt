@@ -32,9 +32,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
@@ -119,7 +116,7 @@ private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) 
             when (tab) {
                 Tab.PRAYER -> drawMihrab(tint)
                 Tab.QURAN -> drawBook(tint)
-                Tab.SETTINGS -> drawGear(tint)
+                Tab.SETTINGS -> drawSliders(tint)
             }
         }
         Spacer(Modifier.height(5.dp))
@@ -155,21 +152,30 @@ private fun DrawScope.drawMihrab(tint: Color) {
     drawCircle(tint, radius = 0.95f * u, center = Offset(8f * u, 6.3f * u))
 }
 
-/** A gear: hub, rim, eight teeth. Reads as "settings" with or without its label. */
-private fun DrawScope.drawGear(tint: Color) {
+/**
+ * Three sliders: full-width tracks with a knob riding each one. The gear it replaces was a busy
+ * radial shape next to two calm line drawings; this is the same handful of strokes as the book —
+ * straight lines and one filled dot per row, on the same 16-unit grid — so the three tabs read as
+ * one set. The knobs sit at different points along their tracks (a gear's eight-fold symmetry was
+ * part of what made it look mechanical rather than drawn); each is painted over its track, which
+ * at 22 dp reads as a knob on the line rather than a gap in it.
+ *
+ * The knob radius is 1.5 u against a 0.7 u half-stroke. Anything under about 1.3 u leaves less
+ * than half a pixel of bulge either side at 22 dp and the glyph collapses into three plain rules;
+ * 1.5 u is also what brings its ink close to the book's, which is the denser of the other two.
+ * With the knobs it spans y 2.5–13.5, near enough the book's 1.9–13.7 to sit level with it.
+ */
+private fun DrawScope.drawSliders(tint: Color) {
     val u = size.width / 16f
-    val c = Offset(8f * u, 8f * u)
-    drawCircle(tint, radius = 2.1f * u, center = c, style = glyphStroke())
-    drawCircle(tint, radius = 4.6f * u, center = c, style = glyphStroke())
-    repeat(8) { i ->
-        val a = i * (PI / 4)
-        val (dx, dy) = cos(a).toFloat() to sin(a).toFloat()
+    val stroke = size.width * 0.0875f
+    listOf(4f to 10.5f, 8f to 5.5f, 12f to 9f).forEach { (y, knobX) ->
         drawLine(
             color = tint,
-            start = Offset(c.x + dx * 4.5f * u, c.y + dy * 4.5f * u),
-            end = Offset(c.x + dx * 6.4f * u, c.y + dy * 6.4f * u),
-            strokeWidth = size.width * 0.0875f,
+            start = Offset(2.2f * u, y * u),
+            end = Offset(13.8f * u, y * u),
+            strokeWidth = stroke,
             cap = StrokeCap.Round,
         )
+        drawCircle(tint, radius = 1.5f * u, center = Offset(knobX * u, y * u))
     }
 }
