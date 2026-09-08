@@ -256,6 +256,27 @@ class ReaderViewModelTest {
     }
 
     @Test
+    fun writingTheReadingPositionDirectlyDoesNotReloadTheTranslation() = runTest {
+        // Regression for the distinctUntilChanged fix in ReaderViewModel.start: readingSettings
+        // and readingPosition are both read from the same underlying DataStore file, so a plain
+        // position write still makes that file's own Flow re-emit. Without distinctUntilChanged
+        // dropping the resulting (unchanged) ReadingSettings object, applySettings re-ran and
+        // re-fetched the translation on every scroll-stop, not just on an actual settings change.
+        val repo = settingsRepo("translation-loads-position")
+        val src = source()
+        val vm = ReaderViewModel(src, repo, "en", surah = 2)
+        vm.start(backgroundScope)
+        vm.awaitReady()
+
+        val loadsBefore = src.translationLoads.size
+        repo.setReadingPosition(ReadingPosition(2, 5, 2))
+        // No event to await here — asserting an absence of a reload, so a short real-time wait
+        // covers the flow's own chance to (wrongly) re-emit before the assertion runs.
+        advanceTimeBy(50)
+        assertEquals(loadsBefore, src.translationLoads.size)
+    }
+
+    @Test
     fun updateSettingsPersistsThroughTheRepositoryAndReEmits() = runTest {
         val repo = settingsRepo("update-settings")
         val vm = ReaderViewModel(source(), repo, "en", surah = 2)

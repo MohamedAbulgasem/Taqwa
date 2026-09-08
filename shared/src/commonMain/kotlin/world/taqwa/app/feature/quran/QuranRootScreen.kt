@@ -10,25 +10,37 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -42,14 +54,14 @@ import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaSegmented
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
-import world.taqwa.app.feature.settings.SectionLabel
 import world.taqwa.app.feature.settings.SettingsGutter
-import world.taqwa.app.feature.settings.SettingsScaffold
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
+import world.taqwa.app.quran.displayName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_continue
 import world.taqwa.app.resources.quran_continue_detail
@@ -59,15 +71,27 @@ import world.taqwa.app.resources.quran_madani
 import world.taqwa.app.resources.quran_makki
 import world.taqwa.app.resources.quran_search_hint
 import world.taqwa.app.resources.quran_surah_subtitle
+import world.taqwa.app.resources.quran_surah_subtitle_arabic_ui
 import world.taqwa.app.resources.quran_tab_juz
 import world.taqwa.app.resources.quran_tab_surah
 import world.taqwa.app.resources.quran_title
+
+/** The card frame's own corner radius (spec §2.1) — [TaqwaCard]'s, kept in one place here since
+ * the list section below rebuilds that frame by hand out of two cap items rather than a single
+ * [TaqwaCard], see [CardTopCap] and [CardBottomCap]. */
+private val CardCorner = 18.dp
 
 /**
  * The Quran tab root (spec §2.1, "Root A"): a filter field, an optional continue-reading card, a
  * Surah | Juz switch, then the matching list. [pageFor] resolves the Mushaf page a tap should
  * open; it is suspend because [world.taqwa.app.quran.QuranSource.pageOf] hits the database, so a
  * tap in Mushaf mode launches its own short-lived coroutine rather than blocking composition.
+ *
+ * The whole screen is one [LazyColumn] (rather than a [SettingsScaffold]-style scrolling `Column`)
+ * so the up-to-114 surah rows are only ever composed near the viewport, not all at once — the
+ * screen otherwise reproduces [world.taqwa.app.feature.settings.SettingsScaffold]'s own tab-root
+ * layout (the 52 dp top spacer in place of a back chevron, the title, the 20 dp gap) by hand,
+ * since that helper is built on `verticalScroll` rather than a lazy list.
  */
 @Composable
 fun QuranRootScreen(
@@ -78,51 +102,187 @@ fun QuranRootScreen(
     onOpenReader: (surah: Int, ayah: Int) -> Unit,
     onOpenMushaf: (page: Int) -> Unit,
 ) {
-    SettingsScaffold(stringResource(Res.string.quran_title), onBack = null) {
-        val ready = state as? QuranRootUiState.Ready ?: return@SettingsScaffold
-        val scope = rememberCoroutineScope()
+    val colors = LocalTaqwaColors.current
+    val ready = state as? QuranRootUiState.Ready
+    val scope = rememberCoroutineScope()
 
-        // Translation mode opens the reader directly; Mushaf mode needs the page number first,
-        // which only the database — through pageFor — knows.
-        fun open(surah: Int, ayah: Int) {
-            if (ready.mode == ReadingMode.TRANSLATION) {
-                onOpenReader(surah, ayah)
-            } else {
-                scope.launch { onOpenMushaf(pageFor(surah, ayah)) }
-            }
+    // Hoisted here, above the LazyColumn, rather than declared inside the `item` that draws the
+    // field: a LazyColumn is free to recompose or move item slots around as the row list beneath
+    // it grows and shrinks on every keystroke, and state declared at this level survives that
+    // regardless, so the field keeps both its text and its IME focus while the user types.
+    var fieldValue by remember { mutableStateOf(TextFieldValue(ready?.filter.orEmpty())) }
+
+    // Translation mode opens the reader directly; Mushaf mode needs the page number first,
+    // which only the database — through pageFor — knows.
+    fun open(surah: Int, ayah: Int) {
+        if (ready?.mode == ReadingMode.TRANSLATION) {
+            onOpenReader(surah, ayah)
+        } else {
+            scope.launch { onOpenMushaf(pageFor(surah, ayah)) }
         }
+    }
 
-        Column(
-            Modifier.padding(horizontal = SettingsGutter),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            QuranSearchField(ready.filter, onFilterChange)
-
-            ready.continueCard?.let { card ->
-                ContinueReadingCard(card) { open(card.surah.number, card.ayah) }
-            }
-
-            TaqwaSegmented(
-                options = listOf(
-                    stringResource(Res.string.quran_tab_surah),
-                    stringResource(Res.string.quran_tab_juz),
-                ),
-                selectedIndex = if (ready.tab == RootTab.SURAH) 0 else 1,
-                onSelect = { onTabChange(if (it == 0) RootTab.SURAH else RootTab.JUZ) },
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .windowInsetsPadding(WindowInsets.systemBars),
+    ) {
+        // 8 dp of top padding plus the 44 dp tap target a back chevron would have occupied, same
+        // as SettingsScaffold's own tab-root spacer.
+        item(key = "top-spacer") { Spacer(Modifier.height(52.dp)) }
+        item(key = "title") {
+            Text(
+                stringResource(Res.string.quran_title),
+                style = TaqwaText.screenTitle,
+                color = colors.textPrimary,
+                modifier = Modifier.padding(start = SettingsGutter, end = SettingsGutter, top = 4.dp),
             )
+        }
+        item(key = "title-gap") { Spacer(Modifier.height(20.dp)) }
 
-            if (ready.tab == RootTab.SURAH) {
-                SurahListCard(ready.filteredSurahs) { surah -> open(surah.number, 1) }
-            } else {
-                JuzListCard(ready.juzs) { juz -> open(juz.startSurah.number, juz.startAyah) }
+        if (ready == null) return@LazyColumn
+
+        item(key = "filter") {
+            Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+                QuranSearchField(fieldValue) { newValue ->
+                    fieldValue = newValue
+                    onFilterChange(newValue.text)
+                }
             }
         }
+        item(key = "filter-gap") { Spacer(Modifier.height(12.dp)) }
+
+        ready.continueCard?.let { card ->
+            item(key = "continue") {
+                Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+                    ContinueReadingCard(card) { open(card.surah.number, card.ayah) }
+                }
+            }
+            item(key = "continue-gap") { Spacer(Modifier.height(12.dp)) }
+        }
+
+        item(key = "tabs") {
+            Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+                TaqwaSegmented(
+                    options = listOf(
+                        stringResource(Res.string.quran_tab_surah),
+                        stringResource(Res.string.quran_tab_juz),
+                    ),
+                    selectedIndex = if (ready.tab == RootTab.SURAH) 0 else 1,
+                    onSelect = { onTabChange(if (it == 0) RootTab.SURAH else RootTab.JUZ) },
+                )
+            }
+        }
+        item(key = "tabs-gap") { Spacer(Modifier.height(12.dp)) }
+
+        if (ready.tab == RootTab.SURAH) {
+            surahListItems(ready.filteredSurahs) { surah -> open(surah.number, 1) }
+        } else {
+            juzListItems(ready.juzs) { juz -> open(juz.startSurah.number, juz.startAyah) }
+        }
+
+        item(key = "bottom-spacer") { Spacer(Modifier.height(40.dp)) }
     }
 }
 
-/** The filter field (spec §2.1 point 1): a hairline card, a hand-drawn magnifier, and a placeholder. */
+/**
+ * The card-shaped list of surahs, laid out as plain [LazyListScope] items instead of one
+ * [TaqwaCard] (spec §2.1 point 4): [CardTopCap] and [CardBottomCap] draw the rounded corners a
+ * `TaqwaCard` would have drawn as a single border, each row draws its own hairline sides via
+ * [CardRow], and [CardDivider] sits between rows exactly as it did inside the old `TaqwaCard`
+ * column — the result is pixel-for-pixel the same card at rest, just no longer one composable
+ * that has to lay out all of its children before anything scrolls.
+ */
+private fun LazyListScope.surahListItems(surahs: List<Surah>, onOpen: (Surah) -> Unit) {
+    if (surahs.isEmpty()) return
+    item(key = "surah-cap-top") {
+        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
+    }
+    itemsIndexed(surahs, key = { _, surah -> "surah-${surah.number}" }) { index, surah ->
+        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+            Column {
+                CardRow { SurahRow(surah) { onOpen(surah) } }
+                if (index != surahs.lastIndex) CardDivider()
+            }
+        }
+    }
+    item(key = "surah-cap-bottom") {
+        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
+    }
+}
+
+private fun LazyListScope.juzListItems(juzs: List<JuzRow>, onOpen: (JuzRow) -> Unit) {
+    if (juzs.isEmpty()) return
+    item(key = "juz-cap-top") {
+        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardTopCap() }
+    }
+    itemsIndexed(juzs, key = { _, juz -> "juz-${juz.number}" }) { index, juz ->
+        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) {
+            Column {
+                CardRow { JuzListRow(juz) { onOpen(juz) } }
+                if (index != juzs.lastIndex) CardDivider()
+            }
+        }
+    }
+    item(key = "juz-cap-bottom") {
+        Box(Modifier.fillMaxWidth().padding(horizontal = SettingsGutter)) { CardBottomCap() }
+    }
+}
+
+/** The rounded top edge a [TaqwaCard] would have drawn as part of its own single border — a
+ * plain box shaped and bordered on its top corners only, so it reads as the top of the same card
+ * once it sits directly above the first row's own [CardRow] sides. */
 @Composable
-private fun QuranSearchField(value: String, onValueChange: (String) -> Unit) {
+private fun CardTopCap() {
+    val colors = LocalTaqwaColors.current
+    val shape = RoundedCornerShape(topStart = CardCorner, topEnd = CardCorner)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(CardCorner)
+            .background(colors.surface, shape)
+            .border(1.dp, colors.hairline, shape),
+    )
+}
+
+/** [CardTopCap]'s mirror for the card's bottom edge. */
+@Composable
+private fun CardBottomCap() {
+    val colors = LocalTaqwaColors.current
+    val shape = RoundedCornerShape(bottomStart = CardCorner, bottomEnd = CardCorner)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(CardCorner)
+            .background(colors.surface, shape)
+            .border(1.dp, colors.hairline, shape),
+    )
+}
+
+/** One row's own share of the card's frame: the surface fill and the two side hairlines, which —
+ * unlike the top and bottom edges — never overlap another item's own line, so every row can draw
+ * them independently without doubling any line up with its neighbour. */
+@Composable
+private fun CardRow(content: @Composable () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(colors.surface)
+            .drawBehind {
+                val stroke = 1.dp.toPx()
+                drawLine(colors.hairline, Offset(stroke / 2, 0f), Offset(stroke / 2, size.height), stroke)
+                drawLine(colors.hairline, Offset(size.width - stroke / 2, 0f), Offset(size.width - stroke / 2, size.height), stroke)
+            },
+    ) { content() }
+}
+
+/** The filter field (spec §2.1 point 1): a hairline card, a hand-drawn magnifier, and a placeholder.
+ * [value] is a [TextFieldValue], not a bare [String] — see [QuranRootScreen]'s own hoisted state —
+ * so the field's cursor position and IME composing state survive the list beneath it changing. */
+@Composable
+private fun QuranSearchField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Unit) {
     val colors = LocalTaqwaColors.current
     Row(
         Modifier
@@ -149,7 +309,7 @@ private fun QuranSearchField(value: String, onValueChange: (String) -> Unit) {
             )
         }
         Box(Modifier.weight(1f)) {
-            if (value.isEmpty()) {
+            if (value.text.isEmpty()) {
                 Text(stringResource(Res.string.quran_search_hint), style = TaqwaText.caption, color = colors.textTertiary)
             }
             BasicTextField(
@@ -169,6 +329,7 @@ private fun QuranSearchField(value: String, onValueChange: (String) -> Unit) {
 private fun ContinueReadingCard(card: ContinueCard, onClick: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
+    val arabic = isRtlLocale()
     TaqwaCard(
         Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
@@ -185,7 +346,18 @@ private fun ContinueReadingCard(card: ContinueCard, onClick: () -> Unit) {
             Spacer(Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(card.surah.nameLatin, style = TaqwaText.rowLabel, color = colors.textPrimary)
+                    if (arabic) {
+                        // The Arabic name stands in for the Latin one under an Arabic UI (spec
+                        // §5.3); the trailing badge below is then dropped rather than repeating it.
+                        Text(
+                            card.surah.nameArabic,
+                            style = TaqwaText.quran(20).copy(fontFamily = mushafFamily(), lineHeight = TextUnit.Unspecified),
+                            color = colors.textPrimary,
+                            maxLines = 1,
+                        )
+                    } else {
+                        Text(card.surah.nameLatin, style = TaqwaText.rowLabel, color = colors.textPrimary)
+                    }
                     Text(
                         stringResource(
                             Res.string.quran_continue_detail,
@@ -197,14 +369,16 @@ private fun ContinueReadingCard(card: ContinueCard, onClick: () -> Unit) {
                         color = colors.textSecondary,
                     )
                 }
-                // A single-line badge, so the 2.0x line height meant for wrapped ayah text is
-                // dropped — kept, it would double this row's height for no visible reason.
-                Text(
-                    card.surah.nameArabic,
-                    style = TaqwaText.quran(26).copy(fontFamily = mushafFamily(), lineHeight = TextUnit.Unspecified),
-                    color = colors.textPrimary,
-                    maxLines = 1,
-                )
+                if (!arabic) {
+                    // A single-line badge, so the 2.0x line height meant for wrapped ayah text is
+                    // dropped — kept, it would double this row's height for no visible reason.
+                    Text(
+                        card.surah.nameArabic,
+                        style = TaqwaText.quran(26).copy(fontFamily = mushafFamily(), lineHeight = TextUnit.Unspecified),
+                        color = colors.textPrimary,
+                        maxLines = 1,
+                    )
+                }
             }
             Spacer(Modifier.height(12.dp))
             val fraction = (card.ayah.toFloat() / card.surah.ayahCount).coerceIn(0f, 1f)
@@ -228,19 +402,10 @@ private fun ContinueReadingCard(card: ContinueCard, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SurahListCard(surahs: List<Surah>, onOpen: (Surah) -> Unit) {
-    TaqwaCard {
-        surahs.forEachIndexed { index, surah ->
-            if (index > 0) CardDivider()
-            SurahRow(surah) { onOpen(surah) }
-        }
-    }
-}
-
-@Composable
 private fun SurahRow(surah: Surah, onClick: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
+    val arabic = isRtlLocale()
     Row(
         Modifier
             .fillMaxWidth()
@@ -265,35 +430,47 @@ private fun SurahRow(surah: Surah, onClick: () -> Unit) {
             )
         }
         Column(Modifier.weight(1f)) {
-            Text(surah.nameLatin, style = TaqwaText.rowLabel, color = colors.textPrimary)
-            Text(
-                stringResource(
-                    Res.string.quran_surah_subtitle,
-                    surah.meaning,
-                    format.localizedDigits(surah.ayahCount),
-                    revelationName(surah.revelation),
-                ),
-                style = TaqwaText.caption.copy(fontSize = 12.sp),
-                color = colors.textSecondary,
-            )
+            if (arabic) {
+                // The Mushaf font, per spec — this is the surah's real name from the database
+                // (surah.name_ar), never retyped, so mushafFamily() is the only face allowed to
+                // draw it. It stands in for the Latin label under an Arabic UI (spec §5.3), so the
+                // trailing badge this row otherwise shows is dropped instead of repeating it.
+                Text(
+                    surah.nameArabic,
+                    style = TaqwaText.quran(20).copy(fontFamily = mushafFamily(), lineHeight = TextUnit.Unspecified),
+                    color = colors.textPrimary,
+                    maxLines = 1,
+                )
+                Text(
+                    stringResource(
+                        Res.string.quran_surah_subtitle_arabic_ui,
+                        format.localizedDigits(surah.ayahCount),
+                        revelationName(surah.revelation),
+                    ),
+                    style = TaqwaText.caption.copy(fontSize = 12.sp),
+                    color = colors.textSecondary,
+                )
+            } else {
+                Text(surah.nameLatin, style = TaqwaText.rowLabel, color = colors.textPrimary)
+                Text(
+                    stringResource(
+                        Res.string.quran_surah_subtitle,
+                        surah.meaning,
+                        format.localizedDigits(surah.ayahCount),
+                        revelationName(surah.revelation),
+                    ),
+                    style = TaqwaText.caption.copy(fontSize = 12.sp),
+                    color = colors.textSecondary,
+                )
+            }
         }
-        // The Mushaf font, per spec — this is the surah's real name from the database
-        // (surah.name_ar), never retyped, so mushafFamily() is the only face allowed to draw it.
-        Text(
-            surah.nameArabic,
-            style = TaqwaText.quran(20).copy(fontFamily = mushafFamily(), lineHeight = TextUnit.Unspecified),
-            color = colors.textPrimary,
-            maxLines = 1,
-        )
-    }
-}
-
-@Composable
-private fun JuzListCard(juzs: List<JuzRow>, onOpen: (JuzRow) -> Unit) {
-    TaqwaCard {
-        juzs.forEachIndexed { index, juz ->
-            if (index > 0) CardDivider()
-            JuzListRow(juz) { onOpen(juz) }
+        if (!arabic) {
+            Text(
+                surah.nameArabic,
+                style = TaqwaText.quran(20).copy(fontFamily = mushafFamily(), lineHeight = TextUnit.Unspecified),
+                color = colors.textPrimary,
+                maxLines = 1,
+            )
         }
     }
 }
@@ -302,6 +479,7 @@ private fun JuzListCard(juzs: List<JuzRow>, onOpen: (JuzRow) -> Unit) {
 private fun JuzListRow(juz: JuzRow, onClick: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
+    val arabic = isRtlLocale()
     Row(
         Modifier
             .fillMaxWidth()
@@ -324,9 +502,9 @@ private fun JuzListRow(juz: JuzRow, onClick: () -> Unit) {
             Text(
                 stringResource(
                     Res.string.quran_juz_range,
-                    juz.startSurah.nameLatin,
+                    juz.startSurah.displayName(arabic),
                     format.localizedDigits(juz.startAyah),
-                    juz.endSurah.nameLatin,
+                    juz.endSurah.displayName(arabic),
                     format.localizedDigits(juz.endAyah),
                 ),
                 style = TaqwaText.caption.copy(fontSize = 12.sp),

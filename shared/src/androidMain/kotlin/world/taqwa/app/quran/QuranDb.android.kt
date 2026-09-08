@@ -19,6 +19,10 @@ actual fun createQuranDriver(): SqlDriver {
         val bytes = runBlocking { Res.readBytes(QuranDb.RESOURCE) }
         val temp = File(file.parentFile, "${QuranDb.FILE}.tmp")
         temp.writeBytes(bytes)
+        // A stale -wal/-shm/-journal beside the old file would otherwise be replayed against the
+        // freshly installed one on next open, applying leftover journalled changes from a
+        // database that no longer exists.
+        listOf("-wal", "-shm", "-journal").forEach { suffix -> File(file.parentFile, "${QuranDb.FILE}$suffix").delete() }
         // File.renameTo is atomic when the source and destination are on the same filesystem,
         // which they are here (both under the app's private databases directory).
         check(temp.renameTo(file)) { "Failed to install $file from $temp" }

@@ -41,8 +41,8 @@ private const val MUSHAF_PAGES = 604
 /**
  * Mushaf mode (spec §2.4): the reader header over a pager of the 604 printed pages. The pager is
  * wrapped in a right-to-left layout direction whatever the UI language is, so page N+1 always sits
- * to the left of page N and a swipe from right to left turns forward, as in the book itself
- * (spec §5.3).
+ * to the left of page N — the next page sits to the left, so a swipe from left to right turns
+ * forward, as in the book itself (spec §5.3).
  *
  * [pageLoader] is [MushafViewModel.page] — each composed pager page asks for its own lines rather
  * than the state carrying them, because the pager holds three pages at a time and the view model,

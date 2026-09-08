@@ -37,6 +37,7 @@ import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.feature.settings.TaqwaToggle
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.TextKind
@@ -176,10 +177,10 @@ fun ReadingSheet(
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 // The roundel takes the accent here as it does on every ayah card: the preview
                 // must show the size the reader will actually use, colour included.
-                val marker = previewAyah.takeLastWhile { it in '٠'..'٩' }
+                val (base, marker) = QuranText.splitMarker(previewAyah)
                 Text(
                     buildAnnotatedString {
-                        append(previewAyah.dropLast(marker.length))
+                        append(base)
                         withStyle(SpanStyle(color = colors.accent)) { append(marker) }
                     },
                     fontFamily = mushafFamily(),

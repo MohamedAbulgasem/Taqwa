@@ -7,6 +7,15 @@ data class Surah(
     val revelation: Revelation, val ayahCount: Int, val startPage: Int, val startJuz: Int,
 )
 
+/**
+ * Which of [Surah.nameArabic] and [Surah.nameLatin] a caller should show, given whether the UI
+ * itself is Arabic (spec §5.3's "Arabic names under an Arabic UI" rule) — a pure function so the
+ * choice is unit-testable without a composable, unlike the isRtlLocale() check that feeds it.
+ * The Arabic branch still requires [world.taqwa.app.design.mushafFamily] at the call site: this
+ * only picks the string, never renders it.
+ */
+fun Surah.displayName(rtl: Boolean): String = if (rtl) nameArabic else nameLatin
+
 data class Ayah(val surah: Int, val number: Int, val text: String, val page: Int, val juz: Int, val hizbQuarter: Int, val sajdah: Int)
 
 data class Juz(val number: Int, val startSurah: Int, val startAyah: Int)

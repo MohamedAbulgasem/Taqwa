@@ -28,6 +28,10 @@ actual fun createQuranDriver(): SqlDriver {
     val filePath = "$directoryPath/${QuranDb.FILE}"
     if (!NSFileManager.defaultManager.fileExistsAtPath(filePath) || userVersion(filePath) != QuranDb.VERSION) {
         val bytes = runBlocking { Res.readBytes(QuranDb.RESOURCE) }
+        // A stale -wal/-shm/-journal beside the old file would otherwise be replayed against the
+        // freshly installed one on next open, applying leftover journalled changes from a
+        // database that no longer exists.
+        listOf("-wal", "-shm", "-journal").forEach { suffix -> remove("$filePath$suffix") }
         writeAtomically(bytes, filePath)
     }
     return NativeSqliteDriver(

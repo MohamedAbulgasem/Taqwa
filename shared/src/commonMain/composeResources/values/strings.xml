@@ -204,6 +204,9 @@
     <string name="quran_tab_surah">Surah</string>
     <string name="quran_tab_juz">Juz</string>
     <string name="quran_surah_subtitle">%1$s · %2$s ayahs · %3$s</string>
+    <!-- Surah row subtitle under an Arabic UI, where the primary label is already the Arabic name
+         (spec §5.3), so the meaning is dropped rather than repeated in a script the row is not in. -->
+    <string name="quran_surah_subtitle_arabic_ui">%1$s ayahs · %2$s</string>
     <string name="quran_makki">Makki</string>
     <string name="quran_madani">Madani</string>
     <string name="quran_juz_n">Juz %1$s</string>

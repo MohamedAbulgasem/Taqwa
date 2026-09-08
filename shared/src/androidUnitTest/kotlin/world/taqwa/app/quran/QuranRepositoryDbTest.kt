@@ -4,6 +4,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
+import world.taqwa.app.feature.quran.computeJuzRows
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -73,6 +74,36 @@ class QuranRepositoryDbTest {
     @Test fun pageOfMapsBothWays() = runTest {
         assertEquals(2, repo.pageOf(2, 1))
         assertEquals(604, repo.pageOf(114, 6))
+    }
+
+    @Test fun everyPageHasLinesAndEveryTextLineHasWords() = runTest {
+        for (n in 1..604) {
+            val page = repo.page(n)
+            assertTrue(page.lines.isNotEmpty(), "page $n has no lines")
+            for (line in page.lines) {
+                if (line.type == LineType.TEXT) {
+                    assertTrue(line.words.isNotEmpty(), "page $n line ${line.line} is TEXT with no words")
+                }
+            }
+        }
+    }
+
+    @Test fun everySurahsAyahCountMatchesItsOwnAyahRows() = runTest {
+        for (s in 1..114) {
+            val surah = repo.surah(s)
+            assertEquals(surah.ayahCount, repo.ayahs(s).size, "surah $s ayah count mismatch")
+        }
+    }
+
+    @Test fun computedJuzRowsCoverAllThirtyJuzsEndingAtTheirKnownBoundaries() = runTest {
+        val rows = computeJuzRows(repo.juzs(), repo.surahs())
+        assertEquals(30, rows.size)
+        val first = rows.first()
+        assertEquals(2, first.endSurah.number)
+        assertEquals(141, first.endAyah)
+        val last = rows.last()
+        assertEquals(114, last.endSurah.number)
+        assertEquals(6, last.endAyah)
     }
 
     companion object {

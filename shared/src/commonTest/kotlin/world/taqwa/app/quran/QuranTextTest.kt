@@ -24,4 +24,13 @@ class QuranTextTest {
         assertEquals("الحمد لله", QuranText.normaliseForSearch("ٱلْحَمْدُ لِلَّهِ"))
         assertEquals("ايمان", QuranText.normaliseForSearch("إيمَان"))
     }
+
+    @Test
+    fun splitMarkerReversesWithMarkerExactly() {
+        val marked = QuranText.withMarker("نص", 255)
+        val (base, marker) = QuranText.splitMarker(marked)
+        assertEquals("نص" + QuranText.MARKER_SEPARATOR, base)
+        assertEquals("٢٥٥", marker)
+        assertEquals(marked, base + marker)
+    }
 }

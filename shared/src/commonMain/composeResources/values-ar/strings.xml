@@ -200,6 +200,7 @@
     <string name="quran_tab_surah">السور</string>
     <string name="quran_tab_juz">الأجزاء</string>
     <string name="quran_surah_subtitle">%1$s · %2$s آية · %3$s</string>
+    <string name="quran_surah_subtitle_arabic_ui">%1$s آية · %2$s</string>
     <string name="quran_makki">مكية</string>
     <string name="quran_madani">مدنية</string>
     <string name="quran_juz_n">الجزء %1$s</string>

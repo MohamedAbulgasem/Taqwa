@@ -84,9 +84,10 @@ fun AyahCard(
                 Text(
                     buildAnnotatedString {
                         append(text)
-                        // U+00A0, not a plain space: keeps the ayah number glued to its text when
-                        // wrapping, matching QuranText.withMarker's own separator (spec §5.2).
-                        append(' ')
+                        // QuranText.MARKER_SEPARATOR, not a plain space: keeps the ayah number
+                        // glued to its text when wrapping, matching QuranText.withMarker's own
+                        // separator (spec §5.2) from the one shared definition.
+                        append(QuranText.MARKER_SEPARATOR)
                         withStyle(SpanStyle(color = colors.accent)) { append(QuranText.arabicIndic(ayahNumber)) }
                     },
                     style = TaqwaText.quran(sizeSp),

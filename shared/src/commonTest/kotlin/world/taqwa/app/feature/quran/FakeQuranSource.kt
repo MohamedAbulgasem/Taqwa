@@ -45,6 +45,11 @@ internal class FakeQuranSource(
     /** One entry per [page] call that reached this fake, newest last. */
     val pageLoads = mutableListOf<Int>()
 
+    /** One entry per [translationTexts] call that reached this fake, newest last — lets a test
+     * (e.g. [ReaderViewModelTest]'s debounce regression) assert a translation was fetched exactly
+     * once rather than re-fetched on every unrelated state change. */
+    val translationLoads = mutableListOf<Pair<String, Int>>()
+
     override suspend fun surahs(): List<Surah> = surahList
     override suspend fun surah(number: Int): Surah = surahList.first { it.number == number }
     override suspend fun juzs(): List<Juz> = juzList
@@ -52,8 +57,10 @@ internal class FakeQuranSource(
         ayahsBySurah[surah] ?: error("no ayahs configured for surah $surah in FakeQuranSource")
     override suspend fun translations(): List<TranslationInfo> =
         translationsList.ifEmpty { error("no translations configured in FakeQuranSource") }
-    override suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String> =
-        translationTextsById[translationId]?.get(surah) ?: emptyMap()
+    override suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String> {
+        translationLoads += translationId to surah
+        return translationTextsById[translationId]?.get(surah) ?: emptyMap()
+    }
     override suspend fun pageOf(surah: Int, ayah: Int): Int =
         ayahsBySurah[surah]?.firstOrNull { it.number == ayah }?.page ?: when (surah) {
             1 -> 1
@@ -66,5 +73,4 @@ internal class FakeQuranSource(
         pageLoads += number
         return pagesByNumber[number] ?: error("no page $number configured in FakeQuranSource")
     }
-    override suspend fun surahOfPage(number: Int): Surah = surah(page(number).firstSurah)
 }

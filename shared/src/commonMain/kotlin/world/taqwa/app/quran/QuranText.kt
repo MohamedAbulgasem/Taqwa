@@ -12,13 +12,23 @@ object QuranText {
 
     private const val ARABIC_INDIC = "٠١٢٣٤٥٦٧٨٩"
 
-    /** U+00A0 non-breaking space — keeps the ayah number glued to its text when wrapping. */
-    private const val NBSP = ' '
+    /** U+00A0 non-breaking space — keeps the ayah number glued to its text when wrapping. Exposed
+     * so [world.taqwa.app.feature.quran.AyahCard] and [world.taqwa.app.feature.quran.ReadingSheet]
+     * share this one definition instead of each repeating the literal. */
+    const val MARKER_SEPARATOR = ' '
 
     fun arabicIndic(n: Int): String = n.toString().map { ARABIC_INDIC[it - '0'] }.joinToString("")
 
     /** Spec §5.2: the Hafs font draws bare Arabic-Indic digits as the Mushaf roundel. */
-    fun withMarker(text: String, ayah: Int): String = text + NBSP + arabicIndic(ayah)
+    fun withMarker(text: String, ayah: Int): String = text + MARKER_SEPARATOR + arabicIndic(ayah)
+
+    /** Splits text produced by [withMarker] back into the ayah's own text and its trailing
+     * Arabic-Indic digit run (the roundel), for a caller — such as the reading-settings sheet's
+     * live preview — that draws the roundel in a different colour from the rest of the line. */
+    fun splitMarker(textWithMarker: String): Pair<String, String> {
+        val marker = textWithMarker.takeLastWhile { it in ARABIC_INDIC }
+        return textWithMarker.dropLast(marker.length) to marker
+    }
 
     // Harakat, quranic annotation marks, and tatweel (U+0640) — all stripped for search.
     private val HARAKAT = Regex("[\\u0610-\\u061A\\u064B-\\u065F\\u0670\\u06D6-\\u06ED\\u0640]")

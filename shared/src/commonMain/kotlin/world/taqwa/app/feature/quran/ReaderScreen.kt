@@ -55,6 +55,7 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings
+import world.taqwa.app.quran.displayName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_next_surah
@@ -126,7 +127,7 @@ fun ReaderScreen(
             snapshotFlow { listState.firstVisibleItemIndex }
                 .distinctUntilChanged()
                 .collect { index ->
-                    val ayahIndex = if (hasBasmala) index - 1 else index
+                    val ayahIndex = firstVisibleAyahIndex(index, hasBasmala)
                     ready.ayahs.getOrNull(ayahIndex)?.let { onFirstVisibleAyah(it.number) }
                 }
         }
@@ -167,7 +168,9 @@ fun ReaderScreen(
             }
             ready.nextSurah?.let { next ->
                 item(key = "next-surah") {
-                    NextSurahCard(next.nameLatin) { onOpenNextSurah(next.number) }
+                    // Arabic name under an Arabic UI (spec §5.3): the Mushaf font is not required
+                    // inside the format string itself, only when Quran text is drawn directly.
+                    NextSurahCard(next.displayName(arabic)) { onOpenNextSurah(next.number) }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package world.taqwa.app.design
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -17,7 +18,12 @@ import world.taqwa.app.resources.uthmanic_hafs
  * digits that [world.taqwa.app.quran.QuranText.withMarker] relies on.
  */
 @Composable
-fun mushafFamily(): FontFamily = FontFamily(Font(Res.font.uthmanic_hafs))
+fun mushafFamily(): FontFamily {
+    // Font(...) is itself composable-cached; remember only has to hold the FontFamily built from
+    // it, so a fresh FontFamily instance is not allocated on every recomposition.
+    val font = Font(Res.font.uthmanic_hafs)
+    return remember(font) { FontFamily(font) }
+}
 
 /**
  * The Quran text style (spec §5): a fixed 2.0x line-height keeps the Hafs glyphs' large stacked

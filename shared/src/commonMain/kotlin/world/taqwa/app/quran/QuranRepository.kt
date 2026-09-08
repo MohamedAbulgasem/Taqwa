@@ -16,7 +16,6 @@ interface QuranSource {
     suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String>
     suspend fun pageOf(surah: Int, ayah: Int): Int
     suspend fun page(number: Int): MushafPage
-    suspend fun surahOfPage(number: Int): Surah
 }
 
 class QuranRepository(
@@ -54,7 +53,6 @@ class QuranRepository(
         val juz = q.juzOfAyah(header.first_surah, header.first_ayah).executeAsOne().toInt()
         MushafPage(number, header.first_surah.toInt(), header.first_ayah.toInt(), juz, lines)
     }
-    override suspend fun surahOfPage(number: Int): Surah = withContext(io) { surah(q.pageHeader(number.toLong()).executeAsOne().first_surah.toInt()) }
 }
 
 private fun world.taqwa.app.quran.db.Surah.toSurah() = Surah(
