@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import world.taqwa.app.domain.Prayer
 
 internal object SettingsKeys {
@@ -43,4 +44,7 @@ internal object SettingsKeys {
     val QURAN_LAST_SURAH = intPreferencesKey("quran_last_surah")
     val QURAN_LAST_AYAH = intPreferencesKey("quran_last_ayah")
     val QURAN_LAST_PAGE = intPreferencesKey("quran_last_page")
+
+    /** Bookmarked ayahs as "<surah>:<ayah>:<epochMillis>" entries (spec 2b §2.2). */
+    val QURAN_BOOKMARKS = stringSetPreferencesKey("quran_bookmarks")
 }
