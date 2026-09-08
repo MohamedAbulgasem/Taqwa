@@ -149,8 +149,11 @@ fun TaqwaRow(
         val valueWanted = valueMeasurable?.maxIntrinsicWidth(Constraints.Infinity) ?: 0
         val valueGap = if (valueMeasurable != null) gap else 0
 
+        // A label that fits is measured against everything the value leaves it, not against its
+        // own intrinsic width: shaped Arabic can lay out a pixel wider than it measures, and a
+        // constraint cut to the exact intrinsic width then wrapped the last letter onto its own line.
         val labelWidth = if (labelWanted + valueGap + valueWanted <= available) {
-            labelWanted
+            available - valueGap - valueWanted
         } else {
             val floor = (available * LABEL_MIN_SHARE).roundToInt()
             min(labelWanted, max(available - valueGap - valueWanted, floor))

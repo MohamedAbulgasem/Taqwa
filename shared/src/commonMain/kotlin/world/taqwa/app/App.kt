@@ -50,6 +50,7 @@ import world.taqwa.app.feature.today.TodayScreen
 import world.taqwa.app.feature.today.TodayViewModel
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
+import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.design.components.TaqwaTabScaffold
@@ -101,13 +102,9 @@ fun App(container: AppContainer) {
     // mirroring code. Only Canvas geometry drawn from literal coordinates needs help; the
     // countdown ring's arc and the settings back chevron do that for themselves.
     val platformFormat = remember { createPlatformFormat() }
-    val layoutDirection = remember(platformFormat) {
-        if (world.taqwa.app.i18n.LayoutDirection.isRtl(platformFormat.languageTag())) {
-            LayoutDirection.Rtl
-        } else {
-            LayoutDirection.Ltr
-        }
-    }
+    // From the resolved strings, not the locale tag, for the reason given on isRtlLocale(): the
+    // tree mirrors exactly when the words on it are Arabic.
+    val layoutDirection = if (isRtlLocale()) LayoutDirection.Rtl else LayoutDirection.Ltr
 
     // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
     // has already happened by the time this runs, so `requestSystemPermission` just returns the

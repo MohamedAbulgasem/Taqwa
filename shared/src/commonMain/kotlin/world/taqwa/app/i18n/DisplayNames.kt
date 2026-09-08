@@ -38,14 +38,21 @@ import world.taqwa.app.resources.sound_adhan
 import world.taqwa.app.resources.sound_notification
 import world.taqwa.app.resources.sound_silent
 import world.taqwa.app.resources.sound_takbir
+import world.taqwa.app.resources.ui_language
 
 /**
- * True when the UI is being rendered right-to-left, which for this app means the device language
- * is Arabic. Read from [LocalPlatformFormat] rather than `LocalLayoutDirection` so a caller can
- * ask the question outside a mirrored subtree.
+ * True when the UI is Arabic: the strings Compose has actually resolved are the Arabic set. Read
+ * from the resources themselves ([Res.string.ui_language] is "ar" only in `values-ar`) rather
+ * than from the platform's locale tag, so this can never disagree with the words on screen — a
+ * phone whose resource locale and default locale differ (a per-app language, a regional variant
+ * the tag spells unexpectedly) used to get Arabic strings with the English naming rule, and so
+ * showed every prayer name twice. Also usable outside a mirrored subtree, unlike
+ * `LocalLayoutDirection`.
  */
 @Composable
-fun isRtlLocale(): Boolean = LayoutDirection.isRtl(LocalPlatformFormat.current.languageTag())
+fun isRtlLocale(): Boolean = stringResource(Res.string.ui_language) == ARABIC_UI
+
+private const val ARABIC_UI = "ar"
 
 /**
  * Manrope ships no Arabic glyphs, so Arabic copy must come from the OS face — SF Arabic on iOS,

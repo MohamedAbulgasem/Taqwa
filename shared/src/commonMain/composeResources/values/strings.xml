@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Taqwa</string>
+    <!-- The language these strings are written in; the one fact every "is the UI Arabic?" decision reads. -->
+    <string name="ui_language">en</string>
 
     <!-- The name of this file's own language, shown in Settings › Language. -->
     <string name="language_name">English</string>
