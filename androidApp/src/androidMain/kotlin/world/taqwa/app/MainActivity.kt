@@ -30,10 +30,12 @@ class MainActivity : ComponentActivity() {
      */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // Kept as the activity's current intent so a later getIntent() agrees with what was acted
-        // on, matching what the platform does for onCreate's.
-        setIntent(intent)
         recordAyahRequest(intent)
+        // Kept as the activity's current intent so a later getIntent() agrees with what was acted
+        // on, matching what the platform does for onCreate's — but only after recordAyahRequest
+        // has stripped the tap extras, so a process restored from a saved instance state does not
+        // find them still on getIntent() and replay the same tap.
+        setIntent(intent)
     }
 
     /**
@@ -48,6 +50,10 @@ class MainActivity : ComponentActivity() {
         val surah = intent?.getIntExtra(EXTRA_OPEN_SURAH, 0) ?: 0
         val ayah = intent?.getIntExtra(EXTRA_OPEN_AYAH, 0) ?: 0
         if (surah > 0 && ayah > 0) LaunchRequests.openAyah(surah, ayah)
+        // Stripped once recorded, so an activity recreated from a saved instance state — which
+        // hands onCreate the same intent back — never re-reads these and replays the tap.
+        intent?.removeExtra(EXTRA_OPEN_SURAH)
+        intent?.removeExtra(EXTRA_OPEN_AYAH)
     }
 
     private companion object {

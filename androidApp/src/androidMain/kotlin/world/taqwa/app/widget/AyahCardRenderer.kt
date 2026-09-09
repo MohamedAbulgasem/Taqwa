@@ -119,11 +119,15 @@ object AyahCardRenderer {
      * `provideGlance` leaves the launcher showing the error view for good, while the wrong face
      * still shows today's ayah.
      */
-    private fun typeface(context: Context, file: String): Typeface =
-        typefaceCache.getOrPut(file) {
-            runCatching { Typeface.createFromAsset(context.assets, FONT_DIR + file) }
-                .getOrNull() ?: Typeface.DEFAULT
-        }
+    private fun typeface(context: Context, file: String): Typeface {
+        typefaceCache[file]?.let { return it }
+        // Only a successful load goes into the cache. A transient failure — the asset briefly
+        // unreadable, say — must not poison every later draw for the rest of the process with the
+        // system face; the next call gets to try the real one again.
+        val loaded = runCatching { Typeface.createFromAsset(context.assets, FONT_DIR + file) }.getOrNull()
+        if (loaded != null) typefaceCache[file] = loaded
+        return loaded ?: Typeface.DEFAULT
+    }
 
     // -- Entry point ------------------------------------------------------------------------------
 
@@ -136,7 +140,8 @@ object AyahCardRenderer {
      * clamped to the lines that remain and ellipsised, because the Arabic is never cut.
      */
     fun render(context: Context, input: AyahCardInput): Bitmap {
-        val scale = renderScale(input.widthPx, input.heightPx)
+        val maxPixels = maxBitmapPixels(context)
+        val scale = renderScale(input.widthPx, input.heightPx, maxPixels)
         val width = max(1, (input.widthPx * scale).toInt())
         val height = max(1, (input.heightPx * scale).toInt())
         val density = input.density * scale
@@ -165,19 +170,27 @@ object AyahCardRenderer {
      * resolution and only starts costing sharpness past that, where `ContentScale.Fit` scales the
      * bitmap back up.
      */
-    private fun renderScale(widthPx: Int, heightPx: Int): Float {
+    private fun renderScale(widthPx: Int, heightPx: Int, maxPixels: Long): Float {
         val pixels = widthPx.toLong() * heightPx.toLong()
-        if (pixels <= MAX_BITMAP_PIXELS) return 1f
-        return sqrt(MAX_BITMAP_PIXELS.toDouble() / pixels.toDouble()).toFloat()
+        if (pixels <= maxPixels) return 1f
+        return sqrt(maxPixels.toDouble() / pixels.toDouble()).toFloat()
     }
 
     /**
-     * 700k pixels is 2.8 MB as ARGB_8888. The host counts about three times that per widget —
-     * `dumpsys appwidget` reported `views_bitmap_memory=8390372` for one card at this budget —
-     * against a ceiling of 1.5 screenfuls of ARGB, which on the 1344x2992 device this was
-     * measured on is 24 MB. A 4x3 cell there is 1.35 M pixels, so it renders at about 0.72 scale.
+     * A quarter of the *display's* own pixel count, not a fixed figure sized for whichever phone
+     * last measured it: a fixed 700k pixels rendered a 4x3 cell at about 0.72 scale and left the
+     * text visibly soft, and it either wastes headroom on a bigger screen or has none to spare on
+     * a smaller one. In ARGB_8888 a quarter of the screen is one screen's worth of *bytes*, and
+     * `dumpsys appwidget` reported the host counting a card's bitmap about three times over
+     * (`views_bitmap_memory`) against a ceiling of roughly 1.5 screens of ARGB — so this stays
+     * comfortably inside that budget on any display. Floored and ceilinged so a tiny or huge
+     * display still gets a sane number either way.
      */
-    private const val MAX_BITMAP_PIXELS = 700_000L
+    private fun maxBitmapPixels(context: Context): Long {
+        val metrics = context.resources.displayMetrics
+        val budget = metrics.widthPixels.toLong() * metrics.heightPixels.toLong() / 4L
+        return budget.coerceIn(500_000L, 1_200_000L)
+    }
 
     // -- Auto-fit -----------------------------------------------------------------------------
 
@@ -191,10 +204,13 @@ object AyahCardRenderer {
         val footerGapPx: Float,
         val rulePx: Float,
         val ruleGapPx: Float,
+        /** True only for the last-resort layout where even the Arabic alone outgrows the space
+         * above the footer: the footer is left undrawn rather than painted over it. */
+        val hideFooter: Boolean = false,
     ) {
         /** Everything from the gap above the rule to the bottom of the footer row. */
         val footerBlockHeight: Float
-            get() = footerGapPx + rulePx + ruleGapPx + footer.height
+            get() = if (hideFooter) 0f else footerGapPx + rulePx + ruleGapPx + footer.height
 
         val contentHeight: Float
             get() = arabic.height + (translation?.let { translationGapPx + it.height } ?: 0f)
@@ -219,6 +235,25 @@ object AyahCardRenderer {
         // Nothing fit even at the floor. The Arabic keeps its full height whatever that costs —
         // half an ayah is not an ayah — and the translation takes whatever height is left.
         val floorBlocks = blocksAt(context, input, density, innerWidth, footer, compact, ARABIC_MIN_SP.toFloat(), maxLines = null)
+        if (floorBlocks.arabic.height > innerHeight - floorBlocks.footerBlockHeight) {
+            // Even the Arabic alone, at the floor size, outgrows the space above the footer.
+            // Drawing the footer under it would mean painting over the Arabic instead — worse
+            // than not drawing it — so it is dropped outright and the Arabic gets the full inner
+            // height, top padding to bottom padding. draw() still centres inside that space with
+            // a floor of zero, so if it still does not fit the only edge that gives is the
+            // bottom; the top padding is never crossed.
+            return CardBlocks(
+                arabic = floorBlocks.arabic,
+                translation = null,
+                footer = floorBlocks.footer,
+                arabicUi = floorBlocks.arabicUi,
+                translationGapPx = floorBlocks.translationGapPx,
+                footerGapPx = 0f,
+                rulePx = 0f,
+                ruleGapPx = 0f,
+                hideFooter = true,
+            )
+        }
         val translation = floorBlocks.translation ?: return floorBlocks
         val available = innerHeight - floorBlocks.arabic.height - floorBlocks.translationGapPx -
             floorBlocks.footerBlockHeight
@@ -465,8 +500,16 @@ object AyahCardRenderer {
         // spec's 9 dp is a minimum — it is what the auto-fit above checks — and the alternative
         // leaves whatever height the chosen size did not use as a band of dead space *below* the
         // footer, which reads as a card that failed to fill its cell.
-        val footerTop = height - padPx - blocks.footer.height
-        val contentBottom = footerTop - blocks.footerGapPx - blocks.rulePx - blocks.ruleGapPx
+        //
+        // [CardBlocks.hideFooter] is the one exception: the footer has already been judged unable
+        // to share the cell with the Arabic at all, so it is left off the canvas entirely and the
+        // Arabic gets the full inner height instead of the space above where the footer would sit.
+        val footerTop = if (blocks.hideFooter) height - padPx else height - padPx - blocks.footer.height
+        val contentBottom = if (blocks.hideFooter) {
+            height - padPx
+        } else {
+            footerTop - blocks.footerGapPx - blocks.rulePx - blocks.ruleGapPx
+        }
 
         // The Arabic and its translation are centred together in the space above the footer.
         // Spec §2 asks for this outright when the translation is off; it is right with one too,
@@ -474,6 +517,10 @@ object AyahCardRenderer {
         // the provider asks for as a minimum, and the auto-fit stops at 28 sp, so on a real home
         // screen there is always height the text cannot use. Top-aligned, all of it collects
         // into one dead band between the translation and the rule; centred, it becomes margin.
+        //
+        // The `max(0f, ...)` floor matters most for [CardBlocks.hideFooter]: when the Arabic is
+        // taller than the space it was just given, this keeps it pinned to the top padding rather
+        // than pushed above it, so the one edge it is allowed to overrun is the bottom.
         var y = padPx + max(0f, (contentBottom - padPx - blocks.contentHeight) / 2f)
         canvas.withTranslation(left, y) { blocks.arabic.draw(canvas) }
         y += blocks.arabic.height
@@ -482,6 +529,7 @@ object AyahCardRenderer {
             canvas.withTranslation(left, y) { translation.draw(canvas) }
         }
 
+        if (blocks.hideFooter) return
         if (blocks.rulePx > 0f) {
             val ruleTop = footerTop - blocks.ruleGapPx - blocks.rulePx
             val rulePaint = Paint().apply { color = textArgb.withAlpha(RULE_ALPHA) }
