@@ -1,16 +1,59 @@
 package world.taqwa.app.qibla
 
+import kotlin.math.sqrt
+
 /**
  * The spec's low-accuracy thresholds, one function per platform's own accuracy signal. Android
  * reports a coarse 0-3 enum; iOS reports a confidence angle in degrees.
  */
 object CompassAccuracyRules {
-    /** `SENSOR_STATUS_ACCURACY_LOW` (1) or `SENSOR_STATUS_ACCURACY_UNRELIABLE` (0). */
-    fun androidAccuracyIsLow(sensorAccuracy: Int): Boolean = sensorAccuracy <= 1
+
+    /** `SensorManager.SENSOR_STATUS_NO_CONTACT`: the sensor is not in contact with what it
+     * measures. Not "uncalibrated" — but equally not a reading to point a needle with. */
+    const val SENSOR_STATUS_NO_CONTACT = -1
+
+    /** `SensorManager.SENSOR_STATUS_ACCURACY_LOW`. Everything at or below this is untrustworthy:
+     * LOW (1), UNRELIABLE (0) and NO_CONTACT (-1). */
+    const val SENSOR_STATUS_ACCURACY_LOW = 1
+
+    /**
+     * The Earth's field runs from about 22 µT near the equator to about 66 µT at the poles. This
+     * band is that range with a little air either side.
+     */
+    const val MIN_PLAUSIBLE_FIELD_MICROTESLA = 20.0
+    const val MAX_PLAUSIBLE_FIELD_MICROTESLA = 70.0
+
+    /** LOW (1), UNRELIABLE (0) or NO_CONTACT (-1). */
+    fun androidAccuracyIsLow(sensorAccuracy: Int): Boolean = sensorAccuracy <= SENSOR_STATUS_ACCURACY_LOW
 
     /** Above 20 degrees, or negative (iOS's "no fix yet" sentinel). */
     fun iosAccuracyIsLow(headingAccuracyDegrees: Double): Boolean =
         headingAccuracyDegrees < 0.0 || headingAccuracyDegrees > 20.0
+
+    /**
+     * Core Location returns a negative `trueHeading` — not an error, just `-1` — whenever it has
+     * no location fix to compute declination from, which is the whole time if the manager
+     * delivering headings never also delivers locations. Left unchecked it flows through the
+     * smoothing filter as a heading of 359°: a needle that looks alive and points at nothing.
+     */
+    fun iosTrueHeadingIsInvalid(trueHeadingDegrees: Double): Boolean = trueHeadingDegrees < 0.0
+
+    /** Magnitude of a magnetometer sample, in µT. */
+    fun fieldMagnitude(x: Float, y: Float, z: Float): Double {
+        val fx = x.toDouble(); val fy = y.toDouble(); val fz = z.toDouble()
+        return sqrt(fx * fx + fy * fy + fz * fz)
+    }
+
+    /**
+     * True when a "calibrated" magnetometer reading cannot be the Earth's field. One phone in
+     * testing reported 536 µT — twenty times the local field — because its HAL was subtracting a
+     * 504 µT bias estimate from an 83 µT measurement. No figure of eight fixes that; the honest
+     * advice is to move away from whatever is producing the field, which is why this is a
+     * separate reason from plain low accuracy.
+     */
+    fun magneticFieldIsImplausible(magnitudeMicroTesla: Double): Boolean =
+        magnitudeMicroTesla < MIN_PLAUSIBLE_FIELD_MICROTESLA ||
+            magnitudeMicroTesla > MAX_PLAUSIBLE_FIELD_MICROTESLA
 
     /**
      * True when the vector part of an Android `TYPE_ROTATION_VECTOR` sample is the zero vector,
