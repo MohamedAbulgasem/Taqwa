@@ -132,10 +132,17 @@ class AyahPoolMirrorTest {
     }
 
     @Test
-    fun aTrailingNewlineIsMalformedNotTolerated() {
-        // A stray trailing newline character must not be trimmed away and tolerated.
-        val serialized = AyahPoolMirror.serialize(mirror)
-        assertNull(AyahPoolMirror.deserialize(serialized + "\n"))
+    fun aTranslationEndingInNewlineRoundTripsUnchanged() {
+        // A newline inside a field is ordinary content per the format (spec §4) — even when
+        // it's the very last character of the very last entry's translation, right before the
+        // end of the whole string.
+        val withTrailingNewline = mirror.copy(
+            entries = mirror.entries.mapIndexed { i, e ->
+                if (i == mirror.entries.lastIndex) e.copy(translation = e.translation + "\n") else e
+            },
+        )
+        val restored = AyahPoolMirror.deserialize(AyahPoolMirror.serialize(withTrailingNewline))
+        assertEquals(withTrailingNewline, restored)
     }
 
     @Test

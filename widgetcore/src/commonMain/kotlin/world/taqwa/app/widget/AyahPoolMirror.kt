@@ -86,11 +86,12 @@ data class AyahPoolMirror(
          * exactly the shape [serialize] produces: a header with other than [HEADER_FIELD_COUNT]
          * fields, a version other than `"1"`, a `0`/`1` field with any other value, an entry
          * block with other than [ENTRY_FIELD_COUNT] fields, or a non-integer surah/ayah. A
-         * trailing [ENTRY_SEP] (a stray empty final block) or a trailing newline are both
-         * malformed by the same rule — nothing here trims or otherwise tolerates them.
+         * trailing [ENTRY_SEP] (a stray empty final block) is malformed by that rule; a trailing
+         * newline inside a field is not — the mirror format (spec §4) allows any character
+         * within a field, so it is preserved and round-trips unchanged.
          */
         fun deserialize(raw: String): AyahPoolMirror? {
-            if (raw.isEmpty() || raw.last() == '\n') return null
+            if (raw.isEmpty()) return null
             val blocks = raw.split(ENTRY_SEP)
             val header = blocks.first().split(FIELD_SEP)
             if (header.size != HEADER_FIELD_COUNT) return null
