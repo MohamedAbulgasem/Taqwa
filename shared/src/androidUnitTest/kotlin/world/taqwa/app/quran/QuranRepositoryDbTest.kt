@@ -22,6 +22,19 @@ class QuranRepositoryDbTest {
 
     private val repo = QuranRepository(driverFactory = { JdbcSqliteDriver("jdbc:sqlite:" + dbFile().absolutePath) }, io = Dispatchers.Unconfined)
 
+    // The bundled file's own user_version must equal QuranDb.VERSION: both platform drivers open
+    // the file at that version with no-op create/upgrade, so if the two ever drifted a stale file
+    // would be stamped with the new version and never replaced. The pipeline asserts the pairing
+    // only when the database is regenerated; this pins it on every test run.
+    @Test fun bundledDatabaseCarriesTheVersionTheDriversOpenAt() {
+        val driver = JdbcSqliteDriver("jdbc:sqlite:" + dbFile().absolutePath)
+        val version = driver.executeQuery(null, "PRAGMA user_version", { cursor ->
+            cursor.next()
+            app.cash.sqldelight.db.QueryResult.Value(cursor.getLong(0))
+        }, 0).value
+        assertEquals(QuranDb.VERSION.toLong(), version)
+    }
+
     @Test fun hasEverySurahInOrder() = runTest {
         val s = repo.surahs()
         assertEquals(114, s.size)
@@ -110,7 +123,7 @@ class QuranRepositoryDbTest {
 
     @Test fun arabicSearchFindsPrefixesAcrossHarakat() = runTest {
         val hits = repo.searchArabic("الرحمن", limit = 100)
-        assertTrue(hits.any { it.surah == 1 && it.ayah == 1 }, "1:1 has ٱلرَّحْمَٰنِ")
+        assertTrue(hits.any { it.surah == 1 && it.ayah == 1 }, "1:1 should be a hit")
         assertTrue(hits.any { it.surah == 1 && it.ayah == 3 })
         assertTrue(hits.all { it.translation == null })
         assertEquals(hits, hits.sortedWith(compareBy({ it.surah }, { it.ayah })))
@@ -119,7 +132,7 @@ class QuranRepositoryDbTest {
     @Test fun arabicSearchMatchesInsideAWordNotOnlyAtItsStart() = runTest {
         // Substring, not FTS prefix: the definite article in front of the word must not hide it.
         val hits = repo.searchArabic("رحمن", limit = 100)
-        assertTrue(hits.any { it.surah == 1 && it.ayah == 1 }, "1:1's ٱلرَّحْمَٰنِ contains رحمن")
+        assertTrue(hits.any { it.surah == 1 && it.ayah == 1 }, "1:1 should be a hit")
     }
 
     @Test fun arabicSearchWithTwoTokensNeedsBoth() = runTest {

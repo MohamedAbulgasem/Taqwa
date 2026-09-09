@@ -56,5 +56,5 @@ class BookmarkStore(
         val ayah = parts[1].toIntOrNull() ?: return@mapNotNull null
         val at = parts[2].toLongOrNull() ?: return@mapNotNull null
         Bookmark(surah, ayah, at)
-    }.sortedByDescending { it.createdAt }
+    }.sortedWith(compareByDescending<Bookmark> { it.createdAt }.thenByDescending { it.surah }.thenByDescending { it.ayah })
 }
