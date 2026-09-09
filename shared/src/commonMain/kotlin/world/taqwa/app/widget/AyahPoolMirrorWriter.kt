@@ -42,10 +42,17 @@ object AyahPoolMirrorWriter {
             translationRtl = settings.translationId.substringBefore('.') in RTL_TRANSLATION_LANGUAGES,
             entries = entries,
         )
-        AyahPoolMirror.write(store, mirror)
+        // Seed first, mirror second, and never the other way round. Both widget processes read
+        // the two keys independently, so a draw that lands between the two writes sees whatever is
+        // already there: with the mirror first, a first-ever write leaves a real pool next to a
+        // missing seed and the card rotates on the fallback seed 0 — a different ayah from the one
+        // every later draw shows. With the seed first, that same window shows *no* mirror, which
+        // both widgets already handle (Android writes it, iOS shows the placeholder) and which the
+        // very next draw corrects.
         if (AyahPoolMirror.seed(store) == null) {
             AyahPoolMirror.writeSeed(store, newSeed())
         }
+        AyahPoolMirror.write(store, mirror)
         return mirror
     }
 }

@@ -43,6 +43,7 @@ import world.taqwa.app.quran.QuranText
 import world.taqwa.app.widget.AyahPoolEntry
 import world.taqwa.app.widget.AyahPoolMirror
 import world.taqwa.app.widget.AyahRotation
+import world.taqwa.app.widget.WidgetDigits
 import world.taqwa.app.widget.WidgetPalette
 import world.taqwa.app.widget.WidgetPaletteColors
 import world.taqwa.app.widget.createWidgetKeyValueStore
@@ -75,8 +76,15 @@ fun AyahWidgetPreview(
     val today = Clock.System.now().toLocalDateTime(zone).date
     val epochDay = AyahRotation.epochDay(today.year, today.monthNumber, today.dayOfMonth)
     val shown = mirror?.entryFor(epochDay, seed)?.let {
-        AyahPreviewContent(it, mirror.showsTranslation, mirror.translationRtl)
-    } ?: AyahPreviewContent(SampleEntry, showsTranslation = true, translationRtl = false)
+        AyahPreviewContent(it, mirror.showsTranslation, mirror.translationRtl, mirror.languageTag)
+    } ?: AyahPreviewContent(
+        SampleEntry,
+        showsTranslation = true,
+        translationRtl = false,
+        // No mirror, no tag to follow: the sample is the app's own copy, so it follows the device
+        // (see [AyahCardFooter]).
+        languageTag = null,
+    )
 
     Box(
         modifier
@@ -89,16 +97,22 @@ fun AyahWidgetPreview(
     }
 }
 
-/** [entry] plus the two per-mirror display flags [AyahPoolMirror] carries alongside it. */
+/**
+ * [entry] plus the per-mirror display values [AyahPoolMirror] carries alongside it.
+ *
+ * [languageTag] is the mirror's own tag, or null when this is the built-in sample and there is no
+ * mirror to follow — the distinction both widgets make, and the one the footer needs (§M3).
+ */
 private data class AyahPreviewContent(
     val entry: AyahPoolEntry,
     val showsTranslation: Boolean,
     val translationRtl: Boolean,
+    val languageTag: String?,
 )
 
 @Composable
 private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColors) {
-    val (entry, showsTranslation, translationRtl) = shown
+    val (entry, showsTranslation, translationRtl, languageTag) = shown
     val textColor = Color(colors.textArgb)
     Column(
         Modifier
@@ -118,7 +132,7 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
                             append(QuranText.arabicIndic(entry.ayah))
                         }
                     },
-                    style = AyahArabicStyle,
+                    style = ayahArabicStyle(entry.arabic),
                     fontFamily = mushafFamily(),
                     color = textColor,
                     modifier = Modifier.fillMaxWidth(),
@@ -130,7 +144,7 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
                 CompositionLocalProvider(LocalLayoutDirection provides translationDirection) {
                     Text(
                         entry.translation,
-                        style = TaqwaText.caption.copy(fontSize = 13.sp),
+                        style = TaqwaText.caption.copy(fontSize = translationSizeFor(entry.translation)),
                         color = textColor.copy(alpha = 0.62f),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth(),
@@ -138,12 +152,24 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
                 }
             }
         }
-        AyahCardFooter(entry, textColor)
+        AyahCardFooter(entry, textColor, languageTag)
     }
 }
 
+/**
+ * Spec §2's footer. [languageTag] is the mirror's, or null for the built-in sample.
+ *
+ * Which script the footer uses, and which digits, follow the *mirror* rather than the device
+ * whenever there is a mirror — because that is exactly what both real widgets do
+ * (`TaqwaAyahGlanceWidget.readAyahRender`, `AyahTimelineProvider.entries`): the tag is the one the
+ * surah names in the mirror were read under, so the digits beside them stay in the same script.
+ * A preview that took the device's answer instead would disagree with the card it is previewing
+ * whenever the two differ — the window between a language change and the mirror's rewrite, and an
+ * `ar-LY` device, whose Arabic UI still wants Western digits. Only the sample, which the app owns
+ * and no mirror describes, falls back to the device's own values.
+ */
 @Composable
-private fun AyahCardFooter(entry: AyahPoolEntry, textColor: Color) {
+private fun AyahCardFooter(entry: AyahPoolEntry, textColor: Color, languageTag: String?) {
     Column {
         Box(
             Modifier
@@ -153,8 +179,14 @@ private fun AyahCardFooter(entry: AyahPoolEntry, textColor: Color) {
         )
         Spacer(Modifier.height(8.dp))
         val format = LocalPlatformFormat.current
-        val reference = "${format.localizedDigits(entry.surah)}:${format.localizedDigits(entry.ayah)}"
-        if (isRtlLocale()) {
+        val plainReference = "${entry.surah}:${entry.ayah}"
+        val reference = if (languageTag != null) {
+            WidgetDigits.localize(plainReference, languageTag)
+        } else {
+            "${format.localizedDigits(entry.surah)}:${format.localizedDigits(entry.ayah)}"
+        }
+        val arabicUi = languageTag?.startsWith("ar") ?: isRtlLocale()
+        if (arabicUi) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     entry.surahArabic,
@@ -199,17 +231,47 @@ private fun AyahCardFooter(entry: AyahPoolEntry, textColor: Color) {
     }
 }
 
-/** Arabic style for the card (design spec §2): 1.75× line height, unlike the reader's 2×. */
-private val AyahArabicStyle = TextStyle(
-    fontSize = 22.sp,
-    lineHeight = 38.5.sp,
-    textAlign = TextAlign.Right,
-    textDirection = TextDirection.Rtl,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Center,
-        trim = LineHeightStyle.Trim.None,
-    ),
-)
+/**
+ * Arabic style for the card (design spec §2): 1.75× line height, unlike the reader's 2×.
+ *
+ * The real widgets auto-fit (spec §2: 28 sp down to 17 sp, measured against the drawn height). The
+ * preview cannot measure the same way — it is a fixed 320:236 box in a scrolling settings screen —
+ * so it approximates that fit with a deterministic rule on the ayah's own length, which is what
+ * decides how many lines it takes at a given size:
+ *
+ *   ≤ 8 Arabic words → 22 sp; ≤ 16 → 20 sp; more → 18 sp.
+ *
+ * The three steps are what the longest ayahs in the pool need to stay inside the card: at a flat
+ * 22 sp, 39:53 and 2:186 overran the footer and were clipped. 18 sp is still above the widgets' own
+ * 17 sp floor, so nothing the preview shows is smaller than what the card can draw.
+ */
+private fun ayahArabicStyle(arabic: String): TextStyle {
+    val words = arabic.split(' ').count { it.isNotBlank() }
+    val size = when {
+        words <= 8 -> 22f
+        words <= 16 -> 20f
+        else -> 18f
+    }
+    return TextStyle(
+        fontSize = size.sp,
+        lineHeight = (size * 1.75f).sp,
+        textAlign = TextAlign.Right,
+        textDirection = TextDirection.Rtl,
+        lineHeightStyle = LineHeightStyle(
+            alignment = LineHeightStyle.Alignment.Center,
+            trim = LineHeightStyle.Trim.None,
+        ),
+    )
+}
+
+/**
+ * The translation's size, on the same deterministic principle as [ayahArabicStyle] and by its
+ * character count, since a translation is one wrapped paragraph rather than a shaped Arabic line:
+ * ≤ 120 characters → 13 sp, longer → 12 sp. The pool caps a translation at 245 characters
+ * (spec §3), so 12 sp is the floor this can ever reach.
+ */
+private fun translationSizeFor(translation: String) =
+    if (translation.length <= 120) 13.sp else 12.sp
 
 /**
  * Ar-Ra'd 13:28, its Saheeh International translation, for when the mirror has not been written

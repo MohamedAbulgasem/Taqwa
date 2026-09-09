@@ -72,6 +72,7 @@ import world.taqwa.app.notifications.canScheduleExactAlarms
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.today_current_location
+import world.taqwa.app.resources.ui_language
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
 import world.taqwa.app.feature.quran.MushafScreen
@@ -150,13 +151,25 @@ fun App(container: AppContainer) {
     }
 
     // Ayah widget pool mirror (design spec §4): fills the widget KeyValueStore from the Quran
-    // database once on start and again whenever the reading translation changes, so neither
-    // widget process ever has to open the database itself. The database work runs off the main
-    // thread, and a failure here (a locked store, a database that failed to open) is swallowed
-    // rather than crashing the app — the mirror simply stays stale until the next successful
-    // write.
-    LaunchedEffect(Unit) {
-        val languageTag = platformFormat.languageTag()
+    // database once on start, again whenever the reading translation changes, and again whenever
+    // the UI language does, so neither widget process ever has to open the database itself. The
+    // database work runs off the main thread, and a failure here (a locked store, a database that
+    // failed to open) is swallowed rather than crashing the app — the mirror simply stays stale
+    // until the next successful write.
+    //
+    // Keyed on the *resolved* `ui_language` string rather than on `Unit`, which is what spec §4's
+    // "whenever the UI language changes" needs on Android: MainActivity declares `configChanges`
+    // for locale, so nothing recreates when the user switches the app's language — the composition
+    // simply re-resolves its strings. `ui_language` is the same string `isRtlLocale()` reads, so
+    // this effect restarts on exactly the changes that flip the card's script. Restarting writes
+    // the mirror once and then re-collects; the write ends in `refreshWidgets()`, which touches
+    // nothing this key reads, so there is no loop.
+    val uiLanguage = stringResource(Res.string.ui_language)
+    LaunchedEffect(uiLanguage) {
+        // A *fresh* format each run: the remembered `platformFormat` was built on first
+        // composition and still reports the language tag the app started in, which is the whole
+        // bug this key exists to fix.
+        val languageTag = createPlatformFormat().languageTag()
         val store = createWidgetKeyValueStore()
         suspend fun writeMirror() {
             runCatching {

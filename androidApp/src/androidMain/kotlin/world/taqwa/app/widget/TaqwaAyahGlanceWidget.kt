@@ -162,7 +162,18 @@ private fun AyahWidgetContent(render: AyahWidgetRender) {
         // `LocalSize` is in dp and the renderer works in device pixels. Remembered against
         // everything that changes the drawing, so a recomposition that changes none of them —
         // Glance recomposes a live session on every `update()` — does not redraw a megabyte.
-        val bitmap = remember(size, entry, render.colors, render.showTranslation, render.languageTag) {
+        // Every input the renderer draws from is therefore in the key: the cell size, the entry,
+        // the palette, and all three text-shaping flags (`arabicUi` is derived from `languageTag`,
+        // so that one tag covers it). `density` is not, because it cannot change without a
+        // configuration change, which tears the whole Glance session down.
+        val bitmap = remember(
+            size,
+            entry,
+            render.colors,
+            render.showTranslation,
+            render.translationRtl,
+            render.languageTag,
+        ) {
             AyahCardRenderer.render(
                 context,
                 AyahCardInput(

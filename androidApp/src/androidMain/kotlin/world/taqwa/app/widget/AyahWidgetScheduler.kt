@@ -13,7 +13,6 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.time.ZoneId
-import java.time.ZonedDateTime
 
 /**
  * The ayah widget's own refresh alarm: one firing per day, just after local midnight.
@@ -51,10 +50,12 @@ object AyahWidgetScheduler {
      * redraw has to follow the wall clock through daylight-saving shifts and a flight across
      * timezones rather than drift a little further from midnight each day.
      *
-     * Pure and zone-injected so it can be reasoned about without a device.
+     * The arithmetic itself is [AyahMidnight.nextMidnight] in `shared`, pure in `(now, zone)` and
+     * unit-tested there against the transitions this has to survive; `androidApp` has no test
+     * source set of its own. All that is left here is reading the clock.
      */
     fun nextMidnight(zone: ZoneId = ZoneId.systemDefault()): Long =
-        ZonedDateTime.now(zone).toLocalDate().plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+        AyahMidnight.nextMidnight(System.currentTimeMillis(), zone)
 
     /**
      * Arms tomorrow's redraw. Idempotent — `FLAG_UPDATE_CURRENT` on a fixed request code replaces

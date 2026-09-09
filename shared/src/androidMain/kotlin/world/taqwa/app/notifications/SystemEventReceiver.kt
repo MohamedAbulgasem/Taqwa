@@ -50,7 +50,10 @@ class SystemEventReceiver : BroadcastReceiver() {
                     // The ayah rotates on the local *date* (spec §5), so a clock or timezone
                     // change can move today's ayah outright; a reboot can land a day later. It is
                     // not on the prayer widgets' five-minute chain, so these events are among the
-                    // few things that redraw it between midnights.
+                    // few things that redraw it between midnights. The hook also re-arms the
+                    // widget's own midnight alarm (`TaqwaWidgets.updateAyah`), which is what makes
+                    // TIMEZONE_CHANGED complete: the redraw alone would have left tomorrow's alarm
+                    // pointing at the *old* zone's midnight.
                     runCatching { androidAyahWidgetUpdateHook?.invoke() }
                 }
             } catch (_: TimeoutCancellationException) {

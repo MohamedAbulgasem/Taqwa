@@ -39,9 +39,22 @@ object TaqwaWidgets {
      * the two on one cadence would spend a megabyte of allocation and a `StaticLayout` pass every
      * five minutes to redraw a picture that cannot have changed. Its own callers are the daily
      * midnight alarm, a pool-mirror rewrite from the app, and the clock/timezone broadcasts.
+     *
+     * Every redraw also re-arms tomorrow's midnight alarm, because the two can go out of step in
+     * ways no other caller notices. `TIMEZONE_CHANGED` is the case that made this necessary:
+     * `SystemEventReceiver` redrew the card for the new zone but left the alarm pointing at the
+     * *old* zone's midnight, so the card would then turn over at the wrong hour until the next
+     * `onUpdate`, up to six hours later. Re-arming here rather than at each call site is what
+     * makes that impossible to forget again: [AyahWidgetScheduler.schedule] is idempotent
+     * (`FLAG_UPDATE_CURRENT` on a fixed request code replaces the pending alarm rather than
+     * stacking another) and reads the zone fresh each time, so calling it on every redraw path
+     * costs one `AlarmManager` call and can only ever make the alarm more correct. Guarded on a
+     * widget actually being placed, so a redraw after the last one was removed does not resurrect
+     * the alarm `onDisabled` just cancelled.
      */
     suspend fun updateAyah(context: Context) {
         TaqwaAyahGlanceWidget().updateAll(context)
+        if (anyAyahWidgetPlaced(context)) AyahWidgetScheduler.schedule(context)
     }
 
     /**
