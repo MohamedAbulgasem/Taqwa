@@ -66,6 +66,7 @@ import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
 import world.taqwa.app.nav.Tab
+import world.taqwa.app.nav.isQuranScreen
 import world.taqwa.app.nav.tabOf
 import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.canScheduleExactAlarms
@@ -168,14 +169,18 @@ fun App(container: AppContainer) {
     LaunchedEffect(uiLanguage) {
         // A *fresh* format each run: the remembered `platformFormat` was built on first
         // composition and still reports the language tag the app started in, which is the whole
-        // bug this key exists to fix.
-        val languageTag = createPlatformFormat().languageTag()
+        // bug this key exists to fix. It is kept, not just asked for its tag, because the mirror
+        // also records the digit set this same format renders (D2).
+        val format = createPlatformFormat()
+        val languageTag = format.languageTag()
         val store = createWidgetKeyValueStore()
         suspend fun writeMirror() {
             runCatching {
                 val reading = settings.readingSettings(languageTag).first()
                 val result = withContext(Dispatchers.Default) {
-                    runCatching { AyahPoolMirrorWriter.write(store, container.quranRepository, reading, languageTag) }
+                    runCatching {
+                        AyahPoolMirrorWriter.write(store, container.quranRepository, reading, languageTag, format)
+                    }
                 }
                 result.onSuccess { refreshWidgets() }
             }
@@ -203,6 +208,13 @@ fun App(container: AppContainer) {
             val (surah, ayah) = pending ?: return@collect
             runCatching {
                 val reading = settings.readingSettings(platformFormat.languageTag()).first()
+                // The reader is pushed on top of the Quran root, not on whatever happened to be
+                // showing. Without this a widget tap put the reader straight on top of the Prayer
+                // tab, so one Back left the Quran entirely and reaching the surah list — the list
+                // the ayah came from — took another tap (D3, S23 round). Skipped when a Quran
+                // screen is already on top, so a second tap while the reader is open does not
+                // stack a root behind it.
+                if (!isQuranScreen(navigator.current)) navigator.push(Screen.Quran)
                 if (reading.mode == ReadingMode.MUSHAF) {
                     navigator.push(Screen.Mushaf(container.quranRepository.pageOf(surah, ayah)))
                 } else {
