@@ -30,6 +30,7 @@ DEPLOYMENT    = '16.0'
 EXT_SOURCES = {
   'TaqwaWidgetBundle.swift'   => { app: false },
   'TaqwaWidgetViews.swift'    => { app: true },
+  'TaqwaAyahWidget.swift'     => { app: true },
   'TaqwaWidgetPreviews.swift' => { app: true }
 }.freeze
 
@@ -164,7 +165,13 @@ app.build_configurations.each do |config|
   # newlines from a hand-edit, which the linker word-splits back into TWO `-framework shared`.
   # Linking a static Kotlin/Native framework twice aborts the process at launch with
   # "runtime assert: runtime injected twice" (KT-42254). Normalise it here so it stays fixed.
-  config.build_settings['OTHER_LDFLAGS'] = ['$(inherited)', '-framework', 'shared']
+  #
+  # `-lsqlite3` belongs in this list, not only in the project as Xcode last left it: SQLDelight's
+  # iOS driver (SQLiter) is a cinterop binding with no library of its own, so every `sqlite3_*`
+  # symbol is unresolved until the system library is linked. Rewriting the setting without it —
+  # which this line does, by design — used to leave the app failing to link with a page of
+  # "_sqlite3_step, referenced from: …" the first time anyone re-ran this script.
+  config.build_settings['OTHER_LDFLAGS'] = ['$(inherited)', '-framework', 'shared', '-lsqlite3']
 end
 file_ref(project.main_group.find_subpath('iosApp', true), 'iosApp.entitlements')
 

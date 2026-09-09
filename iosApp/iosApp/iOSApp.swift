@@ -23,13 +23,14 @@ struct iOSApp: App {
 			// no simctl command that places a widget on a simulator home screen, so this is how a
 			// widget render gets captured. Harmless in a shipping build — nothing reaches it.
 			if Self.widgetPreviewRequested {
-				TaqwaWidgetPreviewScreen()
+				TaqwaWidgetPreviewScreen(section: Self.widgetPreviewSection)
 			} else {
 				ContentView()
 					.onAppear {
 						Self.scheduleNextRefresh()
 						Self.reloadWidgets()
 					}
+					.onOpenURL { url in Self.openAyah(from: url) }
 			}
 		}
 	}
@@ -41,6 +42,29 @@ struct iOSApp: App {
 		if UserDefaults.standard.bool(forKey: "taqwaWidgetPreview") { return true }
 		if ProcessInfo.processInfo.arguments.contains("-taqwaWidgetPreview") { return true }
 		return ProcessInfo.processInfo.environment["TAQWA_WIDGET_PREVIEW"] == "1"
+	}
+
+	/// Which widgets the route draws: `all` (the default) or `ayah`, from
+	/// `-taqwaWidgetPreviewSection ayah`. The ayah card's Large family is 382 pt tall, so the two
+	/// families plus the four prayer ones do not fit one screenshot, and `simctl` cannot scroll.
+	static var widgetPreviewSection: String {
+		UserDefaults.standard.string(forKey: "taqwaWidgetPreviewSection")
+			?? ProcessInfo.processInfo.environment["TAQWA_WIDGET_PREVIEW_SECTION"]
+			?? "all"
+	}
+
+	/// The ayah widget's tap target (design spec §7-8): `taqwa://ayah/<surah>/<ayah>`, set as the
+	/// widget's `widgetURL`. Anything else on the `taqwa` scheme is ignored rather than guessed at,
+	/// so a future link shape cannot silently open the wrong ayah.
+	///
+	/// `LaunchRequests` only *records* the request; `App` collects it and pushes the reader (or the
+	/// Mushaf page, in Mushaf mode). That indirection is what makes a cold launch work — the
+	/// request is set here, before `ContentView`'s composition exists to navigate.
+	static func openAyah(from url: URL) {
+		guard url.scheme == "taqwa", url.host == "ayah" else { return }
+		let parts = url.pathComponents.filter { $0 != "/" }
+		guard parts.count == 2, let surah = Int32(parts[0]), let ayah = Int32(parts[1]) else { return }
+		LaunchRequests_iosKt.openAyahFromWidget(surah: surah, ayah: ayah)
 	}
 
 	static func handleAppRefresh(task: BGAppRefreshTask) {

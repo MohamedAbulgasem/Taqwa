@@ -6,5 +6,6 @@ struct TaqwaWidgetBundle: WidgetBundle {
     var body: some Widget {
         TaqwaHomeWidget()
         TaqwaLockScreenWidget()
+        TaqwaAyahWidget()
     }
 }

@@ -19,13 +19,24 @@ import shared
 /// no `simctl` command that places a widget on a home screen, so this is how a widget render is
 /// captured on a simulator without a human long-pressing the wallpaper.
 struct TaqwaWidgetPreviewScreen: View {
+    /// Which widgets to draw. `-taqwaWidgetPreviewSection ayah` narrows the route to the ayah
+    /// card alone, so both of its families fit one screenshot with nothing to scroll — a
+    /// simulator screenshot is a still of whatever is on screen and there is no way to scroll it
+    /// from `simctl`.
+    var section: String = "all"
+
+    private var showsPrayer: Bool { section != "ayah" }
+    private var showsAyah: Bool { section == "all" || section == "ayah" }
+
     /// Nominal WidgetKit sizes on a modern iPhone.
     private static let small = CGSize(width: 170, height: 170)
     private static let medium = CGSize(width: 364, height: 170)
+    private static let large = CGSize(width: 364, height: 382)
     private static let circular = CGSize(width: 76, height: 76)
     private static let rectangular = CGSize(width: 172, height: 76)
 
     private var entry: TaqwaEntry { TaqwaTimelineProvider.entries(from: Date()).first! }
+    private var ayahEntry: AyahEntry { AyahTimelineProvider.entries(from: Date()).first! }
 
     var body: some View {
         ScrollView {
@@ -38,31 +49,50 @@ struct TaqwaWidgetPreviewScreen: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                labelled("systemSmall") {
-                    TaqwaHomeWidgetView(entry: entry, familyOverride: .systemSmall, inWidgetContainer: false)
-                        .padding(14)
-                        .frame(width: Self.small.width, height: Self.small.height)
-                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                if showsAyah {
+                    labelled("ayah systemMedium") {
+                        // No `.padding(14)` here, unlike the prayer widgets above: the ayah card
+                        // applies spec §2's padding itself, inside its own background, because a
+                        // padded-then-backgrounded card leaves its fill short of the cell edges.
+                        TaqwaAyahWidgetView(entry: ayahEntry, familyOverride: .systemMedium, inWidgetContainer: false)
+                            .frame(width: Self.medium.width, height: Self.medium.height)
+                            .clipShape(RoundedRectangle(cornerRadius: 19, style: .continuous))
+                    }
+
+                    labelled("ayah systemLarge") {
+                        TaqwaAyahWidgetView(entry: ayahEntry, familyOverride: .systemLarge, inWidgetContainer: false)
+                            .frame(width: Self.large.width, height: Self.large.height)
+                            .clipShape(RoundedRectangle(cornerRadius: 19, style: .continuous))
+                    }
                 }
 
-                labelled("systemMedium") {
-                    TaqwaHomeWidgetView(entry: entry, familyOverride: .systemMedium, inWidgetContainer: false)
-                        .padding(14)
-                        .frame(width: Self.medium.width, height: Self.medium.height)
-                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                }
+                if showsPrayer {
+                    labelled("systemSmall") {
+                        TaqwaHomeWidgetView(entry: entry, familyOverride: .systemSmall, inWidgetContainer: false)
+                            .padding(14)
+                            .frame(width: Self.small.width, height: Self.small.height)
+                            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    }
 
-                labelled("accessoryCircular") {
-                    TaqwaLockScreenWidgetView(entry: entry, familyOverride: .accessoryCircular)
-                        .frame(width: Self.circular.width, height: Self.circular.height)
-                        .environment(\.colorScheme, .dark)
-                }
+                    labelled("systemMedium") {
+                        TaqwaHomeWidgetView(entry: entry, familyOverride: .systemMedium, inWidgetContainer: false)
+                            .padding(14)
+                            .frame(width: Self.medium.width, height: Self.medium.height)
+                            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    }
 
-                labelled("accessoryRectangular") {
-                    TaqwaLockScreenWidgetView(entry: entry, familyOverride: .accessoryRectangular)
-                        .frame(width: Self.rectangular.width, height: Self.rectangular.height)
-                        .environment(\.colorScheme, .dark)
-                        .foregroundColor(.white)
+                    labelled("accessoryCircular") {
+                        TaqwaLockScreenWidgetView(entry: entry, familyOverride: .accessoryCircular)
+                            .frame(width: Self.circular.width, height: Self.circular.height)
+                            .environment(\.colorScheme, .dark)
+                    }
+
+                    labelled("accessoryRectangular") {
+                        TaqwaLockScreenWidgetView(entry: entry, familyOverride: .accessoryRectangular)
+                            .frame(width: Self.rectangular.width, height: Self.rectangular.height)
+                            .environment(\.colorScheme, .dark)
+                            .foregroundColor(.white)
+                    }
                 }
             }
             .padding(.vertical, 28)
@@ -118,6 +148,8 @@ struct TaqwaWidget_Previews: PreviewProvider {
                 .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
             TaqwaWidgetPreviewScreen()
                 .previewDisplayName("In-app debug route")
+            TaqwaWidgetPreviewScreen(section: "ayah")
+                .previewDisplayName("In-app debug route (ayah)")
         }
     }
 }

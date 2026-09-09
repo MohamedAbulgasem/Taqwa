@@ -1,0 +1,6 @@
+/* The ayah widget as it appears in the widget gallery (design spec §7). */
+"ayah_widget_name" = "آية اليوم";
+"ayah_widget_description" = "آية اليوم مع ترجمتها.";
+
+/* Shown on the card until the app has run once and written the pool mirror (design spec §2). */
+"ayah_widget_placeholder" = "افتح تقوى مرة لتحميل آية اليوم";
