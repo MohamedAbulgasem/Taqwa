@@ -32,6 +32,19 @@ object TaqwaWidgets {
     }
 
     /**
+     * Redraws the ayah widget alone.
+     *
+     * Kept out of [updateAll] on purpose. That runs every five minutes for the prayer countdown;
+     * this card changes once a day and each of its draws builds a full-cell bitmap, so putting
+     * the two on one cadence would spend a megabyte of allocation and a `StaticLayout` pass every
+     * five minutes to redraw a picture that cannot have changed. Its own callers are the daily
+     * midnight alarm, a pool-mirror rewrite from the app, and the clock/timezone broadcasts.
+     */
+    suspend fun updateAyah(context: Context) {
+        TaqwaAyahGlanceWidget().updateAll(context)
+    }
+
+    /**
      * Asks the launcher to place the two-column widget, from onboarding's "Add widget" button.
      * The launcher shows its own confirmation sheet; false means it declined to ask at all (no
      * pin support, or a work profile that forbids it), and the caller treats that as "done".

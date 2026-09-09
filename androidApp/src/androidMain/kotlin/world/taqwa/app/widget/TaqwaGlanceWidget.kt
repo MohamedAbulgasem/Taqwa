@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalSize
+import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
@@ -338,20 +339,25 @@ private fun NextPrayerBlock(
 }
 
 /**
- * Rounded card, no border. The in-app cards carry a hairline, but on a home screen the launcher
+ * Rounded card, no border, shared by every Taqwa widget. The in-app cards carry a hairline, but on a home screen the launcher
  * clips the widget to its own corner radius and the stretched 1dp stroke image showed up as a
  * bright rim around the dark card; iOS never had one, and the card reads as a card without it.
  */
 @Composable
-private fun WidgetCard(colors: WidgetPaletteColors, content: @Composable () -> Unit) {
+internal fun WidgetCard(
+    colors: WidgetPaletteColors,
+    // The whole card is one target, and what that target opens is the caller's business: Today
+    // for the prayer widgets, the ayah itself for the ayah widget (spec §8).
+    onClick: Action = actionStartActivity<MainActivity>(),
+    content: @Composable () -> Unit,
+) {
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(ColorProvider(colors.cardBackground()))
             .cornerRadius(19.dp)
             .appWidgetBackground()
-            // The whole card is one target: a tap anywhere on it opens Today, as it does on iOS.
-            .clickable(actionStartActivity<MainActivity>()),
+            .clickable(onClick),
         contentAlignment = Alignment.Center,
     ) {
         content()

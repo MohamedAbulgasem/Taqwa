@@ -10,6 +10,17 @@ import kotlinx.coroutines.launch
 var androidWidgetUpdateHook: (suspend () -> Unit)? = null
 
 /**
+ * The ayah widget's own hook, set alongside [androidWidgetUpdateHook] from
+ * `TaqwaApplication.onCreate`.
+ *
+ * Separate because the two widgets are redrawn on entirely different cadences: the prayer widgets
+ * tick every five minutes for their countdown, while the ayah card changes once a day and each of
+ * its draws renders a full-cell bitmap. Everything that redraws the prayer widgets also redraws
+ * this one — [refreshWidgets] fires both — but not the other way round.
+ */
+var androidAyahWidgetUpdateHook: (suspend () -> Unit)? = null
+
+/**
  * Process-lifetime scope for widget nudges. A widget refresh has no owner to be cancelled with —
  * it must outlive whichever screen provoked it — and `SupervisorJob` keeps one failed update from
  * poisoning the scope for every later one.
@@ -29,6 +40,12 @@ private val widgetRefreshScope = CoroutineScope(SupervisorJob() + Dispatchers.De
  * must never do that — it will be redrawn on the next tick anyway.
  */
 actual fun refreshWidgets() {
-    val hook = androidWidgetUpdateHook ?: return
-    widgetRefreshScope.launch { runCatching { hook() } }
+    val prayer = androidWidgetUpdateHook
+    val ayah = androidAyahWidgetUpdateHook
+    widgetRefreshScope.launch {
+        // Each in its own runCatching: a prayer widget that failed to redraw must not take the
+        // ayah card's redraw with it.
+        prayer?.let { runCatching { it() } }
+        ayah?.let { runCatching { it() } }
+    }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Defaults to 4x3 (spec §2): four cells wide (250dp) and three tall (180dp), which is the
+     smallest cell that holds a pool ayah with its translation at a readable size. Resizable down
+     to 4x2 (110dp) and up without a cap: the card auto-fits whatever it is given, and the height
+     is what it has the most use for.
+
+     updatePeriodMillis is the platform floor of 6h, and is only a backstop. The card changes once
+     a day and AyahWidgetScheduler's midnight alarm is what actually turns it over; this exists so
+     a lost alarm heals itself within a quarter of a day. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="180dp"
+    android:minResizeWidth="250dp"
+    android:minResizeHeight="110dp"
+    android:maxResizeWidth="0dp"
+    android:maxResizeHeight="0dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="3"
+    android:updatePeriodMillis="21600000"
+    android:initialLayout="@layout/widget_loading"
+    android:previewImage="@drawable/widget_ayah_preview"
+    android:description="@string/widget_ayah_description"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />

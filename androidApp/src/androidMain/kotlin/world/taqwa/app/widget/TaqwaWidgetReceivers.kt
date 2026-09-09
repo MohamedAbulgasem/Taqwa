@@ -66,6 +66,39 @@ class TaqwaMediumWidgetReceiver : TaqwaGlanceReceiver() {
 }
 
 /**
+ * The ayah widget's provider, on its own daily alarm rather than the prayer widgets' rolling
+ * five-minute one — see [AyahWidgetScheduler] for why the two cadences are separate.
+ *
+ * `onUpdate` as well as `onEnabled` for the same self-healing reason as [TaqwaGlanceReceiver]: an
+ * alarm can be lost without the provider ever being disabled (a reboot clears every
+ * `AlarmManager` entry, a force-stop cancels them all), and `onUpdate` is the cheap point at
+ * which that is noticed — `updatePeriodMillis` guarantees it runs at least every six hours.
+ */
+class TaqwaAyahWidgetReceiver : GlanceAppWidgetReceiver() {
+
+    override val glanceAppWidget: GlanceAppWidget = TaqwaAyahGlanceWidget()
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        AyahWidgetScheduler.schedule(context)
+    }
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray,
+    ) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        AyahWidgetScheduler.schedule(context)
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        if (!anyAyahWidgetPlaced(context)) AyahWidgetScheduler.cancel(context)
+    }
+}
+
+/**
  * One link in the rolling five-minute chain: redraw, then arm the next window.
  *
  * The re-arm happens first and synchronously. If the redraw times out or the process is reclaimed

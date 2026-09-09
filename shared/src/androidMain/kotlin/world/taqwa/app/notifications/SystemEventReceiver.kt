@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import world.taqwa.app.di.appContainer
 import world.taqwa.app.widget.WidgetMirrorRefresher
+import world.taqwa.app.widget.androidAyahWidgetUpdateHook
 import world.taqwa.app.widget.androidWidgetUpdateHook
 
 /**
@@ -46,6 +47,11 @@ class SystemEventReceiver : BroadcastReceiver() {
                         WidgetMirrorRefresher.refresh(appContainer.settingsRepository, appContainer.prayerTimesEngine)
                     }
                     runCatching { androidWidgetUpdateHook?.invoke() }
+                    // The ayah rotates on the local *date* (spec §5), so a clock or timezone
+                    // change can move today's ayah outright; a reboot can land a day later. It is
+                    // not on the prayer widgets' five-minute chain, so these events are among the
+                    // few things that redraw it between midnights.
+                    runCatching { androidAyahWidgetUpdateHook?.invoke() }
                 }
             } catch (_: TimeoutCancellationException) {
                 // Nothing useful to do from a broadcast receiver but stop cleanly.

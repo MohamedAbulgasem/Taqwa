@@ -2,4 +2,5 @@
     <string name="app_name">Taqwa</string>
     <string name="widget_small_description">Next prayer and a live countdown.</string>
     <string name="widget_medium_description">Next prayer, countdown and today\'s times.</string>
+    <string name="widget_ayah_description">Today’s ayah, with its translation.</string>
 </resources>

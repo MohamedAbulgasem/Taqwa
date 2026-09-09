@@ -56,6 +56,19 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_medium_info" />
         </receiver>
+        <!-- The daily-ayah card. Its own once-a-day midnight alarm rather than the prayer
+             widgets' rolling five-minute chain; see AyahWidgetScheduler. -->
+        <receiver android:name=".widget.TaqwaAyahRefreshReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="world.taqwa.app.AYAH_WIDGET_REFRESH" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".widget.TaqwaAyahWidgetReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_ayah_info" />
+        </receiver>
     </application>
 
 </manifest>
