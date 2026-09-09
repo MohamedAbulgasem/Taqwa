@@ -33,12 +33,18 @@ import world.taqwa.app.design.contentWidth
 import world.taqwa.app.feature.settings.BackChevron
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.qibla.CompassLowReason
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.qibla_bearing
+import world.taqwa.app.resources.qibla_best_effort_calibration
+import world.taqwa.app.resources.qibla_best_effort_interference
+import world.taqwa.app.resources.qibla_best_effort_title
 import world.taqwa.app.resources.qibla_calibration_help
 import world.taqwa.app.resources.qibla_distance
 import world.taqwa.app.resources.qibla_facing_qibla
 import world.taqwa.app.resources.qibla_hold_flat
+import world.taqwa.app.resources.qibla_interference_help
+import world.taqwa.app.resources.qibla_interference_title
 import world.taqwa.app.resources.qibla_needs_calibrating
 import world.taqwa.app.resources.qibla_no_sensor_body
 import world.taqwa.app.resources.qibla_no_sensor_title
@@ -91,9 +97,23 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
                     Subtitle(stringResource(Res.string.qibla_hold_flat), colors.textSecondary)
                 is QiblaUiState.Aligned ->
                     Subtitle(stringResource(Res.string.qibla_facing_qibla), colors.accent, FontWeight.SemiBold)
-                // Amber, never red: a compass that wants a wiggle is not an error state.
-                is QiblaUiState.LowAccuracy ->
-                    Subtitle(stringResource(Res.string.qibla_needs_calibrating), colors.accent, FontWeight.SemiBold)
+                // Amber, never red: a compass that wants a wiggle is not an error state. Which
+                // wiggle depends on the reason — a phone sitting in a 500 µT field cannot be
+                // waved back into calibration, and telling it to try is the older bug.
+                is QiblaUiState.LowAccuracy -> Subtitle(
+                    stringResource(
+                        when (state.reason) {
+                            CompassLowReason.CALIBRATION -> Res.string.qibla_needs_calibrating
+                            CompassLowReason.INTERFERENCE -> Res.string.qibla_interference_title
+                        },
+                    ),
+                    colors.accent,
+                    FontWeight.SemiBold,
+                )
+                // Not amber: nothing here is going to be fixed by doing something, so this is a
+                // statement of fact in the secondary colour rather than a call to action.
+                is QiblaUiState.BestEffort ->
+                    Subtitle(stringResource(Res.string.qibla_best_effort_title), colors.textSecondary)
             }
 
             // The dial and its readout sit as one block in the middle of what is left, rather than
@@ -121,20 +141,63 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
                 is QiblaUiState.LowAccuracy -> {
                     QiblaDial(0.0, state.bearingDegrees, aligned = false, dimmed = true, diameter = dialSize)
                     Spacer(Modifier.height(12.dp))
-                    FigureOfEight()
+                    // The figure of eight is drawn only when it is the actual remedy. Under
+                    // interference it would be an instruction that cannot work.
+                    if (state.reason == CompassLowReason.CALIBRATION) {
+                        FigureOfEight()
+                        Spacer(Modifier.height(15.dp))
+                    }
+                    Help(
+                        stringResource(
+                            when (state.reason) {
+                                CompassLowReason.CALIBRATION -> Res.string.qibla_calibration_help
+                                CompassLowReason.INTERFERENCE -> Res.string.qibla_interference_help
+                            },
+                        ),
+                    )
+                }
+
+                // Twenty seconds of an unusable compass. The dial stays, so the screen is still
+                // the same screen, but with no needle and no marker: there is nothing to point
+                // at. The bearing and the distance are arithmetic on the location and are as
+                // correct here as in any other state, so they are shown — under a caveat that
+                // does not go away, saying which of the two problems this device has.
+                is QiblaUiState.BestEffort -> {
+                    QiblaDial(
+                        0.0,
+                        state.bearingDegrees,
+                        aligned = false,
+                        dimmed = true,
+                        needle = false,
+                        diameter = dialSize,
+                    )
+                    Readout(state.bearingDegrees, state.distanceKm)
                     Spacer(Modifier.height(15.dp))
-                    Text(
-                        stringResource(Res.string.qibla_calibration_help),
-                        style = TaqwaText.caption.copy(fontSize = 15.sp, lineHeight = 24.sp),
-                        color = colors.textSecondary,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 36.dp),
+                    Help(
+                        stringResource(
+                            when (state.reason) {
+                                CompassLowReason.CALIBRATION -> Res.string.qibla_best_effort_calibration
+                                CompassLowReason.INTERFERENCE -> Res.string.qibla_best_effort_interference
+                            },
+                        ),
                     )
                 }
             }
             Spacer(Modifier.weight(1f))
         }
     }
+}
+
+/** The one paragraph of body copy the non-pointing states share, so they stay identical. */
+@Composable
+private fun Help(text: String) {
+    Text(
+        text,
+        style = TaqwaText.caption.copy(fontSize = 15.sp, lineHeight = 24.sp),
+        color = LocalTaqwaColors.current.textSecondary,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(horizontal = 36.dp),
+    )
 }
 
 @Composable

@@ -187,6 +187,11 @@
     <string name="qibla_facing_qibla">أنت باتجاه القبلة</string>
     <string name="qibla_needs_calibrating">البوصلة تحتاج إلى معايرة</string>
     <string name="qibla_calibration_help">حرّك هاتفك على شكل الرقم ثمانية عدة مرات. قد يؤثر التداخل المغناطيسي من المعادن والأغطية ومكبرات الصوت على القراءة.</string>
+    <string name="qibla_interference_title">تداخل مغناطيسي</string>
+    <string name="qibla_interference_help">ابتعد عن المعادن والمغناطيس والأغطية والكابلات. لا تستطيع البوصلة قراءة مجال الأرض ما دام حولها مجال أقوى منه.</string>
+    <string name="qibla_best_effort_title">البوصلة غير متاحة</string>
+    <string name="qibla_best_effort_calibration">تعذّرت معايرة بوصلة هذا الهاتف. الاتجاه والمسافة المعروضان صحيحان — استعن بهما مع بوصلة أخرى.</string>
+    <string name="qibla_best_effort_interference">التداخل المغناطيسي هنا أقوى مما تتحمله بوصلة هذا الهاتف. الاتجاه والمسافة المعروضان صحيحان — استعن بهما مع بوصلة أخرى.</string>
     <string name="qibla_distance">مكة · على بُعد %1$s كم</string>
     <string name="qibla_bearing">%1$s°</string>
     <string name="qibla_cardinal_north">ش</string>
