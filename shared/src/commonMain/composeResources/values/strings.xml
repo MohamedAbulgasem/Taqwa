@@ -173,7 +173,6 @@
     <!-- Qibla (plan 2) -->
     <string name="qibla_no_sensor_title">No compass sensor</string>
     <string name="qibla_no_sensor_body">This device has no magnetometer. Use a physical compass together with the bearing below.</string>
-    <string name="qibla_low_accuracy_body">Move your phone in a figure-eight motion. Metal, cases and speakers can interfere with the compass.</string>
 
     <!-- Widget background (Appearance) -->
     <string name="appearance_widget_background_label">WIDGET BACKGROUND</string>
@@ -194,6 +193,15 @@
     <string name="qibla_facing_qibla">Facing qibla</string>
     <string name="qibla_needs_calibrating">Compass needs calibrating</string>
     <string name="qibla_calibration_help">Move your phone in a figure of eight a few times. Magnetic interference from metal, cases and speakers can throw the reading off.</string>
+    <!-- Qibla, magnetic-interference variant: the field around the phone is not the Earth's, so
+         a figure of eight cannot help and the advice is to move instead. -->
+    <string name="qibla_interference_title">Magnetic interference</string>
+    <string name="qibla_interference_help">Move away from metal, magnets, cases and cables. The compass cannot read the Earth’s field while something nearby is stronger.</string>
+    <!-- Qibla, best effort: the compass has been unusable for twenty seconds. The bearing and the
+         distance need no sensor, so they stay; the needle does not. -->
+    <string name="qibla_best_effort_title">Compass unavailable</string>
+    <string name="qibla_best_effort_calibration">This phone’s compass could not be calibrated. The bearing and distance shown are correct — use them with a separate compass.</string>
+    <string name="qibla_best_effort_interference">The magnetic interference here is too strong for this phone’s compass. The bearing and distance shown are correct — use them with a separate compass.</string>
     <string name="qibla_distance">Makkah · %1$s km away</string>
     <string name="qibla_bearing">%1$s°</string>
     <string name="qibla_cardinal_north">N</string>

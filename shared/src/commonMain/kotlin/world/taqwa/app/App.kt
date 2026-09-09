@@ -646,7 +646,19 @@ fun App(container: AppContainer) {
                                         haptics = createHaptics(),
                                     )
                                 }
-                                LaunchedEffect(vm) { vm.start(this) }
+                                // Lifecycle-gated for the same reason Today's tick is: leaving the
+                                // screen cancels this through composition, but the activity merely
+                                // stopping (screen off, Home pressed) does not, and a plain
+                                // LaunchedEffect kept the magnetometer registered at
+                                // SENSOR_DELAY_GAME behind the lock screen for the life of the
+                                // process. repeatOnLifecycle unregisters the sensors on STOP and
+                                // registers them again on the next START.
+                                val qiblaLifecycleOwner = LocalLifecycleOwner.current
+                                LaunchedEffect(vm, qiblaLifecycleOwner) {
+                                    qiblaLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                        vm.collectWhileActive()
+                                    }
+                                }
                                 val qiblaState by vm.state.collectAsState()
                                 QiblaScreen(qiblaState, onBack = { navigator.pop() })
                             }

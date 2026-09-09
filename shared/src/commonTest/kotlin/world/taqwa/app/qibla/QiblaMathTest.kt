@@ -11,6 +11,8 @@ class QiblaMathTest {
     private val makkah = GeoLocation(21.4225, 39.8262, "Asia/Riyadh", "Makkah", "SA")
     private val auckland = GeoLocation(-36.8485, 174.7633, "Pacific/Auckland", "Auckland", "NZ")
     private val quito = GeoLocation(-0.1807, -78.4678, "America/Guayaquil", "Quito", "EC")
+    private val capeTown = GeoLocation(-33.9249, 18.4241, "Africa/Johannesburg", "Cape Town", "ZA")
+    private val tripoli = GeoLocation(32.8872, 13.1913, "Africa/Tripoli", "Tripoli", "LY")
 
     @Test
     fun londonBearingMatchesTheKnownValueOfAboutOneHundredAndNineteenDegrees() {
@@ -24,6 +26,26 @@ class QiblaMathTest {
             val b = QiblaMath.bearing(it)
             assertTrue(b in 0.0..360.0, "was $b for $it")
         }
+    }
+
+    // Southern hemisphere: a sign error in the bearing maths survives every northern case above
+    // and shows up here, where the qibla is north of east rather than south of it. Checked
+    // against an independent great-circle computation: 23.370 degrees, 6 557.3 km haversine.
+    @Test
+    fun capeTownBearingIsNorthNorthEastAndNotItsMirror() {
+        assertEquals(23.37, QiblaMath.bearing(capeTown), absoluteTolerance = 0.05)
+    }
+
+    @Test
+    fun capeTownIsAboutSixAndAHalfThousandKilometresFromMakkah() {
+        assertEquals(6_557.0, QiblaMath.distanceKm(capeTown), absoluteTolerance = 5.0)
+    }
+
+    // Tripoli, the city this app was written for. 109.175 degrees independently; the brief's
+    // 107.7 was wrong.
+    @Test
+    fun tripoliBearingIsJustSouthOfEast() {
+        assertEquals(109.18, QiblaMath.bearing(tripoli), absoluteTolerance = 0.05)
     }
 
     @Test

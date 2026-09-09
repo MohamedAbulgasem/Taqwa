@@ -61,6 +61,11 @@ private const val TickInkedFraction = 2f / 19.6f
  * [bearingDegrees] on the rim. [aligned] lights the outer rim amber; [dimmed] is the low-accuracy
  * state, where the whole dial fades to 28% and drops the marker and the cardinals, because "I
  * don't know" is the correct behaviour there.
+ *
+ * [needle] false drops the needle and the centre pin as well, leaving the ring and its ticks: the
+ * best-effort state, where the compass is known to be unusable and even a dimmed needle would be
+ * a direction the app does not have. The numbers below the dial are still correct — they are
+ * computed from the location, never measured — so the screen keeps them.
  */
 @Composable
 fun QiblaDial(
@@ -69,6 +74,7 @@ fun QiblaDial(
     aligned: Boolean,
     dimmed: Boolean,
     modifier: Modifier = Modifier,
+    needle: Boolean = true,
     diameter: Dp = DialSize,
 ) {
     val colors = LocalTaqwaColors.current
@@ -164,13 +170,15 @@ fun QiblaDial(
             centre.x + r * MarkerR * cos(markerAngle).toFloat(),
             centre.y + r * MarkerR * sin(markerAngle).toFloat(),
         )
-        val needle = if (dimmed) colors.textSecondary else colors.accent
+        val needleColor = if (dimmed) colors.textSecondary else colors.accent
         val needleWidth = (if (aligned) 3.9 else 3.3).dp.toPx()
-        if (!dimmed) haloLine(needle, centre, tip, needleWidth, glow)
-        drawLine(needle, centre, tip, strokeWidth = needleWidth, cap = StrokeCap.Round)
+        if (needle) {
+            if (!dimmed) haloLine(needleColor, centre, tip, needleWidth, glow)
+            drawLine(needleColor, centre, tip, strokeWidth = needleWidth, cap = StrokeCap.Round)
 
-        // 5 — centre pin.
-        drawCircle(color = needle, radius = r * CentreDotR, center = centre)
+            // 5 — centre pin.
+            drawCircle(color = needleColor, radius = r * CentreDotR, center = centre)
+        }
 
         // 6 — the Kaaba: an amber rounded square with its dark band, sitting on the rim. It stays
         // upright at every bearing, as in the mockup.
