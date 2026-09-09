@@ -144,6 +144,13 @@ Reached from the compass icon. Three states:
 - **Aligned** — within 5°, the rim lights and the device emits a single haptic tick. Confirmation you can feel without looking.
 - **Low accuracy** — the dial dims to 28% and the screen asks for a figure-of-eight motion, explaining that metal, cases and speakers cause interference. It does not point anywhere. Saying "I don't know" is the correct behaviour.
 
+**Amended 10 September 2026:** the low-accuracy state now has a reason and a way out, after a sweep on the LoopPhone found a prompt that could never clear (see `docs/BUILD-LOG.md`, "Qibla compass sweep"). Two further states:
+
+- **Low accuracy (interference)** — entered when the magnetometer's own reading cannot be the Earth's field (outside 20–70 µT). The figure of eight is *not* drawn, because it cannot help; the copy asks the user to move away from metal, magnets, cases and cables instead. Interference outranks calibration when both apply.
+- **Best effort** — entered after 20 s of continuously untrustworthy samples. The dial stays, dimmed and with no needle and no marker; the numeric bearing and the distance return, because they are computed from the location and were never in doubt; and a persistent, reason-specific caveat says which of the two problems this device has and to use a separate compass. Aligned haptics never fire in this state.
+
+No state flips on a single sample: low is entered only after 1 000 ms of continuous low samples and left only after 1 500 ms of continuous good ones, the asymmetry being deliberate (pointing wrongly is worse than declining to point). Best effort returns to the dial under the same 1 500 ms rule.
+
 ### 4.4 Settings
 
 Root, in three groups:
@@ -292,6 +299,20 @@ Great-circle bearing to the Kaaba (21.4225° N, 39.8262° E), computed by adhan2
 **Both must resolve to true north.** Using magnetic north is the classic qibla bug and is wrong by up to 15° in some regions.
 
 The needle is low-pass filtered to prevent jitter. The low-accuracy state engages when Android reports `SENSOR_STATUS_ACCURACY_LOW` or `UNRELIABLE`, or when iOS reports `headingAccuracy` above 20° or negative. Below that bar the app shows the calibration state rather than pointing confidently at the wrong thing. Devices with no magnetometer show the numeric bearing and instruct the user to use a physical compass.
+
+**Amended 10 September 2026.** A per-sample fact is not a state. Accuracy is read from `event.accuracy` on *every* Android sample of the sensor driving the emit (`onAccuracyChanged` remains a secondary input writing the same last-known value); iOS additionally treats `trueHeading < 0` as low. Those facts feed one pure, common state machine, `CompassAccuracyGate`:
+
+| | Threshold | Notes |
+|---|---|---|
+| Enter `Low(reason)` | 1 000 ms of continuous low samples | shorter is a wobble |
+| Return to `Good` | 1 500 ms of continuous good samples | from `Low` and `BestEffort` alike |
+| Enter `BestEffort(reason)` | 20 000 ms of *unbroken* low samples | one good sample restarts the count |
+
+Reasons are `CALIBRATION` (accuracy low) and `INTERFERENCE` (field magnitude outside 20–70 µT); interference wins within a low run, and the run's worst reason is forgotten when a good sample ends it.
+
+Also on Android: the rotation matrix is remapped with `SensorManager.remapCoordinateSystem` for the current display rotation before `getOrientation`, so a sideways phone is not 90° out; the raw pair is fused on the magnetometer event only (halving the emit rate, measured 100 → 50 Hz); a rotation vector that has produced nothing but degenerate samples for 2 s is unregistered; a null location marks the heading low rather than presenting magnetic north as true north; and collection follows the lifecycle (`repeatOnLifecycle(STARTED)`), so the sensors are unregistered while the app is not on screen.
+
+On iOS the heading manager also calls `startUpdatingLocation()` — `trueHeading` is `-1` without it — requests when-in-use authorisation if the app has never asked, sets `headingOrientation` from the device's orientation, and implements `locationManagerShouldDisplayHeadingCalibration` so the system's own calibration UI can appear.
 
 ---
 

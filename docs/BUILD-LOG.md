@@ -742,3 +742,59 @@ Version name is 0.1.0 on both platforms (Android versionCode 2, iOS CFBundleVers
 and the widget extension, the Settings row reads the same string). New `scripts/bump-version.sh
 <name> <code>` writes all five places; policy from here is a minor bump plus a new code after any
 meaningful change that ships as an APK.
+
+### Qibla compass sweep (10 September, overnight)
+
+The LoopPhone had been showing "Compass needs calibrating" on the Qibla screen forever, and no
+amount of waving cleared it. An investigation on both phones (`.superpowers/sdd/qibla-investigation.md`)
+found that the prompt was telling the truth on that device and lying by omission on the other.
+
+**On the LoopPhone**, the MediaTek fused rotation vector is stubbed: it streams the identity
+quaternion `(0, 0, 0, 1)` forever while reporting ACCURACY_HIGH, so every sample decodes to azimuth
+0 and the app is forced onto the raw accelerometer+magnetometer path. There, the Voltafield
+magnetometer's HAL is subtracting a 503.9 µT bias estimate from an 83.5 µT measurement, producing a
+"calibrated" field of 536 µT — twenty times the 25.6 µT Earth's field at Cape Town. The reading
+really is unusable. But the accuracy that raised the prompt was read only from `onAccuracyChanged`,
+which fired once, 90 ms after registration, and never again in 90 seconds: the prompt could not
+have cleared even if the phone had been swung, because nothing was listening for the result.
+
+**On the S23** the opposite: the magnetometer accuracy callback never arrived at all, so the flag
+sat at its optimistic `false` default and the app showed a confident needle on an accuracy it had
+never read.
+
+**On iOS**, reading the code, the compass manager called `startUpdatingHeading()` alone. Core
+Location only computes a true heading for a manager that is also receiving location updates, so
+`trueHeading` was `-1` — which the smoothing filter turned into a heading of 359°, a needle that
+looked alive and pointed at nothing.
+
+**What changed.** Accuracy is now read from `event.accuracy` on every sample, and per-sample facts
+feed one pure, unit-tested state machine (`CompassAccuracyGate`) rather than flipping the screen
+directly: low after a full second of low samples, good again only after a second and a half of good
+ones, and — the escape hatch that did not exist — a best-effort state after twenty unbroken seconds,
+which drops the needle and shows the bearing and the distance, which are computed from the location
+and were never in doubt, under a caveat saying why. The magnetometer's field magnitude is now sanity
+checked against 20–70 µT, and a field that cannot be the Earth's is reported as interference, with
+copy that asks the user to move away from metal, magnets, cases and cables instead of drawing a
+figure of eight that cannot help — which is what the LoopPhone now shows, correctly, at 536 µT.
+
+Also: the rotation matrix is remapped for the display rotation (a sideways phone was 90° out); the
+raw pair is fused on the magnetometer event only, which halved the emit rate on the LoopPhone from
+100 Hz to a measured 50; the stubbed rotation vector is unregistered after two seconds of degenerate
+samples (measured: 2 007 ms) instead of streaming two hundred useless samples a second for the life
+of the screen; a null location marks the heading low rather than passing magnetic north off as true
+north; and the collection now follows the lifecycle like Today's tick, so backgrounding the app
+unregisters the sensors — verified with `dumpsys sensorservice`, which shows no connection thirty
+seconds after Home.
+
+On iOS the heading manager now starts location updates beside heading updates, asks for when-in-use
+authorisation if the app has never asked, sets `headingOrientation` from the device's orientation,
+implements `locationManagerShouldDisplayHeadingCalibration` so the system's own calibration dial can
+appear, and treats a negative `trueHeading` as low accuracy. It compiles and installs on the
+iPhone 13, but the runtime check that `trueHeading` becomes valid could not be run: the phone was
+locked and cannot be unlocked from here. That check is still outstanding.
+
+The qibla tests went from 33 to 63 (433 in the module, all green): the gate's state machine in both
+directions and at both thresholds, the field plausibility band at 19/20/45/70/71 µT, the heading
+filter across the 0/360 seam in both directions with monotone convergence, Cape Town (23.37°,
+6 557 km) and Tripoli (109.18° — the brief's 107.7° was wrong), a negative iOS heading, and each
+gate state's mapping to a screen state.
