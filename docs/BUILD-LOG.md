@@ -742,3 +742,36 @@ Version name is 0.1.0 on both platforms (Android versionCode 2, iOS CFBundleVers
 and the widget extension, the Settings row reads the same string). New `scripts/bump-version.sh
 <name> <code>` writes all five places; policy from here is a minor bump plus a new code after any
 meaningful change that ships as an APK.
+
+### Ayah widget (9–10 September, overnight)
+
+Built by subagent-driven development from
+`docs/superpowers/specs/2026-09-09-taqwa-ayah-widget-design.md` and the plan beside it, on branch
+`widget-ayah` from main at 6d7223f. A home-screen widget showing one ayah a day from a curated
+pool of fifty, drawn like the reader's ayah card. Pure-Kotlin pieces landed first in `:widgetcore`:
+the pool itself, a serialised pool mirror that both platforms read instead of opening a database,
+and a seeded Fisher–Yates rotation guaranteeing no repeat until all fifty have shown and never the
+same ayah two days running. On Android, Glance cannot use custom fonts, so `AyahCardRenderer` draws
+the card's text onto a transparent bitmap with `StaticLayout` and the bundled Hafs face, and the
+Glance tree wraps that bitmap in the prayer widget's own card shell. On iOS, the ayah widget is a
+third member of the existing `TaqwaWidgetBundle`, SwiftUI drawing the Hafs face directly with the
+font copied into the extension's resources and registered through `UIAppFonts`.
+
+The sharpest finding was that Glance's `actionParametersOf` tap action, though it did deliver its
+extras, opened a second `MainActivity` on top of the first because the launch intent carried only
+`NEW_TASK`; the old instance's dead Compose composition consumed the navigation request before the
+visible one ever saw it. An explicit `Intent` with `CLEAR_TOP`/`SINGLE_TOP` fixed it. iOS turned up
+two of its own: `Calendar.current` returns Hijri components under an Islamic system calendar, which
+would have desynced the rotation from Android's, and the widget-reload dedupe key omitted the ayah
+pool entirely, so a translation change could sit unseen for a week under the seven-entry `.atEnd`
+timeline. Smaller ones: `tools/add-widget-target.rb` was found to have silently dropped `-lsqlite3`
+from the app's link flags on its last rewrite, and Glance's `RemoteViews` bitmap budget meant the
+render size needed capping (settled at a quarter of the display's pixels, floored and ceilinged).
+
+Two implementation tasks per platform were reviewed clean after one fix pass each; a final
+whole-branch review found nine more findings (three Important: the iOS dedupe key, the Hijri
+calendar, and the mirror not rewriting on a UI language change) and a fix pass closed all nine.
+Full suite at the end: `:shared` 421 tests, `:widgetcore` 73 tests, all green. The compact footer
+branch, the iOS 16 padding fallback, and a forced midnight rollover were never exercised on a real
+device or simulator; the device round on the S23 and iPhone 13, the 0.3.0 version bump, and the
+merge to main were left for the morning.
