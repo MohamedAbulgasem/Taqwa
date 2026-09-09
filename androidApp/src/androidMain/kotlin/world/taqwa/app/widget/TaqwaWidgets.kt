@@ -24,9 +24,16 @@ import kotlinx.coroutines.launch
  */
 object TaqwaWidgets {
 
-    /** Redraws both providers. Cheap when a provider has no instances: Glance's `updateAll`
-     * resolves to an empty id list and does nothing. */
+    /**
+     * Redraws both prayer providers. Cheap when a provider has no instances: Glance's `updateAll`
+     * resolves to an empty id list and does nothing.
+     *
+     * The [WidgetRedraw.bump] first, and never only the `updateAll`: on a session that is still
+     * live, `updateAll` alone does not re-run the content lambda, so the widget keeps drawing the
+     * mirror as it stood when the session started (D1 — see [WidgetRedraw]).
+     */
     suspend fun updateAll(context: Context) {
+        WidgetRedraw.bump()
         TaqwaSmallGlanceWidget().updateAll(context)
         TaqwaMediumGlanceWidget().updateAll(context)
     }
@@ -53,6 +60,7 @@ object TaqwaWidgets {
      * the alarm `onDisabled` just cancelled.
      */
     suspend fun updateAyah(context: Context) {
+        WidgetRedraw.bump()
         TaqwaAyahGlanceWidget().updateAll(context)
         if (anyAyahWidgetPlaced(context)) AyahWidgetScheduler.schedule(context)
     }
