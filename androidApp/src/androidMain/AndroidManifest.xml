@@ -44,13 +44,21 @@
                 <action android:name="world.taqwa.app.WIDGET_REFRESH" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".widget.TaqwaSmallWidgetReceiver" android:exported="false">
+        <!-- android:label is what the widget picker titles each provider with; without it every
+             provider takes the application label and all three read "Taqwa" (N5). -->
+        <receiver
+            android:name=".widget.TaqwaSmallWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_small_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_small_info" />
         </receiver>
-        <receiver android:name=".widget.TaqwaMediumWidgetReceiver" android:exported="false">
+        <receiver
+            android:name=".widget.TaqwaMediumWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_medium_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -63,7 +71,10 @@
                 <action android:name="world.taqwa.app.AYAH_WIDGET_REFRESH" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".widget.TaqwaAyahWidgetReceiver" android:exported="false">
+        <receiver
+            android:name=".widget.TaqwaAyahWidgetReceiver"
+            android:exported="false"
+            android:label="@string/widget_ayah_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">Taqwa</string>
+    <!-- Widget picker titles (android:label on each receiver). All three providers showed as
+         "Taqwa" before, so only the size line told them apart (N5, S23 round). -->
+    <string name="widget_small_label">Next prayer</string>
+    <string name="widget_medium_label">Prayer times</string>
+    <string name="widget_ayah_label">Ayah of the day</string>
     <string name="widget_small_description">Next prayer and a live countdown.</string>
     <string name="widget_medium_description">Next prayer, countdown and today\'s times.</string>
     <string name="widget_ayah_description">Today’s ayah, with its translation.</string>

@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">تقوى</string>
+    <string name="widget_small_label">الصلاة القادمة</string>
+    <string name="widget_medium_label">مواقيت الصلاة</string>
+    <string name="widget_ayah_label">آية اليوم</string>
     <string name="widget_small_description">الصلاة القادمة وعد تنازلي مباشر.</string>
     <string name="widget_medium_description">الصلاة القادمة والعد التنازلي ومواقيت اليوم.</string>
     <string name="widget_ayah_description">آية اليوم مع ترجمتها.</string>
