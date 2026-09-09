@@ -59,10 +59,21 @@ internal class WidgetRender(
     val content: WidgetContent?,
     val remainingMinutes: Long?,
     val colors: WidgetPaletteColors,
-    val languageTag: String,
+    /** The app's own digit set as the mirror records it, rather than one derived from the
+     * snapshot's language tag — see [WidgetSnapshot.arabicIndicDigits] (D2). */
+    val arabicIndicDigits: Boolean,
 )
 
-private fun readWidgetRender(context: Context): WidgetRender {
+/**
+ * [redrawRevision] is deliberately unused: it exists so that reading [WidgetRedraw.revision] at the
+ * call site — inside the content lambda — is what invalidates that lambda when a mirror changes,
+ * and so that the read cannot be mistaken for dead code and deleted. See [WidgetRedraw] for why a
+ * Glance `updateAll` alone does not re-run this function (D1).
+ */
+private fun readWidgetRender(
+    context: Context,
+    @Suppress("UNUSED_PARAMETER") redrawRevision: Int,
+): WidgetRender {
     val store = createWidgetKeyValueStore()
     val snapshot = WidgetMirrorWriter.read(store)
     val background = store.getString("widget_background")
@@ -79,7 +90,10 @@ private fun readWidgetRender(context: Context): WidgetRender {
         content = snapshot?.let { WidgetContentBuilder.build(it, nowEpochSeconds) },
         remainingMinutes = snapshot?.let { WidgetCountdown.remainingMinutesAt(it, nowEpochSeconds) },
         colors = WidgetPalette.colorsFor(background, systemIsDark),
-        languageTag = snapshot?.languageTag.orEmpty(),
+        // The app's answer, written into the mirror beside the clock times this countdown has to
+        // agree with — not the CLDR default for the tag, which an `ar-LY` device disagrees with
+        // (D2). A mirror from an older build carries `false`, exactly what it used to draw.
+        arabicIndicDigits = snapshot?.arabicIndicDigits == true,
     )
 }
 
@@ -202,7 +216,7 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
 @Composable
 private fun StackedCard(render: WidgetRender, size: DpSize) {
     val pad = 10.dp
-    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.languageTag)) } ?: COUNTDOWN_EM
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits)) } ?: COUNTDOWN_EM
     // The label and clock line take about 1.3 em of the countdown between them, so the number is
     // capped at 44% of the height, and by whatever the width allows for its own digits.
     val countdown = minOf((size.width.value - pad.value * 2) / em, size.height.value * 0.44f).sp(24f, 72f)
@@ -220,7 +234,7 @@ private fun StackedCard(render: WidgetRender, size: DpSize) {
 private fun StripCard(render: WidgetRender, size: DpSize) {
     val colors = render.colors
     val padH = 14.dp
-    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.languageTag)) } ?: COUNTDOWN_EM
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits)) } ?: COUNTDOWN_EM
     val countdown = minOf(size.height.value * 0.50f, (size.width.value * 0.5f) / em).sp(18f, 36f)
     val small = (countdown.value * 0.45f).sp(11f, 13f)
     Row(
@@ -244,7 +258,7 @@ private fun StripCard(render: WidgetRender, size: DpSize) {
         render.remainingMinutes?.let {
             Spacer(GlanceModifier.width(8.dp))
             Text(
-                text = countdownText(it, render.languageTag),
+                text = countdownText(it, render.arabicIndicDigits),
                 style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Medium, fontSize = countdown),
                 maxLines = 1,
             )
@@ -256,7 +270,7 @@ private fun StripCard(render: WidgetRender, size: DpSize) {
 @Composable
 private fun TinyCard(render: WidgetRender, size: DpSize) {
     val colors = render.colors
-    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.languageTag)) } ?: COUNTDOWN_EM
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits)) } ?: COUNTDOWN_EM
     val countdown = minOf((size.width.value - 12f) / em, size.height.value * 0.46f).sp(14f, 30f)
     val label = (countdown.value * 0.5f).sp(9f, 12f)
     Column(
@@ -271,7 +285,7 @@ private fun TinyCard(render: WidgetRender, size: DpSize) {
         )
         render.remainingMinutes?.let {
             Text(
-                text = countdownText(it, render.languageTag),
+                text = countdownText(it, render.arabicIndicDigits),
                 style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Medium, fontSize = countdown),
                 maxLines = 1,
             )
@@ -293,11 +307,12 @@ private fun shortName(render: WidgetRender): String =
     render.content?.nextPrayerDisplayName?.substringBefore(" · ")?.trim() ?: "Taqwa"
 
 /** Built here by interpolation, so it needs its own pass through [WidgetDigits.localize] to match
- * the pre-formatted clock times beside it (I9). */
-private fun countdownText(remainingMinutes: Long, languageTag: String): String {
+ * the pre-formatted clock times beside it (I9) — against the mirror's recorded digit choice, so
+ * the two cannot disagree on a device whose ICU data differs from CLDR's default (D2). */
+private fun countdownText(remainingMinutes: Long, arabicIndicDigits: Boolean): String {
     val hours = remainingMinutes / 60
     val minutes = remainingMinutes % 60
-    return WidgetDigits.localize("$hours:${minutes.toString().padStart(2, '0')}", languageTag)
+    return WidgetDigits.localize("$hours:${minutes.toString().padStart(2, '0')}", arabicIndicDigits)
 }
 
 @Composable
@@ -324,7 +339,7 @@ private fun NextPrayerBlock(
         render.remainingMinutes?.let {
             Spacer(GlanceModifier.height(labelGap))
             Text(
-                text = countdownText(it, render.languageTag),
+                text = countdownText(it, render.arabicIndicDigits),
                 style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Medium, fontSize = countdown, textAlign = align),
                 maxLines = 1,
             )
@@ -389,7 +404,10 @@ abstract class TaqwaGlanceWidget : GlanceAppWidget() {
         // again. Read out here, a widget drawn once before the app had written anything kept
         // showing the empty card through every refresh that followed, sitting beside a twin of
         // the same provider that had all five times.
-        provideContent { TaqwaWidgetContent(readWidgetRender(context)) }
+        // `WidgetRedraw.revision` is read *inside* the lambda, which subscribes this lambda's own
+        // recompose scope to it: a live session that Glance will not restart is invalidated by the
+        // bump every redraw path makes, and only then does the mirror get read again (D1).
+        provideContent { TaqwaWidgetContent(readWidgetRender(context, WidgetRedraw.revision)) }
     }
 }
 

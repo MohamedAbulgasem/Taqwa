@@ -21,6 +21,7 @@ import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
 import world.taqwa.app.MainActivity
 import world.taqwa.app.di.appContainer
+import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.quran.ReadingSettings
 import java.time.LocalDate
@@ -43,14 +44,18 @@ class TaqwaAyahGlanceWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        // Read out here, unlike the prayer widget, and deliberately: this mirror is not a
-        // schedule that goes stale by the minute, it is the fifty-ayah pool, which changes only
-        // when the translation or the UI language does — and each of those already ends in a
-        // `refreshWidgets()`, which starts a fresh `provideGlance`. Reading it here is also what
-        // lets the widget *write* it (spec §4) before the first draw, which `provideContent`'s
-        // non-suspending lambda could not do.
-        val render = readAyahRender(context)
-        provideContent { AyahWidgetContent(render) }
+        // Out here because it is the one thing the content lambda cannot do: it may open the
+        // Quran database to write the mirror (spec §4), which is suspending work, and
+        // `provideContent`'s lambda is not.
+        ensureMirror(context)
+        // Everything the card actually draws from is read *inside* the lambda, keyed on
+        // `WidgetRedraw.revision`. The whole render used to be resolved out here, on the
+        // assumption that a redraw restarts `provideGlance` — it does not (that is D1: Glance
+        // leaves a live session's `provideGlance` alone and only recomposes, and a lambda whose
+        // parameters have not changed is skipped), so a background or translation change did not
+        // reach a widget whose session was still alive. Reading the revision here subscribes this
+        // lambda to every bump, and the read that follows it is then genuinely fresh.
+        provideContent { AyahWidgetContent(readAyahRender(context, WidgetRedraw.revision)) }
     }
 }
 
@@ -60,6 +65,8 @@ internal class AyahWidgetRender(
     val languageTag: String,
     val showTranslation: Boolean,
     val translationRtl: Boolean,
+    /** The mirror's record of the digit set the app itself draws (D2). */
+    val arabicIndicDigits: Boolean,
     val colors: WidgetPaletteColors,
 )
 
@@ -107,25 +114,46 @@ private const val EXTRA_OPEN_SURAH = "open_surah"
 private const val EXTRA_OPEN_AYAH = "open_ayah"
 
 /**
- * Reads today's entry from the pool mirror, writing the mirror first when there is none.
+ * Writes the pool mirror when there is none, so the first draw has an ayah to show.
  *
  * Spec §4's Android rule: a Glance widget runs in the app's own process, so unlike the iOS
  * extension it can open the Quran database itself. A widget placed before the app was ever opened
  * therefore fills the mirror with the language's default reading settings and draws a real ayah,
- * rather than the placeholder iOS has to show. The write is best-effort — a database that fails
- * to open leaves [AyahWidgetRender.entry] null and the card empty until the app runs.
+ * rather than the placeholder iOS has to show. Best-effort — a database that fails to open leaves
+ * [AyahWidgetRender.entry] null and the card empty until the app runs.
+ *
+ * A mirror from an older wire version deserialises to null (spec §4, `AyahPoolMirror.VERSION` 2),
+ * so this is also what rewrites it after an upgrade rather than leaving the card blank.
  */
-private suspend fun readAyahRender(context: Context): AyahWidgetRender {
+private suspend fun ensureMirror(context: Context) {
     val store = createWidgetKeyValueStore()
+    if (AyahPoolMirror.read(store) != null) return
     val deviceTag = Locale.getDefault().toLanguageTag()
-    val mirror = AyahPoolMirror.read(store) ?: runCatching {
+    runCatching {
         AyahPoolMirrorWriter.write(
             store,
             appContainer.quranRepository,
             ReadingSettings.defaultsFor(deviceTag),
             deviceTag,
+            createPlatformFormat(),
         )
-    }.getOrNull()
+    }
+}
+
+/**
+ * Everything one draw needs, read from the mirror at the moment it draws.
+ *
+ * [redrawRevision] is deliberately unused. Reading [WidgetRedraw.revision] at the call site —
+ * inside the content lambda — is what subscribes that lambda to a mirror change, and taking it as
+ * a parameter is what keeps the read from looking like dead code (D1; see [WidgetRedraw]).
+ */
+private fun readAyahRender(
+    context: Context,
+    @Suppress("UNUSED_PARAMETER") redrawRevision: Int,
+): AyahWidgetRender {
+    val store = createWidgetKeyValueStore()
+    val deviceTag = Locale.getDefault().toLanguageTag()
+    val mirror = AyahPoolMirror.read(store)
 
     // A mirror written before the seed (an interrupted first write) rotates from 0 rather than
     // failing; the next successful write puts the install's real seed in place.
@@ -147,6 +175,10 @@ private suspend fun readAyahRender(context: Context): AyahWidgetRender {
         languageTag = mirror?.languageTag ?: deviceTag,
         showTranslation = mirror?.showsTranslation == true,
         translationRtl = mirror?.translationRtl == true,
+        // The app's own digit set as it recorded it, not the CLDR default for the tag: under an
+        // `ar-LY` per-app locale the S23 draws the app's numbers in Arabic-Indic digits and the
+        // tag rule says Western, so the footer used to contradict the app (D2).
+        arabicIndicDigits = mirror?.arabicIndicDigits == true,
         colors = WidgetPalette.colorsFor(background, nightMode == Configuration.UI_MODE_NIGHT_YES),
     )
 }
@@ -173,6 +205,7 @@ private fun AyahWidgetContent(render: AyahWidgetRender) {
             render.showTranslation,
             render.translationRtl,
             render.languageTag,
+            render.arabicIndicDigits,
         ) {
             AyahCardRenderer.render(
                 context,
@@ -181,8 +214,8 @@ private fun AyahWidgetContent(render: AyahWidgetRender) {
                     heightPx = (size.height.value * density).toInt(),
                     density = density,
                     entry = entry,
-                    languageTag = render.languageTag,
                     arabicUi = render.languageTag.startsWith("ar"),
+                    arabicIndicDigits = render.arabicIndicDigits,
                     translationRtl = render.translationRtl,
                     showTranslation = render.showTranslation,
                     textArgb = render.colors.textArgb.toInt(),
