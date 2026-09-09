@@ -21,9 +21,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -159,39 +159,47 @@ fun App(container: AppContainer) {
         val languageTag = platformFormat.languageTag()
         val store = createWidgetKeyValueStore()
         suspend fun writeMirror() {
-            val reading = settings.readingSettings(languageTag).first()
-            val result = withContext(Dispatchers.Default) {
-                runCatching { AyahPoolMirrorWriter.write(store, container.quranRepository, reading, languageTag) }
+            runCatching {
+                val reading = settings.readingSettings(languageTag).first()
+                val result = withContext(Dispatchers.Default) {
+                    runCatching { AyahPoolMirrorWriter.write(store, container.quranRepository, reading, languageTag) }
+                }
+                result.onSuccess { refreshWidgets() }
             }
-            result.onSuccess { refreshWidgets() }
         }
         writeMirror()
-        settings.readingSettings(languageTag)
-            .map { it.translationId }
-            .distinctUntilChanged()
-            .drop(1)
-            .collect { writeMirror() }
+        runCatching {
+            settings.readingSettings(languageTag)
+                .map { it.translationId }
+                .distinctUntilChanged()
+                .drop(1)
+                .collect { writeMirror() }
+        }
     }
 
-    // Widget tap launch requests (design spec §8). Combined with the back stack rather than
-    // collected alone: a cold start can set LaunchRequests.pendingAyah before onboarding has even
-    // finished, and since the request itself never changes again while onboarding is showing, only
-    // a re-check triggered by the back stack's own change (onboarding completing) can notice that
-    // it is now safe to act on it. A warm tap, where onboarding is already behind the user, is
-    // handled by the very same emission that carries the new request.
+    // Widget tap launch requests (design spec §8). Waits for onboarding to be known complete before
+    // collecting: on a cold start the back stack still shows Screen.Today until the onboarding
+    // effect above has read DataStore and (if needed) replaced it with Screen.Onboarding, so acting
+    // on a pending request before that point would push a screen only to have replaceAll wipe it out
+    // right after. Once onboarding is known complete it can never become incomplete again in this
+    // session, so a plain collect on the pending flow is enough — a warm tap, where onboarding is
+    // already behind the user, is simply the first emission this effect ever sees.
     LaunchedEffect(Unit) {
-        combine(LaunchRequests.pendingAyah, navigator.backStack) { pending, stack -> pending to stack.last() }
-            .collect { (pending, top) ->
-                val (surah, ayah) = pending ?: return@collect
-                if (top == Screen.Onboarding) return@collect
+        settings.onboardingComplete.filter { it }.first()
+        LaunchRequests.pendingAyah.collect { pending ->
+            val (surah, ayah) = pending ?: return@collect
+            runCatching {
                 val reading = settings.readingSettings(platformFormat.languageTag()).first()
                 if (reading.mode == ReadingMode.MUSHAF) {
                     navigator.push(Screen.Mushaf(container.quranRepository.pageOf(surah, ayah)))
                 } else {
                     navigator.push(Screen.Reader(surah, ayah))
                 }
-                LaunchRequests.consume()
             }
+            // Consumed unconditionally: a bad request (e.g. a database failure resolving the page)
+            // must not be retried forever on every future emission.
+            LaunchRequests.consume()
+        }
     }
 
     fun useGpsFix() {
