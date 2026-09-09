@@ -116,6 +116,10 @@ class AndroidCompassSource : CompassSource {
         var rotationVectorTrusted = false
         var rotationVectorRegistered = rotation != null
         var degenerateSince = 0L
+        // Start of the current unbroken run of non-degenerate samples; 0L when no such run is
+        // in progress. Reset on every degenerate sample so a HAL that alternates between real
+        // and identity samples never accumulates a run long enough to (re-)earn trust.
+        var healthySince = 0L
         var lastDegenerateNoticeAt = 0L
         // The latest accuracy known for each sensor, written by every sample of that sensor and
         // by onAccuracyChanged alike — an assignment, never an accumulation. A flag that could
@@ -231,6 +235,15 @@ class AndroidCompassSource : CompassSource {
                 degenerateSince = 0L
 
                 if (!rotationVectorTrusted) {
+                    val now = SystemClock.elapsedRealtime()
+                    if (healthySince == 0L) healthySince = now
+                    // A single real sample used to flip trust immediately, which is exactly what
+                    // let an unstable HAL emitting one real sample every couple of seconds cycle
+                    // trust/distrust and re-register/unregister the raw pair on every sample.
+                    // Trust now needs RETRUST_DWELL_MILLIS of unbroken non-degenerate samples
+                    // first; the raw pair keeps emitting while this dwell runs, so nothing is
+                    // lost by waiting, including on the very first trust of a healthy device.
+                    if (now - healthySince < RETRUST_DWELL_MILLIS) return
                     rotationVectorTrusted = true
                     // The fused sensor works, so the raw pair is redundant — and leaving a
                     // magnetometer streaming at SENSOR_DELAY_GAME for nothing costs power.
@@ -257,6 +270,8 @@ class AndroidCompassSource : CompassSource {
              * screen, which shows the bearing and the distance and no needle.
              */
             private fun onDegenerateRotationVector() {
+                // Any degenerate sample breaks the non-degenerate run the dwell above is timing.
+                healthySince = 0L
                 val now = SystemClock.elapsedRealtime()
                 if (degenerateSince == 0L) degenerateSince = now
                 if (rotationVectorTrusted) {
@@ -335,6 +350,10 @@ class AndroidCompassSource : CompassSource {
     private companion object {
         /** Two seconds of nothing but identity quaternions is a HAL that is never going to work. */
         const val DEGENERATE_GIVE_UP_MILLIS = 2_000L
+
+        /** How long a run of non-degenerate samples must last before the rotation vector is
+         * (re-)trusted, so one flaky-good sample amid mostly-identity output cannot flap trust. */
+        const val RETRUST_DWELL_MILLIS = 500L
 
         /** How often to say "no heading here" when there is no raw pair to fall back to. */
         const val DEGENERATE_NOTICE_INTERVAL_MILLIS = 200L
