@@ -3,8 +3,9 @@
 #
 #   scripts/bump-version.sh 0.2.0 3
 #
-# Pre-release policy (Mohamed, 9 September 2026): after any meaningful change that ships as an
-# APK, bump the minor version name and the version code. The version code must only ever go up;
+# Pre-release policy (Mohamed, 9 September 2026): every change that ships as an APK gets a new
+# version. A feature or visible change bumps the minor (0.1.0 -> 0.2.0); a pure bug fix bumps the
+# patch (0.2.0 -> 0.2.1); the version code goes up by one either way. The version code must only ever go up;
 # Android refuses to install a lower one over a higher one, and iOS's CFBundleVersion must match
 # between the app and the widget extension, which is why both plists are written here.
 set -euo pipefail
