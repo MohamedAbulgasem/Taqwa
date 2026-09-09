@@ -58,7 +58,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">0.2.0</string>
+    <string name="settings_version_value">0.3.0</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">THEME</string>
