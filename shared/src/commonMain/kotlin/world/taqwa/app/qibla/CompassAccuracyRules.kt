@@ -38,11 +38,12 @@ object CompassAccuracyRules {
      */
     fun iosTrueHeadingIsInvalid(trueHeadingDegrees: Double): Boolean = trueHeadingDegrees < 0.0
 
-    /** Magnitude of a magnetometer sample, in µT. */
-    fun fieldMagnitude(x: Float, y: Float, z: Float): Double {
-        val fx = x.toDouble(); val fy = y.toDouble(); val fz = z.toDouble()
-        return sqrt(fx * fx + fy * fy + fz * fz)
-    }
+    /** Magnitude of a magnetometer sample, in µT. Android hands the vector over as floats,
+     * Core Location as doubles; the check is the same one either way. */
+    fun fieldMagnitude(x: Double, y: Double, z: Double): Double = sqrt(x * x + y * y + z * z)
+
+    fun fieldMagnitude(x: Float, y: Float, z: Float): Double =
+        fieldMagnitude(x.toDouble(), y.toDouble(), z.toDouble())
 
     /**
      * True when a "calibrated" magnetometer reading cannot be the Earth's field. One phone in

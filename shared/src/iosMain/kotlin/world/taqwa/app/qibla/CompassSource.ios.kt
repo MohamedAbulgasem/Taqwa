@@ -14,9 +14,16 @@ import platform.CoreLocation.CLHeading
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
 import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
+import platform.CoreLocation.kCLLocationAccuracyKilometer
 import platform.Foundation.NSProcessInfo
-import platform.UIKit.UIDevice
-import platform.UIKit.UIDeviceOrientation
+import platform.UIKit.UIApplication
+import platform.UIKit.UIInterfaceOrientation
+import platform.UIKit.UIInterfaceOrientationLandscapeLeft
+import platform.UIKit.UIInterfaceOrientationLandscapeRight
+import platform.UIKit.UIInterfaceOrientationPortrait
+import platform.UIKit.UIInterfaceOrientationPortraitUpsideDown
+import platform.UIKit.UIInterfaceOrientationUnknown
+import platform.UIKit.UIWindowScene
 import platform.darwin.NSObject
 import world.taqwa.app.domain.GeoLocation
 
@@ -32,6 +39,11 @@ import world.taqwa.app.domain.GeoLocation
  * nothing, and never says so. Hence `startUpdatingLocation()` beside it, an authorisation request
  * when the app has not asked yet, and [CompassAccuracyRules.iosTrueHeadingIsInvalid] as a floor
  * under `headingAccuracy`.
+ *
+ * That location is *only* ever used for declination, which varies over tens of kilometres and
+ * months. It is asked for at the coarsest accuracy Core Location offers and with a half-kilometre
+ * distance filter: a qibla dial has no use for a GPS fix, and asking for one would keep the
+ * receiver awake for the life of the screen to compute a number that would not change.
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosCompassSource : CompassSource {
@@ -55,21 +67,39 @@ class IosCompassSource : CompassSource {
      */
     private val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
         override fun locationManager(manager: CLLocationManager, didUpdateHeading: CLHeading) {
-            // The device can be turned without the screen being turned; Core Location cannot know
-            // which way the phone is being held unless it is told, and untold it answers for a
-            // portrait device, putting a sideways phone 90° out.
+            // The screen can be turned without the device being turned, and the other way round;
+            // Core Location cannot know which way the phone is being held unless it is told, and
+            // untold it answers for a portrait device, putting a sideways phone 90° out.
             syncHeadingOrientation(manager)
             val accuracy = didUpdateHeading.headingAccuracy
             val heading = didUpdateHeading.trueHeading
             val invalid = CompassAccuracyRules.iosTrueHeadingIsInvalid(heading)
+            // `CLHeading` carries the raw geomagnetic vector in µT beside the heading, so the
+            // same plausibility band the Android path uses applies here: a "calibrated" field
+            // that cannot be the Earth's is a magnet in the room, and telling that user to draw
+            // figures of eight is advice they can follow forever without effect. Without this,
+            // INTERFERENCE was simply unreachable on iOS and every low reading blamed
+            // calibration. All three components at zero is Core Location reporting no raw data
+            // rather than reporting a zero field, so it counts as no information at all.
+            val magnitude = CompassAccuracyRules.fieldMagnitude(
+                didUpdateHeading.x, didUpdateHeading.y, didUpdateHeading.z,
+            )
+            val implausibleField = magnitude > 0.0 &&
+                CompassAccuracyRules.magneticFieldIsImplausible(magnitude)
             subscriber?.trySend(
                 CompassReading(
                     // A negative heading is a sentinel, not a direction; passing it on as 359°
                     // would be the bug this rejects, so it is emitted as 0 and marked low.
                     trueHeadingDegrees = if (invalid) 0.0 else heading,
                     timestampMillis = monotonicMillis(),
-                    isLowAccuracy = invalid || CompassAccuracyRules.iosAccuracyIsLow(accuracy),
-                    lowReason = CompassLowReason.CALIBRATION,
+                    isLowAccuracy = invalid ||
+                        CompassAccuracyRules.iosAccuracyIsLow(accuracy) ||
+                        implausibleField,
+                    lowReason = if (implausibleField) {
+                        CompassLowReason.INTERFERENCE
+                    } else {
+                        CompassLowReason.CALIBRATION
+                    },
                 ),
             )
         }
@@ -88,15 +118,35 @@ class IosCompassSource : CompassSource {
 
     private fun monotonicMillis(): Long = (NSProcessInfo.processInfo.systemUptime * 1_000.0).toLong()
 
+    /**
+     * What Core Location wants is the orientation of the *interface*, not of the device: a phone
+     * lying flat on a table has a device orientation of `faceUp`, which says nothing, while its
+     * interface is still portrait or landscape and that is what the heading has to be measured
+     * against. `UIDevice.orientation` also answers `unknown` unless orientation notifications are
+     * being generated, and disagrees with the interface outright whenever the app or the device
+     * has rotation locked.
+     *
+     * Recomputed on every heading callback rather than from
+     * `UIApplicationDidChangeStatusBarOrientationNotification`: that notification has been
+     * deprecated since iOS 13, and an observer is a second thing to register and — the part that
+     * actually bites — to unregister, on a teardown path that already has to guard against a
+     * replacement collector starting before the old one closes. This is two property reads at
+     * heading rate (well under 100 Hz) and the write to the manager still only happens when the
+     * value changes. Core Location delivers these callbacks on the run loop the manager was
+     * created on, which is the main one, so the UIKit reads happen where UIKit requires.
+     */
     private fun syncHeadingOrientation(manager: CLLocationManager) {
-        val orientation = when (UIDevice.currentDevice.orientation) {
-            UIDeviceOrientation.UIDeviceOrientationPortrait -> CLDeviceOrientationPortrait
-            UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown -> CLDeviceOrientationPortraitUpsideDown
-            UIDeviceOrientation.UIDeviceOrientationLandscapeLeft -> CLDeviceOrientationLandscapeLeft
-            UIDeviceOrientation.UIDeviceOrientationLandscapeRight -> CLDeviceOrientationLandscapeRight
-            // Face up, face down and unknown say nothing about which way the screen is pointing,
-            // so the last real orientation stands.
-            else -> headingOrientation
+        val orientation = when (interfaceOrientation()) {
+            UIInterfaceOrientationPortrait -> CLDeviceOrientationPortrait
+            UIInterfaceOrientationPortraitUpsideDown -> CLDeviceOrientationPortraitUpsideDown
+            // Mirrored on purpose, not a typo: the two enums name these from opposite ends. An
+            // interface in landscapeLeft is a device rotated landscapeRight, and swapping these
+            // is a silent 180° error in the one case the remap exists for.
+            UIInterfaceOrientationLandscapeLeft -> CLDeviceOrientationLandscapeRight
+            UIInterfaceOrientationLandscapeRight -> CLDeviceOrientationLandscapeLeft
+            // `unknown`, and anything a future SDK adds: portrait is what Core Location assumes
+            // untold, and it is what the app launches in.
+            else -> CLDeviceOrientationPortrait
         }
         if (orientation != headingOrientation) {
             headingOrientation = orientation
@@ -104,21 +154,31 @@ class IosCompassSource : CompassSource {
         }
     }
 
+    /** The foreground window scene's interface orientation, or `unknown` before there is one. */
+    private fun interfaceOrientation(): UIInterfaceOrientation =
+        (UIApplication.sharedApplication.connectedScenes.firstOrNull { it is UIWindowScene } as? UIWindowScene)
+            ?.interfaceOrientation
+            ?: UIInterfaceOrientationUnknown
+
     override val readings: Flow<CompassReading> = callbackFlow {
         if (!CLLocationManager.headingAvailable()) { close(); return@callbackFlow }
 
         subscriber = this
         manager.delegate = delegate
-        // `UIDevice.orientation` is `unknown` until something asks for these notifications.
-        UIDevice.currentDevice.beginGeneratingDeviceOrientationNotifications()
         syncHeadingOrientation(manager)
         // Only when the app has never asked: asking again when the user has said no is noise, and
-        // the location screen owns that conversation.
-        if (CLLocationManager.authorizationStatus() == kCLAuthorizationStatusNotDetermined) {
+        // the location screen owns that conversation. The instance property, not the class method
+        // deprecated in iOS 14 — the deployment target is iOS 16, so there is no older path to
+        // keep.
+        if (manager.authorizationStatus == kCLAuthorizationStatusNotDetermined) {
             manager.requestWhenInUseAuthorization()
         }
         // The heading updates are what the dial needs; the location updates are what makes those
-        // headings *true* north rather than a permanent -1.
+        // headings *true* north rather than a permanent -1. Declination is the only consumer, so
+        // the coarsest fix Core Location has is more than enough, and half a kilometre of
+        // movement is the point at which it could change by a hundredth of a degree.
+        manager.desiredAccuracy = kCLLocationAccuracyKilometer
+        manager.distanceFilter = 500.0
         manager.startUpdatingLocation()
         manager.startUpdatingHeading()
         awaitClose {
@@ -128,7 +188,6 @@ class IosCompassSource : CompassSource {
             if (subscriber === this) {
                 manager.stopUpdatingHeading()
                 manager.stopUpdatingLocation()
-                UIDevice.currentDevice.endGeneratingDeviceOrientationNotifications()
                 manager.delegate = null
                 subscriber = null
             }
