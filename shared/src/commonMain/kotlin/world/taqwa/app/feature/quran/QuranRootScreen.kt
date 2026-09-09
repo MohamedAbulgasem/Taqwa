@@ -70,6 +70,7 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
+import world.taqwa.app.quran.RTL_TRANSLATION_LANGUAGES
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.SearchHit
 import world.taqwa.app.quran.Surah

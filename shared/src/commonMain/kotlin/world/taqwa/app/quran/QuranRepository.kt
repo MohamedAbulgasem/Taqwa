@@ -14,6 +14,12 @@ interface QuranSource {
     suspend fun ayahs(surah: Int): List<Ayah>
     suspend fun translations(): List<TranslationInfo>
     suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String>
+    /** One ayah's Uthmani Arabic, or null when the reference does not exist. Used by the ayah
+     * widget pool mirror writer, which needs fifty scattered ayahs rather than whole surahs. */
+    suspend fun ayahText(surah: Int, ayah: Int): String?
+    /** One ayah's text in [translationId], or null when the reference or the translation does
+     * not exist. */
+    suspend fun translationText(translationId: String, surah: Int, ayah: Int): String?
     suspend fun pageOf(surah: Int, ayah: Int): Int
     suspend fun page(number: Int): MushafPage
     /** Arabic search; [query] is raw user text, folded into tokens by
@@ -40,6 +46,12 @@ class QuranRepository(
     override suspend fun translations(): List<TranslationInfo> = withContext(io) { q.translations().executeAsList().map { it.toInfo() } }
     override suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String> = withContext(io) {
         q.translationOfSurah(translationId, surah.toLong()).executeAsList().associate { it.number.toInt() to it.text }
+    }
+    override suspend fun ayahText(surah: Int, ayah: Int): String? = withContext(io) {
+        q.ayahByRef(surah.toLong(), ayah.toLong()).executeAsOneOrNull()?.text_uthmani
+    }
+    override suspend fun translationText(translationId: String, surah: Int, ayah: Int): String? = withContext(io) {
+        q.translationByRef(translationId, surah.toLong(), ayah.toLong()).executeAsOneOrNull()
     }
     override suspend fun pageOf(surah: Int, ayah: Int): Int = withContext(io) { q.pageOfAyah(surah.toLong(), ayah.toLong()).executeAsOne().toInt() }
     override suspend fun page(number: Int): MushafPage = withContext(io) {

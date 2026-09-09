@@ -48,15 +48,9 @@ import world.taqwa.app.design.components.drawBookmark
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.quran.QuranText
+import world.taqwa.app.quran.RTL_TRANSLATION_LANGUAGES
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_action_bookmarked
-
-/** Languages whose bundled translation text itself reads right-to-left (spec §5.1) — Arabic (the
- * Muyassar tafsir), Urdu and Farsi. Everything else, including the UI's own direction, is
- * irrelevant here: an English translation must read left-to-right even under an Arabic UI, and an
- * Urdu one right-to-left even under an English UI. Shared with the root's search hits (spec 2b
- * §2.1), whose translation snippet reads in the same direction. */
-internal val RTL_TRANSLATION_LANGUAGES = setOf("ar", "ur", "fa")
 
 /**
  * One ayah's card (spec §2.3): the Uthmani Arabic with the ayah roundel inline, an optional

@@ -20,7 +20,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -55,6 +61,7 @@ import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.design.components.TaqwaTabScaffold
+import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
@@ -77,7 +84,11 @@ import world.taqwa.app.feature.quran.ReaderUiState
 import world.taqwa.app.feature.quran.ReaderViewModel
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
+import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.displayName
+import world.taqwa.app.widget.AyahPoolMirrorWriter
+import world.taqwa.app.widget.createWidgetKeyValueStore
+import world.taqwa.app.widget.refreshWidgets
 import kotlin.time.Clock
 
 @Composable
@@ -136,6 +147,51 @@ fun App(container: AppContainer) {
         }
         startResolved = true
         container.notificationCoordinator.reschedule(world.taqwa.app.notifications.RescheduleTrigger.APP_FOREGROUND)
+    }
+
+    // Ayah widget pool mirror (design spec §4): fills the widget KeyValueStore from the Quran
+    // database once on start and again whenever the reading translation changes, so neither
+    // widget process ever has to open the database itself. The database work runs off the main
+    // thread, and a failure here (a locked store, a database that failed to open) is swallowed
+    // rather than crashing the app — the mirror simply stays stale until the next successful
+    // write.
+    LaunchedEffect(Unit) {
+        val languageTag = platformFormat.languageTag()
+        val store = createWidgetKeyValueStore()
+        suspend fun writeMirror() {
+            val reading = settings.readingSettings(languageTag).first()
+            val result = withContext(Dispatchers.Default) {
+                runCatching { AyahPoolMirrorWriter.write(store, container.quranRepository, reading, languageTag) }
+            }
+            result.onSuccess { refreshWidgets() }
+        }
+        writeMirror()
+        settings.readingSettings(languageTag)
+            .map { it.translationId }
+            .distinctUntilChanged()
+            .drop(1)
+            .collect { writeMirror() }
+    }
+
+    // Widget tap launch requests (design spec §8). Combined with the back stack rather than
+    // collected alone: a cold start can set LaunchRequests.pendingAyah before onboarding has even
+    // finished, and since the request itself never changes again while onboarding is showing, only
+    // a re-check triggered by the back stack's own change (onboarding completing) can notice that
+    // it is now safe to act on it. A warm tap, where onboarding is already behind the user, is
+    // handled by the very same emission that carries the new request.
+    LaunchedEffect(Unit) {
+        combine(LaunchRequests.pendingAyah, navigator.backStack) { pending, stack -> pending to stack.last() }
+            .collect { (pending, top) ->
+                val (surah, ayah) = pending ?: return@collect
+                if (top == Screen.Onboarding) return@collect
+                val reading = settings.readingSettings(platformFormat.languageTag()).first()
+                if (reading.mode == ReadingMode.MUSHAF) {
+                    navigator.push(Screen.Mushaf(container.quranRepository.pageOf(surah, ayah)))
+                } else {
+                    navigator.push(Screen.Reader(surah, ayah))
+                }
+                LaunchRequests.consume()
+            }
     }
 
     fun useGpsFix() {

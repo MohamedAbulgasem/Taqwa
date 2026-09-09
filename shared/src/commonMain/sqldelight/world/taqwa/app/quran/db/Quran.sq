@@ -90,3 +90,12 @@ SELECT surah, number, text_uthmani, text_search FROM ayah ORDER BY surah, number
 
 translationTextsAll:
 SELECT surah, number, text FROM ayah_translation WHERE translation_id = ? ORDER BY surah, number;
+
+-- One ayah's Arabic by reference, for the ayah widget pool mirror (design spec §4): the pool is
+-- fifty scattered ayahs, not a whole surah, so ayahsOfSurah would fetch far more than is needed.
+ayahByRef:
+SELECT surah, number, text_uthmani FROM ayah WHERE surah = ? AND number = ?;
+
+-- One ayah's translation by reference, the pool mirror's other half.
+translationByRef:
+SELECT text FROM ayah_translation WHERE translation_id = ? AND surah = ? AND number = ?;

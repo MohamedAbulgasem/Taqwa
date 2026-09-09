@@ -82,6 +82,10 @@ internal class FakeQuranSource(
         translationLoads += translationId to surah
         return translationTextsById[translationId]?.get(surah) ?: emptyMap()
     }
+    override suspend fun ayahText(surah: Int, ayah: Int): String? =
+        ayahsBySurah[surah]?.firstOrNull { it.number == ayah }?.text
+    override suspend fun translationText(translationId: String, surah: Int, ayah: Int): String? =
+        translationTextsById[translationId]?.get(surah)?.get(ayah)
     /** Mirrors QuranRepository.searchArabic: every folded token must appear as a substring of
      * the ayah's normalised text, so the view-model tests see the real matching rule. */
     override suspend fun searchArabic(query: String, limit: Int): List<SearchHit> {
