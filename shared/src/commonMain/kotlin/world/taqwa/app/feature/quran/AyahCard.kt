@@ -1,5 +1,12 @@
 package world.taqwa.app.feature.quran
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,7 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -84,6 +94,18 @@ fun AyahCard(
 ) {
     val colors = LocalTaqwaColors.current
     val bookmarkedLabel = stringResource(Res.string.quran_action_bookmarked)
+    // Selection is a state change, not a page change, so nothing about it snaps: the tint fades in
+    // and the action row unfolds from under the translation, and both reverse on deselection.
+    val selectedTint by animateColorAsState(
+        if (selected) colors.accent.copy(alpha = 0.08f) else Color.Transparent,
+        animationSpec = tween(SELECT_MILLIS),
+        label = "ayahSelectedTint",
+    )
+    // The screen hands in a null row the moment the card is deselected (it builds the row for the
+    // selected card only), but the row has to stay composed while it shrinks away, so the last
+    // non-null one is kept for the exit.
+    var lastActions by remember { mutableStateOf(actions) }
+    if (actions != null) lastActions = actions
     TaqwaCard(
         Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
@@ -96,7 +118,7 @@ fun AyahCard(
         Box(
             Modifier
                 .fillMaxWidth()
-                .background(if (selected) colors.accent.copy(alpha = 0.08f) else Color.Transparent),
+                .background(selectedTint),
         ) {
             Column(Modifier.fillMaxWidth().padding(14.dp)) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -142,10 +164,16 @@ fun AyahCard(
                         )
                     }
                 }
-                if (selected && actions != null) {
-                    Spacer(Modifier.height(8.dp))
-                    CardDivider()
-                    actions()
+                AnimatedVisibility(
+                    visible = selected && actions != null,
+                    enter = fadeIn(tween(SELECT_MILLIS)) + expandVertically(tween(SELECT_MILLIS)),
+                    exit = fadeOut(tween(SELECT_MILLIS / 2)) + shrinkVertically(tween(SELECT_MILLIS)),
+                ) {
+                    Column {
+                        Spacer(Modifier.height(8.dp))
+                        CardDivider()
+                        lastActions?.invoke()
+                    }
                 }
             }
             if (bookmarked) {
@@ -165,3 +193,6 @@ fun AyahCard(
         }
     }
 }
+
+/** One duration for the selection tint and the action row, so the two read as a single motion. */
+private const val SELECT_MILLIS = 220
