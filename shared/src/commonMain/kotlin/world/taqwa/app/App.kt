@@ -66,7 +66,6 @@ import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
 import world.taqwa.app.nav.Tab
-import world.taqwa.app.nav.isQuranScreen
 import world.taqwa.app.nav.tabOf
 import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.canScheduleExactAlarms
@@ -208,17 +207,28 @@ fun App(container: AppContainer) {
             val (surah, ayah) = pending ?: return@collect
             runCatching {
                 val reading = settings.readingSettings(platformFormat.languageTag()).first()
-                // The reader is pushed on top of the Quran root, not on whatever happened to be
-                // showing. Without this a widget tap put the reader straight on top of the Prayer
-                // tab, so one Back left the Quran entirely and reaching the surah list — the list
-                // the ayah came from — took another tap (D3, S23 round). Skipped when a Quran
-                // screen is already on top, so a second tap while the reader is open does not
-                // stack a root behind it.
-                if (!isQuranScreen(navigator.current)) navigator.push(Screen.Quran)
-                if (reading.mode == ReadingMode.MUSHAF) {
-                    navigator.push(Screen.Mushaf(container.quranRepository.pageOf(surah, ayah)))
+                // Resolved before the navigator is touched at all: `pageOf` is itself a database
+                // read that can fail, and a failure must leave the back stack exactly as it found
+                // it rather than half-applying a push.
+                val target = if (reading.mode == ReadingMode.MUSHAF) {
+                    Screen.Mushaf(container.quranRepository.pageOf(surah, ayah))
                 } else {
-                    navigator.push(Screen.Reader(surah, ayah))
+                    Screen.Reader(surah, ayah)
+                }
+                val current = navigator.current
+                if (current is Screen.Reader || current is Screen.Mushaf) {
+                    // A second tap (or a tap while an ayah opened another way is still open)
+                    // replaces the open reading screen with the new one instead of stacking a
+                    // second reader behind it, the same rule the mode toggle uses.
+                    navigator.replace(target)
+                } else {
+                    // The reader is pushed on top of the Quran root, not on whatever happened to
+                    // be showing. Without this a widget tap put the reader straight on top of the
+                    // Prayer tab, so one Back left the Quran entirely and reaching the surah list
+                    // — the list the ayah came from — took another tap (D3, S23 round). Skipped
+                    // when the Quran root is already on top, so this never stacks a second root.
+                    if (current != Screen.Quran) navigator.push(Screen.Quran)
+                    navigator.push(target)
                 }
             }
             // Consumed unconditionally: a bad request (e.g. a database failure resolving the page)

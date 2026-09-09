@@ -28,12 +28,14 @@ object TaqwaWidgets {
      * Redraws both prayer providers. Cheap when a provider has no instances: Glance's `updateAll`
      * resolves to an empty id list and does nothing.
      *
-     * The [WidgetRedraw.bump] first, and never only the `updateAll`: on a session that is still
-     * live, `updateAll` alone does not re-run the content lambda, so the widget keeps drawing the
-     * mirror as it stood when the session started (D1 — see [WidgetRedraw]).
+     * The [WidgetRedraw.bumpPrayer] first, and never only the `updateAll`: on a session that is
+     * still live, `updateAll` alone does not re-run the content lambda, so the widget keeps
+     * drawing the mirror as it stood when the session started (D1 — see [WidgetRedraw]). Bumps
+     * only the prayer counter, never the ayah one: this runs every five minutes for the countdown,
+     * and the ayah card cannot change on that cadence.
      */
     suspend fun updateAll(context: Context) {
-        WidgetRedraw.bump()
+        WidgetRedraw.bumpPrayer()
         TaqwaSmallGlanceWidget().updateAll(context)
         TaqwaMediumGlanceWidget().updateAll(context)
     }
@@ -60,7 +62,7 @@ object TaqwaWidgets {
      * the alarm `onDisabled` just cancelled.
      */
     suspend fun updateAyah(context: Context) {
-        WidgetRedraw.bump()
+        WidgetRedraw.bumpAyah()
         TaqwaAyahGlanceWidget().updateAll(context)
         if (anyAyahWidgetPlaced(context)) AyahWidgetScheduler.schedule(context)
     }

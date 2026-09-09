@@ -19,6 +19,7 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
+import kotlinx.coroutines.flow.first
 import world.taqwa.app.MainActivity
 import world.taqwa.app.di.appContainer
 import world.taqwa.app.i18n.createPlatformFormat
@@ -49,13 +50,15 @@ class TaqwaAyahGlanceWidget : GlanceAppWidget() {
         // `provideContent`'s lambda is not.
         ensureMirror(context)
         // Everything the card actually draws from is read *inside* the lambda, keyed on
-        // `WidgetRedraw.revision`. The whole render used to be resolved out here, on the
+        // `WidgetRedraw.ayahRevision`. The whole render used to be resolved out here, on the
         // assumption that a redraw restarts `provideGlance` — it does not (that is D1: Glance
         // leaves a live session's `provideGlance` alone and only recomposes, and a lambda whose
         // parameters have not changed is skipped), so a background or translation change did not
         // reach a widget whose session was still alive. Reading the revision here subscribes this
-        // lambda to every bump, and the read that follows it is then genuinely fresh.
-        provideContent { AyahWidgetContent(readAyahRender(context, WidgetRedraw.revision)) }
+        // lambda to every bump, and the read that follows it is then genuinely fresh. This is the
+        // ayah widget's own counter, not the prayer widgets' — a prayer countdown tick must not
+        // invalidate a live ayah session (see [WidgetRedraw]).
+        provideContent { AyahWidgetContent(readAyahRender(context, WidgetRedraw.ayahRevision)) }
     }
 }
 
@@ -129,11 +132,19 @@ private suspend fun ensureMirror(context: Context) {
     val store = createWidgetKeyValueStore()
     if (AyahPoolMirror.read(store) != null) return
     val deviceTag = Locale.getDefault().toLanguageTag()
+    // The user's own reading settings, not a hardcoded default: a missing mirror here is not
+    // necessarily a fresh install — it is just as likely a version-2 rejection of an old-format
+    // mirror (spec §4) or a prefs file the system cleared, and either one must not silently hand
+    // someone who chose another translation the default one. Only a settings read that actually
+    // throws falls back to the language's own defaults, so the widget still draws something.
+    val readingSettings = runCatching {
+        appContainer.settingsRepository.readingSettings(deviceTag).first()
+    }.getOrElse { ReadingSettings.defaultsFor(deviceTag) }
     runCatching {
         AyahPoolMirrorWriter.write(
             store,
             appContainer.quranRepository,
-            ReadingSettings.defaultsFor(deviceTag),
+            readingSettings,
             deviceTag,
             createPlatformFormat(),
         )
@@ -143,7 +154,7 @@ private suspend fun ensureMirror(context: Context) {
 /**
  * Everything one draw needs, read from the mirror at the moment it draws.
  *
- * [redrawRevision] is deliberately unused. Reading [WidgetRedraw.revision] at the call site —
+ * [redrawRevision] is deliberately unused. Reading [WidgetRedraw.ayahRevision] at the call site —
  * inside the content lambda — is what subscribes that lambda to a mirror change, and taking it as
  * a parameter is what keeps the read from looking like dead code (D1; see [WidgetRedraw]).
  */

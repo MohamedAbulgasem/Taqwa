@@ -65,10 +65,11 @@ internal class WidgetRender(
 )
 
 /**
- * [redrawRevision] is deliberately unused: it exists so that reading [WidgetRedraw.revision] at the
- * call site — inside the content lambda — is what invalidates that lambda when a mirror changes,
- * and so that the read cannot be mistaken for dead code and deleted. See [WidgetRedraw] for why a
- * Glance `updateAll` alone does not re-run this function (D1).
+ * [redrawRevision] is deliberately unused: it exists so that reading [WidgetRedraw.prayerRevision]
+ * at the call site — inside the content lambda — is what invalidates that lambda when a mirror
+ * changes, and so that the read cannot be mistaken for dead code and deleted. See [WidgetRedraw]
+ * for why a Glance `updateAll` alone does not re-run this function (D1), and for why the prayer
+ * widgets read their own counter rather than the ayah widget's.
  */
 private fun readWidgetRender(
     context: Context,
@@ -404,10 +405,12 @@ abstract class TaqwaGlanceWidget : GlanceAppWidget() {
         // again. Read out here, a widget drawn once before the app had written anything kept
         // showing the empty card through every refresh that followed, sitting beside a twin of
         // the same provider that had all five times.
-        // `WidgetRedraw.revision` is read *inside* the lambda, which subscribes this lambda's own
-        // recompose scope to it: a live session that Glance will not restart is invalidated by the
-        // bump every redraw path makes, and only then does the mirror get read again (D1).
-        provideContent { TaqwaWidgetContent(readWidgetRender(context, WidgetRedraw.revision)) }
+        // `WidgetRedraw.prayerRevision` is read *inside* the lambda, which subscribes this
+        // lambda's own recompose scope to it: a live session that Glance will not restart is
+        // invalidated by the bump every prayer redraw path makes, and only then does the mirror
+        // get read again (D1). The ayah widget's own counter would not invalidate this lambda at
+        // all — the two are deliberately separate so a daily ayah redraw does not touch this one.
+        provideContent { TaqwaWidgetContent(readWidgetRender(context, WidgetRedraw.prayerRevision)) }
     }
 }
 
