@@ -173,7 +173,6 @@
     <!-- Qibla (plan 2) -->
     <string name="qibla_no_sensor_title">No compass sensor</string>
     <string name="qibla_no_sensor_body">This device has no magnetometer. Use a physical compass together with the bearing below.</string>
-    <string name="qibla_low_accuracy_body">Move your phone in a figure-eight motion. Metal, cases and speakers can interfere with the compass.</string>
 
     <!-- Widget background (Appearance) -->
     <string name="appearance_widget_background_label">WIDGET BACKGROUND</string>
