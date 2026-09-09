@@ -202,6 +202,20 @@ struct TaqwaWidgetSurface: ViewModifier {
     /// nothing because there is no widget container to paint.
     let inWidgetContainer: Bool
 
+    /// The card's own edge padding, gated the same way the background fill below is: inside a
+    /// widget container, `containerBackground` (iOS 17+) already applies WidgetKit's standard
+    /// content margins, so a card that added its own on top would be inset twice. Below iOS 17 —
+    /// this app's deployment target — the container falls back to a plain `.background`, which
+    /// insets nothing, so the card needs its own padding there exactly as it does outside a
+    /// container altogether (the in-app preview route, where there is no container at all).
+    /// Centralised here, rather than duplicated per widget, so any card that opts in via
+    /// `taqwaSurface` gets the iOS 16 case right without re-deriving it.
+    static func cardPadding(inWidgetContainer: Bool) -> CGFloat {
+        guard inWidgetContainer else { return 14 }
+        if #available(iOS 17.0, *) { return 0 }
+        return 14
+    }
+
     @ViewBuilder
     func body(content: Content) -> some View {
         if inWidgetContainer, #available(iOS 17.0, *) {

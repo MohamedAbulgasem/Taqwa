@@ -38,14 +38,26 @@ struct TaqwaWidgetPreviewScreen: View {
     private var entry: TaqwaEntry { TaqwaTimelineProvider.entries(from: Date()).first! }
     private var ayahEntry: AyahEntry { AyahTimelineProvider.entries(from: Date()).first! }
 
+    /// Only counts a mirror as missing for the section that is actually on screen — a route
+    /// narrowed to `ayah` must not report "no mirror data" over an ayah card that rendered fine
+    /// just because the (unshown) prayer mirror happens to be absent, and vice versa.
+    private var headerText: String {
+        let prayerMissing = showsPrayer && entry.content == nil
+        let ayahMissing = showsAyah && ayahEntry.entry == nil
+        switch (prayerMissing, ayahMissing) {
+        case (false, false): return "Live App Group mirror data"
+        case (true, false): return "No prayer mirror data. Open Taqwa normally first."
+        case (false, true): return "No ayah mirror data. Open Taqwa normally first."
+        case (true, true): return "No mirror data. Open Taqwa normally first."
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 Text("Taqwa widget preview")
                     .font(.headline)
-                Text(entry.content == nil
-                     ? "No mirror data. Open Taqwa normally first."
-                     : "Live App Group mirror data")
+                Text(headerText)
                     .font(.caption)
                     .foregroundColor(.secondary)
 

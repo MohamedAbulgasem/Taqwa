@@ -71,7 +71,13 @@ enum TaqwaHafs {
 /// into a 30 MB extension.
 private func arabicIndicDigits(_ n: Int32) -> String {
     let digits = Array("٠١٢٣٤٥٦٧٨٩")
-    return String(String(n).map { c in c.isNumber ? digits[Int(c.asciiValue! - 48)] : c })
+    return String(String(n).map { c in
+        // `wholeNumberValue` rather than `asciiValue! - 48`: it never force-unwraps, and it still
+        // maps only the plain ASCII digits `String(Int32)` can ever produce (a minus sign or any
+        // other character passes through unchanged).
+        guard let value = c.wholeNumberValue, digits.indices.contains(value) else { return c }
+        return digits[value]
+    })
 }
 
 /// U+00A0. `QuranText.MARKER_SEPARATOR`'s value: a non-breaking space, so wrapping never splits an
@@ -245,11 +251,15 @@ struct TaqwaAyahWidgetView: View {
                 placeholder
             }
         }
-        // Spec §2's 14 pt, but only off a home screen: inside a widget container WidgetKit applies
-        // its own content margins, and adding these on top of them would inset a Medium card twice.
+        // Spec §2's 14 pt, but only off a home screen and only from iOS 17: inside a widget
+        // container, WidgetKit applies its own content margins through `containerBackground`, and
+        // adding these on top of them would inset a Medium card twice — but that API (and the
+        // margins it brings) is iOS 17+ only. On iOS 16 `taqwaSurface` falls back to a plain
+        // `.background`, which insets nothing, so the card still needs its own 14 pt there.
+        // `TaqwaWidgetSurface.cardPadding` is the single place that gate lives.
         // It has to sit *inside* `taqwaSurface` either way — padding applied outside the background
         // leaves the card's fill 14 pt short of the cell on every edge.
-        .padding(inWidgetContainer ? 0 : 14)
+        .padding(TaqwaWidgetSurface.cardPadding(inWidgetContainer: inWidgetContainer))
         .taqwaSurface(colors, frosted: entry.background == .translucentOrFrosted, inWidgetContainer: inWidgetContainer)
     }
 
@@ -285,6 +295,10 @@ struct TaqwaAyahWidgetView: View {
             .font(TaqwaHafs.font(size: arabicSize))
             .foregroundColor(textColor)
             .multilineTextAlignment(.leading)
+            // Spec's 1.75x line height; the Hafs face's own metrics give about 1.68x, so this adds
+            // the small remaining balance rather than replacing it (SwiftUI has no absolute
+            // line-height knob) — the same approach `translationText` takes below.
+            .lineSpacing(arabicSize * 0.1)
             // The Arabic is never cut (spec §2), so no `lineLimit`: it shrinks instead.
             .minimumScaleFactor(0.6)
             .frame(maxWidth: .infinity, alignment: .leading)

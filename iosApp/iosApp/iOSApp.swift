@@ -64,6 +64,9 @@ struct iOSApp: App {
 		guard url.scheme == "taqwa", url.host == "ayah" else { return }
 		let parts = url.pathComponents.filter { $0 != "/" }
 		guard parts.count == 2, let surah = Int32(parts[0]), let ayah = Int32(parts[1]) else { return }
+		// A malformed or stale widget URL (e.g. a surah number outside the Quran's own range)
+		// must not reach `openAyahFromWidget`, which trusts its arguments rather than re-validating.
+		guard (1...114).contains(surah), ayah >= 1 else { return }
 		LaunchRequests_iosKt.openAyahFromWidget(surah: surah, ayah: ayah)
 	}
 
