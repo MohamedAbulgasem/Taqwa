@@ -178,6 +178,7 @@
     <!-- Widget background (Appearance) -->
     <string name="appearance_widget_background_label">WIDGET BACKGROUND</string>
     <string name="appearance_widget_preview_label">PREVIEW</string>
+    <string name="appearance_ayah_widget_preview_label">AYAH WIDGET</string>
     <string name="widget_background_follow_theme">System</string>
     <string name="widget_background_light">Light</string>
     <string name="widget_background_dark">Dark</string>

@@ -15,6 +15,7 @@ import world.taqwa.app.design.components.CheckMark
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.appearance_ayah_widget_preview_label
 import world.taqwa.app.resources.appearance_note
 import world.taqwa.app.resources.appearance_theme_label
 import world.taqwa.app.resources.appearance_widget_background_label
@@ -118,6 +119,14 @@ fun AppearanceSettingsScreen(
             background = widgetBackground,
             systemIsDark = systemIsDark,
             content = mirrorContent,
+            modifier = Modifier.padding(horizontal = SettingsGutter),
+        )
+
+        Spacer(Modifier.height(14.dp))
+        SectionLabel(stringResource(Res.string.appearance_ayah_widget_preview_label))
+        AyahWidgetPreview(
+            background = widgetBackground,
+            systemIsDark = systemIsDark,
             modifier = Modifier.padding(horizontal = SettingsGutter),
         )
     }

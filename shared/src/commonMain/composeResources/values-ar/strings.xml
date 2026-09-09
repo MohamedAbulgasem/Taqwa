@@ -173,6 +173,7 @@
     <!-- Widget background (Appearance) -->
     <string name="appearance_widget_background_label">خلفية الودجت</string>
     <string name="appearance_widget_preview_label">معاينة</string>
+    <string name="appearance_ayah_widget_preview_label">ودجة الآية</string>
     <string name="widget_background_follow_theme">حسب النظام</string>
     <string name="widget_background_light">فاتح</string>
     <string name="widget_background_dark">داكن</string>
