@@ -75,7 +75,7 @@ Ring stroke in light mode uses `#E3A21C` — a large-area stroke tolerates a lig
 
 - **Latin:** Manrope (OFL, variable 200–800, ~90 KB subset). Bundled.
 - **Arabic:** system default — SF Arabic on iOS, the OEM font on Android. Not bundled.
-- Tabular figures everywhere a time is shown. Verified: Manrope holds digit width, so the countdown does not jitter as it ticks.
+- Tabular figures everywhere a time is shown. Correction, 9 September 2026: Manrope's default figures are proportional (the "1" is 0.37em against the "0" at 0.59em); the font carries them under the `tnum` feature, which `TaqwaText.Latin.TABULAR` now enables on the countdown and row-time styles.
 
 The Arabic decision is deliberate and has a known cost: Android's Arabic face varies by manufacturer, so Arabic will not look identical across Android devices. In slice 1 this affects five prayer names and is acceptable. **Revisit at slice 4**, where adhkar are vocalised Arabic at paragraph length and OEM harakat rendering becomes a real problem.
 
@@ -109,7 +109,7 @@ Declining either permission is a first-class path, not a dead end. Onboarding is
 
 Header: location name and Hijri date on the left; compass and settings icon buttons on the right.
 
-**Countdown ring** — next prayer name, time remaining (H:MM), and clock time. The ring's filled arc represents elapsed proportion of the interval between the previous and next prayer.
+**Countdown ring** — next prayer name, time remaining (H:MM:SS, ticking every second — amended 9 September 2026: a bare "0:20" was read as twenty seconds by a first-time viewer, so the seconds are shown and the ring text drops from 44 to 36sp to fit "10:00:00"), and clock time. The ring's filled arc represents elapsed proportion of the interval between the previous and next prayer.
 
 **Prayer timeline** — five rows on a vertical rail:
 

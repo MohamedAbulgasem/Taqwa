@@ -33,10 +33,17 @@ object TaqwaText {
      * use, and they are these run through [forScript].
      */
     object Latin {
-        val countdown = TextStyle(fontWeight = FontWeight.Light, fontSize = 44.sp, letterSpacing = (-0.02).em)
+        /**
+         * Manrope's default figures are proportional (its "1" is 40% narrower than its "0"), so a
+         * ticking countdown would shift sideways every second. The font ships tabular figures under
+         * `tnum`; every style that shows a time asks for them.
+         */
+        const val TABULAR = "tnum"
+
+        val countdown = TextStyle(fontWeight = FontWeight.Light, fontSize = 44.sp, letterSpacing = (-0.02).em, fontFeatureSettings = TABULAR)
         val screenTitle = TextStyle(fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, letterSpacing = (-0.02).em)
         val rowLabel = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
-        val rowTime = TextStyle(fontWeight = FontWeight.Normal, fontSize = 17.sp)
+        val rowTime = TextStyle(fontWeight = FontWeight.Normal, fontSize = 17.sp, fontFeatureSettings = TABULAR)
         val sectionLabel = TextStyle(fontWeight = FontWeight.ExtraBold, fontSize = 11.sp, letterSpacing = 0.14.em)
         val caption = TextStyle(fontWeight = FontWeight.Normal, fontSize = 14.sp)
     }

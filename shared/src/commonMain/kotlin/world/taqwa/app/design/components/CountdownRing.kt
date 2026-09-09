@@ -71,7 +71,14 @@ fun CountdownRing(
                 color = colors.accent,
                 textAlign = TextAlign.Center,
             )
-            Text(text = countdown, style = TaqwaText.countdown, color = colors.textPrimary)
+            // 36sp is the largest size at which the longest string a ring can show, "10:00:00" in
+            // tabular Manrope Light, still clears the stroke on both sides (149dp inside 178dp);
+            // scaled with the diameter so a landscape-shrunken ring keeps the same proportions.
+            Text(
+                text = countdown,
+                style = TaqwaText.countdown.copy(fontSize = 36.sp * (diameter / CountdownRingSize)),
+                color = colors.textPrimary,
+            )
             Text(text = clockTime, style = TaqwaText.caption, color = colors.textSecondary)
         }
     }

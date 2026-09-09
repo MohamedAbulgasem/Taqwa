@@ -720,3 +720,25 @@ preview; the release build is R8 code-shrunk to 12.2 MB (from 26.3) with WorkMan
 that the Glance widgets need, resource shrinking left off after it saved only 0.4 MB and was the
 thing that crashed the app the first time; and the sound-sheet footnote no longer says "on this
 platform".
+
+### Countdown seconds and the pre-release version (9 September, evening)
+
+Merged slice 2b to main (fast-forward, 91d7cc9 → 412bb3d), deleted the branch and the leftover
+`size-round` worktree, installed the shrunk release on the LoopPhone.
+
+Mohamed relayed that someone read the ring's "0:20" as twenty seconds. The ring now shows
+H:MM:SS and ticks visibly; the ticking loop already ran once a second for the timeline, so nothing
+new is scheduled. Measuring Manrope's advance widths for the longer string turned up that its
+default figures are proportional (the "1" is 0.37em, the "0" 0.59em), contradicting the slice 1
+spec's "Manrope holds digit width" — the minute-granular ring had been shifting a few pixels
+whenever a 1 came or went, just rarely enough to pass. The font carries tabular figures under
+`tnum`, so `TaqwaText.Latin.TABULAR` now enables them on the countdown and row-time styles. At
+44sp the tabular "10:00:00" would be 182dp wide against 178dp inside the stroke, so the ring's
+text is 36sp (149dp for the worst case, 127dp for a single-digit hour), scaled with the ring's
+diameter. The widgets stay at H:MM: Glance cannot redraw every second, and their countdown is
+minute-granular by design.
+
+Version name is 0.1.0 on both platforms (Android versionCode 2, iOS CFBundleVersion 2 in the app
+and the widget extension, the Settings row reads the same string). New `scripts/bump-version.sh
+<name> <code>` writes all five places; policy from here is a minor bump plus a new code after any
+meaningful change that ships as an APK.
