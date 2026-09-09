@@ -1,5 +1,6 @@
 package world.taqwa.app.widget
 
+import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.RTL_TRANSLATION_LANGUAGES
@@ -12,13 +13,22 @@ import kotlin.random.Random
  * [QuranSource]; the mirror it produces is all either widget process ever reads.
  */
 object AyahPoolMirrorWriter {
-    /** Reads the fifty pool ayahs and the [settings] translation, writes the mirror and, once
-     * per install, the seed. Returns the mirror written. */
+    /**
+     * Reads the fifty pool ayahs and the [settings] translation, writes the mirror and, once per
+     * install, the seed. Returns the mirror written.
+     *
+     * [format] is asked one question — what a `1` looks like — and the answer is recorded in the
+     * mirror as [AyahPoolMirror.arabicIndicDigits], so the widget footer's reference uses the
+     * digits the app itself is drawing rather than the ones CLDR's default for [languageTag]
+     * would suggest (D2, S23 round). It is a parameter rather than a `createPlatformFormat()`
+     * call inside so this stays a plain, testable function with no platform of its own.
+     */
     suspend fun write(
         store: KeyValueStore,
         quran: QuranSource,
         settings: ReadingSettings,
         languageTag: String,
+        format: PlatformFormat,
         newSeed: () -> Long = { Random.nextLong() },
     ): AyahPoolMirror {
         // Several pool ayahs share a surah (e.g. 2, 3, 9, 39, 93 each appear more than once), so
@@ -40,6 +50,7 @@ object AyahPoolMirrorWriter {
             languageTag = languageTag,
             translationId = settings.translationId,
             translationRtl = settings.translationId.substringBefore('.') in RTL_TRANSLATION_LANGUAGES,
+            arabicIndicDigits = format.usesArabicIndicDigits(),
             entries = entries,
         )
         // Seed first, mirror second, and never the other way round. Both widget processes read

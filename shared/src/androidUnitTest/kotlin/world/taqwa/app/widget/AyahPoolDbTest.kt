@@ -3,6 +3,8 @@ package world.taqwa.app.widget
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
+import world.taqwa.app.i18n.EnglishPlatformFormat
+import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.quran.QuranRepository
 import world.taqwa.app.quran.QuranRepositoryDbTest
 import world.taqwa.app.quran.ReadingSettings
@@ -21,6 +23,15 @@ private class FakePoolKeyValueStore : KeyValueStore {
     private val map = mutableMapOf<String, String>()
     override fun putString(key: String, value: String) { map[key] = value }
     override fun getString(key: String): String? = map[key]
+}
+
+/** A device whose own formatter renders Arabic-Indic digits, whatever its tag says — the S23 under
+ * an `ar-LY` per-app locale (D2). */
+private class ArabicIndicFormat(private val tag: String) : PlatformFormat {
+    override fun languageTag() = tag
+    override fun localizedDigits(number: Int) =
+        number.toString().map { "٠١٢٣٤٥٦٧٨٩"[it - '0'] }.joinToString("")
+    override fun clockTime(hour: Int, minute: Int) = "$hour:$minute"
 }
 
 /**
@@ -76,7 +87,7 @@ class AyahPoolMirrorWriterTest {
         val store = FakePoolKeyValueStore()
         val settings = ReadingSettings(translationId = "en.sahih")
 
-        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "en-US")
+        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "en-US", EnglishPlatformFormat)
 
         assertEquals(AyahPool.REFS.size, mirror.entries.size)
         AyahPool.REFS.forEachIndexed { index, (surah, ayah) ->
@@ -93,7 +104,7 @@ class AyahPoolMirrorWriterTest {
         val store = FakePoolKeyValueStore()
         val settings = ReadingSettings(translationId = ReadingSettings.NO_TRANSLATION)
 
-        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "en-US")
+        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "en-US", EnglishPlatformFormat)
 
         assertTrue(mirror.entries.all { it.translation.isEmpty() })
         assertTrue(mirror.entries.all { it.arabic.isNotEmpty() })
@@ -103,7 +114,7 @@ class AyahPoolMirrorWriterTest {
         val store = FakePoolKeyValueStore()
         val settings = ReadingSettings(translationId = "ur.junagarhi")
 
-        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "ur")
+        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "ur", EnglishPlatformFormat)
 
         assertTrue(mirror.translationRtl)
     }
@@ -112,7 +123,7 @@ class AyahPoolMirrorWriterTest {
         val store = FakePoolKeyValueStore()
         val settings = ReadingSettings(translationId = "en.sahih")
 
-        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "en-US")
+        val mirror = AyahPoolMirrorWriter.write(store, repo, settings, "en-US", EnglishPlatformFormat)
 
         assertEquals(false, mirror.translationRtl)
     }
@@ -121,12 +132,29 @@ class AyahPoolMirrorWriterTest {
         val store = FakePoolKeyValueStore()
         val settings = ReadingSettings(translationId = "en.sahih")
 
-        AyahPoolMirrorWriter.write(store, repo, settings, "en-US", newSeed = { 111L })
+        AyahPoolMirrorWriter.write(store, repo, settings, "en-US", EnglishPlatformFormat, newSeed = { 111L })
         val firstSeed = AyahPoolMirror.seed(store)
         assertEquals(111L, firstSeed)
 
-        AyahPoolMirrorWriter.write(store, repo, settings, "en-US", newSeed = { 222L })
+        AyahPoolMirrorWriter.write(store, repo, settings, "en-US", EnglishPlatformFormat, newSeed = { 222L })
         assertEquals(firstSeed, AyahPoolMirror.seed(store))
+    }
+
+    @Test fun theDigitChoiceComesFromTheFormatNotTheLanguageTag() = runTest {
+        val settings = ReadingSettings(translationId = "en.sahih")
+
+        // `ar-LY` defaults to Western digits under CLDR, but this device's formatter draws
+        // Arabic-Indic ones — the mirror has to record what the *app* draws (D2).
+        val arabicIndic = AyahPoolMirrorWriter.write(
+            FakePoolKeyValueStore(), repo, settings, "ar-LY", ArabicIndicFormat("ar-LY"),
+        )
+        assertTrue(arabicIndic.arabicIndicDigits)
+        assertEquals(false, WidgetDigits.defaultsToArabicIndic("ar-LY"))
+
+        val western = AyahPoolMirrorWriter.write(
+            FakePoolKeyValueStore(), repo, settings, "en-US", EnglishPlatformFormat,
+        )
+        assertEquals(false, western.arabicIndicDigits)
     }
 
     @Test fun noSeedIsWrittenBeforeTheFirstWrite() {

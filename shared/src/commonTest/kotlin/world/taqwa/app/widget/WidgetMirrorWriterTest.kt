@@ -21,9 +21,14 @@ private class FakeKeyValueStore : KeyValueStore {
     override fun getString(key: String): String? = map[key]
 }
 
-private class FakePlatformFormat(private val tag: String = "en-US") : PlatformFormat {
+private class FakePlatformFormat(
+    private val tag: String = "en-US",
+    private val arabicIndicDigits: Boolean = false,
+) : PlatformFormat {
     override fun languageTag() = tag
-    override fun localizedDigits(number: Int) = number.toString()
+    override fun localizedDigits(number: Int) =
+        if (arabicIndicDigits) number.toString().map { "٠١٢٣٤٥٦٧٨٩"[it - '0'] }.joinToString("")
+        else number.toString()
     override fun clockTime(hour: Int, minute: Int) =
         "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
 }
@@ -42,6 +47,20 @@ class WidgetMirrorWriterTest {
         countdown = 90.minutes,
         ringProgress = 0.3f,
     )
+
+    @Test
+    fun theSnapshotRecordsTheDigitSetTheFormatItselfDraws() {
+        // Not the CLDR default for the tag: the countdown a widget composes itself has to match
+        // the clock times this same format produced beside it (D2, S23 round).
+        val store = FakeKeyValueStore()
+        WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat("ar-LY", arabicIndicDigits = true))
+        assertEquals(true, WidgetMirrorWriter.read(store)?.arabicIndicDigits)
+        assertEquals(false, WidgetDigits.defaultsToArabicIndic("ar-LY"))
+
+        val western = FakeKeyValueStore()
+        WidgetMirrorWriter.write(western, today, "UTC", FakePlatformFormat("ar-EG"))
+        assertEquals(false, WidgetMirrorWriter.read(western)?.arabicIndicDigits)
+    }
 
     @Test
     fun writingThenReadingReproducesTheCurrentAndNextPrayer() {

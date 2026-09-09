@@ -145,7 +145,8 @@ struct TaqwaWidget_Previews: PreviewProvider {
         ),
         countdownMinutes: 209,
         background: WidgetBackground.followTheme,
-        languageTag: "en"
+        languageTag: "en",
+        arabicIndicDigits: false
     )
 
     static var previews: some View {

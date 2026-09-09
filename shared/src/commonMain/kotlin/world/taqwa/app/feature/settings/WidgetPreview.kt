@@ -39,6 +39,7 @@ import world.taqwa.app.widget.WidgetMirrorWriter
 import world.taqwa.app.widget.WidgetPalette
 import world.taqwa.app.widget.WidgetPaletteColors
 import world.taqwa.app.widget.WidgetPrayerRow
+import world.taqwa.app.widget.usesArabicIndicDigits
 
 /** The preview cards' height. Both cards share it; the wide one is what is left of the row. */
 private val CardHeight = 100.dp
@@ -171,7 +172,17 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
     }
 }
 
-private fun countdown(minutes: Long): String = "${minutes / 60}:${(minutes % 60).toString().padStart(2, '0')}"
+/**
+ * The preview's countdown, in the digits the app itself draws — asked of the platform, not derived
+ * from the language tag, which is the rule the real widgets now follow through the mirror's
+ * `arabicIndicDigits` (D2, S23 round). A preview showing "5:36" beside a widget showing "٥:٣٦"
+ * would be a new disagreement in the place whose whole job is to show what the widget looks like.
+ */
+@Composable
+private fun countdown(minutes: Long): String = WidgetDigits.localize(
+    "${minutes / 60}:${(minutes % 60).toString().padStart(2, '0')}",
+    LocalPlatformFormat.current.usesArabicIndicDigits(),
+)
 
 private val SampleTimes = mapOf(
     Prayer.FAJR to "5:35",
@@ -189,19 +200,21 @@ private val SampleTimes = mapOf(
  */
 @Composable
 private fun sampleContent(): WidgetContent {
-    val languageTag = LocalPlatformFormat.current.languageTag()
+    val format = LocalPlatformFormat.current
+    val languageTag = format.languageTag()
+    val arabicIndic = format.usesArabicIndicDigits()
     val rows = ObligatoryPrayers.map { prayer ->
         WidgetPrayerRow(
             prayer = prayer,
             displayName = PrayerNaming.display(prayer, languageTag, localizedPrayerName(prayer)),
-            clockTime = WidgetDigits.localize(SampleTimes.getValue(prayer), languageTag),
+            clockTime = WidgetDigits.localize(SampleTimes.getValue(prayer), arabicIndic),
             isCurrent = prayer == Prayer.ASR,
         )
     }
     return WidgetContent(
         nextPrayerDisplayName = PrayerNaming.display(Prayer.MAGHRIB, languageTag, localizedPrayerName(Prayer.MAGHRIB)),
         countdownMinutes = 21,
-        nextClockTime = WidgetDigits.localize(SampleTimes.getValue(Prayer.MAGHRIB), languageTag),
+        nextClockTime = WidgetDigits.localize(SampleTimes.getValue(Prayer.MAGHRIB), arabicIndic),
         rows = rows,
         ringProgress = 0.86f,
         countdownLabel = WidgetMirrorWriter.countdownLabel(Prayer.MAGHRIB, languageTag),

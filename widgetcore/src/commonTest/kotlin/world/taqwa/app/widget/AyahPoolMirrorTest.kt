@@ -44,6 +44,7 @@ class AyahPoolMirrorTest {
         languageTag = "en-US",
         translationId = "en.sahih",
         translationRtl = false,
+        arabicIndicDigits = false,
         entries = listOf(entryOne, entryTwo),
     )
 
@@ -78,6 +79,25 @@ class AyahPoolMirrorTest {
     }
 
     @Test
+    fun roundTripsTheArabicIndicDigitChoice() {
+        // The app's own answer, not one derived from the tag: an Arabic UI on a device whose ICU
+        // data keeps Western digits writes `false` under an `ar` tag, and that has to survive the
+        // wire (D2).
+        val arabicIndic = mirror.copy(languageTag = "ar-LY", arabicIndicDigits = true)
+        val restored = AyahPoolMirror.deserialize(AyahPoolMirror.serialize(arabicIndic))
+        assertEquals(arabicIndic, restored)
+        assertEquals(true, restored?.arabicIndicDigits)
+
+        val western = mirror.copy(languageTag = "ar-EG", arabicIndicDigits = false)
+        assertEquals(false, AyahPoolMirror.deserialize(AyahPoolMirror.serialize(western))?.arabicIndicDigits)
+    }
+
+    @Test
+    fun theSerialisedHeaderCarriesVersionTwo() {
+        assertEquals("2", AyahPoolMirror.serialize(mirror).substringBefore(fs))
+    }
+
+    @Test
     fun roundTripsRtlTranslation() {
         val rtl = mirror.copy(translationRtl = true)
         val restored = AyahPoolMirror.deserialize(AyahPoolMirror.serialize(rtl))
@@ -105,13 +125,35 @@ class AyahPoolMirrorTest {
 
     @Test
     fun aFutureVersionDeserializesToNull() {
-        val futureVersion = listOf("2", "en-US", "en.sahih", "0").joinToString(fs)
+        val futureVersion = listOf("3", "en-US", "en.sahih", "0", "0").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(futureVersion))
     }
 
     @Test
+    fun aVersionOneMirrorDeserializesToNull() {
+        // The version-1 header has no digit field, and there is nothing honest to default it to
+        // (D2): the widgets treat "no mirror" as "write one" (Android) or "show the placeholder"
+        // (iOS), which is the right behaviour for a mirror left by the previous build.
+        val versionOne = listOf("1", "en-US", "en.sahih", "0").joinToString(fs)
+        val entry = listOf("9", "51", "At-Tawbah", "التوبة", "text", "trans").joinToString(fs)
+        assertNull(AyahPoolMirror.deserialize(versionOne + rs + entry))
+    }
+
+    @Test
+    fun aHeaderMissingTheDigitFieldDeserializesToNull() {
+        val fourFieldHeader = listOf("2", "en-US", "en.sahih", "0").joinToString(fs)
+        assertNull(AyahPoolMirror.deserialize(fourFieldHeader))
+    }
+
+    @Test
+    fun aDigitFieldThatIsNotZeroOrOneDeserializesToNull() {
+        val header = listOf("2", "en-US", "en.sahih", "0", "yes").joinToString(fs)
+        assertNull(AyahPoolMirror.deserialize(header))
+    }
+
+    @Test
     fun anEntryWithFiveFieldsDeserializesToNull() {
-        val header = listOf("1", "en-US", "en.sahih", "0").joinToString(fs)
+        val header = listOf("2", "en-US", "en.sahih", "0", "0").joinToString(fs)
         // Five fields: missing the trailing translation field.
         val shortEntry = listOf("9", "51", "At-Tawbah", "التوبة", "text").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(header + rs + shortEntry))
@@ -119,7 +161,7 @@ class AyahPoolMirrorTest {
 
     @Test
     fun anEntryWithNonIntegerSurahDeserializesToNull() {
-        val header = listOf("1", "en-US", "en.sahih", "0").joinToString(fs)
+        val header = listOf("2", "en-US", "en.sahih", "0", "0").joinToString(fs)
         val badEntry = listOf("nine", "51", "At-Tawbah", "التوبة", "text", "trans").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(header + rs + badEntry))
     }
@@ -147,7 +189,7 @@ class AyahPoolMirrorTest {
 
     @Test
     fun aHeaderWithTheWrongFieldCountDeserializesToNull() {
-        val tooFewFields = listOf("1", "en-US", "en.sahih").joinToString(fs)
+        val tooFewFields = listOf("2", "en-US", "en.sahih").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(tooFewFields))
     }
 

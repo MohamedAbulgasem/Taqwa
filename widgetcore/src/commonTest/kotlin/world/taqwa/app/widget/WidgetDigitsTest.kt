@@ -44,4 +44,27 @@ class WidgetDigitsTest {
         assertEquals("1:05", WidgetDigits.localize("1:05", "AR-ly"))
         assertEquals("١:٠٥", WidgetDigits.localize("1:05", "AR-eg"))
     }
+
+    // -- The explicit choice, which is what every widget with a mirror uses (D2) ---------------
+
+    @Test
+    fun theExplicitChoiceOverridesWhateverTheTagWouldHaveSaid() {
+        // An `ar-LY` device whose own ICU data renders Arabic-Indic digits — the S23 under a
+        // per-app locale — is exactly the case the tag rule gets wrong.
+        assertEquals("١:٠٥", WidgetDigits.localize("1:05", arabicIndic = true))
+        // And the other direction: an `ar-EG` tag on a device the app is drawing Western digits on.
+        assertEquals("1:05", WidgetDigits.localize("1:05", arabicIndic = false))
+    }
+
+    @Test
+    fun theExplicitChoiceLeavesEverythingButAsciiDigitsAlone() {
+        assertEquals("h:mm ٠١٢٣", WidgetDigits.localize("h:mm 0123", arabicIndic = true))
+    }
+
+    @Test
+    fun theTagRuleIsExposedForCallersWithNoMirrorToConsult() {
+        assertEquals(true, WidgetDigits.defaultsToArabicIndic("ar-EG"))
+        assertEquals(false, WidgetDigits.defaultsToArabicIndic("ar-LY"))
+        assertEquals(false, WidgetDigits.defaultsToArabicIndic("en-GB"))
+    }
 }

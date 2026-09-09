@@ -32,30 +32,47 @@ package world.taqwa.app.widget
  * a behaviour no other code agrees with. Left Western until the app itself handles them.
  */
 object WidgetDigits {
-    private const val WESTERN_DIGITS = "0123456789"
     private const val ARABIC_INDIC_DIGITS = "٠١٢٣٤٥٦٧٨٩"
 
     /** `ar-*` region codes that default to Western digits despite the language being Arabic. */
     private val WESTERN_ARABIC_REGIONS = setOf("LY", "MA", "TN", "DZ", "EH", "MR")
 
-    private fun digitsFor(languageTag: String): String {
+    /**
+     * True when [languageTag] *defaults* to Arabic-Indic digits under the CLDR rule above.
+     *
+     * A guess, and only ever a fallback: it reads the tag rather than asking the platform, so a
+     * device whose own ICU data disagrees — an `ar-LY` S23 renders every number in the app in
+     * Arabic-Indic digits — makes the widget contradict the app sitting behind it (D2, S23 round).
+     * Every widget that has a mirror to read therefore takes the digit choice recorded in it
+     * ([AyahPoolMirror.arabicIndicDigits], [WidgetSnapshot.arabicIndicDigits]), which the app
+     * wrote by asking its own `PlatformFormat` what a `1` looks like. This stays for the one case
+     * with no mirror to consult.
+     */
+    fun defaultsToArabicIndic(languageTag: String): Boolean {
         val tag = languageTag.uppercase()
         val language = tag.substringBefore('-')
-        if (language != "AR") return WESTERN_DIGITS
+        if (language != "AR") return false
         val region = tag.substringAfter('-', missingDelimiterValue = "")
-        return if (region in WESTERN_ARABIC_REGIONS) WESTERN_DIGITS else ARABIC_INDIC_DIGITS
+        return region !in WESTERN_ARABIC_REGIONS
     }
 
     /**
      * Replaces every ASCII digit `0`-`9` in [text] with the digit [languageTag] defaults to.
      * Everything else in [text] — `:` separators, spaces, RTL marks — passes through unchanged.
      */
-    fun localize(text: String, languageTag: String): String {
-        val digits = digitsFor(languageTag)
-        if (digits === WESTERN_DIGITS) return text
+    fun localize(text: String, languageTag: String): String =
+        localize(text, defaultsToArabicIndic(languageTag))
+
+    /**
+     * The same rewrite against a digit choice the caller already knows — the app's own, carried in
+     * the mirror — rather than one guessed from a language tag. This is what every widget with a
+     * mirror uses, so the widget and the app can never show a number in two different scripts.
+     */
+    fun localize(text: String, arabicIndic: Boolean): String {
+        if (!arabicIndic) return text
         return buildString(text.length) {
             for (c in text) {
-                append(if (c in '0'..'9') digits[c - '0'] else c)
+                append(if (c in '0'..'9') ARABIC_INDIC_DIGITS[c - '0'] else c)
             }
         }
     }

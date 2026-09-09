@@ -62,33 +62,28 @@ struct TaqwaEntry: TimelineEntry {
     /// Minutes remaining at `date`, already extrapolated forward from the mirror write.
     let countdownMinutes: Int64
     let background: WidgetBackground
-    /// `WidgetSnapshot.languageTag`, or `""` for the placeholder entry (no numbers are shown then).
-    /// Needed here — rather than read off `content`, which does not carry it — because the
-    /// countdown text below is built locally instead of read pre-formatted from the snapshot.
+    /// `WidgetSnapshot.languageTag`, or `""` for the placeholder entry. Kept alongside `content`,
+    /// which does not carry it, for anything that has to know which language the mirror was
+    /// written in; the countdown's *digits* come from `arabicIndicDigits` below rather than from
+    /// this tag (D2).
     let languageTag: String
+    /// `WidgetSnapshot.arabicIndicDigits`: the digit set the *app* draws, as its own
+    /// `PlatformFormat` answered when it wrote the mirror. The countdown is the one number this
+    /// extension composes itself, so it is the one that has to be told rather than left to derive
+    /// its own answer from `languageTag` — a device whose ICU data disagrees with CLDR's default
+    /// for that tag (an `ar-LY` S23) then showed the countdown in different digits from the clock
+    /// times beside it (D2, S23 round).
+    let arabicIndicDigits: Bool
 
-    /// Built with `NumberFormatter` rather than raw interpolation so the countdown's digits match
-    /// `content.nextClockTime`'s locale-default digit set instead of always being Western (I9).
-    /// Mirrors `WidgetDigits`/`CountdownFormatter`'s convention: this is minute-granular and
+    /// Built through the shared `WidgetDigits` against the mirror's recorded choice, so this
+    /// countdown, the Android one and the app all agree (D2 — it used to ask `NumberFormatter` for
+    /// the locale default instead, which is the guess the mirror now replaces). Minute-granular and
     /// redrawn at most once a minute, so the Today ring's per-second tabular-jitter exception
     /// (spec §4.2) does not apply.
     var countdownText: String {
         let m = max(0, countdownMinutes)
-        let locale = Locale(identifier: languageTag)
-
-        let hourFormatter = NumberFormatter()
-        hourFormatter.locale = locale
-        hourFormatter.usesGroupingSeparator = false
-
-        let minuteFormatter = NumberFormatter()
-        minuteFormatter.locale = locale
-        minuteFormatter.usesGroupingSeparator = false
-        minuteFormatter.minimumIntegerDigits = 2
-
-        let hours = hourFormatter.string(from: NSNumber(value: m / 60)) ?? "\(m / 60)"
-        let minutes = minuteFormatter.string(from: NSNumber(value: m % 60))
-            ?? String(format: "%02d", m % 60)
-        return "\(hours):\(minutes)"
+        let text = String(format: "%d:%02d", m / 60, m % 60)
+        return WidgetDigits.shared.localize(text: text, arabicIndic: arabicIndicDigits)
     }
 }
 
@@ -99,7 +94,10 @@ struct TaqwaTimelineProvider: TimelineProvider {
     private static let entryCount = 60
 
     func placeholder(in context: Context) -> TaqwaEntry {
-        TaqwaEntry(date: Date(), content: nil, countdownMinutes: 0, background: .followTheme, languageTag: "")
+        TaqwaEntry(
+            date: Date(), content: nil, countdownMinutes: 0, background: .followTheme,
+            languageTag: "", arabicIndicDigits: false
+        )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (TaqwaEntry) -> Void) {
@@ -137,7 +135,10 @@ struct TaqwaTimelineProvider: TimelineProvider {
             ringProgress: 0.86,
             countdownLabel: arabic ? "متبقٍ على المغرب" : "Maghrib in"
         )
-        return TaqwaEntry(date: Date(), content: content, countdownMinutes: 21, background: background, languageTag: tag)
+        return TaqwaEntry(
+            date: Date(), content: content, countdownMinutes: 21, background: background,
+            languageTag: tag, arabicIndicDigits: WidgetDigits.shared.defaultsToArabicIndic(languageTag: tag)
+        )
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<TaqwaEntry>) -> Void) {
@@ -149,7 +150,10 @@ struct TaqwaTimelineProvider: TimelineProvider {
     static func entries(from start: Date) -> [TaqwaEntry] {
         let background = TaqwaMirror.background()
         guard let (snapshot, deadline) = TaqwaMirror.read() else {
-            return [TaqwaEntry(date: start, content: nil, countdownMinutes: 0, background: background, languageTag: "")]
+            return [TaqwaEntry(
+                date: start, content: nil, countdownMinutes: 0, background: background,
+                languageTag: "", arabicIndicDigits: false
+            )]
         }
         return (0..<entryCount).map { minute in
             let date = start.addingTimeInterval(Double(minute) * 60)
@@ -163,7 +167,8 @@ struct TaqwaTimelineProvider: TimelineProvider {
                 content: content,
                 countdownMinutes: derived?.int64Value ?? remainingMinutes(content: content, deadline: deadline, at: date),
                 background: background,
-                languageTag: snapshot.languageTag
+                languageTag: snapshot.languageTag,
+                arabicIndicDigits: snapshot.arabicIndicDigits
             )
         }
     }

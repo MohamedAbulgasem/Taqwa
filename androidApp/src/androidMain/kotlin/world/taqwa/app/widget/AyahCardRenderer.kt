@@ -27,17 +27,17 @@ import kotlin.math.sqrt
  * `WidgetPalette` as plain ARGB ints — the renderer knows nothing about the background choice, it
  * only ever draws on transparency (see [AyahCardRenderer]).
  *
- * [languageTag] is the mirror's own tag, not the device's: it decides the digit set of the footer
- * reference through `WidgetDigits.localize`, and it must agree with the text sitting beside it,
- * which was written into the mirror under that same tag.
+ * [arabicIndicDigits] is the mirror's record of the digit set the app itself draws, not a guess
+ * from its language tag: the footer's reference has to agree with the numbers in the app behind it,
+ * and on an `ar-LY` device the tag rule and the device's own ICU data disagree (D2, S23 round).
  */
 class AyahCardInput(
     val widthPx: Int,
     val heightPx: Int,
     val density: Float,
     val entry: AyahPoolEntry,
-    val languageTag: String,
     val arabicUi: Boolean,
+    val arabicIndicDigits: Boolean,
     val translationRtl: Boolean,
     val showTranslation: Boolean,
     val textArgb: Int,
@@ -62,13 +62,39 @@ object AyahCardRenderer {
 
     private const val PADDING_DP = 14f
 
-    /** Auto-fit range for the Arabic, in sp, walked from the top down in 1 sp steps. */
+    /**
+     * Auto-fit range for the Arabic, in sp, walked from the top down in 1 sp steps. [ARABIC_MAX_SP]
+     * is the ceiling for a card the size the spec sizes the design at ([FIT_HEIGHT_DP]); taller
+     * cells raise it, up to [ARABIC_CEILING_SP] — see [maxArabicSp].
+     */
     private const val ARABIC_MAX_SP = 28
     private const val ARABIC_MIN_SP = 17
 
+    /**
+     * The largest the Arabic is ever drawn, whatever the cell.
+     *
+     * A 4x6 cell at the old flat 28 sp ceiling was about 60 % empty card (N1, S23 round): the fit
+     * only ever walked *down*, so extra height bought nothing. Past this the ayah stops reading as
+     * a card and starts reading as a poster, and a long ayah at 40 sp already needs most of a
+     * full-column cell.
+     */
+    private const val ARABIC_CEILING_SP = 40
+
+    /** The drawn height, in dp, at which the ceiling is exactly [ARABIC_MAX_SP]: the 4x3 cell the
+     * design is drawn at (320 x 236 dp, spec §2). */
+    private const val FIT_HEIGHT_DP = 236f
+
+    /** Extra sp of ceiling per dp of height past [FIT_HEIGHT_DP]. About 6 sp for a 4x4 cell and
+     * the full [ARABIC_CEILING_SP] by 4x6, which is where the empty card was. */
+    private const val ARABIC_GROWTH_PER_DP = 0.06f
+
     private const val TRANSLATION_RATIO = 0.6f
     private const val TRANSLATION_MIN_SP = 11.5f
-    private const val TRANSLATION_MAX_SP = 15f
+
+    /** Raised from 15 sp with the Arabic ceiling (N1): a 34 sp Arabic over a 15 sp translation
+     * reads as two unrelated blocks, and the x0.6 rule wants 17 sp long before the Arabic
+     * reaches its own ceiling. */
+    private const val TRANSLATION_MAX_SP = 17f
 
     private const val ARABIC_LINE_HEIGHT = 1.75f
     private const val TRANSLATION_LINE_HEIGHT = 1.45f
@@ -134,8 +160,9 @@ object AyahCardRenderer {
     /**
      * Renders [input] to a fresh transparent `ARGB_8888` bitmap.
      *
-     * The layout is chosen by auto-fit (spec §2): the largest Arabic size from 28 sp down to 17 sp
-     * at which the Arabic, the translation and the footer all fit the cell. Nothing fits at the
+     * The layout is chosen by auto-fit (spec §2): the largest Arabic size from this cell's own
+     * ceiling ([maxArabicSp], 28 sp at 4x3 and up to 40 sp on a tall cell or with the translation
+     * off) down to 17 sp at which the Arabic, the translation and the footer all fit the cell. Nothing fits at the
      * floor only on a cell too short for the ayah it drew today — there the translation is
      * clamped to the lines that remain and ellipsised, because the Arabic is never cut.
      */
@@ -219,6 +246,28 @@ object AyahCardRenderer {
             get() = contentHeight + footerBlockHeight
     }
 
+    /**
+     * The top of the auto-fit walk for this cell (N1/N2, S23 round).
+     *
+     * Two rules, both about the same complaint — a tall card that draws small text and leaves the
+     * rest blank:
+     * - the ceiling grows with the drawn height, [ARABIC_GROWTH_PER_DP] per dp past the 4x3 the
+     *   design is set at, capped at [ARABIC_CEILING_SP];
+     * - with the translation off the Arabic may reach that cap at *any* height, because it is then
+     *   the only thing on the card. At 4x3 with the translation on this ayah was already at the
+     *   old flat ceiling, so turning the translation off changed nothing at all (N2) — the fit had
+     *   nowhere higher to go.
+     *
+     * Only the ceiling moves. The walk still steps down 1 sp at a time and still floors at
+     * [ARABIC_MIN_SP], so nothing that fits today stops fitting.
+     */
+    private fun maxArabicSp(input: AyahCardInput): Int {
+        if (!input.showTranslation || input.entry.translation.isEmpty()) return ARABIC_CEILING_SP
+        val heightDp = input.heightPx / input.density
+        val grown = ARABIC_MAX_SP + (heightDp - FIT_HEIGHT_DP) * ARABIC_GROWTH_PER_DP
+        return grown.coerceIn(ARABIC_MAX_SP.toFloat(), ARABIC_CEILING_SP.toFloat()).toInt()
+    }
+
     private fun fit(
         context: Context,
         input: AyahCardInput,
@@ -228,7 +277,7 @@ object AyahCardRenderer {
         footer: FooterRow,
         compact: Boolean,
     ): CardBlocks {
-        for (sp in ARABIC_MAX_SP downTo ARABIC_MIN_SP) {
+        for (sp in maxArabicSp(input) downTo ARABIC_MIN_SP) {
             val blocks = blocksAt(context, input, density, innerWidth, footer, compact, sp.toFloat(), maxLines = null)
             if (blocks.totalHeight <= innerHeight) return blocks
         }
@@ -427,9 +476,9 @@ object AyahCardRenderer {
         val primary = input.textArgb
         val tertiary = input.textArgb.withAlpha(TERTIARY_ALPHA)
         // Built by interpolation rather than pre-formatted upstream, so it needs the same pass
-        // through WidgetDigits every other number a widget composes itself gets — including the
-        // ar-LY / ar-MA rule, where CLDR keeps Arabic on Western digits.
-        val reference = WidgetDigits.localize("${entry.surah}:${entry.ayah}", input.languageTag)
+        // through WidgetDigits every other number a widget composes itself gets — against the
+        // choice the app recorded in the mirror, so the two can never disagree (D2).
+        val reference = WidgetDigits.localize("${entry.surah}:${entry.ayah}", input.arabicIndicDigits)
         val arabicNameSp = when {
             compact -> FOOTER_ARABIC_COMPACT_SP
             input.arabicUi -> FOOTER_ARABIC_UI_SP

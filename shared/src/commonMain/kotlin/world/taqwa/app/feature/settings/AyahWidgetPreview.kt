@@ -76,7 +76,13 @@ fun AyahWidgetPreview(
     val today = Clock.System.now().toLocalDateTime(zone).date
     val epochDay = AyahRotation.epochDay(today.year, today.monthNumber, today.dayOfMonth)
     val shown = mirror?.entryFor(epochDay, seed)?.let {
-        AyahPreviewContent(it, mirror.showsTranslation, mirror.translationRtl, mirror.languageTag)
+        AyahPreviewContent(
+            it,
+            mirror.showsTranslation,
+            mirror.translationRtl,
+            mirror.languageTag,
+            mirror.arabicIndicDigits,
+        )
     } ?: AyahPreviewContent(
         SampleEntry,
         showsTranslation = true,
@@ -84,6 +90,7 @@ fun AyahWidgetPreview(
         // No mirror, no tag to follow: the sample is the app's own copy, so it follows the device
         // (see [AyahCardFooter]).
         languageTag = null,
+        arabicIndicDigits = null,
     )
 
     Box(
@@ -102,17 +109,20 @@ fun AyahWidgetPreview(
  *
  * [languageTag] is the mirror's own tag, or null when this is the built-in sample and there is no
  * mirror to follow — the distinction both widgets make, and the one the footer needs (§M3).
+ * [arabicIndicDigits] is the mirror's recorded digit choice, null on the same sample, where the
+ * device's own format answers instead.
  */
 private data class AyahPreviewContent(
     val entry: AyahPoolEntry,
     val showsTranslation: Boolean,
     val translationRtl: Boolean,
     val languageTag: String?,
+    val arabicIndicDigits: Boolean?,
 )
 
 @Composable
 private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColors) {
-    val (entry, showsTranslation, translationRtl, languageTag) = shown
+    val (entry, showsTranslation, translationRtl, languageTag, arabicIndicDigits) = shown
     val textColor = Color(colors.textArgb)
     Column(
         Modifier
@@ -152,7 +162,7 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
                 }
             }
         }
-        AyahCardFooter(entry, textColor, languageTag)
+        AyahCardFooter(entry, textColor, languageTag, arabicIndicDigits)
     }
 }
 
@@ -164,12 +174,19 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
  * (`TaqwaAyahGlanceWidget.readAyahRender`, `AyahTimelineProvider.entries`): the tag is the one the
  * surah names in the mirror were read under, so the digits beside them stay in the same script.
  * A preview that took the device's answer instead would disagree with the card it is previewing
- * whenever the two differ — the window between a language change and the mirror's rewrite, and an
- * `ar-LY` device, whose Arabic UI still wants Western digits. Only the sample, which the app owns
- * and no mirror describes, falls back to the device's own values.
+ * whenever the two differ — the window between a language change and the mirror's rewrite. The
+ * digits follow the mirror's recorded [arabicIndicDigits] rather than being re-derived from the
+ * tag, for the reason D2 records: on an `ar-LY` S23 the tag rule and the device's own ICU data
+ * give different answers, and the mirror carries the one the app is actually drawing. Only the
+ * sample, which the app owns and no mirror describes, falls back to the device's own values.
  */
 @Composable
-private fun AyahCardFooter(entry: AyahPoolEntry, textColor: Color, languageTag: String?) {
+private fun AyahCardFooter(
+    entry: AyahPoolEntry,
+    textColor: Color,
+    languageTag: String?,
+    arabicIndicDigits: Boolean?,
+) {
     Column {
         Box(
             Modifier
@@ -180,8 +197,8 @@ private fun AyahCardFooter(entry: AyahPoolEntry, textColor: Color, languageTag: 
         Spacer(Modifier.height(8.dp))
         val format = LocalPlatformFormat.current
         val plainReference = "${entry.surah}:${entry.ayah}"
-        val reference = if (languageTag != null) {
-            WidgetDigits.localize(plainReference, languageTag)
+        val reference = if (arabicIndicDigits != null) {
+            WidgetDigits.localize(plainReference, arabicIndicDigits)
         } else {
             "${format.localizedDigits(entry.surah)}:${format.localizedDigits(entry.ayah)}"
         }

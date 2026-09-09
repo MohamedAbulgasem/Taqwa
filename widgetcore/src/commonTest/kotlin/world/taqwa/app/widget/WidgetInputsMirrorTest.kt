@@ -30,6 +30,25 @@ class WidgetInputsMirrorTest {
     }
 
     @Test
+    fun theArabicIndicDigitChoiceRoundTripsThroughSerialization() {
+        val arabicIndic = snapshot.copy(languageTag = "ar-LY", arabicIndicDigits = true)
+        val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(arabicIndic))
+        assertEquals(arabicIndic, restored)
+        assertEquals(true, restored?.arabicIndicDigits)
+    }
+
+    @Test
+    fun aPreDigitChoiceSnapshotDeserializesToWesternRatherThanThrowing() {
+        // The eleven-field shape, i.e. the mirror the build before D2 left behind. Western is what
+        // that build drew, so an old mirror keeps rendering exactly as it did.
+        val elevenFields = "ASR|42|15:47|FAJR=05:12;DHUHR=12:34;ASR=15:47;MAGHRIB=18:20;ISHA=19:50" +
+            "|DHUHR|en-US|0.42|Asr in|1757173200|1757163600|"
+        val restored = WidgetInputsMirror.deserialize(elevenFields)
+        assertEquals(Prayer.ASR, restored?.nextPrayer)
+        assertEquals(false, restored?.arabicIndicDigits)
+    }
+
+    @Test
     fun countdownLabelRoundTripsThroughSerialization() {
         val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(snapshot))
         assertEquals("Asr in", restored?.countdownLabel)

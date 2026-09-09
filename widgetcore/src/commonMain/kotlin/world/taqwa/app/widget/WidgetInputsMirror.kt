@@ -47,6 +47,18 @@ data class WidgetSnapshot(
      * a build before this field existed, in which case the older fields carry the render.
      */
     val schedule: List<ScheduledPrayer> = emptyList(),
+    /**
+     * Whether the app itself renders numbers in Arabic-Indic digits, as its own `PlatformFormat`
+     * answered when the mirror was written.
+     *
+     * The countdown is the one number a prayer widget composes itself ("h:mm"), so it is the one
+     * number that has to be told which digits the app is using rather than deriving them from
+     * [languageTag]: CLDR keeps `ar-LY` on Western digits, the S23's own ICU data does not, and
+     * the widget then disagreed with the clock times sitting beside it in the same card (D2, S23
+     * round). `false` on a mirror written before this field existed — the same Western default
+     * that build already drew for the two tags where the two rules differ.
+     */
+    val arabicIndicDigits: Boolean = false,
 )
 
 /** One entry of [WidgetSnapshot.schedule]. [dayIndex] is 0 for the day of writing, 1 for the
@@ -72,7 +84,8 @@ object WidgetInputsMirror {
     /**
      * The wire format has only ever grown, and always by appending. Seven fields is the original
      * shape, eight added [WidgetSnapshot.countdownLabel], ten added the absolute prayer instants,
-     * eleven added the two-day [WidgetSnapshot.schedule].
+     * eleven added the two-day [WidgetSnapshot.schedule], twelve
+     * [WidgetSnapshot.arabicIndicDigits].
      * [deserialize] therefore accepts *at least* the original seven and reads anything beyond that
      * positionally, defaulting what is absent — a mirror left behind by an older build must keep
      * rendering something rather than dropping the widget to its placeholder.
@@ -96,6 +109,7 @@ object WidgetInputsMirror {
                 listOf(e.prayer.name, e.epochSeconds.toString(), e.clockTime, e.dayIndex.toString())
                     .joinToString(SCHEDULE_SEP)
             },
+            if (snapshot.arabicIndicDigits) "1" else "0",
         ).joinToString(FIELD_SEP)
     }
 
@@ -141,6 +155,9 @@ object WidgetInputsMirror {
                 nextPrayerEpochSeconds = parts.getOrElse(8) { "" }.toLongOrNull() ?: 0L,
                 previousPrayerEpochSeconds = parts.getOrElse(9) { "" }.toLongOrNull() ?: 0L,
                 schedule = parts.getOrElse(10) { "" }.let(::parseSchedule),
+                // Absent on any mirror written before D2. Western is both the safe default and
+                // what those builds drew, so an old mirror keeps rendering exactly as it did.
+                arabicIndicDigits = parts.getOrElse(11) { "" } == "1",
             )
         } catch (e: IllegalArgumentException) {
             null

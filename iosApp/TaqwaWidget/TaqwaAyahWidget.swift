@@ -97,8 +97,14 @@ struct AyahEntry: TimelineEntry {
     /// that paragraph left to right.
     let arabicUi: Bool
     /// The mirror's tag, not the device's — it is the tag the surah names in it were read under,
-    /// so the footer's digits follow the script those names are already in.
+    /// so the footer's script follows the script those names are already in.
     let languageTag: String
+    /// `AyahPoolMirror.arabicIndicDigits`: the digit set the *app* itself draws, recorded when it
+    /// wrote the mirror. Not derived from `languageTag`, because CLDR's default for a tag and the
+    /// device's own ICU data are allowed to disagree — under an `ar-LY` per-app locale the S23
+    /// draws Arabic-Indic digits everywhere in the app while the tag rule says Western, and the
+    /// widget footer contradicted the app (D2, S23 round).
+    let arabicIndicDigits: Bool
     let background: WidgetBackground
 }
 
@@ -111,7 +117,7 @@ struct AyahTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> AyahEntry {
         AyahEntry(
             date: Date(), entry: nil, showTranslation: false, translationRtl: false,
-            arabicUi: false, languageTag: "", background: .followTheme
+            arabicUi: false, languageTag: "", arabicIndicDigits: false, background: .followTheme
         )
     }
 
@@ -150,6 +156,7 @@ struct AyahTimelineProvider: TimelineProvider {
                 translationRtl: mirror?.translationRtl ?? false,
                 arabicUi: tag.hasPrefix("ar"),
                 languageTag: tag,
+                arabicIndicDigits: mirror?.arabicIndicDigits ?? false,
                 background: background
             )
         }
@@ -211,7 +218,11 @@ struct AyahTimelineProvider: TimelineProvider {
         )
         return AyahEntry(
             date: Date(), entry: entry, showTranslation: true, translationRtl: arabic,
-            arabicUi: arabic, languageTag: tag, background: background
+            arabicUi: arabic, languageTag: tag,
+            // The gallery sample has no mirror to read, so this is the one place the tag rule
+            // still answers the question (see `WidgetDigits.defaultsToArabicIndic`).
+            arabicIndicDigits: WidgetDigits.shared.defaultsToArabicIndic(languageTag: tag),
+            background: background
         )
     }
 }
@@ -246,8 +257,22 @@ struct TaqwaAyahWidgetView: View {
     private var textColor: Color { Color(argb: colors.textArgb) }
     private var accentColor: Color { Color(argb: colors.accentArgb) }
 
+    /// True when this card actually draws a translation — the mirror can say translations are on
+    /// while this particular entry has none.
+    private var showsTranslation: Bool {
+        entry.showTranslation && !(entry.entry?.translation.isEmpty ?? true)
+    }
+
     // Spec §2 metrics.
-    private var arabicSize: CGFloat { compact ? 19 : 26 }
+    /// Large with the translation off goes to 32 pt, the same move Android's renderer makes when
+    /// it lifts its auto-fit ceiling for a translation-less card (N1/N2, S23 round). Android's
+    /// other half of that rule — a ceiling that grows with the drawn height, up to 40 sp — has no
+    /// counterpart here: a WidgetKit family is a fixed cell, so Large *is* the tall case, and
+    /// there is no 4x6 for the size to grow into.
+    private var arabicSize: CGFloat {
+        if compact { return 19 }
+        return showsTranslation ? 26 : 32
+    }
     private var translationSize: CGFloat { compact ? 13 : 14 }
     private var translationLineLimit: Int { compact ? 3 : 8 }
     /// The Arabic name's size: 16 pt normally, 15 pt under an Arabic UI, 14 pt in a compact footer.
@@ -286,7 +311,7 @@ struct TaqwaAyahWidgetView: View {
             Spacer(minLength: 0)
             VStack(spacing: 8) {
                 arabicText(ayah)
-                if entry.showTranslation && !ayah.translation.isEmpty {
+                if showsTranslation {
                     translationText(ayah)
                 }
             }
@@ -358,11 +383,11 @@ struct TaqwaAyahWidgetView: View {
 
     private func footerRow(_ ayah: AyahPoolEntry) -> some View {
         // Composed here rather than pre-formatted upstream, so it takes the same pass through
-        // `WidgetDigits` every number a widget builds itself gets — including the ar-LY / ar-MA
-        // rule, where CLDR keeps Arabic on Western digits, so this stays Western on Mohamed's
-        // own locale exactly as the app does.
+        // `WidgetDigits` every number a widget builds itself gets — against the choice the app
+        // recorded in the mirror, so the reference is in the digits the app is drawing whatever
+        // CLDR's default for the tag happens to be (D2).
         let reference = WidgetDigits.shared.localize(
-            text: "\(ayah.surah):\(ayah.ayah)", languageTag: entry.languageTag
+            text: "\(ayah.surah):\(ayah.ayah)", arabicIndic: entry.arabicIndicDigits
         )
         let arabicName = Text(ayah.surahArabic)
             .font(TaqwaHafs.font(size: footerArabicSize))
