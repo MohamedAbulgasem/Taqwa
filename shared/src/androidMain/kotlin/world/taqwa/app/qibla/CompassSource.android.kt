@@ -7,6 +7,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.Display
 import android.view.Surface
@@ -31,7 +33,11 @@ import world.taqwa.app.settings.appContext
  * worth listening to; only then does it drop the raw pair. See
  * [CompassAccuracyRules.androidRotationVectorIsDegenerate]. A rotation vector that has produced
  * nothing but degenerate samples for [DEGENERATE_GIVE_UP_MILLIS] is unregistered outright: it was
- * streaming two hundred useless samples a second for the life of the screen.
+ * streaming two hundred useless samples a second for the life of the screen. That trust is
+ * revocable in the other direction too — a rotation vector that worked and then went back to
+ * identity quaternions for the same two seconds is distrusted again and the raw pair registered
+ * again, so a HAL that gives up mid-session does not leave the needle pinned to north with the
+ * fallback already switched off.
  *
  * Accuracy is read from `event.accuracy` on every sample, not only from `onAccuracyChanged`. That
  * callback is not a contract: one device sent exactly one magnetometer accuracy callback, at
@@ -59,8 +65,18 @@ class AndroidCompassSource : CompassSource {
      * The display is fetched from `DisplayManager` rather than `Context.getDisplay()` because the
      * only context here is the application context, which is not a visual context and throws.
      */
-    private val display: Display? = (appContext.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager)
-        ?.getDisplay(Display.DEFAULT_DISPLAY)
+    private val displayManager = appContext.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
+    private val display: Display? = displayManager?.getDisplay(Display.DEFAULT_DISPLAY)
+
+    /**
+     * `Display.getRotation()` is a binder call into the window manager. Reading it inside
+     * `azimuthDegrees` meant one per sensor sample — up to two hundred a second, to learn a value
+     * that changes when the user turns the phone over, which is to say a handful of times a
+     * session. It is read once per registration and then only when the display says it changed.
+     * Written on the main looper by the listener below and read there by every sensor callback,
+     * but volatile anyway: nothing here should depend on that staying true.
+     */
+    @Volatile private var displayRotation: Int = display?.rotation ?: Surface.ROTATION_0
 
     @Volatile private var location: GeoLocation? = null
 
@@ -122,7 +138,7 @@ class AndroidCompassSource : CompassSource {
          * correct; without it `getOrientation` answers for the device's natural orientation.
          */
         fun azimuthDegrees(matrix: FloatArray): Double {
-            val oriented = when (display?.rotation ?: Surface.ROTATION_0) {
+            val oriented = when (displayRotation) {
                 Surface.ROTATION_90 -> SensorManager.remapCoordinateSystem(
                     matrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, remapped,
                 )
@@ -241,9 +257,31 @@ class AndroidCompassSource : CompassSource {
              * screen, which shows the bearing and the distance and no needle.
              */
             private fun onDegenerateRotationVector() {
-                if (rotationVectorTrusted) return
                 val now = SystemClock.elapsedRealtime()
                 if (degenerateSince == 0L) degenerateSince = now
+                if (rotationVectorTrusted) {
+                    // Trust was one-way until this: a sensor that produced one real sample kept
+                    // the dial for the life of the screen, however many identity quaternions it
+                    // streamed afterwards, and the raw pair it had unregistered was not coming
+                    // back. A HAL that stops mid-session (it happens after a suspend, and after
+                    // the sensor service restarts) therefore pinned the needle to north with no
+                    // way out. The mirror of the promotion above: after the same two seconds of
+                    // nothing but identity quaternions, the rotation vector is distrusted, the
+                    // raw pair is registered again, and the sensor goes back on probation in
+                    // exactly the state it started in — one real sample re-earns it, and another
+                    // two seconds of lies unregisters it below.
+                    if (now - degenerateSince < DEGENERATE_GIVE_UP_MILLIS) return
+                    rotationVectorTrusted = false
+                    degenerateSince = now
+                    if (rawPairAvailable && !magnetometerRegistered) {
+                        sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_GAME)
+                        sensorManager.registerListener(this, magnet, SensorManager.SENSOR_DELAY_GAME)
+                        magnetometerRegistered = true
+                        haveField = false
+                        fieldImplausible = false
+                    }
+                    return
+                }
                 if (rawPairAvailable) {
                     if (rotationVectorRegistered && now - degenerateSince >= DEGENERATE_GIVE_UP_MILLIS) {
                         rotation?.let { sensorManager.unregisterListener(this, it) }
@@ -267,6 +305,20 @@ class AndroidCompassSource : CompassSource {
             }
         }
 
+        // The rotation as it is right now, then one callback per actual change. Registered on
+        // the main looper because that is where the sensor callbacks that read it arrive.
+        val displayListener = object : DisplayManager.DisplayListener {
+            override fun onDisplayAdded(displayId: Int) = Unit
+            override fun onDisplayRemoved(displayId: Int) = Unit
+            override fun onDisplayChanged(displayId: Int) {
+                if (displayId == Display.DEFAULT_DISPLAY) {
+                    displayRotation = display?.rotation ?: Surface.ROTATION_0
+                }
+            }
+        }
+        displayRotation = display?.rotation ?: Surface.ROTATION_0
+        displayManager?.registerDisplayListener(displayListener, Handler(Looper.getMainLooper()))
+
         if (rotation != null) {
             sensorManager.registerListener(listener, rotation, SensorManager.SENSOR_DELAY_GAME)
         }
@@ -274,7 +326,10 @@ class AndroidCompassSource : CompassSource {
             sensorManager.registerListener(listener, accel, SensorManager.SENSOR_DELAY_GAME)
             sensorManager.registerListener(listener, magnet, SensorManager.SENSOR_DELAY_GAME)
         }
-        awaitClose { sensorManager.unregisterListener(listener) }
+        awaitClose {
+            sensorManager.unregisterListener(listener)
+            displayManager?.unregisterDisplayListener(displayListener)
+        }
     }
 
     private companion object {
