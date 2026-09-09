@@ -23,8 +23,11 @@ object WidgetPalette {
             WidgetBackground.DARK -> true
         }
         val alpha = if (background == WidgetBackground.TRANSLUCENT_OR_FROSTED) 0.55f else 1.0f
+        // Dark widgets sit on the dark theme's *card* colour, not its page colour: on a home
+        // screen the near-black page tone read as a hole in the wallpaper, and the card tone is
+        // what the in-app ayah card and prayer rows are drawn on (Mohamed, 10 September 2026).
         return if (dark) {
-            WidgetPaletteColors(0xFF0B0D0CL, 0xFFF1F3F1L, 0xFFF0B429L, alpha)
+            WidgetPaletteColors(0xFF131614L, 0xFFF1F3F1L, 0xFFF0B429L, alpha)
         } else {
             WidgetPaletteColors(0xFFFBFAF7L, 0xFF16160FL, 0xFFB5820BL, alpha)
         }
