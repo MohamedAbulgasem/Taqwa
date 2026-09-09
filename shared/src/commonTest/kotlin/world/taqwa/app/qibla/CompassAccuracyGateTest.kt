@@ -153,4 +153,106 @@ class CompassAccuracyGateTest {
         assertEquals(CompassAccuracyState.Good, g.state())
         assertEquals(CompassAccuracyState.Good, g.update(20_100, true, CompassLowReason.INTERFERENCE))
     }
+
+    @Test
+    fun givingUpIsOneWayAndOneGoodSampleDoesNotUndoIt() {
+        val g = gate()
+        g.update(0, true, CompassLowReason.CALIBRATION)
+        assertEquals(
+            CompassAccuracyState.BestEffort(CompassLowReason.CALIBRATION),
+            g.update(20_000, true, CompassLowReason.CALIBRATION),
+        )
+        // The flapping HAL: one good sample, nowhere near the 1 500 ms recovery dwell, then a
+        // fresh second of low ones. A second is enough to enter Low from Good; it must not be
+        // enough to walk back the decision that this compass is not going to be fixed, or the
+        // screen alternates between "wave your phone" and "we have stopped asking".
+        g.update(20_100, false)
+        g.update(20_200, true, CompassLowReason.CALIBRATION)
+        assertEquals(
+            CompassAccuracyState.BestEffort(CompassLowReason.CALIBRATION),
+            g.update(21_200, true, CompassLowReason.CALIBRATION),
+        )
+        assertEquals(
+            CompassAccuracyState.BestEffort(CompassLowReason.CALIBRATION),
+            g.update(22_500, true, CompassLowReason.CALIBRATION),
+        )
+        // The one exit is still open.
+        g.update(23_000, false)
+        assertEquals(CompassAccuracyState.BestEffort(CompassLowReason.CALIBRATION), g.update(24_400, false))
+        assertEquals(CompassAccuracyState.Good, g.update(24_600, false))
+    }
+
+    @Test
+    fun theReasonDeEscalatesWhenTheInterferenceStopsWithoutRestartingTheRun() {
+        val g = gate()
+        g.update(0, true, CompassLowReason.INTERFERENCE)
+        assertEquals(
+            CompassAccuracyState.Low(CompassLowReason.INTERFERENCE),
+            g.update(1_000, true, CompassLowReason.INTERFERENCE),
+        )
+        // The user walks away from the magnet. The field is the Earth's again; the calibration
+        // still is not, so the advice should go back to the figure of eight it can act on.
+        g.update(1_100, true, CompassLowReason.CALIBRATION)
+        assertEquals(
+            CompassAccuracyState.Low(CompassLowReason.INTERFERENCE),
+            g.update(1_900, true, CompassLowReason.CALIBRATION),
+        )
+        assertEquals(
+            CompassAccuracyState.Low(CompassLowReason.CALIBRATION),
+            g.update(2_000, true, CompassLowReason.CALIBRATION),
+        )
+        // The reason changed; the run did not. Twenty seconds of low is twenty seconds of low.
+        assertEquals(
+            CompassAccuracyState.BestEffort(CompassLowReason.CALIBRATION),
+            g.update(20_000, true, CompassLowReason.CALIBRATION),
+        )
+    }
+
+    @Test
+    fun theReasonEscalatesTheMomentInterferenceAppearsMidRun() {
+        val g = gate()
+        g.update(0, true, CompassLowReason.CALIBRATION)
+        assertEquals(
+            CompassAccuracyState.Low(CompassLowReason.CALIBRATION),
+            g.update(1_000, true, CompassLowReason.CALIBRATION),
+        )
+        // A magnet arrives mid-run: no figure of eight will help until it leaves.
+        assertEquals(
+            CompassAccuracyState.Low(CompassLowReason.INTERFERENCE),
+            g.update(1_500, true, CompassLowReason.INTERFERENCE),
+        )
+        // And it stays for the width of the window, not just for the one sample that saw it.
+        assertEquals(
+            CompassAccuracyState.Low(CompassLowReason.INTERFERENCE),
+            g.update(2_400, true, CompassLowReason.CALIBRATION),
+        )
+    }
+
+    @Test
+    fun aTimestampFromBeforeTheRunStartedRestartsTheRun() {
+        val g = gate()
+        g.update(1_000, true, CompassLowReason.CALIBRATION)
+        g.update(1_500, true, CompassLowReason.CALIBRATION)
+        // The clock has gone back past the start of the run. Measured against a start in the
+        // future this sample is 100 ms of *negative* elapsed time, and the run could never enter
+        // Low at all; measured from here it costs the user another second of waiting, which is
+        // the safe way to be wrong.
+        assertEquals(CompassAccuracyState.Good, g.update(900, true, CompassLowReason.CALIBRATION))
+        assertEquals(CompassAccuracyState.Good, g.update(1_800, true, CompassLowReason.CALIBRATION))
+        assertEquals(
+            CompassAccuracyState.Low(CompassLowReason.CALIBRATION),
+            g.update(1_900, true, CompassLowReason.CALIBRATION),
+        )
+    }
+
+    @Test
+    fun aBackwardsClockDuringRecoveryCostsAnotherDwellRatherThanGrantingOneEarly() {
+        val g = gate()
+        g.update(0, true, CompassLowReason.CALIBRATION)
+        g.update(1_000, true, CompassLowReason.CALIBRATION)
+        g.update(3_000, false)
+        assertEquals(CompassAccuracyState.Low(CompassLowReason.CALIBRATION), g.update(1_500, false))
+        assertEquals(CompassAccuracyState.Low(CompassLowReason.CALIBRATION), g.update(2_900, false))
+        assertEquals(CompassAccuracyState.Good, g.update(3_100, false))
+    }
 }
