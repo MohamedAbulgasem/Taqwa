@@ -94,10 +94,13 @@ struct iOSApp: App {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
 	}
 
-	/// Only ever read or written on the main thread — see `reloadWidgets()`. Covers the snapshot
-	/// *and* the background choice: a change to either must reach the widget, and the background
-	/// used to be left out, which is why picking Light or Dark in Appearance did nothing on the
-	/// home screen until WidgetKit's hourly reload happened to come round.
+	/// Only ever read or written on the main thread — see `reloadWidgets()`. Covers every mirror a
+	/// widget draws from: the prayer snapshot, the background choice *and* the ayah pool. Each was
+	/// added because leaving it out made a real change invisible — the background choice used to
+	/// be missing, so picking Light or Dark in Appearance did nothing on the home screen until
+	/// WidgetKit's hourly reload happened to come round, and the ayah pool used to be missing, so
+	/// switching translation left the old one on the ayah card until its timeline ran out a week
+	/// later. Anything a widget reads out of the App Group has to be represented here.
 	private static var lastMirrorKey: String?
 
 	/// `reloadWidgets()` is reached from a Kotlin-invoked closure (`TodayViewModel.refresh()` runs
@@ -121,7 +124,13 @@ struct iOSApp: App {
 			let defaults = UserDefaults(suiteName: taqwaAppGroupId)
 			let snapshot = defaults?.string(forKey: taqwaSnapshotKey)
 			let background = defaults?.string(forKey: taqwaBackgroundKey)
+			// The ayah pool mirror is ~30 KB, so it is folded in by hash and length rather than
+			// concatenated whole — this key is rebuilt once a second by `TodayViewModel.refresh()`.
+			// `hashValue` is per-process seeded, which is fine: `lastMirrorKey` never outlives the
+			// process either, and a fresh process reloading once more is the harmless direction.
+			let ayah = defaults?.string(forKey: AyahPoolMirror.companion.KEY) ?? ""
 			let key = (snapshot ?? "") + "|" + (background ?? "")
+				+ "|" + String(ayah.hashValue) + "|" + String(ayah.count)
 			guard key != lastMirrorKey else { return }
 			lastMirrorKey = key
 			// `WidgetSnapshot` carries no timestamp, so stamp the write here: the extension needs it to

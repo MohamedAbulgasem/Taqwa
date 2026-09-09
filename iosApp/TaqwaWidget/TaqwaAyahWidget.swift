@@ -155,10 +155,24 @@ struct AyahTimelineProvider: TimelineProvider {
         }
     }
 
+    /// The device's time zone on a *Gregorian* calendar — not `Calendar.current`, which is the
+    /// user's chosen calendar and returns Hijri year/month/day components when Settings ▸ General ▸
+    /// Language & Region ▸ Calendar is Islamic. `AyahRotation.epochDay` is proleptic Gregorian
+    /// (spec §5), so feeding it 1447/3/17 instead of 2026/9/9 would rotate to a different ayah than
+    /// Android shows and re-rotate the moment the user changed calendar. The time zone still comes
+    /// from `Calendar.current`, because "today" is genuinely the device's local date; only the
+    /// calendar *system* is pinned. `dates(from:)` uses the same one so the entry boundaries and
+    /// the epoch days computed from them cannot disagree.
+    private static var rotationCalendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = Calendar.current.timeZone
+        return cal
+    }
+
     /// `start`, then each following local midnight. Built by adding a day to a *start of day* and
     /// re-normalising, so a DST transition still lands on the day boundary the phone shows.
     private static func dates(from start: Date) -> [Date] {
-        let calendar = Calendar.current
+        let calendar = rotationCalendar
         var dates = [start]
         var day = calendar.startOfDay(for: start)
         for _ in 0..<futureDays {
@@ -173,7 +187,7 @@ struct AyahTimelineProvider: TimelineProvider {
     /// rotates on — never `timeIntervalSince1970 / 86400`, which is a UTC day and would turn the
     /// ayah over at the wrong hour everywhere but Greenwich.
     private static func epochDay(of date: Date) -> Int64 {
-        let c = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        let c = rotationCalendar.dateComponents([.year, .month, .day], from: date)
         return AyahRotation.shared.epochDay(
             year: Int32(c.year ?? 1970), month: Int32(c.month ?? 1), day: Int32(c.day ?? 1)
         )
