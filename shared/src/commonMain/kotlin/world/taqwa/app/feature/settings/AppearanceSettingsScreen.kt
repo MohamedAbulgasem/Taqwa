@@ -19,7 +19,7 @@ import world.taqwa.app.resources.appearance_ayah_widget_preview_label
 import world.taqwa.app.resources.appearance_note
 import world.taqwa.app.resources.appearance_theme_label
 import world.taqwa.app.resources.appearance_widget_background_label
-import world.taqwa.app.resources.appearance_widget_preview_label
+import world.taqwa.app.resources.appearance_prayer_widget_preview_label
 import world.taqwa.app.resources.settings_appearance
 import world.taqwa.app.resources.theme_dark
 import world.taqwa.app.resources.theme_light
@@ -106,7 +106,7 @@ fun AppearanceSettingsScreen(
         }
 
         Spacer(Modifier.height(14.dp))
-        SectionLabel(stringResource(Res.string.appearance_widget_preview_label))
+        SectionLabel(stringResource(Res.string.appearance_prayer_widget_preview_label))
         val systemIsDark = isSystemInDarkTheme()
         // Read once per composition rather than observed live: the mirror only changes when
         // Today refreshes (once a second while it's open), and re-reading it here on every
