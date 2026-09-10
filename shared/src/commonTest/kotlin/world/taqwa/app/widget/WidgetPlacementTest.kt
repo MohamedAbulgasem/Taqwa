@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 class WidgetPlacementTest {
 
     @Test
-    fun `Unknown reports both widgets placed, so neither is offered`() {
+    fun `Unknown reports both widgets placed so neither is offered`() {
         val unknown = WidgetPlacement.Unknown
         assertTrue(unknown.prayer)
         assertTrue(unknown.ayah)
@@ -31,7 +31,7 @@ class WidgetPlacementTest {
     }
 
     @Test
-    fun `a placed widget is offered nothing, whatever the platform could do`() {
+    fun `a placed widget is offered nothing whatever the platform could do`() {
         for (widget in PinnableWidget.entries) {
             for (pinnable in listOf(true, false)) {
                 for (path in WidgetAddPath.entries) {
@@ -46,7 +46,7 @@ class WidgetPlacementTest {
     }
 
     @Test
-    fun `a missing widget the launcher can be asked for gets the row, naming that widget`() {
+    fun `a missing widget the launcher can be asked for gets the row naming that widget`() {
         for (widget in PinnableWidget.entries) {
             assertEquals(
                 WidgetOffer.Pin(widget),
@@ -69,7 +69,7 @@ class WidgetPlacementTest {
     }
 
     @Test
-    fun `all three add paths are covered, so a new one cannot slip through untested`() {
+    fun `all three add paths are covered so a new one cannot slip through untested`() {
         assertEquals(
             listOf(WidgetAddPath.ANDROID_PIN, WidgetAddPath.IOS_HOLD_ICON, WidgetAddPath.IOS_PLUS_BUTTON),
             WidgetAddPath.entries.toList(),
