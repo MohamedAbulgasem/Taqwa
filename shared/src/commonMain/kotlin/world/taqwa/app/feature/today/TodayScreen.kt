@@ -129,7 +129,11 @@ private fun PortraitBody(
         Column(Modifier.contentWidth()) {
             CityAndDates(state)
 
-            Spacer(Modifier.height(44.dp))
+            // 32 dp here, not 44: CityAndDates already carries 4 dp under its dates, so this puts
+            // 36 dp of air above the ring — the same 36 dp that separates its bottom from the
+            // timeline card, so the ring sits in a band of its own rather than closer to the card
+            // than to the header it hangs beneath.
+            Spacer(Modifier.height(32.dp))
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Countdown(state, zone, format)
             }
