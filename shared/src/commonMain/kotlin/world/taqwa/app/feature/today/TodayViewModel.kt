@@ -72,8 +72,16 @@ class TodayViewModel(
     private val widgetStore: () -> KeyValueStore = { createWidgetKeyValueStore() },
     private val widgetFormat: () -> PlatformFormat = { world.taqwa.app.i18n.createPlatformFormat() },
     private val onWidgetsChanged: () -> Unit = { refreshWidgets() },
+    /**
+     * What the screen shows until the first [refresh] lands. `Loading` on a cold start, and — on
+     * a language change, which swaps this whole object for one holding a format that reports the
+     * new language — the state the outgoing one last published. Without it the Prayer screen
+     * emptied to its spinner for the length of one refresh every time the phone's language
+     * changed; with it the same rows simply re-render in the new language.
+     */
+    initialState: TodayUiState = TodayUiState.Loading,
 ) {
-    private val _state = MutableStateFlow<TodayUiState>(TodayUiState.Loading)
+    private val _state = MutableStateFlow(initialState)
     val state: StateFlow<TodayUiState> = _state.asStateFlow()
 
     /**
@@ -103,6 +111,14 @@ class TodayViewModel(
      * than one per second.
      */
     private var cityIdMigrationAttempted = false
+
+    /**
+     * The id [migrateCityId] wrote back, held until the store catches up. `settings.location` is
+     * a DataStore flow: the tick that writes the id is followed by ticks that still read the
+     * location without one, and until DataStore emits the new value the header would fall back to
+     * the English snapshot — an upgraded install flickering Arabic → English → Arabic once.
+     */
+    private var migratedCityId: Int? = null
 
     /**
      * Runs the one-second tick until the calling coroutine is cancelled. No owned scope and no
@@ -183,7 +199,7 @@ class TodayViewModel(
      * every tick — the first one above all — publishes its state immediately.
      */
     private fun cachedCityName(location: GeoLocation): String? {
-        val id = location.cityId ?: return location.cityName
+        val id = cityIdOf(location) ?: return location.cityName
         return if (cachedNameFor == id to format.languageTag()) {
             cachedName ?: location.cityName
         } else {
@@ -202,7 +218,7 @@ class TodayViewModel(
      */
     private suspend fun resolveCityName(location: GeoLocation) {
         val repository = cityRepository ?: return
-        val id = location.cityId ?: return
+        val id = cityIdOf(location) ?: return
         val language = format.languageTag()
         if (cachedNameFor != id to language) {
             repository.setLanguage(language)
@@ -211,10 +227,23 @@ class TodayViewModel(
         }
         val resolved = cachedName ?: location.cityName
         val current = _state.value
-        if (current is TodayUiState.Ready && current.cityDisplayName != resolved) {
+        // Only when the state on screen is still the one this lookup was started for. The lookup
+        // suspends on a 1.6 MB parse; a city picked, or a fix taken, while it was running has
+        // already published a state about somewhere else, and republishing this name over it
+        // would put the old city's name under the new city's times.
+        if (current is TodayUiState.Ready &&
+            current.location == location &&
+            current.cityDisplayName != resolved
+        ) {
             _state.value = current.copy(cityDisplayName = resolved)
         }
     }
+
+    /**
+     * The id to name the header from: the stored one, or — for the one run in which the backfill
+     * has written an id the location flow has not re-emitted yet — the one just written.
+     */
+    private fun cityIdOf(location: GeoLocation): Int? = location.cityId ?: migratedCityId
 
     /**
      * Gives a location stored before ids existed the id its coordinates imply, once.
@@ -235,6 +264,7 @@ class TodayViewModel(
         val id = repository.nearest(location.latitude, location.longitude)?.id ?: return
         // Only the id, so a city picked or a fix taken while the scan was running is not undone.
         settings.setLocationCityId(id)
+        migratedCityId = id
         val migrated = location.copy(cityId = id)
         val current = _state.value
         if (current is TodayUiState.Ready && current.location == location) {

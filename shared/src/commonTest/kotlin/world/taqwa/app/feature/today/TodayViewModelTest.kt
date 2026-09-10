@@ -2,8 +2,11 @@ package world.taqwa.app.feature.today
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.currentTime
@@ -356,6 +359,8 @@ class TodayViewModelTest {
     private fun noCities() = CityRepository(loadCsv = { "id,name,region,country,countryCode,lat,lon,tz" })
 
     private val londonWithId = london.copy(cityId = 2643743)
+    private val cairoWithId =
+        GeoLocation(30.06263, 31.24967, "Africa/Cairo", "Cairo", "EG", cityId = 360630)
 
     private suspend fun readyFor(
         store: String,
@@ -394,8 +399,7 @@ class TodayViewModelTest {
 
     @Test
     fun aCityWithNoNameInTheInterfaceLanguageFallsBackToTheEnglishOne() = runTest {
-        val cairo = GeoLocation(30.06263, 31.24967, "Africa/Cairo", "Cairo", "EG", cityId = 360630)
-        val ready = readyFor("city-name-ar-missing", cairo, ArabicPlatformFormat())
+        val ready = readyFor("city-name-ar-missing", cairoWithId, ArabicPlatformFormat())
         assertEquals("Cairo", ready.cityDisplayName)
     }
 
@@ -427,6 +431,115 @@ class TodayViewModelTest {
         // And the header follows immediately, without waiting for the next launch.
         val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
         assertEquals("لندن", ready.cityDisplayName)
+    }
+
+    /**
+     * A language change swaps the view model for one whose format reports the new language. A
+     * fresh one starts at `Loading` and the Prayer screen emptied to its spinner until the first
+     * refresh landed; seeded with the outgoing state it simply re-renders in the new language.
+     */
+    @Test
+    fun aLanguageChangeCarriesTheOutgoingStateIntoTheSuccessorRatherThanBlankingTheScreen() = runTest {
+        val outgoing = readyFor("city-language-swap-ar", londonWithId, ArabicPlatformFormat())
+        assertEquals("\u0644\u0646\u062F\u0646", outgoing.cityDisplayName)
+
+        val repo = settings("city-language-swap-en")
+        repo.setPrayerSettings(PrayerSettings())
+        val successor = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { londonWithId },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = cities(),
+            format = EnglishPlatformFormat,
+            initialState = outgoing,
+        )
+        // Before a single refresh: the same rows, still on screen.
+        assertEquals(outgoing, successor.state.value)
+
+        successor.refresh()
+        val ready = successor.state.value as TodayUiState.Ready
+        assertEquals("London", ready.cityDisplayName, "and then the new language's name")
+        assertEquals(outgoing.today.rows.size, ready.today.rows.size)
+    }
+
+    /**
+     * The backfill writes the id, but `settings.location` is a DataStore flow — the next tick can
+     * still read a location without one. Holding the migrated id keeps the header from flickering
+     * Arabic \u2192 English \u2192 Arabic while the store catches up.
+     */
+    @Test
+    fun theMigratedIdSurvivesTicksTakenBeforeTheStoreCatchesUp() = runTest {
+        val repo = settings("city-id-migration-lag")
+        repo.setPrayerSettings(PrayerSettings())
+        repo.setLocation(london)
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { london }, // a store that never reports the id back
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = cities(),
+            format = ArabicPlatformFormat(),
+        )
+        vm.refresh()
+        assertEquals(
+            "\u0644\u0646\u062F\u0646",
+            (vm.state.value as TodayUiState.Ready).cityDisplayName,
+        )
+
+        repeat(3) { vm.refresh() }
+        assertEquals(
+            "\u0644\u0646\u062F\u0646",
+            (vm.state.value as TodayUiState.Ready).cityDisplayName,
+            "the header fell back to the English snapshot while the store caught up",
+        )
+    }
+
+    /**
+     * The name lookup suspends on a 1.6 MB parse. A city picked while it was running has already
+     * published a state about somewhere else, and the resolved name must not be written over it —
+     * the same guard [migrateCityId] has always had.
+     */
+    @Test
+    fun aNameResolvedForACityTheScreenHasAlreadyLeftIsNotPublished() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        val slow = CityRepository(
+            loadCsv = { gate.await(); citiesCsv },
+            loadNames = { language -> if (language == "ar") arabicNames else null },
+        )
+        val store = settings("city-name-stale")
+        store.setPrayerSettings(PrayerSettings())
+        var current = londonWithId
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = store,
+            locationOf = { current },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = slow,
+            format = ArabicPlatformFormat(),
+        )
+
+        // Everything the state flow publishes, captured before the race rather than sampled after
+        // it: the corrupt value the missing guard produced was overwritten by the next tick.
+        val seen = mutableListOf<TodayUiState>()
+        val watcher = launch(start = CoroutineStart.UNDISPATCHED) { vm.state.toList(seen) }
+
+        val first = launch { vm.refresh() } // publishes London, then blocks in the lookup
+        runCurrent()
+        current = cairoWithId
+        val second = launch { vm.refresh() } // publishes Cairo, then queues behind the same lock
+        runCurrent()
+
+        gate.complete(Unit)
+        first.join()
+        second.join()
+        watcher.cancel()
+
+        val misattributed = seen.filterIsInstance<TodayUiState.Ready>().filter {
+            it.location == cairoWithId && it.cityDisplayName == "\u0644\u0646\u062F\u0646"
+        }
+        assertTrue(misattributed.isEmpty(), "London's Arabic name was published under Cairo")
+        assertEquals("Cairo", (vm.state.value as TodayUiState.Ready).cityDisplayName)
     }
 
     @Test

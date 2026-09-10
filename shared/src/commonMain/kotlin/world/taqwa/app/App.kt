@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,7 @@ import world.taqwa.app.feature.settings.PrayerTimesSettingsScreen
 import world.taqwa.app.feature.settings.SettingsRootScreen
 import world.taqwa.app.feature.settings.themeDisplayName
 import world.taqwa.app.feature.today.TodayScreen
+import world.taqwa.app.feature.today.TodayUiState
 import world.taqwa.app.feature.today.TodayViewModel
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
@@ -116,7 +118,15 @@ fun App(container: AppContainer) {
     // moves the timeline's pip gutter and the header's icon buttons across with no bespoke
     // mirroring code. Only Canvas geometry drawn from literal coordinates needs help; the
     // countdown ring's arc and the settings back chevron do that for themselves.
-    val platformFormat = remember { createPlatformFormat() }
+    //
+    // Keyed on the resolved `ui_language` string, not on `Unit`: MainActivity declares `locale`
+    // in configChanges, so switching the app's language recreates nothing, and a format built on
+    // first composition would go on reporting the language the app *started* in for the rest of
+    // the run. Everything downstream — the city search's language, the Prayer view model's, the
+    // Quran screens', the widget mirror's — reads its language from this one value, so there is
+    // exactly one place that decides what language the app is in.
+    val uiLanguage = stringResource(Res.string.ui_language)
+    val platformFormat = remember(uiLanguage) { createPlatformFormat() }
     // From the resolved strings, not the locale tag, for the reason given on isRtlLocale(): the
     // tree mirrors exactly when the words on it are Arabic.
     val layoutDirection = if (isRtlLocale()) LayoutDirection.Rtl else LayoutDirection.Ltr
@@ -163,13 +173,11 @@ fun App(container: AppContainer) {
     // this effect restarts on exactly the changes that flip the card's script. Restarting writes
     // the mirror once and then re-collects; the write ends in `refreshWidgets()`, which touches
     // nothing this key reads, so there is no loop.
-    val uiLanguage = stringResource(Res.string.ui_language)
     LaunchedEffect(uiLanguage) {
-        // A *fresh* format each run: the remembered `platformFormat` was built on first
-        // composition and still reports the language tag the app started in, which is the whole
-        // bug this key exists to fix. It is kept, not just asked for its tag, because the mirror
-        // also records the digit set this same format renders (D2).
-        val format = createPlatformFormat()
+        // `platformFormat` is itself keyed on `uiLanguage`, so by the time this effect restarts
+        // it already reports the new language. It is kept, not just asked for its tag, because
+        // the mirror also records the digit set this same format renders (D2).
+        val format = platformFormat
         val languageTag = format.languageTag()
         val store = createWidgetKeyValueStore()
         suspend fun writeMirror() {
@@ -258,12 +266,8 @@ fun App(container: AppContainer) {
     }
     val today = remember(zone) { Clock.System.now().toLocalDateTime(zone).date }
 
-    // Keyed on `ui_language`, not on the remembered `platformFormat`: MainActivity declares
-    // `locale` in configChanges, so switching the app's language recreates nothing and a format
-    // built on first composition goes on reporting the language the app started in — the same
-    // trap the ayah-mirror effect above documents. `ui_language` is a resolved string, so it
-    // changes exactly when the resolved strings around it do.
-    val languageTag = remember(uiLanguage) { createPlatformFormat().languageTag() }
+    // Straight off the shared format, which is already rebuilt on a language change.
+    val languageTag = platformFormat.languageTag()
 
     // The stored location's city in the interface's language, for the Settings row and the
     // Location screen. Resolved once, here, rather than in each of those screens: they show the
@@ -334,11 +338,14 @@ fun App(container: AppContainer) {
                         )
 
                         Screen.Today -> {
+                            // The last state this screen showed, carried across the view-model
+                            // swap below. Plain `remember`, so a language change — which does not
+                            // recreate the composition — leaves it standing.
+                            val lastState = remember { mutableStateOf<TodayUiState>(TodayUiState.Loading) }
                             // Rebuilt when the language changes, with a format that reports the
-                            // new one: the remembered `platformFormat` cannot (see `languageTag`
-                            // above), and the header's city name, the Hijri and Gregorian dates
-                            // and the high-latitude note all read their language from it. The
-                            // cost is one extra widget-mirror write per language change.
+                            // new one, because the header's city name, the Hijri and Gregorian
+                            // dates and the high-latitude note all read their language from it.
+                            // The cost is one extra widget-mirror write per language change.
                             val viewModel = remember(languageTag) {
                                 TodayViewModel(
                                     engine = container.prayerTimesEngine,
@@ -348,7 +355,11 @@ fun App(container: AppContainer) {
                                     // For the header's city name in the reader's language, and
                                     // for the one-time backfill of a location saved without an id.
                                     cityRepository = container.cityRepository,
-                                    format = createPlatformFormat(),
+                                    format = platformFormat,
+                                    // A language change swaps the view model; without this the
+                                    // new one would start at Loading and blank the whole screen
+                                    // until its first refresh landed.
+                                    initialState = lastState.value,
                                 )
                             }
                             // Gated on the *lifecycle*, not just composition: leaving Today for another
@@ -365,6 +376,7 @@ fun App(container: AppContainer) {
                                 }
                             }
                             val state by viewModel.state.collectAsState()
+                            SideEffect { lastState.value = state }
 
                             val requestLocation = world.taqwa.app.location
                                 .rememberLocationPermissionRequester(container.locationRepository) {
