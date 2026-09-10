@@ -35,3 +35,13 @@ fun Modifier.contentWidth(max: Dp = ContentMaxWidth): Modifier = this
     .wrapContentWidth(Alignment.CenterHorizontally)
     .widthIn(max = max)
     .fillMaxWidth()
+
+/**
+ * How far below the safe-drawing inset every tab root puts its own title.
+ *
+ * The three tabs are switched between constantly, so their titles have to sit on one line: a
+ * title that jumps when the bar is tapped reads as the whole page shifting. Quran and Settings
+ * reach this figure as a 20 dp spacer plus the 4 dp their title carries itself; the Prayer tab
+ * has no spacer and applies it directly to the block holding the city and the two dates.
+ */
+val TabRootTitleTop: Dp = 24.dp

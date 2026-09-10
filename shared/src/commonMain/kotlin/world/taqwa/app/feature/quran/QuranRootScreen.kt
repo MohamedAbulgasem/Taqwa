@@ -168,9 +168,9 @@ fun QuranRootScreen(
             .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         // A tab root has no back chevron, so it no longer reserves the chevron's 52 dp either:
-        // with the title's own 4 dp on top of this, the title lands 24 dp below the status bar,
-        // level with the Prayer tab's, so switching tabs no longer drops it by half a chevron.
-        // Same value as SettingsScaffold's own tab-root spacer.
+        // with the title's own 4 dp on top of this, the title lands `TabRootTitleTop` below the
+        // status bar, level with the Prayer and Settings titles, so switching tabs no longer
+        // moves it. Same value as SettingsScaffold's own tab-root spacer.
         item(key = "top-spacer") { Spacer(Modifier.height(20.dp)) }
         item(key = "title") {
             Text(

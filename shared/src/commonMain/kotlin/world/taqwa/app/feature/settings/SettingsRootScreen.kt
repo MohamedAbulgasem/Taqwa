@@ -97,8 +97,9 @@ internal fun SettingsScaffold(
         // the far left of a 900 dp landscape screen would sit half a hand away from its cards.
         Column(Modifier.contentWidth()) {
             if (onBack == null) {
-                // With the title's own 4 dp on top, this puts the title 24 dp below the status bar,
-                // level with the Prayer tab's — the tab the user has just switched away from.
+                // With the title's own 4 dp on top, this puts the title `TabRootTitleTop` below the
+                // status bar, level with the Prayer and Quran titles — the tabs the user switches
+                // between.
                 Spacer(Modifier.height(20.dp))
             } else {
                 BackChevron(onBack)

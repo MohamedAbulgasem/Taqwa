@@ -42,6 +42,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
+import world.taqwa.app.design.TabRootTitleTop
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.CountdownRing
@@ -172,7 +173,7 @@ private fun LandscapeBody(
             Modifier.weight(1f).fillMaxHeight().contentWidth().padding(horizontal = Gutter),
             verticalArrangement = Arrangement.Center,
         ) {
-            CityAndDates(state, horizontalPadding = 0.dp)
+            CityAndDates(state, horizontalPadding = 0.dp, topPadding = 12.dp)
             Spacer(Modifier.height(20.dp))
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Countdown(state, zone, format, diameter = ring)
@@ -194,11 +195,21 @@ private fun LandscapeBody(
     }
 }
 
-/** The city, then both calendars — the same block in either orientation. */
+/**
+ * The city, then both calendars — the same block in either orientation.
+ *
+ * [topPadding] is what puts the city on the same line as the Quran and Settings titles when the
+ * phone is upright. Sideways the whole left pane is centred vertically instead, so the caller
+ * passes the smaller inset it had before: 24 dp there would only push a centred block off centre.
+ */
 @Composable
-private fun CityAndDates(state: TodayUiState.Ready, horizontalPadding: Dp = Gutter) {
+private fun CityAndDates(
+    state: TodayUiState.Ready,
+    horizontalPadding: Dp = Gutter,
+    topPadding: Dp = TabRootTitleTop,
+) {
     val colors = LocalTaqwaColors.current
-    Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = 12.dp, bottom = 4.dp)) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp)) {
         Text(
             state.location.cityName ?: stringResource(Res.string.today_current_location),
             style = TaqwaText.screenTitle,
