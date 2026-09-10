@@ -85,7 +85,6 @@ import world.taqwa.app.feature.quran.ReaderUiState
 import world.taqwa.app.feature.quran.ReaderViewModel
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
-import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.displayName
 import world.taqwa.app.widget.AyahPoolMirrorWriter
 import world.taqwa.app.widget.createWidgetKeyValueStore
@@ -206,15 +205,11 @@ fun App(container: AppContainer) {
         LaunchRequests.pendingAyah.collect { pending ->
             val (surah, ayah) = pending ?: return@collect
             runCatching {
-                val reading = settings.readingSettings(platformFormat.languageTag()).first()
-                // Resolved before the navigator is touched at all: `pageOf` is itself a database
-                // read that can fail, and a failure must leave the back stack exactly as it found
-                // it rather than half-applying a push.
-                val target = if (reading.mode == ReadingMode.MUSHAF) {
-                    Screen.Mushaf(container.quranRepository.pageOf(surah, ayah))
-                } else {
-                    Screen.Reader(surah, ayah)
-                }
+                // Always the translation reader, whatever the persisted reading mode: the widget
+                // showed this ayah as a card with its translation, so that is the page a tap on it
+                // has to land on. A Mushaf reader would answer the tap with a full page of Arabic
+                // in which the ayah the user actually tapped is one run among fifteen.
+                val target = Screen.Reader(surah, ayah)
                 val current = navigator.current
                 if (current is Screen.Reader || current is Screen.Mushaf) {
                     // A second tap (or a tap while an ayah opened another way is still open)

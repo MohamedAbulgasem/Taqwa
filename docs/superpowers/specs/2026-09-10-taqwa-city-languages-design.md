@@ -1,0 +1,69 @@
+# Taqwa: city names in every supported language
+
+Status: **decided 10 September 2026** with Mohamed. He chose the seven-language option after seeing the coverage and size figures below. Extends `2026-09-06-taqwa-prayer-times-qibla-design.md` (the city search and the Prayer header).
+
+## 1. Goals
+
+- Searching for a city works in the language the person is reading the app in, and in English, always. Under an Arabic interface both «كيب» and "Cape" find Cape Town.
+- A result, and the Prayer header, show the city in the interface's language, falling back to English when that city has no translated name.
+- Changing the phone's language re-renders the header in the new language without the city being picked again.
+
+Non-goals: translating the region and country lines under a search result (a different dataset — recorded as a follow-up); a language picker inside the app (the interface follows the device); city names for languages the app has no data for.
+
+## 2. The data
+
+GeoNames publishes `alternateNamesV2.zip` alongside the `cities15000` extract the bundle already comes from, keyed by the same `geonameId`. `tools/build-city-db.py` gains it as a third source.
+
+- **`files/cities.csv` gains `id` as its first column** — the `geonameId`, the stable key everything below joins on. Columns become `id,name,region,country,countryCode,lat,lon,tz`. Row order (population descending) is unchanged, so search ranking is unchanged.
+- **`files/city-names-<lang>.csv`**, one per language in `ar, id, ur, bn, tr, fr`, each `id,name` sorted by id, holding only the cities that have a name in that language. English is not a file: it is the `name` column of `cities.csv`.
+- Selection per city and language: the entry flagged `isPreferredName` when there is one, otherwise the first non-historic entry. Historic names (`isHistoric`) are skipped. Commas are stripped exactly as `clean()` already does, so the naive split stays valid.
+
+Coverage is partial and that is expected. Measured against the bundled 34,135 cities:
+
+| Language | Largest 100 | Largest 1,000 | All |
+|---|---|---|---|
+| Arabic | 88% | 59% | 26% |
+| French | 93% | 68% | 24% |
+| Urdu | 81% | 64% | 18% |
+| Indonesian | 79% | 51% | 12% |
+| Turkish | 72% | 44% | 12% |
+| Bengali | 74% | 43% | 10% |
+
+Shipping cost, compressed, about 429 KB in total: 100 KB for the id column and 329 KB for the six name files.
+
+## 3. Which names are loaded
+
+`CityRepository` keeps the English list as today and loads **at most one** name file: the one for the current interface language, and only when that language is one of the six. An English interface loads none. The file is parsed once, lazily, on the same `Dispatchers.Default` hop and behind the same mutex the city list already uses, and is dropped and reloaded when the language changes.
+
+This is what keeps the memory cost proportional to use: a reader in Arabic pays for Arabic, nobody pays for the other five.
+
+## 4. Matching
+
+`CityText.fold(s)` in `city/`, pure and unit-tested, applied to both the query and every candidate name:
+
+- lowercase (locale-invariant), then strip combining marks in U+0300–U+036F, which is what makes Turkish `İ` fold to `i` after Kotlin's locale-invariant lowercase leaves `i` plus a combining dot;
+- map the Latin letters that carry a mark in a city name to their bare form: `à â ä á ã å → a`, `ç → c`, `è é ê ë → e`, `ì í î ï ı → i`, `ñ → n`, `ò ó ô ö õ ø → o`, `ù ú û ü → u`, `ý ÿ → y`, `ş → s`, `ğ → g`, `ž → z`, `ć č → c`, `đ → d`, `ł → l`, `ß → ss`, `æ → ae`, `œ → oe`;
+- Arabic: the folding `QuranText.normaliseForSearch` already performs (harakat removed; `ٱ أ إ آ → ا`; `ى → ي`), plus tatweel `ـ` removed and `ة → ه`, so «مكه» finds «مكة»;
+- collapse whitespace and trim.
+
+A city matches when its folded English name **or** its folded name in the loaded language starts with the folded query, keeping today's prefix rule and today's ranking. `search` returns at most `limit` as before.
+
+## 5. What is shown
+
+`City` gains `id: Int` and `localizedName: String?` (the loaded language's name, null when that city has none). `City.displayName` is `localizedName ?: name`. The search list, its `cityQualifier`, the Prayer header, the Settings location row and the Location screen all render `displayName`.
+
+## 6. The saved location
+
+`GeoLocation` gains `cityId: Int?`, persisted under a new `LOCATION_CITY_ID` key. `cityName` stays exactly as it is — the English snapshot — so nothing that reads it breaks and a location whose city is not in the bundle still has something to show.
+
+- Picking a city, and the GPS path's nearest-city lookup, both set `cityId`.
+- **Migration**: a location saved before this change has a name but no id. The first time it is read with the city list available, the id is resolved from its coordinates with the existing `nearest` lookup and written back once. A location whose coordinates match no city keeps a null id and shows `cityName`.
+- The header's localisation happens where the state is built: `TodayViewModel` resolves the display name for `cityId` in the current language and puts it in `TodayUiState.Ready`, so the header re-renders on a language change like every other string. The same resolution serves the Settings and Location rows through `App.kt`.
+
+## 7. Tests
+
+`commonTest`: `CityTextTest` (each folding rule above, including `İstanbul`/`Istanbul`, `Zürich`/`Zurich`, «مكه»/«مكة», tatweel, empty and punctuation-only queries). `CityRepositoryTest` against a small in-memory CSV: an Arabic query matches an Arabic name; an English query matches under an Arabic interface and returns the Arabic display name; a city with no translated name falls back to English; the limit and the population ranking are unchanged; switching language reloads. `androidUnitTest` against the real bundled files: every id in each name file exists in `cities.csv`; no duplicate ids; the six files parse; Cape Town, London, Tripoli, Istanbul and Jakarta resolve to their expected Arabic names.
+
+## 8. Release
+
+Ships with the widget-tap change (a tap on the ayah widget always opens the translation reader, whatever the persisted reading mode) as **0.4.0 (6)** — a minor bump, since both are visible changes rather than fixes.
