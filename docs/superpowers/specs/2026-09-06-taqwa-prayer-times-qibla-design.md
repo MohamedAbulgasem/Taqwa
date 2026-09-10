@@ -109,7 +109,7 @@ Declining either permission is a first-class path, not a dead end. Onboarding is
 
 Header: location name and Hijri date on the left; compass and settings icon buttons on the right.
 
-**Countdown ring** — next prayer name, time remaining (H:MM:SS, ticking every second — amended 9 September 2026: a bare "0:20" was read as twenty seconds by a first-time viewer, so the seconds are shown and the ring text drops from 44 to 36sp to fit "10:00:00"), and clock time. The ring's filled arc represents elapsed proportion of the interval between the previous and next prayer.
+**Countdown ring** — next prayer name, time remaining (H:MM:SS, ticking every second — amended 9 September 2026: a bare "0:20" was read as twenty seconds by a first-time viewer, so the seconds are shown and the ring text drops from 44 to 36sp to fit "10:00:00"), and clock time. The ring's filled arc represents elapsed proportion of the interval between the previous and next prayer. Amended 10 September 2026: the ring sits in a band of its own — 36 dp of air above it and 36 dp below, where it used to hang 48 dp under the header and 36 dp over the timeline card and so read as belonging to the card.
 
 **Prayer timeline** — five rows on a vertical rail:
 

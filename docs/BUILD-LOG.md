@@ -863,3 +863,21 @@ The review also caught that the app's `PlatformFormat` is built once and the act
 locale change, so the search screen would have gone on searching in the language the app started
 in. One format now decides the language for the whole tree, keyed on the loaded strings. 510 tests
 in the shared module, all green.
+
+### Three corrections (10 September, afternoon)
+
+The ayah widget's tap was the interesting one. It had been changed that morning to always open the
+translation reader, on the reasoning that the widget shows a card with a translation; Mohamed's
+actual want was the opposite — open whichever reader he reads in, but land on the ayah *selected*,
+the way tapping the card itself leaves it, with bookmark, copy and share showing. So the mode
+branch came back, and both targets now carry the selection: `Screen.Reader` gained `selectAyah`
+and `Screen.Mushaf` gained the ayah to highlight. The decision between them moved out of the
+composable into a pure `ayahWidgetTarget`, because the mode that picks between the branches is
+persisted and flipping it on a device means driving the reading-settings sheet by hand — as a
+function it takes three lines of test instead.
+
+The Prayer ring hung 48 dp below the header and 36 dp above the timeline card, so it read as
+belonging to the card rather than sitting in a band of its own; both gaps are 36 dp now. And the
+Appearance screen labelled one preview "PREVIEW" and the other "AYAH WIDGET", which read as two
+different kinds of label; both are named now, which also says which widget each card is a picture
+of. 520 tests, all green.
