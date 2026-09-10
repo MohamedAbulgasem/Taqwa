@@ -830,3 +830,36 @@ directions and at both thresholds, the field plausibility band at 19/20/45/70/71
 filter across the 0/360 seam in both directions with monotone convergence, Cape Town (23.37°,
 6 557 km) and Tripoli (109.18° — the brief's 107.7° was wrong), a negative iOS heading, and each
 gate state's mapping to a screen state.
+
+### City names in every language, and the ayah widget's tap (10 September)
+
+Two things Mohamed asked for after living with the ayah widget for a morning. The widget's tap was
+opening the Mushaf page whenever the reader was set to Mushaf mode, which answered a card showing
+one ayah with a page of fifteen; it now always opens the translation reader, since that is the view
+the widget itself is a picture of.
+
+The larger half was the city list. It had only ever been English, so an Arabic reader searched a
+Latin list and read a Latin name in the Prayer header. GeoNames publishes translated names beside
+the `cities15000` extract the bundle already comes from, keyed by the same id, so `build-city-db.py`
+gained it as a third source: `cities.csv` grew a `geonameId` column and six `city-names-<lang>.csv`
+files appeared for Arabic, Indonesian, Urdu, Bengali, Turkish and French. Mohamed chose all seven
+languages over English and Arabic alone after seeing that the six cost about 480 KB compressed and
+that only Arabic can actually be displayed until the other interfaces exist. Coverage is partial by
+nature — Arabic names exist for 88% of the world's hundred largest cities but only 26% of all
+34,135 — and everything uncovered falls back to English, which was his own rule.
+
+Three things only showed up once the rules met the data. GeoNames carries both a vocalised and a
+bare Arabic spelling for some cities with neither flagged preferred, so file order decided it and
+Tripoli — the owner's home city — came out as طَرَابُلُس; the pipeline now prefers the bare
+spelling, which moved nineteen names. The folding rules were written from the examples that
+motivated them (Zürich, İstanbul) and covered 28 of the 111 marked Latin letters the name column
+actually uses, so "thane" did not find Thāne and its 1.8 million people; the table is now generated
+by decomposing U+00C0–U+024F and U+1E00–U+1EFF, and a test over the real bundle asserts no English
+name folds to anything non-ASCII. And the saved location only ever stored a name, so it could not be
+re-translated; it now stores the city's id, with an older location's id resolved once from its
+coordinates.
+
+The review also caught that the app's `PlatformFormat` is built once and the activity swallows a
+locale change, so the search screen would have gone on searching in the language the app started
+in. One format now decides the language for the whole tree, keyed on the loaded strings. 510 tests
+in the shared module, all green.

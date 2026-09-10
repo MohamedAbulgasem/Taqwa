@@ -47,6 +47,7 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 ## Principles
 
 - **Zero recurring cost.** Nothing in the app contacts a server. This is a hard constraint on every feature, not a preference.
+- **Your language, including the map.** The bundled city list carries names in Arabic, Indonesian, Urdu, Bengali, Turkish and French as well as English, so a city can be searched and read in either its own language or English, and the Prayer header follows the phone.
 - **Offline first.** Prayer times and qibla are mathematics; the city database ships inside the app.
 - **Nothing to sell.** No ads, no premium tier, no data collection, no account.
 - **One design, both platforms.** The same Compose UI on Android and iOS, with native widgets, notifications, sensors and location behind small `expect`/`actual` seams.
