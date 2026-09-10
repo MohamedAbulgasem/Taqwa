@@ -1,14 +1,32 @@
 package world.taqwa.app.feature.settings
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
+import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
@@ -20,6 +38,7 @@ import world.taqwa.app.resources.appearance_note
 import world.taqwa.app.resources.appearance_theme_label
 import world.taqwa.app.resources.appearance_widget_background_label
 import world.taqwa.app.resources.appearance_prayer_widget_preview_label
+import world.taqwa.app.resources.appearance_widget_add
 import world.taqwa.app.resources.settings_appearance
 import world.taqwa.app.resources.theme_dark
 import world.taqwa.app.resources.theme_light
@@ -27,13 +46,21 @@ import world.taqwa.app.resources.theme_system
 import world.taqwa.app.resources.widget_background_dark
 import world.taqwa.app.resources.widget_background_follow_theme
 import world.taqwa.app.resources.widget_background_light
+import world.taqwa.app.widget.PinnableWidget
 import world.taqwa.app.widget.WidgetContent
 import world.taqwa.app.widget.WidgetContentBuilder
 import world.taqwa.app.widget.WidgetMirrorWriter
+import world.taqwa.app.widget.WidgetOffer
+import world.taqwa.app.widget.WidgetPinRequester
+import world.taqwa.app.widget.WidgetPlacement
+import world.taqwa.app.widget.WidgetPlacementSource
 import world.taqwa.app.widget.createWidgetKeyValueStore
 import world.taqwa.app.widget.isIosPlatform
 import world.taqwa.app.widget.translucentOrFrostedSubtitleKey
 import world.taqwa.app.widget.translucentOrFrostedTitleKey
+import world.taqwa.app.widget.widgetAddInstructionsKey
+import world.taqwa.app.widget.widgetAddPath
+import world.taqwa.app.widget.widgetOffer
 
 @Composable
 internal fun themeDisplayName(mode: ThemeMode): String = stringResource(
@@ -72,8 +99,24 @@ fun AppearanceSettingsScreen(
     onPick: (ThemeMode) -> Unit,
     widgetBackground: WidgetBackground,
     onPickWidgetBackground: (WidgetBackground) -> Unit,
+    widgetPinRequester: WidgetPinRequester,
+    widgetPlacementSource: WidgetPlacementSource,
     onBack: () -> Unit,
 ) {
+    // Starts at Unknown, which reports both widgets as placed and so offers nothing: the row
+    // fades in when the real answer arrives, rather than flashing away when it turns out the
+    // widget was already there. Read again on every ON_START, not just on entering composition,
+    // because the whole point is that the user leaves to add the widget and comes back — and the
+    // read itself hops off the main thread, since Android's answer is a binder call to the
+    // launcher and iOS's can take up to two seconds.
+    var placement by remember { mutableStateOf(WidgetPlacement.Unknown) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(widgetPlacementSource, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            placement = withContext(Dispatchers.Default) { widgetPlacementSource.current() }
+        }
+    }
+
     SettingsScaffold(stringResource(Res.string.settings_appearance), onBack) {
         SectionLabel(stringResource(Res.string.appearance_theme_label))
         SettingsCard {
@@ -121,6 +164,7 @@ fun AppearanceSettingsScreen(
             content = mirrorContent,
             modifier = Modifier.padding(horizontal = SettingsGutter),
         )
+        WidgetAddOffer(PinnableWidget.PRAYER, placement.prayer, widgetPinRequester)
 
         Spacer(Modifier.height(14.dp))
         SectionLabel(stringResource(Res.string.appearance_ayah_widget_preview_label))
@@ -128,6 +172,63 @@ fun AppearanceSettingsScreen(
             background = widgetBackground,
             systemIsDark = systemIsDark,
             modifier = Modifier.padding(horizontal = SettingsGutter),
+        )
+        WidgetAddOffer(PinnableWidget.AYAH, placement.ayah, widgetPinRequester)
+    }
+}
+
+/**
+ * What sits directly under one preview: nothing at all when the widget is already on a home
+ * screen, a row that asks the launcher for it where the launcher takes such requests, and the
+ * platform's own steps where it does not (iOS always, and an Android launcher without pin
+ * support). The three-way choice is [widgetOffer]'s, not this composable's, so it is decided and
+ * tested as a pure function.
+ */
+@Composable
+private fun WidgetAddOffer(widget: PinnableWidget, placed: Boolean, pinRequester: WidgetPinRequester) {
+    when (val offer = widgetOffer(widget, placed, pinRequester.isSupported(widget), widgetAddPath)) {
+        WidgetOffer.None -> Unit
+        is WidgetOffer.Pin -> {
+            Spacer(Modifier.height(10.dp))
+            SettingsCard {
+                // Fire and forget: the launcher's confirmation sheet is system UI and its answer
+                // never comes back, so the app does nothing further — the row simply is not there
+                // the next time placement is read, on the ON_START that follows.
+                TaqwaRow(
+                    label = stringResource(Res.string.appearance_widget_add),
+                    onClick = { pinRequester.requestPin(offer.widget) },
+                    trailing = { ForwardChevron() },
+                )
+            }
+        }
+        is WidgetOffer.Instructions -> {
+            Spacer(Modifier.height(10.dp))
+            SettingsNote(stringResource(widgetAddInstructionsKey(offer.path)))
+        }
+    }
+}
+
+/**
+ * The disclosure chevron, drawn from literal coordinates like [BackChevron] and mirrored by hand:
+ * a `Row`'s trailing edge already moves itself under RTL, so the glyph inside it must flip too or
+ * it points back the way the text came.
+ */
+@Composable
+private fun ForwardChevron() {
+    val colors = LocalTaqwaColors.current
+    val pointsRight = LocalLayoutDirection.current == LayoutDirection.Ltr
+    Canvas(Modifier.size(14.dp)) {
+        val w = size.width
+        fun x(fraction: Float) = if (pointsRight) w * fraction else w * (1f - fraction)
+        val path = Path().apply {
+            moveTo(x(0.36f), w * 0.14f)
+            lineTo(x(0.68f), w * 0.50f)
+            lineTo(x(0.36f), w * 0.86f)
+        }
+        drawPath(
+            path = path,
+            color = colors.textTertiary,
+            style = Stroke(width = w * 0.12f, cap = StrokeCap.Round, join = StrokeJoin.Round),
         )
     }
 }

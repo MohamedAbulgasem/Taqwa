@@ -1,5 +1,11 @@
 package world.taqwa.app.widget
 
+import org.jetbrains.compose.resources.StringResource
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.appearance_widget_add_android
+import world.taqwa.app.resources.appearance_widget_add_ios_hold
+import world.taqwa.app.resources.appearance_widget_add_ios_plus
+
 /**
  * Which Taqwa widgets are on a home screen right now.
  *
@@ -54,4 +60,18 @@ fun widgetOffer(
     placed -> WidgetOffer.None
     pinnable -> WidgetOffer.Pin(widget)
     else -> WidgetOffer.Instructions(addPath)
+}
+
+/**
+ * The caption shown for [WidgetOffer.Instructions] — this platform's own steps for adding a
+ * widget by hand, in the shorter wording the Appearance screen wants: the preview directly above
+ * already says what the widget is, which is what onboarding's longer copy opens by explaining.
+ *
+ * A pure mapping rather than a `when` inside the composable, so both the branching and the copy
+ * it picks are testable without a UI test, exactly as [translucentOrFrostedTitleKey] is.
+ */
+fun widgetAddInstructionsKey(path: WidgetAddPath): StringResource = when (path) {
+    WidgetAddPath.ANDROID_PIN -> Res.string.appearance_widget_add_android
+    WidgetAddPath.IOS_HOLD_ICON -> Res.string.appearance_widget_add_ios_hold
+    WidgetAddPath.IOS_PLUS_BUTTON -> Res.string.appearance_widget_add_ios_plus
 }

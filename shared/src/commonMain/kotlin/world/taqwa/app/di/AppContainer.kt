@@ -14,6 +14,7 @@ import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.createDataStore
 import world.taqwa.app.widget.createWidgetPinRequester
+import world.taqwa.app.widget.createWidgetPlacementSource
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
@@ -40,6 +41,9 @@ class AppContainer {
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()
     val widgetPinRequester = createWidgetPinRequester()
+    // Stateless — it asks the platform on every call and caches nothing, because widgets are
+    // added and removed outside the app.
+    val widgetPlacementSource = createWidgetPlacementSource()
     val locationRefresher = LocationRefresher(locationRepository, cityRepository, settingsRepository)
     val notificationCoordinator = NotificationCoordinator(
         engine = prayerTimesEngine,

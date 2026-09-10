@@ -662,6 +662,8 @@ fun App(container: AppContainer) {
 
                         Screen.Appearance -> AppearanceSettingsScreen(
                             current = themeMode,
+                            widgetPinRequester = container.widgetPinRequester,
+                            widgetPlacementSource = container.widgetPlacementSource,
                             // No pop: the whole app repaints behind this screen, and seeing that happen
                             // is the confirmation the choice took effect.
                             onPick = { scope.launch { settings.setThemeMode(it) } },

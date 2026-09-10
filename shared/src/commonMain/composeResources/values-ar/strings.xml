@@ -173,6 +173,12 @@
     <string name="appearance_widget_background_label">خلفية الودجت</string>
     <string name="appearance_prayer_widget_preview_label">ودجات الصلاة</string>
     <string name="appearance_ayah_widget_preview_label">ودجة الآية</string>
+
+    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <string name="appearance_widget_add">إضافة إلى الشاشة الرئيسية</string>
+    <string name="appearance_widget_add_ios_hold">اضغط مطولًا على أيقونة تقوى ثم اختر ودجة.</string>
+    <string name="appearance_widget_add_ios_plus">اضغط مطولًا على الشاشة الرئيسية ثم اضغط على علامة الجمع وابحث عن تقوى.</string>
+    <string name="appearance_widget_add_android">اضغط مطولًا على الشاشة الرئيسية ثم اختر الودجات.</string>
     <string name="widget_background_follow_theme">حسب النظام</string>
     <string name="widget_background_light">فاتح</string>
     <string name="widget_background_dark">داكن</string>

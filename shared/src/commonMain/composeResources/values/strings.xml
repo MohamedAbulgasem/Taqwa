@@ -178,6 +178,12 @@
     <string name="appearance_widget_background_label">WIDGET BACKGROUND</string>
     <string name="appearance_prayer_widget_preview_label">PRAYER WIDGETS</string>
     <string name="appearance_ayah_widget_preview_label">AYAH WIDGET</string>
+
+    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <string name="appearance_widget_add">Add to home screen</string>
+    <string name="appearance_widget_add_ios_hold">Touch and hold the Taqwa icon, then choose a widget.</string>
+    <string name="appearance_widget_add_ios_plus">Touch and hold the home screen, tap the plus, then search for Taqwa.</string>
+    <string name="appearance_widget_add_android">Touch and hold the home screen, then choose Widgets.</string>
     <string name="widget_background_follow_theme">System</string>
     <string name="widget_background_light">Light</string>
     <string name="widget_background_dark">Dark</string>
