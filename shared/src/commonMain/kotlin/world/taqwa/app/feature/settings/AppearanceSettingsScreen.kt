@@ -174,15 +174,27 @@ fun AppearanceSettingsScreen(
             modifier = Modifier.padding(horizontal = SettingsGutter),
         )
         WidgetAddOffer(PinnableWidget.AYAH, placement.ayah, widgetPinRequester)
+
+        // The steps are the same sentence for either widget — they are how this platform adds any
+        // widget at all — so they are said once under both previews rather than twice, which read
+        // as a copy-paste. The pin rows above stay per-widget, because those really do differ.
+        val paths = listOf(
+            widgetOffer(PinnableWidget.PRAYER, placement.prayer, widgetPinRequester.isSupported(PinnableWidget.PRAYER), widgetAddPath),
+            widgetOffer(PinnableWidget.AYAH, placement.ayah, widgetPinRequester.isSupported(PinnableWidget.AYAH), widgetAddPath),
+        ).filterIsInstance<WidgetOffer.Instructions>()
+        if (paths.isNotEmpty()) {
+            Spacer(Modifier.height(10.dp))
+            SettingsNote(stringResource(widgetAddInstructionsKey(paths.first().path)))
+        }
     }
 }
 
 /**
- * What sits directly under one preview: nothing at all when the widget is already on a home
- * screen, a row that asks the launcher for it where the launcher takes such requests, and the
- * platform's own steps where it does not (iOS always, and an Android launcher without pin
- * support). The three-way choice is [widgetOffer]'s, not this composable's, so it is decided and
- * tested as a pure function.
+ * The row that sits directly under one preview: nothing at all when the widget is already on a
+ * home screen, and a row that asks the launcher for it where the launcher takes such requests.
+ * The third case — the platform cannot be asked, so the steps are written out — is not per-widget
+ * and is rendered once for the whole screen by the caller. The choice is [widgetOffer]'s, not this
+ * composable's, so it is decided and tested as a pure function.
  */
 @Composable
 private fun WidgetAddOffer(widget: PinnableWidget, placed: Boolean, pinRequester: WidgetPinRequester) {
@@ -201,10 +213,8 @@ private fun WidgetAddOffer(widget: PinnableWidget, placed: Boolean, pinRequester
                 )
             }
         }
-        is WidgetOffer.Instructions -> {
-            Spacer(Modifier.height(10.dp))
-            SettingsNote(stringResource(widgetAddInstructionsKey(offer.path)))
-        }
+        // Said once for the screen, by the caller.
+        is WidgetOffer.Instructions -> Unit
     }
 }
 
