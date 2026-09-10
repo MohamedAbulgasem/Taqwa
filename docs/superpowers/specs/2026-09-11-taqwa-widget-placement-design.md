@@ -64,7 +64,7 @@ Directly beneath each preview, in the same horizontal inset, one of three things
 - **Not placed, and the launcher takes pin requests** — a single tappable row in the card idiom the settings screens already use, labelled **"Add to home screen"** / «إضافة إلى الشاشة الرئيسية», with the chevron those rows carry. Tapping it calls `requestPin` for that widget; the launcher shows its own confirmation sheet, which is system UI and is not reported back, so the app does nothing further and the row simply disappears the next time placement is read.
 - **Not placed, and it cannot be asked for** (iOS, or an Android launcher without pin support) — a caption line in the secondary colour, no row and nothing tappable, giving the platform's own steps:
   - iOS, hold-icon path: "Touch and hold the Taqwa icon, then choose a widget." / «اضغط مطولًا على أيقونة تقوى ثم اختر ودجة.»
-  - iOS, plus-button path: "Touch and hold the home screen, tap the plus, then search for Taqwa." / «اضغط مطولًا على الشاشة الرئيسية ثم اضغط على علامة الجمع وابحث عن تقوى.»
+  - iOS, plus-button path: "Touch and hold the home screen, tap the plus, then search for Taqwa." / «اضغط مطولًا على الشاشة الرئيسية ثم اضغط على علامة الزائد وابحث عن تقوى.»
   - Android without pin support: "Touch and hold the home screen, then choose Widgets." / «اضغط مطولًا على الشاشة الرئيسية ثم اختر الودجات.»
 
   The existing `widgetAddPath` already distinguishes those three cases; these are new, shorter strings than onboarding's, which open by explaining what the widget is for — redundant under a picture of it.
@@ -73,7 +73,7 @@ Directly beneath each preview, in the same horizontal inset, one of three things
 
 ## 6. Tests
 
-`commonTest`: `WidgetPlacement.Unknown` hides both offers; the three-way choice per widget (placed → nothing; not placed and pinnable → the row; not placed and not pinnable → the caption for each of the three add paths) as a pure function `widgetOffer(placed, pinnable, addPath)` returning a small sealed result, so the branching is tested without a composable. `androidUnitTest`: the Android source maps a null hook to `Unknown`. The iOS bridge's timeout is covered by a fake hook that never calls back.
+`commonTest`: `WidgetPlacement.Unknown` hides both offers; the three-way choice per widget (placed → nothing; not placed and pinnable → the row; not placed and not pinnable → the caption for each of the three add paths) as a pure function `widgetOffer(placed, pinnable, addPath)` returning a small sealed result, so the branching is tested without a composable. `androidUnitTest`: the Android source maps a null hook to `Unknown`. **Amended 11 September 2026:** the iOS bridge's timeout has no test. `shared` has no `iosTest` source set, and standing one up to hold a single test of a two-second fallback is a poor trade; the bridge is compile-verified and exercised by the simulator round instead, and this is recorded rather than quietly dropped.
 
 Device: on the emulator, the Appearance screen with no widgets placed shows both rows; adding the ayah widget from the launcher and returning leaves only the prayer row; adding a prayer widget leaves neither. On the simulator, both previews show the iOS caption and no row.
 

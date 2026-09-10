@@ -110,6 +110,11 @@ fun AppearanceSettingsScreen(
     // read itself hops off the main thread, since Android's answer is a binder call to the
     // launcher and iOS's can take up to two seconds.
     var placement by remember { mutableStateOf(WidgetPlacement.Unknown) }
+    // A binder call to the launcher, and the answer cannot change while this screen is open, so
+    // it is asked once rather than on every recomposition of either preview.
+    val pinnable = remember(widgetPinRequester) {
+        PinnableWidget.entries.associateWith(widgetPinRequester::isSupported)
+    }
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(widgetPlacementSource, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -164,7 +169,20 @@ fun AppearanceSettingsScreen(
             content = mirrorContent,
             modifier = Modifier.padding(horizontal = SettingsGutter),
         )
-        WidgetAddOffer(PinnableWidget.PRAYER, placement.prayer, widgetPinRequester)
+        // Both offers are decided here, once, so the caption below can tell which preview it
+        // belongs under.
+        val prayerOffer = widgetOffer(
+            PinnableWidget.PRAYER, placement.prayer, pinnable[PinnableWidget.PRAYER] == true, widgetAddPath,
+        )
+        val ayahOffer = widgetOffer(
+            PinnableWidget.AYAH, placement.ayah, pinnable[PinnableWidget.AYAH] == true, widgetAddPath,
+        )
+        // Where the steps go, when the platform cannot be asked and they have to be written out.
+        // They are the platform's, not the widget's, so they are said once: under whichever
+        // preview needs them when only one does, and after both when both do, where they read as
+        // a note on the screen rather than on the ayah card they happen to follow.
+        val bothNeedSteps = prayerOffer is WidgetOffer.Instructions && ayahOffer is WidgetOffer.Instructions
+        WidgetAddOffer(prayerOffer, widgetPinRequester, showInstructions = !bothNeedSteps)
 
         Spacer(Modifier.height(14.dp))
         SectionLabel(stringResource(Res.string.appearance_ayah_widget_preview_label))
@@ -173,32 +191,32 @@ fun AppearanceSettingsScreen(
             systemIsDark = systemIsDark,
             modifier = Modifier.padding(horizontal = SettingsGutter),
         )
-        WidgetAddOffer(PinnableWidget.AYAH, placement.ayah, widgetPinRequester)
+        // The steps are the same sentence either way — they are how this platform adds any widget
+        // at all — so they are said once, under the first preview that needs them, and suppressed
+        // under the second. Said under both they read as a copy-paste; said only at the bottom
+        // they would sit under the ayah preview while describing a missing prayer widget.
+        WidgetAddOffer(ayahOffer, widgetPinRequester, showInstructions = !bothNeedSteps)
 
-        // The steps are the same sentence for either widget — they are how this platform adds any
-        // widget at all — so they are said once under both previews rather than twice, which read
-        // as a copy-paste. The pin rows above stay per-widget, because those really do differ.
-        val paths = listOf(
-            widgetOffer(PinnableWidget.PRAYER, placement.prayer, widgetPinRequester.isSupported(PinnableWidget.PRAYER), widgetAddPath),
-            widgetOffer(PinnableWidget.AYAH, placement.ayah, widgetPinRequester.isSupported(PinnableWidget.AYAH), widgetAddPath),
-        ).filterIsInstance<WidgetOffer.Instructions>()
-        if (paths.isNotEmpty()) {
+        if (bothNeedSteps) {
             Spacer(Modifier.height(10.dp))
-            SettingsNote(stringResource(widgetAddInstructionsKey(paths.first().path)))
+            SettingsNote(stringResource(widgetAddInstructionsKey((prayerOffer as WidgetOffer.Instructions).path)))
         }
     }
 }
 
 /**
- * The row that sits directly under one preview: nothing at all when the widget is already on a
- * home screen, and a row that asks the launcher for it where the launcher takes such requests.
- * The third case — the platform cannot be asked, so the steps are written out — is not per-widget
- * and is rendered once for the whole screen by the caller. The choice is [widgetOffer]'s, not this
- * composable's, so it is decided and tested as a pure function.
+ * What sits directly under one preview: nothing at all when the widget is already on a home
+ * screen, a row that asks the launcher for it where the launcher takes such requests, and the
+ * platform's own steps where it does not. [showInstructions] is false when the caller is saying
+ * those steps once for the whole screen instead, which it does when both widgets need them.
  */
 @Composable
-private fun WidgetAddOffer(widget: PinnableWidget, placed: Boolean, pinRequester: WidgetPinRequester) {
-    when (val offer = widgetOffer(widget, placed, pinRequester.isSupported(widget), widgetAddPath)) {
+private fun WidgetAddOffer(
+    offer: WidgetOffer,
+    pinRequester: WidgetPinRequester,
+    showInstructions: Boolean,
+) {
+    when (offer) {
         WidgetOffer.None -> Unit
         is WidgetOffer.Pin -> {
             Spacer(Modifier.height(10.dp))
@@ -213,8 +231,10 @@ private fun WidgetAddOffer(widget: PinnableWidget, placed: Boolean, pinRequester
                 )
             }
         }
-        // Said once for the screen, by the caller.
-        is WidgetOffer.Instructions -> Unit
+        is WidgetOffer.Instructions -> if (showInstructions) {
+            Spacer(Modifier.height(10.dp))
+            SettingsNote(stringResource(widgetAddInstructionsKey(offer.path)))
+        }
     }
 }
 

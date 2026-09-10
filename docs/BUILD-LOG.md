@@ -881,3 +881,28 @@ belonging to the card rather than sitting in a band of its own; both gaps are 36
 Appearance screen labelled one preview "PREVIEW" and the other "AYAH WIDGET", which read as two
 different kinds of label; both are named now, which also says which widget each card is a picture
 of. 520 tests, all green.
+
+### Offering the widget you have not added (11 September)
+
+Mohamed asked whether the app can tell which widgets are on the home screen, and whether the
+Appearance previews could offer to add a missing one. It can, and on Android it already did: the
+same query the refresh alarms use to decide whether to keep ticking answers "is this provider
+placed". iOS can answer too, asynchronously, through WidgetKit's current configurations, which the
+app had never asked before. Adding one is the asymmetric half — a launcher can be asked to place a
+specific widget and shows its own confirmation sheet, while WidgetKit has no such call at all, so
+iOS gets the steps written out instead of a button that would do nothing.
+
+Under each preview there is now a row when that widget is missing and the launcher takes pin
+requests, nothing at all when it is already there, and the platform's steps when it cannot be
+asked. The three-way choice is a pure function rather than a tangle of conditions in the
+composable. The suggestion that started this — making the preview itself the button — was turned
+down: the preview's job is to show the background choice, and it is the most obviously tappable
+thing on the screen, so a tap that did something else would be a trapdoor.
+
+Two things came out of review and one out of looking at it. `WidgetPlacement.Unknown` reports both
+widgets as *placed*, so every path that cannot answer — a null hook, a timeout, a device with no
+widget host — offers nothing; offering to add a widget somebody already has is the worse failure.
+The iOS instructions were showing under both previews, one identical sentence twice, which read as
+a copy-paste; they are said once now, under the single preview that needs them, or after both when
+both do. Neither the onboarding skip nor a test for the iOS timeout was built, and the spec says
+why in both cases.
