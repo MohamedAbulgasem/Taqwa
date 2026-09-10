@@ -258,6 +258,31 @@ fun App(container: AppContainer) {
     }
     val today = remember(zone) { Clock.System.now().toLocalDateTime(zone).date }
 
+    // Keyed on `ui_language`, not on the remembered `platformFormat`: MainActivity declares
+    // `locale` in configChanges, so switching the app's language recreates nothing and a format
+    // built on first composition goes on reporting the language the app started in — the same
+    // trap the ayah-mirror effect above documents. `ui_language` is a resolved string, so it
+    // changes exactly when the resolved strings around it do.
+    val languageTag = remember(uiLanguage) { createPlatformFormat().languageTag() }
+
+    // The stored location's city in the interface's language, for the Settings row and the
+    // Location screen. Resolved once, here, rather than in each of those screens: they show the
+    // same city and must never disagree about its name, and the lookup parses the bundled city
+    // list on first use — twice would be twice that cost. Keyed on the language tag as well as
+    // the location so a language change re-resolves; produceState rather than remember because
+    // the lookup suspends, and its initial value is the stored English snapshot, which is what
+    // both rows showed before this existed.
+    val cityDisplayName by produceState(location?.cityName, location, languageTag) {
+        val current = location
+        val id = current?.cityId
+        value = if (current == null || id == null) {
+            current?.cityName
+        } else {
+            container.cityRepository.setLanguage(languageTag)
+            container.cityRepository.displayName(id) ?: current.cityName
+        }
+    }
+
     CompositionLocalProvider(
         LocalLayoutDirection provides layoutDirection,
         LocalPlatformFormat provides platformFormat,
@@ -309,13 +334,21 @@ fun App(container: AppContainer) {
                         )
 
                         Screen.Today -> {
-                            val viewModel = remember {
+                            // Rebuilt when the language changes, with a format that reports the
+                            // new one: the remembered `platformFormat` cannot (see `languageTag`
+                            // above), and the header's city name, the Hijri and Gregorian dates
+                            // and the high-latitude note all read their language from it. The
+                            // cost is one extra widget-mirror write per language change.
+                            val viewModel = remember(languageTag) {
                                 TodayViewModel(
                                     engine = container.prayerTimesEngine,
                                     settings = settings,
                                     locationOf = { settings.location.first() },
                                     now = { Clock.System.now() },
-                                    format = platformFormat,
+                                    // For the header's city name in the reader's language, and
+                                    // for the one-time backfill of a location saved without an id.
+                                    cityRepository = container.cityRepository,
+                                    format = createPlatformFormat(),
                                 )
                             }
                             // Gated on the *lifecycle*, not just composition: leaving Today for another
@@ -474,8 +507,12 @@ fun App(container: AppContainer) {
                         }
 
                         Screen.Settings -> SettingsRootScreen(
-                            cityName = location?.let {
-                                it.cityName ?: stringResource(Res.string.today_current_location)
+                            // Null only when there is no location at all — the row then reads
+                            // "Not set" rather than naming a city nobody chose.
+                            cityName = if (location == null) {
+                                null
+                            } else {
+                                cityDisplayName ?: stringResource(Res.string.today_current_location)
                             },
                             methodName = methodDisplayName(prayerSettings.method),
                             themeName = themeDisplayName(themeMode),
@@ -562,6 +599,7 @@ fun App(container: AppContainer) {
 
                         Screen.LocationSettings -> LocationSettingsScreen(
                             location = location,
+                            cityName = cityDisplayName,
                             locationSource = locationSource,
                             locationRepository = container.locationRepository,
                             onLocationPermission = { permission ->

@@ -211,7 +211,9 @@ private fun CityAndDates(
     val colors = LocalTaqwaColors.current
     Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp)) {
         Text(
-            state.location.cityName ?: stringResource(Res.string.today_current_location),
+            // Resolved by the view model, in the interface's language; `location.cityName` stays
+            // the English snapshot and is only what this falls back to.
+            state.cityDisplayName ?: stringResource(Res.string.today_current_location),
             style = TaqwaText.screenTitle,
             color = colors.textPrimary,
         )

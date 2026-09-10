@@ -38,6 +38,12 @@ import world.taqwa.app.resources.today_current_location
 @Composable
 fun LocationSettingsScreen(
     location: GeoLocation?,
+    /**
+     * The city's name in the interface language, resolved once in `App.kt` and passed down so
+     * this screen and the Settings row it is reached from can never disagree. Null when there is
+     * no location, or none whose city the bundle knows a name for.
+     */
+    cityName: String?,
     locationSource: LocationSource,
     locationRepository: LocationRepository,
     onLocationPermission: (LocationPermission) -> Unit,
@@ -78,7 +84,7 @@ fun LocationSettingsScreen(
             // both languages, and a country code or an IANA id is never translated either.
             TaqwaRow(
                 stringResource(Res.string.location_city),
-                value = location?.cityName ?: stringResource(Res.string.today_current_location),
+                value = cityName ?: stringResource(Res.string.today_current_location),
             )
             CardDivider()
             TaqwaRow(stringResource(Res.string.location_country), value = location?.countryCode ?: "-")

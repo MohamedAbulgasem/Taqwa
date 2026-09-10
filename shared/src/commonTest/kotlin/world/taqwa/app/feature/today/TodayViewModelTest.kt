@@ -12,14 +12,17 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import okio.Path.Companion.toPath
+import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.i18n.EnglishPlatformFormat
+import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.KeyValueStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -37,6 +40,15 @@ private class CountingKeyValueStore : KeyValueStore {
         map[key] = value
     }
     override fun getString(key: String): String? = map[key]
+}
+
+/**
+ * English in every respect but the language tag, which is the only thing the city-name lookup
+ * reads. Delegating keeps the dates and digits in these tests readable while the header resolves
+ * as it would for a reader in Arabic.
+ */
+private class ArabicPlatformFormat : PlatformFormat by EnglishPlatformFormat {
+    override fun languageTag(): String = "ar-LY"
 }
 
 /**
@@ -314,5 +326,130 @@ class TodayViewModelTest {
 
         assertEquals(writesAtCancel, store.writes, "no further mirror writes once the tick job is cancelled")
         assertEquals(refreshesAtCancel, refreshes, "no further widget refresh once the tick job is cancelled")
+    }
+
+    // -- the header's city name, and the id a pre-0.4.0 location was saved without ---------------
+    //
+    // The saved location carries the GeoNames id of the city it came from, so the header can be
+    // re-rendered in whatever language the phone is in. `cityName` stays the English snapshot it
+    // has always been, which is both the fallback and what an upgraded install has until the id
+    // is backfilled.
+
+    private val citiesCsv = """
+        id,name,region,country,countryCode,lat,lon,tz
+        2643743,London,England,United Kingdom,GB,51.50853,-0.12574,Europe/London
+        360630,Cairo,Cairo Governorate,Egypt,EG,30.06263,31.24967,Africa/Cairo
+    """.trimIndent()
+
+    /** London has an Arabic name; Cairo deliberately does not, so the fallback is exercised. */
+    private val arabicNames = """
+        id,name
+        2643743,لندن
+    """.trimIndent()
+
+    private fun cities() = CityRepository(
+        loadCsv = { citiesCsv },
+        loadNames = { language -> if (language == "ar") arabicNames else null },
+    )
+
+    /** Nothing is near anything: `nearest` returns null, which is the no-match case. */
+    private fun noCities() = CityRepository(loadCsv = { "id,name,region,country,countryCode,lat,lon,tz" })
+
+    private val londonWithId = london.copy(cityId = 2643743)
+
+    private suspend fun readyFor(
+        store: String,
+        location: GeoLocation,
+        format: PlatformFormat,
+        cityRepository: CityRepository = cities(),
+    ): TodayUiState.Ready {
+        val repo = settings(store)
+        repo.setPrayerSettings(PrayerSettings())
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { location },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = cityRepository,
+            format = format,
+        )
+        vm.refresh()
+        return vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+    }
+
+    @Test
+    fun aSavedCityIsNamedInArabicWhenTheInterfaceIs() = runTest {
+        val ready = readyFor("city-name-ar", londonWithId, ArabicPlatformFormat())
+        assertEquals("لندن", ready.cityDisplayName)
+        // The stored English snapshot is untouched — it is a record of what was saved, not what
+        // is on screen.
+        assertEquals("London", ready.location.cityName)
+    }
+
+    @Test
+    fun theSameCityIsNamedInEnglishWhenTheInterfaceIs() = runTest {
+        val ready = readyFor("city-name-en", londonWithId, EnglishPlatformFormat)
+        assertEquals("London", ready.cityDisplayName)
+    }
+
+    @Test
+    fun aCityWithNoNameInTheInterfaceLanguageFallsBackToTheEnglishOne() = runTest {
+        val cairo = GeoLocation(30.06263, 31.24967, "Africa/Cairo", "Cairo", "EG", cityId = 360630)
+        val ready = readyFor("city-name-ar-missing", cairo, ArabicPlatformFormat())
+        assertEquals("Cairo", ready.cityDisplayName)
+    }
+
+    @Test
+    fun aLocationWithNoIdAndNoMatchingCityKeepsShowingItsStoredName() = runTest {
+        val ready = readyFor("city-name-no-match", london, ArabicPlatformFormat(), noCities())
+        assertEquals("London", ready.cityDisplayName)
+        assertNull(ready.location.cityId)
+    }
+
+    @Test
+    fun aLocationSavedBeforeIdsExistedGetsItsIdFromItsCoordinates() = runTest {
+        val repo = settings("city-id-migration")
+        repo.setPrayerSettings(PrayerSettings())
+        repo.setLocation(london)
+        assertNull(repo.location.first()!!.cityId, "the fixture must start without an id")
+
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { repo.location.first() },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = cities(),
+            format = ArabicPlatformFormat(),
+        )
+        vm.refresh()
+
+        assertEquals(2643743, repo.location.first()!!.cityId, "the id must be written back")
+        // And the header follows immediately, without waiting for the next launch.
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertEquals("لندن", ready.cityDisplayName)
+    }
+
+    @Test
+    fun theIdBackfillIsAttemptedOnceARunNotOnceASecond() = runTest {
+        val repo = settings("city-id-migration-once")
+        repo.setPrayerSettings(PrayerSettings())
+        repo.setLocation(london)
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { repo.location.first() },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = cities(),
+            format = EnglishPlatformFormat,
+        )
+        vm.refresh()
+        assertEquals(2643743, repo.location.first()!!.cityId)
+
+        // Put the store back the way an old install left it. Ninety more ticks — a minute and a
+        // half with Today open — must not scan the city list or write the id again, which is what
+        // the id staying absent proves.
+        repo.setLocation(london)
+        repeat(90) { vm.refresh() }
+        assertNull(repo.location.first()!!.cityId, "the backfill ran more than once")
     }
 }

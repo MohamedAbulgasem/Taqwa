@@ -29,6 +29,10 @@ internal object SettingsKeys {
     val LOCATION_LON = doublePreferencesKey("location_longitude")
     val LOCATION_TZ = stringPreferencesKey("location_timezone")
     val LOCATION_CITY = stringPreferencesKey("location_city")
+    // The GeoNames id of the chosen city, so its name can be shown in whatever language the
+    // reader is in. Separate from LOCATION_CITY, which stays the English snapshot: a location
+    // stored before this key existed has the name and no id.
+    val LOCATION_CITY_ID = intPreferencesKey("location_city_id")
     val LOCATION_COUNTRY = stringPreferencesKey("location_country")
     // Whether the stored location came from a fix or from the city list. Not derivable from the
     // location itself — see LocationSource — and the only thing "Use my location" can read.

@@ -74,6 +74,7 @@ class LocationRefresher(
             timeZoneId = zoneId,
             cityName = nearest?.name,
             countryCode = nearest?.countryCode,
+            cityId = nearest?.id,
         )
         settings.setLocation(next)
         // A silent re-resolve is still a fix, and it has just overwritten whatever city the user

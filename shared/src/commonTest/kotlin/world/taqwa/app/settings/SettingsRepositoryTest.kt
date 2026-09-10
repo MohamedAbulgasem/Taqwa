@@ -145,6 +145,44 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun theCityIdRoundTripsAlongsideTheEnglishName() = runTest {
+        val r = repo("loc-city-id-roundtrip")
+        r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB", cityId = 2643743))
+        val got = r.location.first()!!
+        assertEquals(2643743, got.cityId)
+        // The name stays the English snapshot: the id is what the language follows, not a
+        // replacement for it.
+        assertEquals("London", got.cityName)
+    }
+
+    @Test
+    fun aLocationStoredWithoutACityIdReadsBackWithNull() = runTest {
+        val r = repo("loc-city-id-absent")
+        r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB"))
+        assertEquals(null, r.location.first()!!.cityId)
+    }
+
+    @Test
+    fun anIdBackfilledOnItsOwnLeavesTheRestOfTheLocationAlone() = runTest {
+        val r = repo("loc-city-id-backfill")
+        r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB"))
+        r.setLocationCityId(2643743)
+        val got = r.location.first()!!
+        assertEquals(2643743, got.cityId)
+        assertEquals("London", got.cityName)
+        assertEquals("Europe/London", got.timeZoneId)
+        assertEquals("GB", got.countryCode)
+    }
+
+    @Test
+    fun aLaterLocationWithNoCityClearsTheIdRatherThanKeepingTheOldCitys() = runTest {
+        val r = repo("loc-city-id-cleared")
+        r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB", cityId = 2643743))
+        r.setLocation(GeoLocation(30.0, 31.0, "Africa/Cairo"))
+        assertEquals(null, r.location.first()!!.cityId)
+    }
+
+    @Test
     fun minuteAdjustmentsDefaultToEmpty() = runTest {
         assertEquals(emptyMap(), repo("adj-default").prayerSettings.first().minuteAdjustments)
     }

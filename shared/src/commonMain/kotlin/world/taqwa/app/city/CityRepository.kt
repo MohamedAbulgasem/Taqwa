@@ -89,6 +89,21 @@ class CityRepository(
     }
 
     /**
+     * The name of one city — the loaded language's, falling back to the English one — or null
+     * when the bundle has no city with that id (an id from an older extract, say).
+     *
+     * The name map is consulted first, so the common case is one hash lookup; only a language
+     * with no name for this city, or an English interface, pays the linear scan. That is
+     * deliberate: an id→city index would be a second 34k-entry structure held for the life of
+     * the process to serve a lookup that happens when the location or the language changes, and
+     * both callers ([TodayViewModel] and `App.kt`) cache the string they get back.
+     */
+    suspend fun displayName(cityId: Int): String? = withContext(Dispatchers.Default) {
+        val (cities, names) = data()
+        names[cityId] ?: cities.firstOrNull { it.id == cityId }?.name
+    }
+
+    /**
      * The nearest bundled city to a raw GPS fix, by great-circle distance. A linear scan over
      * ~34k rows is a few milliseconds — not worth a spatial index for a call that happens once
      * per location resolution. Returns null only when the database itself is empty.

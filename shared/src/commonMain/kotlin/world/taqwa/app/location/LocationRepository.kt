@@ -53,6 +53,7 @@ class LocationRepository(private val provider: LocationProvider) {
             timeZoneId = TimeZone.currentSystemDefault().id,
             cityName = nearest?.name,
             countryCode = nearest?.countryCode,
+            cityId = nearest?.id,
         )
     }
 }

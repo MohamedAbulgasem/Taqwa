@@ -88,7 +88,14 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         val lon = p[SettingsKeys.LOCATION_LON]
         val tz = p[SettingsKeys.LOCATION_TZ]
         if (lat == null || lon == null || tz == null) null
-        else GeoLocation(lat, lon, tz, p[SettingsKeys.LOCATION_CITY], p[SettingsKeys.LOCATION_COUNTRY])
+        else GeoLocation(
+            latitude = lat,
+            longitude = lon,
+            timeZoneId = tz,
+            cityName = p[SettingsKeys.LOCATION_CITY],
+            countryCode = p[SettingsKeys.LOCATION_COUNTRY],
+            cityId = p[SettingsKeys.LOCATION_CITY_ID],
+        )
     }
 
     /**
@@ -211,7 +218,21 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             if (city == null) it.remove(SettingsKeys.LOCATION_CITY) else it[SettingsKeys.LOCATION_CITY] = city
             val country = location.countryCode
             if (country == null) it.remove(SettingsKeys.LOCATION_COUNTRY) else it[SettingsKeys.LOCATION_COUNTRY] = country
+            // Cleared for the same reason the name is: a fix that landed nowhere near a bundled
+            // city must not keep the previous city's id, or the header would name a city the
+            // coordinates are no longer in.
+            val cityId = location.cityId
+            if (cityId == null) it.remove(SettingsKeys.LOCATION_CITY_ID) else it[SettingsKeys.LOCATION_CITY_ID] = cityId
         }
+    }
+
+    /**
+     * Writes only the city id, leaving every other part of the stored location alone. Used by the
+     * one-time migration of a location saved before ids existed: it read the location some time
+     * ago, and rewriting the whole thing would undo a fix or a city pick that landed in between.
+     */
+    suspend fun setLocationCityId(cityId: Int) {
+        store.edit { it[SettingsKeys.LOCATION_CITY_ID] = cityId }
     }
 
     /**

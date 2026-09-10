@@ -9,6 +9,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.TodayState
@@ -33,6 +34,16 @@ sealed interface TodayUiState {
     data object NeedsLocation : TodayUiState
     data class Ready(
         val location: GeoLocation,
+        /**
+         * What the header prints: [GeoLocation.cityId]'s name in the interface language, falling
+         * back to [GeoLocation.cityName] — the English snapshot — and null when there is neither,
+         * which is where the screen substitutes its own "Current location".
+         *
+         * A field of its own rather than a rewritten `location.cityName`: the snapshot stays
+         * exactly what was stored, and there is one obvious answer to "where does the string on
+         * the header come from".
+         */
+        val cityDisplayName: String?,
         val hijri: String,
         /** The same day as [hijri], Gregorian, via [PlatformFormat.longDate]. */
         val gregorian: String,
@@ -49,6 +60,9 @@ class TodayViewModel(
     private val settings: SettingsRepository,
     private val locationOf: suspend () -> GeoLocation?,
     private val now: () -> Instant,
+    // Null means "no city lookup": the header then shows the stored English name, which is what
+    // it did before this existed and what the tests that care only about times want.
+    private val cityRepository: CityRepository? = null,
     // The device's own formatter in the app; the locale-free English one by default, so these
     // tests read the same on a machine whose system language is Arabic.
     private val format: PlatformFormat = EnglishPlatformFormat,
@@ -74,6 +88,21 @@ class TodayViewModel(
      * so comparing the serialised form collapses those 60 ticks to one.
      */
     private var lastWrittenMirror: String? = null
+
+    /**
+     * The last name resolved, with what it was resolved from. The tick runs once a second and the
+     * answer only changes when the city or the language does, so this keeps ~59 of every 60 ticks
+     * from touching the city repository at all.
+     */
+    private var cachedNameFor: Pair<Int, String>? = null
+    private var cachedName: String? = null
+
+    /**
+     * Whether the one-time id backfill has been attempted this run — set before the lookup, not
+     * after, so a location that matches no bundled city costs exactly one scan per app run rather
+     * than one per second.
+     */
+    private var cityIdMigrationAttempted = false
 
     /**
      * Runs the one-second tick until the calling coroutine is cancelled. No owned scope and no
@@ -120,6 +149,7 @@ class TodayViewModel(
         val timeline = TimelineBuilder.build(yesterday, today, tomorrow, instant, prefs.showSunrise)
         _state.value = TodayUiState.Ready(
             location = location,
+            cityDisplayName = cachedCityName(location),
             hijri = HijriFormatter.format(hijri, format),
             gregorian = format.longDate(localDate),
             today = timeline,
@@ -139,6 +169,79 @@ class TodayViewModel(
             lastWrittenMirror = mirror
             widgetStore().putString(WidgetInputsMirror.KEY, mirror)
             onWidgetsChanged()
+        }
+        // Both last, deliberately: the state above is already published, so neither the first
+        // frame nor any later tick waits on the city list being parsed or scanned. Each one
+        // republishes the header's name itself if it ends up with a better one.
+        resolveCityName(location)
+        migrateCityId(location)
+    }
+
+    /**
+     * The header's string with no I/O: the resolved name when this exact city and language were
+     * resolved already, and the stored English snapshot until then. Nothing here can suspend, so
+     * every tick — the first one above all — publishes its state immediately.
+     */
+    private fun cachedCityName(location: GeoLocation): String? {
+        val id = location.cityId ?: return location.cityName
+        return if (cachedNameFor == id to format.languageTag()) {
+            cachedName ?: location.cityName
+        } else {
+            location.cityName
+        }
+    }
+
+    /**
+     * Looks the header's name up in the reader's language and republishes it when it differs from
+     * what the tick above already showed. A no-op on all but the first tick after the city or the
+     * language changes, because [cachedCityName] then already has the answer.
+     *
+     * The language is read from [format] on every call rather than captured once: a language
+     * change recreates the Android activity and restarts the iOS app, but even without that, the
+     * next tick simply asks again and the cache key stops matching.
+     */
+    private suspend fun resolveCityName(location: GeoLocation) {
+        val repository = cityRepository ?: return
+        val id = location.cityId ?: return
+        val language = format.languageTag()
+        if (cachedNameFor != id to language) {
+            repository.setLanguage(language)
+            cachedName = repository.displayName(id)
+            cachedNameFor = id to language
+        }
+        val resolved = cachedName ?: location.cityName
+        val current = _state.value
+        if (current is TodayUiState.Ready && current.cityDisplayName != resolved) {
+            _state.value = current.copy(cityDisplayName = resolved)
+        }
+    }
+
+    /**
+     * Gives a location stored before ids existed the id its coordinates imply, once.
+     *
+     * Here rather than in `SettingsRepository`, because this is the one place that has the stored
+     * location, the city list and a coroutine to suspend in all at once, and it already runs on
+     * every entry to the Prayer screen. `SettingsRepository.location` is a cold `Flow` mapped from
+     * DataStore — it cannot suspend on a 1.6 MB parse, and doing the lookup there would run it for
+     * every collector, including the notification scheduler, which has no use for a name.
+     *
+     * A location whose coordinates match no bundled city — only possible when the list itself is
+     * empty — keeps a null id and goes on showing [GeoLocation.cityName].
+     */
+    private suspend fun migrateCityId(location: GeoLocation) {
+        val repository = cityRepository ?: return
+        if (cityIdMigrationAttempted || location.cityId != null) return
+        cityIdMigrationAttempted = true
+        val id = repository.nearest(location.latitude, location.longitude)?.id ?: return
+        // Only the id, so a city picked or a fix taken while the scan was running is not undone.
+        settings.setLocationCityId(id)
+        val migrated = location.copy(cityId = id)
+        val current = _state.value
+        if (current is TodayUiState.Ready && current.location == location) {
+            _state.value = current.copy(location = migrated)
+            // Now that there is an id, the name it stands for — this is the first tick on which
+            // an upgraded install can show the header in the reader's own language.
+            resolveCityName(migrated)
         }
     }
 

@@ -32,5 +32,6 @@ data class City(
         timeZoneId = timeZoneId,
         cityName = name,
         countryCode = countryCode,
+        cityId = id,
     )
 }
