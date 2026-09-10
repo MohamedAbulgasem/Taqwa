@@ -38,6 +38,13 @@ class CityRepository(
     private var loadedLanguage: String? = null
     private var localizedNames: Map<Int, String> = emptyMap()
 
+    /**
+     * [localizedNames] folded, keyed the same way. Held alongside the display forms rather than
+     * folded on demand for the same reason [City.foldedName] exists: a keystroke would otherwise
+     * fold every translated name it walks past, and there are up to ~9k of them.
+     */
+    private var foldedNames: Map<Int, String> = emptyMap()
+
     /** Guards the one-time parse so two concurrent callers cannot each build the 34k-row list. */
     private val cacheLock = Mutex()
 
@@ -53,18 +60,27 @@ class CityRepository(
     }
 
     /**
-     * The city list and the name map for the current language, both parsed on first use, under
-     * one lock acquisition — [Mutex] is not reentrant, so these cannot be two nested helpers.
+     * The city list and the current language's names — display forms and folded forms both —
+     * parsed on first use under one lock acquisition: [Mutex] is not reentrant, so these cannot
+     * be two nested helpers.
      */
-    private suspend fun data(): Pair<List<City>, Map<Int, String>> = cacheLock.withLock {
+    private suspend fun data(): Loaded = cacheLock.withLock {
         val cities = cache ?: parse(loadCsv()).also { cache = it }
         val language = wantedLanguage
         if (loadedLanguage != language) {
             localizedNames = if (language.isEmpty()) emptyMap() else parseNames(loadNames(language))
+            foldedNames = localizedNames.mapValues { (_, name) -> CityText.fold(name) }
             loadedLanguage = language
         }
-        cities to localizedNames
+        Loaded(cities, localizedNames, foldedNames)
     }
+
+    /** The three structures a search needs, resolved together under one lock acquisition. */
+    private class Loaded(
+        val cities: List<City>,
+        val names: Map<Int, String>,
+        val folded: Map<Int, String>,
+    )
 
     /**
      * A city matches when its English name **or** its name in the loaded language starts with the
@@ -75,13 +91,14 @@ class CityRepository(
         val q = CityText.fold(query)
         if (q.isEmpty()) return emptyList()
         return withContext(Dispatchers.Default) {
-            val (cities, names) = data()
-            cities.asSequence()
+            val loaded = data()
+            loaded.cities.asSequence()
                 .mapNotNull { city ->
-                    val localized = names[city.id]
-                    val matches = CityText.fold(city.name).startsWith(q) ||
-                        (localized != null && CityText.fold(localized).startsWith(q))
-                    if (matches) city.copy(localizedName = localized) else null
+                    // Both sides are already folded — the query once, above; the names once, at
+                    // parse time — so a keystroke is comparisons and no allocation at all.
+                    val matches = city.foldedName.startsWith(q) ||
+                        loaded.folded[city.id]?.startsWith(q) == true
+                    if (matches) city.copy(localizedName = loaded.names[city.id]) else null
                 }
                 .take(limit)
                 .toList()
@@ -99,8 +116,8 @@ class CityRepository(
      * both callers ([TodayViewModel] and `App.kt`) cache the string they get back.
      */
     suspend fun displayName(cityId: Int): String? = withContext(Dispatchers.Default) {
-        val (cities, names) = data()
-        names[cityId] ?: cities.firstOrNull { it.id == cityId }?.name
+        val loaded = data()
+        loaded.names[cityId] ?: loaded.cities.firstOrNull { it.id == cityId }?.name
     }
 
     /**
@@ -110,10 +127,10 @@ class CityRepository(
      */
     suspend fun nearest(latitude: Double, longitude: Double): City? =
         withContext(Dispatchers.Default) {
-            val (cities, names) = data()
-            cities.minByOrNull {
+            val loaded = data()
+            loaded.cities.minByOrNull {
                 LocationRepository.distanceMetres(latitude, longitude, it.latitude, it.longitude)
-            }?.let { it.copy(localizedName = names[it.id]) }
+            }?.let { it.copy(localizedName = loaded.names[it.id]) }
         }
 
     private suspend fun parse(csv: String): List<City> = withContext(Dispatchers.Default) {

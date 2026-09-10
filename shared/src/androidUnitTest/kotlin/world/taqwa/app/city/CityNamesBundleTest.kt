@@ -51,6 +51,14 @@ class CityNamesBundleTest {
             .toSet()
     }
 
+    private val englishNames: List<String> by lazy {
+        resource("cities.csv").readText().lineSequence()
+            .drop(1)
+            .filter { it.isNotBlank() }
+            .map { it.split(",")[1] }
+            .toList()
+    }
+
     private fun repository() = CityRepository(
         loadCsv = { resource("cities.csv").readText() },
         loadNames = { language -> resource("city-names-$language.csv").readText() },
@@ -147,6 +155,43 @@ class CityNamesBundleTest {
         repo.setLanguage("fr-FR")
         assertEquals("Le Cap", repo.search("le cap").first { it.name == "Cape Town" }.displayName)
         assertEquals("Londres", repo.search("londres").first().displayName)
+    }
+
+    /**
+     * The regression guard for the whole class of bug the curated fold table was: if a bundled
+     * English name still carries a letter no rule reaches, that city cannot be found by typing
+     * its name on a plain keyboard. The curated map left 83 such letters in 4,559 places —
+     * Thāne (1.8 M people), Ōta, Niš. Folding must leave nothing but ASCII and spaces behind.
+     */
+    @Test
+    fun noBundledEnglishNameKeepsANonAsciiLetterAfterFolding() {
+        val offenders = mutableMapOf<Char, String>()
+        for (name in englishNames) {
+            for (ch in CityText.fold(name)) {
+                if (ch.code > 0x7F) offenders.putIfAbsent(ch, name)
+            }
+        }
+        assertTrue(
+            offenders.isEmpty(),
+            "cities.csv names still fold to non-ASCII: " +
+                offenders.entries.take(10).joinToString { (ch, name) ->
+                    "'" + ch + "' (U+" + ch.code.toString(16).uppercase() + ") in " + name
+                },
+        )
+    }
+
+    /** The five names the amended §4 rules were written for, found by what a searcher types. */
+    @Test
+    fun theRealBundleFindsTheNamesTheCuratedFoldingMissed() = runTest {
+        val repo = repository()
+        assertEquals("Th\u0101ne", repo.search("thane").first().name)
+        assertEquals("\u014Cta", repo.search("ota").first { it.countryCode == "JP" }.name)
+        assertEquals("Ni\u0161", repo.search("nis").first { it.countryCode == "RS" }.name)
+        assertEquals("Xi\u2019an", repo.search("xian").first { it.countryCode == "CN" }.name)
+        assertTrue(
+            repo.search("saint denis", limit = 200).any { it.name.startsWith("Saint-Denis") },
+            "a hyphenated name must be reachable by typing a space",
+        )
     }
 
     @Test

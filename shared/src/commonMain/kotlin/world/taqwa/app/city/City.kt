@@ -19,6 +19,16 @@ data class City(
     val timeZoneId: String,
     val localizedName: String? = null,
 ) {
+    /**
+     * [name] folded once, when the row is parsed, rather than on every keystroke: a search
+     * compares the folded query against all ~34k of these, and folding them per keystroke was
+     * 34k `fold` calls and 34k `StringBuilder`s per character typed.
+     *
+     * Outside the constructor deliberately — it is derived from [name], so it stays out of
+     * `equals`, `hashCode`, `toString` and `copy`'s parameter list, and `copy` recomputes it.
+     */
+    val foldedName: String = CityText.fold(name)
+
     /** What the reader sees: their language's name, falling back to the English one. */
     val displayName: String get() = localizedName ?: name
 
