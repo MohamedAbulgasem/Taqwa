@@ -43,10 +43,10 @@ class LocationRepositoryTest {
     }
 
     private val citiesCsv = """
-        name,region,country,countryCode,lat,lon,tz
-        London,England,United Kingdom,GB,51.50853,-0.12574,Europe/London
-        London,Ontario,Canada,CA,42.98339,-81.23304,America/Toronto
-        Cairo,Cairo Governorate,Egypt,EG,30.06263,31.24967,Africa/Cairo
+        id,name,region,country,countryCode,lat,lon,tz
+        2643743,London,England,United Kingdom,GB,51.50853,-0.12574,Europe/London
+        6058560,London,Ontario,Canada,CA,42.98339,-81.23304,America/Toronto
+        360630,Cairo,Cairo Governorate,Egypt,EG,30.06263,31.24967,Africa/Cairo
     """.trimIndent()
 
     @Test
@@ -56,7 +56,7 @@ class LocationRepositoryTest {
         val fixLatitude = 51.5
         val fixLongitude = -0.12
         val repo = LocationRepository(FakeLocationProvider(fixLatitude to fixLongitude))
-        val cityRepository = CityRepository { citiesCsv }
+        val cityRepository = CityRepository(loadCsv = { citiesCsv })
 
         val resolved = repo.resolveGpsLocation(cityRepository)
 
@@ -69,7 +69,7 @@ class LocationRepositoryTest {
     @Test
     fun resolveGpsLocationReturnsNullWhenNoFixIsAvailable() = runTest {
         val repo = LocationRepository(FakeLocationProvider(null))
-        val cityRepository = CityRepository { citiesCsv }
+        val cityRepository = CityRepository(loadCsv = { citiesCsv })
 
         assertEquals(null, repo.resolveGpsLocation(cityRepository))
     }

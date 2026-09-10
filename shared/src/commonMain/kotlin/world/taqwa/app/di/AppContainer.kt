@@ -14,6 +14,7 @@ import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.createDataStore
 import world.taqwa.app.widget.createWidgetPinRequester
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
 /** Manual construction. A DI framework earns its place when there is a graph worth managing. */
@@ -21,7 +22,20 @@ class AppContainer {
     private val dataStore = createDataStore()
     val settingsRepository = SettingsRepository(dataStore)
     val bookmarkStore = BookmarkStore(dataStore)
-    val cityRepository = CityRepository { Res.readBytes("files/cities.csv").decodeToString() }
+    val cityRepository = CityRepository(
+        loadCsv = { Res.readBytes("files/cities.csv").decodeToString() },
+        // `Res.readBytes` throws rather than returning null for a file that is not bundled, and
+        // the six name files cover only six of the languages the app can be read in.
+        loadNames = { language ->
+            try {
+                Res.readBytes("files/city-names-$language.csv").decodeToString()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (missing: Exception) {
+                null
+            }
+        },
+    )
     val quranRepository by lazy { QuranRepository() }
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()

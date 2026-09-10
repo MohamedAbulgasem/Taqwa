@@ -30,10 +30,10 @@ private class FixedProvider(private val coordinates: Pair<Double, Double>?) : Lo
 
 /** Cape Town and Istanbul, the review's own travel scenario, plus Riyadh for the method default. */
 private val CITIES = """
-    name,region,country,countryCode,lat,lon,tz
-    Cape Town,Western Cape,South Africa,ZA,-33.92584,18.42322,Africa/Johannesburg
-    Istanbul,Istanbul,Turkey,TR,41.01384,28.94966,Europe/Istanbul
-    Riyadh,Riyadh,Saudi Arabia,SA,24.68773,46.72185,Asia/Riyadh
+    id,name,region,country,countryCode,lat,lon,tz
+    3369157,Cape Town,Western Cape,South Africa,ZA,-33.92584,18.42322,Africa/Johannesburg
+    745044,Istanbul,Istanbul,Turkey,TR,41.01384,28.94966,Europe/Istanbul
+    108410,Riyadh,Riyadh,Saudi Arabia,SA,24.68773,46.72185,Asia/Riyadh
 """.trimIndent()
 
 class LocationRefresherTest {
@@ -49,7 +49,7 @@ class LocationRefresherTest {
         provider: FixedProvider = FixedProvider(coordinates),
     ) = LocationRefresher(
         locationRepository = LocationRepository(provider),
-        cityRepository = CityRepository { CITIES },
+        cityRepository = CityRepository(loadCsv = { CITIES }),
         settings = settings,
         currentZoneId = { zoneId },
     )

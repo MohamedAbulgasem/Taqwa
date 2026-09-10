@@ -35,6 +35,7 @@ import world.taqwa.app.city.CityRepository
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.city_search_hint
 import world.taqwa.app.resources.city_search_no_results
@@ -53,11 +54,13 @@ fun CitySearchScreen(
     onBack: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    val languageTag = LocalPlatformFormat.current.languageTag()
     var query by remember { mutableStateOf("") }
     var results by remember { mutableStateOf(emptyList<City>()) }
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(query) {
+    LaunchedEffect(query, languageTag) {
+        cityRepository.setLanguage(languageTag)
         // A short pause keeps the first keystroke from paying for the CSV parse while the user
         // is still typing; the repository caches it after that.
         delay(120)
@@ -128,7 +131,7 @@ private fun CityRow(city: City, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        Text(city.name, style = TaqwaText.rowLabel, color = colors.textPrimary)
+        Text(city.displayName, style = TaqwaText.rowLabel, color = colors.textPrimary)
         Text(cityQualifier(city), style = TaqwaText.caption, color = colors.textSecondary)
     }
 }
