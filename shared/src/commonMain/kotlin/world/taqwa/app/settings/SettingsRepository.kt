@@ -47,6 +47,13 @@ internal fun decodeMinuteAdjustments(raw: String?): Map<Prayer, Int> {
     }.toMap()
 }
 
+/**
+ * The stored city's name as the header last printed it, with the interface language it was
+ * resolved in. Kept together because neither half means anything alone: a name is only safe to
+ * show a reader whose language is the one it was resolved for.
+ */
+data class ResolvedCityName(val name: String, val languageTag: String)
+
 class SettingsRepository(private val store: DataStore<Preferences>) {
 
     val themeMode: Flow<ThemeMode> =
@@ -96,6 +103,18 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             countryCode = p[SettingsKeys.LOCATION_COUNTRY],
             cityId = p[SettingsKeys.LOCATION_CITY_ID],
         )
+    }
+
+    /**
+     * What the header printed last time, and in which language — null on a fresh install, after a
+     * relocation that has not been resolved yet, and for a build older than this one. Read once
+     * per run, on the Prayer screen's first refresh, so the name is on the first frame instead of
+     * arriving ~0.4 s later behind the 1.6 MB city-list parse.
+     */
+    val resolvedCityName: Flow<ResolvedCityName?> = store.data.map { p ->
+        val name = p[SettingsKeys.LOCATION_CITY_DISPLAY_NAME]
+        val language = p[SettingsKeys.LOCATION_CITY_DISPLAY_LANGUAGE]
+        if (name == null || language == null) null else ResolvedCityName(name, language)
     }
 
     /**
@@ -206,8 +225,23 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         store.edit { it[SettingsKeys.WIDGET_BACKGROUND] = value.name }
     }
 
-    suspend fun setLocation(location: GeoLocation) {
+    /**
+     * Stores a location, and with it the name its city reads as — [resolved] — when the caller
+     * already knows it. The city picker does: the row the user tapped was already rendered in
+     * their language, so the header can print that name on the very next launch without looking
+     * anything up. Every other caller (a GPS fix, a relocation) passes null and the two keys are
+     * **cleared**, exactly as the id is: a name left behind by the previous city would caption
+     * the new coordinates with the old city's label.
+     */
+    suspend fun setLocation(location: GeoLocation, resolved: ResolvedCityName? = null) {
         store.edit {
+            if (resolved == null) {
+                it.remove(SettingsKeys.LOCATION_CITY_DISPLAY_NAME)
+                it.remove(SettingsKeys.LOCATION_CITY_DISPLAY_LANGUAGE)
+            } else {
+                it[SettingsKeys.LOCATION_CITY_DISPLAY_NAME] = resolved.name
+                it[SettingsKeys.LOCATION_CITY_DISPLAY_LANGUAGE] = resolved.languageTag
+            }
             it[SettingsKeys.LOCATION_LAT] = location.latitude
             it[SettingsKeys.LOCATION_LON] = location.longitude
             it[SettingsKeys.LOCATION_TZ] = location.timeZoneId
@@ -233,6 +267,19 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
      */
     suspend fun setLocationCityId(cityId: Int) {
         store.edit { it[SettingsKeys.LOCATION_CITY_ID] = cityId }
+    }
+
+    /**
+     * Records the name the header is now showing, for the language it was resolved in. Written by
+     * the one place that resolves it — `TodayViewModel` — and only when the answer or the language
+     * has actually changed: the Prayer screen ticks once a second and this must not be a write per
+     * tick. Leaves the rest of the location alone for the same reason [setLocationCityId] does.
+     */
+    suspend fun setResolvedCityName(resolved: ResolvedCityName) {
+        store.edit {
+            it[SettingsKeys.LOCATION_CITY_DISPLAY_NAME] = resolved.name
+            it[SettingsKeys.LOCATION_CITY_DISPLAY_LANGUAGE] = resolved.languageTag
+        }
     }
 
     /**

@@ -182,6 +182,50 @@ class SettingsRepositoryTest {
         assertEquals(null, r.location.first()!!.cityId)
     }
 
+    // -- the name the header remembers (D1) ----------------------------------------------------
+
+    @Test
+    fun aFreshInstallRemembersNoDisplayNameAtAll() = runTest {
+        assertEquals(null, repo("loc-city-name-absent").resolvedCityName.first())
+    }
+
+    @Test
+    fun theDisplayNameRoundTripsWithTheLanguageItWasResolvedIn() = runTest {
+        val r = repo("loc-city-name-roundtrip")
+        r.setLocation(
+            GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB", cityId = 2643743),
+            ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"),
+        )
+        assertEquals(ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"), r.resolvedCityName.first())
+        // Still only a caption for the id: the English snapshot underneath is untouched.
+        assertEquals("London", r.location.first()!!.cityName)
+    }
+
+    @Test
+    fun aNameWrittenOnItsOwnLeavesTheRestOfTheLocationAlone() = runTest {
+        val r = repo("loc-city-name-write")
+        r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB", cityId = 2643743))
+        r.setResolvedCityName(ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"))
+        val got = r.location.first()!!
+        assertEquals(2643743, got.cityId)
+        assertEquals("London", got.cityName)
+        assertEquals("Europe/London", got.timeZoneId)
+        assertEquals("\u0644\u0646\u062F\u0646", r.resolvedCityName.first()!!.name)
+    }
+
+    @Test
+    fun replacingTheLocationClearsTheRememberedNameSoItCannotOutliveItsCity() = runTest {
+        val r = repo("loc-city-name-cleared")
+        r.setLocation(
+            GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB", cityId = 2643743),
+            ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"),
+        )
+        // A GPS fix that landed nowhere near a bundled city: no id, and so no name either.
+        r.setLocation(GeoLocation(30.0, 31.0, "Africa/Cairo"))
+        assertEquals(null, r.location.first()!!.cityId)
+        assertEquals(null, r.resolvedCityName.first(), "London's Arabic name survived the move")
+    }
+
     @Test
     fun minuteAdjustmentsDefaultToEmpty() = runTest {
         assertEquals(emptyMap(), repo("adj-default").prayerSettings.first().minuteAdjustments)

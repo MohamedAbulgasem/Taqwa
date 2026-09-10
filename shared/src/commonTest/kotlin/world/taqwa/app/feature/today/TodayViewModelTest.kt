@@ -1,10 +1,13 @@
 package world.taqwa.app.feature.today
 
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -21,12 +24,14 @@ import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
+import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.KeyValueStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -43,6 +48,21 @@ private class CountingKeyValueStore : KeyValueStore {
         map[key] = value
     }
     override fun getString(key: String): String? = map[key]
+}
+
+/**
+ * Counts every write the settings store takes, for the same reason [CountingKeyValueStore] counts
+ * the mirror's: remembering the header's name must cost one write when the answer changes, not one
+ * per tick of a screen that refreshes every second.
+ */
+private class CountingDataStore(private val delegate: DataStore<Preferences>) : DataStore<Preferences> {
+    var writes = 0
+        private set
+    override val data: Flow<Preferences> get() = delegate.data
+    override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences {
+        writes++
+        return delegate.updateData(transform)
+    }
 }
 
 /**
@@ -540,6 +560,125 @@ class TodayViewModelTest {
         }
         assertTrue(misattributed.isEmpty(), "London's Arabic name was published under Cairo")
         assertEquals("Cairo", (vm.state.value as TodayUiState.Ready).cityDisplayName)
+    }
+
+    // -- D1: the header remembers its translated name -------------------------------------------
+    //
+    // The name cannot be looked up without parsing the 1.6 MB city list, and that parse is
+    // deliberately off the first frame so the prayer times are not held behind it. On a cold start
+    // the header therefore showed the English snapshot for ~0.4 s and then swapped — visibly,
+    // after the screen had settled. The answer is remembered next to the id instead, together with
+    // the language it was resolved in, so an ordinary launch needs no lookup at all.
+
+    /** Any read of the city list at all fails the test outright. */
+    private fun noCityListAtAll() = CityRepository(
+        loadCsv = { fail("the city list was parsed on a launch that already knew the name") },
+    )
+
+    private fun viewModelFor(
+        repo: SettingsRepository,
+        location: GeoLocation,
+        cityRepository: CityRepository,
+        format: PlatformFormat,
+    ) = TodayViewModel(
+        engine = PrayerTimesEngine(),
+        settings = repo,
+        locationOf = { location },
+        now = { Instant.parse("2026-09-06T14:30:00Z") },
+        cityRepository = cityRepository,
+        format = format,
+    )
+
+    @Test
+    fun aColdStartWhoseStoredLanguageMatchesOpensOnTheTranslatedNameAndLooksNothingUp() = runTest {
+        val repo = settings("city-name-remembered")
+        repo.setPrayerSettings(PrayerSettings())
+        repo.setLocation(londonWithId, ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"))
+
+        val vm = viewModelFor(repo, londonWithId, noCityListAtAll(), ArabicPlatformFormat())
+        val seen = mutableListOf<TodayUiState>()
+        val watcher = launch(start = CoroutineStart.UNDISPATCHED) { vm.state.toList(seen) }
+        vm.refresh()
+        // The collector is resumed by the scheduler, not by the emission itself: without this it
+        // is cancelled before it has seen anything at all.
+        runCurrent()
+        watcher.cancel()
+
+        val ready = seen.filterIsInstance<TodayUiState.Ready>()
+        assertEquals(
+            "\u0644\u0646\u062F\u0646",
+            ready.first().cityDisplayName,
+            "the first state a cold start publishes must already carry the reader's own name",
+        )
+        // The English snapshot is never on screen, not even for one frame — this is D1 itself.
+        assertTrue(
+            ready.none { it.cityDisplayName == "London" },
+            "the English snapshot was published before the stored name",
+        )
+    }
+
+    @Test
+    fun aColdStartWhoseStoredLanguageDiffersFallsBackToTheSnapshotAndSwapsWhenTheLookupLands() = runTest {
+        val repo = settings("city-name-remembered-other-language")
+        repo.setPrayerSettings(PrayerSettings())
+        // Resolved when the phone was in English; the reader has since switched to Arabic.
+        repo.setLocation(londonWithId, ResolvedCityName("London", "en-GB"))
+
+        val gate = CompletableDeferred<Unit>()
+        val slow = CityRepository(
+            loadCsv = { gate.await(); citiesCsv },
+            loadNames = { language -> if (language == "ar") arabicNames else null },
+        )
+        val vm = viewModelFor(repo, londonWithId, slow, ArabicPlatformFormat())
+
+        val refreshing = launch { vm.refresh() }
+        // Awaited through the state rather than with `runCurrent()`: the settings store's first
+        // read is real I/O, which advancing the scheduler does not wait out. The lookup is still
+        // held at the gate, so this is genuinely the state the first frame would paint.
+        val first = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        // Today's behaviour, kept on purpose for exactly this case: a stored English name must not
+        // be printed to a reader in Arabic, so this one launch flickers as it always did.
+        assertEquals("London", first.cityDisplayName)
+
+        gate.complete(Unit)
+        refreshing.join()
+        assertEquals(
+            "\u0644\u0646\u062F\u0646",
+            (vm.state.value as TodayUiState.Ready).cityDisplayName,
+        )
+        // And the next launch will not: the Arabic name is now what is stored.
+        assertEquals(
+            ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"),
+            repo.resolvedCityName.first(),
+        )
+    }
+
+    @Test
+    fun theNameIsRememberedOnceNotOnEveryTick() = runTest {
+        val store = CountingDataStore(
+            PreferenceDataStoreFactory.createWithPath {
+                "/tmp/taqwa-test-today-city-name-write-once.preferences_pb".toPath()
+            },
+        )
+        val repo = SettingsRepository(store)
+        repo.setPrayerSettings(PrayerSettings())
+        repo.setLocation(londonWithId)
+        assertNull(repo.resolvedCityName.first(), "a location stored without a name must have none")
+
+        val vm = viewModelFor(repo, londonWithId, cities(), ArabicPlatformFormat())
+        val writesBefore = store.writes
+        // A minute and a half with the Prayer screen open.
+        repeat(90) { vm.refresh() }
+
+        assertEquals(
+            1,
+            store.writes - writesBefore,
+            "90 ticks must write the remembered name exactly once",
+        )
+        assertEquals(
+            ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"),
+            repo.resolvedCityName.first(),
+        )
     }
 
     @Test

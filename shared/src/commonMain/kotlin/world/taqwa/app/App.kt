@@ -63,6 +63,7 @@ import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.design.components.TaqwaTabScaffold
+import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
@@ -626,7 +627,14 @@ fun App(container: AppContainer) {
                             onPick = { city ->
                                 scope.launch {
                                     val picked = city.toGeoLocation()
-                                    settings.setLocation(picked)
+                                    // The row the user tapped was already rendered in their
+                                    // language, so the name is known here — stored with the
+                                    // location so the header needs no lookup on any later
+                                    // launch, the first one after picking included.
+                                    settings.setLocation(
+                                        picked,
+                                        ResolvedCityName(city.displayName, languageTag),
+                                    )
                                     // The only writer of MANUAL, which is what makes turning the
                                     // toggle off reversible: back out of the search and the
                                     // stored source — and so the toggle — is untouched.

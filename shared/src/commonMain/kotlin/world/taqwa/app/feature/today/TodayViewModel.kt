@@ -21,6 +21,7 @@ import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.prayer.TimelineBuilder
 import world.taqwa.app.qibla.QiblaMath
+import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.KeyValueStore
 import world.taqwa.app.widget.WidgetInputsMirror
@@ -121,6 +122,14 @@ class TodayViewModel(
     private var migratedCityId: Int? = null
 
     /**
+     * What the two stored display-name keys hold, as far as this run knows: read once on the
+     * first [refresh] and updated by every write this run makes. Its purpose is the write side —
+     * a tick that resolves the same name again must not touch the store.
+     */
+    private var storedName: ResolvedCityName? = null
+    private var storedNameRead = false
+
+    /**
      * Runs the one-second tick until the calling coroutine is cancelled. No owned scope and no
      * `launch` of its own: the caller (`repeatOnLifecycle(STARTED) { … }` in `App.kt`) is what
      * ties this to the screen actually being on screen, not merely composed.
@@ -147,6 +156,9 @@ class TodayViewModel(
             _state.value = TodayUiState.NeedsLocation
             return
         }
+        // Before the state below is built, because it is what that state's header prints on a
+        // cold start. One store read, on the first refresh only.
+        seedStoredCityName(location)
         val prefs = settings.prayerSettings.first()
         val zone = TimeZone.of(location.timeZoneId)
         val instant = now()
@@ -194,9 +206,45 @@ class TodayViewModel(
     }
 
     /**
+     * Hands [cachedCityName] the answer the last run already worked out, so the first frame of a
+     * cold start carries the reader's own name for the city instead of the English snapshot.
+     *
+     * This is the whole point of the two stored keys. The city list is parsed off the first frame
+     * deliberately — the prayer times must not wait behind 1.6 MB of CSV — which used to mean the
+     * header showed "London" for ~0.4 s before «لندن» replaced it under the reader.
+     *
+     * **Only when the stored language is the one on screen now.** A reader who has changed
+     * language since has a name here in the old one, and printing that would be worse than the
+     * flicker; that launch falls back to [GeoLocation.cityName] and swaps when the lookup lands,
+     * as every launch used to. One flicker after a language change, none otherwise.
+     */
+    private suspend fun seedStoredCityName(location: GeoLocation) {
+        if (storedNameRead) return
+        storedNameRead = true
+        val stored = settings.resolvedCityName.first() ?: return
+        storedName = stored
+        val id = cityIdOf(location) ?: return
+        if (stored.languageTag != format.languageTag()) return
+        cachedName = stored.name
+        cachedNameFor = id to stored.languageTag
+    }
+
+    /**
+     * Writes the header's name back for the next cold start, and only when it is genuinely new:
+     * the tick runs once a second, and this compares against what the store is known to hold
+     * rather than editing DataStore sixty times a minute to rewrite the same two strings.
+     */
+    private suspend fun rememberCityName(resolved: ResolvedCityName) {
+        if (storedName == resolved) return
+        storedName = resolved
+        settings.setResolvedCityName(resolved)
+    }
+
+    /**
      * The header's string with no I/O: the resolved name when this exact city and language were
-     * resolved already, and the stored English snapshot until then. Nothing here can suspend, so
-     * every tick — the first one above all — publishes its state immediately.
+     * resolved already — including when [seedStoredCityName] supplied it from the store — and the
+     * stored English snapshot until then. Nothing here can suspend, so every tick, the first one
+     * above all, publishes its state immediately.
      */
     private fun cachedCityName(location: GeoLocation): String? {
         val id = cityIdOf(location) ?: return location.cityName
@@ -231,12 +279,14 @@ class TodayViewModel(
         // suspends on a 1.6 MB parse; a city picked, or a fix taken, while it was running has
         // already published a state about somewhere else, and republishing this name over it
         // would put the old city's name under the new city's times.
-        if (current is TodayUiState.Ready &&
-            current.location == location &&
-            current.cityDisplayName != resolved
-        ) {
+        if (current !is TodayUiState.Ready || current.location != location) return
+        if (current.cityDisplayName != resolved) {
             _state.value = current.copy(cityDisplayName = resolved)
         }
+        // Behind the same guard, and for the same reason: a name resolved for a city the screen
+        // has already left must not be stored as this location's, or the next cold start would
+        // open on the old city's name.
+        if (resolved != null) rememberCityName(ResolvedCityName(resolved, language))
     }
 
     /**

@@ -33,6 +33,13 @@ internal object SettingsKeys {
     // reader is in. Separate from LOCATION_CITY, which stays the English snapshot: a location
     // stored before this key existed has the name and no id.
     val LOCATION_CITY_ID = intPreferencesKey("location_city_id")
+    // The answer to "what does LOCATION_CITY_ID's city read as, here?", remembered so a cold
+    // start needs no lookup to print it. The name the header last showed, and the interface
+    // language it was resolved in — the language matters because a stored Arabic name must not
+    // be printed to a reader who has since switched to English. Both are cleared by setLocation
+    // alongside the id, so a name can never outlive the city it belongs to.
+    val LOCATION_CITY_DISPLAY_NAME = stringPreferencesKey("location_city_display_name")
+    val LOCATION_CITY_DISPLAY_LANGUAGE = stringPreferencesKey("location_city_display_language")
     val LOCATION_COUNTRY = stringPreferencesKey("location_country")
     // Whether the stored location came from a fix or from the city list. Not derivable from the
     // location itself — see LocationSource — and the only thing "Use my location" can read.
