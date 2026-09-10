@@ -61,6 +61,9 @@ private const val MUSHAF_PAGES = 604
 fun MushafScreen(
     state: MushafUiState,
     startPage: Int,
+    /** The ayah to open already highlighted, as a tap on the page would leave it; null when the
+     * page itself is what was asked for. */
+    initialHighlight: Pair<Int, Int>? = null,
     pageLoader: suspend (Int) -> MushafPage,
     onBack: () -> Unit,
     onToggleMode: () -> Unit,
@@ -77,7 +80,7 @@ fun MushafScreen(
     // The tapped ayah (spec §2.4), hoisted here rather than per page so it survives a page turn
     // and so tapping the same ayah again clears it. The pill's three actions (spec 2b §2.5) act on
     // this ayah, which is why they are resolved here and not inside a page.
-    var highlighted by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    var highlighted by remember { mutableStateOf(initialHighlight) }
     // LocalClipboardManager is deprecated in Compose MP 1.12, and its replacement takes a
     // ClipEntry with no common constructor — see [ReaderScreen]'s own note; the migration is one
     // expect/actual covering both screens, tracked as the clipboard follow-up in slice 2c.

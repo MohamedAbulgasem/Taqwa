@@ -71,12 +71,17 @@ private val ReaderGutter = 24.dp
  * tap on the tab root or the continue-reading card asked to open — and is only used once, to scroll
  * there; after that, [ReaderViewModel.onFirstVisibleAyah] tracks whatever the user actually scrolls
  * to, which is why it is a plain constructor-time value here rather than part of [state].
+ *
+ * [selectInitialAyah] additionally opens that ayah selected, as though the reader had arrived and
+ * the user had tapped it: the ayah widget shows one ayah with its actions, so a tap on it lands on
+ * the same ayah with the same actions rather than on a surah scrolled to roughly the right place.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen(
     state: ReaderUiState,
     initialAyah: Int,
+    selectInitialAyah: Boolean = false,
     onBack: () -> Unit,
     onToggleMode: () -> Unit,
     onChangeSettings: (ReadingSettings) -> Unit,
@@ -127,7 +132,9 @@ fun ReaderScreen(
         val hasBasmala = ready.basmala != null
         val listState = rememberLazyListState()
         val jumpOffsetPx = with(LocalDensity.current) { 8.dp.roundToPx() }
-        var selectedAyah by remember(ready.surah.number) { mutableStateOf<Int?>(null) }
+        var selectedAyah by remember(ready.surah.number) {
+            mutableStateOf(initialAyah.takeIf { selectInitialAyah })
+        }
 
         // Runs once per surah (the reader is re-created — a fresh view model — whenever the
         // surah changes, via App.kt's `remember(screen)`), so a settings change from the sheet

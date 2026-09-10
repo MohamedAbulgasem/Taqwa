@@ -65,6 +65,7 @@ import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.design.components.TaqwaTabScaffold
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.nav.LaunchRequests
+import world.taqwa.app.nav.ayahWidgetTarget
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.SystemBackHandler
@@ -214,11 +215,15 @@ fun App(container: AppContainer) {
         LaunchRequests.pendingAyah.collect { pending ->
             val (surah, ayah) = pending ?: return@collect
             runCatching {
-                // Always the translation reader, whatever the persisted reading mode: the widget
-                // showed this ayah as a card with its translation, so that is the page a tap on it
-                // has to land on. A Mushaf reader would answer the tap with a full page of Arabic
-                // in which the ayah the user actually tapped is one run among fifteen.
-                val target = Screen.Reader(surah, ayah)
+                // The reader the user actually reads in, with the tapped ayah already picked out:
+                // selected and showing its actions in translation mode, highlighted with its
+                // reference bar in Mushaf mode. Resolved before the navigator is touched at all,
+                // because `pageOf` is itself a database read that can fail and a failure must
+                // leave the back stack exactly as it found it rather than half-applying a push.
+                val reading = settings.readingSettings(platformFormat.languageTag()).first()
+                val target = ayahWidgetTarget(reading.mode, surah, ayah) { s, a ->
+                    container.quranRepository.pageOf(s, a)
+                }
                 val current = navigator.current
                 if (current is Screen.Reader || current is Screen.Mushaf) {
                     // A second tap (or a tap while an ayah opened another way is still open)
@@ -450,6 +455,7 @@ fun App(container: AppContainer) {
                             ReaderScreen(
                                 state = readerState,
                                 initialAyah = screen.ayah,
+                                selectInitialAyah = screen.selectAyah,
                                 onBack = { navigator.pop() },
                                 onToggleMode = {
                                     scope.launch {
@@ -491,6 +497,9 @@ fun App(container: AppContainer) {
                             MushafScreen(
                                 state = mushafState,
                                 startPage = screen.page,
+                                initialHighlight = screen.highlightSurah?.let { sur ->
+                                    screen.highlightAyah?.let { a -> sur to a }
+                                },
                                 pageLoader = viewModel::page,
                                 onBack = { navigator.pop() },
                                 onToggleMode = {

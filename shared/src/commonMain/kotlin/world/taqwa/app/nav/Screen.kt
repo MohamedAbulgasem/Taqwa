@@ -4,8 +4,23 @@ sealed interface Screen {
     data object Onboarding : Screen
     data object Today : Screen
     data object Quran : Screen
-    data class Reader(val surah: Int, val ayah: Int) : Screen
-    data class Mushaf(val page: Int) : Screen
+    /**
+     * [selectAyah] opens the reader with [ayah] already selected — its card tinted and its copy,
+     * share and bookmark row showing — rather than merely scrolled to. Set when the ayah is what
+     * the user tapped (the widget), not when the surah is (the tab root, the continue card).
+     */
+    data class Reader(val surah: Int, val ayah: Int, val selectAyah: Boolean = false) : Screen
+
+    /**
+     * [highlightSurah] and [highlightAyah] open the page with that ayah already highlighted and
+     * its reference bar showing, the state a tap on the page itself would produce. Both null when
+     * the page, not an ayah, is what was asked for.
+     */
+    data class Mushaf(
+        val page: Int,
+        val highlightSurah: Int? = null,
+        val highlightAyah: Int? = null,
+    ) : Screen
     data object Settings : Screen
     data object PrayerTimesSettings : Screen
     data object NotificationSettings : Screen
