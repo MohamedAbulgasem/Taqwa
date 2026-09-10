@@ -25,7 +25,7 @@ uncompressed .txt) as the first argument to skip the 190 MB download:
 
     tools/build-city-db.py [path/to/alternateNamesV2.zip|.txt]
 """
-import csv, io, os, sys, tempfile, urllib.request, zipfile
+import csv, io, os, re, sys, tempfile, urllib.request, zipfile
 
 BASE = "https://download.geonames.org/export/dump/"
 CITIES_URL = BASE + "cities15000.zip"
@@ -143,8 +143,21 @@ print(f"wrote {len(rows)} cities to {OUT}", file=sys.stderr)
 # --- alternate names: one file per language, for bundled cities only ---
 bundled = {r[0] for r in rows}
 wanted = set(LANGS)
-# lang -> geonameId -> (name, is_preferred); first non-historic wins unless a
-# later row is flagged isPreferredName.
+# Harakat and tatweel. Arabic place names are conventionally written bare, and
+# GeoNames carries both spellings for some cities with neither flagged
+# preferred: Tripoli had طَرَابُلُس ahead of طرابلس purely by file order. An
+# unmarked name therefore beats a marked one whenever the preferred flag does
+# not already decide it.
+MARKS = re.compile("[\u064B-\u0652\u0670\u0640]")
+
+
+def is_marked(name: str) -> bool:
+    return bool(MARKS.search(name))
+
+
+# lang -> geonameId -> (name, is_preferred, is_marked). A preferred name wins;
+# among equally preferred candidates an unmarked name wins; otherwise the first
+# non-historic row seen wins.
 picked = {lang: {} for lang in LANGS}
 
 for line in alt_names_lines(sys.argv[1] if len(sys.argv) > 1 else None):
@@ -159,9 +172,14 @@ for line in alt_names_lines(sys.argv[1] if len(sys.argv) > 1 else None):
     if not name:
         continue
     preferred = len(f) > 4 and f[4] == "1"
+    marked = is_marked(name)
     seen = picked[f[2]].get(f[1])
-    if seen is None or (preferred and not seen[1]):
-        picked[f[2]][f[1]] = (name, preferred)
+    if (
+        seen is None
+        or (preferred and not seen[1])
+        or (preferred == seen[1] and seen[2] and not marked)
+    ):
+        picked[f[2]][f[1]] = (name, preferred, marked)
 
 for lang in LANGS:
     path = f"{OUT_DIR}/city-names-{lang}.csv"
