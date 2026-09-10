@@ -1,0 +1,3933 @@
+id,name
+52078,Zeila
+53654,Mogadishu
+54225,Marka
+55671,Kismaayo
+56335,Jawahar
+57289,Hargeisa
+58933,Garoowe
+59611,Galkayo
+62691,Ceerigaabo
+63795,Burao
+63949,Buale
+64013,Boosaaso
+64435,Berbera
+64460,Beledweyne
+64536,Baidoa
+69426,Zinjibar
+70225,Taiz
+71137,Sanaá
+71334,Sa'dah
+72968,Ma'rib
+73560,Lahij
+74477,Ibb
+75337,Hajjah
+76184,Dhamar
+77726,Ataq
+78428,'Amran
+78751,Mocha
+78754,Mukalla
+79415,Al Hudaydah
+79455,Al Hazm
+79836,Al Bayda
+81302,Thubruq
+87205,Darnah
+88319,Benghazi
+88903,Al Marj
+89055,Al Bayda
+89113,Ajdabiya
+90150,Tikrit
+94787,Kirkuk
+94824,Karbala
+96205,Halabja
+98182,Bagdad
+98717,Ramadi
+98860,Najaf
+99135,Kufah
+99532,Basra
+99759,Dujail
+101628,Tabuk
+102527,Sakakah
+102891,Ras Tanura
+103630,Najran
+104515,Mekkah
+105299,Jizan
+105343,Jeddah
+106281,Ha'il
+107304,Buraydah
+107968,Ta'if
+108410,Riyadh
+108435,Ar Rass
+108512,Arar
+109223,Madinah
+109953,Al Bahah
+110336,Dammam
+110690,Abha
+111822,Yazd
+112931,Teheran
+124665,Masyhad
+128234,Kerman
+139817,Bushehr
+140097,Borazjan
+141681,Bandar Abbas
+144448,Ahvaz
+145459,Abadan
+145531,Saurimo
+145757,Dundo
+146214,Paphos
+146268,Nikosia
+146384,Limassol
+146400,Larnaca
+146412,Kyrenia
+146617,Famagusta
+147105,Susa
+147271,Salyan
+147288,Saatli
+147425,Neftcala
+147429,Naxcivan
+147611,Lerik
+147622,Lankaran
+147982,Imishli
+148106,Fizuli
+148290,Jalilabad
+148340,Pushkino
+148354,Beylagan
+148445,Astara
+148565,Sirvan
+148619,Agdam
+148730,Zanzibar
+148842,Wete
+148942,Vwawa
+149606,Tanga
+149658,Tabora
+149703,Sumbawanga
+149879,Singida
+150006,Shinyanga
+151479,Njombe
+152224,Mwanza
+152451,Musoma
+153176,Mpanda
+153209,Moshi
+153220,Morogoro
+154380,Mbeya
+157738,Kigoma
+158027,Kibaha
+159071,Iringa
+159908,Geita
+160263,Dar-es-Salaam
+160677,Chake Chake
+160961,Bukoba
+161312,Babati
+161325,Arusha
+161616,Balkanabat
+162158,Bäherden
+162183,Ashgabat
+162199,Aenew
+163345,Tartus
+169389,Idlib
+169577,Homs
+170017,Hamah
+170063,Aleppo
+170654,Damaskus
+170794,Deir ez-Zor
+170905,Dar'a
+172408,As-Suwayda
+172955,Ar Raqqah
+173334,Al Qunaytirah
+173576,Latakia
+173811,Al Hasakah
+174875,Kapan
+174979,Artashat
+174991,Ararat
+184707,Naivasha
+184745,Nairobi
+186301,Mombasa
+187968,Malindi
+193827,Karatina
+201463,Rwamagana
+202061,Kigali
+202065,Kibuye
+203104,Byumba
+209228,Mbuji-Mayi
+210379,Lusambo
+212730,Kisangani
+212902,Kindu
+214481,Kananga
+214614,Kamina
+214974,Kalemie
+215771,Isiro
+216281,Goma
+216404,Gbadolite
+217570,Buta
+217695,Bunia
+217745,Bumba
+217831,Bukavu
+218680,Boende
+220782,Tadjourah
+221527,Obock
+223890,Dikhil
+225037,Arta
+225284,Ali Sabih
+229268,Mbarara
+232422,Kampala
+233114,Jinja
+233346,Gulu
+237379,Ndele
+239899,Bria
+240498,Bangassou
+240604,Bambari
+241131,Victoria
+243787,Goz Beida
+244128,Fada
+244878,Biltine
+245338,Am Timan
+245785,Abeche
+250090,Zarqa
+250441,Amman
+251833,Volos
+254352,Rethimno
+255274,Piraeus
+255683,Patras
+256866,Metilene
+261249,Kamatero
+261745,Heraklion
+264371,Athena
+266045,Zahle
+266826,Tripoli
+267008,Tyre
+268064,Sidon
+276781,Beirut
+277130,Baalbek
+278913,Nabatiye et Tahta
+281133,Gaza
+281146,Beit Hanoun
+281184,Yerusalem
+281577,Tulkarm
+282239,Ramallah
+284315,Betlehem
+284583,Es Samu
+284899,Yerikho
+285066,Hebron
+285629,Hawalli
+285787,Kuwait City
+285799,Al Jahra
+285815,Al Farwaniyah
+285839,Al Ahmadi
+286245,Sur
+286282,Sohar
+286621,Salalah
+286987,Nizwa
+287286,Muskat
+287614,Khasab
+287832,Ibra
+289317,Al Buraymi
+289847,Az Za'ayin
+289888,Ar Rayyan
+289915,Al Wakrah
+289962,Al Khawr
+290030,Doha
+290340,Al-Manamah
+290594,Umm Al Quwain
+291074,Ras Al Khaimah
+292223,Dubai
+292672,Sharjah
+292878,Fujairah
+292932,Ajman
+292968,Abu Dhabi
+293100,Safed
+293222,Yamnia
+293397,Tel Aviv
+293655,Sakhnin
+293725,Rehovot
+293825,Kiryat Shmona
+293918,Petah Tikva
+294071,Netanya
+294098,Nazaret
+294117,Nahariya
+294210,Migdal HaEmek
+294514,Kefar Sava
+294778,Herzliyya
+294801,Haifa
+294946,Hadera
+295435,Beit She'an
+295514,Bnei Brak
+295530,Bersyeba
+295548,Bat Yam
+295721,Akko
+295740,Afula
+296562,Yozgat
+298117,Van
+298299,Usak
+298333,Sanli Urfa
+298846,Tunceli
+300619,Sivas
+304922,Malatya
+306571,Konya
+307515,Kirsehir
+307654,Kirikkale
+307864,Kilis
+308464,Kayseri
+309527,Karaman
+309647,Provinsi Ağrı
+310859,Kahramanmaras
+311046,Izmir
+311073,Isparta
+311111,İskenderun
+311665,Igdir
+314830,Gaziantep
+315202,Eskişehir
+315368,Erzurum
+315373,Erzincan
+315808,Elâzığ
+316541,Diyarbakır
+317109,Denizli
+318137,Hakkari
+320392,Burdur
+321025,Bitlis
+321082,Bingöl
+321426,Pergamum
+321836,Batman
+322165,Balıkesir
+322830,Aydın
+323777,Antalya
+323779,Antakya
+323786,Ankara
+324496,Aksaray
+325303,Afyonkarahisar
+325330,Adiyaman
+325363,Adana
+326406,Weldiya
+330546,Massawa
+332288,Lalibela
+333373,Kombolcha
+333772,Jimma
+338832,Dire Dawa
+339219,Dessie
+339686,Debre Tabor
+339734,Debre Berhan
+343300,Asmara
+344797,Adwa
+344979,Addis Ababa
+350203,Rasyid
+351434,Nag Hammâdi
+353229,Kota 10 Ramadan
+355635,Edfu
+358048,Dimyath
+358619,Port Said
+358620,Safaga
+358840,Bilbeis
+359792,Aswan
+359796,Suez
+360502,Luxor
+360630,Kairo
+361055,Ismaïlia
+361058,Iskandariyah
+361320,Al Fayyum
+361546,El Arish
+363243,Saranda
+363417,Dongola
+363533,Zalinjay
+363656,Yambio
+363885,Wau
+364103,Wad Medani
+364367,Aweil
+365742,Torit
+365763,Tonj
+366847,Singa
+367308,Shendi
+367544,Suakin
+367927,Rumbek
+368277,Rabak
+369004,Nyala
+370737,Malakal
+371466,Leer
+371712,Kuacjok
+372753,Kassala
+373141,Kadugli
+377039,Port Sudan
+377241,Bor
+378699,En Nahud
+379003,El Obeid
+379062,Al Qadarif
+379252,Khartoum
+379303,Al-Junaynah
+379555,El Fasher
+380148,El Daein
+380173,Ad-Damir
+380174,Ad-Damazin
+383388,Siaya
+385038,Riffa
+400769,Laascanood
+415189,Aden
+418863,Kota Isfahan
+423549,Rumonge
+425378,Bujumbura
+426272,Gitega
+428515,Bubanza
+430021,Cibitoke
+430569,Ngozi
+430952,Kayanza
+432456,Kirundo
+454310,Ventspils
+454768,Tukums
+455898,Salaspils
+456172,Riga
+456202,Rezekne
+457065,Ogre
+457954,Liepaja
+459201,Jurmala
+459279,Jelgava
+459283,Jekabpils
+460413,Daugavpils
+460570,Cesis
+472459,Vologda
+479561,Ufa
+480562,Tula
+482283,Tolyatti
+484646,Tambov
+485239,Syktyvkar
+487846,Stavropol
+491422,Sochi
+491687,Smolensk
+498677,Saratov
+498698,Saransk
+498817,St. Petersburg
+499099,Samara
+500004,Rybinsk
+500096,Ryazan
+501175,Rostov na Donu
+504341,Pskov
+509820,Petrozavodsk
+511196,Perm
+511565,Penza
+515003,Orenburg
+515012,Orel
+519336,Velikiy Novgorod
+520555,Nizhniy Novgorod
+523392,Nar'yan-Mar
+523523,Nalchik
+524294,Murom
+524305,Murmansk
+524901,Moskwa
+528293,Maykop
+532096,Makhachkala
+535121,Lipetsk
+538560,Kursk
+540771,Kronstadt
+542420,Krasnodar
+543878,Kostroma
+548408,Kirov
+548605,Kineshma
+551487,Kazan
+553915,Kaluga
+554234,Kaliningrad
+554840,Izhevsk
+555312,Ivanovo
+558418,Grozny
+563514,Elista
+569154,Cherkessk
+569223,Cherepovets
+569696,Cheboksary
+571476,Bryansk
+576697,Beslan
+578072,Belgorod
+580497,Astrakhan
+581049,Arkhangelsk
+584596,Zaqatala
+584649,Yevlakh
+584716,Goygol
+584717,Xacmaz
+584791,Ujar
+584871,Terter
+584923,Sumgayit
+585152,Shamkhor
+585156,Shamakhi
+585170,Sheki
+585187,Sabirabad
+585220,Qusar
+585221,Quba
+585225,Haciqabul
+585226,Qazax
+585514,Mingachevir
+585763,Kyurdarmir
+585915,Khirdalan
+586318,Ismayilli
+586427,Goeycay
+586523,Ganja
+586763,Divichibazar
+587057,Barda
+587084,Baku
+587361,Agsu
+587378,Agdas
+587384,Agdzhabedi
+588409,Tallinn
+593116,Vilnius
+593672,Utena
+593926,Telsiai
+593959,Taurage
+594739,Siauliai
+596128,Panevezys
+596238,Palanga
+597231,Marijampole
+598098,Klaipeda
+598272,Kėdainiai
+598316,Kaunas
+601084,Alytus
+601294,Nukus
+601734,Dasoguz
+602150,Umeå
+604490,Luleå
+608668,Oral
+609655,Karaganda
+610529,Atyrau
+610611,Aktobe
+610612,Aqtau
+611717,Tbilisi
+611847,Sukhum
+613607,Kutaisi
+615532,Batumi
+616052,Yerevan
+616062,Echmiadzin
+616530,Vanadzor
+616627,Ijevan
+616629,Hrazdan
+616631,Armavir
+616635,Gyumri
+616785,Charentsavan
+616877,Ashtarak
+617076,Edinet
+617180,Ungheni
+617239,Tiraspol
+617302,Strasheni
+617367,Soroka
+617486,Rîbniţa
+617638,Orhei
+617993,Hincheshti
+618120,Kauseni
+618329,Floreshti
+618365,Dubăsari
+618370,Drokiya
+618405,Komrat
+618426,Kishinev
+618456,Cahul
+618577,Bender
+618605,Balti
+620127,Vitebsk
+621266,Stolbtzy
+623549,Pinsk
+625144,Minsk
+625665,Mogilev
+627904,Grodno
+627907,Homyel
+629634,Brest-Litovsk
+630768,Ylivieska
+633679,Turku
+634093,Tornio
+634963,Tampere
+638936,Rovaniemi
+640999,Pori
+643492,Oulu
+646005,Mikkeli
+649360,Lahti
+650224,Kuopio
+652305,Klaukkala
+655194,Jyväskylä
+655808,Joensuu
+656083,Jämsä
+658225,Helsinki
+659180,Hämeenlinna
+659935,Forssa
+662095,Äänekoski
+662334,Zalau
+663118,Vaslui
+664518,Tulcea
+665004,Targu Mures
+665010,Targu Jiu
+665024,Targoviste
+665087,Timişoara
+665850,Suceava
+666767,Slatina
+667268,Sibiu
+667303,Sfantu Gheorghe
+667873,Satu-Mare
+668872,Ramnicu Valcea
+668954,Resita
+670474,Ploiesti
+670609,Pitesti
+670889,Piatra Neamt
+671768,Oradea
+673441,Miercurea-Ciuc
+673636,Medgidia
+675810,Iasi
+677106,Giurgiu
+677697,Galaţi
+678015,Focsani
+678499,Făgăraş
+678817,Drobeta-Turnu Severin
+680332,Craiova
+680963,Constanta
+681290,Cluj-Napoca
+683123,Buzau
+683506,Bukarest
+683844,Brasov
+683902,Brăila
+684039,Botoşani
+684657,Bistrița
+685826,Baia Mare
+686254,Arad
+692194,Sumy
+696643,Poltava
+698740,Odessa
+702550,Lviv
+702569,Lutsk
+703448,Kiev
+704147,Kremenchuk
+706448,Kherson
+706483,Kharkiv
+717582,Miskolc
+721472,Debrecen
+722437,Békéscsaba
+723819,Presov
+724443,Kosice
+725578,Yambol
+725712,Vratsa
+725905,Vidin
+725988,Velingrad
+725993,Veliko Turnovo
+726050,Varna
+726174,Targovishte
+726418,Dobrich
+726848,Stara Zagora
+727011,Sofia
+727030,Smolyan
+727079,Sliven
+727221,Silistra
+727233,Shumen
+727523,Ruse
+727696,Razgrad
+727886,Parvomay
+728193,Plovdiv
+728203,Pleven
+728317,Peshtera
+728330,Pernik
+728378,Pazardzhik
+728448,Panagyurishte
+729114,Montana
+729559,Lovech
+729581,Lom
+729730,Kyustendil
+729794,Kardzhali
+730435,Haskovo
+731549,Gabrovo
+732770,Burgas
+733191,Blagoevgrad
+733264,Berkovitsa
+734077,Thessaloniki
+735640,Komotini
+737022,Zonguldak
+738025,Yalova
+738648,Trabzon
+738743,Tokat
+738927,Tekirdağ
+739600,Sinop
+740264,Samsun
+740483,Provinsi Rize
+741100,Ordu
+743166,Kırklareli
+743882,Kastamonu
+743952,Kars
+744562,Karabük
+745026,Nicea
+745028,Izmit
+745044,Istanbul
+746425,Gümüşhane
+746881,Giresun
+747712,Edirne
+747764,Düzce
+748879,Çorum
+749748,Çankırı
+749780,Çanakkale
+750269,Bursa
+750516,Bolu
+750598,Bilecik
+750938,Provinsi Bayburt
+751057,Bartın
+751817,Artvin
+751952,Ardahan
+752015,Amasya
+752850,Adapazarı
+753866,Zamość
+755889,Wieliczka
+756135,Warsawa
+758390,Starachowice
+759123,Skierniewice
+759412,Siedlce
+759603,Sandomierz
+759734,Rzeszów
+760778,Radom
+762021,Płońsk
+762909,Ostrołęka
+763166,Olsztyn
+763534,Nowy Sącz
+764849,Mielec
+764862,Międzyrzec Podlaski
+765876,Lublin
+766027,Łomża
+769250,Kielce
+769274,Kętrzyn
+770966,Hrubieszów
+772621,Ełk
+774558,Chełm
+774747,Busko-Zdrój
+776069,Białystok
+776175,Biała Podlaska
+781988,Pogradec
+782519,Librazhd
+782661,Kukes
+782756,Korce
+783148,Gjirokaster
+783263,Elbasan
+783508,Bulkiza
+783926,Zelino
+784424,Vinica
+784759,Ferizaj
+785058,Veles
+785082,Tetovo
+785113,Tearce
+785345,Studenicani
+785380,Strumica
+785387,Struga
+785482,Shtip
+785842,Skopje
+786341,Resen
+786565,Radovis
+786712,Prizren
+786735,Prilep
+786827,Požarevac
+786950,Podujevo
+787157,Peje
+787487,Ohrid
+787716,Negotino
+788654,Lipkovo
+788886,Kumanovo
+789045,Kriva Palanka
+789225,Mitrovice
+789403,Kochani
+789527,Kicevo
+789541,Kavadarci
+790295,Gostivar
+790674,Gjilan
+790744,Gevgelija
+791559,Delcevo
+791606,Debar
+791646,Gjakove
+792227,Brvenica
+792501,Bogovinje
+792578,Bitola
+792680,Beograd
+833357,Ilinden
+864723,Marupe
+877178,Katima Mulilo
+877401,Songea
+877747,Mtwara
+878281,Lindi
+884979,Mutare
+886763,Masvingo
+886990,Marondera
+890422,Gweru
+890516,Gwanda
+893697,Chinhoyi
+894701,Bulawayo
+895061,Bindura
+897045,Solwezi
+901344,Ndola
+906054,Mongu
+907770,Mansa
+909137,Lusaka
+911148,Kitwe
+912764,Kasama
+916095,Kabwe
+917748,Choma
+918702,Chipata
+918905,Chinsali
+921753,Moutsamoudou
+921772,Moroni
+921889,Fomboni
+921900,Dzaoudzi
+922704,Lubumbashi
+922741,Likasi
+925475,Mzuzu
+931755,Blantyre
+932035,Teyateyaneng
+932183,Quthing
+932438,Mohale's Hoek
+932505,Maseru
+932614,Mafeteng
+932698,Hlotse
+932886,Butha-Buthe
+933088,Serowe
+933141,Ramotswa
+933305,Molepolole
+933340,Mochudi
+933366,Maun
+933685,Kanye
+933759,Ghanzi
+933773,Gaborone
+933778,Francistown
+934631,Centre de Flacq
+934765,Beau Bassin-Rose Hill
+934985,Mbabane
+934995,Manzini
+936374,Roodepoort
+953781,Soweto
+963241,Randburg
+964137,Pretoria
+965289,Polokwane
+965301,Pietermaritzburg
+971534,Mbombela
+973709,Teluk Mossel
+980595,Mafikeng
+990930,Kimberley
+993800,Johannesburg
+1006984,East London
+1007311,Durban
+1018725,Bloemfontein
+1019330,Bhisho
+1024552,Xai-Xai
+1024683,Vilanculos
+1026014,Tete
+1028434,Quelimane
+1028918,Pemba
+1033356,Nampula
+1037125,Montepuez
+1039536,Maxixe
+1039854,Matola
+1040652,Maputo
+1043893,Lichinga
+1045114,Inhambane
+1049261,Chimoio
+1052373,Beira
+1053384,Toamasina
+1054463,Tsiroanomandidy
+1055429,Toliara
+1055433,Tolanaro
+1056899,Sambava
+1058381,Morondava
+1061605,Manakara
+1061912,Maintirano
+1062663,Mahajanga
+1062842,Maevatanana
+1064275,Ihosy
+1064890,Fianarantsoa
+1064980,Fenoarivo Atsinanana
+1065158,Farafangana
+1066514,Betafo
+1068971,Antsohihy
+1069129,Antsiranana
+1069166,Antsirabe
+1070940,Antananarivo
+1079048,Ambovombe
+1079088,Ambositra
+1082639,Ambatondrazaka
+1090225,Koungou
+1106835,Thaba-Tseka
+1120985,Zaranj
+1123004,Talokan
+1125155,Shindand
+1125444,Shibirghan
+1125896,Shahrak
+1127110,Sar-e Pul
+1127768,Aibak
+1128265,Rustaq
+1129516,Qarqin
+1130490,Pul-e Khumri
+1131833,Nili
+1132495,Nahrin
+1133453,Maymana
+1133574,Mehtar Lam
+1133616,Mazar-e Sharif
+1134720,Lashkar Gah
+1135689,Kunduz
+1136469,Khost
+1136575,Khulm
+1137079,Khan Neshin
+1137168,Khanabad
+1137807,Karukh
+1138336,Kandahar
+1138958,Kabul
+1139085,Jurm
+1139715,Jalalabad
+1139807,Jabal os Saraj
+1140026,Herat
+1141089,Ghormach
+1141269,Ghazni
+1141540,Gereshk
+1141857,Gardez
+1142170,Fayzabad
+1142264,Farah
+1142330,Istalif
+1145352,Charikar
+1147066,Baraki Barak
+1147242,Bamyan
+1147290,Balkh
+1147489,Baharak
+1147540,Baghlan
+1148205,Asmar
+1148311,Asadabad
+1148658,Andkhoy
+1149698,Phetchaburi
+1150007,Trang
+1150490,Tak
+1150515,Surat Thani
+1150533,Sukhothai
+1150954,Ratchaburi
+1150965,Ranong
+1151074,Prachuap Khiri Khan
+1151254,Phuket
+1151426,Phayao
+1151933,Nakhon Si Thammarat
+1152468,Lamphun
+1152473,Lampang
+1152633,Krabi
+1153081,Kanchanaburi
+1153090,Kamphaeng Phet
+1153269,Hua Hin
+1153557,Chumphon
+1153669,Chiang Rai
+1153671,Chiang Mai
+1165789,Sehwan Sharif
+1166933,Renala Khurd
+1167031,Ratodero
+1167528,Quetta
+1168197,Peshawar
+1169372,Nankana Sahib
+1169607,Muzaffarabad
+1170395,Mingora
+1172451,Lahore
+1174872,Karachi
+1175436,Kahuta
+1175892,Jhang Sadar
+1176106,Jaranwala
+1176948,hazro
+1176995,Havelian
+1177042,Hasilpur
+1178231,Gojra
+1178338,Gilgit
+1182682,Bhawana
+1182787,Bhalwal
+1185099,Sylhet
+1185106,Jamalpur
+1185116,Netrakona
+1185128,Rajshahi
+1185162,Mymensingh
+1185181,Lalmonirhat
+1185188,Rangpur
+1185241,Dhaka
+1185281,Bagerhat
+1200109,Gazipur
+1205733,Chittagong
+1213442,Tongging
+1213493,Teluk Nibung
+1213495,Telukdalam
+1213500,Tebingtinggi
+1213530,Tanjungtiram
+1213614,Sunggal
+1213655,Stabat
+1213713,Singkil
+1213821,Sigli
+1213840,Sidikalang
+1213855,Kota Sibolga
+1214026,Kota Sabang
+1214189,Percut
+1214191,Perbaungan
+1214204,Pematangsiantar
+1214256,Paropo
+1214294,Panguruan
+1214302,Pangkalan Brandan
+1214488,Meulaboh
+1214520,Kota Medan
+1214658,Kota Lhokseumawe
+1214724,Langsa
+1214776,Lahewa
+1214800,Labuhan Deli
+1214882,Kisaran
+1214965,Kabanjahe
+1215102,Gunungsitoli
+1215199,Deli Tua
+1215326,Blangpidie
+1215350,Bireun
+1215355,Kota Binjai
+1215395,Berastagi
+1215412,Belawan
+1215502,Kota Banda Aceh
+1215957,Termez
+1216187,Shahrisabz
+1216265,Samarkand
+1216311,Qarshi
+1217662,Bukhara
+1218667,Mary
+1219649,Turkmenabat
+1220253,Istarawshan
+1220747,Bokhtar
+1221328,Khorog
+1221874,Dushanbe
+1226260,Trincomalee
+1228730,Ratnapura
+1229293,Puttalam
+1231410,Panadura
+1235846,Matara
+1235855,Matale
+1237980,Kurunegala
+1238992,Kotte
+1240723,Kegalle
+1241622,Kandy
+1241964,Kalutara
+1242833,Jaffna
+1244926,Hambantota
+1246000,Gampola
+1246294,Galle
+1248991,Kolombo
+1249145,Chilaw
+1249978,Bentota
+1250615,Badulla
+1251081,Anuradhapura
+1252416,Thimphu
+1252479,Punakha
+1252608,Tsirang
+1252919,Warud
+1253405,Varanasi
+1253573,Vadodara
+1253807,Umred
+1253894,Ulhasnagar
+1253914,Ujjain
+1253952,Udupi
+1254163,Thiruvananthapuram
+1254388,Tiruchirapalli
+1254649,Thanjavur
+1254780,Thalassery
+1255364,Surat
+1255482,Sulya
+1255634,Srinagar
+1255647,Srikakulam
+1257307,Savner
+1258044,Roorkee
+1258526,Ranchi
+1259110,Qadian
+1259166,Purnia
+1259229,Pune
+1259425,Pondicherry
+1259429,Ponda
+1260086,Patna
+1260156,Pataudi
+1261481,New Delhi
+1262180,Nagpur
+1262204,Nagercoil
+1262321,Mysuru
+1262330,Muzaffarpur
+1263780,Mangaluru
+1264154,Malappuram
+1264521,Madurai
+1264527,Chennai
+1264733,Lucknow
+1264976,Leh
+1265491,Kurnool
+1266975,Kharagpur
+1267175,खैराबाद
+1268159,Kanchipuram
+1268782,Jalandhar
+1269300,Jamshedpur
+1269317,Jamnagar
+1269515,Jaipur
+1270498,Haldwani
+1270642,Gurgaon
+1270668,Guntur
+1271715,Gandhinagar
+1272051,Eluru
+1272181,Durg
+1272237,Dumka
+1272646,Bicholim
+1272832,Dharamsala
+1273369,Dausa
+1273491,Darbhanga
+1273784,Curti
+1273865,Coimbatore
+1273874,Kochi
+1274040,Chittorgarh
+1274693,Chandrapur
+1274784,Chandannagar
+1274987,Kannur
+1275004,Kolkata
+1275066,Burhar
+1275120,Bulandshahr
+1275248,Borivali
+1275339,Mumbai
+1275701,Vijayapura
+1275841,Bhopal
+1276128,Bharatpur
+1276609,Begusarai
+1277333,Bengaluru
+1277936,Bagalkot
+1278710,Amritsar
+1278946,Alwar
+1278994,Allahabad
+1279233,Ahmedabad
+1279259,Agra
+1279290,Agartala
+1279390,Achalpur
+1280737,Lhasa
+1282027,Malé
+1282898,Pokhara
+1283240,Kathmandu
+1283318,Janakpur
+1283465,Dhankuta
+1283562,Butwal
+1283613,Bharatpur
+1293625,Dawei
+1293960,Taunggyi
+1295765,Sittwe
+1298824,Yangon
+1298987,Pyinmana
+1300466,Bago
+1301614,Pindaya
+1302849,Hpa-An
+1303351,Nyaung-U
+1307101,Namhkam
+1307741,Myitkyina
+1307835,Myingyan
+1308465,Mawlamyine
+1308522,Monywa
+1308910,Mohnyin
+1309611,Mergui
+1311874,Mandalay
+1312609,Magway
+1313479,Loikaw
+1314759,Lashio
+1315749,Kyonpyaw
+1320974,Kanbalu
+1325211,Hinthada
+1325443,Hakha
+1327659,Chauk
+1328421,Pathein
+1336135,Khulna
+1336137,Barishal
+1429434,Bazarak
+1486209,Ekaterinburg
+1488754,Tyumen
+1489425,Tomsk
+1491953,Shushenskoye
+1493197,Salekhard
+1496153,Omsk
+1496747,Novosibirsk
+1500973,Kyzyl
+1501321,Kurgan
+1502026,Krasnoyarsk
+1503772,Khanty-Mansiysk
+1503901,Kemerovo
+1506271,Gorno-Altaysk
+1508291,Chelyabinsk
+1510853,Barnaul
+1512236,Abakan
+1512473,Urgench
+1512569,Tashkent
+1513131,Navoi
+1513157,Namangan
+1513886,Jizzakh
+1513966,Guliston
+1514019,Fergana
+1514210,Chirchiq
+1514588,Andijan
+1514879,Khujand
+1515007,Uliastay
+1515029,Ulaangom
+1515436,Ölgii
+1516048,Khovd
+1516393,Altai
+1516589,Zhezqazghan
+1516905,Taraz
+1517945,Turkestan
+1518542,Taldykorgan
+1518980,Shymkent
+1519422,Semey
+1519922,Kyzylorda
+1519928,Kostanay
+1519948,Konayev
+1520172,Petropavl
+1520240,Pavlodar
+1520316,Ust-Kamenogorsk
+1521368,Baikonur
+1522203,Koksetau
+1526273,Astana
+1526384,Almaty
+1527299,Talas
+1527534,Osh
+1527592,Naryn
+1528121,Karakol
+1528249,Jalal-Abad
+1528675,Bishkek
+1528735,Batken
+1529102,Urumqi
+1529195,Shihezi
+1529376,Korla
+1562538,Vi Thanh
+1562693,Vinh Long
+1562798,Vinh
+1562820,Viet Tri
+1563281,Tuy Hoa
+1563287,Tuyen Quang
+1563926,Thanh pho Tra Vinh
+1565022,Thu Dau Mot
+1566083,Kota Hồ Chí Minh
+1566166,Thanh Hoa
+1566319,Thai Nguyen
+1566559,Tay Ninh
+1567069,Tan An
+1567148,Tam Ky
+1567681,Son La
+1567788,Soc Trang
+1568510,Rach Gia
+1568574,Qui Nhon
+1568770,Quang Ngai
+1569684,Pleiku
+1570449,Phu Ly
+1571058,Phan Thiet
+1571067,Phan Rang-Thap Cham
+1571968,Ninh Binh
+1572151,Nha Trang
+1573517,Nam Dinh
+1574023,My Tho
+1575627,Long Xuyen
+1576303,Lao Cai
+1576633,Lang Son
+1580142,Hung Yen
+1580240,Hue
+1580410,Ha Long
+1581047,Ha Tinh
+1581130,Hanoi
+1581298,Haiphong
+1581834,Gia Nghia
+1582436,Gjong Xoai
+1582926,Dong Ha
+1583477,Dien Bien Phu
+1583992,Da Nang
+1584071,Da Lat
+1586151,Cao Lanh
+1586185,Cao Bang
+1586203,Can Tho
+1586443,Ca Mau
+1586896,Buon Ma Thuot
+1587923,Bien Hoa
+1587976,Ben Tre
+1591449,Bac Ninh
+1604769,Yasothon
+1604870,Yala
+1605215,Uttaradit
+1605221,Uthai Thani
+1605239,Udon Thani
+1605245,Ubon Ratchathani
+1605279,Trat
+1606030,Surin
+1606033,Suphan Buri
+1606147,Songkhla
+1606239,Si Sa Ket
+1606270,Sing Buri
+1606376,Satun
+1606418,Saraburi
+1606586,Samut Songkhram
+1606588,Samut Sakhon
+1606590,Samut Prakan
+1606790,Sakon Nakhon
+1606807,Sa Kaeo
+1607001,Roi Et
+1607017,Rayong
+1607280,Prachin Buri
+1607532,Phra Nakhon Si Ayutthaya
+1607552,Phrae
+1607708,Phitsanulok
+1607725,Phichit
+1607737,Phetchabun
+1607779,Phatthalung
+1607978,Pattani
+1607983,Pathum Thani
+1608133,Mueang Nonthaburi
+1608232,Nong Khai
+1608269,Nong Bua Lamphu
+1608409,Narathiwat
+1608452,Nan
+1608527,Nakhon Sawan
+1608529,Nakhon Ratchasima
+1608531,Nakhon Phanom
+1608534,Nakhon Pathom
+1608539,Nakhon Nayok
+1608597,Mukdahan
+1608900,Maha Sarakham
+1609032,Lop Buri
+1609071,Loei
+1609350,Bangkok
+1609776,Khon Kaen
+1610469,Kalasin
+1611110,Chon Buri
+1611269,Chanthaburi
+1611407,Chaiyaphum
+1611416,Chai Nat
+1611439,Chachoengsao
+1611453,Buri Ram
+1621060,Amnat Charoen
+1621177,Daerah Istimewa Yogyakarta
+1621395,Wonosobo
+1621520,Wiradesa
+1621613,Weru
+1621655,Weleri
+1621884,Watampone
+1622090,Wangon
+1622138,Wanaraja
+1622318,Waingapu
+1622636,Ungaran
+1622786,Kota Makassar
+1622846,Ubud
+1623080,Tulungagung
+1623096,Tulangan Utara
+1623180,Tuban
+1623424,Tondano
+1623446,Tomohon
+1623502,Tolitoli
+1623834,Timika
+1624041,Ternate
+1624058,Terbanggi Besar
+1624494,Kota Tegal
+1624545,Tayu
+1624647,Kota Tasikmalaya
+1624725,Kota Tarakan
+1624827,Tanjung Selor
+1624863,Kota Tanjungpinang
+1624877,Tanjung Pandan
+1624917,Bandarlampung
+1624974,Tanjung Balai
+1625084,Kota Tangerang
+1625420,Taliwang
+1625585,Tahuna
+1625708,Tabanan
+1625812,Kota Surakarta
+1625822,Kota Surabaya
+1625908,Sungai Raya
+1625929,Sungai Penuh
+1626183,Sumber
+1626312,Sokaraja
+1626381,Kota Sukabumi
+1626444,Subang
+1626459,Suai
+1626486,Srono
+1626498,Sragen
+1626542,Kota Sorong
+1626649,Solok
+1626703,Soe
+1626758,Slawi
+1626801,Situbondo
+1626895,Sinjai
+1626899,Singosari
+1626921,Sengkang
+1626932,Singaraja
+1626936,Singaparna
+1627035,Simpang
+1627185,Sijunjung
+1627253,Sidoarjo
+1627267,Sidareja
+1627549,Kabupaten Serang
+1627896,Kota Semarang
+1627957,Selong
+1628858,Sanana
+1628899,Sampang
+1629001,Kota Samarinda
+1629380,Ruteng
+1629710,Rengasdengklok
+1629749,Rembangan
+1629974,Rantepao
+1630058,Rangkasbitung
+1630088,Randudongkal
+1630200,Rajapolah
+1630238,Raha
+1630328,Kota Purwokerto
+1630333,Purwodadi
+1630341,Kota Purwakarta
+1630366,Purbalingga
+1630634,Kota Probolinggo
+1630662,Praya
+1630723,Poso
+1630789,Kota Pontianak
+1630798,Ponorogo
+1630935,Polewali
+1630997,Plumbon
+1631733,Pelabuhanratu
+1631761,Kota Pekanbaru
+1631766,Kota Pekalongan
+1631851,Pecangaan
+1631905,Kota Payakumbuh
+1631992,Pati
+1632033,Kota Pasuruan
+1632197,Paseh
+1632334,Kota Pariaman
+1632353,Parepare
+1632358,Pare
+1632566,Panji
+1632823,Pandeglang
+1632978,Pamekasan
+1632998,Pamanukan
+1633034,Kota Palu
+1633037,Palopo
+1633056,Palimanan
+1633070,Kota Palembang
+1633118,Kota Palangka Raya
+1633182,Pakisaji
+1633419,Kota Padang
+1634098,Ngawi
+1634131,Nganjuk
+1634718,Muncar
+1634788,Muara Teweh
+1634904,Muara Bungo
+1634954,Mranggen
+1635111,Kota Mojokerto
+1635283,Kota Metro
+1635815,Maumere
+1635882,Kota Mataram
+1635984,Masamba
+1636029,Maros
+1636125,Margahayukencana
+1636308,Manokwari
+1636507,Mendaha
+1636544,Kota Manado
+1636657,Malinau
+1636670,Maliana
+1636722,Kabupaten Malang
+1636806,Majene
+1636808,Majenang
+1636816,Majalengka
+1636884,Kota Magelang
+1636930,Kota Madiun
+1637001,Luwuk
+1637090,Kabupaten Lumajang
+1637158,Kota Lubuklinggau
+1637510,Loa Janan
+1637730,Likisa
+1638217,Lebaksiu
+1638284,Lawang
+1638352,Lasem
+1638868,Labuanbajo
+1638870,Labuan
+1638981,Kutoarjo
+1639094,Kuningan
+1639215,Kudus
+1639337,Kroya
+1639356,Krian
+1639500,Kotamobagu
+1639900,Kabupaten Klaten
+1639925,Klangenan
+1640138,Ketanggungan
+1640296,Kepanjen
+1640344,Kota Kendari
+1640581,Kedungwuni
+1640660,Kota Kediri
+1640889,Kawasi
+1640902,Kawalu
+1641134,Karawang
+1641184,Karangsembung
+1641342,Karangampel
+1641977,Kalianget
+1642317,Juwana
+1642414,Jombang
+1642548,Jepara
+1642628,Jekulo
+1642684,Jatiwangi
+1642726,Jatibarang
+1642858,Jambi
+1642911,Jakarta
+1643078,Indramayu
+1643089,Indralaya
+1643837,Gorontalo
+1643898,Gongdanglegi Kulon
+1643920,Gombong
+1644360,Gebog
+1644409,Garut
+1644557,Gambiran Satu
+1644605,Galesong
+1644932,Kota Ende
+1645133,Kota Dumai
+1645220,Driyorejo
+1645343,Dompu
+1645457,Dili
+1645524,Kota Depok
+1645528,Kota Denpasar
+1645559,Demak
+1645663,Daruba
+1645749,Dampit
+1645976,Comal
+1646170,Kota Cirebon
+1646448,Kota Cimahi
+1646492,Cileunyi
+1646511,Cilegon
+1646559,Cilacap
+1646678,Cikarang
+1646698,Cikampek
+1646893,Cicurug
+1647142,Cianjur
+1647149,Ciamis
+1647179,Cepu
+1647298,Caringin
+1647383,Ciampea
+1647638,Bungku
+1647834,Bulakamba
+1647866,Kota Bukittinggi
+1647936,Buduran
+1648082,Boyolangu
+1648186,Kota Bontang
+1648451,Bojonegoro
+1648473,Kota Bogor
+1648568,Blora
+1648580,Kota Blitar
+1648637,Kota Bitung
+1648844,Biak
+1649125,Tanjungbenoa
+1649150,Bengkulu
+1649378,Kota Bekasi
+1649539,Baucau
+1649541,Baubau
+1649824,Kota Batu
+1649881,Batang
+1650077,Banyuwangi
+1650095,Banyumas
+1650217,Bandjarbaru
+1650232,Banjar
+1650234,Banjar
+1650298,Bangkalan
+1650357,Kota Bandung
+1650527,Kota Balikpapan
+1650600,Balai Pungut
+1650815,Baekrajan
+1651112,Astanajapura
+1651226,Arjawinangun
+1651531,Kota Ambon
+1651763,Airmadidi
+1651816,Aileu
+1651887,Adiwerna
+1651944,Vientiane
+1652203,Xam Nua
+1653316,Savannakhet
+1654379,Pakse
+1655078,Muang Xay
+1655123,Muang Phonsavan
+1655140,Pakxan
+1655199,Thakhek
+1655559,Luang Prabang
+1668341,Kota Taipei
+1668347,Kota Taibao
+1668355,Kota Tainan
+1668399,Kota Taichung
+1671467,Distrik Neihu
+1673820,Kaohsiung
+1674199,Kota Yilan
+1675151,Kota Hsinchu
+1678008,Jincheng
+1678228,Kota Keelung
+1679980,Kota Vigan
+1680116,Kota Valencia
+1680197,Kota Urdaneta
+1680932,Tuguegarao
+1683013,Tanza
+1683088,Tanjay
+1683302,Kota Tandag
+1683340,Kota Tanauan
+1683877,Talisay
+1684269,Tagum
+1684553,Tagaytay
+1684681,Kota Tacurong
+1684712,Kota Tacloban
+1684803,Kota Tabuk
+1685117,Kota Tabaco
+1687894,Kota Santa Rosa
+1688830,San Pablo
+1689395,Kota San Jose del Monte
+1690033,Kota San Fernando
+1690039,Kota San Fernando
+1690666,Kota Samal
+1691150,Kota Sagay
+1692685,Kota Puerto Princesa
+1695804,Panabo
+1696165,Palayan
+1696710,Pagadian
+1697006,Kota Oroquieta
+1697018,Kota Ormoc
+1697175,Kota Olongapo
+1698829,Kota Naga
+1698839,Kota Naga
+1699802,Kota Meycauayan
+1700360,Kota Mati
+1701668,Manila
+1701966,Mandaluyong
+1702540,Malolos City
+1702934,Kota Malaybalay
+1705357,Kota Lucena
+1707404,Laoag City
+1708226,La Carlota
+1708522,Kota Koronadal
+1708824,Kota Kidapawan
+1713022,Kota General Santos
+1713818,Kota Escalante
+1714201,Dumaguete
+1714674,Kota Dipolog
+1714956,Kota Digos
+1715348,Davao
+1715430,Kota Dasmariñas
+1715542,Dapitan
+1716198,Kota Dagupan
+1716771,Cotabato
+1717512,Kota Cebu
+1717911,Kota Catbalogan
+1720561,Kota Calapan
+1720681,Kota Calamba
+1722032,Cabadbaran
+1722186,Kota Butuan
+1723893,Kota Borongan
+1724435,Kota Bogo
+1724767,Bislig City
+1725115,Kota Biñan
+1725799,Kota Baybay
+1725804,Bayawan
+1728523,Kota Balanga
+1728772,Bais
+1728930,Kota Baguio
+1729085,Bago
+1732687,Batu Pahat
+1732752,Johor Bahru
+1732811,Kluang
+1732869,Muar
+1732903,Shah Alam
+1732905,Klang
+1733353,Papar
+1733432,Kota Kinabalu
+1733438,Donggongon
+1733449,Kinarut
+1733697,Semporna
+1733782,Labuan
+1733868,Sipitang
+1734098,Keningau
+1734316,Kerteh
+1734599,Kuala Kangsar
+1734634,Ipoh
+1734705,Kuala Terengganu
+1734759,Melaka
+1734798,Semenyih
+1734810,Seremban
+1735079,Bukit Mertajam
+1735086,Nibong Tebal
+1735106,Georgetown
+1735161,Kuala Lumpur
+1735227,Kuantan
+1735634,Kuching
+1736278,Kangar
+1736284,Changlun
+1736302,Jitra
+1736305,Kuala Kedah
+1736309,Alor Star
+1736366,Wakaf Bharu
+1736376,Kota Bharu
+1736902,Betong
+1736973,Kanowit
+1752256,Pantai Remis
+1784658,Zhengzhou
+1786657,Yinchuan
+1787824,Xuzhou
+1788852,Xining
+1790587,Xiangfan
+1790630,Xian
+1790645,Xiamen
+1790923,Wuxi
+1791247,Wuhan
+1791681,Weifang
+1792947,Tianjin
+1793346,Tangshan
+1793511,Taiyuan
+1795270,Shijiazhuang
+1795940,Shantou
+1796236,Shanghai
+1797929,Qingdao
+1798524,Pudong
+1798636,Pingyao
+1799397,Ningbo
+1799869,Nanning
+1799962,Nanjing
+1800163,Nanchang
+1801792,Luoyang
+1804430,Lanzhou
+1804651,Kunming
+1804879,Kaifeng
+1805753,Jinan
+1808722,Hefei
+1808926,Hangzhou
+1809078,Haikou
+1809461,Guiyang
+1809858,Guangzhou
+1810821,Fuzhou
+1814906,Chongqing
+1815286,Chengdu
+1815395,Chaozhou
+1815577,Changsha
+1816670,Beijing
+1818501,Tsim Sha Tsui
+1820071,Tutong
+1820491,Kuala Belait
+1820906,Bandar Seri Begawan
+1821274,Makau
+1821306,Phnom Penh
+1821935,Ta Khmau
+1821940,Takeo
+1821993,Svay Rieng
+1822019,Suong
+1822029,Stung Treng
+1822207,Sisophon
+1822214,Siem Reap
+1822610,Prey Veng
+1822768,Pursat
+1825093,Samraong
+1830098,Tbeng Meanchey
+1830205,Pailin
+1830467,Kep
+1830468,Koh Kong
+1830564,Kratie
+1831112,Kampot
+1831125,Kampong Thom
+1831133,Kampong Speu
+1831142,Sihanoukville
+1831167,Kampong Chhnang
+1831173,Kampong Cham
+1831732,Banlung
+1831797,Battambang
+1833747,Ulsan
+1835235,Daejeon
+1835329,Daegu
+1835553,Suwon
+1835848,Seoul
+1838524,Busan
+1840982,Muan
+1841811,Gwangju
+1843564,Incheon
+1844174,Hongseong
+1845136,Chuncheon
+1845457,Jeonju
+1845604,Cheongju-si
+1846266,Kota Jeju
+1846326,Changwon
+1846986,Andong
+1850147,Tokyo
+1851100,Takamatsu
+1851713,Shobara
+1852736,Sendai
+1853195,Sakai
+1853909,Osaka
+1854487,Oita
+1855431,Niigata
+1856035,Naha
+1856057,Nagoya
+1856177,Nagasaki
+1856775,Miyakonojo
+1857910,Kyoto
+1858421,Kumamoto
+1859171,Kobe
+1859307,Kitakyushu
+1859642,Kawasaki
+1860243,Kanazawa
+1860672,Kamakura
+1860827,Kagoshima
+1862415,Hiroshima
+1862627,Himeji
+1863018,Hatsukaichi
+1863641,Gifu
+1863967,Fukuoka
+1866923,Wonsan
+1870883,Sariwon
+1871859,Pyongyang
+1871871,Pyongsong
+1873757,Nampo
+1876373,Kaesong
+1877449,Hamhung
+1877615,Haeju
+1882778,Marine Parade
+1886760,Suzhou
+1937274,Lospalos
+2013159,Yakutsk
+2013348,Vladivostok
+2014407,Ulan-Ude
+2019528,Nakhodka
+2022890,Khabarovsk
+2023469,Irkutsk
+2025339,Chita
+2026609,Blagoveshchensk
+2026643,Birobidzhan
+2028462,Ulan Bator
+2028606,Tsetserleg
+2029156,Sükhbaatar
+2029656,Undurkhaan
+2029945,Möron
+2031405,Erdenet
+2031517,Dzuunmod
+2031964,Darhan
+2032007,Dalandzadgad
+2032054,Choibalsan
+2032081,Saynshand
+2032201,Bulgan
+2032533,Bayanhongor
+2032614,Baruun-Urt
+2032814,Arvayheer
+2034937,Shenyang
+2035265,Qiqihar
+2036502,Kota Jilin
+2036581,Jiamusi
+2036892,Hohhot
+2037013,Harbin
+2037886,Dandong
+2038180,Changchun
+2038300,Benxi
+2040893,Sinuiju
+2042645,Rajin
+2043572,Kanggye
+2043837,Hyesan
+2044757,Chongjin
+2057087,Kota Kupang
+2058430,Whyalla
+2062338,Rockingham
+2063523,Perth
+2065594,Mount Isa
+2067119,Mandurah
+2070998,Geraldton
+2071059,Gawler
+2073124,Darwin
+2075265,Busselton
+2075432,Bunbury
+2077895,Alice Springs
+2077963,Albany
+2078025,Adelaide
+2082600,Kota Jayapura
+2082727,Abepura
+2083537,Wewak
+2088122,Port Moresby
+2088163,Popondetta
+2090409,Mount Hagen
+2090990,Mendi
+2091996,Madang
+2092740,Lae
+2093685,Kokopo
+2093967,Kimbe
+2096742,Goroka
+2098329,Daru
+2108502,Honiara
+2113015,Chiba
+2119441,Yuzhno-Sakhalinsk
+2122104,Petropavlovsk Kamchatsky
+2123628,Magadan
+2127202,Anadyr
+2128295,Sapporo
+2130188,Hakodate
+2130658,Aomori
+2135171,Port Vila
+2143285,Wodonga
+2144528,Warrnambool
+2144764,Wangaratta
+2146108,Traralgon
+2147381,Taree
+2147497,Tamworth
+2147714,Sydney
+2149645,Shepparton
+2151437,Rockhampton
+2154219,Orange
+2155472,Newcastle
+2156643,Mount Gambier
+2158177,Melbourne
+2158562,Maryborough
+2159045,Maitland
+2159220,Mackay
+2159851,Liverpool
+2160517,Launceston
+2163055,Horsham
+2163355,Hobart
+2164771,Grafton
+2164837,Goulburn
+2165478,Gladstone
+2165798,Geelong
+2168305,Dubbo
+2168943,Devonport
+2171085,Coffs Harbour
+2171507,Wollongong
+2171845,Cessnock
+2172517,Canberra
+2172797,Cairns
+2173125,Burnie
+2173911,Broken Hill
+2174003,Brisbane
+2176187,Bendigo
+2176632,Bathurst
+2177091,Ballarat
+2177671,Armidale
+2179670,Whanganui
+2183472,Richmond
+2184397,Porirua
+2185018,Palmerston North
+2186239,New Plymouth
+2186280,Nelson
+2186313,Napier
+2188164,Lower Hutt
+2189028,Karori
+2189529,Invercargill
+2190324,Hamilton
+2191562,Dunedin
+2192362,Christchurch
+2193733,Auckland
+2198148,Suva
+2206854,Gisborne
+2208330,Whakatane
+2208425,Zuwarah
+2210554,Sirte
+2212775,Sabha
+2214433,Nalut
+2214603,Murzuk
+2214846,Misratah
+2216645,Hun
+2217362,Gharyan
+2218478,Brak
+2218840,Beni Ulid
+2218970,Az Zawiyah
+2219235,Ubari
+2219905,Al Khums
+2220139,Al Aziziyah
+2220957,Yaoundé
+2224827,Ngaoundere
+2228373,Maroua
+2231320,Garoua
+2232283,Ebolowa
+2232593,Douala
+2233410,Buea
+2234359,Bertoua
+2234974,Bamenda
+2235189,Bafoussam
+2236568,Uige
+2239076,N'dalatando
+2239520,Mbanza Kongo
+2239862,Malanje
+2240449,Luanda
+2242001,Caxito
+2243271,Cabinda
+2243940,Ziguinchor
+2244991,Tambacounda
+2245704,Sedhiou
+2246452,Saint-Louis
+2246512,Rufisque
+2248752,Matam
+2249222,Louga
+2249782,Kolda
+2250645,Kedougou
+2250805,Kaolack
+2251007,Kaffrine
+2251911,Fatick
+2252309,Diourbel
+2255285,Sibiti
+2255414,Pointe-Noire
+2255542,Owando
+2255564,Ouesso
+2258261,Dolisie
+2259655,Impfondo
+2260401,Djambala
+2260535,Brazzaville
+2262644,Tomar
+2262912,Sintra
+2262963,Setúbal
+2263480,Santarem
+2264508,Portalegre
+2267057,Lisboa
+2267095,Leiria
+2267827,Funchal
+2268339,Faro
+2268406,Evora
+2268436,Estoril
+2269514,Castelo Branco
+2270985,Beja
+2272491,Zwedru
+2273312,Voinjama
+2273435,Tubmanburg
+2274129,Sanniquellie
+2274895,Monrovia
+2276086,Kakata
+2276492,Harper
+2276600,Greenville
+2277060,Gbarnga
+2278158,Buchanan
+2279755,Yamoussoukro
+2282006,San-Pedro
+2283016,Odienne
+2284647,Man
+2286304,Korhogo
+2288829,Gagnoa
+2289983,Dimbokro
+2290486,Daloa
+2290956,Bouaké
+2291136,Bondoukou
+2293538,Abidjan
+2293549,Abengourou
+2294700,Tema
+2294877,Tamale
+2295458,Sekondi-Takoradi
+2298890,Kumasi
+2299645,Keta
+2301190,Elmina
+2304121,Ashiaman
+2306104,Accra
+2310046,Bata
+2312895,Mbandaka
+2313002,Matadi
+2313762,Libenge
+2314302,Kinshasa
+2314705,Kikwit
+2315417,Inongo
+2315728,Gemena
+2316702,Boma
+2317285,Basankusu
+2317397,Provinsi Bandundu
+2317569,Zungeru
+2318044,Yola
+2318123,Yenagoa
+2319480,Uyo
+2320576,Umuahia
+2322911,Sokoto
+2324774,Port Harcourt
+2325330,Owerri
+2325590,Osogbo
+2330100,Minna
+2331140,Makurdi
+2331447,Maiduguri
+2331939,Lokoja
+2332459,Lagos
+2332515,Lafia
+2334802,Katsina
+2335204,Kano
+2335727,Kaduna
+2335953,Jos
+2336589,Jalingo
+2337639,Ilorin
+2338313,Ikeja
+2338640,Igbo-Ukwu
+2339354,Ibadan
+2339937,Gusau
+2340451,Gombe
+2343279,Enugu
+2344245,Dutse
+2345521,Damaturu
+2346229,Calabar
+2347059,Birnin Kebbi
+2347283,Kota Benin
+2347470,Bauchi
+2348773,Awka
+2349276,Asaba
+2350841,Akure
+2352379,Ado-Ekiti
+2352778,Abuja
+2352947,Abeokuta
+2353099,Abakaliki
+2353197,Zorgo
+2353257,Ziniare
+2353688,Yako
+2354176,Tougan
+2354265,Toma
+2354349,Titao
+2354675,Tenkodogo
+2355404,Solenzo
+2355869,Sapouy
+2356228,Reo
+2356454,Po
+2357043,Ouahigouya
+2357048,Ouagadougou
+2357163,Nouna
+2358100,Manga
+2358382,Leo
+2358738,Koupela
+2358946,Koudougou
+2359142,Kongoussi
+2359227,Kombissiri
+2359608,Kaya
+2360073,Hounde
+2360238,Gourcy
+2360541,Gayeri
+2360886,Fada N'gourma
+2361082,Dori
+2361177,Djibo
+2361342,Diebougou
+2361373,Diapaga
+2361477,Dedougou
+2361586,Dano
+2361845,Bousse
+2361946,Boulsa
+2362150,Boromo
+2362323,Bogande
+2362344,Bobo-Dioulasso
+2362669,Batie
+2362909,Banfora
+2363534,Tsevie
+2364104,Sokode
+2365267,Lomé
+2366152,Kara
+2367164,Dapaong
+2367886,Atakpame
+2374775,Bissau
+2375558,Zouerat
+2376719,Selibaby
+2376898,Rosso
+2377450,Nouakchott
+2377457,Nouadhibou
+2377539,Nema
+2378538,Kiffa
+2378736,Kaedi
+2381291,Ayoun El Atrous
+2381334,Atar
+2381659,Aleg
+2381690,Akjoujt
+2383119,Sibut
+2383523,Paoua
+2383827,Nola
+2384770,Mbaiki
+2386012,Kaga-Bandoro
+2387495,Carnot
+2387546,Bozoum
+2387926,Bouar
+2388036,Bossangoa
+2388625,Bocaranga
+2388693,Bobangui
+2388873,Bimbo
+2389086,Berberati
+2389691,Batangafo
+2389853,Bangui
+2392204,Parakou
+2392601,Natitingou
+2392897,Lokossa
+2393693,Kandi
+2394560,Djougou
+2394711,Dassa-Zoume
+2395568,Aplahoue
+2395635,Allada
+2395915,Abomey
+2403094,Waterloo
+2404433,Port Loko
+2406407,Makeni
+2407656,Koidutown-Sefadu
+2407790,Kenema
+2409306,Freetown
+2410048,Bo
+2411585,Gibraltar
+2413876,Banjul
+2419992,Kankan
+2425791,Sarh
+2426240,Pala
+2427336,Moussoro
+2427455,Moundou
+2427637,Mongo
+2427697,Moïssala
+2428228,Massakory
+2428394,Mao
+2429296,Lai
+2429605,Koumra
+2432678,Faya-Largeau
+2433437,Doba
+2434910,Bongor
+2434979,Bol
+2436400,Ati
+2437798,Zinder
+2438678,Tillaberi
+2439376,Tahoua
+2440485,Niamey
+2441291,Maradi
+2445488,Dosso
+2445704,Diffa
+2448085,Agadez
+2449067,Timbuktu
+2451185,Sikasso
+2451478,Segou
+2453348,Mopti
+2454530,Koulikoro
+2455290,Kidal
+2455518,Kayes
+2457163,Gao
+2460596,Bamako
+2461874,Smara
+2462881,Laayoune
+2464041,Zaghouan
+2464470,Tunis
+2464648,Tozeur
+2464701,Tataouine
+2464915,Sousse
+2465030,Siliana
+2465840,Sidi Bouzid
+2467454,Sfax
+2468018,Kebili
+2468353,Gafsa
+2468369,Gabes
+2468579,Nabeul
+2469274,Manouba
+2469473,Medenine
+2470088,Jendouba
+2472479,Ben Arous
+2472706,Bizerte
+2472774,Beja
+2473247,Aryanah
+2473449,Kairouan
+2473457,Kasserine
+2473493,Monastir
+2473572,Mahdia
+2473634,El Kef
+2473744,Al-Hammamat
+2474141,Boumerdas
+2475475,Touggourt
+2475687,Tlemcen
+2475744,Tizi Ouzou
+2475860,Tissemsilt
+2476028,Tipasa
+2476301,Provinsi Tindouf
+2476403,Timimoun
+2476897,Tiaret
+2477461,Tebessa
+2478216,Tamanghasset
+2479215,Souk Ahras
+2479536,Skikda
+2481007,Sidi Bilabbas
+2481700,Sathif
+2482572,Saida
+2483668,Relizane
+2484620,Oum el Bouaghi
+2484933,Ouled Djellal
+2485801,Ouargla
+2485926,Oran
+2486690,M'Sila
+2487134,Mostaganem
+2487452,Mila
+2488835,Medea
+2490098,Mascara
+2491191,Laghouat
+2491889,Khenchela
+2492913,Jijel
+2495662,Guelma
+2496049,Ghardaia
+2497411,El Oued
+2497655,El Meghaier
+2498305,El Menia
+2498543,El Bayadh
+2498611,Chlef
+2500017,Djelfa
+2501152,Constantine
+2502958,Bouira
+2503701,Bordj Bou Arreridj
+2503769,Blida
+2503826,Biskra
+2505329,Bejaia
+2505530,Basyar
+2505572,Batnah
+2506999,Annaba
+2507480,Aljir
+2507901,Ain Temouchent
+2508228,Ain Defla
+2508813,Adrar
+2509491,Villarrobledo
+2509954,Valencia
+2510409,Toledo
+2510911,Sevilla
+2511174,Santa Cruz de Tenerife
+2512989,Palma de Mallorca
+2513416,Murcia
+2513917,Mérida
+2513947,Melilla
+2514169,Marbella
+2514256,Málaga
+2514301,Maó
+2515270,Las Palmas de Gran Canaria
+2516548,Huelva
+2517117,Granada
+2519240,Kordoba
+2519752,Castellón de la Plana
+2520600,Cádiz
+2520611,Cáceres
+2521886,Almeria
+2521978,Alicante
+2522013,Algeciras
+2522258,Albacete
+2523083,Sirakusa
+2523630,Reggio di Calabria
+2523920,Palermo
+2524170,Messina
+2524653,Gela
+2525059,Catanzaro
+2525068,Catania
+2525448,Caltanissetta
+2525473,Cagliari
+2530335,Tangier
+2537406,Settat
+2537881,Safi
+2538475,Rabat
+2540483,Oujda
+2542715,Meknes
+2542997,Marrakesh
+2544571,Kenitra
+2548526,Guelmim
+2548885,Fez
+2550078,El Jadida
+2553604,Casablanca
+2555745,Beni Mellal
+2561668,Agadir
+2562266,Zabbar
+2562305,Valletta
+2562501,Sliema
+2562541,San Pawl il-Bahar
+2562629,Qormi
+2562704,Mosta
+2563191,Birkirkara
+2595640,Diamniadio
+2596934,Seguela
+2610319,Viborg
+2610613,Vejle
+2611396,Torshavn
+2613102,Munisipalitas Sønderborg
+2614481,Roskilde
+2614600,Munisipalitas Rødovre
+2615876,Odense
+2618425,Kopenhagen
+2620320,Hillerød
+2620425,Munisipalitas Herning
+2620473,Helsingør
+2621356,Munisipalitas Glostrup
+2622447,Esbjerg
+2624112,Birkerød
+2624341,Munisipalitas Ballerup
+2624652,Aarhus
+2624843,Munisipalitas Allerød
+2624886,Ålborg
+2624906,Munisipalitas Albertslund
+2633274,Akureyri
+2633691,Wolverhampton
+2633866,Wimbledon
+2634491,West Bromwich
+2634677,Watford
+2634853,Walsall
+2636432,Swansea
+2636713,Stratford-upon-Avon
+2637487,Southampton
+2638077,Sheffield
+2638867,Santa Albans
+2639093,Rotherham
+2639323,Ripon
+2639577,Reading
+2639912,Preston
+2639996,Portsmouth
+2640194,Plymouth
+2641022,Oldham
+2641170,Nottingham
+2641181,Norwich
+2641430,Northampton
+2641673,Newcastle upon Tyne
+2642607,Middlesbrough
+2643123,Manchester
+2643736,Derry
+2643743,London
+2644210,Liverpool
+2644531,Lichfield
+2644668,Leicester
+2644688,Leeds
+2645425,Kingston upon Hull
+2646057,Ipswich
+2646914,High Wycombe
+2647461,Harlow
+2647878,Grimsby
+2647937,Greenwich
+2648579,Glasgow
+2648657,Gillingham
+2649672,Farnborough
+2650225,Edinburgh
+2651347,Derby
+2652002,Crewe
+2652618,Colchester
+2653261,Cheltenham
+2653265,Chelsea
+2653353,Chapeltown
+2654264,Burnley
+2654675,Bristol
+2654710,Brighton
+2654993,Bradford
+2655095,Bournemouth
+2655237,Bolton
+2655524,Blackburn
+2655603,Birmingham
+2655984,Belfast
+2657896,Zürich
+2657908,Zug
+2658564,Solothurn
+2658576,Sion
+2658665,Schwyz
+2658761,Schaffhausen
+2658822,Sankt Gallen
+2659496,Neuchâtel
+2659811,Lucerne
+2659994,Lausanne
+2660365,Herisau
+2660646,Jenewa
+2660718,Fribourg
+2660727,Frauenfeld
+2661169,Chur
+2661552,Bern
+2661567,Bellinzona
+2661604,Basel
+2661881,Aarau
+2662689,Visby
+2663536,Växjö
+2664454,Västerås
+2666199,Uppsala
+2673730,Stockholm
+2685750,Östersund
+2686657,Örebro
+2687700,Nyköping
+2692969,Malmö
+2694762,Linköping
+2701680,Karlstad
+2701713,Karlskrona
+2702261,Kalmar
+2702979,Jönköping
+2706767,Helsingborg
+2707684,Härnösand
+2708365,Halmstad
+2711537,Göteborg
+2712414,Gävle
+2715459,Falun
+2729907,Longyearbyen
+2732265,Viseu
+2732438,Vila Real
+2732773,Viana do Castelo
+2735943,Porto
+2738752,Guimaraes
+2738785,Guarda
+2740637,Coimbra
+2742027,Braganca
+2742032,Braga
+2742611,Aveiro
+2743477,Zwolle
+2743493,Zwijndrecht
+2743608,Zutphen
+2743856,Zoetermeer
+2743977,Zeist
+2744042,Zandvoort
+2744114,Zaanstad
+2744248,Woerden
+2744344,Winschoten
+2744514,Wijchen
+2744549,Wierden
+2744904,Weesp
+2744911,Weert
+2745123,Waalwijk
+2745392,Vlissingen
+2745467,Vlaardingen
+2745641,Venlo
+2745673,Velsen
+2745726,Veghel
+2745774,Veenendaal
+2745860,Valkenswaard
+2745912,Utrecht
+2745932,Urk
+2746005,Uden
+2746133,Tubbergen
+2746301,Tilburg
+2746331,Tiel
+2746420,Terneuzen
+2746804,Steenbergen
+2746839,Staphorst
+2746860,Stadskanaal
+2746932,Spijkenisse
+2747063,Sneek
+2747227,Sint-Oedenrode
+2747351,'s-Hertogenbosch
+2747373,Den Haag
+2747584,Schijndel
+2747596,Schiedam
+2747599,Scheveningen
+2747720,Schagen
+2747891,Rotterdam
+2747930,Roosendaal
+2748000,Roermond
+2748371,Raalte
+2748413,Purmerend
+2749234,Oss
+2749450,Oosterhout
+2749644,Oldenzaal
+2749680,Oisterwijk
+2749723,Oegstgeest
+2750053,Nijmegen
+2750325,Nieuwegein
+2750521,Naarden
+2750884,Middelharnis
+2750896,Middelburg
+2750947,Meppel
+2751073,Medemblik
+2751283,Maastricht
+2751285,Maassluis
+2751424,Losser
+2751456,Loon op Zand
+2751738,Lelystad
+2751773,Leiden
+2751792,Leeuwarden
+2751808,Leerdam
+2751834,Leek
+2752923,Kerkrade
+2753106,Kampen
+2753468,Huizen
+2753638,Hoorn
+2753719,Hoogeveen
+2754064,Hilversum
+2754394,Hengelo
+2754447,Helmond
+2754516,Heiloo
+2754652,Heerlen
+2754659,Heerhugowaard
+2754669,Heerenveen
+2754692,Heemstede
+2754697,Heemskerk
+2754817,Harlingen
+2754861,Hardenberg
+2755003,Haarlem
+2755030,Haaksbergen
+2755251,Groningen
+2755420,Gouda
+2755464,Goirle
+2755476,Goes
+2755584,Gennep
+2755633,Geldermalsen
+2755669,Geertruidenberg
+2756071,Enschede
+2756077,Enkhuizen
+2756136,Emmen
+2756253,Eindhoven
+2756342,Eersel
+2756429,Ede
+2756507,Duiven
+2756559,Dronten
+2756669,Dordrecht
+2756723,Dongen
+2756767,Doetinchem
+2756888,Diemen
+2756987,Deventer
+2757220,Den Helder
+2757340,Delfzijl
+2757345,Delft
+2757850,Dalfsen
+2757890,Cranendonck
+2757991,Castricum
+2758012,Capelle aan den IJssel
+2758064,Bussum
+2758174,Brunssum
+2758401,Breda
+2758460,Boxtel
+2758587,Borssele
+2758598,Borne
+2758998,Beverwijk
+2759040,Best
+2759132,Bergeijk
+2759145,Bergen op Zoom
+2759544,Baarn
+2759633,Assen
+2759661,Arnhem
+2759706,Apeldoorn
+2759794,Amsterdam
+2759798,Amstelveen
+2759821,Amersfoort
+2759875,Alphen aan den Rijn
+2759887,Almelo
+2759899,Alkmaar
+2760123,Aalten
+2760134,Aalsmeer
+2761524,Wels
+2762372,Villach
+2766429,St. Pölten
+2766824,Salzburg
+2772173,Lustenau
+2772400,Linz
+2774326,Klagenfurt
+2775220,Innsbruck
+2778067,Graz
+2779674,Feldkirch
+2780741,Dornbirn
+2781503,Bregenz
+2781680,Bludenz
+2782480,Ansfelden
+2783476,Woluwe-Saint-Lambert - Sint-Lambrechts-Woluwe
+2783979,Watermael-Boitsfort - Watermaal-Bosvoorde
+2785123,Uccle-Ukkel
+2787149,Schaerbeek-Schaarbeek
+2787387,Saint-Josse-ten-Noode - Sint-Joost-ten-Node
+2787413,Saint-Gilles - Sint-Gillis
+2790471,Namur
+2791018,Molenbeek-Saint-Jean - Sint-Jans-Molenbeek
+2792073,Louvain-la-Neuve
+2792413,Liège
+2794190,Koekelberg
+2794914,Jette
+2794981,Jambes
+2795011,Ixelles-Elsene
+2797656,Ghent
+2797844,Ganshoren
+2798139,Forest-Vorst
+2798554,Evere
+2798578,Etterbeek
+2800481,Charleroi
+2800866,Brusel
+2800931,Brugge
+2802247,Berchem-Sainte-Agathe - Sint-Agatha-Berchem
+2802960,Auderghem-Oudergem
+2803138,Antwerpen
+2803201,Anderlecht
+2803560,Zwickau
+2803620,Zweibrücken
+2805615,Würzburg
+2805753,Wuppertal
+2806142,Worms
+2807465,Wismar
+2809346,Wiesbaden
+2809889,Wetzlar
+2812482,Weimar
+2813635,Wattenscheid
+2820256,Ulm
+2820860,Tübingen
+2821164,Trier
+2824948,Suhl
+2825297,Stuttgart
+2826287,Stralsund
+2830582,Speyer
+2831580,Solingen
+2834282,Schwerin
+2842647,Saarbrücken
+2844588,Rostock
+2849483,Regensburg
+2852458,Potsdam
+2853292,Plauen
+2853574,Pirmasens
+2856883,Osnabrück
+2857185,Opladen
+2857458,Oldenburg
+2861650,Nürnberg
+2861982,Nordhausen
+2866135,Neubrandenburg
+2867714,München
+2873759,Marburg
+2873891,Mannheim
+2874225,Mainz
+2874545,Magdeburg
+2875115,Lüneburg
+2875376,Ludwigshafen am Rhein
+2875601,Lübeck
+2878234,Leverkusen
+2879139,Leipzig
+2881485,Landshut
+2881646,Landau in der Pfalz
+2885679,Konstanz
+2886242,Köln
+2886946,Koblenz
+2891122,Kiel
+2892794,Karlsruhe
+2893152,Kapellen
+2894003,Kaiserslautern
+2895044,Jena
+2898304,Hoyerswerda
+2904789,Hildesheim
+2905891,Herne
+2907669,Heilbronn
+2910831,Hannover
+2911240,Hamm
+2911298,Hamburg
+2911522,Halle
+2917737,Greiz
+2917788,Greifswald
+2918632,Göttingen
+2918752,Gotha
+2918987,Görlitz
+2920512,Giessen
+2921232,Gera
+2921466,Gelsenkirchen
+2923544,Fürth
+2923822,Fulda
+2925177,Freiburg
+2925533,Frankfurt
+2925535,Frankfurt an der Oder
+2925550,Frankenthal
+2928810,Essen
+2929670,Erfurt
+2930596,Emden
+2931574,Eisenach
+2934246,Düsseldorf
+2934691,Duisburg
+2935022,Dresden
+2935517,Dortmund
+2938323,Delmenhorst
+2939811,Cottbus
+2940132,Chemnitz
+2944388,Bremen
+2945024,Braunschweig
+2945756,Bottrop
+2947416,Bochum
+2949186,Bielefeld
+2950159,Berlin
+2960316,Luksemburg
+2962668,Maynooth
+2962725,Malahide
+2962943,Limerick
+2963848,Greystones
+2964180,Galway
+2964574,Dublin
+2964661,Drogheda
+2965140,Cork
+2966022,Bray
+2966794,Balbriggan
+2971041,Valenciennes
+2971549,Troyes
+2972315,Toulouse
+2972328,Toulon
+2973783,Strasbourg
+2974733,Sete
+2980291,Saint-Etienne
+2982235,Rueil-Malmaison
+2982343,Royan
+2982652,Rouen
+2983990,Rennes
+2986495,Poitiers
+2988507,Paris
+2989317,Orléans
+2990440,Nice
+2990969,Nantes
+2990999,Nancy
+2991214,Mulhouse
+2992166,Montpellier
+2993002,Montauban
+2994160,Metz
+2995469,Marseille
+2996882,Macon
+2996944,Lyon
+2997395,Lourdes
+2997577,Lorient
+2998286,Limoges
+2998324,Lille
+3003603,Le Mans
+3003796,Le Havre
+3006787,La Rochelle
+3014728,Grenoble
+3028808,Cannes
+3029162,Calais
+3029241,Caen
+3030300,Brest
+3031582,Bordeaux
+3032797,Biarritz
+3035681,Avignon
+3035843,Auxerre
+3036016,Aurillac
+3038334,Ajaccio
+3040051,Escaldes-Engordany
+3041563,Andorra la Vella
+3041732,Mariehamn
+3042030,Vaduz
+3042929,Veszprém
+3046526,Pécs
+3053163,Esztergom
+3054643,Budapest
+3056508,Zilina
+3057124,Trnava
+3057140,Trencin
+3057789,Ružomberok
+3058531,Nitra
+3060972,Bratislava
+3061186,Banska Bystrica
+3061370,Zlín
+3063548,Usti nad Labem
+3064288,Teplice
+3067696,Praha
+3068160,Plzeň
+3068582,Pardubice
+3068799,Ostrava
+3069011,Olomouc
+3071961,Liberec
+3073803,Karlovy Vary
+3074199,Jihlava
+3074603,Jablonec nad Nisou
+3074967,Hradec Kralove
+3077916,České Budějovice
+3077929,Česká Lípa
+3078610,Brno
+3080004,Żory
+3080165,Zielona Góra
+3080231,Zgorzelec
+3080251,Zgierz
+3080526,Zawiercie
+3080944,Zagan
+3080985,Zabrze
+3081368,Wroclaw
+3081741,Włocławek
+3082473,Wejherowo
+3082707,Wałbrzych
+3082756,Ustka
+3082914,Tychy
+3083271,Toruń
+3083829,Szczecin
+3083955,Świnoujście
+3083988,Świętochłowice
+3084074,Świecie
+3084840,Stargard
+3085128,Sosnowiec
+3085151,Sopot
+3085450,Słupsk
+3085495,Słubice
+3085978,Sieradz
+3086586,Rybnik
+3086800,Ruda Śląska
+3087497,Radomsko
+3088171,Poznan
+3088461,Police
+3088825,Płock
+3088972,Piotrków Trybunalski
+3089578,Pabianice
+3089684,Ostrów Wielkopolski
+3090048,Opole
+3091150,Nakło nad Notecią
+3091831,Mikołów
+3091969,Międzyrzecz
+3092472,Malbork
+3093066,Łowicz
+3093133,Łódź
+3093524,Leszno
+3093726,Łęczyca
+3094170,Kutno
+3094802,Krakow
+3095049,Koszalin
+3095151,Kościan
+3095321,Konin
+3095795,Kołobrzeg
+3095797,Koło
+3096472,Katowice
+3096880,Kalisz
+3097391,Jastrzębie Zdrój
+3097528,Jarocin
+3097872,Inowrocław
+3098218,Grudziądz
+3098722,Gorzów Wielkopolski
+3098966,Goleniów
+3099112,Gniezno
+3099213,Głogów
+3099230,Gliwice
+3099424,Gdynia
+3099434,Gdańsk
+3099759,Elbląg
+3100796,Dąbrowa Górnicza
+3100946,Częstochowa
+3101619,Chorzów
+3101787,Chełmża
+3101950,Bytom
+3102014,Bydgoszcz
+3102627,Brodnica
+3103402,Bielsko-Biała
+3104324,Zaragoza
+3104499,Vitoria
+3106672,Valladolid
+3108126,Teruel
+3108286,Terrassa
+3109642,Santiago de Compostela
+3109718,Santander
+3111108,Salamanca
+3113209,Pontevedra
+3114531,Palencia
+3114711,Oviedo
+3114965,Orense
+3117735,Madrid
+3118150,Logroño
+3120304,Irun
+3120514,Huesca
+3121424,Gijón
+3123709,Eibar
+3128760,Barcelona
+3129136,Avila
+3130616,Alcála de Henares
+3133880,Trondheim
+3133895,Tromsø
+3134331,Tonsberg
+3137115,Stavanger
+3139075,Skien
+3140084,Sarpsborg
+3143244,Oslo
+3145580,Molde
+3147474,Lillehammer
+3149318,Kristiansand
+3153623,Haugesund
+3154084,Hamar
+3154209,Halden
+3156529,Fredrikstad
+3159016,Drammen
+3160881,Bodo
+3161732,Bergen
+3162955,Arendal
+3164419,Vicenza
+3164527,Verona
+3164603,Venesia
+3165185,Trieste
+3165201,Treviso
+3165524,Torino
+3165771,Terni
+3165803,Teramo
+3165926,Taranto
+3166548,Siena
+3167096,Sassari
+3168070,San Marino
+3169070,Roma
+3169361,Rimini
+3169424,Riccione
+3170027,Potenza
+3170621,Pistoia
+3170647,Pisa
+3171058,Piacenza
+3171168,Pescara
+3171173,Pesaro
+3171180,Perugia
+3171457,Parma
+3172394,Napoli
+3172629,Monza
+3173331,Modena
+3173435,Milan
+3173721,Matera
+3174051,Mantova
+3174380,Macerata
+3174659,Livorno
+3174953,Lecce
+3175081,La Spezia
+3175537,Imola
+3176219,Genova
+3176885,Foggia
+3177400,Empoli
+3178229,Como
+3178796,Chieti
+3178957,Cesena
+3180991,Campobasso
+3181554,Brescia
+3181913,Bozen-Bolzano
+3181928,Bologna
+3182351,Bari
+3182650,Avellino
+3182749,Ascoli Piceno
+3182997,Aosta
+3183089,Ancona
+3183719,Vlore
+3183875,Tirana
+3184081,Shkoder
+3184497,Pekin
+3184862,Lushnja
+3184935,Lezhe
+3185060,Kuchova
+3185082,Kruya
+3185211,Kavaja
+3185672,Fier
+3185728,Durres
+3186084,Berat
+3186573,Zenica
+3186886,Zagreb
+3187609,Visoko
+3188383,Varaždin
+3188582,Tuzla
+3188893,Trebinje
+3188915,Trbovlje
+3188924,Travnik
+3189075,Velenje
+3190261,Split
+3191281,Sarajevo
+3192241,Ptuj
+3192409,Prijedor
+3193044,Podgorica
+3194351,Novo Mesto
+3194828,Mostar
+3195506,Maribor
+3196359,Ljubljana
+3197378,Kranj
+3197753,Koper
+3200396,Gorazde
+3201984,Doboj
+3202641,Cetinje
+3202781,Celje
+3203106,Budva
+3203521,Brčko
+3204176,Bijelo Polje
+3204186,Bijeljina
+3204222,Bihac
+3204509,Bar
+3204541,Banja Luka
+3247449,Aachen
+3313472,Athlone
+3346015,Sumbe
+3346821,Ondjiva
+3347019,Mossamedes
+3347353,Menongue
+3347719,Luena
+3347762,Lubango
+3347939,Lobito
+3348078,Cuito
+3348313,Huambo
+3351663,Benguela
+3352136,Windhoek
+3352844,Swakopmund
+3353383,Rundu
+3353811,Otjiwarongo
+3354021,Oshakati
+3355672,Lüderitz
+3356264,Keetmanshoop
+3357247,Gobabis
+3369157,Cape Town
+3374036,Bridgetown
+3374333,Praia
+3374462,Mindelo
+3374888,Assomada
+3378644,Georgetown
+3383330,Paramaribo
+3383714,Lelydorp
+3386496,Teresina
+3388368,São Luís
+3390760,Recife
+3394023,Natal
+3395981,Maceió
+3396016,Macapá
+3397147,Juazeiro do Norte
+3397277,João Pessoa
+3399415,Fortaleza
+3405870,Belém
+3407669,Ananindeua
+3408424,Abaetetuba
+3413829,Reykjavik
+3415496,Keflavík
+3416706,Hafnarfjörður
+3421319,Nuuk
+3424934,Saint-Pierre
+3427213,Zarate
+3427428,Villaguay
+3427833,Tandil
+3428067,San Vicente
+3428071,Santo Tome
+3428576,San Pedro
+3428577,San Pedro
+3428609,San Miguel del Monte
+3428708,San Luis del Palmar
+3428775,San Justo
+3428975,San Javier
+3428992,San Isidro
+3429248,San Antonio de Areco
+3429399,Saladillo
+3429403,Saladas
+3429577,Resistencia
+3429594,Reconquista
+3429652,Quilmes
+3429732,Puerto Riko
+3429786,Puerto Esperanza
+3429886,Posadas
+3429949,Pirane
+3429971,Pinamar
+3429980,Pilar
+3430104,Paso de los Libres
+3430340,Obera
+3430415,Nogoya
+3430443,Necochea
+3430457,Navarro
+3430545,Moron
+3430598,Monte Caseros
+3430601,Montekarlo
+3430668,Miramar
+3430697,Merlo
+3430708,Mercedes
+3430709,Mercedes
+3430861,Mar del Tuyu
+3430863,Mar del Plata
+3430957,Magdalena
+3430988,Lujan
+3431271,Lomas de Zamora
+3431313,Lobos
+3431391,Leandro N. Alem
+3431788,Las Flores
+3432043,La Plata
+3432079,La Paz
+3432135,Lanus
+3433360,Ituzaingo
+3433424,Isidro Casanova
+3433522,Hurlingham
+3433658,Gualeguaychu
+3433663,Gualeguay
+3433715,Goya
+3433801,General Juan Madariaga
+3433803,General Jose de San Martin
+3433817,General Belgrano
+3433899,Formosa
+3433956,Federal
+3433975,Ezeiza
+3434095,Esquina
+3434141,Ensenada
+3434291,El Soberbio
+3434674,Eldorado
+3435038,Dolores
+3435103,Curuzu Cuatia
+3435217,Corrientes
+3435261,Concordia
+3435264,Konsepsi del Uruguay
+3435352,Kolon
+3435448,Chaskomus
+3435607,Castelar
+3435644,Karmen de Areko
+3435713,Canuelas
+3435810,Campana
+3435963,Kolosel Brandsen
+3436040,Berisso
+3436043,Berazategui
+3436047,Benito Juarez
+3436150,Baradero
+3436177,Balcarce
+3436199,Azul
+3436221,Ayacucho
+3436714,Villarrica
+3436725,Villa Hayes
+3437063,San Juan Bautista
+3437526,Pilar
+3437547,Pedro Juan Caballero
+3438735,Enkarnasi
+3438819,Coronel Oviedo
+3438834,Konsepsi
+3439101,Kota del Este
+3439297,Caazapa
+3439320,Caacupe
+3439389,Asunción
+3439525,Young
+3439748,Trinidad
+3439781,Treinta y Tres
+3440034,Tacuarembo
+3440571,Santa Lucía
+3440639,San Jose de Mayo
+3440696,San Carlos
+3440714,Salto
+3440777,Rocha
+3440781,Rivera
+3440963,Progreso
+3441243,Paysandú
+3441354,Pando
+3441575,Montevideo
+3441665,Minas
+3441684,Mercedes
+3441702,Melo
+3441894,Maldonado
+3442098,La Paz
+3442568,Fray Bentos
+3442585,Florida
+3442727,Durazno
+3442750,Dolores
+3443013,Colonia del Sacramento
+3443341,Carmelo
+3443413,Canelones
+3443758,Artigas
+3444924,Vitória
+3448439,São Paulo
+3449433,Santos
+3450554,Salvador
+3451190,Rio de Janeiro
+3452925,Porto Alegre
+3456068,Novo Hamburgo
+3460522,Itumbiara
+3460629,Itaqui
+3462377,Goiânia
+3463237,Florianópolis
+3464460,Dourados
+3464975,Curitiba
+3465038,Cuiabá
+3465059,Kuba
+3465342,Corumbá
+3466537,Caxias do Sul
+3466779,Ular derik
+3467747,Campo Grande
+3467865,Campinas
+3469058,Brasília
+3469968,Blumenau
+3470127,Belo Horizonte
+3471872,Aracaju
+3474574,Palmas
+3480908,La Asuncion
+3492914,Santiago de los Caballeros
+3492984,Santa Cruz de El Seibo
+3492985,Santa Cruz de Barahona
+3493032,San Pedro de Macoris
+3493081,San Juan de la Maguana
+3493100,San Jose de Ocoa
+3493146,San Francisco de Macoris
+3493174,San Fernando de Monte Cristi
+3493175,Puerto Plata
+3493240,Salvaleon de Higueey
+3493283,Salcedo
+3493383,San Ignacio de Sabaneta
+3495857,Neiba
+3496021,Nagua
+3496134,Monte Plata
+3496331,Moca
+3496831,Mao
+3500957,La Romana
+3504765,Hato Mayor del Rey
+3508952,Dajabon
+3509207,Cotui
+3509382,La Vega
+3511233,Bonao
+3511540,San Cristobal
+3512067,Bani
+3512208,Azua
+3513090,Willemstad
+3513392,Philipsburg
+3514670,Villahermosa
+3514876,Valladolid
+3515001,Tuxtla
+3515302,Toluca
+3520064,Salina Cruz
+3521081,Puebla
+3521342,Playa del Carmen
+3522210,Pachuca de Soto
+3522507,Oaxaca
+3522924,Motul
+3523349,Mérida
+3526617,Xalapa de Enriquez
+3529947,Cuernavaca
+3530580,Ciudad Victoria
+3530597,Mexico City
+3530870,Chilpancingo
+3531023,Chetumal
+3531732,Campeche
+3533462,Acapulco
+3536729,Santiago de Cuba
+3537906,Santa Clara
+3539560,San Jose de las Lajas
+3540667,Sancti Spiritus
+3544091,Pinar del Rio
+3545867,Nueva Gerona
+3547398,Matanzas
+3550598,Las Tunas
+3553478,Havana
+3556969,Holguín
+3557689,Guantanamo
+3564124,Cienfuegos
+3564178,Ciego de Avila
+3566067,Camagüey
+3567597,Bayamo
+3568312,Artemisa
+3570675,Fort-de-France
+3571824,Nassau
+3572375,Pelabuhan Bebas
+3573374,The Valley
+3573576,Tunapuna
+3573703,Scarborough
+3573732,Sangre Grande
+3573738,San Fernando
+3573840,Rio Claro
+3573890,Port-of-Spain
+3573899,Point Fortin
+3574309,Laventille
+3574636,Diego Martin
+3574810,Chaguanas
+3575051,Arima
+3575551,Basseterre
+3576022,St. John's
+3576686,Gros Islet
+3576812,Castries
+3577154,Oranjestad
+3577430,Road Town
+3577887,Kingstown
+3579925,St. George's
+3580477,West Bay
+3580661,George Town
+3581514,Orange Walk
+3582672,Belmopan
+3582677,Kota Belize
+3582805,Zacatecoluca
+3582883,Usulutan
+3583102,Sonsonate
+3583158,Sensuntepeque
+3583178,San Vicente
+3583334,Santa Ana
+3583361,San Salvador
+3583446,San Miguel
+3583747,San Francisco
+3584257,Santa Tecla
+3584772,La Union
+3586977,Cojutepeque
+3587091,Chalatenango
+3587426,Ahuachapan
+3601782,San Pedro Sula
+3616232,Somoto
+3617052,Rivas
+3617154,Puerto Cabezas
+3617448,Ocotal
+3617708,Matagalpa
+3617723,Masaya
+3617763,Managua
+3618030,Leon
+3618908,Juigalpa
+3618926,Jinotepe
+3618929,Jinotega
+3619136,Granada
+3619194,Esteli
+3620381,Chinandega
+3620674,Boaco
+3620680,Bluefields
+3621849,San José
+3622228,Puntarenas
+3622247,Provinsi Limón
+3623076,Liberia
+3623486,Heredia
+3624370,Cartago
+3624955,Alajuela
+3625549,Valencia
+3625929,Tucupita
+3625979,Trujillo
+3628053,San Juan de los Morros
+3628423,San Felipe
+3628473,San Cristobal
+3628503,San Carlos
+3629710,Puerto Ayacucho
+3632308,Merida
+3632998,Maracay
+3633009,Maracaibo
+3633622,Los Teques
+3637721,La Guaira
+3640226,Guanare
+3644768,Cumana
+3645213,Coro
+3645532,Ciudad Bolivar
+3646738,Caracas
+3648522,Barquisimeto
+3648546,Barinas
+3648559,Barcelona
+3649959,Zamora
+3650472,Tulcan
+3650721,Tena
+3651297,Santo Domingo de los Colorados
+3651438,Santa Elena
+3652350,Riobamba
+3652462,Quito
+3652584,Puyo
+3652743,Puerto Francisco de Orellana
+3652941,Portoviejo
+3653287,Pelileo
+3654215,Milagro
+3654533,Machala
+3654541,Macas
+3654667,Loja
+3654870,Latacunga
+3655185,Nueva Loja
+3655673,Ibarra
+3657509,Guayaquil
+3660689,Ambato
+3662574,Rio Branco
+3662762,Porto Velho
+3663517,Manaus
+3664980,Boa Vista
+3665688,Yopal
+3665900,Villavicencio
+3666304,Valledupar
+3666608,Tunja
+3667983,Sincelejo
+3668605,Santa Marta
+3670218,San Andres
+3670745,Riohacha
+3671116,Quibdo
+3671519,Puerto Carreno
+3671916,Popayan
+3672486,Pereira
+3672778,Pasto
+3673899,Neiva
+3674453,Monteria
+3674654,Mocoa
+3674676,Mitu
+3674962,Medellin
+3675443,Manizales
+3676623,Leticia
+3680656,Ibague
+3682426,Florencia
+3685533,Kukuta
+3687238,Cartagena de Indias
+3687925,Cali
+3688465,Bucaramanga
+3688689,Bogotá
+3689147,Barranquilla
+3689560,Armenia
+3689718,Arauca
+3691148,Tumbes
+3691175,Trujillo
+3693345,Pucallpa
+3693528,Piura
+3694564,Moyobamba
+3696183,Iquitos
+3696378,Huaraz
+3696417,Huanuco
+3698350,Chiclayo
+3698540,Chachapoyas
+3699088,Cajamarca
+3701117,Santiago de Veraguas
+3703068,Penonome
+3707961,La Chorrera
+3711668,David
+3712076,Colon
+3718426,Port-au-Prince
+3728474,Cap Haitien
+3778045,Maturin
+3805673,San Fernando de Apure
+3815415,Tlaxcala
+3828545,San Jose del Guaviare
+3832132,Zapala
+3832260,Yerba Buena
+3832694,Villa Maria
+3832765,Villa del Rosario
+3832778,Villa Constitucion
+3832811,Villa Angela
+3832899,Viedma
+3833027,Vera
+3833112,Veinticinco de Mayo
+3833367,Ushuaia
+3833512,Tupungato
+3833520,Tunuyan
+3833794,Tres Isletas
+3833859,Tres Arroyos
+3833875,Trenque Lauquen
+3834048,Tostado
+3834310,Toay
+3834502,Termas de Rio Hondo
+3834601,Tartagal
+3834813,Tafi Viejo
+3835869,Santiago del Estero
+3835994,Santa Rosa
+3836142,Santa Maria
+3836194,Santa Lucia
+3836277,Santa Fe
+3836564,San Salvador de Jujuy
+3836669,San Rafael
+3836772,San Pedro de Jujuy
+3836846,San Nicolas de los Arroyos
+3836873,Tucumán
+3836992,San Martin
+3836993,Villa General San Martin
+3837056,San Luis
+3837124,San Justo
+3837213,San Juan
+3837506,San Isidro
+3837675,San Francisco
+3837702,Catamarca
+3837855,San Carlos de Bolivar
+3837980,San Antonio Oeste
+3838227,Salto
+3838233,Salta
+3838561,Rosario de Lerma
+3838564,Rosario de la Frontera
+3838583,Rosario
+3838650,Rojas
+3838759,Rivadavia
+3838854,Rio Grande
+3838859,Río Gallegos
+3838874,Rio Cuarto
+3838879,Rio Colorado
+3839307,Rawson
+3839444,Ramallo
+3839479,Rafaela
+3839490,Quitilipi
+3839982,Punta Alta
+3840092,Puerto Madryn
+3840104,Puerto Deseado
+3840300,Presidencia Roque Saenz Pena
+3841159,Piguee
+3841490,Pergamino
+3841679,Pehuajo
+3841956,Parana
+3842190,Palpala
+3842670,Olavarria
+3842881,Nueve de Julio
+3843123,Neuquén
+3843803,Monteros
+3844298,San Jose de Metan
+3844421,Mendoza
+3844899,Marcos Juarez
+3845181,Malargüe
+3845330,Machagai
+3846864,Lincoln
+3846915,Libertador General San Martin
+3848687,Las Brenas
+3848950,La Rioja
+3852468,Laboulaye
+3853354,Junin
+3853510,Jesus Maria
+3855041,General Villegas
+3855043,Los Toldos
+3855074,General Pinedo
+3855075,General Pico
+3855090,General Guemes
+3855139,General Alvear
+3855143,General Acha
+3855666,Famailla
+3856022,Esperanza
+3859384,Diamante
+3859512,Dean Funes
+3859828,Cruz del Eje
+3859965,Cosquin
+3860164,Coronel Suarez
+3860174,Coronel Pringles
+3860217,Coronda
+3860259,Cordoba
+3860443,Comodoro Rivadavia
+3860828,Colón
+3861344,Chivilcoy
+3861416,Chimbas
+3861445,Chilecito
+3861678,Charata
+3861953,Chacabuco
+3862086,Cerrillos
+3862240,Caucete
+3862320,Juan José Castelli
+3862351,Casilda
+3862583,Carmen de Patagones
+3862607,Carlos Casares
+3862981,Cañada de Gómez
+3863882,Bragado
+3864331,Bell Ville
+3864375,Bella Vista
+3864430,Belen
+3865086,Bahia Blanca
+3865436,Arrecifes
+3865840,Anatuya
+3866163,Alta Gracia
+3866465,Aimogasta
+3866496,Aguilares
+3867291,Filadelfia
+3868626,Valparaiso
+3868707,Valdivia
+3870011,Temuco
+3870294,Talca
+3873775,Rancagua
+3874787,Punta Arenas
+3874958,Puerto Natales
+3874960,Puerto Montt
+3884373,La Serena
+3887127,Iquique
+3893656,Copiapó
+3893894,Konsepsi
+3894426,Coyhaique
+3895088,Chillán
+3899361,Arica
+3899539,Antofagasta
+3901435,Vinto
+3902202,Tupiza
+3902377,Trinidad
+3903320,Tarija
+3903987,Sucre
+3904906,Santa Cruz de la Sierra
+3906194,Sacaba
+3906791,Quillacollo
+3907080,Punata
+3907584,Potosí
+3909234,Oruro
+3911925,La Paz
+3915350,Guayaramerín
+3919902,Colcapirhua
+3919968,Cochabamba
+3919998,Cobija
+3928128,Tacna
+3931276,Puno
+3931470,Puerto Maldonado
+3934608,Moquegua
+3936456,Lima
+3938527,Ika
+3939459,Huancayo
+3939470,Huancavelica
+3940002,Huacho
+3941584,Cuzco
+3944797,Cerro de Pasco
+3946083,Callao
+3947019,Ayacucho
+3947322,Arequipa
+3948642,Abancay
+3979844,Zacatecas
+3981609,Tijuana
+3981941,Tepic
+3985606,San Luis Potosi
+3985710,Cabo San Lucas
+3987224,San Felipe
+3988086,Saltillo
+3991164,Santiago de Queretaro
+3991328,Puerto Vallarta
+3994616,Nuevo Casas Grandes
+3995402,Morelia
+3995465,Monterrey
+3996069,Mexicali
+4000900,La Paz
+4004898,Hermosillo
+4005270,Guanajuato
+4005539,Guadalajara
+4012176,Culiacan
+4013516,Colima
+4013720,Delicias
+4014338,Chihuahua
+4019233,Aguascalientes
+4023117,Dolores Hidalgo
+4030723,Adamstown
+4032402,Nuku'alofa
+4035715,Avarua
+4036284,Alofi
+4049979,Birmingham
+4061234,Fairhope
+4062644,Foley
+4067927,Homewood
+4076784,Montgomery
+4119403,Little Rock
+4142290,Dover
+4148757,Brandon
+4155966,Fort Lauderdale
+4160021,Jacksonville
+4161438,Lakeland
+4161580,Largo
+4164138,Miami
+4167003,Opa-locka
+4167147,Orlando
+4169014,Pompano Beach
+4174715,Tallahassee
+4174757,Tampa
+4176318,Valrico
+4180439,Atlanta
+4250542,Springfield
+4259418,Indianapolis
+4280539,Topeka
+4281730,Wichita
+4292188,Frankfort
+4315588,Baton Rouge
+4335045,New Orleans
+4346913,Aberdeen
+4347242,Annapolis
+4348599,Bethesda
+4349159,Bowie
+4370616,Suitland
+4370890,Takoma Park
+4391812,Independence
+4392388,Kota Jefferson
+4392768,Joplin
+4393217,Kota Kansas
+4431410,Jackson
+4458228,Burlington
+4474040,Kannapolis
+4487042,Raleigh
+4499379,Wilmington
+4500546,Kota Atlantic
+4508722,Cincinnati
+4509177,Columbus
+4544349,Kota Oklahoma
+4553433,Tulsa
+4560349,Philadelphia
+4562506,Aguadilla
+4562635,Arecibo
+4562768,Barceloneta
+4562831,Bayamon
+4563008,Caguas
+4563243,Carolina
+4563298,Catano
+4563308,Cayey
+4564946,Fajardo
+4565105,Guayama
+4565119,Guaynabo
+4565564,Humacao
+4566137,Manati
+4566385,Mayaguez
+4566880,Ponce
+4568127,San Juan
+4568451,Trujillo Alto
+4568533,Vega Baja
+4568917,Yauco
+4575352,Columbia
+4612862,Chattanooga
+4625282,Goodlettsville
+4634946,Knoxville
+4641239,Memphis
+4644585,Nashville
+4646571,Oak Ridge
+4671654,Austin
+4677551,Burleson
+4684888,Dallas
+4686593,Donna
+4687331,Duncanville
+4693003,Garland
+4699066,Houston
+4700168,Irving
+4702732,Katy
+4720131,Portland
+4724129,Round Rock
+4726440,San Juan
+4740629,Weslaco
+4744870,Ashburn
+4781708,Richmond
+4791259,Virginia Beach
+4795467,Charlotte Amalie
+4796512,Saint Croix
+4801859,Charleston
+4835797,Hartford
+4838633,Middletown
+4839366,New Haven
+4839416,New London
+4845920,Windsor
+4846960,Ankeny
+4853828,Des Moines
+4876523,Kota Sioux
+4884192,Batavia
+4887398,Chicago
+4890864,Elgin
+4891382,Evanston
+4926563,South Bend
+4928788,Agawam
+4929399,Attleboro
+4930505,Beverly
+4930956,Boston
+4931429,Brockton
+4931482,Brookline
+4931972,Cambridge
+4932879,Chelsea
+4933002,Chicopee
+4935582,Easthampton
+4942618,Lowell
+4943097,Marblehead
+4943170,Marlborough
+4945283,Newton
+4948247,Quincy
+4954380,Waltham
+4957003,Augusta
+4975802,Portland
+4985180,Kota Bay
+4986172,Birmingham
+4990729,Detroit
+4994358,Grand Rapids
+4995197,Hamtramck
+4998018,Kentwood
+4998830,Lansing
+5010636,Southfield
+5011148,Sterling Heights
+5014051,Warren
+5016374,Andover
+5025219,Eden Prairie
+5037649,Minneapolis
+5045360,Saint Paul
+5059163,Fargo
+5062458,West Fargo
+5072006,Lincoln
+5074472,Omaha
+5084868,Concord
+5089178,Manchester
+5101798,Newark
+5105496,Trenton
+5106834,Albany
+5110446,Brownsville
+5115699,East Amherst
+5122477,Jackson Heights
+5123718,Lackawanna
+5128581,Kota New York
+5134086,Rochester
+5137507,Seaford
+5146233,Aurora
+5150529,Cleveland
+5162188,Mayfield Heights
+5164582,Niles
+5174035,Toledo
+5177568,Youngstown
+5178195,Altoona
+5180225,Bethlehem
+5192726,Harrisburg
+5193011,Hazleton
+5206379,Pittsburgh
+5219488,wilkes-barre
+5221931,East Providence
+5223593,Newport
+5223869,Pawtucket
+5224151,Providence
+5225809,Woonsocket
+5231851,Sioux Falls
+5234372,Burlington
+5261457,Madison
+5263045,Milwaukee
+5281551,Ansonia
+5282804,Bridgeport
+5287262,Buckeye
+5289282,Chandler
+5293996,El Mirage
+5308480,Peoria
+5308655,Phoenix
+5324200,Antioch
+5324477,Arcadia
+5324903,Arvin
+5325423,Azusa
+5326297,Barstow
+5327684,Berkeley
+5328041,Beverly Hills
+5331920,Burlingame
+5336537,Chino
+5337908,Clearlake
+5339066,Compton
+5339631,Corona
+5341531,Danville
+5343858,Downey
+5345032,Palo Alto Timur
+5345529,El Cajon
+5345743,El Monte
+5345860,El Segundo
+5346827,Escondido
+5350159,Foster City
+5350207,Fountain Valley
+5350734,Fremont
+5350937,Fresno
+5351549,Gardena
+5355828,Hawthorne
+5355933,Hayward
+5356521,Hermosa Beach
+5357527,Hollywood
+5358705,Huntington Beach
+5359488,Inglewood
+5363922,La Habra
+5364369,Laguna Woods
+5364514,Lake Forest
+5367767,Lomita
+5367788,Lompoc
+5368361,Los Angeles
+5370082,Manhattan Beach
+5371261,Maywood
+5372223,Menlo Park
+5374175,Monrovia
+5374361,Monterey
+5374732,Moreno Valley
+5374764,Morgan Hill
+5377995,Norwalk
+5378566,Oakley
+5380184,Oxnard
+5380626,Palm Desert
+5382496,Pico Rivera
+5384170,Pomona
+5384690,Poway
+5386754,Redlands
+5387428,Richmond
+5389489,Sacramento
+5391811,San Diego
+5391959,San Francisco
+5392034,San Gabriel
+5393180,Santa Maria
+5393212,Santa Monica
+5393701,Sawtelle
+5394329,Selma
+5397018,Soledad
+5397717,South Pasadena
+5401469,Temple City
+5403022,Torrance
+5406222,Victorville
+5406602,Vista
+5408076,West Hollywood
+5410902,Yorba Linda
+5411015,Kota Yuba
+5419384,Denver
+5490263,Santa Fe
+5500539,Boulder City
+5501344,Kota Carson
+5506956,Las Vegas
+5515345,Winchester
+5551535,Apache Junction
+5554072,Juneau
+5586437,Boise
+5640350,Billings
+5656882,Helena
+5688025,Bismarck
+5725846,Eugene
+5750162,Salem
+5775782,Herriman
+5780993,Kota Salt Lake
+5785243,Aberdeen
+5799625,Kent
+5805687,Olympia
+5808079,Redmond
+5808276,Richland
+5809844,Seattle
+5814616,Vancouver
+5821086,Cheyenne
+5847486,Kailua
+5854686,Waipahu
+5856195,Honolulu
+5861187,Eagle River
+5861897,Fairbanks
+5879400,Anchorage
+5913490,Calgary
+5920288,Charlottetown
+5927969,Corner Brook
+5935277,Dartmouth
+5946768,Edmonton
+5957776,Fredericton
+6051562,Leduc
+6052788,Les Coteaux
+6071618,Medicine Hat
+6077243,Montreal
+6090785,Vancouver Utara
+6094817,Ottawa
+6113335,Prince Albert
+6118158,Red Deer
+6119109,Regina
+6141256,Saskatoon
+6146279,Sherwood Park
+6156102,Steinbach
+6160603,Swift Current
+6167865,Toronto
+6173331,Vancouver
+6174041,Victoria
+6180550,Whitehorse
+6183235,Winnipeg
+6185377,Yellowknife
+6185607,Yorkton
+6230919,Whangarei
+6243926,Blenheim
+6244895,Upper Hutt
+6254843,Birendranagar
+6254845,Dipayal
+6295587,Kota Batam
+6301965,Palmerston
+6324729,Halifax
+6324733,St. John's
+6325494,Kota Quebec
+6332428,East Harlem
+6354908,Sydney
+6620339,Karratha
+6690863,Hornchurch
+6695247,Chapel Allerton
+6713355,Subulussalam
+6930327,Slavutich
+6941014,Ponta Delgada
+6941080,Fort Bragg
+7062967,Nyanza
+7084521,Seririt
+7087175,Bedugul
+7281840,Parramatta
+7290718,Barra da Tijuca
+7303419,Yerusalem Timur
+7334948,Sukawati
+7336548,Tambolaka
+7529299,Tubangerya
+7535637,Avellaneda
+7601921,Desa Baru Zhongxing
+7614200,Bandar Tenggara
+7670941,Kentron
+7886881,Centar Zupa
+7931933,Ol Kalou
+8096217,Eastvale
+8308627,Jwaneng
+8315400,Holloway
+8436351,Sighişoara
+8456741,Lai Chau
+8521418,Espargos
+8533869,Vancouver Barat
+8581443,Tangerang Selatan
+8594709,Thanh Pho Ba Ria
+8601412,Santo Domingo Este
+8667930,Masohi
+9534257,Amdjarass
+9948272,Sekong
+10630449,Sunshine Coast
+11009418,Tevragh Zeina
+11496397,Dar Naim
+11523293,Sejong
+12076997,Jose C. Paz
+12640344,Kompienga
+13535606,Nga Nam
+13680164,Ibu Kota Negara Nusantara
