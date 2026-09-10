@@ -55,6 +55,7 @@ import world.taqwa.app.resources.onboarding_widget_cta_add
 import world.taqwa.app.resources.onboarding_widget_cta_done
 import world.taqwa.app.resources.onboarding_widget_secondary
 import world.taqwa.app.resources.onboarding_widget_title
+import world.taqwa.app.widget.PinnableWidget
 import world.taqwa.app.widget.WidgetAddPath
 import world.taqwa.app.widget.WidgetPinRequester
 import world.taqwa.app.widget.widgetAddPath
@@ -103,7 +104,7 @@ fun OnboardingScreen(
         onStep(OnboardingStep.WIDGET)
     }
 
-    val canPinWidget = widgetPinRequester.isSupported
+    val canPinWidget = widgetPinRequester.isSupported(PinnableWidget.PRAYER)
 
     // The background is full-bleed; the mark, the copy and the buttons sit in a capped, centred
     // column inside it, so a sideways screen does not stretch a single sentence across 900 dp.
@@ -206,7 +207,7 @@ fun OnboardingScreen(
                         // underneath it either way, because the answer never comes back reliably.
                         TaqwaPrimaryButton(
                             stringResource(Res.string.onboarding_widget_cta_add),
-                            onClick = { widgetPinRequester.requestPin(); onComplete() },
+                            onClick = { widgetPinRequester.requestPin(PinnableWidget.PRAYER); onComplete() },
                         )
                         TaqwaTextLink(stringResource(Res.string.onboarding_widget_secondary), onClick = onComplete)
                     } else {

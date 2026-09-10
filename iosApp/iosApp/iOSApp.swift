@@ -13,6 +13,7 @@ struct iOSApp: App {
 			Self.handleAppRefresh(task: task as! BGAppRefreshTask)
 		}
 		Self.installWidgetRefreshHook()
+		Self.installWidgetPlacementHook()
 		Self.scheduleNextRefresh()
 	}
 
@@ -92,6 +93,38 @@ struct iOSApp: App {
 	/// Kotlin cannot: it reloads only when the serialised snapshot has genuinely changed.
 	static func installWidgetRefreshHook() {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
+	}
+
+	/// The Appearance screen asks which Taqwa widgets are on a home screen; `WidgetCenter` is the
+	/// only thing that knows, it is Swift-only, and it answers asynchronously — so the shared code
+	/// hands over a completion and this fills it in.
+	///
+	/// `prayer` covers both prayer kinds (home and lock screen), `ayah` the ayah card. The
+	/// `answered` guard is not defensive dressing: `getCurrentConfigurations` is not contractually
+	/// single-shot, and the Kotlin side treats a second resume as a programming error. Any failure
+	/// reports both as placed, which is the shared side's `WidgetPlacement.Unknown` — it hides the
+	/// offer rather than inviting the user to add a widget they may already have.
+	static func installWidgetPlacementHook() {
+		WidgetPlacement_iosKt.iosWidgetPlacementHook = { completion in
+			var answered = false
+			let answer: (Bool, Bool) -> Void = { prayer, ayah in
+				guard !answered else { return }
+				answered = true
+				completion(KotlinBoolean(bool: prayer), KotlinBoolean(bool: ayah))
+			}
+			WidgetCenter.shared.getCurrentConfigurations { result in
+				switch result {
+				case .success(let widgets):
+					let kinds = Set(widgets.map { $0.kind })
+					answer(
+						kinds.contains("TaqwaHomeWidget") || kinds.contains("TaqwaLockScreenWidget"),
+						kinds.contains("TaqwaAyahWidget")
+					)
+				case .failure:
+					answer(true, true)
+				}
+			}
+		}
 	}
 
 	/// Only ever read or written on the main thread — see `reloadWidgets()`. Covers every mirror a

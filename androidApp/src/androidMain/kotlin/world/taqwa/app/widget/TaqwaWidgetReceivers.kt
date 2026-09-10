@@ -17,8 +17,12 @@ import kotlinx.coroutines.withTimeout
  * Both providers share one rolling refresh alarm, so each has to hand the scheduler the same
  * answer to "is any Taqwa widget still on a home screen?" — `onDisabled` fires per provider, and
  * removing the small widget must not stop the medium one from ticking.
+ *
+ * `internal` rather than private because `TaqwaApplication` feeds the same answer to
+ * `androidWidgetPlacementHook`: the Appearance screen's "is the prayer widget placed?" is the very
+ * same query, and duplicating it would let the two drift.
  */
-private fun anyWidgetPlaced(context: Context): Boolean {
+internal fun anyWidgetPlaced(context: Context): Boolean {
     val manager = AppWidgetManager.getInstance(context) ?: return false
     return listOf(TaqwaSmallWidgetReceiver::class.java, TaqwaMediumWidgetReceiver::class.java)
         .any { manager.getAppWidgetIds(ComponentName(context, it)).isNotEmpty() }

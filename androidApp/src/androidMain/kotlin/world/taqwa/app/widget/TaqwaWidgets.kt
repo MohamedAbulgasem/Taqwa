@@ -68,15 +68,19 @@ object TaqwaWidgets {
     }
 
     /**
-     * Asks the launcher to place the two-column widget, from onboarding's "Add widget" button.
-     * The launcher shows its own confirmation sheet; false means it declined to ask at all (no
-     * pin support, or a work profile that forbids it), and the caller treats that as "done".
+     * Asks the launcher to place one widget: the two-column prayer widget (what onboarding's
+     * "Add widget" button offers, and the only prayer size worth pinning unasked) or the ayah
+     * card. The launcher shows its own confirmation sheet; false means it declined to ask at all
+     * (no pin support, or a work profile that forbids it), and the caller treats that as "done".
      */
-    fun requestPin(context: Context): Boolean {
+    fun requestPin(context: Context, widget: PinnableWidget): Boolean {
         val manager = AppWidgetManager.getInstance(context) ?: return false
         if (!manager.isRequestPinAppWidgetSupported) return false
-        val provider = ComponentName(context, TaqwaMediumWidgetReceiver::class.java)
-        return manager.requestPinAppWidget(provider, null, null)
+        val receiver = when (widget) {
+            PinnableWidget.PRAYER -> TaqwaMediumWidgetReceiver::class.java
+            PinnableWidget.AYAH -> TaqwaAyahWidgetReceiver::class.java
+        }
+        return manager.requestPinAppWidget(ComponentName(context, receiver), null, null)
     }
 
     /**
