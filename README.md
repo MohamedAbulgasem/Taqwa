@@ -38,7 +38,7 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 - **A live countdown** to the next prayer, on the Prayer screen and in home-screen widgets on both platforms. The widgets keep counting across prayers without the app being opened.
 - **An ayah widget** showing one verse a day, in the same Uthmani typeface and translation as the reader, drawn from a curated pool of fifty that cycles without repeats. Tapping it opens that ayah in the app.
 - **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, your own phrases can be added, and nothing is ever totted up.
-- **Notifications at the exact time**, with a choice per prayer between silence, a clear announcement tone, a takbir, or the opening of the adhan. Optional reminder a few minutes before.
+- **Notifications at the exact time**, with a choice per prayer between silence, a clear announcement tone, a takbir, or the opening of the adhan, and a choice of three adhan recordings. Optional reminder a few minutes before.
 - **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the compass needs it.
 - **Hijri date** (Umm al-Qura tabular calendar) with a one-day adjustment for local moonsighting, shown beside the Gregorian date.
 - **Quran reader** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation, bookmarks, and copy or share of any ayah; everything offline.
@@ -146,7 +146,7 @@ Taqwa asks for your location only to compute prayer times and the qibla, and onl
 
 ## Attribution
 
-Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (MIT), city data from [GeoNames](https://www.geonames.org/) (CC BY 4.0), the Manrope typeface (SIL OFL 1.1), and the adhan and takbir recordings from Wikimedia Commons (CC0). The Quran text and its translations are from the [Tanzil Project](https://tanzil.net), the reading font is KFGQPC Uthmanic Script Hafs from the King Fahd Glorious Quran Printing Complex, and the Mushaf page layout comes from the Quranic Universal Library data. Full details in [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) and in the app under Settings, Attribution & licences.
+Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (MIT), city data from [GeoNames](https://www.geonames.org/) (CC BY 4.0), the Manrope typeface (SIL OFL 1.1), and three adhan and takbir recordings from Wikimedia Commons — "Beautiful adhan" by Adam-synagda (CC0), "The Adhan – Muslim Call to Prayer – Aaqib Azeez" (CC BY-SA 4.0) and "Eid al-Fitr Fajr azan at Malmö Mosque" by Islamic Center Malmö (CC BY 3.0). The Quran text and its translations are from the [Tanzil Project](https://tanzil.net), the reading font is KFGQPC Uthmanic Script Hafs from the King Fahd Glorious Quran Printing Complex, and the Mushaf page layout comes from the Quranic Universal Library data. Full details in [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) and in the app under Settings, Attribution & licences.
 
 ## Licence
 
