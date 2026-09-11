@@ -79,6 +79,8 @@ import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.resources.ui_language
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.feature.tasbeeh.TasbeehScreen
+import world.taqwa.app.feature.tasbeeh.TasbeehViewModel
 import world.taqwa.app.feature.quran.MushafScreen
 import world.taqwa.app.feature.quran.MushafUiState
 import world.taqwa.app.feature.quran.MushafViewModel
@@ -394,6 +396,7 @@ fun App(container: AppContainer) {
                                 onChooseCity = { navigator.push(Screen.CitySearch) },
                                 onAllowLocation = requestLocation,
                                 onOpenQibla = { navigator.push(Screen.Qibla) },
+                                onOpenTasbeeh = { navigator.push(Screen.Tasbeeh) },
                             )
                         }
 
@@ -726,6 +729,31 @@ fun App(container: AppContainer) {
                                 val qiblaState by vm.state.collectAsState()
                                 QiblaScreen(qiblaState, onBack = { navigator.pop() })
                             }
+                        }
+
+                        Screen.Tasbeeh -> {
+                            // Plain `remember`: the counter has no language of its own to be
+                            // rebuilt for — its phrases are Arabic in both interfaces — and it
+                            // owns the count on screen, which a swap would drop back to the last
+                            // written one. It reads the store once on creation and writes back
+                            // 300 ms after the last tap, or at once through `flush` below.
+                            val tasbeehVm = remember {
+                                TasbeehViewModel(
+                                    store = container.tasbeehStore,
+                                    haptics = createHaptics(),
+                                )
+                            }
+                            val tasbeehState by tasbeehVm.state.collectAsState()
+                            TasbeehScreen(
+                                state = tasbeehState,
+                                onBack = { navigator.pop() },
+                                onTap = tasbeehVm::tap,
+                                onSelect = tasbeehVm::select,
+                                onReset = tasbeehVm::reset,
+                                onAddCustom = tasbeehVm::addCustom,
+                                onRemoveCustom = tasbeehVm::removeCustom,
+                                onLeave = tasbeehVm::flush,
+                            )
                         }
                     }
                 }

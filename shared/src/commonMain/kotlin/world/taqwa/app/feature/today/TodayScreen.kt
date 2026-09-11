@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -25,11 +27,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +53,7 @@ import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.CountdownRing
 import world.taqwa.app.design.components.CountdownRingSize
 import world.taqwa.app.design.components.TaqwaCard
+import world.taqwa.app.design.components.drawMisbaha
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.TaqwaTextLink
 import world.taqwa.app.domain.TimelineRow
@@ -66,6 +72,7 @@ import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.resources.today_latitude_label
 import world.taqwa.app.resources.today_next_in
 import world.taqwa.app.resources.today_no_location_title
+import world.taqwa.app.resources.today_open_tasbeeh
 import world.taqwa.app.resources.today_qibla_detail
 import kotlin.time.Instant
 
@@ -83,19 +90,20 @@ fun TodayScreen(
     onChooseCity: () -> Unit,
     onAllowLocation: () -> Unit,
     onOpenQibla: () -> Unit,
+    onOpenTasbeeh: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
     Box(Modifier.fillMaxSize().background(colors.background)) {
         when (state) {
             TodayUiState.Loading -> Unit
             TodayUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onAllowLocation)
-            is TodayUiState.Ready -> ReadyBody(state, onOpenQibla)
+            is TodayUiState.Ready -> ReadyBody(state, onOpenQibla, onOpenTasbeeh)
         }
     }
 }
 
 @Composable
-private fun ReadyBody(state: TodayUiState.Ready, onOpenQibla: () -> Unit) {
+private fun ReadyBody(state: TodayUiState.Ready, onOpenQibla: () -> Unit, onOpenTasbeeh: () -> Unit) {
     val zone = rememberZone(state.location.timeZoneId)
     val format = LocalPlatformFormat.current
     // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move to
@@ -110,9 +118,9 @@ private fun ReadyBody(state: TodayUiState.Ready, onOpenQibla: () -> Unit) {
             // the timeline below it, which is the right order for a page you read top to bottom.
             // Sideways there is no room for that order — the ring alone would fill the screen and
             // push every prayer time off the bottom — so the two halves sit side by side instead.
-            LandscapeBody(state, zone, format, maxWidth, maxHeight, onOpenQibla)
+            LandscapeBody(state, zone, format, maxWidth, maxHeight, onOpenQibla, onOpenTasbeeh)
         } else {
-            PortraitBody(state, zone, format, onOpenQibla)
+            PortraitBody(state, zone, format, onOpenQibla, onOpenTasbeeh)
         }
     }
 }
@@ -124,10 +132,11 @@ private fun PortraitBody(
     zone: TimeZone,
     format: PlatformFormat,
     onOpenQibla: () -> Unit,
+    onOpenTasbeeh: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Column(Modifier.contentWidth()) {
-            CityAndDates(state)
+            CityAndDates(state, onOpenTasbeeh = onOpenTasbeeh)
 
             // 32 dp here, not 44: CityAndDates already carries 4 dp under its dates, so this puts
             // 36 dp of air above the ring — the same 36 dp that separates its bottom from the
@@ -167,6 +176,7 @@ private fun LandscapeBody(
     width: Dp,
     height: Dp,
     onOpenQibla: () -> Unit,
+    onOpenTasbeeh: () -> Unit,
 ) {
     // The ring gets whatever its own half can spare: never bigger than upright, and small enough
     // that the city and the date above it still fit above the fold on a short sideways screen.
@@ -177,7 +187,7 @@ private fun LandscapeBody(
             Modifier.weight(1f).fillMaxHeight().contentWidth().padding(horizontal = Gutter),
             verticalArrangement = Arrangement.Center,
         ) {
-            CityAndDates(state, horizontalPadding = 0.dp, topPadding = 12.dp)
+            CityAndDates(state, onOpenTasbeeh, horizontalPadding = 0.dp, topPadding = 12.dp)
             Spacer(Modifier.height(20.dp))
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Countdown(state, zone, format, diameter = ring)
@@ -209,37 +219,76 @@ private fun LandscapeBody(
 @Composable
 private fun CityAndDates(
     state: TodayUiState.Ready,
+    onOpenTasbeeh: () -> Unit,
     horizontalPadding: Dp = Gutter,
     topPadding: Dp = TabRootTitleTop,
 ) {
     val colors = LocalTaqwaColors.current
-    Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp)) {
-        Text(
-            // Resolved by the view model, in the interface's language; `location.cityName` stays
-            // the English snapshot and is only what this falls back to.
-            state.cityDisplayName ?: stringResource(Res.string.today_current_location),
-            style = TaqwaText.screenTitle,
-            color = colors.textPrimary,
-        )
-        // Hijri first, then the Gregorian a step quieter: one line, the two calendars read
-        // as a pair. The separator is punctuation, not a translated string, so it is the
-        // same in both languages; the bidi algorithm orders the halves under Arabic.
-        //
-        // The Gregorian half is isolated (FSI…PDI). Without it, an English date that opens with a
-        // digit — "8 September 2026" — has that leading number swallowed by the surrounding
-        // right-to-left run and comes out as "September 2026 8"; inside the isolate the date takes
-        // its own direction from its own first strong character and lays out whole.
-        Text(
-            buildAnnotatedString {
-                append(state.hijri)
-                withStyle(SpanStyle(color = colors.textTertiary)) {
-                    append(" · ")
-                    append("\u2068" + state.gregorian + "\u2069")
-                }
-            },
-            style = TaqwaText.caption,
-            color = colors.textSecondary,
-        )
+    // A Row now, for the misbaha at its end (spec Tasbeeh §5). The text keeps the weight and the
+    // block keeps its own paddings, so the 36 dp of air above the ring is untouched: the button is
+    // 44 dp tall against a city line of about 32, and it is the *text* column that still sets the
+    // block's height, because the button is aligned to the city's line rather than stretched.
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp),
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                // Resolved by the view model, in the interface's language; `location.cityName` stays
+                // the English snapshot and is only what this falls back to.
+                state.cityDisplayName ?: stringResource(Res.string.today_current_location),
+                style = TaqwaText.screenTitle,
+                color = colors.textPrimary,
+            )
+            // Hijri first, then the Gregorian a step quieter: one line, the two calendars read
+            // as a pair. The separator is punctuation, not a translated string, so it is the
+            // same in both languages; the bidi algorithm orders the halves under Arabic.
+            //
+            // The Gregorian half is isolated (FSI…PDI). Without it, an English date that opens with a
+            // digit — "8 September 2026" — has that leading number swallowed by the surrounding
+            // right-to-left run and comes out as "September 2026 8"; inside the isolate the date takes
+            // its own direction from its own first strong character and lays out whole.
+            Text(
+                buildAnnotatedString {
+                    append(state.hijri)
+                    withStyle(SpanStyle(color = colors.textTertiary)) {
+                        append(" · ")
+                        append("\u2068" + state.gregorian + "\u2069")
+                    }
+                },
+                style = TaqwaText.caption,
+                color = colors.textSecondary,
+            )
+        }
+        TasbeehButton(onOpenTasbeeh)
+    }
+}
+
+/**
+ * The way to the tasbeeh: the misbaha glyph at the tab bar's 22 dp, in a 44 dp target at the end
+ * of the header row. No ripple, like the tab bar and the Qibla card — the pushed screen is the
+ * feedback. It carries a content description because it is a glyph with no words beside it.
+ *
+ * Nudged up by 4 dp so the 22 dp glyph sits on the city's own line rather than on the block's
+ * centre, which the two lines of dates below would otherwise pull it down to.
+ */
+@Composable
+private fun TasbeehButton(onOpen: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    val description = stringResource(Res.string.today_open_tasbeeh)
+    Box(
+        Modifier
+            .offset(y = (-4).dp)
+            .size(44.dp)
+            .clip(CircleShape)
+            .clickable(
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                indication = null,
+                onClick = onOpen,
+            )
+            .semantics { contentDescription = description },
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.size(22.dp)) { drawMisbaha(colors.textPrimary) }
     }
 }
 

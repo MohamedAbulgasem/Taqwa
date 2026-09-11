@@ -32,4 +32,7 @@ sealed interface Screen {
     data object Appearance : Screen
     data object Attribution : Screen
     data object Qibla : Screen
+
+    /** The dhikr counter, pushed from the misbaha in the Prayer screen's header (spec §4). */
+    data object Tasbeeh : Screen
 }
