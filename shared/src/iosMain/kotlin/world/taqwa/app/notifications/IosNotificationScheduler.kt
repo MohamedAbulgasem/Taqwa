@@ -21,6 +21,7 @@ import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNNotificationSound
 import platform.UserNotifications.UNUserNotificationCenter
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.PrayerSound
 import kotlin.time.Instant
 
@@ -64,7 +65,7 @@ class IosNotificationScheduler : NotificationScheduler {
         val content = UNMutableNotificationContent().apply {
             setTitle(entry.title)
             setBody(entry.body)
-            setSound(soundFor(entry.sound))
+            setSound(soundFor(entry.sound, entry.voice))
         }
 
         center.addNotificationRequest(
@@ -77,8 +78,8 @@ class IosNotificationScheduler : NotificationScheduler {
 
     /** Silent means no sound at all; every other level either uses the bundled `.caf` or, for
      * "Notification", the system default — mirroring the Android channel setup in Task 17. */
-    private fun soundFor(sound: PrayerSound): UNNotificationSound? {
-        val fileName = SoundAssets.iosResourceFileName(sound)
+    private fun soundFor(sound: PrayerSound, voice: AdhanVoice): UNNotificationSound? {
+        val fileName = SoundAssets.iosResourceFileName(sound, voice)
         return when {
             sound == PrayerSound.SILENT -> null
             fileName != null -> UNNotificationSound.soundNamed(fileName)

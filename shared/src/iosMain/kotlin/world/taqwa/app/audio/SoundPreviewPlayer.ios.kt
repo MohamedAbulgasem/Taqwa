@@ -9,6 +9,7 @@ import platform.AVFAudio.setActive
 import platform.Foundation.NSBundle
 import platform.Foundation.NSURL
 import platform.darwin.NSObject
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.notifications.SoundAssets
 
@@ -25,13 +26,13 @@ private class IosSoundPreviewPlayer : SoundPreviewPlayer {
         }
     }
 
-    override fun play(sound: PrayerSound) {
+    override fun play(sound: PrayerSound, voice: AdhanVoice) {
         stop()
         when (sound) {
             // Nothing to audition; the button press itself is the reassurance.
             PrayerSound.SILENT -> return
             PrayerSound.NOTIFICATION, PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
-                val fileName = SoundAssets.iosPreviewResourceFileName(sound)!!
+                val fileName = SoundAssets.iosPreviewResourceFileName(sound, voice)!!
                 val path = NSBundle.mainBundle.pathForResource(
                     fileName.substringBeforeLast('.'), fileName.substringAfterLast('.'),
                 ) ?: return

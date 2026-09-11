@@ -3,6 +3,7 @@ package world.taqwa.app.audio
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.notifications.SoundAssets
 import world.taqwa.app.settings.appContext
@@ -11,13 +12,13 @@ private class AndroidSoundPreviewPlayer : SoundPreviewPlayer {
 
     private var mediaPlayer: MediaPlayer? = null
 
-    override fun play(sound: PrayerSound) {
+    override fun play(sound: PrayerSound, voice: AdhanVoice) {
         stop()
         // Silent has nothing to audition; the button press itself is the reassurance that
         // nothing plays.
         if (sound == PrayerSound.SILENT) return
 
-        val name = SoundAssets.androidPreviewRawResourceName(sound)!!
+        val name = SoundAssets.androidPreviewRawResourceName(sound, voice)!!
         val uri = Uri.parse("android.resource://${appContext.packageName}/raw/$name")
 
         mediaPlayer = MediaPlayer().apply {

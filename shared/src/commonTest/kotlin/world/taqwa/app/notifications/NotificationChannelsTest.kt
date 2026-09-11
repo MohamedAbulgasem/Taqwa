@@ -1,5 +1,6 @@
 package world.taqwa.app.notifications
 
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import kotlin.test.Test
@@ -41,6 +42,64 @@ class NotificationChannelsTest {
         }
     }
 
+    // The whole upgrade story: a user who never opens the new setting must keep the channels they
+    // already have, which means the original voice has to spell every id exactly as the
+    // voice-less build did. These literals are that build's output, written out rather than
+    // derived, so a refactor of the id format cannot quietly agree with itself.
+    @Test
+    fun theOriginalVoiceProducesExactlyTheChannelIdsTheAppAlreadyShipped() {
+        assertEquals("prayer_fajr_silent", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.SILENT))
+        assertEquals("prayer_fajr_notification_chime3", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.NOTIFICATION))
+        assertEquals("prayer_fajr_takbir", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.TAKBIR))
+        assertEquals("prayer_fajr_adhan", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.ADHAN))
+        PrayerSound.entries.forEach { sound ->
+            assertEquals(
+                NotificationChannels.channelId(Prayer.ISHA, sound),
+                NotificationChannels.channelId(Prayer.ISHA, sound, AdhanVoice.ORIGINAL),
+                "$sound",
+            )
+        }
+    }
+
+    @Test
+    fun anotherVoiceSuffixesTheIdOfTheTwoLevelsThatAreARecording() {
+        assertEquals("prayer_asr_takbir_azeez", NotificationChannels.channelId(Prayer.ASR, PrayerSound.TAKBIR, AdhanVoice.AZEEZ))
+        assertEquals("prayer_asr_adhan_azemi", NotificationChannels.channelId(Prayer.ASR, PrayerSound.ADHAN, AdhanVoice.AZEMI))
+    }
+
+    // Silent has no sound and the chime is the same clip whichever adhan was picked, so neither
+    // may fork into one channel per voice.
+    @Test
+    fun silentAndTheChimeKeepOneChannelAcrossEveryVoice() {
+        listOf(PrayerSound.SILENT, PrayerSound.NOTIFICATION).forEach { sound ->
+            val ids = AdhanVoice.entries.map { NotificationChannels.channelId(Prayer.DHUHR, sound, it) }
+            assertEquals(1, ids.toSet().size, "$sound: $ids")
+        }
+    }
+
+    @Test
+    fun everyPrayerSoundAndVoiceCombinationGetsItsOwnChannel() {
+        val voiced = listOf(PrayerSound.TAKBIR, PrayerSound.ADHAN)
+        val ids = voiced.flatMap { sound ->
+            AdhanVoice.entries.map { NotificationChannels.channelId(Prayer.ISHA, sound, it) }
+        }
+        assertEquals(voiced.size * AdhanVoice.entries.size, ids.toSet().size, "$ids")
+    }
+
+    // A channel the sweep cannot name is a channel the user cannot get rid of.
+    @Test
+    fun allChannelIdsForContainsEveryIdChannelIdCanProduce() {
+        Prayer.entries.forEach { prayer ->
+            val all = NotificationChannels.allChannelIdsFor(prayer)
+            PrayerSound.entries.forEach { sound ->
+                AdhanVoice.entries.forEach { voice ->
+                    val id = NotificationChannels.channelId(prayer, sound, voice)
+                    assertEquals(1, all.count { it == id }, "$prayer $sound $voice -> $id")
+                }
+            }
+        }
+    }
+
     // The Notification level has carried four sounds under four ids: the phone's default tone,
     // the 2.4 s chime, the six-second bell motif and the Mixkit announce tone. The scheduler
     // deletes whatever is not live, so
@@ -55,7 +114,9 @@ class NotificationChannelsTest {
             assertNotEquals(stale, live)
             assertEquals(1, ids.count { it == stale }, stale)
         }
-        assertEquals(PrayerSound.entries.size + 3, ids.toSet().size)
+        // Four sounds, of which two fork per voice, plus the three retired chime ids.
+        val voicedExtras = 2 * (AdhanVoice.entries.size - 1)
+        assertEquals(PrayerSound.entries.size + voicedExtras + 3, ids.toSet().size)
     }
 
     @Test

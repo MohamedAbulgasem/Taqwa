@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.di.appContainer
@@ -31,6 +32,12 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val id = intent.getStringExtra(EXTRA_ID) ?: return
         val prayer = intent.getStringExtra(EXTRA_PRAYER)?.let { Prayer.valueOf(it) } ?: return
         val sound = intent.getStringExtra(EXTRA_SOUND)?.let { PrayerSound.valueOf(it) } ?: return
+        // Absent on an alarm scheduled by a build older than the voice setting, and on one
+        // naming a voice this build does not know: either way the original is what played
+        // when that alarm was set, and the original is what its channel carries.
+        val voice = intent.getStringExtra(EXTRA_VOICE)
+            ?.let { name -> AdhanVoice.entries.firstOrNull { it.name == name } }
+            ?: AdhanVoice.ORIGINAL
         val title = intent.getStringExtra(EXTRA_TITLE) ?: return
         val body = intent.getStringExtra(EXTRA_BODY) ?: return
 
@@ -38,7 +45,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         // to the same 32-bit hash used to overwrite each other's notification.
         val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
 
-        val notification = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound))
+        val notification = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice))
             .setSmallIcon(notificationSmallIconResId)
             .setContentTitle(title)
             .setContentText(body)

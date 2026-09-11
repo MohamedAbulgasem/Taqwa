@@ -48,6 +48,11 @@ internal object SettingsKeys {
     val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")
     fun soundKey(prayer: Prayer) = stringPreferencesKey("sound_${prayer.name.lowercase()}")
 
+    /** Which adhan recording the Takbir and Adhan levels play — one voice for all five
+     * prayers, so one key rather than one per prayer. Absent until the user picks a voice,
+     * which is what makes the original the default for everyone who never does. */
+    val ADHAN_VOICE = stringPreferencesKey("adhan_voice")
+
     val QURAN_MODE = stringPreferencesKey("quran_mode")
     val QURAN_SIZE = intPreferencesKey("quran_size")
     val QURAN_TRANSLITERATION = booleanPreferencesKey("quran_transliteration")

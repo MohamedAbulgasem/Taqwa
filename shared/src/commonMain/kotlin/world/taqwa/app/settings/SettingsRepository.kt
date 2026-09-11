@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import world.taqwa.app.design.ThemeMode
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
@@ -84,6 +85,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
                 p[SettingsKeys.soundKey(prayer)].toEnumOr(PrayerSound.TAKBIR)
             },
             remindBeforeMinutes = p[SettingsKeys.REMIND_BEFORE] ?: 0,
+            voice = p[SettingsKeys.ADHAN_VOICE].toEnumOr(AdhanVoice.ORIGINAL),
         )
     }
 
@@ -218,6 +220,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
                 e[SettingsKeys.soundKey(prayer)] = settings.soundFor(prayer).name
             }
             e[SettingsKeys.REMIND_BEFORE] = settings.remindBeforeMinutes
+            e[SettingsKeys.ADHAN_VOICE] = settings.voice.name
         }
     }
 
@@ -305,5 +308,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     /** Test-only hook for the forward-compatibility case, matching [writeRawThemeForTest]. */
     internal suspend fun writeRawMinuteAdjustmentsForTest(raw: String) {
         store.edit { it[SettingsKeys.MINUTE_ADJUSTMENTS] = raw }
+    }
+
+    /** Test-only hook for the forward-compatibility case, matching [writeRawThemeForTest]. */
+    internal suspend fun writeRawAdhanVoiceForTest(raw: String) {
+        store.edit { it[SettingsKeys.ADHAN_VOICE] = raw }
     }
 }

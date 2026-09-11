@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.net.Uri
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.i18n.createPlatformFormat
@@ -32,6 +33,7 @@ const val EXTRA_ID = "id"
 const val EXTRA_REQUEST_CODE = "request_code"
 const val EXTRA_PRAYER = "prayer"
 const val EXTRA_SOUND = "sound"
+const val EXTRA_VOICE = "voice"
 const val EXTRA_TITLE = "title"
 const val EXTRA_BODY = "body"
 
@@ -126,6 +128,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             if (entry != null) {
                 putExtra(EXTRA_PRAYER, entry.prayer.name)
                 putExtra(EXTRA_SOUND, entry.sound.name)
+                putExtra(EXTRA_VOICE, entry.voice.name)
                 putExtra(EXTRA_TITLE, entry.title)
                 putExtra(EXTRA_BODY, entry.body)
             }
@@ -149,13 +152,16 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      */
     private fun ensureChannels(plan: List<ScheduledNotification>) {
         val copy = LocalizedNotificationCopy(createPlatformFormat())
-        val live = plan.map { it.prayer to it.sound }.toSet()
-        live.forEach { (prayer, sound) ->
-            val id = NotificationChannels.channelId(prayer, sound)
+        val live = plan.map { Triple(it.prayer, it.sound, it.voice) }.toSet()
+        live.forEach { (prayer, sound, voice) ->
+            val id = NotificationChannels.channelId(prayer, sound, voice)
             val existing = notificationManager.getNotificationChannel(id)
+            // The channel name says which sound it carries, not which voice: a user switching
+            // voices is not meant to accumulate a list of channels they have to read carefully,
+            // and the old voice's channel is deleted by the sweep below the moment it goes idle.
             val channel =
                 NotificationChannel(id, copy.channelName(prayer, sound), NotificationManager.IMPORTANCE_HIGH)
-            if (existing == null) configureSound(channel, sound)
+            if (existing == null) configureSound(channel, sound, voice)
             notificationManager.createNotificationChannel(channel)
         }
         deleteStaleChannels(live)
@@ -167,8 +173,10 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      * channels are the record of a sound the user may switch back to, and `scheduleAll` is called
      * often enough that deleting on absence would churn.
      */
-    private fun deleteStaleChannels(live: Set<Pair<Prayer, PrayerSound>>) {
-        val liveIds = live.map { (prayer, sound) -> NotificationChannels.channelId(prayer, sound) }.toSet()
+    private fun deleteStaleChannels(live: Set<Triple<Prayer, PrayerSound, AdhanVoice>>) {
+        val liveIds = live.map { (prayer, sound, voice) ->
+            NotificationChannels.channelId(prayer, sound, voice)
+        }.toSet()
         live.map { it.first }.toSet().forEach { prayer ->
             NotificationChannels.allChannelIdsFor(prayer)
                 .filterNot { it in liveIds }
@@ -176,7 +184,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         }
     }
 
-    private fun configureSound(channel: NotificationChannel, sound: PrayerSound) {
+    private fun configureSound(channel: NotificationChannel, sound: PrayerSound, voice: AdhanVoice) {
         val attrs = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -184,7 +192,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         when (sound) {
             PrayerSound.SILENT -> channel.setSound(null, null)
             PrayerSound.NOTIFICATION, PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
-                val name = SoundAssets.androidRawResourceName(sound)!!
+                val name = SoundAssets.androidRawResourceName(sound, voice)!!
                 channel.setSound(Uri.parse("android.resource://${context.packageName}/raw/$name"), attrs)
             }
         }

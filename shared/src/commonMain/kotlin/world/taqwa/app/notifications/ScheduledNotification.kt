@@ -1,5 +1,6 @@
 package world.taqwa.app.notifications
 
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import kotlin.time.Instant
@@ -18,6 +19,9 @@ data class ScheduledNotification(
     val instant: Instant,
     val timeZoneId: String,
     val sound: PrayerSound,
+    /** Which recording [sound] plays, for the two levels that are a recording at all. It is
+     * stamped here rather than read at fire time so the receiver stays free of settings. */
+    val voice: AdhanVoice = AdhanVoice.ORIGINAL,
     val title: String,
     val body: String,
 )

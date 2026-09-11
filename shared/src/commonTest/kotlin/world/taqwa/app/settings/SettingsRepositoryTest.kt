@@ -10,6 +10,7 @@ import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.LocationSource
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
@@ -373,6 +374,36 @@ class NotificationSettingsStorageTest {
         val r = repo("corrupt-sound")
         r.writeRawSoundForTest(Prayer.MAGHRIB, "TRUMPET")
         assertEquals(PrayerSound.TAKBIR, r.notificationSettings.first().soundFor(Prayer.MAGHRIB))
+    }
+
+    @Test
+    fun theAdhanVoiceDefaultsToTheOriginalRecording() = runTest {
+        assertEquals(AdhanVoice.ORIGINAL, repo("voice-default").notificationSettings.first().voice)
+    }
+
+    @Test
+    fun theAdhanVoiceRoundTrips() = runTest {
+        val r = repo("voice-roundtrip")
+        r.setNotificationSettings(r.notificationSettings.first().copy(voice = AdhanVoice.AZEEZ))
+        assertEquals(AdhanVoice.AZEEZ, r.notificationSettings.first().voice)
+    }
+
+    @Test
+    fun anUnknownStoredAdhanVoiceFallsBackToTheOriginal() = runTest {
+        val r = repo("corrupt-voice")
+        r.writeRawAdhanVoiceForTest("MUEZZIN_OF_MARS")
+        assertEquals(AdhanVoice.ORIGINAL, r.notificationSettings.first().voice)
+    }
+
+    @Test
+    fun choosingAVoiceLeavesThePerPrayerSoundsAlone() = runTest {
+        val r = repo("voice-independent")
+        val s = r.notificationSettings.first()
+        r.setNotificationSettings(s.copy(sounds = s.sounds + (Prayer.FAJR to PrayerSound.ADHAN)))
+        r.setNotificationSettings(r.notificationSettings.first().copy(voice = AdhanVoice.AZEMI))
+        val back = r.notificationSettings.first()
+        assertEquals(PrayerSound.ADHAN, back.soundFor(Prayer.FAJR))
+        assertEquals(AdhanVoice.AZEMI, back.voice)
     }
 
     @Test

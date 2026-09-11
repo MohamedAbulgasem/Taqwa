@@ -67,6 +67,7 @@ object NotificationPlanner {
                         instant = at,
                         timeZoneId = location.timeZoneId,
                         sound = notifications.soundFor(prayer),
+                        voice = notifications.voice,
                         title = copy.title(prayer, NotificationKind.PRAYER),
                         body = copy.body(prayer, NotificationKind.PRAYER, clock, 0),
                     )
@@ -88,6 +89,9 @@ object NotificationPlanner {
                             timeZoneId = location.timeZoneId,
                             // A reminder is a nudge, not the call: it never plays the adhan.
                             sound = PrayerSound.NOTIFICATION,
+                            // Stamped even though the chime ignores it, so every entry in a
+                            // plan carries the setting it was planned under.
+                            voice = notifications.voice,
                             title = copy.title(prayer, NotificationKind.REMINDER),
                             body = copy.body(prayer, NotificationKind.REMINDER, clock, lead),
                         )

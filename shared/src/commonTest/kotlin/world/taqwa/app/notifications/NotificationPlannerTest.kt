@@ -2,6 +2,7 @@ package world.taqwa.app.notifications
 
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.Prayer
@@ -151,6 +152,24 @@ class NotificationPlannerTest {
         val fajr = plan.first { it.prayer == Prayer.FAJR && it.kind == NotificationKind.PRAYER }
         val fajrReminder = plan.first { it.prayer == Prayer.FAJR && it.kind == NotificationKind.REMINDER }
         assertEquals(600L, fajr.instant.epochSeconds - fajrReminder.instant.epochSeconds)
+    }
+
+    // The voice is one setting for all five prayers, and the receiver never looks settings up, so
+    // it has to be stamped on every entry the plan produces — reminders included, even though the
+    // chime they carry ignores it.
+    @Test
+    fun everyEntryCarriesTheChosenVoiceIncludingTheReminders() {
+        val plan = planFor(
+            notifications = defaults.copy(voice = AdhanVoice.AZEMI, remindBeforeMinutes = 10),
+            windowDays = 1,
+        )
+        assertTrue(plan.any { it.kind == NotificationKind.REMINDER })
+        assertTrue(plan.all { it.voice == AdhanVoice.AZEMI }, "${plan.map { it.voice }.toSet()}")
+    }
+
+    @Test
+    fun thePlanIsTheOriginalVoiceUntilOneIsChosen() {
+        assertTrue(planFor().all { it.voice == AdhanVoice.ORIGINAL })
     }
 
     @Test
