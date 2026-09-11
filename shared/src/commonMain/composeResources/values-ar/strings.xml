@@ -252,4 +252,25 @@
     <string name="quran_action_copy">نسخ</string>
     <string name="quran_action_copied">تم النسخ</string>
     <string name="quran_action_share">مشاركة</string>
+    <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
+    <string name="tasbeeh_title">التسبيح</string>
+    <string name="today_open_tasbeeh">التسبيح</string>
+    <string name="tasbeeh_add_custom">إضافة ذكر</string>
+    <string name="tasbeeh_round">الجولة %1$s</string>
+    <string name="tasbeeh_of">من %1$s</string>
+    <string name="tasbeeh_hint">اضغط في أي مكان للعدّ</string>
+    <string name="tasbeeh_preset_after_prayer">بعد الصلاة</string>
+    <string name="tasbeeh_preset_subhanallah">سبحان الله</string>
+    <string name="tasbeeh_preset_alhamdulillah">الحمد لله</string>
+    <string name="tasbeeh_preset_allahu_akbar">الله أكبر</string>
+    <string name="tasbeeh_preset_astaghfirullah">أستغفر الله</string>
+    <string name="tasbeeh_preset_la_ilaha_illallah">لا إله إلا الله</string>
+    <string name="tasbeeh_preset_subhanallahi_wa_bihamdihi">سبحان الله وبحمده</string>
+    <string name="tasbeeh_reset">إعادة العدّ</string>
+    <string name="tasbeeh_reset_confirm">إعادة العدّ لهذا الذكر؟</string>
+    <string name="tasbeeh_custom_title">ذكر مخصص</string>
+    <string name="tasbeeh_custom_phrase">العبارة</string>
+    <string name="tasbeeh_custom_target">العدد</string>
+    <string name="tasbeeh_custom_add">إضافة</string>
+    <string name="tasbeeh_custom_delete">حذف</string>
 </resources>
