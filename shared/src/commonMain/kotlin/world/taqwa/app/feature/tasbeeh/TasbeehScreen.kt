@@ -88,7 +88,9 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.tasbeeh_add_custom
 import world.taqwa.app.resources.tasbeeh_custom_add
 import world.taqwa.app.resources.tasbeeh_custom_delete
+import world.taqwa.app.resources.tasbeeh_custom_edit_title
 import world.taqwa.app.resources.tasbeeh_custom_phrase
+import world.taqwa.app.resources.tasbeeh_custom_save
 import world.taqwa.app.resources.tasbeeh_custom_target
 import world.taqwa.app.resources.tasbeeh_custom_title
 import world.taqwa.app.resources.tasbeeh_hint
@@ -141,7 +143,7 @@ private sealed interface TasbeehSheet {
     /** The plus in the top corner: a new phrase of the reader's own. */
     data object NewCustom : TasbeehSheet
 
-    /** A long-press on a custom chip: the same sheet, showing Delete instead of Add. */
+    /** A long-press on a custom chip: the same fields, prefilled, with Save and a Delete row. */
     data class EditCustom(val preset: TasbeehPreset) : TasbeehSheet
 
     /** Reset, which is the one thing here that ninety more taps cannot undo. */
@@ -167,6 +169,7 @@ fun TasbeehScreen(
     onSelect: (String) -> Unit,
     onReset: () -> Unit,
     onAddCustom: (String, Int) -> Unit,
+    onUpdateCustom: (String, String, Int) -> Unit,
     onRemoveCustom: (String) -> Unit,
     onLeave: () -> Unit,
 ) {
@@ -243,14 +246,14 @@ fun TasbeehScreen(
         null -> Unit
         TasbeehSheet.NewCustom -> CustomDhikrSheet(
             existing = null,
-            onAdd = { phrase, target -> onAddCustom(phrase, target); sheet = null },
+            onSubmit = { phrase, target -> onAddCustom(phrase, target); sheet = null },
             onDelete = {},
             onDismiss = { sheet = null },
         )
 
         is TasbeehSheet.EditCustom -> CustomDhikrSheet(
             existing = open.preset,
-            onAdd = { _, _ -> },
+            onSubmit = { phrase, target -> onUpdateCustom(open.preset.id, phrase, target); sheet = null },
             onDelete = { onRemoveCustom(open.preset.id); sheet = null },
             onDismiss = { sheet = null },
         )
@@ -687,20 +690,34 @@ private fun PresetChip(
     }
 }
 
-/** Phrase and target for a dhikr of the reader's own; Delete instead, on one that already exists. */
+/**
+ * Phrase and target for a dhikr of the reader's own — the same two fields whether the phrase is
+ * being written or rewritten, prefilled and headed "Edit dhikr" in the second case, with Delete
+ * beneath the button.
+ *
+ * It used to show an existing phrase as a heading and nothing but Delete, which made the sheet a
+ * confirmation rather than a way in: a target typed as 33 out of habit and meant as 100 could only
+ * be fixed by deleting the phrase and typing it again, count and all. The phrase is in the field
+ * now, where it can be corrected, and the heading is the screen's own title.
+ *
+ * [onSubmit] is Add or Save by the same rule either way, since the store accepts the same two
+ * things from both: something left once the phrase is trimmed, and a target inside 1..1000.
+ */
 @Composable
 private fun CustomDhikrSheet(
     existing: TasbeehPreset?,
-    onAdd: (String, Int) -> Unit,
+    onSubmit: (String, Int) -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
-    var phrase by remember { mutableStateOf("") }
-    var target by remember { mutableStateOf("33") }
+    // Keyed on nothing: the sheet is composed afresh for each opening, so an edit begins at what
+    // is stored and an add at the blank and the 33 that is the commonest target there is.
+    var phrase by remember { mutableStateOf(existing?.parts?.first()?.dhikr?.arabic.orEmpty()) }
+    var target by remember { mutableStateOf(existing?.total?.toString() ?: "33") }
     val bounded = target.toIntOrNull()?.takeIf { it in 1..MAX_TARGET }
-    // Exactly the store's own two conditions, so Add is live only where `addCustom` would accept:
-    // a phrase with something in it once trimmed, and a target inside 1..1000.
+    // Exactly the store's own two conditions, so the button is live only where the store would
+    // accept: a phrase with something in it once trimmed, and a target inside 1..1000.
     val trimmed = phrase.trim()
     val valid = trimmed.isNotEmpty() && bounded != null
 
@@ -713,32 +730,34 @@ private fun CustomDhikrSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                existing?.parts?.first()?.dhikr?.arabic ?: stringResource(Res.string.tasbeeh_custom_title),
+                stringResource(
+                    if (existing == null) Res.string.tasbeeh_custom_title else Res.string.tasbeeh_custom_edit_title,
+                ),
                 style = TaqwaText.screenTitle.copy(fontSize = 20.sp),
                 color = colors.textPrimary,
-                fontFamily = if (existing == null) null else FontFamily.Default,
             )
-            if (existing == null) {
-                SheetField(
-                    label = stringResource(Res.string.tasbeeh_custom_phrase),
-                    value = phrase,
-                    onValueChange = { phrase = it.takeCodePoints(MAX_PHRASE) },
-                    numeric = false,
-                )
-                SheetField(
-                    label = stringResource(Res.string.tasbeeh_custom_target),
-                    value = target,
-                    // Four digits is 1000, the largest target the store keeps; anything longer
-                    // could only be typed to be clamped away on the way in.
-                    onValueChange = { typed -> target = typed.filter { it.isDigit() }.take(4) },
-                    numeric = true,
-                )
-                TaqwaPrimaryButton(
-                    stringResource(Res.string.tasbeeh_custom_add),
-                    onClick = { onAdd(trimmed, bounded ?: 1) },
-                    enabled = valid,
-                )
-            } else {
+            SheetField(
+                label = stringResource(Res.string.tasbeeh_custom_phrase),
+                value = phrase,
+                onValueChange = { phrase = it.takeCodePoints(MAX_PHRASE) },
+                numeric = false,
+            )
+            SheetField(
+                label = stringResource(Res.string.tasbeeh_custom_target),
+                value = target,
+                // Four digits is 1000, the largest target the store keeps; anything longer
+                // could only be typed to be clamped away on the way in.
+                onValueChange = { typed -> target = typed.filter { it.isDigit() }.take(4) },
+                numeric = true,
+            )
+            TaqwaPrimaryButton(
+                stringResource(
+                    if (existing == null) Res.string.tasbeeh_custom_add else Res.string.tasbeeh_custom_save,
+                ),
+                onClick = { onSubmit(trimmed, bounded ?: 1) },
+                enabled = valid,
+            )
+            if (existing != null) {
                 TaqwaCard {
                     TaqwaRow(
                         label = stringResource(Res.string.tasbeeh_custom_delete),

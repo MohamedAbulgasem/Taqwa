@@ -106,6 +106,84 @@ class TasbeehStoreTest {
     }
 
     @Test
+    fun updateCustomKeepsTheIdAndThePlaceInTheOrder() = runTest {
+        var clock = 10L
+        val store = TasbeehStore(dataStore()) { clock++ }
+        val first = store.addCustom("first", 33)
+        val middle = store.addCustom("middle", 33)
+        store.addCustom("last", 33)
+
+        store.updateCustom(middle.id, "  middle, rewritten  ", 7)
+
+        val presets = store.customPresets.first()
+        assertEquals(listOf(first.id, middle.id, "custom_12"), presets.map { it.id })
+        assertEquals(
+            listOf("first", "middle, rewritten", "last"),
+            presets.map { it.parts.first().dhikr.arabic },
+            "the edited phrase is rewritten in place, trimmed, and stays second",
+        )
+        assertEquals(7, presets[1].total)
+        assertTrue(presets[1].custom)
+    }
+
+    /**
+     * A target dropped below the count already reached would leave a ring drawn past its own
+     * circumference and an "8 of 5" that can never complete. At the target it reads 5 of 5.
+     */
+    @Test
+    fun loweringTheTargetClampsTheSavedCountButNotTheRound() = runTest {
+        val store = TasbeehStore(dataStore()) { 55L }
+        val mine = store.addCustom("la hawla", 10)
+        store.save(TasbeehState(mine.id, 8, 3))
+
+        store.updateCustom(mine.id, "la hawla wa la quwwata", 5)
+
+        assertEquals(TasbeehState(mine.id, 5, 3), store.stateOf(mine.id).first())
+    }
+
+    @Test
+    fun raisingTheTargetLeavesTheCountWhereItWas() = runTest {
+        val store = TasbeehStore(dataStore()) { 56L }
+        val mine = store.addCustom("la hawla", 10)
+        store.save(TasbeehState(mine.id, 8, 1))
+
+        store.updateCustom(mine.id, "la hawla", 100)
+
+        assertEquals(TasbeehState(mine.id, 8, 1), store.stateOf(mine.id).first())
+        assertEquals(100, store.customPresets.first().single().total)
+    }
+
+    @Test
+    fun updateCustomRefusesABlankPhraseAndCoercesTheTargetLikeAdd() = runTest {
+        val store = TasbeehStore(dataStore()) { 77L }
+        val mine = store.addCustom("ya latif", 33)
+
+        assertFailsWith<IllegalArgumentException> { store.updateCustom(mine.id, "   ", 33) }
+        assertFailsWith<IllegalArgumentException> { store.updateCustom(mine.id, fs + fs, 33) }
+        assertEquals("ya latif", store.customPresets.first().single().parts.first().dhikr.arabic)
+
+        // The same cut and the same ceiling `addCustom` applies: 60 characters as a reader counts
+        // them — a surrogate pair is one — and a target held to 1..1000.
+        store.updateCustom(mine.id, "  " + "\uD83D\uDD4C".repeat(70) + "  ", 5_000)
+        val kept = store.customPresets.first().single()
+        assertEquals("\uD83D\uDD4C".repeat(60), kept.parts.first().dhikr.arabic)
+        assertEquals(120, kept.parts.first().dhikr.arabic.length)
+        assertEquals(1_000, kept.total)
+
+        store.updateCustom(mine.id, "ya latif", 0)
+        assertEquals(1, store.customPresets.first().single().total)
+    }
+
+    /** Nothing to rewrite is nothing written: an edit never invents the entry it was given. */
+    @Test
+    fun updatingAPresetThatIsNotThereChangesNothing() = runTest {
+        val store = TasbeehStore(dataStore()) { 88L }
+        val mine = store.addCustom("ya latif", 33)
+        store.updateCustom("custom_9999", "nowhere", 12)
+        assertEquals(listOf(mine), store.customPresets.first())
+    }
+
+    @Test
     fun removingACustomPresetClearsItsCountAndFallsTheSelectionBack() = runTest {
         val store = TasbeehStore(dataStore()) { 42L }
         val mine = store.addCustom("ya latif", 100)

@@ -174,6 +174,38 @@ class TasbeehViewModel(
     }
 
     /**
+     * Rewrites a phrase of the reader's own from its own sheet: a new wording, a new target, or
+     * both. The id and the chip's place in the row are the same afterwards, and so is the count —
+     * unless the new target is below it, which the store clamps.
+     *
+     * The count on screen goes to disk first, exactly as [select] and [removeCustom] do it. That
+     * matters most when the phrase being edited *is* the one being counted: the store clamps what
+     * is on disk, so what is on disk has to be the count actually reached, not the one from 300 ms
+     * ago. Editing some other phrase is the same reason [removeCustom] flushes — a pending count
+     * is not something an unrelated edit may drop.
+     *
+     * Everything on screen is then re-derived from the store rather than patched: the preset comes
+     * back out of the freshly read list, so the dhikr block, the ring's target and the chip all
+     * show the new phrase without three separate assignments that could disagree.
+     */
+    fun updateCustom(id: String, phrase: String, target: Int) {
+        val leaving = _state.value.state
+        debounceJob?.cancel()
+        scope.launch {
+            store.save(leaving)
+            store.updateCustom(id, phrase, target)
+            val custom = store.customPresets.first()
+            if (_state.value.preset.id == id) {
+                val edited = TasbeehPresets.byId(id, custom) ?: TasbeehPresets.default
+                val restored = store.stateOf(edited.id).first()
+                _state.update { it.copy(preset = edited, state = restored, custom = custom) }
+            } else {
+                _state.update { it.copy(custom = custom) }
+            }
+        }
+    }
+
+    /**
      * Forgets a phrase and its count. Deleting the one on screen falls back to the default preset
      * — the store makes the same fallback for the stored selection, so the two cannot disagree.
      *

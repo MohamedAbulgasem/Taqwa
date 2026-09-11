@@ -751,6 +751,7 @@ fun App(container: AppContainer) {
                                 onSelect = tasbeehVm::select,
                                 onReset = tasbeehVm::reset,
                                 onAddCustom = tasbeehVm::addCustom,
+                                onUpdateCustom = tasbeehVm::updateCustom,
                                 onRemoveCustom = tasbeehVm::removeCustom,
                                 onLeave = tasbeehVm::flush,
                             )

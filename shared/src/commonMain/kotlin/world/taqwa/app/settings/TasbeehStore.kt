@@ -97,6 +97,43 @@ class TasbeehStore(
     }
 
     /**
+     * Rewrites a phrase of the reader's own in place. The cleaning is [addCustom]'s exactly — the
+     * separator stripped, trimmed, cut to 60 characters as a reader counts them, the target held
+     * to 1..1000 — because an edited entry has to survive the same round trip a new one does.
+     *
+     * The id does not change, which is what keeps both the chip's place in the column (the order
+     * is the millisecond in the id) and the count already stored under it.
+     *
+     * **The count is clamped to the new target.** Dropping a target below the count already
+     * reached would otherwise leave a ring drawn past its own circumference and a "8 of 5" that
+     * can never complete; at the target it reads 5 of 5, complete, which is what lowering a
+     * target to where you already are means. The round is left alone — a round already finished
+     * was finished against the target it was counted under, and is not re-litigated here.
+     *
+     * A preset id that is not there is left alone rather than created: the sheet only opens on a
+     * chip that exists, and inventing an entry from an edit would be a worse surprise than none.
+     *
+     * @throws IllegalArgumentException if [phrase] has nothing left in it once cleaned.
+     */
+    suspend fun updateCustom(id: String, phrase: String, target: Int) {
+        val cleaned = phrase.filterNot { it == FIELD_SEP }.trim().takeCodePoints(MAX_PHRASE)
+        require(cleaned.isNotBlank()) { "A custom dhikr must have a phrase" }
+        val bounded = target.coerceIn(1, MAX_TARGET)
+        store.edit { prefs ->
+            val existing = prefs[SettingsKeys.TASBEEH_CUSTOM].orEmpty()
+            val old = existing.firstOrNull { it.substringBefore(FIELD_SEP) == id } ?: return@edit
+            prefs[SettingsKeys.TASBEEH_CUSTOM] =
+                existing - old + encode(TasbeehPresets.custom(id, cleaned, bounded))
+            // Read back through the same parse the screen reads through, so a malformed stored
+            // count is a fresh one here too rather than something to clamp.
+            val stored = parseState(id, prefs[SettingsKeys.tasbeehStateKey(id)])
+            if (stored.count > bounded) {
+                prefs[SettingsKeys.tasbeehStateKey(id)] = "$bounded:${stored.round}"
+            }
+        }
+    }
+
+    /**
      * Forgets a custom phrase along with its count — leaving the state key behind would hand a
      * stale count to the next `custom_<millis>` that happened to collide with it — and falls the
      * selection back to the default when the phrase deleted is the one on screen.

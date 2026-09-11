@@ -214,6 +214,66 @@ class TasbeehViewModelTest {
     }
 
     /**
+     * The sheet on an existing phrase is an edit, not only a delete: the phrase and the target
+     * both come back changed, and the count is clamped where a lowered target has overtaken it —
+     * 8 against a new target of 5 reads 5 of 5, complete.
+     */
+    @Test
+    fun editingTheSelectedCustomRerendersItsPhraseAndTarget() = runTest {
+        val store = TasbeehStore(dataStore()) { 4_242L }
+        val vm = viewModel(store)
+        runCurrent()
+
+        vm.addCustom("La hawla", 10)
+        vm.state.first { it.preset.id == "custom_4242" }
+        repeat(8) { vm.tap() }
+
+        vm.updateCustom("custom_4242", "La hawla wa la quwwata", 5)
+        val edited = vm.state.first { it.preset.total == 5 }
+
+        assertEquals("custom_4242", edited.preset.id, "the id, and so the chip's place, is kept")
+        assertEquals("La hawla wa la quwwata", edited.preset.parts.first().dhikr.arabic)
+        assertEquals(5, edited.state.count, "the count is clamped to the target it now exceeds")
+        assertEquals(1f, edited.progress, "5 of 5 is a closed ring")
+        assertEquals(listOf("La hawla wa la quwwata"), edited.custom.map { it.parts.first().dhikr.arabic })
+        // And the clamp reached disk, not only the screen.
+        assertEquals(TasbeehState("custom_4242", 5, 1), store.stateOf("custom_4242").first { it.count == 5 })
+    }
+
+    /**
+     * Editing a phrase that is not the one being counted must leave the counting alone: the chip
+     * row is re-read, the selection and its count are not touched, and the pending taps still
+     * reach disk — the same contract [removingACustomWritesThePendingCountFirst] holds a delete to.
+     */
+    @Test
+    fun editingACustomThatIsNotSelectedLeavesTheSelectionAlone() = runTest {
+        var stamp = 4_242L
+        val store = TasbeehStore(dataStore()) { stamp++ }
+        val vm = viewModel(store)
+        runCurrent()
+
+        vm.addCustom("first", 40)
+        vm.state.first { it.preset.id == "custom_4242" }
+        vm.addCustom("second", 40)
+        vm.state.first { it.preset.id == "custom_4243" }
+
+        repeat(3) { vm.tap() }
+        vm.updateCustom("custom_4242", "first, rewritten", 3)
+        runCurrent()
+
+        val after = vm.state.first { it.custom.first().parts.first().dhikr.arabic == "first, rewritten" }
+        assertEquals("custom_4243", after.preset.id, "the selection is untouched")
+        assertEquals(3, after.state.count)
+        assertEquals(40, after.preset.total, "and so is the target it is being counted against")
+        assertEquals(listOf("custom_4242", "custom_4243"), after.custom.map { it.id })
+        assertEquals(
+            TasbeehState("custom_4243", 3, 1),
+            store.stateOf("custom_4243").first { it.count == 3 },
+            "the three taps reach disk rather than being cancelled by the edit",
+        )
+    }
+
+    /**
      * A chip tap and a page tap land within the same 300 ms more often than not. The switch used
      * to share its job slot with the debounced write, so the tap's `scheduleWrite` cancelled the
      * switch outright — between saving the old count and selecting the new preset — and the chip
