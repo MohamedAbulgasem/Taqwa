@@ -1,6 +1,5 @@
 package world.taqwa.app.design.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -8,12 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,37 +27,12 @@ fun CountdownRing(
     diameter: Dp = CountdownRingSize,
 ) {
     val colors = LocalTaqwaColors.current
-    // `drawArc` takes literal angles, so this is one of the few things in the app that does not
-    // mirror itself with the layout direction. Time is read the way text is read: an Arabic
-    // reader's clock hand sweeps from the top towards the left, so the arc fills anticlockwise.
-    val sweepSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
     // [diameter] is only ever *smaller* than the default, when a sideways screen gives the ring
     // less than its own half-page to sit in; the stroke keeps its share of the diameter, so a
-    // shrunken ring reads as the same ring rather than as a thicker one.
+    // shrunken ring reads as the same ring rather than as a thicker one. The track, the arc and
+    // its mirrored sweep live in [RingArc], which the tasbeeh's counter draws too.
     Box(modifier.size(diameter), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(diameter)) {
-            val stroke = (diameter * (9f / 196f)).toPx()
-            val inset = stroke / 2f
-            val arcSize = Size(size.width - stroke, size.height - stroke)
-            drawArc(
-                color = colors.hairline,
-                startAngle = 0f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = androidx.compose.ui.geometry.Offset(inset, inset),
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round),
-            )
-            drawArc(
-                color = colors.ring,
-                startAngle = -90f,
-                sweepAngle = sweepSign * 360f * progress.coerceIn(0f, 1f),
-                useCenter = false,
-                topLeft = androidx.compose.ui.geometry.Offset(inset, inset),
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round),
-            )
-        }
+        RingArc(progress = progress, diameter = diameter)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = label.uppercase(),
