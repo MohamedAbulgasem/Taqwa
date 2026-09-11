@@ -98,6 +98,7 @@ import world.taqwa.app.resources.tasbeeh_preset_subhanallahi_wa_bihamdihi
 import world.taqwa.app.resources.tasbeeh_reset
 import world.taqwa.app.resources.tasbeeh_reset_confirm
 import world.taqwa.app.resources.tasbeeh_round
+import world.taqwa.app.settings.takeCodePoints
 import world.taqwa.app.tasbeeh.Dhikr
 import world.taqwa.app.tasbeeh.TasbeehPreset
 
@@ -470,7 +471,10 @@ private fun CustomDhikrSheet(
     var phrase by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("33") }
     val bounded = target.toIntOrNull()?.takeIf { it in 1..MAX_TARGET }
-    val valid = phrase.isNotBlank() && bounded != null
+    // Exactly the store's own two conditions, so Add is live only where `addCustom` would accept:
+    // a phrase with something in it once trimmed, and a target inside 1..1000.
+    val trimmed = phrase.trim()
+    val valid = trimmed.isNotEmpty() && bounded != null
 
     TaqwaBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -490,7 +494,7 @@ private fun CustomDhikrSheet(
                 SheetField(
                     label = stringResource(Res.string.tasbeeh_custom_phrase),
                     value = phrase,
-                    onValueChange = { phrase = it.take(MAX_PHRASE) },
+                    onValueChange = { phrase = it.takeCodePoints(MAX_PHRASE) },
                     numeric = false,
                 )
                 SheetField(
@@ -501,12 +505,11 @@ private fun CustomDhikrSheet(
                     onValueChange = { typed -> target = typed.filter { it.isDigit() }.take(4) },
                     numeric = true,
                 )
-                Box(Modifier.alpha(if (valid) 1f else 0.4f)) {
-                    TaqwaPrimaryButton(
-                        stringResource(Res.string.tasbeeh_custom_add),
-                        onClick = { if (valid) onAdd(phrase.trim(), bounded!!) },
-                    )
-                }
+                TaqwaPrimaryButton(
+                    stringResource(Res.string.tasbeeh_custom_add),
+                    onClick = { onAdd(trimmed, bounded ?: 1) },
+                    enabled = valid,
+                )
             } else {
                 TaqwaCard {
                     TaqwaRow(

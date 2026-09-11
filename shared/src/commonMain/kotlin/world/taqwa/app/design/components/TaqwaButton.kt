@@ -11,29 +11,44 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import world.taqwa.app.design.LocalTaqwaColors
 
-/** Full-width pill, 48dp tall — above the 44pt minimum with room for large-text settings. */
+/**
+ * Full-width pill, 48dp tall — above the 44pt minimum with room for large-text settings.
+ *
+ * [enabled] false dims it to the disabled alpha and takes the click away outright, ripple
+ * included: a button that looks dead but still fires is worse than either.
+ */
 @Composable
-fun TaqwaPrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun TaqwaPrimaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
     val colors = LocalTaqwaColors.current
     Box(
         modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 48.dp)
+            .alpha(if (enabled) 1f else DisabledAlpha)
             .clip(RoundedCornerShape(percent = 50))
             .background(colors.textPrimary)
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(vertical = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(text, color = colors.background, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
     }
 }
+
+/** Dimmed, not greyed: the pill keeps its shape so the sheet does not reflow when it goes live. */
+private const val DisabledAlpha = 0.4f
 
 /** The secondary action is never a second button. */
 @Composable

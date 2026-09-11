@@ -12,6 +12,7 @@ import kotlin.random.Random
 import kotlin.random.nextULong
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -64,6 +65,30 @@ class TasbeehStoreTest {
     fun aTargetBelowOneIsLiftedToOne() = runTest {
         val store = TasbeehStore(dataStore()) { 9L }
         assertEquals(1, store.addCustom("ya latif", 0).total)
+    }
+
+    /**
+     * The store used to take a blank phrase and write it, and `parseCustom` then dropped the
+     * entry on the way back out — a chip added from the sheet that silently never appeared.
+     */
+    @Test
+    fun aBlankPhraseIsRefusedRatherThanWrittenAndDroppedOnRead() = runTest {
+        val store = TasbeehStore(dataStore())
+        assertFailsWith<IllegalArgumentException> { store.addCustom("   ", 33) }
+        assertFailsWith<IllegalArgumentException> { store.addCustom(fs + fs, 33) }
+        assertEquals(emptyList(), store.customPresets.first())
+    }
+
+    /** The 60 is characters as a reader counts them: a surrogate pair is one, and is never cut. */
+    @Test
+    fun thePhraseIsCutAtSixtyCodePointsNotSixtyUtf16Units() = runTest {
+        val store = TasbeehStore(dataStore())
+        // U+1F54C, a plane-1 character, is two UTF-16 units each: a `take(60)` would keep 30 of
+        // them and leave a lone high surrogate as the 60th unit.
+        val added = store.addCustom("🕌".repeat(70), 33)
+        val phrase = added.parts.first().dhikr.arabic
+        assertEquals(120, phrase.length)
+        assertEquals("🕌".repeat(60), phrase)
     }
 
     @Test

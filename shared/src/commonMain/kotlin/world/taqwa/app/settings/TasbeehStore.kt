@@ -19,6 +19,26 @@ import kotlin.time.Clock
  * one write is the view model's job, because only the screen knows when the taps stopped.
  * [now] is injectable so tests can pin the ids custom presets are given.
  */
+/**
+ * The first [max] characters as a reader counts them, not as UTF-16 stores them: an emoji or a
+ * plane-1 script is one character here, and a cut between a surrogate pair would leave half a
+ * character behind. `codePointCount`/`offsetByCodePoints` are the JVM's, so the walk is done by
+ * hand — which common code can do and every target then shares. The sheet cuts what is typed by
+ * the same rule the store cuts what is saved.
+ */
+internal fun String.takeCodePoints(max: Int): String {
+    var index = 0
+    var taken = 0
+    while (index < length && taken < max) {
+        val pair = this[index].isHighSurrogate() &&
+            index + 1 < length &&
+            this[index + 1].isLowSurrogate()
+        index += if (pair) 2 else 1
+        taken++
+    }
+    return substring(0, index)
+}
+
 class TasbeehStore(
     private val store: DataStore<Preferences>,
     private val now: () -> Long = { Clock.System.now().toEpochMilliseconds() },
@@ -49,11 +69,19 @@ class TasbeehStore(
      * characters the sheet allows, the target held to 1..1000, and the id is the moment of
      * creation — which also orders the chips, and is nudged forward if a second phrase somehow
      * lands in the same millisecond, since the id is a storage key and must be unique.
+     *
+     * A phrase that is blank once cleaned is rejected here rather than written: [parseCustom]
+     * drops such an entry on the way back out, so accepting it would store a chip that silently
+     * never appears. The sheet keeps Add dead until there is a phrase, so this throw is a
+     * contract for callers, not a path the reader can walk into.
+     *
+     * @throws IllegalArgumentException if [phrase] has nothing left in it once cleaned.
      */
     suspend fun addCustom(phrase: String, target: Int): TasbeehPreset {
         // A pasted phrase could in principle carry the separator itself, which would split
         // one entry into four fields and be dropped on the next read as malformed.
-        val cleaned = phrase.filterNot { it == FIELD_SEP }.trim().take(MAX_PHRASE)
+        val cleaned = phrase.filterNot { it == FIELD_SEP }.trim().takeCodePoints(MAX_PHRASE)
+        require(cleaned.isNotBlank()) { "A custom dhikr must have a phrase" }
         val bounded = target.coerceIn(1, MAX_TARGET)
         var made: TasbeehPreset? = null
         store.edit { prefs ->
