@@ -140,9 +140,10 @@ class SoundAssetsTest {
     }
 
     @Test
-    fun theProvisionalVoicesCarryTheirMeasuredLengths() {
-        assertEquals(86.60.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.AZEEZ))
-        assertEquals(242.70.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.AZEMI))
+    fun everyVoiceCarriesItsMeasuredFullLength() {
+        // ffprobe on the shipped files, assets/audio/README.md.
+        assertEquals(86.15.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.AZEEZ))
+        assertEquals(211.40.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.AZEMI))
         assertEquals(154.10.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.ORIGINAL))
     }
 }
