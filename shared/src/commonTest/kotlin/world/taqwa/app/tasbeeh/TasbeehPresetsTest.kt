@@ -7,19 +7,37 @@ import kotlin.test.assertTrue
 
 class TasbeehPresetsTest {
 
+    /**
+     * Every built-in counts to a hundred. The three singles that used to carry the post-prayer
+     * set's 33 · 33 · 34 out of the set were the one place a chip silently changed the target,
+     * and 33 is a third of a set rather than a count anything is said on its own.
+     */
     @Test
-    fun theSevenBuiltInsAreInSpecOrderWithTheirTotals() {
+    fun theSevenBuiltInsAreInSpecOrderAndEveryOneOfThemCountsToAHundred() {
         assertEquals(
             listOf(
                 "after_prayer" to 100,
-                "subhanallah" to 33,
-                "alhamdulillah" to 33,
-                "allahu_akbar" to 34,
+                "subhanallah" to 100,
+                "alhamdulillah" to 100,
+                "allahu_akbar" to 100,
                 "astaghfirullah" to 100,
                 "la_ilaha_illallah" to 100,
                 "subhanallahi_wa_bihamdihi" to 100,
             ),
             TasbeehPresets.builtIn.map { it.id to it.total },
+        )
+    }
+
+    /** The 33 · 33 · 34 survives in the one place it belongs: inside the post-prayer set. */
+    @Test
+    fun onlyThePostPrayerSetIsSplitIntoThirds() {
+        assertEquals(
+            listOf(listOf(33, 33, 34)),
+            TasbeehPresets.builtIn.map { preset -> preset.parts.map { it.count } }.filter { it.size > 1 },
+        )
+        assertEquals(
+            listOf(100, 100, 100, 100, 100, 100),
+            TasbeehPresets.builtIn.filter { it.parts.size == 1 }.map { it.total },
         )
     }
 

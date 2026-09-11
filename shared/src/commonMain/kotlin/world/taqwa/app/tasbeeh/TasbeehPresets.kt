@@ -53,14 +53,24 @@ object TasbeehPresets {
         meaning = "Glory and praise be to Allah",
     )
 
+    /**
+     * Every single dhikr counts to a hundred. The 33 · 33 · 34 belongs to the post-prayer set and
+     * to nothing else: said on its own, a phrase has no third of a hundred to be, and the chips
+     * carried the split out of the set anyway — tapping SubhanAllah while counting the set moved
+     * the target from 100 to 33 without a word, so a set half done looked nearly finished. A
+     * hundred is what these phrases are said in on their own, and it is what the other three
+     * singles already counted to. A phrase of the reader's own keeps whatever target they gave it.
+     */
+    private const val SINGLE_TOTAL = 100
+
     val builtIn: List<TasbeehPreset> = listOf(
         TasbeehPreset("after_prayer", listOf(DhikrPart(SUBHANALLAH, 33), DhikrPart(ALHAMDULILLAH, 33), DhikrPart(ALLAHU_AKBAR, 34))),
-        TasbeehPreset("subhanallah", listOf(DhikrPart(SUBHANALLAH, 33))),
-        TasbeehPreset("alhamdulillah", listOf(DhikrPart(ALHAMDULILLAH, 33))),
-        TasbeehPreset("allahu_akbar", listOf(DhikrPart(ALLAHU_AKBAR, 34))),
-        TasbeehPreset("astaghfirullah", listOf(DhikrPart(ASTAGHFIRULLAH, 100))),
-        TasbeehPreset("la_ilaha_illallah", listOf(DhikrPart(LA_ILAHA_ILLALLAH, 100))),
-        TasbeehPreset("subhanallahi_wa_bihamdihi", listOf(DhikrPart(SUBHANALLAHI_WA_BIHAMDIHI, 100))),
+        TasbeehPreset("subhanallah", listOf(DhikrPart(SUBHANALLAH, SINGLE_TOTAL))),
+        TasbeehPreset("alhamdulillah", listOf(DhikrPart(ALHAMDULILLAH, SINGLE_TOTAL))),
+        TasbeehPreset("allahu_akbar", listOf(DhikrPart(ALLAHU_AKBAR, SINGLE_TOTAL))),
+        TasbeehPreset("astaghfirullah", listOf(DhikrPart(ASTAGHFIRULLAH, SINGLE_TOTAL))),
+        TasbeehPreset("la_ilaha_illallah", listOf(DhikrPart(LA_ILAHA_ILLALLAH, SINGLE_TOTAL))),
+        TasbeehPreset("subhanallahi_wa_bihamdihi", listOf(DhikrPart(SUBHANALLAHI_WA_BIHAMDIHI, SINGLE_TOTAL))),
     )
 
     /** The default when nothing has been selected yet, and the fallback after a delete. */

@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import world.taqwa.app.qibla.Haptics
 import world.taqwa.app.settings.TasbeehStore
+import world.taqwa.app.tasbeeh.TasbeehPresets
 import world.taqwa.app.tasbeeh.TasbeehState
 import kotlin.random.Random
 import kotlin.random.nextULong
@@ -328,6 +329,39 @@ class TasbeehViewModelTest {
         )
         assertEquals(listOf("custom_4243"), vm.state.first { it.custom.size == 1 }.custom.map { it.id })
         assertEquals("custom_4243", vm.state.value.preset.id)
+    }
+
+    /**
+     * SubhanAllah's target went from 33 to 100. Someone who left it at 20 of 33 keeps the twenty
+     * taps they made: the count is stored per preset and the target is not stored at all, so the
+     * same state reads as 20 of 100 and the ring is a fifth full rather than most of the way round.
+     */
+    @Test
+    fun aCountStoredUnderTheOldThirtyThreeReopensAgainstTheHundred() = runTest {
+        val store = TasbeehStore(dataStore())
+        store.select("subhanallah")
+        store.save(TasbeehState("subhanallah", 20, 1))
+
+        val vm = viewModel(store)
+        runCurrent()
+
+        val opened = vm.state.first { it.preset.id == "subhanallah" }
+        assertEquals(20, opened.count, "the taps already made are not touched")
+        assertEquals(100, opened.preset.total)
+        assertEquals(0.2f, opened.progress, absoluteTolerance = 1e-6f)
+    }
+
+    /**
+     * The other direction, which the built-ins can no longer produce but a shrinking target could:
+     * a count past its total reads as a finished set rather than as a ring drawn past itself.
+     */
+    @Test
+    fun aStoredCountAboveItsTargetIsClampedToTheTarget() {
+        val preset = TasbeehPresets.custom("custom_1", "ya latif", 5)
+        val ui = TasbeehUiState(preset, TasbeehState("custom_1", 9, 1))
+        assertEquals(9, ui.state.count, "what is stored is left alone")
+        assertEquals(5, ui.count, "what is shown is the target")
+        assertEquals(1f, ui.progress, absoluteTolerance = 1e-6f)
     }
 
     /**

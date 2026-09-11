@@ -487,7 +487,7 @@ private fun CounterStack(
         // The same reservation for the hint, which leaves at the first tap: the ring must not
         // slide up the screen when it does.
         Box(Modifier.height(28.dp).padding(horizontal = 24.dp), contentAlignment = Alignment.Center) {
-            if (state.state.count == 0 && state.state.round == 1) {
+            if (state.count == 0 && state.state.round == 1) {
                 Text(
                     stringResource(Res.string.tasbeeh_hint),
                     style = TaqwaText.caption.copy(fontSize = 12.sp),
@@ -577,7 +577,7 @@ private fun Counter(state: TasbeehUiState, progress: Float, scale: Float, diamet
                 textAlign = TextAlign.Center,
             )
             Text(
-                format.localizedDigits(state.state.count),
+                format.localizedDigits(state.count),
                 // The countdown's own style, so the two rings show their number in one voice;
                 // tabular figures come with it, which is what stops a count from 99 to 100
                 // shuffling sideways.
@@ -772,9 +772,11 @@ private fun CustomDhikrSheet(
 ) {
     val colors = LocalTaqwaColors.current
     // Keyed on nothing: the sheet is composed afresh for each opening, so an edit begins at what
-    // is stored and an add at the blank and the 33 that is the commonest target there is.
+    // is stored and an add at the blank phrase and the 100 every built-in now counts to. A
+    // prefilled target is a target that need not be thought about: the field is already right for
+    // a phrase said a hundred times, and typing over it is one gesture for anyone who means 33.
     var phrase by remember { mutableStateOf(existing?.parts?.first()?.dhikr?.arabic.orEmpty()) }
-    var target by remember { mutableStateOf(existing?.total?.toString() ?: "33") }
+    var target by remember { mutableStateOf(existing?.total?.toString() ?: DEFAULT_TARGET.toString()) }
     val bounded = target.toIntOrNull()?.takeIf { it in 1..MAX_TARGET }
     // Exactly the store's own two conditions, so the button is live only where the store would
     // accept: a phrase with something in it once trimmed, and a target inside 1..1000.
@@ -888,6 +890,9 @@ private fun ResetSheet(onReset: () -> Unit, onDismiss: () -> Unit) {
 /** The store's own ceiling, restated here only to grey the Add button out before it is hit. */
 private const val MAX_TARGET = 1000
 private const val MAX_PHRASE = 60
+
+/** What a new phrase is counted to until someone says otherwise — every built-in's target. */
+private const val DEFAULT_TARGET = 100
 
 /** A chip's words: the built-in's resource, or the reader's own phrase exactly as typed. */
 @Composable

@@ -15,16 +15,40 @@ Built in, in this order, with stable ids. Arabic is written with tashkeel and is
 | id | parts | Arabic | transliteration | meaning |
 |---|---|---|---|---|
 | `after_prayer` | 33 · 33 · 34 (= 100) | سُبْحَانَ ٱللَّٰهِ · ٱلْحَمْدُ لِلَّٰهِ · ٱللَّٰهُ أَكْبَرُ | SubhanAllah · Alhamdulillah · Allahu Akbar | Glory be to Allah · All praise is due to Allah · Allah is the Greatest |
-| `subhanallah` | 33 | سُبْحَانَ ٱللَّٰهِ | SubhanAllah | Glory be to Allah |
-| `alhamdulillah` | 33 | ٱلْحَمْدُ لِلَّٰهِ | Alhamdulillah | All praise is due to Allah |
-| `allahu_akbar` | 34 | ٱللَّٰهُ أَكْبَرُ | Allahu Akbar | Allah is the Greatest |
+| `subhanallah` | 100 | سُبْحَانَ ٱللَّٰهِ | SubhanAllah | Glory be to Allah |
+| `alhamdulillah` | 100 | ٱلْحَمْدُ لِلَّٰهِ | Alhamdulillah | All praise is due to Allah |
+| `allahu_akbar` | 100 | ٱللَّٰهُ أَكْبَرُ | Allahu Akbar | Allah is the Greatest |
 | `astaghfirullah` | 100 | أَسْتَغْفِرُ ٱللَّٰهَ | Astaghfirullah | I seek Allah's forgiveness |
 | `la_ilaha_illallah` | 100 | لَا إِلَٰهَ إِلَّا ٱللَّٰهُ | La ilaha illallah | There is no god but Allah |
 | `subhanallahi_wa_bihamdihi` | 100 | سُبْحَانَ ٱللَّٰهِ وَبِحَمْدِهِ | SubhanAllahi wa bihamdihi | Glory and praise be to Allah |
 
 Chip labels: English "After prayer", "SubhanAllah", "Alhamdulillah", "Allahu Akbar", "Astaghfirullah", "La ilaha illallah", "SubhanAllahi wa bihamdihi"; Arabic «بعد الصلاة», «سبحان الله», «الحمد لله», «الله أكبر», «أستغفر الله», «لا إله إلا الله», «سبحان الله وبحمده». `after_prayer` is the default on first open.
 
+**Amended 11 September 2026: every single-dhikr built-in counts to 100.** `subhanallah`,
+`alhamdulillah` and `allahu_akbar` were 33, 33 and 34 — the post-prayer set's three parts carried
+out of the set and made into chips of their own. On the screen that reads as a chip that silently
+changes the target: counting the set and tapping SubhanAllah to see the phrase alone moved the
+count from "of 100" to "of 33" without a word, and a set half done looked nearly finished. 33 is a
+third of a set rather than a number anything is said in on its own, and the other three singles
+already counted to 100. The 33 · 33 · 34 stays where it belongs — inside `after_prayer`, whose
+parts, ticks and part haptics are unchanged. A saved count is stored per preset and a target is not
+stored at all, so someone left at 20 of 33 reopens at 20 of 100 with their twenty taps intact.
+A custom preset keeps whatever target its phrase was given; only the built-ins are levelled.
+
 **Custom presets** are added from the plus at the screen's top corner: a bottom sheet with a phrase field (any script, up to 60 characters, shown exactly as typed, no transliteration or meaning) and a target from 1 to 1000. They appear after the built-ins, in creation order, with ids `custom_<epochMillis>`, and can be deleted from the same sheet when opened on an existing custom preset (long-press its chip). Deleting the selected preset selects `after_prayer`.
+
+**Amended 11 September 2026: the sheet's target defaults to 100, and opening it on an existing
+phrase is an edit.** Adding a new dhikr prefills the target field with `100` — the number every
+built-in now counts to — with Add live as soon as a phrase is typed; anyone who means 33 types over
+a prefilled field, which is one gesture rather than a decision. Long-pressing a custom chip opens
+the same two fields prefilled with that phrase's own wording and target, headed «Edit dhikr» /
+«تعديل الذكر» with a Save button under Add's own validity rule and Delete beneath it: a target typed
+out of habit can be corrected without deleting the phrase and its count. Saving keeps the id, and so
+the chip's place and the count stored under it. **The clamp rule:** where the new target is below the
+count already reached, the store clamps the stored count to the target inside the same write — 8
+against a new target of 5 reads 5 of 5, a closed ring — and the round is left as it was, having been
+counted against the target it was counted under. The view model clamps the same way when it derives
+what the screen shows, so a stored count can never be drawn past its own ring.
 
 ## 3. The engine
 

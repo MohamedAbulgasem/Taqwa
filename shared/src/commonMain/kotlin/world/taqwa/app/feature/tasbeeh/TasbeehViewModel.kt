@@ -35,8 +35,20 @@ data class TasbeehUiState(
     /** The part the *next* count belongs to — the dhikr on screen, and the reminder row's dot. */
     val currentPart: Int get() = TasbeehEngine.currentPart(state, preset)
 
+    /**
+     * The count as the screen shows it, which is [TasbeehState.count] clamped to the target.
+     *
+     * A stored count above its preset's target should not happen — the store clamps an edited
+     * custom on the way in, and the built-ins' targets have only ever grown (SubhanAllah's 33
+     * became 100, so someone left at 20 of 33 opens at 20 of 100 with the same twenty taps behind
+     * them). But a target that shrinks is one released build away, and a ring drawn at 120 % or a
+     * count reading past its own "of" is a worse answer than a set that reads as finished. The
+     * engine needs no such guard: a tap from `count >= total` already opens the next round.
+     */
+    val count: Int get() = if (preset.total <= 0) state.count else state.count.coerceAtMost(preset.total)
+
     val progress: Float
-        get() = if (preset.total <= 0) 0f else state.count.toFloat() / preset.total
+        get() = if (preset.total <= 0) 0f else count.toFloat() / preset.total
 
     /**
      * Where the ring's tick marks go: the part boundaries as fractions of the whole, without the
