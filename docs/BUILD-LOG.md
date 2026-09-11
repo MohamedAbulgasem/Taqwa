@@ -934,3 +934,19 @@ never moves. And the view model shared one cancellable job between the debounced
 preset switch, so a chip tap followed within a third of a second by a page tap could silently
 cancel the switch; the debounce has its own job and the state updates are atomic. 565 tests in
 the shared module, the suite green on both targets.
+
+### Tasbeeh, second pass (11 September, 0.8.0)
+
+Four things Mohamed asked for after using it. In landscape the chips column had taken half the
+screen and the ring's Box was the only tappable part, which left the empty start side dead; the
+tap surface now spans everything up to a 220 dp chips column, and a tap anywhere on it counts. A
+custom chip's long-press sheet offers Edit beside Delete, prefilling the phrase and target; a
+lowered target clamps the saved count so the ring never reads past its own end. The screen names
+itself the way the Reader does, "Tasbeeh" beside the chevron at 17 sp, with nothing else moving
+(a pixel diff against the previous build differed only in the header band). And the three single
+built-in dhikr count to a hundred like the rest, because switching from the post-prayer set to
+SubhanAllah silently changed the target from 100 to 33 and looked like a bug; the set alone keeps
+its 33 · 33 · 34, and a new custom dhikr starts at 100. A count saved under the old 33 survives as
+so-many of 100. The landscape header cost the stack height it had been borrowing from the ring,
+so the landscape ring reserve is now measured against the tallest stack and the ring there is
+about 154 dp instead of 196. 576 shared tests, suite green on both targets.
