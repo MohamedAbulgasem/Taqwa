@@ -212,4 +212,80 @@ class TasbeehViewModelTest {
         assertEquals(emptyList(), store.customPresets.first())
         assertEquals(TasbeehState("custom_4242", 0, 1), store.stateOf("custom_4242").first())
     }
+
+    /**
+     * A chip tap and a page tap land within the same 300 ms more often than not. The switch used
+     * to share its job slot with the debounced write, so the tap's `scheduleWrite` cancelled the
+     * switch outright — between saving the old count and selecting the new preset — and the chip
+     * quietly did nothing.
+     */
+    @Test
+    fun aTapDuringAPresetSwitchDoesNotCancelTheSwitch() = runTest {
+        val store = TasbeehStore(dataStore())
+        val vm = viewModel(store)
+        runCurrent()
+
+        vm.select("astaghfirullah")
+        // The switch is still in flight — its coroutine has not run yet.
+        vm.tap()
+        runCurrent()
+
+        // It survives the tap and lands: the tap counted against the preset still on screen.
+        assertEquals(0, vm.state.first { it.preset.id == "astaghfirullah" }.state.count)
+        assertEquals("astaghfirullah", store.selectedId.first())
+
+        vm.tap()
+        assertEquals("astaghfirullah", vm.state.value.preset.id)
+        assertEquals(1, vm.state.value.state.count)
+    }
+
+    /**
+     * Deleting a phrase that is not the one being counted must not take the pending count with
+     * it: `removeCustom` writes what is on screen before it removes anything, exactly as a chip
+     * switch writes the preset it leaves.
+     */
+    @Test
+    fun removingACustomWritesThePendingCountFirst() = runTest {
+        var stamp = 4_242L
+        val store = TasbeehStore(dataStore()) { stamp++ }
+        val vm = viewModel(store)
+        runCurrent()
+
+        vm.addCustom("يا لطيف", 40)
+        vm.state.first { it.preset.id == "custom_4242" }
+        vm.addCustom("يا رحيم", 40)
+        vm.state.first { it.preset.id == "custom_4243" }
+
+        repeat(3) { vm.tap() }
+        // The debounced write is still pending, and the phrase going is not the one on screen.
+        vm.removeCustom("custom_4242")
+        runCurrent()
+
+        assertEquals(
+            TasbeehState("custom_4243", 3, 1),
+            store.stateOf("custom_4243").first { it.count == 3 },
+            "the three taps reach disk rather than being cancelled by the delete",
+        )
+        assertEquals(listOf("custom_4243"), vm.state.first { it.custom.size == 1 }.custom.map { it.id })
+        assertEquals("custom_4243", vm.state.value.preset.id)
+    }
+
+    /**
+     * The stored selection can outlive the phrase it names — a delete from the widget, a
+     * half-written file. The screen opens on the default instead of throwing on the read.
+     */
+    @Test
+    fun aStoredSelectionOfAMissingCustomFallsBackToTheDefault() = runTest {
+        val store = TasbeehStore(dataStore())
+        store.select("custom_9999")
+        store.save(TasbeehState("after_prayer", 7, 1))
+
+        val vm = viewModel(store)
+        runCurrent()
+
+        // The fallback brings its own stored count with it, so the read plainly completed.
+        assertEquals(TasbeehState("after_prayer", 7, 1), vm.state.first { it.state.count == 7 }.state)
+        assertEquals("after_prayer", vm.state.value.preset.id)
+        assertTrue(vm.state.value.custom.isEmpty())
+    }
 }

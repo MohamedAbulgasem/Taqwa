@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import world.taqwa.app.qibla.Haptics
 import world.taqwa.app.settings.TasbeehStore
@@ -58,6 +59,12 @@ data class TasbeehUiState(
  * disk once; [flush] puts it there immediately, and the screen calls that on the way out so a
  * quick exit mid-burst loses nothing (spec §6).
  *
+ * **Why only the debounce is cancellable.** The debounce is the one piece of work that is meant to
+ * be thrown away — every tap replaces it. Switching a chip, adding a phrase and deleting one are
+ * not: each is a save followed by a read that must both happen, so they run on jobs of their own
+ * that nothing cancels. Sharing one job slot between the two kinds once meant a page tap 300 ms
+ * after a chip tap could cut the switch in half and leave the chip silently doing nothing.
+ *
  * [scope] is the seam the tests use: a `TestScope` runs the debounce on virtual time, so
  * `advanceTimeBy(300)` is the clock without a clock parameter to thread through every call. Its
  * default is the view model's own scope rather than the screen's, because the screen's is
@@ -71,14 +78,22 @@ class TasbeehViewModel(
     private val _state = MutableStateFlow(TasbeehUiState())
     val state: StateFlow<TasbeehUiState> = _state.asStateFlow()
 
-    /** The pending debounced write, cancelled and replaced by every tap. */
-    private var writeJob: Job? = null
+    /**
+     * The pending debounced write, and nothing else: only [scheduleWrite] puts a job here, and
+     * only [scheduleWrite] and [flush] cancel it.
+     */
+    private var debounceJob: Job? = null
 
     /**
      * Whether a tap has landed yet. A disk read is not instant, and a thumb on the screen half a
      * second after it opens is not unusual: without this the stored count would arrive and wipe
      * out the taps already made. The reader's own counting wins; only the chip row still takes
      * what the disk says, since that cannot be counted over.
+     *
+     * Read inside the [MutableStateFlow.update] that would overwrite the taps, so that the check
+     * and the write are one step: the flag is set on the main thread and the read runs on
+     * [Dispatchers.Default], and a check made outside the update could pass just before a tap and
+     * be acted on just after it.
      */
     private var counted = false
 
@@ -88,12 +103,12 @@ class TasbeehViewModel(
         scope.launch {
             val custom = store.customPresets.first()
             val selected = store.selectedId.first()
+            // A selection naming a phrase that has since been deleted falls back rather than
+            // throwing — the store makes the same fallback, so the two cannot disagree.
             val preset = TasbeehPresets.byId(selected, custom) ?: TasbeehPresets.default
             val stored = store.stateOf(preset.id).first()
-            _state.value = if (counted) {
-                _state.value.copy(custom = custom)
-            } else {
-                TasbeehUiState(preset, stored, custom)
+            _state.update { current ->
+                if (counted) current.copy(custom = custom) else TasbeehUiState(preset, stored, custom)
             }
         }
     }
@@ -105,10 +120,13 @@ class TasbeehViewModel(
      */
     fun tap() {
         counted = true
-        val current = _state.value
-        val (next, event) = TasbeehEngine.tap(current.state, current.preset)
-        _state.value = current.copy(state = next)
-        when (event) {
+        var fired: TapEvent = TapEvent.Tick
+        _state.update { current ->
+            val (next, event) = TasbeehEngine.tap(current.state, current.preset)
+            fired = event
+            current.copy(state = next)
+        }
+        when (fired) {
             TapEvent.Tick -> haptics.count()
             is TapEvent.PartComplete -> haptics.partComplete()
             TapEvent.SetComplete -> haptics.setComplete()
@@ -118,7 +136,7 @@ class TasbeehViewModel(
 
     /** Back to count 0, round 1 for this preset, and that is worth writing straight away. */
     fun reset() {
-        _state.value = _state.value.let { it.copy(state = TasbeehEngine.reset(it.state)) }
+        _state.update { it.copy(state = TasbeehEngine.reset(it.state)) }
         flush()
     }
 
@@ -130,59 +148,68 @@ class TasbeehViewModel(
         val current = _state.value
         if (id == current.preset.id) return
         val preset = TasbeehPresets.byId(id, current.custom) ?: return
-        writeJob?.cancel()
-        writeJob = scope.launch {
-            store.save(current.state)
+        val leaving = current.state
+        // The debounce would only write what is being written here, a moment later.
+        debounceJob?.cancel()
+        scope.launch {
+            store.save(leaving)
             store.select(id)
-            _state.value = _state.value.copy(preset = preset, state = store.stateOf(id).first())
+            val restored = store.stateOf(id).first()
+            _state.update { it.copy(preset = preset, state = restored) }
         }
     }
 
     /** Adds a phrase of the reader's own and selects it, which is why they typed it. */
     fun addCustom(phrase: String, target: Int) {
         val leaving = _state.value.state
-        writeJob?.cancel()
-        writeJob = scope.launch {
+        debounceJob?.cancel()
+        scope.launch {
             store.save(leaving)
             val added = store.addCustom(phrase, target)
             store.select(added.id)
-            _state.value = _state.value.copy(
-                preset = added,
-                state = store.stateOf(added.id).first(),
-                custom = store.customPresets.first(),
-            )
+            val restored = store.stateOf(added.id).first()
+            val custom = store.customPresets.first()
+            _state.update { it.copy(preset = added, state = restored, custom = custom) }
         }
     }
 
     /**
      * Forgets a phrase and its count. Deleting the one on screen falls back to the default preset
      * — the store makes the same fallback for the stored selection, so the two cannot disagree.
+     *
+     * The count on screen goes to disk first, exactly as [select] writes the preset it leaves: the
+     * phrase deleted is often *not* the one being counted, and a delete is no reason to drop the
+     * taps of the one that is.
      */
     fun removeCustom(id: String) {
-        writeJob?.cancel()
-        writeJob = scope.launch {
+        val leaving = _state.value.state
+        debounceJob?.cancel()
+        scope.launch {
+            store.save(leaving)
             store.removeCustom(id)
             val custom = store.customPresets.first()
-            val current = _state.value
-            if (current.preset.id == id) {
+            if (_state.value.preset.id == id) {
                 val fallback = TasbeehPresets.default
-                _state.value = TasbeehUiState(fallback, store.stateOf(fallback.id).first(), custom)
+                val restored = store.stateOf(fallback.id).first()
+                _state.update { TasbeehUiState(fallback, restored, custom) }
             } else {
-                _state.value = current.copy(custom = custom)
+                _state.update { it.copy(custom = custom) }
             }
         }
     }
 
     /** Writes the count now rather than in 300 ms. The screen's `DisposableEffect` calls this. */
     fun flush() {
-        writeJob?.cancel()
+        debounceJob?.cancel()
+        debounceJob = null
         val state = _state.value.state
-        writeJob = scope.launch { store.save(state) }
+        // Not held in [debounceJob]: a write asked for by name is never the one to throw away.
+        scope.launch { store.save(state) }
     }
 
     private fun scheduleWrite() {
-        writeJob?.cancel()
-        writeJob = scope.launch {
+        debounceJob?.cancel()
+        debounceJob = scope.launch {
             delay(WRITE_DEBOUNCE_MS)
             store.save(_state.value.state)
         }
