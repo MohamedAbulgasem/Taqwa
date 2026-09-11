@@ -41,6 +41,7 @@ import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
+import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.settings.AppearanceSettingsScreen
@@ -576,7 +577,20 @@ fun App(container: AppContainer) {
                                     container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
                                 }
                             },
-                            onPreviewSound = { soundPreviewPlayer.play(it) },
+                            onPickVoice = { voice ->
+                                scope.launch {
+                                    settings.setNotificationSettings(notificationSettings.copy(voice = voice))
+                                    // The same reschedule a sound change needs, and for the same
+                                    // reason: a channel's sound is immutable, so the new voice
+                                    // only reaches the user through channels built from the new
+                                    // plan.
+                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                                }
+                            },
+                            // The sheet's Takbir and Adhan buttons audition the voice that is
+                            // actually chosen, never the original by default.
+                            onPreviewSound = { soundPreviewPlayer.play(it, notificationSettings.voice) },
+                            onPreviewVoice = { voice -> soundPreviewPlayer.play(PrayerSound.ADHAN, voice) },
                             onStopPreview = { soundPreviewPlayer.stop() },
                         )
 

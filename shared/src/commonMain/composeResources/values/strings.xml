@@ -111,6 +111,16 @@
     <string name="sound_adhan_detail">The adhan, first %1$s seconds</string>
     <string name="sound_sheet_footnote">A prayer notification plays the first %1$s seconds of its sound. The complete adhan can be played inside the app.</string>
 
+    <!-- Adhan voice -->
+    <string name="adhan_voice_row">Adhan</string>
+    <string name="adhan_voice_sheet_title">Adhan</string>
+    <string name="adhan_voice_original">Original</string>
+    <string name="adhan_voice_azeez">Aaqib Azeez</string>
+    <string name="adhan_voice_azemi">Besim Azemi</string>
+    <string name="adhan_voice_original_detail">Melismatic, %1$s</string>
+    <string name="adhan_voice_azeez_detail">Plain and brisk, %1$s</string>
+    <string name="adhan_voice_azemi_detail">Live from Malmö Mosque, %1$s</string>
+
     <!-- Prayer time settings -->
     <string name="prayer_times_method">Calculation method</string>
     <string name="prayer_times_high_latitude">High latitude rule</string>

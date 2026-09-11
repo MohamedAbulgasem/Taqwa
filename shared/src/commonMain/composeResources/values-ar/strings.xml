@@ -106,6 +106,16 @@
     <string name="sound_adhan_detail">الأذان، أول %1$s ثانية</string>
     <string name="sound_sheet_footnote">يُشغِّل إشعار الصلاة أول %1$s ثانية من الصوت. ويمكن تشغيل الأذان كاملًا داخل التطبيق.</string>
 
+    <!-- Adhan voice -->
+    <string name="adhan_voice_row">الأذان</string>
+    <string name="adhan_voice_sheet_title">الأذان</string>
+    <string name="adhan_voice_original">الأصلي</string>
+    <string name="adhan_voice_azeez">عاقب عزيز</string>
+    <string name="adhan_voice_azemi">بسيم عظمي</string>
+    <string name="adhan_voice_original_detail">مُرتَّل، %1$s</string>
+    <string name="adhan_voice_azeez_detail">بسيط وسريع، %1$s</string>
+    <string name="adhan_voice_azemi_detail">مباشر من مسجد مالمو، %1$s</string>
+
     <!-- Prayer time settings -->
     <string name="prayer_times_method">طريقة الحساب</string>
     <string name="prayer_times_high_latitude">قاعدة خطوط العرض العليا</string>

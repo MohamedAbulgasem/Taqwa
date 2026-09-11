@@ -4,12 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.manropeFamily
+import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.adhan_voice_azeez
+import world.taqwa.app.resources.adhan_voice_azemi
+import world.taqwa.app.resources.adhan_voice_original
 import world.taqwa.app.resources.high_lat_automatic
 import world.taqwa.app.resources.high_lat_middle
 import world.taqwa.app.resources.high_lat_seventh
@@ -118,5 +122,19 @@ fun soundDisplayName(sound: PrayerSound): String = stringResource(
         PrayerSound.NOTIFICATION -> Res.string.sound_notification
         PrayerSound.TAKBIR -> Res.string.sound_takbir
         PrayerSound.ADHAN -> Res.string.sound_adhan
+    },
+)
+
+/**
+ * The voice's name. A reciter's name is a name in either language — "Aaqib Azeez" is عاقب عزيز,
+ * not a translation of it — so both sets are transliterations of the same person rather than
+ * different words, and "Original" is the one entry that is genuinely translated.
+ */
+@Composable
+fun adhanVoiceDisplayName(voice: AdhanVoice): String = stringResource(
+    when (voice) {
+        AdhanVoice.ORIGINAL -> Res.string.adhan_voice_original
+        AdhanVoice.AZEEZ -> Res.string.adhan_voice_azeez
+        AdhanVoice.AZEMI -> Res.string.adhan_voice_azemi
     },
 )
