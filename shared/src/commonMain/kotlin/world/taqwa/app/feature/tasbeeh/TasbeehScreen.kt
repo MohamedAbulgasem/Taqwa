@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -205,21 +206,33 @@ fun TasbeehScreen(
                 // The gutter is on the blocks that need it, not on the column: the reminder row
                 // is the widest thing on the page — three transliterations in capitals — and on a
                 // 402 pt iPhone the last of them wrapped when it had to clear 24 dp a side too.
+                //
+                // The stack is centred as a group rather than pinned at the top with the ring
+                // floating in what is left: a dhikr held far from the ring it belongs to read as
+                // two unrelated things with a hole between them.
                 Column(
                     Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    Spacer(Modifier.height(14.dp))
                     DhikrBlock(state.preset.parts[state.currentPart].dhikr, Modifier.padding(horizontal = 24.dp))
-                    Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.height(28.dp))
                     Counter(state, animatedProgress, bump.value)
-                    if (state.preset.parts.size > 1) {
-                        Spacer(Modifier.height(18.dp))
+                    Spacer(Modifier.height(20.dp))
+                    // The row's height is held for a single-part preset too — drawn and then
+                    // hidden rather than measured into a constant, so the reserved slot is the
+                    // row's own height whatever the interface's face does to it. Without this the
+                    // ring jumped by half the row every time a chip swapped a set for a phrase.
+                    val multi = state.preset.parts.size > 1
+                    Box(
+                        if (multi) Modifier else Modifier.alpha(0f).clearAndSetSemantics {},
+                        contentAlignment = Alignment.Center,
+                    ) {
                         PartReminder(state)
                     }
-                    Spacer(Modifier.weight(1f))
-                    // A fixed slot: the hint leaves at the first tap, and the ring must not slide
-                    // up the screen when it does.
+                    Spacer(Modifier.height(12.dp))
+                    // The same reservation for the hint, which leaves at the first tap: the ring
+                    // must not slide up the screen when it does.
                     Box(Modifier.height(28.dp).padding(horizontal = 24.dp), contentAlignment = Alignment.Center) {
                         if (state.state.count == 0 && state.state.round == 1) {
                             Text(
