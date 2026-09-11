@@ -56,6 +56,16 @@ object TasbeehEngine {
 `Screen.Tasbeeh`, reached from the Prayer header and by Back returning to it.
 
 - **Top row.** The back chevron at the start; at the end, a plus glyph (44 dp target) that opens the custom-dhikr sheet.
+
+  **Amended 11 September 2026: the screen names itself.** Between the two buttons, beside the
+  chevron, the row carries "Tasbeeh" / «التسبيح» (`tasbeeh_title`) in the reader header's own
+  treatment — `TaqwaText.rowLabel` at extra-bold, 4 dp of gutter either side, centred vertically
+  against the chevron, taking the width left between the two 44 dp targets and ellipsised rather
+  than wrapped. Not the app's 24 sp `screenTitle`: the subject of this screen is the ring in the
+  middle of it, and a title big enough to compete with the count would push the ring down the page.
+  Nothing else in the row moves, and the dhikr, the ring and the stack are where they were to the
+  pixel. Arriving here from the Prayer header's misbaha glyph, the only thing that said what had
+  been opened was the dhikr itself.
 - **The dhikr**, centred: the Arabic in the interface's Arabic face at 30 sp; beneath it, under a Latin interface only, the transliteration in the caption style (secondary) and the meaning at 12 sp (tertiary). Under an Arabic interface the Arabic stands alone. A custom preset shows its phrase alone in both.
 - **The ring**, 196 dp, the `CountdownRing`'s track and arc extracted into a shared `RingArc` so both screens draw the same stroke and corner. The arc fills `count / total`, animated over 250 ms on each tap. For a multi-part preset two 1 dp ticks in the track colour mark the part boundaries on the track (at 33 % and 66 % for the post-prayer set). Inside: «ROUND n» in the section-label style in the accent; the count in Manrope Light 56 sp with tabular figures (the `TABULAR` feature the countdown uses), which bumps to 1.06× and back over 120 ms on each tap; beneath it "of N" / «من N» in the caption style, N being the preset's total.
 - **The part reminder**, only for multi-part presets, directly under the ring: the three parts in the section-label style at 10 sp with `·` between, each with a dot before it — completed parts a filled dot in the tertiary colour, the current part a filled dot and text in the accent, upcoming parts a hollow dot in the tertiary colour. Latin interface: transliterations in capitals; Arabic interface: the Arabic chip labels.
@@ -63,6 +73,21 @@ object TasbeehEngine {
 - **The chips**, one horizontally scrolling row: every preset in §2's order, the selected one filled in the accent with white text, the others bordered in the hairline on the surface colour; 44 dp tall targets. Selecting a preset switches to its own remembered state (each preset keeps its own count and round). Long-press on a custom chip opens its sheet with Delete.
 - **Reset**, a text button at the bottom in the secondary colour: opens a `TaqwaBottomSheet` with one line «Reset the count for this dhikr?» / «إعادة العدّ لهذا الذكر؟» and a Reset row; the sheet exists because a mistap on Reset after ninety counts is the one thing on this screen that cannot be undone by counting.
 - **The tap surface** is everything between the top row and the chips, one clickable region with no ripple; the chips, Reset and the two top buttons are outside it. A tap counts even while the ring is still animating the previous one.
+
+  **Amended 11 September 2026: the landscape body.** Turned sideways the screen is two panes: the
+  counting one from the start edge to a **220 dp** chips column, and the column itself. The tap
+  surface is the whole of the start pane — full width to the column and full height under the header
+  row — with the counter stack merely centred inside it, so the empty margins above, below and beside
+  it count too. The panes were equal once, which meant half a landscape screen did nothing at all:
+  a thumb aiming at the middle landed on a chip or on the dead air beside one. The column is a fixed
+  220 dp rather than a share of the screen because it needs the width of its longest label —
+  "SubhanAllahi wa bihamdihi", 198 dp of chip — and not one pixel more; every pixel it does not take
+  is counting surface. Its chips run down rather than across, with the plus above them and Reset
+  below. The header row of chevron and name sits over the counting pane and is **not** part of the
+  tap surface — a name that counts when it is read is a name you stop reading — and the ring is
+  sized against the height left under that row (down from 196 dp where the screen is too short for
+  it), so the dhikr, the reminder row and the hint all keep their place rather than being pushed off
+  the bottom edge.
 - **Haptics.** `Haptics` gains three calls beside the compass's `tick()`: `count()` — the lightest available (Android `EFFECT_TICK` on API 29+, else 20 ms; iOS light impact); `partComplete()` — two pulses (Android waveform 0/40/60/40 ms; iOS two medium impacts 70 ms apart); `setComplete()` — three, the last long (Android 0/60/70/60/70/140 ms; iOS notification success then a heavy impact 120 ms later). Each event maps to exactly one call; a tap that starts a new round is a `count()`.
 - **Screen stays awake** while this screen is shown: a `KeepScreenOn()` composable, `expect`/`actual` — Android sets `LocalView.current.keepScreenOn` for the composition's life, iOS sets `UIApplication.sharedApplication.idleTimerDisabled` and restores it on dispose.
 - **Arabic interface** mirrors everything as the rest of the app does; the count's digits follow the app's digit choice like every other number.

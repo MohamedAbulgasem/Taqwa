@@ -105,6 +105,7 @@ import world.taqwa.app.resources.tasbeeh_preset_subhanallahi_wa_bihamdihi
 import world.taqwa.app.resources.tasbeeh_reset
 import world.taqwa.app.resources.tasbeeh_reset_confirm
 import world.taqwa.app.resources.tasbeeh_round
+import world.taqwa.app.resources.tasbeeh_title
 import world.taqwa.app.settings.takeCodePoints
 import world.taqwa.app.tasbeeh.Dhikr
 import world.taqwa.app.tasbeeh.TasbeehPreset
@@ -133,6 +134,27 @@ private val ChipColumnWidth = 220.dp
 
 /** The column's gutter, narrow because every dp of it is a dp the longest chip cannot have. */
 private val ChipColumnGutter = 8.dp
+
+/**
+ * The top row's height: [BackChevron]'s own 8 dp of padding above its 44 dp target, which is what
+ * both buttons and the name between them are laid out inside. Sideways this is height the counting
+ * surface does not get, so the ring is sized against what is left rather than against the screen.
+ */
+private val HeaderRowHeight = 52.dp
+
+/**
+ * What the counter stack needs besides its ring: the dhikr block, the reminder row, the hint and
+ * the three spacers between them. Sideways the ring is given whatever is left of the pane after
+ * this, so a short screen shrinks the ring rather than pushing the hint off the bottom of it.
+ *
+ * Measured on the 1344x2992 emulator turned sideways, on the tallest stack there is — the
+ * post-prayer set at 0, which is the only one showing both the reminder row and the hint: 80 dp of
+ * dhikr, 28 + 20 + 12 dp of spacers, 12 dp of reminder and a 28 dp hint come to 180 dp, and the
+ * 10 dp on top of that is what keeps a face with taller metrics than this one from cropping. The
+ * old 150 dp was measured before the header row took its 52 dp, and left the hint drawn past the
+ * bottom edge.
+ */
+private val StackReserve = 190.dp
 
 /** One tap's bump: 1 → 1.06 → 1, 120 ms end to end (spec §4). */
 private const val BumpScale = 1.06f
@@ -266,8 +288,8 @@ fun TasbeehScreen(
 }
 
 /**
- * Upright: the screen as it has always been — a header of two buttons, the whole middle of the
- * page counting, the chips and Reset along the bottom.
+ * Upright: the screen as it has always been — a header of two buttons with the screen's own name
+ * between them, the whole middle of the page counting, the chips and Reset along the bottom.
  */
 @Composable
 private fun PortraitBody(
@@ -282,9 +304,13 @@ private fun PortraitBody(
     onReset: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().contentWidth()) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             BackChevron(onBack)
-            Spacer(Modifier.weight(1f))
+            ScreenName(Modifier.weight(1f))
             GlyphButton(
                 description = stringResource(Res.string.tasbeeh_add_custom),
                 onClick = onAddCustom,
@@ -320,17 +346,23 @@ private fun PortraitBody(
  * **Everything up to the chips counts.** The two panes were equal once, which meant half a
  * landscape screen did nothing at all: someone counting while walking aims at the middle and
  * lands on a chip, or on the dead air beside one. The tap surface now runs from the start edge to
- * the chips column and the full height of the screen — the stack is merely centred inside it, so
- * the empty margins above, below and beside it count too. Only the chips column, which is the
- * three things a tap must *not* do, and the chevron over the corner are outside it.
+ * the chips column and from under the header row to the bottom of the screen — the stack is
+ * merely centred inside it, so the empty margins above, below and beside it count too. Only the
+ * chips column, which is the three things a tap must *not* do, and the header row are outside it.
+ *
+ * The header row is the one place this differs from the pane that came before it: the chevron used
+ * to float over the counting surface, which counted a tap that missed it. Now that the row names
+ * the screen as well, it is a row rather than a glyph — a name that counts when it is read is a
+ * name you stop reading — so the surface begins beneath it.
  *
  * The column is a fixed [ChipColumnWidth] rather than a share of the screen: it needs the width
  * of its longest label and not one pixel more, and every pixel it does not take is counting
  * surface. The chips run down rather than across because the column's shape is a column, and
  * reading down a list is how a set is chosen from.
  *
- * [paneHeight] is the height the body gets. The ring takes what is left after the dhikr block
- * and the stack's own spacers — about 150 dp — and never grows past the 196 dp it draws upright.
+ * [paneHeight] is the height the body gets. The ring takes what is left of it after the header
+ * row, the dhikr block and the stack's own spacers, and never grows past the 196 dp it draws
+ * upright.
  */
 @Composable
 private fun LandscapeBody(
@@ -345,13 +377,21 @@ private fun LandscapeBody(
     onAddCustom: () -> Unit,
     onReset: () -> Unit,
 ) {
-    val diameter = minOf(RingSize, paneHeight - 150.dp).coerceAtLeast(96.dp)
-    Box(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxSize()) {
+    val diameter = minOf(RingSize, paneHeight - HeaderRowHeight - StackReserve).coerceAtLeast(96.dp)
+    Row(Modifier.fillMaxSize()) {
+        Column(Modifier.weight(1f).fillMaxHeight()) {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                BackChevron(onBack)
+                ScreenName(Modifier.weight(1f))
+            }
             Box(
                 Modifier
                     .weight(1f)
-                    .fillMaxHeight()
+                    .fillMaxWidth()
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
@@ -362,27 +402,47 @@ private fun LandscapeBody(
                 // stays the width it reads best at while the tap keeps the whole pane.
                 CounterStack(state, progress, scale, diameter, Modifier.fillMaxHeight().contentWidth())
             }
-            Column(Modifier.width(ChipColumnWidth).fillMaxHeight()) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    GlyphButton(
-                        description = stringResource(Res.string.tasbeeh_add_custom),
-                        onClick = onAddCustom,
-                    )
-                }
-                ChipColumn(state, onSelect, onLongPress, Modifier.weight(1f))
-                TaqwaTextLink(
-                    stringResource(Res.string.tasbeeh_reset),
-                    onClick = onReset,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 6.dp, bottom = 8.dp),
+        }
+        Column(Modifier.width(ChipColumnWidth).fillMaxHeight()) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                GlyphButton(
+                    description = stringResource(Res.string.tasbeeh_add_custom),
+                    onClick = onAddCustom,
                 )
             }
+            ChipColumn(state, onSelect, onLongPress, Modifier.weight(1f))
+            TaqwaTextLink(
+                stringResource(Res.string.tasbeeh_reset),
+                onClick = onReset,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 6.dp, bottom = 8.dp),
+            )
         }
-        // Over both panes, where it is upright: back is a property of the screen, not of either
-        // half of it, and the start pane underneath counts a tap that misses the chevron.
-        Box(Modifier.align(Alignment.TopStart)) { BackChevron(onBack) }
     }
+}
+
+/**
+ * The screen's own name beside the chevron, in the reader header's words and weight: the row used
+ * to be a chevron, a hole and a plus, which named nothing — arriving from the Prayer header's
+ * misbaha glyph, the only thing that said what had been opened was the dhikr itself.
+ *
+ * It is [TaqwaText.rowLabel] at extra-bold rather than the app's 24 sp [TaqwaText.screenTitle]:
+ * this screen's subject is the ring in the middle of it, and a title big enough to compete with
+ * the count would push the ring down the page. The reader makes the same trade for the same
+ * reason, and the two headers now read as one family.
+ */
+@Composable
+private fun ScreenName(modifier: Modifier = Modifier) {
+    val colors = LocalTaqwaColors.current
+    Text(
+        stringResource(Res.string.tasbeeh_title),
+        style = TaqwaText.rowLabel.copy(fontWeight = FontWeight.ExtraBold),
+        color = colors.textPrimary,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier.padding(horizontal = 4.dp),
+    )
 }
 
 /**
