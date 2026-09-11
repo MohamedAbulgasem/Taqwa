@@ -58,4 +58,15 @@ internal object SettingsKeys {
 
     /** Bookmarked ayahs as "<surah>:<ayah>:<epochMillis>" entries (spec 2b §2.2). */
     val QURAN_BOOKMARKS = stringSetPreferencesKey("quran_bookmarks")
+
+    /** The preset the counter reopens on; absent until one is picked (spec Tasbeeh §6). */
+    val TASBEEH_SELECTED = stringPreferencesKey("tasbeeh_selected")
+
+    /** Every preset keeps its own place, as "<count>:<round>", under its own key: switching
+     * presets must not disturb the count of the one left behind. */
+    fun tasbeehStateKey(presetId: String) = stringPreferencesKey("tasbeeh_state_$presetId")
+
+    /** Custom phrases as "<id>\u001F<phrase>\u001F<target>" entries. U+001F because the phrase
+     * is free text in any script and may contain any punctuation a reader can type. */
+    val TASBEEH_CUSTOM = stringSetPreferencesKey("tasbeeh_custom")
 }

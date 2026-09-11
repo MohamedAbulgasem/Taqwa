@@ -12,6 +12,7 @@ import world.taqwa.app.quran.QuranRepository
 import world.taqwa.app.resources.Res
 import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
+import world.taqwa.app.settings.TasbeehStore
 import world.taqwa.app.settings.createDataStore
 import world.taqwa.app.widget.createWidgetPinRequester
 import world.taqwa.app.widget.createWidgetPlacementSource
@@ -23,6 +24,7 @@ class AppContainer {
     private val dataStore = createDataStore()
     val settingsRepository = SettingsRepository(dataStore)
     val bookmarkStore = BookmarkStore(dataStore)
+    val tasbeehStore = TasbeehStore(dataStore)
     val cityRepository = CityRepository(
         loadCsv = { Res.readBytes("files/cities.csv").decodeToString() },
         // `Res.readBytes` throws rather than returning null for a file that is not bundled, and
