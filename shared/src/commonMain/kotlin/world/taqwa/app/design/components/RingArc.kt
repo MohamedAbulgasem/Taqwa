@@ -1,7 +1,7 @@
 package world.taqwa.app.design.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -26,6 +26,12 @@ import kotlin.math.sin
  * [diameter] is the ring's own size; the stroke keeps its share of it (9 dp at 196 dp), so a
  * shrunken ring reads as the same ring rather than as a thicker one.
  *
+ * The square is [requiredSize], not `size`: `size` is coerced by whatever the parent hands down,
+ * so a caller whose column ran short of height — the tasbeeh held sideways did — measured the
+ * ring at its full width and a third of its height and the circle came out an ellipse. A ring is
+ * a circle or it is nothing, so this one refuses the parent's squeeze: it is always [diameter]
+ * square, and a caller that cannot spare the room passes a smaller [diameter] instead.
+ *
  * [ticks] are fractions of the whole ring, 0..1, at which a 1 dp mark in the *track* colour
  * crosses the stroke. Empty for a single-part counter and for the countdown. The mark is
  * invisible against the track it matches and appears only once the arc has swept past it, which
@@ -44,7 +50,7 @@ fun RingArc(
     // mirror itself with the layout direction. Time is read the way text is read: an Arabic
     // reader's clock hand sweeps from the top towards the left, so the arc fills anticlockwise.
     val sweepSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
-    Canvas(modifier.size(diameter)) {
+    Canvas(modifier.requiredSize(diameter)) {
         val stroke = (diameter * (9f / 196f)).toPx()
         val inset = stroke / 2f
         val arcSize = Size(size.width - stroke, size.height - stroke)
