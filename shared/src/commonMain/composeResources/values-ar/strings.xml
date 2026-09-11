@@ -253,7 +253,6 @@
     <string name="quran_action_copied">تم النسخ</string>
     <string name="quran_action_share">مشاركة</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
-    <string name="tasbeeh_title">التسبيح</string>
     <string name="today_open_tasbeeh">التسبيح</string>
     <string name="tasbeeh_add_custom">إضافة ذكر</string>
     <string name="tasbeeh_round">الجولة %1$s</string>

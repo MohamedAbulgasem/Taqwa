@@ -7,6 +7,7 @@ class TasbeehEngineTest {
 
     private val afterPrayer = TasbeehPresets.builtIn.first { it.id == "after_prayer" }
     private val subhanallah = TasbeehPresets.builtIn.first { it.id == "subhanallah" }
+    private val allahuAkbar = TasbeehPresets.builtIn.first { it.id == "allahu_akbar" }
     private val oneOff = TasbeehPresets.custom("custom_1", "dhikr", 1)
 
     private fun start(preset: TasbeehPreset) = TasbeehState(preset.id, 0, 1)
@@ -57,6 +58,22 @@ class TasbeehEngineTest {
         assertEquals(TasbeehState("subhanallah", 33, 1), state)
         assertEquals(TapEvent.SetComplete, events[32])
         assertEquals(emptyList(), events.filterIsInstance<TapEvent.PartComplete>())
+    }
+
+    /**
+     * The 34 of the post-prayer set's third part, standing alone as its own preset. It is the one
+     * built-in whose total is not 33 or 100, and the only place a part length and a preset total
+     * differ by a count — so it is where an off-by-one between "end of part" and "end of set"
+     * would show first.
+     */
+    @Test
+    fun theThirtyFourCountPresetCompletesAt34AndNeverParts() {
+        val (state, events) = walk(allahuAkbar)
+        assertEquals(34, allahuAkbar.total)
+        assertEquals(TasbeehState("allahu_akbar", 34, 1), state)
+        assertEquals(TapEvent.SetComplete, events[33])
+        assertEquals(emptyList(), events.filterIsInstance<TapEvent.PartComplete>())
+        assertEquals(emptyList(), events.dropLast(1).filterNot { it == TapEvent.Tick })
     }
 
     @Test
