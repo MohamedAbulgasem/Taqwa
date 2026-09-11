@@ -61,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -117,6 +118,19 @@ private val CaptionSize = 13.sp
 
 /** 28 sp of the count's 56: how far the ring's three lines may shrink on a short screen. */
 private const val MinCountScale = 28f / 56f
+
+/**
+ * How much of a sideways screen the chips take, and therefore how much of it does not count.
+ *
+ * Measured against the longest label there is — "SubhanAllahi wa bihamdihi" — at the chip's own
+ * 13 sp: on the 1344x2992 emulator it draws 170 dp of text, which with the pill's own 14 dp a
+ * side is 198 dp of chip. 200 dp cut it to "SubhanAllahi wa biha…"; 220 dp with a narrow gutter
+ * holds it whole. Everything left over is tap surface.
+ */
+private val ChipColumnWidth = 220.dp
+
+/** The column's gutter, narrow because every dp of it is a dp the longest chip cannot have. */
+private val ChipColumnGutter = 8.dp
 
 /** One tap's bump: 1 → 1.06 → 1, 120 ms end to end (spec §4). */
 private const val BumpScale = 1.06f
@@ -300,13 +314,19 @@ private fun PortraitBody(
  * Sideways: the thing being counted on the side the eye starts from, the things you choose with
  * on the other — the same split the Prayer screen makes when it is turned.
  *
- * The start pane is the tap surface, so the half of the screen the counting hand rests on is all
- * of it; the end pane holds the plus, the presets as a column and Reset, which are the three
- * things a tap must *not* count. The chips run down rather than across because the end pane's
- * shape is a column: a row of them sideways would be one line of pills in a half-page of air,
- * and reading down a list is how a set is chosen from.
+ * **Everything up to the chips counts.** The two panes were equal once, which meant half a
+ * landscape screen did nothing at all: someone counting while walking aims at the middle and
+ * lands on a chip, or on the dead air beside one. The tap surface now runs from the start edge to
+ * the chips column and the full height of the screen — the stack is merely centred inside it, so
+ * the empty margins above, below and beside it count too. Only the chips column, which is the
+ * three things a tap must *not* do, and the chevron over the corner are outside it.
  *
- * [paneHeight] is the height both panes get. The ring takes what is left after the dhikr block
+ * The column is a fixed [ChipColumnWidth] rather than a share of the screen: it needs the width
+ * of its longest label and not one pixel more, and every pixel it does not take is counting
+ * surface. The chips run down rather than across because the column's shape is a column, and
+ * reading down a list is how a set is chosen from.
+ *
+ * [paneHeight] is the height the body gets. The ring takes what is left after the dhikr block
  * and the stack's own spacers — about 150 dp — and never grows past the 196 dp it draws upright.
  */
 @Composable
@@ -335,9 +355,11 @@ private fun LandscapeBody(
                         onClick = onCount,
                     ),
             ) {
+                // The cap is on the stack's own content, not on the surface under it: the reading
+                // stays the width it reads best at while the tap keeps the whole pane.
                 CounterStack(state, progress, scale, diameter, Modifier.fillMaxHeight().contentWidth())
             }
-            Column(Modifier.weight(1f).fillMaxHeight().contentWidth()) {
+            Column(Modifier.width(ChipColumnWidth).fillMaxHeight()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     GlyphButton(
                         description = stringResource(Res.string.tasbeeh_add_custom),
@@ -580,8 +602,12 @@ private fun ChipRow(
 }
 
 /**
- * The same presets down the end pane when the phone is turned: one chip a row, each keeping its
+ * The same presets down the end column when the phone is turned: one chip a row, each keeping its
  * own width, the column scrolling if a reader has added enough of their own to fill it.
+ *
+ * The gutter is the narrow [ChipColumnGutter] rather than the usual 16 dp: the column is only as
+ * wide as its longest label needs, and a wide gutter would spend that width on air and ellipsise
+ * the label instead.
  */
 @Composable
 private fun ChipColumn(
@@ -598,7 +624,7 @@ private fun ChipColumn(
     LazyColumn(
         modifier.fillMaxWidth(),
         state = listState,
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(horizontal = ChipColumnGutter, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         // Start, not centre: a column of pills of seven different widths centred on one axis
         // reads as a heap. Against the pane's start edge they read as a list — and Start is the
@@ -652,6 +678,11 @@ private fun PresetChip(
             fontWeight = FontWeight.SemiBold,
             fontFamily = FontFamily.Default,
             maxLines = 1,
+            // A last resort, not a layout: the sideways column is sized so the longest built-in
+            // label fits whole, and upright the row is unbounded. Only a phrase of the reader's
+            // own, long enough to outrun the column, is ever cut — and being cut is better than
+            // the pill running off the edge of the screen.
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
