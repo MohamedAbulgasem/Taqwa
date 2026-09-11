@@ -28,6 +28,10 @@ private class FakeCompassSource(private val sensorPresent: Boolean = true) : Com
 private class FakeHaptics : Haptics {
     var tickCount = 0
     override fun tick() { tickCount++ }
+    // The compass uses none of the tasbeeh's three; they are here only to satisfy the interface.
+    override fun count() = Unit
+    override fun partComplete() = Unit
+    override fun setComplete() = Unit
 }
 
 class QiblaViewModelTest {
