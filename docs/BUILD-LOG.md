@@ -906,3 +906,31 @@ The iOS instructions were showing under both previews, one identical sentence tw
 a copy-paste; they are said once now, under the single preview that needs them, or after both when
 both do. Neither the onboarding skip nor a test for the iOS timeout was built, and the spec says
 why in both cases.
+
+### Tasbeeh (11 September)
+
+A dhikr counter, opened from a misbaha glyph at the end of the Prayer header. The design round
+offered six icons in the header and three directions for the screen; Mohamed chose the ring, so
+the counter is the Prayer screen's own ring drawing progress toward a moment, with the dhikr above
+it where the city sits above the countdown. The post-prayer set is one continuous count to a
+hundred — the number never resets at 33 or 66, the displayed dhikr does — with a distinct haptic
+at each part's end and a third at the hundred, and the three parts named in a small row under the
+ring so the current one is always in view. No totals anywhere: dhikr is not a score. Under an
+Arabic interface the Arabic stands alone, without transliteration or meaning.
+
+The engine is a pure function over (preset, count, round) that returns the next state and one
+event, which is what made the off-by-ones at 33, 66 and 100 checkable by walking all hundred taps
+in a test. The ring's Canvas moved out of `CountdownRing` into `RingArc` so both screens draw the
+same stroke, and a before-and-after diff of the Today screen came back empty. Haptics gained three
+patterns beside the compass tick and, on Android, file under touch feedback so Samsung's slider
+governs them; on iOS every generator call was moved to the main thread, which the first draft had
+only done for the delayed pulses. The screen keeps the display awake and restores whatever it
+found.
+
+Two review findings were worth the round trip. The first draft pinned the dhikr to the top and
+centred the ring in what was left, which read as two separate things with a void between; the
+stack is centred as a group now, with the reminder row's and hint's slots reserved so the ring
+never moves. And the view model shared one cancellable job between the debounced write and the
+preset switch, so a chip tap followed within a third of a second by a page tap could silently
+cancel the switch; the debounce has its own job and the state updates are atomic. 565 tests in
+the shared module, the suite green on both targets.
