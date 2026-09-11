@@ -950,3 +950,34 @@ its 33 · 33 · 34, and a new custom dhikr starts at 100. A count saved under th
 so-many of 100. The landscape header cost the stack height it had been borrowing from the ring,
 so the landscape ring reserve is now measured against the tallest stack and the ring there is
 about 154 dp instead of 196. 576 shared tests, suite green on both targets.
+
+### A choice of adhan (12 September, branch `adhan-voices`)
+
+Mohamed asked for two more adhan recordings behind a setting, with the original staying the
+default. Finding them was most of the work. Sixteen candidates were pulled from Wikimedia Commons,
+Freesound, archive.org and the CDN most open-source prayer apps quietly copy from, and measured
+rather than described: duration, loudness, the floor between phrases, and the number of phrases,
+which turns out to separate a Sunni adhan from a Fajr one from a Shia one without a transcript. Two
+Commons files that looked ideal still carried the ID3 tags of the albums they were ripped from; the
+cleanest recording found was the Shia form; the archive.org items were all self-applied "public
+domain" marks that grant nothing. Two survived. "The Adhan" by Aaqib Azeez, CC BY-SA 4.0, is plain
+and brisk at 1:26, the only other complete general adhan with a named reciter. The Eid Fajr adhan
+from Malmö Mosque by Besim Azemi, CC BY 3.0 from the mosque's own channel and the only licence in
+the set audited end to end, is live Balkan maqam. It is a Fajr adhan, so before it could serve as a
+general voice the two *as-salatu khayrun min an-nawm* phrases had to go; a local Whisper transcript
+with word timestamps placed them, silence detection found the two-second pauses on either side, and
+they were spliced out inside those pauses. The transcript also showed a "subscribe to the channel"
+line at the tail of the original CC0 recording, which a closer look at the energy proved to be a
+recognition hallucination over a decaying note, not a YouTube outro.
+
+The setting itself is one row on the Notifications screen with a sheet in the sound sheet's idiom,
+a play button per voice for the complete adhan. Under it the voice threads through everything the
+sound already did: the asset table is keyed on (sound, voice), the Android channel id grows a voice
+suffix for the two recorded levels because a channel's sound is immutable, the alarm receiver reads
+the voice from its intent and falls back to the original for alarms scheduled before the upgrade,
+and iOS picks the file by voice. The original voice produces byte-identical channel ids to before,
+checked by diffing the channel list across the upgrade, so nobody's existing channels churn. The
+Azeez source sat at full scale and the loudness match wanted +4 dB, which needed a limiter after
+the resample back to 44.1 kHz; placed before it, the Vorbis encode overshot to +0.2 dBTP. Nobody has
+listened yet: everything about how the two voices sound is measured, and Mohamed's ear in the
+morning is the release gate.
