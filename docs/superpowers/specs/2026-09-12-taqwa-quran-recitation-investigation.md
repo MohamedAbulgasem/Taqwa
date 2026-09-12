@@ -168,3 +168,18 @@ Downloads live in app-private storage and are removed with the app; the Download
 ## 11. Design round
 
 Mockups of the header button, the ayah action, the player bar (incl. the “back to ayah” pill and the lock screen), the download sheet in its three states, and the picker in list and grid form: https://claude.ai/code/artifact/e72b9fd3-d64b-400c-9636-918dc6fa0d4b. My picks are at the foot of that page: both entry points, a headphones glyph, previous/next ayah on the bar, the list picker, the pill rather than a snapping scroll.
+
+## 12. Decisions taken on 12 September (Mohamed's review)
+
+Answers to §0, plus two design corrections. This section governs where it differs from anything above.
+
+1. **Reciters: ten.** The seven in §3 plus Abu Bakr Ash-Shatri (`ar.shaatree`, 128 kbps, 1,448 MB), Ali Al-Hudhaify (`ar.hudhaify`, 128 kbps, 1,714 MB) and Ahmed Al-Ajmi (`ar.ahmedajamy`, 128 kbps, 1,545 MB), each at its only published tier. Saad Al-Ghamdi was asked for and **cannot be included**: he is absent from the Islamic Network catalogue, and no other source carries a licence we can rely on. About 11.6 GB mirrored in total; Alafasy remains the default.
+2. **Bitrate:** 64 kbps where published, otherwise the single published tier. Confirmed.
+3. **Hosting:** the public repository is `MohamedAbulgasem/Taqwa-data` (capital T); `gh` is installed and signed in on this Mac. Releases named `audio-<identifier>-v1`, one per reciter.
+4. **Emails:** not yet sent. Re-issued to Mohamed on 12 September with the current facts (ten reciters, mirroring) for sending from his personal address.
+5. **Monograms for all ten**, no photos. Confirmed; the manifest keeps an optional photo URL per reciter.
+6. **Wi-Fi only by default**, with a per-download override and a Settings switch. Confirmed.
+7. **Entry points: header button and ayah action**, with a **speaker glyph** rather than headphones in the idle state (headphones read wrong when nobody is wearing any). The live state is unchanged: accent colour and the three-bar equaliser.
+8. **Slice 3a** as in §9 **plus "Download the whole Quran" for a reciter** (queue all 114 surahs, total size stated first, cancellable, survives the app being backgrounded). Word-level highlighting, repeat, speed and the sleep timer remain 3b.
+
+**Lock-screen and media-notification artwork is the Taqwa app icon**, not the reciter's monogram; the monogram is an in-app device only. Version for 3a: **0.11.0 (13)**.
