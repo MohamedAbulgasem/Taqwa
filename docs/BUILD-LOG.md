@@ -981,3 +981,20 @@ Azeez source sat at full scale and the loudness match wanted +4 dB, which needed
 the resample back to 44.1 kHz; placed before it, the Vorbis encode overshot to +0.2 dBTP. Nobody has
 listened yet: everything about how the two voices sound is measured, and Mohamed's ear in the
 morning is the release gate.
+
+### A hundred ayahs for the widget (12 September, 0.10.0)
+
+The widget's pool was fifty references, which is a seven-week loop that a daily glance notices;
+a hundred is about a season. The pool is references only, the text comes from the bundled
+database, so the change costs nothing in size and everything in curation. A ranked list of a
+hundred candidates went through the same database test as the first fifty (each reference exists,
+at most 24 Arabic words, 245 characters of Saheeh International, no duplicates) and a reading of
+the translation for completeness. Mohamed then read the fifty and set a sharper bar than the one
+the first round had used: each card must carry a whole thought a person can sit with, which rules
+out a narrative lead-in ("They said…", "When the youths retreated…"), a rhetorical opening whose
+answer is in the next verse, and a group described without the point about them. Twelve came out
+on his reading and one more on the same rule after it; their replacements came from further down
+the ranked list under the tightened bar. The rotation is a permutation over the pool size, so the
+day someone updates, the widget shows a different ayah once and the no-repeat cycle restarts. 1,295
+tests across the four targets; the emulator's mirror holds a hundred entries and none of the
+vetoed references.
