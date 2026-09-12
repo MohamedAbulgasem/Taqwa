@@ -36,7 +36,7 @@ A database test guards the list: every reference exists, the word and character 
 
 **Amended 12 September 2026:** the pool is a hundred, not fifty. A fifty-day cycle is short enough to notice — the same ayah comes back roughly every seven weeks, and a daily reader starts recognising the round rather than the ayah; a hundred is about a season, which reads as a fresh verse each morning. The second fifty is *appended* to `AyahPool.REFS`, never interleaved, so every existing index is unchanged (the §3 order only fixes indices, and reordering would move which ayah a live (seed, day) resolves to). The new references, in their appended order:
 
-3:102, 3:133, 3:160, 3:200, 7:23, 7:55, 7:56, 7:180, 7:199, 8:46, 9:105, 10:25, 10:58, 10:62, 11:114, 11:115, 15:9, 15:49, 15:99, 16:96, 17:70, 17:80, 17:81, 19:96, 20:114, 21:35, 22:77, 23:115, 27:62, 27:79, 28:56, 28:88, 30:60, 31:17, 33:21, 33:56, 33:70, 35:15, 39:62, 40:65, 41:33, 42:19, 42:30, 49:10, 51:55, 52:48, 55:29, 59:18, 59:19, 62:10.
+3:102, 3:133, 3:160, 3:200, 7:55, 7:56, 7:180, 7:199, 8:46, 9:105, 10:25, 10:58, 10:62, 11:114, 11:115, 15:9, 15:49, 15:99, 16:96, 17:70, 17:80, 17:81, 19:96, 20:114, 21:35, 22:77, 23:115, 27:62, 27:79, 28:56, 28:88, 30:60, 31:17, 33:21, 33:56, 33:70, 35:15, 39:62, 40:65, 41:33, 42:19, 42:30, 49:10, 51:55, 52:48, 55:29, 59:18, 59:19, 62:10, 64:13.
 
 Each holds to the same budgets as the first fifty (≤ 24 Arabic words, ≤ 245 Saheeh characters), stands as a complete sentence on its own, and repeats neither the first fifty nor each other in substance.
 

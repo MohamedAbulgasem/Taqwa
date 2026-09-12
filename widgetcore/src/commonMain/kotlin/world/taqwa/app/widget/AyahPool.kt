@@ -24,8 +24,8 @@ object AyahPool {
         25 to 74, 3 to 8, 23 to 118, 17 to 82, 16 to 97,
         // The second fifty, appended 12 September 2026 (spec §3, "Amended 12 September 2026");
         // twelve of them were replaced the same day so that every card carries a whole thought.
-        3 to 102, 3 to 133, 3 to 160, 3 to 200, 7 to 23,
-        7 to 55, 7 to 56, 7 to 180, 7 to 199, 8 to 46,
+        3 to 102, 3 to 133, 3 to 160, 3 to 200, 7 to 55,
+        7 to 56, 7 to 180, 7 to 199, 8 to 46,
         9 to 105, 10 to 25, 10 to 58, 10 to 62, 11 to 114,
         11 to 115, 15 to 9, 15 to 49, 15 to 99, 16 to 96,
         17 to 70, 17 to 80, 17 to 81, 19 to 96, 20 to 114,
@@ -33,6 +33,6 @@ object AyahPool {
         28 to 56, 28 to 88, 30 to 60, 31 to 17, 33 to 21,
         33 to 56, 33 to 70, 35 to 15, 39 to 62, 40 to 65,
         41 to 33, 42 to 19, 42 to 30, 49 to 10, 51 to 55,
-        52 to 48, 55 to 29, 59 to 18, 59 to 19, 62 to 10,
+        52 to 48, 55 to 29, 59 to 18, 59 to 19, 62 to 10, 64 to 13,
     )
 }
