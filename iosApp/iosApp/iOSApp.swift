@@ -31,7 +31,12 @@ struct iOSApp: App {
 						Self.scheduleNextRefresh()
 						Self.reloadWidgets()
 					}
-					.onOpenURL { url in Self.openAyah(from: url) }
+					.onOpenURL { url in
+						#if DEBUG
+						if RecitationHarness.handle(url) { return }
+						#endif
+						Self.openAyah(from: url)
+					}
 			}
 		}
 	}
@@ -173,3 +178,133 @@ struct iOSApp: App {
 		}
 	}
 }
+
+#if DEBUG
+import MediaPlayer
+
+/// Debug-only remote control for the recitation player, the iOS twin of `androidApp`'s
+/// `RecitationHarnessReceiver`: slice 3a task 3 has to be verified on a simulator before task 4
+/// gives recitation any UI. `#if DEBUG`, so none of it is in a shipping build.
+///
+/// It rides the `taqwa` URL scheme the widget already registers, because that is the only channel
+/// `simctl` has into a running app:
+///
+/// ```
+/// xcrun simctl openurl <udid> "taqwa://recite/load?surah=36&ayah=1&reciter=ar.alafasy"
+/// xcrun simctl openurl <udid> "taqwa://recite/next"
+/// ```
+///
+/// Commands: `load`, `play`, `pause`, `toggle`, `next`, `prev`, `seek?ayah=n`, `stop`, `state`,
+/// `nowplaying` (dumps `MPNowPlayingInfoCenter`), `reconcile`. Everything is `NSLog`ged with the
+/// prefix `TaqwaHarness`, which is how the ayah boundary and the gap are actually measured:
+///
+/// ```
+/// xcrun simctl spawn <udid> log show --last 2m --predicate 'eventMessage CONTAINS "TaqwaHarness"'
+/// ```
+enum RecitationHarness {
+
+	private static var watcher: Timer?
+	private static var last: String = ""
+
+	/// True if this URL was a harness command, so the real `taqwa://ayah/...` route never sees it.
+	static func handle(_ url: URL) -> Bool {
+		guard url.scheme == "taqwa", url.host == "recite" else { return false }
+		let command = url.pathComponents.filter { $0 != "/" }.first ?? ""
+		let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+		func value(_ name: String) -> String? { query.first { $0.name == name }?.value }
+		func number(_ name: String, _ fallback: Int32) -> Int32 {
+			value(name).flatMap { Int32($0) } ?? fallback
+		}
+		let player = AppContainerKt.appContainer.recitationPlayer
+		let reciterId = value("reciter") ?? "ar.alafasy"
+		let surah = number("surah", 1)
+		let ayah = number("ayah", 1)
+		NSLog("TaqwaHarness cmd=\(command) reciter=\(reciterId) surah=\(surah) ayah=\(ayah)")
+		switch command {
+		case "load":
+			watch()
+			player.load(
+				reciter: reciter(reciterId, gapMs: number("gap", -1)),
+				surah: surah,
+				startAyah: ayah,
+				text: NowPlayingText(title: "Surah \(surah)", subtitle: "Mishary Rashid Alafasy")
+			) { _ in }
+		case "play": player.play()
+		case "pause": player.pause()
+		case "toggle": player.toggle()
+		case "next": player.next()
+		case "prev": player.previous()
+		case "seek": player.seekToAyah(n: ayah)
+		case "stop": player.stop()
+		case "state": NSLog("TaqwaHarness state \(player.state.value as Any)")
+		case "nowplaying": logNowPlaying()
+		case "reconcile":
+			AppContainerKt.appContainer.recitationLibrary.reconcile { _ in
+				NSLog("TaqwaHarness reconciled \(reciterId)")
+			}
+		default: NSLog("TaqwaHarness unknown command \"\(command)\"")
+		}
+		return true
+	}
+
+	/// The lock screen's own copy of what is playing. Logged rather than looked at, because a
+	/// simulator's lock screen cannot be reached from `simctl`.
+	static func logNowPlaying() {
+		guard let info = MPNowPlayingInfoCenter.default().nowPlayingInfo else {
+			NSLog("TaqwaHarness nowPlayingInfo is nil")
+			return
+		}
+		let artwork = info[MPMediaItemPropertyArtwork] as? MPMediaItemArtwork
+		NSLog("""
+			TaqwaHarness nowPlayingInfo keys=\(info.keys.count) \
+			title=\(info[MPMediaItemPropertyTitle] ?? "nil") \
+			artist=\(info[MPMediaItemPropertyArtist] ?? "nil") \
+			duration=\(info[MPMediaItemPropertyPlaybackDuration] ?? "nil") \
+			elapsed=\(info[MPNowPlayingInfoPropertyElapsedPlaybackTime] ?? "nil") \
+			rate=\(info[MPNowPlayingInfoPropertyPlaybackRate] ?? "nil") \
+			artwork=\(artwork.map { "\($0.bounds.size)" } ?? "nil")
+			""")
+		let centre = MPRemoteCommandCenter.shared()
+		NSLog("""
+			TaqwaHarness commands play=\(centre.playCommand.isEnabled) \
+			pause=\(centre.pauseCommand.isEnabled) toggle=\(centre.togglePlayPauseCommand.isEnabled) \
+			next=\(centre.nextTrackCommand.isEnabled) prev=\(centre.previousTrackCommand.isEnabled) \
+			seek=\(centre.changePlaybackPositionCommand.isEnabled) \
+			skipFwd=\(centre.skipForwardCommand.isEnabled)
+			""")
+	}
+
+	/// `StateFlow` cannot be collected from Swift, so the state is polled and logged on change —
+	/// which is all the ayah-boundary measurement needs, at four times the player's own tick.
+	private static func watch() {
+		guard watcher == nil else { return }
+		watcher = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+			let state = AppContainerKt.appContainer.recitationPlayer.state.value as! PlaybackState
+			let line = "ayah=\(state.ayah?.intValue ?? -1)/\(state.ayahCount) "
+				+ "playing=\(state.playing) pos=\(state.positionMs) dur=\(state.durationMs) "
+				+ "surah=\(state.surah?.intValue ?? -1)"
+			guard line != last else { return }
+			last = line
+			NSLog("TaqwaHarness state \(line)")
+		}
+	}
+
+	/// The id and the gap are all playback reads of a `Reciter`; the rest is manifest data.
+	private static func reciter(_ id: String, gapMs: Int32) -> Reciter {
+		let launch = Reciters.shared.LAUNCH.first { $0.id == id }
+		return Reciter(
+			id: id,
+			nameEn: id,
+			nameAr: id,
+			style: "murattal",
+			kbps: 64,
+			gapMs: gapMs >= 0 ? gapMs : (launch?.gapMs ?? 300),
+			hue: launch?.hue.name ?? "AMBER",
+			photo: nil,
+			release: "audio-\(id)-v1",
+			totalBytes: 0,
+			surahs: []
+		)
+	}
+}
+#endif
