@@ -7,8 +7,8 @@ import kotlin.test.assertTrue
 class AyahPoolTest {
 
     @Test
-    fun hasFiftyEntries() {
-        assertEquals(50, AyahPool.REFS.size)
+    fun hasAHundredEntries() {
+        assertEquals(100, AyahPool.REFS.size)
     }
 
     @Test

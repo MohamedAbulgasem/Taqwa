@@ -7,14 +7,14 @@ import world.taqwa.app.quran.RTL_TRANSLATION_LANGUAGES
 import kotlin.random.Random
 
 /**
- * Fills the widget pool mirror (design spec §4) from the Quran database: reads the fifty
+ * Fills the widget pool mirror (design spec §4) from the Quran database: reads the hundred
  * [AyahPool.REFS] ayahs and the active translation, then writes an [AyahPoolMirror] and — the
  * first time only — a rotation seed. Stays in `shared` rather than `:widgetcore` because it needs
  * [QuranSource]; the mirror it produces is all either widget process ever reads.
  */
 object AyahPoolMirrorWriter {
     /**
-     * Reads the fifty pool ayahs and the [settings] translation, writes the mirror and, once per
+     * Reads the hundred pool ayahs and the [settings] translation, writes the mirror and, once per
      * install, the seed. Returns the mirror written.
      *
      * [format] is asked one question — what a `1` looks like — and the answer is recorded in the
@@ -31,7 +31,7 @@ object AyahPoolMirrorWriter {
         format: PlatformFormat,
         newSeed: () -> Long = { Random.nextLong() },
     ): AyahPoolMirror {
-        // Several pool ayahs share a surah (e.g. 2, 3, 9, 39, 93 each appear more than once), so
+        // Several pool ayahs share a surah (e.g. 2, 3, 7, 9, 17 each appear more than once), so
         // each distinct surah is looked up once rather than once per pool entry.
         val surahByNumber = AyahPool.REFS.map { it.first }.distinct().associateWith { quran.surah(it) }
         val translationOff = settings.translationId == ReadingSettings.NO_TRANSLATION

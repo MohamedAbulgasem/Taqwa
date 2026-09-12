@@ -27,20 +27,20 @@ class AyahRotationTest {
     fun permutationIsAlwaysAFullPermutationOfTheRange() {
         for (round in -3L..3L) {
             for (seed in listOf(1L, 42L, -99L)) {
-                val order = AyahRotation.permutation(round, seed, 50)
-                assertEquals((0 until 50).toSet(), order.toSet(), "round=$round seed=$seed")
-                assertEquals(50, order.size)
+                val order = AyahRotation.permutation(round, seed, 100)
+                assertEquals((0 until 100).toSet(), order.toSet(), "round=$round seed=$seed")
+                assertEquals(100, order.size)
             }
         }
     }
 
     @Test
-    fun indexForCoversAllFiftyExactlyOnceWithinARoundBoundary() {
+    fun indexForCoversAllAHundredExactlyOnceWithinARoundBoundary() {
         val seed = 7L
         for (round in listOf(-2L, -1L, 0L, 1L, 5L)) {
-            val boundary = round * 50
-            val seen = (0 until 50).map { AyahRotation.indexFor(boundary + it, seed, 50) }.toSet()
-            assertEquals(50, seen.size, "round=$round")
+            val boundary = round * 100
+            val seen = (0 until 100).map { AyahRotation.indexFor(boundary + it, seed, 100) }.toSet()
+            assertEquals(100, seen.size, "round=$round")
         }
     }
 
@@ -48,8 +48,8 @@ class AyahRotationTest {
     fun indexForNeverRepeatsAcrossARoundBoundary() {
         for (round in 0L until 20L) {
             for (seed in listOf(1L, 2L, 3L, 4L, 5L)) {
-                val lastOfRound = AyahRotation.indexFor(round * 50 + 49, seed, 50)
-                val firstOfNextRound = AyahRotation.indexFor((round + 1) * 50, seed, 50)
+                val lastOfRound = AyahRotation.indexFor(round * 100 + 99, seed, 100)
+                val firstOfNextRound = AyahRotation.indexFor((round + 1) * 100, seed, 100)
                 assertNotEquals(lastOfRound, firstOfNextRound, "round=$round seed=$seed")
             }
         }
@@ -58,8 +58,8 @@ class AyahRotationTest {
     @Test
     fun indexForIsDeterministic() {
         assertEquals(
-            AyahRotation.indexFor(20705L, 123L, 50),
-            AyahRotation.indexFor(20705L, 123L, 50),
+            AyahRotation.indexFor(20705L, 123L, 100),
+            AyahRotation.indexFor(20705L, 123L, 100),
         )
     }
 
@@ -72,7 +72,7 @@ class AyahRotationTest {
 
     @Test
     fun negativeEpochDaysWork() {
-        val result = AyahRotation.indexFor(-20705L, 7L, 50)
-        assertTrue(result in 0 until 50)
+        val result = AyahRotation.indexFor(-20705L, 7L, 100)
+        assertTrue(result in 0 until 100)
     }
 }

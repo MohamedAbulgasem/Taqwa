@@ -80,7 +80,7 @@ data class AyahPoolMirror(
          * [AyahPoolMirror.translationRtl], `0`/`1` for [AyahPoolMirror.arabicIndicDigits])
          * followed by one block per entry (`surah`, `ayah`,
          * `surahLatin`, `surahArabic`, `arabic`, `translation`), joined with [ENTRY_SEP]; fields
-         * within a block are joined with [FIELD_SEP]. About 30 KB for the full fifty-ayah pool.
+         * within a block are joined with [FIELD_SEP]. About 60 KB for the full hundred-ayah pool.
          */
         fun serialize(m: AyahPoolMirror): String {
             val header = listOf(

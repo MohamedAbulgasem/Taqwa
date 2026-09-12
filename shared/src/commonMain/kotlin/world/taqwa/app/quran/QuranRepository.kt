@@ -15,7 +15,7 @@ interface QuranSource {
     suspend fun translations(): List<TranslationInfo>
     suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String>
     /** One ayah's Uthmani Arabic, or null when the reference does not exist. Used by the ayah
-     * widget pool mirror writer, which needs fifty scattered ayahs rather than whole surahs. */
+     * widget pool mirror writer, which needs a hundred scattered ayahs rather than whole surahs. */
     suspend fun ayahText(surah: Int, ayah: Int): String?
     /** One ayah's text in [translationId], or null when the reference or the translation does
      * not exist. */

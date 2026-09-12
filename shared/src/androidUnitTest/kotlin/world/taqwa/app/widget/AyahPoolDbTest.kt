@@ -77,13 +77,13 @@ class AyahPoolDbTest {
 
 /**
  * [AyahPoolMirrorWriter] against the real database: the mirror it writes must actually carry the
- * fifty pool ayahs and the requested translation, and the once-only seed rule must hold.
+ * hundred pool ayahs and the requested translation, and the once-only seed rule must hold.
  */
 class AyahPoolMirrorWriterTest {
 
     private val repo = realRepository()
 
-    @Test fun writesFiftyEntriesInPoolOrderWithTheRequestedTranslation() = runTest {
+    @Test fun writesEveryPoolEntryInOrderWithTheRequestedTranslation() = runTest {
         val store = FakePoolKeyValueStore()
         val settings = ReadingSettings(translationId = "en.sahih")
 
