@@ -92,6 +92,22 @@ class ManifestProvider(
  */
 suspend fun bundledManifestBytes(): ByteArray = Res.readBytes("files/recitation/manifest.json")
 
+/**
+ * The reciter's bundled fifteen-second preview (spec §3), or null when this build has none.
+ *
+ * Today only Alafasy's clip is in the tree; the pipeline publishes the other nine later. A
+ * missing file is an ordinary answer here rather than an error, and the picker draws no play
+ * triangle for a reciter it gets null for — `Res.readBytes` throws for a file that is not
+ * bundled, which is why this catches rather than checks.
+ */
+suspend fun recitationPreviewBytes(reciterId: String): ByteArray? = try {
+    Res.readBytes("files/recitation/previews/$reciterId.mp3")
+} catch (cancelled: kotlin.coroutines.cancellation.CancellationException) {
+    throw cancelled
+} catch (missing: Exception) {
+    null
+}
+
 /** The provider the app runs on. */
 fun createManifestProvider(paths: RecitationPaths = createRecitationPaths()): ManifestProvider =
     ManifestProvider(paths, FileSystem.SYSTEM, ::bundledManifestBytes)
