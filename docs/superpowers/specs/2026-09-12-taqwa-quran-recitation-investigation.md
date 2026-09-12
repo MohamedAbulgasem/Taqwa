@@ -4,17 +4,17 @@ Status: **for Mohamed's review, 12 September 2026.** Written while he was out. E
 
 ## 0. The short version, and what I need from you
 
-**What ships.** Recitation inside the reader and the Mushaf, downloaded on demand one surah at a time, with the current ayah lit and the page following the voice; seven reciters in a picker with a photo and a fifteen-second preview each; background playback with lock-screen controls on both platforms; a slim player bar that stays out of the way of reading. The default reciter is Mishary Alafasy, as decided on 7 September.
+**What ships.** Recitation inside the reader and the Mushaf, downloaded on demand one surah at a time, with the current ayah lit and the page following the voice; seven reciters in a picker with a monogram and a fifteen-second preview each; background playback with lock-screen controls on both platforms; a slim player bar that stays out of the way of reading. The default reciter is Mishary Alafasy, as decided on 7 September.
 
-**What it costs.** Nothing recurring. Audio lives on a public GitHub repository's Releases, served through GitHub's CDN at no charge. The app grows by under 1 MB (seven preview clips and seven small photos). A surah download is 0.2 MB (Al-Kawthar) to ~25 MB (Al-Baqarah) at 64 kbps.
+**What it costs.** Nothing recurring. Audio lives on a public GitHub repository's Releases, served through GitHub's CDN at no charge. The app grows by under 1 MB (seven preview clips). A surah download runs from well under 1 MB (the short surahs) to about 58 MB (Al-Baqarah, Alafasy at 64 kbps); a whole reciter is 0.6 to 1.6 GB.
 
 **Decide (answers by number are enough):**
 
 1. **The seven reciters.** The set in §3 is my pick from the corpus we may redistribute. Swap any.
-2. **Bitrate.** 64 kbps for everyone (a full reciter is roughly 0.6–0.9 GB; Al-Baqarah ~25 MB) rather than 128 where it exists (double). Recommend 64: on a phone speaker or earbuds the difference is small, and half the download is a real gift on mobile data.
+2. **Bitrate.** 64 kbps wherever the corpus publishes it (five of the seven), 128 for Minshawi and Shuraim who have no lower tier. We may not re-encode, so this is the only lever. Recommend yes.
 3. **Hosting access.** Create the public repository `MohamedAbulgasem/taqwa-data` (empty is fine) and either install the GitHub CLI and sign in (`brew install gh && gh auth login`) or give me a fine-grained token with *Contents: read and write* on that one repository. Uploading ~6 GB of release assets is the one step I cannot do from here without it. Zero cost.
 4. **The courtesy emails** drafted on 7 September (Islamic Network; Alafasy's foundation). Were they sent, and did anyone reply? Their terms permit us regardless (§2), so this does not block, but a reply is worth recording in the Attribution screen.
-5. **Photos.** For reciters without a genuinely free photo, a calligraphic monogram of the name in the amber palette instead of a portrait. Agree? (§3 says who has one.)
+5. **No photos, monograms for all seven.** Only two reciters have a genuinely free portrait and the default reciter's Commons photos are laundered (§3). Agree to monograms throughout, with a photo slot in the manifest for the day a foundation grants one?
 6. **Wi-Fi only by default** for surah downloads, with an "also on mobile data" switch in Settings and a one-tap override on the download sheet.
 7. **The entry point.** A third round button in the reader header beside the book and "Aa" buttons (§5.1), plus "Play from here" in the ayah action row. Or the ayah row alone, for an even smaller surface?
 8. **Slicing.** 3a as in §9 (everything above), then 3b for repeat, speed, sleep timer and download-whole-Quran. Agree, or pull anything forward?
@@ -29,23 +29,49 @@ Changed by this brief: **seven reciters instead of three**, a **photo** for each
 
 ## 2. Source and licence
 
-*(Filled from the 12 September research report, `.superpowers/sdd/quran-audio-research.md`.)*
+Research report with every measurement: `.superpowers/sdd/quran-audio-research.md` (12 September).
 
-@@SOURCE@@
+**Terms, verbatim from https://alquran.cloud/terms-and-conditions §IV (12 September 2026):** "Recitations are licensed to us by the reciters or their estates for free, non-commercial redistribution at the bitrates we publish. You may stream, embed and download them for personal and educational use. You may bundle them into a commercial product, but please note that copyrights lie with the reciters and they may ask you to remove the con[t]ent." §III adds that they would rather you "cache aggressively at your own edge" and asks anyone needing "full-corpus mirrors" to get in touch through the contact page.
+
+**Verdict.** Mirroring the files on our own host for a free, ad-free app is inside the grant: redistribution is permitted, bundling is permitted even commercially, and caching downstream is invited. No attribution string is mandated for audio; we credit each reciter and the Islamic Network anyway, in the player and the Attribution screen. Two obligations follow: **keep the files at their published bitrates, byte for byte** (no re-encoding, which is why the `.taqa` container in §4 wraps the original MP3s untouched), and **be able to withdraw a reciter** if an estate asks, which the manifest design gives us without an app update. The 7 September courtesy email to the Islamic Network should also say plainly that we mirror the corpus, since §III asks mirrors to say hello.
+
+**Provenance.** The Islamic Network per-ayah files are bit-identical to the everyayah.com corpus (decoded-audio checksums match and everyayah's ID3 comment tag survives in the files). That cuts both ways: the "licensed to us by the reciters" assertion covers a corpus they did not originate, which is the residual risk we carry knowingly; and it means the **CC BY 4.0 word-level timing data from `cpfair/quran-align`** (offsets inside each per-ayah file, 6 of our 7 reciters bit-identical or same-cut) applies directly. Word-by-word highlighting moves from "not planned" to slice 3b.
+
+**Catalogue facts the design must respect** (all measured, details in the report):
+- The CDN's bitrate folders are sometimes mislabelled: Maher Al Muaiqly's `/128` is really 64 kbps (and his `/64` folder has four missing ayahs, so we take `/128`); Saud Ash-Shuraim's `/64` is really 128 kbps. The manifest records the *true* bitrate.
+- Alafasy's `/128` set was HEAD-checked file by file: all 6,236 present. Every other reported gap in the corpus manifest was re-probed live and now serves, except the two noted above.
+- **Four of the seven begin at full voice on sample zero** (Alafasy, Maher, Sudais, Shuraim), the other three carry their own padding. Played back to back the clipped four sound rushed, so the manifest carries one **inter-ayah gap** per reciter (about 300 ms for those four, near zero for the rest) that the player inserts between items.
+- Nothing else beats this source on licence clarity: everyayah has no licence page at all (its link has been dead for years), QUL/Quran Foundation caps caching at a week and forbids redistribution, mp3quran.net contradicts itself between pages.
 
 ## 3. The seven
 
-@@RECITERS@@
+Chosen from the twenty Arabic per-ayah editions for voice, breadth of style and a clean file set. Bitrates are the true measured ones; sizes are the whole Quran at that tier; Al-Baqarah is the largest single download. Alafasy stays the default, as decided on 7 September.
+
+| # | Identifier | Reciter | Style | kbps | Whole Quran | Al-Baqarah | Word timings (3b) |
+|---|---|---|---|---|---|---|---|
+| 1 | `ar.alafasy` (`/64`) | Mishary Rashid Alafasy · مشاري راشد العفاسي | Murattal | 64 | 861 MB | ~58 MB | yes (verify the 64 cut matches the 128 timings) |
+| 2 | `ar.abdulbasitmurattal` (`/64`) | Abdul Basit Abdus-Samad · عبد الباسط عبد الصمد | Murattal | 64 | 903 MB | ~60 MB | yes |
+| 3 | `ar.mahermuaiqly` (`/128` folder) | Maher Al Muaiqly · ماهر المعيقلي | Murattal | 64 | 605 MB | ~40 MB | no |
+| 4 | `ar.husary` (`/64`) | Mahmoud Khalil Al-Husary · محمود خليل الحصري | Murattal | 64 | 1,237 MB | ~85 MB | yes |
+| 5 | `ar.minshawi` (`/128`) | Mohamed Siddiq Al-Minshawi · محمد صديق المنشاوي | Murattal | 128 (only tier) | 1,625 MB | ~110 MB | yes |
+| 6 | `ar.abdurrahmaansudais` (`/64`) | Abdur-Rahman As-Sudais · عبد الرحمن السديس | Murattal | 64 | 612 MB | ~40 MB | yes (timings are for the 192 cut; verify) |
+| 7 | `ar.saoodshuraym` (`/64` folder) | Saud Ash-Shuraim · سعود الشريم | Murattal | 128 | 1,062 MB | ~70 MB | same cut |
+
+Total mirrored: about 6.9 GB. Two Egyptian classical voices (Husary, Minshawi), the two imams of the Haram (Sudais, Shuraim), the two most requested contemporary voices (Alafasy, Maher) and Abdul Basit. Al-Ghamdi, Shatri, Hudhaify and Ajmi are in the corpus and can be added later by a manifest change alone.
+
+**Bitrate.** 64 kbps everywhere it is published, because the licence forbids re-encoding and 64 halves the download; Minshawi and Shuraim have no 64 kbps tier, so they ship at 128 and their sizes say so in the picker caption.
+
+**Photos: none, by decision.** Of twenty-five reciters checked, only Husary and Minshawi have a portrait with a defensible free licence and a usable face (both public domain in Egypt, black-and-white archive photographs). Abdul Basit and Shuraim exist only in group or handshake shots. Alafasy's and Maher's Commons photos are licence laundering: studio portraits tagged "own work" by accounts that mass-upload celebrity images, one deleted as a copyright violation and re-uploaded ten days later under a new licence. Two archive photos beside five monograms would look like an accident, and a laundered portrait of the default reciter is exactly the exposure this app avoids elsewhere. So: **a calligraphic monogram for all seven**, the reciter's name in the Hafs face on a deep tinted disc, one hue per reciter, the treatment shown in the design round. If a reciter's own foundation ever grants a portrait, the manifest can carry a photo URL and the monogram gives way.
 
 **Preview clips.** The picker plays a fifteen-second preview per reciter without a download: Al-Fatiha 1:1–1:2 from each reciter's own files, bundled at their published bitrate (about 100 KB each, ~0.7 MB for seven). The clips are the reciters' unmodified files trimmed at ayah boundaries (they are per-ayah files, so no trimming inside a phrase), the same shape as the adhan previews.
 
-**Photos.** Each reciter has a 96 dp circular portrait in the picker and a 40 dp one on the player bar and lock screen. Sources and licences per reciter are in the table; the files are bundled at 192 px WebP (~10 KB each). Where no free photo exists, a monogram: the reciter's name in the Hafs face on the card surface, amber on dark, the same treatment as the Tasbeeh chips. Nothing scraped from a news site or a YouTube thumbnail, whatever the temptation.
+**Monograms.** 56 dp discs in the picker, 40 dp on the player bar, 54 dp square with rounded corners as lock-screen artwork; drawn at runtime from the reciter's initial in the Hafs face, so they cost no assets and scale to any density.
 
 ## 4. Data pipeline and hosting
 
 **Repository.** `MohamedAbulgasem/taqwa-data`, public, holding only the pipeline script and a `manifest.json`; the audio is attached to GitHub Releases, one release per reciter (`audio-<reciter>-v1`), 114 assets each. Releases allow 2 GiB per file and up to 1,000 files per release; there is no published bandwidth cap for public repositories and the assets are served through GitHub's CDN. The 7 September investigation looked at Play Asset Delivery, Apple Background Assets and Cloudflare R2 and rejected them for card-on-file or platform-lock reasons; nothing has changed.
 
-**The surah file.** One file per (reciter, surah), holding every ayah of the surah as the untouched per-ayah MP3s from the corpus, so we redistribute exactly what we are licensed to redistribute. Not a zip: iOS has no zip reader in Foundation and Kotlin/Native would need a cinterop for one. Instead a trivially simple container, `.taqa`:
+**The surah file.** One file per (reciter, surah), holding every ayah of the surah as the untouched per-ayah MP3s from the corpus (ID3 tags and all), so we redistribute exactly what we are licensed to redistribute. Not a zip: iOS has no zip reader in Foundation and Kotlin/Native would need a cinterop for one. Instead a trivially simple container, `.taqa`:
 
 ```
 magic "TAQA" (4 bytes) · version u8 · reserved (3) · index length u32
@@ -55,7 +81,7 @@ data: the MP3 files back to back, in ayah order
 
 Splitting it is a few lines on both platforms; a download is one HTTP request, resumable with `Range`; the header alone (first few KB) tells the app the ayah offsets, so playback of ayah 1 can start while the rest of the file is still arriving. Each asset carries its SHA-256 in the manifest; the app verifies before marking a surah as downloaded.
 
-**The manifest.** `manifest.json` in the repository (fetched raw, cached, refreshed at most daily when online): schema version, the reciter list (id, names in Arabic and English, style, bitrate, photo credit, licence text), and per (reciter, surah) the asset URL, byte size and hash. Reciters can be added, and if an estate ever objects, withdrawn, without an app update; the app also ships a copy of the manifest so the picker works before the first network call.
+**The manifest.** `manifest.json` in the repository (fetched raw, cached, refreshed at most daily when online): schema version, the reciter list (id, names in Arabic and English, style, true bitrate, inter-ayah gap in ms, monogram hue, optional photo URL, licence text), and per (reciter, surah) the asset URL, byte size and hash. Reciters can be added, and if an estate ever objects, withdrawn, without an app update; the app also ships a copy of the manifest so the picker works before the first network call.
 
 **The pipeline** (`tools/quran-audio/`, Python, run once per reciter on this Mac): fetch the 6,236 per-ayah files at the chosen bitrate from `cdn.islamic.network` (or the archive.org mirror, which is the same files), verify each is a valid MP3 of plausible duration, pack the 114 containers, compute hashes, write the manifest, upload with `gh release upload`. Roughly 6 GB down and up; an evening.
 
@@ -101,7 +127,7 @@ Settings › Quran › **Recitation**: reciter row (opens the picker), *Download
 
 `expect class RecitationPlayer` in `shared` with one small API: `load(queue: List<AyahTrack>, startIndex)`, `play()`, `pause()`, `seekToAyah(i)`, `next()`, `previous()`, `stop()`, a `StateFlow<PlaybackState>` (ayah index, position, duration, playing, buffering) and `setNowPlaying(surah, ayah, reciter, artwork)`.
 
-- **Android:** Media3 ExoPlayer inside a `MediaSessionService` (foreground, `mediaPlayback` type, the standard media notification with artwork and previous/play/next). The playlist is the surah's ayahs as `MediaItem`s over the container file using a custom `DataSource` that reads byte ranges from the `.taqa` (no extraction to disk). ExoPlayer plays a playlist gaplessly; per-ayah boundaries fire `onMediaItemTransition`, which is the highlight signal. Audio focus handled by the player (pause on loss, duck never; recitation should not be ducked under a notification, it pauses).
+- **Android:** Media3 ExoPlayer inside a `MediaSessionService` (foreground, `mediaPlayback` type, the standard media notification with artwork and previous/play/next). The playlist is the surah's ayahs as `MediaItem`s over the container file using a custom `DataSource` that reads byte ranges from the `.taqa` (no extraction to disk). ExoPlayer plays a playlist gaplessly; per-ayah boundaries fire `onMediaItemTransition`, which is the highlight signal. Audio focus handled by the player (pause on loss, duck never; recitation should not be ducked under a notification, it pauses). Between items the player inserts the reciter's inter-ayah gap from the manifest (§2), a short silent `MediaItem` on Android and a timed pause before `advanceToNextItem` on iOS.
 - **iOS:** `AVQueuePlayer` of `AVPlayerItem`s over per-ayah `AVAsset`s (the container split to per-ayah temp files on first play of a surah, or served through a custom `AVAssetResourceLoaderDelegate` reading byte ranges; the temp-file approach is simpler and the files are small). `AVAudioSession` category `playback`, `UIBackgroundModes: audio`, `MPNowPlayingInfoCenter` for artwork and text, `MPRemoteCommandCenter` for play/pause/next/previous, interruption handling for calls and the adhan.
 - **The adhan.** A prayer notification's sound plays over recitation on both platforms today. Recitation pauses on audio-focus loss (Android) and on interruption (iOS), which is what the adhan triggers, then resumes only if the interruption was short and the platform says it may.
 
@@ -114,10 +140,10 @@ Settings › Quran › **Recitation**: reciter row (opens the picker), *Download
 | Item | Size |
 |---|---|
 | App growth (previews + photos + code + Media3) | ~2.5 MB APK, ~1.5 MB IPA |
-| Al-Fatiha | ~0.3 MB |
-| Ya-Sin | ~5 MB |
-| Al-Baqarah (64 kbps) | ~25 MB |
-| Whole Quran, one reciter (64 kbps) | 0.6–0.9 GB |
+| Al-Fatiha | under 1 MB |
+| Ya-Sin | ~6 MB |
+| Al-Baqarah (Alafasy, 64 kbps) | ~58 MB |
+| Whole Quran, one reciter | 0.6–1.6 GB |
 
 Downloads live in app-private storage and are removed with the app; the Downloads screen shows the total and allows per-surah or per-reciter deletion. A device below 200 MB free refuses a download with a plain sentence.
 
@@ -126,8 +152,7 @@ Downloads live in app-private storage and are removed with the app; the Download
 | Slice | Contents | Release |
 |---|---|---|
 | **3a** | `taqwa-data` pipeline and hosting for seven reciters; manifest; per-surah download with progress, resume and verify; reciter picker with photos and previews; header button, ayah-row action; player with ayah highlight and following; player bar; background playback and lock-screen controls; adhan interruption; Settings › Recitation with Downloads; credits | 0.11.0 (13) |
-| **3b** | Repeat ayah / repeat range / repeat surah; playback speed; sleep timer; download whole Quran for a reciter; continue into the next surah; ayah-level share of the audio clip | later minor |
-| **3c** (if ever) | Word-level highlighting: needs timing data we cannot yet redistribute (§2) | not planned |
+| **3b** | Word-by-word highlighting from the CC BY 4.0 `quran-align` timings (six of seven reciters); repeat ayah / range / surah; playback speed; sleep timer; download whole Quran for a reciter; continue into the next surah | later minor |
 
 ## 10. Risks
 
@@ -142,4 +167,4 @@ Downloads live in app-private storage and are removed with the app; the Download
 
 ## 11. Design round
 
-A mockup page for the picker, the player bar and the header button follows this document (link to be added), so the visual direction is settled before the plan is written.
+Mockups of the header button, the ayah action, the player bar (incl. the “back to ayah” pill and the lock screen), the download sheet in its three states, and the picker in list and grid form: https://claude.ai/code/artifact/e72b9fd3-d64b-400c-9636-918dc6fa0d4b. My picks are at the foot of that page: both entry points, a headphones glyph, previous/next ayah on the bar, the list picker, the pill rather than a snapping scroll.
