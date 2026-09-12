@@ -76,3 +76,51 @@ Jazakum Allahu khayran,
 Mohamed Abulgasem
 [your email]
 github.com/MohamedAbulgasem/Taqwa
+
+---
+
+## Revised 12 September 2026 (ten reciters, mirroring stated plainly)
+
+Re-issued to Mohamed for sending from algiriany93@gmail.com. Supersedes drafts 1 and 2 above. The Islamic Network has no published email address: use the form at https://alquran.cloud/contact (their GitHub organisation, github.com/islamic-network, is a second channel if the form goes unanswered). Alafasy's office: the contact page on the official site, alafasy.me; no verified address.
+
+### 1. Islamic Network
+
+**Subject:** Taqwa, a free open-source Quran and prayer app: mirroring ten of your recitations
+
+Assalamu alaykum,
+
+I am building Taqwa, a free Islamic app for Android and iPhone: prayer times, adhan, qibla, a Quran reader, and now recitation. It is non-commercial in every sense: no ads, no subscriptions, no accounts, no analytics. The code is GPL-3.0 at github.com/MohamedAbulgasem/Taqwa.
+
+Your terms (§IV) license the recitations for free, non-commercial redistribution at the bitrates you publish, and §III asks anyone running a full-corpus mirror to get in touch. This is that message.
+
+- Reciters, verse by verse, unmodified, at your published bitrates: Mishary Alafasy (64), Abdul Basit murattal (64), Maher Al Muaiqly (64), Mahmoud Khalil Al-Husary (64), Muhammad Siddiq Al-Minshawi (128), Abdur-Rahman As-Sudais (64), Saud Ash-Shuraim (128), Abu Bakr Ash-Shatri (128), Ali Al-Hudhaify (128), Ahmed Al-Ajmi (128).
+- The app downloads a surah at a time so it works offline. To keep the load off your servers entirely, the files are hosted as unmodified copies on a public GitHub repository dedicated to the app's data (github.com/MohamedAbulgasem/Taqwa-data), packed per surah with checksums. The app never calls your CDN.
+- Every reciter is credited by name in the player and on the app's attribution screen, with a credit and link to Islamic Network as the source.
+- If you or any reciter ask for a recitation to be withdrawn, it is removed from the catalogue without an app update, and I will confirm by email.
+
+If any of this is outside what you intend, please tell me and I will change it. Thank you for keeping these recitations available to everyone.
+
+Jazakum Allahu khayran,
+Mohamed Abulgasem
+algiriany93@gmail.com
+github.com/MohamedAbulgasem/Taqwa
+
+### 2. Mishary Rashid Alafasy's office
+
+**Subject:** Sheikh Mishary Alafasy's recitation in a free, offline Quran app
+
+Assalamu alaykum wa rahmatullah,
+
+My name is Mohamed Abulgasem. I am building Taqwa, a free Islamic app for Android and iPhone with prayer times, adhan, qibla and a Quran reader with recitation. There are no ads, no paid features, no accounts and no data collection; the code is open source under GPL-3.0.
+
+Many people who will use it grew up with Sheikh Mishary's recitation, and it is the voice the app offers first. The files are the widely circulated verse-by-verse murattal set at 64 kbps, obtained from the Islamic Network (alquran.cloud), whose terms permit free non-commercial redistribution. I am writing out of respect rather than necessity, to ask your blessing and to tell you exactly how it is used:
+
+- downloadable per surah inside the app, so it works without a connection; hosted as unmodified copies on a public repository used only for the app's data;
+- credited to Sheikh Mishary by name wherever it plays and on the attribution screen, with any wording or link you prefer;
+- never sold, altered, or separated from the app; removed immediately if you ever wish.
+
+Jazakum Allahu khayran for your time, and for the Sheikh's recitation, which has been a gift to so many.
+
+Mohamed Abulgasem
+algiriany93@gmail.com
+github.com/MohamedAbulgasem/Taqwa
