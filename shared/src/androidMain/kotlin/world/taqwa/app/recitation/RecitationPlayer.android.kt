@@ -64,6 +64,26 @@ actual class RecitationPlayer actual constructor(
         override fun onEvents(player: Player, events: Player.Events) = publish()
     }
 
+    /**
+     * The service released its session and went — it does that when the app is swiped out of
+     * Recents with nothing playing. There is no player any more, so the bar must not go on
+     * showing a paused surah, and the dead controller must not be handed out again: the next
+     * [load] builds a new one, which starts a new service.
+     */
+    private val connectionListener = object : MediaController.Listener {
+        override fun onDisconnected(controller: MediaController) {
+            if (controller !== this@RecitationPlayer.controller) return
+            stopTicker()
+            queue = null
+            reciterId = null
+            releaseController()
+            _state.value = PlaybackState.EMPTY
+        }
+    }
+
+    /** The controller, but only while it is any use. */
+    private val live: MediaController? get() = controller?.takeIf { it.isConnected }
+
     actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) {
         val index = withContext(Dispatchers.IO) {
             runCatching { TaqaFile(library.fileFor(reciter.id, surah), FileSystem.SYSTEM).index() }
@@ -92,13 +112,13 @@ actual class RecitationPlayer actual constructor(
     }
 
     actual fun play() {
-        val bound = controller ?: return
+        val bound = live ?: return
         if (bound.playbackState == Player.STATE_ENDED) bound.seekTo(0, 0L)
         bound.play()
     }
 
     actual fun pause() {
-        controller?.pause()
+        live?.pause()
     }
 
     actual fun toggle() {
@@ -106,19 +126,19 @@ actual class RecitationPlayer actual constructor(
     }
 
     actual fun seekToAyah(n: Int) {
-        val bound = controller ?: return
+        val bound = live ?: return
         val target = queue?.indexOfAyah(n) ?: return
         bound.seekTo(target, 0L)
     }
 
     actual fun next() {
-        val bound = controller ?: return
+        val bound = live ?: return
         val target = queue?.next(bound.currentMediaItemIndex) ?: return
         bound.seekTo(target, 0L)
     }
 
     actual fun previous() {
-        val bound = controller ?: return
+        val bound = live ?: return
         val built = queue ?: return
         val at = bound.currentMediaItemIndex
         bound.seekTo(built.previous(at, if (built.isGap(at)) 0L else bound.currentPosition), 0L)
@@ -129,12 +149,14 @@ actual class RecitationPlayer actual constructor(
         ticker = null
         queue = null
         reciterId = null
-        controller?.let { bound ->
+        live?.let { bound ->
             bound.stop()
             bound.clearMediaItems()
         }
-        // Letting go of the controller is what lets the service stop: with nothing bound, nothing
-        // playing and no items, Media3 takes the notification down and the process is free of it.
+        // An empty, stopped player is what takes the notification down; letting go of the
+        // controller then leaves the service unbound, so it is destroyed with the process rather
+        // than holding it up. The service object itself outlives this — it is the app's one
+        // session, and the next `load` finds it warm — but it costs nothing while it is idle.
         releaseController()
         _state.value = PlaybackState.EMPTY
     }
@@ -154,9 +176,13 @@ actual class RecitationPlayer actual constructor(
     }
 
     private suspend fun connect(): MediaController {
-        controller?.let { if (it.isConnected) return it }
+        live?.let { return it }
+        // A controller left over from a service that has gone still holds a released future.
+        releaseController()
         val token = SessionToken(appContext, ComponentName(appContext, RecitationService::class.java))
-        val future = MediaController.Builder(appContext, token).buildAsync()
+        val future = MediaController.Builder(appContext, token)
+            .setListener(connectionListener)
+            .buildAsync()
         connecting = future
         val bound = suspendCancellableCoroutine { continuation ->
             future.addListener(
@@ -187,7 +213,7 @@ actual class RecitationPlayer actual constructor(
     }
 
     private fun publish() {
-        val bound = controller
+        val bound = live
         val built = queue
         if (bound == null || built == null || bound.mediaItemCount == 0) return
         val at = bound.currentMediaItemIndex
@@ -219,7 +245,7 @@ actual class RecitationPlayer actual constructor(
         ticker = scope.launch {
             while (isActive) {
                 delay(POLL_MS)
-                val bound = controller ?: break
+                val bound = live ?: break
                 if (!bound.isPlaying) break
                 publish()
             }

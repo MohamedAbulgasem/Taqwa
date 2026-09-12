@@ -80,29 +80,44 @@ class RecitationService : MediaSessionService() {
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
 
     /**
-     * The app was swiped out of Recents. Keep playing if it is playing — that is the whole point
-     * of a background service, and the notification is still there to stop it with; stop if it is
-     * paused, because a paused session nobody can see is a notification the user cannot get rid
-     * of.
+     * The app has been swiped out of Recents. Keep playing if it is playing — that is what a
+     * background service is for, and the notification is still there to stop it with. Otherwise
+     * go, notification and all: a paused surah nobody can see is not worth a process.
+     *
+     * `stopSelf()` on its own does not do it, which is worth writing down because the obvious
+     * version was written first and measured on a device doing nothing at all. A service that is
+     * both started and bound is destroyed only once it is *both* stopped and unbound, and after a
+     * swipe-away this app's own `MediaController` is still bound: `RecitationPlayer` lives in
+     * `AppContainer`, which outlives the Activity by design. Media3's own `onTaskRemoved` has the
+     * same limit — it pauses every player and calls `stopSelf()`, which drops the foreground and
+     * leaves the process cached, but leaves the session, the service object and the notification
+     * standing. Releasing the session first is what disconnects the controller and lets the
+     * service actually be destroyed; `RecitationPlayer` hears that as `onDisconnected` and builds
+     * a new controller — and a new service — the next time the reader plays something.
      */
     override fun onTaskRemoved(rootIntent: Intent?) {
         val player = session?.player
-        if (player == null ||
-            !player.playWhenReady ||
-            player.mediaItemCount == 0 ||
-            player.playbackState == Player.STATE_ENDED
-        ) {
-            stopSelf()
-        }
+        val playing = player != null &&
+            player.playWhenReady &&
+            player.mediaItemCount > 0 &&
+            player.playbackState != Player.STATE_ENDED
+        if (playing) return
+        releaseSession()
+        stopSelf()
     }
 
     override fun onDestroy() {
+        releaseSession()
+        super.onDestroy()
+    }
+
+    /** Idempotent: [onTaskRemoved] gets here first, and [onDestroy] follows it. */
+    private fun releaseSession() {
         session?.run {
             player.release()
             release()
         }
         session = null
-        super.onDestroy()
     }
 
     private inner class Callback : MediaSession.Callback {
