@@ -164,6 +164,21 @@ fun App(container: AppContainer) {
         container.notificationCoordinator.reschedule(world.taqwa.app.notifications.RescheduleTrigger.APP_FOREGROUND)
     }
 
+    // Recitation library reconciliation (spec 3a §7). The registry in DataStore is what every
+    // recitation screen reads, and it can fall out of step with the disk without the app being
+    // involved at all — the system clearing app storage, a commit that did not survive the process
+    // being killed, a reinstall over files that were left behind. One pass at start puts the two
+    // back in agreement, in both directions, before anything can be tapped.
+    //
+    // Off the main thread because it stats every downloaded surah, and swallowed on failure for
+    // the same reason the mirror write is: a library that could not be scanned is a stale registry,
+    // which the next start fixes, and not a reason to fail a launch.
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.Default) {
+            runCatching { container.recitationLibrary.reconcile() }
+        }
+    }
+
     // Ayah widget pool mirror (design spec §4): fills the widget KeyValueStore from the Quran
     // database once on start, again whenever the reading translation changes, and again whenever
     // the UI language does, so neither widget process ever has to open the database itself. The

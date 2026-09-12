@@ -74,4 +74,20 @@ internal object SettingsKeys {
     /** Custom phrases as "<id>\u001F<phrase>\u001F<target>" entries. U+001F because the phrase
      * is free text in any script and may contain any punctuation a reader can type. */
     val TASBEEH_CUSTOM = stringSetPreferencesKey("tasbeeh_custom")
+
+    /** The voice the reader listens in; absent until one is picked, which is what makes Alafasy
+     * the default for everyone who never does (spec 3a §12.1). */
+    val RECITATION_RECITER = stringPreferencesKey("recitation_reciter")
+
+    /** Wi-Fi only unless this is on (spec 3a §12.6). The per-download override is not stored. */
+    val RECITATION_MOBILE_DATA = booleanPreferencesKey("recitation_mobile_data")
+
+    /** Which surahs of one reciter are downloaded, as decimal surah numbers. A key per reciter,
+     * not one set of "<reciter>:<surah>" entries, so deleting a reciter is one key removed and so
+     * the picker's per-reciter count is one read. [RECITATION_DOWNLOADED_PREFIX] is what lets
+     * `RecitationLibrary.reconcile` find every such key without knowing the catalogue. */
+    fun recitationDownloadedKey(reciterId: String) =
+        stringSetPreferencesKey("$RECITATION_DOWNLOADED_PREFIX$reciterId")
+
+    const val RECITATION_DOWNLOADED_PREFIX = "recitation_downloaded_"
 }

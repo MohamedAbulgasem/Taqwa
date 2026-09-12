@@ -9,6 +9,9 @@ import world.taqwa.app.notifications.NotificationCoordinator
 import world.taqwa.app.notifications.createNotificationScheduler
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.quran.QuranRepository
+import world.taqwa.app.recitation.createManifestProvider
+import world.taqwa.app.recitation.createRecitationLibrary
+import world.taqwa.app.recitation.createRecitationPaths
 import world.taqwa.app.resources.Res
 import world.taqwa.app.settings.BookmarkStore
 import world.taqwa.app.settings.SettingsRepository
@@ -40,6 +43,16 @@ class AppContainer {
         },
     )
     val quranRepository by lazy { QuranRepository() }
+
+    /**
+     * Recitation (spec 3a). The paths are shared by both so the library and the manifest cache
+     * agree on where `<files>/quran` is; both are `by lazy` because touching them asks the
+     * platform for a directory (and, on iOS, creates it), which nothing that never opens the
+     * Quran should pay for.
+     */
+    val recitationPaths by lazy { createRecitationPaths() }
+    val recitationLibrary by lazy { createRecitationLibrary(dataStore, recitationPaths) }
+    val manifestProvider by lazy { createManifestProvider(recitationPaths) }
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()
     val widgetPinRequester = createWidgetPinRequester()
