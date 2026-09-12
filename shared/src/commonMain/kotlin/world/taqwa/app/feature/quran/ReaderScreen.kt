@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -45,11 +46,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.contentWidth
+import world.taqwa.app.feature.recitation.BackToAyahPill
+import world.taqwa.app.feature.recitation.FOLLOW_VIEWPORT_FRACTION
+import world.taqwa.app.feature.recitation.Follow
+import world.taqwa.app.feature.recitation.PillGap
+import world.taqwa.app.feature.recitation.QuranRecitation
+import world.taqwa.app.feature.recitation.rememberFollowing
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
@@ -91,6 +99,9 @@ fun ReaderScreen(
     /** The copy/share text for one ayah (spec 2b §2.3), null before the surah has loaded — built
      * by the view model, but with the surah name and digits this screen's own locale decides. */
     shareTextFor: (Int) -> String?,
+    /** The recitation surface (spec 3a §5): the header button, the ayah row's Play, the lit ayah
+     * and the room the player bar takes at the foot. */
+    recitation: QuranRecitation = QuranRecitation(),
 ) {
     val colors = LocalTaqwaColors.current
     val arabic = isRtlLocale()
@@ -108,6 +119,10 @@ fun ReaderScreen(
     // expect/actual of our own on both targets; tracked as the clipboard follow-up in slice 2c.
     @Suppress("DEPRECATION")
     val clipboard = LocalClipboardManager.current
+    // Where the header button would start playing from: whatever ayah the reader has scrolled to
+    // (spec §5.1). Tracked here rather than in the view model because the header is drawn before
+    // the list exists and the first value has to be the ayah the screen was opened at.
+    var headerAyah by remember(state) { mutableStateOf(initialAyah) }
 
     // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move
     // to the left and right edges, and only safeDrawing reports those.
@@ -125,6 +140,8 @@ fun ReaderScreen(
             onBack = onBack,
             onToggleMode = onToggleMode,
             onOpenSheet = { showSheet = true },
+            recitation = recitation.header,
+            onRecitation = { ready?.let { recitation.onHeader(it.surah.number, headerAyah) } },
         )
 
         if (ready == null) return@Column
@@ -154,78 +171,168 @@ fun ReaderScreen(
                 .distinctUntilChanged()
                 .collect { index ->
                     val ayahIndex = firstVisibleAyahIndex(index, hasBasmala)
-                    ready.ayahs.getOrNull(ayahIndex)?.let { onFirstVisibleAyah(it.number) }
+                    ready.ayahs.getOrNull(ayahIndex)?.let {
+                        headerAyah = it.number
+                        onFirstVisibleAyah(it.number)
+                    }
                 }
         }
 
-        LazyColumn(
-            state = listState,
-            // The 24 dp gutters moved off the list and onto each item, because each item is now
-            // capped and centred ([contentWidth]) and the gutter belongs inside that capped
-            // column, not against the screen's own edges.
-            contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.weight(1f),
-        ) {
-            if (hasBasmala) {
-                item(key = "basmala") {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        Text(
-                            ready.basmala.orEmpty(),
-                            fontFamily = mushafFamily(),
-                            fontSize = 24.sp,
-                            textAlign = TextAlign.Center,
-                            color = colors.textPrimary,
-                            modifier = Modifier.contentWidth().padding(horizontal = ReaderGutter),
+        val playingAyah = recitation.ayahIn(ready.surah.number)
+        val following = rememberFollowing()
+        val scope = rememberCoroutineScope()
+        // The item index of an ayah: the basmala, when there is one, occupies index 0.
+        fun itemIndexOf(ayah: Int): Int? =
+            ready.ayahs.indexOfFirst { it.number == ayah }.takeIf { it >= 0 }?.plus(if (hasBasmala) 1 else 0)
+
+        /** Where the followed ayah comes to rest: a third of the way down the viewport. */
+        fun restingOffset(): Int = listState.layoutInfo.viewportSize.height / FOLLOW_VIEWPORT_FRACTION
+
+        /** How many screenfuls past the visible range the ayah is: 0 while it is on screen. */
+        fun screensAway(target: Int): Int {
+            val visible = listState.layoutInfo.visibleItemsInfo
+            if (visible.isEmpty()) return 0
+            val first = visible.first().index
+            val last = visible.last().index
+            val span = (last - first + 1).coerceAtLeast(1)
+            return when {
+                target in first..last -> 0
+                target < first -> (first - target + span - 1) / span
+                else -> (target - last + span - 1) / span
+            }
+        }
+
+        // A touch is anything that starts or stops the list moving that we did not start
+        // ourselves; [FollowingState.move] is what tells the two apart.
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.isScrollInProgress }.collect { following.moved() }
+        }
+
+        LaunchedEffect(playingAyah, ready.surah.number) {
+            val target = playingAyah?.let(::itemIndexOf)
+            if (target == null) {
+                following.pill = null
+                return@LaunchedEffect
+            }
+            when (following.decide(screensAway(target))) {
+                Follow.SCROLL -> {
+                    following.pill = null
+                    following.move { listState.animateScrollToItem(target, scrollOffset = -restingOffset()) }
+                }
+                Follow.PILL -> following.pill = playingAyah
+                Follow.LEAVE_ALONE -> Unit
+            }
+        }
+        // The pill goes as soon as the ayah is back on screen, however it got there — the reader
+        // scrolling to it themselves is the commonest way, and a pill still offering to take them
+        // where they already are would be the app talking over them.
+        LaunchedEffect(playingAyah, listState) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { it.index } }
+                .collect { visible ->
+                    val target = playingAyah?.let(::itemIndexOf) ?: return@collect
+                    if (target in visible) following.pill = null
+                }
+        }
+
+        Box(Modifier.weight(1f)) {
+            LazyColumn(
+                state = listState,
+                // The 24 dp gutters moved off the list and onto each item, because each item is now
+                // capped and centred ([contentWidth]) and the gutter belongs inside that capped
+                // column, not against the screen's own edges.
+                contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp + recitation.barSpace),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (hasBasmala) {
+                    item(key = "basmala") {
+                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                            Text(
+                                ready.basmala.orEmpty(),
+                                fontFamily = mushafFamily(),
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center,
+                                color = colors.textPrimary,
+                                modifier = Modifier.contentWidth().padding(horizontal = ReaderGutter),
+                            )
+                        }
+                    }
+                }
+                items(ready.ayahs, key = { it.number }) { ayah ->
+                    Box(Modifier.contentWidth().padding(horizontal = ReaderGutter)) {
+                        AyahCard(
+                            text = ayah.text,
+                            ayahNumber = ayah.number,
+                            transliteration = ready.transliteration?.get(ayah.number),
+                            translation = ready.translation[ayah.number],
+                            translationLanguage = ready.translationLanguage,
+                            sizeSp = ready.settings.arabicSizeSp,
+                            selected = selectedAyah == ayah.number,
+                            playing = playingAyah == ayah.number,
+                            bookmarked = ayah.number in ready.bookmarked,
+                            // Built only for the selected card: every other card would otherwise pay
+                            // for a row it never draws.
+                            actions = if (selectedAyah != ayah.number) {
+                                null
+                            } else {
+                                {
+                                    AyahActions(
+                                        bookmarked = ayah.number in ready.bookmarked,
+                                        onBookmark = { onToggleBookmark(ayah.number) },
+                                        // Answers the row, which only says "Copied" when something
+                                        // actually was: null here means the text was not available.
+                                        onCopy = {
+                                            val copy = shareTextFor(ayah.number)
+                                            if (copy != null) clipboard.setText(AnnotatedString(copy))
+                                            copy != null
+                                        },
+                                        onShare = { shareTextFor(ayah.number)?.let(::shareText) },
+                                        // The equaliser only while the voice is actually going: a
+                                        // paused ayah showing three bouncing bars would be the one
+                                        // moving thing on a screen with nothing playing.
+                                        playing = playingAyah == ayah.number && recitation.live,
+                                        onPlay = {
+                                            if (playingAyah == ayah.number) {
+                                                recitation.onToggle()
+                                            } else {
+                                                recitation.onPlayAyah(ready.surah.number, ayah.number)
+                                            }
+                                        },
+                                    )
+                                }
+                            },
+                            // One ayah at a time: tapping another moves the selection, tapping the same
+                            // one clears it, which is what the action row sits on.
+                            onClick = { selectedAyah = if (selectedAyah == ayah.number) null else ayah.number },
                         )
                     }
                 }
-            }
-            items(ready.ayahs, key = { it.number }) { ayah ->
-                Box(Modifier.contentWidth().padding(horizontal = ReaderGutter)) {
-                    AyahCard(
-                        text = ayah.text,
-                        ayahNumber = ayah.number,
-                        transliteration = ready.transliteration?.get(ayah.number),
-                        translation = ready.translation[ayah.number],
-                        translationLanguage = ready.translationLanguage,
-                        sizeSp = ready.settings.arabicSizeSp,
-                        selected = selectedAyah == ayah.number,
-                        bookmarked = ayah.number in ready.bookmarked,
-                        // Built only for the selected card: every other card would otherwise pay
-                        // for a row it never draws.
-                        actions = if (selectedAyah != ayah.number) {
-                            null
-                        } else {
-                            {
-                                AyahActions(
-                                    bookmarked = ayah.number in ready.bookmarked,
-                                    onBookmark = { onToggleBookmark(ayah.number) },
-                                    // Answers the row, which only says "Copied" when something
-                                    // actually was: null here means the text was not available.
-                                    onCopy = {
-                                        val copy = shareTextFor(ayah.number)
-                                        if (copy != null) clipboard.setText(AnnotatedString(copy))
-                                        copy != null
-                                    },
-                                    onShare = { shareTextFor(ayah.number)?.let(::shareText) },
-                                )
-                            }
-                        },
-                        // One ayah at a time: tapping another moves the selection, tapping the same
-                        // one clears it, which is what the action row sits on.
-                        onClick = { selectedAyah = if (selectedAyah == ayah.number) null else ayah.number },
-                    )
-                }
-            }
-            ready.nextSurah?.let { next ->
-                item(key = "next-surah") {
-                    // Arabic name under an Arabic UI (spec §5.3): the Mushaf font is not required
-                    // inside the format string itself, only when Quran text is drawn directly.
-                    Box(Modifier.contentWidth().padding(horizontal = ReaderGutter)) {
-                        NextSurahCard(next.displayName(arabic)) { onOpenNextSurah(next.number) }
+                ready.nextSurah?.let { next ->
+                    item(key = "next-surah") {
+                        // Arabic name under an Arabic UI (spec §5.3): the Mushaf font is not required
+                        // inside the format string itself, only when Quran text is drawn directly.
+                        Box(Modifier.contentWidth().padding(horizontal = ReaderGutter)) {
+                            NextSurahCard(next.displayName(arabic)) { onOpenNextSurah(next.number) }
+                        }
                     }
                 }
+            }
+            val pill = following.pill
+            if (pill != null) {
+                BackToAyahPill(
+                    ayah = pill,
+                    onClick = {
+                        val target = itemIndexOf(pill) ?: return@BackToAyahPill
+                        following.rearm()
+                        following.pill = null
+                        scope.launch {
+                            following.move { listState.animateScrollToItem(target, -restingOffset()) }
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = recitation.barSpace + PillGap),
+                )
             }
         }
 

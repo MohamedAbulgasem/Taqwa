@@ -18,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -63,6 +64,7 @@ import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.location.LocationPermission
+import world.taqwa.app.design.components.TaqwaBottomSheet
 import world.taqwa.app.design.components.TaqwaTabScaffold
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.nav.LaunchRequests
@@ -90,6 +92,13 @@ import world.taqwa.app.feature.quran.QuranRootViewModel
 import world.taqwa.app.feature.quran.ReaderScreen
 import world.taqwa.app.feature.quran.ReaderUiState
 import world.taqwa.app.feature.quran.ReaderViewModel
+import world.taqwa.app.feature.recitation.DownloadSheet
+import world.taqwa.app.feature.recitation.PlayerBar
+import world.taqwa.app.feature.recitation.PlayerBarHeight
+import world.taqwa.app.feature.recitation.PlayerBarHost
+import world.taqwa.app.feature.recitation.QuranRecitation
+import world.taqwa.app.feature.recitation.ReciterPicker
+import world.taqwa.app.feature.recitation.rememberSurahName
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
 import world.taqwa.app.quran.displayName
@@ -113,6 +122,10 @@ fun App(container: AppContainer) {
     val backStack by navigator.backStack.collectAsState()
     val scope = rememberCoroutineScope()
     val soundPreviewPlayer = remember { createSoundPreviewPlayer() }
+    // Recitation (spec 3a §5). One controller for the process, held by the container, so the bar
+    // and the voice survive every navigation this screen can perform.
+    val recitation = container.recitationController
+    val recitationState by recitation.state.collectAsState()
     // Read once per composition rather than per frame: the user can only change it by leaving
     // the app for system settings, which recreates this anyway.
     val exactAlarmsAllowed = remember { canScheduleExactAlarms() }
@@ -135,6 +148,10 @@ fun App(container: AppContainer) {
     // From the resolved strings, not the locale tag, for the reason given on isRtlLocale(): the
     // tree mirrors exactly when the words on it are Arabic.
     val layoutDirection = if (isRtlLocale()) LayoutDirection.Rtl else LayoutDirection.Ltr
+    // The lock screen's two lines are baked when a surah is loaded, and a service outlives the
+    // composition that started it, so the controller is told the language rather than asked.
+    val arabicUi = isRtlLocale()
+    LaunchedEffect(arabicUi) { recitation.setArabicUi(arabicUi) }
 
     // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
     // has already happened by the time this runs, so `requestSystemPermission` just returns the
@@ -342,7 +359,31 @@ fun App(container: AppContainer) {
                 // so the caret comes back with it rather than jumping to the start of the text.
                 var quranQuery by remember { mutableStateOf(TextFieldValue()) }
 
-                TaqwaTabScaffold(tab, navigator::selectTab) {
+                // The bar belongs to the Quran tab (spec §5.3): on Prayer and Settings it is
+                // hidden and playback simply goes on, which is what a media app does when you
+                // leave the screen you started it from.
+                val quranTab = navigator.currentTab == Tab.QURAN
+                val bar = recitationState.bar
+                val barSurahName = rememberSurahName(bar?.surah) { container.quranRepository.surah(it) }
+                TaqwaTabScaffold(
+                    tab,
+                    navigator::selectTab,
+                    bar = {
+                        PlayerBarHost(visible = bar != null && quranTab) {
+                            if (bar != null) {
+                                PlayerBar(
+                                    bar = bar,
+                                    surahName = barSurahName,
+                                    onToggle = recitation::toggle,
+                                    onNext = recitation::next,
+                                    onPrevious = recitation::previous,
+                                    onOpenPicker = recitation::openPicker,
+                                    onDismiss = recitation::dismissBar,
+                                )
+                            }
+                        }
+                    },
+                ) {
                     when (screen) {
                         Screen.Onboarding -> OnboardingScreen(
                             step = onboardingStep,
@@ -504,6 +545,15 @@ fun App(container: AppContainer) {
                                         )
                                     }
                                 },
+                                recitation = QuranRecitation(
+                                    header = recitationState.header(screen.surah),
+                                    playing = bar?.let { it.surah to it.ayah },
+                                    live = bar?.playing == true,
+                                    barSpace = if (bar != null) PlayerBarHeight else 0.dp,
+                                    onHeader = recitation::onHeaderTap,
+                                    onPlayAyah = recitation::requestPlay,
+                                    onToggle = recitation::toggle,
+                                ),
                             )
                         }
 
@@ -550,6 +600,21 @@ fun App(container: AppContainer) {
                                         )
                                     }
                                 },
+                                recitation = QuranRecitation(
+                                    // The Mushaf's header names whichever surah the page starts
+                                    // in, so the button's state follows the *playing* surah when
+                                    // that surah is on this page and the page's own otherwise.
+                                    header = recitationState.header(
+                                        bar?.surah ?: (mushafState as? MushafUiState.Ready)?.surah?.number ?: 0,
+                                    ),
+                                    playing = bar?.let { it.surah to it.ayah },
+                                    live = bar?.playing == true,
+                                    barSpace = if (bar != null) PlayerBarHeight else 0.dp,
+                                    onHeader = recitation::onHeaderTap,
+                                    onPlayAyah = recitation::requestPlay,
+                                    onToggle = recitation::toggle,
+                                ),
+                                pageOfAyah = { surah, ayah -> container.quranRepository.pageOf(surah, ayah) },
                             )
                         }
 
@@ -791,6 +856,37 @@ fun App(container: AppContainer) {
                                 onLeave = tasbeehVm::flush,
                             )
                         }
+                    }
+                }
+
+                // The two recitation sheets are hosted here, outside the scaffold, for the same
+                // reason the bar is inside it: they can be opened from the reader's header, from
+                // an ayah row, or from the player bar on any Quran screen, and a sheet owned by
+                // one of those screens would go with it.
+                val sheet = recitationState.sheet
+                if (sheet != null) {
+                    val sheetSurahName = rememberSurahName(sheet.surah) { container.quranRepository.surah(it) }
+                    TaqwaBottomSheet(onDismissRequest = recitation::dismissSheet) {
+                        DownloadSheet(
+                            sheet = sheet,
+                            surahName = sheetSurahName,
+                            onConfirm = recitation::confirmDownload,
+                            onCancel = recitation::cancelDownload,
+                            onRetry = recitation::retryDownload,
+                            onChangeReciter = recitation::openPicker,
+                        )
+                    }
+                }
+                if (recitationState.pickerOpen) {
+                    TaqwaBottomSheet(onDismissRequest = recitation::closePicker) {
+                        ReciterPicker(
+                            reciters = recitationState.reciters,
+                            currentId = recitationState.reciter?.id,
+                            downloadedCounts = recitationState.downloadedCounts,
+                            previewable = recitationState.previewable,
+                            onPick = recitation::pickReciter,
+                            onPreview = recitation::previewReciter,
+                        )
                     }
                 }
             }
