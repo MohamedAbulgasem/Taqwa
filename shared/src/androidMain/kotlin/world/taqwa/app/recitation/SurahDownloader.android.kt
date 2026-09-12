@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -52,10 +53,29 @@ actual class SurahDownloader actual constructor(
     private val workManager = WorkManager.getInstance(context)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val batches = mutableMapOf<String, Job>()
+    private val conditions = AndroidDownloadConditions(context)
 
+    /**
+     * The one state WorkManager cannot report. A Wi-Fi-only download asked for on mobile data is
+     * never enqueued at all — see [submit] — so there is no `WorkInfo` to read it from, and the
+     * reader who tapped Download would otherwise be told nothing.
+     *
+     * Only ever holds [DownloadFailure.NEEDS_WIFI], and only until the same surah is asked for
+     * again on a network that allows it.
+     */
+    private val refusals = MutableStateFlow<Map<DownloadKey, DownloadState>>(emptyMap())
+
+    /**
+     * Work first, refusals over the top: a refusal is always the freshest thing known about a key,
+     * because nothing was enqueued for it and any `WorkInfo` still lying around is an older
+     * attempt. [forget] takes the refusal away again the moment the surah is re-enqueued.
+     */
     actual val states: StateFlow<Map<DownloadKey, DownloadState>> =
-        workManager.getWorkInfosByTagFlow(RecitationWork.TAG_ALL)
-            .map { infos -> RecitationWork.statesOf(infos.mapNotNull(RecitationWork::snapshotOf)) }
+        combine(
+            workManager.getWorkInfosByTagFlow(RecitationWork.TAG_ALL)
+                .map { infos -> RecitationWork.statesOf(infos.mapNotNull(RecitationWork::snapshotOf)) },
+            refusals,
+        ) { work, refused -> work + refused }
             .stateIn(scope, SharingStarted.Eagerly, emptyMap())
 
     actual fun enqueue(key: DownloadKey, allowMobileOnce: Boolean) {
@@ -85,13 +105,21 @@ actual class SurahDownloader actual constructor(
     }
 
     actual fun cancel(key: DownloadKey) {
+        forget(listOf(key))
         workManager.cancelUniqueWork(RecitationWork.uniqueName(key))
     }
 
     actual fun cancelReciter(reciterId: String) {
+        refusals.value = refusals.value.filterKeys { it.reciterId != reciterId }
         workManager.cancelAllWorkByTag(RecitationWork.reciterTag(reciterId))
         batches.remove(reciterId)?.cancel()
         clearBatchNotification(reciterId)
+    }
+
+    /** Drops a Wi-Fi refusal, because the surah is being asked for again or dismissed. */
+    private fun forget(keys: List<DownloadKey>) {
+        if (refusals.value.keys.none { it in keys }) return
+        refusals.value = refusals.value - keys.toSet()
     }
 
     /**
@@ -112,13 +140,28 @@ actual class SurahDownloader actual constructor(
         val manifest = manifests.current()
         val reciter = manifest.reciter(reciterId) ?: return
         val allowMetered = allowMobileOnce || settings.recitationSettings.first().downloadOnMobileData
+        val keys = surahs.map { DownloadKey(reciterId, it) }
+        // Refuse before enqueueing rather than inside the worker. The UNMETERED constraint below
+        // is what actually keeps a transfer off mobile data — including one already running when
+        // the reader leaves the house — but a constraint that is not met leaves the work sitting
+        // in the queue saying nothing, and a device test on mobile data showed exactly that: a
+        // download that reads "Queued" for ever with no way to see the override. So the metered
+        // question is asked here, where there is still a reader to answer it (spec §5.4).
+        if (!allowMetered && conditions.network() == NetworkKind.METERED) {
+            refusals.value = refusals.value + keys.associateWith {
+                DownloadState.Failed(DownloadFailure.NEEDS_WIFI)
+            }
+            return
+        }
+        forget(keys)
         val arabic = isArabic()
         val names = runCatching {
             quran.surahs().associate { it.number to if (arabic) it.nameArabic else it.nameLatin }
         }.getOrDefault(emptyMap())
         val constraints = Constraints.Builder()
-            // The constraint and the worker's own check say the same thing for different reasons:
-            // this one stops the transfer, the worker's turns a silent queue into a sentence.
+            // This is the rule that holds mid-transfer: a download running when the reader walks
+            // out of Wi-Fi is stopped by the constraint and resumes from its `.part` when they
+            // come back. The refusal above is the same rule asked once, at the moment of the tap.
             .setRequiredNetworkType(if (allowMetered) NetworkType.CONNECTED else NetworkType.UNMETERED)
             .build()
         for (surah in surahs) {

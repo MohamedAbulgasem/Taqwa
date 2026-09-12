@@ -9,11 +9,12 @@ import android.os.StatFs
  * What the device can offer a download right now: the kind of network, and the room on the volume
  * the audio is written to.
  *
- * WorkManager's own `NetworkType.UNMETERED` constraint already keeps a Wi-Fi-only download from
- * starting on mobile data, and this asks the same question again inside the worker. That is not
- * redundant: a constraint that is not met leaves the work sitting silently in the queue, whereas
- * the reader who tapped Download is owed a sentence saying why nothing is happening. The check
- * here is what turns silence into [DownloadFailure.NEEDS_WIFI].
+ * WorkManager's own `NetworkType.UNMETERED` constraint is what keeps a Wi-Fi-only download off
+ * mobile data once it is enqueued, and it does that by leaving the work sitting silently in the
+ * queue. Silence is no answer for the reader who just tapped Download, so `SurahDownloader` asks
+ * this same question before it enqueues anything and reports [DownloadFailure.NEEDS_WIFI] then.
+ * The worker asks it a third time, for the case no scheduler covers: a network that changed
+ * between the tap and the transfer.
  */
 class AndroidDownloadConditions(private val context: Context) : DownloadConditions {
 
