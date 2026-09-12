@@ -14,12 +14,14 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.SilenceMediaSource
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
+import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import world.taqwa.app.notifications.notificationSmallIconResId
 
 /**
  * Where recitation actually plays (spec §6). A `MediaSessionService` rather than a player inside
@@ -65,6 +67,14 @@ class RecitationService : MediaSessionService() {
             .setHandleAudioBecomingNoisy(true)
             .build()
         session = MediaSession.Builder(this, player).setCallback(Callback()).build()
+        // Media3's own default small icon is a generic music note. The status bar should say
+        // Taqwa, and the mark the prayer notifications already use is the one it should say it
+        // with; `:androidApp` puts the id there in `TaqwaApplication.onCreate`.
+        setMediaNotificationProvider(
+            DefaultMediaNotificationProvider.Builder(this).build().apply {
+                setSmallIcon(notificationSmallIconResId)
+            },
+        )
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
