@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -43,10 +44,17 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.datastore.preferences)
             implementation(libs.sqldelight.coroutines)
+            // Slice 3a. The recitation manifest and the `.taqa` container index are JSON, and
+            // the container is read by byte range off disk on both platforms.
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.okio)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
+            // The `.taqa` and library tests build containers in memory rather than on the
+            // machine running the tests; FakeFileSystem is okio's own in-memory FileSystem.
+            implementation(libs.okio.fakefilesystem)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
