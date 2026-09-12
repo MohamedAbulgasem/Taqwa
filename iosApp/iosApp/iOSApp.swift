@@ -1,12 +1,32 @@
 import SwiftUI
 import BackgroundTasks
+import UIKit
 import WidgetKit
 import shared
 
 private let refreshTaskId = "world.taqwa.app.refresh"
 
+/// The one thing SwiftUI's `App` cannot express: `handleEventsForBackgroundURLSession`.
+///
+/// iOS relaunches the app when a background download finishes and delivers the news here — to a
+/// process that has no URL sessions at all, so nothing would arrive until one with the right
+/// identifier is recreated. `wakeRecitationDownloads` does both halves: it recreates the sessions
+/// and holds the completion handler, which Foundation requires to be called once every delegate
+/// callback has been delivered.
+final class AppDelegate: NSObject, UIApplicationDelegate {
+	func application(
+		_ application: UIApplication,
+		handleEventsForBackgroundURLSession identifier: String,
+		completionHandler: @escaping () -> Void
+	) {
+		SurahDownloader_iosKt.wakeRecitationDownloads(completion: completionHandler)
+	}
+}
+
 @main
 struct iOSApp: App {
+
+	@UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
 	init() {
 		BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskId, using: nil) { task in
