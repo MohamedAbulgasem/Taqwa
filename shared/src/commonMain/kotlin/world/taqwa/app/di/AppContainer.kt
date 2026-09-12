@@ -9,6 +9,7 @@ import world.taqwa.app.notifications.NotificationCoordinator
 import world.taqwa.app.notifications.createNotificationScheduler
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.quran.QuranRepository
+import world.taqwa.app.recitation.RecitationPlayer
 import world.taqwa.app.recitation.createManifestProvider
 import world.taqwa.app.recitation.createRecitationLibrary
 import world.taqwa.app.recitation.createRecitationPaths
@@ -53,6 +54,14 @@ class AppContainer {
     val recitationPaths by lazy { createRecitationPaths() }
     val recitationLibrary by lazy { createRecitationLibrary(dataStore, recitationPaths) }
     val manifestProvider by lazy { createManifestProvider(recitationPaths) }
+
+    // Slice 3a task 3: the player. Lazy for a stronger reason than the three above — building it
+    // is free, but its first `load` binds a MediaSessionService on Android and claims the audio
+    // session on iOS, and nothing that never plays a recitation should pay for either. One per
+    // process, because a media session is a process-wide thing and two would fight over the
+    // notification.
+    val recitationPlayer by lazy { RecitationPlayer(recitationLibrary) }
+
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()
     val widgetPinRequester = createWidgetPinRequester()
