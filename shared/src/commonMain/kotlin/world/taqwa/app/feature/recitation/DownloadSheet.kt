@@ -1,0 +1,253 @@
+package world.taqwa.app.feature.recitation
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
+import world.taqwa.app.design.LocalTaqwaColors
+import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.components.TaqwaCard
+import world.taqwa.app.design.components.TaqwaPrimaryButton
+import world.taqwa.app.design.components.drawChevron
+import world.taqwa.app.design.mushafFamily
+import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.recitation.DownloadFailure
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.recitation_cancel
+import world.taqwa.app.resources.recitation_download
+import world.taqwa.app.resources.recitation_downloading
+import world.taqwa.app.resources.recitation_keep_reading
+import world.taqwa.app.resources.recitation_over_wifi
+import world.taqwa.app.resources.recitation_retry
+import world.taqwa.app.resources.recitation_use_mobile_once
+
+/**
+ * The download sheet (spec §5.4). One surah, one voice, one price, and — while it runs — one
+ * progress bar with a plain sentence saying the reader need not sit and watch it.
+ *
+ * [surahName] is resolved by the caller, as everywhere else in this feature: the sheet has a
+ * surah number and no database.
+ *
+ * The Wi-Fi note is two sentences and only the second is a control: "Over Wi-Fi." states the
+ * policy, "Use mobile data this once" overrides it for this download alone and is never written
+ * back to Settings — allowing this surah onto mobile data is not a decision about the next one.
+ */
+@Composable
+fun DownloadSheet(
+    sheet: DownloadSheetState,
+    surahName: String,
+    onConfirm: (allowMobileOnce: Boolean) -> Unit,
+    onCancel: () -> Unit,
+    onRetry: () -> Unit,
+    onChangeReciter: () -> Unit,
+) {
+    val colors = LocalTaqwaColors.current
+    val arabic = isRtlLocale()
+    Column(Modifier.padding(horizontal = 24.dp)) {
+        if (arabic) {
+            Text(surahName, fontFamily = mushafFamily(), fontSize = 26.sp, color = colors.textPrimary, maxLines = 1)
+        } else {
+            Text(surahName, style = TaqwaText.screenTitle, color = colors.textPrimary, maxLines = 1)
+        }
+        TaqwaCard(Modifier.padding(top = 16.dp)) {
+            ReciterRow(sheet, onChangeReciter)
+        }
+        Spacer(Modifier.height(16.dp))
+        when (val phase = sheet.phase) {
+            is SheetPhase.Ready -> Ready(sheet, phase, onConfirm)
+            is SheetPhase.Downloading -> Running(phase, onCancel)
+            is SheetPhase.Failed -> Failed(phase, onRetry, onConfirm)
+        }
+        Spacer(Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun ReciterRow(sheet: DownloadSheetState, onChangeReciter: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onChangeReciter,
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        ReciterMonogram(sheet.reciter, 44.dp)
+        Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
+            Text(reciterName(sheet.reciter), style = TaqwaText.rowLabel, color = colors.textPrimary, maxLines = 1)
+            Text(
+                reciterStyleAndBitrate(sheet.reciter),
+                style = TaqwaText.caption,
+                color = colors.textSecondary,
+                maxLines = 1,
+            )
+        }
+        Canvas(Modifier.size(18.dp)) { drawChevron(colors.textTertiary, pointsForward = forward) }
+    }
+}
+
+@Composable
+private fun Ready(sheet: DownloadSheetState, phase: SheetPhase.Ready, onConfirm: (Boolean) -> Unit) {
+    val colors = LocalTaqwaColors.current
+    TaqwaPrimaryButton(
+        text = stringResource(Res.string.recitation_download, megabytes(sheet.bytes)),
+        onClick = { onConfirm(false) },
+    )
+    if (!phase.needsWifiNote) return
+    // Two sentences in one paragraph, the second of them a control. Splitting them into a label
+    // and a button would put a line break where the eye expects a sentence to carry on, so the
+    // whole line is one Text and the tap is on the row — the accent on the second half is what
+    // says which half is the control.
+    val accented = buildAnnotatedString {
+        append(stringResource(Res.string.recitation_over_wifi))
+        append(" ")
+        withStyle(SpanStyle(color = colors.accent, fontWeight = FontWeight.SemiBold)) {
+            append(stringResource(Res.string.recitation_use_mobile_once))
+        }
+    }
+    Text(
+        accented,
+        style = TaqwaText.caption,
+        color = colors.textSecondary,
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 44.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { onConfirm(true) },
+            )
+            .padding(top = 14.dp),
+    )
+}
+
+@Composable
+private fun Running(phase: SheetPhase.Downloading, onCancel: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    val target = if (phase.total <= 0L) 0f else (phase.bytes.toFloat() / phase.total).coerceIn(0f, 1f)
+    val fraction by animateFloatAsState(target, tween(400), label = "downloadProgress")
+    // The button's own shape and height, filled from the start: the primary button *becomes* the
+    // progress bar (spec §5.4) rather than being replaced by a thinner thing that leaves the
+    // sheet jumping by twenty pixels.
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clip(RoundedCornerShape(percent = 50))
+            .background(colors.hairline),
+        contentAlignment = Alignment.Center,
+    ) {
+        // Start-aligned inside a centred Box: the bar fills from the reading edge, which under
+        // an Arabic UI is the right one, and `align` is what stops it growing from the middle.
+        Box(
+            Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxWidth(fraction)
+                .height(48.dp)
+                .background(colors.accent.copy(alpha = 0.30f)),
+        )
+        Text(
+            stringResource(Res.string.recitation_downloading, megabytesBare(phase.bytes), megabytes(phase.total)),
+            style = TaqwaText.caption.copy(fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
+            color = colors.textPrimary,
+        )
+    }
+    Text(
+        stringResource(Res.string.recitation_keep_reading),
+        style = TaqwaText.caption,
+        color = colors.textSecondary,
+        modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
+    )
+    QuietAction(stringResource(Res.string.recitation_cancel), onCancel)
+}
+
+@Composable
+private fun Failed(phase: SheetPhase.Failed, onRetry: () -> Unit, onConfirm: (Boolean) -> Unit) {
+    val colors = LocalTaqwaColors.current
+    Text(
+        downloadFailureSentence(phase.reason),
+        style = TaqwaText.caption,
+        color = colors.textPrimary,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(Modifier.height(14.dp))
+    TaqwaPrimaryButton(text = stringResource(Res.string.recitation_retry), onClick = onRetry)
+    // Wi-Fi is the one refusal a Retry cannot answer: the same tap on the same network refuses
+    // again. So the sentence that names the policy is followed by the tap that suspends it, the
+    // same override the Ready face offers — otherwise the reader on mobile data is told what is
+    // wrong and given the one button that cannot put it right.
+    if (phase.reason == DownloadFailure.NEEDS_WIFI) UseMobileOnce(onConfirm)
+}
+
+/** "Use mobile data this once" (spec §5.4), on both the faces that can act on it. */
+@Composable
+private fun UseMobileOnce(onConfirm: (Boolean) -> Unit) {
+    val colors = LocalTaqwaColors.current
+    Text(
+        stringResource(Res.string.recitation_use_mobile_once),
+        style = TaqwaText.caption.copy(fontWeight = FontWeight.SemiBold),
+        color = colors.accent,
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 44.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { onConfirm(true) },
+            )
+            .padding(top = 14.dp),
+    )
+}
+
+/** A text-weight action under a primary one: Cancel, which must be reachable and must not
+ * compete with the thing it cancels. */
+@Composable
+private fun QuietAction(text: String, onClick: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 44.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text, style = TaqwaText.caption.copy(fontWeight = FontWeight.SemiBold), color = colors.textSecondary)
+    }
+}
