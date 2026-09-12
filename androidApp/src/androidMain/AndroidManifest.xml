@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -9,6 +10,13 @@
     <!-- Qibla alignment confirms with a short tick; Vibrator.vibrate() throws SecurityException
          without this. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Slice 3a. The app's first network access: recitation downloads and the daily manifest
+         refresh, both to the public Taqwa-data repository (spec 3a §4, §7). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- A 58 MB surah has to keep downloading while the reader is elsewhere, which means
+         WorkManager's foreground service and, from API 34, its declared type. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:name=".TaqwaApplication"
@@ -80,6 +88,14 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_ayah_info" />
         </receiver>
+        <!-- WorkManager runs `setForeground` work through this service, and from API 34 a
+             foreground service must declare its type at the manifest. The service itself is
+             WorkManager's; `tools:node="merge"` adds the type to its own declaration rather than
+             redeclaring it. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
     </application>
 
 </manifest>
