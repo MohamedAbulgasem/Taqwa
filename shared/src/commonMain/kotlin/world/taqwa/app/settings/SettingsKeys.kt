@@ -3,6 +3,7 @@ package world.taqwa.app.settings
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import world.taqwa.app.domain.Prayer
@@ -90,4 +91,9 @@ internal object SettingsKeys {
         stringSetPreferencesKey("$RECITATION_DOWNLOADED_PREFIX$reciterId")
 
     const val RECITATION_DOWNLOADED_PREFIX = "recitation_downloaded_"
+
+    /** When the catalogue was last *asked* for, epoch millis (spec 3a §4). The attempt rather
+     * than the success, so a repository that is down cannot turn every app start into an HTTP
+     * timeout; see `ManifestRefresher`. */
+    val RECITATION_MANIFEST_CHECKED = longPreferencesKey("recitation_manifest_checked")
 }
