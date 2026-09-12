@@ -55,7 +55,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">0.8.0</string>
+    <string name="settings_version_value">0.9.0</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">السمة</string>
