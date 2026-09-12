@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only additions: the cleartext exception for the local test server, and the broadcast
+  receiver that drives the downloader from `adb shell am broadcast` while slice 3a has no UI yet.
+  Neither is in the release manifest, and nothing in a main source set references either.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:networkSecurityConfig="@xml/network_security_config">
+        <receiver
+            android:name="world.taqwa.app.debug.RecitationDebugReceiver"
+            android:exported="true" />
+    </application>
+</manifest>
