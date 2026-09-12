@@ -285,4 +285,32 @@
     <string name="tasbeeh_custom_add">إضافة</string>
     <string name="tasbeeh_custom_save">حفظ</string>
     <string name="tasbeeh_custom_delete">حذف</string>
+    <!-- Quran recitation (spec 3a §5) -->
+    <string name="recitation_play">تشغيل</string>
+    <string name="recitation_reciter">القارئ</string>
+    <string name="recitation_style_murattal">مرتّل</string>
+    <string name="recitation_kbps">%1$s ك.ب/ث</string>
+    <string name="recitation_megabytes">%1$s م.ب</string>
+    <string name="recitation_on_phone">%1$s من ١١٤ سورة على هذا الهاتف</string>
+    <string name="recitation_download">تنزيل · %1$s</string>
+    <string name="recitation_downloading">%1$s من %2$s</string>
+    <string name="recitation_over_wifi">عبر الواي فاي.</string>
+    <string name="recitation_use_mobile_once">استخدم بيانات الجوال هذه المرة</string>
+    <string name="recitation_keep_reading">يمكنك متابعة القراءة، وسيبدأ التشغيل من الآية التي اخترتها فور اكتمال التنزيل.</string>
+    <string name="recitation_cancel">إلغاء</string>
+    <string name="recitation_retry">إعادة المحاولة</string>
+    <string name="recitation_back_to_ayah">العودة إلى الآية %1$s</string>
+    <string name="recitation_fail_no_network">لا يوجد اتصال في الوقت الحالي.</string>
+    <string name="recitation_fail_needs_wifi">التنزيل مضبوط على الواي فاي فقط.</string>
+    <string name="recitation_fail_no_space">لا توجد مساحة كافية على هذا الهاتف.</string>
+    <string name="recitation_fail_server">لم يكتمل التنزيل، ويمكن البدء من جديد.</string>
+    <string name="recitation_fail_checksum">ما وصل ليس الملف الصحيح، ويمكن جلبه مرة أخرى.</string>
+    <string name="recitation_fail_cancelled">توقف التنزيل قبل أن يكتمل.</string>
+    <string name="recitation_a11y_recitation">التلاوة</string>
+    <string name="recitation_a11y_pause">إيقاف مؤقت</string>
+    <string name="recitation_a11y_downloading">جارٍ تنزيل التلاوة</string>
+    <string name="recitation_a11y_next">الآية التالية</string>
+    <string name="recitation_a11y_previous">الآية السابقة</string>
+    <string name="recitation_a11y_close">إغلاق المشغّل</string>
+    <string name="recitation_a11y_preview">استمع لهذا القارئ</string>
 </resources>

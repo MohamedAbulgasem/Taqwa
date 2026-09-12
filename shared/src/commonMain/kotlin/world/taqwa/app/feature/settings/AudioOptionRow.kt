@@ -6,6 +6,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
@@ -60,6 +64,12 @@ internal fun AudioOptionRow(
     selected: Boolean,
     onSelect: () -> Unit,
     onPreview: (() -> Unit)? = null,
+    /** What a screen reader calls the preview triangle. The two prayer-sound sheets leave it
+     * unset and keep the label they have always had. */
+    previewDescription: String? = null,
+    /** Drawn before the label, with 12 dp after it. The reciter picker passes a monogram disc
+     * (spec 3a §5.5); the two prayer-sound sheets pass nothing and are unchanged. */
+    leading: (@Composable () -> Unit)? = null,
 ) {
     val colors = LocalTaqwaColors.current
     Row(
@@ -73,6 +83,10 @@ internal fun AudioOptionRow(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (leading != null) {
+            leading()
+            Spacer(Modifier.width(12.dp))
+        }
         Column(Modifier.weight(1f)) {
             Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
             Text(caption, style = TaqwaText.caption, color = colors.textSecondary)
@@ -85,7 +99,17 @@ internal fun AudioOptionRow(
             Box(
                 // Clipped first, so the press ripple is a disc the size of the hit area rather
                 // than a square: the target is round in the mind, so it should be round when lit.
-                Modifier.size(MIN_TAP_TARGET).clip(CircleShape).clickable { onPreview() },
+                Modifier
+                    .size(MIN_TAP_TARGET)
+                    .clip(CircleShape)
+                    .clickable { onPreview() }
+                    .then(
+                        if (previewDescription == null) {
+                            Modifier
+                        } else {
+                            Modifier.semantics { contentDescription = previewDescription }
+                        },
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 PlayTriangle()

@@ -127,3 +127,134 @@ internal fun DrawScope.drawPlus(tint: Color) {
     drawLine(tint, Offset(5.5f * u, 8f * u), Offset(10.5f * u, 8f * u), strokeWidth = stroke, cap = StrokeCap.Round)
     drawLine(tint, Offset(8f * u, 5.5f * u), Offset(8f * u, 10.5f * u), strokeWidth = stroke, cap = StrokeCap.Round)
 }
+
+/**
+ * A speaker: the cone, and two waves leaving it. Recitation's idle mark (spec §12.7) — headphones
+ * were the original pick and read wrong when nobody is wearing any, so the glyph is the sound
+ * itself rather than the thing you hear it through.
+ *
+ * The waves are drawn as quadratic curves rather than arc sweeps so they keep the same rounded
+ * stroke as every other glyph here, and the outer one is longer than the inner one, which is what
+ * makes the pair read as sound rather than as brackets.
+ */
+internal fun DrawScope.drawSpeaker(tint: Color) {
+    val u = size.width / 16f
+    val cone = Path().apply {
+        moveTo(2.4f * u, 6.2f * u)
+        lineTo(5f * u, 6.2f * u)
+        lineTo(8.3f * u, 3.1f * u)
+        lineTo(8.3f * u, 12.9f * u)
+        lineTo(5f * u, 9.8f * u)
+        lineTo(2.4f * u, 9.8f * u)
+        close()
+    }
+    drawPath(cone, tint, style = glyphStroke())
+    val inner = Path().apply {
+        moveTo(10.7f * u, 6.1f * u)
+        quadraticTo(12.1f * u, 8f * u, 10.7f * u, 9.9f * u)
+    }
+    drawPath(inner, tint, style = glyphStroke())
+    val outer = Path().apply {
+        moveTo(12.7f * u, 4.2f * u)
+        quadraticTo(15.2f * u, 8f * u, 12.7f * u, 11.8f * u)
+    }
+    drawPath(outer, tint, style = glyphStroke())
+}
+
+/**
+ * Three bars rising and falling: the one cue on a Quran screen that recitation is live (spec
+ * §12.7). [levels] are fractions of the full 11-unit height, one per bar; [Equaliser] animates
+ * them, and a still frame at rest draws the same shape.
+ *
+ * Rounded caps and a bar width matched to [glyphStroke]'s weight would leave three hairlines, so
+ * the bars are deliberately heavier — 1.9 u — which is what lets them read at 18 dp beside a
+ * speaker glyph of the same box.
+ */
+internal fun DrawScope.drawEqualiser(tint: Color, levels: List<Float>) {
+    val u = size.width / 16f
+    val width = 1.9f * u
+    val centres = listOf(3.6f, 8f, 12.4f)
+    centres.forEachIndexed { i, x ->
+        val fraction = levels.getOrElse(i) { 0.5f }.coerceIn(0f, 1f)
+        val half = (1.3f + fraction * 4.6f) * u
+        drawLine(
+            color = tint,
+            start = Offset(x * u, 8f * u - half),
+            end = Offset(x * u, 8f * u + half),
+            strokeWidth = width,
+            cap = StrokeCap.Round,
+        )
+    }
+}
+
+/**
+ * Previous- or next-ayah: a solid triangle against a bar, the transport control every media
+ * player draws. [forward] is resolved by the caller from `LocalLayoutDirection` rather than read
+ * here, because a `DrawScope` has no direction of its own — under an Arabic UI the row of
+ * controls mirrors itself and the glyphs have to follow it, or "next" would point back at the
+ * button before it.
+ */
+internal fun DrawScope.drawSkip(tint: Color, forward: Boolean) {
+    val u = size.width / 16f
+    fun x(value: Float) = (if (forward) value else 16f - value) * u
+    val triangle = Path().apply {
+        moveTo(x(3.2f), 3.4f * u)
+        lineTo(x(10.6f), 8f * u)
+        lineTo(x(3.2f), 12.6f * u)
+        close()
+    }
+    drawPath(triangle, tint, style = Fill)
+    drawLine(
+        tint,
+        Offset(x(12.3f), 3.4f * u),
+        Offset(x(12.3f), 12.6f * u),
+        strokeWidth = size.width * 0.115f,
+        cap = StrokeCap.Round,
+    )
+}
+
+/** A solid play triangle, optically centred: a triangle drawn on the true centre reads as sitting
+ * left of it, so the ink is nudged a third of a unit along. */
+internal fun DrawScope.drawPlayTriangle(tint: Color) {
+    val u = size.width / 16f
+    val path = Path().apply {
+        moveTo(4.6f * u, 3f * u)
+        lineTo(12.6f * u, 8f * u)
+        lineTo(4.6f * u, 13f * u)
+        close()
+    }
+    drawPath(path, tint, style = Fill)
+}
+
+/** Two bars. Rounded ends, like every other filled mark in the set. */
+internal fun DrawScope.drawPause(tint: Color) {
+    val u = size.width / 16f
+    val stroke = size.width * 0.155f
+    listOf(5.6f, 10.4f).forEach { x ->
+        drawLine(tint, Offset(x * u, 3.6f * u), Offset(x * u, 12.4f * u), strokeWidth = stroke, cap = StrokeCap.Round)
+    }
+}
+
+/** A plain cross: the player bar's dismiss. */
+internal fun DrawScope.drawClose(tint: Color) {
+    val u = size.width / 16f
+    val stroke = size.width * 0.0875f
+    drawLine(tint, Offset(4.5f * u, 4.5f * u), Offset(11.5f * u, 11.5f * u), strokeWidth = stroke, cap = StrokeCap.Round)
+    drawLine(tint, Offset(11.5f * u, 4.5f * u), Offset(4.5f * u, 11.5f * u), strokeWidth = stroke, cap = StrokeCap.Round)
+}
+
+/**
+ * A disclosure chevron. [pointsForward] is the caller's own reading of `LocalLayoutDirection`,
+ * for the same reason [drawSkip] takes one: the shape is drawn from literal coordinates and a
+ * `DrawScope` has no direction to consult.
+ */
+internal fun DrawScope.drawChevron(tint: Color, pointsForward: Boolean) {
+    val u = size.width / 16f
+    fun x(value: Float) = (if (pointsForward) value else 16f - value) * u
+    val path = Path().apply {
+        moveTo(x(6.2f), 2.6f * u)
+        lineTo(x(11.2f), 8f * u)
+        lineTo(x(6.2f), 13.4f * u)
+    }
+    drawPath(path, tint, style = glyphStroke())
+}

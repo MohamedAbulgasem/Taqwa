@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -27,6 +28,8 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.drawBookmark
+import world.taqwa.app.design.components.drawSpeaker
+import world.taqwa.app.feature.recitation.PlayingMark
 import world.taqwa.app.design.components.drawCopy
 import world.taqwa.app.design.components.drawShare
 import world.taqwa.app.resources.Res
@@ -35,6 +38,7 @@ import world.taqwa.app.resources.quran_action_bookmarked
 import world.taqwa.app.resources.quran_action_copied
 import world.taqwa.app.resources.quran_action_copy
 import world.taqwa.app.resources.quran_action_share
+import world.taqwa.app.resources.recitation_play
 
 /** How long "Copied" stands in for the copy action's own label (spec 2b §2.3). */
 private const val COPIED_LABEL_MS = 1_500L
@@ -58,6 +62,9 @@ fun AyahActions(
     onBookmark: () -> Unit,
     onCopy: () -> Boolean,
     onShare: () -> Unit,
+    /** True when this ayah is the one being recited, which turns Play into a pause (spec 3a §5.2). */
+    playing: Boolean = false,
+    onPlay: () -> Unit = {},
 ) {
     // Keyed on a tap counter rather than on `copied` itself: a second tap while the label still
     // reads "Copied" has to restart the 1.5 s, and a state that is already true would not
@@ -75,6 +82,16 @@ fun AyahActions(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        // First in the row, before bookmark (spec 3a §5.2): it is the action that does something
+        // to the ayah rather than something with it, and it is the one the whole slice is for.
+        AyahActionButton(
+            glyph = { tint -> if (!playing) drawSpeaker(tint) },
+            label = stringResource(Res.string.recitation_play),
+            onClick = onPlay,
+            // The equaliser is a composable, not a path, so it is drawn over the glyph slot
+            // rather than inside it; the slot itself stays empty while it shows.
+            overlay = if (playing) ({ PlayingMark() }) else null,
+        )
         val bookmarkLabel = stringResource(
             if (bookmarked) Res.string.quran_action_bookmarked else Res.string.quran_action_bookmark,
         )
@@ -115,6 +132,8 @@ internal fun AyahActionButton(
     label: String?,
     onClick: () -> Unit,
     contentDescription: String? = null,
+    /** Drawn in the glyph's 18 dp box instead of a path, for the one action whose mark moves. */
+    overlay: (@Composable () -> Unit)? = null,
 ) {
     val colors = LocalTaqwaColors.current
     // Read out here: inside a `semantics` block the name resolves to the write-only semantics
@@ -134,7 +153,11 @@ internal fun AyahActionButton(
         horizontalArrangement = if (label == null) Arrangement.Center else Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Canvas(Modifier.size(18.dp)) { glyph(colors.accent) }
+        if (overlay != null) {
+            Box(Modifier.size(18.dp), contentAlignment = Alignment.Center) { overlay() }
+        } else {
+            Canvas(Modifier.size(18.dp)) { glyph(colors.accent) }
+        }
         if (label != null) Text(label, style = TaqwaText.caption, color = colors.textSecondary)
     }
 }
