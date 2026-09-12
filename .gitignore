@@ -22,3 +22,7 @@ xcuserdata/
 
 # Quran pipeline downloads
 tools/cache/
+
+# Python bytecode from tools/
+__pycache__/
+*.pyc
