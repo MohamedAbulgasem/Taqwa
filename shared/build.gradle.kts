@@ -71,6 +71,11 @@ kotlin {
             // Slice 3a. A surah download has to survive the app being backgrounded and the
             // process being killed, which on Android is WorkManager and nothing else.
             api(libs.androidx.work.runtime)
+            // Slice 3a task 3: recitation playback. The ExoPlayer lives in a MediaSessionService
+            // so the notification and the lock screen come from the platform rather than from
+            // anything this app draws.
+            implementation(libs.media3.exoplayer)
+            implementation(libs.media3.session)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
