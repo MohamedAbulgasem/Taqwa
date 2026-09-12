@@ -60,6 +60,16 @@ data class TasbeehUiState(
         } else {
             TasbeehEngine.partEnds(preset).dropLast(1).map { it.toFloat() / preset.total }
         }
+
+    /**
+     * This state with a completed set rolled over to 0 of the next round, or this very state if
+     * the set is not complete. The guard is the point: the hold's coroutine cannot be cancelled
+     * once its delay has elapsed, so a rollover that lands just after a tap or a chip switch has
+     * moved the count must find nothing to do — a 1 of round 2 stays a 1.
+     */
+    fun rolledOver(): TasbeehUiState =
+        if (preset.total <= 0 || state.count < preset.total) this
+        else copy(state = TasbeehEngine.nextRound(state))
 }
 
 /**
@@ -71,9 +81,18 @@ data class TasbeehUiState(
  * disk once; [flush] puts it there immediately, and the screen calls that on the way out so a
  * quick exit mid-burst loses nothing (spec §6).
  *
- * **Why only the debounce is cancellable.** The debounce is the one piece of work that is meant to
- * be thrown away — every tap replaces it. Switching a chip, adding a phrase and deleting one are
- * not: each is a save followed by a read that must both happen, so they run on jobs of their own
+ * **Why a completed set rolls over by itself.** The hundredth tap closes the ring and fires the
+ * set haptic; the ring then stays closed for [SET_COMPLETE_HOLD_MS] and the counter rolls over to
+ * 0 of the next round on its own — the reader should not have to tap a finished set off its
+ * hundred, and 100 followed by 1 read as if the first dhikr of the new round had been skipped.
+ * A tap inside the hold still opens the next round at 1, exactly as before, and cancels the
+ * rollover; anything that leaves the screen or the preset mid-hold ([flush], [select], the custom
+ * edits) settles the rollover first, so what reaches disk is the round about to be opened, never
+ * the hundred.
+ *
+ * **Why only the debounce and the hold are cancellable.** Those two are the pieces of work that
+ * are meant to be thrown away — every tap replaces the one and pre-empts the other. Switching a
+ * chip, adding a phrase and deleting one are not: each is a save followed by a read that must both happen, so they run on jobs of their own
  * that nothing cancels. Sharing one job slot between the two kinds once meant a page tap 300 ms
  * after a chip tap could cut the switch in half and leave the chip silently doing nothing.
  *
@@ -95,6 +114,14 @@ class TasbeehViewModel(
      * only [scheduleWrite] and [flush] cancel it.
      */
     private var debounceJob: Job? = null
+
+    /**
+     * The pending rollover of a completed set, or null. Set by [holdThenRollOver] alone; cancelled
+     * by a tap (which rolls the set over itself), by [reset] and by [settle]. Cancelling is best
+     * effort: past its delay the coroutine has no suspension point left and runs to the end
+     * whatever is done to it, which is why [TasbeehUiState.rolledOver] checks before it moves.
+     */
+    private var holdJob: Job? = null
 
     /**
      * Whether a tap has landed yet. A disk read is not instant, and a thumb on the screen half a
@@ -119,9 +146,12 @@ class TasbeehViewModel(
             // throwing — the store makes the same fallback, so the two cannot disagree.
             val preset = TasbeehPresets.byId(selected, custom) ?: TasbeehPresets.default
             val stored = store.stateOf(preset.id).first()
+            var opened = false
             _state.update { current ->
+                opened = !counted
                 if (counted) current.copy(custom = custom) else TasbeehUiState(preset, stored, custom)
             }
+            if (opened) holdIfComplete(preset, stored)
         }
     }
 
@@ -132,6 +162,10 @@ class TasbeehViewModel(
      */
     fun tap() {
         counted = true
+        // A tap on a held hundred is the reader carrying on: the engine opens the next round at 1,
+        // and the rollover that would have opened it at 0 must not land on top of that.
+        holdJob?.cancel()
+        holdJob = null
         var fired: TapEvent = TapEvent.Tick
         _state.update { current ->
             val (next, event) = TasbeehEngine.tap(current.state, current.preset)
@@ -144,10 +178,14 @@ class TasbeehViewModel(
             TapEvent.SetComplete -> haptics.setComplete()
         }
         scheduleWrite()
+        if (fired == TapEvent.SetComplete) holdThenRollOver()
     }
 
     /** Back to count 0, round 1 for this preset, and that is worth writing straight away. */
     fun reset() {
+        // Reset goes to round 1 whatever the hold would have opened; the hold is simply dropped.
+        holdJob?.cancel()
+        holdJob = null
         _state.update { it.copy(state = TasbeehEngine.reset(it.state)) }
         flush()
     }
@@ -160,7 +198,7 @@ class TasbeehViewModel(
         val current = _state.value
         if (id == current.preset.id) return
         val preset = TasbeehPresets.byId(id, current.custom) ?: return
-        val leaving = current.state
+        val leaving = settle()
         // The debounce would only write what is being written here, a moment later.
         debounceJob?.cancel()
         scope.launch {
@@ -168,12 +206,13 @@ class TasbeehViewModel(
             store.select(id)
             val restored = store.stateOf(id).first()
             _state.update { it.copy(preset = preset, state = restored) }
+            holdIfComplete(preset, restored)
         }
     }
 
     /** Adds a phrase of the reader's own and selects it, which is why they typed it. */
     fun addCustom(phrase: String, target: Int) {
-        val leaving = _state.value.state
+        val leaving = settle()
         debounceJob?.cancel()
         scope.launch {
             store.save(leaving)
@@ -182,6 +221,7 @@ class TasbeehViewModel(
             val restored = store.stateOf(added.id).first()
             val custom = store.customPresets.first()
             _state.update { it.copy(preset = added, state = restored, custom = custom) }
+            holdIfComplete(added, restored)
         }
     }
 
@@ -201,7 +241,7 @@ class TasbeehViewModel(
      * show the new phrase without three separate assignments that could disagree.
      */
     fun updateCustom(id: String, phrase: String, target: Int) {
-        val leaving = _state.value.state
+        val leaving = settle()
         debounceJob?.cancel()
         scope.launch {
             store.save(leaving)
@@ -211,6 +251,7 @@ class TasbeehViewModel(
                 val edited = TasbeehPresets.byId(id, custom) ?: TasbeehPresets.default
                 val restored = store.stateOf(edited.id).first()
                 _state.update { it.copy(preset = edited, state = restored, custom = custom) }
+                holdIfComplete(edited, restored)
             } else {
                 _state.update { it.copy(custom = custom) }
             }
@@ -226,7 +267,7 @@ class TasbeehViewModel(
      * taps of the one that is.
      */
     fun removeCustom(id: String) {
-        val leaving = _state.value.state
+        val leaving = settle()
         debounceJob?.cancel()
         scope.launch {
             store.save(leaving)
@@ -236,6 +277,7 @@ class TasbeehViewModel(
                 val fallback = TasbeehPresets.default
                 val restored = store.stateOf(fallback.id).first()
                 _state.update { TasbeehUiState(fallback, restored, custom) }
+                holdIfComplete(fallback, restored)
             } else {
                 _state.update { it.copy(custom = custom) }
             }
@@ -246,8 +288,64 @@ class TasbeehViewModel(
     fun flush() {
         debounceJob?.cancel()
         debounceJob = null
-        val state = _state.value.state
+        val state = settle()
         // Not held in [debounceJob]: a write asked for by name is never the one to throw away.
+        scope.launch { store.save(state) }
+    }
+
+    /** Holds the closed ring for [SET_COMPLETE_HOLD_MS], then [rollOver]. */
+    private fun holdThenRollOver() {
+        holdJob?.cancel()
+        holdJob = scope.launch {
+            delay(SET_COMPLETE_HOLD_MS)
+            rollOver()
+        }
+    }
+
+    /**
+     * Schedules the hold for a state read from disk that is already a completed set. A hundred
+     * can be there: the debounce writes it 300 ms after the last tap, so a process that dies
+     * inside the hold leaves one, and so does an install from before the rollover existed. It is
+     * shown as the hundred it was and rolls over as a fresh one does.
+     */
+    private fun holdIfComplete(preset: TasbeehPreset, state: TasbeehState) {
+        if (preset.total > 0 && state.count >= preset.total) holdThenRollOver()
+    }
+
+    /**
+     * Applies a pending rollover now, if there is one, and returns the state to write for the
+     * preset on screen. Every path that writes the current preset on its way somewhere else goes
+     * through this, so a hundred mid-hold is stored as 0 of the next round rather than as itself.
+     * The coroutine may still land afterwards if it was already past its delay; it then finds the
+     * set rolled over and does nothing.
+     */
+    private fun settle(): TasbeehState {
+        val pending = holdJob
+        holdJob = null
+        if (pending != null && pending.isActive) {
+            pending.cancel()
+            _state.update { it.rolledOver() }
+        }
+        return _state.value.state
+    }
+
+    /**
+     * The hold's end: the completed set becomes 0 of the next round, and that goes to disk at once
+     * — a state the reader did not tap into is not left to a debounce a later tap could push back.
+     * Written directly rather than through [flush]: this runs on [scope], and [flush] and [settle]
+     * touch the two job fields that otherwise only the main thread writes. No debounce needs
+     * cancelling either: one pending here would mean a tap inside the hold, and that tap cancelled
+     * the hold. If the set is no longer complete (a tap or a switch beat this by an instant) there
+     * is nothing to write.
+     */
+    private fun rollOver() {
+        var rolled: TasbeehState? = null
+        _state.update { current ->
+            val next = current.rolledOver()
+            rolled = if (next === current) null else next.state
+            next
+        }
+        val state = rolled ?: return
         scope.launch { store.save(state) }
     }
 
@@ -262,5 +360,13 @@ class TasbeehViewModel(
     companion object {
         /** Spec §6: one write 300 ms after the last tap, not one per tap. */
         const val WRITE_DEBOUNCE_MS = 300L
+
+        /**
+         * How long a completed set holds its closed ring before rolling over to 0 of the next
+         * round. Long enough for the set haptic and the full ring to register as "done", short
+         * enough that a reader going straight on does not wait on it — a tap in the hold opens
+         * the next round at 1 immediately.
+         */
+        const val SET_COMPLETE_HOLD_MS = 1_000L
     }
 }

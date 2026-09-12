@@ -998,3 +998,22 @@ the ranked list under the tightened bar. The rotation is a permutation over the 
 day someone updates, the widget shows a different ayah once and the no-repeat cycle restarts. 1,295
 tests across the four targets; the emulator's mirror holds a hundred entries and none of the
 vetoed references.
+
+### The hundred lets go of the ring (12 September)
+
+A completed tasbeeh set sat on its hundred until the next tap took it to 1 of round 2. Mohamed
+wanted the counter to come back to zero on its own shortly after a set completes, and the change
+is small once it is put in the right place: the engine gains a pure `nextRound` (count 0, round
++ 1), and the view model holds the closed ring for one second after `SetComplete` before applying
+it and writing it straight away. The cases around the hold are the whole of the work. A tap inside
+the hold cancels the rollover and opens the next round at 1, as it always did, so a reader going
+straight through a hundred never waits and never sees a 1 wiped back to 0. Every path that writes
+the preset on its way somewhere else (leaving the screen, a chip switch, adding, editing or
+deleting a phrase) settles the rollover first, so what reaches disk is 0 of the next round rather
+than a hundred that would greet the reader on return. A hundred that is on disk anyway (the
+300 ms debounce wrote it and the process died inside the second; an install from before this
+change) opens as the hundred it was and rolls over after the same hold. The rollover is not a
+count and fires no haptic. Five view-model tests on virtual time and one engine test cover the
+hold, the tap inside it, the flush, the chip switch and the stored hundred. Built in a worktree
+off `main` while the recitation branch was in flight in the main checkout.
+

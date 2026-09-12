@@ -120,4 +120,15 @@ class TasbeehEngineTest {
         assertEquals(listOf(33), TasbeehEngine.partEnds(thirtyThree))
         assertEquals(listOf(100), TasbeehEngine.partEnds(subhanallah))
     }
+
+    /**
+     * The set does not wait to be tapped off the hundred: a moment after it completes the screen
+     * rolls it over on its own, and that is count 0 of the next round — not 1, since no dhikr was
+     * said — with the preset unchanged.
+     */
+    @Test
+    fun nextRoundOpensAtZeroWithTheRoundAdvanced() {
+        assertEquals(TasbeehState("after_prayer", 0, 2), TasbeehEngine.nextRound(TasbeehState("after_prayer", 100, 1)))
+        assertEquals(TasbeehState("custom_1", 0, 4), TasbeehEngine.nextRound(TasbeehState("custom_1", 1, 3)))
+    }
 }

@@ -75,6 +75,19 @@ object TasbeehEngine {
 - **Reset** returns to count 0, round 1, same preset.
 - Single-part presets are the same machine with one part, so `PartComplete` never fires for them.
 
+**Amended 12 September 2026: a completed set rolls over by itself.** The hundred used to sit
+on the ring until the next tap took it to 1 of round 2, which read as if the first dhikr of the
+new round had been skipped, and a reader who had finished had to tap once more to see a fresh
+ring. Now the ring stays closed for `TasbeehViewModel.SET_COMPLETE_HOLD_MS` (1 s: long enough
+for the set haptic and the full ring to register) and then the counter rolls over to **count 0,
+`round + 1`** on its own — `TasbeehEngine.nextRound`, pure like the rest — and that state is
+written at once. A tap inside the hold is the reader carrying on: it opens the next round at 1
+exactly as before and cancels the rollover, so nothing lands on top of the 1. Leaving the
+screen, switching chips, or editing a phrase mid-hold settles the rollover first, so disk holds
+0 of the next round rather than the hundred. A hundred that is nonetheless on disk (the debounce
+wrote it and the process died inside the hold; an install from before this change) opens as
+the hundred it was and rolls over after the same hold. Rolling over is not a count: no haptic.
+
 ## 4. What the screen shows
 
 `Screen.Tasbeeh`, reached from the Prayer header and by Back returning to it.

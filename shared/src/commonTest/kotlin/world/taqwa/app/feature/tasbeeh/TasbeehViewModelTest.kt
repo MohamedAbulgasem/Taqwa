@@ -382,4 +382,189 @@ class TasbeehViewModelTest {
         assertEquals("after_prayer", vm.state.value.preset.id)
         assertTrue(vm.state.value.custom.isEmpty())
     }
+
+    /**
+     * A finished set used to sit at 100 until the next tap took it to 1 of the next round. Now the
+     * hundred is held just long enough to be seen and felt, then the counter rolls over to 0 of
+     * round 2 by itself — and that reaches disk, so a kill during the next minute cannot bring
+     * the hundred back.
+     */
+    @Test
+    fun aCompletedSetRollsOverToZeroOfTheNextRoundOnItsOwn() = runTest {
+        val haptics = FakeHaptics()
+        val ds = CountingDataStore(dataStore())
+        val store = TasbeehStore(ds)
+        val vm = viewModel(store, haptics)
+        runCurrent()
+
+        repeat(100) { vm.tap() }
+        assertEquals(TasbeehState("after_prayer", 100, 1), vm.state.value.state)
+        assertEquals(1, haptics.sets)
+
+        advanceTimeBy(TasbeehViewModel.SET_COMPLETE_HOLD_MS - 1)
+        runCurrent()
+        assertEquals(100, vm.state.value.state.count, "the hundred is held long enough to be seen")
+
+        advanceTimeBy(2)
+        runCurrent()
+        assertEquals(TasbeehState("after_prayer", 0, 2), vm.state.value.state)
+        assertEquals(0f, vm.state.value.progress)
+        // Rolling over is not a count: no haptic of any kind.
+        assertEquals(100, haptics.counts + haptics.parts + haptics.sets)
+
+        // The write is real disk I/O: wait for the value, not for a write count — the debounce's
+        // own write from 300 ms after the hundredth tap is in flight too.
+        assertEquals(TasbeehState("after_prayer", 0, 2), store.stateOf("after_prayer").first { it.round == 2 })
+    }
+
+    /**
+     * Someone who keeps going straight through the hundred gets what they always got: the tap
+     * opens round 2 at 1. The pending rollover must not then land on top and wipe that 1 to 0.
+     */
+    @Test
+    fun aTapDuringTheHoldOpensTheNextRoundAtOneAndCancelsTheRollover() = runTest {
+        val vm = viewModel(TasbeehStore(dataStore()))
+        runCurrent()
+
+        repeat(100) { vm.tap() }
+        advanceTimeBy(TasbeehViewModel.SET_COMPLETE_HOLD_MS / 2)
+        vm.tap()
+        assertEquals(TasbeehState("after_prayer", 1, 2), vm.state.value.state)
+
+        advanceTimeBy(TasbeehViewModel.SET_COMPLETE_HOLD_MS * 2)
+        runCurrent()
+        assertEquals(TasbeehState("after_prayer", 1, 2), vm.state.value.state)
+    }
+
+    /** Leaving on the hundred stores the round it was about to open, not the hundred itself. */
+    @Test
+    fun leavingDuringTheHoldStoresZeroOfTheNextRound() = runTest {
+        val ds = CountingDataStore(dataStore())
+        val store = TasbeehStore(ds)
+        val vm = viewModel(store)
+        runCurrent()
+
+        repeat(100) { vm.tap() }
+        vm.flush()
+        runCurrent()
+        assertEquals(TasbeehState("after_prayer", 0, 2), vm.state.value.state)
+        ds.awaitWrite()
+        assertEquals(TasbeehState("after_prayer", 0, 2), store.stateOf("after_prayer").first())
+
+        // The rollover already happened; its timer must not fire a second one.
+        advanceTimeBy(TasbeehViewModel.SET_COMPLETE_HOLD_MS * 2)
+        runCurrent()
+        assertEquals(TasbeehState("after_prayer", 0, 2), vm.state.value.state)
+    }
+
+    /** The same for a chip switch: the preset left on its hundred comes back at 0 of round 2. */
+    @Test
+    fun switchingChipsDuringTheHoldStoresZeroOfTheNextRound() = runTest {
+        val store = TasbeehStore(dataStore())
+        val vm = viewModel(store)
+        runCurrent()
+
+        repeat(100) { vm.tap() }
+        vm.select("astaghfirullah")
+        vm.state.first { it.preset.id == "astaghfirullah" }
+        assertEquals(TasbeehState("after_prayer", 0, 2), store.stateOf("after_prayer").first())
+
+        vm.select("after_prayer")
+        assertEquals(TasbeehState("after_prayer", 0, 2), vm.state.first { it.preset.id == "after_prayer" }.state)
+    }
+
+    /**
+     * A hundred can still be on disk — written by the debounce 300 ms after the last tap, and the
+     * process gone before the hold ended, or left there by a build from before the rollover. It
+     * opens as the hundred it was and then rolls over exactly as a fresh one does.
+     */
+    @Test
+    fun aStoredCompletedSetRollsOverAfterTheScreenOpens() = runTest {
+        val store = TasbeehStore(dataStore())
+        store.save(TasbeehState("after_prayer", 100, 3))
+        val vm = viewModel(store)
+        // The read is real disk I/O, so wait for it rather than for the dispatcher.
+        assertEquals(TasbeehState("after_prayer", 100, 3), vm.state.first { it.state.count == 100 }.state)
+
+        advanceTimeBy(TasbeehViewModel.SET_COMPLETE_HOLD_MS + 1)
+        runCurrent()
+        assertEquals(TasbeehState("after_prayer", 0, 4), vm.state.value.state)
+        assertEquals(TasbeehState("after_prayer", 0, 4), store.stateOf("after_prayer").first { it.round == 4 })
+    }
+
+    /** Reset inside the hold means round 1, and the hold must not then open round 2 on top. */
+    @Test
+    fun resetDuringTheHoldStaysAtRoundOne() = runTest {
+        val vm = viewModel(TasbeehStore(dataStore()))
+        runCurrent()
+
+        repeat(100) { vm.tap() }
+        vm.reset()
+        assertEquals(TasbeehState("after_prayer", 0, 1), vm.state.value.state)
+
+        advanceTimeBy(TasbeehViewModel.SET_COMPLETE_HOLD_MS * 2)
+        runCurrent()
+        assertEquals(TasbeehState("after_prayer", 0, 1), vm.state.value.state)
+    }
+
+    /**
+     * The custom edits write the preset on screen before they touch anything, as a chip switch
+     * does; deleting some other phrase mid-hold stores the hundred as 0 of the next round too.
+     */
+    @Test
+    fun deletingAnotherPhraseDuringTheHoldStoresZeroOfTheNextRound() = runTest {
+        val store = TasbeehStore(dataStore()) { 4_242L }
+        val vm = viewModel(store)
+        runCurrent()
+
+        vm.addCustom("يا لطيف", 40)
+        vm.state.first { it.preset.id == "custom_4242" }
+        vm.select("after_prayer")
+        vm.state.first { it.preset.id == "after_prayer" }
+
+        repeat(100) { vm.tap() }
+        vm.removeCustom("custom_4242")
+        vm.state.first { it.custom.isEmpty() }
+
+        assertEquals(TasbeehState("after_prayer", 0, 2), vm.state.value.state)
+        assertEquals(TasbeehState("after_prayer", 0, 2), store.stateOf("after_prayer").first { it.round == 2 })
+    }
+
+    /**
+     * A chip can hold a stored hundred exactly as the screen can open on one (a build from before
+     * the rollover left it there). Switching to it shows the hundred and then rolls it over after
+     * the same hold, rather than leaving it to sit until tapped.
+     */
+    @Test
+    fun switchingToAChipStoredOnItsHundredRollsItOver() = runTest {
+        val store = TasbeehStore(dataStore())
+        store.save(TasbeehState("astaghfirullah", 100, 1))
+        val vm = viewModel(store)
+        runCurrent()
+
+        vm.select("astaghfirullah")
+        assertEquals(100, vm.state.first { it.preset.id == "astaghfirullah" }.state.count)
+
+        advanceTimeBy(TasbeehViewModel.SET_COMPLETE_HOLD_MS + 1)
+        runCurrent()
+        assertEquals(TasbeehState("astaghfirullah", 0, 2), vm.state.value.state)
+    }
+
+    /**
+     * The hold's coroutine has no suspension point after its delay, so a tap or a chip switch
+     * landing in that same instant cannot cancel it. The rollover therefore has to do nothing on
+     * anything that is not a completed set: a 1 of round 2 stays a 1, and only a hundred moves.
+     */
+    @Test
+    fun rollingOverLeavesAnythingButACompletedSetAlone() {
+        val preset = TasbeehPresets.default
+        assertEquals(
+            TasbeehState("after_prayer", 0, 2),
+            TasbeehUiState(preset, TasbeehState("after_prayer", 100, 1)).rolledOver().state,
+        )
+        val midRound = TasbeehUiState(preset, TasbeehState("after_prayer", 1, 2))
+        assertEquals(midRound, midRound.rolledOver())
+        val fresh = TasbeehUiState(preset, TasbeehState("after_prayer", 0, 1))
+        assertEquals(fresh, fresh.rolledOver())
+    }
 }

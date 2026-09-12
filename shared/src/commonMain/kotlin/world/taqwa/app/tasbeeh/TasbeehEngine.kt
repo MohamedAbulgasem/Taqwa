@@ -50,6 +50,14 @@ object TasbeehEngine {
     fun reset(state: TasbeehState): TasbeehState = state.copy(count = 0, round = 1)
 
     /**
+     * The round after this one, before anything has been said in it: count 0, `round + 1`. The
+     * screen applies it on its own a moment after a set completes, so a finished set does not sit
+     * on its hundred waiting for a tap. [tap] from a completed set still opens the next round at 1
+     * — that tap *is* the first dhikr of the new round; this is the case where no tap came.
+     */
+    fun nextRound(state: TasbeehState): TasbeehState = state.copy(count = 0, round = state.round + 1)
+
+    /**
      * The cumulative count each part ends on — 33, 66, 100 for the post-prayer set. The ring
      * draws its tick marks at these, and [tap] reads them to decide a part is done.
      */
