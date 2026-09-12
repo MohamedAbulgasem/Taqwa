@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import world.taqwa.app.di.appContainer
 import world.taqwa.app.recitation.NowPlayingText
@@ -72,16 +73,14 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                     "stop" -> player.stop()
                     "state" -> Log.i(TAG, "state ${player.state.value}")
                     "reconcile" -> {
-                        appContainer.recitationLibrary.reconcile()
+                        val library = appContainer.recitationLibrary
+                        library.reconcile()
+                        // `.first()`, not the Flow itself: logging the Flow prints its identity
+                        // hash and says nothing about which surahs were adopted.
                         Log.i(
                             TAG,
-                            "reconciled ${reciterId}: " +
-                                appContainer.recitationLibrary.downloaded(reciterId),
-                        )
-                        Log.i(
-                            TAG,
-                            "downloaded now " +
-                                appContainer.recitationLibrary.isDownloaded(reciterId, surah),
+                            "reconciled $reciterId: " +
+                                library.downloaded(reciterId).first().sorted(),
                         )
                     }
                     "focus" -> stealFocus(context)
