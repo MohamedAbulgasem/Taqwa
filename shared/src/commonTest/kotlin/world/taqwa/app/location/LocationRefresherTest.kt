@@ -91,12 +91,15 @@ class LocationRefresherTest {
         val settings = settings("walked")
         settings.setLocation(capeTown)
         settings.setLocationSource(LocationSource.GPS)
+        // What the store holds, not the fix handed to it: the repository rounds coordinates to
+        // three decimals on the way in, and "left alone" means that stored value.
+        val before = settings.location.first()
         // ~2 km away, same zone: below the 5 km threshold.
         val refreshed = refresher(settings, -33.9258 to 18.4448, "Africa/Johannesburg")
             .refreshFor(RescheduleTrigger.APP_FOREGROUND)
 
-        assertEquals(capeTown.latitude, refreshed?.latitude)
-        assertEquals(capeTown.longitude, settings.location.first()?.longitude)
+        assertEquals(before?.latitude, refreshed?.latitude)
+        assertEquals(before?.longitude, settings.location.first()?.longitude)
     }
 
     @Test

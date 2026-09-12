@@ -40,7 +40,7 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 - **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, your own phrases can be added, and nothing is ever totted up.
 - **Notifications at the exact time**, with a choice per prayer between silence, a clear announcement tone, a takbir, or the opening of the adhan, and a choice of three adhan recordings. Optional reminder a few minutes before.
 - **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the compass needs it.
-- **Hijri date** (Umm al-Qura tabular calendar) with a one-day adjustment for local moonsighting, shown beside the Gregorian date.
+- **Hijri date** from the tabular (arithmetic) Islamic calendar, which can differ by a day from Umm al-Qura and from local moonsighting, with a one-day adjustment to match your community; shown beside the Gregorian date.
 - **Quran reader** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation, bookmarks, and copy or share of any ayah; everything offline.
 - **Arabic and English**, following the phone's language. Arabic is laid out right to left with the locale's own digits, not translated over an English layout.
 - **Light and dark**, following the system or fixed, in one amber accent.

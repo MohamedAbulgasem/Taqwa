@@ -22,7 +22,8 @@ struct iOSApp: App {
 			// Hidden debug route: `xcrun simctl launch booted world.taqwa.app -taqwaWidgetPreview 1`
 			// renders the real widget views full screen against the real App Group mirror. There is
 			// no simctl command that places a widget on a simulator home screen, so this is how a
-			// widget render gets captured. Harmless in a shipping build — nothing reaches it.
+			// widget render gets captured. Compiled out of a release build: a user default is
+			// writable by anyone with the device, and a route nobody should reach is best absent.
 			if Self.widgetPreviewRequested {
 				TaqwaWidgetPreviewScreen(section: Self.widgetPreviewSection)
 			} else {
@@ -40,9 +41,13 @@ struct iOSApp: App {
 	/// `SIMCTL_CHILD_TAQWA_WIDGET_PREVIEW=1`, since `simctl launch` swallows some leading-dash
 	/// arguments before the app ever sees them.
 	static var widgetPreviewRequested: Bool {
+		#if DEBUG
 		if UserDefaults.standard.bool(forKey: "taqwaWidgetPreview") { return true }
 		if ProcessInfo.processInfo.arguments.contains("-taqwaWidgetPreview") { return true }
 		return ProcessInfo.processInfo.environment["TAQWA_WIDGET_PREVIEW"] == "1"
+		#else
+		return false
+		#endif
 	}
 
 	/// Which widgets the route draws: `all` (the default) or `ayah`, from

@@ -131,6 +131,7 @@
     <string name="prayer_times_hijri_label">HIJRI DATE</string>
     <string name="hijri_day_before">A day earlier</string>
     <string name="hijri_day_after">A day later</string>
+    <string name="hijri_method_note">An arithmetic calendar, not a sighting. It can differ by a day from Umm al-Qura and from your local moonsighting; use the adjustment to match your community.</string>
     <string name="prayer_times_show_sunrise">Show sunrise</string>
     <string name="adjustments_none">None</string>
     <string name="adjustments_one">1 prayer</string>

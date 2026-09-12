@@ -59,6 +59,7 @@ import world.taqwa.app.resources.adjustments_many
 import world.taqwa.app.resources.adjustments_none
 import world.taqwa.app.resources.adjustments_one
 import world.taqwa.app.resources.high_lat_auto_note
+import world.taqwa.app.resources.hijri_method_note
 import world.taqwa.app.resources.high_lat_picker_note
 import world.taqwa.app.resources.hijri_day_after
 import world.taqwa.app.resources.hijri_day_before
@@ -144,6 +145,10 @@ fun PrayerTimesSettingsScreen(
                 LocalPlatformFormat.current,
             ),
         )
+        Spacer(Modifier.height(6.dp))
+        // Says what the date is made of. A reader whose mosque is a day off and who finds no
+        // explanation concludes the app is wrong, not that it uses a different convention.
+        SettingsNote(stringResource(Res.string.hijri_method_note))
 
         Spacer(Modifier.height(28.dp))
         SettingsCard {

@@ -31,6 +31,8 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationDefaultAccuracyReduced</key>
+	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Taqwa uses your location to calculate accurate prayer times on your device. Your location is never sent anywhere.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

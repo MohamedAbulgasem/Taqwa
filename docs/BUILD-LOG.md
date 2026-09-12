@@ -1017,3 +1017,26 @@ count and fires no haptic. Five view-model tests on virtual time and one engine 
 hold, the tap inside it, the flush, the chip switch and the stored hundred. Built in a worktree
 off `main` while the recitation branch was in flight in the main checkout.
 
+### Trust round one (13 September)
+
+A read-only audit of the app's trust and security surface produced eleven findings and a
+handful against the unmerged recitation branch; Mohamed picked five for now and deferred the
+privacy policy and About screen. The Android launcher activity is exported, so any app on the
+phone could start it with `open_surah=999` and the reader threw on a surah the database does
+not have; the bounds (114 surahs, 286 ayahs at most) now live in the shared `LaunchRequests`,
+so iOS, which checked only `ayah >= 1`, gets the same rule. Coordinates are stored rounded to
+three decimals, about 110 m, which moves no prayer time and no qibla bearing; the file should
+not hold a GPS fix's metre precision. `allowBackup` is off on Android: the settings file holds
+the coordinates or chosen city, and the promise that the location never leaves the phone has to
+include Google's backup. Backup rules could not split the file, since bookmarks and tasbeeh
+counts live in the same DataStore, so the whole app opts out and settings are redone on a new
+phone. On iOS the same file moves from Documents, which iCloud backs up, to Application Support
+marked excluded from backup, with a one-time move of the existing file so nobody's settings
+vanish on upgrade. iOS now asks for reduced location accuracy by default, so the permission
+sheet shows "Precise: Off"; the qibla bearing at that scale is under a degree out except very
+near Makkah. The README said the Hijri date was Umm al-Qura while the class said, in its own
+comment, that it deliberately is not and can differ by a day; the README now says tabular, and
+a note under the Hijri control says the same to the reader in both languages, since a reader
+whose mosque is a day off and who finds no explanation concludes the app is wrong. The iOS
+widget-preview route is compiled out of release builds.
+

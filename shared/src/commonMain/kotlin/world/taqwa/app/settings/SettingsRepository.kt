@@ -22,6 +22,7 @@ import world.taqwa.app.prayer.CalculationMethodDefaults
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
+import kotlin.math.round
 
 /** Reads a stored enum name, falling back to [fallback] when the value is absent or unrecognised. */
 private inline fun <reified E : Enum<E>> String?.toEnumOr(fallback: E): E =
@@ -245,8 +246,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
                 it[SettingsKeys.LOCATION_CITY_DISPLAY_NAME] = resolved.name
                 it[SettingsKeys.LOCATION_CITY_DISPLAY_LANGUAGE] = resolved.languageTag
             }
-            it[SettingsKeys.LOCATION_LAT] = location.latitude
-            it[SettingsKeys.LOCATION_LON] = location.longitude
+            // Three decimals, about 110 m: prayer times and the qibla bearing do not move at that
+            // scale, and a GPS fix's metre precision is not something the file should hold.
+            it[SettingsKeys.LOCATION_LAT] = location.latitude.roundedTo3dp()
+            it[SettingsKeys.LOCATION_LON] = location.longitude.roundedTo3dp()
             it[SettingsKeys.LOCATION_TZ] = location.timeZoneId
             // Cleared, not skipped, when absent: a GPS fix has no city name, and leaving the
             // previously chosen city's label in place would caption the new coordinates with
@@ -294,6 +297,8 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     suspend fun setLocationSource(source: LocationSource) {
         store.edit { it[SettingsKeys.LOCATION_SOURCE] = source.name }
     }
+
+    private fun Double.roundedTo3dp(): Double = round(this * 1000.0) / 1000.0
 
     /** Test-only hook for the forward-compatibility case. */
     internal suspend fun writeRawThemeForTest(raw: String) {

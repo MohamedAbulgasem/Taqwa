@@ -320,6 +320,20 @@ class SettingsRepositoryTest {
         r.setReadingPosition(ReadingPosition(surah = 2, ayah = 255, page = 42))
         assertEquals(ReadingPosition(surah = 2, ayah = 255, page = 42), r.readingPosition.first())
     }
+
+    /**
+     * A GPS fix arrives with metre precision and prayer times do not need it: three decimals is
+     * about 110 m, which moves no prayer time by a second and no qibla bearing by a visible
+     * amount. Storing the rounded value is the "we could not reconstruct your street even if the
+     * file leaked" half of the location promise.
+     */
+    @Test fun storedCoordinatesAreRoundedToThreeDecimals() = runTest {
+        val r = repo("loc-rounding")
+        r.setLocation(GeoLocation(51.5074123, -0.1278456, "Europe/London", "London", "GB"))
+        val got = r.location.first()!!
+        assertEquals(51.507, got.latitude)
+        assertEquals(-0.128, got.longitude)
+    }
 }
 
 class NotificationSettingsStorageTest {
@@ -410,4 +424,5 @@ class NotificationSettingsStorageTest {
     fun theLeadOptionsStartAtNever() {
         assertEquals(0, NotificationSettings.LeadOptions.first())
     }
+
 }

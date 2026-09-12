@@ -18,9 +18,18 @@ object LaunchRequests {
      * none pending. */
     val pendingAyah: StateFlow<Pair<Int, Int>?> get() = _pendingAyah
 
-    /** Records a request to open [surah]:[ayah]. Overwrites any request still pending — only the
-     * most recent tap matters. */
+    /**
+     * Records a request to open [surah]:[ayah]. Overwrites any request still pending — only the
+     * most recent tap matters.
+     *
+     * A reference outside the Quran is dropped here, not by the callers: the Android launcher
+     * activity is exported, so any app on the phone can start it with `open_surah=999`, and a
+     * surah the database does not have used to reach the reader and throw inside its coroutine.
+     * The bounds are the Quran's own — 114 surahs, none longer than al-Baqarah's 286 ayahs — and
+     * an ayah past its own surah's length is left to the reader, which clamps it.
+     */
     fun openAyah(surah: Int, ayah: Int) {
+        if (surah !in 1..SURAH_COUNT || ayah !in 1..LONGEST_SURAH) return
         _pendingAyah.value = surah to ayah
     }
 
@@ -28,4 +37,7 @@ object LaunchRequests {
     fun consume() {
         _pendingAyah.value = null
     }
+
+    private const val SURAH_COUNT = 114
+    private const val LONGEST_SURAH = 286
 }

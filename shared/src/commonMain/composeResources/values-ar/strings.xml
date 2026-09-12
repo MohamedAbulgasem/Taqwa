@@ -126,6 +126,7 @@
     <string name="prayer_times_hijri_label">التاريخ الهجري</string>
     <string name="hijri_day_before">يوم قبل</string>
     <string name="hijri_day_after">يوم بعد</string>
+    <string name="hijri_method_note">تقويم حسابي لا يعتمد على الرؤية. قد يختلف بيوم عن تقويم أم القرى وعن رؤية الهلال في بلدك؛ استخدم التعديل لتوافق ما يعتمده مجتمعك.</string>
     <string name="prayer_times_show_sunrise">إظهار الشروق</string>
     <string name="adjustments_none">بدون</string>
     <string name="adjustments_one">صلاة واحدة</string>

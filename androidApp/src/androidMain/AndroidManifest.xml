@@ -10,9 +10,13 @@
          without this. -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- allowBackup is off on purpose: the settings file holds the reader's coordinates (or
+         chosen city), and "your location never leaves your phone" has to include Google's
+         backup. Backup rules cannot split the file — bookmarks and tasbeeh counts live in the
+         same DataStore — so the whole app opts out, and settings are redone on a new phone. -->
     <application
         android:name=".TaqwaApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
