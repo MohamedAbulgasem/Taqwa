@@ -176,6 +176,12 @@ fun App(container: AppContainer) {
     LaunchedEffect(Unit) {
         withContext(Dispatchers.Default) {
             runCatching { container.recitationLibrary.reconcile() }
+            // ── Recitation catalogue refresh (spec 3a §4, slice 3a task 2) ──────────
+            // After the reconciliation and on the same background pass: at most one fetch of
+            // manifest.json a day, silent about every way it can fail. A reader who is offline
+            // keeps yesterday's catalogue, or the one bundled with the build.
+            runCatching { container.manifestRefresher.refreshIfStale() }
+            // ── end recitation catalogue refresh ────────────────────────────────────
         }
     }
 

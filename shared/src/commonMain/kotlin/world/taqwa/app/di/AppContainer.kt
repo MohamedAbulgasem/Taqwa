@@ -9,7 +9,9 @@ import world.taqwa.app.notifications.NotificationCoordinator
 import world.taqwa.app.notifications.createNotificationScheduler
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.quran.QuranRepository
+import world.taqwa.app.recitation.ManifestRefresher
 import world.taqwa.app.recitation.createManifestProvider
+import world.taqwa.app.recitation.createSurahDownloader
 import world.taqwa.app.recitation.createRecitationLibrary
 import world.taqwa.app.recitation.createRecitationPaths
 import world.taqwa.app.resources.Res
@@ -53,6 +55,16 @@ class AppContainer {
     val recitationPaths by lazy { createRecitationPaths() }
     val recitationLibrary by lazy { createRecitationLibrary(dataStore, recitationPaths) }
     val manifestProvider by lazy { createManifestProvider(recitationPaths) }
+
+    // ── Recitation downloads (spec 3a §7, slice 3a task 2). One block, kept together. ──
+    // Both are `by lazy` for the same reason as the three above: constructing the downloader
+    // reaches for WorkManager on Android and builds a background URL session on iOS, and an
+    // install that never opens the Quran should pay for neither.
+    val surahDownloader by lazy {
+        createSurahDownloader(recitationLibrary, manifestProvider, settingsRepository, quranRepository)
+    }
+    val manifestRefresher by lazy { ManifestRefresher(manifestProvider, dataStore) }
+    // ── end recitation downloads ──────────────────────────────────────────────────────
     val locationRepository = LocationRepository(createLocationProvider())
     val prayerTimesEngine = PrayerTimesEngine()
     val widgetPinRequester = createWidgetPinRequester()
