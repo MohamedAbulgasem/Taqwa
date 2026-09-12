@@ -1,0 +1,208 @@
+package world.taqwa.app.recitation
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.SilenceMediaSource
+import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionResult
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
+
+/**
+ * Where recitation actually plays (spec §6). A `MediaSessionService` rather than a player inside
+ * the Activity, because the two things the brief asks for — audio that survives the app going to
+ * the background, and controls on the lock screen — are both what a media session is for. The
+ * notification, the lock-screen transport and the artwork are the platform's, drawn from the
+ * session; this app draws none of them.
+ *
+ * The app talks to this through a `MediaController` (see `RecitationPlayer`), which is also how
+ * Android Auto, Assistant and a paired watch would talk to it.
+ */
+@UnstableApi
+class RecitationService : MediaSessionService() {
+
+    private var session: MediaSession? = null
+
+    /**
+     * The two lines the notification shows, set by the app just before it sets the queue.
+     *
+     * It travels as a custom command rather than on each `MediaItem` for a plain reason: a
+     * controller's media items cross a binder, `MediaItem`s lose their URI on the way over
+     * (Media3 strips it to keep transactions small), and Al-Baqarah is 571 items. Sending the
+     * text once and building the metadata on this side keeps the largest surah's queue well under
+     * the binder's 1 MB and puts the artwork — 30 KB, one array shared by every item — entirely
+     * on this side of it.
+     */
+    private var nowPlaying: NowPlayingText? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        val paths = createRecitationPaths()
+        val player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(RecitationSourceFactory(TaqaDataSource.Factory(paths)))
+            // Recitation is speech, and it pauses rather than ducks: a recitation read at a
+            // quarter volume under a notification chime is worse than one that waited.
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(C.USAGE_MEDIA)
+                    .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                    .build(),
+                /* handleAudioFocus = */ true,
+            )
+            .setHandleAudioBecomingNoisy(true)
+            .build()
+        session = MediaSession.Builder(this, player).setCallback(Callback()).build()
+    }
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
+
+    /**
+     * The app was swiped out of Recents. Keep playing if it is playing — that is the whole point
+     * of a background service, and the notification is still there to stop it with; stop if it is
+     * paused, because a paused session nobody can see is a notification the user cannot get rid
+     * of.
+     */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        val player = session?.player
+        if (player == null ||
+            !player.playWhenReady ||
+            player.mediaItemCount == 0 ||
+            player.playbackState == Player.STATE_ENDED
+        ) {
+            stopSelf()
+        }
+    }
+
+    override fun onDestroy() {
+        session?.run {
+            player.release()
+            release()
+        }
+        session = null
+        super.onDestroy()
+    }
+
+    private inner class Callback : MediaSession.Callback {
+
+        override fun onConnect(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+        ): MediaSession.ConnectionResult {
+            val commands = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
+                .add(SessionCommand(COMMAND_NOW_PLAYING, Bundle.EMPTY))
+                .build()
+            return MediaSession.ConnectionResult.AcceptedResultBuilder(mediaSession)
+                .setAvailableSessionCommands(commands)
+                .build()
+        }
+
+        override fun onCustomCommand(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            customCommand: SessionCommand,
+            args: Bundle,
+        ): ListenableFuture<SessionResult> {
+            if (customCommand.customAction == COMMAND_NOW_PLAYING) {
+                nowPlaying = NowPlayingText(
+                    title = args.getString(ARG_TITLE).orEmpty(),
+                    subtitle = args.getString(ARG_SUBTITLE).orEmpty(),
+                )
+                return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+            }
+            return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
+        }
+
+        /**
+         * Puts back the URI the binder stripped, and gives every item the same title, subtitle and
+         * artwork — the gap items included, so the notification does not blink between ayahs.
+         */
+        override fun onAddMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>,
+        ): ListenableFuture<MutableList<MediaItem>> {
+            val text = nowPlaying
+            val artwork = AppIconArtwork.bytes(this@RecitationService)
+            val resolved = mediaItems.mapTo(ArrayList(mediaItems.size)) { item ->
+                val metadata = MediaMetadata.Builder()
+                    .setTitle(text?.title)
+                    .setArtist(text?.subtitle)
+                    .setIsPlayable(true)
+                    .setIsBrowsable(false)
+                    .apply {
+                        if (artwork != null) {
+                            setArtworkData(artwork, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+                        }
+                    }
+                    .build()
+                item.buildUpon()
+                    .setUri(item.mediaId)
+                    .setMediaMetadata(metadata)
+                    .build()
+            }
+            return Futures.immediateFuture(resolved)
+        }
+    }
+
+    companion object {
+        /** Carries [NowPlayingText] to the session before the queue is set. */
+        const val COMMAND_NOW_PLAYING = "world.taqwa.app.recitation.NOW_PLAYING"
+        const val ARG_TITLE = "title"
+        const val ARG_SUBTITLE = "subtitle"
+    }
+}
+
+/**
+ * Ayahs come out of the `.taqa` by byte range ([TaqaDataSource]); the reciter's inter-ayah gap is
+ * a [SilenceMediaSource] of its own length. Two sources rather than one because there is no MP3
+ * of silence in the container to point at, and a silent item is what keeps the queue index and
+ * `RecitationQueue`'s arithmetic the same list.
+ */
+@UnstableApi
+private class RecitationSourceFactory(
+    dataSourceFactory: TaqaDataSource.Factory,
+) : MediaSource.Factory {
+
+    private val audio = DefaultMediaSourceFactory(dataSourceFactory)
+
+    override fun getSupportedTypes(): IntArray = audio.supportedTypes
+
+    override fun setDrmSessionManagerProvider(
+        drmSessionManagerProvider: DrmSessionManagerProvider,
+    ): MediaSource.Factory {
+        audio.setDrmSessionManagerProvider(drmSessionManagerProvider)
+        return this
+    }
+
+    override fun setLoadErrorHandlingPolicy(
+        loadErrorHandlingPolicy: LoadErrorHandlingPolicy,
+    ): MediaSource.Factory {
+        audio.setLoadErrorHandlingPolicy(loadErrorHandlingPolicy)
+        return this
+    }
+
+    override fun createMediaSource(mediaItem: MediaItem): MediaSource {
+        val uri = mediaItem.localConfiguration?.uri
+        if (uri?.scheme == SILENCE_SCHEME) {
+            val millis = uri.authority?.toLongOrNull() ?: 0L
+            // The factory's own createMediaSource() hands back a source whose MediaItem is
+            // Media3's placeholder — no title, no artist, no artwork — which would blank the
+            // notification for the length of every gap. The source will take ours instead.
+            return SilenceMediaSource(millis * 1_000L).apply { updateMediaItem(mediaItem) }
+        }
+        return audio.createMediaSource(mediaItem)
+    }
+}

@@ -9,6 +9,11 @@
     <!-- Qibla alignment confirms with a short tick; Vibrator.vibrate() throws SecurityException
          without this. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Recitation plays from a MediaSessionService so it survives the app going to the
+         background and puts transport controls on the lock screen (spec 3a §6). Both are needed:
+         the generic one since API 28, the typed one since API 34. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:name=".TaqwaApplication"
@@ -28,6 +33,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Quran recitation. Exported with the MediaSessionService intent filter because that
+             is how the platform, Android Auto, Assistant and a paired watch find a media session;
+             it exposes transport controls and nothing else. The class lives in :shared, behind
+             the expect/actual, so Media3 never reaches common code. -->
+        <service
+            android:name="world.taqwa.app.recitation.RecitationService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
+        </service>
         <receiver android:name="world.taqwa.app.notifications.PrayerAlarmReceiver" android:exported="false" />
         <receiver android:name="world.taqwa.app.notifications.SystemEventReceiver" android:exported="true">
             <intent-filter>
