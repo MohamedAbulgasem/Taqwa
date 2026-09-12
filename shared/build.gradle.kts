@@ -10,6 +10,14 @@ plugins {
 kotlin {
     androidTarget()
 
+    // `SurahDownloader` is an `expect class` (spec 3a §7): the two platforms' downloaders are
+    // whole objects with state, not a function each, and the scheduler behind them differs
+    // completely. Expect/actual classes are still flagged Beta by the compiler; the flag says
+    // the shape is deliberate rather than leaving a warning in every build.
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     // Compose Multiplatform 1.12.0 no longer publishes iosX64 (Intel simulator) artifacts.
     listOf(
         iosArm64(),
@@ -60,6 +68,9 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core)
             implementation(libs.sqldelight.android)
+            // Slice 3a. A surah download has to survive the app being backgrounded and the
+            // process being killed, which on Android is WorkManager and nothing else.
+            api(libs.androidx.work.runtime)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

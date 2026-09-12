@@ -12,6 +12,9 @@ datastore = "1.1.7"
 androidx-activity = "1.9.3"
 androidx-core = "1.15.0"
 androidx-glance = "1.1.1"
+# Slice 3a: surah downloads survive the app being backgrounded, which on Android means
+# WorkManager. 2.11.2 is the latest stable; 2.12.0 is still RC.
+androidx-work = "2.11.2"
 # The version Compose Multiplatform 1.12.0 already resolves transitively (via material3's
 # lifecycle-viewmodel-compose), confirmed with
 # `./gradlew :shared:dependencies --configuration metadataCommonMainCompileClasspath | grep lifecycle`.
@@ -43,6 +46,7 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences-cor
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidx-glance" }
+androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
