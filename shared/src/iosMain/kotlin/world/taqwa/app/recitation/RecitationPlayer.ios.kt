@@ -102,6 +102,18 @@ actual class RecitationPlayer actual constructor(
     private var gapJob: Job? = null
     private var ticker: Job? = null
     private var observers: MutableList<NSObjectProtocol> = mutableListOf()
+
+    /**
+     * The did-play-to-end observer of the ayah currently in the player, registered against that
+     * one `AVPlayerItem` rather than against every item in the process.
+     *
+     * This started as one observer for the whole player, taking any did-play-to-end notification
+     * and asking `notification.object === player.currentItem` whether it was ours. On a simulator
+     * that comparison was never true: the notification's `object` arrives as `Any?`, and the
+     * Kotlin object it is wrapped in is not the one `currentItem` hands back, so every ayah ended
+     * and nothing followed it. Naming the item at registration asks no such question.
+     */
+    private var endObserver: NSObjectProtocol? = null
     private var commandsWired = false
 
     /** Held across the gap for the same reason as on Android: the ayah's line must not rewind. */
@@ -139,8 +151,8 @@ actual class RecitationPlayer actual constructor(
             finished = false
             ensurePlayer()
             // Not inside `ensurePlayer`: `stop` removes the observers but keeps the `AVPlayer`, so
-            // a second `load` would have found the player already built and gone on without the
-            // did-play-to-end observer — and stopped dead at the end of the first ayah.
+            // a second `load` would have found the player already built and gone on deaf to
+            // interruptions and to the headphones being pulled out.
             observe()
             activateSession()
             wireCommands()
@@ -252,6 +264,7 @@ actual class RecitationPlayer actual constructor(
         ayahPositionMs = 0L
         ayahDurationMs = 0L
         val item = AVPlayerItem(uRL = NSURL.fileURLWithPath(path))
+        observeEndOf(item)
         player?.replaceCurrentItemWithPlayerItem(item)
         if (wantsPlay) player?.play()
         publish()
@@ -338,13 +351,6 @@ actual class RecitationPlayer actual constructor(
         if (observers.isNotEmpty()) return
         val centre = NSNotificationCenter.defaultCenter
         observers += centre.addObserverForName(
-            name = AVPlayerItemDidPlayToEndTimeNotification,
-            `object` = null,
-            queue = NSOperationQueue.mainQueue,
-        ) { notification: NSNotification? ->
-            if (notification?.`object` === player?.currentItem) onItemEnded()
-        }
-        observers += centre.addObserverForName(
             name = AVAudioSessionInterruptionNotification,
             `object` = null,
             queue = NSOperationQueue.mainQueue,
@@ -389,7 +395,23 @@ actual class RecitationPlayer actual constructor(
         }
     }
 
+    /** The one notification that has to name its item: see [endObserver]. */
+    private fun observeEndOf(item: AVPlayerItem) {
+        clearEndObserver()
+        endObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+            name = AVPlayerItemDidPlayToEndTimeNotification,
+            `object` = item,
+            queue = NSOperationQueue.mainQueue,
+        ) { _: NSNotification? -> onItemEnded() }
+    }
+
+    private fun clearEndObserver() {
+        endObserver?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
+        endObserver = null
+    }
+
     private fun unobserve() {
+        clearEndObserver()
         val centre = NSNotificationCenter.defaultCenter
         observers.forEach { centre.removeObserver(it) }
         observers.clear()
