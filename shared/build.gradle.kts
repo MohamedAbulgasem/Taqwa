@@ -60,6 +60,11 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core)
             implementation(libs.sqldelight.android)
+            // Slice 3a task 3: recitation playback. The ExoPlayer lives in a MediaSessionService
+            // so the notification and the lock screen come from the platform rather than from
+            // anything this app draws.
+            implementation(libs.media3.exoplayer)
+            implementation(libs.media3.session)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
