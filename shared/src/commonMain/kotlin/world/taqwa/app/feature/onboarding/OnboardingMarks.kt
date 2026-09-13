@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -38,18 +39,25 @@ private fun DrawScope.lineStroke() = Stroke(width = ICON_STROKE * unit(), cap = 
 @Composable
 fun MihrabMark(modifier: Modifier = Modifier) {
     val colors = LocalTaqwaColors.current
-    Canvas(modifier.size(MarkSize)) {
-        val u = unit()
-        val arch = Path().apply {
-            moveTo(292f * u, 780f * u)
-            lineTo(292f * u, 520f * u)
-            cubicTo(292f * u, 372f * u, 380f * u, 268f * u, 512f * u, 216f * u)
-            cubicTo(644f * u, 268f * u, 732f * u, 372f * u, 732f * u, 520f * u)
-            lineTo(732f * u, 780f * u)
-        }
-        drawPath(arch, colors.textPrimary, style = lineStroke())
-        drawCircle(colors.ring, radius = 46f * u, center = Offset(512f * u, 392f * u))
+    Canvas(modifier.size(MarkSize)) { drawMihrab(colors.textPrimary, colors.ring) }
+}
+
+/**
+ * The icon's mihrab in this canvas's own space — the same path the launcher icon is cut from,
+ * so the About screen's icon tile and the onboarding mark cannot drift from it. [line] is the
+ * arch, [dot] the amber point at its heart.
+ */
+fun DrawScope.drawMihrab(line: Color, dot: Color) {
+    val u = unit()
+    val arch = Path().apply {
+        moveTo(292f * u, 780f * u)
+        lineTo(292f * u, 520f * u)
+        cubicTo(292f * u, 372f * u, 380f * u, 268f * u, 512f * u, 216f * u)
+        cubicTo(644f * u, 268f * u, 732f * u, 372f * u, 732f * u, 520f * u)
+        lineTo(732f * u, 780f * u)
     }
+    drawPath(arch, line, style = lineStroke())
+    drawCircle(dot, radius = 46f * u, center = Offset(512f * u, 392f * u))
 }
 
 /** A map pin: the circle of a position with a point beneath it, and the position itself in
