@@ -44,17 +44,19 @@ class RecitationLibrary(
     suspend fun isDownloaded(reciterId: String, surah: Int): Boolean =
         surah in downloaded(reciterId).first()
 
-    /** Where the surah lives once it is owned. */
     /**
      * Whether any reciter has any surah on the phone, from the registry alone — no disk I/O.
      * [RecitationEngagement] falls back on this for installs from before the engaged flag
      * existed: a download is engagement whoever made it, and [reconcile] rebuilds the registry
-     * from disk at start, so a reinstall over left-behind files counts too.
+     * from disk at start, so a reinstall over left-behind files counts too. An entry counts only
+     * if [decode] would read a surah out of it, so this and [downloaded] agree.
      */
     suspend fun hasAnyDownloads(): Boolean = store.data.first().asMap().any { (key, value) ->
-        key.name.startsWith(SettingsKeys.RECITATION_DOWNLOADED_PREFIX) && (value as? Set<*>)?.isNotEmpty() == true
+        key.name.startsWith(SettingsKeys.RECITATION_DOWNLOADED_PREFIX) &&
+            (value as? Set<*>)?.any { (it as? String)?.toIntOrNull() != null } == true
     }
 
+    /** Where the surah lives once it is owned. */
     fun fileFor(reciterId: String, surah: Int): Path = paths.surahFile(reciterId, surah)
 
     /** Where a download in flight is written until it has been verified. */

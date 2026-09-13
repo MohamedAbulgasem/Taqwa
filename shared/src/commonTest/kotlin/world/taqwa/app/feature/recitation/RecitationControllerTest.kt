@@ -189,10 +189,10 @@ class RecitationControllerTest {
         val clips: FakeClips = FakeClips(),
     )
 
-    /** What the controller told the outside world about engagement (privacy spec §2.2, §2.4). */
+    /** What the controller told the outside world about engagement, in order (privacy spec
+     * §2.2, §2.4): "mark" and "refresh". */
     private class Engagement {
-        var marks = 0
-        var refreshes = 0
+        val events = mutableListOf<String>()
     }
 
     private fun controller(
@@ -210,8 +210,8 @@ class RecitationControllerTest {
         clips = harness.clips,
         previewBytes = { id -> if (id in previews) ByteArray(8) else null },
         scope = scope,
-        markEngaged = { engagement.marks++ },
-        refreshCatalogue = { engagement.refreshes++ },
+        markEngaged = { engagement.events += "mark" },
+        refreshCatalogue = { engagement.events += "refresh" },
     )
 
     @Test
@@ -661,8 +661,8 @@ class RecitationControllerTest {
 
             controller.openPicker()
 
-            assertEquals(1, engagement.marks)
-            assertEquals(1, engagement.refreshes)
+            // Marked first, so the refresher's own gate sees the flag when it asks.
+            assertEquals(listOf("mark", "refresh"), engagement.events)
         }
 
     @Test
@@ -674,8 +674,7 @@ class RecitationControllerTest {
 
         controller.onHeaderTap(1, 1)
 
-        assertEquals(1, engagement.marks)
-        assertEquals(0, engagement.refreshes, "a tap to play is not a reason to fetch the catalogue")
+        assertEquals(listOf("mark"), engagement.events, "a tap to play is not a reason to fetch the catalogue")
     }
 
     @Test
@@ -685,7 +684,7 @@ class RecitationControllerTest {
 
         controller.requestPlay(112, 1)
 
-        assertEquals(1, engagement.marks)
+        assertEquals(listOf("mark"), engagement.events)
     }
 
     @Test
@@ -695,8 +694,7 @@ class RecitationControllerTest {
 
         controller.onSettingsOpened()
 
-        assertEquals(1, engagement.marks)
-        assertEquals(1, engagement.refreshes)
+        assertEquals(listOf("mark", "refresh"), engagement.events)
     }
 
     @Test
@@ -706,6 +704,6 @@ class RecitationControllerTest {
 
         controller.downloadWholeQuran()
 
-        assertEquals(1, engagement.marks)
+        assertEquals(listOf("mark"), engagement.events)
     }
 }

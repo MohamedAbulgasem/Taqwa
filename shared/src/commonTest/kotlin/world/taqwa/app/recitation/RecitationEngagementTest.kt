@@ -65,6 +65,14 @@ class RecitationEngagementTest {
     }
 
     @Test
+    fun aRegistryEntryThatIsNotASurahNumberIsNotADownload() = runTest {
+        val store = store()
+        // What `downloaded()` would read as nothing must read as nothing here too.
+        store.edit { it[SettingsKeys.recitationDownloadedKey("ar.alafasy")] = setOf("not a surah") }
+        assertFalse(engagement(store).isEngaged())
+    }
+
+    @Test
     fun markThenIsEngaged() = runTest {
         val store = store()
         val engagement = engagement(store)

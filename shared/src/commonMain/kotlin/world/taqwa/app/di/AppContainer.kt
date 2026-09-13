@@ -110,7 +110,18 @@ class AppContainer {
             clips = ClipPlayer().asPort(),
             previewBytes = ::recitationPreviewBytes,
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
-            markEngaged = { recitationEngagement.mark() },
+            // Swallowed for the same reason the refresh is: a flag that failed to write is
+            // retried by the next tap, and a tap to play must never be the thing that takes the
+            // process down. Cancellation still propagates.
+            markEngaged = {
+                try {
+                    recitationEngagement.mark()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    // Next tap.
+                }
+            },
             refreshCatalogue = {
                 withContext(Dispatchers.Default) { runCatching { manifestRefresher.refreshIfStale() } }
             },
