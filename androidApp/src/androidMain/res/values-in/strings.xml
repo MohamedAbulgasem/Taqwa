@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Taqwa</string>
+    <!-- Widget picker titles (android:label on each receiver). -->
+    <string name="widget_small_label">Salat berikutnya</string>
+    <string name="widget_medium_label">Waktu salat</string>
+    <string name="widget_ayah_label">Ayat hari ini</string>
+    <string name="widget_small_description">Salat berikutnya dan hitung mundur yang terus berjalan.</string>
+    <string name="widget_medium_description">Salat berikutnya, hitung mundur, dan waktu salat hari ini.</string>
+    <string name="widget_ayah_description">Ayat hari ini beserta terjemahannya.</string>
+</resources>

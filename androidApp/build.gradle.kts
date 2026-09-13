@@ -46,12 +46,12 @@ android {
         }
     }
 
-    // The app is written in English and Arabic; the other seventy-odd locales in the APK were
-    // AndroidX's own strings. The bundle keeps both languages on every phone because the app
-    // can be switched to Arabic on an English phone (locales_config.xml) and the widget labels
-    // must follow.
+    // The app is written in seven languages; the other seventy-odd locales in the APK were
+    // AndroidX's own strings. Android's resource system still spells Indonesian "in". The bundle
+    // keeps every language on every phone because the app can be switched to any of them on any
+    // phone (locales_config.xml) and the widget labels must follow.
     androidResources {
-        localeFilters += listOf("en", "ar")
+        localeFilters += listOf("en", "ar", "fr", "tr", "in", "ur", "bn")
     }
     bundle {
         language {

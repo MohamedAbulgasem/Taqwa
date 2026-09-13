@@ -1,0 +1,393 @@
+<resources>
+    <string name="app_name">Taqwa</string>
+    <!-- The language these strings are written in; the one fact every "is the UI Arabic?" decision reads. -->
+    <string name="ui_language">fr</string>
+
+    <!-- The name of this file's own language, shown in Settings › Language. -->
+    <string name="language_name">Français</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Taqwa</string>
+    <string name="onboarding_welcome_body">Les horaires de prière, la qibla et le Coran. Gratuit pour toujours. Sans publicité, sans compte, fonctionne hors ligne.</string>
+    <string name="onboarding_welcome_cta">Commencer</string>
+    <string name="onboarding_location_title">Où êtes-vous ?</string>
+    <string name="onboarding_location_body">Les horaires dépendent de votre position exacte. Tout est calculé sur votre appareil, et votre position ne quitte jamais votre téléphone.</string>
+    <string name="onboarding_location_cta">Utiliser ma position</string>
+    <string name="onboarding_location_secondary">Choisir plutôt une ville</string>
+    <string name="onboarding_notifications_title">Ne manquez plus une prière</string>
+    <string name="onboarding_notifications_body">Une notification à chaque prière. Vous choisissez le son de chaque prière séparément, et vous pouvez le changer quand vous voulez.</string>
+    <string name="onboarding_notifications_cta">Activer les notifications</string>
+    <string name="onboarding_notifications_secondary">Pas maintenant</string>
+    <string name="onboarding_exact_title">À l’heure, à la minute près</string>
+    <string name="onboarding_exact_body">Android ne sonne à l’heure exacte de la prière que si « Alarmes et rappels » est autorisé pour Taqwa. Sans cela, une notification peut arriver jusqu’à une heure en retard.</string>
+    <string name="onboarding_widget_title">Sur votre écran d’accueil</string>
+    <string name="onboarding_widget_body">Le widget Taqwa affiche la prochaine prière et un compte à rebours en direct, sans ouvrir l’application.</string>
+    <string name="onboarding_widget_body_ios">Le widget Taqwa affiche la prochaine prière et un compte à rebours en direct, sans ouvrir l’application. Pour l’ajouter, appuyez longuement sur l’icône Taqwa de votre écran d’accueil et choisissez une taille de widget.</string>
+    <string name="onboarding_widget_body_ios_legacy">Le widget Taqwa affiche la prochaine prière et un compte à rebours en direct, sans ouvrir l’application. Pour l’ajouter, appuyez longuement sur votre écran d’accueil, touchez le signe plus dans le coin supérieur, puis recherchez Taqwa.</string>
+    <string name="onboarding_widget_cta_add">Ajouter le widget</string>
+    <string name="onboarding_widget_cta_done">Terminé</string>
+    <string name="onboarding_widget_secondary">Plus tard</string>
+
+    <!-- Prayer names. The Arabic name that sits beside these is never a resource: it is the
+         same in every locale, so it lives in PrayerNaming. -->
+    <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_sunrise">Lever du soleil</string>
+    <string name="prayer_dhuhr">Dhuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Isha</string>
+
+    <!-- Today -->
+    <string name="today_current_location">Position actuelle</string>
+    <string name="today_next_in">%1$s dans</string>
+    <string name="today_latitude_label">À CETTE LATITUDE</string>
+    <string name="today_exact_alarms_label">ALARMES EXACTES DÉSACTIVÉES</string>
+    <string name="today_exact_alarms_body">Android peut sonner jusqu’à une heure en retard tant que « Alarmes et rappels » n’est pas autorisé pour Taqwa.</string>
+    <string name="today_no_location_title">Pas encore de position</string>
+    <string name="today_choose_city">Choisir une ville</string>
+    <string name="today_allow_location">Autoriser plutôt la localisation</string>
+
+    <!-- Settings root -->
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_group_prayer">PRIÈRE</string>
+    <string name="settings_group_app">APPLICATION</string>
+    <string name="settings_group_about">À PROPOS</string>
+    <string name="settings_location">Position</string>
+    <string name="settings_prayer_times">Horaires de prière</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_appearance">Apparence</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_about">À propos de Taqwa</string>
+    <string name="settings_attribution">Attributions et licences</string>
+    <string name="settings_not_set">Non définie</string>
+    <string name="settings_notifications_off">Désactivées</string>
+    <string name="settings_notifications_on_count">%1$s activées</string>
+    <string name="settings_version_value">0.18.0</string>
+
+    <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
+         every locale, as on the icon. -->
+    <string name="about_tagline">Gratuit, pour tous, pour toujours.</string>
+    <string name="about_privacy_label">CONFIDENTIALITÉ</string>
+    <string name="about_stays_title">Tout reste sur votre téléphone</string>
+    <string name="about_stays_body">Position, paramètres, signets et compteurs ne le quittent jamais.</string>
+    <string name="about_online_title">En ligne seulement quand vous le demandez</string>
+    <string name="about_online_body">Internet ne sert qu’à une chose : les récitations que vous choisissez de télécharger, depuis le dépôt public de Taqwa sur GitHub.</string>
+    <string name="about_nothing_title">Sans compte, sans publicité, sans suivi</string>
+    <string name="about_nothing_body">Rien où se connecter, rien à vendre.</string>
+    <string name="about_links_label">PLUS</string>
+    <string name="about_privacy_policy">Politique de confidentialité</string>
+    <string name="about_source">Code source</string>
+    <string name="about_source_value">GitHub</string>
+    <string name="about_licence">Licence</string>
+    <string name="about_licence_value">GPL-3.0</string>
+    <string name="about_website">Site web</string>
+    <string name="about_website_value">taqwa.world</string>
+    <string name="about_icon_open_website">Ouvrir taqwa.world</string>
+
+    <!-- Appearance -->
+    <string name="appearance_theme_label">THÈME</string>
+    <string name="theme_system">Système</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="appearance_note">« Système » suit le mode clair ou sombre de votre appareil.</string>
+
+    <!-- Location settings -->
+    <string name="location_use_my_location">Utiliser ma position</string>
+    <string name="location_in_use">UTILISÉE</string>
+    <string name="location_city">Ville</string>
+    <string name="location_country">Pays</string>
+    <string name="location_timezone">Fuseau horaire</string>
+    <string name="location_choose_city_instead">Choisir plutôt une ville</string>
+    <string name="location_privacy_note">Les coordonnées sont enregistrées sur votre appareil et servent uniquement à calculer les horaires. Rien n’est envoyé nulle part.</string>
+    <string name="location_denied_note">L’accès à la position est actuellement refusé. Vous pouvez l’autoriser dans les paramètres de votre appareil, ou choisir plutôt une ville.</string>
+
+    <!-- City search -->
+    <string name="city_search_title">Choisir une ville</string>
+    <string name="city_search_placeholder">Rechercher une ville</string>
+    <string name="city_search_hint">Commencez à saisir un nom de ville. La base de données est incluse dans l’application, la recherche fonctionne donc hors ligne.</string>
+    <string name="city_search_no_results">Aucune ville ne correspond à « %1$s ».</string>
+
+    <!-- Notification settings -->
+    <string name="notifications_master_toggle">Notifications de prière</string>
+    <string name="notifications_remind_before">Me rappeler avant</string>
+    <string name="notifications_prayers_label">PRIÈRES</string>
+    <string name="notifications_remind_never">Jamais</string>
+    <!--
+        A count of minutes. French breaks like English here: "min" is invariable, and both forms
+        keep %1$s because the callers pass already-localized digits, one of them with a sign
+        that must stay attached to them.
+    -->
+    <plurals name="minutes_count">
+        <item quantity="one">%1$s min</item>
+        <item quantity="other">%1$s min</item>
+    </plurals>
+
+    <!-- Sound sheet -->
+    <string name="sound_sheet_title">Son de la notification</string>
+    <string name="sound_silent">Silencieux</string>
+    <string name="sound_notification">Tonalité</string>
+    <string name="sound_takbir">Takbir</string>
+    <string name="sound_adhan">Adhan</string>
+    <string name="sound_silent_detail">Bannière seule, sans son</string>
+    <string name="sound_notification_detail">Une tonalité d’annonce claire, %1$s secondes</string>
+    <string name="sound_takbir_detail">Allahou akbar, Allahou akbar, environ %1$ss</string>
+    <string name="sound_adhan_detail">L’adhan, les %1$s premières secondes</string>
+    <string name="sound_sheet_footnote">Une notification de prière joue les %1$s premières secondes du son choisi. L’adhan complet peut être écouté dans l’application.</string>
+
+    <!-- Adhan voice -->
+    <string name="adhan_voice_row">Adhan</string>
+    <string name="adhan_voice_sheet_title">Adhan</string>
+    <string name="adhan_voice_original">Originale</string>
+    <string name="adhan_voice_azeez">Aaqib Azeez</string>
+    <string name="adhan_voice_azemi">Besim Azemi</string>
+    <string name="adhan_voice_original_detail">Mélismatique, %1$s</string>
+    <string name="adhan_voice_azeez_detail">Simple et rapide, %1$s</string>
+    <string name="adhan_voice_azemi_detail">En direct de la mosquée de Malmö, %1$s</string>
+
+    <!-- Prayer time settings -->
+    <string name="prayer_times_method">Méthode de calcul</string>
+    <string name="prayer_times_high_latitude">Règle des hautes latitudes</string>
+    <string name="prayer_times_manual">Ajustements manuels</string>
+    <string name="prayer_times_madhab_label">MADHAB POUR L’ASR</string>
+    <string name="madhab_standard">Majoritaire</string>
+    <string name="madhab_hanafi">Hanafite</string>
+    <string name="prayer_times_hijri_label">DATE HÉGIRIENNE</string>
+    <string name="hijri_day_before">Un jour plus tôt</string>
+    <string name="hijri_day_after">Un jour plus tard</string>
+    <string name="hijri_method_note">Un calendrier arithmétique, non fondé sur l’observation. Il peut différer d’un jour de celui d’Oumm al-Qoura et de l’observation locale du croissant ; utilisez l’ajustement pour suivre votre communauté.</string>
+    <string name="prayer_times_show_sunrise">Afficher le lever du soleil</string>
+    <string name="adjustments_none">Aucun</string>
+    <string name="adjustments_one">1 prière</string>
+    <string name="adjustments_many">%1$s prières</string>
+
+    <string name="method_muslim_world_league">Ligue islamique mondiale</string>
+    <string name="method_isna">ISNA (Amérique du Nord)</string>
+    <string name="method_egyptian">Autorité générale égyptienne</string>
+    <string name="method_umm_al_qura">Oumm al-Qoura (La Mecque)</string>
+    <string name="method_karachi">Université des sciences islamiques, Karachi</string>
+    <string name="method_tehran">Institut de géophysique, Téhéran</string>
+    <string name="method_dubai">Dubaï</string>
+    <string name="method_kuwait">Koweït</string>
+    <string name="method_qatar">Qatar</string>
+    <string name="method_singapore">Singapour</string>
+    <string name="method_turkey">Diyanet (Turquie)</string>
+    <string name="method_moonsighting">Comité d’observation du croissant</string>
+    <string name="method_picker_note">Les autorités divergent sur la hauteur du soleil sous l’horizon pour le Fajr et l’Isha. Choisissez celle que suit votre mosquée.</string>
+
+    <string name="high_lat_automatic">Automatique</string>
+    <string name="high_lat_middle">Milieu de la nuit</string>
+    <string name="high_lat_seventh">Un septième de la nuit</string>
+    <string name="high_lat_twilight">Angle du crépuscule</string>
+    <string name="high_lat_auto_note">À votre latitude, le mode automatique utilise la règle : %1$s.</string>
+    <string name="high_lat_picker_note">Au-delà d’environ %1$s degrés, le soleil ne descend plus assez sous l’horizon pour que le Fajr et l’Isha se calculent normalement : une règle de substitution prend alors le relais.</string>
+
+    <string name="manual_note">Décale chaque horaire d’une heure au maximum, en plus de la méthode de calcul. À n’utiliser que si le tableau de votre mosquée diffère de l’heure calculée.</string>
+
+    <!-- Attribution -->
+    <string name="attribution_intro">Taqwa repose sur le travail que d’autres ont offert. Leurs licences imposent de les citer, et cela leur est dû de toute façon.</string>
+    <string name="credit_calculation">Calcul des horaires de prière</string>
+    <string name="credit_calculation_detail">Adhan, de Batoul Apps, licence MIT.</string>
+    <string name="credit_cities">Base de données des villes</string>
+    <string name="credit_cities_detail">GeoNames cities15000, licence CC BY 4.0.</string>
+    <string name="credit_typeface">Police Manrope</string>
+    <string name="credit_typeface_detail">Licence SIL Open Font 1.1.</string>
+    <string name="credit_audio">Enregistrements de l’adhan et du takbir</string>
+    <string name="credit_audio_detail">« Beautiful adhan » d’Adam-synagda, CC0 1.0, via Wikimedia Commons. « The Adhan – Muslim Call to Prayer – Aaqib Azeez », CC BY-SA 4.0, via Wikimedia Commons. « Eid al-Fitr Fajr azan at Malmö Mosque » du Centre islamique de Malmö, CC BY 3.0, via Wikimedia Commons.</string>
+    <string name="credit_chime">Tonalité de notification</string>
+    <string name="credit_chime_detail">« Clear announce tones », de Mixkit, licence gratuite Mixkit pour les effets sonores.</string>
+    <string name="credit_quran_text">Texte du Coran</string>
+    <string name="credit_quran_text_detail">Texte coranique Tanzil v1.1, Creative Commons BY-ND 3.0. Reproduit sans modification.</string>
+    <string name="credit_quran_font">Police du Coran</string>
+    <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs, du Complexe du Roi Fahd pour l’impression du noble Coran. Libre d’utilisation et de diffusion sans modification.</string>
+    <string name="credit_quran_layout">Mise en page</string>
+    <string name="credit_quran_layout_detail">Sauts de page et de ligne du Mushaf de Médine, d’après les données de la Quranic Universal Library.</string>
+    <string name="credit_translations">Traductions</string>
+    <string name="credit_translations_detail">Incluses depuis le projet Tanzil pour un usage non commercial. Chaque traducteur est cité ci-dessous.</string>
+
+    <!-- Qibla (plan 2) -->
+    <string name="qibla_no_sensor_title">Pas de capteur de boussole</string>
+    <string name="qibla_no_sensor_body">Cet appareil n’a pas de magnétomètre. Servez-vous d’une boussole classique avec l’azimut indiqué ci-dessous.</string>
+
+    <!-- Widget background (Appearance) -->
+    <string name="appearance_widget_background_label">FOND DU WIDGET</string>
+    <string name="appearance_prayer_widget_preview_label">WIDGETS DE PRIÈRE</string>
+    <string name="appearance_ayah_widget_preview_label">WIDGET DU VERSET</string>
+
+    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <string name="appearance_widget_add">Ajouter à l’écran d’accueil</string>
+    <string name="appearance_widget_add_ios_hold">Appuyez longuement sur l’icône Taqwa, puis choisissez un widget.</string>
+    <string name="appearance_widget_add_ios_plus">Appuyez longuement sur l’écran d’accueil, touchez le signe plus, puis recherchez Taqwa.</string>
+    <string name="appearance_widget_add_android">Appuyez longuement sur l’écran d’accueil, puis choisissez Widgets.</string>
+    <string name="widget_background_follow_theme">Système</string>
+    <string name="widget_background_light">Clair</string>
+    <string name="widget_background_dark">Sombre</string>
+    <string name="widget_background_translucent_title">Translucide</string>
+    <string name="widget_background_translucent_subtitle">Se fond dans votre fond d’écran.</string>
+    <string name="widget_background_frosted_title">Givré</string>
+    <string name="widget_background_frosted_subtitle">Utilise le matériau de widget du système.</string>
+    <!-- Qibla screen (Task 22 sweep: qibla_no_sensor_title/body above already matched this
+         screen's copy verbatim and are reused there; everything else needed its own string. -->
+    <string name="qibla_title">Qibla</string>
+    <string name="qibla_back">Aujourd’hui</string>
+    <string name="qibla_hold_flat">Tenez votre téléphone à plat</string>
+    <string name="qibla_facing_qibla">Face à la qibla</string>
+    <string name="qibla_needs_calibrating">La boussole doit être calibrée</string>
+    <string name="qibla_calibration_help">Déplacez votre téléphone en forme de huit, plusieurs fois de suite. Les interférences magnétiques du métal, des coques et des haut-parleurs peuvent fausser la lecture.</string>
+    <!-- Qibla, magnetic-interference variant: the field around the phone is not the Earth's, so
+         a figure of eight cannot help and the advice is to move instead. -->
+    <string name="qibla_interference_title">Interférences magnétiques</string>
+    <string name="qibla_interference_help">Éloignez-vous du métal, des aimants, des coques et des câbles. La boussole ne peut pas lire le champ terrestre tant qu’un champ plus fort se trouve à proximité.</string>
+    <!-- Qibla, best effort: the compass has been unusable for twenty seconds. The bearing and the
+         distance need no sensor, so they stay; the needle does not. -->
+    <string name="qibla_best_effort_title">Boussole indisponible</string>
+    <string name="qibla_best_effort_calibration">La boussole de ce téléphone n’a pas pu être calibrée. L’azimut et la distance affichés sont exacts — servez-vous-en avec une autre boussole.</string>
+    <string name="qibla_best_effort_interference">Les interférences magnétiques sont ici trop fortes pour la boussole de ce téléphone. L’azimut et la distance affichés sont exacts — servez-vous-en avec une autre boussole.</string>
+    <string name="qibla_distance">La Mecque · à %1$s km</string>
+    <string name="qibla_bearing">%1$s°</string>
+    <string name="qibla_cardinal_north">N</string>
+    <string name="qibla_cardinal_east">E</string>
+    <string name="qibla_cardinal_south">S</string>
+    <string name="qibla_cardinal_west">O</string>
+    <string name="notifications_exact_alarms_off">Les alarmes exactes sont désactivées pour Taqwa, une notification peut donc arriver jusqu’à une heure en retard. Autorisez « Alarmes et rappels » pour y remédier.</string>
+    <string name="notifications_allow_exact_alarms">Autoriser les alarmes exactes</string>
+    <string name="notifications_blocked">Les notifications sont désactivées pour Taqwa dans les paramètres du système : aucune alerte de prière ne peut s’afficher tant qu’elles ne sont pas réautorisées.</string>
+    <string name="notifications_open_settings">Ouvrir les paramètres de notification</string>
+    <string name="hijri_tabular">Tabulaire</string>
+    <string name="method_tehran_maghrib_note">Le Maghrib suit le coucher du soleil ; l’angle de 4,5° propre à cette méthode n’est pas encore appliqué.</string>
+    <!-- Bottom tab bar (iteration 1: the owner asked for it after seeing Today on a phone;
+         iteration 8: Qibla folded into the Prayer screen; slice 2: the Quran tab arrives). -->
+    <string name="tab_prayer">Prière</string>
+    <string name="tab_quran">Coran</string>
+    <string name="tab_settings">Paramètres</string>
+    <!-- Prayer screen's Qibla card: bearing from north, then the great-circle distance. -->
+    <string name="today_qibla_detail">%1$s° · %2$s km jusqu’à La Mecque</string>
+    <!-- Quran tab root (slice 2a task 5) -->
+    <string name="quran_title">Coran</string>
+    <string name="quran_search_hint">Rechercher dans le Coran</string>
+    <string name="quran_continue">REPRENDRE LA LECTURE</string>
+    <string name="quran_continue_detail">Verset %1$s sur %2$s · Juz %3$s</string>
+    <string name="quran_tab_surah">Sourates</string>
+    <string name="quran_tab_juz">Juz</string>
+    <string name="quran_surah_subtitle">%1$s · %2$s versets · %3$s</string>
+    <!-- Surah row subtitle under an Arabic UI, where the primary label is already the Arabic name
+         (spec §5.3), so the meaning is dropped rather than repeated in a script the row is not in. -->
+    <string name="quran_surah_subtitle_arabic_ui">%1$s versets · %2$s</string>
+    <string name="quran_makki">Mecquoise</string>
+    <string name="quran_madani">Médinoise</string>
+    <string name="quran_juz_n">Juz %1$s</string>
+    <string name="quran_juz_range">De %1$s %2$s à %3$s %4$s</string>
+    <string name="quran_next_surah">Suivante : %1$s</string>
+    <string name="quran_juz_page">Juz %1$s · page %2$s</string>
+    <string name="quran_reader_aa">Options de lecture</string>
+    <string name="quran_reader_mushaf">Mushaf</string>
+    <string name="quran_sheet_size">Taille de l’arabe</string>
+    <string name="quran_sheet_transliteration">Translittération</string>
+    <string name="quran_sheet_translation">Traduction</string>
+    <string name="quran_translation_off">Aucune</string>
+    <string name="quran_translation_off_detail">Arabe seul, un verset par carte</string>
+    <string name="quran_sheet_mode">Mode de lecture</string>
+    <string name="quran_mode_translation">Traduction</string>
+    <string name="quran_mode_mushaf">Mushaf</string>
+    <string name="quran_size_mushaf_note">En mode Mushaf, la taille de la page suit la largeur de l’écran.</string>
+    <!-- Quran search results and bookmarks (slice 2b) -->
+    <string name="quran_section_surahs">Sourates</string>
+    <string name="quran_section_ayahs">Versets · %1$s</string>
+    <string name="quran_search_empty">Aucun verset ne correspond</string>
+    <string name="quran_tab_bookmarks">Signets</string>
+    <string name="quran_bookmarks_empty">Aucun signet pour l’instant. Ouvrez un verset et touchez le signet.</string>
+    <string name="quran_remove_bookmark">Retirer le signet</string>
+    <string name="quran_ayah_n">Verset %1$s</string>
+    <string name="quran_action_bookmark">Marquer</string>
+    <string name="quran_action_bookmarked">Marqué</string>
+    <string name="quran_action_copy">Copier</string>
+    <string name="quran_action_copied">Copié</string>
+    <string name="quran_action_share">Partager</string>
+    <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
+    <string name="tasbeeh_title">Tasbih</string>
+    <string name="today_open_tasbeeh">Tasbih</string>
+    <string name="tasbeeh_add_custom">Ajouter un dhikr</string>
+    <string name="tasbeeh_round">SÉRIE %1$s</string>
+    <string name="tasbeeh_of">sur %1$s</string>
+    <string name="tasbeeh_hint">Touchez n’importe où pour compter</string>
+    <!-- The built-in phrases' meanings, shown under a Latin-script interface beside the
+         transliteration; Arabic-script interfaces show the phrase itself. -->
+    <string name="dhikr_meaning_subhanallah">Gloire à Allah</string>
+    <string name="dhikr_meaning_alhamdulillah">Toute louange revient à Allah</string>
+    <string name="dhikr_meaning_allahu_akbar">Allah est le plus grand</string>
+    <string name="dhikr_meaning_astaghfirullah">Je demande pardon à Allah</string>
+    <string name="dhikr_meaning_la_ilaha_illallah">Il n’y a de dieu qu’Allah</string>
+    <string name="dhikr_meaning_subhanallahi_wa_bihamdihi">Gloire et louange à Allah</string>
+    <string name="tasbeeh_preset_after_prayer">Après la prière</string>
+    <string name="tasbeeh_preset_subhanallah">SoubhanAllah</string>
+    <string name="tasbeeh_preset_alhamdulillah">Alhamdoulillah</string>
+    <string name="tasbeeh_preset_allahu_akbar">Allahou Akbar</string>
+    <string name="tasbeeh_preset_astaghfirullah">Astaghfiroullah</string>
+    <string name="tasbeeh_preset_la_ilaha_illallah">La ilaha illa Allah</string>
+    <string name="tasbeeh_preset_subhanallahi_wa_bihamdihi">SoubhanAllahi wa bihamdihi</string>
+    <string name="tasbeeh_reset">Réinitialiser</string>
+    <string name="tasbeeh_reset_confirm">Réinitialiser le compteur de ce dhikr ?</string>
+    <string name="tasbeeh_custom_title">Dhikr personnalisé</string>
+    <string name="tasbeeh_custom_edit_title">Modifier le dhikr</string>
+    <string name="tasbeeh_custom_phrase">Formule</string>
+    <string name="tasbeeh_custom_target">Objectif</string>
+    <string name="tasbeeh_custom_add">Ajouter</string>
+    <string name="tasbeeh_custom_save">Enregistrer</string>
+    <string name="tasbeeh_custom_delete">Supprimer</string>
+    <!-- Quran recitation (spec 3a §5) -->
+    <string name="recitation_play">Écouter</string>
+    <string name="recitation_reciter">Récitateur</string>
+    <string name="recitation_style_murattal">Mourattal</string>
+    <string name="recitation_kbps">%1$s kbit/s</string>
+    <string name="recitation_megabytes">%1$s Mo</string>
+    <string name="recitation_on_phone">%1$s des %2$s sourates sont sur ce téléphone</string>
+    <string name="recitation_download">Télécharger · %1$s</string>
+    <string name="recitation_downloading">%1$s sur %2$s</string>
+    <string name="recitation_over_wifi">Via le Wi-Fi.</string>
+    <string name="recitation_use_mobile_once">Utiliser les données mobiles cette fois</string>
+    <string name="recitation_keep_reading">Vous pouvez continuer à lire. La lecture commencera au verset que vous avez choisi dès la fin du téléchargement.</string>
+    <string name="recitation_waiting_connection">En attente d’une connexion. Le téléchargement démarrera tout seul dès qu’il y en aura une.</string>
+    <string name="recitation_switch_ready">%1$s continue la récitation jusqu’à ce que la nouvelle arrive.</string>
+    <string name="recitation_switch_running">%1$s continue la récitation. La voix passera à %2$s dès la fin du téléchargement.</string>
+    <string name="recitation_cancel">Annuler</string>
+    <string name="recitation_retry">Réessayer</string>
+    <string name="recitation_back_to_ayah">Revenir au verset %1$s</string>
+    <string name="recitation_fail_no_network">Il n’y a pas de connexion pour le moment.</string>
+    <string name="recitation_fail_needs_wifi">Le téléchargement est réglé sur le Wi-Fi uniquement.</string>
+    <string name="recitation_fail_no_space">Il n’y a pas assez de place sur ce téléphone.</string>
+    <string name="recitation_fail_server">Le téléchargement n’est pas allé au bout. Il peut être relancé.</string>
+    <string name="recitation_fail_checksum">Le fichier reçu n’est pas le bon. Il peut être récupéré de nouveau.</string>
+    <string name="recitation_fail_cancelled">Le téléchargement s’est arrêté avant la fin.</string>
+    <string name="recitation_a11y_recitation">Récitation</string>
+    <string name="recitation_a11y_pause">Mettre en pause</string>
+    <string name="recitation_a11y_downloading">Téléchargement de la récitation</string>
+    <string name="recitation_a11y_next">Sourate suivante</string>
+    <string name="recitation_a11y_previous">Sourate précédente</string>
+    <string name="recitation_a11y_next_ayah">Verset suivant</string>
+    <string name="recitation_a11y_previous_ayah">Verset précédent</string>
+    <string name="recitation_auto_download">Télécharger les prochaines sourates sans demander</string>
+    <string name="recitation_arriving_next">Suivante : %1$s · %2$s</string>
+    <string name="recitation_arriving_voice">%1$s · %2$s</string>
+    <string name="recitation_percent">%1$s%</string>
+    <string name="recitation_a11y_close">Fermer le lecteur</string>
+    <string name="recitation_a11y_change_reciter">Changer de récitateur</string>
+    <string name="recitation_a11y_go_to_playing">Aller au verset en cours de récitation</string>
+    <string name="recitation_a11y_preview">Écouter ce récitateur</string>
+    <!-- Settings > Quran > Recitation, and its Downloads screen (spec 3a §5.6) -->
+    <string name="settings_group_quran">CORAN</string>
+    <string name="settings_recitation">Récitation</string>
+    <string name="recitation_settings_mobile_data">Télécharger via les données mobiles</string>
+    <string name="recitation_settings_auto_download">Télécharger sans demander</string>
+    <string name="recitation_settings_downloads">TÉLÉCHARGEMENTS · %1$s</string>
+    <string name="recitation_settings_surahs_one">%1$s sourate · %2$s</string>
+    <string name="recitation_settings_surahs">%1$s sourates · %2$s</string>
+    <string name="recitation_settings_whole_quran">Télécharger tout le Coran · %1$s</string>
+    <string name="recitation_settings_batch">Téléchargement · %1$s sur %2$s</string>
+    <string name="recitation_settings_credit">Les récitations sont concédées par les récitateurs pour une diffusion gratuite et non commerciale via l’Islamic Network. Crédits dans « Attributions et licences ».</string>
+    <string name="recitation_downloads_delete">Supprimer</string>
+    <string name="recitation_downloads_delete_all">Tout supprimer pour ce récitateur</string>
+    <string name="recitation_downloads_confirm">Supprimer %1$s ?</string>
+    <string name="recitation_downloads_empty">Rien de ce récitateur n’est sur le téléphone.</string>
+    <string name="recitation_gigabytes">%1$s Go</string>
+    <string name="credit_recitations">Récitations</string>
+    <string name="credit_recitations_detail">Récitations verset par verset de l’Islamic Network (alquran.cloud), qui les tient sous licence des récitateurs pour une rediffusion gratuite et non commerciale aux débits qu’ils publient. Copiées sans modification, à ces mêmes débits.</string>
+</resources>

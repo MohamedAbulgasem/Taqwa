@@ -1,0 +1,6 @@
+/* Same sentence as the onboarding body in values-id/strings.xml: the calculation happens on the
+   phone, and the location never leaves it. */
+"NSLocationWhenInUseUsageDescription" = "Taqwa memakai lokasi Anda untuk menghitung waktu salat yang akurat di perangkat Anda. Lokasi Anda tidak pernah dikirim ke mana pun.";
+
+/* The name under the home screen icon. */
+"CFBundleDisplayName" = "Taqwa";

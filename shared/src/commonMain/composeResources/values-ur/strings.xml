@@ -1,0 +1,374 @@
+<resources>
+    <string name="app_name">تقویٰ</string>
+    <string name="ui_language">ur</string>
+
+    <string name="language_name">اردو</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">تقویٰ</string>
+    <string name="onboarding_welcome_body">نماز کے اوقات، قبلہ اور قرآن۔ ہمیشہ کے لیے مفت۔ نہ اشتہار، نہ اکاؤنٹ، اور آف لائن بھی چلتا ہے۔</string>
+    <string name="onboarding_welcome_cta">شروع کریں</string>
+    <string name="onboarding_location_title">آپ کہاں ہیں؟</string>
+    <string name="onboarding_location_body">نماز کے اوقات آپ کے ٹھیک مقام پر منحصر ہیں۔ سارا حساب آپ کے فون پر ہوتا ہے، اور آپ کا مقام کبھی فون سے باہر نہیں جاتا۔</string>
+    <string name="onboarding_location_cta">میرا مقام استعمال کریں</string>
+    <string name="onboarding_location_secondary">اس کے بجائے شہر چنیں</string>
+    <string name="onboarding_notifications_title">کوئی نماز نہ چھوٹے</string>
+    <string name="onboarding_notifications_body">ہر نماز کے وقت ایک اطلاع۔ ہر نماز کی آواز آپ الگ الگ چنتے ہیں، اور جب چاہیں بدل سکتے ہیں۔</string>
+    <string name="onboarding_notifications_cta">اطلاعات فعال کریں</string>
+    <string name="onboarding_notifications_secondary">ابھی نہیں</string>
+    <string name="onboarding_exact_title">عین وقت پر، منٹ کی پابندی سے</string>
+    <string name="onboarding_exact_body">اینڈرائیڈ عین نماز کے وقت پر تبھی بجتا ہے جب تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت ہو۔ اس کے بغیر اطلاع ایک گھنٹے تک دیر سے آ سکتی ہے۔</string>
+    <string name="onboarding_widget_title">آپ کی ہوم اسکرین پر</string>
+    <string name="onboarding_widget_body">تقویٰ کا ویجٹ ایپ کھولے بغیر اگلی نماز اور چلتی ہوئی الٹی گنتی دکھاتا ہے۔</string>
+    <string name="onboarding_widget_body_ios">تقویٰ کا ویجٹ ایپ کھولے بغیر اگلی نماز اور چلتی ہوئی الٹی گنتی دکھاتا ہے۔ اسے شامل کرنے کے لیے ہوم اسکرین پر تقویٰ کے آئیکن کو دبا کر رکھیں اور ویجٹ کا سائز چنیں۔</string>
+    <string name="onboarding_widget_body_ios_legacy">تقویٰ کا ویجٹ ایپ کھولے بغیر اگلی نماز اور چلتی ہوئی الٹی گنتی دکھاتا ہے۔ اسے شامل کرنے کے لیے ہوم اسکرین کو دبا کر رکھیں، اوپر کونے میں جمع کے نشان پر ٹیپ کریں، پھر تقویٰ تلاش کریں۔</string>
+    <string name="onboarding_widget_cta_add">ویجٹ شامل کریں</string>
+    <string name="onboarding_widget_cta_done">ہو گیا</string>
+    <string name="onboarding_widget_secondary">شاید بعد میں</string>
+
+    <!-- Prayer names -->
+    <string name="prayer_fajr">فجر</string>
+    <string name="prayer_sunrise">طلوعِ آفتاب</string>
+    <string name="prayer_dhuhr">ظہر</string>
+    <string name="prayer_asr">عصر</string>
+    <string name="prayer_maghrib">مغرب</string>
+    <string name="prayer_isha">عشاء</string>
+
+    <!-- Today -->
+    <string name="today_current_location">موجودہ مقام</string>
+    <string name="today_next_in">%1$s میں باقی</string>
+    <string name="today_latitude_label">اس عرض بلد پر</string>
+    <string name="today_exact_alarms_label">عین وقت کے الارم بند</string>
+    <string name="today_exact_alarms_body">جب تک تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت نہ ہو، اینڈرائیڈ ایک گھنٹے تک دیر سے بجا سکتا ہے۔</string>
+    <string name="today_no_location_title">ابھی کوئی مقام نہیں</string>
+    <string name="today_choose_city">شہر چنیں</string>
+    <string name="today_allow_location">اس کے بجائے مقام کی اجازت دیں</string>
+
+    <!-- Settings root -->
+    <string name="settings_title">ترتیبات</string>
+    <string name="settings_group_prayer">نماز</string>
+    <string name="settings_group_app">ایپ</string>
+    <string name="settings_group_about">تعارف</string>
+    <string name="settings_location">مقام</string>
+    <string name="settings_prayer_times">نماز کے اوقات</string>
+    <string name="settings_notifications">اطلاعات</string>
+    <string name="settings_appearance">ظاہری شکل</string>
+    <string name="settings_language">زبان</string>
+    <string name="settings_about">تقویٰ کے بارے میں</string>
+    <string name="settings_attribution">اسناد اور لائسنس</string>
+    <string name="settings_not_set">مقرر نہیں</string>
+    <string name="settings_notifications_off">بند</string>
+    <string name="settings_notifications_on_count">%1$s فعال</string>
+    <string name="settings_version_value">0.18.0</string>
+
+    <!-- «تقویٰ کے بارے میں» کی اسکرین۔ -->
+    <string name="about_tagline">مفت، سب کے لیے، ہمیشہ کے لیے۔</string>
+    <string name="about_privacy_label">رازداری</string>
+    <string name="about_stays_title">آپ کے فون پر رہتا ہے</string>
+    <string name="about_stays_body">مقام، ترتیبات، محفوظ آیات اور گنتی کبھی فون سے باہر نہیں جاتیں۔</string>
+    <string name="about_online_title">آن لائن صرف جب آپ کہیں</string>
+    <string name="about_online_body">انٹرنیٹ صرف ایک کام کے لیے استعمال ہوتا ہے: وہ تلاوتیں جو آپ خود ڈاؤن لوڈ کرنا چاہیں، GitHub پر تقویٰ کے عوامی مخزن سے۔</string>
+    <string name="about_nothing_title">نہ اکاؤنٹ، نہ اشتہار، نہ تجزیات</string>
+    <string name="about_nothing_body">نہ کہیں سائن اِن کرنا ہے، نہ کچھ بیچنا ہے۔</string>
+    <string name="about_links_label">مزید</string>
+    <string name="about_privacy_policy">رازداری کی پالیسی</string>
+    <string name="about_source">سورس کوڈ</string>
+    <string name="about_source_value">GitHub</string>
+    <string name="about_licence">لائسنس</string>
+    <string name="about_licence_value">GPL-3.0</string>
+    <string name="about_website">ویب سائٹ</string>
+    <string name="about_website_value">taqwa.world</string>
+    <string name="about_icon_open_website">taqwa.world کھولیں</string>
+
+    <!-- Appearance -->
+    <string name="appearance_theme_label">تھیم</string>
+    <string name="theme_system">نظام کے مطابق</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تاریک</string>
+    <string name="appearance_note">”نظام کے مطابق“ آپ کے آلے کی روشن اور تاریک ترتیب کی پیروی کرتا ہے۔</string>
+
+    <!-- Location settings -->
+    <string name="location_use_my_location">میرا مقام استعمال کریں</string>
+    <string name="location_in_use">زیرِ استعمال</string>
+    <string name="location_city">شہر</string>
+    <string name="location_country">ملک</string>
+    <string name="location_timezone">ٹائم زون</string>
+    <string name="location_choose_city_instead">اس کے بجائے شہر چنیں</string>
+    <string name="location_privacy_note">آپ کے مقام کا طول و عرض آپ کے فون پر محفوظ رہتا ہے اور صرف اوقات کے حساب کے لیے استعمال ہوتا ہے۔ کچھ بھی کہیں نہیں بھیجا جاتا۔</string>
+    <string name="location_denied_note">مقام تک رسائی کی اجازت اس وقت نہیں ہے۔ آپ اسے اپنے آلے کی ترتیبات سے دے سکتے ہیں، یا اس کے بجائے کوئی شہر چن سکتے ہیں۔</string>
+
+    <!-- City search -->
+    <string name="city_search_title">شہر چنیں</string>
+    <string name="city_search_placeholder">شہر تلاش کریں</string>
+    <string name="city_search_hint">شہر کا نام لکھنا شروع کریں۔ ڈیٹابیس ایپ ہی میں شامل ہے، اس لیے تلاش آف لائن بھی کام کرتی ہے۔</string>
+    <string name="city_search_no_results">”%1$s“ سے کوئی شہر نہیں ملتا۔</string>
+
+    <!-- Notification settings -->
+    <string name="notifications_master_toggle">نماز کی اطلاعات</string>
+    <string name="notifications_remind_before">پیشگی یاد دہانی</string>
+    <string name="notifications_prayers_label">نمازیں</string>
+    <string name="notifications_remind_never">کبھی نہیں</string>
+    <plurals name="minutes_count">
+        <item quantity="one">%1$s منٹ</item>
+        <item quantity="other">%1$s منٹ</item>
+    </plurals>
+
+    <!-- Sound sheet -->
+    <string name="sound_sheet_title">اطلاع کی آواز</string>
+    <string name="sound_silent">خاموش</string>
+    <string name="sound_notification">اطلاعی ٹون</string>
+    <string name="sound_takbir">تکبیر</string>
+    <string name="sound_adhan">اذان</string>
+    <string name="sound_silent_detail">صرف بینر، کوئی آواز نہیں</string>
+    <string name="sound_notification_detail">ایک صاف اعلانی ٹون، %1$s سیکنڈ</string>
+    <string name="sound_takbir_detail">اللہ اکبر، اللہ اکبر، تقریباً %1$s سیکنڈ</string>
+    <string name="sound_adhan_detail">اذان، پہلے %1$s سیکنڈ</string>
+    <string name="sound_sheet_footnote">نماز کی اطلاع اپنی آواز کے پہلے %1$s سیکنڈ بجاتی ہے۔ مکمل اذان ایپ کے اندر سنی جا سکتی ہے۔</string>
+
+    <!-- Adhan voice -->
+    <string name="adhan_voice_row">اذان</string>
+    <string name="adhan_voice_sheet_title">اذان</string>
+    <string name="adhan_voice_original">اصل</string>
+    <string name="adhan_voice_azeez">عاقب عزیز</string>
+    <string name="adhan_voice_azemi">بسیم عظمی</string>
+    <string name="adhan_voice_original_detail">پُرترنم، %1$s</string>
+    <string name="adhan_voice_azeez_detail">سادہ اور تیز، %1$s</string>
+    <string name="adhan_voice_azemi_detail">مالمو مسجد سے براہِ راست، %1$s</string>
+
+    <!-- Prayer time settings -->
+    <string name="prayer_times_method">حساب کا طریقہ</string>
+    <string name="prayer_times_high_latitude">بلند عرض بلد کا قاعدہ</string>
+    <string name="prayer_times_manual">دستی ترمیمات</string>
+    <string name="prayer_times_madhab_label">عصر کا مسلک</string>
+    <string name="madhab_standard">جمہور</string>
+    <string name="madhab_hanafi">حنفی</string>
+    <string name="prayer_times_hijri_label">ہجری تاریخ</string>
+    <string name="hijri_day_before">ایک دن پہلے</string>
+    <string name="hijri_day_after">ایک دن بعد</string>
+    <string name="hijri_method_note">یہ حسابی تقویم ہے، رؤیتِ ہلال نہیں۔ اس میں امّ القریٰ اور آپ کے مقامی چاند دیکھنے سے ایک دن کا فرق ہو سکتا ہے؛ اپنے علاقے کے مطابق کرنے کے لیے ترمیم استعمال کریں۔</string>
+    <string name="prayer_times_show_sunrise">طلوعِ آفتاب دکھائیں</string>
+    <string name="adjustments_none">کوئی نہیں</string>
+    <string name="adjustments_one">1 نماز</string>
+    <string name="adjustments_many">%1$s نمازیں</string>
+
+    <string name="method_muslim_world_league">رابطہ عالمِ اسلامی</string>
+    <string name="method_isna">اسنا (شمالی امریکہ)</string>
+    <string name="method_egyptian">مصری جنرل اتھارٹی برائے مساحت</string>
+    <string name="method_umm_al_qura">امّ القریٰ (مکہ مکرمہ)</string>
+    <string name="method_karachi">جامعہ علومِ اسلامیہ، کراچی</string>
+    <string name="method_tehran">ادارۂ جیو فزکس، تہران</string>
+    <string name="method_dubai">دبئی</string>
+    <string name="method_kuwait">کویت</string>
+    <string name="method_qatar">قطر</string>
+    <string name="method_singapore">سنگاپور</string>
+    <string name="method_turkey">دیانت (ترکیہ)</string>
+    <string name="method_moonsighting">رؤیتِ ہلال کمیٹی</string>
+    <string name="method_picker_note">فجر اور عشاء کے لیے سورج کو افق سے کتنا نیچے ہونا چاہیے، اس پر ادارے مختلف رائے رکھتے ہیں۔ وہی چنیں جس پر آپ کی مقامی مسجد عمل کرتی ہے۔</string>
+
+    <string name="high_lat_automatic">خودکار</string>
+    <string name="high_lat_middle">نصف شب</string>
+    <string name="high_lat_seventh">رات کا ساتواں حصہ</string>
+    <string name="high_lat_twilight">شفق کا زاویہ</string>
+    <string name="high_lat_auto_note">آپ کے عرض بلد پر خودکار طریقہ %1$s استعمال کرتا ہے۔</string>
+    <string name="high_lat_picker_note">تقریباً %1$s درجے سے اوپر سورج افق سے اتنا نیچے نہیں جاتا کہ حقیقی فجر اور عشاء بن سکیں، اس لیے ایک متبادل قاعدہ لاگو ہو جاتا ہے۔</string>
+
+    <string name="manual_note">حساب کے طریقے کے اوپر ہر وقت کو ایک گھنٹے تک آگے پیچھے کرتا ہے۔ اسے صرف اُس وقت استعمال کریں جب آپ کی مسجد کا نقشۂ اوقات حساب شدہ وقت سے مختلف ہو۔</string>
+
+    <!-- Attribution -->
+    <string name="attribution_intro">تقویٰ اُس کام پر کھڑا ہے جو دوسروں نے بلا معاوضہ دیا۔ اُن کے لائسنس اعتراف کا تقاضا کرتے ہیں، اور یہ ویسے بھی اُن کا حق ہے۔</string>
+    <string name="credit_calculation">نماز کے اوقات کا حساب</string>
+    <string name="credit_calculation_detail">Batoul Apps کی Adhan لائبریری، MIT لائسنس۔</string>
+    <string name="credit_cities">شہروں کا ڈیٹابیس</string>
+    <string name="credit_cities_detail">GeoNames cities15000، CC BY 4.0۔</string>
+    <string name="credit_typeface">Manrope ٹائپ فیس</string>
+    <string name="credit_typeface_detail">SIL Open Font Licence 1.1۔</string>
+    <string name="credit_audio">اذان اور تکبیر کی آڈیو</string>
+    <string name="credit_audio_detail">”Beautiful adhan“ از Adam-synagda، CC0 1.0، بذریعہ Wikimedia Commons۔ ”The Adhan – Muslim Call to Prayer – Aaqib Azeez“، CC BY-SA 4.0، بذریعہ Wikimedia Commons۔ ”Eid al-Fitr Fajr azan at Malmö Mosque“ از Islamic Center Malmö، CC BY 3.0، بذریعہ Wikimedia Commons۔</string>
+    <string name="credit_chime">اطلاع کی ٹون</string>
+    <string name="credit_chime_detail">Mixkit سے ”Clear announce tones“، Mixkit Sound Effects Free Licence۔</string>
+    <string name="credit_quran_text">قرآن کا متن</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1، Creative Commons BY-ND 3.0۔ حرف بہ حرف نقل کیا گیا۔</string>
+    <string name="credit_quran_font">مصحف کا خط</string>
+    <string name="credit_quran_font_detail">مجمع الملک فہد لطباعۃ المصحف الشریف کا KFGQPC عثمانی خط، حفص۔ بغیر ترمیم کے استعمال اور تقسیم کی آزادی ہے۔</string>
+    <string name="credit_quran_layout">صفحات کی ترتیب</string>
+    <string name="credit_quran_layout_detail">مصحف مدینہ کے صفحات اور سطروں کے وقفے Quranic Universal Library کے ڈیٹا سے۔</string>
+    <string name="credit_translations">تراجم</string>
+    <string name="credit_translations_detail">غیر تجارتی استعمال کے لیے Tanzil پروجیکٹ سے شامل کیے گئے۔ ہر مترجم کا ذکر نیچے موجود ہے۔</string>
+
+    <!-- Qibla (plan 2) -->
+    <string name="qibla_no_sensor_title">قطب نما کا سینسر نہیں</string>
+    <string name="qibla_no_sensor_body">اس آلے میں مقناطیسی سینسر نہیں ہے۔ نیچے دیے گئے رخ کے ساتھ کوئی حقیقی قطب نما استعمال کریں۔</string>
+
+    <!-- Widget background (Appearance) -->
+    <string name="appearance_widget_background_label">ویجٹ کا پس منظر</string>
+    <string name="appearance_prayer_widget_preview_label">نماز کے ویجٹ</string>
+    <string name="appearance_ayah_widget_preview_label">آیت کا ویجٹ</string>
+
+    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <string name="appearance_widget_add">ہوم اسکرین پر شامل کریں</string>
+    <string name="appearance_widget_add_ios_hold">تقویٰ کے آئیکن کو دبا کر رکھیں، پھر کوئی ویجٹ چنیں۔</string>
+    <string name="appearance_widget_add_ios_plus">ہوم اسکرین کو دبا کر رکھیں، جمع کے نشان پر ٹیپ کریں، پھر تقویٰ تلاش کریں۔</string>
+    <string name="appearance_widget_add_android">ہوم اسکرین کو دبا کر رکھیں، پھر ویجٹس چنیں۔</string>
+    <string name="widget_background_follow_theme">نظام کے مطابق</string>
+    <string name="widget_background_light">روشن</string>
+    <string name="widget_background_dark">تاریک</string>
+    <string name="widget_background_translucent_title">نیم شفاف</string>
+    <string name="widget_background_translucent_subtitle">آپ کے وال پیپر میں گھل جاتا ہے۔</string>
+    <string name="widget_background_frosted_title">دھندلا</string>
+    <string name="widget_background_frosted_subtitle">نظام کے ویجٹ میٹیریل کو استعمال کرتا ہے۔</string>
+    <!-- Qibla screen -->
+    <string name="qibla_title">قبلہ</string>
+    <string name="qibla_back">آج</string>
+    <string name="qibla_hold_flat">فون کو افقی رکھیں</string>
+    <string name="qibla_facing_qibla">آپ قبلہ رخ ہیں</string>
+    <string name="qibla_needs_calibrating">قطب نما کو درست کرنے کی ضرورت ہے</string>
+    <string name="qibla_calibration_help">فون کو چند بار آٹھ کے ہندسے کی شکل میں گھمائیں۔ دھات، کور اور اسپیکر کی مقناطیسی مداخلت پیمائش کو بگاڑ سکتی ہے۔</string>
+    <string name="qibla_interference_title">مقناطیسی مداخلت</string>
+    <string name="qibla_interference_help">دھات، مقناطیس، کور اور کیبل سے دور ہٹ جائیں۔ جب تک قریب کوئی زیادہ طاقتور میدان ہے، قطب نما زمین کا میدان نہیں پڑھ سکتا۔</string>
+    <string name="qibla_best_effort_title">قطب نما دستیاب نہیں</string>
+    <string name="qibla_best_effort_calibration">اس فون کے قطب نما کو درست نہیں کیا جا سکا۔ دکھایا گیا رخ اور فاصلہ درست ہے — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
+    <string name="qibla_best_effort_interference">یہاں مقناطیسی مداخلت اس فون کے قطب نما کی سکت سے زیادہ ہے۔ دکھایا گیا رخ اور فاصلہ درست ہے — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
+    <string name="qibla_distance">مکہ مکرمہ · %1$s کلومیٹر دور</string>
+    <string name="qibla_bearing">%1$s°</string>
+    <string name="qibla_cardinal_north">ش</string>
+    <string name="qibla_cardinal_east">مش</string>
+    <string name="qibla_cardinal_south">ج</string>
+    <string name="qibla_cardinal_west">مغ</string>
+    <string name="notifications_exact_alarms_off">تقویٰ کے لیے عین وقت کے الارم بند ہیں، اس لیے اطلاع ایک گھنٹے تک دیر سے آ سکتی ہے۔ اسے ٹھیک کرنے کے لیے ”الارم اور یاد دہانیاں“ کی اجازت دیں۔</string>
+    <string name="notifications_allow_exact_alarms">عین وقت کے الارم کی اجازت دیں</string>
+    <string name="notifications_blocked">نظام کی ترتیبات میں تقویٰ کی اطلاعات بند ہیں، اس لیے دوبارہ اجازت ملنے تک نماز کی کوئی تنبیہ نہیں دکھائی جا سکتی۔</string>
+    <string name="notifications_open_settings">اطلاعات کی ترتیبات کھولیں</string>
+    <string name="hijri_tabular">حسابی</string>
+    <string name="method_tehran_maghrib_note">مغرب غروبِ آفتاب کے تابع ہے؛ اس طریقے کا 4.5° مغرب زاویہ ابھی لاگو نہیں کیا گیا۔</string>
+    <!-- Bottom tab bar -->
+    <string name="tab_prayer">نماز</string>
+    <string name="tab_quran">قرآن</string>
+    <string name="tab_settings">ترتیبات</string>
+    <!-- Prayer screen's Qibla card -->
+    <string name="today_qibla_detail">%1$s° · مکہ مکرمہ تک %2$s کلومیٹر</string>
+    <!-- Quran tab root (slice 2a task 5) -->
+    <string name="quran_title">قرآن</string>
+    <string name="quran_search_hint">قرآن میں تلاش کریں</string>
+    <string name="quran_continue">تلاوت جاری رکھیں</string>
+    <string name="quran_continue_detail">آیت %1$s از %2$s · پارہ %3$s</string>
+    <string name="quran_tab_surah">سورتیں</string>
+    <string name="quran_tab_juz">پارے</string>
+    <string name="quran_surah_subtitle">%1$s · %2$s آیات · %3$s</string>
+    <string name="quran_surah_subtitle_arabic_ui">%1$s آیات · %2$s</string>
+    <string name="quran_makki">مکی</string>
+    <string name="quran_madani">مدنی</string>
+    <string name="quran_juz_n">پارہ %1$s</string>
+    <string name="quran_juz_range">%1$s %2$s سے %3$s %4$s تک</string>
+    <string name="quran_next_surah">اگلی: %1$s</string>
+    <string name="quran_juz_page">پارہ %1$s · صفحہ %2$s</string>
+    <string name="quran_reader_aa">پڑھنے کی ترتیبات</string>
+    <string name="quran_reader_mushaf">مصحف</string>
+    <string name="quran_sheet_size">عربی متن کا سائز</string>
+    <string name="quran_sheet_transliteration">رومن نقل</string>
+    <string name="quran_sheet_translation">ترجمہ</string>
+    <string name="quran_translation_off">بند</string>
+    <string name="quran_translation_off_detail">صرف عربی، ہر کارڈ پر ایک آیت</string>
+    <string name="quran_sheet_mode">پڑھنے کا انداز</string>
+    <string name="quran_mode_translation">ترجمہ</string>
+    <string name="quran_mode_mushaf">مصحف</string>
+    <string name="quran_size_mushaf_note">مصحف انداز میں صفحے کا سائز چوڑائی کے تابع ہوتا ہے۔</string>
+    <!-- Quran search results and bookmarks (slice 2b) -->
+    <string name="quran_section_surahs">سورتیں</string>
+    <string name="quran_section_ayahs">آیات · %1$s</string>
+    <string name="quran_search_empty">کوئی آیت نہیں ملی</string>
+    <string name="quran_tab_bookmarks">محفوظات</string>
+    <string name="quran_bookmarks_empty">ابھی کوئی محفوظ آیت نہیں۔ کوئی آیت کھولیں اور نشان پر ٹیپ کریں۔</string>
+    <string name="quran_remove_bookmark">محفوظات سے ہٹائیں</string>
+    <string name="quran_ayah_n">آیت %1$s</string>
+    <string name="quran_action_bookmark">محفوظ کریں</string>
+    <string name="quran_action_bookmarked">محفوظ ہو گئی</string>
+    <string name="quran_action_copy">نقل کریں</string>
+    <string name="quran_action_copied">نقل ہو گئی</string>
+    <string name="quran_action_share">شیئر کریں</string>
+    <!-- Tasbeeh -->
+    <string name="tasbeeh_title">تسبیح</string>
+    <string name="today_open_tasbeeh">تسبیح</string>
+    <string name="tasbeeh_add_custom">ذکر شامل کریں</string>
+    <string name="tasbeeh_round">چکر %1$s</string>
+    <string name="tasbeeh_of">از %1$s</string>
+    <string name="tasbeeh_hint">گننے کے لیے کہیں بھی ٹیپ کریں</string>
+    <string name="dhikr_meaning_subhanallah">اللہ ہر عیب سے پاک ہے</string>
+    <string name="dhikr_meaning_alhamdulillah">سب تعریف اللہ ہی کے لیے ہے</string>
+    <string name="dhikr_meaning_allahu_akbar">اللہ سب سے بڑا ہے</string>
+    <string name="dhikr_meaning_astaghfirullah">میں اللہ سے مغفرت مانگتا ہوں</string>
+    <string name="dhikr_meaning_la_ilaha_illallah">اللہ کے سوا کوئی معبود نہیں</string>
+    <string name="dhikr_meaning_subhanallahi_wa_bihamdihi">اللہ پاک ہے اور اسی کی تعریف ہے</string>
+    <string name="tasbeeh_preset_after_prayer">نماز کے بعد</string>
+    <string name="tasbeeh_preset_subhanallah">سبحان اللہ</string>
+    <string name="tasbeeh_preset_alhamdulillah">الحمد للہ</string>
+    <string name="tasbeeh_preset_allahu_akbar">اللہ اکبر</string>
+    <string name="tasbeeh_preset_astaghfirullah">استغفر اللہ</string>
+    <string name="tasbeeh_preset_la_ilaha_illallah">لا الٰہ الا اللہ</string>
+    <string name="tasbeeh_preset_subhanallahi_wa_bihamdihi">سبحان اللہ وبحمدہ</string>
+    <string name="tasbeeh_reset">گنتی صفر کریں</string>
+    <string name="tasbeeh_reset_confirm">اس ذکر کی گنتی صفر کر دیں؟</string>
+    <string name="tasbeeh_custom_title">اپنا ذکر</string>
+    <string name="tasbeeh_custom_edit_title">ذکر میں ترمیم</string>
+    <string name="tasbeeh_custom_phrase">کلمہ</string>
+    <string name="tasbeeh_custom_target">ہدف</string>
+    <string name="tasbeeh_custom_add">شامل کریں</string>
+    <string name="tasbeeh_custom_save">محفوظ کریں</string>
+    <string name="tasbeeh_custom_delete">حذف کریں</string>
+    <!-- Quran recitation (spec 3a §5) -->
+    <string name="recitation_play">چلائیں</string>
+    <string name="recitation_reciter">قاری</string>
+    <string name="recitation_style_murattal">مرتّل</string>
+    <string name="recitation_kbps">%1$s کلوبٹ/سیکنڈ</string>
+    <string name="recitation_megabytes">%1$s ایم بی</string>
+    <string name="recitation_on_phone">اس فون پر %2$s میں سے %1$s سورتیں</string>
+    <string name="recitation_download">ڈاؤن لوڈ · %1$s</string>
+    <string name="recitation_downloading">%1$s از %2$s</string>
+    <string name="recitation_over_wifi">وائی فائی پر۔</string>
+    <string name="recitation_use_mobile_once">اس بار موبائل ڈیٹا استعمال کریں</string>
+    <string name="recitation_keep_reading">آپ پڑھنا جاری رکھ سکتے ہیں۔ فائل آتے ہی جس آیت کو آپ نے چنا تھا، وہیں سے تلاوت شروع ہو جائے گی۔</string>
+    <string name="recitation_waiting_connection">کنکشن کا انتظار ہے۔ کنکشن ملتے ہی ڈاؤن لوڈ خود شروع ہو جائے گا۔</string>
+    <string name="recitation_switch_ready">نئی تلاوت آنے تک %1$s کی آواز چلتی رہے گی۔</string>
+    <string name="recitation_switch_running">%1$s کی تلاوت چلتی رہے گی۔ فائل آتے ہی آواز %2$s کی ہو جائے گی۔</string>
+    <string name="recitation_cancel">منسوخ کریں</string>
+    <string name="recitation_retry">دوبارہ کوشش</string>
+    <string name="recitation_back_to_ayah">آیت %1$s پر واپس</string>
+    <string name="recitation_fail_no_network">اس وقت کوئی کنکشن نہیں ہے۔</string>
+    <string name="recitation_fail_needs_wifi">ڈاؤن لوڈ صرف وائی فائی پر مقرر ہے۔</string>
+    <string name="recitation_fail_no_space">اس فون پر کافی جگہ نہیں ہے۔</string>
+    <string name="recitation_fail_server">ڈاؤن لوڈ مکمل نہیں ہوا۔ اسے دوبارہ شروع کیا جا سکتا ہے۔</string>
+    <string name="recitation_fail_checksum">جو فائل آئی وہ درست نہیں تھی۔ اسے دوبارہ لایا جا سکتا ہے۔</string>
+    <string name="recitation_fail_cancelled">ڈاؤن لوڈ مکمل ہونے سے پہلے رک گیا۔</string>
+    <string name="recitation_a11y_recitation">تلاوت</string>
+    <string name="recitation_a11y_pause">روکیں</string>
+    <string name="recitation_a11y_downloading">تلاوت ڈاؤن لوڈ ہو رہی ہے</string>
+    <string name="recitation_a11y_next">اگلی سورت</string>
+    <string name="recitation_a11y_previous">پچھلی سورت</string>
+    <string name="recitation_a11y_next_ayah">اگلی آیت</string>
+    <string name="recitation_a11y_previous_ayah">پچھلی آیت</string>
+    <string name="recitation_auto_download">آئندہ سورتیں پوچھے بغیر ڈاؤن لوڈ کریں</string>
+    <string name="recitation_arriving_next">اگلی: %1$s · %2$s</string>
+    <string name="recitation_arriving_voice">%1$s · %2$s</string>
+    <string name="recitation_percent">%1$s%</string>
+    <string name="recitation_a11y_close">پلیئر بند کریں</string>
+    <string name="recitation_a11y_change_reciter">قاری بدلیں</string>
+    <string name="recitation_a11y_go_to_playing">جس آیت کی تلاوت ہو رہی ہے، اس پر جائیں</string>
+    <string name="recitation_a11y_preview">اس قاری کو سنیں</string>
+    <!-- Settings > Quran > Recitation -->
+    <string name="settings_group_quran">قرآن</string>
+    <string name="settings_recitation">تلاوت</string>
+    <string name="recitation_settings_mobile_data">موبائل ڈیٹا پر ڈاؤن لوڈ کریں</string>
+    <string name="recitation_settings_auto_download">پوچھے بغیر ڈاؤن لوڈ کریں</string>
+    <string name="recitation_settings_downloads">ڈاؤن لوڈز · %1$s</string>
+    <string name="recitation_settings_surahs_one">%1$s سورت · %2$s</string>
+    <string name="recitation_settings_surahs">%1$s سورتیں · %2$s</string>
+    <string name="recitation_settings_whole_quran">پورا قرآن ڈاؤن لوڈ کریں · %1$s</string>
+    <string name="recitation_settings_batch">ڈاؤن لوڈ جاری · %1$s از %2$s</string>
+    <string name="recitation_settings_credit">تلاوتیں قاریوں کی جانب سے اسلامک نیٹ ورک کے ذریعے مفت، غیر تجارتی تقسیم کے لیے لائسنس یافتہ ہیں۔ مکمل اسناد ”اسناد اور لائسنس“ میں ہیں۔</string>
+    <string name="recitation_downloads_delete">حذف کریں</string>
+    <string name="recitation_downloads_delete_all">اس قاری کی سب تلاوتیں حذف کریں</string>
+    <string name="recitation_downloads_confirm">%1$s حذف کریں؟</string>
+    <string name="recitation_downloads_empty">اس قاری کی کوئی تلاوت فون پر نہیں ہے۔</string>
+    <string name="recitation_gigabytes">%1$s جی بی</string>
+    <string name="credit_recitations">تلاوتیں</string>
+    <string name="credit_recitations_detail">آیت بہ آیت تلاوتیں اسلامک نیٹ ورک (alquran.cloud) سے، جنہیں قاریوں نے اُنہی بٹ ریٹس پر مفت، غیر تجارتی تقسیم کے لیے لائسنس دیا ہے جن پر وہ شائع کرتے ہیں۔ بغیر ترمیم کے، انہی بٹ ریٹس پر نقل کی گئیں۔</string>
+</resources>

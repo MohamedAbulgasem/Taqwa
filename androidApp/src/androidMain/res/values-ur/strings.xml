@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">تقویٰ</string>
+    <string name="widget_small_label">اگلی نماز</string>
+    <string name="widget_medium_label">نماز کے اوقات</string>
+    <string name="widget_ayah_label">آج کی آیت</string>
+    <string name="widget_small_description">اگلی نماز اور چلتی ہوئی الٹی گنتی۔</string>
+    <string name="widget_medium_description">اگلی نماز، الٹی گنتی اور آج کے اوقات۔</string>
+    <string name="widget_ayah_description">آج کی آیت، اپنے ترجمے کے ساتھ۔</string>
+</resources>

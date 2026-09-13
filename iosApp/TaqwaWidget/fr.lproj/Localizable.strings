@@ -1,0 +1,19 @@
+/* The ayah widget as it appears in the widget gallery (design spec §7). */
+"ayah_widget_name" = "Verset du jour";
+"ayah_widget_description" = "Le verset du jour, avec sa traduction.";
+
+/* Shown on the card until the app has run once and written the pool mirror (design spec §2). */
+"ayah_widget_placeholder" = "Ouvrez Taqwa une fois pour charger le verset du jour";
+
+/* The two prayer widgets as they appear in the widget gallery. */
+"home_widget_name" = "Taqwa";
+"home_widget_description" = "La prochaine prière, le compte à rebours et les horaires du jour.";
+"lock_widget_name" = "Taqwa sur l’écran verrouillé";
+"lock_widget_description" = "La prochaine prière en un coup d’œil.";
+
+/* Shown on the prayer cards until the app has run once and written the snapshot mirror. */
+"prayer_widget_placeholder_title" = "Taqwa";
+"prayer_widget_placeholder_body" = "Ouvrez Taqwa pour charger vos horaires de prière.";
+
+/* The prayer after the next one on the rectangular complication; %@ is its display name. */
+"lock_widget_then" = "puis %@";

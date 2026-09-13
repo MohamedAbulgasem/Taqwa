@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Taqwa</string>
+    <string name="widget_small_label">Sonraki vakit</string>
+    <string name="widget_medium_label">Namaz vakitleri</string>
+    <string name="widget_ayah_label">Günün ayeti</string>
+    <string name="widget_small_description">Sonraki vakit ve canlı geri sayım.</string>
+    <string name="widget_medium_description">Sonraki vakit, geri sayım ve bugünün vakitleri.</string>
+    <string name="widget_ayah_description">Günün ayeti ve meali.</string>
+</resources>

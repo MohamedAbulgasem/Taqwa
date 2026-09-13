@@ -1,0 +1,373 @@
+<resources>
+    <string name="app_name">Taqwa</string>
+    <string name="ui_language">id</string>
+
+    <string name="language_name">Bahasa Indonesia</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Taqwa</string>
+    <string name="onboarding_welcome_body">Waktu salat, kiblat, dan Al-Qur’an. Gratis selamanya. Tanpa iklan, tanpa akun, berfungsi offline.</string>
+    <string name="onboarding_welcome_cta">Mulai</string>
+    <string name="onboarding_location_title">Di mana Anda berada?</string>
+    <string name="onboarding_location_body">Waktu salat bergantung pada posisi Anda yang tepat. Semuanya dihitung di perangkat Anda. Lokasi Anda tidak pernah keluar dari ponsel.</string>
+    <string name="onboarding_location_cta">Gunakan lokasi saya</string>
+    <string name="onboarding_location_secondary">Pilih kota saja</string>
+    <string name="onboarding_notifications_title">Jangan lewatkan satu salat pun</string>
+    <string name="onboarding_notifications_body">Notifikasi pada setiap waktu salat. Anda memilih suaranya untuk tiap salat secara terpisah, dan bisa menggantinya kapan saja.</string>
+    <string name="onboarding_notifications_cta">Aktifkan notifikasi</string>
+    <string name="onboarding_notifications_secondary">Nanti saja</string>
+    <string name="onboarding_exact_title">Tepat pada waktunya</string>
+    <string name="onboarding_exact_body">Android hanya berbunyi tepat pada waktu salat jika izin “Alarm &amp; pengingat” diberikan untuk Taqwa. Tanpa izin itu, notifikasi bisa terlambat sampai satu jam.</string>
+    <string name="onboarding_widget_title">Di layar utama Anda</string>
+    <string name="onboarding_widget_body">Widget Taqwa menampilkan salat berikutnya dan hitung mundur yang terus berjalan, tanpa membuka aplikasi.</string>
+    <string name="onboarding_widget_body_ios">Widget Taqwa menampilkan salat berikutnya dan hitung mundur yang terus berjalan, tanpa membuka aplikasi. Untuk menambahkannya, sentuh dan tahan ikon Taqwa di layar utama, lalu pilih ukuran widget.</string>
+    <string name="onboarding_widget_body_ios_legacy">Widget Taqwa menampilkan salat berikutnya dan hitung mundur yang terus berjalan, tanpa membuka aplikasi. Untuk menambahkannya, sentuh dan tahan layar utama, ketuk tanda plus di sudut atas, lalu cari Taqwa.</string>
+    <string name="onboarding_widget_cta_add">Tambahkan widget</string>
+    <string name="onboarding_widget_cta_done">Selesai</string>
+    <string name="onboarding_widget_secondary">Mungkin nanti</string>
+
+    <!-- Prayer names -->
+    <string name="prayer_fajr">Subuh</string>
+    <string name="prayer_sunrise">Terbit</string>
+    <string name="prayer_dhuhr">Dzuhur</string>
+    <string name="prayer_asr">Ashar</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Isya</string>
+
+    <!-- Today -->
+    <string name="today_current_location">Lokasi saat ini</string>
+    <string name="today_next_in">Menuju %1$s</string>
+    <string name="today_latitude_label">PADA LINTANG INI</string>
+    <string name="today_exact_alarms_label">ALARM TEPAT WAKTU NONAKTIF</string>
+    <string name="today_exact_alarms_body">Android bisa terlambat sampai satu jam selama izin “Alarm &amp; pengingat” belum diberikan untuk Taqwa.</string>
+    <string name="today_no_location_title">Belum ada lokasi</string>
+    <string name="today_choose_city">Pilih kota</string>
+    <string name="today_allow_location">Izinkan lokasi saja</string>
+
+    <!-- Settings root -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_group_prayer">SALAT</string>
+    <string name="settings_group_app">APLIKASI</string>
+    <string name="settings_group_about">TENTANG</string>
+    <string name="settings_location">Lokasi</string>
+    <string name="settings_prayer_times">Waktu salat</string>
+    <string name="settings_notifications">Notifikasi</string>
+    <string name="settings_appearance">Tampilan</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_about">Tentang Taqwa</string>
+    <string name="settings_attribution">Atribusi &amp; lisensi</string>
+    <string name="settings_not_set">Belum diatur</string>
+    <string name="settings_notifications_off">Nonaktif</string>
+    <string name="settings_notifications_on_count">%1$s aktif</string>
+    <string name="settings_version_value">0.18.0</string>
+
+    <!-- Layar «Tentang Taqwa». Nama «Taqwa» tetap dalam huruf Latin, seperti pada ikonnya. -->
+    <string name="about_tagline">Gratis, untuk semua, selamanya.</string>
+    <string name="about_privacy_label">PRIVASI</string>
+    <string name="about_stays_title">Tetap di ponsel Anda</string>
+    <string name="about_stays_body">Lokasi, pengaturan, penanda, dan hitungan tidak pernah keluar dari ponsel.</string>
+    <string name="about_online_title">Online hanya bila Anda minta</string>
+    <string name="about_online_body">Internet dipakai untuk satu hal saja: tilawah yang Anda pilih untuk diunduh, dari repositori publik Taqwa di GitHub.</string>
+    <string name="about_nothing_title">Tanpa akun, tanpa iklan, tanpa analitik</string>
+    <string name="about_nothing_body">Tidak ada akun untuk masuk, tidak ada data untuk dijual.</string>
+    <string name="about_links_label">LAINNYA</string>
+    <string name="about_privacy_policy">Kebijakan privasi</string>
+    <string name="about_source">Kode sumber</string>
+    <string name="about_source_value">GitHub</string>
+    <string name="about_licence">Lisensi</string>
+    <string name="about_licence_value">GPL-3.0</string>
+    <string name="about_website">Situs web</string>
+    <string name="about_website_value">taqwa.world</string>
+    <string name="about_icon_open_website">Buka taqwa.world</string>
+
+    <!-- Appearance -->
+    <string name="appearance_theme_label">TEMA</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Terang</string>
+    <string name="theme_dark">Gelap</string>
+    <string name="appearance_note">Pilihan Sistem mengikuti setelan terang dan gelap di perangkat Anda.</string>
+
+    <!-- Location settings -->
+    <string name="location_use_my_location">Gunakan lokasi saya</string>
+    <string name="location_in_use">SEDANG DIPAKAI</string>
+    <string name="location_city">Kota</string>
+    <string name="location_country">Negara</string>
+    <string name="location_timezone">Zona waktu</string>
+    <string name="location_choose_city_instead">Pilih kota saja</string>
+    <string name="location_privacy_note">Koordinat disimpan di perangkat Anda dan hanya dipakai untuk menghitung waktu salat. Tidak ada yang dikirim ke mana pun.</string>
+    <string name="location_denied_note">Akses lokasi sedang ditolak. Anda bisa mengizinkannya di pengaturan perangkat, atau pilih kota saja.</string>
+
+    <!-- City search -->
+    <string name="city_search_title">Pilih kota</string>
+    <string name="city_search_placeholder">Cari kota</string>
+    <string name="city_search_hint">Mulai ketik nama kota. Basis datanya sudah ada di dalam aplikasi, jadi pencarian berfungsi offline.</string>
+    <string name="city_search_no_results">Tidak ada kota yang cocok dengan “%1$s”.</string>
+
+    <!-- Notification settings -->
+    <string name="notifications_master_toggle">Notifikasi salat</string>
+    <string name="notifications_remind_before">Ingatkan sebelumnya</string>
+    <string name="notifications_prayers_label">SALAT</string>
+    <string name="notifications_remind_never">Tanpa pengingat</string>
+    <plurals name="minutes_count">
+        <item quantity="other">%1$s menit</item>
+    </plurals>
+
+    <!-- Sound sheet -->
+    <string name="sound_sheet_title">Suara notifikasi</string>
+    <string name="sound_silent">Senyap</string>
+    <string name="sound_notification">Nada notifikasi</string>
+    <string name="sound_takbir">Takbir</string>
+    <string name="sound_adhan">Azan</string>
+    <string name="sound_silent_detail">Hanya banner, tanpa suara</string>
+    <string name="sound_notification_detail">Nada pengumuman yang jelas, %1$s detik</string>
+    <string name="sound_takbir_detail">Allahu akbar, Allahu akbar, sekitar %1$s dtk</string>
+    <string name="sound_adhan_detail">Azan, %1$s detik pertama</string>
+    <string name="sound_sheet_footnote">Notifikasi salat memutar %1$s detik pertama dari suaranya. Azan lengkap bisa diputar di dalam aplikasi.</string>
+
+    <!-- Adhan voice -->
+    <string name="adhan_voice_row">Azan</string>
+    <string name="adhan_voice_sheet_title">Azan</string>
+    <string name="adhan_voice_original">Asli</string>
+    <string name="adhan_voice_azeez">Aaqib Azeez</string>
+    <string name="adhan_voice_azemi">Besim Azemi</string>
+    <string name="adhan_voice_original_detail">Bercengkok, %1$s</string>
+    <string name="adhan_voice_azeez_detail">Lugas dan cepat, %1$s</string>
+    <string name="adhan_voice_azemi_detail">Langsung dari Masjid Malmö, %1$s</string>
+
+    <!-- Prayer time settings -->
+    <string name="prayer_times_method">Metode perhitungan</string>
+    <string name="prayer_times_high_latitude">Aturan lintang tinggi</string>
+    <string name="prayer_times_manual">Penyesuaian manual</string>
+    <string name="prayer_times_madhab_label">MAZHAB ASHAR</string>
+    <string name="madhab_standard">Standar</string>
+    <string name="madhab_hanafi">Hanafi</string>
+    <string name="prayer_times_hijri_label">TANGGAL HIJRIAH</string>
+    <string name="hijri_day_before">Sehari sebelumnya</string>
+    <string name="hijri_day_after">Sehari sesudahnya</string>
+    <string name="hijri_method_note">Kalender hitungan, bukan rukyat. Bisa berbeda sehari dari Ummul Qura dan dari rukyat setempat; gunakan penyesuaian agar cocok dengan yang dipakai di lingkungan Anda.</string>
+    <string name="prayer_times_show_sunrise">Tampilkan waktu terbit</string>
+    <string name="adjustments_none">Tidak ada</string>
+    <string name="adjustments_one">1 salat</string>
+    <string name="adjustments_many">%1$s salat</string>
+
+    <string name="method_muslim_world_league">Liga Muslim Dunia</string>
+    <string name="method_isna">ISNA (Amerika Utara)</string>
+    <string name="method_egyptian">Otoritas Umum Mesir</string>
+    <string name="method_umm_al_qura">Ummul Qura (Makkah)</string>
+    <string name="method_karachi">Universitas Ilmu-Ilmu Islam, Karachi</string>
+    <string name="method_tehran">Institut Geofisika, Teheran</string>
+    <string name="method_dubai">Dubai</string>
+    <string name="method_kuwait">Kuwait</string>
+    <string name="method_qatar">Qatar</string>
+    <string name="method_singapore">Singapura</string>
+    <string name="method_turkey">Diyanet (Turki)</string>
+    <string name="method_moonsighting">Komite Rukyatul Hilal</string>
+    <string name="method_picker_note">Setiap lembaga berbeda pendapat soal seberapa jauh matahari harus berada di bawah ufuk untuk Subuh dan Isya. Pilih yang diikuti masjid Anda.</string>
+
+    <string name="high_lat_automatic">Otomatis</string>
+    <string name="high_lat_middle">Pertengahan malam</string>
+    <string name="high_lat_seventh">Sepertujuh malam</string>
+    <string name="high_lat_twilight">Sudut senja</string>
+    <string name="high_lat_auto_note">Pada lintang Anda, mode otomatis memakai %1$s.</string>
+    <string name="high_lat_picker_note">Di atas sekitar %1$s derajat, matahari tidak lagi turun cukup jauh di bawah ufuk untuk Subuh dan Isya yang sebenarnya, sehingga dipakai aturan pengganti.</string>
+
+    <string name="manual_note">Menggeser setiap waktu sampai satu jam, di atas metode perhitungan. Gunakan hanya bila jadwal masjid Anda berbeda dari waktu hasil perhitungan.</string>
+
+    <!-- Attribution -->
+    <string name="attribution_intro">Taqwa dibangun di atas karya yang dibagikan cuma-cuma oleh orang lain. Lisensi mereka mewajibkan penyebutan, dan itu memang hak mereka.</string>
+    <string name="credit_calculation">Perhitungan waktu salat</string>
+    <string name="credit_calculation_detail">Adhan dari Batoul Apps, lisensi MIT.</string>
+    <string name="credit_cities">Basis data kota</string>
+    <string name="credit_cities_detail">GeoNames cities15000, lisensi CC BY 4.0.</string>
+    <string name="credit_typeface">Huruf Manrope</string>
+    <string name="credit_typeface_detail">Lisensi SIL Open Font 1.1.</string>
+    <string name="credit_audio">Audio azan dan takbir</string>
+    <string name="credit_audio_detail">“Beautiful adhan” oleh Adam-synagda, CC0 1.0, via Wikimedia Commons. “The Adhan – Muslim Call to Prayer – Aaqib Azeez”, CC BY-SA 4.0, via Wikimedia Commons. “Eid al-Fitr Fajr azan at Malmö Mosque” oleh Islamic Center Malmö, CC BY 3.0, via Wikimedia Commons.</string>
+    <string name="credit_chime">Nada notifikasi</string>
+    <string name="credit_chime_detail">“Clear announce tones” dari Mixkit, Lisensi Gratis Efek Suara Mixkit.</string>
+    <string name="credit_quran_text">Teks Al-Qur’an</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons BY-ND 3.0. Disalin apa adanya.</string>
+    <string name="credit_quran_font">Huruf mushaf</string>
+    <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs dari Kompleks Percetakan Al-Qur’an Raja Fahd. Bebas dipakai dan disebarkan tanpa perubahan.</string>
+    <string name="credit_quran_layout">Tata letak halaman</string>
+    <string name="credit_quran_layout_detail">Pembagian halaman dan baris Mushaf Madinah dari data Quranic Universal Library.</string>
+    <string name="credit_translations">Terjemahan</string>
+    <string name="credit_translations_detail">Disertakan dari Tanzil Project untuk penggunaan nonkomersial. Setiap penerjemah disebutkan di bawah.</string>
+
+    <!-- Qibla (plan 2) -->
+    <string name="qibla_no_sensor_title">Tidak ada sensor kompas</string>
+    <string name="qibla_no_sensor_body">Perangkat ini tidak punya magnetometer. Gunakan kompas sungguhan bersama arah di bawah ini.</string>
+
+    <!-- Widget background (Appearance) -->
+    <string name="appearance_widget_background_label">LATAR WIDGET</string>
+    <string name="appearance_prayer_widget_preview_label">WIDGET SALAT</string>
+    <string name="appearance_ayah_widget_preview_label">WIDGET AYAT</string>
+
+    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <string name="appearance_widget_add">Tambahkan ke layar utama</string>
+    <string name="appearance_widget_add_ios_hold">Sentuh dan tahan ikon Taqwa, lalu pilih widget.</string>
+    <string name="appearance_widget_add_ios_plus">Sentuh dan tahan layar utama, ketuk tanda plus, lalu cari Taqwa.</string>
+    <string name="appearance_widget_add_android">Sentuh dan tahan layar utama, lalu pilih Widget.</string>
+    <string name="widget_background_follow_theme">Sistem</string>
+    <string name="widget_background_light">Terang</string>
+    <string name="widget_background_dark">Gelap</string>
+    <string name="widget_background_translucent_title">Tembus pandang</string>
+    <string name="widget_background_translucent_subtitle">Menyatu dengan wallpaper Anda.</string>
+    <string name="widget_background_frosted_title">Buram</string>
+    <string name="widget_background_frosted_subtitle">Memakai material widget bawaan sistem.</string>
+    <!-- Qibla screen (Task 22 sweep) -->
+    <string name="qibla_title">Kiblat</string>
+    <string name="qibla_back">Hari ini</string>
+    <string name="qibla_hold_flat">Pegang ponsel mendatar</string>
+    <string name="qibla_facing_qibla">Menghadap kiblat</string>
+    <string name="qibla_needs_calibrating">Kompas perlu dikalibrasi</string>
+    <string name="qibla_calibration_help">Gerakkan ponsel membentuk angka delapan beberapa kali. Gangguan magnet dari logam, casing, dan speaker bisa mengacaukan pembacaan.</string>
+    <string name="qibla_interference_title">Gangguan magnet</string>
+    <string name="qibla_interference_help">Menjauhlah dari logam, magnet, casing, dan kabel. Kompas tidak bisa membaca medan bumi selama ada medan yang lebih kuat di dekatnya.</string>
+    <string name="qibla_best_effort_title">Kompas tidak tersedia</string>
+    <string name="qibla_best_effort_calibration">Kompas ponsel ini tidak bisa dikalibrasi. Arah dan jarak yang ditampilkan sudah benar — gunakan keduanya bersama kompas lain.</string>
+    <string name="qibla_best_effort_interference">Gangguan magnet di sini terlalu kuat untuk kompas ponsel ini. Arah dan jarak yang ditampilkan sudah benar — gunakan keduanya bersama kompas lain.</string>
+    <string name="qibla_distance">Makkah · %1$s km dari sini</string>
+    <string name="qibla_bearing">%1$s°</string>
+    <string name="qibla_cardinal_north">U</string>
+    <string name="qibla_cardinal_east">T</string>
+    <string name="qibla_cardinal_south">S</string>
+    <string name="qibla_cardinal_west">B</string>
+    <string name="notifications_exact_alarms_off">Alarm tepat waktu dimatikan untuk Taqwa, sehingga notifikasi bisa terlambat sampai satu jam. Izinkan “Alarm &amp; pengingat” untuk memperbaikinya.</string>
+    <string name="notifications_allow_exact_alarms">Izinkan alarm tepat waktu</string>
+    <string name="notifications_blocked">Notifikasi dimatikan untuk Taqwa di pengaturan sistem, sehingga tidak ada peringatan salat yang bisa muncul sampai notifikasi diizinkan lagi.</string>
+    <string name="notifications_open_settings">Buka pengaturan notifikasi</string>
+    <string name="hijri_tabular">Hisab</string>
+    <string name="method_tehran_maghrib_note">Maghrib mengikuti terbenamnya matahari; sudut Maghrib 4,5° pada metode ini belum diterapkan.</string>
+    <!-- Bottom tab bar (iteration 1; iteration 8: two tabs; slice 2: the Quran tab arrives) -->
+    <string name="tab_prayer">Salat</string>
+    <string name="tab_quran">Al-Qur’an</string>
+    <string name="tab_settings">Pengaturan</string>
+    <!-- Prayer screen's Qibla card -->
+    <string name="today_qibla_detail">%1$s° · %2$s km ke Makkah</string>
+    <!-- Quran tab root (slice 2a task 5) -->
+    <string name="quran_title">Al-Qur’an</string>
+    <string name="quran_search_hint">Cari di Al-Qur’an</string>
+    <string name="quran_continue">LANJUTKAN MEMBACA</string>
+    <string name="quran_continue_detail">Ayat %1$s dari %2$s · Juz %3$s</string>
+    <string name="quran_tab_surah">Surah</string>
+    <string name="quran_tab_juz">Juz</string>
+    <string name="quran_surah_subtitle">%1$s · %2$s ayat · %3$s</string>
+    <string name="quran_surah_subtitle_arabic_ui">%1$s ayat · %2$s</string>
+    <string name="quran_makki">Makkiyah</string>
+    <string name="quran_madani">Madaniyah</string>
+    <string name="quran_juz_n">Juz %1$s</string>
+    <string name="quran_juz_range">%1$s %2$s sampai %3$s %4$s</string>
+    <string name="quran_next_surah">Berikutnya: %1$s</string>
+    <string name="quran_juz_page">Juz %1$s · Halaman %2$s</string>
+    <string name="quran_reader_aa">Pengaturan baca</string>
+    <string name="quran_reader_mushaf">Mushaf</string>
+    <string name="quran_sheet_size">Ukuran teks Arab</string>
+    <string name="quran_sheet_transliteration">Transliterasi</string>
+    <string name="quran_sheet_translation">Terjemahan</string>
+    <string name="quran_translation_off">Tanpa terjemahan</string>
+    <string name="quran_translation_off_detail">Teks Arab saja, satu ayat per kartu</string>
+    <string name="quran_sheet_mode">Mode baca</string>
+    <string name="quran_mode_translation">Terjemahan</string>
+    <string name="quran_mode_mushaf">Mushaf</string>
+    <string name="quran_size_mushaf_note">Ukuran halaman mengikuti lebar layar dalam mode Mushaf.</string>
+    <!-- Quran search results and bookmarks (slice 2b) -->
+    <string name="quran_section_surahs">Surah</string>
+    <string name="quran_section_ayahs">Ayat · %1$s</string>
+    <string name="quran_search_empty">Tidak ada ayat yang cocok</string>
+    <string name="quran_tab_bookmarks">Penanda</string>
+    <string name="quran_bookmarks_empty">Belum ada penanda. Buka sebuah ayat lalu ketuk ikon penanda.</string>
+    <string name="quran_remove_bookmark">Hapus penanda</string>
+    <string name="quran_ayah_n">Ayat %1$s</string>
+    <string name="quran_action_bookmark">Tandai</string>
+    <string name="quran_action_bookmarked">Ditandai</string>
+    <string name="quran_action_copy">Salin</string>
+    <string name="quran_action_copied">Tersalin</string>
+    <string name="quran_action_share">Bagikan</string>
+    <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
+    <string name="tasbeeh_title">Tasbih</string>
+    <string name="today_open_tasbeeh">Tasbih</string>
+    <string name="tasbeeh_add_custom">Tambah zikir</string>
+    <string name="tasbeeh_round">PUTARAN %1$s</string>
+    <string name="tasbeeh_of">dari %1$s</string>
+    <string name="tasbeeh_hint">Ketuk di mana saja untuk menghitung</string>
+    <string name="dhikr_meaning_subhanallah">Maha Suci Allah</string>
+    <string name="dhikr_meaning_alhamdulillah">Segala puji bagi Allah</string>
+    <string name="dhikr_meaning_allahu_akbar">Allah Maha Besar</string>
+    <string name="dhikr_meaning_astaghfirullah">Aku memohon ampun kepada Allah</string>
+    <string name="dhikr_meaning_la_ilaha_illallah">Tiada tuhan selain Allah</string>
+    <string name="dhikr_meaning_subhanallahi_wa_bihamdihi">Maha Suci Allah dan segala puji bagi-Nya</string>
+    <string name="tasbeeh_preset_after_prayer">Setelah salat</string>
+    <string name="tasbeeh_preset_subhanallah">Subhanallah</string>
+    <string name="tasbeeh_preset_alhamdulillah">Alhamdulillah</string>
+    <string name="tasbeeh_preset_allahu_akbar">Allahu Akbar</string>
+    <string name="tasbeeh_preset_astaghfirullah">Astaghfirullah</string>
+    <string name="tasbeeh_preset_la_ilaha_illallah">Laa ilaaha illallah</string>
+    <string name="tasbeeh_preset_subhanallahi_wa_bihamdihi">Subhanallahi wa bihamdihi</string>
+    <string name="tasbeeh_reset">Atur ulang</string>
+    <string name="tasbeeh_reset_confirm">Atur ulang hitungan untuk zikir ini?</string>
+    <string name="tasbeeh_custom_title">Zikir baru</string>
+    <string name="tasbeeh_custom_edit_title">Ubah zikir</string>
+    <string name="tasbeeh_custom_phrase">Lafaz</string>
+    <string name="tasbeeh_custom_target">Target</string>
+    <string name="tasbeeh_custom_add">Tambah</string>
+    <string name="tasbeeh_custom_save">Simpan</string>
+    <string name="tasbeeh_custom_delete">Hapus</string>
+    <!-- Quran recitation (spec 3a §5) -->
+    <string name="recitation_play">Putar</string>
+    <string name="recitation_reciter">Qari</string>
+    <string name="recitation_style_murattal">Murottal</string>
+    <string name="recitation_kbps">%1$s kbps</string>
+    <string name="recitation_megabytes">%1$s MB</string>
+    <string name="recitation_on_phone">%1$s dari %2$s surah ada di ponsel ini</string>
+    <string name="recitation_download">Unduh · %1$s</string>
+    <string name="recitation_downloading">%1$s dari %2$s</string>
+    <string name="recitation_over_wifi">Lewat Wi-Fi.</string>
+    <string name="recitation_use_mobile_once">Pakai data seluler kali ini saja</string>
+    <string name="recitation_keep_reading">Anda bisa terus membaca. Pemutaran dimulai dari ayat yang Anda pilih begitu unduhannya selesai.</string>
+    <string name="recitation_waiting_connection">Menunggu koneksi. Unduhan berjalan sendiri begitu koneksinya ada.</string>
+    <string name="recitation_switch_ready">%1$s tetap diputar sampai unduhannya selesai.</string>
+    <string name="recitation_switch_running">%1$s tetap diputar. Suaranya berganti ke %2$s begitu unduhannya selesai.</string>
+    <string name="recitation_cancel">Batal</string>
+    <string name="recitation_retry">Coba lagi</string>
+    <string name="recitation_back_to_ayah">Kembali ke ayat %1$s</string>
+    <string name="recitation_fail_no_network">Tidak ada koneksi saat ini.</string>
+    <string name="recitation_fail_needs_wifi">Unduhan disetel hanya lewat Wi-Fi.</string>
+    <string name="recitation_fail_no_space">Ruang di ponsel ini tidak cukup.</string>
+    <string name="recitation_fail_server">Unduhan tidak selesai. Bisa dimulai lagi.</string>
+    <string name="recitation_fail_checksum">Berkas yang datang tidak sesuai. Bisa diambil lagi.</string>
+    <string name="recitation_fail_cancelled">Unduhan berhenti sebelum selesai.</string>
+    <string name="recitation_a11y_recitation">Tilawah</string>
+    <string name="recitation_a11y_pause">Jeda</string>
+    <string name="recitation_a11y_downloading">Mengunduh tilawah</string>
+    <string name="recitation_a11y_next">Surah berikutnya</string>
+    <string name="recitation_a11y_previous">Surah sebelumnya</string>
+    <string name="recitation_a11y_next_ayah">Ayat berikutnya</string>
+    <string name="recitation_a11y_previous_ayah">Ayat sebelumnya</string>
+    <string name="recitation_auto_download">Unduh surah berikutnya tanpa bertanya</string>
+    <string name="recitation_arriving_next">Berikutnya: %1$s · %2$s</string>
+    <string name="recitation_arriving_voice">%1$s · %2$s</string>
+    <string name="recitation_percent">%1$s%</string>
+    <string name="recitation_a11y_close">Tutup pemutar</string>
+    <string name="recitation_a11y_change_reciter">Ganti qari</string>
+    <string name="recitation_a11y_go_to_playing">Ke ayat yang sedang dibaca</string>
+    <string name="recitation_a11y_preview">Dengarkan qari ini</string>
+    <!-- Settings > Quran > Recitation -->
+    <string name="settings_group_quran">AL-QUR’AN</string>
+    <string name="settings_recitation">Tilawah</string>
+    <string name="recitation_settings_mobile_data">Unduh lewat data seluler</string>
+    <string name="recitation_settings_auto_download">Unduh tanpa bertanya</string>
+    <string name="recitation_settings_downloads">UNDUHAN · %1$s</string>
+    <string name="recitation_settings_surahs_one">%1$s surah · %2$s</string>
+    <string name="recitation_settings_surahs">%1$s surah · %2$s</string>
+    <string name="recitation_settings_whole_quran">Unduh seluruh Al-Qur’an · %1$s</string>
+    <string name="recitation_settings_batch">Mengunduh · %1$s dari %2$s</string>
+    <string name="recitation_settings_credit">Tilawah dilisensikan oleh para qari untuk penyebaran gratis dan nonkomersial lewat Islamic Network. Kreditnya ada di “Atribusi &amp; lisensi”.</string>
+    <string name="recitation_downloads_delete">Hapus</string>
+    <string name="recitation_downloads_delete_all">Hapus semua dari qari ini</string>
+    <string name="recitation_downloads_confirm">Hapus %1$s?</string>
+    <string name="recitation_downloads_empty">Tidak ada tilawah qari ini di ponsel.</string>
+    <string name="recitation_gigabytes">%1$s GB</string>
+    <string name="credit_recitations">Tilawah</string>
+    <string name="credit_recitations_detail">Tilawah per ayat dari Islamic Network (alquran.cloud), dilisensikan kepada mereka oleh para qari untuk penyebaran ulang gratis dan nonkomersial pada bitrate yang mereka terbitkan. Disalin tanpa perubahan, pada bitrate yang sama.</string>
+</resources>

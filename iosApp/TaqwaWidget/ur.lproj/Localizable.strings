@@ -1,0 +1,19 @@
+/* The ayah widget as it appears in the widget gallery (design spec §7). */
+"ayah_widget_name" = "آج کی آیت";
+"ayah_widget_description" = "آج کی آیت، اپنے ترجمے کے ساتھ۔";
+
+/* Shown on the card until the app has run once and written the pool mirror (design spec §2). */
+"ayah_widget_placeholder" = "آج کی آیت لانے کے لیے تقویٰ ایک بار کھولیں";
+
+/* The two prayer widgets as they appear in the widget gallery. */
+"home_widget_name" = "تقویٰ";
+"home_widget_description" = "اگلی نماز، الٹی گنتی اور آج کے اوقات۔";
+"lock_widget_name" = "تقویٰ لاک اسکرین";
+"lock_widget_description" = "اگلی نماز ایک نظر میں۔";
+
+/* Shown on the prayer cards until the app has run once and written the snapshot mirror. */
+"prayer_widget_placeholder_title" = "تقویٰ";
+"prayer_widget_placeholder_body" = "نماز کے اوقات لانے کے لیے تقویٰ کھولیں۔";
+
+/* The prayer after the next one on the rectangular complication; %@ is its display name. */
+"lock_widget_then" = "پھر %@";

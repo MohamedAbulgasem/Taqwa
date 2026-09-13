@@ -1,0 +1,6 @@
+/* Same sentence as the onboarding body in values-bn/strings.xml: the calculation happens on the
+   phone, and the location never leaves it. */
+"NSLocationWhenInUseUsageDescription" = "তাকওয়া আপনার ডিভাইসেই নামাজের সঠিক সময় হিসাব করতে আপনার অবস্থান ব্যবহার করে। আপনার অবস্থান কখনো কোথাও পাঠানো হয় না।";
+
+/* The name under the home screen icon, in the reader's own script. */
+"CFBundleDisplayName" = "তাকওয়া";

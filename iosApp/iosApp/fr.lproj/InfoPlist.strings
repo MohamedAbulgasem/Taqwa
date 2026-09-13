@@ -1,0 +1,6 @@
+/* Same sentence as the onboarding body in values-fr/strings.xml: the calculation happens on the
+   phone, and the location never leaves it. */
+"NSLocationWhenInUseUsageDescription" = "Taqwa utilise votre position pour calculer les horaires de prière avec précision sur votre appareil. Votre position n’est jamais envoyée nulle part.";
+
+/* The name under the home screen icon. */
+"CFBundleDisplayName" = "Taqwa";

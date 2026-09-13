@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">তাকওয়া</string>
+    <!-- Widget picker titles (android:label on each receiver). -->
+    <string name="widget_small_label">পরবর্তী নামাজ</string>
+    <string name="widget_medium_label">নামাজের সময়</string>
+    <string name="widget_ayah_label">আজকের আয়াত</string>
+    <string name="widget_small_description">পরবর্তী নামাজ ও চলমান কাউন্টডাউন।</string>
+    <string name="widget_medium_description">পরবর্তী নামাজ, কাউন্টডাউন ও আজকের সময়সূচি।</string>
+    <string name="widget_ayah_description">আজকের আয়াত, তার অনুবাদসহ।</string>
+</resources>
