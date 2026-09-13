@@ -9,6 +9,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -89,8 +90,14 @@ import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.resources.ui_language
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.about.AboutLinks
+import world.taqwa.app.crash.ReportMail
+import world.taqwa.app.crash.crashLogStore
+import world.taqwa.app.crash.deviceInfoOrUnknown
+import world.taqwa.app.feature.crash.CrashReportSheet
 import world.taqwa.app.feature.tasbeeh.TasbeehScreen
 import world.taqwa.app.feature.tasbeeh.TasbeehViewModel
+import world.taqwa.app.resources.crash_mail_no_report
 import world.taqwa.app.feature.quran.MushafScreen
 import world.taqwa.app.feature.quran.MushafUiState
 import world.taqwa.app.feature.quran.MushafViewModel
@@ -1052,6 +1059,33 @@ fun App(container: AppContainer) {
                             )
                         }
                     }
+                }
+
+                // The crash sheet (crash spec §3.1): read once per process, shown until answered.
+                // Send and Not now both mark the report offered, so it never comes back for the
+                // same crash; the report itself stays for the About screen's row.
+                var crashOffer by remember { mutableStateOf(crashLogStore.pendingOffer()) }
+                val uriHandler = LocalUriHandler.current
+                val noReportLine = stringResource(Res.string.crash_mail_no_report)
+                crashOffer?.let { report ->
+                    CrashReportSheet(
+                        onSend = {
+                            crashLogStore.markOffered(report)
+                            crashOffer = null
+                            val info = deviceInfoOrUnknown()
+                            val mail = ReportMail.mailto(
+                                AboutLinks.SUPPORT_EMAIL,
+                                ReportMail.subject(info),
+                                ReportMail.body(info, report, noReportLine),
+                            )
+                            // A phone with no mail app fails silently rather than crashing again.
+                            runCatching { uriHandler.openUri(mail) }
+                        },
+                        onDismiss = {
+                            crashLogStore.markOffered(report)
+                            crashOffer = null
+                        },
+                    )
                 }
 
                 // The two recitation sheets are hosted here, outside the scaffold, for the same

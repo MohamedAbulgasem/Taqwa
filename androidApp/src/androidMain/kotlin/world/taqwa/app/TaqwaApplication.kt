@@ -1,6 +1,8 @@
 package world.taqwa.app
 
 import android.app.Application
+import world.taqwa.app.crash.crashLogStore
+import world.taqwa.app.crash.installCrashHandler
 import world.taqwa.app.notifications.NotificationTopUpWorker
 import world.taqwa.app.notifications.notificationSmallIconResId
 import world.taqwa.app.settings.appContext
@@ -18,6 +20,8 @@ class TaqwaApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = applicationContext
+        // First, so that a crash anywhere below is already recorded (crash spec §2).
+        installCrashHandler(crashLogStore)
         notificationSmallIconResId = R.drawable.ic_stat_taqwa
         androidWidgetUpdateHook = { TaqwaWidgets.updateAll(applicationContext) }
         androidAyahWidgetUpdateHook = { TaqwaWidgets.updateAyah(applicationContext) }

@@ -19,6 +19,10 @@ Semua yang diketahui aplikasi ini tersimpan di perangkat Anda dan tidak di tempa
 Tidak satu pun dari semua itu dikirim kepada kami atau kepada siapa pun. Tidak ada server di balik
 Taqwa dan tidak ada akun yang perlu dibuat. Menghapus aplikasinya menghapus semuanya.
 
+Jika Taqwa mengalami kerusakan, aplikasi menyimpan laporan teknis di ponsel Anda (versi aplikasi,
+model ponsel Anda, dan kesalahannya, tidak lebih). Laporan itu tidak pernah keluar dari ponsel
+kecuali Anda memilih mengirimkannya kepada kami lewat email.
+
 ## Lokasi
 
 Aplikasi ini meminta lokasi Anda hanya untuk menghitung waktu salat dan arah kiblat, dan hanya jika

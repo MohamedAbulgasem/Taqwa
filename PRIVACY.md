@@ -19,6 +19,9 @@ Everything the app knows is stored on your device and nowhere else:
 None of this is sent to us or to anyone. There is no server behind Taqwa and no account to
 create. Deleting the app deletes all of it.
 
+If Taqwa crashes, it saves a technical report on your phone (the app version, your phone model
+and the error, nothing else). It never leaves the phone unless you choose to email it to us.
+
 ## Location
 
 The app asks for your location only to compute prayer times and the Qibla direction, and

@@ -19,6 +19,10 @@ Tout ce que l’application sait est enregistré sur votre appareil et nulle par
 Rien de tout cela ne nous est envoyé, ni à qui que ce soit. Il n’y a aucun serveur derrière Taqwa
 et aucun compte à créer. Supprimer l’application supprime tout cela.
 
+Si Taqwa plante, elle enregistre un rapport technique sur votre téléphone (la version de
+l’application, le modèle de votre téléphone et l’erreur, rien d’autre). Il ne quitte jamais le
+téléphone, sauf si vous choisissez de nous l’envoyer par e-mail.
+
 ## Position
 
 L’application ne demande votre position que pour calculer les horaires de prière et la direction

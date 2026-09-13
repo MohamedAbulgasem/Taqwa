@@ -79,6 +79,14 @@
     <string name="about_website">ওয়েবসাইট</string>
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">taqwa.world খুলুন</string>
+    <string name="about_report_problem">সমস্যা জানান</string>
+
+    <!-- ক্র্যাশ রিপোর্ট: ক্র্যাশের পরের বার চালু হলে দেখানো শিট, আর পাঠানোর মতো রিপোর্ট না থাকলে ইমেইলের লাইন। -->
+    <string name="crash_sheet_title">তাকওয়া অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে</string>
+    <string name="crash_sheet_body">আপনার ফোনে একটি প্রযুক্তিগত রিপোর্ট সংরক্ষণ করা হয়েছে। এটি support@taqwa.world-এ পাঠালে সমস্যাটি সমাধানে সাহায্য হয়। এতে শুধু অ্যাপের সংস্করণ, আপনার ফোনের মডেল ও ত্রুটির বিবরণ থাকে, আর কিছু নয়।</string>
+    <string name="crash_send">রিপোর্ট পাঠান</string>
+    <string name="crash_not_now">এখন নয়</string>
+    <string name="crash_mail_no_report">এই ফোনে কোনো ক্র্যাশ রিপোর্ট সংরক্ষিত নেই।</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">থিম</string>

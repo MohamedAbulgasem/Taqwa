@@ -19,6 +19,9 @@ Uygulamanın bildiği her şey cihazınızda saklanır, başka hiçbir yerde de�
 Bunların hiçbiri bize ya da bir başkasına gönderilmez. Taqwa'nın arkasında bir sunucu yok,
 açılacak bir hesap da yok. Uygulamayı silmek bunların hepsini siler.
 
+Taqwa çökerse telefonunuza teknik bir rapor kaydeder (uygulama sürümü, telefonunuzun modeli ve hata;
+başka bir şey yok). Siz bize e-postayla göndermeyi seçmedikçe bu rapor telefondan asla çıkmaz.
+
 ## Konum
 
 Uygulama konumunuzu yalnızca namaz vakitlerini ve kıble yönünü hesaplamak için, yalnızca siz

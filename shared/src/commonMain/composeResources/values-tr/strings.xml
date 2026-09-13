@@ -84,6 +84,14 @@
     <string name="about_website">Web sitesi</string>
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">taqwa.world adresini aç</string>
+    <string name="about_report_problem">Sorun bildir</string>
+
+    <!-- Çökme raporu: çökmeden sonraki açılışta gösterilen sayfa ve gönderilecek rapor olmadığında e-postadaki satır. -->
+    <string name="crash_sheet_title">Taqwa beklenmedik şekilde kapandı</string>
+    <string name="crash_sheet_body">Telefonunuza teknik bir rapor kaydedildi. Bunu support@taqwa.world adresine göndermeniz sorunun düzeltilmesine yardımcı olur. Raporda yalnızca uygulama sürümü, telefonunuzun modeli ve hata bilgisi bulunur.</string>
+    <string name="crash_send">Raporu gönder</string>
+    <string name="crash_not_now">Şimdi değil</string>
+    <string name="crash_mail_no_report">Bu telefonda kayıtlı bir çökme raporu yok.</string>
 
     <!-- Görünüm -->
     <string name="appearance_theme_label">TEMA</string>

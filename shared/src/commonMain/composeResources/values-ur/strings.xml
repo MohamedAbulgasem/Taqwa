@@ -79,6 +79,14 @@
     <string name="about_website">ویب سائٹ</string>
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">taqwa.world کھولیں</string>
+    <string name="about_report_problem">مسئلے کی اطلاع دیں</string>
+
+    <!-- کریش رپورٹ: کریش کے بعد اگلی بار کھلنے پر دکھائی جانے والی شیٹ، اور ای میل کی وہ سطر جب بھیجنے کے لیے کوئی رپورٹ نہ ہو۔ -->
+    <string name="crash_sheet_title">تقویٰ غیر متوقع طور پر بند ہو گئی</string>
+    <string name="crash_sheet_body">آپ کے فون پر ایک تکنیکی رپورٹ محفوظ کی گئی ہے۔ اسے support@taqwa.world پر بھیجنے سے مسئلہ حل کرنے میں مدد ملتی ہے۔ اس میں صرف ایپ کا ورژن، آپ کے فون کا ماڈل اور خرابی کی تفصیل ہوتی ہے، اور کچھ نہیں۔</string>
+    <string name="crash_send">رپورٹ بھیجیں</string>
+    <string name="crash_not_now">ابھی نہیں</string>
+    <string name="crash_mail_no_report">اس فون پر کوئی کریش رپورٹ محفوظ نہیں ہے۔</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">تھیم</string>

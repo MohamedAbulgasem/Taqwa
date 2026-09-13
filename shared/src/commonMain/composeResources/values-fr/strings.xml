@@ -83,6 +83,14 @@
     <string name="about_website">Site web</string>
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">Ouvrir taqwa.world</string>
+    <string name="about_report_problem">Signaler un problème</string>
+
+    <!-- Rapport de plantage : la feuille au lancement qui suit un plantage, et la ligne de l’e-mail quand il n’y a aucun rapport à envoyer. -->
+    <string name="crash_sheet_title">Taqwa s’est fermée de manière inattendue</string>
+    <string name="crash_sheet_body">Un rapport technique a été enregistré sur votre téléphone. L’envoyer à support@taqwa.world aide à corriger le problème. Il contient la version de l’application, le modèle de votre téléphone et l’erreur, rien d’autre.</string>
+    <string name="crash_send">Envoyer le rapport</string>
+    <string name="crash_not_now">Pas maintenant</string>
+    <string name="crash_mail_no_report">Aucun rapport de plantage n’est enregistré sur ce téléphone.</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">THÈME</string>
