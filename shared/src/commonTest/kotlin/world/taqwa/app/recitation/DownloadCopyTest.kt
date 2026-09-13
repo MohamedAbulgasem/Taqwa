@@ -41,4 +41,33 @@ class DownloadCopyTest {
         assertEquals("1.0", DownloadCopy.megabytes(1024L * 1024L, false))
         assertEquals("0.5", DownloadCopy.megabytes(512L * 1024L, false))
     }
+
+    @Test
+    fun gigabytesAlsoRunToOneDecimal() {
+        assertEquals("1.0", DownloadCopy.gigabytes(GIGABYTE, false))
+        assertEquals("0.9", DownloadCopy.gigabytes(902L * MEGABYTE, false))
+        assertEquals("١٫٦", DownloadCopy.gigabytes(1625L * MEGABYTE, true))
+    }
+
+    @Test
+    fun theUnitTurnsOverAtAThousandMegabytes() {
+        assertEquals(false, DownloadCopy.useGigabytes(999L * MEGABYTE))
+        assertEquals(true, DownloadCopy.useGigabytes(1000L * MEGABYTE))
+        assertEquals(true, DownloadCopy.useGigabytes(GIGABYTE))
+    }
+
+    @Test
+    fun theUnitIsChosenOnTheRoundedFigureAndNotTheRawBytes() {
+        // 999.96 MB rounds to 1000.0. Asked of the bytes alone the unit would still say MB and
+        // the line would read "1000.0 MB" - four digits before the point is the very thing the
+        // switch exists to avoid.
+        val justUnderAThousand = 1000L * MEGABYTE - 40_000L
+        assertEquals("1000.0", DownloadCopy.megabytes(justUnderAThousand, false))
+        assertEquals(true, DownloadCopy.useGigabytes(justUnderAThousand))
+    }
+
+    private companion object {
+        const val MEGABYTE = 1024L * 1024L
+        const val GIGABYTE = 1024L * 1024L * 1024L
+    }
 }

@@ -38,10 +38,35 @@ object DownloadCopy {
      * may have no locale services worth the call, and the shape is fixed anyway.
      */
     fun megabytes(bytes: Long, arabic: Boolean): String {
-        val tenths = (bytes * 10 + MEGABYTE / 2) / MEGABYTE
+        val tenths = megabyteTenths(bytes)
         val plain = "${tenths / 10}.${tenths % 10}"
         return digits(plain, arabic)
     }
+
+    /**
+     * Gigabytes to one decimal, without the unit. The whole Quran for one reciter is 0.6 to 1.6 GB
+     * (spec §8) and a settings row that priced it at "1625.4 MB" would be asking the reader to
+     * count digits.
+     */
+    fun gigabytes(bytes: Long, arabic: Boolean): String {
+        val tenths = (bytes * 10 + GIGABYTE / 2) / GIGABYTE
+        val plain = "${tenths / 10}.${tenths % 10}"
+        return digits(plain, arabic)
+    }
+
+    /**
+     * Which of the two units a size is printed in: gigabytes from **1000.0 MB up**, megabytes
+     * below it.
+     *
+     * The threshold is asked of the *rounded* megabyte figure, not of the raw byte count, so the
+     * unit and the number can never disagree: 1023.97 MB rounds to 1024.0, and a threshold on the
+     * bytes alone would have printed "1024.0 MB" for it. 1000 rather than 1024 because the point
+     * of switching is that four digits before the decimal point are unreadable, and that happens
+     * at a thousand whichever way the unit is defined.
+     */
+    fun useGigabytes(bytes: Long): Boolean = megabyteTenths(bytes) >= 10_000L
+
+    private fun megabyteTenths(bytes: Long): Long = (bytes * 10 + MEGABYTE / 2) / MEGABYTE
 
     /** Arabic-Indic digits and the Arabic decimal separator, or the string unchanged. */
     private fun digits(text: String, arabic: Boolean): String {
@@ -60,6 +85,7 @@ object DownloadCopy {
     }
 
     private const val MEGABYTE = 1024L * 1024L
+    private const val GIGABYTE = 1024L * 1024L * 1024L
     private const val ARABIC_ZERO = '٠'
     private const val ARABIC_DECIMAL = '٫'
 }
