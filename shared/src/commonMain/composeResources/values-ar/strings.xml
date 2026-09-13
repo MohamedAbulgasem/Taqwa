@@ -38,6 +38,8 @@
     <string name="today_current_location">الموقع الحالي</string>
     <string name="today_next_in">متبقٍ على %1$s</string>
     <string name="today_latitude_label">عند خط العرض هذا</string>
+    <string name="today_exact_alarms_label">المنبهات الدقيقة معطّلة</string>
+    <string name="today_exact_alarms_body">قد يتأخر التنبيه حتى ساعة ما لم يُسمح لتقوى بـ«المنبهات والتذكيرات».</string>
     <string name="today_no_location_title">لا يوجد موقع بعد</string>
     <string name="today_choose_city">اختر مدينة</string>
     <string name="today_allow_location">السماح بالموقع بدلًا من ذلك</string>
@@ -57,7 +59,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">0.16.0</string>
+    <string name="settings_version_value">0.17.0</string>
 
     <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
     <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
