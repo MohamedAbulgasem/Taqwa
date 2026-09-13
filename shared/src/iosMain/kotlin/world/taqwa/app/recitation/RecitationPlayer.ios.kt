@@ -180,8 +180,9 @@ actual class RecitationPlayer actual constructor(
         wantsPlay = true
         pausedByInterruption = false
         activateSession()
-        // A gap is playing silence: there is no item to start, the wait simply resumes.
-        if (built.isGap(at)) go(at) else player?.play()
+        // A gap is playing silence: there is no item to start, the wait simply resumes — from
+        // where the pause froze it, so the surah's clock does not rewind by the part already waited.
+        if (built.isGap(at)) waitOutGap(built, built.gapMs - gapElapsedMs) else player?.play()
         publish()
         startTicker()
     }
@@ -266,15 +267,8 @@ actual class RecitationPlayer actual constructor(
             player?.pause()
             ayahPositionMs = ayahDurationMs
             gapElapsedMs = 0L
-            gapStarted = if (wantsPlay) TimeSource.Monotonic.markNow() else null
             publish()
-            if (wantsPlay) {
-                gapJob = scope.launch {
-                    delay(built.gapMs)
-                    val next = built.next(at)
-                    if (next != null) go(next) else finish()
-                }
-            }
+            if (wantsPlay) waitOutGap(built, built.gapMs)
             return
         }
         val path = files[built.ayahAt(at)] ?: return
@@ -288,6 +282,17 @@ actual class RecitationPlayer actual constructor(
         if (wantsPlay) player?.play()
         publish()
         startTicker()
+    }
+
+    /** The rest of the gap at [at]: [remainingMs] of silence, then the ayah after it. */
+    private fun waitOutGap(built: RecitationQueue, remainingMs: Long) {
+        gapJob?.cancel()
+        gapStarted = TimeSource.Monotonic.markNow()
+        gapJob = scope.launch {
+            delay(remainingMs.coerceAtLeast(0L))
+            val next = built.next(at)
+            if (next != null) go(next) else finish()
+        }
     }
 
     /** The item just played to its end. Move on, or stop at the last ayah of the surah. */

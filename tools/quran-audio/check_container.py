@@ -5,7 +5,8 @@
 For each surah checked: parse the header exactly as the app does, confirm the
 index covers every ayah in order with contiguous offsets, confirm the file size
 equals dataStart + sum(len), extract every ayah slice and require it to be
-byte-identical to the downloaded MP3, and ffprobe the first and last slices.
+byte-identical to the downloaded MP3, confirm every ayah carries a measured
+length, and decode the first and last slices to check their lengths against it.
 """
 
 import json
@@ -30,6 +31,8 @@ def check(rid, surah, ranges):
     count = last - first + 1
     ayahs = index["ayahs"]
     assert [a["n"] for a in ayahs] == list(range(1, count + 1)), f"{path}: index order"
+    for a in ayahs:
+        assert isinstance(a.get("ms"), int) and a["ms"] > 300, f"{path}: ayah {a['n']} has no measured length"
     off = 0
     for i, a in enumerate(ayahs):
         assert a["off"] == off, f"{path}: ayah {a['n']} offset {a['off']} != {off}"
@@ -44,6 +47,7 @@ def check(rid, surah, ranges):
             f.write(blob[data_start + a["off"]: data_start + a["off"] + a["len"]])
         dur, err = probe(tmp)
         assert err is None, f"{path}: ayah {a['n']} slice unplayable: {err}"
+        assert abs(dur * 1000 - a["ms"]) <= 30, f"{path}: ayah {a['n']} index says {a['ms']} ms, slice decodes to {dur * 1000:.0f}"
         os.remove(tmp)
     return len(blob), count
 

@@ -87,11 +87,30 @@ class SurahTimeline(val itemsMs: List<Long>) {
          * [positionMs] into an item the platform measures at [realMs], re-expressed in an item
          * the clock has given [slotMs]: the two differ by the estimate's error, and scaling
          * keeps the clock continuous through the item where clamping would stall it at the end
-         * of a short slot or jump it across a long one. Unknown or zero lengths scale nothing.
+         * of a short slot or jump it across a long one.
+         *
+         * Only within reason. A platform's "measured" length is read off the file's own header,
+         * and a tenth of Al-Ajmi's files carry a header that claims fifteen times their real
+         * length; scaling by that would crawl the clock through the ayah and jump at the seam,
+         * the very thing this exists to prevent. Past a factor of two either way the slot is
+         * trusted and the position merely clamped. Unknown or zero lengths scale nothing.
          */
-        fun fitToSlot(positionMs: Long, realMs: Long, slotMs: Long): Long =
-            if (realMs <= 0L || slotMs <= 0L || realMs == slotMs) positionMs
-            else positionMs * slotMs / realMs
+        fun fitToSlot(positionMs: Long, realMs: Long, slotMs: Long): Long {
+            if (realMs <= 0L || slotMs <= 0L || realMs == slotMs) return positionMs
+            if (realMs > slotMs * SCALE_LIMIT || slotMs > realMs * SCALE_LIMIT) return positionMs
+            return positionMs * slotMs / realMs
+        }
+
+        /** How far a measured length may sit from its slot and still be believed. */
+        const val SCALE_LIMIT = 2L
+
+        /**
+         * No ayah's slot is shorter than this. A zero slot is not merely inaccurate: the clock
+         * would stop for the ayah's whole real length, and a seek could never land on it. A
+         * corrupt index or an ayah shorter than its own tag gets a quarter of a second instead,
+         * which the scaling above then stretches.
+         */
+        const val MIN_AYAH_MS = 250L
 
         /** A constant bit-rate file's length from its audio bytes: `bytes × 8 / kbps` milliseconds. */
         fun estimateMs(audioBytes: Long, kbps: Int): Long =
@@ -101,7 +120,7 @@ class SurahTimeline(val itemsMs: List<Long>) {
         fun of(queue: RecitationQueue, ayahMs: (Int) -> Long): SurahTimeline = SurahTimeline(
             queue.items.map { item ->
                 when (item) {
-                    is QueueItem.Ayah -> ayahMs(item.n)
+                    is QueueItem.Ayah -> ayahMs(item.n).coerceAtLeast(MIN_AYAH_MS)
                     is QueueItem.Gap -> item.durationMs
                 }
             },

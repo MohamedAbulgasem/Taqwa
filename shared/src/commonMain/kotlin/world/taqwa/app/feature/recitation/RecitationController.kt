@@ -312,10 +312,13 @@ class RecitationController(
                 sheetSurah.value = null
                 // A switch (spec §14.3) picks up where the old voice has got to, and in the state
                 // the listener left it: a surah they had paused does not start reading itself
-                // out in a new voice because a download finished.
-                val live = player.state.value.takeIf { waiting.follow && it.surah == waiting.surah }
-                start(waiting.surah, live?.ayah ?: waiting.ayah)
-                if (live != null && !live.playing) player.pause()
+                // out in a new voice because a download finished — and a surah that has since
+                // ended, or been dismissed, does not start again at all. Only the plain §5.4
+                // play, which the reader asked for by name, goes ahead with nothing playing.
+                val live = player.state.value.takeIf { it.surah == waiting.surah }
+                if (waiting.follow && live == null) return@collect
+                start(waiting.surah, if (waiting.follow) live?.ayah ?: waiting.ayah else waiting.ayah)
+                if (waiting.follow && live != null && !live.playing) player.pause()
             }
         }
     }
@@ -499,8 +502,11 @@ class RecitationController(
     fun pickReciter(id: String) {
         scope.launch {
             val hadPausedForPreview = endPreview(resume = false)
+            // Before the settings write suspends, not after: the library collector shares this
+            // scope, and a switch to some other voice landing inside that suspension must not
+            // still be armed. A switch to *this* voice is the one thing a re-pick must keep.
+            if (pending?.reciterId != id) pending = null
             settings.setReciter(id)
-            pending = null
             val voice = manifest.value?.reciter(id) ?: return@launch
             val playback = player.state.value
             val surah = playback.surah
@@ -514,6 +520,12 @@ class RecitationController(
                 return@launch
             }
             if (hadPausedForPreview) player.play()
+            // The copy may already be on its way — this very switch, dismissed and re-picked, or a
+            // whole-Quran batch. The sheet then opens on its progress bar, which has no button to
+            // arm anything with, so the switch is armed here; a Ready face's confirm overwrites it.
+            if (pending == null && downloader.states.value[DownloadKey(id, surah)] != null) {
+                pending = PendingPlay(id, surah, playback.ayah ?: 1, follow = true)
+            }
             sheetAyah = playback.ayah ?: 1
             sheetSurah.value = surah
             picker.value = false
@@ -533,15 +545,27 @@ class RecitationController(
                 endPreview()
                 return@launch
             }
-            val bytes = runCatching { previewBytes(id) }.getOrNull() ?: return@launch
-            if (player.state.value.playing) {
+            // Claim the row before the clip is read: the read suspends, and a previous preview's
+            // end arriving in that gap must find its row already gone rather than resume the
+            // recitation under a preview that is about to start. If the old preview had paused
+            // the recitation, this one inherits the pause.
+            val inherited = endPreview(resume = false)
+            previewing.value = id
+            val bytes = runCatching { previewBytes(id) }.getOrNull()
+            if (bytes == null) {
+                previewing.value = null
+                if (inherited) player.play()
+                return@launch
+            }
+            if (inherited) {
+                pausedForPreview = true
+            } else if (player.state.value.playing) {
                 pausedForPreview = true
                 player.pause()
             }
             clips.play(bytes) {
                 scope.launch { if (previewing.value == id) endPreview() }
             }
-            previewing.value = id
             previewTimeout?.cancel()
             previewTimeout = scope.launch {
                 delay(PREVIEW_MILLIS)

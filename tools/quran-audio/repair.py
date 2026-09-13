@@ -2,14 +2,17 @@
 
     python3 repair.py <reciter id> [rounds] [--fallback] [--substitute]
 
---substitute is the last resort after the fallback: an ayah that is broken at
-source in every copy of the reciter's edition at this bit-rate is taken from
-the CDN's *other* published bit-rate folder for the same reciter (Al-Ajmi's
-9:62 and 50:10 are an MPEG-video fragment and a quarter-second stub at 128 kbps
-everywhere, and whole at 64). The licence covers every bit-rate the Islamic
-Network publishes; pack.py records the ayah's own bit-rate in the index so the
-app's length estimate stays right. Proven to be the same edition first: three
-control ayahs must decode to the same length within a tenth of a second.
+--substitute is the last resort after the fallback, and is never passed by
+finish.py: a human asks for it. An ayah that is broken at source in every copy
+of the reciter's edition at this bit-rate is taken from the CDN's *other*
+published bit-rate folder for the same reciter (Al-Ajmi's 9:62 and 50:10 are an
+MPEG-video fragment and a quarter-second stub at 128 kbps everywhere, and whole
+at 64). The licence covers every bit-rate the Islamic Network publishes, and the
+index carries each ayah's measured length, so a mixed container plays and clocks
+correctly. What is checked first is only that three control ayahs decode to the
+same length within a tenth of a second - the same recording trimmed alike, not
+a proof of the same take - so every substitution is logged in capitals for
+someone to listen to before the reciter ships.
 
 Some objects on cdn.islamic.network answer 502 persistently rather than 403/404:
 the object exists in the catalogue but the origin cannot read it.  This retries
@@ -29,7 +32,7 @@ import time
 import urllib.request
 
 from common import UA, log, outdir, reciter, surah_ranges
-from verify import probe
+from verify import probe, reference_durations
 
 # Islamic Network edition -> candidate everyayah directories at the same true
 # bitrate.  The first candidate whose decoded audio matches three ayahs we
@@ -119,7 +122,9 @@ def check_equivalence(rid, ranges):
                 log(f"  equivalence {rid}/{dirname}: cannot fetch control {g}: {e}")
                 ok = False
                 break
-            if decoded_md5(mine) != decoded_md5(tmp):
+            same = decoded_md5(mine) == decoded_md5(tmp)
+            os.remove(tmp)
+            if not same:
                 log(f"  equivalence {rid}/{dirname}: control {g} differs")
                 ok = False
                 break
@@ -137,9 +142,10 @@ def other_bitrate_folder(rid):
     return {"128": "64", "64": "128"}.get(folder)
 
 
-def check_other_bitrate(rid, ranges, other):
-    """True when the other bit-rate folder is the same edition: three control
-    ayahs we hold decode to the same length within 0.1 s."""
+def check_other_bitrate(rid, other):
+    """True when three control ayahs we hold decode to the same length (within
+    0.1 s) as the other bit-rate folder's. Same length is not the same take;
+    see the module docstring."""
     d = outdir(rid)
     for g in (262, 1000, 5000):
         mine = os.path.join(d, f"{g}.mp3")
@@ -148,15 +154,19 @@ def check_other_bitrate(rid, ranges, other):
         tmp = os.path.join("/tmp", f"ob-{rid}-{g}.mp3")
         try:
             fetch(f"https://cdn.islamic.network/quran/audio/{other}/{rid}/{g}.mp3", tmp)
+            a, ea = probe(mine)
+            b, eb = probe(tmp)
         except Exception as e:  # noqa: BLE001
             log(f"  substitute {rid}/{other}: cannot fetch control {g}: {e}")
             return False
-        a, ea = probe(mine)
-        b, eb = probe(tmp)
+        finally:
+            if os.path.exists(tmp):
+                os.remove(tmp)
         if ea or eb or abs(a - b) > 0.1:
             log(f"  substitute {rid}/{other}: control {g} differs ({a} vs {b}, {ea or eb})")
             return False
-    log(f"  substitute {rid}: cdn/{other} is the same edition on 3 controls")
+    log(f"  substitute {rid}: cdn/{other} matches 3 controls in length - a substitution "
+        f"from it must still be listened to")
     return True
 
 
@@ -169,6 +179,9 @@ def main():
     folder = reciter(rid)[1]
     d = outdir(rid)
     ranges = surah_ranges()
+    # Other reciters' measured lengths, so a fetched file is judged by the same rule
+    # verify.py judges it by - a stub that plays is still a stub.
+    reference = reference_durations(rid)
 
     todo = missing_list(rid)
     log(f"repair {rid}: {len(todo)} absent: {todo}")
@@ -190,7 +203,7 @@ def main():
                 # stream, or a quarter of a second of it (Ajmi 1297 and 4640). verify.py
                 # would only delete it again and the fallback would never be reached, so
                 # a broken object counts as absent here.
-                dur, err = probe(path)
+                dur, err = probe(path, reference.get(n))
                 if err:
                     os.remove(path)
                     raise ValueError(err)
@@ -212,8 +225,9 @@ def main():
                 try:
                     fetch(f"https://everyayah.com/data/{dirname}/{s:03d}{a:03d}.mp3", path)
                     time.sleep(1)
-                    dur, err = probe(path)
+                    dur, err = probe(path, reference.get(n))
                     if err:
+                        os.remove(path)
                         raise ValueError(err)
                     log(f"  fallback {rid} ayah {n} ({s}:{a}) from everyayah/{dirname}: "
                         f"{os.path.getsize(path):,} bytes, {dur:.2f}s")
@@ -224,19 +238,19 @@ def main():
 
     if todo and use_substitute:
         other = other_bitrate_folder(rid)
-        if other and check_other_bitrate(rid, ranges, other):
+        if other and check_other_bitrate(rid, other):
             still = []
             for n in todo:
                 s, a = g2sa(n, ranges)
                 path = os.path.join(d, f"{n}.mp3")
                 try:
                     fetch(f"https://cdn.islamic.network/quran/audio/{other}/{rid}/{n}.mp3", path)
-                    dur, err = probe(path)
+                    dur, err = probe(path, reference.get(n))
                     if err:
                         os.remove(path)
                         raise ValueError(err)
                     log(f"  SUBSTITUTE {rid} ayah {n} ({s}:{a}) taken from cdn/{other} kbps: "
-                        f"{os.path.getsize(path):,} bytes, {dur:.2f}s - the index will say so")
+                        f"{os.path.getsize(path):,} bytes, {dur:.2f}s - LISTEN TO IT before publishing")
                 except Exception as e:  # noqa: BLE001
                     log(f"  substitute {rid} ayah {n}: FAILED {e}")
                     still.append(n)

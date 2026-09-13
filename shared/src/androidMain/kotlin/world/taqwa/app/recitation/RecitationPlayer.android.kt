@@ -260,16 +260,17 @@ actual class RecitationPlayer actual constructor(
             end()
             return
         }
+        // Never a gap: the session's `AyahPlayer` reports the ayah a gap follows as the current
+        // item, so the app never sees a gap index. During the gap the clock sits inside the gap's
+        // slot, which the arithmetic below reads as the ayah's end — the line of an ayah that has
+        // just been read stays full, as it always did.
         val at = bound.currentMediaItemIndex
-        val gap = built.isGap(at)
         val clock = timeline?.takeIf { it.size == built.size }
         var surahPositionMs = 0L
         var surahDurationMs = 0L
         if (clock != null) {
             // The session is on the surah's clock (spec §14.1): the ayah-level pair the bar's
-            // previous button still needs is read back off it. While the gap after an ayah plays
-            // the clock is inside the gap's slot, which puts the position at the ayah's end —
-            // the line of an ayah that has just been read stays full, as it always did.
+            // previous button still needs is read back off it.
             val reported = bound.currentPosition.coerceAtLeast(0L)
             surahPositionMs = if (onSurahClock(bound, clock)) {
                 reported.coerceAtMost(clock.totalMs)
@@ -279,7 +280,7 @@ actual class RecitationPlayer actual constructor(
             surahDurationMs = clock.totalMs
             ayahDurationMs = clock.durationOf(at)
             ayahPositionMs = (surahPositionMs - clock.startOf(at)).coerceIn(0L, ayahDurationMs)
-        } else if (!gap) {
+        } else {
             ayahPositionMs = bound.currentPosition.coerceAtLeast(0L)
             ayahDurationMs = bound.duration.takeIf { it != C.TIME_UNSET }?.coerceAtLeast(0L)
                 ?: ayahDurationMs
@@ -289,9 +290,7 @@ actual class RecitationPlayer actual constructor(
             surah = built.surah,
             ayah = built.ayahAt(at),
             ayahCount = built.ayahCount,
-            // While the gap plays the ayah is over: its progress line stays full rather than
-            // rewinding, which is what the eye expects of an ayah that has just been read.
-            positionMs = if (gap) ayahDurationMs else ayahPositionMs,
+            positionMs = ayahPositionMs,
             durationMs = ayahDurationMs,
             playing = bound.playWhenReady &&
                 bound.playbackState != Player.STATE_IDLE &&

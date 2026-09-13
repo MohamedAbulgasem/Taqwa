@@ -81,10 +81,29 @@ class SurahTimelineTest {
     }
 
     @Test
+    fun `a measured length far from the slot is a lying header and is not believed`() {
+        // Al-Ajmi's Bismillah: 2,457 ms of sound under a header claiming 39,236. The position
+        // stands, and elapsed clamps it into the slot rather than crawling through it.
+        assertEquals(1_000L, SurahTimeline.fitToSlot(1_000L, 39_236L, 2_457L))
+        assertEquals(1_000L, SurahTimeline.fitToSlot(1_000L, 1_000L, 2_001L))
+        // Twice either way is still believed.
+        assertEquals(500L, SurahTimeline.fitToSlot(1_000L, 2_000L, 1_000L))
+    }
+
+    @Test
+    fun `no ayah gets a slot shorter than a quarter of a second`() {
+        val floored = SurahTimeline.of(fatiha) { n -> if (n == 3) 0L else 1_000L }
+        assertEquals(SurahTimeline.MIN_AYAH_MS, floored.durationOf(4))
+        assertEquals(4, floored.indexAt(floored.startOf(4)))
+        // Gaps keep their own length; only ayahs are floored.
+        assertEquals(300L, floored.durationOf(1))
+    }
+
+    @Test
     fun `a queue without gaps is only its ayahs`() {
-        val plain = SurahTimeline.of(RecitationQueue(112, (1..4).toList(), gapMs = 0L)) { n -> n * 100L }
+        val plain = SurahTimeline.of(RecitationQueue(112, (1..4).toList(), gapMs = 0L)) { n -> n * 300L }
         assertEquals(4, plain.size)
-        assertEquals(1_000L, plain.totalMs)
-        assertEquals(300L, plain.startOf(2))
+        assertEquals(3_000L, plain.totalMs)
+        assertEquals(900L, plain.startOf(2))
     }
 }

@@ -41,7 +41,11 @@ RECITERS = [
     ("ar.saoodshuraym",       "64",  128, 300, "rose",  "Saud Ash-Shuraim",           "سعود الشريم"),
     ("ar.abdurrahmaansudais", "64",  64,  300, "olive", "Abdur-Rahman As-Sudais",     "عبد الرحمن السديس"),
     ("ar.hudhaify",           "128", 128,  80, "sand",  "Ali Al-Hudhaify",            "علي الحذيفي"),
-    ("ar.ahmedajamy",         "128", 128,  80, "slate", "Ahmed Al-Ajmi",              "أحمد العجمي"),
+    # The 64 kbps folder, not the 128: the 128 edition is broken at source in several places
+    # (9:62 is an MPEG-video fragment, 50:9 and 50:10 are stubs, three ayahs of 77 are 32 kbps
+    # at 11 kHz) and the 64 kbps folder is the same recording, whole - cross-correlation 0.95 on
+    # the ayahs compared, 13 September.
+    ("ar.ahmedajamy",         "64",  64,   80, "slate", "Ahmed Al-Ajmi",              "أحمد العجمي"),
 ]
 
 STYLE = "murattal"

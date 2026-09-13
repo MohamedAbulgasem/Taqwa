@@ -91,6 +91,23 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
     override fun getContentDuration(): Long =
         clock()?.totalMs ?: if (onGap()) lastAyahDurationMs else real.contentDuration
 
+    // The siblings Media3 bundles beside the six above. Left to the real player they would
+    // describe the *item* next to numbers that describe the surah — a buffered percentage of
+    // 100 beside a buffered position a third of the way along.
+    override fun getBufferedPercentage(): Int {
+        val clock = clock() ?: return real.bufferedPercentage
+        return (bufferedPosition * 100L / clock.totalMs.coerceAtLeast(1L)).toInt().coerceIn(0, 100)
+    }
+
+    override fun getTotalBufferedDuration(): Long =
+        if (clock() != null) (bufferedPosition - currentPosition).coerceAtLeast(0L) else real.totalBufferedDuration
+
+    /** Rewind and fast-forward move by ayah here ([seekBack], [seekForward]); a surface that
+     * prints the increment inside its button must not print fifteen seconds. */
+    override fun getSeekBackIncrement(): Long = if (queue() == null) real.seekBackIncrement else 0L
+
+    override fun getSeekForwardIncrement(): Long = if (queue() == null) real.seekForwardIncrement else 0L
+
     /**
      * [itemPosition] on the surah's clock, or [fallback] when there is no clock to put it on.
      *
@@ -183,18 +200,31 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
      * The same arithmetic the app's bar uses, over the same shape of queue. Only the count and
      * whether there are gaps can be read off a timeline, and only those two are needed: ayah
      * *numbers* never reach the session, and the indices are all this class moves between.
+     *
+     * Kept between calls: Media3 asks the getters above many times per state bundle, the app
+     * polls four times a second on top, and a 571-item queue rebuilt on each ask is a lot of
+     * garbage to make on the application thread to learn two integers.
      */
     private fun queue(): RecitationQueue? {
         val count = real.mediaItemCount
         if (count == 0) return null
         val gapped = count > 1 && isGapItem(1)
+        cachedQueue?.let { if (cachedCount == count && cachedGapped == gapped) return it }
         val ayahs = if (gapped) (count + 1) / 2 else count
         return RecitationQueue(
             surah = 0,
             ayahs = (1..ayahs).toList(),
             gapMs = if (gapped) 1L else 0L,
-        )
+        ).also {
+            cachedQueue = it
+            cachedCount = count
+            cachedGapped = gapped
+        }
     }
+
+    private var cachedQueue: RecitationQueue? = null
+    private var cachedCount = -1
+    private var cachedGapped = false
 
     /** The clock, while it describes the queue that is actually loaded. */
     private fun clock(): SurahTimeline? {

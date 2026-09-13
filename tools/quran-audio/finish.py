@@ -5,6 +5,9 @@
 verify -> repair (with the everyayah fallback) -> verify again -> pack ->
 container round-trip check -> preview check -> publish -> verify the assets.
 Stops at the first failure, so a reciter with a hole never reaches a release.
+repair.py's --substitute (an ayah from the other bit-rate folder) is deliberately
+not passed here: it is a human's call, made by running repair.py by hand and
+listening to what it logged before running finish.py again.
 publish.py writes `state/<id>.done` once the release is verified, and this
 then re-runs finalize.py so the manifest and the committed repository always
 describe exactly what is published.
@@ -30,7 +33,7 @@ def main():
     # and repair.py is what closes them, so its exit code is not fatal.
     run("verify.py", rid, "8")
     steps = [
-        ("repair.py", (rid, "3", "--fallback", "--substitute")),
+        ("repair.py", (rid, "3", "--fallback")),
         ("verify.py", (rid, "8")),
         ("pack.py", (rid,)),
         ("check_container.py", (rid,)),

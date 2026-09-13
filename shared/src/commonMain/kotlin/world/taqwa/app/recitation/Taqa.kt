@@ -36,12 +36,13 @@ data class TaqaAyah(
     val off: Long,
     val len: Long,
     /**
-     * This ayah's own bit-rate when it is not the container's ([TaqaIndex.kbps]): the pipeline
-     * writes it only for an ayah it had to take from the corpus's other published bit-rate
-     * because every copy at the reciter's own was broken at source (Al-Ajmi 9:62 and 50:10).
-     * Read by nothing but the length estimate; the audio plays as it is.
+     * The ayah's length in milliseconds, **measured** by the pipeline from a full decode of the
+     * file (spec §14.1). Containers packed before 13 September carry none, and the length is
+     * then estimated from [len] and [TaqaIndex.kbps]; where it is present it is exact, which
+     * is what makes the clock right for an edition that is not constant-bit-rate and for a
+     * file whose own header lies about its length (both true of Al-Ajmi's).
      */
-    val kbps: Int? = null,
+    val ms: Long? = null,
 )
 
 /**
@@ -213,23 +214,30 @@ class TaqaFile(
     }
 
     /**
-     * Every ayah's length in milliseconds, keyed by ayah number, estimated from the container
-     * alone (see [SurahTimeline]): the ayah's bytes less the ID3 tag at its head, over the
-     * bit-rate the index records. One read of ten bytes per ayah through one open handle — for
-     * Al-Baqarah that is 286 tiny reads, well under a frame — and kept, like the index, because
-     * the players ask for it once per load and the service asks again for the lock screen.
+     * Every ayah's length in milliseconds, keyed by ayah number (see [SurahTimeline]). The
+     * index's own measured [TaqaAyah.ms] where the pipeline wrote one; otherwise an estimate
+     * from the container alone: the ayah's bytes less the ID3 tag at its head and less the
+     * Xing/Info frame the CDN's files carry after it — metadata both, not sound — over the
+     * bit-rate the index records. Two small reads per estimated ayah through one open handle;
+     * for Al-Baqarah well under a frame. Kept, like the index, because the players ask once per
+     * load and the service asks again for the lock screen.
      */
     fun ayahDurationsMs(): Map<Int, Long> {
         cachedDurations?.let { return it }
         val parsed = index()
         val head = ByteArray(ID3V2_HEADER)
+        val frame = ByteArray(XING_PROBE)
         val computed = fs.openReadOnly(path).use { handle ->
             parsed.ayahs.associate { ayah ->
+                ayah.ms?.let { return@associate ayah.n to it }
                 val first = parsed.dataStart + ayah.off
                 val want = minOf(ID3V2_HEADER.toLong(), ayah.len).toInt()
                 val read = if (want > 0) handle.read(first, head, 0, want) else 0
                 val tag = if (read == ID3V2_HEADER) id3v2TagBytes(head) else 0L
-                ayah.n to SurahTimeline.estimateMs((ayah.len - tag).coerceAtLeast(0L), ayah.kbps ?: parsed.kbps)
+                val probe = minOf(XING_PROBE.toLong(), ayah.len - tag).toInt()
+                val got = if (probe > 0) handle.read(first + tag, frame, 0, probe) else 0
+                val xing = if (got == XING_PROBE) xingFrameBytes(frame) else 0L
+                ayah.n to SurahTimeline.estimateMs((ayah.len - tag - xing).coerceAtLeast(0L), parsed.kbps)
             }
         }
         cachedDurations = computed
@@ -276,4 +284,45 @@ internal fun id3v2TagBytes(head: ByteArray): Long {
         (head[9].toInt() and 0x7F)
     val footer = (head[5].toInt() and 0x10) != 0
     return ID3V2_HEADER + size.toLong() + (if (footer) ID3V2_HEADER.toLong() else 0L)
+}
+
+/** Enough of the first frame to see a Xing/Info tag: 4 of header, 32 of side information, 4 of tag. */
+internal const val XING_PROBE = 40
+
+private val MPEG1_LAYER3_KBPS = intArrayOf(0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0)
+private val MPEG2_LAYER3_KBPS = intArrayOf(0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0)
+
+/**
+ * The length in bytes of the Xing/Info frame [frame] begins with, or zero when it does not.
+ *
+ * A LAME-style encoder writes one whole MPEG frame of metadata before the first frame of audio
+ * — a frame count, a byte count, a seek table — and the CDN's re-tagged files carry one after
+ * the ID3 tag on five of the ten reciters. It decodes to silence and ffprobe leaves it out of
+ * the duration, so an estimate that counted it ran a flat 26 ms long on every ayah: 7.4 s over
+ * Al-Baqarah, and a line that never quite reached its end. Layer III only, which the corpus
+ * is; anything else answers zero and the estimate merely stays what it was.
+ */
+internal fun xingFrameBytes(frame: ByteArray): Long {
+    if (frame.size < XING_PROBE) return 0L
+    if (frame[0] != 0xFF.toByte() || (frame[1].toInt() and 0xE0) != 0xE0) return 0L
+    val version = (frame[1].toInt() shr 3) and 0x03      // 3 = MPEG-1, 2 = MPEG-2, 0 = MPEG-2.5
+    val layer = (frame[1].toInt() shr 1) and 0x03        // 1 = Layer III
+    val rateIndex = (frame[2].toInt() shr 4) and 0x0F
+    val sampleIndex = (frame[2].toInt() shr 2) and 0x03
+    val padding = (frame[2].toInt() shr 1) and 0x01
+    val mono = ((frame[3].toInt() shr 6) and 0x03) == 3
+    if (version == 1 || layer != 1 || rateIndex == 0 || rateIndex == 15 || sampleIndex == 3) return 0L
+    val mpeg1 = version == 3
+    val kbps = (if (mpeg1) MPEG1_LAYER3_KBPS else MPEG2_LAYER3_KBPS)[rateIndex]
+    val sampleRate = when (version) {
+        3 -> intArrayOf(44100, 48000, 32000)
+        2 -> intArrayOf(22050, 24000, 16000)
+        else -> intArrayOf(11025, 12000, 8000)
+    }[sampleIndex]
+    val sideInfo = if (mpeg1) (if (mono) 17 else 32) else (if (mono) 9 else 17)
+    val tagAt = 4 + sideInfo
+    val tag = frame.copyOfRange(tagAt, tagAt + 4).decodeToString()
+    if (tag != "Xing" && tag != "Info") return 0L
+    val samplesPerFrame = if (mpeg1) 1152 else 576
+    return (samplesPerFrame / 8 * kbps * 1000 / sampleRate + padding).toLong()
 }
