@@ -304,7 +304,7 @@
     <string name="recitation_style_murattal">Murattal</string>
     <string name="recitation_kbps">%1$s kbps</string>
     <string name="recitation_megabytes">%1$s MB</string>
-    <string name="recitation_on_phone">%1$s of 114 surahs on this phone</string>
+    <string name="recitation_on_phone">%1$s of %2$s surahs on this phone</string>
     <string name="recitation_download">Download · %1$s</string>
     <string name="recitation_downloading">%1$s of %2$s</string>
     <string name="recitation_over_wifi">Over Wi-Fi.</string>

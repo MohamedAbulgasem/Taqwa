@@ -291,7 +291,7 @@
     <string name="recitation_style_murattal">مرتّل</string>
     <string name="recitation_kbps">%1$s ك.ب/ث</string>
     <string name="recitation_megabytes">%1$s م.ب</string>
-    <string name="recitation_on_phone">%1$s من ١١٤ سورة على هذا الهاتف</string>
+    <string name="recitation_on_phone">%1$s من %2$s سورة على هذا الهاتف</string>
     <string name="recitation_download">تنزيل · %1$s</string>
     <string name="recitation_downloading">%1$s من %2$s</string>
     <string name="recitation_over_wifi">عبر الواي فاي.</string>

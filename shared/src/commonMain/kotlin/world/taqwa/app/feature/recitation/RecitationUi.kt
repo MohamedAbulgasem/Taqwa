@@ -105,8 +105,19 @@ fun reciterPickerCaption(reciter: Reciter, downloadedCount: Int): String {
     val format = LocalPlatformFormat.current
     val style = stringResource(Res.string.recitation_style_murattal)
     if (downloadedCount <= 0) return style
-    return "$style · " + stringResource(Res.string.recitation_on_phone, format.localizedDigits(downloadedCount))
+    // Both numbers through the same formatter. The 114 used to be baked into the Arabic string
+    // as ١١٤, which under ar-LY — whose numbering system is Latin, like every other number this
+    // app prints for Mohamed — put an Arabic-Indic total beside a Latin count in one sentence.
+    val on = stringResource(
+        Res.string.recitation_on_phone,
+        format.localizedDigits(downloadedCount),
+        format.localizedDigits(SURAHS),
+    )
+    return "$style · $on"
 }
+
+/** The Quran's surahs, for the picker's "N of 114" alone. */
+private const val SURAHS = 114
 
 /**
  * "58.2 MB", in the locale's own digits and decimal separator. The arithmetic is
@@ -115,13 +126,25 @@ fun reciterPickerCaption(reciter: Reciter, downloadedCount: Int): String {
  * notification by a worker with no composition to ask.
  */
 @Composable
-fun megabytes(bytes: Long): String =
-    stringResource(Res.string.recitation_megabytes, DownloadCopy.megabytes(bytes, isRtlLocale()))
+fun megabytes(bytes: Long): String = stringResource(Res.string.recitation_megabytes, megabytesBare(bytes))
 
 /** The bare number, for the first half of "9.3 of 58.2 MB" — the unit is printed once, for the
  * pair, so the line does not say MB twice. */
 @Composable
-fun megabytesBare(bytes: Long): String = DownloadCopy.megabytes(bytes, isRtlLocale())
+fun megabytesBare(bytes: Long): String = DownloadCopy.megabytes(bytes, arabicDigits())
+
+/**
+ * Whether this locale prints Arabic-Indic digits, asked of the platform's own formatter rather
+ * than of the text direction.
+ *
+ * They are not the same question. Mohamed's ar-LY writes Arabic words with Latin numerals — every
+ * other number in the app already comes out that way, through
+ * [world.taqwa.app.i18n.PlatformFormat.localizedDigits] — so a size formatted from `isRtlLocale()`
+ * put «٠٫٢» on the sheet's button directly above «64 ك.ب/ث», which is the mixed-numeral bug the
+ * app formats everything to avoid. Egyptian Arabic still gets ٩٫٣.
+ */
+@Composable
+private fun arabicDigits(): Boolean = LocalPlatformFormat.current.localizedDigits(0) != "0"
 
 /** Why a download stopped, as a sentence a reader can act on (spec §5.4). */
 @Composable
