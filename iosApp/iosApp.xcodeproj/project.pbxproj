@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
+		0F68438D4F7889E6AD51BAC5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6F9F039BD9EEAB6E8B1E6480 /* PrivacyInfo.xcprivacy */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		3856BCD57F75E6B0887D12EE /* TaqwaWidgetPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */; };
 		3C09810600BD13C6140B3E88 /* TaqwaAyahWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0B3C716739212122BA26FA /* TaqwaAyahWidget.swift */; };
+		427E434635D5050BBA21CB6E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 048F1A4C04407F11D714D729 /* InfoPlist.strings */; };
 		6CA2C2BFEDB0011E41F63B97 /* uthmanic_hafs.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1F7906672509335C684AB77C /* uthmanic_hafs.ttf */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		85546997F5FF01050B5EF34A /* TaqwaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */; };
@@ -33,6 +35,7 @@
 		D44246D1477DD56E7CED694A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E742DE611961B877AB95E6B9 /* SwiftUI.framework */; };
 		DB24BBB0D26B3BD81E0C3701 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C108B61CAA620B3D841285 /* WidgetKit.framework */; };
 		E2A091FCCDAC1469C058AFFC /* TaqwaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */; };
+		EA16D17443377A5A4AC28816 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8C4CA26036C23E171F096392 /* PrivacyInfo.xcprivacy */; };
 		ED048BDFB31EAB8FD61E291E /* TaqwaAyahWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0B3C716739212122BA26FA /* TaqwaAyahWidget.swift */; };
 		FE3B539268555B070C201CEF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0F25BB6BB7980559A8042F3A /* Localizable.strings */; };
 /* End PBXBuildFile section */
@@ -64,6 +67,7 @@
 /* Begin PBXFileReference section */
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		113DD7EF1BD0004BC720CBFD /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = TaqwaWidget.appex; path = TaqwaWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F7906672509335C684AB77C /* uthmanic_hafs.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = uthmanic_hafs.ttf; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
@@ -71,17 +75,19 @@
 		5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetViews.swift; sourceTree = "<group>"; };
 		61981D289C5D41637D0E073A /* TaqwaWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = TaqwaWidget.entitlements; sourceTree = "<group>"; };
 		6AF89C75BDE40455786612CE /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6F9F039BD9EEAB6E8B1E6480 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* My application.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My application.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77C108B61CAA620B3D841285 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		8293053FDA4A6A7B3808978A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		84F628A8027D69D5881E885D /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetBundle.swift; sourceTree = "<group>"; };
+		8C4CA26036C23E171F096392 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		8D3D41085F1CE64BDA3DCC8E /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8D563877F07E6BEE4908C30A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = takbir.caf; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-30s.caf"; sourceTree = "<group>"; };
-		A1B2C3D4E5F6A1B2C3D4E551 /* recitation-artwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "recitation-artwork.png"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E511 /* chime.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = chime.caf; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E521 /* adhan-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-full.m4a"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E531 /* takbir-azeez.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-azeez.caf"; sourceTree = "<group>"; };
@@ -90,6 +96,7 @@
 		A1B2C3D4E5F6A1B2C3D4E541 /* takbir-azemi.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-azemi.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E543 /* adhan-azemi-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azemi-30s.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E545 /* adhan-azemi-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azemi-full.m4a"; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A1B2C3D4E551 /* recitation-artwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "recitation-artwork.png"; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		BB0B3C716739212122BA26FA /* TaqwaAyahWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaAyahWidget.swift; sourceTree = "<group>"; };
 		D5D50647620835E92DA37009 /* iosApp.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
@@ -136,6 +143,7 @@
 				980F5C7F17E54ACF2A71FBBA /* Resources */,
 				0F25BB6BB7980559A8042F3A /* Localizable.strings */,
 				BB0B3C716739212122BA26FA /* TaqwaAyahWidget.swift */,
+				6F9F039BD9EEAB6E8B1E6480 /* PrivacyInfo.xcprivacy */,
 			);
 			name = TaqwaWidget;
 			path = TaqwaWidget;
@@ -181,6 +189,8 @@
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				A1B2C3D4E5F6A1B2C3D4E505 /* Resources */,
 				D5D50647620835E92DA37009 /* iosApp.entitlements */,
+				8C4CA26036C23E171F096392 /* PrivacyInfo.xcprivacy */,
+				048F1A4C04407F11D714D729 /* InfoPlist.strings */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -314,6 +324,8 @@
 				A1B2C3D4E5F6A1B2C3D4E544 /* adhan-azemi-30s.caf in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E546 /* adhan-azemi-full.m4a in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E552 /* recitation-artwork.png in Resources */,
+				EA16D17443377A5A4AC28816 /* PrivacyInfo.xcprivacy in Resources */,
+				427E434635D5050BBA21CB6E /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,6 +335,7 @@
 			files = (
 				6CA2C2BFEDB0011E41F63B97 /* uthmanic_hafs.ttf in Resources */,
 				FE3B539268555B070C201CEF /* Localizable.strings in Resources */,
+				0F68438D4F7889E6AD51BAC5 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +416,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		048F1A4C04407F11D714D729 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				113DD7EF1BD0004BC720CBFD /* en */,
+				84F628A8027D69D5881E885D /* ar */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		0F25BB6BB7980559A8042F3A /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -638,7 +660,7 @@
 				PRODUCT_NAME = "${APP_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -672,7 +694,7 @@
 				PRODUCT_NAME = "${APP_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
