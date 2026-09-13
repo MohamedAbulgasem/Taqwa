@@ -53,12 +53,29 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_appearance">Appearance</string>
     <string name="settings_language">Language</string>
-    <string name="settings_about">Version</string>
+    <string name="settings_about">About Taqwa</string>
     <string name="settings_attribution">Attribution &amp; licences</string>
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
     <string name="settings_version_value">0.12.0</string>
+
+    <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
+         both locales, as on the icon. -->
+    <string name="about_tagline">Free, for everyone, for good.</string>
+    <string name="about_privacy_label">PRIVACY</string>
+    <string name="about_stays_title">Stays on your phone</string>
+    <string name="about_stays_body">Location, settings, bookmarks and counts never leave it.</string>
+    <string name="about_online_title">Online only when you ask</string>
+    <string name="about_online_body">The internet is used for one thing: recitations you choose to download, from Taqwa’s public repository on GitHub.</string>
+    <string name="about_nothing_title">No account, no ads, no analytics</string>
+    <string name="about_nothing_body">Nothing to sign into, nothing to sell.</string>
+    <string name="about_links_label">MORE</string>
+    <string name="about_privacy_policy">Privacy policy</string>
+    <string name="about_source">Source code</string>
+    <string name="about_source_value">GitHub</string>
+    <string name="about_licence">Licence</string>
+    <string name="about_licence_value">GPL-3.0</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">THEME</string>

@@ -50,12 +50,28 @@
     <string name="settings_notifications">الإشعارات</string>
     <string name="settings_appearance">المظهر</string>
     <string name="settings_language">اللغة</string>
-    <string name="settings_about">الإصدار</string>
+    <string name="settings_about">عن تقوى</string>
     <string name="settings_attribution">الإسناد والتراخيص</string>
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
     <string name="settings_version_value">0.12.0</string>
+
+    <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
+    <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
+    <string name="about_privacy_label">الخصوصية</string>
+    <string name="about_stays_title">يبقى على هاتفك</string>
+    <string name="about_stays_body">الموقع والإعدادات والعلامات والعدّاد لا تغادره.</string>
+    <string name="about_online_title">متصل فقط عندما تطلب</string>
+    <string name="about_online_body">يُستخدم الإنترنت لشيء واحد: التلاوات التي تختار تنزيلها، من مستودع تقوى العام على GitHub.</string>
+    <string name="about_nothing_title">بلا حساب، بلا إعلانات، بلا تحليلات</string>
+    <string name="about_nothing_body">لا شيء لتسجيل الدخول إليه، ولا شيء للبيع.</string>
+    <string name="about_links_label">المزيد</string>
+    <string name="about_privacy_policy">سياسة الخصوصية</string>
+    <string name="about_source">الشفرة المصدرية</string>
+    <string name="about_source_value">GitHub</string>
+    <string name="about_licence">الرخصة</string>
+    <string name="about_licence_value">GPL-3.0</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">السمة</string>

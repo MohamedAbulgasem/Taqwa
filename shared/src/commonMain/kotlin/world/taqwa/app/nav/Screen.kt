@@ -36,6 +36,8 @@ sealed interface Screen {
 
     /** The surahs of one reciter on this phone, with the deletes (spec 3a §5.6). */
     data class RecitationDownloads(val reciterId: String) : Screen
+    /** Settings › About Taqwa (privacy spec §6): the promise, and where to check it. */
+    data object About : Screen
     data object Attribution : Screen
     data object Qibla : Screen
 

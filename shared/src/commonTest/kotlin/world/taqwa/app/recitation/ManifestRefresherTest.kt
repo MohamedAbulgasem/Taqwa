@@ -2,6 +2,7 @@ package world.taqwa.app.recitation
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -104,5 +105,44 @@ class ManifestRefresherTest {
         refresher.refreshIfStale()
 
         assertEquals(2, asked)
+    }
+
+    // ── The engagement gate (privacy spec §2.3) ──────────────────────────────────────────
+
+    @Test
+    fun aReaderWhoNeverTouchedRecitationCausesNoFetchAndNoTimestamp() = runTest {
+        var asked = 0
+        val store = store()
+        val refresher = ManifestRefresher(provider, store, { asked++; fresh.encodeToByteArray() }, { clock }, engaged = { false })
+
+        refresher.refreshIfStale()
+
+        assertEquals(0, asked)
+        // Not even the attempt is recorded: nothing about this launch should say "checked".
+        assertNull(store.data.first()[SettingsKeys.RECITATION_MANIFEST_CHECKED])
+    }
+
+    @Test
+    fun aStaleTimestampStillDoesNotFetchWhileNotEngaged() = runTest {
+        var asked = 0
+        val store = store()
+        store.edit { it[SettingsKeys.RECITATION_MANIFEST_CHECKED] = clock - 3L * ManifestRefresher.INTERVAL_MILLIS }
+        val refresher = ManifestRefresher(provider, store, { asked++; fresh.encodeToByteArray() }, { clock }, engaged = { false })
+
+        refresher.refreshIfStale()
+        assertEquals(0, asked)
+    }
+
+    @Test
+    fun theFirstEngagedLaunchFetchesAtOnce() = runTest {
+        var asked = 0
+        var engaged = false
+        val refresher = ManifestRefresher(provider, store(), { asked++; fresh.encodeToByteArray() }, { clock }, engaged = { engaged })
+
+        refresher.refreshIfStale()
+        assertEquals(0, asked)
+        engaged = true
+        refresher.refreshIfStale()
+        assertEquals(1, asked, "no stale window to wait out: the gate never wrote a timestamp")
     }
 }

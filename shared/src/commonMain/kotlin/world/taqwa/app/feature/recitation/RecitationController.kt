@@ -51,6 +51,16 @@ class RecitationController(
     /** The bundled fifteen-second clip for a reciter, or null when this build has none. */
     private val previewBytes: suspend (String) -> ByteArray?,
     private val scope: CoroutineScope,
+    /**
+     * Privacy spec §2.2: recorded, fire-and-forget, at the first line of every entry point.
+     * Until it has been called once, the app makes no network request at all.
+     */
+    private val markEngaged: suspend () -> Unit = {},
+    /**
+     * Spec §2.4: the daily catalogue check, run opportunistically when the picker or the
+     * Recitation settings open. The refresher's own 24-hour window keeps this to one a day.
+     */
+    private val refreshCatalogue: suspend () -> Unit = {},
 ) {
 
     private val manifest = MutableStateFlow<RecitationManifest?>(null)
@@ -333,6 +343,12 @@ class RecitationController(
 
     /** The header button and the ayah row's Play, for a surah the reader may or may not own. */
     fun requestPlay(surah: Int, ayah: Int) {
+        engage()
+        playOrOffer(surah, ayah)
+    }
+
+    /** [requestPlay] without the engagement mark, for [onHeaderTap], which has already made it. */
+    private fun playOrOffer(surah: Int, ayah: Int) {
         scope.launch {
             if (surah in downloaded.value) {
                 pending = null
@@ -352,8 +368,9 @@ class RecitationController(
      * arriving right now.
      */
     fun onHeaderTap(surah: Int, ayah: Int) {
+        engage()
         val playing = state.value.bar
-        if (playing != null && playing.surah == surah) toggle() else requestPlay(surah, ayah)
+        if (playing != null && playing.surah == surah) toggle() else playOrOffer(surah, ayah)
     }
 
     /** The download sheet's primary button. [allowMobileOnce] is spec §5.4's one-tap override. */
@@ -394,6 +411,7 @@ class RecitationController(
      * pass the sheet's one-time mobile-data override straight through.
      */
     fun downloadWholeQuran(allowMobileOnce: Boolean = false) {
+        engage()
         val voice = reciter.value ?: return
         batching.value = batching.value + voice.id
         downloader.enqueueReciter(voice.id, allowMobileOnce)
@@ -453,8 +471,27 @@ class RecitationController(
     }
 
     fun openPicker() {
+        engage(refresh = true)
         picker.value = true
         probePreviews()
+    }
+
+    /**
+     * Settings › Quran › Recitation opened (privacy spec §2.2): engagement on purpose — the screen
+     * shows the reciter list and "Download the whole Quran", and whoever went there wants the
+     * current catalogue.
+     */
+    fun onSettingsOpened() = engage(refresh = true)
+
+    /**
+     * The first line of every entry point. [refresh] only where a fresh catalogue is what the
+     * reader is about to look at; a tap to play is not a reason to fetch it.
+     */
+    private fun engage(refresh: Boolean = false) {
+        scope.launch {
+            markEngaged()
+            if (refresh) refreshCatalogue()
+        }
     }
 
     fun closePicker() {

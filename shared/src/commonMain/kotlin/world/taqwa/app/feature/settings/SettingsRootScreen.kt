@@ -233,6 +233,7 @@ fun SettingsRootScreen(
     onOpenPrayerTimes: () -> Unit,
     onOpenNotifications: () -> Unit,
     onOpenAppearance: () -> Unit,
+    onOpenAbout: () -> Unit,
     onOpenAttribution: () -> Unit,
     /** The voice the reader listens in, for the Recitation row's value; blank until the
      * catalogue has loaded, which is a frame. */
@@ -307,6 +308,7 @@ fun SettingsRootScreen(
             TaqwaRow(
                 stringResource(Res.string.settings_about),
                 value = stringResource(Res.string.settings_version_value),
+                onClick = onOpenAbout,
             )
             CardDivider()
             TaqwaRow(stringResource(Res.string.settings_attribution), onClick = onOpenAttribution)

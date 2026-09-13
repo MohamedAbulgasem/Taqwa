@@ -46,6 +46,7 @@ import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.settings.AppearanceSettingsScreen
+import world.taqwa.app.feature.settings.AboutScreen
 import world.taqwa.app.feature.settings.AttributionScreen
 import world.taqwa.app.feature.settings.CitySearchScreen
 import world.taqwa.app.feature.settings.HighLatitudePickerScreen
@@ -201,7 +202,9 @@ fun App(container: AppContainer) {
             // ── Recitation catalogue refresh (spec 3a §4, slice 3a task 2) ──────────
             // After the reconciliation and on the same background pass: at most one fetch of
             // manifest.json a day, silent about every way it can fail. A reader who is offline
-            // keeps yesterday's catalogue, or the one bundled with the build.
+            // keeps yesterday's catalogue, or the one bundled with the build. And nothing at all
+            // until the reader has used recitation — the refresher checks that itself (privacy
+            // spec §2), which is why this line can stay unconditional.
             runCatching { container.manifestRefresher.refreshIfStale() }
             // ── end recitation catalogue refresh ────────────────────────────────────
         }
@@ -640,6 +643,7 @@ fun App(container: AppContainer) {
                             onOpenPrayerTimes = { navigator.push(Screen.PrayerTimesSettings) },
                             onOpenNotifications = { navigator.push(Screen.NotificationSettings) },
                             onOpenAppearance = { navigator.push(Screen.Appearance) },
+                            onOpenAbout = { navigator.push(Screen.About) },
                             onOpenAttribution = { navigator.push(Screen.Attribution) },
                             reciterName = recitationState.reciter?.let { reciterName(it) }.orEmpty(),
                             onOpenRecitation = { navigator.push(Screen.RecitationSettings) },
@@ -658,6 +662,7 @@ fun App(container: AppContainer) {
                                 state = recitationState,
                                 storage = storage,
                                 onBack = { navigator.pop() },
+                                onOpened = recitation::onSettingsOpened,
                                 onOpenPicker = recitation::openPicker,
                                 onSetMobileData = recitation::setDownloadOnMobileData,
                                 onOpenDownloads = { navigator.push(Screen.RecitationDownloads(it)) },
@@ -862,6 +867,8 @@ fun App(container: AppContainer) {
                             },
                             onBack = { navigator.pop() },
                         )
+
+                        Screen.About -> AboutScreen(onBack = { navigator.pop() })
 
                         Screen.Attribution -> {
                             // The translation credits must never drift from what is actually

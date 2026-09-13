@@ -265,3 +265,21 @@ internal fun DrawScope.drawChevron(tint: Color, pointsForward: Boolean) {
     }
     drawPath(path, tint, style = glyphStroke())
 }
+
+/**
+ * An external link: a box with its top-trailing corner open and an arrow leaving through it.
+ * [pointsForward] is the caller's reading of `LocalLayoutDirection`, as for [drawChevron]: the
+ * arrow leaves toward the trailing edge in both directions.
+ */
+internal fun DrawScope.drawExternalLink(tint: Color, pointsForward: Boolean) {
+    val u = size.width / 16f
+    fun x(value: Float) = (if (pointsForward) value else 16f - value) * u
+    val box = Path().apply {
+        moveTo(x(8.5f), 3.2f * u); lineTo(x(3.2f), 3.2f * u); lineTo(x(3.2f), 12.8f * u)
+        lineTo(x(12.8f), 12.8f * u); lineTo(x(12.8f), 7.5f * u)
+    }
+    drawPath(box, tint, style = glyphStroke())
+    drawLine(tint, Offset(x(7.2f), 8.8f * u), Offset(x(13.2f), 2.8f * u), strokeWidth = size.width * 0.0875f, cap = StrokeCap.Round)
+    val head = Path().apply { moveTo(x(9.6f), 2.8f * u); lineTo(x(13.2f), 2.8f * u); lineTo(x(13.2f), 6.4f * u) }
+    drawPath(head, tint, style = glyphStroke())
+}

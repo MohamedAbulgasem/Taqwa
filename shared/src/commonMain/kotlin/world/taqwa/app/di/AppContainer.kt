@@ -3,6 +3,7 @@ package world.taqwa.app.di
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
 import world.taqwa.app.audio.ClipPlayer
 import world.taqwa.app.feature.recitation.RecitationController
@@ -17,6 +18,7 @@ import world.taqwa.app.notifications.createNotificationScheduler
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.quran.QuranRepository
 import world.taqwa.app.recitation.ManifestRefresher
+import world.taqwa.app.recitation.RecitationEngagement
 import world.taqwa.app.recitation.RecitationPlayer
 import world.taqwa.app.recitation.createManifestProvider
 import world.taqwa.app.recitation.createSurahDownloader
@@ -72,7 +74,12 @@ class AppContainer {
     val surahDownloader by lazy {
         createSurahDownloader(recitationLibrary, manifestProvider, settingsRepository, quranRepository)
     }
-    val manifestRefresher by lazy { ManifestRefresher(manifestProvider, dataStore) }
+    // Privacy spec §2: the daily catalogue fetch waits until the reader has used recitation, so
+    // an install that never opens it never opens a socket.
+    val recitationEngagement by lazy { RecitationEngagement(dataStore, recitationLibrary) }
+    val manifestRefresher by lazy {
+        ManifestRefresher(manifestProvider, dataStore, engaged = { recitationEngagement.isEngaged() })
+    }
     // ── end recitation downloads ──────────────────────────────────────────────────────
     // Slice 3a task 3: the player. Lazy for a stronger reason than the three above — building it
     // is free, but its first `load` binds a MediaSessionService on Android and claims the audio
@@ -103,6 +110,21 @@ class AppContainer {
             clips = ClipPlayer().asPort(),
             previewBytes = ::recitationPreviewBytes,
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+            // Swallowed for the same reason the refresh is: a flag that failed to write is
+            // retried by the next tap, and a tap to play must never be the thing that takes the
+            // process down. Cancellation still propagates.
+            markEngaged = {
+                try {
+                    recitationEngagement.mark()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    // Next tap.
+                }
+            },
+            refreshCatalogue = {
+                withContext(Dispatchers.Default) { runCatching { manifestRefresher.refreshIfStale() } }
+            },
         )
     }
 

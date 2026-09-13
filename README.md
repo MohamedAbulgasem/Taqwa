@@ -6,7 +6,7 @@
 
 <p align="center">
   Prayer times, adhan notifications and qibla.<br>
-  Free, offline, no ads, no accounts, no tracking.
+  Free, offline by design, no ads, no accounts, no tracking.
 </p>
 
 <p align="center">
@@ -38,6 +38,7 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 - **A live countdown** to the next prayer, on the Prayer screen and in home-screen widgets on both platforms. The widgets keep counting across prayers without the app being opened.
 - **An ayah widget** showing one verse a day, in the same Uthmani typeface and translation as the reader, drawn from a curated pool of a hundred that cycles without repeats. Tapping it opens that ayah in the app.
 - **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, your own phrases can be added, and nothing is ever totted up.
+- **Privacy you can check.** Settings › About Taqwa says what stays on the phone and what the internet is used for, and links the policy, the source and the licence.
 - **Notifications at the exact time**, with a choice per prayer between silence, a clear announcement tone, a takbir, or the opening of the adhan, and a choice of three adhan recordings. Optional reminder a few minutes before.
 - **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the compass needs it.
 - **Hijri date** from the tabular (arithmetic) Islamic calendar, which can differ by a day from Umm al-Qura and from local moonsighting, with a one-day adjustment to match your community; shown beside the Gregorian date.
@@ -48,7 +49,7 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 
 ## Principles
 
-- **Zero recurring cost.** Nothing in the app contacts a server. This is a hard constraint on every feature, not a preference.
+- **Zero recurring cost.** Nothing in the app contacts a server of ours; there is none. The only network use is recitation downloads from a public GitHub repository, on request. This is a hard constraint on every feature, not a preference.
 - **Your language, including the map.** The bundled city list carries names in Arabic, Indonesian, Urdu, Bengali, Turkish and French as well as English, so a city can be searched and read in either its own language or English, and the Prayer header follows the phone.
 - **Offline first.** Prayer times and qibla are mathematics; the city database ships inside the app.
 - **Nothing to sell.** No ads, no premium tier, no data collection, no account.
@@ -135,7 +136,7 @@ Contributions are welcome, from a typo in the Arabic strings to a new calculatio
 
 1. **Open an issue first** for anything beyond a small fix, so the approach can be agreed before you spend time on it. Bug reports are most useful with the device, OS version, language, and a screenshot.
 2. **Fork and branch** from `main`.
-3. **Keep the constraints.** No network calls, no third-party SDKs that phone home, no new colour outside the palette in `Palette.kt`, and Arabic must be checked as carefully as English. If a change touches the UI, include screenshots of both languages and both themes.
+3. **Keep the constraints.** No network calls beyond the recitation downloads the person asked for, no third-party SDKs that phone home, no new colour outside the palette in `Palette.kt`, and Arabic must be checked as carefully as English. If a change touches the UI, include screenshots of both languages and both themes.
 4. **Run `./scripts/test.sh`** and add tests for domain logic. Prayer-time and qibla changes need known-answer tests against published values.
 5. **Open a pull request** (merge request) against `main` describing what changed and why. Small, focused PRs are reviewed quickly; large ones are split.
 
@@ -143,7 +144,7 @@ Translations: the two string files are `shared/src/commonMain/composeResources/v
 
 ## Privacy
 
-Taqwa asks for your location only to compute prayer times and the qibla, and only if you choose to allow it; picking a city from the built-in list works just as well. Location never leaves the phone. There are no analytics, no crash reporters and no network access of any kind.
+Taqwa asks for your location only to compute prayer times and the qibla, and only if you choose to allow it; picking a city from the built-in list works just as well. Location never leaves the phone. The app makes no network request until you use Quran recitation. Recitations are downloaded one surah at a time from Taqwa's public data repository on GitHub, only when you ask; that request shows GitHub your IP address and the file you asked for, and nothing else. There are no analytics, no crash reporters and no third-party SDKs that talk to the internet. Full policy in [PRIVACY.md](PRIVACY.md).
 
 ## Attribution
 

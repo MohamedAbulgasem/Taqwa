@@ -211,10 +211,17 @@ class RecitationControllerTest {
         val clips: FakeClips = FakeClips(),
     )
 
+    /** What the controller told the outside world about engagement, in order (privacy spec
+     * §2.2, §2.4): "mark" and "refresh". */
+    private class Engagement {
+        val events = mutableListOf<String>()
+    }
+
     private fun controller(
         harness: Harness,
         scope: kotlinx.coroutines.CoroutineScope,
         previews: Set<String> = setOf("ar.alafasy"),
+        engagement: Engagement = Engagement(),
     ) = RecitationController(
         manifests = { catalogue },
         library = harness.library,
@@ -225,6 +232,8 @@ class RecitationControllerTest {
         clips = harness.clips,
         previewBytes = { id -> if (id in previews) ByteArray(8) else null },
         scope = scope,
+        markEngaged = { engagement.events += "mark" },
+        refreshCatalogue = { engagement.events += "refresh" },
     )
 
     @Test
@@ -975,4 +984,60 @@ class RecitationControllerTest {
             assertTrue(harness.settings.stored.value.downloadOnMobileData)
             assertTrue(controller.state.value.downloadOnMobileData)
         }
+
+    // ── Engagement (privacy spec §2.2, §2.4) ─────────────────────────────────────────────
+
+    @Test
+    fun `opening the picker marks engagement and asks for a catalogue refresh`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val engagement = Engagement()
+            val controller = controller(Harness(), backgroundScope, engagement = engagement)
+
+            controller.openPicker()
+
+            // Marked first, so the refresher's own gate sees the flag when it asks.
+            assertEquals(listOf("mark", "refresh"), engagement.events)
+        }
+
+    @Test
+    fun `the header button marks engagement without a refresh`() = runTest(UnconfinedTestDispatcher()) {
+        val engagement = Engagement()
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        val controller = controller(harness, backgroundScope, engagement = engagement)
+
+        controller.onHeaderTap(1, 1)
+
+        assertEquals(listOf("mark"), engagement.events, "a tap to play is not a reason to fetch the catalogue")
+    }
+
+    @Test
+    fun `play on an ayah row marks engagement`() = runTest(UnconfinedTestDispatcher()) {
+        val engagement = Engagement()
+        val controller = controller(Harness(), backgroundScope, engagement = engagement)
+
+        controller.requestPlay(112, 1)
+
+        assertEquals(listOf("mark"), engagement.events)
+    }
+
+    @Test
+    fun `the recitation settings screen marks engagement and refreshes`() = runTest(UnconfinedTestDispatcher()) {
+        val engagement = Engagement()
+        val controller = controller(Harness(), backgroundScope, engagement = engagement)
+
+        controller.onSettingsOpened()
+
+        assertEquals(listOf("mark", "refresh"), engagement.events)
+    }
+
+    @Test
+    fun `download the whole Quran marks engagement`() = runTest(UnconfinedTestDispatcher()) {
+        val engagement = Engagement()
+        val controller = controller(Harness(), backgroundScope, engagement = engagement)
+
+        controller.downloadWholeQuran()
+
+        assertEquals(listOf("mark"), engagement.events)
+    }
 }

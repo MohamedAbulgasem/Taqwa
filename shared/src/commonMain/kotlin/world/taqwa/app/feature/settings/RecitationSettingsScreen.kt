@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -69,12 +70,15 @@ fun RecitationSettingsScreen(
     state: RecitationState,
     storage: RecitationStorage,
     onBack: () -> Unit,
+    /** Opening this screen is engagement with recitation (privacy spec §2.2). */
+    onOpened: () -> Unit,
     onOpenPicker: () -> Unit,
     onSetMobileData: (Boolean) -> Unit,
     onOpenDownloads: (String) -> Unit,
     onDownloadWholeQuran: () -> Unit,
     onCancelWholeQuran: () -> Unit,
 ) {
+    LaunchedEffect(Unit) { onOpened() }
     SettingsScaffold(stringResource(Res.string.settings_recitation), onBack) {
         SettingsCard {
             TaqwaRow(
