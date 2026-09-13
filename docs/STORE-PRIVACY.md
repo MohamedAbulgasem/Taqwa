@@ -55,9 +55,10 @@ store-readiness sweep (targetSdk 36, 0.16.0).
 - **Hardware features:** `android.hardware.location`, `.location.network`, `.location.gps` and
   `.sensor.compass` are declared `required="false"`, so the app stays visible on devices without
   them (a city from the built-in list gives the same prayer times).
-- **Languages:** English and Arabic, declared through `android:localeConfig` so Android 13+ offers
-  per-app language. The bundle keeps both languages on every phone (`bundle.language.enableSplit
-  = false`).
+- **Languages:** English, Arabic, French, Turkish, Indonesian, Urdu and Bengali, declared through
+  `android:localeConfig` so Android 13+ offers per-app language. The bundle keeps every language
+  on every phone (`bundle.language.enableSplit = false`); iOS carries the same seven as `.lproj`
+  folders.
 - **Target API:** 36 (Android 16), the level Play requires for new apps from 31 August 2026.
 - **Backup:** `allowBackup="false"` plus `data_extraction_rules.xml` excluding every domain from
   cloud backup and device transfer.

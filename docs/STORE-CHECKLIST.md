@@ -68,10 +68,12 @@ item needs Mohamed's accounts, keys or judgement. Tick them in order.
       Financial/News (no), **Foreground service declarations** for `dataSync` and `mediaPlayback`
       (each wants a short screen recording: download a surah and leave the app; play a surah and
       lock the phone), App access (no login), privacy policy URL.
-- [ ] Store listing, English and Arabic: app name «Taqwa» / «تقوى», short description (≤ 80
+- [ ] Store listing in the app's seven languages (English, Arabic, French, Turkish, Indonesian,
+      Urdu, Bengali): app name «Taqwa» / «تقوى» / «تقویٰ» / «তাকওয়া», short description (≤ 80
       characters), full description (≤ 4000), the 512 icon, the feature graphic, 4–8 phone
       screenshots (the S23 at 1080 × 2340 is accepted; the `site` branch has a full set under
-      `docs/screenshots/`, recapture at full size), category Lifestyle, contact email.
+      `docs/screenshots/`, recapture at full size and per language for the localised listings),
+      category Lifestyle, contact email.
 - [ ] Read the **pre-launch report** on the internal track (it runs the app on real devices and
       flags crashes and accessibility) before promoting.
 - [ ] Closed testing (12 × 14 days if required) → production. Staged rollout is fine.
@@ -82,7 +84,8 @@ item needs Mohamed's accounts, keys or judgement. Tick them in order.
       Store Connect. Automatic signing under the chosen team; the widget extension archives with
       the app.
 - [ ] App Store Connect → new app, bundle id `world.taqwa.app`, SKU anything, primary language
-      English, add Arabic localisation. **App Privacy: Data Not Collected.** Age rating: none.
+      English, add the six other localisations (Arabic, French, Turkish, Indonesian, Urdu,
+      Bengali). **App Privacy: Data Not Collected.** Age rating: none.
       Category: Lifestyle (secondary Reference). Export compliance is answered by `Info.plist`.
 - [ ] Screenshots: 6.9-inch (1320 × 2868) from the iPhone 17 Pro Max simulator, English and Arabic
       (`xcrun simctl launch <udid> world.taqwa.app -AppleLanguages "(ar)" -AppleLocale ar_LY` gives

@@ -1188,3 +1188,19 @@ also says so when the OS has notifications off for Taqwa, on both platforms, and
 a prayer notification while the app is open. Plus a licence carve-out (the GPL never covered the
 Quran text, fonts and audio; now the repository says so), the Mixkit source clip taken out of
 the public tree, and the store answers and a launch checklist in `docs/`.
+
+### Seven languages (14 September, overnight)
+
+Mohamed wanted the whole interface in the languages the Quran already came in, and the reach
+argument won: French, Turkish, Indonesian, Urdu and Bengali join English and Arabic. Five
+translation passes ran in parallel from one brief and a glossary each, into the 324 interface
+strings, the widget labels on both platforms, the location permission text, the site's pages and
+the privacy policy; a validator (`tools/i18n-check.py`) holds every file to the English keys,
+placeholders and plural categories. Underneath, the code stopped asking "Arabic or not":
+`UiLanguage` in `widgetcore` knows each language's direction and script, and the words that get
+baked into notifications and widgets outside Compose (prayer names, the countdown heading, Hijri
+months, notification and download copy, the high-latitude note) became tables keyed by it. Urdu
+is right to left without being Arabic; Bengali is upright and left to right without Manrope or
+tracking; Turkish capitals get their dots. Indonesian ships twice under the Compose resources
+because Android still spells it "in" and iOS "id". The site gained a language picker in place of
+the lone Arabic link, and each language its own policy page.

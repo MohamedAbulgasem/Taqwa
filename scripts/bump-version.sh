@@ -26,11 +26,12 @@ for plist in iosApp/iosApp/Info.plist iosApp/TaqwaWidget/Info.plist; do
   perl -0pi -e "s|(<key>CFBundleShortVersionString</key>\s*<string>)[^<]+|\${1}$NAME|; s|(<key>CFBundleVersion</key>\s*<string>)[^<]+|\${1}$CODE|" "$plist"
 done
 
-for strings in shared/src/commonMain/composeResources/values/strings.xml shared/src/commonMain/composeResources/values-ar/strings.xml; do
+# Every language carries the version string (the resource system needs the key everywhere).
+for strings in shared/src/commonMain/composeResources/values*/strings.xml; do
   perl -pi -e "s|(<string name=\"settings_version_value\">)[^<]+|\${1}$NAME|" "$strings"
 done
 
 echo "Version is now $NAME ($CODE):"
 grep -Hn "versionCode\|versionName" androidApp/build.gradle.kts
 grep -Hn -A1 "CFBundleShortVersionString\|CFBundleVersion" iosApp/iosApp/Info.plist iosApp/TaqwaWidget/Info.plist | grep string
-grep -Hn "settings_version_value" shared/src/commonMain/composeResources/values/strings.xml shared/src/commonMain/composeResources/values-ar/strings.xml
+grep -Hn "settings_version_value" shared/src/commonMain/composeResources/values*/strings.xml

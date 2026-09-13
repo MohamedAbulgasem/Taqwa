@@ -51,7 +51,7 @@ Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatf
 - **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, a completed set rolls over on its own, your own phrases can be added, and nothing is ever totted up.
 - **An ayah widget** showing one verse a day, in the same Uthmani typeface and translation as the reader, from a curated pool of a hundred that cycles without repeats. Tapping it opens that ayah in the app.
 - **Privacy you can check.** Settings › About Taqwa says what stays on the phone and what the internet is used for, and links the website, the policy, the source and the licence.
-- **Arabic and English**, following the phone's language. Arabic is laid out right to left with the locale's own digits, not translated over an English layout.
+- **Seven languages.** Arabic, English, French, Turkish, Indonesian, Urdu and Bengali, following the phone's language or a per-app choice. Arabic and Urdu are laid out right to left with the locale's own digits, not translated over an English layout; Bengali keeps its own digits too.
 - **Light and dark**, following the system or fixed, in one amber accent.
 
 ## On your home screen
