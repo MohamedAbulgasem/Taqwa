@@ -139,6 +139,11 @@ fun AboutScreen(onBack: () -> Unit) {
                 val body = ReportMail.body(info, crashLogStore.read(), noReportLine)
                 open(ReportMail.mailto(AboutLinks.SUPPORT_EMAIL, ReportMail.subject(info), body))
             }
+            CardDivider()
+            // TEMPORARY (crash plan Task 6): reverted before merge.
+            LinkRow("Crash now", null, forward) {
+                throw IllegalStateException("Deliberate test crash from About")
+            }
         }
     }
 }
