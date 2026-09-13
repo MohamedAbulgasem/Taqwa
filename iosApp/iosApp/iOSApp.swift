@@ -252,7 +252,12 @@ enum RecitationHarness {
 				reciter: reciter(reciterId, gapMs: number("gap", -1)),
 				surah: surah,
 				startAyah: ayah,
-				text: NowPlayingText(title: "Surah \(surah)", subtitle: "Mishary Rashid Alafasy")
+				text: NowPlayingText(
+					title: "Surah \(surah)",
+					subtitle: "Mishary Rashid Alafasy",
+					previousAyahLabel: "",
+					nextAyahLabel: ""
+				)
 			) { _ in }
 		case "play": player.play()
 		case "pause": player.pause()
