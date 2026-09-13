@@ -25,7 +25,7 @@ The **Notification** level's tone, so a prayer never sounds like a message arriv
 announce tones" from Mixkit (https://mixkit.co/free-sound-effects/tones/), Mixkit Sound Effects
 Free Licence, which permits use in apps without attribution but not redistribution of the clip on
 its own. Mohamed picked it on 8 September 2026 over the synthesised bell motif that preceded it
-(and the softer chime before that). The source WAV is kept in `source/`; `tools/prepare-chime.py`
+(and the softer chime before that). The source WAV is not kept in the repository (its licence forbids redistributing it on its own; see `source/README.md`); `tools/prepare-chime.py`
 folds it to mono, trims the silence, fades the tail, normalises the peak to −1 dBFS (3.79 s) and
 writes `.ogg` (Vorbis q6) for Android and `.caf` (IMA4 ADPCM, like the other clips) for iOS, copying
 both into the platform trees. Android's Notification channel id suffix is `_chime3` (a channel keeps
