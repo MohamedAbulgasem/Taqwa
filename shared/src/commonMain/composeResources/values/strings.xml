@@ -41,6 +41,8 @@
     <string name="today_current_location">Current location</string>
     <string name="today_next_in">%1$s in</string>
     <string name="today_latitude_label">AT THIS LATITUDE</string>
+    <string name="today_exact_alarms_label">EXACT ALARMS OFF</string>
+    <string name="today_exact_alarms_body">Android can ring up to an hour late until “Alarms &amp; reminders” is allowed for Taqwa.</string>
     <string name="today_no_location_title">No location yet</string>
     <string name="today_choose_city">Choose a city</string>
     <string name="today_allow_location">Allow location instead</string>
@@ -60,7 +62,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">0.16.0</string>
+    <string name="settings_version_value">0.17.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->

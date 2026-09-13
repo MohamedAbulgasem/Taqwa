@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Path
@@ -64,11 +65,14 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.notifications_allow_exact_alarms
 import world.taqwa.app.resources.onboarding_location_body
 import world.taqwa.app.resources.qibla_title
 import world.taqwa.app.resources.today_allow_location
 import world.taqwa.app.resources.today_choose_city
 import world.taqwa.app.resources.today_current_location
+import world.taqwa.app.resources.today_exact_alarms_body
+import world.taqwa.app.resources.today_exact_alarms_label
 import world.taqwa.app.resources.today_latitude_label
 import world.taqwa.app.resources.today_next_in
 import world.taqwa.app.resources.today_no_location_title
@@ -91,19 +95,28 @@ fun TodayScreen(
     onAllowLocation: () -> Unit,
     onOpenQibla: () -> Unit,
     onOpenTasbeeh: () -> Unit,
+    /** Android with notifications on and "Alarms & reminders" off; see [ExactAlarmsCard]. */
+    exactAlarmsOff: Boolean = false,
+    onAllowExactAlarms: () -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     Box(Modifier.fillMaxSize().background(colors.background)) {
         when (state) {
             TodayUiState.Loading -> Unit
             TodayUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onAllowLocation)
-            is TodayUiState.Ready -> ReadyBody(state, onOpenQibla, onOpenTasbeeh)
+            is TodayUiState.Ready -> ReadyBody(state, onOpenQibla, onOpenTasbeeh, exactAlarmsOff, onAllowExactAlarms)
         }
     }
 }
 
 @Composable
-private fun ReadyBody(state: TodayUiState.Ready, onOpenQibla: () -> Unit, onOpenTasbeeh: () -> Unit) {
+private fun ReadyBody(
+    state: TodayUiState.Ready,
+    onOpenQibla: () -> Unit,
+    onOpenTasbeeh: () -> Unit,
+    exactAlarmsOff: Boolean,
+    onAllowExactAlarms: () -> Unit,
+) {
     val zone = rememberZone(state.location.timeZoneId)
     val format = LocalPlatformFormat.current
     // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move to
@@ -118,9 +131,9 @@ private fun ReadyBody(state: TodayUiState.Ready, onOpenQibla: () -> Unit, onOpen
             // the timeline below it, which is the right order for a page you read top to bottom.
             // Sideways there is no room for that order — the ring alone would fill the screen and
             // push every prayer time off the bottom — so the two halves sit side by side instead.
-            LandscapeBody(state, zone, format, maxWidth, maxHeight, onOpenQibla, onOpenTasbeeh)
+            LandscapeBody(state, zone, format, maxWidth, maxHeight, onOpenQibla, onOpenTasbeeh, exactAlarmsOff, onAllowExactAlarms)
         } else {
-            PortraitBody(state, zone, format, onOpenQibla, onOpenTasbeeh)
+            PortraitBody(state, zone, format, onOpenQibla, onOpenTasbeeh, exactAlarmsOff, onAllowExactAlarms)
         }
     }
 }
@@ -133,6 +146,8 @@ private fun PortraitBody(
     format: PlatformFormat,
     onOpenQibla: () -> Unit,
     onOpenTasbeeh: () -> Unit,
+    exactAlarmsOff: Boolean,
+    onAllowExactAlarms: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Column(Modifier.contentWidth()) {
@@ -152,6 +167,10 @@ private fun PortraitBody(
 
             Spacer(Modifier.height(14.dp))
             QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, onOpenQibla)
+            if (exactAlarmsOff) {
+                Spacer(Modifier.height(14.dp))
+                ExactAlarmsCard(onAllowExactAlarms)
+            }
 
             if (state.highLatitudeNote != null) {
                 Spacer(Modifier.height(14.dp))
@@ -177,6 +196,8 @@ private fun LandscapeBody(
     height: Dp,
     onOpenQibla: () -> Unit,
     onOpenTasbeeh: () -> Unit,
+    exactAlarmsOff: Boolean,
+    onAllowExactAlarms: () -> Unit,
 ) {
     // The ring gets whatever its own half can spare: never bigger than upright, and small enough
     // that the city and the date above it still fit above the fold on a short sideways screen.
@@ -200,6 +221,10 @@ private fun LandscapeBody(
             TimelineCard(state, zone, format)
             Spacer(Modifier.height(14.dp))
             QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, onOpenQibla)
+            if (exactAlarmsOff) {
+                Spacer(Modifier.height(14.dp))
+                ExactAlarmsCard(onAllowExactAlarms)
+            }
             if (state.highLatitudeNote != null) {
                 Spacer(Modifier.height(14.dp))
                 HighLatitudeCard(state.highLatitudeNote)
@@ -341,6 +366,48 @@ private fun HighLatitudeCard(note: String) {
                 note,
                 style = TaqwaText.caption,
                 color = colors.textSecondary,
+            )
+        }
+    }
+}
+
+/**
+ * Shown while notifications are on but Android's "Alarms & reminders" is off for Taqwa, which is
+ * the default from Android 14: without it a notification can be up to an hour late, and
+ * Settings › Notifications is too far away for a promise this central. The whole card is the tap
+ * target, like the Qibla card below it; it opens the system page, and the card leaves on the next
+ * foreground once the grant is there. Never on iOS, which has no such permission.
+ */
+@Composable
+private fun ExactAlarmsCard(onAllow: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    TaqwaCard(Modifier.padding(horizontal = Gutter)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null,
+                    onClick = onAllow,
+                )
+                .padding(16.dp),
+        ) {
+            Text(
+                stringResource(Res.string.today_exact_alarms_label),
+                style = TaqwaText.sectionLabel,
+                color = colors.accent,
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                stringResource(Res.string.today_exact_alarms_body),
+                style = TaqwaText.caption,
+                color = colors.textSecondary,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                stringResource(Res.string.notifications_allow_exact_alarms),
+                style = TaqwaText.caption.copy(fontWeight = FontWeight.SemiBold),
+                color = colors.accent,
             )
         }
     }

@@ -562,6 +562,10 @@ fun App(container: AppContainer) {
                                 onAllowLocation = requestLocation,
                                 onOpenQibla = { navigator.push(Screen.Qibla) },
                                 onOpenTasbeeh = { navigator.push(Screen.Tasbeeh) },
+                                // Only while there are notifications to be exact about; the flag
+                                // is re-read on every foreground, so the card leaves by itself.
+                                exactAlarmsOff = notificationSettings.enabled && !exactAlarmsAllowed,
+                                onAllowExactAlarms = ::requestExactAlarmAccess,
                             )
                         }
 
