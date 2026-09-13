@@ -87,6 +87,9 @@ class RecitationController(
      */
     private var fraction = 0f
 
+    /** The surah [fraction] was measured in, so a new surah's line starts at nothing. */
+    private var fractionSurah: Int? = null
+
     private data class PendingPlay(val reciterId: String, val surah: Int, val ayah: Int)
 
     /** The current reciter: what the reader chose, or the catalogue's first voice if that id has
@@ -198,7 +201,16 @@ class RecitationController(
         val voice = playback.reciterId?.let { catalogue?.reciter(it) }
         if (surah == null || ayah == null || voice == null) {
             fraction = 0f
+            fractionSurah = null
             return null
+        }
+        // A held fraction belongs to the surah it was measured in. Without this the line opened a
+        // new surah at wherever the last one ended — Al-Faatiha finishes at 1.0, and the first
+        // frames of Al-Baqarah showed a full progress line easing back down, because the first
+        // item of a surah reports no duration yet and [barFraction] answers with `previous`.
+        if (surah != fractionSurah) {
+            fraction = 0f
+            fractionSurah = surah
         }
         fraction = barFraction(playback, fraction)
         return BarState(

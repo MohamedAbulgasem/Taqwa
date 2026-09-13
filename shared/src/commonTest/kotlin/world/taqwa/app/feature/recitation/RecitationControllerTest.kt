@@ -276,6 +276,41 @@ class RecitationControllerTest {
         }
 
     @Test
+    fun `a new surah starts the progress line at nothing rather than where the last one ended`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1, 2))
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(1, 1)
+            harness.player.emit(
+                PlaybackState(
+                    reciterId = "ar.alafasy",
+                    surah = 1,
+                    ayah = 7,
+                    ayahCount = 7,
+                    positionMs = 4_000L,
+                    durationMs = 4_000L,
+                    playing = true,
+                ),
+            )
+            assertEquals(1f, controller.state.value.bar?.fraction ?: -1f, 0.01f)
+
+            // The first item of a surah reports no duration yet, which is when `barFraction`
+            // answers with the fraction it was last given.
+            harness.player.emit(
+                PlaybackState(
+                    reciterId = "ar.alafasy",
+                    surah = 2,
+                    ayah = 1,
+                    ayahCount = 286,
+                    playing = true,
+                ),
+            )
+
+            assertEquals(0f, controller.state.value.bar?.fraction ?: -1f, 0.001f)
+        }
+
+    @Test
     fun `cancelling the download cancels the key and forgets the waiting play`() =
         runTest(UnconfinedTestDispatcher()) {
             val harness = Harness()
