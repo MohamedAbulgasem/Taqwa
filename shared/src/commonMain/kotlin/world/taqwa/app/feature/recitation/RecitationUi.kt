@@ -210,7 +210,18 @@ fun PlayingMark(modifier: Modifier = Modifier) {
 
 /**
  * The height the player bar occupies, which the reader's list and the Mushaf's pager keep clear
- * so the bar never covers the last ayah of a surah: a hairline, the 19 dp clock row and the 56 dp
- * transport row (spec §14.2). It was 56 before the surah had a clock and the buttons grew.
+ * so the bar never covers the last ayah of a surah: a hairline, the 26 dp clock row and the 56 dp
+ * transport row (spec §14.2, §15.2). It was 56 before the surah had a clock and the buttons grew,
+ * and 76 before the clocks were given air above them.
  */
-val PlayerBarHeight: Dp = 76.dp
+val PlayerBarHeight: Dp = 83.dp
+
+/** The status strip above the clock while a download the bar is waiting on runs (spec §15.4). */
+val IncomingStripHeight: Dp = 26.dp
+
+/** What the bar takes up for [bar]: its height, plus the strip while something is arriving. */
+fun playerBarHeight(bar: BarState?): Dp = when {
+    bar == null -> 0.dp
+    bar.incoming != null -> PlayerBarHeight + IncomingStripHeight
+    else -> PlayerBarHeight
+}

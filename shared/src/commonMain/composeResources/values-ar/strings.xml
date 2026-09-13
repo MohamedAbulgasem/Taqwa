@@ -55,7 +55,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">0.13.0</string>
+    <string name="settings_version_value">0.14.1</string>
 
     <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
     <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
@@ -329,14 +329,21 @@
     <string name="recitation_a11y_recitation">التلاوة</string>
     <string name="recitation_a11y_pause">إيقاف مؤقت</string>
     <string name="recitation_a11y_downloading">جارٍ تنزيل التلاوة</string>
-    <string name="recitation_a11y_next">الآية التالية</string>
-    <string name="recitation_a11y_previous">الآية السابقة</string>
+    <string name="recitation_a11y_next">السورة التالية</string>
+    <string name="recitation_a11y_previous">السورة السابقة</string>
+    <string name="recitation_a11y_next_ayah">الآية التالية</string>
+    <string name="recitation_a11y_previous_ayah">الآية السابقة</string>
+    <string name="recitation_auto_download">تنزيل السور القادمة دون سؤال</string>
+    <string name="recitation_arriving_next">التالية: %1$s · %2$s</string>
+    <string name="recitation_arriving_voice">%1$s · %2$s</string>
+    <string name="recitation_percent">%1$s%</string>
     <string name="recitation_a11y_close">إغلاق المشغّل</string>
     <string name="recitation_a11y_preview">استمع لهذا القارئ</string>
     <!-- Settings > Quran > Recitation -->
     <string name="settings_group_quran">القرآن</string>
     <string name="settings_recitation">التلاوة</string>
     <string name="recitation_settings_mobile_data">التنزيل عبر بيانات الجوال</string>
+    <string name="recitation_settings_auto_download">التنزيل دون سؤال</string>
     <string name="recitation_settings_downloads">التنزيلات · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s سورة · %2$s</string>
     <string name="recitation_settings_surahs">%1$s سورة · %2$s</string>

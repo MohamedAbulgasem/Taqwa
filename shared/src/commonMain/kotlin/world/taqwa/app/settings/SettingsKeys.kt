@@ -83,6 +83,13 @@ internal object SettingsKeys {
     /** Wi-Fi only unless this is on (spec 3a §12.6). The per-download override is not stored. */
     val RECITATION_MOBILE_DATA = booleanPreferencesKey("recitation_mobile_data")
 
+    /** Play on a surah that is not on the phone fetches it without the sheet (spec §15.3). */
+    val RECITATION_AUTO_DOWNLOAD = booleanPreferencesKey("recitation_auto_download")
+
+    /** Whether the download sheet has ever been confirmed, which is when the choice above is
+     * first written; before that the sheet offers it ticked. */
+    val RECITATION_AUTO_DOWNLOAD_ASKED = booleanPreferencesKey("recitation_auto_download_asked")
+
     /** Which surahs of one reciter are downloaded, as decimal surah numbers. A key per reciter,
      * not one set of "<reciter>:<surah>" entries, so deleting a reciter is one key removed and so
      * the picker's per-reciter count is one read. [RECITATION_DOWNLOADED_PREFIX] is what lets

@@ -23,6 +23,7 @@ import world.taqwa.app.recitation.NowPlayingText
 import world.taqwa.app.recitation.PlaybackState
 import world.taqwa.app.recitation.RecitationManifest
 import world.taqwa.app.recitation.Reciter
+import world.taqwa.app.recitation.SurahSkip
 
 /**
  * One per app: everything the recitation surface knows, and every decision it makes (spec 3a §5).
@@ -98,6 +99,17 @@ class RecitationController(
     /** Whether the UI is Arabic, for the lock screen's two lines. Set by the composition. */
     private var arabicUi = false
 
+    /** The Android notification's two ayah buttons, localised by the composition (spec §15.1). */
+    private var previousAyahLabel = ""
+    private var nextAyahLabel = ""
+
+    /**
+     * Downloads whose refusal has already been put in front of the reader (spec §15.3): with
+     * auto-download on there is no sheet to show a refusal on, so the sheet opens itself the
+     * first time a fetch the reader is waiting on fails — once per failure, not on every emission.
+     */
+    private val surfacedFailures = mutableSetOf<DownloadKey>()
+
     /**
      * The bar's progress line, held across emissions. Exactly one collector writes it — the
      * `state` pipeline below — which is what makes a `var` in a class honest here rather than a
@@ -172,11 +184,13 @@ class RecitationController(
             picker,
             previewing,
             previewable,
-            combine(settings.settings.map { it.downloadOnMobileData }, batching) { mobileData, batches ->
-                mobileData to batches
-            },
-        ) { surah, pickerOpen, preview, clipsAvailable, (mobileData, batches) ->
-            Surface(surah, pickerOpen, preview, clipsAvailable, mobileData, batches)
+            combine(settings.settings, batching) { prefs, batches -> prefs to batches },
+        ) { surah, pickerOpen, preview, clipsAvailable, (prefs, batches) ->
+            Surface(
+                surah, pickerOpen, preview, clipsAvailable, prefs.downloadOnMobileData, batches,
+                autoDownload = prefs.autoDownload,
+                autoDownloadAsked = prefs.autoDownloadAsked,
+            )
         },
     ) { catalogue, playing, surface ->
         assemble(catalogue, playing, surface)
@@ -202,6 +216,8 @@ class RecitationController(
         val previewable: Set<String>,
         val downloadOnMobileData: Boolean,
         val batching: Set<String>,
+        val autoDownload: Boolean,
+        val autoDownloadAsked: Boolean,
     )
 
     private fun assemble(catalogue: Catalogue, playing: Playing, surface: Surface): RecitationState {
@@ -219,6 +235,7 @@ class RecitationController(
                     total,
                 ),
                 playingMeanwhile = bar?.takeIf { it.surah == surah && it.reciter.id != voice.id }?.reciter,
+                autoDownloadDefault = if (surface.autoDownloadAsked) surface.autoDownload else true,
             )
         }
         return RecitationState(
@@ -233,6 +250,7 @@ class RecitationController(
             previewing = surface.previewing,
             previewable = surface.previewable,
             downloadOnMobileData = surface.downloadOnMobileData,
+            autoDownload = surface.autoDownload,
             wholeQuran = wholeQuranOf(
                 reciter = catalogue.reciter,
                 owned = catalogue.downloaded,
@@ -268,9 +286,18 @@ class RecitationController(
             fractionSurah = surah
         }
         fraction = barFraction(playback, fraction)
+        // The ring on the monogram: whatever the bar is waiting on - a new voice's copy of this
+        // surah (§14.3) or the next surah fetched without asking (§15.3) - and, failing a play
+        // that is waiting, the chosen voice's copy of this surah arriving by some other route.
         val chosen = catalogue.reciter
-        val incoming = chosen?.takeIf { it.id != voice.id }?.let { next ->
+        val waiting = pending
+        val incoming = waiting?.let { wait ->
+            val who = catalogue.manifest?.reciter(wait.reciterId) ?: return@let null
+            downloadFraction(playing.downloads[DownloadKey(wait.reciterId, wait.surah)])
+                ?.let { IncomingDownload(wait.surah, who, it) }
+        } ?: chosen?.takeIf { it.id != voice.id }?.let { next ->
             downloadFraction(playing.downloads[DownloadKey(next.id, surah)])
+                ?.let { IncomingDownload(surah, next, it) }
         }
         return BarState(
             reciter = voice,
@@ -313,6 +340,32 @@ class RecitationController(
                 seen.retainAll(batching.value)
             }
         }
+        // The lock screen's previous and next (spec §15.1): by surah, decided here like every
+        // other press, so a surah not on the phone goes the same way it would from the bar.
+        scope.launch {
+            player.skips.collect { skip ->
+                when (skip) {
+                    SurahSkip.NEXT -> nextSurah()
+                    SurahSkip.PREVIOUS -> previousSurah()
+                }
+            }
+        }
+        // A refusal the reader would otherwise never see (spec §15.3): auto-download asks
+        // nothing, so when the fetch behind a pending play fails - no Wi-Fi, no network, no room
+        // - the sheet opens on the failure face, once, with the sentence and its Retry.
+        scope.launch {
+            downloader.states.collect { states ->
+                surfacedFailures.retainAll { states[it] is DownloadState.Failed }
+                val waiting = pending ?: return@collect
+                val key = DownloadKey(waiting.reciterId, waiting.surah)
+                if (states[key] !is DownloadState.Failed || key in surfacedFailures) return@collect
+                surfacedFailures += key
+                if (sheetSurah.value == null) {
+                    sheetAyah = waiting.ayah
+                    sheetSurah.value = waiting.surah
+                }
+            }
+        }
         scope.launch {
             downloaded.collect { owned ->
                 val waiting = pending ?: return@collect
@@ -339,6 +392,12 @@ class RecitationController(
         arabicUi = arabic
     }
 
+    /** The Android notification's "previous ayah" and "next ayah" buttons (spec §15.1). */
+    fun setAyahButtonLabels(previous: String, next: String) {
+        previousAyahLabel = previous
+        nextAyahLabel = next
+    }
+
     // ── What a tap means ────────────────────────────────────────────────────────────────
 
     /** The header button and the ayah row's Play, for a surah the reader may or may not own. */
@@ -347,18 +406,45 @@ class RecitationController(
         playOrOffer(surah, ayah)
     }
 
-    /** [requestPlay] without the engagement mark, for [onHeaderTap], which has already made it. */
+    /**
+     * [requestPlay] without the engagement mark, for [onHeaderTap], which has already made it.
+     *
+     * A surah the reader owns plays. One they do not is offered on the sheet — or, once they
+     * have said "without asking" (spec §15.3), fetched at once and played the moment it lands,
+     * the header's ring being the only thing that moves in between.
+     */
     private fun playOrOffer(surah: Int, ayah: Int) {
         scope.launch {
             if (surah in downloaded.value) {
                 pending = null
                 start(surah, ayah)
-            } else {
-                sheetAyah = ayah
-                sheetSurah.value = surah
-                picker.value = false
+                return@launch
             }
+            picker.value = false
+            val voice = reciter.value
+            if (voice != null && settings.settings.first().autoDownload) {
+                pending = PendingPlay(voice.id, surah, ayah)
+                downloader.enqueue(DownloadKey(voice.id, surah), allowMobileOnce = false)
+                return@launch
+            }
+            sheetAyah = ayah
+            sheetSurah.value = surah
         }
+    }
+
+    /**
+     * The bar's next and previous, and the lock screen's (spec §15.1): the neighbouring surah
+     * from its first ayah, through the same path as a tap on its header, so a surah not on the
+     * phone is offered or fetched exactly as it would be there. At the ends of the Quran, nothing.
+     */
+    fun nextSurah() {
+        val playing = state.value.bar?.surah ?: return
+        if (playing < LAST_SURAH) requestPlay(playing + 1, 1)
+    }
+
+    fun previousSurah() {
+        val playing = state.value.bar?.surah ?: return
+        if (playing > 1) requestPlay(playing - 1, 1)
     }
 
     /**
@@ -374,12 +460,20 @@ class RecitationController(
     }
 
     /** The download sheet's primary button. [allowMobileOnce] is spec §5.4's one-tap override. */
-    fun confirmDownload(allowMobileOnce: Boolean) {
+    fun confirmDownload(allowMobileOnce: Boolean, autoDownload: Boolean = false) {
         val surah = sheetSurah.value ?: return
         val voice = reciter.value ?: return
+        // The sheet's switch (spec §15.3), written whatever position it is in: a confirm is the
+        // moment the reader has been asked.
+        scope.launch { settings.setAutoDownload(autoDownload) }
         // Another voice reciting this surah right now is what makes this a switch (spec §14.3).
         pending = PendingPlay(voice.id, surah, sheetAyah, follow = player.state.value.surah == surah)
         downloader.enqueue(DownloadKey(voice.id, surah), allowMobileOnce)
+    }
+
+    /** Settings › Recitation's "Download without asking" (spec §15.3). */
+    fun setAutoDownload(value: Boolean) {
+        scope.launch { settings.setAutoDownload(value) }
     }
 
     /** The quiet Cancel under the progress bar. The sheet stays up, showing Ready again. */
@@ -557,15 +651,23 @@ class RecitationController(
                 return@launch
             }
             if (hadPausedForPreview) player.play()
+            picker.value = false
             // The copy may already be on its way — this very switch, dismissed and re-picked, or a
             // whole-Quran batch. The sheet then opens on its progress bar, which has no button to
             // arm anything with, so the switch is armed here; a Ready face's confirm overwrites it.
-            if (pending == null && downloader.states.value[DownloadKey(id, surah)] != null) {
+            val key = DownloadKey(id, surah)
+            if (pending == null && downloader.states.value[key] != null) {
                 pending = PendingPlay(id, surah, playback.ayah ?: 1, follow = true)
+            }
+            // "Without asking" (spec §15.3) covers a new voice too: the old one keeps playing, the
+            // ring on the monogram shows the new one arriving, and no sheet comes up.
+            if (settings.settings.first().autoDownload) {
+                if (pending == null) pending = PendingPlay(id, surah, playback.ayah ?: 1, follow = true)
+                if (downloader.states.value[key] == null) downloader.enqueue(key, allowMobileOnce = false)
+                return@launch
             }
             sheetAyah = playback.ayah ?: 1
             sheetSurah.value = surah
-            picker.value = false
         }
     }
 
@@ -660,7 +762,12 @@ class RecitationController(
     private suspend fun nowPlaying(voice: Reciter, surah: Int): NowPlayingText {
         val named = runCatching { quran.surah(surah) }.getOrNull()
         val title = named?.let { if (arabicUi) it.nameArabic else it.nameLatin }.orEmpty()
-        return NowPlayingText(title = title, subtitle = if (arabicUi) voice.nameAr else voice.nameEn)
+        return NowPlayingText(
+            title = title,
+            subtitle = if (arabicUi) voice.nameAr else voice.nameEn,
+            previousAyahLabel = previousAyahLabel,
+            nextAyahLabel = nextAyahLabel,
+        )
     }
 
     /** For the one caller that needs the setting outside a composition: the sheet's override. */
@@ -670,3 +777,5 @@ class RecitationController(
 /** Long enough for the fifteen-second clip plus a moment: the backstop for a clip player that
  * never reports its end, so the row stops claiming to play and a paused recitation is resumed. */
 private const val PREVIEW_MILLIS = 17_000L
+
+private const val LAST_SURAH = 114

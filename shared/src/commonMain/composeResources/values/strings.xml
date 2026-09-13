@@ -58,7 +58,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">0.13.0</string>
+    <string name="settings_version_value">0.14.1</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
@@ -343,14 +343,21 @@
     <string name="recitation_a11y_recitation">Recitation</string>
     <string name="recitation_a11y_pause">Pause</string>
     <string name="recitation_a11y_downloading">Downloading the recitation</string>
-    <string name="recitation_a11y_next">Next ayah</string>
-    <string name="recitation_a11y_previous">Previous ayah</string>
+    <string name="recitation_a11y_next">Next surah</string>
+    <string name="recitation_a11y_previous">Previous surah</string>
+    <string name="recitation_a11y_next_ayah">Next ayah</string>
+    <string name="recitation_a11y_previous_ayah">Previous ayah</string>
+    <string name="recitation_auto_download">Download future surahs without asking</string>
+    <string name="recitation_arriving_next">Next: %1$s · %2$s</string>
+    <string name="recitation_arriving_voice">%1$s · %2$s</string>
+    <string name="recitation_percent">%1$s%</string>
     <string name="recitation_a11y_close">Close the player</string>
     <string name="recitation_a11y_preview">Hear this reciter</string>
     <!-- Settings > Quran > Recitation, and its Downloads screen (spec 3a §5.6) -->
     <string name="settings_group_quran">QURAN</string>
     <string name="settings_recitation">Recitation</string>
     <string name="recitation_settings_mobile_data">Download over mobile data</string>
+    <string name="recitation_settings_auto_download">Download without asking</string>
     <string name="recitation_settings_downloads">DOWNLOADS · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s surah · %2$s</string>
     <string name="recitation_settings_surahs">%1$s surahs · %2$s</string>

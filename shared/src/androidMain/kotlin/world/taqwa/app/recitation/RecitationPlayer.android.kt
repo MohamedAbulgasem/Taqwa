@@ -9,7 +9,9 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionToken
+import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,8 +19,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -46,6 +51,10 @@ actual class RecitationPlayer actual constructor(
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
     private val _state = MutableStateFlow(PlaybackState.EMPTY)
     actual val state: StateFlow<PlaybackState> = _state.asStateFlow()
+
+    /** A lock-screen previous/next, relayed by the service as a custom command (spec §15.1). */
+    private val _skips = MutableSharedFlow<SurahSkip>(extraBufferCapacity = 4)
+    actual val skips: SharedFlow<SurahSkip> = _skips.asSharedFlow()
 
     private var connecting: ListenableFuture<MediaController>? = null
     private var controller: MediaController? = null
@@ -96,6 +105,20 @@ actual class RecitationPlayer actual constructor(
             releaseController()
             _state.value = PlaybackState.EMPTY
         }
+
+        /** The service saying a lock screen, headset or car pressed previous or next. */
+        override fun onCustomCommand(
+            controller: MediaController,
+            command: SessionCommand,
+            args: Bundle,
+        ): ListenableFuture<SessionResult> {
+            when (command.customAction) {
+                RecitationService.COMMAND_SURAH_NEXT -> _skips.tryEmit(SurahSkip.NEXT)
+                RecitationService.COMMAND_SURAH_PREVIOUS -> _skips.tryEmit(SurahSkip.PREVIOUS)
+                else -> return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
+            }
+            return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+        }
     }
 
     /** The controller, but only while it is any use. */
@@ -126,6 +149,8 @@ actual class RecitationPlayer actual constructor(
             Bundle().apply {
                 putString(RecitationService.ARG_TITLE, text.title)
                 putString(RecitationService.ARG_SUBTITLE, text.subtitle)
+                putString(RecitationService.ARG_PREVIOUS_AYAH, text.previousAyahLabel)
+                putString(RecitationService.ARG_NEXT_AYAH, text.nextAyahLabel)
                 putLongArray(RecitationService.ARG_TIMELINE, clock.itemsMs.toLongArray())
             },
         )

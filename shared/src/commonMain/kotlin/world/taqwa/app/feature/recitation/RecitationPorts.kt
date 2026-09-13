@@ -13,6 +13,7 @@ import world.taqwa.app.recitation.PlaybackState
 import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.recitation.RecitationPlayer
 import world.taqwa.app.recitation.SurahDownloader
+import world.taqwa.app.recitation.SurahSkip
 
 /**
  * The two seams [RecitationController] is written against.
@@ -29,6 +30,9 @@ import world.taqwa.app.recitation.SurahDownloader
  */
 interface PlayerPort {
     val state: StateFlow<PlaybackState>
+
+    /** The lock screen's previous/next, which move by surah (spec §15.1). */
+    val skips: Flow<SurahSkip>
     suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText)
     fun play()
     fun pause()
@@ -64,6 +68,7 @@ interface RecitationSettingsPort {
     val settings: Flow<RecitationSettings>
     suspend fun setReciter(id: String)
     suspend fun setDownloadOnMobileData(value: Boolean)
+    suspend fun setAutoDownload(value: Boolean)
 }
 
 /** The picker's fifteen-second audition. [onEnd] fires when the clip plays out, not on [stop]. */
@@ -97,6 +102,7 @@ fun SettingsRepository.asRecitationPort(): RecitationSettingsPort = object : Rec
     override val settings: Flow<RecitationSettings> get() = recitationSettings
     override suspend fun setReciter(id: String) = setRecitationReciter(id)
     override suspend fun setDownloadOnMobileData(value: Boolean) = setRecitationMobileData(value)
+    override suspend fun setAutoDownload(value: Boolean) = setRecitationAutoDownload(value)
 }
 
 fun ClipPlayer.asPort(): ClipPort = object : ClipPort {
@@ -106,6 +112,7 @@ fun ClipPlayer.asPort(): ClipPort = object : ClipPort {
 
 fun RecitationPlayer.asPort(): PlayerPort = object : PlayerPort {
     override val state: StateFlow<PlaybackState> get() = this@asPort.state
+    override val skips: Flow<SurahSkip> get() = this@asPort.skips
     override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) =
         this@asPort.load(reciter, surah, startAyah, text)
     override fun play() = this@asPort.play()

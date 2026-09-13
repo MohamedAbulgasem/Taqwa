@@ -95,10 +95,12 @@ import world.taqwa.app.feature.quran.ReaderUiState
 import world.taqwa.app.feature.quran.ReaderViewModel
 import world.taqwa.app.feature.recitation.DownloadSheet
 import world.taqwa.app.feature.recitation.PlayerBar
-import world.taqwa.app.feature.recitation.PlayerBarHeight
+import world.taqwa.app.feature.recitation.playerBarHeight
 import world.taqwa.app.feature.recitation.PlayerBarHost
 import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.ReciterPicker
+import world.taqwa.app.resources.recitation_a11y_next_ayah
+import world.taqwa.app.resources.recitation_a11y_previous_ayah
 import world.taqwa.app.feature.recitation.RecitationStorage
 import world.taqwa.app.feature.recitation.reciterName
 import world.taqwa.app.feature.settings.DownloadedSurah
@@ -158,6 +160,12 @@ fun App(container: AppContainer) {
     // composition that started it, so the controller is told the language rather than asked.
     val arabicUi = isRtlLocale()
     LaunchedEffect(arabicUi) { recitation.setArabicUi(arabicUi) }
+    // The Android notification's two ayah buttons (spec §15.1), in the interface's language.
+    val previousAyahLabel = stringResource(Res.string.recitation_a11y_previous_ayah)
+    val nextAyahLabel = stringResource(Res.string.recitation_a11y_next_ayah)
+    LaunchedEffect(previousAyahLabel, nextAyahLabel) {
+        recitation.setAyahButtonLabels(previousAyahLabel, nextAyahLabel)
+    }
 
     // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
     // has already happened by the time this runs, so `requestSystemPermission` just returns the
@@ -373,6 +381,24 @@ fun App(container: AppContainer) {
                 val quranTab = navigator.currentTab == Tab.QURAN
                 val bar = recitationState.bar
                 val barSurahName = rememberSurahName(bar?.surah) { container.quranRepository.surah(it) }
+                val incomingSurahName = rememberSurahName(bar?.incoming?.surah) { container.quranRepository.surah(it) }
+                val barSpace = playerBarHeight(bar)
+                // A surah skip (spec §15.1) takes the page with the voice: a reader on the surah
+                // that was playing is moved to the one now playing, at its first ayah, as the
+                // "Next" row at the foot of a surah would move them. A reader on some other surah
+                // is left where they are - they were not following. The Mushaf follows by page
+                // on its own, since its pages run across surahs.
+                val playingSurah = bar?.surah
+                var followedSurah by remember { mutableStateOf<Int?>(null) }
+                LaunchedEffect(playingSurah) {
+                    val before = followedSurah
+                    followedSurah = playingSurah
+                    if (playingSurah == null || before == null || before == playingSurah) return@LaunchedEffect
+                    val current = navigator.current
+                    if (current is Screen.Reader && current.surah == before) {
+                        navigator.replace(Screen.Reader(playingSurah, 1))
+                    }
+                }
                 TaqwaTabScaffold(
                     tab,
                     navigator::selectTab,
@@ -383,10 +409,13 @@ fun App(container: AppContainer) {
                                     bar = bar,
                                     surahName = barSurahName,
                                     onToggle = recitation::toggle,
-                                    onNext = recitation::next,
-                                    onPrevious = recitation::previous,
+                                    onNext = recitation::nextSurah,
+                                    onPrevious = recitation::previousSurah,
+                                    onNextAyah = recitation::next,
+                                    onPreviousAyah = recitation::previous,
                                     onOpenPicker = recitation::openPicker,
                                     onDismiss = recitation::dismissBar,
+                                    incomingSurahName = incomingSurahName,
                                 )
                             }
                         }
@@ -557,7 +586,7 @@ fun App(container: AppContainer) {
                                     header = recitationState.header(screen.surah),
                                     playing = bar?.let { it.surah to it.ayah },
                                     live = bar?.playing == true,
-                                    barSpace = if (bar != null) PlayerBarHeight else 0.dp,
+                                    barSpace = barSpace,
                                     onHeader = recitation::onHeaderTap,
                                     onPlayAyah = recitation::requestPlay,
                                     onToggle = recitation::toggle,
@@ -619,7 +648,7 @@ fun App(container: AppContainer) {
                                     ),
                                     playing = bar?.let { it.surah to it.ayah },
                                     live = bar?.playing == true,
-                                    barSpace = if (bar != null) PlayerBarHeight else 0.dp,
+                                    barSpace = barSpace,
                                     onHeader = recitation::onHeaderTap,
                                     onPlayAyah = recitation::requestPlay,
                                     onToggle = recitation::toggle,
@@ -665,6 +694,7 @@ fun App(container: AppContainer) {
                                 onOpened = recitation::onSettingsOpened,
                                 onOpenPicker = recitation::openPicker,
                                 onSetMobileData = recitation::setDownloadOnMobileData,
+                                onSetAutoDownload = recitation::setAutoDownload,
                                 onOpenDownloads = { navigator.push(Screen.RecitationDownloads(it)) },
                                 onDownloadWholeQuran = { recitation.downloadWholeQuran() },
                                 onCancelWholeQuran = recitation::cancelWholeQuran,

@@ -48,6 +48,13 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
     var timeline: SurahTimeline? = null
 
     /**
+     * Where the system's previous and next go (spec §15.1): to the app, which decides the
+     * neighbouring surah, its download and its start. The service sets this to a broadcast on
+     * the session; until it is set the two buttons fall back to ayah moves.
+     */
+    var onSurahSkip: ((forward: Boolean) -> Unit)? = null
+
+    /**
      * How long the ayah that is playing — or has just played — runs for. Held because a gap cannot
      * be asked for the duration of the item before it: the platform's clock during those 300 ms is
      * the silence's own. Only read when there is no [timeline].
@@ -150,19 +157,26 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
 
     // ── the buttons and the bar ─────────────────────────────────────────────────────────────
 
-    override fun seekToPrevious() = previousAyah()
+    /** Previous and next are *surah* moves (spec §15.1), like a track skip in a music player. */
+    override fun seekToPrevious() = surahSkip(forward = false)
 
-    override fun seekToPreviousMediaItem() = previousAyah()
+    override fun seekToPreviousMediaItem() = surahSkip(forward = false)
 
-    override fun seekToNext() = nextAyah()
+    override fun seekToNext() = surahSkip(forward = true)
 
-    override fun seekToNextMediaItem() = nextAyah()
+    override fun seekToNextMediaItem() = surahSkip(forward = true)
 
-    /** Rewind and fast-forward — a headset's long press, a car's dial — move by ayah too. A
-     * recitation has no fifteen seconds to skip that would not land inside a word. */
+    /** Rewind and fast-forward — a headset's long press, a car's dial, the notification's two
+     * extra buttons — move by ayah. A recitation has no fifteen seconds to skip that would not
+     * land inside a word. */
     override fun seekBack() = previousAyah()
 
     override fun seekForward() = nextAyah()
+
+    private fun surahSkip(forward: Boolean) {
+        val handler = onSurahSkip
+        if (handler != null) handler(forward) else if (forward) nextAyah() else previousAyah()
+    }
 
     /**
      * A scrub on the lock screen's bar, which is on the surah's clock: it lands on the start of
@@ -179,7 +193,7 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
         real.seekTo(clock.snapToAyah(positionMs, queue::isGap), 0L)
     }
 
-    private fun previousAyah() {
+    internal fun previousAyah() {
         val queue = queue() ?: return
         val at = real.currentMediaItemIndex
         // A gap's own clock is not the ayah's, so it counts as zero and the rule restarts the ayah
@@ -188,7 +202,7 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
         real.seekTo(queue.previous(at, position), 0L)
     }
 
-    private fun nextAyah() {
+    internal fun nextAyah() {
         val queue = queue() ?: return
         val target = queue.next(real.currentMediaItemIndex) ?: return
         real.seekTo(target, 0L)

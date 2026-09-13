@@ -3,13 +3,17 @@ package world.taqwa.app.feature.recitation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -40,12 +44,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -65,8 +76,13 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_ayah_n
 import world.taqwa.app.resources.recitation_a11y_close
 import world.taqwa.app.resources.recitation_a11y_next
+import world.taqwa.app.resources.recitation_a11y_next_ayah
 import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_a11y_previous
+import world.taqwa.app.resources.recitation_a11y_previous_ayah
+import world.taqwa.app.resources.recitation_arriving_next
+import world.taqwa.app.resources.recitation_arriving_voice
+import world.taqwa.app.resources.recitation_percent
 import world.taqwa.app.resources.recitation_back_to_ayah
 import world.taqwa.app.resources.recitation_play
 
@@ -88,8 +104,12 @@ private val Monogram = 40.dp
 /** The monogram's box, with room for the incoming-voice ring around it. */
 private val MonogramBox = 46.dp
 
-/** The clock row: elapsed, the line, the total. */
-private val ClockRow = 19.dp
+/** The clock row: elapsed, the line, the total, with air above it so the clocks do not sit on
+ * the bar's top edge (spec §15.2). */
+private val ClockRow = 26.dp
+
+/** The air above the clocks, inside [ClockRow]. */
+private val ClockInset = 5.dp
 
 /** The transport row: monogram, surah, the four buttons. */
 private val TransportRow = 56.dp
@@ -101,9 +121,14 @@ private val DismissDrag = 36.dp
 private const val HOUR_MS = 3_600_000L
 
 /**
- * The player bar (spec §5.3, §14.2): a hairline over the card surface, then the surah's clock —
- * elapsed, a 3 dp line, total, the way every music player draws a track — then a 56 dp transport
- * row. The whole thing is [PlayerBarHeight], which the reader and the Mushaf keep clear.
+ * The player bar (spec §5.3, §14.2, §15): a hairline over the card surface, then the surah's
+ * clock — elapsed, a 3 dp line, total, the way every music player draws a track — then a 56 dp
+ * transport row. The whole thing is [PlayerBarHeight], which the reader and the Mushaf keep
+ * clear.
+ *
+ * Previous and next move by **surah**, like a track skip; a long press on either moves by ayah
+ * (spec §15.1). [onPrevious]/[onNext] are the surah moves, [onPreviousAyah]/[onNextAyah] the
+ * long presses.
  *
  * The clock is the surah's, not the ayah's ([SurahTimeline]): "12:31" of "2:05:10" through
  * Al-Baqarah, moving at the speed of the recitation, gaps and all. A line that filled and emptied
@@ -125,6 +150,10 @@ fun PlayerBar(
     onOpenPicker: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    onNextAyah: () -> Unit = {},
+    onPreviousAyah: () -> Unit = {},
+    /** The name of [BarState.incoming]'s surah, resolved by the caller like [surahName]. */
+    incomingSurahName: String = "",
 ) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
@@ -164,11 +193,28 @@ fun PlayerBar(
             },
     ) {
         Box(Modifier.fillMaxWidth().height(1.dp).background(colors.hairline))
+        // What the bar is waiting on (spec §15.4): the next surah after a skip, or a new voice's
+        // copy of this one. Slides in above the clock and goes when the download lands, so the
+        // tap that started it is seen to have done something while this surah plays on.
+        AnimatedVisibility(
+            visible = bar.incoming != null,
+            enter = expandVertically(tween(BAR_MILLIS)) + fadeIn(tween(BAR_MILLIS)),
+            exit = shrinkVertically(tween(BAR_MILLIS)) + fadeOut(tween(BAR_MILLIS / 2)),
+        ) {
+            val incoming = bar.incoming
+            if (incoming != null) {
+                IncomingStrip(
+                    name = if (incoming.surah != bar.surah) incomingSurahName else reciterName(incoming.reciter),
+                    nextSurah = incoming.surah != bar.surah,
+                    fraction = incoming.fraction,
+                )
+            }
+        }
         Row(
             Modifier
                 .contentWidth()
                 .height(ClockRow)
-                .padding(horizontal = 14.dp),
+                .padding(start = 14.dp, end = 14.dp, top = ClockInset),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Clock(elapsed)
@@ -211,7 +257,7 @@ fun PlayerBar(
             ) {
                 Box(Modifier.size(MonogramBox), contentAlignment = Alignment.Center) {
                     ReciterMonogram(bar.reciter, Monogram)
-                    bar.incoming?.let { IncomingRing(it) }
+                    bar.incoming?.let { IncomingRing(it.fraction) }
                 }
                 Column(Modifier.padding(start = 8.dp, end = 6.dp)) {
                     if (arabic) {
@@ -245,11 +291,15 @@ fun PlayerBar(
             TransportButton(
                 description = stringResource(Res.string.recitation_a11y_previous),
                 onClick = onPrevious,
+                longPressDescription = stringResource(Res.string.recitation_a11y_previous_ayah),
+                onLongClick = onPreviousAyah,
             ) { tint -> Canvas(Modifier.size(22.dp)) { drawSkip(tint, forward = !forward) } }
             PlayPauseDisc(playing = bar.playing, onClick = onToggle)
             TransportButton(
                 description = stringResource(Res.string.recitation_a11y_next),
                 onClick = onNext,
+                longPressDescription = stringResource(Res.string.recitation_a11y_next_ayah),
+                onLongClick = onNextAyah,
             ) { tint -> Canvas(Modifier.size(22.dp)) { drawSkip(tint, forward = forward) } }
             TransportButton(
                 description = stringResource(Res.string.recitation_a11y_close),
@@ -257,6 +307,49 @@ fun PlayerBar(
                 size = CloseTarget,
             ) { tint -> Canvas(Modifier.size(16.dp)) { drawClose(tint) } }
         }
+    }
+}
+
+/**
+ * "Next: An-Nisa · 38 %", or "Ash-Shatri · 38 %" for a voice arriving for the surah playing: one
+ * line in the caption size with the name in the accent, over a hairline of its own, [IncomingStripHeight]
+ * tall. The percentage moves; the ring on the monogram moves with it.
+ */
+@Composable
+private fun IncomingStrip(name: String, nextSurah: Boolean, fraction: Float) {
+    val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+    val percent = stringResource(Res.string.recitation_percent, format.localizedDigits((fraction * 100).toInt().coerceIn(0, 100)))
+    val template = stringResource(if (nextSurah) Res.string.recitation_arriving_next else Res.string.recitation_arriving_voice, name, percent)
+    // The name in the accent, the rest secondary: built by splitting the resolved sentence on
+    // the name, so the words around it stay whatever the language put there.
+    val at = template.indexOf(name)
+    val text = buildAnnotatedString {
+        if (at < 0 || name.isEmpty()) {
+            append(template)
+        } else {
+            append(template.substring(0, at))
+            withStyle(SpanStyle(color = colors.accent, fontWeight = FontWeight.SemiBold)) { append(name) }
+            append(template.substring(at + name.length))
+        }
+    }
+    Column(Modifier.fillMaxWidth()) {
+        Box(
+            Modifier
+                .contentWidth()
+                .height(IncomingStripHeight - 1.dp)
+                .padding(horizontal = 14.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Text(
+                text,
+                style = TaqwaText.caption.copy(fontSize = 12.sp, fontFeatureSettings = "tnum"),
+                color = colors.textSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Box(Modifier.fillMaxWidth().height(1.dp).background(colors.hairline))
     }
 }
 
@@ -331,24 +424,49 @@ private fun PlayPauseDisc(playing: Boolean, onClick: () -> Unit) {
     }
 }
 
+/**
+ * A transport button. With [onLongClick] it is two buttons in one — the tap and the hold — and a
+ * screen reader gets the hold as a custom action under [longPressDescription], since it cannot
+ * long-press. The hold answers with the platform's long-press haptic, the one cue that the
+ * finger has crossed from one move to the other.
+ */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TransportButton(
     description: String,
     onClick: () -> Unit,
     size: Dp = Target,
+    longPressDescription: String? = null,
+    onLongClick: (() -> Unit)? = null,
     content: @Composable (Color) -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    val haptics = LocalHapticFeedback.current
+    val interaction = remember { MutableInteractionSource() }
+    val press = if (onLongClick == null) {
+        Modifier.clickable(interactionSource = interaction, indication = null, onClick = onClick)
+    } else {
+        Modifier.combinedClickable(
+            interactionSource = interaction,
+            indication = null,
+            onClick = onClick,
+            onLongClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                onLongClick()
+            },
+        )
+    }
     Box(
         Modifier
             .size(size)
             .clip(CircleShape)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick,
-            )
-            .semantics { contentDescription = description },
+            .then(press)
+            .semantics {
+                contentDescription = description
+                if (onLongClick != null && longPressDescription != null) {
+                    customActions = listOf(CustomAccessibilityAction(longPressDescription) { onLongClick(); true })
+                }
+            },
         contentAlignment = Alignment.Center,
     ) {
         content(colors.textSecondary)

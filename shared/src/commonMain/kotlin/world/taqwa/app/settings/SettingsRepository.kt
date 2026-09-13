@@ -178,7 +178,20 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         RecitationSettings(
             reciterId = p[SettingsKeys.RECITATION_RECITER] ?: RecitationManifest.DEFAULT_RECITER,
             downloadOnMobileData = p[SettingsKeys.RECITATION_MOBILE_DATA] ?: false,
+            autoDownload = p[SettingsKeys.RECITATION_AUTO_DOWNLOAD] ?: false,
+            autoDownloadAsked = p[SettingsKeys.RECITATION_AUTO_DOWNLOAD_ASKED] ?: false,
         )
+    }
+
+    /**
+     * Spec §15.3, written by the download sheet's confirm and by the Settings toggle. Either
+     * counts as having been asked, so the sheet stops pre-ticking the box once a choice exists.
+     */
+    suspend fun setRecitationAutoDownload(value: Boolean) {
+        store.edit {
+            it[SettingsKeys.RECITATION_AUTO_DOWNLOAD] = value
+            it[SettingsKeys.RECITATION_AUTO_DOWNLOAD_ASKED] = true
+        }
     }
 
     suspend fun setRecitationSettings(settings: RecitationSettings) {
