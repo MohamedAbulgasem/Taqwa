@@ -31,6 +31,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.about.AboutLinks
+import world.taqwa.app.crash.ReportMail
+import world.taqwa.app.crash.crashLogStore
+import world.taqwa.app.crash.deviceInfoOrUnknown
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.LocalTaqwaDark
 import world.taqwa.app.design.TaqwaText
@@ -50,6 +53,7 @@ import world.taqwa.app.resources.about_online_body
 import world.taqwa.app.resources.about_online_title
 import world.taqwa.app.resources.about_privacy_label
 import world.taqwa.app.resources.about_privacy_policy
+import world.taqwa.app.resources.about_report_problem
 import world.taqwa.app.resources.about_source
 import world.taqwa.app.resources.about_source_value
 import world.taqwa.app.resources.about_stays_body
@@ -57,6 +61,7 @@ import world.taqwa.app.resources.about_stays_title
 import world.taqwa.app.resources.about_tagline
 import world.taqwa.app.resources.about_website
 import world.taqwa.app.resources.about_website_value
+import world.taqwa.app.resources.crash_mail_no_report
 import world.taqwa.app.resources.settings_about
 import world.taqwa.app.resources.settings_version_value
 
@@ -71,6 +76,7 @@ fun AboutScreen(onBack: () -> Unit) {
     val uriHandler = LocalUriHandler.current
     val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
     val website = AboutLinks.website(arabic = isRtlLocale())
+    val noReportLine = stringResource(Res.string.crash_mail_no_report)
     // A device with no browser fails silently rather than crashing (spec §6.3).
     fun open(url: String) {
         runCatching { uriHandler.openUri(url) }
@@ -125,6 +131,13 @@ fun AboutScreen(onBack: () -> Unit) {
             CardDivider()
             LinkRow(stringResource(Res.string.about_licence), stringResource(Res.string.about_licence_value), forward) {
                 open(AboutLinks.LICENCE)
+            }
+            CardDivider()
+            // The support email (crash spec §3.2), carrying the last crash report if there is one.
+            LinkRow(stringResource(Res.string.about_report_problem), null, forward) {
+                val info = deviceInfoOrUnknown()
+                val body = ReportMail.body(info, crashLogStore.read(), noReportLine)
+                open(ReportMail.mailto(AboutLinks.SUPPORT_EMAIL, ReportMail.subject(info), body))
             }
         }
     }

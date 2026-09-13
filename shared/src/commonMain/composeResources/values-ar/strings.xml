@@ -79,6 +79,14 @@
     <string name="about_website">الموقع الإلكتروني</string>
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">افتح taqwa.world</string>
+    <string name="about_report_problem">الإبلاغ عن مشكلة</string>
+
+    <!-- تقرير الأعطال: الورقة التي تظهر عند التشغيل بعد عطل، وسطر البريد حين لا يوجد تقرير. -->
+    <string name="crash_sheet_title">أُغلق تقوى بشكل غير متوقع</string>
+    <string name="crash_sheet_body">حُفظ تقرير تقني على هاتفك. إرساله إلى support@taqwa.world يساعد على إصلاح المشكلة. يحتوي على إصدار التطبيق وطراز هاتفك والخطأ، لا غير.</string>
+    <string name="crash_send">إرسال التقرير</string>
+    <string name="crash_not_now">ليس الآن</string>
+    <string name="crash_mail_no_report">لا يوجد تقرير أعطال محفوظ على هذا الهاتف.</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">السمة</string>

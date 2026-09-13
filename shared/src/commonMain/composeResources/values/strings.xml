@@ -83,6 +83,15 @@
     <string name="about_website">Website</string>
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">Open taqwa.world</string>
+    <string name="about_report_problem">Report a problem</string>
+
+    <!-- Crash report (crash spec §3): the sheet on the launch after a crash, and the email's
+         line when there is no report to send. -->
+    <string name="crash_sheet_title">Taqwa closed unexpectedly</string>
+    <string name="crash_sheet_body">A technical report was saved on your phone. Sending it to support@taqwa.world helps fix the problem. It contains the app version, your phone model and the error, nothing else.</string>
+    <string name="crash_send">Send report</string>
+    <string name="crash_not_now">Not now</string>
+    <string name="crash_mail_no_report">No crash report is saved on this phone.</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">THEME</string>
