@@ -998,3 +998,43 @@ the ranked list under the tightened bar. The rotation is a permutation over the 
 day someone updates, the widget shows a different ayah once and the no-repeat cycle restarts. 1,295
 tests across the four targets; the emulator's mirror holds a hundred entries and none of the
 vetoed references.
+
+### Recitation (12–13 September, branch `recitation`, 0.11.0)
+
+The largest slice since the reader, built in one night by five agents in sequence and two in
+parallel, with a data pipeline running unattended beside them. The investigation came first and
+changed the plan twice before a line was written: the seven reciters became ten (Al-Ghamdi, asked
+for, is simply not in the licensed corpus); the reciter photos were dropped altogether after the
+research found that most Commons portraits of famous reciters are studio pictures tagged "own
+work" by accounts that upload celebrities in bulk, so every reciter has a calligraphic monogram
+instead; and a per-surah size that had been guessed at 25 MB turned out to be 58 MB for Alafasy's
+Al-Baqarah, which made the container's ability to start playing before the file is complete worth
+having rather than merely neat.
+
+The files are the Islamic Network's per-ayah MP3s, byte for byte, because their licence says "at
+the bitrates we publish" and because the ayah boundary being the file boundary is what makes
+highlighting need no timing data. They are packed one surah per `.taqa` container, a twelve-byte
+header, a JSON index of ayah offsets, then the MP3s back to back, and hosted as GitHub Release
+assets on the public `Taqwa-data` repository, one release per reciter, under a manifest the app
+refreshes daily so a reciter can be added or withdrawn without an app update. Four reciters begin
+at full voice on the very first sample, so the manifest carries a per-reciter gap that the player
+inserts between ayahs; without it they sound rushed. Around sixty ayahs across four reciters were
+served as HTTP 502 by the CDN for hours; the pipeline took those from the everyayah mirror only
+after proving, per reciter, that files already held from both sources decode to identical audio.
+Shuraim's mirror copy is a different encode and would not have passed that gate.
+
+On the phone: a speaker button at the end of the reader and Mushaf headers, a Play action first in
+the ayah row, and a 56 dp player bar that hides on the other tabs while playback carries on. The
+bar follows the voice unless the reader has scrolled more than a screen away, in which case a small
+"Back to ayah N" pill offers the way rather than yanking the page. Android plays through Media3 in
+a `MediaSessionService` reading byte ranges straight out of the container; iOS splits the container
+into per-ayah files under Caches and drives a single `AVPlayer` with a manual queue so the ayah
+signal is exact. Downloads are WorkManager on Android and a background `URLSession` on iOS, resumed
+with `Range` from a `.part` file and verified by SHA-256 before a surah counts as present; the
+device round proved a force-stop at 45 % resumes from byte 172,032 rather than zero. The one real
+bug the emulator found: on mobile data the `UNMETERED` constraint parked the work before the code
+that would have said "needs Wi-Fi" could run, so the reader saw "Queued" forever; the question is
+now asked before enqueueing. Settings › Quran › Recitation holds the reciter, the mobile-data
+switch, per-reciter downloads with delete, and "Download the whole Quran", whose batch was cancelled
+on the emulator at 68 surahs with nothing left queued and every finished surah still on disk.
+743 tests in the shared module, the suite green on both targets.

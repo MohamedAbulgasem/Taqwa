@@ -42,6 +42,7 @@ Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multi
 - **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the compass needs it.
 - **Hijri date** (Umm al-Qura tabular calendar) with a one-day adjustment for local moonsighting, shown beside the Gregorian date.
 - **Quran reader** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation, bookmarks, and copy or share of any ayah; everything offline.
+- **Recitation** by ten reciters, downloaded a surah at a time (or the whole Quran for a reciter) and then played offline with the ayah lit and the page following the voice, in the background with lock-screen controls. A speaker button in the reader, a Play action on any ayah, a slim player bar, and a picker with a fifteen-second preview of each voice. The recordings are the Islamic Network's, mirrored unmodified on a public data repository.
 - **Arabic and English**, following the phone's language. Arabic is laid out right to left with the locale's own digits, not translated over an English layout.
 - **Light and dark**, following the system or fixed, in one amber accent.
 
