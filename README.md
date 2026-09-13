@@ -37,7 +37,7 @@
 
 ---
 
-Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatform codebase. It does a few things and tries to do them properly: tell you the prayer times where you are, call you to them, point you to Makkah, and carry the Quran with recitation. Then it stays out of your way. Everything is computed on the phone. There is no server, no sign-in, no analytics and nothing to pay for, now or later.
+Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatform codebase. It does a few things and tries to do them properly: tell you the prayer times where you are, call you to them, point you to Makkah, and carry the Quran with recitation. Everything is computed on the phone. There is no server, no sign-in, no analytics and nothing to pay for, now or later.
 
 ## What it does
 
@@ -118,7 +118,7 @@ Taqwa is built in slices. Each slice ships as a complete, usable app.
 | 1 | Prayer times, notifications, Qibla, widgets, settings, Arabic | **Done** |
 | 2 | Quran reader: Arabic text with translations, Mushaf mode, search, bookmarks, share; bundled offline | **Done** |
 | 3 | Quran audio: ten reciters, per-surah downloads, background playback with the page following | **Done** |
-| 4 | Dhikr: tasbeeh **done**; morning and evening adhkar and a khatm plan to follow | In progress |
+| 4 | Dhikr: tasbeeh counter | **Done** |
 
 Deliberately out of scope: mosque finder, zakat calculator, hadith collections, community features, anything that needs a server.
 
