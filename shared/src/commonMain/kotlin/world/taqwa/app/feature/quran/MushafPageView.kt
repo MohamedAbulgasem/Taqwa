@@ -516,6 +516,10 @@ private fun ReferencePill(
     onShare: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+    // See ReaderHeader: the interface's direction, not this subtree's — the page above is forced
+    // to RTL whatever language the app is being read in.
+    val mirrored = isRtlLocale()
     Box(modifier, contentAlignment = Alignment.Center) {
         Row(
             Modifier
@@ -524,7 +528,11 @@ private fun ReferencePill(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "${QuranText.arabicIndic(reference.first)}:${QuranText.arabicIndic(reference.second)}",
+                // The locale's own digits, like every other number the app prints. It used to be
+                // Arabic-Indic unconditionally, to match the roundels on the page — but the
+                // roundels are Quran text and this is a reference, and under an English UI it put
+                // «٢:٦٧» next to the player bar's "Ayah 67" (task 4a, concern 4).
+                "${format.localizedDigits(reference.first)}:${format.localizedDigits(reference.second)}",
                 style = TaqwaText.caption.copy(fontSize = 12.sp),
                 color = colors.accent,
                 maxLines = 1,
@@ -542,7 +550,7 @@ private fun ReferencePill(
             )
             Box(Modifier.width(1.dp).height(16.dp).background(colors.hairline))
             AyahActionButton(
-                glyph = { tint -> if (!playing) drawSpeaker(tint) },
+                glyph = { tint -> if (!playing) drawSpeaker(tint, pointsForward = !mirrored) },
                 label = null,
                 onClick = onPlay,
                 contentDescription = stringResource(Res.string.recitation_play),

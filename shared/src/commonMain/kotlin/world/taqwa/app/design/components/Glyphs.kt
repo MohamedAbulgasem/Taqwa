@@ -136,27 +136,34 @@ internal fun DrawScope.drawPlus(tint: Color) {
  * The waves are drawn as quadratic curves rather than arc sweeps so they keep the same rounded
  * stroke as every other glyph here, and the outer one is longer than the inner one, which is what
  * makes the pair read as sound rather than as brackets.
+ *
+ * **[pointsForward] mirrors it**, for the reason [drawSkip] and [drawChevron] take the same
+ * parameter: the shape is drawn from literal coordinates, a `DrawScope` has no direction to
+ * consult, and a speaker is one of the glyphs both platforms' guidance mirrors under a
+ * right-to-left interface — the cone should open the way the reading does. The equaliser beside
+ * it is not mirrored: three bars have no direction to be wrong about.
  */
-internal fun DrawScope.drawSpeaker(tint: Color) {
+internal fun DrawScope.drawSpeaker(tint: Color, pointsForward: Boolean = true) {
     val u = size.width / 16f
+    fun x(value: Float) = (if (pointsForward) value else 16f - value) * u
     val cone = Path().apply {
-        moveTo(2.4f * u, 6.2f * u)
-        lineTo(5f * u, 6.2f * u)
-        lineTo(8.3f * u, 3.1f * u)
-        lineTo(8.3f * u, 12.9f * u)
-        lineTo(5f * u, 9.8f * u)
-        lineTo(2.4f * u, 9.8f * u)
+        moveTo(x(2.4f), 6.2f * u)
+        lineTo(x(5f), 6.2f * u)
+        lineTo(x(8.3f), 3.1f * u)
+        lineTo(x(8.3f), 12.9f * u)
+        lineTo(x(5f), 9.8f * u)
+        lineTo(x(2.4f), 9.8f * u)
         close()
     }
     drawPath(cone, tint, style = glyphStroke())
     val inner = Path().apply {
-        moveTo(10.7f * u, 6.1f * u)
-        quadraticTo(12.1f * u, 8f * u, 10.7f * u, 9.9f * u)
+        moveTo(x(10.7f), 6.1f * u)
+        quadraticTo(x(12.1f), 8f * u, x(10.7f), 9.9f * u)
     }
     drawPath(inner, tint, style = glyphStroke())
     val outer = Path().apply {
-        moveTo(12.7f * u, 4.2f * u)
-        quadraticTo(15.2f * u, 8f * u, 12.7f * u, 11.8f * u)
+        moveTo(x(12.7f), 4.2f * u)
+        quadraticTo(x(15.2f), 8f * u, x(12.7f), 11.8f * u)
     }
     drawPath(outer, tint, style = glyphStroke())
 }

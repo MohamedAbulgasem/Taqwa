@@ -152,6 +152,9 @@ private fun RecitationHeaderButton(state: HeaderState, onClick: () -> Unit) {
         },
     )
     val live = state is HeaderState.Playing || state is HeaderState.Paused
+    // Asked of the resolved strings, not of LocalLayoutDirection: the Mushaf forces its own page
+    // to RTL whatever the interface language is, and the glyph follows the interface.
+    val mirrored = isRtlLocale()
     HeaderIconButton(
         selected = false,
         description = description,
@@ -162,7 +165,7 @@ private fun RecitationHeaderButton(state: HeaderState, onClick: () -> Unit) {
         if (state is HeaderState.Playing) {
             Equaliser(tint, size = 17.dp)
         } else {
-            Canvas(Modifier.size(18.dp)) { drawSpeaker(tint) }
+            Canvas(Modifier.size(18.dp)) { drawSpeaker(tint, pointsForward = !mirrored) }
         }
     }
 }

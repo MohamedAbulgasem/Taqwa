@@ -29,6 +29,7 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.drawBookmark
 import world.taqwa.app.design.components.drawSpeaker
+import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.feature.recitation.PlayingMark
 import world.taqwa.app.design.components.drawCopy
 import world.taqwa.app.design.components.drawShare
@@ -78,6 +79,8 @@ fun AyahActions(
         copied = false
     }
 
+    // See ReaderHeader: the interface's direction, not the subtree's.
+    val mirrored = isRtlLocale()
     Row(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -85,7 +88,7 @@ fun AyahActions(
         // First in the row, before bookmark (spec 3a §5.2): it is the action that does something
         // to the ayah rather than something with it, and it is the one the whole slice is for.
         AyahActionButton(
-            glyph = { tint -> if (!playing) drawSpeaker(tint) },
+            glyph = { tint -> if (!playing) drawSpeaker(tint, pointsForward = !mirrored) },
             label = stringResource(Res.string.recitation_play),
             onClick = onPlay,
             // The equaliser is a composable, not a path, so it is drawn over the glyph slot
