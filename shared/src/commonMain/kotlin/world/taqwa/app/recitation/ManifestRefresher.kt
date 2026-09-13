@@ -24,6 +24,13 @@ class ManifestRefresher(
     private val store: DataStore<Preferences>,
     private val fetch: suspend (String) -> ByteArray? = { httpGet(it) },
     private val now: () -> Long = { Clock.System.now().toEpochMilliseconds() },
+    /**
+     * Whether the reader has ever used recitation (privacy spec §2.3). False means return before
+     * reading or writing anything: an install that never opens recitation never opens a socket,
+     * and never records an "attempt" either, so the first engaged launch fetches at once rather
+     * than a day later.
+     */
+    private val engaged: suspend () -> Boolean = { true },
 ) {
 
     /**
@@ -34,6 +41,7 @@ class ManifestRefresher(
      * it would otherwise freeze the catalogue until the calendar caught up.
      */
     suspend fun refreshIfStale() {
+        if (!engaged()) return
         val last = store.data.first()[SettingsKeys.RECITATION_MANIFEST_CHECKED] ?: 0L
         val at = now()
         if (at - last in 0 until INTERVAL_MILLIS) return
