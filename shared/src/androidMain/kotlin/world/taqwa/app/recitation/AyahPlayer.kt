@@ -1,0 +1,155 @@
+package world.taqwa.app.recitation
+
+import androidx.media3.common.C
+import androidx.media3.common.ForwardingPlayer
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+
+/**
+ * The queue seen as *ayahs*, for every control the app does not draw itself: the media
+ * notification, the lock screen, a headset button, Bluetooth and Android Auto.
+ *
+ * The player underneath holds `[ayah, gap, ayah, gap, …]` (see [RecitationQueue]), and Media3's
+ * own Previous and Next step one **item**. On a device that means the lock screen's Previous lands
+ * on a 300 ms silence and runs straight back into the ayah it was meant to leave — so from the
+ * lock screen you cannot go back an ayah at all, while the app's own bar, which goes through
+ * [RecitationQueue], does it in one press. This class is what makes those two the same button.
+ *
+ * It does three things and nothing else:
+ *
+ * 1. **Previous and Next are ayah moves**, decided by [RecitationQueue] itself rather than by a
+ *    second copy of the rule — previous within the first two seconds of an ayah goes back one,
+ *    later restarts the ayah, and a press during a gap restarts the ayah that just ended.
+ * 2. **The gaps are invisible.** While one plays, the current item, position and duration reported
+ *    are the ayah that just ended, so the notification neither blinks nor rewinds between ayahs.
+ * 3. **Previous and Next are always offered** while there is a queue, exactly as the bar offers
+ *    them: at the last ayah Next does nothing, which is what the bar does too.
+ *
+ * The queue is rebuilt from the timeline rather than passed in: the gap items name themselves
+ * ([SILENCE_SCHEME]), the service is the only thing holding the player, and a copy of the queue
+ * kept on this side would be one more thing that can fall out of step with the app's.
+ */
+@UnstableApi
+class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
+
+    /**
+     * How long the ayah that is playing — or has just played — runs for. Held because a gap cannot
+     * be asked for the duration of the item before it: the platform's clock during those 300 ms is
+     * the silence's own.
+     */
+    private var lastAyahDurationMs = 0L
+
+    init {
+        real.addListener(object : Player.Listener {
+            override fun onEvents(player: Player, events: Player.Events) {
+                if (onGap()) return
+                val duration = real.duration
+                if (duration != C.TIME_UNSET && duration > 0L) lastAyahDurationMs = duration
+            }
+        })
+    }
+
+    // ── what the session is told ────────────────────────────────────────────────────────────
+
+    override fun getCurrentMediaItemIndex(): Int = ayahIndex()
+
+    override fun getCurrentPeriodIndex(): Int = ayahIndex()
+
+    override fun getCurrentMediaItem(): MediaItem? =
+        if (onGap()) real.getMediaItemAt(ayahIndex()) else real.currentMediaItem
+
+    override fun getCurrentPosition(): Long = if (onGap()) lastAyahDurationMs else real.currentPosition
+
+    override fun getContentPosition(): Long = if (onGap()) lastAyahDurationMs else real.contentPosition
+
+    override fun getBufferedPosition(): Long = if (onGap()) lastAyahDurationMs else real.bufferedPosition
+
+    override fun getDuration(): Long = if (onGap()) lastAyahDurationMs else real.duration
+
+    override fun getContentDuration(): Long = if (onGap()) lastAyahDurationMs else real.contentDuration
+
+    // ── what the session may ask for ────────────────────────────────────────────────────────
+
+    override fun getAvailableCommands(): Player.Commands {
+        val commands = real.availableCommands
+        if (queue() == null) return commands
+        // Constant for the life of a queue, and deliberately so: a Next that comes and goes at the
+        // last ayah would be a button moving under the reader's thumb, and the bar does not do
+        // that either. At the last ayah it simply does nothing.
+        return commands.buildUpon()
+            .addAll(
+                Player.COMMAND_SEEK_TO_PREVIOUS,
+                Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM,
+                Player.COMMAND_SEEK_TO_NEXT,
+                Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
+            )
+            .build()
+    }
+
+    override fun isCommandAvailable(command: Int): Boolean = availableCommands.contains(command)
+
+    override fun hasNextMediaItem(): Boolean =
+        queue()?.let { it.next(real.currentMediaItemIndex) != null } == true
+
+    override fun hasPreviousMediaItem(): Boolean = queue() != null
+
+    // ── the two buttons ─────────────────────────────────────────────────────────────────────
+
+    override fun seekToPrevious() = previousAyah()
+
+    override fun seekToPreviousMediaItem() = previousAyah()
+
+    override fun seekToNext() = nextAyah()
+
+    override fun seekToNextMediaItem() = nextAyah()
+
+    private fun previousAyah() {
+        val queue = queue() ?: return
+        val at = real.currentMediaItemIndex
+        // A gap's own clock is not the ayah's, so it counts as zero and the rule restarts the ayah
+        // that has just been read — the same answer `RecitationPlayer.previous` gives the bar.
+        val position = if (queue.isGap(at)) 0L else real.currentPosition
+        real.seekTo(queue.previous(at, position), 0L)
+    }
+
+    private fun nextAyah() {
+        val queue = queue() ?: return
+        val target = queue.next(real.currentMediaItemIndex) ?: return
+        real.seekTo(target, 0L)
+    }
+
+    // ── the queue, read off the timeline ────────────────────────────────────────────────────
+
+    /**
+     * The same arithmetic the app's bar uses, over the same shape of queue. Only the count and
+     * whether there are gaps can be read off a timeline, and only those two are needed: ayah
+     * *numbers* never reach the session, and the indices are all this class moves between.
+     */
+    private fun queue(): RecitationQueue? {
+        val count = real.mediaItemCount
+        if (count == 0) return null
+        val gapped = count > 1 && isGapItem(1)
+        val ayahs = if (gapped) (count + 1) / 2 else count
+        return RecitationQueue(
+            surah = 0,
+            ayahs = (1..ayahs).toList(),
+            gapMs = if (gapped) 1L else 0L,
+        )
+    }
+
+    private fun isGapItem(index: Int): Boolean =
+        real.getMediaItemAt(index).mediaId.startsWith("$SILENCE_SCHEME://")
+
+    private fun onGap(): Boolean {
+        val queue = queue() ?: return false
+        return queue.isGap(real.currentMediaItemIndex)
+    }
+
+    /** The queue index of the ayah being heard: itself, or the one a gap follows. */
+    private fun ayahIndex(): Int {
+        val at = real.currentMediaItemIndex
+        val queue = queue() ?: return at
+        return if (queue.isGap(at)) (at - 1).coerceAtLeast(0) else at
+    }
+}

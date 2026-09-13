@@ -66,7 +66,11 @@ class RecitationService : MediaSessionService() {
             )
             .setHandleAudioBecomingNoisy(true)
             .build()
-        session = MediaSession.Builder(this, player).setCallback(Callback()).build()
+        // Wrapped, never the raw ExoPlayer: the queue underneath is `[ayah, gap, ayah, …]`, and
+        // Media3's own Previous and Next step one item — which from the lock screen means stepping
+        // onto a 300 ms silence instead of going back an ayah. [AyahPlayer] is the same
+        // `RecitationQueue` rule the app's own bar uses, applied to everything outside the app.
+        session = MediaSession.Builder(this, AyahPlayer(player)).setCallback(Callback()).build()
         // Media3's own default small icon is a generic music note. The status bar should say
         // Taqwa, and the mark the prayer notifications already use is the one it should say it
         // with; `:androidApp` puts the id there in `TaqwaApplication.onCreate`.
