@@ -75,7 +75,7 @@ Total mirrored: about 6.9 GB. Two Egyptian classical voices (Husary, Minshawi), 
 
 ```
 magic "TAQA" (4 bytes) · version u8 · reserved (3) · index length u32
-index: JSON  {"reciter":"ar.alafasy","surah":2,"bitrate":64,"ayahs":[{"n":1,"off":0,"len":31872},…]}
+index: JSON  {"reciter":"ar.alafasy","surah":2,"kbps":64,"ayahs":[{"n":1,"off":0,"len":31872},…]}
 data: the MP3 files back to back, in ayah order
 ```
 
@@ -183,3 +183,12 @@ Answers to §0, plus two design corrections. This section governs where it diffe
 8. **Slice 3a** as in §9 **plus "Download the whole Quran" for a reciter** (queue all 114 surahs, total size stated first, cancellable, survives the app being backgrounded). Word-level highlighting, repeat, speed and the sleep timer remain 3b.
 
 **Lock-screen and media-notification artwork is the Taqwa app icon**, not the reciter's monogram; the monogram is an in-app device only. Version for 3a: **0.11.0 (13)**.
+
+## 13. Amendments during the build (13 September)
+
+- **Container index key** is `kbps`, not `bitrate` (§4 sketch corrected above); `TaqaIndex` and the pipeline agree.
+- **Source fallback rule.** Where `cdn.islamic.network` answered a persistent HTTP 502 for an ayah (about sixty across Alafasy, Abdul Basit, Husary and Minshawi), the pipeline took that ayah from the everyayah.com mirror at the same bitrate, but only after proving for that reciter that three ayahs already held from both sources decode to identical audio, i.e. the same masters. A reciter whose mirror copy is a different encode (Shuraim) gets no fallback and would be dropped rather than patched. Recorded per reciter in the pipeline report and in `Taqwa-data`'s README.
+- **Manifest in force** is whichever of the bundled and cached manifests was generated later, so a fresh install with a newer bundle is not downgraded by an old cache.
+- **Speaker glyph mirrors under RTL** (Material's convention for volume icons); the equaliser does not.
+- **Batch cancel** lives on the Recitation screen; the download sheet's Cancel stops the one surah it shows. Noted for 3b: a batch's sheet should offer to cancel the batch.
+- **Withdrawn reciter's files** stay on disk and in the storage total but lose their card; offering to delete them is 3b.
