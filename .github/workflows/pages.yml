@@ -5,7 +5,7 @@ name: Website
 on:
   push:
     branches: [main]
-    paths: ["site/**", "PRIVACY.md", "PRIVACY.ar.md", ".github/workflows/pages.yml"]
+    paths: ["site/**", "PRIVACY.md", "PRIVACY.*.md", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:

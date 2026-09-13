@@ -1,0 +1,30 @@
+{
+  "endonym": "Türkçe",
+  "dir": "ltr",
+  "og_locale": "tr_TR",
+  "brand_label": "Taqwa ana sayfası",
+  "nav_label": "Site",
+  "footer_label": "Alt bilgi",
+  "nav_privacy": "Gizlilik",
+  "nav_support": "Destek",
+  "languages_label": "Dil",
+  "copyright": "© 2026 Mohamed Abulgasem",
+  "policy_file": "PRIVACY.tr.md",
+  "pages": {
+    "home": {
+      "title": "Taqwa · Namaz vakitleri, kıble ve Kur'an",
+      "og_title": "Taqwa",
+      "description": "Android ve iPhone için ücretsiz bir İslami uygulama: namaz vakitleri, ezan bildirimleri, kıble, tilavetiyle Kur'an ve tesbih. Reklam yok, hesap yok, tasarımı gereği çevrimdışı."
+    },
+    "support": {
+      "title": "Destek · Taqwa",
+      "og_title": "Taqwa desteği",
+      "description": "Taqwa'daki bir sorunu nasıl bildirirsiniz, bir namaz vakti yanlış göründüğünde neye bakarsınız ve verileriniz nasıl ele alınır."
+    },
+    "privacy": {
+      "title": "Gizlilik politikası · Taqwa",
+      "og_title": "Taqwa gizlilik politikası",
+      "description": "Taqwa'nın telefonunuzda ne sakladığı, interneti kullandığı tek şey ve asla yapmadıkları."
+    }
+  }
+}

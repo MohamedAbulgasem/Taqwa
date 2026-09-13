@@ -56,7 +56,21 @@ html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] .lab
 html[lang="ar"] h1 { line-height: 1.3; }
 html[lang="ar"] .label { font-size: 12px; font-weight: 700; }
 html[lang="ar"] .brand, html[lang="ar"] [lang="en"] { font-family: var(--font); }
-html[lang="en"] .nav .switch { font-family: var(--font-ar); }
+/* Urdu and Bengali pages: the system face too — Manrope has neither script — and no tracking. */
+html[lang="ur"] body, html[lang="bn"] body { font-family: var(--font-ar); }
+html[lang="ur"] h1, html[lang="ur"] h2, html[lang="ur"] h3, html[lang="ur"] .label,
+html[lang="bn"] h1, html[lang="bn"] h2, html[lang="bn"] h3, html[lang="bn"] .label { letter-spacing: 0; }
+html[lang="ur"] h1, html[lang="bn"] h1 { line-height: 1.35; }
+html[lang="ur"] .brand, html[lang="bn"] .brand, html[lang="ur"] [lang="en"], html[lang="bn"] [lang="en"] { font-family: var(--font); }
+html[lang="ur"] body { line-height: 1.9; }
+
+/* The language picker under the header: every language in its own name and its own face, the
+   current one marked. A row that wraps on a phone rather than a menu that hides the others. */
+.langs { display: flex; flex-wrap: wrap; gap: 4px 14px; padding-top: 0; padding-bottom: 8px; font-size: 14px; }
+.langs a, .langs span { padding: 2px 0; color: var(--t2); }
+.langs span[aria-current] { color: var(--t1); font-weight: 700; border-bottom: 2px solid var(--accent); }
+.langs [lang="ar"], .langs [lang="ur"] { font-family: var(--font-ar); }
+.langs [lang="bn"] { font-family: var(--font-ar); }
 /* A Latin URL or address inside Arabic prose is one isolated run, so the sentence's own
    punctuation stays with the sentence instead of jumping to the URL's far end. */
 html[dir="rtl"] a, html[dir="rtl"] code { unicode-bidi: isolate; direction: ltr; display: inline-block; max-width: 100%; overflow-wrap: anywhere; }

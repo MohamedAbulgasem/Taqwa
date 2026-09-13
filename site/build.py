@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Builds taqwa.world into _site/.
 
-Two languages from one set of templates. Each page is a body fragment under site/pages/<lang>/
-(home, support) or a Markdown file at the repository root (PRIVACY.md, PRIVACY.ar.md — the same
-text the app's About link and GitHub show), wrapped in site/templates/base.html with that
-language's header and footer. English lives at the root, Arabic under /ar/, and every page links
-to its twin in the other language.
+Seven languages from one set of templates. Each language is a directory under site/pages/<lang>/
+holding a meta.json (titles, labels, direction, the policy file it uses) and the page bodies
+(home.html, support.html); the privacy page is rendered from the Markdown policy at the
+repository root (PRIVACY.md, PRIVACY.<lang>.md — the same text the app's About link and GitHub
+show). Every page is wrapped in site/templates/base.html with that language's header and footer,
+English lives at the root and every other language under /<lang>/, and every page links to its
+twin in every other language through the language picker and the hreflang alternates.
 
     python3 site/build.py            # writes _site/ next to the repo root
     python3 site/build.py --check    # builds, then fails if any local link is dangling
@@ -13,6 +15,7 @@ to its twin in the other language.
 Needs the `markdown` package (pip install markdown); the Pages workflow installs it.
 """
 import html
+import json
 import os
 import re
 import shutil
@@ -27,55 +30,24 @@ ORIGIN = "https://taqwa.world"
 
 SKIP = {"build.py", "templates", "pages", "README.md"}
 
-LANGS = {
-    "en": {
-        "dir": "ltr",
-        "prefix": "",
-        "og_locale": "en_GB",
-        "brand_label": "Taqwa home",
-        "nav_label": "Site",
-        "footer_label": "Footer",
-        "nav_privacy": "Privacy",
-        "nav_support": "Support",
-        "switch_lang": "ar",
-        "switch_label": "العربية",
-        "copyright": "© 2026 Mohamed Abulgasem",
-        "policy_file": "PRIVACY.md",
-        "pages": {
-            "home": {"title": "Taqwa · Prayer times, Qibla and the Quran", "og_title": "Taqwa",
-                     "description": "A free Islamic app for Android and iPhone: prayer times, adhan notifications, Qibla, the Quran with recitation, and a tasbeeh. No ads, no account, offline by design."},
-            "support": {"title": "Support · Taqwa", "og_title": "Taqwa support",
-                        "description": "How to report a problem with Taqwa, what to check when a prayer time looks wrong, and how your data is handled."},
-            "privacy": {"title": "Privacy policy · Taqwa", "og_title": "Taqwa privacy policy",
-                        "description": "What Taqwa stores on your phone, the one thing it uses the internet for, and what it never does."},
-        },
-    },
-    "ar": {
-        "dir": "rtl",
-        "prefix": "ar/",
-        "og_locale": "ar_LY",
-        "brand_label": "الصفحة الرئيسية لتقوى",
-        "nav_label": "الموقع",
-        "footer_label": "التذييل",
-        "nav_privacy": "الخصوصية",
-        "nav_support": "الدعم",
-        "switch_lang": "en",
-        "switch_label": "English",
-        "copyright": "© 2026 محمد أبو القاسم",
-        "policy_file": "PRIVACY.ar.md",
-        "pages": {
-            "home": {"title": "تقوى · مواقيت الصلاة والقبلة والقرآن", "og_title": "تقوى",
-                     "description": "تطبيق إسلامي مجاني لأندرويد وآيفون: مواقيت الصلاة، وإشعارات الأذان، والقبلة، والقرآن مع التلاوة، والتسبيح. بلا إعلانات ولا حساب، ودون اتصال بالتصميم."},
-            "support": {"title": "الدعم · تقوى", "og_title": "دعم تقوى",
-                        "description": "كيف تبلّغ عن مشكلة في تقوى، وما تراجعه حين يبدو وقت صلاة خاطئًا، وكيف تُعامل بياناتك."},
-            "privacy": {"title": "سياسة الخصوصية · تقوى", "og_title": "سياسة خصوصية تقوى",
-                        "description": "ما يخزّنه تقوى على هاتفك، والشيء الوحيد الذي يستخدم الإنترنت لأجله، وما لا يفعله أبدًا."},
-        },
-    },
-}
+# The order the picker lists them in: English first, then the app's own order.
+LANGUAGE_ORDER = ["en", "ar", "fr", "tr", "id", "ur", "bn"]
 
 # Output directory per page, relative to the language root ("" is the language's home).
 PAGE_DIRS = {"home": "", "support": "support/", "privacy": "privacy/"}
+
+
+def load_languages() -> dict:
+    langs = {}
+    for lang in LANGUAGE_ORDER:
+        path = os.path.join(SITE, "pages", lang, "meta.json")
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as f:
+            cfg = json.load(f)
+        cfg["prefix"] = "" if lang == "en" else f"{lang}/"
+        langs[lang] = cfg
+    return langs
 
 
 def copy_static() -> None:
@@ -123,27 +95,44 @@ def render_markdown(path: str) -> str:
     return f'<main class="wrap prose">\n{page}{body}\n</main>\n'
 
 
-def page_body(lang: str, page: str) -> str:
+def page_body(langs: dict, lang: str, page: str) -> str:
     if page == "privacy":
-        return render_markdown(os.path.join(ROOT, LANGS[lang]["policy_file"]))
+        return render_markdown(os.path.join(ROOT, langs[lang]["policy_file"]))
     with open(os.path.join(SITE, "pages", lang, f"{page}.html"), encoding="utf-8") as f:
         return f.read()
 
 
-def build_page(lang: str, page: str, template: str) -> None:
-    cfg = LANGS[lang]
+def build_page(langs: dict, lang: str, page: str, template: str) -> None:
+    cfg = langs[lang]
     out_dir = cfg["prefix"] + PAGE_DIRS[page]                 # e.g. "ar/support/"
     depth = out_dir.count("/")
     root = "../" * depth                                       # to the site root
     lang_root = "../" * PAGE_DIRS[page].count("/")             # to this language's home
-    other = LANGS[cfg["switch_lang"]]
+
+    def twin(other: str) -> str:
+        """This page in another language, relative to this one."""
+        path = langs[other]["prefix"] + PAGE_DIRS[page]
+        return (root + path) if path else (root or "./")
+
     links = {
         "root": root,
         "home": lang_root or "./",
         "privacy": lang_root + "privacy/" if page != "privacy" else "./",
         "support": lang_root + "support/" if page != "support" else "./",
-        "switch_href": root + other["prefix"] + PAGE_DIRS[page] if (other["prefix"] + PAGE_DIRS[page]) else root or "./",
     }
+    # The picker: every language, the current one marked and not a link. Each entry carries its
+    # own lang so the browser picks a face for it, and the endonym is what a reader looking for
+    # their language recognises.
+    picker = []
+    for other, other_cfg in langs.items():
+        if other == lang:
+            picker.append(f'<span aria-current="true" lang="{other}">{other_cfg["endonym"]}</span>')
+        else:
+            picker.append(f'<a href="{twin(other)}" lang="{other}" hreflang="{other}">{other_cfg["endonym"]}</a>')
+    alternates = "\n".join(
+        f'  <link rel="alternate" hreflang="{other}" href="{ORIGIN}/{langs[other]["prefix"]}{PAGE_DIRS[page]}">'
+        for other in langs
+    ) + f'\n  <link rel="alternate" hreflang="x-default" href="{ORIGIN}/{PAGE_DIRS[page]}">'
     meta = cfg["pages"][page]
     canonical = f"{ORIGIN}/{out_dir}"
     values = {
@@ -154,21 +143,20 @@ def build_page(lang: str, page: str, template: str) -> None:
         "description": meta["description"],
         "og_locale": cfg["og_locale"],
         "canonical": canonical,
-        "alt_en": f"{ORIGIN}/{LANGS['en']['prefix']}{PAGE_DIRS[page]}",
-        "alt_ar": f"{ORIGIN}/{LANGS['ar']['prefix']}{PAGE_DIRS[page]}",
+        "alternates": alternates,
         "brand_label": cfg["brand_label"],
         "nav_label": cfg["nav_label"],
         "footer_label": cfg["footer_label"],
         "nav_privacy": cfg["nav_privacy"],
         "nav_support": cfg["nav_support"],
-        "switch_lang": cfg["switch_lang"],
-        "switch_label": cfg["switch_label"],
+        "languages_label": cfg["languages_label"],
+        "language_links": "\n    ".join(picker),
         "privacy_current": ' aria-current="page"' if page == "privacy" else "",
         "support_current": ' aria-current="page"' if page == "support" else "",
         "copyright": cfg["copyright"],
         **links,
     }
-    body = page_body(lang, page)
+    body = page_body(langs, lang, page)
     for key, value in links.items():
         body = body.replace("{" + key + "}", value)
     values["body"] = body
@@ -208,14 +196,15 @@ def check_links() -> int:
 
 
 if __name__ == "__main__":
+    langs = load_languages()
     copy_static()
     with open(os.path.join(SITE, "templates", "base.html"), encoding="utf-8") as f:
         template = f.read()
-    for lang in LANGS:
+    for lang in langs:
         for page in PAGE_DIRS:
-            build_page(lang, page, template)
+            build_page(langs, lang, page, template)
     pages = sum(1 for _, _, files in os.walk(OUT) for f in files if f.endswith(".html"))
-    print(f"built _site: {pages} pages")
+    print(f"built _site: {pages} pages in {len(langs)} languages ({', '.join(langs)})")
     if "--check" in sys.argv:
         broken = check_links()
         print("links: all local links resolve" if not broken else f"links: {broken} problems")

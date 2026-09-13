@@ -1,0 +1,30 @@
+{
+  "endonym": "Français",
+  "dir": "ltr",
+  "og_locale": "fr_FR",
+  "brand_label": "Accueil de Taqwa",
+  "nav_label": "Site",
+  "footer_label": "Pied de page",
+  "nav_privacy": "Confidentialité",
+  "nav_support": "Assistance",
+  "languages_label": "Langue",
+  "copyright": "© 2026 Mohamed Abulgasem",
+  "policy_file": "PRIVACY.fr.md",
+  "pages": {
+    "home": {
+      "title": "Taqwa · Horaires de prière, qibla et Coran",
+      "og_title": "Taqwa",
+      "description": "Une application islamique gratuite pour Android et iPhone : horaires de prière, notifications de l’adhan, qibla, le Coran avec la récitation, et un tasbih. Sans publicité, sans compte, hors ligne par conception."
+    },
+    "support": {
+      "title": "Assistance · Taqwa",
+      "og_title": "Assistance Taqwa",
+      "description": "Comment signaler un problème dans Taqwa, que vérifier lorsqu’un horaire de prière semble faux, et comment vos données sont traitées."
+    },
+    "privacy": {
+      "title": "Politique de confidentialité · Taqwa",
+      "og_title": "Politique de confidentialité de Taqwa",
+      "description": "Ce que Taqwa enregistre sur votre téléphone, la seule chose pour laquelle il utilise Internet, et ce qu’il ne fait jamais."
+    }
+  }
+}

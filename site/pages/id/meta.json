@@ -1,0 +1,30 @@
+{
+  "endonym": "Bahasa Indonesia",
+  "dir": "ltr",
+  "og_locale": "id_ID",
+  "brand_label": "Beranda Taqwa",
+  "nav_label": "Situs",
+  "footer_label": "Kaki halaman",
+  "nav_privacy": "Privasi",
+  "nav_support": "Dukungan",
+  "languages_label": "Bahasa",
+  "copyright": "© 2026 Mohamed Abulgasem",
+  "policy_file": "PRIVACY.id.md",
+  "pages": {
+    "home": {
+      "title": "Taqwa · Waktu salat, kiblat, dan Al-Qur'an",
+      "og_title": "Taqwa",
+      "description": "Aplikasi Islami gratis untuk Android dan iPhone: waktu salat, notifikasi azan, kiblat, Al-Qur'an dengan tilawah, dan tasbih. Tanpa iklan, tanpa akun, offline sejak dirancang."
+    },
+    "support": {
+      "title": "Dukungan · Taqwa",
+      "og_title": "Dukungan Taqwa",
+      "description": "Cara melaporkan masalah pada Taqwa, apa yang perlu diperiksa saat sebuah waktu salat terlihat keliru, dan bagaimana data Anda diperlakukan."
+    },
+    "privacy": {
+      "title": "Kebijakan privasi · Taqwa",
+      "og_title": "Kebijakan privasi Taqwa",
+      "description": "Apa yang Taqwa simpan di ponsel Anda, satu-satunya hal yang membuatnya memakai internet, dan apa yang tidak pernah dilakukannya."
+    }
+  }
+}

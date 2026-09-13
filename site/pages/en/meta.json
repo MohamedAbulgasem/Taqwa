@@ -1,0 +1,30 @@
+{
+  "endonym": "English",
+  "dir": "ltr",
+  "og_locale": "en_GB",
+  "brand_label": "Taqwa home",
+  "nav_label": "Site",
+  "footer_label": "Footer",
+  "nav_privacy": "Privacy",
+  "nav_support": "Support",
+  "languages_label": "Language",
+  "copyright": "© 2026 Mohamed Abulgasem",
+  "policy_file": "PRIVACY.md",
+  "pages": {
+    "home": {
+      "title": "Taqwa · Prayer times, Qibla and the Quran",
+      "og_title": "Taqwa",
+      "description": "A free Islamic app for Android and iPhone: prayer times, adhan notifications, Qibla, the Quran with recitation, and a tasbeeh. No ads, no account, offline by design."
+    },
+    "support": {
+      "title": "Support · Taqwa",
+      "og_title": "Taqwa support",
+      "description": "How to report a problem with Taqwa, what to check when a prayer time looks wrong, and how your data is handled."
+    },
+    "privacy": {
+      "title": "Privacy policy · Taqwa",
+      "og_title": "Taqwa privacy policy",
+      "description": "What Taqwa stores on your phone, the one thing it uses the internet for, and what it never does."
+    }
+  }
+}
