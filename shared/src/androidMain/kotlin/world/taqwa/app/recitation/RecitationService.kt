@@ -1,6 +1,8 @@
 package world.taqwa.app.recitation
 
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.os.Bundle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -50,6 +52,46 @@ class RecitationService : MediaSessionService() {
      */
     private var nowPlaying: NowPlayingText? = null
 
+    /** Whatever the main thread has to do next; see [teardown]. */
+    private val handler = Handler(Looper.getMainLooper())
+
+    /**
+     * True once a queue has actually been set, so an empty player at start-up is not mistaken for
+     * one that has finished. Only [teardown] reads it.
+     */
+    private var loaded = false
+
+    /**
+     * The queue has been emptied — the surah read itself out, or the reader dismissed the bar.
+     * Either way there is nothing left to play, and a media session with an empty player is a
+     * foreground service and an undismissable `NO_CLEAR` notification for nothing. Media3 takes
+     * the notification down on its own; the service and the session it holds are ours to end.
+     *
+     * `stopSelf()` alone would not do it, for the reason [onTaskRemoved] sets out at length: a
+     * service that is both started and bound goes only when it is both stopped and unbound, and
+     * this app's own `MediaController` lives in `AppContainer`. Releasing the session first is
+     * what disconnects it.
+     *
+     * Posted, not run here: this arrives inside a player callback, and releasing the player from
+     * inside one of its own callbacks is not something to ask of it. The re-check on the other
+     * side of the post is what lets a load that arrives in between win.
+     */
+    private val teardown = object : Player.Listener {
+        override fun onEvents(player: Player, events: Player.Events) {
+            if (player.mediaItemCount > 0) {
+                loaded = true
+                return
+            }
+            if (!loaded) return
+            loaded = false
+            handler.post {
+                if (session?.player?.mediaItemCount != 0) return@post
+                releaseSession()
+                stopSelf()
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         val paths = createRecitationPaths()
@@ -66,6 +108,7 @@ class RecitationService : MediaSessionService() {
             )
             .setHandleAudioBecomingNoisy(true)
             .build()
+        player.addListener(teardown)
         // Wrapped, never the raw ExoPlayer: the queue underneath is `[ayah, gap, ayah, …]`, and
         // Media3's own Previous and Next step one item — which from the lock screen means stepping
         // onto a 300 ms silence instead of going back an ayah. [AyahPlayer] is the same

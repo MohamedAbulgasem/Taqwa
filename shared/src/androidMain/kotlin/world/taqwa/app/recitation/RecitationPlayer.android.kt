@@ -60,6 +60,14 @@ actual class RecitationPlayer actual constructor(
     private var ayahPositionMs = 0L
     private var ayahDurationMs = 0L
 
+    /**
+     * True from the moment the last ayah has played out until the teardown it starts has finished.
+     * The end arrives inside a player callback, and the teardown it wants — stop the player, drop
+     * the queue, let go of the controller — cannot be run from inside one; it is posted instead,
+     * and this is what stops the several events that follow the end posting it again.
+     */
+    private var ending = false
+
     private val listener = object : Player.Listener {
         override fun onEvents(player: Player, events: Player.Events) = publish()
     }
@@ -97,6 +105,7 @@ actual class RecitationPlayer actual constructor(
         reciterId = reciter.id
         ayahPositionMs = 0L
         ayahDurationMs = 0L
+        ending = false
 
         bound.sendCustomCommand(
             SessionCommand(RecitationService.COMMAND_NOW_PLAYING, Bundle.EMPTY),
@@ -113,7 +122,6 @@ actual class RecitationPlayer actual constructor(
 
     actual fun play() {
         val bound = live ?: return
-        if (bound.playbackState == Player.STATE_ENDED) bound.seekTo(0, 0L)
         bound.play()
     }
 
@@ -147,6 +155,7 @@ actual class RecitationPlayer actual constructor(
     actual fun stop() {
         ticker?.cancel()
         ticker = null
+        ending = false
         queue = null
         reciterId = null
         live?.let { bound ->
@@ -216,6 +225,10 @@ actual class RecitationPlayer actual constructor(
         val bound = live
         val built = queue
         if (bound == null || built == null || bound.mediaItemCount == 0) return
+        if (bound.playbackState == Player.STATE_ENDED) {
+            end()
+            return
+        }
         val at = bound.currentMediaItemIndex
         val gap = built.isGap(at)
         if (!gap) {
@@ -238,6 +251,25 @@ actual class RecitationPlayer actual constructor(
             buffering = bound.playbackState == Player.STATE_BUFFERING,
         )
         if (bound.isPlaying) startTicker() else stopTicker()
+    }
+
+    /**
+     * The surah has read itself out. There is nothing left to play, so the bar, the media session
+     * and the foreground service all go — the same teardown the bar's × performs, because a
+     * player with an empty queue is what takes the notification down and lets the service be
+     * destroyed. A surah that simply ended used to leave all three standing: a `NO_CLEAR`
+     * notification and a foreground service, indefinitely, for a player with nothing to play.
+     *
+     * Posted rather than run here. This is reached from a `Player.Listener` callback, and stopping
+     * the controller and dropping it from inside one is exactly the re-entrancy Media3's listener
+     * set is not there to survive; `Dispatchers.Main` (not the scope's `immediate`) is what makes
+     * it the next thing the main thread does instead of a nested one.
+     */
+    private fun end() {
+        if (ending) return
+        ending = true
+        stopTicker()
+        scope.launch(Dispatchers.Main) { stop() }
     }
 
     private fun startTicker() {

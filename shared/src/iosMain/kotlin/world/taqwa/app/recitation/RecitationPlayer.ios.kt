@@ -123,9 +123,6 @@ actual class RecitationPlayer actual constructor(
     /** Set when an interruption paused us, so playback only resumes if it was our pause. */
     private var pausedByInterruption = false
 
-    /** The last ayah has played out. The queue is kept, but play starts the surah again. */
-    private var finished = false
-
     /** The app icon, made into artwork once: `UIImage` decoding is not free and it never changes. */
     private var cachedArtwork: MPMediaItemArtwork? = null
 
@@ -148,7 +145,6 @@ actual class RecitationPlayer actual constructor(
             ayahPositionMs = 0L
             ayahDurationMs = 0L
             wantsPlay = true
-            finished = false
             ensurePlayer()
             // Not inside `ensurePlayer`: `stop` removes the observers but keeps the `AVPlayer`, so
             // a second `load` would have found the player already built and gone on deaf to
@@ -165,13 +161,6 @@ actual class RecitationPlayer actual constructor(
         wantsPlay = true
         pausedByInterruption = false
         activateSession()
-        // Play at the end of the surah starts it again, as it does on Android: the last item has
-        // played to its end and `AVPlayer.play()` on a finished item does nothing at all.
-        if (finished) {
-            finished = false
-            go(0)
-            return
-        }
         // A gap is playing silence: there is no item to start, the wait simply resumes.
         if (built.isGap(at)) go(at) else player?.play()
         publish()
@@ -218,7 +207,6 @@ actual class RecitationPlayer actual constructor(
         reciterId = null
         text = null
         at = 0
-        finished = false
         MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = null
         unwireCommands()
         unobserve()
@@ -245,7 +233,6 @@ actual class RecitationPlayer actual constructor(
         val built = queue ?: return
         gapJob?.cancel()
         gapJob = null
-        finished = false
         at = index.coerceIn(0, built.size - 1)
         if (built.isGap(at)) {
             player?.pause()
@@ -283,13 +270,14 @@ actual class RecitationPlayer actual constructor(
         go(nextIndex)
     }
 
-    /** The surah is over: the queue is kept so the bar still shows it, but nothing is playing. */
-    private fun finish() {
-        wantsPlay = false
-        finished = true
-        player?.pause()
-        publish()
-    }
+    /**
+     * The surah has read itself out. Everything goes: the bar, the lock screen's now-playing
+     * entry, the remote commands and the audio session itself — the same teardown [stop] performs
+     * for the bar's ×, because a surah that has ended and one the reader has dismissed leave
+     * exactly the same nothing behind. Holding the session open for a player with nothing left to
+     * play would keep whatever was playing before recitation from having it back.
+     */
+    private fun finish() = stop()
 
     // ---- the container ----------------------------------------------------------------------
 
