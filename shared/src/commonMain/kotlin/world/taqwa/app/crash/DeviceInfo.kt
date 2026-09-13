@@ -11,3 +11,9 @@ data class DeviceInfo(
     val device: String,
     val language: String,
 )
+
+/** Read from the platform: the bundle or package for the version, the OS for the rest. */
+expect fun deviceInfo(): DeviceInfo
+
+/** What a report says when even reading the version fails; the trace is still worth having. */
+fun unknownDevice(): DeviceInfo = DeviceInfo("?", "?", "?", "?", "?")
