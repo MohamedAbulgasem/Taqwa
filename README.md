@@ -5,8 +5,15 @@
 <h1 align="center">Taqwa</h1>
 
 <p align="center">
-  Prayer times, adhan notifications and qibla.<br>
-  Free, offline by design, no ads, no accounts, no tracking.
+  Prayer times, Qibla and the Quran.<br>
+  Free forever. No ads, no account, offline by design.
+</p>
+
+<p align="center">
+  <a href="https://taqwa.world">taqwa.world</a> ·
+  <a href="https://taqwa.world/ar/">العربية</a> ·
+  <a href="PRIVACY.md">Privacy</a> ·
+  <a href="https://taqwa.world/support/">Support</a>
 </p>
 
 <p align="center">
@@ -14,71 +21,104 @@
   <img alt="Compose Multiplatform" src="https://img.shields.io/badge/Compose_Multiplatform-1.12-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Android 8.0+" src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white">
   <img alt="iOS 16+" src="https://img.shields.io/badge/iOS-16%2B-000000?logo=apple&logoColor=white">
-  <img alt="Works offline" src="https://img.shields.io/badge/works-offline-B5820B">
+  <img alt="Offline by design" src="https://img.shields.io/badge/offline-by_design-B5820B">
   <img alt="GPL-3.0" src="https://img.shields.io/badge/licence-GPL--3.0-blue">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/prayer-light.png" width="200" alt="Prayer screen, light theme: countdown ring to Fajr, the day's five prayer times, and the Qibla card">
+  <img src="docs/screenshots/prayer-light.png" width="200" alt="Prayer screen: a countdown ring to Isha, the day's five prayer times, and the Qibla card">
   &nbsp;
-  <img src="docs/screenshots/prayer-dark.png" width="200" alt="Prayer screen, dark theme">
+  <img src="docs/screenshots/mushaf.png" width="200" alt="Mushaf mode: Al-Fatihah on its page, in the Madinah Mushaf typeface">
   &nbsp;
-  <img src="docs/screenshots/qibla.png" width="200" alt="Qibla compass with the Kaaba marker on the rim and the bearing beneath">
+  <img src="docs/screenshots/recitation.png" width="200" alt="Recitation playing: the current ayah lit, and a player bar with the surah clock">
   &nbsp;
-  <img src="docs/screenshots/prayer-arabic.png" width="200" alt="Prayer screen in Arabic, laid out right to left with Arabic-Indic digits">
+  <img src="docs/screenshots/prayer-dark.png" width="200" alt="Prayer screen in the dark theme">
 </p>
 
 ---
 
-Taqwa is a small Islamic app for Android and iPhone, built from one Kotlin Multiplatform codebase. It does a few things and tries to do them properly: tell you the prayer times where you are, call you to them, point you to Makkah, and stay out of your way. Everything is computed on the phone. There is no server, no sign-in, no analytics and nothing to pay for, now or later.
+Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatform codebase. It does a few things and tries to do them properly: tell you the prayer times where you are, call you to them, point you to Makkah, and carry the Quran with recitation. Then it stays out of your way. Everything is computed on the phone. There is no server, no sign-in, no analytics and nothing to pay for, now or later.
 
 ## What it does
 
-- **Prayer times** for anywhere on Earth, from GPS or a bundled offline database of cities, with the usual calculation methods (Muslim World League, Umm al-Qura, Egyptian, Karachi, ISNA, and more), Hanafi or Standard Asr, high-latitude rules, and per-prayer manual adjustments.
+- **Prayer times** for anywhere on Earth, from your location or a bundled offline database of cities, with the usual calculation methods (Muslim World League, Umm al-Qura, Egyptian, Karachi, ISNA, and more), Hanafi or Standard Asr, high-latitude rules, and per-prayer manual adjustments.
 - **A live countdown** to the next prayer, on the Prayer screen and in home-screen widgets on both platforms. The widgets keep counting across prayers without the app being opened.
-- **An ayah widget** showing one verse a day, in the same Uthmani typeface and translation as the reader, drawn from a curated pool of a hundred that cycles without repeats. Tapping it opens that ayah in the app.
-- **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, your own phrases can be added, and nothing is ever totted up.
-- **Privacy you can check.** Settings › About Taqwa says what stays on the phone and what the internet is used for, and links the policy, the source and the licence.
-- **Notifications at the exact time**, with a choice per prayer between silence, a clear announcement tone, a takbir, or the opening of the adhan, and a choice of three adhan recordings. Optional reminder a few minutes before.
-- **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the compass needs it.
+- **Adhan at the exact time.** A notification for each prayer, with a choice per prayer between silence, a clear tone, a takbir, or the opening of the adhan in a choice of three voices. Optional reminder a few minutes before.
+- **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the phone's compass needs it, instead of a needle that pretends.
 - **Hijri date** from the tabular (arithmetic) Islamic calendar, which can differ by a day from Umm al-Qura and from local moonsighting, with a one-day adjustment to match your community; shown beside the Gregorian date.
-- **Quran reader** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation, bookmarks, and copy or share of any ayah; everything offline.
-- **Recitation** by ten reciters, downloaded a surah at a time (or the whole Quran for a reciter) and then played offline with the ayah lit and the page following the voice, in the background with lock-screen controls. A speaker button in the reader, a Play action on any ayah, a slim player bar, and a picker with a fifteen-second preview of each voice. The recordings are the Islamic Network's, mirrored unmodified on a public data repository.
+- **The Quran** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation, bookmarks, a continue-reading card, and copy or share of any ayah. All of it offline.
+- **Recitation** by ten reciters, downloaded a surah at a time (or the whole Quran for a reciter) and then played offline with the ayah lit and the page following the voice, in the background with lock-screen controls and a surah clock. A speaker button in the reader, a Play action on any ayah, previous and next by surah, and a picker with a fifteen-second preview of each voice.
+- **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, a completed set rolls over on its own, your own phrases can be added, and nothing is ever totted up.
+- **An ayah widget** showing one verse a day, in the same Uthmani typeface and translation as the reader, from a curated pool of a hundred that cycles without repeats. Tapping it opens that ayah in the app.
+- **Privacy you can check.** Settings › About Taqwa says what stays on the phone and what the internet is used for, and links the policy, the source and the licence.
 - **Arabic and English**, following the phone's language. Arabic is laid out right to left with the locale's own digits, not translated over an English layout.
 - **Light and dark**, following the system or fixed, in one amber accent.
 
-## Principles
+## On your home screen
 
-- **Zero recurring cost.** Nothing in the app contacts a server of ours; there is none. The only network use is recitation downloads from a public GitHub repository, on request. This is a hard constraint on every feature, not a preference.
-- **Your language, including the map.** The bundled city list carries names in Arabic, Indonesian, Urdu, Bengali, Turkish and French as well as English, so a city can be searched and read in either its own language or English, and the Prayer header follows the phone.
-- **Offline first.** Prayer times and qibla are mathematics; the city database ships inside the app.
-- **Nothing to sell.** No ads, no premium tier, no data collection, no account.
-- **One design, both platforms.** The same Compose UI on Android and iOS, with native widgets, notifications, sensors and location behind small `expect`/`actual` seams.
-- **Arabic is first-class.** Names, dates, digits and layout direction are all locale-driven.
+<p align="center">
+  <img src="docs/screenshots/widgets.png" width="300" alt="Three home-screen widgets on a Samsung phone: a small countdown to the next prayer, a medium one with the countdown and the day's five times, and an ayah card with the Arabic and its translation">
+</p>
+
+Three widgets, on Android and iOS: a **small** one with the next prayer and a live countdown, a **medium** one that adds the day's five times, and the **ayah of the day** in the reader's own typeface with its translation. They update on their own, all day, without the app being opened, and their background can follow the system, stay light or dark, or blend into the wallpaper as above. Tapping a prayer widget opens the Prayer screen; tapping the ayah opens that verse in the reader.
 
 ## More screens
 
 <p align="center">
-  <img src="docs/screenshots/settings.png" width="200" alt="Settings: location, prayer times method, notifications, appearance, language, version, attribution">
+  <img src="docs/screenshots/qibla.png" width="200" alt="Qibla compass: the dial turned to true north, the Kaaba marker on the rim, the bearing beneath">
   &nbsp;
-  <img src="docs/screenshots/notifications.png" width="200" alt="Notification settings: master switch, remind-before, and a sound per prayer">
+  <img src="docs/screenshots/quran-list.png" width="200" alt="The Quran tab: search, a continue-reading card, and the surah list with Arabic names">
   &nbsp;
-  <img src="docs/screenshots/widget-small.png" width="150" alt="Small home-screen widget: next prayer and countdown">
+  <img src="docs/screenshots/reader.png" width="200" alt="The reader: each ayah in the Mushaf typeface with the translation beneath">
   &nbsp;
-  <img src="docs/screenshots/widget-medium.png" width="232" alt="Medium home-screen widget: next prayer, countdown and the day's times">
+  <img src="docs/screenshots/tasbeeh.png" width="200" alt="Tasbeeh at 40 of 100 on the post-prayer set, the dhikr now Alhamdulillah">
 </p>
+
+<p align="center">
+  <img src="docs/screenshots/settings.png" width="200" alt="Settings: location, prayer times method, notifications, recitation, appearance, language, about, attribution">
+  &nbsp;
+  <img src="docs/screenshots/notifications.png" width="200" alt="Notification settings: the master switch, remind-before, the adhan voice, and a sound per prayer">
+  &nbsp;
+  <img src="docs/screenshots/about.png" width="200" alt="About Taqwa: version, the privacy model in three lines, and links to the policy, the source and the licence">
+  &nbsp;
+  <img src="docs/screenshots/reader-dark.png" width="200" alt="The reader in the dark theme">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/prayer-arabic.png" width="200" alt="Prayer screen in Arabic, laid out right to left with Arabic-Indic digits">
+  &nbsp;
+  <img src="docs/screenshots/quran-list-arabic.png" width="200" alt="The Quran tab in Arabic">
+  &nbsp;
+  <img src="docs/screenshots/mushaf-arabic.png" width="200" alt="Mushaf mode under the Arabic interface">
+  &nbsp;
+  <img src="docs/screenshots/tasbeeh-arabic.png" width="200" alt="Tasbeeh in Arabic, the count in Arabic-Indic digits">
+</p>
+
+All screenshots are from a Samsung Galaxy S23 Ultra running the current build.
+
+## Principles
+
+- **Zero recurring cost.** Nothing in the app contacts a server of ours; there is none. The only network use is recitation downloads from a public GitHub repository, on request. This is a hard constraint on every feature, not a preference.
+- **Offline first.** Prayer times and Qibla are mathematics; the city database and the Quran ship inside the app; recitations are downloaded once and kept.
+- **Your language, including the map.** The bundled city list carries names in Arabic, Indonesian, Urdu, Bengali, Turkish and French as well as English, so a city can be searched and read in either its own language or English, and the Prayer header follows the phone.
+- **Nothing to sell.** No ads, no premium tier, no data collection, no account.
+- **One design, both platforms.** The same Compose UI on Android and iOS, with native widgets, notifications, sensors, audio and location behind small `expect`/`actual` seams.
+- **Arabic is first-class.** Names, dates, digits and layout direction are all locale-driven.
+
+## Get it
+
+Taqwa is coming to Google Play and the App Store. Until then it can be built from source (below), and the website at [taqwa.world](https://taqwa.world) will carry the store links the day they exist.
 
 ## Roadmap
 
-Taqwa is being built in slices. Each slice ships as a complete, usable app.
+Taqwa is built in slices. Each slice ships as a complete, usable app.
 
 | Slice | Scope | Status |
 |---|---|---|
-| 1 | Prayer times, notifications, qibla, widgets, settings, Arabic | **Done**, in device testing |
-| 2 | Quran reader: Arabic text with translations beneath, Mushaf mode, search, bookmarks, share; bundled offline | **Done** |
-| 3 | Quran audio: recitations, per-ayah playback | Planned |
-| 4 | Dhikr: morning and evening adhkar, tasbih, khatm plan | Planned |
-
+| 1 | Prayer times, notifications, Qibla, widgets, settings, Arabic | **Done** |
+| 2 | Quran reader: Arabic text with translations, Mushaf mode, search, bookmarks, share; bundled offline | **Done** |
+| 3 | Quran audio: ten reciters, per-surah downloads, background playback with the page following | **Done** |
+| 4 | Dhikr: tasbeeh **done**; morning and evening adhkar and a khatm plan to follow | In progress |
 
 Deliberately out of scope: mosque finder, zakat calculator, hadith collections, community features, anything that needs a server.
 
@@ -113,22 +153,27 @@ The script builds for the simulator and checks the widget extension stays under 
 ./scripts/test.sh
 ```
 
-Runs the shared and widget test suites on the JVM and on the iOS simulator. All the domain logic (prayer times, qibla, Hijri conversion, notification planning, widget content) lives in `commonMain` and is tested there without a device.
+Runs the shared and widget test suites on the JVM and on the iOS simulator. All the domain logic (prayer times, Qibla, Hijri conversion, notification planning, widget content, the recitation library and downloader) lives in `commonMain` and is tested there without a device. `scripts/check-strings.sh` checks that the English and Arabic string files carry the same keys.
+
+**Website**
+
+The site at taqwa.world lives in `site/` and is built by `site/build.py` from the page fragments and the two policy files; a GitHub Pages workflow deploys it on every push that touches it.
 
 ## Project layout
 
 ```
 shared/       Compose UI, domain logic, view models, expect/actual platform seams
 widgetcore/   Compose-free widget model, linked by the iOS widget extension
-androidApp/   Android entry point, Glance widgets, alarm and boot receivers
+androidApp/   Android entry point, Glance widgets, alarm and boot receivers, the recitation service
 iosApp/       iOS entry point (SwiftUI shell), WidgetKit extension
+site/         The website, English and Arabic, built by site/build.py
 assets/       Source audio and generators for the bundled sounds
-docs/         Design spec, implementation plans, build log, attribution
-scripts/      Test and build helpers (they pin the Xcode 26 toolchain)
-tools/        City database builder, Quran database pipeline (build-quran-db.py) and Xcode project helpers
+docs/         Design specs, implementation plans, build log, attribution, store answers
+scripts/      Test and build helpers
+tools/        City database builder, Quran database pipeline, the recitation audio pipeline
 ```
 
-The design spec that the app is built from is in [`docs/superpowers/specs`](docs/superpowers/specs), and [`docs/BUILD-LOG.md`](docs/BUILD-LOG.md) is the narrative of every iteration since, including what was found on real devices and why things are the way they are.
+The design specs the app is built from are in [`docs/superpowers/specs`](docs/superpowers/specs), and [`docs/BUILD-LOG.md`](docs/BUILD-LOG.md) is the narrative of every iteration since, including what was found on real devices and why things are the way they are.
 
 ## Contributing
 
@@ -137,21 +182,21 @@ Contributions are welcome, from a typo in the Arabic strings to a new calculatio
 1. **Open an issue first** for anything beyond a small fix, so the approach can be agreed before you spend time on it. Bug reports are most useful with the device, OS version, language, and a screenshot.
 2. **Fork and branch** from `main`.
 3. **Keep the constraints.** No network calls beyond the recitation downloads the person asked for, no third-party SDKs that phone home, no new colour outside the palette in `Palette.kt`, and Arabic must be checked as carefully as English. If a change touches the UI, include screenshots of both languages and both themes.
-4. **Run `./scripts/test.sh`** and add tests for domain logic. Prayer-time and qibla changes need known-answer tests against published values.
-5. **Open a pull request** (merge request) against `main` describing what changed and why. Small, focused PRs are reviewed quickly; large ones are split.
+4. **Run `./scripts/test.sh`** and add tests for domain logic. Prayer-time and Qibla changes need known-answer tests against published values.
+5. **Open a pull request** against `main` describing what changed and why. Small, focused PRs are reviewed quickly; large ones are split.
 
 Translations: the two string files are `shared/src/commonMain/composeResources/values/strings.xml` and `values-ar/strings.xml`. New languages are welcome as long as every string is covered.
 
 ## Privacy
 
-Taqwa asks for your location only to compute prayer times and the qibla, and only if you choose to allow it; picking a city from the built-in list works just as well. Location never leaves the phone. The app makes no network request until you use Quran recitation. Recitations are downloaded one surah at a time from Taqwa's public data repository on GitHub, only when you ask; that request shows GitHub your IP address and the file you asked for, and nothing else. There are no analytics, no crash reporters and no third-party SDKs that talk to the internet. Full policy in [PRIVACY.md](PRIVACY.md).
+Taqwa asks for your location only to compute prayer times and the Qibla, and only if you choose to allow it; picking a city from the built-in list works just as well. Location never leaves the phone. The app makes no network request until you use Quran recitation. Recitations are downloaded one surah at a time from Taqwa's public data repository on GitHub, only when you ask; that request shows GitHub your IP address and the file you asked for, and nothing else. There are no analytics, no crash reporters and no third-party SDKs that talk to the internet. Full policy in [PRIVACY.md](PRIVACY.md), also in [Arabic](PRIVACY.ar.md).
 
 ## Attribution
 
-Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (MIT), city data from [GeoNames](https://www.geonames.org/) (CC BY 4.0), the Manrope typeface (SIL OFL 1.1), and three adhan and takbir recordings from Wikimedia Commons — "Beautiful adhan" by Adam-synagda (CC0), "The Adhan – Muslim Call to Prayer – Aaqib Azeez" (CC BY-SA 4.0) and "Eid al-Fitr Fajr azan at Malmö Mosque" by Islamic Center Malmö (CC BY 3.0). The Quran text and its translations are from the [Tanzil Project](https://tanzil.net), the reading font is KFGQPC Uthmanic Script Hafs from the King Fahd Glorious Quran Printing Complex, and the Mushaf page layout comes from the Quranic Universal Library data. The recitations are the [Islamic Network](https://alquran.cloud) per-ayah recordings, licensed to them by the reciters for free, non-commercial redistribution at the bitrates they publish and mirrored here unmodified — Alafasy, Abdul Basit, Maher Al Muaiqly, Al-Husary, Al-Minshawi, As-Sudais, Ash-Shuraim, Ash-Shatri, Al-Hudhaify and Al-Ajmi, each credited by name in the app. Full details in [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) and in the app under Settings, Attribution & licences.
+Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (MIT), city data from [GeoNames](https://www.geonames.org/) (CC BY 4.0), the Manrope typeface (SIL OFL 1.1), and three adhan and takbir recordings from Wikimedia Commons — "Beautiful adhan" by Adam-synagda (CC0), "The Adhan – Muslim Call to Prayer – Aaqib Azeez" (CC BY-SA 4.0) and "Eid al-Fitr Fajr azan at Malmö Mosque" by Islamic Center Malmö (CC BY 3.0). The Quran text and its translations are from the [Tanzil Project](https://tanzil.net), the reading font is KFGQPC Uthmanic Script Hafs from the King Fahd Glorious Quran Printing Complex, and the Mushaf page layout comes from the Quranic Universal Library data. The recitations are the [Islamic Network](https://alquran.cloud) per-ayah recordings, licensed to them by the reciters for free, non-commercial redistribution at the bitrates they publish and mirrored unmodified — Alafasy, Abdul Basit, Maher Al Muaiqly, Al-Husary, Al-Minshawi, As-Sudais, Ash-Shuraim, Ash-Shatri, Al-Hudhaify and Al-Ajmi, each credited by name in the app. Full details in [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) and in the app under Settings › Attribution & licences.
 
 ## Licence
 
-Taqwa is free software under the [GNU General Public License v3.0](LICENSE). You may use, study, share and modify it, and anything you distribute that is built from it must stay under the same licence with its source available. That is deliberate: it keeps a free, ad-free app from being repackaged as neither.
+Taqwa is free software under the [GNU General Public License v3.0](LICENSE). You may use, study, share and modify it, and anything you distribute that is built from it must stay under the same licence with its source available. That is deliberate: it keeps a free, ad-free app from being repackaged as neither. The bundled data carries its own licences, listed above and in the app.
 
 Copyright © 2026 Mohamed Abulgasem.

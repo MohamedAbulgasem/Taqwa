@@ -122,7 +122,7 @@ html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir
 .card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .card p { font-size: 15px; line-height: 1.55; color: var(--t2); text-wrap: pretty; }
 
-.screens { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+.screens { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 20px; }
 .screen { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .screen .shot { max-width: 240px; border-radius: 24px; }
 .screen figcaption { font-size: 14px; color: var(--t2); text-align: center; }
@@ -135,6 +135,8 @@ html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir
 .after { margin-top: 20px; font-size: 15px; }
 
 .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; align-items: start; }
+.widgets-shot { justify-self: center; max-width: 420px; }
+.widgets-shot img { width: 100%; border-radius: 24px; border: 1px solid var(--hair); }
 
 /* ── Prose pages (privacy, support) ───────────────────── */
 .prose { max-width: 68ch; padding: 40px 0 72px; }
