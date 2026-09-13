@@ -205,6 +205,32 @@ class TaqaFile(
         }
     }
 
+    /**
+     * Every ayah's length in milliseconds, keyed by ayah number, estimated from the container
+     * alone (see [SurahTimeline]): the ayah's bytes less the ID3 tag at its head, over the
+     * bit-rate the index records. One read of ten bytes per ayah through one open handle — for
+     * Al-Baqarah that is 286 tiny reads, well under a frame — and kept, like the index, because
+     * the players ask for it once per load and the service asks again for the lock screen.
+     */
+    fun ayahDurationsMs(): Map<Int, Long> {
+        cachedDurations?.let { return it }
+        val parsed = index()
+        val head = ByteArray(ID3V2_HEADER)
+        val computed = fs.openReadOnly(path).use { handle ->
+            parsed.ayahs.associate { ayah ->
+                val first = parsed.dataStart + ayah.off
+                val want = minOf(ID3V2_HEADER.toLong(), ayah.len).toInt()
+                val read = if (want > 0) handle.read(first, head, 0, want) else 0
+                val tag = if (read == ID3V2_HEADER) id3v2TagBytes(head) else 0L
+                ayah.n to SurahTimeline.estimateMs((ayah.len - tag).coerceAtLeast(0L), parsed.kbps)
+            }
+        }
+        cachedDurations = computed
+        return computed
+    }
+
+    private var cachedDurations: Map<Int, Long>? = null
+
     /** The size on disk matches what the manifest says the finished asset measures. */
     fun isComplete(expectedBytes: Long): Boolean =
         fs.metadataOrNull(path)?.size == expectedBytes
@@ -222,4 +248,25 @@ class TaqaFile(
     } catch (e: okio.IOException) {
         false
     }
+}
+
+/** The fixed part of an ID3v2 tag: "ID3", two version bytes, one of flags, four of syncsafe size. */
+internal const val ID3V2_HEADER = 10
+
+/**
+ * How many bytes an ID3v2 tag at the head of an MP3 occupies, or zero when [head] does not begin
+ * one. The corpus files each open with a small tag (title, reciter, a comment naming the CDN) —
+ * metadata, not sound — and a length estimate that counted it would run long by a frame or two
+ * an ayah. The size field is four syncsafe bytes (seven bits each), and a tag with the footer
+ * flag set carries ten more bytes after its frames.
+ */
+internal fun id3v2TagBytes(head: ByteArray): Long {
+    if (head.size < ID3V2_HEADER) return 0L
+    if (head[0] != 'I'.code.toByte() || head[1] != 'D'.code.toByte() || head[2] != '3'.code.toByte()) return 0L
+    val size = ((head[6].toInt() and 0x7F) shl 21) or
+        ((head[7].toInt() and 0x7F) shl 14) or
+        ((head[8].toInt() and 0x7F) shl 7) or
+        (head[9].toInt() and 0x7F)
+    val footer = (head[5].toInt() and 0x10) != 0
+    return ID3V2_HEADER + size.toLong() + (if (footer) ID3V2_HEADER.toLong() else 0L)
 }

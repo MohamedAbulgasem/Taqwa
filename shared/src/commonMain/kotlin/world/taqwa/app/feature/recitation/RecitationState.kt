@@ -29,9 +29,9 @@ sealed interface HeaderState {
  * The player bar (spec §5.3). Everything on it, already resolved: the composable looks up no
  * manifest and asks no library.
  *
- * [fraction] is position within the *surah*, which has no single timeline — it is the ayah's
- * ordinal plus how far through that ayah the voice is, over the ayah count. See [barFraction] for
- * why it is held rather than recomputed when the platform reports no duration.
+ * [fraction] is position within the *surah* on its own clock (spec §14.1): [positionMs] over
+ * [durationMs], both gaps included and both zero until the player has a timeline, in which case
+ * the fraction falls back to the ayah ordinal — see [barFraction].
  */
 data class BarState(
     val reciter: Reciter,
@@ -41,6 +41,10 @@ data class BarState(
     val fraction: Float,
     val playing: Boolean,
     val buffering: Boolean,
+    /** Elapsed on the surah's clock, for the "12:31" at the start of the progress line. */
+    val positionMs: Long = 0L,
+    /** The whole surah, for the "2:05:10" at its end. Zero hides both clocks. */
+    val durationMs: Long = 0L,
 )
 
 /** Which of the download sheet's three faces is showing (spec §5.4). */
@@ -171,6 +175,12 @@ fun headerStateOf(
  */
 fun barFraction(playback: PlaybackState, previous: Float): Float {
     val ayah = playback.ayah ?: return 0f
+    // The surah's own clock, when the player has one (spec §14.1): the line is then simply how
+    // far through the surah the voice is, gaps and all, and moves at the speed of the recitation
+    // rather than jumping a notch at every ayah.
+    if (playback.surahDurationMs > 0L) {
+        return (playback.surahPositionMs.toDouble() / playback.surahDurationMs).toFloat().coerceIn(0f, 1f)
+    }
     val count = playback.ayahCount
     if (count <= 0) return previous
     if (playback.durationMs <= 0L) return previous
@@ -196,4 +206,22 @@ fun sheetPhaseOf(download: DownloadState?, downloadOnMobileData: Boolean, total:
     DownloadState.Verifying -> SheetPhase.Downloading(total, total)
     is DownloadState.Downloading -> SheetPhase.Downloading(download.bytes, download.total)
     is DownloadState.Failed -> SheetPhase.Failed(download.reason)
+}
+
+/**
+ * A clock for the bar: "12:31", or "2:05:10" once [hours] says the surah runs an hour or more.
+ * Both ends of one line are formatted with the same [hours], so the elapsed clock of a long
+ * surah reads "0:12:31" against "2:05:10" and the two never change shape as it plays. Whole
+ * seconds, floored, as every music player counts them. [digits] is the locale's own digit set —
+ * `PlatformFormat.localizedDigits` in the app, the identity in a test — and the zero it produces
+ * is what the minutes and seconds are padded with, so an Arabic-Indic clock pads with «٠».
+ */
+fun formatClock(ms: Long, hours: Boolean, digits: (Int) -> String = Int::toString): String {
+    val seconds = ms.coerceAtLeast(0L) / 1000L
+    val h = (seconds / 3600L).toInt()
+    val m = ((seconds % 3600L) / 60L).toInt()
+    val s = (seconds % 60L).toInt()
+    val zero = digits(0)
+    fun two(n: Int): String = digits(n).let { if (n < 10) zero + it else it }
+    return if (hours) "${digits(h)}:${two(m)}:${two(s)}" else "${digits(h * 60 + m)}:${two(s)}"
 }

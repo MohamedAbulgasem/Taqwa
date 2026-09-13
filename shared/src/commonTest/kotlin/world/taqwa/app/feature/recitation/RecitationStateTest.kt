@@ -78,6 +78,34 @@ class RecitationStateTest {
     }
 
     @Test
+    fun `the fraction is the surah's own clock once the player has one`() {
+        val state = PlaybackState(
+            ayah = 1, ayahCount = 10, positionMs = 0L, durationMs = 0L,
+            surahPositionMs = 2_200L, surahDurationMs = 8_800L,
+        )
+        // Not 0.0 for the first ayah, and not held from before: the clock says a quarter.
+        assertEquals(0.25f, barFraction(state, 0.9f), 0.0001f)
+        assertEquals(1f, barFraction(state.copy(surahPositionMs = 9_000L), 0f), 0.0001f)
+    }
+
+    @Test
+    fun `the clock reads minutes and seconds, or hours once the surah has them`() {
+        assertEquals("0:05", formatClock(5_400L, hours = false))
+        assertEquals("12:31", formatClock(751_000L, hours = false))
+        assertEquals("2:05:10", formatClock(7_510_000L, hours = true))
+        // Both ends of a long surah's line share the shape, so the elapsed clock pads its hour.
+        assertEquals("0:12:31", formatClock(751_000L, hours = true))
+        assertEquals("0:00", formatClock(-3L, hours = false))
+    }
+
+    @Test
+    fun `the clock pads with the locale's own zero`() {
+        val arabic = { n: Int -> n.toString().map { '٠' + (it - '0') }.joinToString("") }
+        assertEquals("١٢:٠٥", formatClock(725_000L, hours = false, digits = arabic))
+        assertEquals("٢:٠٠:٠٩", formatClock(7_209_000L, hours = true, digits = arabic))
+    }
+
+    @Test
     fun `the fraction is zero with nothing loaded`() {
         assertEquals(0f, barFraction(PlaybackState.EMPTY, 0.6f), 0.0001f)
     }

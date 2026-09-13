@@ -196,3 +196,57 @@ class TaqaFileTest {
         fs.checkNoOpenFiles()
     }
 }
+
+/** The length estimate read off a container (spec §14.1), and the ID3 tag it must not count. */
+class TaqaDurationsTest {
+
+    private fun id3(size: Int, footer: Boolean = false): ByteArray {
+        val flags = if (footer) 0x10 else 0
+        val head = byteArrayOf(
+            'I'.code.toByte(), 'D'.code.toByte(), '3'.code.toByte(), 4, 0, flags.toByte(),
+            ((size ushr 21) and 0x7F).toByte(),
+            ((size ushr 14) and 0x7F).toByte(),
+            ((size ushr 7) and 0x7F).toByte(),
+            (size and 0x7F).toByte(),
+        )
+        return head + ByteArray(size) { 9 } + (if (footer) ByteArray(10) else ByteArray(0))
+    }
+
+    @Test
+    fun anId3TagIsItsHeaderPlusItsSyncsafeSizePlusAnyFooter() {
+        assertEquals(407L, id3v2TagBytes(id3(397)))
+        assertEquals(10L + 397L + 10L, id3v2TagBytes(id3(397, footer = true)))
+        // 128 is 0x80: a syncsafe field carries seven bits a byte, so it is written 01 00.
+        assertEquals(10L + 128L, id3v2TagBytes(id3(128)))
+        assertEquals(0L, id3v2TagBytes(ByteArray(10) { 0xFF.toByte() }))
+        assertEquals(0L, id3v2TagBytes(ByteArray(4)))
+    }
+
+    @Test
+    fun everyAyahIsTimedFromItsAudioBytesWithTheTagLeftOut() {
+        val fs = FakeFileSystem()
+        val path = "/quran/ar.alafasy/112.taqa".toPath()
+        fs.createDirectories(path.parent!!)
+        // 64 kbps: 8 bytes a millisecond. 800 bytes of audio is 100 ms, 407 of tag is nothing.
+        val ayahs = listOf(
+            id3(397) + ByteArray(800) { 1 },
+            ByteArray(1_600) { 2 },
+            id3(0) + ByteArray(80) { 3 },
+        )
+        fs.write(path) { write(buildTaqa(surah = 112, kbps = 64, ayahs = ayahs)) }
+
+        val durations = TaqaFile(path, fs).ayahDurationsMs()
+
+        assertEquals(mapOf(1 to 100L, 2 to 200L, 3 to 10L), durations)
+    }
+
+    @Test
+    fun anAyahShorterThanATagHeaderIsStillTimed() {
+        val fs = FakeFileSystem()
+        val path = "/quran/ar.alafasy/1.taqa".toPath()
+        fs.createDirectories(path.parent!!)
+        fs.write(path) { write(buildTaqa(kbps = 64, ayahs = listOf(ByteArray(4) { 1 }))) }
+
+        assertEquals(mapOf(1 to 0L), TaqaFile(path, fs).ayahDurationsMs())
+    }
+}

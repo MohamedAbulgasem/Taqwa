@@ -11,9 +11,11 @@ data class AyahRef(val surah: Int, val ayah: Int)
  * inter-ayah gap plays it stays on the ayah that just ended rather than blanking (see
  * [RecitationQueue]).
  *
- * [positionMs] and [durationMs] are within the current ayah, not the surah — the surah has no
- * single timeline, it is a queue of per-ayah files, and a progress line across a whole surah
- * would have to be the ayah count anyway.
+ * [positionMs] and [durationMs] are within the current ayah. [surahPositionMs] and
+ * [surahDurationMs] are the same moment on the surah's own clock (spec §14.1, [SurahTimeline]):
+ * gaps included, estimated from the container, and zero when the player has no timeline yet.
+ * The bar and the lock screen draw the surah pair; the ayah pair stays for the previous-button
+ * rule and for a player that has not built its timeline.
  */
 data class PlaybackState(
     val reciterId: String? = null,
@@ -24,6 +26,8 @@ data class PlaybackState(
     val durationMs: Long = 0L,
     val playing: Boolean = false,
     val buffering: Boolean = false,
+    val surahPositionMs: Long = 0L,
+    val surahDurationMs: Long = 0L,
 ) {
     /** The ayah playing, if one is. */
     val current: AyahRef? get() = if (surah != null && ayah != null) AyahRef(surah, ayah) else null
