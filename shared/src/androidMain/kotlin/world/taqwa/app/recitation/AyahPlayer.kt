@@ -91,10 +91,19 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
     override fun getContentDuration(): Long =
         clock()?.totalMs ?: if (onGap()) lastAyahDurationMs else real.contentDuration
 
-    /** [itemPosition] on the surah's clock, or [fallback] when there is no clock to put it on. */
+    /**
+     * [itemPosition] on the surah's clock, or [fallback] when there is no clock to put it on.
+     *
+     * The item's slot on the clock is an estimate; the item's real length is known once it is
+     * prepared. Where the two differ the position is scaled into the slot rather than clamped,
+     * so the clock runs a shade fast or slow through that ayah and never stalls at the end of
+     * the slot or jumps at the start of the next — which a variable-bit-rate ayah in a
+     * constant-bit-rate edition would otherwise make it do.
+     */
     private inline fun onClock(itemPosition: Long, fallback: () -> Long): Long {
         val clock = clock() ?: return fallback()
-        return clock.elapsed(real.currentMediaItemIndex, itemPosition)
+        val index = real.currentMediaItemIndex
+        return clock.elapsed(index, SurahTimeline.fitToSlot(itemPosition, real.duration, clock.durationOf(index)))
     }
 
     // ── what the session may ask for ────────────────────────────────────────────────────────

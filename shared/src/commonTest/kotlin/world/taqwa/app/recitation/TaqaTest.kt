@@ -21,12 +21,15 @@ internal fun buildTaqa(
     ayahs: List<ByteArray>,
     version: Int = 1,
     magic: String = "TAQA",
+    /** Ayah number to its own bit-rate, for the one entry the pipeline writes one on. */
+    kbpsOverrides: Map<Int, Int> = emptyMap(),
 ): ByteArray {
     val entries = StringBuilder()
     var off = 0L
     ayahs.forEachIndexed { i, bytes ->
         if (i > 0) entries.append(",")
-        entries.append("{\"n\":${i + 1},\"off\":$off,\"len\":${bytes.size}}")
+        val own = kbpsOverrides[i + 1]?.let { ",\"kbps\":$it" }.orEmpty()
+        entries.append("{\"n\":${i + 1},\"off\":$off,\"len\":${bytes.size}$own}")
         off += bytes.size
     }
     val index = "{\"reciter\":\"$reciter\",\"surah\":$surah,\"kbps\":$kbps,\"ayahs\":[$entries]}"
@@ -238,6 +241,21 @@ class TaqaDurationsTest {
         val durations = TaqaFile(path, fs).ayahDurationsMs()
 
         assertEquals(mapOf(1 to 100L, 2 to 200L, 3 to 10L), durations)
+    }
+
+    @Test
+    fun anAyahAtTheOtherPublishedBitRateIsTimedAtItsOwn() {
+        val fs = FakeFileSystem()
+        val path = "/quran/ar.ahmedajamy/9.taqa".toPath()
+        fs.createDirectories(path.parent!!)
+        // 1,600 bytes is 100 ms at 128 kbps and 200 ms at 64; the second ayah says it is 64.
+        val ayahs = listOf(ByteArray(1_600) { 1 }, ByteArray(1_600) { 2 })
+        fs.write(path) { write(buildTaqa(surah = 9, kbps = 128, ayahs = ayahs, kbpsOverrides = mapOf(2 to 64))) }
+
+        val taqa = TaqaFile(path, fs)
+
+        assertEquals(64, taqa.index().ayah(2)?.kbps)
+        assertEquals(mapOf(1 to 100L, 2 to 200L), taqa.ayahDurationsMs())
     }
 
     @Test

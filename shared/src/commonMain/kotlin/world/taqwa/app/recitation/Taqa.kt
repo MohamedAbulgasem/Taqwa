@@ -35,6 +35,13 @@ data class TaqaAyah(
     /** Offset from `dataStart`, not from the start of the file. See [TaqaIndex.dataStart]. */
     val off: Long,
     val len: Long,
+    /**
+     * This ayah's own bit-rate when it is not the container's ([TaqaIndex.kbps]): the pipeline
+     * writes it only for an ayah it had to take from the corpus's other published bit-rate
+     * because every copy at the reciter's own was broken at source (Al-Ajmi 9:62 and 50:10).
+     * Read by nothing but the length estimate; the audio plays as it is.
+     */
+    val kbps: Int? = null,
 )
 
 /**
@@ -222,7 +229,7 @@ class TaqaFile(
                 val want = minOf(ID3V2_HEADER.toLong(), ayah.len).toInt()
                 val read = if (want > 0) handle.read(first, head, 0, want) else 0
                 val tag = if (read == ID3V2_HEADER) id3v2TagBytes(head) else 0L
-                ayah.n to SurahTimeline.estimateMs((ayah.len - tag).coerceAtLeast(0L), parsed.kbps)
+                ayah.n to SurahTimeline.estimateMs((ayah.len - tag).coerceAtLeast(0L), ayah.kbps ?: parsed.kbps)
             }
         }
         cachedDurations = computed

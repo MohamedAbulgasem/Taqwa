@@ -556,7 +556,11 @@ actual class RecitationPlayer actual constructor(
         }
         val clock = timeline
         if (clock != null) {
-            surahPositionMs = clock.elapsed(at, if (gap) gapElapsedNow() else ayahPositionMs)
+            // The ayah's slot is an estimate and the item's length is measured: scale into the
+            // slot rather than clamp, so the clock neither stalls nor jumps at the seam.
+            val within = if (gap) gapElapsedNow() else
+                SurahTimeline.fitToSlot(ayahPositionMs, ayahDurationMs, clock.durationOf(at))
+            surahPositionMs = clock.elapsed(at, within)
             surahDurationMs = clock.totalMs
         }
         _state.value = PlaybackState(

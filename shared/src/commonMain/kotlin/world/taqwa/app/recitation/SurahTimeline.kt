@@ -83,6 +83,16 @@ class SurahTimeline(val itemsMs: List<Long>) {
     private fun clamp(index: Int): Int = index.coerceIn(0, itemsMs.lastIndex)
 
     companion object {
+        /**
+         * [positionMs] into an item the platform measures at [realMs], re-expressed in an item
+         * the clock has given [slotMs]: the two differ by the estimate's error, and scaling
+         * keeps the clock continuous through the item where clamping would stall it at the end
+         * of a short slot or jump it across a long one. Unknown or zero lengths scale nothing.
+         */
+        fun fitToSlot(positionMs: Long, realMs: Long, slotMs: Long): Long =
+            if (realMs <= 0L || slotMs <= 0L || realMs == slotMs) positionMs
+            else positionMs * slotMs / realMs
+
         /** A constant bit-rate file's length from its audio bytes: `bytes × 8 / kbps` milliseconds. */
         fun estimateMs(audioBytes: Long, kbps: Int): Long =
             if (kbps <= 0 || audioBytes <= 0L) 0L else audioBytes * 8L / kbps

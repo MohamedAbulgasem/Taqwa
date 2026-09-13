@@ -1,6 +1,15 @@
 """Repair the ayahs a reciter's CDN directory refuses to serve.
 
-    python3 repair.py <reciter id> [rounds] [--fallback]
+    python3 repair.py <reciter id> [rounds] [--fallback] [--substitute]
+
+--substitute is the last resort after the fallback: an ayah that is broken at
+source in every copy of the reciter's edition at this bit-rate is taken from
+the CDN's *other* published bit-rate folder for the same reciter (Al-Ajmi's
+9:62 and 50:10 are an MPEG-video fragment and a quarter-second stub at 128 kbps
+everywhere, and whole at 64). The licence covers every bit-rate the Islamic
+Network publishes; pack.py records the ayah's own bit-rate in the index so the
+app's length estimate stays right. Proven to be the same edition first: three
+control ayahs must decode to the same length within a tenth of a second.
 
 Some objects on cdn.islamic.network answer 502 persistently rather than 403/404:
 the object exists in the catalogue but the origin cannot read it.  This retries
@@ -122,10 +131,40 @@ def check_equivalence(rid, ranges):
     return None
 
 
+def other_bitrate_folder(rid):
+    """The CDN folder of the reciter's other published bit-rate, or None."""
+    folder = reciter(rid)[1]
+    return {"128": "64", "64": "128"}.get(folder)
+
+
+def check_other_bitrate(rid, ranges, other):
+    """True when the other bit-rate folder is the same edition: three control
+    ayahs we hold decode to the same length within 0.1 s."""
+    d = outdir(rid)
+    for g in (262, 1000, 5000):
+        mine = os.path.join(d, f"{g}.mp3")
+        if not os.path.exists(mine):
+            return False
+        tmp = os.path.join("/tmp", f"ob-{rid}-{g}.mp3")
+        try:
+            fetch(f"https://cdn.islamic.network/quran/audio/{other}/{rid}/{g}.mp3", tmp)
+        except Exception as e:  # noqa: BLE001
+            log(f"  substitute {rid}/{other}: cannot fetch control {g}: {e}")
+            return False
+        a, ea = probe(mine)
+        b, eb = probe(tmp)
+        if ea or eb or abs(a - b) > 0.1:
+            log(f"  substitute {rid}/{other}: control {g} differs ({a} vs {b}, {ea or eb})")
+            return False
+    log(f"  substitute {rid}: cdn/{other} is the same edition on 3 controls")
+    return True
+
+
 def main():
     rid = sys.argv[1]
     args = sys.argv[2:]
     use_fallback = "--fallback" in args
+    use_substitute = "--substitute" in args
     rounds = next((int(a) for a in args if a.isdigit()), 8)
     folder = reciter(rid)[1]
     d = outdir(rid)
@@ -180,6 +219,26 @@ def main():
                         f"{os.path.getsize(path):,} bytes, {dur:.2f}s")
                 except Exception as e:  # noqa: BLE001
                     log(f"  fallback {rid} ayah {n}: FAILED {e}")
+                    still.append(n)
+            todo = still
+
+    if todo and use_substitute:
+        other = other_bitrate_folder(rid)
+        if other and check_other_bitrate(rid, ranges, other):
+            still = []
+            for n in todo:
+                s, a = g2sa(n, ranges)
+                path = os.path.join(d, f"{n}.mp3")
+                try:
+                    fetch(f"https://cdn.islamic.network/quran/audio/{other}/{rid}/{n}.mp3", path)
+                    dur, err = probe(path)
+                    if err:
+                        os.remove(path)
+                        raise ValueError(err)
+                    log(f"  SUBSTITUTE {rid} ayah {n} ({s}:{a}) taken from cdn/{other} kbps: "
+                        f"{os.path.getsize(path):,} bytes, {dur:.2f}s - the index will say so")
+                except Exception as e:  # noqa: BLE001
+                    log(f"  substitute {rid} ayah {n}: FAILED {e}")
                     still.append(n)
             todo = still
 

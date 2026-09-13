@@ -30,7 +30,7 @@ def main():
     # and repair.py is what closes them, so its exit code is not fatal.
     run("verify.py", rid, "8")
     steps = [
-        ("repair.py", (rid, "3", "--fallback")),
+        ("repair.py", (rid, "3", "--fallback", "--substitute")),
         ("verify.py", (rid, "8")),
         ("pack.py", (rid,)),
         ("check_container.py", (rid,)),

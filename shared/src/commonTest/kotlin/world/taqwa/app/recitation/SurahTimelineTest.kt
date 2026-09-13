@@ -67,6 +67,20 @@ class SurahTimelineTest {
     }
 
     @Test
+    fun `a measured position is scaled into the slot the clock gave the item`() {
+        // Estimated 1,000 ms, measured 1,250: four fifths through the real ayah is four fifths
+        // through the slot, and the end of the real ayah is the end of the slot.
+        assertEquals(800L, SurahTimeline.fitToSlot(1_000L, 1_250L, 1_000L))
+        assertEquals(1_000L, SurahTimeline.fitToSlot(1_250L, 1_250L, 1_000L))
+        // A slot longer than the measured item stretches the same way.
+        assertEquals(1_500L, SurahTimeline.fitToSlot(750L, 1_000L, 2_000L))
+        // Nothing to scale by: the position stands.
+        assertEquals(400L, SurahTimeline.fitToSlot(400L, 0L, 1_000L))
+        assertEquals(400L, SurahTimeline.fitToSlot(400L, 1_000L, 0L))
+        assertEquals(400L, SurahTimeline.fitToSlot(400L, 1_000L, 1_000L))
+    }
+
+    @Test
     fun `a queue without gaps is only its ayahs`() {
         val plain = SurahTimeline.of(RecitationQueue(112, (1..4).toList(), gapMs = 0L)) { n -> n * 100L }
         assertEquals(4, plain.size)
