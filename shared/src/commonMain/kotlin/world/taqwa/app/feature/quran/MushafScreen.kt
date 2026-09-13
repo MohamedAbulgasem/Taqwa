@@ -32,6 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.feature.recitation.BackToAyahPill
 import world.taqwa.app.feature.recitation.Follow
+import world.taqwa.app.feature.recitation.HeaderState
 import world.taqwa.app.feature.recitation.PillGap
 import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.rememberFollowing
@@ -104,6 +105,32 @@ fun MushafScreen(
     // filled in by the effect below as soon as the settled page's lines have loaded.
     var pageStart by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
+    // Which printed page the voice is on. Hoisted above the header for the same reason
+    // [pageStart] is: the header's state depends on it, and the pager that follows the voice with
+    // it is built further down.
+    val playing = recitation.playing
+    val playingPage by produceState<Int?>(null, playing) {
+        val reference = playing
+        value = if (reference == null) {
+            null
+        } else {
+            runCatching { pageOfAyah(reference.first, reference.second) }.getOrNull()
+        }
+    }
+
+    // Spec §5.1: the button has to say what a tap will do, and in the Mushaf a tap starts the
+    // ayah *printed on this page*. So the equaliser belongs to the page the recited ayah is on,
+    // not to any page at all while something plays — a reader sitting on Al-Faatiha while
+    // Al-Kahf recited saw a live equaliser whose tap opened Al-Faatiha's download sheet. The
+    // state handed in is the page's own surah's; this is the only place that knows the ayah is
+    // here. A page that straddles two surahs is covered by asking about the page and not the
+    // surah, which is what the Mushaf's header names.
+    val headerState = if (playingPage != null && playingPage == ready?.currentPage) {
+        if (recitation.live) HeaderState.Playing else HeaderState.Paused
+    } else {
+        recitation.header
+    }
+
     // safeDrawing, not systemBars: sideways the navigation bar and the camera cutout sit on the
     // left and right edges. The pager inside pads nothing of its own, so this is the only place
     // the page is inset and there is nothing here to double up with.
@@ -121,7 +148,7 @@ fun MushafScreen(
             onBack = onBack,
             onToggleMode = onToggleMode,
             onOpenSheet = { showSheet = true },
-            recitation = recitation.header,
+            recitation = headerState,
             onRecitation = {
                 // The tapped ayah if there is one — it is the ayah the reader is looking at —
                 // otherwise the first ayah printed on the page.
@@ -155,11 +182,6 @@ fun MushafScreen(
         val following = rememberFollowing()
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.isScrollInProgress }.collect { following.moved() }
-        }
-        val playing = recitation.playing
-        val playingPage by produceState<Int?>(null, playing) {
-            val reference = playing
-            value = if (reference == null) null else runCatching { pageOfAyah(reference.first, reference.second) }.getOrNull()
         }
         LaunchedEffect(playingPage) {
             val page = playingPage

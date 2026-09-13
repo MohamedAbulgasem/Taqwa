@@ -601,11 +601,13 @@ fun App(container: AppContainer) {
                                     }
                                 },
                                 recitation = QuranRecitation(
-                                    // The Mushaf's header names whichever surah the page starts
-                                    // in, so the button's state follows the *playing* surah when
-                                    // that surah is on this page and the page's own otherwise.
+                                    // The page's own surah, which is the one the header names.
+                                    // Whether the voice is on *this page* is a question only the
+                                    // Mushaf can answer — it knows which page the recited ayah is
+                                    // printed on — so it is the screen that raises this to
+                                    // Playing when the ayah is here.
                                     header = recitationState.header(
-                                        bar?.surah ?: (mushafState as? MushafUiState.Ready)?.surah?.number ?: 0,
+                                        (mushafState as? MushafUiState.Ready)?.surah?.number ?: 0,
                                     ),
                                     playing = bar?.let { it.surah to it.ayah },
                                     live = bar?.playing == true,
