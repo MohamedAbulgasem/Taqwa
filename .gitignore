@@ -26,3 +26,6 @@ tools/cache/
 # Python bytecode from tools/
 __pycache__/
 *.pyc
+
+# The built website (site/build.py)
+_site/

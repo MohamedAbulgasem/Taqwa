@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title} · Taqwa</title>
+  <meta name="description" content="{description}">
+  <meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B0D0C" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="../" aria-label="Taqwa home">
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.56 12.6V8.13c0-2.32 1.38-3.94 3.44-4.75 2.06.81 3.44 2.43 3.44 4.75v4.47" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="6.3" r="0.95" fill="currentColor"/></svg>
+    Taqwa
+  </a>
+  <nav class="nav" aria-label="Site">
+    <a href="../privacy/"{privacy_current}>Privacy</a>
+    <a href="../support/"{support_current}>Support</a>
+    <a href="https://github.com/MohamedAbulgasem/Taqwa">GitHub</a>
+  </nav>
+</header>
+
+<main class="wrap prose">
+{body}
+</main>
+
+<footer class="wrap foot">
+  <nav aria-label="Footer">
+    <a href="../privacy/">Privacy</a>
+    <a href="../support/">Support</a>
+    <a href="https://github.com/MohamedAbulgasem/Taqwa">GitHub</a>
+    <a href="mailto:support@taqwa.world">support@taqwa.world</a>
+  </nav>
+  <span>© 2026 Mohamed Abulgasem</span>
+</footer>
+</body>
+</html>
