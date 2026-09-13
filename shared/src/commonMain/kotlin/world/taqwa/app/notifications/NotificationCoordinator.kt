@@ -71,6 +71,10 @@ class NotificationCoordinator(
     fun needsTopUp(plan: List<ScheduledNotification>): Boolean =
         RescheduleDecider.needsTopUp(plan, now(), TOP_UP_HORIZON)
 
+    /** As above, for a caller holding only how far the armed plan reaches. */
+    fun needsTopUp(furthest: Instant?): Boolean =
+        RescheduleDecider.needsTopUp(furthest, now(), TOP_UP_HORIZON)
+
     private fun localizedClockTime(instant: Instant, timeZoneId: String, format: PlatformFormat): String {
         val t = instant.toLocalDateTime(TimeZone.of(timeZoneId))
         return format.clockTime(t.hour, t.minute)

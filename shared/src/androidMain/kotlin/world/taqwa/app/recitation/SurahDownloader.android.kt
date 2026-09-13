@@ -9,6 +9,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,6 +17,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -51,9 +53,26 @@ actual class SurahDownloader actual constructor(
 
     private val context = appContext
     private val workManager = WorkManager.getInstance(context)
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    // SupervisorJob keeps one failed child from cancelling its siblings; it does nothing about an
+    // uncaught throw, which still reaches the thread's default handler and takes the process down.
+    // A download surface that failed is a chip with a Retry button, never a crash.
+    private val scope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> })
     private val batches = mutableMapOf<String, Job>()
     private val conditions = AndroidDownloadConditions(context)
+
+    init {
+        // Whatever a previous process left posted: watchBatch is re-attached only by a new
+        // enqueueReciter, so without this a summary outlives the batch it was summarising. Only
+        // this app's own notifications are listed, and only this class posts in the batch range.
+        runCatching {
+            val manager = NotificationManagerCompat.from(context)
+            manager.activeNotifications
+                .map { it.id }
+                .filter { it in BATCH_NOTIFICATION_BASE until BATCH_NOTIFICATION_BASE + BATCH_ID_SPAN }
+                .forEach { manager.cancel(it) }
+        }
+    }
 
     /**
      * The two states WorkManager cannot report. A download the network refuses — mobile data
@@ -77,6 +96,9 @@ actual class SurahDownloader actual constructor(
                 .map { infos -> RecitationWork.statesOf(infos.mapNotNull(RecitationWork::snapshotOf)) },
             refusals,
         ) { work, refused -> work + refused }
+            // WorkManager's flow is a Room query and can throw; the sheet showing a stale map is
+            // better than the collector dying in a scope nothing else is watching.
+            .catch { }
             .stateIn(scope, SharingStarted.Eagerly, emptyMap())
 
     actual fun enqueue(key: DownloadKey, allowMobileOnce: Boolean) {
@@ -207,6 +229,10 @@ actual class SurahDownloader actual constructor(
                 workManager.getWorkInfosByTagFlow(RecitationWork.reciterTag(reciterId)),
                 library.downloaded(reciterId),
             ) { infos, owned -> infos.any { !it.state.isFinished } to owned.size }
+                // Same reason as `states` above, plus a DataStore read on the other side of the
+                // combine. `catch` is transparent to what the collector throws, so the deliberate
+                // CancellationException below still ends the batch.
+                .catch { }
                 .collect { (active, owned) ->
                     if (active) {
                         started = true
@@ -230,7 +256,11 @@ actual class SurahDownloader actual constructor(
             .setContentTitle(text)
             .setGroup(SurahDownloadWorker.GROUP_PREFIX + reciterId)
             .setGroupSummary(true)
-            .setOngoing(true)
+            // Not ongoing. The per-surah notifications are the ongoing ones, and WorkManager owns
+            // and cancels those; this summary is cleared only by watchBatch's collector, which
+            // dies with the process — and a whole-Quran batch runs for hours across process
+            // deaths. On API 26–33 setOngoing would then leave a frozen "12 of 114" the reader
+            // cannot even swipe away.
             .setSilent(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
@@ -244,7 +274,7 @@ actual class SurahDownloader actual constructor(
     }
 
     private fun batchNotificationId(reciterId: String) =
-        BATCH_NOTIFICATION_BASE + abs(reciterId.hashCode() % 1000)
+        BATCH_NOTIFICATION_BASE + abs(reciterId.hashCode() % BATCH_ID_SPAN)
 
     private fun isArabic(): Boolean =
         PrayerNaming.isArabicLanguage(createPlatformFormat().languageTag())
@@ -254,6 +284,9 @@ actual class SurahDownloader actual constructor(
 
         /** Clear of the per-surah ids, which run from 770,000. */
         const val BATCH_NOTIFICATION_BASE = 760_000
+
+        /** How many ids [batchNotificationId] can mint, and so how wide the start-up sweep is. */
+        const val BATCH_ID_SPAN = 1_000
     }
 }
 

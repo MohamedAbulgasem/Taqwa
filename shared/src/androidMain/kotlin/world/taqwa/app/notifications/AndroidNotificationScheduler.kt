@@ -13,6 +13,7 @@ import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.i18n.createPlatformFormat
+import kotlin.time.Instant
 
 private const val PREFS_NAME = "taqwa_scheduled_alarms"
 private const val KEY_IDS = "ids"
@@ -22,9 +23,9 @@ private const val KEY_NEXT_CODE = "next_request_code"
 private const val KEY_CODE_PREFIX = "request_code_"
 private const val ALARM_ACTION = "world.taqwa.app.PRAYER_ALARM"
 
-/** Slop allowed when exact alarms are unavailable. The window starts at the prayer time, so a
- * notification is never early — only up to this much late. */
-private const val INEXACT_WINDOW_MILLIS = 5L * 60L * 1000L
+/** How far the plan last handed to [AndroidNotificationScheduler.scheduleAll] reaches; see
+ * [scheduledPlanHorizon]. */
+private const val KEY_HORIZON = "plan_horizon_millis"
 
 /** Wait, buzz, pause, buzz — two short pulses, the length of a knock rather than an alarm. */
 private val NOTIFICATION_VIBRATION = longArrayOf(0L, 220L, 160L, 220L)
@@ -56,14 +57,19 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         ensureChannels(plan)
         plan.forEach(::schedule)
         val ids = plan.map { it.id }.toSet()
-        prefs.edit().putStringSet(KEY_IDS, ids).apply()
+        prefs.edit()
+            .putStringSet(KEY_IDS, ids)
+            // Written for PrayerAlarmReceiver's top-up check, which wakes in a process that has
+            // never built a plan and so has nothing in memory to ask.
+            .putLong(KEY_HORIZON, plan.maxOfOrNull { it.instant.toEpochMilliseconds() } ?: 0L)
+            .apply()
         forgetRequestCodesOutside(ids)
     }
 
     override fun cancelAll() {
         val previousIds = prefs.getStringSet(KEY_IDS, emptySet()) ?: emptySet()
         previousIds.forEach { id -> alarmManager.cancel(pendingIntentFor(id)) }
-        prefs.edit().remove(KEY_IDS).apply()
+        prefs.edit().remove(KEY_IDS).remove(KEY_HORIZON).apply()
     }
 
     /**
@@ -94,14 +100,20 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
     }
 
     /**
-     * Exact where the platform allows it, an inexact window where it does not.
+     * Exact where the platform allows it, inexact-but-Doze-proof where it does not.
      *
-     * `SCHEDULE_EXACT_ALARM` is user-revocable from API 31, and `USE_EXACT_ALARM` — which is
-     * auto-granted but Play-policy-restricted — only exists from API 33, so on API 31–32 a user
-     * who turns off "Alarms & reminders" would otherwise take a `SecurityException` straight out
-     * of `NotificationCoordinator.reschedule` on every cold start. A few minutes' slop on the
-     * adhan is far better than an unrecoverable crash loop, and `runCatching` covers the
-     * remaining race where the permission is revoked between the check and the call.
+     * `SCHEDULE_EXACT_ALARM` is user-revocable from API 31, and the app does not ask for
+     * `USE_EXACT_ALARM` (Play restricts it to alarm-clock and calendar apps), so a user who has
+     * not granted "Alarms & reminders" would otherwise take a `SecurityException` straight out of
+     * `NotificationCoordinator.reschedule` on every cold start. A few minutes' slop on the adhan
+     * is far better than an unrecoverable crash loop, and `runCatching` covers the remaining race
+     * where the permission is revoked between the check and the call.
+     *
+     * The fallback is `setAndAllowWhileIdle`, not `setWindow`: both are inexact and neither fires
+     * early, but a plain window alarm is held until the next Doze maintenance window, which on an
+     * idle phone overnight is hours rather than minutes — and Fajr is the prayer people most rely
+     * on being told about. `setAndAllowWhileIdle` is the one inexact form the platform still
+     * delivers in Doze.
      */
     private fun schedule(entry: ScheduledNotification) {
         val at = entry.instant.toEpochMilliseconds()
@@ -110,9 +122,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             if (canScheduleExactAlarms()) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
             } else {
-                alarmManager.setWindow(
-                    AlarmManager.RTC_WAKEUP, at, INEXACT_WINDOW_MILLIS, pendingIntent,
-                )
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
             }
         }
     }
@@ -206,4 +216,18 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             channel.vibrationPattern = NOTIFICATION_VIBRATION
         }
     }
+}
+
+/**
+ * How far the plan currently armed on this device reaches, or null when nothing is scheduled.
+ *
+ * Read back out of the same preference file [AndroidNotificationScheduler] writes rather than
+ * from the coordinator: the one caller ([PrayerAlarmReceiver]) usually wakes a process that has
+ * never built a plan, so an in-memory answer would always be "nothing scheduled" and every alarm
+ * would rewrite every entry.
+ */
+internal fun scheduledPlanHorizon(context: Context): Instant? {
+    val millis = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        .getLong(KEY_HORIZON, 0L)
+    return if (millis > 0L) Instant.fromEpochMilliseconds(millis) else null
 }

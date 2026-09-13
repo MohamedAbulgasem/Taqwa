@@ -55,7 +55,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             .build()
         NotificationManagerCompat.from(context).notify(notificationId, notification)
 
-        refreshWidgets(context)
+        afterAlarm(context)
     }
 
     /**
@@ -75,34 +75,24 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     }
 
     /**
-     * The one instant in the day when the home-screen widget is guaranteed to be wrong.
-     *
-     * This alarm is already exact, and it fires precisely when "ASR IN 0:01" has to become
-     * "MAGHRIB IN 3:12" — the moment the widget's rolling five-minute refresh would be most
-     * visibly late. Riding along costs one extra redraw per prayer and needs no alarm of its own.
+     * The two things worth doing while this alarm has the process briefly awake: redraw the
+     * widget, and top the plan up before it runs out.
      *
      * `goAsync` rather than [world.taqwa.app.widget.refreshWidgets]: that helper is deliberately
      * fire-and-forget on a process-lifetime scope, which is right for a running app but not here —
      * a broadcast receiver's process may be reclaimed the moment `onReceive` returns, killing the
-     * redraw halfway. The budget is well inside `goAsync`'s own ten-second allowance.
+     * work halfway. The budget is well inside `goAsync`'s own ten-second allowance.
      *
-     * Nothing here may throw: this is the notification path, and a widget that failed to redraw
-     * must never cost the user their adhan.
+     * Nothing here may throw: this is the notification path, and neither a widget that failed to
+     * redraw nor a top-up that failed must ever cost the user their adhan.
      */
-    private fun refreshWidgets(context: Context) {
-        val hook = androidWidgetUpdateHook ?: return
+    private fun afterAlarm(context: Context) {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                withTimeout(WIDGET_REFRESH_BUDGET_MILLIS) {
-                    // A prayer has just arrived, so the mirror's two-day horizon has moved on by
-                    // one prayer: rewrite it from the stored location first, then redraw. This is
-                    // what keeps the widget counting for days on end without the app being
-                    // opened. Same process-wide container and DataStore as the app itself.
-                    runCatching {
-                        WidgetMirrorRefresher.refresh(appContainer.settingsRepository, appContainer.prayerTimesEngine)
-                    }
-                    runCatching { hook() }
+                withTimeout(WORK_BUDGET_MILLIS) {
+                    refreshWidgets()
+                    topUpPlan(context)
                 }
             } catch (_: TimeoutCancellationException) {
                 // The half-hourly update and the next window alarm will both catch up.
@@ -112,7 +102,46 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         }
     }
 
+    /**
+     * The one instant in the day when the home-screen widget is guaranteed to be wrong.
+     *
+     * This alarm is already exact, and it fires precisely when "ASR IN 0:01" has to become
+     * "MAGHRIB IN 3:12" — the moment the widget's rolling five-minute refresh would be most
+     * visibly late. Riding along costs one extra redraw per prayer and needs no alarm of its own.
+     */
+    private suspend fun refreshWidgets() {
+        val hook = androidWidgetUpdateHook ?: return
+        // A prayer has just arrived, so the mirror's two-day horizon has moved on by one prayer:
+        // rewrite it from the stored location first, then redraw. This is what keeps the widget
+        // counting for days on end without the app being opened. Same process-wide container and
+        // DataStore as the app itself.
+        runCatching {
+            WidgetMirrorRefresher.refresh(appContainer.settingsRepository, appContainer.prayerTimesEngine)
+        }
+        runCatching { hook() }
+    }
+
+    /**
+     * The plan is a rolling window — six days with reminders on — and the only Android events
+     * that rebuild it are opening the app, changing a setting, and boot. A reader who keeps the
+     * widget on the home screen and does not open the app for a week would run out of adhan
+     * without ever being told; this alarm is the one thing that reliably runs in between.
+     *
+     * Gated on [NotificationCoordinator.needsTopUp] rather than done every time: a reschedule
+     * cancels and re-arms every pending alarm, and paying that five times a day to extend a
+     * window that still has days left in it is waste. The horizon comes from the scheduler's own
+     * preference file because this process has no plan in memory (see [scheduledPlanHorizon]).
+     */
+    private suspend fun topUpPlan(context: Context) {
+        runCatching {
+            val coordinator = appContainer.notificationCoordinator
+            if (coordinator.needsTopUp(scheduledPlanHorizon(context))) {
+                coordinator.reschedule(RescheduleTrigger.ALARM_FIRED)
+            }
+        }
+    }
+
     private companion object {
-        const val WIDGET_REFRESH_BUDGET_MILLIS = 8_000L
+        const val WORK_BUDGET_MILLIS = 8_000L
     }
 }

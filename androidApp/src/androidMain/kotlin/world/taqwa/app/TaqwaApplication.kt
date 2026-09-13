@@ -1,6 +1,7 @@
 package world.taqwa.app
 
 import android.app.Application
+import world.taqwa.app.notifications.NotificationTopUpWorker
 import world.taqwa.app.notifications.notificationSmallIconResId
 import world.taqwa.app.settings.appContext
 import world.taqwa.app.widget.TaqwaWidgets
@@ -41,5 +42,8 @@ class TaqwaApplication : Application() {
         // needs to be current. Runtime registration is not a choice: ACTION_USER_PRESENT is one of
         // the broadcasts the platform refuses to deliver to manifest-declared receivers.
         TaqwaWidgets.registerUnlockRefresh(this)
+        // The twice-daily rebuild of the alarm plan, for the cases no broadcast covers; see the
+        // worker. WorkManager is already initialised here for the widgets and the downloads.
+        NotificationTopUpWorker.ensureScheduled(this)
     }
 }

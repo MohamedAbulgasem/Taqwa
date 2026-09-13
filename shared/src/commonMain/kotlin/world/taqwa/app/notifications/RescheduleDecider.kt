@@ -24,8 +24,15 @@ object RescheduleDecider {
         plan: List<ScheduledNotification>,
         now: Instant,
         minimumHorizon: Duration,
-    ): Boolean {
-        val furthest = plan.maxOfOrNull { it.instant } ?: return true
+    ): Boolean = needsTopUp(plan.maxOfOrNull { it.instant }, now, minimumHorizon)
+
+    /**
+     * The same question from a caller that never built the plan and knows only how far the armed
+     * one reaches — Android's alarm receiver, which wakes in a process with nothing in memory.
+     * A null [furthest] means nothing is scheduled, which always needs a top-up.
+     */
+    fun needsTopUp(furthest: Instant?, now: Instant, minimumHorizon: Duration): Boolean {
+        if (furthest == null) return true
         return furthest - now < minimumHorizon
     }
 }

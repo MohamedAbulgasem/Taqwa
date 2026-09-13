@@ -1,6 +1,7 @@
 package world.taqwa.app.widget
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -11,10 +12,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
-import androidx.glance.action.actionStartActivity
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.appWidgetBackground
@@ -355,6 +357,21 @@ private fun NextPrayerBlock(
 }
 
 /**
+ * "Open Taqwa", spelled out.
+ *
+ * `actionStartActivity<MainActivity>()` was the shorter form, and it builds an explicit intent
+ * with `FLAG_ACTIVITY_NEW_TASK` and no action at all. From Android 16 an intent with no action
+ * matches no filter, while an explicit intent aimed at a component that *declares* filters has to
+ * match one — and `MainActivity` declares two. Naming the launcher's own action and category is
+ * what this tap has always meant, and it also makes the intent `filterEquals` the task's root, so
+ * a tap on the widget brings the existing task forward exactly as the home-screen icon does.
+ */
+private fun launchIntent(context: Context) = Intent(context, MainActivity::class.java)
+    .setAction(Intent.ACTION_MAIN)
+    .addCategory(Intent.CATEGORY_LAUNCHER)
+    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+/**
  * Rounded card, no border, shared by every Taqwa widget. The in-app cards carry a hairline, but on a home screen the launcher
  * clips the widget to its own corner radius and the stretched 1dp stroke image showed up as a
  * bright rim around the dark card; iOS never had one, and the card reads as a card without it.
@@ -364,7 +381,7 @@ internal fun WidgetCard(
     colors: WidgetPaletteColors,
     // The whole card is one target, and what that target opens is the caller's business: Today
     // for the prayer widgets, the ayah itself for the ayah widget (spec §8).
-    onClick: Action = actionStartActivity<MainActivity>(),
+    onClick: Action = actionStartActivity(launchIntent(LocalContext.current)),
     content: @Composable () -> Unit,
 ) {
     Box(
