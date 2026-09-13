@@ -95,8 +95,9 @@ import world.taqwa.app.resources.recitation_play
  */
 private val Target = 48.dp
 
-/** The dismiss cross, which should be the hardest of the four to hit by accident. */
-private val CloseTarget = 40.dp
+/** The dismiss cross. Its glyph stays the smallest of the four so it is the hardest to hit by
+ * accident, but the target is the 48 dp accessibility minimum like the others. */
+private val CloseTarget = 48.dp
 
 /** The accent disc under the play triangle, 40 dp inside its 48 dp target (was 34 in 44). */
 private val PlayDisc = 40.dp

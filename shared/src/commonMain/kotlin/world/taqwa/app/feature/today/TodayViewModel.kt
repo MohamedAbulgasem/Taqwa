@@ -150,7 +150,11 @@ class TodayViewModel(
         }
     }
 
+    /** Which call to [refresh] is the latest; see the check inside it. */
+    private var latestRefresh = 0
+
     suspend fun refresh() {
+        val ticket = ++latestRefresh
         val location = locationOf()
         if (location == null) {
             _state.value = TodayUiState.NeedsLocation
@@ -160,6 +164,11 @@ class TodayViewModel(
         // cold start. One store read, on the first refresh only.
         seedStoredCityName(location)
         val prefs = settings.prayerSettings.first()
+        // The two reads above suspend on real I/O, and a refresh started later can come out of
+        // them first. This one then holds a location the screen has since left, and publishing
+        // it would put the old city's header over the new one until the next tick — which is
+        // exactly what happened on iOS, where the reads finish in the other order.
+        if (ticket != latestRefresh) return
         val zone = TimeZone.of(location.timeZoneId)
         val instant = now()
         val localDate = instant.toLocalDateTime(zone).date
