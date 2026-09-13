@@ -286,10 +286,15 @@ class RecitationController(
             fractionSurah = surah
         }
         fraction = barFraction(playback, fraction)
+        // The ring on the monogram: whatever the bar is waiting on - a new voice's copy of this
+        // surah (§14.3) or the next surah fetched without asking (§15.3) - and, failing a play
+        // that is waiting, the chosen voice's copy of this surah arriving by some other route.
         val chosen = catalogue.reciter
-        val incoming = chosen?.takeIf { it.id != voice.id }?.let { next ->
-            downloadFraction(playing.downloads[DownloadKey(next.id, surah)])
-        }
+        val waiting = pending
+        val incoming = waiting?.let { downloadFraction(playing.downloads[DownloadKey(it.reciterId, it.surah)]) }
+            ?: chosen?.takeIf { it.id != voice.id }?.let { next ->
+                downloadFraction(playing.downloads[DownloadKey(next.id, surah)])
+            }
         return BarState(
             reciter = voice,
             surah = surah,

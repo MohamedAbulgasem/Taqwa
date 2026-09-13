@@ -783,6 +783,21 @@ class RecitationControllerTest {
         }
 
     @Test
+    fun `the bar's ring shows the next surah arriving`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.settings.stored.value = RecitationSettings(autoDownload = true, autoDownloadAsked = true)
+        harness.library.put("ar.alafasy", setOf(1))
+        val controller = controller(harness, backgroundScope)
+        controller.requestPlay(1, 1)
+
+        controller.nextSurah()
+        harness.downloader.emit(mapOf(DownloadKey("ar.alafasy", 2) to DownloadState.Downloading(25L, 100L)))
+
+        assertEquals(0.25f, controller.state.value.bar?.incoming ?: -1f, 0.001f)
+        assertEquals(1, controller.state.value.bar?.surah)
+    }
+
+    @Test
     fun `the settings switch is written straight through`() = runTest(UnconfinedTestDispatcher()) {
         val harness = Harness()
         val controller = controller(harness, backgroundScope)

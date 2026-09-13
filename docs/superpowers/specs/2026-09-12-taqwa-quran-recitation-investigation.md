@@ -376,6 +376,18 @@ labels sent by the app in its own language); headset rewind and fast-forward mov
 before. iOS shows either track buttons or interval buttons, never both, so there the ayah is
 reached by the seek bar, which snaps to ayahs.
 
+**The page follows.** A reader on the surah that was playing is taken to the one now playing,
+at its first ayah, exactly as the "Next" row at the foot of a surah would take them; a reader on
+some other surah is left where they are. The Mushaf follows by page on its own. While the next
+surah is being fetched without asking, the bar's monogram carries the same ring the reciter
+switch draws (§14.3), so the tap is seen to have done something.
+
+**Verified.** Emulator: bar next offered Ali 'Imran on the sheet, the confirm with the switch on
+fetched it and started it; the system's previous (`KEYCODE_MEDIA_PREVIOUS`) went back to
+Al-Baqarah; a long press on next moved one ayah; the notification's two extra buttons moved an
+ayah each way; a further next fetched An-Nisa with no sheet, started it 75 s later and the reader
+followed it.
+
 ### 15.2 Air over the clock
 
 The clock row grows from 19 to 26 dp with a 5 dp inset above the clocks; the bar is 83 dp.

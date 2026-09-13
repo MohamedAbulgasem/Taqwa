@@ -381,6 +381,22 @@ fun App(container: AppContainer) {
                 val quranTab = navigator.currentTab == Tab.QURAN
                 val bar = recitationState.bar
                 val barSurahName = rememberSurahName(bar?.surah) { container.quranRepository.surah(it) }
+                // A surah skip (spec §15.1) takes the page with the voice: a reader on the surah
+                // that was playing is moved to the one now playing, at its first ayah, as the
+                // "Next" row at the foot of a surah would move them. A reader on some other surah
+                // is left where they are - they were not following. The Mushaf follows by page
+                // on its own, since its pages run across surahs.
+                val playingSurah = bar?.surah
+                var followedSurah by remember { mutableStateOf<Int?>(null) }
+                LaunchedEffect(playingSurah) {
+                    val before = followedSurah
+                    followedSurah = playingSurah
+                    if (playingSurah == null || before == null || before == playingSurah) return@LaunchedEffect
+                    val current = navigator.current
+                    if (current is Screen.Reader && current.surah == before) {
+                        navigator.replace(Screen.Reader(playingSurah, 1))
+                    }
+                }
                 TaqwaTabScaffold(
                     tab,
                     navigator::selectTab,
