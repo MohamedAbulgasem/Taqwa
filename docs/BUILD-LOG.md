@@ -1204,3 +1204,16 @@ is right to left without being Arabic; Bengali is upright and left to right with
 tracking; Turkish capitals get their dots. Indonesian ships twice under the Compose resources
 because Android still spells it "in" and iOS "id". The site gained a language picker in place of
 the lone Arabic link, and each language its own policy page.
+
+The morning review of the screenshots (emulator, five languages, four screens each; simulator,
+three) found three things the validator had not: Compose Multiplatform prints a backslash-escaped
+apostrophe literally, so every Turkish and Indonesian `Kur\'an` showed its backslash — the
+typographic ’ is now the house style and `tools/i18n-check.py` fails the escaped form in Compose
+resources (and the unescaped form in the Android app's own, which aapt rejects); the translated
+files still carried the previous version string, so `scripts/bump-version.sh` now writes it into
+every language; and the timeline showed Urdu the Arabic names (الفجر) while its own ring and
+notifications said فجر — in an Arabic-script interface the interface's own name stands alone, so
+it now does. The crash-report feature landed on main meanwhile; its six strings and its policy
+paragraph went into the five new languages with the merge. 0.18.0 (21) built after the merge:
+tests green on both platforms, the release APK on the emulator and the S23, the site's 21 pages
+checked in the browser.
