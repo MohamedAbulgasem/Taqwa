@@ -56,12 +56,13 @@ actual class SurahDownloader actual constructor(
     private val conditions = AndroidDownloadConditions(context)
 
     /**
-     * The one state WorkManager cannot report. A Wi-Fi-only download asked for on mobile data is
-     * never enqueued at all — see [submit] — so there is no `WorkInfo` to read it from, and the
-     * reader who tapped Download would otherwise be told nothing.
+     * The two states WorkManager cannot report. A download the network refuses — mobile data
+     * against the reader's wishes, or no connection at all — is never enqueued, so there is no
+     * `WorkInfo` to read it from and the reader who tapped Download would otherwise be told
+     * nothing. See [submit].
      *
-     * Only ever holds [DownloadFailure.NEEDS_WIFI], and only until the same surah is asked for
-     * again on a network that allows it.
+     * Only ever holds [DownloadFailure.NEEDS_WIFI] and [DownloadFailure.NO_NETWORK], and only
+     * until the same surah is asked for again on a network that allows it.
      */
     private val refusals = MutableStateFlow<Map<DownloadKey, DownloadState>>(emptyMap())
 
@@ -116,7 +117,7 @@ actual class SurahDownloader actual constructor(
         clearBatchNotification(reciterId)
     }
 
-    /** Drops a Wi-Fi refusal, because the surah is being asked for again or dismissed. */
+    /** Drops a refusal, because the surah is being asked for again or dismissed. */
     private fun forget(keys: List<DownloadKey>) {
         if (refusals.value.keys.none { it in keys }) return
         refusals.value = refusals.value - keys.toSet()
@@ -141,16 +142,15 @@ actual class SurahDownloader actual constructor(
         val reciter = manifest.reciter(reciterId) ?: return
         val allowMetered = allowMobileOnce || settings.recitationSettings.first().downloadOnMobileData
         val keys = surahs.map { DownloadKey(reciterId, it) }
-        // Refuse before enqueueing rather than inside the worker. The UNMETERED constraint below
-        // is what actually keeps a transfer off mobile data — including one already running when
-        // the reader leaves the house — but a constraint that is not met leaves the work sitting
-        // in the queue saying nothing, and a device test on mobile data showed exactly that: a
-        // download that reads "Queued" for ever with no way to see the override. So the metered
-        // question is asked here, where there is still a reader to answer it (spec §5.4).
-        if (!allowMetered && conditions.network() == NetworkKind.METERED) {
-            refusals.value = refusals.value + keys.associateWith {
-                DownloadState.Failed(DownloadFailure.NEEDS_WIFI)
-            }
+        // Refuse before enqueueing rather than inside the worker. The network constraint below is
+        // what actually keeps a transfer off mobile data — including one already running when the
+        // reader leaves the house — but a constraint that is not met leaves the work sitting in
+        // the queue saying nothing, and two device rounds showed exactly that: on mobile data, and
+        // then in flight mode, a download that reads "Queued" for ever. So the network is asked
+        // here, where there is still a reader to answer it (spec §5.4), and both of its answers —
+        // the Wi-Fi policy and no connection at all — become a sentence in the sheet.
+        conditions.refusal(allowMetered)?.let { reason ->
+            refusals.value = refusals.value + keys.associateWith { DownloadState.Failed(reason) }
             return
         }
         forget(keys)

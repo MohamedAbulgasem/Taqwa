@@ -48,8 +48,17 @@ sealed interface SheetPhase {
     /** The primary button, priced. [needsWifiNote] carries the "Over Wi-Fi." line and its override. */
     data class Ready(val needsWifiNote: Boolean) : SheetPhase
 
-    /** The button has become the progress bar. */
-    data class Downloading(val bytes: Long, val total: Long) : SheetPhase
+    /**
+     * The button has become the progress bar.
+     *
+     * [queued] is the difference between a download that is *moving* and one the scheduler has
+     * accepted and not started — WorkManager holding it on a network constraint, most often
+     * because there is no network. Both draw the same bar at the same place; what changes is the
+     * sentence under it, and only after [WAITING_MS], because a second or two of "Queued" is what
+     * every download begins with and a reader told to wait for a connection they already have
+     * would be worse than a bar that sits still for a moment. See the sheet's `Running`.
+     */
+    data class Downloading(val bytes: Long, val total: Long, val queued: Boolean = false) : SheetPhase
 
     /** A plain sentence and a Retry. */
     data class Failed(val reason: DownloadFailure) : SheetPhase
@@ -174,9 +183,16 @@ fun barFraction(playback: PlaybackState, previous: Float): Float {
  * that has committed has no state at all — it is in the library by then — which is why the caller
  * closes the sheet on the library's word rather than on the absence of a [DownloadState].
  */
+/**
+ * How long a [DownloadState.Queued] with nothing behind it may keep saying "playback starts as
+ * soon as it lands" before the sheet admits what it is actually doing (spec §5.4). Long enough
+ * that an ordinary download — accepted, a slot found, the first bytes in — never shows it.
+ */
+const val WAITING_MS = 20_000L
+
 fun sheetPhaseOf(download: DownloadState?, downloadOnMobileData: Boolean, total: Long): SheetPhase = when (download) {
     null -> SheetPhase.Ready(needsWifiNote = !downloadOnMobileData)
-    DownloadState.Queued -> SheetPhase.Downloading(0L, total)
+    DownloadState.Queued -> SheetPhase.Downloading(0L, total, queued = true)
     DownloadState.Verifying -> SheetPhase.Downloading(total, total)
     is DownloadState.Downloading -> SheetPhase.Downloading(download.bytes, download.total)
     is DownloadState.Failed -> SheetPhase.Failed(download.reason)

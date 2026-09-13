@@ -97,6 +97,18 @@ class RecitationStateTest {
     }
 
     @Test
+    fun `a queued download says so and the sheet can stop calling it progress`() {
+        assertEquals(
+            SheetPhase.Downloading(0L, 10L, queued = true),
+            sheetPhaseOf(DownloadState.Queued, downloadOnMobileData = false, total = 10L),
+        )
+        assertEquals(
+            SheetPhase.Downloading(4L, 10L),
+            sheetPhaseOf(DownloadState.Downloading(4L, 10L), downloadOnMobileData = false, total = 10L),
+        )
+    }
+
+    @Test
     fun `following leaves the page alone within four seconds of a touch`() {
         var now = 10_000L
         val following = FollowingState { now }

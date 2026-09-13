@@ -1,6 +1,8 @@
 package world.taqwa.app.recitation
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlin.concurrent.Volatile
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -9,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
@@ -27,6 +30,13 @@ import platform.Foundation.NSURLSessionDownloadTask
 import platform.Foundation.NSURLSessionTask
 import platform.Foundation.setValue
 import platform.darwin.NSObject
+import platform.Network.nw_path_get_status
+import platform.Network.nw_path_monitor_create
+import platform.Network.nw_path_monitor_set_queue
+import platform.Network.nw_path_monitor_set_update_handler
+import platform.Network.nw_path_monitor_start
+import platform.Network.nw_path_monitor_t
+import platform.Network.nw_path_status_satisfied
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 import world.taqwa.app.quran.QuranSource
@@ -297,15 +307,26 @@ actual class SurahDownloader actual constructor(
 }
 
 /**
- * Free space on the volume Application Support lives on. The network half of the policy is the
- * session configuration's (see above), so this always answers "unmetered": refusing here as well
- * would refuse a download iOS is perfectly willing to make over Wi-Fi, and iOS gives no cheap,
- * non-deprecated answer to "is this connection metered" without a live path monitor.
+ * Free space on the volume Application Support lives on, and whether there is a network at all.
+ *
+ * **Metered is still the session configuration's question**, not this one (see above): refusing
+ * here as well would refuse a download iOS is perfectly willing to make over Wi-Fi. But *no
+ * connection at all* has to be answered before a task is created, or the reader in a dead spot is
+ * shown a progress bar for a transfer that has not begun — the same defect the Android side had.
+ * So this answers only two of the three: [NetworkKind.NONE] when the path is unsatisfied,
+ * [NetworkKind.UNMETERED] otherwise.
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosDownloadConditions : DownloadConditions {
 
-    override suspend fun network(): NetworkKind = NetworkKind.UNMETERED
+    init {
+        // Started here rather than at the first question, so the monitor has had the whole of the
+        // app's life to answer one by the time a reader taps Download.
+        IosNetworkPath.start()
+    }
+
+    override suspend fun network(): NetworkKind =
+        if (IosNetworkPath.connected()) NetworkKind.UNMETERED else NetworkKind.NONE
 
     override suspend fun freeBytes(): Long {
         val directory = recitationFilesDirectory().toString()
@@ -315,6 +336,47 @@ class IosDownloadConditions : DownloadConditions {
 }
 
 private typealias NSNumberLike = platform.Foundation.NSNumber
+
+/**
+ * `NWPathMonitor`, once for the process: is there a network the system would let a transfer over.
+ *
+ * A monitor rather than a one-shot check because Network.framework has no one-shot check — the
+ * path arrives on a callback. The first answer takes a few milliseconds, so [connected] waits a
+ * moment for it and **defaults to connected** if it has not come: a downloader that refused
+ * because it had not been told yet would refuse the first tap of every launch.
+ */
+@OptIn(ExperimentalForeignApi::class)
+private object IosNetworkPath {
+
+    @Volatile
+    private var satisfied = true
+
+    private val first = CompletableDeferred<Unit>()
+
+    /** Held for the life of the process; a monitor nobody references stops reporting. */
+    private var monitor: nw_path_monitor_t? = null
+
+    fun start() {
+        if (monitor != null) return
+        val made = nw_path_monitor_create() ?: return
+        monitor = made
+        nw_path_monitor_set_update_handler(made) { path ->
+            satisfied = path != null && nw_path_get_status(path) == nw_path_status_satisfied
+            first.complete(Unit)
+        }
+        nw_path_monitor_set_queue(made, dispatch_get_main_queue())
+        nw_path_monitor_start(made)
+    }
+
+    suspend fun connected(): Boolean {
+        start()
+        withTimeoutOrNull(FIRST_ANSWER_MS) { first.await() }
+        return satisfied
+    }
+
+    /** Long enough for a path that is already known, short enough not to be felt under a thumb. */
+    private const val FIRST_ANSWER_MS = 400L
+}
 
 /**
  * The hook `iOSApp.swift` calls from `application(_:handleEventsForBackgroundURLSession:)`.

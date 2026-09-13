@@ -188,6 +188,39 @@ class DownloadLoopTest {
         )
     }
 
+    // The same three answers asked at the tap rather than in the middle of a transfer. This is
+    // the branch a device in flight mode falls through: nothing is metered when nothing is
+    // connected, so before `refusal` existed the work was enqueued and WorkManager parked it on a
+    // constraint for ever while the sheet drew a progress bar at zero.
+
+    @Test
+    fun theTapRefusesADeviceWithNoNetworkAtAll() = runTest {
+        assertEquals(
+            DownloadFailure.NO_NETWORK,
+            FakeConditions(kind = NetworkKind.NONE).refusal(allowMetered = false),
+        )
+    }
+
+    @Test
+    fun noNetworkIsNotSomethingTheMobileDataOverrideCanAnswer() = runTest {
+        assertEquals(
+            DownloadFailure.NO_NETWORK,
+            FakeConditions(kind = NetworkKind.NONE).refusal(allowMetered = true),
+        )
+    }
+
+    @Test
+    fun theTapRefusesMobileDataUntilThisDownloadOverridesIt() = runTest {
+        val metered = FakeConditions(kind = NetworkKind.METERED)
+        assertEquals(DownloadFailure.NEEDS_WIFI, metered.refusal(allowMetered = false))
+        assertNull(metered.refusal(allowMetered = true))
+    }
+
+    @Test
+    fun theTapLetsAnUnmeteredNetworkThrough() = runTest {
+        assertNull(FakeConditions().refusal(allowMetered = false))
+    }
+
     @Test
     fun aBodyShorterThanTheManifestPromisedIsAServerFailureAndKeepsThePart() = runTest {
         val server = FakeServer(content.copyOfRange(0, content.size - 100))

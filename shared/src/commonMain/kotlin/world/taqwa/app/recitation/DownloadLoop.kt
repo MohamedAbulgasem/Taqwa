@@ -46,6 +46,27 @@ interface DownloadConditions {
     suspend fun freeBytes(): Long
 }
 
+/**
+ * The network's answer to "may this download start", as one rule both platforms and both moments
+ * ask — the tap, and the transfer.
+ *
+ * The two refusals are not the same shape and that is the whole point of writing them together.
+ * [DownloadFailure.NEEDS_WIFI] is a policy the reader can suspend from the sheet; **no network at
+ * all is not a policy**, and until this was pulled out it was not asked at the tap either: the
+ * metered check alone falls straight through a device in flight mode (nothing is metered when
+ * nothing is connected), the work is enqueued, and WorkManager parks it on its `UNMETERED`
+ * constraint. The reader is then shown a progress bar at zero and a ring on the header — a
+ * download that has not started and will not, presented as one in progress.
+ *
+ * @param allowMetered the setting or this download's own one-time override, already resolved.
+ * @return the reason to refuse, or null to go ahead.
+ */
+suspend fun DownloadConditions.refusal(allowMetered: Boolean): DownloadFailure? = when (network()) {
+    NetworkKind.NONE -> DownloadFailure.NO_NETWORK
+    NetworkKind.METERED -> if (allowMetered) null else DownloadFailure.NEEDS_WIFI
+    NetworkKind.UNMETERED -> null
+}
+
 sealed interface DownloadOutcome {
     /** Verified, renamed, in the library. */
     data object Done : DownloadOutcome
@@ -80,11 +101,7 @@ class DownloadLoop(
      * @return the reason to refuse, or null to go ahead.
      */
     suspend fun precheck(asset: SurahAsset, allowMetered: Boolean): DownloadFailure? {
-        when (conditions.network()) {
-            NetworkKind.NONE -> return DownloadFailure.NO_NETWORK
-            NetworkKind.METERED -> if (!allowMetered) return DownloadFailure.NEEDS_WIFI
-            NetworkKind.UNMETERED -> Unit
-        }
+        conditions.refusal(allowMetered)?.let { return it }
         // The whole asset, not what is left to fetch: spec §8's rule is about the device having
         // room to hold the surah, and a part that is already there is room already spent.
         if (conditions.freeBytes() < HEADROOM_BYTES + asset.bytes) {

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
@@ -51,6 +53,7 @@ import world.taqwa.app.resources.recitation_over_wifi
 import world.taqwa.app.resources.recitation_retry
 import world.taqwa.app.resources.recitation_settings_whole_quran
 import world.taqwa.app.resources.recitation_use_mobile_once
+import world.taqwa.app.resources.recitation_waiting_connection
 
 /**
  * The download sheet (spec §5.4). One surah, one voice, one price, and — while it runs — one
@@ -193,6 +196,18 @@ private fun Ready(
 @Composable
 private fun Running(phase: SheetPhase.Downloading, onCancel: () -> Unit) {
     val colors = LocalTaqwaColors.current
+    // A download that has been accepted and has not moved a byte in twenty seconds is a download
+    // waiting for something — a network, most of the time — and saying "playback starts as soon
+    // as it lands" over an empty bar is the sentence the flight-mode round found indistinguishable
+    // from progress. The clock runs only while the state is actually Queued: the first byte, or a
+    // failure, ends it.
+    var waiting by remember(phase.queued) { mutableStateOf(false) }
+    if (phase.queued) {
+        LaunchedEffect(Unit) {
+            delay(WAITING_MS)
+            waiting = true
+        }
+    }
     val target = if (phase.total <= 0L) 0f else (phase.bytes.toFloat() / phase.total).coerceIn(0f, 1f)
     val fraction by animateFloatAsState(target, tween(400), label = "downloadProgress")
     // The button's own shape and height, filled from the start: the primary button *becomes* the
@@ -222,7 +237,9 @@ private fun Running(phase: SheetPhase.Downloading, onCancel: () -> Unit) {
         )
     }
     Text(
-        stringResource(Res.string.recitation_keep_reading),
+        stringResource(
+            if (waiting) Res.string.recitation_waiting_connection else Res.string.recitation_keep_reading,
+        ),
         style = TaqwaText.caption,
         color = colors.textSecondary,
         modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
