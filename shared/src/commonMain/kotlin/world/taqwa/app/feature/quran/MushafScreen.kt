@@ -27,12 +27,15 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.LayoutDirection
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.feature.recitation.BackToAyahPill
 import world.taqwa.app.feature.recitation.Follow
 import world.taqwa.app.feature.recitation.HeaderState
+import world.taqwa.app.feature.recitation.PILL_SETTLE_MS
 import world.taqwa.app.feature.recitation.PillGap
 import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.rememberFollowing
@@ -197,6 +200,23 @@ fun MushafScreen(
                 }
                 Follow.PILL -> following.pill = playing?.second
                 Follow.LEAVE_ALONE -> Unit
+            }
+        }
+        // The same question asked when the *reader* turns pages rather than when the voice does.
+        // The effect above only fires as the recitation crosses onto a new page, which on a page
+        // the reciter is still working through can be minutes; until then a reader who had swiped
+        // several pages away was offered nothing to get back with.
+        // Keyed on the ayah, not only on its page: several ayahs share a page, and a pill offering
+        // to go back to the ayah the voice was on when the *page* last changed is a pill with the
+        // wrong number on it.
+        LaunchedEffect(playing, playingPage, pagerState) {
+            val page = playingPage ?: return@LaunchedEffect
+            snapshotFlow { pagerState.isScrollInProgress }.collectLatest { moving ->
+                if (moving) return@collectLatest
+                delay(PILL_SETTLE_MS)
+                if (kotlin.math.abs(page - (pagerState.currentPage + 1)) > 1) {
+                    following.pill = playing?.second
+                }
             }
         }
         LaunchedEffect(playingPage, pagerState) {

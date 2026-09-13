@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -55,6 +57,7 @@ import world.taqwa.app.design.contentWidth
 import world.taqwa.app.feature.recitation.BackToAyahPill
 import world.taqwa.app.feature.recitation.FOLLOW_VIEWPORT_FRACTION
 import world.taqwa.app.feature.recitation.Follow
+import world.taqwa.app.feature.recitation.PILL_SETTLE_MS
 import world.taqwa.app.feature.recitation.PillGap
 import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.rememberFollowing
@@ -221,6 +224,19 @@ fun ReaderScreen(
                 }
                 Follow.PILL -> following.pill = playingAyah
                 Follow.LEAVE_ALONE -> Unit
+            }
+        }
+        // ...and the pill comes up when the *reader* leaves, not only when the voice moves on. The
+        // effect above fires on an ayah boundary, which with a long ayah can be minutes away; a
+        // reader who has scrolled several screens off in the middle of Al-Baqarah 282 would have
+        // nothing offering the way back until it ended. Asked once the scroll has settled, so it
+        // is not re-evaluated on every frame of a fling, and cancelled by the next scroll.
+        LaunchedEffect(playingAyah, listState) {
+            val target = playingAyah?.let(::itemIndexOf) ?: return@LaunchedEffect
+            snapshotFlow { listState.isScrollInProgress }.collectLatest { moving ->
+                if (moving) return@collectLatest
+                delay(PILL_SETTLE_MS)
+                if (screensAway(target) > 1) following.pill = playingAyah
             }
         }
         // The pill goes as soon as the ayah is back on screen, however it got there — the reader

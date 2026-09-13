@@ -77,6 +77,18 @@ class FollowingState(private val now: () -> Long) {
     }
 }
 
+/**
+ * How long after the reader's scroll has settled the "more than a viewport away" question is asked
+ * again (spec §5.3).
+ *
+ * The rule used to be evaluated only when the *voice* moved to a new ayah, which meant the pill
+ * appeared at the next ayah boundary rather than when the reader actually scrolled away — and
+ * Al-Baqarah 282 runs for minutes, so the reader could be several screens from the recitation with
+ * nothing on screen offering the way back. Scrolling is now an event of its own; the delay is what
+ * keeps the pill from flickering in and out under a moving thumb.
+ */
+const val PILL_SETTLE_MS = 300L
+
 @Composable
 fun rememberFollowing(): FollowingState =
     remember { FollowingState { Clock.System.now().toEpochMilliseconds() } }
