@@ -1158,3 +1158,11 @@ button down. The clock row got air above it. And the download sheet carries a sw
 "Download future surahs without asking", ticked the first time: a surah you play is fetched and
 played when it lands, the header's ring the only thing moving, and the sheet comes back only to
 say why a fetch was refused.
+
+### Back to the ayah (13 September, night)
+
+Two more from Mohamed. The bar's words now take you to the ayah being recited — scrolling if
+the surah is already open, opening its reader or page if not — and the monogram alone opens the
+picker. A tap on the Android media notification does the same through a launch request the
+app resolves once it is in front. iOS gives no such tap, so there the app coming to the front
+with a voice still going opens the ayah; paused, it stays where it was.

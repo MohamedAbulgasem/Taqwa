@@ -29,6 +29,12 @@ data class QuranRecitation(
     val onPlayAyah: (surah: Int, ayah: Int) -> Unit = { _, _ -> },
     /** The play/pause of an ayah that is already the one playing. */
     val onToggle: () -> Unit = {},
+    /**
+     * A request from outside the screen — the bar, the media notification — to show the ayah
+     * being recited (spec §15.5): each new value is one request, and the screen scrolls to the
+     * ayah and re-arms following, exactly as its own "Back to ayah" pill does. Zero is none.
+     */
+    val jumpToken: Int = 0,
 ) {
     /** The ayah of [surah] being recited, or null when the voice is elsewhere. */
     fun ayahIn(surah: Int): Int? = playing?.takeIf { it.first == surah }?.second

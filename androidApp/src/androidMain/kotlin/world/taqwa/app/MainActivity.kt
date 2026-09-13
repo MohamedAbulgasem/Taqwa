@@ -50,10 +50,16 @@ class MainActivity : ComponentActivity() {
         val surah = intent?.getIntExtra(EXTRA_OPEN_SURAH, 0) ?: 0
         val ayah = intent?.getIntExtra(EXTRA_OPEN_AYAH, 0) ?: 0
         if (surah > 0 && ayah > 0) LaunchRequests.openAyah(surah, ayah)
+        // The media notification's tap (recitation spec §15.5): not an ayah but "the one being
+        // recited", resolved by App once it is in front.
+        if (intent?.getBooleanExtra(LaunchRequests.ANDROID_EXTRA_OPEN_PLAYING, false) == true) {
+            LaunchRequests.openPlaying()
+        }
         // Stripped once recorded, so an activity recreated from a saved instance state — which
         // hands onCreate the same intent back — never re-reads these and replays the tap.
         intent?.removeExtra(EXTRA_OPEN_SURAH)
         intent?.removeExtra(EXTRA_OPEN_AYAH)
+        intent?.removeExtra(LaunchRequests.ANDROID_EXTRA_OPEN_PLAYING)
     }
 
     private companion object {

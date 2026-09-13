@@ -58,7 +58,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">0.14.1</string>
+    <string name="settings_version_value">0.15.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
@@ -352,6 +352,8 @@
     <string name="recitation_arriving_voice">%1$s · %2$s</string>
     <string name="recitation_percent">%1$s%</string>
     <string name="recitation_a11y_close">Close the player</string>
+    <string name="recitation_a11y_change_reciter">Change reciter</string>
+    <string name="recitation_a11y_go_to_playing">Go to the ayah being recited</string>
     <string name="recitation_a11y_preview">Hear this reciter</string>
     <!-- Settings > Quran > Recitation, and its Downloads screen (spec 3a §5.6) -->
     <string name="settings_group_quran">QURAN</string>

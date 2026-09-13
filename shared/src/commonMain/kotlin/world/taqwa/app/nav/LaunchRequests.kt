@@ -38,6 +38,26 @@ object LaunchRequests {
         _pendingAyah.value = null
     }
 
+    private val _pendingPlaying = MutableStateFlow(false)
+
+    /**
+     * A tap on the media notification or lock-screen player (spec §15.5): open the ayah being
+     * recited, wherever it is by the time the app is in front. Resolved at that moment rather
+     * than carried as a reference, because the voice keeps moving while the app comes up.
+     */
+    val pendingPlaying: StateFlow<Boolean> get() = _pendingPlaying
+
+    fun openPlaying() {
+        _pendingPlaying.value = true
+    }
+
+    fun consumePlaying() {
+        _pendingPlaying.value = false
+    }
+
+    /** The Android intent extra the media session's tap carries; read by `MainActivity`. */
+    const val ANDROID_EXTRA_OPEN_PLAYING = "open_playing"
+
     private const val SURAH_COUNT = 114
     private const val LONGEST_SURAH = 286
 }
