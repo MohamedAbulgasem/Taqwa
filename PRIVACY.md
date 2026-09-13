@@ -60,6 +60,10 @@ of upcoming prayer times, and that backup is encrypted by Apple and never visibl
 - No third-party SDK that talks to the internet.
 - No sale or sharing of data, because there is none to sell or share.
 
+Your phone may send crash reports to Google or Apple under its own settings; those come from
+the phone, not from Taqwa, and contain nothing of yours beyond the technical details of the
+crash.
+
 ## Children
 
 Taqwa collects no data from anyone, of any age.
