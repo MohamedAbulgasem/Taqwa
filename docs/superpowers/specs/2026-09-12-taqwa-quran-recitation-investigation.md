@@ -192,3 +192,124 @@ Answers to §0, plus two design corrections. This section governs where it diffe
 - **Speaker glyph mirrors under RTL** (Material's convention for volume icons); the equaliser does not.
 - **Batch cancel** lives on the Recitation screen; the download sheet's Cancel stops the one surah it shows. Noted for 3b: a batch's sheet should offer to cancel the batch.
 - **Withdrawn reciter's files** stay on disk and in the storage total but lose their card; offering to delete them is 3b.
+
+## 14. Round two — 13 September (Mohamed's six asks after a day with 0.11.0)
+
+Built on branch `recitation-2`. Each subsection is one ask, the decision taken, and where it
+lives. §2's licence position and §4's container are unchanged except where §14.6 says.
+
+### 14.1 The surah as one clock
+
+**Ask.** Progress against the whole surah, with elapsed and total time, "like a music player".
+
+**Decision.** `SurahTimeline`: every queue item's length in ms — ayahs *and* the reciter's gaps —
+in queue order, with `startOf`, `elapsed(index, positionMs)`, `indexAt(ms)` and `snapToAyah`.
+The lengths are **estimated from the container, not measured**: an ayah's audio bytes (its
+`len` less the ID3 tag at its head, read as ten bytes per ayah through one open handle) over the
+bit-rate the index records, `bytes × 8 / kbps` ms. Measured against ffprobe on the corpus the
+error is under 30 ms an ayah for a constant-bit-rate file. Both players build the timeline from
+the same container and there is deliberately **no refinement from measured durations**, so the
+app's bar and the service's lock-screen bar are on one clock. Where an item's measured length
+differs from its slot, the position is *scaled into the slot* (`fitToSlot`) rather than clamped:
+the clock runs a shade fast or slow through that ayah and never stalls or jumps at a seam.
+
+`PlaybackState` carries `surahPositionMs`/`surahDurationMs` beside the ayah pair; `barFraction`
+reads them when present. `formatClock` prints `m:ss`, or `h:mm:ss` for both ends once the surah
+runs an hour, in the locale's digits and padded with its zero.
+
+**Android.** The app reads the timeline at `load` and sends it to the service with the queue's
+text (`ARG_TIMELINE`, a `LongArray`). `AyahPlayer` reports `getCurrentPosition`, `getDuration`,
+`getBufferedPosition` and their content twins on the surah's clock while the timeline matches
+the loaded queue, so the notification and lock screen show the whole surah; `seekTo(ms)` snaps
+to the start of the ayah under the thumb; `seekBack`/`seekForward` move by ayah. The app's
+`MediaController` therefore reads surah-level numbers too, and derives the within-ayah position
+the previous-button rule needs (`withinAyah`), with a duration check (`onSurahClock`) so a
+session without a clock is still read correctly.
+
+**iOS.** Same timeline in `MPNowPlayingInfoCenter`; the gap — a `delay`, not an item — is
+timed with a monotonic mark; `changePlaybackPositionCommand` is enabled with the same snap.
+
+**Verified.** Emulator: Al-Baqarah by Al Muaiqly 1:41:59, by Ash-Shatri 1:58:20; `dumpsys
+media_session` position 53,896 ms at ayah 7 (queue item 12), i.e. the surah's clock, not the
+item's.
+
+### 14.2 The bar
+
+**Ask.** Bigger previous / play / next so a thumb does not hit the wrong one; the card may grow.
+
+**Decision.** 76 dp (was 56): a hairline, a 19 dp clock row — elapsed, a 3 dp accent line
+filling from the reading edge, total — and a 56 dp transport row. Previous, play and next are
+48 dp targets (were 44) with 22 dp skip glyphs (18) and a 40 dp play disc (34); the dismiss
+cross stays smaller at 40 dp so it is the hardest of the four to hit by accident. The monogram
+sits in a 46 dp box that leaves room for the incoming-voice ring (§14.3). `PlayerBarHeight`
+drives the reader's and Mushaf's bottom clearance, so nothing else had to move. Titles
+ellipsise rather than clip. The clocks use tabular figures.
+
+### 14.3 Picking a voice that does not have the playing surah
+
+**Ask.** Today the tap does nothing visible; only stopping the bar gets the download offered.
+Offer the download while the old voice carries on, then switch when it lands.
+
+**Decision.** `pickReciter` persists the choice, drops any switch still waiting, and then, for
+a voice without this surah, opens the download sheet for it — the same sheet, with one more
+sentence: *"Al Muaiqly keeps playing until it arrives."* on the Ready face, and *"Al Muaiqly
+keeps playing. The voice changes to Ash-Shatri as soon as it lands."* on the Running face
+(`DownloadSheetState.playingMeanwhile`). The bar names the voice being heard and draws the
+header's 2 dp ring around its monogram while the chosen voice's copy arrives
+(`BarState.incoming`). `confirmDownload` records the pending play with `follow = true` when
+the surah is being recited; when the library reports the surah, the new voice starts **at the
+ayah being heard at that moment**, and paused if the listener had paused. Cancelling the
+download leaves the choice of voice as made and the old voice playing; dismissing the bar drops
+the pending switch (the download itself continues, as every download does).
+
+**Verified.** Emulator: Al Muaiqly playing Al-Baqarah, pick Ash-Shatri → sheet with the
+sentence → confirm → ring on the monogram → 108 MB later the bar and the session metadata read
+Ash-Shatri, at the ayah being heard.
+
+### 14.4 The same voice, paused
+
+**Ask.** Tapping the current reciter in the picker while paused should resume.
+
+**Decision.** `pickReciter` on the voice already loaded: paused → `play()`; playing → nothing.
+The picker stays open, as it always did after a pick. Verified on the emulator through the
+session's state: PAUSED → PLAYING on the tap.
+
+### 14.5 Previews over a recitation
+
+**Ask.** A preview played over the surah; it should pause the surah and resume it after.
+
+**Decision.** `previewReciter` pauses a playing recitation and remembers that it did
+(`pausedForPreview`); the recitation is given back when the clip ends — `ClipPlayer.play` now
+takes an `onEnd`, reported by `MediaPlayer`'s completion listener and `AVAudioPlayer`'s
+delegate, with the 17 s timeout as the backstop — when the picker closes, or when a pick leaves
+the old voice playing. It is *not* given back when the reader presses play on the bar (their
+press is the resume) or when a pick starts a new voice. A preview over a recitation that was
+already paused resumes nothing. Verified on the emulator: PAUSED on the triangle, PLAYING 17 s
+later.
+
+### 14.6 Reciter order, and Al-Ajmi
+
+**Order.** Alafasy, Ash-Shatri, Al Muaiqly, Abdul Basit, Al-Minshawi, Al-Husary, Ash-Shuraim,
+As-Sudais, Al-Hudhaify, then Al-Ajmi. The app draws the manifest in its own order, so the order
+is the pipeline's reciter table (`common.py`); published to Taqwa-data and bundled the same
+afternoon, so 0.11.0 installs pick it up on their next daily refresh.
+
+**Al-Ajmi.** The 128 kbps edition (everyayah's *ketaballah* set, byte-identical to the CDN's)
+is broken at source in several places: 9:62 is an MPEG-video fragment, 50:10 a quarter-second
+stub, 50:9 a 1.7 s stub that passed the length check, three ayahs of 77 are 32 kbps at 11 kHz,
+and hundreds are variable-bit-rate averaging 117–134 kbps. The 64 kbps folder is the same
+recording (cross-correlation 0.95 on the ayahs compared) and whole where the 128 is broken, so
+**Al-Ajmi ships at 64 kbps**, like four of the other nine. Two pipeline safeguards came out of
+finding this: `repair.py` now probes what the CDN serves before counting it recovered (a 200
+with no audio stream had it looping), and has a `--substitute` last resort that takes an ayah
+from the reciter's other published bit-rate after proving the same edition on three controls;
+`pack.py` probes every file's bit-rate and writes an ayah's own `kbps` into the index when it is
+further than 2 kbps from the reciter's, which `TaqaAyah.kbps` reads for the length estimate. The
+container format is unchanged — the key is optional and 0.11.0 ignores it.
+
+### 14.7 Not done in this round
+
+- Scrubbing on the bar itself. The drag-down-to-dismiss gesture owns the bar's vertical axis
+  and the line is 3 dp; the lock screen has the scrub.
+- Refining the clock from measured durations (see §14.1 for why not).
+- Cancelling a switch's download from the bar; the sheet's Cancel does it.

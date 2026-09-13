@@ -1079,3 +1079,33 @@ now asked before enqueueing. Settings › Quran › Recitation holds the reciter
 switch, per-reciter downloads with delete, and "Download the whole Quran", whose batch was cancelled
 on the emulator at 68 surahs with nothing left queued and every finished surah still on disk.
 743 tests in the shared module, the suite green on both targets.
+
+### Recitation, round two (13 September, branch `recitation-2`)
+
+Mohamed used 0.11.0 for a morning and came back with six things. The order of the reciters
+(Ash-Shatri second), the transport buttons too close together, and three behaviours that were
+right by the spec and wrong in the hand: a progress line that filled and emptied every ayah, a
+reciter tap that did nothing when the new voice lacked the surah, and a preview that played over
+the recitation like a second radio.
+
+The surah became one clock. A `.taqa` records every ayah's byte length, and the corpus is
+constant-bit-rate, so the length of each ayah is its bytes over its bit-rate to within a frame
+— the only thing to leave out is the ID3 tag at each file's head. `SurahTimeline` is that
+arithmetic, gaps included; both players build it from the same container, the Android service
+is handed it with the queue and reports the whole surah to the lock screen, and a scrub there
+lands on the start of the ayah under the thumb. Nothing is refined from measured durations on
+purpose: two players reading two clocks would drift a frame an ayah, and the one thing a
+measured length is used for is to scale the position inside its estimated slot so the clock
+never stalls at a seam. Then Al-Ajmi's edition turned out not to be constant-bit-rate after all,
+and an ayah may now carry its own `kbps` in the index.
+
+Picking a voice that has nothing for the playing surah now offers the download with a sentence
+saying the old voice carries on, draws a thin ring around the monogram while the copy arrives,
+and switches at the ayah being heard when it lands. Tapping the voice already playing, while
+paused, resumes it. A preview pauses the recitation and the end of the clip — `ClipPlayer`
+reports it now — gives it back.
+
+Al-Ajmi himself cost the afternoon. His 128 kbps edition has an MPEG-video fragment where 9:62
+should be, stubs at 50:9 and 50:10, three ayahs at telephone quality and hundreds at variable
+bit-rate. The repair script had been counting a 200 with no audio as a recovered file and
+looping. The 64 kbps folder is the same recording, whole; he ships from it.
