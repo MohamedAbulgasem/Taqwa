@@ -658,6 +658,7 @@ fun App(container: AppContainer) {
                                 state = recitationState,
                                 storage = storage,
                                 onBack = { navigator.pop() },
+                                onOpened = recitation::onSettingsOpened,
                                 onOpenPicker = recitation::openPicker,
                                 onSetMobileData = recitation::setDownloadOnMobileData,
                                 onOpenDownloads = { navigator.push(Screen.RecitationDownloads(it)) },
