@@ -1,6 +1,12 @@
 """Repair the ayahs a reciter's CDN directory refuses to serve.
 
-    python3 repair.py <reciter id> [rounds] [--fallback] [--substitute]
+    python3 repair.py <reciter id> [rounds] [--fallback] [--substitute] [--only=N,N,...]
+
+--only names global ayahs to treat as absent whatever is on disk - the files are
+removed first - for the case a human has found a file that plays and passes
+every automatic gate and is still wrong (an ayah file carrying the next ayah
+too). With --substitute and rounds 0 it takes exactly those from the other
+bit-rate folder.
 
 --substitute is the last resort after the fallback, and is never passed by
 finish.py: a human asks for it. An ayah that is broken at source in every copy
@@ -9,10 +15,11 @@ published bit-rate folder for the same reciter (Al-Ajmi's 9:62 and 50:10 are an
 MPEG-video fragment and a quarter-second stub at 128 kbps everywhere, and whole
 at 64). The licence covers every bit-rate the Islamic Network publishes, and the
 index carries each ayah's measured length, so a mixed container plays and clocks
-correctly. What is checked first is only that three control ayahs decode to the
-same length within a tenth of a second - the same recording trimmed alike, not
-a proof of the same take - so every substitution is logged in capitals for
-someone to listen to before the reciter ships.
+correctly. The other folder is first shown to be the same take on three control
+ayahs by loudness-envelope cross-correlation (same_take.py; the folders trim
+differently, so lengths prove nothing), each substituted file passes the same
+gate as any other, and every substitution is logged in capitals for someone to
+listen to before the reciter ships.
 
 Some objects on cdn.islamic.network answer 502 persistently rather than 403/404:
 the object exists in the catalogue but the origin cannot read it.  This retries
@@ -32,6 +39,7 @@ import time
 import urllib.request
 
 from common import UA, log, outdir, reciter, surah_ranges
+from same_take import SAME_TAKE, same_take
 from verify import probe, reference_durations
 
 # Islamic Network edition -> candidate everyayah directories at the same true
@@ -143,9 +151,10 @@ def other_bitrate_folder(rid):
 
 
 def check_other_bitrate(rid, other):
-    """True when three control ayahs we hold decode to the same length (within
-    0.1 s) as the other bit-rate folder's. Same length is not the same take;
-    see the module docstring."""
+    """True when three control ayahs we hold are the same take as the other bit-rate
+    folder's, by loudness-envelope cross-correlation (same_take.py): the two folders
+    trim differently, so lengths cannot say, and re-encoding means bytes cannot either.
+    A different take of the same words scores well under the bar."""
     d = outdir(rid)
     for g in (262, 1000, 5000):
         mine = os.path.join(d, f"{g}.mp3")
@@ -154,19 +163,17 @@ def check_other_bitrate(rid, other):
         tmp = os.path.join("/tmp", f"ob-{rid}-{g}.mp3")
         try:
             fetch(f"https://cdn.islamic.network/quran/audio/{other}/{rid}/{g}.mp3", tmp)
-            a, ea = probe(mine)
-            b, eb = probe(tmp)
+            score = same_take(mine, tmp)
         except Exception as e:  # noqa: BLE001
-            log(f"  substitute {rid}/{other}: cannot fetch control {g}: {e}")
+            log(f"  substitute {rid}/{other}: cannot compare control {g}: {e}")
             return False
         finally:
             if os.path.exists(tmp):
                 os.remove(tmp)
-        if ea or eb or abs(a - b) > 0.1:
-            log(f"  substitute {rid}/{other}: control {g} differs ({a} vs {b}, {ea or eb})")
+        if score < SAME_TAKE:
+            log(f"  substitute {rid}/{other}: control {g} is not the same take (envelope correlation {score:.2f})")
             return False
-    log(f"  substitute {rid}: cdn/{other} matches 3 controls in length - a substitution "
-        f"from it must still be listened to")
+        log(f"  substitute {rid}/{other}: control {g} same take, correlation {score:.2f}")
     return True
 
 
@@ -176,6 +183,7 @@ def main():
     use_fallback = "--fallback" in args
     use_substitute = "--substitute" in args
     rounds = next((int(a) for a in args if a.isdigit()), 8)
+    only = next((a for a in args if a.startswith("--only=")), None)
     folder = reciter(rid)[1]
     d = outdir(rid)
     ranges = surah_ranges()
@@ -183,6 +191,13 @@ def main():
     # verify.py judges it by - a stub that plays is still a stub.
     reference = reference_durations(rid)
 
+    if only:
+        chosen = sorted({int(x) for x in only[len("--only="):].split(",") if x.strip()})
+        for n in chosen:
+            path = os.path.join(d, f"{n}.mp3")
+            if os.path.exists(path):
+                os.remove(path)
+        log(f"repair {rid}: --only removed {len(chosen)} files a human judged wrong: {chosen}")
     todo = missing_list(rid)
     log(f"repair {rid}: {len(todo)} absent: {todo}")
     if len(todo) > 50:
