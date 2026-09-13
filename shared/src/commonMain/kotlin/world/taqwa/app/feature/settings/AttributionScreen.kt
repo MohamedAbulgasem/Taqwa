@@ -30,7 +30,11 @@ import world.taqwa.app.resources.credit_quran_font_detail
 import world.taqwa.app.resources.credit_quran_layout
 import world.taqwa.app.resources.credit_quran_layout_detail
 import world.taqwa.app.resources.credit_quran_text
+import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.resources.credit_quran_text_detail
+import world.taqwa.app.resources.credit_recitations
+import world.taqwa.app.resources.credit_recitations_detail
 import world.taqwa.app.resources.credit_translations
 import world.taqwa.app.resources.credit_translations_detail
 import world.taqwa.app.resources.credit_typeface
@@ -38,7 +42,13 @@ import world.taqwa.app.resources.credit_typeface_detail
 import world.taqwa.app.resources.quran_sheet_transliteration
 import world.taqwa.app.resources.settings_attribution
 
-private data class Credit(val what: String, val detail: String, val source: String? = null)
+private data class Credit(
+    val what: String,
+    val detail: String,
+    val source: String? = null,
+    /** A second paragraph under the detail, in the same tint: the ten reciters, named. */
+    val extra: String? = null,
+)
 
 /**
  * The contents of `docs/ATTRIBUTION.md`. GeoNames' CC BY 4.0 makes this screen an obligation.
@@ -46,7 +56,7 @@ private data class Credit(val what: String, val detail: String, val source: Stri
  * one would break the very reference it exists to give.
  */
 @Composable
-private fun credits(translations: List<TranslationInfo>): List<Credit> = listOf(
+private fun credits(translations: List<TranslationInfo>, reciters: List<Reciter>): List<Credit> = listOf(
     Credit(
         what = stringResource(Res.string.credit_calculation),
         detail = stringResource(Res.string.credit_calculation_detail),
@@ -90,6 +100,18 @@ private fun credits(translations: List<TranslationInfo>): List<Credit> = listOf(
         detail = stringResource(Res.string.credit_translations_detail),
         source = "tanzil.net/trans",
     ),
+    Credit(
+        what = stringResource(Res.string.credit_recitations),
+        detail = stringResource(Res.string.credit_recitations_detail),
+        source = "alquran.cloud",
+        // Read from the catalogue in force, never written down here, for the same reason the
+        // translations below are read from the database: a reciter withdrawn from the manifest
+        // (spec §2's one obligation we can be held to) disappears from the app *and* from its
+        // credits, with no app update and no line left behind naming someone we no longer carry.
+        extra = isRtlLocale().let { arabic ->
+            reciters.joinToString(if (arabic) "، " else ", ") { if (arabic) it.nameAr else it.nameEn }
+        }.takeIf { it.isNotBlank() },
+    ),
 ) + translations.map { translation ->
     // Read from the database, never hardcoded, so this list can never drift from what is
     // actually bundled (spec §6).
@@ -105,9 +127,13 @@ private fun credits(translations: List<TranslationInfo>): List<Credit> = listOf(
 }
 
 @Composable
-fun AttributionScreen(translations: List<TranslationInfo>, onBack: () -> Unit) {
+fun AttributionScreen(
+    translations: List<TranslationInfo>,
+    reciters: List<Reciter>,
+    onBack: () -> Unit,
+) {
     val colors = LocalTaqwaColors.current
-    val credits = credits(translations)
+    val credits = credits(translations, reciters)
     SettingsScaffold(stringResource(Res.string.settings_attribution), onBack) {
         SettingsNote(stringResource(Res.string.attribution_intro))
         Spacer(Modifier.height(16.dp))
@@ -118,6 +144,10 @@ fun AttributionScreen(translations: List<TranslationInfo>, onBack: () -> Unit) {
                     Text(credit.what, style = TaqwaText.rowLabel, color = colors.textPrimary)
                     Spacer(Modifier.height(2.dp))
                     Text(credit.detail, style = TaqwaText.caption, color = colors.textSecondary)
+                    if (credit.extra != null) {
+                        Spacer(Modifier.height(6.dp))
+                        Text(credit.extra, style = TaqwaText.caption, color = colors.textSecondary)
+                    }
                     if (credit.source != null) {
                         Spacer(Modifier.height(2.dp))
                         Text(credit.source, style = TaqwaText.caption, color = colors.textTertiary)

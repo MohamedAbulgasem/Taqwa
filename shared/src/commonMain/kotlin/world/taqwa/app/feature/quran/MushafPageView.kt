@@ -55,6 +55,8 @@ import world.taqwa.app.design.ContentMaxWidth
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.drawBookmark
+import world.taqwa.app.design.components.drawSpeaker
+import world.taqwa.app.feature.recitation.PlayingMark
 import world.taqwa.app.design.components.drawCopy
 import world.taqwa.app.design.components.drawShare
 import world.taqwa.app.design.contentWidth
@@ -75,6 +77,7 @@ import world.taqwa.app.resources.quran_action_share
 import world.taqwa.app.resources.quran_juz_n
 import world.taqwa.app.resources.quran_madani
 import world.taqwa.app.resources.quran_makki
+import world.taqwa.app.resources.recitation_play
 
 /** The frame's own width at the reference 375 dp screen, from which the base size scales (spec §5.1). */
 private const val REFERENCE_FRAME_WIDTH_DP = 347f
@@ -116,6 +119,13 @@ fun MushafPageView(
     onBookmark: () -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
+    /** The ayah being recited (spec 3a §5.3), lit whether or not it is the one tapped. */
+    playing: Pair<Int, Int>? = null,
+    /** True while the voice is actually going, as opposed to paused on this ayah. */
+    playingLive: Boolean = false,
+    /** The reference pill's Play, which acts on the *tapped* ayah — the finger's ayah, not the
+     * voice's. */
+    onPlay: () -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     val family = mushafFamily()
@@ -125,6 +135,10 @@ fun MushafPageView(
     // one selection across page turns, and a page the ayah is not on must show neither field nor
     // pill.
     val marked = highlighted?.takeIf { (surah, ayah) ->
+        page.lines.any { line -> line.words.any { it.surah == surah && it.ayah == ayah } }
+    }
+    // The same test for the voice's ayah: a page the recitation has moved off carries no field.
+    val lit = playing?.takeIf { (surah, ayah) ->
         page.lines.any { line -> line.words.any { it.surah == surah && it.ayah == ayah } }
     }
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -207,6 +221,7 @@ fun MushafPageView(
                                         placed = placed,
                                         lineHeight = lineHeight,
                                         highlighted = marked,
+                                        playing = lit,
                                         onTapAyah = onTapAyah,
                                     )
                                 }
@@ -221,7 +236,9 @@ fun MushafPageView(
                             // fully inside the frame would cover the end of it.
                             modifier = Modifier.align(Alignment.BottomCenter).offset(y = 16.dp),
                             bookmarked = bookmarked,
+                            playing = playingLive && marked == lit,
                             onClear = onClearHighlight,
+                            onPlay = onPlay,
                             onBookmark = onBookmark,
                             onCopy = onCopy,
                             onShare = onShare,
@@ -321,16 +338,29 @@ private fun MushafTextLine(
     placed: PlacedLine,
     lineHeight: Dp,
     highlighted: Pair<Int, Int>?,
+    playing: Pair<Int, Int>?,
     onTapAyah: (Int, Int) -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
     val field = colors.accent.copy(alpha = 0.16f)
+    // The voice's field is deeper than the finger's, and drawn over it, so an ayah that is both
+    // tapped and playing reads as playing — the louder of the two claims, as in the reader.
+    val voiceField = colors.accent.copy(alpha = 0.28f)
     val runs = remember(line, highlighted) {
         if (highlighted == null) {
             emptyList()
         } else {
             markedRuns(line.words.size) { i ->
                 line.words[i].surah == highlighted.first && line.words[i].ayah == highlighted.second
+            }
+        }
+    }
+    val voiceRuns = remember(line, playing) {
+        if (playing == null) {
+            emptyList()
+        } else {
+            markedRuns(line.words.size) { i ->
+                line.words[i].surah == playing.first && line.words[i].ayah == playing.second
             }
         }
     }
@@ -345,16 +375,18 @@ private fun MushafTextLine(
                 }
             },
     ) {
-        runs.forEach { run ->
+        fun fields(of: List<IntRange>, colour: Color) = of.forEach { run ->
             val right = placed.positions[run.first].right
             val left = placed.positions[run.last].left
             drawRoundRect(
-                color = field,
+                color = colour,
                 topLeft = Offset(left - 2.dp.toPx(), 0f),
                 size = Size(right - left + 4.dp.toPx(), size.height),
                 cornerRadius = CornerRadius(6.dp.toPx()),
             )
         }
+        fields(runs, field)
+        fields(voiceRuns, voiceField)
         placed.words.forEachIndexed { index, word ->
             val position = placed.positions[index]
             drawText(
@@ -476,12 +508,18 @@ private fun ReferencePill(
     reference: Pair<Int, Int>,
     modifier: Modifier,
     bookmarked: Boolean,
+    playing: Boolean,
     onClear: () -> Unit,
+    onPlay: () -> Unit,
     onBookmark: () -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+    // See ReaderHeader: the interface's direction, not this subtree's — the page above is forced
+    // to RTL whatever language the app is being read in.
+    val mirrored = isRtlLocale()
     Box(modifier, contentAlignment = Alignment.Center) {
         Row(
             Modifier
@@ -490,7 +528,11 @@ private fun ReferencePill(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "${QuranText.arabicIndic(reference.first)}:${QuranText.arabicIndic(reference.second)}",
+                // The locale's own digits, like every other number the app prints. It used to be
+                // Arabic-Indic unconditionally, to match the roundels on the page — but the
+                // roundels are Quran text and this is a reference, and under an English UI it put
+                // «٢:٦٧» next to the player bar's "Ayah 67" (task 4a, concern 4).
+                "${format.localizedDigits(reference.first)}:${format.localizedDigits(reference.second)}",
                 style = TaqwaText.caption.copy(fontSize = 12.sp),
                 color = colors.accent,
                 maxLines = 1,
@@ -507,6 +549,13 @@ private fun ReferencePill(
                     .wrapContentHeight(),
             )
             Box(Modifier.width(1.dp).height(16.dp).background(colors.hairline))
+            AyahActionButton(
+                glyph = { tint -> if (!playing) drawSpeaker(tint, pointsForward = !mirrored) },
+                label = null,
+                onClick = onPlay,
+                contentDescription = stringResource(Res.string.recitation_play),
+                overlay = if (playing) ({ PlayingMark() }) else null,
+            )
             AyahActionButton(
                 glyph = { tint -> drawBookmark(tint, filled = bookmarked) },
                 label = null,

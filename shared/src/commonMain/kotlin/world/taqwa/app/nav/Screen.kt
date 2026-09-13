@@ -30,6 +30,12 @@ sealed interface Screen {
     data object LocationSettings : Screen
     data object CitySearch : Screen
     data object Appearance : Screen
+
+    /** Settings › Quran › Recitation (spec 3a §5.6): the voice, mobile data, and what is stored. */
+    data object RecitationSettings : Screen
+
+    /** The surahs of one reciter on this phone, with the deletes (spec 3a §5.6). */
+    data class RecitationDownloads(val reciterId: String) : Screen
     data object Attribution : Screen
     data object Qibla : Screen
 

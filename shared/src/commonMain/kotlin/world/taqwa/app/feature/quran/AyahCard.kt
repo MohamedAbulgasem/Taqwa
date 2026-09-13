@@ -82,6 +82,10 @@ fun AyahCard(
     translationLanguage: String,
     sizeSp: Int,
     selected: Boolean,
+    /** True for the ayah being recited (spec 3a §5.3). Kept apart from [selected] on purpose:
+     * the voice lights one ayah and the finger selects another, and the action row belongs to
+     * the finger. */
+    playing: Boolean = false,
     bookmarked: Boolean,
     actions: (@Composable () -> Unit)?,
     onClick: () -> Unit,
@@ -90,8 +94,15 @@ fun AyahCard(
     val bookmarkedLabel = stringResource(Res.string.quran_action_bookmarked)
     // Selection is a state change, not a page change, so nothing about it snaps: the tint fades in
     // and the action row unfolds from under the translation, and both reverse on deselection.
+    // Playing wins over selected: it is the louder claim on the ayah, and the two can be true of
+    // different cards at once. Same accent, a shade deeper, so the pair read as one language
+    // rather than as two unrelated highlights.
     val selectedTint by animateColorAsState(
-        if (selected) colors.accent.copy(alpha = 0.08f) else Color.Transparent,
+        when {
+            playing -> colors.accent.copy(alpha = 0.14f)
+            selected -> colors.accent.copy(alpha = 0.08f)
+            else -> Color.Transparent
+        },
         animationSpec = tween(SELECT_MILLIS),
         label = "ayahSelectedTint",
     )

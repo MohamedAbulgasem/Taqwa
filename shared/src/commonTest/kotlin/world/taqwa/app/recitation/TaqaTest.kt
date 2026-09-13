@@ -1,0 +1,198 @@
+package world.taqwa.app.recitation
+
+import okio.Path.Companion.toPath
+import okio.fakefilesystem.FakeFileSystem
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+/**
+ * Builds a `.taqa` exactly as the pipeline does (spec 3a §4), so the reader is tested against the
+ * layout and not against itself. Deliberately hand-rolled — the index JSON is written as text
+ * rather than serialised — because a builder that shared code with the parser would agree with it
+ * even when both were wrong.
+ */
+internal fun buildTaqa(
+    reciter: String = "ar.alafasy",
+    surah: Int = 1,
+    kbps: Int = 64,
+    ayahs: List<ByteArray>,
+    version: Int = 1,
+    magic: String = "TAQA",
+): ByteArray {
+    val entries = StringBuilder()
+    var off = 0L
+    ayahs.forEachIndexed { i, bytes ->
+        if (i > 0) entries.append(",")
+        entries.append("{\"n\":${i + 1},\"off\":$off,\"len\":${bytes.size}}")
+        off += bytes.size
+    }
+    val index = "{\"reciter\":\"$reciter\",\"surah\":$surah,\"kbps\":$kbps,\"ayahs\":[$entries]}"
+        .encodeToByteArray()
+    val out = ArrayList<Byte>()
+    out += magic.encodeToByteArray().toList()
+    out += version.toByte()
+    out += listOf<Byte>(0, 0, 0)
+    out += byteArrayOf(
+        (index.size ushr 24).toByte(),
+        (index.size ushr 16).toByte(),
+        (index.size ushr 8).toByte(),
+        index.size.toByte(),
+    ).toList()
+    out += index.toList()
+    ayahs.forEach { out += it.toList() }
+    return out.toByteArray()
+}
+
+private fun ayah(size: Int, fill: Byte) = ByteArray(size) { fill }
+
+class TaqaIndexTest {
+
+    private val ayahs = listOf(ayah(64, 1), ayah(96, 2), ayah(32, 3))
+
+    @Test
+    fun parsesTheHeaderAndPlacesTheAudioAfterIt() {
+        val file = buildTaqa(surah = 112, ayahs = ayahs)
+        val index = TaqaIndex.parse(file)
+        assertEquals("ar.alafasy", index.reciter)
+        assertEquals(112, index.surah)
+        assertEquals(64, index.kbps)
+        assertEquals(listOf(1, 2, 3), index.ayahs.map { it.n })
+        assertEquals(TaqaAyah(2, 64, 96), index.ayah(2))
+        // Every offset in the index is relative; dataStart is what makes them file offsets.
+        assertEquals(index.dataStart, index.rangeOf(1).first)
+        assertEquals(index.dataStart + 64, index.rangeOf(2).first)
+        assertEquals(index.dataStart + 64 + 95, index.rangeOf(2).last)
+        assertEquals(file.size.toLong(), index.expectedFileBytes)
+    }
+
+    @Test
+    fun theFixedHeaderAloneSaysHowMuchMoreToRead() {
+        val file = buildTaqa(ayahs = ayahs)
+        val length = TaqaIndex.indexLength(file.copyOfRange(0, TaqaIndex.FIXED_HEADER))
+        // Exactly the header plus the index is enough to parse; the audio is never needed.
+        val header = file.copyOfRange(0, TaqaIndex.FIXED_HEADER + length)
+        assertEquals(3, TaqaIndex.parse(header).ayahs.size)
+    }
+
+    @Test
+    fun rejectsAFileThatIsNotATaqa() {
+        val wrong = buildTaqa(ayahs = ayahs, magic = "ZIP!")
+        assertFailsWith<MalformedTaqa> { TaqaIndex.parse(wrong) }
+    }
+
+    @Test
+    fun rejectsAVersionItDoesNotKnow() {
+        val newer = buildTaqa(ayahs = ayahs, version = 2)
+        assertFailsWith<MalformedTaqa> { TaqaIndex.parse(newer) }
+    }
+
+    @Test
+    fun rejectsATruncatedIndex() {
+        val file = buildTaqa(ayahs = ayahs)
+        assertFailsWith<MalformedTaqa> { TaqaIndex.parse(file.copyOfRange(0, 8)) }
+        assertFailsWith<MalformedTaqa> { TaqaIndex.parse(file.copyOfRange(0, TaqaIndex.FIXED_HEADER)) }
+        assertFailsWith<MalformedTaqa> { TaqaIndex.parse(file.copyOfRange(0, TaqaIndex.FIXED_HEADER + 4)) }
+    }
+
+    @Test
+    fun rejectsAnIndexThatIsNotTheJsonThisVersionWrites() {
+        val file = buildTaqa(ayahs = ayahs)
+        // Corrupt one byte inside the index rather than the header.
+        file[TaqaIndex.FIXED_HEADER + 2] = '#'.code.toByte()
+        assertFailsWith<MalformedTaqa> { TaqaIndex.parse(file) }
+    }
+
+    @Test
+    fun anAyahThatIsNotInTheIndexIsAnError() {
+        val index = TaqaIndex.parse(buildTaqa(ayahs = ayahs))
+        assertFailsWith<MalformedTaqa> { index.rangeOf(9) }
+    }
+}
+
+class TaqaFileTest {
+
+    private val fs = FakeFileSystem()
+    private val path = "/audio/ar.alafasy/112.taqa".toPath()
+    private val ayahs = listOf(ayah(64, 1), ayah(96, 2), ayah(32, 3))
+    private val bytes = buildTaqa(surah = 112, ayahs = ayahs)
+
+    private fun writeFile(content: ByteArray = bytes): TaqaFile {
+        fs.createDirectories(path.parent!!)
+        fs.write(path) { write(content) }
+        return TaqaFile(path, fs)
+    }
+
+    @Test
+    fun readsTheIndexOffDisk() {
+        val file = writeFile()
+        assertEquals(112, file.index().surah)
+        assertEquals(3, file.index().ayahs.size)
+        fs.checkNoOpenFiles()
+    }
+
+    @Test
+    fun rangesAreAbsoluteFileOffsets() {
+        val file = writeFile()
+        val start = file.index().dataStart
+        assertEquals(start until start + 64, file.ayahRange(1))
+        assertEquals(start + 64 until start + 160, file.ayahRange(2))
+        assertEquals(start + 160 until start + 192, file.ayahRange(3))
+        assertEquals(bytes.size.toLong(), file.ayahRange(3).last + 1)
+    }
+
+    @Test
+    fun readsOneAyahsBytesUntouched() {
+        val file = writeFile()
+        assertTrue(file.readAyah(1).all { it == 1.toByte() })
+        assertEquals(96, file.readAyah(2).size)
+        assertTrue(file.readAyah(2).all { it == 2.toByte() })
+        assertEquals(32, file.readAyah(3).size)
+        fs.checkNoOpenFiles()
+    }
+
+    @Test
+    fun sha256IsTheWholeFileInLowerCaseHex() {
+        val file = writeFile()
+        val hash = file.sha256()
+        assertEquals(64, hash.length)
+        assertEquals(hash.lowercase(), hash)
+        // The same content hashes the same wherever it sits.
+        val other = "/audio/ar.husary/112.taqa".toPath()
+        fs.createDirectories(other.parent!!)
+        fs.write(other) { write(bytes) }
+        assertEquals(hash, TaqaFile(other, fs).sha256())
+        // A single changed byte does not.
+        val changed = bytes.copyOf().also { it[it.size - 1] = 9 }
+        val third = "/audio/ar.husary/113.taqa".toPath()
+        fs.write(third) { write(changed) }
+        assertTrue(hash != TaqaFile(third, fs).sha256())
+        fs.checkNoOpenFiles()
+    }
+
+    @Test
+    fun isCompleteComparesWithWhatTheManifestPublishes() {
+        val file = writeFile()
+        assertTrue(file.isComplete(bytes.size.toLong()))
+        assertFalse(file.isComplete(bytes.size.toLong() + 1))
+        assertFalse(TaqaFile("/audio/ar.alafasy/113.taqa".toPath(), fs).isComplete(1))
+    }
+
+    @Test
+    fun isWholeRejectsHalfAFileAndAcceptsAFinishedOne() {
+        assertTrue(writeFile().isWhole())
+        val half = "/audio/ar.alafasy/002.taqa".toPath()
+        fs.createDirectories(half.parent!!)
+        fs.write(half) { write(bytes.copyOfRange(0, bytes.size - 10)) }
+        assertFalse(TaqaFile(half, fs).isWhole())
+        // Not a container at all.
+        val junk = "/audio/ar.alafasy/003.taqa".toPath()
+        fs.write(junk) { write("not audio".encodeToByteArray()) }
+        assertFalse(TaqaFile(junk, fs).isWhole())
+        // Not there at all.
+        assertFalse(TaqaFile("/audio/ar.alafasy/004.taqa".toPath(), fs).isWhole())
+        fs.checkNoOpenFiles()
+    }
+}

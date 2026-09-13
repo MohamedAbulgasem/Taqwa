@@ -36,6 +36,20 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    // ── Recitation downloads, debug harness (slice 3a task 2) ─────────────────────────
+    // The debug source set is `src/androidDebug` here, not `src/debug`: the KMP android
+    // layout v2 puts every android source set under its Kotlin name, which is where the
+    // debug Kotlin and the debug resources are already read from. The build-type manifest
+    // overlay is the one thing AGP still looks for at its own default path, so it is
+    // pointed at the same directory as everything else rather than leaving one stray
+    // `src/debug` folder behind. Without this line the debug manifest is silently ignored.
+    sourceSets {
+        getByName("debug") {
+            manifest.srcFile("src/androidDebug/AndroidManifest.xml")
+        }
+    }
+    // ── end recitation downloads ──────────────────────────────────────────────────────
     buildTypes {
         release {
             // Code shrinking only. The first attempt also shrank resources and deleted res/raw

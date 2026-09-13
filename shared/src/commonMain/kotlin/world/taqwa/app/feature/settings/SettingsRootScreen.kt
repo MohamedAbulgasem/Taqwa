@@ -53,6 +53,8 @@ import world.taqwa.app.resources.settings_attribution
 import world.taqwa.app.resources.settings_group_about
 import world.taqwa.app.resources.settings_group_app
 import world.taqwa.app.resources.settings_group_prayer
+import world.taqwa.app.resources.settings_group_quran
+import world.taqwa.app.resources.settings_recitation
 import world.taqwa.app.resources.settings_language
 import world.taqwa.app.resources.settings_location
 import world.taqwa.app.resources.settings_not_set
@@ -232,6 +234,10 @@ fun SettingsRootScreen(
     onOpenNotifications: () -> Unit,
     onOpenAppearance: () -> Unit,
     onOpenAttribution: () -> Unit,
+    /** The voice the reader listens in, for the Recitation row's value; blank until the
+     * catalogue has loaded, which is a frame. */
+    reciterName: String,
+    onOpenRecitation: () -> Unit,
 ) {
     // "Off" once the master toggle is off; otherwise how many of the five obligatory prayers
     // still carry a sound, so the row means something before the screen behind it is even open.
@@ -262,6 +268,19 @@ fun SettingsRootScreen(
                 stringResource(Res.string.settings_notifications),
                 value = notificationValue,
                 onClick = onOpenNotifications,
+            )
+        }
+
+        GroupGap()
+        // Quran sits between Prayer and App: it is a section about content, like Prayer above it,
+        // and not about the app itself. One row today; the reading settings that would join it
+        // live in the reader's own sheet, where they are next to the text they change.
+        SectionLabel(stringResource(Res.string.settings_group_quran))
+        SettingsCard {
+            TaqwaRow(
+                stringResource(Res.string.settings_recitation),
+                value = reciterName,
+                onClick = onOpenRecitation,
             )
         }
 

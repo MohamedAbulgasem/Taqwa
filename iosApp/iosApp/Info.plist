@@ -40,6 +40,8 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<!-- Recitation keeps playing with the screen locked and the app suspended (spec 3a §6). -->
+		<string>audio</string>
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>

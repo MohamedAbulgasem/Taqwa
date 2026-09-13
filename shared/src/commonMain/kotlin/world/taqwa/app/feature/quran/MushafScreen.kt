@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -20,16 +21,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.LayoutDirection
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
+import world.taqwa.app.feature.recitation.BackToAyahPill
+import world.taqwa.app.feature.recitation.Follow
+import world.taqwa.app.feature.recitation.HeaderState
+import world.taqwa.app.feature.recitation.PILL_SETTLE_MS
+import world.taqwa.app.feature.recitation.PillGap
+import world.taqwa.app.feature.recitation.QuranRecitation
+import world.taqwa.app.feature.recitation.rememberFollowing
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.quran.LineType
 import world.taqwa.app.quran.MushafPage
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings
@@ -71,6 +83,10 @@ fun MushafScreen(
     onPageShown: (Int) -> Unit,
     onToggleBookmark: (Int, Int) -> Unit,
     shareTextFor: suspend (Int, Int) -> String?,
+    /** The recitation surface (spec 3a §5). */
+    recitation: QuranRecitation = QuranRecitation(),
+    /** Which printed page an ayah is on, for following the voice across page turns. */
+    pageOfAyah: suspend (Int, Int) -> Int = { _, _ -> 0 },
 ) {
     val colors = LocalTaqwaColors.current
     val arabic = isRtlLocale()
@@ -87,6 +103,36 @@ fun MushafScreen(
     @Suppress("DEPRECATION")
     val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
+    // The first ayah of the page on screen: where the header button starts playing from (spec
+    // §5.1). Hoisted above the header because the header is drawn before the pager exists, and
+    // filled in by the effect below as soon as the settled page's lines have loaded.
+    var pageStart by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+
+    // Which printed page the voice is on. Hoisted above the header for the same reason
+    // [pageStart] is: the header's state depends on it, and the pager that follows the voice with
+    // it is built further down.
+    val playing = recitation.playing
+    val playingPage by produceState<Int?>(null, playing) {
+        val reference = playing
+        value = if (reference == null) {
+            null
+        } else {
+            runCatching { pageOfAyah(reference.first, reference.second) }.getOrNull()
+        }
+    }
+
+    // Spec §5.1: the button has to say what a tap will do, and in the Mushaf a tap starts the
+    // ayah *printed on this page*. So the equaliser belongs to the page the recited ayah is on,
+    // not to any page at all while something plays — a reader sitting on Al-Faatiha while
+    // Al-Kahf recited saw a live equaliser whose tap opened Al-Faatiha's download sheet. The
+    // state handed in is the page's own surah's; this is the only place that knows the ayah is
+    // here. A page that straddles two surahs is covered by asking about the page and not the
+    // surah, which is what the Mushaf's header names.
+    val headerState = if (playingPage != null && playingPage == ready?.currentPage) {
+        if (recitation.live) HeaderState.Playing else HeaderState.Paused
+    } else {
+        recitation.header
+    }
 
     // safeDrawing, not systemBars: sideways the navigation bar and the camera cutout sit on the
     // left and right edges. The pager inside pads nothing of its own, so this is the only place
@@ -105,6 +151,13 @@ fun MushafScreen(
             onBack = onBack,
             onToggleMode = onToggleMode,
             onOpenSheet = { showSheet = true },
+            recitation = headerState,
+            onRecitation = {
+                // The tapped ayah if there is one — it is the ayah the reader is looking at —
+                // otherwise the first ayah printed on the page.
+                val start = highlighted ?: pageStart
+                if (start != null) recitation.onHeader(start.first, start.second)
+            },
         )
 
         if (ready == null) return@Column
@@ -117,8 +170,62 @@ fun MushafScreen(
             // surahs, and the last-read position must only follow a page the reader stopped on.
             snapshotFlow { pagerState.settledPage }.collect { onPageShown(it + 1) }
         }
+        LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.settledPage }.collect { index ->
+                pageStart = runCatching { pageLoader(index + 1) }.getOrNull()
+                    ?.lines?.firstOrNull { it.type == LineType.TEXT }
+                    ?.words?.firstOrNull()
+                    ?.let { it.surah to it.ayah }
+            }
+        }
 
-        Box(Modifier.weight(1f)) {
+        // Following the voice across page turns (spec §5.3), under the same four-second rule the
+        // reader's list uses — and the same refusal to move the page when the reciter is more
+        // than a page away from where the reader actually is.
+        val following = rememberFollowing()
+        LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.isScrollInProgress }.collect { following.moved() }
+        }
+        LaunchedEffect(playingPage) {
+            val page = playingPage
+            if (page == null || page !in 1..MUSHAF_PAGES) {
+                following.pill = null
+                return@LaunchedEffect
+            }
+            val away = kotlin.math.abs(page - (pagerState.currentPage + 1))
+            when (following.decide(away)) {
+                Follow.SCROLL -> {
+                    following.pill = null
+                    if (away > 0) following.move { pagerState.animateScrollToPage(page - 1) }
+                }
+                Follow.PILL -> following.pill = playing?.second
+                Follow.LEAVE_ALONE -> Unit
+            }
+        }
+        // The same question asked when the *reader* turns pages rather than when the voice does.
+        // The effect above only fires as the recitation crosses onto a new page, which on a page
+        // the reciter is still working through can be minutes; until then a reader who had swiped
+        // several pages away was offered nothing to get back with.
+        // Keyed on the ayah, not only on its page: several ayahs share a page, and a pill offering
+        // to go back to the ayah the voice was on when the *page* last changed is a pill with the
+        // wrong number on it.
+        LaunchedEffect(playing, playingPage, pagerState) {
+            val page = playingPage ?: return@LaunchedEffect
+            snapshotFlow { pagerState.isScrollInProgress }.collectLatest { moving ->
+                if (moving) return@collectLatest
+                delay(PILL_SETTLE_MS)
+                if (kotlin.math.abs(page - (pagerState.currentPage + 1)) > 1) {
+                    following.pill = playing?.second
+                }
+            }
+        }
+        LaunchedEffect(playingPage, pagerState) {
+            snapshotFlow { pagerState.currentPage }.collect { current ->
+                if (playingPage == current + 1) following.pill = null
+            }
+        }
+
+        Box(Modifier.weight(1f).padding(bottom = recitation.barSpace)) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 HorizontalPager(
                     state = pagerState,
@@ -157,9 +264,33 @@ fun MushafScreen(
                                     scope.launch { shareTextFor(surah, ayah)?.let(::shareText) }
                                 }
                             },
+                            playing = recitation.playing,
+                            playingLive = recitation.live,
+                            onPlay = {
+                                selected?.let { (surah, ayah) ->
+                                    if (recitation.playing == surah to ayah) {
+                                        recitation.onToggle()
+                                    } else {
+                                        recitation.onPlayAyah(surah, ayah)
+                                    }
+                                }
+                            },
                         )
                     }
                 }
+            }
+            val pill = following.pill
+            val target = playingPage
+            if (pill != null && target != null) {
+                BackToAyahPill(
+                    ayah = pill,
+                    onClick = {
+                        following.rearm()
+                        following.pill = null
+                        scope.launch { following.move { pagerState.animateScrollToPage(target - 1) } }
+                    },
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = PillGap),
+                )
             }
         }
 

@@ -4,10 +4,19 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
     androidTarget()
+
+    // `SurahDownloader` is an `expect class` (spec 3a §7): the two platforms' downloaders are
+    // whole objects with state, not a function each, and the scheduler behind them differs
+    // completely. Expect/actual classes are still flagged Beta by the compiler; the flag says
+    // the shape is deliberate rather than leaving a warning in every build.
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
 
     // Compose Multiplatform 1.12.0 no longer publishes iosX64 (Intel simulator) artifacts.
     listOf(
@@ -43,15 +52,30 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.datastore.preferences)
             implementation(libs.sqldelight.coroutines)
+            // Slice 3a. The recitation manifest and the `.taqa` container index are JSON, and
+            // the container is read by byte range off disk on both platforms.
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.okio)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
+            // The `.taqa` and library tests build containers in memory rather than on the
+            // machine running the tests; FakeFileSystem is okio's own in-memory FileSystem.
+            implementation(libs.okio.fakefilesystem)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core)
             implementation(libs.sqldelight.android)
+            // Slice 3a. A surah download has to survive the app being backgrounded and the
+            // process being killed, which on Android is WorkManager and nothing else.
+            api(libs.androidx.work.runtime)
+            // Slice 3a task 3: recitation playback. The ExoPlayer lives in a MediaSessionService
+            // so the notification and the lock screen come from the platform rather than from
+            // anything this app draws.
+            implementation(libs.media3.exoplayer)
+            implementation(libs.media3.session)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

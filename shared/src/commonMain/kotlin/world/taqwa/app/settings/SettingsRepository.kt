@@ -23,6 +23,8 @@ import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
 import kotlin.math.round
+import world.taqwa.app.recitation.RecitationManifest
+import world.taqwa.app.recitation.RecitationSettings
 
 /** Reads a stored enum name, falling back to [fallback] when the value is absent or unrecognised. */
 private inline fun <reified E : Enum<E>> String?.toEnumOr(fallback: E): E =
@@ -165,6 +167,40 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             it[SettingsKeys.QURAN_LAST_AYAH] = position.ayah
             it[SettingsKeys.QURAN_LAST_PAGE] = position.page
         }
+    }
+
+    /**
+     * The recitation preferences (spec 3a §12.1, §12.6): the voice, and whether a surah may be
+     * fetched over mobile data. Both absent on a fresh install, which is what makes Alafasy and
+     * Wi-Fi-only the defaults rather than something written at first launch.
+     */
+    val recitationSettings: Flow<RecitationSettings> = store.data.map { p ->
+        RecitationSettings(
+            reciterId = p[SettingsKeys.RECITATION_RECITER] ?: RecitationManifest.DEFAULT_RECITER,
+            downloadOnMobileData = p[SettingsKeys.RECITATION_MOBILE_DATA] ?: false,
+        )
+    }
+
+    suspend fun setRecitationSettings(settings: RecitationSettings) {
+        store.edit {
+            it[SettingsKeys.RECITATION_RECITER] = settings.reciterId
+            it[SettingsKeys.RECITATION_MOBILE_DATA] = settings.downloadOnMobileData
+        }
+    }
+
+    /**
+     * The picker's own write. Separate from [setRecitationSettings] because picking a voice must
+     * not also re-assert the mobile-data switch: the two are changed from different screens, and
+     * a read-modify-write of the pair from the picker would race the Settings toggle.
+     */
+    suspend fun setRecitationReciter(reciterId: String) {
+        store.edit { it[SettingsKeys.RECITATION_RECITER] = reciterId }
+    }
+
+    /** Settings › Recitation's "Download over mobile data" (spec §5.6, §12.6). Its own write for
+     * the same reason [setRecitationReciter] is: the two are changed from different surfaces. */
+    suspend fun setRecitationMobileData(value: Boolean) {
+        store.edit { it[SettingsKeys.RECITATION_MOBILE_DATA] = value }
     }
 
     suspend fun setThemeMode(mode: ThemeMode) {

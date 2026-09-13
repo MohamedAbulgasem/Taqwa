@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only additions: the cleartext exception for the local test server, and the two broadcast
+  receivers a device round drives recitation with. Neither is in the release manifest, and nothing
+  in a main source set references either.
+
+  `src/androidDebug`, not `src/debug`: `androidApp/build.gradle.kts` points AGP's build-type
+  manifest overlay here, at the KMP layout's own debug source set, so a receiver declared in
+  `src/debug` is never merged and cannot be reached by `am broadcast`.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:networkSecurityConfig="@xml/network_security_config">
+        <receiver
+            android:name="world.taqwa.app.debug.RecitationDebugReceiver"
+            android:exported="true" />
+        <receiver
+            android:name="world.taqwa.app.debug.RecitationHarnessReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="world.taqwa.app.debug.RECITATION" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

@@ -20,7 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +34,9 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.components.Equaliser
 import world.taqwa.app.design.components.drawBook
+import world.taqwa.app.design.components.drawSpeaker
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
@@ -39,6 +45,11 @@ import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_reader_aa
 import world.taqwa.app.resources.quran_reader_mushaf
+import world.taqwa.app.resources.recitation_a11y_downloading
+import world.taqwa.app.resources.recitation_a11y_pause
+import world.taqwa.app.resources.recitation_a11y_recitation
+import world.taqwa.app.resources.recitation_play
+import world.taqwa.app.feature.recitation.HeaderState
 
 /** The 36 dp round icon buttons' size (spec §2.2). */
 private val TouchTargetSize = 44.dp
@@ -64,6 +75,9 @@ fun ReaderHeader(
     onBack: () -> Unit,
     onToggleMode: () -> Unit,
     onOpenSheet: () -> Unit,
+    /** What recitation is doing for the surah on screen (spec 3a §5.1). */
+    recitation: HeaderState = HeaderState.Idle,
+    onRecitation: () -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     val arabic = isRtlLocale()
@@ -109,21 +123,71 @@ fun ReaderHeader(
                     color = tint,
                 )
             }
+            RecitationHeaderButton(recitation, onRecitation)
+        }
+    }
+}
+
+/**
+ * The third header button (spec 3a §5.1, §12.7): a speaker at rest, the same speaker inside a
+ * 2 dp accent progress ring while the surah is arriving, the three-bar equaliser while the voice
+ * is going, and an accent-tinted speaker when it is paused.
+ *
+ * Four states on one 36 dp disc, and only one of them moves. That is the whole design brief for
+ * this button: recitation has to be reachable from every Quran screen without ever being the
+ * loudest thing on it, so the button says what it is doing in tint and in a single glyph swap,
+ * and nothing else on the page animates at all.
+ */
+@Composable
+private fun RecitationHeaderButton(state: HeaderState, onClick: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    // What the button says it will do, not what it is showing: a screen reader announcing
+    // "Recitation" over a playing surah would leave the one thing a tap does unsaid.
+    val description = stringResource(
+        when (state) {
+            HeaderState.Idle -> Res.string.recitation_a11y_recitation
+            is HeaderState.Downloading -> Res.string.recitation_a11y_downloading
+            HeaderState.Playing -> Res.string.recitation_a11y_pause
+            HeaderState.Paused -> Res.string.recitation_play
+        },
+    )
+    val live = state is HeaderState.Playing || state is HeaderState.Paused
+    // Asked of the resolved strings, not of LocalLayoutDirection: the Mushaf forces its own page
+    // to RTL whatever the interface language is, and the glyph follows the interface.
+    val mirrored = isRtlLocale()
+    HeaderIconButton(
+        selected = false,
+        description = description,
+        onClick = onClick,
+        ring = (state as? HeaderState.Downloading)?.fraction,
+        tint = if (live) colors.accent else colors.textSecondary,
+    ) { tint ->
+        if (state is HeaderState.Playing) {
+            Equaliser(tint, size = 17.dp)
+        } else {
+            Canvas(Modifier.size(18.dp)) { drawSpeaker(tint, pointsForward = !mirrored) }
         }
     }
 }
 
 /** One 36 dp round header button (spec §2.2): plain for "Aa", accent-haloed when [selected] (the
- * book button in Mushaf mode). No ripple — the halo itself is the selected state's feedback. */
+ * book button in Mushaf mode). No ripple — the halo itself is the selected state's feedback.
+ *
+ * [ring] draws a 2 dp accent arc around the disc, from the top, clockwise: a download in flight
+ * (spec 3a §5.4), so that a reader who dismissed the download sheet and went on reading can still
+ * see the surah arriving. It is an arc rather than a filling disc because the glyph inside has to
+ * stay legible while it runs. */
 @Composable
 private fun HeaderIconButton(
     selected: Boolean,
     description: String,
     onClick: () -> Unit,
+    ring: Float? = null,
+    tint: Color? = null,
     content: @Composable (tint: Color) -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
-    val tint = if (selected) colors.accent else colors.textSecondary
+    val resolvedTint = tint ?: if (selected) colors.accent else colors.textSecondary
     // The finger gets 44 dp (spec §92); the eye gets the 36 dp disc drawn inside it.
     Box(
         Modifier
@@ -136,6 +200,30 @@ private fun HeaderIconButton(
             .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
     ) {
+        if (ring != null) {
+            Canvas(Modifier.size(IconButtonSize)) {
+                val stroke = 2.dp.toPx()
+                val inset = stroke / 2f
+                drawArc(
+                    color = colors.hairline,
+                    startAngle = -90f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    topLeft = Offset(inset, inset),
+                    size = Size(size.width - stroke, size.height - stroke),
+                    style = Stroke(width = stroke, cap = StrokeCap.Round),
+                )
+                drawArc(
+                    color = colors.accent,
+                    startAngle = -90f,
+                    sweepAngle = 360f * ring.coerceIn(0f, 1f),
+                    useCenter = false,
+                    topLeft = Offset(inset, inset),
+                    size = Size(size.width - stroke, size.height - stroke),
+                    style = Stroke(width = stroke, cap = StrokeCap.Round),
+                )
+            }
+        }
         Column(
             Modifier
                 .size(IconButtonSize)
@@ -144,7 +232,7 @@ private fun HeaderIconButton(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            content(tint)
+            content(resolvedTint)
         }
     }
 }

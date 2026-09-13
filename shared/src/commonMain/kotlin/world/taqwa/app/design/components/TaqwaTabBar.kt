@@ -65,9 +65,28 @@ import world.taqwa.app.resources.tab_settings
  * safeDrawing is consumed for the content.
  */
 @Composable
-fun TaqwaTabScaffold(current: Tab?, onSelect: (Tab) -> Unit, content: @Composable () -> Unit) {
+fun TaqwaTabScaffold(
+    current: Tab?,
+    onSelect: (Tab) -> Unit,
+    /**
+     * An overlay pinned to the foot of the content, above the tab bar when there is one: the
+     * recitation player bar (spec 3a §5.3). It sits here rather than in any screen because it has
+     * to survive the walk from the surah list to the reader to the Mushaf, and because on a tab
+     * root it belongs above the tab bar rather than over it.
+     *
+     * On a pushed screen (`current == null`) there is no tab bar, so the overlay is the
+     * bottom-most thing on the screen and clears the gesture area itself; on a tab root this Box
+     * has already consumed the bottom insets, so the same padding inside the bar comes to nothing
+     * and the tab bar does the clearing.
+     */
+    bar: @Composable () -> Unit = {},
+    content: @Composable () -> Unit,
+) {
     if (current == null) {
-        content()
+        Box(Modifier.fillMaxSize()) {
+            content()
+            Box(Modifier.align(Alignment.BottomCenter)) { bar() }
+        }
         return
     }
     Column(Modifier.fillMaxSize()) {
@@ -78,7 +97,10 @@ fun TaqwaTabScaffold(current: Tab?, onSelect: (Tab) -> Unit, content: @Composabl
                 // edge, and a tab root has always let the keyboard cover the bar and the list
                 // under it rather than reflowing around it.
                 .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
-        ) { content() }
+        ) {
+            content()
+            Box(Modifier.align(Alignment.BottomCenter)) { bar() }
+        }
         TaqwaTabBar(current, onSelect)
     }
 }
