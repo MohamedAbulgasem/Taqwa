@@ -307,9 +307,47 @@ from the reciter's other published bit-rate after proving the same edition on th
 further than 2 kbps from the reciter's, which `TaqaAyah.kbps` reads for the length estimate. The
 container format is unchanged — the key is optional and 0.11.0 ignores it.
 
+### 14.8 After the whole-branch review (13 September, evening)
+
+The review (`.superpowers/sdd/recitation-r2-review.md`, 1 critical / 6 important / 9 minor)
+changed four things above; the text above is left as written and corrected here.
+
+- **The container carries each ayah's measured length.** §14.1's estimate stays only for the
+  nine containers published before this date. `verify.py` now measures every file by a full
+  decode — ffprobe's duration is read off the file's own header, and a tenth of Al-Ajmi's
+  64 kbps files carry a header claiming fifteen times their real length — and `pack.py`
+  writes the result as `ms` on every ayah of the index (`TaqaAyah.ms`). Per-ayah `kbps`, the
+  first fix, is gone: it measured the wrong quantity. The estimate for the older containers
+  also leaves out the Xing/Info frame after the ID3 tag; against a decode it still runs about
+  1 % long (LAME encoder delay and padding, which both players trim), so on those nine the
+  displayed total is some twenty seconds long over Al-Baqarah and the line ends a fraction
+  short of full. `fitToSlot` keeps that continuous, and refuses to scale by a "measured"
+  platform length more than twice off its slot, which is what a lying header looks like. A
+  slot is never shorter than 250 ms.
+- **The switch cannot be lost.** Re-picking the voice a switch is waiting on keeps it; picking
+  a voice whose copy is already arriving (a batch, a dismissed sheet) arms one without a
+  confirm; a switch whose recitation has since ended or been dismissed starts nothing; the
+  supersede happens before the settings write suspends. A preview claims its row before its
+  clip is read and inherits the pause of the preview it replaces.
+- **A pick of a different downloaded voice while paused starts it** (the reviewer's minor 12
+  asked for it to stay paused). Kept on purpose: §14.4 exists because a tap on a picker row
+  while nothing is playing must produce a voice, and that holds for a new voice as much as
+  for the current one. The follow switch is different — it happens later, with no tap.
+- **`--substitute` is a human's call.** `finish.py` no longer passes it; what it proves is
+  three control ayahs of equal length, not the same take, and it says so and logs every
+  substitution for someone to listen to. The pipeline's gate is one function, `verify.probe`:
+  a decoded length over 0.3 s, an average bit-rate between 24 and 400 kbps, and — where other
+  reciters' lengths are on disk (`state/durations-<id>.json`, medians) — within a factor of
+  three of them. That last rule is what catches a 1.7 s stub that plays.
+- `AyahPlayer` also reports buffered percentage, total buffered duration and zero seek
+  increments on the surah clock, and caches its queue; the Android `publish()` lost a gap
+  branch the wrapper makes unreachable; the iOS gap resumes from where a pause froze it.
+
 ### 14.7 Not done in this round
 
 - Scrubbing on the bar itself. The drag-down-to-dismiss gesture owns the bar's vertical axis
   and the line is 3 dp; the lock screen has the scrub.
 - Refining the clock from measured durations (see §14.1 for why not).
 - Cancelling a switch's download from the bar; the sheet's Cancel does it.
+- Re-packing the nine published reciters with measured lengths (a gigabyte of upload each);
+  their clocks estimate, about 1 % long.

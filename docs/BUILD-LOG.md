@@ -1108,4 +1108,11 @@ reports it now — gives it back.
 Al-Ajmi himself cost the afternoon. His 128 kbps edition has an MPEG-video fragment where 9:62
 should be, stubs at 50:9 and 50:10, three ayahs at telephone quality and hundreds at variable
 bit-rate. The repair script had been counting a 200 with no audio as a recovered file and
-looping. The 64 kbps folder is the same recording, whole; he ships from it.
+looping. The 64 kbps folder is the same recording, whole; he ships from it — and the review
+of the branch found that a tenth of *those* files carry a header claiming fifteen times their
+real length, which ffprobe and both platform players repeat. So the pipeline stopped trusting
+headers: every file is decoded, judged on its decoded length, its average bit-rate and a
+factor-of-three band against the other reciters, and the length goes into the container's
+index, where the app reads it instead of estimating. The same review caught a switch that
+could be lost by re-picking the voice it waited on, and one that would have started a
+finished surah reciting again, unprompted, when its download landed at midnight.
