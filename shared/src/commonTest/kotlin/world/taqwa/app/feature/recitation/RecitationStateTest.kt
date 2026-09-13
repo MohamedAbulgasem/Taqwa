@@ -89,7 +89,7 @@ class RecitationStateTest {
     }
 
     @Test
-    fun `the clock reads minutes and seconds, or hours once the surah has them`() {
+    fun `the clock reads minutes and seconds or hours once the surah has them`() {
         assertEquals("0:05", formatClock(5_400L, hours = false))
         assertEquals("12:31", formatClock(751_000L, hours = false))
         assertEquals("2:05:10", formatClock(7_510_000L, hours = true))

@@ -26,7 +26,7 @@ class SurahTimelineTest {
     }
 
     @Test
-    fun `elapsed is the item's start plus the position inside it, held inside the slot`() {
+    fun `elapsed is the item's start plus the position inside it held inside the slot`() {
         assertEquals(1_450L, timeline.elapsed(2, 150L))
         // A platform that reports a few frames past the estimate does not reach the next ayah.
         assertEquals(2_300L, timeline.elapsed(2, 1_400L))
@@ -49,7 +49,7 @@ class SurahTimelineTest {
     }
 
     @Test
-    fun `a seek snaps to the ayah, and from inside a gap to the ayah the gap leads into`() {
+    fun `a seek snaps to the ayah and from inside a gap to the ayah the gap leads into`() {
         assertEquals(2, timeline.snapToAyah(1_450L, fatiha::isGap))
         assertEquals(2, timeline.snapToAyah(1_100L, fatiha::isGap))
         assertEquals(12, timeline.snapToAyah(8_799L, fatiha::isGap))
