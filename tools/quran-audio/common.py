@@ -29,15 +29,17 @@ BASE = "https://github.com/MohamedAbulgasem/Taqwa-data/releases/download/"
 
 # id, CDN folder, true measured kbps, inter-ayah gap ms, monogram hue,
 # English name, Arabic name.  Order is the manifest order.
+# The order here is the order the app lists reciters in: manifest.py writes it as
+# is and the picker draws the manifest as is. Mohamed's order of 13 September.
 RECITERS = [
     ("ar.alafasy",            "64",  64,  300, "amber", "Mishary Rashid Alafasy",     "مشاري راشد العفاسي"),
-    ("ar.abdulbasitmurattal", "64",  64,   80, "moss",  "Abdul Basit Abdus-Samad",    "عبد الباسط عبد الصمد"),
-    ("ar.mahermuaiqly",       "128", 64,  300, "plum",  "Maher Al Muaiqly",           "ماهر المعيقلي"),
-    ("ar.husary",             "64",  64,   80, "clay",  "Mahmoud Khalil Al-Husary",   "محمود خليل الحصري"),
-    ("ar.minshawi",           "128", 128,  80, "sky",   "Mohamed Siddiq Al-Minshawi", "محمد صديق المنشاوي"),
-    ("ar.abdurrahmaansudais", "64",  64,  300, "olive", "Abdur-Rahman As-Sudais",     "عبد الرحمن السديس"),
-    ("ar.saoodshuraym",       "64",  128, 300, "rose",  "Saud Ash-Shuraim",           "سعود الشريم"),
     ("ar.shaatree",           "128", 128,  80, "teal",  "Abu Bakr Ash-Shatri",        "أبو بكر الشاطري"),
+    ("ar.mahermuaiqly",       "128", 64,  300, "plum",  "Maher Al Muaiqly",           "ماهر المعيقلي"),
+    ("ar.abdulbasitmurattal", "64",  64,   80, "moss",  "Abdul Basit Abdus-Samad",    "عبد الباسط عبد الصمد"),
+    ("ar.minshawi",           "128", 128,  80, "sky",   "Mohamed Siddiq Al-Minshawi", "محمد صديق المنشاوي"),
+    ("ar.husary",             "64",  64,   80, "clay",  "Mahmoud Khalil Al-Husary",   "محمود خليل الحصري"),
+    ("ar.saoodshuraym",       "64",  128, 300, "rose",  "Saud Ash-Shuraim",           "سعود الشريم"),
+    ("ar.abdurrahmaansudais", "64",  64,  300, "olive", "Abdur-Rahman As-Sudais",     "عبد الرحمن السديس"),
     ("ar.hudhaify",           "128", 128,  80, "sand",  "Ali Al-Hudhaify",            "علي الحذيفي"),
     ("ar.ahmedajamy",         "128", 128,  80, "slate", "Ahmed Al-Ajmi",              "أحمد العجمي"),
 ]

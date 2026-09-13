@@ -143,9 +143,18 @@ def main():
             break
         got = []
         for n in todo:
+            path = os.path.join(d, f"{n}.mp3")
             try:
                 fetch(f"https://cdn.islamic.network/quran/audio/{folder}/{rid}/{n}.mp3",
-                      os.path.join(d, f"{n}.mp3"), attempts=2)
+                      path, attempts=2)
+                # The CDN can answer 200 with an object that is not an ayah - no audio
+                # stream, or a quarter of a second of it (Ajmi 1297 and 4640). verify.py
+                # would only delete it again and the fallback would never be reached, so
+                # a broken object counts as absent here.
+                dur, err = probe(path)
+                if err:
+                    os.remove(path)
+                    raise ValueError(err)
                 got.append(n)
             except Exception:  # noqa: BLE001
                 pass
