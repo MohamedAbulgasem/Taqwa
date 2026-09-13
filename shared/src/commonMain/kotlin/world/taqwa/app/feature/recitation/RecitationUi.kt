@@ -36,6 +36,7 @@ import world.taqwa.app.resources.recitation_fail_needs_wifi
 import world.taqwa.app.resources.recitation_fail_no_network
 import world.taqwa.app.resources.recitation_fail_no_space
 import world.taqwa.app.resources.recitation_fail_server
+import world.taqwa.app.resources.recitation_gigabytes
 import world.taqwa.app.resources.recitation_kbps
 import world.taqwa.app.resources.recitation_megabytes
 import world.taqwa.app.resources.recitation_on_phone
@@ -127,6 +128,24 @@ private const val SURAHS = 114
  */
 @Composable
 fun megabytes(bytes: Long): String = stringResource(Res.string.recitation_megabytes, megabytesBare(bytes))
+
+/**
+ * A size in whichever of the two units reads: "58.2 MB" for a surah, "0.9 GB" for a whole Quran.
+ *
+ * Only the storage surfaces use this — Settings › Recitation, its Downloads screen and the sheet's
+ * whole-Quran button. A single surah is always [megabytes], because the largest of the 114 is
+ * 110 MB and a column of sizes that changed unit halfway down would be a column nobody could
+ * compare. See [DownloadCopy.useGigabytes] for where the boundary is and why.
+ */
+@Composable
+fun dataSize(bytes: Long): String {
+    val arabic = arabicDigits()
+    return if (DownloadCopy.useGigabytes(bytes)) {
+        stringResource(Res.string.recitation_gigabytes, DownloadCopy.gigabytes(bytes, arabic))
+    } else {
+        stringResource(Res.string.recitation_megabytes, DownloadCopy.megabytes(bytes, arabic))
+    }
+}
 
 /** The bare number, for the first half of "9.3 of 58.2 MB" — the unit is printed once, for the
  * pair, so the line does not say MB twice. */

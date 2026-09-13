@@ -313,4 +313,21 @@
     <string name="recitation_a11y_previous">الآية السابقة</string>
     <string name="recitation_a11y_close">إغلاق المشغّل</string>
     <string name="recitation_a11y_preview">استمع لهذا القارئ</string>
+    <!-- Settings > Quran > Recitation -->
+    <string name="settings_group_quran">القرآن</string>
+    <string name="settings_recitation">التلاوة</string>
+    <string name="recitation_settings_mobile_data">التنزيل عبر بيانات الجوال</string>
+    <string name="recitation_settings_downloads">التنزيلات · %1$s</string>
+    <string name="recitation_settings_surahs_one">%1$s سورة · %2$s</string>
+    <string name="recitation_settings_surahs">%1$s سورة · %2$s</string>
+    <string name="recitation_settings_whole_quran">تنزيل المصحف كاملًا · %1$s</string>
+    <string name="recitation_settings_batch">جارٍ التنزيل · %1$s من %2$s</string>
+    <string name="recitation_settings_credit">التلاوات مرخّصة من القرّاء للتوزيع المجاني غير التجاري عبر الشبكة الإسلامية. الإسناد الكامل في «الإسناد والتراخيص».</string>
+    <string name="recitation_downloads_delete">حذف</string>
+    <string name="recitation_downloads_delete_all">حذف كل تلاوات هذا القارئ</string>
+    <string name="recitation_downloads_confirm">حذف %1$s؟</string>
+    <string name="recitation_downloads_empty">لا توجد تلاوات لهذا القارئ على الهاتف.</string>
+    <string name="recitation_gigabytes">%1$s ج.ب</string>
+    <string name="credit_recitations">التلاوات</string>
+    <string name="credit_recitations_detail">تلاوات آية بآية من الشبكة الإسلامية (alquran.cloud)، مرخّصة لها من القرّاء للتوزيع المجاني غير التجاري بمعدلات البت التي تنشرها. منسوخة دون تعديل وبالمعدلات نفسها.</string>
 </resources>

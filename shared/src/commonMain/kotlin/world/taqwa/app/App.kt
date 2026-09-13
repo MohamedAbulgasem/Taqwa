@@ -98,6 +98,11 @@ import world.taqwa.app.feature.recitation.PlayerBarHeight
 import world.taqwa.app.feature.recitation.PlayerBarHost
 import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.ReciterPicker
+import world.taqwa.app.feature.recitation.RecitationStorage
+import world.taqwa.app.feature.recitation.reciterName
+import world.taqwa.app.feature.settings.DownloadedSurah
+import world.taqwa.app.feature.settings.RecitationDownloadsScreen
+import world.taqwa.app.feature.settings.RecitationSettingsScreen
 import world.taqwa.app.feature.recitation.rememberSurahName
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
@@ -636,7 +641,75 @@ fun App(container: AppContainer) {
                             onOpenNotifications = { navigator.push(Screen.NotificationSettings) },
                             onOpenAppearance = { navigator.push(Screen.Appearance) },
                             onOpenAttribution = { navigator.push(Screen.Attribution) },
+                            reciterName = recitationState.reciter?.let { reciterName(it) }.orEmpty(),
+                            onOpenRecitation = { navigator.push(Screen.RecitationSettings) },
                         )
+
+                        Screen.RecitationSettings -> {
+                            // Off the disk, so it is asked for rather than observed: the scan
+                            // stats every downloaded file. Re-read whenever the registry moves —
+                            // a download committing, a delete — which is exactly when the number
+                            // on screen would otherwise be wrong.
+                            val byReciter = recitationState.downloadedByReciter
+                            val storage by produceState(RecitationStorage(), byReciter) {
+                                value = withContext(Dispatchers.Default) { recitation.storage() }
+                            }
+                            RecitationSettingsScreen(
+                                state = recitationState,
+                                storage = storage,
+                                onBack = { navigator.pop() },
+                                onOpenPicker = recitation::openPicker,
+                                onSetMobileData = recitation::setDownloadOnMobileData,
+                                onOpenDownloads = { navigator.push(Screen.RecitationDownloads(it)) },
+                                onDownloadWholeQuran = { recitation.downloadWholeQuran() },
+                                onCancelWholeQuran = recitation::cancelWholeQuran,
+                            )
+                        }
+
+                        is Screen.RecitationDownloads -> {
+                            val reciter = recitationState.reciters.firstOrNull { it.id == screen.reciterId }
+                            val owned = recitationState.downloadedByReciter[screen.reciterId].orEmpty()
+                            // The rows are the intersection of the registry and the catalogue: a
+                            // size can only come from the manifest, and a surah on the phone that
+                            // this manifest no longer publishes has no size to print.
+                            val rows by produceState(emptyList<DownloadedSurah>(), reciter, owned, arabicUi) {
+                                val voice = reciter
+                                value = if (voice == null) {
+                                    emptyList()
+                                } else {
+                                    runCatching {
+                                        val names = container.quranRepository.surahs()
+                                            .associate { it.number to it.displayName(arabicUi) }
+                                        voice.surahs
+                                            .filter { it.n in owned }
+                                            .sortedBy { it.n }
+                                            .map { DownloadedSurah(it.n, names[it.n].orEmpty(), it.bytes) }
+                                    }.getOrDefault(emptyList())
+                                }
+                            }
+                            val bytes by produceState(0L, screen.reciterId, owned) {
+                                value = withContext(Dispatchers.Default) {
+                                    recitation.storage().of(screen.reciterId)
+                                }
+                            }
+                            // Popped when the last surah goes, rather than left on an empty
+                            // screen whose title names a reciter with nothing under it.
+                            LaunchedEffect(reciter, owned) {
+                                if (reciter != null && owned.isEmpty()) navigator.pop()
+                            }
+                            RecitationDownloadsScreen(
+                                reciterName = reciter?.let { reciterName(it) }.orEmpty(),
+                                surahs = rows,
+                                totalBytes = bytes,
+                                onBack = { navigator.pop() },
+                                onDelete = { surah ->
+                                    scope.launch { recitation.deleteSurah(screen.reciterId, surah) }
+                                },
+                                onDeleteAll = {
+                                    scope.launch { recitation.deleteReciter(screen.reciterId) }
+                                },
+                            )
+                        }
 
                         Screen.NotificationSettings -> NotificationSettingsScreen(
                             settings = notificationSettings,
@@ -798,7 +871,13 @@ fun App(container: AppContainer) {
                             val translations by produceState(initialValue = emptyList<world.taqwa.app.quran.TranslationInfo>()) {
                                 value = container.quranRepository.translations()
                             }
-                            AttributionScreen(translations = translations, onBack = { navigator.pop() })
+                            AttributionScreen(
+                                translations = translations,
+                                // The catalogue in force, so a reciter withdrawn by a manifest
+                                // refresh leaves the credits with them (spec §2).
+                                reciters = recitationState.reciters,
+                                onBack = { navigator.pop() },
+                            )
                         }
 
                         Screen.Qibla -> {
@@ -872,7 +951,9 @@ fun App(container: AppContainer) {
                         DownloadSheet(
                             sheet = sheet,
                             surahName = sheetSurahName,
+                            wholeQuran = recitationState.wholeQuran,
                             onConfirm = recitation::confirmDownload,
+                            onWholeQuran = recitation::downloadWholeQuran,
                             onCancel = recitation::cancelDownload,
                             onRetry = recitation::retryDownload,
                             onChangeReciter = recitation::openPicker,

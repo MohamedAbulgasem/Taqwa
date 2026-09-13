@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +49,7 @@ import world.taqwa.app.resources.recitation_downloading
 import world.taqwa.app.resources.recitation_keep_reading
 import world.taqwa.app.resources.recitation_over_wifi
 import world.taqwa.app.resources.recitation_retry
+import world.taqwa.app.resources.recitation_settings_whole_quran
 import world.taqwa.app.resources.recitation_use_mobile_once
 
 /**
@@ -64,13 +67,20 @@ import world.taqwa.app.resources.recitation_use_mobile_once
 fun DownloadSheet(
     sheet: DownloadSheetState,
     surahName: String,
+    wholeQuran: WholeQuran?,
     onConfirm: (allowMobileOnce: Boolean) -> Unit,
+    onWholeQuran: (allowMobileOnce: Boolean) -> Unit,
     onCancel: () -> Unit,
     onRetry: () -> Unit,
     onChangeReciter: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
     val arabic = isRtlLocale()
+    // Which of the two downloads the last tap asked for, so "Use mobile data this once" on the
+    // failure face repeats *that* one. Without it a refused whole-Quran batch offered an override
+    // that quietly fetched a single surah instead — the same words meaning a different thing
+    // depending on a button the reader can no longer see.
+    var lastWasWholeQuran by remember(sheet.surah, sheet.reciter.id) { mutableStateOf(false) }
     Column(Modifier.padding(horizontal = 24.dp)) {
         if (arabic) {
             Text(surahName, fontFamily = mushafFamily(), fontSize = 26.sp, color = colors.textPrimary, maxLines = 1)
@@ -82,9 +92,19 @@ fun DownloadSheet(
         }
         Spacer(Modifier.height(16.dp))
         when (val phase = sheet.phase) {
-            is SheetPhase.Ready -> Ready(sheet, phase, onConfirm)
+            is SheetPhase.Ready -> Ready(
+                sheet = sheet,
+                phase = phase,
+                wholeQuran = wholeQuran,
+                onConfirm = { allow -> lastWasWholeQuran = false; onConfirm(allow) },
+                onWholeQuran = { allow -> lastWasWholeQuran = true; onWholeQuran(allow) },
+            )
             is SheetPhase.Downloading -> Running(phase, onCancel)
-            is SheetPhase.Failed -> Failed(phase, onRetry, onConfirm)
+            is SheetPhase.Failed -> Failed(
+                phase = phase,
+                onRetry = onRetry,
+                onOverride = { if (lastWasWholeQuran) onWholeQuran(true) else onConfirm(true) },
+            )
         }
         Spacer(Modifier.height(24.dp))
     }
@@ -120,37 +140,53 @@ private fun ReciterRow(sheet: DownloadSheetState, onChangeReciter: () -> Unit) {
 }
 
 @Composable
-private fun Ready(sheet: DownloadSheetState, phase: SheetPhase.Ready, onConfirm: (Boolean) -> Unit) {
+private fun Ready(
+    sheet: DownloadSheetState,
+    phase: SheetPhase.Ready,
+    wholeQuran: WholeQuran?,
+    onConfirm: (Boolean) -> Unit,
+    onWholeQuran: (Boolean) -> Unit,
+) {
     val colors = LocalTaqwaColors.current
     TaqwaPrimaryButton(
         text = stringResource(Res.string.recitation_download, megabytes(sheet.bytes)),
         onClick = { onConfirm(false) },
     )
-    if (!phase.needsWifiNote) return
-    // Two sentences in one paragraph, the second of them a control. Splitting them into a label
-    // and a button would put a line break where the eye expects a sentence to carry on, so the
-    // whole line is one Text and the tap is on the row — the accent on the second half is what
-    // says which half is the control.
-    val accented = buildAnnotatedString {
-        append(stringResource(Res.string.recitation_over_wifi))
-        append(" ")
-        withStyle(SpanStyle(color = colors.accent, fontWeight = FontWeight.SemiBold)) {
-            append(stringResource(Res.string.recitation_use_mobile_once))
+    if (phase.needsWifiNote) {
+        // Two sentences in one paragraph, the second of them a control. Splitting them into a label
+        // and a button would put a line break where the eye expects a sentence to carry on, so the
+        // whole line is one Text and the tap is on the row — the accent on the second half is what
+        // says which half is the control.
+        val accented = buildAnnotatedString {
+            append(stringResource(Res.string.recitation_over_wifi))
+            append(" ")
+            withStyle(SpanStyle(color = colors.accent, fontWeight = FontWeight.SemiBold)) {
+                append(stringResource(Res.string.recitation_use_mobile_once))
+            }
         }
+        Text(
+            accented,
+            style = TaqwaText.caption,
+            color = colors.textSecondary,
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 44.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = { onConfirm(true) },
+                )
+                .padding(top = 14.dp),
+        )
     }
-    Text(
-        accented,
-        style = TaqwaText.caption,
-        color = colors.textSecondary,
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 44.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = { onConfirm(true) },
-            )
-            .padding(top = 14.dp),
+    // The quieter second button (spec §5.4): the same voice, all 114. Only ever the Offer face —
+    // a batch already running has this surah in it, so the sheet is showing its progress bar
+    // instead, and a reciter whose Quran is complete has nothing to offer.
+    val offer = wholeQuran as? WholeQuran.Offer ?: return
+    Spacer(Modifier.height(if (phase.needsWifiNote) 4.dp else 10.dp))
+    QuietAction(
+        stringResource(Res.string.recitation_settings_whole_quran, dataSize(offer.bytes)),
+        onClick = { onWholeQuran(false) },
     )
 }
 
@@ -195,7 +231,7 @@ private fun Running(phase: SheetPhase.Downloading, onCancel: () -> Unit) {
 }
 
 @Composable
-private fun Failed(phase: SheetPhase.Failed, onRetry: () -> Unit, onConfirm: (Boolean) -> Unit) {
+private fun Failed(phase: SheetPhase.Failed, onRetry: () -> Unit, onOverride: () -> Unit) {
     val colors = LocalTaqwaColors.current
     Text(
         downloadFailureSentence(phase.reason),
@@ -209,12 +245,12 @@ private fun Failed(phase: SheetPhase.Failed, onRetry: () -> Unit, onConfirm: (Bo
     // again. So the sentence that names the policy is followed by the tap that suspends it, the
     // same override the Ready face offers — otherwise the reader on mobile data is told what is
     // wrong and given the one button that cannot put it right.
-    if (phase.reason == DownloadFailure.NEEDS_WIFI) UseMobileOnce(onConfirm)
+    if (phase.reason == DownloadFailure.NEEDS_WIFI) UseMobileOnce(onOverride)
 }
 
 /** "Use mobile data this once" (spec §5.4), on both the faces that can act on it. */
 @Composable
-private fun UseMobileOnce(onConfirm: (Boolean) -> Unit) {
+private fun UseMobileOnce(onOverride: () -> Unit) {
     val colors = LocalTaqwaColors.current
     Text(
         stringResource(Res.string.recitation_use_mobile_once),
@@ -226,7 +262,7 @@ private fun UseMobileOnce(onConfirm: (Boolean) -> Unit) {
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = { onConfirm(true) },
+                onClick = onOverride,
             )
             .padding(top = 14.dp),
     )

@@ -326,4 +326,21 @@
     <string name="recitation_a11y_previous">Previous ayah</string>
     <string name="recitation_a11y_close">Close the player</string>
     <string name="recitation_a11y_preview">Hear this reciter</string>
+    <!-- Settings > Quran > Recitation, and its Downloads screen (spec 3a §5.6) -->
+    <string name="settings_group_quran">QURAN</string>
+    <string name="settings_recitation">Recitation</string>
+    <string name="recitation_settings_mobile_data">Download over mobile data</string>
+    <string name="recitation_settings_downloads">DOWNLOADS · %1$s</string>
+    <string name="recitation_settings_surahs_one">%1$s surah · %2$s</string>
+    <string name="recitation_settings_surahs">%1$s surahs · %2$s</string>
+    <string name="recitation_settings_whole_quran">Download the whole Quran · %1$s</string>
+    <string name="recitation_settings_batch">Downloading · %1$s of %2$s</string>
+    <string name="recitation_settings_credit">Recitations are licensed by the reciters for free, non-commercial distribution through the Islamic Network. Credits in Attribution &amp; licences.</string>
+    <string name="recitation_downloads_delete">Delete</string>
+    <string name="recitation_downloads_delete_all">Delete all for this reciter</string>
+    <string name="recitation_downloads_confirm">Delete %1$s?</string>
+    <string name="recitation_downloads_empty">Nothing of this reciter is on the phone.</string>
+    <string name="recitation_gigabytes">%1$s GB</string>
+    <string name="credit_recitations">Recitations</string>
+    <string name="credit_recitations_detail">Per-ayah recitations from the Islamic Network (alquran.cloud), licensed to them by the reciters for free, non-commercial redistribution at the bitrates they publish. Mirrored unmodified, at those bitrates.</string>
 </resources>
