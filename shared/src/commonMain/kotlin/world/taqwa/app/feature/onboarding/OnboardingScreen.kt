@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +38,9 @@ import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.rememberLocationPermissionRequester
 import world.taqwa.app.notifications.rememberNotificationPermissionRequester
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.notifications_allow_exact_alarms
+import world.taqwa.app.resources.onboarding_exact_body
+import world.taqwa.app.resources.onboarding_exact_title
 import world.taqwa.app.resources.onboarding_location_body
 import world.taqwa.app.resources.onboarding_location_cta
 import world.taqwa.app.resources.onboarding_location_secondary
@@ -65,7 +69,7 @@ import world.taqwa.app.widget.widgetAddPath
  * search: the step must survive the round trip, or the user comes back to the welcome screen
  * having already answered its question.
  */
-enum class OnboardingStep { WELCOME, LOCATION, NOTIFICATIONS, WIDGET }
+enum class OnboardingStep { WELCOME, LOCATION, NOTIFICATIONS, EXACT_ALARMS, WIDGET }
 
 /**
  * Four screens, each asking for exactly one thing and saying why *before* the system dialog
@@ -75,6 +79,11 @@ enum class OnboardingStep { WELCOME, LOCATION, NOTIFICATIONS, WIDGET }
  * The last screen asks for nothing from the system. It exists because the widget is the surface
  * most people will read most often and the one nobody finds on their own; on Android it can place
  * the widget from here, on iOS it can only say how.
+ *
+ * Between notifications and the widget, Android 14+ gets one more: "Alarms & reminders". Play does
+ * not let a prayer app hold the auto-granted exact-alarm permission, and the user-granted one is
+ * off by default, so without this step most people would get an adhan up to an hour late and
+ * never be told why. iOS, and an Android that already allows it, skip the step entirely.
  */
 @Composable
 fun OnboardingScreen(
@@ -87,6 +96,12 @@ fun OnboardingScreen(
     onNotificationPermission: (Boolean) -> Unit,
     onDeclineNotifications: () -> Unit,
     onComplete: () -> Unit,
+    /** True on an Android that has not granted "Alarms & reminders"; always false on iOS. Re-read
+     * by the caller each time the app comes to the front, which is how a grant made in system
+     * settings ends the step. */
+    exactAlarmsNeeded: Boolean = false,
+    /** Opens the system's "Alarms & reminders" page for this app. */
+    onRequestExactAlarms: () -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
 
@@ -101,8 +116,16 @@ fun OnboardingScreen(
     // Settings remain available afterwards.
     val requestNotifications = rememberNotificationPermissionRequester { granted ->
         onNotificationPermission(granted)
-        onStep(OnboardingStep.WIDGET)
+        // Exact alarms are only worth asking for once there are notifications to be exact about.
+        onStep(if (granted && exactAlarmsNeeded) OnboardingStep.EXACT_ALARMS else OnboardingStep.WIDGET)
     }
+
+    // The grant happens in system settings, out of the app's sight. The moment the app is back in
+    // front holding the permission, this step has nothing left to ask and moves on by itself.
+    LaunchedEffect(step, exactAlarmsNeeded) {
+        if (step == OnboardingStep.EXACT_ALARMS && !exactAlarmsNeeded) onStep(OnboardingStep.WIDGET)
+    }
+    val steps = OnboardingStep.entries.filter { it != OnboardingStep.EXACT_ALARMS || exactAlarmsNeeded }
 
     val canPinWidget = widgetPinRequester.isSupported(PinnableWidget.PRAYER)
 
@@ -146,6 +169,13 @@ fun OnboardingScreen(
                     Spacer(Modifier.height(12.dp))
                     Body(stringResource(Res.string.onboarding_notifications_body))
                 }
+                OnboardingStep.EXACT_ALARMS -> {
+                    ClockMark()
+                    Spacer(Modifier.height(28.dp))
+                    Headline(stringResource(Res.string.onboarding_exact_title))
+                    Spacer(Modifier.height(12.dp))
+                    Body(stringResource(Res.string.onboarding_exact_body))
+                }
                 OnboardingStep.WIDGET -> {
                     // The widgets themselves stand in for a mark: the point of the screen is what
                     // they look like. Drawn for the system appearance, since the widget will be.
@@ -171,7 +201,7 @@ fun OnboardingScreen(
 
             Spacer(Modifier.weight(1f))
             Spacer(Modifier.height(24.dp))
-            StepDots(step)
+            StepDots(step, steps)
             Spacer(Modifier.height(20.dp))
 
             when (step) {
@@ -199,6 +229,15 @@ fun OnboardingScreen(
                     TaqwaTextLink(
                         stringResource(Res.string.onboarding_notifications_secondary),
                         onClick = { onDeclineNotifications(); onStep(OnboardingStep.WIDGET) },
+                    )
+                }
+                OnboardingStep.EXACT_ALARMS -> {
+                    // The system page opens over the app; coming back with the grant advances the
+                    // step (the LaunchedEffect above), coming back without it leaves the choice here.
+                    TaqwaPrimaryButton(stringResource(Res.string.notifications_allow_exact_alarms), onRequestExactAlarms)
+                    TaqwaTextLink(
+                        stringResource(Res.string.onboarding_notifications_secondary),
+                        onClick = { onStep(OnboardingStep.WIDGET) },
                     )
                 }
                 OnboardingStep.WIDGET -> {
@@ -242,14 +281,14 @@ private fun Body(text: String) {
 }
 
 @Composable
-private fun StepDots(step: OnboardingStep) {
+private fun StepDots(step: OnboardingStep, steps: List<OnboardingStep>) {
     val colors = LocalTaqwaColors.current
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        OnboardingStep.entries.forEach { entry ->
+        steps.forEach { entry ->
             Box(
                 Modifier
                     .padding(horizontal = 4.dp)

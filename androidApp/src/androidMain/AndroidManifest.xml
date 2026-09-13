@@ -3,8 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Uncapped on purpose. USE_EXACT_ALARM would be auto-granted from API 33 and would make
+         the cap correct, but Play restricts it to alarm-clock and calendar apps; a prayer app is
+         the reviewer's judgement call, and a rejection would cost the release. So the app asks
+         for the user-revocable one on every API level and offers the grant in Settings, and
+         AndroidNotificationScheduler falls back to an inexact wake-up when it is refused. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Qibla alignment confirms with a short tick; Vibrator.vibrate() throws SecurityException
@@ -22,13 +26,28 @@
          the generic one since API 28, the typed one since API 34. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
+    <!-- ACCESS_COARSE_LOCATION would otherwise imply that location hardware is *required*, which
+         hides the app on Play from the few devices without it. Nothing here needs it: a city from
+         the built-in list gives the same prayer times, and the compass says so when it has no
+         magnetometer to work with. -->
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
+
     <!-- allowBackup is off on purpose: the settings file holds the reader's coordinates (or
          chosen city), and "your location never leaves your phone" has to include Google's
          backup. Backup rules cannot split the file — bookmarks and tasbeeh counts live in the
-         same DataStore — so the whole app opts out, and settings are redone on a new phone. -->
+         same DataStore — so the whole app opts out, and settings are redone on a new phone.
+         dataExtractionRules repeats the opt-out in the form Android 12+ reads; below 12,
+         allowBackup="false" alone is the whole answer, which is why lint's request for a
+         fullBackupContent file as well is ignored. -->
     <application
         android:name=".TaqwaApplication"
         android:allowBackup="false"
+        tools:ignore="DataExtractionRules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:localeConfig="@xml/locales_config"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -43,6 +62,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- The ayah widget's tap. It sets this action and a taqwa://ayah/<surah>/<ayah> data
+                 URI so each ayah's PendingIntent is distinct by Intent.filterEquals, which extras
+                 alone are not (TaqwaAyahGlanceWidget). From Android 16 an explicit intent aimed at
+                 a component that declares filters has to match one of them, and MAIN+LAUNCHER
+                 matches neither an action nor a data URI — so the tap needs a filter of its own.
+                 Nothing parses the URI: MainActivity reads the extras. -->
+            <intent-filter>
+                <action android:name="world.taqwa.app.OPEN_AYAH" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="taqwa" android:host="ayah" />
+            </intent-filter>
         </activity>
         <!-- Quran recitation. Exported with the MediaSessionService intent filter because that
              is how the platform, Android Auto, Assistant and a paired watch find a media session;
@@ -51,7 +81,8 @@
         <service
             android:name="world.taqwa.app.recitation.RecitationService"
             android:exported="true"
-            android:foregroundServiceType="mediaPlayback">
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
@@ -62,6 +93,16 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <!-- Replacing the package stops the app and drops every AlarmManager entry it
+                     owns, exactly as a reboot does, so every Play auto-update would otherwise
+                     leave the reader with no adhan until they next opened the app by hand.
+                     MY_PACKAGE_REPLACED is the self-targeted one: no data element, no
+                     permission, and never delivered for another app's update. -->
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <!-- Android 12+ tells the app when "Alarms & reminders" is granted or revoked.
+                     Every alarm already armed keeps the exactness it was armed with, so the plan
+                     is rebuilt on the spot rather than at the next foreground. -->
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
         <!-- The rolling five-minute widget refresh. Inexact RTC window alarms, armed by the

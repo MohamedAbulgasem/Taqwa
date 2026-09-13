@@ -197,6 +197,6 @@ Prayer-time mathematics by [Adhan](https://github.com/batoulapps/adhan-kotlin) (
 
 ## Licence
 
-Taqwa is free software under the [GNU General Public License v3.0](LICENSE). You may use, study, share and modify it, and anything you distribute that is built from it must stay under the same licence with its source available. That is deliberate: it keeps a free, ad-free app from being repackaged as neither. The bundled data carries its own licences, listed above and in the app.
+Taqwa is free software under the [GNU General Public License v3.0](LICENSE). You may use, study, share and modify it, and anything you distribute that is built from it must stay under the same licence with its source available. That is deliberate: it keeps a free, ad-free app from being repackaged as neither. The bundled Quran text, translations, typefaces, city data and audio are third-party works under their own licences, not the GPL, listed above and in the app; see [NOTICE](NOTICE) and [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md).
 
 Copyright © 2026 Mohamed Abulgasem.

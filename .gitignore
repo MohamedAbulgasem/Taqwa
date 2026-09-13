@@ -29,3 +29,7 @@ __pycache__/
 
 # The built website (site/build.py)
 _site/
+# Store signing: the upload key and its passwords never enter the repository
+keystore.properties
+*.jks
+*.keystore

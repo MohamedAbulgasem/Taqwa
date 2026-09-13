@@ -4,3 +4,16 @@
 
 /* Shown on the card until the app has run once and written the pool mirror (design spec §2). */
 "ayah_widget_placeholder" = "افتح تقوى مرة لتحميل آية اليوم";
+
+/* The two prayer widgets as they appear in the widget gallery. */
+"home_widget_name" = "تقوى";
+"home_widget_description" = "الصلاة التالية والعد التنازلي ومواقيت اليوم.";
+"lock_widget_name" = "تقوى على شاشة القفل";
+"lock_widget_description" = "الصلاة التالية في لمحة.";
+
+/* Shown on the prayer cards until the app has run once and written the snapshot mirror. */
+"prayer_widget_placeholder_title" = "تقوى";
+"prayer_widget_placeholder_body" = "افتح تقوى لتحميل مواقيت الصلاة.";
+
+/* The prayer after the next one on the rectangular complication; %@ is its display name. */
+"lock_widget_then" = "ثم %@";

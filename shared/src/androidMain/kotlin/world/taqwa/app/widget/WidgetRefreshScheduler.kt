@@ -21,10 +21,10 @@ import android.content.Intent
  *  - `setWindow` batches with whatever else the platform is already waking for and is deferred
  *    wholesale under Doze, so it costs nothing while the phone is idle in a pocket — and a widget
  *    nobody is looking at does not need to be right.
- *  - It needs no `SCHEDULE_EXACT_ALARM`/`USE_EXACT_ALARM` grant. The app holds those, but they are
- *    spent on the prayer alarms, whose whole justification is that the adhan must land on the
- *    minute. A cosmetic redraw must never compete for that budget, so this deliberately does not
- *    use `setExact*`.
+ *  - It needs no `SCHEDULE_EXACT_ALARM` grant. The app asks for that one — and only that one —
+ *    and it is spent on the prayer alarms, whose whole justification is that the adhan must land
+ *    on the minute. A cosmetic redraw must never compete for that budget, so this deliberately
+ *    does not use `setExact*`.
  *  - `RTC`, not `RTC_WAKEUP`: this must never wake a sleeping device. If the screen is off there
  *    is no one to read the widget, and the alarm will fire on the next wake anyway.
  *

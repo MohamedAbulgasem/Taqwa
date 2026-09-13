@@ -52,7 +52,7 @@ import world.taqwa.app.resources.recitation_play
 import world.taqwa.app.feature.recitation.HeaderState
 
 /** The 36 dp round icon buttons' size (spec §2.2). */
-private val TouchTargetSize = 44.dp
+private val TouchTargetSize = 48.dp
 private val IconButtonSize = 36.dp
 
 /**

@@ -47,10 +47,11 @@ private class AndroidLocationProvider : LocationProvider {
         return fresh?.let { it.latitude to it.longitude }
     }
 
-    private fun lastKnown(lm: LocationManager): Location? = listOfNotNull(
-        runCatching { lm.getLastKnownLocation(LocationManager.GPS_PROVIDER) }.getOrNull(),
-        runCatching { lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) }.getOrNull(),
-    ).maxByOrNull { it.time }
+    /** `NETWORK_PROVIDER` alone, for the same reason [coarseProviders] avoids GPS below: asking
+     * `GPS_PROVIDER` on the coarse permission throws on every call, and a swallowed
+     * SecurityException is a wasted binder round trip that reads as if it might return something. */
+    private fun lastKnown(lm: LocationManager): Location? =
+        runCatching { lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) }.getOrNull()
 
     /**
      * Only providers the *coarse* permission can legally read: `GPS_PROVIDER` requires

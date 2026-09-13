@@ -23,6 +23,46 @@ let taqwaWrittenAtKey = "snapshot_written_at"
 let taqwaSnapshotKey = "snapshot"
 let taqwaBackgroundKey = "widget_background"
 
+// MARK: - Copy
+
+/// The prayer widgets' own strings.
+///
+/// Looked up by hand rather than handed to SwiftUI as a `LocalizedStringKey`, for the reason
+/// `TaqwaAyahWidget.placeholderText` gives: this file is a member of the *app* target too and the
+/// strings table ships only in the extension's bundle, so the `-taqwaWidgetPreview` route would
+/// draw the raw keys. The fallbacks are the same copy `Localizable.strings` carries.
+///
+/// The two `Widget` declarations at the bottom of this file are the exception — a
+/// `WidgetConfiguration` is only ever built inside the extension, so those use
+/// `LocalizedStringKey` exactly as the ayah widget does.
+private enum TaqwaWidgetStrings {
+
+    static var placeholderTitle: String {
+        localized("prayer_widget_placeholder_title", en: "Taqwa", ar: "تقوى")
+    }
+
+    static var placeholderBody: String {
+        localized(
+            "prayer_widget_placeholder_body",
+            en: "Open Taqwa to load your prayer times.",
+            ar: "افتح تقوى لتحميل مواقيت الصلاة."
+        )
+    }
+
+    /// The prayer after the next one, on the rectangular complication. `%@` is the already-
+    /// localised display name, so only the word in front of it is translated here.
+    static func then(_ prayer: String) -> String {
+        String(format: localized("lock_widget_then", en: "then %@", ar: "ثم %@"), prayer)
+    }
+
+    private static func localized(_ key: String, en: String, ar: String) -> String {
+        let value = Bundle.main.localizedString(forKey: key, value: key, table: nil)
+        guard value == key else { return value }
+        let arabic = Locale.current.language.languageCode?.identifier.hasPrefix("ar") ?? false
+        return arabic ? ar : en
+    }
+}
+
 // MARK: - Reading the mirror
 
 enum TaqwaMirror {
@@ -351,10 +391,10 @@ struct TaqwaHomeWidgetView: View {
 
     private var placeholder: some View {
         VStack(spacing: 4) {
-            Text("Taqwa")
+            Text(TaqwaWidgetStrings.placeholderTitle)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(Color(argb: colors.accentArgb))
-            Text("Open Taqwa to load your prayer times.")
+            Text(TaqwaWidgetStrings.placeholderBody)
                 .font(.system(size: 12))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color(argb: colors.textArgb).opacity(0.7))
@@ -430,7 +470,7 @@ struct TaqwaLockScreenWidgetView: View {
                             .monospacedDigit()
                     }
                     if let then = Self.prayerAfterNext(content) {
-                        Text("then \(then.displayName)")
+                        Text(TaqwaWidgetStrings.then(then.displayName))
                             .font(.caption2)
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
@@ -440,7 +480,7 @@ struct TaqwaLockScreenWidgetView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             }
         } else {
-            Text("Taqwa")
+            Text(TaqwaWidgetStrings.placeholderTitle)
         }
     }
 }
@@ -457,8 +497,8 @@ struct TaqwaHomeWidget: Widget {
         StaticConfiguration(kind: kind, provider: TaqwaTimelineProvider()) { entry in
             TaqwaHomeWidgetView(entry: entry)
         }
-        .configurationDisplayName("Taqwa")
-        .description("Next prayer, countdown and today's times.")
+        .configurationDisplayName(LocalizedStringKey("home_widget_name"))
+        .description(LocalizedStringKey("home_widget_description"))
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
@@ -469,8 +509,8 @@ struct TaqwaLockScreenWidget: Widget {
         StaticConfiguration(kind: kind, provider: TaqwaTimelineProvider()) { entry in
             TaqwaLockScreenWidgetView(entry: entry)
         }
-        .configurationDisplayName("Taqwa Lock Screen")
-        .description("Next prayer at a glance.")
+        .configurationDisplayName(LocalizedStringKey("lock_widget_name"))
+        .description(LocalizedStringKey("lock_widget_description"))
         .supportedFamilies([.accessoryCircular, .accessoryRectangular])
     }
 }

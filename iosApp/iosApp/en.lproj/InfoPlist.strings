@@ -1,0 +1,6 @@
+/* The permission sheet's own copy. Info.plist carries the same English sentence as the fallback
+   for every other language; this file exists so ar.lproj can carry the Arabic one. */
+"NSLocationWhenInUseUsageDescription" = "Taqwa uses your location to calculate accurate prayer times on your device. Your location is never sent anywhere.";
+
+/* The name under the home screen icon. */
+"CFBundleDisplayName" = "Taqwa";

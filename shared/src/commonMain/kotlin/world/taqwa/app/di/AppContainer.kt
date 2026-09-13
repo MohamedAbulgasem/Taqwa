@@ -1,5 +1,6 @@
 package world.taqwa.app.di
 
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -109,7 +110,12 @@ class AppContainer {
             quran = quranRepository,
             clips = ClipPlayer().asPort(),
             previewBytes = ::recitationPreviewBytes,
-            scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+            // The handler, not just the SupervisorJob: a supervisor stops a failed child taking
+            // its siblings, but an uncaught throw still reaches the default handler and the
+            // process with it.
+            scope = CoroutineScope(
+                SupervisorJob() + Dispatchers.Main.immediate + CoroutineExceptionHandler { _, _ -> },
+            ),
             // Swallowed for the same reason the refresh is: a flag that failed to write is
             // retried by the next tap, and a tap to play must never be the thing that takes the
             // process down. Cancellation still propagates.

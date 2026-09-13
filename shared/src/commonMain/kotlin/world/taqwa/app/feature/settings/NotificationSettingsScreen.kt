@@ -1,6 +1,9 @@
 package world.taqwa.app.feature.settings
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,10 +14,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
@@ -28,10 +34,14 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.adhanVoiceDisplayName
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.i18n.soundDisplayName
+import world.taqwa.app.notifications.rememberNotificationPermissionRequester
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.adhan_voice_row
 import world.taqwa.app.resources.minutes_count
+import world.taqwa.app.resources.notifications_allow_exact_alarms
+import world.taqwa.app.resources.notifications_blocked
 import world.taqwa.app.resources.notifications_exact_alarms_off
+import world.taqwa.app.resources.notifications_open_settings
 import world.taqwa.app.resources.notifications_master_toggle
 import world.taqwa.app.resources.notifications_prayers_label
 import world.taqwa.app.resources.notifications_remind_before
@@ -67,6 +77,15 @@ fun NotificationSettingsScreen(
     // falls back to an inexact window rather than crashing, and this is where that trade-off is
     // admitted. Always false on iOS.
     exactAlarmsUnavailable: Boolean = false,
+    /** Whether the OS currently lets Taqwa post notifications at all. Re-read by the caller each
+     * time the app comes to the front, so a switch flipped in system settings is reflected here. */
+    notificationsGranted: Boolean = true,
+    /** The app's page in system settings, for when [notificationsGranted] is false. */
+    onOpenNotificationSettings: () -> Unit = {},
+    /** Android's "Alarms & reminders" access for this app, for when [exactAlarmsUnavailable]. */
+    onRequestExactAlarms: () -> Unit = {},
+    /** The permission request has answered; the caller re-reads [notificationsGranted]. */
+    onPermissionChecked: () -> Unit = {},
     onBack: () -> Unit,
     onToggleEnabled: (Boolean) -> Unit,
     onPickLead: (Int) -> Unit,
@@ -85,17 +104,40 @@ fun NotificationSettingsScreen(
     var remindSheetOpen by remember { mutableStateOf(false) }
     var voiceSheetOpen by remember { mutableStateOf(false) }
 
+    // Turning the master switch on while the OS permission is missing asks for it first: on
+    // Android 13+ that is the system dialog (or an immediate refusal once it has been declined
+    // twice), on iOS a permission refused before answers at once. The switch goes on either way,
+    // because notifications are what the person asked for; the note below then says what still
+    // stands in the way and where to fix it.
+    val requestPermission = rememberNotificationPermissionRequester { _ ->
+        onToggleEnabled(true)
+        onPermissionChecked()
+    }
+
     SettingsScaffold(stringResource(Res.string.settings_notifications), onBack) {
         SettingsCard {
             TaqwaRow(
                 stringResource(Res.string.notifications_master_toggle),
-                trailing = { TaqwaToggle(checked = settings.enabled, onCheckedChange = onToggleEnabled) },
+                trailing = {
+                    TaqwaToggle(
+                        checked = settings.enabled,
+                        onCheckedChange = { enabled ->
+                            if (enabled && !notificationsGranted) requestPermission() else onToggleEnabled(enabled)
+                        },
+                    )
+                },
             )
         }
 
+        if (settings.enabled && !notificationsGranted) {
+            Spacer(Modifier.height(10.dp))
+            SettingsNote(stringResource(Res.string.notifications_blocked))
+            SettingsLink(stringResource(Res.string.notifications_open_settings), onOpenNotificationSettings)
+        }
         if (exactAlarmsUnavailable) {
             Spacer(Modifier.height(10.dp))
             SettingsNote(stringResource(Res.string.notifications_exact_alarms_off))
+            SettingsLink(stringResource(Res.string.notifications_allow_exact_alarms), onRequestExactAlarms)
         }
 
         Spacer(Modifier.height(28.dp))
@@ -182,5 +224,28 @@ fun NotificationSettingsScreen(
                 onPreview = onPreviewSound,
             )
         }
+    }
+}
+
+/**
+ * The one action a note can offer: a system screen the app cannot stand in for. Left-aligned
+ * under its note rather than the centred [world.taqwa.app.design.components.TaqwaTextLink], and
+ * a 44 dp row so it is a target, not a line of text.
+ */
+@Composable
+private fun SettingsLink(text: String, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .padding(horizontal = SettingsGutter)
+            .defaultMinSize(minHeight = 44.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Text(
+            text,
+            style = TaqwaText.caption.copy(fontWeight = FontWeight.SemiBold),
+            color = LocalTaqwaColors.current.accent,
+        )
     }
 }

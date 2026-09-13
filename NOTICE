@@ -1,0 +1,16 @@
+Taqwa
+Copyright (C) 2026 Mohamed Abulgasem
+
+The source code in this repository is licensed under the GNU General Public License,
+version 3 (see LICENSE).
+
+The GPL does NOT cover the third-party content the app bundles and this repository
+carries alongside the code: the Quran text (Tanzil, CC BY-ND 3.0), the translations
+(Tanzil, non-commercial), the KFGQPC Uthmanic Hafs typeface (free to use and distribute
+unmodified only), the Manrope typeface (SIL OFL 1.1), the GeoNames city data (CC BY 4.0),
+the adhan recordings (Wikimedia Commons, CC0 / CC BY-SA 4.0 / CC BY 3.0), the notification
+chime (Mixkit licence) and the recitation previews (Islamic Network, non-commercial
+redistribution). Each is redistributed under its own licence, listed with its source in
+docs/ATTRIBUTION.md; licence texts that must accompany a copy are in docs/licences/.
+If you redistribute a derivative of Taqwa, those works come with their own terms or must
+be replaced.

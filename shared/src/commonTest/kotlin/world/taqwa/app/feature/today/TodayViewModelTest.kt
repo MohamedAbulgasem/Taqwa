@@ -17,6 +17,8 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import okio.FileSystem
+import okio.Path
 import okio.Path.Companion.toPath
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.GeoLocation
@@ -101,10 +103,20 @@ private class WidgetTrafficProbe(private val location: GeoLocation, private val 
 class TodayViewModelTest {
 
     // Same absolute-path rule as SettingsRepositoryTest: DataStore's OkioStorage rejects relative
-    // paths at runtime on iosSimulatorArm64Test. One file per test keeps the cases isolated.
-    private fun settings(name: String) = SettingsRepository(
-        PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-test-today-$name.preferences_pb".toPath() }
-    )
+    // paths at runtime on iosSimulatorArm64Test. One file per test keeps the cases isolated, and
+    // the file is removed first: it outlives the process, and a city name remembered by the last
+    // run — or by the JVM run of this same suite, moments earlier — is exactly the stale state
+    // the city-name tests exist to catch. The iOS run failed on precisely that until this did.
+    private fun settings(name: String): SettingsRepository {
+        val path = freshStorePath(name)
+        return SettingsRepository(PreferenceDataStoreFactory.createWithPath { path })
+    }
+
+    private fun freshStorePath(name: String): Path {
+        val path = "/tmp/taqwa-test-today-$name.preferences_pb".toPath()
+        FileSystem.SYSTEM.delete(path, mustExist = false)
+        return path
+    }
 
     private val london = GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB")
     private val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
@@ -655,11 +667,8 @@ class TodayViewModelTest {
 
     @Test
     fun theNameIsRememberedOnceNotOnEveryTick() = runTest {
-        val store = CountingDataStore(
-            PreferenceDataStoreFactory.createWithPath {
-                "/tmp/taqwa-test-today-city-name-write-once.preferences_pb".toPath()
-            },
-        )
+        val writeOncePath = freshStorePath("city-name-write-once")
+        val store = CountingDataStore(PreferenceDataStoreFactory.createWithPath { writeOncePath })
         val repo = SettingsRepository(store)
         repo.setPrayerSettings(PrayerSettings())
         repo.setLocation(londonWithId)

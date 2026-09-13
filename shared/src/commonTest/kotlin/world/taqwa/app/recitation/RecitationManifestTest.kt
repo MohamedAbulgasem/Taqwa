@@ -51,6 +51,32 @@ internal const val TWO_RECITERS = """
 class RecitationManifestTest {
 
     @Test
+    fun aManifestWhoseBaseIsNotHttpsIsRejected() {
+        val cleartext = TWO_RECITERS.replace("https://github.com", "http://github.com")
+        assertFailsWith<IllegalArgumentException> { ManifestJson.parse(cleartext) }
+    }
+
+    @Test
+    fun aReciterIdOrReleaseThatIsNotAPlainNameIsRejected() {
+        // Each names a directory and a file under the audio root, so a traversal in either would
+        // point outside it. The bundled ids ("ar.alafasy") and releases ("audio-ar.alafasy-v1")
+        // pass; anything with a slash or the two directory names does not.
+        assertFailsWith<IllegalArgumentException> {
+            ManifestJson.parse(TWO_RECITERS.replace("\"id\": \"ar.husary\"", "\"id\": \"../../ar.husary\""))
+        }
+        assertFailsWith<IllegalArgumentException> {
+            ManifestJson.parse(TWO_RECITERS.replace("audio-ar.husary-v1", "releases/../audio"))
+        }
+        assertTrue(RecitationManifest.isPlainSegment("ar.alafasy"))
+        assertTrue(RecitationManifest.isPlainSegment("audio-ar.alafasy-v1"))
+        assertTrue(!RecitationManifest.isPlainSegment(".."))
+        assertTrue(!RecitationManifest.isPlainSegment("a/b"))
+        assertTrue(!RecitationManifest.isPlainSegment(""))
+        // The unmodified fixture still parses, so the checks are not rejecting the real shape.
+        assertEquals(2, ManifestJson.parse(TWO_RECITERS).reciters.size)
+    }
+
+    @Test
     fun parsesTheCatalogueAndRoundTripsIt() {
         val manifest = ManifestJson.parse(TWO_RECITERS)
         assertEquals(1, manifest.schema)

@@ -10,6 +10,7 @@ import world.taqwa.app.settings.SettingsRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
 private class FakeScheduler : NotificationScheduler {
@@ -81,5 +82,20 @@ class NotificationCoordinatorTest {
         assertTrue(coordinator.needsTopUp(emptyList()))
         val fullWindow = coordinator.reschedule(RescheduleTrigger.APP_FOREGROUND)
         assertTrue(!coordinator.needsTopUp(fullWindow))
+    }
+
+    @Test
+    fun needsTopUpAnswersTheSameFromAHorizonAloneAsFromThePlan() = runTest {
+        // Android's alarm receiver has no plan in memory — only the furthest instant the armed
+        // plan reaches, read back from the scheduler's preferences. Both must decide alike.
+        val scheduler = FakeScheduler()
+        val coordinator = NotificationCoordinator(
+            engine = engine, settingsRepository = repo("topup-horizon"),
+            locationOf = { london }, scheduler = scheduler, now = { now },
+        )
+        assertTrue(coordinator.needsTopUp(null as Instant?))
+        val fullWindow = coordinator.reschedule(RescheduleTrigger.APP_FOREGROUND)
+        assertTrue(!coordinator.needsTopUp(fullWindow.maxOf { it.instant }))
+        assertTrue(coordinator.needsTopUp(now + 1.days))
     }
 }

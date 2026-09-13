@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.tasbeeh
 
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -104,7 +105,11 @@ data class TasbeehUiState(
 class TasbeehViewModel(
     private val store: TasbeehStore,
     private val haptics: Haptics,
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    // The handler is what keeps a failed save (a full disk, a corrupt store) from taking the
+    // process down: SupervisorJob alone only stops it cancelling its siblings.
+    private val scope: CoroutineScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> },
+    ),
 ) {
     private val _state = MutableStateFlow(TasbeehUiState())
     val state: StateFlow<TasbeehUiState> = _state.asStateFlow()

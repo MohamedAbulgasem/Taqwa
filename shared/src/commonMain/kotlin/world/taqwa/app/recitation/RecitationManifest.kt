@@ -34,9 +34,33 @@ data class RecitationManifest(
     fun assetUrl(reciterId: String, surah: Int): String? =
         reciter(reciterId)?.let { assetUrl(it, surah) }
 
+    /**
+     * The one input the app takes from the network, checked before it is trusted. Every asset
+     * URL has to be HTTPS (both platforms would refuse cleartext anyway, but a manifest asking for
+     * it is wrong rather than unlucky), and a reciter id or release is a single plain path
+     * segment: each names a directory and a file under the audio root, so `..` or a slash in one
+     * would point outside it.
+     *
+     * @throws IllegalArgumentException, which [ManifestProvider.store] turns into "keep the
+     * catalogue already in force".
+     */
+    fun validate() {
+        require(base.startsWith("https://")) { "Recitation manifest base is not https: $base" }
+        for (reciter in reciters) {
+            require(isPlainSegment(reciter.id)) { "Recitation manifest reciter id is not a plain name: ${reciter.id}" }
+            require(isPlainSegment(reciter.release)) { "Recitation manifest release is not a plain name: ${reciter.release}" }
+        }
+    }
+
     companion object {
         /** The only schema this build understands; see [UnsupportedManifest]. */
         const val SCHEMA = 1
+
+        private val PLAIN_SEGMENT = Regex("[A-Za-z0-9._-]{1,64}")
+
+        /** Letters, digits, dot, underscore and hyphen only, and not the two names that mean a directory. */
+        fun isPlainSegment(segment: String): Boolean =
+            PLAIN_SEGMENT.matches(segment) && segment != "." && segment != ".."
 
         /** Alafasy, as decided on 7 September and confirmed on 12 September (spec §12.1). */
         const val DEFAULT_RECITER = "ar.alafasy"
@@ -108,10 +132,13 @@ object ManifestJson {
     /**
      * @throws UnsupportedManifest if the file was written for a newer schema.
      * @throws kotlinx.serialization.SerializationException if it is not a manifest at all.
+     * @throws IllegalArgumentException if it names a cleartext base or a reciter id or release
+     * that is not a plain path segment; see [RecitationManifest.validate].
      */
     fun parse(text: String): RecitationManifest {
         val manifest = json.decodeFromString(RecitationManifest.serializer(), text)
         if (manifest.schema > RecitationManifest.SCHEMA) throw UnsupportedManifest(manifest.schema)
+        manifest.validate()
         return manifest
     }
 

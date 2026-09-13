@@ -75,7 +75,9 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             method = p[SettingsKeys.METHOD].toEnumOr(CalculationMethodId.MUSLIM_WORLD_LEAGUE),
             madhab = p[SettingsKeys.MADHAB].toEnumOr(AsrMadhab.STANDARD),
             highLatitude = p[SettingsKeys.HIGH_LAT].toEnumOr(HighLatitudePreference.AUTOMATIC),
-            hijriOffsetDays = p[SettingsKeys.HIJRI_OFFSET] ?: 0,
+            // Clamped to the range the settings screen offers, like every other stored value here:
+            // a preferences file from elsewhere must not be able to shift the date by a year.
+            hijriOffsetDays = (p[SettingsKeys.HIJRI_OFFSET] ?: 0).coerceIn(-1, 1),
             showSunrise = p[SettingsKeys.SHOW_SUNRISE] ?: false,
             minuteAdjustments = decodeMinuteAdjustments(p[SettingsKeys.MINUTE_ADJUSTMENTS]),
         )

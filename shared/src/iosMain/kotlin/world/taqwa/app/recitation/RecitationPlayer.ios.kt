@@ -53,6 +53,7 @@ import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
+import world.taqwa.app.audio.IosAudioSession
 import platform.MediaPlayer.MPChangePlaybackPositionCommandEvent
 import platform.MediaPlayer.MPMediaItemArtwork
 import platform.MediaPlayer.MPMediaItemPropertyArtist
@@ -246,6 +247,9 @@ actual class RecitationPlayer actual constructor(
         MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = null
         unwireCommands()
         unobserve()
+        // Before the deactivation, so a clip that ends in the same breath does not read a session
+        // recitation still holds and decline to hand it back.
+        IosAudioSession.recitationHoldsSession = false
         // Notify others: whatever was playing before recitation took the session — a podcast, the
         // Quran in another app — is told it may have it back.
         AVAudioSession.sharedInstance().setActive(
@@ -339,6 +343,7 @@ actual class RecitationPlayer actual constructor(
         val taqa = TaqaFile(container, fs)
         val index = taqa.index()
         val dir = cachesRoot() / reciterId / surah.toString()
+        evictSplitsExcept(dir, fs)
         fs.createDirectories(dir)
         val written = LinkedHashMap<Int, String>(index.ayahs.size)
         index.ayahs.forEach { ayah ->
@@ -350,6 +355,28 @@ actual class RecitationPlayer actual constructor(
             written[ayah.n] = out.toString()
         }
         return Split(written, taqa.ayahDurationsMs())
+    }
+
+    /**
+     * A split is the surah's own bytes a second time — 58 MB for a long one — and iOS only purges
+     * `Library/Caches` under real disk pressure, never while the app is running. So the cache
+     * holds exactly the surah about to be played: every other surah of this reciter and every
+     * other reciter goes first. Best effort, and never [keep] itself: a cache that could not be
+     * pruned is not a reason to refuse to play.
+     */
+    private fun evictSplitsExcept(keep: Path, fs: FileSystem) {
+        val reciterDir = keep.parent ?: return
+        runCatching {
+            fs.listOrNull(cachesRoot())?.forEach { entry ->
+                if (entry != reciterDir) {
+                    runCatching { fs.deleteRecursively(entry) }
+                } else {
+                    fs.listOrNull(entry)?.forEach { surahDir ->
+                        if (surahDir != keep) runCatching { fs.deleteRecursively(surahDir) }
+                    }
+                }
+            }
+        }
     }
 
     private fun cachesRoot(): Path {
@@ -380,6 +407,9 @@ actual class RecitationPlayer actual constructor(
             error = null,
         )
         session.setActive(true, error = null)
+        // The adhan audition and the reciter clip share this session; from here until `stop()`
+        // they leave it alone rather than deactivating a surah out from under itself.
+        IosAudioSession.recitationHoldsSession = true
     }
 
     private fun observe() {

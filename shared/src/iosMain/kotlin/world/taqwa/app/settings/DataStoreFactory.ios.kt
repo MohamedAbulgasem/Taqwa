@@ -23,14 +23,23 @@ import platform.Foundation.NSUserDomainMask
 @OptIn(ExperimentalForeignApi::class)
 actual fun dataStoreDirectory(): String {
     val fm = NSFileManager.defaultManager
-    val documents = requireNotNull(fm.directory(NSDocumentDirectory).path)
+    val documentsUrl = fm.directory(NSDocumentDirectory)
+    val documents = requireNotNull(documentsUrl.path)
+    // Every fallback below leaves the settings — and with them the reader's coordinates — in
+    // Documents, which iCloud backs up. There is no per-file rule that survives DataStore
+    // rewriting the file, so the flag goes on the directory, as it does on `Taqwa` above. Best
+    // effort, and Taqwa is the only thing that has ever put a file there.
+    fun documentsFallback(): String {
+        documentsUrl.setResourceValue(true, forKey = NSURLIsExcludedFromBackupKey, error = null)
+        return documents
+    }
     val support = fm.directory(NSApplicationSupportDirectory)
-    val dir = support.URLByAppendingPathComponent("Taqwa", isDirectory = true) ?: return documents
-    val dirPath = dir.path ?: return documents
+    val dir = support.URLByAppendingPathComponent("Taqwa", isDirectory = true) ?: return documentsFallback()
+    val dirPath = dir.path ?: return documentsFallback()
 
     if (!fm.fileExistsAtPath(dirPath)) {
         val made = fm.createDirectoryAtURL(dir, withIntermediateDirectories = true, attributes = null, error = null)
-        if (!made) return documents
+        if (!made) return documentsFallback()
     }
     // Set every time, not only on creation: the attribute is cheap and a restore from an old
     // backup could bring the directory back without it.
@@ -38,9 +47,16 @@ actual fun dataStoreDirectory(): String {
 
     val oldFile = "$documents/$SETTINGS_FILE"
     val newFile = "$dirPath/$SETTINGS_FILE"
-    if (fm.fileExistsAtPath(oldFile) && !fm.fileExistsAtPath(newFile)) {
-        val moved = fm.moveItemAtPath(oldFile, toPath = newFile, error = null)
-        if (!moved) return documents
+    if (fm.fileExistsAtPath(oldFile)) {
+        if (!fm.fileExistsAtPath(newFile)) {
+            val moved = fm.moveItemAtPath(oldFile, toPath = newFile, error = null)
+            if (!moved) return documentsFallback()
+        }
+        // A move is a rename, so this is usually nothing — but an iCloud restore can put the
+        // pre-0.11 file back beside a new one that is already in use, and that copy has the
+        // reader's coordinates in it and would go on being backed up. Whichever way we got here,
+        // Documents does not keep one.
+        fm.removeItemAtPath(oldFile, null)
     }
     return dirPath
 }

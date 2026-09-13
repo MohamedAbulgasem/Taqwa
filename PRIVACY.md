@@ -37,8 +37,9 @@ which reveals the reciter and surah. It carries nothing that identifies you: no 
 device identifier, no cookie. GitHub's own privacy statement covers what GitHub keeps about
 such requests: docs.github.com/site-policy/privacy-policies/github-general-privacy-statement.
 
-Once you have used recitation, the app also checks once a day for an updated list of
-reciters, from the same repository. That request is the same for everyone and reveals
+Once you have opened anything to do with recitation, whether the reciter list, the Recitation
+settings or a download, the app also checks once a day for an updated list of reciters, from the
+same repository. That request is the same for everyone and reveals
 nothing but your IP address. Until you first use recitation, the app makes no network
 request at all.
 
@@ -49,8 +50,9 @@ Downloads.
 
 Taqwa opts out of Android's app backup, so your location and settings are not copied to
 Google. On iOS, your settings, bookmarks, counts and downloaded recitations are excluded
-from iCloud backup; the only thing of Taqwa's that is backed up is the widget's small cache
-of upcoming prayer times, and that backup is encrypted by Apple and never visible to us.
+from iCloud backup; the only things of Taqwa's that are backed up are the widgets' small caches,
+the upcoming prayer times and the hundred ayahs the daily-ayah widget rotates through, neither of
+which contains your location, and that backup is encrypted by Apple and never visible to us.
 
 ## What Taqwa never does
 

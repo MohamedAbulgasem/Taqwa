@@ -8,7 +8,9 @@ import android.os.Vibrator
 import world.taqwa.app.settings.appContext
 
 private class AndroidHaptics : Haptics {
-    private val vibrator = appContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    /** `as?`: an unchecked cast would be a NullPointerException at *construction* on a device
+     * with no vibrator service, before [buzz]'s runCatching could help. */
+    private val vibrator = appContext.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
 
     override fun tick() {
         buzz(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -47,6 +49,7 @@ private class AndroidHaptics : Haptics {
      * taking the app down from inside the compass collector, which has no catch on its path.
      */
     private fun buzz(effect: VibrationEffect) {
+        val vibrator = vibrator ?: return
         runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 vibrator.vibrate(effect, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_TOUCH))

@@ -1166,3 +1166,25 @@ the surah is already open, opening its reader or page if not — and the monogra
 picker. A tap on the Android media notification does the same through a launch request the
 app resolves once it is in front. iOS gives no such tap, so there the app coming to the front
 with a voice still going opens the ayah; paused, it stays where it was.
+
+### Store readiness (13 September, late)
+
+A sweep of everything the two stores look at, done as three read-only audits (Android, iOS,
+shared code and content) and then the fixes. The ones that would have stopped a submission:
+Play has required Android 16 (API 36) for new apps since 31 August, and the app targeted 35;
+release builds were signed with the debug key and there was no App Bundle; iOS had no privacy
+manifest, and its 512 px Play icon file was still the Android Studio placeholder. Now targetSdk
+36 (back gestures, per-app Arabic and the alarms checked on an Android 16 emulator), an upload
+key read from a git-ignored `keystore.properties` with `scripts/release.sh` building the signed
+`.aab`, privacy manifests for the app and the widget, the location permission text in Arabic,
+iPhone-only for launch, and the real icon.
+
+Two things the audits found that were not about the stores but about the adhan itself: prayer
+alarms were never re-armed after an app update, so every Play auto-update would have silenced
+the app until it was next opened, and a denied "Alarms & reminders" had no way back from inside
+the app. Both fixed; `USE_EXACT_ALARM` is gone (Play limits it to alarm-clock apps), replaced by
+a button to the system screen and an inexact-but-Doze-proof fallback. The Notifications screen
+also says so when the OS has notifications off for Taqwa, on both platforms, and iOS now shows
+a prayer notification while the app is open. Plus a licence carve-out (the GPL never covered the
+Quran text, fonts and audio; now the repository says so), the Mixkit source clip taken out of
+the public tree, and the store answers and a launch checklist in `docs/`.

@@ -49,7 +49,9 @@ class MainActivity : ComponentActivity() {
     private fun recordAyahRequest(intent: Intent?) {
         val surah = intent?.getIntExtra(EXTRA_OPEN_SURAH, 0) ?: 0
         val ayah = intent?.getIntExtra(EXTRA_OPEN_AYAH, 0) ?: 0
-        if (surah > 0 && ayah > 0) LaunchRequests.openAyah(surah, ayah)
+        // The activity is exported and now carries a filter for this intent, so the extras are
+        // untrusted: only a real surah number gets through (iOSApp.swift makes the same check).
+        if (surah in 1..LAST_SURAH && ayah > 0) LaunchRequests.openAyah(surah, ayah)
         // The media notification's tap (recitation spec §15.5): not an ayah but "the one being
         // recited", resolved by App once it is in front.
         if (intent?.getBooleanExtra(LaunchRequests.ANDROID_EXTRA_OPEN_PLAYING, false) == true) {
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val EXTRA_OPEN_SURAH = "open_surah"
+        private const val LAST_SURAH = 114
         const val EXTRA_OPEN_AYAH = "open_ayah"
     }
 }

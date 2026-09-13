@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- One frame's placeholder before Glance's first draw. Without an explicit colour it inherits
+     the *launcher's* default text appearance, which on a launcher whose default is dark-on-dark
+     makes it invisible; Palette's secondary text reads on either ground. -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:text="Taqwa" />
+    android:textColor="#6F6E62"
+    android:text="@string/app_name" />
