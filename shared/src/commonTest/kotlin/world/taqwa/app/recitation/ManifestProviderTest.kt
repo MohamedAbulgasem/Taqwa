@@ -34,6 +34,38 @@ class ManifestProviderTest {
     }
 
     @Test
+    fun prefersTheBundledCatalogueWhenTheBuildIsNewerThanTheLastRefresh() = runTest {
+        // The ordinary shape of an app update that adds a reciter: the cache still holds what
+        // yesterday's refresh fetched, and the build ships the catalogue that names the new voice.
+        writeCache(
+            bundled
+                .replace("\"2026-09-12T18:04:00Z\"", "\"2026-09-11T09:00:00Z\"")
+                .replace("\"ar.husary\"", "\"ar.minshawi\""),
+        )
+        assertEquals(listOf("ar.alafasy", "ar.husary"), provider().current().reciters.map { it.id })
+    }
+
+    @Test
+    fun keepsAFetchedCatalogueThatIsNewerThanTheBuild() = runTest {
+        writeCache(
+            bundled
+                .replace("\"2026-09-12T18:04:00Z\"", "\"2026-09-13T09:00:00Z\"")
+                .replace("\"ar.husary\"", "\"ar.minshawi\""),
+        )
+        assertEquals(listOf("ar.alafasy", "ar.minshawi"), provider().current().reciters.map { it.id })
+    }
+
+    @Test
+    fun aCacheWithNoUsableTimestampStaysInForce() = runTest {
+        writeCache(
+            bundled
+                .replace("\"2026-09-12T18:04:00Z\"", "\"whenever\"")
+                .replace("\"ar.husary\"", "\"ar.minshawi\""),
+        )
+        assertEquals(listOf("ar.alafasy", "ar.minshawi"), provider().current().reciters.map { it.id })
+    }
+
+    @Test
     fun ignoresACacheItCannotRead() = runTest {
         writeCache("{ not json")
         assertEquals(listOf("ar.alafasy", "ar.husary"), provider().current().reciters.map { it.id })

@@ -72,18 +72,42 @@ class ManifestProvider(
         } catch (e: okio.IOException) {
             null
         }
-        if (fromDisk != null) {
+        val fetched = fromDisk?.let {
             try {
-                return ManifestJson.parse(fromDisk.decodeToString())
+                ManifestJson.parse(it.decodeToString())
             } catch (e: Exception) {
                 // Fall through to the bundled copy. Deliberately not deleted: it costs a few KB,
                 // and a manifest written for a newer schema is one an upgrade may yet be able to
                 // read.
+                null
             }
         }
-        return ManifestJson.parse(bundled().decodeToString())
+        val shipped = ManifestJson.parse(bundled().decodeToString())
+        return if (fetched != null && newer(fetched, shipped)) fetched else shipped
     }
 }
+
+/**
+ * Which of two catalogues is in force: **the one generated later**, not simply the fetched one.
+ *
+ * The cache is refreshed at most once a day, so a build that ships a newer catalogue — the
+ * ordinary way a reciter is added — would otherwise be masked by whatever the last refresh
+ * happened to fetch, for up to a day after the update, on exactly the launch where the reader
+ * goes looking for the new voice. [RecitationManifest.generated] is an ISO-8601 instant in UTC
+ * written by one pipeline, so comparing the two as text orders them; anything that does not look
+ * like one leaves the fetched copy in force, which is the behaviour a manifest from the network
+ * has always had.
+ */
+internal fun newer(fetched: RecitationManifest, shipped: RecitationManifest): Boolean {
+    if (!isInstant(fetched.generated) || !isInstant(shipped.generated)) return true
+    return fetched.generated >= shipped.generated
+}
+
+/** `2026-09-12T19:34:13Z`, and nothing else: same length, same separators, digits between. */
+private fun isInstant(value: String): Boolean = value.length == 20 &&
+    value[4] == '-' && value[7] == '-' && value[10] == 'T' &&
+    value[13] == ':' && value[16] == ':' && value[19] == 'Z' &&
+    value.filterIndexed { i, _ -> i !in setOf(4, 7, 10, 13, 16, 19) }.all { it.isDigit() }
 
 /**
  * The catalogue bundled with the build. `Res.readBytes` throws rather than returning null for a
