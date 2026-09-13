@@ -45,4 +45,13 @@ class LaunchRequestsTest {
         assertEquals(2 to 286, LaunchRequests.pendingAyah.value)
         LaunchRequests.consume()
     }
+
+    @Test fun openPlayingIsPendingUntilConsumed() {
+        LaunchRequests.consumePlaying()
+        assertEquals(false, LaunchRequests.pendingPlaying.value)
+        LaunchRequests.openPlaying()
+        assertEquals(true, LaunchRequests.pendingPlaying.value)
+        LaunchRequests.consumePlaying()
+        assertEquals(false, LaunchRequests.pendingPlaying.value)
+    }
 }

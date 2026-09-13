@@ -186,6 +186,16 @@ fun MushafScreen(
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.isScrollInProgress }.collect { following.moved() }
         }
+        // The bar or the media notification asking for the recited ayah (spec §15.5).
+        LaunchedEffect(recitation.jumpToken) {
+            if (recitation.jumpToken == 0) return@LaunchedEffect
+            val page = playingPage ?: return@LaunchedEffect
+            if (page !in 1..MUSHAF_PAGES) return@LaunchedEffect
+            following.rearm()
+            following.pill = null
+            following.move { pagerState.animateScrollToPage(page - 1) }
+        }
+
         LaunchedEffect(playingPage) {
             val page = playingPage
             if (page == null || page !in 1..MUSHAF_PAGES) {

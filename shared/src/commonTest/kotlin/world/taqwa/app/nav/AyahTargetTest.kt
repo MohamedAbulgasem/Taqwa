@@ -32,4 +32,15 @@ class AyahTargetTest {
         val target = ayahWidgetTarget(ReadingMode.TRANSLATION, surah = 112, ayah = 1) { _, _ -> 1 }
         assertTrue((target as Screen.Reader).selectAyah)
     }
+
+    @Test fun theRecitedAyahOpensUnselectedInEitherMode() = runTest {
+        assertEquals(
+            Screen.Reader(2, 255),
+            recitationTarget(ReadingMode.TRANSLATION, 2, 255) { _, _ -> error("not asked") },
+        )
+        assertEquals(
+            Screen.Mushaf(page = 42),
+            recitationTarget(ReadingMode.MUSHAF, 2, 255) { s, a -> if (s == 2 && a == 255) 42 else 0 },
+        )
+    }
 }

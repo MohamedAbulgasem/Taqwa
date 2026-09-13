@@ -26,3 +26,16 @@ suspend fun ayahWidgetTarget(
 } else {
     Screen.Reader(surah, ayah, selectAyah = true)
 }
+
+/**
+ * The screen the player bar and the media notification open for the ayah being recited (spec
+ * §15.5): the same reader or page as [ayahWidgetTarget], but with nothing *selected* — the
+ * recitation's own highlight already marks the ayah, and it moves on with the voice, which a
+ * selected card would only argue with.
+ */
+suspend fun recitationTarget(
+    mode: ReadingMode,
+    surah: Int,
+    ayah: Int,
+    pageOf: suspend (Int, Int) -> Int,
+): Screen = if (mode == ReadingMode.MUSHAF) Screen.Mushaf(page = pageOf(surah, ayah)) else Screen.Reader(surah, ayah)

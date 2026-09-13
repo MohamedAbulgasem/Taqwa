@@ -424,3 +424,29 @@ in tabular figures. The bar grows by the strip (`playerBarHeight(bar)`), and the
 Mushaf's clearance grow with it; the ring on the monogram stays. `BarState.incoming` became
 `IncomingDownload(surah, reciter, fraction)` so the strip can name what is coming. Verified on
 the emulator: next on An-Nisa showed *Next: Al-Ma'idah · 0 %* at once and counted up.
+
+### 15.5 Back to the ayah being recited
+
+**Ask.** Leaving the reader — back to the Quran root, or into another surah — loses the place;
+the bar should take you back to the recited ayah. And a tap on the media notification or the
+lock-screen player should open the app on the recited surah with the ayah highlighted, in the
+mode the reader uses (translation or Mushaf), on both platforms.
+
+**Decision.** The bar's two taps split where the eye already splits them: the **monogram** is
+the voice and opens the reciter picker; the **surah and ayah** are the place and open it. "Open
+it" means: a screen already showing the recited surah (its reader, or the Mushaf) scrolls to
+the ayah and re-arms following, exactly as the "Back to ayah" pill does; any other screen is
+replaced (another reader or Mushaf) or pushed (from the root, or from another tab after
+selecting Quran) with the reader the user reads in — `recitationTarget`, the widget's target
+without its selection, since the recitation's own highlight marks the ayah and moves with it.
+
+**Android.** The media session carries a session activity: the app's launcher intent with an
+`open_playing` extra. `MainActivity` turns it into `LaunchRequests.openPlaying()`, a request
+resolved by `App` once it is in front — the voice keeps moving while the app comes up, so it is
+"the recited ayah", not a reference. Verified on the emulator from the Prayer tab and from the
+home screen.
+
+**iOS.** The lock screen's Now Playing opens the app with no word about why, so there is no tap
+to hear. The app coming to the front **while a recitation is playing** opens the recited ayah
+instead (`foregroundReturnsToRecitation`, iOS only); paused, it opens where it was left, so
+opening the app for the prayer times with a surah paused in the background moves nothing.

@@ -338,6 +338,8 @@
     <string name="recitation_arriving_voice">%1$s · %2$s</string>
     <string name="recitation_percent">%1$s%</string>
     <string name="recitation_a11y_close">إغلاق المشغّل</string>
+    <string name="recitation_a11y_change_reciter">تغيير القارئ</string>
+    <string name="recitation_a11y_go_to_playing">الانتقال إلى الآية الجاري تلاوتها</string>
     <string name="recitation_a11y_preview">استمع لهذا القارئ</string>
     <!-- Settings > Quran > Recitation -->
     <string name="settings_group_quran">القرآن</string>

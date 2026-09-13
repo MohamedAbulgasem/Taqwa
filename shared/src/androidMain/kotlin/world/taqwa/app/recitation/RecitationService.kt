@@ -1,5 +1,6 @@
 package world.taqwa.app.recitation
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
@@ -24,6 +25,7 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.notifications.notificationSmallIconResId
 
 /**
@@ -119,7 +121,10 @@ class RecitationService : MediaSessionService() {
         // `RecitationQueue` rule the app's own bar uses, applied to everything outside the app.
         val wrapped = AyahPlayer(player)
         ayahPlayer = wrapped
-        val built = MediaSession.Builder(this, wrapped).setCallback(Callback()).build()
+        val built = MediaSession.Builder(this, wrapped)
+            .setCallback(Callback())
+            .apply { sessionActivity()?.let { setSessionActivity(it) } }
+            .build()
         session = built
         // The lock screen's previous and next (spec §15.1) are the app's to answer: which surah,
         // whether it is on the phone, from where. Told to every connected controller — the app's
@@ -141,6 +146,23 @@ class RecitationService : MediaSessionService() {
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
+
+    /**
+     * What a tap on the notification or the lock-screen player opens (spec §15.5): the app's
+     * launcher activity, told to show the ayah being recited. The launcher intent rather than a
+     * class name, because this service lives in the shared module and the activity does not.
+     */
+    private fun sessionActivity(): PendingIntent? {
+        val launch = packageManager.getLaunchIntentForPackage(packageName) ?: return null
+        launch.putExtra(LaunchRequests.ANDROID_EXTRA_OPEN_PLAYING, true)
+        launch.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        return PendingIntent.getActivity(
+            this,
+            REQUEST_OPEN_PLAYING,
+            launch,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
 
     /**
      * The app has been swiped out of Recents. Keep playing if it is playing — that is what a
@@ -308,6 +330,8 @@ class RecitationService : MediaSessionService() {
         /** Controllers to session: the notification's two ayah buttons. */
         const val COMMAND_PREVIOUS_AYAH = "world.taqwa.app.recitation.PREVIOUS_AYAH"
         const val COMMAND_NEXT_AYAH = "world.taqwa.app.recitation.NEXT_AYAH"
+
+        private const val REQUEST_OPEN_PLAYING = 31
     }
 }
 

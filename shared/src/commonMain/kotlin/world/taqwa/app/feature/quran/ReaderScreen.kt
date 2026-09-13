@@ -211,6 +211,16 @@ fun ReaderScreen(
             snapshotFlow { listState.isScrollInProgress }.collect { following.moved() }
         }
 
+        // The bar or the media notification asking for the recited ayah (spec §15.5): the pill's
+        // own answer, on request.
+        LaunchedEffect(recitation.jumpToken) {
+            if (recitation.jumpToken == 0) return@LaunchedEffect
+            val target = playingAyah?.let(::itemIndexOf) ?: return@LaunchedEffect
+            following.rearm()
+            following.pill = null
+            following.move { listState.animateScrollToItem(target, scrollOffset = -restingOffset()) }
+        }
+
         LaunchedEffect(playingAyah, ready.surah.number) {
             val target = playingAyah?.let(::itemIndexOf)
             if (target == null) {

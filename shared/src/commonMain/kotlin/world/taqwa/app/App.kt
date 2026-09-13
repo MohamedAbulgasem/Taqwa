@@ -69,6 +69,8 @@ import world.taqwa.app.design.components.TaqwaBottomSheet
 import world.taqwa.app.design.components.TaqwaTabScaffold
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.nav.LaunchRequests
+import world.taqwa.app.nav.recitationTarget
+import world.taqwa.app.recitation.foregroundReturnsToRecitation
 import world.taqwa.app.nav.ayahWidgetTarget
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
@@ -165,6 +167,57 @@ fun App(container: AppContainer) {
     val nextAyahLabel = stringResource(Res.string.recitation_a11y_next_ayah)
     LaunchedEffect(previousAyahLabel, nextAyahLabel) {
         recitation.setAyahButtonLabels(previousAyahLabel, nextAyahLabel)
+    }
+
+    // "Show me the ayah being recited" (spec §15.5), from the bar's words, the media
+    // notification's tap, or - on iOS, which has no such tap - the app coming to the front with
+    // a voice going. A screen already showing the surah is asked to scroll (the token); any other
+    // is replaced or pushed with the reader the user reads in, at the ayah, following armed.
+    var jumpToken by remember { mutableStateOf(0) }
+    val jumpScope = rememberCoroutineScope()
+    val openPlaying: () -> Unit = {
+        val playing = recitation.state.value.bar
+        if (playing != null) {
+            jumpScope.launch {
+                val current = navigator.current
+                val onQuran = navigator.currentTab == Tab.QURAN
+                val showsIt = onQuran && ((current is Screen.Reader && current.surah == playing.surah) || current is Screen.Mushaf)
+                if (showsIt) {
+                    jumpToken++
+                } else {
+                    runCatching {
+                        val reading = settings.readingSettings(platformFormat.languageTag()).first()
+                        val target = recitationTarget(reading.mode, playing.surah, playing.ayah) { s, a ->
+                            container.quranRepository.pageOf(s, a)
+                        }
+                        if (!onQuran) navigator.selectTab(Tab.QURAN)
+                        val now = navigator.current
+                        if (now is Screen.Reader || now is Screen.Mushaf) {
+                            navigator.replace(target)
+                        } else {
+                            if (now != Screen.Quran) navigator.push(Screen.Quran)
+                            navigator.push(target)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        settings.onboardingComplete.filter { it }.first()
+        LaunchRequests.pendingPlaying.collect { asked ->
+            if (asked) {
+                openPlaying()
+                LaunchRequests.consumePlaying()
+            }
+        }
+    }
+    val appLifecycle = LocalLifecycleOwner.current
+    LaunchedEffect(appLifecycle) {
+        if (!foregroundReturnsToRecitation) return@LaunchedEffect
+        appLifecycle.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            if (recitation.state.value.bar?.playing == true) openPlaying()
+        }
     }
 
     // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
@@ -416,6 +469,7 @@ fun App(container: AppContainer) {
                                     onOpenPicker = recitation::openPicker,
                                     onDismiss = recitation::dismissBar,
                                     incomingSurahName = incomingSurahName,
+                                    onOpenPlaying = openPlaying,
                                 )
                             }
                         }
@@ -587,6 +641,7 @@ fun App(container: AppContainer) {
                                     playing = bar?.let { it.surah to it.ayah },
                                     live = bar?.playing == true,
                                     barSpace = barSpace,
+                                    jumpToken = jumpToken,
                                     onHeader = recitation::onHeaderTap,
                                     onPlayAyah = recitation::requestPlay,
                                     onToggle = recitation::toggle,
@@ -649,6 +704,7 @@ fun App(container: AppContainer) {
                                     playing = bar?.let { it.surah to it.ayah },
                                     live = bar?.playing == true,
                                     barSpace = barSpace,
+                                    jumpToken = jumpToken,
                                     onHeader = recitation::onHeaderTap,
                                     onPlayAyah = recitation::requestPlay,
                                     onToggle = recitation::toggle,

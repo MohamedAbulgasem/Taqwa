@@ -74,7 +74,9 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_ayah_n
+import world.taqwa.app.resources.recitation_a11y_change_reciter
 import world.taqwa.app.resources.recitation_a11y_close
+import world.taqwa.app.resources.recitation_a11y_go_to_playing
 import world.taqwa.app.resources.recitation_a11y_next
 import world.taqwa.app.resources.recitation_a11y_next_ayah
 import world.taqwa.app.resources.recitation_a11y_pause
@@ -154,6 +156,8 @@ fun PlayerBar(
     onPreviousAyah: () -> Unit = {},
     /** The name of [BarState.incoming]'s surah, resolved by the caller like [surahName]. */
     incomingSurahName: String = "",
+    /** A tap on the surah and ayah: show the ayah being recited (spec §15.5). */
+    onOpenPlaying: () -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
@@ -165,6 +169,8 @@ fun PlayerBar(
     val fraction by animateFloatAsState(bar.fraction, tween(400), label = "recitationProgress")
     val hasClock = bar.durationMs > 0L
     val hours = bar.durationMs >= HOUR_MS
+    val changeReciterLabel = stringResource(Res.string.recitation_a11y_change_reciter)
+    val goToPlayingLabel = stringResource(Res.string.recitation_a11y_go_to_playing)
     val elapsed = if (hasClock) formatClock(bar.positionMs, hours, format::localizedDigits) else ""
     val total = if (hasClock) formatClock(bar.durationMs, hours, format::localizedDigits) else ""
 
@@ -245,21 +251,35 @@ fun PlayerBar(
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                Modifier
-                    .weight(1f)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onOpenPicker,
-                    ),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(Modifier.size(MonogramBox), contentAlignment = Alignment.Center) {
+            // Two taps, split where the eye already splits them (spec §15.5): the monogram is the
+            // voice and opens the picker; the surah and ayah are the place and open it.
+            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier
+                        .size(MonogramBox)
+                        .clip(CircleShape)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onOpenPicker,
+                        )
+                        .semantics { contentDescription = changeReciterLabel },
+                    contentAlignment = Alignment.Center,
+                ) {
                     ReciterMonogram(bar.reciter, Monogram)
                     bar.incoming?.let { IncomingRing(it.fraction) }
                 }
-                Column(Modifier.padding(start = 8.dp, end = 6.dp)) {
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onOpenPlaying,
+                        )
+                        .semantics { contentDescription = goToPlayingLabel }
+                        .padding(start = 8.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+                ) {
                     if (arabic) {
                         Text(
                             surahName,
