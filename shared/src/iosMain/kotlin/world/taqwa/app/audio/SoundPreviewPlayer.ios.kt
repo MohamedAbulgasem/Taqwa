@@ -5,6 +5,7 @@ import platform.AVFAudio.AVAudioPlayer
 import platform.AVFAudio.AVAudioPlayerDelegateProtocol
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
 import platform.AVFAudio.setActive
 import platform.Foundation.NSBundle
 import platform.Foundation.NSURL
@@ -22,6 +23,10 @@ private class IosSoundPreviewPlayer : SoundPreviewPlayer {
      * end-of-clip callback that releases the audio session actually fires. */
     private val playerDelegate = object : NSObject(), AVAudioPlayerDelegateProtocol {
         override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
+            // Only the clip still in the player: a stopped or replaced one has already been let go
+            // of, and its late callback must not take the session from whatever is playing now.
+            if (this@IosSoundPreviewPlayer.player !== player) return
+            this@IosSoundPreviewPlayer.player = null
             releaseSession()
         }
     }
@@ -64,8 +69,21 @@ private class IosSoundPreviewPlayer : SoundPreviewPlayer {
         session.setActive(true, null)
     }
 
+    /**
+     * The session is process-wide, so it is handed back only when nobody else needs it: a reader
+     * auditioning a sound while a surah plays would otherwise have the surah cut dead the moment
+     * the clip ended. Recitation deactivates on its own terms in `RecitationPlayer.stop()`.
+     *
+     * `NotifyOthersOnDeactivation` so the music or podcast interrupted for the audition is told it
+     * may resume, which a bare `setActive(false)` never says.
+     */
     private fun releaseSession() {
-        AVAudioSession.sharedInstance().setActive(false, null)
+        if (IosAudioSession.recitationHoldsSession) return
+        AVAudioSession.sharedInstance().setActive(
+            false,
+            withOptions = AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation,
+            error = null,
+        )
     }
 }
 

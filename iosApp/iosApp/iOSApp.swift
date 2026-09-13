@@ -1,25 +1,51 @@
 import SwiftUI
 import BackgroundTasks
 import UIKit
+import UserNotifications
 import WidgetKit
 import shared
 
 private let refreshTaskId = "world.taqwa.app.refresh"
 
-/// The one thing SwiftUI's `App` cannot express: `handleEventsForBackgroundURLSession`.
+/// The two things SwiftUI's `App` cannot express: the notification-centre delegate and
+/// `handleEventsForBackgroundURLSession`.
 ///
 /// iOS relaunches the app when a background download finishes and delivers the news here — to a
 /// process that has no URL sessions at all, so nothing would arrive until one with the right
 /// identifier is recreated. `wakeRecitationDownloads` does both halves: it recreates the sessions
 /// and holds the completion handler, which Foundation requires to be called once every delegate
 /// callback has been delivered.
-final class AppDelegate: NSObject, UIApplicationDelegate {
+final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+
+	/// The delegate has to be set before the app finishes launching, or a notification that arrives
+	/// in the meantime is presented by the default rules — which is to say not at all.
+	func application(
+		_ application: UIApplication,
+		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+	) -> Bool {
+		UNUserNotificationCenter.current().delegate = self
+		return true
+	}
+
+	/// Without this, iOS shows nothing at all while the app is in the foreground: no banner and, for
+	/// a prayer, no adhan. That is exactly the moment a user is most likely to be looking at Taqwa,
+	/// so a notification is presented in full whether or not the app happens to be open.
+	func userNotificationCenter(
+		_ center: UNUserNotificationCenter,
+		willPresent notification: UNNotification,
+		withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+	) {
+		completionHandler([.banner, .list, .sound])
+	}
+
 	func application(
 		_ application: UIApplication,
 		handleEventsForBackgroundURLSession identifier: String,
 		completionHandler: @escaping () -> Void
 	) {
-		SurahDownloader_iosKt.wakeRecitationDownloads(completion: completionHandler)
+		// The identifier goes with it: this is called once per background session, each time with a
+		// handler belonging to that session alone, and there are two of them (Wi-Fi and cellular).
+		SurahDownloader_iosKt.wakeRecitationDownloads(identifier: identifier, completion: completionHandler)
 	}
 }
 
@@ -39,27 +65,38 @@ struct iOSApp: App {
 
 	var body: some Scene {
 		WindowGroup {
+			#if DEBUG
 			// Hidden debug route: `xcrun simctl launch booted world.taqwa.app -taqwaWidgetPreview 1`
 			// renders the real widget views full screen against the real App Group mirror. There is
 			// no simctl command that places a widget on a simulator home screen, so this is how a
-			// widget render gets captured. Compiled out of a release build: a user default is
-			// writable by anyone with the device, and a route nobody should reach is best absent.
+			// widget render gets captured. The whole branch is compiled out of a release build, along
+			// with `TaqwaWidgetPreviews.swift` itself: a user default is writable by anyone with the
+			// device, and a route nobody should reach is best absent rather than merely unreachable.
 			if Self.widgetPreviewRequested {
 				TaqwaWidgetPreviewScreen(section: Self.widgetPreviewSection)
 			} else {
-				ContentView()
-					.onAppear {
-						Self.scheduleNextRefresh()
-						Self.reloadWidgets()
-					}
-					.onOpenURL { url in
-						#if DEBUG
-						if RecitationHarness.handle(url) { return }
-						#endif
-						Self.openAyah(from: url)
-					}
+				root
 			}
+			#else
+			root
+			#endif
 		}
+	}
+
+	/// The app itself. Named because `#if` cannot straddle the two halves of an `if`/`else`, so the
+	/// debug route above needs something to fall through to that the release build also uses.
+	private var root: some View {
+		ContentView()
+			.onAppear {
+				Self.scheduleNextRefresh()
+				Self.reloadWidgets()
+			}
+			.onOpenURL { url in
+				#if DEBUG
+				if RecitationHarness.handle(url) { return }
+				#endif
+				Self.openAyah(from: url)
+			}
 	}
 
 	/// True for `-taqwaWidgetPreview 1` (which lands in `UserDefaults`' argument domain) and for
@@ -78,11 +115,16 @@ struct iOSApp: App {
 	/// Which widgets the route draws: `all` (the default) or `ayah`, from
 	/// `-taqwaWidgetPreviewSection ayah`. The ayah card's Large family is 382 pt tall, so the two
 	/// families plus the four prayer ones do not fit one screenshot, and `simctl` cannot scroll.
+	///
+	/// `#if DEBUG` like its caller: the `UserDefaults.standard` read is the app's only one, and a
+	/// release binary that does not make it has one fewer required-reason API to declare.
+	#if DEBUG
 	static var widgetPreviewSection: String {
 		UserDefaults.standard.string(forKey: "taqwaWidgetPreviewSection")
 			?? ProcessInfo.processInfo.environment["TAQWA_WIDGET_PREVIEW_SECTION"]
 			?? "all"
 	}
+	#endif
 
 	/// The ayah widget's tap target (design spec §7-8): `taqwa://ayah/<surah>/<ayah>`, set as the
 	/// widget's `widgetURL`. Anything else on the `taqwa` scheme is ignored rather than guessed at,

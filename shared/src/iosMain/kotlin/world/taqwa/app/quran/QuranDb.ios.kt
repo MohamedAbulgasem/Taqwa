@@ -11,6 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSURL
+import platform.Foundation.NSURLIsExcludedFromBackupKey
 import platform.Foundation.NSUserDomainMask
 import platform.posix.SEEK_SET
 import platform.posix.fclose
@@ -61,6 +63,11 @@ private fun quranDatabaseDirectory(): String {
     ) { "Could not resolve the Application Support directory" }
     val directory = "$appSupportPath/databases"
     fileManager.createDirectoryAtPath(directory, withIntermediateDirectories = true, attributes = null, error = null)
+    // 21 MB of re-creatable, bundle-derived database has no business in an iCloud backup. Set here
+    // and every launch rather than relying on `recitationFilesDirectory()` flagging the whole of
+    // Application Support on its way past — that is an unrelated module's start-up side effect.
+    // Best effort: a failure costs a backup that is larger than it needs to be, not a launch.
+    NSURL.fileURLWithPath(directory).setResourceValue(true, forKey = NSURLIsExcludedFromBackupKey, error = null)
     return directory
 }
 

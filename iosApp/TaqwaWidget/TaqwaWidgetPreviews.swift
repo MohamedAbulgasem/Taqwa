@@ -1,3 +1,9 @@
+// Debug only. `TaqwaWidgetPreviewScreen` is the `-taqwaWidgetPreview 1` route's screen and
+// `TaqwaWidget_Previews` is an Xcode canvas provider, so neither belongs in a shipping binary —
+// this file is a member of both the app and the extension, and without the gate both targets
+// carried the screen and its English-only debug copy into release. Its only caller outside this
+// file, `iOSApp.swift`'s preview branch, is `#if DEBUG` too.
+#if DEBUG
 import WidgetKit
 import SwiftUI
 // The extension links `widgetcore.framework` alone — a slim Kotlin/Native framework with no
@@ -166,3 +172,4 @@ struct TaqwaWidget_Previews: PreviewProvider {
         }
     }
 }
+#endif

@@ -1,6 +1,7 @@
 package world.taqwa.app.recitation
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlin.concurrent.AtomicReference
 import kotlin.concurrent.Volatile
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import okio.FileSystem
@@ -43,11 +45,16 @@ import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.settings.SettingsRepository
 
 /**
- * Set from `iOSApp.swift`'s app delegate when iOS wakes the app to say a background session has
- * finished its work. Foundation requires the completion handler to be called once every delegate
- * callback has been delivered, and only Swift can hold it.
+ * The completion handlers `iOSApp.swift`'s app delegate is handed when iOS wakes the app to say a
+ * background session has finished its work. Foundation requires each of them to be called once
+ * every delegate callback for *that* session has been delivered, and only Swift can hold them.
+ *
+ * Keyed by identifier because there are two sessions and the app delegate is called once per
+ * identifier with a distinct handler each time: a single slot dropped the first handler — which
+ * Apple counts against the app's background launches — and then invoked the second one twice.
+ * Touched on the main queue only, which is where both the app delegate and the wake-up below run.
  */
-var iosBackgroundDownloadsCompletion: (() -> Unit)? = null
+private val backgroundCompletions = mutableMapOf<String, () -> Unit>()
 
 /**
  * A background `NSURLSession` (spec 3a §7). One download task per surah, the key as the task's
@@ -73,17 +80,20 @@ actual class SurahDownloader actual constructor(
     private val reported = MutableStateFlow<Map<DownloadKey, DownloadState>>(emptyMap())
 
     /** What each in-flight task started from, so `didWriteData`'s count can be made absolute. */
-    private val startedAt = mutableMapOf<String, Long>()
-    private val sizes = mutableMapOf<String, Long>()
+    private val startedAt = AtomicLongMap()
+    private val sizes = AtomicLongMap()
 
     actual val states: StateFlow<Map<DownloadKey, DownloadState>> = reported.asStateFlow()
+
+    /** Held rather than built inline: an append that fails mid-write has to ask it for the space. */
+    private val conditions = IosDownloadConditions()
 
     private val loop = DownloadLoop(
         library = library,
         // The transfer belongs to the session, so the loop is used only for its two ends: the
         // free-space refusal before a task is created, and the verify-and-commit after one lands.
         source = ByteSource { _, _ -> ByteResponse.Failure(DownloadFailure.SERVER) },
-        conditions = IosDownloadConditions(),
+        conditions = conditions,
         fs = fs,
     )
 
@@ -116,6 +126,16 @@ actual class SurahDownloader actual constructor(
             val key = DownloadKey.parse(wire) ?: return
             val temporary = didFinishDownloadingToURL.path?.toPath() ?: return
             val status = (downloadTask.response as? NSHTTPURLResponse)?.statusCode?.toInt() ?: 0
+            // A 404 or 410 — the normal outcome once a release asset has been retagged — still
+            // arrives here, with the server's HTML error page as the body. Appending it would hash
+            // 58 MB and surface as CHECKSUM ("the download was corrupted") after a full
+            // re-download on Retry, so nothing touches the disk. iOS deletes the temporary itself.
+            if (status !in 200..299) {
+                startedAt.remove(wire)
+                sizes.remove(wire)
+                report(key, DownloadState.Failed(DownloadFailure.SERVER))
+                return
+            }
             val part = library.partFor(key.reciterId, key.surah)
             val appended = runCatching {
                 part.parent?.let { fs.createDirectories(it) }
@@ -127,7 +147,20 @@ actual class SurahDownloader actual constructor(
             }.isSuccess
             startedAt.remove(wire)
             if (!appended) {
-                report(key, DownloadState.Failed(DownloadFailure.SERVER))
+                // The half-appended `.part` would be resumed into, so it goes. The usual reason an
+                // append of 58 MB fails is the disk filling mid-write, which is not the server's
+                // fault and is worth saying; `freeBytes` suspends, so the reason is settled off
+                // the delegate queue.
+                runCatching { fs.delete(part) }
+                val expected = sizes[wire]
+                sizes.remove(wire)
+                scope.launch {
+                    val free = runCatching { conditions.freeBytes() }.getOrDefault(Long.MAX_VALUE)
+                    val reason =
+                        if (expected != null && free < expected) DownloadFailure.NOT_ENOUGH_SPACE
+                        else DownloadFailure.SERVER
+                    report(key, DownloadState.Failed(reason))
+                }
                 return
             }
             report(key, DownloadState.Verifying)
@@ -152,8 +185,10 @@ actual class SurahDownloader actual constructor(
         }
 
         override fun URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-            val completion = iosBackgroundDownloadsCompletion ?: return
-            dispatch_async(dispatch_get_main_queue()) { completion() }
+            val identifier = session.configuration.identifier ?: return
+            // Removed before it is called: iOS hands over a fresh handler on every wake-up, and
+            // calling a spent one a second time is undefined.
+            dispatch_async(dispatch_get_main_queue()) { backgroundCompletions.remove(identifier)?.invoke() }
         }
     }
 
@@ -165,17 +200,26 @@ actual class SurahDownloader actual constructor(
      * one they have allowed goes through the other. Both share this delegate, so nothing else in
      * the class has to know which one a task belongs to.
      *
-     * `NSOperationQueue()` rather than the main queue: appending a finished 58 MB file happens on
-     * a delegate callback, and that must not be the main thread.
+     * A queue of our own rather than the main queue: appending a finished 58 MB file happens on a
+     * delegate callback, and that must not be the main thread.
      */
     private val wifiSession: NSURLSession by lazy { makeSession(SESSION_ID, false) }
     private val mobileSession: NSURLSession by lazy { makeSession(MOBILE_SESSION_ID, true) }
+
+    /**
+     * **Serial**, which a freshly built `NSOperationQueue()` is not: Apple's contract for
+     * `sessionWithConfiguration:delegate:delegateQueue:` is that the queue be serial "in order to
+     * ensure the correct ordering of callbacks". `enqueueReciter` creates a task per remaining
+     * surah — up to 114 — so on the default concurrent queue several `didWriteData` callbacks a
+     * second were running the delegate in parallel with each other.
+     */
+    private val delegateQueue = NSOperationQueue().apply { maxConcurrentOperationCount = 1 }
 
     private fun makeSession(identifier: String, allowsCellular: Boolean): NSURLSession {
         val configuration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(identifier)
         configuration.setAllowsCellularAccess(allowsCellular)
         configuration.setSessionSendsLaunchEvents(true)
-        return NSURLSession.sessionWithConfiguration(configuration, delegate, NSOperationQueue())
+        return NSURLSession.sessionWithConfiguration(configuration, delegate, delegateQueue)
     }
 
     /**
@@ -208,7 +252,7 @@ actual class SurahDownloader actual constructor(
     }
 
     actual fun cancelReciter(reciterId: String) {
-        reported.value = reported.value.filterKeys { it.reciterId != reciterId }
+        reported.update { states -> states.filterKeys { it.reciterId != reciterId } }
         cancelTasks { DownloadKey.parse(it)?.reciterId == reciterId }
     }
 
@@ -283,13 +327,18 @@ actual class SurahDownloader actual constructor(
         }
     }
 
+    /**
+     * `update` rather than `reported.value = reported.value + …`: the delegate reports from its own
+     * queue while `start()` reports from `Dispatchers.Default`, and a plain read-modify-write drops
+     * whichever of two overlapping updates lost the race — a download row that then never moves.
+     */
     private fun report(key: DownloadKey, state: DownloadState) {
-        reported.value = reported.value + (key to state)
+        reported.update { it + (key to state) }
     }
 
     /** A committed surah leaves the map: from here on the library is what reports it. */
     private fun clear(key: DownloadKey) {
-        reported.value = reported.value - key
+        reported.update { it - key }
     }
 
     private companion object {
@@ -338,6 +387,32 @@ class IosDownloadConditions : DownloadConditions {
 private typealias NSNumberLike = platform.Foundation.NSNumber
 
 /**
+ * A `Map<String, Long>` that more than one thread may touch.
+ *
+ * The download delegate reads and removes on the session's delegate queue while `start()` is still
+ * inserting from `Dispatchers.Default`, so a plain `mutableMapOf` here is a real data race:
+ * concurrent `HashMap.put` corrupts buckets rather than merely losing an entry. An immutable map
+ * behind a compare-and-set loop needs no lock and cannot drop a write it raced with.
+ */
+private class AtomicLongMap {
+
+    private val ref = AtomicReference<Map<String, Long>>(emptyMap())
+
+    operator fun get(key: String): Long? = ref.value[key]
+
+    operator fun set(key: String, value: Long) = mutate { it + (key to value) }
+
+    fun remove(key: String) = mutate { it - key }
+
+    private fun mutate(change: (Map<String, Long>) -> Map<String, Long>) {
+        while (true) {
+            val current = ref.value
+            if (ref.compareAndSet(current, change(current))) return
+        }
+    }
+}
+
+/**
  * `NWPathMonitor`, once for the process: is there a network the system would let a transfer over.
  *
  * A monitor rather than a one-shot check because Network.framework has no one-shot check — the
@@ -382,12 +457,16 @@ private object IosNetworkPath {
  * The hook `iOSApp.swift` calls from `application(_:handleEventsForBackgroundURLSession:)`.
  *
  * Two things have to happen there and only there: the completion handler iOS hands over must be
- * remembered so it can be called once every delegate callback has been delivered, and the session
- * has to be recreated, because a relaunched process has no sessions at all and iOS delivers
- * nothing until one with the right identifier exists.
+ * remembered under the identifier it belongs to, so it can be called once every delegate callback
+ * for that session has been delivered, and the sessions have to be recreated, because a relaunched
+ * process has no sessions at all and iOS delivers nothing until one with the right identifier
+ * exists.
+ *
+ * `application(_:handleEventsForBackgroundURLSession:)` is a UIKit app-delegate callback, so this
+ * is the main thread — the only thread [backgroundCompletions] is ever touched from.
  */
-fun wakeRecitationDownloads(completion: () -> Unit) {
-    iosBackgroundDownloadsCompletion = completion
+fun wakeRecitationDownloads(identifier: String, completion: () -> Unit) {
+    backgroundCompletions[identifier] = completion
     world.taqwa.app.di.appContainer.surahDownloader.attach()
 }
 
