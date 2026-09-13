@@ -49,6 +49,18 @@ img { max-width: 100%; height: auto; display: block; }
 h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
 p { margin: 0; }
 [lang="ar"] { font-family: var(--font-ar); letter-spacing: 0; }
+/* Arabic pages: the system Arabic face, no tracking (the app does the same), the product
+   name and store names staying in Latin. */
+html[lang="ar"] body { font-family: var(--font-ar); }
+html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] .label { letter-spacing: 0; }
+html[lang="ar"] h1 { line-height: 1.3; }
+html[lang="ar"] .label { font-size: 12px; font-weight: 700; }
+html[lang="ar"] .brand, html[lang="ar"] [lang="en"] { font-family: var(--font); }
+html[lang="en"] .nav .switch { font-family: var(--font-ar); }
+/* A Latin URL or address inside Arabic prose is one isolated run, so the sentence's own
+   punctuation stays with the sentence instead of jumping to the URL's far end. */
+html[dir="rtl"] a, html[dir="rtl"] code { unicode-bidi: isolate; direction: ltr; display: inline-block; max-width: 100%; overflow-wrap: anywhere; }
+html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir="rtl"] .brand { display: inline-flex; }
 
 .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
 
@@ -132,7 +144,7 @@ p { margin: 0; }
 .prose h3 { font-size: 18px; margin: 28px 0 8px; }
 .prose p, .prose li { color: var(--t2); font-size: 17px; line-height: 1.65; }
 .prose p + p { margin-top: 14px; }
-.prose ul { padding-left: 22px; margin: 10px 0 0; }
+.prose ul { padding-inline-start: 22px; margin: 10px 0 0; }
 .prose li { margin-top: 6px; }
 .prose li::marker { color: var(--t3); }
 .prose ul + p { margin-top: 14px; }
