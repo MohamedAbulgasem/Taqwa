@@ -50,7 +50,7 @@ Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatf
 - **Recitation** by ten reciters, downloaded a surah at a time (or the whole Quran for a reciter) and then played offline with the ayah lit and the page following the voice, in the background with lock-screen controls and a surah clock. A speaker button in the reader, a Play action on any ayah, previous and next by surah, and a picker with a fifteen-second preview of each voice.
 - **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, a completed set rolls over on its own, your own phrases can be added, and nothing is ever totted up.
 - **An ayah widget** showing one verse a day, in the same Uthmani typeface and translation as the reader, from a curated pool of a hundred that cycles without repeats. Tapping it opens that ayah in the app.
-- **Privacy you can check.** Settings › About Taqwa says what stays on the phone and what the internet is used for, and links the policy, the source and the licence.
+- **Privacy you can check.** Settings › About Taqwa says what stays on the phone and what the internet is used for, and links the website, the policy, the source and the licence.
 - **Arabic and English**, following the phone's language. Arabic is laid out right to left with the locale's own digits, not translated over an English layout.
 - **Light and dark**, following the system or fixed, in one amber accent.
 
@@ -79,7 +79,7 @@ Three widgets, on Android and iOS: a **small** one with the next prayer and a li
   &nbsp;
   <img src="docs/screenshots/notifications.png" width="200" alt="Notification settings: the master switch, remind-before, the adhan voice, and a sound per prayer">
   &nbsp;
-  <img src="docs/screenshots/about.png" width="200" alt="About Taqwa: version, the privacy model in three lines, and links to the policy, the source and the licence">
+  <img src="docs/screenshots/about.png" width="200" alt="About Taqwa: version, the privacy model in three lines, and links to the website, the policy, the source and the licence">
   &nbsp;
   <img src="docs/screenshots/reader-dark.png" width="200" alt="The reader in the dark theme">
 </p>

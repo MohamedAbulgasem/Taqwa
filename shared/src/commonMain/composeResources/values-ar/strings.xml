@@ -76,6 +76,9 @@
     <string name="about_source_value">GitHub</string>
     <string name="about_licence">الرخصة</string>
     <string name="about_licence_value">GPL-3.0</string>
+    <string name="about_website">الموقع الإلكتروني</string>
+    <string name="about_website_value">taqwa.world</string>
+    <string name="about_icon_open_website">افتح taqwa.world</string>
 
     <!-- Appearance -->
     <string name="appearance_theme_label">السمة</string>

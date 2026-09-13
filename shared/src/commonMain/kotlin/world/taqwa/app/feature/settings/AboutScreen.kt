@@ -3,6 +3,7 @@ package world.taqwa.app.feature.settings
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -34,7 +38,9 @@ import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.design.components.drawExternalLink
 import world.taqwa.app.feature.onboarding.drawMihrab
+import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.about_icon_open_website
 import world.taqwa.app.resources.about_licence
 import world.taqwa.app.resources.about_licence_value
 import world.taqwa.app.resources.about_links_label
@@ -49,6 +55,8 @@ import world.taqwa.app.resources.about_source_value
 import world.taqwa.app.resources.about_stays_body
 import world.taqwa.app.resources.about_stays_title
 import world.taqwa.app.resources.about_tagline
+import world.taqwa.app.resources.about_website
+import world.taqwa.app.resources.about_website_value
 import world.taqwa.app.resources.settings_about
 import world.taqwa.app.resources.settings_version_value
 
@@ -62,6 +70,7 @@ fun AboutScreen(onBack: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val uriHandler = LocalUriHandler.current
     val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
+    val website = AboutLinks.website(arabic = isRtlLocale())
     // A device with no browser fails silently rather than crashing (spec §6.3).
     fun open(url: String) {
         runCatching { uriHandler.openUri(url) }
@@ -86,7 +95,8 @@ fun AboutScreen(onBack: () -> Unit) {
                     Text(stringResource(Res.string.about_tagline), style = TaqwaText.rowLabel, color = colors.textPrimary)
                 }
                 Spacer(Modifier.width(16.dp))
-                AppIconTile()
+                // The icon is a shortcut to the site; the Website row below is the visible way in.
+                AppIconTile(stringResource(Res.string.about_icon_open_website)) { open(website) }
             }
         }
 
@@ -103,6 +113,10 @@ fun AboutScreen(onBack: () -> Unit) {
         Spacer(Modifier.height(28.dp))
         SectionLabel(stringResource(Res.string.about_links_label))
         SettingsCard {
+            LinkRow(stringResource(Res.string.about_website), stringResource(Res.string.about_website_value), forward) {
+                open(website)
+            }
+            CardDivider()
             LinkRow(stringResource(Res.string.about_privacy_policy), null, forward) { open(AboutLinks.PRIVACY_POLICY) }
             CardDivider()
             LinkRow(stringResource(Res.string.about_source), stringResource(Res.string.about_source_value), forward) {
@@ -133,10 +147,12 @@ private fun LinkRow(label: String, value: String?, forward: Boolean, onClick: ()
  * colours — a white tile with the near-black arch in light, and the same two swapped in dark,
  * the amber point unchanged. Literal colours on purpose: they are the launcher asset's, not the
  * theme's, and the tile has to read as the icon rather than as one more surface. A hairline
- * keeps its edge on a card of nearly the same colour in either theme.
+ * keeps its edge on a card of nearly the same colour in either theme. Tapping it opens the
+ * website: the clip comes before the click so the ripple keeps the tile's corners, and the
+ * description names the destination for screen readers, since the tile has no text of its own.
  */
 @Composable
-private fun AppIconTile() {
+private fun AppIconTile(contentDescription: String, onClick: () -> Unit) {
     val dark = LocalTaqwaDark.current
     val hairline = LocalTaqwaColors.current.hairline
     val tile = if (dark) IconInk else IconPaper
@@ -147,7 +163,9 @@ private fun AppIconTile() {
             .size(56.dp)
             .clip(shape)
             .background(tile)
-            .border(1.dp, hairline, shape),
+            .border(1.dp, hairline, shape)
+            .clickable(onClickLabel = contentDescription, role = Role.Button, onClick = onClick)
+            .semantics { this.contentDescription = contentDescription },
     ) {
         // The launcher draws the mark at 78 % of its canvas so no mask clips it; the same here.
         Canvas(Modifier.fillMaxSize()) { scale(0.78f) { drawMihrab(arch, IconAmber) } }
