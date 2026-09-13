@@ -150,8 +150,9 @@ private fun SurahRow(surah: DownloadedSurah, onDelete: () -> Unit) {
             maxLines = 1,
             textAlign = TextAlign.Start,
             // A fixed column, so 114 names start on one line rather than a ragged edge that
-            // moves in and out by a digit.
-            modifier = Modifier.width(28.dp),
+            // moves in and out by a digit — wide enough for three, with a gap after it, or
+            // «112» sits against the L of Al-Ikhlas.
+            modifier = Modifier.width(40.dp).padding(end = 6.dp),
         )
         Text(
             surah.name,
