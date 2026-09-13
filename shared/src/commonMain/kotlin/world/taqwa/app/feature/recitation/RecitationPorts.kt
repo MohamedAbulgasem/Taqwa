@@ -47,6 +47,15 @@ interface PlayerPort {
 interface LibraryPort {
     fun downloaded(reciterId: String): Flow<Set<Int>>
     suspend fun isDownloaded(reciterId: String, surah: Int): Boolean
+
+    /** Counted off the disk, for the Downloads screen (spec §5.6). See [RecitationLibrary.bytesUsed]. */
+    suspend fun bytesUsed(reciterId: String): Long
+    suspend fun bytesUsedTotal(): Long
+
+    /** The Downloads screen's two deletes. Committing and reconciling stay off this seam: they
+     * belong to the downloader and to app start-up, not to anything a reader taps. */
+    suspend fun delete(reciterId: String, surah: Int)
+    suspend fun deleteReciter(reciterId: String)
 }
 
 /** The two settings the surface reads and writes: which voice, and whether mobile data is
@@ -54,6 +63,7 @@ interface LibraryPort {
 interface RecitationSettingsPort {
     val settings: Flow<RecitationSettings>
     suspend fun setReciter(id: String)
+    suspend fun setDownloadOnMobileData(value: Boolean)
 }
 
 /** The picker's fifteen-second audition. */
@@ -67,17 +77,26 @@ interface DownloaderPort {
     fun enqueue(key: DownloadKey, allowMobileOnce: Boolean)
     fun cancel(key: DownloadKey)
     suspend fun retry(key: DownloadKey)
+
+    /** "Download the whole Quran for this reciter" (spec §12.8) and the Cancel beside it. */
+    fun enqueueReciter(reciterId: String, allowMobileOnce: Boolean)
+    fun cancelReciter(reciterId: String)
 }
 
 fun RecitationLibrary.asPort(): LibraryPort = object : LibraryPort {
     override fun downloaded(reciterId: String): Flow<Set<Int>> = this@asPort.downloaded(reciterId)
     override suspend fun isDownloaded(reciterId: String, surah: Int): Boolean =
         this@asPort.isDownloaded(reciterId, surah)
+    override suspend fun bytesUsed(reciterId: String): Long = this@asPort.bytesUsed(reciterId)
+    override suspend fun bytesUsedTotal(): Long = this@asPort.bytesUsedTotal()
+    override suspend fun delete(reciterId: String, surah: Int) = this@asPort.delete(reciterId, surah)
+    override suspend fun deleteReciter(reciterId: String) = this@asPort.deleteReciter(reciterId)
 }
 
 fun SettingsRepository.asRecitationPort(): RecitationSettingsPort = object : RecitationSettingsPort {
     override val settings: Flow<RecitationSettings> get() = recitationSettings
     override suspend fun setReciter(id: String) = setRecitationReciter(id)
+    override suspend fun setDownloadOnMobileData(value: Boolean) = setRecitationMobileData(value)
 }
 
 fun ClipPlayer.asPort(): ClipPort = object : ClipPort {
@@ -103,4 +122,7 @@ fun SurahDownloader.asPort(): DownloaderPort = object : DownloaderPort {
     override fun enqueue(key: DownloadKey, allowMobileOnce: Boolean) = this@asPort.enqueue(key, allowMobileOnce)
     override fun cancel(key: DownloadKey) = this@asPort.cancel(key)
     override suspend fun retry(key: DownloadKey) = this@asPort.retry(key)
+    override fun enqueueReciter(reciterId: String, allowMobileOnce: Boolean) =
+        this@asPort.enqueueReciter(reciterId, allowMobileOnce)
+    override fun cancelReciter(reciterId: String) = this@asPort.cancelReciter(reciterId)
 }

@@ -196,6 +196,12 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         store.edit { it[SettingsKeys.RECITATION_RECITER] = reciterId }
     }
 
+    /** Settings › Recitation's "Download over mobile data" (spec §5.6, §12.6). Its own write for
+     * the same reason [setRecitationReciter] is: the two are changed from different surfaces. */
+    suspend fun setRecitationMobileData(value: Boolean) {
+        store.edit { it[SettingsKeys.RECITATION_MOBILE_DATA] = value }
+    }
+
     suspend fun setThemeMode(mode: ThemeMode) {
         store.edit { it[SettingsKeys.THEME] = mode.name }
     }

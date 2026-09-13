@@ -74,8 +74,12 @@ data class RecitationState(
     val reciters: List<Reciter> = emptyList(),
     /** The current reciter's surahs on this phone. */
     val downloaded: Set<Int> = emptySet(),
-    /** Every reciter's count, for the picker's caption. */
-    val downloadedCounts: Map<String, Int> = emptyMap(),
+    /**
+     * Every reciter's surahs on this phone. The picker's caption wants only the size of each set
+     * ([downloadedCounts]); Settings › Recitation wants which reciters have anything at all, and
+     * its Downloads screen wants the numbers themselves.
+     */
+    val downloadedByReciter: Map<String, Set<Int>> = emptyMap(),
     val downloads: Map<DownloadKey, DownloadState> = emptyMap(),
     val bar: BarState? = null,
     val sheet: DownloadSheetState? = null,
@@ -84,9 +88,35 @@ data class RecitationState(
     val previewing: String? = null,
     /** The reciters this build actually bundles a preview clip for; the rest show no triangle. */
     val previewable: Set<String> = emptySet(),
+    /** Settings › Recitation's toggle (spec §5.6), and the sheet's "Over Wi-Fi." note. */
+    val downloadOnMobileData: Boolean = false,
+    /** The whole-Quran offer for the current reciter, or null when there is nothing to offer. */
+    val wholeQuran: WholeQuran? = null,
 ) {
     /** The header button's state for [surah], under the current reciter. */
     fun header(surah: Int): HeaderState = headerStateOf(surah, reciter?.id, downloads, bar)
+
+    /** Every reciter's count, for the picker's caption. */
+    val downloadedCounts: Map<String, Int> get() = downloadedByReciter.mapValues { it.value.size }
+
+    /** The reciters with something on the phone, in the catalogue's own order. */
+    val reciterDownloads: List<Reciter>
+        get() = reciters.filter { downloadedByReciter[it.id].orEmpty().isNotEmpty() }
+}
+
+/**
+ * What recitation occupies on the phone, counted off the disk rather than off the registry
+ * (spec §8): the Downloads screen states a number the reader could check in system settings, and
+ * a `.part` left by a cancelled download takes up room whether the registry knows it or not.
+ *
+ * [byReciter] holds only reciters with something to show; [total] is the whole audio root, so it
+ * also carries the bytes of a reciter withdrawn from the catalogue since the files were fetched.
+ */
+data class RecitationStorage(
+    val total: Long = 0L,
+    val byReciter: Map<String, Long> = emptyMap(),
+) {
+    fun of(reciterId: String): Long = byReciter[reciterId] ?: 0L
 }
 
 /**

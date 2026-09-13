@@ -121,6 +121,17 @@ class RecitationControllerTest {
         override suspend fun retry(key: DownloadKey) {
             enqueued += key to false
         }
+
+        val batches = mutableListOf<Pair<String, Boolean>>()
+        val batchesCancelled = mutableListOf<String>()
+
+        override fun enqueueReciter(reciterId: String, allowMobileOnce: Boolean) {
+            batches += reciterId to allowMobileOnce
+        }
+
+        override fun cancelReciter(reciterId: String) {
+            batchesCancelled += reciterId
+        }
     }
 
     private class FakeLibrary : LibraryPort {
@@ -132,6 +143,23 @@ class RecitationControllerTest {
         fun put(reciterId: String, surahs: Set<Int>) {
             owned.value = owned.value + (reciterId to surahs)
         }
+
+        val bytes = mutableMapOf<String, Long>()
+        val deleted = mutableListOf<Pair<String, Int>>()
+        val wiped = mutableListOf<String>()
+
+        override suspend fun bytesUsed(reciterId: String): Long = bytes[reciterId] ?: 0L
+        override suspend fun bytesUsedTotal(): Long = bytes.values.sum()
+
+        override suspend fun delete(reciterId: String, surah: Int) {
+            deleted += reciterId to surah
+            owned.value = owned.value + (reciterId to (owned.value[reciterId].orEmpty() - surah))
+        }
+
+        override suspend fun deleteReciter(reciterId: String) {
+            wiped += reciterId
+            owned.value = owned.value - reciterId
+        }
     }
 
     private class FakeSettings : RecitationSettingsPort {
@@ -139,6 +167,10 @@ class RecitationControllerTest {
         override val settings: Flow<RecitationSettings> = stored
         override suspend fun setReciter(id: String) {
             stored.value = stored.value.copy(reciterId = id)
+        }
+
+        override suspend fun setDownloadOnMobileData(value: Boolean) {
+            stored.value = stored.value.copy(downloadOnMobileData = value)
         }
     }
 
@@ -478,5 +510,135 @@ class RecitationControllerTest {
                 NowPlayingText("الفاتحة", "مشاري راشد العفاسي"),
                 harness.player.lastText,
             )
+        }
+
+    // ── The whole Quran and the Downloads screen (spec §5.6, §12.8) ─────────────────────
+
+    @Test
+    fun `the whole Quran is asked for by reciter and priced at what is missing`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1))
+            val controller = controller(harness, backgroundScope)
+
+            assertEquals(
+                WholeQuran.Offer(bytes = 58_538_153L + 112_778L, missing = 2),
+                controller.state.value.wholeQuran,
+            )
+
+            controller.downloadWholeQuran(allowMobileOnce = true)
+
+            assertEquals(listOf("ar.alafasy" to true), harness.downloader.batches)
+        }
+
+    @Test
+    fun `a batch this app started reports itself even when one surah is left in it`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1, 2))
+            val controller = controller(harness, backgroundScope)
+            controller.downloadWholeQuran()
+            harness.downloader.emit(mapOf(DownloadKey("ar.alafasy", 112) to DownloadState.Queued))
+
+            assertEquals(WholeQuran.Running(done = 2, total = 3), controller.state.value.wholeQuran)
+        }
+
+    @Test
+    fun `a batch that has finished stops claiming to be running`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            val controller = controller(harness, backgroundScope)
+            controller.downloadWholeQuran()
+            harness.downloader.emit(mapOf(DownloadKey("ar.alafasy", 1) to DownloadState.Queued))
+            assertTrue(controller.state.value.wholeQuran is WholeQuran.Running)
+
+            harness.library.put("ar.alafasy", setOf(1, 2, 112))
+            harness.downloader.emit(emptyMap())
+
+            assertNull(controller.state.value.wholeQuran)
+        }
+
+    @Test
+    fun `cancelling the batch cancels the reciter and leaves what landed alone`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1))
+            val controller = controller(harness, backgroundScope)
+            controller.downloadWholeQuran()
+
+            controller.cancelWholeQuran()
+
+            assertEquals(listOf("ar.alafasy"), harness.downloader.batchesCancelled)
+            assertEquals(setOf(1), controller.state.value.downloaded)
+        }
+
+    @Test
+    fun `deleting the surah that is playing stops the player first`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1, 2))
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(1, 1)
+
+            controller.deleteSurah("ar.alafasy", 1)
+
+            assertEquals(1, harness.player.stops)
+            assertEquals(listOf("ar.alafasy" to 1), harness.library.deleted)
+        }
+
+    @Test
+    fun `deleting a surah nobody is listening to leaves the playback alone`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1, 2))
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(1, 1)
+
+            controller.deleteSurah("ar.alafasy", 2)
+
+            assertEquals(0, harness.player.stops)
+            assertEquals(listOf("ar.alafasy" to 2), harness.library.deleted)
+        }
+
+    @Test
+    fun `deleting a whole reciter cancels its batch and stops its voice`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1, 2))
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(2, 1)
+
+            controller.deleteReciter("ar.alafasy")
+
+            assertEquals(listOf("ar.alafasy"), harness.downloader.batchesCancelled)
+            assertEquals(1, harness.player.stops)
+            assertEquals(listOf("ar.alafasy"), harness.library.wiped)
+        }
+
+    @Test
+    fun `storage reports each reciter off the disk and skips the empty ones`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1))
+            harness.library.bytes["ar.alafasy"] = 381_780L
+            val controller = controller(harness, backgroundScope)
+
+            val storage = controller.storage()
+
+            assertEquals(381_780L, storage.total)
+            assertEquals(mapOf("ar.alafasy" to 381_780L), storage.byReciter)
+            assertEquals(0L, storage.of("ar.husary"))
+        }
+
+    @Test
+    fun `the mobile data switch is written straight through`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            val controller = controller(harness, backgroundScope)
+
+            controller.setDownloadOnMobileData(true)
+
+            assertTrue(harness.settings.stored.value.downloadOnMobileData)
+            assertTrue(controller.state.value.downloadOnMobileData)
         }
 }

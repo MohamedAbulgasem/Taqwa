@@ -60,6 +60,14 @@ class RecitationController(
     private val previewable = MutableStateFlow<Set<String>>(emptySet())
 
     /**
+     * The reciters this process asked for a whole-Quran batch of (spec §12.8). Held here rather
+     * than inferred from the downloader, because one surah in flight looks exactly like a batch of
+     * one; see [wholeQuranOf], which also has a process-free fallback for the batch that outlives
+     * the app. Dropped when the reciter's last surah stops moving, and by Cancel.
+     */
+    private val batching = MutableStateFlow<Set<String>>(emptySet())
+
+    /**
      * True while [PlayerPort.load] is in flight. The iOS player splits the container into per-ayah
      * files on the first play of a surah, which for Al-Baqarah is a visible pause, and it reports
      * no `buffering` of its own during it (it has no `AVPlayerItem` to ask yet). So the bar's
@@ -105,21 +113,27 @@ class RecitationController(
         .flatMapLatest { id -> if (id == null) flowOf(emptySet()) else library.downloaded(id) }
         .stateIn(scope, SharingStarted.Eagerly, emptySet())
 
-    private val counts: StateFlow<Map<String, Int>> = manifest
+    /**
+     * Every reciter's surahs, not just the current one's. The picker's caption only wants the
+     * counts, but Settings › Recitation lists a card per reciter that has anything at all and the
+     * Downloads screen lists that reciter's surahs by number — all three off this one collection,
+     * so the three of them can never disagree about what is on the phone.
+     */
+    private val allDownloaded: StateFlow<Map<String, Set<Int>>> = manifest
         .filterNotNull()
         .flatMapLatest { catalogue ->
             if (catalogue.reciters.isEmpty()) {
                 flowOf(emptyMap())
             } else {
                 combine(
-                    catalogue.reciters.map { r -> library.downloaded(r.id).map { r.id to it.size } },
+                    catalogue.reciters.map { r -> library.downloaded(r.id).map { r.id to it } },
                 ) { pairs -> pairs.toMap() }
             }
         }
         .stateIn(scope, SharingStarted.Eagerly, emptyMap())
 
     val state: StateFlow<RecitationState> = combine(
-        combine(manifest, reciter, downloaded, counts) { catalogue, current, owned, byReciter ->
+        combine(manifest, reciter, downloaded, allDownloaded) { catalogue, current, owned, byReciter ->
             Catalogue(catalogue, current, owned, byReciter)
         },
         combine(player.state, downloader.states, loading) { playback, downloads, busy ->
@@ -130,9 +144,11 @@ class RecitationController(
             picker,
             previewing,
             previewable,
-            settings.settings.map { it.downloadOnMobileData },
-        ) { surah, pickerOpen, preview, clipsAvailable, mobileData ->
-            Surface(surah, pickerOpen, preview, clipsAvailable, mobileData)
+            combine(settings.settings.map { it.downloadOnMobileData }, batching) { mobileData, batches ->
+                mobileData to batches
+            },
+        ) { surah, pickerOpen, preview, clipsAvailable, (mobileData, batches) ->
+            Surface(surah, pickerOpen, preview, clipsAvailable, mobileData, batches)
         },
     ) { catalogue, playing, surface ->
         assemble(catalogue, playing, surface)
@@ -142,7 +158,7 @@ class RecitationController(
         val manifest: RecitationManifest?,
         val reciter: Reciter?,
         val downloaded: Set<Int>,
-        val counts: Map<String, Int>,
+        val byReciter: Map<String, Set<Int>>,
     )
 
     private class Playing(
@@ -157,6 +173,7 @@ class RecitationController(
         val previewing: String?,
         val previewable: Set<String>,
         val downloadOnMobileData: Boolean,
+        val batching: Set<String>,
     )
 
     private fun assemble(catalogue: Catalogue, playing: Playing, surface: Surface): RecitationState {
@@ -179,13 +196,20 @@ class RecitationController(
             reciter = catalogue.reciter,
             reciters = catalogue.manifest?.reciters.orEmpty(),
             downloaded = catalogue.downloaded,
-            downloadedCounts = catalogue.counts,
+            downloadedByReciter = catalogue.byReciter,
             downloads = playing.downloads,
             bar = bar,
             sheet = sheet,
             pickerOpen = surface.pickerOpen,
             previewing = surface.previewing,
             previewable = surface.previewable,
+            downloadOnMobileData = surface.downloadOnMobileData,
+            wholeQuran = wholeQuranOf(
+                reciter = catalogue.reciter,
+                owned = catalogue.downloaded,
+                downloads = playing.downloads,
+                declared = catalogue.reciter?.id in surface.batching,
+            ),
         )
     }
 
@@ -229,6 +253,28 @@ class RecitationController(
         // The pending auto-play (spec §5.4). The library is the signal, not the downloader:
         // a surah leaves `states` the moment it commits, and "committed" means hashed and
         // renamed — the one moment at which it can actually be played.
+        // A batch is over when the downloader has nothing of that reciter left in flight. Dropped
+        // here rather than by the row that reads it, so a reader who never opens Settings does not
+        // leave the app believing a finished batch is still running.
+        //
+        // `seen` is what stops the drop firing on the empty state map that is still there in the
+        // frames between the button and the downloader's first emission: a reciter is only ever
+        // forgotten once it has actually been observed moving. A refusal is kept — the row has a
+        // sentence to show for it, and the reader clears it by trying again or walking away.
+        scope.launch {
+            val seen = mutableSetOf<String>()
+            downloader.states.collect { states ->
+                if (batching.value.isEmpty()) {
+                    seen.clear()
+                    return@collect
+                }
+                val moving = states.filterValues { it !is DownloadState.Failed }.keys.map { it.reciterId }.toSet()
+                val known = states.keys.map { it.reciterId }.toSet()
+                seen += moving
+                batching.value = batching.value.filter { it !in seen || it in known }.toSet()
+                seen.retainAll(batching.value)
+            }
+        }
         scope.launch {
             downloaded.collect { owned ->
                 val waiting = pending ?: return@collect
@@ -300,6 +346,73 @@ class RecitationController(
      * surah arrives, and the header button's ring is what keeps the download visible. */
     fun dismissSheet() {
         sheetSurah.value = null
+    }
+
+    // ── The whole Quran (spec §5.4, §12.8) ──────────────────────────────────────────────
+
+    /**
+     * Every surah of the current reciter the reader does not already own, as one batch. The
+     * downloader decides the order, the two-at-a-time limit and the free-space refusal; all this
+     * does is say which voice, remember that a batch is running, and — as with a single surah —
+     * pass the sheet's one-time mobile-data override straight through.
+     */
+    fun downloadWholeQuran(allowMobileOnce: Boolean = false) {
+        val voice = reciter.value ?: return
+        batching.value = batching.value + voice.id
+        downloader.enqueueReciter(voice.id, allowMobileOnce)
+    }
+
+    /**
+     * The Cancel beside a running batch. Every surah still queued or in flight is dropped; the
+     * ones that have already committed stay on the phone, because they are in the library and the
+     * library is not what a cancel touches.
+     */
+    fun cancelWholeQuran() {
+        val voice = reciter.value ?: return
+        batching.value = batching.value - voice.id
+        downloader.cancelReciter(voice.id)
+    }
+
+    // ── Settings › Recitation (spec §5.6) ───────────────────────────────────────────────
+
+    fun setDownloadOnMobileData(value: Boolean) {
+        scope.launch { settings.setDownloadOnMobileData(value) }
+    }
+
+    /** What every reciter's downloads occupy, off the disk. Asked for rather than observed: it
+     * stats every file, and the two screens that show it ask again when the registry changes. */
+    suspend fun storage(): RecitationStorage {
+        val ids = (manifest.value?.reciters?.map { it.id }.orEmpty() + allDownloaded.value.keys).distinct()
+        val byReciter = ids.associateWith { runCatching { library.bytesUsed(it) }.getOrDefault(0L) }
+        return RecitationStorage(
+            total = runCatching { library.bytesUsedTotal() }.getOrDefault(byReciter.values.sum()),
+            byReciter = byReciter.filterValues { it > 0L },
+        )
+    }
+
+    /**
+     * Forgets one surah. **Playback stops first** when it is the surah being recited: the file is
+     * about to go, and on Android the player holds it open through a `DataSource` that would go on
+     * reading a deleted inode until the queue ran out.
+     */
+    suspend fun deleteSurah(reciterId: String, surah: Int) {
+        stopIfPlaying(reciterId) { it == surah }
+        library.delete(reciterId, surah)
+    }
+
+    /** Forgets everything of one reciter — file, registry and, if it was this voice, the playback. */
+    suspend fun deleteReciter(reciterId: String) {
+        batching.value = batching.value - reciterId
+        downloader.cancelReciter(reciterId)
+        stopIfPlaying(reciterId) { true }
+        library.deleteReciter(reciterId)
+    }
+
+    private fun stopIfPlaying(reciterId: String, surah: (Int) -> Boolean) {
+        val playback = player.state.value
+        if (playback.reciterId != reciterId) return
+        val current = playback.surah ?: return
+        if (surah(current)) stop()
     }
 
     fun openPicker() {
