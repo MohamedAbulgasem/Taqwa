@@ -96,4 +96,12 @@ internal object SettingsKeys {
      * than the success, so a repository that is down cannot turn every app start into an HTTP
      * timeout; see `ManifestRefresher`. */
     val RECITATION_MANIFEST_CHECKED = longPreferencesKey("recitation_manifest_checked")
+
+    /**
+     * True once the reader has touched recitation in any way — the speaker button, Play on an
+     * ayah, the picker, the Recitation settings screen, "Download the whole Quran". The daily
+     * catalogue fetch is gated on this (privacy spec §2), so an install that never opens
+     * recitation never opens a socket.
+     */
+    val RECITATION_ENGAGED = booleanPreferencesKey("recitation_engaged")
 }
