@@ -1,6 +1,6 @@
 # Taqwa privacy policy
 
-_Last updated 13 September 2026. Applies to Taqwa 0.12.0 and later on Android and iOS._
+_Last updated 13 September 2026. Applies to Taqwa 1.0.0 and later on Android and iOS._
 
 Taqwa is a free Islamic app with no account, no ads and no analytics. It works offline.
 The one thing it uses the internet for is downloading Quran recitations, and only when you
