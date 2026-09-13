@@ -351,3 +351,51 @@ changed four things above; the text above is left as written and corrected here.
 - Cancelling a switch's download from the bar; the sheet's Cancel does it.
 - Re-packing the nine published reciters with measured lengths (a gigabyte of upload each);
   their clocks estimate, about 1 % long.
+
+## 15. Round three — 13 September, evening (three more asks after 0.13.0)
+
+### 15.1 Previous and next move by surah
+
+**Ask.** Next and previous should go to the next and previous surah, like a music player's
+track buttons; a press-and-hold does the ayah. The same on the lock screen.
+
+**Decision.** On the bar, a tap on previous or next is the neighbouring surah from its first
+ayah, and a long press is the ayah move it used to be, with the platform's long-press haptic
+so the finger knows which it got; a screen reader gets the hold as a custom action. Previous is
+literally the previous surah — no "restart the surah if more than three seconds in" rule,
+which would have made the button restart Al-Baqarah almost every time — and at the ends of the
+Quran the buttons do nothing. Both go through the same path as a tap on a surah's header, so a
+neighbour that is not on the phone is offered on the sheet, or fetched without asking (§15.3).
+
+**Lock screen.** The system's previous and next are surah moves: on Android `AyahPlayer`
+reports the press to the app as a session broadcast (`SURAH_PREVIOUS` / `SURAH_NEXT`) and the
+controller decides; on iOS the track commands do the same through `RecitationPlayer.skips`.
+A lock screen cannot long-press, so on Android the notification carries two extra buttons,
+"Previous ayah" and "Next ayah" (Media3 media-button preferences in the secondary slots,
+labels sent by the app in its own language); headset rewind and fast-forward move by ayah as
+before. iOS shows either track buttons or interval buttons, never both, so there the ayah is
+reached by the seek bar, which snaps to ayahs.
+
+### 15.2 Air over the clock
+
+The clock row grows from 19 to 26 dp with a 5 dp inset above the clocks; the bar is 83 dp.
+
+### 15.3 Downloading without asking
+
+**Ask.** The sheet on every surah that is not on the phone gets annoying; offer "always
+download, don't ask again", and decide whether it starts ticked.
+
+**Decision.** The download sheet carries a switch, *Download future surahs without asking*,
+**ticked the first time** and thereafter in whatever position the reader last confirmed it; it
+is written on confirm (either button), not on a tap alone. Settings › Quran › Recitation has
+the same switch as *Download without asking*, so it can be turned off again. Ticked by default
+because a sheet on every surah is the thing most people will not want, and the first sheet still
+appears — it is the moment the reader learns the size and the Wi-Fi rule — so nothing is fetched
+that they did not confirm once.
+
+With it on: Play, the header button or a surah skip on a surah not on the phone fetches it at
+once and plays it the moment it lands, the header's ring being the only thing that moves in
+between; picking a new voice while another plays fetches its copy and switches when it lands,
+with the ring on the monogram (§14.3) and no sheet. The Wi-Fi rule still applies. A refusal —
+no Wi-Fi, no network, no room — is the one thing the reader must see, so the sheet opens itself
+on the failure face, once per failure, with the sentence and its Retry or mobile-data override.

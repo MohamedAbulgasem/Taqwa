@@ -99,6 +99,8 @@ import world.taqwa.app.feature.recitation.PlayerBarHeight
 import world.taqwa.app.feature.recitation.PlayerBarHost
 import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.ReciterPicker
+import world.taqwa.app.resources.recitation_a11y_next_ayah
+import world.taqwa.app.resources.recitation_a11y_previous_ayah
 import world.taqwa.app.feature.recitation.RecitationStorage
 import world.taqwa.app.feature.recitation.reciterName
 import world.taqwa.app.feature.settings.DownloadedSurah
@@ -158,6 +160,12 @@ fun App(container: AppContainer) {
     // composition that started it, so the controller is told the language rather than asked.
     val arabicUi = isRtlLocale()
     LaunchedEffect(arabicUi) { recitation.setArabicUi(arabicUi) }
+    // The Android notification's two ayah buttons (spec §15.1), in the interface's language.
+    val previousAyahLabel = stringResource(Res.string.recitation_a11y_previous_ayah)
+    val nextAyahLabel = stringResource(Res.string.recitation_a11y_next_ayah)
+    LaunchedEffect(previousAyahLabel, nextAyahLabel) {
+        recitation.setAyahButtonLabels(previousAyahLabel, nextAyahLabel)
+    }
 
     // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
     // has already happened by the time this runs, so `requestSystemPermission` just returns the
@@ -383,8 +391,10 @@ fun App(container: AppContainer) {
                                     bar = bar,
                                     surahName = barSurahName,
                                     onToggle = recitation::toggle,
-                                    onNext = recitation::next,
-                                    onPrevious = recitation::previous,
+                                    onNext = recitation::nextSurah,
+                                    onPrevious = recitation::previousSurah,
+                                    onNextAyah = recitation::next,
+                                    onPreviousAyah = recitation::previous,
                                     onOpenPicker = recitation::openPicker,
                                     onDismiss = recitation::dismissBar,
                                 )
@@ -665,6 +675,7 @@ fun App(container: AppContainer) {
                                 onOpened = recitation::onSettingsOpened,
                                 onOpenPicker = recitation::openPicker,
                                 onSetMobileData = recitation::setDownloadOnMobileData,
+                                onSetAutoDownload = recitation::setAutoDownload,
                                 onOpenDownloads = { navigator.push(Screen.RecitationDownloads(it)) },
                                 onDownloadWholeQuran = { recitation.downloadWholeQuran() },
                                 onCancelWholeQuran = recitation::cancelWholeQuran,

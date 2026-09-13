@@ -16,6 +16,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.SilenceMediaSource
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
+import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -118,7 +119,17 @@ class RecitationService : MediaSessionService() {
         // `RecitationQueue` rule the app's own bar uses, applied to everything outside the app.
         val wrapped = AyahPlayer(player)
         ayahPlayer = wrapped
-        session = MediaSession.Builder(this, wrapped).setCallback(Callback()).build()
+        val built = MediaSession.Builder(this, wrapped).setCallback(Callback()).build()
+        session = built
+        // The lock screen's previous and next (spec §15.1) are the app's to answer: which surah,
+        // whether it is on the phone, from where. Told to every connected controller — the app's
+        // own is the one that acts.
+        wrapped.onSurahSkip = { forward ->
+            built.broadcastCustomCommand(
+                SessionCommand(if (forward) COMMAND_SURAH_NEXT else COMMAND_SURAH_PREVIOUS, Bundle.EMPTY),
+                Bundle.EMPTY,
+            )
+        }
         // Media3's own default small icon is a generic music note. The status bar should say
         // Taqwa, and the mark the prayer notifications already use is the one it should say it
         // with; `:androidApp` puts the id there in `TaqwaApplication.onCreate`.
@@ -181,6 +192,8 @@ class RecitationService : MediaSessionService() {
         ): MediaSession.ConnectionResult {
             val commands = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
                 .add(SessionCommand(COMMAND_NOW_PLAYING, Bundle.EMPTY))
+                .add(SessionCommand(COMMAND_PREVIOUS_AYAH, Bundle.EMPTY))
+                .add(SessionCommand(COMMAND_NEXT_AYAH, Bundle.EMPTY))
                 .build()
             return MediaSession.ConnectionResult.AcceptedResultBuilder(mediaSession)
                 .setAvailableSessionCommands(commands)
@@ -204,9 +217,43 @@ class RecitationService : MediaSessionService() {
                 ayahPlayer?.timeline = args.getLongArray(ARG_TIMELINE)
                     ?.takeIf { it.isNotEmpty() }
                     ?.let { SurahTimeline(it.toList()) }
+                // The notification's two ayah buttons (spec §15.1), beside the system's surah
+                // previous/next: what the bar does with a long press, the lock screen does with
+                // these. Localised by the app, since the service has no string of its own.
+                offerAyahButtons(
+                    previous = args.getString(ARG_PREVIOUS_AYAH).orEmpty(),
+                    next = args.getString(ARG_NEXT_AYAH).orEmpty(),
+                )
+                return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+            }
+            if (customCommand.customAction == COMMAND_PREVIOUS_AYAH) {
+                ayahPlayer?.previousAyah()
+                return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+            }
+            if (customCommand.customAction == COMMAND_NEXT_AYAH) {
+                ayahPlayer?.nextAyah()
                 return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }
             return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
+        }
+
+        private fun offerAyahButtons(previous: String, next: String) {
+            val current = session ?: return
+            if (previous.isEmpty() && next.isEmpty()) return
+            current.setMediaButtonPreferences(
+                listOf(
+                    CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
+                        .setSessionCommand(SessionCommand(COMMAND_PREVIOUS_AYAH, Bundle.EMPTY))
+                        .setDisplayName(previous)
+                        .setSlots(CommandButton.SLOT_BACK_SECONDARY, CommandButton.SLOT_OVERFLOW)
+                        .build(),
+                    CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD)
+                        .setSessionCommand(SessionCommand(COMMAND_NEXT_AYAH, Bundle.EMPTY))
+                        .setDisplayName(next)
+                        .setSlots(CommandButton.SLOT_FORWARD_SECONDARY, CommandButton.SLOT_OVERFLOW)
+                        .build(),
+                ),
+            )
         }
 
         /**
@@ -249,6 +296,18 @@ class RecitationService : MediaSessionService() {
 
         /** A `LongArray` of every queue item's length in ms: [SurahTimeline.itemsMs]. */
         const val ARG_TIMELINE = "timeline"
+
+        /** The notification's two ayah buttons' labels, in the app's language. */
+        const val ARG_PREVIOUS_AYAH = "previousAyah"
+        const val ARG_NEXT_AYAH = "nextAyah"
+
+        /** Session to controllers: a lock screen, headset or car pressed previous or next. */
+        const val COMMAND_SURAH_PREVIOUS = "world.taqwa.app.recitation.SURAH_PREVIOUS"
+        const val COMMAND_SURAH_NEXT = "world.taqwa.app.recitation.SURAH_NEXT"
+
+        /** Controllers to session: the notification's two ayah buttons. */
+        const val COMMAND_PREVIOUS_AYAH = "world.taqwa.app.recitation.PREVIOUS_AYAH"
+        const val COMMAND_NEXT_AYAH = "world.taqwa.app.recitation.NEXT_AYAH"
     }
 }
 

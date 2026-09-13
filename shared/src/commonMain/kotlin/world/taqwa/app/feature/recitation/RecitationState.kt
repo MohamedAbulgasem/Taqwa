@@ -87,6 +87,9 @@ data class DownloadSheetState(
      * thing they need to know is that the old one carries on until the new one lands.
      */
     val playingMeanwhile: Reciter? = null,
+    /** How the sheet's "download future surahs without asking" switch opens (spec §15.3):
+     * ticked until the reader has confirmed a sheet once, then whatever they last chose. */
+    val autoDownloadDefault: Boolean = true,
 )
 
 /**
@@ -116,6 +119,8 @@ data class RecitationState(
     val previewable: Set<String> = emptySet(),
     /** Settings › Recitation's toggle (spec §5.6), and the sheet's "Over Wi-Fi." note. */
     val downloadOnMobileData: Boolean = false,
+    /** Spec §15.3: Play on a surah that is not on the phone fetches it without the sheet. */
+    val autoDownload: Boolean = false,
     /** The whole-Quran offer for the current reciter, or null when there is nothing to offer. */
     val wholeQuran: WholeQuran? = null,
 ) {

@@ -17,6 +17,10 @@ import world.taqwa.app.settings.SettingsKeys
 data class RecitationSettings(
     val reciterId: String = RecitationManifest.DEFAULT_RECITER,
     val downloadOnMobileData: Boolean = false,
+    /** Spec §15.3: a surah played but not on the phone is fetched without the sheet. */
+    val autoDownload: Boolean = false,
+    /** True once the sheet has been confirmed at least once; until then it offers auto-download ticked. */
+    val autoDownloadAsked: Boolean = false,
 )
 
 /**

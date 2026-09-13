@@ -1,5 +1,6 @@
 package world.taqwa.app.recitation
 
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /** One ayah, addressed the way the reader addresses it. */
@@ -44,7 +45,20 @@ data class PlaybackState(
  * nothing below this line touches a string resource and nothing has to be re-resolved when the
  * app's language changes while a service is running.
  */
-data class NowPlayingText(val title: String, val subtitle: String)
+data class NowPlayingText(
+    val title: String,
+    val subtitle: String,
+    /** The two extra notification buttons on Android (spec §15.1), localised by the caller. */
+    val previousAyahLabel: String = "",
+    val nextAyahLabel: String = "",
+)
+
+/**
+ * The lock screen's previous and next move by *surah* (spec §15.1). The player cannot load a
+ * surah by itself — that is the controller's decision, download and all — so it reports the
+ * press and the controller acts on it.
+ */
+enum class SurahSkip { PREVIOUS, NEXT }
 
 /**
  * Recitation playback, background and lock screen included (spec §6).
@@ -60,6 +74,9 @@ data class NowPlayingText(val title: String, val subtitle: String)
 expect class RecitationPlayer(library: RecitationLibrary) {
 
     val state: StateFlow<PlaybackState>
+
+    /** Previous/next pressed on a lock screen, a headset or a car (spec §15.1). */
+    val skips: SharedFlow<SurahSkip>
 
     /**
      * Builds the queue for [surah] from the reciter's downloaded `.taqa` — one item per ayah,

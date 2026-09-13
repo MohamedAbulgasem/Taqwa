@@ -42,9 +42,11 @@ import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.design.mushafFamily
+import world.taqwa.app.feature.settings.TaqwaToggle
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.recitation.DownloadFailure
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.recitation_auto_download
 import world.taqwa.app.resources.recitation_cancel
 import world.taqwa.app.resources.recitation_download
 import world.taqwa.app.resources.recitation_downloading
@@ -73,7 +75,7 @@ fun DownloadSheet(
     sheet: DownloadSheetState,
     surahName: String,
     wholeQuran: WholeQuran?,
-    onConfirm: (allowMobileOnce: Boolean) -> Unit,
+    onConfirm: (allowMobileOnce: Boolean, autoDownload: Boolean) -> Unit,
     onWholeQuran: (allowMobileOnce: Boolean) -> Unit,
     onCancel: () -> Unit,
     onRetry: () -> Unit,
@@ -86,6 +88,9 @@ fun DownloadSheet(
     // that quietly fetched a single surah instead — the same words meaning a different thing
     // depending on a button the reader can no longer see.
     var lastWasWholeQuran by remember(sheet.surah, sheet.reciter.id) { mutableStateOf(false) }
+    // The switch's position (spec §15.3): ticked until the reader has confirmed a sheet once,
+    // then whatever they last chose. Written only when a download is actually asked for.
+    var autoDownload by remember(sheet.surah, sheet.reciter.id) { mutableStateOf(sheet.autoDownloadDefault) }
     Column(Modifier.padding(horizontal = 24.dp)) {
         if (arabic) {
             Text(surahName, fontFamily = mushafFamily(), fontSize = 26.sp, color = colors.textPrimary, maxLines = 1)
@@ -101,14 +106,16 @@ fun DownloadSheet(
                 sheet = sheet,
                 phase = phase,
                 wholeQuran = wholeQuran,
-                onConfirm = { allow -> lastWasWholeQuran = false; onConfirm(allow) },
+                autoDownload = autoDownload,
+                onAutoDownload = { autoDownload = it },
+                onConfirm = { allow -> lastWasWholeQuran = false; onConfirm(allow, autoDownload) },
                 onWholeQuran = { allow -> lastWasWholeQuran = true; onWholeQuran(allow) },
             )
             is SheetPhase.Downloading -> Running(sheet, phase, onCancel)
             is SheetPhase.Failed -> Failed(
                 phase = phase,
                 onRetry = onRetry,
-                onOverride = { if (lastWasWholeQuran) onWholeQuran(true) else onConfirm(true) },
+                onOverride = { if (lastWasWholeQuran) onWholeQuran(true) else onConfirm(true, autoDownload) },
             )
         }
         Spacer(Modifier.height(24.dp))
@@ -149,6 +156,8 @@ private fun Ready(
     sheet: DownloadSheetState,
     phase: SheetPhase.Ready,
     wholeQuran: WholeQuran?,
+    autoDownload: Boolean,
+    onAutoDownload: (Boolean) -> Unit,
     onConfirm: (Boolean) -> Unit,
     onWholeQuran: (Boolean) -> Unit,
 ) {
@@ -183,6 +192,29 @@ private fun Ready(
                 )
                 .padding(top = 14.dp),
         )
+    }
+    // "Download future surahs without asking" (spec §15.3): a switch on the sheet itself, where
+    // the reader is being asked, rather than a setting they would have to go and find. Ticked
+    // the first time, since a sheet on every surah is the thing most people will not want.
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 44.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { onAutoDownload(!autoDownload) },
+            )
+            .padding(top = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(Res.string.recitation_auto_download),
+            style = TaqwaText.caption,
+            color = colors.textSecondary,
+            modifier = Modifier.weight(1f).padding(end = 12.dp),
+        )
+        TaqwaToggle(autoDownload, onAutoDownload)
     }
     // The reader picked this voice from the bar while another was reciting the surah (spec
     // §14.3): say what happens in the meantime, because nothing else on the sheet does.

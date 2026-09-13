@@ -1149,3 +1149,12 @@ the settings idiom, the product name in Latin script in both locales, and three 
 the app under an external-link glyph that mirrors under Arabic. iOS declares exempt
 encryption, which removes the export-compliance question from every upload.
 
+### Recitation, round three (13 September, evening)
+
+Three asks after an hour with 0.13.0. Previous and next on the bar and the lock screen now move
+by surah, like a music player's track buttons; a long press on the bar moves by ayah, and the
+Android notification grew two extra buttons for the ayah, since a lock screen cannot hold a
+button down. The clock row got air above it. And the download sheet carries a switch,
+"Download future surahs without asking", ticked the first time: a surah you play is fetched and
+played when it lands, the header's ring the only thing moving, and the sheet comes back only to
+say why a fetch was refused.

@@ -47,6 +47,7 @@ import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.recitation_cancel
 import world.taqwa.app.resources.recitation_reciter
+import world.taqwa.app.resources.recitation_settings_auto_download
 import world.taqwa.app.resources.recitation_settings_batch
 import world.taqwa.app.resources.recitation_settings_credit
 import world.taqwa.app.resources.recitation_settings_downloads
@@ -74,6 +75,7 @@ fun RecitationSettingsScreen(
     onOpened: () -> Unit,
     onOpenPicker: () -> Unit,
     onSetMobileData: (Boolean) -> Unit,
+    onSetAutoDownload: (Boolean) -> Unit,
     onOpenDownloads: (String) -> Unit,
     onDownloadWholeQuran: () -> Unit,
     onCancelWholeQuran: () -> Unit,
@@ -94,6 +96,14 @@ fun RecitationSettingsScreen(
                 onClick = { onSetMobileData(!state.downloadOnMobileData) },
                 ripple = false,
                 trailing = { TaqwaToggle(state.downloadOnMobileData, onSetMobileData) },
+            )
+            CardDivider()
+            // Spec §15.3: the sheet's switch, here so it can be turned off again.
+            TaqwaRow(
+                stringResource(Res.string.recitation_settings_auto_download),
+                onClick = { onSetAutoDownload(!state.autoDownload) },
+                ripple = false,
+                trailing = { TaqwaToggle(state.autoDownload, onSetAutoDownload) },
             )
         }
 

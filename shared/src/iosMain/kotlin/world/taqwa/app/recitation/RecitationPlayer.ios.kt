@@ -8,8 +8,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -92,6 +95,10 @@ actual class RecitationPlayer actual constructor(
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val _state = MutableStateFlow(PlaybackState.EMPTY)
     actual val state: StateFlow<PlaybackState> = _state.asStateFlow()
+
+    /** The lock screen's track buttons, which move by surah (spec §15.1); the app decides. */
+    private val _skips = MutableSharedFlow<SurahSkip>(extraBufferCapacity = 4)
+    actual val skips: SharedFlow<SurahSkip> = _skips.asSharedFlow()
 
     private var player: AVPlayer? = null
     private var queue: RecitationQueue? = null
@@ -455,9 +462,14 @@ actual class RecitationPlayer actual constructor(
             toggle()
             MPRemoteCommandHandlerStatusSuccess
         }
-        centre.nextTrackCommand.addTargetWithHandler { next(); MPRemoteCommandHandlerStatusSuccess }
+        // Previous and next are surah moves (spec §15.1), like a track skip: reported to the app,
+        // which knows whether the neighbouring surah is on the phone.
+        centre.nextTrackCommand.addTargetWithHandler {
+            _skips.tryEmit(SurahSkip.NEXT)
+            MPRemoteCommandHandlerStatusSuccess
+        }
         centre.previousTrackCommand.addTargetWithHandler {
-            previous()
+            _skips.tryEmit(SurahSkip.PREVIOUS)
             MPRemoteCommandHandlerStatusSuccess
         }
         // The lock screen's bar is on the surah's clock (spec §14.1), so a scrub on it means
