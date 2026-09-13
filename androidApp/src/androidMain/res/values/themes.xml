@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Taqwa" parent="@android:style/Theme.Material.Light.NoActionBar" />
+    <!-- windowBackground is the ground the platform paints for the launch splash and for the
+         frame before Compose draws, so it has to be Palette's own background rather than the
+         framework white it would otherwise inherit. LightColors.background. -->
+    <style name="Theme.Taqwa" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#FBFAF7</item>
+    </style>
 </resources>

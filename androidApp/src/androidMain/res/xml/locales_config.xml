@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The two languages the app is written in. Android 13+ lists them under Settings › Apps ›
+     Taqwa › Language, so the app can be Arabic on an English phone without the app knowing. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="ar" />
+</locale-config>

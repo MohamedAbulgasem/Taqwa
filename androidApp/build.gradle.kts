@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -20,17 +22,50 @@ kotlin {
     }
 }
 
+// ── Store signing ─────────────────────────────────────────────────────────────────
+// The upload key lives outside the repository. `keystore.properties` at the repository root
+// (git-ignored; keystore.properties.example shows the shape) names it. When the file is absent
+// the release build is left unsigned, as before, so any machine can still build and a debug key
+// can sign a device copy by hand. scripts/release.sh builds the store artefacts.
+val keystoreProperties: Properties? = rootProject.file("keystore.properties")
+    .takeIf { it.isFile }
+    ?.let { file -> Properties().also { props -> file.inputStream().use { props.load(it) } } }
+
 android {
     namespace = "world.taqwa.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    signingConfigs {
+        keystoreProperties?.let { props ->
+            create("release") {
+                storeFile = rootProject.file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
+    }
+
+    // The app is written in English and Arabic; the other seventy-odd locales in the APK were
+    // AndroidX's own strings. The bundle keeps both languages on every phone because the app
+    // can be switched to Arabic on an English phone (locales_config.xml) and the widget labels
+    // must follow.
+    androidResources {
+        localeFilters += listOf("en", "ar")
+    }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
 
 
     defaultConfig {
         applicationId = "world.taqwa.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 18
-        versionName = "0.15.0"
+        versionCode = 19
+        versionName = "0.16.0"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -61,6 +96,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 }

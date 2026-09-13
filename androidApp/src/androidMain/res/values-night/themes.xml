@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Without this the light theme is the only one there is, and launching Taqwa on a dark
+         phone flashes a white window and a white splash before the first Compose frame.
+         DarkColors.background, matching the light theme's own windowBackground. -->
+    <style name="Theme.Taqwa" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#0B0D0C</item>
+    </style>
+</resources>
