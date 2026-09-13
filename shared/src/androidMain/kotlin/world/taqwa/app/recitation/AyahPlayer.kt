@@ -7,8 +7,9 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 
 /**
- * The queue seen as *ayahs*, for every control the app does not draw itself: the media
- * notification, the lock screen, a headset button, Bluetooth and Android Auto.
+ * The queue seen as *ayahs on the surah's clock*, for every control the app does not draw itself:
+ * the media notification, the lock screen, a headset button, Bluetooth and Android Auto — and,
+ * through the app's own `MediaController`, the player bar.
  *
  * The player underneath holds `[ayah, gap, ayah, gap, …]` (see [RecitationQueue]), and Media3's
  * own Previous and Next step one **item**. On a device that means the lock screen's Previous lands
@@ -16,27 +17,40 @@ import androidx.media3.common.util.UnstableApi
  * lock screen you cannot go back an ayah at all, while the app's own bar, which goes through
  * [RecitationQueue], does it in one press. This class is what makes those two the same button.
  *
- * It does three things and nothing else:
+ * It does four things and nothing else:
  *
  * 1. **Previous and Next are ayah moves**, decided by [RecitationQueue] itself rather than by a
  *    second copy of the rule — previous within the first two seconds of an ayah goes back one,
  *    later restarts the ayah, and a press during a gap restarts the ayah that just ended.
- * 2. **The gaps are invisible.** While one plays, the current item, position and duration reported
- *    are the ayah that just ended, so the notification neither blinks nor rewinds between ayahs.
- * 3. **Previous and Next are always offered** while there is a queue, exactly as the bar offers
+ * 2. **The gaps are invisible.** While one plays, the current item reported is the ayah that just
+ *    ended, so the notification neither blinks nor changes its title between ayahs.
+ * 3. **Position and duration are the surah's** (spec §14.1) while a [timeline] is set: the lock
+ *    screen's bar runs the length of the surah rather than restarting every few seconds, a scrub
+ *    on it lands on the start of the ayah under the thumb, and the app's bar reads the same clock
+ *    through its controller.
+ * 4. **Previous and Next are always offered** while there is a queue, exactly as the bar offers
  *    them: at the last ayah Next does nothing, which is what the bar does too.
  *
  * The queue is rebuilt from the timeline rather than passed in: the gap items name themselves
  * ([SILENCE_SCHEME]), the service is the only thing holding the player, and a copy of the queue
- * kept on this side would be one more thing that can fall out of step with the app's.
+ * kept on this side would be one more thing that can fall out of step with the app's. The clock
+ * *is* passed in, with the queue's text, because it is read off the container the app has just
+ * opened and the two sides must be reading the same one.
  */
 @UnstableApi
 class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
 
     /**
+     * The surah's clock, sent by the app before it sets the queue. Honoured only while it has one
+     * entry per item actually loaded ([clock]), so a clock from the last surah can never be read
+     * against this one's items in the frames between two loads.
+     */
+    var timeline: SurahTimeline? = null
+
+    /**
      * How long the ayah that is playing — or has just played — runs for. Held because a gap cannot
      * be asked for the duration of the item before it: the platform's clock during those 300 ms is
-     * the silence's own.
+     * the silence's own. Only read when there is no [timeline].
      */
     private var lastAyahDurationMs = 0L
 
@@ -59,15 +73,29 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
     override fun getCurrentMediaItem(): MediaItem? =
         if (onGap()) real.getMediaItemAt(ayahIndex()) else real.currentMediaItem
 
-    override fun getCurrentPosition(): Long = if (onGap()) lastAyahDurationMs else real.currentPosition
+    override fun getCurrentPosition(): Long =
+        onClock(real.currentPosition) { if (onGap()) lastAyahDurationMs else real.currentPosition }
 
-    override fun getContentPosition(): Long = if (onGap()) lastAyahDurationMs else real.contentPosition
+    override fun getContentPosition(): Long =
+        onClock(real.contentPosition) { if (onGap()) lastAyahDurationMs else real.contentPosition }
 
-    override fun getBufferedPosition(): Long = if (onGap()) lastAyahDurationMs else real.bufferedPosition
+    override fun getBufferedPosition(): Long =
+        onClock(real.bufferedPosition) { if (onGap()) lastAyahDurationMs else real.bufferedPosition }
 
-    override fun getDuration(): Long = if (onGap()) lastAyahDurationMs else real.duration
+    override fun getContentBufferedPosition(): Long =
+        onClock(real.contentBufferedPosition) { if (onGap()) lastAyahDurationMs else real.contentBufferedPosition }
 
-    override fun getContentDuration(): Long = if (onGap()) lastAyahDurationMs else real.contentDuration
+    override fun getDuration(): Long =
+        clock()?.totalMs ?: if (onGap()) lastAyahDurationMs else real.duration
+
+    override fun getContentDuration(): Long =
+        clock()?.totalMs ?: if (onGap()) lastAyahDurationMs else real.contentDuration
+
+    /** [itemPosition] on the surah's clock, or [fallback] when there is no clock to put it on. */
+    private inline fun onClock(itemPosition: Long, fallback: () -> Long): Long {
+        val clock = clock() ?: return fallback()
+        return clock.elapsed(real.currentMediaItemIndex, itemPosition)
+    }
 
     // ── what the session may ask for ────────────────────────────────────────────────────────
 
@@ -94,7 +122,7 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
 
     override fun hasPreviousMediaItem(): Boolean = queue() != null
 
-    // ── the two buttons ─────────────────────────────────────────────────────────────────────
+    // ── the buttons and the bar ─────────────────────────────────────────────────────────────
 
     override fun seekToPrevious() = previousAyah()
 
@@ -103,6 +131,27 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
     override fun seekToNext() = nextAyah()
 
     override fun seekToNextMediaItem() = nextAyah()
+
+    /** Rewind and fast-forward — a headset's long press, a car's dial — move by ayah too. A
+     * recitation has no fifteen seconds to skip that would not land inside a word. */
+    override fun seekBack() = previousAyah()
+
+    override fun seekForward() = nextAyah()
+
+    /**
+     * A scrub on the lock screen's bar, which is on the surah's clock: it lands on the start of
+     * the ayah under the thumb ([SurahTimeline.snapToAyah]), never inside one. Without a clock
+     * the position is the item's own, as the platform means it.
+     */
+    override fun seekTo(positionMs: Long) {
+        val clock = clock()
+        val queue = queue()
+        if (clock == null || queue == null) {
+            real.seekTo(positionMs)
+            return
+        }
+        real.seekTo(clock.snapToAyah(positionMs, queue::isGap), 0L)
+    }
 
     private fun previousAyah() {
         val queue = queue() ?: return
@@ -119,7 +168,7 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
         real.seekTo(target, 0L)
     }
 
-    // ── the queue, read off the timeline ────────────────────────────────────────────────────
+    // ── the queue and the clock, read off the timeline ──────────────────────────────────────
 
     /**
      * The same arithmetic the app's bar uses, over the same shape of queue. Only the count and
@@ -136,6 +185,12 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
             ayahs = (1..ayahs).toList(),
             gapMs = if (gapped) 1L else 0L,
         )
+    }
+
+    /** The clock, while it describes the queue that is actually loaded. */
+    private fun clock(): SurahTimeline? {
+        val count = real.mediaItemCount
+        return timeline?.takeIf { count > 0 && it.size == count }
     }
 
     private fun isGapItem(index: Int): Boolean =

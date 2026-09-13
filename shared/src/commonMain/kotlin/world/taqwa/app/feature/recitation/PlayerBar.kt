@@ -1,6 +1,7 @@
 package world.taqwa.app.feature.recitation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -33,18 +34,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.animation.core.animateFloatAsState
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
@@ -59,28 +64,56 @@ import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_ayah_n
 import world.taqwa.app.resources.recitation_a11y_close
-import world.taqwa.app.resources.recitation_back_to_ayah
 import world.taqwa.app.resources.recitation_a11y_next
 import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_a11y_previous
+import world.taqwa.app.resources.recitation_back_to_ayah
 import world.taqwa.app.resources.recitation_play
 
-/** The 44 dp the finger gets, whatever the eye is given inside it (spec §92). */
-private val Target = 44.dp
+/**
+ * The finger's share of previous, play and next (spec §14.2): 48 dp, up from 44, and the glyphs
+ * inside them up with it. The three sit shoulder to shoulder, and on the first phone round a
+ * thumb that meant Next was landing on Play.
+ */
+private val Target = 48.dp
+
+/** The dismiss cross, which should be the hardest of the four to hit by accident. */
+private val CloseTarget = 40.dp
+
+/** The accent disc under the play triangle, 40 dp inside its 48 dp target (was 34 in 44). */
+private val PlayDisc = 40.dp
+
+private val Monogram = 40.dp
+
+/** The monogram's box, with room for the incoming-voice ring around it. */
+private val MonogramBox = 46.dp
+
+/** The clock row: elapsed, the line, the total. */
+private val ClockRow = 19.dp
+
+/** The transport row: monogram, surah, the four buttons. */
+private val TransportRow = 56.dp
 
 /** How far the bar must be dragged down before it counts as a dismissal rather than a fumble. */
 private val DismissDrag = 36.dp
 
+/** A surah that runs an hour or more shows both its clocks as h:mm:ss. */
+private const val HOUR_MS = 3_600_000L
+
 /**
- * The player bar (spec §5.3): a 56 dp strip on the card surface with a hairline top edge and a
- * 2 dp accent line running along that edge to say how far through the surah the voice is.
+ * The player bar (spec §5.3, §14.2): a hairline over the card surface, then the surah's clock —
+ * elapsed, a 3 dp line, total, the way every music player draws a track — then a 56 dp transport
+ * row. The whole thing is [PlayerBarHeight], which the reader and the Mushaf keep clear.
+ *
+ * The clock is the surah's, not the ayah's ([SurahTimeline]): "12:31" of "2:05:10" through
+ * Al-Baqarah, moving at the speed of the recitation, gaps and all. A line that filled and emptied
+ * every few seconds said nothing a listener could use.
  *
  * [surahName] is resolved by the caller — Arabic under an Arabic UI, Latin otherwise, as the
  * reader header does — because only the caller has the surah's row from the database.
  *
  * It is an overlay in the tab scaffold rather than part of any screen, so it survives the walk
- * from the reader to the Mushaf to the surah list; the reader and the Mushaf keep
- * [PlayerBarHeight] of space clear at their foot so it never covers the last ayah.
+ * from the reader to the Mushaf to the surah list.
  */
 @Composable
 fun PlayerBar(
@@ -98,9 +131,13 @@ fun PlayerBar(
     val arabic = isRtlLocale()
     val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
     val dismissPx = with(LocalDensity.current) { DismissDrag.toPx() }
-    // The line eases to each new position rather than stepping: an ayah boundary moves it by a
-    // whole notch, and a bar that jumped would read as a glitch rather than as progress.
+    // The line eases to each new position rather than stepping: a seek moves it by a whole
+    // stretch, and a bar that jumped would read as a glitch rather than as progress.
     val fraction by animateFloatAsState(bar.fraction, tween(400), label = "recitationProgress")
+    val hasClock = bar.durationMs > 0L
+    val hours = bar.durationMs >= HOUR_MS
+    val elapsed = if (hasClock) formatClock(bar.positionMs, hours, format::localizedDigits) else ""
+    val total = if (hasClock) formatClock(bar.durationMs, hours, format::localizedDigits) else ""
 
     Column(
         modifier
@@ -126,18 +163,39 @@ fun PlayerBar(
                 }
             },
     ) {
-        Box(Modifier.fillMaxWidth().height(2.dp).background(colors.hairline)) {
+        Box(Modifier.fillMaxWidth().height(1.dp).background(colors.hairline))
+        Row(
+            Modifier
+                .contentWidth()
+                .height(ClockRow)
+                .padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Clock(elapsed)
+            // Start-aligned inside its box, so the line fills from the reading edge — the right
+            // one under an Arabic UI, where the elapsed clock sits too.
             Box(
                 Modifier
-                    .fillMaxWidth(fraction.coerceIn(0f, 1f))
-                    .height(2.dp)
-                    .background(colors.accent),
-            )
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
+                    .height(3.dp)
+                    .clip(CircleShape)
+                    .background(colors.hairline),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                        .height(3.dp)
+                        .background(colors.accent),
+                )
+            }
+            Clock(total)
         }
         Row(
             Modifier
                 .contentWidth()
-                .height(PlayerBarHeight)
+                .height(TransportRow)
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -151,8 +209,11 @@ fun PlayerBar(
                     ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                ReciterMonogram(bar.reciter, 40.dp)
-                Column(Modifier.padding(horizontal = 10.dp)) {
+                Box(Modifier.size(MonogramBox), contentAlignment = Alignment.Center) {
+                    ReciterMonogram(bar.reciter, Monogram)
+                    bar.incoming?.let { IncomingRing(it) }
+                }
+                Column(Modifier.padding(start = 8.dp, end = 6.dp)) {
                     if (arabic) {
                         Text(
                             surahName,
@@ -160,6 +221,7 @@ fun PlayerBar(
                             fontSize = 17.sp,
                             color = colors.textPrimary,
                             maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     } else {
                         Text(
@@ -167,6 +229,7 @@ fun PlayerBar(
                             style = TaqwaText.rowLabel.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold),
                             color = colors.textPrimary,
                             maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                     Text(
@@ -182,23 +245,68 @@ fun PlayerBar(
             TransportButton(
                 description = stringResource(Res.string.recitation_a11y_previous),
                 onClick = onPrevious,
-            ) { tint -> Canvas(Modifier.size(18.dp)) { drawSkip(tint, forward = !forward) } }
+            ) { tint -> Canvas(Modifier.size(22.dp)) { drawSkip(tint, forward = !forward) } }
             PlayPauseDisc(playing = bar.playing, onClick = onToggle)
             TransportButton(
                 description = stringResource(Res.string.recitation_a11y_next),
                 onClick = onNext,
-            ) { tint -> Canvas(Modifier.size(18.dp)) { drawSkip(tint, forward = forward) } }
+            ) { tint -> Canvas(Modifier.size(22.dp)) { drawSkip(tint, forward = forward) } }
             TransportButton(
                 description = stringResource(Res.string.recitation_a11y_close),
                 onClick = onDismiss,
-                size = 36.dp,
-            ) { tint -> Canvas(Modifier.size(15.dp)) { drawClose(tint) } }
+                size = CloseTarget,
+            ) { tint -> Canvas(Modifier.size(16.dp)) { drawClose(tint) } }
         }
     }
 }
 
-/** The 34 dp accent disc at the middle of the transport (spec §5.3), with 44 dp of finger around
- * it. Playing draws two bars; stopped, the triangle. */
+/** One of the two clocks: small, secondary, and in tabular figures so it does not breathe. */
+@Composable
+private fun Clock(text: String) {
+    Text(
+        text,
+        style = TaqwaText.caption.copy(fontSize = 11.sp, fontFeatureSettings = "tnum"),
+        color = LocalTaqwaColors.current.textSecondary,
+        maxLines = 1,
+    )
+}
+
+/**
+ * The chosen voice's copy of this surah arriving, drawn around the voice being heard (spec
+ * §14.3): the header button's own 2 dp ring, at the monogram's size. It says "something is on
+ * its way" without a word, and goes when the voice changes.
+ */
+@Composable
+private fun IncomingRing(fraction: Float) {
+    val colors = LocalTaqwaColors.current
+    val eased by animateFloatAsState(fraction.coerceIn(0f, 1f), tween(400), label = "incomingVoice")
+    Canvas(Modifier.size(MonogramBox)) {
+        val stroke = 2.dp.toPx()
+        val inset = stroke / 2f
+        val arc = Size(size.width - stroke, size.height - stroke)
+        drawArc(
+            color = colors.hairline,
+            startAngle = -90f,
+            sweepAngle = 360f,
+            useCenter = false,
+            topLeft = Offset(inset, inset),
+            size = arc,
+            style = Stroke(width = stroke, cap = StrokeCap.Round),
+        )
+        drawArc(
+            color = colors.accent,
+            startAngle = -90f,
+            sweepAngle = 360f * eased,
+            useCenter = false,
+            topLeft = Offset(inset, inset),
+            size = arc,
+            style = Stroke(width = stroke, cap = StrokeCap.Round),
+        )
+    }
+}
+
+/** The 40 dp accent disc at the middle of the transport (spec §5.3, §14.2), with 48 dp of finger
+ * around it. Playing draws two bars; stopped, the triangle. */
 @Composable
 private fun PlayPauseDisc(playing: Boolean, onClick: () -> Unit) {
     val colors = LocalTaqwaColors.current
@@ -215,8 +323,8 @@ private fun PlayPauseDisc(playing: Boolean, onClick: () -> Unit) {
             .semantics { contentDescription = label },
         contentAlignment = Alignment.Center,
     ) {
-        Box(Modifier.size(34.dp).background(colors.accent, CircleShape), contentAlignment = Alignment.Center) {
-            Canvas(Modifier.size(15.dp)) {
+        Box(Modifier.size(PlayDisc).background(colors.accent, CircleShape), contentAlignment = Alignment.Center) {
+            Canvas(Modifier.size(17.dp)) {
                 if (playing) drawPause(colors.surface) else drawPlayTriangle(colors.surface)
             }
         }

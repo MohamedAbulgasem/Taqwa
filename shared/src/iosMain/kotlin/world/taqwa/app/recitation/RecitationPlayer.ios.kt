@@ -50,6 +50,7 @@ import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
+import platform.MediaPlayer.MPChangePlaybackPositionCommandEvent
 import platform.MediaPlayer.MPMediaItemArtwork
 import platform.MediaPlayer.MPMediaItemPropertyArtist
 import platform.MediaPlayer.MPMediaItemPropertyArtwork
@@ -62,6 +63,7 @@ import platform.MediaPlayer.MPRemoteCommandCenter
 import platform.MediaPlayer.MPRemoteCommandHandlerStatusSuccess
 import platform.UIKit.UIImage
 import platform.darwin.NSObjectProtocol
+import kotlin.time.TimeSource
 
 /**
  * Recitation on iOS (spec §6): one `AVPlayer` driven through a queue this class keeps itself,
@@ -93,6 +95,9 @@ actual class RecitationPlayer actual constructor(
 
     private var player: AVPlayer? = null
     private var queue: RecitationQueue? = null
+
+    /** The surah's clock (spec §14.1), read off the container at [load]; see [SurahTimeline]. */
+    private var timeline: SurahTimeline? = null
     private var files: Map<Int, String> = emptyMap()
     private var reciterId: String? = null
     private var text: NowPlayingText? = null
@@ -120,6 +125,18 @@ actual class RecitationPlayer actual constructor(
     private var ayahPositionMs = 0L
     private var ayahDurationMs = 0L
 
+    /**
+     * How far into the gap the wait has got. The gap is a `delay`, not an item with a clock, so
+     * the surah's clock keeps moving through it by reading a monotonic mark taken when the wait
+     * began; a pause inside the gap freezes what had elapsed and a play starts the wait again.
+     */
+    private var gapStarted: TimeSource.Monotonic.ValueTimeMark? = null
+    private var gapElapsedMs = 0L
+
+    /** The last surah-clock pair published, for the lock screen's bar. */
+    private var surahPositionMs = 0L
+    private var surahDurationMs = 0L
+
     /** Set when an interruption paused us, so playback only resumes if it was our pause. */
     private var pausedByInterruption = false
 
@@ -131,15 +148,17 @@ actual class RecitationPlayer actual constructor(
         val split = withContext(Dispatchers.Default) {
             runCatching { split(reciter.id, surah, file) }.getOrNull()
         } ?: return
-        if (split.isEmpty()) return
+        if (split.files.isEmpty()) return
         val built = RecitationQueue(
             surah = surah,
-            ayahs = split.keys.sorted(),
+            ayahs = split.files.keys.sorted(),
             gapMs = reciter.gapMs.toLong(),
         )
+        val clock = SurahTimeline.of(built) { split.durationsMs[it] ?: 0L }
         withContext(Dispatchers.Main) {
             queue = built
-            files = split
+            timeline = clock
+            files = split.files
             reciterId = reciter.id
             this@RecitationPlayer.text = text
             ayahPositionMs = 0L
@@ -171,6 +190,10 @@ actual class RecitationPlayer actual constructor(
         wantsPlay = false
         gapJob?.cancel()
         gapJob = null
+        // Freeze the gap's clock where it is; `play` restarts the whole wait, which is a fraction
+        // of a second nobody will hear twice.
+        gapElapsedMs = gapElapsedNow()
+        gapStarted = null
         player?.pause()
         publish()
     }
@@ -203,6 +226,11 @@ actual class RecitationPlayer actual constructor(
         player?.pause()
         player?.replaceCurrentItemWithPlayerItem(null)
         queue = null
+        timeline = null
+        gapStarted = null
+        gapElapsedMs = 0L
+        surahPositionMs = 0L
+        surahDurationMs = 0L
         files = emptyMap()
         reciterId = null
         text = null
@@ -237,6 +265,8 @@ actual class RecitationPlayer actual constructor(
         if (built.isGap(at)) {
             player?.pause()
             ayahPositionMs = ayahDurationMs
+            gapElapsedMs = 0L
+            gapStarted = if (wantsPlay) TimeSource.Monotonic.markNow() else null
             publish()
             if (wantsPlay) {
                 gapJob = scope.launch {
@@ -250,6 +280,8 @@ actual class RecitationPlayer actual constructor(
         val path = files[built.ayahAt(at)] ?: return
         ayahPositionMs = 0L
         ayahDurationMs = 0L
+        gapStarted = null
+        gapElapsedMs = 0L
         val item = AVPlayerItem(uRL = NSURL.fileURLWithPath(path))
         observeEndOf(item)
         player?.replaceCurrentItemWithPlayerItem(item)
@@ -281,13 +313,16 @@ actual class RecitationPlayer actual constructor(
 
     // ---- the container ----------------------------------------------------------------------
 
+    /** What [split] hands back: the per-ayah files, and each ayah's length off the container. */
+    private class Split(val files: Map<Int, String>, val durationsMs: Map<Int, Long>)
+
     /**
      * Splits the surah's container into `Library/Caches/recitation/<reciter>/<surah>/<n>.mp3`,
      * reusing any file already there whose size is the one the index publishes. The bytes written
      * are the corpus's own MP3s, untouched — the licence forbids re-encoding and nothing here
      * decodes anything.
      */
-    private fun split(reciterId: String, surah: Int, container: Path): Map<Int, String> {
+    private fun split(reciterId: String, surah: Int, container: Path): Split {
         val fs = FileSystem.SYSTEM
         val taqa = TaqaFile(container, fs)
         val index = taqa.index()
@@ -302,7 +337,7 @@ actual class RecitationPlayer actual constructor(
             }
             written[ayah.n] = out.toString()
         }
-        return written
+        return Split(written, taqa.ayahDurationsMs())
     }
 
     private fun cachesRoot(): Path {
@@ -420,10 +455,16 @@ actual class RecitationPlayer actual constructor(
             previous()
             MPRemoteCommandHandlerStatusSuccess
         }
-        // An ayah is 5 to 30 seconds; scrubbing inside one, or skipping fifteen seconds of it, is
-        // not a thing anybody wants to do to a recitation. Previous and next move by ayah instead.
+        // The lock screen's bar is on the surah's clock (spec §14.1), so a scrub on it means
+        // something: it lands on the start of the ayah under the thumb, never inside one.
+        centre.changePlaybackPositionCommand.addTargetWithHandler { event ->
+            val seconds = (event as? MPChangePlaybackPositionCommandEvent)?.positionTime
+            if (seconds != null) seekToSurahTime((seconds * 1000.0).toLong())
+            MPRemoteCommandHandlerStatusSuccess
+        }
+        // Skipping fifteen seconds of a recitation lands inside a word. Previous and next move by
+        // ayah instead, and the bar moves by ayah too.
         listOf(
-            centre.changePlaybackPositionCommand,
             centre.seekForwardCommand,
             centre.seekBackwardCommand,
             centre.skipForwardCommand,
@@ -435,7 +476,15 @@ actual class RecitationPlayer actual constructor(
             centre.togglePlayPauseCommand,
             centre.nextTrackCommand,
             centre.previousTrackCommand,
+            centre.changePlaybackPositionCommand,
         ).forEach { it.enabled = true }
+    }
+
+    /** A seek on the surah's clock: the start of the ayah that holds that moment. */
+    private fun seekToSurahTime(ms: Long) {
+        val built = queue ?: return
+        val clock = timeline ?: return
+        go(clock.snapToAyah(ms, built::isGap))
     }
 
     private fun unwireCommands() {
@@ -448,6 +497,7 @@ actual class RecitationPlayer actual constructor(
             centre.togglePlayPauseCommand,
             centre.nextTrackCommand,
             centre.previousTrackCommand,
+            centre.changePlaybackPositionCommand,
         ).forEach {
             it.removeTarget(null)
             it.enabled = false
@@ -459,8 +509,10 @@ actual class RecitationPlayer actual constructor(
         val info = mutableMapOf<Any?, Any?>(
             MPMediaItemPropertyTitle to label.title,
             MPMediaItemPropertyArtist to label.subtitle,
-            MPMediaItemPropertyPlaybackDuration to ayahDurationMs / 1000.0,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime to ayahPositionMs / 1000.0,
+            // The surah's clock, not the ayah's: a lock-screen bar that ran five seconds and
+            // started again was the one thing on that screen that did not look like a player.
+            MPMediaItemPropertyPlaybackDuration to surahDurationMs / 1000.0,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime to surahPositionMs / 1000.0,
             MPNowPlayingInfoPropertyPlaybackRate to if (wantsPlay) 1.0 else 0.0,
         )
         artwork()?.let { info[MPMediaItemPropertyArtwork] = it }
@@ -502,6 +554,11 @@ actual class RecitationPlayer actual constructor(
         } else {
             ayahPositionMs = ayahDurationMs
         }
+        val clock = timeline
+        if (clock != null) {
+            surahPositionMs = clock.elapsed(at, if (gap) gapElapsedNow() else ayahPositionMs)
+            surahDurationMs = clock.totalMs
+        }
         _state.value = PlaybackState(
             reciterId = reciterId,
             surah = built.surah,
@@ -511,9 +568,15 @@ actual class RecitationPlayer actual constructor(
             durationMs = ayahDurationMs,
             playing = wantsPlay,
             buffering = false,
+            surahPositionMs = surahPositionMs,
+            surahDurationMs = surahDurationMs,
         )
         nowPlaying()
     }
+
+    /** How far into the current gap the wait has got, frozen or running. */
+    private fun gapElapsedNow(): Long =
+        gapElapsedMs + (gapStarted?.elapsedNow()?.inWholeMilliseconds ?: 0L)
 
     private companion object {
         const val POLL_MS = 250L

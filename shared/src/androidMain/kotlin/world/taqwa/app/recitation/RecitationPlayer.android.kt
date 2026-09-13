@@ -28,6 +28,7 @@ import okio.FileSystem
 import world.taqwa.app.settings.appContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.math.abs
 
 /**
  * The app's side of [RecitationService]: a `MediaController` bound lazily, and a [PlaybackState]
@@ -49,6 +50,14 @@ actual class RecitationPlayer actual constructor(
     private var connecting: ListenableFuture<MediaController>? = null
     private var controller: MediaController? = null
     private var queue: RecitationQueue? = null
+
+    /**
+     * The surah's clock (spec §14.1), read off the container at [load] and sent to the service
+     * with the queue's text, so both ends are on one clock. Everything the session then reports
+     * — position, duration, buffered position — is on it (see [AyahPlayer]), and the ayah-level
+     * numbers the bar's previous button needs are derived back from it here.
+     */
+    private var timeline: SurahTimeline? = null
     private var reciterId: String? = null
     private var ticker: Job? = null
 
@@ -93,15 +102,20 @@ actual class RecitationPlayer actual constructor(
     private val live: MediaController? get() = controller?.takeIf { it.isConnected }
 
     actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) {
-        val index = withContext(Dispatchers.IO) {
-            runCatching { TaqaFile(library.fileFor(reciter.id, surah), FileSystem.SYSTEM).index() }
-                .getOrNull()
+        val opened = withContext(Dispatchers.IO) {
+            runCatching {
+                val taqa = TaqaFile(library.fileFor(reciter.id, surah), FileSystem.SYSTEM)
+                taqa.index() to taqa.ayahDurationsMs()
+            }.getOrNull()
         } ?: return
+        val (index, durations) = opened
         val built = RecitationQueue.of(index, reciter.gapMs.toLong())
+        val clock = SurahTimeline.of(built) { durations[it] ?: 0L }
         val startIndex = built.indexOfAyah(startAyah) ?: 0
         val bound = runCatching { connect() }.getOrNull() ?: return
 
         queue = built
+        timeline = clock
         reciterId = reciter.id
         ayahPositionMs = 0L
         ayahDurationMs = 0L
@@ -112,6 +126,7 @@ actual class RecitationPlayer actual constructor(
             Bundle().apply {
                 putString(RecitationService.ARG_TITLE, text.title)
                 putString(RecitationService.ARG_SUBTITLE, text.subtitle)
+                putLongArray(RecitationService.ARG_TIMELINE, clock.itemsMs.toLongArray())
             },
         )
         bound.setMediaItems(built.items.map { item(reciter.id, surah, it) }, startIndex, 0L)
@@ -149,7 +164,22 @@ actual class RecitationPlayer actual constructor(
         val bound = live ?: return
         val built = queue ?: return
         val at = bound.currentMediaItemIndex
-        bound.seekTo(built.previous(at, if (built.isGap(at)) 0L else bound.currentPosition), 0L)
+        bound.seekTo(built.previous(at, if (built.isGap(at)) 0L else withinAyah(bound, built, at)), 0L)
+    }
+
+    /**
+     * True when the session is reporting the surah's clock rather than the item's — which it
+     * does whenever [AyahPlayer] holds a clock that matches its queue. Asked rather than assumed:
+     * a duration that is the whole surah's is the one thing the two cannot be confused on.
+     */
+    private fun onSurahClock(bound: MediaController, clock: SurahTimeline): Boolean =
+        bound.duration != C.TIME_UNSET && abs(bound.duration - clock.totalMs) <= CLOCK_TOLERANCE_MS
+
+    /** The position inside the ayah at [at], whichever clock the session is on. */
+    private fun withinAyah(bound: MediaController, built: RecitationQueue, at: Int): Long {
+        val position = bound.currentPosition.coerceAtLeast(0L)
+        val clock = timeline?.takeIf { it.size == built.size } ?: return position
+        return if (onSurahClock(bound, clock)) (position - clock.startOf(at)).coerceAtLeast(0L) else position
     }
 
     actual fun stop() {
@@ -157,6 +187,7 @@ actual class RecitationPlayer actual constructor(
         ticker = null
         ending = false
         queue = null
+        timeline = null
         reciterId = null
         live?.let { bound ->
             bound.stop()
@@ -231,7 +262,24 @@ actual class RecitationPlayer actual constructor(
         }
         val at = bound.currentMediaItemIndex
         val gap = built.isGap(at)
-        if (!gap) {
+        val clock = timeline?.takeIf { it.size == built.size }
+        var surahPositionMs = 0L
+        var surahDurationMs = 0L
+        if (clock != null) {
+            // The session is on the surah's clock (spec §14.1): the ayah-level pair the bar's
+            // previous button still needs is read back off it. While the gap after an ayah plays
+            // the clock is inside the gap's slot, which puts the position at the ayah's end —
+            // the line of an ayah that has just been read stays full, as it always did.
+            val reported = bound.currentPosition.coerceAtLeast(0L)
+            surahPositionMs = if (onSurahClock(bound, clock)) {
+                reported.coerceAtMost(clock.totalMs)
+            } else {
+                clock.elapsed(at, reported)
+            }
+            surahDurationMs = clock.totalMs
+            ayahDurationMs = clock.durationOf(at)
+            ayahPositionMs = (surahPositionMs - clock.startOf(at)).coerceIn(0L, ayahDurationMs)
+        } else if (!gap) {
             ayahPositionMs = bound.currentPosition.coerceAtLeast(0L)
             ayahDurationMs = bound.duration.takeIf { it != C.TIME_UNSET }?.coerceAtLeast(0L)
                 ?: ayahDurationMs
@@ -249,6 +297,8 @@ actual class RecitationPlayer actual constructor(
                 bound.playbackState != Player.STATE_IDLE &&
                 bound.playbackState != Player.STATE_ENDED,
             buffering = bound.playbackState == Player.STATE_BUFFERING,
+            surahPositionMs = surahPositionMs,
+            surahDurationMs = surahDurationMs,
         )
         if (bound.isPlaying) startTicker() else stopTicker()
     }
@@ -292,5 +342,8 @@ actual class RecitationPlayer actual constructor(
     private companion object {
         /** Fine enough for a progress line at 60 Hz-ish and cheap enough to run in the app. */
         const val POLL_MS = 250L
+
+        /** How far the session's duration may sit from the clock's total and still be the clock. */
+        const val CLOCK_TOLERANCE_MS = 1_000L
     }
 }

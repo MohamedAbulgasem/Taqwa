@@ -66,9 +66,9 @@ interface RecitationSettingsPort {
     suspend fun setDownloadOnMobileData(value: Boolean)
 }
 
-/** The picker's fifteen-second audition. */
+/** The picker's fifteen-second audition. [onEnd] fires when the clip plays out, not on [stop]. */
 interface ClipPort {
-    fun play(bytes: ByteArray)
+    fun play(bytes: ByteArray, onEnd: () -> Unit)
     fun stop()
 }
 
@@ -100,7 +100,7 @@ fun SettingsRepository.asRecitationPort(): RecitationSettingsPort = object : Rec
 }
 
 fun ClipPlayer.asPort(): ClipPort = object : ClipPort {
-    override fun play(bytes: ByteArray) = this@asPort.play(bytes)
+    override fun play(bytes: ByteArray, onEnd: () -> Unit) = this@asPort.play(bytes, onEnd)
     override fun stop() = this@asPort.stop()
 }
 

@@ -40,6 +40,9 @@ class RecitationService : MediaSessionService() {
 
     private var session: MediaSession? = null
 
+    /** The session's player, kept so the app's clock can be handed to it (see [AyahPlayer.timeline]). */
+    private var ayahPlayer: AyahPlayer? = null
+
     /**
      * The two lines the notification shows, set by the app just before it sets the queue.
      *
@@ -113,7 +116,9 @@ class RecitationService : MediaSessionService() {
         // Media3's own Previous and Next step one item — which from the lock screen means stepping
         // onto a 300 ms silence instead of going back an ayah. [AyahPlayer] is the same
         // `RecitationQueue` rule the app's own bar uses, applied to everything outside the app.
-        session = MediaSession.Builder(this, AyahPlayer(player)).setCallback(Callback()).build()
+        val wrapped = AyahPlayer(player)
+        ayahPlayer = wrapped
+        session = MediaSession.Builder(this, wrapped).setCallback(Callback()).build()
         // Media3's own default small icon is a generic music note. The status bar should say
         // Taqwa, and the mark the prayer notifications already use is the one it should say it
         // with; `:androidApp` puts the id there in `TaqwaApplication.onCreate`.
@@ -165,6 +170,7 @@ class RecitationService : MediaSessionService() {
             release()
         }
         session = null
+        ayahPlayer = null
     }
 
     private inner class Callback : MediaSession.Callback {
@@ -192,6 +198,12 @@ class RecitationService : MediaSessionService() {
                     title = args.getString(ARG_TITLE).orEmpty(),
                     subtitle = args.getString(ARG_SUBTITLE).orEmpty(),
                 )
+                // The surah's clock (spec §14.1), one entry per queue item, gaps included. It
+                // arrives before the queue it describes and is only read once the item count
+                // matches, which the wrapper checks on every call.
+                ayahPlayer?.timeline = args.getLongArray(ARG_TIMELINE)
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { SurahTimeline(it.toList()) }
                 return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }
             return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
@@ -234,6 +246,9 @@ class RecitationService : MediaSessionService() {
         const val COMMAND_NOW_PLAYING = "world.taqwa.app.recitation.NOW_PLAYING"
         const val ARG_TITLE = "title"
         const val ARG_SUBTITLE = "subtitle"
+
+        /** A `LongArray` of every queue item's length in ms: [SurahTimeline.itemsMs]. */
+        const val ARG_TIMELINE = "timeline"
     }
 }
 

@@ -15,8 +15,12 @@ package world.taqwa.app.audio
  */
 expect class ClipPlayer() {
 
-    /** Plays [bytes] from the start, stopping whatever this player was playing. MP3. */
-    fun play(bytes: ByteArray)
+    /**
+     * Plays [bytes] from the start, stopping whatever this player was playing. MP3. [onEnd] is
+     * called once, on the main thread, when the clip plays out by itself — not when [stop] cuts
+     * it — so the picker can hand the audio back to a recitation it paused for the audition.
+     */
+    fun play(bytes: ByteArray, onEnd: () -> Unit = {})
 
     fun stop()
 }

@@ -52,6 +52,8 @@ import world.taqwa.app.resources.recitation_keep_reading
 import world.taqwa.app.resources.recitation_over_wifi
 import world.taqwa.app.resources.recitation_retry
 import world.taqwa.app.resources.recitation_settings_whole_quran
+import world.taqwa.app.resources.recitation_switch_ready
+import world.taqwa.app.resources.recitation_switch_running
 import world.taqwa.app.resources.recitation_use_mobile_once
 import world.taqwa.app.resources.recitation_waiting_connection
 
@@ -102,7 +104,7 @@ fun DownloadSheet(
                 onConfirm = { allow -> lastWasWholeQuran = false; onConfirm(allow) },
                 onWholeQuran = { allow -> lastWasWholeQuran = true; onWholeQuran(allow) },
             )
-            is SheetPhase.Downloading -> Running(phase, onCancel)
+            is SheetPhase.Downloading -> Running(sheet, phase, onCancel)
             is SheetPhase.Failed -> Failed(
                 phase = phase,
                 onRetry = onRetry,
@@ -182,6 +184,16 @@ private fun Ready(
                 .padding(top = 14.dp),
         )
     }
+    // The reader picked this voice from the bar while another was reciting the surah (spec
+    // §14.3): say what happens in the meantime, because nothing else on the sheet does.
+    sheet.playingMeanwhile?.let { meanwhile ->
+        Text(
+            stringResource(Res.string.recitation_switch_ready, reciterName(meanwhile)),
+            style = TaqwaText.caption,
+            color = colors.textSecondary,
+            modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
+        )
+    }
     // The quieter second button (spec §5.4): the same voice, all 114. Only ever the Offer face —
     // a batch already running has this surah in it, so the sheet is showing its progress bar
     // instead, and a reciter whose Quran is complete has nothing to offer.
@@ -194,7 +206,7 @@ private fun Ready(
 }
 
 @Composable
-private fun Running(phase: SheetPhase.Downloading, onCancel: () -> Unit) {
+private fun Running(sheet: DownloadSheetState, phase: SheetPhase.Downloading, onCancel: () -> Unit) {
     val colors = LocalTaqwaColors.current
     // A download that has been accepted and has not moved a byte in twenty seconds is a download
     // waiting for something — a network, most of the time — and saying "playback starts as soon
@@ -236,10 +248,19 @@ private fun Running(phase: SheetPhase.Downloading, onCancel: () -> Unit) {
             color = colors.textPrimary,
         )
     }
+    val meanwhile = sheet.playingMeanwhile
     Text(
-        stringResource(
-            if (waiting) Res.string.recitation_waiting_connection else Res.string.recitation_keep_reading,
-        ),
+        when {
+            waiting -> stringResource(Res.string.recitation_waiting_connection)
+            // A switch (spec §14.3): the old voice is still going, and the sentence says which
+            // voice takes over rather than promising a start "from the ayah you chose".
+            meanwhile != null -> stringResource(
+                Res.string.recitation_switch_running,
+                reciterName(meanwhile),
+                reciterName(sheet.reciter),
+            )
+            else -> stringResource(Res.string.recitation_keep_reading)
+        },
         style = TaqwaText.caption,
         color = colors.textSecondary,
         modifier = Modifier.fillMaxWidth().padding(top = 14.dp),

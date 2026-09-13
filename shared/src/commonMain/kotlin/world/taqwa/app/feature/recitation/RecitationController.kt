@@ -98,7 +98,25 @@ class RecitationController(
     /** The surah [fraction] was measured in, so a new surah's line starts at nothing. */
     private var fractionSurah: Int? = null
 
-    private data class PendingPlay(val reciterId: String, val surah: Int, val ayah: Int)
+    /**
+     * [follow] is spec §14.3's switch: the surah was being recited by another voice when the
+     * download was asked for, so when it lands the new voice starts at the ayah being *heard
+     * then*, not the one on screen when the sheet opened.
+     */
+    private data class PendingPlay(
+        val reciterId: String,
+        val surah: Int,
+        val ayah: Int,
+        val follow: Boolean = false,
+    )
+
+    /**
+     * True while a preview is playing over a recitation this controller paused for it (spec
+     * §14.5). The recitation is given back when the clip ends, when the picker closes, or when
+     * a pick leaves the old voice playing — and not when the reader has already pressed play
+     * themselves, which is the one case the flag has to be cleared without acting on.
+     */
+    private var pausedForPreview = false
 
     /** The current reciter: what the reader chose, or the catalogue's first voice if that id has
      * been withdrawn from the manifest since it was chosen. */
@@ -177,7 +195,7 @@ class RecitationController(
     )
 
     private fun assemble(catalogue: Catalogue, playing: Playing, surface: Surface): RecitationState {
-        val bar = barOf(playing, catalogue.manifest)
+        val bar = barOf(playing, catalogue)
         val sheet = surface.sheetSurah?.let { surah ->
             val voice = catalogue.reciter ?: return@let null
             val total = voice.surah(surah)?.bytes ?: 0L
@@ -190,6 +208,7 @@ class RecitationController(
                     surface.downloadOnMobileData,
                     total,
                 ),
+                playingMeanwhile = bar?.takeIf { it.surah == surah && it.reciter.id != voice.id }?.reciter,
             )
         }
         return RecitationState(
@@ -217,12 +236,14 @@ class RecitationController(
      * The bar, or null when there is nothing to show one for. The reciter comes from the
      * *playback*, not from the setting: picking a voice the current surah is not downloaded for
      * leaves the old one playing (see [pickReciter]), and the bar must name the voice being heard.
+     * The setting's voice appears only as [BarState.incoming], while its copy of the surah is on
+     * its way.
      */
-    private fun barOf(playing: Playing, catalogue: RecitationManifest?): BarState? {
+    private fun barOf(playing: Playing, catalogue: Catalogue): BarState? {
         val playback = playing.playback
         val surah = playback.surah
         val ayah = playback.ayah
-        val voice = playback.reciterId?.let { catalogue?.reciter(it) }
+        val voice = playback.reciterId?.let { catalogue.manifest?.reciter(it) }
         if (surah == null || ayah == null || voice == null) {
             fraction = 0f
             fractionSurah = null
@@ -237,6 +258,10 @@ class RecitationController(
             fractionSurah = surah
         }
         fraction = barFraction(playback, fraction)
+        val chosen = catalogue.reciter
+        val incoming = chosen?.takeIf { it.id != voice.id }?.let { next ->
+            downloadFraction(playing.downloads[DownloadKey(next.id, surah)])
+        }
         return BarState(
             reciter = voice,
             surah = surah,
@@ -245,6 +270,9 @@ class RecitationController(
             fraction = fraction,
             playing = playback.playing,
             buffering = playback.buffering || playing.loading,
+            positionMs = playback.surahPositionMs,
+            durationMs = playback.surahDurationMs,
+            incoming = incoming,
         )
     }
 
@@ -282,7 +310,12 @@ class RecitationController(
                 if (waiting.surah !in owned) return@collect
                 pending = null
                 sheetSurah.value = null
-                start(waiting.surah, waiting.ayah)
+                // A switch (spec §14.3) picks up where the old voice has got to, and in the state
+                // the listener left it: a surah they had paused does not start reading itself
+                // out in a new voice because a download finished.
+                val live = player.state.value.takeIf { waiting.follow && it.surah == waiting.surah }
+                start(waiting.surah, live?.ayah ?: waiting.ayah)
+                if (live != null && !live.playing) player.pause()
             }
         }
     }
@@ -324,7 +357,8 @@ class RecitationController(
     fun confirmDownload(allowMobileOnce: Boolean) {
         val surah = sheetSurah.value ?: return
         val voice = reciter.value ?: return
-        pending = PendingPlay(voice.id, surah, sheetAyah)
+        // Another voice reciting this surah right now is what makes this a switch (spec §14.3).
+        pending = PendingPlay(voice.id, surah, sheetAyah, follow = player.state.value.surah == surah)
         downloader.enqueue(DownloadKey(voice.id, surah), allowMobileOnce)
     }
 
@@ -422,10 +456,15 @@ class RecitationController(
 
     fun closePicker() {
         picker.value = false
-        stopPreview()
+        endPreview()
     }
 
-    fun toggle() = player.toggle()
+    /** The bar's play/pause. A preview playing over a paused recitation ends first, and does not
+     * resume anything itself: the reader's own press is the resume. */
+    fun toggle() {
+        if (previewing.value != null) endPreview(resume = false)
+        player.toggle()
+    }
 
     fun next() = player.next()
 
@@ -443,41 +482,70 @@ class RecitationController(
     fun dismissBar() = stop()
 
     /**
-     * A new voice (spec §5.5). Persisted first, so the choice survives whatever happens next.
+     * A new voice (spec §5.5, §14.3, §14.4). Persisted first, so the choice survives whatever
+     * happens next; and it supersedes any switch still waiting on a download, because the reader
+     * has just said which voice they want and it is this one.
      *
-     * If a surah is playing and the new voice has it, the swap happens at the current ayah — near
-     * enough the "next ayah boundary" the spec asks for, and honest about where the reader is. If
-     * the new voice does not have this surah, **the old one keeps playing**: the picker's own
-     * caption already says the new voice has nothing on this phone, and a download sheet thrown
-     * up by a tap on a radio button would be a sheet nobody asked for.
+     * Then, by what is playing:
+     * - **the same voice, paused** — resume it. The row is the voice they are listening to, and a
+     *   tap on it while nothing is coming out of the phone can only mean "go on".
+     * - **another voice that has this surah** — swap at the current ayah, near enough the "next
+     *   ayah boundary" the spec asks for, and honest about where the reader is.
+     * - **another voice that does not** — offer the download, and **the old voice keeps playing**
+     *   until it lands, when the new one takes over at the ayah being heard (the sheet says so:
+     *   [DownloadSheetState.playingMeanwhile]). Before this the tap did nothing visible at all,
+     *   and the reader had to stop the bar to be offered the download.
      */
     fun pickReciter(id: String) {
         scope.launch {
-            stopPreview()
+            val hadPausedForPreview = endPreview(resume = false)
             settings.setReciter(id)
+            pending = null
             val voice = manifest.value?.reciter(id) ?: return@launch
             val playback = player.state.value
-            val surah = playback.surah ?: return@launch
-            if (playback.reciterId == id) return@launch
-            if (!library.isDownloaded(id, surah)) return@launch
-            start(surah, playback.ayah ?: 1, voice)
+            val surah = playback.surah
+            if (surah == null) return@launch
+            if (playback.reciterId == id) {
+                if (!playback.playing) player.play()
+                return@launch
+            }
+            if (library.isDownloaded(id, surah)) {
+                start(surah, playback.ayah ?: 1, voice)
+                return@launch
+            }
+            if (hadPausedForPreview) player.play()
+            sheetAyah = playback.ayah ?: 1
+            sheetSurah.value = surah
+            picker.value = false
         }
     }
 
-    /** The picker's play triangle. A second tap on the same row, or picking anything, stops it. */
+    /**
+     * The picker's play triangle. A second tap on the same row, or picking anything, stops it.
+     *
+     * A recitation that is playing is paused for the audition and resumed when the clip ends
+     * (spec §14.5): the clip used to play straight over the surah, two voices at once, which is
+     * not what a person auditioning a reciter wants to hear.
+     */
     fun previewReciter(id: String) {
         scope.launch {
             if (previewing.value == id) {
-                stopPreview()
+                endPreview()
                 return@launch
             }
             val bytes = runCatching { previewBytes(id) }.getOrNull() ?: return@launch
-            clips.play(bytes)
+            if (player.state.value.playing) {
+                pausedForPreview = true
+                player.pause()
+            }
+            clips.play(bytes) {
+                scope.launch { if (previewing.value == id) endPreview() }
+            }
             previewing.value = id
             previewTimeout?.cancel()
             previewTimeout = scope.launch {
                 delay(PREVIEW_MILLIS)
-                if (previewing.value == id) previewing.value = null
+                if (previewing.value == id) endPreview()
             }
         }
     }
@@ -485,11 +553,21 @@ class RecitationController(
     private var previewTimeout: Job? = null
     private var probe: Job? = null
 
-    private fun stopPreview() {
+    /**
+     * Stops the clip, and — when [resume] — gives the recitation back if the preview had paused
+     * it. Returns whether it had, for the one caller that decides about the resume itself
+     * ([pickReciter]: a pick that starts a new voice resumes nothing, a pick that leaves the old
+     * voice playing resumes it).
+     */
+    private fun endPreview(resume: Boolean = true): Boolean {
         previewTimeout?.cancel()
         previewTimeout = null
         clips.stop()
         previewing.value = null
+        val hadPaused = pausedForPreview
+        pausedForPreview = false
+        if (hadPaused && resume) player.play()
+        return hadPaused
     }
 
     /**
@@ -528,6 +606,6 @@ class RecitationController(
     suspend fun downloadsOnMobileData(): Boolean = settings.settings.first().downloadOnMobileData
 }
 
-/** Long enough for the fifteen-second clip plus a moment, after which the row stops claiming to
- * be playing. Neither platform's clip player reports the end back to common code. */
+/** Long enough for the fifteen-second clip plus a moment: the backstop for a clip player that
+ * never reports its end, so the row stops claiming to play and a paused recitation is resumed. */
 private const val PREVIEW_MILLIS = 17_000L

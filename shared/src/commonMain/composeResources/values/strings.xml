@@ -312,6 +312,8 @@
     <string name="recitation_use_mobile_once">Use mobile data this once</string>
     <string name="recitation_keep_reading">You can keep reading. Playback starts from the ayah you chose as soon as it lands.</string>
     <string name="recitation_waiting_connection">Waiting for a connection. The download starts by itself once there is one.</string>
+    <string name="recitation_switch_ready">%1$s keeps playing until it arrives.</string>
+    <string name="recitation_switch_running">%1$s keeps playing. The voice changes to %2$s as soon as it lands.</string>
     <string name="recitation_cancel">Cancel</string>
     <string name="recitation_retry">Retry</string>
     <string name="recitation_back_to_ayah">Back to ayah %1$s</string>

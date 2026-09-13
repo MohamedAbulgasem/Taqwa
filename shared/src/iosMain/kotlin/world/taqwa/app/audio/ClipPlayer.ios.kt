@@ -5,11 +5,13 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.AVFAudio.AVAudioPlayer
+import platform.AVFAudio.AVAudioPlayerDelegateProtocol
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.setActive
 import platform.Foundation.NSData
 import platform.Foundation.create
+import platform.darwin.NSObject
 
 /**
  * `AVAudioPlayer` straight from the bytes — no temp file, since the initialiser takes `NSData`.
@@ -25,7 +27,11 @@ actual class ClipPlayer actual constructor() {
 
     private var player: AVAudioPlayer? = null
 
-    actual fun play(bytes: ByteArray) {
+    /** `AVAudioPlayer.delegate` is weak, like every Cocoa delegate: held here or the end of the
+     * clip is never heard of. */
+    private var delegate: NSObject? = null
+
+    actual fun play(bytes: ByteArray, onEnd: () -> Unit) {
         stop()
         if (bytes.isEmpty()) return
         val data = bytes.usePinned { pinned ->
@@ -34,14 +40,26 @@ actual class ClipPlayer actual constructor() {
         val session = AVAudioSession.sharedInstance()
         session.setCategory(AVAudioSessionCategoryPlayback, null)
         session.setActive(true, null)
-        player = AVAudioPlayer(data = data, error = null).also {
-            it.prepareToPlay()
-            it.play()
+        val started = AVAudioPlayer(data = data, error = null)
+        val ended = object : NSObject(), AVAudioPlayerDelegateProtocol {
+            override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
+                // Only the clip still in the player: a stopped one has already been let go of.
+                if (this@ClipPlayer.player !== player) return
+                this@ClipPlayer.player = null
+                delegate = null
+                onEnd()
+            }
         }
+        delegate = ended
+        started.setDelegate(ended)
+        player = started
+        started.prepareToPlay()
+        started.play()
     }
 
     actual fun stop() {
         player?.stop()
         player = null
+        delegate = null
     }
 }

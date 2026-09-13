@@ -19,7 +19,7 @@ actual class ClipPlayer actual constructor() {
     private var player: MediaPlayer? = null
     private val file: File by lazy { File(appContext.cacheDir, "recitation-preview.mp3") }
 
-    actual fun play(bytes: ByteArray) {
+    actual fun play(bytes: ByteArray, onEnd: () -> Unit) {
         stop()
         val path = runCatching {
             file.writeBytes(bytes)
@@ -34,7 +34,11 @@ actual class ClipPlayer actual constructor() {
                         .build(),
                 )
                 setDataSource(path)
-                setOnCompletionListener { it.release(); player = null }
+                setOnCompletionListener {
+                    it.release()
+                    player = null
+                    onEnd()
+                }
                 prepare()
                 start()
             }

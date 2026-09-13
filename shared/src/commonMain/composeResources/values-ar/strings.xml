@@ -299,6 +299,8 @@
     <string name="recitation_use_mobile_once">استخدم بيانات الجوال هذه المرة</string>
     <string name="recitation_keep_reading">يمكنك متابعة القراءة، وسيبدأ التشغيل من الآية التي اخترتها فور اكتمال التنزيل.</string>
     <string name="recitation_waiting_connection">في انتظار الاتصال، وسيبدأ التنزيل تلقائيًا فور توفره.</string>
+    <string name="recitation_switch_ready">يستمر %1$s في التلاوة حتى يكتمل التنزيل.</string>
+    <string name="recitation_switch_running">يستمر %1$s في التلاوة، وينتقل الصوت إلى %2$s فور اكتمال التنزيل.</string>
     <string name="recitation_cancel">إلغاء</string>
     <string name="recitation_retry">إعادة المحاولة</string>
     <string name="recitation_back_to_ayah">العودة إلى الآية %1$s</string>

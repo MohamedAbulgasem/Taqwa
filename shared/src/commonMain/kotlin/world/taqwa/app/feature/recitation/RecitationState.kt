@@ -45,6 +45,13 @@ data class BarState(
     val positionMs: Long = 0L,
     /** The whole surah, for the "2:05:10" at its end. Zero hides both clocks. */
     val durationMs: Long = 0L,
+    /**
+     * How far along the *chosen* voice's copy of this surah is, when it is a different voice from
+     * the one being heard (spec §14.3): the reader picked a reciter who did not have the surah,
+     * asked for it, and is listening to the old voice until it lands. Null when nothing is
+     * arriving. Drawn as a thin ring around the monogram.
+     */
+    val incoming: Float? = null,
 )
 
 /** Which of the download sheet's three faces is showing (spec §5.4). */
@@ -74,6 +81,12 @@ data class DownloadSheetState(
     /** What the manifest says this surah costs, so the button is priced before the first byte. */
     val bytes: Long,
     val phase: SheetPhase,
+    /**
+     * The voice reciting this very surah right now, when it is not [reciter] (spec §14.3): the
+     * sheet then says so, because the reader has just picked a new voice from the bar and the one
+     * thing they need to know is that the old one carries on until the new one lands.
+     */
+    val playingMeanwhile: Reciter? = null,
 )
 
 /**
@@ -152,12 +165,20 @@ fun headerStateOf(
 ): HeaderState {
     if (bar != null && bar.surah == surah) return if (bar.playing) HeaderState.Playing else HeaderState.Paused
     val id = reciterId ?: return HeaderState.Idle
-    return when (val download = downloads[DownloadKey(id, surah)]) {
-        null, is DownloadState.Failed -> HeaderState.Idle
-        DownloadState.Queued -> HeaderState.Downloading(0f)
-        DownloadState.Verifying -> HeaderState.Downloading(1f)
-        is DownloadState.Downloading -> HeaderState.Downloading(download.fraction)
-    }
+    return downloadFraction(downloads[DownloadKey(id, surah)])?.let { HeaderState.Downloading(it) }
+        ?: HeaderState.Idle
+}
+
+/**
+ * A download as a ring: empty while queued, full while the hash is checked, and nothing at all
+ * for a failure — a ring stuck at where a download died would be a promise the button cannot
+ * keep. The header's ring and the bar's incoming ring are this one rule.
+ */
+fun downloadFraction(download: DownloadState?): Float? = when (download) {
+    null, is DownloadState.Failed -> null
+    DownloadState.Queued -> 0f
+    DownloadState.Verifying -> 1f
+    is DownloadState.Downloading -> download.fraction
 }
 
 /**
