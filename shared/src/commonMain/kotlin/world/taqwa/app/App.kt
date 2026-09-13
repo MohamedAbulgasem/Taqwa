@@ -79,6 +79,9 @@ import world.taqwa.app.nav.Tab
 import world.taqwa.app.nav.tabOf
 import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.canScheduleExactAlarms
+import world.taqwa.app.notifications.isNotificationPermissionGranted
+import world.taqwa.app.notifications.openAppNotificationSettings
+import world.taqwa.app.notifications.requestExactAlarmAccess
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.today_current_location
@@ -136,9 +139,15 @@ fun App(container: AppContainer) {
     // and the voice survive every navigation this screen can perform.
     val recitation = container.recitationController
     val recitationState by recitation.state.collectAsState()
-    // Read once per composition rather than per frame: the user can only change it by leaving
-    // the app for system settings, which recreates this anyway.
-    val exactAlarmsAllowed = remember { canScheduleExactAlarms() }
+    // Re-read each time the app comes to the front (below, with the lifecycle): both are granted
+    // or revoked in system settings, which the Notifications screen can now send someone to, and
+    // its notes have to show the answer they come back with.
+    var exactAlarmsAllowed by remember { mutableStateOf(true) }
+    var notificationsGranted by remember { mutableStateOf(true) }
+    suspend fun refreshPermissions() {
+        exactAlarmsAllowed = canScheduleExactAlarms()
+        notificationsGranted = runCatching { isNotificationPermissionGranted() }.getOrDefault(true)
+    }
 
     // The device locale decides both halves of localisation: which `values-*` strings Compose
     // resolves, and — through this — whether the whole tree is laid out right-to-left. Compose's
@@ -214,9 +223,9 @@ fun App(container: AppContainer) {
     }
     val appLifecycle = LocalLifecycleOwner.current
     LaunchedEffect(appLifecycle) {
-        if (!foregroundReturnsToRecitation) return@LaunchedEffect
         appLifecycle.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            if (recitation.state.value.bar?.playing == true) openPlaying()
+            refreshPermissions()
+            if (foregroundReturnsToRecitation && recitation.state.value.bar?.playing == true) openPlaying()
         }
     }
 
@@ -497,6 +506,8 @@ fun App(container: AppContainer) {
                                     navigator.replaceAll(Screen.Today)
                                 }
                             },
+                            exactAlarmsNeeded = !exactAlarmsAllowed,
+                            onRequestExactAlarms = ::requestExactAlarmAccess,
                         )
 
                         Screen.Today -> {
@@ -805,6 +816,10 @@ fun App(container: AppContainer) {
                         Screen.NotificationSettings -> NotificationSettingsScreen(
                             settings = notificationSettings,
                             exactAlarmsUnavailable = !exactAlarmsAllowed,
+                            notificationsGranted = notificationsGranted,
+                            onOpenNotificationSettings = ::openAppNotificationSettings,
+                            onRequestExactAlarms = ::requestExactAlarmAccess,
+                            onPermissionChecked = { scope.launch { refreshPermissions() } },
                             onBack = { navigator.pop() },
                             onToggleEnabled = { enabled ->
                                 scope.launch {

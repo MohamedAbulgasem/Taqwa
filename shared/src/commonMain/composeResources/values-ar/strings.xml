@@ -16,6 +16,8 @@
     <string name="onboarding_notifications_body">إشعار عند كل صلاة. تختار الصوت لكل صلاة على حدة، ويمكنك تغييره متى شئت.</string>
     <string name="onboarding_notifications_cta">تفعيل الإشعارات</string>
     <string name="onboarding_notifications_secondary">ليس الآن</string>
+    <string name="onboarding_exact_title">في وقتها بالدقيقة</string>
+    <string name="onboarding_exact_body">لا يرنّ أندرويد في وقت الصلاة بالضبط إلا إذا سُمح لتقوى بـ«المنبهات والتذكيرات». بدونها قد يتأخر الإشعار حتى ساعة.</string>
     <string name="onboarding_widget_title">على شاشتك الرئيسية</string>
     <string name="onboarding_widget_body">تعرض أداة تقوى الصلاة القادمة وعدًّا تنازليًا مباشرًا من دون فتح التطبيق.</string>
     <string name="onboarding_widget_body_ios">تعرض أداة تقوى الصلاة القادمة وعدًّا تنازليًا مباشرًا من دون فتح التطبيق. لإضافتها، اضغط مطولًا على أيقونة تقوى في الشاشة الرئيسية واختر حجم الأداة.</string>
@@ -55,7 +57,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">0.15.0</string>
+    <string name="settings_version_value">0.16.0</string>
 
     <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
     <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
@@ -231,7 +233,10 @@
     <string name="qibla_cardinal_east">ق</string>
     <string name="qibla_cardinal_south">ج</string>
     <string name="qibla_cardinal_west">غ</string>
-    <string name="notifications_exact_alarms_off">المنبهات الدقيقة معطّلة لتطبيق تقوى، لذا قد تصل التنبيهات متأخرة بضع دقائق. فعّل «المنبهات والتذكيرات» في إعدادات النظام لإصلاح ذلك.</string>
+    <string name="notifications_exact_alarms_off">المنبهات الدقيقة معطّلة لتطبيق تقوى، لذا قد يتأخر الإشعار حتى ساعة. اسمح بـ«المنبهات والتذكيرات» لإصلاح ذلك.</string>
+    <string name="notifications_allow_exact_alarms">السماح بالمنبهات الدقيقة</string>
+    <string name="notifications_blocked">الإشعارات معطّلة لتطبيق تقوى في إعدادات النظام، لذا لن يظهر أي تنبيه للصلاة حتى يُسمح بها من جديد.</string>
+    <string name="notifications_open_settings">فتح إعدادات الإشعارات</string>
     <string name="hijri_tabular">حسابي</string>
     <string name="method_tehran_maghrib_note">المغرب يتبع غروب الشمس، ولم تُطبّق بعد زاوية المغرب ٤٫٥° الخاصة بهذه الطريقة.</string>
     <!-- Bottom tab bar (iteration 1; iteration 8: two tabs; slice 2: the Quran tab arrives) -->

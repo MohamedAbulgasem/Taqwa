@@ -18,6 +18,8 @@
     <string name="onboarding_notifications_body">A notification at each prayer time. You pick the sound for every prayer separately, and can change it whenever you like.</string>
     <string name="onboarding_notifications_cta">Enable notifications</string>
     <string name="onboarding_notifications_secondary">Not now</string>
+    <string name="onboarding_exact_title">On time, to the minute</string>
+    <string name="onboarding_exact_body">Android rings at the exact prayer time only if “Alarms &amp; reminders” is allowed for Taqwa. Without it, a notification can arrive up to an hour late.</string>
     <string name="onboarding_widget_title">On your home screen</string>
     <string name="onboarding_widget_body">The Taqwa widget shows the next prayer and a live countdown, without opening the app.</string>
     <string name="onboarding_widget_body_ios">The Taqwa widget shows the next prayer and a live countdown, without opening the app. To add it, touch and hold the Taqwa icon on your home screen and choose a widget size.</string>
@@ -58,7 +60,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">0.15.0</string>
+    <string name="settings_version_value">0.16.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
@@ -242,7 +244,10 @@
     <string name="qibla_cardinal_east">E</string>
     <string name="qibla_cardinal_south">S</string>
     <string name="qibla_cardinal_west">W</string>
-    <string name="notifications_exact_alarms_off">Exact alarms are turned off for Taqwa, so notifications may arrive a few minutes late. Turn on “Alarms &amp; reminders” in system settings to fix this.</string>
+    <string name="notifications_exact_alarms_off">Exact alarms are turned off for Taqwa, so a notification can arrive up to an hour late. Allow “Alarms &amp; reminders” to fix this.</string>
+    <string name="notifications_allow_exact_alarms">Allow exact alarms</string>
+    <string name="notifications_blocked">Notifications are turned off for Taqwa in system settings, so no prayer alert can be shown until they are allowed again.</string>
+    <string name="notifications_open_settings">Open notification settings</string>
     <string name="hijri_tabular">Tabular</string>
     <string name="method_tehran_maghrib_note">Maghrib follows sunset; this method’s 4.5° Maghrib angle is not applied yet.</string>
     <!-- Bottom tab bar (iteration 1: the owner asked for it after seeing Today on a phone;

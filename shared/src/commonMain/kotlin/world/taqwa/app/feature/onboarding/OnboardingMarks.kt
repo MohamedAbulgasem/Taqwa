@@ -110,3 +110,18 @@ fun BellMark(modifier: Modifier = Modifier) {
     }
 }
 
+/** A clock with its hands on the hour and the pivot in amber: the screen is about the minute
+ * the adhan rings, not the ringing itself. */
+@Composable
+fun ClockMark(modifier: Modifier = Modifier) {
+    val colors = LocalTaqwaColors.current
+    Canvas(modifier.size(MarkSize)) {
+        val u = unit()
+        val centre = Offset(512f * u, 512f * u)
+        drawCircle(colors.textPrimary, radius = 356f * u, center = centre, style = lineStroke())
+        drawLine(colors.textPrimary, centre, Offset(512f * u, 300f * u), strokeWidth = ICON_STROKE * u, cap = StrokeCap.Round)
+        drawLine(colors.textPrimary, centre, Offset(672f * u, 512f * u), strokeWidth = ICON_STROKE * u, cap = StrokeCap.Round)
+        drawCircle(colors.ring, radius = 52f * u, center = centre)
+    }
+}
+
