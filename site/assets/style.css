@@ -62,12 +62,14 @@ html[lang="en"] .nav .switch { font-family: var(--font-ar); }
 html[dir="rtl"] a, html[dir="rtl"] code { unicode-bidi: isolate; direction: ltr; display: inline-block; max-width: 100%; overflow-wrap: anywhere; }
 html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir="rtl"] .brand { display: inline-flex; }
 
+/* Blocks that share this class (.top, .hero, .prose, .foot) set only padding-block, so the
+   24px inline padding survives on narrow screens where there is no centring margin. */
 .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
 
 /* ── Header ───────────────────────────────────────────── */
 .top {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 22px 0;
+  padding-block: 22px;
 }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--t1); font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
 .brand:hover { text-decoration: none; }
@@ -79,7 +81,7 @@ html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir
 /* ── Hero ─────────────────────────────────────────────── */
 .hero {
   display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; align-items: center;
-  padding: 56px 0 72px;
+  padding-block: 56px 72px;
 }
 .hero-copy { display: flex; flex-direction: column; gap: 22px; }
 .icon-tile {
@@ -139,7 +141,7 @@ html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir
 .widgets-shot img { width: 100%; border-radius: 24px; border: 1px solid var(--hair); }
 
 /* ── Prose pages (privacy, support) ───────────────────── */
-.prose { max-width: 68ch; padding: 40px 0 72px; }
+.prose { max-width: 68ch; padding-block: 40px 72px; }
 .prose h1 { font-size: clamp(32px, 4.6vw, 44px); margin-bottom: 8px; }
 .prose .meta { color: var(--t3); font-size: 15px; margin-bottom: 36px; }
 .prose h2 { font-size: 22px; margin: 40px 0 10px; }
@@ -155,14 +157,14 @@ html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir
 .prose .rows { margin-top: 12px; }
 
 /* ── Footer ───────────────────────────────────────────── */
-.foot { border-top: 1px solid var(--hair); padding: 28px 0 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; font-size: 14px; color: var(--t3); }
+.foot { border-top: 1px solid var(--hair); padding-block: 28px 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; font-size: 14px; color: var(--t3); }
 .foot nav { display: flex; flex-wrap: wrap; gap: 18px; }
 .foot a { color: var(--t2); }
 
 @media (max-width: 720px) {
-  .hero { grid-template-columns: 1fr; padding: 28px 0 48px; gap: 36px; }
+  .hero { grid-template-columns: 1fr; padding-block: 28px 48px; gap: 36px; }
   .hero-shot { order: 2; }
-  .top { padding: 18px 0; }
+  .top { padding-block: 18px; }
   .nav { gap: 16px; font-size: 14px; }
   .section { padding: 44px 0; }
 }
