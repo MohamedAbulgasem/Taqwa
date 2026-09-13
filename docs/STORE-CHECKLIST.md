@@ -31,17 +31,20 @@ item needs Mohamed's accounts, keys or judgement. Tick them in order.
 
 ## 2. Accounts and keys (Mohamed only)
 
-- [ ] **Google Play developer account.** One-time fee, identity verification. **If it is a personal
-      account created after 13 November 2023, Play requires a closed test with at least 12 testers
-      opted in for 14 consecutive days before production access can be requested** — plan two
-      weeks and a dozen people (family, friends, a Telegram group) before launch day. An
-      organisation account (D-U-N-S number) is exempt.
-- [ ] **Apple Developer Program** membership (yearly). The Xcode project signs with team
-      `5S5P2Q72MV` (LOOPDL LIMITED, `iosApp/Configuration/Config.xcconfig`), which is also the
-      **seller name buyers see** on the App Store. To publish as yourself instead, join as an
-      individual, change `TEAM_ID` in `Config.xcconfig`, and register the App Group
-      `group.world.taqwa.app` and bundle ids `world.taqwa.app` / `world.taqwa.app.widget` under
-      the new team (personal free teams cannot use App Groups; a paid individual membership can).
+- [ ] **Apple Developer Program**, individual membership (99 USD a year), enrolled through the Apple
+      Developer app on an iPhone with a government ID. The project currently signs with LOOPDL
+      LIMITED's team (`iosApp/Configuration/Config.xcconfig`), which is Mohamed's employer and
+      cannot publish the app. Xcode's automatic signing has registered `world.taqwa.app`,
+      `world.taqwa.app.widget` and the App Group `group.world.taqwa.app` under that team, and
+      identifiers are unique across all of Apple, so either an admin of LOOPDL's developer
+      portal deletes those three identifiers before the new account registers them, or the iOS
+      identifiers are renamed. Then `TEAM_ID` in `Config.xcconfig` changes to the new team and
+      the widget target's team with it.
+- [ ] **Google Play developer account.** The old one under algiriany93@gmail.com was closed for
+      inactivity on 6 April 2024 and cannot be reinstated; a new personal account (25 USD,
+      identity verification) is created after 13 November 2023 and therefore needs a closed
+      test with **12 testers opted in for 14 consecutive days** before production access.
+      Start that test with the current build; updates during the fortnight do not reset it.
 - [ ] **Upload keystore** (never in the repository, backed up in two places):
 
       ```bash
