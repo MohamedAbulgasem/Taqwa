@@ -29,7 +29,7 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.domain.PrayerStatus
 import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.i18n.PrayerNaming
-import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.i18n.localizedPrayerName
 
 /** Gutter holding the pips; the rail runs down its centre. */
@@ -63,7 +63,7 @@ fun PrayerTimeline(
     formatTime: (TimelineRow) -> String,
 ) {
     val colors = LocalTaqwaColors.current
-    val arabicAlone = isRtlLocale()
+    val arabicAlone = uiLanguage().arabicScript
     Box(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding)) {
         // The rail is drawn behind the pips. matchParentSize takes its height from the column of
         // rows, so this stays correct however many prayers are visible.
@@ -113,11 +113,13 @@ fun PrayerTimeline(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (arabicAlone) {
-                                // The spec's naming rule: in Arabic the Arabic name stands alone,
-                                // never doubled beside a transliteration. It takes the row's full
-                                // weight and size here — it is the name, not a secondary label.
+                                // The spec's naming rule: in an Arabic-script interface the
+                                // interface's own name stands alone — الفجر in Arabic, فجر in
+                                // Urdu — never doubled beside a second Arabic-script name. It
+                                // takes the row's full weight and size here — it is the name,
+                                // not a secondary label.
                                 Text(
-                                    PrayerNaming.arabicName(row.prayer),
+                                    localizedPrayerName(row.prayer),
                                     fontFamily = FontFamily.Default,
                                     style = TaqwaText.rowLabel,
                                     color = if (row.status == PrayerStatus.CURRENT) {

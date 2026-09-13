@@ -25,6 +25,7 @@ import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.recitation.DownloadCopy
+import world.taqwa.app.recitation.NumberStyle
 import world.taqwa.app.recitation.DownloadFailure
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.quran.displayName
@@ -139,18 +140,18 @@ fun megabytes(bytes: Long): String = stringResource(Res.string.recitation_megaby
  */
 @Composable
 fun dataSize(bytes: Long): String {
-    val arabic = arabicDigits()
+    val style = numberStyle()
     return if (DownloadCopy.useGigabytes(bytes)) {
-        stringResource(Res.string.recitation_gigabytes, DownloadCopy.gigabytes(bytes, arabic))
+        stringResource(Res.string.recitation_gigabytes, DownloadCopy.gigabytes(bytes, style))
     } else {
-        stringResource(Res.string.recitation_megabytes, DownloadCopy.megabytes(bytes, arabic))
+        stringResource(Res.string.recitation_megabytes, DownloadCopy.megabytes(bytes, style))
     }
 }
 
 /** The bare number, for the first half of "9.3 of 58.2 MB" — the unit is printed once, for the
  * pair, so the line does not say MB twice. */
 @Composable
-fun megabytesBare(bytes: Long): String = DownloadCopy.megabytes(bytes, arabicDigits())
+fun megabytesBare(bytes: Long): String = DownloadCopy.megabytes(bytes, numberStyle())
 
 /**
  * Whether this locale prints Arabic-Indic digits, asked of the platform's own formatter rather
@@ -163,7 +164,10 @@ fun megabytesBare(bytes: Long): String = DownloadCopy.megabytes(bytes, arabicDig
  * app formats everything to avoid. Egyptian Arabic still gets ٩٫٣.
  */
 @Composable
-private fun arabicDigits(): Boolean = LocalPlatformFormat.current.localizedDigits(0) != "0"
+private fun numberStyle(): NumberStyle {
+    val format = LocalPlatformFormat.current
+    return NumberStyle.of(format.languageTag(), format.localizedDigits(0))
+}
 
 /** Why a download stopped, as a sentence a reader can act on (spec §5.4). */
 @Composable

@@ -23,10 +23,11 @@ object CountdownFormatter {
 
     /**
      * ar-EG and ar-SA default to Arabic-Indic digits; ar-LY, ar-MA, ar-TN and ar-DZ default to
-     * Western already, so the fallback question never arises for them.
+     * Western already, so the fallback question never arises for them. Bengali defaults to its
+     * own digits everywhere, and the same tabular-width question applies to them.
      */
     fun defaultsToArabicIndicDigits(languageTag: String): Boolean =
-        languageTag.uppercase() in setOf("AR-EG", "AR-SA")
+        languageTag.uppercase() in setOf("AR-EG", "AR-SA") || UiLanguage.of(languageTag) == UiLanguage.BENGALI
 
     fun countdown(duration: Duration, format: PlatformFormat, tabularDigitsVerified: Boolean): String {
         val totalSeconds = duration.inWholeSeconds.coerceAtLeast(0)

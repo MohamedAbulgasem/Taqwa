@@ -83,8 +83,16 @@ import world.taqwa.app.design.components.drawPlus
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.feature.settings.BackChevron
 import world.taqwa.app.i18n.LocalPlatformFormat
-import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.isLatinScriptUi
+import world.taqwa.app.i18n.uiLanguage
+import world.taqwa.app.i18n.uppercaseIn
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.dhikr_meaning_alhamdulillah
+import world.taqwa.app.resources.dhikr_meaning_allahu_akbar
+import world.taqwa.app.resources.dhikr_meaning_astaghfirullah
+import world.taqwa.app.resources.dhikr_meaning_la_ilaha_illallah
+import world.taqwa.app.resources.dhikr_meaning_subhanallah
+import world.taqwa.app.resources.dhikr_meaning_subhanallahi_wa_bihamdihi
 import world.taqwa.app.resources.tasbeeh_add_custom
 import world.taqwa.app.resources.tasbeeh_custom_add
 import world.taqwa.app.resources.tasbeeh_custom_delete
@@ -541,11 +549,14 @@ private fun DhikrBlock(dhikr: Dhikr, modifier: Modifier = Modifier) {
             color = colors.textPrimary,
             textAlign = TextAlign.Center,
         )
-        if (!isRtlLocale()) {
+        // Under a Latin-script interface the phrase gets its transliteration and its meaning in
+        // the interface's language; an Arabic-script or Bengali interface shows the phrase alone,
+        // and names it through the preset label instead (see dhikrLabel).
+        if (isLatinScriptUi()) {
             dhikr.transliteration?.let {
                 Text(it, style = TaqwaText.caption.copy(fontSize = 13.sp), color = colors.textSecondary)
             }
-            dhikr.meaning?.let {
+            dhikrMeaning(dhikr)?.let {
                 Text(it, style = TaqwaText.caption.copy(fontSize = 12.sp), color = colors.textTertiary)
             }
         }
@@ -604,7 +615,7 @@ private fun PartReminder(state: TasbeehUiState) {
     // The section label's 0.14 em is display tracking for a lone word; three of them in a row need
     // the mockup's tighter 0.08 em to fit a narrow phone. Arabic keeps none at all, as everywhere.
     val style = TaqwaText.sectionLabel.copy(fontSize = 10.sp).let {
-        if (isRtlLocale()) it else it.copy(letterSpacing = 0.08.em)
+        if (isLatinScriptUi()) it.copy(letterSpacing = 0.08.em) else it
     }
     Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         state.preset.parts.forEachIndexed { index, part ->
@@ -906,10 +917,22 @@ private fun presetLabel(preset: TasbeehPreset): String =
  * the single-dhikr presets are the same strings, which is what makes one lookup serve both.
  */
 @Composable
-private fun dhikrLabel(dhikr: Dhikr): String = if (isRtlLocale()) {
-    presetLabelRes(dhikr.id)?.let { stringResource(it) } ?: dhikr.arabic
+private fun dhikrLabel(dhikr: Dhikr): String = if (isLatinScriptUi()) {
+    dhikr.transliteration?.uppercaseIn(uiLanguage()) ?: dhikr.arabic
 } else {
-    dhikr.transliteration?.uppercase() ?: dhikr.arabic
+    presetLabelRes(dhikr.id)?.let { stringResource(it) } ?: dhikr.arabic
+}
+
+/** A built-in phrase's meaning in the interface language; a phrase of the reader's own has none. */
+@Composable
+private fun dhikrMeaning(dhikr: Dhikr): String? = when (dhikr.id) {
+    "subhanallah" -> stringResource(Res.string.dhikr_meaning_subhanallah)
+    "alhamdulillah" -> stringResource(Res.string.dhikr_meaning_alhamdulillah)
+    "allahu_akbar" -> stringResource(Res.string.dhikr_meaning_allahu_akbar)
+    "astaghfirullah" -> stringResource(Res.string.dhikr_meaning_astaghfirullah)
+    "la_ilaha_illallah" -> stringResource(Res.string.dhikr_meaning_la_ilaha_illallah)
+    "subhanallahi_wa_bihamdihi" -> stringResource(Res.string.dhikr_meaning_subhanallahi_wa_bihamdihi)
+    else -> dhikr.meaning
 }
 
 private fun presetLabelRes(id: String): StringResource? = when (id) {

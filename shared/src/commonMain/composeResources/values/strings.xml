@@ -62,7 +62,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">0.17.0</string>
+    <string name="settings_version_value">0.18.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
@@ -310,6 +310,14 @@
     <string name="tasbeeh_round">ROUND %1$s</string>
     <string name="tasbeeh_of">of %1$s</string>
     <string name="tasbeeh_hint">Tap anywhere to count</string>
+    <!-- The built-in phrases' meanings, shown under a Latin-script interface beside the
+         transliteration; Arabic-script interfaces show the phrase itself. -->
+    <string name="dhikr_meaning_subhanallah">Glory be to Allah</string>
+    <string name="dhikr_meaning_alhamdulillah">All praise is due to Allah</string>
+    <string name="dhikr_meaning_allahu_akbar">Allah is the Greatest</string>
+    <string name="dhikr_meaning_astaghfirullah">I seek Allah’s forgiveness</string>
+    <string name="dhikr_meaning_la_ilaha_illallah">There is no god but Allah</string>
+    <string name="dhikr_meaning_subhanallahi_wa_bihamdihi">Glory and praise be to Allah</string>
     <string name="tasbeeh_preset_after_prayer">After prayer</string>
     <string name="tasbeeh_preset_subhanallah">SubhanAllah</string>
     <string name="tasbeeh_preset_alhamdulillah">Alhamdulillah</string>

@@ -45,26 +45,31 @@ import world.taqwa.app.resources.sound_takbir
 import world.taqwa.app.resources.ui_language
 
 /**
- * True when the UI is Arabic: the strings Compose has actually resolved are the Arabic set. Read
- * from the resources themselves ([Res.string.ui_language] is "ar" only in `values-ar`) rather
- * than from the platform's locale tag, so this can never disagree with the words on screen — a
- * phone whose resource locale and default locale differ (a per-app language, a regional variant
- * the tag spells unexpectedly) used to get Arabic strings with the English naming rule, and so
- * showed every prayer name twice. Also usable outside a mirrored subtree, unlike
- * `LocalLayoutDirection`.
+ * The language the interface is actually in: the one whose strings Compose has resolved. Read
+ * from the resources themselves ([Res.string.ui_language] is the language's own code in each
+ * `values-*` file) rather than from the platform's locale tag, so this can never disagree with
+ * the words on screen — a phone whose resource locale and default locale differ (a per-app
+ * language, a regional variant the tag spells unexpectedly) used to get Arabic strings with the
+ * English naming rule, and so showed every prayer name twice.
  */
 @Composable
-fun isRtlLocale(): Boolean = stringResource(Res.string.ui_language) == ARABIC_UI
+fun uiLanguage(): UiLanguage = UiLanguage.of(stringResource(Res.string.ui_language))
 
-private const val ARABIC_UI = "ar"
+/** Right-to-left interface: Arabic and Urdu. Usable outside a mirrored subtree, unlike `LocalLayoutDirection`. */
+@Composable
+fun isRtlLocale(): Boolean = uiLanguage().rtl
+
+/** Latin-script interface: English, French, Turkish, Indonesian. Manrope and tracking apply. */
+@Composable
+fun isLatinScriptUi(): Boolean = uiLanguage().latinScript
 
 /**
- * Manrope ships no Arabic glyphs, so Arabic copy must come from the OS face — SF Arabic on iOS,
- * the OEM font on Android (spec §3). This is the one decision every text style in the app defers
- * to, which is why it is applied once in the theme rather than per `Text`.
+ * Manrope ships Latin glyphs only, so Arabic, Urdu and Bengali copy must come from the OS face —
+ * SF on iOS, the OEM font on Android (spec §3). This is the one decision every text style in the
+ * app defers to, which is why it is applied once in the theme rather than per `Text`.
  */
 @Composable
-fun uiFontFamily(): FontFamily = if (isRtlLocale()) FontFamily.Default else manropeFamily()
+fun uiFontFamily(): FontFamily = if (isLatinScriptUi()) manropeFamily() else FontFamily.Default
 
 /** The prayer's name in the UI language alone — the pairing rule lives in [PrayerNaming]. */
 @Composable

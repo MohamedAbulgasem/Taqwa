@@ -65,10 +65,13 @@ class CountdownFormatterTest {
     }
 
     @Test
-    fun defaultsToArabicIndicDigitsIsExactlyTheSpecsTwoLocales() {
+    fun defaultsToArabicIndicDigitsIsTheSpecsTwoLocalesAndBengali() {
         assertEquals(true, CountdownFormatter.defaultsToArabicIndicDigits("ar-EG"))
         assertEquals(true, CountdownFormatter.defaultsToArabicIndicDigits("ar-SA"))
-        listOf("ar-LY", "ar-MA", "ar-TN", "ar-DZ", "ar", "en").forEach {
+        // Bengali defaults to its own digits in every region, and the tabular question is the same.
+        assertEquals(true, CountdownFormatter.defaultsToArabicIndicDigits("bn-BD"))
+        assertEquals(true, CountdownFormatter.defaultsToArabicIndicDigits("bn"))
+        listOf("ar-LY", "ar-MA", "ar-TN", "ar-DZ", "ar", "en", "ur-PK", "tr", "id", "fr").forEach {
             assertEquals(false, CountdownFormatter.defaultsToArabicIndicDigits(it), it)
         }
     }

@@ -1,8 +1,49 @@
 package world.taqwa.app.recitation
 
+import world.taqwa.app.i18n.UiLanguage
+
 /**
- * The words a download notification is made of, in the two languages a notification can be baked
- * for, and nothing else.
+ * How a number is written: the digit set and the decimal separator, which the platform decides
+ * per locale (Egyptian Arabic ٩٫٣, Libyan Arabic 9.3, Bangladeshi Bengali ৯.৩, French 9,3).
+ *
+ * Chosen by the caller from the platform's own formatter — `localizedDigits(0)` says which digits
+ * the rest of the app is already drawing — and the language, never from the text direction: that
+ * put «٠٫٢» on a Libyan sheet directly above «64 ك.ب/ث».
+ */
+enum class NumberStyle(private val zero: Char, private val decimal: Char) {
+    WESTERN('0', '.'),
+    WESTERN_COMMA('0', ','),
+    ARABIC_INDIC('٠', '٫'),
+    BENGALI('০', '.'),
+    ;
+
+    fun apply(text: String): String = buildString(text.length) {
+        for (c in text) {
+            append(
+                when (c) {
+                    in '0'..'9' -> zero + (c - '0')
+                    '.' -> decimal
+                    else -> c
+                },
+            )
+        }
+    }
+
+    companion object {
+        /** [platformZero] is the platform's rendering of the digit zero for the current locale. */
+        fun of(languageTag: String, platformZero: String): NumberStyle = when {
+            platformZero == "٠" -> ARABIC_INDIC
+            platformZero == "০" -> BENGALI
+            UiLanguage.of(languageTag) in COMMA_LANGUAGES -> WESTERN_COMMA
+            else -> WESTERN
+        }
+
+        private val COMMA_LANGUAGES = setOf(UiLanguage.FRENCH, UiLanguage.TURKISH, UiLanguage.INDONESIAN)
+    }
+}
+
+/**
+ * The words a download notification is made of, in every interface language, and nothing else.
  *
  * Same reasoning as `LocalizedNotificationCopy` for prayers: no platform code ever localises a
  * notification. A download worker can be started by WorkManager into a process with no Activity,
@@ -11,24 +52,46 @@ package world.taqwa.app.recitation
  */
 object DownloadCopy {
 
+    private class Words(
+        val channelName: String,
+        /** `{name}`, `{done}`, `{total}` and `{unit}`: "Al-Baqarah · 9.3 of 58.2 MB". */
+        val progress: String,
+        /** `{name}`, `{done}`, `{total}`: "Mishary Rashid Alafasy · 12 of 114 surahs". */
+        val batch: String,
+        val megabyteUnit: String,
+    )
+
+    private val WORDS: Map<UiLanguage, Words> = mapOf(
+        UiLanguage.ENGLISH to Words("Downloads", "{name} · {done} of {total} {unit}", "{name} · {done} of {total} surahs", "MB"),
+        UiLanguage.ARABIC to Words("التنزيلات", "{name} · {done} من {total} {unit}", "{name} · {done} من {total} سورة", "م.ب"),
+        UiLanguage.FRENCH to Words("Téléchargements", "{name} · {done} sur {total} {unit}", "{name} · {done} sourates sur {total}", "Mo"),
+        UiLanguage.TURKISH to Words("İndirmeler", "{name} · {done} / {total} {unit}", "{name} · {total} sureden {done}", "MB"),
+        UiLanguage.INDONESIAN to Words("Unduhan", "{name} · {done} dari {total} {unit}", "{name} · {done} dari {total} surah", "MB"),
+        UiLanguage.URDU to Words("ڈاؤن لوڈز", "{name} · {total} {unit} میں سے {done}", "{name} · {total} میں سے {done} سورتیں", "ایم بی"),
+        UiLanguage.BENGALI to Words("ডাউনলোড", "{name} · {total} {unit}-এর মধ্যে {done}", "{name} · {total}টির মধ্যে {done}টি সূরা", "এমবি"),
+    )
+
+    private fun words(languageTag: String) = WORDS.getValue(UiLanguage.of(languageTag))
+
     /** The low-importance channel every download notification is posted into. */
-    fun channelName(arabic: Boolean): String = if (arabic) "التنزيلات" else "Downloads"
+    fun channelName(languageTag: String): String = words(languageTag).channelName
 
     /** "Al-Baqarah · 9.3 of 58.2 MB", "البقرة · ٩٫٣ من ٥٨٫٢ م.ب". */
-    fun progress(surahName: String, bytes: Long, total: Long, arabic: Boolean): String {
-        val done = megabytes(bytes, arabic)
-        val whole = megabytes(total, arabic)
-        val unit = if (arabic) "م.ب" else "MB"
-        val of = if (arabic) "من" else "of"
-        return "$surahName · $done $of $whole $unit"
+    fun progress(surahName: String, bytes: Long, total: Long, languageTag: String, style: NumberStyle): String {
+        val w = words(languageTag)
+        return w.progress
+            .replace("{name}", surahName)
+            .replace("{done}", megabytes(bytes, style))
+            .replace("{total}", megabytes(total, style))
+            .replace("{unit}", w.megabyteUnit)
     }
 
     /** "Mishary Rashid Alafasy · 12 of 114 surahs", "مشاري العفاسي · ١٢ من ١١٤ سورة". */
-    fun batch(reciterName: String, done: Int, total: Int, arabic: Boolean): String {
-        val d = digits(done.toString(), arabic)
-        val t = digits(total.toString(), arabic)
-        return if (arabic) "$reciterName · $d من $t سورة" else "$reciterName · $d of $t surahs"
-    }
+    fun batch(reciterName: String, done: Int, total: Int, languageTag: String, style: NumberStyle): String =
+        words(languageTag).batch
+            .replace("{name}", reciterName)
+            .replace("{done}", style.apply(done.toString()))
+            .replace("{total}", style.apply(total.toString()))
 
     /**
      * Megabytes to one decimal, without the unit — the unit is printed once for the pair, so the
@@ -37,10 +100,9 @@ object DownloadCopy {
      * Rounded rather than truncated, and no platform number formatter: this runs in a worker that
      * may have no locale services worth the call, and the shape is fixed anyway.
      */
-    fun megabytes(bytes: Long, arabic: Boolean): String {
+    fun megabytes(bytes: Long, style: NumberStyle): String {
         val tenths = megabyteTenths(bytes)
-        val plain = "${tenths / 10}.${tenths % 10}"
-        return digits(plain, arabic)
+        return style.apply("${tenths / 10}.${tenths % 10}")
     }
 
     /**
@@ -48,10 +110,9 @@ object DownloadCopy {
      * (spec §8) and a settings row that priced it at "1625.4 MB" would be asking the reader to
      * count digits.
      */
-    fun gigabytes(bytes: Long, arabic: Boolean): String {
+    fun gigabytes(bytes: Long, style: NumberStyle): String {
         val tenths = (bytes * 10 + GIGABYTE / 2) / GIGABYTE
-        val plain = "${tenths / 10}.${tenths % 10}"
-        return digits(plain, arabic)
+        return style.apply("${tenths / 10}.${tenths % 10}")
     }
 
     /**
@@ -68,24 +129,6 @@ object DownloadCopy {
 
     private fun megabyteTenths(bytes: Long): Long = (bytes * 10 + MEGABYTE / 2) / MEGABYTE
 
-    /** Arabic-Indic digits and the Arabic decimal separator, or the string unchanged. */
-    private fun digits(text: String, arabic: Boolean): String {
-        if (!arabic) return text
-        return buildString(text.length) {
-            for (c in text) {
-                append(
-                    when (c) {
-                        in '0'..'9' -> ARABIC_ZERO + (c - '0')
-                        '.' -> ARABIC_DECIMAL
-                        else -> c
-                    }
-                )
-            }
-        }
-    }
-
     private const val MEGABYTE = 1024L * 1024L
     private const val GIGABYTE = 1024L * 1024L * 1024L
-    private const val ARABIC_ZERO = '٠'
-    private const val ARABIC_DECIMAL = '٫'
 }

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import world.taqwa.app.i18n.uiLanguage
+import world.taqwa.app.i18n.uppercaseIn
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +37,7 @@ fun CountdownRing(
         RingArc(progress = progress, diameter = diameter)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = label.uppercase(),
+                text = label.uppercaseIn(uiLanguage()),
                 style = TaqwaText.sectionLabel.copy(fontSize = 11.sp),
                 color = colors.accent,
                 textAlign = TextAlign.Center,

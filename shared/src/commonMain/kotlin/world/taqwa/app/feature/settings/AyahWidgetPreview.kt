@@ -38,7 +38,9 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.widget.AyahPoolEntry
 import world.taqwa.app.widget.AyahPoolMirror
@@ -202,7 +204,7 @@ private fun AyahCardFooter(
         } else {
             "${format.localizedDigits(entry.surah)}:${format.localizedDigits(entry.ayah)}"
         }
-        val arabicUi = languageTag?.startsWith("ar") ?: isRtlLocale()
+        val arabicUi = languageTag?.let { UiLanguage.of(it).arabicScript } ?: uiLanguage().arabicScript
         if (arabicUi) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(

@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.isLatinScriptUi
 import world.taqwa.app.i18n.uiFontFamily
 import world.taqwa.app.resources.Manrope_ExtraBold
 import world.taqwa.app.resources.Manrope_Light
@@ -63,12 +63,12 @@ object TaqwaText {
             style
         }
 
-    val countdown: TextStyle @Composable get() = forScript(Latin.countdown, isRtlLocale())
-    val screenTitle: TextStyle @Composable get() = forScript(Latin.screenTitle, isRtlLocale())
-    val rowLabel: TextStyle @Composable get() = forScript(Latin.rowLabel, isRtlLocale())
-    val rowTime: TextStyle @Composable get() = forScript(Latin.rowTime, isRtlLocale())
-    val sectionLabel: TextStyle @Composable get() = forScript(Latin.sectionLabel, isRtlLocale())
-    val caption: TextStyle @Composable get() = forScript(Latin.caption, isRtlLocale())
+    val countdown: TextStyle @Composable get() = forScript(Latin.countdown, !isLatinScriptUi())
+    val screenTitle: TextStyle @Composable get() = forScript(Latin.screenTitle, !isLatinScriptUi())
+    val rowLabel: TextStyle @Composable get() = forScript(Latin.rowLabel, !isLatinScriptUi())
+    val rowTime: TextStyle @Composable get() = forScript(Latin.rowTime, !isLatinScriptUi())
+    val sectionLabel: TextStyle @Composable get() = forScript(Latin.sectionLabel, !isLatinScriptUi())
+    val caption: TextStyle @Composable get() = forScript(Latin.caption, !isLatinScriptUi())
 }
 
 /**
@@ -79,7 +79,9 @@ object TaqwaText {
 @Composable
 fun TaqwaTypography(): Typography {
     val family = uiFontFamily()
-    val arabic = isRtlLocale()
+    // Every non-Latin script, not only Arabic: Bengali is upright and left-to-right and still has
+    // no business carrying Manrope's tracking.
+    val arabic = !isLatinScriptUi()
     val base = Typography()
 
     // Material3 hands `bodyLarge` down as LocalTextStyle, and its own default carries 0.5sp of

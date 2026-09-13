@@ -16,8 +16,8 @@ class AboutLinksTest {
 
     @Test
     fun theWebsiteOpensInTheLanguageTheAppIsShowing() {
-        assertEquals("https://taqwa.world/", AboutLinks.website(arabic = false))
-        assertEquals("https://taqwa.world/ar/", AboutLinks.website(arabic = true))
+        assertEquals("https://taqwa.world/", AboutLinks.website("en"))
+        assertEquals("https://taqwa.world/ar/", AboutLinks.website("ar"))
     }
 
     @Test
@@ -28,5 +28,12 @@ class AboutLinksTest {
     @Test
     fun theLicenceLinkPointsAtTheLicenceFile() {
         assertTrue(AboutLinks.LICENCE.endsWith("/LICENSE"))
+    }
+
+    @Test
+    fun everyOtherLanguageHasItsOwnHalfOfTheSite() {
+        assertEquals("https://taqwa.world/fr/", AboutLinks.website("fr"))
+        assertEquals("https://taqwa.world/ur/", AboutLinks.website("ur"))
+        assertEquals("https://taqwa.world/", AboutLinks.website("en"))
     }
 }

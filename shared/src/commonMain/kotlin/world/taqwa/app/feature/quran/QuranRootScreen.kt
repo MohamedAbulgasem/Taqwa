@@ -27,6 +27,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import world.taqwa.app.i18n.uiLanguage
+import world.taqwa.app.i18n.uppercaseIn
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -476,7 +478,7 @@ private fun CardRow(content: @Composable () -> Unit) {
  * Arabic labels keep the words as written (`uppercase()` is a no-op in Arabic script). */
 @Composable
 private fun SearchSectionLabel(text: String) {
-    Box(Modifier.contentWidth()) { SectionLabel(text.uppercase()) }
+    Box(Modifier.contentWidth()) { SectionLabel(text.uppercaseIn(uiLanguage())) }
 }
 
 /** A card's one-line answer when it has no rows: "no ayahs match", "no bookmarks yet". Caption on

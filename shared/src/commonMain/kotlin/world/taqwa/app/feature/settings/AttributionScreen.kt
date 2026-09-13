@@ -30,7 +30,7 @@ import world.taqwa.app.resources.credit_quran_font_detail
 import world.taqwa.app.resources.credit_quran_layout
 import world.taqwa.app.resources.credit_quran_layout_detail
 import world.taqwa.app.resources.credit_quran_text
-import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.resources.credit_quran_text_detail
 import world.taqwa.app.resources.credit_recitations
@@ -108,7 +108,7 @@ private fun credits(translations: List<TranslationInfo>, reciters: List<Reciter>
         // translations below are read from the database: a reciter withdrawn from the manifest
         // (spec §2's one obligation we can be held to) disappears from the app *and* from its
         // credits, with no app update and no line left behind naming someone we no longer carry.
-        extra = isRtlLocale().let { arabic ->
+        extra = uiLanguage().arabicScript.let { arabic ->
             reciters.joinToString(if (arabic) "، " else ", ") { if (arabic) it.nameAr else it.nameEn }
         }.takeIf { it.isNotBlank() },
     ),

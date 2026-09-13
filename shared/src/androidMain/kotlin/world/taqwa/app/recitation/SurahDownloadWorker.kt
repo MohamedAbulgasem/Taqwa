@@ -32,7 +32,9 @@ class SurahDownloadWorker(
     private val reciterId = inputData.getString(RecitationWork.KEY_RECITER)
     private val surah = inputData.getInt(RecitationWork.KEY_SURAH, 0)
     private val surahName = inputData.getString(RecitationWork.KEY_SURAH_NAME).orEmpty()
-    private val arabic = inputData.getBoolean(RecitationWork.KEY_ARABIC, false)
+    private val languageTag = inputData.getString(RecitationWork.KEY_LANGUAGE) ?: "en"
+    private val numberStyle = inputData.getString(RecitationWork.KEY_NUMBER_STYLE)
+        ?.let { name -> NumberStyle.entries.firstOrNull { it.name == name } } ?: NumberStyle.WESTERN
     private val totalBytes = inputData.getLong(RecitationWork.KEY_BYTES, 0L)
 
     /**
@@ -110,11 +112,11 @@ class SurahDownloadWorker(
 
     /** "Al-Baqarah · 9.3 of 58.2 MB", and a bar the notification shade can draw. */
     private fun foregroundInfo(done: Long): ForegroundInfo {
-        ensureChannel(applicationContext, arabic)
+        ensureChannel(applicationContext, languageTag)
         val percent = if (totalBytes <= 0L) 0 else ((done * 100) / totalBytes).toInt().coerceIn(0, 100)
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(notificationSmallIconResId)
-            .setContentTitle(DownloadCopy.progress(surahName, done, totalBytes, arabic))
+            .setContentTitle(DownloadCopy.progress(surahName, done, totalBytes, languageTag, numberStyle))
             .setProgress(100, percent, done <= 0L)
             .setOngoing(true)
             .setSilent(true)
@@ -154,12 +156,12 @@ class SurahDownloadWorker(
         const val GROUP_PREFIX = "world.taqwa.app.downloads."
 
         /** Idempotent, and re-created deliberately so a locale change relabels it. */
-        fun ensureChannel(context: Context, arabic: Boolean) {
+        fun ensureChannel(context: Context, languageTag: String) {
             val manager = context.getSystemService(NotificationManager::class.java) ?: return
             manager.createNotificationChannel(
                 NotificationChannel(
                     CHANNEL_ID,
-                    DownloadCopy.channelName(arabic),
+                    DownloadCopy.channelName(languageTag),
                     NotificationManager.IMPORTANCE_LOW,
                 ).apply { setShowBadge(false) }
             )

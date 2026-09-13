@@ -63,6 +63,7 @@ import world.taqwa.app.feature.today.TodayViewModel
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.design.components.TaqwaBottomSheet
@@ -169,7 +170,8 @@ fun App(container: AppContainer) {
     val layoutDirection = if (isRtlLocale()) LayoutDirection.Rtl else LayoutDirection.Ltr
     // The lock screen's two lines are baked when a surah is loaded, and a service outlives the
     // composition that started it, so the controller is told the language rather than asked.
-    val arabicUi = isRtlLocale()
+    // Arabic-script interfaces (Arabic, Urdu) get the Arabic names; the rest the Latin ones.
+    val arabicUi = uiLanguage().arabicScript
     LaunchedEffect(arabicUi) { recitation.setArabicUi(arabicUi) }
     // The Android notification's two ayah buttons (spec §15.1), in the interface's language.
     val previousAyahLabel = stringResource(Res.string.recitation_a11y_previous_ayah)

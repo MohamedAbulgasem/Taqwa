@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import world.taqwa.app.i18n.PrayerNaming
+import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.notifications.notificationSmallIconResId
 import world.taqwa.app.quran.QuranSource
@@ -115,13 +115,13 @@ actual class SurahDownloader actual constructor(
                 val owned = library.downloaded(reciterId).first()
                 val wanted = reciter.surahs.map { it.n }.sorted().filter { it !in owned }
                 if (wanted.isEmpty()) return@runCatching
-                val arabic = isArabic()
+                val wording = wording()
                 submit(reciterId, wanted, allowMobileOnce, ExistingWorkPolicy.KEEP)
                 watchBatch(
                     reciterId = reciterId,
-                    reciterName = if (arabic) reciter.nameAr else reciter.nameEn,
+                    reciterName = if (wording.arabicScript) reciter.nameAr else reciter.nameEn,
                     total = reciter.surahs.size,
-                    arabic = arabic,
+                    wording = wording,
                 )
             }
         }
@@ -176,9 +176,9 @@ actual class SurahDownloader actual constructor(
             return
         }
         forget(keys)
-        val arabic = isArabic()
+        val wording = wording()
         val names = runCatching {
-            quran.surahs().associate { it.number to if (arabic) it.nameArabic else it.nameLatin }
+            quran.surahs().associate { it.number to if (wording.arabicScript) it.nameArabic else it.nameLatin }
         }.getOrDefault(emptyMap())
         val constraints = Constraints.Builder()
             // This is the rule that holds mid-transfer: a download running when the reader walks
@@ -204,7 +204,8 @@ actual class SurahDownloader actual constructor(
                         RecitationWork.KEY_SHA to asset.sha256,
                         RecitationWork.KEY_ALLOW_METERED to allowMetered,
                         RecitationWork.KEY_SURAH_NAME to (names[surah] ?: surah.toString()),
-                        RecitationWork.KEY_ARABIC to arabic,
+                        RecitationWork.KEY_LANGUAGE to wording.languageTag,
+                        RecitationWork.KEY_NUMBER_STYLE to wording.style.name,
                     )
                 )
                 .build()
@@ -221,7 +222,7 @@ actual class SurahDownloader actual constructor(
      * otherwise start at zero out of 84. It lives only as long as the app's process does, which is
      * the honest limit of a summary nobody is holding a foreground service for.
      */
-    private fun watchBatch(reciterId: String, reciterName: String, total: Int, arabic: Boolean) {
+    private fun watchBatch(reciterId: String, reciterName: String, total: Int, wording: Wording) {
         batches.remove(reciterId)?.cancel()
         batches[reciterId] = scope.launch {
             var started = false
@@ -238,8 +239,8 @@ actual class SurahDownloader actual constructor(
                         started = true
                         postBatchNotification(
                             reciterId,
-                            DownloadCopy.batch(reciterName, owned, total, arabic),
-                            arabic,
+                            DownloadCopy.batch(reciterName, owned, total, wording.languageTag, wording.style),
+                            wording.languageTag,
                         )
                     } else if (started) {
                         clearBatchNotification(reciterId)
@@ -249,8 +250,8 @@ actual class SurahDownloader actual constructor(
         }
     }
 
-    private fun postBatchNotification(reciterId: String, text: String, arabic: Boolean) {
-        SurahDownloadWorker.ensureChannel(context, arabic)
+    private fun postBatchNotification(reciterId: String, text: String, languageTag: String) {
+        SurahDownloadWorker.ensureChannel(context, languageTag)
         val notification = NotificationCompat.Builder(context, SurahDownloadWorker.CHANNEL_ID)
             .setSmallIcon(notificationSmallIconResId)
             .setContentTitle(text)
@@ -276,8 +277,18 @@ actual class SurahDownloader actual constructor(
     private fun batchNotificationId(reciterId: String) =
         BATCH_NOTIFICATION_BASE + abs(reciterId.hashCode() % BATCH_ID_SPAN)
 
-    private fun isArabic(): Boolean =
-        PrayerNaming.isArabicLanguage(createPlatformFormat().languageTag())
+    /**
+     * The language a notification is baked in, decided here while the app is running: the
+     * interface's tag, the number style the rest of the app is drawing with, and whether names
+     * come in the Arabic script (Arabic and Urdu interfaces) or the Latin one.
+     */
+    private class Wording(val languageTag: String, val style: NumberStyle, val arabicScript: Boolean)
+
+    private fun wording(): Wording {
+        val format = createPlatformFormat()
+        val tag = format.languageTag()
+        return Wording(tag, NumberStyle.of(tag, format.localizedDigits(0)), UiLanguage.of(tag).arabicScript)
+    }
 
     private companion object {
         const val BACKOFF_SECONDS = 10L

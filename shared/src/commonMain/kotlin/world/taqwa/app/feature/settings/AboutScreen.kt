@@ -38,7 +38,7 @@ import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.design.components.drawExternalLink
 import world.taqwa.app.feature.onboarding.drawMihrab
-import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.about_icon_open_website
 import world.taqwa.app.resources.about_licence
@@ -70,7 +70,7 @@ fun AboutScreen(onBack: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val uriHandler = LocalUriHandler.current
     val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
-    val website = AboutLinks.website(arabic = isRtlLocale())
+    val website = AboutLinks.website(uiLanguage().code)
     // A device with no browser fails silently rather than crashing (spec §6.3).
     fun open(url: String) {
         runCatching { uriHandler.openUri(url) }

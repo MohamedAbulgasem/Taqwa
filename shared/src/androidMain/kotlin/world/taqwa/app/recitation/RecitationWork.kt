@@ -36,7 +36,9 @@ internal object RecitationWork {
     const val KEY_SHA = "sha256"
     const val KEY_ALLOW_METERED = "allowMetered"
     const val KEY_SURAH_NAME = "surahName"
-    const val KEY_ARABIC = "arabic"
+    /** The interface language at enqueue time (a BCP-47 tag) and the number style that goes with it. */
+    const val KEY_LANGUAGE = "language"
+    const val KEY_NUMBER_STYLE = "numberStyle"
 
     /** Progress and output. */
     const val KEY_DONE = "done"

@@ -59,7 +59,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">0.17.0</string>
+    <string name="settings_version_value">0.18.0</string>
 
     <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
     <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
@@ -296,6 +296,12 @@
     <string name="tasbeeh_round">الجولة %1$s</string>
     <string name="tasbeeh_of">من %1$s</string>
     <string name="tasbeeh_hint">اضغط في أي مكان للعدّ</string>
+    <string name="dhikr_meaning_subhanallah">تنزيه الله عن كل نقص</string>
+    <string name="dhikr_meaning_alhamdulillah">الثناء كله لله</string>
+    <string name="dhikr_meaning_allahu_akbar">الله أعظم من كل شيء</string>
+    <string name="dhikr_meaning_astaghfirullah">أطلب المغفرة من الله</string>
+    <string name="dhikr_meaning_la_ilaha_illallah">لا معبود بحق إلا الله</string>
+    <string name="dhikr_meaning_subhanallahi_wa_bihamdihi">تنزيه لله مقرون بحمده</string>
     <string name="tasbeeh_preset_after_prayer">بعد الصلاة</string>
     <string name="tasbeeh_preset_subhanallah">سبحان الله</string>
     <string name="tasbeeh_preset_alhamdulillah">الحمد لله</string>
