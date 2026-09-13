@@ -46,6 +46,7 @@ import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.settings.AppearanceSettingsScreen
+import world.taqwa.app.feature.settings.AboutScreen
 import world.taqwa.app.feature.settings.AttributionScreen
 import world.taqwa.app.feature.settings.CitySearchScreen
 import world.taqwa.app.feature.settings.HighLatitudePickerScreen
@@ -642,6 +643,7 @@ fun App(container: AppContainer) {
                             onOpenPrayerTimes = { navigator.push(Screen.PrayerTimesSettings) },
                             onOpenNotifications = { navigator.push(Screen.NotificationSettings) },
                             onOpenAppearance = { navigator.push(Screen.Appearance) },
+                            onOpenAbout = { navigator.push(Screen.About) },
                             onOpenAttribution = { navigator.push(Screen.Attribution) },
                             reciterName = recitationState.reciter?.let { reciterName(it) }.orEmpty(),
                             onOpenRecitation = { navigator.push(Screen.RecitationSettings) },
@@ -865,6 +867,8 @@ fun App(container: AppContainer) {
                             },
                             onBack = { navigator.pop() },
                         )
+
+                        Screen.About -> AboutScreen(onBack = { navigator.pop() })
 
                         Screen.Attribution -> {
                             // The translation credits must never drift from what is actually
