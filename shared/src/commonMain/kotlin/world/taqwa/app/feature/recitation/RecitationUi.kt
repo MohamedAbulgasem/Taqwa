@@ -215,3 +215,13 @@ fun PlayingMark(modifier: Modifier = Modifier) {
  * and 76 before the clocks were given air above them.
  */
 val PlayerBarHeight: Dp = 83.dp
+
+/** The status strip above the clock while a download the bar is waiting on runs (spec §15.4). */
+val IncomingStripHeight: Dp = 26.dp
+
+/** What the bar takes up for [bar]: its height, plus the strip while something is arriving. */
+fun playerBarHeight(bar: BarState?): Dp = when {
+    bar == null -> 0.dp
+    bar.incoming != null -> PlayerBarHeight + IncomingStripHeight
+    else -> PlayerBarHeight
+}

@@ -95,7 +95,7 @@ import world.taqwa.app.feature.quran.ReaderUiState
 import world.taqwa.app.feature.quran.ReaderViewModel
 import world.taqwa.app.feature.recitation.DownloadSheet
 import world.taqwa.app.feature.recitation.PlayerBar
-import world.taqwa.app.feature.recitation.PlayerBarHeight
+import world.taqwa.app.feature.recitation.playerBarHeight
 import world.taqwa.app.feature.recitation.PlayerBarHost
 import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.ReciterPicker
@@ -381,6 +381,8 @@ fun App(container: AppContainer) {
                 val quranTab = navigator.currentTab == Tab.QURAN
                 val bar = recitationState.bar
                 val barSurahName = rememberSurahName(bar?.surah) { container.quranRepository.surah(it) }
+                val incomingSurahName = rememberSurahName(bar?.incoming?.surah) { container.quranRepository.surah(it) }
+                val barSpace = playerBarHeight(bar)
                 // A surah skip (spec §15.1) takes the page with the voice: a reader on the surah
                 // that was playing is moved to the one now playing, at its first ayah, as the
                 // "Next" row at the foot of a surah would move them. A reader on some other surah
@@ -413,6 +415,7 @@ fun App(container: AppContainer) {
                                     onPreviousAyah = recitation::previous,
                                     onOpenPicker = recitation::openPicker,
                                     onDismiss = recitation::dismissBar,
+                                    incomingSurahName = incomingSurahName,
                                 )
                             }
                         }
@@ -583,7 +586,7 @@ fun App(container: AppContainer) {
                                     header = recitationState.header(screen.surah),
                                     playing = bar?.let { it.surah to it.ayah },
                                     live = bar?.playing == true,
-                                    barSpace = if (bar != null) PlayerBarHeight else 0.dp,
+                                    barSpace = barSpace,
                                     onHeader = recitation::onHeaderTap,
                                     onPlayAyah = recitation::requestPlay,
                                     onToggle = recitation::toggle,
@@ -645,7 +648,7 @@ fun App(container: AppContainer) {
                                     ),
                                     playing = bar?.let { it.surah to it.ayah },
                                     live = bar?.playing == true,
-                                    barSpace = if (bar != null) PlayerBarHeight else 0.dp,
+                                    barSpace = barSpace,
                                     onHeader = recitation::onHeaderTap,
                                     onPlayAyah = recitation::requestPlay,
                                     onToggle = recitation::toggle,

@@ -291,10 +291,14 @@ class RecitationController(
         // that is waiting, the chosen voice's copy of this surah arriving by some other route.
         val chosen = catalogue.reciter
         val waiting = pending
-        val incoming = waiting?.let { downloadFraction(playing.downloads[DownloadKey(it.reciterId, it.surah)]) }
-            ?: chosen?.takeIf { it.id != voice.id }?.let { next ->
-                downloadFraction(playing.downloads[DownloadKey(next.id, surah)])
-            }
+        val incoming = waiting?.let { wait ->
+            val who = catalogue.manifest?.reciter(wait.reciterId) ?: return@let null
+            downloadFraction(playing.downloads[DownloadKey(wait.reciterId, wait.surah)])
+                ?.let { IncomingDownload(wait.surah, who, it) }
+        } ?: chosen?.takeIf { it.id != voice.id }?.let { next ->
+            downloadFraction(playing.downloads[DownloadKey(next.id, surah)])
+                ?.let { IncomingDownload(surah, next, it) }
+        }
         return BarState(
             reciter = voice,
             surah = surah,

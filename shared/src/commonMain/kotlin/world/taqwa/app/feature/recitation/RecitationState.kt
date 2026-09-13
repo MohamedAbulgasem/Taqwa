@@ -46,13 +46,19 @@ data class BarState(
     /** The whole surah, for the "2:05:10" at its end. Zero hides both clocks. */
     val durationMs: Long = 0L,
     /**
-     * How far along the *chosen* voice's copy of this surah is, when it is a different voice from
-     * the one being heard (spec §14.3): the reader picked a reciter who did not have the surah,
-     * asked for it, and is listening to the old voice until it lands. Null when nothing is
-     * arriving. Drawn as a thin ring around the monogram.
+     * The download the bar is waiting on, if any (spec §14.3, §15.1, §15.4): the next surah
+     * fetched after a skip, or a new voice's copy of this surah. Drawn as a status strip above
+     * the clock and a thin ring around the monogram, so the tap that started it is seen to have
+     * done something while the current surah plays on.
      */
-    val incoming: Float? = null,
+    val incoming: IncomingDownload? = null,
 )
+
+/**
+ * What the bar is waiting for: [surah] by [reciter], [fraction] of the way here. The bar names
+ * the surah when it differs from the one playing, and the voice when the surah is the same.
+ */
+data class IncomingDownload(val surah: Int, val reciter: Reciter, val fraction: Float)
 
 /** Which of the download sheet's three faces is showing (spec §5.4). */
 sealed interface SheetPhase {

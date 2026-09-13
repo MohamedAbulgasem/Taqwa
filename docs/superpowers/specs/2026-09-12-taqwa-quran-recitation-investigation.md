@@ -411,3 +411,16 @@ between; picking a new voice while another plays fetches its copy and switches w
 with the ring on the monogram (§14.3) and no sheet. The Wi-Fi rule still applies. A refusal —
 no Wi-Fi, no network, no room — is the one thing the reader must see, so the sheet opens itself
 on the failure face, once per failure, with the sentence and its Retry or mobile-data override.
+
+### 15.4 Saying what the bar is waiting for
+
+**Ask.** Next on a surah that is not on the phone, with "without asking" on, gave no sign
+of anything until the surah landed and the voice moved.
+
+**Decision.** A status strip slides in above the clock while the bar is waiting on a download
+and goes when it lands: *Next: Al-Ma'idah · 38 %* after a skip, *Ash-Shatri · 38 %* when a
+new voice's copy of the surah playing is on its way, the name in the accent and the percentage
+in tabular figures. The bar grows by the strip (`playerBarHeight(bar)`), and the reader's and
+Mushaf's clearance grow with it; the ring on the monogram stays. `BarState.incoming` became
+`IncomingDownload(surah, reciter, fraction)` so the strip can name what is coming. Verified on
+the emulator: next on An-Nisa showed *Next: Al-Ma'idah · 0 %* at once and counted up.

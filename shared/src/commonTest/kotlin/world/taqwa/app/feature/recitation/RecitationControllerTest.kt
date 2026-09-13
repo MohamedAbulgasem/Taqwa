@@ -496,7 +496,10 @@ class RecitationControllerTest {
 
             harness.downloader.emit(mapOf(DownloadKey("ar.husary", 112) to DownloadState.Downloading(50L, 100L)))
 
-            assertEquals(0.5f, controller.state.value.bar?.incoming ?: -1f, 0.001f)
+            val incoming = assertNotNull(controller.state.value.bar?.incoming)
+            assertEquals(0.5f, incoming.fraction, 0.001f)
+            assertEquals(112, incoming.surah)
+            assertEquals("ar.husary", incoming.reciter.id)
             // Playing still beats the download on the header: a tap there is still pause.
             assertEquals(HeaderState.Playing, controller.state.value.header(112))
         }
@@ -793,7 +796,10 @@ class RecitationControllerTest {
         controller.nextSurah()
         harness.downloader.emit(mapOf(DownloadKey("ar.alafasy", 2) to DownloadState.Downloading(25L, 100L)))
 
-        assertEquals(0.25f, controller.state.value.bar?.incoming ?: -1f, 0.001f)
+        val incoming = assertNotNull(controller.state.value.bar?.incoming)
+        assertEquals(0.25f, incoming.fraction, 0.001f)
+        assertEquals(2, incoming.surah)
+        assertEquals("ar.alafasy", incoming.reciter.id)
         assertEquals(1, controller.state.value.bar?.surah)
     }
 

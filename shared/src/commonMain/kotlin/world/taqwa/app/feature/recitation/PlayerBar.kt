@@ -3,8 +3,10 @@ package world.taqwa.app.feature.recitation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
@@ -50,8 +52,11 @@ import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -75,6 +80,9 @@ import world.taqwa.app.resources.recitation_a11y_next_ayah
 import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_a11y_previous
 import world.taqwa.app.resources.recitation_a11y_previous_ayah
+import world.taqwa.app.resources.recitation_arriving_next
+import world.taqwa.app.resources.recitation_arriving_voice
+import world.taqwa.app.resources.recitation_percent
 import world.taqwa.app.resources.recitation_back_to_ayah
 import world.taqwa.app.resources.recitation_play
 
@@ -144,6 +152,8 @@ fun PlayerBar(
     modifier: Modifier = Modifier,
     onNextAyah: () -> Unit = {},
     onPreviousAyah: () -> Unit = {},
+    /** The name of [BarState.incoming]'s surah, resolved by the caller like [surahName]. */
+    incomingSurahName: String = "",
 ) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
@@ -183,6 +193,23 @@ fun PlayerBar(
             },
     ) {
         Box(Modifier.fillMaxWidth().height(1.dp).background(colors.hairline))
+        // What the bar is waiting on (spec §15.4): the next surah after a skip, or a new voice's
+        // copy of this one. Slides in above the clock and goes when the download lands, so the
+        // tap that started it is seen to have done something while this surah plays on.
+        AnimatedVisibility(
+            visible = bar.incoming != null,
+            enter = expandVertically(tween(BAR_MILLIS)) + fadeIn(tween(BAR_MILLIS)),
+            exit = shrinkVertically(tween(BAR_MILLIS)) + fadeOut(tween(BAR_MILLIS / 2)),
+        ) {
+            val incoming = bar.incoming
+            if (incoming != null) {
+                IncomingStrip(
+                    name = if (incoming.surah != bar.surah) incomingSurahName else reciterName(incoming.reciter),
+                    nextSurah = incoming.surah != bar.surah,
+                    fraction = incoming.fraction,
+                )
+            }
+        }
         Row(
             Modifier
                 .contentWidth()
@@ -230,7 +257,7 @@ fun PlayerBar(
             ) {
                 Box(Modifier.size(MonogramBox), contentAlignment = Alignment.Center) {
                     ReciterMonogram(bar.reciter, Monogram)
-                    bar.incoming?.let { IncomingRing(it) }
+                    bar.incoming?.let { IncomingRing(it.fraction) }
                 }
                 Column(Modifier.padding(start = 8.dp, end = 6.dp)) {
                     if (arabic) {
@@ -280,6 +307,49 @@ fun PlayerBar(
                 size = CloseTarget,
             ) { tint -> Canvas(Modifier.size(16.dp)) { drawClose(tint) } }
         }
+    }
+}
+
+/**
+ * "Next: An-Nisa · 38 %", or "Ash-Shatri · 38 %" for a voice arriving for the surah playing: one
+ * line in the caption size with the name in the accent, over a hairline of its own, [IncomingStripHeight]
+ * tall. The percentage moves; the ring on the monogram moves with it.
+ */
+@Composable
+private fun IncomingStrip(name: String, nextSurah: Boolean, fraction: Float) {
+    val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+    val percent = stringResource(Res.string.recitation_percent, format.localizedDigits((fraction * 100).toInt().coerceIn(0, 100)))
+    val template = stringResource(if (nextSurah) Res.string.recitation_arriving_next else Res.string.recitation_arriving_voice, name, percent)
+    // The name in the accent, the rest secondary: built by splitting the resolved sentence on
+    // the name, so the words around it stay whatever the language put there.
+    val at = template.indexOf(name)
+    val text = buildAnnotatedString {
+        if (at < 0 || name.isEmpty()) {
+            append(template)
+        } else {
+            append(template.substring(0, at))
+            withStyle(SpanStyle(color = colors.accent, fontWeight = FontWeight.SemiBold)) { append(name) }
+            append(template.substring(at + name.length))
+        }
+    }
+    Column(Modifier.fillMaxWidth()) {
+        Box(
+            Modifier
+                .contentWidth()
+                .height(IncomingStripHeight - 1.dp)
+                .padding(horizontal = 14.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Text(
+                text,
+                style = TaqwaText.caption.copy(fontSize = 12.sp, fontFeatureSettings = "tnum"),
+                color = colors.textSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Box(Modifier.fillMaxWidth().height(1.dp).background(colors.hairline))
     }
 }
 
