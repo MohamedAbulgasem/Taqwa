@@ -1079,3 +1079,37 @@ now asked before enqueueing. Settings › Quran › Recitation holds the reciter
 switch, per-reciter downloads with delete, and "Download the whole Quran", whose batch was cancelled
 on the emulator at 68 surahs with nothing left queued and every finished surah still on disk.
 743 tests in the shared module, the suite green on both targets.
+
+### Saying what the app does with the network (13 September, 0.12.0)
+
+Until 0.10.0 the README could say "no network access of any kind" and be right. 0.11.0 added
+recitation downloads and, with them, a catalogue refresh that ran from the start effect on every
+launch, whether or not the person had ever touched recitation. Both stores want a privacy policy
+for an app that touches the network, and the app had nowhere to put one. The order of this
+round was the point of it: the code change came first, so that the policy could say "the app
+makes no network request until you use recitation" and be telling the truth, rather than the
+words being softened to fit the code.
+
+The gate is one fact, `RecitationEngagement`: a DataStore flag written the first time any
+recitation entry point is used, falling back to "any surah in the download registry" for the
+0.11.0 installs that downloaded before the flag existed. The refresher returns before reading
+or writing anything until that fact is true, so the first engaged launch fetches at once rather
+than a day later; the picker and the Recitation settings screen also ask for the daily check
+when they open, since a person who went there wants the current catalogue. The proof was a
+logging proxy in front of a fresh emulator: from launch through onboarding and a minute idle
+on the Prayer screen the only hosts seen were Google's own connectivity checks; the single
+GitHub line appeared at 14:36:02, the moment the reciter picker opened, and not on the speaker
+tap before it. A review of the gate found the engagement write running unguarded on the
+reader's primary tap, which a failed DataStore write would have turned into a crash; it is now
+swallowed as the refresh already was, and the refresher takes a mutex so the start effect and
+the picker cannot both fetch in the same second.
+
+The policy is one page of plain English at the repository root, and the store answers live
+beside it in `docs/STORE-PRIVACY.md` so the forms are filled from the code rather than from
+memory. Two facts in the handoff spec were wrong and the words follow the code: bookmarks and
+Tasbeeh counts are DataStore, not SQLDelight, and the iOS settings file is already excluded
+from iCloud backup. The About screen is where the promise is made in the app: three cards in
+the settings idiom, the product name in Latin script in both locales, and three rows that leave
+the app under an external-link glyph that mirrors under Arabic. iOS declares exempt
+encryption, which removes the export-compliance question from every upload.
+
