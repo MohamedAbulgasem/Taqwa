@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
+import world.taqwa.app.notifications.canOpenAppLanguageSettings
+import world.taqwa.app.notifications.openAppLanguageSettings
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.CardDivider
@@ -295,10 +297,13 @@ fun SettingsRootScreen(
             )
             CardDivider()
             // The language is the device's, not a setting of ours — `language_name` is each
-            // translation naming itself, so this row is right without any code to pick it.
+            // translation naming itself. Where the system has a per-app language page (Android
+            // 13 and later, iOS) the row opens it, so a reader on an English phone can put
+            // Taqwa in Urdu without knowing where that page lives; older Android only states it.
             TaqwaRow(
                 stringResource(Res.string.settings_language),
                 value = stringResource(Res.string.language_name),
+                onClick = if (canOpenAppLanguageSettings()) ({ openAppLanguageSettings() }) else null,
             )
         }
 

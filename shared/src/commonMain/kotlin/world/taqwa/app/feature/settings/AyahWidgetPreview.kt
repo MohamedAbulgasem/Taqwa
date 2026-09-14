@@ -200,7 +200,7 @@ private fun AyahCardFooter(
         val format = LocalPlatformFormat.current
         val plainReference = "${entry.surah}:${entry.ayah}"
         val reference = if (arabicIndicDigits != null) {
-            WidgetDigits.localize(plainReference, arabicIndicDigits)
+            WidgetDigits.localize(plainReference, arabicIndicDigits, languageTag.orEmpty())
         } else {
             "${format.localizedDigits(entry.surah)}:${format.localizedDigits(entry.ayah)}"
         }

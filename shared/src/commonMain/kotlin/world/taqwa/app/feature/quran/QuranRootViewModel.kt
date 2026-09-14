@@ -202,6 +202,7 @@ class QuranRootViewModel(
 
     /** The translation the Latin search runs against, resolved once by [load]. */
     private var translationId: String = FALLBACK_TRANSLATION
+    private var translationLanguage: String = "en"
 
     /** Ayah lists by surah, so a hundred bookmarks in one surah cost one query, not a hundred. */
     private val ayahsBySurah = mutableMapOf<Int, List<Ayah>>()
@@ -219,7 +220,7 @@ class QuranRootViewModel(
         translationId = resolveTranslationId(reading.translationId, translations)
         // The same resolution ReaderViewModel does for its own cards: the catalogue's language for
         // the translation actually in use, "en" only if the row somehow has none.
-        val translationLanguage = translations.firstOrNull { it.id == translationId }?.language ?: "en"
+        translationLanguage = translations.firstOrNull { it.id == translationId }?.language ?: "en"
         val position = settings.readingPosition.first()
         val continueCard = position?.let { pos ->
             byNumber[pos.surah]?.let { surah ->
@@ -292,11 +293,22 @@ class QuranRootViewModel(
         searchJob = activeScope.launch {
             if (!immediate) delay(SEARCH_DEBOUNCE_MS)
             // Arabic in, Arabic searched: someone typing Arabic is quoting the Quran, not their
-            // translation (spec 2b §2.1).
-            val hits = if (SearchQuery.isArabic(text)) {
-                source.searchArabic(text, SEARCH_LIMIT + 1)
-            } else {
-                source.searchTranslation(translationId, text, SEARCH_LIMIT + 1)
+            // translation (spec 2b §2.1) — unless their translation is itself in the Arabic
+            // script (Urdu, Farsi), in which case they are typing their own language: that
+            // translation comes first and the Arabic text fills what is left.
+            val hits = when {
+                SearchQuery.searchesTranslationFirst(text, translationLanguage) -> {
+                    val own = source.searchTranslation(translationId, text, SEARCH_LIMIT + 1)
+                    if (own.size > SEARCH_LIMIT) {
+                        own
+                    } else {
+                        val seen = own.map { it.surah to it.ayah }.toSet()
+                        own + source.searchArabic(text, SEARCH_LIMIT + 1 - own.size)
+                            .filter { (it.surah to it.ayah) !in seen }
+                    }
+                }
+                SearchQuery.isArabic(text) -> source.searchArabic(text, SEARCH_LIMIT + 1)
+                else -> source.searchTranslation(translationId, text, SEARCH_LIMIT + 1)
             }
             // A search that lost the race — the query moved on while the database was answering —
             // must never overwrite the newer query's state.

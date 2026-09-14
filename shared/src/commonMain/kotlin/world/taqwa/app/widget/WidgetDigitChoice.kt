@@ -3,8 +3,8 @@ package world.taqwa.app.widget
 import world.taqwa.app.i18n.PlatformFormat
 
 /**
- * Whether the app draws numbers in Arabic-Indic digits, asked of the platform rather than derived
- * from a language tag.
+ * Whether the app draws numbers in the language's own digits (Arabic-Indic, Bengali, …) rather
+ * than Western ones, asked of the platform rather than derived from a language tag.
  *
  * Both mirrors carry this answer ([AyahPoolMirror.arabicIndicDigits],
  * [WidgetSnapshot.arabicIndicDigits]) so a widget never has to guess, and both writers ask it the
@@ -17,4 +17,7 @@ import world.taqwa.app.i18n.PlatformFormat
  * in Arabic-Indic digits although CLDR's default for that tag is `latn`, so the widget footer and
  * the app showed the same reference in two different scripts (D2, S23 round).
  */
-fun PlatformFormat.usesArabicIndicDigits(): Boolean = localizedDigits(1) == "\u0661"
+fun PlatformFormat.usesNativeDigits(): Boolean = localizedDigits(1) != "1"
+
+/** Kept for the two mirrors' field name; the answer now covers every non-Western digit set. */
+fun PlatformFormat.usesArabicIndicDigits(): Boolean = usesNativeDigits()

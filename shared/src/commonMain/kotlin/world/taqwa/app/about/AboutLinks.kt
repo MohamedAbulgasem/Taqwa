@@ -15,4 +15,7 @@ object AboutLinks {
 
     /** The site speaks the app's seven languages, English at the root; open the one the app is in. */
     fun website(languageCode: String): String = if (languageCode == "en") WEBSITE else "$WEBSITE$languageCode/"
+
+    /** The same policy as [PRIVACY_POLICY], rendered by the site in the app's language. */
+    fun privacyPolicy(languageCode: String): String = website(languageCode) + "privacy/"
 }

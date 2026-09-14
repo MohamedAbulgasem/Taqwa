@@ -80,5 +80,7 @@ object WidgetContentBuilder {
     }
 
     private fun displayName(prayer: Prayer, languageTag: String) =
-        PrayerNaming.display(prayer, languageTag, PrayerNaming.englishName(prayer))
+        // The interface language's own name (Sabah, Subuh, ফজর), never the English one — the
+        // widget has no resources, so the table in PrayerNaming stands in for them.
+        PrayerNaming.display(prayer, languageTag, PrayerNaming.name(prayer, languageTag))
 }

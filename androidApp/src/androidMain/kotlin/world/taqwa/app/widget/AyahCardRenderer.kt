@@ -38,6 +38,8 @@ class AyahCardInput(
     val entry: AyahPoolEntry,
     val arabicUi: Boolean,
     val arabicIndicDigits: Boolean,
+    /** The mirror's language tag: with [arabicIndicDigits] it picks the digit set of the footer. */
+    val languageTag: String,
     val translationRtl: Boolean,
     val showTranslation: Boolean,
     val textArgb: Int,
@@ -478,7 +480,7 @@ object AyahCardRenderer {
         // Built by interpolation rather than pre-formatted upstream, so it needs the same pass
         // through WidgetDigits every other number a widget composes itself gets — against the
         // choice the app recorded in the mirror, so the two can never disagree (D2).
-        val reference = WidgetDigits.localize("${entry.surah}:${entry.ayah}", input.arabicIndicDigits)
+        val reference = WidgetDigits.localize("${entry.surah}:${entry.ayah}", input.arabicIndicDigits, input.languageTag)
         val arabicNameSp = when {
             compact -> FOOTER_ARABIC_COMPACT_SP
             input.arabicUi -> FOOTER_ARABIC_UI_SP

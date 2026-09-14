@@ -59,4 +59,14 @@ class UiLanguageTest {
         assertEquals("Sabah · الفجر", PrayerNaming.display(Prayer.FAJR, "tr", "Sabah"))
         assertEquals("Fajr · الفجر", PrayerNaming.display(Prayer.FAJR, "en-GB", "Fajr"))
     }
+
+
+    @Test
+    fun aRegionalTagKeepsItsScriptRule() {
+        // The widgets' footer rule is asked with the mirror's full tag, never a bare code.
+        assertTrue(UiLanguage.of("ur-PK").arabicScript)
+        assertTrue(UiLanguage.of("ar-EG").arabicScript)
+        assertFalse(UiLanguage.of("bn-BD").arabicScript)
+        assertFalse(UiLanguage.of("tr-TR").arabicScript)
+    }
 }

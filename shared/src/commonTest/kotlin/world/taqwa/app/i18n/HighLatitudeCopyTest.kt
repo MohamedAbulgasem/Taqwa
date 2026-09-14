@@ -65,4 +65,17 @@ class HighLatitudeCopyTest {
         assertNull(note("en", rule = null))
         assertNull(note("ar", rule = null))
     }
+
+
+    @Test
+    fun urduAndBengaliNotesEndWithTheirOwnFullStop() {
+        val ur = note("ur-PK", rule = HighLatitudePreference.SEVENTH_OF_NIGHT)!!
+        assertTrue(ur.endsWith("۔"), ur)
+        assertTrue(ur.contains("فجر") && ur.contains("عشاء"), ur)
+        val bn = note("bn-BD", rule = HighLatitudePreference.TWILIGHT_ANGLE)!!
+        assertTrue(bn.endsWith("।"), bn)
+        assertTrue(bn.contains("ফজর") && bn.contains("এশা"), bn)
+        val polar = note("ur-PK", polar = true, rule = HighLatitudePreference.MIDDLE_OF_NIGHT)!!
+        assertTrue(!polar.contains("{"), polar)
+    }
 }

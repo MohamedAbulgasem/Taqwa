@@ -17,4 +17,14 @@ class CasingTest {
         assertEquals("فجر میں باقی", "فجر میں باقی".uppercaseIn(UiLanguage.URDU))
         assertEquals("ফজর পর্যন্ত বাকি", "ফজর পর্যন্ত বাকি".uppercaseIn(UiLanguage.BENGALI))
     }
+
+
+    @Test
+    fun turkishLowerCasingKeepsTheDots() {
+        assertEquals("iman", "İMAN".lowercaseIn(UiLanguage.TURKISH))
+        assertEquals("ışık", "IŞIK".lowercaseIn(UiLanguage.TURKISH))
+        assertEquals("islam", "ISLAM".lowercaseIn(UiLanguage.ENGLISH))
+        // Latin letters inside a non-Latin translation still fold.
+        assertEquals("allah", "Allah".lowercaseIn(UiLanguage.URDU))
+    }
 }

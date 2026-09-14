@@ -1217,3 +1217,33 @@ it now does. The crash-report feature landed on main meanwhile; its six strings 
 paragraph went into the five new languages with the merge. 0.18.0 (21) built after the merge:
 tests green on both platforms, the release APK on the emulator and the S23, the site's 21 pages
 checked in the browser.
+
+### Launch sweep (14 September, before dawn)
+
+Mohamed asked for one more pass over everything before the stores, and the day started with a
+regression in the language work itself. Five native reviewers, one per new language, read every
+string, the Kotlin tables, the policies and the site pages against the English; their must- and
+should-level corrections were applied (a feminine slip in the French meta, «Un jour avant», the
+Turkish ring label shortened to «Sabah vaktine», PUEBI «Mahasuci», an Urdu pronoun that inverted
+the high-latitude sentence, a Bengali onboarding title that read as a duration) and the nits left
+as notes. A code review of the Kotlin found the two-language shortcuts the refactor had not
+reached: the ayah widget on both platforms still asked `startsWith("ar")`, so an Urdu footer paired
+a Latin name with the Arabic one; the Quran search classified every Urdu-script query as Arabic,
+so the default Urdu reader could not search their own translation (Urdu and Farsi translations
+are searched first now, the Arabic text after); Turkish translation search lower-cased with the
+locale-free `lowercase()` and never matched «İman»; the widget mirrors carried an Arabic-Indic
+boolean, so Bengali widgets counted down in Western digits beside Bengali clock times (the flag
+now means "native digits" and `WidgetDigits` picks the language's own zero); and `WidgetContent`
+named every non-Arabic-script widget row in English — a Turkish home screen said «Fajr · الفجر».
+
+Devices found the rest. An in-place language change (the Android 13 per-app page returning to a
+live process) left armed notifications and the prayer-widget mirror in the old language until a
+cold start — the S23's widgets stayed Urdu after the app had run in Bengali because Today's view
+model, which writes the mirror, only exists while the Prayer tab is on screen; `App.kt` now
+reschedules and refreshes the mirror when `uiLanguage` changes. The Settings › Language row was
+informational and did nothing when tapped; on Android 13+ and iOS it now opens the system's
+per-app language page. About › Privacy policy opens the site's policy in the app's language. The
+emulator's London Fajr alarm fired in Bengali with the right copy and digits; Samsung's Urdu and
+Bengali faces render every screen; large font, dark theme and landscape hold in Urdu. Two platform
+facts stay as they are: iOS formats Bengali with Western digits (Apple's locale default, unlike
+Android's ICU) and the ring keeps Western digits until the tabular check. Shipped as 0.18.1 (22).

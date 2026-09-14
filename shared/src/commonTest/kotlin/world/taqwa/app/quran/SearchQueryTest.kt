@@ -47,4 +47,18 @@ class SearchQueryTest {
         assertTrue(SearchQuery.isLongEnough("ab"))
         assertTrue(SearchQuery.isLongEnough("رب"))
     }
+
+
+    @Test
+    fun anArabicScriptQueryUnderAnUrduTranslationSearchesTheTranslationFirst() {
+        // Every Urdu letter is "Arabic" to the script test, the Urdu-only ones included.
+        assertTrue(SearchQuery.isArabic("ہدایت"))
+        assertTrue(SearchQuery.searchesTranslationFirst("ہدایت", "ur"))
+        assertTrue(SearchQuery.searchesTranslationFirst("رحمت", "ur"))
+        assertTrue(SearchQuery.searchesTranslationFirst("هدایت", "fa"))
+        // Arabic itself is still a quotation of the Quran, and Latin queries never take this path.
+        assertFalse(SearchQuery.searchesTranslationFirst("الرحمن", "ar"))
+        assertFalse(SearchQuery.searchesTranslationFirst("الرحمن", "en"))
+        assertFalse(SearchQuery.searchesTranslationFirst("mercy", "ur"))
+    }
 }

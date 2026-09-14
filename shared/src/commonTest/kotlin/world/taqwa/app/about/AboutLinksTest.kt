@@ -36,4 +36,12 @@ class AboutLinksTest {
         assertEquals("https://taqwa.world/ur/", AboutLinks.website("ur"))
         assertEquals("https://taqwa.world/", AboutLinks.website("en"))
     }
+
+
+    @Test
+    fun thePolicyOpensInTheInterfaceLanguage() {
+        assertEquals("https://taqwa.world/privacy/", AboutLinks.privacyPolicy("en"))
+        assertEquals("https://taqwa.world/ur/privacy/", AboutLinks.privacyPolicy("ur"))
+        assertEquals("https://taqwa.world/tr/privacy/", AboutLinks.privacyPolicy("tr"))
+    }
 }

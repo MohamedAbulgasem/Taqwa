@@ -39,7 +39,7 @@ import world.taqwa.app.widget.WidgetMirrorWriter
 import world.taqwa.app.widget.WidgetPalette
 import world.taqwa.app.widget.WidgetPaletteColors
 import world.taqwa.app.widget.WidgetPrayerRow
-import world.taqwa.app.widget.usesArabicIndicDigits
+import world.taqwa.app.widget.usesNativeDigits
 
 /** The preview cards' height. Both cards share it; the wide one is what is left of the row. */
 private val CardHeight = 100.dp
@@ -181,7 +181,8 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
 @Composable
 private fun countdown(minutes: Long): String = WidgetDigits.localize(
     "${minutes / 60}:${(minutes % 60).toString().padStart(2, '0')}",
-    LocalPlatformFormat.current.usesArabicIndicDigits(),
+    LocalPlatformFormat.current.usesNativeDigits(),
+    LocalPlatformFormat.current.languageTag(),
 )
 
 private val SampleTimes = mapOf(
@@ -202,19 +203,19 @@ private val SampleTimes = mapOf(
 private fun sampleContent(): WidgetContent {
     val format = LocalPlatformFormat.current
     val languageTag = format.languageTag()
-    val arabicIndic = format.usesArabicIndicDigits()
+    val nativeDigits = format.usesNativeDigits()
     val rows = ObligatoryPrayers.map { prayer ->
         WidgetPrayerRow(
             prayer = prayer,
             displayName = PrayerNaming.display(prayer, languageTag, localizedPrayerName(prayer)),
-            clockTime = WidgetDigits.localize(SampleTimes.getValue(prayer), arabicIndic),
+            clockTime = WidgetDigits.localize(SampleTimes.getValue(prayer), nativeDigits, languageTag),
             isCurrent = prayer == Prayer.ASR,
         )
     }
     return WidgetContent(
         nextPrayerDisplayName = PrayerNaming.display(Prayer.MAGHRIB, languageTag, localizedPrayerName(Prayer.MAGHRIB)),
         countdownMinutes = 21,
-        nextClockTime = WidgetDigits.localize(SampleTimes.getValue(Prayer.MAGHRIB), arabicIndic),
+        nextClockTime = WidgetDigits.localize(SampleTimes.getValue(Prayer.MAGHRIB), nativeDigits, languageTag),
         rows = rows,
         ringProgress = 0.86f,
         countdownLabel = WidgetMirrorWriter.countdownLabel(Prayer.MAGHRIB, languageTag),

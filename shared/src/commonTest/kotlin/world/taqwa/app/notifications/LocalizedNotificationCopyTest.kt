@@ -78,4 +78,23 @@ class LocalizedNotificationCopyTest {
             copy.body(Prayer.FAJR, NotificationKind.REMINDER, "5:42", 15),
         )
     }
+
+
+    @Test
+    fun everyLanguageRendersBothBodiesWithNoPlaceholderLeftBehind() {
+        for (tag in listOf("en-GB", "ar-LY", "fr-FR", "tr-TR", "id-ID", "ur-PK", "bn-BD")) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            for (prayer in Prayer.entries) {
+                val prayerBody = copy.body(prayer, NotificationKind.PRAYER, "12:34", 0)
+                val reminder = copy.body(prayer, NotificationKind.REMINDER, "12:34", 10)
+                val title = copy.title(prayer, NotificationKind.PRAYER)
+                for (text in listOf(prayerBody, reminder, title)) {
+                    assertFalse(text.contains("{") || text.contains("}"), "$tag $prayer: $text")
+                    assertTrue(text.contains(title), "$tag $prayer: body should name the prayer: $text")
+                }
+                assertTrue(prayerBody.contains("12:34"), "$tag: $prayerBody")
+                assertTrue(reminder.contains("10") && reminder.contains("12:34"), "$tag: $reminder")
+            }
+        }
+    }
 }

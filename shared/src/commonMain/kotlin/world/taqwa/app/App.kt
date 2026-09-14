@@ -303,6 +303,24 @@ fun App(container: AppContainer) {
     // this effect restarts on exactly the changes that flip the card's script. Restarting writes
     // the mirror once and then re-collects; the write ends in `refreshWidgets()`, which touches
     // nothing this key reads, so there is no loop.
+    // The other two things written in the interface language outside the composition: the
+    // notifications already armed (title, body and channel names are baked at schedule time)
+    // and the prayer widgets' mirror (written by Today's view model, which only exists while the
+    // Prayer tab is on screen). Both would otherwise keep the previous language after an in-place
+    // switch — the normal case on Android 13+, where the per-app language page returns to a
+    // process that is still alive — until the next cold start or the twice-daily top-up. Skipped
+    // on the first composition: the cold-start path already reschedules and Today writes its
+    // own mirror.
+    val languageAtStart = remember { uiLanguage }
+    var lastLanguageApplied by remember { mutableStateOf(languageAtStart) }
+    LaunchedEffect(uiLanguage) {
+        if (uiLanguage == lastLanguageApplied) return@LaunchedEffect
+        lastLanguageApplied = uiLanguage
+        container.notificationCoordinator.reschedule(world.taqwa.app.notifications.RescheduleTrigger.SETTINGS_CHANGED)
+        world.taqwa.app.widget.WidgetMirrorRefresher.refresh(settings, container.prayerTimesEngine, format = platformFormat)
+        refreshWidgets()
+    }
+
     LaunchedEffect(uiLanguage) {
         // `platformFormat` is itself keyed on `uiLanguage`, so by the time this effect restarts
         // it already reports the new language. It is kept, not just asked for its tag, because

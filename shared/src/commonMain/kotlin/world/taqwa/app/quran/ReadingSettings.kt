@@ -1,5 +1,7 @@
 package world.taqwa.app.quran
 
+import world.taqwa.app.i18n.UiLanguage
+
 /** Whether the reader shows translation text (with the Arabic above each verse) or the bare Mushaf page. */
 enum class ReadingMode { TRANSLATION, MUSHAF }
 
@@ -38,7 +40,8 @@ data class ReadingSettings(
         )
 
         fun defaultsFor(languageTag: String): ReadingSettings {
-            val lang = languageTag.substringBefore('-').lowercase()
+            // UiLanguage folds Java's legacy "in" for Indonesian; an unknown language is English.
+            val lang = UiLanguage.of(languageTag).code
             return ReadingSettings(
                 mode = if (lang == "ar") ReadingMode.MUSHAF else ReadingMode.TRANSLATION,
                 translationId = byLanguage[lang] ?: "en.sahih",

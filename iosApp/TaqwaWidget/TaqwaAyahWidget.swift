@@ -154,7 +154,8 @@ struct AyahTimelineProvider: TimelineProvider {
                 entry: mirror?.entryFor(epochDay: epochDay(of: date), seed: seed),
                 showTranslation: mirror?.showsTranslation ?? false,
                 translationRtl: mirror?.translationRtl ?? false,
-                arabicUi: tag.hasPrefix("ar"),
+                // Arabic and Urdu: the surah name stands alone in the footer, as in the app.
+                arabicUi: UiLanguage.companion.of(tag: tag).arabicScript,
                 languageTag: tag,
                 arabicIndicDigits: mirror?.arabicIndicDigits ?? false,
                 background: background
@@ -203,7 +204,10 @@ struct AyahTimelineProvider: TimelineProvider {
     /// Ar-Ra'd 13:28 — for the widget gallery alone, in the gallery's own language.
     static func sampleEntry(background: WidgetBackground) -> AyahEntry {
         let tag = Locale.current.language.languageCode?.identifier ?? "en"
+        // The sample translation is the Arabic tafsir only for Arabic itself; the footer's
+        // "name alone" rule covers every Arabic-script interface (Arabic, Urdu).
         let arabic = tag.hasPrefix("ar")
+        let arabicScript = UiLanguage.companion.of(tag: tag).arabicScript
         let entry = AyahPoolEntry(
             surah: 13,
             ayah: 28,
@@ -218,7 +222,7 @@ struct AyahTimelineProvider: TimelineProvider {
         )
         return AyahEntry(
             date: Date(), entry: entry, showTranslation: true, translationRtl: arabic,
-            arabicUi: arabic, languageTag: tag,
+            arabicUi: arabicScript, languageTag: tag,
             // The gallery sample has no mirror to read, so this is the one place the tag rule
             // still answers the question (see `WidgetDigits.defaultsToArabicIndic`).
             arabicIndicDigits: WidgetDigits.shared.defaultsToArabicIndic(languageTag: tag),
@@ -387,7 +391,7 @@ struct TaqwaAyahWidgetView: View {
         // recorded in the mirror, so the reference is in the digits the app is drawing whatever
         // CLDR's default for the tag happens to be (D2).
         let reference = WidgetDigits.shared.localize(
-            text: "\(ayah.surah):\(ayah.ayah)", arabicIndic: entry.arabicIndicDigits
+            text: "\(ayah.surah):\(ayah.ayah)", nativeDigits: entry.arabicIndicDigits, languageTag: entry.languageTag
         )
         let arabicName = Text(ayah.surahArabic)
             .font(TaqwaHafs.font(size: footerArabicSize))

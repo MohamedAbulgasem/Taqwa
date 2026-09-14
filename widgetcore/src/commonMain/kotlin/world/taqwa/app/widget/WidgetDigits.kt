@@ -76,4 +76,35 @@ object WidgetDigits {
             }
         }
     }
+
+    /**
+     * The zero of the digit set [languageTag]'s script writes numbers in when the app is not
+     * drawing Western digits: Arabic-Indic for Arabic, Bengali digits for Bengali, the extended
+     * Arabic-Indic set for Urdu and Persian; `'0'` for every language whose only digits are
+     * Western.
+     */
+    fun nativeZero(languageTag: String): Char =
+        when (languageTag.substringBefore('-').substringBefore('_').lowercase()) {
+            "ar" -> '\u0660'
+            "bn" -> '\u09E6'
+            "ur", "fa" -> '\u06F0'
+            else -> '0'
+        }
+
+    /**
+     * The rewrite every widget with a mirror uses: [nativeDigits] is the app's own recorded
+     * answer (the mirror's `arabicIndicDigits` field — "the app draws this language's own digits,
+     * not Western ones"), and [languageTag] decides which digits those are. A Bengali widget
+     * therefore counts down in ০-৯ beside clock times that already arrive in them.
+     */
+    fun localize(text: String, nativeDigits: Boolean, languageTag: String): String {
+        if (!nativeDigits) return text
+        val zero = nativeZero(languageTag)
+        if (zero == '0') return text
+        return buildString(text.length) {
+            for (c in text) {
+                append(if (c in '0'..'9') zero + (c - '0') else c)
+            }
+        }
+    }
 }

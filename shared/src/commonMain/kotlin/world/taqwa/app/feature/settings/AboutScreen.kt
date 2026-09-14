@@ -76,6 +76,7 @@ fun AboutScreen(onBack: () -> Unit) {
     val uriHandler = LocalUriHandler.current
     val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
     val website = AboutLinks.website(uiLanguage().code)
+    val policy = AboutLinks.privacyPolicy(uiLanguage().code)
     val noReportLine = stringResource(Res.string.crash_mail_no_report)
     // A device with no browser fails silently rather than crashing (spec §6.3).
     fun open(url: String) {
@@ -123,7 +124,7 @@ fun AboutScreen(onBack: () -> Unit) {
                 open(website)
             }
             CardDivider()
-            LinkRow(stringResource(Res.string.about_privacy_policy), null, forward) { open(AboutLinks.PRIVACY_POLICY) }
+            LinkRow(stringResource(Res.string.about_privacy_policy), null, forward) { open(policy) }
             CardDivider()
             LinkRow(stringResource(Res.string.about_source), stringResource(Res.string.about_source_value), forward) {
                 open(AboutLinks.SOURCE)

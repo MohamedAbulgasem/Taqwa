@@ -11,3 +11,14 @@ fun String.uppercaseIn(language: UiLanguage): String = when {
     language == UiLanguage.TURKISH -> replace('i', 'İ').replace('ı', 'I').uppercase()
     else -> uppercase()
 }
+
+/**
+ * The lower-casing twin, for comparing text rather than showing it: Turkish İ lowers to i and I
+ * to ı, where the locale-free `lowercase()` turns İ into i plus a combining dot and I into i, so
+ * a search for "iman" would skip every sentence-initial "İman". Other languages lower-case any
+ * Latin letters they contain the ordinary way.
+ */
+fun String.lowercaseIn(language: UiLanguage): String = when (language) {
+    UiLanguage.TURKISH -> replace('İ', 'i').replace('I', 'ı').lowercase()
+    else -> lowercase()
+}

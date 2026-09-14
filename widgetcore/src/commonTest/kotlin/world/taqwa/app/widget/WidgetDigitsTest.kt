@@ -67,4 +67,16 @@ class WidgetDigitsTest {
         assertEquals(false, WidgetDigits.defaultsToArabicIndic("ar-LY"))
         assertEquals(false, WidgetDigits.defaultsToArabicIndic("en-GB"))
     }
+
+    @Test
+    fun theRecordedChoiceDrawsTheLanguagesOwnDigits() {
+        // A Bengali app records "native digits"; the widget then counts in ০-৯, not Arabic-Indic.
+        assertEquals("১:০৫", WidgetDigits.localize("1:05", true, "bn-BD"))
+        assertEquals("٠:٢١", WidgetDigits.localize("0:21", true, "ar-EG"))
+        assertEquals("۱:۰۵", WidgetDigits.localize("1:05", true, "ur-PK"))
+        // Western stays Western whatever the flag says, and a Western language ignores it.
+        assertEquals("1:05", WidgetDigits.localize("1:05", false, "bn-BD"))
+        assertEquals("1:05", WidgetDigits.localize("1:05", true, "en-GB"))
+        assertEquals("1:05", WidgetDigits.localize("1:05", true, ""))
+    }
 }

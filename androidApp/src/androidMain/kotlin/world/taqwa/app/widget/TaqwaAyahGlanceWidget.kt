@@ -27,6 +27,7 @@ import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.quran.ReadingSettings
 import java.time.LocalDate
 import java.util.Locale
+import world.taqwa.app.i18n.UiLanguage
 
 /**
  * The daily-ayah home-screen widget (design spec §6): one Uthmani ayah, its translation and the
@@ -225,8 +226,10 @@ private fun AyahWidgetContent(render: AyahWidgetRender) {
                     heightPx = (size.height.value * density).toInt(),
                     density = density,
                     entry = entry,
-                    arabicUi = render.languageTag.startsWith("ar"),
+                    // Arabic and Urdu: the surah name stands alone in the footer, as it does in the app.
+                    arabicUi = UiLanguage.of(render.languageTag).arabicScript,
                     arabicIndicDigits = render.arabicIndicDigits,
+                    languageTag = render.languageTag,
                     translationRtl = render.translationRtl,
                     showTranslation = render.showTranslation,
                     textArgb = render.colors.textArgb.toInt(),

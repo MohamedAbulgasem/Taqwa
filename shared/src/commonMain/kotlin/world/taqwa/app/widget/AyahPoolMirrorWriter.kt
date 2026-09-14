@@ -50,7 +50,7 @@ object AyahPoolMirrorWriter {
             languageTag = languageTag,
             translationId = settings.translationId,
             translationRtl = settings.translationId.substringBefore('.') in RTL_TRANSLATION_LANGUAGES,
-            arabicIndicDigits = format.usesArabicIndicDigits(),
+            arabicIndicDigits = format.usesNativeDigits(),
             entries = entries,
         )
         // Seed first, mirror second, and never the other way round. Both widget processes read

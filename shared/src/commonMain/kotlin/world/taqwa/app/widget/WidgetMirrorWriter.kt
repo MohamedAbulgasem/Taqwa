@@ -103,7 +103,7 @@ object WidgetMirrorWriter {
             // The app's own digit set, asked of the platform rather than derived from the tag
             // beside it: the widget's countdown is the one number it composes itself, and it has
             // to match the clock times in the same card, which this same format produced (D2).
-            arabicIndicDigits = format.usesArabicIndicDigits(),
+            arabicIndicDigits = format.usesNativeDigits(),
         )
     }
 

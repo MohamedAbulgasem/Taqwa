@@ -23,3 +23,14 @@ actual fun requestExactAlarmAccess() {
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     runCatching { context.startActivity(intent) }
 }
+
+actual fun canOpenAppLanguageSettings(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+actual fun openAppLanguageSettings() {
+    if (!canOpenAppLanguageSettings()) return
+    val context = appContext
+    // Taqwa's own "App language" page, offering the seven languages of locales_config.xml.
+    val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.fromParts("package", context.packageName, null))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(intent) }
+}

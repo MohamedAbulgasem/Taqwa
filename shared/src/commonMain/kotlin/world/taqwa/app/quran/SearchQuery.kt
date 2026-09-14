@@ -9,6 +9,16 @@ object SearchQuery {
 
     fun isArabic(raw: String): Boolean = ARABIC_LETTER.containsMatchIn(raw)
 
+    /**
+     * Urdu and Farsi are written in the Arabic script, so [isArabic] is true for every word an
+     * Urdu reader types — including the Urdu-only letters (ٹ ڈ ڑ ں ھ ہ ی ے) the Quran's Arabic
+     * never contains. A reader whose active translation is in one of those languages is
+     * therefore searching their own translation first; the Arabic text is still searched after
+     * it, so a shared word (رحمت) finds both.
+     */
+    fun searchesTranslationFirst(raw: String, translationLanguage: String): Boolean =
+        isArabic(raw) && translationLanguage in ARABIC_SCRIPT_TRANSLATION_LANGUAGES
+
     fun isLongEnough(raw: String): Boolean = raw.count { it.isLetterOrDigit() } >= 2
 
     /**

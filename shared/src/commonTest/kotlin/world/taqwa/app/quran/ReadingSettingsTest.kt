@@ -30,4 +30,16 @@ class ReadingSettingsTest {
         assertEquals(22, ReadingSettings(arabicSizeSp = 10).clamped().arabicSizeSp)
         assertEquals(40, ReadingSettings(arabicSizeSp = 99).clamped().arabicSizeSp)
     }
+
+
+    @Test
+    fun everyInterfaceLanguageOpensItsOwnTranslation() {
+        assertEquals("ur.junagarhi", ReadingSettings.defaultsFor("ur-PK").translationId)
+        assertEquals("bn.bengali", ReadingSettings.defaultsFor("bn-BD").translationId)
+        assertEquals("id.indonesian", ReadingSettings.defaultsFor("id-ID").translationId)
+        assertEquals("fr.hamidullah", ReadingSettings.defaultsFor("fr-FR").translationId)
+        // Java still spells Indonesian "in" in Locale.getLanguage().
+        assertEquals("id.indonesian", ReadingSettings.defaultsFor("in-ID").translationId)
+        assertEquals(ReadingMode.TRANSLATION, ReadingSettings.defaultsFor("ur-PK").mode)
+    }
 }

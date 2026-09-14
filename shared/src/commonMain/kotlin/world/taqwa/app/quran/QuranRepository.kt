@@ -1,5 +1,7 @@
 package world.taqwa.app.quran
 
+import world.taqwa.app.i18n.UiLanguage
+import world.taqwa.app.i18n.lowercaseIn
 import app.cash.sqldelight.db.SqlDriver
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -93,11 +95,14 @@ class QuranRepository(
     // the ayah rows for the hits are fetched by surah, so a phrase found in many surahs costs one
     // query per surah touched, not one per hit.
     override suspend fun searchTranslation(translationId: String, query: String, limit: Int): List<SearchHit> = withContext(io) {
-        val needle = query.trim().lowercase()
+        // Case folds in the translation's own language: the Diyanet text capitalises İman and
+        // Işık, which Kotlin's locale-free lowercase() would never match against "iman".
+        val language = UiLanguage.of(translationId.substringBefore('.'))
+        val needle = query.trim().lowercaseIn(language)
         if (needle.isEmpty()) return@withContext emptyList()
         val hits = q.translationTextsAll(translationId).executeAsList()
             .asSequence()
-            .filter { it.text.lowercase().contains(needle) }
+            .filter { it.text.lowercaseIn(language).contains(needle) }
             .take(limit)
             .toList()
         val arabicBySurah = hits.map { it.surah.toInt() }.distinct().associateWith { surah ->

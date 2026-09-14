@@ -12,3 +12,8 @@ actual fun openAppNotificationSettings() {
 
 /** No exact-alarm permission exists on iOS; see ExactAlarms.ios.kt. */
 actual fun requestExactAlarmAccess() = Unit
+
+/** The same Settings page: iOS lists "Preferred Language" there for a multi-language app. */
+actual fun canOpenAppLanguageSettings(): Boolean = true
+
+actual fun openAppLanguageSettings() = openAppNotificationSettings()

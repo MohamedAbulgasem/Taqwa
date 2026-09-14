@@ -59,6 +59,10 @@ store-readiness sweep (targetSdk 36, 0.16.0).
   `android:localeConfig` so Android 13+ offers per-app language. The bundle keeps every language
   on every phone (`bundle.language.enableSplit = false`); iOS carries the same seven as `.lproj`
   folders.
+- **Crash report (0.18.0):** an uncaught exception writes a text report on the phone; the next
+  launch offers, once, to email it to support@taqwa.world through the user's own mail app. Nothing
+  is collected or sent automatically, so the data-safety and App Privacy answers are unchanged
+  ("Data Not Collected"); the policy's paragraph on it exists in all seven languages.
 - **Target API:** 36 (Android 16), the level Play requires for new apps from 31 August 2026.
 - **Backup:** `allowBackup="false"` plus `data_extraction_rules.xml` excluding every domain from
   cloud backup and device transfer.

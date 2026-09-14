@@ -123,7 +123,7 @@ struct TaqwaEntry: TimelineEntry {
     var countdownText: String {
         let m = max(0, countdownMinutes)
         let text = String(format: "%d:%02d", m / 60, m % 60)
-        return WidgetDigits.shared.localize(text: text, arabicIndic: arabicIndicDigits)
+        return WidgetDigits.shared.localize(text: text, nativeDigits: arabicIndicDigits, languageTag: languageTag)
     }
 }
 
@@ -156,24 +156,28 @@ struct TaqwaTimelineProvider: TimelineProvider {
     /// A plausible afternoon, in the gallery's own language, for the preview alone.
     static func sampleEntry(background: WidgetBackground) -> TaqwaEntry {
         let tag = Locale.current.language.languageCode?.identifier ?? "en"
-        let arabic = tag.hasPrefix("ar")
-        func name(_ prayer: Prayer, _ latin: String) -> String {
-            PrayerNaming.shared.display(prayer: prayer, languageTag: tag, localizedName: latin)
+        // The gallery's own language, through the same tables the live widget uses: Sabah · الفجر
+        // in a Turkish gallery, فجر alone in an Urdu one, never the English names.
+        func name(_ prayer: Prayer) -> String {
+            PrayerNaming.shared.display(
+                prayer: prayer, languageTag: tag,
+                localizedName: PrayerNaming.shared.name(prayer: prayer, languageTag: tag)
+            )
         }
         let rows: [WidgetPrayerRow] = [
-            WidgetPrayerRow(prayer: .fajr, displayName: name(.fajr, "Fajr"), clockTime: "5:35", isCurrent: false),
-            WidgetPrayerRow(prayer: .dhuhr, displayName: name(.dhuhr, "Dhuhr"), clockTime: "12:46", isCurrent: false),
-            WidgetPrayerRow(prayer: .asr, displayName: name(.asr, "Asr"), clockTime: "16:03", isCurrent: true),
-            WidgetPrayerRow(prayer: .maghrib, displayName: name(.maghrib, "Maghrib"), clockTime: "18:32", isCurrent: false),
-            WidgetPrayerRow(prayer: .isha, displayName: name(.isha, "Isha"), clockTime: "19:50", isCurrent: false),
+            WidgetPrayerRow(prayer: .fajr, displayName: name(.fajr), clockTime: "5:35", isCurrent: false),
+            WidgetPrayerRow(prayer: .dhuhr, displayName: name(.dhuhr), clockTime: "12:46", isCurrent: false),
+            WidgetPrayerRow(prayer: .asr, displayName: name(.asr), clockTime: "16:03", isCurrent: true),
+            WidgetPrayerRow(prayer: .maghrib, displayName: name(.maghrib), clockTime: "18:32", isCurrent: false),
+            WidgetPrayerRow(prayer: .isha, displayName: name(.isha), clockTime: "19:50", isCurrent: false),
         ]
         let content = WidgetContent(
-            nextPrayerDisplayName: name(.maghrib, "Maghrib"),
+            nextPrayerDisplayName: name(.maghrib),
             countdownMinutes: 21,
             nextClockTime: "18:32",
             rows: rows,
             ringProgress: 0.86,
-            countdownLabel: arabic ? "متبقٍ على المغرب" : "Maghrib in"
+            countdownLabel: PrayerNaming.shared.countdownLabel(prayer: .maghrib, languageTag: tag)
         )
         return TaqwaEntry(
             date: Date(), content: content, countdownMinutes: 21, background: background,

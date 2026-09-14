@@ -64,6 +64,8 @@ internal class WidgetRender(
     /** The app's own digit set as the mirror records it, rather than one derived from the
      * snapshot's language tag — see [WidgetSnapshot.arabicIndicDigits] (D2). */
     val arabicIndicDigits: Boolean,
+    /** The snapshot's language tag, which picks the digit set [arabicIndicDigits] stands for. */
+    val languageTag: String,
 )
 
 /**
@@ -97,6 +99,7 @@ private fun readWidgetRender(
         // agree with — not the CLDR default for the tag, which an `ar-LY` device disagrees with
         // (D2). A mirror from an older build carries `false`, exactly what it used to draw.
         arabicIndicDigits = snapshot?.arabicIndicDigits == true,
+        languageTag = snapshot?.languageTag.orEmpty(),
     )
 }
 
@@ -219,7 +222,7 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
 @Composable
 private fun StackedCard(render: WidgetRender, size: DpSize) {
     val pad = 10.dp
-    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits)) } ?: COUNTDOWN_EM
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits, render.languageTag)) } ?: COUNTDOWN_EM
     // The label and clock line take about 1.3 em of the countdown between them, so the number is
     // capped at 44% of the height, and by whatever the width allows for its own digits.
     val countdown = minOf((size.width.value - pad.value * 2) / em, size.height.value * 0.44f).sp(24f, 72f)
@@ -237,7 +240,7 @@ private fun StackedCard(render: WidgetRender, size: DpSize) {
 private fun StripCard(render: WidgetRender, size: DpSize) {
     val colors = render.colors
     val padH = 14.dp
-    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits)) } ?: COUNTDOWN_EM
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits, render.languageTag)) } ?: COUNTDOWN_EM
     val countdown = minOf(size.height.value * 0.50f, (size.width.value * 0.5f) / em).sp(18f, 36f)
     val small = (countdown.value * 0.45f).sp(11f, 13f)
     Row(
@@ -261,7 +264,7 @@ private fun StripCard(render: WidgetRender, size: DpSize) {
         render.remainingMinutes?.let {
             Spacer(GlanceModifier.width(8.dp))
             Text(
-                text = countdownText(it, render.arabicIndicDigits),
+                text = countdownText(it, render.arabicIndicDigits, render.languageTag),
                 style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Medium, fontSize = countdown),
                 maxLines = 1,
             )
@@ -273,7 +276,7 @@ private fun StripCard(render: WidgetRender, size: DpSize) {
 @Composable
 private fun TinyCard(render: WidgetRender, size: DpSize) {
     val colors = render.colors
-    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits)) } ?: COUNTDOWN_EM
+    val em = render.remainingMinutes?.let { countdownEm(countdownText(it, render.arabicIndicDigits, render.languageTag)) } ?: COUNTDOWN_EM
     val countdown = minOf((size.width.value - 12f) / em, size.height.value * 0.46f).sp(14f, 30f)
     val label = (countdown.value * 0.5f).sp(9f, 12f)
     Column(
@@ -288,7 +291,7 @@ private fun TinyCard(render: WidgetRender, size: DpSize) {
         )
         render.remainingMinutes?.let {
             Text(
-                text = countdownText(it, render.arabicIndicDigits),
+                text = countdownText(it, render.arabicIndicDigits, render.languageTag),
                 style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Medium, fontSize = countdown),
                 maxLines = 1,
             )
@@ -312,10 +315,10 @@ private fun shortName(render: WidgetRender): String =
 /** Built here by interpolation, so it needs its own pass through [WidgetDigits.localize] to match
  * the pre-formatted clock times beside it (I9) — against the mirror's recorded digit choice, so
  * the two cannot disagree on a device whose ICU data differs from CLDR's default (D2). */
-private fun countdownText(remainingMinutes: Long, arabicIndicDigits: Boolean): String {
+private fun countdownText(remainingMinutes: Long, nativeDigits: Boolean, languageTag: String): String {
     val hours = remainingMinutes / 60
     val minutes = remainingMinutes % 60
-    return WidgetDigits.localize("$hours:${minutes.toString().padStart(2, '0')}", arabicIndicDigits)
+    return WidgetDigits.localize("$hours:${minutes.toString().padStart(2, '0')}", nativeDigits, languageTag)
 }
 
 @Composable
@@ -342,7 +345,7 @@ private fun NextPrayerBlock(
         render.remainingMinutes?.let {
             Spacer(GlanceModifier.height(labelGap))
             Text(
-                text = countdownText(it, render.arabicIndicDigits),
+                text = countdownText(it, render.arabicIndicDigits, render.languageTag),
                 style = TextStyle(color = ColorProvider(colors.primaryText()), fontWeight = FontWeight.Medium, fontSize = countdown, textAlign = align),
                 maxLines = 1,
             )
