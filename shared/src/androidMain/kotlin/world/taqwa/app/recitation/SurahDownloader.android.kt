@@ -1,6 +1,5 @@
 package world.taqwa.app.recitation
 
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
@@ -12,7 +11,6 @@ import androidx.work.workDataOf
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,13 +23,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.i18n.createPlatformFormat
-import world.taqwa.app.notifications.notificationSmallIconResId
 import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.appContext
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.math.abs
 
 /**
  * WorkManager (spec 3a §7). One unique work per surah, so a second tap on Download is a no-op
@@ -58,13 +53,13 @@ actual class SurahDownloader actual constructor(
     // A download surface that failed is a chip with a Retry button, never a crash.
     private val scope =
         CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> })
-    private val batches = mutableMapOf<String, Job>()
     private val conditions = AndroidDownloadConditions(context)
 
     init {
-        // Whatever a previous process left posted: watchBatch is re-attached only by a new
-        // enqueueReciter, so without this a summary outlives the batch it was summarising. Only
-        // this app's own notifications are listed, and only this class posts in the batch range.
+        // Builds up to 0.19.0 posted a separate, non-ongoing batch summary in this id range and
+        // cleared it only from the process that posted it; one left standing across the update
+        // would otherwise stay in the shade for good. The workers now draw the batch line
+        // themselves (spec §16.3), under WorkManager's own foreground notification.
         runCatching {
             val manager = NotificationManagerCompat.from(context)
             manager.activeNotifications
@@ -115,14 +110,7 @@ actual class SurahDownloader actual constructor(
                 val owned = library.downloaded(reciterId).first()
                 val wanted = reciter.surahs.map { it.n }.sorted().filter { it !in owned }
                 if (wanted.isEmpty()) return@runCatching
-                val wording = wording()
                 submit(reciterId, wanted, allowMobileOnce, ExistingWorkPolicy.KEEP)
-                watchBatch(
-                    reciterId = reciterId,
-                    reciterName = if (wording.arabicScript) reciter.nameAr else reciter.nameEn,
-                    total = reciter.surahs.size,
-                    wording = wording,
-                )
             }
         }
     }
@@ -135,8 +123,6 @@ actual class SurahDownloader actual constructor(
     actual fun cancelReciter(reciterId: String) {
         refusals.value = refusals.value.filterKeys { it.reciterId != reciterId }
         workManager.cancelAllWorkByTag(RecitationWork.reciterTag(reciterId))
-        batches.remove(reciterId)?.cancel()
-        clearBatchNotification(reciterId)
     }
 
     /** Drops a refusal, because the surah is being asked for again or dismissed. */
@@ -204,6 +190,8 @@ actual class SurahDownloader actual constructor(
                         RecitationWork.KEY_SHA to asset.sha256,
                         RecitationWork.KEY_ALLOW_METERED to allowMetered,
                         RecitationWork.KEY_SURAH_NAME to (names[surah] ?: surah.toString()),
+                        RecitationWork.KEY_RECITER_NAME to (if (wording.arabicScript) reciter.nameAr else reciter.nameEn),
+                        RecitationWork.KEY_RECITER_TOTAL to reciter.surahs.size,
                         RecitationWork.KEY_LANGUAGE to wording.languageTag,
                         RecitationWork.KEY_NUMBER_STYLE to wording.style.name,
                     )
@@ -212,70 +200,6 @@ actual class SurahDownloader actual constructor(
             workManager.enqueueUniqueWork(RecitationWork.uniqueName(key), policy, request)
         }
     }
-
-    /**
-     * One line for the whole batch — "Mishary Rashid Alafasy · 12 of 114 surahs" — as the summary
-     * of the group the per-surah notifications already sit in.
-     *
-     * The count is the library's, not the batch's: what the reader wants to know is how much of
-     * this reciter they now have, and a batch that skipped the 30 surahs they already owned would
-     * otherwise start at zero out of 84. It lives only as long as the app's process does, which is
-     * the honest limit of a summary nobody is holding a foreground service for.
-     */
-    private fun watchBatch(reciterId: String, reciterName: String, total: Int, wording: Wording) {
-        batches.remove(reciterId)?.cancel()
-        batches[reciterId] = scope.launch {
-            var started = false
-            combine(
-                workManager.getWorkInfosByTagFlow(RecitationWork.reciterTag(reciterId)),
-                library.downloaded(reciterId),
-            ) { infos, owned -> infos.any { !it.state.isFinished } to owned.size }
-                // Same reason as `states` above, plus a DataStore read on the other side of the
-                // combine. `catch` is transparent to what the collector throws, so the deliberate
-                // CancellationException below still ends the batch.
-                .catch { }
-                .collect { (active, owned) ->
-                    if (active) {
-                        started = true
-                        postBatchNotification(
-                            reciterId,
-                            DownloadCopy.batch(reciterName, owned, total, wording.languageTag, wording.style),
-                            wording.languageTag,
-                        )
-                    } else if (started) {
-                        clearBatchNotification(reciterId)
-                        throw CancellationException("The batch has finished")
-                    }
-                }
-        }
-    }
-
-    private fun postBatchNotification(reciterId: String, text: String, languageTag: String) {
-        SurahDownloadWorker.ensureChannel(context, languageTag)
-        val notification = NotificationCompat.Builder(context, SurahDownloadWorker.CHANNEL_ID)
-            .setSmallIcon(notificationSmallIconResId)
-            .setContentTitle(text)
-            .setGroup(SurahDownloadWorker.GROUP_PREFIX + reciterId)
-            .setGroupSummary(true)
-            // Not ongoing. The per-surah notifications are the ongoing ones, and WorkManager owns
-            // and cancels those; this summary is cleared only by watchBatch's collector, which
-            // dies with the process — and a whole-Quran batch runs for hours across process
-            // deaths. On API 26–33 setOngoing would then leave a frozen "12 of 114" the reader
-            // cannot even swipe away.
-            .setSilent(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-        // POST_NOTIFICATIONS may not have been granted; a batch the reader cannot see still
-        // downloads, and a SecurityException here must not take the queue down with it.
-        runCatching { NotificationManagerCompat.from(context).notify(batchNotificationId(reciterId), notification) }
-    }
-
-    private fun clearBatchNotification(reciterId: String) {
-        runCatching { NotificationManagerCompat.from(context).cancel(batchNotificationId(reciterId)) }
-    }
-
-    private fun batchNotificationId(reciterId: String) =
-        BATCH_NOTIFICATION_BASE + abs(reciterId.hashCode() % BATCH_ID_SPAN)
 
     /**
      * The language a notification is baked in, decided here while the app is running: the
@@ -293,10 +217,8 @@ actual class SurahDownloader actual constructor(
     private companion object {
         const val BACKOFF_SECONDS = 10L
 
-        /** Clear of the per-surah ids, which run from 770,000. */
+        /** The id range builds up to 0.19.0 posted their batch summary in; see `init`. */
         const val BATCH_NOTIFICATION_BASE = 760_000
-
-        /** How many ids [batchNotificationId] can mint, and so how wide the start-up sweep is. */
         const val BATCH_ID_SPAN = 1_000
     }
 }

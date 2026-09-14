@@ -1280,3 +1280,24 @@ recitation offline.
 the licence does not require it, but the app names every third-party asset it ships.
 
 Released as 0.19.0 (23); the store build becomes 1.0.0 (24).
+
+## One notification per batch, and a pick that does not press play (14 September, night)
+
+Two more from Mohamed's phone. **"Download the whole Quran" filled the shade**: WorkManager posts
+each worker's foreground notification under the id the worker names, and the workers named one
+id per surah, so two surahs in flight were two lines and the batch summary a third. Every
+download worker now uses one id and, while more than one surah of a voice is in flight, writes
+the same batch line — "Mishary Rashid Alafasy · 44 of 114 surahs", the bar counting surahs —
+so the shade holds one entry; a surah on its own keeps its own "Al-Baqarah · 9.3 of 58.2 MB".
+The separate summary is gone. Verified on the emulator against a real batch (Alafasy 14 → 45,
+through a proxy on the Mac because the emulator's own Wi-Fi fails validation today): one entry
+in the shade, counting up, gone the moment the batch was cancelled. The emulator needed
+`pm grant … POST_NOTIFICATIONS`; without it no download notification shows at all, which is
+also what a reader who declined notifications sees, and the downloads run regardless.
+
+**Picking a reciter resumed a paused recitation** (§14.4's rule, from the bar's picker, read from
+Settings as "why did it start playing"). Withdrawn: a pick changes the voice and nothing else —
+playing goes on playing in the new voice, paused stays paused in it, nothing loaded stays that
+way. The audition's own pause is the one resume left. Three controller tests rewritten.
+
+Released as 0.19.1 (24); the store build becomes 1.0.0 (25).

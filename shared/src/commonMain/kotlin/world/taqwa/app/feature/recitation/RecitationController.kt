@@ -667,19 +667,21 @@ class RecitationController(
     fun dismissBar() = stop()
 
     /**
-     * A new voice (spec §5.5, §14.3, §14.4). Persisted first, so the choice survives whatever
+     * A new voice (spec §5.5, §14.3, §16.4). Persisted first, so the choice survives whatever
      * happens next; and it supersedes any switch still waiting on a download, because the reader
      * has just said which voice they want and it is this one.
      *
-     * Then, by what is playing:
-     * - **the same voice, paused** — resume it. The row is the voice they are listening to, and a
-     *   tap on it while nothing is coming out of the phone can only mean "go on".
+     * Then, by what is loaded — and a pick never starts or resumes a recitation on its own
+     * (§16.4): a paused surah stays paused, in the new voice, and one that was playing goes on
+     * playing in it.
+     * - **nothing loaded** — the setting changes and that is all.
+     * - **the same voice** — nothing. The one exception is a recitation the *preview* paused,
+     *   which gets its resume back: the reader was listening before the audition.
      * - **another voice that has this surah** — swap at the current ayah, near enough the "next
-     *   ayah boundary" the spec asks for, and honest about where the reader is.
+     *   ayah boundary" the spec asks for; playing stays playing, paused stays paused.
      * - **another voice that does not** — offer the download, and **the old voice keeps playing**
      *   until it lands, when the new one takes over at the ayah being heard (the sheet says so:
-     *   [DownloadSheetState.playingMeanwhile]). Before this the tap did nothing visible at all,
-     *   and the reader had to stop the bar to be offered the download.
+     *   [DownloadSheetState.playingMeanwhile]); a paused one takes over paused.
      */
     fun pickReciter(id: String) {
         scope.launch {
@@ -693,12 +695,15 @@ class RecitationController(
             val playback = player.state.value
             val surah = playback.surah
             if (surah == null) return@launch
+            // What the reader was doing before any audition got in the way.
+            val wasPlaying = playback.playing || hadPausedForPreview
             if (playback.reciterId == id) {
-                if (!playback.playing) player.play()
+                if (hadPausedForPreview) player.play()
                 return@launch
             }
             if (library.isDownloaded(id, surah)) {
                 start(surah, playback.ayah ?: 1, voice)
+                if (!wasPlaying) player.pause()
                 return@launch
             }
             if (hadPausedForPreview) player.play()

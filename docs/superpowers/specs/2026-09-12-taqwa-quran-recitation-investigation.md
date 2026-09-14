@@ -493,3 +493,34 @@ while the Quran tab is *current*, and `Navigator.currentTab` reads the bottom of
 still Prayer. `Navigator.openReading` now does what the notification's path already did:
 from another tab the stack is replaced with the Quran root first, and the reader goes on top of
 it; both entry points share it.
+
+### 16.3 One notification for a batch
+
+**Ask.** "Download the whole Quran" put a notification in the shade for every surah in flight,
+two at a time, plus the summary line — could it be one long notification?
+
+**Decision.** Yes, and it is an Android detail rather than a design one: WorkManager posts each
+worker's foreground notification under the id the worker names, and the workers named one id per
+surah. Every download worker now uses **one** id. While more than one surah of a voice is in
+flight — now, or at any moment during the transfer — each worker writes the same batch line,
+"Mishary Rashid Alafasy · 12 of 114 surahs", with the bar counting surahs the phone now has, so
+the shade holds one entry and nothing flickers; the last surah of a batch keeps the batch line.
+A surah downloading on its own keeps its own line, "Al-Baqarah · 9.3 of 58.2 MB". The separate,
+non-ongoing summary is gone (a process start still sweeps the id range it used, once, for a
+summary a 0.19.0 batch may have left standing). When the last worker finishes, WorkManager takes
+the notification down with the foreground service, as before. iOS shows no download
+notifications and is untouched.
+
+### 16.4 Picking a voice never starts or resumes a recitation
+
+**Ask.** Choosing a reciter from Settings resumed a paused recitation, or one that had been
+left alone. A pick should change the voice; only a recitation that is playing should go on
+playing, in the new voice.
+
+**Decision.** §14.4's "the same voice, paused — resume it" is withdrawn. A pick persists the
+choice and then: nothing loaded, nothing happens; the same voice, nothing happens; another
+voice with the surah on the phone swaps at the current ayah and keeps the reader's state —
+playing stays playing, paused stays paused; another voice without the surah is offered or
+fetched as before, and takes over in the state the old voice was left in. The one resume left
+is the preview's: a recitation the *audition* paused gets its resume back on the pick, because
+the reader was listening before the clip.

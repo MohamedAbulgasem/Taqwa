@@ -8,8 +8,15 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withTimeoutOrNull
 import world.taqwa.app.di.appContainer
@@ -36,6 +43,20 @@ class SurahDownloadWorker(
     private val numberStyle = inputData.getString(RecitationWork.KEY_NUMBER_STYLE)
         ?.let { name -> NumberStyle.entries.firstOrNull { it.name == name } } ?: NumberStyle.WESTERN
     private val totalBytes = inputData.getLong(RecitationWork.KEY_BYTES, 0L)
+    private val reciterName = inputData.getString(RecitationWork.KEY_RECITER_NAME).orEmpty()
+    private val reciterTotal = inputData.getInt(RecitationWork.KEY_RECITER_TOTAL, 0)
+
+    /**
+     * The batch line (spec §16.3): how many of this voice's surahs the phone now has, shown in
+     * place of this surah's own progress while more than one surah of the voice is in flight.
+     * Null while this surah downloads on its own. Kept by a collector that runs beside the
+     * transfer; every worker of a batch computes the same two numbers from the same two sources,
+     * which is what lets all of them draw the one notification without disagreeing about it.
+     */
+    @Volatile
+    private var batch: Batch? = null
+
+    private class Batch(val owned: Int, val total: Int)
 
     /**
      * WorkManager may ask for this before `doWork`, so it has to stand on its own; the same
@@ -62,39 +83,52 @@ class SurahDownloadWorker(
         }
 
         try {
-            runCatching { setForeground(foregroundInfo(0L)) }
-            val loop = DownloadLoop(
-                library = appContainer.recitationLibrary,
-                source = HttpByteSource(),
-                conditions = AndroidDownloadConditions(applicationContext),
-            )
-            val outcome = loop.run(
-                key = key,
-                url = url,
-                asset = asset,
-                allowMetered = inputData.getBoolean(RecitationWork.KEY_ALLOW_METERED, false),
-            ) { state ->
-                when (state) {
-                    is DownloadState.Downloading -> {
-                        setProgress(
-                            workDataOf(
-                                RecitationWork.KEY_DONE to state.bytes,
-                                RecitationWork.KEY_TOTAL to state.total,
-                                RecitationWork.KEY_VERIFYING to false,
-                            )
-                        )
-                        runCatching { setForeground(foregroundInfo(state.bytes)) }
+            val outcome = coroutineScope {
+                val batches = batchLine(reciter)
+                // Decided before the first post, so a batch never flashes one surah's own line for
+                // the instant before the watcher's first word.
+                if (batches != null) {
+                    withTimeoutOrNull(FIRST_LOOK_MILLIS) { batches.first() }?.let { (pending, owned) -> note(pending, owned) }
+                }
+                val watcher = launch { batches?.collect { (pending, owned) -> note(pending, owned) } }
+                try {
+                    runCatching { setForeground(foregroundInfo(0L)) }
+                    val loop = DownloadLoop(
+                        library = appContainer.recitationLibrary,
+                        source = HttpByteSource(),
+                        conditions = AndroidDownloadConditions(applicationContext),
+                    )
+                    loop.run(
+                        key = key,
+                        url = url,
+                        asset = asset,
+                        allowMetered = inputData.getBoolean(RecitationWork.KEY_ALLOW_METERED, false),
+                    ) { state ->
+                        when (state) {
+                            is DownloadState.Downloading -> {
+                                setProgress(
+                                    workDataOf(
+                                        RecitationWork.KEY_DONE to state.bytes,
+                                        RecitationWork.KEY_TOTAL to state.total,
+                                        RecitationWork.KEY_VERIFYING to false,
+                                    )
+                                )
+                                runCatching { setForeground(foregroundInfo(state.bytes)) }
+                            }
+                            DownloadState.Verifying -> {
+                                setProgress(
+                                    workDataOf(
+                                        RecitationWork.KEY_DONE to totalBytes,
+                                        RecitationWork.KEY_TOTAL to totalBytes,
+                                        RecitationWork.KEY_VERIFYING to true,
+                                    )
+                                )
+                            }
+                            else -> Unit
+                        }
                     }
-                    DownloadState.Verifying -> {
-                        setProgress(
-                            workDataOf(
-                                RecitationWork.KEY_DONE to totalBytes,
-                                RecitationWork.KEY_TOTAL to totalBytes,
-                                RecitationWork.KEY_VERIFYING to true,
-                            )
-                        )
-                    }
-                    else -> Unit
+                } finally {
+                    watcher.cancel()
                 }
             }
             return when (outcome) {
@@ -110,24 +144,61 @@ class SurahDownloadWorker(
         workDataOf(RecitationWork.KEY_REASON to reason.name)
     )
 
-    /** "Al-Baqarah · 9.3 of 58.2 MB", and a bar the notification shade can draw. */
+    /**
+     * What [batch] is kept current from, for the life of the transfer: how many works of this
+     * voice are unfinished, and how many of its surahs the phone owns. Null for a work enqueued
+     * without the voice's numbers (a build before 0.19.1).
+     */
+    private fun batchLine(reciterId: String): Flow<Pair<Int, Int>>? {
+        if (reciterTotal <= 0) return null
+        return combine(
+            WorkManager.getInstance(applicationContext).getWorkInfosByTagFlow(RecitationWork.reciterTag(reciterId)),
+            appContainer.recitationLibrary.downloaded(reciterId),
+        ) { infos, owned -> infos.count { !it.state.isFinished } to owned.size }
+            // A Room query and a DataStore read: either can throw, and a shade that shows the
+            // surah's own line instead of the batch's is not a reason to fail the download.
+            .catch { }
+    }
+
+    /**
+     * More than one unfinished work for this voice — now, or at any moment while this surah was
+     * moving — means the shade gets the batch line, and keeps it through the batch's last surah
+     * rather than switching back to that surah's own numbers for the final minute. The count is
+     * the library's, not the batch's: what the reader wants to know is how much of this voice
+     * they now have, and a batch that skipped the 30 surahs they already owned would otherwise
+     * start at zero out of 84.
+     */
+    private fun note(pending: Int, owned: Int) {
+        if (pending > 1 || batch != null) batch = Batch(owned, reciterTotal)
+    }
+
+    /**
+     * "Al-Baqarah · 9.3 of 58.2 MB" with its bar — or, in a batch, "Mishary Rashid Alafasy ·
+     * 12 of 114 surahs" with the bar counting surahs. Always under [NOTIFICATION_ID].
+     */
     private fun foregroundInfo(done: Long): ForegroundInfo {
         ensureChannel(applicationContext, languageTag)
-        val percent = if (totalBytes <= 0L) 0 else ((done * 100) / totalBytes).toInt().coerceIn(0, 100)
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(notificationSmallIconResId)
-            .setContentTitle(DownloadCopy.progress(surahName, done, totalBytes, languageTag, numberStyle))
-            .setProgress(100, percent, done <= 0L)
             .setOngoing(true)
             .setSilent(true)
-            .setGroup(reciterId?.let { GROUP_PREFIX + it } ?: GROUP_PREFIX)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-        val id = NOTIFICATION_BASE + surah
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            ForegroundInfo(id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        val line = batch
+        if (line != null) {
+            builder
+                .setContentTitle(DownloadCopy.batch(reciterName, line.owned, line.total, languageTag, numberStyle))
+                .setProgress(line.total, line.owned.coerceIn(0, line.total), false)
         } else {
-            ForegroundInfo(id, notification)
+            val percent = if (totalBytes <= 0L) 0 else ((done * 100) / totalBytes).toInt().coerceIn(0, 100)
+            builder
+                .setContentTitle(DownloadCopy.progress(surahName, done, totalBytes, languageTag, numberStyle))
+                .setProgress(100, percent, done <= 0L)
+        }
+        val notification = builder.build()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            ForegroundInfo(NOTIFICATION_ID, notification)
         }
     }
 
@@ -145,15 +216,19 @@ class SurahDownloadWorker(
         /** Five minutes waiting for a slot, then hand the turn back to WorkManager. */
         private const val SLOT_WAIT_MILLIS = 5L * 60L * 1000L
 
-        /**
-         * Well clear of the prayer notifications, which are numbered sequentially from 1. Two
-         * reciters downloading the same surah at the same moment would share a notification;
-         * at two concurrent downloads out of a per-reciter queue that cannot arise, and the cost
-         * if it ever did is one line of the shade showing the other one's progress.
-         */
-        private const val NOTIFICATION_BASE = 770_000
+        /** How long the first post may wait for the batch numbers; a slow read costs one flash. */
+        private const val FIRST_LOOK_MILLIS = 1_500L
 
-        const val GROUP_PREFIX = "world.taqwa.app.downloads."
+        /**
+         * One id for every download worker (spec §16.3). WorkManager posts each worker's
+         * `ForegroundInfo` under the id the worker names, so with an id per surah two surahs in
+         * flight were two lines in the shade, and a batch summary made three. Under one id the
+         * shade holds one line — whichever worker updated it last — and in a batch every worker
+         * writes the same line, so nothing flickers. Well clear of the prayer notifications, which
+         * are numbered from 1. When the last worker finishes, WorkManager takes the notification
+         * down with the foreground service, as before.
+         */
+        private const val NOTIFICATION_ID = 770_000
 
         /** Idempotent, and re-created deliberately so a locale change relabels it. */
         fun ensureChannel(context: Context, languageTag: String) {

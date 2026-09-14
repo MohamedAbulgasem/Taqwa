@@ -625,8 +625,9 @@ class RecitationControllerTest {
         }
 
     @Test
-    fun `picking the voice already playing while paused resumes it`() =
+    fun `picking the voice already loaded while paused leaves it paused`() =
         runTest(UnconfinedTestDispatcher()) {
+            // Spec §16.4: a pick never starts or resumes a recitation by itself.
             val harness = Harness()
             harness.library.put("ar.alafasy", setOf(112))
             val controller = controller(harness, backgroundScope)
@@ -635,9 +636,42 @@ class RecitationControllerTest {
 
             controller.pickReciter("ar.alafasy")
 
-            assertEquals(2, harness.player.plays)
+            assertEquals(1, harness.player.plays)
             assertEquals(1, harness.player.loads.size)
+            assertFalse(harness.player.state.value.playing)
+        }
+
+    @Test
+    fun `picking another voice while paused changes the voice and stays paused`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(112))
+            harness.library.put("ar.husary", setOf(112))
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(112, 3)
+            harness.player.pause()
+
+            controller.pickReciter("ar.husary")
+
+            assertEquals(Triple("ar.husary", 112, 3), harness.player.loads.last())
+            assertEquals("ar.husary", controller.state.value.bar?.reciter?.id)
+            assertFalse(harness.player.state.value.playing)
+        }
+
+    @Test
+    fun `picking another voice while playing goes on playing in it`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(112))
+            harness.library.put("ar.husary", setOf(112))
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(112, 3)
+
+            controller.pickReciter("ar.husary")
+
+            assertEquals(Triple("ar.husary", 112, 3), harness.player.loads.last())
             assertTrue(harness.player.state.value.playing)
+            assertEquals(0, harness.player.pauses)
         }
 
     @Test
