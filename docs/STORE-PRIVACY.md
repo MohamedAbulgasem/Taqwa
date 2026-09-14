@@ -66,9 +66,9 @@ store-readiness sweep (targetSdk 36, 0.16.0).
 - **Target API:** 36 (Android 16), the level Play requires for new apps from 31 August 2026.
 - **Backup:** `allowBackup="false"` plus `data_extraction_rules.xml` excluding every domain from
   cloud backup and device transfer.
-- **Privacy policy URL:** `https://github.com/MohamedAbulgasem/Taqwa/blob/main/PRIVACY.md`
-  (the `AboutLinks.PRIVACY_POLICY` constant; the repository has been public since 13 September
-  2026 and the URL answers 200).
+- **Privacy policy URL:** `https://taqwa.world/privacy/` (English; the same policy is at
+  `https://taqwa.world/<lang>/privacy/` for ar, fr, tr, id, ur and bn, and the About screen opens
+  the one for the interface language through `AboutLinks.privacyPolicy`).
 - **Upload:** `scripts/release.sh` builds the signed `.aab`; the R8 mapping rides inside it.
 
 ## App Store Connect
@@ -81,7 +81,8 @@ store-readiness sweep (targetSdk 36, 0.16.0).
   1C8F.1 shared with the extension), file timestamps (C617.1, own container only), system boot
   time (35F9.1, elapsed time for playback), disk space (E174.1, free-space check before a
   download).
-- **Privacy Policy URL:** the same `AboutLinks.PRIVACY_POLICY` constant.
+- **Privacy Policy URL:** `https://taqwa.world/privacy/`; each App Store localisation may point at
+  its own `https://taqwa.world/<lang>/privacy/`.
 - **Export compliance:** exempt. `ITSAppUsesNonExemptEncryption` is `false` in `Info.plist`; the
   app uses only HTTPS to public hosts and has no App Transport Security exception.
 - **Content rights:** Yes, the app contains third-party content and you have the rights.
