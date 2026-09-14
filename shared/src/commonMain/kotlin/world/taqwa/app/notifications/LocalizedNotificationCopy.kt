@@ -93,7 +93,7 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
             ),
             UiLanguage.TURKISH to Words(
                 prayerBody = "{prayer} vakti girdi · {time}",
-                reminderBody = "{minutes} dakika sonra {prayer} · {time}",
+                reminderBody = "{prayer} vaktine {minutes} dakika · {time}",
                 silent = "Sessiz", notification = "Bildirim", takbir = "Tekbir", adhan = "Ezan",
             ),
             UiLanguage.INDONESIAN to Words(

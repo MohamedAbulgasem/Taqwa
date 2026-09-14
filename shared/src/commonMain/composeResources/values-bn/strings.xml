@@ -9,14 +9,14 @@
     <string name="onboarding_welcome_body">নামাজের সময়, কিবলা ও কুরআন। চিরকাল বিনামূল্যে। বিজ্ঞাপন নেই, অ্যাকাউন্ট নেই, ইন্টারনেট ছাড়াই চলে।</string>
     <string name="onboarding_welcome_cta">শুরু করুন</string>
     <string name="onboarding_location_title">আপনি কোথায় আছেন?</string>
-    <string name="onboarding_location_body">নামাজের সময় আপনার অবস্থানের উপর নির্ভর করে। সব হিসাব আপনার ডিভাইসেই হয়, আর আপনার অবস্থান কখনো ফোন ছেড়ে যায় না।</string>
+    <string name="onboarding_location_body">নামাজের সময় আপনার সঠিক অবস্থানের উপর নির্ভর করে। সব হিসাব আপনার ডিভাইসেই হয়, আর আপনার অবস্থান কখনো ফোন ছেড়ে যায় না।</string>
     <string name="onboarding_location_cta">আমার অবস্থান ব্যবহার করুন</string>
     <string name="onboarding_location_secondary">বরং একটি শহর বেছে নিন</string>
     <string name="onboarding_notifications_title">কোনো নামাজ যেন বাদ না যায়</string>
     <string name="onboarding_notifications_body">প্রতি ওয়াক্তে একটি নোটিফিকেশন। প্রতিটি নামাজের শব্দ আলাদা করে বেছে নিতে পারেন, আর যখন খুশি বদলাতেও পারেন।</string>
     <string name="onboarding_notifications_cta">নোটিফিকেশন চালু করুন</string>
     <string name="onboarding_notifications_secondary">এখন নয়</string>
-    <string name="onboarding_exact_title">ঠিক সময়ে, মিনিট ধরে</string>
+    <string name="onboarding_exact_title">ঠিক সময়ে, কাঁটায় কাঁটায়</string>
     <string name="onboarding_exact_body">তাকওয়াকে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি দিলে তবেই অ্যান্ড্রয়েড ঠিক ওয়াক্তে বাজে। এটি ছাড়া নোটিফিকেশন এক ঘণ্টা পর্যন্ত দেরিতে আসতে পারে।</string>
     <string name="onboarding_widget_title">আপনার হোম স্ক্রিনে</string>
     <string name="onboarding_widget_body">তাকওয়া উইজেট অ্যাপ না খুলেই পরবর্তী নামাজ ও চলমান কাউন্টডাউন দেখায়।</string>
@@ -82,7 +82,7 @@
     <string name="about_report_problem">সমস্যা জানান</string>
 
     <!-- ক্র্যাশ রিপোর্ট: ক্র্যাশের পরের বার চালু হলে দেখানো শিট, আর পাঠানোর মতো রিপোর্ট না থাকলে ইমেইলের লাইন। -->
-    <string name="crash_sheet_title">তাকওয়া অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে</string>
+    <string name="crash_sheet_title">তাকওয়া হঠাৎ বন্ধ হয়ে গেছে</string>
     <string name="crash_sheet_body">আপনার ফোনে একটি প্রযুক্তিগত রিপোর্ট সংরক্ষণ করা হয়েছে। এটি support@taqwa.world-এ পাঠালে সমস্যাটি সমাধানে সাহায্য হয়। এতে শুধু অ্যাপের সংস্করণ, আপনার ফোনের মডেল ও ত্রুটির বিবরণ থাকে, আর কিছু নয়।</string>
     <string name="crash_send">রিপোর্ট পাঠান</string>
     <string name="crash_not_now">এখন নয়</string>
@@ -129,7 +129,7 @@
     <string name="sound_takbir">তাকবীর</string>
     <string name="sound_adhan">আযান</string>
     <string name="sound_silent_detail">শুধু ব্যানার, কোনো শব্দ নেই</string>
-    <string name="sound_notification_detail">স্পষ্ট একটি ঘোষণা-সুর, %1$s সেকেন্ড</string>
+    <string name="sound_notification_detail">স্পষ্ট একটি সুর, %1$s সেকেন্ড</string>
     <string name="sound_takbir_detail">আল্লাহু আকবার, আল্লাহু আকবার, প্রায় %1$s সেকেন্ড</string>
     <string name="sound_adhan_detail">আযান, প্রথম %1$s সেকেন্ড</string>
     <string name="sound_sheet_footnote">নামাজের নোটিফিকেশনে শব্দের প্রথম %1$s সেকেন্ড বাজে। পূর্ণ আযান অ্যাপের ভিতরেই শোনা যায়।</string>
@@ -147,7 +147,7 @@
     <!-- Prayer time settings -->
     <string name="prayer_times_method">হিসাবের পদ্ধতি</string>
     <string name="prayer_times_high_latitude">উচ্চ অক্ষাংশের নিয়ম</string>
-    <string name="prayer_times_manual">নিজ হাতে সমন্বয়</string>
+    <string name="prayer_times_manual">ম্যানুয়াল সমন্বয়</string>
     <string name="prayer_times_madhab_label">আসরের মাযহাব</string>
     <string name="madhab_standard">সাধারণ</string>
     <string name="madhab_hanafi">হানাফি</string>
@@ -178,7 +178,7 @@
     <string name="high_lat_middle">রাতের মধ্যভাগ</string>
     <string name="high_lat_seventh">রাতের এক-সপ্তমাংশ</string>
     <string name="high_lat_twilight">গোধূলি কোণ</string>
-    <string name="high_lat_auto_note">আপনার অক্ষাংশে স্বয়ংক্রিয় নিয়ম %1$s ব্যবহার করে।</string>
+    <string name="high_lat_auto_note">আপনার অক্ষাংশে “স্বয়ংক্রিয়” %1$s নিয়মটি ব্যবহার করে।</string>
     <string name="high_lat_picker_note">প্রায় %1$s ডিগ্রির উপরে সূর্য প্রকৃত ফজর ও এশার জন্য দিগন্তের যথেষ্ট নিচে নামে না, তাই একটি বিকল্প নিয়ম কাজে লাগে।</string>
 
     <string name="manual_note">হিসাবের পদ্ধতির উপরে প্রতিটি সময়কে এক ঘণ্টা পর্যন্ত সরায়। আপনার মসজিদের সময়সূচি হিসাব করা সময় থেকে আলাদা হলে তবেই এটি ব্যবহার করুন।</string>
@@ -229,16 +229,16 @@
     <string name="qibla_title">কিবলা</string>
     <string name="qibla_back">আজ</string>
     <string name="qibla_hold_flat">ফোনটি সমান করে ধরুন</string>
-    <string name="qibla_facing_qibla">কিবলার দিকে মুখ</string>
+    <string name="qibla_facing_qibla">কিবলামুখী</string>
     <string name="qibla_needs_calibrating">কম্পাস ক্যালিব্রেট করা দরকার</string>
-    <string name="qibla_calibration_help">ফোনটি কয়েকবার ৮-এর আকারে ঘোরান। ধাতু, কেস ও স্পিকারের চৌম্বকীয় প্রভাব পাঠকে এলোমেলো করে দিতে পারে।</string>
+    <string name="qibla_calibration_help">ফোনটি কয়েকবার ৮-এর আকারে ঘোরান। ধাতু, কেস ও স্পিকারের চৌম্বকীয় প্রভাবে কম্পাস ভুল দিক দেখাতে পারে।</string>
     <!-- Magnetic interference: a figure of eight cannot help, so the advice is to move away. -->
     <string name="qibla_interference_title">চৌম্বকীয় প্রভাব</string>
     <string name="qibla_interference_help">ধাতু, চুম্বক, কেস ও তার থেকে দূরে সরুন। কাছে আরও শক্তিশালী কিছু থাকলে কম্পাস পৃথিবীর চৌম্বক ক্ষেত্র পড়তে পারে না।</string>
     <!-- Best effort: the bearing and the distance need no sensor, so they stay. -->
     <string name="qibla_best_effort_title">কম্পাস পাওয়া যাচ্ছে না</string>
     <string name="qibla_best_effort_calibration">এই ফোনের কম্পাস ক্যালিব্রেট করা যায়নি। দেখানো দিক ও দূরত্ব সঠিক — আলাদা একটি কম্পাসের সঙ্গে সেগুলো কাজে লাগান।</string>
-    <string name="qibla_best_effort_interference">এখানকার চৌম্বকীয় প্রভাব এই ফোনের কম্পাসের জন্য বড্ড বেশি। দেখানো দিক ও দূরত্ব সঠিক — আলাদা একটি কম্পাসের সঙ্গে সেগুলো কাজে লাগান।</string>
+    <string name="qibla_best_effort_interference">এখানকার চৌম্বকীয় প্রভাব এই ফোনের কম্পাসের জন্য খুব বেশি। দেখানো দিক ও দূরত্ব সঠিক — আলাদা একটি কম্পাসের সঙ্গে সেগুলো কাজে লাগান।</string>
     <string name="qibla_distance">মক্কা · %1$s কিমি দূরে</string>
     <string name="qibla_bearing">%1$s°</string>
     <string name="qibla_cardinal_north">উ</string>
@@ -247,7 +247,7 @@
     <string name="qibla_cardinal_west">প</string>
     <string name="notifications_exact_alarms_off">তাকওয়ার জন্য সুনির্দিষ্ট অ্যালার্ম বন্ধ আছে, তাই নোটিফিকেশন এক ঘণ্টা পর্যন্ত দেরিতে আসতে পারে। ঠিক করতে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি দিন।</string>
     <string name="notifications_allow_exact_alarms">সুনির্দিষ্ট অ্যালার্মের অনুমতি দিন</string>
-    <string name="notifications_blocked">সিস্টেম সেটিংসে তাকওয়ার নোটিফিকেশন বন্ধ আছে, তাই আবার অনুমতি না দেওয়া পর্যন্ত নামাজের কোনো সতর্কবার্তা দেখানো যাবে না।</string>
+    <string name="notifications_blocked">সিস্টেম সেটিংসে তাকওয়ার নোটিফিকেশন বন্ধ আছে, তাই আবার অনুমতি না দেওয়া পর্যন্ত নামাজের কোনো নোটিফিকেশন দেখানো যাবে না।</string>
     <string name="notifications_open_settings">নোটিফিকেশন সেটিংস খুলুন</string>
     <string name="hijri_tabular">গাণিতিক</string>
     <string name="method_tehran_maghrib_note">মাগরিব সূর্যাস্ত অনুসরণ করে; এই পদ্ধতির ৪.৫° মাগরিব কোণ এখনো প্রয়োগ করা হয়নি।</string>

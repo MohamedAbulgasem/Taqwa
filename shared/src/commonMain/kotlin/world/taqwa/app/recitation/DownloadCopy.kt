@@ -64,7 +64,7 @@ object DownloadCopy {
     private val WORDS: Map<UiLanguage, Words> = mapOf(
         UiLanguage.ENGLISH to Words("Downloads", "{name} · {done} of {total} {unit}", "{name} · {done} of {total} surahs", "MB"),
         UiLanguage.ARABIC to Words("التنزيلات", "{name} · {done} من {total} {unit}", "{name} · {done} من {total} سورة", "م.ب"),
-        UiLanguage.FRENCH to Words("Téléchargements", "{name} · {done} sur {total} {unit}", "{name} · {done} sourates sur {total}", "Mo"),
+        UiLanguage.FRENCH to Words("Téléchargements", "{name} · {done} sur {total} {unit}", "{name} · {done} sur {total} sourates", "Mo"),
         UiLanguage.TURKISH to Words("İndirmeler", "{name} · {done} / {total} {unit}", "{name} · {total} sureden {done}", "MB"),
         UiLanguage.INDONESIAN to Words("Unduhan", "{name} · {done} dari {total} {unit}", "{name} · {done} dari {total} surah", "MB"),
         UiLanguage.URDU to Words("ڈاؤن لوڈز", "{name} · {total} {unit} میں سے {done}", "{name} · {total} میں سے {done} سورتیں", "ایم بی"),

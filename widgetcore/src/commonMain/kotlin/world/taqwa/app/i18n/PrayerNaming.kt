@@ -31,7 +31,7 @@ private val COUNTDOWN: Map<UiLanguage, String> = mapOf(
     UiLanguage.ENGLISH to "{prayer} in",
     UiLanguage.ARABIC to "متبقٍ على {prayer}",
     UiLanguage.FRENCH to "{prayer} dans",
-    UiLanguage.TURKISH to "{prayer} vaktine kalan",
+    UiLanguage.TURKISH to "{prayer} vaktine",
     UiLanguage.INDONESIAN to "Menuju {prayer}",
     UiLanguage.URDU to "{prayer} میں باقی",
     UiLanguage.BENGALI to "{prayer} পর্যন্ত বাকি",

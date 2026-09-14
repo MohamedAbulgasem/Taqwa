@@ -13,7 +13,7 @@
     <string name="onboarding_location_cta">میرا مقام استعمال کریں</string>
     <string name="onboarding_location_secondary">اس کے بجائے شہر چنیں</string>
     <string name="onboarding_notifications_title">کوئی نماز نہ چھوٹے</string>
-    <string name="onboarding_notifications_body">ہر نماز کے وقت ایک اطلاع۔ ہر نماز کی آواز آپ الگ الگ چنتے ہیں، اور جب چاہیں بدل سکتے ہیں۔</string>
+    <string name="onboarding_notifications_body">ہر نماز کے وقت ایک اطلاع۔ ہر نماز کی آواز آپ الگ الگ چن سکتے ہیں، اور جب چاہیں بدل سکتے ہیں۔</string>
     <string name="onboarding_notifications_cta">اطلاعات فعال کریں</string>
     <string name="onboarding_notifications_secondary">ابھی نہیں</string>
     <string name="onboarding_exact_title">عین وقت پر، منٹ کی پابندی سے</string>
@@ -82,7 +82,7 @@
     <string name="about_report_problem">مسئلے کی اطلاع دیں</string>
 
     <!-- کریش رپورٹ: کریش کے بعد اگلی بار کھلنے پر دکھائی جانے والی شیٹ، اور ای میل کی وہ سطر جب بھیجنے کے لیے کوئی رپورٹ نہ ہو۔ -->
-    <string name="crash_sheet_title">تقویٰ غیر متوقع طور پر بند ہو گئی</string>
+    <string name="crash_sheet_title">تقویٰ اچانک بند ہو گیا</string>
     <string name="crash_sheet_body">آپ کے فون پر ایک تکنیکی رپورٹ محفوظ کی گئی ہے۔ اسے support@taqwa.world پر بھیجنے سے مسئلہ حل کرنے میں مدد ملتی ہے۔ اس میں صرف ایپ کا ورژن، آپ کے فون کا ماڈل اور خرابی کی تفصیل ہوتی ہے، اور کچھ نہیں۔</string>
     <string name="crash_send">رپورٹ بھیجیں</string>
     <string name="crash_not_now">ابھی نہیں</string>
@@ -109,7 +109,7 @@
     <string name="city_search_title">شہر چنیں</string>
     <string name="city_search_placeholder">شہر تلاش کریں</string>
     <string name="city_search_hint">شہر کا نام لکھنا شروع کریں۔ ڈیٹابیس ایپ ہی میں شامل ہے، اس لیے تلاش آف لائن بھی کام کرتی ہے۔</string>
-    <string name="city_search_no_results">”%1$s“ سے کوئی شہر نہیں ملتا۔</string>
+    <string name="city_search_no_results">”%1$s“ کے لیے کوئی شہر نہیں ملا۔</string>
 
     <!-- Notification settings -->
     <string name="notifications_master_toggle">نماز کی اطلاعات</string>
@@ -128,7 +128,7 @@
     <string name="sound_takbir">تکبیر</string>
     <string name="sound_adhan">اذان</string>
     <string name="sound_silent_detail">صرف بینر، کوئی آواز نہیں</string>
-    <string name="sound_notification_detail">ایک صاف اعلانی ٹون، %1$s سیکنڈ</string>
+    <string name="sound_notification_detail">ایک صاف، واضح ٹون، %1$s سیکنڈ</string>
     <string name="sound_takbir_detail">اللہ اکبر، اللہ اکبر، تقریباً %1$s سیکنڈ</string>
     <string name="sound_adhan_detail">اذان، پہلے %1$s سیکنڈ</string>
     <string name="sound_sheet_footnote">نماز کی اطلاع اپنی آواز کے پہلے %1$s سیکنڈ بجاتی ہے۔ مکمل اذان ایپ کے اندر سنی جا سکتی ہے۔</string>
@@ -153,7 +153,7 @@
     <string name="prayer_times_hijri_label">ہجری تاریخ</string>
     <string name="hijri_day_before">ایک دن پہلے</string>
     <string name="hijri_day_after">ایک دن بعد</string>
-    <string name="hijri_method_note">یہ حسابی تقویم ہے، رؤیتِ ہلال نہیں۔ اس میں امّ القریٰ اور آپ کے مقامی چاند دیکھنے سے ایک دن کا فرق ہو سکتا ہے؛ اپنے علاقے کے مطابق کرنے کے لیے ترمیم استعمال کریں۔</string>
+    <string name="hijri_method_note">یہ حسابی تقویم ہے، رؤیتِ ہلال نہیں۔ اس میں امّ القریٰ اور مقامی رؤیتِ ہلال سے ایک دن کا فرق ہو سکتا ہے؛ اپنے علاقے کے مطابق کرنے کے لیے ترمیم استعمال کریں۔</string>
     <string name="prayer_times_show_sunrise">طلوعِ آفتاب دکھائیں</string>
     <string name="adjustments_none">کوئی نہیں</string>
     <string name="adjustments_one">1 نماز</string>
@@ -170,7 +170,7 @@
     <string name="method_qatar">قطر</string>
     <string name="method_singapore">سنگاپور</string>
     <string name="method_turkey">دیانت (ترکیہ)</string>
-    <string name="method_moonsighting">رؤیتِ ہلال کمیٹی</string>
+    <string name="method_moonsighting">رؤیتِ ہلال کمیٹی (عالمی) (عالمی)</string>
     <string name="method_picker_note">فجر اور عشاء کے لیے سورج کو افق سے کتنا نیچے ہونا چاہیے، اس پر ادارے مختلف رائے رکھتے ہیں۔ وہی چنیں جس پر آپ کی مقامی مسجد عمل کرتی ہے۔</string>
 
     <string name="high_lat_automatic">خودکار</string>
@@ -180,7 +180,7 @@
     <string name="high_lat_auto_note">آپ کے عرض بلد پر خودکار طریقہ %1$s استعمال کرتا ہے۔</string>
     <string name="high_lat_picker_note">تقریباً %1$s درجے سے اوپر سورج افق سے اتنا نیچے نہیں جاتا کہ حقیقی فجر اور عشاء بن سکیں، اس لیے ایک متبادل قاعدہ لاگو ہو جاتا ہے۔</string>
 
-    <string name="manual_note">حساب کے طریقے کے اوپر ہر وقت کو ایک گھنٹے تک آگے پیچھے کرتا ہے۔ اسے صرف اُس وقت استعمال کریں جب آپ کی مسجد کا نقشۂ اوقات حساب شدہ وقت سے مختلف ہو۔</string>
+    <string name="manual_note">حساب کے طریقے سے نکلنے والے وقت کو ہر نماز کے لیے ایک گھنٹے تک آگے پیچھے کرتا ہے۔ اسے صرف اُس وقت استعمال کریں جب آپ کی مسجد کا نقشۂ اوقات حساب شدہ وقت سے مختلف ہو۔</string>
 
     <!-- Attribution -->
     <string name="attribution_intro">تقویٰ اُس کام پر کھڑا ہے جو دوسروں نے بلا معاوضہ دیا۔ اُن کے لائسنس اعتراف کا تقاضا کرتے ہیں، اور یہ ویسے بھی اُن کا حق ہے۔</string>
@@ -199,7 +199,7 @@
     <string name="credit_quran_font">مصحف کا خط</string>
     <string name="credit_quran_font_detail">مجمع الملک فہد لطباعۃ المصحف الشریف کا KFGQPC عثمانی خط، حفص۔ بغیر ترمیم کے استعمال اور تقسیم کی آزادی ہے۔</string>
     <string name="credit_quran_layout">صفحات کی ترتیب</string>
-    <string name="credit_quran_layout_detail">مصحف مدینہ کے صفحات اور سطروں کے وقفے Quranic Universal Library کے ڈیٹا سے۔</string>
+    <string name="credit_quran_layout_detail">مصحف مدینہ کے صفحات اور سطروں کی تقسیم Quranic Universal Library کے ڈیٹا سے۔</string>
     <string name="credit_translations">تراجم</string>
     <string name="credit_translations_detail">غیر تجارتی استعمال کے لیے Tanzil پروجیکٹ سے شامل کیے گئے۔ ہر مترجم کا ذکر نیچے موجود ہے۔</string>
 
@@ -232,7 +232,7 @@
     <string name="qibla_needs_calibrating">قطب نما کو درست کرنے کی ضرورت ہے</string>
     <string name="qibla_calibration_help">فون کو چند بار آٹھ کے ہندسے کی شکل میں گھمائیں۔ دھات، کور اور اسپیکر کی مقناطیسی مداخلت پیمائش کو بگاڑ سکتی ہے۔</string>
     <string name="qibla_interference_title">مقناطیسی مداخلت</string>
-    <string name="qibla_interference_help">دھات، مقناطیس، کور اور کیبل سے دور ہٹ جائیں۔ جب تک قریب کوئی زیادہ طاقتور میدان ہے، قطب نما زمین کا میدان نہیں پڑھ سکتا۔</string>
+    <string name="qibla_interference_help">دھات، مقناطیس، کور اور کیبل سے دور ہٹ جائیں۔ جب تک قریب کوئی زیادہ طاقتور مقناطیسی اثر موجود ہے، قطب نما زمین کا مقناطیسی میدان نہیں پڑھ سکتا۔</string>
     <string name="qibla_best_effort_title">قطب نما دستیاب نہیں</string>
     <string name="qibla_best_effort_calibration">اس فون کے قطب نما کو درست نہیں کیا جا سکا۔ دکھایا گیا رخ اور فاصلہ درست ہے — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
     <string name="qibla_best_effort_interference">یہاں مقناطیسی مداخلت اس فون کے قطب نما کی سکت سے زیادہ ہے۔ دکھایا گیا رخ اور فاصلہ درست ہے — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
@@ -244,10 +244,10 @@
     <string name="qibla_cardinal_west">مغ</string>
     <string name="notifications_exact_alarms_off">تقویٰ کے لیے عین وقت کے الارم بند ہیں، اس لیے اطلاع ایک گھنٹے تک دیر سے آ سکتی ہے۔ اسے ٹھیک کرنے کے لیے ”الارم اور یاد دہانیاں“ کی اجازت دیں۔</string>
     <string name="notifications_allow_exact_alarms">عین وقت کے الارم کی اجازت دیں</string>
-    <string name="notifications_blocked">نظام کی ترتیبات میں تقویٰ کی اطلاعات بند ہیں، اس لیے دوبارہ اجازت ملنے تک نماز کی کوئی تنبیہ نہیں دکھائی جا سکتی۔</string>
+    <string name="notifications_blocked">نظام کی ترتیبات میں تقویٰ کی اطلاعات بند ہیں، اس لیے دوبارہ اجازت ملنے تک نماز کی کوئی اطلاع نہیں دکھائی جا سکتی۔</string>
     <string name="notifications_open_settings">اطلاعات کی ترتیبات کھولیں</string>
     <string name="hijri_tabular">حسابی</string>
-    <string name="method_tehran_maghrib_note">مغرب غروبِ آفتاب کے تابع ہے؛ اس طریقے کا 4.5° مغرب زاویہ ابھی لاگو نہیں کیا گیا۔</string>
+    <string name="method_tehran_maghrib_note">مغرب کا وقت غروبِ آفتاب پر رکھا گیا ہے؛ اس طریقے کا مغرب کے لیے 4.5° کا زاویہ ابھی لاگو نہیں کیا گیا۔</string>
     <!-- Bottom tab bar -->
     <string name="tab_prayer">نماز</string>
     <string name="tab_quran">قرآن</string>
@@ -257,7 +257,7 @@
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">قرآن</string>
     <string name="quran_search_hint">قرآن میں تلاش کریں</string>
-    <string name="quran_continue">تلاوت جاری رکھیں</string>
+    <string name="quran_continue">پڑھنا جاری رکھیں</string>
     <string name="quran_continue_detail">آیت %1$s از %2$s · پارہ %3$s</string>
     <string name="quran_tab_surah">سورتیں</string>
     <string name="quran_tab_juz">پارے</string>
@@ -326,7 +326,7 @@
     <string name="recitation_play">چلائیں</string>
     <string name="recitation_reciter">قاری</string>
     <string name="recitation_style_murattal">مرتّل</string>
-    <string name="recitation_kbps">%1$s کلوبٹ/سیکنڈ</string>
+    <string name="recitation_kbps">%1$s kbps</string>
     <string name="recitation_megabytes">%1$s ایم بی</string>
     <string name="recitation_on_phone">اس فون پر %2$s میں سے %1$s سورتیں</string>
     <string name="recitation_download">ڈاؤن لوڈ · %1$s</string>
@@ -371,7 +371,7 @@
     <string name="recitation_settings_surahs">%1$s سورتیں · %2$s</string>
     <string name="recitation_settings_whole_quran">پورا قرآن ڈاؤن لوڈ کریں · %1$s</string>
     <string name="recitation_settings_batch">ڈاؤن لوڈ جاری · %1$s از %2$s</string>
-    <string name="recitation_settings_credit">تلاوتیں قاریوں کی جانب سے اسلامک نیٹ ورک کے ذریعے مفت، غیر تجارتی تقسیم کے لیے لائسنس یافتہ ہیں۔ مکمل اسناد ”اسناد اور لائسنس“ میں ہیں۔</string>
+    <string name="recitation_settings_credit">تلاوتیں قاریوں کی جانب سے اسلامک نیٹ ورک کے ذریعے مفت، غیر تجارتی تقسیم کے لیے لائسنس یافتہ ہیں۔ تفصیل ”اعتراف اور لائسنس“ میں ہے۔</string>
     <string name="recitation_downloads_delete">حذف کریں</string>
     <string name="recitation_downloads_delete_all">اس قاری کی سب تلاوتیں حذف کریں</string>
     <string name="recitation_downloads_confirm">%1$s حذف کریں؟</string>

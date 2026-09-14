@@ -82,7 +82,7 @@
     <string name="about_report_problem">Laporkan masalah</string>
 
     <!-- Laporan kerusakan: lembar yang muncul saat aplikasi dibuka setelah rusak, dan baris email ketika tidak ada laporan untuk dikirim. -->
-    <string name="crash_sheet_title">Taqwa tertutup secara tak terduga</string>
+    <string name="crash_sheet_title">Taqwa tertutup mendadak</string>
     <string name="crash_sheet_body">Laporan teknis telah disimpan di ponsel Anda. Mengirimnya ke support@taqwa.world membantu memperbaiki masalah ini. Isinya hanya versi aplikasi, model ponsel Anda, dan kesalahannya.</string>
     <string name="crash_send">Kirim laporan</string>
     <string name="crash_not_now">Nanti saja</string>
@@ -93,7 +93,7 @@
     <string name="theme_system">Sistem</string>
     <string name="theme_light">Terang</string>
     <string name="theme_dark">Gelap</string>
-    <string name="appearance_note">Pilihan Sistem mengikuti setelan terang dan gelap di perangkat Anda.</string>
+    <string name="appearance_note">Pilihan Sistem mengikuti pengaturan terang dan gelap di perangkat Anda.</string>
 
     <!-- Location settings -->
     <string name="location_use_my_location">Gunakan lokasi saya</string>
@@ -103,7 +103,7 @@
     <string name="location_timezone">Zona waktu</string>
     <string name="location_choose_city_instead">Pilih kota saja</string>
     <string name="location_privacy_note">Koordinat disimpan di perangkat Anda dan hanya dipakai untuk menghitung waktu salat. Tidak ada yang dikirim ke mana pun.</string>
-    <string name="location_denied_note">Akses lokasi sedang ditolak. Anda bisa mengizinkannya di pengaturan perangkat, atau pilih kota saja.</string>
+    <string name="location_denied_note">Akses lokasi saat ini ditolak. Anda bisa mengizinkannya di pengaturan perangkat, atau pilih kota saja.</string>
 
     <!-- City search -->
     <string name="city_search_title">Pilih kota</string>
@@ -152,7 +152,7 @@
     <string name="prayer_times_hijri_label">TANGGAL HIJRIAH</string>
     <string name="hijri_day_before">Sehari sebelumnya</string>
     <string name="hijri_day_after">Sehari sesudahnya</string>
-    <string name="hijri_method_note">Kalender hitungan, bukan rukyat. Bisa berbeda sehari dari Ummul Qura dan dari rukyat setempat; gunakan penyesuaian agar cocok dengan yang dipakai di lingkungan Anda.</string>
+    <string name="hijri_method_note">Kalender hisab, bukan rukyat. Bisa berbeda sehari dari Ummul Qura dan dari rukyat setempat; gunakan penyesuaian agar cocok dengan yang dipakai di lingkungan Anda.</string>
     <string name="prayer_times_show_sunrise">Tampilkan waktu terbit</string>
     <string name="adjustments_none">Tidak ada</string>
     <string name="adjustments_one">1 salat</string>
@@ -299,12 +299,12 @@
     <string name="tasbeeh_round">PUTARAN %1$s</string>
     <string name="tasbeeh_of">dari %1$s</string>
     <string name="tasbeeh_hint">Ketuk di mana saja untuk menghitung</string>
-    <string name="dhikr_meaning_subhanallah">Maha Suci Allah</string>
+    <string name="dhikr_meaning_subhanallah">Mahasuci Allah</string>
     <string name="dhikr_meaning_alhamdulillah">Segala puji bagi Allah</string>
-    <string name="dhikr_meaning_allahu_akbar">Allah Maha Besar</string>
+    <string name="dhikr_meaning_allahu_akbar">Allah Mahabesar</string>
     <string name="dhikr_meaning_astaghfirullah">Aku memohon ampun kepada Allah</string>
     <string name="dhikr_meaning_la_ilaha_illallah">Tiada tuhan selain Allah</string>
-    <string name="dhikr_meaning_subhanallahi_wa_bihamdihi">Maha Suci Allah dan segala puji bagi-Nya</string>
+    <string name="dhikr_meaning_subhanallahi_wa_bihamdihi">Mahasuci Allah dan segala puji bagi-Nya</string>
     <string name="tasbeeh_preset_after_prayer">Setelah salat</string>
     <string name="tasbeeh_preset_subhanallah">Subhanallah</string>
     <string name="tasbeeh_preset_alhamdulillah">Alhamdulillah</string>

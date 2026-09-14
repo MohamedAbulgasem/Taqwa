@@ -7,7 +7,7 @@
     <string name="language_name">Türkçe</string>
 
     <!-- Tanıtım -->
-    <string name="onboarding_welcome_title">Taqwa’ya hoş geldiniz</string>
+    <string name="onboarding_welcome_title">Taqwa</string>
     <string name="onboarding_welcome_body">Namaz vakitleri, kıble ve Kur’an. Sonsuza dek ücretsiz. Reklam yok, hesap yok, çevrimdışı çalışır.</string>
     <string name="onboarding_welcome_cta">Başlayalım</string>
     <string name="onboarding_location_title">Neredesiniz?</string>
@@ -41,10 +41,10 @@
     <string name="today_current_location">Mevcut konum</string>
     <!-- Geri sayım halkasının etiketi. Halka bu metni büyük harfe çevirir; Türkçedeki İ’lerin
          doğru kalması için burada zaten büyük harfle yazılmıştır. -->
-    <string name="today_next_in">%1$s VAKTİNE KALAN</string>
+    <string name="today_next_in">%1$s vaktine</string>
     <string name="today_latitude_label">BU ENLEMDE</string>
     <string name="today_exact_alarms_label">TAM ALARMLAR KAPALI</string>
-    <string name="today_exact_alarms_body">Taqwa için “Alarmlar ve hatırlatıcılar” izni verilene kadar Android bir saate kadar geç çalabilir.</string>
+    <string name="today_exact_alarms_body">Taqwa için “Alarmlar ve hatırlatıcılar” izni verilmediği sürece Android bir saate kadar geç çalabilir.</string>
     <string name="today_no_location_title">Henüz konum yok</string>
     <string name="today_choose_city">Şehir seç</string>
     <string name="today_allow_location">Ya da konuma izin ver</string>
@@ -72,7 +72,7 @@
     <string name="about_stays_title">Telefonunuzda kalır</string>
     <string name="about_stays_body">Konum, ayarlar, yer imleri ve sayaçlar telefonunuzdan çıkmaz.</string>
     <string name="about_online_title">Yalnızca siz isteyince çevrimiçi</string>
-    <string name="about_online_body">İnternet tek bir şey için kullanılır: indirmeyi seçtiğiniz tilavetler, Taqwa’nın GitHub’daki herkese açık deposundan.</string>
+    <string name="about_online_body">İnternet tek bir şey için kullanılır: Taqwa’nın GitHub’daki herkese açık deposundan indirmeyi seçtiğiniz tilavetler.</string>
     <string name="about_nothing_title">Hesap yok, reklam yok, analiz yok</string>
     <string name="about_nothing_body">Giriş yapılacak bir şey yok, satılacak bir şey yok.</string>
     <string name="about_links_label">DAHA FAZLASI</string>
@@ -181,13 +181,13 @@
     <string name="method_singapore">Singapur</string>
     <string name="method_turkey">Diyanet İşleri Başkanlığı</string>
     <string name="method_moonsighting">Hilal Gözlem Komitesi</string>
-    <string name="method_picker_note">Kurumlar, Sabah ve Yatsı için güneşin ufkun ne kadar altına inmesi gerektiği konusunda ayrılır. Mahallenizdeki caminin uyduğu yöntemi seçin.</string>
+    <string name="method_picker_note">Kurumlar, Sabah ve Yatsı için güneşin ufkun ne kadar altına inmesi gerektiği konusunda farklı görüştedir. Mahallenizdeki caminin uyduğu yöntemi seçin.</string>
 
     <string name="high_lat_automatic">Otomatik</string>
     <string name="high_lat_middle">Gece yarısı</string>
     <string name="high_lat_seventh">Gecenin yedide biri</string>
     <string name="high_lat_twilight">Tan açısı</string>
-    <string name="high_lat_auto_note">Bulunduğunuz enlemde otomatik seçenek şunu kullanır: %1$s.</string>
+    <string name="high_lat_auto_note">Bulunduğunuz enlemde otomatik seçenek %1$s kuralını kullanır.</string>
     <string name="high_lat_picker_note">Yaklaşık %1$s derecenin üstünde güneş, gerçek bir Sabah ve Yatsı için ufkun yeterince altına inmez; bu yüzden onların yerine bir kural devreye girer.</string>
 
     <string name="manual_note">Her vakti, hesaplama yönteminin üstüne bir saate kadar kaydırır. Yalnızca caminizin takvimi hesaplanan vakitten farklıysa kullanın.</string>
@@ -239,7 +239,7 @@
     <string name="qibla_back">Bugün</string>
     <string name="qibla_hold_flat">Telefonunuzu düz tutun</string>
     <string name="qibla_facing_qibla">Kıbleye dönüksünüz</string>
-    <string name="qibla_needs_calibrating">Pusulanın ayarlanması gerekiyor</string>
+    <string name="qibla_needs_calibrating">Pusulanın kalibre edilmesi gerekiyor</string>
     <string name="qibla_calibration_help">Telefonunuzu birkaç kez havada sekiz çizerek hareket ettirin. Metalden, kılıftan ve hoparlörlerden gelen manyetik girişim okumayı bozabilir.</string>
     <!-- Kıble, manyetik girişim durumu: telefonun çevresindeki alan Dünya’nınki olmadığı için
          sekiz çizmek işe yaramaz; tavsiye, oradan uzaklaşmaktır. -->
@@ -248,7 +248,7 @@
     <!-- Kıble, elden gelenin en iyisi: pusula yirmi saniyedir kullanılamıyor. Açı ile mesafe
          sensör istemediği için kalır; iğne kalmaz. -->
     <string name="qibla_best_effort_title">Pusula kullanılamıyor</string>
-    <string name="qibla_best_effort_calibration">Bu telefonun pusulası ayarlanamadı. Gösterilen açı ve mesafe doğru — bunları ayrı bir pusulayla kullanın.</string>
+    <string name="qibla_best_effort_calibration">Bu telefonun pusulası kalibre edilemedi. Gösterilen açı ve mesafe doğru — bunları ayrı bir pusulayla kullanın.</string>
     <string name="qibla_best_effort_interference">Buradaki manyetik girişim bu telefonun pusulası için fazla güçlü. Gösterilen açı ve mesafe doğru — bunları ayrı bir pusulayla kullanın.</string>
     <string name="qibla_distance">Mekke · %1$s km uzakta</string>
     <string name="qibla_bearing">%1$s°</string>
@@ -260,7 +260,7 @@
     <string name="notifications_allow_exact_alarms">Tam alarmlara izin ver</string>
     <string name="notifications_blocked">Sistem ayarlarında Taqwa için bildirimler kapalı; yeniden izin verilene kadar hiçbir namaz uyarısı gösterilemez.</string>
     <string name="notifications_open_settings">Bildirim ayarlarını aç</string>
-    <string name="hijri_tabular">Hesabi</string>
+    <string name="hijri_tabular">Hesaplanan</string>
     <string name="method_tehran_maghrib_note">Akşam, güneşin batışına göre alınır; bu yöntemin 4,5° Akşam açısı henüz uygulanmıyor.</string>
     <!-- Alt sekme çubuğu (yineleme 1; yineleme 8: Kıble Namaz ekranına katlandı; dilim 2: Kur’an
          sekmesi geldi). -->

@@ -41,7 +41,7 @@ class DownloadCopyTest {
             DownloadCopy.batch("Mishary Rashid Alafasy", 12, 114, "en", NumberStyle.WESTERN),
         )
         assertEquals("العفاسي · ١٢ من ١١٤ سورة", DownloadCopy.batch("العفاسي", 12, 114, "ar", NumberStyle.ARABIC_INDIC))
-        assertEquals("Alafasy · 12 sourates sur 114", DownloadCopy.batch("Alafasy", 12, 114, "fr", NumberStyle.WESTERN_COMMA))
+        assertEquals("Alafasy · 12 sur 114 sourates", DownloadCopy.batch("Alafasy", 12, 114, "fr", NumberStyle.WESTERN_COMMA))
         assertEquals("Alafasy · 114 sureden 12", DownloadCopy.batch("Alafasy", 12, 114, "tr-TR", NumberStyle.WESTERN_COMMA))
         assertEquals("Alafasy · 12 dari 114 surah", DownloadCopy.batch("Alafasy", 12, 114, "id", NumberStyle.WESTERN_COMMA))
         assertEquals("العفاسی · 114 میں سے 12 سورتیں", DownloadCopy.batch("العفاسی", 12, 114, "ur-PK", NumberStyle.WESTERN))

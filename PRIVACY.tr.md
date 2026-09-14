@@ -42,7 +42,7 @@ tanımlayıcısı, ne de çerez. GitHub'ın bu tür istekler hakkında ne saklad
 bildirimi anlatır: docs.github.com/site-policy/privacy-policies/github-general-privacy-statement.
 
 Tilavetle ilgili herhangi bir şeyi bir kez açtıktan sonra — kari listesi, Tilavet ayarları ya da
-bir indirme — uygulama ayrıca günde bir kez, aynı depodan güncel kari listesini denetler. Bu
+bir indirme — uygulama ayrıca günde bir kez, aynı depodan güncellenmiş bir kari listesi olup olmadığını kontrol eder. Bu
 istek herkes için aynıdır ve IP adresinizden başka hiçbir şeyi ele vermez. Tilaveti ilk kez
 kullanana kadar uygulama hiçbir ağ isteği yapmaz.
 
@@ -54,7 +54,7 @@ ayrı silinebilir.
 Taqwa, Android'in uygulama yedeklemesinin dışında kalır; böylece konumunuz ve ayarlarınız
 Google'a kopyalanmaz. iOS'ta ayarlarınız, yer imleriniz, sayaçlarınız ve indirdiğiniz tilavetler
 iCloud yedeklemesinin dışında tutulur; Taqwa'ya ait olup yedeklenen tek şey widget'ların küçük
-önbellekleri, yani yaklaşan namaz vakitleri ile günün ayeti widget'ının dolaştığı yüz ayettir.
+önbellekleri, yani yaklaşan namaz vakitleri ile günün ayeti widget'ının sırayla gösterdiği yüz ayettir.
 Bunların hiçbiri konumunuzu içermez; o yedekleme de Apple tarafından şifrelenir ve bize hiçbir
 zaman görünmez.
 
@@ -63,7 +63,7 @@ zaman görünmez.
 - Hesap, oturum açma ya da profil yok.
 - Reklam ve reklam tanımlayıcısı yok.
 - Analiz, çökme raporlaması ya da kullanım istatistiği yok.
-- İnternete konuşan üçüncü taraf SDK yok.
+- İnternete bağlanan üçüncü taraf SDK yok.
 - Veri satışı ya da paylaşımı yok, çünkü satılacak veya paylaşılacak veri yok.
 
 Telefonunuz kendi ayarları uyarınca Google'a ya da Apple'a çökme raporu gönderebilir; bunlar

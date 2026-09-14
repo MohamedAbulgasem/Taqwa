@@ -2,7 +2,7 @@
 
 _Dernière mise à jour le 13 septembre 2026. S’applique à Taqwa 1.0.0 et aux versions ultérieures sur Android et iOS._
 
-Taqwa est une application islamique gratuite, sans compte, sans publicité et sans analyse. Elle
+Taqwa est une application islamique gratuite, sans compte, sans publicité et sans outil d’analyse. Elle
 fonctionne hors ligne. La seule chose pour laquelle elle utilise Internet est le téléchargement
 des récitations du Coran, et uniquement lorsque vous le lui demandez.
 
@@ -48,14 +48,14 @@ Une fois que vous avez ouvert quoi que ce soit qui touche à la récitation, que
 des récitateurs, les paramètres de Récitation ou un téléchargement, l’application vérifie aussi une
 fois par jour s’il existe une liste de récitateurs plus récente, depuis le même dépôt. Cette
 requête est la même pour tout le monde et ne révèle rien d’autre que votre adresse IP. Tant que
-vous n’utilisez pas la récitation, l’application ne fait aucune requête réseau.
+vous n’avez pas utilisé la récitation une première fois, l’application ne fait aucune requête réseau.
 
 Les récitations téléchargées peuvent être supprimées récitateur par récitateur dans Paramètres ›
 Coran › Récitation › Téléchargements.
 
 ## Sauvegardes
 
-Taqwa se retire de la sauvegarde d’applications d’Android : votre position et vos paramètres ne
+Taqwa n’utilise pas la sauvegarde d’applications d’Android : votre position et vos paramètres ne
 sont donc pas copiés chez Google. Sur iOS, vos paramètres, vos signets, vos compteurs et vos
 récitations téléchargées sont exclus de la sauvegarde iCloud ; les seules choses de Taqwa qui
 soient sauvegardées sont les petits caches des widgets, les prochains horaires de prière et les
@@ -66,7 +66,7 @@ et cette sauvegarde est chiffrée par Apple et ne nous est jamais visible.
 
 - Aucun compte, aucune connexion, aucun profil.
 - Aucune publicité et aucun identifiant publicitaire.
-- Aucune analyse, aucun rapport de plantage, aucune statistique d’utilisation.
+- Aucun outil d’analyse, aucun rapport de plantage, aucune statistique d’utilisation.
 - Aucun SDK tiers qui communique avec Internet.
 - Aucune vente ni aucun partage de données, puisqu’il n’y en a aucune à vendre ou à partager.
 

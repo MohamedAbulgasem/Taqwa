@@ -60,7 +60,7 @@ yaitu waktu salat yang akan datang dan seratus ayat yang diputar bergiliran oleh
 harian, dan keduanya tidak memuat lokasi Anda; cadangan itu pun dienkripsi oleh Apple dan tidak
 pernah terlihat oleh kami.
 
-## Apa yang tidak pernah Taqwa lakukan
+## Apa yang tidak pernah dilakukan Taqwa
 
 - Tanpa akun, tanpa proses masuk, tanpa profil.
 - Tanpa iklan dan tanpa pengenal iklan.

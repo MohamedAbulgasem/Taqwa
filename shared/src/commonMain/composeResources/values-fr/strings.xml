@@ -160,8 +160,8 @@
     <string name="madhab_standard">Majoritaire</string>
     <string name="madhab_hanafi">Hanafite</string>
     <string name="prayer_times_hijri_label">DATE HÉGIRIENNE</string>
-    <string name="hijri_day_before">Un jour plus tôt</string>
-    <string name="hijri_day_after">Un jour plus tard</string>
+    <string name="hijri_day_before">Un jour avant</string>
+    <string name="hijri_day_after">Un jour après</string>
     <string name="hijri_method_note">Un calendrier arithmétique, non fondé sur l’observation. Il peut différer d’un jour de celui d’Oumm al-Qoura et de l’observation locale du croissant ; utilisez l’ajustement pour suivre votre communauté.</string>
     <string name="prayer_times_show_sunrise">Afficher le lever du soleil</string>
     <string name="adjustments_none">Aucun</string>
@@ -200,7 +200,7 @@
     <string name="credit_typeface">Police Manrope</string>
     <string name="credit_typeface_detail">Licence SIL Open Font 1.1.</string>
     <string name="credit_audio">Enregistrements de l’adhan et du takbir</string>
-    <string name="credit_audio_detail">« Beautiful adhan » d’Adam-synagda, CC0 1.0, via Wikimedia Commons. « The Adhan – Muslim Call to Prayer – Aaqib Azeez », CC BY-SA 4.0, via Wikimedia Commons. « Eid al-Fitr Fajr azan at Malmö Mosque » du Centre islamique de Malmö, CC BY 3.0, via Wikimedia Commons.</string>
+    <string name="credit_audio_detail">« Beautiful adhan » d’Adam-synagda, CC0 1.0, via Wikimedia Commons. « The Adhan – Muslim Call to Prayer – Aaqib Azeez », CC BY-SA 4.0, via Wikimedia Commons. « Eid al-Fitr Fajr azan at Malmö Mosque » d’Islamic Center Malmö, CC BY 3.0, via Wikimedia Commons.</string>
     <string name="credit_chime">Tonalité de notification</string>
     <string name="credit_chime_detail">« Clear announce tones », de Mixkit, licence gratuite Mixkit pour les effets sonores.</string>
     <string name="credit_quran_text">Texte du Coran</string>
@@ -210,7 +210,7 @@
     <string name="credit_quran_layout">Mise en page</string>
     <string name="credit_quran_layout_detail">Sauts de page et de ligne du Mushaf de Médine, d’après les données de la Quranic Universal Library.</string>
     <string name="credit_translations">Traductions</string>
-    <string name="credit_translations_detail">Incluses depuis le projet Tanzil pour un usage non commercial. Chaque traducteur est cité ci-dessous.</string>
+    <string name="credit_translations_detail">Tirées du projet Tanzil pour un usage non commercial. Chaque traducteur est cité ci-dessous.</string>
 
     <!-- Qibla (plan 2) -->
     <string name="qibla_no_sensor_title">Pas de capteur de boussole</string>
@@ -230,7 +230,7 @@
     <string name="widget_background_light">Clair</string>
     <string name="widget_background_dark">Sombre</string>
     <string name="widget_background_translucent_title">Translucide</string>
-    <string name="widget_background_translucent_subtitle">Se fond dans votre fond d’écran.</string>
+    <string name="widget_background_translucent_subtitle">S’intègre à votre fond d’écran.</string>
     <string name="widget_background_frosted_title">Givré</string>
     <string name="widget_background_frosted_subtitle">Utilise le matériau de widget du système.</string>
     <!-- Qibla screen (Task 22 sweep: qibla_no_sensor_title/body above already matched this
@@ -283,7 +283,7 @@
     <string name="quran_makki">Mecquoise</string>
     <string name="quran_madani">Médinoise</string>
     <string name="quran_juz_n">Juz %1$s</string>
-    <string name="quran_juz_range">De %1$s %2$s à %3$s %4$s</string>
+    <string name="quran_juz_range">%1$s %2$s à %3$s %4$s</string>
     <string name="quran_next_surah">Suivante : %1$s</string>
     <string name="quran_juz_page">Juz %1$s · page %2$s</string>
     <string name="quran_reader_aa">Options de lecture</string>
@@ -347,14 +347,14 @@
     <string name="recitation_style_murattal">Mourattal</string>
     <string name="recitation_kbps">%1$s kbit/s</string>
     <string name="recitation_megabytes">%1$s Mo</string>
-    <string name="recitation_on_phone">%1$s des %2$s sourates sont sur ce téléphone</string>
+    <string name="recitation_on_phone">%1$s des %2$s sourates sur ce téléphone</string>
     <string name="recitation_download">Télécharger · %1$s</string>
     <string name="recitation_downloading">%1$s sur %2$s</string>
     <string name="recitation_over_wifi">Via le Wi-Fi.</string>
     <string name="recitation_use_mobile_once">Utiliser les données mobiles cette fois</string>
-    <string name="recitation_keep_reading">Vous pouvez continuer à lire. La lecture commencera au verset que vous avez choisi dès la fin du téléchargement.</string>
+    <string name="recitation_keep_reading">Vous pouvez continuer à lire. La récitation commencera au verset que vous avez choisi dès la fin du téléchargement.</string>
     <string name="recitation_waiting_connection">En attente d’une connexion. Le téléchargement démarrera tout seul dès qu’il y en aura une.</string>
-    <string name="recitation_switch_ready">%1$s continue la récitation jusqu’à ce que la nouvelle arrive.</string>
+    <string name="recitation_switch_ready">%1$s continue la récitation jusqu’à l’arrivée de la nouvelle voix.</string>
     <string name="recitation_switch_running">%1$s continue la récitation. La voix passera à %2$s dès la fin du téléchargement.</string>
     <string name="recitation_cancel">Annuler</string>
     <string name="recitation_retry">Réessayer</string>
@@ -394,8 +394,8 @@
     <string name="recitation_downloads_delete">Supprimer</string>
     <string name="recitation_downloads_delete_all">Tout supprimer pour ce récitateur</string>
     <string name="recitation_downloads_confirm">Supprimer %1$s ?</string>
-    <string name="recitation_downloads_empty">Rien de ce récitateur n’est sur le téléphone.</string>
+    <string name="recitation_downloads_empty">Aucune sourate de ce récitateur n’est sur ce téléphone.</string>
     <string name="recitation_gigabytes">%1$s Go</string>
     <string name="credit_recitations">Récitations</string>
-    <string name="credit_recitations_detail">Récitations verset par verset de l’Islamic Network (alquran.cloud), qui les tient sous licence des récitateurs pour une rediffusion gratuite et non commerciale aux débits qu’ils publient. Copiées sans modification, à ces mêmes débits.</string>
+    <string name="credit_recitations_detail">Récitations verset par verset de l’Islamic Network (alquran.cloud), que les récitateurs lui ont concédées pour une rediffusion gratuite et non commerciale aux débits qu’il publie. Copiées sans modification, à ces mêmes débits.</string>
 </resources>

@@ -11,9 +11,9 @@ import world.taqwa.app.i18n.UiLanguage
  */
 private val MONTHS: Map<UiLanguage, List<String>> = mapOf(
     UiLanguage.ENGLISH to listOf(
-        "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
-        "Jumada al-Ula", "Jumada al-Akhirah", "Rajab", "Sha'ban",
-        "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah",
+        "Muharram", "Safar", "Rabi’ al-Awwal", "Rabi’ al-Thani",
+        "Jumada al-Ula", "Jumada al-Akhirah", "Rajab", "Sha’ban",
+        "Ramadan", "Shawwal", "Dhu al-Qi’dah", "Dhu al-Hijjah",
     ),
     UiLanguage.ARABIC to listOf(
         "محرّم", "صفر", "ربيع الأوّل", "ربيع الآخر",
@@ -21,7 +21,7 @@ private val MONTHS: Map<UiLanguage, List<String>> = mapOf(
         "رمضان", "شوّال", "ذو القعدة", "ذو الحجّة",
     ),
     UiLanguage.FRENCH to listOf(
-        "Mouharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
+        "Mouharram", "Safar", "Rabi’ al-Awwal", "Rabi’ al-Thani",
         "Joumada al-Oula", "Joumada al-Akhira", "Rajab", "Cha'ban",
         "Ramadan", "Chawwal", "Dhou al-Qi'da", "Dhou al-Hijja",
     ),
