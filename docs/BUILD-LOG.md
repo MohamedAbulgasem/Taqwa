@@ -1301,3 +1301,10 @@ playing goes on playing in the new voice, paused stays paused in it, nothing loa
 way. The audition's own pause is the one resume left. Three controller tests rewritten.
 
 Released as 0.19.1 (24); the store build becomes 1.0.0 (25).
+
+## The Quran switch, full width (14 September, late)
+
+Mohamed: the Surah | Juz | Bookmarks switch should span the row, each option a third of it, the
+selected pill filling its third, the pill itself unchanged. `TaqwaSegmented` gained `fillWidth`
+(the Row fills, each option weighs one); the reading sheet's Translation | Mushaf switch keeps
+hugging its labels. Released as 0.20.0 (25); the store build becomes 1.0.0 (26).

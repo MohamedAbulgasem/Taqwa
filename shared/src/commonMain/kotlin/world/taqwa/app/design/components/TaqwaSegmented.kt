@@ -31,10 +31,21 @@ import world.taqwa.app.design.LocalTaqwaColors
  * accent in both themes rather than only in light mode.
  */
 @Composable
-fun TaqwaSegmented(options: List<String>, selectedIndex: Int, onSelect: (Int) -> Unit) {
+fun TaqwaSegmented(
+    options: List<String>,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+    /**
+     * Span the whole width, every option an equal share of it, the selected pill filling its
+     * share: the Quran root's Surah | Juz | Bookmarks switch (owner's call, 14 September). Off,
+     * the switch hugs its labels, which is what the reading sheet's two-way switch wants.
+     */
+    fillWidth: Boolean = false,
+) {
     val colors = LocalTaqwaColors.current
     Row(
         Modifier
+            .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier)
             .height(44.dp)
             .clip(RoundedCornerShape(percent = 50))
             .background(colors.surface)
@@ -46,6 +57,7 @@ fun TaqwaSegmented(options: List<String>, selectedIndex: Int, onSelect: (Int) ->
             // the inset on the Row instead would leave each option a 38 dp target.
             Box(
                 Modifier
+                    .then(if (fillWidth) Modifier.weight(1f) else Modifier)
                     .fillMaxHeight()
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },

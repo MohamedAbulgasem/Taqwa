@@ -62,7 +62,7 @@
     <string name="settings_not_set">Non définie</string>
     <string name="settings_notifications_off">Désactivées</string>
     <string name="settings_notifications_on_count">%1$s activées</string>
-    <string name="settings_version_value">0.19.1</string>
+    <string name="settings_version_value">0.20.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          every locale, as on the icon. -->
