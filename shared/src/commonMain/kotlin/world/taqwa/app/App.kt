@@ -71,6 +71,7 @@ import world.taqwa.app.design.components.TaqwaBottomSheet
 import world.taqwa.app.design.components.TaqwaTabScaffold
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.nav.LaunchRequests
+import world.taqwa.app.nav.openReading
 import world.taqwa.app.nav.recitationTarget
 import world.taqwa.app.recitation.foregroundReturnsToRecitation
 import world.taqwa.app.nav.ayahWidgetTarget
@@ -208,14 +209,7 @@ fun App(container: AppContainer) {
                         val target = recitationTarget(reading.mode, playing.surah, playing.ayah) { s, a ->
                             container.quranRepository.pageOf(s, a)
                         }
-                        if (!onQuran) navigator.selectTab(Tab.QURAN)
-                        val now = navigator.current
-                        if (now is Screen.Reader || now is Screen.Mushaf) {
-                            navigator.replace(target)
-                        } else {
-                            if (now != Screen.Quran) navigator.push(Screen.Quran)
-                            navigator.push(target)
-                        }
+                        navigator.openReading(target)
                     }
                 }
             }
@@ -370,21 +364,12 @@ fun App(container: AppContainer) {
                 val target = ayahWidgetTarget(reading.mode, surah, ayah) { s, a ->
                     container.quranRepository.pageOf(s, a)
                 }
-                val current = navigator.current
-                if (current is Screen.Reader || current is Screen.Mushaf) {
-                    // A second tap (or a tap while an ayah opened another way is still open)
-                    // replaces the open reading screen with the new one instead of stacking a
-                    // second reader behind it, the same rule the mode toggle uses.
-                    navigator.replace(target)
-                } else {
-                    // The reader is pushed on top of the Quran root, not on whatever happened to
-                    // be showing. Without this a widget tap put the reader straight on top of the
-                    // Prayer tab, so one Back left the Quran entirely and reaching the surah list
-                    // — the list the ayah came from — took another tap (D3, S23 round). Skipped
-                    // when the Quran root is already on top, so this never stacks a second root.
-                    if (current != Screen.Quran) navigator.push(Screen.Quran)
-                    navigator.push(target)
-                }
+                // On the Quran tab, with the Quran root at the bottom of the stack: a tap from
+                // the Prayer tab used to push the root and the reader on top of Prayer, which
+                // kept the tab current at Prayer and so hid the player bar (spec §5.3 draws it
+                // only on the Quran tab) until the tab was left and re-entered. `openReading`
+                // also keeps the D3 rule: one Back from the reader reaches the surah list.
+                navigator.openReading(target)
             }
             // Consumed unconditionally: a bad request (e.g. a database failure resolving the page)
             // must not be retried forever on every future emission.
@@ -481,8 +466,12 @@ fun App(container: AppContainer) {
                 var followedSurah by remember { mutableStateOf<Int?>(null) }
                 LaunchedEffect(playingSurah) {
                     val before = followedSurah
+                    // A bar that goes away keeps its surah remembered: a surah that played out and
+                    // whose successor had to be fetched first (spec §16.1) comes back as a new
+                    // surah on a reader still open on the old one, and that reader follows too.
+                    if (playingSurah == null) return@LaunchedEffect
                     followedSurah = playingSurah
-                    if (playingSurah == null || before == null || before == playingSurah) return@LaunchedEffect
+                    if (before == null || before == playingSurah) return@LaunchedEffect
                     val current = navigator.current
                     if (current is Screen.Reader && current.surah == before) {
                         navigator.replace(Screen.Reader(playingSurah, 1))

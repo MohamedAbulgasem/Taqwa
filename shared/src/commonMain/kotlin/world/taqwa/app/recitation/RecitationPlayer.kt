@@ -61,6 +61,13 @@ data class NowPlayingText(
 enum class SurahSkip { PREVIOUS, NEXT }
 
 /**
+ * How long a platform player holds an ended surah for the controller's decision (spec §16.1):
+ * long enough for the breath before the next surah and its load, short enough that a decision
+ * that never comes costs a few seconds of a paused notification and nothing more.
+ */
+const val SURAH_END_HOLD_MS = 5_000L
+
+/**
  * Recitation playback, background and lock screen included (spec §6).
  *
  * Android puts an ExoPlayer inside a `MediaSessionService` and talks to it through a
@@ -77,6 +84,16 @@ expect class RecitationPlayer(library: RecitationLibrary) {
 
     /** Previous/next pressed on a lock screen, a headset or a car (spec §15.1). */
     val skips: SharedFlow<SurahSkip>
+
+    /**
+     * The surah has played out (spec §16.1). The player does not tear itself down at that point:
+     * it holds the ended surah — the bar paused at its end, the session and its notification up —
+     * for [SURAH_END_HOLD_MS] and reports the surah here, so the controller can [load] the next
+     * one into the same session or [stop]. Should neither arrive, the hold lapses into [stop] by
+     * itself, and a surah that ended never leaves a session standing for a player with nothing
+     * left to play.
+     */
+    val surahEnds: SharedFlow<Int>
 
     /**
      * Builds the queue for [surah] from the reciter's downloaded `.taqa` — one item per ayah,

@@ -450,3 +450,46 @@ home screen.
 to hear. The app coming to the front **while a recitation is playing** opens the recited ayah
 instead (`foregroundReturnsToRecitation`, iOS only); paused, it opens where it was left, so
 opening the app for the prayer times with a surah paused in the background moves nothing.
+
+## 16. Round four — 14 September (after 0.18.1)
+
+### 16.1 Playing on into the next surah
+
+**Ask.** "Automatically proceed to the next surah when the current one finishes — currently it
+just stops on surah end."
+
+**Decision.** A surah that plays out is followed by the next one — the literal neighbour, from
+its first ayah — after a one-second breath, in the chosen voice, through the same rules as the
+bar's Next (§15.1) except that nothing is *asked*. The next surah on the phone plays. One that is
+not is fetched only under "without asking" (§15.3): the bar goes, the header's ring shows it
+arriving, and it starts the moment it lands. With downloads on request the recitation simply
+ends where a tap would have opened the sheet, because a sheet nobody asked for, over whatever
+screen they happen to be on, is no answer to a phone that has gone quiet; Next is one tap away.
+An-Nas ends the recitation. The reader on the surah that ended follows to the new one, as it
+does for a skip.
+
+**How.** The platform players no longer tear themselves down at the last ayah. They hold the
+ended surah — the bar paused with its line full, the notification and the audio session still
+up — for a few seconds and report the end (`RecitationPlayer.surahEnds`), and the controller
+decides, as it does for every other move. A decision to go on is a plain `load` into the same
+session: the notification's title changes and nothing flickers, audio focus is never given up
+and taken back (which would let a paused podcast in for a second), and on iOS the audio session
+stays active, the one way a transition in the background is reliable there (a background task
+covers the split of the next container). A decision to stop is the same teardown as before, made
+explicit; and should no decision arrive, the hold lapses into that teardown by itself, so the
+surah-ended-with-a-notification-forever the old teardown was written against cannot come back.
+Anything that moves the recitation during the breath — a seek back into the surah from the lock
+screen, a tap on another ayah, the bar's × — wins over the advance.
+
+### 16.2 The bar after a widget tap
+
+**Ask.** Opening an ayah from the home-screen widget and pressing Play on its card played the
+surah with no bar; the bar appeared only after leaving the Quran root for another tab and coming
+back.
+
+**Cause.** The widget's path pushed the Quran root and the reader on top of whatever tab was
+showing (the D3 rule that one Back should reach the surah list), while the bar is drawn only
+while the Quran tab is *current*, and `Navigator.currentTab` reads the bottom of the stack —
+still Prayer. `Navigator.openReading` now does what the notification's path already did:
+from another tab the stack is replaced with the Quran root first, and the reader goes on top of
+it; both entry points share it.

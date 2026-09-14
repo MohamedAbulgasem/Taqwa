@@ -33,6 +33,9 @@ interface PlayerPort {
 
     /** The lock screen's previous/next, which move by surah (spec §15.1). */
     val skips: Flow<SurahSkip>
+
+    /** A surah that has played out, held by the player for the decision (spec §16.1). */
+    val surahEnds: Flow<Int>
     suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText)
     fun play()
     fun pause()
@@ -113,6 +116,7 @@ fun ClipPlayer.asPort(): ClipPort = object : ClipPort {
 fun RecitationPlayer.asPort(): PlayerPort = object : PlayerPort {
     override val state: StateFlow<PlaybackState> get() = this@asPort.state
     override val skips: Flow<SurahSkip> get() = this@asPort.skips
+    override val surahEnds: Flow<Int> get() = this@asPort.surahEnds
     override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) =
         this@asPort.load(reciter, surah, startAyah, text)
     override fun play() = this@asPort.play()

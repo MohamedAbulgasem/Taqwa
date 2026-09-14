@@ -96,6 +96,13 @@ class RecitationController(
     /** The ayah the open sheet was opened for, so a confirm knows where to start. */
     private var sheetAyah = 1
 
+    /**
+     * The move to the next surah after one has played out (spec §16.1), while it is still in its
+     * breath. Cancelled by anything the reader does that starts or stops a recitation, because a
+     * tap during the breath is an answer to the question the breath was asking.
+     */
+    private var advancing: Job? = null
+
     /** Whether the UI is Arabic, for the lock screen's two lines. Set by the composition. */
     private var arabicUi = false
 
@@ -350,6 +357,11 @@ class RecitationController(
                 }
             }
         }
+        // A surah that has played out (spec §16.1): on to the next one, or an explicit stop. The
+        // player is holding the ended surah for this answer and never has to lapse on its own.
+        scope.launch {
+            player.surahEnds.collect { ended -> advance(ended) }
+        }
         // A refusal the reader would otherwise never see (spec §15.3): auto-download asks
         // nothing, so when the fetch behind a pending play fails - no Wi-Fi, no network, no room
         // - the sheet opens on the failure face, once, with the sentence and its Retry.
@@ -414,6 +426,7 @@ class RecitationController(
      * the header's ring being the only thing that moves in between.
      */
     private fun playOrOffer(surah: Int, ayah: Int) {
+        advancing?.cancel()
         scope.launch {
             if (surah in downloaded.value) {
                 pending = null
@@ -445,6 +458,43 @@ class RecitationController(
     fun previousSurah() {
         val playing = state.value.bar?.surah ?: return
         if (playing > 1) requestPlay(playing - 1, 1)
+    }
+
+    /**
+     * The surah [ended] has played out (spec §16.1), and the player is holding it. The next surah
+     * follows by itself after a breath, in the chosen voice, through the same rules as a tap on
+     * Next except that nothing is *asked*: a surah not on the phone is fetched only under "without
+     * asking" (§15.3), and otherwise the recitation simply ends where a tap would have opened the
+     * sheet — a sheet nobody asked for, over whatever screen they are on, is no answer to a phone
+     * that has gone quiet. An-Nas ends it. Every branch that does not go on stops the player
+     * explicitly, so the hold never has to run out.
+     *
+     * A move during the breath — a seek back into the surah from the lock screen, a tap on another
+     * ayah — leaves the player playing something, and that wins: the breath then ends nothing.
+     */
+    private fun advance(ended: Int) {
+        advancing?.cancel()
+        advancing = scope.launch {
+            val next = ended + 1
+            val voice = reciter.value
+            if (next > LAST_SURAH || voice == null) {
+                player.stop()
+                return@launch
+            }
+            if (next in downloaded.value) {
+                pending = null
+                delay(SURAH_BREATH_MS)
+                val live = player.state.value
+                if (live.surah != ended || live.playing) return@launch
+                start(next, 1)
+                return@launch
+            }
+            if (settings.settings.first().autoDownload) {
+                pending = PendingPlay(voice.id, next, 1)
+                downloader.enqueue(DownloadKey(voice.id, next), allowMobileOnce = false)
+            }
+            player.stop()
+        }
     }
 
     /**
@@ -607,6 +657,7 @@ class RecitationController(
     fun seekToAyah(n: Int) = player.seekToAyah(n)
 
     fun stop() {
+        advancing?.cancel()
         pending = null
         player.stop()
     }
@@ -779,3 +830,6 @@ class RecitationController(
 private const val PREVIEW_MILLIS = 17_000L
 
 private const val LAST_SURAH = 114
+
+/** The pause between a surah's last ayah and the first of the next (spec §16.1): a breath. */
+internal const val SURAH_BREATH_MS = 1_000L

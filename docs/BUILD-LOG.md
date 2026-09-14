@@ -1247,3 +1247,36 @@ emulator's London Fajr alarm fired in Bengali with the right copy and digits; Sa
 Bengali faces render every screen; large font, dark theme and landscape hold in Urdu. Two platform
 facts stay as they are: iOS formats Bengali with Western digits (Apple's locale default, unlike
 Android's ICU) and the ring keeps Western digits until the tabular check. Shipped as 0.18.1 (22).
+
+## Playing on, and the bar after a widget tap (14 September, evening)
+
+Three notes from Mohamed while he sets up the store accounts.
+
+**The player bar after a widget tap.** Opening an ayah from the home-screen widget and pressing
+Play on its card played the surah with no bar until the Quran tab was left and re-entered.
+Cause: the widget's path pushed the Quran root and the reader on top of whatever tab was showing
+(so that one Back would reach the surah list), while the bar is drawn only while the Quran tab is
+*current*, and `Navigator.currentTab` reads the bottom of the stack — still Prayer.
+`Navigator.openReading` now replaces the stack with the Quran root first when that tab is not
+current, then pushes the reader; the media notification's path shares it. Six navigator tests;
+verified on the emulator and the simulator (bar on the reader and on the root at once).
+
+**A surah that plays out goes on to the next one** (recitation spec §16.1). The platform players
+used to tear everything down at the last ayah. Now they hold the ended surah for up to five
+seconds and report it (`RecitationPlayer.surahEnds`); the controller waits a one-second breath
+and loads the next surah into the same session — no notification flicker, audio focus kept, the
+iOS audio session kept active with a background task over the split — or stops explicitly: at
+An-Nas; when the next surah is not on the phone and downloads are on request; or, under "without
+asking", after enqueueing the fetch that starts it when it lands. The reader follows the new
+surah; anything that moves the recitation during the breath wins. Seven controller tests.
+Verified on the emulator (Al-Fatiha → Al-Baqarah with the reader following; Al-Kawthar, with no
+109 on the phone, ended with no session and no notification left) and on the simulator (the same
+three, read off the debug harness log). The emulator's Wi-Fi reports "no internet" today, so its
+downloads never run: the containers were sideloaded with `run-as` into
+`files/quran/audio/ar.alafasy/` and adopted by `reconcile()` at start, which is the way to test
+recitation offline.
+
+**Mixkit.** The Notification-level tone's credit in Attribution and `docs/ATTRIBUTION.md` stays:
+the licence does not require it, but the app names every third-party asset it ships.
+
+Released as 0.19.0 (23); the store build becomes 1.0.0 (24).

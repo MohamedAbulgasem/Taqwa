@@ -56,6 +56,13 @@ actual class RecitationPlayer actual constructor(
     private val _skips = MutableSharedFlow<SurahSkip>(extraBufferCapacity = 4)
     actual val skips: SharedFlow<SurahSkip> = _skips.asSharedFlow()
 
+    /** The surah read itself out (spec §16.1); the controller answers with `load` or `stop`. */
+    private val _surahEnds = MutableSharedFlow<Int>(extraBufferCapacity = 4)
+    actual val surahEnds: SharedFlow<Int> = _surahEnds.asSharedFlow()
+
+    /** The hold's own deadline: [stop], when the controller has answered with neither. */
+    private var holdJob: Job? = null
+
     private var connecting: ListenableFuture<MediaController>? = null
     private var controller: MediaController? = null
     private var queue: RecitationQueue? = null
@@ -79,10 +86,10 @@ actual class RecitationPlayer actual constructor(
     private var ayahDurationMs = 0L
 
     /**
-     * True from the moment the last ayah has played out until the teardown it starts has finished.
-     * The end arrives inside a player callback, and the teardown it wants — stop the player, drop
-     * the queue, let go of the controller — cannot be run from inside one; it is posted instead,
-     * and this is what stops the several events that follow the end posting it again.
+     * True from the moment the last ayah has played out until a `load` takes the session on or the
+     * hold lapses into [stop] (spec §16.1). The end arrives inside a player callback, and is
+     * reported from there several times over as the events that follow it land; this is what
+     * makes it one hold and one report.
      */
     private var ending = false
 
@@ -100,6 +107,7 @@ actual class RecitationPlayer actual constructor(
         override fun onDisconnected(controller: MediaController) {
             if (controller !== this@RecitationPlayer.controller) return
             stopTicker()
+            leaveHold()
             queue = null
             reciterId = null
             releaseController()
@@ -125,6 +133,9 @@ actual class RecitationPlayer actual constructor(
     private val live: MediaController? get() = controller?.takeIf { it.isConnected }
 
     actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) {
+        // First of all, before the container is even read: a load is the answer the hold was
+        // waiting for, and the hold must not lapse into a stop while the answer is under way.
+        leaveHold()
         val opened = withContext(Dispatchers.IO) {
             runCatching {
                 val taqa = TaqaFile(library.fileFor(reciter.id, surah), FileSystem.SYSTEM)
@@ -142,7 +153,6 @@ actual class RecitationPlayer actual constructor(
         reciterId = reciter.id
         ayahPositionMs = 0L
         ayahDurationMs = 0L
-        ending = false
 
         bound.sendCustomCommand(
             SessionCommand(RecitationService.COMMAND_NOW_PLAYING, Bundle.EMPTY),
@@ -210,7 +220,7 @@ actual class RecitationPlayer actual constructor(
     actual fun stop() {
         ticker?.cancel()
         ticker = null
-        ending = false
+        leaveHold()
         queue = null
         timeline = null
         reciterId = null
@@ -228,6 +238,7 @@ actual class RecitationPlayer actual constructor(
 
     actual fun release() {
         ticker?.cancel()
+        holdJob?.cancel()
         releaseController()
         scope.cancel()
         _state.value = PlaybackState.EMPTY
@@ -282,9 +293,12 @@ actual class RecitationPlayer actual constructor(
         val built = queue
         if (bound == null || built == null || bound.mediaItemCount == 0) return
         if (bound.playbackState == Player.STATE_ENDED) {
-            end()
+            hold(built)
             return
         }
+        // A seek back into the surah during the hold — the lock screen's previous, a tap on an
+        // ayah — has the surah playing again; the hold must not lapse into a stop under it.
+        if (ending) leaveHold()
         // Never a gap: the session's `AyahPlayer` reports the ayah a gap follows as the current
         // item, so the app never sees a gap index. During the gap the clock sits inside the gap's
         // slot, which the arithmetic below reads as the ayah's end — the line of an ayah that has
@@ -328,22 +342,50 @@ actual class RecitationPlayer actual constructor(
     }
 
     /**
-     * The surah has read itself out. There is nothing left to play, so the bar, the media session
-     * and the foreground service all go — the same teardown the bar's × performs, because a
-     * player with an empty queue is what takes the notification down and lets the service be
-     * destroyed. A surah that simply ended used to leave all three standing: a `NO_CLEAR`
-     * notification and a foreground service, indefinitely, for a player with nothing to play.
+     * The surah has read itself out (spec §16.1). Nothing is torn down yet: the bar shows the
+     * last ayah with its line full and its play button up, the notification and the service
+     * stand, and the controller is told — its answer is a plain [load] into this same session
+     * (the next surah, with nothing flickering and audio focus never given up and taken back) or
+     * a [stop]. Should neither arrive within [SURAH_END_HOLD_MS] the hold lapses into [stop] on
+     * its own: a surah that simply ended once left a `NO_CLEAR` notification and a foreground
+     * service standing indefinitely for a player with nothing to play, and that must not come
+     * back by way of a controller that never answered.
      *
-     * Posted rather than run here. This is reached from a `Player.Listener` callback, and stopping
-     * the controller and dropping it from inside one is exactly the re-entrancy Media3's listener
-     * set is not there to survive; `Dispatchers.Main` (not the scope's `immediate`) is what makes
-     * it the next thing the main thread does instead of a nested one.
+     * The lapse is posted rather than run here. This is reached from a `Player.Listener`
+     * callback, and stopping the controller and dropping it from inside one is exactly the
+     * re-entrancy Media3's listener set is not there to survive; `Dispatchers.Main` (not the
+     * scope's `immediate`) is what makes it the next thing the main thread does instead of a
+     * nested one.
      */
-    private fun end() {
+    private fun hold(built: RecitationQueue) {
         if (ending) return
         ending = true
         stopTicker()
-        scope.launch(Dispatchers.Main) { stop() }
+        val clock = timeline?.takeIf { it.size == built.size }
+        val last = built.size - 1
+        _state.value = PlaybackState(
+            reciterId = reciterId,
+            surah = built.surah,
+            ayah = built.ayahAt(last),
+            ayahCount = built.ayahCount,
+            positionMs = ayahDurationMs,
+            durationMs = ayahDurationMs,
+            playing = false,
+            buffering = false,
+            surahPositionMs = clock?.totalMs ?: _state.value.surahPositionMs,
+            surahDurationMs = clock?.totalMs ?: _state.value.surahDurationMs,
+        )
+        _surahEnds.tryEmit(built.surah)
+        holdJob = scope.launch(Dispatchers.Main) {
+            delay(SURAH_END_HOLD_MS)
+            if (ending) stop()
+        }
+    }
+
+    private fun leaveHold() {
+        ending = false
+        holdJob?.cancel()
+        holdJob = null
     }
 
     private fun startTicker() {

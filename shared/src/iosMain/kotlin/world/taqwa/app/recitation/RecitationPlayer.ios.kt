@@ -65,6 +65,9 @@ import platform.MediaPlayer.MPNowPlayingInfoPropertyElapsedPlaybackTime
 import platform.MediaPlayer.MPNowPlayingInfoPropertyPlaybackRate
 import platform.MediaPlayer.MPRemoteCommandCenter
 import platform.MediaPlayer.MPRemoteCommandHandlerStatusSuccess
+import platform.UIKit.UIApplication
+import platform.UIKit.UIBackgroundTaskIdentifier
+import platform.UIKit.UIBackgroundTaskInvalid
 import platform.UIKit.UIImage
 import platform.darwin.NSObjectProtocol
 import kotlin.time.TimeSource
@@ -100,6 +103,22 @@ actual class RecitationPlayer actual constructor(
     /** The lock screen's track buttons, which move by surah (spec §15.1); the app decides. */
     private val _skips = MutableSharedFlow<SurahSkip>(extraBufferCapacity = 4)
     actual val skips: SharedFlow<SurahSkip> = _skips.asSharedFlow()
+
+    /** The surah read itself out (spec §16.1); the controller answers with `load` or `stop`. */
+    private val _surahEnds = MutableSharedFlow<Int>(extraBufferCapacity = 4)
+    actual val surahEnds: SharedFlow<Int> = _surahEnds.asSharedFlow()
+
+    /** True from the last ayah's end until a `load` takes the session on or the hold lapses. */
+    private var ended = false
+    private var holdJob: Job? = null
+
+    /**
+     * Keeps the process running across the breath and the next container's split when a surah
+     * ends in the background: an app that has stopped playing audio is suspended soon after, and
+     * a suspended app cannot start the next surah. Begun at the end, ended when the next surah is
+     * playing or the recitation stops.
+     */
+    private var transition: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
 
     private var player: AVPlayer? = null
     private var queue: RecitationQueue? = null
@@ -152,6 +171,9 @@ actual class RecitationPlayer actual constructor(
     private var cachedArtwork: MPMediaItemArtwork? = null
 
     actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) {
+        // First of all, before the split: a load is the answer the hold was waiting for, and the
+        // hold must not lapse into a stop while Al-Baqarah is still being written out.
+        leaveHold()
         val file = library.fileFor(reciter.id, surah)
         val split = withContext(Dispatchers.Default) {
             runCatching { split(reciter.id, surah, file) }.getOrNull()
@@ -180,6 +202,7 @@ actual class RecitationPlayer actual constructor(
             activateSession()
             wireCommands()
             go(built.indexOfAyah(startAyah) ?: 0)
+            endTransition()
         }
     }
 
@@ -227,6 +250,7 @@ actual class RecitationPlayer actual constructor(
     }
 
     actual fun stop() {
+        leaveHold()
         gapJob?.cancel()
         gapJob = null
         ticker?.cancel()
@@ -258,6 +282,7 @@ actual class RecitationPlayer actual constructor(
             error = null,
         )
         _state.value = PlaybackState.EMPTY
+        endTransition()
     }
 
     actual fun release() {
@@ -271,6 +296,12 @@ actual class RecitationPlayer actual constructor(
     /** Starts queue item [index]: an ayah's file, or the wait that is a gap. */
     private fun go(index: Int) {
         val built = queue ?: return
+        // A move during the hold (a scrub on the lock screen, a tap on an ayah) takes the ended
+        // surah up again from there, playing — as an ExoPlayer seek out of its ended state does.
+        if (ended) {
+            leaveHold()
+            wantsPlay = true
+        }
         gapJob?.cancel()
         gapJob = null
         at = index.coerceIn(0, built.size - 1)
@@ -319,13 +350,49 @@ actual class RecitationPlayer actual constructor(
     }
 
     /**
-     * The surah has read itself out. Everything goes: the bar, the lock screen's now-playing
-     * entry, the remote commands and the audio session itself — the same teardown [stop] performs
-     * for the bar's ×, because a surah that has ended and one the reader has dismissed leave
-     * exactly the same nothing behind. Holding the session open for a player with nothing left to
-     * play would keep whatever was playing before recitation from having it back.
+     * The surah has read itself out (spec §16.1). Nothing goes yet: the bar shows the last ayah
+     * paused with its line full, the lock screen keeps its entry, and — the part that matters in
+     * the background — the audio session stays active, so the next surah the controller answers
+     * with starts in the same session instead of asking for a new one from an app iOS may already
+     * be suspending. Should the answer be a stop, or never come, [stop] hands the session back
+     * exactly as it always did, at most [SURAH_END_HOLD_MS] later.
      */
-    private fun finish() = stop()
+    private fun finish() {
+        val built = queue ?: return
+        if (ended) return
+        ended = true
+        wantsPlay = false
+        ticker?.cancel()
+        ticker = null
+        ayahPositionMs = ayahDurationMs
+        publish()
+        beginTransition()
+        _surahEnds.tryEmit(built.surah)
+        holdJob = scope.launch {
+            delay(SURAH_END_HOLD_MS)
+            if (ended) stop()
+        }
+    }
+
+    private fun leaveHold() {
+        ended = false
+        holdJob?.cancel()
+        holdJob = null
+    }
+
+    private fun beginTransition() {
+        if (transition != UIBackgroundTaskInvalid) return
+        transition = UIApplication.sharedApplication.beginBackgroundTaskWithExpirationHandler {
+            endTransition()
+        }
+    }
+
+    private fun endTransition() {
+        val task = transition
+        if (task == UIBackgroundTaskInvalid) return
+        transition = UIBackgroundTaskInvalid
+        UIApplication.sharedApplication.endBackgroundTask(task)
+    }
 
     // ---- the container ----------------------------------------------------------------------
 
