@@ -1307,4 +1307,6 @@ Released as 0.19.1 (24); the store build becomes 1.0.0 (25).
 Mohamed: the Surah | Juz | Bookmarks switch should span the row, each option a third of it, the
 selected pill filling its third, the pill itself unchanged. `TaqwaSegmented` gained `fillWidth`
 (the Row fills, each option weighs one); the reading sheet's Translation | Mushaf switch keeps
-hugging its labels. Released as 0.20.0 (25); the store build becomes 1.0.0 (26).
+hugging its labels. Released as 0.20.0 (25) — and reverted an hour later on Mohamed's second
+look ("not a good idea"): the switch hugs its labels again, `fillWidth` is gone, 0.20.1 (26).
+The store build becomes 1.0.0 (27).

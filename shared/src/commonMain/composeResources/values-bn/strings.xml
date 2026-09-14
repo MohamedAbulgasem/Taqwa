@@ -59,7 +59,7 @@
     <string name="settings_not_set">নির্ধারিত নয়</string>
     <string name="settings_notifications_off">বন্ধ</string>
     <string name="settings_notifications_on_count">%1$sটি চালু</string>
-    <string name="settings_version_value">0.20.0</string>
+    <string name="settings_version_value">0.20.1</string>
 
     <!-- About screen. The product name is written তাকওয়া here, as on the icon. -->
     <string name="about_tagline">বিনামূল্যে, সবার জন্য, চিরকালের জন্য।</string>

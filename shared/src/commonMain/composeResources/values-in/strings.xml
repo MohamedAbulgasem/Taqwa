@@ -59,7 +59,7 @@
     <string name="settings_not_set">Belum diatur</string>
     <string name="settings_notifications_off">Nonaktif</string>
     <string name="settings_notifications_on_count">%1$s aktif</string>
-    <string name="settings_version_value">0.20.0</string>
+    <string name="settings_version_value">0.20.1</string>
 
     <!-- Layar «Tentang Taqwa». Nama «Taqwa» tetap dalam huruf Latin, seperti pada ikonnya. -->
     <string name="about_tagline">Gratis, untuk semua, selamanya.</string>

@@ -217,7 +217,6 @@ fun QuranRootScreen(
                         // the enum's ordinal both ways round (spec 2b §2.2: Surah | Juz | Bookmarks).
                         selectedIndex = ready.tab.ordinal,
                         onSelect = { onTabChange(RootTab.entries[it]) },
-                        fillWidth = true,
                     )
                 }
             }
