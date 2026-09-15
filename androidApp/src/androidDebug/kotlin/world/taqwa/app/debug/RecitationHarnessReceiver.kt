@@ -88,7 +88,7 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                     // no Activity: has the phone moved, and where does a background refresh land?
                     "location" -> {
                         val refresher = appContainer.locationRefresher
-                        Log.i(TAG, "location hasMoved=${refresher.hasMoved()}")
+                        Log.i(TAG, "location lastKnown=${appContainer.locationRepository.lastKnownCoordinates()} hasMoved=${refresher.hasMoved()}")
                         val landed = refresher.refreshFor(world.taqwa.app.notifications.RescheduleTrigger.ALARM_FIRED)
                         Log.i(TAG, "location after ALARM_FIRED refresh: ${landed?.cityName} ${landed?.latitude},${landed?.longitude}")
                     }

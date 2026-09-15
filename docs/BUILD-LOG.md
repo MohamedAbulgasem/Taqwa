@@ -1323,6 +1323,7 @@ window, and the iOS task is asked for six hours out instead of a day (and now re
 when its work ran, not only when something got scheduled — an empty plan by choice had been
 teaching iOS to grant it less). A manual city stays untouched. Six new refresher tests;
 verified on the simulator through the debug harness (London → Cairo, no fix asked for); the
-emulator cannot give a coarse-only app a fix, so the Android run waits for the LoopPhone. The
-proper iOS answer, significant-change monitoring under "Always" location, is written up in spec §16.5
-as a later opt-in. Released as 0.20.2 (27); the store build becomes 1.0.0 (28).
+emulator cannot give a coarse-only app a fix; on the LoopPhone the cache answers while the
+process is warm from a recent use and is withheld from a cold one, so Android's gain is the day
+of the trip, not a phone left closed. The proper answer on both platforms, background location
+under "Always",, is written up in spec §16.5 as a later opt-in. Released as 0.20.2 (27); the store build becomes 1.0.0 (28).

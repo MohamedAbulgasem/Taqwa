@@ -551,10 +551,13 @@ for iOS and stays a later, opt-in decision.
 **Verified.** Unit tests for the four triggers, the manual city and `hasMoved`. Simulator:
 app open at London, `simctl location set` to Cairo, then the harness's `refresh` ran the
 background task's body and Settings › Location read a Cairo district with no fix asked for. The
-emulator could not stand in for Android: its coarse providers never produce a fix (the injected
-GPS fix is invisible to a coarse-only app), so the Android path — the same common code plus a
-read of the fused/network cache — is covered by the tests and awaits a run of the debug
-harness's `location` command on the LoopPhone from the background. The task's own result also
-changed: it used to report failure whenever the plan came out empty, which is every reader with
+emulator could not stand in for Android (its coarse providers never produce a fix), so the
+LoopPhone ran the debug harness's `location` command: with the process still alive after a
+recent foreground use, the cache answers and the alarm-time refresh works; from a cold process,
+or one never opened since install, Android 16 withholds the cache from a "while in use"
+permission (`lastKnown=null`) and the stored place stands. So on Android the fix covers the day
+of the journey while the app has been used recently, and a fully closed app still waits for its
+next open — closing that needs `ACCESS_BACKGROUND_LOCATION`, a permission Play reviews hard,
+and is the same opt-in decision as iOS's "Always". The task's own result also changed: it used to report failure whenever the plan came out empty, which is every reader with
 notifications off, and iOS grants a task that keeps failing less often; it now reports whether
 the work ran.
