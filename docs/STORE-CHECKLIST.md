@@ -2,7 +2,7 @@
 
 Everything between the code on `main` and Taqwa being live on Google Play and the App Store, in
 the order to do it. Rewritten 14 September 2026 for the accounts Mohamed decided on: a new Google
-account **mohamed.abulgasem@gmail.com** for Google Play and a new Apple Account with the same
+account **mohamed.abulgasem.ly@gmail.com** for Google Play and a new Apple Account with the same
 address for the App Store. LOOPDL LIMITED (team 5S5P2Q72MV) is his employer and is never used to
 publish. The code side is done (§8); what remains is two accounts, one key, listings, uploads and
 waiting.
@@ -20,7 +20,7 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   individual's legal name; Play matches it), public contact email **support@taqwa.world**
   (already forwards to Gmail), website https://taqwa.world, privacy policy
   https://taqwa.world/privacy/ (App Store localisations may use https://taqwa.world/<lang>/privacy/).
-  mohamed.abulgasem@gmail.com is the login, not the public contact.
+  mohamed.abulgasem.ly@gmail.com is the login, not the public contact.
 - **Names in the stores:** Play title "Taqwa: Prayer, Quran & Qibla" (28 of 30 characters). App
   Store name "Taqwa" if it is free (App Store names are unique across the whole store and a
   five-letter Arabic word is probably taken), otherwise the same 28-character title; subtitle
@@ -53,7 +53,7 @@ accounts on day one: the App Store can be live within about a week, Google Play 
 ### 2a. The Google account
 
 1. In a private window → https://accounts.google.com/signup → "For my personal use" → name and
-   birthday → choose the address mohamed.abulgasem@gmail.com (Google proposes alternatives if it
+   birthday → choose the address mohamed.abulgasem.ly@gmail.com (Google proposes alternatives if it
    is taken) → password → phone number (SMS code) → recovery email algiriany93@gmail.com.
 2. Security → turn on **2-Step Verification** (Play Console requires it for the account owner;
    the Google prompt on the S23 or an authenticator app both work). Add a passkey if offered.
@@ -82,7 +82,7 @@ accounts on day one: the App Store can be live within about a week, Google Play 
 ### 2c. Apple Account and the Developer Program (99 USD a year)
 
 1. https://account.apple.com → **Create Your Apple Account** → legal name, country of residence
-   (must match the ID and the card), birthday, email mohamed.abulgasem@gmail.com, password, phone
+   (must match the ID and the card), birthday, email mohamed.abulgasem.ly@gmail.com, password, phone
    (SMS code); verify the email code. Turn on **two-factor authentication** (Sign-In and Security)
    with the phone number; the Developer Program refuses accounts without it.
 2. On the iPhone 12: install the **Apple Developer** app from the App Store → Account tab → sign
