@@ -40,6 +40,7 @@ class LocationRepositoryTest {
         override suspend fun permission(): LocationPermission = LocationPermission.GRANTED
         override suspend fun requestPermission(): LocationPermission = LocationPermission.GRANTED
         override suspend fun currentCoordinates(): Pair<Double, Double>? = coordinates
+    override suspend fun lastKnownCoordinates(): Pair<Double, Double>? = currentCoordinates()
     }
 
     private val citiesCsv = """

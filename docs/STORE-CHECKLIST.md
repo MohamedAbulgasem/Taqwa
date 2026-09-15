@@ -13,9 +13,9 @@ accounts on day one: the App Store can be live within about a week, Google Play 
 
 ## 1. Decisions (made, so nobody re-decides at the keyboard)
 
-- **Store version 1.0.0 (27).** `scripts/bump-version.sh 1.0.0 27` once, when the store builds
-  are cut; one commit feeds both stores. Codes 18–26 are spent on device builds (0.20.1 is code
-  26; the S23 carries a 1.0.0-labelled code 20), so nothing below 27 goes anywhere.
+- **Store version 1.0.0 (28).** `scripts/bump-version.sh 1.0.0 28` once, when the store builds
+  are cut; one commit feeds both stores. Codes 18–27 are spent on device builds (0.20.2 is code
+  27; the S23 carries a 1.0.0-labelled code 20), so nothing below 28 goes anywhere.
 - **Public identity:** seller/developer name "Mohamed Abulgasem" on both stores (Apple shows an
   individual's legal name; Play matches it), public contact email **support@taqwa.world**
   (already forwards to Gmail), website https://taqwa.world, privacy policy
@@ -136,7 +136,7 @@ costs days.
 - Two screen recordings for Play's foreground-service declarations (a surah playing with the
   phone locked and lock-screen controls; a download continuing after leaving the app), from the
   emulator, for Mohamed to upload unlisted to YouTube.
-- The store build: `scripts/test.sh`, `scripts/ios-build.sh`, `scripts/bump-version.sh 1.0.0 27`,
+- The store build: `scripts/test.sh`, `scripts/ios-build.sh`, `scripts/bump-version.sh 1.0.0 28`,
   the iOS identifier rename and Team ID, then `scripts/release.sh` →
   `androidApp/build/outputs/bundle/release/androidApp-release.aab` (+ APK). The APK goes on the
   S23 once before upload. The S23 and the LoopPhone carry debug-key-signed builds, so the Play copy

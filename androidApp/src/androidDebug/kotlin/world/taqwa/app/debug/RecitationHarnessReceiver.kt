@@ -84,6 +84,14 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                         )
                     }
                     "focus" -> stealFocus(context)
+                    // The alarm receiver's question and answer (spec §16.5), from a process with
+                    // no Activity: has the phone moved, and where does a background refresh land?
+                    "location" -> {
+                        val refresher = appContainer.locationRefresher
+                        Log.i(TAG, "location hasMoved=${refresher.hasMoved()}")
+                        val landed = refresher.refreshFor(world.taqwa.app.notifications.RescheduleTrigger.ALARM_FIRED)
+                        Log.i(TAG, "location after ALARM_FIRED refresh: ${landed?.cityName} ${landed?.latitude},${landed?.longitude}")
+                    }
                     else -> Log.w(TAG, "unknown command \"$command\"")
                 }
             } catch (e: Throwable) {

@@ -524,3 +524,37 @@ playing stays playing, paused stays paused; another voice without the surah is o
 fetched as before, and takes over in the state the old voice was left in. The one resume left
 is the preview's: a recitation the *audition* paused gets its resume back on the pick, because
 the reader was listening before the clip.
+
+### 16.5 Prayer times that follow a journey while the app is closed
+
+**Ask** (15 September, from the iPhone). Three hundred kilometres from home, the adhan kept
+coming ten minutes early for a day; opening the app fixed it.
+
+**Cause.** The stored location was refreshed from GPS on two triggers only: the app coming to
+the foreground and the timezone changing. Every background wake-up that rebuilt the plan — the
+iOS refresh task, Android's prayer alarm and the twelve-hourly top-up — planned against the
+stored coordinates. On iOS the notifications are local notifications armed days ahead, so with
+no code running nothing could move them; on Android the alarm receiver only rebuilt the plan
+when the window had drained. Three hundred kilometres east or west is about twelve minutes.
+
+**Decision.** The background wake-ups now read the position the phone *last knew* — no fix is
+asked for, nothing lights up, and a closed app under "While Using" may not be allowed a fix
+anyway — and when it is more than the 5 km recompute distance from the stored place, the
+location is re-resolved and the plan rebuilt for it. A manually picked city is never touched,
+as before. Android's prayer alarm rebuilds the plan when the phone has moved even if the window
+is full, so a journey is caught by the next prayer; iOS's refresh task is requested six hours
+out instead of a day, and catches a journey whenever iOS chooses to run it — usually within a
+day for an app used daily, never on a phone that never opens it. Significant-change monitoring
+under "Always" location, which would wake the app on every cell change, is the proper answer
+for iOS and stays a later, opt-in decision.
+
+**Verified.** Unit tests for the four triggers, the manual city and `hasMoved`. Simulator:
+app open at London, `simctl location set` to Cairo, then the harness's `refresh` ran the
+background task's body and Settings › Location read a Cairo district with no fix asked for. The
+emulator could not stand in for Android: its coarse providers never produce a fix (the injected
+GPS fix is invisible to a coarse-only app), so the Android path — the same common code plus a
+read of the fused/network cache — is covered by the tests and awaits a run of the debug
+harness's `location` command on the LoopPhone from the background. The task's own result also
+changed: it used to report failure whenever the plan came out empty, which is every reader with
+notifications off, and iOS grants a task that keeps failing less often; it now reports whether
+the work ran.

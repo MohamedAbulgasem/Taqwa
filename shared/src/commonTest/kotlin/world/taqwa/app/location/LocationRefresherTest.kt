@@ -14,17 +14,28 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-private class FixedProvider(private val coordinates: Pair<Double, Double>?) : LocationProvider {
+private class FixedProvider(
+    private val coordinates: Pair<Double, Double>?,
+    /** What the platform last knew without a fix; defaults to the fix itself. */
+    private val lastKnown: Pair<Double, Double>? = coordinates,
+) : LocationProvider {
     var callCount = 0
+        private set
+    var lastKnownReads = 0
         private set
 
     override suspend fun permission(): LocationPermission =
-        if (coordinates == null) LocationPermission.NOT_REQUESTED else LocationPermission.GRANTED
+        if (coordinates == null && lastKnown == null) LocationPermission.NOT_REQUESTED else LocationPermission.GRANTED
 
     override suspend fun requestPermission(): LocationPermission = permission()
     override suspend fun currentCoordinates(): Pair<Double, Double>? {
         callCount++
         return coordinates
+    }
+
+    override suspend fun lastKnownCoordinates(): Pair<Double, Double>? {
+        lastKnownReads++
+        return lastKnown
     }
 }
 
@@ -185,6 +196,90 @@ class LocationRefresherTest {
 
         assertEquals("Cape Town", refreshed?.cityName)
         assertEquals("Cape Town", settings.location.first()?.cityName)
+    }
+
+    // ── The background wake-ups (spec §16.5) ────────────────────────────────────────────
+
+    @Test
+    fun aBackgroundRefreshMovesWithThePhonesLastKnownPositionAndAsksForNoFix() = runTest {
+        val settings = settings("bg-moved")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
+        val provider = FixedProvider(coordinates = null, lastKnown = 41.0138 to 28.9496)
+        val refreshed = refresher(settings, null, "Europe/Istanbul", provider)
+            .refreshFor(RescheduleTrigger.BACKGROUND_REFRESH)
+
+        assertEquals("Istanbul", refreshed?.cityName)
+        assertEquals("Istanbul", settings.location.first()?.cityName)
+        assertEquals(0, provider.callCount)
+        assertEquals(1, provider.lastKnownReads)
+    }
+
+    @Test
+    fun aPrayerAlarmDoesTheSame() = runTest {
+        val settings = settings("alarm-moved")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
+        val provider = FixedProvider(coordinates = null, lastKnown = 41.0138 to 28.9496)
+        val refreshed = refresher(settings, null, "Europe/Istanbul", provider)
+            .refreshFor(RescheduleTrigger.ALARM_FIRED)
+
+        assertEquals("Istanbul", refreshed?.cityName)
+        assertEquals(0, provider.callCount)
+    }
+
+    @Test
+    fun aBackgroundRefreshWithNothingCachedKeepsTheStoredLocation() = runTest {
+        val settings = settings("bg-nothing")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
+        val refreshed = refresher(settings, 41.0138 to 28.9496, "Africa/Johannesburg", FixedProvider(41.0138 to 28.9496, lastKnown = null))
+            .refreshFor(RescheduleTrigger.BACKGROUND_REFRESH)
+
+        assertEquals("Cape Town", refreshed?.cityName)
+        assertEquals("Cape Town", settings.location.first()?.cityName)
+    }
+
+    @Test
+    fun aBackgroundRefreshNeverTouchesAManuallyPickedCity() = runTest {
+        val settings = settings("bg-manual")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.MANUAL)
+        val provider = FixedProvider(coordinates = null, lastKnown = 41.0138 to 28.9496)
+        val refreshed = refresher(settings, null, "Europe/Istanbul", provider)
+            .refreshFor(RescheduleTrigger.BACKGROUND_REFRESH)
+
+        assertEquals("Cape Town", refreshed?.cityName)
+        assertEquals(0, provider.lastKnownReads)
+        assertEquals(LocationSource.MANUAL, settings.locationSource.first())
+    }
+
+    @Test
+    fun hasMovedReadsTheCacheAndComparesAgainstTheStoredPlace() = runTest {
+        val settings = settings("has-moved")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
+
+        val far = refresher(settings, null, "Africa/Johannesburg", FixedProvider(null, lastKnown = 41.0138 to 28.9496))
+        val near = refresher(settings, null, "Africa/Johannesburg", FixedProvider(null, lastKnown = -33.93 to 18.44))
+        val blind = refresher(settings, null, "Africa/Johannesburg", FixedProvider(null, lastKnown = null))
+
+        assertEquals(true, far.hasMoved())
+        assertEquals(false, near.hasMoved())
+        assertEquals(false, blind.hasMoved())
+        // The cheap question changes nothing by itself.
+        assertEquals("Cape Town", settings.location.first()?.cityName)
+    }
+
+    @Test
+    fun hasMovedIsFalseUnderAManualCityWhateverThePhoneSays() = runTest {
+        val settings = settings("has-moved-manual")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.MANUAL)
+        val provider = FixedProvider(null, lastKnown = 41.0138 to 28.9496)
+
+        assertEquals(false, refresher(settings, null, "Africa/Johannesburg", provider).hasMoved())
+        assertEquals(0, provider.lastKnownReads)
     }
 
     @Test

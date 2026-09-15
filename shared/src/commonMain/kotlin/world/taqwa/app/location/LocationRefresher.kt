@@ -29,9 +29,10 @@ class LocationRefresher(
 ) {
 
     /**
-     * Refreshes on the two triggers that mean "the world may have moved under us": returning to
-     * the foreground, and the system telling us the zone changed. Boot, a settings change or an
-     * alarm firing are all about the schedule, not the position, and cost a GPS read for nothing.
+     * Asks for a fresh fix on the two triggers that mean "the world may have moved under us":
+     * returning to the foreground, and the system telling us the zone changed. The background
+     * wake-ups read the phone's cached position instead (spec §16.5). Boot, a settings change and
+     * a time change are about the schedule, not the position, and cost nothing.
      *
      * Neither trigger touches GPS when [SettingsRepository.locationSource] reads
      * [LocationSource.MANUAL]: the user picked a city on purpose, and a fix landing behind their
@@ -54,13 +55,40 @@ class LocationRefresher(
             } else {
                 refresh()
             }
+        // The wake-ups the app gets while closed (spec §16.5): iOS's refresh task, Android's
+        // prayer alarm and top-up. No fix is asked for — a closed app may not be allowed one —
+        // but the position the phone last knew is enough to notice a journey, and the
+        // notifications then move with it instead of waiting for the app to be opened.
+        RescheduleTrigger.BACKGROUND_REFRESH, RescheduleTrigger.ALARM_FIRED ->
+            if (settings.locationSource.first() == LocationSource.MANUAL) {
+                settings.location.first()
+            } else {
+                refresh(fresh = false)
+            }
         else -> settings.location.first()
     }
 
-    /** Returns the location now stored — the refreshed one when it moved, the old one otherwise. */
-    suspend fun refresh(): GeoLocation? {
+    /**
+     * Whether the phone's last known position is more than the recompute distance from the
+     * stored one, without asking for a fix. False under a manual city, without permission, or
+     * with nothing cached. For a wake-up that would otherwise leave the schedule alone (Android's
+     * prayer alarm reschedules only when the window has drained), this is the reason to rebuild.
+     */
+    suspend fun hasMoved(): Boolean {
+        if (settings.locationSource.first() == LocationSource.MANUAL) return false
+        val stored = settings.location.first() ?: return false
+        val cached = locationRepository.lastKnownCoordinates() ?: return false
+        return LocationRepository.shouldRecompute(stored, cached)
+    }
+
+    /**
+     * Returns the location now stored — the refreshed one when it moved, the old one otherwise.
+     * [fresh] asks the platform for a new fix; false reads only what it last knew.
+     */
+    suspend fun refresh(fresh: Boolean = true): GeoLocation? {
         val stored = settings.location.first() ?: return null
-        val coordinates = locationRepository.currentCoordinates() ?: return stored
+        val coordinates = (if (fresh) locationRepository.currentCoordinates() else locationRepository.lastKnownCoordinates())
+            ?: return stored
         val zoneId = currentZoneId()
         val moved = LocationRepository.shouldRecompute(stored, coordinates)
         val zoneChanged = zoneId != stored.timeZoneId

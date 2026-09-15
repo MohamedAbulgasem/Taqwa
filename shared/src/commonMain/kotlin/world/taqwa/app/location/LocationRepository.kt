@@ -38,6 +38,9 @@ class LocationRepository(private val provider: LocationProvider) {
      */
     suspend fun currentCoordinates(): Pair<Double, Double>? = provider.currentCoordinates()
 
+    /** The platform's cached position, no new fix asked for. See [LocationProvider.lastKnownCoordinates]. */
+    suspend fun lastKnownCoordinates(): Pair<Double, Double>? = provider.lastKnownCoordinates()
+
     /**
      * Resolves a fresh GPS fix into a [GeoLocation] ready to persist. The coordinates are the
      * exact fix — prayer times must use where the user actually is, never a city's coordinates —

@@ -123,6 +123,18 @@ private class IosLocationProvider : LocationProvider {
         } ?: permission()
     }
 
+    override suspend fun lastKnownCoordinates(): Pair<Double, Double>? {
+        if (permission() != LocationPermission.GRANTED) return null
+        // `CLLocationManager.location` is the cache and costs no fix; reading it is what a
+        // background refresh task may do under "While Using" (spec §16.5). Nil when the system
+        // has nothing cached for this app, which the caller treats as "no move seen".
+        val cached = manager().location ?: return null
+        var lat = 0.0
+        var lon = 0.0
+        cached.coordinate.useContents { lat = latitude; lon = longitude }
+        return lat to lon
+    }
+
     override suspend fun currentCoordinates(): Pair<Double, Double>? {
         if (permission() != LocationPermission.GRANTED) return null
         val manager = manager()

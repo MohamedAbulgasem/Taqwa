@@ -1310,3 +1310,19 @@ selected pill filling its third, the pill itself unchanged. `TaqwaSegmented` gai
 hugging its labels. Released as 0.20.0 (25) — and reverted an hour later on Mohamed's second
 look ("not a good idea"): the switch hugs its labels again, `fillWidth` is gone, 0.20.1 (26).
 The store build becomes 1.0.0 (27).
+
+## Prayer times that follow a journey (15 September)
+
+Mohamed travelled 300 km and the iPhone's adhan stayed ten minutes early for a day until he
+opened the app. Not a fault but a gap: the location was refreshed only on foreground and on a
+timezone change, and every background wake-up planned against the stored coordinates. The
+background wake-ups — the iOS refresh task, Android's prayer alarm and top-up — now read the
+phone's last known position (no fix, no dialog, nothing a closed app is refused) and re-resolve
+when it is more than 5 km away; Android's alarm rebuilds the plan on a move even with a full
+window, and the iOS task is asked for six hours out instead of a day (and now reports success
+when its work ran, not only when something got scheduled — an empty plan by choice had been
+teaching iOS to grant it less). A manual city stays untouched. Six new refresher tests;
+verified on the simulator through the debug harness (London → Cairo, no fix asked for); the
+emulator cannot give a coarse-only app a fix, so the Android run waits for the LoopPhone. The
+proper iOS answer, significant-change monitoring under "Always" location, is written up in spec §16.5
+as a later opt-in. Released as 0.20.2 (27); the store build becomes 1.0.0 (28).

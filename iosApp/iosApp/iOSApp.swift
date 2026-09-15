@@ -155,7 +155,9 @@ struct iOSApp: App {
 
 	static func scheduleNextRefresh() {
 		let request = BGAppRefreshTaskRequest(identifier: refreshTaskId)
-		request.earliestBeginDate = Date(timeIntervalSinceNow: 24 * 60 * 60)
+		// Six hours, not a day: the task now also notices a journey (spec §16.5), and iOS decides
+		// the actual moment anyway — a shorter earliest date only gives it more chances.
+		request.earliestBeginDate = Date(timeIntervalSinceNow: 6 * 60 * 60)
 		try? BGTaskScheduler.shared.submit(request)
 	}
 
@@ -313,6 +315,12 @@ enum RecitationHarness {
 		case "reconcile":
 			AppContainerKt.appContainer.recitationLibrary.reconcile { _ in
 				NSLog("TaqwaHarness reconciled \(reciterId)")
+			}
+		case "refresh":
+			// The background refresh task's body, run on demand after `simctl location set`.
+			DispatchQueue.global(qos: .background).async {
+				let ok = BackgroundRefreshBridge.shared.runBackgroundRefresh()
+				NSLog("TaqwaHarness background refresh ok=\(ok)")
 			}
 		default: NSLog("TaqwaHarness unknown command \"\(command)\"")
 		}

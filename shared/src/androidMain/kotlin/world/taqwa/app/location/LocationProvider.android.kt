@@ -47,6 +47,17 @@ private class AndroidLocationProvider : LocationProvider {
         return fresh?.let { it.latitude to it.longitude }
     }
 
+    override suspend fun lastKnownCoordinates(): Pair<Double, Double>? {
+        if (permission() != LocationPermission.GRANTED) return null
+        val lm = appContext.getSystemService(LocationManager::class.java) ?: return null
+        // The fused cache first where it exists (API 31+; coarse permission reads it coarsened),
+        // since the network provider alone is empty on a phone whose last fix came from GPS.
+        val cached = coarseProviders(lm).firstNotNullOfOrNull { provider ->
+            runCatching { lm.getLastKnownLocation(provider) }.getOrNull()
+        } ?: lastKnown(lm) ?: return null
+        return cached.latitude to cached.longitude
+    }
+
     /** `NETWORK_PROVIDER` alone, for the same reason [coarseProviders] avoids GPS below: asking
      * `GPS_PROVIDER` on the coarse permission throws on every call, and a swallowed
      * SecurityException is a wasted binder round trip that reads as if it might return something. */

@@ -135,7 +135,9 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     private suspend fun topUpPlan(context: Context) {
         runCatching {
             val coordinator = appContainer.notificationCoordinator
-            if (coordinator.needsTopUp(scheduledPlanHorizon(context))) {
+            // Or the phone has moved (spec §16.5): the plan was built for somewhere else, and
+            // this alarm is the one moment a closed app gets to notice before the next prayer.
+            if (coordinator.needsTopUp(scheduledPlanHorizon(context)) || appContainer.locationRefresher.hasMoved()) {
                 coordinator.reschedule(RescheduleTrigger.ALARM_FIRED)
             }
         }
