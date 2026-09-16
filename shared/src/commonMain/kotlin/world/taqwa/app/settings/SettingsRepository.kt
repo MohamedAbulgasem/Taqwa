@@ -155,6 +155,16 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         }
     }
 
+    /** The mode alone, leaving size, transliteration and translation as they are. */
+    suspend fun setReadingMode(mode: ReadingMode) {
+        store.edit { it[SettingsKeys.QURAN_MODE] = mode.name }
+    }
+
+    /** The translation alone, by its id ("fr.hamidullah"). */
+    suspend fun setTranslation(id: String) {
+        store.edit { it[SettingsKeys.QURAN_TRANSLATION] = id }
+    }
+
     /** Null until all three position keys exist — a fresh install has nowhere to resume to. */
     val readingPosition: Flow<ReadingPosition?> = store.data.map { p ->
         val surah = p[SettingsKeys.QURAN_LAST_SURAH]

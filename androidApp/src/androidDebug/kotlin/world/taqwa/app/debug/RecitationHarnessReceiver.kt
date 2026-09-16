@@ -71,6 +71,21 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                     "prev" -> player.previous()
                     "seek" -> player.seekToAyah(ayah)
                     "stop" -> player.stop()
+                    // The store-screenshot run (no finger on the glass): a screen by name, the
+                    // theme, the reading mode and the translation, same words as the iOS harness.
+                    "screen" -> world.taqwa.app.nav.LaunchRequests.openScreen(intent.getStringExtra("name") ?: "prayer")
+                    "theme" -> appContainer.settingsRepository.setThemeMode(
+                        when (intent.getStringExtra("name")) {
+                            "dark" -> world.taqwa.app.design.ThemeMode.DARK
+                            "light" -> world.taqwa.app.design.ThemeMode.LIGHT
+                            else -> world.taqwa.app.design.ThemeMode.SYSTEM
+                        },
+                    )
+                    "mode" -> appContainer.settingsRepository.setReadingMode(
+                        if (intent.getStringExtra("name") == "mushaf") world.taqwa.app.quran.ReadingMode.MUSHAF
+                        else world.taqwa.app.quran.ReadingMode.TRANSLATION,
+                    )
+                    "translation" -> appContainer.settingsRepository.setTranslation(intent.getStringExtra("id") ?: "en.sahih")
                     "state" -> Log.i(TAG, "state ${player.state.value}")
                     "reconcile" -> {
                         val library = appContainer.recitationLibrary

@@ -58,6 +58,24 @@ object LaunchRequests {
     /** The Android intent extra the media session's tap carries; read by `MainActivity`. */
     const val ANDROID_EXTRA_OPEN_PLAYING = "open_playing"
 
+    private val _pendingScreen = MutableStateFlow<String?>(null)
+
+    /**
+     * A screen asked for by name — "prayer", "quran", "settings", "notifications", "qibla",
+     * "tasbeeh", "appearance" — by the debug harnesses only (the store-screenshot runs open every
+     * screen in every language without a finger on the glass). Nothing in a release build calls
+     * [openScreen]; an unknown name is ignored by the collector.
+     */
+    val pendingScreen: StateFlow<String?> get() = _pendingScreen
+
+    fun openScreen(name: String) {
+        _pendingScreen.value = name
+    }
+
+    fun consumeScreen() {
+        _pendingScreen.value = null
+    }
+
     private const val SURAH_COUNT = 114
     private const val LONGEST_SURAH = 286
 }

@@ -322,6 +322,18 @@ enum RecitationHarness {
 				let ok = BackgroundRefreshBridge.shared.runBackgroundRefresh()
 				NSLog("TaqwaHarness background refresh ok=\(ok)")
 			}
+		// The store-screenshot run: `taqwa://recite/screen?name=qibla`, `.../theme?name=dark`,
+		// `.../mode?name=mushaf` open a screen, set the theme or the reading mode by name.
+		case "screen":
+			LaunchRequests.shared.openScreen(name: value("name") ?? "prayer")
+		case "theme":
+			let mode: ThemeMode = value("name") == "dark" ? .dark : (value("name") == "light" ? .light : .system)
+			AppContainerKt.appContainer.settingsRepository.setThemeMode(mode: mode) { _ in }
+		case "mode":
+			let mode: ReadingMode = value("name") == "mushaf" ? .mushaf : .translation
+			AppContainerKt.appContainer.settingsRepository.setReadingMode(mode: mode) { _ in }
+		case "translation":
+			AppContainerKt.appContainer.settingsRepository.setTranslation(id: value("id") ?? "en.sahih") { _ in }
 		default: NSLog("TaqwaHarness unknown command \"\(command)\"")
 		}
 		return true

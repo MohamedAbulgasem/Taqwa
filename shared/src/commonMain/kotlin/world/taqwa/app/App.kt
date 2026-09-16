@@ -224,6 +224,24 @@ fun App(container: AppContainer) {
             }
         }
     }
+    // The debug harnesses' "open this screen" (see LaunchRequests.openScreen): a tab root, or a
+    // sub-screen on top of its own tab, exactly as a finger would reach it.
+    LaunchedEffect(Unit) {
+        settings.onboardingComplete.filter { it }.first()
+        LaunchRequests.pendingScreen.collect { name ->
+            name ?: return@collect
+            when (name) {
+                "prayer" -> navigator.selectTab(Tab.PRAYER)
+                "quran" -> navigator.selectTab(Tab.QURAN)
+                "settings" -> navigator.selectTab(Tab.SETTINGS)
+                "notifications" -> { navigator.selectTab(Tab.SETTINGS); navigator.push(Screen.NotificationSettings) }
+                "appearance" -> { navigator.selectTab(Tab.SETTINGS); navigator.push(Screen.Appearance) }
+                "qibla" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Qibla) }
+                "tasbeeh" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Tasbeeh) }
+            }
+            LaunchRequests.consumeScreen()
+        }
+    }
     val appLifecycle = LocalLifecycleOwner.current
     LaunchedEffect(appLifecycle) {
         appLifecycle.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
