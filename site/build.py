@@ -80,12 +80,12 @@ def render_markdown(path: str) -> str:
     body = markdown.markdown(text, extensions=["smarty"])
     # Bare domains and addresses in the policy become links; the file stays plain text for GitHub.
     body = re.sub(
-        r"(?<![\w/@\"'>])((?:github\.com|docs\.github\.com)/[\w./#?=-]+)",
+        r"(?<![\w/@\"'])((?:github\.com|docs\.github\.com)/[\w./#?=-]+)",
         lambda m: f'<a href="https://{m.group(1)}">{m.group(1)}</a>',
         body,
     )
     body = re.sub(
-        r"(?<![\w/\"'>])([\w.+-]+@[\w-]+\.[\w.]+)",
+        r"(?<![\w/\"'])([\w.+-]+@[\w-]+\.[\w.]+)",
         lambda m: f'<a href="mailto:{m.group(1)}">{m.group(1)}</a>',
         body,
     )
@@ -93,6 +93,25 @@ def render_markdown(path: str) -> str:
     if meta:
         page += f'<p class="meta">{html.escape(meta)}</p>\n'
     return f'<main class="wrap prose">\n{page}{body}\n</main>\n'
+
+
+EMAIL_LINK = re.compile(r'<a href="mailto:[^"]*"[^>]*>[^<]*</a>')
+EMAIL_OFF, EMAIL_ON = "<!--email_off-->", "<!--/email_off-->"
+
+
+def shield_emails(doc: str) -> str:
+    """Wrap every mailto link in Cloudflare's opt-out comments. The domain's DNS sits on
+    Cloudflare, and any request that reaches its proxy edge gets "Email Address Obfuscation"
+    applied: the address is swapped for "[email protected]" plus a script that undoes it, and a
+    reader whose script never ran sees the placeholder. The comments tell the edge to leave the
+    address alone, so the page reads the same whichever way it arrives."""
+    return EMAIL_LINK.sub(lambda m: f"{EMAIL_OFF}{m.group(0)}{EMAIL_ON}", doc)
+
+
+def unshielded_emails(doc: str) -> list:
+    """Addresses that would still be obfuscated: any that sit outside an email_off block."""
+    outside = re.sub(re.escape(EMAIL_OFF) + r".*?" + re.escape(EMAIL_ON), "", doc, flags=re.S)
+    return re.findall(r"[\w.+-]+@[\w-]+\.[\w.]+", outside)
 
 
 def page_body(langs: dict, lang: str, page: str) -> str:
@@ -163,6 +182,7 @@ def build_page(langs: dict, lang: str, page: str, template: str) -> None:
     out = template
     for key, value in values.items():
         out = out.replace("{" + key + "}", value)
+    out = shield_emails(out)
     target = os.path.join(OUT, out_dir)
     os.makedirs(target, exist_ok=True)
     with open(os.path.join(target, "index.html"), "w", encoding="utf-8") as f:
@@ -182,6 +202,9 @@ def check_links() -> int:
                 doc = f.read()
             for leftover in re.findall(r"\{[a-z_]+\}", doc):
                 print(f"placeholder: {os.path.relpath(path, OUT)} -> {leftover}", file=sys.stderr)
+                problems += 1
+            for address in unshielded_emails(doc):
+                print(f"unshielded email: {os.path.relpath(path, OUT)} -> {address}", file=sys.stderr)
                 problems += 1
             for ref in re.findall(r'(?:href|src|srcset)="([^"#]+)"', doc):
                 if re.match(r"^(https?:|mailto:|data:)", ref):

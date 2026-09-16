@@ -157,7 +157,7 @@ Runs the shared and widget test suites on the JVM and on the iOS simulator. All 
 
 **Website**
 
-The site at taqwa.world lives in `site/` and is built by `site/build.py` from the page fragments and the two policy files; a GitHub Pages workflow deploys it on every push that touches it.
+The site at taqwa.world lives in `site/` and is built by `site/build.py` from the page fragments under `site/pages/<lang>/` and the seven policy files at the repository root; a GitHub Pages workflow deploys it on every push that touches it. Email addresses on the site are wrapped in Cloudflare's `email_off` comments so they are never rewritten into `[email protected]` on the way to a reader.
 
 ## Project layout
 
@@ -166,7 +166,7 @@ shared/       Compose UI, domain logic, view models, expect/actual platform seam
 widgetcore/   Compose-free widget model, linked by the iOS widget extension
 androidApp/   Android entry point, Glance widgets, alarm and boot receivers, the recitation service
 iosApp/       iOS entry point (SwiftUI shell), WidgetKit extension
-site/         The website, English and Arabic, built by site/build.py
+site/         The website in seven languages, built by site/build.py
 assets/       Source audio and generators for the bundled sounds
 docs/         Design specs, implementation plans, build log, attribution, store answers
 scripts/      Test and build helpers
@@ -179,17 +179,17 @@ The design specs the app is built from are in [`docs/superpowers/specs`](docs/su
 
 Contributions are welcome, from a typo in the Arabic strings to a new calculation method.
 
-1. **Open an issue first** for anything beyond a small fix, so the approach can be agreed before you spend time on it. Bug reports are most useful with the device, OS version, language, and a screenshot.
+1. **Open an issue first** for anything beyond a small fix, so the approach can be agreed before you spend time on it. Bug reports are most useful with the device, OS version, language, and a screenshot; without a GitHub account, email support@taqwa.world instead.
 2. **Fork and branch** from `main`.
-3. **Keep the constraints.** No network calls beyond the recitation downloads the person asked for, no third-party SDKs that phone home, no new colour outside the palette in `Palette.kt`, and Arabic must be checked as carefully as English. If a change touches the UI, include screenshots of both languages and both themes.
+3. **Keep the constraints.** No network calls beyond the recitation downloads the person asked for, no third-party SDKs that phone home, no new colour outside the palette in `Palette.kt`, and every language must be checked as carefully as English, the right-to-left ones (Arabic, Urdu) especially. If a change touches the UI, include screenshots of English and Arabic in both themes.
 4. **Run `./scripts/test.sh`** and add tests for domain logic. Prayer-time and Qibla changes need known-answer tests against published values.
 5. **Open a pull request** against `main` describing what changed and why. Small, focused PRs are reviewed quickly; large ones are split.
 
-Translations: the two string files are `shared/src/commonMain/composeResources/values/strings.xml` and `values-ar/strings.xml`. New languages are welcome as long as every string is covered.
+Translations: one `strings.xml` per language under `shared/src/commonMain/composeResources/` (`values/` for English, then `values-ar`, `values-fr`, `values-tr`, `values-in`, `values-ur`, `values-bn`), and `scripts/check-strings.sh` checks that every file carries the same keys. New languages are welcome as long as every string is covered, and the website and privacy policy should follow in the same language.
 
 ## Privacy
 
-Taqwa asks for your location only to compute prayer times and the Qibla, and only if you choose to allow it; picking a city from the built-in list works just as well. Location never leaves the phone. The app makes no network request until you use Quran recitation. Recitations are downloaded one surah at a time from Taqwa's public data repository on GitHub, only when you ask; that request shows GitHub your IP address and the file you asked for, and nothing else. There are no analytics, no crash reporters and no third-party SDKs that talk to the internet. Full policy in [PRIVACY.md](PRIVACY.md), also in [Arabic](PRIVACY.ar.md).
+Taqwa asks for your location only to compute prayer times and the Qibla, and only if you choose to allow it; picking a city from the built-in list works just as well. Location never leaves the phone. The app makes no network request until you use Quran recitation. Recitations are downloaded one surah at a time from Taqwa's public data repository on GitHub, only when you ask; that request shows GitHub your IP address and the file you asked for, and nothing else. There are no analytics, no crash-reporting SDKs and no third-party SDKs that talk to the internet; if the app crashes it keeps a report on the phone and only ever emails it when you choose to. Full policy in [PRIVACY.md](PRIVACY.md), also in [Arabic](PRIVACY.ar.md), [French](PRIVACY.fr.md), [Turkish](PRIVACY.tr.md), [Indonesian](PRIVACY.id.md), [Urdu](PRIVACY.ur.md) and [Bengali](PRIVACY.bn.md), and on the website at [taqwa.world/privacy](https://taqwa.world/privacy/). Questions go to support@taqwa.world.
 
 ## Attribution
 
