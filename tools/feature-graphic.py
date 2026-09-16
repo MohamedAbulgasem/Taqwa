@@ -87,14 +87,14 @@ def render(lang):
     d = ImageDraw.Draw(out)
     if rtl:
         x = W - 488
-        d.text((x, 215), "تقوى", font=ImageFont.truetype(UTHMANIC, 132), fill=INK, anchor="rs", direction="rtl")
-        d.text((x, 268), "مواقيت الصلاة والقرآن والتلاوة.", font=ImageFont.truetype(ARABIC_UI, 34), fill=SECONDARY, anchor="rs", direction="rtl")
-        dotted_rtl(d, x, 322, ["مجاني", "بلا إنترنت", "بلا إعلانات", "بلا تتبّع"], ImageFont.truetype(ARABIC_UI, 21), AMBER)
+        d.text((x, 206), "تقوى", font=ImageFont.truetype(UTHMANIC, 132), fill=INK, anchor="rs", direction="rtl")
+        d.text((x, 280), "مواقيت الصلاة والقرآن والتلاوة.", font=ImageFont.truetype(ARABIC_UI, 32), fill=SECONDARY, anchor="rs", direction="rtl")
+        dotted_rtl(d, x, 336, ["مجاني", "بلا إنترنت", "بلا إعلانات", "بلا تتبّع"], ImageFont.truetype(ARABIC_UI, 21), AMBER)
     else:
         x = 488
-        d.text((x - 6, 205), "Taqwa", font=ImageFont.truetype(MANROPE_XB, 124), fill=INK, anchor="ls")
-        d.text((x, 262), "Prayer times, Quran and recitation.", font=ImageFont.truetype(MANROPE_R, 34), fill=SECONDARY, anchor="ls")
-        spaced(d, (x + 1, 322), "FREE · OFFLINE · NO ADS · NO TRACKING", ImageFont.truetype(MANROPE_SB, 20), AMBER, 3)
+        d.text((x - 6, 196), "Taqwa", font=ImageFont.truetype(MANROPE_XB, 124), fill=INK, anchor="ls")
+        d.text((x, 274), "Prayer times, Quran and recitation.", font=ImageFont.truetype(MANROPE_R, 32), fill=SECONDARY, anchor="ls")
+        spaced(d, (x + 1, 334), "FREE · OFFLINE · NO ADS · NO TRACKING", ImageFont.truetype(MANROPE_SB, 20), AMBER, 3)
     os.makedirs(OUT, exist_ok=True)
     path = os.path.join(OUT, f"feature-graphic-{lang}.png")
     out.convert("RGB").save(path, optimize=True)
