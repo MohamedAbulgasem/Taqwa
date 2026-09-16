@@ -59,7 +59,7 @@
     <string name="settings_not_set">مقرر نہیں</string>
     <string name="settings_notifications_off">بند</string>
     <string name="settings_notifications_on_count">%1$s فعال</string>
-    <string name="settings_version_value">0.20.2</string>
+    <string name="settings_version_value">1.0.0</string>
 
     <!-- «تقویٰ کے بارے میں» کی اسکرین۔ -->
     <string name="about_tagline">مفت، سب کے لیے، ہمیشہ کے لیے۔</string>
