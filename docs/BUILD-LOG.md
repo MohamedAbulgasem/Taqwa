@@ -1327,3 +1327,21 @@ emulator cannot give a coarse-only app a fix; on the LoopPhone the cache answers
 process is warm from a recent use and is withheld from a cold one, so Android's gain is the day
 of the trip, not a phone left closed. The proper answer on both platforms, background location
 under "Always",, is written up in spec §16.5 as a later opt-in. Released as 0.20.2 (27); the store build becomes 1.0.0 (28).
+
+## Store copy and screenshots (16 September)
+
+The Play account cleared verification, the upload key exists, 1.0.0 (28) went to internal
+testing. Then the listing: copy in seven languages under `docs/store/listing/` (English and Arabic
+written here, the other five by native-writer agents against the app's own strings, every field
+inside its limit by `tools/store-listing-check.py`), and screenshots from the S23 (1440 × 3088) and
+the iPhone 17 Pro simulator, eight screens per language, framed by `tools/store/frame.py` into
+Play's 1080 × 1920 and the App Store's 1320 × 2868 with the caption above the phone.
+
+What it took to make the captures repeatable: the debug harnesses on both platforms can now open
+a screen, set the theme, the reading mode and the translation by name, so one flow runs in every
+language with no finger on the glass and no dependence on the phone's starting state — the first
+runs toggled the Mushaf mode by counting taps and drifted, and showed the S23's English translation
+under French and Urdu. The first "Tripoli" was Lebanon's (1,498 km to Makkah); Libya's is 2,916.
+The 16 Pro Max simulator needed a tap permission nobody was at the keyboard to grant, so the 17 Pro
+did the iOS set and the framer upsizes into the 6.9-inch slot. The simulator has no compass, so the
+App Store set carries seven screenshots; its notifications had to be allowed once by hand.
