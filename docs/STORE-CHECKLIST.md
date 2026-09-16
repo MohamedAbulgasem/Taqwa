@@ -133,9 +133,12 @@ costs days.
   reads English and Arabic; the native reviewers read the rest.
 - Screenshots per §1, plus the 512 icon (`androidApp/src/androidMain/ic_launcher-playstore.png`)
   and the 1024 × 500 feature graphics already in `assets/store/`.
-- Two screen recordings for Play's foreground-service declarations (a surah playing with the
-  phone locked and lock-screen controls; a download continuing after leaving the app), from the
-  emulator, for Mohamed to upload unlisted to YouTube.
+- Two screen recordings for Play's foreground-service declarations, recorded on the emulator on
+  16 September: `~/Downloads/Taqwa-fgs-media-playback.mp4` (a surah playing, the app left, the
+  media notification with its controls, 29 s) and `~/Downloads/Taqwa-fgs-data-sync.mp4` ("Download
+  the whole Quran", the app left, the download notification counting up, 44 s). Mohamed uploads
+  them unlisted to the new account's YouTube channel and pastes the two links into the
+  declaration form (mediaPlayback and dataSync).
 - The store build: `scripts/test.sh`, `scripts/ios-build.sh`, the bump (done for 1.0.0 (28)),
   the iOS identifier rename and Team ID, then `scripts/release.sh` →
   `androidApp/build/outputs/bundle/release/androidApp-release.aab` (+ APK). The APK goes on the
