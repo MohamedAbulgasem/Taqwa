@@ -38,6 +38,10 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val voice = intent.getStringExtra(EXTRA_VOICE)
             ?.let { name -> AdhanVoice.entries.firstOrNull { it.name == name } }
             ?: AdhanVoice.ORIGINAL
+        // Absent on an alarm set by a build older than Tahajjud, which only ever set prayers.
+        val kind = intent.getStringExtra(EXTRA_KIND)
+            ?.let { name -> NotificationKind.entries.firstOrNull { it.name == name } }
+            ?: NotificationKind.PRAYER
         val title = intent.getStringExtra(EXTRA_TITLE) ?: return
         val body = intent.getStringExtra(EXTRA_BODY) ?: return
 
@@ -45,7 +49,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         // to the same 32-bit hash used to overwrite each other's notification.
         val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
 
-        val notification = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice))
+        val notification = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice, kind))
             .setSmallIcon(notificationSmallIconResId)
             .setContentTitle(title)
             .setContentText(body)

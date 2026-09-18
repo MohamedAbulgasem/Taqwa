@@ -59,7 +59,7 @@
     <string name="settings_not_set">مقرر نہیں</string>
     <string name="settings_notifications_off">بند</string>
     <string name="settings_notifications_on_count">%1$s فعال</string>
-    <string name="settings_version_value">1.0.0</string>
+    <string name="settings_version_value">⁦1.0.0 (29)⁩</string>
 
     <!-- «تقویٰ کے بارے میں» کی اسکرین۔ -->
     <string name="about_tagline">مفت، سب کے لیے، ہمیشہ کے لیے۔</string>
@@ -115,6 +115,9 @@
     <string name="notifications_master_toggle">نماز کی اطلاعات</string>
     <string name="notifications_remind_before">پیشگی یاد دہانی</string>
     <string name="notifications_prayers_label">نمازیں</string>
+    <string name="notifications_tahajjud">تہجد</string>
+    <string name="notifications_tahajjud_subtitle">جب رات کا آخری تہائی حصہ شروع ہو</string>
+    <string name="notifications_tahajjud_sound">آواز</string>
     <string name="notifications_remind_never">کبھی نہیں</string>
     <plurals name="minutes_count">
         <item quantity="one">%1$s منٹ</item>
@@ -132,6 +135,7 @@
     <string name="sound_takbir_detail">اللہ اکبر، اللہ اکبر، تقریباً %1$s سیکنڈ</string>
     <string name="sound_adhan_detail">اذان، پہلے %1$s سیکنڈ</string>
     <string name="sound_sheet_footnote">نماز کی اطلاع اپنی آواز کے پہلے %1$s سیکنڈ بجاتی ہے۔ مکمل اذان ایپ کے اندر سنی جا سکتی ہے۔</string>
+    <string name="sound_sheet_muted_hint">آپ کا فون خاموش یا ”ڈسٹرب نہ کریں“ موڈ پر ہے، اس لیے آواز کا نمونہ اور نماز کی اطلاعات سنائی نہیں دیں گی۔</string>
 
     <!-- Adhan voice -->
     <string name="adhan_voice_row">اذان</string>

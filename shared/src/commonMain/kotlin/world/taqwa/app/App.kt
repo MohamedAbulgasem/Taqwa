@@ -46,6 +46,7 @@ import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
+import world.taqwa.app.feature.quran.QuranRootUiState
 import world.taqwa.app.feature.settings.AppearanceSettingsScreen
 import world.taqwa.app.feature.settings.AboutScreen
 import world.taqwa.app.feature.settings.AttributionScreen
@@ -513,6 +514,7 @@ fun App(container: AppContainer) {
                                     onDismiss = recitation::dismissBar,
                                     incomingSurahName = incomingSurahName,
                                     onOpenPlaying = openPlaying,
+                                    onSeek = recitation::seekToFraction,
                                 )
                             }
                         }
@@ -622,6 +624,16 @@ fun App(container: AppContainer) {
                                 // ayah section blank for a quarter of a second on the way back.
                                 if (quranQuery.text.isNotEmpty()) {
                                     viewModel.setFilter(quranQuery.text, immediate = true)
+                                }
+                            }
+                            // The debug harnesses' typed search (see LaunchRequests.search).
+                            LaunchedEffect(viewModel) {
+                                LaunchRequests.pendingSearch.collect { asked ->
+                                    asked ?: return@collect
+                                    viewModel.state.first { it is QuranRootUiState.Ready }
+                                    quranQuery = TextFieldValue(asked)
+                                    viewModel.setFilter(asked, immediate = true)
+                                    LaunchRequests.consumeSearch()
                                 }
                             }
                             val quranState by viewModel.state.collectAsState()
@@ -879,6 +891,18 @@ fun App(container: AppContainer) {
                                         sounds = notificationSettings.sounds + (prayer to sound),
                                     )
                                     settings.setNotificationSettings(updated)
+                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                                }
+                            },
+                            onToggleTahajjud = { on ->
+                                scope.launch {
+                                    settings.setNotificationSettings(notificationSettings.copy(tahajjud = on))
+                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                                }
+                            },
+                            onPickTahajjudSound = { sound ->
+                                scope.launch {
+                                    settings.setNotificationSettings(notificationSettings.copy(tahajjudSound = sound))
                                     container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
                                 }
                             },

@@ -62,7 +62,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">1.0.0</string>
+    <string name="settings_version_value">⁦1.0.0 (29)⁩</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
@@ -120,6 +120,9 @@
     <string name="notifications_master_toggle">Prayer notifications</string>
     <string name="notifications_remind_before">Remind me before</string>
     <string name="notifications_prayers_label">PRAYERS</string>
+    <string name="notifications_tahajjud">Tahajjud</string>
+    <string name="notifications_tahajjud_subtitle">When the last third of the night begins</string>
+    <string name="notifications_tahajjud_sound">Sound</string>
     <string name="notifications_remind_never">Never</string>
     <!--
         A count of minutes. English has one plural break, Arabic six (CLDR): 3-10 take "دقائق"
@@ -143,6 +146,7 @@
     <string name="sound_takbir_detail">Allahu akbar, Allahu akbar, about %1$ss</string>
     <string name="sound_adhan_detail">The adhan, first %1$s seconds</string>
     <string name="sound_sheet_footnote">A prayer notification plays the first %1$s seconds of its sound. The complete adhan can be played inside the app.</string>
+    <string name="sound_sheet_muted_hint">Your phone is on silent or Do Not Disturb, so previews and prayer notifications make no sound.</string>
 
     <!-- Adhan voice -->
     <string name="adhan_voice_row">Adhan</string>

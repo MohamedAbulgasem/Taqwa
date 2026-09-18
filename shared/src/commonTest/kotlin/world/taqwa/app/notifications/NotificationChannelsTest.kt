@@ -126,4 +126,30 @@ class NotificationChannelsTest {
         assertTrue(NotificationChannels.channelId(Prayer.FAJR, PrayerSound.NOTIFICATION) !in stale)
         assertTrue(stale.all { it in NotificationChannels.allChannelIdsFor(Prayer.FAJR) })
     }
+
+    @Test
+    fun tahajjudHasChannelsOfItsOwnAndNeverFajrs() {
+        val id = NotificationChannels.channelId(Prayer.FAJR, PrayerSound.NOTIFICATION, kind = NotificationKind.TAHAJJUD)
+        assertEquals("tahajjud_notification_chime3", id)
+        assertTrue(id !in NotificationChannels.allChannelIdsFor(Prayer.FAJR))
+        assertTrue(id in NotificationChannels.allTahajjudChannelIds())
+    }
+
+    @Test
+    fun aReminderStillRidesItsPrayersChannel() {
+        assertEquals(
+            NotificationChannels.channelId(Prayer.ASR, PrayerSound.NOTIFICATION),
+            NotificationChannels.channelId(Prayer.ASR, PrayerSound.NOTIFICATION, kind = NotificationKind.REMINDER),
+        )
+    }
+
+    @Test
+    fun everyTahajjudChannelIsOneTheSweepCanDelete() {
+        val all = NotificationChannels.allTahajjudChannelIds()
+        PrayerSound.entries.forEach { sound ->
+            AdhanVoice.entries.forEach { voice ->
+                assertTrue(NotificationChannels.channelId(Prayer.FAJR, sound, voice, NotificationKind.TAHAJJUD) in all)
+            }
+        }
+    }
 }

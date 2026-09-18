@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.quran
 
+import world.taqwa.app.quran.ArabicWordAlignment
 import world.taqwa.app.quran.Ayah
 import world.taqwa.app.quran.Juz
 import world.taqwa.app.quran.MushafPage
@@ -99,7 +100,7 @@ internal class FakeQuranSource(
             }
             .sortedWith(compareBy({ it.surah }, { it.number }))
             .take(limit)
-            .map { SearchHit(it.surah, it.number, it.text, null) }
+            .map { SearchHit(it.surah, it.number, it.text, null, ArabicWordAlignment.matchedWords(it.text, it.text, tokens)) }
     }
 
     override suspend fun searchTranslation(translationId: String, query: String, limit: Int): List<SearchHit> {

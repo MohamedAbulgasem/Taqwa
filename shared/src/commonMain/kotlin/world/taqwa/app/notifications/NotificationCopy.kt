@@ -21,7 +21,7 @@ interface NotificationCopy {
      * prayer alone leaves a list of identical entries the user cannot tell apart. The sound is
      * therefore part of the name, in the same language as the notification itself.
      */
-    fun channelName(prayer: Prayer, sound: PrayerSound): String
+    fun channelName(prayer: Prayer, sound: PrayerSound, kind: NotificationKind = NotificationKind.PRAYER): String
 }
 
 object EnglishNotificationCopy : NotificationCopy {
@@ -35,7 +35,8 @@ object EnglishNotificationCopy : NotificationCopy {
         Prayer.ISHA -> "Isha"
     }
 
-    override fun title(prayer: Prayer, kind: NotificationKind): String = name(prayer)
+    override fun title(prayer: Prayer, kind: NotificationKind): String =
+        if (kind == NotificationKind.TAHAJJUD) "Tahajjud" else name(prayer)
 
     override fun body(
         prayer: Prayer,
@@ -45,16 +46,17 @@ object EnglishNotificationCopy : NotificationCopy {
     ): String = when (kind) {
         NotificationKind.PRAYER -> "It is time for ${name(prayer)} · $clockTime"
         NotificationKind.REMINDER -> "${name(prayer)} in $minutesBefore minutes · $clockTime"
+        NotificationKind.TAHAJJUD -> "The last third of the night has begun · ${name(prayer)} at $clockTime"
     }
 
-    override fun channelName(prayer: Prayer, sound: PrayerSound): String {
+    override fun channelName(prayer: Prayer, sound: PrayerSound, kind: NotificationKind): String {
         val soundName = when (sound) {
             PrayerSound.SILENT -> "Silent"
             PrayerSound.NOTIFICATION -> "Notification"
             PrayerSound.TAKBIR -> "Takbir"
             PrayerSound.ADHAN -> "Adhan"
         }
-        return "${name(prayer)} · $soundName"
+        return "${title(prayer, kind)} · $soundName"
     }
 }
 

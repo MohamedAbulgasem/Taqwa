@@ -3,6 +3,7 @@ package world.taqwa.app.notifications
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.PrayerNaming
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -96,5 +97,30 @@ class LocalizedNotificationCopyTest {
                 assertTrue(reminder.contains("10") && reminder.contains("12:34"), "$tag: $reminder")
             }
         }
+    }
+
+    @Test
+    fun everyLanguageNamesTahajjudAndQuotesFajrInItsBody() {
+        for (tag in listOf("en-GB", "ar-LY", "fr-FR", "tr-TR", "id-ID", "ur-PK", "bn-BD")) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            val title = copy.title(Prayer.FAJR, NotificationKind.TAHAJJUD)
+            val body = copy.body(Prayer.FAJR, NotificationKind.TAHAJJUD, "05:41", 0)
+            val fajr = PrayerNaming.name(Prayer.FAJR, tag)
+            assertTrue(title.isNotBlank() && title != copy.title(Prayer.FAJR, NotificationKind.PRAYER), "$tag: $title")
+            assertFalse(body.contains("{") || body.contains("}"), "$tag: $body")
+            assertTrue(body.contains("05:41") && body.contains(fajr), "$tag: $body")
+            // One separator: the paired «Fajr · الفجر» of a title would make it two.
+            assertEquals(1, body.count { it == '·' }, "$tag: $body")
+        }
+    }
+
+    @Test
+    fun tahajjudsChannelIsNamedAfterItAndNotAfterFajr() {
+        val copy = LocalizedNotificationCopy(StubFormat("en-GB", arabicIndic = false))
+        assertEquals("Tahajjud · Notification", copy.channelName(Prayer.FAJR, PrayerSound.NOTIFICATION, NotificationKind.TAHAJJUD))
+        assertEquals(
+            copy.channelName(Prayer.FAJR, PrayerSound.NOTIFICATION),
+            copy.channelName(Prayer.FAJR, PrayerSound.NOTIFICATION, NotificationKind.REMINDER),
+        )
     }
 }

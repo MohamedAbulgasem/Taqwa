@@ -14,6 +14,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -49,9 +51,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -159,6 +164,8 @@ fun PlayerBar(
     incomingSurahName: String = "",
     /** A tap on the surah and ayah: show the ayah being recited (spec §15.5). */
     onOpenPlaying: () -> Unit = {},
+    /** A tap on the line (spec §17.5): how far along it, from the reading edge, 0 to 1. */
+    onSeek: (Float) -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
@@ -221,29 +228,59 @@ fun PlayerBar(
             Modifier
                 .contentWidth()
                 .height(ClockRow)
-                .padding(start = 14.dp, end = 14.dp, top = ClockInset),
+                .padding(horizontal = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Clock(elapsed)
-            // Start-aligned inside its box, so the line fills from the reading edge — the right
-            // one under an Arabic UI, where the elapsed clock sits too.
+            Box(Modifier.padding(top = ClockInset)) { Clock(elapsed) }
+            // The line is 3 dp and stays 3 dp; what takes the tap is the whole height of the row
+            // around it, exactly as wide as the line, so a fraction of this box is a fraction of
+            // the line (spec §17.5). It fills from the reading edge — the right one under an
+            // Arabic UI — so that is the edge a tap is measured from.
             Box(
                 Modifier
                     .weight(1f)
+                    .fillMaxHeight()
                     .padding(horizontal = 8.dp)
-                    .height(3.dp)
-                    .clip(CircleShape)
-                    .background(colors.hairline),
-                contentAlignment = Alignment.CenterStart,
+                    .then(
+                        if (!hasClock) {
+                            Modifier
+                        } else {
+                            Modifier
+                                .pointerInput(forward) {
+                                    detectTapGestures { tap ->
+                                        val along = (tap.x / size.width).coerceIn(0f, 1f)
+                                        onSeek(if (forward) along else 1f - along)
+                                    }
+                                }
+                                .semantics {
+                                    progressBarRangeInfo = ProgressBarRangeInfo(bar.fraction.coerceIn(0f, 1f), 0f..1f)
+                                    setProgress { target ->
+                                        onSeek(target)
+                                        true
+                                    }
+                                }
+                        },
+                    )
+                    .padding(top = ClockInset),
+                contentAlignment = Alignment.Center,
             ) {
                 Box(
                     Modifier
-                        .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                        .fillMaxWidth()
                         .height(3.dp)
-                        .background(colors.accent),
-                )
+                        .clip(CircleShape)
+                        .background(colors.hairline),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                            .height(3.dp)
+                            .background(colors.accent),
+                    )
+                }
             }
-            Clock(total)
+            Box(Modifier.padding(top = ClockInset)) { Clock(total) }
         }
         Row(
             Modifier

@@ -656,6 +656,17 @@ class RecitationController(
 
     fun seekToAyah(n: Int) = player.seekToAyah(n)
 
+    /**
+     * A tap [fraction] of the way along the bar's line (spec §17.5), from the reading edge. The
+     * line is the surah's clock, so that is the clock the fraction is taken of; with no clock
+     * yet there is no line to have tapped, and nothing happens.
+     */
+    fun seekToFraction(fraction: Float) {
+        val total = player.state.value.surahDurationMs
+        if (total <= 0L || fraction.isNaN()) return
+        player.seekToSurahTime((total * fraction.coerceIn(0f, 1f).toDouble()).toLong())
+    }
+
     fun stop() {
         advancing?.cancel()
         pending = null

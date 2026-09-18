@@ -350,6 +350,26 @@ class QuranRootViewModelTest {
         advanceTimeBy(300)
         val results = (vm.state.value as QuranRootUiState.Ready).search as SearchState.Results
         assertEquals(listOf(1 to 2), results.hits.map { it.surah to it.ayah })
+    }
+
+    @Test
+    fun anArabicHitCarriesTheReadersTranslation() = runTest {
+        val vm = viewModel("search-arabic-translated")
+        vm.load(); vm.start(backgroundScope)
+        vm.setFilter("الحمد")
+        advanceTimeBy(300)
+        val results = (vm.state.value as QuranRootUiState.Ready).search as SearchState.Results
+        assertEquals(listOf("All praise is due to Allah"), results.hits.map { it.translation })
+    }
+
+    @Test
+    fun anArabicInterfaceShowsAnArabicHitWithoutATranslation() = runTest {
+        val vm = viewModel("search-arabic-ui", languageTag = "ar")
+        vm.load(); vm.start(backgroundScope)
+        vm.setFilter("الحمد")
+        advanceTimeBy(300)
+        val results = (vm.state.value as QuranRootUiState.Ready).search as SearchState.Results
+        assertEquals(listOf(1 to 2), results.hits.map { it.surah to it.ayah })
         assertTrue(results.hits.all { it.translation == null })
     }
 

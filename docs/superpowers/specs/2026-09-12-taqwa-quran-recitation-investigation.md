@@ -561,3 +561,94 @@ next open — closing that needs `ACCESS_BACKGROUND_LOCATION`, a permission Play
 and is the same opt-in decision as iOS's "Always". The task's own result also changed: it used to report failure whenever the plan came out empty, which is every reader with
 notifications off, and iOS grants a task that keeps failing less often; it now reports whether
 the work ran.
+
+## 17. Round five — 18 September (the closed test's first feedback, after 1.0.0 (28))
+
+Five testers on Play's closed track sent six things. None of them is about recitation alone, but
+this is the living spec, so they are recorded here.
+
+### 17.1 A preview that made no sound
+
+A tester reported that the play buttons in the notification-sound sheet did nothing. They work:
+the preview plays with `USAGE_NOTIFICATION_EVENT` on purpose, so that it is heard at exactly the
+loudness the real notification will have, and his phone was on silent. The honest preview stays.
+What changed is that the sheet says why it is quiet, and **only when it is**: an accent-coloured
+line under the options while `notificationSoundsMuted()` is true — the ringer on silent or
+vibrate, the notification volume at zero, or Do Not Disturb filtering. It is polled every 1.5 s
+while the sheet is open, so it goes the moment the volume key is pressed. A permanent hint was
+rejected outright: a line that is always there is a line nobody reads. iOS gives an app no way
+to read the mute switch, so it answers false there and shows nothing.
+
+### 17.2 Widgets that would not widen
+
+`widget_small_info.xml` and `widget_medium_info.xml` carried `maxResizeWidth`/`Height` of 250 dp.
+On a phone whose four cells are wider than that (most of them) the launcher refused any widening
+at all, which a tester filmed. The ayah widget already had `0dp`, no cap, and the Glance layout
+has always chosen its form from `LocalSize`; the prayer widgets now have `0dp` too. At full
+width the small widget becomes the two-column card.
+
+### 17.3 What an Arabic hit means
+
+An Arabic search reads the ayah table alone, so its rows showed the verse and no translation.
+`QuranRootViewModel.withTranslations` fills the reader's translation in afterwards, one
+`translationTexts` read per surah touched. Not under an Arabic interface: whoever reads the
+Arabic line needs no second one.
+
+### 17.4 Lighting the matched words — and a search that had been half blind
+
+The brief was "with care; if it breaks letter joining, leave it out". Two decisions follow from
+that. **Colour only** — the accent, no weight change, which would re-measure the line. And
+**whole words**: the search matches a substring («رحمن» finds «ٱلرَّحْمَـٰنِ») but a style boundary
+inside an Arabic word is a shaping boundary on some engines, so the span goes round the whole
+word and a boundary only ever falls on a space. Checked close up on Android (Minikin) and iOS
+(Skia): the lit word joins exactly like its neighbours.
+
+Finding the word was the real work. The search runs over `ayah.text_search`, Tanzil's plain
+text, and the row shows `text_uthmani`; they are different *spellings*, not one text with and
+without marks — «العالمين»/«ٱلْعَـٰلَمِينَ», «الصلاة»/«ٱلصَّلَوٰةَ», two words «يا أيها» for one
+«يَـٰٓأَيُّهَا». No fold of one gives the other (a fold-only matcher missed 27 % of words), so
+`ArabicWordAlignment` walks the two texts together on a skeleton — marks, every alef, hamza, waw
+and yaa, and doubled letters removed — joining runs of up to three words where the orthographies
+divide differently, and resynchronising one word ahead where even the skeletons disagree
+(«وَيَبْصُۜطُ»/«ويبسط»). `ArabicSearchDbTest` holds all 6,236 ayahs to walking to the end of
+both texts together; an ayah that did not would light nothing rather than the wrong word.
+`SearchHit.matchedWords` carries the positions and `highlightArabicWords` is pure formatting.
+Because the row is one line cut at its end, a match more than two words in opens the line two
+words before it, behind an ellipsis.
+
+Measuring that turned up a bug shipped in 1.0.0: `text_search` keeps «أ إ آ ى» as Tanzil
+publishes them, the query was folded to «ا ي», and the row was matched **unfolded** — so any
+query containing one of those letters («إياك», «موسى», «على», «أنزل») found nothing at all. The
+row is now folded by the same rule as the query, once per process.
+
+### 17.5 A tap on the line
+
+The bar's line takes a tap and nothing about it looks different: the 3 dp line sits inside an
+invisible box the height of the clock row and exactly as wide as the line, measured from the
+reading edge (the right one under an Arabic UI). `RecitationController.seekToFraction` turns the
+fraction into surah time and `RecitationPlayer.seekToSurahTime` does what the lock screen's
+scrub already did — it lands on the **start of the ayah** holding that moment
+(`SurahTimeline.snapToAyah`, §14.1), never inside a word. On Android the seek travels through
+the media session to `AyahPlayer.seekTo`, the one place that rule already lived. The box also
+carries progress semantics with `setProgress`, so a screen reader can move it.
+
+### 17.6 Tahajjud, quietly
+
+Optional, off by default, and nowhere but Settings › Notifications: a card below the five
+prayers with a toggle ("When the last third of the night begins") and, only while it is on, a
+sound row offering Silent, Notification and Takbir — not the adhan, which is not called for a
+night prayer. It is not on the timeline or in the widgets.
+
+The night runs from Maghrib to the Fajr that follows; the last third opens two thirds of the way
+through (`NightThirds`). The planner adds one `NotificationKind.TAHAJJUD` entry a night, carrying
+`Prayer.FAJR` (the clock time its body quotes), planned only strictly inside the night so that
+crossed high-latitude times schedule nothing. It costs one slot a day: the iOS window goes from
+twelve days to ten, or six to five with reminders. On Android it has channels of its own
+(`tahajjud_<sound>`, named "Tahajjud · Notification"), because the system's channel list is
+where a person silences one kind of notification and keeps another; the alarm intent carries the
+kind, and an alarm set by an older build reads as a prayer. Its channels are swept on every
+plan that does not use them, so switching it off takes its entry out of system settings too. The body names Fajr by its one name
+in the language, not the paired «Fajr · الفجر» a title wears. Verified by firing one through the
+real scheduler, alarm and receiver on the emulator (debug harness `tahajjud`), and by reading
+iOS's pending requests on the simulator (`taqwa://recite/pending?prefix=TAHAJJUD`: nine, inside
+a total of 57).

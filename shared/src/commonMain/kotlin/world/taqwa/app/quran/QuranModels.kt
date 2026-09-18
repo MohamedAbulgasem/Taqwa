@@ -23,7 +23,14 @@ data class Ayah(val surah: Int, val number: Int, val text: String, val page: Int
 
 /** One search result (spec 2b §2.1): the ayah's own Arabic and, for a translation hit, the
  * translation text the match was found in. */
-data class SearchHit(val surah: Int, val ayah: Int, val arabic: String, val translation: String?)
+data class SearchHit(
+    val surah: Int,
+    val ayah: Int,
+    val arabic: String,
+    val translation: String?,
+    /** The words of [arabic], by position, that an Arabic query found; empty for a translation hit. */
+    val matchedWords: Set<Int> = emptySet(),
+)
 
 data class Juz(val number: Int, val startSurah: Int, val startAyah: Int)
 

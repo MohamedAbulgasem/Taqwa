@@ -76,6 +76,23 @@ object LaunchRequests {
         _pendingScreen.value = null
     }
 
+    private val _pendingSearch = MutableStateFlow<String?>(null)
+
+    /**
+     * A Quran search typed by the debug harnesses only, for the same reason as [pendingScreen]:
+     * `adb` cannot type Arabic, and the search results are one of the things a device run has to
+     * look at (spec §17.4). Collected by the Quran root, so the harness opens "quran" first.
+     */
+    val pendingSearch: StateFlow<String?> get() = _pendingSearch
+
+    fun search(query: String) {
+        _pendingSearch.value = query
+    }
+
+    fun consumeSearch() {
+        _pendingSearch.value = null
+    }
+
     private const val SURAH_COUNT = 114
     private const val LONGEST_SURAH = 286
 }

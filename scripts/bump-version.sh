@@ -9,6 +9,13 @@
 # a fix + two features + a release is 0.3.0. The version code goes up by one per release build;
 # Android refuses to install a lower one over a higher one, and iOS's CFBundleVersion must match
 # between the app and the widget extension, which is why both plists are written here.
+#
+# Until the first production release (Mohamed, 18 September 2026): the name stays 1.0.0 and only
+# the code moves — 1.0.0 (28) went to Play's closed track only and iOS has not shipped, so the
+# first public version on both stores is still 1.0.0. `build-<code>` tags a tester build and
+# `v1.0.0` belongs to the build that reaches production; after that the rule above applies again.
+# The in-app version therefore shows the code too ("1.0.0 (29)"), or a tester's report could not
+# say which build it came from.
 set -euo pipefail
 
 NAME=${1:?usage: bump-version.sh <versionName e.g. 0.2.0> <versionCode e.g. 3>}
@@ -28,7 +35,9 @@ done
 
 # Every language carries the version string (the resource system needs the key everywhere).
 for strings in shared/src/commonMain/composeResources/values*/strings.xml; do
-  perl -pi -e "s|(<string name=\"settings_version_value\">)[^<]+|\${1}$NAME|" "$strings"
+  # Inside a left-to-right isolate (U+2066 … U+2069, written as bytes): under Arabic and Urdu the
+  # brackets are neutral characters and the line read "(29) 1.0.0" without it.
+  perl -pi -e "s|(<string name=\"settings_version_value\">)[^<]+|\${1}\xE2\x81\xA6$NAME ($CODE)\xE2\x81\xA9|" "$strings"
 done
 
 echo "Version is now $NAME ($CODE):"

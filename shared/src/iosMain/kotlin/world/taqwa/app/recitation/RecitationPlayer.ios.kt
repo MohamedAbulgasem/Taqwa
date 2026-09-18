@@ -595,10 +595,10 @@ actual class RecitationPlayer actual constructor(
     }
 
     /** A seek on the surah's clock: the start of the ayah that holds that moment. */
-    private fun seekToSurahTime(ms: Long) {
+    actual fun seekToSurahTime(positionMs: Long) {
         val built = queue ?: return
         val clock = timeline ?: return
-        go(clock.snapToAyah(ms, built::isGap))
+        go(clock.snapToAyah(positionMs, built::isGap))
     }
 
     private fun unwireCommands() {

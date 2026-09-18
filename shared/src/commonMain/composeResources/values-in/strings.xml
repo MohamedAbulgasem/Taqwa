@@ -59,7 +59,7 @@
     <string name="settings_not_set">Belum diatur</string>
     <string name="settings_notifications_off">Nonaktif</string>
     <string name="settings_notifications_on_count">%1$s aktif</string>
-    <string name="settings_version_value">1.0.0</string>
+    <string name="settings_version_value">⁦1.0.0 (29)⁩</string>
 
     <!-- Layar «Tentang Taqwa». Nama «Taqwa» tetap dalam huruf Latin, seperti pada ikonnya. -->
     <string name="about_tagline">Gratis, untuk semua, selamanya.</string>
@@ -115,6 +115,9 @@
     <string name="notifications_master_toggle">Notifikasi salat</string>
     <string name="notifications_remind_before">Ingatkan sebelumnya</string>
     <string name="notifications_prayers_label">SALAT</string>
+    <string name="notifications_tahajjud">Tahajud</string>
+    <string name="notifications_tahajjud_subtitle">Saat sepertiga malam terakhir tiba</string>
+    <string name="notifications_tahajjud_sound">Suara</string>
     <string name="notifications_remind_never">Tanpa pengingat</string>
     <plurals name="minutes_count">
         <item quantity="other">%1$s menit</item>
@@ -131,6 +134,7 @@
     <string name="sound_takbir_detail">Allahu akbar, Allahu akbar, sekitar %1$s dtk</string>
     <string name="sound_adhan_detail">Azan, %1$s detik pertama</string>
     <string name="sound_sheet_footnote">Notifikasi salat memutar %1$s detik pertama dari suaranya. Azan lengkap bisa diputar di dalam aplikasi.</string>
+    <string name="sound_sheet_muted_hint">Ponsel Anda dalam mode senyap atau “Jangan Ganggu”, sehingga pratinjau dan notifikasi salat tidak berbunyi.</string>
 
     <!-- Adhan voice -->
     <string name="adhan_voice_row">Azan</string>

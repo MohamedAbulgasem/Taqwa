@@ -59,7 +59,7 @@
     <string name="settings_not_set">নির্ধারিত নয়</string>
     <string name="settings_notifications_off">বন্ধ</string>
     <string name="settings_notifications_on_count">%1$sটি চালু</string>
-    <string name="settings_version_value">1.0.0</string>
+    <string name="settings_version_value">⁦1.0.0 (29)⁩</string>
 
     <!-- About screen. The product name is written তাকওয়া here, as on the icon. -->
     <string name="about_tagline">বিনামূল্যে, সবার জন্য, চিরকালের জন্য।</string>
@@ -115,6 +115,9 @@
     <string name="notifications_master_toggle">নামাজের নোটিফিকেশন</string>
     <string name="notifications_remind_before">আগে মনে করিয়ে দিন</string>
     <string name="notifications_prayers_label">নামাজসমূহ</string>
+    <string name="notifications_tahajjud">তাহাজ্জুদ</string>
+    <string name="notifications_tahajjud_subtitle">রাতের শেষ তৃতীয়াংশ শুরু হলে</string>
+    <string name="notifications_tahajjud_sound">শব্দ</string>
     <string name="notifications_remind_never">কখনো নয়</string>
     <!-- Bengali counts minutes with one form; both CLDR categories keep %1$s. -->
     <plurals name="minutes_count">
@@ -133,6 +136,7 @@
     <string name="sound_takbir_detail">আল্লাহু আকবার, আল্লাহু আকবার, প্রায় %1$s সেকেন্ড</string>
     <string name="sound_adhan_detail">আযান, প্রথম %1$s সেকেন্ড</string>
     <string name="sound_sheet_footnote">নামাজের নোটিফিকেশনে শব্দের প্রথম %1$s সেকেন্ড বাজে। পূর্ণ আযান অ্যাপের ভিতরেই শোনা যায়।</string>
+    <string name="sound_sheet_muted_hint">আপনার ফোন নীরব বা “বিরক্ত করবেন না” মোডে আছে, তাই প্রিভিউ ও নামাজের নোটিফিকেশনে কোনো শব্দ হবে না।</string>
 
     <!-- Adhan voice -->
     <string name="adhan_voice_row">আযান</string>

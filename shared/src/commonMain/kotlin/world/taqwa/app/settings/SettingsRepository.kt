@@ -91,6 +91,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             },
             remindBeforeMinutes = p[SettingsKeys.REMIND_BEFORE] ?: 0,
             voice = p[SettingsKeys.ADHAN_VOICE].toEnumOr(AdhanVoice.ORIGINAL),
+            tahajjud = p[SettingsKeys.TAHAJJUD_ENABLED] ?: false,
+            // A stored level Tahajjud does not offer — a hand-edited file — is the default again.
+            tahajjudSound = p[SettingsKeys.TAHAJJUD_SOUND].toEnumOr(PrayerSound.NOTIFICATION)
+                .takeIf { it in NotificationSettings.TahajjudSounds } ?: PrayerSound.NOTIFICATION,
         )
     }
 
@@ -283,6 +287,8 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             }
             e[SettingsKeys.REMIND_BEFORE] = settings.remindBeforeMinutes
             e[SettingsKeys.ADHAN_VOICE] = settings.voice.name
+            e[SettingsKeys.TAHAJJUD_ENABLED] = settings.tahajjud
+            e[SettingsKeys.TAHAJJUD_SOUND] = settings.tahajjudSound.name
         }
     }
 

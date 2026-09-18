@@ -53,6 +53,8 @@ internal object SettingsKeys {
      * prayers, so one key rather than one per prayer. Absent until the user picks a voice,
      * which is what makes the original the default for everyone who never does. */
     val ADHAN_VOICE = stringPreferencesKey("adhan_voice")
+    val TAHAJJUD_ENABLED = booleanPreferencesKey("tahajjud_enabled")
+    val TAHAJJUD_SOUND = stringPreferencesKey("tahajjud_sound")
 
     val QURAN_MODE = stringPreferencesKey("quran_mode")
     val QURAN_SIZE = intPreferencesKey("quran_size")

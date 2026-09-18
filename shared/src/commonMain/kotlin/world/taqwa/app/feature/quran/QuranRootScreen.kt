@@ -790,9 +790,14 @@ private fun SearchHitRow(
         )
         // The ayah in the Mushaf face, right-to-left whatever the UI's direction is, cut at the
         // end of the first line: a result row is a pointer to the ayah, not the ayah itself.
+        // The words an Arabic query found, in the accent and nothing else: colour alone, on
+        // whole words, so the Mushaf face shapes the line exactly as it would unlit (spec §17.4).
+        val arabicLine = remember(hit.arabic, hit.matchedWords, colors.accent) {
+            highlightArabicWords(hit.arabic, hit.matchedWords, SpanStyle(color = colors.accent))
+        }
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             Text(
-                hit.arabic,
+                arabicLine,
                 fontFamily = mushafFamily(),
                 fontSize = 18.sp,
                 color = colors.textPrimary,

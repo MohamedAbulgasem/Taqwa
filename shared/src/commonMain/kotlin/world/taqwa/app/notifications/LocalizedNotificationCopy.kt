@@ -19,6 +19,9 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
     private class Words(
         val prayerBody: String,
         val reminderBody: String,
+        /** The night prayer's own name, and what its notification says: `{prayer}` is Fajr. */
+        val tahajjud: String,
+        val tahajjudBody: String,
         val silent: String,
         val notification: String,
         val takbir: String,
@@ -32,7 +35,8 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
     private fun name(prayer: Prayer) =
         PrayerNaming.display(prayer, format.languageTag(), PrayerNaming.name(prayer, format.languageTag()))
 
-    override fun title(prayer: Prayer, kind: NotificationKind): String = name(prayer)
+    override fun title(prayer: Prayer, kind: NotificationKind): String =
+        if (kind == NotificationKind.TAHAJJUD) words.tahajjud else name(prayer)
 
     override fun body(
         prayer: Prayer,
@@ -46,6 +50,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 .replace("{prayer}", n)
                 .replace("{time}", clockTime)
             NotificationKind.REMINDER -> reminder(n, minutesBefore, clockTime)
+            // Fajr by its one name in this language, not the paired «Fajr · الفجر» a title
+            // wears: inside a sentence that already has a separator the pair reads as a list.
+            NotificationKind.TAHAJJUD -> words.tahajjudBody
+                .replace("{prayer}", PrayerNaming.name(prayer, format.languageTag()))
+                .replace("{time}", clockTime)
         }
     }
 
@@ -63,14 +72,14 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
     // Not read from string resources: a channel is created from the Android scheduler, which can
     // be running inside a boot receiver where no Compose resource lookup exists — the same reason
     // title and body are baked in here.
-    override fun channelName(prayer: Prayer, sound: PrayerSound): String {
+    override fun channelName(prayer: Prayer, sound: PrayerSound, kind: NotificationKind): String {
         val soundName = when (sound) {
             PrayerSound.SILENT -> words.silent
             PrayerSound.NOTIFICATION -> words.notification
             PrayerSound.TAKBIR -> words.takbir
             PrayerSound.ADHAN -> words.adhan
         }
-        return "${name(prayer)} · $soundName"
+        return "${title(prayer, kind)} · $soundName"
     }
 
     private companion object {
@@ -79,36 +88,50 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
             UiLanguage.ENGLISH to Words(
                 prayerBody = "It is time for {prayer} · {time}",
                 reminderBody = "{prayer} in {minutes} minutes · {time}",
+                tahajjud = "Tahajjud",
+                tahajjudBody = "The last third of the night has begun · {prayer} at {time}",
                 silent = "Silent", notification = "Notification", takbir = "Takbir", adhan = "Adhan",
             ),
             UiLanguage.ARABIC to Words(
                 prayerBody = "حان الآن وقت صلاة {prayer} · {time}",
                 reminderBody = "{prayer} بعد {minutes} دقيقة · {time}",
+                tahajjud = "التهجد",
+                tahajjudBody = "بدأ الثلث الأخير من الليل · {prayer} {time}",
                 silent = "صامت", notification = "نغمة التنبيه", takbir = "تكبير", adhan = "أذان",
             ),
             UiLanguage.FRENCH to Words(
                 prayerBody = "C’est l’heure de la prière : {prayer} · {time}",
                 reminderBody = "{prayer} dans {minutes} minutes · {time}",
+                tahajjud = "Tahajjud",
+                tahajjudBody = "Le dernier tiers de la nuit a commencé · {prayer} à {time}",
                 silent = "Silencieux", notification = "Tonalité", takbir = "Takbir", adhan = "Adhan",
             ),
             UiLanguage.TURKISH to Words(
                 prayerBody = "{prayer} vakti girdi · {time}",
                 reminderBody = "{prayer} vaktine {minutes} dakika · {time}",
+                tahajjud = "Teheccüd",
+                tahajjudBody = "Gecenin son üçte biri başladı · {prayer} {time}",
                 silent = "Sessiz", notification = "Bildirim", takbir = "Tekbir", adhan = "Ezan",
             ),
             UiLanguage.INDONESIAN to Words(
                 prayerBody = "Telah masuk waktu {prayer} · {time}",
                 reminderBody = "{prayer} {minutes} menit lagi · {time}",
+                tahajjud = "Tahajud",
+                tahajjudBody = "Sepertiga malam terakhir telah tiba · {prayer} pukul {time}",
                 silent = "Senyap", notification = "Nada notifikasi", takbir = "Takbir", adhan = "Azan",
             ),
             UiLanguage.URDU to Words(
                 prayerBody = "{prayer} کا وقت ہو گیا · {time}",
                 reminderBody = "{prayer} میں {minutes} منٹ باقی · {time}",
+                tahajjud = "تہجد",
+                tahajjudBody = "رات کا آخری تہائی حصہ شروع ہو گیا · {prayer} {time}",
                 silent = "خاموش", notification = "اطلاعی ٹون", takbir = "تکبیر", adhan = "اذان",
             ),
             UiLanguage.BENGALI to Words(
                 prayerBody = "{prayer} নামাজের সময় হয়েছে · {time}",
                 reminderBody = "{minutes} মিনিট পর {prayer} · {time}",
+                tahajjud = "তাহাজ্জুদ",
+                tahajjudBody = "রাতের শেষ তৃতীয়াংশ শুরু হয়েছে · {prayer} {time}",
                 silent = "নীরব", notification = "নোটিফিকেশন সুর", takbir = "তাকবীর", adhan = "আযান",
             ),
         )

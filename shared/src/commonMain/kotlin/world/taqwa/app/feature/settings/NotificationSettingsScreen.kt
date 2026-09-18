@@ -1,7 +1,13 @@
 package world.taqwa.app.feature.settings
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
@@ -46,6 +52,9 @@ import world.taqwa.app.resources.notifications_master_toggle
 import world.taqwa.app.resources.notifications_prayers_label
 import world.taqwa.app.resources.notifications_remind_before
 import world.taqwa.app.resources.notifications_remind_never
+import world.taqwa.app.resources.notifications_tahajjud
+import world.taqwa.app.resources.notifications_tahajjud_sound
+import world.taqwa.app.resources.notifications_tahajjud_subtitle
 import world.taqwa.app.resources.settings_notifications
 import world.taqwa.app.design.components.TaqwaBottomSheet
 
@@ -99,8 +108,12 @@ fun NotificationSettingsScreen(
     /** Called whenever either audio sheet goes away, however it goes: the complete adhan previews
      * for minutes, and it must not carry on under a closed sheet. */
     onStopPreview: () -> Unit = {},
+    /** Tahajjud on or off, and what it sounds like (spec §17.6). Both reschedule. */
+    onToggleTahajjud: (Boolean) -> Unit = {},
+    onPickTahajjudSound: (PrayerSound) -> Unit = {},
 ) {
     var soundSheetFor by remember { mutableStateOf<Prayer?>(null) }
+    var tahajjudSheetOpen by remember { mutableStateOf(false) }
     var remindSheetOpen by remember { mutableStateOf(false) }
     var voiceSheetOpen by remember { mutableStateOf(false) }
 
@@ -175,6 +188,33 @@ fun NotificationSettingsScreen(
                 )
             }
         }
+
+        // A card of its own, below the five and off until asked for (spec §17.6): a voluntary
+        // prayer is offered, not assumed, and it is not one of the prayers the card above is
+        // about. Its sound row exists only while it is on, so the screen a person who never
+        // wants it sees has grown by exactly one quiet row.
+        Spacer(Modifier.height(28.dp))
+        SettingsCard {
+            TaqwaRow(
+                stringResource(Res.string.notifications_tahajjud),
+                subtitle = stringResource(Res.string.notifications_tahajjud_subtitle),
+                trailing = { TaqwaToggle(checked = settings.tahajjud, onCheckedChange = onToggleTahajjud) },
+            )
+            AnimatedVisibility(
+                visible = settings.tahajjud,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                Column {
+                    CardDivider()
+                    TaqwaRow(
+                        stringResource(Res.string.notifications_tahajjud_sound),
+                        value = soundDisplayName(settings.tahajjudSound),
+                        onClick = { tahajjudSheetOpen = true },
+                    )
+                }
+            }
+        }
     }
 
     if (remindSheetOpen) {
@@ -209,6 +249,19 @@ fun NotificationSettingsScreen(
                 current = settings.voice,
                 onPick = { voice -> onPickVoice(voice); voiceSheetOpen = false },
                 onPreview = onPreviewVoice,
+            )
+        }
+    }
+
+    if (tahajjudSheetOpen) {
+        DisposableEffect(Unit) { onDispose { onStopPreview() } }
+        TaqwaBottomSheet(onDismissRequest = { tahajjudSheetOpen = false }) {
+            SoundSheet(
+                current = settings.tahajjudSound,
+                voice = settings.voice,
+                onPick = { sound -> onPickTahajjudSound(sound); tahajjudSheetOpen = false },
+                onPreview = onPreviewSound,
+                options = NotificationSettings.TahajjudSounds,
             )
         }
     }

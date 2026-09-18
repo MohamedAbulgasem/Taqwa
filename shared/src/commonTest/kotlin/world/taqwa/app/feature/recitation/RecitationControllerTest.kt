@@ -118,6 +118,8 @@ class RecitationControllerTest {
         }
         override fun toggle() { toggles++ }
         override fun seekToAyah(n: Int) = Unit
+        val surahSeeks = mutableListOf<Long>()
+        override fun seekToSurahTime(positionMs: Long) { surahSeeks += positionMs }
         override fun next() = Unit
         override fun previous() = Unit
         override fun stop() {
@@ -269,6 +271,31 @@ class RecitationControllerTest {
         assertEquals(listOf(Triple("ar.alafasy", 112, 3)), harness.player.loads)
         assertEquals(1, harness.player.plays)
         assertNull(controller.state.value.sheet)
+    }
+
+    @Test
+    fun `a tap on the line seeks to that share of the surah's clock`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        val controller = controller(harness, backgroundScope)
+        harness.player.emit(PlaybackState(reciterId = "ar.alafasy", surah = 2, ayah = 1, surahDurationMs = 7_200_000L))
+
+        controller.seekToFraction(0.25f)
+        controller.seekToFraction(1.4f)
+        controller.seekToFraction(-0.2f)
+
+        assertEquals(listOf(1_800_000L, 7_200_000L, 0L), harness.player.surahSeeks)
+    }
+
+    @Test
+    fun `a tap before the surah has a clock seeks nowhere`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        val controller = controller(harness, backgroundScope)
+        harness.player.emit(PlaybackState(reciterId = "ar.alafasy", surah = 2, ayah = 1))
+
+        controller.seekToFraction(0.5f)
+        controller.seekToFraction(Float.NaN)
+
+        assertTrue(harness.player.surahSeeks.isEmpty())
     }
 
     @Test

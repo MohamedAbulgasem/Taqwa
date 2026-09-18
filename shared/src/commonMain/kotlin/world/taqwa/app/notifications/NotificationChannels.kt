@@ -44,7 +44,8 @@ object NotificationChannels {
         prayer: Prayer,
         sound: PrayerSound,
         voice: AdhanVoice = AdhanVoice.ORIGINAL,
-    ): String = base(prayer, sound) +
+        kind: NotificationKind = NotificationKind.PRAYER,
+    ): String = base(prayer, sound, kind) +
         when {
             sound == PrayerSound.NOTIFICATION -> CHIME_SUFFIX
             sound in VOICED_SOUNDS && voice != AdhanVoice.ORIGINAL -> "_${voice.name.lowercase()}"
@@ -64,6 +65,23 @@ object NotificationChannels {
             .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(prayer, sound, voice) } }
             .distinct() + staleNotificationIds(prayer)
 
-    private fun base(prayer: Prayer, sound: PrayerSound): String =
-        "prayer_${prayer.name.lowercase()}_${sound.name.lowercase()}"
+    /**
+     * Every channel Tahajjud could ever have had. It has channels of its own rather than Fajr's
+     * (spec §17.6): the system's channel list is where a person silences one kind of
+     * notification and keeps another, and a night prayer filed under "Fajr · Notification"
+     * could not be told from the reminder that shares that channel.
+     */
+    fun allTahajjudChannelIds(): List<String> =
+        PrayerSound.entries
+            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.TAHAJJUD) } }
+            .distinct()
+
+    // A reminder rides its prayer's own Notification channel, as it always has; only Tahajjud
+    // leaves the prayer's namespace.
+    private fun base(prayer: Prayer, sound: PrayerSound, kind: NotificationKind = NotificationKind.PRAYER): String =
+        if (kind == NotificationKind.TAHAJJUD) {
+            "tahajjud_${sound.name.lowercase()}"
+        } else {
+            "prayer_${prayer.name.lowercase()}_${sound.name.lowercase()}"
+        }
 }

@@ -189,6 +189,14 @@ actual class RecitationPlayer actual constructor(
         bound.seekTo(target, 0L)
     }
 
+    // The controller's seek arrives at the session's player, which is `AyahPlayer`: the snap to
+    // the ayah's start happens there, in the one place the lock screen's scrub already uses.
+    actual fun seekToSurahTime(positionMs: Long) {
+        val bound = live ?: return
+        if (_state.value.surahDurationMs <= 0L) return
+        bound.seekTo(positionMs.coerceIn(0L, _state.value.surahDurationMs))
+    }
+
     actual fun next() {
         val bound = live ?: return
         val target = queue?.next(bound.currentMediaItemIndex) ?: return

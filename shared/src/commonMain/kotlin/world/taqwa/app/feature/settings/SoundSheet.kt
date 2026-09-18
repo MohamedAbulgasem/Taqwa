@@ -7,6 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import world.taqwa.app.audio.notificationSoundsMuted
+import world.taqwa.app.resources.sound_sheet_muted_hint
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
@@ -23,6 +31,9 @@ import world.taqwa.app.resources.sound_sheet_footnote
 import world.taqwa.app.resources.sound_sheet_title
 import world.taqwa.app.resources.sound_silent_detail
 import world.taqwa.app.resources.sound_takbir_detail
+
+/** How often the open sheet asks whether the phone is silenced. */
+private const val MUTED_POLL_MS = 1_500L
 
 /** The platform cap on a notification sound, which the footnote quotes. */
 private const val SOUND_CAP_SECONDS = 30
@@ -59,8 +70,19 @@ fun SoundSheet(
     voice: AdhanVoice,
     onPick: (PrayerSound) -> Unit,
     onPreview: (PrayerSound) -> Unit,
+    /** The levels on offer: all four for a prayer; Tahajjud leaves the adhan out (spec §17.6). */
+    options: List<PrayerSound> = PrayerSound.entries,
 ) {
     val colors = LocalTaqwaColors.current
+    // Asked while the sheet is open rather than once: the reader who hears nothing reaches for
+    // the volume keys, and the hint should go the moment the phone can be heard again.
+    var muted by remember { mutableStateOf(notificationSoundsMuted()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            muted = notificationSoundsMuted()
+            delay(MUTED_POLL_MS)
+        }
+    }
     Column(Modifier.padding(horizontal = 24.dp)) {
         Text(
             stringResource(Res.string.sound_sheet_title),
@@ -68,7 +90,7 @@ fun SoundSheet(
             color = colors.textPrimary,
         )
         TaqwaCard(Modifier.padding(top = 16.dp)) {
-            PrayerSound.entries.forEachIndexed { i, sound ->
+            options.forEachIndexed { i, sound ->
                 if (i > 0) CardDivider()
                 AudioOptionRow(
                     label = soundDisplayName(sound),
@@ -78,6 +100,14 @@ fun SoundSheet(
                     onPreview = if (sound == PrayerSound.SILENT) null else ({ onPreview(sound) }),
                 )
             }
+        }
+        if (muted) {
+            Text(
+                stringResource(Res.string.sound_sheet_muted_hint),
+                style = TaqwaText.caption,
+                color = colors.accent,
+                modifier = Modifier.padding(top = 16.dp),
+            )
         }
         Text(
             stringResource(

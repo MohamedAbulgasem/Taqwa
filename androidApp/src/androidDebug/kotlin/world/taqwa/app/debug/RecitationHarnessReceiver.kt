@@ -8,6 +8,8 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.util.Log
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,6 +18,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import world.taqwa.app.di.appContainer
+import world.taqwa.app.notifications.NotificationKind
+import world.taqwa.app.notifications.RescheduleTrigger
+import world.taqwa.app.notifications.createNotificationScheduler
+import world.taqwa.app.notifications.setTahajjud
 import world.taqwa.app.recitation.NowPlayingText
 import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.recitation.Reciters
@@ -74,6 +80,7 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                     // The store-screenshot run (no finger on the glass): a screen by name, the
                     // theme, the reading mode and the translation, same words as the iOS harness.
                     "screen" -> world.taqwa.app.nav.LaunchRequests.openScreen(intent.getStringExtra("name") ?: "prayer")
+                    "search" -> world.taqwa.app.nav.LaunchRequests.search(intent.getStringExtra("q") ?: "")
                     "theme" -> appContainer.settingsRepository.setThemeMode(
                         when (intent.getStringExtra("name")) {
                             "dark" -> world.taqwa.app.design.ThemeMode.DARK
@@ -107,6 +114,12 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                         val landed = refresher.refreshFor(world.taqwa.app.notifications.RescheduleTrigger.ALARM_FIRED)
                         Log.i(TAG, "location after ALARM_FIRED refresh: ${landed?.cityName} ${landed?.latitude},${landed?.longitude}")
                     }
+                    // `--es name on|off` switches it; with no name, one fires in a few seconds.
+                    "tahajjud" -> when (intent.getStringExtra("name")) {
+                        "on" -> appContainer.setTahajjud(true)
+                        "off" -> appContainer.setTahajjud(false)
+                        else -> fireTahajjud()
+                    }
                     else -> Log.w(TAG, "unknown command \"$command\"")
                 }
             } catch (e: Throwable) {
@@ -115,6 +128,24 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                 pending.finish()
             }
         }
+    }
+
+    /**
+     * Tahajjud a few seconds from now instead of at two in the morning, through the real
+     * scheduler, alarm and receiver: the entry is the plan's own first Tahajjud with its instant
+     * moved. The receiver reschedules the true plan once it has fired, so nothing of this
+     * outlives the test.
+     */
+    private suspend fun fireTahajjud() {
+        val plan = appContainer.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+        val entry = plan.firstOrNull { it.kind == NotificationKind.TAHAJJUD }
+        if (entry == null) {
+            Log.w(TAG, "tahajjud: nothing planned — is it switched on, with a location set?")
+            return
+        }
+        val soon = entry.copy(id = "TAHAJJUD-debug", instant = Clock.System.now() + 8.seconds)
+        createNotificationScheduler().scheduleAll(plan + soon)
+        Log.i(TAG, "tahajjud: real one at ${entry.instant}, test one in 8 s: ${soon.title} | ${soon.body} | ${soon.sound}")
     }
 
     /** One collector for the life of the process, logging every state the player publishes. */

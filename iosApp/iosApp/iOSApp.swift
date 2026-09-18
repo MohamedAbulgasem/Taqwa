@@ -326,6 +326,26 @@ enum RecitationHarness {
 		// `.../mode?name=mushaf` open a screen, set the theme or the reading mode by name.
 		case "screen":
 			LaunchRequests.shared.openScreen(name: value("name") ?? "prayer")
+		// `taqwa://recite/search?q=%D8%A7%D9%84%D8%B5%D9%84%D8%A7%D8%A9` types a Quran search
+		// (open the quran screen first): the results are something a simulator run has to see.
+		case "search":
+			LaunchRequests.shared.search(query: value("q") ?? "")
+		// What iOS is actually holding: every pending notification whose id starts with
+		// `prefix` (default: all), soonest first. `taqwa://recite/pending?prefix=TAHAJJUD`.
+		case "pending":
+			let prefix = value("prefix") ?? ""
+			UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+				let mine = requests.filter { $0.identifier.hasPrefix(prefix) }
+					.sorted { (($0.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate() ?? .distantFuture) < (($1.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate() ?? .distantFuture) }
+				NSLog("TaqwaHarness pending total=\(requests.count) matching=\(mine.count)")
+				for request in mine.prefix(6) {
+					let at = (request.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate()
+					NSLog("TaqwaHarness pending \(request.identifier) at=\(String(describing: at)) title=\(request.content.title) body=\(request.content.body) sound=\(String(describing: request.content.sound))")
+				}
+			}
+		// `taqwa://recite/tahajjud?name=on` (or off): the settings toggle, for the screenshot run.
+		case "tahajjud":
+			AppContainerKt.appContainer.setTahajjud(on: value("name") == "on") { _ in }
 		case "theme":
 			let mode: ThemeMode = value("name") == "dark" ? .dark : (value("name") == "light" ? .light : .system)
 			AppContainerKt.appContainer.settingsRepository.setThemeMode(mode: mode) { _ in }

@@ -7,8 +7,10 @@ import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
+import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.prayer.NightThirds
 import world.taqwa.app.prayer.PrayerTimesEngine
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
@@ -20,10 +22,12 @@ object NotificationPlanner {
 
     /**
      * How many whole days of prayers fit in [capacity]. Five obligatory prayers a day, doubled
-     * when a reminder precedes each one — so 64 slots is twelve days, or six with reminders on.
+     * when a reminder precedes each one — so 64 slots is twelve days, or six with reminders on —
+     * and one more a day when Tahajjud is on.
      */
     fun windowDaysFor(capacity: Int, notifications: NotificationSettings): Int {
-        val perDay = ObligatoryPrayers.size * if (notifications.remindBeforeMinutes > 0) 2 else 1
+        val perDay = ObligatoryPrayers.size * (if (notifications.remindBeforeMinutes > 0) 2 else 1) +
+            if (notifications.tahajjud) 1 else 0
         return (capacity / perDay).coerceAtLeast(1)
     }
 
@@ -49,11 +53,43 @@ object NotificationPlanner {
         // the previous evening's Isha rather than against nothing.
         var previousPrayerInstant: Instant? = null
 
+        // The night a Tahajjud belongs to began the evening before, so the first day of the
+        // window needs the Maghrib of the day before it. Only computed when it will be used.
+        var previousMaghrib: Instant? = if (notifications.tahajjud) {
+            engine.timesFor(location, firstDate.plus(-1, DateTimeUnit.DAY), settings).time(Prayer.MAGHRIB)
+        } else {
+            null
+        }
+
         for (offset in 0 until windowDays) {
             val date = firstDate.plus(offset, DateTimeUnit.DAY)
             // Recomputing per local date is what makes DST correct: the engine returns instants,
             // and a day that is 23 or 25 hours long still has exactly five prayers.
             val times = engine.timesFor(location, date, settings)
+
+            val evening = previousMaghrib
+            if (notifications.tahajjud && evening != null) {
+                val fajr = times.time(Prayer.FAJR)
+                val at = NightThirds.lastThirdStart(evening, fajr)
+                // Strictly inside the night: where the times have crossed there is no last
+                // third to announce, and Fajr's own notification is about to say the rest.
+                if (at > from && at > evening && at < fajr) {
+                    out += ScheduledNotification(
+                        id = "TAHAJJUD-$date",
+                        prayer = Prayer.FAJR,
+                        kind = NotificationKind.TAHAJJUD,
+                        instant = at,
+                        timeZoneId = location.timeZoneId,
+                        sound = notifications.tahajjudSound,
+                        voice = notifications.voice,
+                        title = copy.title(Prayer.FAJR, NotificationKind.TAHAJJUD),
+                        body = copy.body(
+                            Prayer.FAJR, NotificationKind.TAHAJJUD, formatClockTime(fajr, location.timeZoneId), 0,
+                        ),
+                    )
+                }
+            }
+            previousMaghrib = if (notifications.tahajjud) times.time(Prayer.MAGHRIB) else null
 
             ObligatoryPrayers.forEach { prayer ->
                 val at = times.time(prayer)

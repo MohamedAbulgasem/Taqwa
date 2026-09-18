@@ -1345,3 +1345,26 @@ under French and Urdu. The first "Tripoli" was Lebanon's (1,498 km to Makkah); L
 The 16 Pro Max simulator needed a tap permission nobody was at the keyboard to grant, so the 17 Pro
 did the iOS set and the framer upsizes into the 6.9-inch slot. The simulator has no compass, so the
 App Store set carries seven screenshots; its notifications had to be allowed once by hand.
+
+## The closed test's first feedback (18 September) — 1.0.0 (29)
+
+Five testers, six items, one night. The version name stays 1.0.0: build 28 only ever went to the
+closed track and iOS has not shipped, so the first production release on both stores is still
+1.0.0 and only the code moves until then (`build-29` tags the tester build; `v1.0.0` moves to
+whichever build goes to production).
+
+The sound-preview report was a phone on silent, so the sheet now says so, but only while it is
+true. The widgets' 250 dp resize cap is gone. Arabic hits carry the reader's translation (not
+under an Arabic UI) and light the matched words — whole words, colour only, after a fold-only
+matcher turned out to miss a quarter of them and a word aligner between Tanzil's two spellings
+replaced it. That measurement exposed a 1.0.0 bug: Arabic queries containing «أ إ آ ى» found
+nothing, because the row was matched unfolded against a folded query. The bar's line takes a tap
+and lands on the ayah's start, like the lock screen's scrub. Tahajjud is an optional
+notification at the last third of the night, off by default, with channels of its own. Spec §17.
+
+The store screenshots are checked in now (`docs/store/screenshots`, 105 files, 37 MB, lossless):
+`assemble.sh` writes there, both capture scripts take `ONLY="2-notifications"` to re-shoot one
+screen, and `git status docs/store/screenshots` is the upload list. The harnesses gained
+`search`, `tahajjud` (on, off, or fire one in eight seconds) and, on iOS, `pending`. The site
+and README mention Tahajjud in one clause, and Support has a new entry for the silent phone.
+Release notes for Play are in `docs/store/release-notes/1.0.0-29.txt`.

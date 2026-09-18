@@ -114,6 +114,14 @@ expect class RecitationPlayer(library: RecitationLibrary) {
     /** Jumps to the start of ayah [n]; ignored if this surah has no such ayah. */
     fun seekToAyah(n: Int)
 
+    /**
+     * Moves to [positionMs] on the surah's clock ([PlaybackState.surahPositionMs]) — a tap on
+     * the bar's line (spec §17.5). Like the lock screen's scrub it lands on the start of the
+     * ayah that holds that moment, never inside one ([SurahTimeline.snapToAyah]). Ignored until
+     * the player has a timeline.
+     */
+    fun seekToSurahTime(positionMs: Long)
+
     /** The next ayah. At the last ayah, nothing. */
     fun next()
 

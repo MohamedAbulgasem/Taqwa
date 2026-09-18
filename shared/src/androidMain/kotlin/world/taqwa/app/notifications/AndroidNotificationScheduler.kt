@@ -35,6 +35,7 @@ const val EXTRA_REQUEST_CODE = "request_code"
 const val EXTRA_PRAYER = "prayer"
 const val EXTRA_SOUND = "sound"
 const val EXTRA_VOICE = "voice"
+const val EXTRA_KIND = "kind"
 const val EXTRA_TITLE = "title"
 const val EXTRA_BODY = "body"
 
@@ -139,6 +140,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
                 putExtra(EXTRA_PRAYER, entry.prayer.name)
                 putExtra(EXTRA_SOUND, entry.sound.name)
                 putExtra(EXTRA_VOICE, entry.voice.name)
+                putExtra(EXTRA_KIND, entry.kind.name)
                 putExtra(EXTRA_TITLE, entry.title)
                 putExtra(EXTRA_BODY, entry.body)
             }
@@ -162,15 +164,15 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      */
     private fun ensureChannels(plan: List<ScheduledNotification>) {
         val copy = LocalizedNotificationCopy(createPlatformFormat())
-        val live = plan.map { Triple(it.prayer, it.sound, it.voice) }.toSet()
-        live.forEach { (prayer, sound, voice) ->
-            val id = NotificationChannels.channelId(prayer, sound, voice)
+        val live = plan.map { ChannelKey(it.prayer, it.sound, it.voice, channelKind(it.kind)) }.toSet()
+        live.forEach { (prayer, sound, voice, kind) ->
+            val id = NotificationChannels.channelId(prayer, sound, voice, kind)
             val existing = notificationManager.getNotificationChannel(id)
             // The channel name says which sound it carries, not which voice: a user switching
             // voices is not meant to accumulate a list of channels they have to read carefully,
             // and the old voice's channel is deleted by the sweep below the moment it goes idle.
             val channel =
-                NotificationChannel(id, copy.channelName(prayer, sound), NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(id, copy.channelName(prayer, sound, kind), NotificationManager.IMPORTANCE_HIGH)
             if (existing == null) configureSound(channel, sound, voice)
             notificationManager.createNotificationChannel(channel)
         }
@@ -183,16 +185,30 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      * channels are the record of a sound the user may switch back to, and `scheduleAll` is called
      * often enough that deleting on absence would churn.
      */
-    private fun deleteStaleChannels(live: Set<Triple<Prayer, PrayerSound, AdhanVoice>>) {
-        val liveIds = live.map { (prayer, sound, voice) ->
-            NotificationChannels.channelId(prayer, sound, voice)
+    private fun deleteStaleChannels(live: Set<ChannelKey>) {
+        val liveIds = live.map { (prayer, sound, voice, kind) ->
+            NotificationChannels.channelId(prayer, sound, voice, kind)
         }.toSet()
-        live.map { it.first }.toSet().forEach { prayer ->
-            NotificationChannels.allChannelIdsFor(prayer)
-                .filterNot { it in liveIds }
-                .forEach { runCatching { notificationManager.deleteNotificationChannel(it) } }
-        }
+        // Tahajjud's channels are swept on every plan, in it or not: a prayer missing from a plan
+        // is a rarity to leave alone, but Tahajjud missing means it is switched off, and someone
+        // who never asked for it, or has stopped, should not find its channel in system settings.
+        val candidates = live.filter { it.kind != NotificationKind.TAHAJJUD }
+            .flatMap { NotificationChannels.allChannelIdsFor(it.prayer) }
+            .toSet() + NotificationChannels.allTahajjudChannelIds()
+        candidates.filterNot { it in liveIds }
+            .forEach { runCatching { notificationManager.deleteNotificationChannel(it) } }
     }
+
+    /** A channel's identity. A reminder shares its prayer's channels, so it folds into PRAYER. */
+    private data class ChannelKey(
+        val prayer: Prayer,
+        val sound: PrayerSound,
+        val voice: AdhanVoice,
+        val kind: NotificationKind,
+    )
+
+    private fun channelKind(kind: NotificationKind): NotificationKind =
+        if (kind == NotificationKind.TAHAJJUD) NotificationKind.TAHAJJUD else NotificationKind.PRAYER
 
     private fun configureSound(channel: NotificationChannel, sound: PrayerSound, voice: AdhanVoice) {
         val attrs = AudioAttributes.Builder()

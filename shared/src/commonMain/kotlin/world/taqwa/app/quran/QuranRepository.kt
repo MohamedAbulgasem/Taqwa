@@ -80,16 +80,36 @@ class QuranRepository(
     // pre-normalised ayah.text_search column is scanned in Kotlin instead -- 6,236 short rows,
     // a few milliseconds, the same shape as searchTranslation. Matching is plain `contains`,
     // which is deliberately broader than FTS prefix terms: «رحمن» also finds «الرحمن».
+    //
+    // The column is Tanzil's plain text as published — «إياك», «موسى», «أنزل» keep their hamza and
+    // their alef maksura — while the query arrives folded («اياك», «موسي»). Until 1.1.0 the row
+    // was matched unfolded, so any query with one of those letters in it found nothing at all
+    // (spec §17.4). The row is folded by the same rule as the query, once per process: the fold
+    // is the expensive half of the scan and the text never changes.
     override suspend fun searchArabic(query: String, limit: Int): List<SearchHit> = withContext(io) {
         val tokens = SearchQuery.arabicTokens(query)
         if (tokens.isEmpty()) return@withContext emptyList()
+        val folded = foldedSearchText()
         q.ayahSearchRows().executeAsList()
             .asSequence()
-            .filter { row -> tokens.all { row.text_search.contains(it) } }
+            .filterIndexed { index, _ -> tokens.all { folded[index].contains(it) } }
             .take(limit)
-            .map { SearchHit(it.surah.toInt(), it.number.toInt(), it.text_uthmani, translation = null) }
+            .map {
+                SearchHit(
+                    it.surah.toInt(), it.number.toInt(), it.text_uthmani, translation = null,
+                    matchedWords = ArabicWordAlignment.matchedWords(it.text_uthmani, it.text_search, tokens),
+                )
+            }
             .toList()
     }
+
+    /** `ayah.text_search`, folded, in the order [QuranQueries.ayahSearchRows] returns it. Built on
+     * the first Arabic search; two searches racing to build it build the same list. */
+    private var foldedSearch: List<String>? = null
+
+    private fun foldedSearchText(): List<String> = foldedSearch
+        ?: q.ayahSearchRows().executeAsList().map { QuranText.normaliseForSearch(it.text_search) }
+            .also { foldedSearch = it }
 
     // The whole translation is read once per search (6,236 short rows, a few milliseconds) and
     // the ayah rows for the hits are fetched by surah, so a phrase found in many surahs costs one

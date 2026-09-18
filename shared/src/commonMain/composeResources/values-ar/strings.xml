@@ -59,7 +59,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">1.0.0</string>
+    <string name="settings_version_value">⁦1.0.0 (29)⁩</string>
 
     <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
     <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
@@ -115,6 +115,9 @@
     <string name="notifications_master_toggle">إشعارات الصلاة</string>
     <string name="notifications_remind_before">التذكير قبل</string>
     <string name="notifications_prayers_label">الصلوات</string>
+    <string name="notifications_tahajjud">التهجد</string>
+    <string name="notifications_tahajjud_subtitle">عند بداية الثلث الأخير من الليل</string>
+    <string name="notifications_tahajjud_sound">الصوت</string>
     <string name="notifications_remind_never">بدون تذكير</string>
     <plurals name="minutes_count">
         <item quantity="zero">%1$s دقيقة</item>
@@ -136,6 +139,7 @@
     <string name="sound_takbir_detail">الله أكبر، الله أكبر، نحو %1$s ثانية</string>
     <string name="sound_adhan_detail">الأذان، أول %1$s ثانية</string>
     <string name="sound_sheet_footnote">يُشغِّل إشعار الصلاة أول %1$s ثانية من الصوت. ويمكن تشغيل الأذان كاملًا داخل التطبيق.</string>
+    <string name="sound_sheet_muted_hint">هاتفك على الوضع الصامت أو «عدم الإزعاج»، لذا لن يصدر صوت للمعاينة ولا لإشعارات الصلاة.</string>
 
     <!-- Adhan voice -->
     <string name="adhan_voice_row">الأذان</string>

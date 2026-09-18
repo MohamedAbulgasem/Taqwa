@@ -64,7 +64,7 @@
     <string name="settings_not_set">Belirlenmedi</string>
     <string name="settings_notifications_off">Kapalı</string>
     <string name="settings_notifications_on_count">%1$s açık</string>
-    <string name="settings_version_value">1.0.0</string>
+    <string name="settings_version_value">⁦1.0.0 (29)⁩</string>
 
     <!-- “Taqwa hakkında” ekranı. Ürün adı, simgede olduğu gibi Latin harfleriyle kalır. -->
     <string name="about_tagline">Ücretsiz, herkes için, kalıcı olarak.</string>
@@ -120,6 +120,9 @@
     <string name="notifications_master_toggle">Namaz bildirimleri</string>
     <string name="notifications_remind_before">Önceden hatırlat</string>
     <string name="notifications_prayers_label">VAKİTLER</string>
+    <string name="notifications_tahajjud">Teheccüd</string>
+    <string name="notifications_tahajjud_subtitle">Gecenin son üçte biri başladığında</string>
+    <string name="notifications_tahajjud_sound">Ses</string>
     <string name="notifications_remind_never">Hatırlatma yok</string>
     <!--
         Dakika sayısı. Türkçede sayıdan sonra çoğul eki gelmez, bu yüzden iki biçim de aynıdır;
@@ -142,6 +145,7 @@
     <string name="sound_takbir_detail">Allahu ekber, Allahu ekber, yaklaşık %1$s sn</string>
     <string name="sound_adhan_detail">Ezanın ilk %1$s saniyesi</string>
     <string name="sound_sheet_footnote">Namaz bildirimi, sesinin ilk %1$s saniyesini çalar. Ezanın tamamı uygulama içinde dinlenebilir.</string>
+    <string name="sound_sheet_muted_hint">Telefonunuz sessizde veya “Rahatsız etmeyin” modunda; bu yüzden önizlemeler ve namaz bildirimleri ses çıkarmaz.</string>
 
     <!-- Ezan sesi -->
     <string name="adhan_voice_row">Ezan</string>

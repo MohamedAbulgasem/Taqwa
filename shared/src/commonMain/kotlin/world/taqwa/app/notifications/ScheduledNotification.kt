@@ -5,7 +5,12 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import kotlin.time.Instant
 
-enum class NotificationKind { PRAYER, REMINDER }
+/**
+ * [TAHAJJUD] is the one entry that is not about its [ScheduledNotification.prayer]'s own time:
+ * it carries [world.taqwa.app.domain.Prayer.FAJR], the prayer its night ends at and the clock
+ * time its body quotes, and is told apart everywhere by this kind (spec §17.6).
+ */
+enum class NotificationKind { PRAYER, REMINDER, TAHAJJUD }
 
 /**
  * One notification, fully decided. Title and body are baked in at schedule time so that no

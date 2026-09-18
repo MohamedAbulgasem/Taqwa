@@ -396,6 +396,33 @@ class NotificationSettingsStorageTest {
     }
 
     @Test
+    fun tahajjudIsOffUntilSomeoneTurnsItOn() = runTest {
+        val s = repo("tahajjud-default").notificationSettings.first()
+        assertEquals(false, s.tahajjud)
+        assertEquals(PrayerSound.NOTIFICATION, s.tahajjudSound)
+    }
+
+    @Test
+    fun tahajjudAndItsSoundRoundTrip() = runTest {
+        val r = repo("tahajjud-roundtrip")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(tahajjud = true, tahajjudSound = PrayerSound.TAKBIR),
+        )
+        val s = r.notificationSettings.first()
+        assertEquals(true, s.tahajjud)
+        assertEquals(PrayerSound.TAKBIR, s.tahajjudSound)
+    }
+
+    @Test
+    fun aStoredTahajjudSoundItDoesNotOfferFallsBackToTheChime() = runTest {
+        val r = repo("tahajjud-adhan")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(tahajjud = true, tahajjudSound = PrayerSound.ADHAN),
+        )
+        assertEquals(PrayerSound.NOTIFICATION, r.notificationSettings.first().tahajjudSound)
+    }
+
+    @Test
     fun theAdhanVoiceRoundTrips() = runTest {
         val r = repo("voice-roundtrip")
         r.setNotificationSettings(r.notificationSettings.first().copy(voice = AdhanVoice.AZEEZ))

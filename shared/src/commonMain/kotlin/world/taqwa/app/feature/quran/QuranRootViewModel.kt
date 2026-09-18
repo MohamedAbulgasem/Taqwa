@@ -14,6 +14,7 @@ import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings
+import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.quran.SearchHit
 import world.taqwa.app.quran.SearchQuery
 import world.taqwa.app.quran.Surah
@@ -310,6 +311,7 @@ class QuranRootViewModel(
                 SearchQuery.isArabic(text) -> source.searchArabic(text, SEARCH_LIMIT + 1)
                 else -> source.searchTranslation(translationId, text, SEARCH_LIMIT + 1)
             }
+                .let { withTranslations(it) }
             // A search that lost the race — the query moved on while the database was answering —
             // must never overwrite the newer query's state.
             _state.update { current ->
@@ -322,6 +324,21 @@ class QuranRootViewModel(
                     ),
                 )
             }
+        }
+    }
+
+    /**
+     * An Arabic hit carries no translation of its own — the Arabic search reads the ayah table
+     * alone — so the row said what was found and not what it means. The reader's translation is
+     * filled in here, one read per surah touched (spec §17.3). Not under an Arabic interface:
+     * the reader of the Arabic line needs no second line to tell them what it says.
+     */
+    private suspend fun withTranslations(hits: List<SearchHit>): List<SearchHit> {
+        if (UiLanguage.of(languageTag) == UiLanguage.ARABIC || hits.none { it.translation == null }) return hits
+        val bySurah = hits.filter { it.translation == null }.map { it.surah }.distinct()
+            .associateWith { source.translationTexts(translationId, it) }
+        return hits.map { hit ->
+            if (hit.translation != null) hit else hit.copy(translation = bySurah[hit.surah]?.get(hit.ayah))
         }
     }
 
