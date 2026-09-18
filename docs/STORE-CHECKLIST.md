@@ -54,7 +54,8 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   `git status docs/store/screenshots` (or the commit's file list) is what to upload to each
   store by hand. Play's release notes per build live in `docs/store/release-notes/`.
 - **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
-  `scripts/bump-version.sh`. Settings › About shows both, e.g. "1.0.0 (29)".
+  `scripts/bump-version.sh`. Settings › About shows the name alone; Mohamed tells testers which
+  build they are on.
 
 ## 2. Accounts (Mohamed, about an hour at the keyboard, then waiting)
 

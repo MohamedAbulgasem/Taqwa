@@ -64,7 +64,7 @@
     <string name="settings_not_set">Belirlenmedi</string>
     <string name="settings_notifications_off">Kapalı</string>
     <string name="settings_notifications_on_count">%1$s açık</string>
-    <string name="settings_version_value">⁦1.0.0 (30)⁩</string>
+    <string name="settings_version_value">1.0.0</string>
 
     <!-- “Taqwa hakkında” ekranı. Ürün adı, simgede olduğu gibi Latin harfleriyle kalır. -->
     <string name="about_tagline">Ücretsiz, herkes için, kalıcı olarak.</string>
