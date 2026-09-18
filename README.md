@@ -43,10 +43,10 @@ Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatf
 
 - **Prayer times** for anywhere on Earth, from your location or a bundled offline database of cities, with the usual calculation methods (Muslim World League, Umm al-Qura, Egyptian, Karachi, ISNA, and more), Hanafi or Standard Asr, high-latitude rules, and per-prayer manual adjustments.
 - **A live countdown** to the next prayer, on the Prayer screen and in home-screen widgets on both platforms. The widgets keep counting across prayers without the app being opened.
-- **Adhan at the exact time.** A notification for each prayer, with a choice per prayer between silence, a clear tone, a takbir, or the opening of the adhan in a choice of three voices. Optional reminder a few minutes before.
+- **Adhan at the exact time.** A notification for each prayer, with a choice per prayer between silence, a clear tone, a takbir, or the opening of the adhan in a choice of three voices. Optional reminder a few minutes before, and an optional notification for Tahajjud when the last third of the night begins.
 - **Qibla compass** corrected to true north, with the great-circle distance to Makkah and honest calibration guidance when the phone's compass needs it, instead of a needle that pretends.
 - **Hijri date** from the tabular (arithmetic) Islamic calendar, which can differ by a day from Umm al-Qura and from local moonsighting, with a one-day adjustment to match your community; shown beside the Gregorian date.
-- **The Quran** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation, bookmarks, a continue-reading card, and copy or share of any ayah. All of it offline.
+- **The Quran** with the Uthmani text in the Madinah Mushaf typeface, seven translations and a transliteration, a page-accurate Mushaf mode, search in Arabic or in the chosen translation with the matched words lit in the verse, bookmarks, a continue-reading card, and copy or share of any ayah. All of it offline.
 - **Recitation** by ten reciters, downloaded a surah at a time (or the whole Quran for a reciter) and then played offline with the ayah lit and the page following the voice, in the background with lock-screen controls and a surah clock. A speaker button in the reader, a Play action on any ayah, previous and next by surah, and a picker with a fifteen-second preview of each voice.
 - **Tasbeeh.** A dhikr counter behind the misbaha icon on the Prayer screen: tap anywhere to count, the post-prayer set runs to a hundred with the dhikr changing at each part and a distinct pulse in the hand, a completed set rolls over on its own, your own phrases can be added, and nothing is ever totted up.
 - **An ayah widget** showing one verse a day, in the same Uthmani typeface and translation as the reader, from a curated pool of a hundred that cycles without repeats. Tapping it opens that ayah in the app.
@@ -77,7 +77,7 @@ Three widgets, on Android and iOS: a **small** one with the next prayer and a li
 <p align="center">
   <img src="docs/screenshots/settings.png" width="200" alt="Settings: location, prayer times method, notifications, recitation, appearance, language, about, attribution">
   &nbsp;
-  <img src="docs/screenshots/notifications.png" width="200" alt="Notification settings: the master switch, remind-before, the adhan voice, and a sound per prayer">
+  <img src="docs/screenshots/notifications.png" width="200" alt="Notification settings: the master switch, remind-before, the adhan voice, a sound per prayer, and the optional Tahajjud notification">
   &nbsp;
   <img src="docs/screenshots/about.png" width="200" alt="About Taqwa: version, the privacy model in three lines, and links to the website, the policy, the source and the licence">
   &nbsp;

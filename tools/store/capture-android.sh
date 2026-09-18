@@ -4,6 +4,10 @@
 # the same flow. The phone must have Alafasy surah 2 on it and the city set beforehand.
 #
 #   tools/store/capture-android.sh <serial> en ar fr tr id ur bn
+#   ONLY="2-notifications" tools/store/capture-android.sh <serial> en ar …   re-shoots just those
+#
+# A feature that changes one screen re-shoots that screen, runs tools/store/assemble.sh and
+# commits docs/store/screenshots; the listing on each store is then updated by hand.
 #
 # Output: build/store-shots/android/<lang>/<n>-<name>.png. Restores Mohamed's S23 state at the end
 # (dark theme, English translation, Mushaf mode, no per-app locale); edit that line for another phone.
@@ -12,21 +16,22 @@ D=$1; shift; PKG=world.taqwa.app; OUT=$(cd "$(dirname "$0")/../.." && pwd)/build
 h() { adb -s $D shell am broadcast -a world.taqwa.app.debug.RECITATION -n $PKG/world.taqwa.app.debug.RecitationHarnessReceiver "$@" >/dev/null 2>&1; sleep ${W:-2.5}; }
 shot() { sleep ${2:-1}; adb -s $D exec-out screencap -p > "$L_DIR/$1.png"; echo "  shot $1"; }
 ayah() { adb -s $D shell am start -n $PKG/.MainActivity -a world.taqwa.app.OPEN_AYAH -d taqwa://ayah/$1/$2 --ei open_surah $1 --ei open_ayah $2 -f 0x34000000 >/dev/null 2>&1; sleep 4; }
+want() { [ -z "$ONLY" ] || [[ " $ONLY " == *" $1 "* ]]; }
 tr_for() { case $1 in en) echo en.sahih;; ar) echo ar.muyassar;; fr) echo fr.hamidullah;; tr) echo tr.diyanet;; id) echo id.indonesian;; ur) echo ur.junagarhi;; bn) echo bn.bengali;; esac; }
 for L in "$@"; do
-  L_DIR=$OUT/$L; rm -rf "$L_DIR"; mkdir -p "$L_DIR"; echo "$L"
+  L_DIR=$OUT/$L; [ -z "$ONLY" ] && rm -rf "$L_DIR"; mkdir -p "$L_DIR"; echo "$L"
   adb -s $D shell cmd locale set-app-locales $PKG --user 0 --locales "$L" >/dev/null
   adb -s $D shell am force-stop $PKG; sleep 1; adb -s $D shell am start -n $PKG/.MainActivity >/dev/null; sleep 6
   h --es cmd theme --es name light; h --es cmd mode --es name translation; h --es cmd translation --es id "$(tr_for $L)"
-  h --es cmd screen --es name prayer; shot 1-prayer
-  h --es cmd screen --es name notifications; shot 2-notifications
-  ayah 2 255; shot 3-reader
-  h --es cmd mode --es name mushaf; ayah 2 255; shot 4-mushaf
-  h --es cmd mode --es name translation; ayah 2 255; W=6 h --es cmd load --ei surah 2 --ei ayah 255 --es reciter ar.alafasy; shot 5-recitation
-  h --es cmd stop
-  h --es cmd screen --es name qibla; shot 6-qibla 3
-  h --es cmd screen --es name tasbeeh; shot 7-tasbeeh 2
-  h --es cmd theme --es name dark; h --es cmd screen --es name prayer; shot 8-dark 2
+  want 1-prayer && { h --es cmd screen --es name prayer; shot 1-prayer; }
+  # Tahajjud on for the shot, so the listing shows what the toggle opens; off again after.
+  want 2-notifications && { h --es cmd tahajjud --es name on; h --es cmd screen --es name notifications; shot 2-notifications; h --es cmd tahajjud --es name off; }
+  want 3-reader && { ayah 2 255; shot 3-reader; }
+  want 4-mushaf && { h --es cmd mode --es name mushaf; ayah 2 255; shot 4-mushaf; }
+  want 5-recitation && { h --es cmd mode --es name translation; ayah 2 255; W=6 h --es cmd load --ei surah 2 --ei ayah 255 --es reciter ar.alafasy; shot 5-recitation; h --es cmd stop; }
+  want 6-qibla && { h --es cmd screen --es name qibla; shot 6-qibla 3; }
+  want 7-tasbeeh && { h --es cmd screen --es name tasbeeh; shot 7-tasbeeh 2; }
+  want 8-dark && { h --es cmd theme --es name dark; h --es cmd screen --es name prayer; shot 8-dark 2; }
   echo "  $(ls $L_DIR | wc -l | tr -d ' ') files"
 done
 # Mohamed's own state: dark theme, his English translation, the reader in Mushaf mode, no per-app locale.

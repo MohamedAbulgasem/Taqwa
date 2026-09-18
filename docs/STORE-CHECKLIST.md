@@ -47,6 +47,14 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   the iPhone 16 Pro Max simulator (the 6.9-inch slot, which Apple scales down for smaller
   phones). Seven languages each, eight screens each: Prayer, Quran list, Reader, Mushaf,
   Recitation, Qibla, Tasbeeh, Settings.
+- **The framed sets are checked in** at `docs/store/screenshots/{play,appstore}/<lang>/` (since
+  18 September). A feature that changes a screen re-shoots that screen in the same piece of work
+  — `ONLY="2-notifications" tools/store/capture-android.sh <serial> en ar fr tr id ur bn`, the
+  same for `capture-ios.sh`, then `tools/store/assemble.sh` — and commits the result.
+  `git status docs/store/screenshots` (or the commit's file list) is what to upload to each
+  store by hand. Play's release notes per build live in `docs/store/release-notes/`.
+- **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
+  `scripts/bump-version.sh`. Settings › About shows both, e.g. "1.0.0 (29)".
 
 ## 2. Accounts (Mohamed, about an hour at the keyboard, then waiting)
 

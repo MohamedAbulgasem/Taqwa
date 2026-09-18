@@ -1,0 +1,49 @@
+<en-GB>
+• Tap anywhere on the playback line to jump to that point in the surah.
+• Arabic search lights the matched words, shows your translation under each result, and now finds words typed with a hamza or a final ى (إياك، موسى).
+• Prayer widgets can stretch to the full width of the screen.
+• An optional Tahajjud notification when the last third of the night begins (Settings › Notifications).
+• The sound picker tells you when your phone is on silent.
+</en-GB>
+<ar>
+• انقر أي موضع على خط التشغيل للانتقال إليه في السورة.
+• البحث بالعربية يُبرز الكلمات المطابقة في الآية، ويجد الآن الكلمات المكتوبة بالهمزة أو الألف المقصورة (إياك، موسى).
+• يمكن مدّ أدوات مواقيت الصلاة على عرض الشاشة كاملًا.
+• إشعار اختياري للتهجد عند بداية الثلث الأخير من الليل (الإعدادات › الإشعارات).
+• شاشة اختيار الصوت تنبّهك إذا كان هاتفك على الوضع الصامت.
+</ar>
+<fr-FR>
+• Touchez n’importe où sur la ligne de lecture pour aller à ce moment de la sourate.
+• La recherche en arabe surligne les mots trouvés, affiche votre traduction et trouve désormais les mots écrits avec une hamza ou un ى final (إياك، موسى).
+• Les widgets des horaires peuvent occuper toute la largeur de l’écran.
+• Notification facultative pour le Tahajjud, au début du dernier tiers de la nuit (Paramètres › Notifications).
+• Le choix du son vous signale quand le téléphone est en mode silencieux.
+</fr-FR>
+<tr-TR>
+• Oynatma çizgisinde istediğiniz yere dokunarak surenin o anına gidin.
+• Arapça arama bulunan kelimeleri vurgular, her sonucun altında mealinizi gösterir ve artık hemzeli ya da sonu ى ile biten kelimeleri de bulur (إياك، موسى).
+• Namaz vakti widget’ları ekranın tam genişliğine uzatılabilir.
+• Gecenin son üçte biri başladığında isteğe bağlı teheccüd bildirimi (Ayarlar › Bildirimler).
+• Ses seçim ekranı, telefonunuz sessizdeyken bunu söyler.
+</tr-TR>
+<id>
+• Ketuk di mana saja pada garis pemutaran untuk melompat ke bagian surah itu.
+• Pencarian bahasa Arab menandai kata yang cocok, menampilkan terjemahan Anda di bawah tiap hasil, dan kini menemukan kata yang ditulis dengan hamzah atau ى di akhir (إياك، موسى).
+• Widget waktu salat bisa dilebarkan hingga selebar layar.
+• Notifikasi Tahajud opsional saat sepertiga malam terakhir tiba (Pengaturan › Notifikasi).
+• Layar pemilihan suara memberi tahu bila ponsel Anda dalam mode senyap.
+</id>
+<ur>
+• تلاوت کی لکیر پر کہیں بھی ٹیپ کریں اور سورت کے اسی مقام پر پہنچ جائیں۔
+• عربی تلاش اب ملنے والے الفاظ کو نمایاں کرتی ہے، ہر نتیجے کے نیچے آپ کا ترجمہ دکھاتی ہے، اور ہمزہ یا آخر میں ى والے الفاظ بھی ڈھونڈ لیتی ہے (إياك، موسى)۔
+• نماز کے اوقات کے ویجٹ اب اسکرین کی پوری چوڑائی تک پھیلائے جا سکتے ہیں۔
+• رات کے آخری تہائی حصے کے آغاز پر تہجد کی اختیاری اطلاع (ترتیبات › اطلاعات)۔
+• فون خاموش ہو تو آواز چننے کی اسکرین خود بتا دیتی ہے۔
+</ur>
+<bn-BD>
+• প্লেব্যাক লাইনের যেকোনো জায়গায় ট্যাপ করে সূরার সেই অংশে চলে যান।
+• আরবি অনুসন্ধানে মিলে যাওয়া শব্দগুলো আলাদা রঙে দেখায়, প্রতিটি ফলাফলের নিচে আপনার অনুবাদ থাকে, আর হামযা বা শেষে ى দিয়ে লেখা শব্দও এখন খুঁজে পায় (إياك، موسى)।
+• নামাজের সময়ের উইজেট এখন পর্দার পুরো প্রস্থে ছড়ানো যায়।
+• রাতের শেষ তৃতীয়াংশ শুরু হলে ঐচ্ছিক তাহাজ্জুদ নোটিফিকেশন (সেটিংস › নোটিফিকেশন)।
+• ফোন নীরব থাকলে শব্দ বাছাইয়ের পর্দা তা জানিয়ে দেয়।
+</bn-BD>
