@@ -652,3 +652,11 @@ in the language, not the paired «Fajr · الفجر» a title wears. Verified b
 real scheduler, alarm and receiver on the emulator (debug harness `tahajjud`), and by reading
 iOS's pending requests on the simulator (`taqwa://recite/pending?prefix=TAHAJJUD`: nine, inside
 a total of 57).
+
+### 17.7 Two small things the morning after (19 September, build 30)
+
+A row's subtitle sat directly under its label, line box on line box; `RowSubtitleGap` (4 dp) now
+separates them in `TaqwaRow` and in the sound and voice sheets' rows, so every two-line row in
+the app breathes the same. And a Quran search now belongs to one visit to the tab: it still
+survives the walk into a hit and back (spec 2b §2.1), which never leaves the tab, but going to
+Prayer or Settings clears it, so coming back shows the surah list and not an old result.

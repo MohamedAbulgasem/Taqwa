@@ -64,7 +64,7 @@ android {
         applicationId = "world.taqwa.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 29
+        versionCode = 30
         versionName = "1.0.0"
     }
     compileOptions {

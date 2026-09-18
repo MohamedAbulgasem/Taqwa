@@ -1368,3 +1368,11 @@ screen, and `git status docs/store/screenshots` is the upload list. The harnesse
 `search`, `tahajjud` (on, off, or fire one in eight seconds) and, on iOS, `pending`. The site
 and README mention Tahajjud in one clause, and Support has a new entry for the silent phone.
 Release notes for Play are in `docs/store/release-notes/1.0.0-29.txt`.
+
+## Build 30 (19 September)
+
+Two things from Mohamed's morning look at build 29, which was never uploaded: 4 dp of air
+between a row's label and its subtitle (the Tahajjud row showed it worst; the fix is in the row
+component, so About, the method list and the sound sheets get it too), and the Quran search
+clears when the reader leaves the tab for Prayer or Settings. The Notifications store shot was
+re-taken on the S23 and the simulator (14 files); the release notes moved to `1.0.0-30.txt`.

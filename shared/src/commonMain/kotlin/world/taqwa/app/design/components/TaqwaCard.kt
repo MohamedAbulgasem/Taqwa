@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -53,6 +54,13 @@ private const val TRAILING_ID = "trailing"
 
 /** Space between the label block and whatever sits to its end side. */
 private val RowGap = 12.dp
+
+/**
+ * Air between a row's label and the line under it. They used to sit on each other's line boxes,
+ * which reads as one cramped block at the label's weight; shared with [AudioOptionRow]-style rows
+ * so every two-line row in the app breathes the same.
+ */
+val RowSubtitleGap = 4.dp
 
 /**
  * When the label and the value cannot both fit on one line, the label keeps at least this share of
@@ -111,6 +119,7 @@ fun TaqwaRow(
             } else {
                 Column(Modifier.layoutId(LABEL_ID)) {
                     Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
+                    Spacer(Modifier.height(RowSubtitleGap))
                     Text(subtitle, style = TaqwaText.caption, color = colors.textTertiary)
                 }
             }

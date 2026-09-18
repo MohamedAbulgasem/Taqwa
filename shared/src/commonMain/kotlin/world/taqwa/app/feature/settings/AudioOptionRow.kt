@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.RadioMark
+import world.taqwa.app.design.components.RowSubtitleGap
 import world.taqwa.app.i18n.PlatformFormat
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -89,6 +91,7 @@ internal fun AudioOptionRow(
         }
         Column(Modifier.weight(1f)) {
             Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
+            Spacer(Modifier.height(RowSubtitleGap))
             Text(caption, style = TaqwaText.caption, color = colors.textSecondary)
         }
         if (onPreview != null) {

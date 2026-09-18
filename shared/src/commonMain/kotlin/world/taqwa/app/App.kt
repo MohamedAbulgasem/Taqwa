@@ -472,6 +472,12 @@ fun App(container: AppContainer) {
                 // hidden and playback simply goes on, which is what a media app does when you
                 // leave the screen you started it from.
                 val quranTab = navigator.currentTab == Tab.QURAN
+                // A search belongs to one visit to the Quran tab. It survives the walk into a hit
+                // and back, which never leaves the tab; going to Prayer or Settings ends the
+                // visit, and coming back finds the surah list rather than last hour's results.
+                LaunchedEffect(quranTab) {
+                    if (!quranTab) quranQuery = TextFieldValue()
+                }
                 val bar = recitationState.bar
                 val barSurahName = rememberSurahName(bar?.surah) { container.quranRepository.surah(it) }
                 val incomingSurahName = rememberSurahName(bar?.incoming?.surah) { container.quranRepository.surah(it) }
