@@ -75,6 +75,9 @@ html[lang="ur"] body { line-height: 1.9; }
    punctuation stays with the sentence instead of jumping to the URL's far end. */
 html[dir="rtl"] a, html[dir="rtl"] code { unicode-bidi: isolate; direction: ltr; display: inline-block; max-width: 100%; overflow-wrap: anywhere; }
 html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir="rtl"] .brand { display: inline-flex; }
+/* A link whose text is itself a sentence ("ثبّت التطبيق من Google Play") reads in the page's
+   direction; only links that *are* a Latin address want the rule above. */
+html[dir="rtl"] .row b a { direction: rtl; }
 
 /* Blocks that share this class (.top, .hero, .prose, .foot) set only padding-block, so the
    24px inline padding survives on narrow screens where there is no centring margin. */

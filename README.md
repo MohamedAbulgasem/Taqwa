@@ -39,6 +39,18 @@
 
 Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatform codebase. It does a few things and tries to do them properly: tell you the prayer times where you are, call you to them, point you to Makkah, and carry the Quran with recitation. Everything is computed on the phone. There is no server, no sign-in, no analytics and nothing to pay for, now or later.
 
+<!-- beta:start -->
+## Join the Android beta
+
+Google asks every new app for twelve testers over two weeks before it can be published. If you have an Android phone, joining takes a minute, and it is the biggest help Taqwa can get right now:
+
+1. [Join the testers group](https://groups.google.com/g/taqwa-testers) with the Google account that is on your phone. The group exists only so Google Play knows who the testers are.
+2. [Become a tester](https://play.google.com/apps/testing/world.taqwa.app) on Google Play's testing page.
+3. [Install from Google Play](https://play.google.com/store/apps/details?id=world.taqwa.app), and keep it installed for two weeks.
+
+Feedback is welcome at support@taqwa.world or in [Issues](https://github.com/MohamedAbulgasem/Taqwa/issues).
+<!-- beta:end -->
+
 ## What it does
 
 - **Prayer times** for anywhere on Earth, from your location or a bundled offline database of cities, with the usual calculation methods (Muslim World League, Umm al-Qura, Egyptian, Karachi, ISNA, and more), Hanafi or Standard Asr, high-latitude rules, and per-prayer manual adjustments.
