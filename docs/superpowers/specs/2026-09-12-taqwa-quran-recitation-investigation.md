@@ -735,3 +735,36 @@ error; SystemUI logs no load failure; the media notification still carries its l
 was posted 12 times in 30 s; `content read` as the shell uid gets the PNG and any other path
 gets `FileNotFoundException`. Not seen with eyes: the emulator's screen capture returned blank
 frames all session, so the artwork on the lock screen is confirmed by those dumps, not a picture.
+
+## 19. The Mushaf page on a short screen — 21 September (1.0.0 (32))
+
+On a tester's loopTwo the last four lines of a full Mushaf page were drawn on top of each other.
+The phone is 1021 × 1900 px at 400 dpi — 408 × 760 dp, 1.86 : 1 where every device this was
+built on is 2.1–2.2 : 1 — with a three-button navigation bar, and the player bar was up.
+
+The page's font size came from the frame's **width** alone (`fittedSize`), every row was given a
+fixed 1.9× that size, and nothing asked whether fifteen of them fit the frame's **height**. There
+they needed about 608 dp and had 474. A `Column` measures its children in order against what is
+left, so the last rows were handed almost nothing and their text, which a `Canvas` does not clip,
+landed on the rows above. Reproduced exactly on the emulator set to the phone's size, density
+and navigation mode (`wm size 1021x1900`, `wm density 400`, the three-button overlay).
+
+`fitToHeight`, a pure rule beside `fittedSize`, now holds the page to the height as well, in three
+steps, each taken only if the one before is not enough: keep the size and the 1.9× line box;
+keep the size and close the lines up, no tighter than 1.6× (the printed page is set closer than
+1.9×, and the reader loses nothing but air); then shrink the size in the same half-steps until
+the rows fit at the tightest box. Below 14 sp the page scrolls at its width-fitted size instead,
+as it already does sideways. Surah bands (a fixed 40 dp) and the gaps pages 1–2 keep are taken
+out of the room first, and a pixel a row is held back for rounding. The frame's height is only
+known where the frame is laid out, so the page is now measured inside a `BoxWithConstraints` on
+the frame itself; sideways the height is no limit and the width alone sets the page, as before.
+
+Checked on the emulator at the loopTwo's shape (page 3 with the bar up, light and dark; page
+604 with its three bands and three basmalas; pages 77 and 187), at the S23's shape (unchanged
+without the player bar; with it the lines close a little — by the arithmetic that case was
+already a few dp short before), in landscape (scrolls, unchanged), and on the iPhone 17 Pro
+simulator (unchanged without the bar, closed up with it). Not checked: a short iPhone — the
+iPhone SE simulator needs a tap this session had no permission to make — though the rule and
+the composable are the same code on both platforms. Noted and not changed: while an ayah is
+selected its action pill straddles the frame's bottom edge, and on a page with no slack it
+covers most of the fifteenth line until it is dismissed.

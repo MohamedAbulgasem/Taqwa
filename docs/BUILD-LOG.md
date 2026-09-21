@@ -1389,3 +1389,11 @@ is a content URI now, the platform session publishes no queue, progress goes thr
 and a worker that is going to be refused says nothing first. Spec §18, which also says what is
 left: WorkManager's hand-overs still touch Android's limit on a very fast link, and the cure for
 that is one notification-owning worker per batch.
+
+## The Mushaf page on a short screen (21 September) — 1.0.0 (32)
+
+The same tester's phone — 408 × 760 dp, three-button bar — drew the last four lines of a full
+Mushaf page on top of each other. The page's size came from the frame's width and nothing held it
+to the height. `fitToHeight` now does: close the lines up from 1.9× to no tighter than 1.6×,
+then shrink the type in half-steps, then scroll. Reproduced and fixed on the emulator set to the
+phone's exact size, density and navigation mode; tall phones are unchanged. Spec §19.

@@ -16,6 +16,71 @@ class MushafPageViewTest {
 
     private val accent = Color(0xFFB5820B)
 
+    // --- fitToHeight ---
+
+    // 15 rows at 20 sp and 1.9x need 570 sp of height; at 2.5 px per sp that is 1425 px (+15).
+    private fun fit(availablePx: Float, sizeSp: Float = 20f, rows: Int = 15, fixedPx: Float = 0f) =
+        fitToHeight(sizeSp, rows, fixedPx, availablePx, pxPerSp = 2.5f)
+
+    @Test
+    fun `a frame tall enough leaves the page exactly as the width set it`() {
+        assertEquals(VerticalFit(20f, PREFERRED_LINE_MULTIPLE, scrolls = false), fit(availablePx = 1600f))
+        assertEquals(VerticalFit(20f, PREFERRED_LINE_MULTIPLE, scrolls = false), fit(availablePx = 1440f))
+    }
+
+    @Test
+    fun `a frame a little short closes the lines up and keeps the size`() {
+        val fitted = fit(availablePx = 1300f)
+        assertEquals(20f, fitted.sizeSp)
+        assertFalse(fitted.scrolls)
+        assertTrue(fitted.lineMultiple < PREFERRED_LINE_MULTIPLE && fitted.lineMultiple >= TIGHTEST_LINE_MULTIPLE)
+    }
+
+    @Test
+    fun `a frame shorter still shrinks the size in half steps at the tightest line box`() {
+        // The tester's phone with the player bar up: about 442 dp of inner height at 2.5 px per dp.
+        val fitted = fit(availablePx = 1105f)
+        assertFalse(fitted.scrolls)
+        assertTrue(fitted.sizeSp < 20f, "size ${fitted.sizeSp}")
+        assertEquals(0f, fitted.sizeSp % 0.5f)
+        assertTrue(fitted.lineMultiple >= TIGHTEST_LINE_MULTIPLE && fitted.lineMultiple <= PREFERRED_LINE_MULTIPLE)
+    }
+
+    @Test
+    fun `whatever it decides the rows never add up to more than the frame`() {
+        for (available in 400..2000 step 7) {
+            for (size in listOf(16f, 18.5f, 20f, 23f)) {
+                for (fixed in listOf(0f, 100f, 200f)) {
+                    val fitted = fitToHeight(size, 15, fixed, available.toFloat(), pxPerSp = 2.5f)
+                    if (fitted.scrolls) continue
+                    // Each row rounds up to a whole pixel when placed, as the layout does.
+                    val rows = 15 * kotlin.math.ceil(fitted.sizeSp * fitted.lineMultiple * 2.5f)
+                    assertTrue(rows + fixed <= available, "available=$available size=$size fixed=$fixed -> $fitted needs ${rows + fixed}")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `surah bands and page gaps are taken out of the room before the lines share it`() {
+        val plain = fit(availablePx = 1300f)
+        val withBands = fit(availablePx = 1300f, fixedPx = 200f)
+        assertTrue(withBands.lineMultiple < plain.lineMultiple || withBands.sizeSp < plain.sizeSp)
+    }
+
+    @Test
+    fun `a frame too short for a readable page scrolls at the size the width gave`() {
+        assertEquals(VerticalFit(20f, PREFERRED_LINE_MULTIPLE, scrolls = true), fit(availablePx = 500f))
+    }
+
+    @Test
+    fun `nonsense in is the page as set and never a division by zero`() {
+        val asSet = VerticalFit(20f, PREFERRED_LINE_MULTIPLE, scrolls = false)
+        assertEquals(asSet, fit(availablePx = 0f))
+        assertEquals(asSet, fit(availablePx = 1000f, rows = 0))
+        assertEquals(asSet, fitToHeight(20f, 15, 0f, 1000f, pxPerSp = 0f))
+    }
+
     // --- fittedSize ---
 
     @Test

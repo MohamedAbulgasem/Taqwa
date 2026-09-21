@@ -1,0 +1,21 @@
+<en-GB>
+• Mushaf pages now fit shorter screens: on some phones the last lines of a page were drawn over each other.
+</en-GB>
+<ar>
+• صفحات المصحف تتّسع الآن للشاشات القصيرة: في بعض الهواتف كانت الأسطر الأخيرة من الصفحة تتراكب فوق بعضها.
+</ar>
+<fr-FR>
+• Les pages du Mushaf s’adaptent désormais aux écrans plus courts : sur certains téléphones, les dernières lignes d’une page se superposaient.
+</fr-FR>
+<tr-TR>
+• Mushaf sayfaları artık kısa ekranlara sığıyor: bazı telefonlarda sayfanın son satırları üst üste biniyordu.
+</tr-TR>
+<id>
+• Halaman Mushaf kini pas di layar yang lebih pendek: di sebagian ponsel, baris-baris terakhir halaman saling bertumpuk.
+</id>
+<ur>
+• مصحف کے صفحات اب چھوٹی اسکرینوں پر بھی پورے آتے ہیں: بعض فونوں پر صفحے کی آخری سطریں ایک دوسرے پر چڑھ جاتی تھیں۔
+</ur>
+<bn-BD>
+• মুসহাফের পাতা এখন ছোট পর্দাতেও ঠিকমতো ধরে: কিছু ফোনে পাতার শেষ লাইনগুলো একটির ওপর আরেকটি এসে পড়ত।
+</bn-BD>

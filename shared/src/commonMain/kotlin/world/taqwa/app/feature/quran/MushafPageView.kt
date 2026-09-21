@@ -85,9 +85,14 @@ private const val REFERENCE_BASE_SP = 28f
 private const val MIN_BASE_SP = 20f
 private const val MAX_BASE_SP = 34f
 
-/** Line box height as a multiple of the font size — the same 1.9× the previous renderer used, a
- * little tighter than the reader's 2.0× so fifteen lines fit a phone's height. */
-private const val LINE_HEIGHT = 1.9f
+/** A surah band's height: the one row of a page that does not follow the font size. */
+private val SurahBandHeight = 40.dp
+
+/** The gap pages 1 and 2 keep between their few lines, where every other page spreads evenly. */
+private val OpeningPageGap = 6.dp
+
+/** What the frame's two paddings take from its height: 4 dp and 12 dp, top and bottom. */
+private val FramePaddingVertical = 32.dp
 
 /** Arabic-Indic digits — what a word's trailing ayah number is written in, in every layout row. */
 private val ARABIC_INDIC_DIGITS = '٠'..'٩'
@@ -158,18 +163,25 @@ fun MushafPageView(
             val frameWidthPx = with(density) { frameWidth.toPx() }
             // Keyed on everything the measurements depend on; the highlight is deliberately not
             // among them, since it only changes what is drawn behind words already placed.
-            val layout = remember(page, base, frameWidthPx, family, colors.accent, density) {
-                layoutPage(page, base, frameWidthPx, family, colors.accent, measurer, density)
-            }
-            val lineHeight: Dp = with(density) { (layout.sizeSp * LINE_HEIGHT).sp.toDp() }
-
             Column(Modifier.fillMaxSize().contentWidth()) {
                 // The caption names the surah the page's first *text* line is in — the same rule
                 // the header uses, so the two never disagree while a page straddles two surahs.
                 val captionSurah = page.lines.firstOrNull { it.type == LineType.TEXT }
                     ?.firstSurah?.let(surahOf) ?: surahOf(page.firstSurah)
                 PageCaption(page, captionSurah)
-                Box(Modifier.weight(1f).fillMaxWidth()) {
+                // Measured here, where the frame's own height is known: the page has to fit that
+                // as well as the width (spec §19). Sideways it scrolls, so there the height is
+                // not a limit and the width alone sets the page, as before.
+                BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+                    val innerHeightPx = if (landscape) null else with(density) { (maxHeight - FramePaddingVertical).toPx() }
+                    // Keyed on everything the measurements depend on; the highlight is
+                    // deliberately not among them, since it only changes what is drawn behind
+                    // words already placed.
+                    val layout = remember(page, base, frameWidthPx, innerHeightPx, family, colors.accent, density) {
+                        layoutPage(page, base, frameWidthPx, innerHeightPx, family, colors.accent, measurer, density)
+                    }
+                    val lineHeight: Dp = with(density) { (layout.sizeSp * layout.lineMultiple).sp.toDp() }
+                    val scrolls = landscape || layout.scrolls
                     Column(
                         Modifier
                             .fillMaxSize()
@@ -178,23 +190,24 @@ fun MushafPageView(
                             .background(colors.surface, RoundedCornerShape(15.dp))
                             .border(1.dp, colors.hairline, RoundedCornerShape(15.dp))
                             .padding(horizontal = 10.dp, vertical = 12.dp)
-                            // Sideways the frame is much shorter than fifteen lines at the size
-                            // its width earns them, so the lines scroll instead of being squeezed.
+                            // Sideways — or on a screen too short for a readable page — the
+                            // frame is shorter than fifteen lines at any size worth reading, so
+                            // the lines scroll instead of being squeezed.
                             // The scroll sits inside the frame's own padding, so the two hairlines
                             // stay put while the printed page moves under them. A vertical scroll
                             // inside the horizontal pager is the ordinary nested-scroll case — the
                             // sideways swipe still turns the page.
                             .then(
-                                if (landscape) Modifier.verticalScroll(rememberScrollState()) else Modifier,
+                                if (scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier,
                             ),
                         verticalArrangement = when {
                             // Scrolling, so the column is as tall as its lines and there is no
                             // slack left to spread: each line keeps its own fixed height and they
                             // stack from the top.
-                            landscape -> Arrangement.Top
+                            scrolls -> Arrangement.Top
                             // Pages 1 and 2 hold eight lines where every other page holds fifteen,
                             // so spreading them would leave the printed text floating (spec §2.4).
-                            page.number <= 2 -> Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
+                            page.number <= 2 -> Arrangement.spacedBy(OpeningPageGap, Alignment.CenterVertically)
                             else -> Arrangement.SpaceEvenly
                         },
                     ) {
@@ -207,7 +220,7 @@ fun MushafPageView(
                                     style = TextStyle(
                                         fontFamily = family,
                                         fontSize = layout.sizeSp.sp,
-                                        lineHeight = (layout.sizeSp * LINE_HEIGHT).sp,
+                                        lineHeight = (layout.sizeSp * layout.lineMultiple).sp,
                                         color = colors.textPrimary,
                                         textAlign = TextAlign.Center,
                                         textDirection = TextDirection.Rtl,
@@ -266,11 +279,20 @@ internal class PlacedLine(val words: List<TextLayoutResult>, val positions: List
 
 /** A whole page, measured: the one font size every line uses and the placed text lines, keyed by
  * their index in [MushafPage.lines]. */
-internal class PageLayout(val sizeSp: Float, val lines: Map<Int, PlacedLine>)
+internal class PageLayout(
+    val sizeSp: Float,
+    /** Each text row's height as a multiple of [sizeSp]; 1.9 unless the frame is short. */
+    val lineMultiple: Float,
+    /** The frame is too short for a readable page at any setting, so the rows scroll. */
+    val scrolls: Boolean,
+    val lines: Map<Int, PlacedLine>,
+)
 
 /**
  * Measures the page (spec §2.4). Two passes: every text line is measured whole at [base] to find
- * the widest, which fixes the page's size; then every word is measured at that size and placed.
+ * the widest, which fixes the page's size by its width — and [fitToHeight] then holds that size to
+ * the frame's height, [availableHeightPx], when there is one; then every word is measured at the
+ * size that came out and placed.
  * The natural gap between words is what the same font puts between them when the whole line is
  * measured as one string, so an unjustified line looks exactly as it would if drawn as one text.
  */
@@ -278,6 +300,7 @@ private fun layoutPage(
     page: MushafPage,
     base: Float,
     frameWidthPx: Float,
+    availableHeightPx: Float?,
     family: FontFamily,
     accent: Color,
     measurer: TextMeasurer,
@@ -291,7 +314,17 @@ private fun layoutPage(
     val widestAtBase = textLines.maxOfOrNull { (_, line) ->
         measure(AnnotatedString(line.text.orEmpty()), base).size.width.toFloat()
     } ?: 0f
-    val size = fittedSize(base, widestAtBase, frameWidthPx)
+    val byWidth = fittedSize(base, widestAtBase, frameWidthPx)
+    val fit = if (availableHeightPx == null) {
+        VerticalFit(byWidth, PREFERRED_LINE_MULTIPLE, scrolls = false)
+    } else {
+        val bands = page.lines.count { it.type == LineType.SURAH }
+        val fontRows = page.lines.size - bands
+        val gaps = if (page.number <= 2) (page.lines.size - 1).coerceAtLeast(0) else 0
+        val fixedPx = with(density) { SurahBandHeight.toPx() * bands + OpeningPageGap.toPx() * gaps }
+        fitToHeight(byWidth, fontRows, fixedPx, availableHeightPx, pxPerSp = density.density * density.fontScale)
+    }
+    val size = fit.sizeSp
 
     val lines = textLines.associate { (index, line) ->
         val words = line.words.map { measure(annotateWord(it.text, accent), size) }
@@ -301,7 +334,7 @@ private fun layoutPage(
         val naturalGap = ((whole - widths.sum()) / gaps).coerceAtLeast(0f)
         index to PlacedLine(words, placeWords(widths, frameWidthPx, naturalGap, isJustified(page, line)))
     }
-    return PageLayout(size, lines)
+    return PageLayout(size, fit.lineMultiple, fit.scrolls, lines)
 }
 
 /** The word's text with its trailing ayah digits, if any, in the accent colour: the Hafs font
@@ -453,7 +486,7 @@ internal fun SurahBand(surah: Surah, sizeSp: Float, family: FontFamily) {
     Row(
         Modifier
             .fillMaxWidth()
-            .height(40.dp)
+            .height(SurahBandHeight)
             .border(1.dp, colors.hairline, RoundedCornerShape(12.dp))
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
