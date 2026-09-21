@@ -660,3 +660,78 @@ separates them in `TaqwaRow` and in the sound and voice sheets' rows, so every t
 the app breathes the same. And a Quran search now belongs to one visit to the tab: it still
 survives the walk into a hit and back (spec 2b §2.1), which never leaves the tab, but going to
 Prayer or Settings clears it, so coming back shows the surah list and not an old result.
+
+## 18. A tester's phone restarted — 21 September (1.0.0 (30) on Android 16)
+
+A tester's LoopDL loopTwo (Android 16) restarted itself half an hour after Taqwa was installed,
+and the report blamed a notification flood and bitmap payloads from this app. It was right about
+both, though not about which notification: the device's own log and crash record, read over adb,
+show two separate faults, thirteen minutes apart.
+
+### 18.1 The download notification was posted on every progress event
+
+Between 20:00 and 20:13 Android shed Taqwa's notifications 115 times for exceeding five posts a
+second, and every one was id 770000 — the download notification of §16.3, not the media one the
+report named. `DownloadLoop` reported progress "every 250 ms or 256 KB, whichever comes first",
+which on good Wi-Fi is the bytes, many times a second; `SurahDownloadWorker` answered every
+report with `setForeground`, which WorkManager turns into two enqueues (`startForeground` and
+`notify`); and two workers at a time did this into one id. In a batch the line reads "12 of 114
+surahs" for minutes, so almost all of it said nothing new. Reproduced on the Android 16
+emulator with the old build: 174 posts in 40 s, shed 7 times.
+
+Four changes. The loop reports on time alone (every 500 ms; the part is still flushed every
+256 KB, since that is what a resume continues from). Every worker's progress goes through one
+`PostGate` for the process: post only when what the shade shows has changed, and at most once
+every two seconds across all workers — two, because one `setForeground` is three enqueues. A
+worker announces itself at its start only when no other worker is holding the notification, or
+when its surah is 8 MB or more and may need the foreground for itself; a short surah fits
+inside the ten minutes WorkManager gives a plain worker. And the refusals — no room, mobile
+data not allowed — are checked **before** the worker says anything: when the emulator's disk
+filled, forty queued workers each posted "downloading", failed a millisecond later and handed
+over, 76 posts in one second.
+
+Measured on the emulator through a proxy on the Mac, a far faster link than a phone's (a whole
+reciter, 584 MB, in 84 s): the old build shed 7 times in 40 s and posted continuously; the new
+one posts about twice a second in all, nearly all of it WorkManager's own three enqueues when a
+worker takes the foreground over from one that finished, and was shed 6 times in the whole
+run, each a duplicate of the same line. The full-disk burst went from 76 posts in a second to
+8. At the tester's pace — a surah every seven seconds — the hand-overs are far apart and nothing
+is near the limit. **What would make it zero on any link** is structural and not done: one
+long-lived worker that owns the notification for the whole batch, with the surah workers
+posting nothing, in place of one foreground worker per surah.
+
+### 18.2 Every queue item carried the app icon as a bitmap
+
+At 20:18:32 playback began; the log has `Dead object in setQueue … running out of binder buffer`
+from our process, and three seconds later `system_server` died in
+`MediaSessionRecord.pushQueueUpdate` → `QueueItem.writeToParcel` → `Bitmap.writeToParcel` with
+"Could not write bitmap blob file descriptor", which restarted the device.
+
+§12 put the launcher icon on every `MediaItem` as `artworkData`, 30 KB of PNG, reasoning that one
+array shared by every item never crosses the binder. That missed what Media3 does next: it
+mirrors the queue into the *platform* session, and for every item with `artworkData` it decodes
+the PNG and attaches the **bitmap** to the platform `QueueItem`
+(`MediaSessionLegacyStub.updateQueue`, read in the 1.11.1 sources). 512 × 512 ARGB is a
+megabyte; Al-Baqarah's queue is 571 items; each queue change pushed that to every controller —
+SystemUI, the phone's own now-playing surface — as one ashmem file descriptor per item.
+Android should not let an app's payload take `system_server` down, but the payload was ours.
+
+Two changes, either of which alone prevents it. The artwork is written once to a PNG in the
+cache directory and named on each item by **URI** (`AppIconArtwork.uri`); the one bitmap the
+notification and the lock screen need is loaded from it, for the item playing. It is a
+`content://` URI served by `ArtworkProvider` — read-only, exported, one fixed path, the icon
+every launcher already shows — because the first attempt, a `file://` path into the cache, was
+published to SystemUI as the art URI and SystemUI logged a `FileNotFoundException` on every
+metadata update: it draws the lock screen from another process and may not read our cache. And the platform
+session publishes **no queue at all**: the media notification controller's commands are what
+Media3 gives the platform session, and `onConnect` withholds `COMMAND_GET_TIMELINE` from it.
+A surah's queue is its ayahs and the silences between them, hundreds of rows that all read
+"Al-Baqarah" — nothing a car, a watch or the system's player can use. The app's own controller
+keeps the timeline; it is how the bar knows which ayah is playing.
+
+Verified on the Android 16 emulator with Al-Baqarah, the 571-item case: `dumpsys media_session`
+reports `queue size=0`; no `Dead object in setQueue`, no `TransactionTooLarge`, no bitmap-blob
+error; SystemUI logs no load failure; the media notification still carries its large icon and
+was posted 12 times in 30 s; `content read` as the shell uid gets the PNG and any other path
+gets `FileNotFoundException`. Not seen with eyes: the emulator's screen capture returned blank
+frames all session, so the artwork on the lock screen is confirmed by those dumps, not a picture.

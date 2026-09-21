@@ -87,6 +87,14 @@
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
+        <!-- The recitation's artwork, by content URI (spec §18.2): SystemUI draws the lock
+             screen and the shade's media player from another process and has to be able to open
+             it. Read-only, one fixed file — the launcher icon — and nothing else. -->
+        <provider
+            android:name="world.taqwa.app.recitation.ArtworkProvider"
+            android:authorities="${applicationId}.artwork"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
         <receiver android:name="world.taqwa.app.notifications.PrayerAlarmReceiver" android:exported="false" />
         <receiver android:name="world.taqwa.app.notifications.SystemEventReceiver" android:exported="true">
             <intent-filter>

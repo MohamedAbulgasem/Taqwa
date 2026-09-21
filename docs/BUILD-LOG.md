@@ -1376,3 +1376,16 @@ between a row's label and its subtitle (the Tahajjud row showed it worst; the fi
 component, so About, the method list and the sound sheets get it too), and the Quran search
 clears when the reader leaves the tab for Prayer or Settings. The Notifications store shot was
 re-taken on the S23 and the simulator (14 files); the release notes moved to `1.0.0-30.txt`.
+
+## A tester's phone restarted (21 September) — 1.0.0 (31)
+
+A LoopDL loopTwo on Android 16 restarted itself half an hour after installing build 30, and the
+report blamed this app. It was right. The device's own log and crash record, read over adb,
+showed two faults: the download notification posted on every progress event from two workers at
+once (shed 115 times in thirteen minutes), and — the one that killed `system_server` — every
+queue item carrying the launcher icon as `artworkData`, which Media3 turns into a one-megabyte
+bitmap per platform queue item: 571 of them for Al-Baqarah, on every queue change. The artwork
+is a content URI now, the platform session publishes no queue, progress goes through one gate,
+and a worker that is going to be refused says nothing first. Spec §18, which also says what is
+left: WorkManager's hand-overs still touch Android's limit on a very fast link, and the cure for
+that is one notification-owning worker per batch.

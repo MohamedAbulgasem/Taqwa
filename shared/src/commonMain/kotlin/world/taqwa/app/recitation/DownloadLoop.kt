@@ -127,8 +127,11 @@ class DownloadLoop(
      * so the two halves can never be spliced. Cancellation is left to propagate with the part
      * intact and flushed — the next attempt continues from it.
      *
-     * [onState] is called at most every 250 ms or 256 KB, whichever comes first: on Android every
-     * one of these is a `setProgress` round trip to the WorkManager database.
+     * [onState] is called at most every [PROGRESS_MILLIS], however fast the bytes arrive: on
+     * Android every one of these is a `setProgress` round trip to the WorkManager database. It
+     * used to fire every 256 KB as well, "whichever comes first" — which on good Wi-Fi is forty
+     * times a second, per surah, with several surahs downloading at once (spec §18.1). The part
+     * is still flushed every [PROGRESS_BYTES], because that is what a resume continues from.
      */
     suspend fun run(
         key: DownloadKey,
@@ -178,7 +181,11 @@ class DownloadLoop(
                         out.write(buffer, read)
                         written += read
                         val at = now()
-                        if (at - lastAt >= PROGRESS_MILLIS || written - lastBytes >= PROGRESS_BYTES) {
+                        if (written - lastBytes >= PROGRESS_BYTES) {
+                            out.flush()
+                            lastBytes = written
+                        }
+                        if (at - lastAt >= PROGRESS_MILLIS) {
                             out.flush()
                             lastAt = at
                             lastBytes = written
@@ -206,7 +213,7 @@ class DownloadLoop(
         /** Spec §8: a device below this much free refuses a download, plus the surah's own size. */
         const val HEADROOM_BYTES = 200L * 1024L * 1024L
         const val CHUNK_BYTES = 64L * 1024L
-        const val PROGRESS_MILLIS = 250L
+        const val PROGRESS_MILLIS = 500L
         const val PROGRESS_BYTES = 256L * 1024L
         const val PARTIAL_CONTENT = 206
     }

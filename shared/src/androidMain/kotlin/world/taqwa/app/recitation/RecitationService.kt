@@ -53,8 +53,8 @@ class RecitationService : MediaSessionService() {
      * controller's media items cross a binder, `MediaItem`s lose their URI on the way over
      * (Media3 strips it to keep transactions small), and Al-Baqarah is 571 items. Sending the
      * text once and building the metadata on this side keeps the largest surah's queue well under
-     * the binder's 1 MB and puts the artwork — 30 KB, one array shared by every item — entirely
-     * on this side of it.
+     * the binder's 1 MB. The artwork is named by URI on each item and never carried as bytes;
+     * see [AppIconArtwork] for what carrying it cost.
      */
     private var nowPlaying: NowPlayingText? = null
 
@@ -217,9 +217,22 @@ class RecitationService : MediaSessionService() {
                 .add(SessionCommand(COMMAND_PREVIOUS_AYAH, Bundle.EMPTY))
                 .add(SessionCommand(COMMAND_NEXT_AYAH, Bundle.EMPTY))
                 .build()
-            return MediaSession.ConnectionResult.AcceptedResultBuilder(mediaSession)
+            val accepted = MediaSession.ConnectionResult.AcceptedResultBuilder(mediaSession)
                 .setAvailableSessionCommands(commands)
-                .build()
+            // The media notification controller's commands are what Media3 gives the *platform*
+            // session, and without COMMAND_GET_TIMELINE it publishes no queue there at all
+            // (spec §18.2). A surah's queue is its ayahs and the silences between them, up to
+            // 571 rows that all read "Al-Baqarah": nothing a car, a watch or the system's player
+            // can use, and every change of it is a transaction to each of them. The app's own
+            // controller keeps the timeline — it is how the bar knows which ayah is playing.
+            if (mediaSession.isMediaNotificationController(controller)) {
+                accepted.setAvailablePlayerCommands(
+                    MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
+                        .remove(Player.COMMAND_GET_TIMELINE)
+                        .build(),
+                )
+            }
+            return accepted.build()
         }
 
         override fun onCustomCommand(
@@ -288,7 +301,7 @@ class RecitationService : MediaSessionService() {
             mediaItems: MutableList<MediaItem>,
         ): ListenableFuture<MutableList<MediaItem>> {
             val text = nowPlaying
-            val artwork = AppIconArtwork.bytes(this@RecitationService)
+            val artwork = AppIconArtwork.uri(this@RecitationService)
             val resolved = mediaItems.mapTo(ArrayList(mediaItems.size)) { item ->
                 val metadata = MediaMetadata.Builder()
                     .setTitle(text?.title)
@@ -296,9 +309,7 @@ class RecitationService : MediaSessionService() {
                     .setIsPlayable(true)
                     .setIsBrowsable(false)
                     .apply {
-                        if (artwork != null) {
-                            setArtworkData(artwork, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
-                        }
+                        if (artwork != null) setArtworkUri(artwork)
                     }
                     .build()
                 item.buildUpon()

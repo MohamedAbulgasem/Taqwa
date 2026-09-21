@@ -5,12 +5,14 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -83,6 +85,19 @@ class SurahDownloadWorker(
         }
 
         try {
+            // The refusals — no room, or mobile data the reader has not allowed — come before
+            // the worker says anything. Forty queued surahs on a phone that has just run out of
+            // room each used to post "downloading", fail a millisecond later and hand over to
+            // the next: seventy-six posts in one second on the emulator (spec §18.1). The loop
+            // checks again inside `run`; this one only keeps a doomed worker silent.
+            val loop = DownloadLoop(
+                library = appContainer.recitationLibrary,
+                source = HttpByteSource(),
+                conditions = AndroidDownloadConditions(applicationContext),
+            )
+            loop.precheck(asset, inputData.getBoolean(RecitationWork.KEY_ALLOW_METERED, false))
+                ?.let { return failure(it) }
+
             val outcome = coroutineScope {
                 val batches = batchLine(reciter)
                 // Decided before the first post, so a batch never flashes one surah's own line for
@@ -92,12 +107,19 @@ class SurahDownloadWorker(
                 }
                 val watcher = launch { batches?.collect { (pending, owned) -> note(pending, owned) } }
                 try {
-                    runCatching { setForeground(foregroundInfo(0L)) }
-                    val loop = DownloadLoop(
-                        library = appContainer.recitationLibrary,
-                        source = HttpByteSource(),
-                        conditions = AndroidDownloadConditions(applicationContext),
-                    )
+                    // A worker announces itself only when nobody else is holding the shade, or
+                    // when its surah is long enough to need the foreground for itself: WorkManager
+                    // gives a plain worker ten minutes, which every short surah fits inside, and
+                    // each `setForeground` is three enqueues to the system, milliseconds apart.
+                    // In a batch on a fast link a surah lands every second; announcing each one
+                    // kept the package at Android's five-a-second limit all by itself (§18.1).
+                    // Not gated when it does happen, but counted by the gate, so the progress
+                    // event half a second behind it does not post the same line again.
+                    if (holders.get() == 0 || totalBytes >= LONG_SURAH_BYTES) {
+                        val first = shadeLine(0L)
+                        synchronized(gate) { gate.record(first.toString(), SystemClock.elapsedRealtime()) }
+                        hold(foregroundInfo(first))
+                    }
                     loop.run(
                         key = key,
                         url = url,
@@ -113,7 +135,7 @@ class SurahDownloadWorker(
                                         RecitationWork.KEY_VERIFYING to false,
                                     )
                                 )
-                                runCatching { setForeground(foregroundInfo(state.bytes)) }
+                                postProgress(state.bytes)
                             }
                             DownloadState.Verifying -> {
                                 setProgress(
@@ -136,6 +158,7 @@ class SurahDownloadWorker(
                 is DownloadOutcome.Failed -> failure(outcome.reason)
             }
         } finally {
+            if (holding) holders.decrementAndGet()
             slots.release()
         }
     }
@@ -176,25 +199,58 @@ class SurahDownloadWorker(
      * "Al-Baqarah · 9.3 of 58.2 MB" with its bar — or, in a batch, "Mishary Rashid Alafasy ·
      * 12 of 114 surahs" with the bar counting surahs. Always under [NOTIFICATION_ID].
      */
-    private fun foregroundInfo(done: Long): ForegroundInfo {
+    private fun foregroundInfo(done: Long): ForegroundInfo = foregroundInfo(shadeLine(done))
+
+    /** What the shade says right now: the words, and the bar as (max, progress, indeterminate). */
+    private data class ShadeLine(val title: String, val max: Int, val progress: Int, val indeterminate: Boolean)
+
+    private fun shadeLine(done: Long): ShadeLine {
+        val line = batch
+        return if (line != null) {
+            ShadeLine(
+                DownloadCopy.batch(reciterName, line.owned, line.total, languageTag, numberStyle),
+                line.total, line.owned.coerceIn(0, line.total), false,
+            )
+        } else {
+            val percent = if (totalBytes <= 0L) 0 else ((done * 100) / totalBytes).toInt().coerceIn(0, 100)
+            ShadeLine(DownloadCopy.progress(surahName, done, totalBytes, languageTag, numberStyle), 100, percent, done <= 0L)
+        }
+    }
+
+    /**
+     * A progress event's turn at the shade (spec §18.1). Every worker's events come through the
+     * one [gate], so the notification is re-posted only when what it shows has changed, and no
+     * more than once a second across all of them — it used to be re-posted on every event of
+     * every worker, which Android 16 shed 115 times in thirteen minutes on a tester's phone.
+     * The first `setForeground` of a worker is not gated: WorkManager needs it to run the work.
+     */
+    private suspend fun postProgress(done: Long) {
+        val line = shadeLine(done)
+        val due = synchronized(gate) { gate.shouldPost(line.toString(), SystemClock.elapsedRealtime()) }
+        if (due) hold(foregroundInfo(line))
+    }
+
+    /** Posts, and from the first post on counts this worker among those holding the shade. */
+    private suspend fun hold(info: ForegroundInfo) {
+        if (runCatching { setForeground(info) }.isSuccess && !holding) {
+            holding = true
+            holders.incrementAndGet()
+        }
+    }
+
+    private var holding = false
+
+    private fun foregroundInfo(line: ShadeLine): ForegroundInfo {
         ensureChannel(applicationContext, languageTag)
-        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(notificationSmallIconResId)
             .setOngoing(true)
             .setSilent(true)
+            .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-        val line = batch
-        if (line != null) {
-            builder
-                .setContentTitle(DownloadCopy.batch(reciterName, line.owned, line.total, languageTag, numberStyle))
-                .setProgress(line.total, line.owned.coerceIn(0, line.total), false)
-        } else {
-            val percent = if (totalBytes <= 0L) 0 else ((done * 100) / totalBytes).toInt().coerceIn(0, 100)
-            builder
-                .setContentTitle(DownloadCopy.progress(surahName, done, totalBytes, languageTag, numberStyle))
-                .setProgress(100, percent, done <= 0L)
-        }
-        val notification = builder.build()
+            .setContentTitle(line.title)
+            .setProgress(line.max, line.progress, line.indeterminate)
+            .build()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
         } else {
@@ -212,6 +268,18 @@ class SurahDownloadWorker(
          * 114 does not open 114 sockets against one CDN.
          */
         private val slots = Semaphore(2)
+
+        /** One gate for every worker in the process; see [postProgress]. */
+        private val gate = PostGate(minIntervalMs = 2_000L)
+
+        /** How many running workers have posted the notification and so hold the foreground. */
+        private val holders = AtomicInteger(0)
+
+        /**
+         * A surah this size can outlast the ten minutes a plain worker is given on a slow
+         * connection, so it takes the foreground for itself from the start.
+         */
+        private const val LONG_SURAH_BYTES = 8L * 1024L * 1024L
 
         /** Five minutes waiting for a slot, then hand the turn back to WorkManager. */
         private const val SLOT_WAIT_MILLIS = 5L * 60L * 1000L

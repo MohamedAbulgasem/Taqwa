@@ -1,0 +1,28 @@
+<en-GB>
+• Fixes a fault that could restart some Android 16 phones when a recitation started playing.
+• Recitation downloads update their notification far less often, which is lighter on the phone and the battery.
+</en-GB>
+<ar>
+• إصلاح خلل كان قد يؤدي إلى إعادة تشغيل بعض هواتف أندرويد 16 عند بدء التلاوة.
+• تنزيلات التلاوة تحدّث إشعارها بوتيرة أقل بكثير، وهذا أخفّ على الهاتف والبطارية.
+</ar>
+<fr-FR>
+• Correction d’un défaut qui pouvait redémarrer certains téléphones Android 16 au lancement d’une récitation.
+• Les téléchargements de récitations mettent à jour leur notification bien moins souvent : c’est plus léger pour le téléphone et la batterie.
+</fr-FR>
+<tr-TR>
+• Tilavet başlatıldığında bazı Android 16 telefonların yeniden başlamasına yol açabilen bir hata giderildi.
+• Tilavet indirmeleri bildirimini artık çok daha seyrek güncelliyor; bu, telefonu ve pili daha az yorar.
+</tr-TR>
+<id>
+• Memperbaiki kesalahan yang bisa membuat sebagian ponsel Android 16 memulai ulang saat tilawah mulai diputar.
+• Unduhan tilawah kini jauh lebih jarang memperbarui notifikasinya, sehingga lebih ringan bagi ponsel dan baterai.
+</id>
+<ur>
+• ایک خرابی دور کی گئی جس سے تلاوت شروع ہوتے ہی بعض اینڈرائیڈ 16 فون دوبارہ چالو ہو سکتے تھے۔
+• تلاوت کے ڈاؤن لوڈ اب اپنی اطلاع بہت کم بار تازہ کرتے ہیں، جو فون اور بیٹری دونوں پر ہلکا ہے۔
+</ur>
+<bn-BD>
+• একটি ত্রুটি ঠিক করা হয়েছে, যার কারণে তিলাওয়াত শুরু হলে কিছু অ্যান্ড্রয়েড ১৬ ফোন রিস্টার্ট হয়ে যেতে পারত।
+• তিলাওয়াত ডাউনলোড এখন অনেক কম ঘন ঘন তার নোটিফিকেশন হালনাগাদ করে, যা ফোন ও ব্যাটারির জন্য হালকা।
+</bn-BD>
