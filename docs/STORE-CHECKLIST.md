@@ -213,7 +213,9 @@ costs days.
    minutes of processing. Export compliance is answered by `ITSAppUsesNonExemptEncryption =
    false`, so no encryption question appears. Tag the archived commit `ios-build-<code>`.
 3. **New app record**: My Apps → + → New App → iOS, name (§1), primary language English (U.K.),
-   bundle ID `world.taqwa.ios` from the list, SKU `taqwa-ios`, full access → Create.
+   bundle ID `world.taqwa.ios` from the list, SKU `taqwa-ios`, full access → Create. Done 22
+   September: Apple ID **6814975544**, so the store link is https://apps.apple.com/app/id6814975544
+   (the site's App Store button at launch). Build 1.0.0 (32) uploaded the same night.
 4. **App Information**: subtitle, categories Lifestyle + Reference, content rights (contains
    third-party content, rights held: `docs/ATTRIBUTION.md`), age rating questionnaire (all None →
    4+), standard licence agreement. Localizations: add ar, fr, tr, id (name, subtitle, privacy
