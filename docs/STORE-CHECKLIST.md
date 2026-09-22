@@ -203,18 +203,22 @@ costs days.
 1. **Signing**: with the Team ID in `Config.xcconfig` and the widget target, and the new account
    in Xcode, one device archive registers `world.taqwa.ios`, `world.taqwa.ios.widget` and the App
    Group under the new team (visible at https://developer.apple.com/account/resources/identifiers/list).
-2. **Archive and upload**: `scripts/ios-build.sh` green, then Xcode → scheme iosApp → Any iOS
-   Device (arm64) → Product › Archive → Organizer → Distribute App → App Store Connect → Upload
-   (automatic signing, symbols included); or the same from the command line with
-   `xcodebuild archive` and `-exportArchive` (`method app-store-connect`, `destination upload`).
-   The build appears under TestFlight after 10–30 minutes of processing. Export compliance is
-   answered by `ITSAppUsesNonExemptEncryption = false`, so no encryption question appears.
+2. **Archive and upload**: `scripts/test.sh` and `scripts/ios-build.sh` green, then
+   `scripts/ios-release.sh archive` (the archive lands in `build/ios-archive/`, and the script
+   prints the built identifiers, team, app group and widget size back), the app record (step 3),
+   then `scripts/ios-release.sh upload`. The script signs automatically through the Apple account
+   signed into Xcode 26 and refuses an empty or LOOPDL team. If the command-line upload is refused,
+   open the `.xcarchive` in Xcode (Window › Organizer) → Distribute App → App Store Connect →
+   Upload, automatic signing, symbols included. The build appears under TestFlight after 10–30
+   minutes of processing. Export compliance is answered by `ITSAppUsesNonExemptEncryption =
+   false`, so no encryption question appears. Tag the archived commit `ios-build-<code>`.
 3. **New app record**: My Apps → + → New App → iOS, name (§1), primary language English (U.K.),
    bundle ID `world.taqwa.ios` from the list, SKU `taqwa-ios`, full access → Create.
 4. **App Information**: subtitle, categories Lifestyle + Reference, content rights (contains
    third-party content, rights held: `docs/ATTRIBUTION.md`), age rating questionnaire (all None →
-   4+), standard licence agreement. Localizations: add ar, fr, tr, id, ur, bn (name, subtitle,
-   privacy URL per language).
+   4+), standard licence agreement. Localizations: add ar, fr, tr, id (name, subtitle, privacy
+   URL per language). App Store Connect offers no Urdu or Bengali listing, so those users see the
+   English one; the app itself still opens in their language.
 5. **Pricing and Availability**: Free, all countries and regions. **App Privacy**: Get started →
    no data collected → Publish ("Data Not Collected"). **Trader status** when the banner asks:
    non-trader.
@@ -232,8 +236,8 @@ costs days.
    lock-screen controls or the widget timelines, so check those three.
 8. **Submit for Review** → Waiting for Review → In Review → Ready for Distribution, typically one
    to three days. "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
-   App Review messages without a new build; a binary rejection needs a fix, a new build number
-   (24, 25, …) and a resubmission.
+   App Review messages without a new build; a binary rejection needs a fix, the next build number
+   (33, 34, …, shared with Android) and a resubmission.
 
 ## 7. Cost and calendar
 
