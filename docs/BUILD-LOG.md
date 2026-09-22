@@ -1397,3 +1397,16 @@ Mushaf page on top of each other. The page's size came from the frame's width an
 to the height. `fitToHeight` now does: close the lines up from 1.9× to no tighter than 1.6×,
 then shrink the type in half-steps, then scroll. Reproduced and fixed on the emulator set to the
 phone's exact size, density and navigation mode; tall phones are unchanged. Spec §19.
+
+## The first App Store archive (22 September) — iOS 1.0.0 (32)
+
+Mohamed's individual Apple Developer membership was approved; its Team ID lives in
+`iosApp/Configuration/Config.xcconfig` and nowhere else, and `scripts/ios-release.sh` refuses the
+employer's team outright. The App Store identity is `world.taqwa.ios` (the Android package name
+was registered to the employer's team by an early automatic-signing build, and Apple identifiers
+are unique across teams). A fresh team has no registered devices and Xcode signs archives with a
+development profile, so the first signed build went to the connected iPhone 12 with device
+registration allowed: that created the certificate, the App IDs and the app group in half a
+minute, and put the store build on the phone for its first hardware run. The archive followed in
+thirteen seconds, read back as `world.taqwa.ios` 1.0.0 (32) under team 3K93P4PA5H with
+`group.world.taqwa.ios` and a 1 MB widget; tag `ios-build-32`.
