@@ -19,9 +19,9 @@ PROJECT_PATH  = File.join(ROOT, 'iosApp', 'iosApp.xcodeproj')
 APP_TARGET    = 'iosApp'
 EXT_TARGET    = 'TaqwaWidget'
 EXT_GROUP_DIR = 'TaqwaWidget'                       # relative to SRCROOT (= iosApp/)
-APP_GROUP_ID  = 'group.world.taqwa.app'
-EXT_BUNDLE_ID = 'world.taqwa.app.widget'
-TEAM_ID       = '5S5P2Q72MV'
+APP_GROUP_ID  = 'group.world.taqwa.ios'
+EXT_BUNDLE_ID = '$(BUNDLE_ID).widget'          # from iosApp/Configuration/Config.xcconfig
+TEAM_ID       = '$(TEAM_ID)'                   # from iosApp/Configuration/Config.xcconfig, never a literal
 DEPLOYMENT    = '16.0'
 
 # Swift sources that belong to the extension, and whether the *app* compiles them too. The views

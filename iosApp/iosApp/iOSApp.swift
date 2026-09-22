@@ -5,7 +5,7 @@ import UserNotifications
 import WidgetKit
 import shared
 
-private let refreshTaskId = "world.taqwa.app.refresh"
+private let refreshTaskId = "world.taqwa.ios.refresh"
 
 /// The two things SwiftUI's `App` cannot express: the notification-centre delegate and
 /// `handleEventsForBackgroundURLSession`.
@@ -66,7 +66,7 @@ struct iOSApp: App {
 	var body: some Scene {
 		WindowGroup {
 			#if DEBUG
-			// Hidden debug route: `xcrun simctl launch booted world.taqwa.app -taqwaWidgetPreview 1`
+			// Hidden debug route: `xcrun simctl launch booted world.taqwa.ios -taqwaWidgetPreview 1`
 			// renders the real widget views full screen against the real App Group mirror. There is
 			// no simctl command that places a widget on a simulator home screen, so this is how a
 			// widget render gets captured. The whole branch is compiled out of a release build, along

@@ -14,7 +14,7 @@ import shared
 /// Must match `IosKeyValueStore.APP_GROUP_ID` in `widgetcore/src/iosMain/.../KeyValueStore.ios.kt`
 /// and both `.entitlements` files. A mismatch is silent: the widget reads an empty suite and
 /// shows the placeholder state forever.
-let taqwaAppGroupId = "group.world.taqwa.app"
+let taqwaAppGroupId = "group.world.taqwa.ios"
 
 /// Written by the app (never by Kotlin) each time the mirror actually changes, so the widget can
 /// extrapolate the countdown forward instead of showing whatever minute the app last saw.

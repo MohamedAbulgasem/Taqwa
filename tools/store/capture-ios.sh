@@ -9,7 +9,7 @@
 #
 # Output: build/store-shots/ios/<lang>/<n>-<name>.png. The simulator has no compass, so 6-qibla is
 # dropped by assemble.sh.
-U=$1; shift; APP=world.taqwa.app; OUT=$(cd "$(dirname "$0")/../.." && pwd)/build/store-shots/ios
+U=$1; shift; APP=world.taqwa.ios; OUT=$(cd "$(dirname "$0")/../.." && pwd)/build/store-shots/ios
 url() { xcrun simctl openurl $U "$1" >/dev/null 2>&1; sleep ${2:-2.5}; }
 shot() { sleep ${2:-1}; xcrun simctl io $U screenshot "$D/$1.png" >/dev/null 2>&1; echo "  shot $1"; }
 want() { [ -z "$ONLY" ] || [[ " $ONLY " == *" $1 "* ]]; }

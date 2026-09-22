@@ -3,7 +3,7 @@ package world.taqwa.app.widget
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSUserDefaults
 
-private const val APP_GROUP_ID = "group.world.taqwa.app"
+private const val APP_GROUP_ID = "group.world.taqwa.ios"
 
 @OptIn(ExperimentalForeignApi::class)
 private class IosKeyValueStore : KeyValueStore {

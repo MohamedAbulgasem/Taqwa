@@ -1,3 +1,10 @@
-TEAM_ID=5S5P2Q72MV
-BUNDLE_ID=world.taqwa.app
+// The Apple Developer team the archive is signed with: Mohamed's individual team, and never
+// LOOPDL LIMITED (5S5P2Q72MV), which is his employer's and must not publish Taqwa. Left empty
+// until his Team ID is known — a device archive then fails loudly instead of registering the
+// identifiers under the wrong team. Simulator builds need no team.
+TEAM_ID=
+// world.taqwa.app, the Android package, is registered to LOOPDL's team on Apple's side (Xcode did
+// that with automatic signing before the accounts were settled), and Apple identifiers are unique
+// across every team — so the App Store identity is world.taqwa.ios (docs/STORE-CHECKLIST.md §1).
+BUNDLE_ID=world.taqwa.ios
 APP_NAME=Taqwa

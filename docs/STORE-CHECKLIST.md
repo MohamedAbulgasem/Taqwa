@@ -34,12 +34,13 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   business). Both consoles ask; it is a legal statement Mohamed makes, not a build setting.
 - **iOS identifiers:** Xcode registered `world.taqwa.app`, `world.taqwa.app.widget` and
   `group.world.taqwa.app` under LOOPDL's team, and Apple identifiers are unique across all
-  teams. Plan: rename to `world.taqwa.ios`, `world.taqwa.ios.widget` and `group.world.taqwa.ios`
-  when the store build is cut (six files: `iosApp/Configuration/Config.xcconfig`, the widget
-  target in the pbxproj, both `.entitlements`, `TaqwaWidgetViews.swift`,
-  `widgetcore/…/KeyValueStore.ios.kt`, `tools/add-widget-target.rb`). Nobody sees a bundle id and
-  the Android package stays `world.taqwa.app`. Only if Mohamed prefers the matching id: an Admin
-  of LOOPDL's developer portal deletes the three identifiers first, and nothing is renamed.
+  teams. **Done 22 September:** the iOS identity is `world.taqwa.ios`, `world.taqwa.ios.widget`
+  and `group.world.taqwa.ios` (and `world.taqwa.ios.refresh` for the background task). One
+  source of truth: `iosApp/Configuration/Config.xcconfig` holds `TEAM_ID` and `BUNDLE_ID`, and
+  both targets read them (the widget is `$(BUNDLE_ID).widget`); the app group is literal in the
+  two `.entitlements`, `TaqwaWidgetViews.swift` and `widgetcore/…/KeyValueStore.ios.kt`, which
+  must agree. `TEAM_ID` stays empty until Mohamed's individual Team ID is in — never LOOPDL's
+  `5S5P2Q72MV`. Nobody sees a bundle id and the Android package stays `world.taqwa.app`.
 - **Release timing:** iOS releases automatically on approval; Android follows when the closed
   test ends. The site's store buttons go live one at a time.
 - **Screenshots:** Play gets framed 1080 × 1920 images (the phone slot wants 16:9 or 9:16 and
