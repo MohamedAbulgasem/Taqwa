@@ -203,7 +203,7 @@
     <string name="credit_chime">نغمة التنبيه</string>
     <string name="credit_chime_detail">«Clear announce tones» من Mixkit، رخصة Mixkit المجانية للمؤثرات الصوتية.</string>
     <string name="credit_quran_text">نص القرآن</string>
-    <string name="credit_quran_text_detail">نص مصحف تنزيل، الإصدار 1.1، رخصة المشاع الإبداعي BY-ND 3.0. منقول دون تغيير.</string>
+    <string name="credit_quran_text_detail">نص مصحف تنزيل، الإصدار 1.1، رخصة Creative Commons Attribution 3.0. منقول دون تغيير.</string>
     <string name="credit_quran_font">خط المصحف</string>
     <string name="credit_quran_font_detail">خط مجمع الملك فهد لطباعة المصحف الشريف، حفص. حر الاستخدام والتوزيع دون تعديل.</string>
     <string name="credit_quran_layout">تخطيط الصفحات</string>

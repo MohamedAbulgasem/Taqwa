@@ -4,8 +4,8 @@
 
 Taqwa's own source code is released under the GNU GPL-3.0 (`LICENSE`). The works listed below
 are **not**: they are third-party content redistributed under their own licences, several of which
-forbid what the GPL grants (the KFGQPC font may not be modified or sold, the Tanzil text is
-no-derivatives, the translations and recitations are for non-commercial use). If you build
+forbid what the GPL grants (the KFGQPC font may not be modified or sold, the Tanzil text may
+not be changed, the translations and recitations are for non-commercial use). If you build
 something from this repository, the code is yours under the GPL and each of these works is yours
 only on its own terms, or must be replaced. Licence texts that must travel with a copy are kept in
 `docs/licences/`.
@@ -18,7 +18,7 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
   - *Aaqib Azeez*: "The Adhan – Muslim Call to Prayer – Aaqib Azeez", CC BY-SA 4.0, via Wikimedia Commons. The clips Taqwa bundles are trimmed and loudness-matched excerpts, and are themselves released under CC BY-SA 4.0 as that licence requires.
   - *Besim Azemi*: "Eid al-Fitr Fajr azan at Malmö Mosque" by Islamic Center Malmö, CC BY 3.0, via Wikimedia Commons.
 - **Notification tone**: "Clear announce tones" from [Mixkit](https://mixkit.co/free-sound-effects/tones/), Mixkit Sound Effects Free Licence (use in apps permitted, not redistributable on its own, which is why the source WAV is not in this repository; `assets/audio/source/README.md` says how to regenerate the chime).
-- **Quran text**: [Tanzil Project](https://tanzil.net) Quran Text v1.1, Creative Commons BY-ND 3.0. Reproduced verbatim.
+- **Quran text**: [Tanzil Project](https://tanzil.net) Quran Text v1.1, Creative Commons Attribution 3.0. Reproduced verbatim.
 - **Quran typeface**: KFGQPC Uthmanic Script Hafs by the King Fahd Glorious Quran Printing Complex, free to use and distribute unmodified.
 - **Page layout**: Madinah Mushaf page and line breaks from the Quranic Universal Library data, via [zonetecde/mushaf-layout](https://github.com/zonetecde/mushaf-layout).
 - **Recitations**: per-ayah recordings from the [Islamic Network](https://alquran.cloud) (`cdn.islamic.network`), licensed to them by the reciters or their estates for free, non-commercial redistribution at the bitrates they publish ([terms](https://alquran.cloud/terms-and-conditions), §IV). Taqwa mirrors them unmodified and at those bitrates on a public GitHub release, and downloads them on demand; no file is re-encoded. Each build also bundles one short preview per reciter (Al-Fatiha 1:1–2, the corpus's own bytes concatenated without re-encoding) so the picker can audition a voice offline. Copyright lies with the reciters, and any of them may ask to be removed — the catalogue is a manifest fetched at runtime, so a withdrawal takes effect without an app update, in the app and in its own Attribution screen alike. The voices carried:

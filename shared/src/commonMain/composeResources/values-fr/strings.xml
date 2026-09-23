@@ -208,7 +208,7 @@
     <string name="credit_chime">Tonalité de notification</string>
     <string name="credit_chime_detail">« Clear announce tones », de Mixkit, licence gratuite Mixkit pour les effets sonores.</string>
     <string name="credit_quran_text">Texte du Coran</string>
-    <string name="credit_quran_text_detail">Texte coranique Tanzil v1.1, Creative Commons BY-ND 3.0. Reproduit sans modification.</string>
+    <string name="credit_quran_text_detail">Texte coranique Tanzil v1.1, Creative Commons Attribution 3.0. Reproduit sans modification.</string>
     <string name="credit_quran_font">Police du Coran</string>
     <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs, du Complexe du Roi Fahd pour l’impression du noble Coran. Libre d’utilisation et de diffusion sans modification.</string>
     <string name="credit_quran_layout">Mise en page</string>

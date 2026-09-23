@@ -210,7 +210,7 @@
     <string name="credit_chime">Notification tone</string>
     <string name="credit_chime_detail">“Clear announce tones” from Mixkit, Mixkit Sound Effects Free Licence.</string>
     <string name="credit_quran_text">Quran text</string>
-    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons BY-ND 3.0. Reproduced verbatim.</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons Attribution 3.0. Reproduced verbatim.</string>
     <string name="credit_quran_font">Quran typeface</string>
     <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs by the King Fahd Glorious Quran Printing Complex. Free to use and distribute unmodified.</string>
     <string name="credit_quran_layout">Page layout</string>
