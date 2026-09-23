@@ -233,11 +233,23 @@ costs days.
    player; widgets come from the home-screen gallery), select the processed build, release
    automatically after approval.
 7. **TestFlight** before submitting: TestFlight → Internal Testing → a group with Mohamed as
-   tester → the TestFlight app on the iPhone 12 installs the exact store build. This is the first
+   tester → the TestFlight app on the iPhone 12 installs the exact store build. Caution: TestFlight
+   uses the Apple Account signed into the phone's App Store, and a tester links to one Apple
+   Account only — accepting Mohamed's invitation on the work iPhone (signed in with a work Apple
+   Account) would bind that account to his tester slot, and undoing it can take up to 90 days.
+   Without TestFlight, `build/ios-archive/dev-<v>-<code>/` holds the archive re-signed for
+   development (`xcodebuild -exportArchive`, method `debugging`): the same compiled binary as the
+   upload, installable on a registered phone with `xcrun devicectl device install app`. This is the first
    hardware run of the whole app on iOS; the simulator cannot prove the compass heading, the
    lock-screen controls or the widget timelines, so check those three.
 8. **Submit for Review** → Waiting for Review → In Review → Ready for Distribution, typically one
-   to three days. "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
+   to three days. A new developer account first gets "Guideline 2.1 - Information Needed - New
+   App Submission" (it happened on 23 September 2026): a screen recording on a physical iPhone on
+   the latest iOS, starting at launch, plus six written answers, sent as a reply (Resolve → Reply
+   to App Review → Attach File) and pasted into App Review Information → Notes, then Edit → Add for
+   Review → Resubmit to App Review with the same build. The answers are in
+   `docs/store/app-review/2026-09-23-guideline-2.1-reply.txt` (3,814 of the 4,000 characters both
+   fields allow); keep Notes in step with the app on every later submission. "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
    App Review messages without a new build; a binary rejection needs a fix, the next build number
    (33, 34, …, shared with Android) and a resubmission.
 
