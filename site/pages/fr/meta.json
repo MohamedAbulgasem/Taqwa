@@ -1,5 +1,6 @@
 {
   "endonym": "Français",
+  "brand": "Taqwa",
   "dir": "ltr",
   "og_locale": "fr_FR",
   "brand_label": "Accueil de Taqwa",
@@ -12,9 +13,9 @@
   "policy_file": "PRIVACY.fr.md",
   "pages": {
     "home": {
-      "title": "Taqwa · Horaires de prière, qibla et Coran",
-      "og_title": "Taqwa",
-      "description": "Une application islamique gratuite pour Android et iPhone : horaires de prière, notifications de l’adhan, qibla, le Coran avec la récitation, et un tasbih. Sans publicité, sans compte, hors ligne par conception."
+      "title": "Taqwa · Horaires de prière et Coran, gratuit et sans pub",
+      "og_title": "Taqwa · Horaires de prière, qibla et Coran",
+      "description": "Application islamique gratuite et open source pour Android et iPhone : horaires de prière, adhan, qibla, le Coran récité et un tasbih. Sans publicité ni compte, fonctionne hors ligne."
     },
     "support": {
       "title": "Assistance · Taqwa",

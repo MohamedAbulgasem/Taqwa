@@ -1,5 +1,6 @@
 {
   "endonym": "Türkçe",
+  "brand": "Taqwa",
   "dir": "ltr",
   "og_locale": "tr_TR",
   "brand_label": "Taqwa ana sayfası",
@@ -12,9 +13,9 @@
   "policy_file": "PRIVACY.tr.md",
   "pages": {
     "home": {
-      "title": "Taqwa · Namaz vakitleri, kıble ve Kur'an",
-      "og_title": "Taqwa",
-      "description": "Android ve iPhone için ücretsiz bir İslami uygulama: namaz vakitleri, ezan bildirimleri, kıble, tilavetiyle Kur'an ve tesbih. Reklam yok, hesap yok, tasarımı gereği çevrimdışı."
+      "title": "Taqwa · Namaz vakitleri ve Kur'an, ücretsiz ve reklamsız",
+      "og_title": "Taqwa · Namaz vakitleri, kıble ve Kur'an",
+      "description": "Android ve iPhone için ücretsiz ve açık kaynaklı bir İslami uygulama: namaz vakitleri, ezan, kıble, tilavetiyle Kur'an ve tesbih. Reklam yok, hesap yok, çevrimdışı çalışır."
     },
     "support": {
       "title": "Destek · Taqwa",

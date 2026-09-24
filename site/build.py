@@ -9,8 +9,14 @@ show). Every page is wrapped in site/templates/base.html with that language's he
 English lives at the root and every other language under /<lang>/, and every page links to its
 twin in every other language through the language picker and the hreflang alternates.
 
+It also writes sitemap.xml (every page with its language alternates), robots.txt, and the
+404.html GitHub Pages serves for any address it has nothing for; each language's home page
+carries JSON-LD for the app, and every page a share card from site/assets/og/ (drawn by
+tools/site-og.py).
+
     python3 site/build.py            # writes _site/ next to the repo root
-    python3 site/build.py --check    # builds, then fails if any local link is dangling
+    python3 site/build.py --check    # builds, then fails on dangling links, missing assets,
+                                     # broken structured data or a sitemap that disagrees
 
 Needs the `markdown` package (pip install markdown); the Pages workflow installs it.
 """
@@ -20,6 +26,7 @@ import os
 import re
 import shutil
 import sys
+import xml.etree.ElementTree as ET
 
 import markdown
 
@@ -121,6 +128,71 @@ def page_body(langs: dict, lang: str, page: str) -> str:
         return f.read()
 
 
+# What the structured data says about the app. It is the same on every language's home page
+# apart from the description and the screenshot. No rating is claimed: Google shows stars only
+# from real reviews, and an invented one is a manual-penalty offence.
+APP = {
+    "operatingSystem": "Android 8.0 or later, iOS 16 or later",
+    "applicationCategory": "LifestyleApplication",
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    "isAccessibleForFree": True,
+    "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+    "image": f"{ORIGIN}/assets/icon-512.png",
+    "author": {"@type": "Person", "name": "Mohamed Abulgasem", "url": "https://mohamedabulgasem.github.io/"},
+    "sameAs": ["https://github.com/MohamedAbulgasem/Taqwa"],
+}
+
+
+def structured_data(langs: dict, lang: str, page: str, raw_body: str) -> str:
+    """JSON-LD for a language's home page: the app, and on the root page the site as well, so a
+    search result can name the site "Taqwa" and tell it apart from the other apps of that name."""
+    if page != "home":
+        return ""
+    cfg = langs[lang]
+    app = {
+        "@type": "MobileApplication",
+        "@id": f"{ORIGIN}/#app",
+        "name": "Taqwa",
+        "description": cfg["pages"]["home"]["description"],
+        "url": f"{ORIGIN}/{cfg['prefix']}",
+        "inLanguage": list(langs),
+        **APP,
+    }
+    if cfg["brand"] != "Taqwa":
+        app["alternateName"] = cfg["brand"]
+    shot = re.search(r'<section class="wrap hero">.*?<img src="\{root\}(assets/img/[\w.-]+)"', raw_body, re.S)
+    if shot:
+        app["screenshot"] = f"{ORIGIN}/{shot.group(1)}"
+    graph = [app]
+    if lang == "en":
+        graph.insert(0, {
+            "@type": "WebSite",
+            "@id": f"{ORIGIN}/#website",
+            "name": "Taqwa",
+            "alternateName": ["taqwa.world", "Taqwa app"],
+            "url": f"{ORIGIN}/",
+            "inLanguage": list(langs),
+        })
+    data = json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, separators=(",", ":"))
+    data = data.replace("</", "<\\/")  # a literal "</" would close the script element early
+    return f'  <script type="application/ld+json">{data}</script>\n'
+
+
+def labels(cfg: dict) -> dict:
+    """The header and footer words of one language."""
+    return {key: cfg[key] for key in ("brand_label", "nav_label", "footer_label", "nav_privacy",
+                                       "nav_support", "languages_label", "copyright")}
+
+
+def render(template: str, values: dict) -> str:
+    """Fills the template. The body goes in last, so nothing inside it is read as a placeholder."""
+    out = template
+    for key, value in values.items():
+        if key != "body":
+            out = out.replace("{" + key + "}", value)
+    return shield_emails(out.replace("{body}", values["body"]))
+
+
 def build_page(langs: dict, lang: str, page: str, template: str) -> None:
     cfg = langs[lang]
     out_dir = cfg["prefix"] + PAGE_DIRS[page]                 # e.g. "ar/support/"
@@ -154,6 +226,10 @@ def build_page(langs: dict, lang: str, page: str, template: str) -> None:
     ) + f'\n  <link rel="alternate" hreflang="x-default" href="{ORIGIN}/{PAGE_DIRS[page]}">'
     meta = cfg["pages"][page]
     canonical = f"{ORIGIN}/{out_dir}"
+    raw_body = page_body(langs, lang, page)
+    body = raw_body
+    for key, value in links.items():
+        body = body.replace("{" + key + "}", value)
     values = {
         "lang": lang,
         "dir": cfg["dir"],
@@ -161,60 +237,147 @@ def build_page(langs: dict, lang: str, page: str, template: str) -> None:
         "og_title": meta["og_title"],
         "description": meta["description"],
         "og_locale": cfg["og_locale"],
+        "og_image": f"{ORIGIN}/assets/og/{lang}.jpg",
         "canonical": canonical,
-        "alternates": alternates,
-        "brand_label": cfg["brand_label"],
-        "nav_label": cfg["nav_label"],
-        "footer_label": cfg["footer_label"],
-        "nav_privacy": cfg["nav_privacy"],
-        "nav_support": cfg["nav_support"],
-        "languages_label": cfg["languages_label"],
+        "link_tags": f'  <link rel="canonical" href="{canonical}">\n{alternates}',
+        "robots": "",
+        "structured_data": structured_data(langs, lang, page, raw_body),
         "language_links": "\n    ".join(picker),
         "privacy_current": ' aria-current="page"' if page == "privacy" else "",
         "support_current": ' aria-current="page"' if page == "support" else "",
-        "copyright": cfg["copyright"],
+        **labels(cfg),
         **links,
+        "body": body,
     }
-    body = page_body(langs, lang, page)
-    for key, value in links.items():
-        body = body.replace("{" + key + "}", value)
-    values["body"] = body
-    out = template
-    for key, value in values.items():
-        out = out.replace("{" + key + "}", value)
-    out = shield_emails(out)
     target = os.path.join(OUT, out_dir)
     os.makedirs(target, exist_ok=True)
     with open(os.path.join(target, "index.html"), "w", encoding="utf-8") as f:
-        f.write(out)
+        f.write(render(template, values))
 
 
-def check_links() -> int:
-    """Every relative href/src in the built site must point at a file that exists, and no
-    template placeholder may survive."""
+NOT_FOUND = """<main class="wrap prose">
+  <h1>Page not found</h1>
+  <p class="meta">There is no page at this address on taqwa.world.</p>
+  <p>The link may be mistyped, or the page may have moved. The <a href="/">home page</a> has everything, and the list above has it in every language.</p>
+</main>
+"""
+
+
+def build_404(langs: dict, template: str) -> None:
+    """GitHub Pages answers every address it has nothing for with /404.html, at any depth, so
+    every link here is absolute from the site root. It asks not to be indexed."""
+    cfg = langs["en"]
+    picker = [f'<a href="/{c["prefix"]}" lang="{lang}" hreflang="{lang}">{c["endonym"]}</a>' for lang, c in langs.items()]
+    values = {
+        "lang": "en",
+        "dir": "ltr",
+        "title": "Page not found · Taqwa",
+        "og_title": "Taqwa",
+        "description": "There is no page at this address on taqwa.world.",
+        "og_locale": cfg["og_locale"],
+        "og_image": f"{ORIGIN}/assets/og/en.jpg",
+        "canonical": f"{ORIGIN}/",
+        "link_tags": "",
+        "robots": '  <meta name="robots" content="noindex">\n',
+        "structured_data": "",
+        "language_links": "\n    ".join(picker),
+        "privacy_current": "",
+        "support_current": "",
+        **labels(cfg),
+        "root": "/",
+        "home": "/",
+        "privacy": "/privacy/",
+        "support": "/support/",
+        "body": NOT_FOUND,
+    }
+    with open(os.path.join(OUT, "404.html"), "w", encoding="utf-8") as f:
+        f.write(render(template, values))
+
+
+def write_sitemap(langs: dict) -> None:
+    """Every page, each listing its twins in the other languages: the same alternates the pages
+    carry in their heads. No lastmod: Google only trusts one that is exact, and the build has no
+    honest date to give."""
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    ]
+    for sub in PAGE_DIRS.values():
+        for cfg in langs.values():
+            lines.append("  <url>")
+            lines.append(f"    <loc>{ORIGIN}/{cfg['prefix']}{sub}</loc>")
+            for other, other_cfg in langs.items():
+                lines.append(f'    <xhtml:link rel="alternate" hreflang="{other}" href="{ORIGIN}/{other_cfg["prefix"]}{sub}"/>')
+            lines.append(f'    <xhtml:link rel="alternate" hreflang="x-default" href="{ORIGIN}/{sub}"/>')
+            lines.append("  </url>")
+    lines.append("</urlset>")
+    with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+
+
+def write_robots() -> None:
+    with open(os.path.join(OUT, "robots.txt"), "w", encoding="utf-8") as f:
+        f.write(f"User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n")
+
+
+def check_site() -> int:
+    """Fails the build on: a relative or root-relative href/src that points at nothing, a
+    template placeholder left in a page, an address Cloudflare would rewrite, an image of this
+    site named by absolute address that does not exist, structured data that is not valid JSON,
+    and a sitemap that disagrees with the pages built."""
     problems = 0
+
+    def problem(message: str) -> None:
+        nonlocal problems
+        print(message, file=sys.stderr)
+        problems += 1
+
+    pages = []
     for dirpath, _, files in os.walk(OUT):
         for name in files:
             if not name.endswith(".html"):
                 continue
             path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, OUT)
+            if name == "index.html":
+                pages.append(rel)
             with open(path, encoding="utf-8") as f:
                 doc = f.read()
             for leftover in re.findall(r"\{[a-z_]+\}", doc):
-                print(f"placeholder: {os.path.relpath(path, OUT)} -> {leftover}", file=sys.stderr)
-                problems += 1
+                problem(f"placeholder: {rel} -> {leftover}")
             for address in unshielded_emails(doc):
-                print(f"unshielded email: {os.path.relpath(path, OUT)} -> {address}", file=sys.stderr)
-                problems += 1
+                problem(f"unshielded email: {rel} -> {address}")
             for ref in re.findall(r'(?:href|src|srcset)="([^"#]+)"', doc):
                 if re.match(r"^(https?:|mailto:|data:)", ref):
                     continue
-                target = os.path.normpath(os.path.join(dirpath, ref))
+                base = OUT if ref.startswith("/") else dirpath
+                target = os.path.normpath(os.path.join(base, ref.lstrip("/")))
                 if os.path.isdir(target):
                     target = os.path.join(target, "index.html")
                 if not os.path.exists(target):
-                    print(f"dangling: {os.path.relpath(path, OUT)} -> {ref}", file=sys.stderr)
-                    problems += 1
+                    problem(f"dangling: {rel} -> {ref}")
+            for ref in re.findall(re.escape(ORIGIN) + r'/(assets/[^"\s<]+)', doc):
+                if not os.path.exists(os.path.join(OUT, ref)):
+                    problem(f"missing asset: {rel} -> {ref}")
+            for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', doc, re.S):
+                try:
+                    json.loads(block)
+                except ValueError as error:
+                    problem(f"structured data: {rel} -> {error}")
+
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    locs = [loc.text for loc in ET.parse(os.path.join(OUT, "sitemap.xml")).getroot().findall("s:url/s:loc", ns)]
+    for loc in locs:
+        if not os.path.exists(os.path.join(OUT, loc[len(ORIGIN) + 1:], "index.html")):
+            problem(f"sitemap: no page for {loc}")
+    if len(locs) != len(pages):
+        problem(f"sitemap: {len(locs)} addresses for {len(pages)} pages")
+    with open(os.path.join(OUT, "robots.txt"), encoding="utf-8") as f:
+        if f"Sitemap: {ORIGIN}/sitemap.xml" not in f.read():
+            problem("robots.txt: no Sitemap line")
+    with open(os.path.join(OUT, "404.html"), encoding="utf-8") as f:
+        if 'content="noindex"' not in f.read():
+            problem("404.html: not marked noindex")
     return problems
 
 
@@ -226,9 +389,13 @@ if __name__ == "__main__":
     for lang in langs:
         for page in PAGE_DIRS:
             build_page(langs, lang, page, template)
-    pages = sum(1 for _, _, files in os.walk(OUT) for f in files if f.endswith(".html"))
-    print(f"built _site: {pages} pages in {len(langs)} languages ({', '.join(langs)})")
+    build_404(langs, template)
+    write_sitemap(langs)
+    write_robots()
+    pages = sum(1 for _, _, files in os.walk(OUT) for f in files if f == "index.html")
+    print(f"built _site: {pages} pages in {len(langs)} languages ({', '.join(langs)}), "
+          "plus 404.html, sitemap.xml and robots.txt")
     if "--check" in sys.argv:
-        broken = check_links()
-        print("links: all local links resolve" if not broken else f"links: {broken} problems")
+        broken = check_site()
+        print("check: links, assets, structured data and sitemap all good" if not broken else f"check: {broken} problems")
         sys.exit(1 if broken else 0)

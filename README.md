@@ -169,7 +169,9 @@ Runs the shared and widget test suites on the JVM and on the iOS simulator. All 
 
 **Website**
 
-The site at taqwa.world lives in `site/` and is built by `site/build.py` from the page fragments under `site/pages/<lang>/` and the seven policy files at the repository root; a GitHub Pages workflow deploys it on every push that touches it. Email addresses on the site are wrapped in Cloudflare's `email_off` comments so they are never rewritten into `[email protected]` on the way to a reader.
+The site at taqwa.world lives in `site/` and is built by `site/build.py` from the page fragments under `site/pages/<lang>/` and the seven policy files at the repository root; a GitHub Pages workflow deploys it on every push that touches it. The build also writes the sitemap (every page with its language alternates), `robots.txt`, a `404.html`, and structured data describing the app on each language's home page, and `site/build.py --check` fails on dangling links, missing images, invalid structured data or a sitemap that disagrees with the pages. Email addresses on the site are wrapped in Cloudflare's `email_off` comments so they are never rewritten into `[email protected]` on the way to a reader.
+
+Screenshots on the site are WebP: drop a PNG into `site/assets/img` and run `tools/site-webp.sh`. The share cards shown when a page is posted to WhatsApp, X or Facebook are drawn from each language's hero by `tools/site-og.py`; re-run it after changing a hero.
 
 ## Project layout
 

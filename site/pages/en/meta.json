@@ -1,5 +1,6 @@
 {
   "endonym": "English",
+  "brand": "Taqwa",
   "dir": "ltr",
   "og_locale": "en_GB",
   "brand_label": "Taqwa home",
@@ -12,9 +13,9 @@
   "policy_file": "PRIVACY.md",
   "pages": {
     "home": {
-      "title": "Taqwa · Prayer times, Qibla and the Quran",
-      "og_title": "Taqwa",
-      "description": "A free Islamic app for Android and iPhone: prayer times, adhan notifications, Qibla, the Quran with recitation, and a tasbeeh. No ads, no account, offline by design."
+      "title": "Taqwa · Prayer times & Quran app · Free, no ads, open source",
+      "og_title": "Taqwa · Prayer times, Qibla and the Quran",
+      "description": "Free, open-source Islamic app for Android and iPhone: prayer times, adhan, Qibla, the Quran with recitation and a tasbeeh. No ads, no account, works offline."
     },
     "support": {
       "title": "Support · Taqwa",

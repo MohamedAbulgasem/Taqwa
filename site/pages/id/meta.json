@@ -1,5 +1,6 @@
 {
   "endonym": "Bahasa Indonesia",
+  "brand": "Taqwa",
   "dir": "ltr",
   "og_locale": "id_ID",
   "brand_label": "Beranda Taqwa",
@@ -12,9 +13,9 @@
   "policy_file": "PRIVACY.id.md",
   "pages": {
     "home": {
-      "title": "Taqwa · Waktu salat, kiblat, dan Al-Qur'an",
-      "og_title": "Taqwa",
-      "description": "Aplikasi Islami gratis untuk Android dan iPhone: waktu salat, notifikasi azan, kiblat, Al-Qur'an dengan tilawah, dan tasbih. Tanpa iklan, tanpa akun, offline sejak dirancang."
+      "title": "Taqwa · Aplikasi waktu salat & Al-Qur'an, gratis tanpa iklan",
+      "og_title": "Taqwa · Waktu salat, kiblat, dan Al-Qur'an",
+      "description": "Aplikasi Islami gratis dan sumber terbuka untuk Android dan iPhone: waktu salat, azan, kiblat, Al-Qur'an dengan tilawah, dan tasbih. Tanpa iklan, tanpa akun, berfungsi offline."
     },
     "support": {
       "title": "Dukungan · Taqwa",
