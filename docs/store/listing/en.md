@@ -57,6 +57,8 @@ First release.
 ### Name (30)
 Taqwa
 
+App Store Connect's record was created as "Taqwa: Prayer, Quran & Qibla" on 22 September 2026, so the subtitle below repeats the name; replace it at the next version (see docs/STORE-CHECKLIST.md §1).
+
 (If Apple says the name is taken: "Taqwa: Prayer, Quran & Qibla".)
 
 ### Subtitle (30)

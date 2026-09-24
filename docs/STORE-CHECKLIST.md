@@ -24,7 +24,10 @@ accounts on day one: the App Store can be live within about a week, Google Play 
 - **Names in the stores:** Play title "Taqwa: Prayer, Quran & Qibla" (28 of 30 characters). App
   Store name "Taqwa" if it is free (App Store names are unique across the whole store and a
   five-letter Arabic word is probably taken), otherwise the same 28-character title; subtitle
-  "Prayer times, Quran & Qibla".
+  "Prayer times, Quran & Qibla". Outcome, 22 September: the App Store record is named "Taqwa:
+  Prayer, Quran & Qibla", so that subtitle now repeats the name on the store page and adds no
+  search words. Replace it at the next version with words the name lacks (adhan, Quran audio,
+  tasbeeh), in every localisation.
 - **Category:** Lifestyle on both (Apple secondary: Reference). Primary language English (United
   Kingdom); listings in all seven languages.
 - **Age:** Play target audience 13+ (an under-13 band triggers the Families review); content
@@ -244,7 +247,8 @@ costs days.
    lock-screen controls or the widget timelines, so check those three.
 8. **Submit for Review** → Waiting for Review → In Review → Ready for Distribution, typically one
    to three days. A new developer account first gets "Guideline 2.1 - Information Needed - New
-   App Submission" (it happened on 23 September 2026): a screen recording on a physical iPhone on
+   App Submission" (it happened on 23 September 2026, answered and resubmitted on 24 September
+   with the recording attached): a screen recording on a physical iPhone on
    the latest iOS, starting at launch, plus six written answers, sent as a reply (Resolve → Reply
    to App Review → Attach File) and pasted into App Review Information → Notes, then Edit → Add for
    Review → Resubmit to App Review with the same build. The answers are in
