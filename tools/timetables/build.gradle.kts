@@ -61,6 +61,10 @@ kotlin {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    systemProperty("taqwa.repoRoot", repoRoot.path)
+}
+
 /**
  * Writes the timetable document the site build renders.
  *
