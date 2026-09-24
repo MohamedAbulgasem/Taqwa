@@ -26,9 +26,19 @@ object CompassAccuracyRules {
     /** LOW (1), UNRELIABLE (0) or NO_CONTACT (-1). */
     fun androidAccuracyIsLow(sensorAccuracy: Int): Boolean = sensorAccuracy <= SENSOR_STATUS_ACCURACY_LOW
 
-    /** Above 20 degrees, or negative (iOS's "no fix yet" sentinel). */
+    /**
+     * The largest heading error, in degrees, that iOS may report and still get a needle. Apple marks
+     * a heading it cannot vouch for with a *negative* `headingAccuracy`; a positive one is an error
+     * bound. Measured on an iPhone 13 in Cape Town (25 September 2026), ordinary use ran from 10° to
+     * 33°, median 17°, with Core Motion rating the calibration High throughout — so the 20° this
+     * replaced hid the needle during ordinary use. 45° never fired in that session and still refuses
+     * a heading that is plainly wrong.
+     */
+    const val IOS_MAX_HEADING_ERROR_DEGREES = 45.0
+
+    /** Worse than [IOS_MAX_HEADING_ERROR_DEGREES], or negative (Core Location's "invalid"). */
     fun iosAccuracyIsLow(headingAccuracyDegrees: Double): Boolean =
-        headingAccuracyDegrees < 0.0 || headingAccuracyDegrees > 20.0
+        headingAccuracyDegrees < 0.0 || headingAccuracyDegrees > IOS_MAX_HEADING_ERROR_DEGREES
 
     /**
      * Core Location returns a negative `trueHeading` — not an error, just `-1` — whenever it has
@@ -38,8 +48,13 @@ object CompassAccuracyRules {
      */
     fun iosTrueHeadingIsInvalid(trueHeadingDegrees: Double): Boolean = trueHeadingDegrees < 0.0
 
-    /** Magnitude of a magnetometer sample, in µT. Android hands the vector over as floats,
-     * Core Location as doubles; the check is the same one either way. */
+    /** The whole per-sample verdict on iOS: a heading Core Location could not determine, or one
+     * whose own error estimate is beyond [iosAccuracyIsLow]'s bar. */
+    fun iosSampleIsLow(trueHeadingDegrees: Double, headingAccuracyDegrees: Double): Boolean =
+        iosTrueHeadingIsInvalid(trueHeadingDegrees) || iosAccuracyIsLow(headingAccuracyDegrees)
+
+    /** Magnitude of a magnetometer sample, in µT. Android only: on iOS, Core Location's own
+     * accuracy is the verdict (see [iosSampleIsLow]). */
     fun fieldMagnitude(x: Double, y: Double, z: Double): Double = sqrt(x * x + y * y + z * z)
 
     fun fieldMagnitude(x: Float, y: Float, z: Float): Double =

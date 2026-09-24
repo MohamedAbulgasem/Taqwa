@@ -26,15 +26,33 @@ class CompassAccuracyRulesTest {
         assertTrue(CompassAccuracyRules.androidAccuracyIsLow(CompassAccuracyRules.SENSOR_STATUS_NO_CONTACT))
     }
 
+    // --- Measured 25 September 2026: an iPhone 13 in Cape Town reported headingAccuracy between 10
+    // and 33 degrees through a whole session of ordinary use (median 17), with Core Motion rating its
+    // calibration High on every sample. A 20-degree bar hid the needle for 17% of those samples.
+    // Apple reserves "invalid" for a negative value; a positive one is an error bound.
+
     @Test
-    fun iosAtOrBelowTwentyDegreesIsNotLow() {
+    fun iosErrorsFromOrdinaryUseAreNotLow() {
         assertFalse(CompassAccuracyRules.iosAccuracyIsLow(0.0))
-        assertFalse(CompassAccuracyRules.iosAccuracyIsLow(20.0))
+        assertFalse(CompassAccuracyRules.iosAccuracyIsLow(10.0)) // that phone's best, after a figure of eight
+        assertFalse(CompassAccuracyRules.iosAccuracyIsLow(17.0)) // the session's median
+        assertFalse(CompassAccuracyRules.iosAccuracyIsLow(33.0)) // the session's worst
+        assertFalse(CompassAccuracyRules.iosAccuracyIsLow(45.0))
     }
 
     @Test
-    fun iosAboveTwentyDegreesIsLow() {
-        assertTrue(CompassAccuracyRules.iosAccuracyIsLow(20.01))
+    fun iosErrorsWorseThanFortyFiveDegreesAreLow() {
+        assertTrue(CompassAccuracyRules.iosAccuracyIsLow(45.01))
+        assertTrue(CompassAccuracyRules.iosAccuracyIsLow(90.0))
+    }
+
+    @Test
+    fun anIosSampleIsLowOnlyForAnInvalidHeadingOrAnErrorBeyondTheBar() {
+        assertFalse(CompassAccuracyRules.iosSampleIsLow(trueHeadingDegrees = 112.3, headingAccuracyDegrees = 10.0))
+        assertFalse(CompassAccuracyRules.iosSampleIsLow(trueHeadingDegrees = 0.0, headingAccuracyDegrees = 33.0))
+        assertTrue(CompassAccuracyRules.iosSampleIsLow(trueHeadingDegrees = -1.0, headingAccuracyDegrees = 10.0))
+        assertTrue(CompassAccuracyRules.iosSampleIsLow(trueHeadingDegrees = 112.3, headingAccuracyDegrees = -1.0))
+        assertTrue(CompassAccuracyRules.iosSampleIsLow(trueHeadingDegrees = 112.3, headingAccuracyDegrees = 60.0))
     }
 
     @Test

@@ -14,6 +14,7 @@ import platform.CoreLocation.CLHeading
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
 import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
+import platform.CoreLocation.kCLHeadingFilterNone
 import platform.CoreLocation.kCLLocationAccuracyKilometer
 import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIApplication
@@ -71,35 +72,25 @@ class IosCompassSource : CompassSource {
             // Core Location cannot know which way the phone is being held unless it is told, and
             // untold it answers for a portrait device, putting a sideways phone 90° out.
             syncHeadingOrientation(manager)
-            val accuracy = didUpdateHeading.headingAccuracy
             val heading = didUpdateHeading.trueHeading
             val invalid = CompassAccuracyRules.iosTrueHeadingIsInvalid(heading)
-            // `CLHeading` carries the raw geomagnetic vector in µT beside the heading, so the
-            // same plausibility band the Android path uses applies here: a "calibrated" field
-            // that cannot be the Earth's is a magnet in the room, and telling that user to draw
-            // figures of eight is advice they can follow forever without effect. Without this,
-            // INTERFERENCE was simply unreachable on iOS and every low reading blamed
-            // calibration. All three components at zero is Core Location reporting no raw data
-            // rather than reporting a zero field, so it counts as no information at all.
-            val magnitude = CompassAccuracyRules.fieldMagnitude(
-                didUpdateHeading.x, didUpdateHeading.y, didUpdateHeading.z,
-            )
-            val implausibleField = magnitude > 0.0 &&
-                CompassAccuracyRules.magneticFieldIsImplausible(magnitude)
+            // Core Location's own verdict and nothing layered on top of it. A field-strength band
+            // (20-70 µT on `CLHeading`'s x/y/z) used to sit here too: measured on an iPhone 13 in
+            // Cape Town, whose field is about 25.6 µT, that vector is the *calibrated* field, and it
+            // read 13-20 µT for long stretches while Core Motion rated the calibration High and
+            // `headingAccuracy` sat at its best, 10° — so the screen said "magnetic interference"
+            // to a compass that was fine. Core Location already marks a heading it cannot vouch
+            // for, strong interference included, with a negative accuracy, which
+            // [CompassAccuracyRules.iosSampleIsLow] refuses; its reason is calibration, whose copy
+            // names metal, cases and speakers as the likely culprits.
             subscriber?.trySend(
                 CompassReading(
                     // A negative heading is a sentinel, not a direction; passing it on as 359°
                     // would be the bug this rejects, so it is emitted as 0 and marked low.
                     trueHeadingDegrees = if (invalid) 0.0 else heading,
                     timestampMillis = monotonicMillis(),
-                    isLowAccuracy = invalid ||
-                        CompassAccuracyRules.iosAccuracyIsLow(accuracy) ||
-                        implausibleField,
-                    lowReason = if (implausibleField) {
-                        CompassLowReason.INTERFERENCE
-                    } else {
-                        CompassLowReason.CALIBRATION
-                    },
+                    isLowAccuracy = CompassAccuracyRules.iosSampleIsLow(heading, didUpdateHeading.headingAccuracy),
+                    lowReason = CompassLowReason.CALIBRATION,
                 ),
             )
         }
@@ -179,6 +170,13 @@ class IosCompassSource : CompassSource {
         // movement is the point at which it could change by a hundredth of a degree.
         manager.desiredAccuracy = kCLLocationAccuracyKilometer
         manager.distanceFilter = 500.0
+        // Every heading event, not only those after a degree of turning (the default filter). The
+        // accuracy gate times its dwells on the samples it is given, as Android's continuous stream
+        // gives them; under the default, a phone held still delivered nothing for 14.5 s, the gate
+        // counted that silence as low, crossed its 20 s give-up line, and showed "compass
+        // unavailable" to someone who was only holding still — and a still phone could never
+        // recover, since the improving accuracy never arrived either.
+        manager.headingFilter = kCLHeadingFilterNone
         manager.startUpdatingLocation()
         manager.startUpdatingHeading()
         awaitClose {

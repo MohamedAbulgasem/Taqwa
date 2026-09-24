@@ -314,6 +314,14 @@ Also on Android: the rotation matrix is remapped with `SensorManager.remapCoordi
 
 On iOS the heading manager also calls `startUpdatingLocation()` — `trueHeading` is `-1` without it — requests when-in-use authorisation if the app has never asked, sets `headingOrientation` from the device's orientation, and implements `locationManagerShouldDisplayHeadingCalibration` so the system's own calibration UI can appear.
 
+**Amended 25 September 2026 (iOS measured for the first time).** Two iPhones kept asking for calibration or reporting interference while Apple's Compass on the same phones pointed fine. A diagnostic build recorded every `CLHeading` on an iPhone 13 in Cape Town (984 samples, 53 s, beside Core Motion's calibrated and raw fields; `docs/BUILD-LOG.md`, "Qibla compass on iPhone"): Core Motion rated the calibration High on all but one sample, `headingAccuracy` ran 10–33° (median 17°) and was never negative, yet the app hid the needle for 81% of the session. The iOS rules are now:
+
+- **Low only when Core Location says so or the error is plainly bad:** `trueHeading < 0`, `headingAccuracy < 0`, or `headingAccuracy > 45°` (`CompassAccuracyRules.iosSampleIsLow`). The 20° bar sat inside ordinary use and fired on 17% of samples.
+- **No field-strength check on iOS.** `CLHeading`'s x/y/z is the *calibrated* field (it matched Core Motion's to the decimal); in Cape Town's weak field (about 25.6 µT) it read 13–20 µT for long stretches with the compass at its most accurate, so the 20–70 µT band reported interference 61% of the time. Core Location marks strong interference itself with a negative accuracy. `INTERFERENCE` is now Android-only, where the band still catches the LoopPhone's diverged magnetometer.
+- **`headingFilter = kCLHeadingFilterNone`.** Under the default one-degree filter a phone held still delivered no heading for 14.5 s; the gate, which times its dwells on the samples it receives, counted the silence as low and gave up.
+
+The recorded session is a test fixture (`IphoneCapeTownSession`): replayed through the rules and the gate, it must never leave `Good`.
+
 ---
 
 ## 11. Settings and defaults

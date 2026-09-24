@@ -1513,3 +1513,26 @@ both now correct the one city instead, and were run against data built for those
 script was run in headless Chrome with the clock pinned before Fajr, on a Friday afternoon,
 after Isha, on the first day of the data, across Egypt's clock change and past the end of the
 data; the index filter with Latin, accented, Arabic and Turkish input.
+
+## The compass on an iPhone (25 September)
+
+Two iPhones in testing kept saying the compass needed calibrating, or that there was magnetic
+interference, while Apple's Compass on the same phones pointed without complaint. The iOS rules
+had never met a real iPhone: the 10 September sweep could not unlock one. A diagnostic build (a
+local branch, never merged, installed as a separate app) logged every `CLHeading` beside Core
+Motion's calibrated and raw fields through 53 seconds of ordinary use in Cape Town. Core Motion
+rated the calibration High on all but one of 984 samples and `headingAccuracy` ran 10–33°, never
+negative; the app hid the needle for 81% of the session. Three rules did it. A 20° bar sat inside
+ordinary use and fired on 17% of samples. A 20–70 µT band was applied to `CLHeading`'s x/y/z —
+which is the calibrated field, matching Core Motion's to the decimal — and in Cape Town's
+25.6 µT field that read 13–20 µT for long stretches, so 61% of samples were called interference,
+the last sixteen seconds of them at the phone's best accuracy of 10°. And under the default
+one-degree heading filter a phone held still delivered nothing for 14.5 s, which the gate counted
+as low until it gave up.
+
+The iOS verdict is now Core Location's own: an invalid heading, an invalid accuracy, or an error
+worse than 45°; no field band, so interference is Android-only again, where it still catches the
+LoopPhone; and every heading event, not every degree. The recorded session is a test fixture that
+must never leave `Good`. The LoopPhone's prompts, read over adb the same night, were the truth: its
+rotation vector is a stub and its magnetometer's calibrated field sat at 60–65 µT on the desk,
+two and a half times the Earth's. Spec, "Amended 25 September 2026".
