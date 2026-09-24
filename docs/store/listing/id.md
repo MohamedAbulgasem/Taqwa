@@ -52,18 +52,22 @@ Rilis pertama.
 ## App Store
 
 ### Name (30)
-Taqwa
+Taqwa: Salat, Quran & Kiblat
 
-(Jika Apple menyatakan nama itu sudah dipakai: "Taqwa: Salat, Qur’an & Kiblat".)
+(From the next version. 1.0.0 went out under the name App Store Connect accepted on 22 September 2026; the listing said "Taqwa", but plain "Taqwa" is taken on the store, so it is probably the English title. If this name is refused as taken, keep that one and the 1.0.0 subtitle, which then adds the local words the name lacks.)
 
 ### Subtitle (30)
-Waktu Salat, Al-Qur’an, Kiblat
+Azan & tasbih, tanpa iklan
+
+(From the next version. In 1.0.0: "Waktu Salat, Al-Qur’an, Kiblat". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
 Waktu salat di tempat Anda berada, azan saat waktunya tiba, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Gratis, offline, tanpa akun, dan tanpa iklan.
 
 ### Keywords (100)
-sholat,shalat,jadwal,azan,adzan,quran,alquran,islam,muslim,murottal,tilawah,tasbih,zikir,ramadan
+sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,digital,arah,islam,muslim,ramadan
+
+(From the next version, trimmed of words the new name and subtitle already carry. In 1.0.0: sholat,shalat,jadwal,azan,adzan,quran,alquran,islam,muslim,murottal,tilawah,tasbih,zikir,ramadan)
 
 ### Description (4000)
 (Teks yang sama dengan deskripsi lengkap Play di atas.)

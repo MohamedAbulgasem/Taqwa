@@ -55,18 +55,22 @@ Première version.
 ## App Store
 
 ### Name (30)
-Taqwa
+Taqwa : Prière, Coran & Qibla
 
-(Si Apple dit que le nom est déjà pris : « Taqwa : Prière, Coran & Qibla ».)
+(From the next version. 1.0.0 went out under the name App Store Connect accepted on 22 September 2026; the listing said "Taqwa", but plain "Taqwa" is taken on the store, so it is probably the English title. If this name is refused as taken, keep that one and the 1.0.0 subtitle, which then adds the local words the name lacks.)
 
 ### Subtitle (30)
-Prière, Coran & Qibla
+Adhan & tasbih, sans publicité
+
+(From the next version. In 1.0.0: "Prière, Coran & Qibla". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
 Les horaires de prière là où vous êtes, l’adhan quand ils arrivent, le Coran entier à lire et à écouter, et la qibla. Gratuit, hors ligne, sans compte ni publicité.
 
 ### Keywords (100)
-horaires,salat,adhan,azan,quran,mushaf,kibla,islam,musulman,récitation,tasbih,dhikr,ramadan,namaz
+horaires,salat,azan,quran,mushaf,kibla,islam,musulman,récitation,chapelet,dhikr,ramadan,boussole
+
+(From the next version, trimmed of words the new name and subtitle already carry. In 1.0.0: horaires,salat,adhan,azan,quran,mushaf,kibla,islam,musulman,récitation,tasbih,dhikr,ramadan,namaz)
 
 ### Description (4000)
 (Le même texte que la description complète Play ci-dessus.)

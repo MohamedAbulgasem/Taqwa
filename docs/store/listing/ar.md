@@ -52,16 +52,22 @@
 ## App Store
 
 ### Name (30)
-تقوى
+تقوى: الصلاة والقرآن والقبلة
+
+(From the next version. 1.0.0 went out under the name App Store Connect accepted on 22 September 2026; the listing said "تقوى", but plain "Taqwa" is taken on the store, so it is probably the English title. If this name is refused as taken, keep that one and the 1.0.0 subtitle, which then adds the local words the name lacks.)
 
 ### Subtitle (30)
-مواقيت الصلاة والقرآن والقبلة
+أذان ومسبحة بدون إعلانات
+
+(From the next version. In 1.0.0: "مواقيت الصلاة والقرآن والقبلة". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
 مواقيت الصلاة حيث أنت، والأذان حين يحين وقتها، والقرآن كاملًا للقراءة والاستماع، والقبلة. مجاني، يعمل دون إنترنت، بلا حساب وبلا إعلانات.
 
 ### Keywords (100)
-الصلاة,مواقيت,أذان,القرآن,قرآن,القبلة,تلاوة,تسبيح,ذكر,رمضان,مصحف,إسلام
+مواقيت,صلاة,قرآن,قبلة,اذان,تلاوة,تسبيح,سبحة,ذكر,رمضان,مصحف,إسلام,مسلم,هجري,بوصلة
+
+(From the next version, trimmed of words the new name and subtitle already carry. In 1.0.0: الصلاة,مواقيت,أذان,القرآن,قرآن,القبلة,تلاوة,تسبيح,ذكر,رمضان,مصحف,إسلام)
 
 ### Description (4000)
 (نفس نص الوصف الكامل أعلاه.)

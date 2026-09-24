@@ -25,9 +25,13 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   Store name "Taqwa" if it is free (App Store names are unique across the whole store and a
   five-letter Arabic word is probably taken), otherwise the same 28-character title; subtitle
   "Prayer times, Quran & Qibla". Outcome, 22 September: the App Store record is named "Taqwa:
-  Prayer, Quran & Qibla", so that subtitle now repeats the name on the store page and adds no
-  search words. Replace it at the next version with words the name lacks (adhan, Quran audio,
-  tasbeeh), in every localisation.
+  Prayer, Quran & Qibla", because plain "Taqwa" is taken (so are a dozen look-alikes such as
+  "Taqwa - Prayer Times & Quran", checked 24 September), and that subtitle repeats the name. From
+  the next version each App Store language gets a translated name carrying prayer, Quran and
+  Qibla, a subtitle carrying adhan, tasbeeh and no ads, and keywords with neither's words: the
+  values sit in `docs/store/listing/<lang>.md` (App Information for name and subtitle, the
+  version page for keywords). A translated name refused as taken keeps the English title and the
+  1.0.0 subtitle for that language.
 - **Category:** Lifestyle on both (Apple secondary: Reference). Primary language English (United
   Kingdom); listings in all seven languages.
 - **Age:** Play target audience 13+ (an under-13 band triggers the Families review); content
@@ -222,8 +226,11 @@ costs days.
 4. **App Information**: subtitle, categories Lifestyle + Reference, content rights (contains
    third-party content, rights held: `docs/ATTRIBUTION.md`), age rating questionnaire (all None →
    4+), standard licence agreement. Localizations: add ar, fr, tr, id (name, subtitle, privacy
-   URL per language). App Store Connect offers no Urdu or Bengali listing, so those users see the
-   English one; the app itself still opens in their language.
+   URL per language). App Store Connect offered no Urdu or Bengali listing in September 2026, so
+   those users see the English one; the app itself still opens in their language. Apple listed
+   both as App Store languages on 31 March 2026, but developers reported that adding them failed
+   ("The language specified is not listed for localization"); look again at every new version,
+   since `ur.md` and `bn.md` and their screenshots are ready.
 5. **Pricing and Availability**: Free, all countries and regions. **App Privacy**: Get started →
    no data collected → Publish ("Data Not Collected"). **Trader status** when the banner asks:
    non-trader.

@@ -55,18 +55,22 @@ Destek: support@taqwa.world
 ## App Store
 
 ### Name (30)
-Taqwa
+Taqwa: Namaz, Kur’an ve Kıble
 
-(Apple adın alınmış olduğunu söylerse: "Taqwa: Namaz, Kur’an ve Kıble".)
+(From the next version. 1.0.0 went out under the name App Store Connect accepted on 22 September 2026; the listing said "Taqwa", but plain "Taqwa" is taken on the store, so it is probably the English title. If this name is refused as taken, keep that one and the 1.0.0 subtitle, which then adds the local words the name lacks.)
 
 ### Subtitle (30)
-Namaz vakitleri, Kur’an, Kıble
+Ezan ve zikirmatik, reklamsız
+
+(From the next version. In 1.0.0: "Namaz vakitleri, Kur’an, Kıble". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
 Bulunduğunuz yerin namaz vakitleri, vakti gelince ezan, okumak ve dinlemek için Kur’an’ın tamamı ve Kıble. Ücretsiz, çevrimdışı, hesapsız ve reklamsız.
 
 ### Keywords (100)
-ezan,kuran,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,iftar,sahur,islam,müslüman,pusula
+kuran,vakitleri,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,islam,müslüman,pusula,hicri
+
+(From the next version, trimmed of words the new name and subtitle already carry. In 1.0.0: ezan,kuran,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,iftar,sahur,islam,müslüman,pusula)
 
 ### Description (4000)
 (Yukarıdaki Play tam açıklamasıyla aynı metin.)
