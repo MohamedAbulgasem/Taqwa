@@ -35,6 +35,37 @@ class QuranRepositoryDbTest {
         assertEquals(QuranDb.VERSION.toLong(), version)
     }
 
+    // Tanzil's terms want its copyright notice in every file that carries a substantial part of its
+    // text, and CC BY 3.0 wants the licence URI with every copy (docs/ATTRIBUTION.md). The file
+    // carries two Tanzil texts, so it carries two notices, each exactly as its source file ends it:
+    // the notice forbids changing it, and that includes the trailing spaces on some of its lines.
+    @Test fun bundledDatabaseCarriesTanzilsNoticeForEachText() {
+        val driver = JdbcSqliteDriver("jdbc:sqlite:" + dbFile().absolutePath)
+        val tables = driver.executeQuery(null, "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'notice'", { cursor ->
+            cursor.next()
+            app.cash.sqldelight.db.QueryResult.Value(cursor.getLong(0))
+        }, 0).value
+        assertEquals(1L, tables, "quran.db has no notice table")
+        val rows = driver.executeQuery(null, "SELECT source, licence_url, text FROM notice ORDER BY source", { cursor ->
+            val out = mutableListOf<Triple<String, String, String>>()
+            while (cursor.next().value) out += Triple(cursor.getString(0)!!, cursor.getString(1)!!, cursor.getString(2)!!)
+            app.cash.sqldelight.db.QueryResult.Value(out)
+        }, 0).value
+        assertEquals(listOf("tanzil-simple-clean", "tanzil-uthmani"), rows.map { it.first })
+        val titles = mapOf(
+            "tanzil-simple-clean" to "\n#  Tanzil Quran Text (Simple Clean, Version 1.1)\n",
+            "tanzil-uthmani" to "\n#  Tanzil Quran Text (Uthmani, Version 1.1)\n",
+        )
+        for ((source, licenceUrl, text) in rows) {
+            assertEquals("https://creativecommons.org/licenses/by/3.0/", licenceUrl, source)
+            assertTrue(text.startsWith("# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK\n"), source)
+            assertTrue(titles.getValue(source) in text, "$source carries another text's notice")
+            assertTrue("\n#  License: Creative Commons Attribution 3.0\n" in text, source)
+            assertTrue("\n#  - This copyright notice shall be included in all verbatim copies \n" in text, "$source lost its trailing spaces")
+            assertTrue(text.endsWith("\n#  Please check updates at: http://tanzil.net/updates/\n#\n#====================================================================\n"), "$source is cut short")
+        }
+    }
+
     @Test fun hasEverySurahInOrder() = runTest {
         val s = repo.surahs()
         assertEquals(114, s.size)

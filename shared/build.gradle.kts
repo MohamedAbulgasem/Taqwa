@@ -122,3 +122,12 @@ android {
 kotlin {
     jvmToolchain(21)
 }
+
+// The androidUnitTest classes that check the bundled quran.db and city files read them straight
+// from src/commonMain/composeResources/files, which Gradle does not otherwise count as a test
+// input: a regenerated database on its own left those tests UP-TO-DATE, green from the file before.
+tasks.withType<Test>().configureEach {
+    inputs.dir("src/commonMain/composeResources/files")
+        .withPropertyName("bundledFiles")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+}

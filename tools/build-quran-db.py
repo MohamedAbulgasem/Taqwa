@@ -5,7 +5,8 @@ and the Madinah Mushaf page layout. Standard library only. Run from anywhere:
     python3 tools/build-quran-db.py            # download (cached), build, verify
     python3 tools/build-quran-db.py --verify   # verify an existing quran.db only
 
-Sources and licences are listed in docs/superpowers/specs/2026-09-07-taqwa-quran-reader-design.md §3.1.
+Sources are listed in docs/superpowers/specs/2026-09-07-taqwa-quran-reader-design.md §3.1; their
+licences as they stand are in docs/ATTRIBUTION.md.
 """
 from __future__ import annotations
 
@@ -41,6 +42,14 @@ TRANSLATIONS = [
     ("en.transliteration", "en", "Transliteration", "Tanzil Project", "transliteration"),
 ]
 TANZIL_LICENCE = "Tanzil Project, non-commercial use, verbatim, credit the translator. tanzil.net/trans"
+
+# Each Tanzil text file ends in a copyright block Tanzil asks never to be removed or changed. Its
+# terms want that block in every file derived from the text, and CC BY 3.0 wants the licence's URI
+# with every copy (tanzil.net/docs/text_license), so quran.db carries both in its `notice` table.
+# (notice.source, quranType) for the two texts the database holds.
+TANZIL_NOTICES = (("tanzil-uthmani", "uthmani"), ("tanzil-simple-clean", "simple-clean"))
+TANZIL_NOTICE_START = "# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK"
+TANZIL_TEXT_LICENCE_URL = "https://creativecommons.org/licenses/by/3.0/"
 
 # The Latin surah names shown in the app: the spellings most readers meet (quran.com's), in place
 # of Tanzil's own ("Al-Faatiha", "Aal-i-Imraan", "Al-Mursalaat"), which read oddly and defeated the
@@ -123,6 +132,16 @@ def parse_tanzil_text(raw: bytes) -> dict[tuple[int, int], str]:
         out[(int(s), int(a))] = clean(text)
     assert len(out) == 6236, f"expected 6236 ayahs, got {len(out)}"
     return out
+
+
+def tanzil_notice(raw: bytes) -> str:
+    """The copyright block a Tanzil text file ends with, from its first line to the end of the file.
+    Nothing is stripped or re-wrapped: the block forbids changes, and seven of its lines end in a
+    space."""
+    text = raw.decode("utf-8")
+    start = text.find("\n" + TANZIL_NOTICE_START) + 1
+    assert start > 0, "Tanzil's copyright block not found"
+    return text[start:]
 
 
 def parse_translation(raw: bytes, order: list[tuple[int, int]]) -> dict[tuple[int, int], str]:
@@ -392,6 +411,11 @@ def build(conn: sqlite3.Connection):
     print("Writing schema")
     conn.executescript(open(ROOT / "tools" / "quran-schema.sql", encoding="utf-8").read())
 
+    print("Tanzil's notices")
+    for source, kind in TANZIL_NOTICES:
+        raw = fetch(TANZIL_TEXT.format(kind=kind), f"{kind}.txt")
+        conn.execute("INSERT INTO notice VALUES (?,?,?)", (source, TANZIL_TEXT_LICENCE_URL, tanzil_notice(raw)))
+
     print("Surahs and ayahs")
     for s in suras:
         n = int(s["index"])
@@ -624,6 +648,15 @@ def verify(conn: sqlite3.Connection):
     verify_mushaf_text(conn)
     verify_iqlab_marks(conn)
     verify_glyphs(conn)
+    # Tanzil's notice for each of its texts, exactly as the cached source file ends it.
+    notices = dict(conn.execute("SELECT source, text FROM notice"))
+    assert sorted(notices) == sorted(s for s, _ in TANZIL_NOTICES), f"notice rows: {sorted(notices)}"
+    assert one("SELECT count(*) FROM notice WHERE licence_url = ?", TANZIL_TEXT_LICENCE_URL) == len(TANZIL_NOTICES)
+    for source, kind in TANZIL_NOTICES:
+        assert notices[source].startswith(TANZIL_NOTICE_START + "\n"), f"{source}: not Tanzil's block"
+        cached = CACHE / f"{kind}.txt"
+        if cached.exists():
+            assert notices[source] == tanzil_notice(cached.read_bytes()), f"{source} differs from {cached.name}"
     assert one("PRAGMA user_version") == USER_VERSION
     print("verify: ok")
 

@@ -50,6 +50,12 @@ CREATE TABLE line_word (
   PRIMARY KEY (page, line, position)
 );
 
+CREATE TABLE notice (                                   -- Tanzil's copyright notice for each text above; the app never reads it
+  source TEXT PRIMARY KEY,                              -- 'tanzil-uthmani' (ayah.text_uthmani, the Mushaf words) | 'tanzil-simple-clean' (ayah.text_search)
+  licence_url TEXT NOT NULL,                            -- CC BY 3.0 wants the licence's URI with every copy
+  text TEXT NOT NULL                                    -- the notice exactly as the source file ends, trailing spaces included
+);
+
 surahs:
 SELECT * FROM surah ORDER BY number;
 
