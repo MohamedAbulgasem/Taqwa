@@ -1,18 +1,28 @@
 package world.taqwa.app.feature.settings
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.design.components.drawExternalLink
 import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.resources.Res
@@ -45,10 +55,14 @@ import world.taqwa.app.resources.settings_attribution
 private data class Credit(
     val what: String,
     val detail: String,
+    /** Where the work comes from, shown bare; tapping the credit opens it (see [sourceUrl]). */
     val source: String? = null,
     /** A second paragraph under the detail, in the same tint: the ten reciters, named. */
     val extra: String? = null,
 )
+
+/** A source is shown bare ("tanzil.net"); the link it opens needs the scheme. */
+internal fun sourceUrl(source: String): String = "https://$source"
 
 /**
  * The contents of `docs/ATTRIBUTION.md`. GeoNames' CC BY 4.0 makes this screen an obligation.
@@ -133,24 +147,41 @@ fun AttributionScreen(
     onBack: () -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    val uriHandler = LocalUriHandler.current
+    val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
     val credits = credits(translations, reciters)
+    // A device with no browser fails silently rather than crashing, as on the About screen.
+    fun open(url: String) {
+        runCatching { uriHandler.openUri(url) }
+    }
     SettingsScaffold(stringResource(Res.string.settings_attribution), onBack) {
         SettingsNote(stringResource(Res.string.attribution_intro))
         Spacer(Modifier.height(16.dp))
         SettingsCard {
             credits.forEachIndexed { i, credit ->
                 if (i > 0) CardDivider()
-                Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
-                    Text(credit.what, style = TaqwaText.rowLabel, color = colors.textPrimary)
+                // A credit with a source leaves the app for it, as About's links do: the whole credit
+                // is the target, and the external-link glyph by its name says so before the tap.
+                // Tanzil's terms ask for this link, so readers can follow changes to the text.
+                val source = credit.source
+                val click = if (source != null) Modifier.clickable { open(sourceUrl(source)) } else Modifier
+                Column(Modifier.fillMaxWidth().then(click).padding(horizontal = 16.dp, vertical = 14.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(credit.what, style = TaqwaText.rowLabel, color = colors.textPrimary, modifier = Modifier.weight(1f))
+                        if (source != null) {
+                            Spacer(Modifier.width(12.dp))
+                            Canvas(Modifier.size(16.dp)) { drawExternalLink(colors.textTertiary, forward) }
+                        }
+                    }
                     Spacer(Modifier.height(2.dp))
                     Text(credit.detail, style = TaqwaText.caption, color = colors.textSecondary)
                     if (credit.extra != null) {
                         Spacer(Modifier.height(6.dp))
                         Text(credit.extra, style = TaqwaText.caption, color = colors.textSecondary)
                     }
-                    if (credit.source != null) {
+                    if (source != null) {
                         Spacer(Modifier.height(2.dp))
-                        Text(credit.source, style = TaqwaText.caption, color = colors.textTertiary)
+                        Text(source, style = TaqwaText.caption, color = colors.textTertiary)
                     }
                 }
             }
