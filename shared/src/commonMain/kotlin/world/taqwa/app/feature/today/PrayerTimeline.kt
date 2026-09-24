@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,8 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.domain.PrayerStatus
@@ -31,6 +35,8 @@ import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.i18n.PrayerNaming
 import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.i18n.localizedPrayerName
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.today_jumuah
 
 /** Gutter holding the pips; the rail runs down its centre. */
 private val GutterWidth = 26.dp
@@ -111,7 +117,19 @@ fun PrayerTimeline(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Weighted so the time is measured first and always keeps its line. With a
+                        // large font on a narrow phone the name and what follows it stop fitting
+                        // beside the time — Friday's Dhuhr with its pill from 150 % on a 360 dp
+                        // screen, Maghrib from 200 % — and a plain Row squeezed the time into a
+                        // column of single digits. Here what follows the name wraps under it.
+                        FlowRow(
+                            Modifier.weight(1f, fill = false),
+                            // Spacing between items rather than a start padding on each, so a
+                            // wrapped item starts flush under the name.
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            itemVerticalAlignment = Alignment.CenterVertically,
+                        ) {
                             if (arabicAlone) {
                                 // The spec's naming rule: in an Arabic-script interface the
                                 // interface's own name stands alone — الفجر in Arabic, فجر in
@@ -155,9 +173,9 @@ fun PrayerTimeline(
                                     fontFamily = FontFamily.Default,
                                     fontSize = 14.sp,
                                     color = colors.textTertiary,
-                                    modifier = Modifier.padding(start = 8.dp),
                                 )
                             }
+                            if (row.isJumuah) JumuahPill()
                         }
                         Text(
                             formatTime(row),
@@ -178,4 +196,28 @@ fun PrayerTimeline(
             }
         }
     }
+}
+
+/**
+ * Friday's Dhuhr is Jumuʿah. An outline, not a fill: the current prayer is lit by its text colour
+ * and the pip's halo, never by a background, so the pill sits on the card either way and reads
+ * the same beside an amber name as beside a plain one.
+ */
+@Composable
+private fun JumuahPill(modifier: Modifier = Modifier) {
+    val colors = LocalTaqwaColors.current
+    val shape = RoundedCornerShape(percent = 50)
+    Text(
+        stringResource(Res.string.today_jumuah),
+        modifier = modifier
+            .border(1.dp, colors.accent.copy(alpha = 0.4f), shape)
+            .padding(horizontal = 8.dp, vertical = 1.dp),
+        color = colors.accent,
+        fontWeight = FontWeight.Bold,
+        maxLines = 1,
+        // The type scale's 11 sp label, as the name and time beside it take theirs, so the three
+        // share a face; without the wide tracking it carries for all-caps labels, as this one is
+        // set in mixed case.
+        style = TaqwaText.sectionLabel.copy(letterSpacing = TextUnit.Unspecified),
+    )
 }

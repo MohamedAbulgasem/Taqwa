@@ -1,5 +1,8 @@
 package world.taqwa.app.prayer
 
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
@@ -15,6 +18,9 @@ object TimelineBuilder {
      * [yesterday] and [tomorrow] exist for the same reason: the ring measures the interval the
      * user is currently inside, and between midnight and Fajr that interval starts on yesterday's
      * Isha, just as the interval after Isha ends on tomorrow's Fajr.
+     *
+     * [zone] is the location's, the one [today] was computed in; it decides which row is
+     * Jumuʿah (see [isJumuah]).
      */
     fun build(
         yesterday: DayPrayerTimes,
@@ -22,6 +28,7 @@ object TimelineBuilder {
         tomorrow: DayPrayerTimes,
         now: Instant,
         showSunrise: Boolean,
+        zone: TimeZone,
     ): TodayState {
         val visible = today.times.filter { showSunrise || it.prayer != Prayer.SUNRISE }
 
@@ -40,6 +47,7 @@ object TimelineBuilder {
                     pt.instant <= now -> PrayerStatus.PASSED
                     else -> PrayerStatus.UPCOMING
                 },
+                isJumuah = isJumuah(pt.prayer, pt.instant, zone),
             )
         }
 
@@ -69,4 +77,14 @@ object TimelineBuilder {
             ringProgress = progress,
         )
     }
+
+    /**
+     * Whether this is Friday's Dhuhr, which the Prayer screen marks as Jumuʿah.
+     *
+     * The day is read in [zone], the location's own, and never the device's: the timeline shows
+     * the chosen city's day, so a phone still on Thursday evening that is showing Jakarta, where
+     * Friday has begun, marks Jakarta's Friday Dhuhr.
+     */
+    fun isJumuah(prayer: Prayer, instant: Instant, zone: TimeZone): Boolean =
+        prayer == Prayer.DHUHR && instant.toLocalDateTime(zone).dayOfWeek == DayOfWeek.FRIDAY
 }

@@ -183,7 +183,7 @@ class TodayViewModel(
             localDate.plus(prefs.hijriOffsetDays, DateTimeUnit.DAY),
         )
 
-        val timeline = TimelineBuilder.build(yesterday, today, tomorrow, instant, prefs.showSunrise)
+        val timeline = TimelineBuilder.build(yesterday, today, tomorrow, instant, prefs.showSunrise, zone)
         _state.value = TodayUiState.Ready(
             location = location,
             cityDisplayName = cachedCityName(location),

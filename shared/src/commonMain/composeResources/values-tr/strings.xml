@@ -48,6 +48,7 @@
     <string name="today_no_location_title">Henüz konum yok</string>
     <string name="today_choose_city">Şehir seç</string>
     <string name="today_allow_location">Ya da konuma izin ver</string>
+    <string name="today_jumuah">Cuma</string>
 
     <!-- Ayarlar kökü -->
     <string name="settings_title">Ayarlar</string>

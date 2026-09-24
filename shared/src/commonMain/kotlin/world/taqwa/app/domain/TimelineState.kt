@@ -9,6 +9,8 @@ data class TimelineRow(
     val prayer: Prayer,
     val instant: Instant,
     val status: PrayerStatus,
+    /** Friday's Dhuhr in the location's own zone; decided by `TimelineBuilder.isJumuah`. */
+    val isJumuah: Boolean = false,
 )
 
 data class TodayState(

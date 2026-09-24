@@ -43,6 +43,7 @@
     <string name="today_no_location_title">এখনো কোনো অবস্থান নেই</string>
     <string name="today_choose_city">শহর বেছে নিন</string>
     <string name="today_allow_location">বরং অবস্থানের অনুমতি দিন</string>
+    <string name="today_jumuah">জুমা</string>
 
     <!-- Settings root -->
     <string name="settings_title">সেটিংস</string>

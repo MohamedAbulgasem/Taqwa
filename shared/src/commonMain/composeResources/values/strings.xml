@@ -46,6 +46,8 @@
     <string name="today_no_location_title">No location yet</string>
     <string name="today_choose_city">Choose a city</string>
     <string name="today_allow_location">Allow location instead</string>
+    <!-- The pill beside Dhuhr on a Friday, the chosen city's own Friday. -->
+    <string name="today_jumuah">Jumuʿah</string>
 
     <!-- Settings root -->
     <string name="settings_title">Settings</string>

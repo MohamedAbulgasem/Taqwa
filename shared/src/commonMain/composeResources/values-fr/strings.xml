@@ -46,6 +46,7 @@
     <string name="today_no_location_title">Pas encore de position</string>
     <string name="today_choose_city">Choisir une ville</string>
     <string name="today_allow_location">Autoriser plutôt la localisation</string>
+    <string name="today_jumuah">Joumouʿa</string>
 
     <!-- Settings root -->
     <string name="settings_title">Paramètres</string>

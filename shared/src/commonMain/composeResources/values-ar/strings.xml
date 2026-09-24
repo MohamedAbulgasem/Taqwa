@@ -43,6 +43,7 @@
     <string name="today_no_location_title">لا يوجد موقع بعد</string>
     <string name="today_choose_city">اختر مدينة</string>
     <string name="today_allow_location">السماح بالموقع بدلًا من ذلك</string>
+    <string name="today_jumuah">الجمعة</string>
 
     <!-- Settings root -->
     <string name="settings_title">الإعدادات</string>

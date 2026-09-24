@@ -43,6 +43,7 @@
     <string name="today_no_location_title">ابھی کوئی مقام نہیں</string>
     <string name="today_choose_city">شہر چنیں</string>
     <string name="today_allow_location">اس کے بجائے مقام کی اجازت دیں</string>
+    <string name="today_jumuah">جمعہ</string>
 
     <!-- Settings root -->
     <string name="settings_title">ترتیبات</string>

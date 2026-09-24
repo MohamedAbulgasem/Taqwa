@@ -43,6 +43,7 @@
     <string name="today_no_location_title">Belum ada lokasi</string>
     <string name="today_choose_city">Pilih kota</string>
     <string name="today_allow_location">Izinkan lokasi saja</string>
+    <string name="today_jumuah">Jumat</string>
 
     <!-- Settings root -->
     <string name="settings_title">Pengaturan</string>
