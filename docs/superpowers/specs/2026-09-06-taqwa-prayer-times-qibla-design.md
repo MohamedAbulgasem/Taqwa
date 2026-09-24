@@ -322,6 +322,8 @@ On iOS the heading manager also calls `startUpdatingLocation()` — `trueHeading
 
 The recorded session is a test fixture (`IphoneCapeTownSession`): replayed through the rules and the gate, it must never leave `Good`.
 
+**Amended again, 25 September 2026: iOS computes true north itself.** `CLHeading.trueHeading` is valid only while the same manager receives location updates, so someone with a hand-picked city and location set to "Never" got `-1` on every sample, and the screen said the compass needed calibrating and then gave up on it. iOS now takes `magneticHeading`, which needs no location, and corrects it with the declination for the Qibla screen's city from the **World Magnetic Model 2025** (`WorldMagneticModel`, a port of NOAA's reference implementation embedded with NOAA's `WMM.COF`; public domain; reproduces all 100 of NOAA's published test points; valid to 2030, when WMM2030's coefficients replace it). The compass therefore makes no location request of its own and shows no permission prompt; the `headingAccuracy` rules are unchanged, since Apple states that bound against the magnetic heading. For Cape Town the model gives −26.79°, the declination iOS itself applied on the recorded iPhone to within a hundredth of a degree. Android keeps `GeomagneticField`.
+
 ---
 
 ## 11. Settings and defaults

@@ -4,8 +4,9 @@ import kotlinx.coroutines.flow.Flow
 import world.taqwa.app.domain.GeoLocation
 
 /**
- * One raw reading, as the sensor produced it. Heading is already true north: Android applies
- * `GeomagneticField` declination before emitting; iOS reports `CLHeading.trueHeading` directly.
+ * One raw reading, as the sensor produced it. Heading is already true north: both sources correct
+ * the magnetic heading by the declination at the Qibla screen's location before emitting — Android
+ * with `GeomagneticField`, iOS with [WorldMagneticModel].
  *
  * [isLowAccuracy] and [lowReason] are *per sample* facts, not a state — a single untrustworthy
  * sample means nothing on its own. [CompassAccuracyGate], driven by the view model, is what turns
@@ -24,8 +25,8 @@ interface CompassSource {
      * bearing instead and never subscribes to this at all. */
     val readings: Flow<CompassReading>
     fun hasSensor(): Boolean
-    /** Only meaningful on Android, where declination must be computed from a location; a no-op
-     * on iOS, where `CLHeading.trueHeading` is already true north. */
+    /** The location whose declination turns magnetic north into true north, on both platforms;
+     * without one every heading is marked low rather than passed off as true. */
     fun updateLocation(location: GeoLocation?)
 }
 

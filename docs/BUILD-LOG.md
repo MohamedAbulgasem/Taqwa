@@ -1536,3 +1536,12 @@ LoopPhone; and every heading event, not every degree. The recorded session is a 
 must never leave `Good`. The LoopPhone's prompts, read over adb the same night, were the truth: its
 rotation vector is a stub and its magnetometer's calibrated field sat at 60–65 µT on the desk,
 two and a half times the Earth's. Spec, "Amended 25 September 2026".
+
+The same investigation turned up a quieter fault: Core Location's true heading needs a location
+fix on the manager delivering headings, so anyone who picked their city by hand and keeps location
+off was told, forever, that the compass needed calibrating. iOS now corrects the magnetic heading
+itself with the declination the World Magnetic Model 2025 gives for the city on the Qibla screen —
+NOAA's public-domain model, ported with its coefficient file byte for byte, reproducing all 100 of
+NOAA's published test points to a thousandth of a nanotesla — so the compass works with location
+off and asks iOS for no location at all. For Cape Town it gives −26.79°; the iPhone had applied
+−26.8° itself.

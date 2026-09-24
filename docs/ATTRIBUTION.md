@@ -12,6 +12,7 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
 
 - **Prayer time calculation**: [Adhan](https://github.com/batoulapps/adhan-kotlin) by Batoul Apps, MIT licence.
 - **City database**: [GeoNames](https://www.geonames.org/) `cities15000`, CC BY 4.0.
+- **Magnetic declination (iOS compass)**: the [World Magnetic Model 2025](https://www.ncei.noaa.gov/products/world-magnetic-model) by NOAA's National Centers for Environmental Information and the British Geological Survey, for the US National Geospatial-Intelligence Agency and the UK Defence Geographic Centre. Public domain, not subject to copyright; its coefficient file is embedded in `WorldMagneticModel.kt`.
 - **Manrope** typeface: SIL Open Font Licence 1.1; the licence text is in `docs/licences/OFL-1.1-Manrope.txt`, as the OFL requires of every copy.
 - **Adhan and takbir audio**, three recordings, one chosen in Settings under Notifications, Adhan:
   - *Original*: "Beautiful adhan" by Adam-synagda, CC0 1.0, via Wikimedia Commons.

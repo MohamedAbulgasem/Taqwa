@@ -5,6 +5,9 @@ import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 import platform.CoreLocation.CLDeviceOrientation
 import platform.CoreLocation.CLDeviceOrientationLandscapeLeft
 import platform.CoreLocation.CLDeviceOrientationLandscapeRight
@@ -13,9 +16,7 @@ import platform.CoreLocation.CLDeviceOrientationPortraitUpsideDown
 import platform.CoreLocation.CLHeading
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
-import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
 import platform.CoreLocation.kCLHeadingFilterNone
-import platform.CoreLocation.kCLLocationAccuracyKilometer
 import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIApplication
 import platform.UIKit.UIInterfaceOrientation
@@ -29,22 +30,18 @@ import platform.darwin.NSObject
 import world.taqwa.app.domain.GeoLocation
 
 /**
- * `CLHeading.trueHeading` already applies declination — [updateLocation] is a deliberate no-op,
- * since only the Android path needs a location to correct magnetic north. Never reads
- * `magneticHeading`: that is the classic qibla bug this task exists to avoid.
+ * True north is computed here rather than asked of Core Location: `CLHeading.magneticHeading`
+ * corrected by the declination the [WorldMagneticModel] gives for the city on the Qibla screen
+ * ([updateLocation]), the way the Android source does it with `GeomagneticField`. Never the
+ * magnetic heading uncorrected — that is the classic qibla bug.
  *
- * True north is not free, though. Core Location computes declination from a location fix, and it
- * only hands one to the *same* manager that is delivering headings. A manager that calls
- * `startUpdatingHeading()` alone — as this one used to — reports `trueHeading` as `-1` forever,
- * which the smoothing filter turns into a heading of 359°: a needle that looks alive, points at
- * nothing, and never says so. Hence `startUpdatingLocation()` beside it, an authorisation request
- * when the app has not asked yet, and [CompassAccuracyRules.iosTrueHeadingIsInvalid] as a floor
- * under `headingAccuracy`.
- *
- * That location is *only* ever used for declination, which varies over tens of kilometres and
- * months. It is asked for at the coarsest accuracy Core Location offers and with a half-kilometre
- * distance filter: a qibla dial has no use for a GPS fix, and asking for one would keep the
- * receiver awake for the life of the screen to compute a number that would not change.
+ * Core Location's own `trueHeading` needs a location fix delivered to the *same* manager, and so
+ * location permission. Someone who picked their city by hand and keeps location off never has one:
+ * `trueHeading` stayed -1 for them, and the screen said the compass needed calibrating, then that
+ * this phone's compass could not be calibrated, about a compass that was fine. The magnetic heading
+ * needs no location at all, so this manager asks for none — no location updates, no permission
+ * prompt from the Qibla screen. For Cape Town the model's declination (-26.79° in September 2026)
+ * matches what iOS applied itself on an iPhone 13 that month to a hundredth of a degree.
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosCompassSource : CompassSource {
@@ -56,6 +53,9 @@ class IosCompassSource : CompassSource {
 
     /** Last orientation pushed to the manager, so an unchanged one is not written 20 times a second. */
     private var headingOrientation: CLDeviceOrientation = CLDeviceOrientationPortrait
+
+    /** Degrees east of true north at the Qibla screen's city, or null until [updateLocation]. */
+    private var declination: Double? = null
 
     /**
      * `CLLocationManager.delegate` is a **weak** reference, so a delegate with no other strong
@@ -72,7 +72,7 @@ class IosCompassSource : CompassSource {
             // Core Location cannot know which way the phone is being held unless it is told, and
             // untold it answers for a portrait device, putting a sideways phone 90° out.
             syncHeadingOrientation(manager)
-            val heading = didUpdateHeading.trueHeading
+            val heading = TrueNorth.fromMagneticOrInvalid(didUpdateHeading.magneticHeading, declination)
             val invalid = CompassAccuracyRules.iosTrueHeadingIsInvalid(heading)
             // Core Location's own verdict and nothing layered on top of it. A field-strength band
             // (20-70 µT on `CLHeading`'s x/y/z) used to sit here too: measured on an iPhone 13 in
@@ -105,7 +105,17 @@ class IosCompassSource : CompassSource {
 
     override fun hasSensor(): Boolean = CLLocationManager.headingAvailable()
 
-    override fun updateLocation(location: GeoLocation?) { /* no-op: trueHeading needs no correction */ }
+    /**
+     * The declination for the city on the Qibla screen, from the World Magnetic Model for today's
+     * date. It moves over kilometres and years, never between two headings, so it is computed once
+     * per location rather than per sample; null leaves every heading marked low, not magnetic.
+     */
+    override fun updateLocation(location: GeoLocation?) {
+        declination = location?.let {
+            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+            WorldMagneticModel.declinationDegrees(it.latitude, it.longitude, 0.0, WorldMagneticModel.decimalYear(today))
+        }
+    }
 
     private fun monotonicMillis(): Long = (NSProcessInfo.processInfo.systemUptime * 1_000.0).toLong()
 
@@ -157,19 +167,6 @@ class IosCompassSource : CompassSource {
         subscriber = this
         manager.delegate = delegate
         syncHeadingOrientation(manager)
-        // Only when the app has never asked: asking again when the user has said no is noise, and
-        // the location screen owns that conversation. The instance property, not the class method
-        // deprecated in iOS 14 — the deployment target is iOS 16, so there is no older path to
-        // keep.
-        if (manager.authorizationStatus == kCLAuthorizationStatusNotDetermined) {
-            manager.requestWhenInUseAuthorization()
-        }
-        // The heading updates are what the dial needs; the location updates are what makes those
-        // headings *true* north rather than a permanent -1. Declination is the only consumer, so
-        // the coarsest fix Core Location has is more than enough, and half a kilometre of
-        // movement is the point at which it could change by a hundredth of a degree.
-        manager.desiredAccuracy = kCLLocationAccuracyKilometer
-        manager.distanceFilter = 500.0
         // Every heading event, not only those after a degree of turning (the default filter). The
         // accuracy gate times its dwells on the samples it is given, as Android's continuous stream
         // gives them; under the default, a phone held still delivered nothing for 14.5 s, the gate
@@ -177,7 +174,6 @@ class IosCompassSource : CompassSource {
         // unavailable" to someone who was only holding still — and a still phone could never
         // recover, since the improving accuracy never arrived either.
         manager.headingFilter = kCLHeadingFilterNone
-        manager.startUpdatingLocation()
         manager.startUpdatingHeading()
         awaitClose {
             // Guarded: a recomposition can start the replacement collection before this one's
@@ -185,7 +181,6 @@ class IosCompassSource : CompassSource {
             // updates instead of the old one's.
             if (subscriber === this) {
                 manager.stopUpdatingHeading()
-                manager.stopUpdatingLocation()
                 manager.delegate = null
                 subscriber = null
             }
