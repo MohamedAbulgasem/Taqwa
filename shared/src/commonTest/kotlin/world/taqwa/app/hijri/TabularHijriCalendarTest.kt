@@ -1,6 +1,7 @@
 package world.taqwa.app.hijri
 
 import kotlinx.datetime.LocalDate
+import world.taqwa.app.i18n.UiLanguage
 import kotlinx.datetime.plus
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -69,6 +70,6 @@ class TabularHijriCalendarTest {
 
     @Test
     fun monthNamesCoverAllTwelve() {
-        (1..12).forEach { assertTrue(HijriFormatter.monthNameEnglish(it).isNotBlank()) }
+        (1..12).forEach { assertTrue(HijriMonthNames.of(it, UiLanguage.ENGLISH).isNotBlank()) }
     }
 }
