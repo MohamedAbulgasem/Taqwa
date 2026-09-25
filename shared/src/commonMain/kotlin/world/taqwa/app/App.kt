@@ -43,7 +43,6 @@ import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
-import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.quran.QuranRootUiState
 import world.taqwa.app.feature.settings.AboutScreen
@@ -258,7 +257,6 @@ fun App(container: AppContainer) {
     // Onboarding's step lives here rather than inside the screen: "choose a city instead"
     // navigates away to the city search, which would otherwise reset the flow to its first page.
     val onboardingStepState = remember { mutableStateOf(OnboardingStep.WELCOME) }
-    var onboardingStep by onboardingStepState
 
     // Resolved before anything renders, so a returning user never sees Today flash behind
     // onboarding on launch.
@@ -519,29 +517,15 @@ fun App(container: AppContainer) {
                     },
                 ) {
                     when (screen) {
-                        Screen.Onboarding -> OnboardingScreen(
-                            step = onboardingStep,
-                            onStep = { onboardingStep = it },
-                            locationRepository = container.locationRepository,
-                            widgetPinRequester = container.widgetPinRequester,
-                            onLocationPermission = { permission ->
-                                if (permission == LocationPermission.GRANTED) useGpsFix()
-                            },
-                            onChooseCity = { navigator.push(Screen.CitySearch) },
-                            onNotificationPermission = { granted ->
-                                scope.launch { notificationOnboarding(granted).enable() }
-                            },
-                            onDeclineNotifications = {
-                                scope.launch { notificationOnboarding(false).declineForNow() }
-                            },
-                            onComplete = {
-                                scope.launch {
-                                    settings.setOnboardingComplete(true)
-                                    navigator.replaceAll(Screen.Today)
-                                }
-                            },
-                            exactAlarmsNeeded = !exactAlarmsAllowed,
-                            onRequestExactAlarms = ::requestExactAlarmAccess,
+                        Screen.Onboarding -> OnboardingRoute(
+                            onboardingStepState = onboardingStepState,
+                            container = container,
+                            useGpsFix = ::useGpsFix,
+                            navigator = navigator,
+                            scope = scope,
+                            notificationOnboarding = ::notificationOnboarding,
+                            settings = settings,
+                            exactAlarmsAllowedState = exactAlarmsAllowedState,
                         )
 
                         Screen.Today -> {
