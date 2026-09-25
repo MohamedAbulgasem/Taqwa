@@ -99,6 +99,18 @@ class TimetableTest {
     }
 
     @Test
+    fun anUmmAlQuraRamadanIsRefusedUntilTheAppAddsItsHalfHour() {
+        // Umm al-Qura's Isha is 120 minutes after Maghrib in Ramadan, not 90; the app's engine
+        // keeps 90, so a Ramadan month in Makkah would show Isha half an hour early.
+        val makkah = city("makkah-saudi-arabia", "SA", 21.42664, 39.82563, "Asia/Riyadh")
+        val error = assertFailsWith<IllegalStateException> {
+            timetable.months(makkah, Instant.parse("2027-01-15T00:07:00Z"))
+        }
+        assertTrue(error.message!!.contains("Ramadan"), error.message)
+        assertEquals(2, timetable.months(makkah, Instant.parse("2026-09-25T00:07:00Z")).size)
+    }
+
+    @Test
     fun theHijriDateIsTheAppsTabularOne() {
         val day = timetable.day(tripoli, LocalDate(2026, 9, 13))
         assertEquals(Triple(1448, 3, 30), Triple(day.hijri.year, day.hijri.month, day.hijri.day))

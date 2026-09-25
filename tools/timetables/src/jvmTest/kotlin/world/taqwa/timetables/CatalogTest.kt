@@ -1,6 +1,7 @@
 package world.taqwa.timetables
 
 import world.taqwa.app.domain.AsrMadhab
+import world.taqwa.app.domain.PrayerSettings
 import java.io.File
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
@@ -24,12 +25,12 @@ class CatalogTest {
     }
 
     private fun list(vararg rows: String): File = File.createTempFile("cities", ".tsv").apply {
-        writeText("# slug\tid\tlanguages\tmadhab\tfeatured\tnames\n" + rows.joinToString("\n") + "\n")
+        writeText("# slug\tid\tlanguages\tfeatured\tnames\n" + rows.joinToString("\n") + "\n")
     }
 
     @Test
     fun aRowResolvesCoordinatesZoneAndNamesFromTheAppsData() {
-        val city = Catalog.load(list("tripoli-libya\t2210247\ten ar\t\ten ar\t"), app).single()
+        val city = Catalog.load(list("tripoli-libya\t2210247\ten ar\ten ar\t"), app).single()
         assertEquals("tripoli-libya", city.slug)
         assertEquals("LY", city.countryCode)
         assertEquals("Africa/Tripoli", city.timeZone)
@@ -42,21 +43,23 @@ class CatalogTest {
 
     @Test
     fun anOverrideWinsOverTheAppsName() {
-        val city = Catalog.load(list("al-khums-libya\t2219905\ten ar\t\t\tar=الخمس"), app).single()
+        val city = Catalog.load(list("al-khums-libya\t2219905\ten ar\t\tar=الخمس"), app).single()
         assertEquals("الخمس", city.name("ar"))
         assertEquals("Al Khums", city.name("en"))
     }
 
     @Test
-    fun hanafiIsTheDefaultWhereItIsTheNorm() {
-        assertEquals(AsrMadhab.HANAFI, Catalog.load(list("karachi-pakistan\t1174872\ten ur\t\t\t"), app).single().madhab)
-        assertEquals(AsrMadhab.STANDARD, Catalog.load(list("tripoli-libya\t2210247\ten\t\t\t"), app).single().madhab)
-        assertEquals(AsrMadhab.STANDARD, Catalog.load(list("karachi-pakistan\t1174872\ten\tSTANDARD\t\t"), app).single().madhab)
+    fun theAsrSchoolIsTheAppsDefaultEvenWhereHanafiIsTheNorm() {
+        // The app has no country default for the Asr school, so a user in Karachi who has not
+        // changed a setting sees the Standard Asr, and the page must show the same.
+        val karachi = Catalog.load(list("karachi-pakistan\t1174872\ten ur\t\t"), app).single()
+        assertEquals(PrayerSettings().madhab, karachi.madhab)
+        assertEquals(AsrMadhab.STANDARD, karachi.madhab)
     }
 
     @Test
     fun commentsAndBlankLinesAreIgnored() {
-        val cities = Catalog.load(list("", "# held back: somewhere", "tripoli-libya\t2210247\ten\t\t\t"), app)
+        val cities = Catalog.load(list("", "# held back: somewhere", "tripoli-libya\t2210247\ten\t\t"), app)
         assertEquals(1, cities.size)
     }
 
@@ -65,14 +68,13 @@ class CatalogTest {
         val error = assertFailsWith<CatalogError> {
             Catalog.load(
                 list(
-                    "tripoli-libya\t9999999\ten\t\t\t",
-                    "tripoli-libya\t2210247\ten\t\t\t",
-                    "Karachi Pakistan\t1174872\ten\t\t\t",
-                    "karachi-pakistan\t1174872\ten xx\t\t\t",
-                    "al-khums-libya\t2219905\tar\t\t\t",
-                    "tripoli-2\t2210247\ten fr\t\t\t",
-                    "tripoli-3\t2210247\ten\tSHIA\t\t",
-                    "tripoli-4\t2210247\ten\t\tar\t",
+                    "tripoli-libya\t9999999\ten\t\t",
+                    "tripoli-libya\t2210247\ten\t\t",
+                    "Karachi Pakistan\t1174872\ten\t\t",
+                    "karachi-pakistan\t1174872\ten xx\t\t",
+                    "al-khums-libya\t2219905\tar\t\t",
+                    "tripoli-2\t2210247\ten fr\t\t",
+                    "tripoli-4\t2210247\ten\tar\t",
                 ),
                 app,
             )
@@ -85,7 +87,6 @@ class CatalogTest {
             "unknown language xx",
             "no English page",
             "no fr name",
-            "unknown madhab SHIA",
             "featured in ar",
         ).forEach { assertTrue(message.contains(it), "missing '$it' in:\n$message") }
     }

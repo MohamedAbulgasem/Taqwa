@@ -87,7 +87,7 @@ class Timetable(private val engine: PrayerTimesEngine = PrayerTimesEngine()) {
     fun months(city: City, now: Instant): List<TimetableMonth> {
         val today = localToday(city, now)
         val first = LocalDate(today.year, today.month.number, 1)
-        return (0 until 2).map { offset ->
+        val months = (0 until 2).map { offset ->
             val start = first.plus(offset, DateTimeUnit.MONTH)
             val days = generateSequence(start) { it.plus(1, DateTimeUnit.DAY) }
                 .takeWhile { it.month == start.month }
@@ -95,5 +95,19 @@ class Timetable(private val engine: PrayerTimesEngine = PrayerTimesEngine()) {
                 .toList()
             TimetableMonth(start.year, start.month.number, days)
         }
+        // Umm al-Qura's Isha is 120 minutes after Maghrib in Ramadan and 90 the rest of the year.
+        // The app's engine keeps 90, so its Ramadan Isha in Saudi Arabia is half an hour early;
+        // until the app adds the Ramadan half hour, no page may show a Ramadan day for such a city.
+        val ramadan = months.flatMap { it.days }.firstOrNull { it.hijri.month == RAMADAN }
+        check(method(city) != CalculationMethodId.UMM_AL_QURA || ramadan == null) {
+            "${city.slug}: ${ramadan?.date} is in Ramadan, when Umm al-Qura's Isha is 120 minutes after Maghrib; " +
+                "the app's engine keeps 90, so the page would show Isha half an hour early. " +
+                "Add the Ramadan rule to the app's Umm al-Qura method, or hold the Umm al-Qura cities"
+        }
+        return months
+    }
+
+    private companion object {
+        const val RAMADAN = 9
     }
 }

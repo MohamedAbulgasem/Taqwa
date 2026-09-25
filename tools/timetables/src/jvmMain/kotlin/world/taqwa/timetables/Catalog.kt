@@ -1,6 +1,7 @@
 package world.taqwa.timetables
 
 import world.taqwa.app.domain.AsrMadhab
+import world.taqwa.app.domain.PrayerSettings
 import java.io.File
 
 /** The seven languages the site and the app are written in. */
@@ -35,18 +36,18 @@ class CatalogError(problems: List<String>) :
 /**
  * Reads `site/cities.tsv`, one city per line, tab-separated:
  *
- *     slug  id  languages  madhab  featured  names
+ *     slug  id  languages  featured  names
  *
- * `languages` and `featured` are space-separated language codes; `madhab` is blank (the country's
- * norm), `STANDARD` or `HANAFI`; `names` is `lang=Name` pairs separated by `;`, used only to
- * correct a name the app's data has wrong. Lines starting with `#` are comments.
+ * `languages` and `featured` are space-separated language codes; `names` is `lang=Name` pairs
+ * separated by `;`, used only to correct a name the app's data has wrong. Lines starting with `#`
+ * are comments.
+ *
+ * There is no Asr column: a page shows what the app shows a user there who has changed nothing,
+ * and the app's Asr school is the same everywhere until it is changed by hand.
  *
  * Every problem in the file is collected and reported together, so one run shows them all.
  */
 object Catalog {
-
-    /** Where the Hanafi school is the norm, so Asr is Hanafi unless the list says otherwise. */
-    private val HANAFI_BY_NORM = setOf("PK", "IN", "BD", "AF", "UZ")
 
     private val SLUG = Regex("^[a-z0-9]+(-[a-z0-9]+)*$")
 
@@ -65,8 +66,8 @@ object Catalog {
             val line = raw.trimEnd()
             if (line.isBlank() || line.trimStart().startsWith("#")) return@forEachIndexed
             val where = "line ${index + 1}"
-            val cells = line.split('\t').map { it.trim() } + List(6) { "" }
-            val (slug, idText, languagesText, madhabText, featuredText, namesText) = cells
+            val cells = line.split('\t').map { it.trim() } + List(5) { "" }
+            val (slug, idText, languagesText, featuredText, namesText) = cells
 
             if (!SLUG.matches(slug)) problems += "$where: slug '$slug' must be lowercase letters, digits and hyphens"
             if (!seen.add(slug)) problems += "$where: duplicate slug $slug"
@@ -83,16 +84,6 @@ object Catalog {
             if ("en" !in languages) problems += "$where: $slug has no English page"
             val featured = featuredText.split(' ').filter { it.isNotBlank() }.toSet()
             featured.filter { it !in languages }.forEach { problems += "$where: $slug is featured in $it but has no $it page" }
-
-            val madhab = when (madhabText.uppercase()) {
-                "" -> if (row.getValue("countryCode") in HANAFI_BY_NORM) AsrMadhab.HANAFI else AsrMadhab.STANDARD
-                "STANDARD" -> AsrMadhab.STANDARD
-                "HANAFI" -> AsrMadhab.HANAFI
-                else -> {
-                    problems += "$where: unknown madhab $madhabText"
-                    AsrMadhab.STANDARD
-                }
-            }
 
             val overrides = namesText.split(';').filter { it.contains('=') }.associate {
                 it.substringBefore('=').trim() to it.substringAfter('=').trim()
@@ -118,7 +109,7 @@ object Catalog {
                 longitude = row.getValue("lon").toDouble(),
                 timeZone = row.getValue("tz"),
                 languages = listOf("en") + languages.filter { it != "en" && it in SITE_LANGUAGES },
-                madhab = madhab,
+                madhab = PrayerSettings().madhab,
                 featured = featured,
                 names = names,
             )
@@ -126,8 +117,6 @@ object Catalog {
         if (problems.isNotEmpty()) throw CatalogError(problems)
         return result
     }
-
-    private operator fun <T> List<T>.component6(): T = this[5]
 
     /** The app's files are plain comma-separated with a header row and no quoting. */
     private fun readCsv(file: File): List<Map<String, String>> {
