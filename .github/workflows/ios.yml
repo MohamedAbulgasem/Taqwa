@@ -1,0 +1,85 @@
+name: iOS
+
+# The iOS half of the app's checks, on GitHub's Apple-silicon macOS runner (free for a public
+# repository): the shared and widget suites on the iOS simulator, as scripts/test.sh runs them on a
+# Mac, then the app and its widget extension built by scripts/ios-build.sh, which also holds the
+# extension to its memory budget. That build is the only CI step that compiles the Swift code. The
+# Android half runs in tests.yml.
+#
+# Only for changes that can reach the iOS app: the website, the docs and the Android host app
+# cannot, and a macOS run takes far longer than the Linux one.
+on:
+  push:
+    paths:
+      - "shared/**"
+      - "widgetcore/**"
+      - "iosApp/**"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+      - "gradlew"
+      - "scripts/test.sh"
+      - "scripts/ios-build.sh"
+      - ".github/workflows/ios.yml"
+  pull_request:
+    paths:
+      - "shared/**"
+      - "widgetcore/**"
+      - "iosApp/**"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+      - "gradlew"
+      - "scripts/test.sh"
+      - "scripts/ios-build.sh"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    # A pull request from a branch of this repository is already covered by its push.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    # macOS 26 on Apple silicon: its Xcode is always a 26.x, which Kotlin 2.4's CoreLocation
+    # bindings need (docs/BUILD-LOG.md), and the app builds for Apple-silicon simulators only.
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+      - name: Xcode
+        # The image's default Xcode. Without DEVELOPER_DIR the scripts fall back to the path on the
+        # development Mac, "/Applications/Xcode 26.app", which this machine does not have.
+        run: |
+          echo "DEVELOPER_DIR=$(xcode-select -p)" >> "$GITHUB_ENV"
+          xcodebuild -version
+      - name: Kotlin/Native toolchain cache
+        # The compiler, its LLVM and the library caches it builds on first use: minutes a run.
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Shared and widget tests on the iOS simulator
+        run: ./scripts/test.sh --no-daemon :shared:iosSimulatorArm64Test :widgetcore:iosSimulatorArm64Test
+      - name: The app and its widget build, and the widget stays under its memory budget
+        # Unsigned: a simulator build needs no team, and this machine has none to sign with.
+        run: |
+          ./scripts/ios-build.sh build CODE_SIGNING_ALLOWED=NO
+          # The script skips the size check when there is no extension to measure; here there must be one.
+          test -d build/ios-dd/Build/Products/Debug-iphonesimulator/Taqwa.app/PlugIns/TaqwaWidget.appex
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with:
+          name: ios-test-reports
+          path: "**/build/reports/tests/"
+          if-no-files-found: ignore

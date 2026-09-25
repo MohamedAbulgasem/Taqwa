@@ -3,8 +3,9 @@
 # Xcode 26.2 is installed; this forces it without needing sudo.
 # Permanent fix (needs your password):
 #   sudo xcode-select -s "/Applications/Xcode 26.app/Contents/Developer"
+# An Xcode already chosen through DEVELOPER_DIR wins, as in scripts/test.sh; CI sets it.
 set -e
-export DEVELOPER_DIR="/Applications/Xcode 26.app/Contents/Developer"
+export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode 26.app/Contents/Developer}"
 cd "$(dirname "$0")/.."
 xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator \
   -destination "${IOS_DEST:-platform=iOS Simulator,name=iPhone 17 Pro}" \
