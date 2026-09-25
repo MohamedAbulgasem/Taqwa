@@ -28,6 +28,7 @@ OBLIGATORY = [0, 2, 3, 4, 5]  # the prayers of the Today card, as in the app: Su
 DHUHR = 2
 FAJR, SUNRISE, ASR, MAGHRIB, ISHA = 0, 1, 3, 4, 5
 NEARBY_KM = 900
+AT_KAABA_KM = 5
 MAX_SAME_COUNTRY = 14
 MAX_NEARBY = 6
 
@@ -108,6 +109,16 @@ def plain(sentence: str, **values) -> str:
     for key, value in values.items():
         sentence = sentence.replace("{" + key + "}", str(value))
     return sentence
+
+
+def at_kaaba(city: dict) -> bool:
+    """Whether the city is Makkah itself, where the Qibla is the Kaaba in front of you."""
+    return city["qibla"]["km"] < AT_KAABA_KM
+
+
+def heading(title: str) -> str:
+    """A CLDR month title as a heading: French and others write "septembre 2026" in lower case."""
+    return title[:1].upper() + title[1:]
 
 
 def digits(number: int, digit_set: str) -> str:
@@ -210,10 +221,13 @@ class Timetables:
         page = city["pages"][lang]
         month = page["months"][0]["title"]
         values = self.sentence_values(city, lang)
+        description = plain(t["description"], **values, month=month)
+        if not at_kaaba(city):
+            description += plain(t["description_qibla"], **values)
         meta = {
             "title": plain(t["title"], **values, month=month, brand=cfg["brand"]),
             "og_title": plain(t["og_title"], **values),
-            "description": plain(t["description"], **values, month=month),
+            "description": description,
         }
         write_page(self.langs, lang, template, out_dir=twins[lang], meta=meta, body=self.city_body(city, lang),
                    twins=twins, picker=self.picker_to_city(city), current="prayer_times",
@@ -261,9 +275,15 @@ class Timetables:
         crumbs = (f'<nav class="crumbs" aria-label="{attr(t["nav"])}"><a href="../">{esc(t["nav"])}</a>'
                   f'<span aria-hidden="true">{sep}</span><a href="../#{city["country"].lower()}">{esc(page["country"])}</a>'
                   f'<span aria-hidden="true">{sep}</span><span aria-current="page">{esc(page["city"])}</span></nav>')
+        if at_kaaba(city):
+            # In Makkah itself a bearing and "0 km to Makkah" mean nothing: the Kaaba is there.
+            qibla = f'<div class="fact qibla"><div><span class="label">{esc(page["qibla"])}</span><b>{esc(t["qibla_here"])}</b></div></div>'
+        else:
+            qibla = (f'<div class="fact qibla">{dial(city["qibla"]["bearing"])}<div><span class="label">{esc(page["qibla"])}</span>'
+                     f'<b>{fill(t["qibla_bearing"], **values)}</b><span>{fill(t["qibla_distance"], **values)}</span></div></div>')
         facts = f'''<div class="facts">
         <div class="fact"><span class="label">{esc(t["method"])}</span><b>{esc(page["method"])}</b><span>{fill(t["asr"], **values)} · <span dir="ltr">{esc(page["offset"])}</span></span><a href="{{support}}#prayer-time">{esc(t["why"])}</a></div>
-        <div class="fact qibla">{dial(city["qibla"]["bearing"])}<div><span class="label">{esc(page["qibla"])}</span><b>{fill(t["qibla_bearing"], **values)}</b><span>{fill(t["qibla_distance"], **values)}</span></div></div>
+        {qibla}
       </div>'''
         hero = f'''<div class="city-hero">
     <div class="city-copy">
@@ -309,7 +329,7 @@ class Timetables:
             if p == DHUHR:
                 tag = f'<span class="tag" data-tt="jumuah"{"" if friday else " hidden"}>{esc(page["jumuah"])}</span>'
             items.append(f'<li data-p="{p}"><i></i><b>{esc(page["prayers"][p])}</b>{pair}{tag}<time>{esc(day["times"][p])}</time></li>')
-        month_title = page["months"][0]["title"]
+        month_title = heading(page["months"][0]["title"])
         return f'''<section class="today" aria-label="{attr(t["today"])}">
       <div class="ring-box">{ring(0)}
         <div class="ring-text"><span class="ring-label" data-tt="label">{esc(page["today"]["weekday"])}</span><span class="ring-count" data-tt="count">{esc(day["day"])}</span><span class="ring-at" data-tt="at">{esc(month_title)}</span></div>
@@ -362,11 +382,11 @@ class Timetables:
                 notes.append(f'<p class="note">{fill(t["clock_change"], date=change["date"], offset=change["offset"])}</p>')
         if any_high and page["highLatitude"]:
             notes.append(f'<p class="note">{fill(t["high_latitude"], rule=page["highLatitude"][0], fajr=page["prayers"][FAJR], isha=page["prayers"][ISHA])}</p>')
-        jump = f'<a class="pill quiet" href="#{other_anchor}">{esc(other["title"])}</a>' if other_anchor else ""
+        jump = f'<a class="pill quiet" href="#{other_anchor}">{esc(heading(other["title"]))}</a>' if other_anchor else ""
         caption = fill(t["h1"], **self.sentence_values(city, lang)) + " · " + esc(month["title"])
         return f'''
   <section class="month" id="{anchor}" aria-labelledby="{anchor}-h">
-    <div class="month-head"><div><h2 id="{anchor}-h">{esc(month["title"])}</h2><p>{esc(month["hijri"])}</p></div>{jump}</div>
+    <div class="month-head"><div><h2 id="{anchor}-h">{esc(heading(month["title"]))}</h2><p>{esc(month["hijri"])}</p></div>{jump}</div>
     <div class="tt-wrap"><table class="tt" data-month="{m}">
       <caption class="sr">{caption}</caption>
       <thead><tr>{"".join(heads)}</tr></thead>

@@ -40,7 +40,8 @@
     "no_match": "এই নামে কোনো শহর এখানে এখনো নেই। অ্যাপে ত্রিশ হাজারের বেশি শহর আছে, আর এটি আপনার অবস্থান দিয়েও কাজ করে।",
     "title": "{city} নামাজের সময়সূচি, {country} · {month} · {brand}",
     "og_title": "{city} নামাজের সময়সূচি, {country}",
-    "description": "{city} শহরে {month} মাসের প্রতিদিনের নামাজের সময়: {fajr}, {sunrise}, {dhuhr}, {asr}, {maghrib} ও {isha}, {method} পদ্ধতিতে। কিবলা: {qibla}।",
+    "description": "{city} শহরে {month} মাসের প্রতিদিনের নামাজের সময়: {fajr}, {sunrise}, {dhuhr}, {asr}, {maghrib} ও {isha}, {method} পদ্ধতিতে।",
+    "description_qibla": " কিবলা: {qibla}।",
     "h1": "{city} নামাজের সময়সূচি",
     "method": "হিসাবের পদ্ধতি",
     "asr": "{asr}: {madhab}",
@@ -74,6 +75,7 @@
       "europe": "ইউরোপ",
       "americas": "আমেরিকা",
       "oceania": "ওশেনিয়া"
-    }
+    },
+    "qibla_here": "কাবা এখানেই, মসজিদুল হারামে।"
   }
 }

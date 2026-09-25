@@ -40,7 +40,8 @@
     "no_match": "اس نام کا کوئی شہر ابھی یہاں نہیں۔ ایپ میں تیس ہزار سے زیادہ شہر ہیں، اور یہ آپ کے مقام سے بھی کام کرتی ہے۔",
     "title": "{city} میں نماز کے اوقات، {country} · {month} · {brand}",
     "og_title": "{city} میں نماز کے اوقات، {country}",
-    "description": "{city} میں {month} کے ہر دن کے لیے {fajr}، {sunrise}، {dhuhr}، {asr}، {maghrib} اور {isha} کے اوقات، {method} کے طریقے سے۔ قبلہ: {qibla}۔",
+    "description": "{city} میں {month} کے ہر دن کے لیے {fajr}، {sunrise}، {dhuhr}، {asr}، {maghrib} اور {isha} کے اوقات، {method} کے طریقے سے۔",
+    "description_qibla": " قبلہ: {qibla}۔",
     "h1": "{city} میں نماز کے اوقات",
     "method": "طریقۂ حساب",
     "asr": "{asr}: {madhab}",
@@ -74,6 +75,7 @@
       "europe": "یورپ",
       "americas": "امریکہ",
       "oceania": "اوشیانیا"
-    }
+    },
+    "qibla_here": "خانۂ کعبہ یہیں، مسجدِ حرام میں ہے۔"
   }
 }

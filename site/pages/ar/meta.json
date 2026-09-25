@@ -40,7 +40,8 @@
     "no_match": "لا مدينة بهذا الاسم هنا بعد. في التطبيق أكثر من ثلاثين ألف مدينة، ويعمل بموقعك أيضًا.",
     "title": "مواقيت الصلاة في {city}، {country} · {month} · {brand}",
     "og_title": "مواقيت الصلاة في {city}، {country}",
-    "description": "{fajr} و{sunrise} و{dhuhr} و{asr} و{maghrib} و{isha} في {city} لكل يوم من {month}، بطريقة {method}. القبلة: {qibla}.",
+    "description": "{fajr} و{sunrise} و{dhuhr} و{asr} و{maghrib} و{isha} في {city} لكل يوم من {month}، بطريقة {method}.",
+    "description_qibla": " القبلة: {qibla}.",
     "h1": "مواقيت الصلاة في {city}",
     "method": "طريقة الحساب",
     "asr": "{asr}: {madhab}",
@@ -74,6 +75,7 @@
       "europe": "أوروبا",
       "americas": "الأمريكتان",
       "oceania": "أوقيانوسيا"
-    }
+    },
+    "qibla_here": "الكعبة هنا، في المسجد الحرام."
   }
 }

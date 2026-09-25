@@ -40,7 +40,8 @@
     "no_match": "Bu adla bir şehir burada henüz yok. Uygulamada otuz binden fazla şehir var ve konumunuzla da çalışır.",
     "title": "{city} namaz vakitleri, {country} · {month} · {brand}",
     "og_title": "{city} namaz vakitleri, {country}",
-    "description": "{city} için {month} ayının her günü {fajr}, {sunrise}, {dhuhr}, {asr}, {maghrib} ve {isha} vakitleri, {method} yöntemiyle. Kıble: {qibla}.",
+    "description": "{city} için {month} ayının her günü {fajr}, {sunrise}, {dhuhr}, {asr}, {maghrib} ve {isha} vakitleri, {method} yöntemiyle.",
+    "description_qibla": " Kıble: {qibla}.",
     "h1": "{city} namaz vakitleri",
     "method": "Yöntem",
     "asr": "{asr}: {madhab}",
@@ -74,6 +75,7 @@
       "europe": "Avrupa",
       "americas": "Amerika",
       "oceania": "Okyanusya"
-    }
+    },
+    "qibla_here": "Kâbe burada, Mescid-i Haram’da."
   }
 }

@@ -40,7 +40,8 @@
     "no_match": "Aucune ville de ce nom ici pour l’instant. L’application en compte plus de trente mille, et fonctionne aussi avec votre position.",
     "title": "Horaires de prière à {city}, {country} · {month} · {brand}",
     "og_title": "Horaires de prière à {city}, {country}",
-    "description": "{fajr}, {sunrise}, {dhuhr}, {asr}, {maghrib} et {isha} à {city} pour chaque jour de {month}, selon la méthode {method}. Qibla : {qibla}.",
+    "description": "{fajr}, {sunrise}, {dhuhr}, {asr}, {maghrib} et {isha} à {city} pour chaque jour de {month}, selon la méthode {method}.",
+    "description_qibla": " Qibla : {qibla}.",
     "h1": "Horaires de prière à {city}",
     "method": "Méthode",
     "asr": "{asr} : {madhab}",
@@ -74,6 +75,7 @@
       "europe": "Europe",
       "americas": "Amériques",
       "oceania": "Océanie"
-    }
+    },
+    "qibla_here": "La Kaaba est ici, dans la mosquée al-Haram."
   }
 }

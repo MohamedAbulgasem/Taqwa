@@ -301,7 +301,7 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
 .cities li:not(:last-child)::after { content: "\00a0· "; }
 .filtering .cities li { margin-inline-end: 14px; }
 .filtering .cities li::after { content: none; }
-.country a { color: var(--t2); }
+.country a { color: var(--t2); white-space: nowrap; }
 .country a:hover { color: var(--accent); }
 .no-match { margin-top: 32px; color: var(--t2); }
 [data-hidden] { display: none !important; }
