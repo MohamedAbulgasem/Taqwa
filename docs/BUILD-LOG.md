@@ -1477,13 +1477,14 @@ default for the Asr school.
   minutes before their mosque's. A country default like the method's would fix the app and bring
   back three of the site's languages' home countries.
 - **Umm al-Qura in Ramadan.** Its Isha is Maghrib + 120 in Ramadan and the app keeps 90, so from
-  8 February 2027 the app would show Isha half an hour early in Saudi Arabia. The generator
-  refuses a Ramadan month for Umm al-Qura cities, which it would first meet on 1 January 2027
-  (February in view): the app needs the rule before then, or the Saudi rows go on hold.
-- **Morocco's clock.** Morocco left UTC+1 for UTC+0 on 20 September 2026 (tzdata 2026c). The JDKs
-  here have 2026b, and Android devices get zone updates on their own schedule. The site build now
-  checks every city's offsets against the newest tzdata package and stops if they disagree; it
-  caught exactly the six Moroccan cities.
+  8 February 2027 the app would show Isha half an hour early in Saudi Arabia. The pages add the
+  half hour on Ramadan days and say so under the month, and stop doing it by themselves once the
+  engine returns 120; the app needs the rule before Ramadan.
+- **Clocks the JDK does not know yet.** Morocco left UTC+1 for UTC+0 on 20 September 2026, and
+  Alberta stops changing its clocks after 2026 (both tzdata 2026c). The JDKs here have 2026b, and
+  phones get zone updates on their own schedule. The site reads every clock from the newest
+  tzdata package and rewrites a city's times where the JDK is behind, noting it in the run: with
+  Alberta that happens from 1 October, when November comes into view.
 - **The distance in French, Turkish and Indonesian.** `localizedGroupedKm` groups with a comma in
   every language, so "2,916 km" reads as a decimal there. The generator's `Formats.distance`
   mirrors it by hand; both should change together.
@@ -1506,4 +1507,9 @@ in the app is not actually Manrope: 142 `Text(style = TaqwaText.*)` calls bypass
 **Kept honest by the build.** `site/build.py --check` now also fails on a city page without both
 months or a row for every day, an index that misses a city, an hreflang the other page does not
 return, and a link to an anchor that does not exist; each rule was proved by breaking a built
-page and watching it fail.
+page and watching it fail. An independent review of the branch found that the first versions of
+the zone and Ramadan guards would have stopped every page updating on 1 October and 1 January;
+both now correct the one city instead, and were run against data built for those dates. The page
+script was run in headless Chrome with the clock pinned before Fajr, on a Friday afternoon,
+after Isha, on the first day of the data, across Egypt's clock change and past the end of the
+data; the index filter with Latin, accented, Arabic and Turkish input.

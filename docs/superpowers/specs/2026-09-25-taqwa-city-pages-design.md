@@ -176,10 +176,9 @@ method (the app has no exact Jaʿfari method), anything using the reader's locat
   follows the live day.
 - **The static Today card is a calendar leaf** (weekday, day, month) until the script turns it
   into the countdown; a countdown written at build time would be wrong by the time anyone read it.
-- **The countdown is in the page's digits.** The app falls back to Western digits for ar-EG,
-  ar-SA and Bengali (`CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR` is false) because
-  of glyph widths in its fonts; on the web the digits are tabular, so the page keeps one digit
-  system throughout.
+- **The countdown is in the app's digits.** The app counts down in Western digits for ar-EG,
+  ar-SA and Bengali while `ARABIC_INDIC_DIGITS_VERIFIED_TABULAR` is false; that rule moved into
+  `i18n/CountdownDigits.kt`, which the generator compiles, so the page does the same.
 - **The Jumuʿah pill** is on the Today card everywhere and in the month table on screens wide
   enough for it (1040 px and up); narrower, the Friday row is marked in the accent colour.
 - **High latitudes get one note per month**, not a dot per row: in London nearly every day of
@@ -200,10 +199,14 @@ method (the app has no exact Jaʿfari method), anything using the reader's locat
   Egypt, Türkiye and Singapore, plus the United States and Canada (no authority; ISNA mosques
   agree) and Cape Town (the Muslim Judicial Council agrees). Every other city stays in
   `site/cities.tsv`, commented out with what disagrees, so each comes back with one edit.
-- **Two more guards stop the build rather than publish something wrong:** an Umm al-Qura city
-  with a Ramadan day in view (Umm al-Qura's Ramadan Isha is Maghrib + 120, the app keeps 90), and
-  a city whose UTC offsets from the JDK disagree with the newest tzdata package (Morocco moved to
-  UTC+0 on 20 September 2026 before the JDK's zone data knew).
+- **Two places where the page is right and the app is not yet, each said on the page and each
+  stepping aside by itself once the app catches up.** Umm al-Qura's Isha is Maghrib + 120 in
+  Ramadan and the app keeps 90: on those days the generator adds the half hour and the month
+  carries a note (only while the engine still returns 90). And the JDK's zone data lags IANA
+  (Morocco moved to UTC+0 on 20 September 2026, Alberta stops changing its clocks after 2026):
+  the site reads every clock from the newest tzdata package and rewrites any city where the JDK
+  is behind. Stopping the build instead, as first built, would have frozen the whole site on
+  1 October (Alberta) and on 1 January 2027 (Ramadan in view).
 - **The distance to Makkah** keeps the app's comma grouping ("2,916 km") in every language, which
   reads as a decimal in French, Turkish and Indonesian. It is the app's formatting to fix, and the
   generator's `Formats.distance` mirrors it by hand, so both change together.
