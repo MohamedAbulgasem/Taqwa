@@ -1410,3 +1410,100 @@ registration allowed: that created the certificate, the App IDs and the app grou
 minute, and put the store build on the phone for its first hardware run. The archive followed in
 thirteen seconds, read back as `world.taqwa.ios` 1.0.0 (32) under team 3K93P4PA5H with
 `group.world.taqwa.ios` and a 1 MB widget; tag `ios-build-32`.
+
+## Prayer times on taqwa.world, and the Jumuʿah pill (25 September)
+
+Built overnight from the design Mohamed approved the evening before
+(`docs/superpowers/specs/2026-09-25-taqwa-city-pages-design.md`, §10 for what changed on the
+way). taqwa.world now has a page per city and language with this month and next, an index per
+language, and a section at the bottom of every home page, all rebuilt every six hours by the
+Pages workflow with nobody touching it.
+
+**The times are the app's.** `tools/timetables` compiles the app's engine, Qibla and Hijri files
+by path and runs the app's own tests for them on the JVM before it writes anything; a change
+that breaks them stops the site build. On Friday 25 September the Tripoli page and the app's
+Prayer screen on the emulator read the same: 5:35, 13:00, 16:24, 19:00, 20:17, 12 Rabiʿ
+al-Thani 1448, 109° and 2,916 km. Against Aladhan, for twenty cities on 25 September and 26
+October, every time agrees within a minute except Asr, where the app is within a minute of the
+true Asr worked out from the sun's position and Aladhan is one to three minutes late at higher
+latitudes. The app's Dhuhr is a minute after Aladhan's by design (adhan2's method offsets).
+
+**Only 51 cities are live, on purpose.** A page promises what the app shows a user there, so a
+country goes live only where that also agrees with the timetable its mosques follow. Each was
+checked against the authority's own numbers for September and October 2026 (app minus official,
+largest gap in minutes):
+
+| Country | Timetable checked | Gap | |
+|---|---|---|---|
+| Egypt | Survey Authority via [Dar al-Ifta](https://www.dar-alifta.org/ar/prayer), all of September | 2 (Dhuhr) | live |
+| Saudi Arabia | [Umm al-Qura](https://www.ummulqura.org.sa/ar/prayer-times), second-hand copies | 1 | live |
+| UAE | Awqaf's Dubai table as published by Khaleej Times | 2 | live |
+| Kuwait | Ministry of Awqaf calendar | 1 | live |
+| Türkiye | [Diyanet](https://namazvakitleri.diyanet.gov.tr/), eight cities, October | 2 | live |
+| Singapore | [MUIS](https://data.gov.sg/datasets/d_d441e7242e78efc566024dd5b0d9829c/view), all of 2026 | 1 | live |
+| USA, Canada | no authority; ISNA mosques in New York and Toronto | 3 | live |
+| South Africa, Cape Town | [Muslim Judicial Council](https://mjc.org.za/quick-resources/salaah-times/) | 1 | live |
+| Libya | Awqaf and Dar al-Ifta ([api.ifta.ly](https://api.ifta.ly/api/v1/prayer-time)) | 7 (Isha) | held |
+| Qatar | [Calendar House](https://www.qatarch.com/) | 3 (Maghrib, Isha) | held |
+| Bahrain, Oman | Supreme Council calendar; [Ministry of Endowments](https://www.mara.gov.om/) | 4; 6 | held |
+| Jordan, Palestine | [Ministry of Awqaf](https://www.awqaf.gov.jo/ar/Pages/PrayerTime); [Gaza Awqaf](http://palwakf.ps/ar/praytimes) | 7; 7 | held |
+| Lebanon, Iraq | Dar al-Fatwa; Sunni Endowment (both also split by sect) | 10; 5 | held |
+| Syria | Awqaf, Ramadan 1447 imsakiya (nothing newer) | 2 (Maghrib) | held |
+| Morocco | [Habous](https://www.habous.gov.ma/prieres/index.php?ville=58) | 6, and the clock (below) | held |
+| Algeria, Tunisia | [ministry calendar](https://marw.gov.dz/); [meteo.tn](https://www.meteo.tn/) | 4; 7 | held |
+| Sudan, Mauritania | Ramadan imsakiyas only | 6 (Fajr) | held |
+| Pakistan, India | [Binori Town](https://www.banuri.edu.pk/namaz-times) (Hanafi) | 1, but the app's Asr is Standard | held |
+| Bangladesh | Islamic Foundation (Hanafi, + 3 min) | 3, and the Asr | held |
+| Indonesia | Kemenag via [myQuran](https://api.myquran.com/) | 3 | held |
+| Malaysia | [JAKIM e-solat](https://www.e-solat.gov.my/) (Fajr 18° since 2019) | 12 (Fajr) | held |
+| Uzbekistan | [Muslim Board](https://muslim.uz/) (15.5°, Hanafi) | 49 (Asr) | held |
+| UK | [London Unified Prayer Timetable](https://www.iccuk.org/page.php?section=media&page=unifiedpt) | 24 (Isha) | held |
+| France, Netherlands | no shared timetable (Mawaqit mosques use 12° to 18°) | up to 34 | held |
+| Belgium, Germany, Russia | [EMB](https://www.emb-net.be/); DITIB and Diyanet; [DUM RF](https://dumrf.ru/) | 7; 9; 18 | held |
+| Bosnia, Kosovo, Albania | [vaktija](https://api.vaktija.ba/), BIK, KMSH calendars | 7 to 11 | held |
+| Johannesburg, Pretoria, Durban | [Jamiatul Ulama](https://jamiat.org.za/salaah-times.php) (Hanafi) | 57 (Asr) | held |
+| Australia | Lakemba Mosque | 17 | held |
+
+Countries with no timetable found or not checked yet (Yemen, Nigeria, Senegal, Somalia, the rest
+of Africa, the Maldives, Brunei, Ireland, Austria, Switzerland, Scandinavia, New Zealand) are held
+too. Each held city is in `site/cities.tsv`, commented out under its reason, and comes back by
+deleting its `# ` once the app can match. Most of this list is the app's to-do: a Libyan Awqaf
+method, Kemenag's margin, JAKIM's 18°, the Maghreb ministries' offsets, and above all a country
+default for the Asr school.
+
+**What the pages found in the app:**
+- **No Hanafi default.** The app's Asr is Standard for everyone until changed by hand
+  (`SettingsRepository`), so a new user in Karachi, Delhi or Dhaka sees an Asr about fifty
+  minutes before their mosque's. A country default like the method's would fix the app and bring
+  back three of the site's languages' home countries.
+- **Umm al-Qura in Ramadan.** Its Isha is Maghrib + 120 in Ramadan and the app keeps 90, so from
+  8 February 2027 the app would show Isha half an hour early in Saudi Arabia. The generator
+  refuses a Ramadan month for Umm al-Qura cities, which it would first meet on 1 January 2027
+  (February in view): the app needs the rule before then, or the Saudi rows go on hold.
+- **Morocco's clock.** Morocco left UTC+1 for UTC+0 on 20 September 2026 (tzdata 2026c). The JDKs
+  here have 2026b, and Android devices get zone updates on their own schedule. The site build now
+  checks every city's offsets against the newest tzdata package and stops if they disagree; it
+  caught exactly the six Moroccan cities.
+- **The distance in French, Turkish and Indonesian.** `localizedGroupedKm` groups with a comma in
+  every language, so "2,916 km" reads as a decimal there. The generator's `Formats.distance`
+  mirrors it by hand; both should change together.
+- **The wrong day in the Pacific.** Where the clock runs far ahead of the sun (Samoa, Tonga,
+  eastern Kiribati) the engine answers a date with the next day's times; seen in Apia by the
+  Jumuʿah work, and now a generator guard.
+- **City names**: Al Khums is "المرقب" and Al Bayda "قرية البيضاء" in the Arabic file, Delhi is
+  "پرانی دہلی" (Old Delhi) in Urdu, Kolkata and Khulna are in Latin letters in Bengali, several
+  Indonesian names carry "Kota", Zawiya is in the file twice. `site/cities.tsv` corrects them for
+  the pages.
+
+**The Jumuʿah pill in the app.** On a Friday the Dhuhr row of the Prayer screen carries a small
+outline pill, in the accent at 40 %, with `today_jumuah` in all seven languages. Friday is read in
+the location's zone, not the device's: a phone on Thursday evening showing Jakarta marks Jakarta's
+Friday Dhuhr. The name group became a `FlowRow` so the time keeps its line at large font sizes on
+narrow phones, which also fixes a Maghrib wrap at 200 %. Six new tests; `scripts/test.sh` green
+(shared 964 JVM and 884 iOS, widgetcore 90 and 88). The same work noticed that most Latin text
+in the app is not actually Manrope: 142 `Text(style = TaqwaText.*)` calls bypass the theme's font.
+
+**Kept honest by the build.** `site/build.py --check` now also fails on a city page without both
+months or a row for every day, an index that misses a city, an hreflang the other page does not
+return, and a link to an anchor that does not exist; each rule was proved by breaking a built
+page and watching it fail.
