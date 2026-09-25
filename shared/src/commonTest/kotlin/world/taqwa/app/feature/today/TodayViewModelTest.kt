@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -107,9 +108,12 @@ class TodayViewModelTest {
     // the file is removed first: it outlives the process, and a city name remembered by the last
     // run — or by the JVM run of this same suite, moments earlier — is exactly the stale state
     // the city-name tests exist to catch. The iOS run failed on precisely that until this did.
-    private fun settings(name: String): SettingsRepository {
+    // The store's writes run on the test's own scheduler (`scope = backgroundScope`), as Android's
+    // DataStore testing guidance has it. On its default IO scope a write raced the virtual clock,
+    // and a test waiting for the stored value could hang until runTest gave up (seen in CI).
+    private fun TestScope.settings(name: String): SettingsRepository {
         val path = freshStorePath(name)
-        return SettingsRepository(PreferenceDataStoreFactory.createWithPath { path })
+        return SettingsRepository(PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) { path })
     }
 
     private fun freshStorePath(name: String): Path {
@@ -126,7 +130,7 @@ class TodayViewModelTest {
      * runs without a device, a GPS fix or a real wall clock. `refresh()` is awaited directly
      * rather than starting the one-second tick, which would never terminate under `runTest`.
      */
-    private suspend fun viewModel(
+    private suspend fun TestScope.viewModel(
         store: String,
         location: GeoLocation?,
         now: Instant,
@@ -146,16 +150,16 @@ class TodayViewModelTest {
 
     // Each case gets its own store file: DataStore refuses two live instances over one path,
     // and two tests sharing a name would collide inside a single test binary.
-    private suspend fun todayViewModelWithNoLocation() =
+    private suspend fun TestScope.todayViewModelWithNoLocation() =
         viewModel("no-location", null, Instant.parse("2026-09-06T14:30:00Z"))
 
-    private suspend fun todayViewModelForLondon(
+    private suspend fun TestScope.todayViewModelForLondon(
         store: String,
         now: Instant = Instant.parse("2026-09-06T14:30:00Z"),
         hijriOffset: Int = 0,
     ) = viewModel(store, london, now, hijriOffset)
 
-    private suspend fun todayViewModelForTromso(store: String, now: Instant) =
+    private suspend fun TestScope.todayViewModelForTromso(store: String, now: Instant) =
         viewModel(store, tromso, now)
 
     @Test
@@ -219,7 +223,7 @@ class TodayViewModelTest {
     // write plus two Glance recompositions plus AppWidgetManager IPC, once a second, on the app's
     // primary screen.
 
-    private suspend fun probeFor(storeName: String): WidgetTrafficProbe {
+    private suspend fun TestScope.probeFor(storeName: String): WidgetTrafficProbe {
         val repo = settings(storeName)
         repo.setPrayerSettings(PrayerSettings())
         return WidgetTrafficProbe(london, repo)
@@ -394,7 +398,7 @@ class TodayViewModelTest {
     private val cairoWithId =
         GeoLocation(30.06263, 31.24967, "Africa/Cairo", "Cairo", "EG", cityId = 360630)
 
-    private suspend fun readyFor(
+    private suspend fun TestScope.readyFor(
         store: String,
         location: GeoLocation,
         format: PlatformFormat,
@@ -668,7 +672,7 @@ class TodayViewModelTest {
     @Test
     fun theNameIsRememberedOnceNotOnEveryTick() = runTest {
         val writeOncePath = freshStorePath("city-name-write-once")
-        val store = CountingDataStore(PreferenceDataStoreFactory.createWithPath { writeOncePath })
+        val store = CountingDataStore(PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) { writeOncePath })
         val repo = SettingsRepository(store)
         repo.setPrayerSettings(PrayerSettings())
         repo.setLocation(londonWithId)

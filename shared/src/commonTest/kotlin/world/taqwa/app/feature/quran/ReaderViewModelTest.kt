@@ -3,6 +3,7 @@ package world.taqwa.app.feature.quran
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import world.taqwa.app.quran.Ayah
@@ -40,11 +41,14 @@ import kotlin.test.assertNull
  */
 class ReaderViewModelTest {
 
+    // The store's writes run on the test's own scheduler (`scope = backgroundScope`), as Android's
+    // DataStore testing guidance has it. On its default IO scope a write raced the virtual clock,
+    // and a test waiting for the stored value could hang until runTest gave up (seen in CI).
     /** A fresh file per store, for [bookmarks]' reason and one of its own: a settings file left
      * behind by an earlier run would hand the next one whatever that run last wrote, so a test
      * that says nothing about the translation id would silently inherit one. */
-    private fun settingsRepo(name: String) = SettingsRepository(
-        PreferenceDataStoreFactory.createWithPath {
+    private fun TestScope.settingsRepo(name: String) = SettingsRepository(
+        PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) {
             "/tmp/taqwa-reader-test-$name-${Random.nextULong()}.preferences_pb".toPath()
         },
     )
@@ -52,8 +56,8 @@ class ReaderViewModelTest {
     /** A fresh file per store, as in [QuranRootViewModelTest]: [BookmarkStore.toggle] is a toggle,
      * so a store that outlived an earlier run would start with the bookmark already set and the
      * toggle would remove it instead of adding it. */
-    private fun bookmarks(name: String) = BookmarkStore(
-        PreferenceDataStoreFactory.createWithPath {
+    private fun TestScope.bookmarks(name: String) = BookmarkStore(
+        PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) {
             "/tmp/taqwa-reader-bm-$name-${Random.nextULong()}.preferences_pb".toPath()
         },
     ) { 1L }

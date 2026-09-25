@@ -58,7 +58,10 @@ private class CountingDataStore(private val delegate: DataStore<Preferences>) : 
 
 class TasbeehViewModelTest {
 
-    private fun dataStore() = PreferenceDataStoreFactory.createWithPath {
+    // The store's writes run on the test's own scheduler (`scope = backgroundScope`), as Android's
+    // DataStore testing guidance has it. On its default IO scope a write raced the virtual clock,
+    // and a test waiting for the stored value could hang until runTest gave up (seen in CI).
+    private fun TestScope.dataStore() = PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) {
         "/tmp/taqwa-tasbeeh-vm-${Random.nextULong()}.preferences_pb".toPath()
     }
 

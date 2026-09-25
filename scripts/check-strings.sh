@@ -5,6 +5,6 @@
 # fine and falls back silently at runtime; this is the check the compiler does not do.
 #
 #   scripts/check-strings.sh
-set -e
+set -eo pipefail
 cd "$(dirname "$0")/.."
 python3 tools/i18n-check.py | grep -v "^  note:"
