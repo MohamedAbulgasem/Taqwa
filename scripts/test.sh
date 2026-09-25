@@ -11,7 +11,8 @@ export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode 26.app/Contents/Devel
 cd "$(dirname "$0")/.."
 if [ "$#" -eq 0 ]; then
   # `:widgetcore` holds the widget model the iOS extension links on its own; its tests have to
-  # run here or nothing covers them.
-  set -- :shared:allTests :widgetcore:allTests
+  # run here or nothing covers them. The Android host tests are named as well as allTests, so they
+  # run whether or not allTests counts them under the com.android.kotlin.multiplatform.library plugin.
+  set -- :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
 fi
 exec ./gradlew "$@"

@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
  * not catch quickly: the boundary arithmetic that decides *when* the next redraw is armed. The
  * `AlarmManager` calls themselves are thin enough to verify on the phone (`dumpsys alarm`).
  *
- * This lives in `androidUnitTest` rather than `commonTest` because the scheduler is an Android
+ * This lives in `androidHostTest` rather than `commonTest` because the scheduler is an Android
  * concern; only the pure function is touched, so no Android class is ever loaded.
  */
 class WidgetRefreshSchedulerTest {

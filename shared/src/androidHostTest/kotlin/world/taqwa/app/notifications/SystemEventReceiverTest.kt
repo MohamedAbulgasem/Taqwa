@@ -14,7 +14,7 @@ import kotlin.test.assertNull
  * filter and a `when` that drift apart show up here. `Intent.ACTION_TIME_CHANGED` really is
  * `"android.intent.action.TIME_SET"`.
  *
- * Lives in `androidUnitTest` because the mapping is an Android concern; only the pure function is
+ * Lives in `androidHostTest` because the mapping is an Android concern; only the pure function is
  * touched, so no Android class is ever loaded.
  */
 class SystemEventReceiverTest {

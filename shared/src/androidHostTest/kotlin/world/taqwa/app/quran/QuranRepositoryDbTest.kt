@@ -15,8 +15,8 @@ import kotlin.test.assertTrue
  * rather than a fake, so a schema or data mistake in either the pipeline or the queries above
  * shows up here instead of only at run time on a device.
  *
- * This lives in `androidUnitTest` (the module's JVM unit test source set, run by
- * `:shared:testDebugUnitTest`) because it needs the JDBC SQLite driver, which is JVM-only.
+ * This lives in `androidHostTest` (the module's JVM unit test source set, run by
+ * `:shared:testAndroidHostTest`) because it needs the JDBC SQLite driver, which is JVM-only.
  */
 class QuranRepositoryDbTest {
 

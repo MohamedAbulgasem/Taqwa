@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.sqldelight)
@@ -8,7 +8,18 @@ plugins {
 }
 
 kotlin {
-    androidTarget()
+    android {
+        namespace = "world.taqwa.app.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        // res/raw holds the notification sounds, which the app plays by android.resource:// URI.
+        androidResources {
+            enable = true
+        }
+        // The JVM tests in src/androidHostTest: the bundled database and city files, and the
+        // Android-only mappings.
+        withHostTest {}
+    }
 
     // `SurahDownloader` is an `expect class` (spec 3a §7): the two platforms' downloaders are
     // whole objects with state, not a function each, and the scheduler behind them differs
@@ -80,7 +91,7 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
         }
-        val androidUnitTest by getting {
+        getByName("androidHostTest") {
             dependencies {
                 implementation(libs.sqldelight.sqlite)
             }
@@ -105,25 +116,11 @@ compose.resources {
     generateResClass = always
 }
 
-android {
-    namespace = "world.taqwa.app.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-}
-
 kotlin {
     jvmToolchain(21)
 }
 
-// The androidUnitTest classes that check the bundled quran.db and city files read them straight
+// The androidHostTest classes that check the bundled quran.db and city files read them straight
 // from src/commonMain/composeResources/files, which Gradle does not otherwise count as a test
 // input: a regenerated database on its own left those tests UP-TO-DATE, green from the file before.
 tasks.withType<Test>().configureEach {

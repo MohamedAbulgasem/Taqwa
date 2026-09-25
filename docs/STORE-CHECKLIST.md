@@ -154,7 +154,7 @@ costs days.
 - Listing copy in seven languages: title and subtitle, short description (≤ 80), full description
   (≤ 4000), App Store keywords (≤ 100 characters), release notes for 1.0.0, review notes. Mohamed
   reads English and Arabic; the native reviewers read the rest.
-- Screenshots per §1, plus the 512 icon (`androidApp/src/androidMain/ic_launcher-playstore.png`)
+- Screenshots per §1, plus the 512 icon (`androidApp/src/main/ic_launcher-playstore.png`)
   and the 1024 × 500 feature graphics already in `assets/store/`.
 - Two screen recordings for Play's foreground-service declarations, recorded on the emulator on
   16 September: `~/Downloads/Taqwa-fgs-media-playback.mp4` (a surah playing, the app left, the
@@ -292,7 +292,7 @@ costs days.
   the Manrope OFL text is in `docs/licences/`; the Mixkit source clip is no longer in the
   repository; the privacy policy is live at taqwa.world in seven languages and the About screen
   opens it.
-- **Store assets in the repo**: 512 px icon `androidApp/src/androidMain/ic_launcher-playstore.png`;
+- **Store assets in the repo**: 512 px icon `androidApp/src/main/ic_launcher-playstore.png`;
   feature graphics `assets/store/feature-graphic-{en,ar}.png` (1024 × 500, `tools/feature-graphic.py`).
 - **Store answers**: `docs/STORE-PRIVACY.md` has every Data safety, App content and App Privacy
   answer with the reason.

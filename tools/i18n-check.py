@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMPOSE = os.path.join(ROOT, "shared/src/commonMain/composeResources")
-ANDROID = os.path.join(ROOT, "androidApp/src/androidMain/res")
+ANDROID = os.path.join(ROOT, "androidApp/src/main/res")
 
 # Folder name -> language code the file must declare in ui_language. Android's resource system
 # still spells Indonesian "in", the Compose resources and every other system say "id".

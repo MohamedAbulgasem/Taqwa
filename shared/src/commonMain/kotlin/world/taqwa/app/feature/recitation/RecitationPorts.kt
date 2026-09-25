@@ -21,7 +21,7 @@ import world.taqwa.app.recitation.SurahSkip
  * [RecitationPlayer] and [SurahDownloader] are `expect class`es: they exist only once per target,
  * they cannot be subclassed and their constructors reach for a `MediaSessionService` and for
  * WorkManager. A controller that named them directly could not be driven from
- * `:shared:testDebugUnitTest` at all — and the controller is *only* decisions, which is precisely
+ * `:shared:testAndroidHostTest` at all — and the controller is *only* decisions, which is precisely
  * the layer worth testing. So the decisions are written against these two interfaces and the real
  * classes are adapted into them at the one place the graph is built.
  *
