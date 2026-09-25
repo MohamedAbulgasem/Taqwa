@@ -11,13 +11,16 @@ A page is complete without script: the whole of this month and next are in the m
 row is lit for the day the page was built, and the Today card shows that date. assets/timetable.js
 then makes it live in the city's own time zone (see that file).
 """
+import datetime
 import functools
 import html
+import importlib.resources
 import json
 import math
 import os
 import re
 import unicodedata
+import zoneinfo
 
 SECTION = "prayer-times/"
 HOME_MARKER = "<!-- prayer-times -->"
@@ -39,6 +42,36 @@ RING_C = 2 * math.pi * RING_R
 
 class DataError(Exception):
     pass
+
+
+def _zone(name: str) -> zoneinfo.ZoneInfo:
+    """The zone from the tzdata package where it is installed (the Pages workflow installs the
+    newest), else from the system's zone files."""
+    try:
+        ref = importlib.resources.files("tzdata").joinpath("zoneinfo", *name.split("/"))
+        with ref.open("rb") as f:
+            return zoneinfo.ZoneInfo.from_file(f, key=name)
+    except (ModuleNotFoundError, FileNotFoundError):
+        return zoneinfo.ZoneInfo(name)
+
+
+def stale_zones(cities: list) -> list:
+    """Cities whose clock the generator got wrong. Its offsets come from the JDK's copy of the
+    time-zone database, which is only as new as the JDK; the tzdata package follows IANA within
+    days. Morocco left UTC+1 for good on 20 September 2026 before any JDK knew, and a page built
+    on the old rules prints every time an hour late, so any disagreement stops the build."""
+    problems = []
+    for city in cities:
+        zone = _zone(city["timeZone"])
+        for day in city["days"]:
+            at = datetime.datetime.fromtimestamp(day["epochs"][DHUHR], tz=datetime.timezone.utc)
+            offset = int(at.astimezone(zone).utcoffset().total_seconds())
+            if offset != day["offset"]:
+                problems.append(f"{city['slug']}: on {day['date']} the generator has UTC offset {day['offset']} s "
+                                f"but the time-zone database says {offset} s for {city['timeZone']}; "
+                                "the JDK's zone data is out of date (update the JDK or hold the city)")
+                break
+    return problems
 
 
 def load(path: str) -> dict:
@@ -128,6 +161,9 @@ class Timetables:
             for lang in city["languages"]:
                 if lang not in langs:
                     raise DataError(f"{city['slug']} has a {lang} page but the site has no {lang}")
+        stale = stale_zones(self.cities)
+        if stale:
+            raise DataError("\n".join(stale))
 
     # ---------------------------------------------------------------- addresses
 

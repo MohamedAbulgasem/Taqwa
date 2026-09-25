@@ -171,6 +171,12 @@ Runs the shared and widget test suites on the JVM and on the iOS simulator. All 
 
 The site at taqwa.world lives in `site/` and is built by `site/build.py` from the page fragments under `site/pages/<lang>/` and the seven policy files at the repository root; a GitHub Pages workflow deploys it on every push that touches it. The build also writes the sitemap (every page with its language alternates), `robots.txt`, a `404.html`, and structured data describing the app on each language's home page, and `site/build.py --check` fails on dangling links, missing images, invalid structured data or a sitemap that disagrees with the pages. Email addresses on the site are wrapped in Cloudflare's `email_off` comments so they are never rewritten into `[email protected]` on the way to a reader.
 
+The site also has a prayer-times page per city, in English and the languages spoken there, with this month and next, the Hijri date and the Qibla. The times are the app's own: `tools/timetables` is a small Gradle build that compiles the app's prayer-time, Qibla and Hijri source files unchanged, runs the app's tests for them, and writes `_data/timetables.json` with every value already formatted as the app formats it for a reader in that city. `site/build.py` renders the pages from it, and the Pages workflow runs both every six hours, so nobody has to touch it for the pages to stay current. The cities are listed in `site/cities.tsv`; a country is live only where the app's default method agrees with the timetable its mosques follow, and the others wait there, commented out, with what disagrees.
+
+```bash
+./gradlew -p tools/timetables generate   # needs JDK 21; then python3 site/build.py
+```
+
 Screenshots on the site are WebP: drop a PNG into `site/assets/img` and run `tools/site-webp.sh`. The share cards shown when a page is posted to WhatsApp, X or Facebook are drawn from each language's hero by `tools/site-og.py`; re-run it after changing a hero.
 
 ## Project layout
@@ -184,7 +190,7 @@ site/         The website in seven languages, built by site/build.py
 assets/       Source audio and generators for the bundled sounds
 docs/         Design specs, implementation plans, build log, attribution, store answers
 scripts/      Test and build helpers
-tools/        City database builder, Quran database pipeline, the recitation audio pipeline
+tools/        City database builder, Quran database pipeline, the recitation audio pipeline, the site's prayer timetables
 ```
 
 The design specs the app is built from are in [`docs/superpowers/specs`](docs/superpowers/specs), and [`docs/BUILD-LOG.md`](docs/BUILD-LOG.md) is the narrative of every iteration since, including what was found on real devices and why things are the way they are.

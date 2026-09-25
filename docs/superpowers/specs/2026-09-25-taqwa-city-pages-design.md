@@ -167,3 +167,43 @@ GitHub Pages.
 
 Per-city share images, country pages, month archives, cities whose communities follow the Jaʿfari
 method (the app has no exact Jaʿfari method), anything using the reader's location.
+
+## 10. What changed while building it (25 September)
+
+- **Every six hours, not nightly.** A run at 00:07 UTC turns Asia and Europe over to their new
+  day but leaves the Americas on yesterday for most of theirs. The schedule is `7 */6 * * *`, so
+  each city's static page changes day within a few hours of its own midnight; the script already
+  follows the live day.
+- **The static Today card is a calendar leaf** (weekday, day, month) until the script turns it
+  into the countdown; a countdown written at build time would be wrong by the time anyone read it.
+- **The countdown is in the page's digits.** The app falls back to Western digits for ar-EG,
+  ar-SA and Bengali (`CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR` is false) because
+  of glyph widths in its fonts; on the web the digits are tabular, so the page keeps one digit
+  system throughout.
+- **The Jumuʿah pill** is on the Today card everywhere and in the month table on screens wide
+  enough for it (1040 px and up); narrower, the Friday row is marked in the accent colour.
+- **High latitudes get one note per month**, not a dot per row: in London nearly every day of
+  September and October carries the rule, and the dots were noise.
+- **The app call to action links to the home page**, which carries the store links, rather than
+  to stores that are not live yet.
+- **Country names are CLDR's**, except Palestine, where CLDR's own short form replaces
+  "Palestinian Territories" in every language.
+- **A city whose Dhuhr the engine puts on another local date is refused.** Where the clock runs
+  far ahead of the sun (Samoa, Tonga, eastern Kiribati) the app's engine answers a date with the
+  next day's times; the generator fails the build rather than publish them.
+- **Asr is the app's default, Standard, everywhere.** §2 assumed the app defaults to Hanafi in
+  Pakistan, India, Bangladesh and Afghanistan; it does not (`SettingsRepository` falls back to
+  Standard for everyone), so a Hanafi page would disagree with the app. Those countries wait for
+  a country default for the Asr school in the app, and the list has no Asr column.
+- **51 cities, not 150.** The method research (build log, 25 September) found the app's default
+  within about two minutes of the followed timetable only in Saudi Arabia, the UAE, Kuwait,
+  Egypt, Türkiye and Singapore, plus the United States and Canada (no authority; ISNA mosques
+  agree) and Cape Town (the Muslim Judicial Council agrees). Every other city stays in
+  `site/cities.tsv`, commented out with what disagrees, so each comes back with one edit.
+- **Two more guards stop the build rather than publish something wrong:** an Umm al-Qura city
+  with a Ramadan day in view (Umm al-Qura's Ramadan Isha is Maghrib + 120, the app keeps 90), and
+  a city whose UTC offsets from the JDK disagree with the newest tzdata package (Morocco moved to
+  UTC+0 on 20 September 2026 before the JDK's zone data knew).
+- **The distance to Makkah** keeps the app's comma grouping ("2,916 km") in every language, which
+  reads as a decimal in French, Turkish and Indonesian. It is the app's formatting to fix, and the
+  generator's `Formats.distance` mirrors it by hand, so both change together.
