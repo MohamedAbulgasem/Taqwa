@@ -11,23 +11,15 @@ import kotlin.time.Duration
  * against the tabular jitter Arabic-Indic glyphs might introduce (spec §4.2, "Consequence to
  * verify"). Whether the fallback is actually needed is an on-device verification, not something
  * this pure function can measure — [ARABIC_INDIC_DIGITS_VERIFIED_TABULAR] carries that verdict.
+ * The rule itself is in [CountdownDigits], which the website's generator compiles too.
  */
 object CountdownFormatter {
 
-    /**
-     * Set by the on-device check in Task 22's verification step. Defaults to `false` — the
-     * conservative, always-correct choice — until someone confirms Arabic-Indic glyphs are
-     * tabular in the system Arabic face on both an Android OEM Arabic font and iOS's SF Arabic.
-     */
-    const val ARABIC_INDIC_DIGITS_VERIFIED_TABULAR = false
+    /** See [CountdownDigits.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR]. */
+    const val ARABIC_INDIC_DIGITS_VERIFIED_TABULAR = CountdownDigits.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR
 
-    /**
-     * ar-EG and ar-SA default to Arabic-Indic digits; ar-LY, ar-MA, ar-TN and ar-DZ default to
-     * Western already, so the fallback question never arises for them. Bengali defaults to its
-     * own digits everywhere, and the same tabular-width question applies to them.
-     */
-    fun defaultsToArabicIndicDigits(languageTag: String): Boolean =
-        languageTag.uppercase() in setOf("AR-EG", "AR-SA") || UiLanguage.of(languageTag) == UiLanguage.BENGALI
+    /** See [CountdownDigits.defaultsToArabicIndicDigits]. */
+    fun defaultsToArabicIndicDigits(languageTag: String): Boolean = CountdownDigits.defaultsToArabicIndicDigits(languageTag)
 
     fun countdown(duration: Duration, format: PlatformFormat, tabularDigitsVerified: Boolean): String {
         val totalSeconds = duration.inWholeSeconds.coerceAtLeast(0)
@@ -35,7 +27,7 @@ object CountdownFormatter {
         val minutes = ((totalSeconds % 3_600) / 60).toInt()
         val seconds = (totalSeconds % 60).toInt()
 
-        val useWestern = defaultsToArabicIndicDigits(format.languageTag()) && !tabularDigitsVerified
+        val useWestern = CountdownDigits.westernFallback(format.languageTag(), tabularDigitsVerified)
         return if (useWestern) {
             "$hours:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
         } else {
