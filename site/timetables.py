@@ -246,6 +246,8 @@ class Timetables:
     # ---------------------------------------------------------------- building
 
     def build(self, template: str, write_page) -> None:
+        if not self.cities:
+            return  # every row of site/cities.tsv is held: no index either, the section is off
         for lang in self.langs:
             self.build_index(lang, template, write_page)
         for city in self.cities:
@@ -556,6 +558,8 @@ class Timetables:
         return " ".join(dict.fromkeys(fold(w) for w in words))
 
     def home_section(self, lang: str) -> str:
+        if not self.cities:
+            return ""
         t = self.langs[lang]["timetable"]
         featured = [c for c in self.cities_in(lang) if lang in c["featured"]]
         count = digits(len(self.cities_in(lang)), t["digits"])

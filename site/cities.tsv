@@ -14,11 +14,13 @@
 # Standard Asr (the app has no country default for the Asr school yet), the automatic
 # high-latitude rule, no adjustments.
 #
-# So a country is live only where that agrees, within about two minutes, with the timetable its
-# mosques actually follow (the national authority's, or the dominant one where there is none).
-# Everywhere else the rows are kept below, commented out, with what disagrees; each comes back by
-# deleting its "# " once the app has the method. The checks were made on 25 September 2026
-# against the official tables for September and October 2026 (sources in docs/BUILD-LOG.md).
+# So a country is live only where that agrees with the timetable its mosques actually follow (the
+# national authority's, or the dominant one where there is none), and a page must never show a
+# prayer earlier than that timetable, nor sunrise later: a minute early is a prayer before its time
+# or a fast broken before sunset. The first check, on 25 September 2026, allowed about two minutes
+# either way. An audit the same day that looked at the direction found every live country a minute
+# or more early on some days, so every row is now held, each under what was found. A row comes
+# back by deleting its "# " once the engine passes. The sources are in docs/BUILD-LOG.md.
 #
 # tools/timetables validates every row on every build: an unknown id, a duplicate slug, a page
 # language with no name, or a featured language without a page fails the build.
@@ -26,23 +28,28 @@
 # ---------------------------------------------------------------- Middle East
 # Saudi Arabia: Umm al-Qura, within a minute of second-hand copies of the official calendar.
 # Before Ramadan (from 8 February 2027) the app needs Umm al-Qura's 120-minute Ramadan Isha; until
-# it has it the generator refuses a Ramadan month here rather than show Isha half an hour early.
-makkah-saudi-arabia	104515	en ar fr tr id ur bn	en ar fr tr id ur bn	ur=مکہ مکرمہ
-madinah-saudi-arabia	109223	en ar fr tr id ur bn	en ar fr tr id ur bn	ar=المدينة المنورة
-riyadh-saudi-arabia	108410	en ar ur bn id	en ar id ur bn
-jeddah-saudi-arabia	105343	en ar ur bn id	ar id ur bn
-dammam-saudi-arabia	110336	en ar ur
-taif-saudi-arabia	107968	en ar		en=Taif
-tabuk-saudi-arabia	101628	en ar
-abha-saudi-arabia	110690	en ar
-buraydah-saudi-arabia	107304	en ar		ar=بريدة
+# it has it the pages add the half hour on Ramadan days and say so under the month.
+# held: checked on two days only, against second-hand copies of the calendar; on 20 September
+# Makkah's page was a minute before them at Fajr, Dhuhr, Asr, Maghrib and Isha.
+# makkah-saudi-arabia	104515	en ar fr tr id ur bn	en ar fr tr id ur bn	ur=مکہ مکرمہ
+# madinah-saudi-arabia	109223	en ar fr tr id ur bn	en ar fr tr id ur bn	ar=المدينة المنورة
+# riyadh-saudi-arabia	108410	en ar ur bn id	en ar id ur bn
+# jeddah-saudi-arabia	105343	en ar ur bn id	ar id ur bn
+# dammam-saudi-arabia	110336	en ar ur
+# taif-saudi-arabia	107968	en ar		en=Taif
+# tabuk-saudi-arabia	101628	en ar
+# abha-saudi-arabia	110690	en ar
+# buraydah-saudi-arabia	107304	en ar		ar=بريدة
 # UAE: the Dubai method, within 2 minutes of the published Dubai table.
-dubai-uae	292223	en ar ur bn	en ar ur bn
-abu-dhabi-uae	292968	en ar ur bn
-sharjah-uae	292672	en ar ur bn		ar=الشارقة
-al-ain-uae	292913	en ar		en=Al Ain
+# held: against that table for September the page's Maghrib was a minute early on 13 days and its
+# Isha on 9. The table is later by a rounding; the app rounds to the nearest minute.
+# dubai-uae	292223	en ar ur bn	en ar ur bn
+# abu-dhabi-uae	292968	en ar ur bn
+# sharjah-uae	292672	en ar ur bn		ar=الشارقة
+# al-ain-uae	292913	en ar		en=Al Ain
 # Kuwait: the Kuwait method, within a minute of the ministry's calendar.
-kuwait-city-kuwait	285787	en ar ur bn	ar ur bn	ur=کویت سٹی;bn=কুয়েত সিটি
+# held: checked on one day only, when the page's Asr and Maghrib were a minute early.
+# kuwait-city-kuwait	285787	en ar ur bn	ar ur bn	ur=کویت سٹی;bn=কুয়েত সিটি
 # held: Qatar. Calendar House puts Maghrib at sunset + 3 and Isha at Maghrib + 90; the app is 3 minutes early at both.
 # doha-qatar	290030	en ar ur bn
 # held: Bahrain. The Supreme Council's calendar has Isha 4 minutes later than the app.
@@ -76,16 +83,17 @@ kuwait-city-kuwait	285787	en ar ur bn	ar ur bn	ur=کویت سٹی;bn=কুয�
 
 # ---------------------------------------------------------------- North Africa
 # Egypt: the Egyptian method, within 2 minutes of the Survey Authority's table for all of September.
-cairo-egypt	360630	en ar	en ar
-alexandria-egypt	361058	en ar	ar
-giza-egypt	360995	en ar
-port-said-egypt	358619	en ar
-suez-egypt	359796	en ar		ar=السويس
-luxor-egypt	360502	en ar
-aswan-egypt	359792	en ar		en=Aswan
-mansoura-egypt	360761	en ar		en=Mansoura;ar=المنصورة
-tanta-egypt	347497	en ar
-assiut-egypt	359783	en ar
+# held: the page's Asr was a minute before the Survey Authority's on 11 of September's 30 days.
+# cairo-egypt	360630	en ar	en ar
+# alexandria-egypt	361058	en ar	ar
+# giza-egypt	360995	en ar
+# port-said-egypt	358619	en ar
+# suez-egypt	359796	en ar		ar=السويس
+# luxor-egypt	360502	en ar
+# aswan-egypt	359792	en ar		en=Aswan
+# mansoura-egypt	360761	en ar		en=Mansoura;ar=المنصورة
+# tanta-egypt	347497	en ar
+# assiut-egypt	359783	en ar
 # held: Libya. The Awqaf and Dar al-Ifta table in use since 1994 (about 18.5° Fajr, 18.3° Isha, Dhuhr + 3, Maghrib + 3) has Isha 6 to 7 and Maghrib 3 to 4 minutes later than the app's MWL.
 # tripoli-libya	2210247	en ar	ar
 # benghazi-libya	88319	en ar
@@ -121,14 +129,17 @@ assiut-egypt	359783	en ar
 
 # ---------------------------------------------------------------- Türkiye and Central Asia
 # Türkiye: Diyanet, within 2 minutes of Diyanet's own tables for eight cities across October.
-istanbul-turkiye	745044	en tr	en tr
-ankara-turkiye	323786	en tr	tr
-izmir-turkiye	311046	en tr	tr	en=Izmir
-bursa-turkiye	750269	en tr	tr
-konya-turkiye	306571	en tr	tr
-antalya-turkiye	323777	en tr
-gaziantep-turkiye	314830	en tr
-diyarbakir-turkiye	316541	en tr
+# held: in all eight cities the page's Asr, Maghrib and Isha were 1 to 2 minutes before Diyanet's on
+# nearly every day. Diyanet's Maghrib is sunset + 8 and its Asr about + 5; adhan's Turkey preset adds
+# 7 and 4.
+# istanbul-turkiye	745044	en tr	en tr
+# ankara-turkiye	323786	en tr	tr
+# izmir-turkiye	311046	en tr	tr	en=Izmir
+# bursa-turkiye	750269	en tr	tr
+# konya-turkiye	306571	en tr	tr
+# antalya-turkiye	323777	en tr
+# gaziantep-turkiye	314830	en tr
+# diyarbakir-turkiye	316541	en tr
 # held: Uzbekistan. The Muslim Board uses 15.5° for Fajr and Isha and the Hanafi Asr: Fajr is 13 minutes, Isha 12 and Asr about 49 away from the app's defaults.
 # tashkent-uzbekistan	1512569	en
 # samarkand-uzbekistan	1216265	en
@@ -162,7 +173,8 @@ diyarbakir-turkiye	316541	en tr
 
 # ---------------------------------------------------------------- Southeast Asia
 # Singapore: the Singapore method, within a minute of MUIS for all of 2026.
-singapore	1880252	en
+# held: that minute was early on about a quarter of the year's days, at every prayer.
+# singapore	1880252	en
 # held: Indonesia. Kemenag adds about 2 minutes to its 20°/18° times; all five prayers are 2 to 3 minutes later than the app's.
 # jakarta-indonesia	1642911	en id	en id
 # surabaya-indonesia	1625822	en id	id	id=Surabaya
@@ -183,7 +195,9 @@ singapore	1880252	en
 
 # ---------------------------------------------------------------- Africa
 # South Africa, Cape Town: the Muslim Judicial Council's times match the app's MWL exactly.
-cape-town-south-africa	3369157	en
+# held: Jamiatul Ulama's Cape Town table has Dhuhr 3 to 4 and Maghrib 2 to 3 minutes later than the
+# page; which of the two the city's mosques follow is not settled.
+# cape-town-south-africa	3369157	en
 # held: Johannesburg, Pretoria and Durban. The Jamiatul Ulama tables use the Hanafi Asr (57 minutes later) with Dhuhr + 5 and Maghrib + 3.
 # johannesburg-south-africa	993800	en
 # pretoria-south-africa	964137	en
@@ -257,23 +271,26 @@ cape-town-south-africa	3369157	en
 # ---------------------------------------------------------------- Americas
 # United States and Canada: no national authority. The app's ISNA method is what most ISNA
 # mosques publish (within 3 minutes in New York and Toronto); the page says which method it is.
-new-york-usa	5128581	en ar ur bn	en bn	en=New York;ar=نيويورك;ur=نیویارک;bn=নিউ ইয়র্ক
-chicago-usa	4887398	en ar ur
-los-angeles-usa	5368361	en ar
-houston-usa	4699066	en ar ur
-dearborn-usa	4990510	en ar
-washington-dc-usa	4140963	en ar		en=Washington, DC;ar=واشنطن
-philadelphia-usa	4560349	en
-dallas-usa	4684888	en ar ur
-atlanta-usa	4180439	en
-minneapolis-usa	5037649	en
-toronto-canada	6167865	en ur ar	en
-montreal-canada	6077243	en fr ar	fr	en=Montreal
-mississauga-canada	6075357	en ur
-ottawa-canada	6094817	en ar
-calgary-canada	5913490	en
-edmonton-canada	5946768	en
-vancouver-canada	6173331	en
+# held: no single timetable. The Muslim Association of Canada's Asr in Toronto was 2 to 3 minutes
+# after the page's every day of October, and New York's Islamic Cultural Center has Maghrib up to 4
+# and Isha up to 8 minutes after it.
+# new-york-usa	5128581	en ar ur bn	en bn	en=New York;ar=نيويورك;ur=نیویارک;bn=নিউ ইয়র্ক
+# chicago-usa	4887398	en ar ur
+# los-angeles-usa	5368361	en ar
+# houston-usa	4699066	en ar ur
+# dearborn-usa	4990510	en ar
+# washington-dc-usa	4140963	en ar		en=Washington, DC;ar=واشنطن
+# philadelphia-usa	4560349	en
+# dallas-usa	4684888	en ar ur
+# atlanta-usa	4180439	en
+# minneapolis-usa	5037649	en
+# toronto-canada	6167865	en ur ar	en
+# montreal-canada	6077243	en fr ar	fr	en=Montreal
+# mississauga-canada	6075357	en ur
+# ottawa-canada	6094817	en ar
+# calgary-canada	5913490	en
+# edmonton-canada	5946768	en
+# vancouver-canada	6173331	en
 
 # ---------------------------------------------------------------- Oceania
 # held: Australia and New Zealand. No dominant body; Sydney's Lakemba Mosque is up to 17 minutes from the app, and New Zealand was not checked.

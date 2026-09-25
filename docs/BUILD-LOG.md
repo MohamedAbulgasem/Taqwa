@@ -1545,3 +1545,35 @@ NOAA's public-domain model, ported with its coefficient file byte for byte, repr
 NOAA's published test points to a thousandth of a nanotesla — so the compass works with location
 off and asks iOS for no location at all. For Cape Town it gives −26.79°; the iPhone had applied
 −26.8° itself.
+
+## The city pages held: a minute early is a prayer before its time (25 September)
+
+The first check allowed about two minutes either way. Mohamed asked the harder question: does a
+page ever show a prayer *before* the official time? A Maghrib a minute early is a fast broken
+before sunset; any start shown early is a prayer before its time. The same official tables were
+compared again with the sign kept (app minus official), and every live country failed somewhere:
+
+| Country | Checked against | Days a start was shown early |
+|---|---|---|
+| Türkiye, eight cities | Diyanet, 31 days | Asr, Maghrib and Isha 1–2 min early on nearly every day |
+| Singapore | MUIS, all of 2026 | 1 min early at every prayer on about a quarter of days |
+| UAE | Dubai table, September | Maghrib 13 days, Isha 9 |
+| Egypt | Survey Authority, September | Asr 11 days (Maghrib never) |
+| Kuwait, Saudi Arabia | one day each, second-hand for Saudi | 1 min at several prayers |
+| USA, Canada | MAC Toronto; ICCNY and Hikmah, New York | Asr 2–3 min before MAC's every day of October; ICCNY's Maghrib up to 4 and Isha up to 8 min later |
+| Cape Town | Jamiatul Ulama's Cape Town table | Dhuhr 3–4 and Maghrib 2–3 min early every day |
+
+Two causes. adhan2's presets are near but not on the authorities: Diyanet's Maghrib is sunset + 8
+and its Asr about + 5 where the Turkey preset adds 7 and 4. And the engine rounds to the nearest
+minute, so a start can be shown up to half a minute before the moment it describes. Measured to
+the second against the raw astronomical times, most official tables are that raw time plus a fixed
+number of minutes and a rounding rule, each inside a 60-second band (Diyanet, Egypt, Dubai,
+Kemenag, Habous, Libya, Algeria, MAC Toronto), so a profile can reproduce them to the minute
+without ever being early. MUIS, JAKIM and Jamiatul Ulama Johannesburg spread 100–175 seconds, and
+the London Unified Timetable's Fajr and Isha are not angle-based at all.
+
+Every row of `site/cities.tsv` is now held, each country under what was found, and while none is
+live the build leaves the section out entirely: no index, no header or footer link, no home-page
+strip (`PRAYER_TIMES_LIVE` in `site/build.py`). With the rows restored the new code builds all 154
+pages byte for byte as before. The app shows the same times the pages did, so this is the engine's
+to fix, not the site's.

@@ -59,6 +59,10 @@ PAGE_DIRS = {"home": "", "support": "support/", "privacy": "privacy/"}
 # pages themselves carry.
 SITEMAP = []
 
+# Whether any city has a prayer-time page. While none does (site/cities.tsv holds every row), the
+# section is not built at all: no index, no header or footer link, no home-page strip.
+PRAYER_TIMES_LIVE = True
+
 
 def load_languages() -> dict:
     langs = {}
@@ -208,11 +212,23 @@ def labels(cfg: dict) -> dict:
 
 def render(template: str, values: dict) -> str:
     """Fills the template. The body goes in last, so nothing inside it is read as a placeholder."""
+    values = {**values, **prayer_times_links(values)}
     out = template
     for key, value in values.items():
         if key != "body":
             out = out.replace("{" + key + "}", value)
     return shield_emails(out.replace("{body}", values["body"]))
+
+
+def prayer_times_links(values: dict) -> dict:
+    """The header and footer links to the prayer-time pages, or nothing while no city is live."""
+    if not PRAYER_TIMES_LIVE:
+        return {"prayer_times_nav": "", "prayer_times_footer": ""}
+    href, name = values["prayer_times"], values["nav_prayer_times"]
+    return {
+        "prayer_times_nav": f'<a href="{href}"{values["prayer_times_current"]}>{name}</a>\n    ',
+        "prayer_times_footer": f'<a href="{href}">{name}</a>\n    ',
+    }
 
 
 def rel(from_dir: str, to_dir: str) -> str:
@@ -474,6 +490,7 @@ def check_site(data: timetables.Timetables) -> int:
 if __name__ == "__main__":
     langs = load_languages()
     data = timetables.Timetables(langs, timetables.load(os.path.join(ROOT, "_data", "timetables.json")))
+    PRAYER_TIMES_LIVE = bool(data.cities)
     copy_static()
     with open(os.path.join(SITE, "templates", "base.html"), encoding="utf-8") as f:
         template = f.read()
