@@ -43,7 +43,6 @@ import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.onboarding.OnboardingStep
-import world.taqwa.app.feature.quran.QuranRootUiState
 import world.taqwa.app.feature.settings.AboutScreen
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
@@ -73,19 +72,11 @@ import world.taqwa.app.crash.crashLogStore
 import world.taqwa.app.crash.deviceInfoOrUnknown
 import world.taqwa.app.feature.crash.CrashReportSheet
 import world.taqwa.app.resources.crash_mail_no_report
-import world.taqwa.app.feature.quran.MushafScreen
-import world.taqwa.app.feature.quran.MushafUiState
-import world.taqwa.app.feature.quran.MushafViewModel
 import world.taqwa.app.feature.quran.QuranRootScreen
-import world.taqwa.app.feature.quran.QuranRootViewModel
-import world.taqwa.app.feature.quran.ReaderScreen
-import world.taqwa.app.feature.quran.ReaderUiState
-import world.taqwa.app.feature.quran.ReaderViewModel
 import world.taqwa.app.feature.recitation.DownloadSheet
 import world.taqwa.app.feature.recitation.PlayerBar
 import world.taqwa.app.feature.recitation.playerBarHeight
 import world.taqwa.app.feature.recitation.PlayerBarHost
-import world.taqwa.app.feature.recitation.QuranRecitation
 import world.taqwa.app.feature.recitation.ReciterPicker
 import world.taqwa.app.resources.recitation_a11y_next_ayah
 import world.taqwa.app.resources.recitation_a11y_previous_ayah
@@ -170,7 +161,8 @@ fun App(container: AppContainer) {
     // notification's tap, or - on iOS, which has no such tap - the app coming to the front with
     // a voice going. A screen already showing the surah is asked to scroll (the token); any other
     // is replaced or pushed with the reader the user reads in, at the ayah, following armed.
-    var jumpToken by remember { mutableStateOf(0) }
+    val jumpTokenState = remember { mutableStateOf(0) }
+    var jumpToken by jumpTokenState
     val jumpScope = rememberCoroutineScope()
     val openPlaying: () -> Unit = {
         val playing = recitation.state.value.bar
@@ -443,7 +435,8 @@ fun App(container: AppContainer) {
                 // pushes the reader, which disposes the root and its view model both, and spec 2b
                 // §2.1 says the query is still in the field when you come back. A TextFieldValue,
                 // so the caret comes back with it rather than jumping to the start of the text.
-                var quranQuery by remember { mutableStateOf(TextFieldValue()) }
+                val quranQueryState = remember { mutableStateOf(TextFieldValue()) }
+                var quranQuery by quranQueryState
 
                 // The bar belongs to the Quran tab (spec §5.3): on Prayer and Settings it is
                 // hidden and playback simply goes on, which is what a media app does when you
@@ -529,171 +522,46 @@ fun App(container: AppContainer) {
                         }
 
                         Screen.Quran -> {
-                            val viewModel = remember {
-                                QuranRootViewModel(
-                                    source = container.quranRepository,
-                                    settings = settings,
-                                    bookmarks = container.bookmarkStore,
-                                    languageTag = platformFormat.languageTag(),
-                                )
-                            }
-                            LaunchedEffect(viewModel) {
-                                viewModel.load()
-                                viewModel.start(this)
-                                // The field outlived the screen (see quranQuery); the view model
-                                // did not, so the restored query is searched again on the way back.
-                                // start() first: setFilter needs the scope to run its search.
-                                // immediate: nobody is typing, so the debounce would only leave the
-                                // ayah section blank for a quarter of a second on the way back.
-                                if (quranQuery.text.isNotEmpty()) {
-                                    viewModel.setFilter(quranQuery.text, immediate = true)
-                                }
-                            }
-                            // The debug harnesses' typed search (see LaunchRequests.search).
-                            LaunchedEffect(viewModel) {
-                                LaunchRequests.pendingSearch.collect { asked ->
-                                    asked ?: return@collect
-                                    viewModel.state.first { it is QuranRootUiState.Ready }
-                                    quranQuery = TextFieldValue(asked)
-                                    viewModel.setFilter(asked, immediate = true)
-                                    LaunchRequests.consumeSearch()
-                                }
-                            }
-                            val quranState by viewModel.state.collectAsState()
-                            QuranRootScreen(
-                                state = quranState,
-                                query = quranQuery,
-                                onQueryChange = { value ->
-                                    // Only when the text itself changed: a TextFieldValue also
-                                    // changes on a caret move or a selection, and setFilter
-                                    // cancels the running search and re-queries, which would blank
-                                    // the ayah section for the debounce every time the field is
-                                    // tapped.
-                                    val changed = value.text != quranQuery.text
-                                    quranQuery = value
-                                    if (changed) viewModel.setFilter(value.text)
-                                },
-                                onTabChange = viewModel::setTab,
-                                pageFor = viewModel::pageFor,
-                                onOpenReader = { surah, ayah -> navigator.push(Screen.Reader(surah, ayah)) },
-                                onOpenMushaf = { page -> navigator.push(Screen.Mushaf(page)) },
-                                onRemoveBookmark = viewModel::removeBookmark,
+                            QuranRootRoute(
+                                container = container,
+                                settings = settings,
+                                platformFormat = platformFormat,
+                                quranQueryState = quranQueryState,
+                                navigator = navigator,
                             )
                         }
 
                         is Screen.Reader -> {
-                            val viewModel = remember(screen) {
-                                ReaderViewModel(
-                                    source = container.quranRepository,
-                                    settings = settings,
-                                    bookmarks = container.bookmarkStore,
-                                    languageTag = platformFormat.languageTag(),
-                                    surah = screen.surah,
-                                )
-                            }
-                            LaunchedEffect(viewModel) { viewModel.start(this) }
-                            val readerState by viewModel.state.collectAsState()
-                            ReaderScreen(
-                                state = readerState,
-                                initialAyah = screen.ayah,
-                                selectInitialAyah = screen.selectAyah,
-                                onBack = { navigator.pop() },
-                                onToggleMode = {
-                                    scope.launch {
-                                        val page = viewModel.switchToMushaf()
-                                        navigator.replace(Screen.Mushaf(page))
-                                    }
-                                },
-                                onChangeSettings = viewModel::updateSettings,
-                                onFirstVisibleAyah = viewModel::onFirstVisibleAyah,
-                                onOpenNextSurah = { next -> navigator.replace(Screen.Reader(next, 1)) },
-                                onToggleBookmark = viewModel::toggleBookmark,
-                                // The surah's name and the reference digits follow the UI's own
-                                // language (spec 2b §2.3), which only this layer knows — so the
-                                // view model is handed both rather than resolving them itself.
-                                shareTextFor = { ayah ->
-                                    (readerState as? ReaderUiState.Ready)?.let { ready ->
-                                        viewModel.shareTextFor(
-                                            ayah = ayah,
-                                            surahName = ready.surah.displayName(layoutDirection == LayoutDirection.Rtl),
-                                            digits = platformFormat::localizedDigits,
-                                        )
-                                    }
-                                },
-                                recitation = QuranRecitation(
-                                    header = recitationState.header(screen.surah),
-                                    playing = bar?.let { it.surah to it.ayah },
-                                    live = bar?.playing == true,
-                                    barSpace = barSpace,
-                                    jumpToken = jumpToken,
-                                    onHeader = recitation::onHeaderTap,
-                                    onPlayAyah = recitation::requestPlay,
-                                    onToggle = recitation::toggle,
-                                ),
+                            ReaderRoute(
+                                screen = screen,
+                                container = container,
+                                settings = settings,
+                                platformFormat = platformFormat,
+                                navigator = navigator,
+                                scope = scope,
+                                layoutDirection = layoutDirection,
+                                recitationStateState = recitationStateState,
+                                bar = bar,
+                                barSpace = barSpace,
+                                jumpTokenState = jumpTokenState,
+                                recitation = recitation,
                             )
                         }
 
                         is Screen.Mushaf -> {
-                            val viewModel = remember(screen) {
-                                MushafViewModel(
-                                    source = container.quranRepository,
-                                    settings = settings,
-                                    bookmarks = container.bookmarkStore,
-                                    languageTag = platformFormat.languageTag(),
-                                    startPage = screen.page,
-                                )
-                            }
-                            LaunchedEffect(viewModel) { viewModel.start(this) }
-                            val mushafState by viewModel.state.collectAsState()
-                            MushafScreen(
-                                state = mushafState,
-                                startPage = screen.page,
-                                initialHighlight = screen.highlightSurah?.let { sur ->
-                                    screen.highlightAyah?.let { a -> sur to a }
-                                },
-                                pageLoader = viewModel::page,
-                                onBack = { navigator.pop() },
-                                onToggleMode = {
-                                    scope.launch {
-                                        val (surah, ayah) = viewModel.switchToReader()
-                                        navigator.replace(Screen.Reader(surah, ayah))
-                                    }
-                                },
-                                onChangeSettings = viewModel::updateSettings,
-                                onPageShown = viewModel::onPageShown,
-                                onToggleBookmark = viewModel::toggleBookmark,
-                                // As in the reader's branch: the surah's name and the reference
-                                // digits are the UI language's business, so this layer resolves
-                                // them. A page can straddle two surahs, so the name is looked up
-                                // by the tapped ayah's own surah, never the header's.
-                                shareTextFor = { surah, ayah ->
-                                    (mushafState as? MushafUiState.Ready)?.surahsByNumber?.get(surah)?.let { named ->
-                                        viewModel.shareTextFor(
-                                            surah = surah,
-                                            ayah = ayah,
-                                            surahName = named.displayName(layoutDirection == LayoutDirection.Rtl),
-                                            digits = platformFormat::localizedDigits,
-                                        )
-                                    }
-                                },
-                                recitation = QuranRecitation(
-                                    // The page's own surah, which is the one the header names.
-                                    // Whether the voice is on *this page* is a question only the
-                                    // Mushaf can answer — it knows which page the recited ayah is
-                                    // printed on — so it is the screen that raises this to
-                                    // Playing when the ayah is here.
-                                    header = recitationState.header(
-                                        (mushafState as? MushafUiState.Ready)?.surah?.number ?: 0,
-                                    ),
-                                    playing = bar?.let { it.surah to it.ayah },
-                                    live = bar?.playing == true,
-                                    barSpace = barSpace,
-                                    jumpToken = jumpToken,
-                                    onHeader = recitation::onHeaderTap,
-                                    onPlayAyah = recitation::requestPlay,
-                                    onToggle = recitation::toggle,
-                                ),
-                                pageOfAyah = { surah, ayah -> container.quranRepository.pageOf(surah, ayah) },
+                            MushafRoute(
+                                screen = screen,
+                                container = container,
+                                settings = settings,
+                                platformFormat = platformFormat,
+                                navigator = navigator,
+                                scope = scope,
+                                layoutDirection = layoutDirection,
+                                recitationStateState = recitationStateState,
+                                bar = bar,
+                                barSpace = barSpace,
+                                jumpTokenState = jumpTokenState,
+                                recitation = recitation,
                             )
                         }
 
