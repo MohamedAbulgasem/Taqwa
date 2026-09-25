@@ -11,6 +11,7 @@
   --t3: #A5A498;
   --accent: #B5820B;
   --ring: #E3A21C;
+  --track: #ECEAE2;
   --icon-paper: #FFFFFF;
   --icon-ink: #16160F;
   --font: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -26,6 +27,7 @@
     --t3: #5A625D;
     --accent: #F0B429;
     --ring: #F0B429;
+    --track: #232825;
     --icon-paper: #16160F;
     --icon-ink: #FFFFFF;
   }
@@ -78,6 +80,9 @@ html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir
 /* A link whose text is itself a sentence ("ثبّت التطبيق من Google Play") reads in the page's
    direction; only links that *are* a Latin address want the rule above. */
 html[dir="rtl"] .row b a { direction: rtl; }
+/* So do the prayer-time pages' links, which are all city names or sentences. */
+html[dir="rtl"] .crumbs a, html[dir="rtl"] .fact a, html[dir="rtl"] .chips a, html[dir="rtl"] .cities a,
+html[dir="rtl"] .month-head a, html[dir="rtl"] .cta .pill, html[dir="rtl"] .tt-stale a { direction: rtl; }
 
 /* Blocks that share this class (.top, .hero, .prose, .foot) set only padding-block, so the
    24px inline padding survives on narrow screens where there is no centring margin. */
@@ -177,6 +182,165 @@ html[dir="rtl"] .row b a { direction: rtl; }
 .foot { border-top: 1px solid var(--hair); padding-block: 28px 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; font-size: 14px; color: var(--t3); }
 .foot nav { display: flex; flex-wrap: wrap; gap: 18px; }
 .foot a { color: var(--t2); }
+
+/* ── Prayer times: city pages, the index, the home section ─ */
+/* Laid out as the app's Prayer screen is: the ring and the five prayers, then the month. */
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 999px; padding: 0 8px; line-height: 18px; white-space: nowrap; }
+html[lang="ar"] .tag, html[lang="ur"] .tag, html[lang="bn"] .tag { font-size: 12px; }
+.tag[hidden] { display: none; }
+
+.city-hero { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr); gap: 48px; align-items: start; padding-block: 30px 52px; }
+.crumbs { display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px; color: var(--t3); margin-bottom: 18px; }
+.crumbs a { color: var(--t2); }
+.crumbs [aria-current] { color: var(--t1); font-weight: 600; }
+.city-copy h1 { font-size: clamp(34px, 5.2vw, 54px); }
+.city-meta { margin-top: 12px; font-size: 18px; color: var(--t2); text-wrap: pretty; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 30px; }
+.fact { background: var(--surface); border: 1px solid var(--hair); border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 3px; }
+.fact .label { margin-bottom: 4px; }
+.fact b { font-size: 17px; font-weight: 700; line-height: 1.35; }
+.fact > span:not(.label), .fact > div > span:not(.label) { font-size: 14px; color: var(--t2); line-height: 1.45; }
+.fact a { font-size: 14px; font-weight: 600; margin-top: 8px; }
+.fact.qibla { flex-direction: row; align-items: center; gap: 14px; }
+.fact.qibla > div { display: flex; flex-direction: column; gap: 3px; }
+.dial { width: 54px; height: 54px; flex: none; }
+
+.today { background: var(--surface); border: 1px solid var(--hair); border-radius: 22px; padding: 26px 20px 12px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ring-box { position: relative; width: 196px; height: 196px; }
+.ring { display: block; width: 100%; height: 100%; }
+html[dir="rtl"] .ring { transform: scaleX(-1); }
+.ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; text-align: center; padding-inline: 22px; }
+.ring-label { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); line-height: 1.35; }
+html[lang="ar"] .ring-label, html[lang="ur"] .ring-label, html[lang="bn"] .ring-label { font-size: 13px; letter-spacing: 0; font-weight: 700; }
+.ring-count { font-size: 40px; font-weight: 300; line-height: 1.12; font-variant-numeric: tabular-nums; }
+.ring-at { font-size: 14px; color: var(--t2); font-variant-numeric: tabular-nums; }
+.tl { list-style: none; margin: 0; padding: 0; width: 100%; position: relative; }
+.tl::before { content: ""; position: absolute; inset-inline-start: 13px; top: 22px; bottom: 22px; width: 1px; background: var(--hair); }
+.tl li { display: flex; align-items: center; gap: 10px; padding-block: 9px; padding-inline-end: 6px; font-size: 17px; position: relative; }
+.tl li i { width: 10px; height: 10px; border-radius: 50%; margin-inline: 9px 8px; flex: none; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--t3); position: relative; z-index: 1; }
+.tl li.past i { background: var(--t3); box-shadow: none; }
+.tl li.now i { width: 14px; height: 14px; margin-inline: 7px 6px; background: var(--ring); box-shadow: 0 0 0 5px color-mix(in srgb, var(--ring) 22%, transparent); }
+.tl li b { font-weight: 700; }
+.tl li em { font-style: normal; font-size: 13px; color: var(--t3); font-family: var(--font-ar); }
+.tl li time { margin-inline-start: auto; font-variant-numeric: tabular-nums; color: var(--t2); }
+.tl li.past b, .tl li.past time { color: var(--t3); font-weight: 500; }
+.tl li.now b, .tl li.now time { color: var(--accent); font-weight: 800; }
+.tt-stale { font-size: 14px; color: var(--t2); text-align: center; padding-bottom: 12px; }
+
+.month { border-top: 1px solid var(--hair); padding-block: 40px 44px; }
+.month-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.month h2 { font-size: clamp(24px, 3vw, 30px); }
+.month-head p { color: var(--t2); font-size: 15px; margin-top: 4px; }
+.pill.quiet.small, .month-head .pill.quiet { min-height: 40px; padding: 0 18px; font-size: 14px; font-weight: 700; }
+.tt-wrap { background: var(--surface); border: 1px solid var(--hair); border-radius: 18px; overflow-x: auto; }
+.tt { width: 100%; color: var(--t1); border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 15px; }
+.tt th, .tt td { text-align: start; white-space: nowrap; border-bottom: 1px solid var(--hair); }
+.tt thead th { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); padding: 12px 10px; }
+html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt thead th { font-size: 12.5px; letter-spacing: 0; font-weight: 700; }
+.tt td, .tt tbody th { padding: 7px 10px; font-weight: 400; }
+.tt thead th:first-child, .tt tbody th.d { padding-inline-start: 16px; }
+/* The six times get one width, wide enough for Friday's Dhuhr and its Jumuʿah pill, so the
+   columns line up; narrower than the full table, the Hijri column and the pills give way. */
+.tt thead th:nth-child(n+3) { width: 124px; }
+@media (max-width: 1039px) {
+  .tt .h, .tt td.jm .tag { display: none; }
+  .tt thead th:nth-child(n+3) { width: auto; }
+}
+.tt tbody tr:last-child > * { border-bottom: 0; }
+.tt tbody th.d b { font-weight: 700; display: inline-block; min-width: 1.6em; }
+.tt tbody th.d span { color: var(--t3); font-size: 13px; margin-inline-start: 6px; }
+.tt td.h { color: var(--t2); font-size: 14px; }
+.tt td.jm .tag { margin-inline-start: 6px; line-height: 16px; font-size: 10px; padding: 0 6px; }
+.tt tr.past > *, .tt tr.past td.h { color: var(--t3); }
+.tt tr.past th.d b { color: var(--t3); font-weight: 600; }
+.tt tr.fri th.d span { color: var(--accent); font-weight: 700; }
+.tt tr.fri.past th.d span { color: color-mix(in srgb, var(--accent) 55%, var(--t3)); }
+.tt tr.fri td.jm { color: var(--accent); }
+.tt tr.fri.past td.jm { color: color-mix(in srgb, var(--accent) 55%, var(--t3)); }
+.tt tr.is-today > * { background: color-mix(in srgb, var(--ring) 14%, var(--surface)); font-weight: 700; }
+.tt tr.is-today th.d b { color: var(--accent); }
+.tt tr.fold td { padding: 12px 14px; white-space: normal; }
+.tt tr.fold button { font: inherit; font-size: 14px; color: var(--t2); background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.tt tr.fold button b { color: var(--accent); }
+.note { margin-top: 14px; font-size: 14px; color: var(--t2); max-width: 72ch; text-wrap: pretty; }
+.tt-note { margin-top: 0; padding-bottom: 36px; }
+
+.after-month { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 32px; padding-block: 4px 56px; align-items: start; }
+.cta { background: var(--surface); border: 1px solid var(--hair); border-radius: 22px; padding: 26px 26px 0 26px; display: flex; gap: 22px; align-items: flex-start; overflow: hidden; }
+.cta-copy { display: flex; flex-direction: column; gap: 10px; flex: 1; padding-bottom: 26px; }
+.cta h2 { font-size: 24px; }
+.cta p { color: var(--t2); font-size: 16px; line-height: 1.5; }
+.cta .stores { margin-top: 6px; }
+.cta-shot { width: 156px; flex: none; height: 250px; overflow: hidden; }
+.cta-shot img { width: 100%; height: auto; display: block; border-radius: 22px 22px 0 0; border: 1px solid var(--hair); border-bottom: 0; }
+.nearby { display: flex; flex-direction: column; gap: 10px; }
+.nearby .label { margin-bottom: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chips a { font-size: 14px; font-weight: 600; color: var(--t1); background: var(--surface); border: 1px solid var(--hair); border-radius: 999px; padding: 6px 14px; }
+.chips a:hover { text-decoration: none; border-color: var(--t3); }
+.chips.big a { font-size: 15px; padding: 9px 16px; }
+.chips a.all { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--hair)); }
+
+.index { padding-block: 34px 64px; }
+.index h1 { font-size: clamp(34px, 5vw, 50px); }
+.index .lede { max-width: 48ch; margin-top: 12px; font-size: 19px; }
+.search { display: flex; align-items: center; gap: 12px; max-width: 520px; height: 52px; padding: 0 20px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); color: var(--t3); margin-block: 28px 8px; }
+.search[hidden] { display: none; }
+.search:focus-within { border-color: var(--t3); }
+.search svg { width: 20px; height: 20px; flex: none; }
+.search input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; font: inherit; font-size: 16px; color: var(--t1); outline: none; }
+.search input::placeholder { color: var(--t3); }
+.region { padding-top: 34px; }
+.region > .label { display: block; margin-bottom: 14px; }
+.countries { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 22px 28px; }
+.country h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+/* Inline, so a line breaks after a dot, never before one: the dot stays with the city it follows. */
+.cities { list-style: none; margin: 0; padding: 0; font-size: 15px; color: var(--t3); line-height: 1.7; }
+.cities li { display: inline; }
+.cities li:not(:last-child)::after { content: "\00a0· "; }
+.filtering .cities li { margin-inline-end: 14px; }
+.filtering .cities li::after { content: none; }
+.country a { color: var(--t2); }
+.country a:hover { color: var(--accent); }
+.no-match { margin-top: 32px; color: var(--t2); }
+[data-hidden] { display: none !important; }
+
+.cities-strip { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; align-items: center; }
+.cities-strip .lede { font-size: 17px; max-width: 36ch; }
+
+@media (max-width: 720px) {
+  /* The footer carries Privacy and GitHub; the header keeps the two a phone needs. */
+  .nav a.wide, html[dir="rtl"] .nav a.wide { display: none; }
+  .city-hero { grid-template-columns: 1fr; gap: 28px; padding-block: 18px 32px; }
+  .city-meta { font-size: 15px; margin-top: 10px; }
+  .facts { grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+  .today { padding-top: 22px; }
+  .ring-box { width: 176px; height: 176px; }
+  .ring-count { font-size: 36px; }
+  .month { padding-block: 28px; }
+  .tt { font-size: 13px; }
+  .tt thead th { font-size: 9.5px; letter-spacing: 0.04em; padding: 10px 4px; text-align: center; white-space: normal; line-height: 1.25; }
+  html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt thead th { font-size: 11px; }
+  .tt thead th.d { text-align: start; padding-inline-start: 12px; }
+  .tt td { padding: 6px 4px; text-align: center; }
+  .tt tbody th.d { padding: 6px 4px 6px 0; padding-inline-start: 12px; line-height: 1.2; }
+  .tt tbody th.d b { display: block; }
+  .tt tbody th.d span { display: block; margin: 0; font-size: 10.5px; }
+  .tt .h { display: none; }
+  .tt td.jm .tag { display: none; }
+  .tt tr.fold td { text-align: start; padding: 11px 12px; }
+  .after-month { grid-template-columns: 1fr; gap: 22px; }
+  .cta { padding: 20px; }
+  .cta-copy { padding-bottom: 0; }
+  .cta-shot { display: none; }
+  .cta h2 { font-size: 21px; }
+  .cities-strip { grid-template-columns: 1fr; gap: 20px; }
+  .index { padding-block: 22px 48px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ring-arc { transition: stroke-dasharray 600ms ease; }
+}
 
 @media (max-width: 720px) {
   .hero { grid-template-columns: 1fr; padding-block: 28px 48px; gap: 36px; }

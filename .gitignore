@@ -27,8 +27,9 @@ tools/cache/
 __pycache__/
 *.pyc
 
-# The built website (site/build.py)
+# The built website (site/build.py) and the prayer timetables it is built from (tools/timetables)
 _site/
+_data/
 # Store signing: the upload key and its passwords never enter the repository
 keystore.properties
 *.jks
