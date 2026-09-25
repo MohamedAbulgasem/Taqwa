@@ -53,7 +53,7 @@
     "hijri": "Hijri",
     "earlier": "Earlier this month",
     "note": "Calculated by Taqwa’s own prayer-time engine, the one inside the app, and rebuilt every day. Some mosques add a precautionary minute or two; the app lets you adjust any prayer to match yours. Updated {date}.",
-    "high_latitude": "At this latitude the sun does not sink far enough below the horizon on some nights, so on those days {fajr} and {isha} follow the app’s rule for high latitudes: “{rule}”.",
+    "high_latitude": "On some days this month, {fajr} or {isha} is set by the app’s rule for high latitudes, “{rule}”, rather than by the sun’s angle alone.",
     "clock_change": "The clocks change on {date}; from then on the times are on the new clock ({offset}).",
     "stale": "This timetable is out of date. The app always has today’s times.",
     "cta_label": "The app",
@@ -76,6 +76,8 @@
       "americas": "The Americas",
       "oceania": "Oceania"
     },
-    "qibla_here": "The Kaaba is here, in the Masjid al-Haram."
+    "qibla_here": "The Kaaba is here, in the Masjid al-Haram.",
+    "crumbs": "Breadcrumb",
+    "ramadan_isha": "In Ramadan, {method} puts {isha} two hours after {maghrib} rather than an hour and a half, and these times follow it."
   }
 }

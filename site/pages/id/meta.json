@@ -53,7 +53,7 @@
     "hijri": "Hijriah",
     "earlier": "Awal bulan ini",
     "note": "Dihitung oleh mesin waktu salat Taqwa sendiri, yang sama dengan di dalam aplikasi, dan diperbarui setiap hari. Beberapa masjid menambahkan satu atau dua menit sebagai ihtiyat; di aplikasi Anda dapat menyesuaikan setiap waktu salat agar sama dengan masjid Anda. Diperbarui {date}.",
-    "high_latitude": "Di lintang ini matahari tidak turun cukup jauh di bawah ufuk pada sebagian malam, sehingga pada hari-hari itu {fajr} dan {isha} mengikuti aturan lintang tinggi aplikasi: “{rule}”.",
+    "high_latitude": "Pada beberapa hari bulan ini, {fajr} atau {isha} ditentukan oleh aturan lintang tinggi aplikasi, “{rule}”, bukan oleh sudut matahari saja.",
     "clock_change": "Jam berubah pada {date}; sejak hari itu waktunya memakai jam baru ({offset}).",
     "stale": "Jadwal ini sudah kedaluwarsa. Aplikasi selalu menampilkan waktu hari ini.",
     "cta_label": "Aplikasi",
@@ -76,6 +76,8 @@
       "americas": "Amerika",
       "oceania": "Oseania"
     },
-    "qibla_here": "Ka’bah ada di sini, di Masjidilharam."
+    "qibla_here": "Ka’bah ada di sini, di Masjidilharam.",
+    "crumbs": "Jejak navigasi",
+    "ramadan_isha": "Selama Ramadan, metode {method} menetapkan {isha} dua jam setelah {maghrib}, bukan satu setengah jam, dan jadwal ini mengikutinya."
   }
 }

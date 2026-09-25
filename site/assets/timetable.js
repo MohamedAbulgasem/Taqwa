@@ -3,9 +3,10 @@
    A city page is complete without this file: every day of both months is in the markup, and the
    row of the day the page was built is lit. This makes it follow the reader's clock in the
    city's own time zone, so someone in London looking at Jakarta sees Jakarta's today: it lights
-   that row, turns the Today card into the app's countdown ring (the same next prayer, the same
-   interval, the same H:MM:SS, as TimelineBuilder and CountdownFormatter work them out), and on a
-   phone folds the days of the month already gone. On the index it filters the cities as you type.
+   that row, turns the Today card into the app's countdown ring (the same next prayer and interval
+   as TimelineBuilder, the same H:MM:SS in the same digits as CountdownFormatter, whose digit rule
+   the generator reads from the app), and on a phone folds the days of the month already gone. On
+   the index it filters the cities as you type.
 
    It makes no request and stores nothing. */
 (function () {
@@ -143,7 +144,7 @@
       shown = i;
       var day = days[i];
       items.forEach(function (li) {
-        li.querySelector("time").textContent = day.t[+li.getAttribute("data-p")];
+        li.querySelector(".t").textContent = day.t[+li.getAttribute("data-p")];
       });
       if (jumuah) jumuah.hidden = !day.f;
       if (fullDate) fullDate.textContent = day.full;
@@ -152,6 +153,8 @@
         var r = +row.getAttribute("data-i");
         row.classList.toggle("past", r < i);
         row.classList.toggle("is-today", r === i);
+        if (r === i) row.setAttribute("aria-current", "date");
+        else row.removeAttribute("aria-current");
       });
     }
 
@@ -169,6 +172,7 @@
         rows.forEach(function (row) {
           row.classList.add("past");
           row.classList.remove("is-today");
+          row.removeAttribute("aria-current");
         });
       }
     }

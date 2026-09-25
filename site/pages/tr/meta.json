@@ -53,7 +53,7 @@
     "hijri": "Hicri",
     "earlier": "Ayın önceki günleri",
     "note": "Taqwa’nın kendi vakit motoruyla, yani uygulamanın içindekiyle hesaplanır ve her gün yeniden oluşturulur. Bazı camiler ihtiyaten bir iki dakika ekler; uygulamada her vakti kendi caminize göre ayarlayabilirsiniz. Son güncelleme: {date}.",
-    "high_latitude": "Bu enlemde güneş bazı gecelerde ufkun yeterince altına inmez; o günlerde {fajr} ve {isha}, uygulamanın yüksek enlem kuralına göredir: “{rule}”.",
+    "high_latitude": "Bu ayın bazı günlerinde {fajr} veya {isha}, yalnızca güneşin açısıyla değil, uygulamanın yüksek enlem kuralıyla belirlenir: “{rule}”.",
     "clock_change": "Saatler {date} tarihinde değişiyor; o günden sonraki vakitler yeni saate göredir ({offset}).",
     "stale": "Bu vakit çizelgesi güncel değil. Uygulama her zaman bugünün vakitlerini gösterir.",
     "cta_label": "Uygulama",
@@ -76,6 +76,8 @@
       "americas": "Amerika",
       "oceania": "Okyanusya"
     },
-    "qibla_here": "Kâbe burada, Mescid-i Haram’da."
+    "qibla_here": "Kâbe burada, Mescid-i Haram’da.",
+    "crumbs": "Gezinme yolu",
+    "ramadan_isha": "Ramazan’da {method} yöntemi {isha} vaktini {maghrib} vaktinden bir buçuk değil iki saat sonra verir; bu vakitler de ona göredir."
   }
 }

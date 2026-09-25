@@ -23,7 +23,8 @@ on:
       - "shared/src/commonMain/kotlin/world/taqwa/app/domain/**"
       - "shared/src/commonMain/kotlin/world/taqwa/app/qibla/**"
       - "shared/src/commonMain/kotlin/world/taqwa/app/hijri/**"
-      - "shared/src/commonMain/kotlin/world/taqwa/app/i18n/UiLanguage.kt"
+      - "shared/src/commonMain/kotlin/world/taqwa/app/i18n/CountdownDigits.kt"
+      - "widgetcore/src/commonMain/kotlin/world/taqwa/app/i18n/UiLanguage.kt"
       - "shared/src/commonTest/kotlin/world/taqwa/app/prayer/**"
       - "shared/src/commonTest/kotlin/world/taqwa/app/qibla/**"
       - "shared/src/commonTest/kotlin/world/taqwa/app/hijri/**"
@@ -52,6 +53,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          # The newest 21 each run, so a JDK with newer time-zone data is picked up the day it
+          # ships (site/timetables.py corrects the clocks from tzdata until then).
+          check-latest: true
           cache: gradle
       - name: Prayer times from the app's own engine
         # The app's engine, Qibla and Hijri tests run on the JVM first; a change that breaks
@@ -60,8 +64,8 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.12"
-      # tzdata is deliberately unpinned: the build checks every city's clock against the newest
-      # time-zone database and stops if the JDK's copy, which the times were made with, is behind.
+      # tzdata is deliberately unpinned: the build reads every city's clock from the newest
+      # time-zone database, which is ahead of the JDK's copy whenever a country changes its rules.
       - run: pip install markdown==3.10.3 tzdata
       - run: python3 site/build.py --check
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
@@ -84,9 +88,9 @@ jobs:
   keepalive:
     # GitHub switches off a public repository's scheduled workflows after sixty days without
     # activity. Enabling the workflow from its own scheduled run resets that clock, so the
-    # timetables keep turning over on a quiet repository with nobody touching it.
+    # timetables keep turning over on a quiet repository with nobody touching it. It does not
+    # wait for the build: a broken build must not also let the schedule lapse.
     if: github.event_name == 'schedule'
-    needs: deploy
     runs-on: ubuntu-latest
     permissions:
       actions: write

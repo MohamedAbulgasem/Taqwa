@@ -56,23 +56,73 @@ def _zone(name: str) -> zoneinfo.ZoneInfo:
         return zoneinfo.ZoneInfo(name)
 
 
-def stale_zones(cities: list) -> list:
-    """Cities whose clock the generator got wrong. Its offsets come from the JDK's copy of the
-    time-zone database, which is only as new as the JDK; the tzdata package follows IANA within
-    days. Morocco left UTC+1 for good on 20 September 2026 before any JDK knew, and a page built
-    on the old rules prints every time an hour late, so any disagreement stops the build."""
-    problems = []
-    for city in cities:
-        zone = _zone(city["timeZone"])
-        for day in city["days"]:
-            at = datetime.datetime.fromtimestamp(day["epochs"][DHUHR], tz=datetime.timezone.utc)
-            offset = int(at.astimezone(zone).utcoffset().total_seconds())
-            if offset != day["offset"]:
-                problems.append(f"{city['slug']}: on {day['date']} the generator has UTC offset {day['offset']} s "
-                                f"but the time-zone database says {offset} s for {city['timeZone']}; "
-                                "the JDK's zone data is out of date (update the JDK or hold the city)")
-                break
-    return problems
+def clock_text(hour: int, minute: int, digit_set: str) -> str:
+    """The app's clock, as the generator's Formats.clock writes it: the hour unpadded, the minute
+    padded, in the page's digits."""
+    return digits(hour, digit_set) + ":" + digits(minute, digit_set).rjust(2, digit_set[0])
+
+
+def offset_text(seconds: int, digit_set: str) -> str:
+    """"UTC+2", "UTC+5:30", "UTC−4" or "UTC", as the generator's Formats.utcOffset writes it."""
+    if seconds == 0:
+        return "UTC"
+    sign = "+" if seconds > 0 else "−"
+    hours, minutes = divmod(abs(seconds) // 60, 60)
+    tail = "" if minutes == 0 else ":" + digits(minutes, digit_set).rjust(2, digit_set[0])
+    return f"UTC{sign}{digits(hours, digit_set)}{tail}"
+
+
+def minutes_of(text: str, digit_set: str) -> int:
+    hour, minute = text.translate({ord(d): str(i) for i, d in enumerate(digit_set)}).split(":")
+    return int(hour) * 60 + int(minute)
+
+
+def correct_clocks(city: dict) -> bool:
+    """Rewrites a city's clock times, offsets and clock-change notes from the newest tzdata where
+    the generator's differ, and says whether it had to.
+
+    The instants are the app's engine's and do not depend on any time-zone data; only reading them
+    on the local clock does, and the generator reads them with the JDK's copy of the database,
+    which is only as new as the JDK. Morocco left UTC+1 for good on 20 September 2026 and Alberta
+    stopped changing its clocks after 2026 (tzdata 2026c) before any JDK knew, so a page built on
+    the JDK alone would print their times an hour out. Phones get new zone data within weeks; the
+    page follows the newest there is. A difference that is not a different clock (the same minute
+    written differently) would be a bug in one of the two formatters, and stops the build."""
+    zone = _zone(city["timeZone"])
+    utc = datetime.timezone.utc
+    local = [[datetime.datetime.fromtimestamp(e, tz=utc).astimezone(zone) for e in day["epochs"]] for day in city["days"]]
+    wrong = False
+    for lang, page in city["pages"].items():
+        ds = page["digits"]
+        for i, day in enumerate(page["days"]):
+            for p, (theirs, moment) in enumerate(zip(day["times"], local[i])):
+                ours = clock_text(moment.hour, moment.minute, ds)
+                if ours == theirs:
+                    continue
+                if minutes_of(theirs, ds) == moment.hour * 60 + moment.minute:
+                    raise DataError(f"{city['slug']} {lang}: the generator wrote {theirs!r} where the site writes "
+                                    f"{ours!r} for the same minute; the two clock formats have drifted apart")
+                wrong = True
+    if not wrong:
+        return False
+
+    days = city["days"]
+    for i, day in enumerate(days):
+        day["offset"] = int(local[i][DHUHR].utcoffset().total_seconds())
+    first = days[0]["date"].split("-")
+    midnight = datetime.datetime(int(first[0]), int(first[1]), int(first[2]), tzinfo=zone)
+    before = [int(midnight.utcoffset().total_seconds())] + [d["offset"] for d in days[:-1]]
+    today = [d["date"] for d in days].index(city["today"])
+    for page in city["pages"].values():
+        ds = page["digits"]
+        for i, day in enumerate(page["days"]):
+            day["times"] = [clock_text(m.hour, m.minute, ds) for m in local[i]]
+        page["offset"] = offset_text(days[today]["offset"], ds)
+        page["clockChanges"] = [
+            {"index": i, "date": page["days"][i]["date"], "offset": offset_text(days[i]["offset"], ds)}
+            for i in range(len(days)) if days[i]["offset"] != before[i]
+        ]
+    return True
 
 
 def load(path: str) -> dict:
@@ -172,9 +222,10 @@ class Timetables:
             for lang in city["languages"]:
                 if lang not in langs:
                     raise DataError(f"{city['slug']} has a {lang} page but the site has no {lang}")
-        stale = stale_zones(self.cities)
-        if stale:
-            raise DataError("\n".join(stale))
+        self.corrected = [c["slug"] for c in self.cities if correct_clocks(c)]
+        for slug in self.corrected:
+            # A GitHub Actions notice, so the run summary says which pages the JDK was behind on.
+            print(f"::notice::{slug}: clock times taken from the newest tzdata; the JDK's zone data is older")
 
     # ---------------------------------------------------------------- addresses
 
@@ -245,16 +296,17 @@ class Timetables:
         )
 
     def breadcrumbs(self, city: dict, lang: str) -> str:
-        cfg = self.langs[lang]
-        t = cfg["timetable"]
-        origin = "https://taqwa.world/"
+        """The same trail the page shows: the index, the country on it, the city."""
+        t = self.langs[lang]["timetable"]
+        page = city["pages"][lang]
+        index = "https://taqwa.world/" + self.index_dir(lang)
         data = {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": cfg["brand"], "item": origin + cfg["prefix"]},
-                {"@type": "ListItem", "position": 2, "name": t["nav"], "item": origin + self.index_dir(lang)},
-                {"@type": "ListItem", "position": 3, "name": city["pages"][lang]["city"]},
+                {"@type": "ListItem", "position": 1, "name": t["nav"], "item": index},
+                {"@type": "ListItem", "position": 2, "name": page["country"], "item": f'{index}#{city["country"].lower()}'},
+                {"@type": "ListItem", "position": 3, "name": page["city"]},
             ],
         }
         text = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
@@ -272,7 +324,7 @@ class Timetables:
         today = dates.index(city["today"])
         sep = "‹" if rtl else "›"
 
-        crumbs = (f'<nav class="crumbs" aria-label="{attr(t["nav"])}"><a href="../">{esc(t["nav"])}</a>'
+        crumbs = (f'<nav class="crumbs" aria-label="{attr(t["crumbs"])}"><a href="../">{esc(t["nav"])}</a>'
                   f'<span aria-hidden="true">{sep}</span><a href="../#{city["country"].lower()}">{esc(page["country"])}</a>'
                   f'<span aria-hidden="true">{sep}</span><span aria-current="page">{esc(page["city"])}</span></nav>')
         if at_kaaba(city):
@@ -328,7 +380,8 @@ class Timetables:
             tag = ""
             if p == DHUHR:
                 tag = f'<span class="tag" data-tt="jumuah"{"" if friday else " hidden"}>{esc(page["jumuah"])}</span>'
-            items.append(f'<li data-p="{p}"><i></i><b>{esc(page["prayers"][p])}</b>{pair}{tag}<time>{esc(day["times"][p])}</time></li>')
+            # The spaces are for screen readers: layout ignores them between the row's flex items.
+            items.append(f'<li data-p="{p}"><i></i><b>{esc(page["prayers"][p])}</b> {pair} {tag} <span class="t">{esc(day["times"][p])}</span></li>')
         month_title = heading(page["months"][0]["title"])
         return f'''<section class="today" aria-label="{attr(t["today"])}">
       <div class="ring-box">{ring(0)}
@@ -354,6 +407,7 @@ class Timetables:
         heads += [f'<th scope="col">{esc(name)}</th>' for name in page["prayers"]]
         rows = []
         any_high = False
+        any_ramadan = False
         for i in range(first, first + count):
             facts_d = city["days"][i]
             day = page["days"][i]
@@ -364,17 +418,18 @@ class Timetables:
                 classes.append("is-today")
             if facts_d["friday"]:
                 classes.append("fri")
-            high = facts_d["highLatitude"]
-            any_high = any_high or high
-            cells = [f'<th scope="row" class="d"><b>{esc(day["day"])}</b><span>{esc(day["weekday"])}</span></th>',
+            any_high = any_high or facts_d["highLatitude"]
+            any_ramadan = any_ramadan or facts_d["ramadanIsha"]
+            cells = [f'<th scope="row" class="d"><b>{esc(day["day"])}</b> <span>{esc(day["weekday"])}</span></th>',
                      f'<td class="h">{esc(day["hijri"])}</td>']
             for p, time in enumerate(day["times"]):
                 if p == DHUHR and facts_d["friday"]:
-                    cells.append(f'<td class="jm">{esc(time)}<span class="tag">{esc(page["jumuah"])}</span></td>')
+                    cells.append(f'<td class="jm">{esc(time)} <span class="tag">{esc(page["jumuah"])}</span></td>')
                 else:
                     cells.append(f"<td>{esc(time)}</td>")
             cls = f' class="{" ".join(classes)}"' if classes else ""
-            rows.append(f'<tr data-i="{i}"{cls}>{"".join(cells)}</tr>')
+            current = ' aria-current="date"' if i == today else ""
+            rows.append(f'<tr data-i="{i}"{cls}{current}>{"".join(cells)}</tr>')
 
         notes = []
         for change in page["clockChanges"]:
@@ -382,6 +437,8 @@ class Timetables:
                 notes.append(f'<p class="note">{fill(t["clock_change"], date=change["date"], offset=change["offset"])}</p>')
         if any_high and page["highLatitude"]:
             notes.append(f'<p class="note">{fill(t["high_latitude"], rule=page["highLatitude"][0], fajr=page["prayers"][FAJR], isha=page["prayers"][ISHA])}</p>')
+        if any_ramadan:
+            notes.append(f'<p class="note">{fill(t["ramadan_isha"], **self.sentence_values(city, lang))}</p>')
         jump = f'<a class="pill quiet" href="#{other_anchor}">{esc(heading(other["title"]))}</a>' if other_anchor else ""
         caption = fill(t["h1"], **self.sentence_values(city, lang)) + " · " + esc(month["title"])
         return f'''
@@ -448,7 +505,9 @@ class Timetables:
                          "full": day["full"], "hijri": day["hijriLong"], "t": day["times"]})
         data = {
             "tz": city["timeZone"],
-            "digits": page["digits"],
+            # The countdown's digits, which are the page's except where the app falls back to
+            # Western ones for the ring (Egyptian and Saudi Arabic, Bengali: CountdownDigits).
+            "digits": page["countdownDigits"],
             "rtl": cfg["dir"] == "rtl",
             "next": page["nextIn"],
             "today": today,
@@ -466,9 +525,7 @@ class Timetables:
         cities = self.cities_in(lang)
         count = digits(len(cities), t["digits"])
         regions = []
-        order = ["middle-east", "north-africa", "turkiye-central-asia", "south-asia", "southeast-asia",
-                 "africa", "europe", "americas", "oceania"]
-        for region in order:
+        for region in self.doc["regions"]:
             in_region = [c for c in cities if c["region"] == region]
             if not in_region:
                 continue

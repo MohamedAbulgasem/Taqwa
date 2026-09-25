@@ -223,9 +223,9 @@ html[lang="ar"] .ring-label, html[lang="ur"] .ring-label, html[lang="bn"] .ring-
 .tl li.now i { width: 14px; height: 14px; margin-inline: 7px 6px; background: var(--ring); box-shadow: 0 0 0 5px color-mix(in srgb, var(--ring) 22%, transparent); }
 .tl li b { font-weight: 700; }
 .tl li em { font-style: normal; font-size: 13px; color: var(--t3); font-family: var(--font-ar); }
-.tl li time { margin-inline-start: auto; font-variant-numeric: tabular-nums; color: var(--t2); }
-.tl li.past b, .tl li.past time { color: var(--t3); font-weight: 500; }
-.tl li.now b, .tl li.now time { color: var(--accent); font-weight: 800; }
+.tl li .t { margin-inline-start: auto; font-variant-numeric: tabular-nums; color: var(--t2); }
+.tl li.past b, .tl li.past .t { color: var(--t3); font-weight: 500; }
+.tl li.now b, .tl li.now .t { color: var(--accent); font-weight: 800; }
 .tt-stale { font-size: 14px; color: var(--t2); text-align: center; padding-bottom: 12px; }
 
 .month { border-top: 1px solid var(--hair); padding-block: 40px 44px; }
