@@ -33,13 +33,20 @@ class Formats(val language: String, country: String) {
         minimumIntegerDigits = 2
         isGroupingUsed = false
     }
-    private val grouped = NumberFormat.getIntegerInstance(locale)
     private val decimalStyle = DecimalStyle.of(locale)
 
     private val longDateFormatter: DateTimeFormatter = DateTimeFormatter
         .ofPattern(
             DateTimeFormatterBuilder
                 .getLocalizedDateTimePattern(FormatStyle.LONG, null, IsoChronology.INSTANCE, locale)
+                .replace("dd", "d"),
+            locale,
+        )
+        .withDecimalStyle(decimalStyle)
+    private val fullDateFormatter: DateTimeFormatter = DateTimeFormatter
+        .ofPattern(
+            DateTimeFormatterBuilder
+                .getLocalizedDateTimePattern(FormatStyle.FULL, null, IsoChronology.INSTANCE, locale)
                 .replace("dd", "d"),
             locale,
         )
@@ -54,9 +61,15 @@ class Formats(val language: String, country: String) {
 
     fun digits(number: Int): String = plain.format(number)
 
+    /** The page's ten digits, zero first: what the page script writes its live countdown in. */
+    fun digitSet(): String = (0..9).joinToString("") { plain.format(it) }
+
     fun clock(hour: Int, minute: Int): String = "${plain.format(hour)}:${twoDigits.format(minute)}"
 
     fun longDate(date: LocalDate): String = longDateFormatter.format(date.toJavaLocalDate())
+
+    /** CLDR's FULL date, day unpadded: the weekday where the language puts it ("25 Eylül 2026 Cuma"). */
+    fun fullDate(date: LocalDate): String = fullDateFormatter.format(date.toJavaLocalDate())
 
     fun monthYear(year: Int, month: Int): String = monthYearFormatter.format(YearMonth.of(year, month))
 
@@ -64,11 +77,37 @@ class Formats(val language: String, country: String) {
 
     fun weekdayShort(date: LocalDate): String = weekdayShortFormatter.format(date.toJavaLocalDate())
 
-    fun distance(km: Int): String = grouped.format(km)
+    /**
+     * The distance to Makkah exactly as the app writes it (`localizedGroupedKm`): whole kilometres,
+     * truncated, a comma every three digits whatever the language, each digit in the page's own.
+     */
+    fun distance(km: Double): String {
+        val whole = km.toLong().toString()
+        return buildString {
+            whole.forEachIndexed { i, c ->
+                if (i > 0 && (whole.length - i) % 3 == 0) append(',')
+                append(plain.format(c - '0'))
+            }
+        }
+    }
 
-    fun degrees(value: Int): String = "${plain.format(value)}°"
+    /** The Qibla bearing as the app writes it: the degrees truncated, in the page's digits. */
+    fun bearing(degrees: Double): String = "${plain.format(degrees.toInt())}°"
 
-    fun countryName(code: String): String = Locale.of("", code).getDisplayCountry(locale)
+    /** "Rabi’ al-Awwal – Rabi’ al-Thani 1448", or with both years when a month spans two. */
+    fun hijriSpan(months: List<Pair<Int, Int>>): String {
+        val (firstYear, firstMonth) = months.first()
+        val (lastYear, lastMonth) = months.last()
+        return when {
+            months.size == 1 -> "${hijriMonth(firstMonth)} ${plain.format(firstYear)}"
+            firstYear == lastYear -> "${hijriMonth(firstMonth)} – ${hijriMonth(lastMonth)} ${plain.format(lastYear)}"
+            else -> "${hijriMonth(firstMonth)} ${plain.format(firstYear)} – ${hijriMonth(lastMonth)} ${plain.format(lastYear)}"
+        }
+    }
+
+    /** CLDR's name for the country in the page language, or CLDR's own short form where the long one is not what readers call it. */
+    fun countryName(code: String): String =
+        SHORT_COUNTRY_NAMES[code]?.get(language) ?: Locale.of("", code).getDisplayCountry(locale)
 
     /** The day, the app's own month name, the year: "12 Rabi’ al-Thani 1448". */
     fun hijri(year: Int, month: Int, day: Int): String =
@@ -89,6 +128,14 @@ class Formats(val language: String, country: String) {
     }
 
     private companion object {
+        /** CLDR's long name for PS is "Palestinian Territories" and its equivalents; its short one is the name people use. */
+        val SHORT_COUNTRY_NAMES = mapOf(
+            "PS" to mapOf(
+                "en" to "Palestine", "ar" to "فلسطين", "fr" to "Palestine", "tr" to "Filistin",
+                "id" to "Palestina", "ur" to "فلسطین", "bn" to "ফিলিস্তিন",
+            ),
+        )
+
         val englishWithCountry: Set<Locale> =
             Locale.getAvailableLocales().filter { it.language == "en" && it.country.isNotEmpty() }.toSet()
 

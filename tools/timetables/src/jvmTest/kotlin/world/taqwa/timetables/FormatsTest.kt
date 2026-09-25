@@ -78,9 +78,18 @@ class FormatsTest {
     }
 
     @Test
-    fun distancesAreGroupedTheLocalWay() {
-        assertEquals("2,916", Formats("en", "LY").distance(2916))
-        assertEquals("٢٬٩١٦", Formats("ar", "EG").distance(2916))
+    fun distancesAreGroupedAsTheAppGroupsThem() {
+        // The app's localizedGroupedKm: truncated, a comma every three digits, local digits.
+        assertEquals("2,916", Formats("en", "LY").distance(2916.9))
+        assertEquals("٢,٩١٦", Formats("ar", "EG").distance(2916.2))
+        assertEquals("12,345", Formats("fr", "FR").distance(12345.0))
+        assertEquals("৯৮৭", Formats("bn", "BD").distance(987.0))
+    }
+
+    @Test
+    fun bearingsAreTruncatedAsTheAppTruncatesThem() {
+        assertEquals("109°", Formats("en", "LY").bearing(109.8))
+        assertEquals("١٠٩°", Formats("ar", "EG").bearing(109.8))
     }
 
     @Test
@@ -97,5 +106,36 @@ class FormatsTest {
         assertEquals("12 Rabi’ al-Thani 1448", Formats("en", "LY").hijri(1448, 4, 12))
         assertEquals("١٢ ربيع الآخر ١٤٤٨", Formats("ar", "EG").hijri(1448, 4, 12))
         assertEquals("12 ربيع الآخر 1448", Formats("ar", "LY").hijri(1448, 4, 12))
+    }
+
+    @Test
+    fun theFullDatePutsTheWeekdayWhereTheLanguagePutsIt() {
+        assertEquals("25 Eylül 2026 Cuma", Formats("tr", "TR").fullDate(friday))
+        assertEquals("Jumat, 25 September 2026", Formats("id", "ID").fullDate(friday))
+        assertEquals("vendredi 25 septembre 2026", Formats("fr", "FR").fullDate(friday))
+        assertTrue(Formats("en", "LY").fullDate(LocalDate(2026, 9, 5)).endsWith(" 5 September 2026"))
+    }
+
+    @Test
+    fun palestineIsCalledPalestineInEveryLanguage() {
+        assertEquals("Palestine", Formats("en", "PS").countryName("PS"))
+        assertEquals("فلسطين", Formats("ar", "PS").countryName("PS"))
+        assertEquals("Filistin", Formats("tr", "TR").countryName("PS"))
+        assertEquals("Libya", Formats("en", "PS").countryName("LY"))
+    }
+
+    @Test
+    fun theDigitSetIsWhatThePageScriptWritesTheCountdownIn() {
+        assertEquals("0123456789", Formats("ar", "LY").digitSet())
+        assertEquals("٠١٢٣٤٥٦٧٨٩", Formats("ar", "EG").digitSet())
+        assertEquals("০১২৩৪৫৬৭৮৯", Formats("bn", "BD").digitSet())
+    }
+
+    @Test
+    fun aHijriSpanNamesTheYearOnceWhenBothMonthsShareIt() {
+        val english = Formats("en", "LY")
+        assertEquals("Rabi’ al-Thani 1448", english.hijriSpan(listOf(1448 to 4)))
+        assertEquals("Rabi’ al-Awwal – Rabi’ al-Thani 1448", english.hijriSpan(listOf(1448 to 3, 1448 to 4)))
+        assertEquals("Dhu al-Hijjah 1448 – Muharram 1449", english.hijriSpan(listOf(1448 to 12, 1449 to 1)))
     }
 }

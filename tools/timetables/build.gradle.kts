@@ -68,10 +68,10 @@ tasks.withType<Test>().configureEach {
 /**
  * Writes the timetable document the site build renders.
  *
- *     ./gradlew -p tools/timetables generate -Pout=_data/timetables.json [-Ptoday=2026-09-25]
+ *     ./gradlew -p tools/timetables generate -Pout=_data/timetables.json [-Pnow=2026-09-25T00:07:00Z]
  *
- * Paths are relative to the repository root. `today` defaults to the current UTC date; the
- * document covers the whole of that month and the next.
+ * Paths are relative to the repository root. `now` defaults to the moment the task runs; each
+ * city gets the whole of its own current month and the next, by its own calendar at that moment.
  */
 val jvmMainCompilation = kotlin.jvm().compilations.getByName("main")
 tasks.register<JavaExec>("generate") {
@@ -82,10 +82,11 @@ tasks.register<JavaExec>("generate") {
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
     workingDir = repoRoot
     val out = providers.gradleProperty("out").orElse("_data/timetables.json")
-    val today = providers.gradleProperty("today").orElse("")
+    val now = providers.gradleProperty("now").orElse("")
     val cities = providers.gradleProperty("cities").orElse("site/cities.tsv")
+    val app = providers.gradleProperty("app").orElse("shared/src/commonMain/composeResources")
     argumentProviders.add(CommandLineArgumentProvider {
-        listOf("--cities", cities.get(), "--app", "shared/src/commonMain/composeResources", "--out", out.get()) +
-            (if (today.get().isNotBlank()) listOf("--today", today.get()) else emptyList())
+        listOf("--cities", cities.get(), "--app", app.get(), "--out", out.get()) +
+            (if (now.get().isNotBlank()) listOf("--now", now.get()) else emptyList())
     })
 }
