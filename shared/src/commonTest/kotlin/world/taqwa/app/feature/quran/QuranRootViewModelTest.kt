@@ -3,6 +3,7 @@ package world.taqwa.app.feature.quran
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import world.taqwa.app.quran.Ayah
@@ -30,14 +31,17 @@ import kotlin.test.assertTrue
 
 class QuranRootViewModelTest {
 
-    private fun settings(name: String) = SettingsRepository(
-        PreferenceDataStoreFactory.createWithPath { "/tmp/taqwa-quran-root-test-$name.preferences_pb".toPath() },
+    // The store's writes run on the test's own scheduler (`scope = backgroundScope`), as Android's
+    // DataStore testing guidance has it. On its default IO scope a write raced the virtual clock,
+    // and a test waiting for the stored value could hang until runTest gave up (seen in CI).
+    private fun TestScope.settings(name: String) = SettingsRepository(
+        PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) { "/tmp/taqwa-quran-root-test-$name.preferences_pb".toPath() },
     )
 
     /** A fresh file per store: [BookmarkStore.toggle] is a toggle, so a store that outlived an
      * earlier run would start with the bookmark already in it and the toggle would remove it. */
-    private fun bookmarkStore(name: String) = BookmarkStore(
-        PreferenceDataStoreFactory.createWithPath {
+    private fun TestScope.bookmarkStore(name: String) = BookmarkStore(
+        PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) {
             "/tmp/taqwa-quran-root-bm-$name-${Random.nextULong()}.preferences_pb".toPath()
         },
     ) { 1L }
@@ -90,7 +94,7 @@ class QuranRootViewModelTest {
     private suspend fun QuranRootViewModel.awaitBookmarks(predicate: (List<BookmarkRow>) -> Boolean): List<BookmarkRow> =
         (state.first { it is QuranRootUiState.Ready && predicate(it.bookmarks) } as QuranRootUiState.Ready).bookmarks
 
-    private fun viewModel(name: String, source: QuranSource = searchSource(), languageTag: String = "en") =
+    private fun TestScope.viewModel(name: String, source: QuranSource = searchSource(), languageTag: String = "en") =
         QuranRootViewModel(source, settings(name), bookmarkStore(name), languageTag)
 
     @Test
