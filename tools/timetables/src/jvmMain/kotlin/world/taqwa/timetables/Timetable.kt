@@ -17,6 +17,7 @@ import world.taqwa.app.hijri.HijriDate
 import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.prayer.CalculationMethodDefaults
 import world.taqwa.app.prayer.PrayerTimesEngine
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 data class TimetableDay(
@@ -28,6 +29,8 @@ data class TimetableDay(
     val utcOffsetSeconds: Int,
     /** The high-latitude rule the app's engine reports it applied that day, if any. */
     val highLatitudeRule: HighLatitudePreference?,
+    /** Isha moved to Umm al-Qura's Ramadan time, two hours after Maghrib (see [Timetable.day]). */
+    val ramadanIsha: Boolean = false,
 )
 
 data class TimetableMonth(val year: Int, val month: Int, val days: List<TimetableDay>)
@@ -58,7 +61,19 @@ class Timetable(private val engine: PrayerTimesEngine = PrayerTimesEngine()) {
 
     fun day(city: City, date: LocalDate): TimetableDay {
         val computed = engine.timesFor(location(city), date, settings(city))
-        val times = Prayer.entries.associateWith { computed.time(it) }
+        val hijri = TabularHijriCalendar.fromGregorian(date)
+        val engineTimes = Prayer.entries.associateWith { computed.time(it) }
+        // Umm al-Qura's Isha is 90 minutes after Maghrib, and 120 in Ramadan. The app's engine
+        // keeps 90 all year, which would put Makkah's Ramadan Isha half an hour early, so the page
+        // adds the half hour and says so. The check on the interval means the day the app learns
+        // the rule, this stops adding anything of its own.
+        val ramadanIsha = method(city) == CalculationMethodId.UMM_AL_QURA && hijri.month == RAMADAN &&
+            engineTimes.getValue(Prayer.ISHA) - engineTimes.getValue(Prayer.MAGHRIB) == UMM_AL_QURA_ISHA
+        val times = if (ramadanIsha) {
+            engineTimes + (Prayer.ISHA to engineTimes.getValue(Prayer.ISHA) + RAMADAN_EXTRA)
+        } else {
+            engineTimes
+        }
         // Where the clock runs far enough ahead of the sun (Samoa, Tonga, Kiribati's eastern
         // islands), the engine answers a date with the next day's times. Dhuhr always sits near
         // local noon, so its date shows it at once; such a city has no page until that is fixed.
@@ -70,10 +85,11 @@ class Timetable(private val engine: PrayerTimesEngine = PrayerTimesEngine()) {
         return TimetableDay(
             date = date,
             times = times,
-            hijri = TabularHijriCalendar.fromGregorian(date),
+            hijri = hijri,
             friday = date.dayOfWeek == DayOfWeek.FRIDAY,
             utcOffsetSeconds = TimeZone.of(city.timeZone).offsetAt(times.getValue(Prayer.DHUHR)).totalSeconds,
             highLatitudeRule = computed.highLatitudeRuleApplied,
+            ramadanIsha = ramadanIsha,
         )
     }
 
@@ -87,7 +103,7 @@ class Timetable(private val engine: PrayerTimesEngine = PrayerTimesEngine()) {
     fun months(city: City, now: Instant): List<TimetableMonth> {
         val today = localToday(city, now)
         val first = LocalDate(today.year, today.month.number, 1)
-        val months = (0 until 2).map { offset ->
+        return (0 until 2).map { offset ->
             val start = first.plus(offset, DateTimeUnit.MONTH)
             val days = generateSequence(start) { it.plus(1, DateTimeUnit.DAY) }
                 .takeWhile { it.month == start.month }
@@ -95,19 +111,11 @@ class Timetable(private val engine: PrayerTimesEngine = PrayerTimesEngine()) {
                 .toList()
             TimetableMonth(start.year, start.month.number, days)
         }
-        // Umm al-Qura's Isha is 120 minutes after Maghrib in Ramadan and 90 the rest of the year.
-        // The app's engine keeps 90, so its Ramadan Isha in Saudi Arabia is half an hour early;
-        // until the app adds the Ramadan half hour, no page may show a Ramadan day for such a city.
-        val ramadan = months.flatMap { it.days }.firstOrNull { it.hijri.month == RAMADAN }
-        check(method(city) != CalculationMethodId.UMM_AL_QURA || ramadan == null) {
-            "${city.slug}: ${ramadan?.date} is in Ramadan, when Umm al-Qura's Isha is 120 minutes after Maghrib; " +
-                "the app's engine keeps 90, so the page would show Isha half an hour early. " +
-                "Add the Ramadan rule to the app's Umm al-Qura method, or hold the Umm al-Qura cities"
-        }
-        return months
     }
 
     private companion object {
         const val RAMADAN = 9
+        val UMM_AL_QURA_ISHA = 90.minutes
+        val RAMADAN_EXTRA = 30.minutes
     }
 }

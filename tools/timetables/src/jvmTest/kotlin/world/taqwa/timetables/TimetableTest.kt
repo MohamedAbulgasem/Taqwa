@@ -10,6 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 class TimetableTest {
@@ -99,15 +100,21 @@ class TimetableTest {
     }
 
     @Test
-    fun anUmmAlQuraRamadanIsRefusedUntilTheAppAddsItsHalfHour() {
-        // Umm al-Qura's Isha is 120 minutes after Maghrib in Ramadan, not 90; the app's engine
-        // keeps 90, so a Ramadan month in Makkah would show Isha half an hour early.
+    fun ummAlQuraIshaIsTwoHoursAfterMaghribInRamadan() {
+        // Umm al-Qura's Isha is 90 minutes after Maghrib, and 120 in Ramadan; the app's engine
+        // keeps 90 all year, so the generator adds the half hour itself and says so.
         val makkah = city("makkah-saudi-arabia", "SA", 21.42664, 39.82563, "Asia/Riyadh")
-        val error = assertFailsWith<IllegalStateException> {
-            timetable.months(makkah, Instant.parse("2027-01-15T00:07:00Z"))
-        }
-        assertTrue(error.message!!.contains("Ramadan"), error.message)
-        assertEquals(2, timetable.months(makkah, Instant.parse("2026-09-25T00:07:00Z")).size)
+        fun interval(day: TimetableDay) = day.times.getValue(Prayer.ISHA) - day.times.getValue(Prayer.MAGHRIB)
+        val ramadan = timetable.day(makkah, LocalDate(2027, 2, 15))
+        assertEquals(9, ramadan.hijri.month)
+        assertEquals(120.minutes, interval(ramadan))
+        assertTrue(ramadan.ramadanIsha)
+        val ordinary = timetable.day(makkah, LocalDate(2026, 9, 25))
+        assertEquals(90.minutes, interval(ordinary))
+        assertFalse(ordinary.ramadanIsha)
+        // Only Umm al-Qura has the rule: Cairo's Ramadan Isha is the Egyptian angle as ever.
+        val cairo = city("cairo-egypt", "EG", 30.06263, 31.24967, "Africa/Cairo")
+        assertFalse(timetable.day(cairo, LocalDate(2027, 2, 15)).ramadanIsha)
     }
 
     @Test

@@ -2,10 +2,13 @@ package world.taqwa.timetables
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.offsetAt
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.i18n.CountdownDigits
 import world.taqwa.app.qibla.QiblaMath
 import kotlin.time.Instant
 
@@ -21,6 +24,7 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
     fun build(cities: List<City>, now: Instant): Map<String, Any?> = linkedMapOf(
         "generated" to now.toString(),
         "prayersArabic" to Prayer.entries.map { strings.prayer("ar", it) },
+        "regions" to Regions.ORDER,
         "cities" to cities.map { city(it, now) },
     )
 
@@ -52,6 +56,7 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
                     "friday" to day.friday,
                     "offset" to day.utcOffsetSeconds,
                     "highLatitude" to (day.highLatitudeRule != null),
+                    "ramadanIsha" to day.ramadanIsha,
                     "epochs" to Prayer.entries.map { day.times.getValue(it).epochSeconds },
                 )
             },
@@ -79,8 +84,12 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
         fun clock(instant: Instant) = instant.toLocalDateTime(zone).let { f.clock(it.hour, it.minute) }
 
         val rules: List<HighLatitudePreference> = days.mapNotNull { it.highLatitudeRule }.distinct()
-        val clockChanges = days.indices.drop(1)
-            .filter { days[it].utcOffsetSeconds != days[it - 1].utcOffsetSeconds }
+        // A change on the first day shown (a page built the morning the clocks went back) has no
+        // day before it to compare with, so the clock at that day's midnight stands in.
+        fun offsetBefore(i: Int): Int =
+            if (i > 0) days[i - 1].utcOffsetSeconds else zone.offsetAt(days[0].date.atStartOfDayIn(zone)).totalSeconds
+        val clockChanges = days.indices
+            .filter { days[it].utcOffsetSeconds != offsetBefore(it) }
             .map { i ->
                 linkedMapOf(
                     "index" to i,
@@ -92,6 +101,7 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
         return linkedMapOf(
             "locale" to f.locale.toLanguageTag(),
             "digits" to f.digitSet(),
+            "countdownDigits" to if (CountdownDigits.westernFallback(f.locale.toLanguageTag())) WESTERN else f.digitSet(),
             "city" to city.name(language),
             "country" to f.countryName(city.countryCode),
             "method" to strings.method(language, method),
@@ -124,6 +134,7 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
                 linkedMapOf(
                     "day" to f.digits(day.date.day),
                     "weekday" to f.weekdayShort(day.date),
+                    "date" to f.longDate(day.date),
                     "full" to f.fullDate(day.date),
                     "hijri" to f.hijriDayMonth(day.hijri.month, day.hijri.day),
                     "hijriLong" to f.hijri(day.hijri.year, day.hijri.month, day.hijri.day),
@@ -131,5 +142,9 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
                 )
             },
         )
+    }
+
+    private companion object {
+        const val WESTERN = "0123456789"
     }
 }

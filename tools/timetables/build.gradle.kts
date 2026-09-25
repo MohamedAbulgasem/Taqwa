@@ -22,6 +22,7 @@ val appSources = listOf(
     "world/taqwa/app/hijri/TabularHijriCalendar.kt",
     "world/taqwa/app/hijri/HijriMonthNames.kt",
     "world/taqwa/app/i18n/UiLanguage.kt",
+    "world/taqwa/app/i18n/CountdownDigits.kt",
 )
 
 /** The app's own tests for those files, run here on the JVM to prove this build computes what
@@ -63,6 +64,13 @@ kotlin {
 
 tasks.withType<Test>().configureEach {
     systemProperty("taqwa.repoRoot", repoRoot.path)
+    // The tests read the app's strings and city files through that path, so they are inputs:
+    // without this a changed strings.xml would let a cached test result stand.
+    inputs.files(
+        fileTree(repoRoot.resolve("shared/src/commonMain/composeResources")) {
+            include("values*/strings.xml", "files/cities.csv", "files/city-names-*.csv")
+        },
+    ).withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("appResources")
 }
 
 /**

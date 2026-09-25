@@ -119,6 +119,34 @@ class DocumentTest {
     }
 
     @Test
+    fun aClockChangeOnTheFirstDayShownIsReportedToo() {
+        // Built just after New York's clocks went back on 1 November, the page starts on that day.
+        val changes = page(newYork, "en", Instant.parse("2026-11-01T06:07:00Z")).list("clockChanges")
+        assertEquals(0, changes[0]["index"])
+        assertEquals("UTC−5", changes[0]["offset"])
+    }
+
+    @Test
+    fun theCountdownIsInTheDigitsTheAppCountsDownIn() {
+        // The app falls back to Western digits for the countdown in Egyptian and Saudi Arabic and
+        // in Bengali (CountdownDigits); everywhere else it keeps the page's own.
+        assertEquals("0123456789", page(cairo, "ar")["countdownDigits"])
+        val newYorkArabic = city("new-york-usa", "US", 40.71427, -74.00597, "America/New_York", linkedMapOf("en" to "New York", "ar" to "نيويورك"))
+        assertEquals("٠١٢٣٤٥٦٧٨٩", page(newYorkArabic, "ar")["countdownDigits"])
+        assertEquals(page(newYorkArabic, "ar")["digits"], page(newYorkArabic, "ar")["countdownDigits"])
+    }
+
+    @Test
+    fun theDocumentCarriesTheRegionOrderAndEachDaysLongDate() {
+        val document = document.build(listOf(tripoli), friday)
+        assertEquals(Regions.ORDER, document["regions"])
+        @Suppress("UNCHECKED_CAST")
+        val city = (document["cities"] as List<Map<String, Any?>>).single()
+        assertEquals("25 September 2026", city.map("pages").map("en").list("days")[dayIndex(LocalDate(2026, 9, 25))]["date"])
+        assertEquals(false, city.list("days")[0]["ramadanIsha"])
+    }
+
+    @Test
     fun theFeaturedLanguagesFollowThePageOrder() {
         assertEquals(listOf("en", "ar"), document.city(tripoli, friday)["featured"])
     }
