@@ -235,7 +235,7 @@
     <string name="qibla_hold_flat">فون کو افقی رکھیں</string>
     <string name="qibla_facing_qibla">آپ قبلہ رخ ہیں</string>
     <string name="qibla_needs_calibrating">قطب نما کو درست کرنے کی ضرورت ہے</string>
-    <string name="qibla_calibration_help">فون کو چند بار آٹھ کے ہندسے کی شکل میں گھمائیں۔ دھات، کور اور اسپیکر کی مقناطیسی مداخلت پیمائش کو بگاڑ سکتی ہے۔</string>
+    <string name="qibla_calibration_help">فون کو چند بار 8 کے ہندسے کی شکل میں گھمائیں۔ دھات، کور اور اسپیکر کی مقناطیسی مداخلت پیمائش کو بگاڑ سکتی ہے۔</string>
     <string name="qibla_interference_title">مقناطیسی مداخلت</string>
     <string name="qibla_interference_help">دھات، مقناطیس، کور اور کیبل سے دور ہٹ جائیں۔ جب تک قریب کوئی زیادہ طاقتور مقناطیسی اثر موجود ہے، قطب نما زمین کا مقناطیسی میدان نہیں پڑھ سکتا۔</string>
     <string name="qibla_best_effort_title">قطب نما دستیاب نہیں</string>

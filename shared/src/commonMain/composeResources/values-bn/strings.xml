@@ -236,7 +236,7 @@
     <string name="qibla_hold_flat">ফোনটি সমান করে ধরুন</string>
     <string name="qibla_facing_qibla">কিবলামুখী</string>
     <string name="qibla_needs_calibrating">কম্পাস ক্যালিব্রেট করা দরকার</string>
-    <string name="qibla_calibration_help">ফোনটি কয়েকবার ৮-এর আকারে ঘোরান। ধাতু, কেস ও স্পিকারের চৌম্বকীয় প্রভাবে কম্পাস ভুল দিক দেখাতে পারে।</string>
+    <string name="qibla_calibration_help">ফোনটি কয়েকবার ইংরেজি 8-এর আকারে ঘোরান। ধাতু, কেস ও স্পিকারের চৌম্বকীয় প্রভাবে কম্পাস ভুল দিক দেখাতে পারে।</string>
     <!-- Magnetic interference: a figure of eight cannot help, so the advice is to move away. -->
     <string name="qibla_interference_title">চৌম্বকীয় প্রভাব</string>
     <string name="qibla_interference_help">ধাতু, চুম্বক, কেস ও তার থেকে দূরে সরুন। কাছে আরও শক্তিশালী কিছু থাকলে কম্পাস পৃথিবীর চৌম্বক ক্ষেত্র পড়তে পারে না।</string>
