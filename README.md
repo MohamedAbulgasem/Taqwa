@@ -165,7 +165,7 @@ The script builds for the simulator and checks the widget extension stays under 
 ./scripts/test.sh
 ```
 
-Runs the shared and widget test suites on the JVM and on the iOS simulator. All the domain logic (prayer times, Qibla, Hijri conversion, notification planning, widget content, the recitation library and downloader) lives in `commonMain` and is tested there without a device. `scripts/check-strings.sh` checks that the English and Arabic string files carry the same keys. The `Tests` workflow runs the shared and widget suites, a debug build of the Android app and the string check on every push and pull request; the iOS suites need a Mac and run through `scripts/test.sh`.
+Runs the shared and widget test suites on the JVM and on the iOS simulator. All the domain logic (prayer times, Qibla, Hijri conversion, notification planning, widget content, the recitation library and downloader) lives in `commonMain` and is tested there without a device. `scripts/check-strings.sh` checks that the English and Arabic string files carry the same keys. The `Tests` workflow runs the shared and widget suites, a debug build of the Android app and the string check on every push and pull request. The `iOS` workflow runs the same suites on the iOS simulator and builds the iOS app with its widget-size check, on GitHub's macOS runner, whenever a change can reach the iOS app.
 
 **Website**
 
