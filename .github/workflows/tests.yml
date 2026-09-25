@@ -36,6 +36,15 @@ jobs:
         run: ./gradlew --no-daemon :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
       - name: Android app builds
         run: ./gradlew --no-daemon :androidApp:assembleDebug
+      - name: The APK carries the shared module's sounds and bundled files
+        # They reach the app from `shared` (res/raw, and Compose resources as assets), and a build
+        # that drops them still succeeds: the adhan goes silent, or the Quran and cities are gone.
+        run: |
+          unzip -l androidApp/build/outputs/apk/debug/*.apk > apk-contents.txt
+          for f in res/raw/adhan_full.ogg res/raw/takbir.ogg res/raw/chime.ogg \
+                   files/quran.db files/cities.csv files/city-names-ar.csv; do
+            grep -q "$f" apk-contents.txt || { echo "::error::$f is missing from the APK"; exit 1; }
+          done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
