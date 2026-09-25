@@ -26,6 +26,8 @@ tools/site-og.py).
 
 Needs the `markdown` package (pip install markdown); the Pages workflow installs it.
 """
+import functools
+import hashlib
 import html
 import json
 import os
@@ -219,6 +221,18 @@ def rel(from_dir: str, to_dir: str) -> str:
     return "./" if path == "." else path + "/"
 
 
+@functools.lru_cache(maxsize=None)
+def asset_versions() -> dict:
+    """A fingerprint of the stylesheet and the page script, put in the query string of every URL
+    that loads them. GitHub Pages lets browsers keep a file ten minutes, and without it a reader
+    who opened the site just before a deploy got the new pages with the old stylesheet: every
+    new component unstyled. A changed file now has a new address, so no page can meet an old copy."""
+    def fingerprint(name: str) -> str:
+        with open(os.path.join(SITE, "assets", name), "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()[:10]
+    return {"style_version": fingerprint("style.css"), "script_version": fingerprint("timetable.js")}
+
+
 def page_links(cfg: dict, out_dir: str) -> dict:
     """The links every page carries, relative to it: the site root for assets, and this
     language's home, privacy, support and prayer-times pages."""
@@ -251,7 +265,7 @@ def write_page(langs: dict, lang: str, template: str, *, out_dir: str, meta: dic
         f'  <link rel="alternate" hreflang="{other}" href="{ORIGIN}/{twins[other]}">' for other in langs if other in twins
     ) + f'\n  <link rel="alternate" hreflang="x-default" href="{ORIGIN}/{x_default}">'
     canonical = f"{ORIGIN}/{out_dir}"
-    for key, value in links.items():
+    for key, value in {**links, **asset_versions()}.items():
         body = body.replace("{" + key + "}", value)
     values = {
         "lang": lang,
@@ -271,6 +285,7 @@ def write_page(langs: dict, lang: str, template: str, *, out_dir: str, meta: dic
         "prayer_times_current": ' aria-current="page"' if current == "prayer_times" else "",
         **labels(cfg),
         **links,
+        **asset_versions(),
         "body": body,
     }
     target = os.path.join(OUT, out_dir)
@@ -325,6 +340,7 @@ def build_404(langs: dict, template: str) -> None:
         "support_current": "",
         "prayer_times_current": "",
         **labels(cfg),
+        **asset_versions(),
         "root": "/",
         "home": "/",
         "privacy": "/privacy/",
@@ -403,6 +419,7 @@ def check_site(data: timetables.Timetables) -> int:
                 if not ref or re.match(r"^(https?:|mailto:|data:)", ref):
                     continue
                 address, _, anchor = ref.partition("#")
+                address = address.partition("?")[0]  # a fingerprint in the query names no other file
                 target = path
                 if address:
                     base = OUT if address.startswith("/") else dirpath

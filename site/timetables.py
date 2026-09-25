@@ -362,7 +362,7 @@ class Timetables:
   {self.after(city, lang)}
 </main>
 <script type="application/json" id="tt-data">{data}</script>
-<script src="{{root}}assets/timetable.js" defer></script>
+<script src="{{root}}assets/timetable.js?v={{script_version}}" defer></script>
 '''
 
     def today_card(self, city: dict, lang: str, today: int) -> str:
@@ -545,7 +545,7 @@ class Timetables:
   {"".join(regions)}
   <p class="no-match" hidden>{esc(t["no_match"])}</p>
 </main>
-<script src="{{root}}assets/timetable.js" defer></script>
+<script src="{{root}}assets/timetable.js?v={{script_version}}" defer></script>
 '''
 
     def keys(self, city: dict, lang: str) -> str:
