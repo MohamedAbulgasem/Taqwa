@@ -155,15 +155,29 @@
       });
     }
 
-    function showStale() {
+    /* The page is older than its data: after Isha on its last day, or past it altogether. The
+       ring says nothing rather than something wrong, and the notice points to the app. */
+    function showStale(pastEverything) {
       if (stale) stale.hidden = false;
+      label.textContent = "";
+      count.textContent = "–";
+      at.textContent = "";
+      arc.setAttribute("stroke-dasharray", "0 " + CIRCUMFERENCE.toFixed(1));
+      if (pastEverything) {
+        shown = -1;
+        items.forEach(function (li) { li.classList.remove("now"); li.classList.remove("past"); });
+        rows.forEach(function (row) {
+          row.classList.add("past");
+          row.classList.remove("is-today");
+        });
+      }
     }
 
     function render() {
       var now = Math.floor(Date.now() / 1000);
       var s = state(now);
       if (!s) {
-        showStale();
+        showStale(true);
         return;
       }
       showDay(s.i);
@@ -174,7 +188,7 @@
         li.classList.toggle("past", p !== s.current && today.e[p] <= now);
       });
       if (!s.next) {
-        showStale();
+        showStale(false);
         return;
       }
       var left = Math.max(0, s.next.at - now);
