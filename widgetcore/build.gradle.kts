@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
 }
 
 // The widget model, and nothing else. Deliberately *not* a Compose module: the iOS WidgetKit
@@ -8,7 +8,13 @@ plugins {
 // ~30 MB memory ceiling that a framework carrying Compose/Skia blows straight through. Keep
 // this module's dependencies empty — every one added here lands in the extension.
 kotlin {
-    androidTarget()
+    android {
+        namespace = "world.taqwa.app.widgetcore"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        // src/androidHostTest: NoComposeOnClasspathTest, the guard on this module's classpath.
+        withHostTest {}
+    }
 
     listOf(
         iosArm64(),
@@ -24,19 +30,6 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
-    }
-}
-
-android {
-    namespace = "world.taqwa.app.widgetcore"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 

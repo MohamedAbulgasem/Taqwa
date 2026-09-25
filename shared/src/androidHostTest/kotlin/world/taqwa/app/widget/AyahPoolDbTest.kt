@@ -38,7 +38,7 @@ private class ArabicIndicFormat(private val tag: String) : PlatformFormat {
  * Guards [AyahPool.REFS] against the real bundled `quran.db` (design spec §3): every reference
  * must exist, and every ayah must fit what a 4×3 widget cell can draw with the Arabic at ≥ 17 sp
  * — at most 24 Arabic words and 245 characters of Saheeh International. Lives in
- * `androidUnitTest` for the same reason [QuranRepositoryDbTest] does: it needs the JDBC SQLite
+ * `androidHostTest` for the same reason [QuranRepositoryDbTest] does: it needs the JDBC SQLite
  * driver, which is JVM-only.
  */
 class AyahPoolDbTest {

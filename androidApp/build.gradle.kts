@@ -1,25 +1,20 @@
 import java.util.Properties
 
+// A plain Android application compiled by AGP's built-in Kotlin: since AGP 9 an application
+// module cannot also apply the Kotlin Multiplatform plugin. Everything shared lives in `shared`.
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
 
-kotlin {
-    androidTarget()
-
-    sourceSets {
-        androidMain.dependencies {
-            implementation(project(":shared"))
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.glance.appwidget)
-        }
-    }
+dependencies {
+    implementation(project(":shared"))
+    implementation(compose.runtime)
+    implementation(compose.foundation)
+    implementation(compose.material3)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.glance.appwidget)
 }
 
 // ── Store signing ─────────────────────────────────────────────────────────────────
@@ -72,19 +67,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    // ── Recitation downloads, debug harness (slice 3a task 2) ─────────────────────────
-    // The debug source set is `src/androidDebug` here, not `src/debug`: the KMP android
-    // layout v2 puts every android source set under its Kotlin name, which is where the
-    // debug Kotlin and the debug resources are already read from. The build-type manifest
-    // overlay is the one thing AGP still looks for at its own default path, so it is
-    // pointed at the same directory as everything else rather than leaving one stray
-    // `src/debug` folder behind. Without this line the debug manifest is silently ignored.
-    sourceSets {
-        getByName("debug") {
-            manifest.srcFile("src/androidDebug/AndroidManifest.xml")
-        }
-    }
-    // ── end recitation downloads ──────────────────────────────────────────────────────
     buildTypes {
         release {
             // Code shrinking only. The first attempt also shrank resources and deleted res/raw

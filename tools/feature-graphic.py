@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont, features
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONTS = os.path.join(ROOT, "shared/src/commonMain/composeResources/font")
-ICON = os.path.join(ROOT, "androidApp/src/androidMain/ic_launcher-playstore.png")
+ICON = os.path.join(ROOT, "androidApp/src/main/ic_launcher-playstore.png")
 OUT = os.path.join(ROOT, "assets/store")
 
 W, H = 1024, 500

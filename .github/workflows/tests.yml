@@ -33,7 +33,7 @@ jobs:
         # android-37.0, not android-37 (docs/BUILD-LOG.md).
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" > /dev/null
       - name: Shared and widget tests
-        run: ./gradlew --no-daemon :shared:testDebugUnitTest :widgetcore:testDebugUnitTest
+        run: ./gradlew --no-daemon :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
       - name: Android app builds
         run: ./gradlew --no-daemon :androidApp:assembleDebug
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

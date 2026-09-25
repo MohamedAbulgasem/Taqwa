@@ -12,8 +12,8 @@ import kotlin.test.assertTrue
  * appear twice, and the handful of cities the design was argued over must resolve to the names
  * it quotes.
  *
- * Lives in `androidUnitTest` — the module's JVM unit test source set, run by
- * `:shared:testDebugUnitTest` — because it reads the real resource files. Compose resources are
+ * Lives in `androidHostTest` — the module's JVM unit test source set, run by
+ * `:shared:testAndroidHostTest` — because it reads the real resource files. Compose resources are
  * not on a plain JVM unit test's classpath, so it reads them from the file system relative to the
  * module, exactly as [world.taqwa.app.quran.QuranRepositoryDbTest] reads the bundled `quran.db`.
  */
