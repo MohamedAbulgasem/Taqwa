@@ -79,5 +79,18 @@
     "qibla_here": "Kâbe burada, Mescid-i Haram’da.",
     "crumbs": "Gezinme yolu",
     "ramadan_isha": "Ramazan’da {method} yöntemi {isha} vaktini {maghrib} vaktinden bir buçuk değil iki saat sonra verir; bu vakitler de ona göredir."
+  },
+  "stores": {
+    "beta": "Android beta sürümüne katılın",
+    "source": "Kaynak kodu GitHub’da",
+    "source_end": ".",
+    "coming_both": "Google Play ve App Store’da yakında.",
+    "coming_google_play": "Google Play’de yakında.",
+    "coming_app_store": "App Store’da yakında.",
+    "google_play_alt": "Google Play’den indirin",
+    "app_store_alt": "App Store’dan indirin",
+    "exodus_title": "Bağımsız olarak incelendi",
+    "exodus_body": "{link}, Android uygulamasındaki her izleyiciyi ve her izni listeler.",
+    "exodus_link": "Exodus Privacy’nin raporu"
   }
 }

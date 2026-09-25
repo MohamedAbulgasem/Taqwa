@@ -66,7 +66,15 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   groups, not both). The site's home pages and the README carry a "Join the Android beta"
   section with the three links — group, `play.google.com/apps/testing/world.taqwa.app`, store
   page. **At launch:** `tools/site-beta.py remove && python3 site/build.py`, and delete the
-  README block between its `beta:start`/`beta:end` markers.
+  README block between its `beta:start`/`beta:end` markers. The hero's "Join the Android beta"
+  button goes with the section by itself.
+- **The site's store badges** come from `site/stores.json`, one address per store, `null` until
+  live: set `google_play` to `https://play.google.com/store/apps/details?id=world.taqwa.app`
+  when production opens, `app_store` to `https://apps.apple.com/app/id6814975544` when Apple
+  releases it (check the id in App Store Connect first), and push. Each store's official badge
+  then replaces its "coming" wording on all seven home pages, and the App Store one also turns on
+  Safari's Smart App Banner on every page. Once the Play listing is public, request its report at
+  reports.exodus-privacy.eu.org and set `exodus` to its address: the privacy section links it.
 - **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
   `scripts/bump-version.sh`. Settings › About shows the name alone; Mohamed tells testers which
   build they are on.
@@ -222,7 +230,7 @@ costs days.
 3. **New app record**: My Apps → + → New App → iOS, name (§1), primary language English (U.K.),
    bundle ID `world.taqwa.ios` from the list, SKU `taqwa-ios`, full access → Create. Done 22
    September: Apple ID **6814975544**, so the store link is https://apps.apple.com/app/id6814975544
-   (the site's App Store button at launch). Build 1.0.0 (32) uploaded the same night.
+   (`app_store` in `site/stores.json` at launch). Build 1.0.0 (32) uploaded the same night.
 4. **App Information**: subtitle, categories Lifestyle + Reference, content rights (contains
    third-party content, rights held: `docs/ATTRIBUTION.md`), age rating questionnaire (all None →
    4+), standard licence agreement. Localizations: add ar, fr, tr, id (name, subtitle, privacy

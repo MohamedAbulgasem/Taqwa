@@ -79,5 +79,18 @@
     "qibla_here": "কাবা এখানেই, মসজিদুল হারামে।",
     "crumbs": "পাতার পথ",
     "ramadan_isha": "রমজানে {method} পদ্ধতিতে {isha} হয় {maghrib}-এর দেড় ঘণ্টা নয়, দুই ঘণ্টা পরে; এই সময়সূচি সেটিই মেনে চলে।"
+  },
+  "stores": {
+    "beta": "অ্যান্ড্রয়েড বিটায় যোগ দিন",
+    "source": "GitHub-এ সোর্স কোড",
+    "source_end": "।",
+    "coming_both": "শিগগিরই Google Play ও App Store-এ আসছে।",
+    "coming_google_play": "শিগগিরই Google Play-তে আসছে।",
+    "coming_app_store": "শিগগিরই App Store-এ আসছে।",
+    "google_play_alt": "এটি Google Play তে পান",
+    "app_store_alt": "App Store থেকে ডাউনলোড করুন",
+    "exodus_title": "স্বাধীনভাবে যাচাই করা",
+    "exodus_body": "{link} অ্যান্ড্রয়েড অ্যাপের প্রতিটি ট্র্যাকার ও অনুমতির তালিকা দেয়।",
+    "exodus_link": "Exodus Privacy-র রিপোর্ট"
   }
 }

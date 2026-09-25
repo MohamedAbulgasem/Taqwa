@@ -79,5 +79,18 @@
     "qibla_here": "خانۂ کعبہ یہیں، مسجدِ حرام میں ہے۔",
     "crumbs": "صفحے کا راستہ",
     "ramadan_isha": "رمضان میں {method} کے طریقے میں {isha} کا وقت {maghrib} کے ڈیڑھ گھنٹے کے بجائے دو گھنٹے بعد ہوتا ہے، اور یہ اوقات اسی کے مطابق ہیں۔"
+  },
+  "stores": {
+    "beta": "اینڈرائیڈ بیٹا میں شامل ہوں",
+    "source": "سورس کوڈ GitHub پر",
+    "source_end": "۔",
+    "coming_both": "جلد Google Play اور App Store پر۔",
+    "coming_google_play": "جلد Google Play پر۔",
+    "coming_app_store": "جلد App Store پر۔",
+    "google_play_alt": "اسے Google Play پر حاصل کریں",
+    "app_store_alt": "اسے App Store سے ڈاؤن لوڈ کریں",
+    "exodus_title": "آزادانہ جانچ",
+    "exodus_body": "{link} اینڈرائیڈ ایپ کے ہر ٹریکر اور ہر اجازت کی فہرست دیتی ہے۔",
+    "exodus_link": "Exodus Privacy کی رپورٹ"
   }
 }

@@ -13,6 +13,10 @@ The prayer-time pages (a page per city and language, an index per language, and 
 the bottom of every home page) are rendered by site/timetables.py from the document
 tools/timetables writes with the app's own prayer-time engine; see that module.
 
+Where the app can be had lives in site/stores.json: a store is live once its address is set, and
+then its official badge replaces the "coming" line in every home page's hero, and — for the App
+Store — Safari's Smart App Banner appears on every page. Going live is that one edit and a push.
+
 It also writes sitemap.xml (every page with its language alternates), robots.txt, and the
 404.html GitHub Pages serves for any address it has nothing for; each language's home page
 carries JSON-LD for the app, and every page a share card from site/assets/og/ (drawn by
@@ -46,7 +50,7 @@ SITE = os.path.join(ROOT, "site")
 OUT = os.path.join(ROOT, "_site")
 ORIGIN = "https://taqwa.world"
 
-SKIP = {"build.py", "timetables.py", "cities.tsv", "templates", "pages", "README.md", "__pycache__"}
+SKIP = {"build.py", "timetables.py", "cities.tsv", "stores.json", "templates", "pages", "README.md", "__pycache__"}
 
 # The order the picker lists them in: English first, then the app's own order.
 LANGUAGE_ORDER = ["en", "ar", "fr", "tr", "id", "ur", "bn"]
@@ -62,6 +66,89 @@ SITEMAP = []
 # Whether any city has a prayer-time page. While none does (site/cities.tsv holds every row), the
 # section is not built at all: no index, no header or footer link, no home-page strip.
 PRAYER_TIMES_LIVE = True
+
+# Where the app can be had (site/stores.json). A store is live once its address is set: going live
+# is one edit there and a push. Until then the hero offers what exists — the Android beta while it
+# runs — and says which stores are coming, instead of buttons that lead nowhere. `exodus` is Exodus
+# Privacy's report on the Play build, linked from the privacy section once it exists.
+STORE_ADDRESSES = {
+    "google_play": r"https://play\.google\.com/store/apps/details\?id=world\.taqwa\.app",
+    "app_store": r"https://apps\.apple\.com/app/id\d+",
+    "exodus": r"https://reports\.exodus-privacy\.eu\.org/[\w/.-]+",
+}
+
+
+def load_stores() -> dict:
+    """site/stores.json, refused outright if an address is not one of that store's."""
+    with open(os.path.join(SITE, "stores.json"), encoding="utf-8") as f:
+        stores = json.load(f)
+    if set(stores) != set(STORE_ADDRESSES):
+        sys.exit(f"site/stores.json: expected exactly {sorted(STORE_ADDRESSES)}, found {sorted(stores)}")
+    for key, pattern in STORE_ADDRESSES.items():
+        if stores[key] is not None and not re.fullmatch(pattern, stores[key]):
+            sys.exit(f"site/stores.json: {stores[key]!r} is not a {key} address")
+    return stores
+
+
+STORES = load_stores()
+STORES_MARKER = "<!-- stores -->"
+EXODUS_MARKER = "<!-- exodus -->"
+SOURCE_URL = "https://github.com/MohamedAbulgasem/Taqwa"
+
+# The stores' own badges, as their owners publish them, in site/assets/badges/: Apple's from
+# tools.applemediaservices.com, black for light pages and white for dark, in the languages Apple
+# translates "Download on the" into (English, French, Turkish, Indonesian; Arabic, Urdu and Bengali
+# get the English badge, and "App Store" is English everywhere); Google's from play.google.com's
+# badge page, in all seven. Both owners forbid redrawing or altering them, so they are only sized.
+# Google's PNGs carry their own clear space in one of two shapes, and are scaled so the badge
+# itself stands as tall as Apple's, 40 px. Widths are Apple's viewBox at that height.
+APP_STORE_BADGE_WIDTH = {"en": 120, "fr": 127, "tr": 151, "id": 120}
+GOOGLE_PLAY_BADGE_SIZE = {"fr": (134, 52), "tr": (134, 52), "id": (134, 52)}
+GOOGLE_PLAY_BADGE_DEFAULT = (155, 60)
+
+
+def store_block(cfg: dict, lang: str, body: str) -> str:
+    """The hero's ways to get the app: a badge per live store, the Android beta button while the
+    page still carries its beta section (tools/site-beta.py), and a line naming the stores still
+    to come."""
+    words = cfg["stores"]
+    items = []
+    if STORES["google_play"]:
+        width, height = GOOGLE_PLAY_BADGE_SIZE.get(lang, GOOGLE_PLAY_BADGE_DEFAULT)
+        items.append(
+            f'<a class="badge" href="{STORES["google_play"]}"><img src="{{root}}assets/badges/google-play-{lang}.png" '
+            f'width="{width}" height="{height}" alt="{html.escape(words["google_play_alt"])}"></a>')
+    if STORES["app_store"]:
+        badge = lang if lang in APP_STORE_BADGE_WIDTH else "en"
+        items.append(
+            f'<a class="badge" href="{STORES["app_store"]}"><picture>'
+            f'<source srcset="{{root}}assets/badges/app-store-{badge}-white.svg" media="(prefers-color-scheme: dark)">'
+            f'<img src="{{root}}assets/badges/app-store-{badge}-black.svg" width="{APP_STORE_BADGE_WIDTH[badge]}" '
+            f'height="40" alt="{html.escape(words["app_store_alt"])}"></picture></a>')
+    if 'id="beta"' in body:
+        items.append(f'<a class="pill" href="#beta">{html.escape(words["beta"], quote=False)}</a>')
+    coming = {(False, False): "coming_both", (True, False): "coming_app_store",
+              (False, True): "coming_google_play"}.get((bool(STORES["google_play"]), bool(STORES["app_store"])))
+    line = (html.escape(words[coming], quote=False) + " " if coming else "") + \
+        f'<a href="{SOURCE_URL}">{html.escape(words["source"], quote=False)}</a>{words["source_end"]}'
+    items.append(f'<span class="soon">{line}</span>')
+    return '<div class="stores">\n        ' + "\n        ".join(items) + "\n      </div>"
+
+
+def exodus_row(cfg: dict) -> str:
+    """The privacy section's pointer to Exodus Privacy's independent report, once there is one."""
+    words = cfg["stores"]
+    link = f'<a href="{STORES["exodus"]}">{html.escape(words["exodus_link"], quote=False)}</a>'
+    return (f'<div class="row"><b>{html.escape(words["exodus_title"], quote=False)}</b>'
+            f'<span>{html.escape(words["exodus_body"], quote=False).replace("{link}", link)}</span></div>')
+
+
+def app_banner() -> str:
+    """Safari's Smart App Banner, on every page once the App Store has the app, and on none before:
+    a banner for an app Safari cannot find shows nothing useful."""
+    if not STORES["app_store"]:
+        return ""
+    return f'  <meta name="apple-itunes-app" content="app-id={STORES["app_store"].rsplit("id", 1)[1]}">\n'
 
 
 def load_languages() -> dict:
@@ -293,6 +380,7 @@ def write_page(langs: dict, lang: str, template: str, *, out_dir: str, meta: dic
         "og_image": f"{ORIGIN}/assets/og/{lang}.jpg",
         "canonical": canonical,
         "link_tags": f'  <link rel="canonical" href="{canonical}">\n{alternates}',
+        "app_banner": app_banner(),
         "robots": "",
         "structured_data": head,
         "language_links": "\n    ".join(entries),
@@ -318,6 +406,9 @@ def build_page(langs: dict, lang: str, page: str, template: str, data: timetable
     body = raw_body
     if page == "home":
         body = body.replace(timetables.HOME_MARKER, data.home_section(lang))
+        body = body.replace(STORES_MARKER, store_block(cfg, lang, body))
+        row = exodus_row(cfg) if STORES["exodus"] else ""
+        body = re.sub(r"\n[ \t]*" + re.escape(EXODUS_MARKER), lambda m: ("\n        " + row) if row else "", body)
     write_page(
         langs, lang, template,
         out_dir=twins[lang], meta=cfg["pages"][page], body=body, twins=twins, picker=twins,
@@ -349,6 +440,7 @@ def build_404(langs: dict, template: str) -> None:
         "og_image": f"{ORIGIN}/assets/og/en.jpg",
         "canonical": f"{ORIGIN}/",
         "link_tags": "",
+        "app_banner": app_banner(),
         "robots": '  <meta name="robots" content="noindex">\n',
         "structured_data": "",
         "language_links": "\n    ".join(picker),
@@ -429,6 +521,13 @@ def check_site(data: timetables.Timetables) -> int:
                 doc = f.read()
             for leftover in re.findall(r"\{[a-z_]+\}", doc):
                 problem(f"placeholder: {rel_path} -> {leftover}")
+            # A link to nowhere: the disabled store buttons were this, a tap that did nothing.
+            for _ in re.findall(r'href="#"', doc):
+                problem(f"dead link: {rel_path} -> #")
+            # Safari's banner belongs on every page once the App Store has the app, and on none before.
+            if ('name="apple-itunes-app"' in doc) != bool(STORES["app_store"]):
+                problem(f"app banner: {rel_path} {'has' if 'apple-itunes-app' in doc else 'lacks'} "
+                        f"it while the App Store is {'live' if STORES['app_store'] else 'not live'}")
             for address in unshielded_emails(doc):
                 problem(f"unshielded email: {rel_path} -> {address}")
             for kind, ref in re.findall(r'(href|src|srcset)="([^"]*)"', doc):

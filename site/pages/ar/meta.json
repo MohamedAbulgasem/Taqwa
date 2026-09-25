@@ -79,5 +79,18 @@
     "qibla_here": "الكعبة هنا، في المسجد الحرام.",
     "crumbs": "مسار التصفح",
     "ramadan_isha": "في رمضان يكون {isha} بطريقة {method} بعد {maghrib} بساعتين بدل ساعة ونصف، وهذه المواقيت تتبع ذلك."
+  },
+  "stores": {
+    "beta": "انضم إلى النسخة التجريبية لأندرويد",
+    "source": "الشفرة المصدرية على GitHub",
+    "source_end": ".",
+    "coming_both": "قريبًا على Google Play وApp Store.",
+    "coming_google_play": "قريبًا على Google Play.",
+    "coming_app_store": "قريبًا على App Store.",
+    "google_play_alt": "احصل عليه من Google Play",
+    "app_store_alt": "حمّله من App Store",
+    "exodus_title": "فحص مستقل",
+    "exodus_body": "{link} يسرد كل متتبِّع وكل إذن في تطبيق أندرويد.",
+    "exodus_link": "تقرير Exodus Privacy"
   }
 }

@@ -79,5 +79,18 @@
     "qibla_here": "La Kaaba est ici, dans la mosquée al-Haram.",
     "crumbs": "Fil d’Ariane",
     "ramadan_isha": "Pendant le ramadan, la méthode {method} place {isha} deux heures après {maghrib} au lieu d’une heure et demie, et ces horaires la suivent."
+  },
+  "stores": {
+    "beta": "Rejoindre la bêta Android",
+    "source": "Code source sur GitHub",
+    "source_end": ".",
+    "coming_both": "Bientôt sur Google Play et l’App Store.",
+    "coming_google_play": "Bientôt sur Google Play.",
+    "coming_app_store": "Bientôt sur l’App Store.",
+    "google_play_alt": "Disponible sur Google Play",
+    "app_store_alt": "Télécharger dans l’App Store",
+    "exodus_title": "Vérifié de façon indépendante",
+    "exodus_body": "{link} recense chaque pisteur et chaque autorisation de l’application Android.",
+    "exodus_link": "Le rapport d’Exodus Privacy"
   }
 }

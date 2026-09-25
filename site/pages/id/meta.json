@@ -79,5 +79,18 @@
     "qibla_here": "Ka’bah ada di sini, di Masjidilharam.",
     "crumbs": "Jejak navigasi",
     "ramadan_isha": "Selama Ramadan, metode {method} menetapkan {isha} dua jam setelah {maghrib}, bukan satu setengah jam, dan jadwal ini mengikutinya."
+  },
+  "stores": {
+    "beta": "Ikut beta Android",
+    "source": "Kode sumber di GitHub",
+    "source_end": ".",
+    "coming_both": "Segera hadir di Google Play dan App Store.",
+    "coming_google_play": "Segera hadir di Google Play.",
+    "coming_app_store": "Segera hadir di App Store.",
+    "google_play_alt": "Dapatkan di Google Play",
+    "app_store_alt": "Download di App Store",
+    "exodus_title": "Diperiksa secara independen",
+    "exodus_body": "{link} mencantumkan setiap pelacak dan izin di aplikasi Android.",
+    "exodus_link": "Laporan Exodus Privacy"
   }
 }

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """The "Join the Android beta" section of the site's home pages, while Play's closed test runs.
 
-    tools/site-beta.py add      writes the section (and the hero's link to it) into all seven pages
-    tools/site-beta.py remove   takes both out again, at launch
+    tools/site-beta.py add      writes the section into all seven pages
+    tools/site-beta.py remove   takes it out again, at launch
 
 Everything it writes sits between <!-- beta:start --> and <!-- beta:end --> markers, so `remove`
-leaves the pages exactly as they were. Run site/build.py afterwards.
+leaves the pages exactly as they were. Run site/build.py afterwards: the hero's "Join the Android
+beta" button is the build's, shown exactly while a page carries this section (see store_block).
 """
 import re, sys, pathlib
 
@@ -85,9 +86,6 @@ def main(action):
         html = BLOCK.sub("", path.read_text(encoding="utf-8"))
         if action == "add":
             digits = {"ar": "١٢٣", "bn": "১২৩"}.get(lang, "123")
-            link = f'<!-- beta:start --> <a href="#beta">{c["link"]}</a>.<!-- beta:end -->'
-            html, n = re.subn(r'(<span class="soon">.*?)(</span>)', lambda m: m.group(1) + link + m.group(2), html, count=1, flags=re.S)
-            assert n == 1, f"{lang}: no .soon line"
             marker = '  <section class="section" id="features">'
             assert html.count(marker) == 1, f"{lang}: no features section"
             html = html.replace(marker, section(c, digits) + marker)

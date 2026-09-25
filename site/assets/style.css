@@ -80,6 +80,9 @@ html[dir="rtl"] .nav a, html[dir="rtl"] .foot a, html[dir="rtl"] .pill, html[dir
 /* A link whose text is itself a sentence ("ثبّت التطبيق من Google Play") reads in the page's
    direction; only links that *are* a Latin address want the rule above. */
 html[dir="rtl"] .row b a { direction: rtl; }
+/* And the hero's and the free-software section's "Source on GitHub" and the Exodus Privacy row's
+   link: left to right, "الشفرة المصدرية على GitHub" was read GitHub-first. */
+html[dir="rtl"] .soon a, html[dir="rtl"] .after a, html[dir="rtl"] .row span a { direction: rtl; }
 /* So do the prayer-time pages' links, which are all city names or sentences. */
 html[dir="rtl"] .crumbs a, html[dir="rtl"] .fact a, html[dir="rtl"] .chips a, html[dir="rtl"] .cities a,
 html[dir="rtl"] .month-head a, html[dir="rtl"] .cta .pill, html[dir="rtl"] .tt-stale a { direction: rtl; }
@@ -123,6 +126,10 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .cta .pill, html[dir="rtl"] .tt-s
 .pill:hover { text-decoration: none; opacity: 0.92; }
 .pill.quiet { background: transparent; color: var(--t1); border: 1px solid var(--hair); }
 .pill svg { width: 18px; height: 18px; }
+/* The stores' own badges, as published: sized by their width and height attributes, never restyled. */
+.badge { display: inline-flex; line-height: 0; }
+.badge img { display: block; }
+.badge:hover { opacity: 0.92; }
 .soon { font-size: 14px; color: var(--t3); }
 .hero-shot { justify-self: center; }
 .shot {
