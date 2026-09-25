@@ -43,22 +43,10 @@ import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
-import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.feature.onboarding.OnboardingScreen
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.quran.QuranRootUiState
-import world.taqwa.app.feature.settings.AppearanceSettingsScreen
 import world.taqwa.app.feature.settings.AboutScreen
-import world.taqwa.app.feature.settings.AttributionScreen
-import world.taqwa.app.feature.settings.CitySearchScreen
-import world.taqwa.app.feature.settings.HighLatitudePickerScreen
-import world.taqwa.app.feature.settings.LocationSettingsScreen
-import world.taqwa.app.feature.settings.ManualAdjustmentsScreen
-import world.taqwa.app.feature.settings.MethodPickerScreen
-import world.taqwa.app.feature.settings.NotificationSettingsScreen
-import world.taqwa.app.feature.settings.PrayerTimesSettingsScreen
-import world.taqwa.app.feature.settings.SettingsRootScreen
-import world.taqwa.app.feature.settings.themeDisplayName
 import world.taqwa.app.feature.today.TodayScreen
 import world.taqwa.app.feature.today.TodayUiState
 import world.taqwa.app.feature.today.TodayViewModel
@@ -66,11 +54,9 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.i18n.uiLanguage
-import world.taqwa.app.i18n.methodDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.design.components.TaqwaBottomSheet
 import world.taqwa.app.design.components.TaqwaTabScaffold
-import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.nav.openReading
 import world.taqwa.app.nav.recitationTarget
@@ -84,11 +70,9 @@ import world.taqwa.app.nav.tabOf
 import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.canScheduleExactAlarms
 import world.taqwa.app.notifications.isNotificationPermissionGranted
-import world.taqwa.app.notifications.openAppNotificationSettings
 import world.taqwa.app.notifications.requestExactAlarmAccess
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.resources.ui_language
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
@@ -133,27 +117,34 @@ import kotlin.time.Clock
 @Composable
 fun App(container: AppContainer) {
     val settings = container.settingsRepository
-    val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
-    val prayerSettings by settings.prayerSettings.collectAsState(initial = PrayerSettings())
-    val notificationSettings by settings.notificationSettings.collectAsState(initial = NotificationSettings())
-    val widgetBackground by settings.widgetBackground.collectAsState(
+    val themeModeState = settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+    val themeMode by themeModeState
+    val prayerSettingsState = settings.prayerSettings.collectAsState(initial = PrayerSettings())
+    val notificationSettingsState = settings.notificationSettings.collectAsState(initial = NotificationSettings())
+    val notificationSettings by notificationSettingsState
+    val widgetBackgroundState = settings.widgetBackground.collectAsState(
         initial = world.taqwa.app.domain.WidgetBackground.FOLLOW_THEME,
     )
-    val location by settings.location.collectAsState(initial = null)
-    val locationSource by settings.locationSource.collectAsState(initial = LocationSource.MANUAL)
+    val locationState = settings.location.collectAsState(initial = null)
+    val location by locationState
+    val locationSourceState = settings.locationSource.collectAsState(initial = LocationSource.MANUAL)
     val navigator = remember { Navigator(Screen.Today) }
-    val backStack by navigator.backStack.collectAsState()
+    val backStackState = navigator.backStack.collectAsState()
+    val backStack by backStackState
     val scope = rememberCoroutineScope()
     val soundPreviewPlayer = remember { createSoundPreviewPlayer() }
     // Recitation (spec 3a §5). One controller for the process, held by the container, so the bar
     // and the voice survive every navigation this screen can perform.
     val recitation = container.recitationController
-    val recitationState by recitation.state.collectAsState()
+    val recitationStateState = recitation.state.collectAsState()
+    val recitationState by recitationStateState
     // Re-read each time the app comes to the front (below, with the lifecycle): both are granted
     // or revoked in system settings, which the Notifications screen can now send someone to, and
     // its notes have to show the answer they come back with.
-    var exactAlarmsAllowed by remember { mutableStateOf(true) }
-    var notificationsGranted by remember { mutableStateOf(true) }
+    val exactAlarmsAllowedState = remember { mutableStateOf(true) }
+    var exactAlarmsAllowed by exactAlarmsAllowedState
+    val notificationsGrantedState = remember { mutableStateOf(true) }
+    var notificationsGranted by notificationsGrantedState
     suspend fun refreshPermissions() {
         exactAlarmsAllowed = canScheduleExactAlarms()
         notificationsGranted = runCatching { isNotificationPermissionGranted() }.getOrDefault(true)
@@ -266,7 +257,8 @@ fun App(container: AppContainer) {
 
     // Onboarding's step lives here rather than inside the screen: "choose a city instead"
     // navigates away to the city search, which would otherwise reset the flow to its first page.
-    var onboardingStep by remember { mutableStateOf(OnboardingStep.WELCOME) }
+    val onboardingStepState = remember { mutableStateOf(OnboardingStep.WELCOME) }
+    var onboardingStep by onboardingStepState
 
     // Resolved before anything renders, so a returning user never sees Today flash behind
     // onboarding on launch.
@@ -432,7 +424,7 @@ fun App(container: AppContainer) {
     // the location so a language change re-resolves; produceState rather than remember because
     // the lookup suspends, and its initial value is the stored English snapshot, which is what
     // both rows showed before this existed.
-    val cityDisplayName by produceState(location?.cityName, location, languageTag) {
+    val cityDisplayNameState = produceState(location?.cityName, location, languageTag) {
         val current = location
         val id = current?.cityId
         value = if (current == null || id == null) {
@@ -780,25 +772,14 @@ fun App(container: AppContainer) {
                             )
                         }
 
-                        Screen.Settings -> SettingsRootScreen(
-                            // Null only when there is no location at all — the row then reads
-                            // "Not set" rather than naming a city nobody chose.
-                            cityName = if (location == null) {
-                                null
-                            } else {
-                                cityDisplayName ?: stringResource(Res.string.today_current_location)
-                            },
-                            methodName = methodDisplayName(prayerSettings.method),
-                            themeName = themeDisplayName(themeMode),
-                            notificationSettings = notificationSettings,
-                            onOpenLocation = { navigator.push(Screen.LocationSettings) },
-                            onOpenPrayerTimes = { navigator.push(Screen.PrayerTimesSettings) },
-                            onOpenNotifications = { navigator.push(Screen.NotificationSettings) },
-                            onOpenAppearance = { navigator.push(Screen.Appearance) },
-                            onOpenAbout = { navigator.push(Screen.About) },
-                            onOpenAttribution = { navigator.push(Screen.Attribution) },
-                            reciterName = recitationState.reciter?.let { reciterName(it) }.orEmpty(),
-                            onOpenRecitation = { navigator.push(Screen.RecitationSettings) },
+                        Screen.Settings -> SettingsRootRoute(
+                            locationState = locationState,
+                            cityDisplayNameState = cityDisplayNameState,
+                            prayerSettingsState = prayerSettingsState,
+                            themeModeState = themeModeState,
+                            notificationSettingsState = notificationSettingsState,
+                            navigator = navigator,
+                            recitationStateState = recitationStateState,
                         )
 
                         Screen.RecitationSettings -> {
@@ -869,190 +850,83 @@ fun App(container: AppContainer) {
                             )
                         }
 
-                        Screen.NotificationSettings -> NotificationSettingsScreen(
-                            settings = notificationSettings,
-                            exactAlarmsUnavailable = !exactAlarmsAllowed,
-                            notificationsGranted = notificationsGranted,
-                            onOpenNotificationSettings = ::openAppNotificationSettings,
-                            onRequestExactAlarms = ::requestExactAlarmAccess,
-                            onPermissionChecked = { scope.launch { refreshPermissions() } },
-                            onBack = { navigator.pop() },
-                            onToggleEnabled = { enabled ->
-                                scope.launch {
-                                    settings.setNotificationSettings(notificationSettings.copy(enabled = enabled))
-                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
-                                }
-                            },
-                            onPickLead = { minutes ->
-                                scope.launch {
-                                    settings.setNotificationSettings(
-                                        notificationSettings.copy(remindBeforeMinutes = minutes),
-                                    )
-                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
-                                }
-                            },
-                            onPickSound = { prayer, sound ->
-                                scope.launch {
-                                    val updated = notificationSettings.copy(
-                                        sounds = notificationSettings.sounds + (prayer to sound),
-                                    )
-                                    settings.setNotificationSettings(updated)
-                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
-                                }
-                            },
-                            onToggleTahajjud = { on ->
-                                scope.launch {
-                                    settings.setNotificationSettings(notificationSettings.copy(tahajjud = on))
-                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
-                                }
-                            },
-                            onPickTahajjudSound = { sound ->
-                                scope.launch {
-                                    settings.setNotificationSettings(notificationSettings.copy(tahajjudSound = sound))
-                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
-                                }
-                            },
-                            onPickVoice = { voice ->
-                                scope.launch {
-                                    settings.setNotificationSettings(notificationSettings.copy(voice = voice))
-                                    // The same reschedule a sound change needs, and for the same
-                                    // reason: a channel's sound is immutable, so the new voice
-                                    // only reaches the user through channels built from the new
-                                    // plan.
-                                    container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
-                                }
-                            },
-                            // The sheet's Takbir and Adhan buttons audition the voice that is
-                            // actually chosen, never the original by default.
-                            onPreviewSound = { soundPreviewPlayer.play(it, notificationSettings.voice) },
-                            onPreviewVoice = { voice -> soundPreviewPlayer.play(PrayerSound.ADHAN, voice) },
-                            onStopPreview = { soundPreviewPlayer.stop() },
+                        Screen.NotificationSettings -> NotificationSettingsRoute(
+                            notificationSettingsState = notificationSettingsState,
+                            exactAlarmsAllowedState = exactAlarmsAllowedState,
+                            notificationsGrantedState = notificationsGrantedState,
+                            scope = scope,
+                            refreshPermissions = ::refreshPermissions,
+                            navigator = navigator,
+                            settings = settings,
+                            container = container,
+                            soundPreviewPlayer = soundPreviewPlayer,
                         )
 
-                        Screen.PrayerTimesSettings -> PrayerTimesSettingsScreen(
-                            settings = prayerSettings,
+                        Screen.PrayerTimesSettings -> PrayerTimesSettingsRoute(
+                            prayerSettingsState = prayerSettingsState,
                             today = today,
-                            onChange = ::write,
-                            onBack = { navigator.pop() },
-                            onOpenMethodPicker = { navigator.push(Screen.MethodPicker) },
-                            onOpenHighLatitudePicker = { navigator.push(Screen.HighLatitudePicker) },
-                            onOpenManualAdjustments = { navigator.push(Screen.ManualAdjustments) },
+                            write = ::write,
+                            navigator = navigator,
                         )
 
-                        Screen.MethodPicker -> MethodPickerScreen(
-                            current = prayerSettings.method,
-                            onPick = {
-                                scope.launch {
-                                    settings.setPrayerSettings(prayerSettings.copy(method = it))
-                                    // Latches the choice so a later relocation cannot overwrite it.
-                                    settings.setMethodUserChosen()
-                                }
-                                navigator.pop()
-                            },
-                            onBack = { navigator.pop() },
+                        Screen.MethodPicker -> MethodPickerRoute(
+                            prayerSettingsState = prayerSettingsState,
+                            scope = scope,
+                            settings = settings,
+                            navigator = navigator,
                         )
 
-                        Screen.HighLatitudePicker -> HighLatitudePickerScreen(
-                            current = prayerSettings.highLatitude,
-                            latitude = location?.latitude ?: 0.0,
-                            onPick = {
-                                write(prayerSettings.copy(highLatitude = it))
-                                navigator.pop()
-                            },
-                            onBack = { navigator.pop() },
+                        Screen.HighLatitudePicker -> HighLatitudePickerRoute(
+                            prayerSettingsState = prayerSettingsState,
+                            locationState = locationState,
+                            write = ::write,
+                            navigator = navigator,
                         )
 
-                        Screen.ManualAdjustments -> ManualAdjustmentsScreen(
-                            settings = prayerSettings,
-                            location = location,
-                            engine = container.prayerTimesEngine,
+                        Screen.ManualAdjustments -> ManualAdjustmentsRoute(
+                            prayerSettingsState = prayerSettingsState,
+                            locationState = locationState,
+                            container = container,
                             today = today,
-                            onChange = ::write,
-                            onBack = { navigator.pop() },
+                            write = ::write,
+                            navigator = navigator,
                         )
 
-                        Screen.LocationSettings -> LocationSettingsScreen(
-                            location = location,
-                            cityName = cityDisplayName,
-                            locationSource = locationSource,
-                            locationRepository = container.locationRepository,
-                            onLocationPermission = { permission ->
-                                if (permission == LocationPermission.GRANTED) useGpsFix()
-                            },
-                            onChooseCity = { navigator.push(Screen.CitySearch) },
-                            onBack = { navigator.pop() },
+                        Screen.LocationSettings -> LocationSettingsRoute(
+                            locationState = locationState,
+                            cityDisplayNameState = cityDisplayNameState,
+                            locationSourceState = locationSourceState,
+                            container = container,
+                            useGpsFix = ::useGpsFix,
+                            navigator = navigator,
                         )
 
-                        Screen.CitySearch -> CitySearchScreen(
-                            cityRepository = container.cityRepository,
-                            onPick = { city ->
-                                scope.launch {
-                                    val picked = city.toGeoLocation()
-                                    // The row the user tapped was already rendered in their
-                                    // language, so the name is known here — stored with the
-                                    // location so the header needs no lookup on any later
-                                    // launch, the first one after picking included.
-                                    settings.setLocation(
-                                        picked,
-                                        ResolvedCityName(city.displayName, languageTag),
-                                    )
-                                    // The only writer of MANUAL, which is what makes turning the
-                                    // toggle off reversible: back out of the search and the
-                                    // stored source — and so the toggle — is untouched.
-                                    settings.setLocationSource(LocationSource.MANUAL)
-                                    settings.applyCountryDefaultMethod(picked.countryCode)
-                                }
-                                // Reached from onboarding, a successful pick answers the location
-                                // question, so the flow continues rather than re-asking it.
-                                if (backStack.contains(Screen.Onboarding)) {
-                                    onboardingStep = OnboardingStep.NOTIFICATIONS
-                                }
-                                navigator.pop()
-                            },
-                            onBack = { navigator.pop() },
+                        Screen.CitySearch -> CitySearchRoute(
+                            container = container,
+                            scope = scope,
+                            settings = settings,
+                            languageTag = languageTag,
+                            backStackState = backStackState,
+                            onboardingStepState = onboardingStepState,
+                            navigator = navigator,
                         )
 
-                        Screen.Appearance -> AppearanceSettingsScreen(
-                            current = themeMode,
-                            widgetPinRequester = container.widgetPinRequester,
-                            widgetPlacementSource = container.widgetPlacementSource,
-                            // No pop: the whole app repaints behind this screen, and seeing that happen
-                            // is the confirmation the choice took effect.
-                            onPick = { scope.launch { settings.setThemeMode(it) } },
-                            widgetBackground = widgetBackground,
-                            onPickWidgetBackground = { value ->
-                                scope.launch {
-                                    settings.setWidgetBackground(value)
-                                    // The widget processes never see SettingsRepository/DataStore —
-                                    // only the mirror — so the choice has to be written there too,
-                                    // under the same key TaqwaGlanceWidget.kt (Android) and the iOS
-                                    // TimelineProvider (Task 24) read.
-                                    world.taqwa.app.widget.WidgetMirrorWriter.writeBackground(
-                                        world.taqwa.app.widget.createWidgetKeyValueStore(),
-                                        value,
-                                    )
-                                    world.taqwa.app.widget.refreshWidgets()
-                                }
-                            },
-                            onBack = { navigator.pop() },
+                        Screen.Appearance -> AppearanceRoute(
+                            themeModeState = themeModeState,
+                            container = container,
+                            scope = scope,
+                            settings = settings,
+                            widgetBackgroundState = widgetBackgroundState,
+                            navigator = navigator,
                         )
 
                         Screen.About -> AboutScreen(onBack = { navigator.pop() })
 
                         Screen.Attribution -> {
-                            // The translation credits must never drift from what is actually
-                            // bundled (spec §6), so they are read from the database rather than
-                            // hardcoded; an empty list while loading is fine, it fills in a frame
-                            // later.
-                            val translations by produceState(initialValue = emptyList<world.taqwa.app.quran.TranslationInfo>()) {
-                                value = container.quranRepository.translations()
-                            }
-                            AttributionScreen(
-                                translations = translations,
-                                // The catalogue in force, so a reciter withdrawn by a manifest
-                                // refresh leaves the credits with them (spec §2).
-                                reciters = recitationState.reciters,
-                                onBack = { navigator.pop() },
+                            AttributionRoute(
+                                container = container,
+                                recitationStateState = recitationStateState,
+                                navigator = navigator,
                             )
                         }
 
