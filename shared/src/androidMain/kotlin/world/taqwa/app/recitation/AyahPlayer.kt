@@ -190,7 +190,7 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
             real.seekTo(positionMs)
             return
         }
-        real.seekTo(clock.snapToAyah(positionMs, queue::isGap), 0L)
+        real.seekTo(clock.snapToAyah(positionMs) { !queue.isAyah(it) }, 0L)
     }
 
     internal fun previousAyah() {

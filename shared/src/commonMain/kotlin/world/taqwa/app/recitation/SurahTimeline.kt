@@ -71,13 +71,20 @@ class SurahTimeline(val itemsMs: List<Long>) {
 
     /**
      * Where a seek to surah time [ms] should land: the start of the ayah whose slot holds it, or,
-     * when it falls inside a gap, the start of the ayah that gap leads into. Recitation moves by
-     * ayah — a scrub on the lock screen that dropped the voice into the middle of a word would be
-     * worse than one that snapped — so the snap is the rule and this is where it lives.
+     * when it falls inside a gap or a translation, the start of the next ayah — and when there is
+     * no next ayah, the last one. [isGap] is true for every item that is **not** an ayah.
+     * Recitation moves by ayah — a scrub on the lock screen that dropped the voice into the
+     * middle of a word would be worse than one that snapped — so the snap is the rule and this
+     * is where it lives.
      */
     fun snapToAyah(ms: Long, isGap: (Int) -> Boolean): Int {
         val index = indexAt(ms)
-        return if (isGap(index)) (index + 1).coerceAtMost(itemsMs.lastIndex) else index
+        var forward = index
+        while (forward <= itemsMs.lastIndex && isGap(forward)) forward++
+        if (forward <= itemsMs.lastIndex) return forward
+        var back = index
+        while (back > 0 && isGap(back)) back--
+        return back
     }
 
     private fun clamp(index: Int): Int = index.coerceIn(0, itemsMs.lastIndex)
@@ -117,11 +124,19 @@ class SurahTimeline(val itemsMs: List<Long>) {
             if (kbps <= 0 || audioBytes <= 0L) 0L else audioBytes * 8L / kbps
 
         /** The clock for [queue], asking [ayahMs] for each ayah's length; gaps carry their own. */
-        fun of(queue: RecitationQueue, ayahMs: (Int) -> Long): SurahTimeline = SurahTimeline(
+        fun of(queue: RecitationQueue, ayahMs: (Int) -> Long): SurahTimeline = of(queue, ayahMs) { 0L }
+
+        /**
+         * The clock with read-aloud on (read-aloud spec §5.2): each translation gets the slot
+         * [speechMs] estimates for the ayah it follows, so the lock screen's bar keeps moving
+         * while the voice reads rather than standing still and jumping.
+         */
+        fun of(queue: RecitationQueue, ayahMs: (Int) -> Long, speechMs: (Int) -> Long): SurahTimeline = SurahTimeline(
             queue.items.map { item ->
                 when (item) {
                     is QueueItem.Ayah -> ayahMs(item.n).coerceAtLeast(MIN_AYAH_MS)
                     is QueueItem.Gap -> item.durationMs
+                    is QueueItem.Speech -> speechMs(item.n).coerceAtLeast(0L)
                 }
             },
         )

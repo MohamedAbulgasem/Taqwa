@@ -290,6 +290,9 @@ actual class RecitationPlayer actual constructor(
         val id = when (entry) {
             is QueueItem.Ayah -> ayahUri(reciterId, surah, entry.n)
             is QueueItem.Gap -> gapUri(entry.durationMs)
+            // Read-aloud is not wired into the Android player yet (read-aloud spec §5.5): this
+            // queue is never built with a spoken ayah, so reaching this would mean it was.
+            is QueueItem.Speech -> error("RecitationPlayer.android.kt does not build spoken queues yet")
         }
         // Id only: the URI is stripped crossing the binder anyway and the service puts it back,
         // along with the title, the subtitle and the artwork.

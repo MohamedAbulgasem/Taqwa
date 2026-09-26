@@ -213,7 +213,7 @@ actual class RecitationPlayer actual constructor(
         activateSession()
         // A gap is playing silence: there is no item to start, the wait simply resumes — from
         // where the pause froze it, so the surah's clock does not rewind by the part already waited.
-        if (built.isGap(at)) waitOutGap(built, built.gapMs - gapElapsedMs) else player?.play()
+        if (built.isGap(at)) waitOutGap(built, built.silenceMs(at) - gapElapsedMs) else player?.play()
         publish()
         startTicker()
     }
@@ -310,7 +310,7 @@ actual class RecitationPlayer actual constructor(
             ayahPositionMs = ayahDurationMs
             gapElapsedMs = 0L
             publish()
-            if (wantsPlay) waitOutGap(built, built.gapMs)
+            if (wantsPlay) waitOutGap(built, built.silenceMs(at))
             return
         }
         val path = files[built.ayahAt(at)] ?: return
@@ -598,7 +598,7 @@ actual class RecitationPlayer actual constructor(
     actual fun seekToSurahTime(positionMs: Long) {
         val built = queue ?: return
         val clock = timeline ?: return
-        go(clock.snapToAyah(positionMs, built::isGap))
+        go(clock.snapToAyah(positionMs) { !built.isAyah(it) })
     }
 
     private fun unwireCommands() {
