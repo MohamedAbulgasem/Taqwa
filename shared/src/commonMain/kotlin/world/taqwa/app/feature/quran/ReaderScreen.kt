@@ -251,7 +251,7 @@ fun ReaderScreen(
         // A touch is anything that starts or stops the list moving that we did not start
         // ourselves; [FollowingState.move] is what tells the two apart.
         LaunchedEffect(listState) {
-            snapshotFlow { listState.isScrollInProgress }.collect { following.moved() }
+            snapshotFlow { listState.isScrollInProgress }.collect { following.moved(scrolling = it) }
         }
 
         // The bar or the media notification asking for the recited ayah (spec §15.5): the pill's

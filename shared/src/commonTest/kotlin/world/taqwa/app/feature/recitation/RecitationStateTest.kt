@@ -5,6 +5,8 @@ import world.taqwa.app.recitation.DownloadKey
 import world.taqwa.app.recitation.DownloadState
 import world.taqwa.app.recitation.PlaybackState
 import world.taqwa.app.recitation.Reciter
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -140,10 +142,41 @@ class RecitationStateTest {
     fun `following leaves the page alone within four seconds of a touch`() {
         var now = 10_000L
         val following = FollowingState { now }
-        following.moved()
+        following.moved(scrolling = true)
         assertEquals(Follow.LEAVE_ALONE, following.decide(away = 0))
         now += FOLLOW_GRACE_MS
         assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
+    @Test
+    fun `the page's own scroll heard stopping after it returned is not a touch`() = runTest {
+        val following = FollowingState { 10_000L }
+        following.move { following.moved(scrolling = true) }
+        // The list reports that it stopped a frame after the scroll has returned.
+        following.moved(scrolling = false)
+        assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
+    @Test
+    fun `a scroll the page did not start counts as a touch however it ends`() = runTest {
+        var now = 10_000L
+        val following = FollowingState { now }
+        // A scroll of the page's own too short to be heard at all, then the reader's: a finger
+        // held on the list for five seconds, whose letting go is the touch the four count from.
+        following.move { }
+        following.moved(scrolling = true)
+        now += 5_000L
+        following.moved(scrolling = false)
+        assertEquals(Follow.LEAVE_ALONE, following.decide(away = 0))
+    }
+
+    @Test
+    fun `a reader who takes hold of the page as it follows still counts`() = runTest {
+        val following = FollowingState { 10_000L }
+        // The finger cancels the page's scroll and carries on moving the list itself.
+        runCatching { following.move { following.moved(scrolling = true); throw CancellationException("taken over") } }
+        following.moved(scrolling = false)
+        assertEquals(Follow.LEAVE_ALONE, following.decide(away = 0))
     }
 
     @Test
@@ -156,7 +189,7 @@ class RecitationStateTest {
     fun `asking to go back re-arms following at once`() {
         var now = 10_000L
         val following = FollowingState { now }
-        following.moved()
+        following.moved(scrolling = true)
         following.rearm()
         assertEquals(Follow.SCROLL, following.decide(away = 0))
     }

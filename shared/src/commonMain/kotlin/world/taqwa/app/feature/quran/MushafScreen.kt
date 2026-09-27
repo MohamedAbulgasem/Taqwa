@@ -187,7 +187,7 @@ fun MushafScreen(
         // than a page away from where the reader actually is.
         val following = rememberFollowing()
         LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.isScrollInProgress }.collect { following.moved() }
+            snapshotFlow { pagerState.isScrollInProgress }.collect { following.moved(scrolling = it) }
         }
         // The bar or the media notification asking for the recited ayah (spec §15.5).
         LaunchedEffect(recitation.jumpToken) {
