@@ -164,7 +164,14 @@ fun AyahCard(
                     val translationDirection =
                         if (translationLanguage in RTL_TRANSLATION_LANGUAGES) LayoutDirection.Rtl else LayoutDirection.Ltr
                     CompositionLocalProvider(LocalLayoutDirection provides translationDirection) {
-                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                        // Merged so a screen reader announces the mark's "Being read aloud" and the
+                        // translation itself as one item, rather than stopping short at the icon.
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .semantics(mergeDescendants = true) {},
+                            verticalAlignment = Alignment.Top,
+                        ) {
                             if (speaking) {
                                 val readingLabel = stringResource(Res.string.quran_a11y_read_aloud)
                                 Canvas(

@@ -398,7 +398,7 @@
     <string name="settings_recitation">Recitation</string>
     <string name="recitation_settings_mobile_data">Download over mobile data</string>
     <string name="recitation_settings_auto_download">Download without asking</string>
-    <string name="recitation_read_aloud_heading">After each ayah</string>
+    <string name="recitation_read_aloud_heading">AFTER EACH AYAH</string>
     <string name="recitation_read_aloud_translation">Read the translation aloud</string>
     <string name="recitation_read_aloud_tafsir">Read the tafsir aloud</string>
     <string name="recitation_read_aloud_detail">%1$s, in %2$s. A voice on this phone reads it, so it works offline.</string>

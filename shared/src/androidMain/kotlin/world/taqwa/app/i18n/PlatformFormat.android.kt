@@ -58,6 +58,17 @@ private class AndroidPlatformFormat : PlatformFormat {
         }
         return name.replaceFirstChar { it.titlecase(locale) }
     }
+
+    // Same lookup as languageName, without that function's titlecasing: mid-sentence ("Nécessite
+    // une voix gratuite en anglais.") French and Indonesian keep CLDR's own lower case, and only the
+    // list row above wants the capital.
+    override fun languageNameInSentence(code: String): String {
+        val name = Locale.forLanguageTag(code).getDisplayLanguage(locale)
+        if (name.isBlank() || name.equals(code, ignoreCase = true)) {
+            return EnglishPlatformFormat.languageName(code)
+        }
+        return name
+    }
 }
 
 actual fun createPlatformFormat(): PlatformFormat = AndroidPlatformFormat()

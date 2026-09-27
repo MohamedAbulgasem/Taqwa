@@ -285,7 +285,7 @@
     <string name="quran_sheet_translation">الترجمة</string>
     <string name="quran_translation_off">بدون ترجمة</string>
     <string name="quran_translation_off_detail">النص العربي فقط، آية في كل بطاقة</string>
-    <string name="quran_sheet_read_aloud">القراءة الصوتية بعد كل آية</string>
+    <string name="quran_sheet_read_aloud">قراءتها صوتيًا بعد كل آية</string>
     <string name="quran_sheet_read_aloud_missing">يلزم صوت اللغة %1$s المجاني على هاتفك.</string>
     <string name="quran_sheet_mode">وضع القراءة</string>
     <string name="quran_mode_translation">ترجمة</string>
@@ -304,7 +304,7 @@
     <string name="quran_action_copy">نسخ</string>
     <string name="quran_action_copied">تم النسخ</string>
     <string name="quran_action_share">مشاركة</string>
-    <string name="quran_a11y_read_aloud">تُقرأ صوتيًا الآن</string>
+    <string name="quran_a11y_read_aloud">جارٍ القراءة صوتيًا</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">التسبيح</string>
     <string name="today_open_tasbeeh">التسبيح</string>
@@ -383,7 +383,7 @@
     <string name="recitation_read_aloud_heading">بعد كل آية</string>
     <string name="recitation_read_aloud_translation">قراءة الترجمة صوتيًا</string>
     <string name="recitation_read_aloud_tafsir">قراءة التفسير صوتيًا</string>
-    <string name="recitation_read_aloud_detail">صوتٌ على هذا الهاتف يقرأ %1$s باللغة %2$s، فيعمل دون إنترنت.</string>
+    <string name="recitation_read_aloud_detail">صوتٌ على هذا الهاتف يقرأ %1$s باللغة %2$s، فيعمل دون اتصال.</string>
     <string name="recitation_read_aloud_missing">يحتاج هاتفك إلى صوت اللغة %1$s المجاني، وهو تنزيل صغير لمرة واحدة.</string>
     <string name="recitation_read_aloud_get_voice">تنزيل الصوت</string>
     <string name="recitation_settings_downloads">التنزيلات · %1$s</string>

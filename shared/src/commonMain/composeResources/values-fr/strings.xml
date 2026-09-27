@@ -395,7 +395,7 @@
     <string name="settings_recitation">Récitation</string>
     <string name="recitation_settings_mobile_data">Télécharger via les données mobiles</string>
     <string name="recitation_settings_auto_download">Télécharger sans demander</string>
-    <string name="recitation_read_aloud_heading">Après chaque verset</string>
+    <string name="recitation_read_aloud_heading">APRÈS CHAQUE VERSET</string>
     <string name="recitation_read_aloud_translation">Lire la traduction à voix haute</string>
     <string name="recitation_read_aloud_tafsir">Lire le tafsir à voix haute</string>
     <string name="recitation_read_aloud_detail">%1$s, en %2$s. Une voix de ce téléphone s’en charge, même hors ligne.</string>

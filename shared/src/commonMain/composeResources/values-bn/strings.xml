@@ -386,7 +386,7 @@
     <string name="recitation_read_aloud_tafsir">তাফসির পড়ে শোনান</string>
     <string name="recitation_read_aloud_detail">%1$s, %2$s ভাষায়। এই ফোনের একটি কণ্ঠ পড়ে শোনায়, তাই ইন্টারনেট ছাড়াই চলে।</string>
     <string name="recitation_read_aloud_missing">আপনার ফোনে বিনামূল্যের %1$s কণ্ঠ দরকার, একবারের ছোট একটি ডাউনলোড।</string>
-    <string name="recitation_read_aloud_get_voice">কণ্ঠ নামান</string>
+    <string name="recitation_read_aloud_get_voice">কণ্ঠ ডাউনলোড করুন</string>
     <string name="recitation_settings_downloads">ডাউনলোড · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$sটি সূরা · %2$s</string>
     <string name="recitation_settings_surahs">%1$sটি সূরা · %2$s</string>

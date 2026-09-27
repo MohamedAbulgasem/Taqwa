@@ -132,7 +132,9 @@ fun RecitationSettingsScreen(
                     ripple = false,
                     trailing = { TaqwaToggle(readAloud.enabled, onSetReadAloud) },
                 )
-                val language = format.languageName(readAloud.language)
+                // In-sentence casing (spec §6 fix round 1): both captions below read the language
+                // name mid-sentence, so French and Indonesian must keep their own lower case.
+                val language = format.languageNameInSentence(readAloud.language)
                 Text(
                     if (readAloud.missingEngine != null) {
                         stringResource(Res.string.recitation_read_aloud_missing, language)

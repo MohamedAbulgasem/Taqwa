@@ -379,8 +379,8 @@
     <string name="recitation_read_aloud_heading">ہر آیت کے بعد</string>
     <string name="recitation_read_aloud_translation">ترجمہ سنائیں</string>
     <string name="recitation_read_aloud_tafsir">تفسیر سنائیں</string>
-    <string name="recitation_read_aloud_detail">%1$s، %2$s میں۔ اس فون کی آواز پڑھتی ہے، اس لیے انٹرنیٹ کے بغیر چلتا ہے۔</string>
-    <string name="recitation_read_aloud_missing">آپ کے فون کو %1$s کی مفت آواز درکار ہے، ایک بار کی چھوٹی سی ڈاؤن لوڈ۔</string>
+    <string name="recitation_read_aloud_detail">%1$s، %2$s میں۔ اس فون کی آواز پڑھتی ہے، اس لیے آف لائن بھی چلتا ہے۔</string>
+    <string name="recitation_read_aloud_missing">آپ کے فون کو %1$s کی مفت آواز درکار ہے، ایک بار کا چھوٹا سا ڈاؤن لوڈ۔</string>
     <string name="recitation_read_aloud_get_voice">آواز حاصل کریں</string>
     <string name="recitation_settings_downloads">ڈاؤن لوڈز · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s سورت · %2$s</string>

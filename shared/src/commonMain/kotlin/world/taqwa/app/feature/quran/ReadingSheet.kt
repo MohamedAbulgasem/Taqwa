@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -307,22 +308,29 @@ fun ReadingSheet(
                 val missing = readAloud.missingEngine
                 if (missing != null) {
                     Text(
-                        stringResource(Res.string.quran_sheet_read_aloud_missing, format.languageName(readAloud.language)),
+                        stringResource(Res.string.quran_sheet_read_aloud_missing, format.languageNameInSentence(readAloud.language)),
                         style = TaqwaText.caption,
                         color = colors.textSecondary,
                     )
-                    Text(
-                        stringResource(Res.string.recitation_read_aloud_get_voice),
-                        style = TaqwaText.rowLabel.copy(fontWeight = FontWeight.SemiBold),
-                        color = colors.accent,
-                        modifier = Modifier
+                    // 48 dp minimum, like Settings' own QuietRow: the row was 32 dp and as narrow as
+                    // the string before this fix, under the tap-target floor everywhere else in the app.
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(minHeight = 48.dp)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
                                 onClick = onGetVoice,
-                            )
-                            .padding(vertical = 6.dp),
-                    )
+                            ),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        Text(
+                            stringResource(Res.string.recitation_read_aloud_get_voice),
+                            style = TaqwaText.rowLabel.copy(fontWeight = FontWeight.SemiBold),
+                            color = colors.accent,
+                        )
+                    }
                 }
             }
         }

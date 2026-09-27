@@ -395,10 +395,10 @@
     <string name="settings_recitation">Tilavet</string>
     <string name="recitation_settings_mobile_data">Mobil veriyle indir</string>
     <string name="recitation_settings_auto_download">Sormadan indir</string>
-    <string name="recitation_read_aloud_heading">Her ayetten sonra</string>
+    <string name="recitation_read_aloud_heading">HER AYETTEN SONRA</string>
     <string name="recitation_read_aloud_translation">Meali sesli oku</string>
     <string name="recitation_read_aloud_tafsir">Tefsiri sesli oku</string>
-    <string name="recitation_read_aloud_detail">%1$s, %2$s. Bu telefondaki bir ses okur; internet gerekmez.</string>
+    <string name="recitation_read_aloud_detail">%1$s, %2$s. Bu telefondaki bir ses okur, bu yüzden çevrimdışı çalışır.</string>
     <string name="recitation_read_aloud_missing">Telefonunuzun ücretsiz %1$s sesine ihtiyacı var; küçük, tek seferlik bir indirme.</string>
     <string name="recitation_read_aloud_get_voice">Sesi indir</string>
     <string name="recitation_settings_downloads">İNDİRİLENLER · %1$s</string>

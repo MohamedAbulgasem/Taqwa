@@ -289,8 +289,11 @@ internal fun DrawScope.drawExternalLink(tint: Color, pointsForward: Boolean) {
  * ayah card beside the translation the voice is reading.
  *
  * Named apart from [drawSpeaker] rather than overloading it: that glyph already has a single-`Color`
- * call shape once its own `pointsForward` default is counted, and a second declaration matching it
- * would leave every one-argument call in the file ambiguous between the two.
+ * call shape once its own defaulted `pointsForward` is counted, and Kotlin would not reject a second
+ * `drawSpeaker(tint: Color)` here — it compiles, and resolves a bare one-argument call to whichever
+ * overload needs no default filled in. That silently hands every future one-argument call to this
+ * new, narrower glyph instead of the cone-and-waves one, which is the actual danger a shared name
+ * would create, and why this one is distinct.
  */
 internal fun DrawScope.drawReadAloudMark(tint: Color) {
     val u = size.width / 16f

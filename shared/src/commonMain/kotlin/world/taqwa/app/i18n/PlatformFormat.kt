@@ -42,6 +42,13 @@ interface PlatformFormat {
      * to the English map for the fakes, as [longDate] is.
      */
     fun languageName(code: String): String = EnglishPlatformFormat.languageName(code)
+
+    /**
+     * The language's name as it reads inside a sentence: French and other languages that write it
+     * in lower case keep it so, unlike [languageName], which is titlecased for a list row.
+     * Defaulted to [languageName] itself, which already is sentence case everywhere but Android.
+     */
+    fun languageNameInSentence(code: String): String = languageName(code)
 }
 
 expect fun createPlatformFormat(): PlatformFormat
