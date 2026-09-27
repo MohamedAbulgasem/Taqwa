@@ -21,6 +21,8 @@ data class RecitationSettings(
     val autoDownload: Boolean = false,
     /** True once the sheet has been confirmed at least once; until then it offers auto-download ticked. */
     val autoDownloadAsked: Boolean = false,
+    /** Read-aloud spec §1: read the translation after each ayah. Off by default. */
+    val readAloud: Boolean = false,
 )
 
 /**

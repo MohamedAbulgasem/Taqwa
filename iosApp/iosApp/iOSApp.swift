@@ -301,7 +301,8 @@ enum RecitationHarness {
 					subtitle: "Mishary Rashid Alafasy",
 					previousAyahLabel: "",
 					nextAyahLabel: ""
-				)
+				),
+				speech: nil
 			) { _ in }
 		case "play": player.play()
 		case "pause": player.pause()

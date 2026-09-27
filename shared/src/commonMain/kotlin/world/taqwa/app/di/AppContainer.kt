@@ -10,6 +10,7 @@ import world.taqwa.app.audio.ClipPlayer
 import world.taqwa.app.feature.recitation.RecitationController
 import world.taqwa.app.feature.recitation.asPort
 import world.taqwa.app.feature.recitation.asRecitationPort
+import world.taqwa.app.feature.recitation.readAloudPort
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.location.LocationRefresher
 import world.taqwa.app.location.LocationRepository
@@ -21,7 +22,9 @@ import world.taqwa.app.quran.QuranRepository
 import world.taqwa.app.recitation.ManifestRefresher
 import world.taqwa.app.recitation.RecitationEngagement
 import world.taqwa.app.recitation.RecitationPlayer
+import world.taqwa.app.recitation.SpeechVoices
 import world.taqwa.app.recitation.createManifestProvider
+import world.taqwa.app.recitation.createSpeechVoices
 import world.taqwa.app.recitation.createSurahDownloader
 import world.taqwa.app.recitation.createRecitationLibrary
 import world.taqwa.app.recitation.createRecitationPaths
@@ -89,6 +92,9 @@ class AppContainer {
     // notification.
     val recitationPlayer by lazy { RecitationPlayer(recitationLibrary) }
 
+    /** Read-aloud spec §4: the phone's own offline voices, queried lazily like the player above. */
+    val speechVoices: SpeechVoices by lazy { createSpeechVoices() }
+
     /**
      * Slice 3a task 4a: the one place the recitation surface's decisions live. Its own scope,
      * because it outlives every composition — the bar goes on playing while the reader walks to
@@ -131,6 +137,7 @@ class AppContainer {
             refreshCatalogue = {
                 withContext(Dispatchers.Default) { runCatching { manifestRefresher.refreshIfStale() } }
             },
+            readAloud = readAloudPort(settingsRepository, speechVoices),
         )
     }
 

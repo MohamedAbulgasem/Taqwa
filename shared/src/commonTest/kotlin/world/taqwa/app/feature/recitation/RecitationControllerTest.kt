@@ -11,6 +11,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import world.taqwa.app.feature.quran.FakeQuranSource
+import world.taqwa.app.quran.TextKind
+import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.recitation.DownloadFailure
 import world.taqwa.app.recitation.DownloadKey
 import world.taqwa.app.recitation.DownloadState
@@ -19,8 +21,11 @@ import world.taqwa.app.recitation.PlaybackState
 import world.taqwa.app.recitation.RecitationManifest
 import world.taqwa.app.recitation.RecitationSettings
 import world.taqwa.app.recitation.Reciter
+import world.taqwa.app.recitation.SpeechVoice
+import world.taqwa.app.recitation.SpokenTranslation
 import world.taqwa.app.recitation.SurahAsset
 import world.taqwa.app.recitation.SurahSkip
+import world.taqwa.app.recitation.VoiceStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -94,8 +99,9 @@ class RecitationControllerTest {
             _state.value = value
         }
 
-        override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) {
+        override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) {
             loads += Triple(reciter.id, surah, startAyah)
+            speeches += speech
             lastText = text
             _state.value = PlaybackState(
                 reciterId = reciter.id,
@@ -105,6 +111,10 @@ class RecitationControllerTest {
                 playing = true,
             )
         }
+
+        val speeches = mutableListOf<SpokenTranslation?>()
+        val speechUpdates = mutableListOf<SpokenTranslation?>()
+        override fun setSpeech(speech: SpokenTranslation?) { speechUpdates += speech }
 
         var lastText: NowPlayingText? = null
         var pauses = 0
@@ -204,6 +214,10 @@ class RecitationControllerTest {
         override suspend fun setAutoDownload(value: Boolean) {
             stored.value = stored.value.copy(autoDownload = value, autoDownloadAsked = true)
         }
+
+        override suspend fun setReadAloud(value: Boolean) {
+            stored.value = stored.value.copy(readAloud = value)
+        }
     }
 
     private class FakeClips : ClipPort {
@@ -246,18 +260,21 @@ class RecitationControllerTest {
         scope: kotlinx.coroutines.CoroutineScope,
         previews: Set<String> = setOf("ar.alafasy"),
         engagement: Engagement = Engagement(),
+        readAloud: ReadAloudPort = NoReadAloud,
+        quran: world.taqwa.app.quran.QuranSource = FakeQuranSource(),
     ) = RecitationController(
         manifests = { catalogue },
         library = harness.library,
         downloader = harness.downloader,
         player = harness.player,
         settings = harness.settings,
-        quran = FakeQuranSource(),
+        quran = quran,
         clips = harness.clips,
         previewBytes = { id -> if (id in previews) ByteArray(8) else null },
         scope = scope,
         markEngaged = { engagement.events += "mark" },
         refreshCatalogue = { engagement.events += "refresh" },
+        readAloud = readAloud,
     )
 
     @Test
@@ -1415,5 +1432,136 @@ class RecitationControllerTest {
 
         assertEquals(1, harness.player.loads.size)
         assertEquals(1, harness.player.stops)
+    }
+
+    // ── Read-aloud (read-aloud spec §4, §5.4, §6) ───────────────────────────────────────
+
+    private class FakeReadAloud(
+        val translation: MutableStateFlow<String> = MutableStateFlow("en.sahih"),
+        val statuses: MutableMap<String, VoiceStatus> = mutableMapOf(
+            "en" to VoiceStatus.Ready(SpeechVoice("com.google.android.tts", "en-us-x-sfg-local")),
+        ),
+    ) : ReadAloudPort {
+        val asked = mutableListOf<String>()
+        val installs = mutableListOf<String>()
+        override fun translationId(languageTag: String): Flow<String> = translation
+        override suspend fun status(language: String): VoiceStatus {
+            asked += language
+            return statuses[language] ?: VoiceStatus.Unsupported
+        }
+        override fun installVoice(engine: String) {
+            installs += engine
+        }
+    }
+
+    private val readingQuran = FakeQuranSource(
+        translationsList = listOf(
+            TranslationInfo("en.sahih", "en", "Saheeh International", "Saheeh International", "licence", "url", TextKind.TRANSLATION),
+            TranslationInfo("ar.muyassar", "ar", "التفسير الميسر", "مجمع الملك فهد", "licence", "url", TextKind.TAFSIR),
+            TranslationInfo("ur.junagarhi", "ur", "ترجمہ محمد جوناگڑھی", "محمد جوناگڑھی", "licence", "url", TextKind.TRANSLATION),
+        ),
+        translationTextsById = mapOf(
+            "en.sahih" to mapOf(
+                1 to mapOf(
+                    1 to "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
+                    2 to "[All] praise is [due] to Allah, Lord of the worlds -",
+                ),
+            ),
+        ),
+    )
+
+    @Test
+    fun `read aloud off loads no speech`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        val c = controller(harness, backgroundScope, readAloud = FakeReadAloud(), quran = readingQuran)
+        c.setLanguageTag("en")
+        c.requestPlay(1, 1)
+        assertEquals(listOf<SpokenTranslation?>(null), harness.player.speeches)
+    }
+
+    @Test
+    fun `read aloud on with a ready voice loads the surah's prepared translation`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        harness.settings.stored.value = harness.settings.stored.value.copy(readAloud = true)
+        val c = controller(harness, backgroundScope, readAloud = FakeReadAloud(), quran = readingQuran)
+        c.setLanguageTag("en")
+        c.requestPlay(1, 1)
+        val speech = assertNotNull(harness.player.speeches.single())
+        assertEquals("en.sahih", speech.translationId)
+        assertEquals(TextKind.TRANSLATION, speech.kind)
+        assertEquals("All praise is due to Allah, Lord of the worlds", speech.texts[2])
+        assertEquals(SpeechVoice("com.google.android.tts", "en-us-x-sfg-local"), speech.voice)
+    }
+
+    @Test
+    fun `the switch shows only where the phone can read the language`() = runTest(UnconfinedTestDispatcher()) {
+        val readAloud = FakeReadAloud()
+        val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
+        assertNull(c.state.value.readAloud)
+        c.setLanguageTag("en")
+        c.refreshVoices()
+        val shown = assertNotNull(c.state.value.readAloud)
+        assertFalse(shown.enabled)
+        assertEquals("Saheeh International", shown.translationName)
+        assertEquals("en", shown.language)
+        readAloud.translation.value = "ur.junagarhi"
+        c.refreshVoices()
+        assertNull(c.state.value.readAloud)
+    }
+
+    @Test
+    fun `translation off hides the switch`() = runTest(UnconfinedTestDispatcher()) {
+        val readAloud = FakeReadAloud()
+        val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        c.refreshVoices()
+        assertNotNull(c.state.value.readAloud)
+        readAloud.translation.value = world.taqwa.app.quran.ReadingSettings.NO_TRANSLATION
+        assertNull(c.state.value.readAloud)
+    }
+
+    @Test
+    fun `a missing voice shows the switch with its installer and loads nothing`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        harness.settings.stored.value = harness.settings.stored.value.copy(readAloud = true)
+        val readAloud = FakeReadAloud(statuses = mutableMapOf("en" to VoiceStatus.Missing("com.google.android.tts")))
+        val c = controller(harness, backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        c.refreshVoices()
+        assertEquals("com.google.android.tts", c.state.value.readAloud?.missingEngine)
+        c.getVoice()
+        assertEquals(listOf("com.google.android.tts"), readAloud.installs)
+        c.requestPlay(1, 1)
+        assertEquals(listOf<SpokenTranslation?>(null), harness.player.speeches)
+    }
+
+    @Test
+    fun `turning read aloud on while a surah plays rebuilds it with speech and off again without`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        val c = controller(harness, backgroundScope, readAloud = FakeReadAloud(), quran = readingQuran)
+        c.setLanguageTag("en")
+        c.requestPlay(1, 1)
+        c.setReadAloud(true)
+        assertEquals("en.sahih", harness.player.speechUpdates.single()?.translationId)
+        c.setReadAloud(false)
+        assertEquals(2, harness.player.speechUpdates.size)
+        assertNull(harness.player.speechUpdates.last())
+    }
+
+    @Test
+    fun `the bar says the translation is being read while the voice speaks`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        harness.settings.stored.value = harness.settings.stored.value.copy(readAloud = true)
+        val c = controller(harness, backgroundScope, readAloud = FakeReadAloud(), quran = readingQuran)
+        c.setLanguageTag("en")
+        c.requestPlay(1, 1)
+        assertNull(c.state.value.bar?.readingAloud)
+        harness.player.emit(harness.player.state.value.copy(speaking = true))
+        assertEquals(TextKind.TRANSLATION, c.state.value.bar?.readingAloud)
     }
 }

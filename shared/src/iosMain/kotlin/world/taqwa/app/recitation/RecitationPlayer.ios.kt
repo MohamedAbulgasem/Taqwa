@@ -170,7 +170,7 @@ actual class RecitationPlayer actual constructor(
     /** The app icon, made into artwork once: `UIImage` decoding is not free and it never changes. */
     private var cachedArtwork: MPMediaItemArtwork? = null
 
-    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) {
+    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) {
         // First of all, before the split: a load is the answer the hold was waiting for, and the
         // hold must not lapse into a stop while Al-Baqarah is still being written out.
         leaveHold()
@@ -205,6 +205,8 @@ actual class RecitationPlayer actual constructor(
             endTransition()
         }
     }
+
+    actual fun setSpeech(speech: SpokenTranslation?) = Unit
 
     actual fun play() {
         val built = queue ?: return

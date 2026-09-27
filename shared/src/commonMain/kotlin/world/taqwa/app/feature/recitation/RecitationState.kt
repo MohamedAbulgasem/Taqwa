@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.recitation
 
+import world.taqwa.app.quran.TextKind
 import world.taqwa.app.recitation.DownloadFailure
 import world.taqwa.app.recitation.DownloadKey
 import world.taqwa.app.recitation.DownloadState
@@ -52,6 +53,8 @@ data class BarState(
      * done something while the current surah plays on.
      */
     val incoming: IncomingDownload? = null,
+    /** Set while the phone's voice reads this ayah's translation (read-aloud spec §6): the bar's caption says so. */
+    val readingAloud: TextKind? = null,
 )
 
 /**
@@ -129,6 +132,8 @@ data class RecitationState(
     val autoDownload: Boolean = false,
     /** The whole-Quran offer for the current reciter, or null when there is nothing to offer. */
     val wholeQuran: WholeQuran? = null,
+    /** Read-aloud's switch, or null where it must not show (read-aloud spec §4, §6). */
+    val readAloud: ReadAloudState? = null,
 ) {
     /** The header button's state for [surah], under the current reciter. */
     fun header(surah: Int): HeaderState = headerStateOf(surah, reciter?.id, downloads, bar)
@@ -140,6 +145,19 @@ data class RecitationState(
     val reciterDownloads: List<Reciter>
         get() = reciters.filter { downloadedByReciter[it.id].orEmpty().isNotEmpty() }
 }
+
+/**
+ * Read-aloud's switch as the reading sheet and Settings › Recitation draw it (read-aloud spec §6).
+ * [missingEngine] is Android's engine whose free voice is a download away; null when the voice is
+ * on the phone.
+ */
+data class ReadAloudState(
+    val enabled: Boolean,
+    val translationName: String,
+    val language: String,
+    val kind: TextKind,
+    val missingEngine: String? = null,
+)
 
 /**
  * What recitation occupies on the phone, counted off the disk rather than off the registry

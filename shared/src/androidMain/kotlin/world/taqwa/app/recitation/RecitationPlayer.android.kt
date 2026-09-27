@@ -132,7 +132,7 @@ actual class RecitationPlayer actual constructor(
     /** The controller, but only while it is any use. */
     private val live: MediaController? get() = controller?.takeIf { it.isConnected }
 
-    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) {
+    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) {
         // First of all, before the container is even read: a load is the answer the hold was
         // waiting for, and the hold must not lapse into a stop while the answer is under way.
         leaveHold()
@@ -169,6 +169,8 @@ actual class RecitationPlayer actual constructor(
         bound.play()
         publish()
     }
+
+    actual fun setSpeech(speech: SpokenTranslation?) = Unit
 
     actual fun play() {
         val bound = live ?: return

@@ -29,6 +29,8 @@ data class PlaybackState(
     val buffering: Boolean = false,
     val surahPositionMs: Long = 0L,
     val surahDurationMs: Long = 0L,
+    /** True while the phone's voice reads the translation of [ayah] (read-aloud spec §2). */
+    val speaking: Boolean = false,
 ) {
     /** The ayah playing, if one is. */
     val current: AyahRef? get() = if (surah != null && ayah != null) AyahRef(surah, ayah) else null
@@ -97,13 +99,21 @@ expect class RecitationPlayer(library: RecitationLibrary) {
 
     /**
      * Builds the queue for [surah] from the reciter's downloaded `.taqa` — one item per ayah,
-     * [Reciter.gapMs] of silence between them — and starts playing at [startAyah].
+     * [Reciter.gapMs] of silence between them and, when [speech] is given, a breath and the
+     * translation after every ayah it has text for — and starts playing at [startAyah].
      *
      * Does nothing if the surah is not on disk or its container cannot be read; the caller offers
      * the download, and a player that threw would make every call site handle a case the UI has
      * already handled.
      */
-    suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText)
+    suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation? = null)
+
+    /**
+     * Read-aloud turned on or off, or another translation chosen, while a surah is loaded
+     * (read-aloud spec §2): the queue is rebuilt around the ayah being heard — inside an ayah it
+     * carries on where it is; in a translation or a silence it moves to the next ayah.
+     */
+    fun setSpeech(speech: SpokenTranslation?)
 
     fun play()
 
