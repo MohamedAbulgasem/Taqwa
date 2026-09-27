@@ -114,6 +114,9 @@ fun ReaderScreen(
     // Aa button is this screen's own affordance, and the Mushaf screen (task 8) will host its own
     // instance of [ReadingSheet] the same way, since only each screen knows its own [mushafMode].
     var showSheet by remember { mutableStateOf(false) }
+    // The sheet opening is read-aloud's own cue to ask the phone about its voices again (spec §6):
+    // the reader may have just come back from installing one.
+    LaunchedEffect(showSheet) { if (showSheet) recitation.onSheetOpened() }
     // The clipboard and the share sheet are the screen's own business (spec 2b §2.3): the view
     // model only produces the text.
     // LocalClipboardManager is deprecated in Compose MP 1.12 in favour of LocalClipboard, but its
@@ -295,6 +298,7 @@ fun ReaderScreen(
                             sizeSp = ready.settings.arabicSizeSp,
                             selected = selectedAyah == ayah.number,
                             playing = playingAyah == ayah.number,
+                            speaking = playingAyah == ayah.number && recitation.speaking,
                             bookmarked = ayah.number in ready.bookmarked,
                             // Built only for the selected card: every other card would otherwise pay
                             // for a row it never draws.
@@ -382,6 +386,9 @@ fun ReaderScreen(
                         }
                     },
                     onDismiss = { showSheet = false },
+                    readAloud = recitation.readAloud,
+                    onReadAloud = recitation.onReadAloud,
+                    onGetVoice = recitation.onGetVoice,
                 )
             }
         }

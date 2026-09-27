@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.quran
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +30,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -43,6 +45,7 @@ import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.design.components.TaqwaSegmented
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
+import world.taqwa.app.feature.recitation.ReadAloudState
 import world.taqwa.app.feature.settings.TaqwaToggle
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.quran.QuranText
@@ -54,12 +57,15 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_mode_mushaf
 import world.taqwa.app.resources.quran_mode_translation
 import world.taqwa.app.resources.quran_sheet_mode
+import world.taqwa.app.resources.quran_sheet_read_aloud
+import world.taqwa.app.resources.quran_sheet_read_aloud_missing
 import world.taqwa.app.resources.quran_sheet_size
 import world.taqwa.app.resources.quran_sheet_translation
 import world.taqwa.app.resources.quran_translation_off_detail
 import world.taqwa.app.resources.quran_translation_off
 import world.taqwa.app.resources.quran_sheet_transliteration
 import world.taqwa.app.resources.quran_size_mushaf_note
+import world.taqwa.app.resources.recitation_read_aloud_get_voice
 import kotlin.math.roundToInt
 
 /** Falls back to the bundled default's own name (spec §2.5) — matches [ReadingSettings]'s own
@@ -114,6 +120,9 @@ fun ReadingSheet(
     mushafMode: Boolean,
     onChange: (ReadingSettings) -> Unit,
     onDismiss: () -> Unit,
+    readAloud: ReadAloudState? = null,
+    onReadAloud: (Boolean) -> Unit = {},
+    onGetVoice: () -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
@@ -283,6 +292,37 @@ fun ReadingSheet(
                             },
                         )
                     }
+                }
+            }
+        }
+
+        // Read-aloud (spec §6), under the translation it reads. Hidden with Translation off or
+        // where the phone has no voice for the language: the controller hands in null then.
+        if (readAloud != null) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                TaqwaRow(
+                    label = stringResource(Res.string.quran_sheet_read_aloud),
+                    trailing = { TaqwaToggle(checked = readAloud.enabled, onCheckedChange = onReadAloud) },
+                )
+                val missing = readAloud.missingEngine
+                if (missing != null) {
+                    Text(
+                        stringResource(Res.string.quran_sheet_read_aloud_missing, format.languageName(readAloud.language)),
+                        style = TaqwaText.caption,
+                        color = colors.textSecondary,
+                    )
+                    Text(
+                        stringResource(Res.string.recitation_read_aloud_get_voice),
+                        style = TaqwaText.rowLabel.copy(fontWeight = FontWeight.SemiBold),
+                        color = colors.accent,
+                        modifier = Modifier
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onGetVoice,
+                            )
+                            .padding(vertical = 6.dp),
+                    )
                 }
             }
         }

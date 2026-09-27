@@ -298,6 +298,8 @@
     <string name="quran_sheet_translation">Meal</string>
     <string name="quran_translation_off">Kapalı</string>
     <string name="quran_translation_off_detail">Yalnızca Arapça, her kartta bir ayet</string>
+    <string name="quran_sheet_read_aloud">Her ayetten sonra sesli oku</string>
+    <string name="quran_sheet_read_aloud_missing">Telefonunuzun ücretsiz %1$s sesi gerekir.</string>
     <string name="quran_sheet_mode">Okuma modu</string>
     <string name="quran_mode_translation">Meal</string>
     <string name="quran_mode_mushaf">Mushaf sayfası</string>
@@ -315,6 +317,7 @@
     <string name="quran_action_copy">Kopyala</string>
     <string name="quran_action_copied">Kopyalandı</string>
     <string name="quran_action_share">Paylaş</string>
+    <string name="quran_a11y_read_aloud">Sesli okunuyor</string>
     <!-- Tesbih -->
     <string name="tasbeeh_title">Tesbih</string>
     <string name="today_open_tasbeeh">Tesbih</string>
@@ -385,11 +388,19 @@
     <string name="recitation_a11y_change_reciter">Kariyi değiştir</string>
     <string name="recitation_a11y_go_to_playing">Okunan ayete git</string>
     <string name="recitation_a11y_preview">Bu kariyi dinle</string>
+    <string name="recitation_bar_translation">Meal</string>
+    <string name="recitation_bar_tafsir">Tefsir</string>
     <!-- Ayarlar › Kur’an › Tilavet ve İndirilenler ekranı (dilim 3a §5.6) -->
     <string name="settings_group_quran">KUR’AN</string>
     <string name="settings_recitation">Tilavet</string>
     <string name="recitation_settings_mobile_data">Mobil veriyle indir</string>
     <string name="recitation_settings_auto_download">Sormadan indir</string>
+    <string name="recitation_read_aloud_heading">Her ayetten sonra</string>
+    <string name="recitation_read_aloud_translation">Meali sesli oku</string>
+    <string name="recitation_read_aloud_tafsir">Tefsiri sesli oku</string>
+    <string name="recitation_read_aloud_detail">%1$s, %2$s. Bu telefondaki bir ses okur; internet gerekmez.</string>
+    <string name="recitation_read_aloud_missing">Telefonunuzun ücretsiz %1$s sesine ihtiyacı var; küçük, tek seferlik bir indirme.</string>
+    <string name="recitation_read_aloud_get_voice">Sesi indir</string>
     <string name="recitation_settings_downloads">İNDİRİLENLER · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s sure · %2$s</string>
     <string name="recitation_settings_surahs">%1$s sure · %2$s</string>

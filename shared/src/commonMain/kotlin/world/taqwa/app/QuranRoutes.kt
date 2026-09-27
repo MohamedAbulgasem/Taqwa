@@ -111,6 +111,10 @@ internal fun ReaderRoute(
     jumpTokenState: State<Int>,
     recitation: RecitationController,
 ) {
+    // The reader opened is read-aloud's own cue to ask the phone about its voices (spec §6): the
+    // reading translation may have changed, or a voice may have finished installing, since the
+    // reader was last on screen.
+    LaunchedEffect(Unit) { recitation.refreshVoices() }
     val recitationState by recitationStateState
     val jumpToken by jumpTokenState
     val viewModel = remember(screen) {
@@ -160,6 +164,11 @@ internal fun ReaderRoute(
             onHeader = recitation::onHeaderTap,
             onPlayAyah = recitation::requestPlay,
             onToggle = recitation::toggle,
+            readAloud = recitationState.readAloud,
+            speaking = bar?.readingAloud != null,
+            onReadAloud = recitation::setReadAloud,
+            onGetVoice = recitation::getVoice,
+            onSheetOpened = recitation::refreshVoices,
         ),
     )
 }
@@ -179,6 +188,8 @@ internal fun MushafRoute(
     jumpTokenState: State<Int>,
     recitation: RecitationController,
 ) {
+    // As in the reader's own route: ask the phone about its voices as soon as this screen opens.
+    LaunchedEffect(Unit) { recitation.refreshVoices() }
     val recitationState by recitationStateState
     val jumpToken by jumpTokenState
     val viewModel = remember(screen) {
@@ -239,6 +250,11 @@ internal fun MushafRoute(
             onHeader = recitation::onHeaderTap,
             onPlayAyah = recitation::requestPlay,
             onToggle = recitation::toggle,
+            readAloud = recitationState.readAloud,
+            speaking = bar?.readingAloud != null,
+            onReadAloud = recitation::setReadAloud,
+            onGetVoice = recitation::getVoice,
+            onSheetOpened = recitation::refreshVoices,
         ),
         pageOfAyah = { surah, ayah -> container.quranRepository.pageOf(surah, ayah) },
     )

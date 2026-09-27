@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,11 +46,13 @@ import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.drawBookmark
+import world.taqwa.app.design.components.drawReadAloudMark
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.RTL_TRANSLATION_LANGUAGES
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.quran_a11y_read_aloud
 import world.taqwa.app.resources.quran_action_bookmarked
 
 /**
@@ -86,6 +89,8 @@ fun AyahCard(
      * the voice lights one ayah and the finger selects another, and the action row belongs to
      * the finger. */
     playing: Boolean = false,
+    /** True while the phone's voice reads this card's translation (read-aloud spec §6). */
+    speaking: Boolean = false,
     bookmarked: Boolean,
     actions: (@Composable () -> Unit)?,
     onClick: () -> Unit,
@@ -159,14 +164,25 @@ fun AyahCard(
                     val translationDirection =
                         if (translationLanguage in RTL_TRANSLATION_LANGUAGES) LayoutDirection.Rtl else LayoutDirection.Ltr
                     CompositionLocalProvider(LocalLayoutDirection provides translationDirection) {
-                        Text(
-                            translation,
-                            style = TaqwaText.caption,
-                            color = colors.textSecondary,
-                            lineHeight = 21.sp,
-                            textAlign = TextAlign.Start,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                            if (speaking) {
+                                val readingLabel = stringResource(Res.string.quran_a11y_read_aloud)
+                                Canvas(
+                                    Modifier
+                                        .padding(top = 3.dp, end = 6.dp)
+                                        .size(14.dp)
+                                        .semantics { contentDescription = readingLabel },
+                                ) { drawReadAloudMark(colors.accent) }
+                            }
+                            Text(
+                                translation,
+                                style = TaqwaText.caption,
+                                color = colors.textSecondary,
+                                lineHeight = 21.sp,
+                                textAlign = TextAlign.Start,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
                     }
                 }
                 AnimatedVisibility(

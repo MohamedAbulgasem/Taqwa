@@ -285,6 +285,8 @@
     <string name="quran_sheet_translation">অনুবাদ</string>
     <string name="quran_translation_off">বন্ধ</string>
     <string name="quran_translation_off_detail">শুধু আরবি, প্রতি কার্ডে একটি আয়াত</string>
+    <string name="quran_sheet_read_aloud">প্রতিটি আয়াতের পরে পড়ে শোনান</string>
+    <string name="quran_sheet_read_aloud_missing">আপনার ফোনে বিনামূল্যের %1$s কণ্ঠ দরকার।</string>
     <string name="quran_sheet_mode">পড়ার ধরন</string>
     <string name="quran_mode_translation">অনুবাদ</string>
     <string name="quran_mode_mushaf">মুসহাফ</string>
@@ -302,6 +304,7 @@
     <string name="quran_action_copy">কপি</string>
     <string name="quran_action_copied">কপি হয়েছে</string>
     <string name="quran_action_share">শেয়ার</string>
+    <string name="quran_a11y_read_aloud">পড়ে শোনানো হচ্ছে</string>
     <!-- Tasbeeh -->
     <string name="tasbeeh_title">তাসবিহ</string>
     <string name="today_open_tasbeeh">তাসবিহ</string>
@@ -371,11 +374,19 @@
     <string name="recitation_a11y_change_reciter">কারি বদলান</string>
     <string name="recitation_a11y_go_to_playing">যে আয়াত তিলাওয়াত হচ্ছে সেখানে যান</string>
     <string name="recitation_a11y_preview">এই কারির তিলাওয়াত শুনুন</string>
+    <string name="recitation_bar_translation">অনুবাদ</string>
+    <string name="recitation_bar_tafsir">তাফসির</string>
     <!-- Settings > Quran > Recitation, and its Downloads screen -->
     <string name="settings_group_quran">কুরআন</string>
     <string name="settings_recitation">তিলাওয়াত</string>
     <string name="recitation_settings_mobile_data">মোবাইল ডেটায় ডাউনলোড</string>
     <string name="recitation_settings_auto_download">জিজ্ঞাসা ছাড়াই ডাউনলোড</string>
+    <string name="recitation_read_aloud_heading">প্রতিটি আয়াতের পরে</string>
+    <string name="recitation_read_aloud_translation">অনুবাদ পড়ে শোনান</string>
+    <string name="recitation_read_aloud_tafsir">তাফসির পড়ে শোনান</string>
+    <string name="recitation_read_aloud_detail">%1$s, %2$s ভাষায়। এই ফোনের একটি কণ্ঠ পড়ে শোনায়, তাই ইন্টারনেট ছাড়াই চলে।</string>
+    <string name="recitation_read_aloud_missing">আপনার ফোনে বিনামূল্যের %1$s কণ্ঠ দরকার, একবারের ছোট একটি ডাউনলোড।</string>
+    <string name="recitation_read_aloud_get_voice">কণ্ঠ নামান</string>
     <string name="recitation_settings_downloads">ডাউনলোড · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$sটি সূরা · %2$s</string>
     <string name="recitation_settings_surahs">%1$sটি সূরা · %2$s</string>

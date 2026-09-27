@@ -82,6 +82,8 @@ internal fun ForegroundEffect(
     LaunchedEffect(appLifecycle) {
         appLifecycle.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             refreshPermissions()
+            // Back from the phone's voice installer, perhaps (read-aloud spec §6): ask again.
+            recitation.onForeground()
             if (foregroundReturnsToRecitation && recitation.state.value.bar?.playing == true) openPlaying()
         }
     }

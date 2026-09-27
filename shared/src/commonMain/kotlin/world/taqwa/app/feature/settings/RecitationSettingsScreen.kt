@@ -43,10 +43,17 @@ import world.taqwa.app.feature.recitation.dataSize
 import world.taqwa.app.feature.recitation.downloadFailureSentence
 import world.taqwa.app.feature.recitation.reciterName
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.quran.TextKind
 import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.recitation_cancel
 import world.taqwa.app.resources.recitation_reciter
+import world.taqwa.app.resources.recitation_read_aloud_detail
+import world.taqwa.app.resources.recitation_read_aloud_get_voice
+import world.taqwa.app.resources.recitation_read_aloud_heading
+import world.taqwa.app.resources.recitation_read_aloud_missing
+import world.taqwa.app.resources.recitation_read_aloud_tafsir
+import world.taqwa.app.resources.recitation_read_aloud_translation
 import world.taqwa.app.resources.recitation_settings_auto_download
 import world.taqwa.app.resources.recitation_settings_batch
 import world.taqwa.app.resources.recitation_settings_credit
@@ -79,6 +86,8 @@ fun RecitationSettingsScreen(
     onOpenDownloads: (String) -> Unit,
     onDownloadWholeQuran: () -> Unit,
     onCancelWholeQuran: () -> Unit,
+    onSetReadAloud: (Boolean) -> Unit = {},
+    onGetVoice: () -> Unit = {},
 ) {
     LaunchedEffect(Unit) { onOpened() }
     SettingsScaffold(stringResource(Res.string.settings_recitation), onBack) {
@@ -105,6 +114,40 @@ fun RecitationSettingsScreen(
                 ripple = false,
                 trailing = { TaqwaToggle(state.autoDownload, onSetAutoDownload) },
             )
+        }
+
+        // Read-aloud (spec §6): its own card, shown only where the phone can read the language.
+        val readAloud = state.readAloud
+        if (readAloud != null) {
+            val format = LocalPlatformFormat.current
+            Spacer(Modifier.height(28.dp))
+            SectionLabel(stringResource(Res.string.recitation_read_aloud_heading))
+            SettingsCard {
+                TaqwaRow(
+                    stringResource(
+                        if (readAloud.kind == TextKind.TAFSIR) Res.string.recitation_read_aloud_tafsir
+                        else Res.string.recitation_read_aloud_translation,
+                    ),
+                    onClick = { onSetReadAloud(!readAloud.enabled) },
+                    ripple = false,
+                    trailing = { TaqwaToggle(readAloud.enabled, onSetReadAloud) },
+                )
+                val language = format.languageName(readAloud.language)
+                Text(
+                    if (readAloud.missingEngine != null) {
+                        stringResource(Res.string.recitation_read_aloud_missing, language)
+                    } else {
+                        stringResource(Res.string.recitation_read_aloud_detail, readAloud.translationName, language)
+                    },
+                    style = TaqwaText.caption,
+                    color = LocalTaqwaColors.current.textSecondary,
+                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 14.dp),
+                )
+                if (readAloud.missingEngine != null) {
+                    CardDivider()
+                    QuietRow(stringResource(Res.string.recitation_read_aloud_get_voice), LocalTaqwaColors.current.accent, onGetVoice)
+                }
+            }
         }
 
         val withDownloads = state.reciterDownloads

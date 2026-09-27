@@ -283,3 +283,34 @@ internal fun DrawScope.drawExternalLink(tint: Color, pointsForward: Boolean) {
     val head = Path().apply { moveTo(x(9.6f), 2.8f * u); lineTo(x(13.2f), 2.8f * u); lineTo(x(13.2f), 6.4f * u) }
     drawPath(head, tint, style = glyphStroke())
 }
+
+/**
+ * A small loudspeaker with one wave: read-aloud's "being read" mark (read-aloud spec §6), on the
+ * ayah card beside the translation the voice is reading.
+ *
+ * Named apart from [drawSpeaker] rather than overloading it: that glyph already has a single-`Color`
+ * call shape once its own `pointsForward` default is counted, and a second declaration matching it
+ * would leave every one-argument call in the file ambiguous between the two.
+ */
+internal fun DrawScope.drawReadAloudMark(tint: Color) {
+    val u = size.width / 16f
+    val body = Path().apply {
+        moveTo(2.5f * u, 6.2f * u)
+        lineTo(5.2f * u, 6.2f * u)
+        lineTo(8.6f * u, 3.4f * u)
+        lineTo(8.6f * u, 12.6f * u)
+        lineTo(5.2f * u, 9.8f * u)
+        lineTo(2.5f * u, 9.8f * u)
+        close()
+    }
+    drawPath(body, tint, style = Fill)
+    drawArc(
+        color = tint,
+        startAngle = -50f,
+        sweepAngle = 100f,
+        useCenter = false,
+        topLeft = Offset(7.2f * u, 4.6f * u),
+        size = Size(6.8f * u, 6.8f * u),
+        style = Stroke(width = size.width * 0.1f, cap = StrokeCap.Round),
+    )
+}

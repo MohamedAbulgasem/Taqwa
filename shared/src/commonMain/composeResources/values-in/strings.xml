@@ -280,6 +280,8 @@
     <string name="quran_sheet_translation">Terjemahan</string>
     <string name="quran_translation_off">Tanpa terjemahan</string>
     <string name="quran_translation_off_detail">Teks Arab saja, satu ayat per kartu</string>
+    <string name="quran_sheet_read_aloud">Bacakan setelah setiap ayat</string>
+    <string name="quran_sheet_read_aloud_missing">Memerlukan suara %1$s gratis di ponsel Anda.</string>
     <string name="quran_sheet_mode">Mode baca</string>
     <string name="quran_mode_translation">Terjemahan</string>
     <string name="quran_mode_mushaf">Mushaf</string>
@@ -297,6 +299,7 @@
     <string name="quran_action_copy">Salin</string>
     <string name="quran_action_copied">Tersalin</string>
     <string name="quran_action_share">Bagikan</string>
+    <string name="quran_a11y_read_aloud">Sedang dibacakan</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbih</string>
     <string name="today_open_tasbeeh">Tasbih</string>
@@ -365,11 +368,19 @@
     <string name="recitation_a11y_change_reciter">Ganti qari</string>
     <string name="recitation_a11y_go_to_playing">Ke ayat yang sedang dibaca</string>
     <string name="recitation_a11y_preview">Dengarkan qari ini</string>
+    <string name="recitation_bar_translation">Terjemahan</string>
+    <string name="recitation_bar_tafsir">Tafsir</string>
     <!-- Settings > Quran > Recitation -->
     <string name="settings_group_quran">AL-QUR’AN</string>
     <string name="settings_recitation">Tilawah</string>
     <string name="recitation_settings_mobile_data">Unduh lewat data seluler</string>
     <string name="recitation_settings_auto_download">Unduh tanpa bertanya</string>
+    <string name="recitation_read_aloud_heading">Setelah setiap ayat</string>
+    <string name="recitation_read_aloud_translation">Bacakan terjemahan</string>
+    <string name="recitation_read_aloud_tafsir">Bacakan tafsir</string>
+    <string name="recitation_read_aloud_detail">%1$s, dalam bahasa %2$s. Dibacakan oleh suara di ponsel ini, jadi tetap berfungsi tanpa internet.</string>
+    <string name="recitation_read_aloud_missing">Ponsel Anda memerlukan suara %1$s gratis, unduhan kecil sekali saja.</string>
+    <string name="recitation_read_aloud_get_voice">Unduh suara</string>
     <string name="recitation_settings_downloads">UNDUHAN · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s surah · %2$s</string>
     <string name="recitation_settings_surahs">%1$s surah · %2$s</string>

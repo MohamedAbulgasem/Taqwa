@@ -93,6 +93,9 @@ fun MushafScreen(
     val format = LocalPlatformFormat.current
     val ready = state as? MushafUiState.Ready
     var showSheet by remember { mutableStateOf(false) }
+    // The sheet opening is read-aloud's own cue to ask the phone about its voices again (spec §6):
+    // the reader may have just come back from installing one.
+    LaunchedEffect(showSheet) { if (showSheet) recitation.onSheetOpened() }
     // The tapped ayah (spec §2.4), hoisted here rather than per page so it survives a page turn
     // and so tapping the same ayah again clears it. The pill's three actions (spec 2b §2.5) act on
     // this ayah, which is why they are resolved here and not inside a page.
@@ -324,6 +327,9 @@ fun MushafScreen(
                         }
                     },
                     onDismiss = { showSheet = false },
+                    readAloud = recitation.readAloud,
+                    onReadAloud = recitation.onReadAloud,
+                    onGetVoice = recitation.onGetVoice,
                 )
             }
         }

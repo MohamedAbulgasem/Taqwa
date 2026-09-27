@@ -77,6 +77,7 @@ import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.quran.TextKind
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_ayah_n
 import world.taqwa.app.resources.recitation_a11y_change_reciter
@@ -89,6 +90,8 @@ import world.taqwa.app.resources.recitation_a11y_previous
 import world.taqwa.app.resources.recitation_a11y_previous_ayah
 import world.taqwa.app.resources.recitation_arriving_next
 import world.taqwa.app.resources.recitation_arriving_voice
+import world.taqwa.app.resources.recitation_bar_tafsir
+import world.taqwa.app.resources.recitation_bar_translation
 import world.taqwa.app.resources.recitation_percent
 import world.taqwa.app.resources.recitation_back_to_ayah
 import world.taqwa.app.resources.recitation_play
@@ -336,8 +339,20 @@ fun PlayerBar(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
+                    val ayahCaption = stringResource(Res.string.quran_ayah_n, format.localizedDigits(bar.ayah))
+                    val reading = bar.readingAloud?.let { kind ->
+                        stringResource(if (kind == TextKind.TAFSIR) Res.string.recitation_bar_tafsir else Res.string.recitation_bar_translation)
+                    }
                     Text(
-                        stringResource(Res.string.quran_ayah_n, format.localizedDigits(bar.ayah)),
+                        // "Ayah 2 · Translation" while the voice reads (read-aloud spec §6): the
+                        // word in the accent, so the change reads at a glance.
+                        buildAnnotatedString {
+                            append(ayahCaption)
+                            if (reading != null) {
+                                append(" · ")
+                                withStyle(SpanStyle(color = colors.accent)) { append(reading) }
+                            }
+                        },
                         style = TaqwaText.caption.copy(fontSize = 12.sp),
                         // The one place buffering shows: the ayah caption goes quiet while the
                         // container is being opened, rather than a spinner appearing and leaving.
