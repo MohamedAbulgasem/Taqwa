@@ -169,7 +169,7 @@ The composition hands the controller the UI language tag, as it already does wit
   - Caption: "Saheeh International, in English. A voice on this phone reads it, so it works offline."
   - When Missing, the caption is "Your phone needs its free French voice, a small one-time download." with a quiet accent row, **Get the voice**, like "Download the whole Quran".
 - **Reading sheet:** under the Translation row, "Read it aloud after each ayah" with a switch. When Missing, a one-line caption and the same **Get the voice**. Hidden when Translation is Off or the language is Unsupported.
-- **Player bar:** while the voice reads, the caption under the surah name is "Ayah 2 · Translation" (or "· Tafsir"). The line keeps moving on the clock.
+- **Player bar:** while the voice reads, the caption under the surah name is "Ayah 2 · Translation" (or "· Tafsir"), in the widest form that fits on its one line: "Ayah 56 · Translation", then "56 · Translation", then "Translation" alone. The line keeps moving on the clock.
 - **Reader card:** while its translation is being read, a small accent speaker glyph sits before the translation text, with content description "Being read aloud". The playing tint already marks the ayah.
 - The lock screen and notification are unchanged.
 

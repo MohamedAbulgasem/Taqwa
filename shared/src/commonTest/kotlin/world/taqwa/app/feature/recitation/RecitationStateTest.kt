@@ -8,7 +8,7 @@ import world.taqwa.app.recitation.Reciter
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** The three pure decisions the recitation surface is built on. */
+/** The pure decisions the recitation surface is built on. */
 class RecitationStateTest {
 
     private val reciter = Reciter(
@@ -159,5 +159,33 @@ class RecitationStateTest {
         following.moved()
         following.rearm()
         assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
+    @Test
+    fun `the bar tries its caption from the most said to the least`() {
+        val tried = mutableListOf<String>()
+        val caption = barCaption("Ayah 56", "56", "Translation") { tried += it; false }
+        assertEquals(listOf("Ayah 56 · Translation", "56 · Translation", "Translation"), tried)
+        // Nothing fits at all: the word is still the one thing it says.
+        assertEquals(BarCaption(null, "Translation"), caption)
+    }
+
+    @Test
+    fun `the bar says the whole caption while the voice reads when it fits`() {
+        assertEquals(BarCaption("Ayah 56", "Translation"), barCaption("Ayah 56", "56", "Translation") { true })
+    }
+
+    @Test
+    fun `a caption too wide for the bar drops the word ayah before the reading word`() {
+        // "Ayah 56 · Translation" is 21 characters and "56 · Translation" is 16.
+        assertEquals(
+            BarCaption("56", "Translation"),
+            barCaption("Ayah 56", "56", "Translation") { it.length <= 16 },
+        )
+    }
+
+    @Test
+    fun `between readings the bar names the ayah however narrow it is`() {
+        assertEquals(BarCaption("Ayah 56", null), barCaption("Ayah 56", "56", null) { false })
     }
 }

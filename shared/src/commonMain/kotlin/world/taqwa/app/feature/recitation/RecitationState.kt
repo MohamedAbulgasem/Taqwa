@@ -63,6 +63,38 @@ data class BarState(
  */
 data class IncomingDownload(val surah: Int, val reciter: Reciter, val fraction: Float)
 
+/**
+ * The line under the surah name on the bar: [place], the ayah ("Ayah 56", or the bare "56"),
+ * and while the voice reads, [reading] after a dot ("Translation"). One of the two is always there.
+ */
+data class BarCaption(val place: String?, val reading: String?) {
+    val text: String get() = listOfNotNull(place, reading).joinToString(DOT)
+
+    companion object {
+        /** Between the ayah and the word: as the bar draws it, and as it is measured. */
+        const val DOT = " · "
+    }
+}
+
+/**
+ * What the bar's caption says: the widest form of it that [fits] on its one line.
+ *
+ * The caption gets what the bar has left once the monogram and the four 48 dp buttons are paid
+ * for: 108 dp on the S23, 84 on a 360 dp phone, where "Ayah 56 · Translation" wants about 120.
+ * Drawn as one line that wraps at spaces, it lost its last word to the second line `maxLines`
+ * hides, and the S23 showed "Ayah 56 ·": the one word that was news, gone. So the caption comes
+ * in three lengths and the bar draws the first that fits: all of it, then the number and the
+ * word, then the word alone. The word is given up last because it is what changed. The ayah was
+ * on the bar a moment ago, and it is lit on the page.
+ *
+ * Between readings the caption is [ayah] alone, which fits any phone.
+ */
+fun barCaption(ayah: String, number: String, reading: String?, fits: (String) -> Boolean): BarCaption {
+    if (reading == null) return BarCaption(ayah, null)
+    val forms = listOf(BarCaption(ayah, reading), BarCaption(number, reading), BarCaption(null, reading))
+    return forms.firstOrNull { fits(it.text) } ?: forms.last()
+}
+
 /** Which of the download sheet's three faces is showing (spec §5.4). */
 sealed interface SheetPhase {
     /** The primary button, priced. [needsWifiNote] carries the "Over Wi-Fi." line and its override. */

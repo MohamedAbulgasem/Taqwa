@@ -17,7 +17,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -33,6 +35,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,13 +61,17 @@ import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
@@ -124,6 +131,25 @@ private val ClockInset = 5.dp
 
 /** The transport row: monogram, surah, the four buttons. */
 private val TransportRow = 56.dp
+
+/**
+ * The surah name's line under an Arabic or Urdu UI, where it is set in the Hafs face. The face's
+ * own line box is 1.76 em, built for the stacked marks of Quran text, and a surah name carries
+ * none of them: its letters run from −0.44 em to +0.87 em (measured from the font for every name
+ * in quran.db). 1.5 em holds them with room, and leaves the ayah line under it more of the row.
+ *
+ * [LineHeightStyle.Mode.Tight], because it is the only mode that lets a line be *shorter* than
+ * the font's own box: the default puts the difference back as padding above and below, which on
+ * the S23 kept the name at 30 dp whatever line height it was given.
+ */
+private val SurahNameLine = TextStyle(
+    lineHeight = 1.5.em,
+    lineHeightStyle = LineHeightStyle(
+        LineHeightStyle.Alignment.Center,
+        LineHeightStyle.Trim.Both,
+        LineHeightStyle.Mode.Tight,
+    ),
+)
 
 /** How far the bar must be dragged down before it counts as a dismissal rather than a fumble. */
 private val DismissDrag = 36.dp
@@ -310,16 +336,21 @@ fun PlayerBar(
                     ReciterMonogram(bar.reciter, Monogram)
                     bar.incoming?.let { IncomingRing(it.fraction) }
                 }
+                // The whole height of the row, with the two lines centred in it. The 8 dp that used
+                // to sit above and below them left 40 dp, and under an Arabic or Urdu UI the name
+                // alone took 30 of those, so the ayah line was cut in half along the bottom.
                 Column(
                     Modifier
                         .weight(1f)
+                        .fillMaxHeight()
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = onOpenPlaying,
                         )
                         .semantics { contentDescription = goToPlayingLabel }
-                        .padding(start = 8.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+                        .padding(start = 8.dp, end = 6.dp),
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     if (arabic) {
                         Text(
@@ -329,6 +360,7 @@ fun PlayerBar(
                             color = colors.textPrimary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
+                            style = LocalTextStyle.current.merge(SurahNameLine),
                         )
                     } else {
                         Text(
@@ -339,32 +371,51 @@ fun PlayerBar(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-                    val ayahCaption = stringResource(Res.string.quran_ayah_n, format.localizedDigits(bar.ayah))
+                    val number = format.localizedDigits(bar.ayah)
+                    val ayahCaption = stringResource(Res.string.quran_ayah_n, number)
                     val reading = bar.readingAloud?.let { kind ->
                         stringResource(if (kind == TextKind.TAFSIR) Res.string.recitation_bar_tafsir else Res.string.recitation_bar_translation)
                     }
-                    Text(
-                        // "Ayah 2 · Translation" while the voice reads (read-aloud spec §6): the
-                        // word in the accent, so the change reads at a glance — except while
-                        // buffering, when the whole caption goes quiet together (see below) and
-                        // an accent word would be the one part of it still claiming to play.
-                        buildAnnotatedString {
-                            append(ayahCaption)
-                            if (reading != null) {
-                                append(" · ")
-                                if (bar.buffering) {
-                                    append(reading)
-                                } else {
-                                    withStyle(SpanStyle(color = colors.accent)) { append(reading) }
-                                }
+                    val captionStyle = TaqwaText.caption.copy(fontSize = 12.sp)
+                    // "Ayah 2 · Translation" while the voice reads (read-aloud spec §6), in the
+                    // widest form the line has room for ([barCaption]). Measured at the caption's
+                    // own type, because the words and their widths change with the language.
+                    BoxWithConstraints {
+                        val measurer = rememberTextMeasurer()
+                        val width = constraints.maxWidth
+                        val caption = remember(measurer, captionStyle, width, ayahCaption, number, reading) {
+                            barCaption(ayahCaption, number, reading) { text ->
+                                measurer.measure(text, captionStyle, maxLines = 1, softWrap = false).size.width <= width
                             }
-                        },
-                        style = TaqwaText.caption.copy(fontSize = 12.sp),
-                        // The one place buffering shows: the ayah caption goes quiet while the
-                        // container is being opened, rather than a spinner appearing and leaving.
-                        color = if (bar.buffering) colors.textTertiary else colors.textSecondary,
-                        maxLines = 1,
-                    )
+                        }
+                        Text(
+                            // The word in the accent, so the change reads at a glance — except
+                            // while buffering, when the whole caption goes quiet together (see
+                            // below) and an accent word would be the one part of it still
+                            // claiming to play.
+                            buildAnnotatedString {
+                                caption.place?.let(::append)
+                                caption.reading?.let { word ->
+                                    if (caption.place != null) append(BarCaption.DOT)
+                                    if (bar.buffering) {
+                                        append(word)
+                                    } else {
+                                        withStyle(SpanStyle(color = colors.accent)) { append(word) }
+                                    }
+                                }
+                            },
+                            style = captionStyle,
+                            // The one place buffering shows: the ayah caption goes quiet while the
+                            // container is being opened, rather than a spinner appearing and leaving.
+                            color = if (bar.buffering) colors.textTertiary else colors.textSecondary,
+                            maxLines = 1,
+                            // Never wrapped: a wrapped line puts its last word on the line
+                            // `maxLines` hides. If even the word alone is too wide, it is cut short
+                            // where it can be seen.
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
             TransportButton(
