@@ -25,6 +25,7 @@ import world.taqwa.app.notifications.setTahajjud
 import world.taqwa.app.recitation.NowPlayingText
 import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.recitation.Reciters
+import world.taqwa.app.recitation.buildSpokenTranslation
 
 /**
  * Debug-only remote control for the recitation player, so slice 3a task 3 can be verified on a
@@ -37,10 +38,12 @@ import world.taqwa.app.recitation.Reciters
  *   --es cmd load --ei surah 36 --ei ayah 1 --es reciter ar.alafasy
  * ```
  *
- * Commands: `load`, `play`, `pause`, `toggle`, `next`, `prev`, `seek --ei ayah n`, `stop`,
- * `state`, `reconcile` (adopt the containers pushed onto the device), `focus` (take audio focus
- * away with a second player, to see the recitation pause), `voices` (what the phone's speech
- * engines answer for every bundled language).
+ * Commands: `load` (with `--es translation en.sahih` to read that translation aloud after each
+ * ayah), `play`, `pause`, `toggle`, `next`, `prev`, `seek --ei ayah n`, `stop`, `state`,
+ * `reconcile` (adopt the containers pushed onto the device), `focus` (take audio focus away with
+ * a second player, to see the recitation pause), `voices` (what the phone's speech engines answer
+ * for every bundled language), `speech --es translation <id>` (read-aloud changed while a surah
+ * plays; `none` turns it off).
  *
  * Everything it does is logged under the tag `TaqwaHarness`, including every state change with a
  * millisecond timestamp — which is how the ayah boundary and the gap are actually measured.
@@ -61,6 +64,13 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                 when (command) {
                     "load" -> {
                         watch()
+                        // Read-aloud (spec §5.5): the translation read after each ayah, if the
+                        // phone has a voice for its language.
+                        val translation = intent.getStringExtra("translation")
+                        val speech = translation?.let {
+                            buildSpokenTranslation(appContainer.quranRepository, appContainer.speechVoices, it, surah)
+                        }
+                        Log.i(TAG, "speech ${speech?.translationId} ${speech?.texts?.size}")
                         player.load(
                             reciter = reciter(reciterId, gapMs),
                             surah = surah,
@@ -69,7 +79,18 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                                 title = "Surah $surah",
                                 subtitle = "Mishary Rashid Alafasy",
                             ),
+                            speech = speech,
                         )
+                    }
+                    // Read-aloud live (spec §2): `--es translation fr.hamidullah`, or `none` for off.
+                    "speech" -> {
+                        val surahNow = player.state.value.surah ?: surah
+                        val id = intent.getStringExtra("translation")
+                        val speech = id?.takeIf { it != "none" }?.let {
+                            buildSpokenTranslation(appContainer.quranRepository, appContainer.speechVoices, it, surahNow)
+                        }
+                        Log.i(TAG, "setSpeech ${speech?.translationId}")
+                        player.setSpeech(speech)
                     }
                     "play" -> player.play()
                     "pause" -> player.pause()
@@ -158,7 +179,12 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
         if (watching?.isActive == true) return
         watching = scope.launch {
             appContainer.recitationPlayer.state.collectLatest {
-                Log.i(TAG, "state ayah=${it.ayah}/${it.ayahCount} playing=${it.playing} pos=${it.positionMs} dur=${it.durationMs} surah=${it.surah}")
+                Log.i(
+                    TAG,
+                    "state ayah=${it.ayah}/${it.ayahCount} playing=${it.playing} speaking=${it.speaking} " +
+                        "buffering=${it.buffering} pos=${it.positionMs} dur=${it.durationMs} " +
+                        "clock=${it.surahPositionMs}/${it.surahDurationMs} surah=${it.surah}",
+                )
             }
         }
     }

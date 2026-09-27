@@ -78,6 +78,17 @@ actual class RecitationPlayer actual constructor(
     private var ticker: Job? = null
 
     /**
+     * Read-aloud (spec §5.3): what the loaded queue reads, and what [setSpeech] needs to build the
+     * same surah again with another. [generation] names each queue's speech items, so the service
+     * never plays a WAV it made for a queue that has since been replaced.
+     */
+    private var speech: SpokenTranslation? = null
+    private var generation = 0L
+    private var nowText: NowPlayingText? = null
+    private var gapMs = 0L
+    private var ayahDurations: Map<Int, Long> = emptyMap()
+
+    /**
      * The last position and duration read while an *ayah* was playing. During the reciter's gap
      * the platform's clock is the gap's, and a progress line that jumped back to zero for 300 ms
      * between every two ayahs is exactly the flicker `RecitationQueue` exists to prevent.
@@ -110,8 +121,14 @@ actual class RecitationPlayer actual constructor(
             leaveHold()
             queue = null
             reciterId = null
+            speech = null
             releaseController()
             _state.value = PlaybackState.EMPTY
+        }
+
+        /** The service's phase changed (read-aloud spec §5.5): the voice began or stopped reading. */
+        override fun onExtrasChanged(controller: MediaController, extras: Bundle) {
+            publish()
         }
 
         /** The service saying a lock screen, headset or car pressed previous or next. */
@@ -143,17 +160,38 @@ actual class RecitationPlayer actual constructor(
             }.getOrNull()
         } ?: return
         val (index, durations) = opened
-        val built = RecitationQueue.of(index, reciter.gapMs.toLong())
-        val clock = SurahTimeline.of(built) { durations[it] ?: 0L }
+        val built = RecitationQueue.of(index, reciter.gapMs.toLong(), speech?.spoken.orEmpty())
+        // The clock counts what is heard (read-aloud spec §2): the breath before each
+        // translation, and the translation's own slot as estimated from its length.
+        val clock = SurahTimeline.of(built, { durations[it] ?: 0L }) { speech?.estimateMs(it) ?: 0L }
         val startIndex = built.indexOfAyah(startAyah) ?: 0
         val bound = runCatching { connect() }.getOrNull() ?: return
 
         queue = built
         timeline = clock
         reciterId = reciter.id
+        this.speech = speech
+        generation++
+        nowText = text
+        gapMs = reciter.gapMs.toLong()
+        ayahDurations = durations
         ayahPositionMs = 0L
         ayahDurationMs = 0L
 
+        sendNowPlaying(bound, text, clock)
+        bound.setMediaItems(built.items.map { item(reciter.id, surah, it) }, startIndex, 0L)
+        bound.prepare()
+        bound.play()
+        publish()
+    }
+
+    /**
+     * The notification's text, the clock and read-aloud's script, sent ahead of the queue they
+     * describe. Commands from one controller reach the session in order, so the service has the
+     * script before the first speech item can ask it for anything.
+     */
+    private fun sendNowPlaying(bound: MediaController, text: NowPlayingText, clock: SurahTimeline) {
+        val spoken = speech
         bound.sendCustomCommand(
             SessionCommand(RecitationService.COMMAND_NOW_PLAYING, Bundle.EMPTY),
             Bundle().apply {
@@ -162,15 +200,53 @@ actual class RecitationPlayer actual constructor(
                 putString(RecitationService.ARG_PREVIOUS_AYAH, text.previousAyahLabel)
                 putString(RecitationService.ARG_NEXT_AYAH, text.nextAyahLabel)
                 putLongArray(RecitationService.ARG_TIMELINE, clock.itemsMs.toLongArray())
+                if (spoken != null) {
+                    val entries = spoken.texts.entries.sortedBy { it.key }
+                    putLong(RecitationService.ARG_SPEECH_GENERATION, generation)
+                    putString(RecitationService.ARG_SPEECH_ENGINE, spoken.voice.engine)
+                    putString(RecitationService.ARG_SPEECH_VOICE, spoken.voice.id)
+                    putString(RecitationService.ARG_SPEECH_LANGUAGE, spoken.language)
+                    putIntArray(RecitationService.ARG_SPEECH_AYAHS, entries.map { it.key }.toIntArray())
+                    putStringArray(RecitationService.ARG_SPEECH_TEXTS, entries.map { it.value }.toTypedArray())
+                }
             },
         )
-        bound.setMediaItems(built.items.map { item(reciter.id, surah, it) }, startIndex, 0L)
+    }
+
+    /**
+     * The same surah built again around the ayah being heard, with [speech] or without (read-aloud
+     * spec §2). Inside an ayah, that ayah carries on from where it is; in a translation or a
+     * silence, the next ayah starts — or, after the last one, the last ayah's end, from where the
+     * new queue plays whatever it still has after that ayah and then ends as it would have. One
+     * `setMediaItems` at that point: a fraction of a second of re-buffering, and nothing more.
+     */
+    actual fun setSpeech(speech: SpokenTranslation?) {
+        val bound = live ?: return
+        val old = queue ?: return
+        val reciter = reciterId ?: return
+        val text = nowText ?: return
+        val built = RecitationQueue(old.surah, old.ayahs, gapMs, speech?.spoken.orEmpty())
+        val clock = SurahTimeline.of(built, { ayahDurations[it] ?: 0L }) { speech?.estimateMs(it) ?: 0L }
+        val ayah = _state.value.ayah ?: old.ayahs.first()
+        val ayahIndex = built.indexOfAyah(ayah) ?: 0
+        val (startIndex, startMs) = when {
+            phase() == RecitationService.PHASE_AYAH -> ayahIndex to ayahPositionMs
+            else -> built.next(ayahIndex)?.let { it to 0L } ?: (ayahIndex to (ayahDurations[ayah] ?: 0L))
+        }
+        this.speech = speech
+        generation++
+        queue = built
+        timeline = clock
+        sendNowPlaying(bound, text, clock)
+        bound.setMediaItems(built.items.map { item(reciter, built.surah, it) }, startIndex, startMs)
         bound.prepare()
-        bound.play()
         publish()
     }
 
-    actual fun setSpeech(speech: SpokenTranslation?) = Unit
+    /** The real current item's kind, as the service publishes it (read-aloud spec §5.5). */
+    private fun phase(): Int =
+        live?.sessionExtras?.getInt(RecitationService.EXTRA_PHASE, RecitationService.PHASE_AYAH)
+            ?: RecitationService.PHASE_AYAH
 
     actual fun play() {
         val bound = live ?: return
@@ -209,7 +285,13 @@ actual class RecitationPlayer actual constructor(
         val bound = live ?: return
         val built = queue ?: return
         val at = bound.currentMediaItemIndex
-        bound.seekTo(built.previous(at, if (built.isGap(at)) 0L else withinAyah(bound, built, at)), 0L)
+        // The session reports the ayah a silence or a translation follows (see [AyahPlayer]), so
+        // the service's phase is what says that ayah has already been read: a press then
+        // restarts it, however short it was, as the lock screen's own previous does (read-aloud
+        // spec §2). Otherwise the queue's rule, on the position inside the ayah.
+        val finished = !built.isAyah(at) || phase() != RecitationService.PHASE_AYAH
+        val target = if (finished) built.ayahIndexAt(at) else built.previous(at, withinAyah(bound, built, at))
+        bound.seekTo(target, 0L)
     }
 
     /**
@@ -234,6 +316,7 @@ actual class RecitationPlayer actual constructor(
         queue = null
         timeline = null
         reciterId = null
+        speech = null
         live?.let { bound ->
             bound.stop()
             bound.clearMediaItems()
@@ -292,9 +375,7 @@ actual class RecitationPlayer actual constructor(
         val id = when (entry) {
             is QueueItem.Ayah -> ayahUri(reciterId, surah, entry.n)
             is QueueItem.Gap -> gapUri(entry.durationMs)
-            // Read-aloud is not wired into the Android player yet (read-aloud spec §5.5): this
-            // queue is never built with a spoken ayah, so reaching this would mean it was.
-            is QueueItem.Speech -> error("RecitationPlayer.android.kt does not build spoken queues yet")
+            is QueueItem.Speech -> speechUri(generation, surah, entry.n)
         }
         // Id only: the URI is stripped crossing the binder anyway and the service puts it back,
         // along with the title, the subtitle and the artwork.
@@ -312,10 +393,11 @@ actual class RecitationPlayer actual constructor(
         // A seek back into the surah during the hold — the lock screen's previous, a tap on an
         // ayah — has the surah playing again; the hold must not lapse into a stop under it.
         if (ending) leaveHold()
-        // Never a gap: the session's `AyahPlayer` reports the ayah a gap follows as the current
-        // item, so the app never sees a gap index. During the gap the clock sits inside the gap's
-        // slot, which the arithmetic below reads as the ayah's end — the line of an ayah that has
-        // just been read stays full, as it always did.
+        // Never a gap or a translation: the session's `AyahPlayer` reports the ayah either follows
+        // as the current item, so the app never sees their index. Meanwhile the clock sits inside
+        // their slot, which the arithmetic below reads as the ayah's end — the line of an ayah
+        // that has just been read stays full, as it always did — and the service's phase is what
+        // says the voice is reading.
         val at = bound.currentMediaItemIndex
         val clock = timeline?.takeIf { it.size == built.size }
         var surahPositionMs = 0L
@@ -350,6 +432,7 @@ actual class RecitationPlayer actual constructor(
             buffering = bound.playbackState == Player.STATE_BUFFERING,
             surahPositionMs = surahPositionMs,
             surahDurationMs = surahDurationMs,
+            speaking = phase() == RecitationService.PHASE_SPEECH,
         )
         if (bound.isPlaying) startTicker() else stopTicker()
     }
