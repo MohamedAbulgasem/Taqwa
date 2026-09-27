@@ -162,6 +162,26 @@ class RecitationStateTest {
     }
 
     @Test
+    fun `a followed card that fits below the resting line rests there`() {
+        assertEquals(600, followOffset(rest = 600, room = 1_900, card = 900, edge = 30))
+    }
+
+    @Test
+    fun `a followed card too long for the resting line rises until its foot clears the bar`() {
+        assertEquals(400, followOffset(rest = 600, room = 1_900, card = 1_500, edge = 30))
+    }
+
+    @Test
+    fun `a followed card taller than the screen starts at the top edge`() {
+        assertEquals(30, followOffset(rest = 600, room = 1_900, card = 2_500, edge = 30))
+    }
+
+    @Test
+    fun `a followed card not yet laid out rests at the usual line`() {
+        assertEquals(600, followOffset(rest = 600, room = 1_900, card = null, edge = 30))
+    }
+
+    @Test
     fun `the bar tries its caption from the most said to the least`() {
         val tried = mutableListOf<String>()
         val caption = barCaption("Ayah 56", "56", "Translation") { tried += it; false }

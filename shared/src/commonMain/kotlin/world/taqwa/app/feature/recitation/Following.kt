@@ -78,6 +78,24 @@ class FollowingState(private val now: () -> Long) {
 }
 
 /**
+ * Where a followed ayah's card comes to rest (spec §5.3): how far below the top of the list its
+ * top edge lands, in pixels.
+ *
+ * A card that fits below the resting line rests there, a third of the way down, as every card
+ * used to. A longer one rises until its foot clears the player bar: an ayah with its translation
+ * is on screen whole while it is recited, instead of running under the bar until the reader
+ * scrolls it up by hand. It rises no higher than [edge], so a card taller than the screen starts
+ * at the top and the rest of it is the reader's to scroll, as it always was.
+ *
+ * @param rest the resting line.
+ * @param room how far down the list a card may reach before the player bar covers it.
+ * @param card the card's height, or null when it has not been laid out yet.
+ * @param edge the highest a card goes: the 8 dp the reader keeps above an ayah it jumps to.
+ */
+fun followOffset(rest: Int, room: Int, card: Int?, edge: Int): Int =
+    if (card == null) rest else minOf(rest, maxOf(edge, room - card))
+
+/**
  * How long after the reader's scroll has settled the "more than a viewport away" question is asked
  * again (spec §5.3).
  *

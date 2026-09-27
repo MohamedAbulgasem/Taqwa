@@ -52,7 +52,8 @@ data class QuranRecitation(
 const val FOLLOW_GRACE_MS = 4_000L
 
 /** Where a followed ayah is put: a third of the way down the viewport, so the ayah before it is
- * still on screen and the eye has somewhere to have come from. */
+ * still on screen and the eye has somewhere to have come from. A card too long for that rises
+ * ([followOffset]). */
 const val FOLLOW_VIEWPORT_FRACTION = 3
 
 /** The gap between the "Back to ayah" pill and the player bar under it. */

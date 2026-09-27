@@ -3,6 +3,7 @@ package world.taqwa.app.feature.quran
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,6 +61,7 @@ import world.taqwa.app.feature.recitation.Follow
 import world.taqwa.app.feature.recitation.PILL_SETTLE_MS
 import world.taqwa.app.feature.recitation.PillGap
 import world.taqwa.app.feature.recitation.QuranRecitation
+import world.taqwa.app.feature.recitation.followOffset
 import world.taqwa.app.feature.recitation.rememberFollowing
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.i18n.LocalPlatformFormat
@@ -75,6 +77,10 @@ import world.taqwa.app.design.components.TaqwaBottomSheet
 
 /** The gutter between an ayah card and the edge of the reader's own content column. */
 private val ReaderGutter = 24.dp
+
+/** The space between one card and the next, which is also what a followed card keeps above the
+ * player bar. */
+private val CardSpacing = 12.dp
 
 /**
  * Translation mode's reader (spec §2.3): the header, the basmala, one [AyahCard] per ayah, and the
@@ -191,8 +197,42 @@ fun ReaderScreen(
         fun itemIndexOf(ayah: Int): Int? =
             ready.ayahs.indexOfFirst { it.number == ayah }.takeIf { it >= 0 }?.plus(if (hasBasmala) 1 else 0)
 
-        /** Where the followed ayah comes to rest: a third of the way down the viewport. */
-        fun restingOffset(): Int = listState.layoutInfo.viewportSize.height / FOLLOW_VIEWPORT_FRACTION
+        val barSpacePx = with(LocalDensity.current) { recitation.barSpace.roundToPx() }
+        val cardSpacingPx = with(LocalDensity.current) { CardSpacing.roundToPx() }
+
+        /** The item at [index] as the list last laid it out, or null while it is off screen. */
+        fun laidOut(index: Int) = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
+
+        /**
+         * Where the followed ayah comes to rest ([followOffset]): a third of the way down, or as
+         * high as it has to go for a card of [card]'s height to end clear of the player bar, by
+         * the gap the cards keep between them.
+         */
+        fun restingOffset(card: Int?): Int {
+            val layout = listState.layoutInfo
+            return followOffset(
+                rest = layout.viewportSize.height / FOLLOW_VIEWPORT_FRACTION,
+                room = layout.viewportEndOffset - barSpacePx - cardSpacingPx,
+                card = card,
+                edge = jumpOffsetPx,
+            )
+        }
+
+        /**
+         * Takes the list to the followed ayah. A card off screen has not been measured, so it
+         * goes to the resting line first and then rises the rest of the way once it has a height:
+         * the second move happens only for a card that is both off screen and too long to fit,
+         * such as the one after an ayah taller than the screen.
+         */
+        suspend fun follow(target: Int) {
+            val height = laidOut(target)?.size
+            listState.animateScrollToItem(target, scrollOffset = -restingOffset(height))
+            if (height == null) {
+                val card = laidOut(target) ?: return
+                val rise = card.offset - restingOffset(card.size)
+                if (rise > 0) listState.animateScrollBy(rise.toFloat())
+            }
+        }
 
         /** How many screenfuls past the visible range the ayah is: 0 while it is on screen. */
         fun screensAway(target: Int): Int {
@@ -221,7 +261,7 @@ fun ReaderScreen(
             val target = playingAyah?.let(::itemIndexOf) ?: return@LaunchedEffect
             following.rearm()
             following.pill = null
-            following.move { listState.animateScrollToItem(target, scrollOffset = -restingOffset()) }
+            following.move { follow(target) }
         }
 
         LaunchedEffect(playingAyah, ready.surah.number) {
@@ -233,7 +273,7 @@ fun ReaderScreen(
             when (following.decide(screensAway(target))) {
                 Follow.SCROLL -> {
                     following.pill = null
-                    following.move { listState.animateScrollToItem(target, scrollOffset = -restingOffset()) }
+                    following.move { follow(target) }
                 }
                 Follow.PILL -> following.pill = playingAyah
                 Follow.LEAVE_ALONE -> Unit
@@ -270,7 +310,7 @@ fun ReaderScreen(
                 // capped and centred ([contentWidth]) and the gutter belongs inside that capped
                 // column, not against the screen's own edges.
                 contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp + recitation.barSpace),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(CardSpacing),
                 modifier = Modifier.fillMaxSize(),
             ) {
                 if (hasBasmala) {
@@ -356,7 +396,7 @@ fun ReaderScreen(
                         following.rearm()
                         following.pill = null
                         scope.launch {
-                            following.move { listState.animateScrollToItem(target, -restingOffset()) }
+                            following.move { follow(target) }
                         }
                     },
                     modifier = Modifier
