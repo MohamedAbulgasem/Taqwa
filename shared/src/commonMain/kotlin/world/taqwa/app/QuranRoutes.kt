@@ -111,10 +111,10 @@ internal fun ReaderRoute(
     jumpTokenState: State<Int>,
     recitation: RecitationController,
 ) {
-    // The reader opened is read-aloud's own cue to ask the phone about its voices (spec §6): the
-    // reading translation may have changed, or a voice may have finished installing, since the
-    // reader was last on screen.
-    LaunchedEffect(Unit) { recitation.refreshVoices() }
+    // Read-aloud (spec §4): the phone is asked about the reading language's voice the first time a
+    // reader opens on it, so the sheet's switch is ready and the first play does not wait. Only
+    // then — the sheet asks again every time it opens, and that is where a change shows.
+    LaunchedEffect(Unit) { recitation.onReaderOpened() }
     val recitationState by recitationStateState
     val jumpToken by jumpTokenState
     val viewModel = remember(screen) {
@@ -188,8 +188,8 @@ internal fun MushafRoute(
     jumpTokenState: State<Int>,
     recitation: RecitationController,
 ) {
-    // As in the reader's own route: ask the phone about its voices as soon as this screen opens.
-    LaunchedEffect(Unit) { recitation.refreshVoices() }
+    // As in the reader's own route: the phone is asked only about a language it has not answered for.
+    LaunchedEffect(Unit) { recitation.onReaderOpened() }
     val recitationState by recitationStateState
     val jumpToken by jumpTokenState
     val viewModel = remember(screen) {

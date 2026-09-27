@@ -1448,12 +1448,15 @@ class RecitationControllerTest {
         val statuses: MutableMap<String, VoiceStatus> = mutableMapOf(
             "en" to VoiceStatus.Ready(SpeechVoice("com.google.android.tts", "en-us-x-sfg-local")),
         ),
+        /** Closed by a test that wants a question in flight: the phone still binding its engines. */
+        val gate: CompletableDeferred<Unit>? = null,
     ) : ReadAloudPort {
         val asked = mutableListOf<String>()
         val installs = mutableListOf<String>()
         override fun translationId(languageTag: String): Flow<String> = translation
         override suspend fun status(language: String): VoiceStatus {
             asked += language
+            gate?.await()
             return statuses[language] ?: VoiceStatus.Unsupported
         }
         override fun installVoice(engine: String) {
@@ -1596,14 +1599,96 @@ class RecitationControllerTest {
     }
 
     @Test
-    fun `onForeground asks again only after the phone has been asked once`() = runTest(UnconfinedTestDispatcher()) {
-        val readAloud = FakeReadAloud()
+    fun `onForeground re-asks only a voice that was missing`() = runTest(UnconfinedTestDispatcher()) {
+        val readAloud = FakeReadAloud(statuses = mutableMapOf("en" to VoiceStatus.Missing("com.google.android.tts")))
         val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
         c.setLanguageTag("en")
+        // Nothing asked yet: a return to the app binds no engine.
         c.onForeground()
         assertTrue(readAloud.asked.isEmpty())
         c.refreshVoices()
+        // Missing: back from the installer, perhaps, so asked again — and again while it stays so.
         c.onForeground()
         assertEquals(2, readAloud.asked.size)
+        readAloud.statuses["en"] = VoiceStatus.Ready(SpeechVoice("com.google.android.tts", "en-us-x-sfg-local"))
+        c.onForeground()
+        assertEquals(3, readAloud.asked.size)
+        assertNull(assertNotNull(c.state.value.readAloud).missingEngine)
+        // Ready now: a return to the app asks nothing more.
+        c.onForeground()
+        assertEquals(3, readAloud.asked.size)
+    }
+
+    @Test
+    fun `onForeground does not re-ask a ready voice`() = runTest(UnconfinedTestDispatcher()) {
+        val readAloud = FakeReadAloud()
+        val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        c.refreshVoices()
+        c.onForeground()
+        assertEquals(listOf("en"), readAloud.asked)
+    }
+
+    @Test
+    fun `opening Settings asks the phone so its card shows after a cold start`() = runTest(UnconfinedTestDispatcher()) {
+        val readAloud = FakeReadAloud()
+        val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        assertNull(c.state.value.readAloud)
+        c.onSettingsOpened()
+        assertNotNull(c.state.value.readAloud)
+        assertEquals(listOf("en"), readAloud.asked)
+    }
+
+    @Test
+    fun `the reader asks only about a language the phone has not answered for`() = runTest(UnconfinedTestDispatcher()) {
+        val readAloud = FakeReadAloud()
+        val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        c.onReaderOpened()
+        assertEquals(listOf("en"), readAloud.asked)
+        assertNotNull(c.state.value.readAloud)
+        c.onReaderOpened()
+        assertEquals(listOf("en"), readAloud.asked)
+        // The sheet opening always asks again.
+        c.refreshVoices()
+        assertEquals(listOf("en", "en"), readAloud.asked)
+    }
+
+    @Test
+    fun `asks for one language at once reach the phone once`() = runTest(UnconfinedTestDispatcher()) {
+        val gate = CompletableDeferred<Unit>()
+        val readAloud = FakeReadAloud(gate = gate)
+        val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        c.refreshVoices()
+        c.refreshVoices()
+        // No answer cached yet, so the reader would ask too: it joins the question in flight.
+        c.onReaderOpened()
+        assertEquals(listOf("en"), readAloud.asked)
+        assertNull(c.state.value.readAloud)
+        gate.complete(Unit)
+        assertNotNull(c.state.value.readAloud)
+        assertEquals(listOf("en"), readAloud.asked)
+        // Answered: the next ask is a new question.
+        c.refreshVoices()
+        assertEquals(listOf("en", "en"), readAloud.asked)
+    }
+
+    @Test
+    fun `a load waits for the question already in flight instead of asking again`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        harness.settings.stored.value = harness.settings.stored.value.copy(readAloud = true)
+        val gate = CompletableDeferred<Unit>()
+        val readAloud = FakeReadAloud(gate = gate)
+        val c = controller(harness, backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        c.refreshVoices()
+        c.requestPlay(1, 1)
+        assertTrue(harness.player.loads.isEmpty())
+        gate.complete(Unit)
+        assertEquals("en.sahih", assertNotNull(harness.player.speeches.single()).translationId)
+        assertEquals(listOf("en"), readAloud.asked)
     }
 }

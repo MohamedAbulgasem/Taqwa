@@ -16,7 +16,15 @@ data class VoiceCandidate(
 /** The choice of voice, shared by both platforms so one test holds it. */
 object VoicePick {
 
-    /** The best offline, installed voice for [language]: highest quality, then the preferred country. */
+    /**
+     * The best offline, installed voice for [language], on both platforms: the highest quality,
+     * then the preferred country, then — between voices the engine rates alike — one whose id
+     * ends in `-local`, then the id, so the choice never rests on the order an engine lists in.
+     *
+     * The `-local` step is for Google's engine, whose on-phone voices are named that way
+     * (`en-us-x-iol-local`) beside aliases such as `en-US-language` that also report themselves
+     * offline: a voice whose own name says it runs on the phone is the safer of two equals.
+     */
     fun best(language: String, candidates: List<VoiceCandidate>): VoiceCandidate? {
         val wanted = normalize(language)
         val countries = PREFERRED[wanted].orEmpty()
@@ -25,6 +33,7 @@ object VoicePick {
             .sortedWith(
                 compareByDescending<VoiceCandidate> { it.quality }
                     .thenBy { voice -> countries.indexOf(voice.country.uppercase()).let { if (it < 0) countries.size else it } }
+                    .thenBy { if (it.id.endsWith(LOCAL_SUFFIX, ignoreCase = true)) 0 else 1 }
                     .thenBy { it.id },
             )
             .firstOrNull()
@@ -49,6 +58,9 @@ object VoicePick {
             "ben" -> "bn"
             else -> code
         }
+
+    /** How Google's engine names a voice that synthesizes on the phone. */
+    private const val LOCAL_SUFFIX = "-local"
 
     private val PREFERRED = mapOf(
         "en" to listOf("US", "GB", "AU", "IE", "ZA", "IN"),

@@ -40,4 +40,19 @@ class VoicePickTest {
         val english = listOf(voice("en-us", "en", "US", quality = 300), voice("en-gb-premium", "en", "GB", quality = 500))
         assertEquals("en-gb-premium", VoicePick.best("en", english)?.id)
     }
+
+    @Test
+    fun `between equals a voice named local wins before the id decides`() {
+        // Google's alias sorts first by id alone ('U' before 'u'); its local twin must win the tie.
+        val google = listOf(voice("en-US-language", "en", "US"), voice("en-us-x-tpf-LOCAL", "en", "US"))
+        assertEquals("en-us-x-tpf-LOCAL", VoicePick.best("en", google)?.id)
+        // Two local voices: the id decides between them.
+        val twoLocal = google + voice("en-us-x-iol-local", "en", "US")
+        assertEquals("en-us-x-iol-local", VoicePick.best("en", twoLocal)?.id)
+        // Quality and the preferred country still come first.
+        val better = listOf(voice("en-US-language", "en", "US", quality = 400), voice("en-us-x-iol-local", "en", "US"))
+        assertEquals("en-US-language", VoicePick.best("en", better)?.id)
+        val preferred = listOf(voice("en-US-language", "en", "US"), voice("en-gb-x-gba-local", "en", "GB"))
+        assertEquals("en-US-language", VoicePick.best("en", preferred)?.id)
+    }
 }

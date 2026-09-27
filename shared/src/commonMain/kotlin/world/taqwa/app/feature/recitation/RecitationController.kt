@@ -1,8 +1,11 @@
 package world.taqwa.app.feature.recitation
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -166,6 +169,14 @@ class RecitationController(
 
     /** What the phone said for each language this process has asked about (read-aloud spec §4). */
     private val voices = MutableStateFlow<Map<String, VoiceStatus>>(emptyMap())
+
+    /**
+     * The questions still on their way to the phone, one per language (read-aloud spec §4). An
+     * Android ask binds every speech engine in turn, and the reader's sheet, a return to the app
+     * and a load can all want the same language within a moment of each other: a second ask joins
+     * the one in flight instead of binding the engines again. Only touched on [scope]'s one thread.
+     */
+    private val asking = mutableMapOf<String, Deferred<VoiceStatus>>()
 
     /** The kind the loaded surah's translation is, for the bar's caption. */
     private var speechKind: TextKind? = null
@@ -482,15 +493,39 @@ class RecitationController(
         languageTag.value = tag
     }
 
-    /** The reading sheet, Settings › Recitation or the reader opened: ask the phone again. */
+    /**
+     * The reading sheet or Settings › Recitation opened (read-aloud spec §4): ask the phone again.
+     * These are the two screens that show the switch, and so the two places a voice installed or
+     * deleted since the last ask must be noticed.
+     */
     fun refreshVoices() {
         val info = readingTranslation.value ?: return
         scope.launch { checkVoice(info.language) }
     }
 
-    /** The app came back to the front — perhaps from installing a voice. Only once asked before. */
+    /**
+     * The reader or the Mushaf opened (read-aloud spec §4): ask only about a reading language the
+     * phone has not answered for yet, so the sheet's switch is ready when it opens and the first
+     * play does not wait on the question. The reader opens far more often than its sheet — every
+     * surah, every change of mode — and an answer this process already holds is not worth binding
+     * the engines for again; the sheet asks afresh whenever it opens.
+     */
+    fun onReaderOpened() {
+        val info = readingTranslation.value ?: return
+        if (info.language in voices.value) return
+        scope.launch { checkVoice(info.language) }
+    }
+
+    /**
+     * The app came back to the front (read-aloud spec §4). The one answer worth asking again is a
+     * Missing voice: the reader may be back from the engine's installer, and the switch's caption
+     * should not go on asking for a download that has just finished. Ready and Unsupported wait
+     * for the sheet or Settings to open.
+     */
     fun onForeground() {
-        if (voices.value.isNotEmpty()) refreshVoices()
+        val info = readingTranslation.value ?: return
+        if (voices.value[info.language] !is VoiceStatus.Missing) return
+        scope.launch { checkVoice(info.language) }
     }
 
     /** Read-aloud's switch (read-aloud spec §6). */
@@ -725,8 +760,15 @@ class RecitationController(
      * Settings › Quran › Recitation opened (privacy spec §2.2): engagement on purpose — the screen
      * shows the reciter list and "Download the whole Quran", and whoever went there wants the
      * current catalogue.
+     *
+     * It also holds read-aloud's card, which shows only once the phone has answered for the
+     * reading language (read-aloud spec §4). Nothing else asks after a cold start, so without
+     * this ask the card was missing from Settings until the reading sheet had been opened.
      */
-    fun onSettingsOpened() = engage(refresh = true)
+    fun onSettingsOpened() {
+        engage(refresh = true)
+        refreshVoices()
+    }
 
     /**
      * The first line of every entry point. [refresh] only where a fresh catalogue is what the
@@ -977,11 +1019,25 @@ class RecitationController(
     }
 
     /**
-     * Asks the phone about [language] and remembers the answer. A failure, or a query that takes
-     * too long, is "cannot read it" (spec: "a failed voice never stops the recitation") — never a
-     * crash and never a hang across the breath before the next ayah's translation.
+     * Asks the phone about [language] and remembers the answer — or, when that same question is
+     * already on its way, waits for its answer instead of asking twice (see [asking]). The ask
+     * itself runs on [scope], not in the caller, so a caller that is cancelled (a load another one
+     * replaced) leaves it to finish for whoever else is waiting on it.
      */
     private suspend fun checkVoice(language: String): VoiceStatus {
+        asking[language]?.takeIf { !it.isCompleted }?.let { return it.await() }
+        val ask = scope.async(start = CoroutineStart.LAZY) { askVoice(language) }
+        asking[language] = ask
+        ask.invokeOnCompletion { if (asking[language] === ask) asking.remove(language) }
+        return ask.await()
+    }
+
+    /**
+     * One question to the phone, and its answer remembered. A failure, or a query that takes too
+     * long, is "cannot read it" (spec: "a failed voice never stops the recitation") — never a
+     * crash and never a hang across the breath before the next ayah's translation.
+     */
+    private suspend fun askVoice(language: String): VoiceStatus {
         val status = try {
             withTimeoutOrNull(VOICE_QUERY_TIMEOUT_MS) { readAloud.status(language) } ?: VoiceStatus.Unsupported
         } catch (cancelled: CancellationException) {
