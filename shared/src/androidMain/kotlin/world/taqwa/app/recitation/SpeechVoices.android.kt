@@ -22,12 +22,18 @@ actual fun createSpeechVoices(): SpeechVoices = AndroidSpeechVoices()
  * The user's default engine is asked first, then Google's, then any other. The first with an
  * offline voice installed answers Ready; otherwise the first that offers the language as a
  * download answers Missing; otherwise the language is Unsupported and the switch stays hidden.
+ *
+ * **Threads.** An engine is bound on the main thread: making a `TextToSpeech` only starts the
+ * bind, and its start-up callback arrives on the main looper whichever thread made it. Everything
+ * then asked of it — and the list of engines itself — is a binder call into another process, one
+ * the engine may still be starting, so it is asked on [Dispatchers.IO] and the screen that wanted
+ * the answer never waits on it.
  */
 internal class AndroidSpeechVoices : SpeechVoices {
 
     override suspend fun status(language: String): VoiceStatus = withContext(Dispatchers.Main) {
         var missing: String? = null
-        for (engine in engines()) {
+        for (engine in withContext(Dispatchers.IO) { engines() }) {
             when (val answer = ask(engine, language)) {
                 is VoiceStatus.Ready -> return@withContext answer
                 is VoiceStatus.Missing -> if (missing == null) missing = answer.engine
@@ -44,7 +50,28 @@ internal class AndroidSpeechVoices : SpeechVoices {
         runCatching { appContext.startActivity(intent) }
     }
 
-    /** Installed engines, the user's default first and Google's second. */
+    /**
+     * The voice as its engine lists it, with this class's own verdict beside the raw fields: the
+     * debug harness logs it after each Ready, so the offline rule ([isOffline]) can be checked on
+     * a real phone's voices. Bound and let go like [status], on the same threads.
+     */
+    override suspend fun describe(voice: SpeechVoice): String = withContext(Dispatchers.Main) {
+        val tts = bind(voice.engine) ?: return@withContext "${voice.engine} did not start"
+        try {
+            withContext(Dispatchers.IO) {
+                val listed = runCatching { tts.voices.orEmpty() }.getOrDefault(emptySet())
+                    .firstOrNull { it.name == voice.id }
+                    ?: return@withContext "${voice.id} is not listed by ${voice.engine}"
+                "${listed.name} features=${listed.features.orEmpty().sorted()} " +
+                    "networkRequired=${listed.isNetworkConnectionRequired} offline=${listed.isOffline()} " +
+                    "quality=${listed.quality} latency=${listed.latency}"
+            }
+        } finally {
+            tts.shutdownQuietly()
+        }
+    }
+
+    /** Installed engines, the user's default first and Google's second. Binder calls: IO only. */
     private fun engines(): List<String> {
         val installed = appContext.packageManager
             .queryIntentServices(Intent(TextToSpeech.Engine.INTENT_ACTION_TTS_SERVICE), 0)
@@ -54,20 +81,26 @@ internal class AndroidSpeechVoices : SpeechVoices {
         return (listOfNotNull(preferred, GOOGLE_ENGINE) + installed).distinct().filter { it in installed }
     }
 
+    /** Main thread: binds [engine], puts the question to it on [Dispatchers.IO], and lets it go. */
     private suspend fun ask(engine: String, language: String): VoiceStatus {
         val tts = bind(engine) ?: return VoiceStatus.Unsupported
         return try {
-            val candidates = runCatching { tts.voices.orEmpty().map { it.candidate() } }.getOrDefault(emptyList())
-            val best = VoicePick.best(language, candidates)
-            when {
-                best != null -> VoiceStatus.Ready(SpeechVoice(engine, best.id))
-                VoicePick.downloadable(language, candidates) -> VoiceStatus.Missing(engine)
-                runCatching { tts.isLanguageAvailable(Locale(language)) }.getOrNull() == TextToSpeech.LANG_MISSING_DATA ->
-                    VoiceStatus.Missing(engine)
-                else -> VoiceStatus.Unsupported
-            }
+            withContext(Dispatchers.IO) { answer(tts, engine, language) }
         } finally {
-            tts.shutdown()
+            tts.shutdownQuietly()
+        }
+    }
+
+    /** What [tts] can do for [language]. Each question is a binder call into the engine: IO only. */
+    private fun answer(tts: TextToSpeech, engine: String, language: String): VoiceStatus {
+        val candidates = runCatching { tts.voices.orEmpty().map { it.candidate() } }.getOrDefault(emptyList())
+        val best = VoicePick.best(language, candidates)
+        return when {
+            best != null -> VoiceStatus.Ready(SpeechVoice(engine, best.id))
+            VoicePick.downloadable(language, candidates) -> VoiceStatus.Missing(engine)
+            runCatching { tts.isLanguageAvailable(Locale.forLanguageTag(language)) }.getOrNull() == TextToSpeech.LANG_MISSING_DATA ->
+                VoiceStatus.Missing(engine)
+            else -> VoiceStatus.Unsupported
         }
     }
 
@@ -81,11 +114,11 @@ internal class AndroidSpeechVoices : SpeechVoices {
                 if (status == TextToSpeech.SUCCESS && bound != null) {
                     continuation.resume(bound)
                 } else {
-                    bound?.shutdown()
+                    bound?.shutdownQuietly()
                     continuation.resume(null)
                 }
             }, engine)
-            continuation.invokeOnCancellation { tts?.shutdown() }
+            continuation.invokeOnCancellation { tts.shutdownQuietly() }
         }
     }
 
@@ -93,7 +126,7 @@ internal class AndroidSpeechVoices : SpeechVoices {
         id = name,
         language = locale.language,
         country = locale.country,
-        offline = !isNetworkConnectionRequired,
+        offline = isOffline(),
         installed = TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in features.orEmpty(),
         quality = quality,
     )
@@ -104,3 +137,23 @@ internal class AndroidSpeechVoices : SpeechVoices {
         const val BIND_TIMEOUT_MS = 4_000L
     }
 }
+
+/**
+ * True only for a voice that makes its speech on the phone (read-aloud spec §1: no text leaves
+ * it). `isNetworkConnectionRequired` is the engine's own word, and it is not the whole story: a
+ * voice that says it needs no connection but lists network synthesis among its features, or the
+ * timeout and retry settings only a network voice reads, is not counted as offline either.
+ */
+internal fun Voice.isOffline(): Boolean =
+    !isNetworkConnectionRequired && features.orEmpty().none { it in NETWORK_FEATURES }
+
+/**
+ * The feature keys that mark a network voice. `"networkTts"` is
+ * `TextToSpeech.Engine.KEY_FEATURE_NETWORK_SYNTHESIS`, written out because the constant has been
+ * deprecated since API 21 in favour of the flag above, while an engine may still set the key.
+ */
+private val NETWORK_FEATURES = setOf(
+    "networkTts",
+    TextToSpeech.Engine.KEY_FEATURE_NETWORK_TIMEOUT_MS,
+    TextToSpeech.Engine.KEY_FEATURE_NETWORK_RETRIES_COUNT,
+)

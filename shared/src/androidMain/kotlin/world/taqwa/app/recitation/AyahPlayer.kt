@@ -218,9 +218,8 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
 
     /**
      * The same arithmetic the app's bar uses, over the items actually loaded — ayahs, silences
-     * and, with read-aloud on, translations, each naming itself by its scheme. Ayah *numbers*
-     * never reach the session, so they are simply counted: the indices are all this class moves
-     * between.
+     * and, with read-aloud on, translations, each naming itself by its scheme ([queueItemsOf],
+     * which a host test holds to the app's own queue item for item).
      *
      * Kept per timeline: Media3 asks the getters above many times per state bundle, the app polls
      * four times a second on top, and an Al-Baqarah read aloud is over a thousand items — a lot of
@@ -232,16 +231,7 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
         if (count == 0) return null
         val timeline = real.currentTimeline
         cachedQueue?.let { if (cachedTimeline === timeline && cachedCount == count) return it }
-        var ayah = 0
-        val items = (0 until count).map { i ->
-            val id = real.getMediaItemAt(i).mediaId
-            when {
-                id.startsWith("$SILENCE_SCHEME://") -> QueueItem.Gap(0L)
-                id.startsWith("$SPEECH_SCHEME://") -> QueueItem.Speech(ayah.coerceAtLeast(1))
-                else -> QueueItem.Ayah(++ayah)
-            }
-        }
-        if (ayah == 0) return null
+        val items = queueItemsOf((0 until count).map { real.getMediaItemAt(it).mediaId }) ?: return null
         return RecitationQueue(0, items).also {
             cachedQueue = it
             cachedCount = count

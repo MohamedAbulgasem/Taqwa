@@ -371,16 +371,13 @@ actual class RecitationPlayer actual constructor(
         return bound
     }
 
-    private fun item(reciterId: String, surah: Int, entry: QueueItem): MediaItem {
-        val id = when (entry) {
-            is QueueItem.Ayah -> ayahUri(reciterId, surah, entry.n)
-            is QueueItem.Gap -> gapUri(entry.durationMs)
-            is QueueItem.Speech -> speechUri(generation, surah, entry.n)
-        }
-        // Id only: the URI is stripped crossing the binder anyway and the service puts it back,
-        // along with the title, the subtitle and the artwork.
-        return MediaItem.Builder().setMediaId(id).build()
-    }
+    /**
+     * Id only: the URI is stripped crossing the binder anyway and the service puts it back, along
+     * with the title, the subtitle and the artwork. The session reads the queue back off these ids
+     * ([queueItemsOf]).
+     */
+    private fun item(reciterId: String, surah: Int, entry: QueueItem): MediaItem =
+        MediaItem.Builder().setMediaId(mediaIdOf(entry, reciterId, surah, generation)).build()
 
     private fun publish() {
         val bound = live

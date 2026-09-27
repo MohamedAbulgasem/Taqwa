@@ -25,6 +25,7 @@ import world.taqwa.app.notifications.setTahajjud
 import world.taqwa.app.recitation.NowPlayingText
 import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.recitation.Reciters
+import world.taqwa.app.recitation.VoiceStatus
 import world.taqwa.app.recitation.buildSpokenTranslation
 
 /**
@@ -42,8 +43,8 @@ import world.taqwa.app.recitation.buildSpokenTranslation
  * ayah), `play`, `pause`, `toggle`, `next`, `prev`, `seek --ei ayah n`, `stop`, `state`,
  * `reconcile` (adopt the containers pushed onto the device), `focus` (take audio focus away with
  * a second player, to see the recitation pause), `voices` (what the phone's speech engines answer
- * for every bundled language), `speech --es translation <id>` (read-aloud changed while a surah
- * plays; `none` turns it off).
+ * for every bundled language, with each chosen voice's features and network flag), `speech --es
+ * translation <id>` (read-aloud changed while a surah plays; `none` turns it off).
  *
  * Everything it does is logged under the tag `TaqwaHarness`, including every state change with a
  * millisecond timestamp — which is how the ayah boundary and the gap are actually measured.
@@ -115,9 +116,15 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                         else world.taqwa.app.quran.ReadingMode.TRANSLATION,
                     )
                     "translation" -> appContainer.settingsRepository.setTranslation(intent.getStringExtra("id") ?: "en.sahih")
-                    // Read-aloud (spec §4): what the phone's engines answer for every bundled language.
+                    // Read-aloud (spec §4): what the phone's engines answer for every bundled language,
+                    // and for each Ready one the chosen voice as its engine lists it — its features,
+                    // its network flag and the app's own offline verdict on the two.
                     "voices" -> listOf("en", "ar", "fr", "tr", "id", "ur", "bn").forEach { language ->
-                        Log.i(TAG, "voice $language ${appContainer.speechVoices.status(language)}")
+                        val status = appContainer.speechVoices.status(language)
+                        Log.i(TAG, "voice $language $status")
+                        if (status is VoiceStatus.Ready) {
+                            Log.i(TAG, "voice $language ${appContainer.speechVoices.describe(status.voice)}")
+                        }
                     }
                     "state" -> Log.i(TAG, "state ${player.state.value}")
                     "reconcile" -> {

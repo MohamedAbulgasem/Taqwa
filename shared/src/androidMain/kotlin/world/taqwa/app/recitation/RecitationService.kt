@@ -250,9 +250,19 @@ class RecitationService : MediaSessionService() {
             controller: MediaSession.ControllerInfo,
         ): MediaSession.ConnectionResult {
             val commands = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
-                .add(SessionCommand(COMMAND_NOW_PLAYING, Bundle.EMPTY))
+                // The notification's two ayah buttons, which the system's own controller presses.
                 .add(SessionCommand(COMMAND_PREVIOUS_AYAH, Bundle.EMPTY))
                 .add(SessionCommand(COMMAND_NEXT_AYAH, Bundle.EMPTY))
+                .apply {
+                    // The text, the clock and read-aloud's script are this app's alone to send
+                    // (read-aloud spec §5.5). The service is exported, and without this any app on
+                    // the phone could hand the session a script for its voice to read aloud. Media3
+                    // checks a controller's package against its calling uid before this is asked,
+                    // and refuses a custom command the controller was not granted here.
+                    if (controller.packageName == this@RecitationService.packageName) {
+                        add(SessionCommand(COMMAND_NOW_PLAYING, Bundle.EMPTY))
+                    }
+                }
                 .build()
             val accepted = MediaSession.ConnectionResult.AcceptedResultBuilder(mediaSession)
                 .setAvailableSessionCommands(commands)

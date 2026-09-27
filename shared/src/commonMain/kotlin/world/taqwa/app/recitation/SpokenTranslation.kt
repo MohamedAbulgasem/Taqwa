@@ -27,6 +27,13 @@ interface SpeechVoices {
 
     /** Opens [engine]'s own voice installer (Android). Nothing on iOS. */
     fun installVoice(engine: String)
+
+    /**
+     * For the debug harnesses: [voice] as its platform lists it — on Android its features and its
+     * network flag, which "offline" is decided on (read-aloud spec §4) — so the answer a phone
+     * gives can be checked by eye. Empty where there is nothing more to say.
+     */
+    suspend fun describe(voice: SpeechVoice): String = ""
 }
 
 expect fun createSpeechVoices(): SpeechVoices

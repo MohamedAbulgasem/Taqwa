@@ -24,6 +24,40 @@ internal fun ayahUri(reciterId: String, surah: Int, ayah: Int): String =
 internal fun gapUri(durationMs: Long): String = "$SILENCE_SCHEME://$durationMs"
 
 /**
+ * The media id the app gives queue item [entry]: ids are all that cross the binder to the
+ * session, and [queueItemsOf] is how the session reads them back. [generation] names the queue's
+ * translations (read-aloud spec §5.5), so a WAV made for a replaced queue is never played.
+ */
+internal fun mediaIdOf(entry: QueueItem, reciterId: String, surah: Int, generation: Long): String = when (entry) {
+    is QueueItem.Ayah -> ayahUri(reciterId, surah, entry.n)
+    is QueueItem.Gap -> gapUri(entry.durationMs)
+    is QueueItem.Speech -> speechUri(generation, surah, entry.n)
+}
+
+/**
+ * The queue items [mediaIds] stand for, in order: how the session's `AyahPlayer` rebuilds the
+ * app's queue from the items it was given, rather than keeping a copy that could fall out of step.
+ * A `silence://` id is a gap or a breath, a `speech://` id the translation read after the ayah
+ * before it, and any other id an ayah.
+ *
+ * Only the kinds and their order matter to the arithmetic the session does, which moves between
+ * indices and nothing else: ayahs are counted from one rather than read off their ids, and a
+ * silence's length is left at zero. Null when there is no ayah at all, which no queue the app
+ * builds can be.
+ */
+internal fun queueItemsOf(mediaIds: List<String>): List<QueueItem>? {
+    var ayah = 0
+    val items = mediaIds.map { id ->
+        when {
+            id.startsWith("$SILENCE_SCHEME://") -> QueueItem.Gap(0L)
+            id.startsWith("$SPEECH_SCHEME://") -> QueueItem.Speech(ayah.coerceAtLeast(1))
+            else -> QueueItem.Ayah(++ayah)
+        }
+    }
+    return items.takeIf { ayah > 0 }
+}
+
+/**
  * Serves one ayah out of the middle of a `.taqa` without extracting it.
  *
  * The container holds the corpus's own MP3s back to back and its index says where each one starts

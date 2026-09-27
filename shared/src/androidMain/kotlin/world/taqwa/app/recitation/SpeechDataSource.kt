@@ -36,6 +36,17 @@ internal data class SpeechScript(
 )
 
 /**
+ * Lets an engine go, and never throws. `shutdown()` unbinds a service, and an engine that never
+ * finished binding, or whose process has died, can answer that with an exception: from the
+ * service's teardown or a main-looper callback it would crash the app, and from a synthesis on
+ * ExoPlayer's loading thread it would reach ExoPlayer as the very error [SpeechDataSource] exists
+ * to keep from it. Every engine this app binds is let go through here.
+ */
+internal fun TextToSpeech.shutdownQuietly() {
+    runCatching { shutdown() }
+}
+
+/**
  * The service's voice (read-aloud spec §5.5): one `TextToSpeech` bound to the engine the app
  * chose, turning a translation into a WAV the player plays like any other item.
  *
@@ -110,7 +121,7 @@ internal class Speaker(private val context: Context) {
             Thread.currentThread().interrupt()
             return null
         }
-        return try {
+        val wav = try {
             synthesize(generation, ayah)
         } catch (e: InterruptedException) {
             // ExoPlayer has let go of the item — a new queue, a seek, the player released — and
@@ -120,11 +131,21 @@ internal class Speaker(private val context: Context) {
         } catch (e: Exception) {
             null
         } finally {
-            // Read-aloud was turned off, or the service went, while this ran: nothing will ask
-            // for the engine again, and a bound engine keeps its own process alive for nothing.
-            if (script == null || released) unbind()
-            lock.unlock()
+            try {
+                // Read-aloud was turned off, or the service went, while this ran: nothing will ask
+                // for the engine again, and a bound engine keeps its own process alive for nothing.
+                if (script == null || released) unbind()
+            } finally {
+                // In a `finally` of its own: whatever the line above throws, a lock left held
+                // would silence every translation after this one.
+                lock.unlock()
+            }
         }
+        // A `setScript(null)` that landed after the check above but before the unlock found the
+        // lock held and left the engine to this synthesis, which had already looked. Looked at
+        // again now that the lock is free, so that engine is not left bound for nothing.
+        if (script == null && !released) letGo()
+        return wav
     }
 
     /**
@@ -134,7 +155,7 @@ internal class Speaker(private val context: Context) {
      */
     fun release() {
         released = true
-        tts.getAndSet(null)?.shutdown()
+        tts.getAndSet(null)?.shutdownQuietly()
         clear()
     }
 
@@ -214,11 +235,11 @@ internal class Speaker(private val context: Context) {
         val answered = try {
             ready.await(BIND_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         } catch (e: InterruptedException) {
-            made.shutdown()
+            made.shutdownQuietly()
             throw e
         }
         if (!answered || !started) {
-            made.shutdown()
+            made.shutdownQuietly()
             return null
         }
         tts.set(made)
@@ -244,7 +265,7 @@ internal class Speaker(private val context: Context) {
     private fun unbind() {
         ttsEngine = null
         ttsVoice = null
-        tts.getAndSet(null)?.shutdown()
+        tts.getAndSet(null)?.shutdownQuietly()
     }
 
     /** Lets the engine go if no synthesis holds it; one that does lets it go itself. Never waits. */
