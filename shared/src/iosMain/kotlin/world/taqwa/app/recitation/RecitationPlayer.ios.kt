@@ -104,7 +104,8 @@ import kotlin.time.TimeSource
  * as *finished*, exactly as it does one that read itself out (measured on the iOS 26.2 simulator;
  * the delegate's cancel callback, which a stop suggests, never came). So what advances the queue
  * is a finish for the translation still current: each stop lets go of it first, a late finish
- * matches nothing, and a move can never advance the queue twice.
+ * matches nothing, and a move can never advance the queue twice. A voice that never reports a
+ * finish at all is given up on by a watchdog, and the recitation carries on (spec §7).
  *
  * Everything that touches AVFoundation or MediaPlayer runs on the main thread.
  */
@@ -199,6 +200,17 @@ actual class RecitationPlayer actual constructor(
      */
     private var speechStarted: TimeSource.Monotonic.ValueTimeMark? = null
     private var speechElapsedMs = 0L
+
+    /**
+     * The backstop for a voice that never says it has finished (read-aloud spec §7: the recitation
+     * always carries on). Armed with each translation and given [SPEECH_BUDGET_FACTOR] times its
+     * estimated length, or the estimate and [SPEECH_GRACE_MS] more if that is longer, of speaking
+     * time — the same frozen-through-a-pause time as the clock ([speechElapsedNow]): a pause
+     * cancels it and a play arms it again with what is left. A translation still current when it
+     * fires is stopped and left behind exactly as if it had read itself out. Every move, stop,
+     * pause and finish cancels it.
+     */
+    private var watchdog: Job? = null
 
     /**
      * The synthesizer's delegate. Its `delegate` property is weak, so this is what keeps the
@@ -312,8 +324,13 @@ actual class RecitationPlayer actual constructor(
             built.isSpeech(at) -> {
                 val n = (built.items[at] as QueueItem.Speech).n
                 when {
-                    // Not begun: the pause came in the breath before it. From the top.
-                    utterance == null -> speak(n)
+                    // Nothing reading and nothing paused. That is the hold after the surah's last
+                    // translation, which the controller answers with the next surah or a stop: a
+                    // play there must not read the translation a second time. Nothing else leaves
+                    // a translation's item without its utterance — a pause in the breath before
+                    // one rests on the breath — so off the hold this is only a backstop, and it
+                    // reads the translation from the top rather than waiting on nothing.
+                    utterance == null -> if (!ended) speak(n)
                     // Paused by [pause]: on from the word it stopped at. This player's own mark
                     // says so, not the synthesizer's `paused`, which it sets only a moment after
                     // the pause was asked for: a quick pause and play would find it still false
@@ -325,6 +342,9 @@ actual class RecitationPlayer actual constructor(
                         if (!synthesizer.continueSpeaking() && !synthesizer.speaking) {
                             speechElapsedMs = 0L
                             speak(n)
+                        } else {
+                            // On again with what is left of its budget: the pause did not count.
+                            watchSpeech(n)
                         }
                     }
                     // Already reading — a second play from a headset or the lock screen. Speaking
@@ -352,6 +372,8 @@ actual class RecitationPlayer actual constructor(
             speechStarted = null
             synthesizer.pauseSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
         }
+        // Paused time is not speaking time: the watchdog waits with the voice.
+        stopWatchdog()
         player?.pause()
         publish()
     }
@@ -513,6 +535,7 @@ actual class RecitationPlayer actual constructor(
         if (ended) return
         ended = true
         wantsPlay = false
+        stopWatchdog()
         ticker?.cancel()
         ticker = null
         ayahPositionMs = ayahDurationMs
@@ -565,13 +588,44 @@ actual class RecitationPlayer actual constructor(
         next.voice = voice
         next.rate = AVSpeechUtteranceDefaultSpeechRate
         utterance = next
+        // From the top, so from nothing: the clock's slot and the watchdog's budget both start here.
+        speechElapsedMs = 0L
         speechStarted = TimeSource.Monotonic.markNow()
         synthesizer.speakUtterance(next)
+        watchSpeech(n)
         startTicker()
     }
 
-    /** The translation read itself out: on to whatever follows it. */
+    /**
+     * Arms [watchdog] for the translation after ayah [n], which [utterance] now holds, with what is
+     * left of its budget.
+     */
+    private fun watchSpeech(n: Int) {
+        stopWatchdog()
+        val current = utterance ?: return
+        val estimate = speech?.estimateMs(n) ?: 0L
+        val budget = maxOf(estimate * SPEECH_BUDGET_FACTOR, estimate + SPEECH_GRACE_MS)
+        val left = (budget - speechElapsedNow()).coerceAtLeast(0L)
+        watchdog = scope.launch {
+            delay(left)
+            if (current != utterance) return@launch
+            // Let go of first, so the stop below does not cancel the job that is making it.
+            watchdog = null
+            // As every stop is made — the utterance cleared before the synthesizer is told — so
+            // the finish it reports for this one matches nothing and cannot advance a second time.
+            stopSpeaking()
+            onSpeechEnded()
+        }
+    }
+
+    private fun stopWatchdog() {
+        watchdog?.cancel()
+        watchdog = null
+    }
+
+    /** The translation read itself out, or the watchdog gave up on it: on to whatever follows it. */
     private fun onSpeechEnded() {
+        stopWatchdog()
         utterance = null
         speechStarted = null
         val built = queue ?: return
@@ -587,9 +641,11 @@ actual class RecitationPlayer actual constructor(
 
     /**
      * Silences the voice without advancing. The synthesizer reports the stopped translation as
-     * finished, so [utterance] is let go of before the stop and that finish matches nothing.
+     * finished, so [utterance] is let go of before the stop and that finish matches nothing. The
+     * [watchdog] goes with it: every move, stop and rebuild comes through here.
      */
     private fun stopSpeaking() {
+        stopWatchdog()
         if (utterance == null) return
         utterance = null
         speechStarted = null
@@ -901,7 +957,9 @@ actual class RecitationPlayer actual constructor(
             buffering = false,
             surahPositionMs = surahPositionMs,
             surahDurationMs = surahDurationMs,
-            speaking = speaking,
+            // The hold after the surah's last translation rests on that translation's item, but
+            // nothing is being read, and the bar must not go on saying "· Translation".
+            speaking = speaking && !ended,
         )
         nowPlaying()
     }
@@ -912,6 +970,14 @@ actual class RecitationPlayer actual constructor(
 
     private companion object {
         const val POLL_MS = 250L
+
+        /**
+         * The [watchdog]'s budget: three times a translation's estimated length, or the estimate
+         * and twenty seconds more, whichever is longer. Room enough for a slow voice and an
+         * estimate that ran short, and still an end to a voice that will never finish.
+         */
+        const val SPEECH_BUDGET_FACTOR = 3L
+        const val SPEECH_GRACE_MS = 20_000L
 
         /** `iosApp/iosApp/Resources/recitation-artwork.png`, the app icon at 512 px (spec §12). */
         const val ARTWORK = "recitation-artwork"
