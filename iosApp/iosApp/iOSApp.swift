@@ -263,9 +263,12 @@ import MediaPlayer
 /// xcrun simctl openurl <udid> "taqwa://recite/next"
 /// ```
 ///
-/// Commands: `load`, `play`, `pause`, `toggle`, `next`, `prev`, `seek?ayah=n`, `stop`, `state`,
-/// `nowplaying` (dumps `MPNowPlayingInfoCenter`), `reconcile`. Everything is `NSLog`ged with the
-/// prefix `TaqwaHarness`, which is how the ayah boundary and the gap are actually measured:
+/// Commands: `load` (with `translation=en.sahih` to read that translation aloud after each ayah),
+/// `play`, `pause`, `toggle`, `next`, `prev`, `seek?ayah=n`, `stop`, `state`, `nowplaying` (dumps
+/// `MPNowPlayingInfoCenter`), `reconcile`, `voices` (what this phone's voices answer for every
+/// bundled language), `speech?translation=<id>` (read-aloud changed while a surah plays; `none`
+/// turns it off). Everything is `NSLog`ged with the prefix `TaqwaHarness`, which is how the ayah
+/// boundary, the gap and the translation are actually measured:
 ///
 /// ```
 /// xcrun simctl spawn <udid> log show --last 2m --predicate 'eventMessage CONTAINS "TaqwaHarness"'
@@ -292,18 +295,43 @@ enum RecitationHarness {
 		switch command {
 		case "load":
 			watch()
-			player.load(
-				reciter: reciter(reciterId, gapMs: number("gap", -1)),
-				surah: surah,
-				startAyah: ayah,
-				text: NowPlayingText(
-					title: "Surah \(surah)",
-					subtitle: "Mishary Rashid Alafasy",
-					previousAyahLabel: "",
-					nextAyahLabel: ""
-				),
-				speech: nil
-			) { _ in }
+			let playWith = reciter(reciterId, gapMs: number("gap", -1))
+			let text = NowPlayingText(
+				title: "Surah \(surah)",
+				subtitle: "Mishary Rashid Alafasy",
+				previousAyahLabel: "",
+				nextAyahLabel: ""
+			)
+			// Read-aloud (spec §5.6): the translation read after each ayah, if the phone has a
+			// voice for its language.
+			if let id = value("translation") {
+				spoken(id, surah: surah) { speech in
+					NSLog("TaqwaHarness speech \(speech?.translationId ?? "none") \(speech?.texts.count ?? 0)")
+					player.load(reciter: playWith, surah: surah, startAyah: ayah, text: text, speech: speech) { _ in }
+				}
+			} else {
+				player.load(reciter: playWith, surah: surah, startAyah: ayah, text: text, speech: nil) { _ in }
+			}
+		// Read-aloud live (spec §2): `speech?translation=fr.hamidullah`, or `none` for off.
+		case "speech":
+			let id = value("translation") ?? "none"
+			let surahNow = (player.state.value as? PlaybackState)?.surah?.int32Value ?? surah
+			if id == "none" {
+				NSLog("TaqwaHarness setSpeech none")
+				player.setSpeech(speech: nil)
+			} else {
+				spoken(id, surah: surahNow) { speech in
+					NSLog("TaqwaHarness setSpeech \(speech?.translationId ?? "none") \(speech?.texts.count ?? 0)")
+					player.setSpeech(speech: speech)
+				}
+			}
+		// Read-aloud (spec §4): what this phone's voices answer for every bundled language.
+		case "voices":
+			for language in ["en", "ar", "fr", "tr", "id", "ur", "bn"] {
+				AppContainerKt.appContainer.speechVoices.status(language: language) { status, error in
+					NSLog("TaqwaHarness voice \(language) \(status.map { "\($0)" } ?? "failed: \(String(describing: error))")")
+				}
+			}
 		case "play": player.play()
 		case "pause": player.pause()
 		case "toggle": player.toggle()
@@ -394,11 +422,28 @@ enum RecitationHarness {
 		watcher = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
 			let state = AppContainerKt.appContainer.recitationPlayer.state.value as! PlaybackState
 			let line = "ayah=\(state.ayah?.intValue ?? -1)/\(state.ayahCount) "
-				+ "playing=\(state.playing) pos=\(state.positionMs) dur=\(state.durationMs) "
+				+ "playing=\(state.playing) speaking=\(state.speaking) "
+				+ "pos=\(state.positionMs) dur=\(state.durationMs) "
+				+ "clock=\(state.surahPositionMs)/\(state.surahDurationMs) "
 				+ "surah=\(state.surah?.intValue ?? -1)"
 			guard line != last else { return }
 			last = line
 			NSLog("TaqwaHarness state \(line)")
+		}
+	}
+
+	/// `buildSpokenTranslation` for the harness. Its completion can arrive on whichever thread the
+	/// last of its reads finished on, and the player is driven from the main thread only, so the
+	/// answer is handed on from the main queue.
+	private static func spoken(_ id: String, surah: Int32, then: @escaping (SpokenTranslation?) -> Void) {
+		SpokenTranslationKt.buildSpokenTranslation(
+			quran: AppContainerKt.appContainer.quranRepository,
+			voices: AppContainerKt.appContainer.speechVoices,
+			translationId: id,
+			surah: surah
+		) { speech, error in
+			if let error = error { NSLog("TaqwaHarness speech \(id) failed: \(error)") }
+			DispatchQueue.main.async { then(speech) }
 		}
 	}
 

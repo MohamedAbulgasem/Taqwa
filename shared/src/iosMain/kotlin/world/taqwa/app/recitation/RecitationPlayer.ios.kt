@@ -2,6 +2,7 @@ package world.taqwa.app.recitation
 
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCSignatureOverride
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -33,6 +34,12 @@ import platform.AVFAudio.AVAudioSessionRouteChangeNotification
 import platform.AVFAudio.AVAudioSessionRouteChangeReasonKey
 import platform.AVFAudio.AVAudioSessionRouteChangeReasonOldDeviceUnavailable
 import platform.AVFAudio.AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
+import platform.AVFAudio.AVSpeechBoundary
+import platform.AVFAudio.AVSpeechSynthesisVoice
+import platform.AVFAudio.AVSpeechSynthesizer
+import platform.AVFAudio.AVSpeechSynthesizerDelegateProtocol
+import platform.AVFAudio.AVSpeechUtterance
+import platform.AVFAudio.AVSpeechUtteranceDefaultSpeechRate
 import platform.AVFAudio.setActive
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
@@ -69,6 +76,7 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIBackgroundTaskIdentifier
 import platform.UIKit.UIBackgroundTaskInvalid
 import platform.UIKit.UIImage
+import platform.darwin.NSObject
 import platform.darwin.NSObjectProtocol
 import kotlin.time.TimeSource
 
@@ -88,6 +96,15 @@ import kotlin.time.TimeSource
  * custom URL scheme. Splitting the container into `Library/Caches/recitation/...` on load is a
  * few lines instead, and Caches is the right place for it: the files can be rebuilt from the
  * container at any time and iOS may take them back when the disk is tight.
+ *
+ * **Read-aloud (read-aloud spec §5.6).** A translation is a timed phase like a gap, not an item:
+ * the `AVPlayer` rests on the end of the ayah it follows while an `AVSpeechSynthesizer` reads the
+ * text through this app's own audio session — playback, spoken audio — so it goes on reading with
+ * the screen locked. Every move stops the voice, and the synthesizer reports a stopped utterance
+ * as *finished*, exactly as it does one that read itself out (measured on the iOS 26.2 simulator;
+ * the delegate's cancel callback, which a stop suggests, never came). So what advances the queue
+ * is a finish for the translation still current: each stop lets go of it first, a late finish
+ * matches nothing, and a move can never advance the queue twice.
  *
  * Everything that touches AVFoundation or MediaPlayer runs on the main thread.
  */
@@ -148,7 +165,10 @@ actual class RecitationPlayer actual constructor(
     private var endObserver: NSObjectProtocol? = null
     private var commandsWired = false
 
-    /** Held across the gap for the same reason as on Android: the ayah's line must not rewind. */
+    /**
+     * Held across the gap and the translation for the same reason as on Android: the ayah's line
+     * must not rewind.
+     */
     private var ayahPositionMs = 0L
     private var ayahDurationMs = 0L
 
@@ -159,6 +179,43 @@ actual class RecitationPlayer actual constructor(
      */
     private var gapStarted: TimeSource.Monotonic.ValueTimeMark? = null
     private var gapElapsedMs = 0L
+
+    /** Read-aloud (spec §5.6): what this surah reads, and what a rebuild needs to redo the queue. */
+    private var speech: SpokenTranslation? = null
+    private var gapMs = 0L
+    private var ayahDurations: Map<Int, Long> = emptyMap()
+
+    /**
+     * The translation being read, from [speak] until it finishes or is stopped. Cleared *before*
+     * any stop, so a finish the synthesizer reports for a translation already left behind finds
+     * nothing to match and is ignored.
+     */
+    private var utterance: AVSpeechUtterance? = null
+
+    /**
+     * How far into the translation the voice has got, on the surah's clock: a monotonic mark, as
+     * for the gap, since the synthesizer has no position to ask. A pause freezes it and a play
+     * starts it again from there.
+     */
+    private var speechStarted: TimeSource.Monotonic.ValueTimeMark? = null
+    private var speechElapsedMs = 0L
+
+    /**
+     * The synthesizer's delegate. Its `delegate` property is weak, so this is what keeps the
+     * object alive. Apple promises no thread for the callback, and [utterance] and the queue are
+     * main-thread state, so the finish is matched on the main thread — at once when the callback
+     * is already there, which leaves no gap for a play to start the translation again between
+     * its finish and the move. `==` is `isEqual:`, which for an utterance is the object itself,
+     * whatever Kotlin wrapper the callback hands over.
+     */
+    private val speechEnd = SpeechEnd { finished ->
+        scope.launch(Dispatchers.Main.immediate) { if (finished == utterance) onSpeechEnded() }
+    }
+
+    /** Made on the first translation read, not with the player: constructing this class is free. */
+    private val synthesizer: AVSpeechSynthesizer by lazy {
+        AVSpeechSynthesizer().also { it.delegate = speechEnd }
+    }
 
     /** The last surah-clock pair published, for the lock screen's bar. */
     private var surahPositionMs = 0L
@@ -183,11 +240,15 @@ actual class RecitationPlayer actual constructor(
             surah = surah,
             ayahs = split.files.keys.sorted(),
             gapMs = reciter.gapMs.toLong(),
+            spoken = speech?.spoken.orEmpty(),
         )
-        val clock = SurahTimeline.of(built) { split.durationsMs[it] ?: 0L }
+        val clock = SurahTimeline.of(built, { split.durationsMs[it] ?: 0L }) { speech?.estimateMs(it) ?: 0L }
         withContext(Dispatchers.Main) {
             queue = built
             timeline = clock
+            this@RecitationPlayer.speech = speech
+            gapMs = reciter.gapMs.toLong()
+            ayahDurations = split.durationsMs
             files = split.files
             reciterId = reciter.id
             this@RecitationPlayer.text = text
@@ -206,16 +267,73 @@ actual class RecitationPlayer actual constructor(
         }
     }
 
-    actual fun setSpeech(speech: SpokenTranslation?) = Unit
+    actual fun setSpeech(speech: SpokenTranslation?) {
+        val old = queue ?: return
+        this.speech = speech
+        val built = RecitationQueue(old.surah, old.ayahs, gapMs, speech?.spoken.orEmpty())
+        val clock = SurahTimeline.of(built, { ayahDurations[it] ?: 0L }) { speech?.estimateMs(it) ?: 0L }
+        val ayah = old.ayahAt(at)
+        val inAyah = old.isAyah(at)
+        queue = built
+        timeline = clock
+        if (inAyah) {
+            // The ayah's own item carries on playing; only its place in the queue has moved.
+            at = built.indexOfAyah(ayah) ?: 0
+            publish()
+            return
+        }
+        // In a silence or a translation: on to the next ayah (read-aloud spec §2).
+        stopSpeaking()
+        gapJob?.cancel()
+        gapJob = null
+        val own = built.indexOfAyah(ayah) ?: 0
+        val next = built.next(own)
+        if (next != null) {
+            go(next)
+            return
+        }
+        // The last ayah's translation, or the hold after it: nothing follows, so the surah rests
+        // on its last ayah, ended. `at` is moved first, because the index it held belonged to the
+        // old queue, and a hold that has already begun is only shown again.
+        at = own
+        if (ended) publish() else finish()
+    }
 
     actual fun play() {
         val built = queue ?: return
         wantsPlay = true
         pausedByInterruption = false
         activateSession()
-        // A gap is playing silence: there is no item to start, the wait simply resumes — from
-        // where the pause froze it, so the surah's clock does not rewind by the part already waited.
-        if (built.isGap(at)) waitOutGap(built, built.silenceMs(at) - gapElapsedMs) else player?.play()
+        when {
+            // A gap is playing silence: there is no item to start, the wait simply resumes — from
+            // where the pause froze it, so the surah's clock does not rewind by the part already
+            // waited.
+            built.isGap(at) -> waitOutGap(built, built.silenceMs(at) - gapElapsedMs)
+            built.isSpeech(at) -> {
+                val n = (built.items[at] as QueueItem.Speech).n
+                when {
+                    // Not begun: the pause came in the breath before it. From the top.
+                    utterance == null -> speak(n)
+                    // Paused by [pause]: on from the word it stopped at. This player's own mark
+                    // says so, not the synthesizer's `paused`, which it sets only a moment after
+                    // the pause was asked for: a quick pause and play would find it still false
+                    // and queue the text a second time behind the paused one. Should there be
+                    // nothing to continue and nothing reading — the system let it go without a
+                    // word — it is read again from the top rather than waited on for ever.
+                    speechStarted == null -> {
+                        speechStarted = TimeSource.Monotonic.markNow()
+                        if (!synthesizer.continueSpeaking() && !synthesizer.speaking) {
+                            speechElapsedMs = 0L
+                            speak(n)
+                        }
+                    }
+                    // Already reading — a second play from a headset or the lock screen. Speaking
+                    // it again would queue the text behind itself and read the translation twice.
+                    else -> Unit
+                }
+            }
+            else -> player?.play()
+        }
         publish()
         startTicker()
     }
@@ -228,6 +346,12 @@ actual class RecitationPlayer actual constructor(
         // of a second nobody will hear twice.
         gapElapsedMs = gapElapsedNow()
         gapStarted = null
+        // A translation pauses mid-word and its clock with it; `play` continues both.
+        if (queue?.isSpeech(at) == true && utterance != null) {
+            speechElapsedMs = speechElapsedNow()
+            speechStarted = null
+            synthesizer.pauseSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
+        }
         player?.pause()
         publish()
     }
@@ -248,13 +372,16 @@ actual class RecitationPlayer actual constructor(
 
     actual fun previous() {
         val built = queue ?: return
-        go(built.previous(at, if (built.isGap(at)) 0L else ayahPositionMs))
+        go(built.previous(at, if (!built.isAyah(at)) 0L else ayahPositionMs))
     }
 
     actual fun stop() {
         leaveHold()
         gapJob?.cancel()
         gapJob = null
+        stopSpeaking()
+        speech = null
+        speechElapsedMs = 0L
         ticker?.cancel()
         ticker = null
         wantsPlay = false
@@ -295,7 +422,10 @@ actual class RecitationPlayer actual constructor(
 
     // ---- the queue --------------------------------------------------------------------------
 
-    /** Starts queue item [index]: an ayah's file, or the wait that is a gap. */
+    /**
+     * Starts queue item [index]: an ayah's file, the wait that is a gap or a breath, or the voice
+     * reading a translation. Whatever was playing stops first, the voice included.
+     */
     private fun go(index: Int) {
         val built = queue ?: return
         // A move during the hold (a scrub on the lock screen, a tap on an ayah) takes the ended
@@ -306,6 +436,7 @@ actual class RecitationPlayer actual constructor(
         }
         gapJob?.cancel()
         gapJob = null
+        stopSpeaking()
         at = index.coerceIn(0, built.size - 1)
         if (built.isGap(at)) {
             player?.pause()
@@ -313,6 +444,18 @@ actual class RecitationPlayer actual constructor(
             gapElapsedMs = 0L
             publish()
             if (wantsPlay) waitOutGap(built, built.silenceMs(at))
+            return
+        }
+        if (built.isSpeech(at)) {
+            // The ayah it follows has played out; the player rests on its end, as in a gap.
+            player?.pause()
+            ayahPositionMs = ayahDurationMs
+            gapStarted = null
+            gapElapsedMs = 0L
+            speechElapsedMs = 0L
+            speechStarted = null
+            publish()
+            if (wantsPlay) speak((built.items[at] as QueueItem.Speech).n)
             return
         }
         val path = files[built.ayahAt(at)] ?: return
@@ -328,21 +471,27 @@ actual class RecitationPlayer actual constructor(
         startTicker()
     }
 
-    /** The rest of the gap at [at]: [remainingMs] of silence, then the ayah after it. */
+    /**
+     * The rest of the silence at [at]: [remainingMs] of it, then the item after it — the next
+     * ayah after a reciter's gap, the translation after a breath. Not [RecitationQueue.next],
+     * which skips to the next ayah and would skip the translation with it.
+     */
     private fun waitOutGap(built: RecitationQueue, remainingMs: Long) {
         gapJob?.cancel()
         gapStarted = TimeSource.Monotonic.markNow()
         gapJob = scope.launch {
             delay(remainingMs.coerceAtLeast(0L))
-            val next = built.next(at)
-            if (next != null) go(next) else finish()
+            val following = at + 1
+            if (following < built.size) go(following) else finish()
         }
     }
 
-    /** The item just played to its end. Move on, or stop at the last ayah of the surah. */
+    /** The ayah just played to its end. Move on, or stop at the last ayah of the surah. */
     private fun onItemEnded() {
         val built = queue ?: return
-        if (built.isGap(at)) return
+        // Only an ayah has an item that ends; a silence or a translation still resting on the
+        // ayah's ended item must not be taken for it.
+        if (!built.isAyah(at)) return
         val nextIndex = at + 1
         if (nextIndex >= built.size) {
             finish()
@@ -395,6 +544,61 @@ actual class RecitationPlayer actual constructor(
         transition = UIBackgroundTaskInvalid
         UIApplication.sharedApplication.endBackgroundTask(task)
     }
+
+    // ---- the voice --------------------------------------------------------------------------
+
+    /**
+     * Reads the translation after ayah [n] (read-aloud spec §5.6), at Apple's default rate. A
+     * voice that has gone from the phone since it was chosen falls back to any voice for the
+     * language; with none at all the translation is skipped, and the recitation goes on (§7).
+     */
+    private fun speak(n: Int) {
+        val spoken = speech
+        val text = spoken?.texts?.get(n)
+        val voice = spoken?.voice?.id?.let { AVSpeechSynthesisVoice.voiceWithIdentifier(it) }
+            ?: spoken?.language?.let { AVSpeechSynthesisVoice.voiceWithLanguage(it) }
+        if (text == null || voice == null) {
+            onSpeechEnded()
+            return
+        }
+        val next = AVSpeechUtterance(string = text)
+        next.voice = voice
+        next.rate = AVSpeechUtteranceDefaultSpeechRate
+        utterance = next
+        speechStarted = TimeSource.Monotonic.markNow()
+        synthesizer.speakUtterance(next)
+        startTicker()
+    }
+
+    /** The translation read itself out: on to whatever follows it. */
+    private fun onSpeechEnded() {
+        utterance = null
+        speechStarted = null
+        val built = queue ?: return
+        val following = at + 1
+        if (following < built.size) {
+            go(following)
+            return
+        }
+        // The surah's last translation: its slot is full, as a last ayah's line is when it ends.
+        speechElapsedMs = timeline?.durationOf(at) ?: 0L
+        finish()
+    }
+
+    /**
+     * Silences the voice without advancing. The synthesizer reports the stopped translation as
+     * finished, so [utterance] is let go of before the stop and that finish matches nothing.
+     */
+    private fun stopSpeaking() {
+        if (utterance == null) return
+        utterance = null
+        speechStarted = null
+        synthesizer.stopSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
+    }
+
+    /** How far into the current translation the voice has got, frozen or running. */
+    private fun speechElapsedNow(): Long =
+        speechElapsedMs + (speechStarted?.elapsedNow()?.inWholeMilliseconds ?: 0L)
 
     // ---- the container ----------------------------------------------------------------------
 
@@ -659,7 +863,9 @@ actual class RecitationPlayer actual constructor(
     private fun publish() {
         val built = queue ?: return
         val gap = built.isGap(at)
-        if (!gap) {
+        val speaking = built.isSpeech(at)
+        // Only an ayah is in the player; in a silence or a translation it rests on the ayah's end.
+        if (!gap && !speaking) {
             val item = player?.currentItem
             if (item != null) {
                 val position = CMTimeGetSeconds(player!!.currentTime())
@@ -673,9 +879,14 @@ actual class RecitationPlayer actual constructor(
         val clock = timeline
         if (clock != null) {
             // The ayah's slot is an estimate and the item's length is measured: scale into the
-            // slot rather than clamp, so the clock neither stalls nor jumps at the seam.
-            val within = if (gap) gapElapsedNow() else
-                SurahTimeline.fitToSlot(ayahPositionMs, ayahDurationMs, clock.durationOf(at))
+            // slot rather than clamp, so the clock neither stalls nor jumps at the seam. A
+            // translation has no measured length to scale by: its clock runs from its mark and
+            // waits at the end of its slot should the voice take longer than the estimate.
+            val within = when {
+                gap -> gapElapsedNow()
+                speaking -> speechElapsedNow().coerceAtMost(clock.durationOf(at))
+                else -> SurahTimeline.fitToSlot(ayahPositionMs, ayahDurationMs, clock.durationOf(at))
+            }
             surahPositionMs = clock.elapsed(at, within)
             surahDurationMs = clock.totalMs
         }
@@ -690,6 +901,7 @@ actual class RecitationPlayer actual constructor(
             buffering = false,
             surahPositionMs = surahPositionMs,
             surahDurationMs = surahDurationMs,
+            speaking = speaking,
         )
         nowPlaying()
     }
@@ -703,5 +915,21 @@ actual class RecitationPlayer actual constructor(
 
         /** `iosApp/iosApp/Resources/recitation-artwork.png`, the app icon at 512 px (spec §12). */
         const val ARTWORK = "recitation-artwork"
+    }
+}
+
+/**
+ * Tells the player the synthesizer has finished an utterance — one that read itself out, or one
+ * the player stopped, which is reported the same way; the player tells the two apart by whether
+ * the utterance is still its current one. Every method of the delegate protocol has the same
+ * Kotlin signature, so the one overridden here is picked by its Objective-C selector.
+ */
+private class SpeechEnd(
+    private val onFinish: (AVSpeechUtterance) -> Unit,
+) : NSObject(), AVSpeechSynthesizerDelegateProtocol {
+
+    @ObjCSignatureOverride
+    override fun speechSynthesizer(synthesizer: AVSpeechSynthesizer, didFinishSpeechUtterance: AVSpeechUtterance) {
+        onFinish(didFinishSpeechUtterance)
     }
 }
