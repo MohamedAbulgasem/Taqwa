@@ -138,22 +138,29 @@ internal class AndroidSpeechVoices : SpeechVoices {
     }
 }
 
-/**
- * True only for a voice that makes its speech on the phone (read-aloud spec §1: no text leaves
- * it). `isNetworkConnectionRequired` is the engine's own word, and it is not the whole story: a
- * voice that says it needs no connection but lists network synthesis among its features, or the
- * timeout and retry settings only a network voice reads, is not counted as offline either.
- */
-internal fun Voice.isOffline(): Boolean =
-    !isNetworkConnectionRequired && features.orEmpty().none { it in NETWORK_FEATURES }
+/** True only for a voice that makes its speech on the phone: see [isOfflineVoice]. */
+internal fun Voice.isOffline(): Boolean = isOfflineVoice(isNetworkConnectionRequired, features.orEmpty())
 
 /**
- * The feature keys that mark a network voice. `"networkTts"` is
- * `TextToSpeech.Engine.KEY_FEATURE_NETWORK_SYNTHESIS`, written out because the constant has been
- * deprecated since API 21 in favour of the flag above, while an engine may still set the key.
+ * True only for a voice that makes its speech on the phone (read-aloud spec §1: no text leaves
+ * it): one that needs no connection by the engine's own word, and does not list network synthesis
+ * among its [features].
+ *
+ * That is all a voice's features can be trusted to say. Google's engine lists its timeout and
+ * retry settings (`networkTimeoutMs`, `networkRetriesCount`) on every voice, local ones included,
+ * as measured on the emulator and the S23: `en-us-x-iob-local` carries both, exactly as its twin
+ * `en-us-x-iob-network` and the `en-US-language` alias do. Counting those two as the mark of a
+ * network voice ruled every voice out, and every language read as Unsupported. The `-network`
+ * twins are the ones that raise `isNetworkConnectionRequired`. Of the voices left, `VoicePick`'s
+ * `-local` tie-break then chooses an explicitly local one, such as `en-us-x-iob-local`, over the
+ * `en-US-language` alias when the engine rates the two alike.
  */
-private val NETWORK_FEATURES = setOf(
-    "networkTts",
-    TextToSpeech.Engine.KEY_FEATURE_NETWORK_TIMEOUT_MS,
-    TextToSpeech.Engine.KEY_FEATURE_NETWORK_RETRIES_COUNT,
-)
+internal fun isOfflineVoice(networkRequired: Boolean, features: Set<String>): Boolean =
+    !networkRequired && NETWORK_SYNTHESIS !in features
+
+/**
+ * `TextToSpeech.Engine.KEY_FEATURE_NETWORK_SYNTHESIS`, written out because the constant has been
+ * deprecated since API 21 in favour of `isNetworkConnectionRequired`, while an engine may still
+ * set the key on a voice that does not raise the flag.
+ */
+private const val NETWORK_SYNTHESIS = "networkTts"
