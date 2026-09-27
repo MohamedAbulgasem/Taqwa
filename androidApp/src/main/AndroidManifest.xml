@@ -26,6 +26,14 @@
          the generic one since API 28, the typed one since API 34. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
+    <!-- Read-aloud (spec §4): from Android 11 an app sees other text-to-speech engines — Google's,
+         Samsung's — only when it says it looks for them. No permission; nothing is sent anywhere. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <!-- ACCESS_COARSE_LOCATION would otherwise imply that location hardware is *required*, which
          hides the app on Play from the few devices without it. Nothing here needs it: a city from
          the built-in list gives the same prayer times, and the compass says so when it has no

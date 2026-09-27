@@ -39,7 +39,8 @@ import world.taqwa.app.recitation.Reciters
  *
  * Commands: `load`, `play`, `pause`, `toggle`, `next`, `prev`, `seek --ei ayah n`, `stop`,
  * `state`, `reconcile` (adopt the containers pushed onto the device), `focus` (take audio focus
- * away with a second player, to see the recitation pause).
+ * away with a second player, to see the recitation pause), `voices` (what the phone's speech
+ * engines answer for every bundled language).
  *
  * Everything it does is logged under the tag `TaqwaHarness`, including every state change with a
  * millisecond timestamp — which is how the ayah boundary and the gap are actually measured.
@@ -93,6 +94,10 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                         else world.taqwa.app.quran.ReadingMode.TRANSLATION,
                     )
                     "translation" -> appContainer.settingsRepository.setTranslation(intent.getStringExtra("id") ?: "en.sahih")
+                    // Read-aloud (spec §4): what the phone's engines answer for every bundled language.
+                    "voices" -> listOf("en", "ar", "fr", "tr", "id", "ur", "bn").forEach { language ->
+                        Log.i(TAG, "voice $language ${appContainer.speechVoices.status(language)}")
+                    }
                     "state" -> Log.i(TAG, "state ${player.state.value}")
                     "reconcile" -> {
                         val library = appContainer.recitationLibrary
