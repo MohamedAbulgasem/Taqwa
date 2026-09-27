@@ -1577,3 +1577,45 @@ live the build leaves the section out entirely: no index, no header or footer li
 strip (`PRAYER_TIMES_LIVE` in `site/build.py`). With the rows restored the new code builds all 154
 pages byte for byte as before. The app shows the same times the pages did, so this is the engine's
 to fix, not the site's.
+
+## Reading the translation aloud (27 September)
+
+An option, off by default: after the reciter recites an ayah, the phone's own voice reads the translation shown under it. Headphones on a journey: the Quran in Arabic and its meaning in your language, with no network and no cost. Mohamed decided three things before any code:
+
+- Tafsir al-Muyassar is read too, with the Quran words it quotes dropped.
+- The switch lives in the reading sheet, under Translation, and in Settings › Recitation.
+- Both platforms ship together. Where a phone cannot read a language, the switch is not shown.
+
+**What is read.** `SpeechText` turns the text on screen into the text a voice reads. It was measured against every row of quran.db:
+
+- **Muyassar's quotations.** Muyassar marks its quotations in exactly three ways:
+  - braces around verses quoted from elsewhere (9 of them);
+  - fully voweled parentheses, which quote the ayah itself (6);
+  - the disjoined letters at a surah's opening, e.g. (الم), (حم * عسق), and 29:1's bare الم:.
+
+  Each is dropped with its marks. The roughly 190 other parentheses are explanation, and the voice reads them.
+- **Shared texts.** Diyanet's Turkish repeats one translation over as many as 12 ayahs (570 runs), and Muyassar over as many as 14 (605). A shared text is read once, after the last ayah of its run.
+- **Bengali.** The bundled Bengali has 42 rows with mangled HTML character references, such as "চিহিߦ#2468;". The voice gets them decoded. The reader still shows them, and repairing the data is a separate task.
+
+**How it plays.** The queue per ayah is: the ayah, a 400 ms breath, the translation, then the reciter's gap.
+
+- **Android.** The Media3 service turns each translation into a WAV with the chosen engine, on ExoPlayer's loading thread while the ayah before it plays. `AyahPlayer` hides translations from the session exactly as it hides gaps, so the notification and lock screen never change between an ayah and its translation.
+- **iOS.** `AVSpeechSynthesizer` speaks as a timed phase between AVPlayer items.
+- **The surah clock.** It includes each translation's estimated length. Otherwise Android's media controls, which extrapolate position, would run ahead and snap back after every translation.
+- **Changes mid-surah.** Turning the switch or changing the translation mid-surah rebuilds the queue around the ayah being heard.
+
+**Voices.**
+
+| Phone | What it has |
+|---|---|
+| Emulator and S23 (Google's engine) | English installed. The other six languages are free packs, which "Get the voice" opens: French 23 MB, Arabic 4.2 MB. Samsung's own engine on the S23 offered none of the seven offline. |
+| iOS 26.2 simulator | Voices for six languages (Samantha, Majed, Thomas, Yelda, Damayanti, and Piya for Bangla). Urdu has none, so Urdu hides the switch on iPhone. |
+
+**Surprises worth keeping.**
+
+- iOS 26.2 reports `didFinish` (not cancel) when speech is stopped. The player clears its current utterance first, and matches finishes by identity.
+- `AVSpeechSynthesizer.paused` updates late.
+- Android 16 refuses audio focus and a foreground service to a harness `load` sent while the S23 is locked, so device playback tests start from the app.
+- The whole-branch review caught Settings › Recitation never asking about voices after a cold start, and an engine `shutdown()` that could leave the speech lock held. Its offline-only hardening then broke Android outright: Google's engine lists `networkTimeoutMs` and `networkRetriesCount` on every voice, the local ones included, so treating those keys as "network" left no voice at all. A device probe measured this, and the rule is now `!isNetworkConnectionRequired` and no `networkTts`, with the `-local` voice winning ties (`en-us-x-iob-local` on both phones). `OfflineVoiceTest` pins the measured feature sets.
+
+**Built with.** Spec `docs/superpowers/specs/2026-09-27-translation-read-aloud-design.md`, plan `docs/superpowers/plans/2026-09-27-translation-read-aloud.md`, and seven subagent tasks, each with its own review.
