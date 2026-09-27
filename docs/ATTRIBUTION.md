@@ -44,3 +44,5 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
   - Diyanet İşleri: Diyanet İşleri Başkanlığı (Turkish)
   - Muhammad Hamidullah: Muhammad Hamidullah (French)
   - Transliteration: Tanzil Project (English)
+
+  Tanzil's own Bengali and Indonesian files are damaged in places: 44 Bengali rows lost letters in a font conversion and 11 Indonesian rows carry OCR slips. The build repairs those rows from the printed translation and Kemenag's text, and `TRANSLATION_REPAIRS` in `tools/build-quran-db.py` lists every change.

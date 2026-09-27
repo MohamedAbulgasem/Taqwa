@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / "cache"
 OUT = ROOT / "shared" / "src" / "commonMain" / "composeResources" / "files" / "quran.db"
-USER_VERSION = 4
+USER_VERSION = 5
 
 TANZIL_TEXT = "https://tanzil.net/pub/download/index.php?quranType={kind}&marks=true&sajdah=true&rub=true&tatweel=false&outType=txt-2&agree=true"
 TANZIL_TRANS = "https://tanzil.net/trans/?transID={id}&type=txt"
@@ -42,6 +42,90 @@ TRANSLATIONS = [
     ("en.transliteration", "en", "Transliteration", "Tanzil Project", "transliteration"),
 ]
 TANZIL_LICENCE = "Tanzil Project, non-commercial use, verbatim, credit the translator. tanzil.net/trans"
+
+# Tanzil's own files for two translations carry damage a reader sees under the ayah (27 Sep 2026).
+# Each entry is (surah, ayah, the damaged text exactly as Tanzil has it, what replaces it); the build
+# stops if an entry does not match its row exactly once, so a changed download is never patched
+# blindly. A \uXXXX escape is the stray character: Python reads exactly four hex digits, so the
+# digits after it are what is left of the reference.
+#
+# bn.bengali went through a legacy-font conversion that could not map some glyphs (a reph, a
+# ya/ba/na-phala, the ন্ত conjunct). Each lost glyph left a byte behind that fused with what came
+# next into a stray character: with the tail of an HTML numeric character reference for the
+# following letter ("চিহি\u07e6#2468;", 2468 = ত, for চিহ্নিত), as "?" with that tail, or with a
+# swallowed space. A glyph lost before a pre-base vowel sign also left the sign out of order
+# ("সম্প\ua9a32503;ক" for সম্পর্কে), so an entry covers the whole damaged word; the six that stop
+# early leave Tanzil's own encoding of য়, ো and ৌ untouched and name the whole word in their
+# comment. Every word was read off the translation's 1992 King Fahd Complex print (archive.org item
+# tafseer_maariful_quran_bangla, at the printed page given); it spells two of them the older way
+# (খর্জ্জুর, সৌন্দর্য্য), and so do the damaged bytes. Tanzil's current download and the copies made
+# from it (alquran.cloud, fawazahmed0/quran-api) carry the same damage.
+#
+# id.indonesian carries OCR slips: "]" for "l", "}" for ")", "0" for "-", and a stray "]" after a
+# word, where a footnote marker was cut away: Kemenag's current edition (quran.com) has a footnote at
+# exactly that spot in 3:130, 4:102 and 18:12, and a copy of the older edition reads 37:1 without it.
+TRANSLATION_REPAIRS: dict[str, list[tuple[int, int, str, str]]] = {
+    "bn.bengali": [
+        (2, 230, "কতৃ\ua9a32453;", "কর্তৃক"),  # p. 126
+        (3, 33, "(আঃ)\u0360ও", "(আঃ) ও"),  # p. 173
+        (3, 97, "সামর্থ?2480;", "সামর্থ্য র"),  # p. 186, সামর্থ্য রয়েছে
+        (3, 125, "চিহি\u07e6#2468;", "চিহ্নিত"),  # p. 199
+        (5, 9, "তা\u02e6#2503;দরকে", "তাদেরকে"),  # p. 313
+        (5, 64, "প্রজ্জ?482;িত", "প্রজ্জ্বলিত"),  # p. 343
+        (6, 83, "সম্প্র\u07a6#2470;", "সম্প্রদ"),  # p. 394, সম্প্রদায়ের
+        (6, 151, "দারিদ্রে?480;", "দারিদ্র্যের"),  # p. 419
+        (9, 28, "দারিদ্রে?480;", "দারিদ্র্যের"),  # p. 563
+        (9, 86, "সামর্থ?476;ান", "সামর্থ্যবান"),  # p. 584
+        (10, 83, "কর্ত\ua9a32499;ত্বের", "কর্তৃত্বের"),  # p. 614
+        (11, 40, "পূর্বহে\u07e6#2439;", "পূর্বাহ্নেই"),  # p. 630
+        (12, 76, "কিু\u6826#2438;ল্লাহ", "কিন্তু আল্লাহ"),  # p. 681
+        (13, 4, "খজ্জ\ua9a32497;র", "খর্জ্জুর"),  # p. 696
+        (16, 5, "আহার্যে?2474;রিণত", "আহার্যে পরিণত"),  # p. 733
+        (16, 7, "পরিশ্র\u06e6#2478;", "পরিশ্রম"),  # p. 735
+        (16, 44, "নি\ua9a32503;দশাবলী", "নির্দেশাবলী"),  # p. 742
+        (17, 59, "কতৃ\ua9a32453;", "কর্তৃক"),  # p. 781
+        (17, 111, "মাহাত্ন?2476;র্ণনা", "মাহাত্ম্য বর্ণনা"),  # p. 794
+        (18, 95, "সামর্থ?2470;", "সামর্থ্য দ"),  # p. 818, সামর্থ্য দিয়েছেন
+        (20, 59, "পূর্বাহে\u07e0", "পূর্বাহ্নে "),  # p. 855, পূর্বাহ্নে লোকজন
+        (20, 96, "পদচিহে\u07e6#2480;", "পদচিহ্নের"),  # p. 862
+        (22, 3, "সম্প\ua9a32503;ক", "সম্পর্কে"),  # p. 893
+        (22, 41, "শক্তি-সামর্থ?2470;ান", "শক্তি-সামর্থ্য দান"),  # p. 903
+        (23, 68, "সম্প\ua9a32503;ক", "সম্পর্কে"),  # p. 918
+        (23, 71, "মধ্যবর্ত\ua9a32496;", "মধ্যবর্তী"),  # p. 918
+        (23, 88, "কতৃর্\ua9a32468;্ব", "কর্তৃত্ব"),  # p. 920
+        (24, 55, "শাসনকতৃ\ua9a32468;্ব", "শাসনকর্তৃত্ব"),  # p. 949
+        (24, 60, "ন্দর্য?2474;্রকাশ", "ন্দর্য্য প্রকাশ"),  # p. 952, সৌন্দর্য্য প্রকাশ
+        (26, 211, "সামর্থ?451;", "সামর্থ্যও"),  # p. 984
+        (27, 19, "সামর্থ?2470;াও", "সামর্থ্য দাও"),  # p. 991
+        (27, 64, "মর্ত?2469;েকে", "মর্ত্য থেকে"),  # p. 1000
+        (28, 40, "সমু\u02e6#2503;দ্র", "সমুদ্রে"),  # p. 1012
+        (28, 46, "পূ\ua9a32503;ব", "পূর্বে"),  # p. 1013
+        (28, 71, "কর্ণ\ua9a32474;াত", "কর্ণপাত"),  # p. 1020
+        (30, 18, "অপরাহে\u07e0ও", "অপরাহ্নে ও"),  # p. 1040
+        (30, 18, "মধ্যাহে\u07e6#2404;", "মধ্যাহ্নে।"),  # p. 1040
+        (40, 3, "সামর্থ?476;ান", "সামর্থ্যবান"),  # p. 1184
+        (46, 15, "শক্তি-সামর্থে?480;", "শক্তি-সামর্থ্যের"),  # p. 1247
+        (47, 4, "তা\u02e6#2503;দরকে", "তাদেরকে"),  # p. 1254
+        (51, 34, "চিহি\u07e6#2468;", "চিহ্নিত"),  # p. 1297
+        (52, 48, "পালনকর্ত\ua9a32494;র", "পালনকর্তার"),  # p. 1301
+        (59, 23, "মাহাত্ন?486;ীল", "মাহাত্ম্যশীল"),  # p. 1356
+        (65, 6, "সামর্থ?2437;", "সামর্থ্য অ"),  # p. 1383, সামর্থ্য অনুযায়ী
+        (82, 19, "কতৃ\ua9a32468;্ব", "কর্তৃত্ব"),  # p. 1441
+    ],
+    "id.indonesian": [
+        (3, 130, "ganda]", "ganda"),
+        (4, 102, "denganmu],", "denganmu,"),
+        (5, 73, "orang0orang", "orang-orang"),
+        (7, 192, "berha]a", "berhala"),
+        (10, 64, "(dalam kehidupan}", "(dalam kehidupan)"),
+        (11, 70, "ma]aikat", "malaikat"),
+        (12, 58, "(ke Mesir}", "(ke Mesir)"),
+        (16, 49, "ma]aikat", "malaikat"),
+        (18, 12, "itu]", "itu"),
+        (20, 53, "ja]an", "jalan"),
+        (37, 1, "benarnya],", "benarnya,"),
+    ],
+}
 
 # Each Tanzil text file ends in a copyright block Tanzil asks never to be removed or changed. Its
 # terms want that block in every file derived from the text, and CC BY 3.0 wants the licence's URI
@@ -157,6 +241,17 @@ def parse_translation(raw: bytes, order: list[tuple[int, int]]) -> dict[tuple[in
     assert len(body) == 6236, f"translation has {len(body)} lines"
     tag = re.compile(r"</?[ub]>", re.IGNORECASE)
     return {k: re.sub(r"  +", " ", tag.sub("", v)).strip() for k, v in zip(order, body)}
+
+
+def repair_translation(tid: str, text: dict[tuple[int, int], str]) -> int:
+    """Apply TRANSLATION_REPAIRS[tid] to one parsed translation in place; returns how many."""
+    repairs = TRANSLATION_REPAIRS.get(tid, [])
+    for s, a, damaged, repaired in repairs:
+        found = text[(s, a)].count(damaged)
+        if found != 1:
+            raise SystemExit(f"{tid} {s}:{a}: expected {damaged!r} once, found it {found} time(s)")
+        text[(s, a)] = text[(s, a)].replace(damaged, repaired)
+    return len(repairs)
 
 
 def parse_meta(raw: bytes):
@@ -443,6 +538,8 @@ def build(conn: sqlite3.Connection):
         conn.execute("INSERT INTO translation VALUES (?,?,?,?,?,?,?)",
                      (tid, lang, name, translator, licence, f"https://tanzil.net/trans/{tid}", kind))
         text = parse_translation(fetch(TANZIL_TRANS.format(id=tid), f"{tid}.txt"), order)
+        if repaired := repair_translation(tid, text):
+            print(f"  {tid}: {repaired} repair(s) from TRANSLATION_REPAIRS")
         conn.executemany("INSERT INTO ayah_translation VALUES (?,?,?,?)",
                          [(tid, s, a, text[(s, a)]) for (s, a) in order])
 
@@ -657,8 +754,34 @@ def verify(conn: sqlite3.Connection):
         cached = CACHE / f"{kind}.txt"
         if cached.exists():
             assert notices[source] == tanzil_notice(cached.read_bytes()), f"{source} differs from {cached.name}"
+    verify_translation_repairs(conn)
     assert one("PRAGMA user_version") == USER_VERSION
     print("verify: ok")
+
+
+def verify_translation_repairs(conn: sqlite3.Connection):
+    """No stored row carries the damage TRANSLATION_REPAIRS removes: a character reference's tail or
+    a stray character in the Bengali, a closing bracket the Indonesian never opened or a digit inside
+    one of its words. A download with more of it stops the build instead of reaching a reader."""
+    def rows(tid):
+        return conn.execute("SELECT surah, number, text FROM ayah_translation WHERE translation_id = ?", (tid,))
+
+    def own_bengali(c):
+        return 0x0980 <= ord(c) <= 0x09FF or 0x20 <= ord(c) <= 0x7E or ord(c) in (0x0964, 0x2018, 0x2019)
+
+    for s, a, t in rows("bn.bengali"):
+        assert not re.search("#?[0-9]{3,4};", t), f"bn.bengali {s}:{a} carries a character reference's tail"
+        assert all(own_bengali(c) for c in t), f"bn.bengali {s}:{a} carries a stray character"
+    for s, a, t in rows("id.indonesian"):
+        opened = {"]": 0, "}": 0}
+        for c in t:
+            if c in "[{":
+                opened["]" if c == "[" else "}"] += 1
+            elif c in "]}":
+                assert opened[c], f"id.indonesian {s}:{a} closes a {c} it never opened"
+                opened[c] -= 1
+        assert not re.search("[A-Za-z][0-9]+[A-Za-z]", t), f"id.indonesian {s}:{a} has a digit inside a word"
+    print("  translations: no damaged Bengali or Indonesian row")
 
 
 # Every code point the stored Quran text may contain: Arabic letters, harakat, the Quranic
