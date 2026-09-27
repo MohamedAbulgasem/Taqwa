@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.recitation
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -99,6 +100,11 @@ class RecitationControllerTest {
             _state.value = value
         }
 
+        /** Closed by a test that wants `load` in flight — the state already updated, as a real
+         * player's would be by the time it is worth asking about, but the suspend fun not yet
+         * returned — while it drives the controller from the outside. */
+        var loadGate: CompletableDeferred<Unit>? = null
+
         override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) {
             loads += Triple(reciter.id, surah, startAyah)
             speeches += speech
@@ -110,6 +116,7 @@ class RecitationControllerTest {
                 ayahCount = 7,
                 playing = true,
             )
+            loadGate?.await()
         }
 
         val speeches = mutableListOf<SpokenTranslation?>()
@@ -1493,6 +1500,9 @@ class RecitationControllerTest {
         assertEquals(TextKind.TRANSLATION, speech.kind)
         assertEquals("All praise is due to Allah, Lord of the worlds", speech.texts[2])
         assertEquals(SpeechVoice("com.google.android.tts", "en-us-x-sfg-local"), speech.voice)
+        // start() re-checks after the load finishes (so a change during it is not lost, see the
+        // "still loading" test below); the key guard must make that a no-op right after a load.
+        assertTrue(harness.player.speechUpdates.isEmpty())
     }
 
     @Test
@@ -1563,5 +1573,37 @@ class RecitationControllerTest {
         assertNull(c.state.value.bar?.readingAloud)
         harness.player.emit(harness.player.state.value.copy(speaking = true))
         assertEquals(TextKind.TRANSLATION, c.state.value.bar?.readingAloud)
+    }
+
+    @Test
+    fun `a switch turned on while the surah is still loading is not lost`() = runTest(UnconfinedTestDispatcher()) {
+        val harness = Harness()
+        harness.library.put("ar.alafasy", setOf(1))
+        val gate = CompletableDeferred<Unit>()
+        harness.player.loadGate = gate
+        val c = controller(harness, backgroundScope, readAloud = FakeReadAloud(), quran = readingQuran)
+        c.setLanguageTag("en")
+        c.requestPlay(1, 1)
+        // The switch changes while `load` is still in flight (the gate is closed): the read-aloud
+        // collector finds `loading` true and does nothing, rather than building a speech for a
+        // load that has not landed yet.
+        c.setReadAloud(true)
+        assertTrue(harness.player.speechUpdates.isEmpty())
+        // `start()` catches this up itself once the load has actually finished.
+        gate.complete(Unit)
+        val speech = assertNotNull(harness.player.speechUpdates.single())
+        assertEquals("en.sahih", speech.translationId)
+    }
+
+    @Test
+    fun `onForeground asks again only after the phone has been asked once`() = runTest(UnconfinedTestDispatcher()) {
+        val readAloud = FakeReadAloud()
+        val c = controller(Harness(), backgroundScope, readAloud = readAloud, quran = readingQuran)
+        c.setLanguageTag("en")
+        c.onForeground()
+        assertTrue(readAloud.asked.isEmpty())
+        c.refreshVoices()
+        c.onForeground()
+        assertEquals(2, readAloud.asked.size)
     }
 }

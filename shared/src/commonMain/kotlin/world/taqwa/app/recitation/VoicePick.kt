@@ -30,10 +30,11 @@ object VoicePick {
             .firstOrNull()
     }
 
-    /** True when [language] is offered but not yet usable offline: a download away. */
+    /** True when [language] is offered but not yet usable offline: a download away. A
+     * network-only voice has nothing to download, so it does not count. */
     fun downloadable(language: String, candidates: List<VoiceCandidate>): Boolean {
         val wanted = normalize(language)
-        return candidates.any { normalize(it.language) == wanted && !(it.offline && it.installed) }
+        return candidates.any { normalize(it.language) == wanted && it.offline && !it.installed }
     }
 
     /** Legacy and three-letter codes, and region suffixes, to the database's two letters. */

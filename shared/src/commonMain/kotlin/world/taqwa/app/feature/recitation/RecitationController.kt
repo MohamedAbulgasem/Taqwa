@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.TextKind
@@ -927,13 +928,22 @@ class RecitationController(
         } finally {
             loading.value = false
         }
+        // A switch, translation or voice change that arrived while the load above was in flight
+        // found `applyReadAloud` a no-op (see there) and is otherwise lost for the rest of this
+        // surah; this call catches it up. The key guard makes it a no-op itself when nothing
+        // changed, so a plain load is never followed by a redundant `setSpeech`.
+        applyReadAloud()
     }
 
     /**
      * The surah's translation as the voice will read it (read-aloud spec §5.4), or null: the
      * switch off, Translation off, no voice on the phone, or nothing to read.
+     *
+     * Never throws anything but cancellation (spec: "a failed voice never stops the recitation"):
+     * the settings read, [SpeechText.prepare] and the rest are wrapped so a surprise from any of
+     * them is "nothing to read" rather than a crash out of [start] or the read-aloud collector.
      */
-    private suspend fun spokenFor(surah: Int): SpokenTranslation? {
+    private suspend fun spokenFor(surah: Int): SpokenTranslation? = try {
         if (!settings.settings.first().readAloud) return null
         val info = readingTranslation.value ?: return null
         val status = voices.value[info.language] ?: checkVoice(info.language)
@@ -941,7 +951,11 @@ class RecitationController(
         val texts = runCatching { quran.translationTexts(info.id, surah) }.getOrNull() ?: return null
         val prepared = SpeechText.prepare(info.kind, info.language, surah, texts)
         if (prepared.isEmpty()) return null
-        return SpokenTranslation(info.id, info.kind, info.language, voice, prepared)
+        SpokenTranslation(info.id, info.kind, info.language, voice, prepared)
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (e: Exception) {
+        null
     }
 
     private fun keyOf(surah: Int, speech: SpokenTranslation?) = SpeechKey(surah, speech?.translationId, speech?.voice)
@@ -951,8 +965,10 @@ class RecitationController(
         val surah = player.state.value.surah ?: return
         if (loading.value) return
         val speech = spokenFor(surah)
-        // The surah may have changed while the texts were read; that load built its own speech.
-        if (player.state.value.surah != surah) return
+        // Stale by the time the suspension above returns: the surah changed under it, or a fresh
+        // `start()` (same surah or not) began and will call this itself when it finishes — either
+        // way this call must not overwrite `appliedSpeech` for a build that raced it.
+        if (loading.value || player.state.value.surah != surah) return
         val key = keyOf(surah, speech)
         if (key == appliedSpeech) return
         appliedSpeech = key
@@ -960,10 +976,14 @@ class RecitationController(
         player.setSpeech(speech)
     }
 
-    /** Asks the phone about [language] and remembers the answer. A failure is "cannot read it". */
+    /**
+     * Asks the phone about [language] and remembers the answer. A failure, or a query that takes
+     * too long, is "cannot read it" (spec: "a failed voice never stops the recitation") — never a
+     * crash and never a hang across the breath before the next ayah's translation.
+     */
     private suspend fun checkVoice(language: String): VoiceStatus {
         val status = try {
-            readAloud.status(language)
+            withTimeoutOrNull(VOICE_QUERY_TIMEOUT_MS) { readAloud.status(language) } ?: VoiceStatus.Unsupported
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (e: Exception) {
@@ -996,6 +1016,10 @@ private const val LAST_SURAH = 114
 
 /** What the reader loads when the stored translation id is not bundled. */
 private const val FALLBACK_TRANSLATION = "en.sahih"
+
+/** How long a voice query waits before treating the phone as unreadable (spec: "a failed voice
+ * never stops the recitation"). */
+private const val VOICE_QUERY_TIMEOUT_MS = 6_000L
 
 /** The pause between a surah's last ayah and the first of the next (spec §16.1): a breath. */
 internal const val SURAH_BREATH_MS = 1_000L

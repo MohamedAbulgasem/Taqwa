@@ -22,6 +22,8 @@ class VoicePickTest {
         assertTrue(VoicePick.downloadable("fr", voices))
         assertEquals("en-local", VoicePick.best("en", voices)?.id)
         assertFalse(VoicePick.downloadable("ur", voices))
+        // A network-only voice has nothing to download.
+        assertFalse(VoicePick.downloadable("de", listOf(voice("de-net", "de", "DE", offline = false))))
     }
 
     @Test
