@@ -76,7 +76,7 @@ class SpeechTextTest {
     fun `bengali's mangled character references are repaired`() {
         assertEquals("চিহিত ঘোড়ার", translation("bn", "চিহিߦ#2468; ঘোড়ার"))
         assertEquals("কতৃক নির্ধারিত", translation("bn", "কতৃꦣ2453; নির্ধারিত"))
-        assertEquals("প্রজ্জিত করে", translation("bn", "প্রজ্জ?482;িত করে").replace("িত", "িত"))
+        assertEquals("প্রজ্জিত করে", translation("bn", "প্রজ্জ?482;িত করে"))
     }
 
     @Test
