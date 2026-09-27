@@ -345,12 +345,18 @@ fun PlayerBar(
                     }
                     Text(
                         // "Ayah 2 · Translation" while the voice reads (read-aloud spec §6): the
-                        // word in the accent, so the change reads at a glance.
+                        // word in the accent, so the change reads at a glance — except while
+                        // buffering, when the whole caption goes quiet together (see below) and
+                        // an accent word would be the one part of it still claiming to play.
                         buildAnnotatedString {
                             append(ayahCaption)
                             if (reading != null) {
                                 append(" · ")
-                                withStyle(SpanStyle(color = colors.accent)) { append(reading) }
+                                if (bar.buffering) {
+                                    append(reading)
+                                } else {
+                                    withStyle(SpanStyle(color = colors.accent)) { append(reading) }
+                                }
                             }
                         },
                         style = TaqwaText.caption.copy(fontSize = 12.sp),

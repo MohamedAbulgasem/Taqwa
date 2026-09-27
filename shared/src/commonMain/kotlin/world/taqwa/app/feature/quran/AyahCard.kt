@@ -167,12 +167,15 @@ fun AyahCard(
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                             if (speaking) {
                                 val readingLabel = stringResource(Res.string.quran_a11y_read_aloud)
+                                // Inside the provider above, so this is the translation's own
+                                // direction, not the app's: the wave faces the text it precedes.
+                                val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
                                 Canvas(
                                     Modifier
                                         .padding(top = 3.dp, end = 6.dp)
                                         .size(14.dp)
                                         .semantics { contentDescription = readingLabel },
-                                ) { drawReadAloudMark(colors.accent) }
+                                ) { drawReadAloudMark(colors.accent, pointsForward = forward) }
                             }
                             Text(
                                 translation,

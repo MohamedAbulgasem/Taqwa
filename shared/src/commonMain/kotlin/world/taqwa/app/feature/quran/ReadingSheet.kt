@@ -307,13 +307,17 @@ fun ReadingSheet(
                 )
                 val missing = readAloud.missingEngine
                 if (missing != null) {
+                    // Both inset by TaqwaRow's own 16 dp, so they start under "Read it aloud after
+                    // each ayah" rather than 16 dp before it, at the sheet's edge.
                     Text(
                         stringResource(Res.string.quran_sheet_read_aloud_missing, format.languageNameInSentence(readAloud.language)),
                         style = TaqwaText.caption,
                         color = colors.textSecondary,
+                        modifier = Modifier.padding(horizontal = 16.dp),
                     )
                     // 48 dp minimum, like Settings' own QuietRow: the row was 32 dp and as narrow as
                     // the string before this fix, under the tap-target floor everywhere else in the app.
+                    // The inset is inside the clickable, so the whole width still takes the tap.
                     Box(
                         Modifier
                             .fillMaxWidth()
@@ -322,7 +326,8 @@ fun ReadingSheet(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
                                 onClick = onGetVoice,
-                            ),
+                            )
+                            .padding(horizontal = 16.dp),
                         contentAlignment = Alignment.CenterStart,
                     ) {
                         Text(

@@ -294,25 +294,32 @@ internal fun DrawScope.drawExternalLink(tint: Color, pointsForward: Boolean) {
  * overload needs no default filled in. That silently hands every future one-argument call to this
  * new, narrower glyph instead of the cone-and-waves one, which is the actual danger a shared name
  * would create, and why this one is distinct.
+ *
+ * [pointsForward] mirrors it, as [drawSkip] and [drawSpeaker] are mirrored: the caller reads it off
+ * the translation's own `LocalLayoutDirection`, so the wave faces the text it sits before — to the
+ * right in English, to the left in Arabic and Urdu.
  */
-internal fun DrawScope.drawReadAloudMark(tint: Color) {
+internal fun DrawScope.drawReadAloudMark(tint: Color, pointsForward: Boolean) {
     val u = size.width / 16f
+    fun x(value: Float) = (if (pointsForward) value else 16f - value) * u
     val body = Path().apply {
-        moveTo(2.5f * u, 6.2f * u)
-        lineTo(5.2f * u, 6.2f * u)
-        lineTo(8.6f * u, 3.4f * u)
-        lineTo(8.6f * u, 12.6f * u)
-        lineTo(5.2f * u, 9.8f * u)
-        lineTo(2.5f * u, 9.8f * u)
+        moveTo(x(2.5f), 6.2f * u)
+        lineTo(x(5.2f), 6.2f * u)
+        lineTo(x(8.6f), 3.4f * u)
+        lineTo(x(8.6f), 12.6f * u)
+        lineTo(x(5.2f), 9.8f * u)
+        lineTo(x(2.5f), 9.8f * u)
         close()
     }
     drawPath(body, tint, style = Fill)
+    // The wave is the right-hand stretch of a circle centred at 10.6 u; mirrored, the left-hand
+    // stretch of one centred at 5.4 u, so its box starts at the mirror of its far edge.
     drawArc(
         color = tint,
-        startAngle = -50f,
+        startAngle = if (pointsForward) -50f else 130f,
         sweepAngle = 100f,
         useCenter = false,
-        topLeft = Offset(7.2f * u, 4.6f * u),
+        topLeft = Offset(x(if (pointsForward) 7.2f else 14f), 4.6f * u),
         size = Size(6.8f * u, 6.8f * u),
         style = Stroke(width = size.width * 0.1f, cap = StrokeCap.Round),
     )
