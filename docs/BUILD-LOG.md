@@ -1595,7 +1595,7 @@ An option, off by default: after the reciter recites an ayah, the phone's own vo
 
   Each is dropped with its marks. The roughly 190 other parentheses are explanation, and the voice reads them.
 - **Shared texts.** Diyanet's Turkish repeats one translation over as many as 12 ayahs (570 runs), and Muyassar over as many as 14 (605). A shared text is read once, after the last ayah of its run.
-- **Bengali.** The bundled Bengali has 42 rows with mangled HTML character references, such as "চিহিߦ#2468;". The voice gets them decoded. The reader still shows them, and repairing the data is a separate task.
+- **Bengali.** The bundled Bengali has 42 rows with mangled HTML character references, such as "চিহিߦ#2468;". The voice gets them decoded. The data itself was repaired on main the same day (e9e5c62, quran.db version 5), so for the bundled text that decoding is now only a safety net.
 
 **How it plays.** The queue per ayah is: the ayah, a 400 ms breath, the translation, then the reciter's gap.
 

@@ -225,4 +225,4 @@ Language names come from `PlatformFormat.languageName`, as the reading sheet alr
 - Changing the lock-screen text.
 - A Mushaf-page marker.
 - Linking iOS voice downloads.
-- Repairing the bundled Bengali text (about 15 mangled references the reader displays) and Indonesian typos (`orang0orang`, `berha]a`, `ma]aikat`, `}` for `)`): a data-pipeline fix, flagged separately.
+- Repairing the bundled Bengali text (about 15 mangled references the reader displays) and Indonesian typos (`orang0orang`, `berha]a`, `ma]aikat`, `}` for `)`): a data-pipeline fix, flagged separately. Done on 27 September in e9e5c62 (quran.db version 5).
