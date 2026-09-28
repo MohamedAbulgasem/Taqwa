@@ -1,0 +1,434 @@
+{
+  "entry": "gb.london.lupt",
+  "class": "B",
+  "engineHash": "dd3a5d9900a73987",
+  "broken": 0,
+  "places": 11,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "placeDays": 4015,
+  "heldOutDays": 3650,
+  "ramadanDays": 330,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 4046,
+      "early": 0,
+      "late": {
+        "0": 1245,
+        "1": 1375,
+        "2": 980,
+        "3+": 446
+      },
+      "exactShare": 0.3077,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit gb.london.lupt",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 4046,
+      "lateEnd": 0,
+      "late": {
+        "0": 2428,
+        "1": 974,
+        "2": 641,
+        "3+": 3
+      },
+      "exactShare": 0.6001,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "unit gb.london.lupt",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 4046,
+      "early": 0,
+      "late": {
+        "0": 1695,
+        "1": 1440,
+        "2": 911,
+        "3+": 0
+      },
+      "exactShare": 0.4189,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "class B",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 4046,
+      "early": 0,
+      "late": {
+        "0": 554,
+        "1": 1687,
+        "2": 1425,
+        "3+": 380
+      },
+      "exactShare": 0.1369,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "unit gb.london.lupt",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 1095,
+      "early": 0,
+      "late": {
+        "0": 187,
+        "1": 256,
+        "2": 545,
+        "3+": 107
+      },
+      "exactShare": 0.1708,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "unit gb.london.lupt",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 4046,
+      "early": 0,
+      "late": {
+        "0": 1656,
+        "1": 1285,
+        "2": 1022,
+        "3+": 83
+      },
+      "exactShare": 0.4093,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "unit gb.london.lupt",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 4046,
+      "early": 0,
+      "late": {
+        "0": 1390,
+        "1": 1364,
+        "2": 983,
+        "3+": 309
+      },
+      "exactShare": 0.3435,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit gb.london.lupt",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 4046,
+      "lateEnd": 0,
+      "late": {
+        "0": 1919,
+        "1": 1241,
+        "2": 752,
+        "3+": 134
+      },
+      "exactShare": 0.4743,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit gb.london.lupt",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 3650,
+    "ramadanDays": 300,
+    "events": {
+      "fajr": {
+        "checked": 3681,
+        "early": 0,
+        "late": {
+          "0": 1006,
+          "1": 1256,
+          "2": 973,
+          "3+": 446
+        },
+        "exactShare": 0.2733,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "unit gb.london.lupt",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 3681,
+        "lateEnd": 0,
+        "late": {
+          "0": 2121,
+          "1": 916,
+          "2": 641,
+          "3+": 3
+        },
+        "exactShare": 0.5762,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "unit gb.london.lupt",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 3681,
+        "early": 0,
+        "late": {
+          "0": 1361,
+          "1": 1409,
+          "2": 911,
+          "3+": 0
+        },
+        "exactShare": 0.3697,
+        "worstLate": 2,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 3681,
+        "early": 0,
+        "late": {
+          "0": 442,
+          "1": 1434,
+          "2": 1425,
+          "3+": 380
+        },
+        "exactShare": 0.1201,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "unit gb.london.lupt",
+        "overLimit": 0
+      },
+      "asrHanafi": {
+        "checked": 730,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 78,
+          "2": 545,
+          "3+": 107
+        },
+        "exactShare": 0,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "unit gb.london.lupt",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 3681,
+        "early": 0,
+        "late": {
+          "0": 1348,
+          "1": 1228,
+          "2": 1022,
+          "3+": 83
+        },
+        "exactShare": 0.3662,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "unit gb.london.lupt",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 3681,
+        "early": 0,
+        "late": {
+          "0": 1133,
+          "1": 1267,
+          "2": 972,
+          "3+": 309
+        },
+        "exactShare": 0.3078,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "unit gb.london.lupt",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 3681,
+        "lateEnd": 0,
+        "late": {
+          "0": 1673,
+          "1": 1138,
+          "2": 736,
+          "3+": 134
+        },
+        "exactShare": 0.4545,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "unit gb.london.lupt",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class B: 2 min": {
+      "events": ["dhuhr"]
+    },
+    "unit gb.london.lupt: 3 min (asrHanafi)": {
+      "reason": "The M25 follows one table computed at its point; at the M25's western edge the user's own sun is 1.6 min later, and Asr and Maghrib shown follow it.",
+      "events": ["asrStandard", "asrHanafi", "maghrib"]
+    },
+    "unit gb.london.lupt: 3 min (sunrise)": {
+      "reason": "The M25 follows one table computed at its point; at the M25's eastern edge the user's own sunrise is 1.7 min earlier, and the sunrise shown follows it.",
+      "events": ["sunrise"]
+    },
+    "unit gb.london.lupt: 4 min": {
+      "reason": "The M25 follows one table computed at its point; at its eastern edge the user's own dawn is 1.7 min earlier, and at its northern edge up to 3 min earlier in summer, and the end of eating shown follows it.",
+      "events": ["endOfEating"]
+    },
+    "unit gb.london.lupt: 5 min": {
+      "reason": "The M25 follows one table computed at its point, and Fajr and Isha shown are the later of the point's and the user's own: at the M25's southern and western edges the user's Fajr, and at its northern and north-western edges the user's Isha, at the table's depression run up to 3 min later than the point's in summer.",
+      "events": ["fajr", "isha"]
+    }
+  },
+  "units": {
+    "gb.london.lupt": {
+      "name": "London (M25)",
+      "placeDays": 365,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["dhuhr"]
+        },
+        "unit gb.london.lupt: 3 min (asrHanafi)": {
+          "reason": "The M25 follows one table computed at its point; at the M25's western edge the user's own sun is 1.6 min later, and Asr and Maghrib shown follow it.",
+          "events": ["asrStandard", "asrHanafi", "maghrib"]
+        },
+        "unit gb.london.lupt: 3 min (sunrise)": {
+          "reason": "The M25 follows one table computed at its point; at the M25's eastern edge the user's own sunrise is 1.7 min earlier, and the sunrise shown follows it.",
+          "events": ["sunrise"]
+        },
+        "unit gb.london.lupt: 4 min": {
+          "reason": "The M25 follows one table computed at its point; at its eastern edge the user's own dawn is 1.7 min earlier, and at its northern edge up to 3 min earlier in summer, and the end of eating shown follows it.",
+          "events": ["endOfEating"]
+        },
+        "unit gb.london.lupt: 5 min": {
+          "reason": "The M25 follows one table computed at its point, and Fajr and Isha shown are the later of the point's and the user's own: at the M25's southern and western edges the user's Fajr, and at its northern and north-western edges the user's Isha, at the table's depression run up to 3 min later than the point's in summer.",
+          "events": ["fajr", "isha"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 4046,
+          "early": 0,
+          "late": {
+            "0": 1245,
+            "1": 1375,
+            "2": 980,
+            "3+": 446
+          },
+          "exactShare": 0.3077,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit gb.london.lupt",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 4046,
+          "lateEnd": 0,
+          "late": {
+            "0": 2428,
+            "1": 974,
+            "2": 641,
+            "3+": 3
+          },
+          "exactShare": 0.6001,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit gb.london.lupt",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 4046,
+          "early": 0,
+          "late": {
+            "0": 1695,
+            "1": 1440,
+            "2": 911,
+            "3+": 0
+          },
+          "exactShare": 0.4189,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 4046,
+          "early": 0,
+          "late": {
+            "0": 554,
+            "1": 1687,
+            "2": 1425,
+            "3+": 380
+          },
+          "exactShare": 0.1369,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit gb.london.lupt",
+          "overLimit": 0
+        },
+        "asrHanafi": {
+          "checked": 1095,
+          "early": 0,
+          "late": {
+            "0": 187,
+            "1": 256,
+            "2": 545,
+            "3+": 107
+          },
+          "exactShare": 0.1708,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit gb.london.lupt",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 4046,
+          "early": 0,
+          "late": {
+            "0": 1656,
+            "1": 1285,
+            "2": 1022,
+            "3+": 83
+          },
+          "exactShare": 0.4093,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit gb.london.lupt",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 4046,
+          "early": 0,
+          "late": {
+            "0": 1390,
+            "1": 1364,
+            "2": 983,
+            "3+": 309
+          },
+          "exactShare": 0.3435,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit gb.london.lupt",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 4046,
+          "lateEnd": 0,
+          "late": {
+            "0": 1919,
+            "1": 1241,
+            "2": 752,
+            "3+": 134
+          },
+          "exactShare": 0.4743,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit gb.london.lupt",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}

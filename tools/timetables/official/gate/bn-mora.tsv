@@ -1,0 +1,11 @@
+# Brunei, MORA (Jabatan Mufti Kerajaan): the ministry's public SharePoint list for Bandar Seri
+# Begawan (Brunei-Muara district, minutes = 0), captured 2026-09-25. The full-year file has 9
+# duplicate/typo rows (the ministry's own list, research: "one would put Fajr about 9 min early");
+# they are dropped in the "-clean" file used to fit. September was captured again independently on
+# the same day and held out as a small forward check; it differs from the full-year file's own
+# September rows by up to a minute on a few days (site noise), which is exactly why it is kept
+# separate rather than folded into the fit. Belait, Tutong and Temburong's own minutes are
+# documented (mora.gov.bn), not checked against a table: they stay unmeasured (Muis.kt).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/sea/off-bn-2026-clean.txt	bn.mora/brunei-muara			Asia/Brunei	F S D A M I	daily	standard	fit	BSB, 356 days deduped
+archive/tables/moral-auth-world/sea/off-bn-2026-09.txt	bn.mora/brunei-muara			Asia/Brunei	F S D A M I	daily	standard	test	BSB, September re-capture

@@ -1,0 +1,8 @@
+# Ireland (ie.cautious): no majority. Members: the Islamic Foundation of Ireland's fixed table (ie.ifi, the most
+# followed: Dublin Mosque, Lucan, Finglas, Al-Khidmah) and the Islamic Cultural Centre of Ireland's (ie.icci), both
+# Dublin's (53.3498, -6.2603) and both held for all of 2026, so every start is checked against the later of the two
+# that day. Neither prints an imsak: each Fajr is also the start of the fast. Every row is held out. (Lucan's copy
+# of IFI's table differs only in its summer Isha, its own and earlier, so it is not a separate row.)
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/ukfr/ifi_dublin_local.txt	ie.cautious	53.3498	-6.2603	Europe/Dublin	F+E S D A M I	daily	standard	test	IFI Dublin 2026	ie.ifi
+archive/tables/moral-auth-world/ukfr/icci_year.txt	ie.cautious	53.3498	-6.2603	Europe/Dublin	F+E S D A M I	daily	standard	test	ICCI 2026	ie.icci

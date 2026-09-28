@@ -1,0 +1,35 @@
+# Malaysia, JAKIM e-solat: 13 fitted zones (SBH06 excluded, its 2026 table has internal breaks).
+# Fit on each zone's 2025 table (a public mirror of e-solat, api.waktusolat.app), test forward in
+# time on its own 2026 e-solat table (a better split than profiles-tested.md's "fit one year, test
+# the other, both directions", which let the held-out year decide the pad). Checked at each zone's
+# own unit (lat/lon empty): WLY01 and SGR01 share Selangor's two start points, PHG06 its -2.5 deg
+# horizon, KTN01 its 17 deg Isha, all in the registry, not here (R41).
+# PLS01's fit row is a "-clean" copy (its own note explains the one row dropped), same pattern as
+# bn-mora.tsv: the archive row is never edited, only copied and filtered locally.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-wide-band/off-jakim-WLY01-2025-mirror.txt	my.jakim/WLY01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025
+archive/tables/round/data-wide-band/off-jakim-WLY01.txt	my.jakim/WLY01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026
+archive/tables/round/data-wide-band/off-jakim-SGR01-2025-mirror.txt	my.jakim/SGR01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025
+archive/tables/round/data-wide-band/off-jakim-SGR01.txt	my.jakim/SGR01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026
+archive/tables/round/data-wide-band/off-jakim-JHR01-2025-mirror.txt	my.jakim/JHR01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025, Pulau Aur
+archive/tables/round/data-wide-band/off-jakim-JHR01.txt	my.jakim/JHR01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026, Pulau Aur
+archive/tables/round/data-wide-band/off-jakim-JHR02-2025-mirror.txt	my.jakim/JHR02			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025
+archive/tables/round/data-wide-band/off-jakim-JHR02.txt	my.jakim/JHR02			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026
+archive/tables/round/data-wide-band/off-jakim-KTN01-2025-mirror.txt	my.jakim/KTN01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025, Kelantan 17 deg Isha
+archive/tables/round/data-wide-band/off-jakim-KTN01.txt	my.jakim/KTN01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026, Kelantan 17 deg Isha
+archive/tables/round/data-wide-band/off-jakim-PHG01-2025-mirror.txt	my.jakim/PHG01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025, Pulau Tioman
+archive/tables/round/data-wide-band/off-jakim-PHG01.txt	my.jakim/PHG01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026, Pulau Tioman
+archive/tables/round/data-wide-band/off-jakim-PHG06-2025-mirror.txt	my.jakim/PHG06			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025, Cameron Highlands -2.5 deg horizon
+archive/tables/round/data-wide-band/off-jakim-PHG06.txt	my.jakim/PHG06			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026, Cameron Highlands -2.5 deg horizon
+archive/tables/round/data-wide-band/off-jakim-PLS01-2025-mirror-clean.txt	my.jakim/PLS01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025, no imsak; a local copy with 2025-03-01 dropped (its Fajr is printed 12h off, an AM/PM slip; the archive row is left as captured)
+archive/tables/round/data-wide-band/off-jakim-PLS01.txt	my.jakim/PLS01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026, no imsak
+archive/tables/round/data-wide-band/off-jakim-PNG01-2025-mirror.txt	my.jakim/PNG01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	fit	e-solat mirror 2025
+archive/tables/round/data-wide-band/off-jakim-PNG01.txt	my.jakim/PNG01			Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	e-solat 2026
+archive/tables/round/data-wide-band/off-jakim-SBH01-2025-mirror.txt	my.jakim/SBH01			Asia/Kuching	F S D A M I	daily	standard	fit	e-solat mirror 2025, Sandakan
+archive/tables/round/data-wide-band/off-jakim-SBH01.txt	my.jakim/SBH01			Asia/Kuching	F S D A M I	daily	standard	test	e-solat 2026, Sandakan
+archive/tables/round/data-wide-band/off-jakim-SBH07-2025-mirror.txt	my.jakim/SBH07			Asia/Kuching	F S D A M I	daily	standard	fit	e-solat mirror 2025, Kota Kinabalu
+archive/tables/round/data-wide-band/off-jakim-SBH07.txt	my.jakim/SBH07			Asia/Kuching	F S D A M I	daily	standard	test	e-solat 2026, Kota Kinabalu
+archive/tables/round/data-wide-band/off-jakim-SWK08-2025-mirror.txt	my.jakim/SWK08			Asia/Kuching	F S D A M I	daily	standard	fit	e-solat mirror 2025, Kuching
+archive/tables/round/data-wide-band/off-jakim-SWK08.txt	my.jakim/SWK08			Asia/Kuching	F S D A M I	daily	standard	test	e-solat 2026, Kuching
+archive/tables/round/data-wide-band/off-jakim-WLY02-2025-mirror.txt	my.jakim/WLY02			Asia/Kuching	F S D A M I	daily	standard	fit	e-solat mirror 2025, Labuan
+archive/tables/round/data-wide-band/off-jakim-WLY02.txt	my.jakim/WLY02			Asia/Kuching	F S D A M I	daily	standard	test	e-solat 2026, Labuan

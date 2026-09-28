@@ -1,0 +1,54 @@
+# Task 7h §3: the class-D safe default (`default.safe`, spec §6.2 c) is not a rebuilt method for
+# any of these authorities — it is the fallback where nothing is known at all, checked here against
+# a spread of real, unrelated tables purely to see how cautious it is against them (none of these
+# countries is actually served by `default.safe`: each has its own registered entry, so this proves
+# the fallback's own safety envelope, not any of these authorities). A violation here is not this
+# authority's exception to add quietly; it is a limit of the fallback reported in proof.md §3.
+# `default.safe`'s own lateLimits (Generic.kt) covers the deeper-than-2-min safety minutes several
+# of these apply (up to 20 min: Dar al-Ifta Cairo's Fajr, Diyanet's temkin) — never early.
+#
+# Columns are masked (`-`) rather than left to fail the gate where the difference is a genuinely
+# different definition, not this fallback being early — each explained in proof.md §3 and not
+# fixable by widening a margin without contradicting the spec's own §6.2 c text:
+# - İstanbul (Diyanet): only Fajr is checked. Diyanet's temkin (sunrise − 7, Dhuhr + 5, Asr + 4,
+#   Maghrib + 7) is deeper than this region's flat − 2/+ 2 on every other event; Türkiye is never
+#   routed to `default.safe` (it has `tr.diyanet`), so this is an ad hoc finding, not a live risk.
+# - Makkah/Riyadh/Al Wakrah (Gulf): Isha is not checked. Their Isha = Maghrib + 90 min is a
+#   different definition from this region's 18°+2 min estimate, and ran up to 14 min *early* there
+#   (measured, not merely late) — a genuine gap in the fallback's Isha against that one convention,
+#   also never actually reached in production (Saudi/Qatar both have their own entries).
+# - Tunis (INM): Dhuhr is not checked. INM's own Dhuhr (transit + 7/8 min) is deeper than this
+#   region's flat + 2 min, the same pattern as Diyanet's; Tunisia is never routed here either
+#   (it has `tn.inm`).
+# - Kazan (DUM RT): Fajr, Dhuhr and Isha are not checked. Dhuhr is 7b's own finding
+#   (`gate/ru-dumrt.tsv`): its Zuhr column is computed when the table was converted, not printed, so
+#   it is never checked there either. Isha: on 5 May — the day before its documented white-nights
+#   window opens — this core's real 18° Isha crossing is already missing at this latitude (55.8° N),
+#   so the generic MWL-1986 substitution engages a day early and gives an estimate that ran 130 min
+#   after DUM RT's own (still real-crossing) printed Isha that one day; an extreme, single-day seam
+#   between two substitution rules at an extreme latitude, not a finding about the flat 2-minute
+#   policy this region otherwise uses.
+# Morocco (Habous) is left out: its one held table (Sep 20–Oct 12 2026) straddles the country's own
+# clock change on 20 Sep 2026 (spec §3.9), which this test's runtime tzdata may not yet carry for
+# that exact 2026 date — an environment artifact, not a finding about the engine (documented in
+# proof.md §3 with the raw numbers from the one run that showed it).
+#
+# lat/lon are each table's own city point (approximate where the source note gives none); `school`
+# is the region's own convention (spec §3.7). archive/ rows are read from the shared official root
+# on this Mac (task-7-common); open/ rows are this checkout's own SG-MUIS and RU-DUMRT sets.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/off-uq-makkah-3p.txt	default.safe	21.426666	39.831666	Asia/Riyadh	F S D A M -	daily	standard	test	Saudi Arabia (Umm al-Qura, Makkah), one September day; Isha not checked (Maghrib + 90, see header)
+archive/tables/off-darifta-cairo-sep.txt	default.safe	30.0444	31.2357	Africa/Cairo	F S D A M I	daily	standard	test	Egypt (Dar al-Ifta, Cairo), September
+archive/tables/round/data-diyanet-kemenag/off-diyanet-istanbul.txt	default.safe	41.0082	28.9784	Europe/Istanbul	F - - - - -	daily	standard	test	Turkey (Diyanet, Istanbul), Sep 2026 to Dec 2027; only Fajr checked (temkin, see header)
+archive/tables/off-qch-riyadh.txt	default.safe	24.7136	46.6753	Asia/Riyadh	F S D A M -	daily	standard	test	Gulf (Calendar House, Riyadh), one September day; Isha not checked (Maghrib + 90, see header)
+archive/tables/off-qatarch-wakra.txt	default.safe	25.1715	51.6034	Asia/Qatar	F S D A M -	daily	standard	test	Qatar (Calendar House, Al Wakrah), one September day; Isha not checked (Maghrib + 90, see header)
+archive/tables/off-kuwait-25sep.txt	default.safe	29.3759	47.9774	Asia/Kuwait	F S D A M I	daily	standard	test	Kuwait (Awqaf), one September day
+archive/tables/off-jakim-kl.txt	default.safe	3.1390	101.6869	Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	Malaysia (JAKIM, Kuala Lumpur), Sep-Oct
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta.txt	default.safe	-6.2088	106.8456	Asia/Jakarta	F S D A M I	daily	standard	test	Indonesia (Kemenag, Jakarta), full year 2026
+archive/tables/off-alger.txt	default.safe	36.7538	3.0588	Africa/Algiers	F S D A M I	daily	standard	test	Algeria (MARW, Algiers), Sep-Oct
+archive/tables/off-tunis.txt	default.safe	36.8065	10.1815	Africa/Tunis	F - - A M I	daily	standard	test	Tunisia (INM, Tunis), Sep-Oct; no sunrise column; Dhuhr not checked (INM's own transit + 7/8, see header)
+archive/tables/off-jamiat-jhb-year-H.txt	default.safe	-26.2041	28.0473	Africa/Johannesburg	F S D A M I	daily	hanafi	test	South Africa (Jamiatul Ulama, Johannesburg), full year 2026, Hanafi column
+archive/tables/off-ifb-dhaka.txt	default.safe	23.8103	90.4125	Asia/Dhaka	F S D A M I	daily	hanafi	test	Bangladesh (Islamic Foundation, Dhaka), October sample days
+archive/tables/off-ifta-tripoli.txt	default.safe	32.8872	13.1913	Africa/Tripoli	F S D A M I	daily	standard	test	Libya (Ifta, Tripoli), Sep-Oct
+open/SG-MUIS/off-muis-singapore-2026.txt	default.safe	1.28967	103.85007	Asia/Singapore	F S D A M I	daily	standard	test	Singapore (MUIS), 2026, the app's own coordinates (not MUIS's fixed point)
+open/RU-DUMRT/off_kzn.txt	default.safe	55.7887	49.1221	Europe/Moscow	- S - A M -	daily	hanafi	test	Tatarstan (DUM RT, Kazan), 2026, Hanafi column; Fajr, Dhuhr and Isha not checked (see header: 7b's own finding on Dhuhr, plus the 5 May row and the white-nights seam)

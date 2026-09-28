@@ -1,0 +1,1501 @@
+{
+  "entry": "ma.habous",
+  "class": "B/D (authority)",
+  "engineHash": "10bca0c7727890f6",
+  "broken": 0,
+  "places": 11,
+  "first": "2015-02-20",
+  "last": "2026-10-12",
+  "placeDays": 1509,
+  "heldOutDays": 1209,
+  "ramadanDays": 126,
+  "outOfOrderDays": 0,
+  "unreadableLines": 22,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 1509,
+      "early": 0,
+      "late": {
+        "0": 900,
+        "1": 592,
+        "2": 17,
+        "3+": 0
+      },
+      "exactShare": 0.5964,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, class D (authority)",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 1509,
+      "lateEnd": 0,
+      "late": {
+        "0": 644,
+        "1": 865,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.4268,
+      "worstLate": 1,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry ma.habous, unit casablanca, unit dakhla, unit figuig, unit ifrane, unit laayoune, unit lagouira, unit midelt, unit oujda, unit rabat, unit tangier",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 1509,
+      "early": 0,
+      "late": {
+        "0": 1080,
+        "1": 413,
+        "2": 16,
+        "3+": 0
+      },
+      "exactShare": 0.7157,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, class D (authority)",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 1509,
+      "early": 0,
+      "late": {
+        "0": 649,
+        "1": 836,
+        "2": 24,
+        "3+": 0
+      },
+      "exactShare": 0.4301,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 1509,
+      "early": 0,
+      "late": {
+        "0": 593,
+        "1": 916,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.393,
+      "worstLate": 1,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry ma.habous, unit casablanca, unit dakhla, unit figuig, unit ifrane, unit laayoune, unit lagouira, unit midelt, unit oujda, unit rabat, unit tangier",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 1509,
+      "early": 0,
+      "late": {
+        "0": 1093,
+        "1": 403,
+        "2": 13,
+        "3+": 0
+      },
+      "exactShare": 0.7243,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, class D (authority)",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 1509,
+      "lateEnd": 0,
+      "late": {
+        "0": 1102,
+        "1": 407,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.7303,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, class D (authority)",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 1209,
+    "ramadanDays": 126,
+    "events": {
+      "fajr": {
+        "checked": 1209,
+        "early": 0,
+        "late": {
+          "0": 714,
+          "1": 478,
+          "2": 17,
+          "3+": 0
+        },
+        "exactShare": 0.5906,
+        "worstLate": 2,
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, class D (authority)",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 1209,
+        "lateEnd": 0,
+        "late": {
+          "0": 539,
+          "1": 670,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.4458,
+        "worstLate": 1,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry ma.habous, unit casablanca, unit dakhla, unit figuig, unit laayoune, unit lagouira, unit midelt, unit oujda, unit rabat, unit tangier",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 1209,
+        "early": 0,
+        "late": {
+          "0": 869,
+          "1": 324,
+          "2": 16,
+          "3+": 0
+        },
+        "exactShare": 0.7188,
+        "worstLate": 2,
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, class D (authority)",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 1209,
+        "early": 0,
+        "late": {
+          "0": 541,
+          "1": 644,
+          "2": 24,
+          "3+": 0
+        },
+        "exactShare": 0.4475,
+        "worstLate": 2,
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, class D (authority)",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 1209,
+        "early": 0,
+        "late": {
+          "0": 522,
+          "1": 687,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.4318,
+        "worstLate": 1,
+        "lateLimit": 6,
+        "lateLimitFrom": "entry ma.habous, unit casablanca, unit dakhla, unit figuig, unit laayoune, unit lagouira, unit midelt, unit oujda, unit rabat, unit tangier",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 1209,
+        "early": 0,
+        "late": {
+          "0": 882,
+          "1": 314,
+          "2": 13,
+          "3+": 0
+        },
+        "exactShare": 0.7295,
+        "worstLate": 2,
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, class D (authority)",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 1209,
+        "lateEnd": 0,
+        "late": {
+          "0": 881,
+          "1": 328,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.7287,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, class D (authority)",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class B: 2 min": {
+      "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+    },
+    "class D (authority): 3 min": {
+      "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+    },
+    "entry ma.habous: 6 min": {
+      "reason": "Beyond the cities whose own Habous table Taqwa fits, the place's elevation is not known, so Maghrib takes a national margin that covers the highest town checked (Imilchil, about 2,150 m): at a low town it is up to 6 min after Habous's Maghrib.",
+      "events": ["maghrib"]
+    },
+    "entry ma.habous: 7 min": {
+      "reason": "Beyond the cities whose own Habous table Taqwa fits, the place's elevation is not known, so sunrise takes a national margin that covers the highest town checked (Imilchil, about 2,150 m): at a low town it is up to 7 min before Habous's sunrise.",
+      "events": ["sunrise"]
+    },
+    "unit casablanca: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit dakhla: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit figuig: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit ifrane: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit laayoune: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit lagouira: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit midelt: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit oujda: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit rabat: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "unit tangier: 2 min": {
+      "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+      "events": ["sunrise", "maghrib"]
+    }
+  },
+  "units": {
+    "casablanca": {
+      "name": "Casablanca",
+      "placeDays": 210,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit casablanca: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 210,
+          "early": 0,
+          "late": {
+            "0": 168,
+            "1": 42,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 210,
+          "lateEnd": 0,
+          "late": {
+            "0": 97,
+            "1": 113,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4619,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit casablanca",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 210,
+          "early": 0,
+          "late": {
+            "0": 195,
+            "1": 15,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.9286,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 210,
+          "early": 0,
+          "late": {
+            "0": 139,
+            "1": 71,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6619,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 210,
+          "early": 0,
+          "late": {
+            "0": 96,
+            "1": 114,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4571,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit casablanca",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 210,
+          "early": 0,
+          "late": {
+            "0": 189,
+            "1": 21,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.9,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 210,
+          "lateEnd": 0,
+          "late": {
+            "0": 123,
+            "1": 87,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5857,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "dakhla": {
+      "name": "Dakhla",
+      "placeDays": 60,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit dakhla: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 34,
+            "1": 26,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5667,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 37,
+            "1": 23,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit dakhla",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 40,
+            "1": 20,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6667,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 28,
+            "1": 32,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4667,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 13,
+            "1": 47,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.2167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit dakhla",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 51,
+            "1": 9,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.85,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 48,
+            "1": 12,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "figuig": {
+      "name": "Figuig",
+      "placeDays": 120,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit figuig: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 120,
+          "early": 0,
+          "late": {
+            "0": 61,
+            "1": 59,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5083,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 120,
+          "lateEnd": 0,
+          "late": {
+            "0": 22,
+            "1": 98,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.1833,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit figuig",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 120,
+          "early": 0,
+          "late": {
+            "0": 64,
+            "1": 56,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 120,
+          "early": 0,
+          "late": {
+            "0": 39,
+            "1": 81,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.325,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 120,
+          "early": 0,
+          "late": {
+            "0": 28,
+            "1": 92,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.2333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit figuig",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 120,
+          "early": 0,
+          "late": {
+            "0": 81,
+            "1": 39,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.675,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 120,
+          "lateEnd": 0,
+          "late": {
+            "0": 99,
+            "1": 21,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.825,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "ifrane": {
+      "name": "Ifrane",
+      "placeDays": 30,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit ifrane: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 14,
+            "1": 16,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4667,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 30,
+          "lateEnd": 0,
+          "late": {
+            "0": 9,
+            "1": 21,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.3,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit ifrane",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 17,
+            "1": 13,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5667,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 9,
+            "1": 21,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.3,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 9,
+            "1": 21,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.3,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit ifrane",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 19,
+            "1": 11,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 30,
+          "lateEnd": 0,
+          "late": {
+            "0": 27,
+            "1": 3,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.9,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "laayoune": {
+      "name": "Laayoune",
+      "placeDays": 224,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit laayoune: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 224,
+          "early": 0,
+          "late": {
+            "0": 162,
+            "1": 62,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7232,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 224,
+          "lateEnd": 0,
+          "late": {
+            "0": 107,
+            "1": 117,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4777,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit laayoune",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 224,
+          "early": 0,
+          "late": {
+            "0": 205,
+            "1": 19,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.9152,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 224,
+          "early": 0,
+          "late": {
+            "0": 133,
+            "1": 91,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5938,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 224,
+          "early": 0,
+          "late": {
+            "0": 93,
+            "1": 131,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4152,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit laayoune",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 224,
+          "early": 0,
+          "late": {
+            "0": 207,
+            "1": 17,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.9241,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 224,
+          "lateEnd": 0,
+          "late": {
+            "0": 135,
+            "1": 89,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6027,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "lagouira": {
+      "name": "Lagouira",
+      "placeDays": 60,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit lagouira: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 54,
+            "1": 6,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.9,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 29,
+            "1": 31,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4833,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit lagouira",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 50,
+            "1": 10,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 27,
+            "1": 33,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.45,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 32,
+            "1": 28,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit lagouira",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 49,
+            "1": 11,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 29,
+            "1": 31,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4833,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "midelt": {
+      "name": "Midelt",
+      "placeDays": 60,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit midelt: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 41,
+            "1": 19,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6833,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 19,
+            "1": 41,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.3167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit midelt",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 36,
+            "1": 24,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 19,
+            "1": 41,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.3167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 15,
+            "1": 45,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.25,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit midelt",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 38,
+            "1": 22,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 53,
+            "1": 7,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8833,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "oujda": {
+      "name": "Oujda",
+      "placeDays": 60,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit oujda: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 34,
+            "1": 26,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5667,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 25,
+            "1": 35,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit oujda",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 44,
+            "1": 16,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 21,
+            "1": 39,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.35,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 20,
+            "1": 40,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.3333,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit oujda",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 41,
+            "1": 19,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6833,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 48,
+            "1": 12,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "rabat": {
+      "name": "Rabat",
+      "placeDays": 595,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit rabat: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 595,
+          "early": 0,
+          "late": {
+            "0": 302,
+            "1": 293,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5076,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 595,
+          "lateEnd": 0,
+          "late": {
+            "0": 257,
+            "1": 338,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4319,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit rabat",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 595,
+          "early": 0,
+          "late": {
+            "0": 396,
+            "1": 199,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6655,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 595,
+          "early": 0,
+          "late": {
+            "0": 224,
+            "1": 371,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.3765,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 595,
+          "early": 0,
+          "late": {
+            "0": 253,
+            "1": 342,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4252,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit rabat",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 595,
+          "early": 0,
+          "late": {
+            "0": 385,
+            "1": 210,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6471,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 595,
+          "lateEnd": 0,
+          "late": {
+            "0": 472,
+            "1": 123,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7933,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "tangier": {
+      "name": "Tangier",
+      "placeDays": 60,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
+        },
+        "unit tangier: 2 min": {
+          "reason": "This city's own Habous table gives its sunrise and Maghrib (its elevation), so the national margin for other places does not apply here.",
+          "events": ["sunrise", "maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 30,
+            "1": 30,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 31,
+            "1": 29,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tangier",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 33,
+            "1": 27,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.55,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 10,
+            "1": 50,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.1667,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 31,
+            "1": 29,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5167,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tangier",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 60,
+          "early": 0,
+          "late": {
+            "0": 33,
+            "1": 27,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.55,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 60,
+          "lateEnd": 0,
+          "late": {
+            "0": 54,
+            "1": 6,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.9,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}

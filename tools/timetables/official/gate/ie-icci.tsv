@@ -1,0 +1,6 @@
+# Ireland: the Islamic Cultural Centre of Ireland (Clonskeagh), its 2026 year table (its site's code, adhan-js MWL
+# with the TwilightAngle rule at 53.3498, -6.2603, ruling R44). No imsak is printed: Fajr is also the start of the fast.
+# January-June fit, July-December held out (Task 7g split in ukfr/split-7g/).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/ukfr/split-7g/icci-2026-h1.txt	ie.icci/ie.icci			Europe/Dublin	F+E S D A M I	daily	standard	fit	ICCI January-June 2026
+archive/tables/moral-auth-world/ukfr/split-7g/icci-2026-h2.txt	ie.icci/ie.icci			Europe/Dublin	F+E S D A M I	daily	standard	test	ICCI July-December 2026

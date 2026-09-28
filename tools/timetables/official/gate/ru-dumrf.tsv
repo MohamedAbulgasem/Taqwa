@@ -1,0 +1,10 @@
+# Russia, DUM RF: its monthly Moscow tables ("Moscow and Moscow oblast"), as captured (Wayback,
+# mosmechet.ru, muslim.ru; restricted: archive only). Fajr is also the end of suhur (printed, F+E).
+# Standard Asr. Checked at the Moscow unit's point.
+# - off_msk_all.txt: every day captured, 2024-05-02 .. 2026-09-25. Its 13 rows of 2024 follow DUM RF's
+#   old summer rule (a fixed 1 h 55 min) and are left out by the daily-since-2025 reader, which
+#   reports them unread (a known exception, proof/7b-turkiye-balkans-russia.md). The 107 rows kept
+#   (2025: May, June, October, December; 2026: May to September) are fit: nothing is held out.
+#   off_msk.txt and off_msk_months.txt repeat its rows and are not rows here.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/centralasia/off_msk_all.txt	ru.dumrf/moscow			Europe/Moscow	F+E S D A M I	daily-since-2025	standard	fit	Moscow 2025-26 (2024 left out)

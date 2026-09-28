@@ -1,0 +1,17 @@
+# Lebanon, Dar al-Fatwa: fit on its own mosque-screen feed (Masjidi TV id 26, Ras Beirut), all 365
+# printable rows of the perpetual table mapped onto the real 2024 calendar (archive/tables/
+# normalized-7e/lb-fatwa-beirut-2024.txt; found printed on a FIXED winter/standard UTC+02:00 clock all
+# year, unlike the engine's real Asia/Beirut civil zone -- hence `clock` differs from `zone`, exactly
+# as ps.iftaa's table; see proof.md for how this was found); test on 19 dated captures spanning
+# 2019-2026 from the older homepage widget and Al-Liwaa's daily reprint of the same table, a genuine
+# cross-year, cross-source holdout. One more dated capture (1 Apr 2023) prints on a clock that does
+# not match Asia/Beirut's real DST for that date -- Lebanon's government decreed the 2023 clock
+# change delayed to 20 Apr, and this capture (before that date) matches the fixed +2 clock within 0-2
+# min on every event -- so it is included with its own fixed clock. 25 Jan 2023 and 28 Mar 2024 are
+# excluded (see proof.md): the first a genuine widget bug, the second real on every other event but
+# with a sunrise that would be 10 min late under the same reading, which no margin may ever be (an
+# end, not a start), and which is not worth 11 more minutes of everyone else's sunrise to accommodate.
+path	entry	lat	lon	zone	clock	columns	format	school	split	note
+archive/tables/normalized-7e/lb-fatwa-beirut-2024.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F S D A M I	daily	standard	fit	Masjidi TV id 26 (Ras Beirut), 2024
+archive/tables/normalized-7e/lb-fatwa-beirut-dated.txt	lb.fatwa	33.894	35.502	Asia/Beirut		F S D A M I	daily	standard	test	Dar al-Fatwa homepage widget + Al-Liwaa, 2019-2026, held out
+archive/tables/normalized-7e/lb-fatwa-beirut-dated-2023-04-01.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F S D A M I	daily	standard	test	1 Apr 2023, Lebanon's decreed delay to the clock change that year

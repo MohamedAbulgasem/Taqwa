@@ -1,0 +1,8 @@
+# Singapore, MUIS: the open national table (data.gov.sg, Singapore Open Data Licence v1.0; see
+# open/SG-MUIS/ATTRIBUTION.md), one file a year, 24-hour times. Checked at MUIS's fixed point (lat
+# and lon empty). Subuh is also when eating stops (F+E); imsak (Subuh − 10) is not in these files.
+# Fit on 2024 and 2025, whose rows are dated a day off in opposite directions, and 2026 held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+open/SG-MUIS/off-muis-singapore-2024.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	fit	2024, data.gov.sg consolidated set
+open/SG-MUIS/off-muis-singapore-2025.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	fit	2025, data.gov.sg consolidated set
+open/SG-MUIS/off-muis-singapore-2026.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	test	2026, the same as the MUIS website's own file

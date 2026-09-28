@@ -17,6 +17,13 @@ if [ ! -f keystore.properties ]; then
     exit 1
 fi
 
+# Spec §5 / ruling R86: refuse to build on a stale or red prayer-time stamp.
+if ! ./gradlew -q -p tools/timetables checkStamps; then
+    echo "A prayer-time stamp is stale or red (see above). Refresh it first: " \
+        "./gradlew -p tools/timetables gate, then ./gradlew -p tools/timetables generateProofStamps." >&2
+    exit 1
+fi
+
 ./gradlew -q :androidApp:bundleRelease :androidApp:assembleRelease
 
 SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"

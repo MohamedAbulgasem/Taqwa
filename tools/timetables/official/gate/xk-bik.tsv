@@ -1,0 +1,11 @@
+# Kosovo, BIK Takvimi 2026 (dituriaislame.com; restricted: archive only). One table computed for
+# 42.5° N 21° E, with whole-minute town offsets; imsak ends the fast (E), and "Sabahu fillon 20 min.
+# pas imsakut": the Fajr shown is its Sabah column.
+# - bik-imsak.txt and bik-sabah.txt: the base table at its own point, the imsak and the Sabah column
+#   (fit).
+# - bik-prishtina.txt: Prishtina's own table (the base less a minute), at the app's Prishtina point,
+#   held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/europe/verify/bik-imsak.txt	xk.bik	42.5	21.0	Europe/Belgrade	E S D A M I	daily	standard	fit	the base table, imsak
+archive/tables/moral-auth-world/europe/verify/bik-sabah.txt	xk.bik	42.5	21.0	Europe/Belgrade	F - - - - -	daily	-	fit	the base table, Sabah
+archive/tables/moral-auth-world/europe/verify/bik-prishtina.txt	xk.bik	42.67272	21.16688	Europe/Belgrade	E S D A M I	daily	standard	test	Prishtina 2026, imsak

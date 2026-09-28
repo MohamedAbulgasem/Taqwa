@@ -1,0 +1,117 @@
+{
+  "entry": "kg.default",
+  "class": "D (authority)",
+  "engineHash": "09bef834abeff70b",
+  "broken": 0,
+  "places": 1,
+  "first": "2026-09-26",
+  "last": "2026-09-26",
+  "placeDays": 1,
+  "heldOutDays": 0,
+  "ramadanDays": 0,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 1,
+      "early": 0,
+      "late": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 1,
+      "lateEnd": 0,
+      "late": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 1,
+      "early": 0,
+      "late": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 1,
+      "early": 0,
+      "late": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 1,
+      "early": 0,
+      "late": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 1,
+      "early": 0,
+      "late": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 0,
+    "ramadanDays": 0,
+    "events": {}
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["fajr", "sunrise", "dhuhr", "asrHanafi", "maghrib", "isha"]
+    }
+  }
+}

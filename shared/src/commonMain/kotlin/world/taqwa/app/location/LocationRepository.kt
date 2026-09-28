@@ -57,6 +57,7 @@ class LocationRepository(private val provider: LocationProvider) {
             cityName = nearest?.name,
             countryCode = nearest?.countryCode,
             cityId = nearest?.id,
+            region = nearest?.region?.ifEmpty { null },
         )
     }
 }

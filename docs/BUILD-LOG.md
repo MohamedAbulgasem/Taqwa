@@ -1626,3 +1626,200 @@ An option, off by default: after the reciter recites an ayah, the phone's own vo
 - **Following skipped short ayahs.** The list reports that it has stopped a frame after the page's own scroll returns, so every follow counted as a touch, and an ayah arriving within the next four seconds was not followed. On the S23, 2:72 arrived 1.5 s after 2:71 and was left under the bar. `FollowingState` now ignores the stop of a scroll of its own that finished. A finger that takes over mid-scroll still counts.
 
 **Built with.** Spec `docs/superpowers/specs/2026-09-27-translation-read-aloud-design.md`, plan `docs/superpowers/plans/2026-09-27-translation-read-aloud.md`, and seven subagent tasks, each with its own review.
+
+## The never-early prayer engine (27 September 2026), branch `prayer-engine`
+
+The answer to "The city pages held" above: a new engine, built from the design at
+`docs/superpowers/specs/2026-09-26-taqwa-prayer-times-engine-design.md` (approved 27 September,
+implemented the same day, tested by Mohamed on his phones on 28 September and squashed into main).
+
+**What it is.** For every place, Taqwa now reproduces the authority its own mosques follow — its
+sun model, its rounding, its margins — at that authority's own reference point, and takes the
+later of that and the user's own point for every start, the earlier for sunrise and the end of
+eating. Where several timetables are in local use with no clear majority, it shows the latest of
+them (cautious times). Where nothing is known, it falls back to a documented convention, always on
+the safe side. Nothing is ever shown beginning before the time it is describing.
+
+**How it is proven.** A gate runs the shipping engine against every official table Taqwa holds
+locally (not just the sample used to fit it) and checks, per place and per day, that no start is
+early and no end (sunrise, end of eating) is late. The final run: **71 entries, 137,468
+place-days, 0 starts early, 0 late ends, 0 broken rows.** Each entry gets a class from that
+evidence (A/B rebuilt and proven over a year including Ramadan; C cautious times over proven
+members; D the authority's own method at a tested safety margin, not yet fully proven; one entry,
+`default.safe`, is Taqwa's own fallback where nothing local is known at all). By region:
+
+| Region | Entries | Place-days | Classes present |
+|---|---|---|---|
+| Saudi Arabia & the Gulf | 7 | 39,894 | A, B, B/D, D |
+| Türkiye, the Caucasus & the Balkans | 7 | 18,475 | A/D, B, D |
+| Russia & Central Asia | 5 | 7,792 | B, D |
+| Levant & Iraq | 6 | 549 | A, B, D |
+| North Africa & the Nile | 7 | 6,622 | B, B/D, D |
+| South Asia | 3 | 192 | D |
+| Southeast Asia | 4 | 15,685 | B |
+| Western & northern Europe | 16 | 9,680 | B, C, D |
+| North America | 8 | 20,370 | C, D |
+| Oceania | 3 | 851 | C, D |
+| Southern Africa | 4 | 15,304 | B, C, D |
+| No authority anywhere | 1 | 2,054 | D (none) |
+
+**What was built, by task:**
+
+| Task | What it built |
+|---|---|
+| 1 | The astronomy core: exact sun position, the Asr models, transit (`SunClock`) |
+| 2 | The day model: methods as data, rounding, Ramadan lag dates, imsak and the end of eating (`DayComputer`) |
+| 3 + 4 | Real times at any latitude with an estimate only when a sign is missing; cautious times over several timetables; a day whose order always holds (`HighLatitude`, `Cautious`, `Ends`, `Invariants`) |
+| 5 | The registry: every authority's units, methods and reference points, point tables, day-of-year curves, Algeria's wilayas, London's curve |
+| 6 | `DayPipeline`, the one path from a resolution and a place to a day, and the gate that checks it against the archive |
+| 7a–7h | Every authority's own timetable, region by region, in eight parallel subtasks: the Gulf and Egypt; Türkiye, the Balkans and Russia; Singapore, Malaysia and Indonesia; the Levant; South and Central Asia; the Maghreb and Libya; Europe, the Americas and South Africa; the "Other methods" and generic conventions |
+| 8 | `PrayerEngine`: settings, adjustments, caching, migration and rescheduling wired to the new engine |
+| 9 | The settings model and its migration, run ahead of Task 8 |
+| 10 | The Prayer screen: the ⓘ card, "set by rule", the polar-day line, the clock-mismatch line |
+| 11 | About these times, and the stamp-to-string generator (`ProofStamps`) |
+| 12 | Settings › Prayer times: the Timetable and Match my mosque screens |
+| 13 | Every new string in all seven languages, and a translation-quality pass |
+| 14 | Device verification: Android emulator and iOS simulator, city by city |
+| 15 | Wrap-up: the final fix round, a full gate refresh, and this log |
+
+**Notable engine findings:**
+
+- **The SunClock fallback.** A twilight the sun only just reaches (within about a hundredth of a
+  degree) was sometimes reported missing, because the search started from the wrong side of local
+  noon and never crossed it. Retrying from the sun's lower culmination finds the real crossing
+  instead of falling back to an estimate — checked against 986,772 brute-force altitude scans
+  across 44–66°N, five twilight angles and two years, zero misses.
+- **DUM RT's summer rule.** It first ran on a fixed calendar window (6 May – 8 August). Because the
+  date each town's 18° dawn actually disappears moves with the town and the year, the fixed window
+  put some southern towns' Isha tens of minutes early and Suhoor over an hour late where the real
+  dawn was there all along. It now runs on whichever nights each town's own dawn is genuinely
+  missing, computed per point, not read off a calendar.
+- **The 20-minutes-a-day limit.** The original design's 7-day "ramp" is gone. In its place: while a
+  sign is missing, the shown Isha may not move earlier than the day before by more than 20 minutes,
+  and the end of eating may not move later by more than 20 minutes — checked over the whole
+  lookback, not just up to the first day found, and applied to a value borrowed from a substitute
+  latitude on a polar day as much as to a local estimate. Fajr moving later is always the safe side
+  and is never limited.
+- **Point tables.** A cautious member or a single-authority timetable now carries its own reference
+  point. Starts are the later of that point's and the user's own; sunrise, the end of eating and
+  imsak are the earlier. Past the point where that stops being a fair comparison, the table's point
+  still bounds the ends only, while starts fall back to the user's own point at the entry's edge
+  margin — so leaving a table's practical reach still stops a user eating by it, without handing
+  them a start time the table never measured.
+- **Curve envelopes.** Authorities with no reproducible model of their own (IRN, EMB, Diyanet
+  Europe, DUM RF, ICCI, GMP, the LUPT corners) get a 366-slot day-of-year curve indexed on a
+  leap-year reference, each value an envelope over its neighbouring days — the smallest plausible
+  depression for a dawn, the largest for a dusk — so the four-year leap cycle can never drift a
+  start early. Every curve file is committed as that derived envelope, with its source recorded;
+  none of the authorities' own printed tables are committed.
+- **Libya's seasonal margins.** The first fit used one day's margins (25–26 September) at 21
+  cities. Checked against Tripoli's own widget and prayer-times API across 23 days spanning March
+  2025 to October 2026, most margins needed to move across the seasons, and the end of eating
+  needed the tightest refit of all (a late end of eating is the costliest place to be wrong). The
+  refitted margins hold every Libyan city never-early across the whole year, not just the day they
+  were measured. The owner's own Benghazi and Sabha mosque observations still run a few minutes
+  ahead of the national method Taqwa uses everywhere in Libya — his decision (spec §10.3) was to
+  keep the national method, which is never early against it, rather than move the east and south to
+  local practice.
+
+**What remains** (as of 27 September; the completion below settled the decisions and the Tromsø
+and Longyearbyen limitations):
+
+- **Owner decisions.** Nordic summer lateness where a cautious member's table doesn't reach that
+  far north (Isha over two hours later in places at 48°+ in midsummer); US, Montreal and Ottawa
+  mosque floors costing 5–7 minutes at Dhuhr and Maghrib against every held table; Chicago now a
+  cautious entry (four of its seven held tables use 15°); the UK's 12–14° group and France's 15°
+  family running summer Isha up to 38 minutes later than most; IISC Calgary's 10°/10° table, where
+  the app is up to 32 minutes ahead of its own Fajr; ICCI's end of eating running up to 80 minutes
+  before its own printed Fajr under the current curve, where a small margin change would close most
+  of the gap.
+- **Known limitations.** Tromsø against IRN's own Tromsø calendar: IRN prints artificial figures
+  for the polar period there, and Taqwa's real-sign engine runs far ahead of them (an early Fajr, a
+  late Maghrib, by hours); IRN's Tromsø calendar isn't modelled, so Norway's cautious entry is
+  marked unmeasured there. Near-threshold edges: places within around two-tenths of a degree of a
+  defining twilight angle (DUM RT's edge with no fixed point, the UK's cautious entry in high
+  summer, IRN north of about 69°) are position-sensitive enough that a few kilometres can flip
+  which sign is "real"; each is banded to its safe side rather than matched exactly. The
+  Longyearbyen polar Maghrib against the next end of eating: on 9 Longyearbyen days and 3 at Bodø,
+  the cautious combination's borrowed polar Maghrib itself falls at or after the next day's end of
+  eating, and the 20-minute limit can't move it without an early Maghrib or a late Fajr — it needs
+  its own ruling. Separately, some Other methods' own Maghrib+90 Isha rule puts their Isha after the
+  next Fajr at Tromsø and Longyearbyen on many summer days; that is those methods' own rule, not an
+  engine gap.
+- **The website slice** (spec §7): city pages for proven places, the "How Taqwa checks" page, the
+  detailed view — after the app, as Mohamed asked.
+- **The Ramadan release items** (spec §7): "Suhoor ends" on the Prayer screen, iftar, the printed
+  imsak precaution, the suhoor alert, the Ramadan widgets and their highlight change, Tahajjud
+  ending at the end of eating, "I'm fasting today".
+- **The weekly monitor** (spec §5): a scheduled local job that fetches each entry's newest published
+  table and re-runs the gate on it, opening a task on a failure. Needs the stamps this branch adds
+  (done) and a local scheduled job (not yet built) — after launch.
+
+### Completion (28 September 2026)
+
+Mohamed delegated the pending decisions ("make the best judgement calls"; never early first, good
+accuracy where most Muslims live). A research pass (Sudan, Tromsø, the UK, a Mawaqit spot survey of
+France, Belgium, the Netherlands, Germany and Canada, coverage by Muslim population, the launch
+requirements) was followed by three waves of parallel tracks, each reviewed and merged into
+`prayer-engine`, then a final whole-branch review and its fixes. Rulings R73–R92 (spec §12).
+
+**What changed.**
+
+- **Eastern and southern Libya** follow the local adhan Mohamed observed (R73): Fajr at the 19.5°
+  dawn, Maghrib at sunset + 1, an exact fit at Benghazi and Sabha; the gate holds his two
+  observations as an open table. This reverses the 27 September decision above.
+- **Sudan** keeps its angles and gains a Ramadan-only Isha floor of Maghrib + 90 (R74).
+- **The UK outside London** is never early against all 62 surveyed Mawaqit calendars (R75): a
+  late-dawn member, Karachi's end of eating at the 18.6° dawn or mid-night, Scotland's Asr minutes;
+  cost, summer Fajr 15–28 min later in England, the end of eating 47–147 min earlier May–August.
+- **North America** keeps its mosque-table floors, Chicago stays cautious, Canada's three families
+  apply beyond the held tables (R76–R78); France's 15° family and the Nordic summer lateness stay,
+  recorded (R79).
+- **GMP and ICCI's end of eating** is the authority's own dawn as an end (R80); the envelope curves
+  stay (R81).
+- **Tromsø** follows IRN's Makkah-time calendar as an authority clock rule (R82): the app shows
+  IRN's times wherever the sun allows and IRN's whole Makkah day where it neither rises nor sets;
+  what no day in order can show (a Fajr after sunrise on about fifty summer days, a sunrise at the
+  sun's lowest point) is declared, and About says so. The Longyearbyen and Bodø nights whose Maghrib
+  or Isha reaches the next Fajr get no alert and never a passed "next" (R83).
+- **Proof and release**: a golden vector of about 2,000 invented place-days checked on Android and
+  iOS (R84), a benchmark guard on the worst cautious place-days (R85, worst 1.14 ms on the Mac), and
+  both release scripts refusing a stale or red stamp (R86).
+- **Continental Europe** (R87, R88): the Netherlands gains a Maghrib floor by month, France gains
+  Diyanet Europe, Germany gains a late-dawn and an 18° member, Belgium keeps the spec's Maghrib cap at
+  EMB's own minutes; a point table's final end bounds the ends across its reach (R89).
+- **The final review's fixes**: no repair pulls Fajr before a real dawn at the polar edge (R90: the
+  sunrise precaution gives way before Fajr does; what the sun itself overtakes is declared), About
+  names the Maghrib cap on the days it decides (R91), and the Isha cap reads the next day's end as
+  shown (R92).
+
+**Final figures.** The gate over the whole archive: 588 rows, 137,835 place-days, 0 starts early,
+0 late ends, 0 broken; all 71 stamps fresh and `checkStamps` green. The surveys, each repeatable
+from the restricted archive: the UK's 62 calendars (22,630 place-days) and the continental 54, with
+every early or late calendar day either fixed or recorded in the survey's outliers (0 unrecorded).
+The Arctic walk of 2026 at nine places and the Tromsø reach: no day repaired for Fajr (from 8–75 a
+place before R90), no Fajr before a member's own Fajr or real dawn.
+
+**What remains.**
+
+- **Diyanet Europe beyond its city tables**: its takdir is read from the nearest city curve, 4–5 min
+  early at Fajr in Ghent and Antwerp from April to August and its carried imsak 7 min late at Lyon
+  in early summer; fetching Diyanet's own tables for those cities (and Copenhagen, Helsinki,
+  Trondheim) is the next slice.
+- **Nordic summer lateness**: where Diyanet Europe's takdir applies beyond its tables (Trondheim,
+  Helsinki, Copenhagen) Fajr and Isha run up to 118 and 155 min after the other member's calendar;
+  never early, the user's way out is Timetable or Match my mosque.
+- **The Arctic residual**: in the week the sun stops setting, at Finnsnes, Narvik, Kirkenes, Vadsø,
+  Kiruna, Rovaniemi and Murmansk the sun has risen by every member's Fajr on up to nine days a year
+  (Fajr is the minute before sunrise, declared), and on one to three days the members' sun models
+  disagree on whether the sun set at all, so the sunrise shown (the shown-Fajr member's own) is
+  after the other model's by up to 47 min.
+- **Population coverage gaps**: South Asia per city (Pakistan, India, Bangladesh have three class-D
+  entries and 192 place-days between them), Indonesia's other kabupaten and kota beyond the held
+  tables, sub-Saharan Africa (Nigeria, Ethiopia, Niger, Mali, Senegal and the rest fall to the
+  generic convention), and Iraq, Syria and Yemen, where no official table could be obtained.
+- **The weekly monitor**, the **website slice** (city pages for proven places, "How Taqwa checks")
+  and the **Ramadan release** items above, in that order after the owner's device test.
+
+Tested by the owner on 28 September 2026 (Cape Town and London checked against published sources:
+nothing early) and squashed into main as one commit; the weekly monitor follows.

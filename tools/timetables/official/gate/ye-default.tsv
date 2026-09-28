@@ -1,0 +1,8 @@
+# Yemen: archive/raw/moral-auth-mena/levant holds no Yemeni capture at all (the README's own list of
+# what that folder holds names Jordan, Palestine, Lebanon, Syria and Iraq, not Yemen). The one claim
+# in the research -- the Sanaa Awqaf's 31-location page, Fajr 18 degrees, Isha about 16 degrees, Dhuhr
+# about +10, Maghrib +6 lowland/+9.5 highland, on a single date -- is LOW confidence and was never
+# captured to a file, so nothing here can be read against the engine. ye.default stays D_NONE
+# (spec 6.2 c): calculated, not reproducing an authority, with the published minutes as floors
+# (spec 6.2 d). This file intentionally has no rows; see proof.md.
+path	entry	lat	lon	zone	columns	format	school	split	note

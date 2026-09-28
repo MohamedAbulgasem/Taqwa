@@ -1,0 +1,5 @@
+# Cells of the ca.cautious survey's calendars left out as faulty, each with its reason: dates and columns only (F Fajr,
+# which is also the end of eating; S sunrise; D Dhuhr; A Asr; M Maghrib; I Isha).
+calendar	from	to	columns	reason
+masjid-bilal-winnipeg-r3e-3l6-canada	2026-11-01	2026-11-01	F S D A M I	the autumn clock change taken on the wrong side: every time 39-60 min off that day alone
+rahma-wpg	2026-11-01	2026-11-01	F S D A M I	the autumn clock change taken on the wrong side: every time 39-60 min off that day alone

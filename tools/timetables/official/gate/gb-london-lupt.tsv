@@ -1,0 +1,25 @@
+# London Unified Prayer Timetable (LUPT): the East London Mosque's 2026 table as London Prayer Times
+# republishes it ("completely free for all use"), both Asr columns (elm2026_std: Standard, elm2026_han:
+# Hanafi). The Fajr printed is also when the fast begins (no imsak): F+E. The whole M25 follows the one
+# table computed at its point (ruling R44), so every row names the M25 unit.
+# - Fit: the 2026 year files at the table's point (the curve's own source).
+# - Test: the October 2026 file (off-elm-oct.txt: the same table as republished for October, so not
+#   independent of the fit; no other year of LUPT is held, see proof.md), and the 2026 table at points
+#   across the M25 where the same printed times apply, its western and eastern edges and its corners,
+#   for the edges' lateness (rulings R44, R49).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt			Europe/London	F+E S D As M I	daily	-	fit	LUPT 2026, Standard Asr
+archive/tables/moral-auth-world/ukfr/elm2026_han.txt	gb.london.lupt/gb.london.lupt			Europe/London	- - - Ah - -	daily	-	fit	LUPT 2026, Hanafi Asr
+archive/tables/off-elm-oct.txt	gb.london.lupt/gb.london.lupt			Europe/London	F+E S D As M I	daily	-	test	LUPT October 2026 (the same table)
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.5462	-0.4786	Europe/London	F+E S D As M I	daily	-	test	Uxbridge
+archive/tables/moral-auth-world/ukfr/elm2026_han.txt	gb.london.lupt/gb.london.lupt	51.5462	-0.4786	Europe/London	- - - Ah - -	daily	-	test	Uxbridge, Hanafi Asr
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.4700	-0.4543	Europe/London	F+E S D As M I	daily	-	test	Heathrow
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.4000	-0.5300	Europe/London	F+E S D As M I	daily	-	test	the M25's western edge (Thorpe)
+archive/tables/moral-auth-world/ukfr/elm2026_han.txt	gb.london.lupt/gb.london.lupt	51.4000	-0.5300	Europe/London	- - - Ah - -	daily	-	test	the M25's western edge, Hanafi Asr
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.6900	-0.4450	Europe/London	F+E S D As M I	daily	-	test	the north-west (Kings Langley)
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.3300	-0.4350	Europe/London	F+E S D As M I	daily	-	test	the south-west (Cobham)
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.7200	-0.3600	Europe/London	F+E S D As M I	daily	-	test	the north (London Colney)
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.2500	-0.0700	Europe/London	F+E S D As M I	daily	-	test	the south (Godstone)
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.5230	0.2000	Europe/London	F+E S D As M I	daily	-	test	Rainham
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.5000	0.2850	Europe/London	F+E S D As M I	daily	-	test	the M25's eastern edge (Thurrock)
+archive/tables/moral-auth-world/ukfr/elm2026_std.txt	gb.london.lupt/gb.london.lupt	51.3000	0.1250	Europe/London	F+E S D As M I	daily	-	test	the south-east (Sevenoaks junction)

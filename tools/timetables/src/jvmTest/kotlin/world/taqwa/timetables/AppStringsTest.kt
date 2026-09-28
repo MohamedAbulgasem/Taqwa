@@ -1,9 +1,8 @@
 package world.taqwa.timetables
 
-import world.taqwa.app.domain.AsrMadhab
-import world.taqwa.app.domain.CalculationMethodId
-import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.registry.Registry
 import java.io.File
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
@@ -24,18 +23,18 @@ class AppStringsTest {
     }
 
     @Test
-    fun methodNamesComeFromTheApp() {
-        assertEquals("Muslim World League", strings.method("en", CalculationMethodId.MUSLIM_WORLD_LEAGUE))
-        assertEquals("رابطة العالم الإسلامي", strings.method("ar", CalculationMethodId.MUSLIM_WORLD_LEAGUE))
-        assertEquals("Diyanet (Türkiye)", strings.method("en", CalculationMethodId.TURKEY))
+    fun timetableNamesComeFromTheApp() {
+        assertEquals("Muslim World League", strings.timetable("en", Registry.byId("other.mwl")!!))
+        assertEquals("رابطة العالم الإسلامي", strings.timetable("ar", Registry.byId("other.mwl")!!))
+        assertEquals("Diyanet (Türkiye)", strings.timetable("en", Registry.byId("other.turkey")!!))
     }
 
     @Test
-    fun everyMethodAndMadhabAndRuleHasANameInEveryLanguage() {
+    fun everyOtherMethodAndSchoolAndPrayerHasANameInEveryLanguage() {
+        val others = Registry.otherMethods.filter { it.id.startsWith("other.") }
         for (language in listOf("en", "ar", "fr", "tr", "id", "ur", "bn")) {
-            CalculationMethodId.entries.forEach { assertTrue(strings.method(language, it).isNotBlank()) }
-            AsrMadhab.entries.forEach { assertTrue(strings.madhab(language, it).isNotBlank()) }
-            HighLatitudePreference.entries.forEach { assertTrue(strings.highLatitude(language, it).isNotBlank()) }
+            others.forEach { assertTrue(strings.timetable(language, it)?.isNotBlank() == true, "${it.id} in $language") }
+            AsrSchool.entries.forEach { assertTrue(strings.school(language, it).isNotBlank()) }
             Prayer.entries.forEach { assertTrue(strings.prayer(language, it).isNotBlank()) }
         }
     }

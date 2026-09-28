@@ -1,0 +1,4 @@
+# Official timetables whose publishers do not allow redistribution. The repository is public, so
+# they stay on the machine that fetched them (and on the local-only branch
+# local/official-data-never-push); MANIFEST.tsv lists every one with its source.
+/archive

@@ -1,0 +1,8 @@
+# What fr.cautious does not absorb (ruling R87): each case with the days it may cover (for "*", at any one calendar),
+# the most minutes it may reach, and why no member takes it at a fair cost for everyone. Figures only, never a printed time.
+calendar	event	from	to	days	worst	reason
+el-amine-lyon	isha	2026-01-01	2026-12-31	365	12	prints Isha at a flat 17° all year (its Fajr a flat 15°): one calendar of the twelve; absorbing it would move Isha up to 12 min later all over France (brief L item 2: recorded, not absorbed)
+koba-lyon	isha	2026-03-01	2026-10-31	72	3	prints Isha a little after 16° in March, September and October, up to 3 min after Diyanet's 16°: a 16° calendar's own rounding
+m-essalem-lyon	isha	2026-02-01	2026-02-28	5	7	five February days with Isha up to 7 min after 16°, a step in its own table
+mosquee-centrale-lyon-ditib-decines-charpieu-69150-france	endOfEating	2026-05-01	2026-07-31	71	7	Diyanet's Lyon table (as Mawaqit prints it) begins its fast at its own takdir Fajr, a larger share of the night than the Zürich dawns Diyanet's member carries to Lyon (Diyanet's Lyon table is not held): a Diyanet-Europe question beyond its city tables, not a French member
+mosquee-centrale-lyon-ditib-decines-charpieu-69150-france	maghribCap	2026-01-01	2026-12-31	333	4	Diyanet's Maghrib, sunset + 7 on its own sun; France's Maghrib is capped at the 12-13° family's + 4 (spec 3.6), which 78 % of the Île-de-France survey prints, and this is one calendar of the twelve

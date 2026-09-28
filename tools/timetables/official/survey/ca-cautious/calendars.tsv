@@ -1,0 +1,11 @@
+# Canada outside Toronto, Montreal and Ottawa (ca.cautious): the 6 Mawaqit calendars research-mawaqit spot-checked (ruling R87), each at its
+# own mosque's point. The tables are restricted: they live in the local archive only (official/README.md). `use` is
+# "yes", or why the whole calendar is left out.
+# `zone`: the mosque's own civil zone (Canada spans three).
+path	name	lat	lon	columns	use	zone
+archive/tables/ca-mawaqit/ummah-masjid-and-community-centre-halifax.txt	Ummah Masjid & Community Centre	44.6505908	-63.5977976	F S D A M I	yes	America/Halifax
+archive/tables/ca-mawaqit/tci-windsor.txt	The Clear Islam Information Center - WINDSOR	42.315171153863	-83.038801391217	F S D A M I	yes	America/Toronto
+archive/tables/ca-mawaqit/windsor-islamic-association.txt	Windsor Islamic Association	42.277573538558	-83.032092372422	F S D A M I	yes	America/Toronto
+archive/tables/ca-mawaqit/manitoba-dawah-center-winnipeg-r3b-2l3-canada.txt	MANITOBA DAWAH CENTER - WINNIPEG	49.895	-97.149	F S D A M I	yes	America/Winnipeg
+archive/tables/ca-mawaqit/masjid-bilal-winnipeg-r3e-3l6-canada.txt	Masjid Bilal	49.9137691	-97.1676656	F S D A M I	yes	America/Winnipeg
+archive/tables/ca-mawaqit/rahma-wpg.txt	Rahma Masjid	49.919	-97.097	F S D A M I	yes	America/Winnipeg

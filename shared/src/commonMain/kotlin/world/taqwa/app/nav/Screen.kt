@@ -24,9 +24,21 @@ sealed interface Screen {
     data object Settings : Screen
     data object PrayerTimesSettings : Screen
     data object NotificationSettings : Screen
-    data object MethodPicker : Screen
+    /** Settings › Prayer times › Timetable (spec §2.2): Automatic, the timetables used nearby, Other methods. */
+    data object Timetable : Screen
+
+    /** Settings › Prayer times › Timetable › Other methods: the eleven that apply anywhere. */
+    data object OtherMethods : Screen
+
+    /** Match my mosque (spec §2.2): the board's Fajr and Isha against the timetables Taqwa knows. */
+    data object MatchMyMosque : Screen
     data object HighLatitudePicker : Screen
     data object ManualAdjustments : Screen
+
+    /** "About these times" (spec §2.3, task 11): whose times these are, and how sure Taqwa is of
+     * them. Reached from Settings › Prayer times, and — once Task 10 wires it — from the Prayer
+     * screen's ⓘ card and "Cautious times" line. */
+    data object AboutTimes : Screen
     data object LocationSettings : Screen
     data object CitySearch : Screen
     data object Appearance : Screen

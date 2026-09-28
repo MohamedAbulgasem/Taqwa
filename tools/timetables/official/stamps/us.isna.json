@@ -1,0 +1,281 @@
+{
+  "entry": "us.isna",
+  "class": "D (authority)",
+  "engineHash": "778fa9ddd95f3b40",
+  "broken": 0,
+  "places": 35,
+  "first": "2025-02-01",
+  "last": "2026-12-31",
+  "placeDays": 8617,
+  "heldOutDays": 3993,
+  "ramadanDays": 628,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 8617,
+      "early": 0,
+      "late": {
+        "0": 654,
+        "1": 3271,
+        "2": 4067,
+        "3+": 625
+      },
+      "exactShare": 0.0759,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 8617,
+      "lateEnd": 0,
+      "late": {
+        "0": 427,
+        "1": 1520,
+        "2": 5674,
+        "3+": 996
+      },
+      "exactShare": 0.0496,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 8617,
+      "early": 0,
+      "late": {
+        "0": 287,
+        "1": 89,
+        "2": 314,
+        "3+": 7927
+      },
+      "exactShare": 0.0333,
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 7145,
+      "early": 0,
+      "late": {
+        "0": 98,
+        "1": 207,
+        "2": 2214,
+        "3+": 4626
+      },
+      "exactShare": 0.0137,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 1472,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 44,
+        "2": 299,
+        "3+": 1129
+      },
+      "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 8617,
+      "early": 0,
+      "late": {
+        "0": 50,
+        "1": 186,
+        "2": 1292,
+        "3+": 7089
+      },
+      "exactShare": 0.0058,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 8617,
+      "early": 0,
+      "late": {
+        "0": 22,
+        "1": 712,
+        "2": 1772,
+        "3+": 6111
+      },
+      "exactShare": 0.0026,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 8617,
+      "lateEnd": 0,
+      "late": {
+        "0": 320,
+        "1": 512,
+        "2": 4850,
+        "3+": 2935
+      },
+      "exactShare": 0.0371,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry us.isna",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 3993,
+    "ramadanDays": 269,
+    "events": {
+      "fajr": {
+        "checked": 3993,
+        "early": 0,
+        "late": {
+          "0": 231,
+          "1": 1471,
+          "2": 2152,
+          "3+": 139
+        },
+        "exactShare": 0.0579,
+        "worstLate": 3,
+        "lateLimit": 4,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 3993,
+        "lateEnd": 0,
+        "late": {
+          "0": 52,
+          "1": 767,
+          "2": 2658,
+          "3+": 516
+        },
+        "exactShare": 0.013,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 3993,
+        "early": 0,
+        "late": {
+          "0": 2,
+          "1": 5,
+          "2": 0,
+          "3+": 3986
+        },
+        "exactShare": 5.0E-4,
+        "worstLate": 7,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 3496,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 47,
+          "2": 808,
+          "3+": 2641
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      },
+      "asrHanafi": {
+        "checked": 497,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 7,
+          "2": 120,
+          "3+": 370
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 3993,
+        "early": 0,
+        "late": {
+          "0": 30,
+          "1": 29,
+          "2": 335,
+          "3+": 3599
+        },
+        "exactShare": 0.0075,
+        "worstLate": 6,
+        "lateLimit": 6,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 3993,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 135,
+          "2": 578,
+          "3+": 3280
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 3993,
+        "lateEnd": 0,
+        "late": {
+          "0": 1,
+          "1": 265,
+          "2": 2511,
+          "3+": 1216
+        },
+        "exactShare": 3.0E-4,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "entry us.isna",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry us.isna: 4 min": {
+      "reason": "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: ADAMS moves Fajr and sunrise 2 min earlier (its safe direction): Fajr up to 4 min after its, and sunrise and the end of eating, never after its, up to 4 min before the others'.",
+      "events": ["fajr", "sunrise", "endOfEating"]
+    },
+    "entry us.isna: 5 min": {
+      "reason": "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Asr and Isha, a minute or two after the angle at some tables (ADAMS's Isha 2 min later by its rule), up to 5 min after the others'.",
+      "events": ["asrStandard", "asrHanafi", "isha"]
+    },
+    "entry us.isna: 6 min": {
+      "reason": "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Maghrib up to 6 min after the tables that add nothing.",
+      "events": ["maghrib"]
+    },
+    "entry us.isna: 7 min": {
+      "reason": "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Zuhr up to 7 min after the tables that add nothing.",
+      "events": ["dhuhr"]
+    }
+  }
+}

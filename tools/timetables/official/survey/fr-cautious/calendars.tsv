@@ -1,0 +1,16 @@
+# France (fr.cautious): the 12 Mawaqit calendars research-mawaqit spot-checked (ruling R87), each at its
+# own mosque's point. The tables are restricted: they live in the local archive only (official/README.md). `use` is
+# "yes", or why the whole calendar is left out.
+path	name	lat	lon	columns	use
+archive/tables/fr-mawaqit/aboubakr69003.txt	مسجد أبو بكر الصديق - Lyon	45.7570348	4.8438032	F S D A M I	yes
+archive/tables/fr-mawaqit/attawba-lyon.txt	مسجد التوبة - Lyon	45.7882926	4.7930922	F S D A M I	yes
+archive/tables/fr-mawaqit/el-amine-lyon.txt	El AMINE - Lyon	45.7682703	4.7966933	F S D A M I	yes
+archive/tables/fr-mawaqit/koba-lyon.txt	مسجد قباء Mosquée Koba - Lyon	45.7712985	4.8327583	F S D A M I	yes
+archive/tables/fr-mawaqit/m-essalem-lyon.txt	مسجد السلام-mosquée Es-Salem - Lyon	45.7552746	4.8667453	F S D A M I	yes
+archive/tables/fr-mawaqit/mosquee-centrale-lyon-ditib-decines-charpieu-69150-france.txt	Mosquée Centrale LYON DITIB	45.7559686	4.9379307	F S D A M I	yes
+archive/tables/fr-mawaqit/bilal-marseille.txt	Mosquée  Bilal  بلال - Marseille	43.3011148	5.3796587	F S D A M I	yes
+archive/tables/fr-mawaqit/consolat-marseille-13015-france.txt	Consolat - MARSEILLE	43.3465558	5.3468972	F S D A M I	yes
+archive/tables/fr-mawaqit/ikram-mosquee-marseille-13014-france.txt	IKRAM MOSQUÉE - MARSEILLE	43.3025742	5.3690743	F S D A M I	yes
+archive/tables/fr-mawaqit/institut-rissalat-averroes-marseille-13001-france.txt	Institut Rissalat Averroes - Marseille	43.3009577	5.3767525	F S D A M I	yes
+archive/tables/fr-mawaqit/la-grande-mosquee-ali-hacene-blidi-marseille-13003-france.txt	La Grande Mosquée Ali Hacene-Blidi - MARSEILLE	43.3099123	5.3806638	F S D A M I	yes
+archive/tables/fr-mawaqit/mosquee-al-taqwa-marseille-13002-france.txt	Mosquée Al Taqwa	43.3027042	5.3738762	F S D A M I	yes

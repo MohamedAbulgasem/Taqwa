@@ -1,0 +1,15 @@
+# What nl.cautious does not absorb (ruling R87): each case with the days it may cover (for "*", at any one calendar),
+# the most minutes it may reach, and why no member takes it at a fair cost for everyone. Figures only, never a printed time.
+calendar	event	from	to	days	worst	reason
+alfarouk-utrecht	fajr	2026-05-01	2026-08-31	101	16	prints Fajr at 18° but from May to August at about 0.18 of the night before sunrise (8.7-11.7°), later than Diyanet's Amsterdam takdir and the Moroccan member's 14°: one calendar of the twelve; absorbing it (a summer curve on the Moroccan member) would move everyone's Fajr up to 16 min later from May to August (brief L item 1: recorded)
+alfarouk-utrecht	isha	2026-08-01	2026-11-30	69	2	prints Isha a little after 17° (17.04-17.25°): up to 2 min after MWL's 17°
+el-tawheed-amsterdam-amsterdam-1053sv-netherlands	isha	2026-06-01	2026-07-31	10	2	ten June and July days up to 2 min after the latest member's Isha (its own summer rule)
+hicret-cami-den-haag-2572-ht-netherlands	maghribCap	2026-01-01	2026-12-31	352	2	prints Maghrib at sunset + 8.4 all year, an offset of its own a minute or two beyond Diyanet's (its Fajr is Mawaqit's 110 minutes before sunrise, section 2); absorbing it would move everyone's Maghrib later all year
+iskenderpasa-camii-igmg-rotterdam-3037-bk-netherlands	fajr	2026-01-01	2026-12-31	365	58	Mawaqit's own minutes-before-sunrise Fajr setting (40 min, fajrFixationComparedToShuruq), one admin's simplification and not a convention (research-mawaqit section 2): not evidence for a Fajr change, recorded
+mevlana-moskee-amsterdam-1061-da-netherlands	endOfEating	2026-05-22	2026-07-25	8	14	Mawaqit's own Diyanet computation returns to the real 18° dawn on 20-25 July (and two May days), days before Diyanet's Amsterdam table does; Diyanet's own table is the member
+moskee-el-islam-msjd-lslm-den-haag-2525-cg-netherlands	endOfEating	2026-07-21	2026-07-23	3	8	returns to the real 18° dawn on 21-23 July, days before Diyanet's Amsterdam dawns do
+pakistan-islamic-centre-rotterdam-rotterdam-3014-ed-netherlands	isha	2026-01-01	2026-12-31	181	30	its own late Isha from October to April (18° to 21.5°, up to 30 min after the 17° shown): one calendar; absorbing it would put everyone's Isha up to 30 min later in February and March
+pakistan-islamic-centre-rotterdam-rotterdam-3014-ed-netherlands	dhuhr	2026-09-22	2026-09-30	8	2	its September Dhuhr + 5.6, a step of its own
+pakistan-islamic-centre-rotterdam-rotterdam-3014-ed-netherlands	endOfEating	2026-02-19	2026-02-26	8	2	eight February days with Fajr up to 18.7°, 2 min before the 18° dawn
+pakistan-islamic-centre-rotterdam-rotterdam-3014-ed-netherlands	asrStandard	2026-12-01	2026-12-31	28	2	the Standard option against its December Asr, printed nearer the Standard time than the Hanafi (its school) and up to 2 min after it
+pakistan-islamic-centre-rotterdam-rotterdam-3014-ed-netherlands	maghribCap	2026-11-01	2026-12-31	22	1	its own Maghrib, sunset + 7.6 to + 8.3 in November and December, a minute after Diyanet's

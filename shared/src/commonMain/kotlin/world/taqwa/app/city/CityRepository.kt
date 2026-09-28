@@ -121,6 +121,16 @@ class CityRepository(
     }
 
     /**
+     * The bundled city with GeoNames id [cityId], or null when the bundle has none (an id from an
+     * older extract). A linear scan, like [displayName]'s fallback: it serves the one-time
+     * backfill of a stored location, not a keystroke.
+     */
+    suspend fun byId(cityId: Int): City? = withContext(Dispatchers.Default) {
+        val loaded = data()
+        loaded.cities.firstOrNull { it.id == cityId }?.let { it.copy(localizedName = loaded.names[it.id]) }
+    }
+
+    /**
      * The nearest bundled city to a raw GPS fix, by great-circle distance. A linear scan over
      * ~34k rows is a few milliseconds — not worth a spatial index for a call that happens once
      * per location resolution. Returns null only when the database itself is empty.

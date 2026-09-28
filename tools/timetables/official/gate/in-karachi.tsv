@@ -1,0 +1,6 @@
+# India, in.karachi: no state or umbrella authority found; the only verified table is
+# Dawat-e-Islami's Delhi AJAX (18/18 Hanafi, elevation-adjusted; dawateislami.net, "sharing these
+# default timings is not allowed", used only to fit and prove). One month, one source: fit only,
+# nothing held out (as RU-DUMRT's single-town table).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/southasia/off-di-delhi-2026-09.txt	in.karachi	28.6139	77.2090	Asia/Kolkata	F S D Ah M I	daily	-	fit	Dawat-e-Islami Delhi AJAX, September 2026

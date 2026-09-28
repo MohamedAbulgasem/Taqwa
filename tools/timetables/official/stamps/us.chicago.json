@@ -1,0 +1,272 @@
+{
+  "entry": "us.chicago",
+  "class": "C",
+  "engineHash": "febd161cc41c0c2f",
+  "broken": 0,
+  "places": 7,
+  "first": "2025-10-01",
+  "last": "2026-12-31",
+  "placeDays": 1101,
+  "heldOutDays": 1101,
+  "ramadanDays": 30,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 1101,
+      "early": 0,
+      "late": {
+        "0": 36,
+        "1": 185,
+        "2": 242,
+        "3+": 638
+      },
+      "exactShare": 0.0327,
+      "worstLate": 31,
+      "lateLimit": 31,
+      "lateLimitFrom": "entry us.chicago",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 1101,
+      "lateEnd": 0,
+      "late": {
+        "0": 52,
+        "1": 281,
+        "2": 722,
+        "3+": 46
+      },
+      "exactShare": 0.0472,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "entry us.chicago",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 1101,
+      "early": 0,
+      "late": {
+        "0": 29,
+        "1": 76,
+        "2": 17,
+        "3+": 979
+      },
+      "exactShare": 0.0263,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry us.chicago",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 1101,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 7,
+        "2": 281,
+        "3+": 813
+      },
+      "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry us.chicago",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 1101,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 33,
+        "2": 216,
+        "3+": 852
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry us.chicago",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 1101,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 174,
+        "3+": 927
+      },
+      "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry us.chicago",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 1101,
+      "lateEnd": 0,
+      "late": {
+        "0": 15,
+        "1": 129,
+        "2": 225,
+        "3+": 732
+      },
+      "exactShare": 0.0136,
+      "worstLate": 32,
+      "lateLimit": 32,
+      "lateLimitFrom": "entry us.chicago",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 1101,
+    "ramadanDays": 30,
+    "events": {
+      "fajr": {
+        "checked": 1101,
+        "early": 0,
+        "late": {
+          "0": 36,
+          "1": 185,
+          "2": 242,
+          "3+": 638
+        },
+        "exactShare": 0.0327,
+        "worstLate": 31,
+        "lateLimit": 31,
+        "lateLimitFrom": "entry us.chicago",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 1101,
+        "lateEnd": 0,
+        "late": {
+          "0": 52,
+          "1": 281,
+          "2": 722,
+          "3+": 46
+        },
+        "exactShare": 0.0472,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "entry us.chicago",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 1101,
+        "early": 0,
+        "late": {
+          "0": 29,
+          "1": 76,
+          "2": 17,
+          "3+": 979
+        },
+        "exactShare": 0.0263,
+        "worstLate": 6,
+        "lateLimit": 6,
+        "lateLimitFrom": "entry us.chicago",
+        "overLimit": 0
+      },
+      "asrHanafi": {
+        "checked": 1101,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 7,
+          "2": 281,
+          "3+": 813
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry us.chicago",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 1101,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 33,
+          "2": 216,
+          "3+": 852
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 6,
+        "lateLimitFrom": "entry us.chicago",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 1101,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 174,
+          "3+": 927
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry us.chicago",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 1101,
+        "lateEnd": 0,
+        "late": {
+          "0": 15,
+          "1": 129,
+          "2": 225,
+          "3+": 732
+        },
+        "exactShare": 0.0136,
+        "worstLate": 32,
+        "lateLimit": 32,
+        "lateLimitFrom": "entry us.chicago",
+        "overLimit": 0
+      }
+    }
+  },
+  "maghribCap": {
+    "uncheckedDays": 0,
+    "members": {
+      "us.chicago.eighteen": {
+        "days": 609,
+        "cappedDays": 0,
+        "leastGap": 1,
+        "mostGap": 6
+      },
+      "us.isna": {
+        "days": 492,
+        "cappedDays": 0,
+        "leastGap": 1,
+        "mostGap": 6
+      }
+    }
+  },
+  "lateLimits": {
+    "entry us.chicago: 3 min": {
+      "reason": "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Sunrise up to 3 min before theirs.",
+      "events": ["sunrise"]
+    },
+    "entry us.chicago: 5 min": {
+      "reason": "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Asr and Isha up to 5 min.",
+      "events": ["asrHanafi", "isha"]
+    },
+    "entry us.chicago: 6 min": {
+      "reason": "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Zuhr and Maghrib up to 6 min.",
+      "events": ["dhuhr", "maghrib"]
+    },
+    "entry us.chicago: 31 min": {
+      "reason": "Chicago's mosques differ on Fajr: the 15° mosques' Fajr, never before it, runs up to 31 min after the 18° block's (Villa Park, Makki, DarusSalam).",
+      "events": ["fajr"]
+    },
+    "entry us.chicago: 32 min": {
+      "reason": "Chicago's mosques differ on Fajr: the end of eating is the 18° block's dawn, never after it, up to 32 min before the 15° mosques' Fajr (MCC, MEC, Mosque Foundation, Orland Park).",
+      "events": ["endOfEating"]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+# New Zealand: FIANZ's Auckland table (fianz.com, one of its 20 cities), March, June, September and December 2026:
+# 18°/18°, Shafi'i Asr, nearest minute. No imsak: Fajr is also the start of the fast. March and June fit, September
+# and December held out (Task 7g split in africaoceania/split-7g/).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/africaoceania/split-7g/fianz-akl-2026-h1.txt	nz.fianz/auckland			Pacific/Auckland	F+E S D A M I	daily	standard	fit	FIANZ Auckland March and June
+archive/tables/moral-auth-world/africaoceania/split-7g/fianz-akl-2026-h2.txt	nz.fianz/auckland			Pacific/Auckland	F+E S D A M I	daily	standard	test	FIANZ Auckland September and December

@@ -1,0 +1,357 @@
+{
+  "entry": "nz.fianz",
+  "class": "D (authority)",
+  "engineHash": "14c2cf5e85d726c7",
+  "broken": 0,
+  "places": 1,
+  "first": "2026-03-01",
+  "last": "2026-12-31",
+  "placeDays": 122,
+  "heldOutDays": 61,
+  "ramadanDays": 19,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 122,
+      "early": 0,
+      "late": {
+        "0": 76,
+        "1": 46,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.623,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 122,
+      "lateEnd": 0,
+      "late": {
+        "0": 81,
+        "1": 41,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6639,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 122,
+      "early": 0,
+      "late": {
+        "0": 96,
+        "1": 26,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.7869,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 122,
+      "early": 0,
+      "late": {
+        "0": 107,
+        "1": 15,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.877,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 122,
+      "early": 0,
+      "late": {
+        "0": 69,
+        "1": 53,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.5656,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 122,
+      "early": 0,
+      "late": {
+        "0": 72,
+        "1": 50,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.5902,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 122,
+      "lateEnd": 0,
+      "late": {
+        "0": 83,
+        "1": 39,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6803,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 61,
+    "ramadanDays": 0,
+    "events": {
+      "fajr": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 52,
+          "1": 9,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8525,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 61,
+        "lateEnd": 0,
+        "late": {
+          "0": 35,
+          "1": 26,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.5738,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 49,
+          "1": 12,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8033,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 54,
+          "1": 7,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8852,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 24,
+          "1": 37,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.3934,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 22,
+          "1": 39,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.3607,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 61,
+        "lateEnd": 0,
+        "late": {
+          "0": 33,
+          "1": 28,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.541,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+    }
+  },
+  "units": {
+    "auckland": {
+      "name": "Auckland",
+      "placeDays": 122,
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 122,
+          "early": 0,
+          "late": {
+            "0": 76,
+            "1": 46,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.623,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 122,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 41,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6639,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 122,
+          "early": 0,
+          "late": {
+            "0": 96,
+            "1": 26,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7869,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 122,
+          "early": 0,
+          "late": {
+            "0": 107,
+            "1": 15,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.877,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 122,
+          "early": 0,
+          "late": {
+            "0": 69,
+            "1": 53,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5656,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 122,
+          "early": 0,
+          "late": {
+            "0": 72,
+            "1": 50,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5902,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 122,
+          "lateEnd": 0,
+          "late": {
+            "0": 83,
+            "1": 39,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6803,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}

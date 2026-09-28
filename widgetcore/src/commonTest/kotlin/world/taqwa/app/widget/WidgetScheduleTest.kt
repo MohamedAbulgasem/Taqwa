@@ -111,6 +111,24 @@ class WidgetScheduleTest {
     }
 
     @Test
+    fun yesterdaysIshaCarriedPastMidnightIsNextThenCurrentWithTheNewDaysRows() {
+        // Spec §3.3: the day before's Isha at 00:20, carried as day −1. It is next until it begins,
+        // then the ring counts from it to Fajr; the rows are day 0's and none of them is lit.
+        val carried = snapshot.copy(schedule = listOf(ScheduledPrayer(Prayer.ISHA, midnight + 20 * 60, "00:20", -1)) + day(0) + day(1))
+        val before = WidgetContentBuilder.build(carried, midnight + 5 * 60)
+        assertEquals("Isha in", before.countdownLabel)
+        assertEquals(15L, WidgetCountdown.remainingMinutesAt(carried, midnight + 5 * 60))
+        assertEquals(day(0).map { it.clockTime }, before.rows.map { it.clockTime })
+        assertFalse(before.rows.any { it.isCurrent })
+        val after = WidgetContentBuilder.build(carried, midnight + 3 * hour)
+        assertEquals("Fajr in", after.countdownLabel)
+        assertEquals(day(0).map { it.clockTime }, after.rows.map { it.clockTime })
+        assertFalse(after.rows.any { it.isCurrent })
+        assertTrue(after.ringProgress > 0f)
+        assertEquals(carried, WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(carried)))
+    }
+
+    @Test
     fun pastTheWholeHorizonThereIsNoHonestCountdown() {
         val day3 = midnight + 3 * 24 * hour
         assertNull(WidgetCountdown.remainingMinutesAt(snapshot, day3))

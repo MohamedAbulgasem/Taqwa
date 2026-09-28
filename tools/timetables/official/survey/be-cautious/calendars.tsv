@@ -1,0 +1,16 @@
+# Belgium (be.cautious): the 12 Mawaqit calendars research-mawaqit spot-checked (ruling R87), each at its
+# own mosque's point. The tables are restricted: they live in the local archive only (official/README.md). `use` is
+# "yes", or why the whole calendar is left out.
+path	name	lat	lon	columns	use
+archive/tables/be-mawaqit/el-gazali-camii-antwerpen-2060-belgium.txt	Moskee El Gazali - ANTWERPEN	51.2251992	4.425539	F S D A M I	yes
+archive/tables/be-mawaqit/shahjalal-baitul-aman-antwerpen-2060-belgium.txt	Moskee Shahjalal Baitul Aman - ANTWERPEN	51.2204546	4.423437	F S D A M I	yes
+archive/tables/be-mawaqit/taoubat-moskee-antwerpen-2000-belgium.txt	Taoubat moskee - ANTWERPEN	51.209	4.391	F S D A M I	yes
+archive/tables/be-mawaqit/al-ghofrane-anderlecht-1070-belgium.txt	Al Ghoufrane - Anderlecht	50.843048997494	4.3128430544935	F S D A M I	left out whole: Isha equals Maghrib from May to July and its Fajr does not follow the sun (research-mawaqit section 1)
+archive/tables/be-mawaqit/mosquee-fatih-de-bruxelles-diyanet-bruxelles-1030-belgium.txt	Brüksel Fatih Camii (Diyanet) - Bruxelles	50.8574933	4.3699022	F S D A M I	yes
+archive/tables/be-mawaqit/pakistan-islamic-cultural-centre-bruxelles-1080-belgium.txt	PAKISTAN ISLAMIC CENTER - Bruxelles	50.8575644	4.3428101	F S D A M I	yes
+archive/tables/be-mawaqit/masjid-sakina-charleroi-6000-belgium.txt	Masjid Sakina - CHARLEROI	50.41806242758	4.4451869693115	F S D A M I	yes
+archive/tables/be-mawaqit/mosquee-des-beaux-arts-de-charleroi-charleroi-6000-belgium.txt	Charleroi Milli Görüş camii- Beaux-arts - Charleroi	50.4143873	4.4446211	F S D A M I	yes
+archive/tables/be-mawaqit/fatih-camii-gent-gent-9000-belgium.txt	Fatih Camii Gent - GENT	51.063	3.707	F S D A M I	yes
+archive/tables/be-mawaqit/jamia-masjid-anwar-e-madina-gent-gent-9000-belgium.txt	Jamia Masjid Anwar E Madina انوارِ مدینہ - GENT	51.0629381	3.7074661	F S D A M I	yes
+archive/tables/be-mawaqit/masjid-bilal-liege-4000-belgium.txt	Mosquée bilal  مسجد بلال لييج - LIEGE	50.6462101	5.5389864	F S D A M I	yes
+archive/tables/be-mawaqit/mosquee-attakwa-msjd-ltqw-liege-4030-belgium.txt	Mosquée Attakwa مسجد التقوى - LIèGE	50.6291936	5.5879043	F S D A M I	yes

@@ -1,0 +1,59 @@
+# Dubai, IACAD: its perpetual zone tables for Dubai, Dubai Rural and Hatta (profiles-tested.md,
+# data-gulf-egypt): yearly spreadsheets on iacad.gov.ae, 2022–2025 identical by month and day, read
+# from Wayback captures. The 2026–2029 files are that table mapped onto those dates (derived: a
+# perpetual table against the sun of each year of a leap cycle; Khaleej Times' September 2026 copy
+# matches it on 30 of 30 days). Each table is checked at its unit's reference point. No end of eating
+# is printed: the fast begins at its Fajr (F+E). Standard Asr.
+# Split, forward in time: fit on the captured years (Dubai 2022 to June 2025, a whole leap cycle;
+# Dubai Rural the same; Hatta 2023 to June 2025); held out, the table mapped onto 2026–2029, the
+# years the app shows (Dubai Rural's mapped 2026 only). A zone's table is the official one at every
+# point of the zone, so it is also checked at towns across it (its unit's point rides as the fixed
+# point there, ruling R15): Dubai's from Jebel Ali and the Marina in the west to Deira, Al Qusais,
+# Mirdif and Al Mizhar in the north and east; Dubai Rural's at Lahbab, its north.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai.txt	ae.iacad.dubai/dubai			Asia/Dubai	F+E S D A M I	daily	standard	fit	Dubai, captured 2022–2025
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai/dubai			Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai, mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai/dubai			Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai, mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai/dubai			Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai, mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai/dubai			Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai, mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural.txt	ae.iacad.dubai/dubai-rural			Asia/Dubai	F+E S D A M I	daily	standard	fit	Dubai Rural, captured 2022–2025
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural-2026.txt	ae.iacad.dubai/dubai-rural			Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Rural, mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-hatta.txt	ae.iacad.dubai/hatta			Asia/Dubai	F+E S D A M I	daily	standard	fit	Hatta, captured 2023–2025
+archive/tables/round/data-gulf-egypt/off-ae-iacad-hatta-2026.txt	ae.iacad.dubai/hatta			Asia/Dubai	F+E S D A M I	daily	standard	test	Hatta, mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-hatta-2027.txt	ae.iacad.dubai/hatta			Asia/Dubai	F+E S D A M I	daily	standard	test	Hatta, mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-hatta-2028.txt	ae.iacad.dubai/hatta			Asia/Dubai	F+E S D A M I	daily	standard	test	Hatta, mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-hatta-2029.txt	ae.iacad.dubai/hatta			Asia/Dubai	F+E S D A M I	daily	standard	test	Hatta, mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.00255	55.10811	Asia/Dubai	F+E S D A M I	daily	standard	test	Jebel Ali, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.00255	55.10811	Asia/Dubai	F+E S D A M I	daily	standard	test	Jebel Ali, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.00255	55.10811	Asia/Dubai	F+E S D A M I	daily	standard	test	Jebel Ali, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.00255	55.10811	Asia/Dubai	F+E S D A M I	daily	standard	test	Jebel Ali, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.08525	55.14646	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Marina, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.08525	55.14646	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Marina, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.08525	55.14646	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Marina, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.08525	55.14646	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Marina, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.11607	55.13506	Asia/Dubai	F+E S D A M I	daily	standard	test	The Palm Jumeirah, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.11607	55.13506	Asia/Dubai	F+E S D A M I	daily	standard	test	The Palm Jumeirah, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.11607	55.13506	Asia/Dubai	F+E S D A M I	daily	standard	test	The Palm Jumeirah, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.11607	55.13506	Asia/Dubai	F+E S D A M I	daily	standard	test	The Palm Jumeirah, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.27143	55.30207	Asia/Dubai	F+E S D A M I	daily	standard	test	Deira, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.27143	55.30207	Asia/Dubai	F+E S D A M I	daily	standard	test	Deira, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.27143	55.30207	Asia/Dubai	F+E S D A M I	daily	standard	test	Deira, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.27143	55.30207	Asia/Dubai	F+E S D A M I	daily	standard	test	Deira, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.27925	55.36995	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Qusais, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.27925	55.36995	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Qusais, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.27925	55.36995	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Qusais, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.27925	55.36995	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Qusais, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.22443	55.41412	Asia/Dubai	F+E S D A M I	daily	standard	test	Mirdif, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.22443	55.41412	Asia/Dubai	F+E S D A M I	daily	standard	test	Mirdif, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.22443	55.41412	Asia/Dubai	F+E S D A M I	daily	standard	test	Mirdif, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.22443	55.41412	Asia/Dubai	F+E S D A M I	daily	standard	test	Mirdif, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.24805	55.44128	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Mizhar, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.24805	55.44128	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Mizhar, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.24805	55.44128	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Mizhar, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.24805	55.44128	Asia/Dubai	F+E S D A M I	daily	standard	test	Al Mizhar, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2026.txt	ae.iacad.dubai	25.11985	55.38718	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Silicon Oasis, Dubai's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2027.txt	ae.iacad.dubai	25.11985	55.38718	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Silicon Oasis, Dubai's table mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	25.11985	55.38718	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Silicon Oasis, Dubai's table mapped onto 2028
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.11985	55.38718	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Silicon Oasis, Dubai's table mapped onto 2029
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural-2026.txt	ae.iacad.dubai	25.03763	55.59135	Asia/Dubai	F+E S D A M I	daily	standard	test	Lahbab, Dubai Rural's table mapped onto 2026
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural.txt	ae.iacad.dubai	25.03763	55.59135	Asia/Dubai	F+E S D A M I	daily	standard	test	Lahbab, Dubai Rural's captured table 2022–2025

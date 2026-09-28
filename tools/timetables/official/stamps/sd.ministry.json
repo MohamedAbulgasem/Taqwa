@@ -1,0 +1,125 @@
+{
+  "entry": "sd.ministry",
+  "class": "D (authority)",
+  "engineHash": "17f21b583ed0e735",
+  "broken": 0,
+  "places": 1,
+  "first": "2022-04-02",
+  "last": "2022-05-01",
+  "placeDays": 30,
+  "heldOutDays": 0,
+  "ramadanDays": 30,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 6,
+        "1": 19,
+        "2": 5,
+        "3+": 0
+      },
+      "exactShare": 0.2,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 26,
+        "1": 4,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.8667,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 18,
+        "2": 12,
+        "3+": 0
+      },
+      "exactShare": 0,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 24,
+        "2": 6,
+        "3+": 0
+      },
+      "exactShare": 0,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 30
+      },
+      "exactShare": 0,
+      "worstLate": 20,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry sd.ministry",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 30,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 30
+      },
+      "exactShare": 0,
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry sd.ministry",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 0,
+    "ramadanDays": 0,
+    "events": {}
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["fajr", "dhuhr", "asrStandard", "maghrib"]
+    },
+    "entry sd.ministry: 7 min": {
+      "reason": "News reports of Sudan's 2026 imsakiya, not the table itself, put its dawn near 19.4°, earlier than the 18.3° of the one table held (Khartoum, Ramadan 1443); until a current table is held the fast begins at the 19.5° dawn, up to 7 min before that table's Fajr.",
+      "events": ["endOfEating"]
+    },
+    "entry sd.ministry: 20 min": {
+      "reason": "A 2026 Ramadan imsakiya circulating under the Fiqh Academy's name (not the verified 2022 table) puts Isha at Maghrib + 90; on the entry's Ramadan dates only, Isha never earlier than that, up to 20 min after the 2022 table's 18.0° angle.",
+      "events": ["isha"]
+    }
+  }
+}

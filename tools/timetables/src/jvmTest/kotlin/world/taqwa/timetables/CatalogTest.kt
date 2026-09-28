@@ -1,7 +1,5 @@
 package world.taqwa.timetables
 
-import world.taqwa.app.domain.AsrMadhab
-import world.taqwa.app.domain.PrayerSettings
 import java.io.File
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
@@ -49,12 +47,11 @@ class CatalogTest {
     }
 
     @Test
-    fun theAsrSchoolIsTheAppsDefaultEvenWhereHanafiIsTheNorm() {
-        // The app has no country default for the Asr school, so a user in Karachi who has not
-        // changed a setting sees the Standard Asr, and the page must show the same.
+    fun theFirstLevelRegionComesFromTheAppsData() {
+        // What the engine picks an authority's unit by where the units are regions (ruling R32).
         val karachi = Catalog.load(list("karachi-pakistan\t1174872\ten ur\t\t"), app).single()
-        assertEquals(PrayerSettings().madhab, karachi.madhab)
-        assertEquals(AsrMadhab.STANDARD, karachi.madhab)
+        assertEquals("Sindh", karachi.admin1)
+        assertEquals("south-asia", karachi.region)
     }
 
     @Test

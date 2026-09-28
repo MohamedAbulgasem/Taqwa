@@ -103,15 +103,15 @@ class LocationRefresher(
             cityName = nearest?.name,
             countryCode = nearest?.countryCode,
             cityId = nearest?.id,
+            region = nearest?.region?.ifEmpty { null },
         )
         settings.setLocation(next)
         // A silent re-resolve is still a fix, and it has just overwritten whatever city the user
         // picked, so "Use my location" has to say so. Only reached when a fix arrived at all —
         // the early return above is the manually-chosen-city case.
         settings.setLocationSource(LocationSource.GPS)
-        // A move across a border is exactly when the country default becomes relevant; it is a
-        // no-op once the user has picked a method themselves.
-        settings.applyCountryDefaultMethod(next.countryCode)
+        // A location save no longer writes a calculation method (spec §8): the never-early
+        // engine's Automatic timetable already follows the move on its own.
         return next
     }
 }

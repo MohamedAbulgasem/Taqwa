@@ -1,0 +1,57 @@
+# South Africa, Jamiatul Ulama's perpetual salaah times (jamiat.org.za; Jamiat SA, Darul Ihsan and Jamiat
+# KZN publish the same system): each town's perpetual CSV (research round, data-wide-band) mapped onto
+# 2025-2029 in the local archive (round/data-wide-band/jamiat-7g/), with its printed Suhoor column (E),
+# both Asr columns and both Isha columns; the entry's Isha is the Hanafi 18° (the later), so the Shafi'i
+# Isha column is not checked here (it is the Cape Town member's, za-cape.tsv). Each town at its unit, the
+# point Jamiat prints for it.
+# The research's split: fit on Johannesburg, Cape Town and Durban over the leap cycle 2025-2028; held out
+# the other five towns 2025-2029 and the three fit towns' 2029. Darul Ihsan's own 2026 Pretoria tables
+# (the same system; no Suhoor column) and Jamiat KZN's Durban and Johannesburg as masjids.co.za relays
+# them (March-December 2026; sunrise not printed, and its third column is Zawaal, noon, not the Zuhr) are
+# held out too.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-jhb-2025.txt	za.jamiat/johannesburg			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Johannesburg 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-jhb-2026.txt	za.jamiat/johannesburg			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Johannesburg 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-jhb-2027.txt	za.jamiat/johannesburg			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Johannesburg 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-jhb-2028.txt	za.jamiat/johannesburg			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Johannesburg 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-jhb-2029.txt	za.jamiat/johannesburg			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Johannesburg 2029
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-cpt-2025.txt	za.jamiat/cape-town			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Cape Town 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-cpt-2026.txt	za.jamiat/cape-town			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Cape Town 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-cpt-2027.txt	za.jamiat/cape-town			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Cape Town 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-cpt-2028.txt	za.jamiat/cape-town			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Cape Town 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-cpt-2029.txt	za.jamiat/cape-town			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Cape Town 2029
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-dbn-2025.txt	za.jamiat/durban			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Durban 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-dbn-2026.txt	za.jamiat/durban			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Durban 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-dbn-2027.txt	za.jamiat/durban			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Durban 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-dbn-2028.txt	za.jamiat/durban			Africa/Johannesburg	E F S D As Ah M - I	daily	-	fit	Durban 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-dbn-2029.txt	za.jamiat/durban			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Durban 2029
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-blm-2025.txt	za.jamiat/bloemfontein			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Bloemfontein 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-blm-2026.txt	za.jamiat/bloemfontein			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Bloemfontein 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-blm-2027.txt	za.jamiat/bloemfontein			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Bloemfontein 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-blm-2028.txt	za.jamiat/bloemfontein			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Bloemfontein 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-blm-2029.txt	za.jamiat/bloemfontein			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Bloemfontein 2029
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-pe-2025.txt	za.jamiat/port-elizabeth			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Port Elizabeth 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-pe-2026.txt	za.jamiat/port-elizabeth			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Port Elizabeth 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-pe-2027.txt	za.jamiat/port-elizabeth			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Port Elizabeth 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-pe-2028.txt	za.jamiat/port-elizabeth			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Port Elizabeth 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-pe-2029.txt	za.jamiat/port-elizabeth			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Port Elizabeth 2029
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-plk-2025.txt	za.jamiat/pietersburg/polokwane			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Polokwane 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-plk-2026.txt	za.jamiat/pietersburg/polokwane			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Polokwane 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-plk-2027.txt	za.jamiat/pietersburg/polokwane			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Polokwane 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-plk-2028.txt	za.jamiat/pietersburg/polokwane			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Polokwane 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-plk-2029.txt	za.jamiat/pietersburg/polokwane			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Polokwane 2029
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-spb-2025.txt	za.jamiat/springbok-ncape			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Springbok 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-spb-2026.txt	za.jamiat/springbok-ncape			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Springbok 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-spb-2027.txt	za.jamiat/springbok-ncape			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Springbok 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-spb-2028.txt	za.jamiat/springbok-ncape			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Springbok 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-spb-2029.txt	za.jamiat/springbok-ncape			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Springbok 2029
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-upt-2025.txt	za.jamiat/upington			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Upington 2025
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-upt-2026.txt	za.jamiat/upington			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Upington 2026
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-upt-2027.txt	za.jamiat/upington			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Upington 2027
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-upt-2028.txt	za.jamiat/upington			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Upington 2028
+archive/tables/round/data-wide-band/jamiat-7g/jamiat-upt-2029.txt	za.jamiat/upington			Africa/Johannesburg	E F S D As Ah M - I	daily	-	test	Upington 2029
+archive/tables/moral-auth-world/africaoceania/di-pta-H.txt	za.jamiat/pretoria			Africa/Johannesburg	F S D A M I	daily	hanafi	test	Darul Ihsan Pretoria 2026, Hanafi columns
+archive/tables/moral-auth-world/africaoceania/di-pta-S.txt	za.jamiat/pretoria			Africa/Johannesburg	- - - A - -	daily	standard	test	Darul Ihsan Pretoria 2026, the Standard Asr
+archive/tables/moral-auth-world/africaoceania/di-dbn-H.txt	za.jamiat/durban			Africa/Johannesburg	F S D A M I	daily	hanafi	test	Darul Ihsan Durban 2026, Hanafi columns
+archive/tables/moral-auth-world/africaoceania/masjids-durban-H.txt	za.jamiat/durban			Africa/Johannesburg	F - - A M I	daily	hanafi	test	Jamiat KZN Durban via masjids.co.za, Mar-Dec 2026
+archive/tables/moral-auth-world/africaoceania/masjids-johannesburg-H.txt	za.jamiat/johannesburg			Africa/Johannesburg	F - - A M I	daily	hanafi	test	Jamiat Johannesburg via masjids.co.za, Mar-Dec 2026

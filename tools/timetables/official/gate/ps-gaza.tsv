@@ -1,0 +1,9 @@
+# Gaza, Ministry of Awqaf: the one real captured page (an imsakiya PDF for Dhul-Qi'dah 1441, Jun-Jul
+# 2020) gives six full dated rows (archive/tables/normalized-7e/ps-gaza-awqaf-2020.txt); the sheet's
+# other days abbreviate to minutes-only, carried against the nearest full row, not attempted. Too thin
+# to hold anything out: every row is fit. ps.gaza.cautious (the class C entry combining this with
+# ps.iftaa) is not gated here: no dated printed table names Gaza specifically for the PA member (only
+# the qualitative "Gaza = Jerusalem + 3 min" claim in the research, which would mean inventing rows
+# from an offset rather than reading them) -- see proof.md.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/normalized-7e/ps-gaza-awqaf-2020.txt	ps.gaza.awqaf	31.502	34.467	Asia/Gaza	F S D A M I	daily	standard	fit	Gaza Awqaf imsakiya PDF, 1441/11 (Jun-Jul 2020)

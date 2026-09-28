@@ -1,0 +1,19 @@
+# Tunisia, the Institut National de la Météorologie (meteo.tn), per delegation at INM's own
+# reference points, the units' points (profiles-tested.md, data-maghreb-libya). Africa/Tunis.
+# Standard Asr. Sunrise comes from INM's ephemeris endpoint every third day ('-' on the others). The
+# Fajr printed is when the fast begins (F+E); these tables print no imsak.
+# Split: fit on the four low delegations' 2026 (Tunis and Sfax every day, Tabarka and Ben Guerdane
+# every third day); held out, Tunis 2019–2026 (eight days a year, at INM's earlier point for Tunis)
+# and the elevated delegations Tataouine and Tala. Their dips (0.45°, 1.0°) and the dipped Fajr's
+# 60 s were found on these same tables in the research, so those rows check the national margins
+# with the dips, not the dips themselves.
+# Not rows: tn_tunis_2026.txt, agentB/tunis_inm.txt, off-tunis.txt, tn_tunis1.txt and tn_tala.txt
+# repeat the same days.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-maghreb-libya/off-inm-tunis.txt	tn.inm/tunis			Africa/Tunis	F+E S D A M I	daily	standard	fit	Tunis 2026
+archive/tables/round/data-maghreb-libya/off-inm-sfax.txt	tn.inm/sfax			Africa/Tunis	F+E S D A M I	daily	standard	fit	Sfax 2026
+archive/tables/round/data-maghreb-libya/off-inm-tabarka.txt	tn.inm/tabarka			Africa/Tunis	F+E S D A M I	daily	standard	fit	Tabarka 2026, every third day (the far north-west)
+archive/tables/round/data-maghreb-libya/off-inm-benguerdane.txt	tn.inm/ben-guerdane			Africa/Tunis	F+E S D A M I	daily	standard	fit	Ben Guerdane 2026, every third day (the far east)
+archive/tables/moral-auth-mena/maghreb/tn_tunis_multiyear.txt	tn.inm/tunis	36.798	10.172	Africa/Tunis	F+E - D A M I	daily	standard	test	Tunis 2019–2026, eight days a year
+archive/tables/round/data-maghreb-libya/off-inm-tataouine.txt	tn.inm/tataouine			Africa/Tunis	F+E S D A M I	daily	standard	test	Tataouine 2026 (dip 0.45°)
+archive/tables/round/data-maghreb-libya/off-inm-tala.txt	tn.inm/tala			Africa/Tunis	F+E S D A M I	daily	standard	test	Tala 2026, every third day (about 1,000 m, dip 1.0°)

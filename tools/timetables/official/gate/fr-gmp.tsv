@@ -1,0 +1,16 @@
+# France, the Grande Mosquée de Paris: its 2026 table as its Mawaqit page carries it, printed for the
+# mosque (ruling R44), split in the local archive (ukfr/split-7g/): January to September, its 2026 method
+# (the Moonsighting Committee's seasonal Fajr, Isha = sunset + 90), fit; October to December, which the
+# page still carries in its earlier method (its October rows are the mosque's October 2025 rows: Fajr about
+# 18° tapering, Isha about 16°, Zuhr + 1), held out. Also held out: the mosque's own September 2026 page
+# and its October 2025 rows. No imsak is printed: the Fajr is also where the fast begins (F+E).
+# On the earlier method's rows (October to December on the page, and October 2025) the Fajr start and Zuhr
+# are not checked: the 2026 method's are 7-16 and 4-5 min later by design (it is the method in force), so they
+# are never early there and would only measure the two methods' distance. Every other column is, and Isha
+# takes the later of the two methods from October (TwilightCurves' GMP rule). Their Fajr is still checked as
+# the end of eating (E, ruling R80): a reader of the page stops eating then, and the end is never after it.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/ukfr/split-7g/gmp-2026-jan-sep.txt	fr.gmp/fr.gmp			Europe/Paris	F+E S D A M I	daily	standard	fit	GMP January-September 2026 (Mawaqit)
+archive/tables/moral-auth-world/ukfr/split-7g/gmp-2026-oct-dec.txt	fr.gmp/fr.gmp			Europe/Paris	E S - A M I	daily	standard	test	GMP October-December, its earlier method (Mawaqit)
+archive/tables/moral-auth-world/ukfr/gmp_sep2026.txt	fr.gmp/fr.gmp			Europe/Paris	F+E S D A M I	daily	standard	test	GMP September 2026 (its own page)
+archive/tables/moral-auth-world/ukfr/gmp_oct2025.txt	fr.gmp/fr.gmp			Europe/Paris	E S - A M I	daily	standard	test	GMP October 2025 (nine days)

@@ -1,0 +1,8 @@
+# Jordan, Ministry of Awqaf: no monthly table was captured, only a "recent calculations" log the
+# awqaf.gov.jo search tool showed on 11 web.archive.org captures 2021-2025 (archive/raw/moral-auth-mena/
+# levant/wb/jo_*.html), normalised into archive/tables/normalized-7e/. 80 dates, no place recorded, so
+# the tool's default point (Amman, per the research's an.py) is given explicitly. Fit on 2021-2024,
+# test on 2025 (forward in time).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/normalized-7e/jo-awqaf-amman-2021-2024.txt	jo.awqaf	31.955	35.945	Asia/Amman	F S D A M I	daily	standard	fit	Amman, 2021-2024, awqaf.gov.jo calculator log
+archive/tables/normalized-7e/jo-awqaf-amman-2025.txt	jo.awqaf	31.955	35.945	Asia/Amman	F S D A M I	daily	standard	test	Amman, 2025, held out

@@ -231,16 +231,12 @@ fun App(container: AppContainer) {
                 // Only on a fix that actually arrived: a granted permission that then fails to
                 // produce coordinates must not leave "Use my location" claiming to be on.
                 settings.setLocationSource(LocationSource.GPS)
-                // Spec §249: method auto-detection from the resolved country. A no-op once the
-                // user has picked a method themselves.
-                settings.applyCountryDefaultMethod(it.countryCode)
+                // A location save no longer writes a calculation method (spec §8): the never-early
+                // engine's Automatic timetable already follows the resolved place on its own.
+                // The alarms and widgets armed for the old place follow it now (ruling R53).
+                refreshForNewTimes(container, settings, platformFormat)
             }
         }
-    }
-
-    fun write(next: PrayerSettings) {
-        // Every control in settings writes through on touch; there is no save button anywhere.
-        scope.launch { settings.setPrayerSettings(next) }
     }
 
     // Both the Hijri preview and the adjusted times in manual adjustments are "today" in the
@@ -468,13 +464,40 @@ fun App(container: AppContainer) {
 
                         Screen.PrayerTimesSettings -> PrayerTimesSettingsRoute(
                             prayerSettingsState = prayerSettingsState,
+                            locationState = locationState,
+                            cityDisplayNameState = cityDisplayNameState,
                             today = today,
-                            write = ::write,
+                            scope = scope,
+                            settings = settings,
+                            container = container,
                             navigator = navigator,
                         )
 
-                        Screen.MethodPicker -> MethodPickerRoute(
+                        Screen.Timetable -> TimetableRoute(
                             prayerSettingsState = prayerSettingsState,
+                            locationState = locationState,
+                            container = container,
+                            today = today,
+                            scope = scope,
+                            settings = settings,
+                            navigator = navigator,
+                        )
+
+                        Screen.OtherMethods -> OtherMethodsRoute(
+                            prayerSettingsState = prayerSettingsState,
+                            locationState = locationState,
+                            container = container,
+                            today = today,
+                            scope = scope,
+                            settings = settings,
+                            navigator = navigator,
+                        )
+
+                        Screen.MatchMyMosque -> MatchMyMosqueRoute(
+                            prayerSettingsState = prayerSettingsState,
+                            locationState = locationState,
+                            container = container,
+                            today = today,
                             scope = scope,
                             settings = settings,
                             navigator = navigator,
@@ -483,7 +506,19 @@ fun App(container: AppContainer) {
                         Screen.HighLatitudePicker -> HighLatitudePickerRoute(
                             prayerSettingsState = prayerSettingsState,
                             locationState = locationState,
-                            write = ::write,
+                            today = today,
+                            scope = scope,
+                            settings = settings,
+                            container = container,
+                            navigator = navigator,
+                        )
+
+                        Screen.AboutTimes -> AboutTimesRoute(
+                            prayerSettingsState = prayerSettingsState,
+                            locationState = locationState,
+                            cityDisplayNameState = cityDisplayNameState,
+                            today = today,
+                            container = container,
                             navigator = navigator,
                         )
 
@@ -492,7 +527,8 @@ fun App(container: AppContainer) {
                             locationState = locationState,
                             container = container,
                             today = today,
-                            write = ::write,
+                            scope = scope,
+                            settings = settings,
                             navigator = navigator,
                         )
 

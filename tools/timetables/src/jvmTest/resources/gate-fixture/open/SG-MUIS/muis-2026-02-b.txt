@@ -1,0 +1,8 @@
+# The first five days of Ramadan 1447 in MUIS's open 2026 table (Majlis Ugama Islam Singapura,
+# data.gov.sg, Singapore Open Data Licence v1.0; see
+# tools/timetables/official/open/SG-MUIS/ATTRIBUTION.md), times unchanged.
+2026-02-19 05:58 07:17 13:20 16:36 19:22 20:31
+2026-02-20 05:58 07:16 13:20 16:36 19:22 20:31
+2026-02-21 05:58 07:16 13:20 16:35 19:22 20:31
+2026-02-22 05:58 07:16 13:20 16:35 19:22 20:31
+2026-02-23 05:58 07:16 13:20 16:34 19:22 20:31

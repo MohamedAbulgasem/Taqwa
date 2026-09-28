@@ -1,0 +1,19 @@
+# The UAE outside Dubai, the federal Awqaf (GAIAE; profiles-tested.md, data-gulf-egypt): 25 September
+# 2026, the one day read from awqaf.gov.ae's page for ten areas. Its zones' reference points are not
+# published, so each table is checked at its city's point in the app's list. The fast begins at its
+# Fajr (F+E). Standard Asr. The margins are this day's never-early fit, IACAD's seasonal allowance
+# and 60 s for the unknown points (see Gulf.awqafMethod): fit, nothing held out.
+# Not checked: Abu Dhabi city's monthly tables of 2013–2014 (archived PDFs), an older method (Isha
+# Maghrib + 90 until 2017; its Fajr runs from 8 min before this method's in January to 2 min after
+# it in June, and its Dhuhr about 4 min before), so they prove nothing about today's.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-abudhabi-20260925.txt	ae.awqaf	24.45118	54.39696	Asia/Dubai	F+E S D A M I	daily	standard	fit	Abu Dhabi, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-alain-20260925.txt	ae.awqaf	24.19167	55.76056	Asia/Dubai	F+E S D A M I	daily	standard	fit	Al Ain, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-ruwais-20260925.txt	ae.awqaf	24.11028	52.73056	Asia/Dubai	F+E S D A M I	daily	standard	fit	Ruwais, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-zayedcity-20260925.txt	ae.awqaf	23.65416	53.70522	Asia/Dubai	F+E S D A M I	daily	standard	fit	Madinat Zayed, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-sharjah-20260925.txt	ae.awqaf	25.3342	55.41221	Asia/Dubai	F+E S D A M I	daily	standard	fit	Sharjah, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-ajman-20260925.txt	ae.awqaf	25.40177	55.47878	Asia/Dubai	F+E S D A M I	daily	standard	fit	Ajman, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-uaq-20260925.txt	ae.awqaf	25.56473	55.55517	Asia/Dubai	F+E S D A M I	daily	standard	fit	Umm Al Quwain, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-rak-20260925.txt	ae.awqaf	25.78953	55.9432	Asia/Dubai	F+E S D A M I	daily	standard	fit	Ras Al Khaimah, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-fujairah-20260925.txt	ae.awqaf	25.11641	56.34141	Asia/Dubai	F+E S D A M I	daily	standard	fit	Fujairah, 25 Sep 2026
+archive/tables/round/data-gulf-egypt/off-ae-awqaf-dibba-20260925.txt	ae.awqaf	25.59246	56.26176	Asia/Dubai	F+E S D A M I	daily	standard	fit	Dibba Al-Fujairah, 25 Sep 2026

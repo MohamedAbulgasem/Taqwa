@@ -1,0 +1,221 @@
+{
+  "entry": "za.mjc",
+  "class": "D (authority)",
+  "engineHash": "ec12d8774314d7ed",
+  "broken": 0,
+  "places": 1,
+  "first": "2026-09-01",
+  "last": "2026-09-30",
+  "placeDays": 30,
+  "heldOutDays": 0,
+  "ramadanDays": 0,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 19,
+        "1": 11,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6333,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 30,
+      "lateEnd": 0,
+      "late": {
+        "0": 19,
+        "1": 11,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6333,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 19,
+        "1": 11,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6333,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 21,
+        "1": 9,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.7,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 18,
+        "1": 12,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 30,
+      "early": 0,
+      "late": {
+        "0": 17,
+        "1": 13,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.5667,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 0,
+    "ramadanDays": 0,
+    "events": {}
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+    }
+  },
+  "units": {
+    "za.mjc": {
+      "name": "Cape Town",
+      "placeDays": 30,
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 19,
+            "1": 11,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6333,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 30,
+          "lateEnd": 0,
+          "late": {
+            "0": 19,
+            "1": 11,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6333,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 19,
+            "1": 11,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6333,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 21,
+            "1": 9,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 18,
+            "1": 12,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 30,
+          "early": 0,
+          "late": {
+            "0": 17,
+            "1": 13,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5667,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}

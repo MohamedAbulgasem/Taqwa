@@ -43,5 +43,6 @@ data class City(
         cityName = name,
         countryCode = countryCode,
         cityId = id,
+        region = region.ifEmpty { null },
     )
 }

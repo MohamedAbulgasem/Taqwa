@@ -1,0 +1,373 @@
+{
+  "entry": "ie.icci",
+  "class": "D (authority)",
+  "engineHash": "84b8bae370e912ef",
+  "broken": 0,
+  "places": 1,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "placeDays": 365,
+  "heldOutDays": 184,
+  "ramadanDays": 30,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 46,
+        "1": 257,
+        "2": 22,
+        "3+": 40
+      },
+      "exactShare": 0.126,
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry ie.icci",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 365,
+      "lateEnd": 0,
+      "late": {
+        "0": 328,
+        "1": 37,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.8986,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 316,
+        "1": 49,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.8658,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 83,
+        "1": 104,
+        "2": 108,
+        "3+": 70
+      },
+      "exactShare": 0.2274,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 328,
+        "1": 37,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.8986,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 210,
+        "1": 65,
+        "2": 16,
+        "3+": 74
+      },
+      "exactShare": 0.5753,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry ie.icci",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 365,
+      "lateEnd": 0,
+      "late": {
+        "0": 226,
+        "1": 75,
+        "2": 53,
+        "3+": 11
+      },
+      "exactShare": 0.6192,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 184,
+    "ramadanDays": 0,
+    "events": {
+      "fajr": {
+        "checked": 184,
+        "early": 0,
+        "late": {
+          "0": 21,
+          "1": 146,
+          "2": 17,
+          "3+": 0
+        },
+        "exactShare": 0.1141,
+        "worstLate": 2,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry ie.icci",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 184,
+        "lateEnd": 0,
+        "late": {
+          "0": 165,
+          "1": 19,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8967,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 184,
+        "early": 0,
+        "late": {
+          "0": 161,
+          "1": 23,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.875,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 184,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 18,
+          "2": 96,
+          "3+": 70
+        },
+        "exactShare": 0,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 184,
+        "early": 0,
+        "late": {
+          "0": 167,
+          "1": 17,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.9076,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 184,
+        "early": 0,
+        "late": {
+          "0": 100,
+          "1": 44,
+          "2": 4,
+          "3+": 36
+        },
+        "exactShare": 0.5435,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry ie.icci",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 184,
+        "lateEnd": 0,
+        "late": {
+          "0": 124,
+          "1": 19,
+          "2": 30,
+          "3+": 11
+        },
+        "exactShare": 0.6739,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["sunrise", "dhuhr", "asrStandard", "maghrib", "endOfEating"]
+    },
+    "entry ie.icci: 5 min": {
+      "reason": "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no later than 17/60 after sunset (adhan-js's TwilightAngle rule); on the curve's slots each is widened over the day before and after (ruling R28), most when the rule takes over, in late April and May: Isha up to 5 min after its table.",
+      "events": ["isha"]
+    },
+    "entry ie.icci: 7 min": {
+      "reason": "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no later than 17/60 after sunset (adhan-js's TwilightAngle rule); on the curve's slots each is widened over the day before and after (ruling R28), most when the rule takes over, in late April and May: Fajr up to 7 min after its table.",
+      "events": ["fajr"]
+    }
+  },
+  "units": {
+    "ie.icci": {
+      "name": "Dublin",
+      "placeDays": 365,
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib", "endOfEating"]
+        },
+        "entry ie.icci: 5 min": {
+          "reason": "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no later than 17/60 after sunset (adhan-js's TwilightAngle rule); on the curve's slots each is widened over the day before and after (ruling R28), most when the rule takes over, in late April and May: Isha up to 5 min after its table.",
+          "events": ["isha"]
+        },
+        "entry ie.icci: 7 min": {
+          "reason": "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no later than 17/60 after sunset (adhan-js's TwilightAngle rule); on the curve's slots each is widened over the day before and after (ruling R28), most when the rule takes over, in late April and May: Fajr up to 7 min after its table.",
+          "events": ["fajr"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 46,
+            "1": 257,
+            "2": 22,
+            "3+": 40
+          },
+          "exactShare": 0.126,
+          "worstLate": 7,
+          "lateLimit": 7,
+          "lateLimitFrom": "entry ie.icci",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 365,
+          "lateEnd": 0,
+          "late": {
+            "0": 328,
+            "1": 37,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8986,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 316,
+            "1": 49,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8658,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 83,
+            "1": 104,
+            "2": 108,
+            "3+": 70
+          },
+          "exactShare": 0.2274,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 328,
+            "1": 37,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8986,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 210,
+            "1": 65,
+            "2": 16,
+            "3+": 74
+          },
+          "exactShare": 0.5753,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "entry ie.icci",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 365,
+          "lateEnd": 0,
+          "late": {
+            "0": 226,
+            "1": 75,
+            "2": 53,
+            "3+": 11
+          },
+          "exactShare": 0.6192,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+# Palestine, PA Dar al-Iftaa: the perpetual al-Aqsa Mosque table, printed on the perpetual winter
+# (standard) clock all year -- UTC+02:00 fixed, never the summer clock -- hence `clock` differs from
+# `zone` (Asia/Hebron, the engine's own civil zone, which does observe DST). Fit on the 2012 printing
+# (archive/tables/normalized-7e/ps-iftaa-aqsa-2012.txt, 72 dates); test on six dates from the Ramadan
+# 1447 (2026) imsakiya, the SAME table reprinted 14 years later (the research's "reused verbatim"
+# claim, held out forward in time).
+path	entry	lat	lon	zone	clock	columns	format	school	split	note
+archive/tables/normalized-7e/ps-iftaa-aqsa-2012.txt	ps.iftaa	31.7767	35.2345	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	al-Aqsa, 2012 printing
+archive/tables/normalized-7e/ps-iftaa-aqsa-2026.txt	ps.iftaa	31.7767	35.2345	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	test	al-Aqsa, 2026 imsakiya reprint, held out

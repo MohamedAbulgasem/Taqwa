@@ -10,12 +10,13 @@ import world.taqwa.app.domain.Prayer
 
 internal object SettingsKeys {
     val THEME = stringPreferencesKey("theme_mode")
+    // The old engine's method, whether the user chose it, and its Asr school: written by builds
+    // before the never-early engine, read now only by SettingsRepository's migration (spec §8).
     val METHOD = stringPreferencesKey("calculation_method")
-    // Set only by the method picker. Everything else that writes PrayerSettings — madhab, the
-    // Hijri offset, sunrise, manual adjustments — must leave it alone, because it is the single
-    // signal that stops a later relocation from overwriting a deliberate choice.
     val METHOD_USER_CHOSEN = booleanPreferencesKey("calculation_method_user_chosen")
     val MADHAB = stringPreferencesKey("asr_madhab")
+    // The old high-latitude picker's rule, kept and read as PrayerSettings.legacyHighLatitude while
+    // the timetable is an Other method (spec §8).
     val HIGH_LAT = stringPreferencesKey("high_latitude")
     val HIJRI_OFFSET = intPreferencesKey("hijri_offset_days")
     val SHOW_SUNRISE = booleanPreferencesKey("show_sunrise")
@@ -42,9 +43,42 @@ internal object SettingsKeys {
     val LOCATION_CITY_DISPLAY_NAME = stringPreferencesKey("location_city_display_name")
     val LOCATION_CITY_DISPLAY_LANGUAGE = stringPreferencesKey("location_city_display_language")
     val LOCATION_COUNTRY = stringPreferencesKey("location_country")
+    // The city's first-level region (admin-1) as the bundled city list spells it: the prayer
+    // engine picks an authority's unit by it where the units are regions (Algeria's wilayas,
+    // ruling R32). Cleared with the rest of the location's city facts.
+    val LOCATION_REGION = stringPreferencesKey("location_region")
+    // The Prayer screen's one-time backfill of the stored location's city facts has run, so it is
+    // not run again for a city the list gives no region (Singapore, Hong Kong …). Cleared with
+    // every new location.
+    val LOCATION_BACKFILLED = booleanPreferencesKey("location_backfilled")
     // Whether the stored location came from a fix or from the city list. Not derivable from the
     // location itself — see LocationSource — and the only thing "Use my location" can read.
     val LOCATION_SOURCE = stringPreferencesKey("location_source")
+    // Task 9 (spec §2.2, §8): the never-early engine's own settings. Populated once by
+    // SettingsRepository.migrateIfNeeded from the old keys above, which it leaves in place, then
+    // written per field by the Settings screens.
+    val PRAYER_TIMETABLE = stringPreferencesKey("prayer_timetable")
+    // The entry id the user last confirmed following (spec §8, ruling R52): the timetable is
+    // confirmed while it equals PRAYER_TIMETABLE. The migration leaves it unset.
+    val PRAYER_TIMETABLE_CONFIRMED = stringPreferencesKey("prayer_timetable_confirmed")
+    // The id of the Automatic entry at the place where that confirmation was given (ruling R70):
+    // where the place's Automatic differs (travel), the choice is paused again. A confirmation
+    // stored without it (before R70) counts as not given.
+    val PRAYER_TIMETABLE_CONFIRMED_UNDER = stringPreferencesKey("prayer_timetable_confirmed_under")
+    val PRAYER_SCHOOL = stringPreferencesKey("prayer_school")
+    val PRAYER_SHOW_BOTH_ASR = booleanPreferencesKey("prayer_show_both_asr")
+    val PRAYER_SHOW_WHERE_DIFFER = booleanPreferencesKey("prayer_show_where_differ")
+    val PRAYER_SAUDI_FAJR_LATER = booleanPreferencesKey("prayer_saudi_fajr_later")
+    // "<PRAYER>:<entryId>" entries, same shape as MINUTE_ADJUSTMENTS but naming the registry
+    // entry a negative adjustment was last confirmed against (spec §2.2).
+    val PRAYER_ADJUST_CONFIRMED = stringPreferencesKey("prayer_adjust_confirmed")
+    // Whether the once-only Sunni/cautious-times cards (spec §2.1) have already been shown.
+    val PRAYER_CARD_SUNNI_SEEN = booleanPreferencesKey("prayer_card_sunni_seen")
+    val PRAYER_CARD_CAUTIOUS_SEEN = booleanPreferencesKey("prayer_card_cautious_seen")
+    // Gates SettingsRepository.migrateIfNeeded so the spec §8 migration runs at most once per
+    // install; bump PRAYER_SETTINGS_SCHEMA_VERSION when the derivation changes.
+    val PRAYER_SETTINGS_SCHEMA = intPreferencesKey("prayer_settings_schema")
+
     val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")
     fun soundKey(prayer: Prayer) = stringPreferencesKey("sound_${prayer.name.lowercase()}")

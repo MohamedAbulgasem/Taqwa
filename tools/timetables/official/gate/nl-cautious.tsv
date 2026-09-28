@@ -1,0 +1,8 @@
+# The Netherlands (nl.cautious): no authority. At Amsterdam, on the 2026 days both are held (25 September to
+# 25 October), in the local archive (europe/split-7g/): the Moroccan calendar as Al-Ihsane's Mawaqit page
+# carries it (member nl.moroccan) and Diyanet's Amsterdam table (member tr.diyanet.europe, subtask 7b's
+# method; its Fajr is also its imsak). No table of the third member, MWL 18°/17°, is held. Every row is
+# held out (a cautious entry has no margins of its own).
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/europe/split-7g/ihsane-2026-q4.txt	nl.cautious	52.37403	4.88969	Europe/Amsterdam	F S D A M I	daily	standard	test	Al-Ihsane, the Moroccan calendar	nl.moroccan
+archive/tables/moral-auth-world/europe/split-7g/dy-amsterdam-2026.txt	nl.cautious	52.37403	4.88969	Europe/Amsterdam	F+E S D A M I	daily	standard	test	Diyanet Amsterdam	tr.diyanet.europe

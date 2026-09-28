@@ -1,0 +1,13 @@
+# Mauritania, the Ministry of Islamic Affairs: its Ramadan imsakiyas, the only tables it publishes
+# (profiles-tested.md, authorities-arab-world-turkiye.md). Africa/Nouakchott. Standard Asr. The Fajr
+# is when the fast begins (F+E); the imsak printed is Fajr − 5.
+# - Nouadhibou, Ramadan 1444 (2023): its listed Maghrib (sunset + 2).
+# - Nouakchott, Ramadan 1445 (2024): imsak, Fajr, sunrise, Dhuhr, Asr, the printed sunset (not
+#   checked), Maghrib and Isha.
+# Split, forward in time and to another city: fit on 1444, held out 1445.
+# Not rows: mr_ndb_1444.txt (its Maghrib column is the printed sunset), mr_nkc_1445_magh.txt,
+# mr_nkc_1445_rows.txt, off-nkc-1445.txt and agentB/mr_1445.txt (the same days), agentB/mr1.txt (two
+# Fajr times a reporter derived from an imsak, and one home-page day dated only to its month).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-mena/maghreb/mr_ndb_1444_magh.txt	mr.ministry	20.931	-17.0347	Africa/Nouakchott	F+E S D A M I	daily	standard	fit	Nouadhibou, Ramadan 1444 (2023), eight days
+archive/tables/moral-auth-mena/maghreb/mr_nkc_1445_full.txt	mr.ministry	18.0858	-15.9785	Africa/Nouakchott	Im F+E S D A - M I	daily	standard	test	Nouakchott, Ramadan 1445 (2024)

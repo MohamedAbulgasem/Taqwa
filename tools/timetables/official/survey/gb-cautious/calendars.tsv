@@ -1,0 +1,75 @@
+# The UK outside London (gb.cautious): the 71 Mawaqit calendars outside London research-uk surveyed
+# (ruling R75), each at its own mosque's point. The tables are restricted: they live in the local archive
+# only (official/README.md). `use` is "yes", or why the whole calendar is left out.
+path	name	lat	lon	columns	use
+archive/tables/uk-mawaqit/17345.txt	BMACC - GLASGOW	55.9124023	-4.3205414	F S D A M I	yes
+archive/tables/uk-mawaqit/31937.txt	Al Rahmah Centre - GLASGOW	55.87512357545	-4.2680544460327	F S D A M I	yes
+archive/tables/uk-mawaqit/adam-mosque-dawah-academy-birmingham-b12-8np-united-kingdom-1.txt	Adam Mosque & Dawah Academy - BIRMINGHAM	52.4571396	-1.8816212	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian (one clock time all year; Fajr after sunrise in summer)
+archive/tables/uk-mawaqit/al-falah-community-support-centre-birmingham-b12-9qu-united-kingdom.txt	Al Falah Community Support Centre	52.4554274	-1.8899398	F S D A M I	yes
+archive/tables/uk-mawaqit/al-furqan-mosque-19-carrington-street-glasgow-g4-9aj-united-kingdom.txt	Al-Furqan Mosque - GLASGOW	55.871635506808	-4.2717046233135	F S D A M I	yes
+archive/tables/uk-mawaqit/al-marifah-academy-leicester-le5-1gz-united-kingdom.txt	Al Ma'rifah Academy - LEICESTER	52.6471983	-1.0603312	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian
+archive/tables/uk-mawaqit/al-sunnah-mosque-manchester-manchester-m8-9pb-united-kingdom.txt	Al-Sunnah Mosque Manchester - MANCHESTER	53.506493564611	-2.2446795619713	F S D A M I	yes
+archive/tables/uk-mawaqit/alberr-blackburn-bb1-2hu-united-kingdom.txt	ALBERR - BLACKBURN	53.7359052	-2.4546096	F S D A M I	yes
+archive/tables/uk-mawaqit/amanah-masjid-birmingham-b11-1jb-united-kingdom.txt	Amanah Masjid - Birmingham	52.467148453971	-1.8765163421631	F S D A M I	yes
+archive/tables/uk-mawaqit/ashton-jame-mosque-ashton-under-lyne-ol6-7dd-united-kingdom.txt	Ashton Jam'e Mosque - ASHTON-UNDER-LYNE	53.4894622	-2.1011453	- F S D A M I	yes
+archive/tables/uk-mawaqit/bishopbriggs-islamic-community-centre-bishopbriggs-g64-1ng-united-kingdom.txt	Bishopbriggs Islamic Community Centre - GLASGOW	55.8978197	-4.2115236	F S D A M I	yes
+archive/tables/uk-mawaqit/brayatee-mosque-birmingham-b18-7pw-united-kingdom.txt	BRAYATEE MOSQUE - BIRMINGHAM	52.487676	-1.9219111	F S D A M I	yes
+archive/tables/uk-mawaqit/community-masjid-glasgow-g21-3ba-united-kingdom.txt	Community Masjid - GLASGOW	55.884	-4.201	F S D A M I	yes
+archive/tables/uk-mawaqit/dawatul-islam-glasgow-glasgow-g12-8ll-united-kingdom.txt	Dawatul Islam - GLASGOW	55.874458961852	-4.2844143411045	F S D A M I	yes
+archive/tables/uk-mawaqit/emaan-community-centre-birmingham-b6-5uh-united-kingdom.txt	EMAAN COMMUNITY CENTRE	52.504105164844	-1.8792553894927	F S D A M I	yes
+archive/tables/uk-mawaqit/erdington-islamic-foundation-birmingham-b23-6rg-united-kingdom.txt	BAIT-US-SALAM	52.5274153	-1.8367562	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian (one clock time in winter and one in summer)
+archive/tables/uk-mawaqit/faizan-e-madina-bradford-bd3-9le-united-kingdom.txt	Faizan-e-Madina - BRADFORD	53.7941299	-1.7331154	F S D A M I	yes
+archive/tables/uk-mawaqit/faizan-e-madina-halifax-hx1-4jx-united-kingdom.txt	Faizan E Madina - Halifax	53.7224783	-1.8812652	F S D A M I	yes
+archive/tables/uk-mawaqit/faizan-e-madina-stechford.txt	Faizan e Madina Stechford	52.4783958	-1.814082	F S D A M I	yes
+archive/tables/uk-mawaqit/faizan-e-makkah-bradford-bd9-5ab-united-kingdom-1.txt	Faizan-e-Makkah - BRADFORD	53.807151482163	-1.7815124988556	F S D A M I	yes
+archive/tables/uk-mawaqit/faizan-e-raza-bradford-bd6-3et-united-kingdom.txt	Faizan E Raza - BRADFORD	53.768	-1.788	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian (and Fajr at one clock time all year)
+archive/tables/uk-mawaqit/gambian-islamic-community-centre-smethwick-b66-3eu-united-kingdom.txt	Gambian Islamic Community Centre - SMETHWICK	52.490133466215	-1.9581493735313	F S D A M I	yes
+archive/tables/uk-mawaqit/ghosiyah-masjid-keighley-bd21-2ta-united-kingdom.txt	Ghosiyah Masjid - KEIGHLEY	53.8744104	-1.9090385	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian (one clock time in winter and one in summer)
+archive/tables/uk-mawaqit/glasgow-mena-trust-glasgow-g4-0bz-united-kingdom.txt	Mena Trust - GLASGOW	55.8674962	-4.2427165	F S D A M I	yes
+archive/tables/uk-mawaqit/glasgow-university-muslim-student-assoc-glasgow-g12-8lg-united-kingdom.txt	GUMSA	55.874	-4.287	F S D A M I	yes
+archive/tables/uk-mawaqit/hazrat-mujaddid-alf-e-sani-trust-masjid-birmingham-b12-8bg-united-kingdom.txt	Hazrat Mujaddid Alf-e-Sani Trust Masjid - BIRMINGHAM	52.452	-1.875	F S D A M I	yes
+archive/tables/uk-mawaqit/hco-leicester-le5-4da-united-kingdom-1.txt	HAMIDIYA - LEICESTER	52.6410683	-1.0875901	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian (one clock time in winter and one in summer)
+archive/tables/uk-mawaqit/huda-birmingham.txt	HUDA MASJID	52.4916923	-1.9056951	F S D A M I	yes
+archive/tables/uk-mawaqit/jamia-masjid-madni-halifax-hx1-5le-united-kingdom.txt	Jamia Masjid Madni - Halifax	53.7232985	-1.8721692	F S D A M I	yes
+archive/tables/uk-mawaqit/jamiyat-tabligh-ul-islam-bradford-bd5-7te-united-kingdom.txt	Jamia Masjid Tabligh-Ul-Islam Ryan St	53.776818955797	-1.7589738356216	F S D A M I	yes
+archive/tables/uk-mawaqit/jamiyat-tablighul-islam-bradford-bd4-7hx-united-kingdom.txt	Jamiyat Tablighul Islam	53.7825494	-1.7355987	F S D A M I	yes
+archive/tables/uk-mawaqit/jmah-halifax-west-yorkshire-hx1-4et-united-kingdom.txt	JMAH Halifax	53.719989104168	-1.8858259932541	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian (one clock time in winter and one in summer)
+archive/tables/uk-mawaqit/leeds-grand-mosque-leeds-ls6-1sn-united-kingdom.txt	Leeds Grand Mosque - LEEDS	53.8065442	-1.5679982	F S D A M I	yes
+archive/tables/uk-mawaqit/madina-masjid-levenshulme-manchester-m19-3dj-united-kingdom.txt	Madina Masjid	53.446218395191	-2.1906217023959	F S D A M I	yes
+archive/tables/uk-mawaqit/mahmudsabir-al-furqan-masjid-birmingham-b11-3bz-united-kingdom.txt	MahmudSabir (Al Furqan) Masjid	52.4486208	-1.8480156	F S D A M I	yes
+archive/tables/uk-mawaqit/majid-adam-a-s-leicester-le2-5qf-united-kingdom.txt	Masjid Adam (A.S)	52.5969295	-1.0811693	F S D A M I	congregation (iqama) times, not starts: Dhuhr at a fixed clock time by season, 20-70 min after the meridian
+archive/tables/uk-mawaqit/makki-masjid-halifax.txt	Makki Masjid - Halifax	53.718834	-1.878147	F S D A M I	yes
+archive/tables/uk-mawaqit/markaz-quba-islamic-centre-leicester-le2-0nq-united-kingdom.txt	Markaz Quba (Islamic Centre) - LEICESTER	52.6285706	-1.1187947	F S D A M I	yes
+archive/tables/uk-mawaqit/marwa-masjid-birmingham-b12-9lb-united-kingdom.txt	Marwa Masjid - BIRMINGHAM	52.4583596	-1.8951956	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-abdul-raheem-birmingham-b34-6bg-united-kingdom.txt	Masjid Abdul Raheem - BIRMINGHAM	52.49118	-1.8124484	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-aisha-leicester-le5-5an-united-kingdom.txt	Masjid Aisha - LEICESTER	52.6309431	-1.1097167	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-al-huda-birmingham-b109jf-united-kingdom.txt	Al-Huda Masjid	52.4698817	-1.8309234	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-ar-rashideen-batley-wf17-8lt-united-kingdom.txt	Masjid Ar-Rashideen - BATLEY	53.7197933	-1.6445806	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-at-taqwa-greater-manchester-ol7-0ag-united-kingdom.txt	Masjid At Taqwa - GREATER MANCHESTER	53.485	-2.112	F S D A M I	whole months repeat (January, March and December identical) and do not follow the sun
+archive/tables/uk-mawaqit/masjid-e-hidayah-manchester-m16-9dd-united-kingdom.txt	Masjid-E-Hidayah - MANCHESTER	53.461177720959	-2.2751191564487	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-e-iqbal-manchester-m71sn-united-kingdom.txt	Masjid e Iqbal - MANCHESTER	53.4936637	-2.2523206	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-imam-al-shafii-birmingham-b8-3an-united-kingdom.txt	Masjid Imam al-Shafi'i - BIRMINGHAM	52.488	-1.846	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-imdadia-manchester-m16-9lj-united-kingdom.txt	Masjid Imdadia	53.4609524	-2.2665159	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-muadh-ibn-jabal-leicester-le5-6tb-united-kingdom.txt	Masjid Mu'adh Ibn Jabal - LEICESTER	52.6328031	-1.0722415	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-salaam-community-centre-birmingham-b8-3ph-united-kingdom.txt	Masjid Salaam & Community Centre - BIRMINGHAM	52.491	-1.842	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-salahudin-glasgow-g40-3sa-united-kingdom.txt	Masjid Bilal - Glasgow	55.85	-4.219	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-usman-arrehman-trust-birminghan-b23-7jg-united-kingdom.txt	Masjid Usman Ar RahmanTrust - BIRMINGHAM	52.5242061	-1.8589892	F S D A M I	yes
+archive/tables/uk-mawaqit/masjid-zamunta-birmingham-b192ss-united-kingdom.txt	Masjid Zumunta - BIRMINGHAM	52.497555402566	-1.8958451511032	F S D A M I	yes
+archive/tables/uk-mawaqit/miec.txt	Masjid Ibraheem & Education Centre	53.7966076	-1.7105742	F S D A M I	yes
+archive/tables/uk-mawaqit/msh-birmingham.txt	M.S.H.M.C.C. |  مسجد دار الطلبة المسلمين - Birmingham	52.457	-1.886	F S D A M I	yes
+archive/tables/uk-mawaqit/muslim-youth-foundation-manchester-m4-1dy-united-kingdom.txt	Muslim Youth Foundation - MANCHESTER	53.483942994746	-2.2373977159386	F S D A M I	yes
+archive/tables/uk-mawaqit/najashi-islamic-centre-erdington-b23-6sn-united-kingdom.txt	NAJASHI ISLAMIC CENTRE	52.5222499	-1.8423857	F S D A M I	yes
+archive/tables/uk-mawaqit/nimrah-masjid-manchester-m19-3aq-united-kingdom.txt	Nimrah Masjid	53.448545769337	-2.1925530330257	F S D A M I	yes
+archive/tables/uk-mawaqit/quba-islamic-cultural-centre-birmingham-b7-4ny-united-kingdom.txt	QUBA Islamic Centre - Birmingham	52.492565	-1.8757116	F S D A M I	yes
+archive/tables/uk-mawaqit/sbmca-birmingham-b30-1qd-united-kingdom.txt	Bournville Masjid & Community Centre - BIRMINGHAM	52.4250446	-1.9500744	F S D A M I	yes
+archive/tables/uk-mawaqit/south-birmingham-central-masjid-birmingham-b139ls-united-kingdom.txt	South Birmingham Central Masjid - BIRMINGHAM	52.4432816	-1.8565489	F S D A M I	yes
+archive/tables/uk-mawaqit/stoney-lane-islamic-community-centre-birmingham-b128aj-united-kingdom.txt	Stoney Lane Islamic Community Centre - BIRMINGHAM	52.4545049	-1.8732774	F S D A M I	yes
+archive/tables/uk-mawaqit/strathclyde-muslim-student-association-bristol-g1-2tb-united-kingdom.txt	Strathclyde Muslim Student Association - BRISTOL	55.862	-4.247	F S D A M I	yes
+archive/tables/uk-mawaqit/sultan-bahu-centre-birmingham-b8-2ls-united-kingdom.txt	Sultan Bahu Centre - BIRMINGHAM	52.492097727352	-1.8231934455078	F S D A M I	yes
+archive/tables/uk-mawaqit/taybah-educational-centre-leicester-le5-4hj-united-kingdom.txt	Taybah Educational Centre - LEICESTER	52.6318526	-1.0942927	F S D A M I	yes
+archive/tables/uk-mawaqit/woodfarm-education-centre-wec-g46-7hf-glasgow-united-kingdom.txt	Woodfarm Education Centre (WEC)	55.801772739131	-4.3079715373096	F S D A M I	yes
+archive/tables/uk-mawaqit/wythenshawe-masjid-wythenshawe-m22-4jq-united-kingdom.txt	Wythenshawe Masjid - WYTHENSHAWE	53.406	-2.262	F S D A M I	yes
+archive/tables/uk-mawaqit/yca-cultural-centre-west-bromwich-b70-9sj-united-kingdom.txt	YCA Cultural Centre Masjid	52.526134120312	-2.0071096538212	F S D A M I	yes
+archive/tables/uk-mawaqit/zawia-mosque-birmingham-b5-7ph-united-kingdom.txt	Zawia Mosque - BIRMINGHAM	52.4590212	-1.9009364	F S D A M I	yes
+archive/tables/uk-mawaqit/zaytuna-masjid-birmingham-b32-1pj-united-kingdom.txt	ZAYTUNA MASJID مسجد الزيتونة	52.454499126901	-1.9996726512909	F S D A M I	yes
+archive/tables/uk-mawaqit/zia-ul-quran-jamia-mosque-birmingham-b8-1er-united-kingdom.txt	Zia-Ul-Quran Jamia Mosque - BIRMINGHAM	52.484964	-1.8544928	F S D A M I	yes

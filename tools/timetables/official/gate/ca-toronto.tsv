@@ -1,0 +1,41 @@
+# Toronto and the GTA: the 2026 tables of its three mosques (research Canada section), each printed for
+# its own mosque (ruling R30), split forward in time in the local archive (canada/split-7g/): January to
+# June fit, July to December held out. IFT's Asr is Hanafi, IIT's and MAC's Standard.
+# IFT's table has faults, left out of its split files and named in their headers (proof.md): it keeps
+# standard time for 8-12 March and daylight time for 1-6 November (an hour off), repeats 27 March's Fajr
+# on the 28th, and prints Isha 5 min after its neighbours on 28-30 November.
+# - ca.ift, ca.iit, ca.mac alone, at their units' points (the mosques).
+# - ca.toronto (cautious): the three tables at each mosque's point, where each start is checked against
+#   the latest of the three and each end against the earliest; and in the GTA's west (Mississauga,
+#   Brampton, Milton at the tables' reach) and east (Oshawa), July to December.
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h1.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	fit	IFT January-June 2026
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	test	IFT July-December 2026
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h1.txt	ca.iit/ca.iit			America/Toronto	F+E S D A M I	daily	standard	fit	IIT January-June 2026
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.iit/ca.iit			America/Toronto	F+E S D A M I	daily	standard	test	IIT July-December 2026
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h1.txt	ca.mac/ca.mac			America/Toronto	F+E S D A M I	daily	standard	fit	MAC January-June 2026
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.mac/ca.mac			America/Toronto	F+E S D A M I	daily	standard	test	MAC July-December 2026
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h1.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	hanafi	fit	at IFT	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	hanafi	test	at IFT	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h1.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	standard	fit	at IFT	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	standard	test	at IFT	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h1.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	standard	fit	at IFT	ca.mac
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	standard	test	at IFT	ca.mac
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h1.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	hanafi	fit	at MAC	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	hanafi	test	at MAC	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h1.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	standard	fit	at MAC	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	standard	test	at MAC	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h1.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	standard	fit	at MAC	ca.mac
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	standard	test	at MAC	ca.mac
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.toronto	43.5890	-79.6441	America/Toronto	F+E S D A M I	daily	hanafi	test	Mississauga	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.toronto	43.5890	-79.6441	America/Toronto	F+E S D A M I	daily	standard	test	Mississauga	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toronto	43.5890	-79.6441	America/Toronto	F+E S D A M I	daily	standard	test	Mississauga	ca.mac
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.toronto	43.6834	-79.7663	America/Toronto	F+E S D A M I	daily	hanafi	test	Brampton	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.toronto	43.6834	-79.7663	America/Toronto	F+E S D A M I	daily	standard	test	Brampton	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toronto	43.6834	-79.7663	America/Toronto	F+E S D A M I	daily	standard	test	Brampton	ca.mac
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.toronto	43.5183	-79.8774	America/Toronto	F+E S D A M I	daily	hanafi	test	Milton, the GTA's far west	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.toronto	43.5183	-79.8774	America/Toronto	F+E S D A M I	daily	standard	test	Milton, the GTA's far west	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toronto	43.5183	-79.8774	America/Toronto	F+E S D A M I	daily	standard	test	Milton, the GTA's far west	ca.mac
+archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	hanafi	test	Oshawa, the GTA's east	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	standard	test	Oshawa, the GTA's east	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	standard	test	Oshawa, the GTA's east	ca.mac

@@ -1,0 +1,50 @@
+# Qatar, Calendar House ("the official calendar of the State of Qatar"; profiles-tested.md,
+# data-gulf-egypt). Its Fajr is also when the fast begins (F+E). Standard Asr.
+# - The printed Doha calendar (Muharram to Rabi' I 1448: 16 Jun to 11 Sep 2026, and a second copy
+#   running to 11 Oct) and the Ramadan 1447 imsakiya. Doha's table serves the east coast from Al Khor
+#   to Al Wakrah, so it is also checked at those two towns' points (the unit's reference point rides
+#   as the fixed point there, ruling R15).
+# - The Ministry of Awqaf's API (all 2026) prints the calendar's Fajr, sunrise, Maghrib and Isha, and
+#   Dhuhr and Asr a minute earlier (on all 119 days both print). Taqwa follows the later of the two,
+#   so the API is checked at F S M I, and Dhuhr and Asr against the derived calendar year (the API's
+#   own times plus that minute).
+# - The Calendar House website's own header (Wayback captures 2023–2026, one day each) prints the
+#   API's Dhuhr and Asr, so it too is checked at F S M I; for the other zones it is the only data.
+# Split, forward in time: fit on the printed calendar to 11 Sep 2026 and the Ramadan imsakiya; held
+# out, the second copy's later days, the rest of 2026 from the API, 2023–2025 from the website and
+# the other zones.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse/doha			Asia/Qatar	F+E S D A M I	daily	standard	fit	Doha, printed calendar 16 Jun–11 Sep 2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse/doha			Asia/Qatar	F+E S D A M I	daily	standard	fit	Doha, Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qch-doha.txt	qa.calendarhouse/doha			Asia/Qatar	F+E S D A M I	daily	standard	test	Doha, the second copy of the print, to 11 Oct 2026
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse/doha			Asia/Qatar	F+E S - - M I	daily	standard	test	Doha, the ministry API, all 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse/doha			Asia/Qatar	- - D A - -	daily	standard	test	Doha, all 2026: the API's Dhuhr and Asr plus the calendar's minute (derived)
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-web.txt	qa.calendarhouse/doha			Asia/Qatar	F+E S - - M I	daily	standard	test	Doha, the website header 2023–2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	F+E S D A M I	daily	standard	test	Al Khor, Doha's printed calendar
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	F+E S D A M I	daily	standard	test	Al Khor, Doha's Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	F+E S - - M I	daily	standard	test	Al Khor, the ministry API for Doha, 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	- - D A - -	daily	standard	test	Al Khor, Doha's derived calendar Dhuhr and Asr, 2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	F+E S D A M I	daily	standard	test	Az Za'ayin, Doha's printed calendar
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	F+E S D A M I	daily	standard	test	Az Za'ayin, Doha's Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	F+E S - - M I	daily	standard	test	Az Za'ayin, the ministry API for Doha, 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	- - D A - -	daily	standard	test	Az Za'ayin, Doha's derived calendar Dhuhr and Asr, 2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	F+E S D A M I	daily	standard	test	Lusail, Doha's printed calendar
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	F+E S D A M I	daily	standard	test	Lusail, Doha's Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	F+E S - - M I	daily	standard	test	Lusail, the ministry API for Doha, 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	- - D A - -	daily	standard	test	Lusail, Doha's derived calendar Dhuhr and Asr, 2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	F+E S D A M I	daily	standard	test	Umm Salal Muhammad, Doha's printed calendar
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	F+E S D A M I	daily	standard	test	Umm Salal Muhammad, Doha's Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	F+E S - - M I	daily	standard	test	Umm Salal Muhammad, the ministry API for Doha, 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	- - D A - -	daily	standard	test	Umm Salal Muhammad, Doha's derived calendar Dhuhr and Asr, 2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	F+E S D A M I	daily	standard	test	Ar Rayyan, Doha's printed calendar
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	F+E S D A M I	daily	standard	test	Ar Rayyan, Doha's Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	F+E S - - M I	daily	standard	test	Ar Rayyan, the ministry API for Doha, 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	- - D A - -	daily	standard	test	Ar Rayyan, Doha's derived calendar Dhuhr and Asr, 2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	F+E S D A M I	daily	standard	test	Mu'aydhir, Doha's printed calendar
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	F+E S D A M I	daily	standard	test	Mu'aydhir, Doha's Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	F+E S - - M I	daily	standard	test	Mu'aydhir, the ministry API for Doha, 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	- - D A - -	daily	standard	test	Mu'aydhir, Doha's derived calendar Dhuhr and Asr, 2026
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-pdf.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	F+E S D A M I	daily	standard	test	Al Wakrah, Doha's printed calendar
+archive/tables/round/data-gulf-egypt/off-qa-qch-doha-ramadan1447.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	F+E S D A M I	daily	standard	test	Al Wakrah, Doha's Ramadan 1447 imsakiya
+archive/tables/moral-auth-mena/gulfB/off-qa-ministry-2026.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	F+E S - - M I	daily	standard	test	Al Wakrah, the ministry API for Doha, 2026
+archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	- - D A - -	daily	standard	test	Al Wakrah, Doha's derived calendar Dhuhr and Asr, 2026

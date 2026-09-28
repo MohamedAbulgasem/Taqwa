@@ -1,0 +1,8 @@
+# Ten days of MUIS's open 2026 table (Majlis Ugama Islam Singapura, data.gov.sg, Singapore Open
+# Data Licence v1.0; see tools/timetables/official/open/SG-MUIS/ATTRIBUTION.md), times unchanged:
+# the five days before Ramadan 1447 (this file) and its first five (muis-2026-02-b.txt).
+2026-02-14 05:58 07:17 13:20 16:38 19:22 20:32
+2026-02-15 05:58 07:17 13:20 16:38 19:22 20:32
+2026-02-16 05:58 07:17 13:20 16:38 19:22 20:32
+2026-02-17 05:58 07:17 13:20 16:37 19:22 20:32
+2026-02-18 05:58 07:17 13:20 16:37 19:21 20:31

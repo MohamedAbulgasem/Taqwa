@@ -1,0 +1,19 @@
+# Sudan, the Fiqh Academy: Khartoum State's Ministry of Religious Affairs and Endowments imsakiya for
+# Ramadan 1443 (2022, UTC+2), the one table held (profiles-tested.md, authorities-arab-world-turkiye.md),
+# at the research's Khartoum point. Africa/Khartoum. Standard Asr. Its first column, labelled imsak,
+# is the Fajr and when the fast begins (the Academy calls an imsak before Fajr unfounded): F+E. No
+# sunrise is printed.
+# One table: fit, nothing held out.
+# Not a row: nile/khartoum.txt, eight days of Ramadan 2026 from agentB/sudan1.json ("Khartoum Fiqh
+# Academy Ramadan 2026"), which gives no source. It looks like an Umm al-Qura-style calculator's
+# output: columns named noon and sunset, Fajr near 18.6°, Isha = Maghrib + 90 on all eight days
+# without Umm al-Qura's Ramadan 120. It is not taken as the Academy's table until a source is found.
+# Ruling R74: a second, independent republication (a Sudanese news aggregator's Ramadan 2026
+# imsakiya, attributed to the Fiqh Academy) gives the same day-1 Khartoum Fajr and Isha as
+# nile/khartoum.txt, so the Maghrib + 90 figure is no longer an isolated data point, though its
+# authorship is still unconfirmed. sd.ministry now carries a Ramadan-only Isha floor (Maghrib + 90,
+# never earlier than the 18.0° angle) as a safety margin against it; this table's own Isha, which
+# fits the 18.0° angle exactly, is up to 20 min "late" against that floor on its own Ramadan
+# 1443 dates (a recorded exception, not an error: the floor only ever moves Isha later).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-mena/nile/khartoum2022.txt	sd.ministry	15.5007	32.5599	Africa/Khartoum	F+E S D A M I	daily	standard	fit	Khartoum, Ramadan 1443 (2022)

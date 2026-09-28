@@ -1,6 +1,23 @@
 package world.taqwa.app.feature.today
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.unit.em
+import world.taqwa.app.resources.timetable_cautious
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,7 +74,10 @@ import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.drawMisbaha
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.TaqwaTextLink
+import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.TimelineRow
+import world.taqwa.app.feature.common.authorityShortName
+import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.feature.qibla.QiblaMiniDial
 import world.taqwa.app.feature.qibla.localizedGroupedKm
 import world.taqwa.app.i18n.CountdownFormatter
@@ -73,10 +93,16 @@ import world.taqwa.app.resources.today_choose_city
 import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.resources.today_exact_alarms_body
 import world.taqwa.app.resources.today_exact_alarms_label
-import world.taqwa.app.resources.today_latitude_label
+import world.taqwa.app.resources.madhab_hanafi
+import world.taqwa.app.resources.madhab_standard
+import world.taqwa.app.resources.today_about_these_times
+import world.taqwa.app.resources.today_differ_after
+import world.taqwa.app.resources.today_differ_before
+import world.taqwa.app.resources.today_polar_line
 import world.taqwa.app.resources.today_next_in
 import world.taqwa.app.resources.today_no_location_title
 import world.taqwa.app.resources.today_open_tasbeeh
+import world.taqwa.app.resources.today_other_asr
 import world.taqwa.app.resources.today_qibla_detail
 import kotlin.time.Instant
 
@@ -98,27 +124,53 @@ fun TodayScreen(
     /** Android with notifications on and "Alarms & reminders" off; see [ExactAlarmsCard]. */
     exactAlarmsOff: Boolean = false,
     onAllowExactAlarms: () -> Unit = {},
+    /** About these times (Task 11), from the ⓘ's card, the source line and the Sunni card. */
+    onOpenAboutTimes: () -> Unit = {},
+    /** Match my mosque (Task 12), from the cautious-times card. */
+    onMatchMyMosque: () -> Unit = {},
+    /** A one-time card was answered, by either of its actions. */
+    onAnswerCard: (OneTimeCard) -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
+    val actions = ReadyActions(
+        onOpenQibla = onOpenQibla,
+        onOpenTasbeeh = onOpenTasbeeh,
+        onAllowExactAlarms = onAllowExactAlarms,
+        onOpenAboutTimes = onOpenAboutTimes,
+        onMatchMyMosque = onMatchMyMosque,
+        onAnswerCard = onAnswerCard,
+    )
     Box(Modifier.fillMaxSize().background(colors.background)) {
         when (state) {
             TodayUiState.Loading -> Unit
             TodayUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onAllowLocation)
-            is TodayUiState.Ready -> ReadyBody(state, onOpenQibla, onOpenTasbeeh, exactAlarmsOff, onAllowExactAlarms)
+            is TodayUiState.Ready -> ReadyBody(state, actions, exactAlarmsOff)
         }
     }
 }
 
+/** Everything the ready screen can be asked to do, passed down as one. */
+private class ReadyActions(
+    val onOpenQibla: () -> Unit,
+    val onOpenTasbeeh: () -> Unit,
+    val onAllowExactAlarms: () -> Unit,
+    val onOpenAboutTimes: () -> Unit,
+    val onMatchMyMosque: () -> Unit,
+    val onAnswerCard: (OneTimeCard) -> Unit,
+)
+
 @Composable
 private fun ReadyBody(
     state: TodayUiState.Ready,
-    onOpenQibla: () -> Unit,
-    onOpenTasbeeh: () -> Unit,
+    actions: ReadyActions,
     exactAlarmsOff: Boolean,
-    onAllowExactAlarms: () -> Unit,
 ) {
     val zone = rememberZone(state.location.timeZoneId)
     val format = LocalPlatformFormat.current
+    var clockSheetOpen by remember { mutableStateOf(false) }
+    val openClockSheet = { clockSheetOpen = true }
+    val warning = state.clockWarning
+    if (clockSheetOpen && warning != null) ClockSheet(warning, onDismiss = { clockSheetOpen = false })
     // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move to
     // the left and right edges, which systemBars alone does not report.
     BoxWithConstraints(
@@ -131,9 +183,9 @@ private fun ReadyBody(
             // the timeline below it, which is the right order for a page you read top to bottom.
             // Sideways there is no room for that order — the ring alone would fill the screen and
             // push every prayer time off the bottom — so the two halves sit side by side instead.
-            LandscapeBody(state, zone, format, maxWidth, maxHeight, onOpenQibla, onOpenTasbeeh, exactAlarmsOff, onAllowExactAlarms)
+            LandscapeBody(state, zone, format, maxWidth, maxHeight, actions, exactAlarmsOff, openClockSheet)
         } else {
-            PortraitBody(state, zone, format, onOpenQibla, onOpenTasbeeh, exactAlarmsOff, onAllowExactAlarms)
+            PortraitBody(state, zone, format, actions, exactAlarmsOff, openClockSheet)
         }
     }
 }
@@ -144,37 +196,37 @@ private fun PortraitBody(
     state: TodayUiState.Ready,
     zone: TimeZone,
     format: PlatformFormat,
-    onOpenQibla: () -> Unit,
-    onOpenTasbeeh: () -> Unit,
+    actions: ReadyActions,
     exactAlarmsOff: Boolean,
-    onAllowExactAlarms: () -> Unit,
+    onOpenClockSheet: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Column(Modifier.contentWidth()) {
-            CityAndDates(state, onOpenTasbeeh = onOpenTasbeeh)
+            CityAndDates(state, actions)
 
             // 32 dp here, not 44: CityAndDates already carries 4 dp under its dates, so this puts
             // 36 dp of air above the ring — the same 36 dp that separates its bottom from the
             // timeline card, so the ring sits in a band of its own rather than closer to the card
-            // than to the header it hangs beneath.
-            Spacer(Modifier.height(32.dp))
+            // than to the header it hangs beneath. The clock line, when it shows, sits in that air.
+            if (state.clockWarning != null) {
+                Spacer(Modifier.height(12.dp))
+                ClockLine(onClick = onOpenClockSheet, horizontalPadding = Gutter)
+                Spacer(Modifier.height(20.dp))
+            } else {
+                Spacer(Modifier.height(32.dp))
+            }
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Countdown(state, zone, format)
             }
             Spacer(Modifier.height(36.dp))
 
             TimelineCard(state, zone, format)
+            UnderTheList(state, actions)
 
-            Spacer(Modifier.height(14.dp))
-            QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, onOpenQibla)
+            QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, actions.onOpenQibla)
             if (exactAlarmsOff) {
                 Spacer(Modifier.height(14.dp))
-                ExactAlarmsCard(onAllowExactAlarms)
-            }
-
-            if (state.highLatitudeNote != null) {
-                Spacer(Modifier.height(14.dp))
-                HighLatitudeCard(state.highLatitudeNote)
+                ExactAlarmsCard(actions.onAllowExactAlarms)
             }
             Spacer(Modifier.height(32.dp))
         }
@@ -194,10 +246,9 @@ private fun LandscapeBody(
     format: PlatformFormat,
     width: Dp,
     height: Dp,
-    onOpenQibla: () -> Unit,
-    onOpenTasbeeh: () -> Unit,
+    actions: ReadyActions,
     exactAlarmsOff: Boolean,
-    onAllowExactAlarms: () -> Unit,
+    onOpenClockSheet: () -> Unit,
 ) {
     // The ring gets whatever its own half can spare: never bigger than upright, and small enough
     // that the city and the date above it still fit above the fold on a short sideways screen.
@@ -208,7 +259,7 @@ private fun LandscapeBody(
             Modifier.weight(1f).fillMaxHeight().contentWidth().padding(horizontal = Gutter),
             verticalArrangement = Arrangement.Center,
         ) {
-            CityAndDates(state, onOpenTasbeeh, horizontalPadding = 0.dp, topPadding = 12.dp)
+            CityAndDates(state, actions, horizontalPadding = 0.dp, topPadding = 12.dp)
             Spacer(Modifier.height(20.dp))
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Countdown(state, zone, format, diameter = ring)
@@ -218,16 +269,16 @@ private fun LandscapeBody(
             Modifier.weight(1f).fillMaxHeight().contentWidth().verticalScroll(rememberScrollState()),
         ) {
             Spacer(Modifier.height(16.dp))
+            if (state.clockWarning != null) {
+                ClockLine(onClick = onOpenClockSheet, horizontalPadding = Gutter)
+                Spacer(Modifier.height(12.dp))
+            }
             TimelineCard(state, zone, format)
-            Spacer(Modifier.height(14.dp))
-            QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, onOpenQibla)
+            UnderTheList(state, actions)
+            QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, actions.onOpenQibla)
             if (exactAlarmsOff) {
                 Spacer(Modifier.height(14.dp))
-                ExactAlarmsCard(onAllowExactAlarms)
-            }
-            if (state.highLatitudeNote != null) {
-                Spacer(Modifier.height(14.dp))
-                HighLatitudeCard(state.highLatitudeNote)
+                ExactAlarmsCard(actions.onAllowExactAlarms)
             }
             Spacer(Modifier.height(24.dp))
         }
@@ -244,11 +295,18 @@ private fun LandscapeBody(
 @Composable
 private fun CityAndDates(
     state: TodayUiState.Ready,
-    onOpenTasbeeh: () -> Unit,
+    actions: ReadyActions,
     horizontalPadding: Dp = Gutter,
     topPadding: Dp = TabRootTitleTop,
 ) {
     val colors = LocalTaqwaColors.current
+    val density = LocalDensity.current
+    val place = state.cityDisplayName ?: stringResource(Res.string.today_current_location)
+    var whoseOpen by remember { mutableStateOf(false) }
+    // Where the block and the ⓘ sit in the window, for the card's width and its caret.
+    var blockLeft by remember { mutableFloatStateOf(0f) }
+    var blockWidth by remember { mutableIntStateOf(0) }
+    var infoCentre by remember { mutableStateOf<Float?>(null) }
     // A Row now, for the misbaha at its end (spec Tasbeeh §5). The text keeps the weight and the
     // block keeps its own paddings, so the 36 dp of air above the ring is untouched: the button is
     // 44 dp tall against a city line of about 32, and it is the *text* column that still sets the
@@ -256,11 +314,27 @@ private fun CityAndDates(
     Row(
         Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp),
     ) {
-        Column(Modifier.weight(1f)) {
+        // The whole city-and-date block is the ⓘ's 48 dp target (spec §2.1). No ripple, like
+        // every surface on this screen: the card opening is the feedback.
+        Column(
+            Modifier
+                .weight(1f)
+                .onGloballyPositioned {
+                    blockLeft = it.positionInWindow().x
+                    blockWidth = it.size.width
+                }
+                .defaultMinSize(minHeight = 48.dp)
+                .clickable(
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null,
+                    role = Role.Button,
+                    onClick = { whoseOpen = true },
+                ),
+        ) {
             Text(
                 // Resolved by the view model, in the interface's language; `location.cityName` stays
                 // the English snapshot and is only what this falls back to.
-                state.cityDisplayName ?: stringResource(Res.string.today_current_location),
+                place,
                 style = TaqwaText.screenTitle,
                 color = colors.textPrimary,
             )
@@ -272,6 +346,12 @@ private fun CityAndDates(
             // digit — "8 September 2026" — has that leading number swallowed by the surrounding
             // right-to-left run and comes out as "September 2026 8"; inside the isolate the date takes
             // its own direction from its own first strong character and lays out whole.
+            //
+            // The ⓘ ends the line (spec §2.1), held to the date by a no-break space so it never
+            // wraps alone and adds no line of its own; under Arabic the end is the left. Its
+            // alternate text is the block's one screen-reader label (spec §2.4).
+            val label = whoseLabel(state.whose, place)
+            val infoTint = if (whoseOpen) colors.accent else colors.textTertiary
             Text(
                 buildAnnotatedString {
                     append(state.hijri)
@@ -279,12 +359,90 @@ private fun CityAndDates(
                         append(" · ")
                         append("\u2068" + state.gregorian + "\u2069")
                     }
+                    append("\u00A0")
+                    appendInlineContent(INFO_GLYPH, label)
                 },
                 style = TaqwaText.caption,
                 color = colors.textSecondary,
+                inlineContent = mapOf(
+                    INFO_GLYPH to InlineTextContent(
+                        Placeholder(1.em, 1.em, PlaceholderVerticalAlign.TextCenter),
+                    ) {
+                        InfoGlyph(
+                            infoTint,
+                            Modifier.fillMaxSize().onGloballyPositioned {
+                                infoCentre = it.boundsInWindow().center.x
+                            },
+                        )
+                    },
+                ),
             )
+            if (whoseOpen) {
+                WhoseTimesPopup(
+                    whose = state.whose,
+                    place = place,
+                    width = with(density) { blockWidth.toDp() },
+                    caretX = infoCentre?.let { it - blockLeft },
+                    onOpenAboutTimes = actions.onOpenAboutTimes,
+                    onDismiss = { whoseOpen = false },
+                )
+            }
         }
-        TasbeehButton(onOpenTasbeeh)
+        TasbeehButton(actions.onOpenTasbeeh)
+    }
+}
+
+private const val INFO_GLYPH = "info"
+
+/**
+ * What sits between the prayer list and the Qibla card, each only where it applies (spec §2.1):
+ * the "Cautious times ›" line and, on a polar day, the line that says some times follow a nearby
+ * latitude (both open About these times), then the one-time card due this launch. The
+ * exact-alarms card keeps its place under the Qibla card.
+ */
+@Composable
+private fun UnderTheList(state: TodayUiState.Ready, actions: ReadyActions) {
+    val place = state.cityDisplayName ?: stringResource(Res.string.today_current_location)
+    val about = stringResource(Res.string.today_about_these_times)
+    val anyLine = state.whose.cautious || state.polar
+    if (anyLine) Spacer(Modifier.height(2.dp))
+    if (state.whose.cautious) {
+        TertiaryLine(
+            text = stringResource(Res.string.timetable_cautious),
+            label = aboutLabel(state.whose, place),
+            onClick = actions.onOpenAboutTimes,
+            horizontalPadding = Gutter + 6.dp,
+            onClickLabel = about,
+        )
+    }
+    if (state.polar) {
+        val sentence = stringResource(Res.string.today_polar_line)
+        TertiaryLine(
+            text = sentence,
+            label = sentence,
+            onClick = actions.onOpenAboutTimes,
+            horizontalPadding = Gutter + 6.dp,
+            onClickLabel = about,
+        )
+    }
+    val card = state.oneTimeCard
+    if (card != null) {
+        Spacer(Modifier.height(if (anyLine) 6.dp else 14.dp))
+        OneTimeCardView(
+            card = card,
+            onAction = {
+                actions.onAnswerCard(card)
+                when (card) {
+                    OneTimeCard.CAUTIOUS -> actions.onMatchMyMosque()
+                    OneTimeCard.SUNNI -> actions.onOpenAboutTimes()
+                }
+            },
+            onOk = { actions.onAnswerCard(card) },
+            horizontalPadding = Gutter,
+        )
+        Spacer(Modifier.height(14.dp))
+    } else {
+        Spacer(Modifier.height(if (anyLine) 2.dp else 14.dp))
     }
 }
 
@@ -344,31 +502,44 @@ private fun Countdown(
 private fun TimelineCard(state: TodayUiState.Ready, zone: TimeZone, format: PlatformFormat) {
     TaqwaCard(Modifier.padding(horizontal = Gutter)) {
         Spacer(Modifier.height(4.dp))
-        PrayerTimeline(state.today.rows, horizontalPadding = 16.dp) { row: TimelineRow ->
+        PrayerTimeline(
+            state.today.rows,
+            horizontalPadding = 16.dp,
+            setByRule = state.setByRule,
+            subLines = subLines(state, zone, format),
+        ) { row: TimelineRow ->
             formatClock(row.instant, zone, format)
         }
         Spacer(Modifier.height(4.dp))
     }
 }
 
+/**
+ * The quiet lines under the rows (spec §2.1): the other school's Asr under Asr ("Standard {time}"),
+ * and where timetables differ under the current prayer. Names and times are isolated so each keeps
+ * its own direction inside the other script's sentence.
+ */
 @Composable
-private fun HighLatitudeCard(note: String) {
-    val colors = LocalTaqwaColors.current
-    TaqwaCard(Modifier.padding(horizontal = Gutter)) {
-        Column(Modifier.padding(16.dp)) {
-            Text(
-                stringResource(Res.string.today_latitude_label),
-                style = TaqwaText.sectionLabel,
-                color = colors.accent,
-            )
-            Spacer(Modifier.height(6.dp))
-            Text(
-                note,
-                style = TaqwaText.caption,
-                color = colors.textSecondary,
-            )
-        }
+private fun subLines(state: TodayUiState.Ready, zone: TimeZone, format: PlatformFormat): Map<Prayer, List<String>> {
+    val lines = mutableMapOf<Prayer, MutableList<String>>()
+    state.otherAsr?.let { other ->
+        val school = stringResource(
+            if (other.school == AsrSchool.HANAFI) Res.string.madhab_hanafi else Res.string.madhab_standard,
+        )
+        lines.getOrPut(Prayer.ASR) { mutableListOf() } +=
+            stringResource(Res.string.today_other_asr, school, isolated(formatClock(other.instant, zone, format)))
     }
+    state.differ?.let { d ->
+        val member = isolated(authorityShortName(d.memberNameKey))
+        val prayer = localizedPrayerName(d.prayer)
+        val line = if (d.begun) {
+            stringResource(Res.string.today_differ_after, member, prayer, isolated(formatClock(d.shownStart, zone, format)))
+        } else {
+            stringResource(Res.string.today_differ_before, member, prayer, isolated(formatClock(d.memberStart, zone, format)))
+        }
+        lines.getOrPut(d.under) { mutableListOf() } += line
+    }
+    return lines
 }
 
 /**

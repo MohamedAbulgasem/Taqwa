@@ -1,0 +1,8 @@
+# What ca.cautious does not absorb (ruling R87): each case with the days it may cover (for "*", at any one calendar),
+# the most minutes it may reach, and why no member takes it at a fair cost for everyone. Figures only, never a printed time.
+calendar	event	from	to	days	worst	reason
+manitoba-dawah-center-winnipeg-r3b-2l3-canada	endOfEating	2026-05-01	2026-07-31	55	12	recorded only (brief L item 7): its summer Fajr, a flat 15° as long as the sun reaches it, comes up to 12 min before the 18° family's end (a quarter of the night); one calendar at a city with no table held
+manitoba-dawah-center-winnipeg-r3b-2l3-canada	isha	2026-05-01	2026-07-31	48	31	recorded only: its 15° Isha, up to 31 min after the members' summer Isha
+masjid-bilal-winnipeg-r3e-3l6-canada	fajr	2026-08-01	2026-09-30	5	1	recorded only: prints Fajr at about 14.5° from August to October, a minute after the 15° families' on five days
+rahma-wpg	fajr	2026-08-01	2026-10-31	52	2	recorded only: prints Fajr at about 14.5° from August to October, 1-2 min after the 15° families'
+tci-windsor	sunrise	2026-01-01	2026-12-31	246	1	recorded only: prints sunrise a minute before the sun's on two days in three (its own rounding)

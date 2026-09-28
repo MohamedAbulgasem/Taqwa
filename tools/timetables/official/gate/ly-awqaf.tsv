@@ -1,0 +1,54 @@
+# Libya, the General Authority of Awqaf and Dar al-Ifta: awqaf.gov.ly's prayer widget for its 22
+# cities and api.ifta.ly for Tripoli (profiles-tested.md, data-maghreb-libya). Checked at each city's
+# unit point (lat and lon empty); Africa/Tripoli. Standard Asr.
+# - In the west the Fajr printed is also when the fast begins (F+E). East of 18.5° E or south of
+#   29.5° N Fajr and Maghrib follow the local adhan instead of this national table (ruling R73: the
+#   owner's own adhan times of 27 Sep 2026, checked in MaghrebProofTest and in the two owner rows
+#   at the end of this file), earlier than this calendar's Fajr and Maghrib, so there those two
+#   columns and the imsak they carry (Im, which now reads the same, moved dawn) are not checked (F,
+#   M and Im all "-"); sunrise, Dhuhr, Asr and Isha still are.
+# - Every city's imsak (Im) is the widget's emsak from the same two fetches (Fajr − 9 to − 11), added
+#   to the city files in the archive as a seventh column.
+# - Tripoli's table is read by awqaf-widget, which skips the four Wayback captures that show an
+#   earlier day than their own (the page served from its cache: 19 May 2025, 2 Feb 2026, 21 May 2026
+#   and 3 Sep 2026, the stale capture that reads a minute early at Maghrib and Isha; see
+#   AwqafWidgetFormat). nile/tripoli.txt is checked for its imsak column only: its other columns
+#   repeat off-libya-tripoli.txt, and its six lines without an imsak are skipped.
+# - Not rows: off-ifta-tripoli.txt and nile/tripoli_all.txt repeat the same days (the latter adds
+#   24 Sep 2026 from a copy of the widget); off-darifta-cairo-sep.txt, filed LY-IFTA by its name, is
+#   Egypt's Dar al-Ifta for Cairo (its Dhuhr is Cairo's).
+# Split: fit on the 21 other cities' two days (25–26 Sep 2026); held out, Tripoli's days from March
+# 2025 to October 2026, every season, and its imsak, and the owner's two adhan rows (Benghazi and
+# Sabha, Fajr and Maghrib only).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-maghreb-libya/off-libya-alkomos.txt	ly.awqaf/khoms			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Khoms, 25–26 Sep 2026
+archive/tables/round/data-maghreb-libya/off-libya-almarag.txt	ly.awqaf/marj			Africa/Tripoli	- S D A - I -	daily	standard	fit	Marj, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-alzaweya.txt	ly.awqaf/zawiya			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Zawiya, 25–26 Sep 2026
+archive/tables/round/data-maghreb-libya/off-libya-banywalead.txt	ly.awqaf/bani-walid			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Bani Walid, 25–26 Sep 2026
+archive/tables/round/data-maghreb-libya/off-libya-beda.txt	ly.awqaf/bayda			Africa/Tripoli	- S D A - I -	daily	standard	fit	Bayda, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-benghazi.txt	ly.awqaf/benghazi			Africa/Tripoli	- S D A - I -	daily	standard	fit	Benghazi, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-breaka.txt	ly.awqaf/brega			Africa/Tripoli	- S D A - I -	daily	standard	fit	Brega, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-derna.txt	ly.awqaf/derna			Africa/Tripoli	- S D A - I -	daily	standard	fit	Derna, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-ejdabya.txt	ly.awqaf/ajdabiya			Africa/Tripoli	- S D A - I -	daily	standard	fit	Ajdabiya, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-ekdames.txt	ly.awqaf/ghadames			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Ghadames, 25–26 Sep 2026
+archive/tables/round/data-maghreb-libya/off-libya-emsaed.txt	ly.awqaf/emsaed			Africa/Tripoli	- S D A - I -	daily	standard	fit	Emsaed, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-hoon.txt	ly.awqaf/hun			Africa/Tripoli	- S D A - I -	daily	standard	fit	Hun, 25–26 Sep 2026 (south); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-jalo.txt	ly.awqaf/jalu			Africa/Tripoli	- S D A - I -	daily	standard	fit	Jalu, 25–26 Sep 2026 (east; Asr 7.5 min later); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-koufra.txt	ly.awqaf/kufra			Africa/Tripoli	- S D A - I -	daily	standard	fit	Kufra, 25–26 Sep 2026 (south-east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-mosrata.txt	ly.awqaf/misrata			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Misrata, 25–26 Sep 2026
+archive/tables/round/data-maghreb-libya/off-libya-ojala.txt	ly.awqaf/awjila			Africa/Tripoli	- S D A - I -	daily	standard	fit	Awjila, 25–26 Sep 2026 (east; Asr 7.5 min later); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-raslanof.txt	ly.awqaf/ras-lanuf			Africa/Tripoli	- S D A - I -	daily	standard	fit	Ras Lanuf, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-sabha.txt	ly.awqaf/sabha			Africa/Tripoli	- S D A - I -	daily	standard	fit	Sabha, 25–26 Sep 2026 (south); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-sert.txt	ly.awqaf/sirte			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Sirte, 25–26 Sep 2026
+archive/tables/round/data-maghreb-libya/off-libya-tobrek.txt	ly.awqaf/tobruk			Africa/Tripoli	- S D A - I -	daily	standard	fit	Tobruk, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
+archive/tables/round/data-maghreb-libya/off-libya-zaleaten.txt	ly.awqaf/zliten			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Zliten, 25–26 Sep 2026
+archive/tables/round/data-maghreb-libya/off-libya-tripoli.txt	ly.awqaf/tripoli			Africa/Tripoli	F+E S D A M I	awqaf-widget	standard	test	Tripoli, Wayback captures of the widget Mar 2025–Sep 2026 and api.ifta.ly 25 Sep–2 Oct 2026
+archive/tables/moral-auth-mena/nile/tripoli.txt	ly.awqaf/tripoli			Africa/Tripoli	- - - - - - Im	daily	standard	test	Tripoli, api.ifta.ly's imsak 25 Sep–2 Oct 2026
+# Eastern and southern Libya's Fajr and Maghrib (ruling R73): the owner's own adhan, heard at
+# Benghazi and at Sabha on 27 Sep 2026, the two points whose national rows above no longer check Fajr
+# and Maghrib (the national table there is not what the mosques call, see the header). Not restricted
+# (the owner's own data, open/LY-AWQAF-OWNER/ATTRIBUTION.md): a two-column table, Fajr and Maghrib,
+# one day each. Held out (there is nothing to fit it against): a "never before, at most a few minutes
+# after" proof, not a margin source.
+open/LY-AWQAF-OWNER/benghazi.txt	ly.awqaf/benghazi			Africa/Tripoli	F M	daily	standard	test	Benghazi, the owner's adhan, 27 Sep 2026
+open/LY-AWQAF-OWNER/sabha.txt	ly.awqaf/sabha			Africa/Tripoli	F M	daily	standard	test	Sabha, the owner's adhan, 27 Sep 2026

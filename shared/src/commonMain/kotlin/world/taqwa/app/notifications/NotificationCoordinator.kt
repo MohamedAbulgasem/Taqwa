@@ -1,6 +1,11 @@
 package world.taqwa.app.notifications
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.GeoLocation
@@ -15,6 +20,12 @@ import kotlin.time.Instant
  * Ties settings, the prayer engine, the pure planner and a platform [NotificationScheduler]
  * together. Every platform entry point — app foreground, a boot receiver, a background task —
  * calls [reschedule] and never touches [NotificationPlanner] or the scheduler directly.
+ *
+ * One reschedule runs at a time: two quick stepper taps, or a settings write racing the foreground
+ * reschedule, each read the settings and hand the scheduler a whole plan, and the one that planned
+ * first could otherwise arm last and leave a stale plan behind. Each waits for the one before it,
+ * so the last to start reads the latest settings and is the last to arm. The plan itself is built
+ * on [planning] (the default dispatcher), not on the caller's, which is Main for a Settings write.
  */
 class NotificationCoordinator(
     private val engine: PrayerTimesEngine,
@@ -30,20 +41,31 @@ class NotificationCoordinator(
      * that have no location stack to hand.
      */
     private val locationFor: suspend (RescheduleTrigger) -> GeoLocation? = { locationOf() },
+    private val planning: CoroutineDispatcher = Dispatchers.Default,
 ) {
+    private val rescheduling = Mutex()
+
     companion object {
         /** Below this much runway left in the window, a background task is worth requesting. */
         val TOP_UP_HORIZON = 3.days
     }
 
-    suspend fun reschedule(trigger: RescheduleTrigger): List<ScheduledNotification> {
+    suspend fun reschedule(trigger: RescheduleTrigger): List<ScheduledNotification> = rescheduling.withLock {
         val location = locationFor(trigger)
         if (location == null) {
             // Nothing to schedule against, and nothing stale should be left behind either —
             // this is what happens when a user revokes location after granting it once.
             scheduler.cancelAll()
-            return emptyList()
+            return@withLock emptyList()
         }
+        val plan = withContext(planning) { plan(location) }
+        // trigger is not branched on: every reason for waking up resolves to the same correct
+        // plan for right now. It exists so callers and logs can say why a reschedule happened.
+        scheduler.scheduleAll(plan)
+        plan
+    }
+
+    private suspend fun plan(location: GeoLocation): List<ScheduledNotification> {
         val prayerSettings = settingsRepository.prayerSettings.first()
         val notificationSettings = settingsRepository.notificationSettings.first()
         val windowDays = NotificationPlanner.windowDaysFor(capacity, notificationSettings)
@@ -51,7 +73,7 @@ class NotificationCoordinator(
         // from a boot receiver or a background task, where there is no composition to read a
         // locale from and the device's own default is the only truth available.
         val format = createPlatformFormat()
-        val plan = NotificationPlanner.plan(
+        return NotificationPlanner.plan(
             location = location,
             settings = prayerSettings,
             notifications = notificationSettings,
@@ -62,10 +84,6 @@ class NotificationCoordinator(
             copy = LocalizedNotificationCopy(format),
             formatClockTime = { instant, tz -> localizedClockTime(instant, tz, format) },
         )
-        // trigger is not branched on: every reason for waking up resolves to the same correct
-        // plan for right now. It exists so callers and logs can say why a reschedule happened.
-        scheduler.scheduleAll(plan)
-        return plan
     }
 
     fun needsTopUp(plan: List<ScheduledNotification>): Boolean =

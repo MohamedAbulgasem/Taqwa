@@ -48,6 +48,9 @@ object WidgetContentBuilder {
      * The content as it stands at [nowEpochSeconds], worked out from the snapshot's two-day
      * schedule: next is the first entry still ahead, current the last one behind, the rows the
      * five of the day the current prayer belongs to (or the next one's, before the day's first).
+     * A start of the day before the day of writing, carried past midnight (day −1: a
+     * high-latitude Isha), can be next or current but has no rows of its own: the rows are then
+     * the day of writing's, none of them highlighted, as the Prayer screen shows it.
      * A mirror with no schedule, or one so old that every entry is behind, falls back to
      * [build], whose fields describe the moment of writing.
      */
@@ -55,7 +58,7 @@ object WidgetContentBuilder {
         val schedule = snapshot.schedule.sortedBy { it.epochSeconds }
         val next = schedule.firstOrNull { it.epochSeconds > nowEpochSeconds } ?: return build(snapshot)
         val current = schedule.lastOrNull { it.epochSeconds <= nowEpochSeconds }
-        val rowDay = (current ?: next).dayIndex
+        val rowDay = maxOf(0, (current ?: next).dayIndex)
         val rows = schedule.filter { it.dayIndex == rowDay }
         val languageTag = snapshot.languageTag
         val progress = current?.let {

@@ -1,0 +1,13 @@
+# Norway (no.cautious, ruling R64): no national authority. Members: IRN's joint calendar (no.irn, Oslo's largest
+# mosques, the most followed) and Diyanet's European method (subtask 7b's). Each member's tables where held:
+# - Oslo: IRN's 2026 calendar (both Asr columns printed) and Diyanet's Oslo table (September 2026-December 2027; its
+#   Fajr is also its imsak), split by year (Task 7g slices in europe/split-7g/): in 2027 Maghrib is not checked, since
+#   the members' Maghribs spread beyond 2 min and the cap follows the most-followed member, IRN, whose 2027 calendar
+#   is not held.
+# - Trondheim: IRN's 2026 calendar.
+# Every row is held out (a cautious entry has no margins of its own).
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/europe/nordic/off-irn-oslo-2026.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D As M I Ah	daily	-	test	IRN Oslo	no.irn
+archive/tables/moral-auth-world/europe/split-7g/dy-oslo-2026.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo 2026	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/split-7g/dy-oslo-2027.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo 2027	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/nordic/off-irn-trondheim-2026.txt	no.cautious	63.43049	10.39506	Europe/Oslo	F+E S D As M I Ah	daily	-	test	IRN Trondheim	no.irn

@@ -3,11 +3,10 @@ package world.taqwa.timetables
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.PrayerSettings
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
@@ -21,11 +20,10 @@ class TimetableTest {
         lat: Double,
         lon: Double,
         zone: String,
-        madhab: AsrMadhab = AsrMadhab.STANDARD,
         languages: List<String> = listOf("en"),
     ) = City(
         slug = slug, id = 1, countryCode = country, region = "north-africa", latitude = lat, longitude = lon,
-        timeZone = zone, languages = languages, madhab = madhab, featured = emptySet(),
+        timeZone = zone, languages = languages, featured = emptySet(),
         names = languages.associateWith { slug },
     )
 
@@ -39,12 +37,13 @@ class TimetableTest {
 
     @Test
     fun tripoliOnThe13thMatchesTheAppsOwnPrayerScreen() {
+        // Libya's Awqaf method (18.5°/18.5°, Dhuhr + 4, Maghrib + 5), the engine's Automatic there;
+        // the old engine's MWL gave 5:26, 13:04, 16:34, 19:16, 20:35.
         val day = timetable.day(tripoli, LocalDate(2026, 9, 13))
-        assertEquals("5:26", clock(tripoli, day, Prayer.FAJR))
-        assertEquals("13:04", clock(tripoli, day, Prayer.DHUHR))
-        assertEquals("16:34", clock(tripoli, day, Prayer.ASR))
-        assertEquals("19:16", clock(tripoli, day, Prayer.MAGHRIB))
-        assertEquals("20:35", clock(tripoli, day, Prayer.ISHA))
+        assertEquals(
+            listOf("5:25", "6:47", "13:08", "16:36", "19:21", "20:42"),
+            listOf(Prayer.FAJR, Prayer.SUNRISE, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA).map { clock(tripoli, day, it) },
+        )
     }
 
     @Test
@@ -78,10 +77,14 @@ class TimetableTest {
 
     @Test
     fun hanafiAsrIsLaterThanStandardAsr() {
-        val standard = city("karachi-pakistan", "PK", 24.8608, 67.0104, "Asia/Karachi", AsrMadhab.STANDARD)
-        val hanafi = standard.copy(madhab = AsrMadhab.HANAFI)
+        val karachi = city("karachi-pakistan", "PK", 24.8608, 67.0104, "Asia/Karachi")
         val date = LocalDate(2026, 9, 25)
-        assertTrue(timetable.day(hanafi, date).times.getValue(Prayer.ASR) > timetable.day(standard, date).times.getValue(Prayer.ASR))
+        val standard = Timetable(settings = PrayerSettings(school = "standard")).day(karachi, date)
+        val hanafi = Timetable(settings = PrayerSettings(school = "hanafi")).day(karachi, date)
+        assertTrue(hanafi.times.getValue(Prayer.ASR) > standard.times.getValue(Prayer.ASR))
+        // Karachi's own school is Hanafi (spec §3.7), which is what a page shows.
+        assertEquals(hanafi.times, timetable.day(karachi, date).times)
+        assertEquals("HANAFI", timetable.source(karachi, date).school.name)
     }
 
     @Test
@@ -91,18 +94,23 @@ class TimetableTest {
     }
 
     @Test
-    fun aCityWhoseTimesTheEngineWouldPutOnAnotherDayIsRefused() {
-        // Apia's clock runs thirteen hours ahead of UTC at a longitude eleven hours behind it,
-        // and the app's engine then answers with the next day's times. No page may say so.
+    fun apiaKeepsEveryTimeOnItsOwnCivilDate() {
+        // Apia's clock runs thirteen hours ahead of UTC at a longitude eleven hours behind it; the
+        // old engine answered with the next day's times, and the page refused the city. The engine
+        // keeps every time on the civil date asked for.
         val apia = city("apia-samoa", "WS", -13.83333, -171.76666, "Pacific/Apia")
-        val error = assertFailsWith<IllegalStateException> { timetable.day(apia, LocalDate(2026, 9, 25)) }
-        assertTrue(error.message!!.contains("apia-samoa"), error.message)
+        val date = LocalDate(2026, 9, 25)
+        val day = timetable.day(apia, date)
+        for (prayer in listOf(Prayer.FAJR, Prayer.SUNRISE, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB)) {
+            assertEquals(date, day.times.getValue(prayer).toLocalDateTime(TimeZone.of(apia.timeZone)).date, "$prayer")
+        }
+        assertTrue(clock(apia, day, Prayer.DHUHR).startsWith("12:"), clock(apia, day, Prayer.DHUHR))
     }
 
     @Test
     fun ummAlQuraIshaIsTwoHoursAfterMaghribInRamadan() {
-        // Umm al-Qura's Isha is 90 minutes after Maghrib, and 120 in Ramadan; the app's engine
-        // keeps 90 all year, so the generator adds the half hour itself and says so.
+        // Umm al-Qura's Isha is 90 minutes after Maghrib, and 120 in Ramadan: the engine applies
+        // it on Umm al-Qura's own Ramadan dates, and the page says so.
         val makkah = city("makkah-saudi-arabia", "SA", 21.42664, 39.82563, "Asia/Riyadh")
         fun interval(day: TimetableDay) = day.times.getValue(Prayer.ISHA) - day.times.getValue(Prayer.MAGHRIB)
         val ramadan = timetable.day(makkah, LocalDate(2027, 2, 15))

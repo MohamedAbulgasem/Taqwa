@@ -1,18 +1,29 @@
 package world.taqwa.app.widget
 
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.plus
+import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerStatus
 import world.taqwa.app.domain.PrayerTime
 import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.prayer.PrayerTimesEngine
+import world.taqwa.app.prayer.TimelineBuilder
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 private class FakeKeyValueStore : KeyValueStore {
@@ -206,6 +217,11 @@ class WidgetMirrorWriterScheduleTest {
             PrayerTime(Prayer.ISHA, Instant.fromEpochSeconds((offsetHours + 20) * 3600)),
         ),
         highLatitudeRuleApplied = null,
+        asrOther = Instant.fromEpochSeconds((offsetHours + 16) * 3600),
+        sunset = Instant.fromEpochSeconds((offsetHours + 18) * 3600 - 60),
+        endOfEating = Instant.fromEpochSeconds((offsetHours + 5) * 3600),
+        sourceEntryId = "test",
+        entryClass = world.taqwa.app.prayer.engine.registry.EntryClass.D_NONE,
     )
 
     private val today = TodayState(
@@ -232,5 +248,50 @@ class WidgetMirrorWriterScheduleTest {
         val store = FakeKeyValueStore()
         WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat(), listOf(dayAt(0), dayAt(24)))
         assertEquals(10, WidgetMirrorWriter.read(store)!!.schedule.size)
+    }
+
+    @Test
+    fun yesterdaysIshaAfterMidnightIsTheWidgetsNextPrayer() {
+        // Spec §3.3, ruling R8 amended: Helsinki on 21 June 2026 and Edmonton on 27 June give an
+        // Isha after local midnight. Written just after midnight, the mirror carries it (day −1),
+        // and the widget, at the moment of writing and a few minutes on, counts down to it; the
+        // rows are the new day's, none highlighted.
+        val engine = PrayerTimesEngine()
+        val helsinki = GeoLocation(60.1699, 24.9384, "Europe/Helsinki", "Helsinki", "FI")
+        val edmonton = GeoLocation(53.5461, -113.4938, "America/Edmonton", "Edmonton", "CA")
+        for ((location, date) in listOf(helsinki to LocalDate(2026, 6, 21), edmonton to LocalDate(2026, 6, 27))) {
+            val zone = TimeZone.of(location.timeZoneId)
+            val yesterday = engine.timesFor(location, date, PrayerSettings())
+            val day = date.plus(1, DateTimeUnit.DAY)
+            val todays = engine.timesFor(location, day, PrayerSettings())
+            val tomorrow = engine.timesFor(location, day.plus(1, DateTimeUnit.DAY), PrayerSettings())
+            val isha = yesterday.time(Prayer.ISHA)
+            val now = day.atStartOfDayIn(zone) + 30.seconds
+            assertTrue(isha > now + 1.minutes, "$date: Isha $isha is not after midnight")
+
+            val timeline = TimelineBuilder.buildForWidgets(yesterday, todays, tomorrow, now, false, zone)
+            assertEquals(PrayerTime(Prayer.ISHA, isha), timeline.next, "$date")
+            assertEquals(isha - now, timeline.countdown)
+
+            val snapshot = WidgetMirrorWriter.snapshotOf(
+                timeline, location.timeZoneId, FakePlatformFormat(), listOf(todays, tomorrow), yesterday,
+            )
+            assertEquals(listOf(ScheduledPrayer(Prayer.ISHA, isha.epochSeconds, snapshot.schedule.first().clockTime, -1)), snapshot.schedule.filter { it.dayIndex < 0 })
+            assertEquals(11, snapshot.schedule.size)
+            for (later in listOf(now, now + 1.minutes)) {
+                val epoch = later.epochSeconds
+                val content = WidgetContentBuilder.build(snapshot, epoch)
+                assertEquals(isha.epochSeconds, snapshot.schedule.filter { it.epochSeconds > epoch }.minOf { it.epochSeconds })
+                assertEquals((isha.epochSeconds - epoch) / 60, WidgetCountdown.remainingMinutesAt(snapshot, epoch), "$date")
+                assertEquals("Isha in", content.countdownLabel)
+                assertEquals(ObligatoryPrayers, content.rows.map { it.prayer })
+                assertTrue(content.rows.none { it.isCurrent })
+            }
+            // Once it has begun, the widget counts to the new day's Fajr from it.
+            val afterIsha = WidgetContentBuilder.build(snapshot, isha.epochSeconds + 60)
+            assertEquals("Fajr in", afterIsha.countdownLabel)
+            assertTrue(afterIsha.rows.none { it.isCurrent })
+            assertTrue(afterIsha.ringProgress > 0f)
+        }
     }
 }

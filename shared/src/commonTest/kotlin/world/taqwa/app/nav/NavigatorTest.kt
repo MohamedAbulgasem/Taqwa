@@ -45,7 +45,7 @@ class NavigatorTest {
         val n = Navigator(Screen.Today)
         n.selectTab(Tab.SETTINGS)
         n.push(Screen.PrayerTimesSettings)
-        n.push(Screen.MethodPicker)
+        n.push(Screen.Timetable)
         // The tab does not change under a pushed child — the bar would otherwise lose its
         // highlight the moment anyone opened a picker.
         assertEquals(Tab.SETTINGS, n.currentTab)
@@ -73,7 +73,9 @@ class NavigatorTest {
             Screen.Onboarding,
             Screen.PrayerTimesSettings,
             Screen.NotificationSettings,
-            Screen.MethodPicker,
+            Screen.Timetable,
+            Screen.OtherMethods,
+            Screen.MatchMyMosque,
             Screen.HighLatitudePicker,
             Screen.ManualAdjustments,
             Screen.LocationSettings,

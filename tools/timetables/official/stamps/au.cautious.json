@@ -1,0 +1,275 @@
+{
+  "entry": "au.cautious",
+  "class": "C",
+  "engineHash": "06bb487fbaf41107",
+  "broken": 0,
+  "places": 2,
+  "first": "2026-06-16",
+  "last": "2027-06-05",
+  "placeDays": 380,
+  "heldOutDays": 380,
+  "ramadanDays": 28,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 380,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 227,
+        "2": 153,
+        "3+": 0
+      },
+      "exactShare": 0,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "entry au.cautious",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 380,
+      "lateEnd": 0,
+      "late": {
+        "0": 14,
+        "1": 46,
+        "2": 2,
+        "3+": 318
+      },
+      "exactShare": 0.0368,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry au.cautious",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 380,
+      "early": 0,
+      "late": {
+        "0": 51,
+        "1": 103,
+        "2": 155,
+        "3+": 71
+      },
+      "exactShare": 0.1342,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry au.cautious",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 380,
+      "early": 0,
+      "late": {
+        "0": 37,
+        "1": 28,
+        "2": 27,
+        "3+": 288
+      },
+      "exactShare": 0.0974,
+      "worstLate": 18,
+      "lateLimit": 18,
+      "lateLimitFrom": "entry au.cautious",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 349,
+      "early": 0,
+      "late": {
+        "0": 269,
+        "1": 80,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.7708,
+      "worstLate": 1,
+      "lateLimit": 1,
+      "lateLimitFrom": "class C",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 380,
+      "early": 0,
+      "late": {
+        "0": 169,
+        "1": 116,
+        "2": 8,
+        "3+": 87
+      },
+      "exactShare": 0.4447,
+      "worstLate": 10,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry au.cautious",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 380,
+      "lateEnd": 0,
+      "late": {
+        "0": 147,
+        "1": 218,
+        "2": 15,
+        "3+": 0
+      },
+      "exactShare": 0.3868,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "entry au.cautious",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 380,
+    "ramadanDays": 28,
+    "events": {
+      "fajr": {
+        "checked": 380,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 227,
+          "2": 153,
+          "3+": 0
+        },
+        "exactShare": 0,
+        "worstLate": 2,
+        "lateLimit": 2,
+        "lateLimitFrom": "entry au.cautious",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 380,
+        "lateEnd": 0,
+        "late": {
+          "0": 14,
+          "1": 46,
+          "2": 2,
+          "3+": 318
+        },
+        "exactShare": 0.0368,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry au.cautious",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 380,
+        "early": 0,
+        "late": {
+          "0": 51,
+          "1": 103,
+          "2": 155,
+          "3+": 71
+        },
+        "exactShare": 0.1342,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "entry au.cautious",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 380,
+        "early": 0,
+        "late": {
+          "0": 37,
+          "1": 28,
+          "2": 27,
+          "3+": 288
+        },
+        "exactShare": 0.0974,
+        "worstLate": 18,
+        "lateLimit": 18,
+        "lateLimitFrom": "entry au.cautious",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 349,
+        "early": 0,
+        "late": {
+          "0": 269,
+          "1": 80,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.7708,
+        "worstLate": 1,
+        "lateLimit": 1,
+        "lateLimitFrom": "class C",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 380,
+        "early": 0,
+        "late": {
+          "0": 169,
+          "1": 116,
+          "2": 8,
+          "3+": 87
+        },
+        "exactShare": 0.4447,
+        "worstLate": 10,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry au.cautious",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 380,
+        "lateEnd": 0,
+        "late": {
+          "0": 147,
+          "1": 218,
+          "2": 15,
+          "3+": 0
+        },
+        "exactShare": 0.3868,
+        "worstLate": 2,
+        "lateLimit": 2,
+        "lateLimitFrom": "entry au.cautious",
+        "overLimit": 0
+      }
+    }
+  },
+  "maghribCap": {
+    "uncheckedDays": 0,
+    "members": {
+      "au.lma": {
+        "days": 349,
+        "cappedDays": 349,
+        "leastGap": 0,
+        "mostGap": 1
+      },
+      "other.turkey": {
+        "days": 31,
+        "cappedDays": 31,
+        "leastGap": -6,
+        "mostGap": -5
+      }
+    }
+  },
+  "lateLimits": {
+    "class C: 1 min": {
+      "events": ["maghrib"]
+    },
+    "entry au.cautious: 2 min": {
+      "reason": "Fajr and the end of eating keep each member's own margins: up to 2 min from the tables'.",
+      "events": ["fajr", "endOfEating"]
+    },
+    "entry au.cautious: 4 min": {
+      "reason": "Zuhr is the later member's: the TURKEY preset's (+ 5) and LMA's (+ 2 to + 7 by month), up to 4 min after the earlier table's.",
+      "events": ["dhuhr"]
+    },
+    "entry au.cautious: 8 min": {
+      "reason": "Sunrise is the earlier member's, the TURKEY preset's (the sun's less 7 min): up to 8 min before LMA's.",
+      "events": ["sunrise"]
+    },
+    "entry au.cautious: 10 min": {
+      "reason": "Isha is the later member's, the TURKEY preset's 17° or LMA's Maghrib + 90: up to 10 min after the other's.",
+      "events": ["isha"]
+    },
+    "entry au.cautious: 18 min": {
+      "reason": "Asr is the later member's: LMA's, on its per-month offsets up to 15 min after its own table, and the TURKEY preset's with its allowance for Diyanet's daily model (subtask 7b): up to 18 min after the earlier table's.",
+      "events": ["asrStandard"]
+    }
+  }
+}

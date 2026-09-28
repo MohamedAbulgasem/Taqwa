@@ -8,10 +8,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
@@ -22,6 +24,8 @@ import world.taqwa.app.feature.tasbeeh.TasbeehViewModel
 import world.taqwa.app.feature.today.TodayScreen
 import world.taqwa.app.feature.today.TodayUiState
 import world.taqwa.app.feature.today.TodayViewModel
+import world.taqwa.app.feature.today.OneTimeCardSession
+import world.taqwa.app.feature.today.clockSetByHand
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
@@ -63,10 +67,16 @@ internal fun TodayRoute(
             // for the one-time backfill of a location saved without an id.
             cityRepository = container.cityRepository,
             format = platformFormat,
+            // A backfilled country or region can change the timetable (ruling R53).
+            onLocationBackfilled = { refreshForNewTimes(container, settings, platformFormat) },
             // A language change swaps the view model; without this the
             // new one would start at Loading and blank the whole screen
             // until its first refresh landed.
             initialState = lastState.value,
+            clockSetByHand = ::clockSetByHand,
+            // The process's own: an answered card keeps the other one
+            // away until the next launch, across a language change too.
+            cardSession = OneTimeCardSession.process,
         )
     }
     // Gated on the *lifecycle*, not just composition: leaving Today for another
@@ -84,6 +94,7 @@ internal fun TodayRoute(
     }
     val state by viewModel.state.collectAsState()
     SideEffect { lastState.value = state }
+    val scope = rememberCoroutineScope()
 
     val requestLocation = world.taqwa.app.location
         .rememberLocationPermissionRequester(container.locationRepository) {
@@ -100,6 +111,9 @@ internal fun TodayRoute(
         // is re-read on every foreground, so the card leaves by itself.
         exactAlarmsOff = notificationSettings.enabled && !exactAlarmsAllowed,
         onAllowExactAlarms = ::requestExactAlarmAccess,
+        onOpenAboutTimes = { navigator.push(Screen.AboutTimes) },
+        onMatchMyMosque = { navigator.push(Screen.MatchMyMosque) },
+        onAnswerCard = { card -> scope.launch { viewModel.answerOneTimeCard(card) } },
     )
 }
 

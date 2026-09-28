@@ -40,7 +40,6 @@
     <!-- Today -->
     <string name="today_current_location">Current location</string>
     <string name="today_next_in">%1$s in</string>
-    <string name="today_latitude_label">AT THIS LATITUDE</string>
     <string name="today_exact_alarms_label">EXACT ALARMS OFF</string>
     <string name="today_exact_alarms_body">Android can ring up to an hour late until “Alarms &amp; reminders” is allowed for Taqwa.</string>
     <string name="today_no_location_title">No location yet</string>
@@ -48,6 +47,46 @@
     <string name="today_allow_location">Allow location instead</string>
     <!-- The pill beside Dhuhr on a Friday, the chosen city's own Friday. -->
     <string name="today_jumuah">Jumuʿah</string>
+
+    <!-- Prayer engine: the Prayer screen (Task 10) -->
+    <!-- The card the ⓘ after the date opens (spec §2.1): whose times these are, by the entry's class. %1$s is the timetable's short name, %2$s the place. -->
+    <string name="today_whose_checked_title">%1$s timetable</string>
+    <string name="today_whose_checked_body">%1$s’s times for %2$s, reproduced by Taqwa and checked against its published timetable.</string>
+    <string name="today_whose_unchecked_title">%1$s method, not yet fully checked</string>
+    <string name="today_whose_unchecked_body">Taqwa calculates the times for %2$s by the %1$s method, with a safety margin.</string>
+    <string name="today_whose_cautious_body">Mosques here follow different timetables, so Taqwa shows each prayer once they have all begun it.</string>
+    <string name="today_whose_calculated_body">No local timetable is known here, so Taqwa calculates these times on the safe side.</string>
+    <!-- The link to About these times; the screen adds the chevron. -->
+    <string name="today_about_these_times">About these times</string>
+    <!-- Screen-reader labels (spec §2.4): %1$s names the times ("Times by Diyanet", "Cautious times"), %2$s the place. -->
+    <string name="today_times_by">Times by %1$s</string>
+    <string name="today_whose_a11y">%1$s, %2$s. Opens whose times these are</string>
+    <string name="today_about_a11y">%1$s, %2$s. Opens About these times</string>
+    <!-- The pill after a prayer's name when a high-latitude rule set its time (spec §2.1, the Jumuʿah pill's style); approved terms in §2.4. -->
+    <string name="today_set_by_rule">Set by rule</string>
+    <!-- On a polar day, one line under the prayer list instead of the pills; it opens About these times. Some times, not all, follow the nearby latitude. -->
+    <string name="today_polar_line">The sun does not rise or set here today, so some times follow the nearest latitude where it does.</string>
+    <!-- One-time cards below the prayer list (spec §2.1): the cautious-times card, then the Sunni card on a later launch. -->
+    <string name="today_card_cautious_title">Mosques here follow different timetables</string>
+    <string name="today_card_cautious_body">Taqwa shows each prayer once they have all begun it.</string>
+    <string name="today_card_sunni_title">These are Sunni prayer times</string>
+    <string name="today_card_sunni_body">In Shia (Ja’fari) practice, Maghrib and iftar are later.</string>
+    <string name="today_match_my_mosque">Match my mosque</string>
+    <string name="today_card_ok">OK</string>
+    <!-- The clock line above the ring (spec §3.9) and its sheet: %1$s the place whose clocks changed, %2$s the date of the change. -->
+    <string name="today_clock_line">Your phone’s clock may be an hour off</string>
+    <string name="today_clock_stale_early">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour early. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <string name="today_clock_stale_late">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour late. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <string name="today_clock_manual_early">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour early. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
+    <string name="today_clock_manual_late">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour late. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
+    <string name="today_clock_region_morocco">Morocco</string>
+    <string name="today_clock_region_british_columbia">British Columbia</string>
+    <string name="today_clock_region_kazakhstan">Kazakhstan</string>
+    <!-- "Show where timetables differ", under the current prayer (spec §2.1): %1$s a timetable's short name, %2$s the next prayer, %3$s a time. -->
+    <string name="today_differ_before">%1$s’s %2$s begins at %3$s</string>
+    <string name="today_differ_after">%1$s’s %2$s has begun · Taqwa shows it from %3$s</string>
+    <!-- "Show both Asr times": the other school’s Asr under Asr ("Standard 16:24"). %1$s is the school (madhab_standard or madhab_hanafi), %2$s its time; one string, so each language puts them in its own order. -->
+    <string name="today_other_asr">%1$s %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">Settings</string>
@@ -161,10 +200,85 @@
     <string name="adhan_voice_azemi_detail">Live from Malmö Mosque, %1$s</string>
 
     <!-- Prayer time settings -->
-    <string name="prayer_times_method">Calculation method</string>
+    <!-- Prayer engine: Settings (Task 12) -->
+    <string name="prayer_times_timetable">Timetable</string>
+    <string name="timetable_automatic">Automatic</string>
+    <string name="timetable_automatic_named">Automatic · %1$s</string>
+    <string name="prayer_times_paused_value">%1$s · paused</string>
+    <string name="timetable_out_of_scope">%1$s isn’t used here, so Automatic applies until you return.</string>
+    <string name="timetable_paused_note">%1$s is paused: no prayer is shown before Automatic’s time until you confirm it in Timetable.</string>
+    <string name="saudi_fajr_later">Pray Fajr 5 minutes later</string>
+    <string name="saudi_fajr_later_detail">Some scholars advise waiting a few minutes after Umm al-Qura’s Fajr. The Fajr shown and its alert move; stop eating at Umm al-Qura’s Fajr, 5 minutes before.</string>
+    <string name="prayer_times_asr_label">ASR</string>
+    <string name="asr_automatic">Automatic</string>
+    <string name="asr_shadow_standard">the shadow equal to its length</string>
+    <string name="asr_shadow_hanafi">twice the shadow</string>
+    <string name="asr_note_automatic_authority">Automatic: %1$s, as %2$s.</string>
+    <string name="asr_note_automatic_majority">Automatic: %1$s, as most mosques here.</string>
+    <string name="asr_note_automatic_unknown">Automatic: %1$s, the later time, because %2$s’s majority school isn’t known.</string>
+    <string name="asr_note_automatic_unknown_here">Automatic: %1$s, the later time, because the majority school here isn’t known.</string>
+    <string name="asr_note_standard">Standard: %1$s.</string>
+    <string name="asr_note_hanafi">Hanafi: %1$s.</string>
+    <string name="show_both_asr">Show both Asr times</string>
+    <string name="show_where_differ">Show where timetables differ</string>
+    <string name="show_where_differ_detail">When %1$s’s timetables begin a prayer at different times</string>
+    <string name="show_where_differ_detail_here">When the timetables here begin a prayer at different times</string>
+    <string name="prayer_times_about_row">About these times</string>
+    <string name="timetable_auto_authority">The timetable %1$s publishes for this place</string>
+    <!-- Under Automatic when it follows the timetable most local mosques follow, not an authority’s (London Unified, the ISNA and Karachi conventions): %1$s is its name. -->
+    <string name="timetable_auto_majority">%1$s, followed by most mosques here</string>
+    <string name="timetable_auto_cautious">Cautious times: each prayer once this place’s timetables have all begun it</string>
+    <string name="timetable_auto_calculated">Calculated by Taqwa: no timetable is known for this place</string>
+    <string name="timetable_times_today">Fajr %1$s, Maghrib %2$s, Isha %3$s today</string>
+    <string name="timetable_nearby_label">ALSO USED NEARBY</string>
+    <string name="timetable_other_methods">Other methods</string>
+    <string name="timetable_other_examples">%1$s, %2$s, %3$s…</string>
+    <string name="timetable_match_mosque">Match my mosque</string>
+    <string name="timetable_checking">Checking the next 12 months…</string>
+    <string name="timetable_paused_row">Paused: shown no earlier than Automatic until you confirm it</string>
+    <string name="timetable_earlier_start">Its %1$s begins %2$s before %3$s on some days. Follow it only if your mosque does.</string>
+    <!-- The same warning when the earlier time is the other school’s Asr, the one "Show both Asr times" adds: %1$s is that school (madhab_standard or madhab_hanafi), %2$s the minutes, %3$s whose time it runs ahead of. -->
+    <string name="timetable_earlier_asr_other">Its %1$s Asr begins %2$s before %3$s on some days. Follow it only if your mosque does.</string>
+    <string name="timetable_later_sunrise">Its sunrise is %1$s after %2$s on some days. Follow it only if your mosque does.</string>
+    <string name="timetable_later_fast">Its fast begins %1$s after %2$s on some days. Follow it only if your mosque does.</string>
+    <string name="timetable_of_authority">%1$s’s</string>
+    <string name="timetable_of_cautious">the cautious times</string>
+    <string name="timetable_of_taqwa">Taqwa’s</string>
+    <plurals name="timetable_minutes">
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
+    </plurals>
+    <string name="timetable_keep_automatic">Keep Automatic</string>
+    <string name="timetable_keep_current">Keep %1$s</string>
+    <string name="timetable_follow_it">Follow it</string>
+    <string name="match_note">From your mosque’s board, for today, %1$s. Use when each prayer begins (the adhan time), not the jamāʿah.</string>
+    <string name="match_fajr_begins">Fajr begins</string>
+    <string name="match_isha_begins">Isha begins</string>
+    <string name="match_both">Both times match. Check its other times against the board: Dhuhr %1$s, Asr %2$s, Maghrib %3$s.</string>
+    <string name="match_hour_apart">Both times are exactly an hour off: your board may be on summer or winter time. Its Fajr begins at %1$s and its Isha at %2$s.</string>
+    <string name="match_one_fajr">Its Fajr matches, but its Isha begins at %1$s.</string>
+    <string name="match_one_isha">Its Isha matches, but its Fajr begins at %1$s.</string>
+    <string name="match_none">No timetable Taqwa knows matches both times.</string>
+    <string name="match_fajr_isha">Fajr %1$s, Isha %2$s</string>
+    <string name="match_use">Use this timetable</string>
+    <string name="match_in_use">Taqwa already follows this timetable.</string>
+    <string name="timetable_source_authority">%1$s’s time</string>
+    <string name="timetable_source_cautious">the cautious time</string>
+    <string name="timetable_source_taqwa">Taqwa’s time</string>
+    <string name="timetable_source_latest">the latest local timetable</string>
+    <string name="adjust_paused_for">%1$s · paused (set for %2$s)</string>
+    <string name="adjust_timetable_paused_note">Earlier adjustments wait until %1$s is confirmed in Timetable.</string>
+    <string name="adjust_confirm_title">Show %1$s before %2$s?</string>
+    <string name="adjust_confirm_body">A prayer prayed before its time must be repeated. Only do this if your mosque’s timetable is earlier.</string>
+    <string name="adjust_confirm_body_maghrib">A prayer prayed before its time must be repeated, and a fast broken before it must be made up. Only do this if your mosque’s timetable is earlier.</string>
+    <string name="adjust_strong_body">Taqwa’s %1$s is at most %2$s after %3$s, so %4$s moves it before that time. A prayer prayed before its time must be repeated. Only do this if your mosque’s timetable is this much earlier.</string>
+    <string name="adjust_strong_body_maghrib">Taqwa’s %1$s is at most %2$s after %3$s, so %4$s moves it before that time. A prayer prayed before its time must be repeated, and a fast broken before it must be made up. Only do this if your mosque’s timetable is this much earlier.</string>
+    <string name="adjust_keep">Keep %1$s</string>
+    <string name="adjust_use">Use %1$s</string>
+    <string name="adjust_note">Moves a time by up to an hour from the timetable’s. Use it only when your mosque’s board differs.</string>
+    <!-- /Prayer engine: Settings (Task 12) -->
     <string name="prayer_times_high_latitude">High latitude rule</string>
     <string name="prayer_times_manual">Manual adjustments</string>
-    <string name="prayer_times_madhab_label">ASR MADHAB</string>
     <string name="madhab_standard">Standard</string>
     <string name="madhab_hanafi">Hanafi</string>
     <string name="prayer_times_hijri_label">HIJRI DATE</string>
@@ -181,7 +295,6 @@
     <string name="method_egyptian">Egyptian General Authority</string>
     <string name="method_umm_al_qura">Umm al-Qura (Makkah)</string>
     <string name="method_karachi">University of Islamic Sciences, Karachi</string>
-    <string name="method_tehran">Institute of Geophysics, Tehran</string>
     <string name="method_dubai">Dubai</string>
     <string name="method_kuwait">Kuwait</string>
     <string name="method_qatar">Qatar</string>
@@ -194,15 +307,61 @@
     <string name="high_lat_middle">Middle of the night</string>
     <string name="high_lat_seventh">One-seventh of the night</string>
     <string name="high_lat_twilight">Twilight angle</string>
-    <string name="high_lat_auto_note">At your latitude, automatic uses %1$s.</string>
     <string name="high_lat_picker_note">Above roughly %1$s degrees the sun stops dropping far enough below the horizon for a true Fajr and Isha, so a substitution rule takes over.</string>
 
-    <string name="manual_note">Shifts each time by up to an hour, on top of the calculation method. Use it only when your mosque’s timetable differs from the calculated time.</string>
+    <!-- Prayer engine: About these times (Task 11) -->
+    <string name="about_times_title">About these times</string>
+    <string name="timetable_cautious">Cautious times</string>
+    <string name="timetable_calculated">Calculated by Taqwa</string>
+    <string name="about_who_publishes">Who publishes them</string>
+    <string name="about_who_publishes_body">%1$s publishes the prayer times used in %2$s.</string>
+    <string name="about_not_affiliated">Taqwa is not affiliated with %1$s.</string>
+    <string name="about_how_reproduces">How Taqwa reproduces them</string>
+    <string name="about_method_intro">The way %1$s calculates: %2$s.</string>
+    <string name="about_method_fajr_angle">dawn (Fajr) at %1$s° below the horizon</string>
+    <string name="about_method_isha_angle">nightfall (Isha) at %1$s° below the horizon</string>
+    <string name="about_method_fajr_curve">dawn (Fajr) at a twilight angle that changes through the year, between %1$s° and %2$s° below the horizon</string>
+    <string name="about_method_isha_curve">nightfall (Isha) at a twilight angle that changes through the year, between %1$s° and %2$s° below the horizon</string>
+    <string name="about_method_isha_after_maghrib">nightfall (Isha) %1$s minutes after Maghrib</string>
+    <string name="about_method_minutes_note">its own minutes (%1$s)</string>
+    <string name="about_method_rounding_note">and each start rounded up to the next minute (sunrise and the end of eating down)</string>
+    <string name="about_method_daily_sun">the sun’s position taken once a day</string>
+    <string name="about_method_horizon_dip">its own horizon, set lower for elevation and haze</string>
+    <string name="about_how_checked">How it was checked</string>
+    <string name="about_stat_days_at_places">days at %1$s places</string>
+    <string name="about_stat_never_before">starts before %1$s’s</string>
+    <string name="about_stat_minutes_value">%1$s min</string>
+    <string name="about_stat_at_most_after">at most after</string>
+    <string name="about_checked_through">Checked against %1$s’s published timetable through %2$s.</string>
+    <string name="about_not_measured_unit">Not measured for %1$s.</string>
+    <string name="about_checked_so_far_with_data">Checked on %1$s days so far: never before %2$s’s, up to %3$s minutes after.</string>
+    <string name="about_checked_so_far_without_data">Taqwa has not yet compared them with %1$s’s own timetable.</string>
+    <!-- About at Tromsø (ruling R82), after "Checked on … days so far": what of IRN's Makkah-time calendar Taqwa does not follow. %1$s is the authority's short name. -->
+    <string name="about_not_followed_irn_tromso">%1$s’s Makkah-time Fajr is not followed from late April to mid-May and from late July to mid-August, when it falls after sunrise, nor its sunrise under the midnight sun; Maghrib never comes before the real sunset.</string>
+    <string name="about_authority_method_title">%1$s method</string>
+    <string name="about_authority_unchecked_body">%1$s publishes the prayer times for %2$s. Taqwa calculates them the way %1$s does, with a safety margin.</string>
+    <!-- About, not yet fully checked, for a convention most mosques follow with no authority behind it (spec §6.2 b): %1$s its name, %2$s the place. -->
+    <string name="about_majority_unchecked_body">Most mosques in %2$s follow the %1$s method. Taqwa calculates the times by it, with a safety margin.</string>
+    <string name="about_nearby_heading">Timetables some local mosques follow instead</string>
+    <string name="about_cautious_body">Mosques in %1$s follow different timetables in good faith, and none is followed by most. Taqwa combines %2$s: each prayer once all have begun it.</string>
+    <!-- About, cautious times (ruling R91, spec §3.6): shown only on a day the Maghrib cap decided the Maghrib. %1$s the most-followed timetable's short name, %2$s the timetable(s) whose Maghrib is later. -->
+    <string name="about_cautious_maghrib_cap">Maghrib is the exception today: it follows %1$s, the most-followed timetable, rather than the later Maghrib of %2$s.</string>
+    <string name="about_which_decides">Which timetable decides each time today</string>
+    <string name="about_calculated_body">Taqwa found no official Sunni timetable for %1$s, so it calculates one on the safe side: %2$s.</string>
+    <string name="about_asr_heading">Asr</string>
+    <string name="about_asr_known">%1$s: %3$s, because most mosques in %2$s follow it.</string>
+    <string name="about_asr_unknown">%1$s: %3$s, the later time, because %2$s’s majority school is not known. You can change it in Settings.</string>
+    <string name="about_sunni_heading">Sunni times</string>
+    <string name="about_sunni_body">These are Sunni prayer times. In Shia (Ja’fari) practice, Maghrib and iftar are later.</string>
+    <string name="about_check_mosque_heading">Check your mosque</string>
+    <string name="about_check_mosque_body">Calculated times can differ from a mosque’s by a few minutes. If yours differs, choose its timetable or adjust a prayer in Settings.</string>
+    <string name="about_if_fasting">If you are fasting</string>
+    <string name="about_stop_eating">Stop eating by %1$s today.</string>
 
     <!-- Attribution -->
     <string name="attribution_intro">Taqwa is built on work other people gave away. Their licences require credit, and it is owed regardless.</string>
     <string name="credit_calculation">Prayer time calculation</string>
-    <string name="credit_calculation_detail">Adhan by Batoul Apps, MIT licence.</string>
+    <string name="credit_calculation_detail">Taqwa’s own engine. The Qibla bearing uses Adhan by Batoul Apps, MIT licence.</string>
     <string name="credit_cities">City database</string>
     <string name="credit_cities_detail">GeoNames cities15000, CC BY 4.0.</string>
     <string name="credit_typeface">Manrope typeface</string>
@@ -219,6 +378,78 @@
     <string name="credit_quran_layout_detail">Madinah Mushaf page and line breaks from the Quranic Universal Library data.</string>
     <string name="credit_translations">Translations</string>
     <string name="credit_translations_detail">Bundled from the Tanzil Project for non-commercial use. Each translator is credited below.</string>
+
+    <!-- Prayer engine: authority names (Task 10) -->
+    <!-- The short name of every timetable the registry names (an entry's shortNameKey, a cautious
+         member's nameKey): read through feature/common/AuthorityNames.kt, never by key directly.
+         The Other methods reuse the method_* names above. -->
+    <string name="authority_awqaf_jordan">Jordan Awqaf</string>
+    <string name="authority_awqaf_kuwait">Kuwait Awqaf</string>
+    <string name="authority_awqaf_libya">Libyan Awqaf</string>
+    <string name="authority_awqaf_syria">Syrian Awqaf</string>
+    <string name="authority_awqaf_uae">UAE Awqaf</string>
+    <string name="authority_bahrain_council">Bahrain Supreme Council</string>
+    <string name="authority_bik">BIK Kosovo</string>
+    <string name="authority_cape_calendar">Cape community calendar</string>
+    <string name="authority_chicago">Chicago 18°/15°</string>
+    <string name="authority_dar_al_fatwa">Dar al-Fatwa</string>
+    <string name="authority_diyanet">Diyanet</string>
+    <string name="authority_diyanet_europe">Diyanet Europe</string>
+    <string name="authority_dum_rd">Dagestan Muftiate</string>
+    <string name="authority_dum_rf">DUM RF</string>
+    <string name="authority_dum_rt">Tatarstan Muftiate</string>
+    <string name="authority_emb">EMB Belgium</string>
+    <string name="authority_esa">Egyptian Survey Authority</string>
+    <string name="authority_fazilet">Fazilet</string>
+    <string name="authority_fianz">FIANZ</string>
+    <string name="authority_fids">FIDS</string>
+    <string name="authority_gaza_awqaf">Gaza Awqaf</string>
+    <string name="authority_grande_mosquee_paris">Paris Grand Mosque</string>
+    <string name="authority_habous">Habous</string>
+    <string name="authority_iacad">IACAD</string>
+    <string name="authority_icci">ICCI Dublin</string>
+    <string name="authority_ifb">Islamic Foundation Bangladesh</string>
+    <string name="authority_ifi">IFI Ireland</string>
+    <string name="authority_ift">Islamic Foundation Toronto</string>
+    <string name="authority_iggo">IGGÖ</string>
+    <string name="authority_iit">Islamic Institute</string>
+    <string name="authority_inm">INM Tunisia</string>
+    <string name="authority_irn">IRN Norway</string>
+    <string name="authority_isna">ISNA</string>
+    <string name="authority_iz_bih">IZ BiH</string>
+    <string name="authority_izcg">IZ Montenegro</string>
+    <string name="authority_jakim">JAKIM</string>
+    <string name="authority_jamiat">Jamiatul Ulama</string>
+    <string name="authority_karachi">Karachi</string>
+    <string name="authority_kemenag">Kemenag</string>
+    <string name="authority_kmsh">KMSH Albania</string>
+    <string name="authority_kyrgyz_muftiate">Kyrgyz Muftiate</string>
+    <string name="authority_lakemba">Lakemba Mosque</string>
+    <string name="authority_london_unified">London Unified</string>
+    <string name="authority_mac_toronto">MAC Masjid</string>
+    <string name="authority_marw">Ministry of Religious Affairs</string>
+    <string name="authority_mauritania">Ministry of Islamic Affairs</string>
+    <string name="authority_mjc">MJC</string>
+    <string name="authority_mora_brunei">MORA Brunei</string>
+    <string name="authority_muhammadiyah">Muhammadiyah</string>
+    <string name="authority_muis">MUIS</string>
+    <string name="authority_oman_awqaf">Oman Awqaf</string>
+    <string name="authority_pa_iftaa">Dar al-Iftaa</string>
+    <string name="authority_qatar_calendar">Qatar Calendar House</string>
+    <string name="authority_qmdb">Kazakh Muftiate</string>
+    <string name="authority_sudan_fiqh">Sudan Fiqh Academy</string>
+    <string name="authority_sunni_endowment">Sunni Endowment</string>
+    <string name="authority_umm_al_qura">Umm al-Qura</string>
+    <string name="authority_uzbek_board">Uzbek Muslim Board</string>
+    <string name="authority_wifaqul_ulama">Wifaqul Ulama</string>
+    <string name="timetable_twelve_degrees">12° timetable</string>
+    <string name="timetable_late_dawn">Late-dawn timetable</string>
+    <string name="timetable_moroccan_calendar">Moroccan calendar</string>
+    <string name="timetable_isha_ninety">90-minute Isha timetable</string>
+    <string name="timetable_fifteen_degrees">15° timetable</string>
+    <string name="timetable_eighteen_degrees">18° timetable</string>
+    <string name="timetable_chicago_eighteen">Chicago 18° timetable</string>
+    <string name="timetable_rabita">Rabita Helsinki</string>
 
     <!-- Qibla (plan 2) -->
     <string name="qibla_no_sensor_title">No compass sensor</string>
@@ -269,7 +500,6 @@
     <string name="notifications_blocked">Notifications are turned off for Taqwa in system settings, so no prayer alert can be shown until they are allowed again.</string>
     <string name="notifications_open_settings">Open notification settings</string>
     <string name="hijri_tabular">Tabular</string>
-    <string name="method_tehran_maghrib_note">Maghrib follows sunset; this method’s 4.5° Maghrib angle is not applied yet.</string>
     <!-- Bottom tab bar (iteration 1: the owner asked for it after seeing Today on a phone;
          iteration 8: Qibla folded into the Prayer screen; slice 2: the Quran tab arrives). -->
     <string name="tab_prayer">Prayer</string>

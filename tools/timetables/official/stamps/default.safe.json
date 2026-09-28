@@ -1,0 +1,243 @@
+{
+  "entry": "default.safe",
+  "class": "D (none)",
+  "engineHash": "f8e45ec19c011e0c",
+  "broken": 0,
+  "places": 15,
+  "first": "2026-01-01",
+  "last": "2027-12-31",
+  "placeDays": 2054,
+  "heldOutDays": 2054,
+  "ramadanDays": 149,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 1689,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 20,
+        "2": 42,
+        "3+": 1627
+      },
+      "exactShare": 0,
+      "worstLate": 12,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 1597,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 242,
+        "3+": 1355
+      },
+      "exactShare": 0,
+      "worstLate": 7,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 1232,
+      "early": 0,
+      "late": {
+        "0": 195,
+        "1": 190,
+        "2": 368,
+        "3+": 479
+      },
+      "exactShare": 0.1583,
+      "worstLate": 6,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 923,
+      "early": 0,
+      "late": {
+        "0": 219,
+        "1": 209,
+        "2": 293,
+        "3+": 202
+      },
+      "exactShare": 0.2373,
+      "worstLate": 4,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 735,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 48,
+        "2": 325,
+        "3+": 362
+      },
+      "exactShare": 0,
+      "worstLate": 4,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 1658,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 23,
+        "2": 467,
+        "3+": 1168
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 1290,
+      "early": 0,
+      "late": {
+        "0": 178,
+        "1": 235,
+        "2": 375,
+        "3+": 502
+      },
+      "exactShare": 0.138,
+      "worstLate": 8,
+      "lateLimit": 15,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 2054,
+    "ramadanDays": 149,
+    "events": {
+      "fajr": {
+        "checked": 1689,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 20,
+          "2": 42,
+          "3+": 1627
+        },
+        "exactShare": 0,
+        "worstLate": 12,
+        "lateLimit": 20,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 1597,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 242,
+          "3+": 1355
+        },
+        "exactShare": 0,
+        "worstLate": 7,
+        "lateLimit": 20,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 1232,
+        "early": 0,
+        "late": {
+          "0": 195,
+          "1": 190,
+          "2": 368,
+          "3+": 479
+        },
+        "exactShare": 0.1583,
+        "worstLate": 6,
+        "lateLimit": 20,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 923,
+        "early": 0,
+        "late": {
+          "0": 219,
+          "1": 209,
+          "2": 293,
+          "3+": 202
+        },
+        "exactShare": 0.2373,
+        "worstLate": 4,
+        "lateLimit": 20,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
+      },
+      "asrHanafi": {
+        "checked": 735,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 48,
+          "2": 325,
+          "3+": 362
+        },
+        "exactShare": 0,
+        "worstLate": 4,
+        "lateLimit": 20,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 1658,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 23,
+          "2": 467,
+          "3+": 1168
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 20,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 1290,
+        "early": 0,
+        "late": {
+          "0": 178,
+          "1": 235,
+          "2": 375,
+          "3+": 502
+        },
+        "exactShare": 0.138,
+        "worstLate": 8,
+        "lateLimit": 15,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry default.safe: 15 min": {
+      "reason": "this region's 18° Isha is deeper (later) than some real authorities' own shallower Isha angle (Dar al-Ifta Cairo's 17.5°, Task 7h, safe-default.tsv) — never early, only later by more than the class default",
+      "events": ["isha"]
+    },
+    "entry default.safe: 20 min": {
+      "reason": "no local convention is known here; nearby authorities elsewhere run deeper safety minutes than this region's flat 1986 baseline (Task 7h, safe-default.tsv)",
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib"]
+    }
+  }
+}

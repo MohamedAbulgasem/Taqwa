@@ -1,0 +1,10 @@
+# Bangladesh, bd.ifb: the Islamic Foundation's year-round Dhaka table (a mirrored PDF, kivabe.com;
+# no licence found; used only to fit and prove). Sehri (E) and the printed Fajr (F) are two
+# different columns 6 minutes apart (true dawn - 3 and + 3): the entry's own end-of-eating rule,
+# never F+E (ruling R39). Fit on the permanent table (72 days spread across the year, one row
+# blanked: 06-24's Maghrib was misread about an hour off its neighbours); held out on an
+# independently digitized October page of the same table (already in the public manifest as
+# BD-IFB), which agrees with the permanent table wherever both cover the same date. Hanafi only.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/southasia/off-ifb-perm-2026.txt	bd.ifb	23.7104	90.4074	Asia/Dhaka	E F D A M I S	daily	hanafi	fit	IFB permanent Dhaka table, year-round (2026 dates)
+archive/tables/off-ifb-dhaka.txt	bd.ifb	23.7104	90.4074	Asia/Dhaka	F S D A M I	daily	hanafi	test	IFB permanent Dhaka table, October rows (independent digitization, held out)

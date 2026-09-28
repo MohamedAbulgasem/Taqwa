@@ -1,0 +1,44 @@
+# The United States (us.isna): FCNA/ISNA 15°/15°, no binding authority. The mosque tables that follow 15°/15°
+# are its floors (the brief): the app is never before any of them. Each table is its own mosque's (the research's
+# index: slug, city, point); Asr in the school the table prints. No US mosque prints an imsak: each Fajr is also
+# the start of the fast. Split by mosque (fit / test), every region in both. Faults left out in the Task 7g copies
+# under namerica/split-7g/ (each named in its header, proof.md). Not floors: ICCNY (its June-August rows follow
+# about 17° with Maghrib + 10, another table), the Diyanet mosques (Diyanet), the Islamic Center of Washington
+# (19.5°), Masjid Yaseen (18°/18°), Al-Farooq (MWL), the Chicago 18° block (us.chicago) and one-day captures
+# with no stated method.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/namerica/us-east/adams-sterling.txt	us.isna	39.037	-77.383	America/New_York	F+E S D A M I	daily	standard	fit	All Dulles Area Muslim Society (ADAMS Center), Sterling, VA
+archive/tables/moral-auth-world/namerica/us-east/dar-al-hijrah-falls-church.txt	us.isna	38.8614	-77.1467	America/New_York	F+E S D A M I	daily	standard	fit	Dar Al-Hijrah Islamic Center, Falls Church, VA
+archive/tables/moral-auth-world/namerica/us-east/dar-al-noor-manassas.txt	us.isna	38.6767	-77.3703	America/New_York	F+E S D A M I	daily	standard	fit	Dar Al Noor Islamic Community Center (Muslim Association of , Manassas area, VA
+archive/tables/moral-auth-world/namerica/us-east/icnvt-fairfax.txt	us.isna	38.8459	-77.3413	America/New_York	F+E S D A M I	daily	hanafi	fit	Islamic Center of Northern Virginia, Fairfax, VA
+archive/tables/moral-auth-world/namerica/us-east/al-iman-mosque-astoria.txt	us.isna	40.7684	-73.9116	America/New_York	F+E S D A M I	daily	standard	fit	Al-Iman Mosque, Astoria (Queens), NY
+archive/tables/moral-auth-world/namerica/us-east/tawheed-center-detroit.txt	us.isna	42.3436	-83.2227	America/New_York	F+E S D A M I	daily	standard	fit	Tawheed Center, Detroit (W Warren Ave), MI
+archive/tables/moral-auth-world/namerica/us-east/iagd-rochester-hills.txt	us.isna	42.6356	-83.1495	America/New_York	F+E S D A M I	daily	hanafi	fit	Islamic Association of Greater Detroit (IAGD), Rochester Hills, MI
+archive/tables/moral-auth-world/namerica/us-sw/east-cobb-marietta.txt	us.isna	33.97849	-84.48726	America/New_York	F+E S D A M I	daily	hanafi	fit	East Cobb Islamic Center (ECIC), Marietta GA (Atlanta metro)
+archive/tables/moral-auth-world/namerica/us-east/mcc-chicago.txt	us.isna	41.9603	-87.7291	America/Chicago	F+E S D A M I	daily	hanafi	fit	Muslim Community Center (MCC), Chicago (Elston Ave), IL
+archive/tables/moral-auth-world/namerica/us-sw/isgh-houston.txt	us.isna	29.7369	-95.4251	America/Chicago	F+E S D A M I	daily	standard	fit	Islamic Society of Greater Houston (ISGH) - shared timetable, Houston TX
+archive/tables/moral-auth-world/namerica/us-sw/islamic-center-irving.txt	us.isna	32.8427	-97.0107	America/Chicago	F+E S D A M I	daily	standard	fit	Islamic Center of Irving (ICI), Irving TX
+archive/tables/moral-auth-world/namerica/us-sw/plano-masjid-iacc.txt	us.isna	33.059901	-96.750624	America/Chicago	F+E S D A M I	daily	standard	fit	Plano Masjid (Islamic Association of Collin County), Plano TX
+archive/tables/moral-auth-world/namerica/us-sw/iioc-anaheim.txt	us.isna	33.8517	-117.8887	America/Los_Angeles	F+E S D A M I	daily	standard	fit	Islamic Institute of Orange County (IIOC), Anaheim CA
+archive/tables/moral-auth-world/namerica/split-7g/mca-santa-clara.txt	us.isna	37.3772	-121.9595	America/Los_Angeles	F+E S D A M I	daily	standard	fit	Muslim Community Association (MCA), Santa Clara CA
+archive/tables/moral-auth-world/namerica/us-east/masjid-manhattan.txt	us.isna	40.7081	-74.0050	America/New_York	F+E S D A M I	daily	standard	test	Masjid Manhattan, New York (Manhattan), NY
+archive/tables/moral-auth-world/namerica/us-east/86th-st-islamic-center-bay-ridge.txt	us.isna	40.6235	-74.0299	America/New_York	F+E S D A M I	daily	standard	test	86 St Islamic Center (Masjid Al-Rahman Bay Ridge), Bay Ridge (Brooklyn), NY
+archive/tables/moral-auth-world/namerica/us-east/jamaica-muslim-center.txt	us.isna	40.7126	-73.7957	America/New_York	F+E S D A M I	daily	hanafi	test	Jamaica Muslim Center, Jamaica (Queens), NY
+archive/tables/moral-auth-world/namerica/us-east/dar-us-salaam-college-park.txt	us.isna	39.0150	-76.9113	America/New_York	F+E S D A M I	daily	standard	test	Dar-us-Salaam, College Park, MD
+archive/tables/moral-auth-world/namerica/us-east/mcc-silver-spring.txt	us.isna	39.1054	-77.0034	America/New_York	F+E S D A M I	daily	hanafi	test	Muslim Community Center (MCC), Silver Spring, MD
+archive/tables/moral-auth-world/namerica/us-east/ams-dearborn.txt	us.isna	42.3043	-83.1436	America/New_York	F+E S D A M I	daily	standard	test	American Moslem Society (Masjid Dearborn), Dearborn, MI
+archive/tables/moral-auth-world/namerica/us-east/muslim-unity-center-bloomfield-hills.txt	us.isna	42.605	-83.3158	America/New_York	F+E S D A M I	daily	standard	test	Muslim Unity Center, Bloomfield Hills, MI
+archive/tables/moral-auth-world/namerica/us-east/masjid-al-taqwa-ann-arbor.txt	us.isna	42.2499	-83.6610	America/New_York	F+E S D A M I	daily	standard	test	Masjid At-Taqwa (Ann Arbor/Ypsilanti), Ann Arbor, MI
+archive/tables/moral-auth-world/namerica/us-east/mec-morton-grove.txt	us.isna	42.0381	-87.7708	America/Chicago	F+E S D A M I	daily	hanafi	test	Muslim Education Center (MEC), Morton Grove, IL
+archive/tables/moral-auth-world/namerica/us-east/mosque-foundation-bridgeview.txt	us.isna	41.7229	-87.8030	America/Chicago	F+E S D A M I	daily	hanafi	test	Mosque Foundation, Bridgeview, IL
+archive/tables/moral-auth-world/namerica/us-east/oppc-orland-park.txt	us.isna	41.5896	-87.8724	America/Chicago	F+E S D A M I	daily	hanafi	test	The Prayer Center of Orland Park, Orland Park, IL
+archive/tables/moral-auth-world/namerica/us-sw/maryam-sugar-land.txt	us.isna	29.59449	-95.683845	America/Chicago	F+E S D A M I	daily	standard	test	Maryam Islamic Center, Sugar Land TX
+archive/tables/moral-auth-world/namerica/split-7g/mishkah-houston.txt	us.isna	29.6779852	-95.3969742	America/Chicago	F+E S D A M I	daily	standard	test	Mishkah Masjid, Houston TX (2222 Mansard St)
+archive/tables/moral-auth-world/namerica/us-sw/iant-richardson.txt	us.isna	32.9378	-96.7309	America/Chicago	F+E S D A M I	daily	standard	test	Islamic Association of North Texas (IANT), Richardson TX
+archive/tables/moral-auth-world/namerica/split-7g/islamic-center-frisco.txt	us.isna	33.1725659	-96.8347209	America/Chicago	F+E S D A M I	daily	standard	test	Islamic Center of Frisco, Frisco TX
+archive/tables/moral-auth-world/namerica/us-sw/epic-plano.txt	us.isna	33.05	-96.7487	America/Chicago	F+E S D A M I	daily	standard	test	East Plano Islamic Center (EPIC Masjid), Plano TX
+archive/tables/moral-auth-world/namerica/split-7g/icoi-irvine.txt	us.isna	33.6965	-117.765	America/Los_Angeles	F+E S D A M I	daily	standard	test	Islamic Center of Irvine (ICOI), Irvine CA
+archive/tables/moral-auth-world/namerica/us-sw/isoc-garden-grove.txt	us.isna	33.7555	-117.9584	America/Los_Angeles	F+E S D A M I	daily	standard	test	Islamic Society of Orange County (ISOC), Garden Grove CA
+archive/tables/moral-auth-world/namerica/us-sw/icsgv-rowland-heights.txt	us.isna	33.9955	-117.884	America/Los_Angeles	F+E S D A M I	daily	standard	test	Islamic Center of San Gabriel Valley (ICSGV), Rowland Heights CA
+archive/tables/moral-auth-world/namerica/us-sw/king-fahad-culver-city.txt	us.isna	34.0119	-118.4102	America/Los_Angeles	F+E S D A M I	daily	standard	test	King Fahad Mosque (Islamic Foundation of Shaikh Ibn Taymiyah, Culver City CA
+archive/tables/moral-auth-world/namerica/us-sw/ocif-mission-viejo.txt	us.isna	33.6206	-117.6758	America/Los_Angeles	F+E S D A M I	daily	standard	test	Orange County Islamic Foundation (OCIF) - Mission Viejo Masj, Mission Viejo CA

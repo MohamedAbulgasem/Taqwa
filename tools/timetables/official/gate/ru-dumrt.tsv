@@ -1,0 +1,30 @@
+# Tatarstan, DUM RT: the open 2026 table (dumrt.ru, CC BY 4.0; see open/RU-DUMRT/ATTRIBUTION.md), each
+# locality checked at its unit's reference point (the app's city point).
+# - off_kzn.txt: the first column is the end of sahur, which is also the Fajr shown (F+E); its third
+#   column is the printed "zenith", the sun's transit, not a prayer time, so it is not checked.
+# - off_kzn_mosque.txt: only its Zuhr, the 12:00 the table prints; its first column is the "mosque
+#   Fajr" (sunrise − 91, "совершается в мечетях"), a congregation time the app never shows.
+# - dumrt-2026-<town>.txt: every column of the xlsx for the other 18 unit towns (end of sahur, mosque
+#   Fajr, sunrise, zenith, Zuhr, Asr, Maghrib, Isha); the mosque Fajr and the zenith are not checked.
+# Fit on Kazan, whose table the margins are fitted on; the 18 other towns held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+open/RU-DUMRT/off_kzn.txt	ru.dumrt/kazan			Europe/Moscow	F+E S - A M I	daily	hanafi	fit	Kazan 2026
+open/RU-DUMRT/off_kzn_mosque.txt	ru.dumrt/kazan			Europe/Moscow	- - D - - -	daily	-	fit	Kazan 2026, the printed Zuhr
+open/RU-DUMRT/dumrt-2026-naberezhnye-chelny.txt	ru.dumrt/naberezhnye-chelny			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Naberezhnye Chelny 2026, held out
+open/RU-DUMRT/dumrt-2026-nizhnekamsk.txt	ru.dumrt/nizhnekamsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Nizhnekamsk 2026, held out
+open/RU-DUMRT/dumrt-2026-almetyevsk.txt	ru.dumrt/almetyevsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Almetyevsk 2026, held out
+open/RU-DUMRT/dumrt-2026-zelenodolsk.txt	ru.dumrt/zelenodolsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Zelenodolsk 2026, held out
+open/RU-DUMRT/dumrt-2026-bugulma.txt	ru.dumrt/bugulma			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Bugulma 2026, held out
+open/RU-DUMRT/dumrt-2026-yelabuga.txt	ru.dumrt/yelabuga			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Yelabuga 2026, held out
+open/RU-DUMRT/dumrt-2026-leninogorsk.txt	ru.dumrt/leninogorsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Leninogorsk 2026, held out
+open/RU-DUMRT/dumrt-2026-chistopol.txt	ru.dumrt/chistopol			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Chistopol 2026, held out
+open/RU-DUMRT/dumrt-2026-zainsk.txt	ru.dumrt/zainsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Zainsk 2026, held out
+open/RU-DUMRT/dumrt-2026-aznakayevo.txt	ru.dumrt/aznakayevo			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Aznakayevo 2026, held out
+open/RU-DUMRT/dumrt-2026-nurlat.txt	ru.dumrt/nurlat			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Nurlat 2026, held out
+open/RU-DUMRT/dumrt-2026-bavly.txt	ru.dumrt/bavly			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Bavly 2026, held out
+open/RU-DUMRT/dumrt-2026-mendeleyevsk.txt	ru.dumrt/mendeleyevsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Mendeleyevsk 2026, held out
+open/RU-DUMRT/dumrt-2026-buinsk.txt	ru.dumrt/buinsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Buinsk 2026, held out
+open/RU-DUMRT/dumrt-2026-agryz.txt	ru.dumrt/agryz			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Agryz 2026, held out
+open/RU-DUMRT/dumrt-2026-arsk.txt	ru.dumrt/arsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Arsk 2026, held out
+open/RU-DUMRT/dumrt-2026-menzelinsk.txt	ru.dumrt/menzelinsk			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Menzelinsk 2026, held out
+open/RU-DUMRT/dumrt-2026-kukmor.txt	ru.dumrt/kukmor			Europe/Moscow	F+E - S - D A M I	daily	hanafi	test	Kukmor 2026, held out

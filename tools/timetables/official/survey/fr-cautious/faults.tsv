@@ -1,0 +1,8 @@
+# Cells of the fr.cautious survey's calendars left out as faulty, each with its reason: dates and columns only (F Fajr,
+# which is also the end of eating; S sunrise; D Dhuhr; A Asr; M Maghrib; I Isha).
+calendar	from	to	columns	reason
+bilal-marseille	2026-04-23	2026-04-23	M	an isolated misprint: 58 min off both neighbours (the same source as Institut Rissalat's)
+bilal-marseille	2026-08-23	2026-08-23	A	an isolated misprint: 10 min off both neighbours
+institut-rissalat-averroes-marseille-13001-france	2026-04-23	2026-04-23	M	an isolated misprint: 58 min off both neighbours
+institut-rissalat-averroes-marseille-13001-france	2026-08-23	2026-08-23	A	an isolated misprint: 10 min off both neighbours
+institut-rissalat-averroes-marseille-13001-france	2026-03-07	2026-03-07	I	an isolated misprint: an hour off both neighbours

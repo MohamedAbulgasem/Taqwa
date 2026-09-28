@@ -1,0 +1,9 @@
+# Oman, the Ministry of Awqaf and Religious Affairs (authorities-arab-world-turkiye.md): 18°/18°,
+# Dhuhr, Asr and Maghrib + 5, rounded up, the sun taken once a day at about 0h UT, 86 localities at
+# their own coordinates. Only Muscat's table is held: checked at the Muscat unit's point. The fast
+# begins at the printed Fajr (F+E). Standard Asr.
+# Split, forward and back in time: fit on Muscat's 2026 year; held out, its January and July 2021
+# and March and September 2031 (the 2021–2031 file holds those four months only).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-mena/gulfB/off-om-muscat-2026.txt	om.mara/muscat			Asia/Muscat	F+E S D A M I	daily	standard	fit	Muscat 2026
+archive/tables/moral-auth-mena/gulfB/off-om-muscat-2021-2031.txt	om.mara/muscat			Asia/Muscat	F+E S D A M I	daily	standard	test	Muscat, Jan and Jul 2021, Mar and Sep 2031

@@ -1,0 +1,15 @@
+# Sweden, Denmark, Finland and Iceland (se.cautious, ruling R64): no national authority. Members: Diyanet's European
+# method (subtask 7b's; the most followed) and Rabita Helsinki's family (se.rabita). Each member's tables where held,
+# at their own cities:
+# - Stockholm: Islamiska Förbundet's (IFIS, Diyanet Stockholm) December 2025-September 2026 pages and Diyanet's own
+#   Stockholm table (September 2026-December 2027), both the member tr.diyanet.europe; their Fajr is also their imsak.
+# - Copenhagen: Diyanet's Copenhagen table (tr.diyanet.europe).
+# - Helsinki: Rabita's 2026 calendar (se.rabita; 31 March left out, its Asr an hour off). Maghrib is not checked:
+#   the members' Maghribs spread beyond 2 min and the cap follows the most-followed member, Diyanet, whose table is
+#   not held at Helsinki.
+# Every row is held out (a cautious entry has no margins of its own).
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/europe/nordic/off-ifis-stockholm-all.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	IFIS Stockholm	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Stockholm	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/verify/dy-cph.txt	se.cautious	55.6761	12.5683	Europe/Copenhagen	F+E S D A M I	daily	standard	test	Diyanet Copenhagen	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.1699	24.9384	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita Helsinki	se.rabita

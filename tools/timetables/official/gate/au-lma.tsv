@@ -1,0 +1,6 @@
+# Australia: Lakemba Mosque (LMA), its 1448 AH table (June 2026 to June 2027, 349 days), printed for Lakemba (ruling
+# R30). No imsak: Fajr is also the start of the fast. Its Dhuhr and Asr move month by month (Asr from 12 min before
+# the Shafi'i Asr to 22 min after it), so its monthly offsets are fitted on the whole table and nothing is held out
+# (proof.md). The October 2026 captures (off-lakemba-oct, lakemba-nodst) repeat this table's rows and are not used.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/africaoceania/lma-1448.txt	au.lma/au.lma			Australia/Sydney	F+E S D A M I	daily	standard	fit	LMA 1448 AH

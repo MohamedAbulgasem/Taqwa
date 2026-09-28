@@ -1,0 +1,12 @@
+# Albania, KMSH: its Kalendari 2026 for Tirana, and Diyanet's own Tirana table, which KMSH follows
+# (restricted: archive only). The first column is the imsak, both the Fajr start and the end of
+# eating (F+E). First-shadow Asr.
+# - kmsh-tirana.txt (2026) at the Tirana unit's point: fit.
+# - dy-tirana.txt (Diyanet, 26 Sep 2026 – 31 Dec 2027), the same method, later in time: held out.
+# - KMSH's Korçë and Shkodër (every half month of 2026, Tirana plus the town's offsets), at the
+#   app's city points, beyond the Tirana unit: held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/europe/verify/kmsh-tirana.txt	al.kmsh/tirana			Europe/Tirane	F+E S D A M I	daily	standard	fit	Tirana 2026, KMSH
+archive/tables/moral-auth-world/europe/verify/dy-tirana.txt	al.kmsh/tirana			Europe/Tirane	F+E S D A M I	daily	standard	test	Tirana, Diyanet 2026-27
+archive/code/moral-auth-world/europe/balkans/kmsh-korce-2026.csv	al.kmsh	40.61861	20.78083	Europe/Tirane	F+E S D A M I	csv	standard	test	Korçë 2026, KMSH, half-monthly
+archive/code/moral-auth-world/europe/balkans/kmsh-shkoder-2026.csv	al.kmsh	42.06828	19.51258	Europe/Tirane	F+E S D A M I	csv	standard	test	Shkodër 2026, KMSH, half-monthly

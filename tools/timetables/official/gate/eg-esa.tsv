@@ -1,0 +1,43 @@
+# Egypt, the General Authority for Survey (ESA), as Dar al-Ifta republishes it (profiles-tested.md,
+# data-gulf-egypt): each town's table read from Dar al-Ifta's monthly GetPrayer (September 2026), its
+# Wayback month tables and ESA's own daily all-cities page (Wayback, 2024–2026). Only days from
+# 1 January 2025 on are read (format daily-from-2025): ESA changed its method between its December
+# 2024 and January 2025 captures. The fast begins at the printed Fajr (F+E). Standard Asr.
+# Each town is checked at its unit's point (Cairo's is ESA's own, fitted; the others the app's, or
+# the town centre for the five towns not in the app's list).
+# Split, across the country (the research's split B): the national margins are fitted on eleven
+# towns (Cairo, Alexandria, Aswan, Sallum, Halaib, Rafah, Luxor, Port Said, Edfu, Damietta, Suez)
+# and held out on eleven others and on Dahab, Nuweiba, Saint Catherine, Farafra and Shalatin.
+# Kharga, Ras Gharib and Taba, whose ESA points sit well off the town, keep margins of their own,
+# fitted on their own days (nothing held out there).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-gulf-egypt/off-eg-cairo.txt	eg.esa/cairo			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Cairo, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-alexandria.txt	eg.esa/alexandria			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Alexandria, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-aswan.txt	eg.esa/aswan			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Aswan, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-sallum.txt	eg.esa/sallum			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Sallum, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-halaib.txt	eg.esa/halaib			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Halaib, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-rafah.txt	eg.esa/rafah			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Rafah, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-luxor.txt	eg.esa/luxor			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Luxor, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-portsaid.txt	eg.esa/port-said			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Port Said, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-edfu.txt	eg.esa/edfu			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Edfu, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-damietta.txt	eg.esa/damietta			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Damietta, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-suez.txt	eg.esa/suez			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Suez, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-kharga.txt	eg.esa/kharga			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Kharga, 2025–2026 (its own margins)
+archive/tables/round/data-gulf-egypt/off-eg-rasgharib.txt	eg.esa/ras-gharib			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Ras Gharib, 2025–2026 (its own margins)
+archive/tables/round/data-gulf-egypt/off-eg-taba.txt	eg.esa/taba			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Taba, 2025–2026 (its own margins)
+archive/tables/round/data-gulf-egypt/off-eg-arish.txt	eg.esa/el-arish			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	El Arish, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-matruh.txt	eg.esa/marsa-matruh			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Marsa Matruh, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-sidibarrani.txt	eg.esa/sidi-barrani			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Sidi Barrani, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-siwa.txt	eg.esa/siwa			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Siwa, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-sharm.txt	eg.esa/sharm-el-sheikh			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Sharm El Sheikh, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-hurghada.txt	eg.esa/hurghada			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Hurghada, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-mut.txt	eg.esa/mut			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Mut, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-bawiti.txt	eg.esa/bawiti			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Bawiti, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-qusair.txt	eg.esa/quseir			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Quseir, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-tor.txt	eg.esa/el-tor			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	El Tor, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-dabaa.txt	eg.esa/el-dabaa			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	El Dabaa, 2025–2026
+archive/tables/round/data-gulf-egypt/off-eg-dahab.txt	eg.esa/dahab			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Dahab, 2025–2026 (the unit at its town centre)
+archive/tables/round/data-gulf-egypt/off-eg-nuweiba.txt	eg.esa/nuweiba			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Nuweiba, 2025–2026 (the unit at its town centre)
+archive/tables/round/data-gulf-egypt/off-eg-catherine.txt	eg.esa/saint-catherine			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Saint Catherine (about 1,600 m), 2025–2026 (the unit at its town centre)
+archive/tables/round/data-gulf-egypt/off-eg-farafra.txt	eg.esa/farafra			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Farafra, 2025–2026 (the unit at its town centre)
+archive/tables/round/data-gulf-egypt/off-eg-shalatin.txt	eg.esa/shalatin			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Shalatin, 2025–2026 (the unit at its town centre)

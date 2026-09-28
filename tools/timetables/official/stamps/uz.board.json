@@ -1,0 +1,129 @@
+{
+  "entry": "uz.board",
+  "class": "D (authority)",
+  "engineHash": "55b3f2cd084e2d0f",
+  "broken": 0,
+  "places": 1,
+  "first": "2024-07-31",
+  "last": "2026-09-26",
+  "placeDays": 19,
+  "heldOutDays": 0,
+  "ramadanDays": 0,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 20,
+      "early": 0,
+      "late": {
+        "0": 17,
+        "1": 3,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.85,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 20,
+      "lateEnd": 0,
+      "late": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3+": 19
+      },
+      "exactShare": 0.05,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry uz.board",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 20,
+      "early": 0,
+      "late": {
+        "0": 15,
+        "1": 2,
+        "2": 0,
+        "3+": 3
+      },
+      "exactShare": 0.75,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry uz.board",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 20,
+      "early": 0,
+      "late": {
+        "0": 18,
+        "1": 2,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.9,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 20,
+      "early": 0,
+      "late": {
+        "0": 6,
+        "1": 14,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.3,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 20,
+      "early": 0,
+      "late": {
+        "0": 3,
+        "1": 0,
+        "2": 7,
+        "3+": 10
+      },
+      "exactShare": 0.15,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry uz.board",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 0,
+    "ramadanDays": 0,
+    "events": {}
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["fajr", "asrHanafi", "maghrib"]
+    },
+    "entry uz.board: 4 min": {
+      "reason": "the margin also covers both the 15° and 15.5° Isha eras together (task 7f)",
+      "events": ["isha"]
+    },
+    "entry uz.board: 5 min": {
+      "reason": "the margin also covers the pre-Jul-2026 rule's earlier sunrise (task 7f); an early end is the safe side",
+      "events": ["sunrise"]
+    },
+    "entry uz.board: 6 min": {
+      "reason": "the margin also covers the pre-Jul-2026 rule's Dhuhr + 5 min next to the new rule's own (task 7f)",
+      "events": ["dhuhr"]
+    }
+  }
+}

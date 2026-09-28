@@ -1,0 +1,7 @@
+# Kyrgyzstan, kg.default: the Muftiate (muftiyat.kg), a likely majority with no API found; a
+# single region-wide homepage JSON fetch (25-26 Sep 2026) is the only archived evidence, for
+# Bishkek among 115 localities. Its "maghrib" field already carries the Muftiate's own + 7 min over
+# "sunset" (the plain astronomical sunset the same JSON prints). Fit only: one day, one place,
+# nothing held out (as RU-DUMRT's single-town table).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/centralasia/off_kg_bishkek.txt	kg.default	42.8746	74.5698	Asia/Bishkek	F S D A M I	daily	hanafi	fit	muftiyat.kg homepage JSON, Bishkek, 26 Sep 2026

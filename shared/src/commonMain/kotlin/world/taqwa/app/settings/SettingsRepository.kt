@@ -1,6 +1,7 @@
 package world.taqwa.app.settings
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +19,6 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.domain.WidgetBackground
-import world.taqwa.app.prayer.CalculationMethodDefaults
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
@@ -52,6 +52,60 @@ internal fun decodeMinuteAdjustments(raw: String?): Map<Prayer, Int> {
 }
 
 /**
+ * Same shape as [encodeMinuteAdjustments]/[decodeMinuteAdjustments] but the value is a registry
+ * entry id (e.g. `"MAGHRIB:other.turkey"`) rather than a minute count — see
+ * [PrayerSettings.confirmedAdjustments].
+ */
+internal fun encodeConfirmedAdjustments(confirmed: Map<Prayer, String>): String =
+    confirmed.entries.joinToString(",") { "${it.key.name}:${it.value}" }
+
+internal fun decodeConfirmedAdjustments(raw: String?): Map<Prayer, String> {
+    if (raw.isNullOrBlank()) return emptyMap()
+    return raw.split(",").mapNotNull { entry ->
+        val name = entry.substringBefore(':', missingDelimiterValue = "")
+        val prayer = Prayer.entries.firstOrNull { it.name == name } ?: return@mapNotNull null
+        val id = entry.substringAfter(':', missingDelimiterValue = "")
+        if (id.isBlank()) return@mapNotNull null
+        prayer to id
+    }.toMap()
+}
+
+/**
+ * Spec §8's method migration, run once per install by
+ * [SettingsRepository.migratePrayerSettingsIfNeeded] (called transactionally from every setter
+ * that touches a migrated field, and from the read path via
+ * [SettingsRepository.migrateIfNeeded]). A method the user never chose always becomes
+ * `"automatic"` — today's app writes a country
+ * default on every location save, so an unchosen stored method carries no signal at all. A method
+ * the user *did* choose becomes `"automatic"` only when it is the authority's own stand-in for the
+ * country the location was last resolved to (TEHRAN always, since it is being removed from the
+ * registry outright); anywhere else it becomes the matching Other entry, per R12's fixed mapping.
+ */
+internal fun migratedTimetable(
+    method: CalculationMethodId,
+    userChosen: Boolean,
+    countryCode: String?,
+): String {
+    if (!userChosen) return "automatic"
+    val country = countryCode?.uppercase()
+    return when (method) {
+        CalculationMethodId.TEHRAN -> "automatic"
+        CalculationMethodId.SINGAPORE ->
+            if (country in setOf("SG", "MY", "ID", "BN")) "automatic" else "other.singapore"
+        CalculationMethodId.KARACHI -> if (country == "BD") "automatic" else "other.karachi"
+        CalculationMethodId.TURKEY -> if (country == "TR") "automatic" else "other.turkey"
+        CalculationMethodId.UMM_AL_QURA -> if (country == "SA") "automatic" else "other.ummalqura"
+        CalculationMethodId.EGYPTIAN -> if (country == "EG") "automatic" else "other.egyptian"
+        CalculationMethodId.DUBAI -> if (country == "AE") "automatic" else "other.dubai"
+        CalculationMethodId.KUWAIT -> if (country == "KW") "automatic" else "other.kuwait"
+        CalculationMethodId.QATAR -> if (country == "QA") "automatic" else "other.qatar"
+        CalculationMethodId.ISNA -> if (country in setOf("US", "CA")) "automatic" else "other.isna"
+        CalculationMethodId.MUSLIM_WORLD_LEAGUE -> "other.mwl"
+        CalculationMethodId.MOONSIGHTING_COMMITTEE -> "other.moonsighting"
+    }
+}
+
+/**
  * The stored city's name as the header last printed it, with the interface language it was
  * resolved in. Kept together because neither half means anything alone: a name is only safe to
  * show a reader whose language is the one it was resolved for.
@@ -66,22 +120,39 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     val onboardingComplete: Flow<Boolean> =
         store.data.map { it[SettingsKeys.ONBOARDED] ?: false }
 
-    /** True once the user has picked a calculation method by hand. See [applyCountryDefaultMethod]. */
-    val methodUserChosen: Flow<Boolean> =
-        store.data.map { it[SettingsKeys.METHOD_USER_CHOSEN] ?: false }
-
     val prayerSettings: Flow<PrayerSettings> = store.data.map { p ->
+        val migrated = migrateIfNeeded(p)
+        val timetable = migrated[SettingsKeys.PRAYER_TIMETABLE] ?: "automatic"
+        // Ruling R70: a confirmation holds with the Automatic entry it was given under; one stored
+        // without it (before R70) counts as not given, so the choice waits to be confirmed again.
+        val confirmedUnder = migrated[SettingsKeys.PRAYER_TIMETABLE_CONFIRMED_UNDER]
+            .takeIf { migrated[SettingsKeys.PRAYER_TIMETABLE_CONFIRMED] == timetable }
         PrayerSettings(
-            method = p[SettingsKeys.METHOD].toEnumOr(CalculationMethodId.MUSLIM_WORLD_LEAGUE),
-            madhab = p[SettingsKeys.MADHAB].toEnumOr(AsrMadhab.STANDARD),
-            highLatitude = p[SettingsKeys.HIGH_LAT].toEnumOr(HighLatitudePreference.AUTOMATIC),
             // Clamped to the range the settings screen offers, like every other stored value here:
             // a preferences file from elsewhere must not be able to shift the date by a year.
-            hijriOffsetDays = (p[SettingsKeys.HIJRI_OFFSET] ?: 0).coerceIn(-1, 1),
-            showSunrise = p[SettingsKeys.SHOW_SUNRISE] ?: false,
-            minuteAdjustments = decodeMinuteAdjustments(p[SettingsKeys.MINUTE_ADJUSTMENTS]),
+            hijriOffsetDays = (migrated[SettingsKeys.HIJRI_OFFSET] ?: 0).coerceIn(-1, 1),
+            showSunrise = migrated[SettingsKeys.SHOW_SUNRISE] ?: false,
+            minuteAdjustments = decodeMinuteAdjustments(migrated[SettingsKeys.MINUTE_ADJUSTMENTS]),
+            timetable = timetable,
+            timetableConfirmed = confirmedUnder != null,
+            timetableConfirmedUnder = confirmedUnder,
+            school = migrated[SettingsKeys.PRAYER_SCHOOL] ?: "automatic",
+            showBothAsr = migrated[SettingsKeys.PRAYER_SHOW_BOTH_ASR] ?: false,
+            showWhereDiffer = migrated[SettingsKeys.PRAYER_SHOW_WHERE_DIFFER] ?: false,
+            saudiFajrLater = migrated[SettingsKeys.PRAYER_SAUDI_FAJR_LATER] ?: false,
+            confirmedAdjustments = decodeConfirmedAdjustments(migrated[SettingsKeys.PRAYER_ADJUST_CONFIRMED]),
+            // Spec §8: kept for Other methods, ignored (null) while Automatic.
+            legacyHighLatitude = if (timetable == "automatic") null
+            else migrated[SettingsKeys.HIGH_LAT].toEnumOr(HighLatitudePreference.AUTOMATIC),
         )
     }
+
+    /** Once-only, once-migrated flags for the Sunni and cautious-times cards (spec §2.1). */
+    val sunniCardSeen: Flow<Boolean> =
+        store.data.map { it[SettingsKeys.PRAYER_CARD_SUNNI_SEEN] ?: false }
+
+    val cautiousCardSeen: Flow<Boolean> =
+        store.data.map { it[SettingsKeys.PRAYER_CARD_CAUTIOUS_SEEN] ?: false }
 
     val notificationSettings: Flow<NotificationSettings> = store.data.map { p ->
         NotificationSettings(
@@ -113,8 +184,16 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             cityName = p[SettingsKeys.LOCATION_CITY],
             countryCode = p[SettingsKeys.LOCATION_COUNTRY],
             cityId = p[SettingsKeys.LOCATION_CITY_ID],
+            region = p[SettingsKeys.LOCATION_REGION],
         )
     }
+
+    /**
+     * Whether the one-time backfill of the stored location's city facts ([backfillLocation]) has
+     * run for it: a city the list gives no region leaves the location without one for good.
+     */
+    val locationBackfilled: Flow<Boolean> =
+        store.data.map { it[SettingsKeys.LOCATION_BACKFILLED] ?: false }
 
     /**
      * What the header printed last time, and in which language — null on a fresh install, after a
@@ -246,43 +325,203 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         store.edit { it[SettingsKeys.ONBOARDED] = value }
     }
 
-    suspend fun setPrayerSettings(settings: PrayerSettings) {
+    /** [PrayerSettings.hijriOffsetDays] alone, clamped to the range the screen offers. */
+    suspend fun setHijriOffsetDays(days: Int) {
         store.edit {
-            it[SettingsKeys.METHOD] = settings.method.name
-            it[SettingsKeys.MADHAB] = settings.madhab.name
-            it[SettingsKeys.HIGH_LAT] = settings.highLatitude.name
-            it[SettingsKeys.HIJRI_OFFSET] = settings.hijriOffsetDays
-            it[SettingsKeys.SHOW_SUNRISE] = settings.showSunrise
-            it[SettingsKeys.MINUTE_ADJUSTMENTS] = encodeMinuteAdjustments(settings.minuteAdjustments)
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.HIJRI_OFFSET] = days.coerceIn(-1, 1)
+        }
+    }
+
+    suspend fun setShowSunrise(value: Boolean) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.SHOW_SUNRISE] = value
+        }
+    }
+
+    /** [PrayerSettings.minuteAdjustments] alone — written by Manual adjustments. */
+    suspend fun setMinuteAdjustments(adjustments: Map<Prayer, Int>) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.MINUTE_ADJUSTMENTS] = encodeMinuteAdjustments(adjustments)
         }
     }
 
     /**
-     * Records that the method now stored was chosen by the user, not derived from their country.
-     * Written by the method picker alone — [setPrayerSettings] deliberately does not set it, since
-     * every other control on the prayer-times screen also writes the whole [PrayerSettings].
+     * The high-latitude rule for the Other methods ([PrayerSettings.legacyHighLatitude]), stored
+     * under the old picker's key, which is what the migration keeps for them (spec §8).
      */
-    suspend fun setMethodUserChosen() {
-        store.edit { it[SettingsKeys.METHOD_USER_CHOSEN] = true }
+    suspend fun setLegacyHighLatitude(preference: HighLatitudePreference) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.HIGH_LAT] = preference.name
+        }
     }
 
     /**
-     * Applies the calculation method a user in [countryCode] is most likely to expect, unless they
-     * have already chosen one themselves. Called wherever a location is persisted: an unchosen
-     * method should follow the user to Riyadh or Istanbul, but a deliberate choice must survive
-     * the move. Returns the method now in force.
+     * The spec §8 derivation, callable from *inside* any `store.edit` transform — every setter
+     * below calls this before writing its own field, and so does the read path's
+     * [migrateIfNeeded]. The schema check happens against `this` — the live `MutablePreferences`
+     * DataStore hands the transform, which always reflects every previously *committed* edit
+     * (`androidx.datastore.core.DataStore` serialises `edit` calls one at a time; nothing here
+     * runs against a stale snapshot) — so no matter which caller's `store.edit` is the one that
+     * actually gets serialised first, exactly one of them sees schema 0 and derives, and every
+     * other one (including a concurrent one) sees the schema already bumped and no-ops here,
+     * before going on to write its own field regardless. This is what review round 1 found
+     * missing: the previous version checked the schema *outside* the transaction (against a
+     * caller's own stale read) and had four setters merely stamp the schema without ever
+     * deriving, so a switch flipped before the first-ever [prayerSettings] read could permanently
+     * strand a user's real historic method as Automatic.
      */
-    suspend fun applyCountryDefaultMethod(countryCode: String?): CalculationMethodId {
-        val default = CalculationMethodDefaults.forCountry(countryCode)
-        var applied = default
-        store.edit { p ->
-            if (p[SettingsKeys.METHOD_USER_CHOSEN] == true) {
-                applied = p[SettingsKeys.METHOD].toEnumOr(CalculationMethodId.MUSLIM_WORLD_LEAGUE)
-            } else {
-                p[SettingsKeys.METHOD] = default.name
+    private fun MutablePreferences.migratePrayerSettingsIfNeeded() {
+        val schema = this[SettingsKeys.PRAYER_SETTINGS_SCHEMA] ?: 0
+        if (schema >= PRAYER_SETTINGS_SCHEMA_VERSION) return
+        val method = this[SettingsKeys.METHOD].toEnumOr(CalculationMethodId.MUSLIM_WORLD_LEAGUE)
+        val userChosen = this[SettingsKeys.METHOD_USER_CHOSEN] ?: false
+        val country = this[SettingsKeys.LOCATION_COUNTRY]
+        this[SettingsKeys.PRAYER_TIMETABLE] = migratedTimetable(method, userChosen, country)
+        val madhab = this[SettingsKeys.MADHAB].toEnumOr(AsrMadhab.STANDARD)
+        this[SettingsKeys.PRAYER_SCHOOL] = if (madhab == AsrMadhab.HANAFI) "hanafi" else "automatic"
+        // Negative adjustments (spec §8's "kept overrides that begin earlier") are left exactly
+        // where they were — `minute_adjustments` is untouched here — and `prayer_adjust_confirmed`
+        // is left unset, which decodeConfirmedAdjustments reads as empty: every prayer starts
+        // paused until re-confirmed in the new Settings screens, never silently pre-confirmed by
+        // the migration itself.
+        this[SettingsKeys.PRAYER_SETTINGS_SCHEMA] = PRAYER_SETTINGS_SCHEMA_VERSION
+    }
+
+    /** [PrayerSettings.timetable] alone — written by the Timetable row and Match my mosque. */
+    suspend fun setTimetable(timetable: String) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.PRAYER_TIMETABLE] = timetable
+        }
+    }
+
+    /**
+     * Records that the user confirmed following [entryId] (the Timetable screen's warning, spec
+     * §2.2) at a place whose Automatic entry is [automaticId] (ruling R70), or clears it with null.
+     * [PrayerSettings.timetableConfirmed] holds while the stored timetable is this entry, so
+     * choosing another one needs its own confirmation, and applies where Automatic is still
+     * [automaticId].
+     */
+    suspend fun setTimetableConfirmed(entryId: String?, automaticId: String?) {
+        store.edit { it.confirm(if (automaticId == null) null else entryId, automaticId) }
+    }
+
+    /**
+     * The Timetable screen's and Match my mosque's choice in one write (spec §2.2, ruling R52):
+     * [timetable], confirmed at a place whose Automatic entry is [confirmedUnder] when that is
+     * given (the earlier-than check found nothing, or the user chose "Follow it"; ruling R70),
+     * else with no confirmation, so no reader ever sees the new timetable under an old one's
+     * confirmation or the other way round.
+     */
+    suspend fun chooseTimetable(timetable: String, confirmedUnder: String?) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.PRAYER_TIMETABLE] = timetable
+            it.confirm(if (confirmedUnder == null) null else timetable, confirmedUnder)
+        }
+    }
+
+    /** A confirmation of [entryId] under the Automatic entry [automaticId], both or neither (ruling R70). */
+    private fun MutablePreferences.confirm(entryId: String?, automaticId: String?) {
+        migratePrayerSettingsIfNeeded()
+        if (entryId == null || automaticId == null) {
+            remove(SettingsKeys.PRAYER_TIMETABLE_CONFIRMED)
+            remove(SettingsKeys.PRAYER_TIMETABLE_CONFIRMED_UNDER)
+        } else {
+            this[SettingsKeys.PRAYER_TIMETABLE_CONFIRMED] = entryId
+            this[SettingsKeys.PRAYER_TIMETABLE_CONFIRMED_UNDER] = automaticId
+        }
+    }
+
+    /**
+     * One prayer's minute adjustment and, for an earlier one, the entry it was confirmed under
+     * (Manual adjustments' "Use −2 min", spec §2.2), in one write. [confirmedUnder] null leaves the
+     * prayer's confirmation as it was.
+     */
+    suspend fun setMinuteAdjustment(prayer: Prayer, minutes: Int, confirmedUnder: String?) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            val adjustments = decodeMinuteAdjustments(it[SettingsKeys.MINUTE_ADJUSTMENTS]).toMutableMap()
+            if (minutes == 0) adjustments.remove(prayer) else adjustments[prayer] = minutes
+            it[SettingsKeys.MINUTE_ADJUSTMENTS] = encodeMinuteAdjustments(adjustments)
+            if (confirmedUnder != null) {
+                val confirmed = decodeConfirmedAdjustments(it[SettingsKeys.PRAYER_ADJUST_CONFIRMED]) + (prayer to confirmedUnder)
+                it[SettingsKeys.PRAYER_ADJUST_CONFIRMED] = encodeConfirmedAdjustments(confirmed)
             }
         }
-        return applied
+    }
+
+    /** [PrayerSettings.school] alone — written by the Asr row. */
+    suspend fun setSchool(school: String) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.PRAYER_SCHOOL] = school
+        }
+    }
+
+    suspend fun setShowBothAsr(value: Boolean) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.PRAYER_SHOW_BOTH_ASR] = value
+        }
+    }
+
+    suspend fun setShowWhereDiffer(value: Boolean) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.PRAYER_SHOW_WHERE_DIFFER] = value
+        }
+    }
+
+    /** Saudi Arabia's "Pray Fajr 5 minutes later" (spec §2.2), off by default. */
+    suspend fun setSaudiFajrLater(value: Boolean) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.PRAYER_SAUDI_FAJR_LATER] = value
+        }
+    }
+
+    /** [PrayerSettings.confirmedAdjustments] alone — written by the manual-adjustment dialog. */
+    suspend fun setConfirmedAdjustments(confirmed: Map<Prayer, String>) {
+        store.edit {
+            it.migratePrayerSettingsIfNeeded()
+            it[SettingsKeys.PRAYER_ADJUST_CONFIRMED] = encodeConfirmedAdjustments(confirmed)
+        }
+    }
+
+    suspend fun setSunniCardSeen(value: Boolean) {
+        store.edit { it[SettingsKeys.PRAYER_CARD_SUNNI_SEEN] = value }
+    }
+
+    suspend fun setCautiousCardSeen(value: Boolean) {
+        store.edit { it[SettingsKeys.PRAYER_CARD_CAUTIOUS_SEEN] = value }
+    }
+
+    /**
+     * The read path's own entry into [migratePrayerSettingsIfNeeded]. [current] — the
+     * [Preferences] [prayerSettings]'s own `map` was just handed by `store.data` — is used only as
+     * a cheap outer guard to skip `store.edit` entirely on the overwhelmingly common
+     * already-migrated case; it can never cause a *missed* migration, because the schema key only
+     * ever counts up, so a stale "not yet migrated" reading here is always safe to act on (the
+     * inner, transactional check inside [migratePrayerSettingsIfNeeded] is what actually decides,
+     * against live state, whether to derive) and a stale "already migrated" reading can never
+     * happen. `DataStore.edit` returns the post-edit [Preferences], so on the rare occasion this
+     * does take the slow path, the same collection reads the migrated values immediately, with no
+     * extra round trip through `store.data`.
+     */
+    private suspend fun migrateIfNeeded(current: Preferences): Preferences {
+        val schema = current[SettingsKeys.PRAYER_SETTINGS_SCHEMA] ?: 0
+        if (schema >= PRAYER_SETTINGS_SCHEMA_VERSION) return current
+        return store.edit { it.migratePrayerSettingsIfNeeded() }
+    }
+
+    companion object {
+        /** Bump when [migratePrayerSettingsIfNeeded]'s derivation changes, so it reruns. */
+        internal const val PRAYER_SETTINGS_SCHEMA_VERSION = 3
     }
 
     suspend fun setNotificationSettings(settings: NotificationSettings) {
@@ -336,23 +575,47 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             // coordinates are no longer in.
             val cityId = location.cityId
             if (cityId == null) it.remove(SettingsKeys.LOCATION_CITY_ID) else it[SettingsKeys.LOCATION_CITY_ID] = cityId
+            val region = location.region
+            if (region == null) it.remove(SettingsKeys.LOCATION_REGION) else it[SettingsKeys.LOCATION_REGION] = region
+            it.remove(SettingsKeys.LOCATION_BACKFILLED)
         }
     }
 
     /**
-     * Writes only the city id, leaving every other part of the stored location alone. Used by the
-     * one-time migration of a location saved before ids existed: it read the location some time
-     * ago, and rewriting the whole thing would undo a fix or a city pick that landed in between.
+     * Fills in what a location stored by an older build lacks — its city id, country and region —
+     * from its city, leaving everything it already has alone. Only while the stored coordinates are
+     * still [location]'s: the lookup behind it takes a moment, and a city picked or a fix taken
+     * meanwhile must not be captioned with the old city.
+     *
+     * True when it wrote the country or the region, which can change the timetable the prayer
+     * engine resolves, so what was scheduled with the old times needs refreshing (ruling R53).
      */
-    suspend fun setLocationCityId(cityId: Int) {
-        store.edit { it[SettingsKeys.LOCATION_CITY_ID] = cityId }
+    suspend fun backfillLocation(location: GeoLocation, cityId: Int, countryCode: String, region: String): Boolean {
+        var timesMayChange = false
+        store.edit {
+            val unchanged = it[SettingsKeys.LOCATION_LAT] == location.latitude &&
+                it[SettingsKeys.LOCATION_LON] == location.longitude
+            if (unchanged) {
+                it[SettingsKeys.LOCATION_BACKFILLED] = true
+                if (it[SettingsKeys.LOCATION_CITY_ID] == null) it[SettingsKeys.LOCATION_CITY_ID] = cityId
+                if (it[SettingsKeys.LOCATION_COUNTRY] == null) {
+                    it[SettingsKeys.LOCATION_COUNTRY] = countryCode
+                    timesMayChange = true
+                }
+                if (it[SettingsKeys.LOCATION_REGION] == null && region.isNotEmpty()) {
+                    it[SettingsKeys.LOCATION_REGION] = region
+                    timesMayChange = true
+                }
+            }
+        }
+        return timesMayChange
     }
 
     /**
      * Records the name the header is now showing, for the language it was resolved in. Written by
      * the one place that resolves it — `TodayViewModel` — and only when the answer or the language
      * has actually changed: the Prayer screen ticks once a second and this must not be a write per
-     * tick. Leaves the rest of the location alone for the same reason [setLocationCityId] does.
+     * tick. Leaves the rest of the location alone for the same reason [backfillLocation] does.
      */
     suspend fun setResolvedCityName(resolved: ResolvedCityName) {
         store.edit {

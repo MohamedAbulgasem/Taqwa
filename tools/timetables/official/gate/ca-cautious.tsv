@@ -1,0 +1,16 @@
+# Canada outside Toronto, Montreal and Ottawa (ca.cautious): no majority. Members, each with its own summer rule
+# fitted on its tables: the Edmonton mosques' 18° family (ca.eighteen: Al Omari, Al Ansar, Al Farooq; Surrey Jamea in
+# BC, 18°/17°, one month), Edmonton's 15° family (ca.fifteen: Markaz Al Imam Malik) and Calgary Islamic Centre SW's 15°
+# with Isha = Maghrib + 90 (ca.isha90). Each table is its own mosque's (the research's index: slug, city, point); none
+# prints an imsak, so each Fajr is also the start of the fast. Maghrib is capped at the most-followed member's (the 18°
+# family's, Maghrib + 5 to 6 at Al Omari) and so is not checked at Calgary Islamic Centre SW and Imam Malik, whose
+# Maghribs are within minutes of sunset (shown up to 6 min after them). Faults left out in the Task 7g copies under
+# namerica/split-7g/ (proof.md). Not members (proof.md): IISC Calgary (10°/10°), Al-Medina and Assiddiq Edmonton,
+# Al-Rahmah Surrey (18°/15° Hanafi, one month), Burnaby's 2015 table and Eyup Sultan (Diyanet). Every row is held out.
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/namerica/canada/cal-calgary-islamic-centre-sw.txt	ca.cautious	51.0395	-114.1685	America/Edmonton	F+E S D A - I	daily	standard	test	Calgary Islamic Centre SW, Calgary (SW)	ca.isha90
+archive/tables/moral-auth-world/namerica/split-7g/edm-al-omari-masjid.txt	ca.cautious	53.6000	-113.4410	America/Edmonton	F+E S D A M I	daily	standard	test	Al Omari Masjid, Edmonton	ca.eighteen
+archive/tables/moral-auth-world/namerica/split-7g/edm-masjid-al-ansar.txt	ca.cautious	53.5606	-113.5300	America/Edmonton	F+E S D A M I	daily	standard	test	Masjid Al Ansar - EDMONTON, Edmonton	ca.eighteen
+archive/tables/moral-auth-world/namerica/split-7g/edm-masjid-al-farooq.txt	ca.cautious	53.4675	-113.4302	America/Edmonton	F+E S D A M I	daily	standard	test	Masjid Al Farooq (345 Woodvale Rd W), Edmonton (Mill Woods)	ca.eighteen
+archive/tables/moral-auth-world/namerica/canada/van-surrey-jamea-masjid-bcma.txt	ca.cautious	49.1342	-122.8787	America/Vancouver	F+E S D A M I	daily	standard	test	Surrey Jamea Masjid (BCMA Surrey-Delta branch), Surrey	ca.eighteen
+archive/tables/moral-auth-world/namerica/split-7g/edm-markaz-al-imam-malik.txt	ca.cautious	53.6080	-113.5260	America/Edmonton	F+E S D A - I	daily	standard	test	Markaz Al Imam Malik - Edmonton, Edmonton	ca.fifteen

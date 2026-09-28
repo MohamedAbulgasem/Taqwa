@@ -14,6 +14,14 @@ class JsonTest {
     }
 
     @Test
+    fun prettyJsonPutsEachMemberOnItsOwnLine() {
+        assertEquals(
+            "{\n  \"a\": 1,\n  \"b\": {\n    \"c\": [1, 2]\n  },\n  \"d\": {}\n}\n",
+            Json.pretty(linkedMapOf("a" to 1, "b" to linkedMapOf("c" to listOf(1, 2)), "d" to emptyMap<String, Any>())),
+        )
+    }
+
+    @Test
     fun stringsAreEscaped() {
         assertEquals("\"q\\\"b\\\\n\\nt\\t\\u0001\"", Json.write("q\"b\\n\nt\t\u0001"))
     }

@@ -1,0 +1,14 @@
+# Bosnia and Herzegovina, IZ BiH vaktija (vaktija.ba's data, 2026 with its 18°/16° method from
+# 1 Jan 2025; restricted: archive only). One morning column, "Zora (Sabah)", both the Fajr start and
+# the end of eating (F+E). First-shadow Asr.
+# - Sarajevo, Banja Luka and Bihać, each at its unit's point (the app's). Each unit follows its own
+#   table by curves and monthly offsets derived from it (Balkans.kt), so all three are fit; only the
+#   2-day live capture of 25 Sep and 1 Oct 2026 is held out.
+# - Not rows: vk-sarajevo-base.txt (the same Sarajevo year without summer time) and
+#   vk-sarajevo-base-old.txt (the 19°/17° method before 2025). No table is held for the towns south of
+#   Sarajevo (the recorded exception, Balkans.kt) or for any other town (the edge, class D).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/europe/verify/vk-sarajevo-2026.txt	ba.iz/sarajevo			Europe/Sarajevo	F+E S D A M I	daily	standard	fit	Sarajevo 2026
+archive/tables/moral-auth-world/europe/verify/vk-banjaluka-2026.txt	ba.iz/banja-luka			Europe/Sarajevo	F+E S D A M I	daily	standard	fit	Banja Luka 2026
+archive/tables/moral-auth-world/europe/verify/vk-bihac-2026.txt	ba.iz/bihac			Europe/Sarajevo	F+E S D A M I	daily	standard	fit	Bihać 2026
+archive/tables/off-vaktija-sarajevo.txt	ba.iz/sarajevo			Europe/Sarajevo	F+E S D A M I	daily	standard	test	Sarajevo, live 25 Sep and 1 Oct 2026

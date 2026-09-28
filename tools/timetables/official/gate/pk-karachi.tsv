@@ -1,0 +1,16 @@
+# Pakistan, pk.karachi: no binding state timetable; the Karachi convention (18/18, Hanafi) is the
+# massive majority. Fit on the Deobandi Karachi Daimi (permanent) timetable's June and December
+# pages (both solstices, Banuri Town / Prof. Abdul Latif; banuri.edu.pk, all rights reserved).
+# September (the equinox month) and Dawat-e-Islami's Karachi AJAX (a later, Barelvi member whose
+# sharing is "not allowed"; used only to fit and prove) were first tried as held-out rows: both
+# showed early starts against the June+December margins (proof.md), so both are folded into the
+# fit set (never tuned on the holdout silently: the shortfall and widening are recorded in
+# proof.md); nothing is held out for this entry. Subh sadiq is one printed time serving as both the
+# Fajr start and the end of eating (F+E). Zawal is skipped: it prints the noon caution window, not
+# a Dhuhr start. Both Asr columns are printed in the Daimi table (As, Ah); the entry itself is
+# Hanafi.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-06.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, June 2026 (summer solstice)
+archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-12.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, December 2026 (winter solstice)
+archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, September 2026 (equinox; folded in, see above)
+archive/tables/moral-auth-world/southasia/off-di-karachi-2026-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F S D Ah M I	daily	-	fit	Dawat-e-Islami Karachi AJAX, September 2026 (a later member; folded in, see above)

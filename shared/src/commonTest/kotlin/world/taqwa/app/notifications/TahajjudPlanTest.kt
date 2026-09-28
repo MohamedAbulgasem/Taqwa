@@ -2,6 +2,8 @@ package world.taqwa.app.notifications
 
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
@@ -99,6 +101,41 @@ class TahajjudPlanTest {
     @Test
     fun `turning notifications off turns it off too`() {
         assertTrue(planFor(on.copy(enabled = false)).isEmpty())
+    }
+
+    @Test
+    fun `it is never called before the night's Isha`() {
+        // Review M2: at Fairbanks the last third of a short night can begin before its Isha
+        // (four nights in 2026, in mid-April and late August). No night prayer is called before the
+        // obligatory one.
+        val fairbanks = GeoLocation(64.8378, -147.7164, "America/Anchorage", "Fairbanks", "US")
+        val zone = TimeZone.of(fairbanks.timeZoneId)
+        val planned = mutableMapOf<String, Instant>()
+        var start = LocalDate(2026, 1, 1)
+        while (start.year == 2026) {
+            val from = start.atStartOfDayIn(zone)
+            planFor(on, from = from, windowDays = 10, location = fairbanks)
+                .filter { it.kind == NotificationKind.TAHAJJUD }
+                .forEach { planned[it.id] = it.instant }
+            start = start.plus(10, DateTimeUnit.DAY)
+        }
+        var guarded = 0
+        var date = LocalDate(2026, 1, 2)
+        while (date.year == 2026) {
+            val evening = engine.timesFor(fairbanks, date.plus(-1, DateTimeUnit.DAY), PrayerSettings())
+            val fajr = engine.timesFor(fairbanks, date, PrayerSettings()).time(Prayer.FAJR)
+            val lastThird = NightThirds.lastThirdStart(evening.time(Prayer.MAGHRIB), fajr)
+            val entry = planned["TAHAJJUD-$date"]
+            if (entry != null) {
+                assertTrue(entry > evening.time(Prayer.ISHA), "$date: Tahajjud $entry before Isha ${evening.time(Prayer.ISHA)}")
+                assertEquals(lastThird, entry)
+            } else if (lastThird > evening.time(Prayer.MAGHRIB) && lastThird < fajr) {
+                assertTrue(lastThird <= evening.time(Prayer.ISHA), "$date: Tahajjud missing")
+                guarded++
+            }
+            date = date.plus(1, DateTimeUnit.DAY)
+        }
+        assertTrue(guarded > 0, "the last third begins before Isha on some night")
     }
 
     @Test

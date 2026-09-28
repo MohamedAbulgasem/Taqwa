@@ -1,0 +1,12 @@
+# Uzbekistan, uz.board: the Muslim Board (muslim.uz / islom.uz), documented in the site's own code
+# as adhan-js CUSTOM 15.5/15.5, Hanafi, Maghrib = sunset + 4 (islom.uz, "all rights reserved"; used
+# only to fit and prove). The live site's current rule (Wayback captures, 25-26 Sep 2026) was first
+# fit alone, held out on Wayback captures from Jul 2024 to Jul 2026 (the site's older rule: Isha 15
+# deg, Dhuhr + 5, Maghrib + 3) and failed on almost every event (proof.md): the two rules are not
+# margin-compatible, and it is not certain which one every cached client sees, or exactly when the
+# switch happened (2026-07-19 is the last capture on the old rule found; the new rule is confirmed
+# live by 2026-09-25). So both eras are folded into one fit set, and the entry's margins are the
+# ones never early against either; nothing is held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F S D A M I	daily	hanafi	fit	muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F S D A M I	daily	hanafi	fit	Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)

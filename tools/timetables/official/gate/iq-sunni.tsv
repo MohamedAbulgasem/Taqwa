@@ -1,0 +1,9 @@
+# Iraq, Sunni Endowment: the one dated official sample the research found for Baghdad. A third-party
+# site (waqtazan.com, which states it publishes the Sunni Endowment's table) was also normalised
+# (archive/tables/normalized-7e/iq-sunni-baghdad-waqtazan.txt) but is NOT gated here: checked against
+# it, the margins this one official date implies for Dhuhr/Asr/Maghrib/Isha are 6-27 min early on
+# every one of its 30 days -- a disagreement far too large and one-sided to be the same table's normal
+# variation, so it is not established as reliable evidence for this authority (see proof.md). Too thin
+# for any real split; the one row is fit, nothing held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/normalized-7e/iq-sunni-baghdad-official.txt	iq.sunni	33.341	44.401	Asia/Baghdad	F S D A M I	daily	standard	fit	Baghdad, one official date, 4 Dec 2025

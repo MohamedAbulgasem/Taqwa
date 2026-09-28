@@ -1,10 +1,11 @@
 package world.taqwa.timetables
 
 import kotlinx.datetime.LocalDate
-import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.Prayer
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Instant
 
@@ -20,7 +21,7 @@ class DocumentTest {
         featured: Set<String> = emptySet(),
     ) = City(
         slug = slug, id = 1, countryCode = country, region = "north-africa", latitude = lat, longitude = lon,
-        timeZone = zone, languages = names.keys.toList(), madhab = AsrMadhab.STANDARD, featured = featured,
+        timeZone = zone, languages = names.keys.toList(), featured = featured,
         names = names,
     )
 
@@ -51,7 +52,7 @@ class DocumentTest {
         val page = page(tripoli, "ar")
         assertEquals("0123456789", page["digits"])
         val times = page.list("days")[dayIndex(LocalDate(2026, 9, 13))]["times"] as List<*>
-        assertEquals(listOf("5:26", "13:04", "16:34", "19:16", "20:35"), listOf(0, 2, 3, 4, 5).map { times[it] })
+        assertEquals(listOf("5:25", "13:08", "16:36", "19:21", "20:42"), listOf(0, 2, 3, 4, 5).map { times[it] })
     }
 
     @Test
@@ -75,8 +76,11 @@ class DocumentTest {
         val page = page(tripoli, "en")
         assertEquals(listOf("Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"), page["prayers"])
         assertEquals("Asr in", (page["nextIn"] as List<*>)[3])
-        assertEquals("Muslim World League", page["method"])
+        // Libya's Awqaf, by the short name the app shows beside its ⓘ (Task 10).
+        assertEquals("Libyan Awqaf", page["method"])
         assertEquals("Standard", page["madhab"])
+        assertEquals("ly.awqaf", document.city(tripoli, friday)["method"])
+        assertEquals("STANDARD", document.city(tripoli, friday)["madhab"])
         assertEquals("109° · 2,916 km to Makkah", page["qiblaDetail"])
         assertEquals("Tripoli", page["city"])
         assertEquals("Libya", page["country"])
@@ -138,12 +142,19 @@ class DocumentTest {
 
     @Test
     fun theDocumentCarriesTheRegionOrderAndEachDaysLongDate() {
-        val document = document.build(listOf(tripoli), friday)
-        assertEquals(Regions.ORDER, document["regions"])
-        @Suppress("UNCHECKED_CAST")
-        val city = (document["cities"] as List<Map<String, Any?>>).single()
+        assertEquals(Regions.ORDER, document.build(emptyList(), friday)["regions"])
+        val city = document.city(tripoli, friday)
         assertEquals("25 September 2026", city.map("pages").map("en").list("days")[dayIndex(LocalDate(2026, 9, 25))]["date"])
         assertEquals(false, city.list("days")[0]["ramadanIsha"])
+        assertEquals(false, city.list("days")[0]["highLatitude"])
+        assertEquals(emptyList<String>(), city.map("pages").map("en")["highLatitude"])
+    }
+
+    @Test
+    fun aCityWhoseTimetableTheAppCanNameIsBuilt() {
+        // Every registry entry has a short name since Task 10, so no city is refused for want of one.
+        val built = document.build(listOf(tripoli), friday)
+        assertTrue((built["cities"] as List<*>).isNotEmpty(), built.toString())
     }
 
     @Test

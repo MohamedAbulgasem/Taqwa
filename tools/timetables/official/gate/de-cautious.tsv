@@ -1,0 +1,9 @@
+# Germany (de.cautious): Diyanet (DITIB, and IGMG's byte-identical Berlin calendar) and VIKZ's Fazilet,
+# which is Diyanet's times with Isha 10 min later; no VIKZ table is held. At Berlin: Diyanet's table (25
+# September-25 October 2026) and IGMG's (September-October 2026), both the member tr.diyanet.europe (subtask
+# 7b's method); their Fajr is also their imsak. Isha is checked against Diyanet's tables: the cautious Isha is
+# VIKZ's, 10 min after Diyanet's by its rule (no VIKZ table is held), recorded as an exception. Every row is held
+# out.
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/europe/split-7g/dy-berlin-2026.txt	de.cautious	52.52437	13.41053	Europe/Berlin	F+E S D A M I	daily	standard	test	Diyanet Berlin	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/split-7g/igmg-berlin-2026.txt	de.cautious	52.52437	13.41053	Europe/Berlin	F+E S D A M I	daily	standard	test	IGMG Berlin	tr.diyanet.europe

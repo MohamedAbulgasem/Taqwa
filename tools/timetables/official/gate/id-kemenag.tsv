@@ -1,0 +1,32 @@
+# Indonesia, Kemenag: 13 fitted kab/kota, myQuran's republication of bimasislam.kemenag.go.id
+# (api.myquran.com/v2/sholat/jadwal/<id>/<yyyy>/<mm>), the only year captured (2026). No second year
+# exists yet for a forward split, so each place's own 365-day file is split by date: fit on
+# Jan-Sep (273 days), test on Oct-Dec (92 days, forward in time) — a better split than "no split at
+# all", the only one profiles-tested.md ran. Checked at each kab/kota's own unit (lat/lon empty).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta-fit.txt	id.kemenag/1301			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Jakarta, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta-test.txt	id.kemenag/1301			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Jakarta, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bandaaceh-fit.txt	id.kemenag/0119			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Banda Aceh, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bandaaceh-test.txt	id.kemenag/0119			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Banda Aceh, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-makassar-fit.txt	id.kemenag/2622			Asia/Makassar	F S D A M I	daily	standard	fit	Kota Makassar, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-makassar-test.txt	id.kemenag/2622			Asia/Makassar	F S D A M I	daily	standard	test	Kota Makassar, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-denpasar-fit.txt	id.kemenag/1709			Asia/Makassar	F S D A M I	daily	standard	fit	Kota Denpasar, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-denpasar-test.txt	id.kemenag/1709			Asia/Makassar	F S D A M I	daily	standard	test	Kota Denpasar, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jayapura-fit.txt	id.kemenag/3329			Asia/Jayapura	F S D A M I	daily	standard	fit	Kota Jayapura, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jayapura-test.txt	id.kemenag/3329			Asia/Jayapura	F S D A M I	daily	standard	test	Kota Jayapura, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-malang-fit.txt	id.kemenag/1634			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Malang, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-malang-test.txt	id.kemenag/1634			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Malang, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bandung-fit.txt	id.kemenag/1219			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Bandung, Jan-Sep 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bandung-test.txt	id.kemenag/1219			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Bandung, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jayawijaya-fit.txt	id.kemenag/3308			Asia/Jayapura	F S D A M I	daily	standard	fit	Kab. Jayawijaya, Jan-Sep 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jayawijaya-test.txt	id.kemenag/3308			Asia/Jayapura	F S D A M I	daily	standard	test	Kab. Jayawijaya, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-batu-fit.txt	id.kemenag/1630			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Batu, Jan-Sep 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-batu-test.txt	id.kemenag/1630			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Batu, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bukittinggi-fit.txt	id.kemenag/0313			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Bukittinggi, Jan-Sep 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bukittinggi-test.txt	id.kemenag/0313			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Bukittinggi, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bogor-fit.txt	id.kemenag/1222			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Bogor, Jan-Sep 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bogor-test.txt	id.kemenag/1222			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Bogor, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-garut-fit.txt	id.kemenag/1208			Asia/Jakarta	F S D A M I	daily	standard	fit	Kab. Garut, Jan-Sep 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-garut-test.txt	id.kemenag/1208			Asia/Jakarta	F S D A M I	daily	standard	test	Kab. Garut, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-wonosobo-fit.txt	id.kemenag/1429			Asia/Jakarta	F S D A M I	daily	standard	fit	Kab. Wonosobo, Jan-Sep 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-wonosobo-test.txt	id.kemenag/1429			Asia/Jakarta	F S D A M I	daily	standard	test	Kab. Wonosobo, Oct-Dec 2026, highland

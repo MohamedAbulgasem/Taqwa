@@ -1,0 +1,13 @@
+# Kazakhstan, kz.qmdb: QMDB (muftyat.kz), documented in the site's own code as praytimes.js ISNA
+# 15/15, Hanafi, AngleBased high-latitude rule, sunrise -3/Dhuhr,Asr,Maghrib +3 below 48N and -5/+5
+# at or above it (terms not found; used only to fit and prove). First fit on Almaty (43.24N, below
+# 48) and Astana (51.13N, at or above 48, the ≥48N variant) over Jan-Jun 2026 alone, held out on
+# the same two cities' Jul-Dec 2026: high summer (Jul-Sep) showed a few 1-minute-early Fajr/Asr/
+# Isha days at both cities (proof.md), so Jul-Dec is folded into the fit set too (a season the
+# solstice-adjacent half did not cover); nothing is held out. The API's own "imsak" field (= Fajr +
+# 10, undocumented) is not used.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/centralasia/off_ala_h1.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F S D A M I	daily	hanafi	fit	Almaty, Jan-Jun 2026 (below 48N)
+archive/tables/moral-auth-world/centralasia/off_ala_h2.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F S D A M I	daily	hanafi	fit	Almaty, Jul-Dec 2026 (folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_ast_h1.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F S D A M I	daily	hanafi	fit	Astana, Jan-Jun 2026 (at/above 48N)
+archive/tables/moral-auth-world/centralasia/off_ast_h2.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F S D A M I	daily	hanafi	fit	Astana, Jul-Dec 2026 (folded in, see above)

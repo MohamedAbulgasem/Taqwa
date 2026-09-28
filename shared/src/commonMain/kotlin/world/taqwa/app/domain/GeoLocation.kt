@@ -10,6 +10,12 @@ package world.taqwa.app.domain
  * location stored by a build older than this one (resolved once from the coordinates and written
  * back — see `TodayViewModel.migrateCityId`) and for a fix whose coordinates match no bundled
  * city at all, which simply keeps showing [cityName].
+ *
+ * [region] is that city's first-level region (admin-1) as the bundled city list spells it
+ * ("Béjaïa", "Punjab"): where an authority's units are its regions, as Algeria's wilayas are, the
+ * prayer engine decides by it (ruling R32). Null for a location stored before regions were, until
+ * the Prayer screen backfills it from the nearest city; [countryCode] likewise, and the engine
+ * then reads the country from the zone.
  */
 data class GeoLocation(
     val latitude: Double,
@@ -18,4 +24,5 @@ data class GeoLocation(
     val cityName: String? = null,
     val countryCode: String? = null,
     val cityId: Int? = null,
+    val region: String? = null,
 )

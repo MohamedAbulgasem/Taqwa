@@ -23,15 +23,20 @@ import okio.Path
 import okio.Path.Companion.toPath
 import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.GeoLocation
-import world.taqwa.app.domain.PrayerSettings
+import world.taqwa.app.domain.HighLatitudePreference
+import world.taqwa.app.domain.Prayer
 import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.prayer.ClockIssue
 import world.taqwa.app.prayer.PrayerTimesEngine
+import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.KeyValueStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -124,6 +129,7 @@ class TodayViewModelTest {
 
     private val london = GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB")
     private val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
+    private val longyearbyen = GeoLocation(78.2232, 15.6267, "Europe/Oslo", "Longyearbyen", "SJ")
 
     /**
      * The view model is built with a fake location lookup and a frozen clock, so every case here
@@ -137,7 +143,7 @@ class TodayViewModelTest {
         hijriOffset: Int = 0,
     ): TodayViewModel {
         val repo = settings(store)
-        repo.setPrayerSettings(PrayerSettings(hijriOffsetDays = hijriOffset))
+        repo.setHijriOffsetDays(hijriOffset)
         val vm = TodayViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
@@ -188,23 +194,239 @@ class TodayViewModelTest {
         assertTrue(ready.qiblaDistanceKm in 4_600.0..4_800.0, "distance ${ready.qiblaDistanceKm}")
     }
 
+    private val oslo = GeoLocation(59.91273, 10.74609, "Europe/Oslo", "Oslo", "NO")
+    private val bergen = GeoLocation(60.39299, 5.32415, "Europe/Oslo", "Bergen", "NO")
+
     @Test
-    fun tromsoSurfacesTheHighLatitudeNote() = runTest {
-        val vm = todayViewModelForTromso("tromso-rule", Instant.parse("2026-06-21T12:00:00Z"))
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
-        assertTrue(ready.highLatitudeNote != null)
-        assertTrue(
-            ready.highLatitudeNote.contains("one-seventh") ||
-                ready.highLatitudeNote.contains("twilight"),
+    fun anOtherMethodsLegacyRuleMarksFajrAndIshaSetByRule() = runTest {
+        // Oslo in June: the 18° dawn never comes, so MWL's Fajr and Isha are set by the rule the
+        // user chose for it, and each row says so in its pill (spec §2.1).
+        val repo = settings("oslo-legacy-rule")
+        repo.setTimetable("other.mwl")
+        repo.setTimetableConfirmed("other.mwl", PrayerTimesEngine().automaticEntryId(oslo))
+        repo.setLegacyHighLatitude(HighLatitudePreference.SEVENTH_OF_NIGHT)
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { oslo },
+            now = { Instant.parse("2026-06-21T12:00:00Z") },
         )
+        vm.refresh()
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertTrue(Prayer.FAJR in ready.setByRule && Prayer.ISHA in ready.setByRule, "${ready.setByRule}")
+        assertFalse(ready.polar)
     }
 
     @Test
-    fun polarDaySaysEveryTimeWasSubstitutedNotJustFajrAndIsha() = runTest {
-        val vm = todayViewModelForTromso("tromso-polar", Instant.parse("2026-06-21T12:00:00Z"))
+    fun theEnginesOwnRuleMarksOnlyWhatItSet() = runTest {
+        // The engine's own rule at Bergen on the solstice: the real dawn comes, the nightfall that
+        // ends Isha's twilight does not, so Isha alone is set by rule. (Oslo itself follows IRN's and
+        // Diyanet's own calendars' curves since Task 7g, so nothing there is set by rule.)
+        val vm = viewModel("bergen-own-rule", bergen, Instant.parse("2026-06-21T12:00:00Z"))
         val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
-        assertTrue(ready.highLatitudeNote!!.contains("does not rise or set"))
-        assertTrue(ready.highLatitudeNote.contains("All times"))
+        assertEquals(setOf(Prayer.ISHA), ready.setByRule)
+    }
+
+    @Test
+    fun aPolarDayShowsItsLineAndNoPills() = runTest {
+        val vm = viewModel("longyearbyen-polar", longyearbyen, Instant.parse("2026-06-21T12:00:00Z"))
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertTrue(ready.polar)
+        assertTrue(ready.setByRule.isEmpty(), "${ready.setByRule}")
+    }
+
+    @Test
+    fun underTromsosMidnightSunIrnsMakkahTimeShowsItsEstimatesAsSetByRule() = runTest {
+        // Ruling R82: IRN's rule gives the whole day, so nothing follows the nearest latitude and no
+        // polar line says so; its Makkah-time estimates carry the pill, its noon Dhuhr does not.
+        val vm = todayViewModelForTromso("tromso-makkah-time", Instant.parse("2026-06-21T12:00:00Z"))
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertFalse(ready.polar)
+        assertTrue(ready.setByRule.containsAll(listOf(Prayer.FAJR, Prayer.MAGHRIB, Prayer.ISHA)), "${ready.setByRule}")
+        assertFalse(Prayer.DHUHR in ready.setByRule)
+    }
+
+    // -- Whose times and the one-time cards (spec §2.1) -----------------------------------------
+
+    private val toronto = GeoLocation(43.6532, -79.3832, "America/Toronto", "Toronto", "CA")
+    private val dammam = GeoLocation(26.4344, 50.1033, "Asia/Riyadh", "Dammam", "SA")
+    private val istanbul = GeoLocation(41.0082, 28.9784, "Europe/Istanbul", "Istanbul", "TR")
+
+    private fun TestScope.cardViewModel(
+        store: String,
+        location: GeoLocation,
+        session: OneTimeCardSession = OneTimeCardSession(),
+        repo: SettingsRepository = settings(store),
+    ) = TodayViewModel(
+        engine = PrayerTimesEngine(),
+        settings = repo,
+        locationOf = { location },
+        now = { Instant.parse("2026-10-01T18:00:00Z") },
+        cardSession = session,
+    )
+
+    @Test
+    fun istanbulNamesDiyanetAsAClassATimetableWithNoCard() = runTest {
+        val vm = cardViewModel("istanbul-whose", istanbul)
+        vm.refresh()
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertEquals(WhoseTimes("authority_diyanet", EntryClass.A), ready.whose)
+        assertNull(ready.oneTimeCard)
+    }
+
+    @Test
+    fun torontoIsCautiousAndShowsTheCautiousCardUntilItIsAnswered() = runTest {
+        val repo = settings("toronto-card")
+        val session = OneTimeCardSession()
+        val vm = cardViewModel("toronto-card", toronto, session, repo)
+        vm.refresh()
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertTrue(ready.whose.cautious)
+        assertEquals(OneTimeCard.CAUTIOUS, ready.oneTimeCard)
+        // Once-only: stored as seen as soon as it is shown, and still on screen this launch.
+        assertTrue(repo.cautiousCardSeen.first())
+        vm.refresh()
+        assertEquals(OneTimeCard.CAUTIOUS, (vm.state.value as TodayUiState.Ready).oneTimeCard)
+
+        vm.answerOneTimeCard(OneTimeCard.CAUTIOUS)
+        assertNull((vm.state.value as TodayUiState.Ready).oneTimeCard)
+        vm.refresh()
+        assertNull((vm.state.value as TodayUiState.Ready).oneTimeCard)
+    }
+
+    @Test
+    fun aCardShownButNeverAnsweredDoesNotComeBackNextLaunch() = runTest {
+        val repo = settings("toronto-unanswered")
+        val first = cardViewModel("toronto-unanswered", toronto, OneTimeCardSession(), repo)
+        first.refresh()
+        assertEquals(OneTimeCard.CAUTIOUS, (first.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard)
+        val nextLaunch = cardViewModel("toronto-unanswered", toronto, OneTimeCardSession(), repo)
+        nextLaunch.refresh()
+        assertNull((nextLaunch.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard)
+    }
+
+    @Test
+    fun dammamShowsTheSunniCard() = runTest {
+        val vm = cardViewModel("dammam-card", dammam)
+        vm.refresh()
+        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        assertEquals(OneTimeCard.SUNNI, ready.oneTimeCard)
+    }
+
+    @Test
+    fun anAnsweredCardKeepsTheOtherAwayUntilTheNextLaunch() = runTest {
+        // Answered in Toronto; a move to Dammam in the same launch shows nothing until the next.
+        val session = OneTimeCardSession()
+        val first = cardViewModel("launch-toronto", toronto, session)
+        first.refresh()
+        first.answerOneTimeCard(OneTimeCard.CAUTIOUS)
+        val second = cardViewModel("launch-dammam", dammam, session)
+        second.refresh()
+        assertNull((second.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard)
+        val nextLaunch = cardViewModel("launch-dammam-next", dammam, OneTimeCardSession())
+        nextLaunch.refresh()
+        assertEquals(
+            OneTimeCard.SUNNI,
+            (nextLaunch.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard,
+        )
+    }
+
+    // -- The other Asr and where timetables differ (spec §2.1) ----------------------------------
+
+    private suspend fun TestScope.readyAt(
+        store: String,
+        location: GeoLocation,
+        now: Instant,
+        configure: suspend (SettingsRepository) -> Unit,
+    ): TodayUiState.Ready {
+        val repo = settings(store)
+        configure(repo)
+        val vm = TodayViewModel(engine = PrayerTimesEngine(), settings = repo, locationOf = { location }, now = { now })
+        vm.refresh()
+        return vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+    }
+
+    @Test
+    fun showBothAsrTimesGivesTheOtherSchoolsAsr() = runTest {
+        // Istanbul follows Diyanet's Standard Asr, so the other is the Hanafi one, later.
+        val ready = readyAt("both-asr", istanbul, Instant.parse("2026-09-26T10:00:00Z")) { it.setShowBothAsr(true) }
+        val other = ready.otherAsr!!
+        assertEquals(AsrSchool.HANAFI, other.school)
+        assertTrue(other.instant > ready.today.rows.first { it.prayer == Prayer.ASR }.instant)
+    }
+
+    @Test
+    fun bothAsrTimesAreOffByDefault() = runTest {
+        assertNull(readyAt("both-asr-off", istanbul, Instant.parse("2026-09-26T10:00:00Z")) {}.otherAsr)
+    }
+
+    private val torontoMembers = setOf("authority_ift", "authority_iit", "authority_mac_toronto")
+
+    @Test
+    fun beforeTheEarliestIshaTheLineSaysWhenItBegins() = runTest {
+        // 19:30 in Toronto on 1 October: Maghrib is current; the earliest listed timetable begins
+        // Isha before the Isha Taqwa shows.
+        val ready = readyAt("differ-before", toronto, Instant.parse("2026-10-01T23:30:00Z")) { it.setShowWhereDiffer(true) }
+        val line = ready.differ!!
+        assertEquals(Prayer.MAGHRIB, line.under)
+        assertEquals(Prayer.ISHA, line.prayer)
+        assertTrue(line.memberNameKey in torontoMembers, line.memberNameKey)
+        assertTrue(line.memberStart < line.shownStart)
+        assertEquals(ready.today.next.instant, line.shownStart)
+        assertFalse(line.begun)
+    }
+
+    @Test
+    fun afterTheEarliestIshaTheLineSaysItHasBegun() = runTest {
+        // 20:20: the earliest member's Isha has begun, Taqwa's has not.
+        val ready = readyAt("differ-after", toronto, Instant.parse("2026-10-02T00:20:00Z")) { it.setShowWhereDiffer(true) }
+        val line = ready.differ!!
+        assertEquals(Prayer.ISHA, line.prayer)
+        assertTrue(line.begun)
+    }
+
+    @Test
+    fun whereTimetablesDifferIsOffByDefault() = runTest {
+        assertNull(readyAt("differ-off", toronto, Instant.parse("2026-10-01T23:30:00Z")) {}.differ)
+    }
+
+    @Test
+    fun aPlaceWithOneTimetableHasNoDifferLine() = runTest {
+        assertNull(readyAt("differ-istanbul", istanbul, Instant.parse("2026-09-26T15:30:00Z")) { it.setShowWhereDiffer(true) }.differ)
+    }
+
+    // -- The clock line (spec §3.9) -------------------------------------------------------------
+
+    private val casablanca = GeoLocation(33.5731, -7.5898, "Africa/Casablanca", "Casablanca", "MA")
+
+    private suspend fun TestScope.casablancaReady(store: String, phoneOffset: Int, setByHand: Boolean?): TodayUiState.Ready {
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = settings(store),
+            locationOf = { casablanca },
+            now = { Instant.parse("2026-09-26T21:02:00Z") },
+            clockSetByHand = { setByHand },
+            zoneOffsetSeconds = { _, _ -> phoneOffset },
+        )
+        vm.refresh()
+        return vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+    }
+
+    @Test
+    fun casablancaOnOldZoneDataWarnsThatTimesMayBeAnHourLate() = runTest {
+        val warning = casablancaReady("casa-stale", phoneOffset = 3600, setByHand = false).clockWarning!!
+        assertEquals(ClockIssue.STALE_ZONE_DATA, warning.issue)
+        assertFalse(warning.timesEarly)
+    }
+
+    @Test
+    fun casablancaOnAHandSetClockWarnsToo() = runTest {
+        assertEquals(ClockIssue.SET_BY_HAND, casablancaReady("casa-hand", phoneOffset = 0, setByHand = true).clockWarning?.issue)
+    }
+
+    @Test
+    fun casablancaOnCurrentZoneDataAndAutomaticTimeHasNoClockLine() = runTest {
+        assertNull(casablancaReady("casa-fine", phoneOffset = 0, setByHand = false).clockWarning)
     }
 
     @Test
@@ -225,7 +447,7 @@ class TodayViewModelTest {
 
     private suspend fun TestScope.probeFor(storeName: String): WidgetTrafficProbe {
         val repo = settings(storeName)
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         return WidgetTrafficProbe(london, repo)
     }
 
@@ -309,7 +531,7 @@ class TodayViewModelTest {
     @Test
     fun cancellingTheTickingJobStopsFurtherWidgetActivity() = runTest {
         val repo = settings("tick-while-active-cancel")
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         val store = CountingKeyValueStore()
         var refreshes = 0
         val base = Instant.parse("2026-09-06T14:30:00Z")
@@ -394,9 +616,10 @@ class TodayViewModelTest {
     /** Nothing is near anything: `nearest` returns null, which is the no-match case. */
     private fun noCities() = CityRepository(loadCsv = { "id,name,region,country,countryCode,lat,lon,tz" })
 
-    private val londonWithId = london.copy(cityId = 2643743)
+    // Saved by this build: the id, the country and the region all stored, so nothing is backfilled.
+    private val londonWithId = london.copy(cityId = 2643743, region = "England")
     private val cairoWithId =
-        GeoLocation(30.06263, 31.24967, "Africa/Cairo", "Cairo", "EG", cityId = 360630)
+        GeoLocation(30.06263, 31.24967, "Africa/Cairo", "Cairo", "EG", cityId = 360630, region = "Cairo Governorate")
 
     private suspend fun TestScope.readyFor(
         store: String,
@@ -405,7 +628,7 @@ class TodayViewModelTest {
         cityRepository: CityRepository = cities(),
     ): TodayUiState.Ready {
         val repo = settings(store)
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         val vm = TodayViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
@@ -449,7 +672,7 @@ class TodayViewModelTest {
     @Test
     fun aLocationSavedBeforeIdsExistedGetsItsIdFromItsCoordinates() = runTest {
         val repo = settings("city-id-migration")
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         repo.setLocation(london)
         assertNull(repo.location.first()!!.cityId, "the fixture must start without an id")
 
@@ -469,6 +692,105 @@ class TodayViewModelTest {
         assertEquals("لندن", ready.cityDisplayName)
     }
 
+    @Test
+    fun aLocationSavedWithoutItsCountryOrRegionGetsThemFromTheNearestCity() = runTest {
+        // What the prayer engine resolves the timetable by (spec §8, ruling R32).
+        val repo = settings("city-region-migration")
+        repo.setHijriOffsetDays(0)
+        repo.setLocation(londonWithId.copy(countryCode = null, region = null))
+        var refreshes = 0
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { repo.location.first() },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = cities(),
+            format = EnglishPlatformFormat,
+            onLocationBackfilled = { refreshes++ },
+        )
+        vm.refresh()
+        val stored = repo.location.first()!!
+        assertEquals("GB", stored.countryCode)
+        assertEquals("England", stored.region)
+        assertEquals(2643743, stored.cityId)
+        assertEquals("London", stored.cityName)
+        // The timetable can have changed: notifications and widgets are refreshed once (ruling R53).
+        assertEquals(1, refreshes)
+        repeat(5) { vm.refresh() }
+        assertEquals(1, refreshes)
+    }
+
+    @Test
+    fun aCityWithNoRegionIsBackfilledOnceNotOnEveryLaunch() = runTest {
+        // Singapore's row has no region: the backfill cannot complete the location, so without a
+        // done flag every launch would parse and scan the whole city list again.
+        val singapore = GeoLocation(1.28967, 103.85007, "Asia/Singapore", "Singapore", "SG", cityId = 1880252)
+        val csv = citiesCsv + "\n1880252,Singapore,,Singapore,SG,1.28967,103.85007,Asia/Singapore"
+        val repo = settings("city-no-region-once")
+        repo.setHijriOffsetDays(0)
+        repo.setLocation(singapore)
+        var parses = 0
+        val first = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { repo.location.first() },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = CityRepository(loadCsv = { parses++; csv }),
+            format = EnglishPlatformFormat,
+        )
+        first.refresh()
+        assertEquals(1, parses)
+        assertEquals(true, repo.locationBackfilled.first())
+        assertNull(repo.location.first()!!.region)
+        // The next launch: a fresh view model and a fresh city list, with the name already stored.
+        val next = viewModelFor(repo, repo.location.first()!!, noCityListAtAll(), EnglishPlatformFormat)
+        next.refresh()
+    }
+
+    @Test
+    fun aLocationThatNamesItsCityIsBackfilledFromThatCityNotTheNearest() = runTest {
+        // A neighbour sits exactly on the stored point; the location's own city is a little away.
+        val csv = """
+            id,name,region,country,countryCode,lat,lon,tz
+            2643743,London,England,United Kingdom,GB,51.50853,-0.12574,Europe/London
+            9999999,Southwark,Southwark Region,United Kingdom,GB,51.5074,-0.1278,Europe/London
+        """.trimIndent()
+        val repo = settings("city-by-id-backfill")
+        repo.setHijriOffsetDays(0)
+        repo.setLocation(london.copy(cityId = 2643743))
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { repo.location.first() },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = CityRepository(loadCsv = { csv }),
+            format = EnglishPlatformFormat,
+        )
+        vm.refresh()
+        assertEquals("England", repo.location.first()!!.region)
+    }
+
+    @Test
+    fun aBackfillOfTheIdAloneDoesNotRefreshTheNotifications() = runTest {
+        // An id changes the header's name, never the times.
+        val repo = settings("city-id-only-backfill")
+        repo.setHijriOffsetDays(0)
+        repo.setLocation(london.copy(region = "England"))
+        var refreshes = 0
+        val vm = TodayViewModel(
+            engine = PrayerTimesEngine(),
+            settings = repo,
+            locationOf = { repo.location.first() },
+            now = { Instant.parse("2026-09-06T14:30:00Z") },
+            cityRepository = cities(),
+            format = EnglishPlatformFormat,
+            onLocationBackfilled = { refreshes++ },
+        )
+        vm.refresh()
+        assertEquals(2643743, repo.location.first()!!.cityId)
+        assertEquals(0, refreshes)
+    }
+
     /**
      * A language change swaps the view model for one whose format reports the new language. A
      * fresh one starts at `Loading` and the Prayer screen emptied to its spinner until the first
@@ -480,7 +802,7 @@ class TodayViewModelTest {
         assertEquals("\u0644\u0646\u062F\u0646", outgoing.cityDisplayName)
 
         val repo = settings("city-language-swap-en")
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         val successor = TodayViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
@@ -507,7 +829,7 @@ class TodayViewModelTest {
     @Test
     fun theMigratedIdSurvivesTicksTakenBeforeTheStoreCatchesUp() = runTest {
         val repo = settings("city-id-migration-lag")
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         repo.setLocation(london)
         val vm = TodayViewModel(
             engine = PrayerTimesEngine(),
@@ -544,7 +866,7 @@ class TodayViewModelTest {
             loadNames = { language -> if (language == "ar") arabicNames else null },
         )
         val store = settings("city-name-stale")
-        store.setPrayerSettings(PrayerSettings())
+        store.setHijriOffsetDays(0)
         var current = londonWithId
         val vm = TodayViewModel(
             engine = PrayerTimesEngine(),
@@ -608,7 +930,7 @@ class TodayViewModelTest {
     @Test
     fun aColdStartWhoseStoredLanguageMatchesOpensOnTheTranslatedNameAndLooksNothingUp() = runTest {
         val repo = settings("city-name-remembered")
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         repo.setLocation(londonWithId, ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"))
 
         val vm = viewModelFor(repo, londonWithId, noCityListAtAll(), ArabicPlatformFormat())
@@ -636,7 +958,7 @@ class TodayViewModelTest {
     @Test
     fun aColdStartWhoseStoredLanguageDiffersFallsBackToTheSnapshotAndSwapsWhenTheLookupLands() = runTest {
         val repo = settings("city-name-remembered-other-language")
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         // Resolved when the phone was in English; the reader has since switched to Arabic.
         repo.setLocation(londonWithId, ResolvedCityName("London", "en-GB"))
 
@@ -674,9 +996,13 @@ class TodayViewModelTest {
         val writeOncePath = freshStorePath("city-name-write-once")
         val store = CountingDataStore(PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) { writeOncePath })
         val repo = SettingsRepository(store)
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         repo.setLocation(londonWithId)
         assertNull(repo.resolvedCityName.first(), "a location stored without a name must have none")
+        // Spends the Task 9 migration's own one-time write (spec §8) before writesBefore is taken,
+        // same as refresh()'s first-ever prayerSettings read would otherwise do on tick 1 — this
+        // test is about the per-tick cost, not that one-time cost.
+        repo.prayerSettings.first()
 
         val vm = viewModelFor(repo, londonWithId, cities(), ArabicPlatformFormat())
         val writesBefore = store.writes
@@ -697,7 +1023,7 @@ class TodayViewModelTest {
     @Test
     fun theIdBackfillIsAttemptedOnceARunNotOnceASecond() = runTest {
         val repo = settings("city-id-migration-once")
-        repo.setPrayerSettings(PrayerSettings())
+        repo.setHijriOffsetDays(0)
         repo.setLocation(london)
         val vm = TodayViewModel(
             engine = PrayerTimesEngine(),

@@ -1,9 +1,8 @@
 package world.taqwa.timetables
 
-import world.taqwa.app.domain.AsrMadhab
-import world.taqwa.app.domain.CalculationMethodId
-import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Element
@@ -11,7 +10,7 @@ import org.w3c.dom.Element
 /**
  * The app's own translations, read from its `composeResources/values/strings.xml` and the
  * per-language twins beside it (`values-ar`, `values-fr`, and so on), so a city
- * page names every prayer, method, Asr school and high-latitude rule in the words the app uses.
+ * page names every prayer, timetable and Asr school in the words the app uses.
  * English is `values`; Indonesian is `values-in` or `values-id` (the app keeps both as twins).
  */
 class AppStrings(private val resources: File) {
@@ -30,23 +29,17 @@ class AppStrings(private val resources: File) {
 
     fun prayer(language: String, prayer: Prayer): String = get(language, "prayer_${prayer.name.lowercase()}")
 
-    fun method(language: String, method: CalculationMethodId): String = get(language, METHOD_KEYS.getValue(method))
+    /**
+     * [entry]'s short name, by its [RegistryEntry.shortNameKey], or null while the app has no
+     * string for it yet (the authorities' names arrive with the app's own screens for them).
+     */
+    fun timetable(language: String, entry: RegistryEntry): String? = table(language)[entry.shortNameKey]
 
-    fun madhab(language: String, madhab: AsrMadhab): String = get(
+    fun school(language: String, school: AsrSchool): String = get(
         language,
-        when (madhab) {
-            AsrMadhab.STANDARD -> "madhab_standard"
-            AsrMadhab.HANAFI -> "madhab_hanafi"
-        },
-    )
-
-    fun highLatitude(language: String, rule: HighLatitudePreference): String = get(
-        language,
-        when (rule) {
-            HighLatitudePreference.AUTOMATIC -> "high_lat_automatic"
-            HighLatitudePreference.MIDDLE_OF_NIGHT -> "high_lat_middle"
-            HighLatitudePreference.SEVENTH_OF_NIGHT -> "high_lat_seventh"
-            HighLatitudePreference.TWILIGHT_ANGLE -> "high_lat_twilight"
+        when (school) {
+            AsrSchool.STANDARD -> "madhab_standard"
+            AsrSchool.HANAFI -> "madhab_hanafi"
         },
     )
 
@@ -77,21 +70,4 @@ class AppStrings(private val resources: File) {
         .replace("\\\"", "\"")
         .replace("\\n", "\n")
         .replace("\\@", "@")
-
-    private companion object {
-        val METHOD_KEYS = mapOf(
-            CalculationMethodId.MUSLIM_WORLD_LEAGUE to "method_muslim_world_league",
-            CalculationMethodId.ISNA to "method_isna",
-            CalculationMethodId.EGYPTIAN to "method_egyptian",
-            CalculationMethodId.UMM_AL_QURA to "method_umm_al_qura",
-            CalculationMethodId.KARACHI to "method_karachi",
-            CalculationMethodId.TEHRAN to "method_tehran",
-            CalculationMethodId.DUBAI to "method_dubai",
-            CalculationMethodId.KUWAIT to "method_kuwait",
-            CalculationMethodId.QATAR to "method_qatar",
-            CalculationMethodId.SINGAPORE to "method_singapore",
-            CalculationMethodId.TURKEY to "method_turkey",
-            CalculationMethodId.MOONSIGHTING_COMMITTEE to "method_moonsighting",
-        )
-    }
 }

@@ -1,0 +1,13 @@
+# Kuwait, the Ministry of Awqaf with the Al-Ojairi Scientific Centre (authorities-arab-world-turkiye.md,
+# profiles-tested.md data-gulf-egypt): no official table is publicly reachable. Checked at Kuwait
+# City's point in the app's list, the method's own (no units). The margins are these days' never-early
+# fit plus 60 s for the unknown reference point: fit, nothing held out.
+# - The ministry's times for 25 September 2026, one day (MEDIUM: read second-hand in the audit).
+# - Al-Anba's daily prayer box (a newspaper that names no source; secondary): 24 Wayback captures
+#   2019–2026, dated as the research corrected them (off-alanba-kuwait-fixed.txt): about half the
+#   pages print the day before the date they state (2023-01-18 and 01-19 print the same times), and
+#   those are moved back a day (one back two); dated as printed, a stale page is up to 4 min off.
+# The fast begins at the printed Fajr (F+E). Standard Asr.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/off-kuwait-25sep.txt	kw.awqaf	29.367	47.97429	Asia/Kuwait	F+E S D A M I	daily	standard	fit	Kuwait City, the ministry, 25 Sep 2026
+archive/tables/moral-auth-mena/gulfA/off-alanba-kuwait-fixed.txt	kw.awqaf	29.367	47.97429	Asia/Kuwait	F+E S D A M I	daily	standard	fit	Kuwait City, Al-Anba's box 2019–2026, stale pages redated (secondary)

@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import world.taqwa.app.city.CityRepository
-import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.notifications.RescheduleTrigger
@@ -80,8 +79,6 @@ class LocationRefresherTest {
         val stored = settings.location.first()
         assertEquals("Istanbul", stored?.cityName)
         assertEquals("Europe/Istanbul", stored?.timeZoneId)
-        // C4's country default rides along: the method follows the move unless the user chose one.
-        assertEquals(CalculationMethodId.TURKEY, settings.prayerSettings.first().method)
     }
 
     @Test

@@ -1,6 +1,7 @@
 package world.taqwa.app.widget
 
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.ObligatoryPrayers
@@ -10,6 +11,7 @@ import world.taqwa.app.domain.TodayState
 import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.PrayerNaming
+import world.taqwa.app.prayer.TimelineBuilder
 import kotlin.math.round
 import kotlin.time.Instant
 
@@ -30,8 +32,7 @@ object WidgetMirrorWriter {
     /**
      * Mirrors the exact copy `Res.string.today_next_in` renders for Today's ring ("%1$s in" /
      * "متبقٍ على %1$s") as plain Kotlin instead of a resource lookup — for the same reason
-     * [world.taqwa.app.i18n.HighLatitudeCopy] and
-     * [world.taqwa.app.notifications.LocalizedNotificationCopy] are: this runs from a plain,
+     * [world.taqwa.app.notifications.LocalizedNotificationCopy] is: this runs from a plain,
      * non-composable writer, which is what makes it testable without a resource loader. That
      * matters concretely here, not just stylistically — Compose Multiplatform's non-composable
      * `getString` calls `Resources.getSystem()` unconditionally on Android, which the local JVM
@@ -60,26 +61,43 @@ object WidgetMirrorWriter {
      */
     private const val RING_STEPS = 120
 
+    /** [ScheduledPrayer.dayIndex] of a start of yesterday's carried past midnight. */
+    private const val YESTERDAY = -1
+
     private fun quantisedRing(progress: Float): Float =
         round(progress.coerceIn(0f, 1f) * RING_STEPS) / RING_STEPS
 
     /**
      * Builds the snapshot [write] would store, without storing it. [days] is the day of writing
      * followed by the day after; their obligatory prayers become [WidgetSnapshot.schedule], the
-     * two-day horizon a widget can count across on its own.
+     * two-day horizon a widget can count across on its own. [yesterday], the day before the day of
+     * writing, adds the starts of its that fall after the day of writing's midnight and before its
+     * Fajr, at [ScheduledPrayer.dayIndex] −1 (spec §3.3: a high-latitude Isha after midnight), so
+     * every start of yesterday's still ahead is in the schedule and the widget's next prayer and
+     * countdown look across it.
      */
     fun snapshotOf(
         today: TodayState,
         timeZoneId: String,
         format: PlatformFormat,
         days: List<DayPrayerTimes> = emptyList(),
+        yesterday: DayPrayerTimes? = null,
     ): WidgetSnapshot {
         val zone = TimeZone.of(timeZoneId)
         fun clock(instant: Instant): String {
             val t = instant.toLocalDateTime(zone)
             return format.clockTime(t.hour, t.minute)
         }
-        val schedule = days.flatMapIndexed { dayIndex, day ->
+        val first = days.firstOrNull()
+        val carried = if (yesterday != null && first != null) {
+            val midnight = first.date.atStartOfDayIn(zone)
+            TimelineBuilder.yesterdaysStarts(yesterday, first)
+                .filter { it.instant >= midnight }
+                .map { ScheduledPrayer(it.prayer, it.instant.epochSeconds, clock(it.instant), YESTERDAY) }
+        } else {
+            emptyList()
+        }
+        val schedule = carried + days.flatMapIndexed { dayIndex, day ->
             ObligatoryPrayers.map { prayer ->
                 val instant = day.time(prayer)
                 ScheduledPrayer(prayer, instant.epochSeconds, clock(instant), dayIndex)
@@ -135,7 +153,8 @@ object WidgetMirrorWriter {
         timeZoneId: String,
         format: PlatformFormat,
         days: List<DayPrayerTimes> = emptyList(),
-    ): String = WidgetInputsMirror.serialize(snapshotOf(today, timeZoneId, format, days))
+        yesterday: DayPrayerTimes? = null,
+    ): String = WidgetInputsMirror.serialize(snapshotOf(today, timeZoneId, format, days, yesterday))
 
     fun write(
         store: KeyValueStore,
@@ -143,8 +162,9 @@ object WidgetMirrorWriter {
         timeZoneId: String,
         format: PlatformFormat,
         days: List<DayPrayerTimes> = emptyList(),
+        yesterday: DayPrayerTimes? = null,
     ) {
-        store.putString(WidgetInputsMirror.KEY, serializedSnapshot(today, timeZoneId, format, days))
+        store.putString(WidgetInputsMirror.KEY, serializedSnapshot(today, timeZoneId, format, days, yesterday))
     }
 
     fun read(store: KeyValueStore): WidgetSnapshot? = WidgetInputsMirror.read(store)

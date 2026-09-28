@@ -1,0 +1,41 @@
+# Türkiye, Diyanet: namazvakitleri.diyanet.gov.tr district (ilçe) tables, 396 days each
+# (25 Sep 2026 – 31 Dec 2027, the page's month and its 2027 year), restricted: archive only.
+# Its first column is İmsak, which is both the Fajr start and the end of eating (F+E).
+# - The 13 analysed districts, each at its unit's point (Diyanet's own published point for İstanbul,
+#   Ankara, Tekirdağ, Adana, Hatay and Karaman; the app's for the other seven). Fit on the research's
+#   five (İstanbul, Ankara, Tekirdağ, Edirne, Van); the other eight held out.
+# - Nine more districts at the app's city points, beyond every unit (the edge: Diyanet's method at
+#   the user's point, a minute later for starts and earlier for sunrise), held out: Antalya, Bursa,
+#   Diyarbakır, Gaziantep, İzmir and Konya (their merkez tables) and İstanbul's own Çatalca, Şile
+#   and Silivri, whose tables are Diyanet's for those ilçe.
+# - other.turkey (the old picker's method: Diyanet's algorithm at any point, plain safe rounding) at
+#   Diyanet's six published points, held out: never fitted.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-diyanet-kemenag/off-diyanet-istanbul.txt	tr.diyanet/9541			Europe/Istanbul	F+E S D A M I	daily	standard	fit	İstanbul 9541
+archive/tables/round/data-diyanet-kemenag/off-diyanet-ankara.txt	tr.diyanet/9206			Europe/Istanbul	F+E S D A M I	daily	standard	fit	Ankara 9206
+archive/tables/round/data-diyanet-kemenag/off-diyanet-tekirdag.txt	tr.diyanet/9879			Europe/Istanbul	F+E S D A M I	daily	standard	fit	Tekirdağ 9879
+archive/tables/round/data-diyanet-kemenag/off-diyanet-edirne.txt	tr.diyanet/9419			Europe/Istanbul	F+E S D A M I	daily	standard	fit	Edirne 9419
+archive/tables/round/data-diyanet-kemenag/off-diyanet-van.txt	tr.diyanet/9930			Europe/Istanbul	F+E S D A M I	daily	standard	fit	Van 9930
+archive/tables/round/data-diyanet-kemenag/off-diyanet-adana.txt	tr.diyanet/9146			Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana 9146
+archive/tables/round/data-diyanet-kemenag/off-diyanet-hatay.txt	tr.diyanet/20089			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay 20089
+archive/tables/round/data-diyanet-kemenag/off-diyanet-karaman.txt	tr.diyanet/9587			Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman 9587
+archive/tables/round/data-diyanet-kemenag/off-diyanet-canakkale.txt	tr.diyanet/9352			Europe/Istanbul	F+E S D A M I	daily	standard	test	Çanakkale 9352
+archive/tables/round/data-diyanet-kemenag/off-diyanet-hakkari.txt	tr.diyanet/9507			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hakkâri 9507
+archive/tables/round/data-diyanet-kemenag/off-diyanet-kars.txt	tr.diyanet/9594			Europe/Istanbul	F+E S D A M I	daily	standard	test	Kars 9594
+archive/tables/round/data-diyanet-kemenag/off-diyanet-igdir.txt	tr.diyanet/9522			Europe/Istanbul	F+E S D A M I	daily	standard	test	Iğdır 9522
+archive/tables/round/data-diyanet-kemenag/off-diyanet-erzurum.txt	tr.diyanet/9451			Europe/Istanbul	F+E S D A M I	daily	standard	test	Erzurum 9451
+archive/tables/moral-auth-mena/turkiye/tt-9225.txt	tr.diyanet	36.90812	30.69556	Europe/Istanbul	F+E S D A M I	daily	standard	test	Antalya 9225, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9335.txt	tr.diyanet	40.19559	29.06013	Europe/Istanbul	F+E S D A M I	daily	standard	test	Bursa 9335, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9402.txt	tr.diyanet	37.91363	40.21721	Europe/Istanbul	F+E S D A M I	daily	standard	test	Diyarbakır 9402, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9479.txt	tr.diyanet	37.05944	37.3825	Europe/Istanbul	F+E S D A M I	daily	standard	test	Gaziantep 9479, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9560.txt	tr.diyanet	38.41273	27.13838	Europe/Istanbul	F+E S D A M I	daily	standard	test	İzmir 9560, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9676.txt	tr.diyanet	37.87135	32.48464	Europe/Istanbul	F+E S D A M I	daily	standard	test	Konya 9676, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9538.txt	tr.diyanet	41.14073	28.45967	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Çatalca 9538, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9547.txt	tr.diyanet	41.17891	29.61085	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Şile 9547, at the app's point (edge)
+archive/tables/moral-auth-mena/turkiye/tt-9548.txt	tr.diyanet	41.07393	28.24644	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Silivri 9548, at the app's point (edge)
+archive/tables/round/data-diyanet-kemenag/off-diyanet-istanbul.txt	other.turkey	41.012	28.974	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul at Diyanet's point
+archive/tables/round/data-diyanet-kemenag/off-diyanet-ankara.txt	other.turkey	39.938	32.848	Europe/Istanbul	F+E S D A M I	daily	standard	test	Ankara at Diyanet's point
+archive/tables/round/data-diyanet-kemenag/off-diyanet-tekirdag.txt	other.turkey	40.973	27.511	Europe/Istanbul	F+E S D A M I	daily	standard	test	Tekirdağ at Diyanet's point
+archive/tables/round/data-diyanet-kemenag/off-diyanet-adana.txt	other.turkey	36.987	35.326	Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana at Diyanet's point
+archive/tables/round/data-diyanet-kemenag/off-diyanet-hatay.txt	other.turkey	36.2	36.153	Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay at Diyanet's point
+archive/tables/round/data-diyanet-kemenag/off-diyanet-karaman.txt	other.turkey	37.181	33.214	Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman at Diyanet's point

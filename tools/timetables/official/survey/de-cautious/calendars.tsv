@@ -1,0 +1,16 @@
+# Germany (de.cautious): the 12 Mawaqit calendars research-mawaqit spot-checked (ruling R87), each at its
+# own mosque's point. The tables are restricted: they live in the local archive only (official/README.md). `use` is
+# "yes", or why the whole calendar is left out.
+path	name	lat	lon	columns	use
+archive/tables/de-mawaqit/darul-aman-berlin-berlin-10365-germany.txt	Darul Aman Lichtenberg - BERLIN	52.529084574912	13.492946208262	F S D A M I	yes
+archive/tables/de-mawaqit/pak-muhammad-jamia-masjid-berlin-10551-germany-3.txt	Pak Muhammad Jamia Masjid - BERLIN	52.5300242	13.3337962	F S D A M I	yes
+archive/tables/de-mawaqit/ditib-du-hochfeld-muradiye-moschee-duisburg-47053-germany.txt	DITIB DU-Hochfeld Muradiye Moschee - DUISBURG	51.4218255	6.7495837	F S D A M I	yes
+archive/tables/de-mawaqit/masjid-indonesia-frankfurt-frankfurt-60599-germany.txt	Masjid Indonesia - FRANKFURT	50.1033708	8.7023687	F S D A M I	yes
+archive/tables/de-mawaqit/pak-muhammadi-moschee-frankfurt-am-main-60599-germany.txt	PAK MUHAMMADI MOSCHEE Frankfurt	50.0988984	8.7103698	F S D A M I	yes
+archive/tables/de-mawaqit/licht-des-islam-moschee-gelsenkirchen-45879-germany.txt	Licht des Islam Moschee	51.502905883373	7.1003758907318	F S D A M I	left out whole: Isha frozen at one clock time in six months of the year, before Maghrib in June and July (research-mawaqit section 1)
+archive/tables/de-mawaqit/pak-islami-majlis-e-v-hamburg-20099-germany.txt	PAK ISLAMI MAJLIS E.V - HAMBURG	53.5549362	10.0142499	F S D A M I	yes
+archive/tables/de-mawaqit/ditib-zentralmoschee-koln-50823-koln-germany.txt	DİTİB-Zentralmoschee Köln	50.94610539576	6.9281297922134	F S D A M I	yes
+archive/tables/de-mawaqit/hilaly-koln.txt	تقي الدين الهلالي Taqiyyudin Al Hilaly - Köln	50.9323152	6.9963435	F S D A M I	yes
+archive/tables/de-mawaqit/eyup-sultan-camii-munich-81673-germany.txt	IGMG Ortsv. München Berg-am-Laim e.V.	48.130194328991	11.615743339062	F S D A M I	yes
+archive/tables/de-mawaqit/rahma-moschee-msjd-lrhm-munich-81549-germany.txt	Rahma Moschee - مسجد الرحمة - Munich	48.1017	11.5989	F S D A M I	yes
+archive/tables/de-mawaqit/licht-aus-dem-osten-verein-nordhorn-48529-germany-1.txt	Licht aus dem Osten Verein - NORDHORN	52.437	7.07	F S D A M I	yes

@@ -1,19 +1,28 @@
 package world.taqwa.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.audio.SoundPreviewPlayer
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
@@ -22,28 +31,41 @@ import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.recitation.RecitationState
 import world.taqwa.app.feature.recitation.reciterName
+import world.taqwa.app.feature.settings.AboutTimesScreen
 import world.taqwa.app.feature.settings.AppearanceSettingsScreen
 import world.taqwa.app.feature.settings.AttributionScreen
 import world.taqwa.app.feature.settings.CitySearchScreen
 import world.taqwa.app.feature.settings.HighLatitudePickerScreen
 import world.taqwa.app.feature.settings.LocationSettingsScreen
+import world.taqwa.app.feature.settings.AdjustmentsState
 import world.taqwa.app.feature.settings.ManualAdjustmentsScreen
-import world.taqwa.app.feature.settings.MethodPickerScreen
 import world.taqwa.app.feature.settings.NotificationSettingsScreen
 import world.taqwa.app.feature.settings.PrayerTimesSettingsScreen
 import world.taqwa.app.feature.settings.SettingsRootScreen
+import world.taqwa.app.feature.settings.TimetableCheck
+import world.taqwa.app.feature.settings.TimetableChooser
+import world.taqwa.app.feature.settings.TimetableStatus
+import world.taqwa.app.feature.settings.highLatitudeNeedsCheck
+import world.taqwa.app.feature.settings.timetableName
+import world.taqwa.app.feature.settings.aboutTimesUiState
 import world.taqwa.app.feature.settings.themeDisplayName
-import world.taqwa.app.i18n.methodDisplayName
+import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.timetableDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
+import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.notifications.openAppNotificationSettings
 import world.taqwa.app.notifications.requestExactAlarmAccess
+import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.settings.SettingsRepository
+import world.taqwa.app.widget.WidgetMirrorRefresher
+import world.taqwa.app.widget.refreshWidgets
 
 @Composable
 internal fun SettingsRootRoute(
@@ -69,7 +91,7 @@ internal fun SettingsRootRoute(
         } else {
             cityDisplayName ?: stringResource(Res.string.today_current_location)
         },
-        methodName = methodDisplayName(prayerSettings.method),
+        methodName = timetableDisplayName(prayerSettings.timetable),
         themeName = themeDisplayName(themeMode),
         notificationSettings = notificationSettings,
         onOpenLocation = { navigator.push(Screen.LocationSettings) },
@@ -159,64 +181,177 @@ internal fun NotificationSettingsRoute(
     )
 }
 
+/**
+ * After anything that changes the prayer times outside the Prayer screen (ruling R53): a
+ * prayer-settings write, a new location (a city picked, a GPS fix), or the one-time backfill of a
+ * location's country or region. The armed
+ * notifications and the widgets' mirror move to the new times at once, as a language change moves
+ * them to the new words (`LanguageChangeReschedule`), instead of at the next foreground, alarm or
+ * top-up.
+ *
+ * One at a time, like the reschedule inside it: two quick taps refresh in the order they were
+ * made, so the mirror the widgets end on is the latest settings'. The engine's days, cold after a
+ * change, are computed off the main thread (the coordinator plans on the default dispatcher, and
+ * so does the mirror here).
+ */
+internal suspend fun refreshForNewTimes(container: AppContainer, settings: SettingsRepository, format: PlatformFormat) {
+    newTimesRefresh.withLock {
+        container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+        withContext(Dispatchers.Default) {
+            WidgetMirrorRefresher.refresh(settings, container.prayerTimesEngine, format = format)
+        }
+        refreshWidgets()
+    }
+}
+
+private val newTimesRefresh = Mutex()
+
+/*
+ * Every prayer-time control writes its own field through the repository on touch (spec §2.2's
+ * per-field writes), then refreshes what was armed with the old times ([refreshForNewTimes]).
+ */
+
 @Composable
 internal fun PrayerTimesSettingsRoute(
     prayerSettingsState: State<PrayerSettings>,
+    locationState: State<GeoLocation?>,
+    cityDisplayNameState: State<String?>,
     today: LocalDate,
-    write: (PrayerSettings) -> Unit,
-    navigator: Navigator,
-) {
-    val prayerSettings by prayerSettingsState
-    PrayerTimesSettingsScreen(
-        settings = prayerSettings,
-        today = today,
-        onChange = write,
-        onBack = { navigator.pop() },
-        onOpenMethodPicker = { navigator.push(Screen.MethodPicker) },
-        onOpenHighLatitudePicker = { navigator.push(Screen.HighLatitudePicker) },
-        onOpenManualAdjustments = { navigator.push(Screen.ManualAdjustments) },
-    )
-}
-
-@Composable
-internal fun MethodPickerRoute(
-    prayerSettingsState: State<PrayerSettings>,
     scope: CoroutineScope,
     settings: SettingsRepository,
-    navigator: Navigator,
-) {
-    val prayerSettings by prayerSettingsState
-    MethodPickerScreen(
-        current = prayerSettings.method,
-        onPick = {
-            scope.launch {
-                settings.setPrayerSettings(prayerSettings.copy(method = it))
-                // Latches the choice so a later relocation cannot overwrite it.
-                settings.setMethodUserChosen()
-            }
-            navigator.pop()
-        },
-        onBack = { navigator.pop() },
-    )
-}
-
-@Composable
-internal fun HighLatitudePickerRoute(
-    prayerSettingsState: State<PrayerSettings>,
-    locationState: State<GeoLocation?>,
-    write: (PrayerSettings) -> Unit,
+    container: AppContainer,
     navigator: Navigator,
 ) {
     val prayerSettings by prayerSettingsState
     val location by locationState
-    HighLatitudePickerScreen(
-        current = prayerSettings.highLatitude,
-        latitude = location?.latitude ?: 0.0,
-        onPick = {
-            write(prayerSettings.copy(highLatitude = it))
-            navigator.pop()
-        },
+    val cityDisplayName by cityDisplayNameState
+    val format = LocalPlatformFormat.current
+    fun write(change: suspend () -> Unit) {
+        scope.launch {
+            change()
+            refreshForNewTimes(container, settings, format)
+        }
+    }
+    // Today's day as the Prayer screen has it (the engine's cache already holds it): what applies
+    // here, whether the stored timetable does, and what is paused.
+    val day = location?.let { container.prayerTimesEngine.dayFor(it, today, prayerSettings) }
+    PrayerTimesSettingsScreen(
+        settings = prayerSettings,
+        status = day?.let { TimetableStatus.of(prayerSettings, it) },
+        adjustmentsPaused = day?.pausedAdjustments?.isNotEmpty() == true,
+        placeName = cityDisplayName.takeIf { location != null },
+        today = today,
+        onSchool = { write { settings.setSchool(it) } },
+        onHijriOffset = { write { settings.setHijriOffsetDays(it) } },
+        onShowSunrise = { write { settings.setShowSunrise(it) } },
+        onShowBothAsr = { write { settings.setShowBothAsr(it) } },
+        onShowWhereDiffer = { write { settings.setShowWhereDiffer(it) } },
+        onSaudiFajrLater = { write { settings.setSaudiFajrLater(it) } },
         onBack = { navigator.pop() },
+        // A timetable belongs to a place: without one, the way forward is to set it.
+        onOpenTimetable = { navigator.push(if (location != null) Screen.Timetable else Screen.LocationSettings) },
+        onOpenHighLatitudePicker = { navigator.push(Screen.HighLatitudePicker) },
+        onOpenManualAdjustments = { navigator.push(Screen.ManualAdjustments) },
+        onOpenAboutTimes = { navigator.push(Screen.AboutTimes) },
+    )
+}
+
+/**
+ * "About these times" (spec §2.3, task 11): filled from the never-early engine's own resolution
+ * for the stored location, exactly as the Prayer screen and Manual adjustments read it
+ * ([world.taqwa.app.prayer.PrayerTimesEngine.dayFor]). Pops back if the location disappears from
+ * under it (the location screen's own "clear" — unreachable today, but [ManualAdjustmentsScreen]
+ * guards the same way for when it becomes one).
+ */
+@Composable
+internal fun AboutTimesRoute(
+    prayerSettingsState: State<PrayerSettings>,
+    locationState: State<GeoLocation?>,
+    cityDisplayNameState: State<String?>,
+    today: LocalDate,
+    container: AppContainer,
+    navigator: Navigator,
+) {
+    val prayerSettings by prayerSettingsState
+    val location by locationState
+    val cityDisplayName by cityDisplayNameState
+    val loc = location
+    if (loc == null) {
+        LaunchedEffect(Unit) { navigator.pop() }
+        return
+    }
+    val zone = remember(loc.timeZoneId) { TimeZone.of(loc.timeZoneId) }
+    val place = remember(loc) { PrayerTimesEngine.placeOf(loc) }
+    val engineDay = remember(loc, prayerSettings, today) {
+        container.prayerTimesEngine.dayFor(loc, today, prayerSettings)
+    }
+    val state = remember(engineDay, place, today) {
+        aboutTimesUiState(engineDay, place, today, prayerSettings.hijriOffsetDays)
+    }
+    AboutTimesScreen(
+        state = state,
+        engineDay = engineDay,
+        place = place,
+        cityLabel = cityDisplayName ?: stringResource(Res.string.today_current_location),
+        zone = zone,
+        onBack = { navigator.pop() },
+        onMatchMyMosque = { navigator.push(Screen.MatchMyMosque) },
+    )
+}
+
+/**
+ * The high-latitude rule of an Other method (spec §2.2). A confirmed one is checked again with the
+ * new rule before it is written (review I1): never earlier than Automatic, the rule is written and
+ * the confirmation kept; earlier, the warning names the new figures, "Follow it" writes the rule
+ * and confirms, and the other button changes nothing.
+ */
+@Composable
+internal fun HighLatitudePickerRoute(
+    prayerSettingsState: State<PrayerSettings>,
+    locationState: State<GeoLocation?>,
+    today: LocalDate,
+    scope: CoroutineScope,
+    settings: SettingsRepository,
+    container: AppContainer,
+    navigator: Navigator,
+) {
+    val prayerSettings by prayerSettingsState
+    val location by locationState
+    val format = LocalPlatformFormat.current
+    val screenScope = rememberCoroutineScope()
+    val current = prayerSettings.legacyHighLatitude ?: HighLatitudePreference.AUTOMATIC
+    val timetable = prayerSettings.timetable
+    val chooser = remember(location, prayerSettings, today) {
+        TimetableChooser(
+            checkScope = screenScope,
+            check = { rule, onProgress ->
+                val here = location ?: return@TimetableChooser TimetableCheck.NotHere
+                val withRule = prayerSettings.copy(legacyHighLatitude = HighLatitudePreference.valueOf(rule))
+                checkTimetable(container.prayerTimesEngine, here, withRule, today, timetable, onProgress)
+            },
+            nameKeyOf = { Registry.byId(timetable)?.shortNameKey ?: timetable },
+            apply = { rule, confirmed ->
+                scope.launch {
+                    settings.setLegacyHighLatitude(HighLatitudePreference.valueOf(rule))
+                    if (confirmed) {
+                        settings.setTimetableConfirmed(timetable, location?.let { container.prayerTimesEngine.automaticEntryId(it) })
+                    }
+                    refreshForNewTimes(container, settings, format)
+                }
+                navigator.pop()
+            },
+            needsCheck = { location != null && highLatitudeNeedsCheck(prayerSettings) },
+        )
+    }
+    HighLatitudePickerScreen(
+        current = current,
+        onPick = { picked -> if (picked == current) navigator.pop() else chooser.choose(picked.name) },
+        onBack = { navigator.pop() },
+        checking = chooser.checking?.progress,
+        warning = chooser.warning,
+        automatic = location?.let { container.prayerTimesEngine.dayFor(it, today, prayerSettings).resolution.timetableName() },
+        onKeep = chooser::keep,
+        onFollow = chooser::follow,
     )
 }
 
@@ -226,17 +361,26 @@ internal fun ManualAdjustmentsRoute(
     locationState: State<GeoLocation?>,
     container: AppContainer,
     today: LocalDate,
-    write: (PrayerSettings) -> Unit,
+    scope: CoroutineScope,
+    settings: SettingsRepository,
     navigator: Navigator,
 ) {
     val prayerSettings by prayerSettingsState
     val location by locationState
+    val format = LocalPlatformFormat.current
+    val state = location?.let { AdjustmentsState.of(container.prayerTimesEngine.dayFor(it, today, prayerSettings), prayerSettings, TimeZone.of(it.timeZoneId)) }
+        ?: AdjustmentsState()
     ManualAdjustmentsScreen(
-        settings = prayerSettings,
-        location = location,
-        engine = container.prayerTimesEngine,
-        today = today,
-        onChange = write,
+        adjustments = prayerSettings.minuteAdjustments,
+        confirmed = prayerSettings.confirmedAdjustments,
+        state = state,
+        onSet = { prayer, minutes, confirmUnder ->
+            scope.launch {
+                settings.setMinuteAdjustment(prayer, minutes, confirmUnder)
+                refreshForNewTimes(container, settings, format)
+            }
+        },
+        onOpenTimetable = { navigator.push(Screen.Timetable) },
         onBack = { navigator.pop() },
     )
 }
@@ -278,6 +422,7 @@ internal fun CitySearchRoute(
 ) {
     val backStack by backStackState
     var onboardingStep by onboardingStepState
+    val format = LocalPlatformFormat.current
     CitySearchScreen(
         cityRepository = container.cityRepository,
         onPick = { city ->
@@ -295,7 +440,10 @@ internal fun CitySearchRoute(
                 // toggle off reversible: back out of the search and the
                 // stored source — and so the toggle — is untouched.
                 settings.setLocationSource(LocationSource.MANUAL)
-                settings.applyCountryDefaultMethod(picked.countryCode)
+                // A location save no longer writes a calculation method (spec §8): the
+                // never-early engine's Automatic timetable already follows the picked city.
+                // The alarms and widgets armed for the old city follow it now (ruling R53).
+                refreshForNewTimes(container, settings, format)
             }
             // Reached from onboarding, a successful pick answers the location
             // question, so the flow continues rather than re-asking it.

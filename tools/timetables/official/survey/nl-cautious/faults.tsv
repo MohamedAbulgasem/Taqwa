@@ -1,0 +1,4 @@
+# Cells of the nl.cautious survey's calendars left out as faulty, each with its reason: dates and columns only (F Fajr,
+# which is also the end of eating; S sunrise; D Dhuhr; A Asr; M Maghrib; I Isha).
+calendar	from	to	columns	reason
+pakistan-islamic-centre-rotterdam-rotterdam-3014-ed-netherlands	2026-10-22	2026-10-26	F S D A M I	rows an hour off their neighbours in the days before the October clock change (Maghrib 65 min after sunset, Fajr and Asr the same)

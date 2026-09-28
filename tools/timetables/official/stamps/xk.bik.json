@@ -1,0 +1,235 @@
+{
+  "entry": "xk.bik",
+  "class": "D (authority)",
+  "engineHash": "d4961b271ce75341",
+  "broken": 0,
+  "places": 2,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "placeDays": 730,
+  "heldOutDays": 365,
+  "ramadanDays": 60,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 248,
+        "1": 117,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6795,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 730,
+      "lateEnd": 0,
+      "late": {
+        "0": 44,
+        "1": 279,
+        "2": 223,
+        "3+": 184
+      },
+      "exactShare": 0.0603,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry xk.bik",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 730,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 234,
+        "2": 379,
+        "3+": 117
+      },
+      "exactShare": 0,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry xk.bik",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 730,
+      "early": 0,
+      "late": {
+        "0": 4,
+        "1": 247,
+        "2": 248,
+        "3+": 231
+      },
+      "exactShare": 0.0055,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry xk.bik",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 730,
+      "early": 0,
+      "late": {
+        "0": 4,
+        "1": 329,
+        "2": 326,
+        "3+": 71
+      },
+      "exactShare": 0.0055,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry xk.bik",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 730,
+      "early": 0,
+      "late": {
+        "0": 307,
+        "1": 307,
+        "2": 101,
+        "3+": 15
+      },
+      "exactShare": 0.4205,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 730,
+      "lateEnd": 0,
+      "late": {
+        "0": 33,
+        "1": 462,
+        "2": 192,
+        "3+": 43
+      },
+      "exactShare": 0.0452,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 365,
+    "ramadanDays": 30,
+    "events": {
+      "sunrise": {
+        "checked": 365,
+        "lateEnd": 0,
+        "late": {
+          "0": 44,
+          "1": 134,
+          "2": 103,
+          "3+": 84
+        },
+        "exactShare": 0.1205,
+        "worstLate": 4,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry xk.bik",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 75,
+          "2": 214,
+          "3+": 76
+        },
+        "exactShare": 0,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "entry xk.bik",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 4,
+          "1": 100,
+          "2": 131,
+          "3+": 130
+        },
+        "exactShare": 0.011,
+        "worstLate": 6,
+        "lateLimit": 6,
+        "lateLimitFrom": "entry xk.bik",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 4,
+          "1": 116,
+          "2": 195,
+          "3+": 50
+        },
+        "exactShare": 0.011,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry xk.bik",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 71,
+          "1": 178,
+          "2": 101,
+          "3+": 15
+        },
+        "exactShare": 0.1945,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 365,
+        "lateEnd": 0,
+        "late": {
+          "0": 33,
+          "1": 178,
+          "2": 111,
+          "3+": 43
+        },
+        "exactShare": 0.0904,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["fajr", "isha", "endOfEating"]
+    },
+    "entry xk.bik: 4 min": {
+      "reason": "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.",
+      "events": ["dhuhr"]
+    },
+    "entry xk.bik: 5 min": {
+      "reason": "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.",
+      "events": ["sunrise", "maghrib"]
+    },
+    "entry xk.bik: 6 min": {
+      "reason": "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.",
+      "events": ["asrStandard"]
+    }
+  }
+}

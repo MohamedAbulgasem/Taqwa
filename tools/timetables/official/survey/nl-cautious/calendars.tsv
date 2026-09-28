@@ -1,0 +1,16 @@
+# the Netherlands (nl.cautious): the 12 Mawaqit calendars research-mawaqit spot-checked (ruling R87), each at its
+# own mosque's point. The tables are restricted: they live in the local archive only (official/README.md). `use` is
+# "yes", or why the whole calendar is left out.
+path	name	lat	lon	columns	use
+archive/tables/nl-mawaqit/el-tawheed-amsterdam-amsterdam-1053sv-netherlands.txt	El Tawheed Moskee	52.367740394659	4.8639526963234	F S D A M I	yes
+archive/tables/nl-mawaqit/markaz-quba-amsterdam-1021kd-netherlands.txt	Markaz Quba - AMSTERDAM	52.385649878171	4.9229623004794	F S D A M I	yes
+archive/tables/nl-mawaqit/mevlana-moskee-amsterdam-1061-da-netherlands.txt	Mevlana Moskee - AMSTERDAM	52.3772035	4.8408045	F S D A M I	yes
+archive/tables/nl-mawaqit/ayasofya-moskee-den-haag-den-haag-2571-hc-netherlands.txt	Ayasofya Moskee	52.069579	4.2872559	F S D A M I	yes
+archive/tables/nl-mawaqit/hicret-cami-den-haag-2572-ht-netherlands.txt	Hicret Cami - DEN HAAG	52.0641869	4.2950942	F S D A M I	yes
+archive/tables/nl-mawaqit/moskee-el-islam-msjd-lslm-den-haag-2525-cg-netherlands.txt	Moskee El Islam | مسجد الإسلام - DEN HAAG	52.0669209	4.2992307	F S D A M I	yes
+archive/tables/nl-mawaqit/moskee-arrahmaan-eindhoven-eindhoven-5612bt-netherlands.txt	Moskee Arrahmaan Eindhoven	51.450047194441	5.4750886559486	F S D A M I	yes
+archive/tables/nl-mawaqit/ar-abou-bakr-rotterdam.txt	Moskee Aboubakr  -  مسجد ابوبكر - Rotterdam	51.9327372	4.4853475	F S D A M I	yes
+archive/tables/nl-mawaqit/iskenderpasa-camii-igmg-rotterdam-3037-bk-netherlands.txt	Iskenderpasa camii IGMG - ROTTERDAM	51.932624180354	4.4693815429222	F S D A M I	yes
+archive/tables/nl-mawaqit/pakistan-islamic-centre-rotterdam-rotterdam-3014-ed-netherlands.txt	Pakistan Islamic Centre Rotterdam	51.917554713903	4.4632333517075	F S D A M I	yes
+archive/tables/nl-mawaqit/alfarouk-utrecht.txt	المركز الثقافي الإسلامي عمر الفاروق - Utrecht	52.1109079	5.1232109	F S D A M I	yes
+archive/tables/nl-mawaqit/utrecht-ulu-moskee-utrecht-3531-bx-netherlands.txt	HDV Utrecht Ulu Camii	52.091863	5.104403	F S D A M I	yes

@@ -1,7 +1,10 @@
 package world.taqwa.app.notifications
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import world.taqwa.app.domain.GeoLocation
@@ -43,6 +46,36 @@ class NotificationCoordinatorTest {
         assertTrue(plan.isEmpty())
         assertEquals(1, scheduler.cancelCalls)
         assertTrue(scheduler.scheduledCalls.isEmpty())
+    }
+
+    @Test
+    fun twoReschedulesAtOnceRunOneAfterTheOther() = runTest {
+        // Two quick stepper taps: the second must not plan while the first is still arming, or
+        // the first could arm last and leave a stale plan behind.
+        val scheduler = FakeScheduler()
+        val gate = CompletableDeferred<Unit>()
+        val events = mutableListOf<String>()
+        var calls = 0
+        val coordinator = NotificationCoordinator(
+            engine = engine, settingsRepository = repo("serial"),
+            locationOf = { london }, scheduler = scheduler, now = { now },
+            locationFor = {
+                val call = ++calls
+                events += "start $call"
+                if (call == 1) gate.await()
+                london
+            },
+        )
+        val first = launch { coordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED); events += "armed 1" }
+        runCurrent()
+        val second = launch { coordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED); events += "armed 2" }
+        runCurrent()
+        assertEquals(listOf("start 1"), events, "the second began while the first was running")
+        gate.complete(Unit)
+        first.join()
+        second.join()
+        assertEquals(listOf("start 1", "armed 1", "start 2", "armed 2"), events)
+        assertEquals(2, scheduler.scheduledCalls.size)
     }
 
     @Test

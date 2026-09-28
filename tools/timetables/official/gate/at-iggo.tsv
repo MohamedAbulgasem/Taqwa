@@ -1,0 +1,7 @@
+# Austria, IGGÖ: its own 2026 Wien table (derislam.at: March, May, June, July, September and December; Diyanet's
+# European method, printed city by city), a point table at Wien (ruling R44). Its Fajr is also its imsak (F+E).
+# Split forward in time in the local archive (europe/split-7g/): March, May and June fit; July, September and
+# December held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/europe/split-7g/iggo-wien-2026-h1.txt	at.iggo/at.iggo			Europe/Vienna	F+E S D A M I	daily	standard	fit	IGGÖ Wien, first half
+archive/tables/moral-auth-world/europe/split-7g/iggo-wien-2026-h2.txt	at.iggo/at.iggo			Europe/Vienna	F+E S D A M I	daily	standard	test	IGGÖ Wien, second half

@@ -1,0 +1,373 @@
+{
+  "entry": "fr.gmp",
+  "class": "D (authority)",
+  "engineHash": "612c03b3a00d29fd",
+  "broken": 0,
+  "places": 1,
+  "first": "2025-10-01",
+  "last": "2026-12-31",
+  "placeDays": 374,
+  "heldOutDays": 101,
+  "ramadanDays": 30,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 303,
+      "early": 0,
+      "late": {
+        "0": 172,
+        "1": 127,
+        "2": 4,
+        "3+": 0
+      },
+      "exactShare": 0.5677,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 395,
+      "lateEnd": 0,
+      "late": {
+        "0": 299,
+        "1": 96,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.757,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 303,
+      "early": 0,
+      "late": {
+        "0": 271,
+        "1": 32,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.8944,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 404,
+      "early": 0,
+      "late": {
+        "0": 115,
+        "1": 186,
+        "2": 103,
+        "3+": 0
+      },
+      "exactShare": 0.2847,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 404,
+      "early": 0,
+      "late": {
+        "0": 44,
+        "1": 360,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.1089,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 404,
+      "early": 0,
+      "late": {
+        "0": 49,
+        "1": 296,
+        "2": 44,
+        "3+": 15
+      },
+      "exactShare": 0.1213,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry fr.gmp",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 404,
+      "lateEnd": 0,
+      "late": {
+        "0": 32,
+        "1": 197,
+        "2": 96,
+        "3+": 79
+      },
+      "exactShare": 0.0792,
+      "worstLate": 16,
+      "lateLimit": 16,
+      "lateLimitFrom": "entry fr.gmp",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 101,
+    "ramadanDays": 0,
+    "events": {
+      "fajr": {
+        "checked": 30,
+        "early": 0,
+        "late": {
+          "0": 25,
+          "1": 5,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8333,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 122,
+        "lateEnd": 0,
+        "late": {
+          "0": 78,
+          "1": 44,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.6393,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 30,
+        "early": 0,
+        "late": {
+          "0": 28,
+          "1": 2,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.9333,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 131,
+        "early": 0,
+        "late": {
+          "0": 5,
+          "1": 85,
+          "2": 41,
+          "3+": 0
+        },
+        "exactShare": 0.0382,
+        "worstLate": 2,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 131,
+        "early": 0,
+        "late": {
+          "0": 39,
+          "1": 92,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.2977,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 131,
+        "early": 0,
+        "late": {
+          "0": 36,
+          "1": 71,
+          "2": 9,
+          "3+": 15
+        },
+        "exactShare": 0.2748,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry fr.gmp",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 131,
+        "lateEnd": 0,
+        "late": {
+          "0": 32,
+          "1": 84,
+          "2": 13,
+          "3+": 2
+        },
+        "exactShare": 0.2443,
+        "worstLate": 8,
+        "lateLimit": 16,
+        "lateLimitFrom": "entry fr.gmp",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib"]
+    },
+    "entry fr.gmp: 5 min": {
+      "reason": "From October the Grande Mosquée's page still carries its earlier method, whose Isha moves from about 15.3° to 16° over October; Isha is taken at the later of its 2026 method and 16°, never before either, and so runs up to 5 min after the earlier method's in early October.",
+      "events": ["isha"]
+    },
+    "entry fr.gmp: 16 min": {
+      "reason": "The GMP prints no imsak, so the fast begins at its own Fajr (ruling R80), within 4 min of it (the end holds for everyone within its table's reach, where its rule's dawn to the south comes up to 2 min earlier in June) but where its page changes method (the Moonsighting Committee's from January to September, its earlier method from October): each change is carried over the two days either side, so the end comes up to 16 min before its printed Fajr on 1 and 2 January and 8 before it on 29 and 30 September.",
+      "events": ["endOfEating"]
+    }
+  },
+  "units": {
+    "fr.gmp": {
+      "name": "Paris",
+      "placeDays": 374,
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib"]
+        },
+        "entry fr.gmp: 5 min": {
+          "reason": "From October the Grande Mosquée's page still carries its earlier method, whose Isha moves from about 15.3° to 16° over October; Isha is taken at the later of its 2026 method and 16°, never before either, and so runs up to 5 min after the earlier method's in early October.",
+          "events": ["isha"]
+        },
+        "entry fr.gmp: 16 min": {
+          "reason": "The GMP prints no imsak, so the fast begins at its own Fajr (ruling R80), within 4 min of it (the end holds for everyone within its table's reach, where its rule's dawn to the south comes up to 2 min earlier in June) but where its page changes method (the Moonsighting Committee's from January to September, its earlier method from October): each change is carried over the two days either side, so the end comes up to 16 min before its printed Fajr on 1 and 2 January and 8 before it on 29 and 30 September.",
+          "events": ["endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 303,
+          "early": 0,
+          "late": {
+            "0": 172,
+            "1": 127,
+            "2": 4,
+            "3+": 0
+          },
+          "exactShare": 0.5677,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 395,
+          "lateEnd": 0,
+          "late": {
+            "0": 299,
+            "1": 96,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.757,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 303,
+          "early": 0,
+          "late": {
+            "0": 271,
+            "1": 32,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8944,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 404,
+          "early": 0,
+          "late": {
+            "0": 115,
+            "1": 186,
+            "2": 103,
+            "3+": 0
+          },
+          "exactShare": 0.2847,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 404,
+          "early": 0,
+          "late": {
+            "0": 44,
+            "1": 360,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.1089,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 404,
+          "early": 0,
+          "late": {
+            "0": 49,
+            "1": 296,
+            "2": 44,
+            "3+": 15
+          },
+          "exactShare": 0.1213,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "entry fr.gmp",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 404,
+          "lateEnd": 0,
+          "late": {
+            "0": 32,
+            "1": 197,
+            "2": 96,
+            "3+": 79
+          },
+          "exactShare": 0.0792,
+          "worstLate": 16,
+          "lateLimit": 16,
+          "lateLimitFrom": "entry fr.gmp",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}

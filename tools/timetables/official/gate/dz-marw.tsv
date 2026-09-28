@@ -1,0 +1,18 @@
+# Algeria, the Ministry of Religious Affairs and Waqfs: the 1448 calendars (marw.gov.dz, image
+# PDFs read by OCR and checked by eye; profiles-tested.md, data-maghreb-libya). Africa/Algiers.
+# Standard Asr. MARW prints no imsak: the fast begins at its Fajr (F+E).
+# - The base cities Algiers, Djelfa and Adrar, each at the research's point (the unit's): fit on
+#   Algiers's 1448 table; held out, Djelfa's and Adrar's and eight days of Algiers's 1447 calendar
+#   (2025).
+# - Oran and Tamanrasset: the tables the ministry derives for them (Algiers plus Oran's monthly
+#   differences; Adrar plus Tamanrasset's half-monthly ones), each fitting its own seat's margins at
+#   the seat: fit, nothing held out.
+# Not rows: the OCR stages (dz/*_ocr.txt, dz/*_resolved.txt) and the copies of the same calendar
+# days (dz_alger_all.txt, dz_adrar.txt, dz_djelfa.txt, agentB/alger_rabi2.txt, off-alger.txt).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-maghreb-libya/off-marw-alger.txt	dz.marw/16			Africa/Algiers	F+E S D A M I	daily	standard	fit	Algiers, calendar 1448
+archive/tables/moral-auth-mena/maghreb/dz_alger1447.txt	dz.marw/16			Africa/Algiers	F+E S D A M I	daily	standard	test	Algiers, calendar 1447 (2025), eight days
+archive/tables/round/data-maghreb-libya/off-marw-djelfa.txt	dz.marw/17			Africa/Algiers	F+E S D A M I	daily	standard	test	Djelfa, calendar 1448 (about 1,140 m)
+archive/tables/round/data-maghreb-libya/off-marw-adrar.txt	dz.marw/1			Africa/Algiers	F+E S D A M I	daily	standard	test	Adrar, calendar 1448 (the far south-west)
+archive/tables/round/data-maghreb-libya/off-marw-oran.txt	dz.marw/31			Africa/Algiers	F+E S D A M I	daily	standard	fit	Oran, calendar 1448 (Algiers plus Oran's monthly differences)
+archive/tables/round/data-maghreb-libya/off-marw-tamanrasset.txt	dz.marw/11			Africa/Algiers	F+E S D A M I	daily	standard	fit	Tamanrasset, calendar 1448 (Adrar plus its half-monthly differences)

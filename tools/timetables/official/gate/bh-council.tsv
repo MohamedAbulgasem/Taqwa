@@ -1,0 +1,17 @@
+# Bahrain, the Supreme Council for Islamic Affairs: one table for the kingdom, its 1448 calendar book
+# (16 Jun 2026 to 5 Jun 2027; authorities-arab-world-turkiye.md). Fajr and sunrise for the kingdom's
+# easternmost point, Dhuhr to Isha for its westernmost. The engine computes at the Hawar islands'
+# east (the method's fixed point: lat and lon empty) and Umm an Nasan's west coast (a start point)
+# beside the user's own point, so the table is checked there and at the app's eight Bahraini towns,
+# since the whole kingdom follows it. The fast begins at the printed Fajr (F+E). Standard Asr.
+# One year for one table, whose days the margins are fitted on: fit, nothing held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council			Asia/Bahrain	F+E S D A M I	daily	standard	fit	the 1448 book at the method's fixed point
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.22787	50.58565	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Manama
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.25722	50.61194	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Al Muharraq
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.21861	50.54778	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Jidd Hafs
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.17361	50.54778	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Isa Town
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.15472	50.62056	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Sitra
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.13	50.555	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Riffa
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.11528	50.50694	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Hamad Town
+archive/tables/moral-auth-mena/gulfB/off-bh-1448.txt	bh.council	26.06861	50.50389	Asia/Bahrain	F+E S D A M I	daily	standard	fit	Dar Kulaib

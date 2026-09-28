@@ -1,0 +1,6 @@
+# Wifaqul Ulama (Deobandi): the only table of theirs held is Manchester Central Mosque's September
+# 2026 PDF (manchestercentralmosque.org; seven dated rows, every fifth day), "FAJR (SEHRI ENDS)" 18°,
+# Isha 15°, Hanafi Asr: the Fajr printed is also when the fast begins (F+E). Seven rows cannot be split:
+# all fit, nothing held out (proof.md).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/ukfr/mcm_sep2026.txt	gb.wifaqul	53.4631	-2.2285	Europe/London	F+E S D A M I	daily	hanafi	fit	Manchester Central Mosque, September 2026

@@ -1,0 +1,43 @@
+# Morocco, the Ministry of Habous and Islamic Affairs (habous.gov.ma): city tables, checked at the
+# city centres, the units' points (Habous's own are unpublished; profiles-tested.md,
+# data-maghreb-libya). Africa/Casablanca; the clock column says how each file is read. Standard Asr.
+# Habous prints no imsak: the fast begins at its Fajr (F+E).
+# - Each off-habous file holds the live month (13 Sep–12 Oct 2026, printed in UTC+0), read by
+#   habous-live, and Wayback captures of earlier month pages printed in legal time, read into UTC by
+#   habous-archive (see HabousArchiveFormat: a page keeps its own clock, not tzdata's, around
+#   Ramadan). habous-archive skips the misdated days: the Laayoune capture of 19 Sep 2020 is dated
+#   October from 19 Oct 2020, where its Dhuhr jumps by about 9 min (those days are September's), and
+#   two runs on the default page (28–31 Jan 2020 and 1–6 Oct 2021) carry another month's days.
+# - The site's default page and the Ramadan 1445 page, filed without a city, are Rabat's: their Dhuhr
+#   sits as far after Rabat's transit as Rabat's own page's does (about 5 min).
+# - Imilchil (about 2,150 m) has no unit: it checks the edge, the national margin every other place
+#   takes.
+# Split: fit on the ten cities' live month; held out, every Wayback page (2015–2025), Rabat's
+# 2022–2023 days and Ramadan 1445, and Imilchil. The per-city sunrise and Maghrib were then widened
+# where the held-out pages asked for more (proof/7d-maghreb-libya.md).
+# Not rows: ma_casa_202501/202609.txt, ma_rabat_202402/202609.txt, ma_ifrane_202609.txt,
+# ma_laayoune_202405.txt and off-habous-casa.txt repeat the round files' days.
+path	entry	lat	lon	zone	clock	columns	format	school	split	note
+archive/tables/round/data-maghreb-libya/off-habous-casablanca.txt	ma.habous/casablanca			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Casablanca, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-rabat.txt	ma.habous/rabat			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Rabat, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-oujda.txt	ma.habous/oujda			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Oujda, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-tangier.txt	ma.habous/tangier			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Tangier, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-laayoune.txt	ma.habous/laayoune			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Laayoune, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-dakhla.txt	ma.habous/dakhla			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Dakhla, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-figuig.txt	ma.habous/figuig			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Figuig, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-midelt.txt	ma.habous/midelt			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Midelt, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-lagouira.txt	ma.habous/lagouira			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Lagouira, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-ifrane.txt	ma.habous/ifrane			Africa/Casablanca	UTC	F+E S D A M I	habous-live	standard	fit	Ifrane, the live month 13 Sep–12 Oct 2026
+archive/tables/round/data-maghreb-libya/off-habous-casablanca.txt	ma.habous/casablanca			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Casablanca, Wayback captures: 2015, 2017, 2022 and 2025 pages
+archive/tables/round/data-maghreb-libya/off-habous-rabat.txt	ma.habous/rabat			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Rabat, Wayback captures: Jul–Aug 2022 and Feb–Mar 2024 pages
+archive/tables/round/data-maghreb-libya/off-habous-oujda.txt	ma.habous/oujda			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Oujda, Wayback captures: Jul–Aug 2022 page
+archive/tables/round/data-maghreb-libya/off-habous-tangier.txt	ma.habous/tangier			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Tangier, Wayback captures: Jul–Aug 2022 page
+archive/tables/round/data-maghreb-libya/off-habous-laayoune.txt	ma.habous/laayoune			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Laayoune, Wayback captures: 2019–2025 pages
+archive/tables/round/data-maghreb-libya/off-habous-dakhla.txt	ma.habous/dakhla			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Dakhla, Wayback captures: Jul–Aug 2022 page
+archive/tables/round/data-maghreb-libya/off-habous-figuig.txt	ma.habous/figuig			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Figuig, Wayback captures: 2019 and 2020 pages
+archive/tables/round/data-maghreb-libya/off-habous-midelt.txt	ma.habous/midelt			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Midelt, Wayback captures: Jul–Aug 2022 page
+archive/tables/round/data-maghreb-libya/off-habous-lagouira.txt	ma.habous/lagouira			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Lagouira, Wayback captures: Jul–Aug 2022 page
+archive/tables/round/data-maghreb-libya/off-habous-default.txt	ma.habous/rabat			Africa/Casablanca	UTC	F+E S D A M I	habous-archive	standard	test	Rabat, the site's default page: Wayback captures 2019–2022
+archive/tables/moral-auth-mena/maghreb/ma_rabat_2022_2023.txt	ma.habous/rabat			Africa/Casablanca	Africa/Casablanca	F+E S D A M I	daily	standard	test	Rabat, five days 2022–2023
+archive/tables/moral-auth-mena/maghreb/ma_ramadan1445.txt	ma.habous/rabat			Africa/Casablanca	Africa/Casablanca	F+E S D A M I	daily	standard	test	Rabat, Ramadan 1445 (2024)
+archive/tables/moral-auth-mena/maghreb/ma_imilchil_202609.txt	ma.habous	32.155	-5.635	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Imilchil (about 2,150 m), beyond every unit: the edge, live month 13 Sep–12 Oct 2026

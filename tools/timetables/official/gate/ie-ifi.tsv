@@ -1,0 +1,7 @@
+# Ireland: the Islamic Foundation of Ireland's fixed table (islamicfoundation.ie, printed in GMT for 28 towns; Dublin's
+# column as local time), the table for Dublin (ruling R44). No imsak is printed: Fajr is also the start of the fast.
+# IFI's Fajr and Isha curves (IfiCurve) are fitted to this same table, and it repeats every year, so nothing is held
+# out. Lucan's copy differs only in its summer Isha (its own, earlier); the second Dublin capture (ifi_dublin_b) is
+# another town's column, unnamed, and is not used.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/ukfr/ifi_dublin_local.txt	ie.ifi/ie.ifi			Europe/Dublin	F+E S D A M I	daily	standard	fit	IFI Dublin 2026

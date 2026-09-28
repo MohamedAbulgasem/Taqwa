@@ -1,0 +1,21 @@
+# Saudi Arabia, Umm al-Qura (KACST): the calendar's own prayer-times API, GetPrayerByYear at each
+# point with zone 3 (profiles-tested.md, data-umm-al-qura; 12 places, 13,146 place-days 2024–2030).
+# Each file is one API point, checked there (lat and lon are the query's). The API prints no end of
+# eating: the fast begins at its Fajr (F+E). Standard Asr.
+# Split, forward in time and across the country: fit on the nine files that end by 2027 (Madinah,
+# Jeddah, Dammam and Abha 2025–2027; Haql, Al Kharkhir, At Tuwal, Taif and Tabuk 2026); held out,
+# Makkah and Riyadh 2024–2030 and Turaif (the far north, 31.7° N) 2024 and 2026–2030, whose 2024 has
+# no lag dates and whose 2028–2030 lie beyond every fitted day.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-umm-al-qura/off-uq-madinah.txt	sa.ummalqura	24.54	39.63	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Madinah 2025–2027
+archive/tables/round/data-umm-al-qura/off-uq-jeddah.txt	sa.ummalqura	21.5	39.17	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Jeddah 2025–2027
+archive/tables/round/data-umm-al-qura/off-uq-dammam.txt	sa.ummalqura	26.44	50.1	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Dammam 2025–2027
+archive/tables/round/data-umm-al-qura/off-uq-abha.txt	sa.ummalqura	18.22	42.51	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Abha 2025–2027 (about 2,200 m)
+archive/tables/round/data-umm-al-qura/off-uq-haql.txt	sa.ummalqura	29.3	34.95	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Haql 2026, the far west
+archive/tables/round/data-umm-al-qura/off-uq-al-kharkhir.txt	sa.ummalqura	18.85	51.819	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Al Kharkhir 2026, the far east
+archive/tables/round/data-umm-al-qura/off-uq-at-tuwal.txt	sa.ummalqura	16.528	42.9685	Asia/Riyadh	F+E S D A M I	daily	standard	fit	At Tuwal 2026, the far south
+archive/tables/round/data-umm-al-qura/off-uq-taif.txt	sa.ummalqura	21.25	40.4	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Taif 2026 (about 1,900 m)
+archive/tables/round/data-umm-al-qura/off-uq-tabuk.txt	sa.ummalqura	28.4	36.58	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Tabuk 2026
+archive/tables/round/data-umm-al-qura/off-uq-makkah.txt	sa.ummalqura	21.426666	39.831666	Asia/Riyadh	F+E S D A M I	daily	standard	test	Makkah 2024–2030
+archive/tables/round/data-umm-al-qura/off-uq-riyadh.txt	sa.ummalqura	24.67	46.69	Asia/Riyadh	F+E S D A M I	daily	standard	test	Riyadh 2024–2030
+archive/tables/round/data-umm-al-qura/off-uq-turaif.txt	sa.ummalqura	31.68	38.66	Asia/Riyadh	F+E S D A M I	daily	standard	test	Turaif 2024 and 2026–2030, the far north

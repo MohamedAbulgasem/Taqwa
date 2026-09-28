@@ -6,18 +6,27 @@ import com.batoulapps.adhan2.PrayerTimes
 import com.batoulapps.adhan2.data.DateComponents
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
+import world.taqwa.app.prayer.engine.EngineSettings
+import world.taqwa.app.prayer.engine.PrayerEngine
+import world.taqwa.app.prayer.engine.SchoolChoice
+import world.taqwa.app.prayer.engine.TimetableChoice
+import world.taqwa.app.prayer.engine.method.HighLatRule
+import world.taqwa.app.prayer.engine.registry.EntryClass
+import world.taqwa.app.prayer.engine.registry.Place
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 
+/** adhan2 stays for the Qibla bearing; its API is still what the probe expects. */
 class AdhanApiProbeTest {
     @Test
     fun adhanReturnsOrderedInstantsForLondon() {
@@ -34,47 +43,117 @@ class AdhanApiProbeTest {
     }
 }
 
+/** The app's door to the engine: the stored location and settings in, the day the screens read out. */
 class PrayerTimesEngineTest {
 
     private val engine = PrayerTimesEngine()
     private val london = GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB")
-
-    private fun localHourMinute(instant: kotlin.time.Instant, zone: String): Pair<Int, Int> {
-        val t = instant.toLocalDateTime(TimeZone.of(zone))
-        return t.hour to t.minute
-    }
+    private val istanbul = GeoLocation(41.0082, 28.9784, "Europe/Istanbul", "Istanbul", "TR")
+    private val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
+    private val longyearbyen = GeoLocation(78.2232, 15.6267, "Europe/Oslo", "Longyearbyen", "SJ")
 
     @Test
     fun timesAreStrictlyOrderedThroughTheDay() {
         val d = engine.timesFor(london, LocalDate(2026, 9, 6), PrayerSettings())
         val instants = d.times.map { it.instant }
         assertEquals(instants.sorted(), instants)
+        assertEquals(Prayer.entries, d.times.map { it.prayer })
     }
 
     @Test
     fun dhuhrIsNearSolarNoonInLondon() {
         val d = engine.timesFor(london, LocalDate(2026, 9, 6), PrayerSettings())
-        val (h, _) = localHourMinute(d.time(Prayer.DHUHR), "Europe/London")
+        val h = d.time(Prayer.DHUHR).toLocalDateTime(TimeZone.of("Europe/London")).hour
         assertTrue(h in 12..13, "Dhuhr fell at hour $h, expected 12 or 13 local")
     }
 
     @Test
-    fun hanafiAsrIsLaterThanStandardAsr() {
-        val date = LocalDate(2026, 9, 6)
-        val standard = engine.timesFor(london, date, PrayerSettings(madhab = AsrMadhab.STANDARD))
-        val hanafi = engine.timesFor(london, date, PrayerSettings(madhab = AsrMadhab.HANAFI))
-        assertTrue(hanafi.time(Prayer.ASR) > standard.time(Prayer.ASR))
+    fun theTimesAreTheEnginesForTheSameSettings() {
+        val date = LocalDate(2026, 9, 26)
+        val d = engine.timesFor(istanbul, date, PrayerSettings())
+        val day = PrayerEngine.dayTimes(Place(41.0082, 28.9784, "Europe/Istanbul", "TR"), date, EngineSettings()).day
+        assertEquals(listOf(day.fajr, day.sunrise, day.dhuhr, day.asr, day.maghrib, day.isha), d.times.map { it.instant })
+        assertEquals(day.asrOther, d.asrOther)
+        assertEquals(day.sunset, d.sunset)
+        assertEquals(day.endOfEating, d.endOfEating)
+        assertEquals(day.ends, d.ends)
+        assertEquals("tr.diyanet", d.sourceEntryId)
+        assertEquals(EntryClass.A, d.entryClass)
     }
 
     @Test
-    fun minuteAdjustmentsShiftOnlyTheNamedPrayer() {
+    fun theStoredSettingsMapOntoTheEngines() {
+        val settings = PrayerSettings(
+            timetable = "other.mwl",
+            timetableConfirmed = true,
+            school = "hanafi",
+            saudiFajrLater = true,
+            minuteAdjustments = mapOf(Prayer.FAJR to 2, Prayer.ISHA to 0),
+            confirmedAdjustments = mapOf(Prayer.MAGHRIB to "other.mwl"),
+            legacyHighLatitude = HighLatitudePreference.SEVENTH_OF_NIGHT,
+            hijriOffsetDays = 1,
+        )
+        assertEquals(
+            EngineSettings(
+                timetable = TimetableChoice.Entry("other.mwl"),
+                timetableConfirmed = true,
+                school = SchoolChoice.Hanafi,
+                saudiFajrLater = true,
+                legacyHighLatitude = HighLatRule.Legacy.SEVENTH,
+                adjustmentsMinutes = mapOf(Prayer.FAJR to 2),
+                confirmedAdjustments = mapOf(Prayer.MAGHRIB to "other.mwl"),
+                hijriOffsetDays = 1,
+            ),
+            PrayerTimesEngine.engineSettingsOf(settings),
+        )
+        assertEquals(EngineSettings(), PrayerTimesEngine.engineSettingsOf(PrayerSettings()))
+        assertNull(PrayerTimesEngine.engineSettingsOf(PrayerSettings(legacyHighLatitude = HighLatitudePreference.AUTOMATIC)).legacyHighLatitude)
+    }
+
+    @Test
+    fun aHanafiSchoolGivesALaterAsr() {
+        val date = LocalDate(2026, 9, 6)
+        val standard = engine.timesFor(istanbul, date, PrayerSettings(school = "standard"))
+        val hanafi = engine.timesFor(istanbul, date, PrayerSettings(school = "hanafi"))
+        assertTrue(hanafi.time(Prayer.ASR) > standard.time(Prayer.ASR))
+        assertEquals(hanafi.time(Prayer.ASR), standard.asrOther)
+    }
+
+    @Test
+    fun aLaterMinuteAdjustmentShiftsOnlyTheNamedPrayer() {
         val date = LocalDate(2026, 9, 6)
         val base = engine.timesFor(london, date, PrayerSettings())
-        val shifted = engine.timesFor(
-            london, date, PrayerSettings(minuteAdjustments = mapOf(Prayer.FAJR to 5)),
-        )
-        assertEquals(base.time(Prayer.FAJR).epochSeconds + 300, shifted.time(Prayer.FAJR).epochSeconds)
+        val shifted = engine.timesFor(london, date, PrayerSettings(minuteAdjustments = mapOf(Prayer.FAJR to 5)))
+        assertEquals(base.time(Prayer.FAJR) + 5.minutes, shifted.time(Prayer.FAJR))
         assertEquals(base.time(Prayer.ISHA), shifted.time(Prayer.ISHA))
+    }
+
+    @Test
+    fun anUnconfirmedEarlierAdjustmentIsNotApplied() {
+        val date = LocalDate(2026, 9, 6)
+        val base = engine.timesFor(london, date, PrayerSettings())
+        val earlier = engine.timesFor(london, date, PrayerSettings(minuteAdjustments = mapOf(Prayer.MAGHRIB to -3)))
+        assertEquals(base.time(Prayer.MAGHRIB), earlier.time(Prayer.MAGHRIB))
+    }
+
+    @Test
+    fun aMigratedIsnaInTheUkIsNeverEarlierThanItsCautiousTimesUntilConfirmed() {
+        // Spec §8: the migration keeps a chosen ISNA but never confirms it (ruling R52).
+        val manchester = GeoLocation(53.48095, -2.23743, "Europe/London", "Manchester", "GB")
+        val migrated = PrayerSettings(timetable = "other.isna")
+        var date = LocalDate(2026, 1, 3)
+        repeat(52) {
+            val automatic = engine.timesFor(manchester, date, PrayerSettings())
+            val isna = engine.timesFor(manchester, date, migrated)
+            assertEquals("gb.cautious", automatic.sourceEntryId)
+            assertEquals("other.isna", isna.sourceEntryId)
+            for (prayer in listOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA)) {
+                assertTrue(isna.time(prayer) >= automatic.time(prayer), "$prayer on $date")
+            }
+            assertTrue(isna.time(Prayer.SUNRISE) <= automatic.time(Prayer.SUNRISE), "sunrise on $date")
+            assertTrue(isna.endOfEating <= automatic.endOfEating, "end of eating on $date")
+            date = date.plus(7, DateTimeUnit.DAY)
+        }
     }
 
     @Test
@@ -85,153 +164,69 @@ class PrayerTimesEngineTest {
     }
 
     @Test
-    fun tromsoInJuneStillProducesOrderedTimesAndReportsItsRule() {
-        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
-        val d = engine.timesFor(tromso, LocalDate(2026, 6, 21), PrayerSettings())
-        assertEquals(d.times.map { it.instant }.sorted(), d.times.map { it.instant })
-        assertEquals(
-            world.taqwa.app.domain.HighLatitudePreference.TWILIGHT_ANGLE,
-            d.highLatitudeRuleApplied,
-        )
-    }
-
-    @Test
-    fun tromsoAtSummerSolsticeReportsNearestLatitudeFallback() {
-        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
-        val d = engine.timesFor(tromso, LocalDate(2026, 6, 21), PrayerSettings())
-        assertTrue(
-            d.nearestLatitudeFallbackApplied,
-            "Expected true polar day at Tromsø on the summer solstice to trigger the nearest-latitude fallback",
-        )
-    }
-
-    @Test
-    fun ordinaryLondonDayDoesNotReportNearestLatitudeFallback() {
-        val d = engine.timesFor(london, LocalDate(2026, 9, 6), PrayerSettings())
-        assertEquals(false, d.nearestLatitudeFallbackApplied)
-    }
-
-    @Test
-    fun tromsoAtEquinoxHasARealSunriseAndDoesNotReportFallback() {
-        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
-        val d = engine.timesFor(tromso, LocalDate(2026, 9, 23), PrayerSettings())
-        assertEquals(false, d.nearestLatitudeFallbackApplied)
-    }
-
-    @Test
-    fun londonInSeptemberGenuinelyEngagesTheSeventhOfNightRuleUnderMwl() {
-        // Investigated directly against adhan2 (all three HighLatitudeRule values, several
-        // latitudes, every month of 2026) rather than assumed: at London's automatically-selected
-        // SEVENTH_OF_NIGHT rule, the one-seventh-of-the-night bound genuinely moves both Fajr
-        // (03:19 -> 03:49 UTC) and Isha (20:29 -> 20:08 UTC) on 2026-09-06 under the default
-        // Muslim World League method — MIDDLE_OF_THE_NIGHT and TWILIGHT_ANGLE both agree on the
-        // unclamped 03:19/20:29, so the substitution is real, not a no-op. The same seventh-of-
-        // night divergence appears every year from roughly March to September at this latitude
-        // (verified at 40 degrees and even, by a single minute, at 25 degrees near the June
-        // solstice) — it tracks night *length*, not proximity to a pole. So the exact screenshot
-        // date does not go quiet on its own; what the fix actually buys is that the note now only
-        // appears when a rule change is real (see the November/January tests below), instead of
-        // unconditionally for any location north of the 48-degree threshold as it did before.
-        val d = engine.timesFor(london, LocalDate(2026, 9, 6), PrayerSettings())
-        assertEquals(HighLatitudePreference.SEVENTH_OF_NIGHT, d.highLatitudeRuleApplied)
-    }
-
-    @Test
-    fun anExplicitlyChosenRuleIsStillReportedWhenItEngages() {
-        // Same London date as the test above, where the seventh-of-night bound genuinely moves
-        // Fajr and Isha — but with the rule picked by hand rather than resolved automatically.
-        // The note used to be suppressed for exactly this user, who had shown they care which
-        // rule is in force and was the one person never told it was changing their Fajr.
-        val chosen = PrayerSettings(highLatitude = HighLatitudePreference.SEVENTH_OF_NIGHT)
-        val d = engine.timesFor(london, LocalDate(2026, 9, 6), chosen)
-        assertEquals(HighLatitudePreference.SEVENTH_OF_NIGHT, d.highLatitudeRuleApplied)
-    }
-
-    @Test
-    fun anExplicitlyChosenRuleIsStillSilentWhenNothingBinds() {
-        val chosen = PrayerSettings(highLatitude = HighLatitudePreference.TWILIGHT_ANGLE)
-        val d = engine.timesFor(london, LocalDate(2026, 11, 15), chosen)
-        assertEquals(null, d.highLatitudeRuleApplied)
-    }
-
-    @Test
-    fun repeatedCallsWithTheSameInputsAgreeWithTheFirst() {
-        // The engaged-rule answer is memoised per (date, settings, location); the memo must not
-        // leak an answer across a change of any of the three.
-        val settings = PrayerSettings()
-        val september = engine.timesFor(london, LocalDate(2026, 9, 6), settings)
-        val november = engine.timesFor(london, LocalDate(2026, 11, 15), settings)
-        val septemberAgain = engine.timesFor(london, LocalDate(2026, 9, 6), settings)
-        assertEquals(HighLatitudePreference.SEVENTH_OF_NIGHT, september.highLatitudeRuleApplied)
-        assertEquals(null, november.highLatitudeRuleApplied)
-        assertEquals(september.highLatitudeRuleApplied, septemberAgain.highLatitudeRuleApplied)
-    }
-
-    @Test
-    fun londonInNovemberHasNoHighLatitudeNoteBecauseNoRuleActuallyBinds() {
-        // An ordinary autumn night: long enough that the raw angle-based Fajr and Isha already
-        // sit inside every rule's bound, so all three HighLatitudeRule values agree and the note
-        // correctly disappears — this is the behaviour the fix is actually for.
-        val d = engine.timesFor(london, LocalDate(2026, 11, 15), PrayerSettings())
-        assertEquals(null, d.highLatitudeRuleApplied)
-    }
-
-    @Test
-    fun theEngagedCacheHitsAcrossTheThreeDateRotationTodayViewModelActuallyUses() {
-        // TodayViewModel.refresh() calls timesFor for yesterday/today/tomorrow every tick, all
-        // sharing one settings object and one location. The M1 regression was a single-slot memo
-        // that a rotation like this thrashed on every call. With a bounded multi-entry cache the
-        // first round of three (all misses) should perform the two extra solves per call, and a
-        // second round over the same three dates should hit the cache every time and perform none.
-        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
-        val settings = PrayerSettings()
-        val today = LocalDate(2026, 6, 21)
-        val yesterday = LocalDate(2026, 6, 20)
-        val tomorrow = LocalDate(2026, 6, 22)
-        val dates = listOf(yesterday, today, tomorrow)
-
-        val freshEngine = PrayerTimesEngine()
-        dates.forEach { freshEngine.timesFor(tromso, it, settings) }
-        val afterFirstRound = freshEngine.solveCount
-        assertTrue(afterFirstRound > 0, "Expected the first round to perform extra solves")
-
-        dates.forEach { freshEngine.timesFor(tromso, it, settings) }
-        val afterSecondRound = freshEngine.solveCount
-        assertEquals(
-            afterFirstRound,
-            afterSecondRound,
-            "Second round over the same yesterday/today/tomorrow rotation should hit the cache " +
-                "and add zero extra solves",
-        )
-    }
-
-    @Test
-    fun theEngagedCacheIsBoundedRegardlessOfHowManyDistinctDatesAreQueried() {
-        val tromso = GeoLocation(69.6492, 18.9553, "Europe/Oslo", "Tromsø", "NO")
-        val settings = PrayerSettings()
-        val freshEngine = PrayerTimesEngine()
-        val start = LocalDate(2026, 6, 1)
-        repeat(20) { offset ->
-            freshEngine.timesFor(tromso, start.plus(offset, DateTimeUnit.DAY), settings)
+    fun apiaKeepsEveryTimeOnItsOwnCivilDate() {
+        val apia = GeoLocation(-13.83333, -171.76666, "Pacific/Apia", "Apia", "WS")
+        val date = LocalDate(2026, 9, 25)
+        val d = engine.timesFor(apia, date, PrayerSettings())
+        val zone = TimeZone.of("Pacific/Apia")
+        for (prayer in listOf(Prayer.FAJR, Prayer.SUNRISE, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB)) {
+            assertEquals(date, d.time(prayer).toLocalDateTime(zone).date, "$prayer")
         }
-        assertTrue(
-            freshEngine.engagedCacheSize() <= 8,
-            "Expected the engaged-rule cache to stay bounded at 8 entries, was " +
-                freshEngine.engagedCacheSize(),
-        )
     }
 
     @Test
-    fun londonInDecemberAlsoHasNoHighLatitudeNoteBecauseWinterNightsAreLong() {
-        // Investigated directly: contrary to the assumption that a London winter would engage the
-        // rule, 2026-12-21 (and every mid-winter date checked) has all three HighLatitudeRule
-        // values agreeing exactly (05:59/17:51 UTC for Fajr/Isha) — winter nights here are long
-        // enough that the seventh-of-night bound never binds. The genuine divergence window is
-        // the *shorter*-night half of the year (see the September test above), not the longer-
-        // night half, which is the opposite of what the bug report assumed but consistent with
-        // why high-latitude substitution rules exist in the first place (short nights, not long
-        // ones, are what leave too little room for a full angle-based twilight).
-        val d = engine.timesFor(london, LocalDate(2026, 12, 21), PrayerSettings())
-        assertEquals(null, d.highLatitudeRuleApplied)
+    fun aPolarDayReportsTheNearestLatitudeFlag() {
+        val d = engine.timesFor(longyearbyen, LocalDate(2026, 6, 21), PrayerSettings())
+        assertTrue(d.polar)
+        assertTrue(d.nearestLatitudeFallbackApplied)
+        assertEquals(d.times.map { it.instant }.sorted(), d.times.map { it.instant })
+    }
+
+    @Test
+    fun aDayIrnsRuleGivesWholeFollowsNoNearestLatitude() {
+        // Ruling R82: under Tromsø's midnight sun every time is IRN's Makkah time.
+        val d = engine.timesFor(tromso, LocalDate(2026, 6, 21), PrayerSettings())
+        assertEquals(false, d.polar)
+        assertEquals(false, d.nearestLatitudeFallbackApplied)
+        assertEquals(d.times.map { it.instant }.sorted(), d.times.map { it.instant })
+    }
+
+    @Test
+    fun anOrdinaryDayReportsNoRuleAndNoPolarDay() {
+        val d = engine.timesFor(london, LocalDate(2026, 11, 15), PrayerSettings())
+        assertEquals(false, d.polar)
+        assertEquals(false, d.nearestLatitudeFallbackApplied)
+        assertEquals(emptySet(), d.setByRule)
+        assertNull(d.highLatitudeRuleApplied)
+    }
+
+    @Test
+    fun aRuleThatSetsFajrOrIshaIsReportedAsTheEnginesOwnOrTheLegacyOne() {
+        // Oslo in June: the 18° dawn does not come, so the engine's own rule sets Fajr and Isha.
+        val oslo = GeoLocation(59.91273, 10.74609, "Europe/Oslo", "Oslo", "NO")
+        val june = LocalDate(2026, 6, 21)
+        val mwl = PrayerSettings(timetable = "other.mwl", timetableConfirmed = true)
+        val own = engine.timesFor(oslo, june, mwl)
+        assertTrue(Prayer.FAJR in own.setByRule || Prayer.ISHA in own.setByRule, "${own.setByRule}")
+        assertEquals(HighLatitudePreference.AUTOMATIC, own.highLatitudeRuleApplied)
+        val seventh = engine.timesFor(oslo, june, mwl.copy(legacyHighLatitude = HighLatitudePreference.SEVENTH_OF_NIGHT))
+        assertEquals(HighLatitudePreference.SEVENTH_OF_NIGHT, seventh.highLatitudeRuleApplied)
+    }
+
+    @Test
+    fun aLocationWithNoCountryTakesItsCountryFromTheZone() {
+        val noCountry = istanbul.copy(countryCode = null)
+        assertEquals("TR", PrayerTimesEngine.placeOf(noCountry).countryCode)
+        assertEquals("tr.diyanet", engine.timesFor(noCountry, LocalDate(2026, 9, 26), PrayerSettings()).sourceEntryId)
+        // A zone the city list does not name: the safe default, never a crash.
+        val nowhere = GeoLocation(0.0, -160.0, "UTC")
+        assertEquals("", PrayerTimesEngine.placeOf(nowhere).countryCode)
+        assertEquals("default.safe", engine.timesFor(nowhere, LocalDate(2026, 9, 26), PrayerSettings()).sourceEntryId)
+    }
+
+    @Test
+    fun theRegionTravelsAsTheFirstLevelRegion() {
+        val algiers = GeoLocation(36.73225, 3.08746, "Africa/Algiers", "Algiers", "DZ", region = "Algiers")
+        assertEquals("Algiers", PrayerTimesEngine.placeOf(algiers).admin1)
     }
 }

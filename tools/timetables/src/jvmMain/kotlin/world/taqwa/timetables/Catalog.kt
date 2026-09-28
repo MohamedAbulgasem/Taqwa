@@ -1,7 +1,5 @@
 package world.taqwa.timetables
 
-import world.taqwa.app.domain.AsrMadhab
-import world.taqwa.app.domain.PrayerSettings
 import java.io.File
 
 /** The seven languages the site and the app are written in. */
@@ -9,8 +7,9 @@ val SITE_LANGUAGES = listOf("en", "ar", "fr", "tr", "id", "ur", "bn")
 
 /**
  * One city of the curated list, resolved against the app's own city data: the coordinates, the
- * time zone and the country always come from the app's `cities.csv`, and the names from its
- * `city-names-<lang>.csv`, unless the list overrides a name it knows to be wrong.
+ * time zone, the country and its first-level region ([admin1]) always come from the app's
+ * `cities.csv`, and the names from its `city-names-<lang>.csv`, unless the list overrides a name
+ * it knows to be wrong. [region] is the site's own grouping of countries ([Regions]).
  */
 data class City(
     val slug: String,
@@ -22,10 +21,11 @@ data class City(
     val timeZone: String,
     /** English first, then the others in the list's order. */
     val languages: List<String>,
-    val madhab: AsrMadhab,
     /** The languages whose home page lists this city. */
     val featured: Set<String>,
     private val names: Map<String, String>,
+    /** The city's first-level region as the app's city list names it (the engine's `admin1`). */
+    val admin1: String? = null,
 ) {
     fun name(language: String): String = names.getValue(language)
 }
@@ -42,8 +42,8 @@ class CatalogError(problems: List<String>) :
  * separated by `;`, used only to correct a name the app's data has wrong. Lines starting with `#`
  * are comments.
  *
- * There is no Asr column: a page shows what the app shows a user there who has changed nothing,
- * and the app's Asr school is the same everywhere until it is changed by hand.
+ * There is no Asr or method column: a page shows what the app shows a user there who has changed
+ * nothing, and the app's engine decides both from the place.
  *
  * Every problem in the file is collected and reported together, so one run shows them all.
  */
@@ -109,9 +109,9 @@ object Catalog {
                 longitude = row.getValue("lon").toDouble(),
                 timeZone = row.getValue("tz"),
                 languages = listOf("en") + languages.filter { it != "en" && it in SITE_LANGUAGES },
-                madhab = PrayerSettings().madhab,
                 featured = featured,
                 names = names,
+                admin1 = row.getValue("region").ifEmpty { null },
             )
         }
         if (problems.isNotEmpty()) throw CatalogError(problems)

@@ -1,0 +1,25 @@
+# Montreal and Ottawa (ca.isna): ISNA 15°/15° (Montreal 12 of 16 mosques, Ottawa 6 of 6). The mosque tables that
+# follow 15°/15° are its floors, as in the US: the app is never before any of them. Each table is its own mosque's
+# (Mawaqit, the research's index: slug, city, point), Asr in the school the table prints; none prints an imsak, so
+# each Fajr is also the start of the fast. Split by mosque (fit / test), both cities in both. Faults left out in the
+# Task 7g copies under namerica/split-7g/ (each named in its header, proof.md). Not floors: Montreal's four 18°
+# tables (Assuna, ICQ, Makkah Al-Mukarramah, ISQ), another convention.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/namerica/canada/mtl-al-andalous.txt	ca.isna	45.5140	-73.6760	America/Toronto	F+E S D A M I	daily	standard	fit	Al Andalous Islamic Center, Montreal (Saint-Laurent)
+archive/tables/moral-auth-world/namerica/canada/mtl-aisha-islamic-center.txt	ca.isna	45.4920	-73.5650	America/Toronto	F+E S D A M I	daily	standard	fit	Aisha Islamic Center- AIC - مسجد عائشة, Montreal
+archive/tables/moral-auth-world/namerica/canada/mtl-masjid-taiba.txt	ca.isna	45.5012	-73.6317	America/Toronto	F+E S D A M I	daily	standard	fit	Masjid Taiba - مسجد طيبة, Montreal (Cote-des-Neiges)
+archive/tables/moral-auth-world/namerica/canada/mtl-islamic-center-west-island.txt	ca.isna	45.4790	-73.8130	America/Toronto	F+E S D A M I	daily	hanafi	fit	Islamic Center of West Island, Dollard-des-Ormeaux
+archive/tables/moral-auth-world/namerica/canada/mtl-ccml-longueuil.txt	ca.isna	45.5314	-73.4869	America/Toronto	F+E S D A M I	daily	standard	fit	CCML - المركز الإسلامي بلونقاي, Longueuil
+archive/tables/moral-auth-world/namerica/split-7g/mtl-mac-al-rawdah.txt	ca.isna	45.5294	-73.7225	America/Toronto	F+E S D A M I	daily	standard	fit	مسجد الروضة - Montréal, Montreal (Cartierville)
+archive/tables/moral-auth-world/namerica/canada/ott-ottawa-main-mosque.txt	ca.isna	45.4015	-75.7413	America/Toronto	F+E S D A M I	daily	standard	fit	Ottawa Main Mosque (OMA), Ottawa
+archive/tables/moral-auth-world/namerica/split-7g/ott-mac-abrar-masjid.txt	ca.isna	45.3516	-75.7955	America/Toronto	F+E S D A M I	daily	standard	fit	MAC MIC - Abrar Masjid, Ottawa
+archive/tables/moral-auth-world/namerica/canada/ott-ottawa-south-mosque.txt	ca.isna	45.3949	-75.6812	America/Toronto	F+E S D A M I	daily	standard	fit	Ottawa South Mosque, Ottawa
+archive/tables/moral-auth-world/namerica/canada/mtl-al-madinah-center.txt	ca.isna	45.4950	-73.5770	America/Toronto	F+E S D A M I	daily	standard	test	Al-Madinah Center - مركز المدينة, Montreal (downtown)
+archive/tables/moral-auth-world/namerica/canada/mtl-dar-al-arkam.txt	ca.isna	45.5629	-73.5950	America/Toronto	F+E S D A M I	daily	standard	test	Dar Al Arkam - دار  الأرقم, Montreal
+archive/tables/moral-auth-world/namerica/canada/mtl-centre-islamique-badr.txt	ca.isna	45.5989	-73.5909	America/Toronto	F+E S D A M I	daily	standard	test	Centre Islamique Badr, Montreal
+archive/tables/moral-auth-world/namerica/canada/mtl-kbw-laval.txt	ca.isna	45.5476	-73.7543	America/Toronto	F+E S D A M I	daily	standard	test	Centre Culturel Islamique Laval - KBW, Laval
+archive/tables/moral-auth-world/namerica/canada/mtl-masjid-al-salam.txt	ca.isna	45.4972	-73.5731	America/Toronto	F+E S D A M I	daily	standard	test	مسجد السلام - Montréal, Montreal (downtown)
+archive/tables/moral-auth-world/namerica/canada/mtl-canadian-islamic-center-aljamieh.txt	ca.isna	45.4926	-73.8380	America/Toronto	F+E S D A M I	daily	standard	test	Canadian Islamic Center -  الجمعية, Dollard-des-Ormeaux
+archive/tables/moral-auth-world/namerica/canada/ott-abdullah-issa-masjid.txt	ca.isna	45.3428	-75.7089	America/Toronto	F+E S D A M I	daily	standard	test	Abdullah Issa Masjid (AIM), Ottawa (Nepean)
+archive/tables/moral-auth-world/namerica/canada/ott-kanata-muslim-association.txt	ca.isna	45.3561	-75.9284	America/Toronto	F+E S D A M I	daily	standard	test	Kanata Muslim Association, Ottawa (Kanata)
+archive/tables/moral-auth-world/namerica/split-7g/ott-jami-omar.txt	ca.isna	45.3116	-75.8284	America/Toronto	F+E S D A M I	daily	standard	test	Jami Omar - جامع عمر, Ottawa (Nepean)

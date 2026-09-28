@@ -1,0 +1,482 @@
+{
+  "entry": "qa.calendarhouse",
+  "class": "B",
+  "engineHash": "840649b5cba985d0",
+  "broken": 0,
+  "places": 8,
+  "first": "2023-02-03",
+  "last": "2026-12-31",
+  "placeDays": 2963,
+  "heldOutDays": 2845,
+  "ramadanDays": 243,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 4003,
+      "early": 0,
+      "late": {
+        "0": 1294,
+        "1": 2623,
+        "2": 86,
+        "3+": 0
+      },
+      "exactShare": 0.3233,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "class B",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 4003,
+      "lateEnd": 0,
+      "late": {
+        "0": 2726,
+        "1": 1277,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.681,
+      "worstLate": 1,
+      "lateLimit": 2,
+      "lateLimitFrom": "class B",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 3953,
+      "early": 0,
+      "late": {
+        "0": 2432,
+        "1": 1521,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.6152,
+      "worstLate": 1,
+      "lateLimit": 2,
+      "lateLimitFrom": "class B",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 3953,
+      "early": 0,
+      "late": {
+        "0": 2070,
+        "1": 1785,
+        "2": 98,
+        "3+": 0
+      },
+      "exactShare": 0.5237,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "class B",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 4003,
+      "early": 0,
+      "late": {
+        "0": 446,
+        "1": 2306,
+        "2": 1245,
+        "3+": 6
+      },
+      "exactShare": 0.1114,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, unit al-khor",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 4003,
+      "early": 0,
+      "late": {
+        "0": 446,
+        "1": 2306,
+        "2": 1245,
+        "3+": 6
+      },
+      "exactShare": 0.1114,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, unit al-khor",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 4003,
+      "lateEnd": 0,
+      "late": {
+        "0": 2089,
+        "1": 1829,
+        "2": 85,
+        "3+": 0
+      },
+      "exactShare": 0.5219,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "class B",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 2845,
+    "ramadanDays": 213,
+    "events": {
+      "fajr": {
+        "checked": 3885,
+        "early": 0,
+        "late": {
+          "0": 1242,
+          "1": 2557,
+          "2": 86,
+          "3+": 0
+        },
+        "exactShare": 0.3197,
+        "worstLate": 2,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 3885,
+        "lateEnd": 0,
+        "late": {
+          "0": 2631,
+          "1": 1254,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.6772,
+        "worstLate": 1,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 3835,
+        "early": 0,
+        "late": {
+          "0": 2332,
+          "1": 1503,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.6081,
+        "worstLate": 1,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 3835,
+        "early": 0,
+        "late": {
+          "0": 1978,
+          "1": 1759,
+          "2": 98,
+          "3+": 0
+        },
+        "exactShare": 0.5158,
+        "worstLate": 2,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 3885,
+        "early": 0,
+        "late": {
+          "0": 418,
+          "1": 2218,
+          "2": 1243,
+          "3+": 6
+        },
+        "exactShare": 0.1076,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, unit al-khor",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 3885,
+        "early": 0,
+        "late": {
+          "0": 418,
+          "1": 2218,
+          "2": 1243,
+          "3+": 6
+        },
+        "exactShare": 0.1076,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, unit al-khor",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 3885,
+        "lateEnd": 0,
+        "late": {
+          "0": 2011,
+          "1": 1789,
+          "2": 85,
+          "3+": 0
+        },
+        "exactShare": 0.5176,
+        "worstLate": 2,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class B: 2 min": {
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+    },
+    "unit al-khor: 3 min": {
+      "reason": "Al Khor follows Doha's calendar, and Taqwa also keeps Al Khor's own later summer sunset with the calendar's Maghrib + 3 (its Ramadan Maghrib, kept all year)",
+      "events": ["maghrib", "isha"]
+    }
+  },
+  "units": {
+    "al-khor": {
+      "name": "Al Khor",
+      "placeDays": 365,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "endOfEating"]
+        },
+        "unit al-khor: 3 min": {
+          "reason": "Al Khor follows Doha's calendar, and Taqwa also keeps Al Khor's own later summer sunset with the calendar's Maghrib + 3 (its Ramadan Maghrib, kept all year)",
+          "events": ["maghrib", "isha"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 483,
+          "early": 0,
+          "late": {
+            "0": 177,
+            "1": 296,
+            "2": 10,
+            "3+": 0
+          },
+          "exactShare": 0.3665,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 483,
+          "lateEnd": 0,
+          "late": {
+            "0": 238,
+            "1": 245,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.4928,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 483,
+          "early": 0,
+          "late": {
+            "0": 356,
+            "1": 127,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7371,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 483,
+          "early": 0,
+          "late": {
+            "0": 211,
+            "1": 218,
+            "2": 54,
+            "3+": 0
+          },
+          "exactShare": 0.4369,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 483,
+          "early": 0,
+          "late": {
+            "0": 67,
+            "1": 217,
+            "2": 193,
+            "3+": 6
+          },
+          "exactShare": 0.1387,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit al-khor",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 483,
+          "early": 0,
+          "late": {
+            "0": 67,
+            "1": 217,
+            "2": 193,
+            "3+": 6
+          },
+          "exactShare": 0.1387,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit al-khor",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 483,
+          "lateEnd": 0,
+          "late": {
+            "0": 135,
+            "1": 273,
+            "2": 75,
+            "3+": 0
+          },
+          "exactShare": 0.2795,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    },
+    "doha": {
+      "name": "Doha",
+      "placeDays": 408,
+      "broken": 0,
+      "lateLimits": {
+        "class B: 2 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 3520,
+          "early": 0,
+          "late": {
+            "0": 1117,
+            "1": 2327,
+            "2": 76,
+            "3+": 0
+          },
+          "exactShare": 0.3173,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 3520,
+          "lateEnd": 0,
+          "late": {
+            "0": 2488,
+            "1": 1032,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7068,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 3470,
+          "early": 0,
+          "late": {
+            "0": 2076,
+            "1": 1394,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.5983,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 3470,
+          "early": 0,
+          "late": {
+            "0": 1859,
+            "1": 1567,
+            "2": 44,
+            "3+": 0
+          },
+          "exactShare": 0.5357,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 3520,
+          "early": 0,
+          "late": {
+            "0": 379,
+            "1": 2089,
+            "2": 1052,
+            "3+": 0
+          },
+          "exactShare": 0.1077,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 3520,
+          "early": 0,
+          "late": {
+            "0": 379,
+            "1": 2089,
+            "2": 1052,
+            "3+": 0
+          },
+          "exactShare": 0.1077,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 3520,
+          "lateEnd": 0,
+          "late": {
+            "0": 1954,
+            "1": 1556,
+            "2": 10,
+            "3+": 0
+          },
+          "exactShare": 0.5551,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}

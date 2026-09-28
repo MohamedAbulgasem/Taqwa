@@ -38,8 +38,10 @@ object WidgetMirrorRefresher {
         val yesterday = engine.timesFor(location, localDate.plus(-1, DateTimeUnit.DAY), prefs)
         val today = engine.timesFor(location, localDate, prefs)
         val tomorrow = engine.timesFor(location, localDate.plus(1, DateTimeUnit.DAY), prefs)
-        val timeline = TimelineBuilder.build(yesterday, today, tomorrow, now, prefs.showSunrise, zone)
-        WidgetMirrorWriter.write(store, timeline, location.timeZoneId, format, listOf(today, tomorrow))
+        // Today's highlight rule: the widgets change in the Ramadan release (ruling R8); the next
+        // prayer looks across yesterday's, which the mirror carries past midnight (spec §3.3).
+        val timeline = TimelineBuilder.buildForWidgets(yesterday, today, tomorrow, now, prefs.showSunrise, zone)
+        WidgetMirrorWriter.write(store, timeline, location.timeZoneId, format, listOf(today, tomorrow), yesterday)
         return true
     }
 }

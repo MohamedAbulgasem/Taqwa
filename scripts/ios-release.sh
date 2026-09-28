@@ -34,6 +34,13 @@ EXPORT="$OUT/export-$VERSION-$BUILD"
 APPEX_LIMIT_MB=15
 
 archive() {
+    # Spec §5 / ruling R86: refuse to build on a stale or red prayer-time stamp.
+    if ! ./gradlew -q -p tools/timetables checkStamps; then
+        echo "A prayer-time stamp is stale or red (see above). Refresh it first: " \
+            "./gradlew -p tools/timetables gate, then ./gradlew -p tools/timetables generateProofStamps." >&2
+        exit 1
+    fi
+
     mkdir -p "$OUT"
     rm -rf "$ARCHIVE"
     xcodebuild archive -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release \

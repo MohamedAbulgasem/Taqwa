@@ -40,13 +40,43 @@
     <!-- Today -->
     <string name="today_current_location">Position actuelle</string>
     <string name="today_next_in">%1$s dans</string>
-    <string name="today_latitude_label">À CETTE LATITUDE</string>
     <string name="today_exact_alarms_label">ALARMES EXACTES DÉSACTIVÉES</string>
     <string name="today_exact_alarms_body">Android peut sonner jusqu’à une heure en retard tant que « Alarmes et rappels » n’est pas autorisé pour Taqwa.</string>
     <string name="today_no_location_title">Pas encore de position</string>
     <string name="today_choose_city">Choisir une ville</string>
     <string name="today_allow_location">Autoriser plutôt la localisation</string>
     <string name="today_jumuah">Joumouʿa</string>
+
+    <!-- Prayer engine: the Prayer screen (Task 10) -->
+    <string name="today_whose_checked_title">Calendrier %1$s</string>
+    <string name="today_whose_checked_body">Horaires %1$s pour %2$s, reproduits par Taqwa et vérifiés d’après le calendrier publié.</string>
+    <string name="today_whose_unchecked_title">Méthode %1$s, pas encore entièrement vérifiée</string>
+    <string name="today_whose_unchecked_body">Taqwa calcule les horaires pour %2$s selon la méthode %1$s, avec une marge de sécurité.</string>
+    <string name="today_whose_cautious_body">Les mosquées d’ici suivent des calendriers différents : Taqwa affiche chaque prière une fois qu’elles l’ont toutes commencée.</string>
+    <string name="today_whose_calculated_body">Aucun calendrier local n’est connu ici : Taqwa calcule donc ces horaires avec prudence.</string>
+    <string name="today_about_these_times">À propos de ces horaires</string>
+    <string name="today_times_by">Horaires selon %1$s</string>
+    <string name="today_whose_a11y">%1$s, %2$s. Ouvre la provenance de ces horaires</string>
+    <string name="today_about_a11y">%1$s, %2$s. Ouvre « À propos de ces horaires »</string>
+    <string name="today_set_by_rule">Fixé par règle</string>
+    <string name="today_polar_line">Le soleil ne se lève ni ne se couche ici aujourd’hui : certains horaires suivent la latitude la plus proche où c’est le cas.</string>
+    <string name="today_card_cautious_title">Les mosquées d’ici suivent des calendriers différents</string>
+    <string name="today_card_cautious_body">Taqwa affiche chaque prière une fois qu’elles l’ont toutes commencée.</string>
+    <string name="today_card_sunni_title">Ce sont des horaires de prière sunnites</string>
+    <string name="today_card_sunni_body">Dans la pratique chiite (jaʿfarite), le Maghrib et l’iftar sont plus tardifs.</string>
+    <string name="today_match_my_mosque">Aligner sur ma mosquée</string>
+    <string name="today_card_ok">OK</string>
+    <string name="today_clock_line">L’horloge de votre téléphone a peut-être une heure d’écart</string>
+    <string name="today_clock_stale_early">%1$s a changé d’heure le %2$s et votre téléphone ne le sait pas encore : les horaires de prière peuvent avoir une heure d’avance. Installez la dernière mise à jour du système et laissez la date et l’heure en automatique : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="today_clock_stale_late">%1$s a changé d’heure le %2$s et votre téléphone ne le sait pas encore : les horaires de prière peuvent avoir une heure de retard. Installez la dernière mise à jour du système et laissez la date et l’heure en automatique : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="today_clock_manual_early">%1$s a changé d’heure le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure d’avance. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="today_clock_manual_late">%1$s a changé d’heure le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure de retard. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="today_clock_region_morocco">Le Maroc</string>
+    <string name="today_clock_region_british_columbia">La Colombie-Britannique</string>
+    <string name="today_clock_region_kazakhstan">Le Kazakhstan</string>
+    <string name="today_differ_before">Selon %1$s, %2$s commence à %3$s</string>
+    <string name="today_differ_after">Selon %1$s, %2$s a commencé · Taqwa l’affiche dès %3$s</string>
+    <string name="today_other_asr">%1$s %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">Paramètres</string>
@@ -145,7 +175,7 @@
     <string name="sound_takbir_detail">Allahou akbar, Allahou akbar, environ %1$ss</string>
     <string name="sound_adhan_detail">L’adhan, les %1$s premières secondes</string>
     <string name="sound_sheet_footnote">Une notification de prière joue les %1$s premières secondes du son choisi. L’adhan complet peut être écouté dans l’application.</string>
-    <string name="sound_sheet_muted_hint">Votre téléphone est en mode silencieux ou « Ne pas déranger » : les aperçus et les notifications de prière ne produisent aucun son.</string>
+    <string name="sound_sheet_muted_hint">Votre téléphone est en mode silencieux ou « Ne pas déranger » : les aperçus et les notifications de prière ne produisent aucun son.</string>
 
     <!-- Adhan voice -->
     <string name="adhan_voice_row">Adhan</string>
@@ -158,11 +188,84 @@
     <string name="adhan_voice_azemi_detail">En direct de la mosquée de Malmö, %1$s</string>
 
     <!-- Prayer time settings -->
-    <string name="prayer_times_method">Méthode de calcul</string>
+    <!-- Prayer engine: Settings (Task 12) -->
+    <string name="prayer_times_timetable">Calendrier</string>
+    <string name="timetable_automatic">Automatique</string>
+    <string name="timetable_automatic_named">Automatique · %1$s</string>
+    <string name="prayer_times_paused_value">%1$s · en pause</string>
+    <string name="timetable_out_of_scope">%1$s ne s’applique pas ici : Automatique est utilisé jusqu’à votre retour.</string>
+    <string name="timetable_paused_note">%1$s est en pause : aucune prière n’est affichée avant l’heure d’Automatique tant que vous ne l’avez pas confirmé dans Calendrier.</string>
+    <string name="saudi_fajr_later">Prier le Fajr 5 minutes plus tard</string>
+    <string name="saudi_fajr_later_detail">Certains savants conseillent d’attendre quelques minutes après le Fajr d’Oumm al-Qoura. Le Fajr affiché et son alerte sont décalés ; cessez de manger au Fajr d’Oumm al-Qoura, 5 minutes avant.</string>
+    <string name="prayer_times_asr_label">ASR</string>
+    <string name="asr_automatic">Automatique</string>
+    <string name="asr_shadow_standard">l’ombre égale à la hauteur de l’objet</string>
+    <string name="asr_shadow_hanafi">l’ombre double de la hauteur de l’objet</string>
+    <string name="asr_note_automatic_authority">Automatique : %1$s, comme %2$s.</string>
+    <string name="asr_note_automatic_majority">Automatique : %1$s, comme la plupart des mosquées d’ici.</string>
+    <string name="asr_note_automatic_unknown">Automatique : %1$s, l’heure la plus tardive, car l’école majoritaire à %2$s n’est pas connue.</string>
+    <string name="asr_note_automatic_unknown_here">Automatique : %1$s, l’heure la plus tardive, car l’école majoritaire ici n’est pas connue.</string>
+    <string name="asr_note_standard">Standard : %1$s.</string>
+    <string name="asr_note_hanafi">Hanafite : %1$s.</string>
+    <string name="show_both_asr">Afficher les deux horaires de l’Asr</string>
+    <string name="show_where_differ">Afficher les écarts entre calendriers</string>
+    <string name="show_where_differ_detail">Quand les calendriers suivis à %1$s font commencer une prière à des heures différentes</string>
+    <string name="show_where_differ_detail_here">Quand les calendriers d’ici font commencer une prière à des heures différentes</string>
+    <string name="prayer_times_about_row">À propos de ces horaires</string>
+    <string name="timetable_auto_authority">Le calendrier publié par %1$s pour ce lieu</string>
+    <string name="timetable_auto_majority">%1$s, suivi par la plupart des mosquées d’ici</string>
+    <string name="timetable_auto_cautious">Horaires par précaution : chaque prière une fois que tous les calendriers du lieu l’ont commencée</string>
+    <string name="timetable_auto_calculated">Calculé par Taqwa : aucun calendrier n’est connu pour ce lieu</string>
+    <string name="timetable_times_today">Aujourd’hui : Fajr %1$s, Maghrib %2$s, Isha %3$s</string>
+    <string name="timetable_nearby_label">AUSSI SUIVIS À PROXIMITÉ</string>
+    <string name="timetable_other_methods">Autres méthodes</string>
+    <string name="timetable_other_examples">%1$s, %2$s, %3$s…</string>
+    <string name="timetable_match_mosque">Aligner sur ma mosquée</string>
+    <string name="timetable_checking">Vérification des 12 prochains mois…</string>
+    <string name="timetable_paused_row">En pause : jamais affiché avant Automatique tant que vous ne l’avez pas confirmé</string>
+    <string name="timetable_earlier_start">Son %1$s commence %2$s avant %3$s certains jours. Ne le suivez que si votre mosquée le suit.</string>
+    <string name="timetable_earlier_asr_other">Son Asr (%1$s) commence %2$s avant %3$s certains jours. Ne le suivez que si votre mosquée le suit.</string>
+    <string name="timetable_later_sunrise">Son lever du soleil a lieu %1$s après %2$s certains jours. Ne le suivez que si votre mosquée le suit.</string>
+    <string name="timetable_later_fast">Son jeûne commence %1$s après %2$s certains jours. Ne le suivez que si votre mosquée le suit.</string>
+    <string name="timetable_of_authority">l’horaire %1$s</string>
+    <string name="timetable_of_cautious">les horaires par précaution</string>
+    <string name="timetable_of_taqwa">l’horaire de Taqwa</string>
+    <plurals name="timetable_minutes">
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
+    </plurals>
+    <string name="timetable_keep_automatic">Garder Automatique</string>
+    <string name="timetable_keep_current">Garder %1$s</string>
+    <string name="timetable_follow_it">Le suivre</string>
+    <string name="match_note">D’après le tableau de votre mosquée, pour aujourd’hui, %1$s. Indiquez l’heure où commence chaque prière (l’heure de l’adhan), pas celle de la jamāʿa.</string>
+    <string name="match_fajr_begins">Début du Fajr</string>
+    <string name="match_isha_begins">Début de l’Isha</string>
+    <string name="match_both">Les deux horaires correspondent. Vérifiez ses autres horaires sur le tableau : Dhuhr %1$s, Asr %2$s, Maghrib %3$s.</string>
+    <string name="match_hour_apart">Les deux horaires diffèrent d’exactement une heure : votre tableau suit peut-être l’heure d’été ou d’hiver. Son Fajr commence à %1$s et son Isha à %2$s.</string>
+    <string name="match_one_fajr">Son Fajr correspond, mais son Isha commence à %1$s.</string>
+    <string name="match_one_isha">Son Isha correspond, mais son Fajr commence à %1$s.</string>
+    <string name="match_none">Aucun calendrier connu de Taqwa ne correspond aux deux horaires.</string>
+    <string name="match_fajr_isha">Fajr %1$s, Isha %2$s</string>
+    <string name="match_use">Utiliser ce calendrier</string>
+    <string name="match_in_use">Taqwa suit déjà ce calendrier.</string>
+    <string name="timetable_source_authority">l’heure %1$s</string>
+    <string name="timetable_source_cautious">l’heure par précaution</string>
+    <string name="timetable_source_taqwa">l’heure de Taqwa</string>
+    <string name="timetable_source_latest">le calendrier local le plus tardif</string>
+    <string name="adjust_paused_for">%1$s · en pause (réglé pour %2$s)</string>
+    <string name="adjust_timetable_paused_note">Les ajustements qui avancent un horaire attendent que le calendrier %1$s soit confirmé dans Calendrier.</string>
+    <string name="adjust_confirm_title">Afficher %1$s avant %2$s ?</string>
+    <string name="adjust_confirm_body">Une prière accomplie avant son heure doit être refaite. Ne le faites que si le calendrier de votre mosquée est plus tôt.</string>
+    <string name="adjust_confirm_body_maghrib">Une prière accomplie avant son heure doit être refaite, et un jeûne rompu avant l’heure doit être rattrapé. Ne le faites que si le calendrier de votre mosquée est plus tôt.</string>
+    <string name="adjust_strong_body">Chez Taqwa, %1$s vient au plus %2$s après %3$s : %4$s le place donc avant cette heure. Une prière accomplie avant son heure doit être refaite. Ne le faites que si le calendrier de votre mosquée est aussi tôt.</string>
+    <string name="adjust_strong_body_maghrib">Chez Taqwa, %1$s vient au plus %2$s après %3$s : %4$s le place donc avant cette heure. Une prière accomplie avant son heure doit être refaite, et un jeûne rompu avant l’heure doit être rattrapé. Ne le faites que si le calendrier de votre mosquée est aussi tôt.</string>
+    <string name="adjust_keep">Garder %1$s</string>
+    <string name="adjust_use">Utiliser %1$s</string>
+    <string name="adjust_note">Décale un horaire d’une heure au plus par rapport au calendrier. À n’utiliser que si le tableau de votre mosquée diffère.</string>
+    <!-- /Prayer engine: Settings (Task 12) -->
     <string name="prayer_times_high_latitude">Règle des hautes latitudes</string>
     <string name="prayer_times_manual">Ajustements manuels</string>
-    <string name="prayer_times_madhab_label">MADHAB POUR L’ASR</string>
-    <string name="madhab_standard">Majoritaire</string>
+    <string name="madhab_standard">Standard</string>
     <string name="madhab_hanafi">Hanafite</string>
     <string name="prayer_times_hijri_label">DATE HÉGIRIENNE</string>
     <string name="hijri_day_before">Un jour avant</string>
@@ -178,7 +281,6 @@
     <string name="method_egyptian">Autorité générale égyptienne</string>
     <string name="method_umm_al_qura">Oumm al-Qoura (La Mecque)</string>
     <string name="method_karachi">Université des sciences islamiques, Karachi</string>
-    <string name="method_tehran">Institut de géophysique, Téhéran</string>
     <string name="method_dubai">Dubaï</string>
     <string name="method_kuwait">Koweït</string>
     <string name="method_qatar">Qatar</string>
@@ -191,15 +293,58 @@
     <string name="high_lat_middle">Milieu de la nuit</string>
     <string name="high_lat_seventh">Un septième de la nuit</string>
     <string name="high_lat_twilight">Angle du crépuscule</string>
-    <string name="high_lat_auto_note">À votre latitude, le mode automatique utilise la règle : %1$s.</string>
     <string name="high_lat_picker_note">Au-delà d’environ %1$s degrés, le soleil ne descend plus assez sous l’horizon pour que le Fajr et l’Isha se calculent normalement : une règle de substitution prend alors le relais.</string>
 
-    <string name="manual_note">Décale chaque horaire d’une heure au maximum, en plus de la méthode de calcul. À n’utiliser que si le tableau de votre mosquée diffère de l’heure calculée.</string>
+    <!-- Prayer engine: About these times (Task 11) -->
+    <string name="about_times_title">À propos de ces horaires</string>
+    <string name="timetable_cautious">Horaires par précaution</string>
+    <string name="timetable_calculated">Calculé par Taqwa</string>
+    <string name="about_who_publishes">Qui les publie</string>
+    <string name="about_who_publishes_body">%1$s publie les horaires de prière suivis pour %2$s.</string>
+    <string name="about_not_affiliated">Taqwa n’est pas affiliée à %1$s.</string>
+    <string name="about_how_reproduces">Comment Taqwa les reproduit</string>
+    <string name="about_method_intro">Comment %1$s calcule : %2$s.</string>
+    <string name="about_method_fajr_angle">l’aube (Fajr) à %1$s° sous l’horizon</string>
+    <string name="about_method_isha_angle">la tombée de la nuit (Isha) à %1$s° sous l’horizon</string>
+    <string name="about_method_fajr_curve">l’aube (Fajr) selon un angle crépusculaire qui change au fil de l’année, entre %1$s° et %2$s° sous l’horizon</string>
+    <string name="about_method_isha_curve">la tombée de la nuit (Isha) selon un angle crépusculaire qui change au fil de l’année, entre %1$s° et %2$s° sous l’horizon</string>
+    <string name="about_method_isha_after_maghrib">l’Isha %1$s minutes après le Maghrib</string>
+    <string name="about_method_minutes_note">ses propres minutes (%1$s)</string>
+    <string name="about_method_rounding_note">et chaque début arrondi à la minute suivante (le lever du soleil et la fin du sahour à la minute précédente)</string>
+    <string name="about_method_daily_sun">la position du soleil prise une fois par jour</string>
+    <string name="about_method_horizon_dip">son propre horizon, abaissé pour l’altitude et la brume</string>
+    <string name="about_how_checked">Comment ils ont été vérifiés</string>
+    <string name="about_stat_days_at_places">jours sur %1$s lieux</string>
+    <string name="about_stat_never_before">débuts avant %1$s</string>
+    <string name="about_stat_minutes_value">%1$s min</string>
+    <string name="about_stat_at_most_after">de retard au plus</string>
+    <string name="about_checked_through">Vérifiés d’après le calendrier publié par %1$s jusqu’au %2$s.</string>
+    <string name="about_not_measured_unit">Pas mesuré pour %1$s.</string>
+    <string name="about_checked_so_far_with_data">Vérifiés sur %1$s jours jusqu’ici : jamais avant %2$s, jusqu’à %3$s minutes après.</string>
+    <string name="about_checked_so_far_without_data">Taqwa ne les a pas encore comparés au calendrier publié par %1$s.</string>
+    <string name="about_not_followed_irn_tromso">Le Fajr à l’heure de La Mecque que publie %1$s n’est pas suivi de fin avril à mi-mai et de fin juillet à mi-août, quand il tombe après le lever du soleil, ni le lever du soleil qu’il publie sous le soleil de minuit ; le Maghrib ne vient jamais avant le vrai coucher du soleil.</string>
+    <string name="about_authority_method_title">Méthode %1$s</string>
+    <string name="about_authority_unchecked_body">%1$s publie les horaires de prière pour %2$s. Taqwa les calcule comme le fait %1$s, avec une marge de sécurité.</string>
+    <string name="about_majority_unchecked_body">La plupart des mosquées à %2$s suivent la méthode %1$s. Taqwa calcule les horaires selon cette méthode, avec une marge de sécurité.</string>
+    <string name="about_nearby_heading">Calendriers que suivent plutôt certaines mosquées d’ici</string>
+    <string name="about_cautious_body">À %1$s, les mosquées suivent de bonne foi des calendriers différents, et aucun n’est suivi par la plupart. Taqwa combine %2$s : chaque prière s’affiche une fois que tous l’ont commencée.</string>
+    <string name="about_cautious_maghrib_cap">Le Maghrib fait exception aujourd’hui : il suit %1$s, le calendrier le plus suivi, plutôt que le Maghrib plus tardif de %2$s.</string>
+    <string name="about_which_decides">Quel calendrier fixe chaque horaire aujourd’hui</string>
+    <string name="about_calculated_body">Faute de calendrier sunnite officiel pour %1$s, Taqwa en calcule un avec prudence : %2$s.</string>
+    <string name="about_asr_heading">Asr</string>
+    <string name="about_asr_known">%1$s : %3$s, car c’est l’heure que suivent la plupart des mosquées à %2$s.</string>
+    <string name="about_asr_unknown">%1$s : %3$s, l’heure la plus tardive, car l’école majoritaire à %2$s n’est pas connue. Vous pouvez la changer dans les Paramètres.</string>
+    <string name="about_sunni_heading">Horaires sunnites</string>
+    <string name="about_sunni_body">Ce sont des horaires de prière sunnites. Dans la pratique chiite (jaʿfarite), le Maghrib et l’iftar sont plus tardifs.</string>
+    <string name="about_check_mosque_heading">Vérifiez auprès de votre mosquée</string>
+    <string name="about_check_mosque_body">Les horaires calculés peuvent différer de quelques minutes de ceux d’une mosquée. Si c’est le cas de la vôtre, choisissez son calendrier ou ajustez une prière dans les Paramètres.</string>
+    <string name="about_if_fasting">Si vous jeûnez</string>
+    <string name="about_stop_eating">Arrêtez de manger au plus tard à %1$s aujourd’hui.</string>
 
     <!-- Attribution -->
     <string name="attribution_intro">Taqwa repose sur le travail que d’autres ont offert. Leurs licences imposent de les citer, et cela leur est dû de toute façon.</string>
     <string name="credit_calculation">Calcul des horaires de prière</string>
-    <string name="credit_calculation_detail">Adhan, de Batoul Apps, licence MIT.</string>
+    <string name="credit_calculation_detail">Le moteur propre à Taqwa. La direction de la qibla est calculée avec Adhan de Batoul Apps, licence MIT.</string>
     <string name="credit_cities">Base de données des villes</string>
     <string name="credit_cities_detail">GeoNames cities15000, licence CC BY 4.0.</string>
     <string name="credit_typeface">Police Manrope</string>
@@ -216,6 +361,75 @@
     <string name="credit_quran_layout_detail">Sauts de page et de ligne du Mushaf de Médine, d’après les données de la Quranic Universal Library.</string>
     <string name="credit_translations">Traductions</string>
     <string name="credit_translations_detail">Tirées du projet Tanzil pour un usage non commercial. Chaque traducteur est cité ci-dessous.</string>
+
+    <!-- Prayer engine: authority names (Task 10) -->
+    <string name="authority_awqaf_jordan">Awqaf de Jordanie</string>
+    <string name="authority_awqaf_kuwait">Awqaf du Koweït</string>
+    <string name="authority_awqaf_libya">Awqaf de Libye</string>
+    <string name="authority_awqaf_syria">Awqaf de Syrie</string>
+    <string name="authority_awqaf_uae">Awqaf des Émirats</string>
+    <string name="authority_bahrain_council">Conseil suprême de Bahreïn</string>
+    <string name="authority_bik">BIK (Kosovo)</string>
+    <string name="authority_cape_calendar">Communauté du Cap</string>
+    <string name="authority_chicago">Chicago 18°/15°</string>
+    <string name="authority_dar_al_fatwa">Dar al-Fatwa</string>
+    <string name="authority_diyanet">Diyanet</string>
+    <string name="authority_diyanet_europe">Diyanet Europe</string>
+    <string name="authority_dum_rd">Muftiat du Daghestan</string>
+    <string name="authority_dum_rf">DUM RF</string>
+    <string name="authority_dum_rt">Muftiat du Tatarstan</string>
+    <string name="authority_emb">EMB (Belgique)</string>
+    <string name="authority_esa">ESA (Égypte)</string>
+    <string name="authority_fazilet">Fazilet</string>
+    <string name="authority_fianz">FIANZ</string>
+    <string name="authority_fids">FIDS</string>
+    <string name="authority_gaza_awqaf">Awqaf de Gaza</string>
+    <string name="authority_grande_mosquee_paris">Grande Mosquée de Paris</string>
+    <string name="authority_habous">Ministère des Habous</string>
+    <string name="authority_iacad">IACAD (Dubaï)</string>
+    <string name="authority_icci">ICCI (Dublin)</string>
+    <string name="authority_ifb">Fondation islamique du Bangladesh</string>
+    <string name="authority_ifi">IFI (Irlande)</string>
+    <string name="authority_ift">Islamic Foundation Toronto</string>
+    <string name="authority_iggo">IGGÖ (Autriche)</string>
+    <string name="authority_iit">Islamic Institute</string>
+    <string name="authority_inm">INM (Tunisie)</string>
+    <string name="authority_irn">IRN (Norvège)</string>
+    <string name="authority_isna">ISNA</string>
+    <string name="authority_iz_bih">IZ BiH</string>
+    <string name="authority_izcg">IZ (Monténégro)</string>
+    <string name="authority_jakim">JAKIM</string>
+    <string name="authority_jamiat">Jamiatul Ulama</string>
+    <string name="authority_karachi">Karachi</string>
+    <string name="authority_kemenag">Kemenag</string>
+    <string name="authority_kmsh">KMSH (Albanie)</string>
+    <string name="authority_kyrgyz_muftiate">Muftiat du Kirghizistan</string>
+    <string name="authority_lakemba">Mosquée de Lakemba</string>
+    <string name="authority_london_unified">London Unified</string>
+    <string name="authority_mac_toronto">MAC Masjid</string>
+    <string name="authority_marw">Ministère des Affaires religieuses</string>
+    <string name="authority_mauritania">Ministère des Affaires islamiques</string>
+    <string name="authority_mjc">MJC</string>
+    <string name="authority_mora_brunei">MORA (Brunei)</string>
+    <string name="authority_muhammadiyah">Muhammadiyah</string>
+    <string name="authority_muis">MUIS</string>
+    <string name="authority_oman_awqaf">Awqaf d’Oman</string>
+    <string name="authority_pa_iftaa">Dar al-Iftaa palestinien</string>
+    <string name="authority_qatar_calendar">Maison du calendrier du Qatar</string>
+    <string name="authority_qmdb">Muftiat du Kazakhstan</string>
+    <string name="authority_sudan_fiqh">Académie du fiqh du Soudan</string>
+    <string name="authority_sunni_endowment">Waqf sunnite</string>
+    <string name="authority_umm_al_qura">Oumm al-Qoura</string>
+    <string name="authority_uzbek_board">Muftiat d’Ouzbékistan</string>
+    <string name="authority_wifaqul_ulama">Wifaqul Ulama</string>
+    <string name="timetable_twelve_degrees">Calendrier à 12°</string>
+    <string name="timetable_late_dawn">Calendrier à Fajr tardif</string>
+    <string name="timetable_moroccan_calendar">Calendrier marocain</string>
+    <string name="timetable_isha_ninety">Calendrier Isha à 90 min</string>
+    <string name="timetable_fifteen_degrees">Calendrier à 15°</string>
+    <string name="timetable_eighteen_degrees">Calendrier à 18°</string>
+    <string name="timetable_chicago_eighteen">Calendrier de Chicago à 18°</string>
+    <string name="timetable_rabita">Rabita Helsinki</string>
 
     <!-- Qibla (plan 2) -->
     <string name="qibla_no_sensor_title">Pas de capteur de boussole</string>
@@ -266,7 +480,6 @@
     <string name="notifications_blocked">Les notifications sont désactivées pour Taqwa dans les paramètres du système : aucune alerte de prière ne peut s’afficher tant qu’elles ne sont pas réautorisées.</string>
     <string name="notifications_open_settings">Ouvrir les paramètres de notification</string>
     <string name="hijri_tabular">Tabulaire</string>
-    <string name="method_tehran_maghrib_note">Le Maghrib suit le coucher du soleil ; l’angle de 4,5° propre à cette méthode n’est pas encore appliqué.</string>
     <!-- Bottom tab bar (iteration 1: the owner asked for it after seeing Today on a phone;
          iteration 8: Qibla folded into the Prayer screen; slice 2: the Quran tab arrives). -->
     <string name="tab_prayer">Prière</string>

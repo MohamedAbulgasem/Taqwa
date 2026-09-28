@@ -41,10 +41,12 @@ data class WidgetSnapshot(
     val previousPrayerEpochSeconds: Long = 0L,
     /**
      * Every obligatory prayer of the day the mirror was written and the day after, each as an
-     * absolute instant with its clock string. This is what lets a widget keep counting *across*
-     * prayers without the app: the next prayer is whichever entry is first after the widget's own
-     * clock, not whichever one was next when the app last had Today open. Empty on a mirror from
-     * a build before this field existed, in which case the older fields carry the render.
+     * absolute instant with its clock string, and any start of the day before that falls after
+     * the day of writing's midnight (a high-latitude Isha, spec §3.3). This is what lets a widget
+     * keep counting *across* prayers without the app: the next prayer is whichever entry is first
+     * after the widget's own clock, not whichever one was next when the app last had Today open.
+     * Empty on a mirror from a build before this field existed, in which case the older fields
+     * carry the render.
      */
     val schedule: List<ScheduledPrayer> = emptyList(),
     /**
@@ -62,7 +64,8 @@ data class WidgetSnapshot(
 )
 
 /** One entry of [WidgetSnapshot.schedule]. [dayIndex] is 0 for the day of writing, 1 for the
- * day after, so a renderer can pick the five rows that belong together without a time zone. */
+ * day after, so a renderer can pick the five rows that belong together without a time zone, and
+ * −1 for a start of the day before carried past midnight, which has no rows of its own. */
 data class ScheduledPrayer(
     val prayer: Prayer,
     val epochSeconds: Long,

@@ -1,0 +1,286 @@
+{
+  "entry": "fr.cautious",
+  "class": "C",
+  "engineHash": "bf2356acdcc671a5",
+  "broken": 0,
+  "places": 1,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "placeDays": 365,
+  "heldOutDays": 365,
+  "ramadanDays": 30,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 365
+      },
+      "exactShare": 0,
+      "worstLate": 15,
+      "lateLimit": 15,
+      "lateLimitFrom": "entry fr.cautious",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 365,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 365
+      },
+      "exactShare": 0,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry fr.cautious",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 1,
+        "1": 336,
+        "2": 28,
+        "3+": 0
+      },
+      "exactShare": 0.0027,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "entry fr.cautious",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 54,
+        "3+": 311
+      },
+      "exactShare": 0,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry fr.cautious",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 7,
+        "2": 259,
+        "3+": 99
+      },
+      "exactShare": 0,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "entry fr.cautious",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 365,
+      "early": 0,
+      "late": {
+        "0": 20,
+        "1": 69,
+        "2": 22,
+        "3+": 254
+      },
+      "exactShare": 0.0548,
+      "worstLate": 38,
+      "lateLimit": 38,
+      "lateLimitFrom": "entry fr.cautious",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 365,
+      "lateEnd": 0,
+      "late": {
+        "0": 24,
+        "1": 66,
+        "2": 14,
+        "3+": 261
+      },
+      "exactShare": 0.0658,
+      "worstLate": 29,
+      "lateLimit": 29,
+      "lateLimitFrom": "entry fr.cautious",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 365,
+    "ramadanDays": 30,
+    "events": {
+      "fajr": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 365
+        },
+        "exactShare": 0,
+        "worstLate": 15,
+        "lateLimit": 15,
+        "lateLimitFrom": "entry fr.cautious",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 365,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 365
+        },
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry fr.cautious",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 1,
+          "1": 336,
+          "2": 28,
+          "3+": 0
+        },
+        "exactShare": 0.0027,
+        "worstLate": 2,
+        "lateLimit": 2,
+        "lateLimitFrom": "entry fr.cautious",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 54,
+          "3+": 311
+        },
+        "exactShare": 0,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "entry fr.cautious",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 7,
+          "2": 259,
+          "3+": 99
+        },
+        "exactShare": 0,
+        "worstLate": 3,
+        "lateLimit": 3,
+        "lateLimitFrom": "entry fr.cautious",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 365,
+        "early": 0,
+        "late": {
+          "0": 20,
+          "1": 69,
+          "2": 22,
+          "3+": 254
+        },
+        "exactShare": 0.0548,
+        "worstLate": 38,
+        "lateLimit": 38,
+        "lateLimitFrom": "entry fr.cautious",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 365,
+        "lateEnd": 0,
+        "late": {
+          "0": 24,
+          "1": 66,
+          "2": 14,
+          "3+": 261
+        },
+        "exactShare": 0.0658,
+        "worstLate": 29,
+        "lateLimit": 29,
+        "lateLimitFrom": "entry fr.cautious",
+        "overLimit": 0
+      }
+    }
+  },
+  "maghribCap": {
+    "uncheckedDays": 0,
+    "members": {
+      "fr.fifteen": {
+        "days": 365,
+        "cappedDays": 258,
+        "leastGap": 4,
+        "mostGap": 5
+      },
+      "fr.gmp": {
+        "days": 365,
+        "cappedDays": 258,
+        "leastGap": 1,
+        "mostGap": 3
+      },
+      "fr.twelve": {
+        "days": 365,
+        "cappedDays": 258,
+        "leastGap": 1,
+        "mostGap": 3
+      }
+    }
+  },
+  "lateLimits": {
+    "entry fr.cautious: 2 min": {
+      "reason": "Each family's tables differ among themselves (Drancy's and Al-Amel's Asr swing by 3-5 min over the year; the 12-13° family prints Zuhr + 5 and Maghrib + 3..4); each member takes its family's latest. Dhuhr runs up to 2 min after the latest of them.",
+      "events": ["dhuhr"]
+    },
+    "entry fr.cautious: 3 min": {
+      "reason": "Each family's tables differ among themselves (Drancy's and Al-Amel's Asr swing by 3-5 min over the year; the 12-13° family prints Zuhr + 5 and Maghrib + 3..4); each member takes its family's latest. Maghrib (capped at the 12–13° family's + 4) runs up to 3 min after the latest of them.",
+      "events": ["maghrib"]
+    },
+    "entry fr.cautious: 4 min": {
+      "reason": "Each family's tables differ among themselves (Drancy's and Al-Amel's Asr swing by 3-5 min over the year; the 12-13° family prints Zuhr + 5 and Maghrib + 3..4); each member takes its family's latest. Asr (Diyanet's + 4 the latest) runs up to 4 min after the latest of the three tables held.",
+      "events": ["asrStandard"]
+    },
+    "entry fr.cautious: 8 min": {
+      "reason": "Sunrise is the earliest member's, Diyanet's (the sun's less 7): up to 8 min before the three families' tables, which print the sun's own.",
+      "events": ["sunrise"]
+    },
+    "entry fr.cautious: 15 min": {
+      "reason": "The 12–13° family prints Fajr from about 12° to 13° (Drancy's at 12.7°); its member takes 12°, the family's latest, never before any of them, so against Drancy's table Fajr runs up to 7 min late; from late May to June Diyanet's Paris table (its takdir, a member since ruling R87) is the latest, up to 15 min after Drancy's.",
+      "events": ["fajr"]
+    },
+    "entry fr.cautious: 29 min": {
+      "reason": "The end of eating is the earliest member's: from late April to August the flat 15° family's 15° dawn, which Al-Amel's table (the family's one held) leaves for a later summer Fajr of its own, up to 29 min before the earliest printed Fajr of the three tables in June; the rest of the year Diyanet's Paris table's dawn (its 18° and takdir, a member since ruling R87), up to 26 min before the Grande Mosquée's own Fajr in April and August and about 12 in winter, and where the Grande Mosquée's page changes method its own dawn (ruling R80: 16 min on 1 and 2 January, 8 on 29 and 30 September).",
+      "events": ["endOfEating"]
+    },
+    "entry fr.cautious: 38 min": {
+      "reason": "The flat 15° family prints Isha at 15° (in a Paris June after midnight), while the Grande Mosquée's is sunset + 90 and Drancy's and Al-Amel's summer Isha follow earlier rules of their own; Isha is the latest member's, so in summer it runs up to 38 min after the latest of those three tables.",
+      "events": ["isha"]
+    }
+  }
+}

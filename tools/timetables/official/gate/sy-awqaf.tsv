@@ -1,0 +1,7 @@
+# Syria, Ministry of Awqaf: no monthly table was captured (the one Wayback page held is a menu of
+# links to per-city pages, none of which were themselves captured), only two dated samples the
+# research found. Too thin for a real split; the earlier date fits, the later (Umayyad Mosque, a
+# slightly different point) is held out.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/normalized-7e/sy-awqaf-damascus-fit.txt	sy.awqaf	33.5138	36.2765	Asia/Damascus	F S D A M I	daily	standard	fit	Damascus, Ramadan 1447 imsakiya sample
+archive/tables/normalized-7e/sy-awqaf-damascus-test.txt	sy.awqaf	33.5116	36.3064	Asia/Damascus	F S D A M I	daily	standard	test	Umayyad Mosque, held out

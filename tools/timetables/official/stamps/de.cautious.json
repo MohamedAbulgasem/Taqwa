@@ -1,0 +1,265 @@
+{
+  "entry": "de.cautious",
+  "class": "C",
+  "engineHash": "872424c502d1d719",
+  "broken": 0,
+  "places": 1,
+  "first": "2026-09-01",
+  "last": "2026-10-31",
+  "placeDays": 61,
+  "heldOutDays": 61,
+  "ramadanDays": 0,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 61,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 61
+      },
+      "exactShare": 0,
+      "worstLate": 43,
+      "lateLimit": 44,
+      "lateLimitFrom": "entry de.cautious",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 61,
+      "lateEnd": 0,
+      "late": {
+        "0": 26,
+        "1": 35,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.4262,
+      "worstLate": 1,
+      "lateLimit": 2,
+      "lateLimitFrom": "entry de.cautious",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 61,
+      "early": 0,
+      "late": {
+        "0": 51,
+        "1": 10,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.8361,
+      "worstLate": 1,
+      "lateLimit": 1,
+      "lateLimitFrom": "class C",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 61,
+      "early": 0,
+      "late": {
+        "0": 50,
+        "1": 11,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.8197,
+      "worstLate": 1,
+      "lateLimit": 1,
+      "lateLimitFrom": "class C",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 61,
+      "early": 0,
+      "late": {
+        "0": 56,
+        "1": 5,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.918,
+      "worstLate": 1,
+      "lateLimit": 1,
+      "lateLimitFrom": "class C",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 61,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 61
+      },
+      "exactShare": 0,
+      "worstLate": 11,
+      "lateLimit": 11,
+      "lateLimitFrom": "entry de.cautious",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 61,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 61
+      },
+      "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry de.cautious",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 61,
+    "ramadanDays": 0,
+    "events": {
+      "fajr": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 61
+        },
+        "exactShare": 0,
+        "worstLate": 43,
+        "lateLimit": 44,
+        "lateLimitFrom": "entry de.cautious",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 61,
+        "lateEnd": 0,
+        "late": {
+          "0": 26,
+          "1": 35,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.4262,
+        "worstLate": 1,
+        "lateLimit": 2,
+        "lateLimitFrom": "entry de.cautious",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 51,
+          "1": 10,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8361,
+        "worstLate": 1,
+        "lateLimit": 1,
+        "lateLimitFrom": "class C",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 50,
+          "1": 11,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8197,
+        "worstLate": 1,
+        "lateLimit": 1,
+        "lateLimitFrom": "class C",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 56,
+          "1": 5,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.918,
+        "worstLate": 1,
+        "lateLimit": 1,
+        "lateLimitFrom": "class C",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 61,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 61
+        },
+        "exactShare": 0,
+        "worstLate": 11,
+        "lateLimit": 11,
+        "lateLimitFrom": "entry de.cautious",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 61,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 61
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry de.cautious",
+        "overLimit": 0
+      }
+    }
+  },
+  "maghribCap": {
+    "uncheckedDays": 0,
+    "members": {
+      "tr.diyanet.europe": {
+        "days": 61,
+        "cappedDays": 14,
+        "leastGap": 0,
+        "mostGap": 1
+      }
+    }
+  },
+  "lateLimits": {
+    "class C: 1 min": {
+      "events": ["dhuhr", "asrStandard", "maghrib"]
+    },
+    "entry de.cautious: 2 min": {
+      "reason": "Diyanet's European method's own margins (subtask 7b): sunrise up to 2 min before Diyanet's Berlin table.",
+      "events": ["sunrise"]
+    },
+    "entry de.cautious: 5 min": {
+      "reason": "The end of eating is the earliest member's, the 18° family's 18.4° dawn (Hamburg's 18.35°, ruling R87), up to 5 min before Diyanet's Berlin imsak.",
+      "events": ["endOfEating"]
+    },
+    "entry de.cautious: 11 min": {
+      "reason": "Isha is the later member's, VIKZ's: Diyanet's Isha + 10 min by VIKZ's own rule (no VIKZ table is held), up to 11 min after Diyanet's Berlin table.",
+      "events": ["isha"]
+    },
+    "entry de.cautious: 44 min": {
+      "reason": "Fajr is the latest member's: the late-dawn family's 13° from September to April (ruling R87), up to 44 min after Diyanet's Berlin table in early September, as its takdir ends, and about 30 in October; in summer VIKZ's, Diyanet's generic European method (VIKZ has no city curves of its own), no earlier than 19 % of the night, up to 12 min after the table.",
+      "events": ["fajr"]
+    }
+  }
+}

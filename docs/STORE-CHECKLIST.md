@@ -289,6 +289,9 @@ costs days.
 - **Release signing** reads `keystore.properties` (git-ignored; `scripts/make-upload-key.sh`
   writes it); `scripts/release.sh` builds the signed App Bundle and APK with the R8 mapping
   inside the bundle.
+- **Prayer-time stamps**: `scripts/release.sh` and `scripts/ios-release.sh` both run
+  `./gradlew -p tools/timetables checkStamps` first and refuse to build on a stale or red stamp
+  (spec §5, ruling R86).
 - **Manifest**: `MY_PACKAGE_REPLACED` re-arms prayer alarms after every update; `USE_EXACT_ALARM`
   removed, `SCHEDULE_EXACT_ALARM` kept with an in-app route to "Alarms & reminders"; location and
   compass hardware optional; `localeConfig` lists the seven languages; backup opted out twice

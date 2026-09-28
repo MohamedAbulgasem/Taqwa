@@ -6,15 +6,15 @@ plugins {
 
 /**
  * The app's own files this generator compiles, by path, unchanged. They are the prayer-time
- * engine and everything it reads, the Qibla maths, the tabular Hijri calendar and the Hijri month
- * names: every number and every month name on a city page comes out of these files, exactly as
- * the app computes them. They must stay free of Compose and platform code; a change that breaks
- * that fails this build, and with it the website's nightly run, which is the point.
+ * engine (the whole `prayer` package, the new engine and its registry included) and everything it
+ * reads, the Qibla maths, the tabular Hijri calendar and the Hijri month names: every number and
+ * every month name on a city page, and every day the gate checks, comes out of these files,
+ * exactly as the app computes them. They must stay free of Compose and platform code; a change
+ * that breaks that fails this build, and with it the website's nightly run, which is the point.
  */
 val appSources = listOf(
-    "world/taqwa/app/prayer/PrayerTimesEngine.kt",
-    "world/taqwa/app/prayer/HighLatitudeSelector.kt",
-    "world/taqwa/app/prayer/CalculationMethodDefaults.kt",
+    "world/taqwa/app/prayer/**",
+    "world/taqwa/app/domain/TimelineState.kt",
     "world/taqwa/app/domain/Prayer.kt",
     "world/taqwa/app/domain/PrayerSettings.kt",
     "world/taqwa/app/domain/GeoLocation.kt",
@@ -29,8 +29,6 @@ val appSources = listOf(
  * the app computes. */
 val appTests = listOf(
     "world/taqwa/app/prayer/PrayerTimesEngineTest.kt",
-    "world/taqwa/app/prayer/HighLatitudeSelectorTest.kt",
-    "world/taqwa/app/prayer/CalculationMethodDefaultsTest.kt",
     "world/taqwa/app/qibla/QiblaMathTest.kt",
     "world/taqwa/app/hijri/TabularHijriCalendarTest.kt",
 )
@@ -62,8 +60,55 @@ kotlin {
     }
 }
 
+/**
+ * The archive root the gate reads official tables from: `-Pofficial=<dir>`, else the environment's
+ * `TAQWA_OFFICIAL`, else this checkout's own `tools/timetables/official`, whose `archive/` is
+ * git-ignored (restored from the local-only branch, see that folder's README). Gate rows name files
+ * relative to it, except `open/…` tables, which are read from this checkout's own
+ * `tools/timetables/official/open`.
+ *
+ * Where no root is given and this checkout holds no `archive/`: on CI (`CI` set) the root is that
+ * missing folder, so every row is skipped and the gate passes with "0 rows checked"; anywhere else
+ * the gate and the tests stop at once and say how to restore it ([requireArchive]). Where a root
+ * holds its archive, a file it does not hold fails.
+ */
+val checkoutOfficial: File = repoRoot.resolve("tools/timetables/official")
+val explicitOfficial: Provider<String> = providers.gradleProperty("official")
+    .orElse(providers.environmentVariable("TAQWA_OFFICIAL"))
+val onCi: Boolean = providers.environmentVariable("CI").orNull.let { !it.isNullOrBlank() && it != "false" }
+val archiveHeld: Boolean = checkoutOfficial.resolve("archive").isDirectory
+val officialRoot: Provider<String> = explicitOfficial.orElse(
+    if (archiveHeld || !onCi) checkoutOfficial.path else checkoutOfficial.resolve("archive").path,
+)
+
+/**
+ * Stops the task before it reads anything where the root is this checkout's own and its `archive/`
+ * is missing, off CI: a gate that skipped every archived row would prove nothing and still pass.
+ */
+fun Task.requireArchive() {
+    val missing = !explicitOfficial.isPresent && !onCi && !archiveHeld
+    val archive = checkoutOfficial.resolve("archive").path
+    doFirst {
+        if (missing) {
+            throw GradleException(
+                "No official archive at $archive. The gate reads the official timetables from this " +
+                    "checkout's tools/timetables/official/archive (git-ignored; tools/timetables/official/README.md " +
+                    "says how to restore it). Restore it there, pass -Pofficial=<dir> (or TAQWA_OFFICIAL) for a root " +
+                    "that holds archive/, or set CI=true to skip every archived row.",
+            )
+        }
+    }
+}
+
 tasks.withType<Test>().configureEach {
+    requireArchive()
     systemProperty("taqwa.repoRoot", repoRoot.path)
+    systemProperty("taqwa.official", officialRoot.get())
+    // -PgateGroup / -Pentry narrow NeverEarlyGateTest as they narrow the gate task (one group's proof;
+    // not -Pgroup, which is Gradle's own project group).
+    systemProperty("taqwa.gateGroups", providers.gradleProperty("gateGroup").getOrElse(""))
+    systemProperty("taqwa.gateEntries", providers.gradleProperty("entry").getOrElse(""))
+    maxHeapSize = "2g"
     // The tests read the app's strings and city files through that path, so they are inputs:
     // without this a changed strings.xml would let a cached test result stand.
     inputs.files(
@@ -71,6 +116,17 @@ tasks.withType<Test>().configureEach {
             include("values*/strings.xml", "files/cities.csv", "files/city-names-*.csv")
         },
     ).withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("appResources")
+    // NeverEarlyGateTest reads the gate rows and every official table they name.
+    inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/gate")) { include("*.tsv") })
+        .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("gateRows")
+    // UkMawaqitSurveyTest reads its survey's calendars, faults and outliers (official/survey/).
+    inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/survey")) { include("**/*.tsv") })
+        .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("surveys")
+    inputs.files(fileTree(officialRoot.get()) { include("open/**", "archive/tables/**", "archive/raw/**") })
+        .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("officialTables")
+    // open/ tables are read from this checkout, not the archive root: a changed one must rerun the gate.
+    inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/open")))
+        .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("openTables")
 }
 
 /**
@@ -97,4 +153,104 @@ tasks.register<JavaExec>("generate") {
         listOf("--cities", cities.get(), "--app", app.get(), "--out", out.get()) +
             (if (now.get().isNotBlank()) listOf("--now", now.get()) else emptyList())
     })
+}
+
+/**
+ * The gate (spec §5): every official day held locally, checked against the engine.
+ *
+ *     ./gradlew -p tools/timetables gate [-Pofficial=<dir>] [-PgateGroup=sg-muis,ru-dumrt] [-Pentry=sg.muis]
+ *         [-Pfit=sg.muis] [-Pstamps=false]
+ *
+ * Prints a table per entry and event (days, early, late ends, 0/1/2/3+ minutes late, exact share),
+ * writes each checked entry's stamp to `official/stamps/<entry>.json`, and with `-Pfit` prints that
+ * entry's never-early margins from its fit rows and the held-out table they give. Fails when a
+ * start is early, an end late, lateness is over the entry's limit, or a day is out of order.
+ */
+/**
+ * Task 11's proof-stamp table: writes `ProofStamps.kt` (the About-times screen's headline numbers)
+ * from every committed `official/stamps/<entry>.json`. Re-run after any `gate` run that changes a
+ * stamp, and commit the result — see `GenerateProofStamps.kt`'s own comment.
+ *
+ *     ./gradlew -p tools/timetables generateProofStamps [-Pstamps=<dir>] [-Pout=<file>]
+ */
+tasks.register<JavaExec>("generateProofStamps") {
+    group = "application"
+    description = "Writes ProofStamps.kt (the About-times screen's headline numbers) from the committed stamps."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.gate.GenerateProofStampsKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    val stampsDir = providers.gradleProperty("stamps").orElse("")
+    val out = providers.gradleProperty("out").orElse("")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", repoRoot.path) +
+            (if (stampsDir.get().isNotBlank()) listOf("--stamps", stampsDir.get()) else emptyList()) +
+            (if (out.get().isNotBlank()) listOf("--out", out.get()) else emptyList())
+    })
+}
+
+/**
+ * Writes the golden vector (spec §3.2, ruling R84):
+ * `shared/src/commonTest/kotlin/world/taqwa/app/prayer/engine/golden/GoldenVectorData.kt`.
+ *
+ *     ./gradlew -p tools/timetables generateGoldenVector [-Pout=<file>]
+ *
+ * `out` is relative to the repository root; the default is the committed file itself. Regenerate
+ * after any change to the engine, the registry or the generator (`tools/timetables/.../golden/`)
+ * and commit the result (`GenerateGoldenVectorKt`'s own KDoc).
+ */
+tasks.register<JavaExec>("generateGoldenVector") {
+    group = "application"
+    description = "Writes the golden vector shared/commonTest reads (spec 3.2)."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.golden.GenerateGoldenVectorKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    val out = providers.gradleProperty("out")
+        .orElse("shared/src/commonTest/kotlin/world/taqwa/app/prayer/engine/golden/GoldenVectorData.kt")
+    argumentProviders.add(CommandLineArgumentProvider { listOf("--out", out.get()) })
+}
+
+tasks.register<JavaExec>("gate") {
+    group = "verification"
+    description = "Checks the engine against every official day held locally and writes the stamps."
+    requireArchive()
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.gate.GateMainKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    maxHeapSize = "2g"
+    workingDir = repoRoot
+    val official = officialRoot
+    val groups = providers.gradleProperty("gateGroup").orElse("")
+    val entries = providers.gradleProperty("entry").orElse("")
+    val fit = providers.gradleProperty("fit").orElse("")
+    val stamps = providers.gradleProperty("stamps").orElse("true")
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider {
+        fun each(option: String, values: String) =
+            values.split(',').map { it.trim() }.filter { it.isNotEmpty() }.flatMap { listOf(option, it) }
+        listOf("--repo", root, "--official", official.get()) + each("--group", groups.get()) +
+            each("--entry", entries.get()) + each("--fit", fit.get()) +
+            (if (stamps.get() == "false") listOf("--no-stamps") else emptyList())
+    })
+}
+
+/**
+ * Spec §5 / ruling R86: `release.sh` and `ios-release.sh` refuse to build on a stale or red stamp;
+ * this is that check, run first by both. Fails, naming each entry, where a stamp is red (`broken` >
+ * 0), stale (its `engineHash` no longer matches what the current engine core and methods give at the
+ * manifest's own points), missing (the manifest has rows for an entry with no stamp file), or where
+ * `ProofStamps.kt` no longer matches what `generateProofStamps` would write from the committed
+ * stamps. Needs **no archive** — see `CheckStamps.kt`'s own comment for why that is enough.
+ *
+ *     ./gradlew -p tools/timetables checkStamps
+ */
+tasks.register<JavaExec>("checkStamps") {
+    group = "verification"
+    description = "Fails on a stale or red stamp, a missing one, or a stale ProofStamps.kt (spec §5). Needs no archive."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.gate.CheckStampsKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", repoRoot.path) })
 }

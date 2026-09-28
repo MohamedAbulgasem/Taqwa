@@ -1,0 +1,11 @@
+# Australia (au.cautious): no dominant table. Members: Lakemba Mosque's table (au.lma, the most followed; its 1448 AH
+# table at Lakemba) and Diyanet's per-suburb tables (other.turkey, the TURKEY preset to within a minute; Sydney and
+# Melbourne, 25 September to 25 October 2026; Diyanet's own district points are not published with the tables, so
+# Sydney's is checked at Lakemba, west of the city centre (a later sun), and Melbourne's at its centre). The Brisbane capture (diy-bro) repeats Melbourne's times (its Zuhr falls at Melbourne's
+# longitude), a capture fault, and is not used. Maghrib is capped at LMA's where the members spread, so it is not
+# checked at Melbourne, where no LMA table is held. No imsak is printed: each Fajr is also the start of the fast.
+# Every row is held out.
+path	entry	lat	lon	zone	columns	format	school	split	note	member
+archive/tables/moral-auth-world/africaoceania/lma-1448.txt	au.cautious	-33.92	151.0756	Australia/Sydney	F+E S D A M I	daily	standard	test	LMA 1448 AH	au.lma
+archive/tables/moral-auth-world/africaoceania/diy-syd.txt	au.cautious	-33.92	151.0756	Australia/Sydney	F+E S D A M I	daily	standard	test	Diyanet Sydney	other.turkey
+archive/tables/moral-auth-world/africaoceania/diy-mel.txt	au.cautious	-37.8136	144.9631	Australia/Melbourne	F+E S D A - I	daily	standard	test	Diyanet Melbourne	other.turkey

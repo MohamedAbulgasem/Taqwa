@@ -1,0 +1,6 @@
+# Montenegro, the Islamic Community's table for Podgorica, September 2026 (agent-reported in the
+# research, LOW: its publisher's page was not kept; restricted: archive only). One morning column
+# (the Fajr and the end of eating, F+E). First-shadow Asr. Held out: the method's minutes are the
+# research's, never fitted on it.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/code/moral-auth-world/europe/balkans/me-podgorica-2026-09.csv	me.izcg	42.44124	19.26309	Europe/Podgorica	F+E S D A M I	csv	standard	test	Podgorica, September 2026

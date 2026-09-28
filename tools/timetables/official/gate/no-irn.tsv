@@ -1,0 +1,11 @@
+# Norway, Islamsk Råd Norge's joint calendars (bonnetid.info), 2026, each printed for its city (ruling
+# R44). No imsak is printed. Both Asr columns are printed (As, Ah). Oslo's and Trondheim's Fajr and Isha
+# curves are derived from these same calendars (ruling R48, IrnCurves), so nothing is held out: no other
+# year is held. Tromsø's calendar follows IRN's Makkah-time rule for the far north (IrnArctic, ruling R82),
+# its constants read from this same calendar; where its Fajr falls after the sun has risen and where its
+# sunrise is the sun's lowest point, the day declares it not followed and the gate counts those cells as
+# declared.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/europe/nordic/off-irn-oslo-2026.txt	no.irn/no.irn.oslo			Europe/Oslo	F+E S D As M I Ah	daily	-	fit	IRN Oslo 2026
+archive/tables/moral-auth-world/europe/nordic/off-irn-trondheim-2026.txt	no.irn/no.irn.trondheim			Europe/Oslo	F+E S D As M I Ah	daily	-	fit	IRN Trondheim 2026
+archive/tables/moral-auth-world/europe/nordic/off-irn-tromso-2026.txt	no.irn/no.irn.tromso			Europe/Oslo	F+E S D As M I Ah	daily	-	fit	IRN Tromsø 2026

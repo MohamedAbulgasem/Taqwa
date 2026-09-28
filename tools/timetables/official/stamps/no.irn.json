@@ -1,0 +1,654 @@
+{
+  "entry": "no.irn",
+  "class": "D (authority)",
+  "engineHash": "173f3fdaef385a32",
+  "broken": 0,
+  "places": 3,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "placeDays": 1095,
+  "heldOutDays": 0,
+  "ramadanDays": 90,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 1043,
+      "early": 0,
+      "late": {
+        "0": 168,
+        "1": 572,
+        "2": 98,
+        "3+": 205
+      },
+      "exactShare": 0.1611,
+      "worstLate": 11,
+      "lateLimit": 56,
+      "lateLimitFrom": "entry no.irn, unit no.irn.tromso",
+      "overLimit": 0,
+      "declared": 52,
+      "declaredDates": ["2026-04-23..2026-05-18", "2026-07-26..2026-08-20"]
+    },
+    "sunrise": {
+      "checked": 1026,
+      "lateEnd": 0,
+      "late": {
+        "0": 554,
+        "1": 209,
+        "2": 126,
+        "3+": 137
+      },
+      "exactShare": 0.54,
+      "worstLate": 42,
+      "lateLimit": 42,
+      "lateLimitFrom": "class D (authority), unit no.irn.tromso",
+      "overLimit": 0,
+      "declared": 69,
+      "declaredDates": ["2026-05-18..2026-07-25"]
+    },
+    "dhuhr": {
+      "checked": 1095,
+      "early": 0,
+      "late": {
+        "0": 931,
+        "1": 102,
+        "2": 0,
+        "3+": 62
+      },
+      "exactShare": 0.8502,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry no.irn, unit no.irn.tromso",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 1095,
+      "early": 0,
+      "late": {
+        "0": 321,
+        "1": 642,
+        "2": 66,
+        "3+": 66
+      },
+      "exactShare": 0.2932,
+      "worstLate": 10,
+      "lateLimit": 36,
+      "lateLimitFrom": "class D (authority), unit no.irn.tromso",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 1095,
+      "early": 0,
+      "late": {
+        "0": 316,
+        "1": 604,
+        "2": 113,
+        "3+": 62
+      },
+      "exactShare": 0.2886,
+      "worstLate": 7,
+      "lateLimit": 36,
+      "lateLimitFrom": "class D (authority), unit no.irn.tromso",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 1095,
+      "early": 0,
+      "late": {
+        "0": 635,
+        "1": 264,
+        "2": 60,
+        "3+": 136
+      },
+      "exactShare": 0.5799,
+      "worstLate": 313,
+      "lateLimit": 313,
+      "lateLimitFrom": "class D (authority), unit no.irn.tromso",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 1095,
+      "early": 0,
+      "late": {
+        "0": 35,
+        "1": 671,
+        "2": 71,
+        "3+": 318
+      },
+      "exactShare": 0.032,
+      "worstLate": 237,
+      "lateLimit": 237,
+      "lateLimitFrom": "entry no.irn, unit no.irn.tromso",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 1095,
+      "lateEnd": 0,
+      "late": {
+        "0": 470,
+        "1": 250,
+        "2": 57,
+        "3+": 318
+      },
+      "exactShare": 0.4292,
+      "worstLate": 235,
+      "lateLimit": 235,
+      "lateLimitFrom": "entry no.irn, unit no.irn.tromso",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 0,
+    "ramadanDays": 0,
+    "events": {}
+  },
+  "lateLimits": {
+    "class D (authority): 3 min": {
+      "events": ["sunrise", "asrStandard", "asrHanafi", "maghrib"]
+    },
+    "entry no.irn: 4 min": {
+      "reason": "IRN's Isha is each calendar's own curve (ruling R48), widened over the day before and after (ruling R28): up to 4 min after the calendar's.",
+      "events": ["isha"]
+    },
+    "entry no.irn: 5 min": {
+      "reason": "IRN's Zuhr is + 4 in winter and + 9 from spring to autumn, changing within March and September; those two months take the later, up to 5 min after the calendar's before the change.",
+      "events": ["dhuhr"]
+    },
+    "entry no.irn: 6 min": {
+      "reason": "IRN's Fajr is each calendar's own curve (ruling R48), widened over the day before and after (ruling R28): when it moves fastest, in spring and autumn, up to 6 min after the calendar's.",
+      "events": ["fajr"]
+    },
+    "entry no.irn: 10 min": {
+      "reason": "IRN prints no imsak, so the fast begins at its Fajr; the end reads IRN's own earliest dawns (ruling R39), each the earliest of the day before, the day and the day after: where its Fajr moves fastest, in April as the summer rule begins, up to 10 min before its printed Fajr.",
+      "events": ["endOfEating"]
+    },
+    "unit no.irn.tromso: 6 min": {
+      "reason": "IRN's Zuhr at Tromsø is noon + 5, + 10 from 21 March to 20 September; until its 2027 calendar is held the change is taken a day early and a day late: up to 6 min after IRN's on 20 March and 21 September.",
+      "events": ["dhuhr"]
+    },
+    "unit no.irn.tromso: 36 min": {
+      "reason": "IRN's Asr at Tromsø is the later of the shadow and midway between noon and its own Maghrib less 5; with its window dates taken a day either way until its 2027 calendar is held, up to 10 min after IRN's on the Maghrib blends' first and last days (16 April, 28 August) and 7 in the winter blends. In a year whose clocks go back on 31 October (2027, 2032, 2038) the day-early autumn blend starts on summer time: up to 36 in early November.",
+      "events": ["asrStandard", "asrHanafi"]
+    },
+    "unit no.irn.tromso: 42 min": {
+      "reason": "IRN prints noon as Tromsø's sunrise in the polar night and keeps it, or its own later sunrise, for some days after the sun returns: there the sunrise shown (IRN's calculator's) is up to 42 min before IRN's in January and 17 in November; elsewhere up to 4.",
+      "events": ["sunrise"]
+    },
+    "unit no.irn.tromso: 56 min": {
+      "reason": "IRN's window dates at Tromsø are read from its 2026 calendar alone, so until its 2027 calendar is held each is taken a day early and a day late and the later start kept: on the Fajr blends' first and last days (22 April, 21 August) Fajr runs up to 11 min after IRN's, and up to 5 in the winter blends. In a year whose clocks go back on 31 October (2027, 2032, 2038) the day-early autumn blend starts on summer time: up to 56 min after IRN's in early November, less than 10 from about 23 November.",
+      "events": ["fajr"]
+    },
+    "unit no.irn.tromso: 235 min": {
+      "reason": "IRN prints no imsak, so the fast begins at its Fajr. Where its Makkah-time Fajr at Tromsø falls after the sun has risen (late April to mid-May and late July to mid-August; declared not followed) the fast begins at the unit's own dawn before sunrise, up to 235 min before IRN's Fajr; elsewhere up to 5.",
+      "events": ["endOfEating"]
+    },
+    "unit no.irn.tromso: 237 min": {
+      "reason": "Where IRN's Makkah-time Isha comes before the real sunset at Tromsø (late April to mid-August), Isha follows the Maghrib shown, up to 237 min after IRN's; otherwise, with the window dates taken a day either way, up to 12 on the Isha blends' edge days (23 April, 19-20 August) and 5 in the winter blends, and up to 65 in early November of a year whose clocks go back on 31 October (2027, 2032, 2038), when the day-early blend starts on summer time.",
+      "events": ["isha"]
+    },
+    "unit no.irn.tromso: 313 min": {
+      "reason": "From mid-April to late August IRN's Maghrib at Tromsø is Makkah's sunset + 5, while the sun there sets hours later: Maghrib never comes before the real sunset, up to 313 min after IRN's (mid-May and late July); in the winter blends, with the window dates taken a day either way, up to 12, and in early November of a year whose clocks go back on 31 October (2027, 2032, 2038), when the day-early blend starts on summer time, up to 71.",
+      "events": ["maghrib"]
+    }
+  },
+  "units": {
+    "no.irn.oslo": {
+      "name": "Oslo",
+      "placeDays": 365,
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["sunrise", "asrStandard", "asrHanafi", "maghrib"]
+        },
+        "entry no.irn: 4 min": {
+          "reason": "IRN's Isha is each calendar's own curve (ruling R48), widened over the day before and after (ruling R28): up to 4 min after the calendar's.",
+          "events": ["isha"]
+        },
+        "entry no.irn: 5 min": {
+          "reason": "IRN's Zuhr is + 4 in winter and + 9 from spring to autumn, changing within March and September; those two months take the later, up to 5 min after the calendar's before the change.",
+          "events": ["dhuhr"]
+        },
+        "entry no.irn: 6 min": {
+          "reason": "IRN's Fajr is each calendar's own curve (ruling R48), widened over the day before and after (ruling R28): when it moves fastest, in spring and autumn, up to 6 min after the calendar's.",
+          "events": ["fajr"]
+        },
+        "entry no.irn: 10 min": {
+          "reason": "IRN prints no imsak, so the fast begins at its Fajr; the end reads IRN's own earliest dawns (ruling R39), each the earliest of the day before, the day and the day after: where its Fajr moves fastest, in April as the summer rule begins, up to 10 min before its printed Fajr.",
+          "events": ["endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 268,
+            "2": 18,
+            "3+": 79
+          },
+          "exactShare": 0,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 365,
+          "lateEnd": 0,
+          "late": {
+            "0": 294,
+            "1": 71,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8055,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 304,
+            "1": 31,
+            "2": 0,
+            "3+": 30
+          },
+          "exactShare": 0.8329,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 110,
+            "1": 249,
+            "2": 6,
+            "3+": 0
+          },
+          "exactShare": 0.3014,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrHanafi": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 110,
+            "1": 238,
+            "2": 17,
+            "3+": 0
+          },
+          "exactShare": 0.3014,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 301,
+            "1": 64,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.8247,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 249,
+            "2": 24,
+            "3+": 92
+          },
+          "exactShare": 0,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 365,
+          "lateEnd": 0,
+          "late": {
+            "0": 238,
+            "1": 33,
+            "2": 13,
+            "3+": 81
+          },
+          "exactShare": 0.6521,
+          "worstLate": 10,
+          "lateLimit": 10,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        }
+      }
+    },
+    "no.irn.tromso": {
+      "name": "Tromsø",
+      "placeDays": 365,
+      "broken": 0,
+      "lateLimits": {
+        "unit no.irn.tromso: 6 min": {
+          "reason": "IRN's Zuhr at Tromsø is noon + 5, + 10 from 21 March to 20 September; until its 2027 calendar is held the change is taken a day early and a day late: up to 6 min after IRN's on 20 March and 21 September.",
+          "events": ["dhuhr"]
+        },
+        "unit no.irn.tromso: 36 min": {
+          "reason": "IRN's Asr at Tromsø is the later of the shadow and midway between noon and its own Maghrib less 5; with its window dates taken a day either way until its 2027 calendar is held, up to 10 min after IRN's on the Maghrib blends' first and last days (16 April, 28 August) and 7 in the winter blends. In a year whose clocks go back on 31 October (2027, 2032, 2038) the day-early autumn blend starts on summer time: up to 36 in early November.",
+          "events": ["asrStandard", "asrHanafi"]
+        },
+        "unit no.irn.tromso: 42 min": {
+          "reason": "IRN prints noon as Tromsø's sunrise in the polar night and keeps it, or its own later sunrise, for some days after the sun returns: there the sunrise shown (IRN's calculator's) is up to 42 min before IRN's in January and 17 in November; elsewhere up to 4.",
+          "events": ["sunrise"]
+        },
+        "unit no.irn.tromso: 56 min": {
+          "reason": "IRN's window dates at Tromsø are read from its 2026 calendar alone, so until its 2027 calendar is held each is taken a day early and a day late and the later start kept: on the Fajr blends' first and last days (22 April, 21 August) Fajr runs up to 11 min after IRN's, and up to 5 in the winter blends. In a year whose clocks go back on 31 October (2027, 2032, 2038) the day-early autumn blend starts on summer time: up to 56 min after IRN's in early November, less than 10 from about 23 November.",
+          "events": ["fajr"]
+        },
+        "unit no.irn.tromso: 235 min": {
+          "reason": "IRN prints no imsak, so the fast begins at its Fajr. Where its Makkah-time Fajr at Tromsø falls after the sun has risen (late April to mid-May and late July to mid-August; declared not followed) the fast begins at the unit's own dawn before sunrise, up to 235 min before IRN's Fajr; elsewhere up to 5.",
+          "events": ["endOfEating"]
+        },
+        "unit no.irn.tromso: 237 min": {
+          "reason": "Where IRN's Makkah-time Isha comes before the real sunset at Tromsø (late April to mid-August), Isha follows the Maghrib shown, up to 237 min after IRN's; otherwise, with the window dates taken a day either way, up to 12 on the Isha blends' edge days (23 April, 19-20 August) and 5 in the winter blends, and up to 65 in early November of a year whose clocks go back on 31 October (2027, 2032, 2038), when the day-early blend starts on summer time.",
+          "events": ["isha"]
+        },
+        "unit no.irn.tromso: 313 min": {
+          "reason": "From mid-April to late August IRN's Maghrib at Tromsø is Makkah's sunset + 5, while the sun there sets hours later: Maghrib never comes before the real sunset, up to 313 min after IRN's (mid-May and late July); in the winter blends, with the window dates taken a day either way, up to 12, and in early November of a year whose clocks go back on 31 October (2027, 2032, 2038), when the day-early blend starts on summer time, up to 71.",
+          "events": ["maghrib"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 313,
+          "early": 0,
+          "late": {
+            "0": 168,
+            "1": 92,
+            "2": 14,
+            "3+": 39
+          },
+          "exactShare": 0.5367,
+          "worstLate": 11,
+          "lateLimit": 56,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0,
+          "declared": 52,
+          "declaredDates": ["2026-04-23..2026-05-18", "2026-07-26..2026-08-20"]
+        },
+        "sunrise": {
+          "checked": 296,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 38,
+            "2": 121,
+            "3+": 137
+          },
+          "exactShare": 0,
+          "worstLate": 42,
+          "lateLimit": 42,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0,
+          "declared": 69,
+          "declaredDates": ["2026-05-18..2026-07-25"]
+        },
+        "dhuhr": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 318,
+            "1": 45,
+            "2": 0,
+            "3+": 2
+          },
+          "exactShare": 0.8712,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 98,
+            "1": 175,
+            "2": 26,
+            "3+": 66
+          },
+          "exactShare": 0.2685,
+          "worstLate": 10,
+          "lateLimit": 36,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0
+        },
+        "asrHanafi": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 55,
+            "1": 198,
+            "2": 50,
+            "3+": 62
+          },
+          "exactShare": 0.1507,
+          "worstLate": 7,
+          "lateLimit": 36,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 75,
+            "1": 95,
+            "2": 59,
+            "3+": 136
+          },
+          "exactShare": 0.2055,
+          "worstLate": 313,
+          "lateLimit": 313,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 35,
+            "1": 208,
+            "2": 18,
+            "3+": 104
+          },
+          "exactShare": 0.0959,
+          "worstLate": 237,
+          "lateLimit": 237,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 365,
+          "lateEnd": 0,
+          "late": {
+            "0": 33,
+            "1": 200,
+            "2": 31,
+            "3+": 101
+          },
+          "exactShare": 0.0904,
+          "worstLate": 235,
+          "lateLimit": 235,
+          "lateLimitFrom": "unit no.irn.tromso",
+          "overLimit": 0
+        }
+      }
+    },
+    "no.irn.trondheim": {
+      "name": "Trondheim",
+      "placeDays": 365,
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["sunrise", "asrStandard", "asrHanafi", "maghrib"]
+        },
+        "entry no.irn: 4 min": {
+          "reason": "IRN's Isha is each calendar's own curve (ruling R48), widened over the day before and after (ruling R28): up to 4 min after the calendar's.",
+          "events": ["isha"]
+        },
+        "entry no.irn: 5 min": {
+          "reason": "IRN's Zuhr is + 4 in winter and + 9 from spring to autumn, changing within March and September; those two months take the later, up to 5 min after the calendar's before the change.",
+          "events": ["dhuhr"]
+        },
+        "entry no.irn: 6 min": {
+          "reason": "IRN's Fajr is each calendar's own curve (ruling R48), widened over the day before and after (ruling R28): when it moves fastest, in spring and autumn, up to 6 min after the calendar's.",
+          "events": ["fajr"]
+        },
+        "entry no.irn: 10 min": {
+          "reason": "IRN prints no imsak, so the fast begins at its Fajr; the end reads IRN's own earliest dawns (ruling R39), each the earliest of the day before, the day and the day after: where its Fajr moves fastest, in April as the summer rule begins, up to 10 min before its printed Fajr.",
+          "events": ["endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 212,
+            "2": 66,
+            "3+": 87
+          },
+          "exactShare": 0,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 365,
+          "lateEnd": 0,
+          "late": {
+            "0": 260,
+            "1": 100,
+            "2": 5,
+            "3+": 0
+          },
+          "exactShare": 0.7123,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 309,
+            "1": 26,
+            "2": 0,
+            "3+": 30
+          },
+          "exactShare": 0.8466,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 113,
+            "1": 218,
+            "2": 34,
+            "3+": 0
+          },
+          "exactShare": 0.3096,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrHanafi": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 151,
+            "1": 168,
+            "2": 46,
+            "3+": 0
+          },
+          "exactShare": 0.4137,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 259,
+            "1": 105,
+            "2": 1,
+            "3+": 0
+          },
+          "exactShare": 0.7096,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 365,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 214,
+            "2": 29,
+            "3+": 122
+          },
+          "exactShare": 0,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 365,
+          "lateEnd": 0,
+          "late": {
+            "0": 199,
+            "1": 17,
+            "2": 13,
+            "3+": 136
+          },
+          "exactShare": 0.5452,
+          "worstLate": 10,
+          "lateLimit": 10,
+          "lateLimitFrom": "entry no.irn",
+          "overLimit": 0
+        }
+      }
+    }
+  }
+}
