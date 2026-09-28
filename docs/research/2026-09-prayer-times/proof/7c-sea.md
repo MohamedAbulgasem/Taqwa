@@ -195,6 +195,63 @@ that rule.
 Muhammadiyah table exists locally to check it against, so it stays class D_AUTHORITY, a named
 timetable per spec §9.
 
+### Monitor round (29 Sep 2026): five more kota, and why the edge ran 6–7 min wide at the horizon
+
+The weekly monitor's first real run (28 Sep 2026) fetched Kemenag's Sep–Oct 2026 tables for five
+kota not held before — Kota Medan, Palembang, Semarang, Surabaya and Yogyakarta (61 days each, the
+same myQuran republication) — and found the engine never early and never late at an end there, but
+with sunrise 6–7 min before Kemenag's and Maghrib 6–7 min after on every day, the other four events
+within 3. It also re-fetched the 13 held kab/kota: identical on all 61 overlapping days.
+
+**Cause.** Beyond the fitted units the entry's edge computes sunrise and Maghrib at the deepest
+plausible horizon, −2° (the highland class, ruling R46), with 2 min more on every event for a
+capital up to half a degree away. All five kota are lowland: the printed sunrise and Maghrib of each
+sit exactly where a −1° horizon puts them (the residual against the engine's own astronomy at −1°,
+with Kemenag's 2 min ihtiyat, spans one rounding minute at every one of the five, as at the 13) and
+about 4 min from where −2° puts them. So the 6–7 min are about 4 min of horizon, 2 min of unknown
+capital point, and the rest the edge's margins and the rounding. Nothing in the edge is unjustified
+given what it does not know: a kab/kota's horizon class cannot be told without its own table (the 18
+now held split 11 lowland / 7 highland, and elevation does not predict the class: Malang at about
+450 m is −1°, Bogor at about 260 m is −2°), so the edge keeps −2° and the five become fitted units,
+as the 13 are — the brief's "if not" branch. Kemenag's horizon rule, as far as its tables show it:
+sunrise and Maghrib at a −1° or −2° sun altitude by kab/kota class (never the plain −0.833°), then
+the 2 min ihtiyat (−2 on syuruk), then the minute; its own elevation table is not published.
+
+**The five units** carry the app's own GeoNames points like the 13 (Kemenag's reference points are
+not published; myQuran's JSON carries none), the −1° horizon, radii 12 km (8 for Kota Yogyakarta,
+32 km²), and margins fitted by `Fitter.fit("id.kemenag/<id>")` over their 61 days plus a
+two-month allowance (`TWO_MONTH_ALLOWANCE` in Kemenag.kt). The allowance is what two months near the
+equinox cannot see, measured on the 13: each of them fitted over its own Sep–Oct 2026 capture alone
+against its full-year margins gives at most +24 s on Fajr (Banda Aceh, the 21–22 March days), −6 on
+sunrise, +15 on Dhuhr, +6 on Asr, +32 on Maghrib and +32 on Isha; the fitter's 5 s safety is added
+once more. That it is needed: Palembang's September-only Maghrib fit (−1 s) was a minute early on
+one held-out October day, and the 13's shared envelope was a minute early on Surabaya's Asr on one
+October day (Surabaya's printed times run about 10 s later than the engine's at its GeoNames point,
+a point offset its own margins absorb).
+
+Per-unit fits over Sep–Oct 2026 (seconds; the registry holds fit + allowance): Medan Fajr +1,
+sunrise −11, Dhuhr +61, Asr +5, Maghrib +2, Isha +1; Palembang +4, −9, +62, +12, +6, +5; Semarang
++1, −13, +62, +12, −2, +2; Surabaya +15, +1, +75, +36, +17, +18; Yogyakarta +3, −8, +65, +16, +3, +5.
+
+Gate, `id-kemenag` group after the change: 36 rows, 18 places, 5,050 place-days (1,351 held out,
+390 in Ramadan), 0 early, 0 late ends, 0 over the class-B limit, worst 1 min at every unit — the
+five's 61 days each included (the September fit rows' October holdout: 0 early, 0 late ends, worst 1).
+Per place before → after (worst minutes): each of the five had sunrise 7 (an end, early), Maghrib 7,
+the other four events 3; now 1 on every event. The 13 are unchanged (worst 1).
+
+**Class (spec §5).** The evidence now reads: method rebuilt; 18 kab/kota across Sumatra, Java, Bali,
+Sulawesi and Papua; a year including Ramadan 1447 at 13 of them; never early on held-out data; at
+most 1 min after Kemenag's at every unit — every line of class A's row. What still holds it at B:
+the reference points are the app's, not Kemenag's own (spec §5's "a reference point not yet
+verified"; the residual levels differ between places by up to about 10 s, which the per-unit margins
+absorb but a verified point would remove), only one calendar year has ever been published (the
+held-out split is by date inside 2026, not a second year), and the five hold two months. Proposed
+ruling: `id.kemenag` stays class B; its fitted units become class A once Kemenag's 2027 tables (the
+monitor fetches them from November 2026) hold at each with the same margins — 0 early, 0 late ends,
+worst 1 min — a real year-over-year holdout that also answers the point question; the five join when
+they hold a full year, refitted without the allowance. The monitor's 28 Sep recaptures of the 13 are
+identical to the held files on every day, so they add no rows.
+
 ## 7h's ADHAN2_ASR_ALLOWANCE (added to `other.singapore`, per the coordinator's message)
 
 `other.singapore`'s Asr now carries `SAFE_START + ADHAN2_ASR_ALLOWANCE` instead of the plain
