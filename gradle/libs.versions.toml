@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.10"
-compose-multiplatform = "1.12.0"
+compose-multiplatform = "1.12.1"
 agp = "9.4.0"
 android-minSdk = "26"
 android-compileSdk = "37"
@@ -15,7 +15,7 @@ androidx-glance = "1.1.1"
 # Slice 3a: surah downloads survive the app being backgrounded, which on Android means
 # WorkManager. 2.11.2 is the latest stable; 2.12.0 is still RC.
 androidx-work = "2.11.2"
-# The version Compose Multiplatform 1.12.0 already resolves transitively (via material3's
+# The version Compose Multiplatform 1.12.1 already resolves transitively (via material3's
 # lifecycle-viewmodel-compose), confirmed with
 # `./gradlew :shared:dependencies --configuration metadataCommonMainCompileClasspath | grep lifecycle`.
 # Pinning it here rather than leaving it implicit avoids a second, unpinned resolution picking a
