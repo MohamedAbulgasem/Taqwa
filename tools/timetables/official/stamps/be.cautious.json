@@ -1,7 +1,7 @@
 {
   "entry": "be.cautious",
   "class": "C",
-  "engineHash": "5f6fbfb9dacc163a",
+  "engineHash": "a7daf517a327bfec",
   "broken": 0,
   "places": 1,
   "first": "2026-09-25",
@@ -107,12 +107,12 @@
       "checked": 31,
       "lateEnd": 0,
       "late": {
-        "0": 8,
-        "1": 23,
+        "0": 20,
+        "1": 11,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.2581,
+      "exactShare": 0.6452,
       "worstLate": 1,
       "lateLimit": 1,
       "lateLimitFrom": "class C",
@@ -217,12 +217,12 @@
         "checked": 31,
         "lateEnd": 0,
         "late": {
-          "0": 8,
-          "1": 23,
+          "0": 20,
+          "1": 11,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.2581,
+        "exactShare": 0.6452,
         "worstLate": 1,
         "lateLimit": 1,
         "lateLimitFrom": "class C",

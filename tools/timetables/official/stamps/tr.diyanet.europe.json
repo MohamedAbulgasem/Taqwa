@@ -1,118 +1,118 @@
 {
   "entry": "tr.diyanet.europe",
   "class": "D (authority)",
-  "engineHash": "80187360499a1822",
+  "engineHash": "747a380c3a68e9b5",
   "broken": 0,
   "places": 12,
   "first": "2026-09-25",
   "last": "2027-12-31",
-  "placeDays": 4752,
-  "heldOutDays": 2376,
+  "placeDays": 4798,
+  "heldOutDays": 2422,
   "ramadanDays": 348,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 4752,
+      "checked": 9504,
       "early": 0,
       "late": {
-        "0": 3244,
-        "1": 933,
-        "2": 387,
-        "3+": 188
+        "0": 4332,
+        "1": 2984,
+        "2": 1120,
+        "3+": 1068
       },
-      "exactShare": 0.6827,
-      "worstLate": 5,
-      "lateLimit": 5,
-      "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.stockholm",
+      "exactShare": 0.4558,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.london, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.stockholm",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 4752,
+      "checked": 9504,
       "lateEnd": 0,
       "late": {
-        "0": 3101,
-        "1": 1628,
-        "2": 2,
-        "3+": 21
+        "0": 6195,
+        "1": 3263,
+        "2": 4,
+        "3+": 42
       },
-      "exactShare": 0.6526,
+      "exactShare": 0.6518,
       "worstLate": 8,
       "lateLimit": 8,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.oslo",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 4752,
+      "checked": 9504,
       "early": 0,
       "late": {
-        "0": 3539,
-        "1": 1213,
+        "0": 7075,
+        "1": 2429,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7447,
+      "exactShare": 0.7444,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 4752,
+      "checked": 9504,
       "early": 0,
       "late": {
-        "0": 3435,
-        "1": 1317,
+        "0": 6876,
+        "1": 2628,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7229,
+      "exactShare": 0.7235,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 4752,
+      "checked": 9504,
       "early": 0,
       "late": {
-        "0": 3668,
-        "1": 1084,
+        "0": 7337,
+        "1": 2167,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7719,
+      "exactShare": 0.772,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "isha": {
-      "checked": 4752,
+      "checked": 9504,
       "early": 0,
       "late": {
-        "0": 3619,
-        "1": 776,
-        "2": 301,
-        "3+": 56
+        "0": 4559,
+        "1": 3217,
+        "2": 1018,
+        "3+": 710
       },
-      "exactShare": 0.7616,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.4797,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.london, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.stockholm",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 4752,
+      "checked": 9504,
       "lateEnd": 0,
       "late": {
-        "0": 1370,
-        "1": 2451,
-        "2": 477,
-        "3+": 454
+        "0": 4166,
+        "1": 3346,
+        "2": 968,
+        "3+": 1024
       },
-      "exactShare": 0.2883,
+      "exactShare": 0.4383,
       "worstLate": 5,
       "lateLimit": 5,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.london, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.stockholm",
@@ -120,112 +120,112 @@
     }
   },
   "heldOut": {
-    "placeDays": 2376,
+    "placeDays": 2422,
     "ramadanDays": 174,
     "events": {
       "fajr": {
-        "checked": 2376,
+        "checked": 7128,
         "early": 0,
         "late": {
-          "0": 1772,
-          "1": 325,
-          "2": 221,
-          "3+": 58
+          "0": 3292,
+          "1": 2181,
+          "2": 849,
+          "3+": 806
         },
-        "exactShare": 0.7458,
-        "worstLate": 4,
-        "lateLimit": 4,
-        "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.oslo",
+        "exactShare": 0.4618,
+        "worstLate": 6,
+        "lateLimit": 6,
+        "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.london, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.stockholm",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 2376,
+        "checked": 7128,
         "lateEnd": 0,
         "late": {
-          "0": 1560,
-          "1": 794,
-          "2": 1,
-          "3+": 21
+          "0": 4654,
+          "1": 2429,
+          "2": 3,
+          "3+": 42
         },
-        "exactShare": 0.6566,
+        "exactShare": 0.6529,
         "worstLate": 8,
         "lateLimit": 8,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.oslo",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 2376,
+        "checked": 7128,
         "early": 0,
         "late": {
-          "0": 1752,
-          "1": 624,
+          "0": 5288,
+          "1": 1840,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7374,
+        "exactShare": 0.7419,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 2376,
+        "checked": 7128,
         "early": 0,
         "late": {
-          "0": 1687,
-          "1": 689,
+          "0": 5128,
+          "1": 2000,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.71,
+        "exactShare": 0.7194,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 2376,
+        "checked": 7128,
         "early": 0,
         "late": {
-          "0": 1771,
-          "1": 605,
+          "0": 5440,
+          "1": 1688,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7454,
+        "exactShare": 0.7632,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "isha": {
-        "checked": 2376,
+        "checked": 7128,
         "early": 0,
         "late": {
-          "0": 1859,
-          "1": 330,
-          "2": 156,
-          "3+": 31
+          "0": 3356,
+          "1": 2425,
+          "2": 799,
+          "3+": 548
         },
-        "exactShare": 0.7824,
-        "worstLate": 3,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "exactShare": 0.4708,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.london, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.stockholm",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 2376,
+        "checked": 7128,
         "lateEnd": 0,
         "late": {
-          "0": 559,
-          "1": 1292,
-          "2": 280,
-          "3+": 245
+          "0": 3070,
+          "1": 2504,
+          "2": 763,
+          "3+": 791
         },
-        "exactShare": 0.2353,
+        "exactShare": 0.4307,
         "worstLate": 5,
         "lateLimit": 5,
-        "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.london, unit tr.diyanet.europe.oslo",
+        "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.london, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.stockholm",
         "overLimit": 0
       }
     }
@@ -234,109 +234,157 @@
     "class D (authority): 3 min": {
       "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
     },
-    "unit tr.diyanet.europe.amsterdam: 4 min": {
+    "unit tr.diyanet.europe.amsterdam: 4 min (endOfEating)": {
       "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
       "events": ["endOfEating"]
     },
-    "unit tr.diyanet.europe.berlin: 4 min": {
-      "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
-      "events": ["endOfEating"]
-    },
-    "unit tr.diyanet.europe.brussels: 4 min": {
-      "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
-      "events": ["endOfEating"]
-    },
-    "unit tr.diyanet.europe.london: 4 min": {
-      "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
-      "events": ["endOfEating"]
-    },
-    "unit tr.diyanet.europe.oslo: 4 min": {
-      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days.",
+    "unit tr.diyanet.europe.amsterdam: 4 min (fajr)": {
+      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
       "events": ["fajr"]
     },
-    "unit tr.diyanet.europe.oslo: 5 min": {
+    "unit tr.diyanet.europe.amsterdam: 4 min (isha)": {
+      "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["isha"]
+    },
+    "unit tr.diyanet.europe.berlin: 4 min (endOfEating)": {
       "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
       "events": ["endOfEating"]
+    },
+    "unit tr.diyanet.europe.berlin: 4 min (fajr)": {
+      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["fajr"]
+    },
+    "unit tr.diyanet.europe.berlin: 4 min (isha)": {
+      "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["isha"]
+    },
+    "unit tr.diyanet.europe.brussels: 4 min (endOfEating)": {
+      "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
+      "events": ["endOfEating"]
+    },
+    "unit tr.diyanet.europe.brussels: 4 min (fajr)": {
+      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["fajr"]
+    },
+    "unit tr.diyanet.europe.brussels: 4 min (isha)": {
+      "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["isha"]
+    },
+    "unit tr.diyanet.europe.london: 4 min (endOfEating)": {
+      "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
+      "events": ["endOfEating"]
+    },
+    "unit tr.diyanet.europe.london: 4 min (fajr)": {
+      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["fajr"]
+    },
+    "unit tr.diyanet.europe.london: 4 min (isha)": {
+      "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["isha"]
+    },
+    "unit tr.diyanet.europe.oslo: 4 min": {
+      "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["isha"]
+    },
+    "unit tr.diyanet.europe.oslo: 5 min (endOfEating)": {
+      "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
+      "events": ["endOfEating"]
+    },
+    "unit tr.diyanet.europe.oslo: 5 min (fajr)": {
+      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["fajr"]
     },
     "unit tr.diyanet.europe.oslo: 8 min": {
       "reason": "Diyanet prints Oslo's June and July sunrise up to 7 min after the sun's own (its rule is not published); the app keeps the sun's, the safe side.",
       "events": ["sunrise"]
     },
-    "unit tr.diyanet.europe.stockholm: 5 min (endOfEating)": {
+    "unit tr.diyanet.europe.stockholm: 4 min": {
+      "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["isha"]
+    },
+    "unit tr.diyanet.europe.stockholm: 5 min": {
       "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
       "events": ["endOfEating"]
     },
-    "unit tr.diyanet.europe.stockholm: 5 min (fajr)": {
-      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. Stockholm's Fajr also waits for Islamiska Förbundet's pages, a minute later than Diyanet's own table on some days: up to 5 min after Diyanet's in April and August.",
+    "unit tr.diyanet.europe.stockholm: 6 min": {
+      "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after. Stockholm's Fajr also waits for Islamiska Förbundet's pages, a minute later than Diyanet's own table on some days: up to 6 min after Diyanet's in April and August.",
       "events": ["fajr"]
     }
   },
   "units": {
     "tr.diyanet.europe.amsterdam": {
       "name": "Amsterdam",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
         },
-        "unit tr.diyanet.europe.amsterdam: 4 min": {
+        "unit tr.diyanet.europe.amsterdam: 4 min (endOfEating)": {
           "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
           "events": ["endOfEating"]
+        },
+        "unit tr.diyanet.europe.amsterdam: 4 min (fajr)": {
+          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["fajr"]
+        },
+        "unit tr.diyanet.europe.amsterdam: 4 min (isha)": {
+          "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 289,
-            "1": 67,
-            "2": 35,
-            "3+": 5
+            "0": 380,
+            "1": 218,
+            "2": 116,
+            "3+": 78
           },
-          "exactShare": 0.7298,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4798,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.amsterdam",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 250,
-            "1": 146,
+            "0": 499,
+            "1": 293,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6313,
+          "exactShare": 0.6301,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 305,
-            "1": 91,
+            "0": 609,
+            "1": 183,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7702,
+          "exactShare": 0.7689,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 301,
-            "1": 95,
+            "0": 602,
+            "1": 190,
             "2": 0,
             "3+": 0
           },
@@ -347,45 +395,45 @@
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 311,
-            "1": 85,
+            "0": 623,
+            "1": 169,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7854,
+          "exactShare": 0.7866,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 308,
-            "1": 64,
-            "2": 21,
-            "3+": 3
+            "0": 392,
+            "1": 228,
+            "2": 120,
+            "3+": 52
           },
-          "exactShare": 0.7778,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4949,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.amsterdam",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 85,
-            "1": 219,
-            "2": 58,
-            "3+": 34
+            "0": 307,
+            "1": 293,
+            "2": 114,
+            "3+": 78
           },
-          "exactShare": 0.2146,
+          "exactShare": 0.3876,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.amsterdam",
@@ -395,54 +443,62 @@
     },
     "tr.diyanet.europe.berlin": {
       "name": "Berlin",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
         },
-        "unit tr.diyanet.europe.berlin: 4 min": {
+        "unit tr.diyanet.europe.berlin: 4 min (endOfEating)": {
           "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
           "events": ["endOfEating"]
+        },
+        "unit tr.diyanet.europe.berlin: 4 min (fajr)": {
+          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["fajr"]
+        },
+        "unit tr.diyanet.europe.berlin: 4 min (isha)": {
+          "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 292,
-            "1": 63,
-            "2": 34,
-            "3+": 7
+            "0": 415,
+            "1": 179,
+            "2": 120,
+            "3+": 78
           },
-          "exactShare": 0.7374,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.524,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.berlin",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 210,
-            "1": 186,
+            "0": 419,
+            "1": 373,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5303,
+          "exactShare": 0.529,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 345,
-            "1": 51,
+            "0": 690,
+            "1": 102,
             "2": 0,
             "3+": 0
           },
@@ -453,60 +509,60 @@
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 338,
-            "1": 58,
+            "0": 677,
+            "1": 115,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8535,
+          "exactShare": 0.8548,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 346,
-            "1": 50,
+            "0": 693,
+            "1": 99,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8737,
+          "exactShare": 0.875,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 304,
-            "1": 65,
-            "2": 24,
-            "3+": 3
+            "0": 416,
+            "1": 204,
+            "2": 120,
+            "3+": 52
           },
-          "exactShare": 0.7677,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.5253,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.berlin",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 85,
-            "1": 219,
-            "2": 56,
-            "3+": 36
+            "0": 256,
+            "1": 338,
+            "2": 116,
+            "3+": 82
           },
-          "exactShare": 0.2146,
+          "exactShare": 0.3232,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.berlin",
@@ -516,39 +572,47 @@
     },
     "tr.diyanet.europe.brussels": {
       "name": "Brussels",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
         },
-        "unit tr.diyanet.europe.brussels: 4 min": {
+        "unit tr.diyanet.europe.brussels: 4 min (endOfEating)": {
           "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
           "events": ["endOfEating"]
+        },
+        "unit tr.diyanet.europe.brussels: 4 min (fajr)": {
+          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["fajr"]
+        },
+        "unit tr.diyanet.europe.brussels: 4 min (isha)": {
+          "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 304,
-            "1": 58,
-            "2": 30,
-            "3+": 4
+            "0": 359,
+            "1": 261,
+            "2": 102,
+            "3+": 70
           },
-          "exactShare": 0.7677,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4533,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.brussels",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 275,
-            "1": 121,
+            "0": 550,
+            "1": 242,
             "2": 0,
             "3+": 0
           },
@@ -559,75 +623,75 @@
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 283,
-            "1": 113,
+            "0": 565,
+            "1": 227,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7146,
+          "exactShare": 0.7134,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 267,
-            "1": 129,
+            "0": 535,
+            "1": 257,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6742,
+          "exactShare": 0.6755,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 272,
-            "1": 124,
+            "0": 545,
+            "1": 247,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6869,
+          "exactShare": 0.6881,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 318,
-            "1": 58,
-            "2": 19,
-            "3+": 1
+            "0": 343,
+            "1": 303,
+            "2": 104,
+            "3+": 42
           },
-          "exactShare": 0.803,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4331,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.brussels",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 98,
-            "1": 218,
-            "2": 50,
-            "3+": 30
+            "0": 351,
+            "1": 267,
+            "2": 102,
+            "3+": 72
           },
-          "exactShare": 0.2475,
+          "exactShare": 0.4432,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.brussels",
@@ -637,7 +701,7 @@
     },
     "tr.diyanet.europe.freiburg": {
       "name": "Freiburg",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -646,41 +710,41 @@
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 327,
-            "1": 46,
-            "2": 23,
-            "3+": 0
+            "0": 461,
+            "1": 205,
+            "2": 78,
+            "3+": 48
           },
-          "exactShare": 0.8258,
-          "worstLate": 2,
+          "exactShare": 0.5821,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 248,
-            "1": 148,
+            "0": 495,
+            "1": 297,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6263,
+          "exactShare": 0.625,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 314,
-            "1": 82,
+            "0": 628,
+            "1": 164,
             "2": 0,
             "3+": 0
           },
@@ -691,60 +755,60 @@
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 312,
-            "1": 84,
+            "0": 623,
+            "1": 169,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7879,
+          "exactShare": 0.7866,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 320,
-            "1": 76,
+            "0": 639,
+            "1": 153,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8081,
+          "exactShare": 0.8068,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 340,
-            "1": 41,
-            "2": 15,
-            "3+": 0
+            "0": 421,
+            "1": 265,
+            "2": 74,
+            "3+": 32
           },
-          "exactShare": 0.8586,
-          "worstLate": 2,
+          "exactShare": 0.5316,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 112,
-            "1": 228,
-            "2": 36,
-            "3+": 20
+            "0": 319,
+            "1": 347,
+            "2": 76,
+            "3+": 50
           },
-          "exactShare": 0.2828,
+          "exactShare": 0.4028,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -754,39 +818,47 @@
     },
     "tr.diyanet.europe.london": {
       "name": "London",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
         },
-        "unit tr.diyanet.europe.london: 4 min": {
+        "unit tr.diyanet.europe.london: 4 min (endOfEating)": {
           "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
           "events": ["endOfEating"]
+        },
+        "unit tr.diyanet.europe.london: 4 min (fajr)": {
+          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["fajr"]
+        },
+        "unit tr.diyanet.europe.london: 4 min (isha)": {
+          "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 297,
-            "1": 63,
-            "2": 31,
-            "3+": 5
+            "0": 319,
+            "1": 293,
+            "2": 112,
+            "3+": 68
           },
-          "exactShare": 0.75,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4028,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.london",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 306,
-            "1": 90,
+            "0": 612,
+            "1": 180,
             "2": 0,
             "3+": 0
           },
@@ -797,26 +869,26 @@
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 262,
-            "1": 134,
+            "0": 523,
+            "1": 269,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6616,
+          "exactShare": 0.6604,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 241,
-            "1": 155,
+            "0": 482,
+            "1": 310,
             "2": 0,
             "3+": 0
           },
@@ -827,11 +899,11 @@
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 254,
-            "1": 142,
+            "0": 508,
+            "1": 284,
             "2": 0,
             "3+": 0
           },
@@ -842,30 +914,30 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 314,
-            "1": 61,
-            "2": 19,
-            "3+": 2
+            "0": 283,
+            "1": 357,
+            "2": 106,
+            "3+": 46
           },
-          "exactShare": 0.7929,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.3573,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.london",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 95,
-            "1": 218,
-            "2": 52,
-            "3+": 31
+            "0": 369,
+            "1": 243,
+            "2": 110,
+            "3+": 70
           },
-          "exactShare": 0.2399,
+          "exactShare": 0.4659,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.london",
@@ -875,7 +947,7 @@
     },
     "tr.diyanet.europe.munich": {
       "name": "München",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -884,105 +956,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 323,
-            "1": 48,
-            "2": 25,
-            "3+": 0
+            "0": 429,
+            "1": 239,
+            "2": 76,
+            "3+": 48
           },
-          "exactShare": 0.8157,
-          "worstLate": 2,
+          "exactShare": 0.5417,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 266,
-            "1": 130,
+            "0": 531,
+            "1": 261,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6717,
+          "exactShare": 0.6705,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 298,
-            "1": 98,
+            "0": 595,
+            "1": 197,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7525,
+          "exactShare": 0.7513,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 291,
-            "1": 105,
+            "0": 581,
+            "1": 211,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7348,
+          "exactShare": 0.7336,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 319,
-            "1": 77,
+            "0": 637,
+            "1": 155,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8056,
+          "exactShare": 0.8043,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 340,
-            "1": 38,
-            "2": 18,
-            "3+": 0
+            "0": 422,
+            "1": 264,
+            "2": 76,
+            "3+": 30
           },
-          "exactShare": 0.8586,
-          "worstLate": 2,
+          "exactShare": 0.5328,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 105,
-            "1": 233,
-            "2": 37,
-            "3+": 21
+            "0": 331,
+            "1": 333,
+            "2": 78,
+            "3+": 50
           },
-          "exactShare": 0.2652,
+          "exactShare": 0.4179,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -992,19 +1064,23 @@
     },
     "tr.diyanet.europe.oslo": {
       "name": "Oslo",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["dhuhr", "asrStandard", "maghrib"]
         },
         "unit tr.diyanet.europe.oslo: 4 min": {
-          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days.",
-          "events": ["fajr"]
+          "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["isha"]
         },
-        "unit tr.diyanet.europe.oslo: 5 min": {
+        "unit tr.diyanet.europe.oslo: 5 min (endOfEating)": {
           "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
           "events": ["endOfEating"]
+        },
+        "unit tr.diyanet.europe.oslo: 5 min (fajr)": {
+          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["fajr"]
         },
         "unit tr.diyanet.europe.oslo: 8 min": {
           "reason": "Diyanet prints Oslo's June and July sunrise up to 7 min after the sun's own (its rule is not published); the app keeps the sun's, the safe side.",
@@ -1013,105 +1089,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 229,
-            "1": 47,
-            "2": 76,
-            "3+": 44
+            "0": 273,
+            "1": 201,
+            "2": 90,
+            "3+": 228
           },
-          "exactShare": 0.5783,
-          "worstLate": 4,
-          "lateLimit": 4,
+          "exactShare": 0.3447,
+          "worstLate": 5,
+          "lateLimit": 5,
           "lateLimitFrom": "unit tr.diyanet.europe.oslo",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 265,
-            "1": 109,
-            "2": 1,
-            "3+": 21
+            "0": 529,
+            "1": 219,
+            "2": 2,
+            "3+": 42
           },
-          "exactShare": 0.6692,
+          "exactShare": 0.6679,
           "worstLate": 8,
           "lateLimit": 8,
           "lateLimitFrom": "unit tr.diyanet.europe.oslo",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 252,
-            "1": 144,
+            "0": 505,
+            "1": 287,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6364,
+          "exactShare": 0.6376,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 248,
-            "1": 148,
+            "0": 498,
+            "1": 294,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6263,
+          "exactShare": 0.6288,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 269,
-            "1": 127,
+            "0": 537,
+            "1": 255,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6793,
+          "exactShare": 0.678,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 244,
-            "1": 63,
-            "2": 64,
-            "3+": 25
+            "0": 269,
+            "1": 241,
+            "2": 102,
+            "3+": 180
           },
-          "exactShare": 0.6162,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.3396,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.oslo",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 67,
-            "1": 173,
-            "2": 46,
-            "3+": 110
+            "0": 307,
+            "1": 169,
+            "2": 80,
+            "3+": 236
           },
-          "exactShare": 0.1692,
+          "exactShare": 0.3876,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "unit tr.diyanet.europe.oslo",
@@ -1121,7 +1197,7 @@
     },
     "tr.diyanet.europe.paris": {
       "name": "Paris",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -1130,26 +1206,26 @@
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 317,
-            "1": 49,
-            "2": 30,
-            "3+": 0
+            "0": 390,
+            "1": 254,
+            "2": 90,
+            "3+": 58
           },
-          "exactShare": 0.8005,
-          "worstLate": 2,
+          "exactShare": 0.4924,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 251,
-            "1": 145,
+            "0": 502,
+            "1": 290,
             "2": 0,
             "3+": 0
           },
@@ -1160,11 +1236,11 @@
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 298,
-            "1": 98,
+            "0": 596,
+            "1": 196,
             "2": 0,
             "3+": 0
           },
@@ -1175,11 +1251,11 @@
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 280,
-            "1": 116,
+            "0": 560,
+            "1": 232,
             "2": 0,
             "3+": 0
           },
@@ -1190,11 +1266,11 @@
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 311,
-            "1": 85,
+            "0": 622,
+            "1": 170,
             "2": 0,
             "3+": 0
           },
@@ -1205,30 +1281,30 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 331,
-            "1": 43,
-            "2": 22,
-            "3+": 0
+            "0": 366,
+            "1": 302,
+            "2": 84,
+            "3+": 40
           },
-          "exactShare": 0.8359,
-          "worstLate": 2,
+          "exactShare": 0.4621,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 102,
-            "1": 228,
-            "2": 40,
-            "3+": 26
+            "0": 353,
+            "1": 295,
+            "2": 84,
+            "3+": 60
           },
-          "exactShare": 0.2576,
+          "exactShare": 0.4457,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1238,7 +1314,7 @@
     },
     "tr.diyanet.europe.sarajevo": {
       "name": "Sarajevo",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -1247,26 +1323,26 @@
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 211,
-            "1": 185,
+            "0": 423,
+            "1": 369,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5328,
+          "exactShare": 0.5341,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 334,
-            "1": 62,
+            "0": 668,
+            "1": 124,
             "2": 0,
             "3+": 0
           },
@@ -1277,56 +1353,56 @@
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 223,
-            "1": 173,
+            "0": 444,
+            "1": 348,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5631,
+          "exactShare": 0.5606,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 208,
-            "1": 188,
+            "0": 417,
+            "1": 375,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5253,
+          "exactShare": 0.5265,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 233,
-            "1": 163,
+            "0": 467,
+            "1": 325,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5884,
+          "exactShare": 0.5896,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 187,
-            "1": 209,
+            "0": 374,
+            "1": 418,
             "2": 0,
             "3+": 0
           },
@@ -1337,11 +1413,11 @@
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 338,
-            "1": 58,
+            "0": 676,
+            "1": 116,
             "2": 0,
             "3+": 0
           },
@@ -1355,88 +1431,92 @@
     },
     "tr.diyanet.europe.stockholm": {
       "name": "Stockholm",
-      "placeDays": 396,
+      "placeDays": 400,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
         },
-        "unit tr.diyanet.europe.stockholm: 5 min (endOfEating)": {
+        "unit tr.diyanet.europe.stockholm: 4 min": {
+          "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["isha"]
+        },
+        "unit tr.diyanet.europe.stockholm: 5 min": {
           "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
           "events": ["endOfEating"]
         },
-        "unit tr.diyanet.europe.stockholm: 5 min (fajr)": {
-          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. Stockholm's Fajr also waits for Islamiska Förbundet's pages, a minute later than Diyanet's own table on some days: up to 5 min after Diyanet's in April and August.",
+        "unit tr.diyanet.europe.stockholm: 6 min": {
+          "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after. Stockholm's Fajr also waits for Islamiska Förbundet's pages, a minute later than Diyanet's own table on some days: up to 6 min after Diyanet's in April and August.",
           "events": ["fajr"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
             "0": 0,
-            "1": 214,
-            "2": 59,
-            "3+": 123
+            "1": 300,
+            "2": 190,
+            "3+": 302
           },
           "exactShare": 0,
-          "worstLate": 5,
-          "lateLimit": 5,
+          "worstLate": 6,
+          "lateLimit": 6,
           "lateLimitFrom": "unit tr.diyanet.europe.stockholm",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 216,
-            "1": 179,
-            "2": 1,
+            "0": 430,
+            "1": 360,
+            "2": 2,
             "3+": 0
           },
-          "exactShare": 0.5455,
+          "exactShare": 0.5429,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 326,
-            "1": 70,
+            "0": 653,
+            "1": 139,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8232,
+          "exactShare": 0.8245,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 334,
-            "1": 62,
+            "0": 669,
+            "1": 123,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8434,
+          "exactShare": 0.8447,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 355,
-            "1": 41,
+            "0": 710,
+            "1": 82,
             "2": 0,
             "3+": 0
           },
@@ -1447,30 +1527,30 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 253,
-            "1": 51,
-            "2": 70,
-            "3+": 22
+            "0": 365,
+            "1": 153,
+            "2": 88,
+            "3+": 186
           },
-          "exactShare": 0.6389,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4609,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.stockholm",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 74,
-            "1": 178,
-            "2": 32,
-            "3+": 112
+            "0": 211,
+            "1": 285,
+            "2": 60,
+            "3+": 236
           },
-          "exactShare": 0.1869,
+          "exactShare": 0.2664,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "unit tr.diyanet.europe.stockholm",
@@ -1480,7 +1560,7 @@
     },
     "tr.diyanet.europe.wien": {
       "name": "Wien",
-      "placeDays": 396,
+      "placeDays": 399,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -1489,41 +1569,41 @@
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 326,
-            "1": 44,
-            "2": 26,
-            "3+": 0
+            "0": 458,
+            "1": 204,
+            "2": 78,
+            "3+": 52
           },
-          "exactShare": 0.8232,
-          "worstLate": 2,
+          "exactShare": 0.5783,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 216,
-            "1": 180,
+            "0": 431,
+            "1": 361,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5455,
+          "exactShare": 0.5442,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 336,
-            "1": 60,
+            "0": 672,
+            "1": 120,
             "2": 0,
             "3+": 0
           },
@@ -1534,26 +1614,26 @@
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 318,
-            "1": 78,
+            "0": 637,
+            "1": 155,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.803,
+          "exactShare": 0.8043,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 345,
-            "1": 51,
+            "0": 690,
+            "1": 102,
             "2": 0,
             "3+": 0
           },
@@ -1564,30 +1644,30 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 335,
-            "1": 43,
-            "2": 18,
-            "3+": 0
+            "0": 444,
+            "1": 240,
+            "2": 74,
+            "3+": 34
           },
-          "exactShare": 0.846,
-          "worstLate": 2,
+          "exactShare": 0.5606,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 102,
-            "1": 236,
-            "2": 38,
-            "3+": 20
+            "0": 321,
+            "1": 343,
+            "2": 76,
+            "3+": 52
           },
-          "exactShare": 0.2576,
+          "exactShare": 0.4053,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1597,7 +1677,7 @@
     },
     "tr.diyanet.europe.zurich": {
       "name": "Zürich",
-      "placeDays": 396,
+      "placeDays": 399,
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -1606,71 +1686,71 @@
       },
       "events": {
         "fajr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 329,
-            "1": 49,
-            "2": 18,
-            "3+": 0
+            "0": 425,
+            "1": 261,
+            "2": 68,
+            "3+": 38
           },
-          "exactShare": 0.8308,
-          "worstLate": 2,
+          "exactShare": 0.5366,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 264,
-            "1": 132,
+            "0": 529,
+            "1": 263,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6667,
+          "exactShare": 0.6679,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 297,
-            "1": 99,
+            "0": 595,
+            "1": 197,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.75,
+          "exactShare": 0.7513,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 297,
-            "1": 99,
+            "0": 595,
+            "1": 197,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.75,
+          "exactShare": 0.7513,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 333,
-            "1": 63,
+            "0": 666,
+            "1": 126,
             "2": 0,
             "3+": 0
           },
@@ -1681,30 +1761,30 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 396,
+          "checked": 792,
           "early": 0,
           "late": {
-            "0": 345,
-            "1": 40,
-            "2": 11,
-            "3+": 0
+            "0": 464,
+            "1": 242,
+            "2": 70,
+            "3+": 16
           },
-          "exactShare": 0.8712,
-          "worstLate": 2,
+          "exactShare": 0.5859,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 396,
+          "checked": 792,
           "lateEnd": 0,
           "late": {
-            "0": 107,
-            "1": 243,
-            "2": 32,
-            "3+": 14
+            "0": 365,
+            "1": 317,
+            "2": 72,
+            "3+": 38
           },
-          "exactShare": 0.2702,
+          "exactShare": 0.4609,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",

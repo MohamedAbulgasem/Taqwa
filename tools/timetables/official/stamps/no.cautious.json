@@ -1,7 +1,7 @@
 {
   "entry": "no.cautious",
   "class": "C",
-  "engineHash": "e0285bd840ab6ea1",
+  "engineHash": "7853a0678c8276af",
   "broken": 0,
   "places": 2,
   "first": "2026-01-01",
@@ -17,12 +17,12 @@
       "checked": 1095,
       "early": 0,
       "late": {
-        "0": 8,
-        "1": 420,
-        "2": 96,
-        "3+": 571
+        "0": 0,
+        "1": 413,
+        "2": 71,
+        "3+": 611
       },
-      "exactShare": 0.0073,
+      "exactShare": 0,
       "worstLate": 51,
       "lateLimit": 51,
       "lateLimitFrom": "entry no.cautious",
@@ -107,12 +107,12 @@
       "checked": 1095,
       "early": 0,
       "late": {
-        "0": 244,
-        "1": 63,
-        "2": 64,
-        "3+": 724
+        "0": 135,
+        "1": 120,
+        "2": 51,
+        "3+": 789
       },
-      "exactShare": 0.2228,
+      "exactShare": 0.1233,
       "worstLate": 148,
       "lateLimit": 148,
       "lateLimitFrom": "entry no.cautious",
@@ -122,12 +122,12 @@
       "checked": 1095,
       "lateEnd": 0,
       "late": {
-        "0": 94,
-        "1": 171,
-        "2": 43,
-        "3+": 787
+        "0": 181,
+        "1": 81,
+        "2": 40,
+        "3+": 793
       },
-      "exactShare": 0.0858,
+      "exactShare": 0.1653,
       "worstLate": 96,
       "lateLimit": 96,
       "lateLimitFrom": "entry no.cautious",
@@ -142,12 +142,12 @@
         "checked": 1095,
         "early": 0,
         "late": {
-          "0": 8,
-          "1": 420,
-          "2": 96,
-          "3+": 571
+          "0": 0,
+          "1": 413,
+          "2": 71,
+          "3+": 611
         },
-        "exactShare": 0.0073,
+        "exactShare": 0,
         "worstLate": 51,
         "lateLimit": 51,
         "lateLimitFrom": "entry no.cautious",
@@ -232,12 +232,12 @@
         "checked": 1095,
         "early": 0,
         "late": {
-          "0": 244,
-          "1": 63,
-          "2": 64,
-          "3+": 724
+          "0": 135,
+          "1": 120,
+          "2": 51,
+          "3+": 789
         },
-        "exactShare": 0.2228,
+        "exactShare": 0.1233,
         "worstLate": 148,
         "lateLimit": 148,
         "lateLimitFrom": "entry no.cautious",
@@ -247,12 +247,12 @@
         "checked": 1095,
         "lateEnd": 0,
         "late": {
-          "0": 94,
-          "1": 171,
-          "2": 43,
-          "3+": 787
+          "0": 181,
+          "1": 81,
+          "2": 40,
+          "3+": 793
         },
-        "exactShare": 0.0858,
+        "exactShare": 0.1653,
         "worstLate": 96,
         "lateLimit": 96,
         "lateLimitFrom": "entry no.cautious",

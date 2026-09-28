@@ -764,9 +764,13 @@ object Europe {
      * Austria: IGGÖ's national calendar since 1 Jan 2023 is Diyanet's European method, printed city by
      * city (its PDFs are per location); Wien's equals Diyanet Wien (121 of 122 days). Wien's table is the
      * one held: a point table (ruling R44) on Diyanet's own Wien curves (subtask 7b: its takdir as its
-     * table prints it), margins fitted by Task 7g on IGGÖ's own Wien table (March, May and June; July,
-     * September and December held out). Other Austrian cities' tables are not held, so beyond Wien's
-     * reach the edge applies: Diyanet's generic European method, a minute more.
+     * table prints it), the other columns' margins fitted by Task 7g on IGGÖ's own Wien table (March,
+     * May and June; July, September and December held out). Fajr, Isha and the end of eating keep
+     * Diyanet's curve margins: since the monitor round a curve slot is a bound on Diyanet's own moment
+     * in any year (Diyanet.CITY_CURVE_START), and IGGÖ's 2026 table, the year before Diyanet's held
+     * rows, is that construction's cross-year check, with the same step lateness as Diyanet's own
+     * cities. Other Austrian cities' tables are not held, so beyond Wien's reach the edge applies:
+     * Diyanet's generic European method, a minute more.
      */
     val austria: RegistryEntry = single(
         id = "at.iggo", nameKey = "authority_iggo", entryClass = EntryClass.D_AUTHORITY,
@@ -780,8 +784,9 @@ object Europe {
     val austriaUnits: UnitSet = cityTable(
         austria, "Wien", GeoPoint(48.20849, 16.37208),
         diyanetCity("wien", "at.iggo.wien").copy(
-            margins = margins(start = -17, sunrise = 31, fajr = 3, maghrib = -18, isha = -12), endOfEatingMarginSeconds = 49,
+            margins = margins(start = -17, sunrise = 31, fajr = Diyanet.CITY_CURVE_START, maghrib = -18, isha = Diyanet.CITY_CURVE_START),
         ),
+        lateLimits = Diyanet.steps(4, 4, 4),
     )
 
     /**
@@ -811,9 +816,15 @@ object Europe {
      * A point table (rulings R30, R44) on its own [method] at [point]; beyond its reach the edge takes the
      * entry's own (Diyanet's generic European) method, as Diyanet's own edge does (ruling R45).
      */
-    private fun cityTable(entry: RegistryEntry, name: String, point: GeoPoint, method: TimetableMethod): UnitSet {
+    private fun cityTable(
+        entry: RegistryEntry,
+        name: String,
+        point: GeoPoint,
+        method: TimetableMethod,
+        lateLimits: List<LateLimit> = emptyList(),
+    ): UnitSet {
         val reach = lateReachKm(point.lat, entry.entryClass)
-        return UnitSet(entry.id, listOf(AuthorityUnit(entry.id, name, point, reach, method))) { user ->
+        return UnitSet(entry.id, listOf(AuthorityUnit(entry.id, name, point, reach, method, lateLimits = lateLimits))) { user ->
             requireNotNull(entry.method).beyondTable(entry.id + ".edge", point, user, reach)
         }
     }
@@ -1192,7 +1203,7 @@ object Europe {
     /** France's late limits with Diyanet as a member (ruling R87; measured by the gate at Paris). */
     private const val FRANCE_SUNRISE = 8
     private const val FRANCE_ASR = 4
-    private const val FRANCE_FAJR = 15
+    private const val FRANCE_FAJR = 16
     private const val FRANCE_DIYANET_END = 26
 
     /** Germany's late-dawn family's June share of the night before sunrise (Hilaly 0.206, Rahma 0.213). */

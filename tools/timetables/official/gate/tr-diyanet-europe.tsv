@@ -1,10 +1,15 @@
 # Diyanet's European method (since 1 Jan 2023): namazvakitleri.diyanet.gov.tr city tables, restricted:
 # archive only. The first column is İmsak, both the Fajr start and the end of eating (F+E).
-# The twelve cities held for 396 days (25 Sep 2026 – 31 Dec 2027), each its own point table (ruling
-# R44), checked at its unit's point. North of 44.5° each city's Fajr, Isha and end of eating follow
-# depression curves derived from its own table (DiyanetEuropeCurves), so those three columns there
-# are fitted, not held out; the other columns' margins are fitted on six cities spread from south to
-# north (Sarajevo, Zürich, München, Paris, Berlin, Stockholm) and the other six held out.
+# Each city is its own point table (ruling R44), checked at its unit's point, and is held in two
+# captures: the research's of 25/26 Sep 2026 (that month to 25/26 Oct, and all of 2027) and the
+# monitor's of 28 Sep 2026 (29 Sep – 29 Oct 2026, and all of 2027; identical on every day both hold).
+# North of 44.5° each city's Fajr, Isha and end of eating follow depression curves derived from every
+# held row of its own table (DiyanetEuropeCurves, tools/timetables' generateDiyanetEuropeCurves), so
+# those three columns are fitted on both captures, not held out; the other columns' margins are fitted
+# on six cities spread from south to north (Sarajevo, Zürich, München, Paris, Berlin, Stockholm) and
+# the other six held out. The monitor's captures are split=test throughout: they add the four days
+# after the clock change of 25 Oct 2026, which no research capture holds, and the monitor round found
+# the first curves a minute early there (brief D); the curves' derivation was rebuilt on them.
 # Diyanet's tables for places beyond every held city (Copenhagen and nine Nordic cities) are not rows
 # here: there the entry claims no "at most" figure; proof/7b-turkiye-balkans-russia.md gives their
 # never-early check.
@@ -21,3 +26,15 @@ archive/tables/moral-auth-world/europe/dy-brussels.txt	tr.diyanet.europe/tr.diya
 archive/tables/moral-auth-world/europe/dy-london.txt	tr.diyanet.europe/tr.diyanet.europe.london			Europe/London	F+E S D A M I	daily	standard	test	London, its own point table
 archive/tables/moral-auth-world/europe/dy-amsterdam.txt	tr.diyanet.europe/tr.diyanet.europe.amsterdam			Europe/Amsterdam	F+E S D A M I	daily	standard	test	Amsterdam, its own point table
 archive/tables/moral-auth-world/europe/verify/dy-oslo.txt	tr.diyanet.europe/tr.diyanet.europe.oslo			Europe/Oslo	F+E S D A M I	daily	standard	test	Oslo, its own point table
+archive/tables/monitor/tr-diyanet-europe/amsterdam.txt	tr.diyanet.europe/tr.diyanet.europe.amsterdam			Europe/Amsterdam	F+E S D A M I	daily	standard	test	Amsterdam, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/berlin.txt	tr.diyanet.europe/tr.diyanet.europe.berlin			Europe/Berlin	F+E S D A M I	daily	standard	test	Berlin, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/brussels.txt	tr.diyanet.europe/tr.diyanet.europe.brussels			Europe/Brussels	F+E S D A M I	daily	standard	test	Brussels, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/freiburg.txt	tr.diyanet.europe/tr.diyanet.europe.freiburg			Europe/Berlin	F+E S D A M I	daily	standard	test	Freiburg, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/london.txt	tr.diyanet.europe/tr.diyanet.europe.london			Europe/London	F+E S D A M I	daily	standard	test	London, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/munich.txt	tr.diyanet.europe/tr.diyanet.europe.munich			Europe/Berlin	F+E S D A M I	daily	standard	test	München, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/oslo.txt	tr.diyanet.europe/tr.diyanet.europe.oslo			Europe/Oslo	F+E S D A M I	daily	standard	test	Oslo, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/paris.txt	tr.diyanet.europe/tr.diyanet.europe.paris			Europe/Paris	F+E S D A M I	daily	standard	test	Paris, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/sarajevo.txt	tr.diyanet.europe/tr.diyanet.europe.sarajevo			Europe/Sarajevo	F+E S D A M I	daily	standard	test	Sarajevo, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/stockholm.txt	tr.diyanet.europe/tr.diyanet.europe.stockholm			Europe/Stockholm	F+E S D A M I	daily	standard	test	Stockholm, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/wien.txt	tr.diyanet.europe/tr.diyanet.europe.wien			Europe/Vienna	F+E S D A M I	daily	standard	test	Wien, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tr-diyanet-europe/zurich.txt	tr.diyanet.europe/tr.diyanet.europe.zurich			Europe/Zurich	F+E S D A M I	daily	standard	test	Zürich, the monitor capture of 28 Sep 2026

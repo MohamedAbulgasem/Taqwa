@@ -1,7 +1,7 @@
 {
   "entry": "se.cautious",
   "class": "C",
-  "engineHash": "65c03cf0be5b9920",
+  "engineHash": "94d2ac675df3efaa",
   "broken": 0,
   "places": 3,
   "first": "2025-12-01",
@@ -17,12 +17,12 @@
       "checked": 1300,
       "early": 0,
       "late": {
-        "0": 19,
-        "1": 468,
-        "2": 310,
-        "3+": 503
+        "0": 0,
+        "1": 405,
+        "2": 341,
+        "3+": 554
       },
-      "exactShare": 0.0146,
+      "exactShare": 0,
       "worstLate": 118,
       "lateLimit": 118,
       "lateLimitFrom": "entry se.cautious",
@@ -93,9 +93,9 @@
       "early": 0,
       "late": {
         "0": 12,
-        "1": 235,
-        "2": 12,
-        "3+": 1041
+        "1": 231,
+        "2": 7,
+        "3+": 1050
       },
       "exactShare": 0.0092,
       "worstLate": 155,
@@ -127,12 +127,12 @@
         "checked": 1300,
         "early": 0,
         "late": {
-          "0": 19,
-          "1": 468,
-          "2": 310,
-          "3+": 503
+          "0": 0,
+          "1": 405,
+          "2": 341,
+          "3+": 554
         },
-        "exactShare": 0.0146,
+        "exactShare": 0,
         "worstLate": 118,
         "lateLimit": 118,
         "lateLimitFrom": "entry se.cautious",
@@ -203,9 +203,9 @@
         "early": 0,
         "late": {
           "0": 12,
-          "1": 235,
-          "2": 12,
-          "3+": 1041
+          "1": 231,
+          "2": 7,
+          "3+": 1050
         },
         "exactShare": 0.0092,
         "worstLate": 155,

@@ -149,18 +149,18 @@ object Diyanet {
             europeTable("munich", "München", GeoPoint(48.13743, 11.57549)),
             europeTable("wien", "Wien", GeoPoint(48.20849, 16.37208)),
             europeTable("paris", "Paris", GeoPoint(48.85341, 2.3488)),
-            europeTable("brussels", "Brussels", GeoPoint(50.85045, 4.34878), lateLimits = listOf(springEnd(4))),
-            europeTable("london", "London", GeoPoint(51.5074, -0.1278), lateLimits = listOf(springEnd(4))),
-            europeTable("amsterdam", "Amsterdam", GeoPoint(52.37403, 4.88969), lateLimits = listOf(springEnd(4))),
-            europeTable("berlin", "Berlin", GeoPoint(52.52437, 13.41053), lateLimits = listOf(springEnd(4))),
+            europeTable("brussels", "Brussels", GeoPoint(50.85045, 4.34878), lateLimits = steps(4, 4, 4)),
+            europeTable("london", "London", GeoPoint(51.5074, -0.1278), lateLimits = steps(4, 4, 4)),
+            europeTable("amsterdam", "Amsterdam", GeoPoint(52.37403, 4.88969), lateLimits = steps(4, 4, 4)),
+            europeTable("berlin", "Berlin", GeoPoint(52.52437, 13.41053), lateLimits = steps(4, 4, 4)),
             europeTable(
                 "stockholm", "Stockholm", GeoPoint(59.32938, 18.06871),
                 method = cityMethod("stockholm").let { it.copy(margins = it.margins.copy(fajr = it.margins.fajr + STOCKHOLM_IFIS_FAJR)) },
-                lateLimits = listOf(LateLimit(5, STOCKHOLM_FAJR, setOf(TimedEvent.FAJR)), springEnd(5)),
+                lateLimits = listOf(LateLimit(6, STOCKHOLM_FAJR, setOf(TimedEvent.FAJR)), springIsha(4), springEnd(5)),
             ),
             europeTable(
                 "oslo", "Oslo", GeoPoint(59.91273, 10.74609),
-                lateLimits = listOf(springFajr(4), springEnd(5), LateLimit(8, OSLO_SUNRISE, setOf(TimedEvent.SUNRISE))),
+                lateLimits = steps(5, 4, 5) + LateLimit(8, OSLO_SUNRISE, setOf(TimedEvent.SUNRISE)),
             ),
         )
         UnitSet("tr.diyanet.europe", units) { user ->
@@ -179,16 +179,40 @@ object Diyanet {
         "tr.diyanet.europe.$key", name, point, lateReachKm(point.lat, EntryClass.D_AUTHORITY), method, lateLimits = lateLimits,
     )
 
+    /**
+     * A takdir city's recorded lateness on the days its takdir moves a time in steps: Fajr up to [fajr]
+     * and Isha up to [isha] min late, the end of eating up to [end] min early. Shared with the units
+     * that print a Diyanet city's times under their own name (IGGÖ's Wien, Europe.kt).
+     */
+    internal fun steps(fajr: Int, isha: Int, end: Int) = listOf(springFajr(fajr), springIsha(isha), springEnd(end))
+
     /** Where the spring takdir moves Fajr by minutes a day, the leap-cycle envelope makes Fajr up to [minutes] late. */
     private fun springFajr(minutes: Int) = LateLimit(minutes, SPRING_FAJR, setOf(TimedEvent.FAJR))
+
+    /** The same for Isha, whose takdir steps come in spring and in August. */
+    private fun springIsha(minutes: Int) = LateLimit(minutes, SPRING_ISHA, setOf(TimedEvent.ISHA))
 
     /** The same envelope makes the end of eating up to [minutes] early. */
     private fun springEnd(minutes: Int) = LateLimit(minutes, SPRING_END, setOf(TimedEvent.END_OF_EATING))
 
+    /**
+     * Why a takdir city's curve runs after Diyanet's minute by up to a minute on takdir days: a slot is
+     * the latest moment Diyanet's own could be under its nearest-minute rounding, since a slot that
+     * reproduced one year's rounding showed the minute before Diyanet's in the next year.
+     */
+    private const val ROUNDING_BOUND =
+        " On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the " +
+            "minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after."
+
     private const val SPRING_FAJR =
         "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest " +
             "of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed " +
-            "time by as much as a day's step on those days."
+            "time by as much as a day's step on those days." + ROUNDING_BOUND
+
+    private const val SPRING_ISHA =
+        "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve " +
+            "takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs " +
+            "after the printed time by as much as a day's step on those days." + ROUNDING_BOUND
 
     private const val SPRING_END =
         "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating " +
@@ -208,15 +232,24 @@ object Diyanet {
      */
     private fun cityMethod(key: String): TimetableMethod {
         val curves = DiyanetEuropeCurves.byCity.getValue(key)
-        return europeMethod.copy(
-            id = "tr.diyanet.europe.$key",
-            fajrAngleByDayOfYear = curves.fajr,
-            ishaAngleByDayOfYear = curves.isha,
-            endOfEating = EndOfEating.DawnAngle(18.0, curves.end),
+        return curveMethod("tr.diyanet.europe.$key", curves.fajr, curves.isha, curves.end)
+    }
+
+    /**
+     * [europeMethod] on one city table's own curves under [id]: Fajr and Isha at [fajr] and [isha]
+     * (depressions by slot) with [CITY_CURVE_START], the end of eating at [end] with [CITY_CURVE_END].
+     * Shared with the curve generator's test in tools/timetables, which checks an invented table's curves
+     * the way the registry uses them.
+     */
+    internal fun curveMethod(id: String, fajr: DoubleArray, isha: DoubleArray, end: DoubleArray): TimetableMethod =
+        europeMethod.copy(
+            id = id,
+            fajrAngleByDayOfYear = fajr,
+            ishaAngleByDayOfYear = isha,
+            endOfEating = EndOfEating.DawnAngle(18.0, end),
             margins = europeMethod.margins.copy(fajr = CITY_CURVE_START, isha = CITY_CURVE_START),
             endOfEatingMarginSeconds = CITY_CURVE_END,
         )
-    }
 
     /**
      * Stockholm's Fajr takes this many seconds more (Task 7g, review fix round 2): Islamiska Förbundet's
@@ -227,11 +260,18 @@ object Diyanet {
     private const val STOCKHOLM_IFIS_FAJR = 69
 
     private const val STOCKHOLM_FAJR = SPRING_FAJR + " Stockholm's Fajr also waits for Islamiska Förbundet's pages, a " +
-        "minute later than Diyanet's own table on some days: up to 5 min after Diyanet's in April and August."
+        "minute later than Diyanet's own table on some days: up to 6 min after Diyanet's in April and August."
 
-    /** The margins on a city's own curves, which are derived 25 s before each printed minute. */
-    private const val CITY_CURVE_START = -29
-    private const val CITY_CURVE_END = 30
+    /**
+     * The margins on a city's own curves (DiyanetEuropeCurves, whose generator in tools/timetables reads
+     * them): a curve slot is the latest moment Diyanet's own could be under its nearest-minute rounding,
+     * 30 s after the printed minute and 5 s of safety, so a start on it shows the printed minute or the
+     * one after in any year; the end curve the earliest, 35 s before, so it never passes the printed
+     * minute. Where Diyanet prints the plain 18° or 16° that day, the slot is the plain method's own
+     * moment instead ([europeMethod]'s margins), which shows the same minute as the plain method.
+     */
+    internal const val CITY_CURVE_START = -29
+    internal const val CITY_CURVE_END = 30
 
     /**
      * The old picker's Turkey method: Diyanet's algorithm at any point, the plain ±30 s (ruling R31),
