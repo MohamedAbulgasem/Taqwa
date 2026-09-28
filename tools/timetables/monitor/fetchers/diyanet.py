@@ -53,12 +53,12 @@ TURKEY = [
 # the seven others are new data: checked against the entry Automatic follows there.
 EUROPE = [
     ("sarajevo", "Sarajevo", "9", ["SARAJEVO", "SARAYBOSNA"], 43.84864, 18.35644, "Europe/Sarajevo", "BA", "tr.diyanet.europe/tr.diyanet.europe.sarajevo"),
-    ("zurich", "Zürich", "49", ["ZURICH", "ZÜRİCH", "ZÜRICH"], 47.36667, 8.55, "Europe/Zurich", "CH", "tr.diyanet.europe/tr.diyanet.europe.zurich"),
+    ("zurich", "Zürich", "49", ["ZÜRİH", "ZURIH", "ZURICH", "ZÜRICH"], 47.36667, 8.55, "Europe/Zurich", "CH", "tr.diyanet.europe/tr.diyanet.europe.zurich"),
     ("munich", "München", "13", ["MUNCHEN", "MÜNCHEN", "MUNICH", "MÜNIH"], 48.13743, 11.57549, "Europe/Berlin", "DE", "tr.diyanet.europe/tr.diyanet.europe.munich"),
     ("paris", "Paris", "21", ["PARIS"], 48.85341, 2.3488, "Europe/Paris", "FR", "tr.diyanet.europe/tr.diyanet.europe.paris"),
     ("berlin", "Berlin", "13", ["BERLIN"], 52.52437, 13.41053, "Europe/Berlin", "DE", "tr.diyanet.europe/tr.diyanet.europe.berlin"),
     ("stockholm", "Stockholm", "12", ["STOCKHOLM"], 59.32938, 18.06871, "Europe/Stockholm", "SE", "tr.diyanet.europe/tr.diyanet.europe.stockholm"),
-    ("freiburg", "Freiburg", "13", ["FREIBURG", "FREIBURG IM BREISGAU"], 47.9959, 7.85222, "Europe/Berlin", "DE", "tr.diyanet.europe/tr.diyanet.europe.freiburg"),
+    ("freiburg", "Freiburg", "13", ["FREIBURG", "FREIBURG IM BREISGAU", "FREIBURG I. BR.", "FREIBURG (BREISGAU)"], 47.9959, 7.85222, "Europe/Berlin", "DE", "tr.diyanet.europe/tr.diyanet.europe.freiburg"),
     ("wien", "Wien", "35", ["WIEN", "VIENNA", "VİYANA", "VIYANA"], 48.20849, 16.37208, "Europe/Vienna", "AT", "tr.diyanet.europe/tr.diyanet.europe.wien"),
     ("brussels", "Brussels", "11", ["BRUSSELS", "BRUXELLES", "BRUSSEL", "BRÜKSEL", "BRUKSEL"], 50.85045, 4.34878, "Europe/Brussels", "BE", "tr.diyanet.europe/tr.diyanet.europe.brussels"),
     ("london", "London", "15", ["LONDON", "LONDRA"], 51.5074, -0.1278, "Europe/London", "GB", "tr.diyanet.europe/tr.diyanet.europe.london"),
@@ -133,8 +133,10 @@ class Ids:
                     if name:
                         found.setdefault(norm(name), (str(r["IlceID"]), state_name))
 
-        take(d.get("StateRegionList"), states[0].get("SehirAdiEn") if states else "")
-        for s in states[1:]:
+        # The country call's own district list is one state's, not necessarily the first listed
+        # (Germany's came without Baden-Württemberg): every state is asked for its own.
+        take(d.get("StateRegionList"), "")
+        for s in states:
             e = self.ctx.http.json(f"{BASE}/home/GetRegList?ChangeType=state&CountryId={country}&StateId={s['SehirID']}&Culture=tr-TR", headers=AJAX)
             take(e.get("StateRegionList"), s.get("SehirAdiEn"))
         if not found:
@@ -148,15 +150,27 @@ class Ids:
         if known:
             return known
         districts = self.districts(country)
+        hit = None
         for c in candidates:
             hit = districts.get(norm(c))
             if hit:
-                self.data["cities"][key] = hit[0]
-                self.save()
-                self.ctx.note(f"{key}: district {hit[0]} ({c}, {hit[1]})")
-                return hit[0]
-        sample = ", ".join(sorted(districts)[:12])
-        raise FetchError(f"{key}: no district named {'/'.join(candidates)} in country {country} (some: {sample} …)")
+                break
+        if hit is None:
+            # The site's own spelling may carry a suffix ("FREIBURG IM BREISGAU" as "FREIBURG I.BR."):
+            # the one district whose folded name starts with a candidate, the shortest when several.
+            for c in candidates:
+                starts = sorted((name for name in districts if name.startswith(norm(c))), key=len)
+                if starts:
+                    hit = districts[starts[0]]
+                    c = starts[0]
+                    break
+        if hit is None:
+            sample = ", ".join(sorted(districts)[:12])
+            raise FetchError(f"{key}: no district named {'/'.join(candidates)} in country {country} (some: {sample} …)")
+        self.data["cities"][key] = hit[0]
+        self.save()
+        self.ctx.note(f"{key}: district {hit[0]} ({c}, {hit[1]})")
+        return hit[0]
 
 
 def fetch(ctx):

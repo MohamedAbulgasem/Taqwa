@@ -38,10 +38,14 @@ class TableCheck(
         data class Row(val manifest: GateManifest, val text: String, val why: String) : Plan()
         data class Calendar(val survey: Survey, val why: String) : Plan()
         data class Refused(val reason: String) : Plan()
+
+        /** A calendar its survey leaves out whole (`use` is the reason): not checked, for the record. */
+        data class LeftOut(val reason: String) : Plan()
     }
 
     fun check(table: MonitorTable): Item = when (val plan = plan(table)) {
         is Plan.Refused -> Item(Kind.FETCH_BROKEN, "${table.id} could not be checked", listOf(plan.reason), CHECK_FIX)
+        is Plan.LeftOut -> Item(Kind.GREEN, "${table.id} (${table.name}): its survey leaves it out, not checked (${plan.reason})")
         is Plan.Row -> checkRow(table, plan)
         is Plan.Calendar -> checkCalendar(table, plan)
     }
@@ -93,10 +97,9 @@ class TableCheck(
             zone = TimeZone.of(table.zone).takeIf { it != whole.zone },
         )
         val held = whole.calendars.firstOrNull { it.id == table.key }
+        if (held != null && !held.used) return Plan.LeftOut(held.use)
         val why = if (held == null) {
             "a calendar the survey does not list yet: checked at the mosque's point with no recorded faults or outliers"
-        } else if (!held.used) {
-            "a calendar the survey leaves out (${held.use}): checked anyway, for the record"
         } else {
             "checked as the survey checks it, with its recorded faults and outliers"
         }

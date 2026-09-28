@@ -136,5 +136,14 @@ class MonitorReportTest {
         assertEquals(0, again.exitCode, again.report)
         assertEquals("All green.", again.summary)
         assertTrue("No fetch this run" in again.report && "Nothing new since the last reminder (2026-10-05)" in again.report, again.report)
+        assertTrue("sg-muis/singapore" !in again.report, "a held table that was fine is not checked again")
+
+        // A table red last run is checked again although unchanged, until it is green.
+        val state = MonitorState(monitorDir.resolve("state.json"))
+        state.redTables = setOf("sg-muis/singapore")
+        state.save()
+        val third = Monitor(TestPaths.repoRoot, official, monitorDir, LocalDate(2026, 10, 19), emptySet(), checkAll = false, skipFull = true, stampsDir = stamps).run()
+        assertTrue("Changed table, fine: sg-muis/singapore" in third.report, third.report)
+        assertEquals(emptySet(), MonitorState(monitorDir.resolve("state.json")).redTables)
     }
 }

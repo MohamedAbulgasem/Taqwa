@@ -85,6 +85,14 @@ class HorizonsTest {
     }
 
     @Test
+    fun `a stale proof waits while a manual source names the entry with a due date still to come`() {
+        val stamps = fresh + stamp("dd.old", "D (authority)", "2024-01-01", "2025-09-30")
+        val deferred = mapOf("dd.old" to LocalDate(2027, 2, 1))
+        assertTrue(Horizons.check(LocalDate(2026, 10, 1), stamps, uqLast, changes, deferred = deferred).none { "dd.old" in it.title })
+        assertEquals(1, Horizons.check(LocalDate(2027, 2, 1), stamps, uqLast, changes, deferred = deferred).count { "dd.old" in it.title })
+    }
+
+    @Test
     fun `eight weeks before a tabular ramadan the a and b entries whose proof stops short are listed`() {
         // Tabular 1 Ramadan 1448 is 8 February 2027 (spec §7); the window opens 56 days before.
         val stamps = listOf(

@@ -16,7 +16,7 @@ sys.path.insert(0, HERE)
 
 from common import FetchError, Table, nearest_year, norm_time, pm, read_table_rows  # noqa: E402
 from fetch import INDEX_HEADER, Store, due  # noqa: E402
-from fetchers import diyanet, egypt, jakim, morocco, muis, qatar  # noqa: E402
+from fetchers import diyanet, egypt, jakim, mawaqit, morocco, muis, qatar  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -202,6 +202,15 @@ class Parsers(unittest.TestCase):
         rows = morocco.parse(page, dt.date(2026, 9, 28))
         self.assertEqual(["2026-09-13", "2026-10-02"], sorted(rows))
         self.assertEqual(["05:23", "06:48", "12:33", "16:00", "18:11", "19:29"], rows["2026-09-13"])
+
+    def test_mawaqit_takes_the_last_columns(self):
+        six = {"calendar": [{"1": ["05:00", "07:00", "12:30", "15:00", "17:30", "19:00"]}]}
+        seven = {"calendar": [{"1": ["04:40", "05:00", "07:00", "12:30", "15:00", "17:30", "19:00"]}]}
+        self.assertEqual(["05:00", "07:00", "12:30", "15:00", "17:30", "19:00"], mawaqit.calendar_rows(six, 2026)["2026-01-01"])
+        self.assertEqual(["05:00", "07:00", "12:30", "15:00", "17:30", "19:00"], mawaqit.calendar_rows(seven, 2026)["2026-01-01"])
+        self.assertEqual(7, len(mawaqit.calendar_rows(seven, 2026, 7)["2026-01-01"]))
+        page = 'x confData = {"name": "M", "calendar": [{"1": ["05:00", "07:00", "12:30", "15:00", "17:30", "19:00"]}], "s": "a}b"}; y'
+        self.assertEqual("M", mawaqit.conf_data(page)["name"])
 
     def test_qatar(self):
         body = json.dumps({"gregorianDate": {"year": 2026, "month": 9, "day": 28},

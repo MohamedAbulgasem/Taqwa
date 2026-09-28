@@ -112,12 +112,20 @@ class Monitor(
             )
         }
 
-        // 2. Each new or changed table at its own point.
-        val toCheck = index.filter { checkAll || it.isNewOrChanged }
+        // 2. Each new or changed table at its own point, and each table red last run until it is green.
+        val state = MonitorState(monitorDir.resolve("state.json"))
+        val red = state.redTables
+        val toCheck = index.filter { checkAll || it.isNewOrChanged || it.id in red }
+        val stillRed = mutableSetOf<String>()
         if (toCheck.isNotEmpty()) {
             val check = TableCheck(roots, officialDir)
-            for (table in toCheck) items += check.check(table)
+            for (table in toCheck) {
+                val item = check.check(table)
+                items += item
+                if (item.kind.attention) stillRed += table.id
+            }
         }
+        state.redTables = stillRed + (red - index.map { it.id }.toSet()).filter { only.isNotEmpty() }.toSet()
 
         // 3. The whole gate and every survey.
         if (!skipFull) {
@@ -126,7 +134,9 @@ class Monitor(
         }
 
         // 4. Horizons.
-        items += Horizons.check(today, StampSummary.load(stampsDir))
+        val deferred = sources.filter { it.manual && it.nextExpected != null }
+            .flatMap { s -> ENTRY_ID.findAll(s.entries).map { it.value to s.nextExpected!! } }.toMap()
+        items += Horizons.check(today, StampSummary.load(stampsDir), deferred = deferred)
 
         // 5. Manual sources due.
         for (s in sources.filter { it.manual && (only.isEmpty() || it.id in only) }) {
@@ -142,7 +152,6 @@ class Monitor(
         }
 
         // 6. The backup reminder.
-        val state = MonitorState(monitorDir.resolve("state.json"))
         val backup = BackupRun.load(monitorDir.resolve("backup.json"))?.takeIf { it.date == today }
         val reminder = backupReminder(backup, state)
 
@@ -204,6 +213,11 @@ class Monitor(
                     "the outlier with its worst minutes.",
             )
         }
+    }
+
+    private companion object {
+        /** A registry entry id as the catalogue's `entries` column names it: `sa.ummalqura`, `ps.gaza.awqaf`. */
+        val ENTRY_ID = Regex("""\b[a-z]{2}\.[a-z0-9]+(?:\.[a-z0-9]+)*\b""")
     }
 
     /** The backup paragraph, and the reminder to upload when files were added since the last one. */

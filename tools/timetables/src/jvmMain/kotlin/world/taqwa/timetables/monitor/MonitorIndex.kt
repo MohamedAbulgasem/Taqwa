@@ -156,6 +156,13 @@ class MonitorState(private val file: File) {
             values["lastReminder"] = value?.toString()
         }
 
+    /** The tables whose check needed attention last run: checked again, changed or not, until green. */
+    var redTables: Set<String>
+        get() = (values["redTables"] as? List<*>).orEmpty().mapNotNull { it as? String }.toSet()
+        set(value) {
+            values["redTables"] = value.sorted()
+        }
+
     fun note(key: String, value: Any?) {
         values[key] = value
     }

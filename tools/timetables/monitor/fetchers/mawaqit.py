@@ -46,7 +46,11 @@ def conf_data(page):
     return json.loads(raw[:end])
 
 
-def calendar_rows(conf, year):
+def calendar_rows(conf, year, columns=6):
+    """{date: the last `columns` values of each day}: a day holds six times (Fajr, sunrise, Dhuhr,
+    Asr, Maghrib, Isha), or seven where the mosque displays an imsak before them (Mawaqit's
+    `displayingSabahImsak`, the Turkish mosques); a survey that reads the imsak column names seven
+    columns (`- F S D A M I`), one that does not, six, so the values are taken from the end."""
     cal = conf.get("calendar")
     if not cal:
         raise FetchError("no calendar in confData")
@@ -60,8 +64,8 @@ def calendar_rows(conf, year):
                 d = dt.date(year, mi + 1, int(day))
             except ValueError:
                 continue
-            if isinstance(row, list) and len(row) >= 6:
-                rows[d.isoformat()] = row[:6]
+            if isinstance(row, list) and len(row) >= columns:
+                rows[d.isoformat()] = row[-columns:]
     if not rows:
         raise FetchError("an empty calendar")
     return rows
@@ -76,7 +80,7 @@ def fetch(ctx):
         try:
             page = ctx.http.text(url)
             conf = conf_data(page)
-            rows = calendar_rows(conf, ctx.today.year)
+            rows = calendar_rows(conf, ctx.today.year, len(columns.split()))
         except (FetchError, ValueError) as e:
             ctx.error(f"{folder} {slug}: {e}")
             continue

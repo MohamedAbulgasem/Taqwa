@@ -163,6 +163,17 @@ class TableCheckTest {
     }
 
     @Test
+    fun `a calendar its survey leaves out is not checked and stays green`() {
+        val leftOut = officialDir.resolve("survey/gb-cautious/calendars.tsv").readLines()
+            .filter { it.isNotBlank() && !it.startsWith("#") }.drop(1).map { it.split('\t') }.firstOrNull { it[5] != "yes" }
+        if (leftOut == null) return
+        val slug = leftOut[0].substringAfterLast('/').removeSuffix(".txt")
+        val item = check.check(table("mawaqit", slug, "archive/t.txt", null, 52.48, -1.89, "Europe/London", "GB", "F S D A M I", survey = "gb-cautious"))
+        assertEquals(Kind.GREEN, item.kind, item.toString())
+        assertTrue("leaves it out" in item.title, item.title)
+    }
+
+    @Test
     fun `a canadian calendar keeps its own zone`() {
         val plan = check.plan(table("mawaqit", "x", "archive/t.txt", null, 44.65, -63.6, "America/Halifax", "CA", "F S D A M I", survey = "ca-cautious")) as TableCheck.Plan.Calendar
         assertEquals(TimeZone.of("America/Halifax"), plan.survey.calendars.single().zone)

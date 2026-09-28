@@ -15,6 +15,8 @@ import hashlib
 import json
 import os
 import re
+import ssl
+import subprocess
 import sys
 import time
 import urllib.error
@@ -73,13 +75,46 @@ class Http:
                     time.sleep(5)
                     continue
                 raise last
-            except (urllib.error.URLError, TimeoutError, OSError) as e:
+            except urllib.error.URLError as e:
+                if isinstance(e.reason, ssl.SSLCertVerificationError):
+                    # Python's own certificate store does not know this site's chain (habous.gov.ma);
+                    # curl verifies it against the system's, so the request goes through curl instead.
+                    return self._curl(url, hdrs, body, timeout)
+                last = FetchError(f"{type(e).__name__}: {getattr(e, 'reason', e)} from {url}")
+                if attempt < retries:
+                    time.sleep(5)
+                    continue
+                raise last
+            except (TimeoutError, OSError) as e:
                 last = FetchError(f"{type(e).__name__}: {getattr(e, 'reason', e)} from {url}")
                 if attempt < retries:
                     time.sleep(5)
                     continue
                 raise last
         raise last
+
+    def _curl(self, url, headers, body, timeout):
+        """The same request through curl (still verifying the certificate, against the system store)."""
+        cmd = ["curl", "-sS", "--compressed", "--max-time", str(timeout), "-o", "-", "-w", "\n%{http_code}"]
+        for k, v in headers.items():
+            cmd += ["-H", f"{k}: {v}"]
+        if body is not None:
+            cmd += ["--data-binary", "@-"]
+        cmd.append(url)
+        try:
+            r = subprocess.run(cmd, input=body if body is not None else None, capture_output=True, timeout=timeout + 10)
+        except (OSError, subprocess.TimeoutExpired) as e:
+            raise FetchError(f"curl: {e} from {url}")
+        out = r.stdout
+        nl = out.rfind(b"\n")
+        code = out[nl + 1:].decode("ascii", "replace").strip() if nl >= 0 else ""
+        data = out[:nl] if nl >= 0 else out
+        if r.returncode != 0:
+            raise FetchError(f"curl exit {r.returncode}: {r.stderr.decode('utf-8', 'replace').strip()[:160]} from {url}")
+        if not code.startswith("2"):
+            raise FetchError(f"HTTP {code or '?'} (via curl) from {url}")
+        self.log(f"  {code} {len(data)} bytes {url[:120]} (via curl: the certificate chain is not in Python's store)")
+        return data
 
     def text(self, url, **kw):
         return self.get(url, **kw).decode("utf-8", "replace")

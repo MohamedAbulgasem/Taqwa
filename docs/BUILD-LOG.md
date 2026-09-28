@@ -1823,3 +1823,11 @@ place before R90), no Fajr before a member's own Fajr or real dawn.
 
 Tested by the owner on 28 September 2026 (Cape Town and London checked against published sources:
 nothing early) and squashed into main as one commit; the weekly monitor follows.
+
+### The weekly monitor (28 September 2026)
+
+`scripts/monitor.sh` (docs/MONITOR.md): fourteen polite fetchers bring each authority's newest
+table into the restricted archive, each new or changed table goes through the gate at its own
+point, then the whole gate and the six surveys, the data horizons and the manual sources' due
+dates; the archive is mirrored into its backup; a report under the archive root's `monitor/`
+folder, silent (exit 0) when all is well.

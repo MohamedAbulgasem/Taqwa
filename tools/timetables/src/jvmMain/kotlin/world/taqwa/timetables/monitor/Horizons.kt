@@ -82,6 +82,13 @@ object Horizons {
         uqLast: LocalDate = UmmAlQuraDates.lastDate,
         changes: List<ClockChange> = ClockChanges.table,
         rules: List<NextYearRule> = NEXT_YEAR,
+        /**
+         * Entries a manual source in `sources.tsv` watches, with the date its next edition is
+         * expected: a proof older than twelve months stays quiet for them until that date passes
+         * (the manual-due item takes over), so an authority that prints one table a year is not
+         * nagged about every week.
+         */
+        deferred: Map<String, LocalDate> = emptyMap(),
     ): List<Item> {
         val items = mutableListOf<Item>()
         val byId = stamps.associateBy { it.entryId }
@@ -128,13 +135,15 @@ object Horizons {
         val staleBefore = today.plus(-12, DateTimeUnit.MONTH)
         for (stamp in stamps) {
             val last = stamp.last ?: continue
-            if (last < staleBefore) {
+            val until = deferred[stamp.entryId]
+            if (last < staleBefore && (until == null || today >= until)) {
                 items += Item(
                     Kind.HORIZON,
                     "${stamp.entryId}'s proof is older than twelve months (through $last)",
                     listOf("About states \"not yet checked after $last\" for it."),
                     "fetch the authority's newest table (add a fetcher if it has none), add gate rows and re-run the gate; " +
-                        "where the authority publishes nothing newer, say so in sources.tsv.",
+                        "where the authority prints one table a year, list it as a manual source in sources.tsv naming this entry, " +
+                        "with next_expected the month it is due: this line then waits for that date.",
                 )
             }
         }
