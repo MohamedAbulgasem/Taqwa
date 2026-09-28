@@ -301,6 +301,8 @@
     <string name="quran_sheet_translation">Translation</string>
     <string name="quran_translation_off">Off</string>
     <string name="quran_translation_off_detail">Arabic only, one ayah per card</string>
+    <string name="quran_sheet_read_aloud">Read it aloud after each ayah</string>
+    <string name="quran_sheet_read_aloud_missing">Needs your phone’s free %1$s voice.</string>
     <string name="quran_sheet_mode">Reading mode</string>
     <string name="quran_mode_translation">Translation</string>
     <string name="quran_mode_mushaf">Mushaf</string>
@@ -318,6 +320,7 @@
     <string name="quran_action_copy">Copy</string>
     <string name="quran_action_copied">Copied</string>
     <string name="quran_action_share">Share</string>
+    <string name="quran_a11y_read_aloud">Being read aloud</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbeeh</string>
     <string name="today_open_tasbeeh">Tasbeeh</string>
@@ -388,11 +391,19 @@
     <string name="recitation_a11y_change_reciter">Change reciter</string>
     <string name="recitation_a11y_go_to_playing">Go to the ayah being recited</string>
     <string name="recitation_a11y_preview">Hear this reciter</string>
+    <string name="recitation_bar_translation">Translation</string>
+    <string name="recitation_bar_tafsir">Tafsir</string>
     <!-- Settings > Quran > Recitation, and its Downloads screen (spec 3a §5.6) -->
     <string name="settings_group_quran">QURAN</string>
     <string name="settings_recitation">Recitation</string>
     <string name="recitation_settings_mobile_data">Download over mobile data</string>
     <string name="recitation_settings_auto_download">Download without asking</string>
+    <string name="recitation_read_aloud_heading">AFTER EACH AYAH</string>
+    <string name="recitation_read_aloud_translation">Read the translation aloud</string>
+    <string name="recitation_read_aloud_tafsir">Read the tafsir aloud</string>
+    <string name="recitation_read_aloud_detail">%1$s, in %2$s. A voice on this phone reads it, so it works offline.</string>
+    <string name="recitation_read_aloud_missing">Your phone needs its free %1$s voice, a small one-time download.</string>
+    <string name="recitation_read_aloud_get_voice">Get the voice</string>
     <string name="recitation_settings_downloads">DOWNLOADS · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s surah · %2$s</string>
     <string name="recitation_settings_surahs">%1$s surahs · %2$s</string>

@@ -82,6 +82,9 @@ internal fun ForegroundEffect(
     LaunchedEffect(appLifecycle) {
         appLifecycle.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             refreshPermissions()
+            // Back from the phone's voice installer, perhaps (read-aloud spec §4): a voice that was
+            // Missing is asked about again, and nothing else is.
+            recitation.onForeground()
             if (foregroundReturnsToRecitation && recitation.state.value.bar?.playing == true) openPlaying()
         }
     }

@@ -47,6 +47,8 @@ internal fun RecitationSettingsRoute(
         onOpenDownloads = { navigator.push(Screen.RecitationDownloads(it)) },
         onDownloadWholeQuran = { recitation.downloadWholeQuran() },
         onCancelWholeQuran = recitation::cancelWholeQuran,
+        onSetReadAloud = recitation::setReadAloud,
+        onGetVoice = recitation::getVoice,
     )
 }
 

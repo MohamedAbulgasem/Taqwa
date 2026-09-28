@@ -281,6 +281,8 @@
     <string name="quran_sheet_translation">ترجمہ</string>
     <string name="quran_translation_off">بند</string>
     <string name="quran_translation_off_detail">صرف عربی، ہر کارڈ پر ایک آیت</string>
+    <string name="quran_sheet_read_aloud">ہر آیت کے بعد سنائیں</string>
+    <string name="quran_sheet_read_aloud_missing">آپ کے فون پر %1$s کی مفت آواز درکار ہے۔</string>
     <string name="quran_sheet_mode">پڑھنے کا انداز</string>
     <string name="quran_mode_translation">ترجمہ</string>
     <string name="quran_mode_mushaf">مصحف</string>
@@ -298,6 +300,7 @@
     <string name="quran_action_copy">نقل کریں</string>
     <string name="quran_action_copied">نقل ہو گئی</string>
     <string name="quran_action_share">شیئر کریں</string>
+    <string name="quran_a11y_read_aloud">سنایا جا رہا ہے</string>
     <!-- Tasbeeh -->
     <string name="tasbeeh_title">تسبیح</string>
     <string name="today_open_tasbeeh">تسبیح</string>
@@ -366,11 +369,19 @@
     <string name="recitation_a11y_change_reciter">قاری بدلیں</string>
     <string name="recitation_a11y_go_to_playing">جس آیت کی تلاوت ہو رہی ہے، اس پر جائیں</string>
     <string name="recitation_a11y_preview">اس قاری کو سنیں</string>
+    <string name="recitation_bar_translation">ترجمہ</string>
+    <string name="recitation_bar_tafsir">تفسیر</string>
     <!-- Settings > Quran > Recitation -->
     <string name="settings_group_quran">قرآن</string>
     <string name="settings_recitation">تلاوت</string>
     <string name="recitation_settings_mobile_data">موبائل ڈیٹا پر ڈاؤن لوڈ کریں</string>
     <string name="recitation_settings_auto_download">پوچھے بغیر ڈاؤن لوڈ کریں</string>
+    <string name="recitation_read_aloud_heading">ہر آیت کے بعد</string>
+    <string name="recitation_read_aloud_translation">ترجمہ سنائیں</string>
+    <string name="recitation_read_aloud_tafsir">تفسیر سنائیں</string>
+    <string name="recitation_read_aloud_detail">%1$s، %2$s میں۔ اس فون کی آواز پڑھتی ہے، اس لیے آف لائن بھی چلتا ہے۔</string>
+    <string name="recitation_read_aloud_missing">آپ کے فون کو %1$s کی مفت آواز درکار ہے، ایک بار کا چھوٹا سا ڈاؤن لوڈ۔</string>
+    <string name="recitation_read_aloud_get_voice">آواز حاصل کریں</string>
     <string name="recitation_settings_downloads">ڈاؤن لوڈز · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s سورت · %2$s</string>
     <string name="recitation_settings_surahs">%1$s سورتیں · %2$s</string>

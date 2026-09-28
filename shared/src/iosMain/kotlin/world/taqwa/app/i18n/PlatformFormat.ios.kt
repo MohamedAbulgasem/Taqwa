@@ -76,9 +76,12 @@ private class IosPlatformFormat : PlatformFormat {
     override fun localizedDigits(number: Int): String =
         plainFormatter.stringFromNumber(NSNumber(int = number)) ?: number.toString()
 
-    // Foundation already titlecases these for the display locale, so unlike Android's there is no
-    // case to fix up here. A code Foundation does not know returns null or the code itself, which
-    // hands the seven bundled languages to the English map rather than showing a bare "bn".
+    // NSLocale returns the name exactly as that locale writes it — lower case in French ("anglais"),
+    // for one — rather than titlecasing it for a list row the way Android's own lookup has to. That
+    // is also why this file overrides only languageName: the interface's default languageNameInSentence
+    // (= languageName(code)) already reads correctly inside a sentence, with no fix-up to make. A
+    // code Foundation does not know returns null or the code itself, which hands the seven bundled
+    // languages to the English map rather than showing a bare "bn".
     override fun languageName(code: String): String {
         val name = currentLocale.localizedStringForLanguageCode(code)
         if (name.isNullOrBlank() || name.equals(code, ignoreCase = true)) {

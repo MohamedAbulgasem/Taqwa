@@ -120,6 +120,8 @@ fun App(container: AppContainer) {
     // Arabic-script interfaces (Arabic, Urdu) get the Arabic names; the rest the Latin ones.
     val arabicUi = uiLanguage().arabicScript
     LaunchedEffect(arabicUi) { recitation.setArabicUi(arabicUi) }
+    // Read-aloud (spec §5.4) needs the reading translation's language default.
+    LaunchedEffect(platformFormat) { recitation.setLanguageTag(platformFormat.languageTag()) }
     // The Android notification's two ayah buttons (spec §15.1), in the interface's language.
     val previousAyahLabel = stringResource(Res.string.recitation_a11y_previous_ayah)
     val nextAyahLabel = stringResource(Res.string.recitation_a11y_next_ayah)

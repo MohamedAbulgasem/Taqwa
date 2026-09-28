@@ -109,7 +109,7 @@ A 56 dp bar pinned above the bottom inset, card surface with a hairline top edge
 
 The bar is a Compose overlay in the tab scaffold, so it survives navigation between Reader, Mushaf and the Quran root and hides on the Prayer and Settings tabs while playback continues in the background. When the user scrolls away from the playing ayah, a small "Following" pill appears at the top of the bar; tapping it scrolls back and re-enables following.
 
-**Following.** The playing ayah is highlighted exactly like a tapped ayah (reader card accent; Mushaf word-run field), and the list scrolls so the ayah sits in the upper third. Following pauses while the user's finger is on the screen and for four seconds after, then resumes only if the user has not moved more than a screen away, in which case the pill offers the way back.
+**Following.** The playing ayah is highlighted exactly like a tapped ayah (reader card accent; Mushaf word-run field), and the list scrolls so the ayah sits in the upper third. A card too long to fit below that line rises until its foot clears the player bar, never above the top, so a card taller than the screen starts at the top (28 September, after the S23 test). Following pauses while the user's finger is on the screen and for four seconds after, then resumes only if the user has not moved more than a screen away, in which case the pill offers the way back.
 
 ### 5.4 The download sheet
 

@@ -4,6 +4,7 @@ import androidx.media3.common.C
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 
 /**
@@ -11,31 +12,35 @@ import androidx.media3.common.util.UnstableApi
  * the media notification, the lock screen, a headset button, Bluetooth and Android Auto — and,
  * through the app's own `MediaController`, the player bar.
  *
- * The player underneath holds `[ayah, gap, ayah, gap, …]` (see [RecitationQueue]), and Media3's
- * own Previous and Next step one **item**. On a device that means the lock screen's Previous lands
- * on a 300 ms silence and runs straight back into the ayah it was meant to leave — so from the
- * lock screen you cannot go back an ayah at all, while the app's own bar, which goes through
- * [RecitationQueue], does it in one press. This class is what makes those two the same button.
+ * The player underneath holds `[ayah, gap, ayah, gap, …]` (see [RecitationQueue]) — with
+ * read-aloud on, `[ayah, breath, translation, gap, ayah, …]` — and Media3's own Previous and Next
+ * step one **item**. On a device that means the lock screen's Previous lands on a 300 ms silence
+ * and runs straight back into the ayah it was meant to leave — so from the lock screen you cannot
+ * go back an ayah at all, while the app's own bar, which goes through [RecitationQueue], does it
+ * in one press. This class is what makes those two the same button.
  *
  * It does four things and nothing else:
  *
  * 1. **Previous and Next are ayah moves**, decided by [RecitationQueue] itself rather than by a
  *    second copy of the rule — previous within the first two seconds of an ayah goes back one,
- *    later restarts the ayah, and a press during a gap restarts the ayah that just ended.
- * 2. **The gaps are invisible.** While one plays, the current item reported is the ayah that just
- *    ended, so the notification neither blinks nor changes its title between ayahs.
+ *    later restarts the ayah, and a press during a gap or a translation restarts the ayah that
+ *    just ended.
+ * 2. **The gaps and translations are invisible.** While one plays, the current item reported is
+ *    the ayah that just ended, so the notification neither blinks nor changes its title between
+ *    ayahs, nor between an ayah and its translation (read-aloud spec §5.5).
  * 3. **Position and duration are the surah's** (spec §14.1) while a [timeline] is set: the lock
  *    screen's bar runs the length of the surah rather than restarting every few seconds, a scrub
  *    on it lands on the start of the ayah under the thumb, and the app's bar reads the same clock
- *    through its controller.
+ *    through its controller. A translation has its slot on that clock, so the bar keeps moving
+ *    while the voice reads.
  * 4. **Previous and Next are always offered** while there is a queue, exactly as the bar offers
  *    them: at the last ayah Next does nothing, which is what the bar does too.
  *
- * The queue is rebuilt from the timeline rather than passed in: the gap items name themselves
- * ([SILENCE_SCHEME]), the service is the only thing holding the player, and a copy of the queue
- * kept on this side would be one more thing that can fall out of step with the app's. The clock
- * *is* passed in, with the queue's text, because it is read off the container the app has just
- * opened and the two sides must be reading the same one.
+ * The queue is rebuilt from the loaded items rather than passed in: the gap and translation items
+ * name themselves ([SILENCE_SCHEME], [SPEECH_SCHEME]), the service is the only thing holding the
+ * player, and a copy of the queue kept on this side would be one more thing that can fall out of
+ * step with the app's. The clock *is* passed in, with the queue's text, because it is read off the
+ * container the app has just opened and the two sides must be reading the same one.
  */
 @UnstableApi
 class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
@@ -55,9 +60,9 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
     var onSurahSkip: ((forward: Boolean) -> Unit)? = null
 
     /**
-     * How long the ayah that is playing — or has just played — runs for. Held because a gap cannot
-     * be asked for the duration of the item before it: the platform's clock during those 300 ms is
-     * the silence's own. Only read when there is no [timeline].
+     * How long the ayah that is playing — or has just played — runs for. Held because a gap or a
+     * translation cannot be asked for the duration of the ayah before it: the platform's clock
+     * then is the item's own. Only read when there is no [timeline].
      */
     private var lastAyahDurationMs = 0L
 
@@ -190,15 +195,16 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
             real.seekTo(positionMs)
             return
         }
-        real.seekTo(clock.snapToAyah(positionMs, queue::isGap), 0L)
+        real.seekTo(clock.snapToAyah(positionMs) { !queue.isAyah(it) }, 0L)
     }
 
     internal fun previousAyah() {
         val queue = queue() ?: return
         val at = real.currentMediaItemIndex
-        // A gap's own clock is not the ayah's, so it counts as zero and the rule restarts the ayah
-        // that has just been read — the same answer `RecitationPlayer.previous` gives the bar.
-        val position = if (queue.isGap(at)) 0L else real.currentPosition
+        // A gap's or a translation's own clock is not the ayah's, so it counts as zero and the
+        // rule restarts the ayah that has just been read — the same answer
+        // `RecitationPlayer.previous` gives the bar.
+        val position = if (!queue.isAyah(at)) 0L else real.currentPosition
         real.seekTo(queue.previous(at, position), 0L)
     }
 
@@ -211,34 +217,31 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
     // ── the queue and the clock, read off the timeline ──────────────────────────────────────
 
     /**
-     * The same arithmetic the app's bar uses, over the same shape of queue. Only the count and
-     * whether there are gaps can be read off a timeline, and only those two are needed: ayah
-     * *numbers* never reach the session, and the indices are all this class moves between.
+     * The same arithmetic the app's bar uses, over the items actually loaded — ayahs, silences
+     * and, with read-aloud on, translations, each naming itself by its scheme ([queueItemsOf],
+     * which a host test holds to the app's own queue item for item).
      *
-     * Kept between calls: Media3 asks the getters above many times per state bundle, the app
-     * polls four times a second on top, and a 571-item queue rebuilt on each ask is a lot of
-     * garbage to make on the application thread to learn two integers.
+     * Kept per timeline: Media3 asks the getters above many times per state bundle, the app polls
+     * four times a second on top, and an Al-Baqarah read aloud is over a thousand items — a lot of
+     * garbage to make on the application thread on each ask. The timeline is a new object whenever
+     * the items change, which is the one thing that can make this answer change.
      */
     private fun queue(): RecitationQueue? {
         val count = real.mediaItemCount
         if (count == 0) return null
-        val gapped = count > 1 && isGapItem(1)
-        cachedQueue?.let { if (cachedCount == count && cachedGapped == gapped) return it }
-        val ayahs = if (gapped) (count + 1) / 2 else count
-        return RecitationQueue(
-            surah = 0,
-            ayahs = (1..ayahs).toList(),
-            gapMs = if (gapped) 1L else 0L,
-        ).also {
+        val timeline = real.currentTimeline
+        cachedQueue?.let { if (cachedTimeline === timeline && cachedCount == count) return it }
+        val items = queueItemsOf((0 until count).map { real.getMediaItemAt(it).mediaId }) ?: return null
+        return RecitationQueue(0, items).also {
             cachedQueue = it
             cachedCount = count
-            cachedGapped = gapped
+            cachedTimeline = timeline
         }
     }
 
     private var cachedQueue: RecitationQueue? = null
     private var cachedCount = -1
-    private var cachedGapped = false
+    private var cachedTimeline: Timeline? = null
 
     /** The clock, while it describes the queue that is actually loaded. */
     private fun clock(): SurahTimeline? {
@@ -246,18 +249,19 @@ class AyahPlayer(private val real: Player) : ForwardingPlayer(real) {
         return timeline?.takeIf { count > 0 && it.size == count }
     }
 
-    private fun isGapItem(index: Int): Boolean =
-        real.getMediaItemAt(index).mediaId.startsWith("$SILENCE_SCHEME://")
-
+    /**
+     * True while anything but an ayah plays — a gap, the breath before a translation, or the
+     * translation itself — none of which the session is shown.
+     */
     private fun onGap(): Boolean {
         val queue = queue() ?: return false
-        return queue.isGap(real.currentMediaItemIndex)
+        return !queue.isAyah(real.currentMediaItemIndex)
     }
 
-    /** The queue index of the ayah being heard: itself, or the one a gap follows. */
+    /** The queue index of the ayah being heard: itself, or the one a gap or translation follows. */
     private fun ayahIndex(): Int {
         val at = real.currentMediaItemIndex
         val queue = queue() ?: return at
-        return if (queue.isGap(at)) (at - 1).coerceAtLeast(0) else at
+        return queue.ayahIndexAt(at)
     }
 }

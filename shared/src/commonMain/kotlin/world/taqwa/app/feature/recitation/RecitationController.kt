@@ -1,8 +1,11 @@
 package world.taqwa.app.feature.recitation
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,14 +19,23 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import world.taqwa.app.quran.QuranSource
+import world.taqwa.app.quran.ReadingSettings
+import world.taqwa.app.quran.TextKind
+import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.recitation.DownloadKey
 import world.taqwa.app.recitation.DownloadState
 import world.taqwa.app.recitation.NowPlayingText
 import world.taqwa.app.recitation.PlaybackState
 import world.taqwa.app.recitation.RecitationManifest
 import world.taqwa.app.recitation.Reciter
+import world.taqwa.app.recitation.SpeechText
+import world.taqwa.app.recitation.SpeechVoice
+import world.taqwa.app.recitation.SpokenTranslation
 import world.taqwa.app.recitation.SurahSkip
+import world.taqwa.app.recitation.VoiceStatus
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * One per app: everything the recitation surface knows, and every decision it makes (spec 3a §5).
@@ -62,6 +74,8 @@ class RecitationController(
      * Recitation settings open. The refresher's own 24-hour window keeps this to one a day.
      */
     private val refreshCatalogue: suspend () -> Unit = {},
+    /** Read-aloud spec §5.4: the reading translation and the phone's voices. None by default. */
+    private val readAloud: ReadAloudPort = NoReadAloud,
 ) {
 
     private val manifest = MutableStateFlow<RecitationManifest?>(null)
@@ -147,6 +161,31 @@ class RecitationController(
      */
     private var pausedForPreview = false
 
+    /** The UI language, for the reading translation's default; set by the composition. */
+    private val languageTag = MutableStateFlow<String?>(null)
+
+    /** The bundled translations, read once. */
+    private val translationInfos = MutableStateFlow<List<TranslationInfo>>(emptyList())
+
+    /** What the phone said for each language this process has asked about (read-aloud spec §4). */
+    private val voices = MutableStateFlow<Map<String, VoiceStatus>>(emptyMap())
+
+    /**
+     * The questions still on their way to the phone, one per language (read-aloud spec §4). An
+     * Android ask binds every speech engine in turn, and the reader's sheet, a return to the app
+     * and a load can all want the same language within a moment of each other: a second ask joins
+     * the one in flight instead of binding the engines again. Only touched on [scope]'s one thread.
+     */
+    private val asking = mutableMapOf<String, Deferred<VoiceStatus>>()
+
+    /** The kind the loaded surah's translation is, for the bar's caption. */
+    private var speechKind: TextKind? = null
+
+    /** What the loaded surah was built with, so a rebuild only follows a real change. */
+    private var appliedSpeech: SpeechKey? = null
+
+    private data class SpeechKey(val surah: Int, val translationId: String?, val voice: SpeechVoice?)
+
     /** The current reciter: what the reader chose, or the catalogue's first voice if that id has
      * been withdrawn from the manifest since it was chosen. */
     private val reciter: StateFlow<Reciter?> =
@@ -179,6 +218,34 @@ class RecitationController(
         }
         .stateIn(scope, SharingStarted.Eagerly, emptyMap())
 
+    /**
+     * The translation the reader shows, as the reader resolves it: none for Translation off, the
+     * bundled default for an id that is not bundled, and nothing for the transliteration.
+     */
+    private val readingTranslation: StateFlow<TranslationInfo?> =
+        combine(
+            languageTag.filterNotNull().flatMapLatest { readAloud.translationId(it) },
+            translationInfos,
+        ) { id, infos ->
+            if (id == ReadingSettings.NO_TRANSLATION) {
+                null
+            } else {
+                (infos.firstOrNull { it.id == id } ?: infos.firstOrNull { it.id == FALLBACK_TRANSLATION })
+                    ?.takeIf { it.kind != TextKind.TRANSLITERATION }
+            }
+        }.stateIn(scope, SharingStarted.Eagerly, null)
+
+    /** The switch, or null where it must not show (read-aloud spec §4). */
+    private val readAloudState: StateFlow<ReadAloudState?> =
+        combine(settings.settings.map { it.readAloud }.distinctUntilChanged(), readingTranslation, voices) { enabled, info, statuses ->
+            if (info == null) return@combine null
+            when (val status = statuses[info.language]) {
+                is VoiceStatus.Ready -> ReadAloudState(enabled, info.name, info.language, info.kind)
+                is VoiceStatus.Missing -> ReadAloudState(enabled, info.name, info.language, info.kind, missingEngine = status.engine)
+                else -> null
+            }
+        }.stateIn(scope, SharingStarted.Eagerly, null)
+
     val state: StateFlow<RecitationState> = combine(
         combine(manifest, reciter, downloaded, allDownloaded) { catalogue, current, owned, byReciter ->
             Catalogue(catalogue, current, owned, byReciter)
@@ -199,8 +266,9 @@ class RecitationController(
                 autoDownloadAsked = prefs.autoDownloadAsked,
             )
         },
-    ) { catalogue, playing, surface ->
-        assemble(catalogue, playing, surface)
+        readAloudState,
+    ) { catalogue, playing, surface, spoken ->
+        assemble(catalogue, playing, surface, spoken)
     }.stateIn(scope, SharingStarted.Eagerly, RecitationState())
 
     private class Catalogue(
@@ -227,8 +295,8 @@ class RecitationController(
         val autoDownloadAsked: Boolean,
     )
 
-    private fun assemble(catalogue: Catalogue, playing: Playing, surface: Surface): RecitationState {
-        val bar = barOf(playing, catalogue)
+    private fun assemble(catalogue: Catalogue, playing: Playing, surface: Surface, spoken: ReadAloudState?): RecitationState {
+        val bar = barOf(playing, catalogue)?.let { if (playing.playback.speaking) it.copy(readingAloud = speechKind) else it }
         val sheet = surface.sheetSurah?.let { surah ->
             val voice = catalogue.reciter ?: return@let null
             val total = voice.surah(surah)?.bytes ?: 0L
@@ -264,6 +332,7 @@ class RecitationController(
                 downloads = playing.downloads,
                 declared = catalogue.reciter?.id in surface.batching,
             ),
+            readAloud = spoken,
         )
     }
 
@@ -396,12 +465,79 @@ class RecitationController(
                 if (waiting.follow && live != null && !live.playing) player.pause()
             }
         }
+        scope.launch { translationInfos.value = runCatching { quran.translations() }.getOrDefault(emptyList()) }
+        // Read-aloud changes while a surah is loaded (read-aloud spec §2): the switch, the
+        // translation, or its voice arriving — rebuild around the ayah being heard.
+        scope.launch {
+            combine(settings.settings.map { it.readAloud }.distinctUntilChanged(), readingTranslation, voices) { on, info, statuses ->
+                Triple(on, info?.id, info?.language?.let { statuses[it] })
+            }.distinctUntilChanged().collect { applyReadAloud() }
+        }
+        // A new reading language while the switch is in use: ask the phone about it at once, so
+        // the switch does not vanish for a language it can read.
+        scope.launch {
+            readingTranslation.filterNotNull().map { it.language }.distinctUntilChanged().collect { language ->
+                if (voices.value.isNotEmpty() && language !in voices.value) checkVoice(language)
+            }
+        }
     }
 
     /** The two lines a lock screen shows. The ayah is deliberately not among them: it changes
      * every few seconds and a lock screen that flickers is worse than one that says less. */
     fun setArabicUi(arabic: Boolean) {
         arabicUi = arabic
+    }
+
+    /** The UI language, for the reading translation's default (read-aloud spec §5.4). */
+    fun setLanguageTag(tag: String) {
+        languageTag.value = tag
+    }
+
+    /**
+     * The reading sheet or Settings › Recitation opened (read-aloud spec §4): ask the phone again.
+     * These are the two screens that show the switch, and so the two places a voice installed or
+     * deleted since the last ask must be noticed.
+     */
+    fun refreshVoices() {
+        val info = readingTranslation.value ?: return
+        scope.launch { checkVoice(info.language) }
+    }
+
+    /**
+     * The reader or the Mushaf opened (read-aloud spec §4): ask only about a reading language the
+     * phone has not answered for yet, so the sheet's switch is ready when it opens and the first
+     * play does not wait on the question. The reader opens far more often than its sheet — every
+     * surah, every change of mode — and an answer this process already holds is not worth binding
+     * the engines for again; the sheet asks afresh whenever it opens.
+     */
+    fun onReaderOpened() {
+        val info = readingTranslation.value ?: return
+        if (info.language in voices.value) return
+        scope.launch { checkVoice(info.language) }
+    }
+
+    /**
+     * The app came back to the front (read-aloud spec §4). The one answer worth asking again is a
+     * Missing voice: the reader may be back from the engine's installer, and the switch's caption
+     * should not go on asking for a download that has just finished. Ready and Unsupported wait
+     * for the sheet or Settings to open.
+     */
+    fun onForeground() {
+        val info = readingTranslation.value ?: return
+        if (voices.value[info.language] !is VoiceStatus.Missing) return
+        scope.launch { checkVoice(info.language) }
+    }
+
+    /** Read-aloud's switch (read-aloud spec §6). */
+    fun setReadAloud(on: Boolean) {
+        scope.launch { settings.setReadAloud(on) }
+    }
+
+    /** "Get the voice": the engine's own installer, for the language the reader shows. */
+    fun getVoice() {
+        val info = readingTranslation.value ?: return
+        val engine = (voices.value[info.language] as? VoiceStatus.Missing)?.engine ?: return
+        readAloud.installVoice(engine)
     }
 
     /** The Android notification's "previous ayah" and "next ayah" buttons (spec §15.1). */
@@ -624,8 +760,15 @@ class RecitationController(
      * Settings › Quran › Recitation opened (privacy spec §2.2): engagement on purpose — the screen
      * shows the reciter list and "Download the whole Quran", and whoever went there wants the
      * current catalogue.
+     *
+     * It also holds read-aloud's card, which shows only once the phone has answered for the
+     * reading language (read-aloud spec §4). Nothing else asks after a cold start, so without
+     * this ask the card was missing from Settings until the reading sheet had been opened.
      */
-    fun onSettingsOpened() = engage(refresh = true)
+    fun onSettingsOpened() {
+        engage(refresh = true)
+        refreshVoices()
+    }
 
     /**
      * The first line of every entry point. [refresh] only where a fresh catalogue is what the
@@ -819,11 +962,91 @@ class RecitationController(
         val playWith = voice ?: reciter.value ?: return
         loading.value = true
         try {
-            player.load(playWith, surah, ayah, nowPlaying(playWith, surah))
+            val speech = spokenFor(surah)
+            speechKind = speech?.kind
+            appliedSpeech = keyOf(surah, speech)
+            player.load(playWith, surah, ayah, nowPlaying(playWith, surah), speech)
             player.play()
         } finally {
             loading.value = false
         }
+        // A switch, translation or voice change that arrived while the load above was in flight
+        // found `applyReadAloud` a no-op (see there) and is otherwise lost for the rest of this
+        // surah; this call catches it up. The key guard makes it a no-op itself when nothing
+        // changed, so a plain load is never followed by a redundant `setSpeech`.
+        applyReadAloud()
+    }
+
+    /**
+     * The surah's translation as the voice will read it (read-aloud spec §5.4), or null: the
+     * switch off, Translation off, no voice on the phone, or nothing to read.
+     *
+     * Never throws anything but cancellation (spec: "a failed voice never stops the recitation"):
+     * the settings read, [SpeechText.prepare] and the rest are wrapped so a surprise from any of
+     * them is "nothing to read" rather than a crash out of [start] or the read-aloud collector.
+     */
+    private suspend fun spokenFor(surah: Int): SpokenTranslation? = try {
+        if (!settings.settings.first().readAloud) return null
+        val info = readingTranslation.value ?: return null
+        val status = voices.value[info.language] ?: checkVoice(info.language)
+        val voice = (status as? VoiceStatus.Ready)?.voice ?: return null
+        val texts = runCatching { quran.translationTexts(info.id, surah) }.getOrNull() ?: return null
+        val prepared = SpeechText.prepare(info.kind, info.language, surah, texts)
+        if (prepared.isEmpty()) return null
+        SpokenTranslation(info.id, info.kind, info.language, voice, prepared)
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun keyOf(surah: Int, speech: SpokenTranslation?) = SpeechKey(surah, speech?.translationId, speech?.voice)
+
+    /** Rebuilds the loaded surah's speech when what it should be has changed. */
+    private suspend fun applyReadAloud() {
+        val surah = player.state.value.surah ?: return
+        if (loading.value) return
+        val speech = spokenFor(surah)
+        // Stale by the time the suspension above returns: the surah changed under it, or a fresh
+        // `start()` (same surah or not) began and will call this itself when it finishes — either
+        // way this call must not overwrite `appliedSpeech` for a build that raced it.
+        if (loading.value || player.state.value.surah != surah) return
+        val key = keyOf(surah, speech)
+        if (key == appliedSpeech) return
+        appliedSpeech = key
+        speechKind = speech?.kind
+        player.setSpeech(speech)
+    }
+
+    /**
+     * Asks the phone about [language] and remembers the answer — or, when that same question is
+     * already on its way, waits for its answer instead of asking twice (see [asking]). The ask
+     * itself runs on [scope], not in the caller, so a caller that is cancelled (a load another one
+     * replaced) leaves it to finish for whoever else is waiting on it.
+     */
+    private suspend fun checkVoice(language: String): VoiceStatus {
+        asking[language]?.takeIf { !it.isCompleted }?.let { return it.await() }
+        val ask = scope.async(start = CoroutineStart.LAZY) { askVoice(language) }
+        asking[language] = ask
+        ask.invokeOnCompletion { if (asking[language] === ask) asking.remove(language) }
+        return ask.await()
+    }
+
+    /**
+     * One question to the phone, and its answer remembered. A failure, or a query that takes too
+     * long, is "cannot read it" (spec: "a failed voice never stops the recitation") — never a
+     * crash and never a hang across the breath before the next ayah's translation.
+     */
+    private suspend fun askVoice(language: String): VoiceStatus {
+        val status = try {
+            withTimeoutOrNull(VOICE_QUERY_TIMEOUT_MS) { readAloud.status(language) } ?: VoiceStatus.Unsupported
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (e: Exception) {
+            VoiceStatus.Unsupported
+        }
+        voices.value = voices.value + (language to status)
+        return status
     }
 
     private suspend fun nowPlaying(voice: Reciter, surah: Int): NowPlayingText {
@@ -846,6 +1069,13 @@ class RecitationController(
 private const val PREVIEW_MILLIS = 17_000L
 
 private const val LAST_SURAH = 114
+
+/** What the reader loads when the stored translation id is not bundled. */
+private const val FALLBACK_TRANSLATION = "en.sahih"
+
+/** How long a voice query waits before treating the phone as unreadable (spec: "a failed voice
+ * never stops the recitation"). */
+private const val VOICE_QUERY_TIMEOUT_MS = 6_000L
 
 /** The pause between a surah's last ayah and the first of the next (spec §16.1): a breath. */
 internal const val SURAH_BREATH_MS = 1_000L

@@ -2,7 +2,11 @@ package world.taqwa.app.feature.recitation
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import world.taqwa.app.audio.ClipPlayer
+import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.recitation.RecitationLibrary
 import world.taqwa.app.recitation.RecitationSettings
 import world.taqwa.app.settings.SettingsRepository
@@ -12,8 +16,11 @@ import world.taqwa.app.recitation.NowPlayingText
 import world.taqwa.app.recitation.PlaybackState
 import world.taqwa.app.recitation.Reciter
 import world.taqwa.app.recitation.RecitationPlayer
+import world.taqwa.app.recitation.SpeechVoices
+import world.taqwa.app.recitation.SpokenTranslation
 import world.taqwa.app.recitation.SurahDownloader
 import world.taqwa.app.recitation.SurahSkip
+import world.taqwa.app.recitation.VoiceStatus
 
 /**
  * The two seams [RecitationController] is written against.
@@ -36,7 +43,8 @@ interface PlayerPort {
 
     /** A surah that has played out, held by the player for the decision (spec §16.1). */
     val surahEnds: Flow<Int>
-    suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText)
+    suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?)
+    fun setSpeech(speech: SpokenTranslation?)
     fun play()
     fun pause()
     fun toggle()
@@ -73,6 +81,7 @@ interface RecitationSettingsPort {
     suspend fun setReciter(id: String)
     suspend fun setDownloadOnMobileData(value: Boolean)
     suspend fun setAutoDownload(value: Boolean)
+    suspend fun setReadAloud(value: Boolean)
 }
 
 /** The picker's fifteen-second audition. [onEnd] fires when the clip plays out, not on [stop]. */
@@ -107,6 +116,7 @@ fun SettingsRepository.asRecitationPort(): RecitationSettingsPort = object : Rec
     override suspend fun setReciter(id: String) = setRecitationReciter(id)
     override suspend fun setDownloadOnMobileData(value: Boolean) = setRecitationMobileData(value)
     override suspend fun setAutoDownload(value: Boolean) = setRecitationAutoDownload(value)
+    override suspend fun setReadAloud(value: Boolean) = setRecitationReadAloud(value)
 }
 
 fun ClipPlayer.asPort(): ClipPort = object : ClipPort {
@@ -118,8 +128,9 @@ fun RecitationPlayer.asPort(): PlayerPort = object : PlayerPort {
     override val state: StateFlow<PlaybackState> get() = this@asPort.state
     override val skips: Flow<SurahSkip> get() = this@asPort.skips
     override val surahEnds: Flow<Int> get() = this@asPort.surahEnds
-    override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText) =
-        this@asPort.load(reciter, surah, startAyah, text)
+    override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) =
+        this@asPort.load(reciter, surah, startAyah, text, speech)
+    override fun setSpeech(speech: SpokenTranslation?) = this@asPort.setSpeech(speech)
     override fun play() = this@asPort.play()
     override fun pause() = this@asPort.pause()
     override fun toggle() = this@asPort.toggle()
@@ -138,4 +149,29 @@ fun SurahDownloader.asPort(): DownloaderPort = object : DownloaderPort {
     override fun enqueueReciter(reciterId: String, allowMobileOnce: Boolean) =
         this@asPort.enqueueReciter(reciterId, allowMobileOnce)
     override fun cancelReciter(reciterId: String) = this@asPort.cancelReciter(reciterId)
+}
+
+/**
+ * What read-aloud asks outside the recitation: which translation the reader shows, and what the
+ * phone's voices can do (read-aloud spec §4, §5.4).
+ */
+interface ReadAloudPort {
+    /** `ReadingSettings.translationId` under UI language [languageTag]. */
+    fun translationId(languageTag: String): Flow<String>
+    suspend fun status(language: String): VoiceStatus
+    fun installVoice(engine: String)
+}
+
+/** No voices at all: the switch never shows. The default, so tests and previews need nothing. */
+object NoReadAloud : ReadAloudPort {
+    override fun translationId(languageTag: String): Flow<String> = flowOf(ReadingSettings.NO_TRANSLATION)
+    override suspend fun status(language: String): VoiceStatus = VoiceStatus.Unsupported
+    override fun installVoice(engine: String) = Unit
+}
+
+fun readAloudPort(settings: SettingsRepository, voices: SpeechVoices): ReadAloudPort = object : ReadAloudPort {
+    override fun translationId(languageTag: String): Flow<String> =
+        settings.readingSettings(languageTag).map { it.translationId }.distinctUntilChanged()
+    override suspend fun status(language: String): VoiceStatus = voices.status(language)
+    override fun installVoice(engine: String) = voices.installVoice(engine)
 }

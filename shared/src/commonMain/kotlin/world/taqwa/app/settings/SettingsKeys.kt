@@ -92,6 +92,9 @@ internal object SettingsKeys {
      * first written; before that the sheet offers it ticked. */
     val RECITATION_AUTO_DOWNLOAD_ASKED = booleanPreferencesKey("recitation_auto_download_asked")
 
+    /** Read-aloud spec §1. */
+    val RECITATION_READ_ALOUD = booleanPreferencesKey("recitation_read_aloud")
+
     /** Which surahs of one reciter are downloaded, as decimal surah numbers. A key per reciter,
      * not one set of "<reciter>:<surah>" entries, so deleting a reciter is one key removed and so
      * the picker's per-reciter count is one read. [RECITATION_DOWNLOADED_PREFIX] is what lets

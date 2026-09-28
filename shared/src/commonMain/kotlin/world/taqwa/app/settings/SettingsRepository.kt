@@ -196,6 +196,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             downloadOnMobileData = p[SettingsKeys.RECITATION_MOBILE_DATA] ?: false,
             autoDownload = p[SettingsKeys.RECITATION_AUTO_DOWNLOAD] ?: false,
             autoDownloadAsked = p[SettingsKeys.RECITATION_AUTO_DOWNLOAD_ASKED] ?: false,
+            readAloud = p[SettingsKeys.RECITATION_READ_ALOUD] ?: false,
         )
     }
 
@@ -230,6 +231,11 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
      * the same reason [setRecitationReciter] is: the two are changed from different surfaces. */
     suspend fun setRecitationMobileData(value: Boolean) {
         store.edit { it[SettingsKeys.RECITATION_MOBILE_DATA] = value }
+    }
+
+    /** Read-aloud's switch (read-aloud spec §6), from the reading sheet or Settings › Recitation. */
+    suspend fun setRecitationReadAloud(value: Boolean) {
+        store.edit { it[SettingsKeys.RECITATION_READ_ALOUD] = value }
     }
 
     suspend fun setThemeMode(mode: ThemeMode) {

@@ -5,10 +5,12 @@ import world.taqwa.app.recitation.DownloadKey
 import world.taqwa.app.recitation.DownloadState
 import world.taqwa.app.recitation.PlaybackState
 import world.taqwa.app.recitation.Reciter
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** The three pure decisions the recitation surface is built on. */
+/** The pure decisions the recitation surface is built on. */
 class RecitationStateTest {
 
     private val reciter = Reciter(
@@ -140,10 +142,41 @@ class RecitationStateTest {
     fun `following leaves the page alone within four seconds of a touch`() {
         var now = 10_000L
         val following = FollowingState { now }
-        following.moved()
+        following.moved(scrolling = true)
         assertEquals(Follow.LEAVE_ALONE, following.decide(away = 0))
         now += FOLLOW_GRACE_MS
         assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
+    @Test
+    fun `the page's own scroll heard stopping after it returned is not a touch`() = runTest {
+        val following = FollowingState { 10_000L }
+        following.move { following.moved(scrolling = true) }
+        // The list reports that it stopped a frame after the scroll has returned.
+        following.moved(scrolling = false)
+        assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
+    @Test
+    fun `a scroll the page did not start counts as a touch however it ends`() = runTest {
+        var now = 10_000L
+        val following = FollowingState { now }
+        // A scroll of the page's own too short to be heard at all, then the reader's: a finger
+        // held on the list for five seconds, whose letting go is the touch the four count from.
+        following.move { }
+        following.moved(scrolling = true)
+        now += 5_000L
+        following.moved(scrolling = false)
+        assertEquals(Follow.LEAVE_ALONE, following.decide(away = 0))
+    }
+
+    @Test
+    fun `a reader who takes hold of the page as it follows still counts`() = runTest {
+        val following = FollowingState { 10_000L }
+        // The finger cancels the page's scroll and carries on moving the list itself.
+        runCatching { following.move { following.moved(scrolling = true); throw CancellationException("taken over") } }
+        following.moved(scrolling = false)
+        assertEquals(Follow.LEAVE_ALONE, following.decide(away = 0))
     }
 
     @Test
@@ -156,8 +189,56 @@ class RecitationStateTest {
     fun `asking to go back re-arms following at once`() {
         var now = 10_000L
         val following = FollowingState { now }
-        following.moved()
+        following.moved(scrolling = true)
         following.rearm()
         assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
+    @Test
+    fun `a followed card that fits below the resting line rests there`() {
+        assertEquals(600, followOffset(rest = 600, room = 1_900, card = 900, edge = 30))
+    }
+
+    @Test
+    fun `a followed card too long for the resting line rises until its foot clears the bar`() {
+        assertEquals(400, followOffset(rest = 600, room = 1_900, card = 1_500, edge = 30))
+    }
+
+    @Test
+    fun `a followed card taller than the screen starts at the top edge`() {
+        assertEquals(30, followOffset(rest = 600, room = 1_900, card = 2_500, edge = 30))
+    }
+
+    @Test
+    fun `a followed card not yet laid out rests at the usual line`() {
+        assertEquals(600, followOffset(rest = 600, room = 1_900, card = null, edge = 30))
+    }
+
+    @Test
+    fun `the bar tries its caption from the most said to the least`() {
+        val tried = mutableListOf<String>()
+        val caption = barCaption("Ayah 56", "56", "Translation") { tried += it; false }
+        assertEquals(listOf("Ayah 56 · Translation", "56 · Translation", "Translation"), tried)
+        // Nothing fits at all: the word is still the one thing it says.
+        assertEquals(BarCaption(null, "Translation"), caption)
+    }
+
+    @Test
+    fun `the bar says the whole caption while the voice reads when it fits`() {
+        assertEquals(BarCaption("Ayah 56", "Translation"), barCaption("Ayah 56", "56", "Translation") { true })
+    }
+
+    @Test
+    fun `a caption too wide for the bar drops the word ayah before the reading word`() {
+        // "Ayah 56 · Translation" is 21 characters and "56 · Translation" is 16.
+        assertEquals(
+            BarCaption("56", "Translation"),
+            barCaption("Ayah 56", "56", "Translation") { it.length <= 16 },
+        )
+    }
+
+    @Test
+    fun `between readings the bar names the ayah however narrow it is`() {
+        assertEquals(BarCaption("Ayah 56", null), barCaption("Ayah 56", "56", null) { false })
     }
 }

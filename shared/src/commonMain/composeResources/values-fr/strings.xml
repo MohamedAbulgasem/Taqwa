@@ -298,6 +298,8 @@
     <string name="quran_sheet_translation">Traduction</string>
     <string name="quran_translation_off">Aucune</string>
     <string name="quran_translation_off_detail">Arabe seul, un verset par carte</string>
+    <string name="quran_sheet_read_aloud">Lecture à voix haute après chaque verset</string>
+    <string name="quran_sheet_read_aloud_missing">Nécessite une voix gratuite en %1$s.</string>
     <string name="quran_sheet_mode">Mode de lecture</string>
     <string name="quran_mode_translation">Traduction</string>
     <string name="quran_mode_mushaf">Mushaf</string>
@@ -315,6 +317,7 @@
     <string name="quran_action_copy">Copier</string>
     <string name="quran_action_copied">Copié</string>
     <string name="quran_action_share">Partager</string>
+    <string name="quran_a11y_read_aloud">Lecture à voix haute en cours</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbih</string>
     <string name="today_open_tasbeeh">Tasbih</string>
@@ -385,11 +388,19 @@
     <string name="recitation_a11y_change_reciter">Changer de récitateur</string>
     <string name="recitation_a11y_go_to_playing">Aller au verset en cours de récitation</string>
     <string name="recitation_a11y_preview">Écouter ce récitateur</string>
+    <string name="recitation_bar_translation">Traduction</string>
+    <string name="recitation_bar_tafsir">Tafsir</string>
     <!-- Settings > Quran > Recitation, and its Downloads screen (spec 3a §5.6) -->
     <string name="settings_group_quran">CORAN</string>
     <string name="settings_recitation">Récitation</string>
     <string name="recitation_settings_mobile_data">Télécharger via les données mobiles</string>
     <string name="recitation_settings_auto_download">Télécharger sans demander</string>
+    <string name="recitation_read_aloud_heading">APRÈS CHAQUE VERSET</string>
+    <string name="recitation_read_aloud_translation">Lire la traduction à voix haute</string>
+    <string name="recitation_read_aloud_tafsir">Lire le tafsir à voix haute</string>
+    <string name="recitation_read_aloud_detail">%1$s, en %2$s. Une voix de ce téléphone s’en charge, même hors ligne.</string>
+    <string name="recitation_read_aloud_missing">Votre téléphone a besoin d’une voix gratuite en %1$s, un petit téléchargement unique.</string>
+    <string name="recitation_read_aloud_get_voice">Obtenir la voix</string>
     <string name="recitation_settings_downloads">TÉLÉCHARGEMENTS · %1$s</string>
     <string name="recitation_settings_surahs_one">%1$s sourate · %2$s</string>
     <string name="recitation_settings_surahs">%1$s sourates · %2$s</string>

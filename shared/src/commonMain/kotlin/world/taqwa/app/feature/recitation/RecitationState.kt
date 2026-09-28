@@ -1,5 +1,6 @@
 package world.taqwa.app.feature.recitation
 
+import world.taqwa.app.quran.TextKind
 import world.taqwa.app.recitation.DownloadFailure
 import world.taqwa.app.recitation.DownloadKey
 import world.taqwa.app.recitation.DownloadState
@@ -52,6 +53,8 @@ data class BarState(
      * done something while the current surah plays on.
      */
     val incoming: IncomingDownload? = null,
+    /** Set while the phone's voice reads this ayah's translation (read-aloud spec §6): the bar's caption says so. */
+    val readingAloud: TextKind? = null,
 )
 
 /**
@@ -59,6 +62,38 @@ data class BarState(
  * the surah when it differs from the one playing, and the voice when the surah is the same.
  */
 data class IncomingDownload(val surah: Int, val reciter: Reciter, val fraction: Float)
+
+/**
+ * The line under the surah name on the bar: [place], the ayah ("Ayah 56", or the bare "56"),
+ * and while the voice reads, [reading] after a dot ("Translation"). One of the two is always there.
+ */
+data class BarCaption(val place: String?, val reading: String?) {
+    val text: String get() = listOfNotNull(place, reading).joinToString(DOT)
+
+    companion object {
+        /** Between the ayah and the word: as the bar draws it, and as it is measured. */
+        const val DOT = " · "
+    }
+}
+
+/**
+ * What the bar's caption says: the widest form of it that [fits] on its one line.
+ *
+ * The caption gets what the bar has left once the monogram and the four 48 dp buttons are paid
+ * for: 108 dp on the S23, 84 on a 360 dp phone, where "Ayah 56 · Translation" wants about 120.
+ * Drawn as one line that wraps at spaces, it lost its last word to the second line `maxLines`
+ * hides, and the S23 showed "Ayah 56 ·": the one word that was news, gone. So the caption comes
+ * in three lengths and the bar draws the first that fits: all of it, then the number and the
+ * word, then the word alone. The word is given up last because it is what changed. The ayah was
+ * on the bar a moment ago, and it is lit on the page.
+ *
+ * Between readings the caption is [ayah] alone, which fits any phone.
+ */
+fun barCaption(ayah: String, number: String, reading: String?, fits: (String) -> Boolean): BarCaption {
+    if (reading == null) return BarCaption(ayah, null)
+    val forms = listOf(BarCaption(ayah, reading), BarCaption(number, reading), BarCaption(null, reading))
+    return forms.firstOrNull { fits(it.text) } ?: forms.last()
+}
 
 /** Which of the download sheet's three faces is showing (spec §5.4). */
 sealed interface SheetPhase {
@@ -129,6 +164,8 @@ data class RecitationState(
     val autoDownload: Boolean = false,
     /** The whole-Quran offer for the current reciter, or null when there is nothing to offer. */
     val wholeQuran: WholeQuran? = null,
+    /** Read-aloud's switch, or null where it must not show (read-aloud spec §4, §6). */
+    val readAloud: ReadAloudState? = null,
 ) {
     /** The header button's state for [surah], under the current reciter. */
     fun header(surah: Int): HeaderState = headerStateOf(surah, reciter?.id, downloads, bar)
@@ -140,6 +177,19 @@ data class RecitationState(
     val reciterDownloads: List<Reciter>
         get() = reciters.filter { downloadedByReciter[it.id].orEmpty().isNotEmpty() }
 }
+
+/**
+ * Read-aloud's switch as the reading sheet and Settings › Recitation draw it (read-aloud spec §6).
+ * [missingEngine] is Android's engine whose free voice is a download away; null when the voice is
+ * on the phone.
+ */
+data class ReadAloudState(
+    val enabled: Boolean,
+    val translationName: String,
+    val language: String,
+    val kind: TextKind,
+    val missingEngine: String? = null,
+)
 
 /**
  * What recitation occupies on the phone, counted off the disk rather than off the registry

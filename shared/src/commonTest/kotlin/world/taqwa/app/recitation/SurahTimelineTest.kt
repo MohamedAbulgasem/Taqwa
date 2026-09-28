@@ -106,4 +106,37 @@ class SurahTimelineTest {
         assertEquals(3_000L, plain.totalMs)
         assertEquals(900L, plain.startOf(2))
     }
+
+    private val spoken = RecitationQueue(1, (1..2).toList(), gapMs = 300L, spoken = setOf(1))
+
+    @Test
+    fun `a translation takes the slot it is given and the breath its length`() {
+        val clock = SurahTimeline.of(spoken, { 1_000L }) { 5_000L }
+        // [ayah 1000][breath 400][speech 5000][gap 300][ayah 1000]
+        assertEquals(7_700L, clock.totalMs)
+        assertEquals(1_400L, clock.startOf(2))
+        assertEquals(6_400L, clock.startOf(3))
+    }
+
+    @Test
+    fun `without speech lengths a translation slot is empty`() {
+        val clock = SurahTimeline.of(spoken) { 1_000L }
+        assertEquals(0L, clock.durationOf(2))
+        assertEquals(2_700L, clock.totalMs)
+    }
+
+    @Test
+    fun `a seek inside a translation lands on the next ayah`() {
+        val clock = SurahTimeline.of(spoken, { 1_000L }) { 5_000L }
+        assertEquals(4, clock.snapToAyah(3_000L) { !spoken.isAyah(it) })
+        assertEquals(4, clock.snapToAyah(1_200L) { !spoken.isAyah(it) })
+    }
+
+    @Test
+    fun `a seek inside the last translation goes back to its ayah`() {
+        val last = RecitationQueue(1, (1..2).toList(), gapMs = 300L, spoken = setOf(2))
+        val clock = SurahTimeline.of(last, { 1_000L }) { 5_000L }
+        // [ayah1 0-1000][gap 1000-1300][ayah2 1300-2300][breath 2300-2700][speech 2700-7700]
+        assertEquals(2, clock.snapToAyah(5_000L) { !last.isAyah(it) })
+    }
 }

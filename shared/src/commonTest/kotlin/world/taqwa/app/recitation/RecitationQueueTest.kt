@@ -183,4 +183,89 @@ class RecitationQueueTest {
         assertEquals(7, queue.size)
         assertEquals(listOf(1, 2, 3, 4), queue.ayahs)
     }
+
+    private fun spokenFatiha() = RecitationQueue(1, (1..3).toList(), gapMs = 300L, spoken = setOf(1, 3))
+
+    @Test
+    fun `a spoken ayah is followed by a breath and its translation before the gap`() {
+        assertEquals(
+            listOf(
+                QueueItem.Ayah(1), QueueItem.Gap(SPEECH_BREATH_MS), QueueItem.Speech(1), QueueItem.Gap(300L),
+                QueueItem.Ayah(2), QueueItem.Gap(300L),
+                QueueItem.Ayah(3), QueueItem.Gap(SPEECH_BREATH_MS), QueueItem.Speech(3),
+            ),
+            spokenFatiha().items,
+        )
+    }
+
+    @Test
+    fun `a translation reports the ayah it follows`() {
+        val queue = spokenFatiha()
+        assertTrue(queue.isSpeech(2))
+        assertFalse(queue.isAyah(2))
+        assertFalse(queue.isGap(2))
+        assertEquals(1, queue.ayahAt(2))
+        assertEquals(0, queue.ayahIndexAt(2))
+        assertEquals(1, queue.ayahAt(1))
+        assertEquals(6, queue.ayahIndexAt(8))
+    }
+
+    @Test
+    fun `ayahs keep their own indices past the translations`() {
+        val queue = spokenFatiha()
+        assertEquals(0, queue.indexOfAyah(1))
+        assertEquals(4, queue.indexOfAyah(2))
+        assertEquals(6, queue.indexOfAyah(3))
+        assertEquals(listOf(1, 2, 3), queue.ayahs)
+        assertEquals(3, queue.ayahCount)
+        assertEquals(9, queue.size)
+    }
+
+    @Test
+    fun `next from a translation is the next ayah and nothing after the last`() {
+        val queue = spokenFatiha()
+        assertEquals(4, queue.next(2))
+        assertEquals(4, queue.next(1))
+        assertEquals(6, queue.next(5))
+        assertNull(queue.next(8))
+    }
+
+    @Test
+    fun `previous during a translation restarts the ayah it follows`() {
+        val queue = spokenFatiha()
+        assertEquals(0, queue.previous(index = 2, positionMs = 0L))
+        assertEquals(6, queue.previous(index = 8, positionMs = 10L))
+        // An ayah after a translation still steps back within the first two seconds.
+        assertEquals(0, queue.previous(index = 4, positionMs = 100L))
+    }
+
+    @Test
+    fun `a silence knows its own length`() {
+        val queue = spokenFatiha()
+        assertEquals(SPEECH_BREATH_MS, queue.silenceMs(1))
+        assertEquals(300L, queue.silenceMs(3))
+        assertEquals(0L, queue.silenceMs(0))
+        assertEquals(0L, queue.silenceMs(2))
+    }
+
+    @Test
+    fun `a queue rebuilt from its items keeps the same arithmetic`() {
+        val queue = RecitationQueue(
+            0,
+            listOf(QueueItem.Ayah(1), QueueItem.Gap(0L), QueueItem.Speech(1), QueueItem.Ayah(2)),
+        )
+        assertEquals(1, queue.ayahAt(2))
+        assertEquals(3, queue.next(2))
+        assertEquals(3, queue.indexOfAyah(2))
+        assertEquals(listOf(1, 2), queue.ayahs)
+    }
+
+    @Test
+    fun `an ayah outside the spoken set has no translation after it`() {
+        val queue = RecitationQueue(1, (1..2).toList(), gapMs = 0L, spoken = setOf(2))
+        assertEquals(
+            listOf(QueueItem.Ayah(1), QueueItem.Ayah(2), QueueItem.Gap(SPEECH_BREATH_MS), QueueItem.Speech(2)),
+            queue.items,
+        )
+    }
 }

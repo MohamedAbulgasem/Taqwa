@@ -29,6 +29,14 @@ data class QuranRecitation(
     val onPlayAyah: (surah: Int, ayah: Int) -> Unit = { _, _ -> },
     /** The play/pause of an ayah that is already the one playing. */
     val onToggle: () -> Unit = {},
+    /** Read-aloud's switch for the reading sheet, or null where it must not show (read-aloud spec §6). */
+    val readAloud: ReadAloudState? = null,
+    /** True while the voice reads the translation of [playing]'s ayah: its card shows the mark. */
+    val speaking: Boolean = false,
+    val onReadAloud: (Boolean) -> Unit = {},
+    val onGetVoice: () -> Unit = {},
+    /** The reading sheet opened: the phone is asked about its voices again. */
+    val onSheetOpened: () -> Unit = {},
     /**
      * A request from outside the screen — the bar, the media notification — to show the ayah
      * being recited (spec §15.5): each new value is one request, and the screen scrolls to the
@@ -44,7 +52,8 @@ data class QuranRecitation(
 const val FOLLOW_GRACE_MS = 4_000L
 
 /** Where a followed ayah is put: a third of the way down the viewport, so the ayah before it is
- * still on screen and the eye has somewhere to have come from. */
+ * still on screen and the eye has somewhere to have come from. A card too long for that rises
+ * ([followOffset]). */
 const val FOLLOW_VIEWPORT_FRACTION = 3
 
 /** The gap between the "Back to ayah" pill and the player bar under it. */
