@@ -245,6 +245,44 @@ tasks.register<JavaExec>("gate") {
  *
  *     ./gradlew -p tools/timetables checkStamps
  */
+/**
+ * The weekly monitor's check half (spec §5, brief P; `scripts/monitor.sh` runs it after the fetchers):
+ * each new or changed fetched table at its own point, the whole gate and every survey, the data
+ * horizons and the manual sources' due dates, written as a report under the monitor's state folder.
+ *
+ *     ./gradlew -p tools/timetables monitor -Pofficial=<root> [-Pmonitor=<state dir>] [-Ptoday=yyyy-mm-dd]
+ *         [-Ponly=a,b] [-PcheckAll=true] [-PskipFull=true]
+ *
+ * The exit code is the report's (0 green, 1 attention), read by the shell from `last-run.json`, so
+ * a red report is not a failed build here. Needs the archive, like the gate.
+ */
+tasks.register<JavaExec>("monitor") {
+    group = "verification"
+    description = "Checks the fetched tables, the gate, the surveys and the horizons, and writes the monitor's report."
+    requireArchive()
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.monitor.MonitorMainKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    maxHeapSize = "2g"
+    workingDir = repoRoot
+    isIgnoreExitValue = true
+    val official = officialRoot
+    val monitorDir = providers.gradleProperty("monitor").orElse("")
+    val today = providers.gradleProperty("today").orElse("")
+    val only = providers.gradleProperty("only").orElse("")
+    val checkAll = providers.gradleProperty("checkAll").orElse("false")
+    val skipFull = providers.gradleProperty("skipFull").orElse("false")
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", root, "--official", official.get()) +
+            (if (monitorDir.get().isNotBlank()) listOf("--monitor", monitorDir.get()) else emptyList()) +
+            (if (today.get().isNotBlank()) listOf("--today", today.get()) else emptyList()) +
+            only.get().split(',').map { it.trim() }.filter { it.isNotEmpty() }.flatMap { listOf("--only", it) } +
+            (if (checkAll.get() == "true") listOf("--check-all") else emptyList()) +
+            (if (skipFull.get() == "true") listOf("--skip-full") else emptyList())
+    })
+}
+
 tasks.register<JavaExec>("checkStamps") {
     group = "verification"
     description = "Fails on a stale or red stamp, a missing one, or a stale ProofStamps.kt (spec §5). Needs no archive."
