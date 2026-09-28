@@ -1,41 +1,48 @@
 #!/usr/bin/env python3
 """The fetch half of the weekly monitor (spec §5, brief P): each source's newest published table,
-politely, into the restricted local archive, with a content hash so an unchanged table is
-recognised. `scripts/monitor.sh` runs it before the check half (`./gradlew -p tools/timetables
-monitor`), which reads what this writes:
+politely, into the restricted archive, with a content hash so an unchanged table is recognised.
+`scripts/monitor.sh` runs it before the check half (`./gradlew -p tools/timetables monitor`), which
+reads what this writes:
 
     <official>/archive/tables/monitor/<source>/<key>.txt   the normalised tables (the gate's layout)
-    <official>/archive/tables/monitor/index.tsv            every table held, with this run's status
+    <official>/archive/tables/monitor/index.tsv            every table held (rewritten only when it changes)
     <official>/archive/raw/monitor/<source>/<date>/        the raw responses of new or changed tables (gzip)
     <monitor>/hashes.json                                  content hashes, last-fetch dates, metadata
     <monitor>/fetch/latest.json, <date>.json, <date>.log   this run's outcome per source
 
-    python3 tools/timetables/monitor/fetch.py [--official <root>] [--only <source>]... [--today yyyy-mm-dd] [--force]
+    python3 tools/timetables/monitor/fetch.py [--official <root>] [--only <source>]... [--today yyyy-mm-dd]
+                                              [--force] [--budget-minutes N]
 
 `--official` defaults to $TAQWA_OFFICIAL, else ~/Desktop/Workspace/apps/Taqwa-official. A source
 whose cadence is not due (monthly ones) is skipped unless `--only` names it or `--force` is given;
-a `manual` source is never fetched. A fetcher that fails is a finding in the report, never a crash:
-this exits 0 unless the driver itself breaks (2). The archive is git-ignored and restricted: nothing
-fetched is ever committed.
+a source with cadence `manual` runs only when named; a source whose fetcher is `manual` is read by
+hand and never runs. A fetcher that fails is a finding in the report, never a crash: this exits 0
+unless the driver itself breaks (2), and then `latest.json` carries the error so the report says so.
+The run has a time budget (review M3; 90 minutes unless given): once it is spent the remaining
+sources are recorded as not fetched. Python 3.9 or later, standard library only. The archive is
+git-ignored and restricted: nothing fetched is ever committed.
 """
 import argparse
 import datetime as dt
 import gzip
 import importlib
+import io
 import json
 import os
 import sys
+import time
 import traceback
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from common import Context, Table, read_table_rows  # noqa: E402
+from common import Context, Http, Table, read_table_rows, runtime_line, write_atomic, write_json  # noqa: E402
 
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 SOURCES_TSV = os.path.join(REPO, "tools", "timetables", "official", "monitor", "sources.tsv")
 INDEX_HEADER = ["source", "key", "path", "name", "lat", "lon", "zone", "clock", "cc", "entry", "survey", "columns",
-                "format", "school", "hash", "status", "fetched", "note"]
+                "format", "school", "hash", "fetched", "note"]
 CADENCE_DAYS = {"weekly": 6, "monthly": 27}
+DEFAULT_BUDGET_MINUTES = 90
 
 
 def read_sources(path):
@@ -54,17 +61,26 @@ def read_sources(path):
     return out
 
 
-def due(row, last_fetch, today, only, force):
-    """Whether a source is fetched this run: never a manual one unless named; a weekly one every run
+def skip_reason(row, last_fetch, today, only, force):
+    """Why a source is not fetched this run, or None when it is: a source read by hand (fetcher
+    `manual`) never, named or not; one with cadence `manual` only when named; a weekly one every run
     (six days after its last fetch), a monthly one after 27 days; `--only` and `--force` override."""
+    if row["fetcher"] == "manual":
+        return "fetched by hand"
     if row["source"] in only:
-        return True
+        return None
     if force:
-        return row["fetcher"] != "manual"
-    if row["fetcher"] == "manual" or row["cadence"] == "manual":
-        return False
+        return None
+    if row["cadence"] == "manual":
+        return "runs only when named"
     days = CADENCE_DAYS.get(row["cadence"], 6)
-    return last_fetch is None or (today - last_fetch).days >= days
+    if last_fetch is None or (today - last_fetch).days >= days:
+        return None
+    return "not due"
+
+
+def due(row, last_fetch, today, only, force):
+    return skip_reason(row, last_fetch, today, only, force) is None
 
 
 class Store:
@@ -106,14 +122,13 @@ class Store:
         prev = self.data["tables"].get(tid)
         status = "new" if prev is None else ("unchanged" if prev.get("hash") == h else "changed")
         if status != "unchanged":
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(table.text(self.today.isoformat()))
+            write_atomic(path, table.text(self.today.isoformat()))
             raw_dir = os.path.join(self.official, "archive", "raw", "monitor", source, self.today.isoformat())
             for name, body in table.raw:
-                os.makedirs(raw_dir, exist_ok=True)
-                with gzip.open(os.path.join(raw_dir, name + ".gz"), "wb") as f:
-                    f.write(body if isinstance(body, bytes) else body.encode("utf-8"))
+                buf = io.BytesIO()
+                with gzip.GzipFile(fileobj=buf, mode="wb", mtime=0) as z:
+                    z.write(body if isinstance(body, bytes) else body.encode("utf-8"))
+                write_atomic(os.path.join(raw_dir, name + ".gz"), buf.getvalue())
         self.data["tables"][tid] = {
             "source": source, "key": table.key, "path": rel, "name": table.name, "lat": table.lat, "lon": table.lon,
             "zone": table.zone, "clock": table.clock, "cc": table.cc, "entry": table.entry, "survey": table.survey,
@@ -138,36 +153,37 @@ class Store:
             cells = [
                 t["source"], t["key"], t["path"], t["name"], t.get("lat"), t.get("lon"), t["zone"], t.get("clock"), t["cc"],
                 t.get("entry"), t.get("survey"), t["columns"], t.get("format", "daily"), t.get("school", "standard"), t["hash"],
-                self.run_status.get(tid, "held"), t.get("fetched") or "", t.get("note") or "",
+                t.get("fetched") or "", t.get("note") or "",
             ]
             lines.append("\t".join("" if c is None else str(c).replace("\t", " ").replace("\n", " ") for c in cells))
         return lines
 
     def write_index(self):
+        """The index, rewritten only when its content changed (so a mirror copies it only then, review M11)."""
         path = os.path.join(self.official, "archive", "tables", "monitor", "index.tsv")
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w", encoding="utf-8") as f:
-            f.write("# Written by tools/timetables/monitor/fetch.py on every run; never committed (the archive is restricted).\n")
-            f.write("\n".join(self.index_lines()) + "\n")
+        text = ("# Written by tools/timetables/monitor/fetch.py when a table changes; never committed (the archive is restricted).\n"
+                + "\n".join(self.index_lines()) + "\n")
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                if f.read() == text:
+                    return path
+        write_atomic(path, text)
         return path
 
     def save(self):
-        os.makedirs(self.monitor_dir, exist_ok=True)
-        with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, ensure_ascii=False, indent=1, sort_keys=True)
+        write_json(self.path, self.data)
 
 
-def run_source(row, store, today, official, monitor_dir, log, force):
+def run_source(row, store, ctx):
     """One source through its fetcher; returns (status, message, requests, {key: status})."""
     source = row["source"]
-    ctx = Context(source, official, today, log, monitor_dir, force)
     tables = []
     try:
         module = importlib.import_module("fetchers." + row["fetcher"])
         tables = list(module.fetch(ctx) or [])
     except Exception as e:  # a fetcher's failure is a finding, never a crash of the run
         ctx.error(f"{type(e).__name__}: {e}")
-        log(traceback.format_exc())
+        ctx.log(traceback.format_exc())
     statuses = {}
     for t in tables:
         if not isinstance(t, Table) or not t.rows:
@@ -179,16 +195,20 @@ def run_source(row, store, today, official, monitor_dir, log, force):
             ctx.error(f"{t.key}: could not be written: {type(e).__name__}: {e}")
     status = "ok" if not ctx.errors else ("partial" if statuses else "failed")
     message = "; ".join(ctx.errors + ctx.notes)[:4000]
-    return status, message, ctx.http.requests, statuses
+    return status, message, ctx.requests, statuses
 
 
 def main(argv=None):
+    if sys.version_info < (3, 9):
+        print(f"fetch: Python 3.9 or later is needed, this is {sys.version.split()[0]}", file=sys.stderr)
+        return 2
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--official", default=os.environ.get("TAQWA_OFFICIAL") or os.path.expanduser("~/Desktop/Workspace/apps/Taqwa-official"))
     p.add_argument("--monitor", default=None, help="the state folder (default <official>/monitor)")
     p.add_argument("--only", action="append", default=[], help="fetch this source only (repeatable); a manual-cadence source runs only when named")
     p.add_argument("--today", default=None)
     p.add_argument("--force", action="store_true", help="fetch every source whatever its cadence")
+    p.add_argument("--budget-minutes", type=float, default=DEFAULT_BUDGET_MINUTES, help="the run's time budget (0: none)")
     p.add_argument("--sources", default=SOURCES_TSV)
     args = p.parse_args(argv)
 
@@ -205,45 +225,61 @@ def main(argv=None):
         log_file.write(line + "\n")
         log_file.flush()
 
-    log(f"== fetch {dt.datetime.now().isoformat(timespec='seconds')} official={official}")
-    store = Store(official, monitor_dir, today)
-    only = set(args.only)
+    def write_outcome(results, error=None):
+        out = {"date": today.isoformat(), "sources": results}
+        if error:
+            out["error"] = error
+        for name in ("latest.json", today.isoformat() + ".json"):
+            write_json(os.path.join(monitor_dir, "fetch", name), out)
+
+    log(f"== fetch {dt.datetime.now().isoformat(timespec='seconds')} {runtime_line()}")
     results = {}
-    for row in read_sources(args.sources):
-        source = row["source"]
-        if only and source not in only:
-            results[source] = {"status": "skipped", "message": "not selected", "requests": 0, "tables": {}}
-            continue
-        if not due(row, store.last_fetch(source), today, only, args.force):
-            why = "manual" if row["fetcher"] == "manual" else "not due"
-            results[source] = {"status": "skipped", "message": why, "requests": 0, "tables": {}}
-            print(f"{source}: skipped ({why})")
-            continue
-        log(f"-- {source} ({row['fetcher']})")
-        print(f"{source}: fetching …", flush=True)
-        status, message, requests, statuses = run_source(row, store, today, official, monitor_dir, log, args.force)
-        store.source_done(source, status, message, requests)
-        results[source] = {"status": status, "message": message, "requests": requests, "tables": statuses}
-        counts = {s: list(statuses.values()).count(s) for s in ("new", "changed", "unchanged")}
-        print(f"{source}: {status}, {requests} requests, {len(statuses)} tables "
-              f"({counts['new']} new, {counts['changed']} changed, {counts['unchanged']} unchanged)"
-              + (f" — {message[:300]}" if message else ""), flush=True)
-    index = store.write_index()
-    store.save()
-    out = {"date": today.isoformat(), "official": official, "sources": results}
-    for name in ("latest.json", today.isoformat() + ".json"):
-        with open(os.path.join(monitor_dir, "fetch", name), "w", encoding="utf-8") as f:
-            json.dump(out, f, ensure_ascii=False, indent=1)
-    log_file.close()
-    print(f"index: {index}")
-    return 0
+    try:
+        store = Store(official, monitor_dir, today)
+        only = set(args.only)
+        deadline = time.monotonic() + args.budget_minutes * 60 if args.budget_minutes and args.budget_minutes > 0 else None
+        http = Http(log, deadline=deadline)
+        for row in read_sources(args.sources):
+            source = row["source"]
+            if only and source not in only:
+                results[source] = {"status": "skipped", "message": "not selected", "requests": 0, "tables": {}}
+                continue
+            why = skip_reason(row, store.last_fetch(source), today, only, args.force)
+            if why:
+                results[source] = {"status": "skipped", "message": why, "requests": 0, "tables": {}}
+                print(f"{source}: skipped ({why})")
+                continue
+            if http.budget_spent():
+                message = f"not fetched: the run's time budget ({args.budget_minutes:g} min) was spent before its turn"
+                results[source] = {"status": "failed", "message": message, "requests": 0, "tables": {}}
+                store.source_done(source, "failed", message, 0)
+                print(f"{source}: failed — {message}", flush=True)
+                continue
+            log(f"-- {source} ({row['fetcher']})")
+            print(f"{source}: fetching …", flush=True)
+            ctx = Context(source, official, today, log, monitor_dir, args.force, http=http)
+            status, message, requests, statuses = run_source(row, store, ctx)
+            store.source_done(source, status, message, requests)
+            results[source] = {"status": status, "message": message, "requests": requests, "tables": statuses}
+            counts = {s: list(statuses.values()).count(s) for s in ("new", "changed", "unchanged")}
+            print(f"{source}: {status}, {requests} requests, {len(statuses)} tables "
+                  f"({counts['new']} new, {counts['changed']} changed, {counts['unchanged']} unchanged)"
+                  + (f" — {message[:300]}" if message else ""), flush=True)
+            store.save()
+        index = store.write_index()
+        store.save()
+        write_outcome(results)
+        print(f"index: {index}")
+        return 0
+    except Exception:
+        error = traceback.format_exc()
+        log(error)
+        write_outcome(results, error=error)
+        print(error, file=sys.stderr)
+        return 2
+    finally:
+        log_file.close()
 
 
 if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except SystemExit:
-        raise
-    except Exception:
-        traceback.print_exc()
-        sys.exit(2)
+    sys.exit(main())

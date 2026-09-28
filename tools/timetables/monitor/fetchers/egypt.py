@@ -7,7 +7,7 @@ import html
 import re
 import urllib.parse
 
-from common import FetchError, Table
+from common import FetchError, Table, add_all
 
 SOURCE = "eg-esa"
 DARIFTA = "https://www.dar-alifta.org/ar/Prayer/GetPrayer?town="
@@ -111,8 +111,7 @@ def fetch(ctx):
             ctx.error(f"{unit}: no month table in Dar al-Ifta's response for {name}")
             continue
         t = table(unit)
-        for date, times in rows.items():
-            t.add(date, times)
+        add_all(ctx, t, rows, unit)
         t.raw.append((f"darifta-{unit}.html", page))
     by_name = {norm_city(n): u for u, n in TOWNS}
     by_name.update({norm_city(k): v for k, v in ALIASES.items()})
@@ -128,11 +127,12 @@ def fetch(ctx):
                 unmapped.append(city)
                 continue
             t = table(unit)
-            t.add(date, times)
+            if not add_all(ctx, t, [(date, times)], f"ESA {unit}"):
+                continue
             if not any(n.startswith("esa-") for n, _ in t.raw):
                 t.raw.append((f"esa-{date}.html", page))
         if unmapped:
             ctx.note(f"ESA's page lists {len(unmapped)} cities the gate has no unit for (not kept): {', '.join(unmapped[:8])} …")
     except FetchError as e:
         ctx.error(f"ESA's daily page: {e}")
-    return list(tables.values())
+    return [t for t in tables.values() if t.rows]

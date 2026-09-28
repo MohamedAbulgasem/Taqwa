@@ -7,7 +7,7 @@ import datetime as dt
 import html
 import re
 
-from common import FetchError, Table
+from common import FetchError, Table, add_all
 
 SOURCE = "ma-habous"
 PAGE = "https://www.habous.gov.ma/prieres/index.php?ville="
@@ -89,7 +89,6 @@ def fetch(ctx):
         t = Table(unit, name, None, None, "Africa/Casablanca", "MA", "F+E S D A M I", entry=f"ma.habous/{unit}", clock="UTC",
                   source_line=f"Ministry of Habous and Islamic Affairs, Morocco: {url} (the current Hijri month, legal time UTC+0; page selected '{sel[0].strip() if sel else '?'}')",
                   raw=[(f"habous-{ville}.html", page)])
-        for date, times in rows.items():
-            t.add(date, times)
-        tables.append(t)
+        if add_all(ctx, t, rows, name):
+            tables.append(t)
     return tables

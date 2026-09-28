@@ -4,7 +4,7 @@ it appears (probed on WLY01: a 404 is "not yet")."""
 import datetime as dt
 import json
 
-from common import FetchError, Table
+from common import FetchError, Table, add_all
 
 SOURCE = "my-jakim"
 ESOLAT = "https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=year&zone="
@@ -62,9 +62,8 @@ def fetch(ctx):
         for year, days in by_year.items():
             t = Table(f"{zone}-{year}", f"{name} {zone} {year}", None, None, tz, "MY", "F S D A M I", entry=f"my.jakim/{zone}",
                       source_line=f"JAKIM e-solat {url} (serverTime {server})", raw=[(f"esolat-{zone}-{year}.json", body)])
-            for date, times in days.items():
-                t.add(date, times)
-            tables.append(t)
+            if add_all(ctx, t, days, f"{zone} {year}"):
+                tables.append(t)
     nxt = ctx.today.year + 1
     if ctx.today.month >= 10:
         probe = f"{MIRROR}WLY01?year={nxt}&month=1"
@@ -84,10 +83,9 @@ def fetch(ctx):
                 for month in range(1, 13):
                     try:
                         body = ctx.http.get(f"{MIRROR}{zone}?year={nxt}&month={month}")
-                        for date, times in parse_mirror(body, nxt, month).items():
-                            t.add(date, times)
+                        add_all(ctx, t, parse_mirror(body, nxt, month), f"{zone} {nxt}-{month:02d} (mirror)")
                         t.raw.append((f"mirror-{zone}-{nxt}-{month:02d}.json", body))
-                    except FetchError as e:
+                    except (FetchError, KeyError, ValueError) as e:
                         ctx.error(f"{zone} {nxt}-{month:02d} (mirror): {e}")
                 if t.rows:
                     tables.append(t)

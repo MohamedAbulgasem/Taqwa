@@ -12,7 +12,7 @@ import json
 import os
 import re
 
-from common import FetchError, Table
+from common import FetchError, Table, add_all
 
 SOURCE_TR = "tr-diyanet"
 SOURCE_EU = "tr-diyanet-europe"
@@ -48,9 +48,11 @@ TURKEY = [
     ("9548", "silivri", "Silivri (edge)", "tr.diyanet", 41.07393, 28.24644),
 ]
 
-# Europe: (key, name, country id, district name candidates, lat, lon, zone, cc, entry or None).
-# The twelve held cities name their unit (checked at the unit's own point, DiyanetEuropeCurves);
-# the seven others are new data: checked against the entry Automatic follows there.
+# Europe: (key, name, country id, district name candidates, lat, lon, zone, cc, entry).
+# The twelve cities of the first proof name their unit (checked at the unit's own point,
+# DiyanetEuropeCurves, and as the member of the cautious entry Automatic follows there); the seven
+# of the round of 29 September 2026 name the entry at their point, so the check resolves whatever
+# unit the registry holds for them, and the cautious entry's member row beside it.
 EUROPE = [
     ("sarajevo", "Sarajevo", "9", ["SARAJEVO", "SARAYBOSNA"], 43.84864, 18.35644, "Europe/Sarajevo", "BA", "tr.diyanet.europe/tr.diyanet.europe.sarajevo"),
     ("zurich", "Zürich", "49", ["ZÜRİH", "ZURIH", "ZURICH", "ZÜRICH"], 47.36667, 8.55, "Europe/Zurich", "CH", "tr.diyanet.europe/tr.diyanet.europe.zurich"),
@@ -64,13 +66,13 @@ EUROPE = [
     ("london", "London", "15", ["LONDON", "LONDRA"], 51.5074, -0.1278, "Europe/London", "GB", "tr.diyanet.europe/tr.diyanet.europe.london"),
     ("amsterdam", "Amsterdam", "4", ["AMSTERDAM"], 52.37403, 4.88969, "Europe/Amsterdam", "NL", "tr.diyanet.europe/tr.diyanet.europe.amsterdam"),
     ("oslo", "Oslo", "36", ["OSLO"], 59.91273, 10.74609, "Europe/Oslo", "NO", "tr.diyanet.europe/tr.diyanet.europe.oslo"),
-    ("antwerpen", "Antwerpen (new)", "11", ["ANTWERPEN", "ANTWERP", "ANVERS"], 51.2194, 4.4025, "Europe/Brussels", "BE", "tr.diyanet.europe"),
-    ("gent", "Gent (new)", "11", ["GENT", "GHENT", "GAND"], 51.0543, 3.7174, "Europe/Brussels", "BE", "tr.diyanet.europe"),
-    ("lyon", "Lyon (new)", "21", ["LYON"], 45.764, 4.8357, "Europe/Paris", "FR", "tr.diyanet.europe"),
-    ("lille", "Lille (new)", "21", ["LILLE"], 50.6292, 3.0573, "Europe/Paris", "FR", "tr.diyanet.europe"),
-    ("copenhagen", "Copenhagen (new)", "26", ["COPENHAGEN", "KOPENHAG", "KØBENHAVN", "KOBENHAVN"], 55.6761, 12.5683, "Europe/Copenhagen", "DK", "tr.diyanet.europe"),
-    ("helsinki", "Helsinki (new)", "41", ["HELSINKI"], 60.1699, 24.9384, "Europe/Helsinki", "FI", "tr.diyanet.europe"),
-    ("trondheim", "Trondheim (new)", "36", ["TRONDHEIM"], 63.4305, 10.3951, "Europe/Oslo", "NO", "tr.diyanet.europe"),
+    ("antwerpen", "Antwerpen", "11", ["ANTWERPEN", "ANTWERP", "ANVERS"], 51.2194, 4.4025, "Europe/Brussels", "BE", "tr.diyanet.europe"),
+    ("gent", "Gent", "11", ["GENT", "GHENT", "GAND"], 51.0543, 3.7174, "Europe/Brussels", "BE", "tr.diyanet.europe"),
+    ("lyon", "Lyon", "21", ["LYON"], 45.764, 4.8357, "Europe/Paris", "FR", "tr.diyanet.europe"),
+    ("lille", "Lille", "21", ["LILLE"], 50.6292, 3.0573, "Europe/Paris", "FR", "tr.diyanet.europe"),
+    ("copenhagen", "Copenhagen", "26", ["COPENHAGEN", "KOPENHAG", "KØBENHAVN", "KOBENHAVN"], 55.6761, 12.5683, "Europe/Copenhagen", "DK", "tr.diyanet.europe"),
+    ("helsinki", "Helsinki", "41", ["HELSINKI"], 60.1699, 24.9384, "Europe/Helsinki", "FI", "tr.diyanet.europe"),
+    ("trondheim", "Trondheim", "36", ["TRONDHEIM"], 63.4305, 10.3951, "Europe/Oslo", "NO", "tr.diyanet.europe"),
 ]
 
 FOLD = str.maketrans({"İ": "I", "Ü": "U", "Ö": "O", "Ş": "S", "Ç": "C", "Ğ": "G", "Â": "A", "Ø": "O", "Å": "A",
@@ -185,9 +187,8 @@ def fetch(ctx):
             t = Table(key, name, lat, lon, "Europe/Istanbul", "TR", "F+E S D A M I", entry=entry,
                       source_line=f"Diyanet {BASE}/{ilce} (namazvakitleri.diyanet.gov.tr, IlceID {ilce}; the month and the year tables)",
                       raw=[(f"diyanet-{ilce}.html", text)])
-            for date, times in rows.items():
-                t.add(date, times)
-            tables.append(t)
+            if add_all(ctx, t, rows, name):
+                tables.append(t)
         return tables
     ids = Ids(ctx)
     for key, name, country, candidates, lat, lon, zone, cc, entry in EUROPE:
@@ -200,7 +201,6 @@ def fetch(ctx):
         t = Table(key, name, lat, lon, zone, cc, "F+E S D A M I", entry=entry,
                   source_line=f"Diyanet {BASE}/{ilce} (namazvakitleri.diyanet.gov.tr, {name}, IlceID {ilce}; the month and the year tables)",
                   raw=[(f"diyanet-{ilce}.html", text)])
-        for date, times in rows.items():
-            t.add(date, times)
-        tables.append(t)
+        if add_all(ctx, t, rows, name):
+            tables.append(t)
     return tables

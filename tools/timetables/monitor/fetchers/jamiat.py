@@ -5,7 +5,7 @@ Shafi'i Isha not checked). A perpetual table, so a changed file is the news."""
 import csv
 import datetime as dt
 
-from common import FetchError, Table
+from common import FetchError, Table, add_all
 
 SOURCE = "za-jamiat"
 EXPORT = "https://salaahtimes.starlite.za.net/jamiat/perpetual/export-csv.php?id="
@@ -57,12 +57,13 @@ def fetch(ctx):
                       source_line=f"Jamiatul Ulama perpetual salaah times, {title}; mapped onto {year} (29 Feb only in leap years): {url} "
                                   f"(linked from https://jamiat.org.za/salaah-times.php); columns Suhoor, Fajr, Sunrise, Zuhr, Asr (S), Asr (H), Maghrib, Isha (S), Isha (H)",
                       raw=[(f"jamiat-{key}.csv", body)] if year == ctx.today.year else [])
+            rows = {}
             for month, day, times in days:
                 try:
-                    date = dt.date(year, month, day)
+                    rows[dt.date(year, month, day).isoformat()] = times
                 except ValueError:
                     continue
-                t.add(date.isoformat(), times)
             t.merge = False
-            tables.append(t)
+            if add_all(ctx, t, rows, f"{name} {year}"):
+                tables.append(t)
     return tables

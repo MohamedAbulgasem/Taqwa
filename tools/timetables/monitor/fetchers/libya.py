@@ -6,7 +6,7 @@ the Fajr printed is also when the fast begins (F+E) and the widget's emsak is th
 there Fajr, Maghrib and imsak are not checked, as ly-awqaf.tsv has it."""
 import json
 
-from common import FetchError, Table, nearest_year
+from common import FetchError, Table, add_all, nearest_year
 
 SOURCE = "ly-awqaf"
 WIDGET = "https://awqaf.gov.ly/sovinel/admin-ajax.php"
@@ -65,8 +65,7 @@ def fetch(ctx):
         if unit == "tripoli":
             try:
                 body = ctx.http.get(IFTA)
-                for date, times in ifta_rows(body, ctx.today).items():
-                    t.add(date, times)
+                add_all(ctx, t, ifta_rows(body, ctx.today), "api.ifta.ly")
                 t.raw.append((f"ifta-{ctx.today.isoformat()}.json", body))
             except (FetchError, KeyError, ValueError) as e:
                 ctx.error(f"api.ifta.ly: {e}")

@@ -43,13 +43,20 @@ def date_of(text):
     raise FetchError(f"not a date: {text!r}")
 
 
-def parse_records(records):
+def parse_records(records, bad=None):
+    """{date: [6 times]} of the dataset's records; a record whose cells do not read goes to `bad`
+    (a list, when given) instead of dropping the whole year (review M5)."""
     rows = {}
     for r in records:
         keys = {k.lower(): k for k in r}
         if "date" not in keys or not all(n in keys for n in NAMES):
             continue
-        rows[date_of(r[keys["date"]])] = [h24(r[keys[n]], i) for i, n in enumerate(NAMES)]
+        try:
+            rows[date_of(r[keys["date"]])] = [h24(r[keys[n]], i) for i, n in enumerate(NAMES)]
+        except FetchError as e:
+            if bad is None:
+                raise
+            bad.append(f"{r.get(keys['date'])}: {e}")
     return rows
 
 
@@ -71,20 +78,27 @@ def fetch(ctx):
     tables = []
     rows = {}
     raw = []
+    bad = []
     url = DATAGOV
-    for page in range(20):
-        body = ctx.http.get(url)
-        d = json.loads(body.decode("utf-8", "replace"))
-        result = d.get("result") or {}
-        records = result.get("records") or []
-        raw.append((f"datagov-{page}.json", body))
-        rows.update(parse_records(records))
-        nxt = (result.get("_links") or {}).get("next")
-        if not records or not nxt or len(rows) >= int(result.get("total") or 0):
-            break
-        url = "https://data.gov.sg" + nxt
-    if not rows:
-        ctx.error("data.gov.sg: no records")
+    # The dataset half; its failure leaves the website half to run (review M5).
+    try:
+        for page in range(20):
+            body = ctx.http.get(url)
+            d = json.loads(body.decode("utf-8", "replace"))
+            result = d.get("result") or {}
+            records = result.get("records") or []
+            raw.append((f"datagov-{page}.json", body))
+            rows.update(parse_records(records, bad))
+            nxt = (result.get("_links") or {}).get("next")
+            if not records or not nxt or len(rows) >= int(result.get("total") or 0):
+                break
+            url = "https://data.gov.sg" + nxt
+        if not rows:
+            ctx.error("data.gov.sg: no records")
+        if bad:
+            ctx.note(f"data.gov.sg: {len(bad)} records skipped ({'; '.join(bad[:3])})")
+    except (FetchError, ValueError, KeyError, TypeError) as e:
+        ctx.error(f"data.gov.sg: {e}")
     by_year = {}
     for date, times in rows.items():
         by_year.setdefault(date[:4], {})[date] = times
@@ -110,6 +124,6 @@ def fetch(ctx):
                 t.add(date, times)
             t.merge = False
             tables.append(t)
-    except FetchError as e:
+    except (FetchError, ValueError, KeyError, TypeError) as e:
         ctx.error(f"website: {e}")
     return tables

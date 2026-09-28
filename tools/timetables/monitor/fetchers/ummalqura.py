@@ -4,7 +4,7 @@ year and the next. The API prints no end of eating: the fast begins at its Fajr 
 carries each day's Hijri month, which is what UmmAlQuraDates' Ramadan dates are regenerated from."""
 import json
 
-from common import FetchError, Table
+from common import FetchError, Table, add_all
 
 SOURCE = "sa-ummalqura"
 BASE = "https://umqserv.kacst.gov.sa/api/v1/Prayer/GetPrayerByYear"
@@ -55,8 +55,8 @@ def fetch(ctx):
             t = Table(f"{key}-{year}", f"{name} {year}", lat, lon, "Asia/Riyadh", "SA", "F+E S D A M I", entry="sa.ummalqura",
                       source_line=f"Umm al-Qura (KACST) {url} (the JSON API the official page ummulqura.org.sa calls)",
                       raw=[(f"{key}-{year}.json", body)])
-            for date, times in rows.items():
-                t.add(date, times)
+            add_all(ctx, t, rows, f"{name} {year}")
             t.merge = False
-            tables.append(t)
+            if t.rows:
+                tables.append(t)
     return tables

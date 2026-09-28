@@ -14,9 +14,12 @@ import unittest
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from common import FetchError, Table, nearest_year, norm_time, pm, read_table_rows  # noqa: E402
-from fetch import INDEX_HEADER, Store, due  # noqa: E402
-from fetchers import diyanet, egypt, jakim, mawaqit, morocco, muis, qatar  # noqa: E402
+import common  # noqa: E402
+from common import Context, FetchError, Http, Table, add_all, nearest_year, norm_time, pm, read_table_rows, redact, runtime_line, write_atomic  # noqa: E402
+import backup  # noqa: E402
+import fetch  # noqa: E402
+from fetch import INDEX_HEADER, Store, due, skip_reason  # noqa: E402
+from fetchers import diyanet, egypt, irn, jakim, kemenag, london, mawaqit, morocco, muis, qatar  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -90,17 +93,24 @@ class StoreTests(unittest.TestCase):
         self.assertEqual("2026-10-12", later.data["tables"]["src/k"]["fetched"])
         with open(path) as f:
             self.assertIn("18:01", f.read())
-        # Another source's table not fetched this run is `held` in the index.
-        later.data["tables"]["other/x"] = dict(later.data["tables"]["src/k"], source="other", key="x", path="archive/tables/monitor/other/x.txt")
+        # Another source's table not fetched this run stays in the index, with the date its content last changed.
+        later.data["tables"]["other/x"] = dict(later.data["tables"]["src/k"], source="other", key="x", path="archive/tables/monitor/other/x.txt", fetched="2026-09-28")
         lines = later.index_lines()
         self.assertEqual("\t".join(INDEX_HEADER), lines[0])
+        self.assertNotIn("status", INDEX_HEADER, "what a run found is the fetch log's, not the index's (review I8, M11)")
         rows = {l.split("\t")[0] + "/" + l.split("\t")[1]: l.split("\t") for l in lines[1:]}
-        self.assertEqual("changed", rows["src/k"][INDEX_HEADER.index("status")])
-        self.assertEqual("held", rows["other/x"][INDEX_HEADER.index("status")])
+        self.assertEqual("2026-10-12", rows["src/k"][INDEX_HEADER.index("fetched")])
+        self.assertEqual("2026-09-28", rows["other/x"][INDEX_HEADER.index("fetched")])
         self.assertEqual("gb.cautious", rows["src/k"][INDEX_HEADER.index("entry")])
         self.assertEqual("", rows["src/k"][INDEX_HEADER.index("survey")])
-        later.write_index()
+        index = later.write_index()
         self.assertTrue(os.path.exists(os.path.join(self.root, "archive", "tables", "monitor", "index.tsv")))
+        # Written again with the same content: the file is left alone (a mirror would copy it every week otherwise).
+        before = os.stat(index).st_mtime_ns
+        os.utime(index, ns=(before - 10_000_000_000, before - 10_000_000_000))
+        later.write_index()
+        self.assertEqual(before - 10_000_000_000, os.stat(index).st_mtime_ns)
+        self.assertFalse(any(n.endswith(".tmp") for n in os.listdir(os.path.dirname(index))))
 
     def test_merge_keeps_held_days(self):
         store = Store(self.root, self.monitor, dt.date(2026, 10, 5))
@@ -131,10 +141,15 @@ class StoreTests(unittest.TestCase):
         self.assertTrue(due(monthly, dt.date(2026, 9, 1), today, set(), False))
         self.assertFalse(due(manual, None, today, set(), False))
         self.assertFalse(due(manual, None, today, set(), True))
-        self.assertTrue(due(manual, None, today, {"c"}, False))
+        # A source read by hand never runs, named or not (review I6: naming it reported a broken fetch).
+        self.assertFalse(due(manual, None, today, {"c"}, False))
+        self.assertEqual("fetched by hand", skip_reason(manual, None, today, {"c"}, False))
         self.assertFalse(due(keyed, None, today, set(), False))
+        self.assertEqual("runs only when named", skip_reason(keyed, None, today, set(), False))
         self.assertTrue(due(keyed, None, today, {"d"}, False))
         self.assertTrue(due(monthly, dt.date(2026, 9, 20), today, set(), True))
+        self.assertEqual("not due", skip_reason(monthly, dt.date(2026, 9, 20), today, set(), False))
+        self.assertEqual(None, skip_reason(weekly, None, today, set(), False))
 
 
 class Parsers(unittest.TestCase):
@@ -231,3 +246,263 @@ class Parsers(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Politeness(unittest.TestCase):
+    """The client without a network: a fake urlopen, no waits (review I5 the key, M3 the breaker and the budget)."""
+
+    def setUp(self):
+        self.calls = []
+        self.lines = []
+        self._urlopen = common.urllib.request.urlopen
+        self._sleep = common.time.sleep
+        self._interval = common.MIN_INTERVAL
+        common.time.sleep = lambda s: None
+        common.MIN_INTERVAL = 0
+
+    def tearDown(self):
+        common.urllib.request.urlopen = self._urlopen
+        common.time.sleep = self._sleep
+        common.MIN_INTERVAL = self._interval
+
+    def fake(self, outcome):
+        def urlopen(req, timeout=None):
+            self.calls.append(req.full_url)
+            raise outcome(req.full_url)
+        common.urllib.request.urlopen = urlopen
+
+    def test_redact_masks_a_key_and_leaves_the_rest(self):
+        self.assertEqual("https://x/api/?format=json&key=***&year=2027", redact("https://x/api/?format=json&key=SECRET&year=2027"))
+        self.assertEqual("https://x/api/?token=***", redact("https://x/api/?token=abc"))
+        self.assertEqual("https://x/api/?q=a+b%20c&key=***", redact("https://x/api/?q=a+b%20c&key=SECRET"))
+        self.assertEqual("https://x/page", redact("https://x/page"))
+        self.assertNotIn("SECRET", redact("https://x/?API_KEY=SECRET&apikey=SECRET&access_token=SECRET"))
+
+    def test_an_http_error_names_the_url_without_its_key(self):
+        self.fake(lambda url: common.urllib.error.HTTPError(url, 401, "no", {}, None))
+        http = Http(self.lines.append)
+        with self.assertRaises(FetchError) as caught:
+            http.get("https://x/api/?format=json&key=SECRET&year=2027")
+        self.assertIn("HTTP 401 from https://x/api/?format=json&key=***&year=2027", str(caught.exception))
+        self.assertNotIn("SECRET", str(caught.exception))
+        self.assertEqual(1, len(self.calls), "an HTTP 401 is not retried")
+
+    def test_the_breaker_stops_a_host_after_three_network_failures(self):
+        self.fake(lambda url: common.urllib.error.URLError("timed out"))
+        http = Http(self.lines.append)
+        with self.assertRaises(FetchError):
+            http.get("https://a.example/1")  # two attempts: failures 1 and 2
+        with self.assertRaises(FetchError) as third:
+            http.get("https://a.example/2")  # failure 3 trips the breaker, no retry
+        self.assertEqual(3, len(self.calls))
+        self.assertIn("timed out", str(third.exception))
+        with self.assertRaises(FetchError) as skipped:
+            http.get("https://a.example/3")
+        self.assertEqual(3, len(self.calls), "a tripped host is not tried")
+        self.assertIn("not tried: a.example failed 3 times in a row", str(skipped.exception))
+        self.assertTrue(any("BREAKER a.example" in l for l in self.lines))
+        # Another host is unaffected.
+        with self.assertRaises(FetchError):
+            http.get("https://b.example/1")
+        self.assertEqual(5, len(self.calls))
+
+    def test_the_run_budget_stops_every_request_once_spent(self):
+        self.fake(lambda url: common.urllib.error.URLError("unreachable"))
+        http = Http(self.lines.append, deadline=common.time.monotonic() - 1)
+        self.assertTrue(http.budget_spent())
+        with self.assertRaises(FetchError) as caught:
+            http.get("https://a.example/1")
+        self.assertIn("time budget is spent", str(caught.exception))
+        self.assertEqual(0, len(self.calls))
+
+    def test_a_context_counts_its_own_requests_on_the_shared_client(self):
+        self.fake(lambda url: common.urllib.error.HTTPError(url, 404, "no", {}, None))
+        http = Http(self.lines.append)
+        a = Context("a", "/nowhere", dt.date(2026, 10, 5), self.lines.append, "/nowhere/monitor", http=http)
+        for _ in range(2):
+            with self.assertRaises(FetchError):
+                a.http.get("https://a.example/x")
+        b = Context("b", "/nowhere", dt.date(2026, 10, 5), self.lines.append, "/nowhere/monitor", http=http)
+        with self.assertRaises(FetchError):
+            b.http.get("https://b.example/x")
+        self.assertEqual(2, a.requests)
+        self.assertEqual(1, b.requests)
+        self.assertEqual(3, http.requests)
+
+    def test_keys_come_from_the_environment_or_the_file(self):
+        root = tempfile.mkdtemp("monitor-keys")
+        try:
+            ctx = Context("a", root, dt.date(2026, 10, 5), self.lines.append, root)
+            had = os.environ.pop("LPT_API_KEY", None)
+            try:
+                self.assertEqual({}, ctx.keys_env())
+                with open(os.path.join(root, "keys.env"), "w") as f:
+                    f.write("# a comment\nLPT_API_KEY = fromfile\n")
+                self.assertEqual("fromfile", ctx.keys_env()["LPT_API_KEY"])
+                os.environ["LPT_API_KEY"] = "fromenv"
+                self.assertEqual("fromenv", ctx.keys_env()["LPT_API_KEY"])
+            finally:
+                if had is None:
+                    os.environ.pop("LPT_API_KEY", None)
+                else:
+                    os.environ["LPT_API_KEY"] = had
+        finally:
+            shutil.rmtree(root)
+
+    def test_the_runtime_line_names_the_interpreter_and_tls(self):
+        self.assertIn("python 3.", runtime_line())
+        self.assertTrue("SSL" in runtime_line())
+
+
+class Writes(unittest.TestCase):
+    def test_write_atomic_leaves_no_temp_file(self):
+        root = tempfile.mkdtemp("monitor-atomic")
+        try:
+            path = os.path.join(root, "deep", "file.txt")
+            write_atomic(path, "one\n")
+            write_atomic(path, "two\n")
+            with open(path) as f:
+                self.assertEqual("two\n", f.read())
+            write_atomic(os.path.join(root, "b.bin"), b"\x00\x01")
+            with open(os.path.join(root, "b.bin"), "rb") as f:
+                self.assertEqual(b"\x00\x01", f.read())
+            self.assertEqual(["file.txt"], os.listdir(os.path.join(root, "deep")))
+        finally:
+            shutil.rmtree(root)
+
+    def test_add_all_skips_a_bad_cell_and_keeps_the_rest(self):
+        notes = []
+        ctx = Context("a", "/nowhere", dt.date(2026, 10, 5), lambda line: None, "/nowhere/monitor")
+        ctx.note = notes.append
+        t = Table("k", "n", None, None, "UTC", "XX", "F S D A M I")
+        added = add_all(ctx, t, {"2026-01-01": ["05:00", "06:30", "12:00", "15:00", "18:00", "19:30"],
+                                 "2026-01-02": ["5h00", "06:30", "12:00", "15:00", "18:00", "19:30"]}, "n")
+        self.assertEqual(1, added)
+        self.assertEqual(["2026-01-01"], sorted(t.rows))
+        self.assertEqual(1, len(notes))
+        self.assertIn("2026-01-02", notes[0])
+
+
+class Drivers(unittest.TestCase):
+    """fetch.py and backup.py end to end on a throwaway root, without a network."""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-driver")
+        os.makedirs(os.path.join(self.root, "archive"))
+        self.monitor = os.path.join(self.root, "monitor")
+        self.sources = os.path.join(self.root, "sources.tsv")
+        with open(self.sources, "w") as f:
+            f.write("source\tentries\tfetcher\tcadence\tnext_expected\tpoints\tnote\n")
+            f.write("ae-iacad\tae.iacad.dubai\tmanual\tmanual\t2027-01\tp\tn\n")
+            f.write("gb-london-lupt\tgb.london.lupt\tlondon\tmanual\t2026-12-01\tp\tn\n")
+            f.write("za-jamiat\tza.jamiat\tjamiat\tmonthly\t-\tp\tn\n")
+        self.had = os.environ.pop("LPT_API_KEY", None)
+
+    def tearDown(self):
+        shutil.rmtree(self.root)
+        if self.had is not None:
+            os.environ["LPT_API_KEY"] = self.had
+
+    def outcome(self):
+        with open(os.path.join(self.monitor, "fetch", "latest.json")) as f:
+            return json.load(f)
+
+    def test_named_manual_sources_are_skipped_not_failed_and_no_path_is_written(self):
+        code = fetch.main(["--official", self.root, "--sources", self.sources, "--today", "2026-10-05",
+                           "--only", "ae-iacad", "--only", "gb-london-lupt"])
+        self.assertEqual(0, code)
+        out = self.outcome()
+        self.assertEqual("2026-10-05", out["date"])
+        self.assertNotIn("official", out)
+        self.assertEqual({"status": "skipped", "message": "fetched by hand", "requests": 0, "tables": {}}, out["sources"]["ae-iacad"])
+        self.assertEqual("ok", out["sources"]["gb-london-lupt"]["status"])
+        self.assertEqual(0, out["sources"]["gb-london-lupt"]["requests"])
+        self.assertIn("no LPT_API_KEY", out["sources"]["gb-london-lupt"]["message"])
+        self.assertEqual("not selected", out["sources"]["za-jamiat"]["message"])
+        with open(os.path.join(self.monitor, "fetch", "2026-10-05.log")) as f:
+            self.assertIn("python 3.", f.readline())
+
+    def test_a_spent_budget_records_the_rest_as_not_fetched(self):
+        # No --force: the monthly source is due on its own (never fetched), the manual-cadence one is not run.
+        code = fetch.main(["--official", self.root, "--sources", self.sources, "--today", "2026-10-05", "--budget-minutes", "0.0000001"])
+        self.assertEqual(0, code)
+        out = self.outcome()
+        self.assertEqual("failed", out["sources"]["za-jamiat"]["status"])
+        self.assertIn("time budget", out["sources"]["za-jamiat"]["message"])
+        self.assertEqual("runs only when named", out["sources"]["gb-london-lupt"]["message"])
+
+    def test_a_broken_driver_writes_its_error_and_exits_2(self):
+        code = fetch.main(["--official", self.root, "--sources", os.path.join(self.root, "missing.tsv"), "--today", "2026-10-05"])
+        self.assertEqual(2, code)
+        out = self.outcome()
+        self.assertIn("FileNotFoundError", out["error"])
+        self.assertEqual({}, out["sources"])
+
+    def test_backup_mirrors_and_reports_a_missing_folder(self):
+        with open(os.path.join(self.root, "archive", "a.txt"), "w") as f:
+            f.write("x")
+        target = os.path.join(self.root, "backup")
+        code = backup.main(["--official", self.root, "--backup", target, "--today", "2026-10-05"])
+        self.assertEqual(2, code)
+        with open(os.path.join(self.monitor, "backup.json")) as f:
+            record = json.load(f)
+        self.assertEqual("2026-10-05", record["date"])
+        self.assertIn("no backup archive", record["error"])
+        os.makedirs(os.path.join(target, "archive"))
+        self.assertEqual(0, backup.main(["--official", self.root, "--backup", target, "--today", "2026-10-05"]))
+        with open(os.path.join(self.monitor, "backup.json")) as f:
+            record = json.load(f)
+        self.assertEqual(1, record["copied"])
+        self.assertNotIn("error", record)
+        self.assertEqual(2, backup.main(["--official", self.root, "--backup", "", "--today", "2026-10-05"]))
+        with open(os.path.join(self.monitor, "backup.json")) as f:
+            self.assertIn("no backup folder given", json.load(f)["error"])
+
+
+class MoreParsers(unittest.TestCase):
+    def test_kemenag_checks_the_place_name(self):
+        body = json.dumps({"status": True, "data": {"lokasi": "KOTA SURABAYA", "jadwal": [
+            {"date": "2026-10-01", "subuh": "04:00", "terbit": "05:15", "dzuhur": "11:30", "ashar": "14:45", "maghrib": "17:35", "isya": "18:45"}]}}).encode()
+        rows, lokasi = kemenag.parse(body, expected="Kota Surabaya")
+        self.assertEqual(["2026-10-01"], sorted(rows))
+        self.assertEqual("KOTA SURABAYA", lokasi)
+        self.assertEqual("KABJAYAWIJAYA", kemenag.fold("Kab. Jayawijaya"))
+        with self.assertRaises(FetchError) as caught:
+            kemenag.parse(body, expected="Kota Medan")
+        self.assertIn("KOTA SURABAYA", str(caught.exception))
+        self.assertNotIn("(new)", str([p[2] for p in kemenag.PLACES]))
+
+    def test_muis_records_skip_a_bad_cell_when_asked(self):
+        records = [{"Date": "2026-01-01", "Subuh": "5:44", "Syuruk": "7:07", "Zohor": "1:06", "Asar": "4:29", "Maghrib": "7:11", "Isyak": "8:26"},
+                   {"Date": "2026-01-02", "Subuh": "5h44", "Syuruk": "7:07", "Zohor": "1:06", "Asar": "4:29", "Maghrib": "7:11", "Isyak": "8:26"}]
+        with self.assertRaises(FetchError):
+            muis.parse_records(records)
+        bad = []
+        rows = muis.parse_records(records, bad)
+        self.assertEqual(["2026-01-01"], sorted(rows))
+        self.assertEqual(1, len(bad))
+
+    def test_london_month_needs_every_field(self):
+        good = json.dumps({"times": {"2027-01-01": {"fajr": "06:20", "sunrise": "08:06", "dhuhr": "12:07", "asr": "13:37", "magrib": "16:09", "isha": "17:40", "asr_2": "14:15"}}}).encode()
+        self.assertEqual(["06:20", "08:06", "12:07", "13:37", "16:09", "17:40", "14:15"], london.month_rows(good)["2027-01-01"])
+        missing = json.dumps({"times": {"2027-01-01": {"fajr": "06:20", "sunrise": "08:06", "dhuhr": "12:07", "asr": "13:37", "magrib": "16:09", "isha": "17:40"}}}).encode()
+        with self.assertRaises(FetchError) as caught:
+            london.month_rows(missing)
+        self.assertIn("no asr_2", str(caught.exception))
+
+    def test_irn_page_and_month(self):
+        page = ('<script>var prayerAjax = {"ajaxurl":"https://bonnetid.info/wp-admin/admin-ajax.php","nonce":"abc123"};</script>'
+                '<select name="city"><option value="1">Oslo</option><option value="7">Trondheim</option><option value="9">Tromsø</option></select>')
+        ajaxurl, nonce, cities = irn.page_config(page)
+        self.assertEqual("https://bonnetid.info/wp-admin/admin-ajax.php", ajaxurl)
+        self.assertEqual("abc123", nonce)
+        self.assertEqual({"oslo": "1", "trondheim": "7", "tromso": "9"}, cities)
+        month = json.dumps({"success": True, "data": {"html": "<h3>Januar 2027</h3><table>"
+                            "<tr><td>1</td><td>x</td><td>06:40</td><td>09:15</td><td>12:25</td><td>13:20</td><td>13:50</td><td>15:30</td><td>17:15</td></tr>"
+                            "<tr><td>2</td><td>x</td><td>06:39</td><td>09:14</td><td>12:26</td><td>13:21</td><td>13:52</td><td>15:32</td><td>17:16</td></tr></table>"}}).encode()
+        rows, year = irn.parse_month(month)
+        self.assertEqual("2027", year)
+        self.assertEqual([(1, ["06:40", "09:15", "12:25", "13:20", "15:30", "17:15", "13:50"]), (2, ["06:39", "09:14", "12:26", "13:21", "15:32", "17:16", "13:52"])], rows)
+        with self.assertRaises(FetchError):
+            irn.page_config("<html>nothing</html>")
+        self.assertNotIn("(new)", str([c[1] for c in diyanet.EUROPE]))

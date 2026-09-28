@@ -55,7 +55,10 @@ def fetch(ctx):
             except (FetchError, KeyError, ValueError) as e:
                 ctx.note(f"{name} {day}: no sunrise ({e})")
                 s = "-"
-            t.add(day, [f, s, d, a, m, isha])
+            try:
+                t.add(day, [f, s, d, a, m, isha])
+            except FetchError as e:
+                ctx.note(f"{name} {day}: {e}")
         if t.rows:
             tables.append(t)
     return tables
