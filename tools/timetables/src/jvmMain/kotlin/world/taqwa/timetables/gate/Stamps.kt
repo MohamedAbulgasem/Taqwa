@@ -119,11 +119,20 @@ object Stamps {
     }
 
     /** The core's sources, hashed with their paths (see the class comment). */
-    fun coreHash(repoRoot: File): String {
+    fun coreHash(repoRoot: File): String = hashSources(repoRoot, wholeEngine = false)
+
+    /**
+     * The whole engine hashed the same way, the authority files and their data included: what the
+     * monitor remembers each table was checked with, so that any engine or registry change has every
+     * held table checked again (one authority's change re-checks every table; that costs seconds).
+     */
+    fun wholeEngineHash(repoRoot: File): String = hashSources(repoRoot, wholeEngine = true)
+
+    private fun hashSources(repoRoot: File, wholeEngine: Boolean): String {
         val engine = repoRoot.resolve("shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine")
         val files = engine.walkTopDown().filter { it.isFile && it.extension == "kt" }.filter { file ->
             val path = file.relativeTo(engine).invariantSeparatorsPath
-            !path.startsWith("registry/authorities/") && (!path.startsWith("registry/data/") || path == "registry/data/UmmAlQuraDates.kt")
+            wholeEngine || (!path.startsWith("registry/authorities/") && (!path.startsWith("registry/data/") || path == "registry/data/UmmAlQuraDates.kt"))
         }.toList() + listOf(
             repoRoot.resolve("widgetcore/src/commonMain/kotlin/world/taqwa/app/domain/Prayer.kt"),
             repoRoot.resolve("shared/src/commonMain/kotlin/world/taqwa/app/hijri/TabularHijriCalendar.kt"),

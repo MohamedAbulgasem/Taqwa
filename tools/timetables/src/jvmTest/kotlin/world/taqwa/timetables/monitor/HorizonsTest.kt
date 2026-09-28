@@ -71,6 +71,22 @@ class HorizonsTest {
     }
 
     @Test
+    fun `a next-year rule keeps asking for the current year after the first of january`() {
+        // Review I1: proven through 2026 only, on 5 January 2027 the 2027 table is still wanted.
+        val lastYear = fresh.map { if (it.entryId == "gb.london.lupt" || it.entryId == "no.irn") it.copy(last = LocalDate(2026, 12, 31)) else it }
+        val items = Horizons.check(LocalDate(2027, 1, 5), lastYear, uqLast, changes)
+        assertEquals(1, items.count { "London" in it.title }, items.toString())
+        assertEquals(1, items.count { "IRN" in it.title }, items.toString())
+        assertTrue(items.first { "London" in it.title }.details.any { "a proof through 2027-12-31" in it }, items.toString())
+        // Proven through 2027: quiet until 1 December 2027, when 2028 is wanted.
+        assertTrue(Horizons.check(LocalDate(2027, 1, 5), fresh, uqLast, changes).none { "London" in it.title || "IRN" in it.title })
+        assertTrue(Horizons.check(LocalDate(2027, 11, 30), fresh, uqLast, changes).none { "London" in it.title })
+        val december = Horizons.check(LocalDate(2027, 12, 1), fresh, uqLast, changes)
+        assertEquals(1, december.count { "London" in it.title }, december.toString())
+        assertTrue(december.first { "London" in it.title }.details.any { "a proof through 2028-12-31" in it }, december.toString())
+    }
+
+    @Test
     fun `a missing stamp for a next-year rule is reported too`() {
         val stamps = fresh.filter { it.entryId != "gb.london.lupt" }
         assertEquals(1, Horizons.check(LocalDate(2026, 12, 15), stamps, uqLast, changes).count { "London" in it.title })

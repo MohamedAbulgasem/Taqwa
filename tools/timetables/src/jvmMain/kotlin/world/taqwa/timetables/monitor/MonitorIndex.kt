@@ -3,19 +3,22 @@ package world.taqwa.timetables.monitor
 import kotlinx.datetime.LocalDate
 import world.taqwa.timetables.Json
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 /**
  * One table the fetchers hold (`archive/tables/monitor/index.tsv`, written by
- * `tools/timetables/monitor/fetch.py` on every run, never committed): where it is, the point and
- * clock it applies to, how the gate reads it, and whether this run found it new, changed or
- * unchanged. The fetchers carry every field from their own metadata (derived parameters: ids,
- * points, zones, column layouts), never a printed time.
+ * `tools/timetables/monitor/fetch.py` when it changes, never committed): where it is, the point and
+ * clock it applies to, how the gate reads it, and its content hash. The fetchers carry every field
+ * from their own metadata (derived parameters: ids, points, zones, column layouts), never a printed
+ * time. Whether a table is new, changed, or checked with an engine that changed is not the index's
+ * to say: the monitor remembers the signature each table was last checked with ([MonitorState]).
  *
  * - [entry]: the registry entry the table is a table of, `id` or `id/unit` (a unit named checks at
  *   the unit's own point, like a gate row with lat and lon empty); null for a mosque calendar.
  * - [survey]: for a mosque calendar, the `official/survey/<folder>` whose faults and outliers
  *   cover it ([Surveys]); the calendar's id is [key].
- * - [status]: `new`, `changed`, `unchanged` (this run), or `held` (not fetched this run).
+ * - [fetched]: the date the content last changed.
  */
 data class MonitorTable(
     val source: String,
@@ -33,18 +36,20 @@ data class MonitorTable(
     val format: String,
     val school: String,
     val hash: String,
-    val status: String,
     val fetched: String,
     val note: String,
 ) {
     val id: String get() = "$source/$key"
-    val isNewOrChanged: Boolean get() = status == "new" || status == "changed"
+
+    /** Everything the check depends on but the engine: the content and how it is read. */
+    val metadata: String
+        get() = listOf(hash, path, lat, lon, zone, clock, cc, entry, survey, columns, format, school).joinToString("|")
 }
 
 object MonitorIndex {
     val HEADER = listOf(
         "source", "key", "path", "name", "lat", "lon", "zone", "clock", "cc", "entry", "survey", "columns", "format", "school",
-        "hash", "status", "fetched", "note",
+        "hash", "fetched", "note",
     )
 
     fun load(file: File): List<MonitorTable> = if (file.isFile) parse(file.readText()) else emptyList()
@@ -64,7 +69,7 @@ object MonitorIndex {
                 lat = opt("lat")?.toDouble(), lon = opt("lon")?.toDouble(), zone = row.getValue("zone"), clock = opt("clock"),
                 cc = row.getValue("cc"), entry = opt("entry"), survey = opt("survey"), columns = row.getValue("columns"),
                 format = row.getValue("format"), school = row.getValue("school"), hash = row.getValue("hash"),
-                status = row.getValue("status"), fetched = row.getValue("fetched"), note = row.getValue("note"),
+                fetched = row.getValue("fetched"), note = row.getValue("note"),
             )
         }
     }
@@ -73,8 +78,11 @@ object MonitorIndex {
 /** One source's run in the fetch log (`monitor/fetch/latest.json`): `ok`, `partial`, `failed` or `skipped`. */
 data class SourceRun(val source: String, val status: String, val message: String, val requests: Int, val tables: Map<String, String>)
 
-/** The fetch log `fetch.py` writes: the date it ran and each source's outcome. */
-data class FetchLog(val date: LocalDate, val sources: List<SourceRun>) {
+/**
+ * The fetch log `fetch.py` writes: the date it ran, each source's outcome, and [error] when the
+ * driver itself broke (then the sources are whatever it got to).
+ */
+data class FetchLog(val date: LocalDate, val sources: List<SourceRun>, val error: String? = null) {
     companion object {
         fun load(file: File): FetchLog? {
             if (!file.isFile) return null
@@ -90,7 +98,7 @@ data class FetchLog(val date: LocalDate, val sources: List<SourceRun>) {
                     (run["tables"] as? Map<String, Any?>).orEmpty().mapValues { it.value as? String ?: "" },
                 )
             }
-            return FetchLog(LocalDate.parse(root["date"] as String), sources)
+            return FetchLog(LocalDate.parse(root["date"] as String), sources, root["error"] as? String)
         }
     }
 }
@@ -110,7 +118,8 @@ data class Source(
     val points: String,
     val note: String,
 ) {
-    val manual: Boolean get() = fetcher == "manual"
+    /** Read by hand, or run only when named (`fetch.py` treats either field the same way). */
+    val manual: Boolean get() = fetcher == "manual" || cadence == "manual"
 
     companion object {
         val HEADER = listOf("source", "entries", "fetcher", "cadence", "next_expected", "points", "note")
@@ -141,7 +150,25 @@ data class Source(
     }
 }
 
-/** What the monitor remembers between runs (`monitor/state.json`): the last backup reminder's date. */
+/** Own-table lateness over the limit, as first raised: since when, over how many cells, and the worst minutes. */
+data class Lateness(val since: LocalDate, val days: Int, val worst: Int)
+
+/**
+ * What the monitor remembers of one table: the [signature] it was last checked with (content,
+ * metadata and the engine), its content [hash], the [date], whether it was [red] (checked again
+ * next run whatever changed) and its open [lateness].
+ */
+data class CheckRecord(val signature: String, val hash: String, val date: LocalDate, val red: Boolean, val lateness: Lateness?)
+
+/** A tier-1 item as last notified: its failing days and worst minutes (more of either is news). */
+data class Notified(val days: Int, val worst: Int)
+
+/**
+ * What the monitor remembers between runs (`monitor/state.json`): each table's check record
+ * ([checked]), the attention set last notified ([notified]), the last backup reminder's date and
+ * the last run's outcome. Paths in it are relative to the archive root, so the same state serves
+ * the owner's Mac and the cloud runner. Written atomically.
+ */
 class MonitorState(private val file: File) {
     private val values: MutableMap<String, Any?> = if (file.isFile) {
         @Suppress("UNCHECKED_CAST")
@@ -156,11 +183,39 @@ class MonitorState(private val file: File) {
             values["lastReminder"] = value?.toString()
         }
 
-    /** The tables whose check needed attention last run: checked again, changed or not, until green. */
-    var redTables: Set<String>
-        get() = (values["redTables"] as? List<*>).orEmpty().mapNotNull { it as? String }.toSet()
+    val checked: MutableMap<String, CheckRecord> = run {
+        val out = linkedMapOf<String, CheckRecord>()
+        @Suppress("UNCHECKED_CAST")
+        for ((id, v) in (values["checked"] as? Map<String, Any?>).orEmpty()) {
+            val r = v as? Map<String, Any?> ?: continue
+            @Suppress("UNCHECKED_CAST")
+            val late = (r["lateness"] as? Map<String, Any?>)?.let {
+                Lateness(LocalDate.parse(it["since"] as String), (it["days"] as? Long ?: 0L).toInt(), (it["worst"] as? Long ?: 0L).toInt())
+            }
+            out[id] = CheckRecord(
+                r["signature"] as? String ?: "", r["hash"] as? String ?: "", LocalDate.parse(r["date"] as String),
+                r["red"] as? Boolean ?: false, late,
+            )
+        }
+        // The first monitor's state named the red tables alone: they are checked again, like any table
+        // whose signature is not remembered.
+        for (id in (values["redTables"] as? List<*>).orEmpty().mapNotNull { it as? String }) {
+            if (id !in out) out[id] = CheckRecord("", "", LocalDate(1970, 1, 1), red = true, lateness = null)
+        }
+        values.remove("redTables")
+        out
+    }
+
+    var notified: Map<String, Notified>
+        get() {
+            @Suppress("UNCHECKED_CAST")
+            return (values["notified"] as? Map<String, Any?>).orEmpty().mapValues { (_, v) ->
+                val m = v as? Map<String, Any?>
+                Notified((m?.get("days") as? Long ?: 0L).toInt(), (m?.get("worst") as? Long ?: 0L).toInt())
+            }
+        }
         set(value) {
-            values["redTables"] = value.sorted()
+            values["notified"] = value.toSortedMap().mapValues { (_, n) -> linkedMapOf("days" to n.days, "worst" to n.worst) }
         }
 
     fun note(key: String, value: Any?) {
@@ -168,13 +223,42 @@ class MonitorState(private val file: File) {
     }
 
     fun save() {
-        file.parentFile.mkdirs()
-        file.writeText(Json.pretty(values))
+        values["checked"] = checked.toSortedMap().mapValues { (_, r) ->
+            linkedMapOf<String, Any?>(
+                "signature" to r.signature, "hash" to r.hash, "date" to r.date.toString(), "red" to r.red,
+                "lateness" to r.lateness?.let { linkedMapOf("since" to it.since.toString(), "days" to it.days, "worst" to it.worst) },
+            ).filterValues { it != null }
+        }
+        writeAtomic(file, Json.pretty(values))
     }
 }
 
-/** What `backup.py` wrote (`monitor/backup.json`): how many files it mirrored and the newest file's date. */
-data class BackupRun(val date: LocalDate, val copied: Int, val total: Int, val newest: LocalDate?, val target: String) {
+/** Writes [text] to [file] through a sibling temp file and an atomic move, so a kill mid-write leaves the old file. */
+fun writeAtomic(file: File, text: String) {
+    file.absoluteFile.parentFile.mkdirs()
+    val tmp = File(file.absoluteFile.parentFile, ".${file.name}.tmp")
+    tmp.writeText(text)
+    try {
+        Files.move(tmp.toPath(), file.absoluteFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
+    } catch (_: java.nio.file.AtomicMoveNotSupportedException) {
+        Files.move(tmp.toPath(), file.absoluteFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    }
+}
+
+/**
+ * What the backup step wrote (`monitor/backup.json`): how many files `backup.py` mirrored and the
+ * newest file's date; or [error] when the mirror was configured and did not run; or [skipped]
+ * when no mirror is configured (the private repository is the backup, ruling R94).
+ */
+data class BackupRun(
+    val date: LocalDate,
+    val copied: Int,
+    val total: Int,
+    val newest: LocalDate?,
+    val target: String,
+    val error: String? = null,
+    val skipped: String? = null,
+) {
     companion object {
         fun load(file: File): BackupRun? {
             if (!file.isFile) return null
@@ -183,6 +267,7 @@ data class BackupRun(val date: LocalDate, val copied: Int, val total: Int, val n
             return BackupRun(
                 LocalDate.parse(root["date"] as String), (root["copied"] as? Long ?: 0L).toInt(), (root["total"] as? Long ?: 0L).toInt(),
                 (root["newest"] as? String)?.take(10)?.let(LocalDate::parse), root["target"] as? String ?: "",
+                root["error"] as? String, root["skipped"] as? String,
             )
         }
     }

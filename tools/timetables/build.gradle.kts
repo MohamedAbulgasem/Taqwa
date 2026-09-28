@@ -254,12 +254,23 @@ tasks.register<JavaExec>("gate") {
  *         [-Ponly=a,b] [-PcheckAll=true] [-PskipFull=true]
  *
  * The exit code is the report's (0 green, 1 attention), read by the shell from `last-run.json`, so
- * a red report is not a failed build here. Needs the archive, like the gate.
+ * a red report is not a failed build here. Needs the archive, like the gate, and an explicit root:
+ * without `-Pofficial` or `TAQWA_OFFICIAL` the state and the reports (which quote dates and minutes
+ * from restricted tables) would land in this checkout's `tools/timetables/official/monitor/`.
  */
 tasks.register<JavaExec>("monitor") {
     group = "verification"
     description = "Checks the fetched tables, the gate, the surveys and the horizons, and writes the monitor's report."
     requireArchive()
+    val explicit = explicitOfficial.isPresent
+    doFirst {
+        if (!explicit) {
+            throw GradleException(
+                "The monitor needs its root named: pass -Pofficial=<root> or set TAQWA_OFFICIAL (the folder that holds archive/ and " +
+                    "monitor/), never this checkout's own tools/timetables/official.",
+            )
+        }
+    }
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.monitor.MonitorMainKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })

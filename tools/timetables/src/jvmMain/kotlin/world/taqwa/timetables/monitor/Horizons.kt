@@ -101,6 +101,7 @@ object Horizons {
                 "fetch GetPrayerByYear for the years after $uqLast (the sa-ummalqura fetcher's raw JSON holds the Hijri month of every " +
                     "day), regenerate UmmAlQuraDates (Ramadan dates: Hijri month 9; lag dates: rows equal to the day before at every point), " +
                     "run the gate on the new years and commit.",
+                key = "horizon:ummalqura-dates",
             )
         }
 
@@ -112,22 +113,26 @@ object Horizons {
                     listOf("ClockChanges.table stops checking phones' zone data for ${change.zones.joinToString()} on that date."),
                     "decide whether the entry is still needed (is old zone data still around?) and either extend `until` or leave it to expire; " +
                         "check tzdata for any new change to add.",
+                    key = "horizon:clock-change:${change.id}",
                 )
             }
         }
 
         for (rule in rules) {
+            // The current year is always wanted; from the rule's date the next one too (review I1: a
+            // rule that only asked for next year went silent every 1 January).
             val from = LocalDate(today.year, rule.fromMonth, rule.fromDay)
-            if (today < from) continue
-            val needed = LocalDate(today.year + 1, 12, 31)
+            val needed = if (today >= from) LocalDate(today.year + 1, 12, 31) else LocalDate(today.year, 12, 31)
+            val wantedBy = if (today >= from) from else LocalDate(today.year - 1, rule.fromMonth, rule.fromDay)
             val stamp = byId[rule.entryId]
             val last = stamp?.last
             if (last == null || last < needed) {
                 items += Item(
                     Kind.HORIZON,
                     "${rule.what} is not held (${rule.entryId}${if (last == null) " has no stamp" else " is proven through $last"})",
-                    listOf("Wanted by $from: a proof through $needed."),
+                    listOf("Wanted by $wantedBy: a proof through $needed."),
                     rule.fix,
+                    key = "horizon:${rule.entryId}:next-year",
                 )
             }
         }
@@ -144,6 +149,7 @@ object Horizons {
                     "fetch the authority's newest table (add a fetcher if it has none), add gate rows and re-run the gate; " +
                         "where the authority prints one table a year, list it as a manual source in sources.tsv naming this entry, " +
                         "with next_expected the month it is due: this line then waits for that date.",
+                    key = "horizon:stale:${stamp.entryId}",
                 )
             }
         }
@@ -164,6 +170,7 @@ object Horizons {
                     "the Ramadan release refuses to build unless every A/B entry's proof covers Ramadan or the gate has demoted it (spec §5): " +
                         "fetch each authority's table for those dates (most publish the Ramadan imsakiya a few weeks before), add gate rows " +
                         "(split test) and re-run the gate.",
+                    key = "horizon:ramadan:$ramadan",
                 )
             }
         }
