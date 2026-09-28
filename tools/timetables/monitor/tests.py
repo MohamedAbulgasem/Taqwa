@@ -215,17 +215,17 @@ class Parsers(unittest.TestCase):
     def test_qatar(self):
         body = json.dumps({"gregorianDate": {"year": 2026, "month": 9, "day": 28},
                            "times": [{"prayerTimeName": n, "time": {"hour": h, "minutes": m}} for n, h, m in
-                                     [("Fajr", 4, 8), ("Sunrise", 5, 25), ("Jummah", 11, 27), ("Asr", 14, 52), ("Maghrib", 17, 30), ("Isha", 19, 0)]]}).encode()
+                                     [("Fajr", 4, 12), ("Sunrise", 5, 31), ("Jummah", 11, 33), ("Asr", 14, 58), ("Maghrib", 17, 36), ("Isha", 19, 6)]]}).encode()
         date, vals = qatar.ministry_day(body)
         self.assertEqual("2026-09-28", date)
-        self.assertEqual(["04:08", "05:25", "11:27", "14:52", "17:30", "19:00"], vals)
-        self.assertEqual("11:28", qatar.plus_minute("11:27"))
+        self.assertEqual(["04:12", "05:31", "11:33", "14:58", "17:36", "19:06"], vals)
+        self.assertEqual("11:34", qatar.plus_minute("11:33"))
         self.assertEqual("12:00", qatar.plus_minute("11:59"))
-        page = ('<script>var prayData = [{"cityId":7,"fajr":"4:01","shrouq":"5:20","thahr":"11:20","aser":"2:45","moghreb":"5:25","ishaa":"6:55"},'
-                '{"cityId":3,"fajr":"4:08","shrouq":"5:25","thahr":"11:27","aser":"2:52","moghreb":"5:30","ishaa":"7:00"}];'
+        page = ('<script>var prayData = [{"cityId":7,"fajr":"4:05","shrouq":"5:26","thahr":"11:26","aser":"2:51","moghreb":"5:31","ishaa":"7:01"},'
+                '{"cityId":3,"fajr":"4:12","shrouq":"5:31","thahr":"11:33","aser":"2:58","moghreb":"5:36","ishaa":"7:06"}];'
                 'var calData = {"year":"1448","days":[{"month":4,"days":[{"h":"١٦","m":"28","today":true}]}]};</script>')
         date, vals = qatar.header(page, dt.date(2026, 9, 28))
-        self.assertEqual(["04:08", "05:25", "11:27", "14:52", "17:30", "19:00"], vals)
+        self.assertEqual(["04:12", "05:31", "11:33", "14:58", "17:36", "19:06"], vals)
         self.assertEqual(10, len(date))
 
 
