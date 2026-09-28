@@ -35,16 +35,34 @@ import world.taqwa.app.prayer.engine.registry.widened
  * every other place to cover the tightest one (Kota Jakarta's own sunrise had 0 s of slack left
  * under the shared margin fitted to Bukittinggi's wider swing; each place now keeps its own).
  *
- * Units are the 13 fitted kab/kota. Kota Jakarta's own core reaches about 15 km with its checked
- * −1° horizon; beyond it, out to R40's reach for class B (about 55 km), a reach unit keeps its point
- * with the deepest plausible −2° horizon and claims nothing (ruling R46; the circle takes in western
- * Kota Bekasi, Pondok Gede — ruled, not revisited here). Elsewhere (class D, spec §6.3: Maghrib and
- * sunrise about 4 min off until slice 3 fits every kab/kota) the highland horizon −2° (the deepest
- * plausible, brief) and 2 min more for a capital up to half a degree away (Merauke's west edge is
- * 6 min off; slice 3).
+ * Units are the 18 fitted kab/kota: the 13 of the research round and, since the monitor round of
+ * 29 Sep 2026, Kota Medan, Palembang, Semarang, Surabaya and Yogyakarta, whose tables the weekly
+ * monitor first held on 28 Sep 2026 (Sep–Oct 2026, 61 days each): at all five the printed sunrise
+ * and Maghrib sit where a −1° horizon puts them, to the rounding minute, and about 4 min from where
+ * −2° would. Their margins are their own two-month fit plus [TWO_MONTH_ALLOWANCE]. Kota Jakarta's
+ * own core reaches about 15 km with its checked −1° horizon; beyond it, out to R40's reach for
+ * class B (about 55 km), a reach unit keeps its point with the deepest plausible −2° horizon and
+ * claims nothing (ruling R46; the circle takes in western Kota Bekasi, Pondok Gede — ruled, not
+ * revisited here). Elsewhere (class D, spec §6.3) the highland horizon −2° (the deepest plausible,
+ * brief) and 2 min more for a capital up to half a degree away. At a lowland kab/kota that edge
+ * puts sunrise 6–7 min before Kemenag's and Maghrib 6–7 min after (about 4 min the horizon, 2 the
+ * capital's unknown point, the rest the margins and the rounding), as the monitor measured at the
+ * five kota before they were fitted; it stays, since a kab/kota's horizon class cannot be told
+ * without its own table (Malang, 450 m up, is −1°; Bogor, 260 m, is −2°).
  */
 object Kemenag {
     private val ihtiyat = EventOffsets(fajr = 2, sunrise = -2, dhuhr = 2, asr = 2, maghrib = 2, isha = 2)
+
+    /**
+     * What a fit over September–October alone misses, in seconds: at each of the 13 kab/kota fitted
+     * over the whole of 2026, the fit over its Sep–Oct 2026 capture alone against its full-year fit
+     * (the same fitter, the same safety) — the seasonal drift of each event and Kemenag's 21–22 March
+     * days, which run 20–30 s later than its own pattern at 9 of the 13 — at most 24 s on Fajr, 6 on
+     * sunrise, 15 on Dhuhr, 6 on Asr and 32 on Maghrib and Isha, plus the fitter's 5 s safety once
+     * more for a place that may run a little past the worst of the 13 (Palembang's September-only
+     * Maghrib fit was a minute early on one October day).
+     */
+    private val TWO_MONTH_ALLOWANCE = EventOffsets(fajr = 29, sunrise = -11, dhuhr = 20, asr = 11, maghrib = 37, isha = 37)
 
     val method = TimetableMethod(
         id = "id.kemenag",
@@ -85,6 +103,24 @@ object Kemenag {
         Kabkota("1222", "Kota Bogor", -6.59444, 106.78917, highland = true, radiusKm = 10.0, m(12, -5, 80, 26, 13, 18)),
         Kabkota("1208", "Kab. Garut", -7.245, 107.921, highland = true, radiusKm = 25.0, m(14, -5, 74, 27, 15, 15)),
         Kabkota("1429", "Kab. Wonosobo", -7.35889, 109.90306, highland = true, radiusKm = 20.0, m(8, -9, 69, 18, 11, 9)),
+        // Monitor round (29 Sep 2026): five more lowland kota, each its own Sep–Oct 2026 fit plus
+        // [TWO_MONTH_ALLOWANCE] (see the class KDoc).
+        Kabkota("0228", "Kota Medan", 3.58333, 98.66667, highland = false, radiusKm = 12.0, twoMonths(1, -11, 61, 5, 2, 1)),
+        Kabkota("0816", "Kota Palembang", -2.91673, 104.7458, highland = false, radiusKm = 12.0, twoMonths(4, -9, 62, 12, 6, 5)),
+        Kabkota("1433", "Kota Semarang", -6.99306, 110.42083, highland = false, radiusKm = 12.0, twoMonths(1, -13, 62, 12, -2, 2)),
+        Kabkota("1638", "Kota Surabaya", -7.24917, 112.75083, highland = false, radiusKm = 12.0, twoMonths(15, 1, 75, 36, 17, 18)),
+        Kabkota("1505", "Kota Yogyakarta", -7.80139, 110.36472, highland = false, radiusKm = 8.0, twoMonths(3, -8, 65, 16, 3, 5)),
+    )
+
+    /**
+     * A kota fitted on two months (`Fitter.fit`, safety 5 s, over the monitor's Sep–Oct 2026 capture)
+     * takes its own fit plus [TWO_MONTH_ALLOWANCE] on every event: the terms two months near the
+     * equinox cannot see (monitor round, 29 Sep 2026).
+     */
+    private fun twoMonths(fajr: Int, sunrise: Int, dhuhr: Int, asr: Int, maghrib: Int, isha: Int) = EventOffsets(
+        fajr = fajr + TWO_MONTH_ALLOWANCE.fajr, sunrise = sunrise + TWO_MONTH_ALLOWANCE.sunrise,
+        dhuhr = dhuhr + TWO_MONTH_ALLOWANCE.dhuhr, asr = asr + TWO_MONTH_ALLOWANCE.asr,
+        maghrib = maghrib + TWO_MONTH_ALLOWANCE.maghrib, isha = isha + TWO_MONTH_ALLOWANCE.isha,
     )
 
     private fun unitsFor(base: TimetableMethod, idPrefix: String) = fitted.map { k ->

@@ -202,6 +202,38 @@ class RegistryTest {
     }
 
     @Test
+    fun `medan palembang semarang surabaya and yogyakarta are fitted kemenag kota at the lowland horizon`() {
+        // Monitor round (29 Sep 2026): five more kota at the app's own points, each carrying its point as the fixed point.
+        val kota = listOf(
+            Triple("Kota Medan", 3.58333, 98.66667),
+            Triple("Kota Palembang", -2.91673, 104.7458),
+            Triple("Kota Semarang", -6.99306, 110.42083),
+            Triple("Kota Surabaya", -7.24917, 112.75083),
+            Triple("Kota Yogyakarta", -7.80139, 110.36472),
+        )
+        for ((name, lat, lon) in kota) {
+            val r = resolve(lat, lon, "Asia/Jakarta", "ID")
+            assertEquals("id.kemenag", r.entry.id)
+            assertEquals(name, r.unitName)
+            assertEquals(EntryClass.B, r.entryClass)
+            assertTrue(r.measured, name)
+            val method = assertNotNull(r.method)
+            near(-1.0, method.horizonDeg, "$name horizon")
+            assertEquals(GeoPoint(lat, lon), method.fixedPoint, name)
+            // A two-month fit carries the allowance the 13 full years show: never tighter than the entry's own sunrise margin.
+            assertTrue(method.margins.sunrise <= Registry.byId("id.kemenag")!!.method!!.margins.sunrise, "$name sunrise margin ${method.margins.sunrise}")
+            // Muhammadiyah's units are Kemenag's, so the five are its too.
+            assertEquals(name, Registry.resolveEntry(Registry.byId("id.muhammadiyah")!!, Place(lat, lon, "Asia/Jakarta", "ID")).unitName)
+        }
+        // Beyond a kota's radius the edge keeps the deepest plausible horizon and claims nothing: Belawan, Medan's port, 22 km north.
+        val belawan = resolve(3.78, 98.68, "Asia/Jakarta", "ID")
+        assertNull(belawan.unitName)
+        near(-2.0, assertNotNull(belawan.method).horizonDeg, "edge horizon")
+        assertFalse(belawan.measured)
+        assertEquals(EntryClass.D_AUTHORITY, belawan.entryClass)
+    }
+
+    @Test
     fun `london inside the m25 follows london unified alone`() {
         val r = resolve(51.5074, -0.1278, "Europe/London", "GB")
         assertEquals("gb.london.lupt", r.entry.id)
