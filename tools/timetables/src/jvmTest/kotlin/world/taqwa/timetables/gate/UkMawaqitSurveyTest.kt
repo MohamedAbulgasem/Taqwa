@@ -16,9 +16,11 @@ import kotlin.test.fail
  */
 class UkMawaqitSurveyTest {
 
-    private val dir = TestPaths.repoRoot.resolve("tools/timetables/official/survey/gb-cautious")
+    private val officialDir = TestPaths.repoRoot.resolve("tools/timetables/official")
+    private val dir = officialDir.resolve("survey/gb-cautious")
 
-    private fun survey() = Survey.load(dir, entryId = "gb.cautious", zoneId = "Europe/London", countryCode = "GB")
+    /** The survey as the monitor runs it too ([Surveys]): one list, so a survey added here runs weekly. */
+    private fun survey() = requireNotNull(Surveys.named("gb-cautious")) { "gb-cautious is not in Surveys.all" }.load(officialDir)
 
     @Test
     fun `gb cautious is never early and never late against the uk mawaqit calendars but for its recorded outliers`() {

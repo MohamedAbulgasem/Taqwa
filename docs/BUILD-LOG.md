@@ -1823,3 +1823,23 @@ place before R90), no Fajr before a member's own Fajr or real dawn.
 
 Tested by the owner on 28 September 2026 (Cape Town and London checked against published sources:
 nothing early) and squashed into main as one commit; the weekly monitor follows.
+
+### The weekly monitor (28 September 2026)
+
+`scripts/monitor.sh` (docs/MONITOR.md): fourteen polite fetchers bring each authority's newest
+table into the restricted archive, each new or changed table goes through the gate at its own
+point, then the whole gate and the six surveys, the data horizons and the manual sources' due
+dates; the archive is mirrored into its backup; a report under the archive root's `monitor/`
+folder, silent (exit 0) when all is well.
+
+### The monitor's fix round, and the cloud (29 September 2026)
+
+After its review (8 important, 15 minor findings) the monitor classifies each finding line on its
+own (ruling R93): never-early failures first on every run, own-table lateness raised once and
+carried, member-row lateness and unchecked capped Maghribs for the record; a table is also checked
+as the member of the cautious entry Automatic follows at its point; each table's check signature
+(content, metadata, the whole engine) is remembered, so nothing is skipped for good and an engine
+change re-checks everything; a key never reaches a log; a breaker per host and a budget per run;
+one lock, one `today`, atomic writes. It now runs weekly on GitHub Actions in a private archive
+repository (ruling R94; `tools/timetables/monitor/ci/monitor-weekly.yml`, docs/MONITOR.md), keeping
+one issue open while something needs attention; IRN is fetched on its own (ruling R95).

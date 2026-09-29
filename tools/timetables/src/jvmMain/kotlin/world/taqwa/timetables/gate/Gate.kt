@@ -400,6 +400,10 @@ class EventStats {
     val broken = mutableListOf<String>()
     val overLimit = mutableListOf<String>()
 
+    /** The most minutes an early start or a late end reached, and every date one fell on (the monitor's figures). */
+    var worstEarly = 0
+    val brokenDates = sortedSetOf<LocalDate>()
+
     val exact: Double get() = if (checked == 0) 0.0 else late[0].toDouble() / checked
 }
 
@@ -431,6 +435,10 @@ class EntryStats(val entry: RegistryEntry) {
     var maghribUnchecked = 0
         private set
     val maghribUncheckedSamples = mutableListOf<String>()
+
+    /** The most-followed member whose table was missing on the unchecked days (the monitor names it). */
+    var maghribUncheckedMember: String? = null
+        private set
     var first: LocalDate? = null
         private set
     var last: LocalDate? = null
@@ -438,11 +446,20 @@ class EntryStats(val entry: RegistryEntry) {
 
     val placeDayCount: Int get() = placeDays.size
 
+    /** Every date checked, whatever the point (a one-row manifest's coverage; the monitor names the holes). */
+    val dates: Set<LocalDate> get() = placeDays.mapTo(sortedSetOf()) { LocalDate.parse(it.substringAfter('|')) }
+
     /**
      * Early starts, late ends, cells over the limit, days out of order and cautious Maghribs that
      * could not be checked: 0 when the entry is green.
      */
     val broken: Int get() = events.values.sumOf { it.early + it.lateEnd + it.over } + outOfOrder + maghribUnchecked
+
+    /** Early starts, late ends and days out of order: the promise itself, never excused. */
+    val neverEarlyBroken: Int get() = events.values.sumOf { it.early + it.lateEnd } + outOfOrder
+
+    /** Cells over the late limit. */
+    val overLimit: Int get() = events.values.sumOf { it.over }
 
     internal fun maghribGap(member: String, minutes: Int, capped: Boolean) {
         maghribGaps.getOrPut(member) { MaghribGap() }.add(minutes, capped)
@@ -450,6 +467,7 @@ class EntryStats(val entry: RegistryEntry) {
 
     internal fun maghribUnchecked(o: Observation, mostFollowed: String) {
         maghribUnchecked++
+        maghribUncheckedMember = mostFollowed
         if (maghribUncheckedSamples.size < SAMPLES) {
             maghribUncheckedSamples += "${o.date}: members spread beyond the agreement and $mostFollowed's table is not held (${o.row.path})"
         }
@@ -505,6 +523,8 @@ class EntryStats(val entry: RegistryEntry) {
         val safe = if (o.event.isStart) seconds else -seconds
         if (safe < 0) {
             if (o.event.isStart) e.early++ else e.lateEnd++
+            e.worstEarly = maxOf(e.worstEarly, (-safe / 60).toInt())
+            e.brokenDates += o.date
             sample(e.broken, o, if (o.event.isStart) "${-safe / 60} min early" else "${-safe / 60} min late (an end)")
             return
         }
@@ -579,22 +599,33 @@ class GateResult(
 ) {
     val placeDays: Int get() = entries.values.sumOf { it.placeDayCount }
 
-    /** Every broken promise: early starts, late ends, lateness over the limit, days out of order. */
-    fun violations(): List<String> = entries.values.flatMap { s ->
-        s.events.flatMap { (event, e) ->
-            fun lines(samples: List<String>) = samples.joinToString("") { "\n    $it" }
-            listOfNotNull(
-                ("${s.entry.id} ${event.key}: ${e.early} early" + lines(e.broken)).takeIf { e.early > 0 },
-                ("${s.entry.id} ${event.key}: ${e.lateEnd} late ends" + lines(e.broken)).takeIf { e.lateEnd > 0 },
-                ("${s.entry.id} ${event.key}: ${e.over} over the late limit" + lines(e.overLimit)).takeIf { e.over > 0 },
-            )
-        } + listOfNotNull(
-            "${s.entry.id}: ${s.outOfOrder} days out of order${s.outOfOrderSamples.joinToString("") { "\n    $it" }}"
-                .takeIf { s.outOfOrder > 0 },
-            "${s.entry.id} maghrib: ${s.maghribUnchecked} capped days unchecked${s.maghribUncheckedSamples.joinToString("") { "\n    $it" }}"
-                .takeIf { s.maghribUnchecked > 0 },
+    /**
+     * Every broken promise: early starts, late ends and days out of order ([neverEarly]), lateness
+     * over the limit ([overLimit]) and cautious Maghribs left unchecked ([unchecked]), in that order.
+     */
+    fun violations(): List<String> = entries.values.flatMap { s -> neverEarly(s) + overLimit(s) + unchecked(s) }
+
+    /** The promise itself, for one entry: early starts, late ends, days out of order (never excused). */
+    fun neverEarly(s: EntryStats): List<String> = s.events.flatMap { (event, e) ->
+        listOfNotNull(
+            ("${s.entry.id} ${event.key}: ${e.early} early" + lines(e.broken)).takeIf { e.early > 0 },
+            ("${s.entry.id} ${event.key}: ${e.lateEnd} late ends" + lines(e.broken)).takeIf { e.lateEnd > 0 },
         )
+    } + listOfNotNull(
+        "${s.entry.id}: ${s.outOfOrder} days out of order${lines(s.outOfOrderSamples)}".takeIf { s.outOfOrder > 0 },
+    )
+
+    /** Lateness over the recorded limit, for one entry. */
+    fun overLimit(s: EntryStats): List<String> = s.events.mapNotNull { (event, e) ->
+        ("${s.entry.id} ${event.key}: ${e.over} over the late limit" + lines(e.overLimit)).takeIf { e.over > 0 }
     }
+
+    /** Capped Maghribs left unchecked (the most-followed member's table not held), for one entry. */
+    fun unchecked(s: EntryStats): List<String> = listOfNotNull(
+        "${s.entry.id} maghrib: ${s.maghribUnchecked} capped days unchecked${lines(s.maghribUncheckedSamples)}".takeIf { s.maghribUnchecked > 0 },
+    )
+
+    private fun lines(samples: List<String>) = samples.joinToString("") { "\n    $it" }
 
     private fun StringBuilder.table(s: EntryStats, events: Map<Event, EventStats>) {
         append(

@@ -1,0 +1,6 @@
+# Only the catalogue is committed. The monitor's state and reports (which quote dates and minutes
+# from restricted tables) live under the archive root's monitor/ folder, never here; should a run
+# ever be pointed at this checkout by mistake, nothing it writes here can be committed.
+*
+!.gitignore
+!sources.tsv
