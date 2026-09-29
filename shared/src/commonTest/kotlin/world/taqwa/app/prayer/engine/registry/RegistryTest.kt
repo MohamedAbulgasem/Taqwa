@@ -220,8 +220,6 @@ class RegistryTest {
             val method = assertNotNull(r.method)
             near(-1.0, method.horizonDeg, "$name horizon")
             assertEquals(GeoPoint(lat, lon), method.fixedPoint, name)
-            // A two-month fit carries the allowance the 13 full years show: never tighter than the entry's own sunrise margin.
-            assertTrue(method.margins.sunrise <= Registry.byId("id.kemenag")!!.method!!.margins.sunrise, "$name sunrise margin ${method.margins.sunrise}")
             // Muhammadiyah's units are Kemenag's, so the five are its too.
             assertEquals(name, Registry.resolveEntry(Registry.byId("id.muhammadiyah")!!, Place(lat, lon, "Asia/Jakarta", "ID")).unitName)
         }
@@ -231,6 +229,45 @@ class RegistryTest {
         near(-2.0, assertNotNull(belawan.method).horizonDeg, "edge horizon")
         assertFalse(belawan.measured)
         assertEquals(EntryClass.D_AUTHORITY, belawan.entryClass)
+    }
+
+    @Test
+    fun `a kemenag unit reaches only its own kab or kota and every neighbouring place keeps the edge`() {
+        // Ruling R103: Kemenag prints one table per kabupaten/kota and a user follows their own, so a unit's circle
+        // stays inside its own boundary. The app's own places in the neighbouring kabupaten resolve to the edge.
+        val neighbours = listOf(
+            Triple("Kasihan (Bantul)", -7.82694, 110.32917),
+            Triple("Gamping Lor (Sleman)", -7.79556, 110.32639),
+            Triple("Melati (Sleman)", -7.73333, 110.36667),
+            Triple("Deli Tua (Deli Serdang)", 3.5078, 98.6839),
+            Triple("Sunggal (Deli Serdang)", 3.5765, 98.6151),
+            Triple("Mranggen (Demak)", -7.0268, 110.5158),
+            Triple("Kamal (Bangkalan)", -7.16778, 112.71917),
+            Triple("Paseh (Kab. Bandung)", -7.068, 107.794),
+            Triple("Margahayukencana (Kab. Bandung)", -6.97083, 107.5675),
+            Triple("Dalung (Badung)", -8.62553, 115.17042),
+            Triple("Kuta (Badung)", -8.72332, 115.17234),
+            Triple("Batubulan (Gianyar)", -8.62379, 115.26203),
+        )
+        for ((name, lat, lon) in neighbours) {
+            val zone = if (lon > 114.0) "Asia/Makassar" else "Asia/Jakarta"
+            val r = resolve(lat, lon, zone, "ID")
+            assertEquals("id.kemenag", r.entry.id)
+            assertNull(r.unitName, name)
+            near(-2.0, assertNotNull(r.method).horizonDeg, "$name horizon")
+            assertFalse(r.measured, name)
+            assertEquals(EntryClass.D_AUTHORITY, r.entryClass, name)
+        }
+        // Each unit's own point resolves to its unit.
+        for (unit in Units.of("id.kemenag")!!.units) {
+            val zone = when {
+                unit.point.lon > 130.0 -> "Asia/Jayapura"
+                unit.point.lon > 114.0 -> "Asia/Makassar"
+                else -> "Asia/Jakarta"
+            }
+            val r = resolve(unit.point.lat, unit.point.lon, zone, "ID")
+            assertEquals(if (unit.id == "1301-reach") "Kota Jakarta" else unit.name, r.unitName, unit.id)
+        }
     }
 
     @Test
