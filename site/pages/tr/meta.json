@@ -78,7 +78,14 @@
     },
     "qibla_here": "Kâbe burada, Mescid-i Haram’da.",
     "crumbs": "Gezinme yolu",
-    "ramadan_isha": "Ramazan’da {method} yöntemi {isha} vaktini {maghrib} vaktinden bir buçuk değil iki saat sonra verir; bu vakitler de ona göredir."
+    "ramadan_isha": "Ramazan’da {method} yöntemi {isha} vaktini {maghrib} vaktinden bir buçuk değil iki saat sonra verir; bu vakitler de ona göredir.",
+    "detailed_title": "Ayrıntılı görünüm",
+    "detailed_body": "Her iki ikindi vakti, imsak ve takdirî günler",
+    "eat_by": "imsak",
+    "print_month": "Yazdır veya PDF olarak kaydet",
+    "note_detailed": "Ayrıntılı görünümde {fajr} altındaki küçük saat, oruç günü yemeyi bırakma vaktidir; {asr} altındaki ise {school} {asr} vaktidir. {fajr} veya {isha} güneşin açısıyla değil uygulamanın yüksek enlem kuralıyla belirlendiğinde o gün takdirîdir ve bir işaret taşır.",
+    "note_no_rule": "Bu ay ve gelecek ay takdirî gün yok.",
+    "note_engine": "Uygulamadakiyle aynı motordan, her gün yeniden oluşturulur. Cuma günleri {jumuah} namazı için işaretlidir. Son güncelleme: {date}."
   },
   "stores": {
     "beta": "Android beta sürümüne katılın",

@@ -78,7 +78,14 @@
     },
     "qibla_here": "The Kaaba is here, in the Masjid al-Haram.",
     "crumbs": "Breadcrumb",
-    "ramadan_isha": "In Ramadan, {method} puts {isha} two hours after {maghrib} rather than an hour and a half, and these times follow it."
+    "ramadan_isha": "In Ramadan, {method} puts {isha} two hours after {maghrib} rather than an hour and a half, and these times follow it.",
+    "detailed_title": "Detailed view",
+    "detailed_body": "Both Asr times, the end of eating, and days set by rule",
+    "eat_by": "eat by",
+    "print_month": "Print or save as PDF",
+    "note_detailed": "In the detailed view, the small time under {fajr} is when to stop eating on a fasting day, and the one under {asr} is the {school} {asr}. A day set by rule, when {fajr} or {isha} follows the app’s rule for high latitudes rather than the sun’s angle, carries a mark.",
+    "note_no_rule": "None is set by rule this month or next.",
+    "note_engine": "From the same engine as the app, rebuilt every day. Fridays are marked for {jumuah}. Updated {date}."
   },
   "stores": {
     "beta": "Join the Android beta",

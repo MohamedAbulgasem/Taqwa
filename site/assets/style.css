@@ -360,3 +360,103 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
   .card { transition: border-color 160ms ease; }
   .card:hover { border-color: var(--t3); }
 }
+
+/* Task 3 — the months */
+/* ── The month tables (spec §3.4): the detailed-view switch, C's tables with a second line
+   under Fajr and Asr and a mark on a day set by rule (shown by the class `dv` on <main>),
+   the fold at every width, a print button per month, and the print stylesheet. Later rules
+   than the table's first ones above, so they win by order; logical properties only. ── */
+.months { margin-top: 8px; }
+.dv-switch { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 0; border-block: 1px solid var(--hair); }
+.dv-switch[hidden] { display: none; }
+.dv-switch:not([hidden]) + .month { border-top: 0; }
+.dv-text { display: flex; flex-direction: column; gap: 2px; }
+.dv-text b { font-size: 16px; font-weight: 700; }
+.dv-text span { font-size: 14px; color: var(--t2); line-height: 1.5; text-wrap: pretty; }
+/* The switch: a 60 × 44 target around a 52 × 32 track; on, the track fills and the knob moves
+   to the inline end, which in Arabic and Urdu is the left. */
+.dv-toggle { flex: none; width: 60px; height: 44px; padding: 6px 4px; border: 0; background: none; cursor: pointer; display: flex; align-items: center; border-radius: 999px; }
+.dv-toggle .track { display: flex; align-items: center; width: 52px; height: 32px; padding: 3px; border-radius: 999px; background: var(--track); box-shadow: inset 0 0 0 1px var(--hair); }
+.dv-toggle .knob { width: 26px; height: 26px; border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 1px var(--t3), 0 1px 2px rgba(0, 0, 0, 0.2); }
+.dv-toggle[aria-checked="true"] .track { background: var(--t1); box-shadow: none; }
+.dv-toggle[aria-checked="true"] .knob { margin-inline-start: auto; background: var(--bg); box-shadow: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .dv-toggle .track { transition: background 160ms ease; }
+}
+
+.month-head { align-items: flex-end; }
+button.print { font: inherit; cursor: pointer; position: relative; flex: none; }
+button.print::before { content: ""; position: absolute; inset: -2px; border-radius: 999px; } /* the 44 px hit area */
+button.print[hidden] { display: none; }
+
+/* The heads in --t2, 11 px on desktop and 10 px on phones (never 9.5); every cell sits on its
+   first line, so a cell with a second line grows down and the row stays aligned at the top. */
+.tt thead th { color: var(--t2); vertical-align: bottom; }
+.tt thead th small.dv { display: none; font-size: 10px; font-weight: 700; letter-spacing: 0; text-transform: none; line-height: 1.3; }
+html[lang="ar"] .tt thead th small.dv, html[lang="ur"] .tt thead th small.dv, html[lang="bn"] .tt thead th small.dv { font-size: 11px; }
+main.dv .tt thead th small.dv { display: block; }
+.tt td.t, .tt td.h, .tt tbody th.d { vertical-align: top; line-height: 1.3; }
+.tt td.t small.dv { display: none; font-size: 11px; font-weight: 400; color: var(--t2); line-height: 1.3; margin-top: 1px; white-space: nowrap; }
+main.dv .tt td.t small.dv { display: block; }
+.tag.dv { display: none; }
+main.dv .tag.dv { display: block; width: max-content; margin-top: 3px; }
+.tt tr.past td.t small.dv { color: var(--t3); }
+.note.dv { display: none; }
+main.dv .note.dv { display: block; }
+.note-engine { margin-top: 0; padding-bottom: 36px; }
+
+/* The fold row at every width: one 44 px button across the table, the range in --t1 and the
+   amber "+" at the far end. */
+.tt tr.fold td { padding: 0; }
+.tt tr.fold button { width: 100%; min-height: 44px; padding: 0 14px; text-align: start; }
+.tt tr.fold button span + span { color: var(--t1); font-weight: 700; }
+.tt tr.fold button b { font-size: 20px; font-weight: 800; line-height: 1; margin-inline-start: auto; }
+
+@media (max-width: 720px) {
+  .tt thead th { font-size: 10px; letter-spacing: 0.04em; color: var(--t2); padding-inline: 3px; }
+  .tt td { padding-inline: 3px; }
+  .tt td.t small.dv { font-size: 10px; }
+  /* The mark is as wide as its longest word and wraps, so it never widens its column (in a
+     table cell a percentage max-width would not hold it): the day's row grows instead. */
+  main.dv .tag.dv { width: min-content; min-width: 4em; margin-inline: auto; font-size: 10px; padding: 2px 5px; line-height: 1.2; white-space: normal; text-align: center; }
+  .tt tr.fold button { padding: 0 12px; }
+  .dv-switch { gap: 12px; }
+}
+
+/* Print, and "Print or save as PDF": black on white, only the title, the date line and the
+   months; each month on its own page with every day, the Hijri column and, when the detailed
+   view is on, its second lines. With data-print set by a month's button, that month alone. */
+@media print {
+  @page { margin: 10mm; }
+  :root { color-scheme: light; --bg: #fff; --surface: #fff; --t1: #000; --t2: #333; --t3: #555; --hair: #999; --accent: #000; --accent-text: #000; --ring: #000; }
+  .top, .langs, .crumbs, .today, .facts, .qibla-line, .pitch, .whence, .dv-switch, .app, .after, .after-month, .foot, .tt-stale, button.print, tr.fold, .note-engine { display: none !important; }
+  main.wrap { max-width: none; padding: 0; }
+  .city-hero { display: block; padding: 0; }
+  .city-copy h1 { font-size: 26px; }
+  .city-meta { font-size: 13px; margin-top: 4px; }
+  .months { margin-top: 0; }
+  .month { break-before: page; border: 0; padding: 12px 0 0; }
+  .month:first-of-type { break-before: auto; }
+  .month h2 { font-size: 20px; }
+  .month-head { margin-bottom: 8px; }
+  .month-head p { font-size: 13px; margin-top: 2px; }
+  .tt-wrap { border: 0; border-radius: 0; overflow: visible; }
+  .tt { font-size: 12px; }
+  .tt thead th { font-size: 9px; padding: 6px 6px; }
+  .tt td, .tt tbody th { padding: 3px 6px; }
+  .tt td.h { font-size: 12px; }
+  .tt td.t, .tt td.h, .tt tbody th.d { line-height: 1.35; }
+  .tt tr[hidden] { display: table-row; }
+  .tt .h { display: table-cell; }
+  .tt td.jm .tag { display: inline-block; }
+  .tt .tag { font-size: 9px; padding: 0 5px; line-height: 15px; }
+  .tt tr.is-today > * { background: none; font-weight: 400; }
+  /* A month stays one page in the detailed view too: its lines sit beside the time on paper,
+     each with its word ("4:38 eat by 4:38"), which on screen the column head carries. */
+  main.dv .tt td.t small.dv { display: inline; font-size: 10px; margin: 0; margin-inline-start: 5px; }
+  main.dv .tt td.t small.dv::before { content: attr(data-w) " "; }
+  main.dv .tag.dv { display: inline-block; width: auto; margin: 0; margin-inline-start: 5px; }
+  .note { font-size: 12px; margin-top: 8px; }
+  html[data-print] .month { display: none; break-before: auto; }
+  html[data-print] .month[data-print-target] { display: block; }
+}

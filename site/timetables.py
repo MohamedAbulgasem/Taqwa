@@ -37,6 +37,9 @@ MIHRAB = ('<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5
           'stroke-linejoin="round"/><circle cx="8" cy="6.3" r="0.95" fill="currentColor"/></svg>')
 SEARCH = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" '
           'stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>')
+PRINTER = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+           'stroke-linejoin="round" aria-hidden="true"><path d="M7 8V4h10v4"/><rect x="4" y="8" width="16" height="8" rx="2"/>'
+           '<path d="M7 14h10v6H7z"/></svg>')
 RING_R = 88
 RING_C = 2 * math.pi * RING_R
 
@@ -349,18 +352,10 @@ class Timetables:
     {self.today_card(city, lang, today)}
   </div>'''
 
-        months = []
-        first = 0
-        for m, (facts_m, month) in enumerate(zip(city["months"], page["months"])):
-            other = page["months"][1 - m] if len(page["months"]) == 2 else None
-            months.append(self.month_section(city, lang, m, first, facts_m["days"], today, other))
-            first += facts_m["days"]
-
         data = self.live_data(city, lang, today)
         return f'''<main class="wrap city">
   {hero}
-  {"".join(months)}
-  <p class="note tt-note">{fill(t["note"], date=page["today"]["date"])}</p>
+  {self.months_section(city, lang, today)}
   {self.after(city, lang)}
 </main>
 <script type="application/json" id="tt-data">{data}</script>
@@ -393,22 +388,50 @@ class Timetables:
       <p class="tt-stale" hidden>{esc(t["stale"])} <a href="{{home}}">{esc(t["cta_button"])}</a></p>
     </section>'''
 
-    def month_section(self, city: dict, lang: str, m: int, first: int, count: int, today: int, other) -> str:
+    def months_section(self, city: dict, lang: str, today: int) -> str:
+        """The months (spec §3.4): the detailed-view switch, then each month with its table and
+        its print button and notes, then the engine line. The switch and the print buttons are
+        the script's and stay hidden without it; the view itself is one class, `dv`, on <main>,
+        which shows the second lines the tables already carry. Nothing is stored."""
+        t = self.langs[lang]["timetable"]
+        page = city["pages"][lang]
+        months = []
+        first = 0
+        for m, facts in enumerate(city["months"]):
+            months.append(self.month_section(city, lang, m, first, facts["days"], today))
+            first += facts["days"]
+        switch = (f'<div class="dv-switch" hidden><div class="dv-text"><b id="dv-label">{esc(t["detailed_title"])}</b>'
+                  f'<span id="dv-desc">{esc(t["detailed_body"])}</span></div>'
+                  f'<button type="button" class="dv-toggle" role="switch" aria-checked="false" aria-labelledby="dv-label" '
+                  f'aria-describedby="dv-desc"><span class="track"><span class="knob"></span></span></button></div>')
+        engine = fill(t["note_engine"], jumuah=page["jumuah"], date=page["today"]["date"])
+        return f'''<section class="months">
+    {switch}{"".join(months)}
+    <p class="note note-engine">{engine}</p>
+  </section>'''
+
+    def month_section(self, city: dict, lang: str, m: int, first: int, count: int, today: int) -> str:
+        """One month as C's table: a row per day with the six times, each time cell carrying,
+        for the detailed view, the end of eating under Fajr, the other school's Asr under Asr,
+        and a mark after a time set by rule. Past days are folded by the script; Friday's Dhuhr
+        wears the Jumuʿah pill; today's row is lit for the day the page was built."""
         cfg = self.langs[lang]
         t = cfg["timetable"]
         page = city["pages"][lang]
         month = page["months"][m]
         facts = city["months"][m]
         anchor = f'm-{facts["year"]}-{facts["month"]:02d}'
-        other_anchor = None
-        if other is not None:
-            o = city["months"][1 - m]
-            other_anchor = f'm-{o["year"]}-{o["month"]:02d}'
-        arabic_script = cfg["dir"] == "rtl"
+        values = self.sentence_values(city, lang)
+        # The detailed view's words sit in the heads ("Fajr / eat by", "Asr / Standard", as C's
+        # phone table has them), so the cells' second lines are bare times and the seven columns
+        # still fit a 390 px phone; print puts the word back beside the time from data-w.
+        sub = {FAJR: esc(t["eat_by"]), ASR: esc(page["otherSchool"])}
         heads = [f'<th scope="col" class="d">{esc(t["date"])}</th>', f'<th scope="col" class="h">{esc(t["hijri"])}</th>']
-        heads += [f'<th scope="col">{esc(name)}</th>' for name in page["prayers"]]
+        for p, name in enumerate(page["prayers"]):
+            word = f'<small class="dv">{sub[p]}</small>' if p in sub else ""
+            heads.append(f'<th scope="col">{esc(name)}{word}</th>')
+        rule = esc(page["strings"]["setByRule"])
         rows = []
-        any_high = False
         any_ramadan = False
         for i in range(first, first + count):
             facts_d = city["days"][i]
@@ -420,15 +443,22 @@ class Timetables:
                 classes.append("is-today")
             if facts_d["friday"]:
                 classes.append("fri")
-            any_high = any_high or facts_d["highLatitude"]
             any_ramadan = any_ramadan or facts_d["ramadanIsha"]
             cells = [f'<th scope="row" class="d"><b>{esc(day["day"])}</b> <span>{esc(day["weekday"])}</span></th>',
                      f'<td class="h">{esc(day["hijri"])}</td>']
             for p, time in enumerate(day["times"]):
-                if p == DHUHR and facts_d["friday"]:
-                    cells.append(f'<td class="jm">{esc(time)} <span class="tag">{esc(page["jumuah"])}</span></td>')
-                else:
-                    cells.append(f"<td>{esc(time)}</td>")
+                jumuah = p == DHUHR and facts_d["friday"]
+                parts = [f'<span class="v">{esc(time)}</span>']
+                if jumuah:
+                    parts.append(f'<span class="tag">{esc(page["jumuah"])}</span>')
+                if p == FAJR:
+                    parts.append(f'<small class="dv" data-w="{attr(t["eat_by"])}">{esc(day["endOfEating"])}</small>')
+                elif p == ASR:
+                    parts.append(f'<small class="dv" data-w="{attr(page["otherSchool"])}">{esc(day["asrOther"])}</small>')
+                if p in facts_d["setByRule"]:
+                    parts.append(f'<span class="tag dv">{rule}</span>')
+                # No whitespace between the parts: a hidden line would still leave its space.
+                cells.append(f'<td class="{"t jm" if jumuah else "t"}">{"".join(parts)}</td>')
             cls = f' class="{" ".join(classes)}"' if classes else ""
             current = ' aria-current="date"' if i == today else ""
             rows.append(f'<tr data-i="{i}"{cls}{current}>{"".join(cells)}</tr>')
@@ -437,15 +467,20 @@ class Timetables:
         for change in page["clockChanges"]:
             if first <= change["index"] < first + count:
                 notes.append(f'<p class="note">{fill(t["clock_change"], date=change["date"], offset=change["offset"])}</p>')
-        if any_high and page["highLatitude"]:
-            notes.append(f'<p class="note">{fill(t["high_latitude"], rule=page["highLatitude"][0], fajr=page["prayers"][FAJR], isha=page["prayers"][ISHA])}</p>')
+        # The legend of the detailed view, under each table; the "none this month or next"
+        # sentence once, under the first, since it speaks for both months.
+        detailed = fill(t["note_detailed"], **values, school=page["otherSchool"])
+        if m == 0 and not any(d["setByRule"] for d in city["days"]):
+            detailed += " " + fill(t["note_no_rule"])
+        notes.append(f'<p class="note dv">{detailed}</p>')
         if any_ramadan:
-            notes.append(f'<p class="note">{fill(t["ramadan_isha"], **self.sentence_values(city, lang))}</p>')
-        jump = f'<a class="pill quiet" href="#{other_anchor}">{esc(heading(other["title"]))}</a>' if other_anchor else ""
-        caption = fill(t["h1"], **self.sentence_values(city, lang)) + " · " + esc(month["title"])
+            notes.append(f'<p class="note">{fill(t["ramadan_isha"], **values)}</p>')
+        print_button = (f'<button type="button" class="pill quiet small print" data-month="{anchor}" hidden>'
+                        f'{PRINTER} {esc(t["print_month"])}</button>')
+        caption = fill(t["h1"], **values) + " · " + esc(month["title"])
         return f'''
   <section class="month" id="{anchor}" aria-labelledby="{anchor}-h">
-    <div class="month-head"><div><h2 id="{anchor}-h">{esc(heading(month["title"]))}</h2><p>{esc(month["hijri"])}</p></div>{jump}</div>
+    <div class="month-head"><div><h2 id="{anchor}-h">{esc(heading(month["title"]))}</h2><p>{esc(month["hijri"])}</p></div>{print_button}</div>
     <div class="tt-wrap"><table class="tt" data-month="{m}">
       <caption class="sr">{caption}</caption>
       <thead><tr>{"".join(heads)}</tr></thead>
@@ -503,8 +538,11 @@ class Timetables:
         page = city["pages"][lang]
         days = []
         for facts, day in zip(city["days"], page["days"]):
-            days.append({"d": facts["date"], "e": facts["epochs"], "f": 1 if facts["friday"] else 0,
-                         "full": day["full"], "hijri": day["hijriLong"], "t": day["times"]})
+            # t: the six clocks; o: the other school's Asr; x: the end of eating; e: the six
+            # epochs; s: sunset's epoch (Asr is over at sunset); r: the prayers set by rule.
+            days.append({"d": facts["date"], "e": facts["epochs"], "s": facts["sunset"], "f": 1 if facts["friday"] else 0,
+                         "r": facts["setByRule"], "full": day["full"], "hijri": day["hijriLong"], "t": day["times"],
+                         "o": day["asrOther"], "x": day["endOfEating"]})
         data = {
             "tz": city["timeZone"],
             # The countdown's digits, which are the page's except where the app falls back to
@@ -579,8 +617,9 @@ class Timetables:
 
 def check_page(rel_path: str, doc: str, data: Timetables) -> list:
     """What --check asks of a prayer-time page beyond links and markup: a city page has both
-    months, each with a row for every day of that month and six times in each, and the live
-    data the script needs; an index lists every city that has a page in its language."""
+    months, each with a row for every day of that month, six times in each with the two detail
+    lines of the detailed view, the view's switch, a print button per month, and the live data
+    the script needs; an index lists every city that has a page in its language."""
     problems = []
     parts = rel_path.split("/")
     if SECTION.rstrip("/") not in parts:
@@ -605,9 +644,16 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
         if len(rows) != facts["days"]:
             problems.append(f"timetable: {rel_path} month {m} has {len(rows)} rows for {facts['days']} days")
         for row in rows:
-            if len(re.findall(r"<td(?: class=\"jm\")?>", row)) != 6:
+            if len(re.findall(r'<td class="t[ "]', row)) != 6:
                 problems.append(f"timetable: {rel_path} month {m} has a row without six times")
                 break
+            if row.count('<small class="dv" data-w="') != 2:
+                problems.append(f"timetable: {rel_path} month {m} has a row without its two detail lines")
+                break
+    if doc.count('class="dv-switch"') != 1:
+        problems.append(f"timetable: {rel_path} has no detailed-view switch")
+    if len(re.findall(r'<button type="button" class="[^"]*\bprint\b[^"]*" data-month="m-\d{4}-\d{2}"', doc)) != len(tables):
+        problems.append(f"timetable: {rel_path} does not have a print button per month")
     match = re.search(r'<script type="application/json" id="tt-data">(.*?)</script>', doc, re.S)
     if not match:
         problems.append(f"timetable: {rel_path} has no live data")
