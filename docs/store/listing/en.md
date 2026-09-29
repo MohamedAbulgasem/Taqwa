@@ -17,10 +17,10 @@ Taqwa gives you the essentials of the day in one quiet place: accurate prayer ti
 PRAYER TIMES
 • Times for where you are, from GPS or a city you choose from more than 34,000.
 • Times from the timetable the mosques near you follow. Where Taqwa holds it, it reproduces it and checks it day by day against the published tables: on every day checked, no prayer starts before the published time. Where a timetable is not yet fully checked, Taqwa adds a safety margin; where mosques follow different timetables, it shows cautious times, each prayer once all have begun it; and where no timetable is known, it calculates on the safe side.
-• Tap ⓘ on the Prayer screen to see whose times these are, and About these times for how they are made and checked. Match my mosque looks for your mosque's timetable from two times on its board, and the usual calculation methods (Muslim World League, Egyptian, Karachi, ISNA and more) and a per-prayer adjustment are there too.
+• Tap the (i) on the Prayer screen to see whose times these are, and About these times for how they are made and checked. Match my mosque looks for your mosque's timetable from two times on its board, and the usual calculation methods (Muslim World League, Egyptian, Karachi, ISNA and more) and a per-prayer adjustment are there too.
 • Rules for high latitudes, where the night is too short for the usual angles.
 • A notification for each prayer: a clear tone, a takbir, or the opening of the adhan in a choice of voices, with an optional reminder before it.
-• A Jumuʿah pill on Friday's Dhuhr, home-screen widgets with today's times and the countdown to the next prayer, and the Hijri date alongside the Gregorian one.
+• A Jumu'ah pill on Friday's Dhuhr, home-screen widgets with today's times and the countdown to the next prayer, and the Hijri date alongside the Gregorian one.
 
 THE QURAN
 • The complete Uthmani text, in the same script as the Madinah Mushaf, with the traditional page layout when you want to read as from the printed Mushaf.

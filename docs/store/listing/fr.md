@@ -17,10 +17,10 @@ Taqwa réunit l’essentiel de la journée en un seul endroit paisible : des hor
 HORAIRES DE PRIÈRE
 • Les horaires pour votre position, depuis le GPS ou une ville que vous choisissez parmi plus de 34 000.
 • Les horaires du calendrier que suivent les mosquées proches de chez vous. Là où Taqwa le détient, elle le reproduit et le vérifie jour après jour d’après les tableaux publiés : pour chaque jour vérifié, aucune prière ne commence avant l’heure publiée. Là où un calendrier n’est pas encore entièrement vérifié, Taqwa ajoute une marge de sécurité ; là où les mosquées suivent des calendriers différents, elle affiche des horaires par précaution, chaque prière une fois que tous l’ont commencée ; et là où aucun calendrier n’est connu, elle calcule avec prudence.
-• Touchez ⓘ sur l’écran Prière pour voir de qui viennent ces horaires, et « À propos de ces horaires » pour savoir comment ils sont établis et vérifiés. « Aligner sur ma mosquée » cherche le calendrier de votre mosquée à partir de deux horaires de son tableau, et les méthodes de calcul habituelles (Ligue islamique mondiale, égyptienne, Karachi, ISNA et d’autres) ainsi qu’un ajustement par prière sont aussi proposés.
+• Touchez le (i) sur l’écran Prière pour voir de qui viennent ces horaires, et « À propos de ces horaires » pour savoir comment ils sont établis et vérifiés. « Aligner sur ma mosquée » cherche le calendrier de votre mosquée à partir de deux horaires de son tableau, et les méthodes de calcul habituelles (Ligue islamique mondiale, égyptienne, Karachi, ISNA et d’autres) ainsi qu’un ajustement par prière sont aussi proposés.
 • Des règles pour les hautes latitudes, où la nuit est trop courte pour les angles habituels.
 • Une notification pour chaque prière : une tonalité claire, un takbir ou le début de l’adhan, avec plusieurs voix au choix, et un rappel facultatif avant.
-• Une pastille Joumouʿa sur le Dhuhr du vendredi, des widgets sur l’écran d’accueil avec les horaires du jour et le compte à rebours jusqu’à la prochaine prière, et la date hégirienne à côté de la date grégorienne.
+• Une pastille Joumou’a sur le Dhuhr du vendredi, des widgets sur l’écran d’accueil avec les horaires du jour et le compte à rebours jusqu’à la prochaine prière, et la date hégirienne à côté de la date grégorienne.
 
 LE CORAN
 • Le texte othmanien complet, dans la même graphie que le Mushaf de Médine, avec la mise en page traditionnelle quand vous voulez lire comme dans le Mushaf imprimé.
