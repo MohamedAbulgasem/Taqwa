@@ -254,8 +254,8 @@ hidden (`summary::-webkit-details-marker { display: none }`).
   with the language's list comma, site sentences `combined` and `not_affiliated_any`.
 - **Proof sentence** (spec §7 "a proof sentence from the stamp"): checked, the app's
   `about_checked_through` — "Checked against London Unified's published timetable through 31 December
-  2026."; cautious, the app's new `about_cautious_checked_through` (§10) — "Checked against the timetables
-  followed here through 31 December 2026."
+  2026."; cautious, the app's new `about_cautious_checked` (§10) — "Checked against the timetables
+  followed here." (no date: ruling R112, until the stamps hold each member's own last date).
 - Label: "Where these times come from" + chevron.
 
 **The body, checked places (B's three steps, `ol.steps`):**
@@ -273,7 +273,8 @@ hidden (`summary::-webkit-details-marker { display: none }`).
    down)."
 3. **How it was checked** (`about_how_checked`) — "Then Taqwa replays every checked day against
    {authority}'s published timetable." (`replays`); the **three tiles** (`.tiles`, three equal cells,
-   value 22 px 800 over a 12 px label): `4,015` / "days at 11 places" (`about_stat_days_at_places`),
+   value 22 px 800 over a 12 px label): `4015` / "days at 11 places" (`about_stat_days_at_places`; the
+   app's digits, no thousands separator: ruling R107),
    `0` / "starts before London Unified's" (`about_stat_never_before`, the 0 in `--accent`, a large
    numeral), `5 min` / "at most after" (`about_stat_minutes_value`, `about_stat_at_most_after`); the
    **minute ruler** (§3.3.1); then the link "How Taqwa checks every city ›" → the checks page.
@@ -295,9 +296,11 @@ hidden (`summary::-webkit-details-marker { display: none }`).
    `about_stop_eating` for today; then `match_prompt` + "**Match my mosque ›**" (`timetable_match_mosque`)
    → `#app`.
 3. **How it was checked** — `replays_cautious` ("Then Taqwa replays every checked day against each of the
-   published timetables."); the tiles with the cautious labels: `30` / "days at 1 place"; `0` / "starts
-   before any of them" (`about_stat_never_before_any`, §10); `4 min` / "at most after the earliest of
-   them" (`about_stat_at_most_after_earliest`, §10); the link to the checks page.
+   published timetables."); two tiles with the cautious labels: `1400` / "days at 6 places" (Toronto);
+   `0` / "starts before the timetable that decides it" (`about_stat_never_before_decider`, §10; ruling
+   R111: "before any of them" is false where the Maghrib cap decides); no "at most" tile (ruling R105:
+   a cautious entry's worst is entry-wide and would misattribute another place's spread); the link to
+   the checks page.
 
 The site's copy for a cautious page's "which decides" table and ruler is the built day's without
 script; `timetable.js` rewrites both for the reader's today from the per-day member times (§9.3).
@@ -417,11 +420,11 @@ blocks carry the same keys (the build fails otherwise). New site keys and their 
 
 Removed keys: `method`, `asr`, `why`, `note`, `high_latitude`, `cta_label`, `cta_title`, `cta_body`,
 `description`. App strings the document carries, filled per language: `today_whose_checked_title`,
-`timetable_cautious`, `about_not_affiliated`, `about_checked_through`, `about_cautious_checked_through`,
+`timetable_cautious`, `about_not_affiliated`, `about_checked_through`, `about_cautious_checked`,
 `about_who_publishes`, `about_who_publishes_body`, `about_how_reproduces`, `about_method_intro` (+ the
 `about_method_*` parts), `about_how_checked`, `about_stat_days_at_places`, `about_stat_never_before`,
-`about_stat_never_before_any`, `about_stat_minutes_value`, `about_stat_at_most_after`,
-`about_stat_at_most_after_earliest`, `about_cautious_body`, `about_cautious_maghrib_cap`,
+`about_stat_never_before_decider`, `about_stat_minutes_value`, `about_stat_at_most_after`,
+`about_cautious_body`, `about_cautious_maghrib_cap`,
 `about_which_decides`, `about_stop_eating`, `timetable_match_mosque`, `today_set_by_rule`,
 `today_polar_line`, `today_next_in`, `today_jumuah`, `madhab_standard`, `madhab_hanafi`, the prayer names
 and the authority short names. Translations of new site sentences follow the app's terms (Cautious times =
@@ -591,17 +594,16 @@ inputs, so a stamp refresh rebuilds the pages).
 
 `AboutTimesScreen.kt`'s cautious template gains, after the "Which timetable decides each time today"
 table and before "Match my mosque", a divider, the heading `about_how_checked`, the `StatTilesRow` with
-`stamp.placeDays` / `about_stat_days_at_places(places)`, `0` / `about_stat_never_before_any`, and
-`about_stat_minutes_value(worst)` / `about_stat_at_most_after_earliest`, where `worst` is
-`measuredStartsWorst(resolution, stamp)`, and the sentence `about_cautious_checked_through(date)` with
-`stamp.provenThrough`; nothing when there is no stamp or the place is not measured (as the checked
-template does). `AboutTimesUiState.Cautious` carries the `ProofStamp?` like the other two.
+`stamp.placeDays` / `about_stat_days_at_places(places)` and `0` / `about_stat_never_before_decider` —
+two tiles, no "at most" figure (ruling R105) — then the sentence `about_cautious_checked`, without a
+date (ruling R112); nothing when there is no stamp, the place is not measured, or the stamp has unit
+rows and the place's own unit row is incomplete (as the checked template does).
+`AboutTimesUiState.Cautious` carries the `ProofStamp?` like the other two.
 
-New strings (all seven locales, `values-in` synced): `about_stat_never_before_any` = "starts before any
-of them"; `about_stat_at_most_after_earliest` = "at most after the earliest of them";
-`about_cautious_checked_through` = "Checked against the timetables followed here through %1$s." The
-figures are the stamp's (Cape Town: 30 / 1 place · 0 · 4 min · 30 September 2026; Toronto: 1,400 / 6 ·
-0 · 7 min · 31 December 2026). The visible UI at default settings changes only by these lines
+New strings (all seven locales, `values-in` synced): `about_stat_never_before_decider` = "starts before
+the timetable that decides it" (ruling R111; the heading above says "Which timetable decides each time
+today"); `about_cautious_checked` = "Checked against the timetables followed here." The figures are the
+stamp's (Toronto: 1400 / 6 · 0). The visible UI at default settings changes only by these lines
 (accessibility rule of 28 September kept).
 
 ## 11. Verification

@@ -10,6 +10,12 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-29-city-pages-design.md` (read it first; every task argues from it). The engine spec's §7 "Website" paragraph is at `docs/superpowers/specs/2026-09-26-taqwa-prayer-times-engine-design.md` lines 350–354.
 
+**Amended during execution (29 Sep 2026):** rulings R105 (a cautious place shows two proof tiles, no
+"at most" figure), R107 (the app's digits, no thousands separator), R108 (Tasks 2 and 3 built in
+parallel and merged), R111 (`about_stat_never_before_decider`: "starts before the timetable that
+decides it"), R112 (`about_cautious_checked`, no date) and R114 (the checks page dates in each language's
+own form) supersede the task text below where they differ; the spec carries the final wording.
+
 ## Global Constraints
 
 - **The repository is public.** No printed time from any restricted official table appears anywhere — not in code, tests, fixtures, screenshots or commit messages (ruling R69). The site shows only the engine's own computed times and the stamps' statistics. Test expectations are engine outputs (as `DocumentTest` and `TimetableTest` already do).
