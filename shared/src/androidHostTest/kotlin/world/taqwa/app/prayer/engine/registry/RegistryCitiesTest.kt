@@ -2,8 +2,11 @@ package world.taqwa.app.prayer.engine.registry
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import world.taqwa.app.prayer.engine.EngineSettings
+import world.taqwa.app.prayer.engine.PrayerEngine
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.method.EndOfEating
+import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.registry.data.AlgeriaWilayas
 import java.io.File
 import kotlin.test.Test
@@ -202,6 +205,33 @@ class RegistryCitiesTest {
             val r = Registry.resolve(city.place)
             assertEquals("dz.marw", r.entry.id, city.name)
             assertNotNull(r.unitName, city.name)
+        }
+    }
+
+    @Test
+    fun `every kemenag unit is reached through the app's engine at its own point and by its city entry`() {
+        // Ruling R113: the app computes every place at three decimals (PrayerEngine.canonical), which moves a point
+        // by up to about 0.08 km, and a unit's radius is never below 0.1 km; so each unit's own point, and the app's
+        // city entry at that point (the 18 units' points are the app's own GeoNames points), resolve to the unit
+        // the way the app resolves them.
+        val units = Units.of("id.kemenag")!!.units
+        assertEquals(18, units.size)
+        val date = LocalDate(2026, 3, 20)
+        for (unit in units) {
+            val zone = when {
+                unit.point.lon > 130.0 -> "Asia/Jayapura"
+                unit.point.lon > 114.0 -> "Asia/Makassar"
+                else -> "Asia/Jakarta"
+            }
+            val ownPoint = PrayerEngine.dayTimes(Place(unit.point.lat, unit.point.lon, zone, "ID"), date, EngineSettings())
+            assertEquals(unit.name, ownPoint.resolution.unitName, "${unit.id} at its own point through the app's engine")
+            val entries = cities.filter { it.countryCode == "ID" && distanceKm(GeoPoint(it.lat, it.lon), unit.point) < 0.1 }
+            assertTrue(entries.isNotEmpty(), "${unit.id} ${unit.name}: no city entry at its point")
+            for (city in entries) {
+                val viaApp = PrayerEngine.dayTimes(city.place, date, EngineSettings())
+                assertEquals(unit.name, viaApp.resolution.unitName, "${city.name} (${city.region}) through the app's engine")
+                assertTrue(viaApp.resolution.measured, city.name)
+            }
         }
     }
 

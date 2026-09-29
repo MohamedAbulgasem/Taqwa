@@ -233,22 +233,27 @@ monitor's two months plus an allowance drawn from the 13; the review showed the 
 sample maximum, not a bound (a leave-one-out test failed at Banda Aceh's Fajr on 21 March), and the
 whole year was published, so it was replaced by the year.
 
-**Every unit's reach (ruling R103).** Kemenag prints one table per kabupaten/kota and a user follows
-their own, so a unit's circle stays inside its own kab/kota: its radius is the distance from its point
-to the nearest boundary of a kabupaten/kota Kemenag prints separately, measured on OpenStreetMap's
-administrative boundaries (admin_level 5, Overpass, 29 Sep 2026; point-to-segment distances over each
-neighbour's rings), rounded down to a whole km. Where a coastline is nearer than any neighbour
-(Makassar 2.6 km, Jayapura 0.1, Semarang 4.2, Surabaya 4.9) the sea bounds no table and the circle
-may cross it. Radii, km (the nearest neighbour and its distance): Kota Jakarta 8 (Bekasi 8.35; the
-R46 reach unit beyond it is unchanged), Banda Aceh 1 (Aceh Besar 1.44), Makassar 4 (Gowa 4.53),
-Denpasar 3 (Badung 3.88), Jayapura 9 (Kab. Jayapura 9.46), Malang 3 (Kab. Malang 3.14), Bandung 4
-(Kab. Bandung 4.32), Jayawijaya 13 (Yahukimo 13.82), Batu 3 (Kab. Malang 3.99), Bukittinggi 0 (Agam
-0.69: only its own point), Bogor 1 (Kab. Bogor 1.82), Garut 4 (Kab. Tasikmalaya 4.31), Wonosobo 10
-(Banjarnegara 10.46), Medan 3 (Deli Serdang 3.86), Palembang 1 (Banyuasin 1.19), Semarang 7 (Demak
-7.85), Surabaya 8 (Bangkalan 8.50, across the strait), Yogyakarta 1 (Bantul 1.82). Beyond the circle
-the edge applies as before these units existed. The app's own places in the neighbouring kabupaten
-(Kasihan, Gamping Lor, Melati, Deli Tua, Sunggal, Mranggen, Kamal, Paseh, Margahayukencana, Dalung,
-Kuta, Batubulan) resolve to the edge, pinned by RegistryTest.
+**Every unit's reach (rulings R103 and R113).** Kemenag prints one table per kabupaten/kota and a user
+follows their own, so a unit's circle stays inside its own kab/kota: its radius is the distance from
+its point to the nearest boundary of a kabupaten/kota Kemenag prints separately, measured on
+OpenStreetMap's administrative boundaries (admin_level 5, Overpass, 29 Sep 2026; point-to-segment
+distances over each neighbour's rings, in the engine's own spherical distance), less a 0.5 km buffer
+for those boundaries' accuracy, rounded down to 0.1 km and never below 0.1 km — so that a unit's own
+point, as the app rounds a location to three decimals (at most 0.08 km), always stays inside. Where a
+coastline is nearer than any neighbour (Makassar 2.6 km, Jayapura 0.1, Semarang 4.2, Surabaya 4.9)
+the sea bounds no table and the circle may cross it. Radii, km (the nearest neighbour and its
+distance): Kota Jakarta 7.8 (Bekasi 8.365), Banda Aceh 0.9 (Aceh Besar 1.438), Makassar 4.0 (Gowa
+4.554), Denpasar 3.3 (Badung 3.872), Jayapura 8.9 (Kab. Jayapura 9.464), Malang 2.6 (Kab. Malang
+3.137), Bandung 3.8 (Kab. Bandung 4.348), Jayawijaya 13.3 (Yahukimo 13.895), Batu 3.4 (Kab. Malang
+3.988), Bukittinggi 0.1 (Agam 0.687: the city entry and little else), Bogor 1.3 (Kab. Bogor 1.822),
+Garut 3.8 (Kab. Tasikmalaya 4.332), Wonosobo 9.9 (Banjarnegara 10.475), Medan 3.3 (Deli Serdang
+3.873), Palembang 0.6 (Banyuasin 1.189), Semarang 7.3 (Demak 7.841), Surabaya 8.0 (Bangkalan 8.552,
+across the strait), Yogyakarta 1.3 (Bantul 1.819). Beyond the circle the edge applies as before these
+units existed. The app's own places in the neighbouring kabupaten (Kasihan, Gamping Lor, Melati,
+Deli Tua, Mranggen, Kamal, Paseh, Margahayukencana, Dalung, Kuta, Batubulan) and Sunggal (in Kota
+Medan on OSM, beyond its circle) resolve to the edge, pinned by RegistryTest; every unit's own point,
+rounded as the app rounds it and resolved through the app's engine, resolves to its unit, and so does
+the app's city entry for each of the 18.
 
 **Ruling R106 closes R46's reach unit.** Beyond Kota Jakarta's core, R46 let Jakarta's point ride
 as the fixed point out to 55 km with the deepest horizon but without the edge's allowance for an
@@ -313,8 +318,9 @@ margin, not something fit against data.
   internally — unchanged from Task 5). The outside-zone edge (Peninsular and Borneo) is not
   measured and was not re-verified this task; the towns it was checked at earlier (Kapit, Sibu,
   Mukah, Gua Musang, Jeli, Kuala Krai, Dabong) have no local official tables to re-run.
-- **id.kemenag**: 13 of 13 captured kab/kota are measured, over one year only (2026; myQuran has
-  never captured a second year for Kemenag, so there is no cross-year check — see the split above).
+- **id.kemenag**: 18 of 18 captured kab/kota are measured (13 in this task, five in the monitor
+  round), over one year only (2026; myQuran has never captured a second year for Kemenag, so there is
+  no cross-year check — see the split above).
   Everywhere else in Indonesia is not measured (the Jabodetabek reach unit is gone since ruling R106).
   `id.muhammadiyah` is not measured anywhere (no official Muhammadiyah table held locally).
 
