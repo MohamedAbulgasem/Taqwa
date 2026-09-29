@@ -179,6 +179,16 @@ sealed interface HighLatRule {
  *   [authorityMinutes] (Tunisia's monthly Asr).
  * - [clockRule]: the authority's own clock rule, applied last with these margins (IRN Tromsø's
  *   Makkah time, ruling R82); see [ClockTimes] for what the day shows.
+ * - [dayAroundDhuhrMinutes]: the authority's day is never shorter than twice these minutes around
+ *   its Dhuhr (the transit plus its Dhuhr minutes): its sunrise no later than Dhuhr − minutes, its
+ *   Maghrib no earlier than Dhuhr + minutes, each with the event's own margin (Diyanet's winter
+ *   takdir at Trondheim: a 5-hour day, 150; monitor round, brief D). An [IshaRule.AfterMaghrib]
+ *   still counts from the sun's own sunset.
+ * - [declaresIshaBeforeMaghrib]: the authority's own Isha can fall at or before the Maghrib shown
+ *   (Diyanet's from Umeå north in June, counted from a Maghrib its nineteen-hour day puts before the
+ *   sunset); such a day shows Isha the minute after Maghrib and declares it not followed
+ *   (DayComputer's point 9). Off, an Isha at or before Maghrib stays out of order for
+ *   [world.taqwa.app.prayer.engine.day.Invariants.repair] and the gate to flag (review D round 1).
  *
  * The arrays compare by reference in [equals]; methods are registry singletons.
  */
@@ -210,8 +220,13 @@ data class TimetableMethod(
     val ishaAngleByDayOfYear: DoubleArray? = null,
     val monthlyOffsets: Map<Prayer, IntArray>? = null,
     val clockRule: ClockRule? = null,
+    val dayAroundDhuhrMinutes: Int? = null,
+    val declaresIshaBeforeMaghrib: Boolean = false,
 ) {
     init {
+        require(dayAroundDhuhrMinutes == null || dayAroundDhuhrMinutes in 1 until 12 * 60) {
+            "$id: dayAroundDhuhrMinutes is half a day's minimum length, under 12 hours"
+        }
         require(fajrAngleByDayOfYear == null || fajrAngleByDayOfYear.size == DAYS_IN_CURVE) {
             "$id: fajrAngleByDayOfYear needs $DAYS_IN_CURVE values"
         }

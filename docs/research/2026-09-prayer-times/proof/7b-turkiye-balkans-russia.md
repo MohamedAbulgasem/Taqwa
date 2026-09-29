@@ -200,37 +200,142 @@ tables.
 ## Diyanet's European method (`tr.diyanet.europe`)
 
 Tables: Diyanet's own for the twelve held cities (Sarajevo, Zürich, Freiburg, München, Wien, Paris,
-Brussels, London, Amsterdam, Berlin, Stockholm, Oslo; 396 days each), each its own point table.
+Brussels, London, Amsterdam, Berlin, Stockholm, Oslo), each its own point table, in two captures:
+the research's of 25/26 September 2026 (that month to 25/26 October, and all of 2027; 396 days) and
+the weekly monitor's of 28 September (29 September – 29 October 2026 and all of 2027; 396 days).
+The two print the same minutes on every day both hold (392–393 a city, 0 differing cells).
 
 North of 44.5° Diyanet's takdir set its Fajr up to 39 min and its Isha up to 143 min before what the
-generic rule (19 % of the night; the real 16°) gave. Each takdir city now follows its own table:
-Fajr, Isha and the end of eating at depression curves derived from it (`DiyanetEuropeCurves`, under
-the method's own daily sun, the R28 envelope), with − 29 s on the start curves and + 30 s on the end
+generic rule (19 % of the night; the real 16°) gave. Each takdir city follows its own table: Fajr,
+Isha and the end of eating at depression curves derived from every held row of it
+(`DiyanetEuropeCurves`, written by `tools/timetables`' `generateDiyanetEuropeCurves`, under the
+method's own daily sun, the R28 envelope), with − 29 s on the start curves and + 30 s on the end
 curve (the end never passes the Fajr at either point, R15). Those three columns are therefore fitted
 at every city; the other columns' margins are fitted on six cities (Sarajevo, Zürich, München,
 Paris, Berlin, Stockholm) and held out on six: Fajr and Isha at the plain angles − 13 / − 10 s,
 sunrise + 10, Dhuhr − 13, Asr − 12, Maghrib − 15, the end + 9.
 
-| `tr.diyanet.europe`, 12 cities | days | early / late end | +0 | +1 | +2 | +3+ | exact | worst |
+**The clock-change days (monitor round, brief D).** The monitor's captures hold 26–29 October 2026,
+the first winter-time days, which no research capture does (its month ends on the change day, 25
+October). There the first curves were a minute early: Isha at Amsterdam, Berlin and London on 27–28
+October, at Brussels on 26–27, at Wien on 28, and Oslo's Fajr on 27 (9 of 44 Isha cells, 1 of 44
+Fajr). Not the clock change itself and not a reader: a curve slot then reproduced the printed minute
+of the one year the slot was held in (the depression 25 s before it), and a printed minute, rounded
+to the nearest, says only that Diyanet's own moment lies within 30 s of it; which side depends on
+the year, as the sun's position on a month and day shifts through the leap cycle. Every slot from 30
+October on had one year of rows, so the same thing would have followed on about half the plain days
+of November and December 2026 and of 2028. Each slot is now a bound on Diyanet's own moment: for a
+start the latest it could be under the rounding (the printed minute + 35 s), or, where the plain
+18°/16° holds the row, the plain method's own moment; for the end the earliest (− 35 s) or the
+plain end; across the years a slot is held in, the tightest. The cost: on takdir days the start
+shows the printed minute or the one after (a minute of lateness the tightening across years will
+shrink as the monitor holds more years); on plain days the plain method's own minute. The
+regenerated curves also move the stamps of the entries built on them, still 0 early and 0 late
+ends: Zürich's (`ch.fids`), the Netherlands' cautious (`nl.cautious`, Amsterdam's member) and
+Austria's (`at.iggo`), whose Wien unit now keeps Diyanet's curve margins on Fajr, Isha and the end
+of eating with three exceptions of 4 min (7g's Austria section).
+
+**Seven more cities (monitor round, brief D).** The monitor's capture also holds Diyanet's tables for
+Lyon, Lille, Gent, Antwerpen, Copenhagen (the research capture holds it too), Helsinki and Trondheim,
+which the cautious entries of France, Belgium, Sweden–Denmark–Finland and Norway lean on and which
+were only the edge before (the ledger's wave 3 and R79 gaps: Gent's Fajr 1 min early on 86 days,
+Trondheim's up to 42 min on 57, Lyon's end of eating 1–2 min late on 70). Each is now its own point
+table at the app's point (Trondheim at IRN's, so the two members' rows pair) with its own curves,
+its plain columns held out, and a member row of the cautious entry Automatic follows there. Their
+reach against their neighbours (class D, 52 km at 51°): Antwerpen is 43 km and Gent 48 km from
+Brussels, inside its reach, and 50 km from each other, so between them the nearer table wins
+(Mechelen to Antwerpen, Aalst to Brussels); Lille is 67 km from Gent and reaches Kortrijk; Lyon,
+Copenhagen (302 km from Berlin), Helsinki and Trondheim (388 km from Oslo) stand alone. Beyond
+them all the edge is unchanged.
+
+Trondheim showed Diyanet's Nordic takdir for the day itself: from 9 December to 4 January its table
+holds the day to five hours around Dhuhr (sunrise no later than Dhuhr − 150 min, Maghrib no earlier
+than Dhuhr + 150, every row within its rounding), which the engine now models
+(`TimetableMethod.dayAroundDhuhrMinutes`, the Trondheim unit only; its December Maghrib was 10–11 min
+early before); from late May to late July it holds the day to about nineteen hours (sunrise up to
+53 min after the sun's, Maghrib up to 43 min before the sunset, Fajr 59 min before that sunrise,
+Isha about 53 after that Maghrib), where the app keeps the sun's sunrise and sunset (Maghrib never
+before the real sunset, as at Tromsø under IRN) and its Fajr and Isha follow the table's curves.
+Helsinki prints its June sunrise up to 10 min after the sun's, Oslo 7, Stockholm none.
+
+| `tr.diyanet.europe`, 33 cities, 46 rows, 13,117 place-days | days | early / late end | +0 | +1 | +2 | +3+ | exact | worst |
 |---|---|---|---|---|---|---|---|---|
-| fajr | 4,752 | 0 | 3,480 | 764 | 398 | 110 | 73.2% | 4 |
-| sunrise | 4,752 | 0 | 3,101 | 1,628 | 2 | 21 | 65.3% | 8 |
-| dhuhr | 4,752 | 0 | 3,539 | 1,213 | 0 | 0 | 74.5% | 1 |
-| asr | 4,752 | 0 | 3,435 | 1,317 | 0 | 0 | 72.3% | 1 |
-| maghrib | 4,752 | 0 | 3,668 | 1,084 | 0 | 0 | 77.2% | 1 |
-| isha | 4,752 | 0 | 3,619 | 776 | 301 | 56 | 76.2% | 3 |
-| end of eating | 4,752 | 0 | 1,370 | 2,451 | 477 | 454 | 28.8% | 5 |
+| fajr | 18,108 | 0 | 7,894 | 5,074 | 1,773 | 3,367 | 43.6% | 7 |
+| sunrise | 18,216 | 0 | 11,468 | 6,183 | 13 | 552 | 63.0% | 129 |
+| dhuhr | 18,216 | 0 | 13,404 | 4,812 | 0 | 0 | 73.6% | 1 |
+| asr | 18,216 | 0 | 13,046 | 5,170 | 0 | 0 | 71.6% | 1 |
+| maghrib | 18,216 | 0 | 13,649 | 4,183 | 15 | 369 | 74.9% | 126 |
+| isha | 18,115 | 0 | 7,981 | 5,671 | 1,810 | 2,653 | 44.1% | 7 |
+| end of eating | 18,216 | 0 | 7,289 | 5,879 | 1,590 | 3,458 | 40.0% | 70 |
 
-Recorded exceptions (units): the spring takdir moves the dawn by several minutes a day in steps, and
-the R28 envelope takes the latest (Fajr) or earliest (the end) of three days: Fajr up to 4 min late
-at Stockholm and Oslo; the end of eating up to 4 min early at Brussels, London, Amsterdam and Berlin,
-5 at Stockholm and Oslo. Diyanet prints Oslo's June and July sunrise up to 7 min after the sun's (its
-rule is not published); the app keeps the sun's: up to 8 min early.
+Beside these, 108 Fajr cells (Oulu and Luleå, 28 May – 15 July) and 101 Isha cells (Umeå, Oulu and
+Luleå, 31 May – 14 July) are declared not followed: Diyanet's Fajr after the sun has risen and its
+Isha before the sunset + 7, which no day in order can show. The sunrise, Maghrib and end-of-eating
+worsts are the far north's (below); south of Bergen every event stays within 7.
 
-**Beyond the twelve tables** (not gate rows: the entry claims no figure there): Diyanet's own tables
-for Copenhagen (396 days) and nine Nordic cities (31 days), 675 place-days at the app's points: 0
-early, 0 late ends; Fajr up to 34 min late, Isha up to 135 min, the end of eating up to 35 min
-early, in the takdir months. A latitude-free takdir rule could replace the generic one there.
+Recorded exceptions (units): the spring takdir moves Fajr and the dawn by several minutes a day in
+steps, and in spring and August Isha too; the R28 envelope takes the latest (a start) or earliest
+(the end) of three days, and the rounding bound a minute more on takdir days: Fajr up to 4 min late
+at Brussels, London, Amsterdam, Berlin, Antwerpen, Gent, Lille and Copenhagen, 5 at Oslo and
+Helsinki, 6 at Stockholm (which also waits for Islamiska Förbundet's pages) and Trondheim; Isha up
+to 4 at those cities and 5 at Trondheim; the end of eating up to 4 min early at Brussels, London,
+Amsterdam, Berlin, Antwerpen, Gent and Lille, 5 at Stockholm, Oslo, Copenhagen and Helsinki, 6 at
+Trondheim. Sunrise, the sun's own less 7 against Diyanet's summer takdir: up to 8 min early at
+Oslo, 11 at Helsinki, 58 at Trondheim; Maghrib at Trondheim up to 50 min after Diyanet's. Lyon,
+Zürich, Freiburg, München, Wien and Paris stay within class D's 3.
+
+The cautious entries these tables feed record the lateness a cautious time inherits from waiting
+for every member (R41): Belgium Fajr 4, Isha 53 (EMB's after Diyanet's takdir) and the end of
+eating 65 min early (EMB's dawns before Diyanet's imsak); France Fajr 56 (the 12° family's after
+Diyanet's 18° at Lyon), Isha 88 and the end 77 (at Lille); Norway Fajr 54 and Maghrib 4, with Isha
+down from 148 to 34 and the end from 96 to 55 now that Trondheim follows its own table, and sunrise
+58 (Trondheim's takdir); Sweden's sunrise 11 (Helsinki's), Fajr down from 118 to 109.
+
+**The Nordic edge (monitor round, step c).** Trondheim's table showed the edge's takdir (19 % of the
+night before sunrise) up to 42 min early at 63° N in June, so the round fetched Diyanet's tables for
+eighteen more Nordic cities (Malmö to Tromsø, 55.6–69.6° N, 29 Sep 2026 – 31 Dec 2027, politely,
+into the restricted archive). They show one rule: Diyanet holds the printed day between five and
+nineteen hours around its Dhuhr. Every city north of about 59.9° prints a day capped at 1136–1140
+min from late May to late July (Uppsala and Oslo for eleven days, Trondheim to Tromsø for fifty),
+with Fajr 57–65 min before that capped sunrise (624–635 min before Dhuhr over all 22 tables) and Isha
+51–58 min after that capped Maghrib; from Umeå (63.8°) north the December day is floored at 300 min,
+Tromsø's included through its polar night and its midnight sun. Fourteen of the eighteen (Malmö,
+Aarhus, Aalborg, Göteborg, Kristiansand, Stavanger, Uppsala, Bergen, Turku, Tampere, Sundsvall, Umeå,
+Oulu, Luleå) are units of their own now, curves and gate rows like the rest; Rovaniemi, Bodø, Kiruna
+and Tromsø, whose polar days need the engine's polar path, are held as evidence only.
+
+The edge itself changed twice: its Fajr is never earlier than 624 min before Diyanet's Dhuhr (the
+transit + 5) where the sun's own day exceeds the cap (`PlaceCurves`' Diyanet rule; north of about
+64.5° that moment is after the sun has risen, as Diyanet's own Fajr is, and ruling R90 keeps Fajr
+before the sunrise shown and declares it), and the five-hour winter floor travels with the European
+method to every city and the edge (`TimetableMethod.dayAroundDhuhrMinutes`). Two engine points came
+with the far north: from Umeå north in June Diyanet's Isha, counted from a Maghrib its cap puts before
+the sunset, falls before the Maghrib shown (the real sunset + 7, which never gives way): the day
+shows Isha the minute after Maghrib, declared not followed (DayComputer's point 9, beside R90's
+point 8), and a member so declared does not close a cautious day's Maghrib window (Cautious). At
+Oulu and Luleå Diyanet's June Fajr is after the sun has risen (108 cells declared), and its Isha
+before the sunset + 7 (101 cells declared at Umeå, Oulu and Luleå).
+
+What the far north costs, recorded per unit and on the Nordic cautious entries: sunrise up to 129
+min before Diyanet's printed sunrise (Luleå; 97 Oulu, 62 Umeå, 41 Sundsvall, 28 Tampere, 14 Turku,
+13 Bergen, 7 Uppsala) and Maghrib up to 126 min after its printed Maghrib (Luleå; 94, 59, 32, 17,
+4, 4), the end of eating up to 70 min before its imsak (Luleå; 35 Oulu) and Isha, beside the
+declared cells, up to 7 min after, all in the six weeks around the solstice, where the app keeps the
+sun's own day. Sweden–Denmark–Finland's
+entry records sunrise 129, Maghrib 126, Isha 170 (Rabita's model at Luleå) and the end 154 (Rabita's
+dawns at Malmö and Aarhus); Norway's Fajr 101 and Isha 135 (IRN's edge rule at Kristiansand,
+Stavanger and Bergen against Diyanet's own tables there), Dhuhr 6 and the end 57. The residual
+beyond the evidence: the edge north of Luleå and away from every unit (Rovaniemi, Bodø, Kiruna,
+Tromsø, Narvik, Alta, Kirkenes) in their polar periods, where Diyanet still prints a five- or
+nineteen-hour day and the engine's polar path takes the nearest latitude where the sun rises and
+sets. Measured against the four polar tables at the edge (1,584 place-days, not gate rows): Fajr
+early on 183 days, up to 60 min beyond the declared cells (Rovaniemi from 7 June, the polar day,
+where the borrowed Fajr comes an hour before Diyanet's), 30 December days out of order at Rovaniemi
+(its polar night), and lateness far past class D everywhere else (sunrise up to 157 min early,
+Maghrib 149 late, Isha 179, the end 163, Asr 9). The edge there is not never early and not claimed:
+the next step is Diyanet's own polar day as an authority clock rule (its five- and nineteen-hour
+day around Dhuhr, Fajr and Isha at their fixed intervals from it), fitted on these four tables the
+way IRN's Makkah time was on Tromsø's (ruling R82).
 
 **Countries (ruling R50):** Germany, Austria, Switzerland, Liechtenstein, France, Belgium, the
 Netherlands, the UK, Sweden, Norway, Denmark, Finland, Bosnia. Not Kosovo, Albania or Australia:

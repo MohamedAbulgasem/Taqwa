@@ -457,14 +457,15 @@ object Europe {
         named = { it == "fr.gmp" || it == "tr.diyanet.europe" },
         lateLimits = listOf(
             LateLimit(
-                29,
+                FRANCE_END,
                 "The end of eating is the earliest member's: from late April to August the flat 15° family's 15° dawn, " +
                     "which Al-Amel's table (the family's one held) leaves for a later summer Fajr of its own, up to 29 min " +
-                    "before the earliest printed Fajr of the three tables in June; the rest of the year Diyanet's Paris " +
-                    "table's dawn (its 18° and takdir, a member since ruling R87), up to " + FRANCE_DIYANET_END + " min " +
-                    "before the Grande Mosquée's own Fajr in April and August and about 12 in winter, and where the " +
-                    "Grande Mosquée's page changes method its own dawn (ruling R80: 16 min on 1 and 2 January, 8 on 29 " +
-                    "and 30 September).",
+                    "before the earliest printed Fajr of the three tables in June at Paris and up to " + FRANCE_END + " min " +
+                    "before Diyanet's own Lille table's imsak in late May, when its takdir has moved its dawn later; the " +
+                    "rest of the year Diyanet's table's dawn (its 18° and takdir, a member since ruling R87), up to " +
+                    FRANCE_DIYANET_END + " min before the Grande Mosquée's own Fajr in April and August and about 12 in " +
+                    "winter, and where the Grande Mosquée's page changes method its own dawn (ruling R80: 16 min on 1 and " +
+                    "2 January, 8 on 29 and 30 September).",
                 setOf(TimedEvent.END_OF_EATING),
             ),
             LateLimit(
@@ -478,14 +479,18 @@ object Europe {
                 "The 12–13° family prints Fajr from about 12° to 13° (Drancy's at 12.7°); its member takes 12°, the " +
                     "family's latest, never before any of them, so against Drancy's table Fajr runs up to 7 min late; " +
                     "from late May to June Diyanet's Paris table (its takdir, a member since ruling R87) is the latest, " +
-                    "up to " + FRANCE_FAJR + " min after Drancy's.",
+                    "up to 16 min after Drancy's. Against Diyanet's own Lyon and Lille tables (their own units since the " +
+                    "monitor round) the 12° family's Fajr is the later on most days, up to " + FRANCE_FAJR + " min after " +
+                    "Diyanet's 18° at Lyon in autumn and winter.",
                 setOf(TimedEvent.FAJR),
             ),
             LateLimit(
-                38,
+                FRANCE_ISHA,
                 "The flat 15° family prints Isha at 15° (in a Paris June after midnight), while the Grande Mosquée's " +
                     "is sunset + 90 and Drancy's and Al-Amel's summer Isha follow earlier rules of their own; Isha is " +
-                    "the latest member's, so in summer it runs up to 38 min after the latest of those three tables.",
+                    "the latest member's, so in summer it runs up to 38 min after the latest of those three tables at " +
+                    "Paris, and up to " + FRANCE_ISHA + " min after Diyanet's own Lille table in June, whose takdir Isha " +
+                    "is earlier still.",
                 setOf(TimedEvent.ISHA),
             ),
             LateLimit(
@@ -572,6 +577,27 @@ object Europe {
         id = "be.cautious", members = listOf(emb.asMember(1), Diyanet.europe.asMember(2)),
         school = AsrSchool.STANDARD, schoolKnown = true, scope = Scope.COUNTRY, countries = setOf("BE"), measured = true,
         named = { true },
+        lateLimits = listOf(
+            LateLimit(
+                4,
+                "Fajr is the later member's; against Diyanet's Antwerpen and Gent tables (their own units since the " +
+                    "monitor round) up to 4 min on the days its spring takdir moves Fajr in steps, and 2 on plain days " +
+                    "where EMB's 18° dawn is the later.",
+                setOf(TimedEvent.FAJR),
+            ),
+            LateLimit(
+                53,
+                "Isha is the later member's, EMB's (18°, in summer its clock cap and proportion from 45°): up to 53 min " +
+                    "after Diyanet's Antwerpen and Gent tables in July, whose takdir Isha is earlier.",
+                setOf(TimedEvent.ISHA),
+            ),
+            LateLimit(
+                65,
+                "The end of eating is the earlier member's, EMB's own dawns (ruling R39): up to 65 min before Diyanet's " +
+                    "Antwerpen and Gent imsak in late April and May, when Diyanet's takdir has moved its dawn later.",
+                setOf(TimedEvent.END_OF_EATING),
+            ),
+        ),
     )
 
     /**
@@ -764,9 +790,13 @@ object Europe {
      * Austria: IGGÖ's national calendar since 1 Jan 2023 is Diyanet's European method, printed city by
      * city (its PDFs are per location); Wien's equals Diyanet Wien (121 of 122 days). Wien's table is the
      * one held: a point table (ruling R44) on Diyanet's own Wien curves (subtask 7b: its takdir as its
-     * table prints it), margins fitted by Task 7g on IGGÖ's own Wien table (March, May and June; July,
-     * September and December held out). Other Austrian cities' tables are not held, so beyond Wien's
-     * reach the edge applies: Diyanet's generic European method, a minute more.
+     * table prints it), the other columns' margins fitted by Task 7g on IGGÖ's own Wien table (March,
+     * May and June; July, September and December held out). Fajr, Isha and the end of eating keep
+     * Diyanet's curve margins: since the monitor round a curve slot is a bound on Diyanet's own moment
+     * in any year (Diyanet.CITY_CURVE_START), and IGGÖ's 2026 table, the year before Diyanet's held
+     * rows, is that construction's cross-year check, with the same step lateness as Diyanet's own
+     * cities. Other Austrian cities' tables are not held, so beyond Wien's reach the edge applies:
+     * Diyanet's generic European method, a minute more.
      */
     val austria: RegistryEntry = single(
         id = "at.iggo", nameKey = "authority_iggo", entryClass = EntryClass.D_AUTHORITY,
@@ -780,8 +810,9 @@ object Europe {
     val austriaUnits: UnitSet = cityTable(
         austria, "Wien", GeoPoint(48.20849, 16.37208),
         diyanetCity("wien", "at.iggo.wien").copy(
-            margins = margins(start = -17, sunrise = 31, fajr = 3, maghrib = -18, isha = -12), endOfEatingMarginSeconds = 49,
+            margins = margins(start = -17, sunrise = 31, fajr = Diyanet.CITY_CURVE_START, maghrib = -18, isha = Diyanet.CITY_CURVE_START),
         ),
+        lateLimits = Diyanet.steps(4, 4, 4),
     )
 
     /**
@@ -811,9 +842,15 @@ object Europe {
      * A point table (rulings R30, R44) on its own [method] at [point]; beyond its reach the edge takes the
      * entry's own (Diyanet's generic European) method, as Diyanet's own edge does (ruling R45).
      */
-    private fun cityTable(entry: RegistryEntry, name: String, point: GeoPoint, method: TimetableMethod): UnitSet {
+    private fun cityTable(
+        entry: RegistryEntry,
+        name: String,
+        point: GeoPoint,
+        method: TimetableMethod,
+        lateLimits: List<LateLimit> = emptyList(),
+    ): UnitSet {
         val reach = lateReachKm(point.lat, entry.entryClass)
-        return UnitSet(entry.id, listOf(AuthorityUnit(entry.id, name, point, reach, method))) { user ->
+        return UnitSet(entry.id, listOf(AuthorityUnit(entry.id, name, point, reach, method, lateLimits = lateLimits))) { user ->
             requireNotNull(entry.method).beyondTable(entry.id + ".edge", point, user, reach)
         }
     }
@@ -1046,29 +1083,35 @@ object Europe {
         measured = true, named = { true },
         lateLimits = listOf(
             LateLimit(
-                51,
-                "Fajr is the later member's, Diyanet's European takdir: at Oslo its own city curve, up to 48 min after " +
-                    "IRN's calendar; at Trondheim, beyond its city tables, up to 51.",
+                101,
+                "Fajr is the later member's. At IRN's own calendars Diyanet's European takdir on its own city curves: up " +
+                    "to 54 min after IRN's Trondheim calendar in June and 48 after its Oslo calendar. Beyond them, at " +
+                    "Diyanet's Kristiansand, Stavanger and Bergen tables (their own units since the monitor round), IRN's " +
+                    "edge (its hour before sunrise from April to September, else 16°) is the later: up to 101 min after " +
+                    "Diyanet's 18° in spring and autumn.",
                 setOf(TimedEvent.FAJR),
             ),
             LateLimit(
-                148,
-                "Isha is the later member's, Diyanet's European takdir beyond its city tables: at Trondheim up to 148 min " +
-                    "after IRN's calendar (at Oslo, on its own city curve, 29).",
+                135,
+                "Isha is the later member's. At IRN's own calendars Diyanet's European takdir on its own city curves: up " +
+                    "to 34 min after IRN's calendars (Trondheim's in spring, Oslo's 29). Beyond them, at Diyanet's " +
+                    "Kristiansand, Stavanger and Bergen tables, IRN's edge (15°, else the proportion from 45°) is the " +
+                    "later: up to 135 min after Diyanet's takdir Isha in spring and summer.",
                 setOf(TimedEvent.ISHA),
             ),
             LateLimit(
-                96,
-                "The end of eating is the earlier member's. At Trondheim it is Diyanet's European imsak beyond its " +
-                    "city tables (its takdir dawns, read from Oslo's), up to 96 min before IRN's printed Fajr in spring; " +
-                    "at Oslo IRN's own earliest dawns (ruling R39), up to 55 min before Diyanet's imsak and 26 before " +
-                    "IRN's Fajr.",
+                57,
+                "The end of eating is the earlier member's: IRN's own earliest dawns (ruling R39) at Oslo, up to 55 min " +
+                    "before Diyanet's imsak and 26 before IRN's Fajr; at Trondheim Diyanet's own table's dawn, up to 55 " +
+                    "before IRN's printed Fajr in spring; at Bergen up to 57 before Diyanet's imsak in August.",
                 setOf(TimedEvent.END_OF_EATING),
             ),
             LateLimit(
-                10,
-                "Sunrise is the earlier member's (Diyanet's the sun's less 7, IRN's up to 2 min before the sun's): up to " +
-                    "10 min before IRN's Trondheim sunrise.",
+                58,
+                "Sunrise is the earlier member's, the sun's own less Diyanet's 7 (IRN's is up to 2 min before the sun's): " +
+                    "up to 10 min before IRN's Trondheim sunrise, and from late May to late July up to 58 min before " +
+                    "Diyanet's own Trondheim table, which holds the day to about nineteen hours around Dhuhr and prints " +
+                    "its sunrise up to 53 min after the sun's (the app keeps the sun's, the safe side).",
                 setOf(TimedEvent.SUNRISE),
             ),
             LateLimit(
@@ -1078,13 +1121,15 @@ object Europe {
                 setOf(TimedEvent.ASR),
             ),
             LateLimit(
-                5,
-                "Zuhr is the later member's (IRN's + 4 to + 9, Diyanet's + 5): up to 5 min after the tables'.",
+                6,
+                "Zuhr is the later member's (IRN's + 4 to + 9, Diyanet's + 5): up to 5 min after the tables', and beyond " +
+                    "IRN's calendars, where its edge keeps + 10, up to 6 after Diyanet's Kristiansand table.",
                 setOf(TimedEvent.DHUHR),
             ),
             LateLimit(
-                3,
-                "Maghrib is capped at IRN's (the most followed) where the members spread: up to 3 min after it.",
+                4,
+                "Maghrib is capped at IRN's (the most followed) where the members spread: up to 4 min after it (at " +
+                    "Trondheim in June, where IRN's monthly minutes run ahead of its calendar).",
                 setOf(TimedEvent.MAGHRIB),
             ),
         ),
@@ -1101,24 +1146,26 @@ object Europe {
         measured = true, named = { it != "se.rabita" },
         lateLimits = listOf(
             LateLimit(
-                118,
-                "Fajr is the later member's, Diyanet's European takdir: beyond its city tables at Helsinki (up to 118 " +
-                    "min after Rabita's calendar) and Copenhagen (34); at Stockholm, on its own city curve, 5. Rabita's " +
-                    "own Fajr follows its calendar.",
+                109,
+                "Fajr is the later member's, Diyanet's European takdir on its own city curves (Helsinki's and " +
+                    "Copenhagen's since the monitor round): up to 109 min after Rabita's Helsinki calendar in summer; at " +
+                    "Stockholm 6. Rabita's own Fajr follows its calendar.",
                 setOf(TimedEvent.FAJR),
             ),
             LateLimit(
-                155,
+                170,
                 "Isha is the later member's, Rabita's own model: 17° while the sun reaches it, near midnight in late " +
                     "spring and late summer, up to 155 min after Rabita's calendar at Helsinki and 136 after Diyanet's " +
-                    "Stockholm table; at Copenhagen Diyanet's takdir beyond its city tables as well (135).",
+                    "Stockholm table, 170 after Diyanet's Luleå table in April and September (its takdir Isha comes " +
+                    "earlier the further north).",
                 setOf(TimedEvent.ISHA),
             ),
             LateLimit(
-                137,
+                154,
                 "The end of eating is the earlier member's: Rabita's own earliest dawns, near the middle of the night " +
                     "from April to August (ruling R39), applied at Copenhagen and Stockholm, up to 137 and 136 min before " +
-                    "Diyanet's imsak there; at Helsinki up to 25 min before Rabita's own Fajr.",
+                    "Diyanet's imsak there, and up to 154 before its Malmö and Aarhus tables in August; at Helsinki up to " +
+                    "25 min before Rabita's own Fajr.",
                 setOf(TimedEvent.END_OF_EATING),
             ),
             LateLimit(
@@ -1128,8 +1175,11 @@ object Europe {
                 setOf(TimedEvent.ASR),
             ),
             LateLimit(
-                6,
-                "Sunrise is the earlier member's, Diyanet's (the sun's less 7): up to 6 min before Rabita's at Helsinki.",
+                129,
+                "Sunrise is the earlier member's, Diyanet's (the sun's less 7): up to 6 min before Rabita's at Helsinki, " +
+                    "and from late May to late July, where Diyanet holds its tables' day to nineteen hours around Dhuhr " +
+                    "and prints its sunrise after the sun's, up to 11 min before its Helsinki table and 129 before its " +
+                    "Luleå table (the app keeps the sun's, the safe side).",
                 setOf(TimedEvent.SUNRISE),
             ),
             LateLimit(
@@ -1138,8 +1188,11 @@ object Europe {
                 setOf(TimedEvent.DHUHR),
             ),
             LateLimit(
-                2,
-                "Maghrib is capped at Diyanet's (its sunset + 7) where the members spread: up to 2 min after it.",
+                126,
+                "Maghrib is capped at Diyanet's (its sunset + 7) where the members spread: up to 2 min after it, and from " +
+                    "late May to late July, where Diyanet holds its tables' day to nineteen hours around Dhuhr and prints " +
+                    "its Maghrib before the sun sets, never before the real sunset: up to 4 min after its Turku table and " +
+                    "126 after its Luleå table.",
                 setOf(TimedEvent.MAGHRIB),
             ),
         ),
@@ -1189,10 +1242,16 @@ object Europe {
     /** The Dutch Moroccan member's Maghrib minutes (ruling R87; the calendar itself prints + 1..4). */
     private const val NL_MAGHRIB = 7
 
-    /** France's late limits with Diyanet as a member (ruling R87; measured by the gate at Paris). */
+    /**
+     * France's late limits with Diyanet as a member (ruling R87; measured by the gate at Paris, and since
+     * the monitor round against Diyanet's own Lyon and Lille tables, where the families' later Fajr and
+     * Isha and the earliest end stand against Diyanet's 18° and takdir).
+     */
     private const val FRANCE_SUNRISE = 8
     private const val FRANCE_ASR = 4
-    private const val FRANCE_FAJR = 15
+    private const val FRANCE_FAJR = 56
+    private const val FRANCE_ISHA = 88
+    private const val FRANCE_END = 77
     private const val FRANCE_DIYANET_END = 26
 
     /** Germany's late-dawn family's June share of the night before sunrise (Hilaly 0.206, Rahma 0.213). */

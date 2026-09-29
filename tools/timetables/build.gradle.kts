@@ -220,6 +220,28 @@ tasks.register<JavaExec>("generateGoldenVector") {
     argumentProviders.add(CommandLineArgumentProvider { listOf("--out", out.get()) })
 }
 
+/**
+ * Writes `DiyanetEuropeCurves.kt`, the per-city curves of Diyanet's European tables, from every held
+ * capture of each city (restricted, read from the official root); the generator's KDoc says how a
+ * slot is derived. Re-run when a capture is added to the archive, then run the gate and commit.
+ *
+ *     ./gradlew -p tools/timetables generateDiyanetEuropeCurves [-Pofficial=<dir>] [-Pout=<file>]
+ */
+tasks.register<JavaExec>("generateDiyanetEuropeCurves") {
+    group = "application"
+    description = "Writes DiyanetEuropeCurves.kt from the held Diyanet city tables."
+    requireArchive()
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.curves.DiyanetEuropeCurveGeneratorKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    val out = providers.gradleProperty("out").orElse("")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", repoRoot.path, "--official", officialRoot.get()) +
+            (if (out.get().isNotBlank()) listOf("--out", out.get()) else emptyList())
+    })
+}
+
 tasks.register<JavaExec>("gate") {
     group = "verification"
     description = "Checks the engine against every official day held locally and writes the stamps."

@@ -117,6 +117,9 @@ object Diyanet {
         margins = margins(start = -13, sunrise = 10, asr = -12, maghrib = -15, isha = -10),
         highLatitude = HighLatRule.NightFraction(fajrFraction = 0.19, ishaFraction = 0.22),
         endOfEatingMarginSeconds = 9,
+        dayAroundDhuhrMinutes = WINTER_HALF_DAY_MINUTES,
+        // From Umeå north its capped Isha falls before the Maghrib shown in June (point 9 declares it).
+        declaresIshaBeforeMaghrib = true,
     )
 
     /**
@@ -139,28 +142,67 @@ object Diyanet {
      * 44.5° each follows its own table's takdir ([cityMethod]); Sarajevo, south of it, the plain
      * method. Beyond every reach, the plain method at the user's point a minute later, the nearest
      * table's point still bounding the ends within three reaches (ruling R45). Built as
-     * `pointTables` builds it, so that Stockholm and Oslo can carry their own exceptions.
+     * `pointTables` builds it, so that Stockholm and Oslo can carry their own exceptions. Lazy, so that
+     * the curve generator in tools/timetables can read [europeMethod] before a new city's curves exist.
      */
-    val europeUnits: UnitSet = run {
+    val europeUnits: UnitSet by lazy {
         val units = listOf(
             europeTable("sarajevo", "Sarajevo", GeoPoint(43.84864, 18.35644), method = null),
+            europeTable("lyon", "Lyon", GeoPoint(45.764, 4.8357)),
             europeTable("zurich", "Zürich", GeoPoint(47.36667, 8.55)),
             europeTable("freiburg", "Freiburg", GeoPoint(47.9959, 7.85222)),
             europeTable("munich", "München", GeoPoint(48.13743, 11.57549)),
             europeTable("wien", "Wien", GeoPoint(48.20849, 16.37208)),
             europeTable("paris", "Paris", GeoPoint(48.85341, 2.3488)),
-            europeTable("brussels", "Brussels", GeoPoint(50.85045, 4.34878), lateLimits = listOf(springEnd(4))),
-            europeTable("london", "London", GeoPoint(51.5074, -0.1278), lateLimits = listOf(springEnd(4))),
-            europeTable("amsterdam", "Amsterdam", GeoPoint(52.37403, 4.88969), lateLimits = listOf(springEnd(4))),
-            europeTable("berlin", "Berlin", GeoPoint(52.52437, 13.41053), lateLimits = listOf(springEnd(4))),
+            europeTable("lille", "Lille", GeoPoint(50.6292, 3.0573), lateLimits = listOf(springFajr(4), springEnd(4))),
+            europeTable("brussels", "Brussels", GeoPoint(50.85045, 4.34878), lateLimits = steps(4, 4, 4)),
+            europeTable("gent", "Gent", GeoPoint(51.0543, 3.7174), lateLimits = listOf(springFajr(4), springEnd(4))),
+            europeTable("antwerpen", "Antwerpen", GeoPoint(51.2194, 4.4025), lateLimits = steps(4, 4, 4)),
+            europeTable("london", "London", GeoPoint(51.5074, -0.1278), lateLimits = steps(4, 4, 4)),
+            europeTable("amsterdam", "Amsterdam", GeoPoint(52.37403, 4.88969), lateLimits = steps(4, 4, 4)),
+            europeTable("berlin", "Berlin", GeoPoint(52.52437, 13.41053), lateLimits = steps(4, 4, 4)),
+            europeTable("malmo", "Malmö", GeoPoint(55.60587, 13.00073), lateLimits = steps(4, 4, 5)),
+            europeTable("copenhagen", "Copenhagen", GeoPoint(55.6761, 12.5683), lateLimits = steps(4, 4, 5)),
+            europeTable("aarhus", "Aarhus", GeoPoint(56.15674, 10.21076), lateLimits = steps(4, 4, 5)),
+            europeTable("aalborg", "Aalborg", GeoPoint(57.048, 9.9187), lateLimits = steps(5, 4, 5)),
+            europeTable("goteborg", "Göteborg", GeoPoint(57.70716, 11.96679), lateLimits = steps(5, 4, 5)),
+            europeTable("kristiansand", "Kristiansand", GeoPoint(58.14671, 7.9956), lateLimits = steps(5, 4, 5)),
+            europeTable("stavanger", "Stavanger", GeoPoint(58.97005, 5.73332), lateLimits = steps(5, 4, 5)),
             europeTable(
                 "stockholm", "Stockholm", GeoPoint(59.32938, 18.06871),
                 method = cityMethod("stockholm").let { it.copy(margins = it.margins.copy(fajr = it.margins.fajr + STOCKHOLM_IFIS_FAJR)) },
-                lateLimits = listOf(LateLimit(5, STOCKHOLM_FAJR, setOf(TimedEvent.FAJR)), springEnd(5)),
+                lateLimits = listOf(LateLimit(6, STOCKHOLM_FAJR, setOf(TimedEvent.FAJR)), springIsha(4), springEnd(5)),
             ),
+            europeTable("uppsala", "Uppsala", GeoPoint(59.85882, 17.63889), lateLimits = steps(5, 4, 5) + capSunrise(7)),
             europeTable(
                 "oslo", "Oslo", GeoPoint(59.91273, 10.74609),
-                lateLimits = listOf(springFajr(4), springEnd(5), LateLimit(8, OSLO_SUNRISE, setOf(TimedEvent.SUNRISE))),
+                lateLimits = steps(5, 4, 5) + LateLimit(8, OSLO_SUNRISE, setOf(TimedEvent.SUNRISE)),
+            ),
+            europeTable(
+                "helsinki", "Helsinki", GeoPoint(60.1699, 24.9384),
+                lateLimits = steps(5, 4, 5) + LateLimit(11, HELSINKI_SUNRISE, setOf(TimedEvent.SUNRISE)),
+            ),
+            europeTable("bergen", "Bergen", GeoPoint(60.39299, 5.32415), lateLimits = steps(5, 5, 5) + capSunrise(13) + capMaghrib(4)),
+            europeTable("turku", "Turku", GeoPoint(60.45148, 22.26869), lateLimits = steps(5, 4, 5) + capSunrise(14) + capMaghrib(4)),
+            europeTable("tampere", "Tampere", GeoPoint(61.49911, 23.78712), lateLimits = steps(5, 4, 5) + capSunrise(28) + capMaghrib(17)),
+            europeTable("sundsvall", "Sundsvall", GeoPoint(62.39129, 17.3063), lateLimits = steps(5, 5, 5) + capSunrise(41) + capMaghrib(32)),
+            europeTable(
+                "trondheim", "Trondheim", GeoPoint(63.43049, 10.39506),
+                lateLimits = steps(6, 5, 6) +
+                    LateLimit(58, TRONDHEIM_SUNRISE, setOf(TimedEvent.SUNRISE)) +
+                    LateLimit(50, TRONDHEIM_MAGHRIB, setOf(TimedEvent.MAGHRIB)),
+            ),
+            europeTable(
+                "umea", "Umeå", GeoPoint(63.82842, 20.25972),
+                lateLimits = steps(6, 6, 6) + capSunrise(62) + capMaghrib(59),
+            ),
+            europeTable(
+                "oulu", "Oulu", GeoPoint(65.01236, 25.46816),
+                lateLimits = listOf(springFajr(7), springIsha(7), capEnd(35)) + capSunrise(97) + capMaghrib(94),
+            ),
+            europeTable(
+                "lulea", "Luleå", GeoPoint(65.58415, 22.15465),
+                lateLimits = listOf(springFajr(7), springIsha(7), capEnd(70)) + capSunrise(129) + capMaghrib(126),
             ),
         )
         UnitSet("tr.diyanet.europe", units) { user ->
@@ -179,16 +221,40 @@ object Diyanet {
         "tr.diyanet.europe.$key", name, point, lateReachKm(point.lat, EntryClass.D_AUTHORITY), method, lateLimits = lateLimits,
     )
 
+    /**
+     * A takdir city's recorded lateness on the days its takdir moves a time in steps: Fajr up to [fajr]
+     * and Isha up to [isha] min late, the end of eating up to [end] min early. Shared with the units
+     * that print a Diyanet city's times under their own name (IGGÖ's Wien, Europe.kt).
+     */
+    internal fun steps(fajr: Int, isha: Int, end: Int) = listOf(springFajr(fajr), springIsha(isha), springEnd(end))
+
     /** Where the spring takdir moves Fajr by minutes a day, the leap-cycle envelope makes Fajr up to [minutes] late. */
     private fun springFajr(minutes: Int) = LateLimit(minutes, SPRING_FAJR, setOf(TimedEvent.FAJR))
+
+    /** The same for Isha, whose takdir steps come in spring and in August. */
+    private fun springIsha(minutes: Int) = LateLimit(minutes, SPRING_ISHA, setOf(TimedEvent.ISHA))
 
     /** The same envelope makes the end of eating up to [minutes] early. */
     private fun springEnd(minutes: Int) = LateLimit(minutes, SPRING_END, setOf(TimedEvent.END_OF_EATING))
 
+    /**
+     * Why a takdir city's curve runs after Diyanet's minute by up to a minute on takdir days: a slot is
+     * the latest moment Diyanet's own could be under its nearest-minute rounding, since a slot that
+     * reproduced one year's rounding showed the minute before Diyanet's in the next year.
+     */
+    private const val ROUNDING_BOUND =
+        " On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the " +
+            "minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after."
+
     private const val SPRING_FAJR =
         "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest " +
             "of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed " +
-            "time by as much as a day's step on those days."
+            "time by as much as a day's step on those days." + ROUNDING_BOUND
+
+    private const val SPRING_ISHA =
+        "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve " +
+            "takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs " +
+            "after the printed time by as much as a day's step on those days." + ROUNDING_BOUND
 
     private const val SPRING_END =
         "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating " +
@@ -200,6 +266,69 @@ object Diyanet {
             "the app keeps the sun's, the safe side."
 
     /**
+     * Diyanet's summer takdir in the north (monitor round, brief D): from late May to late July its
+     * tables hold the printed day to nineteen hours around Dhuhr, so north of about 60° its sunrise
+     * comes after the sun's own and its Maghrib before the sunset, more the further north (Bergen a
+     * few minutes, Luleå about two hours); the app keeps the sun's sunrise and its sunset + 7 (Maghrib
+     * never before the real sunset, as at Tromsø under IRN, ruling R82). From Umeå north its Isha,
+     * counted from that earlier Maghrib, comes before the sunset + 7 and its Fajr after the sun has
+     * risen: the app shows Isha the minute after Maghrib and Fajr the minute before the sunrise, both
+     * declared not followed (points 8 and 9 of DayComputer), and the end of eating stays before that Fajr.
+     */
+    private fun capSunrise(minutes: Int) = LateLimit(
+        minutes,
+        "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its " +
+            "sunrise after the sun's own; the app keeps the sun's, the safe side: up to $minutes min before Diyanet's.",
+        setOf(TimedEvent.SUNRISE),
+    )
+
+    private fun capMaghrib(minutes: Int) = LateLimit(
+        minutes,
+        "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its " +
+            "Maghrib before the sun sets; Maghrib never comes before the real sunset (the sun's plus Diyanet's 7 min): up to " +
+            "$minutes min after Diyanet's.",
+        setOf(TimedEvent.MAGHRIB),
+    )
+
+    private fun capEnd(minutes: Int) = LateLimit(
+        minutes,
+        "In June Diyanet's imsak here, its Fajr under its nineteen-hour day, comes after the sun has risen; the end of " +
+            "eating stays before the Fajr shown, which stays before the sunrise (declared not followed), and around those " +
+            "days comes up to $minutes min before Diyanet's imsak.",
+        setOf(TimedEvent.END_OF_EATING),
+    )
+
+    private const val HELSINKI_SUNRISE =
+        "Diyanet prints Helsinki's June and early July sunrise up to 10 min after the sun's own (its rule is not " +
+            "published); the app keeps the sun's, the safe side: up to 11 min before Diyanet's."
+
+    /**
+     * Diyanet's summer takdir at Trondheim (monitor round, brief D): from late May to late July its table holds
+     * the day to about nineteen hours around Dhuhr, printing its sunrise up to 53 min after the sun's own and
+     * its Maghrib up to 43 min before the sun sets, its Fajr 59 min before that sunrise and its Isha about 53
+     * min after that Maghrib. The app keeps the sun's sunrise and sunset (Maghrib never before the real
+     * sunset, as at Tromsø under IRN, ruling R82); Fajr and Isha follow the table's own curves.
+     */
+    private const val TRONDHEIM_SUNRISE =
+        "From late May to late July Diyanet's Trondheim table holds the day to about nineteen hours around Dhuhr " +
+            "and prints its sunrise up to 53 min after the sun's own; the app keeps the sun's, the safe side: up to " +
+            "58 min before Diyanet's."
+
+    private const val TRONDHEIM_MAGHRIB =
+        "From late May to late July Diyanet's Trondheim table holds the day to about nineteen hours around Dhuhr " +
+            "and prints its Maghrib up to 43 min before the sun sets; Maghrib never comes before the real sunset " +
+            "(the sun's plus Diyanet's 7 min): up to 50 min after Diyanet's."
+
+    /**
+     * Diyanet's winter takdir in the north (monitor round, brief D): its tables hold the day to five hours
+     * around Dhuhr (its sunrise no later than Dhuhr − 150 min, its Maghrib no earlier than Dhuhr + 150),
+     * every row within its rounding, from Trondheim (9 December to 4 January) to Tromsø (its whole polar
+     * night); south of about 63° the shortest day is longer than that and the rule never binds, so the
+     * European method carries it everywhere ([europeMethod], every city and the edge).
+     */
+    private const val WINTER_HALF_DAY_MINUTES = 150
+
+    /**
      * A takdir city's own method (rulings R39, R42, R44): Fajr, Isha and the end of eating at the
      * depressions its own table prints (DiyanetEuropeCurves: never a start before, nor the end after,
      * any printed minute), with the curves' own margins. Its id keeps PlaceCurves from replacing the
@@ -208,15 +337,24 @@ object Diyanet {
      */
     private fun cityMethod(key: String): TimetableMethod {
         val curves = DiyanetEuropeCurves.byCity.getValue(key)
-        return europeMethod.copy(
-            id = "tr.diyanet.europe.$key",
-            fajrAngleByDayOfYear = curves.fajr,
-            ishaAngleByDayOfYear = curves.isha,
-            endOfEating = EndOfEating.DawnAngle(18.0, curves.end),
+        return curveMethod("tr.diyanet.europe.$key", curves.fajr, curves.isha, curves.end)
+    }
+
+    /**
+     * [europeMethod] on one city table's own curves under [id]: Fajr and Isha at [fajr] and [isha]
+     * (depressions by slot) with [CITY_CURVE_START], the end of eating at [end] with [CITY_CURVE_END].
+     * Shared with the curve generator's test in tools/timetables, which checks an invented table's curves
+     * the way the registry uses them.
+     */
+    internal fun curveMethod(id: String, fajr: DoubleArray, isha: DoubleArray, end: DoubleArray): TimetableMethod =
+        europeMethod.copy(
+            id = id,
+            fajrAngleByDayOfYear = fajr,
+            ishaAngleByDayOfYear = isha,
+            endOfEating = EndOfEating.DawnAngle(18.0, end),
             margins = europeMethod.margins.copy(fajr = CITY_CURVE_START, isha = CITY_CURVE_START),
             endOfEatingMarginSeconds = CITY_CURVE_END,
         )
-    }
 
     /**
      * Stockholm's Fajr takes this many seconds more (Task 7g, review fix round 2): Islamiska Förbundet's
@@ -227,11 +365,18 @@ object Diyanet {
     private const val STOCKHOLM_IFIS_FAJR = 69
 
     private const val STOCKHOLM_FAJR = SPRING_FAJR + " Stockholm's Fajr also waits for Islamiska Förbundet's pages, a " +
-        "minute later than Diyanet's own table on some days: up to 5 min after Diyanet's in April and August."
+        "minute later than Diyanet's own table on some days: up to 6 min after Diyanet's in April and August."
 
-    /** The margins on a city's own curves, which are derived 25 s before each printed minute. */
-    private const val CITY_CURVE_START = -29
-    private const val CITY_CURVE_END = 30
+    /**
+     * The margins on a city's own curves (DiyanetEuropeCurves, whose generator in tools/timetables reads
+     * them): a curve slot is the latest moment Diyanet's own could be under its nearest-minute rounding,
+     * 30 s after the printed minute and 5 s of safety, so a start on it shows the printed minute or the
+     * one after in any year; the end curve the earliest, 35 s before, so it never passes the printed
+     * minute. Where Diyanet prints the plain 18° or 16° that day, the slot is the plain method's own
+     * moment instead ([europeMethod]'s margins), which shows the same minute as the plain method.
+     */
+    internal const val CITY_CURVE_START = -29
+    internal const val CITY_CURVE_END = 30
 
     /**
      * The old picker's Turkey method: Diyanet's algorithm at any point, the plain ±30 s (ruling R31),

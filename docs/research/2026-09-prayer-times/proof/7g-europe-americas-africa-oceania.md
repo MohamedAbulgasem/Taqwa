@@ -47,7 +47,7 @@ Event codes: F Fajr, S sunrise, D Dhuhr, A Asr (Ah Hanafi), M Maghrib, I Isha, E
 
 | entry | class | place-days (held out) | worst per event |
 | --- | --- | --- | --- |
-| `at.iggo` | D | 184 (92) | F 3, S 1, D 1, A 1, M 1, I 3, E 3 |
+| `at.iggo` | D | 184 (92) | F 3 (4), S 1, D 1, A 1, M 1, I 3 (4), E 4 (4) |
 | `au.cautious` | C | 380 (380) | F 2, S 8 (8), D 4 (4), A 18 (18), M 1, I 10 (10), E 2 |
 | `au.lma` | D | 349 (0) | F 1, S 1, D 3, A 15 (15), M 1, I 1, E 1 |
 | `be.cautious` | C | 31 (31) | F 1, S 1, D 1, A 1, M 1, I 1, E 1 |
@@ -1136,6 +1136,18 @@ The gate over 184 place-days showed 0 early and 0 late ends. The worst per event
 the end of eating) and 1 for the rest. The old exceptions (Fajr 22, Isha 63, end of eating 6), from
 Diyanet's generic curves, are gone.
 
+Since the monitor round (29 Sep 2026, brief D; 7b's Diyanet Europe section) Diyanet's city curves are
+bounds on its own moment, and Wien's Fajr, Isha and end of eating keep Diyanet's curve margins (−29 s
+for the two starts, +30 s for the end) in place of IGGÖ's fitted +3 s, −12 s and +49 s; the other
+events keep IGGÖ's margins. The unit records three exceptions of 4 min, on Fajr, Isha and the end of
+eating, with Diyanet's own reasons: in spring its takdir moves the dawn and Isha by several minutes a
+day in steps, the curve takes the safe side of three neighbouring days so the leap cycle cannot make
+a start early or the end late, and on takdir days the slot is the latest moment Diyanet's own could
+be under its rounding. Over the same 184 place-days: still 0 early and 0 late ends; the worst is now 3
+on Fajr and Isha and 4 on the end of eating (the About figure, R63, moves from 3 to 4 min), the exact
+share on Fajr 40 %. IGGÖ's 2026 table, the year before Diyanet's held Wien rows, is that
+construction's cross-year check.
+
 **`ch.fids`: class D_AUTHORITY.** The data is FIDS's Zürich page for 25 September to 26 October 2026: 32
 days, all fit, with nothing held out. It is on Diyanet's own Zürich curves.
 
@@ -1867,7 +1879,8 @@ groups were re-run and the stamps regenerated.
   see each section above.
 - **`at.iggo`, `ch.fids`:** now on Diyanet's own Wien and Zürich curves (the quick win the coordinator
   named). IGGÖ's Fajr went from 22 to 3, Isha from 63 to 3, and the end of eating from 6 to 3. Its
-  exceptions are gone.
+  exceptions are gone. (Since the monitor round Wien's Fajr, Isha and end keep Diyanet's curve
+  margins, with three unit exceptions of 4 min; see the section above.)
 - **`de.vikz`:** not changed. It has no units of its own, so following Diyanet's Berlin, München and
   Freiburg curves would need a unit set for it, which means a new list in the registry core's
   `Units.kt`. Germany's cautious Fajr stays up to 12 min after Diyanet's Berlin table.

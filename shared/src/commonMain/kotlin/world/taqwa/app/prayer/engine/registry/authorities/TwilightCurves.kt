@@ -79,6 +79,9 @@ internal object TwilightCurves {
         /** The night from the day's sunset to the next sunrise, in minutes (adhan-js's for the day's Fajr). */
         val followingNight: Double get() = nightAfter
 
+        /** From sunrise to the transit, in minutes: half the sun's own day. */
+        val halfDayMinutes: Double get() = h0 * 4.0
+
         /** The sun's depression [minutes] after sunset (or, the same, before sunrise). */
         fun depression(minutes: Double): Double = depressionAt(phi, delta, h0 + minutes / 4.0)
 
@@ -405,8 +408,27 @@ internal object PlaceCurves {
      * Fitted to its 2026–27 tables for eleven European cities (not committed). Isha keeps the plain
      * 16° (its fraction varies by season), which also drops a city's own Isha curve from the edge
      * beyond that city's reach, where the curve's depressions do not hold.
+     *
+     * Where the sun's own day is longer than Diyanet's cap (monitor round, brief D: its Nordic tables
+     * hold the printed day to nineteen hours around Dhuhr and print Fajr 57–65 min before that capped
+     * sunrise, never later than [DIYANET_CAPPED_FAJR_BEFORE_DHUHR] min before Dhuhr over 22 tables
+     * from 55.6° to 69.6° N), 19 % of the night ran up to 42 min before Diyanet's Fajr at Trondheim:
+     * the Fajr is then no earlier than that many minutes before Diyanet's Dhuhr (the transit + 5),
+     * the later of the two. North of about 64.5° that moment comes after the sun has risen, as
+     * Diyanet's own Fajr does there; the engine keeps Fajr before the sunrise it shows and declares it
+     * (ruling R90), as at Tromsø under IRN.
      */
-    private val diyanetEurope = Rule(fajr = { d -> if (d.latitude() > 44.5) 0.19 else null }, isha = { null })
+    private val diyanetEurope = Rule(
+        fajr = { d ->
+            if (d.latitude() > 44.5) {
+                val cappedFajrBeforeSunrise = DIYANET_CAPPED_FAJR_BEFORE_DHUHR - DIYANET_DHUHR_MINUTES - d.halfDayMinutes
+                min(0.19, cappedFajrBeforeSunrise / d.morningNight)
+            } else {
+                null
+            }
+        },
+        isha = { null },
+    )
 
     /**
      * EMB (Task 7g, fitted to its 2026 Brussels table, not committed). From 1 May to 31 July above 45°
@@ -701,4 +723,14 @@ internal object PlaceCurves {
     private const val GMP_EARLIER_FROM = 276
     private const val GMP_EARLIER_TO = 365
     private const val DIYANET_TAKDIR_FROM = 44.5
+
+    /**
+     * On the days Diyanet's nineteen-hour cap binds, its Fajr comes 624–635 min before its Dhuhr (the
+     * capped sunrise 566–570 before Dhuhr, Fajr 57–65 before it) over its 22 Nordic tables held
+     * (monitor round, brief D); the edge's Fajr is never earlier than the latest of them.
+     */
+    private const val DIYANET_CAPPED_FAJR_BEFORE_DHUHR = 624.0
+
+    /** Diyanet's Dhuhr: the transit plus its temkin of 5 min. */
+    private const val DIYANET_DHUHR_MINUTES = 5.0
 }

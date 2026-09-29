@@ -1,7 +1,7 @@
 {
   "entry": "nl.cautious",
   "class": "C",
-  "engineHash": "65db599f2b8d950e",
+  "engineHash": "5dcab34f8c74d8ce",
   "broken": 0,
   "places": 1,
   "first": "2026-09-25",
@@ -107,12 +107,12 @@
       "checked": 31,
       "lateEnd": 0,
       "late": {
-        "0": 7,
-        "1": 24,
+        "0": 8,
+        "1": 23,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.2258,
+      "exactShare": 0.2581,
       "worstLate": 1,
       "lateLimit": 2,
       "lateLimitFrom": "entry nl.cautious",
@@ -217,12 +217,12 @@
         "checked": 31,
         "lateEnd": 0,
         "late": {
-          "0": 7,
-          "1": 24,
+          "0": 8,
+          "1": 23,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.2258,
+        "exactShare": 0.2581,
         "worstLate": 1,
         "lateLimit": 2,
         "lateLimitFrom": "entry nl.cautious",
