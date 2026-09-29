@@ -11,6 +11,9 @@
 #   under the cap against IRN's held calendar, in 2027 not (IRN's 2027 calendar is not held).
 # - Kristiansand, Stavanger and Bergen, Diyanet (the monitor round, step c): its own tables, the member tr.diyanet.europe at
 #   its units there; Maghrib not checked (the cap follows IRN, whose calendars are Oslo's, Trondheim's and Tromsø's).
+# - Oslo, Diyanet (the monitor's capture of 28 Sep 2026, the member tr.diyanet.europe): 29 Sep – 29 Oct 2026 and 2027,
+#   the same minutes as the split-7g rows on every day both hold; it adds 26–29 October. Maghrib is not checked on
+#   this row (IRN's 2027 calendar is not held; in 2026 IRN's own row checks it under the cap).
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/nordic/off-irn-oslo-2026.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D As M I Ah	daily	-	test	IRN Oslo	no.irn
 archive/tables/moral-auth-world/europe/split-7g/dy-oslo-2026.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo 2026	tr.diyanet.europe
@@ -21,3 +24,4 @@ archive/tables/monitor-round/tr-diyanet-europe/trondheim-2027.txt	no.cautious	63
 archive/tables/monitor/tr-diyanet-europe/kristiansand.txt	no.cautious	58.14671	7.9956	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Kristiansand (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
 archive/tables/monitor/tr-diyanet-europe/stavanger.txt	no.cautious	58.97005	5.73332	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Stavanger (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
 archive/tables/monitor/tr-diyanet-europe/bergen.txt	no.cautious	60.39299	5.32415	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Bergen (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 28 Sep 2026)	tr.diyanet.europe

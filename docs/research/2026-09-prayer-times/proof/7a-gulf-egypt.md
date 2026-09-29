@@ -332,6 +332,13 @@ there.
 Toshka (an ESA table, but no point I could place); the five new towns' points are town centres, not
 ESA's.
 
+**The weekly monitor's capture (28 September 2026).** Dar al-Ifta's September 2026 month table for
+all 30 towns, the same minutes as the held rows on every day both hold. Dahab's adds 29 days to the
+one (25 September) the round held, as a held-out row: 0 early, 0 late ends, within 1 min like every
+held-out town; `eg.esa` holds 1,707 place-days (was 1,678). The fetcher reads the current month, so
+no capture holds October 2026 yet: every Egyptian page stays held from 1 October (ruling R115) until
+a capture of October is gated.
+
 ## The Other methods in these files and adhan2's Asr
 
 Task 7h found that adhan2 0.0.7, whose presets the Other methods reproduce, takes one declination

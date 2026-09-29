@@ -216,6 +216,14 @@ nothing). The Dar al-Ifta statement of 2022 said the eastern Awqaf had put mosqu
 min later; the owner's own adhan times of 27 Sep 2026 show the east now calls Fajr earlier than the
 national calendar, not later.
 
+**The weekly monitor's capture (28 September 2026).** The widget's day for all 22 cities (28
+September, its emsak as the imsak) and api.ifta.ly's eight days for Tripoli (28 September – 5 October;
+the five to 2 October the same as `nile/tripoli.txt`'s), held out with each city's round columns
+(east and south of R73's line no Fajr, Maghrib or imsak): 0 early, 0 late ends, within class D's
+3 min. Seven units' worst rose a minute, to 2 (Awjila's, Bani Walid's and Jalu's Isha, Derna's Dhuhr,
+Marj's, Misrata's and Zliten's Asr). `ly.awqaf` holds 91 place-days (was 67), checked to 5 October at
+Tripoli and to 28 September elsewhere; still class D everywhere, so no page.
+
 ## Tunisia — `tn.inm`, class B
 
 **Evidence.** meteo.tn per delegation at INM's own reference points: Tunis, Sfax and Tataouine every
@@ -275,6 +283,13 @@ dipped ones (Isha and the end of eating), a full year at three places including 
 the edge takes the deepest dip seen for sunrise, Maghrib and Isha and claims nothing); INM's Asr
 definition (a monthly table fitted on one year); the dips' mechanism (INM's elevation data was not
 found).
+
+**The weekly monitor's capture (28 September 2026).** INM's coming seven days (28 September – 4
+October) for the six delegations, with its sunrise on each. Tabarka's, Ben Guerdane's and Tala's are
+held-out rows: they add 29–30 September and 2–3 October to their every-third-day tables, and Tabarka's
+and Ben Guerdane's first sunrise cells (7 each): 0 early, 0 late ends, worst 1 min (Tala's Isha and end
+of eating 2, as before). Tunis's, Sfax's and Tataouine's print the same minutes as their rows and add
+only four sunrises each, so they are not rows. `tn.inm` holds 1,531 place-days (was 1,519).
 
 ## Algeria — `dz.marw`, class B at the base cities, D at Oran and Tamanrasset
 

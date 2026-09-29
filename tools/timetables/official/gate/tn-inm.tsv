@@ -9,6 +9,10 @@
 # with the dips, not the dips themselves.
 # Not rows: tn_tunis_2026.txt, agentB/tunis_inm.txt, off-tunis.txt, tn_tunis1.txt and tn_tala.txt
 # repeat the same days.
+# The weekly monitor's capture of 28 Sep 2026 (the coming seven days, 28 Sep – 4 Oct, with INM's sunrise on
+# each), held out where it adds days: Tabarka, Ben Guerdane and Tala (29–30 Sep and 2–3 Oct). Tunis's, Sfax's
+# and Tataouine's repeat their rows' days (the same minutes; they add only INM's sunrise on four of them), so
+# they are not rows.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-maghreb-libya/off-inm-tunis.txt	tn.inm/tunis			Africa/Tunis	F+E S D A M I	daily	standard	fit	Tunis 2026
 archive/tables/round/data-maghreb-libya/off-inm-sfax.txt	tn.inm/sfax			Africa/Tunis	F+E S D A M I	daily	standard	fit	Sfax 2026
@@ -17,3 +21,6 @@ archive/tables/round/data-maghreb-libya/off-inm-benguerdane.txt	tn.inm/ben-guerd
 archive/tables/moral-auth-mena/maghreb/tn_tunis_multiyear.txt	tn.inm/tunis	36.798	10.172	Africa/Tunis	F+E - D A M I	daily	standard	test	Tunis 2019–2026, eight days a year
 archive/tables/round/data-maghreb-libya/off-inm-tataouine.txt	tn.inm/tataouine			Africa/Tunis	F+E S D A M I	daily	standard	test	Tataouine 2026 (dip 0.45°)
 archive/tables/round/data-maghreb-libya/off-inm-tala.txt	tn.inm/tala			Africa/Tunis	F+E S D A M I	daily	standard	test	Tala 2026, every third day (about 1,000 m, dip 1.0°)
+archive/tables/monitor/tn-inm/tabarka.txt	tn.inm/tabarka			Africa/Tunis	F+E S D A M I	daily	standard	test	Tabarka, 28 Sep – 4 Oct 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tn-inm/ben-guerdane.txt	tn.inm/ben-guerdane			Africa/Tunis	F+E S D A M I	daily	standard	test	Ben Guerdane, 28 Sep – 4 Oct 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tn-inm/tala.txt	tn.inm/tala			Africa/Tunis	F+E S D A M I	daily	standard	test	Tala, 28 Sep – 4 Oct 2026, the monitor capture of 28 Sep 2026

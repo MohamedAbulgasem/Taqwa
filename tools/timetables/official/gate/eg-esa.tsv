@@ -10,6 +10,9 @@
 # and held out on eleven others and on Dahab, Nuweiba, Saint Catherine, Farafra and Shalatin.
 # Kharga, Ras Gharib and Taba, whose ESA points sit well off the town, keep margins of their own,
 # fitted on their own days (nothing held out there).
+# The weekly monitor's capture of 28 Sep 2026 (Dar al-Ifta's September 2026 month table for all 30 towns)
+# prints the same minutes as the rows above on every day both hold; only Dahab's adds days (the round held
+# its 25 September alone), so only Dahab's is a row, held out. No capture holds October yet.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-gulf-egypt/off-eg-cairo.txt	eg.esa/cairo			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Cairo, 2025–2026
 archive/tables/round/data-gulf-egypt/off-eg-alexandria.txt	eg.esa/alexandria			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Alexandria, 2025–2026
@@ -41,3 +44,4 @@ archive/tables/round/data-gulf-egypt/off-eg-nuweiba.txt	eg.esa/nuweiba			Africa/
 archive/tables/round/data-gulf-egypt/off-eg-catherine.txt	eg.esa/saint-catherine			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Saint Catherine (about 1,600 m), 2025–2026 (the unit at its town centre)
 archive/tables/round/data-gulf-egypt/off-eg-farafra.txt	eg.esa/farafra			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Farafra, 2025–2026 (the unit at its town centre)
 archive/tables/round/data-gulf-egypt/off-eg-shalatin.txt	eg.esa/shalatin			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Shalatin, 2025–2026 (the unit at its town centre)
+archive/tables/monitor/eg-esa/dahab.txt	eg.esa/dahab			Africa/Cairo	F+E S D A M I	daily	standard	test	Dahab, September 2026, the monitor capture of 28 Sep 2026 (the unit at its town centre)

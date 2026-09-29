@@ -52,3 +52,28 @@ archive/tables/moral-auth-mena/nile/tripoli.txt	ly.awqaf/tripoli			Africa/Tripol
 # after" proof, not a margin source.
 open/LY-AWQAF-OWNER/benghazi.txt	ly.awqaf/benghazi			Africa/Tripoli	F M	daily	standard	test	Benghazi, the owner's adhan, 27 Sep 2026
 open/LY-AWQAF-OWNER/sabha.txt	ly.awqaf/sabha			Africa/Tripoli	F M	daily	standard	test	Sabha, the owner's adhan, 27 Sep 2026
+# The weekly monitor's capture of 28 Sep 2026: the widget's day for the 22 cities (28 Sep, its emsak the Im
+# column) and, for Tripoli, api.ifta.ly's eight days (28 Sep – 5 Oct, with its imsak; the five to 2 Oct the
+# same as nile/tripoli.txt's). Held out, each city's columns as its round row's (R73 east and south).
+archive/tables/monitor/ly-awqaf/khoms.txt	ly.awqaf/khoms			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Khoms, 28 Sep 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/ly-awqaf/zawiya.txt	ly.awqaf/zawiya			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Zawiya, 28 Sep 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/ly-awqaf/bani-walid.txt	ly.awqaf/bani-walid			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Bani Walid, 28 Sep 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/ly-awqaf/ghadames.txt	ly.awqaf/ghadames			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Ghadames, 28 Sep 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/ly-awqaf/misrata.txt	ly.awqaf/misrata			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Misrata, 28 Sep 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/ly-awqaf/sirte.txt	ly.awqaf/sirte			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Sirte, 28 Sep 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/ly-awqaf/zliten.txt	ly.awqaf/zliten			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Zliten, 28 Sep 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/ly-awqaf/marj.txt	ly.awqaf/marj			Africa/Tripoli	- S D A - I -	daily	standard	test	Marj, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/bayda.txt	ly.awqaf/bayda			Africa/Tripoli	- S D A - I -	daily	standard	test	Bayda, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/benghazi.txt	ly.awqaf/benghazi			Africa/Tripoli	- S D A - I -	daily	standard	test	Benghazi, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/brega.txt	ly.awqaf/brega			Africa/Tripoli	- S D A - I -	daily	standard	test	Brega, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/derna.txt	ly.awqaf/derna			Africa/Tripoli	- S D A - I -	daily	standard	test	Derna, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/ajdabiya.txt	ly.awqaf/ajdabiya			Africa/Tripoli	- S D A - I -	daily	standard	test	Ajdabiya, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/emsaed.txt	ly.awqaf/emsaed			Africa/Tripoli	- S D A - I -	daily	standard	test	Emsaed, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/hun.txt	ly.awqaf/hun			Africa/Tripoli	- S D A - I -	daily	standard	test	Hun, 28 Sep 2026 (south), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/jalu.txt	ly.awqaf/jalu			Africa/Tripoli	- S D A - I -	daily	standard	test	Jalu, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/kufra.txt	ly.awqaf/kufra			Africa/Tripoli	- S D A - I -	daily	standard	test	Kufra, 28 Sep 2026 (south-east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/awjila.txt	ly.awqaf/awjila			Africa/Tripoli	- S D A - I -	daily	standard	test	Awjila, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/ras-lanuf.txt	ly.awqaf/ras-lanuf			Africa/Tripoli	- S D A - I -	daily	standard	test	Ras Lanuf, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/sabha.txt	ly.awqaf/sabha			Africa/Tripoli	- S D A - I -	daily	standard	test	Sabha, 28 Sep 2026 (south), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/tobruk.txt	ly.awqaf/tobruk			Africa/Tripoli	- S D A - I -	daily	standard	test	Tobruk, 28 Sep 2026 (east), the monitor capture of 28 Sep 2026; Fajr, Maghrib and imsak not checked (R73)
+archive/tables/monitor/ly-awqaf/tripoli.txt	ly.awqaf/tripoli			Africa/Tripoli	F+E S D A M I Im	daily	standard	test	Tripoli, api.ifta.ly 28 Sep – 5 Oct 2026, the monitor capture of 28 Sep 2026

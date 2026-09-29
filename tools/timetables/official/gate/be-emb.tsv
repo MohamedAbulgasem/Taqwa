@@ -7,6 +7,8 @@
 # be.cautious at Antwerpen and Gent (the monitor round, brief D): Diyanet's own tables for both, the member
 # tr.diyanet.europe at its new units there; Maghrib is not checked, since the members' Maghribs spread beyond 2 min
 # and the cap follows the most-followed member, EMB, whose table is printed for Brussels alone.
+# be.cautious at Brussels, Diyanet (the monitor's capture of 28 Sep 2026, the member tr.diyanet.europe): 29 Sep – 29 Oct
+# 2026 and 2027; Maghrib is not checked on this row, as at Antwerpen and Gent (EMB's row beside it ends 25 October).
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/split-7g/emb-2026-h1.txt	be.emb/be.emb			Europe/Brussels	F+E S D A M I	daily	standard	fit	EMB January-June 2026
 archive/tables/moral-auth-world/europe/split-7g/emb-2026-h2.txt	be.emb/be.emb			Europe/Brussels	F+E S D A M I	daily	standard	test	EMB July-December 2026
@@ -15,3 +17,4 @@ archive/tables/moral-auth-world/europe/split-7g/emb-2026-q4.txt	be.cautious	50.8
 archive/tables/moral-auth-world/europe/split-7g/dy-brussels-2026-q4.txt	be.cautious	50.8467	4.3525	Europe/Brussels	F+E S D A M I	daily	standard	test	Diyanet Brussels, the same days	tr.diyanet.europe
 archive/tables/monitor/tr-diyanet-europe/antwerpen.txt	be.cautious	51.2194	4.4025	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Antwerpen (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
 archive/tables/monitor/tr-diyanet-europe/gent.txt	be.cautious	51.0543	3.7174	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Gent (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/brussels.txt	be.cautious	50.8467	4.3525	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Brussels (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
