@@ -159,6 +159,19 @@ class GateFixtureTest {
         assertEquals(listOf("Kazan", 365), listOf("name", "placeDays").map { stamped[it] })
         @Suppress("UNCHECKED_CAST")
         assertEquals(listOf("dhuhr"), (stamped["lateLimits"] as Map<String, Map<String, Any>>).getValue("class B: 2 min")["events"])
+        // Ruling R115: the unit's checked dates, as runs, so a page can hold every day no table checked.
+        assertEquals(listOf("2026-01-01..2026-12-31"), stamped["checked"])
+    }
+
+    @Test
+    fun `the stamp records the entry's checked dates as runs`() {
+        val s = Gate(roots, PINNED).evaluate(muis).entries.getValue("sg.muis")
+        assertEquals(listOf("2026-02-14..2026-02-23"), Stamps.stamp(s, "core")["checked"])
+        // A day missing from the tables leaves a hole between two runs, never one span over it.
+        val holed = manifest(
+            "open/SG-MUIS/muis-2026-02-a.txt\tsg.muis\t\t\tAsia/Singapore\tF+E S D A M I\tdaily\tstandard\tfit\t",
+        )
+        assertEquals(listOf("2026-02-14..2026-02-18"), Stamps.stamp(Gate(roots, PINNED).evaluate(holed).entries.getValue("sg.muis"), "core")["checked"])
     }
 
     @Test

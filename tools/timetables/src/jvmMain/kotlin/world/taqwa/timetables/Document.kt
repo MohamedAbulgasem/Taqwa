@@ -7,6 +7,7 @@ import kotlinx.datetime.offsetAt
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.i18n.CountdownDigits
+import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.prayer.engine.EngineDay
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.Resolution
@@ -79,7 +80,8 @@ class Document(
         val months = timetable.months(city, now)
         val today = timetable.localToday(city, now)
         val source = timetable.source(city, today)
-        val verdict = Proven.verdict(source.effective, stamps, months.first().days.first().date, months.last().days.last().date)
+        val place = PrayerTimesEngine.placeOf(timetable.location(city))
+        val verdict = Proven.verdict(source.effective, place, stamps, months.first().days.first().date, months.last().days.last().date)
         return Prepared(city, months, today, source, verdict)
     }
 
@@ -111,7 +113,7 @@ class Document(
                     "places" to v.stamp.places,
                     "ramadanDays" to v.stamp.ramadanDays,
                     "first" to v.stamp.first.toString(),
-                    "through" to v.stamp.last.toString(),
+                    "through" to v.through.toString(),
                     "atMost" to v.atMost,
                     "fajrShares" to v.stamp.shares(v.events, "fajr"),
                     "cautious" to p.cautious,
@@ -244,7 +246,7 @@ class Document(
         val unitLabel = effective.unitName ?: p.city.name(language)
         val comma = MethodWords.listComma(language)
         val members = effective.members.map { strings.get(language, it.nameKey) }
-        val through = stamp?.let { f.longDate(it.last) }
+        val through = p.published?.let { f.longDate(it.through) }
         fun checked(key: String, vararg args: String) = if (cautious) "" else strings.format(language, key, *args)
         return linkedMapOf(
             "whoseTitle" to if (cautious) strings.get(language, "timetable_cautious") else strings.format(language, "today_whose_checked_title", authority),
@@ -296,7 +298,10 @@ class Document(
 
     /**
      * The "How Taqwa checks" page's figures (spec §5): the totals over every stamp, the gate's rows
-     * and the surveys' calendars read from the files, and one row per published timetable.
+     * and the surveys' calendars read from the files, and one row per published timetable, with
+     * the figures its published cities' own pages show: checked through the earliest of their
+     * dates (ruling R115), at most the worst over their units — nothing for a cautious entry
+     * (ruling R105), never the entry-wide worst of a place no page shows.
      */
     private fun proof(published: List<Prepared>): Map<String, Any?> {
         val all = stamps.values
@@ -304,19 +309,21 @@ class Document(
             val first = cities.first()
             val stamp = stamps.getValue(id)
             val entry = first.effective.entry
+            val verdicts = cities.map { it.published!! }
+            val through = verdicts.minOf { it.through }
             linkedMapOf(
                 "entry" to id,
                 "class" to first.effective.entryClass.name,
                 "placeDays" to stamp.placeDays,
                 "places" to stamp.places,
                 "first" to stamp.first.toString(),
-                "through" to stamp.last.toString(),
-                "atMost" to stamp.worstStarts(stamp.events),
+                "through" to through.toString(),
+                "atMost" to if (first.cautious) null else verdicts.mapNotNull { it.atMost }.maxOrNull(),
                 "names" to SITE_LANGUAGES.associateWith { lang ->
                     if (first.cautious) strings.get(lang, "timetable_cautious") else strings.timetable(lang, entry).orEmpty()
                 },
                 // The checks page has no country: one date form per language (ruling R114).
-                "throughText" to SITE_LANGUAGES.associateWith { lang -> Formats.forLanguage(lang).longDate(stamp.last) },
+                "throughText" to SITE_LANGUAGES.associateWith { lang -> Formats.forLanguage(lang).longDate(through) },
             )
         }
         return linkedMapOf(

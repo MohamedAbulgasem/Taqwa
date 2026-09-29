@@ -6,6 +6,7 @@
   "places": 1,
   "first": "2026-01-01",
   "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
   "placeDays": 365,
   "heldOutDays": 0,
   "ramadanDays": 30,
@@ -133,6 +134,7 @@
     "ie.ifi": {
       "name": "Dublin",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {

@@ -1,9 +1,70 @@
 package world.taqwa.timetables
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaLocalDate
+import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.registry.EntryClass
+import world.taqwa.app.prayer.engine.registry.Member
+import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Resolution
+import world.taqwa.app.prayer.engine.registry.Units
+import world.taqwa.app.prayer.engine.registry.distanceKm
+import world.taqwa.app.prayer.engine.registry.lateReachKm
 import java.io.File
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+/**
+ * The days the gate compared, as runs of consecutive dates (a stamp's `checked`, written by
+ * gate/Stamps.kt: "2026-01-01..2026-12-31" or one date). Dates only, never a time (ruling R69).
+ */
+class Checked(runs: List<ClosedRange<LocalDate>>) {
+    val runs: List<ClosedRange<LocalDate>> = runs.sortedBy { it.start }
+
+    fun covers(date: LocalDate): Boolean = runs.any { date in it }
+
+    /** The first date of [first]..[last] no run holds, or null when every day is checked. */
+    fun firstUncovered(first: LocalDate, last: LocalDate): LocalDate? {
+        var date = first
+        while (date <= last) {
+            val run = runs.firstOrNull { date in it } ?: return date
+            date = run.endInclusive.plus(1, DateTimeUnit.DAY)
+        }
+        return null
+    }
+
+    /** The last date of the run holding [date], or null. */
+    fun endOf(date: LocalDate): LocalDate? = runs.firstOrNull { date in it }?.endInclusive
+
+    /** The first checked date after [date], or null. */
+    fun nextStartAfter(date: LocalDate): LocalDate? = runs.map { it.start }.filter { it > date }.minOrNull()
+
+    companion object {
+        /** A stamp's list of runs; absent, it reads as nothing checked (the safe side). */
+        fun parse(value: Any?): Checked = Checked(
+            (value as? List<*>).orEmpty().mapNotNull { run ->
+                (run as? String)?.split("..")?.let { ends -> LocalDate.parse(ends.first())..LocalDate.parse(ends.last()) }
+            },
+        )
+
+        /** [all] merged: touching and overlapping runs become one. */
+        fun union(all: Collection<Checked>): Checked {
+            val merged = mutableListOf<ClosedRange<LocalDate>>()
+            for (run in all.flatMap { it.runs }.sortedBy { it.start }) {
+                val last = merged.lastOrNull()
+                if (last != null && run.start <= last.endInclusive.plus(1, DateTimeUnit.DAY)) {
+                    if (run.endInclusive > last.endInclusive) merged[merged.lastIndex] = last.start..run.endInclusive
+                } else {
+                    merged += run
+                }
+            }
+            return Checked(merged)
+        }
+    }
+}
 
 /**
  * One stamp (`official/stamps/<entry>.json`, written by gate/Stamps.kt): statistics only — places,
@@ -22,6 +83,9 @@ class Stamp(private val root: Map<String, Any?>) {
     val last: LocalDate = LocalDate.parse(root["last"] as String)
     val events: Map<String, Any?> = root["events"] as Map<String, Any?>
 
+    /** The days any row of the entry compared, at any place (ruling R115); nothing on a stamp from before the runs were written. */
+    val checked: Checked = Checked.parse(root["checked"])
+
     /** The per-unit rows where the gate checks the entry by unit; null where it checks it whole (as the app's `worstLateByUnit.isEmpty()`). */
     val units: Map<String, Any?>? = (root["units"] as? Map<String, Any?>)?.takeIf { it.isNotEmpty() }
 
@@ -32,6 +96,19 @@ class Stamp(private val root: Map<String, Any?>) {
         (units?.get(unitId) as? Map<String, Any?>)?.get("events") as? Map<String, Any?>
 
     fun unitBroken(unitId: String): Int = ((units?.get(unitId) as? Map<String, Any?>)?.get("broken") as? Long ?: 0L).toInt()
+
+    /** The days the unit's own rows compared. */
+    fun unitChecked(unitId: String): Checked = Checked.parse((units?.get(unitId) as? Map<String, Any?>)?.get("checked"))
+
+    /** A cautious stamp: [memberId]'s checked days by the point its rows were read at (gate/Gate.kt's `pointKey`). */
+    fun memberPoints(memberId: String): Map<GeoPoint, Checked> {
+        val member = (root["members"] as? Map<String, Any?>)?.get(memberId) as? Map<String, Any?> ?: return emptyMap()
+        val points = member["points"] as? Map<String, Any?> ?: return emptyMap()
+        return points.entries.associate { (key, runs) ->
+            val (lat, lon) = key.split(',')
+            GeoPoint(lat.toDouble(), lon.toDouble()) to Checked.parse(runs)
+        }
+    }
 
     /** Early starts over every event: 0 on a green stamp. */
     fun early(): Int = events.values.sumOf { ((it as Map<String, Any?>)["early"] as? Long ?: 0L).toInt() }
@@ -82,39 +159,86 @@ sealed interface Verdict {
      * [events] is the row the page's figures come from: the unit's where the stamp has units, else
      * the entry's. [atMost] is the worst lateness over the starts there — null for a cautious place,
      * which claims no such figure (ruling R105: the entry-wide worst would be another place's).
+     * [through] is the last date of the checked run the days shown sit in (ruling R115): for a
+     * cautious place the earliest such date over its members.
      */
-    data class Published(val stamp: Stamp, val events: Map<String, Any?>, val atMost: Int?) : Verdict
+    data class Published(val stamp: Stamp, val events: Map<String, Any?>, val atMost: Int?, val through: LocalDate) : Verdict
 
     data class Held(val reason: String) : Verdict
 }
 
 /**
- * Spec §2 (ruling R101): a city has a page only where the stamps prove every day it shows — class
- * A, B or C at the city, measured there, a green stamp for the resolved entry and its unit, covering
- * the first day shown through the last.
+ * Spec §2 (rulings R101, R115): a city has a page only where the stamps prove every day it shows —
+ * class A, B or C at the city, measured there, a green stamp for the resolved entry and its unit,
+ * and every shown date among the days the gate compared for every timetable the page's times
+ * depend on: the place's unit (or the entry, where the stamp has no units), and for a cautious
+ * place every member at that place.
  */
 object Proven {
-    fun verdict(resolution: Resolution, stamps: Map<String, Stamp>, firstShown: LocalDate, lastShown: LocalDate): Verdict {
+    /** "26 Oct 2026": plain English months (en-GB's CLDR data abbreviates September as "Sept"). */
+    private val DAY = DateTimeFormatter.ofPattern("d MMM uuuu", Locale.ENGLISH)
+
+    fun verdict(resolution: Resolution, place: Place, stamps: Map<String, Stamp>, firstShown: LocalDate, lastShown: LocalDate): Verdict {
         val cls = resolution.entryClass
         if (cls != EntryClass.A && cls != EntryClass.B && cls != EntryClass.C) return Verdict.Held("class ${cls.name} is not proven")
         if (!resolution.measured) return Verdict.Held("not measured at this place")
         val stamp = stamps[resolution.entry.id] ?: return Verdict.Held("no stamp for ${resolution.entry.id}")
         if (stamp.broken != 0) return Verdict.Held("${stamp.entry}'s stamp is red")
-        val events = if (stamp.units != null) {
-            val unitId = resolution.unitId ?: return Verdict.Held("${stamp.entry} is checked by unit and this place is in none")
+        val unitId = if (stamp.units != null) {
+            resolution.unitId ?: return Verdict.Held("${stamp.entry} is checked by unit and this place is in none")
+        } else {
+            null
+        }
+        val events = if (unitId != null) {
             val unit = stamp.unitEvents(unitId) ?: return Verdict.Held("unit $unitId is not in ${stamp.entry}'s stamp")
             if (stamp.unitBroken(unitId) != 0) return Verdict.Held("unit $unitId is red")
             unit
         } else {
             stamp.events
         }
-        if (stamp.first > firstShown || stamp.last < lastShown) {
-            return Verdict.Held("${stamp.entry}'s stamp covers ${stamp.first}..${stamp.last}; the page shows $firstShown..$lastShown")
+        // The timetables the page's times depend on, each with the days it was checked on here.
+        val proven: List<Pair<String, Checked>> = if (cls == EntryClass.C) {
+            resolution.members.map { member ->
+                val here = memberChecked(stamp, member, resolution.point, place, stamps)
+                    ?: return Verdict.Held("${member.id} (a member of ${stamp.entry}): no checked table at this place")
+                "${member.id} (a member of ${stamp.entry})" to here
+            }
+        } else {
+            listOf(stamp.entry to (if (unitId != null) stamp.unitChecked(unitId) else stamp.checked))
         }
-        if (cls == EntryClass.C) return Verdict.Published(stamp, events, atMost = null)
+        for ((who, checked) in proven) {
+            val hole = hole(checked, firstShown, lastShown) ?: continue
+            return Verdict.Held("$who: no checked table day $hole")
+        }
+        val through = proven.minOf { (_, checked) -> checked.endOf(lastShown)!! }
+        if (cls == EntryClass.C) return Verdict.Published(stamp, events, atMost = null, through = through)
         val atMost = stamp.worstStarts(events) ?: return Verdict.Held("no start is measured at this unit")
-        return Verdict.Published(stamp, events, atMost)
+        return Verdict.Published(stamp, events, atMost, through)
     }
+
+    /**
+     * [member]'s checked days at [point] (ruling R115): the cautious [stamp]'s rows for it within
+     * class C's reach of the point (the registry's own rule for how far a member's proof reaches,
+     * `memberMeasured`), else — where the member is its own entry with a green unit covering
+     * [place] — that unit's rows; null where it has neither.
+     */
+    private fun memberChecked(stamp: Stamp, member: Member, point: GeoPoint, place: Place, stamps: Map<String, Stamp>): Checked? {
+        val near = stamp.memberPoints(member.id).filter { (at, _) -> distanceKm(point, at) <= lateReachKm(at.lat, EntryClass.C) }.values
+        if (near.isNotEmpty()) return Checked.union(near)
+        val own = stamps[member.id] ?: return null
+        val unit = Units.of(member.id)?.unitFor(place) ?: return null
+        if (own.unitEvents(unit.id) == null || own.unitBroken(unit.id) != 0) return null
+        return own.unitChecked(unit.id)
+    }
+
+    /** The first stretch of [first]..[last] [checked] leaves unchecked — "26 Oct 2026 – 31 Dec 2026", or "from 1 Oct 2026" with nothing checked after — or null. */
+    private fun hole(checked: Checked, first: LocalDate, last: LocalDate): String? {
+        val from = checked.firstUncovered(first, last) ?: return null
+        val next = checked.nextStartAfter(from) ?: return "from ${day(from)}"
+        return "${day(from)} – ${day(next.minus(1, DateTimeUnit.DAY))}"
+    }
+
+    private fun day(date: LocalDate): String = DAY.format(date.toJavaLocalDate())
 }
 
 /** The totals the "How Taqwa checks" page prints (spec §5), read from the files, never typed. */

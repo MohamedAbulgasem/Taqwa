@@ -6,6 +6,7 @@
   "places": 1,
   "first": "2026-09-01",
   "last": "2026-10-31",
+  "checked": ["2026-09-01..2026-10-31"],
   "placeDays": 61,
   "heldOutDays": 61,
   "ramadanDays": 0,
@@ -238,6 +239,14 @@
         "cappedDays": 14,
         "leastGap": 0,
         "mostGap": 1
+      }
+    }
+  },
+  "members": {
+    "tr.diyanet.europe": {
+      "checked": ["2026-09-01..2026-10-31"],
+      "points": {
+        "52.52437,13.41053": ["2026-09-01..2026-10-31"]
       }
     }
   },

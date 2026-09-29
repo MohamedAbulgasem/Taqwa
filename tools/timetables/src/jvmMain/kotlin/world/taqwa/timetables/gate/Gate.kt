@@ -26,6 +26,8 @@ import world.taqwa.app.prayer.engine.registry.Units
 import world.taqwa.app.prayer.engine.registry.lateLimitFor
 import java.io.File
 import java.util.Locale
+import java.util.SortedMap
+import java.util.SortedSet
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -106,8 +108,8 @@ class Gate(
             for (official in table.days) {
                 val day = days.day(official.date)
                 // A place-day is the entry at one point on one date, however many tables hold it.
-                val group = "${entry.id}@${point.lat},${point.lon}"
-                s.placeDay(group, official.date, row.split, ramadan.isRamadan(official.date), day, unit)
+                val group = "${entry.id}@${pointKey(point)}"
+                s.placeDay(group, official.date, row.split, ramadan.isRamadan(official.date), day, unit, row.member, point)
                 row.columns.forEachIndexed { column, events ->
                     val minutes = official.minutes[column] ?: return@forEachIndexed
                     for (event in events) {
@@ -478,11 +480,32 @@ class EntryStats(val entry: RegistryEntry) {
     /** Per authority unit (rows outside every unit are not listed): its place-days and tally. */
     val units = sortedMapOf<String, UnitStats>()
 
+    /**
+     * A cautious entry's members (ruling R115): each member's checked dates by the point its rows
+     * were read at ([pointKey]), so a page can hold every day some member's table was not checked
+     * on at that place.
+     */
+    val memberDays = sortedMapOf<String, SortedMap<String, SortedSet<LocalDate>>>()
+
     /** The limits [event] was held to: "1", or "1/3" where its rows' units or classes differ. */
     fun effectiveLimit(event: Event): String = events[event]?.limits.orEmpty().joinToString("/")
 
-    internal fun placeDay(group: String, date: LocalDate, split: Split, ramadan: Boolean, day: PrayerDay, unit: UnitKey?) {
+    internal fun placeDay(
+        group: String,
+        date: LocalDate,
+        split: Split,
+        ramadan: Boolean,
+        day: PrayerDay,
+        unit: UnitKey?,
+        member: String? = null,
+        point: GeoPoint? = null,
+    ) {
         if (unit != null) units.getOrPut(unit.id) { UnitStats(unit.name) }.placeDays += date
+        // Recorded before the place-day check: a second member's table at the same point and date is
+        // the same place-day, but its own checked day all the same.
+        if (member != null && point != null) {
+            memberDays.getOrPut(member) { sortedMapOf() }.getOrPut(pointKey(point)) { sortedSetOf() } += date
+        }
         if (!placeDays.add("$group|$date")) return
         if (ramadan) ramadanDays++
         if (split == Split.TEST) testDays++
@@ -698,6 +721,9 @@ class GateResult(
         }
     }
 }
+
+/** A point as the stamps key it: "lat,lon" as the gate file gives them (read back by `Stamp.memberPoints`). */
+fun pointKey(point: GeoPoint): String = "${point.lat},${point.lon}"
 
 /** [dates] as runs of consecutive days, "2026-04-24..2026-05-18", or a single date, in order. */
 fun dateRanges(dates: Collection<LocalDate>): List<String> {

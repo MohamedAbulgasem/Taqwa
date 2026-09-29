@@ -6,6 +6,7 @@
   "places": 18,
   "first": "2026-01-01",
   "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
   "placeDays": 6570,
   "heldOutDays": 1656,
   "ramadanDays": 540,
@@ -209,6 +210,7 @@
     "0119": {
       "name": "Kota Banda Aceh",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -311,6 +313,7 @@
     "0228": {
       "name": "Kota Medan",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -413,6 +416,7 @@
     "0313": {
       "name": "Kota Bukittinggi",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -515,6 +519,7 @@
     "0816": {
       "name": "Kota Palembang",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -617,6 +622,7 @@
     "1208": {
       "name": "Kab. Garut",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -719,6 +725,7 @@
     "1219": {
       "name": "Kota Bandung",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -821,6 +828,7 @@
     "1222": {
       "name": "Kota Bogor",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -923,6 +931,7 @@
     "1301": {
       "name": "Kota Jakarta",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1025,6 +1034,7 @@
     "1429": {
       "name": "Kab. Wonosobo",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1127,6 +1137,7 @@
     "1433": {
       "name": "Kota Semarang",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1229,6 +1240,7 @@
     "1505": {
       "name": "Kota Yogyakarta",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1331,6 +1343,7 @@
     "1630": {
       "name": "Kota Batu",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1433,6 +1446,7 @@
     "1634": {
       "name": "Kota Malang",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1535,6 +1549,7 @@
     "1638": {
       "name": "Kota Surabaya",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1637,6 +1652,7 @@
     "1709": {
       "name": "Kota Denpasar",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1739,6 +1755,7 @@
     "2622": {
       "name": "Kota Makassar",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1841,6 +1858,7 @@
     "3308": {
       "name": "Kab. Jayawijaya",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1943,6 +1961,7 @@
     "3329": {
       "name": "Kota Jayapura",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
