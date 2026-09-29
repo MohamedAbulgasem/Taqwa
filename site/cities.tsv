@@ -13,14 +13,15 @@
 # that city who has changed no setting: the timetable or method the engine resolves for the city,
 # its Asr school, the automatic high-latitude rule, no adjustments.
 #
-# A row is un-held when the stamps prove every day its page shows (ruling R101, spec §2 in
-# docs/superpowers/specs/2026-09-29-city-pages-design.md): the engine resolves the city to a
-# class A, B or C entry, measured at the city, with a green stamp for the entry and its unit
-# covering both months shown. tools/timetables applies the rule on every build and holds a row it
-# rejects, with a notice, so a stamp that ends before next month holds its cities by itself
-# (London Unified's ends 31 December 2026: gate the 2027 table before December) and one that
-# begins inside this month publishes them on the first of the next (Diyanet's and Belgium's begin
-# 25 September 2026: İstanbul, Ankara, Brussels and Antwerp on 1 October). A held row comes back
+# A row is un-held when the stamps prove every day its page shows (rulings R101, R115 and R116,
+# spec §2 in docs/superpowers/specs/2026-09-29-city-pages-design.md): the engine resolves the city
+# to a class A, B or C entry, measured at the city, with a green stamp for the entry and its unit,
+# and every day of this month checked for every timetable the page depends on; next month is shown
+# too once every day of it is checked. tools/timetables applies the rule on every build and holds a
+# row it rejects, with a notice, so a city whose timetable is not yet checked for this month holds
+# by itself (London Unified's ends 31 December 2026: gate the 2027 table before January) and comes
+# back at the first build after its month is checked (Diyanet's captures reach 29 October 2026:
+# İstanbul and Ankara wait for a capture that completes October). A held row comes back
 # by deleting its "# " once its stamp qualifies; a row the rule rejects is never published. The
 # proof is in tools/timetables/official/stamps and summarised at /prayer-times/how-taqwa-checks/.
 #
