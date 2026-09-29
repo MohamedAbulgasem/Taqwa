@@ -1941,3 +1941,51 @@ so 34 goes to App Review in its place at no cost in time; 33 stays unused in Tes
 suite passed on it (shared 1,595 Android host and 1,474 iOS tests, widgetcore 91 and 89). Play's
 release notes, with the never-early claim scoped to the days checked, are in
 `docs/store/release-notes/1.0.0-34.txt`.
+
+## A city page shows the months proven, one or two (30 September) — ruling R116
+
+The owner's ruling of 29 September: a page shows the current month when every day of it is checked
+against every timetable it depends on (R115), and the next month too only when every day of that is
+checked as well; otherwise the current month alone, until the next month's table arrives and is
+checked. A city whose current month is not wholly checked stays held, a partly checked month is never
+shown, and the standard of proof is unchanged (spec §2, amended). Until now both months had to pass, so
+a city whose authority had published only this month was held, and Toronto, Mississauga and Chicago
+were to come off on 1 October over a few unchecked November days.
+
+**The generator.** The verdict yields the proven months or a hold, and for a month left off the first
+timetable leaving a day of it unchecked, with that day. The document carries only the proven months —
+the months list, the days, every page's texts, so the live data too — with that reason as
+`nextUnchecked`, and each day's long weekday. Beside the hold notices, each run prints one per city
+shown alone ("toronto-canada: showing October alone — the next month is not yet checked: ca.ift (a
+member of ca.toronto), first unchecked day 1 Nov 2026"). The warning of a stamp ending before the
+month after the two shown is gone: a month shown alone is that month's notice before the hold.
+
+**The site.** A one-month page is one month: one table, one print button, a clock change noted only
+when it falls on a day shown (Toronto's of 1 November is on no day its October page carries), "None
+is set by rule this month." (`note_no_rule_month`, seven languages), the fold over the whole month.
+`check_page` asks for exactly the document's months and their days in the live data. The script never
+shows a time the page does not carry: after Isha on a page's last day the next prayer is tomorrow's
+Fajr, on no day the page holds, and where the card used to show the out-of-date line and a dash it now
+shows that day's calendar leaf (weekday, day, month, as without script) with an empty ring and no
+countdown, Isha current as in the app — today's times are still right. At the city's midnight the
+out-of-date line comes, as before. The index's lede and description, the checks page's "Which places
+have a page" and the README now say this month, and next month once it is checked, in each language's
+own words.
+
+**On today's stamps** (every row of `cities.tsv` probed, not only the un-held): the 06:07 UTC build of
+1 October publishes 41 cities, not 38, with Toronto, Mississauga and Chicago showing October alone
+(Chicago's us.isna has no November). İstanbul, Ankara, Paris, Oslo, Brussels and Antwerp stay held:
+the Diyanet-family hole from 26 October is in their current month. On 1 November Bandar Seri Begawan
+shows November alone (bn.mora lacks 14 December) and Toronto, Mississauga and Chicago are held for
+November's gaps; on 1 December 26 cities show December alone, their checked days ending with 2026,
+and on 1 January they are held unless their 2027 tables are gated first (Brunei already on
+1 December, for its one day). `site/cities.tsv` is untouched here, the stamps being extended in
+parallel tonight, so its header still says "covering both months shown".
+
+**Checked.** The tools' tests (264; ProvenTest's two months, one month, hold and next-month-hole
+cases, DocumentTest's one-month city, MainTest's notices); `site/test_timetables.py` (18, the page
+script run in headless Chrome with its clock pinned before and after Isha and after midnight on a
+one-month page's last day, and into November on a two-month page); `generate` for 1 October 06:07 UTC
+and `build.py --check`; Toronto's English and Arabic one-month pages at 390 and 1440 px on the first
+day and the last evening; the one-month page printed on A4 and Letter in English, Arabic and Urdu,
+with and without the detailed view — one sheet each, with its foot.

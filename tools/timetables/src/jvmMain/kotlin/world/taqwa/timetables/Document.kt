@@ -18,17 +18,19 @@ import kotlin.time.Instant
 /**
  * The one document the site is rendered from (spec §9.1). Per city: the facts (slug, country, zone,
  * the timetable — its registry id, class and unit — and Asr school the app's engine follows there,
- * the Qibla, the stamp's proof figures, and for every day of both months the instants as epoch
- * seconds for the page's live countdown, a cautious place's members' own days among them); and per
- * page language, every string the page shows about that city, already written the way the app
- * writes it (the About screen's sentences filled for the city). The site build adds only its own
- * sentences around these values, so it never formats a number or a date itself.
+ * the Qibla, the stamp's proof figures, and for every day of the months the page shows the instants
+ * as epoch seconds for the page's live countdown, a cautious place's members' own days among them);
+ * and per page language, every string the page shows about that city, already written the way the
+ * app writes it (the About screen's sentences filled for the city). The site build adds only its
+ * own sentences around these values, so it never formats a number or a date itself.
  *
- * [build] applies the proven rule (spec §2, [Proven]): a city the stamps do not prove every shown
- * day of is written under `held` with its reason, never as a page. A page names its timetable in
- * the app's own words, so [build] also refuses a city whose timetable the app has no name for yet.
- * No page names a high-latitude rule: the engine's own rule has no name in the app (its days are
- * still marked in the facts).
+ * [build] applies the proven rule (spec §2, [Proven]): a city the stamps do not prove every day of
+ * its current month of is written under `held` with its reason, never as a page; a page carries its
+ * current month, and the next only where every day of that is proven too (ruling R116) — else
+ * `nextUnchecked` says which timetable leaves which day of it unchecked, and the next month is in
+ * no part of the city's document. A page names its timetable in the app's own words, so [build]
+ * also refuses a city whose timetable the app has no name for yet. No page names a high-latitude
+ * rule: the engine's own rule has no name in the app (its days are still marked in the facts).
  */
 class Document(
     private val strings: AppStrings,
@@ -60,12 +62,16 @@ class Document(
         )
     }
 
-    /** One city as [build] writes it, whatever its verdict: a held city carries no proof. */
+    /**
+     * One city as [build] writes it, whatever its verdict: a held city carries no proof, and both
+     * of its months (nothing of it is published; the tests read its pages).
+     */
     fun city(city: City, now: Instant): Map<String, Any?> = city(prepare(city, now))
 
     /** What every part of a city's document reads: computed once, the verdict with it. */
     private class Prepared(
         val city: City,
+        /** The months the page shows: the verdict's (ruling R116), or both for a held city. */
         val months: List<TimetableMonth>,
         val today: LocalDate,
         val source: EngineDay,
@@ -81,8 +87,11 @@ class Document(
         val today = timetable.localToday(city, now)
         val source = timetable.source(city, today)
         val place = PrayerTimesEngine.placeOf(timetable.location(city))
-        val verdict = Proven.verdict(source.effective, place, stamps, months.first().days.first().date, months.last().days.last().date)
-        return Prepared(city, months, today, source, verdict)
+        val verdict = Proven.verdict(source.effective, place, stamps, months.map { it.days.first().date..it.days.last().date })
+        // Only the proven months go any further: the months list, the days, the pages' texts and
+        // everything the site builds from them, the live data included.
+        val shown = (verdict as? Verdict.Published)?.let { months.take(it.months.size) } ?: months
+        return Prepared(city, shown, today, source, verdict)
     }
 
     private fun city(p: Prepared): Map<String, Any?> {
@@ -122,6 +131,9 @@ class Document(
             "qibla" to linkedMapOf("bearing" to qibla.bearing, "km" to qibla.km),
             "today" to p.today.toString(),
             "months" to p.months.map { linkedMapOf("year" to it.year, "month" to it.month, "days" to it.days.size) },
+            // Why a page shows its current month alone (ruling R116): the first timetable that
+            // leaves a day of the next month unchecked, and that day. Null where both are shown.
+            "nextUnchecked" to p.published?.nextUnchecked?.let { linkedMapOf("timetable" to it.timetable, "day" to it.day.toString()) },
             "days" to days.map { day ->
                 linkedMapOf<String, Any?>(
                     "date" to day.date.toString(),
@@ -214,6 +226,10 @@ class Document(
                 linkedMapOf<String, Any?>(
                     "day" to f.digits(day.date.day),
                     "weekday" to f.weekdayShort(day.date),
+                    // The Today card's calendar leaf for this day, as `today.weekday` is for the
+                    // day the page was built: the card shows it on the page's last evening, when
+                    // the next prayer is on no day the page carries.
+                    "weekdayLong" to f.weekday(day.date),
                     "date" to f.longDate(day.date),
                     "full" to f.fullDate(day.date),
                     "hijri" to f.hijriDayMonth(day.hijri.month, day.hijri.day),

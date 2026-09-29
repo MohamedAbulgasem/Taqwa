@@ -7,9 +7,12 @@ already written the way the app writes it for a reader there, in the page's lang
 country's digits; this module only places them in the site's sentences (each language's
 meta.json, under "timetable") and markup, and formats nothing about a city itself.
 
-A page is complete without script: the whole of this month and next are in the markup, today's
-row is lit for the day the page was built, and the Today card shows that date. assets/timetable.js
-then makes it live in the city's own time zone (see that file).
+A page shows whole months only (ruling R116): this month, whose every day the gate checked, and
+the next only once every day of that is checked too; until then this month stands alone. The
+document carries exactly those months, and nothing here assumes a second. A page is complete
+without script: every day of its months is in the markup, today's row is lit for the day the page
+was built, and the Today card shows that date. assets/timetable.js then makes it live in the
+city's own time zone (see that file).
 
 Every sentence on a city page is one of two things: an app string the generator filled for the
 city in the page's language (`pages[lang].strings`, so the page says exactly what the app's About
@@ -629,9 +632,9 @@ class Timetables:
 
     def print_foot(self, city: dict, lang: str) -> str:
         """The foot of every printed sheet, hidden on screen: the Taqwa mark and name, the page's
-        address (where next month's times are), and whose times these are, so a sheet pinned up
-        in a mosque still says where it came from. The print stylesheet fixes it to the bottom
-        of each sheet."""
+        address (where next month's times appear once they are checked), and whose times these
+        are, so a sheet pinned up in a mosque still says where it came from. The print stylesheet
+        fixes it to the bottom of each sheet."""
         cfg = self.langs[lang]
         address = f"taqwa.world/{cfg['prefix']}{SECTION}{city['slug']}/"
         return (f'<div class="print-foot"><p class="pf-brand">{PRINT_MARK}<b>{esc(cfg["brand"])}</b>'
@@ -724,8 +727,9 @@ class Timetables:
     </section>'''
 
     def months_section(self, city: dict, lang: str, today: int) -> str:
-        """The months (spec §3.4): the detailed-view switch, then each month with its table and
-        its print button and notes, then the engine line. The switch and the print buttons are
+        """The months (spec §3.4): the detailed-view switch, then each month the page shows — this
+        month, and the next where every day of it is checked (ruling R116) — with its table, its
+        print button and its notes, then the engine line. The switch and the print buttons are
         the script's and stay hidden without it; the view itself is one class, `dv`, on <main>,
         which shows the second lines the tables already carry. Nothing is stored."""
         t = self.langs[lang]["timetable"]
@@ -802,11 +806,12 @@ class Timetables:
         for change in page["clockChanges"]:
             if first <= change["index"] < first + count:
                 notes.append(f'<p class="note">{fill(t["clock_change"], date=change["date"], offset=change["offset"])}</p>')
-        # The legend of the detailed view, under each table; the "none this month or next"
-        # sentence once, under the first, since it speaks for both months.
+        # The legend of the detailed view, under each table; the "none is set by rule" sentence
+        # once, under the first, since it speaks for every month shown: "this month or next", or
+        # "this month" where the page shows this month alone (ruling R116).
         detailed = fill(t["note_detailed"], **values, school=page["otherSchool"])
         if m == 0 and not any(d["setByRule"] for d in city["days"]):
-            detailed += " " + fill(t["note_no_rule"])
+            detailed += " " + fill(t["note_no_rule" if len(city["months"]) > 1 else "note_no_rule_month"])
         notes.append(f'<p class="note dv">{detailed}</p>')
         if any_ramadan:
             notes.append(f'<p class="note">{fill(t["ramadan_isha"], **values)}</p>')
@@ -872,6 +877,7 @@ class Timetables:
                 # epoch (the Fajr ruler's start); cap: the Maghrib cap decided the day.
                 days[-1].update({"m": day["members"], "me": facts["members"], "xe": facts["endOfEating"],
                                  "cap": 1 if facts["capped"] else 0})
+        last = page["days"][-1]
         data = {
             "tz": city["timeZone"],
             # The countdown's digits, which are the page's except where the app falls back to
@@ -880,7 +886,13 @@ class Timetables:
             "rtl": cfg["dir"] == "rtl",
             "next": page["nextIn"],
             "today": today,
+            # The days of the first month: the fold reaches no further (every day, where the page
+            # shows this month alone).
             "first": city["months"][0]["days"],
+            # The calendar leaf of the page's last day (weekday, day, month), which the card shows
+            # on that day's last evening instead of a countdown to a prayer the page does not
+            # carry (tomorrow's Fajr is on no day it holds).
+            "end": {"w": last["weekdayLong"], "n": last["day"], "m": heading(page["months"][-1]["title"])},
             # The fold row's words; its accessible name is "Earlier this month, 1–27" with the
             # language's list comma (a cautious page's lists of members use the same comma).
             "earlier": t["earlier"],
@@ -1029,13 +1041,14 @@ class Timetables:
 
 
 def check_page(rel_path: str, doc: str, data: Timetables) -> list:
-    """What --check asks of a prayer-time page beyond links and markup: a city page has both
-    months, each with a row for every day of that month, six times in each with the two detail
-    lines of the detailed view, the view's switch, a print button per month, the live data the
-    script needs, its folded explainer with the link to the checks page, its app section and,
-    on a cautious page, the decides table; an index lists every city that has a page in its
-    language and links to the checks page; the checks page prints the document's totals and a
-    row per published timetable."""
+    """What --check asks of a prayer-time page beyond links and markup: a city page has exactly
+    the months the document gives it — this month alone or this month and next (ruling R116) —
+    each with a row for every day of that month, six times in each with the two detail lines of
+    the detailed view, the view's switch, a print button per month, the live data the script
+    needs for those days and no others, its folded explainer with the link to the checks page,
+    its app section and, on a cautious page, the decides table; an index lists every city that
+    has a page in its language and links to the checks page; the checks page prints the
+    document's totals and a row per published timetable."""
     problems = []
     parts = rel_path.split("/")
     if SECTION.rstrip("/") not in parts:
@@ -1068,10 +1081,17 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
         problems.append(f"timetable: {rel_path} does not link to the checks page")
     if city["entryClass"] == "C" and (doc.count('<ul class="decides">') != 1 or doc.count('class="cautious-line"') != 1):
         problems.append(f"timetable: {rel_path} is a cautious page without its decides table or its cautious line")
+    months = city["months"]
+    if not 1 <= len(months) <= 2:
+        problems.append(f"timetable: {rel_path} is given {len(months)} months; a page shows this month, or this month and next")
     tables = re.findall(r'<table class="tt" data-month="(\d)">(.*?)</table>', doc, re.S)
-    if len(tables) != 2:
-        problems.append(f"timetable: {rel_path} has {len(tables)} month tables, not 2")
-    for (m, table), facts in zip(tables, city["months"]):
+    if len(tables) != len(months):
+        problems.append(f"timetable: {rel_path} has {len(tables)} month tables, not {len(months)}")
+    anchors = re.findall(r'<section class="month" id="(m-\d{4}-\d{2})"', doc)
+    wanted = [f'm-{facts["year"]}-{facts["month"]:02d}' for facts in months]
+    if anchors != wanted:
+        problems.append(f"timetable: {rel_path} shows the months {anchors}, not {wanted}")
+    for (m, table), facts in zip(tables, months):
         rows = re.findall(r"<tr data-i=\"\d+\"[^>]*>(.*?)</tr>", table, re.S)
         if len(rows) != facts["days"]:
             problems.append(f"timetable: {rel_path} month {m} has {len(rows)} rows for {facts['days']} days")
@@ -1091,8 +1111,13 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
         problems.append(f"timetable: {rel_path} has no live data")
     else:
         live = json.loads(match.group(1))
-        if len(live["days"]) != sum(m["days"] for m in city["months"]):
-            problems.append(f"timetable: {rel_path} live data covers {len(live['days'])} days")
+        dates = [d["date"] for d in city["days"]]
+        if [d["d"] for d in live["days"]] != dates or len(dates) != sum(m["days"] for m in months):
+            problems.append(f"timetable: {rel_path} live data covers {len(live['days'])} days, not the {len(dates)} shown")
+        if months and live.get("first") != months[0]["days"]:
+            problems.append(f"timetable: {rel_path} live data folds {live.get('first')} days, not the first month's {months[0]['days']}")
+        if not live.get("end") or not all(live["end"].get(k) for k in ("w", "n", "m")):
+            problems.append(f"timetable: {rel_path} live data has no calendar leaf for its last evening")
     for piece, name in (('<details class="whence"', "explainer"), ('<section class="app"', "app section")):
         if doc.count(piece) != 1:
             problems.append(f"timetable: {rel_path} has {doc.count(piece)} {name}s, not 1")

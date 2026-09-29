@@ -235,6 +235,53 @@ class DocumentTest {
         assertEquals("31 October 2026", row.map("throughText")["en"])
     }
 
+    // ── Ruling R116: the document carries only the months the page shows ──
+
+    @Test
+    fun aCityWhoseNextMonthIsUncheckedCarriesItsCurrentMonthAlone() {
+        // Built at the first run of 1 October: Toronto's members leave 1–6 November unchecked, so its
+        // page is October alone — the months, the facts' days and every page's days — and the
+        // document says why. November's clock change is on no day shown, so no page mentions it.
+        val october = Instant.parse("2026-10-01T06:07:00Z")
+        val built = document.build(listOf(toronto, london), october)
+        assertEquals(emptyList<Map<String, Any?>>(), built.list("held"))
+        val city = built.list("cities").first { it["slug"] == "toronto-canada" }
+        assertEquals(listOf(linkedMapOf<String, Any?>("year" to 2026, "month" to 10, "days" to 31)), city.list("months"))
+        assertEquals((1..31).map { LocalDate(2026, 10, it).toString() }, city.list("days").map { it["date"] })
+        assertEquals(mapOf("timetable" to "ca.ift (a member of ca.toronto)", "day" to "2026-11-01"), city["nextUnchecked"])
+        assertEquals("2026-10-31", city.map("proof")["through"])
+        for (language in listOf("en", "ur")) {
+            val page = city.map("pages").map(language)
+            assertEquals(1, page.list("months").size, language)
+            assertEquals(31, page.list("days").size, language)
+            assertEquals(emptyList<Map<String, Any?>>(), page.list("clockChanges"), language)
+        }
+        assertEquals("October 2026", city.map("pages").map("en").list("months").single()["title"])
+        // London is checked through December: October and November, and nothing to say.
+        val london = built.list("cities").first { it["slug"] == "london-uk" }
+        assertEquals(listOf(10, 11), london.list("months").map { it["month"] })
+        assertEquals(61, london.list("days").size)
+        assertNull(london["nextUnchecked"])
+    }
+
+    @Test
+    fun aCityShownWithBothMonthsSaysNothingIsUnchecked() {
+        val city = document.city(toronto, friday) // September and October, both checked
+        assertEquals(listOf(9, 10), city.list("months").map { it["month"] })
+        assertNull(city["nextUnchecked"])
+    }
+
+    @Test
+    fun everyDayCarriesItsLongWeekdayForTheCalendarLeaf() {
+        // The Today card shows the page's last day as a calendar leaf on its last evening (the next
+        // prayer is on no day the page carries), so each day has the leaf's weekday as `today` does.
+        val page = page(london, "en")
+        assertEquals("Tuesday", page.list("days")[0]["weekdayLong"])
+        assertEquals("Tue", page.list("days")[0]["weekday"])
+        assertEquals(page.map("today")["weekday"], page.list("days")[dayIndex(LocalDate(2026, 9, 25))]["weekdayLong"])
+        assertEquals("الجمعة", page(london, "ar").list("days")[dayIndex(LocalDate(2026, 9, 25))]["weekdayLong"])
+    }
+
     @Test
     fun aHeldCityIsListedWithItsReasonAndNotBuilt() {
         val built = document.build(listOf(tripoli, london), friday)

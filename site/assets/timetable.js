@@ -1,12 +1,14 @@
 /* taqwa.world's prayer-time pages, made live.
 
-   A city page is complete without this file: every day of both months is in the markup, and the
-   row of the day the page was built is lit. This makes it follow the reader's clock in the
-   city's own time zone, so someone in London looking at Jakarta sees Jakarta's today: it lights
-   that row, turns the Today card into the app's countdown ring (the same next prayer and interval
-   as TimelineBuilder, the same H:MM:SS in the same digits as CountdownFormatter, whose digit rule
-   the generator reads from the app), and folds the days of the month already gone. On
-   the index it filters the cities as you type.
+   A city page is complete without this file: every day of the months it shows is in the markup
+   (this month, and the next once every day of it is checked: ruling R116), and the row of the day
+   the page was built is lit. This makes it follow the reader's clock in the city's own time zone,
+   so someone in London looking at Jakarta sees Jakarta's today: it lights that row, turns the
+   Today card into the app's countdown ring (the same next prayer and interval as TimelineBuilder,
+   the same H:MM:SS in the same digits as CountdownFormatter, whose digit rule the generator reads
+   from the app), and folds the days of the month already gone. It never shows a time the page
+   does not carry: on the page's last evening the next prayer is on no day it holds, so the card
+   counts down to nothing (see showLeaf). On the index it filters the cities as you type.
 
    It makes no request and stores nothing. */
 (function () {
@@ -59,7 +61,7 @@
      the print stylesheet then prints that month alone with every day and the Hijri column, and
      the marks go when the dialog closes (afterprint, or the print media query ending where a
      browser fires no afterprint). Without script the buttons stay hidden and the browser's own
-     print gives both months. */
+     print gives every month on the page. */
   function printButtons() {
     var buttons = [].slice.call(document.querySelectorAll("button.print[data-month]"));
     if (!buttons.length) return;
@@ -447,30 +449,43 @@
       return { show: show };
     }
 
-    /* The page is older than its data: after Isha on its last day, or past it altogether. The
-       ring says nothing rather than something wrong, and the notice points to the app. */
-    function showStale(pastEverything) {
+    /* The page's last evening: Isha has begun on the last day the page carries, and the next
+       prayer, tomorrow's Fajr, is on no day it holds. On a page that shows one month (ruling R116)
+       that is the last evening of every month. Today's times are still right, so the page is not
+       out of date and says nothing of the kind; it counts down to nothing it cannot show. The
+       card is the day's calendar leaf, as without script (weekday, day, month), with an empty
+       ring, and the list keeps Isha current as the app does after Isha. */
+    function showLeaf() {
+      var leaf = data.end || { w: "", n: "–", m: "" }; // a page cached from before the leaf: a dash
+      if (stale) stale.hidden = true;
+      label.textContent = leaf.w;
+      count.textContent = leaf.n;
+      at.textContent = leaf.m;
+      arc.setAttribute("stroke-dasharray", "0 " + CIRCUMFERENCE.toFixed(1));
+    }
+
+    /* The page is older than its data: the reader's day is past every day it carries. The ring
+       says nothing rather than something wrong, and the notice points to the app. */
+    function showStale() {
       if (stale) stale.hidden = false;
       label.textContent = "";
       count.textContent = "–";
       at.textContent = "";
       arc.setAttribute("stroke-dasharray", "0 " + CIRCUMFERENCE.toFixed(1));
-      if (pastEverything) {
-        shown = -1;
-        items.forEach(function (li) { li.classList.remove("now"); li.classList.remove("past"); });
-        rows.forEach(function (row) {
-          row.classList.add("past");
-          row.classList.remove("is-today");
-          row.removeAttribute("aria-current");
-        });
-      }
+      shown = -1;
+      items.forEach(function (li) { li.classList.remove("now"); li.classList.remove("past"); });
+      rows.forEach(function (row) {
+        row.classList.add("past");
+        row.classList.remove("is-today");
+        row.removeAttribute("aria-current");
+      });
     }
 
     function render() {
       var now = Math.floor(Date.now() / 1000);
       var s = state(now);
       if (!s) {
-        showStale(true);
+        showStale();
         return;
       }
       showDay(s.i);
@@ -481,9 +496,10 @@
         li.classList.toggle("past", p !== s.current && today.e[p] <= now);
       });
       if (!s.next) {
-        showStale(false);
+        showLeaf();
         return;
       }
+      if (stale) stale.hidden = true;
       var left = Math.max(0, s.next.at - now);
       label.textContent = data.next[s.next.p];
       count.textContent = local(Math.floor(left / 3600)) + ":" + two(Math.floor(left % 3600 / 60)) + ":" + two(left % 60);

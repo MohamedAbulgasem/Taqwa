@@ -108,6 +108,28 @@ current month publishes it on the first of the next (İstanbul, Ankara on 1 Octo
 GitHub Actions notice per city held by the rule and one warning per published city whose stamp ends
 before the last day of the month after the two shown, a month's notice to run the gate on the new table.
 
+**Amended by ruling R116 (the owner, 29 September; binding): whole months, the next only when proven.**
+A page shows the current month when every day of it is checked (clause 4, for every timetable it depends
+on), and the next month too only when every day of that month is checked as well; otherwise it shows the
+current month alone until the next month's table arrives and is checked. A city whose current month is
+not wholly checked stays held; a partly checked month is never shown; the standard of proof (clauses 1–4)
+is unchanged. In code: the verdict yields the proven months, one or two, or a hold, and for a month left
+off the first timetable leaving a day of it unchecked, with that day; the document carries only the
+proven months (the months list, the days, the pages' texts, hence the live data), with that reason as
+`nextUnchecked` and each day's long weekday for the card. Each build prints a notice per city shown
+alone — `::notice::toronto-canada: showing October alone — the next month is not yet checked: ca.ift (a
+member of ca.toronto), first unchecked day 1 Nov 2026` — which replaces the warning above: a month shown
+alone is itself the month's notice before the hold (London shows December alone from 1 December and is
+held on 1 January unless a 2027 table is gated). From the 06:07 UTC build of 1 October Toronto,
+Mississauga and Chicago show October alone: 41 cities, not §2.1's 38. On a page of one month the "none
+set by rule" note says "this month" (`note_no_rule_month`), `check_page` asks for exactly the document's
+months (§9.3), and every sentence that said "this month and next" (the index's lede and description, the
+checks page's "Which places have a page") says what now holds, in the seven languages. The page script
+never shows a time the page does not carry: after Isha on the page's last day, when tomorrow's Fajr is on
+no day it holds, the Today card is that day's calendar leaf (weekday, day, month, as without script) with
+an empty ring and no countdown, Isha current as in the app; once that day is over, the page's own
+out-of-date line.
+
 ### 2.1 Published (41 on 29 September; 38 from 1 October)
 
 *Final, under ruling R115 (the release build of 29 September):* **41 published** — the nine Saudi
@@ -579,15 +601,16 @@ stamp and the two months' first and last days, exactly as §2. `Main` prints `::
 would be held` where `last` < the last day of the month after the two shown, writes only published cities,
 and refuses (exit 1) a `cities.tsv` row whose slug is `how-taqwa-checks`. A Kotlin test covers each clause
 with real stamps (London published; Cairo held for coverage; Tripoli held for class; Cape Town held for
-coverage; Birmingham held as not measured; a fake unit id held).
+coverage; Birmingham held as not measured; a fake unit id held). *Amended by ruling R116 (§2): the
+verdict also says which months are shown, and the warning is a notice per city shown with one month.*
 
 ### 9.3 The site (`site/`)
 
 - `site/stores.py` (new): `load()`, `badges(cfg, lang, root)`, `block(cfg, lang, *, beta: bool)`,
   `app_banner()`; `build.py` uses it for the hero and the banner; `timetables.py` for the city pages.
 - `site/timetables.py`: the page per §3, the checks page per §5, the index line; `check_page` asks for two
-  tables with a row per day and six `td.t` per row, the live data, the details element, and on the checks
-  page the totals; `build.py`'s check adds: every language's `timetable` block has the same keys as
+  tables (since ruling R116, §2: one or two, as the document gives) with a row per day and six `td.t` per
+  row, the live data, the details element, and on the checks page the totals; `build.py`'s check adds: every language's `timetable` block has the same keys as
   English, and no city slug is `how-taqwa-checks`.
 - `site/assets/timetable.js`: the current-prayer rule with sunrise and sunset; the fold at every width;
   the detailed-view switch; the print buttons (`data-print`, `window.print()`, `afterprint`); the

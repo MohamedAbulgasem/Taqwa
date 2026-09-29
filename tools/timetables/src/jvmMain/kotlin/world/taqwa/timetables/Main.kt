@@ -1,10 +1,10 @@
 package world.taqwa.timetables
 
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
 import java.io.File
+import java.time.Month
+import java.time.format.TextStyle
+import java.util.Locale
 import kotlin.system.exitProcess
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -44,22 +44,23 @@ fun main(args: Array<String>) {
 }
 
 /**
- * The run's annotations (spec §2): `::notice::` per city the proven rule held, with its reason, and
- * `::warning::` per published city whose stamp ends before the last day of the month after the two
- * shown — a month's notice to run the gate on the authority's new table before the page is held.
+ * The run's annotations (spec §2, ruling R116): `::notice::` per city the proven rule held, with
+ * its reason, and per city shown with its current month alone, naming the timetable that leaves a
+ * day of the next month unchecked and that day. The second is also the month's notice to run the
+ * gate on the authority's new table: unless it is checked by the first of next month, the city is
+ * held then.
  */
 @Suppress("UNCHECKED_CAST")
 internal fun notices(document: Map<String, Any?>): List<String> {
     val held = (document["held"] as List<Map<String, Any?>>).map { "::notice::${it["slug"]}: held — ${it["reason"]}" }
-    val warnings = (document["cities"] as List<Map<String, Any?>>).mapNotNull { city ->
-        val shown = (city["months"] as List<Map<String, Any?>>).last()
-        val monthAfter = LocalDate(shown["year"] as Int, shown["month"] as Int, 1).plus(1, DateTimeUnit.MONTH)
-        val lastDayAfter = monthAfter.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
-        val through = LocalDate.parse((city["proof"] as Map<String, Any?>)["through"] as String)
-        if (through >= lastDayAfter) return@mapNotNull null
-        "::warning::${city["slug"]}: ${city["method"]}'s stamp ends $through; the page after next month would be held — run the gate on the new table"
+    val alone = (document["cities"] as List<Map<String, Any?>>).mapNotNull { city ->
+        val next = city["nextUnchecked"] as Map<String, Any?>? ?: return@mapNotNull null
+        val shown = (city["months"] as List<Map<String, Any?>>).single()
+        val month = Month.of(shown["month"] as Int).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+        val day = Proven.day(LocalDate.parse(next["day"] as String))
+        "::notice::${city["slug"]}: showing $month alone — the next month is not yet checked: ${next["timetable"]}, first unchecked day $day"
     }
-    return held + warnings
+    return held + alone
 }
 
 /** "Wrote N cities (M held) and P pages". */
