@@ -624,20 +624,44 @@ html[dir="rtl"] .index-checks a { direction: rtl; }
 /* Print, and "Print or save as PDF": black on white, only the title, the date line and the
    months; each month on its own page with every day, the Hijri column and, when the detailed
    view is on, its second lines. With data-print set by a month's button, that month alone. */
+.print-foot { display: none; }
 @media print {
-  @page { margin: 10mm; }
-  :root { color-scheme: light; --bg: #fff; --surface: #fff; --t1: #000; --t2: #333; --t3: #555; --hair: #999; --accent: #000; --accent-text: #000; --ring: #000; }
+  /* The sheet's margins are the page's own padding, not @page's: Chrome's print dialog drops
+     @page margins when its Margins menu says None (and remembers that), which printed the month
+     flush against the paper's edge. With @page at 0 every setting prints the same sheet, and the
+     browser's own header and footer (date, title, address) go too; the page carries its own. */
+  @page { margin: 0; }
+  /* Amber stays on paper where it marks something (Fridays, Jumuʿah, the month's rule, the foot),
+     in the darker text amber, which a black-and-white printer turns into a dark grey. */
+  :root { color-scheme: light; --bg: #fff; --surface: #fff; --t1: #000; --t2: #333; --t3: #555; --hair: #999; --accent: #8A6407; --accent-text: #8A6407; --ring: #000; }
   /* .app-row too, not only what it holds: its own padding would push a month's last rows onto a
      second, blank sheet on Letter (review I2). */
   .top, .langs, .crumbs, .today, .qibla-line, .pitch, .whence, .dv-switch, .app-row, .app, .after, .foot, .tt-stale, button.print, tr.fold, .note-engine { display: none !important; }
-  main.wrap { max-width: none; padding: 0; }
+  main.wrap { max-width: none; padding: 12mm 14mm 0; }
   .city-hero { display: block; padding: 0; }
   .city-copy h1 { font-size: 26px; }
   .city-meta { font-size: 13px; margin-top: 4px; }
   .months { margin-top: 0; }
   .month { break-before: page; border: 0; padding: 12px 0 0; }
   .month:first-of-type { break-before: auto; }
+  /* A whole-page print's second month starts a sheet of its own: its top margin is this. */
+  .month ~ .month { padding-top: 12mm; }
   .month h2 { font-size: 20px; }
+  .month h2::after { content: ""; display: block; width: 26px; margin-top: 5px; border-top: 2px solid #E3A21C; }
+  /* Every row reads alike on paper: the days already gone are only quieter on screen. */
+  .tt tr.past > *, .tt tr.past th.d b { color: var(--t1); }
+  .tt tr.past td.h, .tt tr.past th.d span { color: var(--t2); }
+  .tt tr.fri.past th.d span, .tt tr.fri.past td.jm { color: var(--accent-text); }
+  /* The foot of every sheet (fixed, so each printed page repeats it): the Taqwa mark and name,
+     the page's address, and whose times these are. Borders and text print without the dialog's
+     "Background graphics"; fills would not. */
+  .print-foot { display: block; position: fixed; left: 14mm; right: 14mm; bottom: 8mm; border-top: 1px solid #E3A21C; padding-top: 2.5mm; }
+  .pf-brand { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--t1); }
+  .pf-brand b { font-weight: 800; }
+  .pf-mark { width: 13px; height: 13px; flex: none; color: var(--t1); }
+  .pf-url { margin-inline-start: auto; font-size: 10px; color: var(--accent-text); }
+  .pf-line { margin-top: 1.5mm; font-size: 8.5px; line-height: 1.35; color: var(--t3); }
+  .pf-line b { font-weight: 700; color: var(--t2); }
   .month-head { margin-bottom: 8px; }
   /* A whole-page print puts the next month on a sheet of its own, below no h1: that sheet names
      the city with the table's caption ("Prayer times in London · October 2026"; review M10). A
@@ -666,6 +690,6 @@ html[dir="rtl"] .index-checks a { direction: rtl; }
   main.dv .tt td.t small.dv::before { content: attr(data-w) " "; }
   main.dv .tag.dv { display: inline-block; width: auto; margin: 0; margin-inline-start: 5px; }
   .note { font-size: 12px; margin-top: 8px; }
-  html[data-print] .month { display: none; break-before: auto; }
+  html[data-print] .month { display: none; break-before: auto; padding-top: 12px; }
   html[data-print] .month[data-print-target] { display: block; }
 }

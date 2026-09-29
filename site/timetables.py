@@ -53,6 +53,10 @@ CHEVRON = ('<svg class="chev" viewBox="0 0 12 12" fill="none" stroke="currentCol
            'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>')
 CHECK = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
          'stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>')
+# The Taqwa mark (the arch and its amber dot, as on the home page) for the foot of a printed month.
+PRINT_MARK = ('<svg class="pf-mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.56 12.6V8.13c0-2.32 '
+              '1.38-3.94 3.44-4.75 2.06.81 3.44 2.43 3.44 4.75v4.47" stroke="currentColor" stroke-width="1.4" '
+              'stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="6.3" r="0.95" fill="#E3A21C"/></svg>')
 SEARCH = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" '
           'stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>')
 PRINTER = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
@@ -506,6 +510,7 @@ class Timetables:
     {self.app_section(city, lang)}
     {self.after(city, lang)}
   </div>
+  {self.print_foot(city, lang)}
 </main>
 <script type="application/json" id="tt-data">{data}</script>
 <script src="{{root}}assets/timetable.js?v={{script_version}}" defer></script>
@@ -579,12 +584,10 @@ class Timetables:
         authority = page["method"]
         sep = "‹" if rtl else "›"
         checks_link = f'<a class="more" href="../{CHECKS_PAGE_SLUG}/">{esc(t["how_checks_link"])} {sep}</a>'
+        line = self.source_line(city, lang)
         if cautious:
-            line = (f'<b>{esc(words["whoseTitle"])}</b> · {esc(comma.join(page["members"]))}{esc(comma)}{esc(t["combined"])}'
-                    f' · {esc(t["not_affiliated_any"])}')
             steps = self.cautious_steps(city, lang, today, checks_link)
         else:
-            line = f'<b>{esc(words["whoseTitle"])}</b> · {esc(t["reproduced"])} · {esc(words["notAffiliated"])}'
             ruler_words = {
                 "percent": t["ruler_percent"], "alt": plain(t["ruler_alt"], authority=authority),
                 "none": t["ruler_none"], "before": t["ruler_before"], "same": t["ruler_same"],
@@ -610,6 +613,30 @@ class Timetables:
     </summary>
     <div class="whence-body"><ol class="steps">{"".join(steps)}</ol></div>
   </details>'''
+
+    def source_line(self, city: dict, lang: str) -> str:
+        """Whose times these are (spec §3.3): the authority line of the explainer's summary, which
+        the foot of a printed month repeats — the timetable, how Taqwa uses it, and that Taqwa is
+        not affiliated with it (with any of them, for a cautious place)."""
+        t = self.langs[lang]["timetable"]
+        page = city["pages"][lang]
+        words = page["strings"]
+        if city["entryClass"] == "C":
+            comma = list_comma(lang)
+            return (f'<b>{esc(words["whoseTitle"])}</b> · {esc(comma.join(page["members"]))}{esc(comma)}{esc(t["combined"])}'
+                    f' · {esc(t["not_affiliated_any"])}')
+        return f'<b>{esc(words["whoseTitle"])}</b> · {esc(t["reproduced"])} · {esc(words["notAffiliated"])}'
+
+    def print_foot(self, city: dict, lang: str) -> str:
+        """The foot of every printed sheet, hidden on screen: the Taqwa mark and name, the page's
+        address (where next month's times are), and whose times these are, so a sheet pinned up
+        in a mosque still says where it came from. The print stylesheet fixes it to the bottom
+        of each sheet."""
+        cfg = self.langs[lang]
+        address = f"taqwa.world/{cfg['prefix']}{SECTION}{city['slug']}/"
+        return (f'<div class="print-foot"><p class="pf-brand">{PRINT_MARK}<b>{esc(cfg["brand"])}</b>'
+                f'<span class="pf-url"><bdi dir="ltr">{esc(address)}</bdi></span></p>'
+                f'<p class="pf-line">{self.source_line(city, lang)}</p></div>')
 
     def cautious_steps(self, city: dict, lang: str, today: int, checks_link: str) -> list:
         """A cautious place's three steps (spec §3.3): the members the app names, with the most
