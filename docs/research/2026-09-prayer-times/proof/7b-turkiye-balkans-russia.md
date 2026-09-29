@@ -197,6 +197,16 @@ changed (not asked): its Isha is up to 50 s and its Maghrib up to 20 s earlier t
 some days at London, Berlin, New York and İstanbul (Isha only), never earlier than Diyanet's own
 tables.
 
+**The weekly monitor's capture (28 September 2026).** The same 22 district pages as the monitor read
+them: 29 September – 29 October 2026 and all of 2027, 396 days each, the same minutes as the
+research's capture on all 392 days both hold. Held out, at each research row's unit or point and at
+Diyanet's six points for `other.turkey`, they add 26–29 October 2026: 0 early, 0 late ends, no worst
+moved (1 min at every unit, 2 at the edge; `other.turkey` 2, its Asr 3). `tr.diyanet` holds 8,800
+place-days (was 8,712), its 13 units checked 25 September – 29 October 2026 and all of 2027;
+`other.turkey` 2,400 (was 2,376). Diyanet's month page runs a month from the day it is read and its
+year page is 2027's, so 30 October – 31 December 2026 is in no capture yet: İstanbul's and Ankara's
+October pages wait for a capture read on or after 1 October (ruling R115).
+
 ## Diyanet's European method (`tr.diyanet.europe`)
 
 Tables: Diyanet's own for the twelve held cities (Sarajevo, Zürich, Freiburg, München, Wien, Paris,

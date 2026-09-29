@@ -954,6 +954,13 @@ Rabita's end at Malmö and Lund (Sweden), carried south from Helsinki, is never 
 curve at either place over 2026–2029 (0 of 1,461 days each; slot by slot its depression is at least the
 curve's, and the minute shown is at least 18 min before the curve's moment).
 
+**Brussels, Diyanet (the weekly monitor's capture of 28 September 2026).** Diyanet's Brussels table as
+the member `tr.diyanet.europe` at EMB's point (29 September – 29 October 2026 and 2027; Maghrib not
+checked on it, as at Antwerpen and Gent): 0 early, 0 late ends, no figure moved; `be.cautious` holds
+1,192 place-days (was 823). The member's days at Brussels now run to 29 October, but EMB's member row
+still ends on 25 October (the slice of the days both tables were held on), so Brussels's and Antwerp's
+pages stay held from 26 October (ruling R115); and no Diyanet capture holds 30–31 October yet.
+
 ## The Netherlands (`nl.cautious`, gate `nl-cautious.tsv`)
 
 **Class C.** At Amsterdam, 25 September to 25 October 2026, there are two tables:
@@ -1021,6 +1028,14 @@ change). With the floor: **0 early starts and 0 late ends**, but for these recor
 
 **What the floor costs everyone in the Netherlands:** Maghrib is now sunset + 7 to + 9 (+ 30 s), 4–8 min
 after the Moroccan calendar's + 1..4 and within 0–3 min of Diyanet's own, all year (`cost.txt`).
+
+**Not a row: the weekly monitor's Amsterdam capture (28 September 2026).** As a second Diyanet member
+row (29 September – 29 October 2026 and 2027) it would leave Diyanet's table alone at Amsterdam after
+25 October, while the cautious Fajr, Isha and end of eating follow the other members (the Moroccan
+calendar's Fajr, MWL's Isha), so against Diyanet's alone they read as the members' spread: Fajr over
+its 16 min on 262 days (up to 37; 26–29 October among them), Isha over its 6 on 303 (up to 131), the
+end of eating over its 2 on 127 (up to 123 min early, in 2027). It is left out, and nothing is
+loosened: the member row waits for the Moroccan calendar's own table for the same days.
 
 ## Germany (`de.vikz`, `de.cautious`, gate `de-cautious.tsv`)
 
@@ -1453,6 +1468,15 @@ owner decides the Nordic summer policy. The limits above are the data's, each sc
 
 With 7b, every Nordic figure stays within its limit. Norway's Fajr and Isha fall to 51 and 148;
 Sweden's stay at 143 and 155.
+
+**Oslo and Stockholm, Diyanet (the weekly monitor's capture of 28 September 2026).** Diyanet's Oslo
+table as `no.cautious`'s member row at Oslo (Maghrib not checked on it: IRN's 2027 calendar is not
+held, and in 2026 IRN's own row checks Maghrib under the cap) and its Stockholm table as
+`se.cautious`'s at Stockholm, 29 September – 29 October 2026 and 2027, the same minutes as the
+research's capture on every day both hold. They add 26–29 October 2026 to the member's days at both
+points: 0 early, 0 late ends, no figure moved (`se.cautious` 6,028 place-days, was 6,024; `no.cautious`
+2,648, whose Oslo days were IRN's place-days already). Oslo's page stays held from 30 October (ruling
+R115): no Diyanet capture holds 30–31 October yet.
 
 ## The United States (`us.isna`, gate `us-isna.tsv`)
 

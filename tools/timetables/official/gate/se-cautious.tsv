@@ -13,6 +13,8 @@
 # - The monitor round's fourteen Nordic tables (step c): Diyanet's own for Malmö, Aarhus, Aalborg, Göteborg, Uppsala, Turku,
 #   Tampere, Sundsvall, Umeå, Oulu and Luleå, the member tr.diyanet.europe at its units there; Maghrib checked, the cap
 #   following Diyanet itself.
+# - Stockholm, Diyanet (the monitor's capture of 28 Sep 2026, the member tr.diyanet.europe): 29 Sep – 29 Oct 2026
+#   and 2027; it adds 26–29 October to Diyanet's own Stockholm table above.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/nordic/off-ifis-stockholm-all.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	IFIS Stockholm	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Stockholm	tr.diyanet.europe
@@ -31,3 +33,4 @@ archive/tables/monitor/tr-diyanet-europe/sundsvall.txt	se.cautious	62.39129	17.3
 archive/tables/monitor/tr-diyanet-europe/umea.txt	se.cautious	63.82842	20.25972	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Umeå (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
 archive/tables/monitor/tr-diyanet-europe/oulu.txt	se.cautious	65.01236	25.46816	Europe/Helsinki	F+E S D A M I	daily	standard	test	Diyanet Oulu (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
 archive/tables/monitor/tr-diyanet-europe/lulea.txt	se.cautious	65.58415	22.15465	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Luleå (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/stockholm.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Stockholm (the monitor capture of 28 Sep 2026)	tr.diyanet.europe

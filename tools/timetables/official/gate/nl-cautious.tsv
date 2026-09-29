@@ -3,6 +3,12 @@
 # carries it (member nl.moroccan) and Diyanet's Amsterdam table (member tr.diyanet.europe, subtask 7b's
 # method; its Fajr is also its imsak). No table of the third member, MWL 18°/17°, is held. Every row is
 # held out (a cautious entry has no margins of its own).
+# Not a row: the weekly monitor's Amsterdam capture of 28 Sep 2026 (29 Sep – 29 Oct 2026 and 2027). After 25
+# October only Diyanet's table would be held here, and the cautious Fajr, Isha and end of eating follow the other
+# members (the Moroccan calendar's Fajr, MWL's Isha), so against Diyanet's alone they read as the members' spread:
+# Fajr over its 16 min on 262 days (up to 37; 26–29 October among them), Isha over its 6 on 303 (up to 131), the
+# end of eating over its 2 on 127 (up to 123 min early, in 2027). It waits for the Moroccan calendar's table for
+# the same days.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/split-7g/ihsane-2026-q4.txt	nl.cautious	52.37403	4.88969	Europe/Amsterdam	F S D A M I	daily	standard	test	Al-Ihsane, the Moroccan calendar	nl.moroccan
 archive/tables/moral-auth-world/europe/split-7g/dy-amsterdam-2026.txt	nl.cautious	52.37403	4.88969	Europe/Amsterdam	F+E S D A M I	daily	standard	test	Diyanet Amsterdam	tr.diyanet.europe
