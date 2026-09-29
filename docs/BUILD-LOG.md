@@ -1912,3 +1912,19 @@ mid-line; now "Kıble kuzeyden 151°".
 **Still to do.** Native readers' glance at the Turkish, Bengali and Urdu sentences added tonight;
 a routine to gate each authority's 2027 table as it appears, with the monitor; the accessibility
 audit's follow-ups on the app's About table.
+
+## Build 33 on both platforms (29 September) — 1.0.0 (33)
+
+The first build with the never-early prayer engine. App Review approved iOS 1.0.0 (32) on
+29 September, but 32 still calculates with adhan2's presets, the engine the audit of 25 September
+found showing prayers before the official time in places, so it is never released: its release is
+cancelled and 33 goes to review in its place, to be released by hand when approved (a soft launch
+on iOS while Google's 14-day closed test runs out). Play's closed track gets the same build.
+
+Since 32: the engine (28 September) with the next day's Diyanet Europe and Kemenag fixes and the
+cautious places' proof tiles in About these times; the Jumuʿah pill on Friday's Dhuhr; the
+translation read aloud by the phone's own voice after each ayah; the Bengali and Indonesian rows
+Tanzil ships damaged, repaired; the iPhone's Qibla on true north from the saved city; credits that
+open their source. Play's release notes are in `docs/store/release-notes/1.0.0-33.txt`. The gate
+holds 654 tables and 155,886 place-days with none early; the release scripts refuse to build on a
+stale or red stamp.

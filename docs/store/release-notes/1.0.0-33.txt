@@ -1,0 +1,49 @@
+<en-GB>
+• Prayer times now follow the timetable the mosques near you use. Where Taqwa holds it, every day is checked against it, so no prayer is shown starting early. Tap ⓘ on the Prayer screen to see where your times come from, or match your mosque.
+• Where mosques follow different timetables, each prayer shows once all have begun it.
+• Friday’s Dhuhr carries a Jumuʿah pill.
+• Your phone’s voice can read the translation after each ayah.
+• Bengali and Indonesian translations repaired.
+</en-GB>
+<ar>
+• مواقيت الصلاة تتبع الآن الجدول الذي تعتمده المساجد من حولك. وحيث يملك تقوى هذا الجدول، يتحقّق من مواقيته مقارنةً به يومًا بيوم، فلا تُعرض صلاة قبل وقتها. اضغط ⓘ في شاشة الصلاة لترى مصدر مواقيتك، أو طابِق مواقيت مسجدك.
+• حيث تتبع المساجد جداول مختلفة، تظهر كل صلاة بعد دخول وقتها فيها جميعًا.
+• ظهر يوم الجمعة يحمل شارة «الجمعة».
+• صوت هاتفك يقرأ الترجمة بعد كل آية.
+• إصلاح الترجمتين البنغالية والإندونيسية.
+</ar>
+<fr-FR>
+• Les horaires suivent désormais le calendrier des mosquées proches, vérifié jour après jour là où Taqwa le détient : aucune prière n’est affichée en avance. Touchez ⓘ sur l’écran Prière pour voir leur origine, ou alignez-les sur votre mosquée.
+• Si les mosquées diffèrent, chaque prière s’affiche quand toutes l’ont commencée.
+• Le Dhuhr du vendredi porte une pastille Joumouʿa.
+• La voix du téléphone lit la traduction après chaque verset.
+• Traductions bengali et indonésienne réparées.
+</fr-FR>
+<tr-TR>
+• Namaz vakitleri artık yakınınızdaki camilerin takvimini izliyor; Taqwa bu takvime sahipse vakitler onunla gün gün karşılaştırılır, hiçbir namaz erken gösterilmez. Vakitlerin kaynağı için Namaz ekranındaki ⓘ simgesine dokunun ya da caminizle eşleştirin.
+• Camiler farklı takvimlere uyuyorsa her namaz, hepsinde vakit girince gösterilir.
+• Cuma günleri öğle vaktinde Cuma etiketi görünür.
+• Telefonunuzun sesi her ayetten sonra meali okuyabilir.
+• Bengalce ve Endonezce mealler düzeltildi.
+</tr-TR>
+<id>
+• Waktu salat kini mengikuti jadwal masjid di sekitar Anda. Jika Taqwa memiliki jadwal itu, waktunya dicocokkan hari demi hari, jadi tidak ada salat yang tampil lebih awal. Ketuk ⓘ di layar Salat untuk melihat asal waktunya, atau cocokkan dengan masjid Anda.
+• Jika jadwal masjid berbeda-beda, setiap salat tampil setelah waktunya masuk di semuanya.
+• Dzuhur hari Jumat kini bertanda Jumat.
+• Suara ponsel bisa membacakan terjemahan setelah tiap ayat.
+• Terjemahan Bengali dan Indonesia diperbaiki.
+</id>
+<ur>
+• نماز کے اوقات اب آپ کے قریب کی مساجد کے نقشۂ اوقات کے مطابق ہیں۔ جہاں تقویٰ کے پاس وہ نقشہ ہے، وہاں اوقات روز اس سے ملا کر جانچے جاتے ہیں، تاکہ کوئی نماز وقت سے پہلے نہ دکھے۔ اوقات کا ماخذ دیکھنے کے لیے نماز کی اسکرین پر ⓘ دبائیں، یا اپنی مسجد سے ملائیں۔
+• جہاں مساجد کے نقشۂ اوقات مختلف ہیں، وہاں ہر نماز تب دکھتی ہے جب سب کے ہاں وقت شروع ہو چکا ہو۔
+• جمعہ کے دن ظہر پر جمعہ کا نشان۔
+• آپ کے فون کی آواز ہر آیت کے بعد ترجمہ سنا سکتی ہے۔
+• بنگالی اور انڈونیشیائی تراجم کی درستی۔
+</ur>
+<bn-BD>
+• নামাজের সময় এখন আপনার কাছের মসজিদগুলোর সময়সূচি অনুসরণ করে। তাকওয়ার কাছে সেই সময়সূচি থাকলে সময়গুলো প্রতিদিন তার সঙ্গে মিলিয়ে দেখা হয়, তাই কোনো নামাজ আগে দেখায় না। সময়ের উৎস দেখতে নামাজ পর্দায় ⓘ চাপুন, অথবা আপনার মসজিদের সঙ্গে মেলান।
+• মসজিদগুলোর সময়সূচি ভিন্ন হলে সবগুলোতে ওয়াক্ত শুরু হওয়ার পরই প্রতিটি নামাজ দেখায়।
+• শুক্রবারের যোহরে এখন জুমার চিহ্ন থাকে।
+• আপনার ফোনের কণ্ঠ প্রতিটি আয়াতের পরে অনুবাদ পড়ে শোনাতে পারে।
+• বাংলা ও ইন্দোনেশীয় অনুবাদ মেরামত করা হয়েছে।
+</bn-BD>
