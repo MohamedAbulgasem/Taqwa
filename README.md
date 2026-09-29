@@ -42,7 +42,7 @@ Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatf
 <!-- beta:start -->
 ## Join the Android beta
 
-Google asks every new app for twelve testers over two weeks before it can be published. If you have an Android phone, joining takes a minute, and it is the biggest help Taqwa can get right now:
+Taqwa for iPhone is on the [App Store](https://apps.apple.com/app/id6814975544); Taqwa for Android follows on Google Play after its closed test. Google asks every new app for twelve testers over two weeks before it can be published. If you have an Android phone, joining takes a minute, and it is the biggest help Taqwa can get right now:
 
 1. [Join the testers group](https://groups.google.com/g/taqwa-testers) with the Google account that is on your phone. The group exists only so Google Play knows who the testers are.
 2. [Become a tester](https://play.google.com/apps/testing/world.taqwa.app) on Google Play's testing page.
@@ -120,7 +120,7 @@ All screenshots are from a Samsung Galaxy S23 Ultra running the current build.
 
 ## Get it
 
-Taqwa is coming to Google Play and the App Store. Until then it can be built from source (below), and the website at [taqwa.world](https://taqwa.world) will carry the store links the day they exist.
+Taqwa is on the [App Store](https://apps.apple.com/app/id6814975544) for iPhone. Google Play follows after its closed test; until then Android testers can join the beta above, and anyone can build it from source (below). The website at [taqwa.world](https://taqwa.world) carries each store's link from the day it is live.
 
 ## Roadmap
 
