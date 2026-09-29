@@ -12,7 +12,6 @@ import world.taqwa.timetables.gate.Stamps
 import world.taqwa.timetables.gate.SurveyFolder
 import world.taqwa.timetables.gate.Surveys
 import java.io.File
-import java.security.MessageDigest
 import kotlin.system.exitProcess
 import kotlin.time.Clock
 
@@ -147,8 +146,8 @@ class Monitor(
         //    its metadata, the engine, the checker's own code, a calendar's survey rows), and each
         //    table red last run, until it is green (reviews I8, N9).
         val engineHash = Stamps.wholeEngineHash(repo)
-        val checkerHash = checkerHash(repo)
-        val surveyRows = SurveyRows(officialDir)
+        val checkerHash = Signatures.checkerHash(repo)
+        val surveyCache = HashMap<String, List<String>>()
         val check = TableCheck(roots, officialDir)
         val records = state.checked
         // What today's fetch said of each table (new, changed, unchanged): a table the state does not
@@ -156,7 +155,7 @@ class Monitor(
         val fetched = if (fetchedToday) log!!.sources.flatMap { r -> r.tables.map { (key, s) -> "${r.source}/$key" to s } }.toMap() else emptyMap()
         for (table in index) {
             val record = records[table.id]
-            val signature = signature(table, engineHash, checkerHash, surveyRows.of(table))
+            val signature = Signatures.of(table, engineHash, checkerHash, Signatures.surveyRows(officialDir, table, surveyCache))
             if (!checkAll && record != null && record.signature == signature && !record.red) continue
             val status = TableCheck.Status(
                 isNew = fetched[table.id] == "new" || (record == null && table.fetched == today.toString()),
@@ -236,32 +235,6 @@ class Monitor(
             ),
         )
         return MonitorRun(exitCode, summary, text, reportFile, changed, partial)
-    }
-
-    /** What a check depends on: the table's content and metadata, the whole engine, the checker's own code, the survey rows that cover it. */
-    private fun signature(table: MonitorTable, engineHash: String, checkerHash: String, surveyRows: String): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        for (part in listOf(table.metadata, engineHash, checkerHash, surveyRows)) {
-            digest.update(part.toByteArray())
-            digest.update(0)
-        }
-        return digest.digest().joinToString("") { "%02x".format(it) }.take(24)
-    }
-
-    /** The faults and outliers a survey records for one calendar (and for every calendar, `*`), as text. */
-    private class SurveyRows(private val officialDir: File) {
-        private val cache = HashMap<String, List<String>>()
-
-        fun of(table: MonitorTable): String {
-            val folder = table.survey ?: return ""
-            val lines = cache.getOrPut(folder) {
-                listOf("faults.tsv", "outliers.tsv").flatMap { name ->
-                    val file = officialDir.resolve("survey/$folder/$name")
-                    if (file.isFile) file.readLines().filter { it.isNotBlank() && !it.startsWith("#") }.map { "$name\t$it" } else emptyList()
-                }
-            }
-            return lines.filter { line -> line.split('\t').getOrNull(1).let { it == table.key || it == "*" } }.joinToString("\n")
-        }
     }
 
     private fun fullGate(): List<Item> {
@@ -352,24 +325,6 @@ class Monitor(
 
         const val BACKUP_FIX = "the mirror is TAQWA_OFFICIAL_BACKUP's archive/ folder: point it at the folder, or unset it where the private " +
             "repository is the backup (ruling R94); a run that fetched new captures left them in one place only until it runs."
-
-        /** The checker's own sources (the gate and monitor Kotlin, the fetch Python), hashed with their paths (review N9). */
-        fun checkerHash(repo: File): String {
-            val roots = listOf(
-                repo.resolve("tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/gate") to "kt",
-                repo.resolve("tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/monitor") to "kt",
-                repo.resolve("tools/timetables/monitor") to "py",
-            )
-            val files = roots.flatMap { (dir, ext) -> dir.walkTopDown().filter { it.isFile && it.extension == ext }.toList() }
-            val digest = MessageDigest.getInstance("SHA-256")
-            for (file in files.sortedBy { it.relativeTo(repo).invariantSeparatorsPath }) {
-                digest.update(file.relativeTo(repo).invariantSeparatorsPath.toByteArray())
-                digest.update(0)
-                digest.update(file.readBytes())
-                digest.update(0)
-            }
-            return digest.digest().joinToString("") { "%02x".format(it) }.take(16)
-        }
     }
 
     /**

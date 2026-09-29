@@ -349,14 +349,59 @@ class MonitorReportTest {
         assertEquals(24, signature.length)
         // Nothing changed: not checked again.
         assertTrue("sg-muis/singapore" !in run("2026-10-12").report)
-        // A calendar's signature carries its survey's rows: an invented calendar listed nowhere has none, so its
-        // signature is stable, while the checker hash differs from the engine hash's world.
-        val calendar = "mawaqit\tinvented\tarchive/tables/monitor/mawaqit/invented.txt\tInvented\t52.5\t-1.9\tEurope/London\t\tGB\t\tgb-cautious\tF S D A M I\tdaily\t-\tzzz\t2026-10-05\t\n"
-        index("h1", more = calendar)
-        val withCalendar = run("2026-10-19")
-        assertTrue("mawaqit/invented could not be checked" in withCalendar.report, withCalendar.report)
-        val records = MonitorState(monitorDir.resolve("state.json")).checked
-        assertEquals(signature, records.getValue("sg-muis/singapore").signature, "another table's row does not move this one's signature")
-        assertTrue(records.getValue("mawaqit/invented").red)
+        // The checker's own code changed (the state remembers a signature made with another checker hash): checked again.
+        val state = MonitorState(monitorDir.resolve("state.json"))
+        val record = state.checked.getValue("sg-muis/singapore")
+        state.checked["sg-muis/singapore"] = record.copy(signature = "made-by-an-older-checker")
+        state.save()
+        assertTrue("Checked again, fine: 1 held table (sg-muis 1)" in run("2026-10-19").report)
+        assertEquals(signature, MonitorState(monitorDir.resolve("state.json")).checked.getValue("sg-muis/singapore").signature)
+    }
+
+    @Test
+    fun `the signature moves with the checker's sources and a calendar's own survey rows and with nothing else`() {
+        // An invented repository with the checker's folders, and an invented survey folder.
+        val repo = official.resolve("repo")
+        val kt = repo.resolve("tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/monitor/A.kt")
+        kt.parentFile.mkdirs()
+        kt.writeText("class A")
+        val py = repo.resolve("tools/timetables/monitor/fetchers/x.py")
+        py.parentFile.mkdirs()
+        py.writeText("x = 1\n")
+        val checker1 = Signatures.checkerHash(repo)
+        assertEquals(16, checker1.length)
+        assertEquals(checker1, Signatures.checkerHash(repo), "stable")
+        py.writeText("x = 2\n")
+        val checker2 = Signatures.checkerHash(repo)
+        assertTrue(checker1 != checker2, "a fetcher's change moves the checker hash")
+        kt.writeText("class A { }")
+        assertTrue(checker2 != Signatures.checkerHash(repo), "a Kotlin change moves it too")
+        repo.resolve("tools/timetables/monitor/notes.txt").writeText("not code")
+        assertEquals(Signatures.checkerHash(repo), Signatures.checkerHash(repo))
+
+        val officialDir = official.resolve("official-invented")
+        val survey = officialDir.resolve("survey/gb-cautious")
+        survey.mkdirs()
+        survey.resolve("faults.tsv").writeText("calendar\tfrom\tto\tcolumns\treason\nmosque-a\t2026-10-01\t2026-10-02\tD\ta slip\nmosque-b\t2026-10-01\t2026-10-01\tS\tanother\n")
+        survey.resolve("outliers.tsv").writeText("calendar\tevent\tfrom\tto\tdays\tworst\treason\n*\tisha\t2026-06-01\t2026-06-30\t2\t3\tthe threshold nights\n")
+        fun table(key: String, survey: String? = "gb-cautious") = MonitorTable(
+            "mawaqit", key, "archive/tables/monitor/mawaqit/$key.txt", key, 52.5, -1.9, "Europe/London", null, "GB", null, survey,
+            "F S D A M I", "daily", "-", "hash", "2026-10-05", "",
+        )
+        val a = Signatures.surveyRows(officialDir, table("mosque-a"))
+        assertTrue("mosque-a\t2026-10-01\t2026-10-02\tD" in a && "*\tisha" in a && "mosque-b" !in a, a)
+        assertEquals("", Signatures.surveyRows(officialDir, table("mosque-a", survey = null)), "no survey, no rows")
+        val before = Signatures.of(table("mosque-a"), "engine", "checker", a)
+        assertEquals(24, before.length)
+        assertEquals(before, Signatures.of(table("mosque-a"), "engine", "checker", a))
+        // A new fault row for mosque-a moves its signature; mosque-b's rows do not.
+        survey.resolve("faults.tsv").appendText("mosque-a\t2026-11-01\t2026-11-01\tM\tone more\n")
+        val after = Signatures.of(table("mosque-a"), "engine", "checker", Signatures.surveyRows(officialDir, table("mosque-a")))
+        assertTrue(before != after, "a new row for the calendar moves its signature")
+        val b = Signatures.surveyRows(officialDir, table("mosque-b"))
+        survey.resolve("faults.tsv").appendText("mosque-a\t2026-12-01\t2026-12-01\tM\tand another\n")
+        assertEquals(b, Signatures.surveyRows(officialDir, table("mosque-b")), "another calendar's row is not this one's")
+        assertTrue(Signatures.of(table("mosque-a"), "engine", "checker-2", a) != before, "the checker hash is part of it")
+        assertTrue(Signatures.of(table("mosque-a"), "engine-2", "checker", a) != before, "the engine hash is part of it")
     }
 }

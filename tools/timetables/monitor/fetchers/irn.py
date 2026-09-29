@@ -76,9 +76,11 @@ def parse_month(body, month=None):
     years = re.findall(r"\b(20\d\d)\b", text)
     year = max(set(years), key=years.count) if years else None
     if month is not None:
-        named = [MONTHS[w] for w in re.findall(r"[A-Za-z]+", text.lower()) if w in MONTHS]
+        # The heading names the month beside its year ("Januar 2027"); a month word in prose ("times
+        # may vary") is not a heading and never decides.
+        named = [MONTHS[w.lower()] for w, _ in re.findall(r"([A-Za-zÆØÅæøå]+)\s+(20\d\d)", text) if w.lower() in MONTHS]
         if named:
-            if named[0] != month:
+            if month not in named:
                 raise FetchError(f"the reply names month {named[0]}, not {month}")
         else:
             days = calendar.monthrange(int(year), month)[1] if year else None

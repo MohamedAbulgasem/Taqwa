@@ -61,10 +61,12 @@ def read_sources(path):
     return out
 
 
-def skip_reason(row, last_fetch, today, only, force):
+def skip_reason(row, last_fetch, today, only, force, retry=False):
     """Why a source is not fetched this run, or None when it is: a source read by hand (fetcher
     `manual`) never, named or not; one with cadence `manual` only when named; a weekly one every run
-    (six days after its last fetch), a monthly one after 27 days; `--only` and `--force` override."""
+    (six days after its last fetch), a monthly one after 27 days; one whose last run failed or came
+    back in part once more (`retry`, review R3-M2), then on its cadence; `--only` and `--force`
+    override."""
     if row["fetcher"] == "manual":
         return "fetched by hand"
     if row["source"] in only:
@@ -73,14 +75,16 @@ def skip_reason(row, last_fetch, today, only, force):
         return None
     if row["cadence"] == "manual":
         return "runs only when named"
+    if retry:
+        return None
     days = CADENCE_DAYS.get(row["cadence"], 6)
     if last_fetch is None or (today - last_fetch).days >= days:
         return None
     return "not due"
 
 
-def due(row, last_fetch, today, only, force):
-    return skip_reason(row, last_fetch, today, only, force) is None
+def due(row, last_fetch, today, only, force, retry=False):
+    return skip_reason(row, last_fetch, today, only, force, retry) is None
 
 
 class Store:
@@ -103,6 +107,10 @@ class Store:
     def last_fetch(self, source):
         s = self.data["sources"].get(source, {}).get("lastFetch")
         return dt.date.fromisoformat(s) if s else None
+
+    def retry(self, source):
+        """Whether the source's last run failed or came back in part and has not been retried yet."""
+        return bool(self.data["sources"].get(source, {}).get("retry"))
 
     @staticmethod
     def rel_path(source, key):
@@ -141,12 +149,16 @@ class Store:
         return status
 
     def source_done(self, source, status, message, requests):
-        """Only a complete fetch moves `lastFetch` on: a partial one (a breaker, the budget, a table
-        that failed) is due again next run (review N7)."""
+        """Records the run. A source that failed or came back in part (a breaker, the budget, one
+        table that failed) is retried on the next run once; if it fails or comes back in part again
+        it falls back to its cadence (reviews N7, R3-M2: one mosque gone for good must not refetch
+        all 125 calendars weekly). Returns (retried next run, this run was the retry)."""
         entry = self.data["sources"].setdefault(source, {})
-        if status == "ok":
-            entry["lastFetch"] = self.today.isoformat()
+        was_retry = bool(entry.get("retry"))
+        entry["lastFetch"] = self.today.isoformat()
+        entry["retry"] = status in ("partial", "failed") and not was_retry
         entry.update({"status": status, "message": scrub(message), "requests": requests, "lastRun": self.today.isoformat()})
+        return entry["retry"], was_retry
 
     def index_lines(self):
         lines = ["\t".join(INDEX_HEADER)]
@@ -174,6 +186,13 @@ class Store:
 
     def save(self):
         write_json(self.path, self.data)
+
+
+def next_time(store, row):
+    """What a source that failed or came back in part can expect (review R3-M2), for its message."""
+    if not store.retry(row["source"]):
+        return "retried on the next run, once"
+    return f"this was the retry; the source now waits for its cadence ({row['cadence']})"
 
 
 def run_source(row, store, ctx):
@@ -246,13 +265,13 @@ def main(argv=None):
             if only and source not in only:
                 results[source] = {"status": "skipped", "message": "not selected", "requests": 0, "tables": {}}
                 continue
-            why = skip_reason(row, store.last_fetch(source), today, only, args.force)
+            why = skip_reason(row, store.last_fetch(source), today, only, args.force, retry=store.retry(source))
             if why:
                 results[source] = {"status": "skipped", "message": why, "requests": 0, "tables": {}}
                 print(f"{source}: skipped ({why})")
                 continue
             if http.budget_spent():
-                message = f"not fetched: the run's time budget ({args.budget_minutes:g} min) was spent before its turn"
+                message = f"not fetched: the run's time budget ({args.budget_minutes:g} min) was spent before its turn; " + next_time(store, row)
                 results[source] = {"status": "failed", "message": message, "requests": 0, "tables": {}}
                 store.source_done(source, "failed", message, 0)
                 print(f"{source}: failed — {message}", flush=True)
@@ -261,6 +280,9 @@ def main(argv=None):
             print(f"{source}: fetching …", flush=True)
             ctx = Context(source, official, today, log, monitor_dir, args.force, http=http)
             status, message, requests, statuses = run_source(row, store, ctx)
+            if status in ("partial", "failed"):
+                # The report keeps naming the missing part (the errors above) and says what happens next.
+                message = (message + "; " if message else "") + next_time(store, row)
             store.source_done(source, status, message, requests)
             results[source] = {"status": status, "message": message, "requests": requests, "tables": statuses}
             counts = {s: list(statuses.values()).count(s) for s in ("new", "changed", "unchanged")}

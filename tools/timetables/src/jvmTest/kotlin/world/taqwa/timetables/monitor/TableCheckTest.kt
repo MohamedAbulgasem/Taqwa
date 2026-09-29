@@ -150,14 +150,13 @@ class TableCheckTest {
         val back = check.check(late(5), TableCheck.Status(false, true, true, worse.lateness), LocalDate(2026, 10, 26))
         assertEquals(Kind.STILL_OPEN, back.item.kind, back.item.toString())
         assertEquals(record.worst + 2, back.lateness!!.worst)
-        // An event over the limit for the first time (Fajr's column read now): raised again.
-        val newEvent = check.check(late(5, columns = "F+E S D A M I", drop = "2026-02-23"), TableCheck.Status(false, true, true, back.lateness), LocalDate(2026, 11, 2))
-        val kinds = newEvent.items.map { it.kind }
-        if (Kind.NEVER_EARLY !in kinds) {
-            assertEquals(Kind.OWN_LATE, newEvent.item.kind, newEvent.item.toString())
-            assertTrue(newEvent.item.details.first().startsWith("worse: fajr over the limit for the first time"), newEvent.item.toString())
-            assertTrue("fajr" in newEvent.lateness!!.events)
-        }
+        // An event over the limit for the first time: a record without Dhuhr among its events, then Dhuhr's
+        // column read (a start printed earlier is late, never early, so this is the only change): raised again.
+        val withoutDhuhr = back.lateness!!.copy(events = back.lateness!!.events - "dhuhr")
+        val newEvent = check.check(late(5), TableCheck.Status(false, true, true, withoutDhuhr), LocalDate(2026, 11, 2))
+        assertEquals(Kind.OWN_LATE, newEvent.item.kind, newEvent.item.toString())
+        assertTrue(newEvent.item.details.first().startsWith("worse: dhuhr over the limit for the first time"), newEvent.item.toString())
+        assertTrue("dhuhr" in newEvent.lateness!!.events && newEvent.lateness!!.events.containsAll(withoutDhuhr.events))
     }
 
     @Test

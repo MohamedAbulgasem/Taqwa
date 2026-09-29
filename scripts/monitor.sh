@@ -14,16 +14,18 @@
 # again, not only the ones whose signature changed and the ones red last run; --verbose prints each
 # step's progress (otherwise one summary line and the report's path).
 # Exit 0 all green, 1 attention needed, 2 the monitor itself failed; every early exit writes
-# monitor/last-run.json with exit 2 and the reason (ruling N3), except a run refused by the lock,
-# which leaves the holder's record alone. On macOS a notification is posted when the attention set
-# changed since the last one, and always on 2.
+# monitor/last-run.json with exit 2 and the reason (ruling N3), a signal (INT, TERM, HUP) included,
+# which also stops the fetch or check still running (review R3-M1); a run refused by the lock leaves
+# the holder's record alone. On macOS a notification is posted when the attention set changed since
+# the last one, and always on 2.
 #
 # Every path comes from TAQWA_OFFICIAL, the folder that holds archive/ and monitor/ (default
 # ~/Desktop/Workspace/apps/Taqwa-official on the Mac; the workspace in the cloud). The backup mirror
 # runs only where TAQWA_OFFICIAL_BACKUP names a folder; a configured mirror that fails is reported.
 # TAQWA_PYTHON picks the interpreter (else Homebrew's python3, else the first python3 on PATH; 3.9
-# or later); JAVA_HOME the JDK (else macOS's java_home for 21). Runs only JVM tasks. Nothing fetched
-# is ever committed to the public repository.
+# or later); JAVA_HOME the JDK (else macOS's java_home for 21); TAQWA_GRADLE the Gradle command
+# (default ./gradlew; a test hands a stand-in). Runs only JVM tasks. Nothing fetched is ever
+# committed to the public repository.
 set -uo pipefail
 
 OFFICIAL="${TAQWA_OFFICIAL:-${HOME:-}/Desktop/Workspace/apps/Taqwa-official}"
@@ -39,6 +41,9 @@ RECORDED=0      # 1 once this run has written monitor/last-run.json
 LOCK_REFUSED=0  # 1 when another run holds the lock: its record is left alone
 HOLD_LOCK=0
 REASON=""
+CHILD=""        # the fetch or check running in the background, stopped on a signal
+STEP="start"
+GRADLE="${TAQWA_GRADLE:-./gradlew}"
 ONLY=()
 
 json_escape() {
@@ -88,16 +93,52 @@ failed() {
     notify "The monitor itself failed: $1"
     exit 2
 }
+stop_child() {
+    # The fetch or check still running: its own children first (a JVM the Gradle client started when
+    # there is no daemon; a daemon cancels the build when its client goes), while it is still their
+    # parent, then the child itself.
+    [ -n "$CHILD" ] || return 0
+    pkill -TERM -P "$CHILD" 2>/dev/null || true
+    kill -TERM "$CHILD" 2>/dev/null || true
+    local i=0
+    while kill -0 "$CHILD" 2>/dev/null && [ "$i" -lt 20 ]; do sleep 0.25; i=$((i + 1)); done
+    pkill -KILL -P "$CHILD" 2>/dev/null || true
+    kill -KILL "$CHILD" 2>/dev/null || true
+    CHILD=""
+}
+run_child() {
+    # A step in the background, waited for: a trapped signal interrupts the wait at once, so the
+    # handler can stop the step and record the failure (bash 3.2 waits out a foreground child first).
+    "$@" &
+    CHILD=$!
+    wait "$CHILD"
+    local rc=$?
+    CHILD=""
+    return $rc
+}
+on_signal() {
+    REASON="stopped by SIG$1 during the $STEP step"
+    echo "monitor: $REASON" >&2
+    stop_child
+    write_failure_record "$REASON"
+    exit "$2"
+}
 finish() {
-    # Every exit: give the lock back, and leave a failure record behind any exit that is not a result
-    # (a signal, a set -u slip, a command that died), unless the lock refused this run.
+    # Every exit: stop what still runs, give the lock back, and leave a failure record behind any exit
+    # that is not a result (a signal, a set -u slip, a command that died), unless the lock refused this run.
     local code=$?
+    stop_child
     [ "$HOLD_LOCK" = 1 ] && rm -rf "$LOCK"
     if [ "$code" != 0 ] && [ "$code" != 1 ] && [ "$RECORDED" != 1 ] && [ "$LOCK_REFUSED" != 1 ]; then
         write_failure_record "${REASON:-exited $code before a result (see the run log under monitor/fetch/)}"
     fi
 }
 trap finish EXIT
+# The Mac's bash 3.2 lets the EXIT trap see 0 after a signal: each signal gets its own handler, which
+# writes the record and exits with the signal's code.
+trap 'on_signal INT 130' INT
+trap 'on_signal TERM 143' TERM
+trap 'on_signal HUP 129' HUP
 
 cd "$(dirname "$0")/.." || failed "cannot enter the repository"
 
@@ -172,7 +213,8 @@ fi
 # 1. Fetch. A driver that breaks is a finding the check reports; what is held is still checked.
 if [ "$FETCH" = 1 ]; then
     say "monitor: fetching (log: $LOG)"
-    if ! "$PY" tools/timetables/monitor/fetch.py --official "$OFFICIAL" --today "$TODAY" ${ONLY_PY[@]+"${ONLY_PY[@]}"} >>"$LOG" 2>&1; then
+    STEP="fetch"
+    if ! run_child "$PY" tools/timetables/monitor/fetch.py --official "$OFFICIAL" --today "$TODAY" ${ONLY_PY[@]+"${ONLY_PY[@]}"} >>"$LOG" 2>&1; then
         FETCH_BROKE=1
         tail -20 "$LOG" >&2
         echo "monitor: the fetch driver broke (see $LOG); what is held is checked anyway" >&2
@@ -181,8 +223,9 @@ if [ "$FETCH" = 1 ]; then
 fi
 
 # 2. Backup: only where a mirror is configured; the record says what happened either way (review I2).
+STEP="backup"
 if [ -n "$BACKUP" ]; then
-    if ! "$PY" tools/timetables/monitor/backup.py --official "$OFFICIAL" --backup "$BACKUP" --today "$TODAY" >>"$LOG" 2>&1; then
+    if ! run_child "$PY" tools/timetables/monitor/backup.py --official "$OFFICIAL" --backup "$BACKUP" --today "$TODAY" >>"$LOG" 2>&1; then
         echo "monitor: the backup step failed (see $LOG)" >&2
     fi
     if ! grep -q "\"date\": \"$TODAY\"" "$MONITOR/backup.json" 2>/dev/null; then
@@ -196,12 +239,14 @@ fi
 # 3. Check.
 rm -f "$MONITOR/last-run.json"
 say "monitor: checking (the tables whose signature changed, the gate, the surveys, the horizons)"
+STEP="check"
 GRADLE_ARGS=(-q -p tools/timetables monitor "-Pofficial=$OFFICIAL" "-Pmonitor=$MONITOR" "-Ptoday=$TODAY")
 [ -n "$ONLY_GRADLE" ] && GRADLE_ARGS+=("-Ponly=$ONLY_GRADLE")
 [ "$CHECK_ALL" = 1 ] && GRADLE_ARGS+=("-PcheckAll=true")
 [ -n "${CI:-}" ] && GRADLE_ARGS+=(--no-daemon)
-./gradlew "${GRADLE_ARGS[@]}" >>"$LOG" 2>&1
+run_child "$GRADLE" "${GRADLE_ARGS[@]}" >>"$LOG" 2>&1
 GRADLE_EXIT=$?
+STEP="report"
 if [ ! -f "$MONITOR/last-run.json" ]; then
     tail -30 "$LOG" >&2
     failed "the check step wrote no result (Gradle exit $GRADLE_EXIT, see $LOG)"
