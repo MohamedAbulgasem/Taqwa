@@ -4,6 +4,11 @@
 # repository holds the restricted archive (archive/) and the monitor's state (monitor/) at its root,
 # the layout TAQWA_OFFICIAL names.
 #
+# It runs on Mondays and on the 1st of each month, after midnight in Cape Town: the MJC's page shows
+# the current month alone and drops it when the next begins (a month-start source in sources.tsv).
+# The run on the 1st is a normal full run: whatever is due is fetched, and the issue follows the same
+# rules; when the 1st is a Monday the second run waits for the first and finds nothing new due.
+#
 # Each run checks out the archive repository at its branch's head and the public Taqwa repository
 # at main into taqwa/ (neither checkout keeps a token; the commit step alone is given one), runs
 # scripts/monitor.sh, commits and pushes whatever the run added or changed under archive/ and
@@ -25,6 +30,7 @@ name: Taqwa monitor
 on:
   schedule:
     - cron: "0 3 * * 1" # Mondays 03:00 UTC
+    - cron: "17 3 1 * *" # the 1st of each month, 03:17 UTC (two hours later in Cape Town): the MJC's new month
   workflow_dispatch:
     inputs:
       options:

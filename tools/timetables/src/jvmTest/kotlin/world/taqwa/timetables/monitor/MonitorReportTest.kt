@@ -49,14 +49,17 @@ class MonitorReportTest {
     fun `the committed catalogue reads and names every fetcher or manual`() {
         val sources = Source.load(TestPaths.repoRoot.resolve("tools/timetables/official/monitor/sources.tsv"))
         assertTrue(sources.size >= 10)
-        assertTrue(sources.all { it.cadence in setOf("weekly", "monthly", "manual") }, sources.joinToString { it.cadence })
+        assertTrue(sources.all { it.cadence in setOf("weekly", "monthly", "month-start", "manual") }, sources.joinToString { it.cadence })
         assertTrue(sources.all { !it.manual || it.nextExpected != null || it.fetcher != "manual" }, "a source read by hand names when its next edition is expected")
         val fetchers = TestPaths.repoRoot.resolve("tools/timetables/monitor/fetchers").listFiles { f -> f.extension == "py" }!!.map { it.nameWithoutExtension }.toSet()
         for (s in sources.filter { it.fetcher != "manual" }) assertTrue(s.fetcher in fetchers, "${s.id}: no fetcher ${s.fetcher}.py")
-        // IRN runs on its own (ruling R95); London waits for the owner's key.
+        // IRN runs on its own (ruling R95); London waits for the owner's key; the MJC's page is due each new month.
         assertEquals("irn", sources.first { it.id == "no-irn" }.fetcher)
         assertTrue(!sources.first { it.id == "no-irn" }.manual)
         assertTrue(sources.first { it.id == "gb-london-lupt" }.manual)
+        val mjc = sources.first { it.id == "za-mjc" }
+        assertEquals("mjc" to "month-start", mjc.fetcher to mjc.cadence)
+        assertTrue(!mjc.manual && mjc.nextExpected == null)
         // Metadata only (ruling R69): no printed time in the catalogue.
         val time = Regex("""\b\d{1,2}:\d{2}\b""")
         assertTrue(sources.none { time.containsMatchIn(it.points) || time.containsMatchIn(it.note) })

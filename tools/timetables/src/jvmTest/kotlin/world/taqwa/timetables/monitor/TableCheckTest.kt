@@ -252,6 +252,18 @@ class TableCheckTest {
     }
 
     @Test
+    fun `the MJC's month is checked at its Cape Town unit and there as the cautious za_cape's member`() {
+        // As za-cape.tsv holds the MJC's table: za.mjc's one unit at its own point, and za.cape's member row at that point.
+        val rows = rows(check.plan(table("za-mjc", "cape-town-2026-10", "archive/t.txt", "za.mjc/za.mjc", null, null, "Africa/Johannesburg", "ZA", "F S D A M I")))
+        assertEquals(2, rows.size, rows.toString())
+        assertEquals("za.cape", rows[0].entry)
+        assertEquals("za.mjc", rows[0].member)
+        assertEquals(-33.92584 to 18.42322, rows[0].lat to rows[0].lon)
+        assertEquals("za.mjc/za.mjc", rows[1].entry)
+        assertTrue(rows[1].own && rows[1].lat == null && rows[1].lon == null, rows[1].toString())
+    }
+
+    @Test
     fun `a table automatic does not follow is checked as its own entry`() {
         // Inside the M25 Automatic follows London Unified; Diyanet's London table is still Diyanet's.
         val rows = rows(check.plan(table("tr-diyanet-europe", "london", "archive/t.txt", "tr.diyanet.europe", 51.5074, -0.1278, "Europe/London", "GB", "F+E S D A M I")))
@@ -377,6 +389,20 @@ class TableCheckTest {
         assertTrue(row != null && "`invented-mosque\t2026-10-29\t2026-10-31\tD\tsuspected" in row, item.toString())
         val time = Regex("""\b\d{1,2}:\d{2}\b""")
         assertTrue(item.details.none { time.containsMatchIn(it) }, item.toString())
+    }
+
+    @Test
+    fun `an MJC month made from the engine's own days is new and fine against its unit and za_cape's member row`() {
+        // za.mjc's own days at its Cape Town point, each start printed a minute before the engine's; the fetcher names the unit.
+        val made = engineTable("za-mjc", "cape-town-2026-10", "za.mjc", -33.92584, 18.42322, "Africa/Johannesburg", "ZA", -1)
+        val outcome = check.check(made.copy(entry = "za.mjc/za.mjc", lat = null, lon = null), TableCheck.Status.NEW, today)
+        val kinds = outcome.items.map { it.kind }
+        assertTrue(Kind.NEVER_EARLY !in kinds && Kind.FETCH_BROKEN !in kinds, outcome.items.toString())
+        val item = outcome.items.first { it.kind == Kind.NEW_TABLE_FINE }
+        assertTrue(item.title.startsWith("za-mjc/cape-town-2026-10 (cape-town-2026-10 (test)) against za.cape (member za.mjc) and za.mjc/za.mjc"), item.title)
+        assertTrue(item.details.any { it.startsWith("za.cape member za.mjc: 10 place-days") }, item.toString())
+        assertTrue(item.details.any { it.startsWith("za.mjc/za.mjc: 10 place-days") }, item.toString())
+        assertTrue(item.details.any { "archive/tables/held/za-mjc/cape-town-2026-10-2026-10-05.txt\tza.mjc/za.mjc\t\t\tAfrica/Johannesburg\tF S D A M I" in it }, item.toString())
     }
 
     @Test

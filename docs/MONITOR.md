@@ -18,12 +18,16 @@ needs attention, so that a Claude session can act on it.
    budget of 90 minutes), normalised into the gate's layout under `<official>/archive/tables/monitor/<source>/`,
    with a content hash so an unchanged table is recognised. The raw responses of new or changed
    tables are kept gzipped under `archive/raw/monitor/<source>/<date>/`. A source's cadence is
-   weekly or monthly; one with cadence `manual` runs only when named; a source whose fetcher is
-   `manual` is read by hand. A fetcher that fails is a finding in the report, never a crash, and a
-   driver that breaks is one too (what is held is still checked). A source that failed or came back
-   in part is fetched once more on the next run, then waits for its cadence (one mosque gone from
-   Mawaqit for good does not refetch all 125 calendars weekly); its finding names the missing part
-   and says which of the two it is.
+   weekly, monthly or month-start; one with cadence `manual` runs only when named; a source whose
+   fetcher is `manual` is read by hand. A month-start source is a page that shows the current month
+   alone and drops it when the next begins (the MJC's): it is due as soon as a new month has begun
+   in Africa/Johannesburg since its last complete fetch, so it stays due until that month is
+   captured whole, and each month is kept as its own capture. A fetcher that fails is a finding in
+   the report, never a crash, and a driver that breaks is one too (what is held is still checked). A
+   source that failed or came back in part is fetched once more on the next run, then waits for its
+   cadence (one mosque gone from Mawaqit for good does not refetch all 125 calendars weekly; a
+   month-start source whose month is not captured yet is due on every run anyway); its finding names
+   the missing part and says which of the two it is.
 2. **Backup** (`tools/timetables/monitor/backup.py`): only where `TAQWA_OFFICIAL_BACKUP` names a
    folder (the owner's Mac): every new or changed file of the archive is mirrored there, never
    deleting anything, and the report reminds him to upload it to his Drive when files were added.
@@ -100,9 +104,9 @@ restricted archive and the monitor's state. Setting it up, once:
    else stops the job). The first run exercises every fetcher from GitHub's addresses; a site that
    refuses them stays `manual` in `sources.tsv`. Remember that `--only` is a partial run.
 
-Each run (Mondays 03:00 UTC, and on request) checks out the private repository at its branch's
-head and the public one at `main` into `taqwa/` (neither checkout keeps a token; the commit step
-alone is given one), installs Temurin 21
+Each run (Mondays 03:00 UTC, the 1st of each month 03:17 UTC, and on request) checks out the
+private repository at its branch's head and the public one at `main` into `taqwa/` (neither
+checkout keeps a token; the commit step alone is given one), installs Temurin 21
 (with Gradle caching keyed on `gradle/libs.versions.toml` too) and Python, runs
 `taqwa/scripts/monitor.sh --verbose` with `TAQWA_OFFICIAL` set to the workspace, then commits what
 the run added or changed under `archive/` and `monitor/` (new captures, the state, the report) and
@@ -111,6 +115,17 @@ retrying once; when the push still fails the changes are kept as the artifact
 `monitor-run-changes-<run id>` and the job fails, so nothing captured is lost. The job fails
 whenever the monitor itself failed: an exit other than 0 or 1, or a result record
 (`monitor/last-run.json`) missing or older than the run's start. Every action is pinned by commit.
+
+**The run on the 1st.** The MJC publishes only the current month and its page drops it when the
+next begins, so the workflow also runs at 03:17 UTC on the 1st of each month (two hours later in
+Cape Town, after the page has turned), when the MJC's source is due for its new month. It is a normal full
+run, not a partial one: whatever else is due is fetched too (a source whose retry is pending, which
+then counts its cadence from the 1st; on a Sunday the 1st, the weekly sources), and the report and
+the issue follow the same rules as on a Monday. So a fetch failure, which is a finding of the run
+that fetched, drops out on the 1st when its source is not due that day (the issue is updated, or
+closed if that was all, and the next Monday raises it again); and when the 1st is a Monday the two
+runs queue, the second finds nothing new due and rewrites that day's report (the first's stays in
+the repository's history).
 
 **The issue.** One issue titled "Taqwa monitor", labelled `monitor-attention`, is open while
 something needs attention. Its body (at most 60,000 characters, always ending with the pointer to
@@ -135,6 +150,7 @@ yet).
     scripts/monitor.sh --verbose                with each step's progress
 
     python3 tools/timetables/monitor/fetch.py --official <root> [--only <source>] [--force] [--budget-minutes N]
+                                              [--now <ISO 8601 moment: a month-start source's clock, for a test>]
     ./gradlew -p tools/timetables monitor -Pofficial=<root> [-PcheckAll=true] [-PskipFull=true] [-Ptoday=yyyy-mm-dd]
     python3 -m unittest tools/timetables/monitor/tests.py
     ./gradlew -p tools/timetables jvmTest --tests 'world.taqwa.timetables.monitor.*'
@@ -176,12 +192,14 @@ repository.
 
 ## Sources
 
-`sources.tsv` is the list. As of 29 September 2026 the fetchers cover Umm al-Qura, Diyanet
+`sources.tsv` is the list. As of 30 September 2026 the fetchers cover Umm al-Qura, Diyanet
 (Türkiye and nineteen European cities, Antwerpen, Gent, Lyon, Lille, Copenhagen, Helsinki and
 Trondheim among them), Kemenag (eighteen kab/kota, Surabaya, Medan, Semarang, Palembang and
 Yogyakarta among them), JAKIM, MUIS, Egypt (ESA via Dar al-Ifta, and ESA's daily page), Qatar (the
 ministry API and the Calendar House header), Libya (the Awqaf widget and api.ifta.ly), Tunisia (INM),
-Morocco (Habous), Jamiatul Ulama, IRN (bonnetid.info's own month tables, no token, ruling R95) and
+Morocco (Habous), Jamiatul Ulama, the Muslim Judicial Council (mjc.org.za's current month for Cape
+Town, month-start, each month kept as `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
+unit and as za.cape's member there), IRN (bonnetid.info's own month tables, no token, ruling R95) and
 the surveyed Mawaqit calendars. IACAD Dubai (Cloudflare refuses scripted access), the Calendar
 House's printed calendar and Ramadan imsakiya (PDFs), and Sudan's, Gaza's and Mauritania's tables
 are read by hand. London Unified waits for the owner's London Prayer Times key: with it,

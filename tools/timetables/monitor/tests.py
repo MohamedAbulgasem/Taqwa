@@ -6,6 +6,7 @@
 import datetime as dt
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -18,8 +19,8 @@ import common  # noqa: E402
 from common import Context, FetchError, Http, Table, add_all, nearest_year, norm_time, pm, read_table_rows, redact, runtime_line, write_atomic  # noqa: E402
 import backup  # noqa: E402
 import fetch  # noqa: E402
-from fetch import INDEX_HEADER, Store, due, skip_reason  # noqa: E402
-from fetchers import diyanet, egypt, irn, jakim, kemenag, london, mawaqit, morocco, muis, qatar  # noqa: E402
+from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
+from fetchers import diyanet, egypt, irn, jakim, kemenag, london, mawaqit, mjc, morocco, muis, qatar  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -236,10 +237,13 @@ class Parsers(unittest.TestCase):
         self.assertEqual(["04:12", "05:31", "11:33", "14:58", "17:36", "19:06"], vals)
         self.assertEqual("11:34", qatar.plus_minute("11:33"))
         self.assertEqual("12:00", qatar.plus_minute("11:59"))
+        # The site's calendar flags today; the fetcher holds it against Doha's own date on the clock
+        # (UTC+3), so the invented calendar takes its day from that clock, not a fixed date.
+        doha = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=3)).date()
         page = ('<script>var prayData = [{"cityId":7,"fajr":"4:05","shrouq":"5:26","thahr":"11:26","aser":"2:51","moghreb":"5:31","ishaa":"7:01"},'
                 '{"cityId":3,"fajr":"4:12","shrouq":"5:31","thahr":"11:33","aser":"2:58","moghreb":"5:36","ishaa":"7:06"}];'
-                'var calData = {"year":"1448","days":[{"month":4,"days":[{"h":"١٦","m":"28","today":true}]}]};</script>')
-        date, vals = qatar.header(page, dt.date(2026, 9, 28))
+                'var calData = {"year":"1448","days":[{"month":4,"days":[{"h":"١٦","m":"%d","today":true}]}]};</script>' % doha.day)
+        date, vals = qatar.header(page, doha)
         self.assertEqual(["04:12", "05:31", "11:33", "14:58", "17:36", "19:06"], vals)
         self.assertEqual(10, len(date))
 
@@ -764,3 +768,430 @@ class RoundThree(unittest.TestCase):
         # No heading month: the day count decides (one row is not a month).
         with self.assertRaises(FetchError):
             irn.parse_month(reply("<p>Times may vary.</p><h3>2027</h3><table>" + row + "</table>"), 1)
+
+
+# The MJC's Salaah Times page as its markup has it (the hidden copy of the today card in the top bar,
+# the card shown, the "This Month" table with its caption), every time invented: the day's number as
+# the minutes of six hours no Cape Town table prints (Fajr 02, sunrise 03, Dhuhr 10, Asr 13, Maghrib 16,
+# Isha 22), in the day's order (ruling R69: never a printed time).
+MJC_HEADER = ["Date", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]
+MJC_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+              "November", "December"]
+MJC_WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+TIME_SHAPE = re.compile(r"\b\d{1,2}:\d{2}\b")
+
+
+def mjc_times(day):
+    return [f"{h:02d}:{day:02d}" for h in (2, 3, 10, 13, 16, 22)]
+
+
+def mjc_label(date, full=False):
+    name = MJC_WEEKDAYS[date.weekday()]
+    return f"{name if full else name[:3]} {date.day}"
+
+
+def mjc_card(date, times):
+    names = ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
+    attrs = " ".join(f'data-prayer-{n}="{t}"' for n, t in zip(names, times))
+    grid = "".join(f'<div class="mjc-salaah-time" role="listitem"><span>{n.title()}</span><strong>{t}</strong></div>'
+                   for n, t in zip(names, times))
+    return (f'<div class="mjc-salaah-today" data-salaah-provider="mjc-native" data-hijri-date="an invented date AH" {attrs}>\n'
+            f'      <p class="mjc-salaah-date"><strong>{MJC_WEEKDAYS[date.weekday()]}, {date.day} {MJC_MONTHS[date.month - 1]} {date.year}</strong>'
+            '<span>an invented date AH</span></p>\n'
+            f'      <div class="mjc-salaah-daily-grid" role="list" aria-label="Cape Town Salaah times for today">{grid}</div>\n'
+            '      <p class="mjc-salaah-note">Calculated for Cape Town (SAST). Please confirm congregational times with your local Masjid.</p>\n'
+            '    </div>')
+
+
+def mjc_page(year=2026, month=9, days=None, caption=None, header=None, label=mjc_label, cells=None, card_day=None, card_times=None):
+    """The page for a month: `days` its rows (every day by default), `label(date)` a row's date cell,
+    `cells(day)` its times in the header's order, `card_day` the today card's day (with `card_times`,
+    else that day's row)."""
+    import calendar
+    length = calendar.monthrange(year, month)[1]
+    days = list(range(1, length + 1)) if days is None else list(days)
+    header = header or MJC_HEADER
+    cells = cells or mjc_times
+    card_day = card_day or min(29, length)
+    card = mjc_card(dt.date(year, month, card_day), card_times or mjc_times(card_day))
+    caption = f"Cape Town — {MJC_MONTHS[month - 1]} {year}" if caption is None else caption
+    rows = "".join(
+        "\n              <tr" + (' class="is-today"' if d == card_day else "") + f'><th scope="row">{label(dt.date(year, month, d))}</th>'
+        + "".join(f"<td>{c}</td>" for c in cells(d)) + "</tr>"
+        for d in days)
+    head = "".join(f'<th scope="col">{h}</th>' for h in header)
+    return ('<!doctype html><html lang="en-ZA"><head><meta charset="UTF-8"><title>Salaah Times | Muslim Judicial Council (SA)</title></head><body>'
+            '<div class="mjc-top"><span class="mjc-salaah-source" data-salaah-source hidden>    ' + card + '\n    </span></div>'
+            '<main><section class="mjc-section"><div class="mjc-wrap"><div class="mjc-title-row"><div><span class="mjc-eyebrow">CAPE TOWN</span>'
+            '<h2>Today’s Salaah Times</h2></div></div><div class="mjc-salaah-glass">    ' + card + '\n    </div></div></section>'
+            '<section class="mjc-section mjc-tint"><div class="mjc-wrap"><div class="mjc-title-row"><div><span class="mjc-eyebrow">MONTHLY TIMETABLE</span>'
+            '<h2>This Month</h2></div></div><div class="mjc-salaah-glass mjc-salaah-month">    <div class="mjc-salaah-calendar" data-salaah-provider="mjc-native">\n'
+            f'      <table><caption>{caption}</caption><thead><tr>{head}</tr></thead><tbody>{rows}\n            </tbody></table>\n'
+            '      <p class="mjc-salaah-note">Calculated for Cape Town (SAST). Please confirm congregational times with your local Masjid.</p>\n'
+            '    </div>\n    </div></div></section></main></body></html>')
+
+
+class Mjc(unittest.TestCase):
+    """The MJC's page (ruling R69: invented times only): the month table read by its caption and
+    header, never the today card; a table that is not the whole month refused; a bad day left out."""
+
+    SEPT = common.parse_moment("2026-09-28T03:05:00Z")
+
+    def setUp(self):
+        self.lines = []
+
+    def ctx(self, page, now=None):
+        return Context("za-mjc", "/nowhere", dt.date(2026, 9, 28), self.lines.append, "/nowhere/monitor",
+                       http=FakeHttp([(mjc.PAGE, page.encode("utf-8"))]), now=now or self.SEPT)
+
+    def no_time(self, messages):
+        for m in messages:
+            self.assertIsNone(TIME_SHAPE.search(m), m)
+
+    def test_the_month_table_is_read_by_its_caption_and_header_never_the_today_card(self):
+        year, month, days = mjc.parse(mjc_page())
+        self.assertEqual((2026, 9), (year, month))
+        self.assertEqual(list(range(1, 31)), sorted(days))
+        self.assertEqual(mjc_times(1), days[1])
+        self.assertEqual(mjc_times(30), days[30])
+        ctx = self.ctx(mjc_page())
+        tables = mjc.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+        self.assertEqual(1, len(tables))
+        t = tables[0]
+        self.assertEqual(("cape-town-2026-09", "Cape Town, September 2026", "za.mjc/za.mjc", "F S D A M I", "Africa/Johannesburg", "ZA", "standard"),
+                         (t.key, t.name, t.entry, t.columns, t.zone, t.cc, t.school))
+        self.assertEqual((None, None, None), (t.lat, t.lon, t.survey), "checked at za.mjc's unit, its own Cape Town point")
+        self.assertEqual(30, len(t.rows))
+        self.assertEqual(mjc_times(17), t.rows["2026-09-17"])
+        self.assertFalse(t.merge, "a whole month replaces what is held for it (the MJC's corrections)")
+        self.assertEqual(["salaah-times-2026-09.html"], [name for name, _ in t.raw])
+        head = t.text("2026-09-28").splitlines()[0]
+        self.assertTrue(head.startswith("# Muslim Judicial Council (SA), Salaah Times: https://mjc.org.za/salaah-times/"), head)
+        self.assertIn("September 2026", head)
+        self.assertTrue(head.endswith("fetched 2026-09-28"), head)
+        self.no_time([head])
+
+    @staticmethod
+    def shape(page):
+        year, month, days = mjc.parse(page)
+        return year, month, len(days)
+
+    def test_month_and_year_come_from_the_caption(self):
+        # A leap February, an entity for the dash, a 28-day February, a month that ends the year.
+        self.assertEqual((2028, 2, 29), self.shape(mjc_page(2028, 2, caption="Cape Town &mdash; February 2028")))
+        self.assertEqual((2027, 2, 28), self.shape(mjc_page(2027, 2)))
+        self.assertEqual((2026, 12, 31), self.shape(mjc_page(2026, 12, caption="Cape Town – December 2026")))
+        # A full weekday name in a row reads too.
+        self.assertEqual((2026, 9, 30), self.shape(mjc_page(label=lambda d: mjc_label(d, full=True))))
+        # The caption decides: September's 30 rows captioned as October are not October.
+        with self.assertRaises(FetchError) as caught:
+            mjc.parse(mjc_page(caption="Cape Town — October 2026"))
+        self.assertIn("the table has 30 rows, October 2026 has 31 days", str(caught.exception))
+        # The today card names its day and month too, but only a table's caption gives the month.
+        with self.assertRaises(FetchError) as none:
+            mjc.parse(mjc_page(caption="This Month"))
+        self.assertIn("no table captioned with a month and a year", str(none.exception))
+
+    def test_a_shortened_or_malformed_table_is_refused(self):
+        def refused(page, words):
+            with self.assertRaises(FetchError) as caught:
+                mjc.parse(page)
+            self.assertIn(words, str(caught.exception))
+            ctx = self.ctx(page)
+            self.assertEqual([], mjc.fetch(ctx), "a refused table is not kept")
+            self.assertEqual(1, len(ctx.errors), ctx.errors)
+            self.assertIn(words, ctx.errors[0])
+            self.no_time(ctx.errors)
+        refused(mjc_page(days=range(1, 30)), "the table has 29 rows, September 2026 has 30 days: refused")
+        refused(mjc_page(days=[1, 2, 4, 3] + list(range(5, 31))), "row 3 is day 4, not 3 of September 2026")
+        # August's weekdays under September's caption give the rows away.
+        refused(mjc_page(label=lambda d: f"{mjc_label(d - dt.timedelta(days=1)).split()[0]} {d.day}"),
+                "row 1 says Monday 1, but 1 September 2026 is a Tuesday")
+        refused(mjc_page(label=lambda d: f"{d.day}"), "row 1's date '1' is not a weekday and a day")
+        refused(mjc_page(caption="Johannesburg — September 2026"), "captioned for 'Johannesburg', not Cape Town")
+        refused(mjc_page(header=MJC_HEADER[:-1], cells=lambda d: mjc_times(d)[:-1]), "the header names Isha 0 times")
+        refused(mjc_page(header=MJC_HEADER + ["Isha"], cells=lambda d: mjc_times(d) + mjc_times(d)[-1:]), "the header names Isha 2 times")
+        refused(mjc_page(cells=lambda d: mjc_times(d)[:-1]), "row 1 has 6 cells, the header 7")
+
+    def test_the_columns_are_read_by_their_names(self):
+        # Sunrise printed before Fajr, and a column the gate does not read: each time still lands in its place.
+        header = ["Date", "Sunrise", "Fajr", "Dhuhr", "Asr (Hanafi)", "Asr", "Maghrib", "Isha"]
+
+        def cells(d):
+            f, s, dh, a, m, i = mjc_times(d)
+            return [s, f, dh, f"14:{d:02d}", a, m, i]
+        _, _, days = mjc.parse(mjc_page(header=header, cells=cells))
+        self.assertEqual(mjc_times(9), days[9])
+
+    def test_a_bad_cell_or_a_day_out_of_order_is_left_out_and_the_fetch_is_partial(self):
+        def cells(d):
+            t = mjc_times(d)
+            if d == 7:
+                t[0] = "2h07"  # not a time
+            if d == 12:
+                t[4] = "4:12"  # a Maghrib on a 12-hour clock: not in the day's order
+            return t
+        ctx = self.ctx(mjc_page(cells=cells))
+        tables = mjc.fetch(ctx)
+        self.assertEqual(1, len(tables))
+        t = tables[0]
+        self.assertEqual(28, len(t.rows))
+        self.assertNotIn("2026-09-07", t.rows)
+        self.assertNotIn("2026-09-12", t.rows)
+        self.assertTrue(t.merge, "a month read in part is merged into what is held, so the days left out keep their held values")
+        self.assertEqual(1, len(ctx.errors), ctx.errors)
+        self.assertIn("September 2026: 2 days left out, what is held for them stays", ctx.errors[0])
+        self.assertIn("2026-09-07 (cell 1 is not a time)", ctx.errors[0])
+        self.assertIn("2026-09-12 (its times are not in the day's order)", ctx.errors[0])
+        self.assertNotIn("2h07", ctx.errors[0])
+        self.no_time(ctx.errors)
+
+    def test_the_today_card_must_agree_with_its_row(self):
+        card = mjc_times(29)
+        card[3] = "13:58"
+        ctx = self.ctx(mjc_page(card_times=card))
+        tables = mjc.fetch(ctx)
+        self.assertEqual(30, len(tables[0].rows), "the table is kept and checked as read")
+        self.assertEqual(1, len(ctx.errors), ctx.errors)
+        self.assertIn("the page's today card for 2026-09-29 disagrees with the table's row in Asr", ctx.errors[0])
+        self.no_time(ctx.errors)
+        # A card that agrees says nothing, whichever day it is.
+        ctx = self.ctx(mjc_page(card_day=3))
+        mjc.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+
+    def test_a_page_still_showing_last_month_is_kept_but_the_new_month_is_not_captured(self):
+        ctx = self.ctx(mjc_page(), now=common.parse_moment("2026-10-01T03:17:00Z"))
+        tables = mjc.fetch(ctx)
+        self.assertEqual(["cape-town-2026-09"], [t.key for t in tables], "kept as September's capture")
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("the page shows September 2026 while it is October 2026 in Cape Town", ctx.errors[0])
+        # The month is Cape Town's: at 22:30 UTC on 30 September it is October there already.
+        ctx = self.ctx(mjc_page(2026, 10), now=common.parse_moment("2026-09-30T22:30:00Z"))
+        self.assertEqual(["cape-town-2026-10"], [t.key for t in mjc.fetch(ctx)])
+        self.assertEqual([], ctx.errors)
+
+
+class MonthStart(unittest.TestCase):
+    """The month-start cadence (the MJC's page shows the current month alone): due as soon as a new
+    month has begun in Africa/Johannesburg since the last complete fetch; R3-M2's retry-once rule kept."""
+
+    ROW = {"source": "za-mjc", "fetcher": "mjc", "cadence": "month-start"}
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-month-start")
+        os.makedirs(os.path.join(self.root, "archive"))
+        self.monitor = os.path.join(self.root, "monitor")
+
+    def tearDown(self):
+        shutil.rmtree(self.root)
+
+    @staticmethod
+    def at(text):
+        return common.parse_moment(text)
+
+    def reason(self, last_complete, now, retry=False, today=dt.date(2026, 10, 1), last_fetch=None, only=(), force=False):
+        return skip_reason(self.ROW, last_fetch, today, set(only), force, retry=retry,
+                           last_complete=self.at(last_complete) if last_complete else None, now=self.at(now))
+
+    def test_due_as_soon_as_a_new_month_has_begun_in_johannesburg(self):
+        self.assertIn("month-start", CADENCES)
+        last = "2026-09-28T03:05:00Z"
+        self.assertEqual("not due", self.reason(last, "2026-09-30T21:59:59Z"), "23:59:59 on 30 September in Cape Town")
+        self.assertEqual(None, self.reason(last, "2026-09-30T22:00:00Z"), "midnight in Cape Town: October, though 30 September in UTC")
+        self.assertEqual(None, self.reason(last, "2026-10-01T03:17:00Z"), "the workflow's run on the 1st")
+        # The month is Johannesburg's on both sides: a fetch at 22:30 UTC on 31 October was November's there.
+        self.assertEqual("not due", self.reason("2026-10-31T22:30:00Z", "2026-11-02T03:00:00Z"))
+        self.assertEqual(None, self.reason("2026-10-31T21:30:00Z", "2026-11-02T03:00:00Z"))
+        # Across the year, and before any complete fetch.
+        self.assertEqual(None, self.reason("2026-12-28T03:00:00Z", "2027-01-01T03:17:00Z"))
+        self.assertEqual(None, self.reason(None, "2026-10-01T03:17:00Z"))
+        # Only the month counts, not the days since the last fetch.
+        self.assertEqual(None, self.reason("2026-09-30T08:00:00Z", "2026-10-01T03:17:00Z", last_fetch=dt.date(2026, 9, 30)))
+        self.assertEqual("not due", self.reason("2026-10-01T03:17:00Z", "2026-10-29T03:00:00Z", last_fetch=dt.date(2026, 10, 1),
+                                                today=dt.date(2026, 10, 29)))
+        # The retry, --only and --force override, as for every cadence.
+        self.assertEqual(None, self.reason("2026-10-01T03:17:00Z", "2026-10-05T03:00:00Z", retry=True))
+        self.assertEqual(None, self.reason("2026-10-01T03:17:00Z", "2026-10-05T03:00:00Z", only=("za-mjc",)))
+        self.assertEqual(None, self.reason("2026-10-01T03:17:00Z", "2026-10-05T03:00:00Z", force=True))
+        self.assertTrue(due(self.ROW, None, dt.date(2026, 10, 1), set(), False, now=self.at("2026-10-01T03:17:00Z")))
+
+    def test_only_a_complete_fetch_captures_the_month_and_the_retry_once_rule_holds(self):
+        store = Store(self.root, self.monitor, dt.date(2026, 9, 28))
+
+        def due_at(when):
+            return skip_reason(self.ROW, store.last_fetch("za-mjc"), store.today, set(), False, retry=store.retry("za-mjc"),
+                               last_complete=store.last_complete("za-mjc"), now=self.at(when))
+
+        def done(day, status, started):
+            store.today = dt.date.fromisoformat(day)
+            return store.source_done("za-mjc", status, "" if status == "ok" else "a reason", 1, started=self.at(started))
+        # September captured whole on the 28th.
+        done("2026-09-28", "ok", "2026-09-28T03:05:00Z")
+        self.assertEqual("2026-09-28T03:05:00+00:00", store.data["sources"]["za-mjc"]["lastComplete"])
+        self.assertEqual("not due", due_at("2026-09-30T20:00:00Z"))
+        # 1 October: the page still shows September (partial). Retried once; October is not captured.
+        self.assertEqual(None, due_at("2026-10-01T03:17:00Z"))
+        self.assertEqual("retried on the next run, once", fetch.next_time(store, self.ROW, self.at("2026-10-01T03:17:00Z")))
+        self.assertEqual((True, False), done("2026-10-01", "partial", "2026-10-01T03:17:00Z"))
+        self.assertEqual("2026-09-28T03:05:00+00:00", store.data["sources"]["za-mjc"]["lastComplete"], "a partial fetch captures nothing")
+        # 5 October, the retry, fails too: no further retry, but October is still not captured, so still due.
+        self.assertEqual(None, due_at("2026-10-05T03:00:00Z"))
+        self.assertIn("stays due on every run until its month is captured complete", fetch.next_time(store, self.ROW, self.at("2026-10-05T03:00:00Z")))
+        self.assertEqual((False, True), done("2026-10-05", "failed", "2026-10-05T03:00:00Z"))
+        self.assertEqual(None, due_at("2026-10-12T03:00:00Z"))
+        # 12 October, complete: October captured, not due again this month.
+        done("2026-10-12", "ok", "2026-10-12T03:00:00Z")
+        self.assertEqual("not due", due_at("2026-10-19T03:00:00Z"))
+        # A forced fetch that fails later in the month is retried once (R3-M2), then waits for November.
+        self.assertEqual((True, False), done("2026-10-20", "failed", "2026-10-20T09:00:00Z"))
+        self.assertEqual(None, due_at("2026-10-26T03:00:00Z"))
+        self.assertIn("this month is already captured, so the source now waits for the next month",
+                      fetch.next_time(store, self.ROW, self.at("2026-10-26T03:00:00Z")))
+        self.assertEqual((False, True), done("2026-10-26", "failed", "2026-10-26T03:00:00Z"))
+        self.assertEqual("not due", due_at("2026-10-27T03:00:00Z"))
+        self.assertEqual(None, due_at("2026-10-31T22:00:00Z"), "November begins at midnight in Cape Town")
+
+
+class FakeResponse:
+    def __init__(self, body):
+        self.body = body
+        self.status = 200
+        self.headers = {}
+
+    def read(self):
+        return self.body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+class MjcDriver(unittest.TestCase):
+    """fetch.py end to end for the MJC without a network: each month kept as its own capture when the
+    page moves on, the index, the raw copy, and the cadence between runs."""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-mjc")
+        os.makedirs(os.path.join(self.root, "archive"))
+        self.monitor = os.path.join(self.root, "monitor")
+        self.sources = os.path.join(self.root, "sources.tsv")
+        with open(self.sources, "w") as f:
+            f.write("source\tentries\tfetcher\tcadence\tnext_expected\tpoints\tnote\n")
+            f.write("za-mjc\tza.mjc\tmjc\tmonth-start\t-\tp\tn\n")
+        self.page = None
+        self.urls = []
+        self._urlopen = common.urllib.request.urlopen
+        self._sleep = common.time.sleep
+        self._interval = common.MIN_INTERVAL
+        common.time.sleep = lambda s: None
+        common.MIN_INTERVAL = 0
+
+        def urlopen(req, timeout=None):
+            self.urls.append(req.full_url)
+            return FakeResponse(self.page.encode("utf-8"))
+        common.urllib.request.urlopen = urlopen
+
+    def tearDown(self):
+        shutil.rmtree(self.root)
+        common.urllib.request.urlopen = self._urlopen
+        common.time.sleep = self._sleep
+        common.MIN_INTERVAL = self._interval
+
+    def run_fetch(self, today, now, *more):
+        self.assertEqual(0, fetch.main(["--official", self.root, "--sources", self.sources, "--today", today, "--now", now, *more]))
+        with open(os.path.join(self.monitor, "fetch", "latest.json")) as f:
+            return json.load(f)["sources"]["za-mjc"]
+
+    def path(self, key):
+        return os.path.join(self.root, "archive", "tables", "monitor", "za-mjc", key + ".txt")
+
+    def index(self):
+        with open(os.path.join(self.root, "archive", "tables", "monitor", "index.tsv")) as f:
+            lines = [line.rstrip("\n").split("\t") for line in f if not line.startswith("#")]
+        return [dict(zip(lines[0], cells)) for cells in lines[1:]]
+
+    def test_each_month_is_kept_when_the_page_moves_on(self):
+        self.page = mjc_page(2026, 9)
+        run = self.run_fetch("2026-09-28", "2026-09-28T03:05:00Z")
+        self.assertEqual(("ok", {"cape-town-2026-09": "new"}), (run["status"], run["tables"]), run)
+        self.assertEqual(["https://mjc.org.za/salaah-times/"], self.urls)
+        september = read_table_rows(self.path("cape-town-2026-09"))
+        self.assertEqual(30, len(september))
+        with open(self.path("cape-town-2026-09")) as f:
+            head = f.readline()
+        self.assertTrue(head.startswith("# Muslim Judicial Council (SA), Salaah Times: https://mjc.org.za/salaah-times/"), head)
+        self.assertIn("fetched 2026-09-28", head)
+        self.assertTrue(os.path.exists(os.path.join(self.root, "archive", "raw", "monitor", "za-mjc", "2026-09-28", "salaah-times-2026-09.html.gz")))
+        rows = self.index()
+        self.assertEqual(1, len(rows))
+        self.assertEqual(("za-mjc", "cape-town-2026-09", "archive/tables/monitor/za-mjc/cape-town-2026-09.txt", "za.mjc/za.mjc", "F S D A M I",
+                          "Africa/Johannesburg", "ZA", "", ""),
+                         tuple(rows[0][k] for k in ("source", "key", "path", "entry", "columns", "zone", "cc", "lat", "lon")))
+        # The next day: September is captured, nothing is asked.
+        run = self.run_fetch("2026-09-29", "2026-09-29T03:00:00Z")
+        self.assertEqual(("skipped", "not due"), (run["status"], run["message"]))
+        self.assertEqual(1, len(self.urls))
+        # The run on the 1st: the page has turned to October and no longer holds September.
+        self.page = mjc_page(2026, 10)
+        run = self.run_fetch("2026-10-01", "2026-10-01T03:17:00Z")
+        self.assertEqual(("ok", {"cape-town-2026-10": "new"}), (run["status"], run["tables"]), run)
+        self.assertEqual(31, len(read_table_rows(self.path("cape-town-2026-10"))))
+        self.assertEqual(september, read_table_rows(self.path("cape-town-2026-09")), "September's capture is kept as it was")
+        self.assertEqual(["cape-town-2026-09", "cape-town-2026-10"], sorted(r["key"] for r in self.index()))
+        # The next Monday: not due; named with --only it is fetched, and October is unchanged.
+        run = self.run_fetch("2026-10-05", "2026-10-05T03:00:00Z")
+        self.assertEqual(("skipped", "not due"), (run["status"], run["message"]))
+        run = self.run_fetch("2026-10-05", "2026-10-05T09:00:00Z", "--only", "za-mjc")
+        self.assertEqual(("ok", {"cape-town-2026-10": "unchanged"}), (run["status"], run["tables"]))
+        self.assertEqual(["cape-town-2026-09", "cape-town-2026-10"], sorted(r["key"] for r in self.index()))
+
+    def test_a_refused_table_fails_and_the_source_stays_due_until_the_month_is_captured(self):
+        self.page = mjc_page(2026, 10, days=range(1, 31))
+        run = self.run_fetch("2026-10-01", "2026-10-01T03:17:00Z")
+        self.assertEqual("failed", run["status"])
+        self.assertIn("the table has 30 rows, October 2026 has 31 days: refused", run["message"])
+        self.assertTrue(run["message"].endswith("retried on the next run, once"), run["message"])
+        self.assertFalse(os.path.exists(self.path("cape-town-2026-10")))
+        # The retry fails too; October is still not captured, so the source stays due.
+        run = self.run_fetch("2026-10-05", "2026-10-05T03:00:00Z")
+        self.assertEqual("failed", run["status"])
+        self.assertIn("stays due on every run until its month is captured complete", run["message"])
+        self.page = mjc_page(2026, 10)
+        run = self.run_fetch("2026-10-12", "2026-10-12T03:00:00Z")
+        self.assertEqual(("ok", {"cape-town-2026-10": "new"}), (run["status"], run["tables"]))
+
+    def test_a_malformed_now_is_refused(self):
+        self.assertEqual(2, fetch.main(["--official", self.root, "--sources", self.sources, "--now", "yesterday"]))
+
+
+class Catalogue(unittest.TestCase):
+    """The committed sources.tsv: well formed, metadata only, and the MJC's row as the check needs it."""
+
+    def test_the_committed_catalogue_is_valid(self):
+        with open(fetch.SOURCES_TSV, encoding="utf-8") as f:
+            lines = [line.rstrip("\n") for line in f if line.strip() and not line.startswith("#")]
+        header = lines[0].split("\t")
+        self.assertEqual(["source", "entries", "fetcher", "cadence", "next_expected", "points", "note"], header)
+        for line in lines[1:]:
+            self.assertEqual(len(header), len(line.split("\t")), line[:60])
+        rows = fetch.read_sources(fetch.SOURCES_TSV)
+        ids = [r["source"] for r in rows]
+        self.assertEqual(len(ids), len(set(ids)), "source ids are unique")
+        fetchers = {n[:-3] for n in os.listdir(os.path.join(HERE, "fetchers")) if n.endswith(".py") and n != "__init__.py"}
+        for r in rows:
+            self.assertRegex(r["source"], r"^[a-z0-9-]+$", "the workflow accepts --only <id> in this shape")
+            self.assertIn(r["cadence"], CADENCES, r["source"])
+            self.assertTrue(r["fetcher"] == "manual" or r["fetcher"] in fetchers, r["source"])
+            self.assertRegex(r["next_expected"], r"^(-|\d{4}-\d{2}(-\d{2})?)$", r["source"])
+            self.assertFalse(any(TIME_SHAPE.search(v) for v in r.values()), f"{r['source']}: no printed time in the catalogue (ruling R69)")
+        mine = [r for r in rows if r["source"] == "za-mjc"]
+        self.assertEqual(1, len(mine))
+        self.assertEqual(("mjc", "month-start", "-"), (mine[0]["fetcher"], mine[0]["cadence"], mine[0]["next_expected"]))
+        self.assertIn("za.mjc", mine[0]["entries"])
+        self.assertIn("za.cape", mine[0]["entries"])
+        self.assertEqual("za-mjc", mjc.SOURCE)
+        self.assertEqual("za.mjc/za.mjc", mjc.ENTRY, "the entry's one unit, as za-cape.tsv holds the MJC's table")

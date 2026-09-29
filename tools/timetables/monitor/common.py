@@ -39,6 +39,10 @@ SECRET_PARAMS = {"key", "token", "apikey", "api_key", "access_token", "secret", 
 
 TIME_RE = re.compile(r"^(\d{1,2}):(\d{2})(?::\d{2})?$")
 
+# Africa/Johannesburg is UTC+2 all the year round (South Africa has kept no summer time since 1944),
+# so a fixed offset is exact and needs no zone database. A month-start source counts its months here.
+JOHANNESBURG = dt.timezone(dt.timedelta(hours=2), "SAST")
+
 
 class FetchError(Exception):
     """A request or a response the fetcher could not use; the message is what the report shows."""
@@ -374,19 +378,38 @@ def nearest_year(month, day, today):
     return best
 
 
+def utc_now():
+    return dt.datetime.now(dt.timezone.utc)
+
+
+def parse_moment(text):
+    """An ISO 8601 moment ('2026-10-01T03:17:00Z', '…+02:00'); one without an offset is UTC."""
+    moment = dt.datetime.fromisoformat(str(text).strip().replace("Z", "+00:00"))
+    return moment if moment.tzinfo else moment.replace(tzinfo=dt.timezone.utc)
+
+
+def month_of(moment, zone=JOHANNESBURG):
+    """(year, month) of an aware moment, in `zone` (Africa/Johannesburg unless given)."""
+    local = moment.astimezone(zone)
+    return local.year, local.month
+
+
 def runtime_line():
     """The interpreter and TLS stack a run used, for the top of its log (review I7)."""
     return f"python {sys.version.split()[0]} ({sys.executable}), {ssl.OPENSSL_VERSION}, {sys.platform}"
 
 
 class Context:
-    """What a fetcher gets: the client (shared by the run), today's date, the official root (to read
-    what is held), a place for errors that do not sink the whole source, and a log line writer."""
+    """What a fetcher gets: the client (shared by the run), today's date, the moment this source's
+    run began (`started`: the clock, or the moment a test pins; a month-start source's month is
+    judged by it), the official root (to read what is held), a place for errors that do not sink
+    the whole source, and a log line writer."""
 
-    def __init__(self, source, official, today, log, monitor_dir, force=False, http=None):
+    def __init__(self, source, official, today, log, monitor_dir, force=False, http=None, now=None):
         self.source = source
         self.official = official
         self.today = today
+        self.started = now or utc_now()
         self.log = log
         self.monitor_dir = monitor_dir
         self.force = force

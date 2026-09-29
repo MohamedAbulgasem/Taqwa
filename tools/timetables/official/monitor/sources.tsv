@@ -2,8 +2,10 @@
 # edition of a source read by hand is expected. Metadata only: ids, cadences, dates and the points
 # fetched; every fetched table lives in the archive (archive/tables/monitor/<source>/), never here.
 # `fetcher` names the module in tools/timetables/monitor/fetchers/ (`manual` for a source with no
-# working endpoint: PDFs, images, a site that refuses scripted access). `cadence` is weekly, monthly or
-# manual (a fetcher with cadence manual runs only when named with --only); `next_expected` (a date or a
+# working endpoint: PDFs, images, a site that refuses scripted access). `cadence` is weekly, monthly,
+# month-start (a page that shows the current month alone: due as soon as a new month has begun in
+# Africa/Johannesburg since the source's last complete fetch, so due until that month is captured whole)
+# or manual (a fetcher with cadence manual runs only when named with --only); `next_expected` (a date or a
 # month, or `-`) is when a source read by hand expects its next edition — the report says "due" once it
 # passes; move it on after the edition is in the archive. Every fetched table is checked as the entry
 # Automatic follows at its point: a cautious entry's member row beside the table's own entry.
@@ -22,6 +24,7 @@ ly-awqaf	ly.awqaf	libya	weekly	-	the 22 cities of awqaf.gov.ly's widget (today, 
 tn-inm	tn.inm	tunisia	weekly	-	the 6 delegations of tn-inm.tsv (Tunis, Sfax, Tabarka, Ben Guerdane, Tataouine, Tala): the coming 7 days, with INM's sunrise	meteo.tn horaire_gouvernorat and lever_coucher_gouvernorat, one request a day each; restricted: archive only
 ma-habous	ma.habous	morocco	weekly	-	the 10 cities of ma-habous.tsv: the live Hijri month page, printed in Morocco's legal time (UTC+0 all year since 20 Sep 2026)	habous.gov.ma prieres/index.php?ville=…; restricted: archive only
 za-jamiat	za.jamiat	jamiat	monthly	-	the 8 towns' perpetual CSVs, mapped onto the current year and the next	salaahtimes.starlite.za.net export (linked from jamiat.org.za); a perpetual table, so a changed file is the news
+za-mjc	za.mjc (and za.cape as its member)	mjc	month-start	-	Cape Town: the Muslim Judicial Council's "This Month" table, the current month only (calculated for Cape Town, SAST), each month kept as its own capture; checked at za.mjc's unit, its Cape Town point -33.92584, 18.42322, and there as za.cape's member	mjc.org.za/salaah-times/, a server-rendered WordPress page with no month parameter, form or API: the page drops a month when the next begins, so month-start (and the workflow's run on the 1st); the caption gives the month and year, the rows only a weekday and a day; restricted: archive only
 gb-london-lupt	gb.london.lupt	london	manual	2026-12-01	the East London Mosque's yearly table as London Prayer Times republishes it	londonprayertimes.com's API needs a key issued by hand: with one (LPT_API_KEY in <monitor>/keys.env on the Mac, the repository secret in the cloud) `--only gb-london-lupt` reads the coming year; without one the fetcher does nothing and the horizon reminds from 1 December that the next year is wanted by hand
 no-irn	no.irn (and no.cautious as its member)	irn	monthly	-	Islamsk Råd Norge's Oslo, Trondheim and Tromsø calendars: the site's month tables for the year it shows (the next year appears when IRN publishes it, usually in December)	bonnetid.info: its own page carries the WordPress nonce its month tables need, so no token (ruling R95); Tromsø's 2027 calendar is wanted by 1 November 2026 (ruling R82, a horizon)
 mawaqit	gb, fr, be, nl, de, ca cautious (the surveys)	mawaqit	monthly	-	the 125 surveyed Mawaqit calendars (official/survey/*/calendars.tsv), each at its mosque's point	mawaqit.net/en/<slug> confData.calendar; a calendar that changed is checked with its survey's faults and outliers, and a cell that is the calendar's own slip is pre-classified as a suspected fault with its row ready; restricted: archive only

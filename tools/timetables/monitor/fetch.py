@@ -11,14 +11,17 @@ reads what this writes:
     <monitor>/fetch/latest.json, <date>.json, <date>.log   this run's outcome per source
 
     python3 tools/timetables/monitor/fetch.py [--official <root>] [--only <source>]... [--today yyyy-mm-dd]
-                                              [--force] [--budget-minutes N]
+                                              [--now <ISO 8601 moment>] [--force] [--budget-minutes N]
 
 `--official` defaults to $TAQWA_OFFICIAL; with neither this refuses to run (`scripts/monitor.sh`
 passes the root it uses, the Mac's default included, so the repository names no one's folders). A source
-whose cadence is not due (monthly ones) is skipped unless `--only` names it or `--force` is given;
-a source with cadence `manual` runs only when named; a source whose fetcher is `manual` is read by
-hand and never runs. A fetcher that fails is a finding in the report, never a crash: this exits 0
-unless the driver itself breaks (2), and then `latest.json` carries the error so the report says so.
+whose cadence is not due (monthly ones) is skipped unless `--only` names it or `--force` is given; a
+month-start source (a page that shows the current month alone, the MJC's) is due as soon as a new
+month has begun in Africa/Johannesburg since its last complete fetch, judged on the clock (`--now`
+pins the moment for a test); a source with cadence `manual` runs only when named; a source whose
+fetcher is `manual` is read by hand and never runs. A fetcher that fails is a finding in the report,
+never a crash: this exits 0 unless the driver itself breaks (2), and then `latest.json` carries the
+error so the report says so.
 The run has a time budget (review M3; 90 minutes unless given): once it is spent the remaining
 sources are recorded as not fetched. Python 3.9 or later, standard library only. The archive is
 git-ignored and restricted: nothing fetched is ever committed.
@@ -36,13 +39,17 @@ import traceback
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from common import Context, Http, Table, read_table_rows, runtime_line, scrub, write_atomic, write_json  # noqa: E402
+from common import (Context, Http, Table, month_of, parse_moment, read_table_rows, runtime_line, scrub, utc_now,  # noqa: E402
+                    write_atomic, write_json)
 
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 SOURCES_TSV = os.path.join(REPO, "tools", "timetables", "official", "monitor", "sources.tsv")
 INDEX_HEADER = ["source", "key", "path", "name", "lat", "lon", "zone", "clock", "cc", "entry", "survey", "columns",
                 "format", "school", "hash", "fetched", "note"]
 CADENCE_DAYS = {"weekly": 6, "monthly": 27}
+# Every cadence sources.tsv may name: weekly and monthly count days from the last fetch; month-start
+# counts months in Africa/Johannesburg from the last complete fetch; manual runs only when named.
+CADENCES = ("weekly", "monthly", "month-start", "manual")
 DEFAULT_BUDGET_MINUTES = 90
 
 
@@ -62,12 +69,15 @@ def read_sources(path):
     return out
 
 
-def skip_reason(row, last_fetch, today, only, force, retry=False):
+def skip_reason(row, last_fetch, today, only, force, retry=False, last_complete=None, now=None):
     """Why a source is not fetched this run, or None when it is: a source read by hand (fetcher
     `manual`) never, named or not; one with cadence `manual` only when named; a weekly one every run
-    (six days after its last fetch), a monthly one after 27 days; one whose last run failed or came
-    back in part once more (`retry`, review R3-M2), then on its cadence; `--only` and `--force`
-    override."""
+    (six days after its last fetch), a monthly one after 27 days; a month-start one (a page that
+    shows the current month alone and drops it when the month turns) as soon as a new month has
+    begun in Africa/Johannesburg since its last complete fetch (`last_complete`, a moment; `now`, the
+    clock unless given), so it stays due until the month is captured complete; one whose last run
+    failed or came back in part once more (`retry`, review R3-M2), then on its cadence; `--only` and
+    `--force` override."""
     if row["fetcher"] == "manual":
         return "fetched by hand"
     if row["source"] in only:
@@ -78,14 +88,18 @@ def skip_reason(row, last_fetch, today, only, force, retry=False):
         return "runs only when named"
     if retry:
         return None
+    if row["cadence"] == "month-start":
+        if last_complete is None or month_of(now or utc_now()) > month_of(last_complete):
+            return None
+        return "not due"
     days = CADENCE_DAYS.get(row["cadence"], 6)
     if last_fetch is None or (today - last_fetch).days >= days:
         return None
     return "not due"
 
 
-def due(row, last_fetch, today, only, force, retry=False):
-    return skip_reason(row, last_fetch, today, only, force, retry) is None
+def due(row, last_fetch, today, only, force, retry=False, last_complete=None, now=None):
+    return skip_reason(row, last_fetch, today, only, force, retry, last_complete, now) is None
 
 
 class Store:
@@ -112,6 +126,11 @@ class Store:
     def retry(self, source):
         """Whether the source's last run failed or came back in part and has not been retried yet."""
         return bool(self.data["sources"].get(source, {}).get("retry"))
+
+    def last_complete(self, source):
+        """The moment the source's last complete run began (an aware datetime), None before one."""
+        s = self.data["sources"].get(source, {}).get("lastComplete")
+        return parse_moment(s) if s else None
 
     @staticmethod
     def rel_path(source, key):
@@ -149,15 +168,19 @@ class Store:
         self.run_status[tid] = status
         return status
 
-    def source_done(self, source, status, message, requests):
+    def source_done(self, source, status, message, requests, started=None):
         """Records the run. A source that failed or came back in part (a breaker, the budget, one
         table that failed) is retried on the next run once; if it fails or comes back in part again
         it falls back to its cadence (reviews N7, R3-M2: one mosque gone for good must not refetch
-        all 125 calendars weekly). Returns (retried next run, this run was the retry)."""
+        all 125 calendars weekly). A complete run also records `lastComplete`, the moment it began
+        (`started`, else now: never after what it fetched), which a month-start cadence counts
+        from. Returns (retried next run, this run was the retry)."""
         entry = self.data["sources"].setdefault(source, {})
         was_retry = bool(entry.get("retry"))
         entry["lastFetch"] = self.today.isoformat()
         entry["retry"] = status in ("partial", "failed") and not was_retry
+        if status == "ok":
+            entry["lastComplete"] = (started or utc_now()).astimezone(dt.timezone.utc).isoformat(timespec="seconds")
         entry.update({"status": status, "message": scrub(message), "requests": requests, "lastRun": self.today.isoformat()})
         return entry["retry"], was_retry
 
@@ -189,10 +212,15 @@ class Store:
         write_json(self.path, self.data)
 
 
-def next_time(store, row):
+def next_time(store, row, now=None):
     """What a source that failed or came back in part can expect (review R3-M2), for its message."""
     if not store.retry(row["source"]):
         return "retried on the next run, once"
+    if row["cadence"] == "month-start":
+        last = store.last_complete(row["source"])
+        if last is None or month_of(now or utc_now()) > month_of(last):
+            return "this was the retry; a month-start source stays due on every run until its month is captured complete"
+        return "this was the retry; this month is already captured, so the source now waits for the next month (month-start)"
     return f"this was the retry; the source now waits for its cadence ({row['cadence']})"
 
 
@@ -230,6 +258,8 @@ def main(argv=None):
     p.add_argument("--monitor", default=None, help="the state folder (default <official>/monitor)")
     p.add_argument("--only", action="append", default=[], help="fetch this source only (repeatable); a manual-cadence source runs only when named")
     p.add_argument("--today", default=None)
+    p.add_argument("--now", default=None,
+                   help="the moment a month-start source's months are judged by, ISO 8601 (default the clock; a test pins it)")
     p.add_argument("--force", action="store_true", help="fetch every source whatever its cadence")
     p.add_argument("--budget-minutes", type=float, default=DEFAULT_BUDGET_MINUTES, help="the run's time budget (0: none)")
     p.add_argument("--sources", default=SOURCES_TSV)
@@ -244,6 +274,11 @@ def main(argv=None):
         return 2
     monitor_dir = args.monitor or os.path.join(official, "monitor")
     today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
+    try:
+        pinned = parse_moment(args.now) if args.now else None
+    except ValueError:
+        print(f"fetch: --now {args.now!r} is not an ISO 8601 moment", file=sys.stderr)
+        return 2
     os.makedirs(os.path.join(monitor_dir, "fetch"), exist_ok=True)
     log_file = open(os.path.join(monitor_dir, "fetch", today.isoformat() + ".log"), "a", encoding="utf-8")
 
@@ -270,25 +305,26 @@ def main(argv=None):
             if only and source not in only:
                 results[source] = {"status": "skipped", "message": "not selected", "requests": 0, "tables": {}}
                 continue
-            why = skip_reason(row, store.last_fetch(source), today, only, args.force, retry=store.retry(source))
+            why = skip_reason(row, store.last_fetch(source), today, only, args.force, retry=store.retry(source),
+                              last_complete=store.last_complete(source), now=pinned)
             if why:
                 results[source] = {"status": "skipped", "message": why, "requests": 0, "tables": {}}
                 print(f"{source}: skipped ({why})")
                 continue
             if http.budget_spent():
-                message = f"not fetched: the run's time budget ({args.budget_minutes:g} min) was spent before its turn; " + next_time(store, row)
+                message = f"not fetched: the run's time budget ({args.budget_minutes:g} min) was spent before its turn; " + next_time(store, row, pinned)
                 results[source] = {"status": "failed", "message": message, "requests": 0, "tables": {}}
                 store.source_done(source, "failed", message, 0)
                 print(f"{source}: failed — {message}", flush=True)
                 continue
             log(f"-- {source} ({row['fetcher']})")
             print(f"{source}: fetching …", flush=True)
-            ctx = Context(source, official, today, log, monitor_dir, args.force, http=http)
+            ctx = Context(source, official, today, log, monitor_dir, args.force, http=http, now=pinned)
             status, message, requests, statuses = run_source(row, store, ctx)
             if status in ("partial", "failed"):
                 # The report keeps naming the missing part (the errors above) and says what happens next.
-                message = (message + "; " if message else "") + next_time(store, row)
-            store.source_done(source, status, message, requests)
+                message = (message + "; " if message else "") + next_time(store, row, pinned)
+            store.source_done(source, status, message, requests, started=ctx.started)
             results[source] = {"status": status, "message": message, "requests": requests, "tables": statuses}
             counts = {s: list(statuses.values()).count(s) for s in ("new", "changed", "unchanged")}
             print(f"{source}: {status}, {requests} requests, {len(statuses)} tables "
