@@ -5,7 +5,7 @@
    city's own time zone, so someone in London looking at Jakarta sees Jakarta's today: it lights
    that row, turns the Today card into the app's countdown ring (the same next prayer and interval
    as TimelineBuilder, the same H:MM:SS in the same digits as CountdownFormatter, whose digit rule
-   the generator reads from the app), and on a phone folds the days of the month already gone. On
+   the generator reads from the app), and folds the days of the month already gone. On
    the index it filters the cities as you type.
 
    It makes no request and stores nothing. */
@@ -491,11 +491,12 @@
       arc.setAttribute("stroke-dasharray", (s.progress * CIRCUMFERENCE).toFixed(1) + " " + CIRCUMFERENCE.toFixed(1));
     }
 
-    /* At every width the days already gone this month fold behind one row, so today is near
-       the top of the table; a tap brings them back. The print stylesheet prints every row
-       whatever the fold. */
+    /* At every width the days already gone this month fold behind one row once today is the
+       4th or later (spec §3.4; `shown` counts from 0 on the 1st), so today is near the top of
+       the table; a tap brings them back and puts focus on the first of them, where the row
+       was. The print stylesheet prints every row whatever the fold. */
     function foldPast() {
-      if (shown < 4 || shown >= data.first) return;
+      if (shown < 3 || shown >= data.first) return;
       var gone = rows.slice(0, shown);
       var first = gone[0].querySelector("th b").textContent;
       var last = gone[gone.length - 1].querySelector("th b").textContent;
@@ -506,11 +507,14 @@
       var button = document.createElement("button");
       button.type = "button";
       button.setAttribute("aria-expanded", "false");
+      // Its name is what it shows, with a pause: "Earlier this month, 1–27"; the "+" is drawn.
+      button.setAttribute("aria-label", data.earlier + data.comma + first + "–" + last);
       var words = document.createElement("span");
       words.textContent = data.earlier;
       var range = document.createElement("span");
       range.textContent = first + "–" + last;
       var plus = document.createElement("b");
+      plus.setAttribute("aria-hidden", "true");
       plus.textContent = "+";
       button.appendChild(words);
       button.appendChild(range);
@@ -519,6 +523,11 @@
         button.setAttribute("aria-expanded", "true");
         gone.forEach(function (r) { r.hidden = false; });
         row.parentNode.removeChild(row);
+        var head = gone[0].querySelector("th");
+        if (head) {
+          head.tabIndex = -1;
+          head.focus();
+        }
       });
       cell.appendChild(button);
       row.appendChild(cell);

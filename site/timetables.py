@@ -61,6 +61,9 @@ PRINTER = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 RING_R = 88
 RING_C = 2 * math.pi * RING_R
 RULER_W = 342
+# The CSS counter style of a page's digits, for the numbers the stylesheet draws itself (the
+# explainer's steps): one digit set per page (R107, review I1). Western digits need none.
+COUNTER_STYLES = {"٠١٢٣٤٥٦٧٨٩": "arabic-indic", "۰۱۲۳۴۵۶۷۸۹": "persian", "০১২৩৪৫৬৭৮৯": "bengali"}
 
 
 class DataError(Exception):
@@ -99,9 +102,26 @@ def minutes_of(text: str, digit_set: str) -> int:
     return int(hour) * 60 + int(minute)
 
 
+def day_clocks(facts: dict, day: dict) -> list:
+    """Every clock a page's day writes beside the instant it is read from, as (epoch, text) pairs:
+    the six times, the other school's Asr, the end of eating, imsak where the country's calendar
+    has one, and each cautious member's seven. The generator writes all of them with one clock
+    (spec §9.1), so the site reads all of them again, never the six alone."""
+    pairs = list(zip(facts["epochs"], day["times"]))
+    pairs.append((facts["asrOther"], day["asrOther"]))
+    pairs.append((facts["endOfEating"], day["endOfEating"]))
+    if facts.get("imsak") is not None and day.get("imsak") is not None:
+        pairs.append((facts["imsak"], day["imsak"]))
+    for epochs, clocks in zip(facts.get("members") or [], day.get("members") or []):
+        pairs.extend(zip(epochs, clocks))
+    return pairs
+
+
 def correct_clocks(city: dict) -> bool:
-    """Rewrites a city's clock times, offsets and clock-change notes from the newest tzdata where
-    the generator's differ, and says whether it had to.
+    """Rewrites a city's clocks, offsets and clock-change notes from the newest tzdata where the
+    generator's differ, and says whether it had to. Every clock of a day is rewritten, not the six
+    times alone (see day_clocks): the end of eating under Fajr, the other school's Asr, imsak and a
+    cautious place's members' own times are the same instants read on the same clock.
 
     The instants are the app's engine's and do not depend on any time-zone data; only reading them
     on the local clock does, and the generator reads them with the JDK's copy of the database,
@@ -112,33 +132,49 @@ def correct_clocks(city: dict) -> bool:
     written differently) would be a bug in one of the two formatters, and stops the build."""
     zone = _zone(city["timeZone"])
     utc = datetime.timezone.utc
-    local = [[datetime.datetime.fromtimestamp(e, tz=utc).astimezone(zone) for e in day["epochs"]] for day in city["days"]]
+    moments = {}
+
+    def moment(epoch: int) -> datetime.datetime:
+        if epoch not in moments:
+            moments[epoch] = datetime.datetime.fromtimestamp(epoch, tz=utc).astimezone(zone)
+        return moments[epoch]
+
+    def ours(epoch: int, ds: str) -> str:
+        m = moment(epoch)
+        return clock_text(m.hour, m.minute, ds)
+
+    days = city["days"]
     wrong = False
     for lang, page in city["pages"].items():
         ds = page["digits"]
-        for i, day in enumerate(page["days"]):
-            for p, (theirs, moment) in enumerate(zip(day["times"], local[i])):
-                ours = clock_text(moment.hour, moment.minute, ds)
-                if ours == theirs:
+        for facts, day in zip(days, page["days"]):
+            for epoch, theirs in day_clocks(facts, day):
+                if ours(epoch, ds) == theirs:
                     continue
-                if minutes_of(theirs, ds) == moment.hour * 60 + moment.minute:
+                m = moment(epoch)
+                if minutes_of(theirs, ds) == m.hour * 60 + m.minute:
                     raise DataError(f"{city['slug']} {lang}: the generator wrote {theirs!r} where the site writes "
-                                    f"{ours!r} for the same minute; the two clock formats have drifted apart")
+                                    f"{ours(epoch, ds)!r} for the same minute; the two clock formats have drifted apart")
                 wrong = True
     if not wrong:
         return False
 
-    days = city["days"]
-    for i, day in enumerate(days):
-        day["offset"] = int(local[i][DHUHR].utcoffset().total_seconds())
+    for day in days:
+        day["offset"] = int(moment(day["epochs"][DHUHR]).utcoffset().total_seconds())
     first = days[0]["date"].split("-")
     midnight = datetime.datetime(int(first[0]), int(first[1]), int(first[2]), tzinfo=zone)
     before = [int(midnight.utcoffset().total_seconds())] + [d["offset"] for d in days[:-1]]
     today = [d["date"] for d in days].index(city["today"])
     for page in city["pages"].values():
         ds = page["digits"]
-        for i, day in enumerate(page["days"]):
-            day["times"] = [clock_text(m.hour, m.minute, ds) for m in local[i]]
+        for facts, day in zip(days, page["days"]):
+            day["times"] = [ours(e, ds) for e in facts["epochs"]]
+            day["asrOther"] = ours(facts["asrOther"], ds)
+            day["endOfEating"] = ours(facts["endOfEating"], ds)
+            if facts.get("imsak") is not None and day.get("imsak") is not None:
+                day["imsak"] = ours(facts["imsak"], ds)
+            if facts.get("members") and day.get("members"):
+                day["members"] = [[ours(e, ds) for e in member] for member in facts["members"]]
         page["offset"] = offset_text(days[today]["offset"], ds)
         page["clockChanges"] = [
             {"index": i, "date": page["days"][i]["date"], "offset": offset_text(days[i]["offset"], ds)}
@@ -203,35 +239,45 @@ def ruler_svg(shares: dict, rtl: bool, words: dict, digit_set: str) -> str:
     minute, one, two, or three or more minutes after it — drawn and labelled as shares of that
     event's checked count, so the only day total on the page is the tile's. On an RTL page the
     layout is mirrored: every x is measured from the right, and the text, which the SVG lays out
-    in the page's direction, is never flipped."""
+    in the page's direction, is never flipped.
+
+    Every numeral is in the page's own digits (`digit_set`, the country's: Western on an Arabic
+    page in the UAE, Tunisia or Algeria), the labels' too: "0 days", "1 min", "3 or more" are
+    templates filled here. The authority's label hangs above the drawing (y 10) and the bars
+    stand on a baseline at y 82, so the tallest bar's percentage (its top at y 34) clears the
+    label in every script (review M1)."""
     order = ["0", "1", "2", "3+"]
     values = [float(shares.get(key, 0.0)) for key in order]
     top = max(values) or 1.0
-    percents = [fill(words["percent"], n=digits(round(value * 100), digit_set)) for value in values]
+    percents = [plain(words["percent"], n=digits(round(value * 100), digit_set)) for value in values]
+    base = 82  # the bars' baseline; the label line above them ends at y 12
 
     def x(left: float, width: float = 0) -> str:
         at = RULER_W - left - width if rtl else left
         return f"{at:g}"
 
-    alt = fill(words["alt"], p0=percents[0], p1=percents[1], p2=percents[2], p3=percents[3])
-    parts = [f'<svg viewBox="0 0 {RULER_W} 100" role="img" aria-label="{alt}">',
+    def label(key: str, n: int) -> str:
+        return esc(plain(words[key], n=digits(n, digit_set)))
+
+    alt = plain(words["alt"], p0=percents[0], p1=percents[1], p2=percents[2], p3=percents[3])
+    parts = [f'<svg viewBox="0 0 {RULER_W} {base + 28}" role="img" aria-label="{attr(alt)}">',
              '<defs><pattern id="ruler-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
              '<line x1="0" y1="0" x2="0" y2="6" stroke="var(--hair)" stroke-width="2"/></pattern></defs>',
-             f'<rect x="{x(0, 66)}" y="18" width="66" height="54" fill="url(#ruler-hatch)"/>',
-             f'<text x="{x(33)}" y="48" font-size="11" font-weight="800" fill="var(--t1)" text-anchor="middle">{esc(words["none"])}</text>',
-             f'<text x="{x(33)}" y="90" font-size="11" fill="var(--t2)" text-anchor="middle">{esc(words["before"])}</text>']
-    labels = [words["same"], words["one"], words["two"], words["three"]]
+             f'<rect x="{x(0, 66)}" y="{base - 54}" width="66" height="54" fill="url(#ruler-hatch)"/>',
+             f'<text x="{x(33)}" y="{base - 24}" font-size="11" font-weight="800" fill="var(--t1)" text-anchor="middle">{label("none", 0)}</text>',
+             f'<text x="{x(33)}" y="{base + 18}" font-size="11" fill="var(--t2)" text-anchor="middle">{esc(words["before"])}</text>']
+    labels = [label("same", 0), label("one", 1), label("two", 2), label("three", 3)]
     for i, value in enumerate(values):
         left = 76 + 60 * i
         height = 48 * value / top
-        parts.append(f'<rect x="{x(left, 40)}" y="{72 - height:.1f}" width="40" height="{height:.1f}" rx="2" fill="var(--accent)"/>')
-        parts.append(f'<text x="{x(left + 20)}" y="{72 - height - 4.5:.1f}" font-size="10.5" font-weight="700" fill="var(--t1)" '
+        parts.append(f'<rect x="{x(left, 40)}" y="{base - height:.1f}" width="40" height="{height:.1f}" rx="2" fill="var(--accent)"/>')
+        parts.append(f'<text x="{x(left + 20)}" y="{base - height - 4.5:.1f}" font-size="10.5" font-weight="700" fill="var(--t1)" '
                      f'text-anchor="middle">{esc(percents[i])}</text>')
-        parts.append(f'<text x="{x(left + 20)}" y="90" font-size="11" fill="var(--t2)" text-anchor="middle">{esc(labels[i])}</text>')
-    parts.append(f'<line x1="{x(0)}" y1="72" x2="{x(RULER_W)}" y2="72" stroke="var(--t3)" stroke-width="1"/>')
+        parts.append(f'<text x="{x(left + 20)}" y="{base + 18}" font-size="11" fill="var(--t2)" text-anchor="middle">{labels[i]}</text>')
+    parts.append(f'<line x1="{x(0)}" y1="{base}" x2="{x(RULER_W)}" y2="{base}" stroke="var(--t3)" stroke-width="1"/>')
     for tick in (126, 186, 246, 306):
-        parts.append(f'<line x1="{x(tick)}" y1="72" x2="{x(tick)}" y2="77" stroke="var(--t3)" stroke-width="1"/>')
-    parts.append(f'<line x1="{x(66)}" y1="12" x2="{x(66)}" y2="77" stroke="var(--accent)" stroke-width="2"/>')
+        parts.append(f'<line x1="{x(tick)}" y1="{base}" x2="{x(tick)}" y2="{base + 5}" stroke="var(--t3)" stroke-width="1"/>')
+    parts.append(f'<line x1="{x(66)}" y1="12" x2="{x(66)}" y2="{base + 5}" stroke="var(--accent)" stroke-width="2"/>')
     # Anchored at its start: on an RTL page the start is the right end, so the label still hangs
     # off the amber line towards the bars.
     parts.append(f'<text x="{x(71)}" y="10" font-size="10.5" font-weight="700" fill="var(--t1)" text-anchor="start">{esc(words["minute"])}</text>')
@@ -451,7 +497,8 @@ class Timetables:
   </div>'''
 
         data = self.live_data(city, lang, today)
-        return f'''<main class="wrap city">
+        counter = COUNTER_STYLES.get(page["digits"])
+        return f'''<main class="wrap city"{f' data-digits="{counter}"' if counter else ""}>
   {hero}
   {self.whence(city, lang, today)}
   {self.months_section(city, lang, today)}
@@ -546,14 +593,14 @@ class Timetables:
             }
             tiles = (f'<div class="tiles">'
                      f'<div class="tile"><b>{esc(words["statDaysValue"])}</b><span>{esc(words["statDays"])}</span></div>'
-                     f'<div class="tile zero"><b>{digits(0, t["digits"])}</b><span>{esc(words["statNever"])}</span></div>'
+                     f'<div class="tile zero"><b>{digits(0, page["digits"])}</b><span>{esc(words["statNever"])}</span></div>'
                      f'<div class="tile"><b>{esc(words["statMinutes"])}</b><span>{esc(words["statAtMost"])}</span></div></div>')
             ruler = (f'<figure class="ruler"><figcaption>{fill(t["ruler_caption"], authority=authority, fajr=page["prayers"][FAJR])}</figcaption>'
-                     f'{ruler_svg(city["proof"]["fajrShares"], rtl, ruler_words, t["digits"])}</figure>')
+                     f'{ruler_svg(city["proof"]["fajrShares"], rtl, ruler_words, page["digits"])}</figure>')
             steps = [
-                f'<li><h3>{esc(words["whoPublishes"])}</h3><p>{esc(words["whoPublishesBody"])} {esc(words["notAffiliated"])}</p></li>',
-                f'<li><h3>{esc(words["howReproduces"])}</h3><p>{esc(t["no_copy"])}</p><p>{esc(words["methodIntro"])}</p></li>',
-                f'<li><h3>{esc(words["howChecked"])}</h3><p>{fill(t["replays"], authority=authority)}</p>{tiles}{ruler}{checks_link}</li>',
+                f'<li><h2>{esc(words["whoPublishes"])}</h2><p>{esc(words["whoPublishesBody"])} {esc(words["notAffiliated"])}</p></li>',
+                f'<li><h2>{esc(words["howReproduces"])}</h2><p>{esc(t["no_copy"])}</p><p>{esc(words["methodIntro"])}</p></li>',
+                f'<li><h2>{esc(words["howChecked"])}</h2><p>{fill(t["replays"], authority=authority)}</p>{tiles}{ruler}{checks_link}</li>',
             ]
         return f'''<details class="whence" id="about">
     <summary>
@@ -594,17 +641,17 @@ class Timetables:
                  f'<p class="ruler-text">{self.fajr_ruler_text(city, lang, today)}</p></figure>')
         tiles = (f'<div class="tiles two">'
                  f'<div class="tile"><b>{esc(words["statDaysValue"])}</b><span>{esc(words["statDays"])}</span></div>'
-                 f'<div class="tile zero"><b>{digits(0, t["digits"])}</b><span>{esc(words["statNeverAny"])}</span></div></div>')
+                 f'<div class="tile zero"><b>{digits(0, page["digits"])}</b><span>{esc(words["statNeverAny"])}</span></div></div>')
         return [
-            f'<li><h3>{esc(words["whoPublishes"])}</h3><p>{esc(words["cautiousBody"])}</p><p class="members-intro">{esc(t["members_intro"])}</p>'
+            f'<li><h2>{esc(words["whoPublishes"])}</h2><p>{esc(words["cautiousBody"])}</p><p class="members-intro">{esc(t["members_intro"])}</p>'
             f'<ul class="members">{members}</ul><p>{esc(t["not_affiliated_any"])}</p></li>',
-            f'<li><h3>{esc(t["combine_heading"])}</h3><p>{esc(t["combine_body"])}</p>'
+            f'<li><h2>{esc(t["combine_heading"])}</h2><p>{esc(t["combine_body"])}</p>'
             f'<p class="cap" data-tt="cap"{"" if facts["capped"] else " hidden"}>{esc(words["maghribCap"])}</p>{ruler}'
-            f'<h4>{esc(words["whichDecides"])}</h4><ul class="decides">{"".join(rows)}</ul>'
+            f'<h3>{esc(words["whichDecides"])}</h3><ul class="decides">{"".join(rows)}</ul>'
             f'<p class="legend"><i class="swatch" aria-hidden="true"></i>{esc(t["decides_legend"])}</p>'
             f'<p class="stop" data-tt="stop">{fill(words["stopEating"], time=day["endOfEating"])}</p>'
             f'<p class="match">{esc(t["match_prompt"])}</p><a class="more" href="#app">{esc(words["matchMosque"])} {sep}</a></li>',
-            f'<li><h3>{esc(words["howChecked"])}</h3><p>{esc(t["replays_cautious"])}</p>{tiles}{checks_link}</li>',
+            f'<li><h2>{esc(words["howChecked"])}</h2><p>{esc(t["replays_cautious"])}</p>{tiles}{checks_link}</li>',
         ]
 
     def fajr_ruler_text(self, city: dict, lang: str, i: int) -> str:
@@ -807,7 +854,10 @@ class Timetables:
             "next": page["nextIn"],
             "today": today,
             "first": city["months"][0]["days"],
+            # The fold row's words; its accessible name is "Earlier this month, 1–27" with the
+            # language's list comma (a cautious page's lists of members use the same comma).
             "earlier": t["earlier"],
+            "comma": list_comma(lang),
             "days": days,
         }
         if cautious:
@@ -816,7 +866,6 @@ class Timetables:
             # another split (capT), the stop-eating line, and the Fajr ruler's words.
             data.update({
                 "mn": page["members"],
-                "comma": list_comma(lang),
                 "capT": words["maghribCapTemplate"],
                 "capText": words["maghribCap"],
                 "stop": words["stopEating"],

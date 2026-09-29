@@ -48,7 +48,7 @@ body {
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 6px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 6px; }
 img { max-width: 100%; height: auto; display: block; }
 h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
 p { margin: 0; }
@@ -86,8 +86,8 @@ html[dir="rtl"] .row b a { direction: rtl; }
    link: left to right, "الشفرة المصدرية على GitHub" was read GitHub-first. */
 html[dir="rtl"] .soon a, html[dir="rtl"] .after a, html[dir="rtl"] .row span a { direction: rtl; }
 /* So do the prayer-time pages' links, which are all city names or sentences. */
-html[dir="rtl"] .crumbs a, html[dir="rtl"] .fact a, html[dir="rtl"] .chips a, html[dir="rtl"] .cities a,
-html[dir="rtl"] .month-head a, html[dir="rtl"] .cta .pill, html[dir="rtl"] .tt-stale a { direction: rtl; }
+html[dir="rtl"] .crumbs a, html[dir="rtl"] .chips a, html[dir="rtl"] .cities a,
+html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
 
 /* Blocks that share this class (.top, .hero, .prose, .foot) set only padding-block, so the
    24px inline padding survives on narrow screens where there is no centring margin. */
@@ -132,7 +132,9 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .cta .pill, html[dir="rtl"] .tt-s
 .badge { display: inline-flex; line-height: 0; }
 .badge img { display: block; }
 .badge:hover { opacity: 0.92; }
-.soon { font-size: 14px; color: var(--t3); }
+/* --t2, not --t3: until launch this is the only "get the app" line, and it must read (4.93:1 on
+   the page, 5.14 in a card; review I3). */
+.soon { font-size: 14px; color: var(--t2); }
 .hero-shot { justify-self: center; }
 .shot {
   width: 100%; max-width: 300px; border-radius: 28px; border: 1px solid var(--hair); background: var(--surface);
@@ -205,14 +207,6 @@ html[lang="ar"] .tag, html[lang="ur"] .tag, html[lang="bn"] .tag { font-size: 12
 .crumbs [aria-current] { color: var(--t1); font-weight: 600; }
 .city-copy h1 { font-size: clamp(34px, 5.2vw, 54px); }
 .city-meta { margin-top: 12px; font-size: 18px; color: var(--t2); text-wrap: pretty; }
-.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 30px; }
-.fact { background: var(--surface); border: 1px solid var(--hair); border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 3px; }
-.fact .label { margin-bottom: 4px; }
-.fact b { font-size: 17px; font-weight: 700; line-height: 1.35; }
-.fact > span:not(.label), .fact > div > span:not(.label) { font-size: 14px; color: var(--t2); line-height: 1.45; }
-.fact a { font-size: 14px; font-weight: 600; margin-top: 8px; }
-.fact.qibla { flex-direction: row; align-items: center; gap: 14px; }
-.fact.qibla > div { display: flex; flex-direction: column; gap: 3px; }
 .dial { width: 54px; height: 54px; flex: none; }
 
 .today { background: var(--surface); border: 1px solid var(--hair); border-radius: 22px; padding: 26px 20px 12px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
@@ -231,9 +225,12 @@ html[lang="ar"] .ring-label, html[lang="ur"] .ring-label, html[lang="bn"] .ring-
 .tl li.past i { background: var(--t3); box-shadow: none; }
 .tl li.now i { width: 14px; height: 14px; margin-inline: 7px 6px; background: var(--ring); box-shadow: 0 0 0 5px color-mix(in srgb, var(--ring) 22%, transparent); }
 .tl li b { font-weight: 700; }
-.tl li em { font-style: normal; font-size: 13px; color: var(--t3); font-family: var(--font-ar); }
+/* Text on the card reads at 4.5:1 or more in both themes (R102, review I3): the Arabic names and
+   the past prayers in --t2 (5.14:1 on the card, 5.85 dark), the past ones in the lighter weight
+   of spec §3.1 and with the filled grey dot, the prayers still to come with their names in --t1. */
+.tl li em { font-style: normal; font-size: 13px; color: var(--t2); font-family: var(--font-ar); }
 .tl li .t { margin-inline-start: auto; font-variant-numeric: tabular-nums; color: var(--t2); }
-.tl li.past b, .tl li.past .t { color: var(--t3); font-weight: 500; }
+.tl li.past b, .tl li.past .t { color: var(--t2); font-weight: 500; }
 .tl li.now b, .tl li.now .t { color: var(--accent); font-weight: 800; }
 .tt-stale { font-size: 14px; color: var(--t2); text-align: center; padding-bottom: 12px; }
 
@@ -258,33 +255,25 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
 }
 .tt tbody tr:last-child > * { border-bottom: 0; }
 .tt tbody th.d b { font-weight: 700; display: inline-block; min-width: 1.6em; }
-.tt tbody th.d span { color: var(--t3); font-size: 13px; margin-inline-start: 6px; }
+/* The weekday under the day number and the days already gone in --t2 (4.5:1 or more on the table
+   in both themes, review I3): the past rows still read quieter than the rest, whose times are
+   --t1, and a past Friday keeps its amber, mixed down. */
+.tt tbody th.d span { color: var(--t2); font-size: 13px; margin-inline-start: 6px; }
 .tt td.h { color: var(--t2); font-size: 14px; }
 .tt td.jm .tag { margin-inline-start: 6px; line-height: 16px; font-size: 10px; padding: 0 6px; }
-.tt tr.past > *, .tt tr.past td.h { color: var(--t3); }
-.tt tr.past th.d b { color: var(--t3); font-weight: 600; }
+.tt tr.past > *, .tt tr.past td.h { color: var(--t2); }
+.tt tr.past th.d b { color: var(--t2); font-weight: 600; }
 .tt tr.fri th.d span { color: var(--accent); font-weight: 700; }
-.tt tr.fri.past th.d span { color: color-mix(in srgb, var(--accent) 55%, var(--t3)); }
+.tt tr.fri.past th.d span { color: color-mix(in srgb, var(--accent) 55%, var(--t2)); }
 .tt tr.fri td.jm { color: var(--accent); }
-.tt tr.fri.past td.jm { color: color-mix(in srgb, var(--accent) 55%, var(--t3)); }
+.tt tr.fri.past td.jm { color: color-mix(in srgb, var(--accent) 55%, var(--t2)); }
 .tt tr.is-today > * { background: color-mix(in srgb, var(--ring) 14%, var(--surface)); font-weight: 700; }
 .tt tr.is-today th.d b { color: var(--accent); }
 .tt tr.fold td { padding: 12px 14px; white-space: normal; }
 .tt tr.fold button { font: inherit; font-size: 14px; color: var(--t2); background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
 .tt tr.fold button b { color: var(--accent); }
 .note { margin-top: 14px; font-size: 14px; color: var(--t2); max-width: 72ch; text-wrap: pretty; }
-.tt-note { margin-top: 0; padding-bottom: 36px; }
 
-.after-month { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 32px; padding-block: 4px 56px; align-items: start; }
-.cta { background: var(--surface); border: 1px solid var(--hair); border-radius: 22px; padding: 26px 26px 0 26px; display: flex; gap: 22px; align-items: flex-start; overflow: hidden; }
-.cta-copy { display: flex; flex-direction: column; gap: 10px; flex: 1; padding-bottom: 26px; }
-.cta h2 { font-size: 24px; }
-.cta p { color: var(--t2); font-size: 16px; line-height: 1.5; }
-.cta .stores { margin-top: 6px; }
-.cta-shot { width: 156px; flex: none; height: 250px; overflow: hidden; }
-.cta-shot img { width: 100%; height: auto; display: block; border-radius: 22px 22px 0 0; border: 1px solid var(--hair); border-bottom: 0; }
-.nearby { display: flex; flex-direction: column; gap: 10px; }
-.nearby .label { margin-bottom: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .chips a { font-size: 14px; font-weight: 600; color: var(--t1); background: var(--surface); border: 1px solid var(--hair); border-radius: 999px; padding: 6px 14px; }
 .chips a:hover { text-decoration: none; border-color: var(--t3); }
@@ -323,10 +312,7 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
   .nav a.wide, html[dir="rtl"] .nav a.wide { display: none; }
   .city-hero { grid-template-columns: 1fr; gap: 28px; padding-block: 18px 32px; }
   .city-meta { font-size: 15px; margin-top: 10px; }
-  .facts { grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
   .today { padding-top: 22px; }
-  .ring-box { width: 176px; height: 176px; }
-  .ring-count { font-size: 36px; }
   .month { padding-block: 28px; }
   .tt { font-size: 13px; }
   .tt thead th { font-size: 9.5px; letter-spacing: 0.04em; padding: 10px 4px; text-align: center; white-space: normal; line-height: 1.25; }
@@ -339,11 +325,6 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
   .tt .h { display: none; }
   .tt td.jm .tag { display: none; }
   .tt tr.fold td { text-align: start; padding: 11px 12px; }
-  .after-month { grid-template-columns: 1fr; gap: 22px; }
-  .cta { padding: 20px; }
-  .cta-copy { padding-bottom: 0; }
-  .cta-shot { display: none; }
-  .cta h2 { font-size: 21px; }
   .cities-strip { grid-template-columns: 1fr; gap: 20px; }
   .index { padding-block: 22px 48px; }
 }
@@ -373,7 +354,7 @@ a { color: var(--accent-text); }
 .ring-label { color: var(--accent-text); }
 .tl li.now b, .tl li.now .t { color: var(--accent-text); }
 .tt tr.fri th.d span, .tt tr.fri td.jm { color: var(--accent-text); }
-.tt tr.fri.past th.d span, .tt tr.fri.past td.jm { color: color-mix(in srgb, var(--accent-text) 55%, var(--t3)); }
+.tt tr.fri.past th.d span, .tt tr.fri.past td.jm { color: color-mix(in srgb, var(--accent-text) 55%, var(--t2)); }
 .tt tr.is-today th.d b { color: var(--accent-text); }
 .tt tr.fold button b { color: var(--accent-text); }
 .chips a.all { color: var(--accent-text); }
@@ -413,7 +394,9 @@ a { color: var(--accent-text); }
 .today-foot > svg { width: 22px; height: 22px; flex: none; color: var(--t1); }
 .foot-text { flex: 1 1 170px; font-size: 14px; line-height: 1.4; color: var(--t2); text-align: start; }
 .foot-text b { color: var(--t1); font-weight: 700; }
-.today-foot .pill { flex: none; margin-inline-start: auto; }
+/* "Get Taqwa": a 40 px pill with a 44 px hit area, as the chips have (spec §8, review M2). */
+.today-foot .pill { flex: none; margin-inline-start: auto; position: relative; }
+.today-foot .pill::before { content: ""; position: absolute; inset: -2px 0; }
 .today .tt-stale { width: 100%; padding-bottom: 14px; }
 html[dir="rtl"] .today-foot .pill, html[dir="rtl"] .today-foot a { direction: rtl; }
 
@@ -448,7 +431,14 @@ html[dir="rtl"] .whence a, html[dir="rtl"] .app a { direction: rtl; }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font); font-size: 14px; font-weight: 800; color: var(--accent-text); z-index: 1;
 }
-.steps h3 { font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+/* The steps are the page's second-level headings (h2, under the h1: review M11), set as B's step
+   titles; "Which timetable decides each time today" is an h3 inside the second step. */
+/* A counter counts in Western digits unless told: the steps' numbers in the page's own digits,
+   which <main> names where they are not Western (R107, review I1). */
+main[data-digits="arabic-indic"] .steps > li::before { content: counter(step, arabic-indic); }
+main[data-digits="persian"] .steps > li::before { content: counter(step, persian); }
+main[data-digits="bengali"] .steps > li::before { content: counter(step, bengali); }
+.steps h2 { font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
 .steps p { margin-top: 6px; font-size: 15px; line-height: 1.55; color: var(--t2); text-wrap: pretty; }
 .steps p + p { margin-top: 10px; }
 .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
@@ -505,7 +495,7 @@ html[dir="rtl"] .whence a, html[dir="rtl"] .app a { direction: rtl; }
   .steps::before { inset-inline-start: 16px; top: 15px; bottom: auto; width: calc((100% - 80px) / 3 * 2 + 80px); height: 2px; }
   .steps > li { padding-inline-start: 0; padding-bottom: 0; }
   .steps > li::before { position: static; margin-bottom: 18px; }
-  .steps h3 { font-size: 20px; }
+  .steps h2 { font-size: 20px; }
   .steps p { margin-top: 8px; }
 }
 
@@ -548,7 +538,12 @@ main.dv .tt thead th small.dv { display: block; }
 main.dv .tt td.t small.dv { display: block; }
 .tag.dv { display: none; }
 main.dv .tag.dv { display: block; width: max-content; margin-top: 3px; }
-.tt tr.past td.t small.dv { color: var(--t3); }
+.tt tr.past td.t small.dv { color: var(--t2); }
+/* On today's tint --t2 is 4.62:1 in the light theme but 4.47 in the dark one: there today's
+   weekday, Hijri date and detail lines read in --t1 (a Friday keeps its amber). */
+@media (prefers-color-scheme: dark) {
+  .tt tr.is-today:not(.fri) th.d span, .tt tr.is-today td.h, .tt tr.is-today td.t small.dv { color: var(--t1); }
+}
 .note.dv { display: none; }
 main.dv .note.dv { display: block; }
 .note-engine { margin-top: 0; padding-bottom: 36px; }
@@ -559,6 +554,8 @@ main.dv .note.dv { display: block; }
 .tt tr.fold button { width: 100%; min-height: 44px; padding: 0 14px; text-align: start; }
 .tt tr.fold button span + span { color: var(--t1); font-weight: 700; }
 .tt tr.fold button b { font-size: 20px; font-weight: 800; line-height: 1; margin-inline-start: auto; }
+/* After the fold opens, focus moves to the first day it revealed (its row head), not to the page. */
+.tt tbody th.d:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
 
 @media (max-width: 720px) {
   .tt thead th { font-size: 10px; letter-spacing: 0.04em; color: var(--t2); padding-inline: 3px; }
@@ -584,7 +581,7 @@ html[dir="rtl"] .cautious-line { direction: rtl; }
 .members { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; font-size: 15px; line-height: 1.4; }
 .members li { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .members b { font-weight: 700; }
-.steps h4 { margin: 20px 0 0; font-size: 15px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+.steps h3 { margin: 20px 0 0; font-size: 15px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
 .decides { list-style: none; margin: 8px 0 0; padding: 0; }
 .decides li { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 6px; padding: 8px 0; border-top: 1px solid var(--hair); font-size: 15px; line-height: 1.4; }
 .decides li:last-child { border-bottom: 1px solid var(--hair); }
@@ -630,7 +627,9 @@ html[dir="rtl"] .index-checks a { direction: rtl; }
 @media print {
   @page { margin: 10mm; }
   :root { color-scheme: light; --bg: #fff; --surface: #fff; --t1: #000; --t2: #333; --t3: #555; --hair: #999; --accent: #000; --accent-text: #000; --ring: #000; }
-  .top, .langs, .crumbs, .today, .facts, .qibla-line, .pitch, .whence, .dv-switch, .app, .after, .after-month, .foot, .tt-stale, button.print, tr.fold, .note-engine { display: none !important; }
+  /* .app-row too, not only what it holds: its own padding would push a month's last rows onto a
+     second, blank sheet on Letter (review I2). */
+  .top, .langs, .crumbs, .today, .qibla-line, .pitch, .whence, .dv-switch, .app-row, .app, .after, .foot, .tt-stale, button.print, tr.fold, .note-engine { display: none !important; }
   main.wrap { max-width: none; padding: 0; }
   .city-hero { display: block; padding: 0; }
   .city-copy h1 { font-size: 26px; }
@@ -640,6 +639,13 @@ html[dir="rtl"] .index-checks a { direction: rtl; }
   .month:first-of-type { break-before: auto; }
   .month h2 { font-size: 20px; }
   .month-head { margin-bottom: 8px; }
+  /* A whole-page print puts the next month on a sheet of its own, below no h1: that sheet names
+     the city with the table's caption ("Prayer times in London · October 2026"; review M10). A
+     month printed alone shares its sheet with the h1 and keeps the caption for screen readers. */
+  html:not([data-print]) .month ~ .month .tt caption.sr {
+    position: static; width: auto; height: auto; margin: 0; padding: 0 0 6px; overflow: visible; clip: auto;
+    white-space: normal; text-align: start; font-size: 13px; font-weight: 700;
+  }
   .month-head p { font-size: 13px; margin-top: 2px; }
   .tt-wrap { border: 0; border-radius: 0; overflow: visible; }
   .tt { font-size: 12px; }

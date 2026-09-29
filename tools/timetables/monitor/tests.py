@@ -464,6 +464,22 @@ class Drivers(unittest.TestCase):
         with open(os.path.join(self.monitor, "backup.json")) as f:
             self.assertIn("no backup folder given", json.load(f)["error"])
 
+    def test_without_a_root_neither_half_guesses_one(self):
+        # Review M5 (final): no one's home folder is a default in the public repository; the root
+        # comes from --official or TAQWA_OFFICIAL (scripts/monitor.sh passes it), else exit 2.
+        had = os.environ.pop("TAQWA_OFFICIAL", None)
+        try:
+            self.assertEqual(2, fetch.main(["--sources", self.sources, "--today", "2026-10-05"]))
+            self.assertEqual(2, backup.main(["--backup", os.path.join(self.root, "backup"), "--today", "2026-10-05"]))
+            self.assertFalse(os.path.exists(self.monitor))
+            os.environ["TAQWA_OFFICIAL"] = self.root
+            self.assertEqual(0, fetch.main(["--sources", self.sources, "--today", "2026-10-05", "--only", "ae-iacad"]))
+            self.assertEqual("skipped", self.outcome()["sources"]["ae-iacad"]["status"])
+        finally:
+            os.environ.pop("TAQWA_OFFICIAL", None)
+            if had is not None:
+                os.environ["TAQWA_OFFICIAL"] = had
+
 
 class MoreParsers(unittest.TestCase):
     def test_kemenag_checks_the_place_name(self):

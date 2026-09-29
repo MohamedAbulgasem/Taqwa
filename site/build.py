@@ -52,7 +52,7 @@ SITE = os.path.join(ROOT, "site")
 OUT = os.path.join(ROOT, "_site")
 ORIGIN = "https://taqwa.world"
 
-SKIP = {"build.py", "timetables.py", "stores.py", "cities.tsv", "stores.json", "templates", "pages", "README.md", "__pycache__"}
+SKIP = {"build.py", "timetables.py", "test_timetables.py", "stores.py", "cities.tsv", "stores.json", "templates", "pages", "README.md", "__pycache__"}
 
 # The order the picker lists them in: English first, then the app's own order.
 LANGUAGE_ORDER = ["en", "ar", "fr", "tr", "id", "ur", "bn"]
