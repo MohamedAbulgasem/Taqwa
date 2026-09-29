@@ -92,14 +92,15 @@ class ProvenTest {
     }
 
     @Test fun istanbulIsHeldOnBothSidesOfDiyanetsHole() {
-        // Diyanet's captures hold 25 Sep – 25 Oct 2026 and 2027: September's first days and the end
-        // of October through December were never checked (review C1, ruling R115).
+        // Diyanet's captures hold 25 Sep – 29 Oct 2026 (the research's to 25 Oct, the weekly monitor's
+        // of 28 Sep to 29 Oct) and 2027: September's first days and the last of October through
+        // December were never checked (review C1, ruling R115).
         val september = verdict(istanbul)
         assertIs<Verdict.Held>(september)
         assertEquals("tr.diyanet: no checked table day 1 Sep 2026 – 24 Sep 2026", september.reason)
         val october = verdict(istanbul, oct1, nov30)
         assertIs<Verdict.Held>(october)
-        assertEquals("tr.diyanet: no checked table day 26 Oct 2026 – 31 Dec 2026", october.reason)
+        assertEquals("tr.diyanet: no checked table day 30 Oct 2026 – 31 Dec 2026", october.reason)
     }
 
     @Test fun birminghamIsHeldAsNotMeasured() {
