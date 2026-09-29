@@ -171,10 +171,13 @@ object DayComputer {
          * authority's own Isha counted from a Maghrib its takdir puts before the real sunset, which the
          * Maghrib shown never precedes), Isha moves later to the minute after Maghrib, Maghrib's end
          * with it, and it is declared not followed (as R82's cells and point 8's Fajr): no day in order
-         * can show it. Nothing moves where Isha is already after Maghrib.
+         * can show it. Only under a method that declares it
+         * ([TimetableMethod.declaresIshaBeforeMaghrib]); under any other, such a day stays out of order
+         * for [Invariants.repair] and the gate to flag (review D round 1: a wrong slot or margin must
+         * fail, not declare). Nothing moves where Isha is already after Maghrib.
          */
         private fun PrayerDay.ishaAfterMaghrib(): PrayerDay {
-            if (isha > maghrib) return this
+            if (isha > maghrib || !method.declaresIshaBeforeMaghrib) return this
             val moved = maghrib + 1.minutes
             return copy(isha = moved, ends = ends + (Prayer.MAGHRIB to moved), notFollowed = notFollowed + Prayer.ISHA)
         }

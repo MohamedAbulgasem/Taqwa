@@ -97,13 +97,14 @@ class DayComputerTest {
 
     /**
      * Point 9 (monitor round, brief D): an authority whose Isha its own takdir puts before the real
-     * sunset (Diyanet from Umeå north in June) cannot be shown in order: Isha is the minute after the
-     * Maghrib shown and declared not followed.
+     * sunset (Diyanet from Umeå north in June) cannot be shown in order: where its method declares it
+     * (TimetableMethod.declaresIshaBeforeMaghrib), Isha is the minute after the Maghrib shown and
+     * declared not followed.
      */
     @Test
-    fun `an isha before the maghrib shown moves to the minute after it and is declared`() {
+    fun `an isha before the maghrib shown moves to the minute after it and is declared where the method declares it`() {
         // An invented rule: Isha at the sun 5° above the horizon in the evening, before every sunset.
-        val aboveHorizon = plain("test.isha.early").copy(ishaAngleByDayOfYear = DoubleArray(366) { -5.0 })
+        val aboveHorizon = plain("test.isha.early").copy(ishaAngleByDayOfYear = DoubleArray(366) { -5.0 }, declaresIshaBeforeMaghrib = true)
         val date = LocalDate(2027, 6, 21)
         val day = compute(aboveHorizon, GeoPoint(51.5, -0.1), date, TimeZone.of("Europe/London"))
         assertEquals(day.maghrib + 1.minutes, day.isha)
@@ -111,8 +112,24 @@ class DayComputerTest {
         assertEquals(day.isha, day.ends[Prayer.MAGHRIB])
         assertFalse(day.repaired)
         assertTrue(Invariants.holds(day))
-        val ordinary = compute(plain("test.isha.plain"), GeoPoint(51.5, -0.1), date, TimeZone.of("Europe/London"))
+        val ordinary = compute(plain("test.isha.plain").copy(declaresIshaBeforeMaghrib = true), GeoPoint(51.5, -0.1), date, TimeZone.of("Europe/London"))
         assertTrue(ordinary.notFollowed.isEmpty() && ordinary.isha > ordinary.maghrib + 1.minutes)
+    }
+
+    /**
+     * Review D round 1 (I4): under a method that does not declare it, an Isha at or before the Maghrib
+     * shown stays where its rule put it, out of order, for Invariants.repair and the gate to flag as
+     * repaired: a wrong slot or margin under any other method still fails, never declares.
+     */
+    @Test
+    fun `an isha before the maghrib shown stays out of order under a method that does not declare it`() {
+        val aboveHorizon = plain("test.isha.bug").copy(ishaAngleByDayOfYear = DoubleArray(366) { -5.0 })
+        val date = LocalDate(2027, 6, 21)
+        val day = compute(aboveHorizon, GeoPoint(51.5, -0.1), date, TimeZone.of("Europe/London"))
+        assertTrue(day.isha <= day.maghrib, "Isha ${day.isha} stays where the rule put it against Maghrib ${day.maghrib}")
+        assertTrue(day.notFollowed.isEmpty())
+        assertFalse(Invariants.holds(day))
+        assertTrue(Invariants.repair(day).repaired)
     }
 
     @Test

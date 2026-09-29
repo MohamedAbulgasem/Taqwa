@@ -118,6 +118,8 @@ object Diyanet {
         highLatitude = HighLatRule.NightFraction(fajrFraction = 0.19, ishaFraction = 0.22),
         endOfEatingMarginSeconds = 9,
         dayAroundDhuhrMinutes = WINTER_HALF_DAY_MINUTES,
+        // From Umeå north its capped Isha falls before the Maghrib shown in June (point 9 declares it).
+        declaresIshaBeforeMaghrib = true,
     )
 
     /**

@@ -59,8 +59,9 @@ import kotlin.system.exitProcess
  * On takdir days the plain moment is hours off and the rounding bound wins; on the days between,
  * whichever is tighter. Across the rows of one slot (the same month and day in several years) a
  * start takes the tightest bound (the earliest moment: Fajr's largest depression, Isha's smallest)
- * and the end likewise (the latest moment: the largest depression); a slot without a row (29
- * February) takes the safe side of its neighbours. Then ruling R28's envelope, each slot the
+ * and the end the safe side rather than the tightest (the earliest moment: the largest
+ * depression), so that no held year's end is late; a slot without a row (29 February) takes the
+ * safe side of its neighbours. Then ruling R28's envelope, each slot the
  * latest of the day before, the day and the day after for a start and the earliest for the end,
  * so the leap cycle's drift of the sun cannot make a start early or the end late; and rounding to
  * a hundredth of a degree on the safe side.

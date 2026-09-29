@@ -229,7 +229,11 @@ start the latest it could be under the rounding (the printed minute + 35 s), or,
 18°/16° holds the row, the plain method's own moment; for the end the earliest (− 35 s) or the
 plain end; across the years a slot is held in, the tightest. The cost: on takdir days the start
 shows the printed minute or the one after (a minute of lateness the tightening across years will
-shrink as the monitor holds more years); on plain days the plain method's own minute.
+shrink as the monitor holds more years); on plain days the plain method's own minute. The
+regenerated curves also move the stamps of the entries built on them, still 0 early and 0 late
+ends: Zürich's (`ch.fids`), the Netherlands' cautious (`nl.cautious`, Amsterdam's member) and
+Austria's (`at.iggo`), whose Wien unit now keeps Diyanet's curve margins on Fajr, Isha and the end
+of eating with three exceptions of 4 min (7g's Austria section).
 
 **Seven more cities (monitor round, brief D).** The monitor's capture also holds Diyanet's tables for
 Lyon, Lille, Gent, Antwerpen, Copenhagen (the research capture holds it too), Helsinki and Trondheim,

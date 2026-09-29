@@ -85,6 +85,5 @@ class DiyanetEuropeUnitsTest {
             assertEquals(unit, units.nearest(unit.point), unit.id)
         }
         assertEquals(33, units.units.size)
-        assertEquals(TimeZone.of("Europe/Oslo").id, "Europe/Oslo")
     }
 }
