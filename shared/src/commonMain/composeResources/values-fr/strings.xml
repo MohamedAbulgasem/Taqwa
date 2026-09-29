@@ -330,6 +330,8 @@
     <string name="about_cautious_body">À %1$s, les mosquées suivent de bonne foi des calendriers différents, et aucun n’est suivi par la plupart. Taqwa combine %2$s : chaque prière s’affiche une fois que tous l’ont commencée.</string>
     <string name="about_cautious_maghrib_cap">Le Maghrib fait exception aujourd’hui : il suit %1$s, le calendrier le plus suivi, plutôt que le Maghrib plus tardif de %2$s.</string>
     <string name="about_which_decides">Quel calendrier fixe chaque horaire aujourd’hui</string>
+    <string name="about_stat_never_before_any">débuts avant l’un d’eux</string>
+    <string name="about_cautious_checked_through">Vérifiés d’après les calendriers suivis ici jusqu’au %1$s.</string>
     <string name="about_calculated_body">Faute de calendrier sunnite officiel pour %1$s, Taqwa en calcule un avec prudence : %2$s.</string>
     <string name="about_asr_heading">Asr</string>
     <string name="about_asr_known">%1$s : %3$s, car c’est l’heure que suivent la plupart des mosquées à %2$s.</string>

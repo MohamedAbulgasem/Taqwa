@@ -331,6 +331,8 @@
     <string name="about_cautious_body">%1$s camileri iyi niyetle farklı takvimlere uyuyor ve hiçbirine çoğunluk uymuyor. Taqwa %2$s takvimlerini birleştirir: her namaz, hepsinde vakit girdikten sonra gösterilir.</string>
     <string name="about_cautious_maghrib_cap">Akşam bugün istisnadır: en çok uyulan takvim olan %1$s takvimine uyar, %2$s takviminin daha geç akşam vaktine değil.</string>
     <string name="about_which_decides">Bugün her vakti hangi takvim belirliyor</string>
+    <string name="about_stat_never_before_any">hiçbirinin vaktinden önce başlangıç</string>
+    <string name="about_cautious_checked_through">Burada uyulan takvimlerle %1$s tarihine kadar karşılaştırıldı.</string>
     <string name="about_calculated_body">Taqwa, %1$s için resmî bir Sünni takvim bulamadı; bu yüzden ihtiyatlı biçimde hesaplıyor: %2$s.</string>
     <string name="about_asr_heading">İkindi</string>
     <string name="about_asr_known">%1$s: %3$s; çünkü %2$s camilerinin çoğu buna uyuyor.</string>

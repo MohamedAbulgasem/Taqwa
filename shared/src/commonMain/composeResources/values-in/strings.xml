@@ -319,6 +319,8 @@
     <string name="about_cautious_body">Masjid-masjid di %1$s mengikuti jadwal yang berbeda dengan niat baik, dan tidak satu pun diikuti mayoritas. Taqwa menggabungkan %2$s: setiap salat ditampilkan setelah waktunya masuk di semua jadwal itu.</string>
     <string name="about_cautious_maghrib_cap">Maghrib hari ini pengecualian: mengikuti %1$s, jadwal yang paling banyak diikuti, bukan Maghrib yang lebih lambat dari %2$s.</string>
     <string name="about_which_decides">Jadwal mana yang menentukan setiap waktu hari ini</string>
+    <string name="about_stat_never_before_any">awal waktu sebelum salah satunya</string>
+    <string name="about_cautious_checked_through">Dicocokkan dengan jadwal-jadwal yang diikuti di sini hingga %1$s.</string>
     <string name="about_calculated_body">Taqwa tidak menemukan jadwal Sunni resmi untuk %1$s, jadi Taqwa menghitungnya dengan memilih yang lebih aman: %2$s.</string>
     <string name="about_asr_heading">Ashar</string>
     <string name="about_asr_known">%1$s: %3$s, karena kebanyakan masjid di %2$s mengikutinya.</string>

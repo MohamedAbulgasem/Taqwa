@@ -79,6 +79,61 @@ class AboutTimesUiStateTest {
         // note and the Toronto mockup both expect.
         assertEquals(1, state.resolution.members.first().shareRank)
         assertTrue(state.members.all { (member, _) -> member in state.resolution.members })
+        // A cautious state carries the entry's proof stamp like the two authority states (ruling R100).
+        assertEquals("ca.toronto", state.stamp?.entryId)
+    }
+
+    /**
+     * Rulings R100 and R105 (city-pages spec §10): a measured cautious place shows two proof tiles
+     * and a sentence — the stamp's place-days at its places, the 0 starts before any member, and the
+     * date the proof runs through — the same figures the site's cautious page shows from the same
+     * stamp. Toronto's are the committed `ca.toronto` stamp's: 1,400 days at 6 places through 31
+     * December 2026.
+     */
+    @Test
+    fun `a cautious place's proof is its stamp's place-days and places and its proven-through date`() {
+        val toronto = Place(43.6532, -79.3832, "America/Toronto", "CA")
+        val state = stateFor(toronto)
+        assertIs<AboutTimesUiState.Cautious>(state)
+        assertTrue(state.resolution.measured)
+        val proof = requireNotNull(cautiousProof(state.resolution, state.stamp)) { "Toronto is measured and stamped" }
+        assertEquals(CautiousProof(placeDays = 1400, places = 6, provenThrough = LocalDate(2026, 12, 31)), proof)
+    }
+
+    /**
+     * No figure is claimed where the proof does not reach (spec §10, as the checked template does):
+     * without a stamp, or at a place the members' proof does not measure — Vancouver lies beyond the
+     * places `ca.cautious`'s stamp was gated at, though the stamp itself exists.
+     */
+    @Test
+    fun `a cautious place claims no proof without a stamp or where it is not measured`() {
+        val toronto = stateFor(Place(43.6532, -79.3832, "America/Toronto", "CA"))
+        assertIs<AboutTimesUiState.Cautious>(toronto)
+        assertNull(cautiousProof(toronto.resolution, null))
+
+        val vancouver = stateFor(Place(49.2827, -123.1207, "America/Vancouver", "CA"))
+        assertIs<AboutTimesUiState.Cautious>(vancouver)
+        assertEquals("ca.cautious", vancouver.resolution.entry.id)
+        assertFalse(vancouver.resolution.measured)
+        assertTrue(vancouver.stamp != null, "ca.cautious carries a committed stamp")
+        assertNull(cautiousProof(vancouver.resolution, vancouver.stamp))
+    }
+
+    /**
+     * Ruling R105: the cautious proof carries no "at most" figure at all. A cautious stamp is
+     * entry-wide, with no unit rows, so its worst lateness would be another place's spread: Oslo
+     * would read Trondheim's Isha (over two hours; Oslo's own is under half an hour).
+     */
+    @Test
+    fun `a cautious place's proof never carries the stamp's entry-wide worst`() {
+        val oslo = stateFor(Place(59.91273, 10.74609, "Europe/Oslo", "NO"))
+        assertIs<AboutTimesUiState.Cautious>(oslo)
+        assertEquals("no.cautious", oslo.resolution.entry.id)
+        val stamp = requireNotNull(oslo.stamp)
+        assertTrue(stamp.worstLateByUnit.isEmpty())
+        assertTrue(stamp.worstLateMinutes.values.max() > 120)
+        val proof = requireNotNull(cautiousProof(oslo.resolution, stamp))
+        assertEquals(CautiousProof(stamp.placeDays, stamp.places, LocalDate.parse(stamp.provenThrough!!)), proof)
     }
 
     private fun instantFor(day: PrayerDay, prayer: Prayer): Instant = when (prayer) {
