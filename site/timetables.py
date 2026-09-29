@@ -10,9 +10,14 @@ meta.json, under "timetable") and markup, and formats nothing about a city itsel
 A page is complete without script: the whole of this month and next are in the markup, today's
 row is lit for the day the page was built, and the Today card shows that date. assets/timetable.js
 then makes it live in the city's own time zone (see that file).
+
+Every sentence on a city page is one of two things: an app string the generator filled for the
+city in the page's language (`pages[lang].strings`, so the page says exactly what the app's About
+screen says), or a site sentence from meta.json. A site sentence may carry a "|" where its opening
+words are set in bold (the card's foot, the app section's points): the mark is the site's own and
+is never shown.
 """
 import datetime
-import functools
 import html
 import importlib.resources
 import json
@@ -22,23 +27,34 @@ import re
 import unicodedata
 import zoneinfo
 
+from stores import block as store_block
+
 SECTION = "prayer-times/"
+CHECKS_PAGE_SLUG = "how-taqwa-checks"  # reserved for the "How Taqwa checks" page; no city may use it
 HOME_MARKER = "<!-- prayer-times -->"
-OBLIGATORY = [0, 2, 3, 4, 5]  # the prayers of the Today card, as in the app: Sunrise is not one
+OBLIGATORY = [0, 2, 3, 4, 5]  # the prayers of the countdown, as in the app: Sunrise is never "next"
 DHUHR = 2
 FAJR, SUNRISE, ASR, MAGHRIB, ISHA = 0, 1, 3, 4, 5
 NEARBY_KM = 900
 AT_KAABA_KM = 5
 MAX_SAME_COUNTRY = 14
 MAX_NEARBY = 6
+SUPPORT_EMAIL = "support@taqwa.world"
 
 MIHRAB = ('<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.56 12.6V8.13c0-2.32 1.38-3.94 3.44-4.75 '
           '2.06.81 3.44 2.43 3.44 4.75v4.47" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" '
           'stroke-linejoin="round"/><circle cx="8" cy="6.3" r="0.95" fill="currentColor"/></svg>')
+# The same glyph with the app icon's amber dot: the card's foot and the app section's tile.
+MIHRAB_LIT = MIHRAB.replace('r="0.95" fill="currentColor"', 'r="0.95" fill="var(--ring)"')
+CHEVRON = ('<svg class="chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" '
+           'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>')
+CHECK = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+         'stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>')
 SEARCH = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" '
           'stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>')
 RING_R = 88
 RING_C = 2 * math.pi * RING_R
+RULER_W = 342
 
 
 class DataError(Exception):
@@ -161,6 +177,62 @@ def plain(sentence: str, **values) -> str:
     return sentence
 
 
+def lead(sentence: str, **values) -> str:
+    """A site sentence whose opening words are set in bold: the part before its "|" is the lead,
+    the rest follows it in the running weight. A sentence without the mark is filled as it is."""
+    head, mark, rest = sentence.partition("|")
+    if not mark:
+        return fill(sentence, **values)
+    return f"<b>{fill(head, **values)}</b>{fill(rest, **values)}"
+
+
+def list_comma(lang: str) -> str:
+    """The comma between the members of a list, as the app joins them (MethodWords.listComma)."""
+    return "، " if lang in ("ar", "ur") else ", "
+
+
+def ruler_svg(shares: dict, rtl: bool, words: dict, digit_set: str) -> str:
+    """B's minute ruler (spec §3.3.1): the hatched "before" box holding the one true count of
+    early starts, 0, and four bars for the checked days whose Fajr fell on the authority's own
+    minute, one, two, or three or more minutes after it — drawn and labelled as shares of that
+    event's checked count, so the only day total on the page is the tile's. On an RTL page the
+    layout is mirrored: every x is measured from the right, and the text, which the SVG lays out
+    in the page's direction, is never flipped."""
+    order = ["0", "1", "2", "3+"]
+    values = [float(shares.get(key, 0.0)) for key in order]
+    top = max(values) or 1.0
+    percents = [fill(words["percent"], n=digits(round(value * 100), digit_set)) for value in values]
+
+    def x(left: float, width: float = 0) -> str:
+        at = RULER_W - left - width if rtl else left
+        return f"{at:g}"
+
+    alt = fill(words["alt"], p0=percents[0], p1=percents[1], p2=percents[2], p3=percents[3])
+    parts = [f'<svg viewBox="0 0 {RULER_W} 100" role="img" aria-label="{alt}">',
+             '<defs><pattern id="ruler-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+             '<line x1="0" y1="0" x2="0" y2="6" stroke="var(--hair)" stroke-width="2"/></pattern></defs>',
+             f'<rect x="{x(0, 66)}" y="18" width="66" height="54" fill="url(#ruler-hatch)"/>',
+             f'<text x="{x(33)}" y="48" font-size="11" font-weight="800" fill="var(--t1)" text-anchor="middle">{esc(words["none"])}</text>',
+             f'<text x="{x(33)}" y="90" font-size="11" fill="var(--t2)" text-anchor="middle">{esc(words["before"])}</text>']
+    labels = [words["same"], words["one"], words["two"], words["three"]]
+    for i, value in enumerate(values):
+        left = 76 + 60 * i
+        height = 48 * value / top
+        parts.append(f'<rect x="{x(left, 40)}" y="{72 - height:.1f}" width="40" height="{height:.1f}" rx="2" fill="var(--accent)"/>')
+        parts.append(f'<text x="{x(left + 20)}" y="{72 - height - 4.5:.1f}" font-size="10.5" font-weight="700" fill="var(--t1)" '
+                     f'text-anchor="middle">{esc(percents[i])}</text>')
+        parts.append(f'<text x="{x(left + 20)}" y="90" font-size="11" fill="var(--t2)" text-anchor="middle">{esc(labels[i])}</text>')
+    parts.append(f'<line x1="{x(0)}" y1="72" x2="{x(RULER_W)}" y2="72" stroke="var(--t3)" stroke-width="1"/>')
+    for tick in (126, 186, 246, 306):
+        parts.append(f'<line x1="{x(tick)}" y1="72" x2="{x(tick)}" y2="77" stroke="var(--t3)" stroke-width="1"/>')
+    parts.append(f'<line x1="{x(66)}" y1="12" x2="{x(66)}" y2="77" stroke="var(--accent)" stroke-width="2"/>')
+    # Anchored at its start: on an RTL page the start is the right end, so the label still hangs
+    # off the amber line towards the bars.
+    parts.append(f'<text x="{x(71)}" y="10" font-size="10.5" font-weight="700" fill="var(--t1)" text-anchor="start">{esc(words["minute"])}</text>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 def at_kaaba(city: dict) -> bool:
     """Whether the city is Makkah itself, where the Qibla is the Kaaba in front of you."""
     return city["qibla"]["km"] < AT_KAABA_KM
@@ -274,7 +346,8 @@ class Timetables:
         page = city["pages"][lang]
         month = page["months"][0]["title"]
         values = self.sentence_values(city, lang)
-        description = plain(t["description"], **values, month=month)
+        described = "description_cautious" if city["entryClass"] == "C" else "description_checked"
+        description = plain(t[described], **values, month=month)
         if not at_kaaba(city):
             description += plain(t["description_qibla"], **values)
         meta = {
@@ -329,24 +402,18 @@ class Timetables:
         crumbs = (f'<nav class="crumbs" aria-label="{attr(t["crumbs"])}"><a href="../">{esc(t["nav"])}</a>'
                   f'<span aria-hidden="true">{sep}</span><a href="../#{city["country"].lower()}">{esc(page["country"])}</a>'
                   f'<span aria-hidden="true">{sep}</span><span aria-current="page">{esc(page["city"])}</span></nav>')
-        if at_kaaba(city):
-            # In Makkah itself a bearing and "0 km to Makkah" mean nothing: the Kaaba is there.
-            qibla = f'<div class="fact qibla"><div><span class="label">{esc(page["qibla"])}</span><b>{esc(t["qibla_here"])}</b></div></div>'
-        else:
-            qibla = (f'<div class="fact qibla">{dial(city["qibla"]["bearing"])}<div><span class="label">{esc(page["qibla"])}</span>'
-                     f'<b>{fill(t["qibla_bearing"], **values)}</b><span>{fill(t["qibla_distance"], **values)}</span></div></div>')
-        facts = f'''<div class="facts">
-        <div class="fact"><span class="label">{esc(t["method"])}</span><b>{esc(page["method"])}</b><span>{fill(t["asr"], **values)} · <span dir="ltr">{esc(page["offset"])}</span></span><a href="{{support}}#prayer-time">{esc(t["why"])}</a></div>
-        {qibla}
-      </div>'''
+        # The pitch shows on desktop beside the card; on phones the app section carries it (CSS).
+        pitch = (f'<div class="pitch"><p><b>{esc(t["pitch_title"])}</b> <span>{esc(t["pitch_body"])}</span></p>'
+                 f'{store_block(cfg, lang, beta_anchor=False)}</div>')
         hero = f'''<div class="city-hero">
     <div class="city-copy">
       {crumbs}
       <h1>{fill(t["h1"], **values)}</h1>
       <p class="city-meta"><span>{esc(page["country"])}</span> · <span data-tt="full">{esc(page["today"]["full"])}</span> · <span data-tt="hijri">{esc(page["today"]["hijri"])}</span></p>
-      {facts}
     </div>
     {self.today_card(city, lang, today)}
+    {self.qibla_line(city, lang)}
+    {pitch}
   </div>'''
 
         months = []
@@ -359,38 +426,125 @@ class Timetables:
         data = self.live_data(city, lang, today)
         return f'''<main class="wrap city">
   {hero}
+  {self.whence(city, lang)}
+  <section class="months">
   {"".join(months)}
-  <p class="note tt-note">{fill(t["note"], date=page["today"]["date"])}</p>
-  {self.after(city, lang)}
+  </section>
+  <div class="app-row">
+    {self.app_section(city, lang)}
+    {self.after(city, lang)}
+  </div>
 </main>
 <script type="application/json" id="tt-data">{data}</script>
 <script src="{{root}}assets/timetable.js?v={{script_version}}" defer></script>
 '''
 
     def today_card(self, city: dict, lang: str, today: int) -> str:
-        """The app's Prayer screen in a card. Without script it is a calendar leaf for the day the
-        page was built and the day's five times; the script turns the ring into the countdown."""
+        """The app's Prayer screen in a card: the ring, the six times with sunrise, the pill after a
+        prayer the high-latitude rule set, the polar line, and the foot that says so. Without
+        script it is a calendar leaf for the day the page was built and that day's times; the
+        script turns the ring into the countdown and follows the reader's day."""
         cfg = self.langs[lang]
         t = cfg["timetable"]
         page = city["pages"][lang]
+        words = page["strings"]
         day = page["days"][today]
-        friday = city["days"][today]["friday"]
+        facts = city["days"][today]
         arabic_script = cfg["dir"] == "rtl"
         items = []
-        for p in OBLIGATORY:
+        for p, name in enumerate(page["prayers"]):
             pair = "" if arabic_script else f'<em lang="ar">{esc(self.arabic[p])}</em>'
-            tag = ""
+            tags = ""
             if p == DHUHR:
-                tag = f'<span class="tag" data-tt="jumuah"{"" if friday else " hidden"}>{esc(page["jumuah"])}</span>'
+                tags = f'<span class="tag" data-tt="jumuah"{"" if facts["friday"] else " hidden"}>{esc(page["jumuah"])}</span> '
+            tags += f'<span class="tag" data-rule="{p}"{"" if p in facts["setByRule"] else " hidden"}>{esc(words["setByRule"])}</span>'
+            sun = ' class="sun"' if p == SUNRISE else ""
             # The spaces are for screen readers: layout ignores them between the row's flex items.
-            items.append(f'<li data-p="{p}"><i></i><b>{esc(page["prayers"][p])}</b> {pair} {tag} <span class="t">{esc(day["times"][p])}</span></li>')
+            items.append(f'<li data-p="{p}"{sun}><i></i><b>{esc(name)}</b> {pair} {tags} <span class="t">{esc(day["times"][p])}</span></li>')
         month_title = heading(page["months"][0]["title"])
         return f'''<section class="today" aria-label="{attr(t["today"])}">
-      <div class="ring-box">{ring(0)}
+      <div class="today-head">
+        <div class="ring-box">{ring(0)}</div>
         <div class="ring-text"><span class="ring-label" data-tt="label">{esc(page["today"]["weekday"])}</span><span class="ring-count" data-tt="count">{esc(day["day"])}</span><span class="ring-at" data-tt="at">{esc(month_title)}</span></div>
       </div>
       <ol class="tl">{"".join(items)}</ol>
-      <p class="tt-stale" hidden>{esc(t["stale"])} <a href="{{home}}">{esc(t["cta_button"])}</a></p>
+      <p class="polar" data-tt="polar"{"" if facts["polar"] else " hidden"}>{esc(words["polarLine"])}</p>
+      <div class="today-foot">{MIHRAB_LIT}<span class="foot-text">{lead(t["card_foot"])}</span><a class="pill quiet small" href="#app">{esc(t["cta_button"])}</a></div>
+      <p class="tt-stale" hidden>{esc(t["stale"])} <a href="#app">{esc(t["cta_button"])}</a></p>
+    </section>'''
+
+    def qibla_line(self, city: dict, lang: str) -> str:
+        """The dial and one line: the bearing and the distance, or in Makkah itself, where a bearing
+        and "0 km to Makkah" mean nothing, that the Kaaba is there."""
+        t = self.langs[lang]["timetable"]
+        page = city["pages"][lang]
+        values = self.sentence_values(city, lang)
+        if at_kaaba(city):
+            return f'<p class="qibla-line"><span><b>{esc(page["qibla"])}</b> · {esc(t["qibla_here"])}</span></p>'
+        return (f'<p class="qibla-line">{dial(city["qibla"]["bearing"])}<span><b>{esc(page["qibla"])} {fill(t["qibla_bearing"], **values)}</b>'
+                f' · {fill(t["qibla_distance"], **values)}</span></p>')
+
+    def whence(self, city: dict, lang: str) -> str:
+        """"Where these times come from" (spec §3.3, R97): a folded explainer whose summary — the
+        authority line and the stamp's proof sentence — is always visible. Open, a checked place
+        shows the three steps of the app's About screen with the proof tiles and the minute
+        ruler; a cautious place shows its first step here (the rest is the cautious pages' work)."""
+        cfg = self.langs[lang]
+        t = cfg["timetable"]
+        page = city["pages"][lang]
+        words = page["strings"]
+        rtl = cfg["dir"] == "rtl"
+        comma = list_comma(lang)
+        cautious = city["entryClass"] == "C"
+        authority = page["method"]
+        if cautious:
+            line = (f'<b>{esc(words["whoseTitle"])}</b> · {esc(comma.join(page["members"]))}{esc(comma)}{esc(t["combined"])}'
+                    f' · {esc(t["not_affiliated_any"])}')
+            steps = [f'<li><h3>{esc(words["whoPublishes"])}</h3><p>{esc(words["cautiousBody"])}</p><p>{esc(t["not_affiliated_any"])}</p></li>']
+        else:
+            line = f'<b>{esc(words["whoseTitle"])}</b> · {esc(t["reproduced"])} · {esc(words["notAffiliated"])}'
+            ruler_words = {
+                "percent": t["ruler_percent"], "alt": plain(t["ruler_alt"], authority=authority),
+                "none": t["ruler_none"], "before": t["ruler_before"], "same": t["ruler_same"],
+                "one": t["ruler_one"], "two": t["ruler_two"], "three": t["ruler_three"],
+                "minute": plain(t["ruler_minute"], authority=authority),
+            }
+            tiles = (f'<div class="tiles">'
+                     f'<div class="tile"><b>{esc(words["statDaysValue"])}</b><span>{esc(words["statDays"])}</span></div>'
+                     f'<div class="tile zero"><b>{digits(0, t["digits"])}</b><span>{esc(words["statNever"])}</span></div>'
+                     f'<div class="tile"><b>{esc(words["statMinutes"])}</b><span>{esc(words["statAtMost"])}</span></div></div>')
+            ruler = (f'<figure class="ruler"><figcaption>{fill(t["ruler_caption"], authority=authority, fajr=page["prayers"][FAJR])}</figcaption>'
+                     f'{ruler_svg(city["proof"]["fajrShares"], rtl, ruler_words, t["digits"])}</figure>')
+            steps = [
+                f'<li><h3>{esc(words["whoPublishes"])}</h3><p>{esc(words["whoPublishesBody"])} {esc(words["notAffiliated"])}</p></li>',
+                f'<li><h3>{esc(words["howReproduces"])}</h3><p>{esc(t["no_copy"])}</p><p>{esc(words["methodIntro"])}</p></li>',
+                f'<li><h3>{esc(words["howChecked"])}</h3><p>{fill(t["replays"], authority=authority)}</p>{tiles}{ruler}</li>',
+            ]
+        return f'''<details class="whence" id="about">
+    <summary>
+      <span class="whence-line">{line}</span>
+      <span class="whence-proof">{esc(words["checkedThrough"])}</span>
+      <span class="whence-label">{esc(t["whence"])} {CHEVRON}</span>
+    </summary>
+    <div class="whence-body"><ol class="steps">{"".join(steps)}</ol></div>
+  </details>'''
+
+    def app_section(self, city: dict, lang: str) -> str:
+        """The app, once (spec §3.5, R98): the pitch, four checked points, the stores block the home
+        hero uses — the official badges once a store is live, the coming-soon line until then —
+        and the platforms line."""
+        cfg = self.langs[lang]
+        t = cfg["timetable"]
+        values = self.sentence_values(city, lang)
+        points = "".join(f'<li>{CHECK}<span>{lead(t[key])}</span></li>'
+                         for key in ("app_point_adhan", "app_point_widgets", "app_point_qibla", "app_point_free"))
+        return f'''<section class="app" id="app" aria-labelledby="app-h">
+      <div class="icon-tile">{MIHRAB_LIT}</div>
+      <h2 id="app-h">{esc(t["app_title"])}</h2>
+      <p>{fill(t["app_body"], **values)}</p>
+      <ul class="points">{points}</ul>
+      {store_block(cfg, lang, beta_anchor=False)}
+      <p class="platforms">{esc(t["app_platforms"])}</p>
     </section>'''
 
     def month_section(self, city: dict, lang: str, m: int, first: int, count: int, today: int, other) -> str:
@@ -471,30 +625,13 @@ class Timetables:
 
         groups = []
         if same:
-            groups.append(f'<h2 class="label">{fill(t["other_cities"], **values)}</h2><div class="chips">{chips(same[:MAX_SAME_COUNTRY])}</div>')
+            groups.append(f'<div><h2>{fill(t["other_cities"], **values)}</h2><div class="chips">{chips(same[:MAX_SAME_COUNTRY])}</div></div>')
         if near:
-            groups.append(f'<h2 class="label">{fill(t["nearby"], **values)}</h2><div class="chips">{chips(near)}</div>')
-        groups.append(f'<div class="chips"><a class="all" href="../">{esc(t["all_cities"])}</a></div>')
-        return f'''<section class="after-month">
-    <div class="cta">
-      <div class="cta-copy"><span class="label">{esc(t["cta_label"])}</span><h2>{esc(t["cta_title"])}</h2>
-        <p>{fill(t["cta_body"], **values)}</p>
-        <div class="stores"><a class="pill" href="{{home}}">{MIHRAB} {esc(t["cta_button"])}</a></div></div>
-      <div class="cta-shot">{self.screenshot(lang)}</div>
-    </div>
-    <div class="nearby">{"".join(groups)}</div>
-  </section>'''
-
-    @functools.lru_cache(maxsize=None)
-    def screenshot(self, lang: str) -> str:
-        """The Prayer screen the language's own home page shows, light and dark, loaded lazily."""
-        with open(os.path.join(os.path.dirname(__file__), "pages", lang, "home.html"), encoding="utf-8") as f:
-            home = f.read()
-        match = re.search(r'<section class="wrap hero">.*?(<picture>.*?</picture>)', home, re.S)
-        if not match:
-            raise DataError(f"site/pages/{lang}/home.html has no hero screenshot to reuse")
-        picture = match.group(1).replace(' fetchpriority="high"', ' loading="lazy"')
-        return re.sub(r'alt="[^"]*"', 'alt=""', picture)
+            groups.append(f'<div><h2>{fill(t["nearby"], **values)}</h2><div class="chips">{chips(near)}</div></div>')
+        groups.append(f'<div><h2>{esc(t["more_times"])}</h2><div class="chips"><a class="all" href="../">{esc(t["all_cities"])}</a></div></div>')
+        groups.append(f'<div><h2>{esc(t["questions"])}</h2><div class="chips"><a href="{{support}}">{esc(cfg["nav_support"])}</a>'
+                      f'<a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a></div></div>')
+        return f'''<section class="after">{"".join(groups)}</section>'''
 
     def live_data(self, city: dict, lang: str, today: int) -> str:
         """What assets/timetable.js needs and cannot read from the markup: the zone, the instants,
@@ -504,7 +641,8 @@ class Timetables:
         days = []
         for facts, day in zip(city["days"], page["days"]):
             days.append({"d": facts["date"], "e": facts["epochs"], "f": 1 if facts["friday"] else 0,
-                         "full": day["full"], "hijri": day["hijriLong"], "t": day["times"]})
+                         "full": day["full"], "hijri": day["hijriLong"], "t": day["times"],
+                         "r": facts["setByRule"], "p": 1 if facts["polar"] else 0})
         data = {
             "tz": city["timeZone"],
             # The countdown's digits, which are the page's except where the app falls back to
@@ -579,8 +717,9 @@ class Timetables:
 
 def check_page(rel_path: str, doc: str, data: Timetables) -> list:
     """What --check asks of a prayer-time page beyond links and markup: a city page has both
-    months, each with a row for every day of that month and six times in each, and the live
-    data the script needs; an index lists every city that has a page in its language."""
+    months, each with a row for every day of that month and six times in each, the live data
+    the script needs, its folded explainer and its app section; an index lists every city that
+    has a page in its language."""
     problems = []
     parts = rel_path.split("/")
     if SECTION.rstrip("/") not in parts:
@@ -615,4 +754,7 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
         live = json.loads(match.group(1))
         if len(live["days"]) != sum(m["days"] for m in city["months"]):
             problems.append(f"timetable: {rel_path} live data covers {len(live['days'])} days")
+    for piece, name in (('<details class="whence"', "explainer"), ('<section class="app"', "app section")):
+        if doc.count(piece) != 1:
+            problems.append(f"timetable: {rel_path} has {doc.count(piece)} {name}s, not 1")
     return problems

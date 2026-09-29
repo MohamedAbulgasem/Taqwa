@@ -13,9 +13,10 @@ The prayer-time pages (a page per city and language, an index per language, and 
 the bottom of every home page) are rendered by site/timetables.py from the document
 tools/timetables writes with the app's own prayer-time engine; see that module.
 
-Where the app can be had lives in site/stores.json: a store is live once its address is set, and
-then its official badge replaces the "coming" line in every home page's hero, and — for the App
-Store — Safari's Smart App Banner appears on every page. Going live is that one edit and a push.
+Where the app can be had lives in site/stores.json, read by site/stores.py: a store is live once
+its address is set, and then its official badge replaces the "coming" line in every home page's
+hero and in the city pages' app places, and — for the App Store — Safari's Smart App Banner
+appears on every page. Going live is that one edit and a push.
 
 It also writes sitemap.xml (every page with its language alternates), robots.txt, and the
 404.html GitHub Pages serves for any address it has nothing for; each language's home page
@@ -44,13 +45,14 @@ import xml.etree.ElementTree as ET
 import markdown
 
 import timetables
+from stores import STORES, block as store_block, app_banner
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "site")
 OUT = os.path.join(ROOT, "_site")
 ORIGIN = "https://taqwa.world"
 
-SKIP = {"build.py", "timetables.py", "cities.tsv", "stores.json", "templates", "pages", "README.md", "__pycache__"}
+SKIP = {"build.py", "timetables.py", "stores.py", "cities.tsv", "stores.json", "templates", "pages", "README.md", "__pycache__"}
 
 # The order the picker lists them in: English first, then the app's own order.
 LANGUAGE_ORDER = ["en", "ar", "fr", "tr", "id", "ur", "bn"]
@@ -67,72 +69,10 @@ SITEMAP = []
 # section is not built at all: no index, no header or footer link, no home-page strip.
 PRAYER_TIMES_LIVE = True
 
-# Where the app can be had (site/stores.json). A store is live once its address is set: going live
-# is one edit there and a push. Until then the hero offers what exists — the Android beta while it
-# runs — and says which stores are coming, instead of buttons that lead nowhere. `exodus` is Exodus
-# Privacy's report on the Play build, linked from the privacy section once it exists.
-STORE_ADDRESSES = {
-    "google_play": r"https://play\.google\.com/store/apps/details\?id=world\.taqwa\.app",
-    "app_store": r"https://apps\.apple\.com/app/id\d+",
-    "exodus": r"https://reports\.exodus-privacy\.eu\.org/[\w/.-]+",
-}
-
-
-def load_stores() -> dict:
-    """site/stores.json, refused outright if an address is not one of that store's."""
-    with open(os.path.join(SITE, "stores.json"), encoding="utf-8") as f:
-        stores = json.load(f)
-    if set(stores) != set(STORE_ADDRESSES):
-        sys.exit(f"site/stores.json: expected exactly {sorted(STORE_ADDRESSES)}, found {sorted(stores)}")
-    for key, pattern in STORE_ADDRESSES.items():
-        if stores[key] is not None and not re.fullmatch(pattern, stores[key]):
-            sys.exit(f"site/stores.json: {stores[key]!r} is not a {key} address")
-    return stores
-
-
-STORES = load_stores()
+# The hero's stores block (site/stores.py) and the privacy section's Exodus row go where the home
+# page's markup marks them.
 STORES_MARKER = "<!-- stores -->"
 EXODUS_MARKER = "<!-- exodus -->"
-SOURCE_URL = "https://github.com/MohamedAbulgasem/Taqwa"
-
-# The stores' own badges, as their owners publish them, in site/assets/badges/: Apple's from
-# tools.applemediaservices.com, black for light pages and white for dark, in the languages Apple
-# translates "Download on the" into (English, French, Turkish, Indonesian; Arabic, Urdu and Bengali
-# get the English badge, and "App Store" is English everywhere); Google's from play.google.com's
-# badge page, in all seven. Both owners forbid redrawing or altering them, so they are only sized.
-# Google's PNGs carry their own clear space in one of two shapes, and are scaled so the badge
-# itself stands as tall as Apple's, 40 px. Widths are Apple's viewBox at that height.
-APP_STORE_BADGE_WIDTH = {"en": 120, "fr": 127, "tr": 151, "id": 120}
-GOOGLE_PLAY_BADGE_SIZE = {"fr": (134, 52), "tr": (134, 52), "id": (134, 52)}
-GOOGLE_PLAY_BADGE_DEFAULT = (155, 60)
-
-
-def store_block(cfg: dict, lang: str, body: str) -> str:
-    """The hero's ways to get the app: a badge per live store, the Android beta button while the
-    page still carries its beta section (tools/site-beta.py), and a line naming the stores still
-    to come."""
-    words = cfg["stores"]
-    items = []
-    if STORES["google_play"]:
-        width, height = GOOGLE_PLAY_BADGE_SIZE.get(lang, GOOGLE_PLAY_BADGE_DEFAULT)
-        items.append(
-            f'<a class="badge" href="{STORES["google_play"]}"><img src="{{root}}assets/badges/google-play-{lang}.png" '
-            f'width="{width}" height="{height}" alt="{html.escape(words["google_play_alt"])}"></a>')
-    if STORES["app_store"]:
-        badge = lang if lang in APP_STORE_BADGE_WIDTH else "en"
-        items.append(
-            f'<a class="badge" href="{STORES["app_store"]}"><picture>'
-            f'<source srcset="{{root}}assets/badges/app-store-{badge}-white.svg" media="(prefers-color-scheme: dark)">'
-            f'<img src="{{root}}assets/badges/app-store-{badge}-black.svg" width="{APP_STORE_BADGE_WIDTH[badge]}" '
-            f'height="40" alt="{html.escape(words["app_store_alt"])}"></picture></a>')
-    if 'id="beta"' in body:
-        items.append(f'<a class="pill" href="#beta">{html.escape(words["beta"], quote=False)}</a>')
-    coming = {(False, False): "coming_both", (True, False): "coming_app_store",
-              (False, True): "coming_google_play"}.get((bool(STORES["google_play"]), bool(STORES["app_store"])))
-    line = (html.escape(words[coming], quote=False) + " " if coming else "") + \
-        f'<a href="{SOURCE_URL}">{html.escape(words["source"], quote=False)}</a>{words["source_end"]}'
-    items.append(f'<span class="soon">{line}</span>')
-    return '<div class="stores">\n        ' + "\n        ".join(items) + "\n      </div>"
 
 
 def exodus_row(cfg: dict) -> str:
@@ -141,14 +81,6 @@ def exodus_row(cfg: dict) -> str:
     link = f'<a href="{STORES["exodus"]}">{html.escape(words["exodus_link"], quote=False)}</a>'
     return (f'<div class="row"><b>{html.escape(words["exodus_title"], quote=False)}</b>'
             f'<span>{html.escape(words["exodus_body"], quote=False).replace("{link}", link)}</span></div>')
-
-
-def app_banner() -> str:
-    """Safari's Smart App Banner, on every page once the App Store has the app, and on none before:
-    a banner for an app Safari cannot find shows nothing useful."""
-    if not STORES["app_store"]:
-        return ""
-    return f'  <meta name="apple-itunes-app" content="app-id={STORES["app_store"].rsplit("id", 1)[1]}">\n'
 
 
 def load_languages() -> dict:
@@ -406,7 +338,7 @@ def build_page(langs: dict, lang: str, page: str, template: str, data: timetable
     body = raw_body
     if page == "home":
         body = body.replace(timetables.HOME_MARKER, data.home_section(lang))
-        body = body.replace(STORES_MARKER, store_block(cfg, lang, body))
+        body = body.replace(STORES_MARKER, store_block(cfg, lang, beta_anchor='id="beta"' in body))
         row = exodus_row(cfg) if STORES["exodus"] else ""
         body = re.sub(r"\n[ \t]*" + re.escape(EXODUS_MARKER), lambda m: ("\n        " + row) if row else "", body)
     write_page(
@@ -502,6 +434,20 @@ def check_site(data: timetables.Timetables) -> int:
     pages = []
     alternates = {}
     texts = {}
+
+    # Every language says every sentence of the timetable pages itself: a key missing from one
+    # language would otherwise surface as a KeyError on the first city page that needs it, or as
+    # English on a page that is not.
+    english = data.langs["en"]["timetable"]
+    for language, cfg in data.langs.items():
+        keys, regions = set(cfg["timetable"]), set(cfg["timetable"].get("regions", {}))
+        if keys != set(english) or regions != set(english["regions"]):
+            problem(f"meta: {language} timetable keys differ from English: "
+                    f"missing {sorted((set(english) - keys) | (set(english['regions']) - regions))}, "
+                    f"extra {sorted((keys - set(english)) | (regions - set(english['regions'])))}")
+    for city in data.cities:
+        if city["slug"] == timetables.CHECKS_PAGE_SLUG:
+            problem(f"cities: the slug {timetables.CHECKS_PAGE_SLUG} is reserved for the checks page")
 
     def text_of(path: str) -> str:
         if path not in texts:

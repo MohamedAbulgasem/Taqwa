@@ -105,6 +105,8 @@
     var arc = card.querySelector(".ring-arc");
     var items = [].slice.call(card.querySelectorAll(".tl li"));
     var jumuah = card.querySelector('[data-tt="jumuah"]');
+    var rules = [].slice.call(card.querySelectorAll(".tl .tag[data-rule]"));
+    var polar = card.querySelector('[data-tt="polar"]');
     var stale = card.querySelector(".tt-stale");
     var fullDate = document.querySelector('[data-tt="full"]');
     var hijriDate = document.querySelector('[data-tt="hijri"]');
@@ -147,6 +149,12 @@
         li.querySelector(".t").textContent = day.t[+li.getAttribute("data-p")];
       });
       if (jumuah) jumuah.hidden = !day.f;
+      /* The app's "Set by rule" pill after a prayer the high-latitude rule set today, and its
+         line for a day the sun neither rises nor sets. */
+      rules.forEach(function (tag) {
+        tag.hidden = (day.r || []).indexOf(+tag.getAttribute("data-rule")) === -1;
+      });
+      if (polar) polar.hidden = !day.p;
       if (fullDate) fullDate.textContent = day.full;
       if (hijriDate) hijriDate.textContent = day.hijri;
       rows.forEach(function (row) {
