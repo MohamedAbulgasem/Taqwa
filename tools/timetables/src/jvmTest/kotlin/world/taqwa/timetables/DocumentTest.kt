@@ -266,17 +266,12 @@ class DocumentTest {
                 "Taqwa combines Islamic Foundation Toronto, Islamic Institute, MAC Masjid: each prayer once all have begun it.",
             s["cautiousBody"],
         )
-        // Task 6's strings are read the moment the app has them; until then the checked sentence
-        // names the members and the "before any of them" label is empty. The date is Canadian
-        // English's, as on a phone there ("December 31, 2026").
-        val through = Formats("en", "CA").longDate(LocalDate(2026, 12, 31))
-        val cautiousThrough = strings.getOrNull("en", "about_cautious_checked_through")
-        assertEquals(
-            cautiousThrough?.replace("%1\$s", through)
-                ?: strings.format("en", "about_checked_through", members.joinToString(", "), through),
-            s["checkedThrough"],
-        )
-        assertEquals(strings.getOrNull("en", "about_stat_never_before_any") ?: "", s["statNeverAny"])
+        // The app's cautious About screen's proof sentence and second tile (rulings R111 and R112):
+        // no date, and the tile names the timetable that decides each start.
+        assertEquals("Checked against the timetables followed here.", s["checkedThrough"])
+        assertEquals("starts before the timetable that decides it", s["statNeverAny"])
+        assertEquals(strings.get("ur", "about_cautious_checked"), page(toronto, "ur").map("strings")["checkedThrough"])
+        assertEquals(strings.get("ur", "about_stat_never_before_decider"), page(toronto, "ur").map("strings")["statNeverAny"])
         // The built day's members, seven epochs and seven clocks each, and the Maghrib cap's sentence only on a capped day.
         val todayIndex = dayIndex(LocalDate(2026, 9, 25))
         val dayMembers = city.list("days")[todayIndex]["members"] as List<*>
