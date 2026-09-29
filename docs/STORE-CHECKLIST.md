@@ -75,6 +75,10 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   then replaces its "coming" wording on all seven home pages, and the App Store one also turns on
   Safari's Smart App Banner on every page. Once the Play listing is public, request its report at
   reports.exodus-privacy.eu.org and set `exodus` to its address: the privacy section links it.
+  The city pages' three app places — the Today card's foot, the desktop pitch and the section
+  `#app` at the foot of every city page (`site/timetables.py`, through `site/stores.py`, the same
+  function as the hero) — switch with the same edit: after the build open one city page and check
+  the badge shows in the pitch and in `#app`.
 - **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
   `scripts/bump-version.sh`. Settings › About shows the name alone; Mohamed tells testers which
   build they are on.
@@ -176,7 +180,8 @@ costs days.
   S23 once before upload. The S23 and the LoopPhone carry debug-key-signed builds, so the Play copy
   will not install over them: uninstall first (bookmarks and tasbeeh counts are lost; backup is
   off by design).
-- Site: `site/pages/<lang>/home.html` store buttons get their real links as each store goes live.
+- Site: `site/pages/<lang>/home.html` store buttons get their real links as each store goes live,
+  and the city pages' app sections with them (no edit there: `site/stores.json` drives both).
 
 ## 5. Google Play, in console order
 
