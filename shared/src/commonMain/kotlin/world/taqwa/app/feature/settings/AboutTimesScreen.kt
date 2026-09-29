@@ -66,7 +66,7 @@ import world.taqwa.app.resources.about_authority_method_title
 import world.taqwa.app.resources.about_authority_unchecked_body
 import world.taqwa.app.resources.about_calculated_body
 import world.taqwa.app.resources.about_cautious_body
-import world.taqwa.app.resources.about_cautious_checked_through
+import world.taqwa.app.resources.about_cautious_checked
 import world.taqwa.app.resources.about_cautious_maghrib_cap
 import world.taqwa.app.resources.about_check_mosque_body
 import world.taqwa.app.resources.about_check_mosque_heading
@@ -95,7 +95,7 @@ import world.taqwa.app.resources.about_stat_at_most_after
 import world.taqwa.app.resources.about_stat_days_at_places
 import world.taqwa.app.resources.about_stat_minutes_value
 import world.taqwa.app.resources.about_stat_never_before
-import world.taqwa.app.resources.about_stat_never_before_any
+import world.taqwa.app.resources.about_stat_never_before_decider
 import world.taqwa.app.resources.about_stop_eating
 import world.taqwa.app.resources.about_sunni_body
 import world.taqwa.app.resources.about_sunni_heading
@@ -359,8 +359,8 @@ private fun CautiousContent(
     SectionHeading(stringResource(Res.string.about_which_decides))
     CautiousTable(state.members, state.combined, zone, format)
 
-    // The proof the site's cautious page shows from the same stamp (rulings R100 and R105): two
-    // tiles and the sentence, and nothing at all where the proof does not reach this place.
+    // The proof the site's cautious page shows from the same stamp (rulings R100, R105, R111 and
+    // R112): two tiles and the sentence, and nothing at all where the proof does not reach this place.
     cautiousProof(state.resolution, state.stamp)?.let { proof ->
         CardDivider()
         SectionHeading(stringResource(Res.string.about_how_checked))
@@ -368,12 +368,10 @@ private fun CautiousContent(
             tiles = listOf(
                 format.localizedDigits(proof.placeDays) to
                     stringResource(Res.string.about_stat_days_at_places, format.localizedDigits(proof.places)),
-                format.localizedDigits(0) to stringResource(Res.string.about_stat_never_before_any),
+                format.localizedDigits(0) to stringResource(Res.string.about_stat_never_before_decider),
             ),
         )
-        proof.provenThrough?.let { through ->
-            SectionBody(stringResource(Res.string.about_cautious_checked_through, format.longDate(through)))
-        }
+        SectionBody(stringResource(Res.string.about_cautious_checked))
     }
 
     if (onMatchMyMosque != null) {
@@ -383,24 +381,37 @@ private fun CautiousContent(
 }
 
 /**
- * What the cautious template's "How it was checked" shows (rulings R100 and R105, city-pages spec
- * §10): the stamp's place-days at its places for the first tile, the 0 starts before any member for
- * the second, and [provenThrough] for the sentence — the site's cautious page reads the same three
- * from the same stamp. Deliberately no "at most" figure: a cautious stamp is entry-wide, with no
- * unit rows, so its worst lateness would be another place's spread (Oslo would read Trondheim's
- * Isha, over two hours; Oslo's own is under half an hour).
+ * What the cautious template's "How it was checked" shows (rulings R100, R105, R111 and R112,
+ * city-pages spec §10): the stamp's place-days at its places for the first tile, and the 0 starts
+ * before the timetable that decides each of them for the second — the site's cautious page reads the
+ * same two from the same stamp.
+ *
+ * The second tile says "the timetable that decides it", never "any of them" (R111): the gate checks a
+ * start against the latest member's printed time, and a Maghrib the cap decided against the
+ * most-followed member's alone, so on a capped day another member's printed Maghrib is later than
+ * the shown one — exactly what [MaghribCap] says above the table. Deliberately no "at most" figure
+ * (R105): a cautious stamp is entry-wide, so its worst lateness would be another place's spread
+ * (Oslo would read Trondheim's Isha, over two hours; Oslo's own is under half an hour). And no date
+ * (R112): a cautious stamp's last date is the latest of *any* member's rows, which would claim the
+ * others through it (Oslo's Diyanet table runs a year past IRN's), until the stamps hold each
+ * member's own last date.
  */
-internal data class CautiousProof(val placeDays: Int, val places: Int, val provenThrough: LocalDate?)
+internal data class CautiousProof(val placeDays: Int, val places: Int)
 
 /**
  * [stamp] read into a [CautiousProof] where [resolution] is measured, and null — so nothing at all —
  * where there is no stamp or the place is not measured (spec §3.5, as the checked template does:
- * Vancouver lies beyond the places `ca.cautious`'s stamp was gated at). Pure so a test can check it
- * directly against a committed stamp.
+ * Vancouver lies beyond the places `ca.cautious`'s stamp was gated at). A stamp with unit rows proves
+ * only the units in them: the place's own row must be there and complete, as [measuredStartsWorst]
+ * requires of the checked template, never another unit's (the plan's units gate). No cautious stamp
+ * has unit rows today, and a cautious resolution carries no unit, so such a stamp would show nothing
+ * until the registry places cautious entries by unit — the same holding the site's proven rule
+ * applies. Pure so a test can check it directly against a committed stamp.
  */
 internal fun cautiousProof(resolution: Resolution, stamp: ProofStamp?): CautiousProof? {
     if (stamp == null || !resolution.measured) return null
-    return CautiousProof(stamp.placeDays, stamp.places, stamp.provenThrough?.let(LocalDate::parse))
+    if (stamp.worstLateByUnit.isNotEmpty() && measuredStartsWorst(resolution, stamp) == null) return null
+    return CautiousProof(stamp.placeDays, stamp.places)
 }
 
 /**

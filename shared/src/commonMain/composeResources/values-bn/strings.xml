@@ -322,8 +322,8 @@
     <string name="about_cautious_body">%1$s-এর মসজিদগুলো সরল বিশ্বাসে ভিন্ন ভিন্ন সময়সূচি মানে, আর কোনোটিই বেশিরভাগ মসজিদ মানে না। তাকওয়া %2$s একত্র করে: প্রতিটি নামাজ দেখানো হয় সবগুলোতে ওয়াক্ত শুরু হওয়ার পর।</string>
     <string name="about_cautious_maghrib_cap">আজ মাগরিব ব্যতিক্রম: এটি %1$s অনুসরণ করে, যে সময়সূচি সবচেয়ে বেশি মানা হয়, %2$s-এর পরের মাগরিব নয়।</string>
     <string name="about_which_decides">আজ কোন সময়সূচি কোন সময় ঠিক করছে</string>
-    <string name="about_stat_never_before_any">এগুলোর কোনোটির আগে শুরু</string>
-    <string name="about_cautious_checked_through">এখানে অনুসৃত সময়সূচিগুলোর সঙ্গে %1$s পর্যন্ত মিলিয়ে দেখা হয়েছে।</string>
+    <string name="about_stat_never_before_decider">যে সময়সূচি তা ঠিক করে, তার আগে শুরু</string>
+    <string name="about_cautious_checked">এখানে অনুসৃত সময়সূচিগুলোর সঙ্গে মিলিয়ে দেখা হয়েছে।</string>
     <string name="about_calculated_body">তাকওয়া %1$s-এর জন্য কোনো সরকারি সুন্নি সময়সূচি খুঁজে পায়নি, তাই সাবধানতার সঙ্গে নিজেই হিসাব করে: %2$s।</string>
     <string name="about_asr_heading">আসর</string>
     <string name="about_asr_known">%1$s: %3$s, কারণ %2$s-এর বেশিরভাগ মসজিদ এটি মানে।</string>

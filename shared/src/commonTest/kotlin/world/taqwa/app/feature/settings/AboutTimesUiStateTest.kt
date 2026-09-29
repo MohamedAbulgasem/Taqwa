@@ -84,20 +84,20 @@ class AboutTimesUiStateTest {
     }
 
     /**
-     * Rulings R100 and R105 (city-pages spec §10): a measured cautious place shows two proof tiles
-     * and a sentence — the stamp's place-days at its places, the 0 starts before any member, and the
-     * date the proof runs through — the same figures the site's cautious page shows from the same
-     * stamp. Toronto's are the committed `ca.toronto` stamp's: 1,400 days at 6 places through 31
-     * December 2026.
+     * Rulings R100, R105, R111 and R112 (city-pages spec §10): a measured cautious place shows two
+     * proof tiles — the stamp's place-days at its places, and the 0 starts before the timetable that
+     * decides each of them — and a sentence with no date; the same figures the site's cautious page
+     * shows from the same stamp. Toronto's are the committed `ca.toronto` stamp's: 1,400 days at 6
+     * places.
      */
     @Test
-    fun `a cautious place's proof is its stamp's place-days and places and its proven-through date`() {
+    fun `a cautious place's proof is its stamp's place-days and places`() {
         val toronto = Place(43.6532, -79.3832, "America/Toronto", "CA")
         val state = stateFor(toronto)
         assertIs<AboutTimesUiState.Cautious>(state)
         assertTrue(state.resolution.measured)
         val proof = requireNotNull(cautiousProof(state.resolution, state.stamp)) { "Toronto is measured and stamped" }
-        assertEquals(CautiousProof(placeDays = 1400, places = 6, provenThrough = LocalDate(2026, 12, 31)), proof)
+        assertEquals(CautiousProof(placeDays = 1400, places = 6), proof)
     }
 
     /**
@@ -119,21 +119,40 @@ class AboutTimesUiStateTest {
         assertNull(cautiousProof(vancouver.resolution, vancouver.stamp))
     }
 
-    /**
-     * Ruling R105: the cautious proof carries no "at most" figure at all. A cautious stamp is
-     * entry-wide, with no unit rows, so its worst lateness would be another place's spread: Oslo
-     * would read Trondheim's Isha (over two hours; Oslo's own is under half an hour).
-     */
+    /** Oslo is measured (the city pages publish it) and shows its `no.cautious` stamp's own figures. */
     @Test
-    fun `a cautious place's proof never carries the stamp's entry-wide worst`() {
+    fun `oslo is measured and shows its stamp's figures`() {
         val oslo = stateFor(Place(59.91273, 10.74609, "Europe/Oslo", "NO"))
         assertIs<AboutTimesUiState.Cautious>(oslo)
         assertEquals("no.cautious", oslo.resolution.entry.id)
+        assertTrue(oslo.resolution.measured)
         val stamp = requireNotNull(oslo.stamp)
-        assertTrue(stamp.worstLateByUnit.isEmpty())
-        assertTrue(stamp.worstLateMinutes.values.max() > 120)
-        val proof = requireNotNull(cautiousProof(oslo.resolution, stamp))
-        assertEquals(CautiousProof(stamp.placeDays, stamp.places, LocalDate.parse(stamp.provenThrough!!)), proof)
+        assertTrue(stamp.worstLateByUnit.isEmpty(), "no cautious stamp has unit rows today")
+        assertEquals(CautiousProof(stamp.placeDays, stamp.places), cautiousProof(oslo.resolution, stamp))
+    }
+
+    /**
+     * Review M2 (the plan's units gate): a cautious stamp with unit rows proves only the units in
+     * them. A cautious resolution carries no unit today, so such a stamp shows nothing; a resolution
+     * placed in one of its units shows the stamp's figures; one placed outside them, or in a unit
+     * whose row lacks a start the entry is checked on elsewhere, shows nothing — as the checked
+     * template's [measuredStartsWorst] decides. The rows are lateness counts only, never a time.
+     */
+    @Test
+    fun `a cautious stamp with unit rows proves only the place's own complete unit row`() {
+        val toronto = stateFor(Place(43.6532, -79.3832, "America/Toronto", "CA"))
+        assertIs<AboutTimesUiState.Cautious>(toronto)
+        assertNull(toronto.resolution.unitId)
+        val byUnit = requireNotNull(toronto.stamp).copy(
+            worstLateByUnit = mapOf(
+                "toronto" to mapOf("fajr" to 6, "sunrise" to 3, "dhuhr" to 5, "asrStandard" to 6, "maghrib" to 5, "isha" to 7),
+                "milton" to mapOf("sunrise" to 3, "dhuhr" to 5, "asrStandard" to 6, "maghrib" to 5, "isha" to 7),
+            ),
+        )
+        assertNull(cautiousProof(toronto.resolution, byUnit), "no unit: nothing, as the site holds the page")
+        assertEquals(CautiousProof(byUnit.placeDays, byUnit.places), cautiousProof(toronto.resolution.copy(unitId = "toronto"), byUnit))
+        assertNull(cautiousProof(toronto.resolution.copy(unitId = "milton"), byUnit), "Milton's row lacks Fajr")
+        assertNull(cautiousProof(toronto.resolution.copy(unitId = "ottawa"), byUnit), "no row for Ottawa")
     }
 
     private fun instantFor(day: PrayerDay, prayer: Prayer): Instant = when (prayer) {
