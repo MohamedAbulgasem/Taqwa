@@ -66,6 +66,7 @@ import world.taqwa.app.resources.about_authority_method_title
 import world.taqwa.app.resources.about_authority_unchecked_body
 import world.taqwa.app.resources.about_calculated_body
 import world.taqwa.app.resources.about_cautious_body
+import world.taqwa.app.resources.about_cautious_checked_through
 import world.taqwa.app.resources.about_cautious_maghrib_cap
 import world.taqwa.app.resources.about_check_mosque_body
 import world.taqwa.app.resources.about_check_mosque_heading
@@ -94,6 +95,7 @@ import world.taqwa.app.resources.about_stat_at_most_after
 import world.taqwa.app.resources.about_stat_days_at_places
 import world.taqwa.app.resources.about_stat_minutes_value
 import world.taqwa.app.resources.about_stat_never_before
+import world.taqwa.app.resources.about_stat_never_before_any
 import world.taqwa.app.resources.about_stop_eating
 import world.taqwa.app.resources.about_sunni_body
 import world.taqwa.app.resources.about_sunni_heading
@@ -136,11 +138,15 @@ sealed interface AboutTimesUiState {
      * printed a stray leading "; " (review fix). Cautious entries are Automatic's own, so this
      * mismatch would only ever come from a chosen Other method's adjustment or the Saudi rule
      * leaking in through a shared code path — never from the cautious entry itself.
+     *
+     * [stamp] is the cautious entry's own proof, like the two authority states' (ruling R100): the
+     * gate over every member's official days, read by [cautiousProof] into the tiles and sentence.
      */
     data class Cautious(
         override val resolution: Resolution,
         val members: List<Pair<Member, PrayerDay>>,
         val combined: PrayerDay,
+        val stamp: ProofStamp?,
     ) : AboutTimesUiState
 
     data class Calculated(override val resolution: Resolution) : AboutTimesUiState
@@ -164,7 +170,7 @@ fun aboutTimesUiState(engineDay: EngineDay, place: Place, date: LocalDate, hijri
             val zone = TimeZone.of(place.zoneId)
             val days = DayPipeline.members(resolution, date, zone, engineDay.school, hijriOffsetDays)
             val combined = DayPipeline.day(resolution, date, zone, engineDay.school, hijriOffsetDays)
-            AboutTimesUiState.Cautious(resolution, resolution.members.zip(days), combined)
+            AboutTimesUiState.Cautious(resolution, resolution.members.zip(days), combined, ProofStamps.of(resolution.entry.id))
         }
         AboutTemplate.CALCULATED -> AboutTimesUiState.Calculated(resolution)
     }
@@ -353,10 +359,48 @@ private fun CautiousContent(
     SectionHeading(stringResource(Res.string.about_which_decides))
     CautiousTable(state.members, state.combined, zone, format)
 
+    // The proof the site's cautious page shows from the same stamp (rulings R100 and R105): two
+    // tiles and the sentence, and nothing at all where the proof does not reach this place.
+    cautiousProof(state.resolution, state.stamp)?.let { proof ->
+        CardDivider()
+        SectionHeading(stringResource(Res.string.about_how_checked))
+        StatTilesRow(
+            tiles = listOf(
+                format.localizedDigits(proof.placeDays) to
+                    stringResource(Res.string.about_stat_days_at_places, format.localizedDigits(proof.places)),
+                format.localizedDigits(0) to stringResource(Res.string.about_stat_never_before_any),
+            ),
+        )
+        proof.provenThrough?.let { through ->
+            SectionBody(stringResource(Res.string.about_cautious_checked_through, format.longDate(through)))
+        }
+    }
+
     if (onMatchMyMosque != null) {
         CardDivider()
         MatchMyMosqueLink(onMatchMyMosque)
     }
+}
+
+/**
+ * What the cautious template's "How it was checked" shows (rulings R100 and R105, city-pages spec
+ * §10): the stamp's place-days at its places for the first tile, the 0 starts before any member for
+ * the second, and [provenThrough] for the sentence — the site's cautious page reads the same three
+ * from the same stamp. Deliberately no "at most" figure: a cautious stamp is entry-wide, with no
+ * unit rows, so its worst lateness would be another place's spread (Oslo would read Trondheim's
+ * Isha, over two hours; Oslo's own is under half an hour).
+ */
+internal data class CautiousProof(val placeDays: Int, val places: Int, val provenThrough: LocalDate?)
+
+/**
+ * [stamp] read into a [CautiousProof] where [resolution] is measured, and null — so nothing at all —
+ * where there is no stamp or the place is not measured (spec §3.5, as the checked template does:
+ * Vancouver lies beyond the places `ca.cautious`'s stamp was gated at). Pure so a test can check it
+ * directly against a committed stamp.
+ */
+internal fun cautiousProof(resolution: Resolution, stamp: ProofStamp?): CautiousProof? {
+    if (stamp == null || !resolution.measured) return null
+    return CautiousProof(stamp.placeDays, stamp.places, stamp.provenThrough?.let(LocalDate::parse))
 }
 
 /**
@@ -536,15 +580,18 @@ private fun SectionBody(text: String) {
     )
 }
 
-/** The three headline figures of the "how it was checked" section (spec §2.3, İstanbul mockup). */
+/**
+ * The headline figures of the "how it was checked" section (spec §2.3, İstanbul mockup): the
+ * checked template's three, the cautious template's two (ruling R105).
+ */
 @Composable
 private fun StatTilesRow(tiles: List<Pair<String, String>>) {
     val colors = LocalTaqwaColors.current
     Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
         tiles.forEach { (value, label) ->
-            // Equal thirds, start-aligned like the rest of the card: a long label ("starts before
-            // London Unified's") wraps inside its own third instead of taking the row and leaving
-            // the last figure a sliver one letter wide.
+            // Equal shares (thirds or halves), start-aligned like the rest of the card: a long label
+            // ("starts before London Unified's") wraps inside its own share instead of taking the
+            // row and leaving the last figure a sliver one letter wide.
             Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
                 Text(value, style = TaqwaText.rowLabel, color = colors.textPrimary)
                 Text(label, style = TaqwaText.caption, color = colors.textTertiary)

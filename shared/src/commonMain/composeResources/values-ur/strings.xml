@@ -321,6 +321,8 @@
     <string name="about_cautious_body">%1$s کی مساجد نیک نیتی سے مختلف نقشۂ اوقات پر چلتی ہیں، اور کسی ایک پر اکثریت نہیں۔ تقویٰ %2$s کو یکجا کرتا ہے: ہر نماز تب دکھائی جاتی ہے جب سب میں اس کا وقت شروع ہو چکا ہو۔</string>
     <string name="about_cautious_maghrib_cap">آج مغرب مستثنیٰ ہے: تقویٰ اس میں %1$s پر چلتا ہے، جو سب سے زیادہ مانا جانے والا نقشۂ اوقات ہے، نہ کہ %2$s کے بعد والے مغرب پر۔</string>
     <string name="about_which_decides">آج ہر وقت کون سا نقشۂ اوقات طے کرتا ہے</string>
+    <string name="about_stat_never_before_any">ان میں سے کسی کے وقت سے پہلے آغاز</string>
+    <string name="about_cautious_checked_through">یہاں رائج تمام نقشۂ اوقات سے %1$s تک ملا کر جانچا گیا۔</string>
     <string name="about_calculated_body">تقویٰ کو %1$s کے لیے کوئی سرکاری سنی نقشۂ اوقات نہیں ملا، اس لیے وہ احتیاط کے ساتھ خود حساب کرتا ہے: %2$s۔</string>
     <string name="about_asr_heading">عصر</string>
     <string name="about_asr_known">%1$s: %3$s، کیونکہ %2$s کی اکثر مساجد اسی پر چلتی ہیں۔</string>

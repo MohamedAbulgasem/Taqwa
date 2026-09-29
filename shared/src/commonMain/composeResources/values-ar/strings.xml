@@ -329,6 +329,8 @@
     <string name="about_cautious_body">تتبع المساجد في %1$s جداول مختلفة بحسن نية، ولا يتبع أغلبُها جدولًا واحدًا. يجمع تقوى بين %2$s: فيعرض كل صلاة بعد دخول وقتها فيها جميعًا.</string>
     <string name="about_cautious_maghrib_cap">المغرب استثناء اليوم: يتبع فيه تقوى %1$s، الجدول الأكثر اتباعًا، لا المغرب الأكثر تأخرًا في %2$s.</string>
     <string name="about_which_decides">أي جدول يحدّد كل وقت اليوم</string>
+    <string name="about_stat_never_before_any">بداية قبل أيٍّ منها</string>
+    <string name="about_cautious_checked_through">قورنت بالجداول المتّبعة هنا حتى %1$s.</string>
     <string name="about_calculated_body">لم يجد تقوى جدولًا سنيًا رسميًا في %1$s، لذا يحسب مواقيته احتياطًا: %2$s.</string>
     <string name="about_asr_heading">العصر</string>
     <string name="about_asr_known">%1$s: %3$s، لأن أغلب المساجد في %2$s تعمل به.</string>
