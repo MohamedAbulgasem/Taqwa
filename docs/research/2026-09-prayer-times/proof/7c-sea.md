@@ -217,40 +217,55 @@ as the 13 are — the brief's "if not" branch. Kemenag's horizon rule, as far as
 sunrise and Maghrib at a −1° or −2° sun altitude by kab/kota class (never the plain −0.833°), then
 the 2 min ihtiyat (−2 on syuruk), then the minute; its own elevation table is not published.
 
-**The five units** carry the app's own GeoNames points like the 13 (Kemenag's reference points are
-not published; myQuran's JSON carries none), the −1° horizon, radii 12 km (8 for Kota Yogyakarta,
-32 km²), and margins fitted by `Fitter.fit("id.kemenag/<id>")` over their 61 days plus a
-two-month allowance (`TWO_MONTH_ALLOWANCE` in Kemenag.kt). The allowance is what two months near the
-equinox cannot see, measured on the 13: each of them fitted over its own Sep–Oct 2026 capture alone
-against its full-year margins gives at most +24 s on Fajr (Banda Aceh, the 21–22 March days), −6 on
-sunrise, +15 on Dhuhr, +6 on Asr, +32 on Maghrib and +32 on Isha; the fitter's 5 s safety is added
-once more. That it is needed: Palembang's September-only Maghrib fit (−1 s) was a minute early on
-one held-out October day, and the 13's shared envelope was a minute early on Surabaya's Asr on one
-October day (Surabaya's printed times run about 10 s later than the engine's at its GeoNames point,
-a point offset its own margins absorb).
+**The five units** (fix round 1, ruling R104) carry the app's own GeoNames points like the 13
+(Kemenag's reference points are not published; myQuran's JSON carries none) and the −1° horizon, and
+are fitted exactly as the 13 were: Kemenag's whole 2026 for each was fetched on 29 Sep 2026 from the
+same endpoint as the 13's files (its Sep–Oct rows equal the monitor's capture on every day), split
+Jan–Sep fit / Oct–Dec test, `Fitter.fit("id.kemenag/<id>")` at safety 5 s. The Jan–Sep fit alone
+holds Oct–Dec at all five (0 early, 0 late ends, worst 1 min); the registry's margins are fitted over
+both halves, as the 13's are (the two differ by at most 6 s on any event: Yogyakarta's Fajr, decided
+by a November day). Margins (seconds, F/S/D/A/M/I): Medan +4/−14/+62/+27/+4/+4; Palembang
++8/−18/+70/+16/+23/+19; Semarang +3/−14/+63/+12/+16/+17; Surabaya +22/−8/+77/+36/+36/+33 (its printed
+times run about 10 s later than the engine's at its GeoNames point, a point offset its own margins
+absorb); Yogyakarta +9/−10/+80/+18/+34/+27. A first version of this round fitted the five on the
+monitor's two months plus an allowance drawn from the 13; the review showed the allowance was a
+sample maximum, not a bound (a leave-one-out test failed at Banda Aceh's Fajr on 21 March), and the
+whole year was published, so it was replaced by the year.
 
-Per-unit fits over Sep–Oct 2026 (seconds; the registry holds fit + allowance): Medan Fajr +1,
-sunrise −11, Dhuhr +61, Asr +5, Maghrib +2, Isha +1; Palembang +4, −9, +62, +12, +6, +5; Semarang
-+1, −13, +62, +12, −2, +2; Surabaya +15, +1, +75, +36, +17, +18; Yogyakarta +3, −8, +65, +16, +3, +5.
+**Every unit's reach (ruling R103).** Kemenag prints one table per kabupaten/kota and a user follows
+their own, so a unit's circle stays inside its own kab/kota: its radius is the distance from its point
+to the nearest boundary of a kabupaten/kota Kemenag prints separately, measured on OpenStreetMap's
+administrative boundaries (admin_level 5, Overpass, 29 Sep 2026; point-to-segment distances over each
+neighbour's rings), rounded down to a whole km. Where a coastline is nearer than any neighbour
+(Makassar 2.6 km, Jayapura 0.1, Semarang 4.2, Surabaya 4.9) the sea bounds no table and the circle
+may cross it. Radii, km (the nearest neighbour and its distance): Kota Jakarta 8 (Bekasi 8.35; the
+R46 reach unit beyond it is unchanged), Banda Aceh 1 (Aceh Besar 1.44), Makassar 4 (Gowa 4.53),
+Denpasar 3 (Badung 3.88), Jayapura 9 (Kab. Jayapura 9.46), Malang 3 (Kab. Malang 3.14), Bandung 4
+(Kab. Bandung 4.32), Jayawijaya 13 (Yahukimo 13.82), Batu 3 (Kab. Malang 3.99), Bukittinggi 0 (Agam
+0.69: only its own point), Bogor 1 (Kab. Bogor 1.82), Garut 4 (Kab. Tasikmalaya 4.31), Wonosobo 10
+(Banjarnegara 10.46), Medan 3 (Deli Serdang 3.86), Palembang 1 (Banyuasin 1.19), Semarang 7 (Demak
+7.85), Surabaya 8 (Bangkalan 8.50, across the strait), Yogyakarta 1 (Bantul 1.82). Beyond the circle
+the edge applies as before these units existed (Jakarta: the R46 reach unit). The app's own places
+in the neighbouring kabupaten (Kasihan, Gamping Lor, Melati, Deli Tua, Sunggal, Mranggen, Kamal,
+Paseh, Margahayukencana, Dalung, Kuta, Batubulan) resolve to the edge, pinned by RegistryTest.
 
-Gate, `id-kemenag` group after the change: 36 rows, 18 places, 5,050 place-days (1,351 held out,
-390 in Ramadan), 0 early, 0 late ends, 0 over the class-B limit, worst 1 min at every unit — the
-five's 61 days each included (the September fit rows' October holdout: 0 early, 0 late ends, worst 1).
-Per place before → after (worst minutes): each of the five had sunrise 7 (an end, early), Maghrib 7,
-the other four events 3; now 1 on every event. The 13 are unchanged (worst 1).
+Gate, `id-kemenag` group after the round: 36 rows, 18 places, 6,570 place-days (1,656 held out, 540
+in Ramadan), 0 early, 0 late ends, 0 over the class-B limit, worst 1 min at every unit. Per place
+before → after (worst minutes): each of the five had sunrise 7 (an end, early), Maghrib 7, the other
+four events 3; now 1 on every event. The 13 are unchanged (worst 1).
 
 **Class (spec §5).** The evidence now reads: method rebuilt; 18 kab/kota across Sumatra, Java, Bali,
-Sulawesi and Papua; a year including Ramadan 1447 at 13 of them; never early on held-out data; at
-most 1 min after Kemenag's at every unit — every line of class A's row. What still holds it at B:
-the reference points are the app's, not Kemenag's own (spec §5's "a reference point not yet
-verified"; the residual levels differ between places by up to about 10 s, which the per-unit margins
-absorb but a verified point would remove), only one calendar year has ever been published (the
-held-out split is by date inside 2026, not a second year), and the five hold two months. Proposed
-ruling: `id.kemenag` stays class B; its fitted units become class A once Kemenag's 2027 tables (the
-monitor fetches them from November 2026) hold at each with the same margins — 0 early, 0 late ends,
-worst 1 min — a real year-over-year holdout that also answers the point question; the five join when
-they hold a full year, refitted without the allowance. The monitor's 28 Sep recaptures of the 13 are
-identical to the held files on every day, so they add no rows.
+Sulawesi and Papua; a year including Ramadan 1447 at every one of them; never early on held-out data
+(each place's Jan–Sep fit holds its Oct–Dec); at most 1 min after Kemenag's at every unit — every
+line of class A's row. What still holds it at B: the reference points are the app's, not Kemenag's
+own (spec §5's "a reference point not yet verified"; the residual levels differ between places by up
+to about 10 s, which the per-unit margins absorb but a verified point would remove), and only one
+calendar year has ever been published (the held-out split is by date inside 2026, not a second year).
+Proposed ruling: `id.kemenag` stays class B; its fitted units become class A once Kemenag's 2027
+tables (the monitor fetches them from November 2026) hold at each with the same margins — 0 early,
+0 late ends, worst 1 min — a real year-over-year holdout that also answers the point question. The
+monitor's 28 Sep recaptures of the 13 are identical to the held files on every day, so they add no
+rows.
 
 ## 7h's ADHAN2_ASR_ALLOWANCE (added to `other.singapore`, per the coordinator's message)
 
