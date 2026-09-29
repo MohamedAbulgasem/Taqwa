@@ -11,11 +11,13 @@ failure is recorded (`ctx.error`) or raised; either way it is a finding in the r
 of the run. Nothing fetched is ever committed: the archive is git-ignored and restricted.
 
 A key (London Prayer Times') never reaches a log, a state file or the report: every URL is written
-through `redact`, which masks the query parameters that carry one (review I5).
+through `redact`, which masks the query parameters that carry one, and every message a fetcher
+records or logs goes through `scrub`, which masks the values of the keys the run loaded (review I5).
 """
 import datetime as dt
 import gzip
 import hashlib
+import http.client
 import json
 import os
 import re
@@ -44,6 +46,25 @@ class FetchError(Exception):
 
 MASK = "***"
 
+# The values of the keys this run loaded (`Context.keys_env`), in every form they may take in a
+# message: as given, stripped, and URL-quoted. `scrub` masks them wherever a fetcher's words are
+# written (review I5: an exception that quotes a request path would otherwise carry the key).
+SECRETS = set()
+
+
+def remember_secret(value):
+    for form in (value, value.strip(), urllib.parse.quote(value, safe=""), urllib.parse.quote(value.strip(), safe="")):
+        if form and len(form) >= 4:
+            SECRETS.add(form)
+
+
+def scrub(text):
+    """`text` with every loaded key value masked."""
+    out = str(text)
+    for secret in sorted(SECRETS, key=len, reverse=True):
+        out = out.replace(secret, MASK)
+    return out
+
 
 def redact(url):
     """`url` with the value of every secret-carrying query parameter masked (review I5); the other
@@ -58,7 +79,7 @@ def redact(url):
     for pair in parts.query.split("&"):
         name, eq, value = pair.partition("=")
         masked.append(name + eq + (MASK if eq and name.lower() in SECRET_PARAMS else value))
-    return urllib.parse.urlunsplit(parts._replace(query="&".join(masked)))
+    return scrub(urllib.parse.urlunsplit(parts._replace(query="&".join(masked))))
 
 
 def host_of(url):
@@ -160,6 +181,10 @@ class Http:
                     time.sleep(5)
                     continue
                 raise last
+            except (http.client.HTTPException, ValueError) as e:
+                # A request the client refused to build or a reply it could not parse (InvalidURL quotes
+                # the whole request path, so its text is never repeated: only its kind and the masked URL).
+                raise FetchError(f"{type(e).__name__} for {shown}")
         raise last
 
     def _curl(self, url, headers, body, timeout):
@@ -197,7 +222,7 @@ class Http:
         try:
             return json.loads(body.decode("utf-8", "replace"))
         except ValueError as e:
-            raise FetchError(f"not JSON ({e}) from {redact(url)}: {body[:80]!r}")
+            raise FetchError(f"not JSON ({e}; {len(body)} bytes) from {redact(url)}")
 
 
 class Table:
@@ -231,8 +256,16 @@ class Table:
         self.raw = list(raw or [])
 
     def add(self, date, times):
-        """One day; a later call for the same date replaces the earlier (the newest fetch wins)."""
-        self.rows[date] = [norm_time(t) for t in times]
+        """One day; a later call for the same date replaces the earlier (the newest fetch wins). A
+        cell that is not a time raises, naming the cell's place, never its text (a printed time in
+        another notation would otherwise reach the report and the run log)."""
+        cells = []
+        for i, t in enumerate(times):
+            try:
+                cells.append(norm_time(t))
+            except FetchError:
+                raise FetchError(f"cell {i + 1} is not a time")
+        self.rows[date] = cells
 
     def lines(self):
         return [f"{d} {' '.join(self.rows[d])}" for d in sorted(self.rows)]
@@ -274,10 +307,10 @@ def norm_time(t):
         return "-"
     m = TIME_RE.match(s)
     if not m:
-        raise FetchError(f"not a time: {t!r}")
+        raise FetchError("not a time")
     h, mi = int(m.group(1)), int(m.group(2))
     if h > 30 or mi > 59:
-        raise FetchError(f"not a time: {t!r}")
+        raise FetchError("not a time")
     return f"{h:02d}:{mi:02d}"
 
 
@@ -369,12 +402,14 @@ class Context:
         return self.made
 
     def error(self, message):
+        message = scrub(message)
         self.log(f"  ERROR {message}")
-        self.errors.append(str(message))
+        self.errors.append(message)
 
     def note(self, message):
+        message = scrub(message)
         self.log(f"  {message}")
-        self.notes.append(str(message))
+        self.notes.append(message)
 
     def held(self, key):
         """The rows of this source's held table `key`, {} when none (append-style sources build on it)."""
@@ -382,7 +417,8 @@ class Context:
 
     def keys_env(self):
         """Secrets the owner keeps: <monitor>/keys.env (`NAME=value` lines, never in the repository) on
-        the Mac, the environment (a repository secret) in the cloud; the environment wins."""
+        the Mac, the environment (a repository secret) in the cloud; the environment wins. Values
+        are stripped (a pasted secret may carry a newline) and remembered for `scrub`."""
         out = {}
         path = os.path.join(self.monitor_dir, "keys.env")
         if os.path.exists(path):
@@ -393,8 +429,10 @@ class Context:
                         k, v = line.split("=", 1)
                         out[k.strip()] = v.strip()
         for name in ("LPT_API_KEY",):
-            if os.environ.get(name):
-                out[name] = os.environ[name]
+            if os.environ.get(name, "").strip():
+                out[name] = os.environ[name].strip()
+        for value in out.values():
+            remember_secret(value)
         return out
 
 

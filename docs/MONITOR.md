@@ -57,15 +57,23 @@ Each finding line is classified on its own, not each table:
 | 2 | **Backup did not run** | The mirror was configured (`TAQWA_OFFICIAL_BACKUP`) and did not run | Point it at the folder, or unset it where the private repository is the backup |
 | 3 | **Horizon** | A built-in date runs out: Umm al-Qura's dates (from six months before 31 Dec 2030), a clock-change entry's expiry (eight weeks before), London Unified's or IRN's current year not held (and, from 1 December and 1 November, the next), a proof older than twelve months, or from eight weeks before Ramadan an A/B entry whose proof does not cover it | Fetch the calendar named and add its gate rows; regenerate `UmmAlQuraDates` from the API's raw JSON; review `ClockChanges.table`. A proof older than twelve months stays quiet while a manual source in `sources.tsv` names the entry with a `next_expected` date still to come |
 | 3 | **Over the late limit in the gate** | Lateness over the recorded limit, or a capped Maghrib left unchecked, in the full gate: the stamp is red | Refit the margins or record the exception in the registry (rulings R37, R41); hold the most-followed member's table at that point |
-| 4 | **Over the late limit** (low) | Lateness over the recorded limit on a fetched table's own entry: raised the first time and whenever it worsens (more cells, or a higher worst) | Refit, or record the exception. Afterwards it is carried under "Still open since <date>" without raising the exit code, and the table is checked again every run until it is green |
+| 4 | **Over the late limit** (low) | Lateness over the recorded limit on a fetched table's own entry: raised the first time and whenever it worsens — a higher worst in minutes, or an event over the limit for the first time; a table that merely grew (more cells at the same worst) is never worse (ruling N2) | Refit, or record the exception. Afterwards it is carried under "Still open since <date>" without raising the exit code, and the table is checked again every run until it is green |
 | 5 | **Manual source due** | A source read by hand whose next edition was expected by now | Fetch it by hand, normalise it into the archive, add its gate rows, re-run the gate, move `next_expected` on |
-| — | **Informational** | "Still open" (above); "For the record": lateness measured on a member row (a cautious start waits for the latest member: the spread between members, not an engine error; the member's own entry is checked beside it), and a capped Maghrib left unchecked because the most-followed member's table is not held at that point (a coverage gap) | Nothing, or hold the missing member's table |
+| — | **Informational** | "Still open" (above); "For the record": lateness measured on a member row (a cautious start waits for the latest member: the spread between members, not an engine error; the member's own entry is checked beside it), and a capped Maghrib left unchecked because the most-followed member's table is not held at that point (a coverage gap); "Note": the archive repository's workflow file differs from the public template | Nothing, or hold the missing member's table; copy the workflow template over |
 | — | **Green** | New table, fine (a gate row is ready to paste); Changed table, fine; Green again (red last run); Checked again, fine (one line for all the held tables an engine change or `--check-all` re-checked) | Optional: add the row to the gate file (or the calendar to its survey) so the proof grows |
 
 The summary leads with the never-early count ("2 never-early failures (…), 3 other items (…)").
 The exit code is 1 on any attention. The notification, and the cloud issue, follow only when the
 attention set differs from the one last notified: a new item, an item gone, or a never-early item
-whose failing days or worst minutes grew.
+whose failing days or worst minutes grew. Every table is checked again when its content, its
+metadata, the engine, the checker's own code or (for a calendar) its survey's fault and outlier
+rows changed, and every run while it is red.
+
+**Partial runs (ruling N1).** `--only <source>` checks one source alone, so it cannot see the whole
+attention set: its report is written beside the day's as `reports/<date>-partial-<source>.md`,
+`latest.md` and the notified attention set are left as they were, no notification is posted, and
+in the cloud the issue is neither closed nor rewritten by it (a comment at most). The same holds for
+`-PskipFull=true` (the gate and the surveys left out).
 
 ## Running in the cloud (ruling R94)
 
@@ -74,38 +82,48 @@ restricted archive and the monitor's state. Setting it up, once:
 
 1. Create the private repository `MohamedAbulgasem/Taqwa-official` (empty, no README).
 2. In `~/Desktop/Workspace/apps/Taqwa-official` (the folder that holds `archive/` and `monitor/`):
-   `git init`, add a `.gitignore` with `monitor/lock/`, `monitor/keys.env` and `.DS_Store`, commit
-   `archive/` and `monitor/` (the state files hold paths relative to this folder, so the same state
-   serves the Mac and the runner), and push to the new repository. Never push it anywhere public,
-   and never add it as a remote of the public checkout.
+   `git init`, add a `.gitignore` with `monitor/lock/` (the run lock), `.*.tmp` (the atomic writers'
+   temp files), `monitor/keys.env` and `.DS_Store`, commit `archive/` and `monitor/` (the state
+   files hold paths relative to this folder, so the same state serves the Mac and the runner), and
+   push to the new repository. Never push it anywhere public, and never add it as a remote of the
+   public checkout.
 3. Copy `tools/timetables/monitor/ci/monitor-weekly.yml` from the public repository to
    `.github/workflows/monitor-weekly.yml` there and push.
 4. Optional: add the repository secret `LPT_API_KEY` (Settings › Secrets and variables › Actions)
    once London Prayer Times has issued a key; the fetcher reads it from the environment. Nothing
    else is secret.
-5. Run it once by hand: Actions › Taqwa monitor › Run workflow (the `options` field takes
-   `--no-fetch --check-all` for a check without a fetch, or `--only <source>`). The first run
-   exercises every fetcher from GitHub's addresses; a site that refuses them stays `manual` in
-   `sources.tsv`.
+5. Run it once by hand: Actions › Taqwa monitor › Run workflow (the `options` field takes only
+   `--no-fetch`, `--check-all`, `--verbose` and `--only <a source id of sources.tsv>`; anything
+   else stops the job). The first run exercises every fetcher from GitHub's addresses; a site that
+   refuses them stays `manual` in `sources.tsv`. Remember that `--only` is a partial run.
 
-Each run (Mondays 03:00 UTC, and on request) checks out the private repository at the root and
-the public one at `main` into `taqwa/`, installs Temurin 21 (with Gradle caching) and Python,
-runs `taqwa/scripts/monitor.sh --verbose` with `TAQWA_OFFICIAL` set to the workspace, then commits
-and pushes what the run added or changed under `archive/` and `monitor/` (new captures, the state,
-the report) and nothing else. The job fails only when the monitor itself failed (exit 2).
+Each run (Mondays 03:00 UTC, and on request) checks out the private repository at its branch's
+head and the public one at `main` into `taqwa/` (its credentials not kept), installs Temurin 21
+(with Gradle caching keyed on `gradle/libs.versions.toml` too) and Python, runs
+`taqwa/scripts/monitor.sh --verbose` with `TAQWA_OFFICIAL` set to the workspace, then commits what
+the run added or changed under `archive/` and `monitor/` (new captures, the state, the report) and
+nothing else, rebases it onto whatever arrived meanwhile (a run by hand, a queued run) and pushes,
+retrying once; when the push still fails the changes are kept as the artifact
+`monitor-run-changes-<run id>` and the job fails, so nothing captured is lost. The job fails
+whenever the monitor itself failed: an exit other than 0 or 1, or a result record
+(`monitor/last-run.json`) missing or older than the run's start. Every action is pinned by commit.
 
 **The issue.** One issue titled "Taqwa monitor", labelled `monitor-attention`, is open while
-something needs attention. Its body is the report's summary, the never-early index and each
-attention item's title (dates, counts and minutes, never a printed time); the full report is
-`monitor/latest.md` in the private repository. It is created or updated only when the attention
-set changed (always when the monitor itself failed), and closed with a one-line comment when a run
-is green. A Claude routine fired by that issue prepares fixes as pull requests (not set up yet).
+something needs attention. Its body (at most 60,000 characters, always ending with the pointer to
+the full report) is the report's summary, the never-early index and each attention item's title
+(dates, counts and minutes, never a printed time); the full report is `monitor/latest.md` in the
+private repository. It is created or updated only when the attention set changed (always when the
+monitor itself failed), a green full run closes it with a one-line comment and never opens one, and
+a partial run (`--only`) adds a comment at most. The same body is the job's step summary. When the
+private repository's `.github/workflows/monitor-weekly.yml` differs from the public template, the
+report says so under Informational. A Claude routine fired by that issue prepares fixes as pull
+requests (not set up yet).
 
 ## Running by hand on the Mac
 
     scripts/monitor.sh                          fetch, back up, check, report
     scripts/monitor.sh --no-fetch               check what is held (the gate, the surveys, the horizons)
-    scripts/monitor.sh --only sa-ummalqura      one source (a manual-cadence one runs only when named)
+    scripts/monitor.sh --only sa-ummalqura      one source: a partial run (its own report, nothing notified)
     scripts/monitor.sh --no-fetch --check-all   every held table again
     scripts/monitor.sh --verbose                with each step's progress
 
@@ -122,14 +140,20 @@ folder; `TAQWA_PYTHON` the interpreter (else Homebrew's `python3`, else the firs
 runs never overlap (`monitor/lock`). The Python code and its tests run under both the Mac's
 `/usr/bin/python3` (3.9, LibreSSL) and Homebrew's; a site the Mac's TLS stack cannot reach goes
 through `curl`. A notification is posted on macOS when the attention set changed, and always when
-the monitor itself failed. After a run by hand, commit and push `archive/` and `monitor/` in the
-private repository so the cloud run builds on the same state.
+the monitor itself failed; every early exit leaves `monitor/last-run.json` saying why (exit 2),
+except a run refused by the lock. The Mac and the cloud share one state through the private
+repository: **pull it before a run by hand** (`git pull` in `~/Desktop/Workspace/apps/Taqwa-official`),
+and **commit and push `archive/` and `monitor/` after**, so that neither side overwrites the
+other's `state.json` and `hashes.json`. A London key in `keys.env` (or the cloud's secret) is
+stripped, URL-quoted, and masked wherever the run writes.
 
 The state lives in `<official>/monitor/`: `hashes.json` (content hashes, last-fetch dates, each
 table's metadata), `state.json` (each table's check record and open lateness, the attention set
 last notified, the last backup reminder), `fetch/<date>.json` and `.log` (each run; logs older than
-90 days are pruned), `backup.json`, `last-run.json`, `diyanet-ids.json` (resolved district ids), and
-on the Mac `keys.env` for a key the owner holds (`LPT_API_KEY`), never in any repository.
+90 days are pruned), `backup.json`, `notes.json` (the shell's notes about the run's setup),
+`last-run.json`, `diyanet-ids.json` (resolved district ids; a corrupt cache is discarded and
+rebuilt), and on the Mac `keys.env` for a key the owner holds (`LPT_API_KEY`), never in any
+repository.
 
 ## Where things live
 

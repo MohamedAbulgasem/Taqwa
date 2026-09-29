@@ -38,6 +38,9 @@ enum class Kind(val tier: Int, val attention: Boolean, val heading: String) {
     /** Own-table lateness already raised and not worse: carried, without raising the exit code. */
     STILL_OPEN(6, false, "Still open"),
 
+    /** Something the run noticed about its own setup (the private repository's workflow file differs from the template). */
+    NOTE(6, false, "Note"),
+
     /**
      * Lateness measured on a member row (the spread between a cautious entry's members, not an
      * engine error) and capped Maghribs left unchecked (the most-followed member's table not held).
@@ -91,11 +94,17 @@ object Report {
     fun attention(items: List<Item>): List<Item> =
         items.filter { it.kind.attention }.sortedWith(compareBy({ it.kind.tier }, { it.group }, { -it.days }, { it.title }))
 
+    /** The most items the index line and the summary name; the rest is "and N more". */
+    private const val NAMED = 40
+
+    private fun named(items: List<Item>, separator: String): String =
+        items.take(NAMED).joinToString(separator) { it.label } + (if (items.size > NAMED) "${separator}and ${items.size - NAMED} more" else "")
+
     /** "Never early: N — a; b; c", or null when there is none. */
     fun index(items: List<Item>): String? {
         val never = attention(items).filter { it.kind == Kind.NEVER_EARLY }
         if (never.isEmpty()) return null
-        return "Never early: ${never.size} — ${never.joinToString("; ") { it.label }}"
+        return "Never early: ${never.size} — ${named(never, "; ")}"
     }
 
     /** The summary's first sentence, also the line the shell prints. */
@@ -106,7 +115,7 @@ object Report {
         val others = attention.filter { it.kind != Kind.NEVER_EARLY }
         val parts = mutableListOf<String>()
         parts += "${never.size} never-early failure${if (never.size == 1) "" else "s"}" +
-            (if (never.isEmpty()) "" else " (${never.joinToString(", ") { it.label }})")
+            (if (never.isEmpty()) "" else " (${named(never, ", ")})")
         if (others.isNotEmpty()) {
             val counts = others.groupingBy { it.kind }.eachCount()
             val kinds = Kind.entries.filter { counts.containsKey(it) }.joinToString(", ") { "${counts.getValue(it)} ${it.heading.lowercase()}" }
@@ -117,12 +126,15 @@ object Report {
 
     /**
      * The whole report. [fetched] says whether a fetch ran today; [changed] whether the attention
-     * set differs from the one last notified (null when nothing needs attention).
+     * set differs from the one last notified (null when nothing needs attention); [partial] names
+     * what a partial run was limited to (its report stands beside the day's, never as it).
      */
-    fun render(date: LocalDate, items: List<Item>, backup: String?, fetched: Boolean, changed: Boolean? = null): String = buildString {
-        appendLine("# Taqwa monitor — $date")
+    fun render(date: LocalDate, items: List<Item>, backup: String?, fetched: Boolean, changed: Boolean? = null, partial: String? = null): String = buildString {
+        appendLine("# Taqwa monitor — $date${if (partial != null) " (partial: $partial)" else ""}")
         appendLine()
-        append("**Summary.** ").append(summary(items))
+        append("**Summary.** ")
+        if (partial != null) append("Partial run ($partial): only what it covers is listed, the notified attention set and latest.md are untouched. ")
+        append(summary(items))
         if (changed == true) append(" The attention set changed since the last notification.")
         if (changed == false) append(" Nothing new since the last notification.")
         if (!fetched) append(" No fetch this run: the tables checked are the ones already held.")
@@ -180,19 +192,30 @@ object Report {
         }
     }
 
-    /** The issue's body (the cloud run): the summary and the never-early index, then each attention item's title. */
-    fun issueBody(date: LocalDate, items: List<Item>): String = buildString {
-        appendLine("**Taqwa monitor, $date.** ${summary(items)}")
-        index(items)?.let {
-            appendLine()
-            appendLine(it)
+    /** The most characters an issue body (GitHub refuses 65,536) or a step summary may hold, the pointer included. */
+    const val ISSUE_LIMIT = 60_000
+
+    /**
+     * The issue's body (the cloud run): the summary and the never-early index, then each attention
+     * item's title, cut to [ISSUE_LIMIT] characters and always ending with the pointer to the full
+     * report file in the archive repository.
+     */
+    fun issueBody(date: LocalDate, items: List<Item>, partial: String? = null): String {
+        val pointer = "\nThe full report is `monitor/latest.md` in the archive repository (restricted: it quotes dates, counts and minutes)."
+        val body = buildString {
+            appendLine("**Taqwa monitor, $date.** ${if (partial != null) "Partial run ($partial): " else ""}${summary(items)}")
+            index(items)?.let {
+                appendLine()
+                appendLine(it)
+            }
+            val attention = attention(items)
+            if (attention.isNotEmpty()) {
+                appendLine()
+                attention.forEachIndexed { i, item -> appendLine("${i + 1}. ${item.kind.heading} — ${item.title}") }
+            }
         }
-        val attention = attention(items)
-        if (attention.isNotEmpty()) {
-            appendLine()
-            attention.forEachIndexed { i, item -> appendLine("${i + 1}. ${item.kind.heading} — ${item.title}") }
-        }
-        appendLine()
-        appendLine("The full report is `monitor/latest.md` in the archive repository (restricted: it quotes dates, counts and minutes).")
+        val room = ISSUE_LIMIT - pointer.length - 2
+        val cut = if (body.length <= room) body else body.take(room).substringBeforeLast('\n') + "\n… (cut: the rest is in the report)\n"
+        return cut + pointer + "\n"
     }
 }

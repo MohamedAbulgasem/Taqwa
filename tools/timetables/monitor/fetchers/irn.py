@@ -3,13 +3,22 @@ Oslo, Trondheim and Tromsø through its WordPress AJAX call (action get_prayer_t
 nonce its page carries), twelve months per city. The page shows one year at a time (the current
 one; the next appears when IRN publishes it, usually in December), so a table is keyed by the year
 read off the page. Both Asr columns are printed (As, Ah), no imsak. Restricted: archive only."""
+import calendar
 import json
 import re
+import urllib.parse
 
 from common import FetchError, Table
 
 SOURCE = "no-irn"
 HOME = "https://bonnetid.info/"
+HOST = "bonnetid.info"
+# The month a reply names, in the site's Norwegian or in English, folded.
+MONTHS = {
+    "januar": 1, "january": 1, "februar": 2, "february": 2, "mars": 3, "march": 3, "april": 4, "mai": 5, "may": 5,
+    "juni": 6, "june": 6, "juli": 7, "july": 7, "august": 8, "september": 9, "oktober": 10, "october": 10,
+    "november": 11, "desember": 12, "december": 12,
+}
 
 # city (as the site's select names it, folded), unit id (no-irn.tsv), name, lat, lon
 CITIES = [
@@ -33,6 +42,9 @@ def page_config(page):
     nonce = cfg.get("nonce")
     if not ajaxurl or not nonce:
         raise FetchError(f"prayerAjax without ajaxurl or nonce ({sorted(cfg)})")
+    host = urllib.parse.urlsplit(ajaxurl).hostname or ""
+    if host != HOST and not host.endswith("." + HOST):
+        raise FetchError(f"the page's ajaxurl points at {host or '?'}, not {HOST}: not followed")
     cities = {}
     for sel in re.findall(r"<select[^>]*>(.*?)</select>", page, flags=re.S):
         opts = re.findall(r"<option[^>]*value=\"([^\"]*)\"[^>]*>([^<]*)</option>", sel)
@@ -45,11 +57,14 @@ def page_config(page):
     return ajaxurl, nonce, cities
 
 
-def parse_month(body):
-    """The AJAX month: rows of (day, [fajr, sunrise, dhuhr, asr1, maghrib, isha, asr2]) and the year the html names."""
+def parse_month(body, month=None):
+    """The AJAX month: rows of (day, [fajr, sunrise, dhuhr, asr1, maghrib, isha, asr2]) and the year
+    the html names. With `month`, a reply for another month is an error: the month the html names
+    must be it, or, where it names none, the rows must be as many as the month has days (a handler
+    that ignored the month asked for would otherwise store one month under all twelve)."""
     j = json.loads(body.decode("utf-8", "replace"))
     if not j.get("success"):
-        raise FetchError("success false (" + str(j)[:100] + ")")
+        raise FetchError("success false")
     h = j["data"]["html"] if isinstance(j.get("data"), dict) else str(j.get("data"))
     rows = []
     for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", h, flags=re.S):
@@ -57,8 +72,18 @@ def parse_month(body):
         if len(tds) >= 9 and tds[0].isdigit():
             fajr, sunr, dhuhr, asr1, asr2, magh, isha = tds[2:9]
             rows.append((int(tds[0]), [fajr, sunr, dhuhr, asr1, magh, isha, asr2]))
-    years = re.findall(r"\b(20\d\d)\b", re.sub(r"<[^>]+>", " ", h))
+    text = re.sub(r"<[^>]+>", " ", h)
+    years = re.findall(r"\b(20\d\d)\b", text)
     year = max(set(years), key=years.count) if years else None
+    if month is not None:
+        named = [MONTHS[w] for w in re.findall(r"[A-Za-z]+", text.lower()) if w in MONTHS]
+        if named:
+            if named[0] != month:
+                raise FetchError(f"the reply names month {named[0]}, not {month}")
+        else:
+            days = calendar.monthrange(int(year), month)[1] if year else None
+            if days is not None and len(rows) != days:
+                raise FetchError(f"the reply has {len(rows)} days, month {month} of {year} has {days}")
     return rows, year
 
 
@@ -77,7 +102,7 @@ def fetch(ctx):
             try:
                 body = ctx.http.get(ajaxurl, data={"action": "get_prayer_times", "nonce": nonce, "city": value, "month": month},
                                     headers={"X-Requested-With": "XMLHttpRequest", "Referer": HOME})
-                rows, year = parse_month(body)
+                rows, year = parse_month(body, month)
             except (FetchError, KeyError, ValueError) as e:
                 ctx.error(f"{name} month {month}: {e}")
                 continue

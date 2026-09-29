@@ -106,7 +106,7 @@ class TableCheckTest {
         assertTrue(item.details.any { "fajr: 10 early" in it }, item.toString())
         assertEquals(10, item.days)
         assertEquals(3, item.worst)
-        assertEquals("table:sg-muis/singapore", item.key)
+        assertEquals("table:sg-muis/singapore:never-early", item.key)
         assertTrue("2026-02-14..2026-02-23" in item.label, item.label)
         assertTrue(item.next != null && "never excused" in item.next, item.toString())
         // No printed time reaches the report: dates, counts and minutes only.
@@ -118,28 +118,77 @@ class TableCheckTest {
     fun `lateness over the limit on the table's own entry is raised once and carried until it worsens`() {
         // The starts printed five minutes earlier than the engine (sunrise as printed, Fajr's column not read,
         // so no end moves): never early, five minutes late, over MUIS's limit.
-        fun late(minutes: Int) = muisTable(-minutes, columns = "- S D A M I", shiftSunrise = 0)
-        val first = check.check(late(5), TableCheck.Status.NEW, today)
+        fun late(minutes: Int, columns: String = "- S D A M I", drop: String? = null) = muisTable(-minutes, drop = drop, columns = columns, shiftSunrise = 0)
+        val first = check.check(late(5, drop = "2026-02-23"), TableCheck.Status.NEW, today)
         val raised = first.item
         assertEquals(Kind.OWN_LATE, raised.kind, raised.toString())
         assertTrue(raised.kind.attention)
         assertTrue(first.red, "an open lateness keeps the table checked every run")
+        assertTrue(raised.details.first().startsWith("raised for the first time"), raised.toString())
         val record = first.lateness!!
         assertEquals(today, record.since)
         assertTrue(record.worst >= 5, record.toString())
-        assertTrue(record.days > 0)
+        assertEquals(setOf("dhuhr", "asrStandard", "maghrib", "isha"), record.events)
+        assertTrue(record.cells > 0)
         assertEquals("table:sg-muis/singapore:late", raised.key)
-        // The next run, nothing worse: still open, informational, the exit code untouched.
-        val carried = check.check(late(5), TableCheck.Status(false, false, true, record), LocalDate(2026, 10, 12))
-        assertEquals(Kind.STILL_OPEN, carried.item.kind, carried.item.toString())
-        assertTrue(!carried.item.kind.attention)
-        assertEquals(today, carried.item.since)
-        assertEquals(today, carried.lateness!!.since)
-        // Worse: raised again, its first date kept.
-        val worse = check.check(late(7), TableCheck.Status(false, true, true, record), LocalDate(2026, 10, 19))
+        // The next run, the table grew by a day (more cells, the same worst, the same events): still open,
+        // informational, the exit code untouched (ruling N2: growth alone is never worse).
+        val grown = check.check(late(5), TableCheck.Status(false, true, true, record), LocalDate(2026, 10, 12))
+        assertEquals(Kind.STILL_OPEN, grown.item.kind, grown.item.toString())
+        assertTrue(!grown.item.kind.attention)
+        assertEquals(today, grown.item.since)
+        assertEquals(today, grown.lateness!!.since)
+        assertTrue(grown.lateness!!.cells > record.cells, "the cells are recorded for the record")
+        assertEquals(record.worst, grown.lateness!!.worst, "the worst is a high-water mark")
+        // A higher worst: raised again, its first date kept, the high-water mark raised.
+        val worse = check.check(late(7), TableCheck.Status(false, true, true, grown.lateness), LocalDate(2026, 10, 19))
         assertEquals(Kind.OWN_LATE, worse.item.kind, worse.item.toString())
+        assertTrue(worse.item.details.first().startsWith("worse: the worst grew"), worse.item.toString())
         assertEquals(today, worse.lateness!!.since)
         assertEquals(record.worst + 2, worse.lateness!!.worst)
+        // Back to five minutes: not worse than the mark (carried), even though the cells changed.
+        val back = check.check(late(5), TableCheck.Status(false, true, true, worse.lateness), LocalDate(2026, 10, 26))
+        assertEquals(Kind.STILL_OPEN, back.item.kind, back.item.toString())
+        assertEquals(record.worst + 2, back.lateness!!.worst)
+        // An event over the limit for the first time (Fajr's column read now): raised again.
+        val newEvent = check.check(late(5, columns = "F+E S D A M I", drop = "2026-02-23"), TableCheck.Status(false, true, true, back.lateness), LocalDate(2026, 11, 2))
+        val kinds = newEvent.items.map { it.kind }
+        if (Kind.NEVER_EARLY !in kinds) {
+            assertEquals(Kind.OWN_LATE, newEvent.item.kind, newEvent.item.toString())
+            assertTrue(newEvent.item.details.first().startsWith("worse: fajr over the limit for the first time"), newEvent.item.toString())
+            assertTrue("fajr" in newEvent.lateness!!.events)
+        }
+    }
+
+    @Test
+    fun `a calendar whose cells are last year's capture re-dated is said so`() {
+        // The first calendar the UK survey lists, with an invented held capture for 2026 and the same cells fetched as 2027.
+        val listed = officialDir.resolve("survey/gb-cautious/calendars.tsv").readLines()
+            .filter { it.isNotBlank() && !it.startsWith("#") }.drop(1).map { it.split('\t') }.first { it[5] == "yes" && it[4] == "F S D A M I" }
+        val heldPath = listed[0]
+        val slug = heldPath.substringAfterLast('/').removeSuffix(".txt")
+        fun cells(year: Int, shiftDhuhr: Int = 0) = (1..40).joinToString("\n") { d ->
+            val date = LocalDate(year, 1, 1).plus(d - 1, DateTimeUnit.DAY)
+            val dh = 12 * 60 + 10 + d + shiftDhuhr
+            "$date 06:${(30 + d % 20).toString().padStart(2, '0')} 08:0${d % 10} ${dh / 60}:${(dh % 60).toString().padStart(2, '0')} 14:0${d % 10} 16:${(20 + d % 30).toString().padStart(2, '0')} 18:0${d % 10}"
+        }
+        official.resolve(heldPath).parentFile.mkdirs()
+        official.resolve(heldPath).writeText("# an invented held capture\n" + cells(2026) + "\n")
+        val path = "archive/tables/monitor/mawaqit/$slug.txt"
+        official.resolve(path).parentFile.mkdirs()
+        official.resolve(path).writeText("# the same cells fetched a year later\n" + cells(2027) + "\n")
+        val table = table("mawaqit", slug, path, null, listed[2].toDouble(), listed[3].toDouble(), "Europe/London", "GB", "F S D A M I", survey = "gb-cautious")
+        val plan = check.plan(table) as TableCheck.Plan.Calendar
+        assertEquals(slug, plan.held?.id)
+        val note = check.reDated(table, plan)
+        assertEquals(1, note.size, note.toString())
+        assertTrue("the survey's 2026 capture re-dated (40 of 40 days identical by month and day)" in note.single(), note.single())
+        // Cells that differ (a real 2027 calendar) say nothing.
+        official.resolve(path).writeText("# a real new year\n" + cells(2027, shiftDhuhr = 3) + "\n")
+        assertEquals(emptyList(), check.reDated(table, plan))
+        // The same year is not re-dating either.
+        official.resolve(path).writeText("# this year's\n" + cells(2026) + "\n")
+        assertEquals(emptyList(), check.reDated(table, plan))
     }
 
     @Test
@@ -147,6 +196,7 @@ class TableCheckTest {
         val outcome = check.check(table("x", "missing", "archive/tables/monitor/x/missing.txt", "sg.muis", null, null, "Asia/Singapore", "SG", "F S D A M I"))
         assertEquals(Kind.FETCH_BROKEN, outcome.item.kind)
         assertTrue(outcome.red)
+        assertEquals("table:x/missing:broken", outcome.item.key, "its own key: a table that turns unreadable is news beside its never-early item")
         assertTrue(outcome.item.details.any { "is not held" in it }, outcome.item.toString())
     }
 

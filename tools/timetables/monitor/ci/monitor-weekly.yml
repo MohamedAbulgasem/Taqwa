@@ -1,17 +1,22 @@
 # The weekly monitor in the cloud (docs/MONITOR.md, ruling R94). This file belongs in the PRIVATE
 # archive repository (MohamedAbulgasem/Taqwa-official) as .github/workflows/monitor-weekly.yml; the
-# public Taqwa repository only keeps this template. That repository holds the restricted archive
-# (archive/) and the monitor's state (monitor/) at its root, the layout TAQWA_OFFICIAL names.
+# public Taqwa repository only keeps this template, and a run says when the two differ. That
+# repository holds the restricted archive (archive/) and the monitor's state (monitor/) at its root,
+# the layout TAQWA_OFFICIAL names.
 #
-# Each run checks out the archive repository at the root and the public Taqwa repository at main
-# into taqwa/, runs scripts/monitor.sh, commits and pushes whatever the run added or changed under
-# archive/ and monitor/ (nothing else), and keeps one issue "Taqwa monitor" (label
+# Each run checks out the archive repository at its branch's head and the public Taqwa repository
+# at main into taqwa/, runs scripts/monitor.sh, commits and pushes whatever the run added or changed
+# under archive/ and monitor/ (nothing else; rebased onto what arrived meanwhile, retried once, and
+# kept as an artifact when the push still fails), and keeps one issue "Taqwa monitor" (label
 # monitor-attention) open while something needs attention: created or updated only when the
 # attention set changed (always when the monitor itself failed), closed with a one-line comment when
-# a run is green. The job itself fails only when the monitor itself failed (exit 2).
+# a full run is green (a green run never opens one). A partial run (--only) adds a comment at most.
+# The job fails when the monitor itself failed: an exit other than 0 or 1, a result record missing
+# or older than the run's start, or a push that could not land.
 #
 # No secret is ever echoed: the one optional secret, LPT_API_KEY (London Prayer Times), reaches the
-# fetcher through the environment alone, and every URL the monitor writes is masked.
+# fetcher through the environment alone, and every URL and message the monitor writes is masked.
+# Every action is pinned by commit (its version beside it, as the public workflows do).
 name: Taqwa monitor
 
 on:
@@ -20,7 +25,7 @@ on:
   workflow_dispatch:
     inputs:
       options:
-        description: "Options for scripts/monitor.sh, for example --no-fetch --check-all, or --only sa-ummalqura"
+        description: "Options for scripts/monitor.sh: --no-fetch, --check-all, --verbose, --only <a source id of sources.tsv> (a partial run)"
         required: false
         default: ""
 
@@ -38,28 +43,71 @@ jobs:
     timeout-minutes: 170
     env:
       TAQWA_OFFICIAL: ${{ github.workspace }}
+      BRANCH: ${{ github.ref_name }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - name: Check out the archive (this repository)
-        uses: actions/checkout@v4
+      - name: Check out the archive at the branch's head
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Check out Taqwa at main
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: MohamedAbulgasem/Taqwa
           ref: main
           path: taqwa
+          persist-credentials: false
 
       - name: Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
           java-version: "21"
           cache: gradle
+          cache-dependency-path: |
+            taqwa/gradle/libs.versions.toml
+            taqwa/gradle/wrapper/gradle-wrapper.properties
+            taqwa/tools/timetables/*.gradle.kts
 
       - name: Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.12"
+
+      - name: Check the options
+        id: options
+        env:
+          OPTIONS: ${{ github.event.inputs.options }}
+        run: |
+          # Only --no-fetch, --check-all, --verbose and --only <a source id listed in sources.tsv> pass;
+          # anything else stops the job before the monitor runs. The words never reach a shell unquoted.
+          set -euo pipefail
+          args=()
+          partial=false
+          expect_source=false
+          for word in $OPTIONS; do
+            if [ "$expect_source" = true ]; then
+              if [[ "$word" =~ ^[a-z0-9-]+$ ]] && grep -q "^${word}"$'\t' taqwa/tools/timetables/official/monitor/sources.tsv; then
+                args+=(--only "$word")
+                partial=true
+                expect_source=false
+                continue
+              fi
+              echo "::error::'$word' is not a source id of sources.tsv"
+              exit 1
+            fi
+            case "$word" in
+              --no-fetch|--check-all|--verbose) args+=("$word") ;;
+              --only) expect_source=true ;;
+              *) echo "::error::option '$word' is not allowed here"; exit 1 ;;
+            esac
+          done
+          if [ "$expect_source" = true ]; then echo "::error::--only needs a source id"; exit 1; fi
+          : > .monitor-args
+          for a in ${args[@]+"${args[@]}"}; do printf '%s\n' "$a" >> .monitor-args; done
+          echo "partial=$partial" >> "$GITHUB_OUTPUT"
+          echo "Options: ${args[*]:-none}"
 
       - name: Run the monitor
         id: run
@@ -67,69 +115,154 @@ jobs:
           LPT_API_KEY: ${{ secrets.LPT_API_KEY }}
         run: |
           set +e
-          taqwa/scripts/monitor.sh --verbose ${{ github.event.inputs.options }}
+          rm -f monitor/last-run.json
+          start=$(date +%s)
+          echo "start=$start" >> "$GITHUB_OUTPUT"
+          args=()
+          while IFS= read -r line; do [ -n "$line" ] && args+=("$line"); done < .monitor-args
+          rm -f .monitor-args
+          taqwa/scripts/monitor.sh --verbose ${args[@]+"${args[@]}"}
           code=$?
           echo "code=$code" >> "$GITHUB_OUTPUT"
           echo "The monitor exited $code"
 
+      - name: Read the result
+        id: result
+        if: always()
+        env:
+          CODE: ${{ steps.run.outputs.code }}
+          START: ${{ steps.run.outputs.start }}
+        run: |
+          # The record counts only when it is this run's: present, written after the run started, and
+          # its code 0 or 1. Anything else is "the monitor itself failed". Writes issue-body.md (at most
+          # 60,000 characters, ending with the pointer to the full report) and the step summary.
+          python3 - <<'PY'
+          import json, os, time
+          code = os.environ.get("CODE") or ""
+          start = int(os.environ.get("START") or "0")
+          path = "monitor/last-run.json"
+          record, fresh = {}, False
+          if os.path.isfile(path) and int(os.stat(path).st_mtime) >= start - 1:
+              try:
+                  record = json.load(open(path, encoding="utf-8"))
+                  fresh = True
+              except ValueError:
+                  record = {}
+          date = record.get("date") or time.strftime("%Y-%m-%d", time.gmtime())
+          valid = fresh and code in ("0", "1") and str(record.get("exit")) == code
+          if valid:
+              body = record.get("issue") or ""
+              summary = record.get("summary") or ""
+          else:
+              if fresh and str(record.get("exit")) == "2":
+                  reason = record.get("summary") or "no reason recorded"
+              elif fresh:
+                  reason = "the run exited %s but its record says %s" % (code or "?", record.get("exit"))
+              else:
+                  reason = "the run exited %s and wrote no result record (see the workflow log)" % (code or "?")
+              summary = reason if reason.startswith("The monitor itself failed") else "The monitor itself failed: " + reason
+              body = "**Taqwa monitor, %s.** %s\n" % (date, summary)
+          pointer = "\nThe full report is `monitor/latest.md` in the archive repository (restricted: it quotes dates, counts and minutes).\n"
+          limit = 60000
+          if len(body) + len(pointer) > limit:
+              body = body[: limit - len(pointer) - 40].rsplit("\n", 1)[0] + "\n… (cut: the rest is in the report)\n"
+          if not body.rstrip().endswith("minutes)."):
+              body = body.rstrip("\n") + "\n" + pointer
+          with open("issue-body.md", "w", encoding="utf-8") as f:
+              f.write(body)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write(body[:limit])
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("valid=%s\n" % str(valid).lower())
+              f.write("partial=%s\n" % str(bool(record.get("partial"))).lower())
+              f.write("changed=%s\n" % str(bool(record.get("attentionChanged"))).lower())
+              f.write("date=%s\n" % date)
+              f.write("summary=%s\n" % summary.replace("\n", " ")[:900])
+          print("valid" if valid else "not valid", "-", summary[:300])
+          PY
+
       - name: Commit what the run added or changed
+        id: commit
         if: always()
         run: |
+          # Only archive/ and monitor/, rebased onto whatever arrived meanwhile (a run by hand, a queued
+          # run), one retry; when the push still fails the changes are kept as an artifact and the job fails.
+          set -uo pipefail
           git config user.name "taqwa-monitor"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           rm -rf monitor/lock
           git add -A archive monitor
           if git diff --cached --quiet; then
             echo "Nothing to commit"
-          else
-            git commit -q -m "Monitor: run of $(date -u +%Y-%m-%d)"
-            git push
+            exit 0
           fi
+          git commit -q -m "Monitor: run of $(date -u +%Y-%m-%d)"
+          git diff --name-only HEAD~1 HEAD -- archive monitor > changed-files.txt
+          for attempt in 1 2; do
+            if git pull --rebase origin "$BRANCH" && git push origin "HEAD:$BRANCH"; then
+              echo "Pushed"
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "The push did not land (attempt $attempt)"
+            sleep 20
+          done
+          tar -czf monitor-run-changes.tgz -T changed-files.txt
+          echo "::error::the push was rejected twice; this run's changes are kept as the artifact monitor-run-changes"
+          echo "pushfailed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Keep the changes when the push failed
+        if: always() && steps.commit.outputs.pushfailed == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: monitor-run-changes-${{ github.run_id }}
+          path: monitor-run-changes.tgz
+          retention-days: 90
 
       - name: Open, update or close the issue
         if: always()
-        uses: actions/github-script@v7
         env:
+          GH_TOKEN: ${{ github.token }}
           CODE: ${{ steps.run.outputs.code }}
-        with:
-          script: |
-            const fs = require('fs');
-            const code = Number(process.env.CODE || '2');
-            const repo = { owner: context.repo.owner, repo: context.repo.repo };
-            const runUrl = `${context.serverUrl}/${repo.owner}/${repo.repo}/actions/runs/${context.runId}`;
-            let last = {};
-            try {
-              last = JSON.parse(fs.readFileSync('monitor/last-run.json', 'utf8'));
-            } catch (e) {
-              last = { date: new Date().toISOString().slice(0, 10), summary: 'The monitor wrote no result; see the workflow log.', attentionChanged: true, issue: '' };
-            }
-            const { data: open } = await github.rest.issues.listForRepo({ ...repo, state: 'open', labels: 'monitor-attention', per_page: 10 });
-            const existing = open.find(i => i.title === 'Taqwa monitor');
-            if (code === 0) {
-              if (existing) {
-                await github.rest.issues.createComment({ ...repo, issue_number: existing.number, body: `All green on ${last.date}; closed (${runUrl}).` });
-                await github.rest.issues.update({ ...repo, issue_number: existing.number, state: 'closed' });
-              }
-              return;
-            }
-            const changed = code === 2 || last.attentionChanged === true || !existing;
-            if (!changed) {
-              core.info('The attention set is as last notified; the issue stands as it is.');
-              return;
-            }
-            const body = `${last.issue || last.summary || ''}\n\nRun: ${runUrl}`;
-            if (existing) {
-              await github.rest.issues.update({ ...repo, issue_number: existing.number, body });
-              await github.rest.issues.createComment({ ...repo, issue_number: existing.number, body: `Updated on ${last.date}: ${last.summary}` });
-            } else {
-              try {
-                await github.rest.issues.getLabel({ ...repo, name: 'monitor-attention' });
-              } catch (e) {
-                await github.rest.issues.createLabel({ ...repo, name: 'monitor-attention', color: 'B60205', description: 'The weekly timetable monitor needs attention' });
-              }
-              await github.rest.issues.create({ ...repo, title: 'Taqwa monitor', body, labels: ['monitor-attention'] });
-            }
+          VALID: ${{ steps.result.outputs.valid }}
+          PARTIAL: ${{ steps.result.outputs.partial }}
+          CHANGED: ${{ steps.result.outputs.changed }}
+          RUN_DATE: ${{ steps.result.outputs.date }}
+          SUMMARY: ${{ steps.result.outputs.summary }}
+        run: |
+          set -euo pipefail
+          number="$(gh issue list --state open --label monitor-attention --limit 20 --json number,title --jq '[.[] | select(.title == "Taqwa monitor")][0].number // empty')"
+          failed=true
+          if [ "$VALID" = true ] && { [ "$CODE" = 0 ] || [ "$CODE" = 1 ]; }; then failed=false; fi
+          if [ "$failed" = false ] && [ "$PARTIAL" = true ]; then
+            # A partial run never closes, opens or rewrites the issue (ruling N1): a comment at most.
+            if [ -n "$number" ]; then gh issue comment "$number" --body "Partial run on $RUN_DATE ($RUN_URL): $SUMMARY"; fi
+            echo "Partial run: the issue stands as it is"
+            exit 0
+          fi
+          if [ "$failed" = false ] && [ "$CODE" = 0 ]; then
+            # A green week closes an open issue and never opens one.
+            if [ -n "$number" ]; then gh issue close "$number" --comment "All green on $RUN_DATE; closed ($RUN_URL)."; fi
+            echo "All green"
+            exit 0
+          fi
+          if [ "$failed" = false ] && [ "$CHANGED" != true ] && [ -n "$number" ]; then
+            echo "The attention set is as last notified; the issue stands as it is"
+            exit 0
+          fi
+          printf '\n\nRun: %s\n' "$RUN_URL" >> issue-body.md
+          gh label create monitor-attention --color B60205 --description "The weekly timetable monitor needs attention" --force >/dev/null 2>&1 || true
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file issue-body.md >/dev/null
+            gh issue comment "$number" --body "Updated on $RUN_DATE ($RUN_URL): $SUMMARY"
+            echo "Updated issue #$number"
+          else
+            gh issue create --title "Taqwa monitor" --label monitor-attention --body-file issue-body.md
+            echo "Opened the issue"
+          fi
 
-      - name: Fail the job when the monitor itself failed
-        if: always() && steps.run.outputs.code == '2'
-        run: exit 1
+      - name: Fail the job when the monitor itself failed or its changes did not land
+        if: always() && (steps.result.outputs.valid != 'true' || steps.commit.outputs.pushfailed == 'true')
+        run: |
+          echo "::error::the monitor itself failed (exit ${{ steps.run.outputs.code }}, result valid: ${{ steps.result.outputs.valid }}, push failed: ${{ steps.commit.outputs.pushfailed }})"
+          exit 1

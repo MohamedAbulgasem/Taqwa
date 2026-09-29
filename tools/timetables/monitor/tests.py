@@ -381,6 +381,12 @@ class Writes(unittest.TestCase):
         self.assertEqual(["2026-01-01"], sorted(t.rows))
         self.assertEqual(1, len(notes))
         self.assertIn("2026-01-02", notes[0])
+        # The cell's own text never reaches a message (a printed time in another notation would otherwise).
+        self.assertIn("cell 1 is not a time", notes[0])
+        self.assertNotIn("5h00", notes[0])
+        with self.assertRaises(FetchError) as caught:
+            muis.h24("7h12", 0)
+        self.assertNotIn("7h12", str(caught.exception))
 
 
 class Drivers(unittest.TestCase):
@@ -500,9 +506,167 @@ class MoreParsers(unittest.TestCase):
         month = json.dumps({"success": True, "data": {"html": "<h3>Januar 2027</h3><table>"
                             "<tr><td>1</td><td>x</td><td>06:40</td><td>09:15</td><td>12:25</td><td>13:20</td><td>13:50</td><td>15:30</td><td>17:15</td></tr>"
                             "<tr><td>2</td><td>x</td><td>06:39</td><td>09:14</td><td>12:26</td><td>13:21</td><td>13:52</td><td>15:32</td><td>17:16</td></tr></table>"}}).encode()
-        rows, year = irn.parse_month(month)
+        rows, year = irn.parse_month(month, 1)
         self.assertEqual("2027", year)
         self.assertEqual([(1, ["06:40", "09:15", "12:25", "13:20", "15:30", "17:15", "13:50"]), (2, ["06:39", "09:14", "12:26", "13:21", "15:32", "17:16", "13:52"])], rows)
+        # A reply for another month than the one asked for is refused: by the month it names, else by its day count.
+        with self.assertRaises(FetchError) as named:
+            irn.parse_month(month, 2)
+        self.assertIn("names month 1, not 2", str(named.exception))
+        unnamed = json.dumps({"success": True, "data": {"html": "<h3>2027</h3><table>"
+                              "<tr><td>1</td><td>x</td><td>06:40</td><td>09:15</td><td>12:25</td><td>13:20</td><td>13:50</td><td>15:30</td><td>17:15</td></tr></table>"}}).encode()
+        with self.assertRaises(FetchError) as counted:
+            irn.parse_month(unnamed, 3)
+        self.assertIn("has 1 days, month 3 of 2027 has 31", str(counted.exception))
         with self.assertRaises(FetchError):
             irn.page_config("<html>nothing</html>")
+        # The AJAX URL must be the site's own.
+        elsewhere = page.replace("https://bonnetid.info/wp-admin/admin-ajax.php", "https://evil.example/admin-ajax.php")
+        with self.assertRaises(FetchError) as host:
+            irn.page_config(elsewhere)
+        self.assertIn("evil.example, not bonnetid.info", str(host.exception))
         self.assertNotIn("(new)", str([c[1] for c in diyanet.EUROPE]))
+
+
+class FakeHttp:
+    """A client that answers from a table of URL -> body (bytes) or an exception, for fetchers under test."""
+
+    def __init__(self, answers):
+        self.answers = answers
+        self.urls = []
+        self.requests = 0
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1):
+        self.urls.append(url)
+        self.requests += 1
+        for prefix, answer in self.answers:
+            if url.startswith(prefix):
+                if isinstance(answer, Exception):
+                    raise answer
+                return answer
+        raise FetchError(f"no canned answer for {redact(url)}")
+
+    def text(self, url, **kw):
+        return self.get(url, **kw).decode("utf-8", "replace")
+
+    def json(self, url, **kw):
+        return json.loads(self.get(url, **kw).decode("utf-8", "replace"))
+
+
+class RoundTwo(unittest.TestCase):
+    """The second fix round: a key with a newline (I5), a partial fetch (N7), the id cache (M7)."""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-two")
+        os.makedirs(os.path.join(self.root, "archive"))
+        self.monitor = os.path.join(self.root, "monitor")
+        os.makedirs(self.monitor)
+        self.lines = []
+        self.had = os.environ.pop("LPT_API_KEY", None)
+        self._urlopen = common.urllib.request.urlopen
+        self._sleep = common.time.sleep
+        self._interval = common.MIN_INTERVAL
+        common.time.sleep = lambda s: None
+        common.MIN_INTERVAL = 0
+        common.SECRETS.clear()
+
+    def tearDown(self):
+        shutil.rmtree(self.root)
+        if self.had is not None:
+            os.environ["LPT_API_KEY"] = self.had
+        else:
+            os.environ.pop("LPT_API_KEY", None)
+        common.urllib.request.urlopen = self._urlopen
+        common.time.sleep = self._sleep
+        common.MIN_INTERVAL = self._interval
+        common.SECRETS.clear()
+
+    def ctx(self, source="x", http=None):
+        return Context(source, self.root, dt.date(2026, 10, 5), self.lines.append, self.monitor, http=http)
+
+    def test_a_key_with_a_trailing_newline_is_stripped_quoted_and_never_written(self):
+        # The owner pastes the secret with a trailing newline and an inner space; the client then refuses the
+        # request as InvalidURL, whose text quotes the whole request path. Nothing written may hold the key.
+        os.environ["LPT_API_KEY"] = "SEKRET KEY\n"
+        seen = []
+
+        def urlopen(req, timeout=None):
+            seen.append(req.full_url)
+            raise common.http.client.InvalidURL("URL can't contain control characters. " + repr(req.full_url) + " and SEKRET KEY")
+        common.urllib.request.urlopen = urlopen
+        store = Store(self.root, self.monitor, dt.date(2026, 10, 5))
+        ctx = self.ctx("gb-london-lupt")
+        status, message, requests, statuses = fetch.run_source({"source": "gb-london-lupt", "fetcher": "london"}, store, ctx)
+        store.source_done("gb-london-lupt", status, message, requests)
+        self.assertEqual("failed", status)
+        self.assertEqual({}, statuses)
+        self.assertEqual(12, len(seen))
+        self.assertTrue(all("key=SEKRET%20KEY&" in u and "\n" not in u for u in seen), seen[0])
+        for text in [message, "\n".join(self.lines), json.dumps(store.data)]:
+            self.assertNotIn("SEKRET", text)
+            self.assertNotIn("SEKRET%20KEY", text)
+        self.assertIn("InvalidURL for https://www.londonprayertimes.com/api/times/?format=json&key=***&year=", message)
+
+    def test_scrub_masks_a_loaded_key_in_every_form(self):
+        common.remember_secret("abc def\n")
+        self.assertEqual("x *** y *** z", common.scrub("x abc def y abc%20def z"))
+        self.assertEqual("nothing", common.scrub("nothing"))
+        ctx = self.ctx()
+        ctx.error("failed with abc def")
+        self.assertEqual(["failed with ***"], ctx.errors)
+        self.assertTrue(all("abc def" not in l for l in self.lines))
+
+    def test_only_a_complete_fetch_moves_last_fetch_on(self):
+        store = Store(self.root, self.monitor, dt.date(2026, 10, 5))
+        store.source_done("a", "partial", "one table broke", 3)
+        self.assertNotIn("lastFetch", store.data["sources"]["a"])
+        self.assertEqual("partial", store.data["sources"]["a"]["status"])
+        store.source_done("a", "ok", "", 3)
+        self.assertEqual("2026-10-05", store.data["sources"]["a"]["lastFetch"])
+        self.assertEqual(None, store.last_fetch("b"))
+
+    def muis_page(self, records, nxt, total):
+        return json.dumps({"result": {"records": records, "total": total, "_links": ({"next": nxt} if nxt else {})}}).encode()
+
+    def test_muis_merges_a_dataset_read_in_part_and_replaces_a_complete_one(self):
+        rec = {"_id": 1, "Date": "2026-01-01", "Subuh": "5:44", "Syuruk": "7:07", "Zohor": "1:06", "Asar": "4:29", "Maghrib": "7:11", "Isyak": "8:26"}
+        rec2 = dict(rec, _id=2, Date="2026-01-02")
+        website = json.dumps({"2026-01-02": {"subuh": "5:44am", "syuruk": "7:07am", "zohor": "1:06pm", "asar": "4:29pm", "maghrib": "7:11pm", "isyak": "8:26pm"}}).encode()
+        # Page two fails: the year table is merged into what is held, and the website half still runs.
+        http = FakeHttp([(muis.DATAGOV, self.muis_page([rec], "/api/page2", 2)), ("https://data.gov.sg/api/page2", FetchError("HTTP 429")), (muis.WEBSITE, website)])
+        tables = muis.fetch(self.ctx("sg-muis", http=http))
+        dataset = [t for t in tables if t.key == "singapore-2026"]
+        self.assertEqual(1, len(dataset))
+        self.assertTrue(dataset[0].merge, "a partial read merges")
+        self.assertTrue(any("read in part" in n for n in self.lines))
+        self.assertTrue(any(t.key == "website-2026" for t in tables))
+        # A complete pagination replaces the held table.
+        http = FakeHttp([(muis.DATAGOV, self.muis_page([rec], "/api/page2", 2)), ("https://data.gov.sg/api/page2", self.muis_page([rec2], None, 2)), (muis.WEBSITE, website)])
+        tables = muis.fetch(self.ctx("sg-muis", http=http))
+        dataset = [t for t in tables if t.key == "singapore-2026"][0]
+        self.assertFalse(dataset.merge)
+        self.assertEqual(["2026-01-01", "2026-01-02"], sorted(dataset.rows))
+
+    def test_a_corrupt_diyanet_id_cache_is_discarded_and_rebuilt_atomically(self):
+        path = os.path.join(self.monitor, "diyanet-ids.json")
+        with open(path, "w") as f:
+            f.write('{"countries": {"13": {"BERL')
+        ctx = self.ctx("tr-diyanet-europe")
+        ids = diyanet.Ids(ctx)
+        self.assertEqual({}, ids.data)
+        self.assertEqual(1, sum(1 for n in ctx.notes if "could not be read" in n))
+        ids.data = {"cities": {"berlin": "1"}}
+        ids.save()
+        with open(path) as f:
+            self.assertEqual({"cities": {"berlin": "1"}}, json.load(f))
+        self.assertFalse(any(n.endswith(".tmp") for n in os.listdir(self.monitor)))
+        self.assertEqual({"cities": {"berlin": "1"}}, diyanet.Ids(ctx).data)
+
+    def test_london_quotes_the_key_in_the_url(self):
+        with open(os.path.join(self.monitor, "keys.env"), "w") as f:
+            f.write("LPT_API_KEY=a b/c\n")
+        http = FakeHttp([(london.API, FetchError("HTTP 404"))])
+        self.assertEqual([], london.fetch(self.ctx("gb-london-lupt", http=http)))
+        self.assertEqual(1, len(http.urls), "a year the API lacks stops after its first month")
+        self.assertIn("key=a%20b%2Fc&", http.urls[0])

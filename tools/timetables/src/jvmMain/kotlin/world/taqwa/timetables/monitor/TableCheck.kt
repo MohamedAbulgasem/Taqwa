@@ -95,7 +95,7 @@ class TableCheck(
         }
 
     private fun broken(table: MonitorTable, reasons: List<String>): Outcome =
-        Outcome(listOf(Item(Kind.FETCH_BROKEN, "${table.id} could not be checked", reasons, CHECK_FIX, key = "table:${table.id}")), red = true, lateness = null)
+        Outcome(listOf(Item(Kind.FETCH_BROKEN, "${table.id} could not be checked", reasons, CHECK_FIX, key = "table:${table.id}:broken")), red = true, lateness = null)
 
     fun plan(table: MonitorTable): Plan {
         if (table.survey != null) return calendarPlan(table)
@@ -191,6 +191,7 @@ class TableCheck(
         var worstEarly = 0
         var lateCells = 0
         var lateWorst = 0
+        val lateEvents = sortedSetOf<String>()
         for (row in plan.rows) {
             val s = result.entries[row.entryId] ?: return broken(table, listOf("the gate read no day from it for ${row.entry}"))
             figures += figures(s, row)
@@ -204,7 +205,12 @@ class TableCheck(
             if (row.own) {
                 ownLate += late
                 lateCells += s.overLimit
-                lateWorst = maxOf(lateWorst, s.events.values.filter { it.over > 0 }.maxOfOrNull { it.worst } ?: 0)
+                for ((event, e) in s.events) {
+                    if (e.over > 0) {
+                        lateEvents += event.key
+                        lateWorst = maxOf(lateWorst, e.worst)
+                    }
+                }
             } else {
                 memberLate += late
             }
@@ -219,20 +225,29 @@ class TableCheck(
             val days = failingDates.size + outOfOrder
             items += Item(
                 Kind.NEVER_EARLY, head, figures + neverEarly.map { it.replace("\n", "; ") } + gateRows(table, plan), EARLY_LATE_FIX,
-                key = "table:${table.id}", days = days, worst = worstEarly, group = 0,
+                key = "table:${table.id}:never-early", days = days, worst = worstEarly, group = 0,
                 label = "${table.id} (${dateRanges(failingDates).take(3).joinToString(", ")}${if (dateRanges(failingDates).size > 3) ", …" else ""})",
             )
         }
         var lateness: Lateness? = null
         if (ownLate.isNotEmpty()) {
+            // Raised the first time, and again only when the worst grew or an event is over the limit for
+            // the first time (ruling N2): a table that merely grew, more cells at the same worst, is carried.
             val was = status.lateness
-            val worse = was == null || lateCells > was.days || lateWorst > was.worst
-            lateness = Lateness(was?.since ?: today, lateCells, lateWorst)
+            val newEvents = lateEvents - was?.events.orEmpty()
+            val worse = was == null || lateWorst > was.worst || newEvents.isNotEmpty()
+            lateness = Lateness(was?.since ?: today, maxOf(lateWorst, was?.worst ?: 0), was?.events.orEmpty() + lateEvents, lateCells)
+            val why = when {
+                was == null -> "raised for the first time"
+                lateWorst > was.worst -> "worse: the worst grew from ${was.worst} to $lateWorst min"
+                newEvents.isNotEmpty() -> "worse: ${newEvents.joinToString(", ")} over the limit for the first time"
+                else -> "not worse than when raised on ${was.since} (worst ${was.worst} min; ${was.events.sorted().joinToString(", ")})"
+            }
             val title = "$head: $lateCells cell${if (lateCells == 1) "" else "s"} over the late limit, worst $lateWorst min"
             items += if (worse) {
-                Item(Kind.OWN_LATE, title, figures + ownLate.map { it.replace("\n", "; ") } + gateRows(table, plan), LATE_FIX, key = "table:${table.id}:late", days = lateCells, worst = lateWorst)
+                Item(Kind.OWN_LATE, title, listOf(why) + figures + ownLate.map { it.replace("\n", "; ") } + gateRows(table, plan), LATE_FIX, key = "table:${table.id}:late", days = lateCells, worst = lateWorst)
             } else {
-                Item(Kind.STILL_OPEN, title, ownLate.map { it.replace("\n", "; ") }, key = "table:${table.id}:late", since = was!!.since)
+                Item(Kind.STILL_OPEN, title, listOf(why) + ownLate.map { it.replace("\n", "; ") }, key = "table:${table.id}:late", since = was!!.since)
             }
         }
         if (memberLate.isNotEmpty()) {
@@ -279,7 +294,7 @@ class TableCheck(
             return Outcome(
                 listOf(
                     Item(
-                        Kind.NEVER_EARLY, head, details, CALENDAR_FIX, key = "table:${table.id}", days = days, worst = worst, group = 0,
+                        Kind.NEVER_EARLY, head, details, CALENDAR_FIX, key = "table:${table.id}:never-early", days = days, worst = worst, group = 0,
                         label = "${table.id} (${ranges.take(3).joinToString(", ")}${if (ranges.size > 3) ", …" else ""})",
                     ),
                 ),
@@ -358,7 +373,7 @@ class TableCheck(
      * re-dated (review M6), and its clock-change days then fall on the old year's dates. Said when
      * the fetched year differs from the held capture's and the cells agree by month and day.
      */
-    private fun reDated(table: MonitorTable, plan: Plan.Calendar): List<String> {
+    internal fun reDated(table: MonitorTable, plan: Plan.Calendar): List<String> {
         val held = plan.held ?: return emptyList()
         val columns = table.columns.split(' ').filter { it.isNotEmpty() }
         if (columns != held.columns) return emptyList()

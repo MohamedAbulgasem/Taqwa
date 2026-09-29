@@ -152,8 +152,13 @@ data class Source(
     }
 }
 
-/** Own-table lateness over the limit, as first raised: since when, over how many cells, and the worst minutes. */
-data class Lateness(val since: LocalDate, val days: Int, val worst: Int)
+/**
+ * Own-table lateness over the limit as raised: since when, the [worst] minutes and the [events]
+ * ever seen over the limit (high-water marks, ruling N2: only a higher worst or a new event is
+ * worse, never more cells on a table that grew), and the [cells] over the limit last time (for the
+ * record only).
+ */
+data class Lateness(val since: LocalDate, val worst: Int, val events: Set<String>, val cells: Int)
 
 /**
  * What the monitor remembers of one table: the [signature] it was last checked with (content,
@@ -192,7 +197,11 @@ class MonitorState(private val file: File) {
             val r = v as? Map<String, Any?> ?: continue
             @Suppress("UNCHECKED_CAST")
             val late = (r["lateness"] as? Map<String, Any?>)?.let {
-                Lateness(LocalDate.parse(it["since"] as String), (it["days"] as? Long ?: 0L).toInt(), (it["worst"] as? Long ?: 0L).toInt())
+                Lateness(
+                    LocalDate.parse(it["since"] as String), (it["worst"] as? Long ?: 0L).toInt(),
+                    (it["events"] as? List<*>).orEmpty().mapNotNull { e -> e as? String }.toSet(),
+                    ((it["cells"] ?: it["days"]) as? Long ?: 0L).toInt(),
+                )
             }
             out[id] = CheckRecord(
                 r["signature"] as? String ?: "", r["hash"] as? String ?: "", LocalDate.parse(r["date"] as String),
@@ -228,7 +237,7 @@ class MonitorState(private val file: File) {
         values["checked"] = checked.toSortedMap().mapValues { (_, r) ->
             linkedMapOf<String, Any?>(
                 "signature" to r.signature, "hash" to r.hash, "date" to r.date.toString(), "red" to r.red,
-                "lateness" to r.lateness?.let { linkedMapOf("since" to it.since.toString(), "days" to it.days, "worst" to it.worst) },
+                "lateness" to r.lateness?.let { linkedMapOf("since" to it.since.toString(), "worst" to it.worst, "events" to it.events.sorted(), "cells" to it.cells) },
             ).filterValues { it != null }
         }
         writeAtomic(file, Json.pretty(values))

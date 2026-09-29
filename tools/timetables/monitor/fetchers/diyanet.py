@@ -12,7 +12,7 @@ import json
 import os
 import re
 
-from common import FetchError, Table, add_all
+from common import FetchError, Table, add_all, write_json
 
 SOURCE_TR = "tr-diyanet"
 SOURCE_EU = "tr-diyanet-europe"
@@ -105,20 +105,27 @@ def district_page(ctx, ilce):
 
 
 class Ids:
-    """The cached district ids of the European cities."""
+    """The cached district ids of the European cities (<monitor>/diyanet-ids.json). A cache that does
+    not read (a kill mid-write, a stray edit) is discarded, said once in the source's message, and
+    rebuilt from the site's own dropdowns; it is written atomically (review M7)."""
 
     def __init__(self, ctx):
         self.ctx = ctx
         self.path = os.path.join(ctx.monitor_dir, "diyanet-ids.json")
         self.data = {}
         if os.path.exists(self.path):
-            with open(self.path, encoding="utf-8") as f:
-                self.data = json.load(f)
+            try:
+                with open(self.path, encoding="utf-8") as f:
+                    loaded = json.load(f)
+                if not isinstance(loaded, dict):
+                    raise ValueError("not an object")
+                self.data = loaded
+            except (ValueError, OSError) as e:
+                ctx.note(f"diyanet-ids.json could not be read ({type(e).__name__}): the district ids are resolved again from the site")
+                self.data = {}
 
     def save(self):
-        os.makedirs(os.path.dirname(self.path), exist_ok=True)
-        with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, ensure_ascii=False, indent=1, sort_keys=True)
+        write_json(self.path, self.data)
 
     def districts(self, country):
         """{normalised name: (id, state name)} over every state of a country, fetched once."""

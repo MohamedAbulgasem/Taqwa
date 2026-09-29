@@ -8,6 +8,7 @@ parameters (year, month, format=json, 24hours=true); it has not been exercised w
 the first run with one may need a fix: a month whose response lacks a field is an error, never a
 silent "-", and a year the API does not have yet stops after its first month."""
 import json
+import urllib.parse
 
 from common import FetchError, Table
 
@@ -55,8 +56,9 @@ def fetch(ctx):
     year = ctx.today.year + 1 if ctx.today.month >= 10 else ctx.today.year
     t = Table(f"elm-{year}", f"LUPT {year}", None, None, "Europe/London", "GB", "F+E S D As M I Ah", entry="gb.london.lupt/gb.london.lupt", school="-",
               source_line=f"London Prayer Times API {API} (the East London Mosque's LUPT table, free for all use), year {year}")
+    quoted = urllib.parse.quote(key.strip(), safe="")
     for month in range(1, 13):
-        url = f"{API}?format=json&key={key}&year={year}&month={month}&24hours=true"
+        url = f"{API}?format=json&key={quoted}&year={year}&month={month}&24hours=true"
         try:
             body = ctx.http.get(url)
             for date, times in month_rows(body).items():

@@ -35,7 +35,7 @@ import traceback
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from common import Context, Http, Table, read_table_rows, runtime_line, write_atomic, write_json  # noqa: E402
+from common import Context, Http, Table, read_table_rows, runtime_line, scrub, write_atomic, write_json  # noqa: E402
 
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 SOURCES_TSV = os.path.join(REPO, "tools", "timetables", "official", "monitor", "sources.tsv")
@@ -141,10 +141,12 @@ class Store:
         return status
 
     def source_done(self, source, status, message, requests):
+        """Only a complete fetch moves `lastFetch` on: a partial one (a breaker, the budget, a table
+        that failed) is due again next run (review N7)."""
         entry = self.data["sources"].setdefault(source, {})
-        if status in ("ok", "partial"):
+        if status == "ok":
             entry["lastFetch"] = self.today.isoformat()
-        entry.update({"status": status, "message": message, "requests": requests, "lastRun": self.today.isoformat()})
+        entry.update({"status": status, "message": scrub(message), "requests": requests, "lastRun": self.today.isoformat()})
 
     def index_lines(self):
         lines = ["\t".join(INDEX_HEADER)]
@@ -183,7 +185,7 @@ def run_source(row, store, ctx):
         tables = list(module.fetch(ctx) or [])
     except Exception as e:  # a fetcher's failure is a finding, never a crash of the run
         ctx.error(f"{type(e).__name__}: {e}")
-        ctx.log(traceback.format_exc())
+        ctx.log(scrub(traceback.format_exc()))
     statuses = {}
     for t in tables:
         if not isinstance(t, Table) or not t.rows:
@@ -194,7 +196,7 @@ def run_source(row, store, ctx):
         except Exception as e:
             ctx.error(f"{t.key}: could not be written: {type(e).__name__}: {e}")
     status = "ok" if not ctx.errors else ("partial" if statuses else "failed")
-    message = "; ".join(ctx.errors + ctx.notes)[:4000]
+    message = scrub("; ".join(ctx.errors + ctx.notes)[:4000])
     return status, message, ctx.requests, statuses
 
 
@@ -222,13 +224,13 @@ def main(argv=None):
     log_file = open(os.path.join(monitor_dir, "fetch", today.isoformat() + ".log"), "a", encoding="utf-8")
 
     def log(line):
-        log_file.write(line + "\n")
+        log_file.write(scrub(line) + "\n")
         log_file.flush()
 
     def write_outcome(results, error=None):
         out = {"date": today.isoformat(), "sources": results}
         if error:
-            out["error"] = error
+            out["error"] = scrub(error)
         for name in ("latest.json", today.isoformat() + ".json"):
             write_json(os.path.join(monitor_dir, "fetch", name), out)
 
@@ -272,7 +274,7 @@ def main(argv=None):
         print(f"index: {index}")
         return 0
     except Exception:
-        error = traceback.format_exc()
+        error = scrub(traceback.format_exc())
         log(error)
         write_outcome(results, error=error)
         print(error, file=sys.stderr)

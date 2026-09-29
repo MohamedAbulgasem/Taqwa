@@ -20,7 +20,7 @@ def h24(value, index):
     suffix = None
     m = re.match(r"^(\d{1,2}[:.]\d{2})\s*(am|pm)?$", s)
     if not m:
-        raise FetchError(f"not a time: {value!r}")
+        raise FetchError("not a time")
     t = norm_time(m.group(1))
     suffix = m.group(2)
     h, mi = (int(x) for x in t.split(":"))
@@ -56,7 +56,7 @@ def parse_records(records, bad=None):
         except FetchError as e:
             if bad is None:
                 raise
-            bad.append(f"{r.get(keys['date'])}: {e}")
+            bad.append(f"record {r.get('_id', len(bad) + 1)}: {e}")
     return rows
 
 
@@ -80,7 +80,9 @@ def fetch(ctx):
     raw = []
     bad = []
     url = DATAGOV
-    # The dataset half; its failure leaves the website half to run (review M5).
+    # The dataset half; its failure leaves the website half to run (review M5). A pagination that
+    # did not complete is merged into the held tables instead of replacing them (review N7).
+    complete = False
     try:
         for page in range(20):
             body = ctx.http.get(url)
@@ -91,6 +93,7 @@ def fetch(ctx):
             rows.update(parse_records(records, bad))
             nxt = (result.get("_links") or {}).get("next")
             if not records or not nxt or len(rows) >= int(result.get("total") or 0):
+                complete = True
                 break
             url = "https://data.gov.sg" + nxt
         if not rows:
@@ -99,6 +102,8 @@ def fetch(ctx):
             ctx.note(f"data.gov.sg: {len(bad)} records skipped ({'; '.join(bad[:3])})")
     except (FetchError, ValueError, KeyError, TypeError) as e:
         ctx.error(f"data.gov.sg: {e}")
+    if rows and not complete:
+        ctx.note("data.gov.sg: the dataset was read in part; merged into the held tables, not replacing them")
     by_year = {}
     for date, times in rows.items():
         by_year.setdefault(date[:4], {})[date] = times
@@ -108,7 +113,7 @@ def fetch(ctx):
                   raw=raw if year == max(by_year) else [])
         for date, times in days.items():
             t.add(date, times)
-        t.merge = False
+        t.merge = not complete
         tables.append(t)
     try:
         body = ctx.http.get(WEBSITE)

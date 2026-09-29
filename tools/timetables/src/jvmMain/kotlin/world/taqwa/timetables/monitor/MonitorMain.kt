@@ -23,13 +23,19 @@ import kotlin.time.Clock
  *     [--only <source>]... [--check-all] [--skip-full]
  *
  * Reads what `fetch.py` wrote (the tables' index, the fetch log) and what the shell wrote about the
- * backup, checks every table whose signature (content, metadata, engine) differs from the one it was
- * last checked with and every table red last run ([TableCheck]), runs the whole gate and every
- * survey, the horizons ([Horizons]) and the manual sources' due dates, and writes the report to
- * `<state dir>/reports/<today>.md` and `latest.md`. `last-run.json` carries the exit code, the
- * summary line, whether the attention set changed since the last notification (the shell notifies,
- * the cloud run opens or updates its issue, only then), and the issue's body: 0 all green, 1
- * attention needed (2, the monitor itself failed, is the shell's, when this never gets to write it).
+ * backup and its own setup, checks every table whose signature (content, metadata, the engine, the
+ * checker, a calendar's survey rows) differs from the one it was last checked with and every table
+ * red last run ([TableCheck]), runs the whole gate and every survey, the horizons ([Horizons]) and
+ * the manual sources' due dates, and writes the report to `<state dir>/reports/<today>.md` and
+ * `latest.md`. `last-run.json` carries the exit code, the summary line, whether the attention set
+ * changed since the last notification (the shell notifies, the cloud run opens or updates its
+ * issue, only then), and the issue's body: 0 all green, 1 attention needed (2, the monitor itself
+ * failed, is the shell's, when this never gets to write it).
+ *
+ * A **partial** run (`--only`, or `--skip-full`) checks only part of what the attention set covers
+ * (ruling N1): it never changes the notified attention set, writes its report beside the day's as
+ * `reports/<today>-partial-<what>.md`, leaves `latest.md` alone, and says `partial` in
+ * `last-run.json`, so that nothing downstream closes or rewrites the issue from it.
  *
  * `--check-all` checks every held table; `--skip-full` leaves the whole gate and the surveys out
  * (a quick look at the fetched tables alone).
@@ -70,7 +76,7 @@ private fun fail(problem: String): Nothing {
     exitProcess(2)
 }
 
-class MonitorRun(val exitCode: Int, val summary: String, val report: String, val reportFile: File, val attentionChanged: Boolean)
+class MonitorRun(val exitCode: Int, val summary: String, val report: String, val reportFile: File, val attentionChanged: Boolean, val partial: Boolean)
 
 class Monitor(
     private val repo: File,
@@ -82,9 +88,17 @@ class Monitor(
     private val skipFull: Boolean,
     /** The committed stamps the horizons read; a test hands invented ones. */
     private val stampsDir: File = repo.resolve("tools/timetables/official/stamps"),
+    /** The gate files; a test hands an empty folder. */
+    private val gateDir: File = repo.resolve("tools/timetables/official/gate"),
+    /** The surveys run after the gate; a test hands none. */
+    private val surveys: List<SurveyFolder> = Surveys.all,
 ) {
     private val officialDir = repo.resolve("tools/timetables/official")
     private val roots = OfficialRoots(official, officialDir)
+
+    /** A run that does not cover everything the attention set covers (ruling N1). */
+    private val partial: Boolean get() = only.isNotEmpty() || skipFull
+    private val partialLabel: String get() = if (only.isNotEmpty()) only.sorted().joinToString("+") else "skip-full"
 
     fun run(): MonitorRun {
         val items = mutableListOf<Item>()
@@ -111,7 +125,8 @@ class Monitor(
                     "read the message: an endpoint moved or changed shape (fix the fetcher in tools/timetables/monitor/fetchers/, " +
                         "the raw response is under archive/raw/monitor/), a site refused the request (try by hand, respect its terms; " +
                         "if it stays closed, make the source manual in sources.tsv with the month its next edition is expected), or the " +
-                        "run's time budget was spent (a host that never answers trips the breaker after three failures).",
+                        "run's time budget was spent (a host that never answers trips the breaker after three failures). A source fetched " +
+                        "in part is due again next run.",
                     key = "fetch:${r.source}",
                 )
             }
@@ -129,8 +144,11 @@ class Monitor(
         }
 
         // 2. Each table whose signature differs from the one it was last checked with (its content,
-        //    its metadata, the engine), and each table red last run, until it is green (review I8).
+        //    its metadata, the engine, the checker's own code, a calendar's survey rows), and each
+        //    table red last run, until it is green (reviews I8, N9).
         val engineHash = Stamps.wholeEngineHash(repo)
+        val checkerHash = checkerHash(repo)
+        val surveyRows = SurveyRows(officialDir)
         val check = TableCheck(roots, officialDir)
         val records = state.checked
         // What today's fetch said of each table (new, changed, unchanged): a table the state does not
@@ -138,7 +156,7 @@ class Monitor(
         val fetched = if (fetchedToday) log!!.sources.flatMap { r -> r.tables.map { (key, s) -> "${r.source}/$key" to s } }.toMap() else emptyMap()
         for (table in index) {
             val record = records[table.id]
-            val signature = signature(table, engineHash)
+            val signature = signature(table, engineHash, checkerHash, surveyRows.of(table))
             if (!checkAll && record != null && record.signature == signature && !record.red) continue
             val status = TableCheck.Status(
                 isNew = fetched[table.id] == "new" || (record == null && table.fetched == today.toString()),
@@ -147,14 +165,15 @@ class Monitor(
             )
             val outcome = check.check(table, status, today)
             items += outcome.items
-            records[table.id] = CheckRecord(signature, table.hash, today, outcome.red, outcome.lateness)
+            // A partial run leaves the lateness record as it was: the next full run raises what it finds.
+            records[table.id] = CheckRecord(signature, table.hash, today, outcome.red, if (partial) record?.lateness else outcome.lateness)
         }
         if (only.isEmpty()) records.keys.retainAll(index.map { it.id }.toSet())
 
         // 3. The whole gate and every survey.
         if (!skipFull) {
             items += fullGate()
-            for (folder in Surveys.all) items += survey(folder)
+            for (folder in surveys) items += survey(folder)
         }
 
         // 4. Horizons.
@@ -175,25 +194,34 @@ class Monitor(
             }
         }
 
-        // 6. The backup: its reminder, or that it did not run (review I2).
+        // 6. The backup: its reminder, or that it did not run (review I2); and the shell's notes (review N8).
         val (backupItem, reminder) = backupStatus(BackupRun.load(monitorDir.resolve("backup.json")), state, fetchedToday)
         if (backupItem != null) items += backupItem
+        items += notes(monitorDir.resolve("notes.json"))
 
-        // 7. The attention set against the one last notified (ruling R93: notify on change only).
+        // 7. The attention set against the one last notified (ruling R93: notify on change only; a
+        //    tier-1 item counts as changed when its failing days or worst minutes grew). A partial run
+        //    never touches it (ruling N1).
         val attention = Report.attention(items)
-        val current = attention.associate { it.key to Notified(it.days, it.worst) }
+        val current = attention.associate { it.key to if (it.kind == Kind.NEVER_EARLY) Notified(it.days, it.worst) else Notified(0, 0) }
         val before = state.notified
-        val changed = current.keys != before.keys ||
-            current.any { (key, now) -> before[key]?.let { now.days > it.days || now.worst > it.worst } == true }
+        val changed = !partial && (
+            current.keys != before.keys ||
+                current.any { (key, now) -> before[key]?.let { now.days > it.days || now.worst > it.worst } == true }
+            )
         if (changed) state.notified = current
         val exitCode = if (attention.isNotEmpty()) 1 else 0
 
+        val label = if (partial) partialLabel else null
         val summary = Report.summary(items) + (if (reminder != null && "upload" in reminder) " Plus the backup reminder." else "")
-        val text = Report.render(today, items, reminder, fetchedToday, changed = if (attention.isEmpty() && before.isEmpty()) null else changed)
-        val reportFile = monitorDir.resolve("reports/$today.md")
+        val text = Report.render(
+            today, items, reminder, fetchedToday,
+            changed = if (partial || (attention.isEmpty() && before.isEmpty())) null else changed, partial = label,
+        )
+        val reportFile = monitorDir.resolve(if (partial) "reports/$today-partial-$partialLabel.md" else "reports/$today.md")
         writeAtomic(reportFile, text)
-        writeAtomic(monitorDir.resolve("latest.md"), text)
-        state.note("lastRun", linkedMapOf("date" to today.toString(), "exit" to exitCode, "summary" to summary))
+        if (!partial) writeAtomic(monitorDir.resolve("latest.md"), text)
+        state.note(if (partial) "lastPartialRun" else "lastRun", linkedMapOf("date" to today.toString(), "exit" to exitCode, "summary" to summary))
         state.save()
         val reportPath = reportFile.absoluteFile.relativeToOrNull(official.absoluteFile)?.invariantSeparatorsPath ?: reportFile.path
         writeAtomic(
@@ -201,26 +229,44 @@ class Monitor(
             Json.pretty(
                 linkedMapOf(
                     "date" to today.toString(), "exit" to exitCode, "summary" to summary, "report" to reportPath,
+                    "partial" to partial, "partialOf" to label,
                     "attentionChanged" to changed, "neverEarly" to attention.count { it.kind == Kind.NEVER_EARLY },
-                    "attention" to attention.size, "issue" to Report.issueBody(today, items),
+                    "attention" to attention.size, "issue" to Report.issueBody(today, items, label),
                 ),
             ),
         )
-        return MonitorRun(exitCode, summary, text, reportFile, changed)
+        return MonitorRun(exitCode, summary, text, reportFile, changed, partial)
     }
 
-    /** What a check depends on: the table's content and metadata, and the whole engine. */
-    private fun signature(table: MonitorTable, engineHash: String): String {
+    /** What a check depends on: the table's content and metadata, the whole engine, the checker's own code, the survey rows that cover it. */
+    private fun signature(table: MonitorTable, engineHash: String, checkerHash: String, surveyRows: String): String {
         val digest = MessageDigest.getInstance("SHA-256")
-        digest.update(table.metadata.toByteArray())
-        digest.update(0)
-        digest.update(engineHash.toByteArray())
+        for (part in listOf(table.metadata, engineHash, checkerHash, surveyRows)) {
+            digest.update(part.toByteArray())
+            digest.update(0)
+        }
         return digest.digest().joinToString("") { "%02x".format(it) }.take(24)
+    }
+
+    /** The faults and outliers a survey records for one calendar (and for every calendar, `*`), as text. */
+    private class SurveyRows(private val officialDir: File) {
+        private val cache = HashMap<String, List<String>>()
+
+        fun of(table: MonitorTable): String {
+            val folder = table.survey ?: return ""
+            val lines = cache.getOrPut(folder) {
+                listOf("faults.tsv", "outliers.tsv").flatMap { name ->
+                    val file = officialDir.resolve("survey/$folder/$name")
+                    if (file.isFile) file.readLines().filter { it.isNotBlank() && !it.startsWith("#") }.map { "$name\t$it" } else emptyList()
+                }
+            }
+            return lines.filter { line -> line.split('\t').getOrNull(1).let { it == table.key || it == "*" } }.joinToString("\n")
+        }
     }
 
     private fun fullGate(): List<Item> {
         val manifest = try {
-            GateManifest.load(officialDir.resolve("gate"))
+            GateManifest.load(gateDir)
         } catch (e: GateError) {
             return listOf(Item(Kind.FETCH_BROKEN, "the gate files could not be read", e.problems, "fix the gate file named", key = "gate:files"))
         }
@@ -283,12 +329,47 @@ class Monitor(
         }
     }
 
+    /** The shell's notes about the run's own setup (`monitor/notes.json`, today's only): each an informational line. */
+    private fun notes(file: File): List<Item> {
+        if (!file.isFile) return emptyList()
+        @Suppress("UNCHECKED_CAST")
+        val root = runCatching { Json.parse(file.readText()) as Map<String, Any?> }.getOrNull() ?: return emptyList()
+        if (root["date"] != today.toString()) return emptyList()
+        val drift = root["workflowDrift"] as? String ?: return emptyList()
+        return listOf(
+            Item(
+                Kind.NOTE, "the archive repository's workflow file differs from the public template", listOf(drift),
+                "copy tools/timetables/monitor/ci/monitor-weekly.yml from the public repository to .github/workflows/monitor-weekly.yml " +
+                    "in the archive repository and push it.",
+                key = "note:workflow-drift",
+            ),
+        )
+    }
+
     private companion object {
         /** A registry entry id as the catalogue's `entries` column names it: `sa.ummalqura`, `ps.gaza.awqaf`. */
         val ENTRY_ID = Regex("""\b[a-z]{2}\.[a-z0-9]+(?:\.[a-z0-9]+)*\b""")
 
         const val BACKUP_FIX = "the mirror is TAQWA_OFFICIAL_BACKUP's archive/ folder: point it at the folder, or unset it where the private " +
             "repository is the backup (ruling R94); a run that fetched new captures left them in one place only until it runs."
+
+        /** The checker's own sources (the gate and monitor Kotlin, the fetch Python), hashed with their paths (review N9). */
+        fun checkerHash(repo: File): String {
+            val roots = listOf(
+                repo.resolve("tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/gate") to "kt",
+                repo.resolve("tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/monitor") to "kt",
+                repo.resolve("tools/timetables/monitor") to "py",
+            )
+            val files = roots.flatMap { (dir, ext) -> dir.walkTopDown().filter { it.isFile && it.extension == ext }.toList() }
+            val digest = MessageDigest.getInstance("SHA-256")
+            for (file in files.sortedBy { it.relativeTo(repo).invariantSeparatorsPath }) {
+                digest.update(file.relativeTo(repo).invariantSeparatorsPath.toByteArray())
+                digest.update(0)
+                digest.update(file.readBytes())
+                digest.update(0)
+            }
+            return digest.digest().joinToString("") { "%02x".format(it) }.take(16)
+        }
     }
 
     /**

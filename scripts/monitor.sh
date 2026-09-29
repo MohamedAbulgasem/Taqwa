@@ -8,12 +8,15 @@
 #
 #   scripts/monitor.sh [--no-fetch] [--only <source>]... [--check-all] [--verbose]
 #
-# --no-fetch checks what is held; --only <source> fetches and checks that source alone (a source
-# with cadence manual runs only when named); --check-all checks every held table again, not only
-# the ones whose signature changed and the ones red last run; --verbose prints each step's progress
-# (otherwise one summary line and the report's path).
-# Exit 0 all green, 1 attention needed, 2 the monitor itself failed. On macOS a notification is
-# posted when the attention set changed since the last one, and always on 2.
+# --no-fetch checks what is held; --only <source> fetches and checks that source alone: a PARTIAL
+# run, whose report stands beside the day's (reports/<date>-partial-<source>.md) and which never
+# changes the notified attention set nor latest.md (ruling N1); --check-all checks every held table
+# again, not only the ones whose signature changed and the ones red last run; --verbose prints each
+# step's progress (otherwise one summary line and the report's path).
+# Exit 0 all green, 1 attention needed, 2 the monitor itself failed; every early exit writes
+# monitor/last-run.json with exit 2 and the reason (ruling N3), except a run refused by the lock,
+# which leaves the holder's record alone. On macOS a notification is posted when the attention set
+# changed since the last one, and always on 2.
 #
 # Every path comes from TAQWA_OFFICIAL, the folder that holds archive/ and monitor/ (default
 # ~/Desktop/Workspace/apps/Taqwa-official on the Mac; the workspace in the cloud). The backup mirror
@@ -22,25 +25,90 @@
 # or later); JAVA_HOME the JDK (else macOS's java_home for 21). Runs only JVM tasks. Nothing fetched
 # is ever committed to the public repository.
 set -uo pipefail
-cd "$(dirname "$0")/.." || { echo "monitor: cannot enter the repository" >&2; exit 2; }
 
 OFFICIAL="${TAQWA_OFFICIAL:-${HOME:-}/Desktop/Workspace/apps/Taqwa-official}"
 BACKUP="${TAQWA_OFFICIAL_BACKUP:-}"
 MONITOR="$OFFICIAL/monitor"
+LOCK="$MONITOR/lock"
 TODAY="$(date +%Y-%m-%d)"
 FETCH=1
 CHECK_ALL=0
 VERBOSE=0
 FETCH_BROKE=0
+RECORDED=0      # 1 once this run has written monitor/last-run.json
+LOCK_REFUSED=0  # 1 when another run holds the lock: its record is left alone
+HOLD_LOCK=0
+REASON=""
 ONLY=()
+
+json_escape() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/ }"
+    s="${s//$'\t'/ }"
+    printf '%s' "$s"
+}
+write_json_record() {
+    # A small JSON object at $1 from name/value pairs, written through a temp file: true, false, null
+    # and whole numbers bare, everything else a string. Pure shell, so it works before any interpreter
+    # is known to exist.
+    local path="$1"
+    shift
+    local tmp out="{" sep=""
+    tmp="$(dirname "$path")/.$(basename "$path").tmp"
+    while [ $# -ge 2 ]; do
+        local k="$1" v="$2"
+        shift 2
+        if [ "$v" = true ] || [ "$v" = false ] || [ "$v" = null ] || [[ "$v" =~ ^-?[0-9]+$ ]]; then
+            out="$out$sep\"$k\": $v"
+        else
+            out="$out$sep\"$k\": \"$(json_escape "$v")\""
+        fi
+        sep=", "
+    done
+    printf '%s}\n' "$out" > "$tmp" && mv -f "$tmp" "$path"
+}
+write_failure_record() {
+    [ -d "$MONITOR" ] || return 0
+    write_json_record "$MONITOR/last-run.json" date "$TODAY" exit 2 summary "The monitor itself failed: $1" report "" \
+        partial false partialOf null attentionChanged true neverEarly 0 attention 0 \
+        issue "**Taqwa monitor, $TODAY.** The monitor itself failed: $1" && RECORDED=1
+}
+notify() {
+    # A macOS nicety; nothing anywhere else (the cloud run keeps an issue instead).
+    if [ "$(uname)" = Darwin ] && command -v osascript >/dev/null 2>&1; then
+        osascript -e "display notification \"$1\" with title \"Taqwa monitor\"" >/dev/null 2>&1 || true
+    fi
+}
+failed() {
+    REASON="$1"
+    echo "monitor: $1" >&2
+    write_failure_record "$1"
+    notify "The monitor itself failed: $1"
+    exit 2
+}
+finish() {
+    # Every exit: give the lock back, and leave a failure record behind any exit that is not a result
+    # (a signal, a set -u slip, a command that died), unless the lock refused this run.
+    local code=$?
+    [ "$HOLD_LOCK" = 1 ] && rm -rf "$LOCK"
+    if [ "$code" != 0 ] && [ "$code" != 1 ] && [ "$RECORDED" != 1 ] && [ "$LOCK_REFUSED" != 1 ]; then
+        write_failure_record "${REASON:-exited $code before a result (see the run log under monitor/fetch/)}"
+    fi
+}
+trap finish EXIT
+
+cd "$(dirname "$0")/.." || failed "cannot enter the repository"
+
 while [ $# -gt 0 ]; do
     case "$1" in
         --no-fetch) FETCH=0; shift ;;
         --check-all) CHECK_ALL=1; shift ;;
         --verbose) VERBOSE=1; shift ;;
-        --only) [ $# -ge 2 ] || { echo "monitor: --only needs a source" >&2; exit 2; }; ONLY+=("$2"); shift 2 ;;
-        -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
-        *) echo "monitor: unknown option $1" >&2; exit 2 ;;
+        --only) [ $# -ge 2 ] || failed "--only needs a source"; ONLY+=("$2"); shift 2 ;;
+        -h|--help) sed -n '2,26p' "$0"; RECORDED=1; exit 0 ;;
+        *) failed "unknown option $1" ;;
     esac
 done
 
@@ -52,7 +120,7 @@ elif [ -x /opt/homebrew/bin/python3 ]; then
 else
     PY="$(command -v python3 || true)"
 fi
-[ -n "$PY" ] && [ -x "$PY" ] || { echo "monitor: no python3 (set TAQWA_PYTHON)" >&2; exit 2; }
+[ -n "$PY" ] && [ -x "$PY" ] || failed "no python3 (set TAQWA_PYTHON)"
 # Java 21 for Gradle: JAVA_HOME as given, else macOS's own lookup.
 if [ -z "${JAVA_HOME:-}" ] && [ "$(uname)" = Darwin ] && [ -x /usr/libexec/java_home ]; then
     JH="$(/usr/libexec/java_home -v 21 2>/dev/null || true)"
@@ -60,50 +128,23 @@ if [ -z "${JAVA_HOME:-}" ] && [ "$(uname)" = Darwin ] && [ -x /usr/libexec/java_
 fi
 
 say() { [ "$VERBOSE" = 1 ] && echo "$1"; return 0; }
-notify() {
-    # A macOS nicety; nothing anywhere else (the cloud run keeps an issue instead).
-    if [ "$(uname)" = Darwin ] && command -v osascript >/dev/null 2>&1; then
-        osascript -e "display notification \"$1\" with title \"Taqwa monitor\"" >/dev/null 2>&1 || true
-    fi
-}
-write_record() {
-    # A small JSON record under monitor/ ($1 the file, then name/value pairs), for the check half.
-    "$PY" -c '
-import json, sys
-path = sys.argv[1]
-pairs = sys.argv[2:]
-out = {pairs[i]: (pairs[i + 1] == "true" if pairs[i + 1] in ("true", "false") else pairs[i + 1]) for i in range(0, len(pairs), 2)}
-with open(path + ".tmp", "w", encoding="utf-8") as f:
-    json.dump(out, f, indent=1, ensure_ascii=False)
-import os
-os.replace(path + ".tmp", path)
-' "$@"
-}
-failed() {
-    echo "monitor: $1" >&2
-    if [ -d "$MONITOR" ]; then
-        write_record "$MONITOR/last-run.json" date "$TODAY" exit 2 summary "The monitor itself failed: $1" report "" \
-            attentionChanged true issue "**Taqwa monitor, $TODAY.** The monitor itself failed: $1" || true
-    fi
-    notify "The monitor itself failed: $1"
-    exit 2
-}
 
 [ -d "$OFFICIAL/archive" ] || failed "no archive under $OFFICIAL (set TAQWA_OFFICIAL)"
 mkdir -p "$MONITOR/fetch" "$MONITOR/reports" || failed "cannot write $MONITOR"
 
 # One run at a time (review M8): a lock folder, with the holder's pid; a dead holder's lock is taken over.
-LOCK="$MONITOR/lock"
 if ! mkdir "$LOCK" 2>/dev/null; then
     HOLDER="$(cat "$LOCK/pid" 2>/dev/null || true)"
     if [ -n "$HOLDER" ] && kill -0 "$HOLDER" 2>/dev/null; then
-        failed "another run is in progress (pid $HOLDER holds $LOCK)"
+        LOCK_REFUSED=1
+        echo "monitor: another run is in progress (pid $HOLDER holds $LOCK); its record is left alone" >&2
+        exit 2
     fi
     rm -rf "$LOCK"
     mkdir "$LOCK" 2>/dev/null || failed "cannot take the lock $LOCK"
 fi
+HOLD_LOCK=1
 echo $$ > "$LOCK/pid"
-trap 'rm -rf "$LOCK"' EXIT
 
 LOG="$MONITOR/fetch/run-$TODAY.log"
 : > "$LOG"
@@ -116,6 +157,17 @@ for s in ${ONLY[@]+"${ONLY[@]}"}; do
     ONLY_PY+=(--only "$s")
     ONLY_GRADLE="${ONLY_GRADLE:+$ONLY_GRADLE,}$s"
 done
+
+# 0. The run's own setup: does the archive repository's workflow file still match the public template? (review N8)
+TEMPLATE="tools/timetables/monitor/ci/monitor-weekly.yml"
+PRIVATE_WORKFLOW="$OFFICIAL/.github/workflows/monitor-weekly.yml"
+if [ -f "$PRIVATE_WORKFLOW" ] && [ -f "$TEMPLATE" ] && ! cmp -s "$TEMPLATE" "$PRIVATE_WORKFLOW"; then
+    DRIFT="$OFFICIAL/.github/workflows/monitor-weekly.yml differs from the public template $TEMPLATE ($(diff "$TEMPLATE" "$PRIVATE_WORKFLOW" | grep -c '^[<>]') lines differ)"
+    write_json_record "$MONITOR/notes.json" date "$TODAY" workflowDrift "$DRIFT" || true
+    echo "monitor: $DRIFT" >&2
+else
+    write_json_record "$MONITOR/notes.json" date "$TODAY" || true
+fi
 
 # 1. Fetch. A driver that breaks is a finding the check reports; what is held is still checked.
 if [ "$FETCH" = 1 ]; then
@@ -134,11 +186,11 @@ if [ -n "$BACKUP" ]; then
         echo "monitor: the backup step failed (see $LOG)" >&2
     fi
     if ! grep -q "\"date\": \"$TODAY\"" "$MONITOR/backup.json" 2>/dev/null; then
-        write_record "$MONITOR/backup.json" date "$TODAY" error "backup.py wrote no record (see $LOG)" target "$BACKUP" || true
+        write_json_record "$MONITOR/backup.json" date "$TODAY" error "backup.py wrote no record (see $LOG)" target "$BACKUP" || true
     fi
     [ "$VERBOSE" = 1 ] && grep -E '^backup: ' "$LOG" | tail -1 | sed 's/^/  /'
 else
-    write_record "$MONITOR/backup.json" date "$TODAY" skipped "TAQWA_OFFICIAL_BACKUP is not set; the private repository is the backup" || true
+    write_json_record "$MONITOR/backup.json" date "$TODAY" skipped "TAQWA_OFFICIAL_BACKUP is not set; the private repository is the backup" || true
 fi
 
 # 3. Check.
@@ -154,29 +206,44 @@ if [ ! -f "$MONITOR/last-run.json" ]; then
     tail -30 "$LOG" >&2
     failed "the check step wrote no result (Gradle exit $GRADLE_EXIT, see $LOG)"
 fi
+RECORDED=1
 
 field() {
     "$PY" -c 'import json, sys
 v = json.load(open(sys.argv[1], encoding="utf-8")).get(sys.argv[2], "")
-print(str(v).lower() if isinstance(v, bool) else v)' "$MONITOR/last-run.json" "$1"
+print(str(v).lower() if isinstance(v, bool) else ("" if v is None else v))' "$MONITOR/last-run.json" "$1"
 }
+if [ "$FETCH_BROKE" = 1 ]; then
+    # The check ran on what is held, but the run as a whole failed: the record says so (exit 2).
+    "$PY" -c 'import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["exit"] = 2
+d["summary"] = "The monitor itself failed: the fetch driver broke (see the run log); " + d.get("summary", "")
+d["attentionChanged"] = True
+d["issue"] = "**Taqwa monitor, " + d.get("date", "") + ".** The monitor itself failed: the fetch driver broke (see the run log).\n\n" + d.get("issue", "")
+with open(p + ".tmp", "w", encoding="utf-8") as f:
+    json.dump(d, f, indent=1, ensure_ascii=False)
+import os
+os.replace(p + ".tmp", p)' "$MONITOR/last-run.json" || true
+fi
 CODE="$(field exit)"
 SUMMARY="$(field summary)"
 REPORT="$(field report)"
 CHANGED="$(field attentionChanged)"
+PARTIAL="$(field partial)"
 case "$REPORT" in
     /*) ;;
     "") REPORT="$MONITOR/latest.md" ;;
     *) REPORT="$OFFICIAL/$REPORT" ;;
 esac
-[ "$FETCH_BROKE" = 1 ] && CODE=2
 echo "monitor: $SUMMARY"
 echo "report: $REPORT"
 
-# 4. Notify on change only (ruling R93); always when the monitor itself failed.
+# 4. Notify on change only (ruling R93); always when the monitor itself failed; never on a partial run.
 if [ "$CODE" = 2 ]; then
     notify "The monitor itself failed — see $REPORT"
-elif [ "$CHANGED" = true ]; then
+elif [ "$PARTIAL" != true ] && [ "$CHANGED" = true ]; then
     if [ "$CODE" = 0 ]; then notify "All green again"; else notify "$SUMMARY — see $REPORT"; fi
 fi
 

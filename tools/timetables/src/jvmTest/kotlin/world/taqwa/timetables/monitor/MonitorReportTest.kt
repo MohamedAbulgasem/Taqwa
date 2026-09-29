@@ -17,6 +17,9 @@ class MonitorReportTest {
     private val monitorDir = official.resolve("monitor")
     private val stamps = official.resolve("stamps")
 
+    /** No gate rows and no surveys: a full run's gate is "0 rows" and green, so the runs here stay fast and offline. */
+    private val gateDir = official.resolve("gate").also { it.mkdirs() }
+
     @AfterTest
     fun cleanUp() {
         official.deleteRecursively()
@@ -72,13 +75,14 @@ class MonitorReportTest {
         val items = listOf(
             Item(Kind.GREEN, "the gate: fine"),
             Item(Kind.MANUAL_DUE, "ae-iacad: due", key = "due:ae-iacad"),
-            Item(Kind.NEVER_EARLY, "x early", listOf("fajr: 3 early"), "fix it", key = "table:x", days = 3, worst = 2, label = "x (2026-10-01..2026-10-03)"),
+            Item(Kind.NEVER_EARLY, "x early", listOf("fajr: 3 early"), "fix it", key = "table:x:never-early", days = 3, worst = 2, label = "x (2026-10-01..2026-10-03)"),
             Item(Kind.NEVER_EARLY, "the gate: 1 rows", listOf("aa.one fajr: 1 early"), "fix it", key = "gate", days = 1, worst = 1, group = 1, label = "the gate (aa.one)"),
             Item(Kind.NEW_TABLE_FINE, "y new", listOf("gate row: `a\tb`")),
             Item(Kind.FETCH_BROKEN, "z broke", listOf("HTTP 503"), "look", key = "fetch:z"),
             Item(Kind.OWN_LATE, "w late", listOf("dhuhr: 2 over the late limit"), "refit", key = "table:w:late", days = 2, worst = 4),
             Item(Kind.FOR_THE_RECORD, "m: lateness on the member row", listOf("fr.cautious isha: 20 over the late limit"), key = "table:m:member"),
             Item(Kind.STILL_OPEN, "s late", listOf("asr: 1 over"), key = "table:s:late", since = LocalDate(2026, 9, 1)),
+            Item(Kind.NOTE, "the workflow file differs", listOf("copy it"), key = "note:workflow-drift"),
             Item(Kind.CHECKED_FINE, "sg-muis/a"),
             Item(Kind.CHECKED_FINE, "sg-muis/b"),
             Item(Kind.CHECKED_FINE, "eg-esa/c"),
@@ -95,7 +99,7 @@ class MonitorReportTest {
             "## Needs attention", "Never early: 2 — x (2026-10-01..2026-10-03); the gate (aa.one)",
             "### 1. Never early — x early", "### 2. Never early — the gate: 1 rows", "### 3. Fetch broken — z broke",
             "### 4. Over the late limit — w late", "### 5. Manual source due — ae-iacad: due",
-            "## Informational", "- Still open (since 2026-09-01): s late", "- For the record: m: lateness on the member row",
+            "## Informational", "- Still open (since 2026-09-01): s late", "- Note: the workflow file differs", "- For the record: m: lateness on the member row",
             "## Green", "New table, fine: y new", "Checked again, fine: 3 held tables (sg-muis 2, eg-esa 1)", "## Backup",
         )
         val positions = order.map { text.indexOf(it) }
@@ -103,16 +107,32 @@ class MonitorReportTest {
         assertTrue("**Next:** fix it" in text && "- fajr: 3 early" in text && "The attention set changed since the last notification." in text, text)
         assertTrue(text.trimEnd().endsWith("## Backup\nBackup: 3 files mirrored."), text)
         assertTrue("No fetch this run" in Report.render(LocalDate(2026, 10, 5), items, null, fetched = false))
+        val partial = Report.render(LocalDate(2026, 10, 5), items, null, fetched = false, partial = "sg-muis")
+        assertTrue(partial.startsWith("# Taqwa monitor — 2026-10-05 (partial: sg-muis)") && "Partial run (sg-muis)" in partial, partial)
         val issue = Report.issueBody(LocalDate(2026, 10, 5), items)
         assertTrue(issue.startsWith("**Taqwa monitor, 2026-10-05.** 2 never-early failures") && "Never early: 2" in issue && "5. Manual source due" in issue, issue)
+        assertTrue(issue.trimEnd().endsWith("(restricted: it quotes dates, counts and minutes)."), issue)
+    }
+
+    @Test
+    fun `the index line and the issue body are bounded however many tables fail`() {
+        val many = (1..3000).map { n ->
+            Item(Kind.NEVER_EARLY, "src-$n/table-$n (a name) against an.entry", listOf("fajr: 1 early"), "fix", key = "table:src-$n/table-$n:never-early", days = 1, worst = 1, label = "src-$n/table-$n (2026-10-01)")
+        }
+        val index = Report.index(many)!!
+        assertTrue(index.startsWith("Never early: 3000 — src-1/table-1 (2026-10-01); ") && index.endsWith("; and 2960 more"), index)
+        assertTrue(Report.summary(many).endsWith(", and 2960 more)."), Report.summary(many))
+        val issue = Report.issueBody(LocalDate(2026, 10, 5), many)
+        assertTrue(issue.length <= Report.ISSUE_LIMIT, "${issue.length}")
+        assertTrue("… (cut: the rest is in the report)" in issue && issue.trimEnd().endsWith("(restricted: it quotes dates, counts and minutes)."), issue.takeLast(300))
     }
 
     private val tablePath = "archive/tables/monitor/sg-muis/singapore.txt"
 
-    private fun index(hash: String) {
+    private fun index(hash: String, more: String = "") {
         official.resolve("archive/tables/monitor/index.tsv").writeText(
             MonitorIndex.HEADER.joinToString("\t") + "\n" +
-                "sg-muis\tsingapore\t$tablePath\tSingapore\t\t\tAsia/Singapore\t\tSG\tsg.muis\t\tF+E S D A M I\tdaily\tstandard\t$hash\t2026-10-05\t\n",
+                "sg-muis\tsingapore\t$tablePath\tSingapore\t\t\tAsia/Singapore\t\tSG\tsg.muis\t\tF+E S D A M I\tdaily\tstandard\t$hash\t2026-10-05\t\n" + more,
         )
     }
 
@@ -144,8 +164,8 @@ class MonitorReportTest {
         }
     }
 
-    private fun run(today: String, only: Set<String> = emptySet(), checkAll: Boolean = false) =
-        Monitor(TestPaths.repoRoot, official, monitorDir, LocalDate.parse(today), only, checkAll, skipFull = true, stampsDir = stamps).run()
+    private fun run(today: String, only: Set<String> = emptySet(), checkAll: Boolean = false, skipFull: Boolean = false) =
+        Monitor(TestPaths.repoRoot, official, monitorDir, LocalDate.parse(today), only, checkAll, skipFull, stampsDir = stamps, gateDir = gateDir, surveys = emptyList()).run()
 
     private val ok = linkedMapOf<String, Any?>("status" to "ok", "message" to "", "requests" to 2, "tables" to linkedMapOf("singapore" to "new"))
     private val failed = linkedMapOf<String, Any?>("status" to "failed", "message" to "HTTP 503 from dar-alifta.org", "requests" to 1, "tables" to emptyMap<String, String>())
@@ -159,10 +179,12 @@ class MonitorReportTest {
 
         val run = run("2026-10-05")
         assertEquals(1, run.exitCode, run.report)
+        assertTrue(!run.partial)
         assertTrue(run.summary.startsWith("0 never-early failures, 1 other item (1 fetch broken)."), run.summary)
         assertTrue("Plus the backup reminder." in run.summary, run.summary)
         assertTrue("### 1. Fetch broken — eg-esa (failed)" in run.report && "HTTP 503" in run.report, run.report)
         assertTrue("New table, fine: sg-muis/singapore" in run.report, run.report)
+        assertTrue("the gate: 0 rows, 0 place-days, 0 entries, 0 broken" in run.report, run.report)
         assertTrue("1 new tables, 0 changed" in run.report && "not due: mawaqit" in run.report, run.report)
         assertTrue("upload the backup folder" in run.report, run.report)
         assertTrue(run.attentionChanged)
@@ -170,7 +192,7 @@ class MonitorReportTest {
         assertEquals(run.report, monitorDir.resolve("reports/2026-10-05.md").readText())
         val lastRun = monitorDir.resolve("last-run.json").readText()
         assertTrue("\"exit\": 1" in lastRun && "\"attentionChanged\": true" in lastRun && "\"report\": \"monitor/reports/2026-10-05.md\"" in lastRun, lastRun)
-        assertTrue("\"issue\": \"**Taqwa monitor, 2026-10-05.**" in lastRun, lastRun)
+        assertTrue("\"partial\": false" in lastRun && "\"issue\": \"**Taqwa monitor, 2026-10-05.**" in lastRun, lastRun)
         val state = MonitorState(monitorDir.resolve("state.json"))
         assertEquals(LocalDate(2026, 10, 5), state.lastReminder)
         assertEquals("h1", state.checked.getValue("sg-muis/singapore").hash)
@@ -237,11 +259,46 @@ class MonitorReportTest {
         assertTrue("Nothing new since the last notification." in second.report, second.report)
         assertTrue("\"attentionChanged\": false" in monitorDir.resolve("last-run.json").readText())
         // A driver that broke is a finding of its own.
-        fetchLog("2026-10-19", "sg-muis" to ok, error = "Traceback\nKeyError: 'tables'")
+        fetchLog("2026-10-19", "sg-muis" to unchanged, error = "Traceback\nKeyError: 'tables'")
         backup("2026-10-19", 0)
         val third = run("2026-10-19")
         assertTrue("Fetch broken — the fetch driver itself broke" in third.report && "KeyError" in third.report, third.report)
         assertTrue(third.attentionChanged)
+    }
+
+    @Test
+    fun `a partial run never touches the notified set or the day's report and says so`() {
+        invented()
+        fetchLog("2026-10-05", "sg-muis" to ok, "eg-esa" to failed)
+        backup("2026-10-05", 0)
+        val full = run("2026-10-05")
+        assertEquals(setOf("fetch:eg-esa"), MonitorState(monitorDir.resolve("state.json")).notified.keys)
+        val latest = monitorDir.resolve("latest.md").readText()
+        assertEquals(full.report, latest)
+        // --only sg-muis a week later: its own report beside the day's, the notified set and latest.md as they were,
+        // nothing "changed", and the record says partial (ruling N1).
+        fetchLog("2026-10-12", "sg-muis" to ok, "eg-esa" to failed)
+        backup("2026-10-12", 0)
+        val partial = run("2026-10-12", only = setOf("sg-muis"))
+        assertTrue(partial.partial)
+        assertTrue(!partial.attentionChanged)
+        assertEquals(0, partial.exitCode, partial.report)
+        assertTrue(partial.report.startsWith("# Taqwa monitor — 2026-10-12 (partial: sg-muis)"), partial.report)
+        assertTrue("Partial run (sg-muis): only what it covers is listed" in partial.report, partial.report)
+        assertTrue("eg-esa" !in partial.report, "the other source's failure is not this run's to report")
+        assertEquals(partial.report, monitorDir.resolve("reports/2026-10-12-partial-sg-muis.md").readText())
+        assertTrue(!monitorDir.resolve("reports/2026-10-12.md").exists())
+        assertEquals(latest, monitorDir.resolve("latest.md").readText(), "latest.md is the last full run's")
+        assertEquals(setOf("fetch:eg-esa"), MonitorState(monitorDir.resolve("state.json")).notified.keys)
+        val lastRun = monitorDir.resolve("last-run.json").readText()
+        assertTrue("\"partial\": true" in lastRun && "\"partialOf\": \"sg-muis\"" in lastRun && "\"attentionChanged\": false" in lastRun, lastRun)
+        assertTrue("\"report\": \"monitor/reports/2026-10-12-partial-sg-muis.md\"" in lastRun, lastRun)
+        assertTrue("Partial run (sg-muis)" in lastRun, lastRun)
+        // A run that skips the gate and the surveys is partial too.
+        val quick = run("2026-10-19", skipFull = true)
+        assertTrue(quick.partial)
+        assertTrue(monitorDir.resolve("reports/2026-10-19-partial-skip-full.md").isFile)
+        assertEquals(latest, monitorDir.resolve("latest.md").readText())
     }
 
     @Test
@@ -250,7 +307,7 @@ class MonitorReportTest {
         val run = run("2026-12-05", only = setOf("gb-london-lupt"))
         assertEquals(1, run.exitCode, run.report)
         assertTrue("Manual source due — gb-london-lupt: its next edition was expected by 2026-12-01" in run.report, run.report)
-        assertTrue(run("2026-11-30", only = setOf("gb-london-lupt")).report.let { "gb-london-lupt" !in it }, "not due before its date")
+        assertTrue("Manual source due" !in run("2026-11-30", only = setOf("gb-london-lupt")).report, "not due before its date")
     }
 
     @Test
@@ -269,5 +326,37 @@ class MonitorReportTest {
         fetchLog("2026-10-19", "sg-muis" to ok)
         val stale = run("2026-10-19")
         assertTrue("Backup did not run — the backup step did not run this run" in stale.report, stale.report)
+    }
+
+    @Test
+    fun `the shell's note about a drifting workflow file is an informational line for today only`() {
+        invented()
+        monitorDir.mkdirs()
+        monitorDir.resolve("notes.json").writeText(Json.pretty(linkedMapOf("date" to "2026-10-05", "workflowDrift" to "the two files differ in 3 lines")))
+        val run = run("2026-10-05")
+        assertEquals(0, run.exitCode, run.report)
+        assertTrue("- Note: the archive repository's workflow file differs from the public template" in run.report && "differ in 3 lines" in run.report, run.report)
+        assertTrue("note:workflow-drift" !in MonitorState(monitorDir.resolve("state.json")).notified.keys, "a note is not attention")
+        assertTrue("Note:" !in run("2026-10-12").report, "yesterday's note is not repeated")
+    }
+
+    @Test
+    fun `a stricter checker or a new survey row re-checks the tables it touches`() {
+        invented()
+        val first = run("2026-10-05")
+        assertTrue("sg-muis/singapore" in first.report)
+        val signature = MonitorState(monitorDir.resolve("state.json")).checked.getValue("sg-muis/singapore").signature
+        assertEquals(24, signature.length)
+        // Nothing changed: not checked again.
+        assertTrue("sg-muis/singapore" !in run("2026-10-12").report)
+        // A calendar's signature carries its survey's rows: an invented calendar listed nowhere has none, so its
+        // signature is stable, while the checker hash differs from the engine hash's world.
+        val calendar = "mawaqit\tinvented\tarchive/tables/monitor/mawaqit/invented.txt\tInvented\t52.5\t-1.9\tEurope/London\t\tGB\t\tgb-cautious\tF S D A M I\tdaily\t-\tzzz\t2026-10-05\t\n"
+        index("h1", more = calendar)
+        val withCalendar = run("2026-10-19")
+        assertTrue("mawaqit/invented could not be checked" in withCalendar.report, withCalendar.report)
+        val records = MonitorState(monitorDir.resolve("state.json")).checked
+        assertEquals(signature, records.getValue("sg-muis/singapore").signature, "another table's row does not move this one's signature")
+        assertTrue(records.getValue("mawaqit/invented").red)
     }
 }
