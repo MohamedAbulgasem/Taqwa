@@ -351,7 +351,12 @@ fasting today".
 reproduced and checked by Taqwa · Taqwa is not affiliated with {authority}" and a proof sentence from
 the stamp; the "How Taqwa checks" page from the stamps; the detailed view (both Asr, suhoor, "rule"
 marks); no link to the other month; past days folded at every width; "Print or save as PDF" for each
-month from a print stylesheet, so every script prints correctly.
+month from a print stylesheet, so every script prints correctly. Built 29 September 2026 (design and
+details in `docs/superpowers/specs/2026-09-29-city-pages-design.md`): "proven" means every day a page
+shows lies inside the days the gate actually checked, for the place's unit or, for cautious times,
+every member there (ruling R115; the stamps record those days); a cautious place shows two proof
+tiles — days checked, and "0 starts before the timetable that decides it" — with no "at most" figure
+and a sentence without a date (rulings R105, R111, R112), in the app's About screen as on the site.
 
 ## 8. Migration (launch release)
 

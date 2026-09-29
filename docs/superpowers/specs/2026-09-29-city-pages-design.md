@@ -60,9 +60,10 @@ times and the stamps' statistics; Taqwa commits carry no Co-Authored-By trailer.
   sentence as the summary of a folded explainer, then C's month tables with a detailed view and per-month
   printing, then one app section, then the other cities.
 - A "How Taqwa checks" page per language, generated from the stamps (§5).
-- The index and the home strip come back with the cities that pass the proven rule (§2, §6): **38 cities
-  tonight, 40 from 1 October** (İstanbul and Ankara), out of the 196 rows in `site/cities.tsv`; **158 stay
-  held** (156 from 1 October).
+- The index and the home strip come back with the cities that pass the proven rule (§2, §6): **41 cities
+  on 29 September, 38 from the first build of 1 October** (ruling R115: only days the gate checked), out of
+  the 196 rows in `site/cities.tsv`; 47 rows are un-held there and the generator holds the others of them
+  until their tables cover every day shown (§2.1).
 - The generator applies the proven rule at every build and drops a city the stamps no longer cover, so a
   page never shows a day the gate has not proven (§9.2).
 - The app's cautious About screen gains the proof tiles and sentence (§10).
@@ -84,17 +85,21 @@ changed nothing:**
    {unit}" and claim no figure).
 3. **A green stamp for the resolved entry**, i.e. a stamp file exists and its `broken` is 0; where the
    stamp carries `units`, the resolution's `unitId` is one of them and that unit's `broken` is 0.
-4. **Covering every day the page shows:** the stamp's `first` ≤ the first day of the current month and
-   its `last` ≥ the last day of the next month, in the city's own calendar at build time. Past days of the
-   current month are shown (folded) and printed, so they count.
+4. **Every day the page shows was checked (ruling R115, amended after the review of Tasks 1–3):** each
+   shown date lies inside the days the gate actually compared, which each stamp records as runs of dates —
+   for class A/B the place's unit's runs (or the entry's, where the stamp has no units), for class C every
+   member's runs at the place (the cautious stamp's rows within class C's reach of the city, else the
+   member's own unit covering it). A stamp's first–last span is not enough: tables have holes (every
+   Diyanet capture lacks 26 October – 31 December 2026; Toronto's members lack 1–6 and 28–30 November).
+   Past days of the current month are shown (folded) and printed, so they count. The held reason names the
+   first unchecked date and the timetable.
 
 Ambiguities and how they were read (the reading that never publishes an unproven time): a stamp that
 starts inside the current month (Diyanet's begins 25 September 2026) holds the city until the month
 turns; a cautious entry proven only by a Mawaqit survey (`gb.cautious`, `de.cautious`, `nl.cautious` …)
-has no stamp days of its own at most places and is held wherever it is not measured; a cautious entry
-without units quotes the entry-wide worst lateness (Oslo's page shows `no.cautious`'s 148 minutes, which
-is Trondheim's; Oslo's own is 29). The last is honest and what the app will show (R100); a per-place
-figure needs units in the stamp, which is the gate's work, not this one's.
+has no stamp days of its own at most places and is held wherever it is not measured; a cautious page
+shows no "at most" figure at all (ruling R105: a cautious entry's worst is entry-wide — Oslo would have
+read Trondheim's 148 minutes), in the app as on the site.
 
 **The rule runs in the generator on every build** (§9.2), so a stamp that ends before the next month
 holds the city automatically from the first of the month (London Unified's stamp ends 31 December 2026:
@@ -103,7 +108,17 @@ current month publishes it on the first of the next (İstanbul, Ankara on 1 Octo
 GitHub Actions notice per city held by the rule and one warning per published city whose stamp ends
 before the last day of the month after the two shown, a month's notice to run the gate on the new table.
 
-### 2.1 Published (38 tonight; 40 from 1 October)
+### 2.1 Published (41 on 29 September; 38 from 1 October)
+
+*Final, under ruling R115 (the release build of 29 September):* **41 published** — the nine Saudi
+cities, Dubai, Doha, Muscat, Tunis, Sfax, Algiers, Singapore, the nine Indonesian cities, the four
+Malaysian ones, Bandar Seri Begawan, Johannesburg, Pretoria, Durban, London, Sarajevo, Tirana, Kazan,
+Dublin, Toronto, Mississauga and Chicago. Held by R115 although un-held in `cities.tsv`: İstanbul,
+Ankara, Paris, Oslo, Brussels and Antwerp (their Diyanet-family tables begin on 25 September, so 1–24
+September is unchecked; from 1 October the Diyanet hole of 26 October – 31 December holds them until a
+table covers it). From the 06:07 UTC build of 1 October **38**: Toronto, Mississauga (their members lack
+1–6 November) and Chicago (November checked against one member only) are held too. The paragraph and
+table below are the planner's and Task 5's earlier counts, kept for the record.
 
 *Amended at Task 5 (29 September, after the night's Diyanet Europe and Kemenag merges changed the
 stamps):* the rule run over every row of `cities.tsv` on the new stamps publishes **43 tonight and 47
@@ -475,7 +490,7 @@ document's `proof` block (§9.2), sentences in `meta.json` (`checks_*`):
    once they have all begun it (cautious times)."
 3. **The gate** — "Before every release Taqwa replays its engine against every official table it holds:
    {tables} published tables, {days} place-days across {entries} timetables. Starts shown early: {early}.
-   Sunrises or ends of eating shown late: {late}." (tonight: 588 tables, 137,835 place-days, 71
+   Sunrises or ends of eating shown late: {late}." (tonight: 654 tables, 155,886 place-days, 71
    timetables, 0, 0 — read from the gate files and stamps at build time, never typed).
 4. **Where mosques follow families of calendars** — "a survey of {calendars} mosque calendars stands in
    for the gate, each checked at its own mosque" (125, from `official/survey/*/calendars.tsv`).

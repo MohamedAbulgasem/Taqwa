@@ -1874,14 +1874,16 @@ digits, ungrouped (R107). The app's cautious About screen gained the same two ti
 "Checked against the timetables followed here." in seven languages (R100, R111, R112).
 
 **Which cities.** A row of `site/cities.tsv` is un-held only where the stamps prove every day its
-page shows: class A, B or C at the city, measured there, a green stamp for the entry and its unit
-covering both months (R101, spec §2). The generator applies the rule on every build and holds a row it
-rejects with a notice, so pages come and go with the proofs and nobody edits the list to chase them.
-Run over every row on the night's stamps — after the Diyanet Europe and Kemenag merges — the rule
-publishes **43 cities tonight and 47 from 1 October** (the plan's 38 and 40 plus Kemenag's five newly
-fitted kota, Surabaya, Medan, Semarang, Palembang and Yogyakarta, and from 1 October Brussels and
-Antwerp beside İstanbul and Ankara, all four held for two days because their stamps begin on
-25 September). Held, in one line each in the file: the class-D countries whose authority's method is
+page shows: class A, B or C at the city, measured there, a green stamp for the entry and its unit,
+and every shown date inside the days the gate actually checked for every timetable the page depends
+on (R101, R115, spec §2; the stamps now record those days as runs, per unit and per cautious member,
+because a stamp's first–last span hides holes such as Diyanet's 26 October – 31 December 2026). The
+generator applies the rule on every build and holds a row it rejects with a notice, so pages come and
+go with the proofs and nobody edits the list to chase them. `cities.tsv` un-holds 47 rows; the release
+build publishes **41 cities on 29 September and 38 from 1 October**: İstanbul, Ankara, Paris, Oslo,
+Brussels and Antwerp wait for Diyanet-family tables covering the whole shown months (theirs begin
+25 September and skip late October to December), and from 1 October Toronto, Mississauga and Chicago
+wait for November's missing days. Held, in one line each in the file: the class-D countries whose authority's method is
 not yet fully checked (the Gulf beyond Dubai, Doha and Muscat; the Levant, Iraq, Libya, Sudan,
 Mauritania, Uzbekistan, Pakistan, India, Bangladesh, Kosovo, Moscow, Austria, Switzerland, ISNA's
 cities, Auckland, and the cities outside a checked unit — Salalah, Irbid, Sousse, Oran, Constantine,
