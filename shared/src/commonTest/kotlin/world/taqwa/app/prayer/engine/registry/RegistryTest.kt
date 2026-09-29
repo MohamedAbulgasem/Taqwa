@@ -240,7 +240,7 @@ class RegistryTest {
             Triple("Gamping Lor (Sleman)", -7.79556, 110.32639),
             Triple("Melati (Sleman)", -7.73333, 110.36667),
             Triple("Deli Tua (Deli Serdang)", 3.5078, 98.6839),
-            Triple("Sunggal (Deli Serdang)", 3.5765, 98.6151),
+            Triple("Sunggal (Kota Medan, beyond its circle)", 3.5765, 98.6151),
             Triple("Mranggen (Demak)", -7.0268, 110.5158),
             Triple("Kamal (Bangkalan)", -7.16778, 112.71917),
             Triple("Paseh (Kab. Bandung)", -7.068, 107.794),
@@ -283,14 +283,17 @@ class RegistryTest {
         }
         assertEquals("Kota Bogor", resolve(-6.59444, 106.78917, "Asia/Jakarta", "ID").unitName)
         assertNull(Units.of("id.kemenag")!!.units.firstOrNull { it.id == "1301-reach" }, "R46's reach unit is closed (R106)")
-        // Each unit's own point resolves to its unit.
+        // Each unit's own point resolves to its unit, rounded to three decimals as the app rounds every location
+        // (ruling R113: a radius is never below 0.1 km, and the rounding moves a point at most about 0.08 km).
         for (unit in Units.of("id.kemenag")!!.units) {
             val zone = when {
                 unit.point.lon > 130.0 -> "Asia/Jayapura"
                 unit.point.lon > 114.0 -> "Asia/Makassar"
                 else -> "Asia/Jakarta"
             }
-            assertEquals(unit.name, resolve(unit.point.lat, unit.point.lon, zone, "ID").unitName, unit.id)
+            fun e3(degrees: Double) = kotlin.math.round(degrees * 1000.0) / 1000.0
+            assertEquals(unit.name, resolve(e3(unit.point.lat), e3(unit.point.lon), zone, "ID").unitName, "${unit.id} at three decimals")
+            assertTrue(unit.radiusKm >= 0.1, "${unit.id} radius ${unit.radiusKm}")
         }
     }
 

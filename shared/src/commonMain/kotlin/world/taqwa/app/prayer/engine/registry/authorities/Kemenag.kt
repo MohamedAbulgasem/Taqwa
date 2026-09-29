@@ -40,19 +40,23 @@ import world.taqwa.app.prayer.engine.registry.widened
  * horizon puts them, to the rounding minute, and about 4 min from where −2° would. Their whole 2026
  * was then fetched from the same source and fitted exactly as the 13 were (ruling R104).
  *
- * Ruling R103: Kemenag prints one table per kabupaten/kota and a user follows their own, so a
- * unit's circle stays inside its own kab/kota. Each radius is the distance from the unit's point to
- * the nearest boundary of a kabupaten/kota Kemenag prints separately, on OpenStreetMap's
- * administrative boundaries (29 Sep 2026), rounded down to a whole km — a coastline bounds no table,
- * so a circle may cross it (Makassar, Jayapura, Semarang, Surabaya). Kota Bukittinggi's point is
- * 0.69 km from Kab. Agam, so its unit is its own point alone. Beyond a circle the edge applies as it
- * did before the unit existed. Kota Jakarta's own core (DKI Jakarta, 8 km: Bekasi is 8.35 km away)
- * keeps its checked −1° horizon. Ruling R106 closes ruling R46's reach unit (Jakarta's point riding
- * as the fixed point out to 55 km with the deepest horizon but without the edge's allowance for an
- * unknown capital: a start could fall seconds before a neighbouring kabupaten's own table where its
- * seat lies further west): beyond the core the edge takes over, which is never early against
- * Jakarta's table and every neighbour's for a seat up to half a degree away, and is at least as
- * accurate everywhere, since the fixed point only added lateness east of Jakarta. Beyond every unit
+ * Rulings R103 and R113: Kemenag prints one table per kabupaten/kota and a user follows their own,
+ * so a unit's circle stays inside its own kab/kota. Each radius is the distance from the unit's
+ * point to the nearest boundary of a kabupaten/kota Kemenag prints separately, on OpenStreetMap's
+ * administrative boundaries (29 Sep 2026, in the engine's own distance), less a 0.5 km buffer for
+ * those boundaries' accuracy, rounded down to 0.1 km and never below 0.1 km, so that the unit's own
+ * point still resolves to it after the app's rounding of a location to three decimals (at most
+ * 0.08 km). A coastline bounds no table, so a circle may cross it (Makassar, Jayapura, Semarang,
+ * Surabaya). Kota Bukittinggi's point is 0.687 km from Kab. Agam: 0.1 km, the city entry and little
+ * else. Beyond a circle the edge applies as it did before the unit existed. Kota Jakarta's own core
+ * (DKI Jakarta, 7.8 km: Bekasi is 8.365 km away) keeps its checked −1° horizon. Ruling R106 closes
+ * ruling R46's reach unit (Jakarta's point riding as the fixed point out to 55 km with the deepest
+ * horizon but without the edge's allowance for an unknown capital: a start could fall seconds
+ * before a neighbouring kabupaten's own table where its seat lies further west): beyond the core the
+ * edge takes over, which is never early against Jakarta's table and every neighbour's for a seat up
+ * to half a degree away. It is at least as accurate as the ruling's other closure, the reach unit
+ * widened by the same allowance (whose fixed point only added lateness east of Jakarta); against the
+ * closed unit itself, each start is 2 min later and sunrise 2 min earlier there. Beyond every unit
  * (class D, spec §6.3) the highland horizon −2° (the deepest plausible, brief) and 2 min
  * more for a capital up to half a degree away. At a lowland kab/kota that edge puts sunrise 6–7 min
  * before Kemenag's and Maghrib 6–7 min after (about 4 min the horizon, 2 the capital's unknown
@@ -90,24 +94,24 @@ object Kemenag {
 
     private val fitted = listOf(
         Kabkota("1301", "Kota Jakarta", -6.21462, 106.84513, highland = false, radiusKm = JAKARTA_CORE_KM, m(14, -9, 76, 23, 28, 33)),
-        Kabkota("0119", "Kota Banda Aceh", 5.54167, 95.33333, highland = false, radiusKm = 1.0, m(35, -5, 74, 26, 18, 12)),
+        Kabkota("0119", "Kota Banda Aceh", 5.54167, 95.33333, highland = false, radiusKm = 0.9, m(35, -5, 74, 26, 18, 12)),
         Kabkota("2622", "Kota Makassar", -5.14861, 119.43194, highland = false, radiusKm = 4.0, m(12, -7, 71, 19, 13, 31)),
-        Kabkota("1709", "Kota Denpasar", -8.65, 115.21667, highland = false, radiusKm = 3.0, m(9, -9, 68, 20, 31, 12)),
-        Kabkota("3329", "Kota Jayapura", -2.53371, 140.71813, highland = false, radiusKm = 9.0, m(12, -4, 73, 20, 13, 14)),
-        Kabkota("1634", "Kota Malang", -7.9797, 112.6304, highland = false, radiusKm = 3.0, m(8, -8, 84, 19, 37, 30)),
-        Kabkota("1219", "Kota Bandung", -6.92222, 107.60694, highland = true, radiusKm = 4.0, m(8, -8, 79, 19, 30, 32)),
-        Kabkota("3308", "Kab. Jayawijaya", -4.09583, 138.94806, highland = true, radiusKm = 13.0, m(9, -8, 70, 16, 12, 7)),
-        Kabkota("1630", "Kota Batu", -7.87, 112.52833, highland = true, radiusKm = 3.0, m(8, -7, 78, 19, 11, 35)),
-        Kabkota("0313", "Kota Bukittinggi", -0.30907, 100.37055, highland = true, radiusKm = 0.0, m(17, -10, 82, 22, 8, 5)),
-        Kabkota("1222", "Kota Bogor", -6.59444, 106.78917, highland = true, radiusKm = 1.0, m(12, -5, 80, 26, 13, 18)),
-        Kabkota("1208", "Kab. Garut", -7.245, 107.921, highland = true, radiusKm = 4.0, m(14, -5, 74, 27, 15, 15)),
-        Kabkota("1429", "Kab. Wonosobo", -7.35889, 109.90306, highland = true, radiusKm = 10.0, m(8, -9, 69, 18, 11, 9)),
+        Kabkota("1709", "Kota Denpasar", -8.65, 115.21667, highland = false, radiusKm = 3.3, m(9, -9, 68, 20, 31, 12)),
+        Kabkota("3329", "Kota Jayapura", -2.53371, 140.71813, highland = false, radiusKm = 8.9, m(12, -4, 73, 20, 13, 14)),
+        Kabkota("1634", "Kota Malang", -7.9797, 112.6304, highland = false, radiusKm = 2.6, m(8, -8, 84, 19, 37, 30)),
+        Kabkota("1219", "Kota Bandung", -6.92222, 107.60694, highland = true, radiusKm = 3.8, m(8, -8, 79, 19, 30, 32)),
+        Kabkota("3308", "Kab. Jayawijaya", -4.09583, 138.94806, highland = true, radiusKm = 13.3, m(9, -8, 70, 16, 12, 7)),
+        Kabkota("1630", "Kota Batu", -7.87, 112.52833, highland = true, radiusKm = 3.4, m(8, -7, 78, 19, 11, 35)),
+        Kabkota("0313", "Kota Bukittinggi", -0.30907, 100.37055, highland = true, radiusKm = 0.1, m(17, -10, 82, 22, 8, 5)),
+        Kabkota("1222", "Kota Bogor", -6.59444, 106.78917, highland = true, radiusKm = 1.3, m(12, -5, 80, 26, 13, 18)),
+        Kabkota("1208", "Kab. Garut", -7.245, 107.921, highland = true, radiusKm = 3.8, m(14, -5, 74, 27, 15, 15)),
+        Kabkota("1429", "Kab. Wonosobo", -7.35889, 109.90306, highland = true, radiusKm = 9.9, m(8, -9, 69, 18, 11, 9)),
         // Monitor round (29 Sep 2026, ruling R104): five more lowland kota, fitted over the whole of 2026 like the 13.
-        Kabkota("0228", "Kota Medan", 3.58333, 98.66667, highland = false, radiusKm = 3.0, m(4, -14, 62, 27, 4, 4)),
-        Kabkota("0816", "Kota Palembang", -2.91673, 104.7458, highland = false, radiusKm = 1.0, m(8, -18, 70, 16, 23, 19)),
-        Kabkota("1433", "Kota Semarang", -6.99306, 110.42083, highland = false, radiusKm = 7.0, m(3, -14, 63, 12, 16, 17)),
+        Kabkota("0228", "Kota Medan", 3.58333, 98.66667, highland = false, radiusKm = 3.3, m(4, -14, 62, 27, 4, 4)),
+        Kabkota("0816", "Kota Palembang", -2.91673, 104.7458, highland = false, radiusKm = 0.6, m(8, -18, 70, 16, 23, 19)),
+        Kabkota("1433", "Kota Semarang", -6.99306, 110.42083, highland = false, radiusKm = 7.3, m(3, -14, 63, 12, 16, 17)),
         Kabkota("1638", "Kota Surabaya", -7.24917, 112.75083, highland = false, radiusKm = 8.0, m(22, -8, 77, 36, 36, 33)),
-        Kabkota("1505", "Kota Yogyakarta", -7.80139, 110.36472, highland = false, radiusKm = 1.0, m(9, -10, 80, 18, 34, 27)),
+        Kabkota("1505", "Kota Yogyakarta", -7.80139, 110.36472, highland = false, radiusKm = 1.3, m(9, -10, 80, 18, 34, 27)),
     )
 
     private fun unitsFor(base: TimetableMethod, idPrefix: String) = fitted.map { k ->
@@ -144,8 +148,9 @@ object Kemenag {
     private const val EDGE_SECONDS = 120
 
     /**
-     * Kota Jakarta's own core (ruling R103): DKI Jakarta within its point's distance to the nearest
-     * neighbouring kota, Bekasi (8.35 km on OpenStreetMap's boundaries), rounded down.
+     * Kota Jakarta's own core (rulings R103, R113): DKI Jakarta within its point's distance to the
+     * nearest neighbouring kota, Bekasi (8.365 km on OpenStreetMap's boundaries), less the buffer,
+     * rounded down to 0.1 km.
      */
-    private const val JAKARTA_CORE_KM = 8.0
+    private const val JAKARTA_CORE_KM = 7.8
 }
