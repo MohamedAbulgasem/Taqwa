@@ -1928,3 +1928,16 @@ Tanzil ships damaged, repaired; the iPhone's Qibla on true north from the saved 
 open their source. Play's release notes are in `docs/store/release-notes/1.0.0-33.txt`. The gate
 holds 654 tables and 155,886 place-days with none early; the release scripts refuse to build on a
 stale or red stamp.
+
+## Build 34 (29 September) — 1.0.0 (34)
+
+Build 33 with one line more: Compose Multiplatform 1.12.1, whose release fixes a crash when iOS
+reads an accessibility element after its node is gone (JetBrains/compose-multiplatform-core#3403),
+which VoiceOver, Voice Control, Switch Control and Full Keyboard Access users could hit while
+moving between screens. Taken alone from the accessibility round's branch: the round's other work
+(the Mushaf at any font size, controls' names and states, VoiceOver's escape gesture) waits for its
+device pass and ships as the first update. Nothing had been reviewed yet, 33 was never submitted,
+so 34 goes to App Review in its place at no cost in time; 33 stays unused in TestFlight. The whole
+suite passed on it (shared 1,595 Android host and 1,474 iOS tests, widgetcore 91 and 89). Play's
+release notes, with the never-early claim scoped to the days checked, are in
+`docs/store/release-notes/1.0.0-34.txt`.
