@@ -6,6 +6,7 @@
   "places": 12,
   "first": "2022-01-01",
   "last": "2029-12-31",
+  "checked": ["2022-01-01..2025-06-26", "2026-01-01..2029-12-31"],
   "placeDays": 20067,
   "heldOutDays": 16613,
   "ramadanDays": 1690,
@@ -246,6 +247,7 @@
     "dubai": {
       "name": "Dubai",
       "placeDays": 2734,
+      "checked": ["2022-01-01..2025-06-26", "2026-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -367,6 +369,7 @@
     "dubai-rural": {
       "name": "Dubai Rural",
       "placeDays": 1638,
+      "checked": ["2022-01-01..2025-06-26", "2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -484,6 +487,7 @@
     "hatta": {
       "name": "Hatta",
       "placeDays": 2369,
+      "checked": ["2023-01-01..2025-06-26", "2026-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {

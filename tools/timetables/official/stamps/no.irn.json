@@ -6,6 +6,7 @@
   "places": 3,
   "first": "2026-01-01",
   "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
   "placeDays": 1095,
   "heldOutDays": 0,
   "ramadanDays": 90,
@@ -196,6 +197,7 @@
     "no.irn.oslo": {
       "name": "Oslo",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -344,6 +346,7 @@
     "no.irn.tromso": {
       "name": "Tromsø",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "unit no.irn.tromso: 6 min": {
@@ -505,6 +508,7 @@
     "no.irn.trondheim": {
       "name": "Trondheim",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {

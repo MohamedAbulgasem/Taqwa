@@ -6,6 +6,7 @@
   "places": 1,
   "first": "2026-09-25",
   "last": "2026-10-26",
+  "checked": ["2026-09-25..2026-10-26"],
   "placeDays": 32,
   "heldOutDays": 0,
   "ramadanDays": 0,
@@ -133,6 +134,7 @@
     "ch.fids": {
       "name": "Zürich",
       "placeDays": 32,
+      "checked": ["2026-09-25..2026-10-26"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {

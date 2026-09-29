@@ -6,6 +6,7 @@
   "places": 2,
   "first": "2026-02-19",
   "last": "2026-10-01",
+  "checked": ["2026-02-19", "2026-10-01"],
   "placeDays": 2,
   "heldOutDays": 1,
   "ramadanDays": 1,

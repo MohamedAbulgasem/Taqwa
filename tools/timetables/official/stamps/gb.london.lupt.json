@@ -6,6 +6,7 @@
   "places": 11,
   "first": "2026-01-01",
   "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
   "placeDays": 4015,
   "heldOutDays": 3650,
   "ramadanDays": 330,
@@ -285,6 +286,7 @@
     "gb.london.lupt": {
       "name": "London (M25)",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {

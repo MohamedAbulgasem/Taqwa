@@ -6,6 +6,7 @@
   "places": 13,
   "first": "2025-01-01",
   "last": "2026-12-31",
+  "checked": ["2025-01-01..2026-12-31"],
   "placeDays": 9489,
   "heldOutDays": 4745,
   "ramadanDays": 766,
@@ -213,6 +214,7 @@
     "JHR01": {
       "name": "JHR01",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -315,6 +317,7 @@
     "JHR02": {
       "name": "JHR02",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -417,6 +420,7 @@
     "KTN01": {
       "name": "KTN01",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -519,6 +523,7 @@
     "PHG01": {
       "name": "PHG01",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -621,6 +626,7 @@
     "PHG06": {
       "name": "PHG06",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -723,6 +729,7 @@
     "PLS01": {
       "name": "PLS01",
       "placeDays": 729,
+      "checked": ["2025-01-01..2025-02-28", "2025-03-02..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -829,6 +836,7 @@
     "PNG01": {
       "name": "PNG01",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -931,6 +939,7 @@
     "SBH01": {
       "name": "SBH01",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1033,6 +1042,7 @@
     "SBH07": {
       "name": "SBH07",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1135,6 +1145,7 @@
     "SGR01": {
       "name": "SGR01",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1237,6 +1248,7 @@
     "SWK08": {
       "name": "SWK08",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1339,6 +1351,7 @@
     "WLY01": {
       "name": "WLY01",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1441,6 +1454,7 @@
     "WLY02": {
       "name": "WLY02",
       "placeDays": 730,
+      "checked": ["2025-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {

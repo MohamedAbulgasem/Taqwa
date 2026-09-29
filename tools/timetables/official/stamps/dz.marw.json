@@ -6,6 +6,7 @@
   "places": 5,
   "first": "2025-06-27",
   "last": "2027-06-05",
+  "checked": ["2025-06-27", "2025-07-01", "2025-07-04", "2025-07-10", "2025-11-22", "2025-11-26", "2025-12-01", "2025-12-05", "2026-06-16..2027-06-05"],
   "placeDays": 1783,
   "heldOutDays": 718,
   "ramadanDays": 145,
@@ -246,6 +247,7 @@
     "1": {
       "name": "Adrar",
       "placeDays": 355,
+      "checked": ["2026-06-16..2027-06-05"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -363,6 +365,7 @@
     "11": {
       "name": "Tamanrasset",
       "placeDays": 355,
+      "checked": ["2026-06-16..2027-06-05"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -484,6 +487,7 @@
     "16": {
       "name": "Algiers",
       "placeDays": 363,
+      "checked": ["2025-06-27", "2025-07-01", "2025-07-04", "2025-07-10", "2025-11-22", "2025-11-26", "2025-12-01", "2025-12-05", "2026-06-16..2027-06-05"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -601,6 +605,7 @@
     "17": {
       "name": "Djelfa",
       "placeDays": 355,
+      "checked": ["2026-06-16..2027-06-05"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -718,6 +723,7 @@
     "31": {
       "name": "Oran",
       "placeDays": 355,
+      "checked": ["2026-06-16..2027-06-05"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {

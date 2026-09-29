@@ -6,6 +6,7 @@
   "places": 1,
   "first": "2025-12-04",
   "last": "2025-12-04",
+  "checked": ["2025-12-04"],
   "placeDays": 1,
   "heldOutDays": 0,
   "ramadanDays": 0,

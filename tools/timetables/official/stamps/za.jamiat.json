@@ -6,6 +6,7 @@
   "places": 9,
   "first": "2025-01-01",
   "last": "2029-12-31",
+  "checked": ["2025-01-01..2029-12-31"],
   "placeDays": 14973,
   "heldOutDays": 10590,
   "ramadanDays": 1198,
@@ -269,6 +270,7 @@
     "bloemfontein": {
       "name": "Bloemfontein",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -401,6 +403,7 @@
     "cape-town": {
       "name": "Cape Town",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -533,6 +536,7 @@
     "durban": {
       "name": "Durban",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -665,6 +669,7 @@
     "johannesburg": {
       "name": "Johannesburg",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -797,6 +802,7 @@
     "pietersburg/polokwane": {
       "name": "Pietersburg/Polokwane",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -929,6 +935,7 @@
     "port-elizabeth": {
       "name": "Port Elizabeth",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1061,6 +1068,7 @@
     "pretoria": {
       "name": "Pretoria",
       "placeDays": 365,
+      "checked": ["2026-01-01..2026-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1178,6 +1186,7 @@
     "springbok-ncape": {
       "name": "Springbok Ncape",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1310,6 +1319,7 @@
     "upington": {
       "name": "Upington",
       "placeDays": 1826,
+      "checked": ["2025-01-01..2029-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {

@@ -6,6 +6,7 @@
   "places": 3,
   "first": "2026-01-01",
   "last": "2027-12-31",
+  "checked": ["2026-01-01..2027-12-31"],
   "placeDays": 780,
   "heldOutDays": 415,
   "ramadanDays": 63,
@@ -242,6 +243,7 @@
     "tirana": {
       "name": "Tirana",
       "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class A: 1 min": {

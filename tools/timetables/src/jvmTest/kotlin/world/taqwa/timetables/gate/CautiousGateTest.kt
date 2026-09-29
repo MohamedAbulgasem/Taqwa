@@ -185,6 +185,26 @@ class CautiousGateTest {
     }
 
     @Test
+    fun `the stamp records each member's checked dates at its point`() {
+        // Ruling R115: a page shows only days every member's table was checked on at that place,
+        // so the stamp carries each member's checked dates by the point its rows were read at.
+        val result = gate(twoMembers).evaluate(
+            manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(shifted("b.txt", 3), "test.b")),
+        )
+        val s = result.entries.getValue("test.cautious")
+        val stamp = Stamps.stamp(s, "core")
+        assertEquals(listOf("2026-02-14..2026-02-18"), stamp["checked"])
+        @Suppress("UNCHECKED_CAST")
+        val members = stamp["members"] as Map<String, Map<String, Any?>>
+        assertEquals(setOf("test.a", "test.b"), members.keys)
+        assertEquals(listOf("2026-02-14..2026-02-18"), members.getValue("test.a")["checked"])
+        assertEquals(
+            mapOf("1.28967,103.85007" to listOf("2026-02-14..2026-02-18")),
+            members.getValue("test.b")["points"],
+        )
+    }
+
+    @Test
     fun `a cautious row names its member and no other row does`() {
         val missing = assertFailsWith<GateError> { gate(twoMembers).evaluate(manifest(row("open/SG-MUIS/muis-2026-02-a.txt", null))) }
         assertTrue("names the member whose table it is (test.cautious: test.a test.b)" in missing.message!!, missing.message)

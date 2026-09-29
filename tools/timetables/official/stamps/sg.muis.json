@@ -6,6 +6,7 @@
   "places": 1,
   "first": "2024-01-01",
   "last": "2026-12-31",
+  "checked": ["2024-01-01..2026-12-31"],
   "placeDays": 1096,
   "heldOutDays": 365,
   "ramadanDays": 89,

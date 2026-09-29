@@ -8,11 +8,13 @@ import java.security.MessageDigest
 
 /**
  * The gate's stamps (spec §5): per entry, what was checked and how it came out, as statistics only.
- * A stamp never holds an official time: places, first and last date, place-days, Ramadan days,
- * early and late-end counts per event, the late histogram, the exact share, the worst late minutes,
- * the cells declared not followed and their dates (ruling R82), and the engine hash they were
- * measured on. Committed as `official/stamps/<entry>.json`; the same
- * inputs always write the same bytes.
+ * A stamp never holds an official time: places, first and last date, the checked dates as runs
+ * (for the entry, each unit and, for a cautious entry, each member at each point its rows were
+ * read at — ruling R115: a page shows only days some table was checked on), place-days, Ramadan
+ * days, early and late-end counts per event, the late histogram, the exact share, the worst late
+ * minutes, the cells declared not followed and their dates (ruling R82), and the engine hash they
+ * were measured on. Committed as `official/stamps/<entry>.json`; the same inputs always write the
+ * same bytes.
  *
  * The engine hash covers the engine's core (everything under `prayer/engine/` but the authority
  * files and their data, plus the Umm al-Qura dates, the `Prayer` keys and the Hijri calendar every
@@ -42,6 +44,8 @@ object Stamps {
         "places" to s.places.size,
         "first" to s.first?.toString(),
         "last" to s.last?.toString(),
+        // The days any row compared, as runs: the envelope first..last may have holes (ruling R115).
+        "checked" to dateRanges(s.dates),
         "placeDays" to s.placeDayCount,
         "heldOutDays" to s.testDays,
         // Place-days in Ramadan by Umm al-Qura's own dates.
@@ -64,14 +68,23 @@ object Stamps {
                 member to linkedMapOf("days" to g.days, "cappedDays" to g.capped, "leastGap" to g.least, "mostGap" to g.most)
             },
         ),
+        // A cautious entry's members: each one's checked days, and by the point its rows were read at
+        // (ruling R115: a place is proven only where every member's table was checked near it).
+        "members" to if (s.memberDays.isEmpty()) null else s.memberDays.entries.associate { (member, points) ->
+            member to linkedMapOf(
+                "checked" to dateRanges(points.values.flatten()),
+                "points" to points.entries.associate { (point, dates) -> point to dateRanges(dates) },
+            )
+        },
         // The limits the events were held to (rulings R37, R41): each event's exception from its unit,
         // else its entry, else its class's.
         "lateLimits" to limits(s.events),
-        // Per authority unit: its own place-days, limits and tally.
+        // Per authority unit: its own place-days, checked days, limits and tally.
         "units" to if (s.units.isEmpty()) null else s.units.entries.associate { (id, u) ->
             id to linkedMapOf<String, Any?>(
                 "name" to u.name,
                 "placeDays" to u.placeDays.size,
+                "checked" to dateRanges(u.placeDays),
                 "broken" to u.broken,
                 "lateLimits" to limits(u.events),
                 "events" to events(u.events),

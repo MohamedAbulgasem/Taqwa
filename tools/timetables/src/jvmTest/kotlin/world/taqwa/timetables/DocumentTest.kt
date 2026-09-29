@@ -198,6 +198,44 @@ class DocumentTest {
     }
 
     @Test
+    fun theChecksTablesAtMostIsThePublishedCitiesOwnFigure() {
+        // Kazan's own unit runs at most 2 minutes after DUM RT's starts; the entry-wide worst is
+        // Yelabuga's, which no page shows (final review I1).
+        val kazan = city("kazan-russia", "RU", 55.78874, 49.12214, "Europe/Moscow", linkedMapOf("en" to "Kazan"), admin1 = "Tatarstan Republic")
+        val built = document.build(listOf(kazan), friday)
+        val row = built.map("proof").list("published").single()
+        assertEquals("ru.dumrt", row["entry"])
+        assertEquals(2, row["atMost"])
+        assertEquals(2, built.list("cities").single().map("proof")["atMost"])
+        assertTrue(stamps.getValue("ru.dumrt").worstStarts(stamps.getValue("ru.dumrt").events)!! > 2)
+    }
+
+    @Test
+    fun theProofSaysThroughWhenTheCheckedRunHoldingTheDaysShownEnds() {
+        // Ruling R115: "through" is the end of the checked run the shown days sit in, not the stamp's
+        // last date beyond a hole.
+        @Suppress("UNCHECKED_CAST")
+        val root = LinkedHashMap(Json.parse(official.resolve("stamps/gb.london.lupt.json").readText()) as Map<String, Any?>)
+        @Suppress("UNCHECKED_CAST")
+        val units = LinkedHashMap(root["units"] as Map<String, Any?>)
+        @Suppress("UNCHECKED_CAST")
+        val unit = LinkedHashMap(units["gb.london.lupt"] as Map<String, Any?>)
+        unit["checked"] = listOf("2026-01-01..2026-10-31", "2027-01-01..2027-12-31")
+        units["gb.london.lupt"] = unit
+        root["units"] = units
+        val holed = Document(strings, mapOf("gb.london.lupt" to Stamp(root)), official)
+        val city = holed.city(london, friday)
+        assertEquals("2026-10-31", city.map("proof")["through"])
+        assertEquals(
+            "Checked against London Unified’s published timetable through 31 October 2026.",
+            city.map("pages").map("en").map("strings")["checkedThrough"],
+        )
+        val row = holed.build(listOf(london), friday).map("proof").list("published").single()
+        assertEquals("2026-10-31", row["through"])
+        assertEquals("31 October 2026", row.map("throughText")["en"])
+    }
+
+    @Test
     fun aHeldCityIsListedWithItsReasonAndNotBuilt() {
         val built = document.build(listOf(tripoli, london), friday)
         assertEquals(listOf("london-uk"), built.list("cities").map { it["slug"] })
@@ -331,12 +369,15 @@ class DocumentTest {
         assertEquals("31 December 2026", london.map("throughText")["en"])
         val toronto = published[0]
         assertEquals("C", toronto["class"])
-        assertEquals(7, toronto["atMost"]) // the entry's worst over the starts, for the checks page's table
+        assertNull(toronto["atMost"]) // a cautious entry claims no "at most" (ruling R105); the page renders "—"
         assertEquals("Cautious times", toronto.map("names")["en"])
-        // Ruling R114: the checks page has no country, so every row's date reads in the language's
-        // own form — Toronto's row in British order, not en-CA's "December 31, 2026".
-        assertEquals("31 December 2026", toronto.map("throughText")["en"])
-        assertEquals(london.map("throughText")["ar"], toronto.map("throughText")["ar"])
+        // Ruling R115: Toronto's members are checked through 31 October, then not again until
+        // 7 November, so the row says October, not the stamp's December. Ruling R114: the checks
+        // page has no country, so the date reads in the language's own form — British order, not
+        // en-CA's "October 31, 2026".
+        assertEquals("2026-10-31", toronto["through"])
+        assertEquals("31 October 2026", toronto.map("throughText")["en"])
+        assertEquals(Formats.forLanguage("ar").longDate(LocalDate(2026, 10, 31)), toronto.map("throughText")["ar"])
         assertEquals(1, built.list("held").size)
     }
 }
