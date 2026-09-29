@@ -11,7 +11,6 @@ import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.Scope
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.atEdge
-import world.taqwa.app.prayer.engine.registry.lateReachKm
 import world.taqwa.app.prayer.engine.registry.margins
 import world.taqwa.app.prayer.engine.registry.single
 import world.taqwa.app.prayer.engine.registry.widened
@@ -48,9 +47,13 @@ import world.taqwa.app.prayer.engine.registry.widened
  * so a circle may cross it (Makassar, Jayapura, Semarang, Surabaya). Kota Bukittinggi's point is
  * 0.69 km from Kab. Agam, so its unit is its own point alone. Beyond a circle the edge applies as it
  * did before the unit existed. Kota Jakarta's own core (DKI Jakarta, 8 km: Bekasi is 8.35 km away)
- * keeps its checked −1° horizon; beyond it, out to R40's reach for class B (about 55 km), a reach
- * unit keeps its point with the deepest plausible −2° horizon and claims nothing (ruling R46).
- * Elsewhere (class D, spec §6.3) the highland horizon −2° (the deepest plausible, brief) and 2 min
+ * keeps its checked −1° horizon. Ruling R106 closes ruling R46's reach unit (Jakarta's point riding
+ * as the fixed point out to 55 km with the deepest horizon but without the edge's allowance for an
+ * unknown capital: a start could fall seconds before a neighbouring kabupaten's own table where its
+ * seat lies further west): beyond the core the edge takes over, which is never early against
+ * Jakarta's table and every neighbour's for a seat up to half a degree away, and is at least as
+ * accurate everywhere, since the fixed point only added lateness east of Jakarta. Beyond every unit
+ * (class D, spec §6.3) the highland horizon −2° (the deepest plausible, brief) and 2 min
  * more for a capital up to half a degree away. At a lowland kab/kota that edge puts sunrise 6–7 min
  * before Kemenag's and Maghrib 6–7 min after (about 4 min the horizon, 2 the capital's unknown
  * point, the rest the margins and the rounding), as the monitor measured at the five kota before
@@ -111,21 +114,6 @@ object Kemenag {
         AuthorityUnit(
             id = k.id, name = k.name, point = GeoPoint(k.lat, k.lon), radiusKm = k.radiusKm,
             method = base.copy(id = "$idPrefix.${k.id}", horizonDeg = if (k.highland) -2.0 else -1.0, margins = k.margins),
-        )
-    } + jakartaReach(base, idPrefix)
-
-    /**
-     * Ruling R46: beyond Kota Jakarta's own core (its checked −1° horizon, about 15 km) its point
-     * still rides as the fixed point out to R40's reach for class B (about 55 km: Depok, Bekasi,
-     * Tangerang, which publish their own tables), with the deepest plausible horizon (−2°), and no
-     * "at most" figure is claimed there.
-     */
-    private fun jakartaReach(base: TimetableMethod, idPrefix: String): AuthorityUnit {
-        val core = fitted.first { it.id == "1301" }
-        return AuthorityUnit(
-            id = "1301-reach", name = "Jabodetabek", point = GeoPoint(core.lat, core.lon),
-            radiusKm = lateReachKm(core.lat, EntryClass.B),
-            method = base.copy(id = "$idPrefix.1301.reach", horizonDeg = -2.0), measured = false,
         )
     }
 

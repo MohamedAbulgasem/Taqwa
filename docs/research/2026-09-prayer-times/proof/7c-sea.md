@@ -183,9 +183,10 @@ specifically would need a wider margin again. Per-kab/kota margins remove the sq
 Jakarta now carries exactly its own −9 s, independent of Bukittinggi or any other place.
 
 Kota Jakarta's own core (≈15 km, the checked −1° horizon) and its wider Jabodetabek reach unit
-(≈55 km, R40's class-B reach, −2° horizon, `measured = false`, no "at most" claimed) are unchanged
-from Task 5/6 (ruling R46). **The core circle takes in western Kota Bekasi (Pondok Gede) — already
-ruled, not revisited here**, per the brief.
+(≈55 km, R40's class-B reach, −2° horizon, `measured = false`, no "at most" claimed) were unchanged
+from Task 5/6 (ruling R46) in this task; the monitor round's fix rounds cut the core to DKI's own
+boundary (8 km, ruling R103) and closed the reach unit (ruling R106) — see the monitor-round
+subsection below.
 
 Imsak (Subuh − 10) is unchanged: it already reads from the authority's own dawn as an end
 (`dawnEnd`, R14/R27), not the rounded start, so refitting the start margins does not move it off
@@ -245,9 +246,26 @@ Denpasar 3 (Badung 3.88), Jayapura 9 (Kab. Jayapura 9.46), Malang 3 (Kab. Malang
 0.69: only its own point), Bogor 1 (Kab. Bogor 1.82), Garut 4 (Kab. Tasikmalaya 4.31), Wonosobo 10
 (Banjarnegara 10.46), Medan 3 (Deli Serdang 3.86), Palembang 1 (Banyuasin 1.19), Semarang 7 (Demak
 7.85), Surabaya 8 (Bangkalan 8.50, across the strait), Yogyakarta 1 (Bantul 1.82). Beyond the circle
-the edge applies as before these units existed (Jakarta: the R46 reach unit). The app's own places
-in the neighbouring kabupaten (Kasihan, Gamping Lor, Melati, Deli Tua, Sunggal, Mranggen, Kamal,
-Paseh, Margahayukencana, Dalung, Kuta, Batubulan) resolve to the edge, pinned by RegistryTest.
+the edge applies as before these units existed. The app's own places in the neighbouring kabupaten
+(Kasihan, Gamping Lor, Melati, Deli Tua, Sunggal, Mranggen, Kamal, Paseh, Margahayukencana, Dalung,
+Kuta, Batubulan) resolve to the edge, pinned by RegistryTest.
+
+**Ruling R106 closes R46's reach unit.** Beyond Kota Jakarta's core, R46 let Jakarta's point ride
+as the fixed point out to 55 km with the deepest horizon but without the edge's allowance for an
+unknown seat, so a start could fall seconds before a neighbouring kabupaten's own table where its
+seat lies further west (Kab. Tangerang's Tigaraksa, Kota Tangerang). Of the ruling's two closures —
+the reach unit taking the edge's allowance, or stopping at DKI's boundary with the edge beyond — the
+second keeps at least as much accuracy everywhere (the fixed point only added lateness east of
+Jakarta and bought no safety the allowance does not give), so the reach unit is gone: beyond the
+8 km core the edge applies. Shown with the reviewer's model (each kabupaten/kota's table as the pure
+method at its seat, at −1° and at −2°, on every day of 2026) at the app's 25 places in the former
+reach: 24 resolve to the edge (Kota Bogor's own point keeps its unit) and against their own
+kabupaten/kota's table — Kota Bekasi, Kab. Bekasi (Cikarang), Depok, Kab. Bogor (Cibinong), Kota
+Tangerang, Tangerang Selatan (Ciputat), Kab. Tangerang (Tigaraksa), Karawang, and for Utan (DKI)
+Kota Jakarta's real table — 0 early starts and 0 late ends; starts 1–4 min after the table, sunrise
+1–3 min before a −2° table (5–8 before a −1° one), Maghrib 1–4 (5–8) after. Cost against the closed
+reach unit: 2 min later at each start, 2 min earlier at sunrise, at those 24 places. RegistryTest
+pins all 24 to the edge and asserts the reach unit is gone.
 
 Gate, `id-kemenag` group after the round: 36 rows, 18 places, 6,570 place-days (1,656 held out, 540
 in Ramadan), 0 early, 0 late ends, 0 over the class-B limit, worst 1 min at every unit. Per place
@@ -297,7 +315,7 @@ margin, not something fit against data.
   Mukah, Gua Musang, Jeli, Kuala Krai, Dabong) have no local official tables to re-run.
 - **id.kemenag**: 13 of 13 captured kab/kota are measured, over one year only (2026; myQuran has
   never captured a second year for Kemenag, so there is no cross-year check — see the split above).
-  Kota Jakarta's reach unit (Jabodetabek) and everywhere else in Indonesia are not measured.
+  Everywhere else in Indonesia is not measured (the Jabodetabek reach unit is gone since ruling R106).
   `id.muhammadiyah` is not measured anywhere (no official Muhammadiyah table held locally).
 
 ## Concerns
