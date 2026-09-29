@@ -51,6 +51,9 @@ object Catalog {
 
     private val SLUG = Regex("^[a-z0-9]+(-[a-z0-9]+)*$")
 
+    /** `/prayer-times/how-taqwa-checks/` is the "How Taqwa checks" page (spec §5), so no city may take it. */
+    const val CHECKS_PAGE_SLUG = "how-taqwa-checks"
+
     fun load(listFile: File, appFiles: File): List<City> {
         val cities = readCsv(File(appFiles, "cities.csv")).associateBy { it.getValue("id").toInt() }
         val localNames = SITE_LANGUAGES.filter { it != "en" }.associateWith { language ->
@@ -70,6 +73,7 @@ object Catalog {
             val (slug, idText, languagesText, featuredText, namesText) = cells
 
             if (!SLUG.matches(slug)) problems += "$where: slug '$slug' must be lowercase letters, digits and hyphens"
+            if (slug == CHECKS_PAGE_SLUG) problems += "$where: the slug $slug is reserved for the checks page"
             if (!seen.add(slug)) problems += "$where: duplicate slug $slug"
 
             val id = idText.toIntOrNull()

@@ -136,6 +136,11 @@ tasks.withType<Test>().configureEach {
  *
  * Paths are relative to the repository root. `now` defaults to the moment the task runs; each
  * city gets the whole of its own current month and the next, by its own calendar at that moment.
+ *
+ * The proven rule and the "How Taqwa checks" page read this checkout's `official/stamps`,
+ * `official/gate` and `official/survey` (spec §2, §5, §9.4): they are inputs, so a stamp refresh
+ * rebuilds the pages. The archive root (`-Pofficial`) is the gate's, not this task's: the stamps
+ * are committed here.
  */
 val jvmMainCompilation = kotlin.jvm().compilations.getByName("main")
 tasks.register<JavaExec>("generate") {
@@ -145,12 +150,16 @@ tasks.register<JavaExec>("generate") {
     mainClass.set("world.taqwa.timetables.MainKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
     workingDir = repoRoot
+    inputs.files(
+        fileTree(checkoutOfficial) { include("stamps/*.json", "gate/*.tsv", "survey/**/*.tsv") },
+    ).withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("proof")
     val out = providers.gradleProperty("out").orElse("_data/timetables.json")
     val now = providers.gradleProperty("now").orElse("")
     val cities = providers.gradleProperty("cities").orElse("site/cities.tsv")
     val app = providers.gradleProperty("app").orElse("shared/src/commonMain/composeResources")
+    val official = checkoutOfficial.path
     argumentProviders.add(CommandLineArgumentProvider {
-        listOf("--cities", cities.get(), "--app", app.get(), "--out", out.get()) +
+        listOf("--cities", cities.get(), "--app", app.get(), "--out", out.get(), "--official", official) +
             (if (now.get().isNotBlank()) listOf("--now", now.get()) else emptyList())
     })
 }

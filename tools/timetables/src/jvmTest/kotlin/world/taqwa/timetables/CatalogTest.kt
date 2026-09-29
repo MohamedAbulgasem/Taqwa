@@ -61,6 +61,13 @@ class CatalogTest {
     }
 
     @Test
+    fun theChecksPagesSlugIsReserved() {
+        // `/prayer-times/how-taqwa-checks/` is the "How Taqwa checks" page (spec §5), never a city.
+        val error = assertFailsWith<CatalogError> { Catalog.load(list("how-taqwa-checks\t2210247\ten\t\t"), app) }
+        assertTrue(error.message!!.contains("slug how-taqwa-checks is reserved for the checks page"), error.message)
+    }
+
+    @Test
     fun everyProblemIsReportedAtOnce() {
         val error = assertFailsWith<CatalogError> {
             Catalog.load(

@@ -20,6 +20,9 @@ class AppStrings(private val resources: File) {
     fun get(language: String, key: String): String =
         table(language)[key] ?: error("The app has no string '$key' in language '$language'")
 
+    /** [key] in [language], or null where the app has no such string yet (a key another task adds). */
+    fun getOrNull(language: String, key: String): String? = table(language)[key]
+
     /** [key] with `%1$s`, `%2$s`... replaced by [args] in order. */
     fun format(language: String, key: String, vararg args: String): String {
         var text = get(language, key)

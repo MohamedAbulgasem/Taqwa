@@ -8,25 +8,38 @@ import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.i18n.CountdownDigits
 import world.taqwa.app.prayer.engine.EngineDay
+import world.taqwa.app.prayer.engine.registry.EntryClass
+import world.taqwa.app.prayer.engine.registry.Resolution
 import world.taqwa.app.qibla.QiblaMath
+import java.io.File
 import kotlin.time.Instant
 
 /**
- * The one document the site is rendered from. Per city: the facts (slug, country, zone, the
- * timetable — its registry id — and Asr school the app's engine follows there, the Qibla, and for
- * every day of both months the six instants as epoch seconds for the page's live countdown); and
- * per page language, every string the page shows about that city, already written the way the app
- * writes it. The site build adds only its own sentences around these values, so it never formats a
- * number or a date itself.
+ * The one document the site is rendered from (spec §9.1). Per city: the facts (slug, country, zone,
+ * the timetable — its registry id, class and unit — and Asr school the app's engine follows there,
+ * the Qibla, the stamp's proof figures, and for every day of both months the instants as epoch
+ * seconds for the page's live countdown, a cautious place's members' own days among them); and per
+ * page language, every string the page shows about that city, already written the way the app
+ * writes it (the About screen's sentences filled for the city). The site build adds only its own
+ * sentences around these values, so it never formats a number or a date itself.
  *
- * A page names its timetable in the app's own words, so [build] refuses a city whose timetable the
- * app has no name for yet; [city] leaves that name null. No page names a high-latitude rule: the
- * engine's own rule has no name in the app (its days are still marked in the facts).
+ * [build] applies the proven rule (spec §2, [Proven]): a city the stamps do not prove every shown
+ * day of is written under `held` with its reason, never as a page. A page names its timetable in
+ * the app's own words, so [build] also refuses a city whose timetable the app has no name for yet.
+ * No page names a high-latitude rule: the engine's own rule has no name in the app (its days are
+ * still marked in the facts).
  */
-class Document(private val strings: AppStrings, private val timetable: Timetable = Timetable()) {
+class Document(
+    private val strings: AppStrings,
+    private val stamps: Map<String, Stamp>,
+    private val official: File,
+    private val timetable: Timetable = Timetable(),
+) {
 
     fun build(cities: List<City>, now: Instant): Map<String, Any?> {
-        val built = cities.map { city(it, now) }
+        val prepared = cities.map { prepare(it, now) }
+        val published = prepared.filter { it.verdict is Verdict.Published }
+        val built = published.map { city(it) }
         val unnamed = built.filter { city ->
             (city["pages"] as Map<*, *>).values.any { page -> (page as Map<*, *>)["method"] == null }
         }.map { it["slug"] }
@@ -39,16 +52,43 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
             "prayersArabic" to Prayer.entries.map { strings.prayer("ar", it) },
             "regions" to Regions.ORDER,
             "cities" to built,
+            "held" to prepared.mapNotNull { p ->
+                (p.verdict as? Verdict.Held)?.let { linkedMapOf("slug" to p.city.slug, "reason" to it.reason) }
+            },
+            "proof" to proof(published),
         )
     }
 
-    fun city(city: City, now: Instant): Map<String, Any?> {
+    /** One city as [build] writes it, whatever its verdict: a held city carries no proof. */
+    fun city(city: City, now: Instant): Map<String, Any?> = city(prepare(city, now))
+
+    /** What every part of a city's document reads: computed once, the verdict with it. */
+    private class Prepared(
+        val city: City,
+        val months: List<TimetableMonth>,
+        val today: LocalDate,
+        val source: EngineDay,
+        val verdict: Verdict,
+    ) {
+        val effective: Resolution get() = source.effective
+        val cautious: Boolean get() = effective.entryClass == EntryClass.C
+        val published: Verdict.Published? get() = verdict as? Verdict.Published
+    }
+
+    private fun prepare(city: City, now: Instant): Prepared {
         val months = timetable.months(city, now)
-        val days = months.flatMap { it.days }
         val today = timetable.localToday(city, now)
+        val source = timetable.source(city, today)
+        val verdict = Proven.verdict(source.effective, stamps, months.first().days.first().date, months.last().days.last().date)
+        return Prepared(city, months, today, source, verdict)
+    }
+
+    private fun city(p: Prepared): Map<String, Any?> {
+        val city = p.city
+        val days = p.months.flatMap { it.days }
         val location = timetable.location(city)
         val qibla = Qibla(QiblaMath.bearing(location), QiblaMath.distanceKm(location))
-        val source = timetable.source(city, today)
+        val effective = p.effective
         return linkedMapOf(
             "slug" to city.slug,
             "id" to city.id,
@@ -59,40 +99,62 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
             "longitude" to city.longitude,
             "languages" to city.languages,
             "featured" to city.languages.filter { it in city.featured },
-            "method" to source.effectiveEntry.id,
-            "madhab" to source.school.name,
-            "qibla" to linkedMapOf("bearing" to qibla.bearing, "km" to qibla.km),
-            "today" to today.toString(),
-            "months" to months.map { linkedMapOf("year" to it.year, "month" to it.month, "days" to it.days.size) },
-            "days" to days.map { day ->
+            "method" to p.source.effectiveEntry.id,
+            "madhab" to p.source.school.name,
+            "entryClass" to effective.entryClass.name,
+            "measured" to effective.measured,
+            "unitId" to effective.unitId,
+            "unitName" to effective.unitName,
+            "proof" to p.published?.let { v ->
                 linkedMapOf(
+                    "placeDays" to v.stamp.placeDays,
+                    "places" to v.stamp.places,
+                    "ramadanDays" to v.stamp.ramadanDays,
+                    "first" to v.stamp.first.toString(),
+                    "through" to v.stamp.last.toString(),
+                    "atMost" to v.atMost,
+                    "fajrShares" to v.stamp.shares(v.events, "fajr"),
+                    "cautious" to p.cautious,
+                )
+            },
+            "qibla" to linkedMapOf("bearing" to qibla.bearing, "km" to qibla.km),
+            "today" to p.today.toString(),
+            "months" to p.months.map { linkedMapOf("year" to it.year, "month" to it.month, "days" to it.days.size) },
+            "days" to days.map { day ->
+                linkedMapOf<String, Any?>(
                     "date" to day.date.toString(),
                     "friday" to day.friday,
                     "offset" to day.utcOffsetSeconds,
-                    "highLatitude" to day.setByRule,
+                    "highLatitude" to (day.setByRule.isNotEmpty() || day.polar),
                     "ramadanIsha" to day.ramadanIsha,
                     "epochs" to Prayer.entries.map { day.times.getValue(it).epochSeconds },
-                )
+                    "asrOther" to day.asrOther.epochSeconds,
+                    "endOfEating" to day.endOfEating.epochSeconds,
+                    "sunset" to day.sunset.epochSeconds,
+                    "imsak" to day.imsak?.epochSeconds,
+                    "setByRule" to day.setByRule.map { it.ordinal }.sorted(),
+                    "polar" to day.polar,
+                ).also { facts ->
+                    if (p.cautious) {
+                        facts["members"] = day.members.map { member -> member.map { it.epochSeconds } }
+                        facts["capped"] = day.capped
+                    }
+                }
             },
             "pages" to linkedMapOf(
-                *city.languages.map { it to page(city, it, months, today, qibla, source) }.toTypedArray(),
+                *city.languages.map { it to page(p, it, qibla) }.toTypedArray(),
             ),
         )
     }
 
     private data class Qibla(val bearing: Double, val km: Double)
 
-    private fun page(
-        city: City,
-        language: String,
-        months: List<TimetableMonth>,
-        today: LocalDate,
-        qibla: Qibla,
-        source: EngineDay,
-    ): Map<String, Any?> {
+    private fun page(p: Prepared, language: String, qibla: Qibla): Map<String, Any?> {
+        val city = p.city
         val f = Formats(language, city.countryCode)
         val zone = TimeZone.of(city.timeZone)
-        val days = months.flatMap { it.days }
+        val days = p.months.flatMap { it.days }
+        val today = p.today
         val todayRow = days.first { it.date == today }
         val prayers = Prayer.entries.map { strings.prayer(language, it) }
         fun clock(instant: Instant) = instant.toLocalDateTime(zone).let { f.clock(it.hour, it.minute) }
@@ -117,8 +179,10 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
             "countdownDigits" to if (CountdownDigits.westernFallback(f.locale.toLanguageTag())) WESTERN else f.digitSet(),
             "city" to city.name(language),
             "country" to f.countryName(city.countryCode),
-            "method" to strings.timetable(language, source.effectiveEntry),
-            "madhab" to strings.school(language, source.school),
+            "method" to strings.timetable(language, p.source.effectiveEntry),
+            "madhab" to strings.school(language, p.source.school),
+            "otherSchool" to strings.school(language, p.source.school.other),
+            "members" to p.effective.members.map { strings.get(language, it.nameKey) },
             "prayers" to prayers,
             "nextIn" to prayers.map { strings.format(language, "today_next_in", it) },
             "jumuah" to strings.get(language, "today_jumuah"),
@@ -137,14 +201,15 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
             ),
             "highLatitude" to emptyList<String>(),
             "clockChanges" to clockChanges,
-            "months" to months.map { month ->
+            "strings" to sentences(p, language, f, todayRow),
+            "months" to p.months.map { month ->
                 linkedMapOf(
                     "title" to f.monthYear(month.year, month.month),
                     "hijri" to f.hijriSpan(month.days.map { it.hijri.year to it.hijri.month }.distinct()),
                 )
             },
             "days" to days.map { day ->
-                linkedMapOf(
+                linkedMapOf<String, Any?>(
                     "day" to f.digits(day.date.day),
                     "weekday" to f.weekdayShort(day.date),
                     "date" to f.longDate(day.date),
@@ -152,8 +217,118 @@ class Document(private val strings: AppStrings, private val timetable: Timetable
                     "hijri" to f.hijriDayMonth(day.hijri.month, day.hijri.day),
                     "hijriLong" to f.hijri(day.hijri.year, day.hijri.month, day.hijri.day),
                     "times" to Prayer.entries.map { clock(day.times.getValue(it)) },
-                )
+                    "asrOther" to clock(day.asrOther),
+                    "endOfEating" to clock(day.endOfEating),
+                    "imsak" to day.imsak?.let(::clock),
+                    "setByRule" to day.setByRule.sortedBy { it.ordinal }.map { strings.prayer(language, it) },
+                ).also { texts ->
+                    if (p.cautious) texts["members"] = day.members.map { member -> member.map(::clock) }
+                }
             },
+        )
+    }
+
+    /**
+     * The app's About sentences filled for this city (spec §3.6), exactly as `AboutTimesScreen`
+     * fills them: the checked template's for class A and B, the cautious template's for class C.
+     * A sentence a template does not say is "". Task 6's cautious strings are read the moment the
+     * app has them; until then the cautious proof sentence names the members instead.
+     */
+    private fun sentences(p: Prepared, language: String, f: Formats, todayRow: TimetableDay): Map<String, Any?> {
+        val effective = p.effective
+        val cautious = p.cautious
+        val stamp = p.published?.stamp
+        val atMost = p.published?.atMost
+        val authority = strings.timetable(language, effective.entry).orEmpty()
+        val unitLabel = effective.unitName ?: p.city.name(language)
+        val comma = MethodWords.listComma(language)
+        val members = effective.members.map { strings.get(language, it.nameKey) }
+        val through = stamp?.let { f.longDate(it.last) }
+        fun checked(key: String, vararg args: String) = if (cautious) "" else strings.format(language, key, *args)
+        return linkedMapOf(
+            "whoseTitle" to if (cautious) strings.get(language, "timetable_cautious") else strings.format(language, "today_whose_checked_title", authority),
+            "notAffiliated" to checked("about_not_affiliated", authority),
+            "checkedThrough" to when {
+                through == null -> ""
+                cautious -> strings.getOrNull(language, "about_cautious_checked_through")?.replace("%1\$s", through)
+                    ?: strings.format(language, "about_checked_through", members.joinToString(comma), through)
+                else -> strings.format(language, "about_checked_through", authority, through)
+            },
+            "whoPublishes" to strings.get(language, "about_who_publishes"),
+            "whoPublishesBody" to checked("about_who_publishes_body", authority, unitLabel),
+            "howReproduces" to strings.get(language, "about_how_reproduces"),
+            "methodIntro" to (effective.method?.let { method ->
+                strings.format(language, "about_method_intro", authority, MethodWords.describe(strings, language, method, f))
+            } ?: ""),
+            "howChecked" to strings.get(language, "about_how_checked"),
+            "statDaysValue" to (stamp?.let { f.digits(it.placeDays) } ?: ""),
+            "statDays" to (stamp?.let { strings.format(language, "about_stat_days_at_places", f.digits(it.places)) } ?: ""),
+            "statNever" to (if (stamp == null) "" else checked("about_stat_never_before", authority)),
+            "statNeverAny" to (if (cautious && stamp != null) strings.getOrNull(language, "about_stat_never_before_any").orEmpty() else ""),
+            "statMinutes" to (atMost?.let { strings.format(language, "about_stat_minutes_value", f.digits(it)) } ?: ""),
+            "statAtMost" to (if (atMost == null) "" else strings.get(language, "about_stat_at_most_after")),
+            "cautiousBody" to (if (cautious) strings.format(language, "about_cautious_body", p.city.name(language), members.joinToString(comma)) else ""),
+            "maghribCap" to (if (cautious) maghribCap(language, effective, todayRow, comma) else ""),
+            "maghribCapTemplate" to (if (cautious) strings.get(language, "about_cautious_maghrib_cap") else ""),
+            "whichDecides" to strings.get(language, "about_which_decides"),
+            "matchMosque" to strings.get(language, "timetable_match_mosque"),
+            "setByRule" to strings.get(language, "today_set_by_rule"),
+            "polarLine" to strings.get(language, "today_polar_line"),
+            "stopEating" to strings.get(language, "about_stop_eating").replace("%1\$s", "{time}"),
+        )
+    }
+
+    /**
+     * Ruling R91 (the app's `maghribCapToday`): where the Maghrib cap decided the day's Maghrib —
+     * a member's own is later than the one shown — the sentence naming the member followed (the
+     * first whose Maghrib is the one shown, else the most-followed) and the later ones; else "".
+     */
+    private fun maghribCap(language: String, effective: Resolution, day: TimetableDay, comma: String): String {
+        val shown = day.times.getValue(Prayer.MAGHRIB)
+        val members = effective.members
+        fun name(i: Int) = strings.get(language, members[i].nameKey)
+        val later = members.indices.filter { day.members[it][MEMBER_MAGHRIB] > shown }
+        if (later.isEmpty()) return ""
+        val followed = members.indices.firstOrNull { day.members[it][MEMBER_MAGHRIB] == shown }
+            ?: members.indices.minBy { members[it].shareRank }
+        return strings.format(language, "about_cautious_maghrib_cap", name(followed), later.joinToString(comma) { name(it) })
+    }
+
+    /**
+     * The "How Taqwa checks" page's figures (spec §5): the totals over every stamp, the gate's rows
+     * and the surveys' calendars read from the files, and one row per published timetable.
+     */
+    private fun proof(published: List<Prepared>): Map<String, Any?> {
+        val all = stamps.values
+        val rows = published.groupBy { it.effective.entry.id }.toSortedMap().map { (id, cities) ->
+            val first = cities.first()
+            val stamp = stamps.getValue(id)
+            val entry = first.effective.entry
+            linkedMapOf(
+                "entry" to id,
+                "class" to first.effective.entryClass.name,
+                "placeDays" to stamp.placeDays,
+                "places" to stamp.places,
+                "first" to stamp.first.toString(),
+                "through" to stamp.last.toString(),
+                "atMost" to stamp.worstStarts(stamp.events),
+                "names" to SITE_LANGUAGES.associateWith { lang ->
+                    if (first.cautious) strings.get(lang, "timetable_cautious") else strings.timetable(lang, entry).orEmpty()
+                },
+                "throughText" to SITE_LANGUAGES.associateWith { lang -> Formats(lang, first.city.countryCode).longDate(stamp.last) },
+            )
+        }
+        return linkedMapOf(
+            "entries" to all.size,
+            "placeDays" to all.sumOf { it.placeDays },
+            "heldOutDays" to all.sumOf { it.heldOutDays },
+            "ramadanDays" to all.sumOf { it.ramadanDays },
+            "earlyStarts" to all.sumOf { it.early() },
+            "lateEnds" to all.sumOf { it.lateEnds() },
+            "brokenStamps" to all.count { it.broken != 0 },
+            "tables" to ProofTotals.gateRows(official),
+            "surveyCalendars" to ProofTotals.surveyCalendars(official),
+            "published" to rows,
         )
     }
 

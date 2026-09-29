@@ -126,6 +126,36 @@ class TimetableTest {
     }
 
     @Test
+    fun aCautiousDayCarriesEachMembersOwnSevenInstants() {
+        // Toronto combines three timetables: each prayer once all have begun it, so no member's
+        // Fajr is after the one shown, and no member's sunrise before it.
+        val toronto = city("toronto-canada", "CA", 43.70643, -79.39864, "America/Toronto")
+        val day = timetable.day(toronto, LocalDate(2026, 10, 1))
+        assertEquals(3, day.members.size)
+        assertTrue(day.members.all { it.size == 7 }, day.members.map { it.size }.toString())
+        val fajr = day.times.getValue(Prayer.FAJR)
+        assertTrue(day.members.all { it[0] <= fajr }, "a member's Fajr after the shown ${day.members.map { it[0] }} > $fajr")
+        assertTrue(day.members.all { it[1] >= day.times.getValue(Prayer.SUNRISE) })
+        assertTrue(day.members.all { it[6] <= it[0] }, "a member's end of eating after its own Fajr")
+        assertEquals(day.members.any { it[4] > day.times.getValue(Prayer.MAGHRIB) }, day.capped)
+    }
+
+    @Test
+    fun aSingleMethodDayCarriesTheOtherSchoolsAsrAndTheDaysEnds() {
+        val london = city("london-uk", "GB", 51.50853, -0.12574, "Europe/London")
+        val day = timetable.day(london, LocalDate(2026, 10, 1))
+        assertTrue(day.members.isEmpty())
+        assertFalse(day.capped)
+        // London Unified leads with the Hanafi Asr (its school is not known), so the other is the earlier Standard one.
+        assertTrue(day.asrOther < day.times.getValue(Prayer.ASR), "${day.asrOther} vs ${day.times.getValue(Prayer.ASR)}")
+        assertTrue(day.endOfEating <= day.times.getValue(Prayer.FAJR))
+        assertTrue(day.sunset <= day.times.getValue(Prayer.MAGHRIB))
+        assertTrue(day.imsak == null || day.imsak!! <= day.times.getValue(Prayer.FAJR))
+        assertEquals(emptySet(), day.setByRule)
+        assertFalse(day.polar)
+    }
+
+    @Test
     fun theHijriDateIsTheAppsTabularOne() {
         val day = timetable.day(tripoli, LocalDate(2026, 9, 13))
         assertEquals(Triple(1448, 3, 30), Triple(day.hijri.year, day.hijri.month, day.hijri.day))

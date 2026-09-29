@@ -57,6 +57,12 @@ class AppStringsTest {
     }
 
     @Test
+    fun aKeyTheAppMayNotHaveYetReadsAsNull() {
+        assertEquals("Fajr", strings.getOrNull("en", "prayer_fajr"))
+        assertEquals(null, strings.getOrNull("en", "no_such_key"))
+    }
+
+    @Test
     fun aMissingKeyNamesTheKeyAndTheLanguage() {
         val error = assertFailsWith<IllegalStateException> { strings.get("fr", "no_such_key") }
         assertTrue(error.message!!.contains("no_such_key") && error.message!!.contains("fr"), error.message)
