@@ -13,7 +13,8 @@ reads what this writes:
     python3 tools/timetables/monitor/fetch.py [--official <root>] [--only <source>]... [--today yyyy-mm-dd]
                                               [--force] [--budget-minutes N]
 
-`--official` defaults to $TAQWA_OFFICIAL, else ~/Desktop/Workspace/apps/Taqwa-official. A source
+`--official` defaults to $TAQWA_OFFICIAL; with neither this refuses to run (`scripts/monitor.sh`
+passes the root it uses, the Mac's default included, so the repository names no one's folders). A source
 whose cadence is not due (monthly ones) is skipped unless `--only` names it or `--force` is given;
 a source with cadence `manual` runs only when named; a source whose fetcher is `manual` is read by
 hand and never runs. A fetcher that fails is a finding in the report, never a crash: this exits 0
@@ -224,7 +225,8 @@ def main(argv=None):
         print(f"fetch: Python 3.9 or later is needed, this is {sys.version.split()[0]}", file=sys.stderr)
         return 2
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--official", default=os.environ.get("TAQWA_OFFICIAL") or os.path.expanduser("~/Desktop/Workspace/apps/Taqwa-official"))
+    p.add_argument("--official", default=os.environ.get("TAQWA_OFFICIAL") or None,
+                   help="the folder that holds archive/ (default $TAQWA_OFFICIAL)")
     p.add_argument("--monitor", default=None, help="the state folder (default <official>/monitor)")
     p.add_argument("--only", action="append", default=[], help="fetch this source only (repeatable); a manual-cadence source runs only when named")
     p.add_argument("--today", default=None)
@@ -233,6 +235,9 @@ def main(argv=None):
     p.add_argument("--sources", default=SOURCES_TSV)
     args = p.parse_args(argv)
 
+    if not args.official:
+        print("fetch: no archive root given (pass --official or set TAQWA_OFFICIAL)", file=sys.stderr)
+        return 2
     official = os.path.abspath(args.official)
     if not os.path.isdir(os.path.join(official, "archive")):
         print(f"fetch: no archive under {official} (pass --official or set TAQWA_OFFICIAL)", file=sys.stderr)

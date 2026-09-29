@@ -67,6 +67,8 @@ jobs:
       # tzdata is deliberately unpinned: the build reads every city's clock from the newest
       # time-zone database, which is ahead of the JDK's copy whenever a country changes its rules.
       - run: pip install markdown==3.10.3 tzdata
+      # The page code's own tests (the clock correction, the minute ruler); standard library only.
+      - run: python3 site/test_timetables.py
       - run: python3 site/build.py --check
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:

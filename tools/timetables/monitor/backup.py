@@ -7,7 +7,9 @@ run, `backup.json` says so (`error`), and the report raises it (review I2).
 
     python3 tools/timetables/monitor/backup.py --official <root> --backup <root> [--monitor <dir>] [--today yyyy-mm-dd]
 
-`--backup` is the folder that holds the mirrored `archive/` ($TAQWA_OFFICIAL_BACKUP).
+`--official` defaults to $TAQWA_OFFICIAL and `--backup`, the folder that holds the mirrored
+`archive/`, to $TAQWA_OFFICIAL_BACKUP; without a root this refuses to run (`scripts/monitor.sh`
+passes both).
 """
 import argparse
 import datetime as dt
@@ -49,11 +51,15 @@ def mirror(src_root, dst_root):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--official", default=os.environ.get("TAQWA_OFFICIAL") or os.path.expanduser("~/Desktop/Workspace/apps/Taqwa-official"))
+    p.add_argument("--official", default=os.environ.get("TAQWA_OFFICIAL") or None)
     p.add_argument("--backup", default=os.environ.get("TAQWA_OFFICIAL_BACKUP") or "")
     p.add_argument("--monitor", default=None)
     p.add_argument("--today", default=None)
     args = p.parse_args(argv)
+    if not args.official:
+        # No root, so no monitor folder to write backup.json into: the message is the record.
+        print("backup: no archive root given (pass --official or set TAQWA_OFFICIAL)", file=sys.stderr)
+        return 2
     official = os.path.abspath(args.official)
     monitor_dir = args.monitor or os.path.join(official, "monitor")
     today = args.today or dt.date.today().isoformat()
