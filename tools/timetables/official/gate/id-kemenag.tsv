@@ -1,8 +1,14 @@
-# Indonesia, Kemenag: 13 fitted kab/kota, myQuran's republication of bimasislam.kemenag.go.id
-# (api.myquran.com/v2/sholat/jadwal/<id>/<yyyy>/<mm>), the only year captured (2026). No second year
-# exists yet for a forward split, so each place's own 365-day file is split by date: fit on
-# Jan-Sep (273 days), test on Oct-Dec (92 days, forward in time) — a better split than "no split at
-# all", the only one profiles-tested.md ran. Checked at each kab/kota's own unit (lat/lon empty).
+# Indonesia, Kemenag: 18 fitted kab/kota, myQuran's republication of bimasislam.kemenag.go.id
+# (api.myquran.com/v2/sholat/jadwal/<id>/<yyyy>/<mm>), the only year published (2026). No second year
+# exists yet for a forward split, so each place's own 365-day file is split by date, forward in time:
+# fit on Jan-Sep (273 days), test on Oct-Dec (92 days) — a better split than "no split at all", the
+# only one profiles-tested.md ran. The 13 of the research round were fetched on 25 Sep 2026; the five
+# kota the weekly monitor first met on 28 Sep 2026 (Medan, Palembang, Semarang, Surabaya, Yogyakarta)
+# were fetched whole on 29 Sep 2026 from the same endpoint (ruling R104; their Sep-Oct rows equal the
+# monitor's capture, archive/tables/monitor/id-kemenag/<kota>-2026.txt). For every place the Jan-Sep
+# fit alone holds Oct-Dec; the registry's margins are fitted over both halves. Checked at each kab/kota's
+# own unit (lat/lon empty). The monitor's 28 Sep 2026 recaptures of the 13 hold no day their files do
+# not (identical on all 61 days), so they are not rows here.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta-fit.txt	id.kemenag/1301			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Jakarta, Jan-Sep 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta-test.txt	id.kemenag/1301			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Jakarta, Oct-Dec 2026
@@ -30,3 +36,13 @@ archive/tables/round/data-diyanet-kemenag/off-kemenag-garut-fit.txt	id.kemenag/1
 archive/tables/round/data-diyanet-kemenag/off-kemenag-garut-test.txt	id.kemenag/1208			Asia/Jakarta	F S D A M I	daily	standard	test	Kab. Garut, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-wonosobo-fit.txt	id.kemenag/1429			Asia/Jakarta	F S D A M I	daily	standard	fit	Kab. Wonosobo, Jan-Sep 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-wonosobo-test.txt	id.kemenag/1429			Asia/Jakarta	F S D A M I	daily	standard	test	Kab. Wonosobo, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-medan-fit.txt	id.kemenag/0228			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Medan, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-medan-test.txt	id.kemenag/0228			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Medan, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-palembang-fit.txt	id.kemenag/0816			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Palembang, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-palembang-test.txt	id.kemenag/0816			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Palembang, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-semarang-fit.txt	id.kemenag/1433			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Semarang, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-semarang-test.txt	id.kemenag/1433			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Semarang, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-surabaya-fit.txt	id.kemenag/1638			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Surabaya, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-surabaya-test.txt	id.kemenag/1638			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Surabaya, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-yogyakarta-fit.txt	id.kemenag/1505			Asia/Jakarta	F S D A M I	daily	standard	fit	Kota Yogyakarta, Jan-Sep 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-yogyakarta-test.txt	id.kemenag/1505			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Yogyakarta, Oct-Dec 2026

@@ -96,7 +96,6 @@ class RegistryTest {
         // Ruling R40: a minute of time is a quarter degree of longitude; A allows 1 min, B 2.
         near(20.98, Units.of("tr.diyanet")!!.unit("9541").radiusKm, 0.01, "İstanbul km")
         near(21.31, Units.of("tr.diyanet")!!.unit("9206").radiusKm, 0.01, "Ankara km")
-        near(55.27, Units.of("id.kemenag")!!.unit("1301-reach").radiusKm, 0.01, "Jakarta km")
         // The app's own city points are inside again.
         assertEquals("İstanbul", resolve(41.01384, 28.94966, "Europe/Istanbul", "TR").unitName)
         assertEquals("Ankara", resolve(39.91987, 32.85427, "Europe/Istanbul", "TR").unitName)
@@ -107,12 +106,13 @@ class RegistryTest {
         val esenyurt = resolve(41.02697, 28.67732, "Europe/Istanbul", "TR")
         assertNull(esenyurt.unitName)
         assertEquals(EntryClass.D_AUTHORITY, esenyurt.entryClass)
-        // Ruling R46: beyond Kota Jakarta's 15 km core, its reach unit with the deepest horizon, claiming nothing.
+        // Rulings R103 and R106: beyond Kota Jakarta's 8 km core (DKI's own boundary) the edge, with its allowance for
+        // an unknown seat, replaces R46's reach unit: Depok and Bekasi, which print their own tables, get the edge.
         for ((lat, lon) in listOf(-6.4 to 106.81861, -6.2349 to 106.9896)) { // Depok, Bekasi
             val r = resolve(lat, lon, "Asia/Jakarta", "ID")
-            assertEquals("Jabodetabek", r.unitName)
-            near(-2.0, assertNotNull(r.method).horizonDeg, "reach horizon")
-            assertEquals(GeoPoint(-6.21462, 106.84513), r.method!!.fixedPoint)
+            assertNull(r.unitName)
+            near(-2.0, assertNotNull(r.method).horizonDeg, "edge horizon")
+            assertNull(r.method!!.fixedPoint)
             assertFalse(r.measured)
             assertEquals(EntryClass.D_AUTHORITY, r.entryClass)
         }
@@ -199,6 +199,99 @@ class RegistryTest {
         near(-2.0, assertNotNull(r.method).horizonDeg, "horizon")
         assertFalse(r.measured)
         assertNull(r.unitName)
+    }
+
+    @Test
+    fun `medan palembang semarang surabaya and yogyakarta are fitted kemenag kota at the lowland horizon`() {
+        // Monitor round (29 Sep 2026): five more kota at the app's own points, each carrying its point as the fixed point.
+        val kota = listOf(
+            Triple("Kota Medan", 3.58333, 98.66667),
+            Triple("Kota Palembang", -2.91673, 104.7458),
+            Triple("Kota Semarang", -6.99306, 110.42083),
+            Triple("Kota Surabaya", -7.24917, 112.75083),
+            Triple("Kota Yogyakarta", -7.80139, 110.36472),
+        )
+        for ((name, lat, lon) in kota) {
+            val r = resolve(lat, lon, "Asia/Jakarta", "ID")
+            assertEquals("id.kemenag", r.entry.id)
+            assertEquals(name, r.unitName)
+            assertEquals(EntryClass.B, r.entryClass)
+            assertTrue(r.measured, name)
+            val method = assertNotNull(r.method)
+            near(-1.0, method.horizonDeg, "$name horizon")
+            assertEquals(GeoPoint(lat, lon), method.fixedPoint, name)
+            // Muhammadiyah's units are Kemenag's, so the five are its too.
+            assertEquals(name, Registry.resolveEntry(Registry.byId("id.muhammadiyah")!!, Place(lat, lon, "Asia/Jakarta", "ID")).unitName)
+        }
+        // Beyond a kota's radius the edge keeps the deepest plausible horizon and claims nothing: Belawan, Medan's port, 22 km north.
+        val belawan = resolve(3.78, 98.68, "Asia/Jakarta", "ID")
+        assertNull(belawan.unitName)
+        near(-2.0, assertNotNull(belawan.method).horizonDeg, "edge horizon")
+        assertFalse(belawan.measured)
+        assertEquals(EntryClass.D_AUTHORITY, belawan.entryClass)
+    }
+
+    @Test
+    fun `a kemenag unit reaches only its own kab or kota and every neighbouring place keeps the edge`() {
+        // Ruling R103: Kemenag prints one table per kabupaten/kota and a user follows their own, so a unit's circle
+        // stays inside its own boundary. The app's own places in the neighbouring kabupaten resolve to the edge.
+        val neighbours = listOf(
+            Triple("Kasihan (Bantul)", -7.82694, 110.32917),
+            Triple("Gamping Lor (Sleman)", -7.79556, 110.32639),
+            Triple("Melati (Sleman)", -7.73333, 110.36667),
+            Triple("Deli Tua (Deli Serdang)", 3.5078, 98.6839),
+            Triple("Sunggal (Deli Serdang)", 3.5765, 98.6151),
+            Triple("Mranggen (Demak)", -7.0268, 110.5158),
+            Triple("Kamal (Bangkalan)", -7.16778, 112.71917),
+            Triple("Paseh (Kab. Bandung)", -7.068, 107.794),
+            Triple("Margahayukencana (Kab. Bandung)", -6.97083, 107.5675),
+            Triple("Dalung (Badung)", -8.62553, 115.17042),
+            Triple("Kuta (Badung)", -8.72332, 115.17234),
+            Triple("Batubulan (Gianyar)", -8.62379, 115.26203),
+        )
+        for ((name, lat, lon) in neighbours) {
+            val zone = if (lon > 114.0) "Asia/Makassar" else "Asia/Jakarta"
+            val r = resolve(lat, lon, zone, "ID")
+            assertEquals("id.kemenag", r.entry.id)
+            assertNull(r.unitName, name)
+            near(-2.0, assertNotNull(r.method).horizonDeg, "$name horizon")
+            assertFalse(r.measured, name)
+            assertEquals(EntryClass.D_AUTHORITY, r.entryClass, name)
+        }
+        // Ruling R106: the app's own places in the former Jabodetabek reach (beyond DKI's 8 km core, within 55 km of
+        // Jakarta's point) take the edge, never a Jakarta unit; Kota Bogor's own point keeps its own unit.
+        val reach = listOf(
+            Triple("Utan (Jakarta Timur)", -6.17694, 106.94667), Triple("Bekasi", -6.2349, 106.9896),
+            Triple("Cikarang (Kab. Bekasi)", -6.26111, 107.15278), Triple("Depok", -6.4, 106.81861),
+            Triple("Sawangan (Depok)", -6.40278, 106.77444), Triple("Cibinong (Kab. Bogor)", -6.48167, 106.85417),
+            Triple("Citeureup (Kab. Bogor)", -6.48556, 106.88194), Triple("Cileungsir (Kab. Bogor)", -6.39472, 106.95917),
+            Triple("Parung (Kab. Bogor)", -6.42139, 106.73306), Triple("Ciampea (Kab. Bogor)", -6.55472, 106.70083),
+            Triple("Caringin (Kab. Bogor)", -6.70611, 106.82139), Triple("Tangerang", -6.17806, 106.63),
+            Triple("Ciputat", -6.2375, 106.69556), Triple("South Tangerang", -6.28862, 106.71789),
+            Triple("Pamulang (Tangerang Selatan)", -6.34278, 106.73833), Triple("Serpong (Tangerang Selatan)", -6.31694, 106.66417),
+            Triple("Cikupa (Kab. Tangerang)", -6.23639, 106.50833), Triple("Curug (Kab. Tangerang)", -6.26583, 106.55639),
+            Triple("Pasarkemis (Kab. Tangerang)", -6.17028, 106.53028), Triple("Sepatan (Kab. Tangerang)", -6.11889, 106.575),
+            Triple("Teluknaga (Kab. Tangerang)", -6.09889, 106.63806), Triple("Kresek (Kab. Tangerang)", -6.13139, 106.37972),
+            Triple("Karawang", -6.30525, 107.3197), Triple("Rengasdengklok (Karawang)", -6.15917, 107.29806),
+        )
+        for ((name, lat, lon) in reach) {
+            val r = resolve(lat, lon, "Asia/Jakarta", "ID")
+            assertNull(r.unitName, name)
+            assertNull(assertNotNull(r.method).fixedPoint, name)
+            near(-2.0, r.method!!.horizonDeg, "$name horizon")
+            assertEquals(EntryClass.D_AUTHORITY, r.entryClass, name)
+        }
+        assertEquals("Kota Bogor", resolve(-6.59444, 106.78917, "Asia/Jakarta", "ID").unitName)
+        assertNull(Units.of("id.kemenag")!!.units.firstOrNull { it.id == "1301-reach" }, "R46's reach unit is closed (R106)")
+        // Each unit's own point resolves to its unit.
+        for (unit in Units.of("id.kemenag")!!.units) {
+            val zone = when {
+                unit.point.lon > 130.0 -> "Asia/Jayapura"
+                unit.point.lon > 114.0 -> "Asia/Makassar"
+                else -> "Asia/Jakarta"
+            }
+            assertEquals(unit.name, resolve(unit.point.lat, unit.point.lon, zone, "ID").unitName, unit.id)
+        }
     }
 
     @Test
