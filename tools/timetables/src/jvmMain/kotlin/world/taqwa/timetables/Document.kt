@@ -231,8 +231,9 @@ class Document(
     /**
      * The app's About sentences filled for this city (spec §3.6), exactly as `AboutTimesScreen`
      * fills them: the checked template's for class A and B, the cautious template's for class C.
-     * A sentence a template does not say is "". Task 6's cautious strings are read the moment the
-     * app has them; until then the cautious proof sentence names the members instead.
+     * A sentence a template does not say is "". A cautious place's proof sentence carries no date
+     * (ruling R112: a cautious stamp's last date is one member's, not every member's) and its
+     * second tile names the timetable that decides each start (ruling R111), as the app's do.
      */
     private fun sentences(p: Prepared, language: String, f: Formats, todayRow: TimetableDay): Map<String, Any?> {
         val effective = p.effective
@@ -250,8 +251,7 @@ class Document(
             "notAffiliated" to checked("about_not_affiliated", authority),
             "checkedThrough" to when {
                 through == null -> ""
-                cautious -> strings.getOrNull(language, "about_cautious_checked_through")?.replace("%1\$s", through)
-                    ?: strings.format(language, "about_checked_through", members.joinToString(comma), through)
+                cautious -> strings.get(language, "about_cautious_checked")
                 else -> strings.format(language, "about_checked_through", authority, through)
             },
             "whoPublishes" to strings.get(language, "about_who_publishes"),
@@ -264,7 +264,7 @@ class Document(
             "statDaysValue" to (stamp?.let { f.digits(it.placeDays) } ?: ""),
             "statDays" to (stamp?.let { strings.format(language, "about_stat_days_at_places", f.digits(it.places)) } ?: ""),
             "statNever" to (if (stamp == null) "" else checked("about_stat_never_before", authority)),
-            "statNeverAny" to (if (cautious && stamp != null) strings.getOrNull(language, "about_stat_never_before_any").orEmpty() else ""),
+            "statNeverAny" to (if (cautious && stamp != null) strings.get(language, "about_stat_never_before_decider") else ""),
             "statMinutes" to (atMost?.let { strings.format(language, "about_stat_minutes_value", f.digits(it)) } ?: ""),
             "statAtMost" to (if (atMost == null) "" else strings.get(language, "about_stat_at_most_after")),
             "cautiousBody" to (if (cautious) strings.format(language, "about_cautious_body", p.city.name(language), members.joinToString(comma)) else ""),

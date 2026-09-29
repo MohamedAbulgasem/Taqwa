@@ -1,5 +1,5 @@
-"""The prayer-time pages of taqwa.world: a page per city and language, an index per language, and
-the section at the bottom of every home page.
+"""The prayer-time pages of taqwa.world: a page per city and language, an index per language, the
+"How Taqwa checks" page per language, and the section at the bottom of every home page.
 
 They are rendered from the one document tools/timetables writes (_data/timetables.json) with the
 app's own prayer-time engine. Every time, date, number and name about a city in that document is
@@ -31,6 +31,9 @@ from stores import block as store_block
 
 SECTION = "prayer-times/"
 CHECKS_PAGE_SLUG = "how-taqwa-checks"  # reserved for the "How Taqwa checks" page; no city may use it
+# Where the checks page sends a reader who wants to see the proof for themselves (spec §5.6).
+STAMPS_URL = "https://github.com/MohamedAbulgasem/Taqwa/tree/main/tools/timetables/official/stamps"
+DESIGN_URL = "https://github.com/MohamedAbulgasem/Taqwa/blob/main/docs/superpowers/specs/2026-09-26-taqwa-prayer-times-engine-design.md"
 HOME_MARKER = "<!-- prayer-times -->"
 OBLIGATORY = [0, 2, 3, 4, 5]  # the prayers of the countdown, as in the app: Sunrise is never "next"
 DHUHR = 2
@@ -236,6 +239,21 @@ def ruler_svg(shares: dict, rtl: bool, words: dict, digit_set: str) -> str:
     return "".join(parts)
 
 
+def deciders(facts: dict, p: int) -> list:
+    """The members of a cautious place that decide prayer `p` on a day (spec §3.3): those whose own
+    instant is the one shown — the latest to begin it, for sunrise the earliest, and for a capped
+    Maghrib the most-followed timetable's (the app's CautiousTable reads the same equality). Where
+    the day was repaired into order and no member's instant is the shown one, the latest (for
+    sunrise the earliest) member stands, so a row never lacks a deciding chip."""
+    shown = facts["epochs"][p]
+    members = facts["members"]
+    on = [k for k, member in enumerate(members) if member[p] == shown]
+    if not on:
+        pick = min(member[p] for member in members) if p == SUNRISE else max(member[p] for member in members)
+        on = [k for k, member in enumerate(members) if member[p] == pick]
+    return on
+
+
 def at_kaaba(city: dict) -> bool:
     """Whether the city is Makkah itself, where the Qibla is the Kaaba in front of you."""
     return city["qibla"]["km"] < AT_KAABA_KM
@@ -325,6 +343,7 @@ class Timetables:
             return  # every row of site/cities.tsv is held: no index either, the section is off
         for lang in self.langs:
             self.build_index(lang, template, write_page)
+            self.build_checks(lang, template, write_page)
         for city in self.cities:
             twins = {lang: self.city_dir(lang, city["slug"]) for lang in city["languages"]}
             for lang in city["languages"]:
@@ -340,6 +359,18 @@ class Timetables:
             "description": plain(t["index_description"], count=count),
         }
         write_page(self.langs, lang, template, out_dir=twins[lang], meta=meta, body=self.index_body(lang),
+                   twins=twins, picker=twins, current="prayer_times")
+        self.page_count += 1
+
+    def checks_dir(self, lang: str) -> str:
+        return self.index_dir(lang) + CHECKS_PAGE_SLUG + "/"
+
+    def build_checks(self, lang: str, template: str, write_page) -> None:
+        """The "How Taqwa checks" page (spec §5), one per language, with twins in every other."""
+        t = self.langs[lang]["timetable"]
+        twins = {other: self.checks_dir(other) for other in self.langs}
+        meta = {"title": t["checks_title"], "og_title": t["checks_og_title"], "description": t["checks_description"]}
+        write_page(self.langs, lang, template, out_dir=twins[lang], meta=meta, body=self.checks_body(lang),
                    twins=twins, picker=twins, current="prayer_times")
         self.page_count += 1
 
@@ -422,7 +453,7 @@ class Timetables:
         data = self.live_data(city, lang, today)
         return f'''<main class="wrap city">
   {hero}
-  {self.whence(city, lang)}
+  {self.whence(city, lang, today)}
   {self.months_section(city, lang, today)}
   <div class="app-row">
     {self.app_section(city, lang)}
@@ -456,13 +487,19 @@ class Timetables:
             # The spaces are for screen readers: layout ignores them between the row's flex items.
             items.append(f'<li data-p="{p}"{sun}><i></i><b>{esc(name)}</b> {pair} {tags} <span class="t">{esc(day["times"][p])}</span></li>')
         month_title = heading(page["months"][0]["title"])
+        # A cautious place's card carries the app's tertiary line under the list, which opens the
+        # explainer (a link to it; the script also opens the element).
+        cautious_line = ""
+        if city["entryClass"] == "C":
+            sep = "‹" if arabic_script else "›"
+            cautious_line = f'\n      <a class="cautious-line" href="#about">{esc(words["whoseTitle"])} {sep}</a>'
         return f'''<section class="today" aria-label="{attr(t["today"])}">
       <div class="today-head">
         <div class="ring-box">{ring(0)}</div>
         <div class="ring-text"><span class="ring-label" data-tt="label">{esc(page["today"]["weekday"])}</span><span class="ring-count" data-tt="count">{esc(day["day"])}</span><span class="ring-at" data-tt="at">{esc(month_title)}</span></div>
       </div>
       <ol class="tl">{"".join(items)}</ol>
-      <p class="polar" data-tt="polar"{"" if facts["polar"] else " hidden"}>{esc(words["polarLine"])}</p>
+      <p class="polar" data-tt="polar"{"" if facts["polar"] else " hidden"}>{esc(words["polarLine"])}</p>{cautious_line}
       <div class="today-foot">{MIHRAB_LIT}<span class="foot-text">{lead(t["card_foot"])}</span><a class="pill quiet small" href="#app">{esc(t["cta_button"])}</a></div>
       <p class="tt-stale" hidden>{esc(t["stale"])} <a href="#app">{esc(t["cta_button"])}</a></p>
     </section>'''
@@ -478,11 +515,13 @@ class Timetables:
         return (f'<p class="qibla-line">{dial(city["qibla"]["bearing"])}<span><b>{esc(page["qibla"])} {fill(t["qibla_bearing"], **values)}</b>'
                 f' · {fill(t["qibla_distance"], **values)}</span></p>')
 
-    def whence(self, city: dict, lang: str) -> str:
+    def whence(self, city: dict, lang: str, today: int) -> str:
         """"Where these times come from" (spec §3.3, R97): a folded explainer whose summary — the
         authority line and the stamp's proof sentence — is always visible. Open, a checked place
         shows the three steps of the app's About screen with the proof tiles and the minute
-        ruler; a cautious place shows its first step here (the rest is the cautious pages' work)."""
+        ruler; a cautious place its members, how they are combined (the Fajr ruler and which
+        timetable decides each time today) and its two proof tiles (ruling R105); both end with
+        the link to the checks page."""
         cfg = self.langs[lang]
         t = cfg["timetable"]
         page = city["pages"][lang]
@@ -491,10 +530,12 @@ class Timetables:
         comma = list_comma(lang)
         cautious = city["entryClass"] == "C"
         authority = page["method"]
+        sep = "‹" if rtl else "›"
+        checks_link = f'<a class="more" href="../{CHECKS_PAGE_SLUG}/">{esc(t["how_checks_link"])} {sep}</a>'
         if cautious:
             line = (f'<b>{esc(words["whoseTitle"])}</b> · {esc(comma.join(page["members"]))}{esc(comma)}{esc(t["combined"])}'
                     f' · {esc(t["not_affiliated_any"])}')
-            steps = [f'<li><h3>{esc(words["whoPublishes"])}</h3><p>{esc(words["cautiousBody"])}</p><p>{esc(t["not_affiliated_any"])}</p></li>']
+            steps = self.cautious_steps(city, lang, today, checks_link)
         else:
             line = f'<b>{esc(words["whoseTitle"])}</b> · {esc(t["reproduced"])} · {esc(words["notAffiliated"])}'
             ruler_words = {
@@ -512,7 +553,7 @@ class Timetables:
             steps = [
                 f'<li><h3>{esc(words["whoPublishes"])}</h3><p>{esc(words["whoPublishesBody"])} {esc(words["notAffiliated"])}</p></li>',
                 f'<li><h3>{esc(words["howReproduces"])}</h3><p>{esc(t["no_copy"])}</p><p>{esc(words["methodIntro"])}</p></li>',
-                f'<li><h3>{esc(words["howChecked"])}</h3><p>{fill(t["replays"], authority=authority)}</p>{tiles}{ruler}</li>',
+                f'<li><h3>{esc(words["howChecked"])}</h3><p>{fill(t["replays"], authority=authority)}</p>{tiles}{ruler}{checks_link}</li>',
             ]
         return f'''<details class="whence" id="about">
     <summary>
@@ -523,6 +564,71 @@ class Timetables:
     <div class="whence-body"><ol class="steps">{"".join(steps)}</ol></div>
   </details>'''
 
+    def cautious_steps(self, city: dict, lang: str, today: int, checks_link: str) -> list:
+        """A cautious place's three steps (spec §3.3): the members the app names, with the most
+        followed tagged; how Taqwa combines them — the Maghrib cap's sentence on a day it decided,
+        the Fajr ruler (the built day's sentence; the script draws it for the reader's today),
+        which timetable decides each time today, when to stop eating, and Match my mosque; and
+        the proof — the two tiles of ruling R105 — with the link to the checks page."""
+        cfg = self.langs[lang]
+        t = cfg["timetable"]
+        page = city["pages"][lang]
+        words = page["strings"]
+        rtl = cfg["dir"] == "rtl"
+        sep = "‹" if rtl else "›"
+        names = page["members"]
+        facts = city["days"][today]
+        day = page["days"][today]
+        most_followed = f' <span class="tag">{esc(t["most_followed"])}</span>'
+        members = "".join(f'<li><b>{esc(name)}</b>{most_followed if k == 0 else ""}</li>' for k, name in enumerate(names))
+        rows = []
+        for p, prayer in enumerate(page["prayers"]):
+            on = deciders(facts, p)
+            chips = "".join(
+                f'<b class="chip on">{esc(name)}</b>' if k in on else f'<span class="chip">{esc(name)} {esc(day["members"][k][p])}</span>'
+                for k, name in enumerate(names)
+            )
+            rows.append(f'<li data-p="{p}"><span class="pn">{esc(prayer)}</span><span class="shown">{esc(day["times"][p])}</span>'
+                        f'<span class="who">{chips}</span></li>')
+        ruler = (f'<figure class="ruler fajr"><figcaption>{fill(t["fajr_ruler_caption"], fajr=page["prayers"][FAJR])}</figcaption>'
+                 f'<p class="ruler-text">{self.fajr_ruler_text(city, lang, today)}</p></figure>')
+        tiles = (f'<div class="tiles two">'
+                 f'<div class="tile"><b>{esc(words["statDaysValue"])}</b><span>{esc(words["statDays"])}</span></div>'
+                 f'<div class="tile zero"><b>{digits(0, t["digits"])}</b><span>{esc(words["statNeverAny"])}</span></div></div>')
+        return [
+            f'<li><h3>{esc(words["whoPublishes"])}</h3><p>{esc(words["cautiousBody"])}</p><p class="members-intro">{esc(t["members_intro"])}</p>'
+            f'<ul class="members">{members}</ul><p>{esc(t["not_affiliated_any"])}</p></li>',
+            f'<li><h3>{esc(t["combine_heading"])}</h3><p>{esc(t["combine_body"])}</p>'
+            f'<p class="cap" data-tt="cap"{"" if facts["capped"] else " hidden"}>{esc(words["maghribCap"])}</p>{ruler}'
+            f'<h4>{esc(words["whichDecides"])}</h4><ul class="decides">{"".join(rows)}</ul>'
+            f'<p class="legend"><i class="swatch" aria-hidden="true"></i>{esc(t["decides_legend"])}</p>'
+            f'<p class="stop" data-tt="stop">{fill(words["stopEating"], time=day["endOfEating"])}</p>'
+            f'<p class="match">{esc(t["match_prompt"])}</p><a class="more" href="#app">{esc(words["matchMosque"])} {sep}</a></li>',
+            f'<li><h3>{esc(words["howChecked"])}</h3><p>{esc(t["replays_cautious"])}</p>{tiles}{checks_link}</li>',
+        ]
+
+    def fajr_ruler_text(self, city: dict, lang: str, i: int) -> str:
+        """The Fajr ruler as a sentence for day `i` (spec §3.3.1, the no-script form): when to
+        stop eating, when each timetable begins Fajr — those sharing a minute named together, the
+        earliest first — and the Fajr shown, once all have begun it. The script builds the same
+        sentence for the reader's today as the drawn ruler's description."""
+        t = self.langs[lang]["timetable"]
+        page = city["pages"][lang]
+        facts = city["days"][i]
+        day = page["days"][i]
+        names = page["members"]
+        fajr = page["prayers"][FAJR]
+        comma = list_comma(lang)
+        groups = {}
+        for k, member in enumerate(facts["members"]):
+            groups.setdefault(member[FAJR], []).append(k)
+        parts = []
+        for n, epoch in enumerate(sorted(groups)):
+            ks = groups[epoch]
+            parts.append(plain(t["begins_first" if n == 0 else "begins_at"], names=comma.join(names[k] for k in ks),
+                               fajr=fajr, time=day["members"][ks[0]][FAJR]))
+        return fill(t["fajr_ruler_text"], eat=day["endOfEating"], list=" · ".join(parts), fajr=fajr, shown=day["times"][FAJR])
+
     def app_section(self, city: dict, lang: str) -> str:
         """The app, once (spec §3.5, R98): the pitch, four checked points, the stores block the home
         hero uses — the official badges once a store is live, the coming-soon line until then —
@@ -530,8 +636,10 @@ class Timetables:
         cfg = self.langs[lang]
         t = cfg["timetable"]
         values = self.sentence_values(city, lang)
-        points = "".join(f'<li>{CHECK}<span>{lead(t[key])}</span></li>'
-                         for key in ("app_point_adhan", "app_point_widgets", "app_point_qibla", "app_point_free"))
+        # A cautious page's first two points are the app's Timetable screen's: follow one of the
+        # timetables here alone, and see where they differ (spec §3.5).
+        keys = ("app_point_match", "app_point_differ") if city["entryClass"] == "C" else ("app_point_adhan", "app_point_widgets")
+        points = "".join(f'<li>{CHECK}<span>{lead(t[key])}</span></li>' for key in keys + ("app_point_qibla", "app_point_free"))
         return f'''<section class="app" id="app" aria-labelledby="app-h">
       <div class="icon-tile">{MIHRAB_LIT}</div>
       <h2 id="app-h">{esc(t["app_title"])}</h2>
@@ -662,7 +770,8 @@ class Timetables:
             groups.append(f'<div><h2>{fill(t["other_cities"], **values)}</h2><div class="chips">{chips(same[:MAX_SAME_COUNTRY])}</div></div>')
         if near:
             groups.append(f'<div><h2>{fill(t["nearby"], **values)}</h2><div class="chips">{chips(near)}</div></div>')
-        groups.append(f'<div><h2>{esc(t["more_times"])}</h2><div class="chips"><a class="all" href="../">{esc(t["all_cities"])}</a></div></div>')
+        groups.append(f'<div><h2>{esc(t["more_times"])}</h2><div class="chips"><a class="all" href="../">{esc(t["all_cities"])}</a>'
+                      f'<a href="../{CHECKS_PAGE_SLUG}/">{esc(t["checks_nav"])}</a></div></div>')
         groups.append(f'<div><h2>{esc(t["questions"])}</h2><div class="chips"><a href="{{support}}">{esc(cfg["nav_support"])}</a>'
                       f'<a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a></div></div>')
         return f'''<section class="after">{"".join(groups)}</section>'''
@@ -671,7 +780,10 @@ class Timetables:
         """What assets/timetable.js needs and cannot read from the markup: the zone, the instants,
         and the day's long forms for when the reader's day is not the one the page was built on."""
         cfg = self.langs[lang]
+        t = cfg["timetable"]
         page = city["pages"][lang]
+        words = page["strings"]
+        cautious = city["entryClass"] == "C"
         days = []
         for facts, day in zip(city["days"], page["days"]):
             # t: the six clocks; o: the other school's Asr; x: the end of eating; e: the six
@@ -681,6 +793,11 @@ class Timetables:
                          "r": facts["setByRule"], "p": 1 if facts["polar"] else 0,
                          "full": day["full"], "hijri": day["hijriLong"], "t": day["times"],
                          "o": day["asrOther"], "x": day["endOfEating"]})
+            if cautious:
+                # m: each member's seven clocks; me: the same as epochs; xe: the end of eating's
+                # epoch (the Fajr ruler's start); cap: the Maghrib cap decided the day.
+                days[-1].update({"m": day["members"], "me": facts["members"], "xe": facts["endOfEating"],
+                                 "cap": 1 if facts["capped"] else 0})
         data = {
             "tz": city["timeZone"],
             # The countdown's digits, which are the page's except where the app falls back to
@@ -690,10 +807,90 @@ class Timetables:
             "next": page["nextIn"],
             "today": today,
             "first": city["months"][0]["days"],
-            "earlier": cfg["timetable"]["earlier"],
+            "earlier": t["earlier"],
             "days": days,
         }
+        if cautious:
+            # The cautious explainer's words for the reader's today: the members' names (mn), the
+            # Maghrib cap's sentence for the built day (capText) and its template for a day with
+            # another split (capT), the stop-eating line, and the Fajr ruler's words.
+            data.update({
+                "mn": page["members"],
+                "comma": list_comma(lang),
+                "capT": words["maghribCapTemplate"],
+                "capText": words["maghribCap"],
+                "stop": words["stopEating"],
+                "ruler": {
+                    "fajr": page["prayers"][FAJR], "stop": t["fajr_ruler_stop"], "notAll": t["fajr_ruler_not_all"],
+                    "shown": plain(t["fajr_ruler_shown"], fajr=page["prayers"][FAJR]), "text": t["fajr_ruler_text"],
+                    "beginsFirst": t["begins_first"], "beginsAt": t["begins_at"],
+                },
+            })
         return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+
+    # ---------------------------------------------------------------- the checks page
+
+    def checks_body(self, lang: str) -> str:
+        """Spec §5: the one rule, the gate's totals and the surveys' (read from the document,
+        which the generator computed from the stamps and the gate files — never typed), the
+        proven rule in plain words with the table of the published timetables, and where to
+        read the proof. Figures in the page's digits, ungrouped, as the app writes them (R107)."""
+        cfg = self.langs[lang]
+        t = cfg["timetable"]
+        proof = self.doc["proof"]
+        ds = t["digits"]
+
+        def n(value) -> str:
+            return digits(int(value), ds)
+
+        heads = "".join(f'<th scope="col">{esc(t[key])}</th>' for key in (
+            "checks_head_timetable", "checks_head_kind", "checks_head_days", "checks_head_places", "checks_head_through", "checks_head_at_most"))
+
+        def places(entry: str) -> str:
+            """The cities with a page on this timetable, linked where they have one in this
+            language (a cautious entry's name is the same "Cautious times" everywhere, so its
+            cities are what tells the rows apart)."""
+            links = []
+            for city in self.cities:
+                if city["method"] != entry:
+                    continue
+                if lang in city["pages"]:
+                    links.append(f'<a href="../{city["slug"]}/">{esc(city["pages"][lang]["city"])}</a>')
+                else:
+                    links.append(esc(city["pages"]["en"]["city"]))
+            return list_comma(lang).join(links)
+
+        rows = []
+        for row in sorted(proof["published"], key=lambda r: (r["class"] == "C", fold(r["names"][lang]))):
+            kind = t["checks_kind_cautious"] if row["class"] == "C" else t["checks_kind_checked"]
+            at_most = fill(t["checks_minutes"], n=n(row["atMost"])) if row["atMost"] is not None else "—"
+            rows.append(f'<tr><th scope="row">{esc(row["names"][lang])}<small>{places(row["entry"])}</small></th><td>{esc(kind)}</td>'
+                        f'<td>{n(row["placeDays"])}</td><td>{n(row["places"])}</td><td>{esc(row["throughText"][lang])}</td><td>{at_most}</td></tr>')
+        gate = fill(t["checks_gate_body"], tables=n(proof["tables"]), days=n(proof["placeDays"]), entries=n(proof["entries"]),
+                    early=n(proof["earlyStarts"]), late=n(proof["lateEnds"]))
+        return f'''<main class="wrap prose checks">
+  <h1>{esc(t["checks_h1"])}</h1>
+  <p class="meta">{esc(t["checks_lede"])}</p>
+  <h2>{esc(t["checks_rule_h"])}</h2>
+  <p>{esc(t["checks_rule_body"])}</p>
+  <h2>{esc(t["checks_gate_h"])}</h2>
+  <p>{gate}</p>
+  <h2>{esc(t["checks_survey_h"])}</h2>
+  <p>{fill(t["checks_survey_body"], calendars=n(proof["surveyCalendars"]))}</p>
+  <h2>{esc(t["checks_pages_h"])}</h2>
+  <p>{esc(t["checks_pages_body"])}</p>
+  <div class="tt-wrap"><table class="checks-table">
+    <thead><tr>{heads}</tr></thead>
+    <tbody>{"".join(rows)}</tbody>
+  </table></div>
+  <h2>{esc(t["checks_source_h"])}</h2>
+  <p>{esc(t["checks_source_body"])}</p>
+  <ul>
+    <li><a href="{STAMPS_URL}">{esc(t["checks_source_stamps"])}</a></li>
+    <li><a href="{DESIGN_URL}">{esc(t["checks_source_design"])}</a></li>
+  </ul>
+</main>
+'''
 
     # ---------------------------------------------------------------- the index and the home section
 
@@ -716,9 +913,11 @@ class Timetables:
                 countries.append(f'<div class="country" id="{code.lower()}"><h3>{esc(here[0]["pages"][lang]["country"])}</h3><ul class="cities">{links}</ul></div>')
             regions.append(f'<section class="region" id="r-{region}"><h2 class="label">{esc(t["regions"][region])}</h2>'
                            f'<div class="countries">{"".join(countries)}</div></section>')
+        sep = "‹" if cfg["dir"] == "rtl" else "›"
         return f'''<main class="wrap index">
   <h1>{esc(t["index_h1"])}</h1>
   <p class="lede">{fill(t["index_lede"], count=count)}</p>
+  <p class="index-checks">{esc(t["checks_index_line"])} <a href="{CHECKS_PAGE_SLUG}/">{esc(t["checks_nav"])} {sep}</a></p>
   <label class="search" hidden>{SEARCH}<input id="city-filter" type="search" placeholder="{attr(t["search"])}" aria-label="{attr(t["search"])}" autocomplete="off" spellcheck="false"></label>
   {"".join(regions)}
   <p class="no-match" hidden>{esc(t["no_match"])}</p>
@@ -757,8 +956,10 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
     """What --check asks of a prayer-time page beyond links and markup: a city page has both
     months, each with a row for every day of that month, six times in each with the two detail
     lines of the detailed view, the view's switch, a print button per month, the live data the
-    script needs, its folded explainer and its app section; an index lists every city that has a
-    page in its language."""
+    script needs, its folded explainer with the link to the checks page, its app section and,
+    on a cautious page, the decides table; an index lists every city that has a page in its
+    language and links to the checks page; the checks page prints the document's totals and a
+    row per published timetable."""
     problems = []
     parts = rel_path.split("/")
     if SECTION.rstrip("/") not in parts:
@@ -770,11 +971,27 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
         for city in data.cities_in(lang):
             if f'href="{city["slug"]}/"' not in doc:
                 problems.append(f"timetable index: {rel_path} does not list {city['slug']}")
+        if f'href="{CHECKS_PAGE_SLUG}/"' not in doc:
+            problems.append(f"timetable index: {rel_path} does not link to the checks page")
         return problems
     slug = rest[0]
+    if slug == CHECKS_PAGE_SLUG:
+        proof = data.doc["proof"]
+        ds = data.langs[lang]["timetable"]["digits"]
+        for key in ("tables", "placeDays", "entries", "surveyCalendars"):
+            if digits(proof[key], ds) not in doc:
+                problems.append(f"checks page: {rel_path} does not print the {key} total ({proof[key]})")
+        rows = doc.count('<tr><th scope="row">')
+        if rows != len(proof["published"]):
+            problems.append(f"checks page: {rel_path} lists {rows} timetables, not {len(proof['published'])}")
+        return problems
     city = data.by_slug.get(slug)
     if city is None:
         return [f"timetable: {rel_path} is not a city in the document"]
+    if f'href="../{CHECKS_PAGE_SLUG}/"' not in doc:
+        problems.append(f"timetable: {rel_path} does not link to the checks page")
+    if city["entryClass"] == "C" and (doc.count('<ul class="decides">') != 1 or doc.count('class="cautious-line"') != 1):
+        problems.append(f"timetable: {rel_path} is a cautious page without its decides table or its cautious line")
     tables = re.findall(r'<table class="tt" data-month="(\d)">(.*?)</table>', doc, re.S)
     if len(tables) != 2:
         problems.append(f"timetable: {rel_path} has {len(tables)} month tables, not 2")

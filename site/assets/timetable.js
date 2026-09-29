@@ -16,6 +16,7 @@
   var FAJR = 0;
   var SUNRISE = 1;
   var ASR = 3;
+  var MAGHRIB = 4;
   var ISHA = 5;
   var CIRCUMFERENCE = 2 * Math.PI * 88;
 
@@ -36,6 +37,7 @@
   if (!holder) return;
   detailedView();
   printButtons();
+  cautiousLine();
   cityPage(JSON.parse(holder.textContent));
 
   /* The detailed view (spec §3.4): a switch that shows the second lines the tables already
@@ -86,6 +88,15 @@
         window.print();
       });
     });
+  }
+
+  /* A cautious page's "Cautious times ›" line under the Today card's list is a link to the
+     explainer; it opens the element as well, so the tap lands on the working, not the fold. */
+  function cautiousLine() {
+    var line = document.querySelector(".cautious-line");
+    var details = document.getElementById("about");
+    if (!line || !details) return;
+    line.addEventListener("click", function () { details.open = true; });
   }
 
   function indexFilter(input) {
@@ -166,6 +177,7 @@
     var hijriDate = document.querySelector('[data-tt="hijri"]');
     var rows = [].slice.call(document.querySelectorAll("tr[data-i]"));
     var shown = data.today;
+    var cautious = data.mn ? cautiousParts() : null;
 
     /* The app's TimelineBuilder: "current" is the last obligatory prayer whose time has come;
        "next" the first still to come, or tomorrow's Fajr after Isha; the ring measures the
@@ -222,6 +234,217 @@
         if (r === i) row.setAttribute("aria-current", "date");
         else row.removeAttribute("aria-current");
       });
+      if (cautious) cautious.show(i);
+    }
+
+    /* A cautious place's explainer for the reader's today (spec §3.3, §9.3): which timetable
+       decides each time, the Maghrib cap's sentence on a day it decided, when to stop eating,
+       and the Fajr ruler drawn from the members' own minutes. Without script the built day's
+       rows and the ruler's sentence stand. */
+    function cautiousParts() {
+      var names = data.mn;
+      var words = data.ruler;
+      var decideRows = [].slice.call(document.querySelectorAll(".decides li[data-p]"));
+      var cap = document.querySelector('[data-tt="cap"]');
+      var stop = document.querySelector('[data-tt="stop"]');
+      var figure = document.querySelector("figure.ruler.fajr");
+      var sentence = figure ? figure.querySelector(".ruler-text") : null;
+      var SVG = "http://www.w3.org/2000/svg";
+      var W = 342;
+      var X0 = 24;
+      var X1 = 318;
+
+      /* The members whose own instant is the one shown — the latest to begin it, for sunrise
+         the earliest, for a capped Maghrib the most-followed's — as site/timetables.py picks
+         them for the built day; a repaired day falls back to the latest (earliest) member. */
+      function deciders(day, p) {
+        var on = [];
+        day.me.forEach(function (m, k) { if (m[p] === day.e[p]) on.push(k); });
+        if (!on.length) {
+          var pick = null;
+          day.me.forEach(function (m) {
+            if (pick === null || (p === SUNRISE ? m[p] < pick : m[p] > pick)) pick = m[p];
+          });
+          day.me.forEach(function (m, k) { if (m[p] === pick) on.push(k); });
+        }
+        return on;
+      }
+
+      function chip(text, on) {
+        var node = document.createElement(on ? "b" : "span");
+        node.className = on ? "chip on" : "chip";
+        node.textContent = text;
+        return node;
+      }
+
+      /* A sentence's {name} and %1$s placeholders filled (a function, so a name holding "$" is
+         never read as a replacement pattern). */
+      function put(template, values) {
+        return template.replace(/\{(\w+)\}|%(\d)\$s/g, function (match, name, index) {
+          var key = name || index;
+          return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : match;
+        });
+      }
+
+      /* The app's maghribCapToday: the member whose Maghrib is the one shown (else the most
+         followed, the first) and those whose own is later. */
+      function capSentence(day, i) {
+        if (i === data.today) return data.capText;
+        var followed = -1;
+        var later = [];
+        day.me.forEach(function (m, k) {
+          if (m[MAGHRIB] > day.e[MAGHRIB]) later.push(names[k]);
+          if (followed < 0 && m[MAGHRIB] === day.e[MAGHRIB]) followed = k;
+        });
+        if (followed < 0) followed = 0;
+        return put(data.capT, { "1": names[followed], "2": later.join(data.comma) });
+      }
+
+      /* The members grouped by their Fajr minute, earliest first. */
+      function fajrGroups(day) {
+        var groups = [];
+        day.me.forEach(function (m, k) {
+          var group = null;
+          groups.forEach(function (g) { if (g.at === m[FAJR]) group = g; });
+          if (group) group.ks.push(k);
+          else groups.push({ at: m[FAJR], ks: [k] });
+        });
+        groups.sort(function (a, b) { return a.at - b.at; });
+        return groups;
+      }
+
+      /* The ruler as a sentence, as site/timetables.py writes it for the built day. */
+      function rulerSentence(day, groups) {
+        var list = groups.map(function (g, n) {
+          return put(n === 0 ? words.beginsFirst : words.beginsAt, {
+            names: g.ks.map(function (k) { return names[k]; }).join(data.comma),
+            fajr: words.fajr,
+            time: day.m[g.ks[0]][FAJR]
+          });
+        }).join(" · ");
+        return put(words.text, { eat: day.x, list: list, fajr: words.fajr, shown: day.t[FAJR] });
+      }
+
+      /* Labels laid in rows so that none overlaps its neighbour: a label at a tick hangs off
+         it towards the middle of the drawing (so it stays beside its minute however long it
+         is), a label on the box is centred, and each takes the first row with room after the
+         label before it; the widths are estimated from the text. Returns the number of rows. */
+      function lay(labels) {
+        var ends = [];
+        labels.forEach(function (label) {
+          var width = label.text.length * 6.2 + 4;
+          var cx = label.x;
+          if (!label.centred) cx += label.x < W / 2 ? width / 2 : -width / 2;
+          label.cx = Math.max(width / 2, Math.min(W - width / 2, cx));
+          label.left = label.cx - width / 2;
+          label.right = label.cx + width / 2;
+        });
+        labels.sort(function (a, b) { return a.left - b.left; });
+        labels.forEach(function (label) {
+          var row = 0;
+          while (row < ends.length && ends[row] + 6 > label.left) row++;
+          ends[row] = label.right;
+          label.row = row;
+        });
+        return ends.length;
+      }
+
+      function node(name, attrs, text) {
+        var made = document.createElementNS(SVG, name);
+        Object.keys(attrs).forEach(function (key) { made.setAttribute(key, attrs[key]); });
+        if (text !== undefined) made.textContent = text;
+        return made;
+      }
+
+      /* B's "Fajr today, minute by minute" (spec §3.3.1): a scale from the end of eating to the
+         Fajr shown, a tick and a name per member minute, the stretch where not all have begun
+         it hatched, the shown minute in amber. Mirrored on an RTL page; the text never flipped. */
+      function drawRuler(day, i) {
+        if (!figure || !day.me || !day.me.length) return;
+        var groups = fajrGroups(day);
+        var start = day.xe;
+        var shownAt = day.e[FAJR];
+        var span = Math.max(60, shownAt - start);
+        function xOf(epoch) {
+          var x = X0 + (Math.min(Math.max(epoch, start), shownAt) - start) / span * (X1 - X0);
+          return data.rtl ? W - x : x;
+        }
+        var above = [{ x: xOf(start), text: words.stop, weight: 700 }];
+        var below = [{ x: xOf(start), text: day.x, weight: 700, centred: true }];
+        groups.forEach(function (g) {
+          above.push({ x: xOf(g.at), text: g.ks.map(function (k) { return names[k]; }).join(" · "), weight: 700 });
+          // A member minute that is the shown one, or the end of eating, has its time already.
+          if (g.at !== shownAt && g.at !== start) below.push({ x: xOf(g.at), text: day.m[g.ks[0]][FAJR], weight: 700, centred: true });
+        });
+        above.push({ x: xOf(shownAt), text: words.shown, weight: 700, accent: true });
+        below.push({ x: xOf(shownAt), text: day.t[FAJR], weight: 800, accent: true, centred: true });
+        var boxFrom = xOf(groups[0].at);
+        var boxTo = xOf(shownAt);
+        var boxed = Math.abs(boxTo - boxFrom) >= 2;
+        if (boxed) above.push({ x: (boxFrom + boxTo) / 2, text: words.notAll, weight: 400, quiet: true, centred: true });
+        var lineY = 28 + 14 * lay(above);
+        var height = lineY + 14 * lay(below) + 12;
+        var svg = node("svg", { viewBox: "0 0 " + W + " " + height, role: "img", "aria-label": rulerSentence(day, groups) });
+        var defs = node("defs", {});
+        var hatch = node("pattern", { id: "fajr-hatch", width: "6", height: "6", patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
+        hatch.appendChild(node("line", { x1: "0", y1: "0", x2: "0", y2: "6", stroke: "var(--hair)", "stroke-width": "2" }));
+        defs.appendChild(hatch);
+        svg.appendChild(defs);
+        if (boxed) {
+          svg.appendChild(node("rect", {
+            x: Math.min(boxFrom, boxTo), y: lineY - 16, width: Math.abs(boxTo - boxFrom), height: "16", fill: "url(#fajr-hatch)"
+          }));
+        }
+        svg.appendChild(node("line", {
+          x1: data.rtl ? W - X1 : X0, y1: lineY, x2: data.rtl ? W - X0 : X1, y2: lineY, stroke: "var(--t3)", "stroke-width": "1"
+        }));
+        [xOf(start)].concat(groups.map(function (g) { return xOf(g.at); })).forEach(function (x) {
+          svg.appendChild(node("line", { x1: x, y1: lineY - 5, x2: x, y2: lineY + 5, stroke: "var(--t3)", "stroke-width": "1" }));
+        });
+        svg.appendChild(node("line", {
+          x1: xOf(shownAt), y1: lineY - 18, x2: xOf(shownAt), y2: lineY + 7, stroke: "var(--accent)", "stroke-width": "2"
+        }));
+        above.forEach(function (label) {
+          svg.appendChild(node("text", {
+            x: label.cx, y: lineY - 22 - 14 * label.row, "font-size": "10.5", "font-weight": label.weight,
+            fill: label.accent ? "var(--accent-text)" : (label.quiet ? "var(--t2)" : "var(--t1)"), "text-anchor": "middle"
+          }, label.text));
+        });
+        below.forEach(function (label) {
+          svg.appendChild(node("text", {
+            x: label.cx, y: lineY + 20 + 14 * label.row, "font-size": "11", "font-weight": label.weight,
+            fill: label.accent ? "var(--accent-text)" : "var(--t1)", "text-anchor": "middle"
+          }, label.text));
+        });
+        var old = figure.querySelector("svg");
+        if (old) figure.removeChild(old);
+        figure.insertBefore(svg, sentence);
+        if (sentence) sentence.hidden = true;
+      }
+
+      function show(i) {
+        var day = days[i];
+        if (!day || !day.me) return;
+        decideRows.forEach(function (row) {
+          var p = +row.getAttribute("data-p");
+          row.querySelector(".shown").textContent = day.t[p];
+          var who = row.querySelector(".who");
+          while (who.firstChild) who.removeChild(who.firstChild);
+          var on = deciders(day, p);
+          names.forEach(function (name, k) {
+            var isOn = on.indexOf(k) !== -1;
+            who.appendChild(chip(isOn ? name : name + " " + day.m[k][p], isOn));
+          });
+        });
+        if (cap) {
+          cap.hidden = !day.cap;
+          if (day.cap) cap.textContent = capSentence(day, i);
+        }
+        if (stop) stop.textContent = put(data.stop, { time: day.x });
+        drawRuler(day, i);
+      }
+
+      return { show: show };
     }
 
     /* The page is older than its data: after Isha on its last day, or past it altogether. The
@@ -308,6 +531,7 @@
       window.setTimeout(tick, 1000 - (Date.now() % 1000) + 10);
     }
 
+    if (cautious) cautious.show(shown); // the built day's ruler is drawn before the day can move
     tick();
     foldPast();
     document.addEventListener("visibilitychange", function () {

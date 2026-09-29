@@ -465,7 +465,11 @@ def check_site(data: timetables.Timetables) -> int:
                 pages.append(rel_path)
             with open(path, encoding="utf-8") as f:
                 doc = f.read()
-            for leftover in re.findall(r"\{[a-z_]+\}", doc):
+            # The live data the page script reads carries sentence templates with their
+            # placeholders on purpose (a cautious page's stop-eating line and Fajr ruler for the
+            # reader's today); everywhere else a placeholder is a sentence left unfilled.
+            markup = re.sub(r'<script type="application/json"[^>]*>.*?</script>', "", doc, flags=re.S)
+            for leftover in re.findall(r"\{[a-z_]+\}", markup):
                 problem(f"placeholder: {rel_path} -> {leftover}")
             # A link to nowhere: the disabled store buttons were this, a tap that did nothing.
             for _ in re.findall(r'href="#"', doc):
