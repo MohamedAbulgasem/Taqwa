@@ -31,7 +31,8 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   Qibla, a subtitle carrying adhan, tasbeeh and no ads, and keywords with neither's words: the
   values sit in `docs/store/listing/<lang>.md` (App Information for name and subtitle, the
   version page for keywords). A translated name refused as taken keeps the English title and the
-  1.0.0 subtitle for that language.
+  1.0.0 subtitle for that language. Cancelling the release of 1.0.0 (32) on 29 September made
+  them editable again, so they go in with 1.0.0 (34) rather than waiting for the next version.
 - **Category:** Lifestyle on both (Apple secondary: Reference). Primary language English (United
   Kingdom); listings in all seven languages.
 - **Age:** Play target audience 13+ (an under-13 band triggers the Families review); content
@@ -46,28 +47,46 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   source of truth: `iosApp/Configuration/Config.xcconfig` holds `TEAM_ID` and `BUNDLE_ID`, and
   both targets read them (the widget is `$(BUNDLE_ID).widget`); the app group is literal in the
   two `.entitlements`, `TaqwaWidgetViews.swift` and `widgetcore/…/KeyValueStore.ios.kt`, which
-  must agree. `TEAM_ID` stays empty until Mohamed's individual Team ID is in — never LOOPDL's
-  `5S5P2Q72MV`. Nobody sees a bundle id and the Android package stays `world.taqwa.app`.
-- **Release timing:** iOS releases automatically on approval; Android follows when the closed
-  test ends. The site's store buttons go live one at a time.
+  must agree. `TEAM_ID` is `3K93P4PA5H`, Mohamed's individual team, set on 22 September — never
+  LOOPDL's `5S5P2Q72MV`. Nobody sees a bundle id and the Android package stays `world.taqwa.app`.
+- **The launch is split by store: iOS first, Android after production access.** iOS 1.0.0 goes
+  to App Review with **"Manually release this version"**: approval parks it in Pending Developer
+  Release, and Mohamed presses Release This Version when he chooses (a soft launch while
+  Google's closed test runs). Android reaches production only after the closed test (12 testers
+  opted in for 14 days) and Google's answer to the production-access application (§5.6–5.7), so
+  some days or weeks later. The site's store buttons, the beta section and the README go live
+  one store at a time: the steps for each are below and in §6.10.
 - **Screenshots:** Play gets framed 1080 × 1920 images (the phone slot wants 16:9 or 9:16 and
-  flags a raw 1080 × 2340 capture as too tall); the App Store gets raw 1320 × 2868 captures from
-  the iPhone 16 Pro Max simulator (the 6.9-inch slot, which Apple scales down for smaller
-  phones). Seven languages each, eight screens each: Prayer, Quran list, Reader, Mushaf,
-  Recitation, Qibla, Tasbeeh, Settings.
+  flags a raw 1080 × 2340 capture as too tall); the App Store gets framed 1320 × 2868 images made
+  from simulator captures (the 6.9-inch slot, which Apple scales down for smaller phones). Seven
+  languages each. Play has eight screens: 1 Prayer, 2 Notifications, 3 Reader, 4 Mushaf,
+  5 Recitation, 6 Qibla, 7 Tasbeeh, 8 Prayer in Dark; the App Store has the same seven without
+  Qibla, because the simulator has no compass. 1 and 8 show the Prayer screen, so a change to its
+  times or its ⓘ means re-shooting both, as the engine did (launch audit A8).
 - **The framed sets are checked in** at `docs/store/screenshots/{play,appstore}/<lang>/` (since
   18 September). A feature that changes a screen re-shoots that screen in the same piece of work
   — `ONLY="2-notifications" tools/store/capture-android.sh <serial> en ar fr tr id ur bn`, the
   same for `capture-ios.sh`, then `tools/store/assemble.sh` — and commits the result.
   `git status docs/store/screenshots` (or the commit's file list) is what to upload to each
   store by hand. Play's release notes per build live in `docs/store/release-notes/`.
+  **Re-shoot only from the main checkout** (`~/Desktop/Workspace/apps/Taqwa`), never from a
+  worktree: `assemble.sh` starts with `rm -rf docs/store/screenshots/play docs/store/screenshots/appstore`
+  and frames back only what `build/store-shots/{android,ios}/<lang>/` holds. `build/` is
+  git-ignored, so the raw captures, all eight per language, exist only in the main checkout's
+  `build/store-shots`; run from a worktree, `assemble.sh` deletes both sets and writes back only
+  the screens just shot.
 - **Recruiting testers (since 20 September):** the closed track takes its testers from the Google
   Group `taqwa-testers@googlegroups.com` (anyone can join; the console allows email lists *or*
   groups, not both). The site's home pages and the README carry a "Join the Android beta"
   section with the three links — group, `play.google.com/apps/testing/world.taqwa.app`, store
-  page. **At launch:** `tools/site-beta.py remove && python3 site/build.py`, and delete the
-  README block between its `beta:start`/`beta:end` markers. The hero's "Join the Android beta"
-  button goes with the section by itself.
+  page. **At Android production**, not at the iOS release: `tools/site-beta.py remove && python3
+  site/build.py`, and delete the README block between its `beta:start`/`beta:end` markers. The
+  hero's "Join the Android beta" button goes with the section by itself. **At the iOS release**
+  the section stays, because the closed test is still running, but its heading "Help test Taqwa
+  before it launches." stops being true: re-word it for Android in all seven languages in
+  `tools/site-beta.py` (en: "Help test Taqwa for Android before it reaches Google Play.") and
+  run `tools/site-beta.py add && python3 site/build.py` (`add` strips and re-inserts, so it can
+  run again).
 - **The site's store badges** come from `site/stores.json`, one address per store, `null` until
   live: set `google_play` to `https://play.google.com/store/apps/details?id=world.taqwa.app`
   when production opens, `app_store` to `https://apps.apple.com/app/id6814975544` when Apple
@@ -82,6 +101,17 @@ accounts on day one: the App Store can be live within about a week, Google Play 
 - **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
   `scripts/bump-version.sh`. Settings › About shows the name alone; Mohamed tells testers which
   build they are on.
+- **Versioning for a split launch** (proposed 29 September; Mohamed decides the tag): a code
+  means the same build on both stores and only goes up (33 and 34 were cut for both). iOS 1.0.0
+  (34) is the first production release. Until Apple releases 1.0.0, a replacement build keeps
+  the name and takes the next code (1.0.0 (35)). Once 1.0.0 is live on the App Store, App Store
+  Connect needs a new version name for any new iOS release, so every later release build follows
+  the rule in `scripts/bump-version.sh` on both platforms (1.0.1 for fixes only, 1.1.0 if
+  anything visible changed): one name per code everywhere. Android's first production release
+  is whatever the closed track carries when production access comes: 1.0.0 (34) if nothing newer
+  was cut, otherwise that newer name, since Play needs only a higher code. `v1.0.0` still points
+  at 500f1e5f (1.0.0 (28), Play internal); moving it to 4af923ac, the build that reaches
+  production first, is Mohamed's call.
 
 ## 2. Accounts (Mohamed, about an hour at the keyboard, then waiting)
 
@@ -164,8 +194,10 @@ costs days.
 ## 4. Built here before the uploads (nothing needs an account)
 
 - Listing copy in seven languages: title and subtitle, short description (≤ 80), full description
-  (≤ 4000), App Store keywords (≤ 100 characters), release notes for 1.0.0, review notes. Mohamed
-  reads English and Arabic; the native reviewers read the rest.
+  (≤ 4000), App Store promotional text (≤ 170) and keywords (≤ 100 bytes, which is how App Store
+  Connect Help states it: an Arabic or Urdu letter takes two, a Bengali one three;
+  `tools/store-listing-check.py` counts them that way), release notes for 1.0.0, review notes.
+  Mohamed reads English and Arabic; the native reviewers read the rest.
 - Screenshots per §1, plus the 512 icon (`androidApp/src/main/ic_launcher-playstore.png`)
   and the 1024 × 500 feature graphics already in `assets/store/`.
 - Two screen recordings for Play's foreground-service declarations, recorded on the emulator on
@@ -235,7 +267,7 @@ costs days.
 3. **New app record**: My Apps → + → New App → iOS, name (§1), primary language English (U.K.),
    bundle ID `world.taqwa.ios` from the list, SKU `taqwa-ios`, full access → Create. Done 22
    September: Apple ID **6814975544**, so the store link is https://apps.apple.com/app/id6814975544
-   (`app_store` in `site/stores.json` at launch). Build 1.0.0 (32) uploaded the same night.
+   (`app_store` in `site/stores.json` at the iOS release). Build 1.0.0 (32) uploaded the same night.
 4. **App Information**: subtitle, categories Lifestyle + Reference, content rights (contains
    third-party content, rights held: `docs/ATTRIBUTION.md`), age rating questionnaire (all None →
    4+), standard licence agreement. Localizations: add ar, fr, tr, id (name, subtitle, privacy
@@ -247,14 +279,26 @@ costs days.
 5. **Pricing and Availability**: Free, all countries and regions. **App Privacy**: Get started →
    no data collected → Publish ("Data Not Collected"). **Trader status** when the banner asks:
    non-trader.
+   **App Accessibility** (app level, voluntary, not tied to a version, so it can wait): declare
+   **Dark Interface only for now**, and only after walking the common tasks in Dark Mode on an
+   iPhone running the submitted build: Prayer with the ⓘ card, About these times, Settings ›
+   Prayer times › Timetable and Match my mosque; the Quran reader, the Mushaf and recitation;
+   Qibla; Tasbeeh; Settings; and the Home Screen and Lock Screen widgets. Declare nothing else
+   yet (launch audit of 29 September, §6): VoiceOver and Voice Control wait for the accessibility
+   round (unnamed controls, a silent Mushaf page), Larger Text for the Mushaf at large sizes,
+   Differentiate Without Color Alone and Sufficient Contrast for their fixes, Reduced Motion and
+   Captions for a device check; Audio Descriptions do not apply (no video).
 6. **Version 1.0.0 page**: screenshots (the 6.9-inch set per language; a localisation without its
    own falls back to English), promotional text, description, keywords, support URL
    https://taqwa.world/support/, marketing URL https://taqwa.world, copyright
    "2026 Mohamed Abulgasem", App Review contact (name, phone, email), sign-in required: No,
-   **review notes** (no account; location optional, Settings › Location picks a city; only
-   recitation downloads use the network; play a surah and lock the phone for the lock-screen
-   player; widgets come from the home-screen gallery), select the processed build, release
-   automatically after approval.
+   **App Review Information › Notes** from `docs/store/app-review/2026-09-29-notes-1.0.0.txt` (the
+   Guideline 2.1 answers, which Apple asked to find there on every submission), select the
+   processed build, and under Version Release choose **Manually release this version**. A first
+   version has no "What's New" field, so Play's release notes have no App Store twin until the
+   next version.
+   The promotional text is the one field that can change at any time, even after release, with
+   no review.
 7. **TestFlight** before submitting: TestFlight → Internal Testing → a group with Mohamed as
    tester → the TestFlight app on the iPhone 12 installs the exact store build. Caution: TestFlight
    uses the Apple Account signed into the phone's App Store, and a tester links to one Apple
@@ -273,9 +317,35 @@ costs days.
    to App Review → Attach File) and pasted into App Review Information → Notes, then Edit → Add for
    Review → Resubmit to App Review with the same build. The answers are in
    `docs/store/app-review/2026-09-23-guideline-2.1-reply.txt` (3,814 of the 4,000 characters both
-   fields allow); keep Notes in step with the app on every later submission. "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
+   fields allow), kept as the record of that reply; the Notes for the engine build are
+   `docs/store/app-review/2026-09-29-notes-1.0.0.txt` (3,958 bytes; App Store Connect Help gives
+   the Notes field 4,000 bytes). Keep Notes in step with the app on every later submission.
+   "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
    App Review messages without a new build; a binary rejection needs a fix, the next build number
-   (33, 34, …, shared with Android) and a resubmission.
+   (35, 36, …, shared with Android) and a resubmission.
+9. **Replacing an approved build** (done on 29 September: 1.0.0 (32) was approved but calculates
+   with the old presets, so it was never released, and 1.0.0 (34) goes in its place; 33 stays
+   unused in TestFlight). It works only while the approved version waits in Pending Developer
+   Release, which is what manual release is for; a version already released cannot be withdrawn
+   this way and needs a new version name instead.
+   1. On the version page, **Cancel this release**. The version returns to Developer Rejected,
+      and every field on it is editable again, as are the name and subtitle under App Information.
+   2. Upload the replacement: `scripts/ios-release.sh archive`, then `scripts/ios-release.sh
+      upload`, and wait until TestFlight shows the build processed.
+   3. Edit whatever metadata changed: App Information (name, subtitle), then per localisation the
+      promotional text, description, keywords and screenshots, then App Review Information ›
+      Notes. Every value is in `docs/store/listing/<lang>.md` and `docs/store/app-review/`, and
+      `python3 tools/store-listing-check.py` counts them against the limits.
+   4. Under Build, remove the old build (the remove button beside it) and **Add Build** → the new
+      one.
+   5. Version Release: **Manually release this version**. Save.
+   6. **Add for Review**, then **Submit to App Review**. Review starts again from Waiting for
+      Review.
+10. **At the iOS release** (after approval, when Mohamed presses Release This Version): check the
+    live page at https://apps.apple.com/app/id6814975544, then set `app_store` in
+    `site/stores.json`, build and push the site (§1, "The site's store badges"), re-word the site's
+    beta heading for Android (§1, "Recruiting testers"), and update the README's "Get it" section.
+    Nothing Android-side changes until production access.
 
 ## 7. Cost and calendar
 

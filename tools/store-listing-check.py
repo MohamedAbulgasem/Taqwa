@@ -5,7 +5,9 @@
     python3 tools/store-listing-check.py fr ur    # only these
 
 A field is a `### Heading (limit)` followed by its text up to the next heading; lines in
-parentheses are notes and are skipped. Keywords are also checked for spaces after commas."""
+parentheses are notes and are skipped. Keywords are also checked for spaces after commas, and
+are counted in UTF-8 bytes, not characters: App Store Connect Help gives their limit as "up to
+100 bytes", and an Arabic or Urdu letter takes two, a Bengali one three."""
 import glob, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,14 +31,15 @@ def check(path):
             i += 1
         text = "\n".join(body).strip()
         text = "\n".join(l for l in text.split("\n") if not (l.startswith("(") and l.endswith(")"))).strip()
-        n = len(text)
+        keywords = name.startswith("Keywords")
+        n = len(text.encode("utf-8")) if keywords else len(text)
         flag = "" if n <= limit else "  <-- OVER"
         if n > limit:
             problems += 1
-        if name.startswith("Keywords") and ", " in text:
+        if keywords and ", " in text:
             print(f"{lang}: {name}: a space after a comma wastes characters")
             problems += 1
-        print(f"{lang}: {name:20s} {n:4d}/{limit}{flag}")
+        print(f"{lang}: {name:20s} {n:4d}/{limit}{' bytes' if keywords else ''}{flag}")
     return problems
 
 if __name__ == "__main__":

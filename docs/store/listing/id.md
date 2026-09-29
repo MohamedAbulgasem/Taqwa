@@ -12,12 +12,12 @@ Waktu salat, azan, Al-Qur’an 30 juz dengan tilawah, dan kiblat. Gratis, offlin
 Taqwa menghadirkan hal-hal pokok dalam hari Anda di satu tempat yang tenang: waktu salat yang akurat di tempat Anda berada, azan saat waktunya tiba, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Berfungsi offline, tidak berbayar, tanpa iklan, dan tidak meminta akun.
 
 WAKTU SALAT
-• Waktu untuk lokasi Anda, dari GPS atau dari kota yang Anda pilih di antara lebih dari 24.000 kota.
-• Metode perhitungan yang dipakai di seluruh dunia (Liga Muslim Dunia, Ummul Qura, Mesir, Karachi, ISNA, Turki, dan lainnya), dengan metode yang tepat disarankan untuk negara Anda.
-• Aturan yang masuk akal untuk lintang tinggi, ketika malam terlalu pendek untuk sudut yang biasa.
-• Notifikasi untuk setiap salat, dari nada yang lembut sampai azan lengkap dalam beberapa pilihan suara, dengan pengingat sebelumnya bila Anda mau.
-• Widget layar utama dengan waktu salat hari ini dan hitung mundur ke salat berikutnya.
-• Tanggal Hijriah di samping tanggal Masehi.
+• Waktu untuk lokasi Anda, dari GPS atau dari kota yang Anda pilih di antara lebih dari 34.000 kota.
+• Waktu menurut jadwal yang diikuti masjid di sekitar Anda. Jika Taqwa memiliki jadwal itu, Taqwa menghitungnya ulang dan mencocokkannya hari demi hari dengan jadwal terbitannya: pada setiap hari yang diperiksa, tidak ada salat yang dimulai sebelum waktu yang diterbitkan. Jika suatu jadwal belum diperiksa sepenuhnya, Taqwa menambahkan margin pengaman; jika masjid-masjid mengikuti jadwal yang berbeda, Taqwa menampilkan waktu ihtiyat, yaitu setiap salat setelah waktunya masuk di semua jadwal itu; dan jika tidak ada jadwal yang diketahui, Taqwa menghitung dengan memilih yang lebih aman.
+• Ketuk ⓘ di layar Salat untuk melihat asal waktu ini, dan “Tentang waktu ini” untuk melihat cara waktu ini dihitung dan diperiksa. “Cocokkan dengan masjid saya” mencari jadwal masjid Anda dari dua waktu di papannya, dan metode perhitungan yang biasa (Liga Muslim Dunia, Mesir, Karachi, ISNA, dan lainnya) serta penyesuaian per salat juga tersedia.
+• Aturan untuk lintang tinggi, ketika malam terlalu pendek untuk sudut yang biasa.
+• Notifikasi untuk setiap salat: nada yang jelas, takbir, atau awal azan dalam beberapa pilihan suara, dengan pengingat sebelumnya bila Anda mau.
+• Tanda Jumat pada Dzuhur hari Jumat, widget layar utama dengan waktu salat hari ini dan hitung mundur ke salat berikutnya, serta tanggal Hijriah di samping tanggal Masehi.
 
 AL-QUR’AN
 • Teks Utsmani lengkap, dengan huruf yang sama seperti Mushaf Madinah, serta tata letak halaman tradisional ketika Anda ingin membaca seperti dari Mushaf cetak.
@@ -25,6 +25,7 @@ AL-QUR’AN
 • Pencarian pada teks Arab dan terjemahannya.
 • Penanda, salin dan bagikan, serta kartu yang membawa Anda kembali ke tempat terakhir berhenti.
 • Tilawah oleh sepuluh qari, diunduh sekali per surah dan diputar offline, dengan kendali di layar terkunci; begitu satu surah selesai, surah berikutnya menyusul.
+• Selama tilawah, suara ponsel Anda sendiri dapat membacakan terjemahan atau tafsir setelah setiap ayat, jika ponsel memiliki suara untuk bahasa itu.
 • Widget ayat hari ini.
 
 KIBLAT
@@ -36,12 +37,12 @@ TASBIH
 DIBUAT UNTUK DIPERCAYA
 • Tanpa akun, tanpa iklan, tanpa analitik, dan tanpa pelacakan dalam bentuk apa pun.
 • Lokasi Anda dipakai di ponsel Anda untuk menghitung waktu salat dan tidak pernah dikirim ke mana pun.
-• Satu-satunya yang pernah diunduh aplikasi ini adalah audio tilawah yang Anda minta.
+• Internet hanya dipakai untuk tilawah: audio yang Anda minta, dan pemeriksaan harian daftar qari setelah Anda memakainya.
 • Gratis dan sumber terbuka di bawah lisensi GPL, dengan setiap sumber dan lisensi disebutkan di dalam aplikasi.
 
 Tersedia dalam bahasa Inggris, Arab, Prancis, Turki, Indonesia, Urdu, dan Bengali.
 
-Perhitungan waktu salat oleh Adhan. Teks Al-Qur’an dari Tanzil Project. Tilawah dari Islamic Network, dilisensikan oleh para qari untuk penyebaran gratis.
+Waktu salat dari mesin milik Taqwa sendiri; arah kiblat memakai pustaka Adhan. Teks Al-Qur’an dari Tanzil Project. Tilawah dari Islamic Network, dilisensikan oleh para qari untuk penyebaran gratis. Taqwa tidak berafiliasi dengan otoritas keagamaan yang jadwalnya diikutinya.
 
 Situs web: https://taqwa.world/id/
 Dukungan: support@taqwa.world
@@ -62,12 +63,16 @@ Azan & tasbih, tanpa iklan
 (From the next version. In 1.0.0: "Waktu Salat, Al-Qur’an, Kiblat". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
-Waktu salat di tempat Anda berada, azan saat waktunya tiba, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Gratis, offline, tanpa akun, dan tanpa iklan.
+Waktu salat menurut jadwal masjid Anda, dicocokkan hari demi hari jika Taqwa memiliki jadwalnya. Azan, Al-Qur’an lengkap dengan tilawah, dan kiblat. Gratis, tanpa iklan.
+
+(Proposal of 29 September, the owner's to take or leave; editable at any time. Until then: "Waktu salat di tempat Anda berada, azan saat waktunya tiba, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Gratis, offline, tanpa akun, dan tanpa iklan.")
 
 ### Keywords (100)
-sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,digital,arah,islam,muslim,ramadan
+sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,masjid,arah,islam,muslim,ramadan
 
 (From the next version, trimmed of words the new name and subtitle already carry. In 1.0.0: sholat,shalat,jadwal,azan,adzan,quran,alquran,islam,muslim,murottal,tilawah,tasbih,zikir,ramadan)
+
+(Apple states the limit as 100 bytes. "masjid" for "digital" (the counter word: tasbih digital), for Cocokkan dengan masjid saya, is a proposal of 29 September; without it: sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,digital,arah,islam,muslim,ramadan)
 
 ### Description (4000)
 (Teks yang sama dengan deskripsi lengkap Play di atas.)
