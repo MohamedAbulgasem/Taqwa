@@ -105,6 +105,15 @@ before the last day of the month after the two shown, a month's notice to run th
 
 ### 2.1 Published (38 tonight; 40 from 1 October)
 
+*Amended at Task 5 (29 September, after the night's Diyanet Europe and Kemenag merges changed the
+stamps):* the rule run over every row of `cities.tsv` on the new stamps publishes **43 tonight and 47
+from 1 October** — the table below plus Surabaya, Medan, Semarang, Palembang and Yogyakarta (Kemenag's
+five newly fitted kota; `id.kemenag` now 6,570 place-days at 18 places) and, from 1 October, Brussels and
+Antwerp (`be.cautious`, whose stamp now runs 25 September 2026 – 31 December 2027, so it is held like
+Diyanet's until the month turns). On the same stamps Paris reads 1,157 · 3 · 31 Dec 2027 and Oslo
+2,648 · 5 · 31 Dec 2027. `site/cities.tsv` is the record of what is un-held; §2.2's groups are otherwise
+unchanged.
+
 Per city: the entry, the class at the city, the figures the page shows (place-days at places, checked
 through, at most N minutes after over the starts, read as the app's About reads them: the unit's own row
 where the stamp has units, else the entry's), and the page languages from `cities.tsv`.

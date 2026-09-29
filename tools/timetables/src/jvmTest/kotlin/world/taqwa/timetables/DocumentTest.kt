@@ -333,6 +333,10 @@ class DocumentTest {
         assertEquals("C", toronto["class"])
         assertEquals(7, toronto["atMost"]) // the entry's worst over the starts, for the checks page's table
         assertEquals("Cautious times", toronto.map("names")["en"])
+        // Ruling R114: the checks page has no country, so every row's date reads in the language's
+        // own form — Toronto's row in British order, not en-CA's "December 31, 2026".
+        assertEquals("31 December 2026", toronto.map("throughText")["en"])
+        assertEquals(london.map("throughText")["ar"], toronto.map("throughText")["ar"])
         assertEquals(1, built.list("held").size)
     }
 }
