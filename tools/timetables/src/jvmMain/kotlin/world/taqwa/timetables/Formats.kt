@@ -127,19 +127,27 @@ class Formats(val language: String, country: String) {
         return "UTC$sign${plain.format(hours)}$tail"
     }
 
-    private companion object {
+    companion object {
+        /**
+         * The language's own form, no country (ruling R114): the "How Taqwa checks" page belongs to
+         * no country, so each language dates every row of its table one way — English in British
+         * order, Arabic in Arabic-Indic digits — rather than as a phone in each entry's first city
+         * would (Toronto's row read "December 31, 2026" beside London's "31 December 2026").
+         */
+        fun forLanguage(language: String): Formats = Formats(language, "")
+
         /** CLDR's long name for PS is "Palestinian Territories" and its equivalents; its short one is the name people use. */
-        val SHORT_COUNTRY_NAMES = mapOf(
+        private val SHORT_COUNTRY_NAMES = mapOf(
             "PS" to mapOf(
                 "en" to "Palestine", "ar" to "فلسطين", "fr" to "Palestine", "tr" to "Filistin",
                 "id" to "Palestina", "ur" to "فلسطین", "bn" to "ফিলিস্তিন",
             ),
         )
 
-        val englishWithCountry: Set<Locale> =
+        private val englishWithCountry: Set<Locale> =
             Locale.getAvailableLocales().filter { it.language == "en" && it.country.isNotEmpty() }.toSet()
 
-        fun localeFor(language: String, country: String): Locale {
+        private fun localeFor(language: String, country: String): Locale {
             val candidate = Locale.Builder().setLanguage(language).setRegion(country).build()
             if (language == "en" && candidate !in englishWithCountry) return Locale.UK
             return candidate

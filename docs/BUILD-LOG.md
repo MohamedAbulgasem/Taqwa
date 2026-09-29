@@ -1843,3 +1843,70 @@ change re-checks everything; a key never reaches a log; a breaker per host and a
 one lock, one `today`, atomic writes. It now runs weekly on GitHub Actions in a private archive
 repository (ruling R94; `tools/timetables/monitor/ci/monitor-weekly.yml`, docs/MONITOR.md), keeping
 one issue open while something needs attention; IRN is fetched on its own (ruling R95).
+
+## The city pages, rebuilt on the engine (29 September)
+
+Built overnight from the design Mohamed chose the evening before — B ("show the working") with C's
+month table — under `docs/superpowers/specs/2026-09-29-city-pages-design.md` and its plan, six tasks
+each reviewed. taqwa.world's prayer-time pages are live again, on the never-early engine.
+
+**What a page is now.** The Today card is the app's Prayer screen — the same six times, the same
+countdown ring in the same digits, lit for the reader's day in the city's own time zone — with a quiet
+foot saying so. Under it the authority line and the stamp's proof sentence stay visible
+("{Authority} timetable · reproduced and checked by Taqwa · Taqwa is not affiliated with …";
+"Checked against …'s published timetable through …"), and "Where these times come from" folds the
+rest behind a native `<details>`: who publishes the times, how Taqwa reproduces them in the app's own
+words for the method, and how it was checked — the stat tiles (place-days at places, starts before the
+timetable, at most N minutes after) and the minute ruler, every figure read from the stamp, none typed
+(R97). A cautious place shows its members, "which timetable decides each time today" with a chip per
+member, the Maghrib-cap sentence on the days it applies, the drawn Fajr ruler, and two tiles rather
+than three (R105: the entry-wide worst would be another place's spread). The months are C's real
+tables: past days folded at every width, Fridays marked, a **detailed view** switch that adds the end
+of eating under Fajr, the other school's Asr under Asr and a mark on days set by rule, and **Print or
+save as PDF** per month from a print stylesheet that prints every script. **How Taqwa checks** is a
+page per language from the stamps and the gate files: the rule, the gate's totals, the surveys, and
+the table of every timetable with a page (spec §5; the index links it, every city page does). The
+get-the-app places — the card's foot, the desktop pitch, `#app` at the foot — show their coming-soon
+state until `site/stores.json` has an address, when the official badges appear with no other change
+(R98); the launch note in `docs/STORE-CHECKLIST.md` names all three. Small amber text uses the darker
+`--accent-text` (4.5:1 on the page, on white and on the today tint; R99); figures read as the app's
+digits, ungrouped (R107). The app's cautious About screen gained the same two tiles and the sentence
+"Checked against the timetables followed here." in seven languages (R100, R111, R112).
+
+**Which cities.** A row of `site/cities.tsv` is un-held only where the stamps prove every day its
+page shows: class A, B or C at the city, measured there, a green stamp for the entry and its unit
+covering both months (R101, spec §2). The generator applies the rule on every build and holds a row it
+rejects with a notice, so pages come and go with the proofs and nobody edits the list to chase them.
+Run over every row on the night's stamps — after the Diyanet Europe and Kemenag merges — the rule
+publishes **43 cities tonight and 47 from 1 October** (the plan's 38 and 40 plus Kemenag's five newly
+fitted kota, Surabaya, Medan, Semarang, Palembang and Yogyakarta, and from 1 October Brussels and
+Antwerp beside İstanbul and Ankara, all four held for two days because their stamps begin on
+25 September). Held, in one line each in the file: the class-D countries whose authority's method is
+not yet fully checked (the Gulf beyond Dubai, Doha and Muscat; the Levant, Iraq, Libya, Sudan,
+Mauritania, Uzbekistan, Pakistan, India, Bangladesh, Kosovo, Moscow, Austria, Switzerland, ISNA's
+cities, Auckland, and the cities outside a checked unit — Salalah, Irbid, Sousse, Oran, Constantine,
+Mansoura, Tanta, Assiut, Marrakesh, Fes, Agadir, six Turkish cities), the places with no authority
+where Taqwa calculates (Yemen, Maldives, the rest of Africa), the stamps that end before the days
+shown (Egypt, Jordan, Palestine, Morocco, Cape Town), and the cautious entries not measured at the
+city (the UK beyond London, France beyond Paris, the Netherlands, Germany, Sweden, Denmark, Calgary,
+Edmonton, Vancouver, Sydney, Melbourne). London Unified's stamp ends 31 December 2026 and so do
+Doha's, Singapore's, Kemenag's, JAKIM's, Brunei's, Sarajevo's, Kazan's, Dublin's, Chicago's and
+Toronto's: gate the 2027 tables before December or those pages hold themselves on 1 December.
+
+**Surprises on the way.** Headless Chrome on this Mac will not lay a window out narrower than 500 px,
+so every phone capture goes through a 390-px iframe (the plan's command gave a cropped desktop
+layout). The integration merge of Tasks 2 and 3 lost one `}` and nested the whole months block inside
+the desktop media query — nothing of the months' phone rules or the print stylesheet applied on a
+phone until Task 4's capture found it. The app never groups thousands, so the tiles read "4015" (R107).
+Toronto's English page is en-CA and its date read "December 31, 2026" beside London's "31 December
+2026" on the checks table, so that page now dates every row in the language's own form (R114). A
+printed month fitted A4 but spilled a blank sheet on Letter (and Bengali on A4 too) once the page's
+own head printed above it; 2 px cells at 1.25 line-height fit every script on both. The words of the
+detailed view's second lines live in the column heads on a phone ("Fajr / eat by"), because in the
+cells they pushed Isha off a 390-px screen; on paper the word comes back beside the time. The
+`<ol>` of steps numbered every nested list until scoped. "Kıble Kuzeyden 151°" read with a capital
+mid-line; now "Kıble kuzeyden 151°".
+
+**Still to do.** Native readers' glance at the Turkish, Bengali and Urdu sentences added tonight;
+a routine to gate each authority's 2027 table as it appears, with the monitor; the accessibility
+audit's follow-ups on the app's About table.

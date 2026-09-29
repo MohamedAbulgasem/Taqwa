@@ -10,80 +10,76 @@
 #            badly as a page title. Every one here is a finding to fix in the app's city files.
 #
 # Nothing about the calculation is set here. A page shows exactly what the app shows a user in
-# that city who has changed no setting: the country's method from CalculationMethodDefaults, the
-# Standard Asr (the app has no country default for the Asr school yet), the automatic
-# high-latitude rule, no adjustments.
+# that city who has changed no setting: the timetable or method the engine resolves for the city,
+# its Asr school, the automatic high-latitude rule, no adjustments.
 #
-# So a country is live only where that agrees with the timetable its mosques actually follow (the
-# national authority's, or the dominant one where there is none), and a page must never show a
-# prayer earlier than that timetable, nor sunrise later: a minute early is a prayer before its time
-# or a fast broken before sunset. The first check, on 25 September 2026, allowed about two minutes
-# either way. An audit the same day that looked at the direction found every live country a minute
-# or more early on some days, so every row is now held, each under what was found. A row comes
-# back by deleting its "# " once the engine passes. The sources are in docs/BUILD-LOG.md.
+# A row is un-held when the stamps prove every day its page shows (ruling R101, spec §2 in
+# docs/superpowers/specs/2026-09-29-city-pages-design.md): the engine resolves the city to a
+# class A, B or C entry, measured at the city, with a green stamp for the entry and its unit
+# covering both months shown. tools/timetables applies the rule on every build and holds a row it
+# rejects, with a notice, so a stamp that ends before next month holds its cities by itself
+# (London Unified's ends 31 December 2026: gate the 2027 table before December) and one that
+# begins inside this month publishes them on the first of the next (Diyanet's and Belgium's begin
+# 25 September 2026: İstanbul, Ankara, Brussels and Antwerp on 1 October). A held row comes back
+# by deleting its "# " once its stamp qualifies; a row the rule rejects is never published. The
+# proof is in tools/timetables/official/stamps and summarised at /prayer-times/how-taqwa-checks/.
 #
 # tools/timetables validates every row on every build: an unknown id, a duplicate slug, a page
 # language with no name, or a featured language without a page fails the build.
 
 # ---------------------------------------------------------------- Middle East
-# Saudi Arabia: Umm al-Qura, within a minute of second-hand copies of the official calendar.
-# Before Ramadan (from 8 February 2027) the app needs Umm al-Qura's 120-minute Ramadan Isha; until
-# it has it the pages add the half hour on Ramadan days and say so under the month.
-# held: checked on two days only, against second-hand copies of the calendar; on 20 September
-# Makkah's page was a minute before them at Fajr, Dhuhr, Asr, Maghrib and Isha.
-# makkah-saudi-arabia	104515	en ar fr tr id ur bn	en ar fr tr id ur bn	ur=مکہ مکرمہ
-# madinah-saudi-arabia	109223	en ar fr tr id ur bn	en ar fr tr id ur bn	ar=المدينة المنورة
-# riyadh-saudi-arabia	108410	en ar ur bn id	en ar id ur bn
-# jeddah-saudi-arabia	105343	en ar ur bn id	ar id ur bn
-# dammam-saudi-arabia	110336	en ar ur
-# taif-saudi-arabia	107968	en ar		en=Taif
-# tabuk-saudi-arabia	101628	en ar
-# abha-saudi-arabia	110690	en ar
-# buraydah-saudi-arabia	107304	en ar		ar=بريدة
-# UAE: the Dubai method, within 2 minutes of the published Dubai table.
-# held: against that table for September the page's Maghrib was a minute early on 13 days and its
-# Isha on 9. The table is later by a rounding; the app rounds to the nearest minute.
-# dubai-uae	292223	en ar ur bn	en ar ur bn
+# Saudi Arabia: Umm al-Qura (sa.ummalqura, class A).
+makkah-saudi-arabia	104515	en ar fr tr id ur bn	en ar fr tr id ur bn	ur=مکہ مکرمہ
+madinah-saudi-arabia	109223	en ar fr tr id ur bn	en ar fr tr id ur bn	ar=المدينة المنورة
+riyadh-saudi-arabia	108410	en ar ur bn id	en ar id ur bn
+jeddah-saudi-arabia	105343	en ar ur bn id	ar id ur bn
+dammam-saudi-arabia	110336	en ar ur
+taif-saudi-arabia	107968	en ar		en=Taif
+tabuk-saudi-arabia	101628	en ar
+abha-saudi-arabia	110690	en ar
+buraydah-saudi-arabia	107304	en ar		ar=بريدة
+# UAE: Dubai's IACAD table (ae.iacad.dubai, class B) at Dubai.
+dubai-uae	292223	en ar ur bn	en ar ur bn
+# held: Abu Dhabi, Sharjah, Al Ain — Awqaf's method not yet fully checked (ae.awqaf, class D).
 # abu-dhabi-uae	292968	en ar ur bn
 # sharjah-uae	292672	en ar ur bn		ar=الشارقة
 # al-ain-uae	292913	en ar		en=Al Ain
-# Kuwait: the Kuwait method, within a minute of the ministry's calendar.
-# held: checked on one day only, when the page's Asr and Maghrib were a minute early.
+# held: Kuwait — the ministry's method not yet fully checked (class D).
 # kuwait-city-kuwait	285787	en ar ur bn	ar ur bn	ur=کویت سٹی;bn=কুয়েত সিটি
-# held: Qatar. Calendar House puts Maghrib at sunset + 3 and Isha at Maghrib + 90; the app is 3 minutes early at both.
-# doha-qatar	290030	en ar ur bn
-# held: Bahrain. The Supreme Council's calendar has Isha 4 minutes later than the app.
+# Qatar: Calendar House (qa.calendarhouse, class B) at Doha.
+doha-qatar	290030	en ar ur bn
+# held: Bahrain — the council's method not yet fully checked (class D).
 # manama-bahrain	290340	en ar ur
-# held: Oman. The Ministry of Endowments' Dhuhr to Isha are 5 to 6 minutes later than the app's.
-# muscat-oman	287286	en ar ur
+# Oman: the Ministry of Endowments (om.mara, class B) at Muscat.
+muscat-oman	287286	en ar ur
+# held: Salalah — outside om.mara's checked unit (class D).
 # salalah-oman	286621	en ar		en=Salalah
-# held: Jordan. The Ministry of Awqaf's Maghrib is 7 and Isha 5 minutes later than the app's.
+# held: Jordan — jo.awqaf's stamp ends 27 December 2025 (Amman, Zarqa); Irbid is outside its checked units (class D).
 # amman-jordan	250441	en ar	ar
 # zarqa-jordan	250090	en ar		ar=الزرقاء
 # irbid-jordan	248946	en ar
-# held: Palestine. Gaza Awqaf (about 19.5°/17.5°, Maghrib + 3): the app's Fajr is 7 minutes late, Maghrib and Isha 3 early; no West Bank table was found.
+# held: Palestine — Gaza's cautious times are not measured at the city; ps.iftaa's stamp ends 19 March 2026 (Hebron, Nablus).
 # gaza-palestine	281133	en ar
 # hebron-palestine	285066	en ar
 # nablus-palestine	282615	en ar
-# held: Lebanon. Dar al-Fatwa's Fajr is 9 minutes earlier and Maghrib 6 later than the app's; Shia calendars differ further.
+# held: Lebanon — Dar al-Fatwa's method not yet fully checked (class D).
 # beirut-lebanon	276781	en ar fr
 # tripoli-lebanon	266826	en ar fr
 # sidon-lebanon	268064	en ar fr		fr=Saïda
-# held: Syria. The Awqaf table (MWL plus a 2-minute margin) has Maghrib 2 minutes after the app's, and nothing newer than February 2026 to check.
+# held: Syria — the Awqaf method not yet fully checked (class D).
 # damascus-syria	170654	en ar
 # aleppo-syria	170063	en ar
 # homs-syria	169577	en ar
-# held: Iraq. The Sunni Endowment's Dhuhr is 4 minutes later than the app's; the Shia Endowment's Maghrib is about sunset + 15.
+# held: Iraq — the Sunni Endowment's method not yet fully checked (class D).
 # baghdad-iraq	98182	en ar
 # mosul-iraq	99072	en ar
 # erbil-iraq	95446	en ar
-# held: Yemen. No published timetable could be found to check against.
+# held: Yemen — no authority; calculated by Taqwa (class D).
 # sanaa-yemen	71137	en ar
 # aden-yemen	415189	en ar
 
 # ---------------------------------------------------------------- North Africa
-# Egypt: the Egyptian method, within 2 minutes of the Survey Authority's table for all of September.
-# held: the page's Asr was a minute before the Survey Authority's on 11 of September's 30 days.
+# held: Egypt — eg.esa's stamp ends 30 September 2026 (Cairo, Alexandria, Giza, Port Said, Suez, Luxor, Aswan); Mansoura, Tanta and Assiut are outside its checked units (class D).
 # cairo-egypt	360630	en ar	en ar
 # alexandria-egypt	361058	en ar	ar
 # giza-egypt	360995	en ar
@@ -94,7 +90,7 @@
 # mansoura-egypt	360761	en ar		en=Mansoura;ar=المنصورة
 # tanta-egypt	347497	en ar
 # assiut-egypt	359783	en ar
-# held: Libya. The Awqaf and Dar al-Ifta table in use since 1994 (about 18.5° Fajr, 18.3° Isha, Dhuhr + 3, Maghrib + 3) has Isha 6 to 7 and Maghrib 3 to 4 minutes later than the app's MWL.
+# held: Libya — the Awqaf table's method not yet fully checked (ly.awqaf, class D everywhere; ruling R73).
 # tripoli-libya	2210247	en ar	ar
 # benghazi-libya	88319	en ar
 # misrata-libya	2214846	en ar		en=Misrata
@@ -105,48 +101,48 @@
 # al-khums-libya	2219905	en ar		ar=الخمس
 # zliten-libya	2208485	en ar
 # sirte-libya	2210554	en ar		ar=سرت
-# held: Tunisia. The National Institute of Meteorology's Dhuhr is 6 to 7 and Isha 5 to 6 minutes later than the app's.
-# tunis-tunisia	2464470	en ar fr	fr
-# sfax-tunisia	2467454	en ar fr
+# Tunisia: the National Institute of Meteorology (tn.inm, class B) at Tunis and Sfax.
+tunis-tunisia	2464470	en ar fr	fr
+sfax-tunisia	2467454	en ar fr
+# held: Sousse — outside tn.inm's checked units (class D).
 # sousse-tunisia	2464915	en ar fr
-# held: Algeria. The ministry's calendar has Maghrib 3 to 4 minutes after the app's.
-# algiers-algeria	2507480	en ar fr	fr
+# Algeria: the ministry's calendar (dz.marw, class B) at Algiers.
+algiers-algeria	2507480	en ar fr	fr
+# held: Oran, Constantine — class D at the city (Oran's unit is not fully checked; Constantine is outside dz.marw's checked units).
 # oran-algeria	2485926	en ar fr
 # constantine-algeria	2501152	en ar fr
-# held: Morocco. The Ministry of Habous (about 19°/17°, Dhuhr + 5, Maghrib + 4 to 5) differs from the app by 4 to 6 minutes, and the country left UTC+1 for UTC+0 on 20 September 2026 (tzdata 2026c), which the JDK does not have yet.
+# held: Morocco — ma.habous's stamp ends 12 October 2026 (Casablanca, Rabat, Tangier); Marrakesh, Fes and Agadir are outside its checked units (class D).
 # casablanca-morocco	2553604	en ar fr	fr
 # rabat-morocco	2538475	en ar fr		ar=الرباط
 # marrakesh-morocco	2542997	en ar fr
 # fes-morocco	2548885	en ar fr
 # tangier-morocco	2530335	en ar fr
 # agadir-morocco	2561668	en ar fr
-# held: Mauritania. The ministry's Fajr (19.5°) is 5 to 6 minutes earlier than the app's.
+# held: Mauritania — the ministry's method not yet fully checked (class D).
 # nouakchott-mauritania	2377450	en ar fr
-# held: Sudan. The Fiqh Academy's Fajr (19.5°) is about 6 minutes earlier than the app's.
+# held: Sudan — the ministry's method not yet fully checked (class D).
 # khartoum-sudan	379252	en ar		ar=الخرطوم
 # omdurman-sudan	365137	en ar
 # port-sudan-sudan	377039	en ar
 
 # ---------------------------------------------------------------- Türkiye and Central Asia
-# Türkiye: Diyanet, within 2 minutes of Diyanet's own tables for eight cities across October.
-# held: in all eight cities the page's Asr, Maghrib and Isha were 1 to 2 minutes before Diyanet's on
-# nearly every day. Diyanet's Maghrib is sunset + 8 and its Asr about + 5; adhan's Turkey preset adds
-# 7 and 4.
-# istanbul-turkiye	745044	en tr	en tr
-# ankara-turkiye	323786	en tr	tr
+# Türkiye: Diyanet (tr.diyanet, class A) at İstanbul and Ankara. Its stamp begins 25 September 2026, so the generator holds both until 1 October, when the pages show October and November.
+istanbul-turkiye	745044	en tr	en tr
+ankara-turkiye	323786	en tr	tr
+# held: İzmir, Bursa, Konya, Antalya, Gaziantep, Diyarbakır — outside Diyanet's checked districts (class D).
 # izmir-turkiye	311046	en tr	tr	en=Izmir
 # bursa-turkiye	750269	en tr	tr
 # konya-turkiye	306571	en tr	tr
 # antalya-turkiye	323777	en tr
 # gaziantep-turkiye	314830	en tr
 # diyarbakir-turkiye	316541	en tr
-# held: Uzbekistan. The Muslim Board uses 15.5° for Fajr and Isha and the Hanafi Asr: Fajr is 13 minutes, Isha 12 and Asr about 49 away from the app's defaults.
+# held: Uzbekistan — the Muslim Board's method not yet fully checked (class D).
 # tashkent-uzbekistan	1512569	en
 # samarkand-uzbekistan	1216265	en
 # bukhara-uzbekistan	1217662	en
 
 # ---------------------------------------------------------------- South Asia
-# held: Pakistan and India. The Karachi seminaries' timetable matches the app's Karachi method within a minute, but with the Hanafi Asr, which mosques here follow; the app's default Asr is Standard, about 50 minutes earlier. Back when the app defaults to Hanafi here.
+# held: Pakistan and India — the Karachi seminaries' method not yet fully checked (pk.karachi, in.karachi, class D).
 # karachi-pakistan	1174872	en ur	en ur
 # lahore-pakistan	1172451	en ur	ur	ur=لاہور
 # islamabad-pakistan	1176615	en ur	ur
@@ -162,47 +158,44 @@
 # bengaluru-india	1277333	en ur
 # srinagar-india	1255634	en ur
 # kolkata-india	1275004	en bn ur	bn	bn=কলকাতা
-# held: Bangladesh. Hanafi Asr as above, and the Islamic Foundation adds 3 minutes to Fajr, Dhuhr and Maghrib.
+# held: Bangladesh — the Islamic Foundation's method not yet fully checked (class D).
 # dhaka-bangladesh	1185241	en bn	en bn
 # chittagong-bangladesh	1205733	en bn	bn	en=Chittagong
 # sylhet-bangladesh	1185099	en bn	bn
 # khulna-bangladesh	1336135	en bn		bn=খুলনা
 # rajshahi-bangladesh	1185128	en bn
-# held: Maldives. Not checked yet.
+# held: Maldives — no authority; calculated by Taqwa (class D).
 # male-maldives	1282027	en		en=Malé
 
 # ---------------------------------------------------------------- Southeast Asia
-# Singapore: the Singapore method, within a minute of MUIS for all of 2026.
-# held: that minute was early on about a quarter of the year's days, at every prayer.
-# singapore	1880252	en
-# held: Indonesia. Kemenag adds about 2 minutes to its 20°/18° times; all five prayers are 2 to 3 minutes later than the app's.
-# jakarta-indonesia	1642911	en id	en id
-# surabaya-indonesia	1625822	en id	id	id=Surabaya
-# bandung-indonesia	1650357	en id	id	id=Bandung
-# medan-indonesia	1214520	en id	id	id=Medan
-# semarang-indonesia	1627896	en id		id=Semarang
-# makassar-indonesia	1622786	en id		id=Makassar
-# palembang-indonesia	1633070	en id		id=Palembang
-# yogyakarta-indonesia	1621177	en id		id=Yogyakarta
-# banda-aceh-indonesia	1215502	en id		id=Banda Aceh
-# held: Malaysia. JAKIM moved Fajr to 18° in 2019; the app's Fajr is 8 to 12 minutes earlier.
-# kuala-lumpur-malaysia	1735161	en
-# george-town-malaysia	1735106	en
-# johor-bahru-malaysia	1732752	en
-# kota-bharu-malaysia	1736376	en
-# held: Brunei. Not checked yet.
-# bandar-seri-begawan-brunei	1820906	en
+# Singapore: MUIS (sg.muis, class B).
+singapore	1880252	en
+# Indonesia: Kemenag (id.kemenag, class B) at its fitted kota — each city below is its own unit.
+jakarta-indonesia	1642911	en id	en id
+surabaya-indonesia	1625822	en id	id	id=Surabaya
+bandung-indonesia	1650357	en id	id	id=Bandung
+medan-indonesia	1214520	en id	id	id=Medan
+semarang-indonesia	1627896	en id		id=Semarang
+makassar-indonesia	1622786	en id		id=Makassar
+palembang-indonesia	1633070	en id		id=Palembang
+yogyakarta-indonesia	1621177	en id		id=Yogyakarta
+banda-aceh-indonesia	1215502	en id		id=Banda Aceh
+# Malaysia: JAKIM (my.jakim, class B) at its zones WLY01, PNG01, JHR02 and KTN01.
+kuala-lumpur-malaysia	1735161	en
+george-town-malaysia	1735106	en
+johor-bahru-malaysia	1732752	en
+kota-bharu-malaysia	1736376	en
+# Brunei: the Ministry of Religious Affairs (bn.mora, class B) at Brunei-Muara.
+bandar-seri-begawan-brunei	1820906	en
 
 # ---------------------------------------------------------------- Africa
-# South Africa, Cape Town: the Muslim Judicial Council's times match the app's MWL exactly.
-# held: Jamiatul Ulama's Cape Town table has Dhuhr 3 to 4 and Maghrib 2 to 3 minutes later than the
-# page; which of the two the city's mosques follow is not settled.
+# held: Cape Town — za.cape's stamp covers September 2026 only.
 # cape-town-south-africa	3369157	en
-# held: Johannesburg, Pretoria and Durban. The Jamiatul Ulama tables use the Hanafi Asr (57 minutes later) with Dhuhr + 5 and Maghrib + 3.
-# johannesburg-south-africa	993800	en
-# pretoria-south-africa	964137	en
-# durban-south-africa	1007311	en
-# held: the rest of Africa. No national timetable was found to check (Nigeria, Senegal, Somalia), or the country was not checked yet.
+# South Africa: Jamiatul Ulama (za.jamiat, class B) at Johannesburg, Pretoria and Durban, each its own unit.
+johannesburg-south-africa	993800	en
+pretoria-south-africa	964137	en
+durban-south-africa	1007311	en
+# held: the rest of Africa — no authority; calculated by Taqwa (class D).
 # lagos-nigeria	2332459	en
 # kano-nigeria	2335204	en
 # abuja-nigeria	2352778	en
@@ -224,58 +217,63 @@
 # accra-ghana	2306104	en
 
 # ---------------------------------------------------------------- Europe
-# held: United Kingdom. Most large mosques use the London Unified Prayer Timetable, whose seasonal Fajr and Isha are 13 to 18 minutes later and 15 to 24 minutes earlier than the app's.
-# london-uk	2643743	en ur bn ar	en ur bn
+# United Kingdom: the London Unified Prayer Timetable (gb.london.lupt, class B) at London (M25).
+london-uk	2643743	en ur bn ar	en ur bn
+# held: Birmingham, Manchester, Bradford, Leicester, Glasgow — cautious times (gb.cautious, survey-proven) not measured at the city.
 # birmingham-uk	2655603	en ur bn		ur=برمنگھم;bn=বার্মিংহাম
 # manchester-uk	2643123	en ur		ur=مانچسٹر
 # bradford-uk	2654993	en ur
 # leicester-uk	2644668	en ur		ur=لیسٹر
 # glasgow-uk	2648579	en ur
-# held: France. No shared timetable: most Île-de-France mosques use about 12 to 13° for Fajr, the Grande Mosquée its own; the app's 18° Fajr is up to 34 minutes earlier.
-# paris-france	2988507	en fr ar	fr
+# France: cautious times (fr.cautious, class C) at Paris.
+paris-france	2988507	en fr ar	fr
+# held: Marseille, Lyon, Toulouse, Lille, Strasbourg — cautious times (fr.cautious) not measured at the city.
 # marseille-france	2995469	en fr ar
 # lyon-france	2996944	en fr ar
 # toulouse-france	2972315	en fr ar
 # lille-france	2998324	en fr ar
 # strasbourg-france	2973783	en fr tr
-# held: Belgium. The Executive of Muslims of Belgium's Isha is 6 to 7 minutes later than the app's.
-# brussels-belgium	2800866	en fr ar	fr
-# antwerp-belgium	2803138	en fr ar
-# held: the Netherlands. No authority; three different timetables are in use, none within 7 minutes of the app.
+# Belgium: cautious times (be.cautious, class C) at Brussels and Antwerp. Its stamp begins 25 September 2026, so the generator holds both until 1 October.
+brussels-belgium	2800866	en fr ar	fr
+antwerp-belgium	2803138	en fr ar
+# held: the Netherlands — cautious times (nl.cautious) not measured at the city.
 # amsterdam-netherlands	2759794	en tr ar
 # rotterdam-netherlands	2747891	en tr ar
 # the-hague-netherlands	2747373	en tr ar
-# held: Germany. Most mosques follow DITIB and Diyanet, up to 9 minutes from the app.
+# held: Germany — cautious times (de.cautious) not measured at the city.
 # berlin-germany	2950159	en tr ar	tr
 # hamburg-germany	2911298	en tr ar
 # cologne-germany	2886242	en tr ar		en=Cologne;ar=كولونيا
 # frankfurt-germany	2925533	en tr ar		en=Frankfurt
 # munich-germany	2867714	en tr ar
-# held: Bosnia, Kosovo and Albania. Their national calendars differ from the app by 7 to 11 minutes.
-# sarajevo-bosnia	3191281	en
+# Bosnia: the Islamic Community's takvim (ba.iz, class B) at Sarajevo.
+sarajevo-bosnia	3191281	en
+# held: Kosovo — the community's method not yet fully checked (class D).
 # pristina-kosovo	786714	en
-# tirana-albania	3183875	en
-# held: Russia. The Spiritual Administration uses 18°/15°; the app's Fajr is 18 minutes later.
+# Albania: the Muslim Community (al.kmsh, class A) at Tirana.
+tirana-albania	3183875	en
+# held: Moscow — the Spiritual Administration's method not yet fully checked (class D).
 # moscow-russia	524901	en
-# kazan-russia	551487	en
-# held: the rest of Europe. Not checked yet.
-# dublin-ireland	2964574	en ar
+# Russia: the Spiritual Administration of Tatarstan (ru.dumrt, class B) at Kazan.
+kazan-russia	551487	en
+# Ireland: cautious times (ie.cautious, class C) at Dublin.
+dublin-ireland	2964574	en ar
+# held: Austria, Switzerland — the authority's method not yet fully checked (class D).
 # vienna-austria	2761369	en tr
 # zurich-switzerland	2657896	en tr
 # geneva-switzerland	2660646	en fr
+# held: Sweden, Denmark — cautious times (se.cautious) not measured at the city.
 # stockholm-sweden	2673730	en ar
 # malmo-sweden	2692969	en ar
-# oslo-norway	3143244	en ur
 # copenhagen-denmark	2618425	en ar
+# Norway: cautious times (no.cautious, class C) at Oslo.
+oslo-norway	3143244	en ur
 
 # ---------------------------------------------------------------- Americas
-# United States and Canada: no national authority. The app's ISNA method is what most ISNA
-# mosques publish (within 3 minutes in New York and Toronto); the page says which method it is.
-# held: no single timetable. The Muslim Association of Canada's Asr in Toronto was 2 to 3 minutes
-# after the page's every day of October, and New York's Islamic Cultural Center has Maghrib up to 4
-# and Isha up to 8 minutes after it.
+# Chicago: cautious times (us.chicago, class C).
+chicago-usa	4887398	en ar ur
+# held: United States — ISNA's method not yet fully checked (us.isna, class D).
 # new-york-usa	5128581	en ar ur bn	en bn	en=New York;ar=نيويورك;ur=نیویارک;bn=নিউ ইয়র্ক
-# chicago-usa	4887398	en ar ur
 # los-angeles-usa	5368361	en ar
 # houston-usa	4699066	en ar ur
 # dearborn-usa	4990510	en ar
@@ -284,16 +282,19 @@
 # dallas-usa	4684888	en ar ur
 # atlanta-usa	4180439	en
 # minneapolis-usa	5037649	en
-# toronto-canada	6167865	en ur ar	en
+# Canada: cautious times (ca.toronto, class C) at Toronto and Mississauga.
+toronto-canada	6167865	en ur ar	en
+mississauga-canada	6075357	en ur
+# held: Montreal, Ottawa — ISNA's method not yet fully checked (ca.isna, class D).
 # montreal-canada	6077243	en fr ar	fr	en=Montreal
-# mississauga-canada	6075357	en ur
 # ottawa-canada	6094817	en ar
+# held: Calgary, Edmonton, Vancouver — cautious times (ca.cautious) not measured at the city.
 # calgary-canada	5913490	en
 # edmonton-canada	5946768	en
 # vancouver-canada	6173331	en
 
 # ---------------------------------------------------------------- Oceania
-# held: Australia and New Zealand. No dominant body; Sydney's Lakemba Mosque is up to 17 minutes from the app, and New Zealand was not checked.
+# held: Sydney, Melbourne — cautious times (au.cautious) not measured at the city; Auckland — FIANZ's method not yet fully checked (class D).
 # sydney-australia	2147714	en ar tr
 # melbourne-australia	2158177	en ar tr
 # auckland-new-zealand	2193733	en

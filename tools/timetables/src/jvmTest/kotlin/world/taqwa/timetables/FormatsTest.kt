@@ -50,6 +50,17 @@ class FormatsTest {
     }
 
     @Test
+    fun aLanguagesOwnFormHasNoCountry() {
+        // Ruling R114: the "How Taqwa checks" page dates every row one way per language.
+        assertEquals("25 September 2026", Formats.forLanguage("en").longDate(friday))
+        assertEquals("25 septembre 2026", Formats.forLanguage("fr").longDate(friday))
+        assertEquals("25 Eylül 2026", Formats.forLanguage("tr").longDate(friday))
+        assertEquals("٠١٢٣٤٥٦٧٨٩", Formats.forLanguage("ar").digitSet())
+        assertEquals("০১২৩৪৫৬৭৮৯", Formats.forLanguage("bn").digitSet())
+        assertEquals("0123456789", Formats.forLanguage("ur").digitSet())
+    }
+
+    @Test
     fun theDayOfTheMonthIsNeverPadded() {
         val text = Formats("en", "ZA").longDate(LocalDate(2026, 9, 5))
         assertTrue(!text.contains("05"), text)

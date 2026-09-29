@@ -644,9 +644,11 @@ html[dir="rtl"] .index-checks a { direction: rtl; }
   .tt-wrap { border: 0; border-radius: 0; overflow: visible; }
   .tt { font-size: 12px; }
   .tt thead th { font-size: 9px; padding: 6px 6px; }
-  .tt td, .tt tbody th { padding: 3px 6px; }
+  /* 2 px cells at 1.25: a 31-day month with the page's head and the clock-change note fits one
+     sheet on Letter as well as A4, in Bengali too (at 3 px and 1.35 it spilled a blank sheet). */
+  .tt td, .tt tbody th { padding: 2px 6px; }
   .tt td.h { font-size: 12px; }
-  .tt td.t, .tt td.h, .tt tbody th.d { line-height: 1.35; }
+  .tt td.t, .tt td.h, .tt tbody th.d { line-height: 1.25; }
   .tt tr[hidden] { display: table-row; }
   .tt .h { display: table-cell; }
   .tt td.jm .tag { display: inline-block; }

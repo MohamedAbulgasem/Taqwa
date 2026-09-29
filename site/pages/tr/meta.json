@@ -42,7 +42,7 @@
     "og_title": "{city} namaz vakitleri, {country}",
     "description_qibla": " Kıble: {qibla}.",
     "h1": "{city} namaz vakitleri",
-    "qibla_bearing": "Kuzeyden {bearing}",
+    "qibla_bearing": "kuzeyden {bearing}",
     "qibla_distance": "Mekke’ye {distance} km",
     "today": "Bugün",
     "date": "Tarih",

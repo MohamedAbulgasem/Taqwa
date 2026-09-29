@@ -315,7 +315,8 @@ class Document(
                 "names" to SITE_LANGUAGES.associateWith { lang ->
                     if (first.cautious) strings.get(lang, "timetable_cautious") else strings.timetable(lang, entry).orEmpty()
                 },
-                "throughText" to SITE_LANGUAGES.associateWith { lang -> Formats(lang, first.city.countryCode).longDate(stamp.last) },
+                // The checks page has no country: one date form per language (ruling R114).
+                "throughText" to SITE_LANGUAGES.associateWith { lang -> Formats.forLanguage(lang).longDate(stamp.last) },
             )
         }
         return linkedMapOf(
