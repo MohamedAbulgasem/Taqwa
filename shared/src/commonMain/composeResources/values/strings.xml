@@ -347,9 +347,9 @@
     <!-- About, cautious times (ruling R91, spec §3.6): shown only on a day the Maghrib cap decided the Maghrib. %1$s the most-followed timetable's short name, %2$s the timetable(s) whose Maghrib is later. -->
     <string name="about_cautious_maghrib_cap">Maghrib is the exception today: it follows %1$s, the most-followed timetable, rather than the later Maghrib of %2$s.</string>
     <string name="about_which_decides">Which timetable decides each time today</string>
-    <!-- About, cautious times (rulings R100 and R105, site parity): the proof tiles and sentence a cautious place shows — "0" / "starts before any of them" beside "days at N places" (about_stat_days_at_places), then the sentence with the date the proof runs through. -->
-    <string name="about_stat_never_before_any">starts before any of them</string>
-    <string name="about_cautious_checked_through">Checked against the timetables followed here through %1$s.</string>
+    <!-- About, cautious times (rulings R100, R105, R111 and R112, site parity): the proof tiles and sentence a cautious place shows — "0" / "starts before the timetable that decides it" beside "days at N places" (about_stat_days_at_places), then the sentence. "The timetable that decides it" is the one the table above names for each time (the latest to begin it; for a capped Maghrib the most-followed), which is what the gate checks a start against — never "any of them": on a capped day another timetable's Maghrib is later. No date: a cautious stamp's last date is one member's, not every member's. -->
+    <string name="about_stat_never_before_decider">starts before the timetable that decides it</string>
+    <string name="about_cautious_checked">Checked against the timetables followed here.</string>
     <string name="about_calculated_body">Taqwa found no official Sunni timetable for %1$s, so it calculates one on the safe side: %2$s.</string>
     <string name="about_asr_heading">Asr</string>
     <string name="about_asr_known">%1$s: %3$s, because most mosques in %2$s follow it.</string>
