@@ -52,6 +52,12 @@ store-readiness sweep (targetSdk 36, 0.16.0).
     constraint, and keeping the CPU awake while a surah is being written.
   - `world.taqwa.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — a signature-level permission
     androidx.core defines for its own runtime receivers; no other app can hold it.
+- **Package visibility (1.0.0 (33)):** one `<queries>` element, an intent for
+  `android.intent.action.TTS_SERVICE` (`androidApp/src/main/AndroidManifest.xml`), lets read-aloud
+  see the phone's text-to-speech engines (Google's, Samsung's) from Android 11 on. It is not a
+  permission and needs no Play declaration; Taqwa's manifest does not ask for
+  `QUERY_ALL_PACKAGES`. It is the only manifest change since build 32 apart from the source
+  folders' rename (`androidMain` → `main`, `androidDebug` → `debug`).
 - **Hardware features:** `android.hardware.location`, `.location.network`, `.location.gps` and
   `.sensor.compass` are declared `required="false"`, so the app stays visible on devices without
   them (a city from the built-in list gives the same prayer times).
@@ -63,6 +69,15 @@ store-readiness sweep (targetSdk 36, 0.16.0).
   launch offers, once, to email it to support@taqwa.world through the user's own mail app. Nothing
   is collected or sent automatically, so the data-safety and App Privacy answers are unchanged
   ("Data Not Collected"); the policy's paragraph on it exists in all seven languages.
+- **Read-aloud (1.0.0 (33)):** during recitation, the phone's own text-to-speech voice can read
+  the translation or tafsir after each ayah. Taqwa uses only voices that make their speech on the
+  phone (on Android a voice its engine marks as needing no connection and not network synthesis,
+  `isOfflineVoice` in `SpeechVoices.android.kt`; on iOS Apple's installed voices) and sends the
+  text nowhere itself. On Android the engine is a separate app, Google's or Samsung's, under its
+  own settings and terms, and "Get the voice" opens that engine's own voice download. The text
+  read is the app's content, not user data, so the data-safety and App Privacy answers are
+  unchanged ("Data Not Collected"), and `AVSpeechSynthesizer` is not a required-reason API. The
+  privacy policy's own read-aloud paragraph is due before Android production (launch audit C4).
 - **Target API:** 36 (Android 16), the level Play requires for new apps from 31 August 2026.
 - **Backup:** `allowBackup="false"` plus `data_extraction_rules.xml` excluding every domain from
   cloud backup and device transfer.
