@@ -20,7 +20,10 @@ needs attention, so that a Claude session can act on it.
    tables are kept gzipped under `archive/raw/monitor/<source>/<date>/`. A source's cadence is
    weekly or monthly; one with cadence `manual` runs only when named; a source whose fetcher is
    `manual` is read by hand. A fetcher that fails is a finding in the report, never a crash, and a
-   driver that breaks is one too (what is held is still checked).
+   driver that breaks is one too (what is held is still checked). A source that failed or came back
+   in part is fetched once more on the next run, then waits for its cadence (one mosque gone from
+   Mawaqit for good does not refetch all 125 calendars weekly); its finding names the missing part
+   and says which of the two it is.
 2. **Backup** (`tools/timetables/monitor/backup.py`): only where `TAQWA_OFFICIAL_BACKUP` names a
    folder (the owner's Mac): every new or changed file of the archive is mirrored there, never
    deleting anything, and the report reminds him to upload it to his Drive when files were added.
@@ -98,7 +101,8 @@ restricted archive and the monitor's state. Setting it up, once:
    refuses them stays `manual` in `sources.tsv`. Remember that `--only` is a partial run.
 
 Each run (Mondays 03:00 UTC, and on request) checks out the private repository at its branch's
-head and the public one at `main` into `taqwa/` (its credentials not kept), installs Temurin 21
+head and the public one at `main` into `taqwa/` (neither checkout keeps a token; the commit step
+alone is given one), installs Temurin 21
 (with Gradle caching keyed on `gradle/libs.versions.toml` too) and Python, runs
 `taqwa/scripts/monitor.sh --verbose` with `TAQWA_OFFICIAL` set to the workspace, then commits what
 the run added or changed under `archive/` and `monitor/` (new captures, the state, the report) and
@@ -113,11 +117,14 @@ something needs attention. Its body (at most 60,000 characters, always ending wi
 the full report) is the report's summary, the never-early index and each attention item's title
 (dates, counts and minutes, never a printed time); the full report is `monitor/latest.md` in the
 private repository. It is created or updated only when the attention set changed (always when the
-monitor itself failed), a green full run closes it with a one-line comment and never opens one, and
-a partial run (`--only`) adds a comment at most. The same body is the job's step summary. When the
-private repository's `.github/workflows/monitor-weekly.yml` differs from the public template, the
-report says so under Informational. A Claude routine fired by that issue prepares fixes as pull
-requests (not set up yet).
+monitor itself failed, whose body names the run's own log and report); on the first sound full run
+after a failure the body is rewritten from the report and a "Recovered" comment added; a green full
+run closes it with a one-line comment and never opens one; a partial run (`--only`), sound or
+failed, adds a comment at most; refused dispatch options stop the job before anything runs and
+touch nothing. The same body is the job's step summary. When the private repository's
+`.github/workflows/monitor-weekly.yml` differs from the public template, the report says so under
+Informational. A Claude routine fired by that issue prepares fixes as pull requests (not set up
+yet).
 
 ## Running by hand on the Mac
 
@@ -141,6 +148,7 @@ runs never overlap (`monitor/lock`). The Python code and its tests run under bot
 `/usr/bin/python3` (3.9, LibreSSL) and Homebrew's; a site the Mac's TLS stack cannot reach goes
 through `curl`. A notification is posted on macOS when the attention set changed, and always when
 the monitor itself failed; every early exit leaves `monitor/last-run.json` saying why (exit 2),
+a closed terminal or a `kill` included (the fetch or check still running is stopped with it),
 except a run refused by the lock. The Mac and the cloud share one state through the private
 repository: **pull it before a run by hand** (`git pull` in `~/Desktop/Workspace/apps/Taqwa-official`),
 and **commit and push `archive/` and `monitor/` after**, so that neither side overwrites the

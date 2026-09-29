@@ -617,14 +617,16 @@ class RoundTwo(unittest.TestCase):
         self.assertEqual(["failed with ***"], ctx.errors)
         self.assertTrue(all("abc def" not in l for l in self.lines))
 
-    def test_only_a_complete_fetch_moves_last_fetch_on(self):
+    def test_a_partial_fetch_is_due_once_more_and_a_complete_one_clears_it(self):
         store = Store(self.root, self.monitor, dt.date(2026, 10, 5))
         store.source_done("a", "partial", "one table broke", 3)
-        self.assertNotIn("lastFetch", store.data["sources"]["a"])
-        self.assertEqual("partial", store.data["sources"]["a"]["status"])
-        store.source_done("a", "ok", "", 3)
         self.assertEqual("2026-10-05", store.data["sources"]["a"]["lastFetch"])
+        self.assertEqual("partial", store.data["sources"]["a"]["status"])
+        self.assertTrue(store.retry("a"), "due once more next run, whatever the cadence (review R3-M2)")
+        store.source_done("a", "ok", "", 3)
+        self.assertFalse(store.retry("a"))
         self.assertEqual(None, store.last_fetch("b"))
+        self.assertFalse(store.retry("b"))
 
     def muis_page(self, records, nxt, total):
         return json.dumps({"result": {"records": records, "total": total, "_links": ({"next": nxt} if nxt else {})}}).encode()
@@ -670,3 +672,79 @@ class RoundTwo(unittest.TestCase):
         self.assertEqual([], london.fetch(self.ctx("gb-london-lupt", http=http)))
         self.assertEqual(1, len(http.urls), "a year the API lacks stops after its first month")
         self.assertIn("key=a%20b%2Fc&", http.urls[0])
+
+
+class RoundThree(unittest.TestCase):
+    """The third fix round: a source retried once (R3-M2), IRN's heading month (nit)."""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-three")
+        os.makedirs(os.path.join(self.root, "archive"))
+        self.monitor = os.path.join(self.root, "monitor")
+
+    def tearDown(self):
+        shutil.rmtree(self.root)
+
+    def test_a_source_that_fails_or_comes_back_in_part_is_retried_once_then_waits_for_its_cadence(self):
+        monthly = {"source": "mawaqit", "fetcher": "mawaqit", "cadence": "monthly"}
+        # The cadence counts from the retry (12 Oct): a monthly source is due again from 8 November.
+        d1, d2, d3, d4 = (dt.date(2026, 10, 5), dt.date(2026, 10, 12), dt.date(2026, 10, 19), dt.date(2026, 11, 9))
+        store = Store(self.root, self.monitor, d1)
+        # A partial run: recorded as fetched, and due once more next run.
+        self.assertEqual((True, False), store.source_done("mawaqit", "partial", "one mosque: HTTP 404", 125))
+        self.assertEqual("2026-10-05", store.data["sources"]["mawaqit"]["lastFetch"])
+        self.assertTrue(store.retry("mawaqit"))
+        self.assertEqual(None, skip_reason(monthly, store.last_fetch("mawaqit"), d2, set(), False, retry=store.retry("mawaqit")))
+        # The retry comes back in part again: no third try, the cadence applies.
+        store.today = d2
+        self.assertEqual((False, True), store.source_done("mawaqit", "partial", "one mosque: HTTP 404", 125))
+        self.assertFalse(store.retry("mawaqit"))
+        self.assertEqual("not due", skip_reason(monthly, store.last_fetch("mawaqit"), d3, set(), False, retry=store.retry("mawaqit")))
+        self.assertEqual(None, skip_reason(monthly, store.last_fetch("mawaqit"), d4, set(), False, retry=store.retry("mawaqit")))
+        # A failed source is treated the same way; a complete fetch clears everything.
+        store.today = d4
+        self.assertEqual((True, False), store.source_done("mawaqit", "failed", "HTTP 503", 1))
+        self.assertTrue(store.retry("mawaqit"))
+        self.assertEqual((False, True), store.source_done("mawaqit", "ok", "", 125))
+        self.assertFalse(store.retry("mawaqit"))
+        self.assertEqual("2026-11-09", store.data["sources"]["mawaqit"]["lastFetch"])
+        self.assertEqual((False, False), store.source_done("mawaqit", "ok", "", 125))
+
+    def test_the_driver_says_what_happens_to_a_partial_source(self):
+        with open(os.path.join(self.root, "sources.tsv"), "w") as f:
+            f.write("source\tentries\tfetcher\tcadence\tnext_expected\tpoints\tnote\n")
+            f.write("za-jamiat\tza.jamiat\tjamiat\tmonthly\t-\tp\tn\n")
+        sources = os.path.join(self.root, "sources.tsv")
+        # A budget already spent makes the source fail: the message says it is retried next run.
+        fetch.main(["--official", self.root, "--sources", sources, "--today", "2026-10-05", "--budget-minutes", "0.0000001"])
+        with open(os.path.join(self.monitor, "fetch", "latest.json")) as f:
+            out = json.load(f)
+        self.assertEqual("failed", out["sources"]["za-jamiat"]["status"])
+        self.assertTrue(out["sources"]["za-jamiat"]["message"].endswith("retried on the next run, once"), out["sources"]["za-jamiat"]["message"])
+        # The retry a week later, failing again: it now waits for its cadence.
+        fetch.main(["--official", self.root, "--sources", sources, "--today", "2026-10-12", "--budget-minutes", "0.0000001"])
+        with open(os.path.join(self.monitor, "fetch", "latest.json")) as f:
+            out = json.load(f)
+        self.assertEqual("failed", out["sources"]["za-jamiat"]["status"])
+        self.assertIn("this was the retry; the source now waits for its cadence (monthly)", out["sources"]["za-jamiat"]["message"])
+        # A week later still: not due.
+        fetch.main(["--official", self.root, "--sources", sources, "--today", "2026-10-19", "--budget-minutes", "0.0000001"])
+        with open(os.path.join(self.monitor, "fetch", "latest.json")) as f:
+            out = json.load(f)
+        self.assertEqual({"status": "skipped", "message": "not due", "requests": 0, "tables": {}}, out["sources"]["za-jamiat"])
+
+    def test_irn_takes_the_month_from_the_heading_not_from_prose(self):
+        def reply(html):
+            return json.dumps({"success": True, "data": {"html": html}}).encode()
+        row = "<tr><td>1</td><td>x</td><td>06:40</td><td>09:15</td><td>12:25</td><td>13:20</td><td>13:50</td><td>15:30</td><td>17:15</td></tr>"
+        # Prose with "may" before the heading does not decide: the heading's "Januar 2027" does.
+        rows, year = irn.parse_month(reply("<p>Times may vary.</p><h3>Januar 2027</h3><table>" + row + "</table>"), 1)
+        self.assertEqual(("2027", 1), (year, len(rows)))
+        with self.assertRaises(FetchError) as wrong:
+            irn.parse_month(reply("<p>Times may vary.</p><h3>Januar 2027</h3><table>" + row + "</table>"), 5)
+        self.assertIn("names month 1, not 5", str(wrong.exception))
+        # An English heading works too, and so does "May 2027" for May.
+        self.assertEqual("2027", irn.parse_month(reply("<h3>May 2027</h3><table>" + row + "</table>"), 5)[1])
+        # No heading month: the day count decides (one row is not a month).
+        with self.assertRaises(FetchError):
+            irn.parse_month(reply("<p>Times may vary.</p><h3>2027</h3><table>" + row + "</table>"), 1)

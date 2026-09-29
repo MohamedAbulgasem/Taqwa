@@ -5,12 +5,15 @@
 # the layout TAQWA_OFFICIAL names.
 #
 # Each run checks out the archive repository at its branch's head and the public Taqwa repository
-# at main into taqwa/, runs scripts/monitor.sh, commits and pushes whatever the run added or changed
-# under archive/ and monitor/ (nothing else; rebased onto what arrived meanwhile, retried once, and
-# kept as an artifact when the push still fails), and keeps one issue "Taqwa monitor" (label
-# monitor-attention) open while something needs attention: created or updated only when the
-# attention set changed (always when the monitor itself failed), closed with a one-line comment when
-# a full run is green (a green run never opens one). A partial run (--only) adds a comment at most.
+# at main into taqwa/ (neither checkout keeps a token; the commit step alone is given one), runs
+# scripts/monitor.sh, commits and pushes whatever the run added or changed under archive/ and
+# monitor/ (nothing else; rebased onto what arrived meanwhile, retried once, and kept as an artifact
+# when the push still fails), and keeps one issue "Taqwa monitor" (label monitor-attention) open
+# while something needs attention: created or updated only when the attention set changed (always
+# when the monitor itself failed), its body rewritten from the report with a "Recovered" comment on
+# the first sound full run after a failure, closed with a one-line comment when a full run is green
+# (a green run never opens one). A partial run (--only) adds a comment at most, whether it succeeded
+# or failed. Refused dispatch options stop the job before anything runs, and nothing else is touched.
 # The job fails when the monitor itself failed: an exit other than 0 or 1, a result record missing
 # or older than the run's start, or a push that could not land.
 #
@@ -50,6 +53,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ github.ref_name }}
+          persist-credentials: false
 
       - name: Check out Taqwa at main
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -81,14 +85,17 @@ jobs:
           OPTIONS: ${{ github.event.inputs.options }}
         run: |
           # Only --no-fetch, --check-all, --verbose and --only <a source id listed in sources.tsv> pass;
-          # anything else stops the job before the monitor runs. The words never reach a shell unquoted.
+          # anything else stops the job before the monitor runs. The words are split with globbing off
+          # and never reach a shell unquoted; the catalogue's comment and header lines are no source.
           set -euo pipefail
+          set -f
           args=()
           partial=false
           expect_source=false
+          ids="$(awk -F'\t' '/^#/ {next} !seen {seen=1; next} {print $1}' taqwa/tools/timetables/official/monitor/sources.tsv)"
           for word in $OPTIONS; do
             if [ "$expect_source" = true ]; then
-              if [[ "$word" =~ ^[a-z0-9-]+$ ]] && grep -q "^${word}"$'\t' taqwa/tools/timetables/official/monitor/sources.tsv; then
+              if [[ "$word" =~ ^[a-z0-9-]+$ ]] && printf '%s\n' "$ids" | grep -qx -- "$word"; then
                 args+=(--only "$word")
                 partial=true
                 expect_source=false
@@ -128,53 +135,67 @@ jobs:
 
       - name: Read the result
         id: result
-        if: always()
+        if: always() && steps.options.outcome == 'success'
         env:
           CODE: ${{ steps.run.outputs.code }}
           START: ${{ steps.run.outputs.start }}
+          PARTIAL: ${{ steps.options.outputs.partial }}
         run: |
           # The record counts only when it is this run's: present, written after the run started, and
           # its code 0 or 1. Anything else is "the monitor itself failed". Writes issue-body.md (at most
-          # 60,000 characters, ending with the pointer to the full report) and the step summary.
+          # 60,000 characters, ending with a pointer to the run's files) and the step summary. Whether
+          # the run was partial comes from the checked options, never from a record.
           python3 - <<'PY'
           import json, os, time
           code = os.environ.get("CODE") or ""
-          start = int(os.environ.get("START") or "0")
+          start_text = os.environ.get("START") or ""
+          partial = os.environ.get("PARTIAL") == "true"
           path = "monitor/last-run.json"
-          record, fresh = {}, False
-          if os.path.isfile(path) and int(os.stat(path).st_mtime) >= start - 1:
-              try:
-                  record = json.load(open(path, encoding="utf-8"))
-                  fresh = True
-              except ValueError:
-                  record = {}
+          record, fresh, stale = {}, False, False
+          if start_text and os.path.isfile(path):
+              if int(os.stat(path).st_mtime) >= int(start_text) - 1:
+                  try:
+                      record = json.load(open(path, encoding="utf-8"))
+                      fresh = True
+                  except ValueError:
+                      record = {}
+              else:
+                  stale = True
           date = record.get("date") or time.strftime("%Y-%m-%d", time.gmtime())
           valid = fresh and code in ("0", "1") and str(record.get("exit")) == code
+          marker = "<!-- monitor-failed -->"
           if valid:
               body = record.get("issue") or ""
               summary = record.get("summary") or ""
           else:
-              if fresh and str(record.get("exit")) == "2":
+              if not start_text:
+                  reason = "the run step did not run"
+              elif fresh and str(record.get("exit")) == "2":
                   reason = record.get("summary") or "no reason recorded"
               elif fresh:
                   reason = "the run exited %s but its record says %s" % (code or "?", record.get("exit"))
+              elif stale:
+                  reason = "the run exited %s and left a result record older than this run" % (code or "?")
               else:
                   reason = "the run exited %s and wrote no result record (see the workflow log)" % (code or "?")
               summary = reason if reason.startswith("The monitor itself failed") else "The monitor itself failed: " + reason
-              body = "**Taqwa monitor, %s.** %s\n" % (date, summary)
+              # A failure record that still carries the check's own list (the fetch driver broke, the check ran) keeps it.
+              kept = (record.get("issue") or "") if fresh and str(record.get("exit")) == "2" else ""
+              body = marker + "\n" + (kept if kept.startswith("**Taqwa monitor") else "**Taqwa monitor, %s.** %s\n" % (date, summary))
+              body = body.rstrip("\n") + ("\n\nThe run's log is `monitor/fetch/run-%s.log` in the archive repository, its report (when the check ran) "
+                                          "`monitor/reports/%s.md`, and the last full report `monitor/latest.md`.\n") % (date, date)
           pointer = "\nThe full report is `monitor/latest.md` in the archive repository (restricted: it quotes dates, counts and minutes).\n"
           limit = 60000
           if len(body) + len(pointer) > limit:
               body = body[: limit - len(pointer) - 40].rsplit("\n", 1)[0] + "\n… (cut: the rest is in the report)\n"
-          if not body.rstrip().endswith("minutes)."):
+          if valid and not body.rstrip().endswith("minutes)."):
               body = body.rstrip("\n") + "\n" + pointer
           with open("issue-body.md", "w", encoding="utf-8") as f:
               f.write(body)
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
-              f.write(body[:limit])
+              f.write(("Partial run.\n\n" if partial else "") + body[:limit])
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
               f.write("valid=%s\n" % str(valid).lower())
-              f.write("partial=%s\n" % str(bool(record.get("partial"))).lower())
               f.write("changed=%s\n" % str(bool(record.get("attentionChanged"))).lower())
               f.write("date=%s\n" % date)
               f.write("summary=%s\n" % summary.replace("\n", " ")[:900])
@@ -183,10 +204,13 @@ jobs:
 
       - name: Commit what the run added or changed
         id: commit
-        if: always()
+        if: always() && steps.options.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           # Only archive/ and monitor/, rebased onto whatever arrived meanwhile (a run by hand, a queued
-          # run), one retry; when the push still fails the changes are kept as an artifact and the job fails.
+          # run), one retry; when the push still fails the changes are kept as an artifact and the job
+          # fails. The token is given to this step alone, on the remote URL.
           set -uo pipefail
           git config user.name "taqwa-monitor"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -197,9 +221,10 @@ jobs:
             exit 0
           fi
           git commit -q -m "Monitor: run of $(date -u +%Y-%m-%d)"
-          git diff --name-only HEAD~1 HEAD -- archive monitor > changed-files.txt
+          git diff -z --name-only --diff-filter=d HEAD~1 HEAD -- archive monitor > changed-files.z
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           for attempt in 1 2; do
-            if git pull --rebase origin "$BRANCH" && git push origin "HEAD:$BRANCH"; then
+            if git pull --rebase "$remote" "$BRANCH" && git push "$remote" "HEAD:$BRANCH"; then
               echo "Pushed"
               exit 0
             fi
@@ -207,7 +232,7 @@ jobs:
             echo "The push did not land (attempt $attempt)"
             sleep 20
           done
-          tar -czf monitor-run-changes.tgz -T changed-files.txt
+          tar --null -T changed-files.z -czf monitor-run-changes.tgz
           echo "::error::the push was rejected twice; this run's changes are kept as the artifact monitor-run-changes"
           echo "pushfailed=true" >> "$GITHUB_OUTPUT"
 
@@ -220,12 +245,12 @@ jobs:
           retention-days: 90
 
       - name: Open, update or close the issue
-        if: always()
+        if: always() && steps.options.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           CODE: ${{ steps.run.outputs.code }}
           VALID: ${{ steps.result.outputs.valid }}
-          PARTIAL: ${{ steps.result.outputs.partial }}
+          PARTIAL: ${{ steps.options.outputs.partial }}
           CHANGED: ${{ steps.result.outputs.changed }}
           RUN_DATE: ${{ steps.result.outputs.date }}
           SUMMARY: ${{ steps.result.outputs.summary }}
@@ -234,8 +259,8 @@ jobs:
           number="$(gh issue list --state open --label monitor-attention --limit 20 --json number,title --jq '[.[] | select(.title == "Taqwa monitor")][0].number // empty')"
           failed=true
           if [ "$VALID" = true ] && { [ "$CODE" = 0 ] || [ "$CODE" = 1 ]; }; then failed=false; fi
-          if [ "$failed" = false ] && [ "$PARTIAL" = true ]; then
-            # A partial run never closes, opens or rewrites the issue (ruling N1): a comment at most.
+          if [ "$PARTIAL" = true ]; then
+            # A partial run, sound or failed, never closes, opens or rewrites the issue (ruling N1): a comment at most.
             if [ -n "$number" ]; then gh issue comment "$number" --body "Partial run on $RUN_DATE ($RUN_URL): $SUMMARY"; fi
             echo "Partial run: the issue stands as it is"
             exit 0
@@ -246,7 +271,12 @@ jobs:
             echo "All green"
             exit 0
           fi
-          if [ "$failed" = false ] && [ "$CHANGED" != true ] && [ -n "$number" ]; then
+          recovered=false
+          if [ "$failed" = false ] && [ -n "$number" ] && gh issue view "$number" --json body --jq .body | grep -q -- '<!-- monitor-failed -->'; then
+            # The first sound full run after a failure: the body is rewritten from the report whatever the set did.
+            recovered=true
+          fi
+          if [ "$failed" = false ] && [ "$recovered" = false ] && [ "$CHANGED" != true ] && [ -n "$number" ]; then
             echo "The attention set is as last notified; the issue stands as it is"
             exit 0
           fi
@@ -254,15 +284,24 @@ jobs:
           gh label create monitor-attention --color B60205 --description "The weekly timetable monitor needs attention" --force >/dev/null 2>&1 || true
           if [ -n "$number" ]; then
             gh issue edit "$number" --body-file issue-body.md >/dev/null
-            gh issue comment "$number" --body "Updated on $RUN_DATE ($RUN_URL): $SUMMARY"
-            echo "Updated issue #$number"
+            if [ "$recovered" = true ]; then
+              gh issue comment "$number" --body "Recovered on $RUN_DATE ($RUN_URL): $SUMMARY"
+              echo "Recovered: issue #$number rewritten from the report"
+            else
+              gh issue comment "$number" --body "Updated on $RUN_DATE ($RUN_URL): $SUMMARY"
+              echo "Updated issue #$number"
+            fi
           else
             gh issue create --title "Taqwa monitor" --label monitor-attention --body-file issue-body.md
             echo "Opened the issue"
           fi
 
-      - name: Fail the job when the monitor itself failed or its changes did not land
-        if: always() && (steps.result.outputs.valid != 'true' || steps.commit.outputs.pushfailed == 'true')
+      - name: Fail the job when the options were refused, the monitor itself failed, or its changes did not land
+        if: always() && (steps.options.outcome != 'success' || steps.result.outputs.valid != 'true' || steps.commit.outputs.pushfailed == 'true')
         run: |
-          echo "::error::the monitor itself failed (exit ${{ steps.run.outputs.code }}, result valid: ${{ steps.result.outputs.valid }}, push failed: ${{ steps.commit.outputs.pushfailed }})"
+          if [ "${{ steps.options.outcome }}" != "success" ]; then
+            echo "::error::the dispatch options were refused (see the 'Check the options' step); nothing ran and nothing was touched"
+          else
+            echo "::error::the monitor itself failed (exit ${{ steps.run.outputs.code }}, result valid: ${{ steps.result.outputs.valid }}, push failed: ${{ steps.commit.outputs.pushfailed }})"
+          fi
           exit 1
