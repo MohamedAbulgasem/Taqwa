@@ -153,32 +153,53 @@ class Stamp(private val root: Map<String, Any?>) {
     }
 }
 
-/** Whether a city has a page (spec §2). */
+/** Whether a city has a page (spec §2), and which of its months the page shows (ruling R116). */
 sealed interface Verdict {
     /**
-     * [events] is the row the page's figures come from: the unit's where the stamp has units, else
-     * the entry's. [atMost] is the worst lateness over the starts there — null for a cautious place,
-     * which claims no such figure (ruling R105: the entry-wide worst would be another place's).
-     * [through] is the last date of the checked run the days shown sit in (ruling R115): for a
-     * cautious place the earliest such date over its members.
+     * [months] are the whole months the page shows: the current month, and the next only where
+     * every day of it was checked too (ruling R116); where it was not, [nextUnchecked] names the
+     * first timetable that leaves a day of it unchecked, and that day. [events] is the row the
+     * page's figures come from: the unit's where the stamp has units, else the entry's. [atMost]
+     * is the worst lateness over the starts there — null for a cautious place, which claims no
+     * such figure (ruling R105: the entry-wide worst would be another place's). [through] is the
+     * last date of the checked run the days shown sit in (ruling R115): for a cautious place the
+     * earliest such date over its members.
      */
-    data class Published(val stamp: Stamp, val events: Map<String, Any?>, val atMost: Int?, val through: LocalDate) : Verdict
+    data class Published(
+        val stamp: Stamp,
+        val events: Map<String, Any?>,
+        val atMost: Int?,
+        val through: LocalDate,
+        val months: List<ClosedRange<LocalDate>>,
+        val nextUnchecked: Unchecked? = null,
+    ) : Verdict
 
     data class Held(val reason: String) : Verdict
 }
 
+/** A day the gate did not check, and the timetable it was not checked against (ruling R116). */
+data class Unchecked(val timetable: String, val day: LocalDate)
+
 /**
- * Spec §2 (rulings R101, R115): a city has a page only where the stamps prove every day it shows —
- * class A, B or C at the city, measured there, a green stamp for the resolved entry and its unit,
- * and every shown date among the days the gate compared for every timetable the page's times
- * depend on: the place's unit (or the entry, where the stamp has no units), and for a cautious
- * place every member at that place.
+ * Spec §2 (rulings R101, R115, R116): a city has a page only where the stamps prove every day it
+ * shows — class A, B or C at the city, measured there, a green stamp for the resolved entry and
+ * its unit, and every shown date among the days the gate compared for every timetable the page's
+ * times depend on: the place's unit (or the entry, where the stamp has no units), and for a
+ * cautious place every member at that place. The page shows whole months only: the current one
+ * when every day of it is checked (else the city is held), and the next as well only when every
+ * day of that one is checked too.
  */
 object Proven {
     /** "26 Oct 2026": plain English months (en-GB's CLDR data abbreviates September as "Sept"). */
     private val DAY = DateTimeFormatter.ofPattern("d MMM uuuu", Locale.ENGLISH)
 
-    fun verdict(resolution: Resolution, place: Place, stamps: Map<String, Stamp>, firstShown: LocalDate, lastShown: LocalDate): Verdict {
+    /**
+     * [months] are the city's current month and the next, each from its first day to its last,
+     * the current first. The verdict shows a month only after every one before it: whole months,
+     * in order.
+     */
+    fun verdict(resolution: Resolution, place: Place, stamps: Map<String, Stamp>, months: List<ClosedRange<LocalDate>>): Verdict {
+        require(months.isNotEmpty()) { "a page shows at least its current month" }
         val cls = resolution.entryClass
         if (cls != EntryClass.A && cls != EntryClass.B && cls != EntryClass.C) return Verdict.Held("class ${cls.name} is not proven")
         if (!resolution.measured) return Verdict.Held("not measured at this place")
@@ -206,14 +227,30 @@ object Proven {
         } else {
             listOf(stamp.entry to (if (unitId != null) stamp.unitChecked(unitId) else stamp.checked))
         }
+        // The current month, whole, or no page.
+        val current = months.first()
         for ((who, checked) in proven) {
-            val hole = hole(checked, firstShown, lastShown) ?: continue
+            val hole = hole(checked, current.start, current.endInclusive) ?: continue
             return Verdict.Held("$who: no checked table day $hole")
         }
+        // Each later month, whole, or the page ends before it (ruling R116): a partly checked
+        // month is never shown, and the first timetable leaving a day of it unchecked is named.
+        var shown = 1
+        var nextUnchecked: Unchecked? = null
+        for (month in months.drop(1)) {
+            nextUnchecked = proven.firstNotNullOfOrNull { (who, checked) ->
+                checked.firstUncovered(month.start, month.endInclusive)?.let { Unchecked(who, it) }
+            }
+            if (nextUnchecked != null) break
+            shown++
+        }
+        val lastShown = months[shown - 1].endInclusive
         val through = proven.minOf { (_, checked) -> checked.endOf(lastShown)!! }
-        if (cls == EntryClass.C) return Verdict.Published(stamp, events, atMost = null, through = through)
-        val atMost = stamp.worstStarts(events) ?: return Verdict.Held("no start is measured at this unit")
-        return Verdict.Published(stamp, events, atMost, through)
+        val atMost = when (cls) {
+            EntryClass.C -> null
+            else -> stamp.worstStarts(events) ?: return Verdict.Held("no start is measured at this unit")
+        }
+        return Verdict.Published(stamp, events, atMost, through, months.take(shown), nextUnchecked)
     }
 
     /**
@@ -238,7 +275,8 @@ object Proven {
         return "${day(from)} – ${day(next.minus(1, DateTimeUnit.DAY))}"
     }
 
-    private fun day(date: LocalDate): String = DAY.format(date.toJavaLocalDate())
+    /** A date as the run's notices write it: "1 Nov 2026". */
+    fun day(date: LocalDate): String = DAY.format(date.toJavaLocalDate())
 }
 
 /** The totals the "How Taqwa checks" page prints (spec §5), read from the files, never typed. */

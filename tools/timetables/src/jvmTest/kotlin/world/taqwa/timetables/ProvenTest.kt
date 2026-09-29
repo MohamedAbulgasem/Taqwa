@@ -1,6 +1,9 @@
 package world.taqwa.timetables
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.timetables.gate.GateManifest
 import kotlin.test.Test
@@ -10,7 +13,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
- * The proven rule (spec §2, rulings R101 and R115), clause by clause, against the committed stamps.
+ * The proven rule (spec §2, rulings R101, R115 and R116), clause by clause, against the committed
+ * stamps, and which of its two months a page shows.
  * Only entries no other track rewrites tonight are pinned by figure (gb.london.lupt, ca.toronto,
  * ly.awqaf, eg.esa, tr.diyanet); the totals are computed from the files, never typed. The dates
  * pinned here are the tables' own coverage — dates only, never a time (ruling R69).
@@ -29,14 +33,22 @@ class ProvenTest {
     private val toronto = city("toronto-canada", "CA", 43.70643, -79.39864, "America/Toronto", "Ontario")
     private val istanbul = city("istanbul-turkiye", "TR", 41.01384, 28.94966, "Europe/Istanbul", "Istanbul")
     private val sep1 = LocalDate(2026, 9, 1)
+    private val sep30 = LocalDate(2026, 9, 30)
     private val oct1 = LocalDate(2026, 10, 1)
     private val oct31 = LocalDate(2026, 10, 31)
-    private val nov30 = LocalDate(2026, 11, 30)
+    private val nov1 = LocalDate(2026, 11, 1)
 
     private fun place(city: City) = Place(city.latitude, city.longitude, city.timeZone, city.countryCode, city.admin1)
 
-    private fun verdict(city: City, first: LocalDate = sep1, last: LocalDate = oct31, with: Map<String, Stamp> = stamps) =
-        Proven.verdict(timetable.source(city, first).effective, place(city), with, first, last)
+    /** The month of [first] and the next, whole: the two a page may show when built in [first]'s month. */
+    private fun months(first: LocalDate): List<ClosedRange<LocalDate>> {
+        val start = LocalDate(first.year, first.month, 1)
+        val next = start.plus(1, DateTimeUnit.MONTH)
+        return listOf(start..next.minus(1, DateTimeUnit.DAY), next..next.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY))
+    }
+
+    private fun verdict(city: City, first: LocalDate = sep1, with: Map<String, Stamp> = stamps) =
+        Proven.verdict(timetable.source(city, first).effective, place(city), with, months(first))
 
     /** The committed stamp of [entry] with [edit] applied to its parsed JSON (numbers are Longs). */
     @Suppress("UNCHECKED_CAST")
@@ -77,6 +89,8 @@ class ProvenTest {
         assertEquals(11, v.stamp.places)
         assertEquals(LocalDate(2026, 12, 31), v.through)
         assertEquals(false, v.stamp.cautious)
+        assertEquals(months(sep1), v.months) // September and October, both checked
+        assertNull(v.nextUnchecked)
     }
 
     @Test fun tripoliIsHeldForItsClass() {
@@ -85,10 +99,17 @@ class ProvenTest {
         assertTrue(v.reason.startsWith("class D_AUTHORITY"), v.reason)
     }
 
-    @Test fun cairoIsHeldBecauseItsTableEndsInSeptember() {
-        val v = verdict(city("cairo-egypt", "EG", 30.06263, 31.24967, "Africa/Cairo"))
-        assertIs<Verdict.Held>(v)
-        assertEquals("eg.esa: no checked table day from 1 Oct 2026", v.reason)
+    @Test fun cairoShowsSeptemberAloneAndIsHeldFromOctoberBecauseItsTableEndsInSeptember() {
+        // Ruling R116: September is checked whole, so in September a page would show it alone; from
+        // 1 October the current month itself is unchecked and the city is held.
+        val cairo = city("cairo-egypt", "EG", 30.06263, 31.24967, "Africa/Cairo")
+        val september = verdict(cairo)
+        assertIs<Verdict.Published>(september)
+        assertEquals(listOf(sep1..sep30), september.months)
+        assertEquals(Unchecked("eg.esa", oct1), september.nextUnchecked)
+        val october = verdict(cairo, oct1)
+        assertIs<Verdict.Held>(october)
+        assertEquals("eg.esa: no checked table day from 1 Oct 2026", october.reason)
     }
 
     @Test fun istanbulIsHeldOnBothSidesOfDiyanetsHole() {
@@ -98,7 +119,7 @@ class ProvenTest {
         val september = verdict(istanbul)
         assertIs<Verdict.Held>(september)
         assertEquals("tr.diyanet: no checked table day 1 Sep 2026 – 24 Sep 2026", september.reason)
-        val october = verdict(istanbul, oct1, nov30)
+        val october = verdict(istanbul, oct1)
         assertIs<Verdict.Held>(october)
         assertEquals("tr.diyanet: no checked table day 30 Oct 2026 – 31 Dec 2026", october.reason)
     }
@@ -119,11 +140,16 @@ class ProvenTest {
         assertEquals(1400, v.stamp.placeDays)
     }
 
-    @Test fun torontoIsHeldForNovembersUncheckedDays() {
-        // Its three member tables lack 1–6 and 28–30 November (review C1): the October–November page waits.
-        val v = verdict(toronto, oct1, nov30)
-        assertIs<Verdict.Held>(v)
-        assertTrue(v.reason.endsWith("(a member of ca.toronto): no checked table day 1 Nov 2026 – 6 Nov 2026"), v.reason)
+    @Test fun torontoShowsOctoberAloneWhileNovemberIsUnchecked() {
+        // Its three member tables lack 1–6 and 28–30 November (review C1). Ruling R116: October is
+        // checked whole, so the page shows October alone and names the first member that leaves a
+        // November day unchecked; November joins the page when every day of it is checked.
+        val v = verdict(toronto, oct1)
+        assertIs<Verdict.Published>(v)
+        assertEquals(listOf(oct1..oct31), v.months)
+        assertEquals(Unchecked("ca.ift (a member of ca.toronto)", nov1), v.nextUnchecked)
+        assertEquals(oct31, v.through)
+        assertNull(v.atMost)
     }
 
     // ── Each clause on a synthetic stamp (built from a committed one; never a time) ──
@@ -167,11 +193,52 @@ class ProvenTest {
         assertEquals("no stamp for gb.london.lupt", v.reason)
     }
 
-    @Test fun aHoleInTheUnitsCheckedDaysHoldsTheCityAndIsNamed() {
+    @Test fun aHoleInTheCurrentMonthHoldsTheCityAndIsNamed() {
         val holed = londonChecked("2026-01-01..2026-10-25", "2027-01-01..2027-12-31")
-        val v = verdict(london, with = mapOf(holed.entry to holed))
+        val v = verdict(london, oct1, with = mapOf(holed.entry to holed))
         assertIs<Verdict.Held>(v)
         assertEquals("gb.london.lupt: no checked table day 26 Oct 2026 – 31 Dec 2026", v.reason)
+    }
+
+    // ── Ruling R116: whole months — the current one or no page, the next only when checked too ──
+
+    @Test fun theCurrentMonthAndTheNextBothCheckedShowTwoMonths() {
+        val whole = londonChecked("2026-09-01..2026-10-31")
+        val v = verdict(london, with = mapOf(whole.entry to whole))
+        assertIs<Verdict.Published>(v)
+        assertEquals(listOf(sep1..sep30, oct1..oct31), v.months)
+        assertNull(v.nextUnchecked)
+        assertEquals(oct31, v.through)
+    }
+
+    @Test fun theCurrentMonthAloneCheckedShowsItAlone() {
+        // The table ends with the current month: September is shown, October waits for its table.
+        val september = londonChecked("2026-01-01..2026-09-30")
+        val v = verdict(london, with = mapOf(september.entry to september))
+        assertIs<Verdict.Published>(v)
+        assertEquals(listOf(sep1..sep30), v.months)
+        assertEquals(Unchecked("gb.london.lupt", oct1), v.nextUnchecked)
+        assertEquals(sep30, v.through)
+        assertEquals(5, v.atMost) // the figures are the unit's, whatever the months shown
+    }
+
+    @Test fun aCurrentMonthNotCheckedWholeHoldsTheCityWhateverTheNext() {
+        // One unchecked day of September holds the page, though October is checked whole.
+        val late = londonChecked("2026-09-02..2026-12-31")
+        val v = verdict(london, with = mapOf(late.entry to late))
+        assertIs<Verdict.Held>(v)
+        assertEquals("gb.london.lupt: no checked table day 1 Sep 2026 – 1 Sep 2026", v.reason)
+    }
+
+    @Test fun aHoleInTheNextMonthShowsTheCurrentMonthAlone() {
+        // One unchecked day of October: a partly checked month is never shown, so September stands
+        // alone and the notice names the day. Through is still the end of the run September sits in.
+        val holed = londonChecked("2026-01-01..2026-10-14", "2026-10-16..2026-12-31")
+        val v = verdict(london, with = mapOf(holed.entry to holed))
+        assertIs<Verdict.Published>(v)
+        assertEquals(listOf(sep1..sep30), v.months)
+        assertEquals(Unchecked("gb.london.lupt", LocalDate(2026, 10, 15)), v.nextUnchecked)
+        assertEquals(LocalDate(2026, 10, 14), v.through)
     }
 
     @Test fun aHoleOutsideTheDaysShownDoesNotHoldTheCity() {
@@ -210,13 +277,21 @@ class ProvenTest {
             "ca.iit" to mapOf(mosque to year),
             "ca.mac" to mapOf(mosque to year),
         )
-        val v = verdict(toronto, oct1, nov30, with = mapOf(holed.entry to holed))
+        val with = mapOf(holed.entry to holed)
+        // In November the member's hole is in the current month: no page.
+        val v = verdict(toronto, nov1, with = with)
         assertIs<Verdict.Held>(v)
         assertEquals("ca.ift (a member of ca.toronto): no checked table day 1 Nov 2026 – 6 Nov 2026", v.reason)
+        // In October it is in the next: October alone, the member named.
+        val october = verdict(toronto, oct1, with = with)
+        assertIs<Verdict.Published>(october)
+        assertEquals(listOf(oct1..oct31), october.months)
+        assertEquals(Unchecked("ca.ift (a member of ca.toronto)", nov1), october.nextUnchecked)
         // The same members over September and October: every day checked, through the run's end.
-        val autumn = verdict(toronto, with = mapOf(holed.entry to holed))
+        val autumn = verdict(toronto, with = with)
         assertIs<Verdict.Published>(autumn)
-        assertEquals(LocalDate(2026, 10, 31), autumn.through)
+        assertEquals(listOf(sep1..sep30, oct1..oct31), autumn.months)
+        assertEquals(oct31, autumn.through)
     }
 
     @Test fun aMemberCheckedOnlyFarAwayCountsForNothingHere() {
