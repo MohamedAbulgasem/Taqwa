@@ -76,6 +76,11 @@ import kotlin.time.Instant
  *    rule puts after sunrise, at the polar edge), the sunrise moves later to the minute after Fajr,
  *    never past the sun's own sunrise at the user's point; only where the sun has risen by that Fajr
  *    does Fajr move earlier, to the minute before, and it is declared in [PrayerDay.notFollowed].
+ * 9. **Isha after the Maghrib shown** (monitor round, brief D), with it: where the Isha shown is not
+ *    after the Maghrib shown (an authority whose takdir holds its day short of the sun's, so that
+ *    its Isha, counted from its own earlier Maghrib, falls before the real sunset the Maghrib shown
+ *    never precedes: Diyanet's Nordic tables from Umeå north in June), Isha moves later to the minute
+ *    after Maghrib and is declared in [PrayerDay.notFollowed]: no day in order can show it.
  *
  * Ramadan, the month and the Isha minutes are always [date]'s, even when a day rule borrows a
  * neighbouring date's astronomy. Where [date] itself has no sunrise or no sunset the day is
@@ -158,7 +163,20 @@ object DayComputer {
             val own = clocked(date, banded(date, limited(date, unlimited(date), capIsha)))
             val table = atFixedPoint?.day(date, capIsha)
             val bounded = if (table != null) own.endsNoLaterThan(table) else own
-            return bounded.fajrBeforeSunrise(date)
+            return bounded.fajrBeforeSunrise(date).ishaAfterMaghrib()
+        }
+
+        /**
+         * Point 9: Isha stays after the Maghrib shown. Where the Isha shown is at or before it (an
+         * authority's own Isha counted from a Maghrib its takdir puts before the real sunset, which the
+         * Maghrib shown never precedes), Isha moves later to the minute after Maghrib, Maghrib's end
+         * with it, and it is declared not followed (as R82's cells and point 8's Fajr): no day in order
+         * can show it. Nothing moves where Isha is already after Maghrib.
+         */
+        private fun PrayerDay.ishaAfterMaghrib(): PrayerDay {
+            if (isha > maghrib) return this
+            val moved = maghrib + 1.minutes
+            return copy(isha = moved, ends = ends + (Prayer.MAGHRIB to moved), notFollowed = notFollowed + Prayer.ISHA)
         }
 
         /**
@@ -817,13 +835,25 @@ object DayComputer {
 
             val fajrOffset = method.fajrAfterDawnMinutes * 60 + total(Prayer.FAJR)
             var fajr = startOf(latest { it.dawn } + fajrOffset)
-            val sunrise = endOf(earliest { it.sunrise } + total(Prayer.SUNRISE))
+            // TimetableMethod.dayAroundDhuhrMinutes: the authority's day is never shorter than twice
+            // these minutes around its own Dhuhr (the transit plus its Dhuhr minutes): its sunrise no
+            // later than Dhuhr − minutes, its Maghrib no earlier than Dhuhr + minutes, each with the
+            // event's own margin (Diyanet's 5-hour winter day at Trondheim).
+            val halfDay = method.dayAroundDhuhrMinutes?.let { it * 60.0 }
+            val authorityDhuhr = latest { it.transit } + offsets.authority(Prayer.DHUHR)
+            val sunriseRaw = earliest { it.sunrise } + total(Prayer.SUNRISE)
+            val sunrise = endOf(
+                if (halfDay == null) sunriseRaw else minOf(sunriseRaw, authorityDhuhr - halfDay + method.margins[Prayer.SUNRISE]),
+            )
             val transit = startOf(latest { it.transit } + total(Prayer.DHUHR))
             val dhuhr = method.fixedDhuhrLocalMinutes?.let { maxOf(transit, localTime(date, it, zone)) } ?: transit
             val asr = startOf(latest { it.asr } + total(Prayer.ASR))
             val asrOther = startOf(latest { it.asrOther } + total(Prayer.ASR))
             val maghribRaw = latest { it.sunset }
-            val maghrib = startOf(maghribRaw + total(Prayer.MAGHRIB) + ramadanMaghrib)
+            val maghribAt = maghribRaw + total(Prayer.MAGHRIB) + ramadanMaghrib
+            val maghrib = startOf(
+                if (halfDay == null) maghribAt else maxOf(maghribAt, authorityDhuhr + halfDay + method.margins[Prayer.MAGHRIB]),
+            )
             val ishaRaw = when (val rule = method.isha) {
                 is IshaRule.Angle -> latest { it.dusk!! }
                 is IshaRule.AfterMaghrib ->

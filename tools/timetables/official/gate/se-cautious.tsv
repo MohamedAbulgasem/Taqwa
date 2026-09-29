@@ -8,8 +8,26 @@
 #   the members' Maghribs spread beyond 2 min and the cap follows the most-followed member, Diyanet, whose table is
 #   not held at Helsinki.
 # Every row is held out (a cautious entry has no margins of its own).
+# - Helsinki and Copenhagen, Diyanet (the monitor round, brief D): Diyanet's own tables, the member tr.diyanet.europe
+#   at its new units there; Maghrib is checked, the cap following Diyanet itself, the most-followed member.
+# - The monitor round's fourteen Nordic tables (step c): Diyanet's own for Malmö, Aarhus, Aalborg, Göteborg, Uppsala, Turku,
+#   Tampere, Sundsvall, Umeå, Oulu and Luleå, the member tr.diyanet.europe at its units there; Maghrib checked, the cap
+#   following Diyanet itself.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/nordic/off-ifis-stockholm-all.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	IFIS Stockholm	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Stockholm	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/verify/dy-cph.txt	se.cautious	55.6761	12.5683	Europe/Copenhagen	F+E S D A M I	daily	standard	test	Diyanet Copenhagen	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.1699	24.9384	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita Helsinki	se.rabita
+archive/tables/monitor/tr-diyanet-europe/helsinki.txt	se.cautious	60.1699	24.9384	Europe/Helsinki	F+E S D A M I	daily	standard	test	Diyanet Helsinki (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/copenhagen.txt	se.cautious	55.6761	12.5683	Europe/Copenhagen	F+E S D A M I	daily	standard	test	Diyanet Copenhagen (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/malmo.txt	se.cautious	55.60587	13.00073	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Malmö (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/aarhus.txt	se.cautious	56.15674	10.21076	Europe/Copenhagen	F+E S D A M I	daily	standard	test	Diyanet Aarhus (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/aalborg.txt	se.cautious	57.048	9.9187	Europe/Copenhagen	F+E S D A M I	daily	standard	test	Diyanet Aalborg (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/goteborg.txt	se.cautious	57.70716	11.96679	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Göteborg (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/uppsala.txt	se.cautious	59.85882	17.63889	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Uppsala (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/turku.txt	se.cautious	60.45148	22.26869	Europe/Helsinki	F+E S D A M I	daily	standard	test	Diyanet Turku (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/tampere.txt	se.cautious	61.49911	23.78712	Europe/Helsinki	F+E S D A M I	daily	standard	test	Diyanet Tampere (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/sundsvall.txt	se.cautious	62.39129	17.3063	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Sundsvall (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/umea.txt	se.cautious	63.82842	20.25972	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Umeå (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/oulu.txt	se.cautious	65.01236	25.46816	Europe/Helsinki	F+E S D A M I	daily	standard	test	Diyanet Oulu (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/lulea.txt	se.cautious	65.58415	22.15465	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Luleå (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe

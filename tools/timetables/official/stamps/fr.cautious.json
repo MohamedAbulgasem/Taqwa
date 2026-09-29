@@ -1,73 +1,73 @@
 {
   "entry": "fr.cautious",
   "class": "C",
-  "engineHash": "7927fcecb2cd4813",
+  "engineHash": "a349a4e17d7a22ea",
   "broken": 0,
-  "places": 1,
+  "places": 3,
   "first": "2026-01-01",
-  "last": "2026-12-31",
-  "placeDays": 365,
-  "heldOutDays": 365,
-  "ramadanDays": 30,
+  "last": "2027-12-31",
+  "placeDays": 1157,
+  "heldOutDays": 1157,
+  "ramadanDays": 88,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 365,
+      "checked": 1157,
       "early": 0,
       "late": {
         "0": 0,
-        "1": 0,
-        "2": 0,
-        "3+": 365
+        "1": 37,
+        "2": 18,
+        "3+": 1102
       },
       "exactShare": 0,
-      "worstLate": 16,
-      "lateLimit": 16,
+      "worstLate": 56,
+      "lateLimit": 56,
       "lateLimitFrom": "entry fr.cautious",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 365,
+      "checked": 1157,
       "lateEnd": 0,
       "late": {
-        "0": 0,
-        "1": 0,
+        "0": 495,
+        "1": 297,
         "2": 0,
         "3+": 365
       },
-      "exactShare": 0,
+      "exactShare": 0.4278,
       "worstLate": 8,
       "lateLimit": 8,
       "lateLimitFrom": "entry fr.cautious",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 365,
+      "checked": 1157,
       "early": 0,
       "late": {
-        "0": 1,
-        "1": 336,
-        "2": 28,
+        "0": 11,
+        "1": 1042,
+        "2": 104,
         "3+": 0
       },
-      "exactShare": 0.0027,
+      "exactShare": 0.0095,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "entry fr.cautious",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 365,
+      "checked": 1157,
       "early": 0,
       "late": {
-        "0": 0,
-        "1": 0,
+        "0": 522,
+        "1": 270,
         "2": 54,
         "3+": 311
       },
-      "exactShare": 0,
+      "exactShare": 0.4512,
       "worstLate": 4,
       "lateLimit": 4,
       "lateLimitFrom": "entry fr.cautious",
@@ -89,95 +89,95 @@
       "overLimit": 0
     },
     "isha": {
-      "checked": 365,
+      "checked": 1157,
       "early": 0,
       "late": {
-        "0": 16,
-        "1": 56,
-        "2": 34,
-        "3+": 259
+        "0": 254,
+        "1": 252,
+        "2": 144,
+        "3+": 507
       },
-      "exactShare": 0.0438,
-      "worstLate": 38,
-      "lateLimit": 38,
+      "exactShare": 0.2195,
+      "worstLate": 88,
+      "lateLimit": 88,
       "lateLimitFrom": "entry fr.cautious",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 365,
+      "checked": 1157,
       "lateEnd": 0,
       "late": {
-        "0": 30,
-        "1": 69,
-        "2": 7,
-        "3+": 259
+        "0": 268,
+        "1": 326,
+        "2": 70,
+        "3+": 493
       },
-      "exactShare": 0.0822,
-      "worstLate": 29,
-      "lateLimit": 29,
+      "exactShare": 0.2316,
+      "worstLate": 77,
+      "lateLimit": 77,
       "lateLimitFrom": "entry fr.cautious",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 365,
-    "ramadanDays": 30,
+    "placeDays": 1157,
+    "ramadanDays": 88,
     "events": {
       "fajr": {
-        "checked": 365,
+        "checked": 1157,
         "early": 0,
         "late": {
           "0": 0,
-          "1": 0,
-          "2": 0,
-          "3+": 365
+          "1": 37,
+          "2": 18,
+          "3+": 1102
         },
         "exactShare": 0,
-        "worstLate": 16,
-        "lateLimit": 16,
+        "worstLate": 56,
+        "lateLimit": 56,
         "lateLimitFrom": "entry fr.cautious",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 365,
+        "checked": 1157,
         "lateEnd": 0,
         "late": {
-          "0": 0,
-          "1": 0,
+          "0": 495,
+          "1": 297,
           "2": 0,
           "3+": 365
         },
-        "exactShare": 0,
+        "exactShare": 0.4278,
         "worstLate": 8,
         "lateLimit": 8,
         "lateLimitFrom": "entry fr.cautious",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 365,
+        "checked": 1157,
         "early": 0,
         "late": {
-          "0": 1,
-          "1": 336,
-          "2": 28,
+          "0": 11,
+          "1": 1042,
+          "2": 104,
           "3+": 0
         },
-        "exactShare": 0.0027,
+        "exactShare": 0.0095,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "entry fr.cautious",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 365,
+        "checked": 1157,
         "early": 0,
         "late": {
-          "0": 0,
-          "1": 0,
+          "0": 522,
+          "1": 270,
           "2": 54,
           "3+": 311
         },
-        "exactShare": 0,
+        "exactShare": 0.4512,
         "worstLate": 4,
         "lateLimit": 4,
         "lateLimitFrom": "entry fr.cautious",
@@ -199,32 +199,32 @@
         "overLimit": 0
       },
       "isha": {
-        "checked": 365,
+        "checked": 1157,
         "early": 0,
         "late": {
-          "0": 16,
-          "1": 56,
-          "2": 34,
-          "3+": 259
+          "0": 254,
+          "1": 252,
+          "2": 144,
+          "3+": 507
         },
-        "exactShare": 0.0438,
-        "worstLate": 38,
-        "lateLimit": 38,
+        "exactShare": 0.2195,
+        "worstLate": 88,
+        "lateLimit": 88,
         "lateLimitFrom": "entry fr.cautious",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 365,
+        "checked": 1157,
         "lateEnd": 0,
         "late": {
-          "0": 30,
-          "1": 69,
-          "2": 7,
-          "3+": 259
+          "0": 268,
+          "1": 326,
+          "2": 70,
+          "3+": 493
         },
-        "exactShare": 0.0822,
-        "worstLate": 29,
-        "lateLimit": 29,
+        "exactShare": 0.2316,
+        "worstLate": 77,
+        "lateLimit": 77,
         "lateLimitFrom": "entry fr.cautious",
         "overLimit": 0
       }
@@ -270,16 +270,16 @@
       "reason": "Sunrise is the earliest member's, Diyanet's (the sun's less 7): up to 8 min before the three families' tables, which print the sun's own.",
       "events": ["sunrise"]
     },
-    "entry fr.cautious: 16 min": {
-      "reason": "The 12–13° family prints Fajr from about 12° to 13° (Drancy's at 12.7°); its member takes 12°, the family's latest, never before any of them, so against Drancy's table Fajr runs up to 7 min late; from late May to June Diyanet's Paris table (its takdir, a member since ruling R87) is the latest, up to 16 min after Drancy's.",
+    "entry fr.cautious: 56 min": {
+      "reason": "The 12–13° family prints Fajr from about 12° to 13° (Drancy's at 12.7°); its member takes 12°, the family's latest, never before any of them, so against Drancy's table Fajr runs up to 7 min late; from late May to June Diyanet's Paris table (its takdir, a member since ruling R87) is the latest, up to 16 min after Drancy's. Against Diyanet's own Lyon and Lille tables (their own units since the monitor round) the 12° family's Fajr is the later on most days, up to 56 min after Diyanet's 18° at Lyon in autumn and winter.",
       "events": ["fajr"]
     },
-    "entry fr.cautious: 29 min": {
-      "reason": "The end of eating is the earliest member's: from late April to August the flat 15° family's 15° dawn, which Al-Amel's table (the family's one held) leaves for a later summer Fajr of its own, up to 29 min before the earliest printed Fajr of the three tables in June; the rest of the year Diyanet's Paris table's dawn (its 18° and takdir, a member since ruling R87), up to 26 min before the Grande Mosquée's own Fajr in April and August and about 12 in winter, and where the Grande Mosquée's page changes method its own dawn (ruling R80: 16 min on 1 and 2 January, 8 on 29 and 30 September).",
+    "entry fr.cautious: 77 min": {
+      "reason": "The end of eating is the earliest member's: from late April to August the flat 15° family's 15° dawn, which Al-Amel's table (the family's one held) leaves for a later summer Fajr of its own, up to 29 min before the earliest printed Fajr of the three tables in June at Paris and up to 77 min before Diyanet's own Lille table's imsak in late May, when its takdir has moved its dawn later; the rest of the year Diyanet's table's dawn (its 18° and takdir, a member since ruling R87), up to 26 min before the Grande Mosquée's own Fajr in April and August and about 12 in winter, and where the Grande Mosquée's page changes method its own dawn (ruling R80: 16 min on 1 and 2 January, 8 on 29 and 30 September).",
       "events": ["endOfEating"]
     },
-    "entry fr.cautious: 38 min": {
-      "reason": "The flat 15° family prints Isha at 15° (in a Paris June after midnight), while the Grande Mosquée's is sunset + 90 and Drancy's and Al-Amel's summer Isha follow earlier rules of their own; Isha is the latest member's, so in summer it runs up to 38 min after the latest of those three tables.",
+    "entry fr.cautious: 88 min": {
+      "reason": "The flat 15° family prints Isha at 15° (in a Paris June after midnight), while the Grande Mosquée's is sunset + 90 and Drancy's and Al-Amel's summer Isha follow earlier rules of their own; Isha is the latest member's, so in summer it runs up to 38 min after the latest of those three tables at Paris, and up to 88 min after Diyanet's own Lille table in June, whose takdir Isha is earlier still.",
       "events": ["isha"]
     }
   }

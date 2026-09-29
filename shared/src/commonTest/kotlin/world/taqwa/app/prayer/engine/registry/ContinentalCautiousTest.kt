@@ -274,10 +274,19 @@ class ContinentalCautiousTest {
                 assertEquals(expected, day.maghrib, "$label Maghrib")
                 assertTrue(day.maghrib >= ownDay.maghrib && day.maghrib <= ownDay.maghrib + Cautious.MAGHRIB_AGREEMENT, "$label Maghrib ${day.maghrib} against EMB's own ${ownDay.maghrib}")
             }
-            // Diyanet's sunset + 7 on its own sun runs 3 to 7 min after EMB's + 2: past the agreement on every day, so
-            // the cap decides all year and Maghrib is EMB's own.
+            // Diyanet's sunset + 7 on its own sun runs 3 to 7 min after EMB's + 2 at EMB's own point and beyond
+            // every Diyanet table: past the agreement on every day, so the cap decides all year and Maghrib is
+            // EMB's own. At Antwerp and Ghent Diyanet's member computes at its own table's point since the
+            // monitor round while EMB's stays at Brussels, whose winter sunset comes later: on a few winter days
+            // the two agree within 2 min and Maghrib is the later member's (asserted day by day above).
             val range = "${place.lat}: Diyanet's Maghrib ${spreads.min()}..${spreads.max()} after EMB's"
-            assertTrue(spreads.min() > Cautious.MAGHRIB_AGREEMENT && spreads.max() <= 7.minutes, range)
+            assertTrue(spreads.min() > Duration.ZERO && spreads.max() <= 7.minutes, range)
+            val agreeing = spreads.count { it <= Cautious.MAGHRIB_AGREEMENT }
+            if (place.lat == 51.2194 || place.lat == 51.0543) {
+                assertTrue(agreeing in 0..40, "$range: $agreeing sampled days within the agreement")
+            } else {
+                assertEquals(0, agreeing, "$range: within the agreement on $agreeing sampled days")
+            }
         }
     }
 

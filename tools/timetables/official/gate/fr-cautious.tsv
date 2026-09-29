@@ -7,8 +7,13 @@
 #   but its Fajr is, as the end of eating: E, ruling R80);
 # - fr.fifteen, the flat 15° family: Al-Amel Neuilly-Plaisance's 2026 table (15°, + 0.6, + 1.1).
 # A cautious entry has no margins of its own: every row is held out.
+# Lyon and Lille (the monitor round, brief D): Diyanet's own tables for both, the member tr.diyanet.europe at its new
+# units there, at the cities' points; Maghrib is not checked, since the members' Maghribs spread beyond 2 min and the
+# cap follows the most-followed member, the 12-13° family, whose table is held at Paris alone.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/ukfr/fr_drancy.txt	fr.cautious	48.8418	2.3556	Europe/Paris	F+E S D A M I	daily	standard	test	Drancy 2026, the 12-13° family	fr.twelve
 archive/tables/moral-auth-world/ukfr/split-7g/gmp-2026-jan-sep.txt	fr.cautious	48.8418	2.3556	Europe/Paris	F+E S D A M I	daily	standard	test	GMP January-September 2026	fr.gmp
 archive/tables/moral-auth-world/ukfr/split-7g/gmp-2026-oct-dec.txt	fr.cautious	48.8418	2.3556	Europe/Paris	E S - A M I	daily	standard	test	GMP October-December, its earlier method	fr.gmp
 archive/tables/moral-auth-world/ukfr/fr_alamel.txt	fr.cautious	48.8418	2.3556	Europe/Paris	F+E S D A M I	daily	standard	test	Al-Amel Neuilly-Plaisance 2026, the 15° family	fr.fifteen
+archive/tables/monitor/tr-diyanet-europe/lyon.txt	fr.cautious	45.764	4.8357	Europe/Paris	F+E S D A - I	daily	standard	test	Diyanet Lyon (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
+archive/tables/monitor/tr-diyanet-europe/lille.txt	fr.cautious	50.6292	3.0573	Europe/Paris	F+E S D A - I	daily	standard	test	Diyanet Lille (the monitor capture of 28 Sep 2026)	tr.diyanet.europe

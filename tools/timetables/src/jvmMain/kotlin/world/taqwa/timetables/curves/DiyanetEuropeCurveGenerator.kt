@@ -277,10 +277,16 @@ object DiyanetEuropeCurveGenerator {
 
 /**
  * Diyanet's European city tables north of 44.5°, south to north, with the archive tables each is
- * held in (the research captures of September 2026 and the monitor's, restricted). Sarajevo, south
- * of 44.5°, follows the plain method and has no curve.
+ * held in (the research captures of September 2026 and the monitor's of 28 September, restricted;
+ * the seven cities the monitor round added, Lyon to Trondheim, are held in the monitor's capture,
+ * Copenhagen in the research's too). Sarajevo, south of 44.5°, follows the plain method and has no
+ * curve. The points are the units' (Diyanet.europeUnits).
  */
 val DIYANET_EUROPE_CITIES: List<DiyanetEuropeCurveGenerator.City> = listOf(
+    DiyanetEuropeCurveGenerator.City(
+        "lyon", "Lyon", GeoPoint(45.764, 4.8357), "Europe/Paris",
+        listOf("archive/tables/monitor/tr-diyanet-europe/lyon.txt"),
+    ),
     DiyanetEuropeCurveGenerator.City(
         "zurich", "Zürich", GeoPoint(47.36667, 8.55), "Europe/Zurich",
         listOf("archive/tables/moral-auth-world/europe/verify/dy-zurich.txt", "archive/tables/monitor/tr-diyanet-europe/zurich.txt"),
@@ -302,8 +308,20 @@ val DIYANET_EUROPE_CITIES: List<DiyanetEuropeCurveGenerator.City> = listOf(
         listOf("archive/tables/moral-auth-world/europe/dy-paris.txt", "archive/tables/monitor/tr-diyanet-europe/paris.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
+        "lille", "Lille", GeoPoint(50.6292, 3.0573), "Europe/Paris",
+        listOf("archive/tables/monitor/tr-diyanet-europe/lille.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
         "brussels", "Brussels", GeoPoint(50.85045, 4.34878), "Europe/Brussels",
         listOf("archive/tables/moral-auth-world/europe/dy-brussels.txt", "archive/tables/monitor/tr-diyanet-europe/brussels.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "gent", "Gent", GeoPoint(51.0543, 3.7174), "Europe/Brussels",
+        listOf("archive/tables/monitor/tr-diyanet-europe/gent.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "antwerpen", "Antwerpen", GeoPoint(51.2194, 4.4025), "Europe/Brussels",
+        listOf("archive/tables/monitor/tr-diyanet-europe/antwerpen.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "london", "London", GeoPoint(51.5074, -0.1278), "Europe/London",
@@ -318,12 +336,80 @@ val DIYANET_EUROPE_CITIES: List<DiyanetEuropeCurveGenerator.City> = listOf(
         listOf("archive/tables/moral-auth-world/europe/dy-berlin.txt", "archive/tables/monitor/tr-diyanet-europe/berlin.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
+        "malmo", "Malmö", GeoPoint(55.60587, 13.00073), "Europe/Stockholm",
+        listOf("archive/tables/monitor/tr-diyanet-europe/malmo.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "copenhagen", "Copenhagen", GeoPoint(55.6761, 12.5683), "Europe/Copenhagen",
+        listOf("archive/tables/moral-auth-world/europe/verify/dy-cph.txt", "archive/tables/monitor/tr-diyanet-europe/copenhagen.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "aarhus", "Aarhus", GeoPoint(56.15674, 10.21076), "Europe/Copenhagen",
+        listOf("archive/tables/monitor/tr-diyanet-europe/aarhus.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "aalborg", "Aalborg", GeoPoint(57.048, 9.9187), "Europe/Copenhagen",
+        listOf("archive/tables/monitor/tr-diyanet-europe/aalborg.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "goteborg", "Göteborg", GeoPoint(57.70716, 11.96679), "Europe/Stockholm",
+        listOf("archive/tables/monitor/tr-diyanet-europe/goteborg.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "kristiansand", "Kristiansand", GeoPoint(58.14671, 7.9956), "Europe/Oslo",
+        listOf("archive/tables/monitor/tr-diyanet-europe/kristiansand.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "stavanger", "Stavanger", GeoPoint(58.97005, 5.73332), "Europe/Oslo",
+        listOf("archive/tables/monitor/tr-diyanet-europe/stavanger.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
         "stockholm", "Stockholm", GeoPoint(59.32938, 18.06871), "Europe/Stockholm",
         listOf("archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt", "archive/tables/monitor/tr-diyanet-europe/stockholm.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
+        "uppsala", "Uppsala", GeoPoint(59.85882, 17.63889), "Europe/Stockholm",
+        listOf("archive/tables/monitor/tr-diyanet-europe/uppsala.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
         "oslo", "Oslo", GeoPoint(59.91273, 10.74609), "Europe/Oslo",
         listOf("archive/tables/moral-auth-world/europe/verify/dy-oslo.txt", "archive/tables/monitor/tr-diyanet-europe/oslo.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "helsinki", "Helsinki", GeoPoint(60.1699, 24.9384), "Europe/Helsinki",
+        listOf("archive/tables/monitor/tr-diyanet-europe/helsinki.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "bergen", "Bergen", GeoPoint(60.39299, 5.32415), "Europe/Oslo",
+        listOf("archive/tables/monitor/tr-diyanet-europe/bergen.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "turku", "Turku", GeoPoint(60.45148, 22.26869), "Europe/Helsinki",
+        listOf("archive/tables/monitor/tr-diyanet-europe/turku.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "tampere", "Tampere", GeoPoint(61.49911, 23.78712), "Europe/Helsinki",
+        listOf("archive/tables/monitor/tr-diyanet-europe/tampere.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "sundsvall", "Sundsvall", GeoPoint(62.39129, 17.3063), "Europe/Stockholm",
+        listOf("archive/tables/monitor/tr-diyanet-europe/sundsvall.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "trondheim", "Trondheim", GeoPoint(63.43049, 10.39506), "Europe/Oslo",
+        listOf("archive/tables/monitor/tr-diyanet-europe/trondheim.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "umea", "Umeå", GeoPoint(63.82842, 20.25972), "Europe/Stockholm",
+        listOf("archive/tables/monitor/tr-diyanet-europe/umea.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "oulu", "Oulu", GeoPoint(65.01236, 25.46816), "Europe/Helsinki",
+        listOf("archive/tables/monitor/tr-diyanet-europe/oulu.txt"),
+    ),
+    DiyanetEuropeCurveGenerator.City(
+        "lulea", "Luleå", GeoPoint(65.58415, 22.15465), "Europe/Stockholm",
+        listOf("archive/tables/monitor/tr-diyanet-europe/lulea.txt"),
     ),
 )
 

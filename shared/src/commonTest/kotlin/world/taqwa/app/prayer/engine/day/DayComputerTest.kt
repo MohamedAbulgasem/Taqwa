@@ -58,6 +58,69 @@ class DayComputerTest {
 
     private fun plain(id: String) = TimetableMethod(id = id, fajrAngle = 18.0, isha = IshaRule.Angle(17.0))
 
+    // TimetableMethod.dayAroundDhuhrMinutes: Diyanet's winter takdir at Trondheim (monitor round, brief D).
+
+    private val trondheimLike = GeoPoint(63.5, 10.0)
+    private val osloZone = TimeZone.of("Europe/Oslo")
+    private val winterDay = plain("test.winter").copy(
+        authorityMinutes = EventOffsets(sunrise = -7, dhuhr = 5, maghrib = 7), dayAroundDhuhrMinutes = 150,
+    )
+
+    @Test
+    fun `the day around dhuhr holds sunrise and maghrib apart by its minutes where the sun's day is shorter`() {
+        val date = LocalDate(2027, 12, 21)
+        val ruled = compute(winterDay, trondheimLike, date, osloZone)
+        val plainDay = compute(winterDay.copy(dayAroundDhuhrMinutes = null), trondheimLike, date, osloZone)
+        // The sun's own day at 63.5° in December is under five hours: the rule binds on both sides.
+        assertTrue(plainDay.maghrib - plainDay.dhuhr < 150.minutes, "the plain day's afternoon ${plainDay.maghrib - plainDay.dhuhr}")
+        assertTrue(plainDay.dhuhr - plainDay.sunrise < 150.minutes, "the plain day's morning ${plainDay.dhuhr - plainDay.sunrise}")
+        assertTrue(ruled.maghrib - ruled.dhuhr >= 150.minutes && ruled.maghrib - ruled.dhuhr <= 151.minutes, "ruled afternoon ${ruled.maghrib - ruled.dhuhr}")
+        assertTrue(ruled.dhuhr - ruled.sunrise >= 150.minutes && ruled.dhuhr - ruled.sunrise <= 151.minutes, "ruled morning ${ruled.dhuhr - ruled.sunrise}")
+        // Never before the real sunset, and every other time as without the rule.
+        assertTrue(ruled.maghrib >= ruled.sunset && ruled.sunset == plainDay.sunset)
+        assertTrue(ruled.sunrise < plainDay.sunrise && ruled.maghrib > plainDay.maghrib)
+        assertEquals(plainDay.fajr, ruled.fajr)
+        assertEquals(plainDay.dhuhr, ruled.dhuhr)
+        assertEquals(plainDay.asr, ruled.asr)
+        assertEquals(plainDay.isha, ruled.isha)
+        assertTrue(ruled.fajr < ruled.sunrise && ruled.maghrib < ruled.isha, "the day stays in order")
+    }
+
+    @Test
+    fun `the day around dhuhr does nothing where the sun's day is longer than its minutes`() {
+        for (date in listOf(LocalDate(2027, 3, 21), LocalDate(2027, 6, 21), LocalDate(2027, 11, 1))) {
+            val ruled = compute(winterDay, trondheimLike, date, osloZone)
+            val plainDay = compute(winterDay.copy(dayAroundDhuhrMinutes = null), trondheimLike, date, osloZone)
+            assertEquals(plainDay.everyInstant(), ruled.everyInstant(), "$date")
+        }
+    }
+
+    /**
+     * Point 9 (monitor round, brief D): an authority whose Isha its own takdir puts before the real
+     * sunset (Diyanet from Umeå north in June) cannot be shown in order: Isha is the minute after the
+     * Maghrib shown and declared not followed.
+     */
+    @Test
+    fun `an isha before the maghrib shown moves to the minute after it and is declared`() {
+        // An invented rule: Isha at the sun 5° above the horizon in the evening, before every sunset.
+        val aboveHorizon = plain("test.isha.early").copy(ishaAngleByDayOfYear = DoubleArray(366) { -5.0 })
+        val date = LocalDate(2027, 6, 21)
+        val day = compute(aboveHorizon, GeoPoint(51.5, -0.1), date, TimeZone.of("Europe/London"))
+        assertEquals(day.maghrib + 1.minutes, day.isha)
+        assertEquals(setOf(Prayer.ISHA), day.notFollowed)
+        assertEquals(day.isha, day.ends[Prayer.MAGHRIB])
+        assertFalse(day.repaired)
+        assertTrue(Invariants.holds(day))
+        val ordinary = compute(plain("test.isha.plain"), GeoPoint(51.5, -0.1), date, TimeZone.of("Europe/London"))
+        assertTrue(ordinary.notFollowed.isEmpty() && ordinary.isha > ordinary.maghrib + 1.minutes)
+    }
+
+    @Test
+    fun `the day around dhuhr must be under twelve hours`() {
+        assertFailsWith<IllegalArgumentException> { plain("bad").copy(dayAroundDhuhrMinutes = 12 * 60) }
+        assertFailsWith<IllegalArgumentException> { plain("bad").copy(dayAroundDhuhrMinutes = 0) }
+    }
+
     private fun compute(
         method: TimetableMethod,
         point: GeoPoint,

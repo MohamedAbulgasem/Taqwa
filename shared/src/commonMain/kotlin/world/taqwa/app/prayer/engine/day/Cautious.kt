@@ -54,12 +54,17 @@ object Cautious {
         val sunrise = if (earliestSunrise > fajr) earliestSunrise else members.filter { it.fajr == fajr }.minOf { it.sunrise }
         val sunset = earliest { it.sunset }
         val ishaEnds = members.mapNotNull { it.ends[Prayer.ISHA] }
+        // A member whose Isha is declared not followed (DayComputer's point 9: its rule's Isha fell before
+        // its own Maghrib, so it shows the minute after) has no Isha in play to close Maghrib's window:
+        // the earliest Isha, and the members' own Maghrib ends, are the other members' (all of them
+        // where every member declares).
+        val ishaInPlay = members.filter { Prayer.ISHA !in it.notFollowed }.ifEmpty { members }
         val ends = Ends.of(
             sunrise = sunrise,
             standardAsr = earliest { it.ends[Prayer.DHUHR] ?: minOf(it.asr, it.asrOther) },
             sunset = sunset,
-            earliestIsha = earliestStart.getValue(Prayer.ISHA),
-            maghribEndCap = members.mapNotNull { it.ends[Prayer.MAGHRIB] }.minOrNull(),
+            earliestIsha = ishaInPlay.minOf { it.isha },
+            maghribEndCap = ishaInPlay.mapNotNull { it.ends[Prayer.MAGHRIB] }.minOrNull(),
             // The earliest member's end, and none where it is not after the latest Isha (ruling R26).
             nextEndOfEating = ishaEnds.takeIf { it.size == members.size }?.min()
                 ?.takeIf { end -> end > latest { it.isha } },
