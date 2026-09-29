@@ -54,15 +54,17 @@ object MonitorIndex {
 
     fun load(file: File): List<MonitorTable> = if (file.isFile) parse(file.readText()) else emptyList()
 
+    /** The rows by column name; a column this reader does not know (the first monitor's per-run `status`) is ignored. */
     fun parse(text: String): List<MonitorTable> {
         val lines = text.lines().filter { it.isNotBlank() && !it.startsWith("#") }
         if (lines.isEmpty()) return emptyList()
         val header = lines.first().split('\t').map { it.trim() }
-        require(header == HEADER) { "index.tsv: the header must be ${HEADER.joinToString(" ")}, not ${header.joinToString(" ")}" }
+        val missing = HEADER - header.toSet()
+        require(missing.isEmpty()) { "index.tsv: the header lacks ${missing.joinToString(" ")} (it must name ${HEADER.joinToString(" ")})" }
         return lines.drop(1).map { line ->
             val cells = line.split('\t').map { it.trim() }
-            require(cells.size == HEADER.size) { "index.tsv: '$line' has ${cells.size} cells" }
-            val row = HEADER.zip(cells).toMap()
+            require(cells.size == header.size) { "index.tsv: '$line' has ${cells.size} cells, the header ${header.size}" }
+            val row = header.zip(cells).toMap()
             fun opt(name: String) = row.getValue(name).takeIf { it.isNotEmpty() }
             MonitorTable(
                 source = row.getValue("source"), key = row.getValue("key"), path = row.getValue("path"), name = row.getValue("name"),

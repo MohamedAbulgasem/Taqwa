@@ -1831,3 +1831,15 @@ table into the restricted archive, each new or changed table goes through the ga
 point, then the whole gate and the six surveys, the data horizons and the manual sources' due
 dates; the archive is mirrored into its backup; a report under the archive root's `monitor/`
 folder, silent (exit 0) when all is well.
+
+### The monitor's fix round, and the cloud (29 September 2026)
+
+After its review (8 important, 15 minor findings) the monitor classifies each finding line on its
+own (ruling R93): never-early failures first on every run, own-table lateness raised once and
+carried, member-row lateness and unchecked capped Maghribs for the record; a table is also checked
+as the member of the cautious entry Automatic follows at its point; each table's check signature
+(content, metadata, the whole engine) is remembered, so nothing is skipped for good and an engine
+change re-checks everything; a key never reaches a log; a breaker per host and a budget per run;
+one lock, one `today`, atomic writes. It now runs weekly on GitHub Actions in a private archive
+repository (ruling R94; `tools/timetables/monitor/ci/monitor-weekly.yml`, docs/MONITOR.md), keeping
+one issue open while something needs attention; IRN is fetched on its own (ruling R95).

@@ -133,12 +133,16 @@ class Monitor(
         val engineHash = Stamps.wholeEngineHash(repo)
         val check = TableCheck(roots, officialDir)
         val records = state.checked
+        // What today's fetch said of each table (new, changed, unchanged): a table the state does not
+        // know but that was not fetched today is merely checked again, not new.
+        val fetched = if (fetchedToday) log!!.sources.flatMap { r -> r.tables.map { (key, s) -> "${r.source}/$key" to s } }.toMap() else emptyMap()
         for (table in index) {
             val record = records[table.id]
             val signature = signature(table, engineHash)
             if (!checkAll && record != null && record.signature == signature && !record.red) continue
             val status = TableCheck.Status(
-                isNew = record == null, contentChanged = record != null && record.hash.isNotEmpty() && record.hash != table.hash,
+                isNew = fetched[table.id] == "new" || (record == null && table.fetched == today.toString()),
+                contentChanged = fetched[table.id] == "changed" || (record != null && record.hash.isNotEmpty() && record.hash != table.hash),
                 wasRed = record?.red == true, lateness = record?.lateness,
             )
             val outcome = check.check(table, status, today)

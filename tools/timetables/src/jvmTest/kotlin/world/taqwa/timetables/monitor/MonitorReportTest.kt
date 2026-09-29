@@ -35,6 +35,11 @@ class MonitorReportTest {
         assertEquals("gb-cautious", tables[1].survey)
         assertEquals(null, tables[1].entry)
         assertTrue("abc" in tables[0].metadata && "def" !in tables[0].metadata)
+        // The first monitor's index carried a per-run status column: still read, the column ignored.
+        val old = (MonitorIndex.HEADER.dropLast(2) + "status" + MonitorIndex.HEADER.takeLast(2)).joinToString("\t") + "\n" +
+            "sa-ummalqura\tmakkah-2026\tarchive/tables/monitor/sa-ummalqura/makkah-2026.txt\tMakkah 2026\t21.426666\t39.831666\tAsia/Riyadh\t\tSA\tsa.ummalqura\t\tF+E S D A M I\tdaily\tstandard\tabc\theld\t2026-10-05\t\n"
+        assertEquals("2026-10-05", MonitorIndex.parse(old).single().fetched)
+        assertTrue(runCatching { MonitorIndex.parse("source\tkey\nx\ty\n") }.isFailure, "a header lacking columns is refused")
     }
 
     @Test
@@ -204,18 +209,27 @@ class MonitorReportTest {
     }
 
     @Test
+    fun `a table the state does not know but that was not fetched today is checked again and not new`() {
+        invented()
+        val first = run("2026-10-12")
+        assertTrue("Checked again, fine: 1 held table (sg-muis 1)" in first.report, first.report)
+        assertTrue("New table" !in first.report, first.report)
+    }
+
+    @Test
     fun `the old state's red tables are checked again and the notification is posted only when the attention set changes`() {
         invented()
         monitorDir.mkdirs()
         monitorDir.resolve("state.json").writeText(Json.pretty(linkedMapOf("redTables" to listOf("sg-muis/singapore"), "lastReminder" to "2026-09-28")))
-        fetchLog("2026-10-05", "sg-muis" to ok, "eg-esa" to failed)
+        val unchanged = linkedMapOf<String, Any?>("status" to "ok", "message" to "", "requests" to 2, "tables" to linkedMapOf("singapore" to "unchanged"))
+        fetchLog("2026-10-05", "sg-muis" to unchanged, "eg-esa" to failed)
         backup("2026-10-05", 0)
         val first = run("2026-10-05")
         assertTrue("Green again: sg-muis/singapore" in first.report, first.report)
         assertTrue(first.attentionChanged)
         assertTrue("redTables" !in monitorDir.resolve("state.json").readText())
         // The same failure a week later: the report lists it, the notification is not repeated.
-        fetchLog("2026-10-12", "sg-muis" to ok, "eg-esa" to failed)
+        fetchLog("2026-10-12", "sg-muis" to unchanged, "eg-esa" to failed)
         backup("2026-10-12", 0)
         val second = run("2026-10-12")
         assertEquals(1, second.exitCode)
