@@ -100,7 +100,14 @@
     "app_platforms": "Untuk Android dan iPhone. Dalam bahasa Indonesia, Inggris, Arab, Prancis, Turki, Urdu, dan Bengali.",
     "more_times": "Waktu salat lainnya",
     "questions": "Pertanyaan",
-    "ruler_percent": "{n}%"
+    "ruler_percent": "{n}%",
+    "detailed_title": "Tampilan rinci",
+    "detailed_body": "Kedua waktu Ashar, waktu imsak, dan hari-hari menurut aturan",
+    "eat_by": "imsak",
+    "print_month": "Cetak atau simpan sebagai PDF",
+    "note_detailed": "Dalam tampilan rinci, waktu kecil di bawah {fajr} adalah batas berhenti makan pada hari puasa, dan yang di bawah {asr} adalah {asr} {school}. Hari yang menurut aturan, ketika {fajr} atau {isha} mengikuti aturan lintang tinggi aplikasi dan bukan sudut matahari, diberi tanda.",
+    "note_no_rule": "Tidak ada yang menurut aturan bulan ini maupun bulan depan.",
+    "note_engine": "Dari mesin yang sama dengan aplikasi, diperbarui setiap hari. Hari Jumat ditandai untuk salat {jumuah}. Diperbarui {date}."
   },
   "stores": {
     "beta": "Ikut beta Android",

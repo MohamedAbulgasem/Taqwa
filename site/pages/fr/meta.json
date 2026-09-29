@@ -100,7 +100,14 @@
     "app_platforms": "Pour Android et iPhone. En français, anglais, arabe, turc, indonésien, ourdou et bengali.",
     "more_times": "Plus d’horaires de prière",
     "questions": "Questions",
-    "ruler_percent": "{n} %"
+    "ruler_percent": "{n} %",
+    "detailed_title": "Vue détaillée",
+    "detailed_body": "Les deux horaires de l’Asr, la fin du repas et les jours fixés par règle",
+    "eat_by": "manger avant",
+    "print_month": "Imprimer ou enregistrer en PDF",
+    "note_detailed": "Dans la vue détaillée, la petite heure sous {fajr} est celle où cesser de manger un jour de jeûne, et celle sous {asr} est l’{asr} {school}. Un jour fixé par règle, quand {fajr} ou {isha} suit la règle de l’application pour les hautes latitudes plutôt que l’angle du soleil, porte une marque.",
+    "note_no_rule": "Aucun n’est fixé par règle ce mois-ci ni le suivant.",
+    "note_engine": "Du même moteur que l’application, recalculés chaque jour. Les vendredis sont marqués pour la {jumuah}. Mis à jour le {date}."
   },
   "stores": {
     "beta": "Rejoindre la bêta Android",

@@ -14,6 +14,8 @@
 
   var OBLIGATORY = [0, 2, 3, 4, 5]; // Fajr, Dhuhr, Asr, Maghrib, Isha: Sunrise is never "next"
   var FAJR = 0;
+  var SUNRISE = 1;
+  var ASR = 3;
   var ISHA = 5;
   var CIRCUMFERENCE = 2 * Math.PI * 88;
 
@@ -32,7 +34,59 @@
   }
   var holder = document.getElementById("tt-data");
   if (!holder) return;
+  detailedView();
+  printButtons();
   cityPage(JSON.parse(holder.textContent));
+
+  /* The detailed view (spec §3.4): a switch that shows the second lines the tables already
+     carry, the end of eating under Fajr and the other school's Asr under Asr, and the mark on
+     a day set by rule, through one class on <main>. Off when the page opens, never stored. */
+  function detailedView() {
+    var toggle = document.querySelector(".dv-toggle");
+    if (!toggle) return;
+    var row = toggle.closest(".dv-switch");
+    if (row) row.hidden = false;
+    toggle.addEventListener("click", function () {
+      var on = toggle.getAttribute("aria-checked") !== "true";
+      toggle.setAttribute("aria-checked", String(on));
+      document.querySelector("main").classList.toggle("dv", on);
+    });
+  }
+
+  /* "Print or save as PDF", one button per month: the month is marked on <html> and its section,
+     the print stylesheet then prints that month alone with every day and the Hijri column, and
+     the marks go when the dialog closes (afterprint, or the print media query ending where a
+     browser fires no afterprint). Without script the buttons stay hidden and the browser's own
+     print gives both months. */
+  function printButtons() {
+    var buttons = [].slice.call(document.querySelectorAll("button.print[data-month]"));
+    if (!buttons.length) return;
+    var root = document.documentElement;
+    function clear() {
+      root.removeAttribute("data-print");
+      [].slice.call(document.querySelectorAll("[data-print-target]")).forEach(function (section) {
+        section.removeAttribute("data-print-target");
+      });
+    }
+    window.addEventListener("afterprint", clear);
+    if (window.matchMedia) {
+      var printing = window.matchMedia("print");
+      var ended = function (event) { if (!event.matches) clear(); };
+      if (printing.addEventListener) printing.addEventListener("change", ended);
+      else if (printing.addListener) printing.addListener(ended);
+    }
+    buttons.forEach(function (button) {
+      var section = document.getElementById(button.getAttribute("data-month"));
+      if (!section) return;
+      button.hidden = false;
+      button.addEventListener("click", function () {
+        clear();
+        root.setAttribute("data-print", section.id);
+        section.setAttribute("data-print-target", "");
+        window.print();
+      });
+    });
+  }
 
   function indexFilter(input) {
     var main = document.querySelector(".index");
@@ -115,7 +169,9 @@
 
     /* The app's TimelineBuilder: "current" is the last obligatory prayer whose time has come;
        "next" the first still to come, or tomorrow's Fajr after Isha; the ring measures the
-       interval between the two, which before Fajr began at yesterday's Isha. */
+       interval between the two, which before Fajr began at yesterday's Isha. As on the app's
+       Prayer screen, Fajr is over at sunrise and Asr at sunset, so nothing is current from
+       sunrise to Dhuhr or from sunset to Maghrib; the ring's interval is unchanged. */
     function state(now) {
       var i = byDate[cityDate(now * 1000)];
       if (i === undefined) return null;
@@ -131,6 +187,8 @@
           next = { p: p, at: today.e[p], day: i };
         }
       });
+      if (current === FAJR && now >= today.e[SUNRISE]) current = null;
+      if (current === ASR && now >= today.s) current = null;
       if (next === null) {
         if (i + 1 >= days.length) return { i: i, current: current, next: null };
         next = { p: FAJR, at: days[i + 1].e[FAJR], day: i + 1 };
@@ -210,10 +268,10 @@
       arc.setAttribute("stroke-dasharray", (s.progress * CIRCUMFERENCE).toFixed(1) + " " + CIRCUMFERENCE.toFixed(1));
     }
 
-    /* On a phone the days already gone this month fold behind one row, so today is near the
-       top of the table; a tap brings them back. */
+    /* At every width the days already gone this month fold behind one row, so today is near
+       the top of the table; a tap brings them back. The print stylesheet prints every row
+       whatever the fold. */
     function foldPast() {
-      if (!window.matchMedia("(max-width: 720px)").matches) return;
       if (shown < 4 || shown >= data.first) return;
       var gone = rows.slice(0, shown);
       var first = gone[0].querySelector("th b").textContent;
@@ -224,6 +282,7 @@
       cell.colSpan = 8;
       var button = document.createElement("button");
       button.type = "button";
+      button.setAttribute("aria-expanded", "false");
       var words = document.createElement("span");
       words.textContent = data.earlier;
       var range = document.createElement("span");
@@ -234,6 +293,7 @@
       button.appendChild(range);
       button.appendChild(plus);
       button.addEventListener("click", function () {
+        button.setAttribute("aria-expanded", "true");
         gone.forEach(function (r) { r.hidden = false; });
         row.parentNode.removeChild(row);
       });
