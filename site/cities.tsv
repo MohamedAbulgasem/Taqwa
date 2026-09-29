@@ -107,7 +107,7 @@ sfax-tunisia	2467454	en ar fr
 # held: Sousse — outside tn.inm's checked units (class D).
 # sousse-tunisia	2464915	en ar fr
 # Algeria: the ministry's calendar (dz.marw, class B) at Algiers.
-algiers-algeria	2507480	en ar fr	fr
+algiers-algeria	2507480	en ar fr	fr	fr=Alger
 # held: Oran, Constantine — class D at the city (Oran's unit is not fully checked; Constantine is outside dz.marw's checked units).
 # oran-algeria	2485926	en ar fr
 # constantine-algeria	2501152	en ar fr
