@@ -74,6 +74,11 @@ PRAYER_TIMES_LIVE = True
 STORES_MARKER = "<!-- stores -->"
 EXODUS_MARKER = "<!-- exodus -->"
 
+# A home page's link to the "How Taqwa checks" page (the credits row). That page is built only while
+# a city has a page (timetables.Timetables.build), so with every city held the link keeps its words
+# and loses its address rather than point at nothing.
+CHECKS_LINK = re.compile(r'<a href="\{prayer_times\}' + re.escape(timetables.CHECKS_PAGE_SLUG) + r'/">(.*?)</a>')
+
 
 def exodus_row(cfg: dict) -> str:
     """The privacy section's pointer to Exodus Privacy's independent report, once there is one."""
@@ -341,6 +346,8 @@ def build_page(langs: dict, lang: str, page: str, template: str, data: timetable
         body = body.replace(STORES_MARKER, store_block(cfg, lang, beta_anchor='id="beta"' in body))
         row = exodus_row(cfg) if STORES["exodus"] else ""
         body = re.sub(r"\n[ \t]*" + re.escape(EXODUS_MARKER), lambda m: ("\n        " + row) if row else "", body)
+        if not data.cities:
+            body = CHECKS_LINK.sub(r"\1", body)
     write_page(
         langs, lang, template,
         out_dir=twins[lang], meta=cfg["pages"][page], body=body, twins=twins, picker=twins,

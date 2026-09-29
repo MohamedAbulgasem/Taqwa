@@ -1,6 +1,6 @@
 # Taqwa privacy policy
 
-_Last updated 13 September 2026. Applies to Taqwa 1.0.0 and later on Android and iOS._
+_Last updated 29 September 2026. Applies to Taqwa 1.0.0 and later on Android and iOS._
 
 Taqwa is a free Islamic app with no account, no ads and no analytics. It works offline.
 The one thing it uses the internet for is downloading Quran recitations, and only when you
@@ -11,7 +11,7 @@ ask it to.
 Everything the app knows is stored on your device and nowhere else:
 
 - your location, or the city you chose, used to compute prayer times and the Qibla;
-- your settings: calculation method, notification choices, adhan voice, theme, reciter;
+- your settings: prayer timetable, notification choices, adhan voice, theme, reciter;
 - your Quran bookmarks and reading position;
 - your Tasbeeh counts;
 - any recitations you have downloaded.
@@ -48,6 +48,15 @@ request at all.
 
 Downloaded recitations can be deleted per reciter in Settings › Quran › Recitation ›
 Downloads.
+
+## Read-aloud
+
+If you choose to have the translation or tafsir read aloud after each ayah, your phone's own
+text-to-speech voice reads it: one of Apple's voices on iPhone; on Android, a voice from the
+phone's speech engine, a separate app (usually Google's or Samsung's) with its own settings and
+privacy terms. Taqwa picks only voices that work offline and sends the text nowhere itself. If
+an Android phone lacks the voice, "Get the voice" opens the speech engine's own download for it;
+on iPhone, voices are added in the Settings app.
 
 ## Backups
 

@@ -1,6 +1,6 @@
 # Politique de confidentialité de Taqwa
 
-_Dernière mise à jour le 13 septembre 2026. S’applique à Taqwa 1.0.0 et aux versions ultérieures sur Android et iOS._
+_Dernière mise à jour le 29 septembre 2026. S’applique à Taqwa 1.0.0 et aux versions ultérieures sur Android et iOS._
 
 Taqwa est une application islamique gratuite, sans compte, sans publicité et sans outil d’analyse. Elle
 fonctionne hors ligne. La seule chose pour laquelle elle utilise Internet est le téléchargement
@@ -11,7 +11,7 @@ des récitations du Coran, et uniquement lorsque vous le lui demandez.
 Tout ce que l’application sait est enregistré sur votre appareil et nulle part ailleurs :
 
 - votre position, ou la ville que vous avez choisie, servant à calculer les horaires de prière et la qibla ;
-- vos paramètres : méthode de calcul, choix de notification, voix de l’adhan, thème, récitateur ;
+- vos paramètres : calendrier de prière, choix de notification, voix de l’adhan, thème, récitateur ;
 - vos signets du Coran et votre position de lecture ;
 - vos compteurs de Tasbih ;
 - les récitations que vous avez téléchargées.
@@ -52,6 +52,17 @@ vous n’avez pas utilisé la récitation une première fois, l’application ne
 
 Les récitations téléchargées peuvent être supprimées récitateur par récitateur dans Paramètres ›
 Coran › Récitation › Téléchargements.
+
+## Lecture à voix haute
+
+Si vous choisissez de faire lire la traduction ou le tafsir à voix haute après chaque verset,
+c’est une voix de synthèse vocale de votre téléphone qui s’en charge : l’une des voix d’Apple
+sur iPhone ; sur Android, une voix du moteur de synthèse vocale du téléphone, une application
+distincte (le plus souvent celle de Google ou de Samsung) qui a ses propres réglages et ses
+propres conditions de confidentialité. Taqwa ne choisit que des voix qui fonctionnent hors ligne
+et n’envoie elle-même le texte nulle part. Si un téléphone Android n’a pas la voix,
+« Obtenir la voix » ouvre le téléchargement proposé par le moteur de synthèse vocale lui-même ;
+sur iPhone, les voix s’ajoutent dans l’app Réglages.
 
 ## Sauvegardes
 

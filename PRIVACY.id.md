@@ -1,6 +1,6 @@
 # Kebijakan privasi Taqwa
 
-_Terakhir diperbarui 13 September 2026. Berlaku untuk Taqwa 1.0.0 dan versi setelahnya di Android dan iOS._
+_Terakhir diperbarui 29 September 2026. Berlaku untuk Taqwa 1.0.0 dan versi setelahnya di Android dan iOS._
 
 Taqwa adalah aplikasi Islami gratis tanpa akun, tanpa iklan, dan tanpa analitik. Aplikasi ini
 berfungsi offline. Satu-satunya hal yang membuatnya memakai internet adalah mengunduh tilawah
@@ -11,7 +11,7 @@ Al-Qur'an, dan hanya ketika Anda memintanya.
 Semua yang diketahui aplikasi ini tersimpan di perangkat Anda dan tidak di tempat lain:
 
 - lokasi Anda, atau kota yang Anda pilih, dipakai untuk menghitung waktu salat dan arah kiblat;
-- pengaturan Anda: metode perhitungan, pilihan notifikasi, suara azan, tema, qari;
+- pengaturan Anda: jadwal salat, pilihan notifikasi, suara azan, tema, qari;
 - penanda Al-Qur'an dan posisi bacaan Anda;
 - hitungan tasbih Anda;
 - tilawah apa pun yang sudah Anda unduh.
@@ -50,6 +50,16 @@ mengungkapkan apa pun selain alamat IP Anda. Sampai Anda pertama kali memakai ti
 ini tidak melakukan permintaan jaringan sama sekali.
 
 Tilawah yang sudah diunduh bisa dihapus per qari di Pengaturan › Al-Qur'an › Tilawah › Unduhan.
+
+## Terjemahan dan tafsir yang dibacakan
+
+Jika Anda memilih agar terjemahan atau tafsir dibacakan setelah setiap ayat, yang membacakannya
+adalah suara teks-ke-ucapan milik ponsel Anda sendiri: salah satu suara Apple di iPhone; di
+Android, suara dari mesin ucapan ponsel, yaitu aplikasi terpisah (biasanya milik Google atau
+Samsung) yang punya pengaturan dan ketentuan privasinya sendiri. Taqwa hanya memilih suara yang
+berfungsi offline, dan Taqwa sendiri tidak mengirim teks itu ke mana pun. Jika ponsel Android
+belum punya suaranya, “Unduh suara” membuka unduhan milik mesin ucapan itu sendiri; di iPhone,
+suara ditambahkan lewat app Pengaturan.
 
 ## Cadangan
 

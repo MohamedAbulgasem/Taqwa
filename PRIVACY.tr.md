@@ -1,6 +1,6 @@
 # Taqwa gizlilik politikası
 
-_Son güncelleme 13 Eylül 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
+_Son güncelleme 29 Eylül 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
 
 Taqwa; hesabı, reklamı ve analizi olmayan ücretsiz bir İslami uygulamadır. Çevrimdışı çalışır.
 İnterneti tek bir şey için kullanır: Kur'an tilavetlerini indirmek, o da yalnızca siz
@@ -11,7 +11,7 @@ istediğinizde.
 Uygulamanın bildiği her şey cihazınızda saklanır, başka hiçbir yerde değil:
 
 - namaz vakitlerini ve kıbleyi hesaplamak için kullanılan konumunuz ya da seçtiğiniz şehir;
-- ayarlarınız: hesaplama yöntemi, bildirim tercihleri, ezan sesi, tema, kari;
+- ayarlarınız: vakit takvimi, bildirim tercihleri, ezan sesi, tema, kari;
 - Kur'an yer imleriniz ve okuma konumunuz;
 - tesbih sayaçlarınız;
 - indirdiğiniz tilavetler.
@@ -48,6 +48,15 @@ kullanana kadar uygulama hiçbir ağ isteği yapmaz.
 
 İndirilen tilavetler, Ayarlar › Kur'an › Tilavet › İndirilenler altından her kari için ayrı
 ayrı silinebilir.
+
+## Sesli okuma
+
+Mealin ya da tefsirin her ayetten sonra sesli okunmasını seçerseniz, onu telefonunuzun kendi
+metin okuma sesi okur: iPhone'da Apple'ın seslerinden biri; Android'de ise telefonun konuşma
+motorundan bir ses. Bu motor, kendi ayarları ve gizlilik koşulları olan ayrı bir uygulamadır
+(çoğunlukla Google'ınki ya da Samsung'unki). Taqwa yalnızca çevrimdışı çalışan sesleri seçer ve
+metni kendisi hiçbir yere göndermez. Android telefonda ses yoksa "Sesi indir", konuşma motorunun
+kendi indirme ekranını açar; iPhone'da sesler Ayarlar uygulamasından eklenir.
 
 ## Yedeklemeler
 
