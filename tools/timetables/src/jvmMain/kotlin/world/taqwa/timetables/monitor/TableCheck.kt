@@ -101,7 +101,7 @@ class TableCheck(
         if (table.survey != null) return calendarPlan(table)
         val hint = table.entry ?: return Plan.Refused("no entry named in the index (a mosque calendar names its survey instead)")
         val hintId = hint.substringBefore('/')
-        val hintEntry = lookup(hintId) ?: return Plan.Refused("no registry entry '$hintId'")
+        val hintEntry = lookup(hintId) ?: return conventionPlan(table, hint)
         val unitId = hint.substringAfter('/', "").takeIf { it.isNotEmpty() }
         if (unitId != null) {
             val unit = Units.of(hintId)?.units?.firstOrNull { it.id == unitId } ?: return Plan.Refused("$hintId has no unit '$unitId'")
@@ -131,6 +131,26 @@ class TableCheck(
                     PlannedRow(hint, lat, lon, null, "Automatic follows ${automatic.id} at ${table.name}, not this table's ${hintEntry.id}: the table's own entry is checked"),
                 )
             },
+        )
+    }
+
+    /**
+     * A table naming a convention member, a member with no entry of its own (Chicago's 18° block,
+     * `us.chicago.eighteen`): checked at its point as the member row of the cautious entry Automatic
+     * follows there, as the gate's own rows hold such a table (us-chicago.tsv); there is no own entry to
+     * check beside it. Refused where no point is given or Automatic there lists no such member.
+     */
+    private fun conventionPlan(table: MonitorTable, hint: String): Plan {
+        if ('/' in hint) return Plan.Refused("no registry entry '${hint.substringBefore('/')}'")
+        val lat = table.lat
+        val lon = table.lon
+        if (lat == null || lon == null) return Plan.Refused("no registry entry '$hint'")
+        val automatic = Registry.automaticEntry(Place(lat, lon, table.zone, table.cc))
+        if (automatic.members.none { it.id == hint }) {
+            return Plan.Refused("no registry entry '$hint', and Automatic follows ${automatic.id} at ${table.name}, which has no member '$hint'")
+        }
+        return Plan.Rows(
+            listOf(PlannedRow(automatic.id, lat, lon, hint, "Automatic follows the cautious ${automatic.id} at ${table.name}, whose member $hint (a convention, no entry of its own) this table is")),
         )
     }
 

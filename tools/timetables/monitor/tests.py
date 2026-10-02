@@ -21,7 +21,7 @@ from common import Context, FetchError, Http, Table, add_all, nearest_year, norm
 import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
-from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, mawaqit, mjc, morocco, muis, qatar, toronto  # noqa: E402
+from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, toronto  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -1596,3 +1596,66 @@ class Toronto(unittest.TestCase):
             toronto.ampm("6:05")
         with self.assertRaises(FetchError):
             toronto.ordered(["05:00", "04:00"], "x")
+
+
+# Masjidal's time/range reply as the API gives it, every time invented (toronto_times's, ruling R69).
+def masjidal_reply(start, end, weekday_shift=0, skip=None, status="success"):
+    days = []
+    d = start
+    while d <= end:
+        if d != skip:
+            f, s, z, a, m, i = toronto_times(d)
+            ap = lambda t: f"{int(t[:2]) % 12 or 12}:{t[3:]}{'PM' if int(t[:2]) >= 12 else 'AM'}"
+            name = calendar.day_name[(d.weekday() + weekday_shift) % 7]
+            days.append({"date": f"{name}, {d.strftime('%b')} {d.day}, {d.year}", "hijri_date": "1, 1448", "day": name,
+                         "fajr": ap(f), "sunrise": ap(s), "zuhr": ap(z), "asr": ap(a), "maghrib": ap(m), "isha": ap(i)})
+        d += dt.timedelta(days=1)
+    return json.dumps({"status": status, "data": {"salah": days, "iqamah": []}}).encode()
+
+
+class Masjidal(unittest.TestCase):
+    def setUp(self):
+        self.root = tempfile.mkdtemp("masjidal")
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def test_the_window_runs_from_this_month_to_the_end_of_the_month_after_next(self):
+        self.assertEqual((dt.date(2026, 10, 1), dt.date(2026, 12, 31)), masjidal.window(dt.date(2026, 10, 2)))
+        self.assertEqual((dt.date(2026, 11, 1), dt.date(2027, 1, 31)), masjidal.window(dt.date(2026, 11, 30)))
+        self.assertEqual((dt.date(2026, 12, 1), dt.date(2027, 2, 28)), masjidal.window(dt.date(2026, 12, 15)))
+
+    def test_a_reply_must_hold_the_days_asked_each_on_its_weekday(self):
+        start, end = dt.date(2026, 10, 1), dt.date(2026, 10, 31)
+        bad = []
+        rows = masjidal.parse(masjidal_reply(start, end), start, end, bad)
+        self.assertEqual(([], 31), (bad, len(rows)))
+        self.assertEqual(toronto_times(dt.date(2026, 10, 9)), rows["2026-10-09"])
+        for reply, words in [(masjidal_reply(start, end, weekday_shift=1), "printed on another weekday"),
+                             (masjidal_reply(start, end, skip=dt.date(2026, 10, 9)), "not the 31 asked"),
+                             (masjidal_reply(start, dt.date(2026, 10, 20)), "not the 31 asked"),
+                             (masjidal_reply(start, end, status="error"), "not a success")]:
+            with self.assertRaises(FetchError) as caught:
+                masjidal.parse(reply, start, end, [])
+            self.assertIn(words, str(caught.exception))
+            self.assertIsNone(TIME_SHAPE.search(str(caught.exception)))
+
+    def test_a_fetch_asks_each_mosque_once_and_checks_each_as_us_chicagos_member(self):
+        start, end = masjidal.window(dt.date(2026, 10, 2))
+        asked = []
+
+        class Answers:
+            owner = None
+
+            def get(self, url, headers=None, data=None, timeout=None, retries=1):
+                asked.append(url)
+                if "masjid_id=1QL0MDAZ" in url:
+                    raise FetchError("HTTP 500")
+                return masjidal_reply(start, end)
+        ctx = Context("us-chicago", self.root, dt.date(2026, 10, 2), [].append, self.root, http=Answers())
+        tables = masjidal.fetch(ctx)
+        self.assertEqual(3, len(asked))
+        self.assertTrue(all("from_date=2026-10-01&to_date=2026-12-31" in u for u in asked))
+        self.assertEqual([("makki-masjid-chicago", "us.chicago.eighteen"), ("mosque-foundation-bridgeview", "us.isna")], [(t.key, t.entry) for t in tables])
+        self.assertEqual({"hanafi"}, {t.school for t in tables})
+        self.assertEqual(92, len(tables[0].rows))
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("Masjid DarusSalam, Lombard, IL: HTTP 500", ctx.errors[0])
