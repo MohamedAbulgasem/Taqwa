@@ -96,7 +96,7 @@ object Units {
             Balkans.bosniaUnits, Balkans.albaniaUnits, Europe.austriaUnits, Europe.switzerlandUnits, Americas.fianzUnits,
         ).plus(Americas.torontoUnits).plus(Americas.lakembaUnits).plus(Europe.dublinTables).plus(SouthAfrica.capeTownTables)
             .plus(listOf(Europe.londonUnits, Europe.gmpUnits, Europe.embUnits, Europe.irnUnits, Diyanet.europeUnits))
-            .plus(Levant.jordanUnits)
+            .plus(Levant.jordanUnits).plus(Levant.paUnits)
             .associateBy { it.entryId }
     }
 
@@ -119,8 +119,17 @@ internal fun lateReachKm(latitude: Double, entryClass: EntryClass): Double {
     return minutes * DEGREES_PER_MINUTE * rad(180.0) / 180.0 * EARTH_RADIUS_KM * cos(rad(latitude))
 }
 
-/** One table an authority prints for one point: [key] names its unit, [method] where it differs from the entry's. */
-internal class PrintedTable(val key: String, val name: String, val point: GeoPoint, val method: TimetableMethod? = null)
+/**
+ * One table an authority prints for one point: [key] names its unit, [method] where it differs from the
+ * entry's, [lateLimits] the unit's own exceptions to the late limit (ruling R41).
+ */
+internal class PrintedTable(
+    val key: String,
+    val name: String,
+    val point: GeoPoint,
+    val method: TimetableMethod? = null,
+    val lateLimits: List<LateLimit> = emptyList(),
+)
 
 /**
  * Rulings R30, R44, R45: an authority's tables printed for one point each.
@@ -133,7 +142,7 @@ internal fun pointTables(entry: RegistryEntry, tables: List<PrintedTable>): Unit
     val method = requireNotNull(entry.method) { "${entry.id} has no single method" }
     val units = tables.map { t ->
         val id = if (tables.size == 1) entry.id else "${entry.id}.${t.key}"
-        AuthorityUnit(id, t.name, t.point, lateReachKm(t.point.lat, entry.entryClass), t.method)
+        AuthorityUnit(id, t.name, t.point, lateReachKm(t.point.lat, entry.entryClass), t.method, lateLimits = t.lateLimits)
     }
     return UnitSet(entry.id, units) { user ->
         val nearest = units.minBy { distanceKm(user, it.point) }

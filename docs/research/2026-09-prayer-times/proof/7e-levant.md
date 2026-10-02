@@ -17,7 +17,8 @@ is green (11 rows checked, 549 place-days, 0 violations). No entry's start is ev
 measured; no sunrise, end of eating or imsak is ever late anywhere measured.
 
 `measured` is `true` only for `jo.awqaf`'s Amman unit and for `ps.iftaa` (both genuinely checked
-everywhere they apply); every D_AUTHORITY entry here (`lb.fatwa`, `sy.awqaf`, `iq.sunni`,
+everywhere they apply; since ruling R118 `ps.iftaa` is measured at its four printed tables' units, class
+D_AUTHORITY, see below); every D_AUTHORITY entry here (`lb.fatwa`, `sy.awqaf`, `iq.sunni`,
 `ps.gaza.awqaf`, and `jo.awqaf`'s own base entry outside Amman) is `false`, consistently, since none
 of their thin samples covers a whole area's tables. `lb.fatwa` had briefly carried `measured = true`
 in error (a leftover from before its two late-limit exceptions existed) — fixed here.
@@ -83,40 +84,95 @@ table.
   angle was chosen from, so this is a consistency check, not independent proof of −2.25 over −2.0,
   and it too is Amman-only, for the same reason as above).
 
-### Palestine, PA Dar al-Iftaa, `ps.iftaa` — class B
+### Palestine, PA Dar al-Iftaa, `ps.iftaa` — class D_AUTHORITY since ruling R118 (was B on 78 dates)
 
-- **Data:** `ps-iftaa-aqsa-2012.txt` (72 dates, fit): the perpetual al-Aqsa Mosque table, 2012
-  printing (`archive/raw/moral-auth-mena/levant/pif/ssalah2012.txt`, OCR'd from a PDF via
-  web.archive.org). `ps-iftaa-aqsa-2026.txt` (6 dates, test): the SAME table reprinted as the
-  Ramadan 1447 (2026) imsakiya image — 14 years later, a real forward-in-time holdout of the
-  research's "reused verbatim" claim. Both at al-Aqsa Mosque, 31.7767N 35.2345E.
-- **The perpetual winter clock:** both files are printed on a fixed UTC+02:00 (winter/standard)
-  clock all year, never Asia/Hebron's real summer daylight-saving time (the imsakiya's own words,
-  "حسب التوقيت الدهري... الشتوي" — "by the perpetual... winter timekeeping"). The gate tsv's `clock`
-  column carries this; `zone` stays Asia/Hebron, the engine's own civil zone.
-- **Margins fitted:** Fajr −16, sunrise +216, Dhuhr −40, Asr −26, Maghrib −25, Isha +23. No widening
-  needed.
-- **Gate table** (78 place-days):
+**Ruling R118 (owner, 2 October 2026):** Palestine's own printed town offsets may be applied to its
+al-Aqsa perpetual table. The authority publishes no table for Hebron or Nablus, only the al-Aqsa
+table and, printed with it, a list of towns and their minutes from Jerusalem. The ruling allows the
+offsets only where the authority itself prints them. The earlier refusal below (Gaza, "inventing
+numbers") is superseded where an offset is printed (Gaza's is: + 3) and stands everywhere else.
 
-  | event | days | early | late-end | +0 | +1 | +2 | +3+ | worst | limit | over |
-  |---|---|---|---|---|---|---|---|---|---|---|
-  | fajr | 78 | 0 | – | 20 | 46 | 12 | 0 | 2 | 2 | 0 |
-  | sunrise | 78 | – | 0 | 15 | 50 | 13 | 0 | 2 | 2 | 0 |
-  | dhuhr | 78 | 0 | – | 58 | 20 | 0 | 0 | 1 | 2 | 0 |
-  | asr | 78 | 0 | – | 45 | 33 | 0 | 0 | 1 | 2 | 0 |
-  | maghrib | 78 | 0 | – | 19 | 41 | 18 | 0 | 2 | 2 | 0 |
-  | isha | 78 | 0 | – | 19 | 38 | 21 | 0 | 2 | 2 | 0 |
+- **The whole table read (2 October 2026).** Two prints were fetched from darifta.ps and kept under
+  `archive/raw/manual/ps-iftaa/2026-10-02/`. The first is the 2012 printing (`ssalahtime/ssalah2012.pdf`,
+  32 pages, the table on pp. 4–27, the offset list on p. 2). The second is the 2026 yearly calendar
+  (`taqweem2026/riznama2026.pdf`, the same table on pp. 30–35, "al-Aqsa Mosque, winter", without the
+  offset list). Both PDFs carry a text layer. Each was read by word position: the columns by x, the
+  rows by y, and a minute printed alone sits under the hour of the row above it, as the print does.
+  The two reads were made independently and agree on every cell, 366 days × 6 times. They also match
+  the earlier OCR read (72 dates) and the Ramadan 1447 imsakiya (6 dates). One half-month page was
+  checked by eye against the rendered print. `ssalah/ssalah.pdf`, which the sources row named, is not
+  a table: it is the Dar al-Iftaa's 256-page book on the fiqh of prayer (2013).
+- **The offsets as printed** (`offsets.tsv` in the archive folder) are one figure per town, for every
+  time alike, sunrise included:
+  - Jerusalem, and with it Ramallah, Bethlehem, Jenin and Nablus: + 0.
+  - Jericho: − 1.
+  - Hebron, Idhna, Dura, Beit Awwa and Tulkarm: + 1.
+  - Qalqilya: + 1.5.
+  - Gaza: + 3.
+  - Rafah, Khan Yunis and Deir al-Balah: + 4.
 
-  Held out alone (6 dates, 2026): fajr/dhuhr/asr worst 1, sunrise/maghrib/isha worst 2. At most 2 min
-  late everywhere: class B.
-- **Gaza's cautious entry, `ps.gaza.cautious`, is not separately gated.** It combines
-  `ps.gaza.awqaf` (below) with `ps.iftaa` as members. No dated printed table names Gaza specifically
-  for the PA's side of that pairing — only the research's qualitative note that the perpetual table
-  says "Gaza = Jerusalem + 3 min", checked once in `pif_2026.py` against a single Gaza date, not a
-  printed Gaza-labelled PA table. Synthesising Gaza rows for the PA member by adding that 3-minute
-  offset to the al-Aqsa printed times would be inventing numbers, which the brief forbids; the
-  cautious entry's correctness rests on its two components' own gates plus the engine's generic
-  cautious-merge logic (already covered by `CautiousGateTest`).
+  Towns in Israel are listed too and are not used here. The derived tables (Nablus, Hebron and Gaza,
+  the three towns with a city-page row) are the al-Aqsa table plus that figure. Each file's header
+  names its source and its derivation.
+- **Model.** Fajr 18° and Isha 18°, with sunrise and Maghrib on a −2.25° horizon, as before. Every
+  event is now taken at the noon declination (`SunModel.CLASSIC_NOON`). Over the whole table this
+  narrows the spread against the sun: Fajr's from 3.1 to 2.4 min, Isha's from 2.9 to 2.6. The day-of-noon model is MUIS's and JAKIM's. Each printed table is a unit
+  (`Levant.paUnits`, a point table under rulings R30, R44 and R45):
+  - `ps.iftaa.jerusalem` at al-Aqsa;
+  - `ps.iftaa.nablus`, `ps.iftaa.hebron` and `ps.iftaa.gaza`, each at the app's city point.
+
+  Each unit has its own never-early margins. Within a unit's reach its point rides as the fixed point.
+  Beyond every reach, the nearest table's method applies a minute later.
+- **Split.** The fit rows are the table on its printing year, 2012 (a leap year, so every printed line
+  is used), and on 2026, the 2026 calendar's own print. The held-out rows are the table mapped onto
+  2027 (darifta.ps had no 2027 calendar on 2 October 2026) and the imsakiya's six dates. Fitted on 2012
+  and 2026, 2027 was 1 min early on a few days of Fajr, sunrise, Maghrib and Isha (1, 11, 1 and 2 days
+  at al-Aqsa; 2, 7, 1 and 2 at Hebron and at Gaza). This is a perpetual table drifting against the leap
+  cycle. Those margins are widened to the bound over all three years, never silently. Nablus's
+  holdout was clean.
+- **Margins (seconds):**
+
+  | unit | Fajr | sunrise | Dhuhr | Asr | Maghrib | Isha |
+  |---|---|---|---|---|---|---|
+  | al-Aqsa | +1 | +191 | −37 | −21 | −2 | +59 |
+  | Nablus | +90 | +194 | −32 | +41 | −3 | +13 |
+  | Hebron | +31 | +197 | −11 | +17 | +41 | +121 |
+  | Gaza | +0 | +164 | −41 | −10 | +12 | +95 |
+
+- **Gate** (whole table, 13 rows: 2012, 2026 and 2027 at four points, plus the imsakiya; 4,384
+  place-days): 0 early, 0 late ends, none over its limit. Worst minutes late by unit and event:
+
+  | unit | Fajr | sunrise | Dhuhr | Asr | Maghrib | Isha |
+  |---|---|---|---|---|---|---|
+  | al-Aqsa | 3 | 3 | 1 | 2 | 3 | 3 |
+  | Nablus | 4 | 4 | 1 | 3 | 4 | 4 |
+  | Hebron | 4 | 4 | 1 | 2 | 3 | 4 |
+  | Gaza | 4 | 4 | 1 | 2 | 3 | 4 |
+
+  At al-Aqsa (1,102 days), 3 min late occurs on 62 days of Fajr, 38 of sunrise, 41 of Maghrib and 129
+  of Isha.
+- **Why class D, not B (ruling R57).** The table's own minutes wander about 2.4 min against any one
+  smooth rule, and the wander is not seasonal: Fajr in April and August sits a minute nearer the sun
+  than in October. So one never-early margin per event runs 3 min late on some days of four events,
+  even at al-Aqsa itself. Holding class B would need an exception on four of six events. R57 says an
+  entry like that takes the class its data supports: D, at most 3 min late, as Libya's is.
+
+  The 78 dates that made the entry class B (Task 7e) happened to sit inside a 2-min band. Read whole,
+  the table disproves it. With the old margins the engine was also 1 min early on some days at
+  al-Aqsa (Fajr, Maghrib and Isha, in 2012, 2026 and 2027), its sunrise 1 min late on others, and it was
+  early on many days at Nablus and Hebron. The refit removes every one of those.
+- **The towns' exception (ruling R41).** A town's printed offset is one whole-minute figure for every
+  time, all year. Yet the town's own sun moves against al-Aqsa's through the seasons: Nablus is 49 km
+  north, and Hebron and Gaza lie south and west. Never early at the town's own point costs a further
+  minute. Each of the three units therefore carries its own exception, 4 min, on the events that
+  reach it:
+  - Nablus: Fajr, sunrise, Maghrib and Isha.
+  - Hebron and Gaza: Fajr, sunrise and Isha.
+
+  This is a specific reasoned case, not a class held: the class is already D.
+- **Pages.** Hebron and Nablus stay held. The city-page rule needs class A, B or C, and the data
+  supports D. Gaza stays held as before, since its cautious entry's Ministry of Awqaf member is checked
+  on six 2020 days only. The PA member is now checked at Gaza (`ps.iftaa.gaza`).
 
 ### Gaza, Ministry of Awqaf, `ps.gaza.awqaf` — class D_AUTHORITY
 
@@ -256,9 +312,9 @@ table.
 ## What could not be proven, and why
 
 - **Yemen (Aden and everywhere else):** no data at all, as above.
-- **`ps.gaza.cautious`** (the class C combination): not gated directly, for the reason under Gaza
-  above — no printed table exists that would let its PA-for-Gaza member be checked without inventing
-  numbers.
+- **`ps.gaza.cautious`** (the class C combination): its PA member is checked at Gaza since ruling R118,
+  the al-Aqsa table + 3 as the authority prints it (unit `ps.iftaa.gaza`). Its Ministry of Awqaf member
+  still has six 2020 days only, so the cautious entry is still not measured at Gaza.
 - **Jordan's horizon angle (−2.0° vs −2.25°):** confirmed consistent with the 80 dates it was already
   chosen from, not independently re-derived from new data (there is none beyond those 80 dates).
 - **Lebanon's end of eating:** no authority ever prints an end-of-eating or imsak column; the dawn-

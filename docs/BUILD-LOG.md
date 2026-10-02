@@ -2073,3 +2073,44 @@ Checked: tools jvmTest 267/0 with the archive. The shared stamp, About and golde
 (25/0), and so did `checkStamps`. `build.py --check` passed (164 pages, 143 of them prayer times for
 55 cities), and `site/test_timetables.py` passed (18). Brussels and Chicago were looked at whole at a
 true 390 px, and Antwerp at the top.
+
+## Palestine's printed town offsets (2 October, night) — ruling R118
+
+The owner ruled that the PA Dar al-Iftaa's own printed town offsets may be applied to its al-Aqsa
+perpetual table. The authority prints no table for Hebron or Nablus. It prints the al-Aqsa table and,
+with it, a list of towns and their minutes from Jerusalem: Nablus + 0, Hebron + 1, Gaza + 3. The
+earlier refusal for Gaza stands only where no offset is printed.
+
+**The whole table.** Two prints were fetched once each from darifta.ps: the 2012 printing, which
+carries the table and the offset list, and the 2026 yearly calendar, which reprints the table. Both
+have a text layer and were read by word position, independently. They agree on all 366 days and every
+time, and they match the earlier 72-date OCR read and the 2026 imsakiya. The third PDF named in the
+monitor's row, `ssalah/ssalah.pdf`, turned out to be a book on the fiqh of prayer, not a table. The
+reads, the offset list and the derived Nablus, Hebron and Gaza tables, each mapped onto 2012, 2026 and
+2027, are in the private archive (`archive/tables/manual/ps-iftaa/2026-10-02/`).
+
+**What the whole table shows.** The 78 dates held before kept the entry inside class B's 2 minutes.
+The full year does not. The printed minutes wander about 2.4 min against any one smooth rule (Fajr
+sits a minute nearer the sun in April and August than in October). So one never-early margin per
+event runs 3 min late on some days of four events even at al-Aqsa. Under ruling R57 that is class D,
+the class the data supports, as Libya's is. The old margins were also 1 min early on some days at
+al-Aqsa, and on many at Nablus and Hebron. The refit removes all of them.
+
+**The registry.** `ps.iftaa` now takes every event at the noon declination (it fits the table better
+than the exact sun: Fajr's spread 2.4 min, not 3.1). It has four point-table units: al-Aqsa, and
+Nablus, Hebron and Gaza at the app's city points, each with its own margins. The margins are fitted
+on 2012 and 2026. 2027, held out, was 1 min early on a few days, so those margins are widened to the
+three years' bound. The three towns run a further minute late: their printed offset is one figure all
+year while their own sun moves against al-Aqsa's through the seasons. Each carries its own 4-minute
+exception on those events (ruling R41). `PrintedTable` gained a `lateLimits` field to carry them.
+Gaza's cautious times now place their PA member at Gaza's own table.
+
+**Checked.** Whole gate: 839 rows, 162,157 place-days, 0 early, 0 late ends, none over its limit,
+nothing broken. The stamps' engine hashes all moved, since `Units.kt` is core. ProofStamps.kt is
+regenerated. The golden vector moved only at its two Palestinian points (Ramallah's and Gaza City's
+jittered seeds), by 1–2 min, later starts and earlier sunrises. Tools jvmTest passed 267/0 with the
+archive, `:shared:testAndroidHostTest` passed 1,595/0, and `checkStamps` passed.
+
+**The cities.** The rule over every row on 2 October still publishes 55 cities. Hebron and Nablus stay
+held: the city-page rule needs class A, B or C, and the whole table supports D. Gaza stays held too,
+since its Ministry of Awqaf member is checked on six 2020 days only.

@@ -900,10 +900,13 @@ class RegistryTest {
         for (entry in Registry.entries) {
             val base = entry.method ?: continue
             val units = Units.of(entry.id) ?: continue
-            val edge = units.outside(GeoPoint(0.0, 0.0))
-            assertEquals(
-                minOf(base.endOfEatingMarginSeconds + (edge.margins.sunrise - base.margins.sunrise), SAFE_END),
-                edge.endOfEatingMarginSeconds,
+            val origin = GeoPoint(0.0, 0.0)
+            val edge = units.outside(origin)
+            // The edge is built from the entry's method, or (point tables, rulings R44 and R45) from the
+            // nearest table's own method where it has one (the PA's towns, ruling R118).
+            val from = listOfNotNull(base, units.units.minBy { distanceKm(origin, it.point) }.method)
+            assertTrue(
+                from.any { m -> edge.endOfEatingMarginSeconds == minOf(m.endOfEatingMarginSeconds + (edge.margins.sunrise - m.margins.sunrise), SAFE_END) },
                 "${edge.id}: end of eating ${edge.endOfEatingMarginSeconds} s, sunrise ${edge.margins.sunrise} s",
             )
             assertTrue(edge.endOfEatingMarginSeconds <= SAFE_END, edge.id)

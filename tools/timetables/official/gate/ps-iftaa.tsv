@@ -1,9 +1,30 @@
 # Palestine, PA Dar al-Iftaa: the perpetual al-Aqsa Mosque table, printed on the perpetual winter
 # (standard) clock all year -- UTC+02:00 fixed, never the summer clock -- hence `clock` differs from
-# `zone` (Asia/Hebron, the engine's own civil zone, which does observe DST). Fit on the 2012 printing
-# (archive/tables/normalized-7e/ps-iftaa-aqsa-2012.txt, 72 dates); test on six dates from the Ramadan
-# 1447 (2026) imsakiya, the SAME table reprinted 14 years later (the research's "reused verbatim"
-# claim, held out forward in time).
+# `zone` (Asia/Hebron, the engine's own civil zone, which does observe DST).
+# Ruling R118 (owner, 2 Oct 2026): the authority's own printed town offsets apply to its al-Aqsa table.
+# The whole table (366 days, every printed time) read from the two prints held, the 2012 printing and
+# the 2026 yearly calendar's reprint, identical on every cell (archive/tables/manual/ps-iftaa/2026-10-02/,
+# with the printed offset list, offsets.tsv); each town's table is the al-Aqsa table plus its printed
+# offset on every time alike: Nablus + 0, Hebron + 1, Gaza + 3. Each is a unit (a table printed for one
+# point, rulings R30, R44, R45), checked at the city's own point (the app's city).
+# Split, forward in time: fit on the table on its printing year, 2012 (a leap year: every printed line,
+# 29 February included), and on 2026 (the 2026 calendar's own print); held out, the table mapped onto
+# 2027 (no 2027 calendar yet) and six dates of the Ramadan 1447 (2026) imsakiya, a third print. 2027
+# held out was early by 1 min on a few days of Fajr, sunrise, Maghrib and Isha at al-Aqsa, Hebron and
+# Gaza (a perpetual table against the leap cycle): those margins are widened to the three years' bound
+# (Levant.kt). Class D (ruling R57): never early, at most 3 min late at al-Aqsa, 4 at the three towns
+# on the events their own exception names.
 path	entry	lat	lon	zone	clock	columns	format	school	split	note
-archive/tables/normalized-7e/ps-iftaa-aqsa-2012.txt	ps.iftaa	31.7767	35.2345	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	al-Aqsa, 2012 printing
+archive/tables/manual/ps-iftaa/2026-10-02/aqsa-2012.txt	ps.iftaa	31.7767	35.2345	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	al-Aqsa, the perpetual table on 2012
+archive/tables/manual/ps-iftaa/2026-10-02/aqsa-2026.txt	ps.iftaa	31.7767	35.2345	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	al-Aqsa, the perpetual table on 2026
+archive/tables/manual/ps-iftaa/2026-10-02/aqsa-2027.txt	ps.iftaa	31.7767	35.2345	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	test	al-Aqsa, the perpetual table on 2027
 archive/tables/normalized-7e/ps-iftaa-aqsa-2026.txt	ps.iftaa	31.7767	35.2345	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	test	al-Aqsa, 2026 imsakiya reprint, held out
+archive/tables/manual/ps-iftaa/2026-10-02/nablus-2012.txt	ps.iftaa	32.22111	35.25444	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	Nablus (+ 0), the perpetual table on 2012
+archive/tables/manual/ps-iftaa/2026-10-02/nablus-2026.txt	ps.iftaa	32.22111	35.25444	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	Nablus (+ 0), the perpetual table on 2026
+archive/tables/manual/ps-iftaa/2026-10-02/nablus-2027.txt	ps.iftaa	32.22111	35.25444	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	test	Nablus (+ 0), the perpetual table on 2027
+archive/tables/manual/ps-iftaa/2026-10-02/hebron-2012.txt	ps.iftaa	31.52935	35.0938	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	Hebron (+ 1), the perpetual table on 2012
+archive/tables/manual/ps-iftaa/2026-10-02/hebron-2026.txt	ps.iftaa	31.52935	35.0938	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	fit	Hebron (+ 1), the perpetual table on 2026
+archive/tables/manual/ps-iftaa/2026-10-02/hebron-2027.txt	ps.iftaa	31.52935	35.0938	Asia/Hebron	UTC+02:00	F S D A M I	daily	standard	test	Hebron (+ 1), the perpetual table on 2027
+archive/tables/manual/ps-iftaa/2026-10-02/gaza-2012.txt	ps.iftaa	31.50161	34.46672	Asia/Gaza	UTC+02:00	F S D A M I	daily	standard	fit	Gaza (+ 3), the perpetual table on 2012
+archive/tables/manual/ps-iftaa/2026-10-02/gaza-2026.txt	ps.iftaa	31.50161	34.46672	Asia/Gaza	UTC+02:00	F S D A M I	daily	standard	fit	Gaza (+ 3), the perpetual table on 2026
+archive/tables/manual/ps-iftaa/2026-10-02/gaza-2027.txt	ps.iftaa	31.50161	34.46672	Asia/Gaza	UTC+02:00	F S D A M I	daily	standard	test	Gaza (+ 3), the perpetual table on 2027

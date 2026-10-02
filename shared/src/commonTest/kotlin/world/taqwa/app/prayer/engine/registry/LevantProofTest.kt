@@ -60,11 +60,33 @@ class LevantProofTest {
     }
 
     @Test
-    fun `the pa's al-aqsa table is class B over its own fitted point`() {
+    fun `the pa's al-aqsa table is class D authority, measured at its printed towns (ruling R118)`() {
+        // The whole perpetual table runs 3 min late on four events even at al-Aqsa (ruling R57): D.
         val entry = requireNotNull(Registry.byId("ps.iftaa"))
-        assertEquals(EntryClass.B, entry.entryClass)
+        assertEquals(EntryClass.D_AUTHORITY, entry.entryClass)
         assertTrue(entry.measured)
         assertOrdered("ps.iftaa", day("ps.iftaa", 31.7767, 35.2345, "Asia/Hebron", LocalDate(2026, 6, 21)))
+        // Each town with a page is its own printed table (the al-Aqsa table plus the town's printed
+        // minutes), measured at the town: Hebron and Nablus resolve to their units.
+        for ((name, lat, lon) in listOf(Triple("Hebron", 31.52935, 35.0938), Triple("Nablus", 32.22111, 35.25444))) {
+            val here = Registry.resolve(Place(lat, lon, "Asia/Hebron", "PS"))
+            assertEquals("ps.iftaa", here.entry.id, name)
+            assertEquals(name, here.unitName, name)
+            assertEquals(EntryClass.D_AUTHORITY, here.entryClass, name)
+            assertTrue(here.measured, name)
+        }
+        // Ramallah sits within al-Aqsa's reach: the Jerusalem table.
+        assertEquals("Jerusalem", Registry.resolve(Place(31.89964, 35.20422, "Asia/Hebron", "PS")).unitName)
+        // Gaza's cautious times place their PA member at Gaza's own printed table (+ 3).
+        val gaza = Registry.resolve(Place(31.50161, 34.46672, "Asia/Gaza", "PS"))
+        assertEquals("ps.gaza.cautious", gaza.entry.id)
+        // Only the three towns whose offset exceeds al-Aqsa's 3 min carry an exception, each its own.
+        val units = requireNotNull(Units.of("ps.iftaa")).units
+        assertEquals(
+            setOf("ps.iftaa.nablus", "ps.iftaa.hebron", "ps.iftaa.gaza"),
+            units.filter { it.lateLimits.isNotEmpty() }.map { it.id }.toSet(),
+        )
+        for (unit in units) for (limit in unit.lateLimits) assertTrue(limit.reason.isNotBlank(), unit.id)
     }
 
     @Test
