@@ -10,11 +10,9 @@
     <string name="onboarding_welcome_cta">شروع کریں</string>
     <string name="onboarding_location_title">آپ کہاں ہیں؟</string>
     <string name="onboarding_location_body">نماز کے اوقات آپ کے ٹھیک مقام پر منحصر ہیں۔ سارا حساب آپ کے فون پر ہوتا ہے، اور آپ کا مقام کبھی فون سے باہر نہیں جاتا۔</string>
-    <string name="onboarding_location_cta">میرا مقام استعمال کریں</string>
-    <string name="onboarding_location_secondary">اس کے بجائے شہر چنیں</string>
+    <string name="onboarding_continue">جاری رکھیں</string>
     <string name="onboarding_notifications_title">کوئی نماز نہ چھوٹے</string>
     <string name="onboarding_notifications_body">ہر نماز کے وقت ایک اطلاع۔ ہر نماز کی آواز آپ الگ الگ چن سکتے ہیں، اور جب چاہیں بدل سکتے ہیں۔</string>
-    <string name="onboarding_notifications_cta">اطلاعات فعال کریں</string>
     <string name="onboarding_notifications_secondary">ابھی نہیں</string>
     <string name="onboarding_exact_title">عین وقت پر، منٹ کی پابندی سے</string>
     <string name="onboarding_exact_body">اینڈرائیڈ عین نماز کے وقت پر تبھی بجتا ہے جب تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت ہو۔ اس کے بغیر اطلاع ایک گھنٹے تک دیر سے آ سکتی ہے۔</string>
@@ -41,7 +39,7 @@
     <string name="today_exact_alarms_body">جب تک تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت نہ ہو، اینڈرائیڈ ایک گھنٹے تک دیر سے بجا سکتا ہے۔</string>
     <string name="today_no_location_title">ابھی کوئی مقام نہیں</string>
     <string name="today_choose_city">شہر چنیں</string>
-    <string name="today_allow_location">اس کے بجائے مقام کی اجازت دیں</string>
+    <string name="today_location_settings">ترتیبات سے مقام فعال کریں</string>
     <string name="today_jumuah">جمعہ</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->

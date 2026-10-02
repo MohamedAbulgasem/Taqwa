@@ -10,11 +10,9 @@
     <string name="onboarding_welcome_cta">ابدأ</string>
     <string name="onboarding_location_title">أين أنت؟</string>
     <string name="onboarding_location_body">تعتمد المواقيت على موقعك بالضبط. كل الحساب يجري على جهازك، وموقعك لا يغادر هاتفك.</string>
-    <string name="onboarding_location_cta">استخدام موقعي</string>
-    <string name="onboarding_location_secondary">اختر مدينة بدلًا من ذلك</string>
+    <string name="onboarding_continue">متابعة</string>
     <string name="onboarding_notifications_title">لا تفوّت صلاة</string>
     <string name="onboarding_notifications_body">إشعار عند كل صلاة. تختار الصوت لكل صلاة على حدة، ويمكنك تغييره متى شئت.</string>
-    <string name="onboarding_notifications_cta">تفعيل الإشعارات</string>
     <string name="onboarding_notifications_secondary">ليس الآن</string>
     <string name="onboarding_exact_title">في وقتها بالدقيقة</string>
     <string name="onboarding_exact_body">لا يرنّ أندرويد في وقت الصلاة بالضبط إلا إذا سُمح لتقوى بـ«المنبهات والتذكيرات». بدونها قد يتأخر الإشعار حتى ساعة.</string>
@@ -41,7 +39,7 @@
     <string name="today_exact_alarms_body">قد يتأخر التنبيه حتى ساعة ما لم يُسمح لتقوى بـ«المنبهات والتذكيرات».</string>
     <string name="today_no_location_title">لا يوجد موقع بعد</string>
     <string name="today_choose_city">اختر مدينة</string>
-    <string name="today_allow_location">السماح بالموقع بدلًا من ذلك</string>
+    <string name="today_location_settings">تفعيل الموقع من الإعدادات</string>
     <string name="today_jumuah">الجمعة</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->

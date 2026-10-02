@@ -12,11 +12,9 @@
     <string name="onboarding_welcome_cta">Get started</string>
     <string name="onboarding_location_title">Where are you?</string>
     <string name="onboarding_location_body">Prayer times depend on your exact position. Everything is calculated on your device. Your location never leaves your phone.</string>
-    <string name="onboarding_location_cta">Use my location</string>
-    <string name="onboarding_location_secondary">Choose a city instead</string>
+    <string name="onboarding_continue">Continue</string>
     <string name="onboarding_notifications_title">Never miss a prayer</string>
     <string name="onboarding_notifications_body">A notification at each prayer time. You pick the sound for every prayer separately, and can change it whenever you like.</string>
-    <string name="onboarding_notifications_cta">Enable notifications</string>
     <string name="onboarding_notifications_secondary">Not now</string>
     <string name="onboarding_exact_title">On time, to the minute</string>
     <string name="onboarding_exact_body">Android rings at the exact prayer time only if “Alarms &amp; reminders” is allowed for Taqwa. Without it, a notification can arrive up to an hour late.</string>
@@ -44,7 +42,7 @@
     <string name="today_exact_alarms_body">Android can ring up to an hour late until “Alarms &amp; reminders” is allowed for Taqwa.</string>
     <string name="today_no_location_title">No location yet</string>
     <string name="today_choose_city">Choose a city</string>
-    <string name="today_allow_location">Allow location instead</string>
+    <string name="today_location_settings">Turn on location in Settings</string>
     <!-- The pill beside Dhuhr on a Friday, the chosen city's own Friday. -->
     <string name="today_jumuah">Jumuʿah</string>
 

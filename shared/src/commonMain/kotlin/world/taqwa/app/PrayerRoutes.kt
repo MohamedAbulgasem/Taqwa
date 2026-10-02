@@ -30,6 +30,7 @@ import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
+import world.taqwa.app.notifications.openAppSettings
 import world.taqwa.app.notifications.requestExactAlarmAccess
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
@@ -96,15 +97,21 @@ internal fun TodayRoute(
     SideEffect { lastState.value = state }
     val scope = rememberCoroutineScope()
 
-    val requestLocation = world.taqwa.app.location
-        .rememberLocationPermissionRequester(container.locationRepository) {
-            if (it == LocationPermission.GRANTED) useGpsFix()
+    // "No location yet" sends someone to the system's settings (see TodayScreen), so coming back
+    // with location allowed has to be enough: the fix is fetched on every return while there is
+    // still no place, and on arriving here with access already granted but no fix yet.
+    val needsLocation = state is TodayUiState.NeedsLocation
+    LaunchedEffect(needsLocation, lifecycleOwner) {
+        if (!needsLocation) return@LaunchedEffect
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            if (container.locationRepository.permission() == LocationPermission.GRANTED) useGpsFix()
         }
+    }
 
     TodayScreen(
         state = state,
         onChooseCity = { navigator.push(Screen.CitySearch) },
-        onAllowLocation = requestLocation,
+        onOpenLocationSettings = ::openAppSettings,
         onOpenQibla = { navigator.push(Screen.Qibla) },
         onOpenTasbeeh = { navigator.push(Screen.Tasbeeh) },
         // Only while there are notifications to be exact about; the flag

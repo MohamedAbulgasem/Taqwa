@@ -10,11 +10,9 @@
     <string name="onboarding_welcome_cta">শুরু করুন</string>
     <string name="onboarding_location_title">আপনি কোথায় আছেন?</string>
     <string name="onboarding_location_body">নামাজের সময় আপনার সঠিক অবস্থানের উপর নির্ভর করে। সব হিসাব আপনার ডিভাইসেই হয়, আর আপনার অবস্থান কখনো ফোন ছেড়ে যায় না।</string>
-    <string name="onboarding_location_cta">আমার অবস্থান ব্যবহার করুন</string>
-    <string name="onboarding_location_secondary">বরং একটি শহর বেছে নিন</string>
+    <string name="onboarding_continue">চালিয়ে যান</string>
     <string name="onboarding_notifications_title">কোনো নামাজ যেন বাদ না যায়</string>
     <string name="onboarding_notifications_body">প্রতি ওয়াক্তে একটি নোটিফিকেশন। প্রতিটি নামাজের শব্দ আলাদা করে বেছে নিতে পারেন, আর যখন খুশি বদলাতেও পারেন।</string>
-    <string name="onboarding_notifications_cta">নোটিফিকেশন চালু করুন</string>
     <string name="onboarding_notifications_secondary">এখন নয়</string>
     <string name="onboarding_exact_title">ঠিক সময়ে, কাঁটায় কাঁটায়</string>
     <string name="onboarding_exact_body">তাকওয়াকে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি দিলে তবেই অ্যান্ড্রয়েড ঠিক ওয়াক্তে বাজে। এটি ছাড়া নোটিফিকেশন এক ঘণ্টা পর্যন্ত দেরিতে আসতে পারে।</string>
@@ -41,7 +39,7 @@
     <string name="today_exact_alarms_body">তাকওয়াকে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি না দেওয়া পর্যন্ত অ্যান্ড্রয়েড এক ঘণ্টা পর্যন্ত দেরিতে বাজতে পারে।</string>
     <string name="today_no_location_title">এখনো কোনো অবস্থান নেই</string>
     <string name="today_choose_city">শহর বেছে নিন</string>
-    <string name="today_allow_location">বরং অবস্থানের অনুমতি দিন</string>
+    <string name="today_location_settings">সেটিংসে অবস্থান চালু করুন</string>
     <string name="today_jumuah">জুমা</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
