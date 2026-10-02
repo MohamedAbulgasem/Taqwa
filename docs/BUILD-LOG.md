@@ -2027,3 +2027,35 @@ with the archive (ProvenTest's Cairo and İstanbul cases now pin October), the s
 golden-vector and Diyanet tests, `checkStamps`, `build.py --check` (158 pages, 137 of them prayer
 times for 53 cities), `site/test_timetables.py` (18), and every new city's English page at a true
 390 px — Cape Town, İstanbul, Cairo and Oslo whole, the rest at the top.
+
+## One button before each permission prompt (2 October) — 1.0.0 (35)
+
+Apple rejected 1.0.0 (34) under guideline 5.1.1(iv), reviewed on an iPad Air 11-inch (M3): the
+location screen before the system prompt said "Use my location", wording that steers toward Allow.
+The Human Interface Guidelines' rule for a screen before a prompt is stricter than the message
+said: one button, titled like Continue or Next, and no way to leave without seeing the prompt. So
+"Choose a city instead" beside it broke the rule too, and so did the notifications screen's
+"Enable notifications" with "Not now". Build 32 had passed with the same screens; each submission
+gets a fresh reviewer.
+
+- Both screens have one button, Continue, which always opens the system prompt.
+- A refused location opens the city search at once, and a city is required to go on (Mohamed's
+  call): `locationAnswer` maps the answer, and a prompt still unanswered when iOS stops waiting
+  leaves the screen as it is. Backing out of the search and pressing Continue again goes straight
+  back to it: iOS asks only once, and Android stops asking after two refusals.
+- Today's "No location yet" link said "Allow location instead" and asked the system again, which
+  on an iPhone after "Don't Allow" did nothing at all. It is now "Turn on location in Settings",
+  opening the app's page in the system settings (`openAppSettings`), and coming back with access
+  fetches the location by itself.
+- Settings › Location and Notifications keep their switches: a person flipping a switch is the
+  in-context request Apple recommends.
+
+Checked from fresh installs on the iPhone 17 Pro simulator and the Android 16 emulator: allow,
+decline, back out and Continue again, Android's second and third refusal, and Today's link out to
+App info and back with location on. The iPad simulator was not driven: the simulator tool's
+per-device permission went unanswered. Apple's reply and the build's review Notes are in
+`docs/store/app-review/2026-10-02-*`. Beyond the fix, 35 carries October's proof stamps
+(`ProofStamps.kt`, from the gate commits c21b9c06 and 8c31ac05 that landed after 34), which the
+release script requires fresh; no other app code changed since 34. Android keeps 34 on Play:
+Google has no such rule, so the change rides along with the next Play build.
+
