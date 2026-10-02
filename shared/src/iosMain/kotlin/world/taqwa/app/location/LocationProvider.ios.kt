@@ -108,7 +108,7 @@ private class IosLocationProvider : LocationProvider {
         if (existing != LocationPermission.NOT_REQUESTED) return existing
 
         // The timeout is a wedge-breaker, not a UX deadline: without it a callback that never
-        // arrives leaves onboarding's "Use my location" button pending forever with no recourse
+        // arrives leaves onboarding's Continue button pending forever with no recourse
         // but killing the app. On expiry the status is simply re-read — still NOT_REQUESTED if
         // the user is genuinely still deciding, which leaves the button tappable again.
         return withTimeoutOrNull(PERMISSION_TIMEOUT_MILLIS) {

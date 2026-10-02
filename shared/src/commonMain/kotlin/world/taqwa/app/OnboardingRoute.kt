@@ -42,9 +42,6 @@ internal fun OnboardingRoute(
         onNotificationPermission = { granted ->
             scope.launch { notificationOnboarding(granted).enable() }
         },
-        onDeclineNotifications = {
-            scope.launch { notificationOnboarding(false).declineForNow() }
-        },
         onComplete = {
             scope.launch {
                 settings.setOnboardingComplete(true)

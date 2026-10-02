@@ -10,11 +10,9 @@
     <string name="onboarding_welcome_cta">Mulai</string>
     <string name="onboarding_location_title">Di mana Anda berada?</string>
     <string name="onboarding_location_body">Waktu salat bergantung pada posisi Anda yang tepat. Semuanya dihitung di perangkat Anda. Lokasi Anda tidak pernah keluar dari ponsel.</string>
-    <string name="onboarding_location_cta">Gunakan lokasi saya</string>
-    <string name="onboarding_location_secondary">Pilih kota saja</string>
+    <string name="onboarding_continue">Lanjutkan</string>
     <string name="onboarding_notifications_title">Jangan lewatkan satu salat pun</string>
     <string name="onboarding_notifications_body">Notifikasi pada setiap waktu salat. Anda memilih suaranya untuk tiap salat secara terpisah, dan bisa menggantinya kapan saja.</string>
-    <string name="onboarding_notifications_cta">Aktifkan notifikasi</string>
     <string name="onboarding_notifications_secondary">Nanti saja</string>
     <string name="onboarding_exact_title">Tepat pada waktunya</string>
     <string name="onboarding_exact_body">Android hanya berbunyi tepat pada waktu salat jika izin “Alarm &amp; pengingat” diberikan untuk Taqwa. Tanpa izin itu, notifikasi bisa terlambat sampai satu jam.</string>
@@ -41,7 +39,7 @@
     <string name="today_exact_alarms_body">Android bisa terlambat sampai satu jam selama izin “Alarm &amp; pengingat” belum diberikan untuk Taqwa.</string>
     <string name="today_no_location_title">Belum ada lokasi</string>
     <string name="today_choose_city">Pilih kota</string>
-    <string name="today_allow_location">Izinkan lokasi saja</string>
+    <string name="today_location_settings">Aktifkan lokasi di Pengaturan</string>
     <string name="today_jumuah">Jumat</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->

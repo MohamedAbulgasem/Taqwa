@@ -12,11 +12,9 @@
     <string name="onboarding_welcome_cta">Commencer</string>
     <string name="onboarding_location_title">Où êtes-vous ?</string>
     <string name="onboarding_location_body">Les horaires dépendent de votre position exacte. Tout est calculé sur votre appareil, et votre position ne quitte jamais votre téléphone.</string>
-    <string name="onboarding_location_cta">Utiliser ma position</string>
-    <string name="onboarding_location_secondary">Choisir plutôt une ville</string>
+    <string name="onboarding_continue">Continuer</string>
     <string name="onboarding_notifications_title">Ne manquez plus une prière</string>
     <string name="onboarding_notifications_body">Une notification à chaque prière. Vous choisissez le son de chaque prière séparément, et vous pouvez le changer quand vous voulez.</string>
-    <string name="onboarding_notifications_cta">Activer les notifications</string>
     <string name="onboarding_notifications_secondary">Pas maintenant</string>
     <string name="onboarding_exact_title">À l’heure, à la minute près</string>
     <string name="onboarding_exact_body">Android ne sonne à l’heure exacte de la prière que si « Alarmes et rappels » est autorisé pour Taqwa. Sans cela, une notification peut arriver jusqu’à une heure en retard.</string>
@@ -44,7 +42,7 @@
     <string name="today_exact_alarms_body">Android peut sonner jusqu’à une heure en retard tant que « Alarmes et rappels » n’est pas autorisé pour Taqwa.</string>
     <string name="today_no_location_title">Pas encore de position</string>
     <string name="today_choose_city">Choisir une ville</string>
-    <string name="today_allow_location">Autoriser plutôt la localisation</string>
+    <string name="today_location_settings">Activer la position dans les paramètres</string>
     <string name="today_jumuah">Joumouʿa</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->

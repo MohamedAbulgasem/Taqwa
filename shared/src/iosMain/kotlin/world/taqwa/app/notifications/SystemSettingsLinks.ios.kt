@@ -5,7 +5,10 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
 
 /** iOS opens the app's own page in Settings, where the notification switch lives. */
-actual fun openAppNotificationSettings() {
+actual fun openAppNotificationSettings() = openAppSettings()
+
+/** The app's own page in Settings: its Location and Notifications switches are both there. */
+actual fun openAppSettings() {
     val url = NSURL.URLWithString(UIApplicationOpenSettingsURLString) ?: return
     UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>(), completionHandler = null)
 }

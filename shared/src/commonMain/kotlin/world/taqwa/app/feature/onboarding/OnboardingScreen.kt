@@ -42,11 +42,9 @@ import world.taqwa.app.resources.notifications_allow_exact_alarms
 import world.taqwa.app.resources.onboarding_exact_body
 import world.taqwa.app.resources.onboarding_exact_title
 import world.taqwa.app.resources.onboarding_location_body
-import world.taqwa.app.resources.onboarding_location_cta
-import world.taqwa.app.resources.onboarding_location_secondary
+import world.taqwa.app.resources.onboarding_continue
 import world.taqwa.app.resources.onboarding_location_title
 import world.taqwa.app.resources.onboarding_notifications_body
-import world.taqwa.app.resources.onboarding_notifications_cta
 import world.taqwa.app.resources.onboarding_notifications_secondary
 import world.taqwa.app.resources.onboarding_notifications_title
 import world.taqwa.app.resources.onboarding_welcome_body
@@ -65,9 +63,9 @@ import world.taqwa.app.widget.WidgetPinRequester
 import world.taqwa.app.widget.widgetAddPath
 
 /**
- * Hoisted out of this composable because "choose a city instead" navigates away to the city
- * search: the step must survive the round trip, or the user comes back to the welcome screen
- * having already answered its question.
+ * Hoisted out of this composable because a declined location navigates away to the city search:
+ * the step must survive the round trip, or the user comes back to the welcome screen having
+ * already answered its question.
  */
 enum class OnboardingStep { WELCOME, LOCATION, NOTIFICATIONS, EXACT_ALARMS, WIDGET }
 
@@ -75,6 +73,13 @@ enum class OnboardingStep { WELCOME, LOCATION, NOTIFICATIONS, EXACT_ALARMS, WIDG
  * Four screens, each asking for exactly one thing and saying why *before* the system dialog
  * appears. Unexplained prompts get denied, and a denied location permission is the difference
  * between a working app and a dead one. Declining is a first-class path, never a dead end.
+ *
+ * A screen that comes before a system prompt has one button, Continue, and it always opens the
+ * prompt. That is App Review's rule (guideline 5.1.1(iv), and the pre-alert screens of the Human
+ * Interface Guidelines: one button, titled like Continue or Next, and no way to leave without
+ * seeing the prompt). 1.0.0 (34) was rejected for "Use my location" beside "Choose a city
+ * instead". The alternative comes after the prompt instead: a refused location opens the city
+ * search ([locationAnswer]), and a refused notification prompt moves on.
  *
  * The last screen asks for nothing from the system. It exists because the widget is the surface
  * most people will read most often and the one nobody finds on their own; on Android it can place
@@ -94,7 +99,6 @@ fun OnboardingScreen(
     onLocationPermission: (LocationPermission) -> Unit,
     onChooseCity: () -> Unit,
     onNotificationPermission: (Boolean) -> Unit,
-    onDeclineNotifications: () -> Unit,
     onComplete: () -> Unit,
     /** True on an Android that has not granted "Alarms & reminders"; always false on iOS. Re-read
      * by the caller each time the app comes to the front, which is how a grant made in system
@@ -107,9 +111,14 @@ fun OnboardingScreen(
 
     val requestLocation = rememberLocationPermissionRequester(locationRepository) { permission ->
         onLocationPermission(permission)
-        // Granted or denied, the flow moves on: the city picker remains available from Today
-        // and from Settings, so a refusal is never a dead end.
-        onStep(OnboardingStep.NOTIFICATIONS)
+        when (locationAnswer(permission)) {
+            LocationAnswer.CONTINUE -> onStep(OnboardingStep.NOTIFICATIONS)
+            // The city search moves the step on itself once a city is picked, and backing out
+            // of it lands here again, where Continue leads straight back to it: the system asks
+            // only once, so a second tap answers DENIED at once.
+            LocationAnswer.CHOOSE_CITY -> onChooseCity()
+            LocationAnswer.STAY -> Unit
+        }
     }
 
     // Granted or denied, the flow moves on here too: the sound sheet and the master toggle in
@@ -212,24 +221,16 @@ fun OnboardingScreen(
                     )
                     Spacer(Modifier.height(44.dp))
                 }
+                // The two screens before a system prompt: Continue, and nothing beside it (see
+                // the class comment). The spacer stands where a second link would be, so the
+                // button sits at the same height on every screen.
                 OnboardingStep.LOCATION -> {
-                    TaqwaPrimaryButton(stringResource(Res.string.onboarding_location_cta), requestLocation)
-                    // The city search is a pushed screen; it advances the step itself once a city
-                    // has actually been chosen, so backing out of it lands here again.
-                    TaqwaTextLink(
-                        stringResource(Res.string.onboarding_location_secondary),
-                        onClick = onChooseCity,
-                    )
+                    TaqwaPrimaryButton(stringResource(Res.string.onboarding_continue), requestLocation)
+                    Spacer(Modifier.height(44.dp))
                 }
                 OnboardingStep.NOTIFICATIONS -> {
-                    TaqwaPrimaryButton(
-                        stringResource(Res.string.onboarding_notifications_cta),
-                        requestNotifications,
-                    )
-                    TaqwaTextLink(
-                        stringResource(Res.string.onboarding_notifications_secondary),
-                        onClick = { onDeclineNotifications(); onStep(OnboardingStep.WIDGET) },
-                    )
+                    TaqwaPrimaryButton(stringResource(Res.string.onboarding_continue), requestNotifications)
+                    Spacer(Modifier.height(44.dp))
                 }
                 OnboardingStep.EXACT_ALARMS -> {
                     // The system page opens over the app; coming back with the grant advances the

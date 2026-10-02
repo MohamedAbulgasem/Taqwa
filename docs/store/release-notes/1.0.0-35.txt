@@ -1,0 +1,28 @@
+<en-GB>
+• Simpler first launch: one Continue before each permission request, and if you’d rather not share your location, you pick your city instead.
+• If Taqwa has no location, its link now opens your phone’s settings, and your location is used as soon as you come back.
+</en-GB>
+<ar>
+• بداية أبسط: زر «متابعة» واحد قبل كل طلب إذن، وإن فضّلت ألّا تشارك موقعك اخترت مدينتك بدلًا من ذلك.
+• إن لم يكن لدى تقوى موقع، يفتح الرابط الآن إعدادات هاتفك، ويُستخدم موقعك فور عودتك.
+</ar>
+<fr-FR>
+• Premier lancement simplifié : un seul bouton Continuer avant chaque demande d’autorisation, et si vous préférez ne pas partager votre position, vous choisissez votre ville.
+• Sans position, le lien de Taqwa ouvre désormais les paramètres du téléphone, et votre position est utilisée dès votre retour.
+</fr-FR>
+<tr-TR>
+• Daha sade ilk açılış: her izin isteğinden önce tek bir Devam düğmesi; konumunuzu paylaşmak istemezseniz şehrinizi seçersiniz.
+• Taqwa’da konum yoksa bağlantı artık telefonunuzun ayarlarını açar ve döndüğünüzde konumunuz hemen kullanılır.
+</tr-TR>
+<id>
+• Pembukaan pertama lebih sederhana: satu tombol Lanjutkan sebelum setiap permintaan izin, dan jika tak ingin berbagi lokasi, Anda memilih kota saja.
+• Jika Taqwa belum punya lokasi, tautannya kini membuka pengaturan ponsel, dan lokasi Anda langsung dipakai saat Anda kembali.
+</id>
+<ur>
+• پہلی بار کھولنا اب آسان: ہر اجازت کی درخواست سے پہلے صرف ایک «جاری رکھیں» بٹن، اور اگر آپ مقام شیئر نہ کرنا چاہیں تو اپنا شہر چن لیں۔
+• اگر تقویٰ کے پاس مقام نہ ہو تو اس کا لنک اب فون کی ترتیبات کھولتا ہے، اور واپس آتے ہی آپ کا مقام استعمال ہو جاتا ہے۔
+</ur>
+<bn-BD>
+• প্রথমবার চালু করা আরও সহজ: প্রতিটি অনুমতির অনুরোধের আগে একটিই «চালিয়ে যান» বোতাম, আর অবস্থান শেয়ার করতে না চাইলে আপনার শহর বেছে নিন।
+• তাকওয়ার কাছে অবস্থান না থাকলে লিংকটি এখন ফোনের সেটিংস খোলে, আর ফিরে এলেই আপনার অবস্থান ব্যবহার হয়।
+</bn-BD>

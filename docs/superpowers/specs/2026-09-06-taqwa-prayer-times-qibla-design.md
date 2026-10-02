@@ -100,8 +100,8 @@ All tap targets ≥44pt.
 Each asks for exactly one thing and states why *before* the system dialog appears. Unexplained permission prompts get denied, and a denied location permission is the difference between a working app and a dead one.
 
 1. **Welcome** — app mark (the ring), name, and the three promises: free forever, no ads or account, works offline.
-2. **Location** — explains that times depend on exact position and that everything is computed on-device. Primary: *Use my location*. Secondary: *Choose a city instead*.
-3. **Notifications** — explains that sound is chosen per prayer and changeable. Primary: *Enable notifications*. Secondary: *Not now*.
+2. **Location** — explains that times depend on exact position and that everything is computed on-device. One button, *Continue*, which always opens the system prompt; declining opens the city search, and a city is required to go on. (Until 1.0.0 (35) it was *Use my location* beside *Choose a city instead*; App Review rejected that under guideline 5.1.1(iv): a screen before a system prompt gets one button, titled like Continue, and no way to leave without seeing the prompt.)
+3. **Notifications** — explains that sound is chosen per prayer and changeable. One button, *Continue*, which opens the system prompt; either answer moves on. (Was *Enable notifications* / *Not now*, changed for the same rule.)
 
 Declining either permission is a first-class path, not a dead end. Onboarding is shown once; completion is persisted.
 
@@ -133,7 +133,7 @@ Each row shows the prayer name in the UI language, the Arabic name in the system
 
 **Two states that must be built, not deferred:**
 
-- **Location denied** — replaces the ring and timeline with a clear explanation and two actions (*Choose a city*, *Allow location instead*). Never an error toast over an empty screen.
+- **Location denied** — replaces the ring and timeline with a clear explanation and two actions (*Choose a city*, and *Turn on location in Settings*, which opens the app's page in the system settings: iOS shows its prompt once). Coming back with access fetches the location by itself. Never an error toast over an empty screen.
 - **High latitude** — normal layout plus a note stating which rule is in force: "The sun never sets far enough here. Fajr and Isha use the one-seventh rule." Most apps either hide this or invent times; it is why they lose their UK and Nordic users.
 
 ### 4.3 Qibla
