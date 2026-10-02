@@ -21,7 +21,7 @@ from common import Context, FetchError, Http, Table, add_all, nearest_year, norm
 import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
-from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, mawaqit, mjc, morocco, muis, qatar  # noqa: E402
+from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, mawaqit, mjc, morocco, muis, qatar, toronto  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -1450,3 +1450,149 @@ class Jordan(unittest.TestCase):
         with self.assertRaises(FetchError) as curl:
             client._curl("https://awqaf.gov.jo/AR/Pages/PrayerTime", {}, None, 5, jar)
         self.assertIn("not sent through curl", str(curl.exception))
+
+
+# The three Toronto tables as their sources print them, every time invented: the hours of the day's
+# order with the day of the month as the minutes, an hour less from 1 November (America/Toronto's
+# clock change) where `slip` days leave the table on the old clock (ruling R69).
+def toronto_times(d, slip=()):
+    back = 60 if d >= dt.date(2026, 11, 1) and d not in slip else 0
+    base = [5 * 60, 7 * 60, 13 * 60, 16 * 60, 19 * 60, 20 * 60 + 30]
+    return [f"{(m - back + d.day) // 60:02d}:{(m - back + d.day) % 60:02d}" for m in base]
+
+
+def toronto_ift_csv(year=2026, slip=(), days=None):
+    lines = ["PrayerDate,FajarBegins,Fajar,Sunrise,ZuharBegins,Zuhar,AsarBegins,Asar,Sunset,MagribBegins,IshaBegins,Isha"]
+    d = dt.date(year, 1, 1)
+    while d.year == year and (days is None or len(lines) <= days):
+        f, s, z, a, m, i = toronto_times(d, slip)
+        twelve = lambda t: f"{int(t[:2]) % 12 or 12}:{t[3:]}"
+        lines.append(",".join([d.isoformat(), twelve(f), twelve(f), twelve(s), twelve(z), twelve(z), twelve(a), twelve(a), twelve(m), twelve(m), twelve(i), twelve(i)]))
+        d += dt.timedelta(days=1)
+    return ("\r\n".join(lines) + "\r\n").encode()
+
+
+def toronto_iit_month(year, month, heading=None):
+    name = calendar.month_name[month]
+    rows = ""
+    for day in range(1, calendar.monthrange(year, month)[1] + 1):
+        d = dt.date(year, month, day)
+        f, s, z, a, m, i = toronto_times(d)
+        ap = lambda t: f"{int(t[:2]) % 12 or 12}:{t[3:]} {'pm' if int(t[:2]) >= 12 else 'am'}"
+        cells = [f"{name} {day}, {year} <p class=\"hijriDate\"> x</p>", d.strftime("%A"), ap(f), ap(f), ap(s), ap(z), ap(z), ap(a), ap(a), ap(a), ap(m), ap(m), ap(i), ap(i)]
+        rows += "<tr>" + "".join(f"<td>{c}</td>" for c in cells) + "</tr>"
+    return (f'<div class="dpt-monthly-table-wrapper"><table><thead class="prayerName"><th class="prayerName" colspan="2">{heading or name}</th></thead>'
+            + rows + "</table></div>").encode()
+
+
+def toronto_mac_page(lat=43.6554647, lon=-79.3857551):
+    cal = []
+    for month in range(1, 13):
+        cal.append({str(day): toronto_times(dt.date(2026, month, day)) for day in range(1, calendar.monthrange(2026, month)[1] + 1)})
+    conf = {"latitude": lat, "longitude": lon, "timezone": "America/Toronto", "calendar": cal}
+    return ("<script>var confData = " + json.dumps(conf) + ";</script>").encode()
+
+
+class TorontoHttp:
+    def __init__(self, answers):
+        self.answers = answers
+        self.urls = []
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1):
+        self.urls.append(url)
+        answer = self.answers(url)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+    def text(self, url, **kw):
+        return self.get(url, **kw).decode("utf-8")
+
+
+def toronto_answers(ift=None, iit=None, mac=None):
+    def answer(url):
+        if url == toronto.IFT_CSV:
+            return ift if ift is not None else toronto_ift_csv(slip={dt.date(2026, 11, 1), dt.date(2026, 11, 2)})
+        if url.startswith("https://islam.ca/"):
+            month = int(url.rsplit("=", 1)[1])
+            return (iit or (lambda m: toronto_iit_month(2026, m)))(month)
+        if url.endswith(toronto.MAC_SLUG):
+            return mac if mac is not None else toronto_mac_page()
+        return FetchError("no canned answer")
+    return answer
+
+
+class Toronto(unittest.TestCase):
+    def setUp(self):
+        self.root = tempfile.mkdtemp("toronto")
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def ctx(self, http, today=dt.date(2026, 10, 2)):
+        return Context("ca-toronto", self.root, today, [].append, self.root, http=http)
+
+    def test_a_fetch_keeps_the_three_tables_from_the_month_on_less_the_days_on_the_wrong_clock(self):
+        ctx = self.ctx(TorontoHttp(toronto_answers()))
+        tables = {t.key: t for t in toronto.fetch(ctx)}
+        self.assertEqual([], ctx.errors)
+        self.assertEqual({"ift-2026", "iit-2026", "mac-2026"}, set(tables))
+        self.assertEqual(("ca.ift/ca.ift", "hanafi"), (tables["ift-2026"].entry, tables["ift-2026"].school))
+        self.assertEqual(("ca.iit/ca.iit", "ca.mac/ca.mac"), (tables["iit-2026"].entry, tables["mac-2026"].entry))
+        for t in tables.values():
+            self.assertEqual("2026-10-01", t.first(), "the days from the first of the current month")
+            self.assertFalse(t.merge)
+        self.assertEqual(toronto_times(dt.date(2026, 10, 5)), tables["ift-2026"].rows["2026-10-05"], "12-hour cells read as the day's")
+        self.assertEqual(toronto_times(dt.date(2026, 10, 5)), tables["iit-2026"].rows["2026-10-05"])
+        self.assertEqual(toronto_times(dt.date(2026, 10, 5)), tables["mac-2026"].rows["2026-10-05"])
+        # IFT's file keeps the old clock on 1-2 November: those days (and its recorded 28-30 November) are left out, with notes.
+        left = {"2026-11-01", "2026-11-02", "2026-11-28", "2026-11-29", "2026-11-30"}
+        self.assertEqual(set(), left & set(tables["ift-2026"].rows))
+        self.assertEqual(92 - 5, len(tables["ift-2026"].rows))
+        self.assertEqual(92, len(tables["iit-2026"].rows))
+        self.assertTrue(any("2026-11-01 to 2026-11-02 are on the wrong clock" in n for n in ctx.notes), ctx.notes)
+        self.assertTrue(any("left out: IFT prints Isha" in n for n in ctx.notes))
+        self.assertEqual(1 + 12 + 1, len(ctx.http.urls))
+
+    def test_the_clock_check_reads_each_column_and_only_near_a_change(self):
+        rows = {}
+        d = dt.date(2026, 10, 20)
+        while d <= dt.date(2026, 11, 15):
+            times = toronto_times(d)
+            if d in (dt.date(2026, 11, 1), dt.date(2026, 11, 2)):
+                times[1] = toronto_times(d, slip={d})[1]  # the sunrise column alone a day late
+            rows[d.isoformat()] = times
+            d += dt.timedelta(days=1)
+        slips, notes = toronto.clock_slips(rows)
+        self.assertEqual({"2026-11-01", "2026-11-02"}, slips)
+        self.assertEqual("2026-11-02", notes[0][0])
+        # A table on the right clock leaves nothing out.
+        self.assertEqual(set(), toronto.clock_slips({k: toronto_times(dt.date.fromisoformat(k)) for k in rows})[0])
+
+    def test_tables_that_do_not_read_as_expected_are_refused(self):
+        # IFT: not one whole year.
+        ctx = self.ctx(TorontoHttp(toronto_answers(ift=toronto_ift_csv(days=200))))
+        tables = toronto.fetch(ctx)
+        self.assertTrue(any(e.startswith("IFT: the CSV holds 200 days of 2026") for e in ctx.errors), ctx.errors)
+        self.assertNotIn("ift-2026", [t.key for t in tables])
+        # IIT: a reply for another month.
+        ctx = self.ctx(TorontoHttp(toronto_answers(iit=lambda m: toronto_iit_month(2026, 5 if m == 6 else m))))
+        tables = toronto.fetch(ctx)
+        self.assertEqual(["IIT month 6: the table's heading is not month 6"], ctx.errors)
+        # MAC: another mosque's page.
+        ctx = self.ctx(TorontoHttp(toronto_answers(mac=toronto_mac_page(lat=45.5))))
+        tables = toronto.fetch(ctx)
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("MAC: the page's point", ctx.errors[0])
+        self.assertNotIn("mac-2026", [t.key for t in tables])
+        for e in ctx.errors:
+            self.assertIsNone(TIME_SHAPE.search(e), "no message quotes a cell")
+
+    def test_twelve_hour_cells(self):
+        self.assertEqual("13:05", toronto.twelve("1:05", True))
+        self.assertEqual("12:30", toronto.twelve("12:30", True))
+        self.assertEqual("06:05", toronto.twelve("6:05", False))
+        self.assertEqual(("00:10", "12:10", "18:05"), (toronto.ampm("12:10 am"), toronto.ampm("12:10 pm"), toronto.ampm("6:05PM")))
+        with self.assertRaises(FetchError):
+            toronto.ampm("6:05")
+        with self.assertRaises(FetchError):
+            toronto.ordered(["05:00", "04:00"], "x")
