@@ -172,7 +172,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "be.cautious",
             places = 3,
-            placeDays = 1192,
+            placeDays = 1201,
             ramadanDays = 87,
             provenThrough = "2027-12-31",
             worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 65, "fajr" to 4, "isha" to 53, "maghrib" to 1, "sunrise" to 1),
@@ -380,9 +380,9 @@ object ProofStamps {
         ProofStamp(
             entryId = "eg.esa",
             places = 30,
-            placeDays = 1707,
+            placeDays = 2637,
             ramadanDays = 30,
-            provenThrough = "2026-09-30",
+            provenThrough = "2026-10-31",
             worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 3),
             worstLateByUnit = mapOf(
                 "alexandria" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
@@ -424,7 +424,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "fr.cautious",
             places = 3,
-            placeDays = 1157,
+            placeDays = 1163,
             ramadanDays = 88,
             provenThrough = "2027-12-31",
             worstLateMinutes = mapOf("asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 77, "fajr" to 56, "isha" to 88, "maghrib" to 3, "sunrise" to 8),
@@ -866,7 +866,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "other.turkey",
             places = 6,
-            placeDays = 2400,
+            placeDays = 2418,
             ramadanDays = 174,
             provenThrough = "2027-12-31",
             worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
@@ -1013,7 +1013,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "se.cautious",
             places = 14,
-            placeDays = 6028,
+            placeDays = 6034,
             ramadanDays = 447,
             provenThrough = "2027-12-31",
             worstLateMinutes = mapOf("asrStandard" to 6, "dhuhr" to 4, "endOfEating" to 154, "fajr" to 109, "isha" to 170, "maghrib" to 126, "sunrise" to 129),
@@ -1075,7 +1075,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "tr.diyanet",
             places = 22,
-            placeDays = 8800,
+            placeDays = 8866,
             ramadanDays = 638,
             provenThrough = "2027-12-31",
             worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
@@ -1102,7 +1102,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "tr.diyanet.europe",
             places = 33,
-            placeDays = 13117,
+            placeDays = 13174,
             ramadanDays = 957,
             provenThrough = "2027-12-31",
             worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 70, "fajr" to 7, "isha" to 7, "maghrib" to 126, "sunrise" to 129),
@@ -1304,9 +1304,9 @@ object ProofStamps {
         ProofStamp(
             entryId = "za.cape",
             places = 1,
-            placeDays = 30,
+            placeDays = 61,
             ramadanDays = 0,
-            provenThrough = "2026-09-30",
+            provenThrough = "2026-10-31",
             worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 4, "sunrise" to 2),
             worstLateByUnit = emptyMap(),
             lateLimits = listOf(
@@ -1340,9 +1340,9 @@ object ProofStamps {
         ProofStamp(
             entryId = "za.mjc",
             places = 1,
-            placeDays = 30,
+            placeDays = 61,
             ramadanDays = 0,
-            provenThrough = "2026-09-30",
+            provenThrough = "2026-10-31",
             worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
             worstLateByUnit = mapOf(
                 "za.mjc" to mapOf("asrStandard" to 1, "dhuhr" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),

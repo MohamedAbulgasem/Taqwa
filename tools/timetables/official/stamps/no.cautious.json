@@ -33,12 +33,12 @@
       "checked": 2648,
       "lateEnd": 0,
       "late": {
-        "0": 1263,
-        "1": 599,
+        "0": 1265,
+        "1": 600,
         "2": 4,
-        "3+": 782
+        "3+": 779
       },
-      "exactShare": 0.477,
+      "exactShare": 0.4777,
       "worstLate": 58,
       "lateLimit": 58,
       "lateLimitFrom": "entry no.cautious",
@@ -48,12 +48,12 @@
       "checked": 2648,
       "early": 0,
       "late": {
-        "0": 878,
-        "1": 631,
+        "0": 881,
+        "1": 628,
         "2": 3,
         "3+": 1136
       },
-      "exactShare": 0.3316,
+      "exactShare": 0.3327,
       "worstLate": 6,
       "lateLimit": 6,
       "lateLimitFrom": "entry no.cautious",
@@ -63,12 +63,12 @@
       "checked": 2648,
       "early": 0,
       "late": {
-        "0": 1330,
+        "0": 1333,
         "1": 654,
         "2": 0,
-        "3+": 664
+        "3+": 661
       },
-      "exactShare": 0.5023,
+      "exactShare": 0.5034,
       "worstLate": 7,
       "lateLimit": 8,
       "lateLimitFrom": "entry no.cautious",
@@ -108,12 +108,12 @@
       "checked": 2648,
       "early": 0,
       "late": {
-        "0": 698,
-        "1": 516,
+        "0": 700,
+        "1": 517,
         "2": 106,
-        "3+": 1328
+        "3+": 1325
       },
-      "exactShare": 0.2636,
+      "exactShare": 0.2644,
       "worstLate": 135,
       "lateLimit": 135,
       "lateLimitFrom": "entry no.cautious",
@@ -123,12 +123,12 @@
       "checked": 2648,
       "lateEnd": 0,
       "late": {
-        "0": 737,
-        "1": 493,
+        "0": 738,
+        "1": 495,
         "2": 104,
-        "3+": 1314
+        "3+": 1311
       },
-      "exactShare": 0.2783,
+      "exactShare": 0.2787,
       "worstLate": 57,
       "lateLimit": 57,
       "lateLimitFrom": "entry no.cautious",
@@ -158,12 +158,12 @@
         "checked": 2648,
         "lateEnd": 0,
         "late": {
-          "0": 1263,
-          "1": 599,
+          "0": 1265,
+          "1": 600,
           "2": 4,
-          "3+": 782
+          "3+": 779
         },
-        "exactShare": 0.477,
+        "exactShare": 0.4777,
         "worstLate": 58,
         "lateLimit": 58,
         "lateLimitFrom": "entry no.cautious",
@@ -173,12 +173,12 @@
         "checked": 2648,
         "early": 0,
         "late": {
-          "0": 878,
-          "1": 631,
+          "0": 881,
+          "1": 628,
           "2": 3,
           "3+": 1136
         },
-        "exactShare": 0.3316,
+        "exactShare": 0.3327,
         "worstLate": 6,
         "lateLimit": 6,
         "lateLimitFrom": "entry no.cautious",
@@ -188,12 +188,12 @@
         "checked": 2648,
         "early": 0,
         "late": {
-          "0": 1330,
+          "0": 1333,
           "1": 654,
           "2": 0,
-          "3+": 664
+          "3+": 661
         },
-        "exactShare": 0.5023,
+        "exactShare": 0.5034,
         "worstLate": 7,
         "lateLimit": 8,
         "lateLimitFrom": "entry no.cautious",
@@ -233,12 +233,12 @@
         "checked": 2648,
         "early": 0,
         "late": {
-          "0": 698,
-          "1": 516,
+          "0": 700,
+          "1": 517,
           "2": 106,
-          "3+": 1328
+          "3+": 1325
         },
-        "exactShare": 0.2636,
+        "exactShare": 0.2644,
         "worstLate": 135,
         "lateLimit": 135,
         "lateLimitFrom": "entry no.cautious",
@@ -248,12 +248,12 @@
         "checked": 2648,
         "lateEnd": 0,
         "late": {
-          "0": 737,
-          "1": 493,
+          "0": 738,
+          "1": 495,
           "2": 104,
-          "3+": 1314
+          "3+": 1311
         },
-        "exactShare": 0.2783,
+        "exactShare": 0.2787,
         "worstLate": 57,
         "lateLimit": 57,
         "lateLimitFrom": "entry no.cautious",
@@ -287,11 +287,11 @@
       }
     },
     "tr.diyanet.europe": {
-      "checked": ["2026-09-25..2026-10-29", "2027-01-01..2027-12-31"],
+      "checked": ["2026-09-25..2026-11-01", "2027-01-01..2027-12-31"],
       "points": {
         "58.14671,7.9956": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"],
         "58.97005,5.73332": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"],
-        "59.91273,10.74609": ["2026-09-25..2026-10-29", "2027-01-01..2027-12-31"],
+        "59.91273,10.74609": ["2026-09-25..2026-11-01", "2027-01-01..2027-12-31"],
         "60.39299,5.32415": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"],
         "63.43049,10.39506": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"]
       }

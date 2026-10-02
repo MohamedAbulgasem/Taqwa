@@ -99,29 +99,33 @@ class ProvenTest {
         assertTrue(v.reason.startsWith("class D_AUTHORITY"), v.reason)
     }
 
-    @Test fun cairoShowsSeptemberAloneAndIsHeldFromOctoberBecauseItsTableEndsInSeptember() {
-        // Ruling R116: September is checked whole, so in September a page would show it alone; from
-        // 1 October the current month itself is unchecked and the city is held.
+    @Test fun cairoShowsSeptemberAndOctoberThenOctoberAloneBecauseItsTablesEndInOctober() {
+        // Ruling R116: the monitor's captures of 28 Sep and 2 Oct 2026 hold September and October, so a
+        // page built in September shows both; from 1 October it shows October alone and names November.
         val cairo = city("cairo-egypt", "EG", 30.06263, 31.24967, "Africa/Cairo")
         val september = verdict(cairo)
         assertIs<Verdict.Published>(september)
-        assertEquals(listOf(sep1..sep30), september.months)
-        assertEquals(Unchecked("eg.esa", oct1), september.nextUnchecked)
+        assertEquals(months(sep1), september.months)
+        assertNull(september.nextUnchecked)
         val october = verdict(cairo, oct1)
-        assertIs<Verdict.Held>(october)
-        assertEquals("eg.esa: no checked table day from 1 Oct 2026", october.reason)
+        assertIs<Verdict.Published>(october)
+        assertEquals(listOf(oct1..oct31), october.months)
+        assertEquals(Unchecked("eg.esa", nov1), october.nextUnchecked)
+        assertEquals(oct31, october.through)
     }
 
-    @Test fun istanbulIsHeldOnBothSidesOfDiyanetsHole() {
-        // Diyanet's captures hold 25 Sep – 29 Oct 2026 (the research's to 25 Oct, the weekly monitor's
-        // of 28 Sep to 29 Oct) and 2027: September's first days and the last of October through
-        // December were never checked (review C1, ruling R115).
+    @Test fun istanbulIsHeldInSeptemberAndShowsOctoberAloneUntilNovemberIsChecked() {
+        // Diyanet's captures hold 25 Sep – 1 Nov 2026 (the research's to 25 Oct, the weekly monitor's of
+        // 28 Sep to 29 Oct and of 2 Oct to 1 Nov) and 2027: September's first days were never checked
+        // (review C1, ruling R115), so a September page is held; October is checked whole, so from
+        // 1 October the page shows it alone (ruling R116) and names 2 November, the first day unchecked.
         val september = verdict(istanbul)
         assertIs<Verdict.Held>(september)
         assertEquals("tr.diyanet: no checked table day 1 Sep 2026 – 24 Sep 2026", september.reason)
         val october = verdict(istanbul, oct1)
-        assertIs<Verdict.Held>(october)
-        assertEquals("tr.diyanet: no checked table day 30 Oct 2026 – 31 Dec 2026", october.reason)
+        assertIs<Verdict.Published>(october)
+        assertEquals(listOf(oct1..oct31), october.months)
+        assertEquals(Unchecked("tr.diyanet", LocalDate(2026, 11, 2)), october.nextUnchecked)
     }
 
     @Test fun birminghamIsHeldAsNotMeasured() {

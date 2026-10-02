@@ -13,7 +13,11 @@
 # - The weekly monitor's capture of 28 Sep 2026 of the same 22 district pages (29 Sep – 29 Oct 2026 and
 #   all of 2027, 396 days each; the same minutes as the research's on every day both hold), each at its
 #   research row's unit or point, and at Diyanet's six points for other.turkey, held out: it adds 26–29
-#   October 2026.
+#   October 2026. Its rows read the copy pinned as it was then (archive/tables/pinned/tr-diyanet/2026-09-28/),
+#   since the monitor's own files grow with each fetch.
+# - The monitor's capture of 2 Oct 2026 (pinned, archive/tables/pinned/tr-diyanet/2026-10-02/): the same 22
+#   pages, now 29 Sep – 1 Nov 2026 and all of 2027 (the same minutes as the 28 Sep capture on every day both
+#   hold), at the same units and points, held out: it adds 30 October – 1 November 2026.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-diyanet-kemenag/off-diyanet-istanbul.txt	tr.diyanet/9541			Europe/Istanbul	F+E S D A M I	daily	standard	fit	İstanbul 9541
 archive/tables/round/data-diyanet-kemenag/off-diyanet-ankara.txt	tr.diyanet/9206			Europe/Istanbul	F+E S D A M I	daily	standard	fit	Ankara 9206
@@ -43,31 +47,59 @@ archive/tables/round/data-diyanet-kemenag/off-diyanet-tekirdag.txt	other.turkey	
 archive/tables/round/data-diyanet-kemenag/off-diyanet-adana.txt	other.turkey	36.987	35.326	Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana at Diyanet's point
 archive/tables/round/data-diyanet-kemenag/off-diyanet-hatay.txt	other.turkey	36.2	36.153	Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay at Diyanet's point
 archive/tables/round/data-diyanet-kemenag/off-diyanet-karaman.txt	other.turkey	37.181	33.214	Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman at Diyanet's point
-archive/tables/monitor/tr-diyanet/istanbul.txt	tr.diyanet/9541			Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul 9541, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/ankara.txt	tr.diyanet/9206			Europe/Istanbul	F+E S D A M I	daily	standard	test	Ankara 9206, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/tekirdag.txt	tr.diyanet/9879			Europe/Istanbul	F+E S D A M I	daily	standard	test	Tekirdağ 9879, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/edirne.txt	tr.diyanet/9419			Europe/Istanbul	F+E S D A M I	daily	standard	test	Edirne 9419, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/van.txt	tr.diyanet/9930			Europe/Istanbul	F+E S D A M I	daily	standard	test	Van 9930, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/adana.txt	tr.diyanet/9146			Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana 9146, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/hatay.txt	tr.diyanet/20089			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay 20089, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/karaman.txt	tr.diyanet/9587			Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman 9587, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/canakkale.txt	tr.diyanet/9352			Europe/Istanbul	F+E S D A M I	daily	standard	test	Çanakkale 9352, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/hakkari.txt	tr.diyanet/9507			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hakkâri 9507, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/kars.txt	tr.diyanet/9594			Europe/Istanbul	F+E S D A M I	daily	standard	test	Kars 9594, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/igdir.txt	tr.diyanet/9522			Europe/Istanbul	F+E S D A M I	daily	standard	test	Iğdır 9522, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/erzurum.txt	tr.diyanet/9451			Europe/Istanbul	F+E S D A M I	daily	standard	test	Erzurum 9451, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/antalya.txt	tr.diyanet	36.90812	30.69556	Europe/Istanbul	F+E S D A M I	daily	standard	test	Antalya 9225, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/bursa.txt	tr.diyanet	40.19559	29.06013	Europe/Istanbul	F+E S D A M I	daily	standard	test	Bursa 9335, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/diyarbakir.txt	tr.diyanet	37.91363	40.21721	Europe/Istanbul	F+E S D A M I	daily	standard	test	Diyarbakır 9402, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/gaziantep.txt	tr.diyanet	37.05944	37.3825	Europe/Istanbul	F+E S D A M I	daily	standard	test	Gaziantep 9479, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/izmir.txt	tr.diyanet	38.41273	27.13838	Europe/Istanbul	F+E S D A M I	daily	standard	test	İzmir 9560, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/konya.txt	tr.diyanet	37.87135	32.48464	Europe/Istanbul	F+E S D A M I	daily	standard	test	Konya 9676, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/catalca.txt	tr.diyanet	41.14073	28.45967	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Çatalca 9538, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/sile.txt	tr.diyanet	41.17891	29.61085	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Şile 9547, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/silivri.txt	tr.diyanet	41.07393	28.24644	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Silivri 9548, at the app's point (edge), the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/istanbul.txt	other.turkey	41.012	28.974	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul at Diyanet's point, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/ankara.txt	other.turkey	39.938	32.848	Europe/Istanbul	F+E S D A M I	daily	standard	test	Ankara at Diyanet's point, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/tekirdag.txt	other.turkey	40.973	27.511	Europe/Istanbul	F+E S D A M I	daily	standard	test	Tekirdağ at Diyanet's point, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/adana.txt	other.turkey	36.987	35.326	Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana at Diyanet's point, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/hatay.txt	other.turkey	36.2	36.153	Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay at Diyanet's point, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tr-diyanet/karaman.txt	other.turkey	37.181	33.214	Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman at Diyanet's point, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/istanbul.txt	tr.diyanet/9541			Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul 9541, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/ankara.txt	tr.diyanet/9206			Europe/Istanbul	F+E S D A M I	daily	standard	test	Ankara 9206, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/tekirdag.txt	tr.diyanet/9879			Europe/Istanbul	F+E S D A M I	daily	standard	test	Tekirdağ 9879, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/edirne.txt	tr.diyanet/9419			Europe/Istanbul	F+E S D A M I	daily	standard	test	Edirne 9419, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/van.txt	tr.diyanet/9930			Europe/Istanbul	F+E S D A M I	daily	standard	test	Van 9930, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/adana.txt	tr.diyanet/9146			Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana 9146, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/hatay.txt	tr.diyanet/20089			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay 20089, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/karaman.txt	tr.diyanet/9587			Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman 9587, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/canakkale.txt	tr.diyanet/9352			Europe/Istanbul	F+E S D A M I	daily	standard	test	Çanakkale 9352, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/hakkari.txt	tr.diyanet/9507			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hakkâri 9507, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/kars.txt	tr.diyanet/9594			Europe/Istanbul	F+E S D A M I	daily	standard	test	Kars 9594, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/igdir.txt	tr.diyanet/9522			Europe/Istanbul	F+E S D A M I	daily	standard	test	Iğdır 9522, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/erzurum.txt	tr.diyanet/9451			Europe/Istanbul	F+E S D A M I	daily	standard	test	Erzurum 9451, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/antalya.txt	tr.diyanet	36.90812	30.69556	Europe/Istanbul	F+E S D A M I	daily	standard	test	Antalya 9225, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/bursa.txt	tr.diyanet	40.19559	29.06013	Europe/Istanbul	F+E S D A M I	daily	standard	test	Bursa 9335, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/diyarbakir.txt	tr.diyanet	37.91363	40.21721	Europe/Istanbul	F+E S D A M I	daily	standard	test	Diyarbakır 9402, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/gaziantep.txt	tr.diyanet	37.05944	37.3825	Europe/Istanbul	F+E S D A M I	daily	standard	test	Gaziantep 9479, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/izmir.txt	tr.diyanet	38.41273	27.13838	Europe/Istanbul	F+E S D A M I	daily	standard	test	İzmir 9560, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/konya.txt	tr.diyanet	37.87135	32.48464	Europe/Istanbul	F+E S D A M I	daily	standard	test	Konya 9676, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/catalca.txt	tr.diyanet	41.14073	28.45967	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Çatalca 9538, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/sile.txt	tr.diyanet	41.17891	29.61085	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Şile 9547, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/silivri.txt	tr.diyanet	41.07393	28.24644	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Silivri 9548, at the app's point (edge), the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/istanbul.txt	other.turkey	41.012	28.974	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul at Diyanet's point, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/ankara.txt	other.turkey	39.938	32.848	Europe/Istanbul	F+E S D A M I	daily	standard	test	Ankara at Diyanet's point, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/tekirdag.txt	other.turkey	40.973	27.511	Europe/Istanbul	F+E S D A M I	daily	standard	test	Tekirdağ at Diyanet's point, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/adana.txt	other.turkey	36.987	35.326	Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana at Diyanet's point, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/hatay.txt	other.turkey	36.2	36.153	Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay at Diyanet's point, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-09-28/karaman.txt	other.turkey	37.181	33.214	Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman at Diyanet's point, the monitor capture of 28 Sep 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/istanbul.txt	tr.diyanet/9541			Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul 9541, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/ankara.txt	tr.diyanet/9206			Europe/Istanbul	F+E S D A M I	daily	standard	test	Ankara 9206, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/tekirdag.txt	tr.diyanet/9879			Europe/Istanbul	F+E S D A M I	daily	standard	test	Tekirdağ 9879, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/edirne.txt	tr.diyanet/9419			Europe/Istanbul	F+E S D A M I	daily	standard	test	Edirne 9419, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/van.txt	tr.diyanet/9930			Europe/Istanbul	F+E S D A M I	daily	standard	test	Van 9930, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/adana.txt	tr.diyanet/9146			Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana 9146, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/hatay.txt	tr.diyanet/20089			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay 20089, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/karaman.txt	tr.diyanet/9587			Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman 9587, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/canakkale.txt	tr.diyanet/9352			Europe/Istanbul	F+E S D A M I	daily	standard	test	Çanakkale 9352, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/hakkari.txt	tr.diyanet/9507			Europe/Istanbul	F+E S D A M I	daily	standard	test	Hakkâri 9507, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/kars.txt	tr.diyanet/9594			Europe/Istanbul	F+E S D A M I	daily	standard	test	Kars 9594, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/igdir.txt	tr.diyanet/9522			Europe/Istanbul	F+E S D A M I	daily	standard	test	Iğdır 9522, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/erzurum.txt	tr.diyanet/9451			Europe/Istanbul	F+E S D A M I	daily	standard	test	Erzurum 9451, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/antalya.txt	tr.diyanet	36.90812	30.69556	Europe/Istanbul	F+E S D A M I	daily	standard	test	Antalya 9225, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/bursa.txt	tr.diyanet	40.19559	29.06013	Europe/Istanbul	F+E S D A M I	daily	standard	test	Bursa 9335, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/diyarbakir.txt	tr.diyanet	37.91363	40.21721	Europe/Istanbul	F+E S D A M I	daily	standard	test	Diyarbakır 9402, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/gaziantep.txt	tr.diyanet	37.05944	37.3825	Europe/Istanbul	F+E S D A M I	daily	standard	test	Gaziantep 9479, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/izmir.txt	tr.diyanet	38.41273	27.13838	Europe/Istanbul	F+E S D A M I	daily	standard	test	İzmir 9560, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/konya.txt	tr.diyanet	37.87135	32.48464	Europe/Istanbul	F+E S D A M I	daily	standard	test	Konya 9676, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/catalca.txt	tr.diyanet	41.14073	28.45967	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Çatalca 9538, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/sile.txt	tr.diyanet	41.17891	29.61085	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Şile 9547, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/silivri.txt	tr.diyanet	41.07393	28.24644	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul's Silivri 9548, at the app's point (edge), the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/istanbul.txt	other.turkey	41.012	28.974	Europe/Istanbul	F+E S D A M I	daily	standard	test	İstanbul at Diyanet's point, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/ankara.txt	other.turkey	39.938	32.848	Europe/Istanbul	F+E S D A M I	daily	standard	test	Ankara at Diyanet's point, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/tekirdag.txt	other.turkey	40.973	27.511	Europe/Istanbul	F+E S D A M I	daily	standard	test	Tekirdağ at Diyanet's point, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/adana.txt	other.turkey	36.987	35.326	Europe/Istanbul	F+E S D A M I	daily	standard	test	Adana at Diyanet's point, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/hatay.txt	other.turkey	36.2	36.153	Europe/Istanbul	F+E S D A M I	daily	standard	test	Hatay at Diyanet's point, the monitor capture of 2 Oct 2026
+archive/tables/pinned/tr-diyanet/2026-10-02/karaman.txt	other.turkey	37.181	33.214	Europe/Istanbul	F+E S D A M I	daily	standard	test	Karaman at Diyanet's point, the monitor capture of 2 Oct 2026

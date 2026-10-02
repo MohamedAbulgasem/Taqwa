@@ -12,7 +12,13 @@
 # fitted on their own days (nothing held out there).
 # The weekly monitor's capture of 28 Sep 2026 (Dar al-Ifta's September 2026 month table for all 30 towns)
 # prints the same minutes as the rows above on every day both hold; only Dahab's adds days (the round held
-# its 25 September alone), so only Dahab's is a row, held out. No capture holds October yet.
+# its 25 September alone), so only Dahab's is a row, held out. Its row reads the capture re-parsed and pinned
+# as it was then (archive/tables/pinned/eg-esa/2026-09-28/), since the monitor's own files grow with each fetch.
+# The monitor's capture of 2 Oct 2026 adds October 2026 for all 30 towns. Egypt's clock goes back on 30 October,
+# Dhuhr then falls before noon, and the page labels it م: the fetcher's first reading took it for night (720 min
+# "early" at 27 towns); egypt.py now places each prayer in its own half of the day, and both captures,
+# re-parsed with it, are pinned together (archive/tables/pinned/eg-esa/2026-10-02/: September and October 2026,
+# the same minutes as before everywhere but those two Dhuhrs). A row each, at its unit, held out.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-gulf-egypt/off-eg-cairo.txt	eg.esa/cairo			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Cairo, 2025–2026
 archive/tables/round/data-gulf-egypt/off-eg-alexandria.txt	eg.esa/alexandria			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	fit	Alexandria, 2025–2026
@@ -44,4 +50,34 @@ archive/tables/round/data-gulf-egypt/off-eg-nuweiba.txt	eg.esa/nuweiba			Africa/
 archive/tables/round/data-gulf-egypt/off-eg-catherine.txt	eg.esa/saint-catherine			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Saint Catherine (about 1,600 m), 2025–2026 (the unit at its town centre)
 archive/tables/round/data-gulf-egypt/off-eg-farafra.txt	eg.esa/farafra			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Farafra, 2025–2026 (the unit at its town centre)
 archive/tables/round/data-gulf-egypt/off-eg-shalatin.txt	eg.esa/shalatin			Africa/Cairo	F+E S D A M I	daily-from-2025	standard	test	Shalatin, 2025–2026 (the unit at its town centre)
-archive/tables/monitor/eg-esa/dahab.txt	eg.esa/dahab			Africa/Cairo	F+E S D A M I	daily	standard	test	Dahab, September 2026, the monitor capture of 28 Sep 2026 (the unit at its town centre)
+archive/tables/pinned/eg-esa/2026-09-28/dahab.txt	eg.esa/dahab			Africa/Cairo	F+E S D A M I	daily	standard	test	Dahab, September 2026, the monitor capture of 28 Sep 2026 (the unit at its town centre)
+archive/tables/pinned/eg-esa/2026-10-02/cairo.txt	eg.esa/cairo			Africa/Cairo	F+E S D A M I	daily	standard	test	Cairo, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/alexandria.txt	eg.esa/alexandria			Africa/Cairo	F+E S D A M I	daily	standard	test	Alexandria, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/aswan.txt	eg.esa/aswan			Africa/Cairo	F+E S D A M I	daily	standard	test	Aswan, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/sallum.txt	eg.esa/sallum			Africa/Cairo	F+E S D A M I	daily	standard	test	Sallum, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/halaib.txt	eg.esa/halaib			Africa/Cairo	F+E S D A M I	daily	standard	test	Halaib, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/rafah.txt	eg.esa/rafah			Africa/Cairo	F+E S D A M I	daily	standard	test	Rafah, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/luxor.txt	eg.esa/luxor			Africa/Cairo	F+E S D A M I	daily	standard	test	Luxor, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/port-said.txt	eg.esa/port-said			Africa/Cairo	F+E S D A M I	daily	standard	test	Port Said, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/edfu.txt	eg.esa/edfu			Africa/Cairo	F+E S D A M I	daily	standard	test	Edfu, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/damietta.txt	eg.esa/damietta			Africa/Cairo	F+E S D A M I	daily	standard	test	Damietta, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/suez.txt	eg.esa/suez			Africa/Cairo	F+E S D A M I	daily	standard	test	Suez, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/kharga.txt	eg.esa/kharga			Africa/Cairo	F+E S D A M I	daily	standard	test	Kharga, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (its own margins)
+archive/tables/pinned/eg-esa/2026-10-02/ras-gharib.txt	eg.esa/ras-gharib			Africa/Cairo	F+E S D A M I	daily	standard	test	Ras Gharib, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (its own margins)
+archive/tables/pinned/eg-esa/2026-10-02/taba.txt	eg.esa/taba			Africa/Cairo	F+E S D A M I	daily	standard	test	Taba, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (its own margins)
+archive/tables/pinned/eg-esa/2026-10-02/el-arish.txt	eg.esa/el-arish			Africa/Cairo	F+E S D A M I	daily	standard	test	El Arish, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/marsa-matruh.txt	eg.esa/marsa-matruh			Africa/Cairo	F+E S D A M I	daily	standard	test	Marsa Matruh, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/sidi-barrani.txt	eg.esa/sidi-barrani			Africa/Cairo	F+E S D A M I	daily	standard	test	Sidi Barrani, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/siwa.txt	eg.esa/siwa			Africa/Cairo	F+E S D A M I	daily	standard	test	Siwa, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/sharm-el-sheikh.txt	eg.esa/sharm-el-sheikh			Africa/Cairo	F+E S D A M I	daily	standard	test	Sharm El Sheikh, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/hurghada.txt	eg.esa/hurghada			Africa/Cairo	F+E S D A M I	daily	standard	test	Hurghada, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/mut.txt	eg.esa/mut			Africa/Cairo	F+E S D A M I	daily	standard	test	Mut, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/bawiti.txt	eg.esa/bawiti			Africa/Cairo	F+E S D A M I	daily	standard	test	Bawiti, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/quseir.txt	eg.esa/quseir			Africa/Cairo	F+E S D A M I	daily	standard	test	Quseir, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/el-tor.txt	eg.esa/el-tor			Africa/Cairo	F+E S D A M I	daily	standard	test	El Tor, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/el-dabaa.txt	eg.esa/el-dabaa			Africa/Cairo	F+E S D A M I	daily	standard	test	El Dabaa, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed)
+archive/tables/pinned/eg-esa/2026-10-02/dahab.txt	eg.esa/dahab			Africa/Cairo	F+E S D A M I	daily	standard	test	Dahab, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (the unit at its town centre)
+archive/tables/pinned/eg-esa/2026-10-02/nuweiba.txt	eg.esa/nuweiba			Africa/Cairo	F+E S D A M I	daily	standard	test	Nuweiba, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (the unit at its town centre)
+archive/tables/pinned/eg-esa/2026-10-02/saint-catherine.txt	eg.esa/saint-catherine			Africa/Cairo	F+E S D A M I	daily	standard	test	Saint Catherine (about 1,600 m), September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (the unit at its town centre)
+archive/tables/pinned/eg-esa/2026-10-02/farafra.txt	eg.esa/farafra			Africa/Cairo	F+E S D A M I	daily	standard	test	Farafra, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (the unit at its town centre)
+archive/tables/pinned/eg-esa/2026-10-02/shalatin.txt	eg.esa/shalatin			Africa/Cairo	F+E S D A M I	daily	standard	test	Shalatin, September–October 2026, the monitor's captures of 28 Sep and 2 Oct 2026 (re-parsed) (the unit at its town centre)
