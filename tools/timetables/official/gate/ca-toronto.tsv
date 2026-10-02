@@ -8,6 +8,13 @@
 # - ca.toronto (cautious): the three tables at each mosque's point, where each start is checked against
 #   the latest of the three and each end against the earliest; and in the GTA's west (Mississauga,
 #   Brampton, Milton at the tables' reach) and east (Oshawa), July to December.
+# The monitor's captures of 2 Oct 2026 (fetchers/toronto.py: IFT's year CSV, IIT's month tables, MAC's Mawaqit calendar,
+# 1 October - 31 December 2026), read from copies pinned as they were (archive/tables/pinned/ca-toronto/2026-10-02/), each
+# at its unit and as ca.toronto's member at the six points above. IFT's capture leaves out its own faults, as its split
+# files do: 1-6 November (daylight time kept) and 28-30 November (Isha 5 min after its neighbours). IIT's and MAC's hold
+# every day and are read whole at their units; as ca.toronto's members they leave out IFT's fault days too, as the split
+# files do (split-7g/<mosque>-2026-q4-capture.txt), since a capped Maghrib follows IFT's table, which those days lack.
+# On every day both hold, each capture prints the same minutes as the split files.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h1.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	fit	IFT January-June 2026
 archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	test	IFT July-December 2026
@@ -39,3 +46,24 @@ archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toro
 archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	hanafi	test	Oshawa, the GTA's east	ca.ift
 archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	standard	test	Oshawa, the GTA's east	ca.iit
 archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	standard	test	Oshawa, the GTA's east	ca.mac
+archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	test	IFT October-December 2026, the monitor capture of 2 Oct 2026
+archive/tables/pinned/ca-toronto/2026-10-02/iit-2026.txt	ca.iit/ca.iit			America/Toronto	F+E S D A M I	daily	standard	test	IIT October-December 2026, the monitor capture of 2 Oct 2026
+archive/tables/pinned/ca-toronto/2026-10-02/mac-2026.txt	ca.mac/ca.mac			America/Toronto	F+E S D A M I	daily	standard	test	MAC October-December 2026, the monitor capture of 2 Oct 2026
+archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	hanafi	test	at IFT, IFT (the monitor capture of 2 Oct 2026)	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-q4-capture.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	standard	test	at IFT, IIT (the monitor capture of 2 Oct 2026)	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-q4-capture.txt	ca.toronto	43.7980	-79.2417	America/Toronto	F+E S D A M I	daily	standard	test	at IFT, MAC (the monitor capture of 2 Oct 2026)	ca.mac
+archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	hanafi	test	at MAC, IFT (the monitor capture of 2 Oct 2026)	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-q4-capture.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	standard	test	at MAC, IIT (the monitor capture of 2 Oct 2026)	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-q4-capture.txt	ca.toronto	43.6555	-79.3858	America/Toronto	F+E S D A M I	daily	standard	test	at MAC, MAC (the monitor capture of 2 Oct 2026)	ca.mac
+archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	ca.toronto	43.5890	-79.6441	America/Toronto	F+E S D A M I	daily	hanafi	test	Mississauga, IFT (the monitor capture of 2 Oct 2026)	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-q4-capture.txt	ca.toronto	43.5890	-79.6441	America/Toronto	F+E S D A M I	daily	standard	test	Mississauga, IIT (the monitor capture of 2 Oct 2026)	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-q4-capture.txt	ca.toronto	43.5890	-79.6441	America/Toronto	F+E S D A M I	daily	standard	test	Mississauga, MAC (the monitor capture of 2 Oct 2026)	ca.mac
+archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	ca.toronto	43.6834	-79.7663	America/Toronto	F+E S D A M I	daily	hanafi	test	Brampton, IFT (the monitor capture of 2 Oct 2026)	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-q4-capture.txt	ca.toronto	43.6834	-79.7663	America/Toronto	F+E S D A M I	daily	standard	test	Brampton, IIT (the monitor capture of 2 Oct 2026)	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-q4-capture.txt	ca.toronto	43.6834	-79.7663	America/Toronto	F+E S D A M I	daily	standard	test	Brampton, MAC (the monitor capture of 2 Oct 2026)	ca.mac
+archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	ca.toronto	43.5183	-79.8774	America/Toronto	F+E S D A M I	daily	hanafi	test	Milton, the GTA's far west, IFT (the monitor capture of 2 Oct 2026)	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-q4-capture.txt	ca.toronto	43.5183	-79.8774	America/Toronto	F+E S D A M I	daily	standard	test	Milton, the GTA's far west, IIT (the monitor capture of 2 Oct 2026)	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-q4-capture.txt	ca.toronto	43.5183	-79.8774	America/Toronto	F+E S D A M I	daily	standard	test	Milton, the GTA's far west, MAC (the monitor capture of 2 Oct 2026)	ca.mac
+archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	hanafi	test	Oshawa, the GTA's east, IFT (the monitor capture of 2 Oct 2026)	ca.ift
+archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-q4-capture.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	standard	test	Oshawa, the GTA's east, IIT (the monitor capture of 2 Oct 2026)	ca.iit
+archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-q4-capture.txt	ca.toronto	43.8971	-78.8658	America/Toronto	F+E S D A M I	daily	standard	test	Oshawa, the GTA's east, MAC (the monitor capture of 2 Oct 2026)	ca.mac

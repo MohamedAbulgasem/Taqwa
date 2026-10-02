@@ -2027,3 +2027,49 @@ with the archive (ProvenTest's Cairo and İstanbul cases now pin October), the s
 golden-vector and Diyanet tests, `checkStamps`, `build.py --check` (158 pages, 137 of them prayer
 times for 53 cities), `site/test_timetables.py` (18), and every new city's English page at a true
 390 px — Cape Town, İstanbul, Cairo and Oslo whole, the rest at the top.
+
+## The new sources' first tables, gated (2 October, evening)
+
+The monitor's new fetchers' captures of 2 October, each read from a copy pinned as it was
+(`archive/tables/pinned/<source>/2026-10-02/`). **26 new rows, all held out:**
+
+- **jo.awqaf (1):** the ministry's region table (Amman, Balqa, Zarqa, Madaba), 2 October – 31 December
+  2026, at jo-awqaf.tsv's Amman point. Zarqa's capture is the same table line for line, so it has no
+  row of its own; Zarqa is in the Amman unit. Within class A's 1 min on every day.
+- **be.cautious (1):** EMB's held 2026 table, 26 October – 1 November, at Brussels beside Diyanet's
+  pinned captures (`split-7g/emb-2026-q4-late.txt`). A row over EMB's whole remainder (to 31 December)
+  failed from 2 November: with Diyanet's table not held on those days, the cautious start is measured
+  against EMB's alone, and the later member's Dhuhr and Asr (and EMB's sunrise against the earlier
+  one) read 4–6 min over class C's 1. The engine is not at fault, and no limit was moved. The row was
+  cut to the days both members hold, as emb-2026-q4.txt is. EMB's November waits for Diyanet's.
+- **ca.toronto (21):** IFT's, IIT's and MAC's October–December at their units and as members at the six
+  points. On every day both hold, each prints the same minutes as the held split files. IIT and MAC
+  are read whole at their units, so ca.iit and ca.mac are now checked through 31 December with no
+  November hole. As ca.toronto's members they leave out IFT's fault days, as the split files do
+  (`split-7g/<mosque>-2026-q4-capture.txt`): read whole, 28 capped Maghribs on 1–6 November went
+  unchecked, since the cap follows IFT's table, which those days lack.
+- **us.chicago (3):** Makki and DarusSalam Lombard (the 18° block) and the Mosque Foundation (us.isna),
+  October – December, at their points.
+
+IRN's capture is the held 2026 calendars unchanged, so it adds no row. Whole gate: 828 rows,
+157,851 place-days, 0 early, 0 late ends, none over its limit, nothing broken. The golden vector is
+unchanged, and ProofStamps.kt is regenerated.
+
+**The cities.** The rule over every row on 2 October publishes 55 cities, Brussels and Antwerp the
+new ones, each showing October alone. Antwerp's EMB days come from the Brussels rows, 42 km away,
+within class C's reach. November waits on Diyanet's Brussels and Antwerpen tables, which end on
+1 November. Chicago now shows October and November: each member is checked at Chicago through
+December (the 18° block by Villa Park's year, Makki and DarusSalam; us.isna by the Mosque
+Foundation). MCC's, MEC's and Orland Park's own tables still lack November. Toronto and Mississauga
+show October alone. November is checked for all three members except IFT's fault days, 1–6 and
+28–30 November, so it would show if those days did not block.
+
+Amman and Zarqa are un-held, but the generator holds both until 1 November. The ministry's table
+starts on the day it was fetched, so 1 October is not checked. From 1 November they show November
+and December. Their pages were looked at from a build dated 1 November: Amman in English and Arabic,
+Zarqa in English.
+
+Checked: tools jvmTest 267/0 with the archive. The shared stamp, About and golden-vector tests passed
+(25/0), and so did `checkStamps`. `build.py --check` passed (164 pages, 143 of them prayer times for
+55 cities), and `site/test_timetables.py` passed (18). Brussels and Chicago were looked at whole at a
+true 390 px, and Antwerp at the top.

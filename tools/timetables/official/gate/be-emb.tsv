@@ -12,6 +12,10 @@
 # The monitor's captures are read from copies pinned as they were (archive/tables/pinned/tr-diyanet-europe/<date>/):
 # 28 Sep 2026 and 2 Oct 2026 (Brussels, Antwerpen and Gent: 29 Sep – 1 Nov 2026 and 2027, the same minutes on every
 # day both hold; it adds 30 October – 1 November), each row as the one before it.
+# be.cautious at Brussels, EMB's later days (the refresh of 2 Oct 2026): 26 October - 1 November 2026, the dates Diyanet's
+# pinned Brussels capture of 2 Oct 2026 also holds, sliced from the held table (split-7g/emb-2026-q4-late.txt), at EMB's
+# point. EMB's days after 1 November wait for Diyanet's: a cautious start is measured against the latest member's printed
+# time, and with EMB's table alone its later member (Diyanet's Dhuhr and Asr) reads as lateness over class C's limit.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/split-7g/emb-2026-h1.txt	be.emb/be.emb			Europe/Brussels	F+E S D A M I	daily	standard	fit	EMB January-June 2026
 archive/tables/moral-auth-world/europe/split-7g/emb-2026-h2.txt	be.emb/be.emb			Europe/Brussels	F+E S D A M I	daily	standard	test	EMB July-December 2026
@@ -24,3 +28,4 @@ archive/tables/pinned/tr-diyanet-europe/2026-09-28/brussels.txt	be.cautious	50.8
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/antwerpen.txt	be.cautious	51.2194	4.4025	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Antwerpen (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/gent.txt	be.cautious	51.0543	3.7174	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Gent (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/brussels.txt	be.cautious	50.8467	4.3525	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Brussels (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/split-7g/emb-2026-q4-late.txt	be.cautious	50.8467	4.3525	Europe/Brussels	F+E S D A M I	daily	standard	test	EMB, 26 October-1 November 2026	be.emb

@@ -7,66 +7,66 @@
   "first": "2025-10-01",
   "last": "2026-12-31",
   "checked": ["2025-10-01..2025-10-31", "2025-12-01..2026-12-31"],
-  "placeDays": 1101,
-  "heldOutDays": 1101,
+  "placeDays": 1253,
+  "heldOutDays": 1253,
   "ramadanDays": 30,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 1101,
+      "checked": 1253,
       "early": 0,
       "late": {
-        "0": 36,
-        "1": 185,
+        "0": 55,
+        "1": 196,
         "2": 242,
-        "3+": 638
+        "3+": 760
       },
-      "exactShare": 0.0327,
+      "exactShare": 0.0439,
       "worstLate": 31,
       "lateLimit": 31,
       "lateLimitFrom": "entry us.chicago",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 1101,
+      "checked": 1253,
       "lateEnd": 0,
       "late": {
         "0": 52,
         "1": 281,
-        "2": 722,
-        "3+": 46
+        "2": 859,
+        "3+": 61
       },
-      "exactShare": 0.0472,
+      "exactShare": 0.0415,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "entry us.chicago",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 1101,
+      "checked": 1253,
       "early": 0,
       "late": {
-        "0": 29,
-        "1": 76,
+        "0": 39,
+        "1": 96,
         "2": 17,
-        "3+": 979
+        "3+": 1101
       },
-      "exactShare": 0.0263,
+      "exactShare": 0.0311,
       "worstLate": 6,
       "lateLimit": 6,
       "lateLimitFrom": "entry us.chicago",
       "overLimit": 0
     },
     "asrHanafi": {
-      "checked": 1101,
+      "checked": 1253,
       "early": 0,
       "late": {
         "0": 0,
         "1": 7,
-        "2": 281,
-        "3+": 813
+        "2": 318,
+        "3+": 928
       },
       "exactShare": 0,
       "worstLate": 5,
@@ -75,13 +75,13 @@
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 1101,
+      "checked": 1253,
       "early": 0,
       "late": {
         "0": 0,
-        "1": 33,
-        "2": 216,
-        "3+": 852
+        "1": 34,
+        "2": 248,
+        "3+": 971
       },
       "exactShare": 0,
       "worstLate": 6,
@@ -90,13 +90,13 @@
       "overLimit": 0
     },
     "isha": {
-      "checked": 1101,
+      "checked": 1253,
       "early": 0,
       "late": {
         "0": 0,
         "1": 0,
-        "2": 174,
-        "3+": 927
+        "2": 196,
+        "3+": 1057
       },
       "exactShare": 0,
       "worstLate": 5,
@@ -105,15 +105,15 @@
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 1101,
+      "checked": 1253,
       "lateEnd": 0,
       "late": {
         "0": 15,
-        "1": 129,
-        "2": 225,
-        "3+": 732
+        "1": 156,
+        "2": 308,
+        "3+": 774
       },
-      "exactShare": 0.0136,
+      "exactShare": 0.012,
       "worstLate": 32,
       "lateLimit": 32,
       "lateLimitFrom": "entry us.chicago",
@@ -121,62 +121,62 @@
     }
   },
   "heldOut": {
-    "placeDays": 1101,
+    "placeDays": 1253,
     "ramadanDays": 30,
     "events": {
       "fajr": {
-        "checked": 1101,
+        "checked": 1253,
         "early": 0,
         "late": {
-          "0": 36,
-          "1": 185,
+          "0": 55,
+          "1": 196,
           "2": 242,
-          "3+": 638
+          "3+": 760
         },
-        "exactShare": 0.0327,
+        "exactShare": 0.0439,
         "worstLate": 31,
         "lateLimit": 31,
         "lateLimitFrom": "entry us.chicago",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 1101,
+        "checked": 1253,
         "lateEnd": 0,
         "late": {
           "0": 52,
           "1": 281,
-          "2": 722,
-          "3+": 46
+          "2": 859,
+          "3+": 61
         },
-        "exactShare": 0.0472,
+        "exactShare": 0.0415,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "entry us.chicago",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 1101,
+        "checked": 1253,
         "early": 0,
         "late": {
-          "0": 29,
-          "1": 76,
+          "0": 39,
+          "1": 96,
           "2": 17,
-          "3+": 979
+          "3+": 1101
         },
-        "exactShare": 0.0263,
+        "exactShare": 0.0311,
         "worstLate": 6,
         "lateLimit": 6,
         "lateLimitFrom": "entry us.chicago",
         "overLimit": 0
       },
       "asrHanafi": {
-        "checked": 1101,
+        "checked": 1253,
         "early": 0,
         "late": {
           "0": 0,
           "1": 7,
-          "2": 281,
-          "3+": 813
+          "2": 318,
+          "3+": 928
         },
         "exactShare": 0,
         "worstLate": 5,
@@ -185,13 +185,13 @@
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 1101,
+        "checked": 1253,
         "early": 0,
         "late": {
           "0": 0,
-          "1": 33,
-          "2": 216,
-          "3+": 852
+          "1": 34,
+          "2": 248,
+          "3+": 971
         },
         "exactShare": 0,
         "worstLate": 6,
@@ -200,13 +200,13 @@
         "overLimit": 0
       },
       "isha": {
-        "checked": 1101,
+        "checked": 1253,
         "early": 0,
         "late": {
           "0": 0,
           "1": 0,
-          "2": 174,
-          "3+": 927
+          "2": 196,
+          "3+": 1057
         },
         "exactShare": 0,
         "worstLate": 5,
@@ -215,15 +215,15 @@
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 1101,
+        "checked": 1253,
         "lateEnd": 0,
         "late": {
           "0": 15,
-          "1": 129,
-          "2": 225,
-          "3+": 732
+          "1": 156,
+          "2": 308,
+          "3+": 774
         },
-        "exactShare": 0.0136,
+        "exactShare": 0.012,
         "worstLate": 32,
         "lateLimit": 32,
         "lateLimitFrom": "entry us.chicago",
@@ -235,13 +235,13 @@
     "uncheckedDays": 0,
     "members": {
       "us.chicago.eighteen": {
-        "days": 609,
+        "days": 731,
         "cappedDays": 0,
         "leastGap": 1,
         "mostGap": 6
       },
       "us.isna": {
-        "days": 492,
+        "days": 522,
         "cappedDays": 0,
         "leastGap": 1,
         "mostGap": 6
@@ -253,15 +253,15 @@
       "checked": ["2025-10-01..2025-10-31", "2025-12-01..2026-12-31"],
       "points": {
         "41.8898,-87.989": ["2026-01-01..2026-12-31"],
-        "41.9028,-88.047": ["2025-10-01..2025-10-31", "2025-12-01..2025-12-31", "2026-06-01..2026-06-30", "2026-09-01..2026-09-30"],
-        "41.9704,-87.7144": ["2026-06-01..2026-06-30", "2026-09-01..2026-10-31", "2026-12-01..2026-12-31"]
+        "41.9028,-88.047": ["2025-10-01..2025-10-31", "2025-12-01..2025-12-31", "2026-06-01..2026-06-30", "2026-09-01..2026-12-31"],
+        "41.9704,-87.7144": ["2026-06-01..2026-06-30", "2026-09-01..2026-12-31"]
       }
     },
     "us.isna": {
-      "checked": ["2025-10-01..2025-10-31", "2025-12-01..2026-01-02", "2026-06-01..2026-06-30", "2026-09-01..2026-10-31", "2026-12-01..2026-12-31"],
+      "checked": ["2025-10-01..2025-10-31", "2025-12-01..2026-01-02", "2026-06-01..2026-06-30", "2026-09-01..2026-12-31"],
       "points": {
         "41.5896,-87.8724": ["2025-10-01..2025-10-31", "2025-12-01..2025-12-31", "2026-06-01..2026-06-30", "2026-09-01..2026-09-30"],
-        "41.7229,-87.803": ["2026-06-01..2026-06-30", "2026-09-01..2026-10-31", "2026-12-01..2026-12-31"],
+        "41.7229,-87.803": ["2026-06-01..2026-06-30", "2026-09-01..2026-12-31"],
         "41.9603,-87.7291": ["2025-12-01..2026-01-02", "2026-06-01..2026-06-30", "2026-09-01..2026-10-31"],
         "42.0381,-87.7708": ["2025-12-01..2026-01-02", "2026-06-01..2026-06-30", "2026-09-01..2026-10-31"]
       }

@@ -259,7 +259,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "ca.iit",
             places = 1,
-            placeDays = 350,
+            placeDays = 359,
             ramadanDays = 25,
             provenThrough = "2026-12-31",
             worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 4, "maghrib" to 4, "sunrise" to 4),
@@ -288,7 +288,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "ca.mac",
             places = 1,
-            placeDays = 350,
+            placeDays = 359,
             ramadanDays = 25,
             provenThrough = "2026-12-31",
             worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
@@ -589,9 +589,9 @@ object ProofStamps {
         ProofStamp(
             entryId = "jo.awqaf",
             places = 1,
-            placeDays = 80,
+            placeDays = 171,
             ramadanDays = 2,
-            provenThrough = "2025-12-27",
+            provenThrough = "2026-12-31",
             worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
             worstLateByUnit = mapOf(
                 "jo.awqaf.amman" to mapOf("asrStandard" to 1, "dhuhr" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
@@ -1243,7 +1243,7 @@ object ProofStamps {
         ProofStamp(
             entryId = "us.chicago",
             places = 7,
-            placeDays = 1101,
+            placeDays = 1253,
             ramadanDays = 30,
             provenThrough = "2026-12-31",
             worstLateMinutes = mapOf("asrHanafi" to 5, "dhuhr" to 6, "endOfEating" to 32, "fajr" to 31, "isha" to 5, "maghrib" to 6, "sunrise" to 3),

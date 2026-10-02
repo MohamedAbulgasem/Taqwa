@@ -3,6 +3,9 @@
 # Bridgeview, the Prayer Center of Orland Park), all Hanafi. Each table is its own mosque's (the research's index), each
 # checked against its own member; none prints an imsak, so each Fajr is also the start of the fast. Every row is held
 # out (a cautious entry has no margins of its own). Downtown Islamic Center's one-day capture is not used.
+# The monitor's Masjidal captures of 2 Oct 2026 (fetchers/masjidal.py: Makki, DarusSalam Lombard and the Mosque Foundation,
+# 1 October - 31 December 2026), read from copies pinned as they were (archive/tables/pinned/us-chicago/2026-10-02/), each at
+# its mosque's point as its member, as the rows above. The other four mosques' tables are read by hand (us-chicago-print).
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/namerica/us-east/islamic-foundation-villa-park.txt	us.chicago	41.8898	-87.9890	America/Chicago	F+E S D A M I	daily	hanafi	test	Islamic Foundation, Villa Park, IL	us.chicago.eighteen
 archive/tables/moral-auth-world/namerica/us-east/makki-masjid-chicago.txt	us.chicago	41.9704	-87.7144	America/Chicago	F+E S D A M I	daily	hanafi	test	Makki Masjid, Chicago (Albany Park), IL	us.chicago.eighteen
@@ -11,3 +14,6 @@ archive/tables/moral-auth-world/namerica/us-east/mcc-chicago.txt	us.chicago	41.9
 archive/tables/moral-auth-world/namerica/us-east/mec-morton-grove.txt	us.chicago	42.0381	-87.7708	America/Chicago	F+E S D A M I	daily	hanafi	test	Muslim Education Center (MEC), Morton Grove, IL	us.isna
 archive/tables/moral-auth-world/namerica/us-east/mosque-foundation-bridgeview.txt	us.chicago	41.7229	-87.8030	America/Chicago	F+E S D A M I	daily	hanafi	test	Mosque Foundation, Bridgeview, IL	us.isna
 archive/tables/moral-auth-world/namerica/us-east/oppc-orland-park.txt	us.chicago	41.5896	-87.8724	America/Chicago	F+E S D A M I	daily	hanafi	test	The Prayer Center of Orland Park, Orland Park, IL	us.isna
+archive/tables/pinned/us-chicago/2026-10-02/makki-masjid-chicago.txt	us.chicago	41.9704	-87.7144	America/Chicago	F+E S D A M I	daily	hanafi	test	Makki Masjid, Chicago (Albany Park), IL: its Masjidal table, the monitor capture of 2 Oct 2026	us.chicago.eighteen
+archive/tables/pinned/us-chicago/2026-10-02/masjid-darussalam-lombard.txt	us.chicago	41.9028	-88.0470	America/Chicago	F+E S D A M I	daily	hanafi	test	Masjid DarusSalam, Lombard, IL: its Masjidal table, the monitor capture of 2 Oct 2026	us.chicago.eighteen
+archive/tables/pinned/us-chicago/2026-10-02/mosque-foundation-bridgeview.txt	us.chicago	41.7229	-87.8030	America/Chicago	F+E S D A M I	daily	hanafi	test	Mosque Foundation, Bridgeview, IL: its Masjidal table, the monitor capture of 2 Oct 2026	us.isna

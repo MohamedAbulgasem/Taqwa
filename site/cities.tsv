@@ -55,9 +55,12 @@ doha-qatar	290030	en ar ur bn
 muscat-oman	287286	en ar ur
 # held: Salalah — outside om.mara's checked unit (class D).
 # salalah-oman	286621	en ar		en=Salalah
-# held: Jordan — jo.awqaf's stamp ends 27 December 2025 (Amman, Zarqa); Irbid is outside its checked units (class D).
-# amman-jordan	250441	en ar	ar
-# zarqa-jordan	250090	en ar		ar=الزرقاء
+# Jordan: the Ministry of Awqaf (jo.awqaf, class A) at Amman and Zarqa, its one table for Amman, Balqa, Zarqa and Madaba.
+# Its 2026 days are checked from 2 October (the monitor's first capture), so October, which lacks its 1st, is never shown:
+# the generator holds both until 1 November, when they show November and December.
+amman-jordan	250441	en ar	ar
+zarqa-jordan	250090	en ar		ar=الزرقاء
+# held: Jordan — Irbid is outside jo.awqaf's checked units (class D).
 # irbid-jordan	248946	en ar
 # held: Palestine — Gaza's cautious times are not measured at the city; ps.iftaa's stamp ends 19 March 2026 (Hebron, Nablus).
 # gaza-palestine	281133	en ar
@@ -235,7 +238,7 @@ paris-france	2988507	en fr ar	fr
 # toulouse-france	2972315	en fr ar
 # lille-france	2998324	en fr ar
 # strasbourg-france	2973783	en fr tr
-# Belgium: cautious times (be.cautious, class C) at Brussels and Antwerp. The member EMB's held table ends 25 October 2026, so the generator holds both until October's last days are checked for it.
+# Belgium: cautious times (be.cautious, class C) at Brussels and Antwerp. Both members are checked through 1 November 2026 (Diyanet's captures end there, and EMB's table is checked on the same days), so the pages show October alone until November is checked.
 brussels-belgium	2800866	en fr ar	fr
 antwerp-belgium	2803138	en fr ar
 # held: the Netherlands — cautious times (nl.cautious) not measured at the city.
@@ -272,7 +275,7 @@ dublin-ireland	2964574	en ar
 oslo-norway	3143244	en ur
 
 # ---------------------------------------------------------------- Americas
-# Chicago: cautious times (us.chicago, class C).
+# Chicago: cautious times (us.chicago, class C). Both members are checked at Chicago through 31 December 2026 (the 18° block's tables and the Mosque Foundation's for us.isna), so its page shows two months until December.
 chicago-usa	4887398	en ar ur
 # held: United States — ISNA's method not yet fully checked (us.isna, class D).
 # new-york-usa	5128581	en ar ur bn	en bn	en=New York;ar=نيويورك;ur=نیویارک;bn=নিউ ইয়র্ক
