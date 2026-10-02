@@ -21,7 +21,7 @@ from common import Context, FetchError, Http, Table, add_all, nearest_year, norm
 import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
-from fetchers import diyanet, egypt, irn, jakim, kemenag, london, mawaqit, mjc, morocco, muis, qatar  # noqa: E402
+from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, mawaqit, mjc, morocco, muis, qatar  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -1302,3 +1302,151 @@ class IrnSearchList(unittest.TestCase):
         self.assertEqual(1, len(ctx.errors))
         self.assertIn("Oslo month 3", ctx.errors[0])
         self.assertEqual(365 - 31, len(tables[0].rows))
+
+
+# awqaf.gov.jo's PrayerTime form as its markup has it: the region list, the paged table (ten days a page,
+# dd/mm/yyyy, 12-hour times with no AM or PM) and the pager's postback links. Every time invented: the
+# day of the month as the minutes of hours in the day's order (ruling R69).
+JO_HEADER = "".join(f'<th class="headrgv" scope="col"><p style="color: #fff">{h}</p></th>' for h in jordan.HEADER)
+
+
+def jo_page(first, days=10, region="1", label="عمان، البلقاء، الزرقاء، مادبا", offered=(), state="vs0", header=JO_HEADER, cells=None):
+    rows = ""
+    for i in range(days):
+        d = first + dt.timedelta(days=i)
+        times = cells(d) if cells else [f"04:{d.day:02d}", f"05:{d.day:02d}", f"11:{d.day:02d}", f"02:{d.day:02d}", f"05:{d.day:02d}", f"07:{d.day:02d}"]
+        rows += "<tr>" + f"<td><span>{d.day:02d}/{d.month:02d}/{d.year}</span></td>" + "".join(f"<td><span>{t}:00</span></td>" for t in times) + "</tr>"
+    pager = "".join(f"<td><a href=\"javascript:__doPostBack(&#39;ctl00$MainContent$gvWebparts&#39;,&#39;Page${n}&#39;)\">{n}</a></td>" for n in offered)
+    return (f'<form method="post" action="./PrayerTime" id="ctl01"><input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="{state}" />'
+            '<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="ev" />'
+            '<select name="ctl00$MainContent$DropCompany" id="MainContent_DropCompany"><option value="0">الرجاء الاختيار</option>'
+            f'<option selected="selected" value="{region}">{label}</option><option value="6">العقبة</option></select>'
+            '<table class="borderTable" id="MainContent_gvWebparts"><tr align="center">' + header + "</tr>" + rows
+            + f'<tr class="pagerGV"><td colspan="7"><table><tr>{pager}</tr></table></td></tr></table></form>')
+
+
+class JordanHttp:
+    """awqaf.gov.jo under test: the first page on a GET, each postback's page by its argument."""
+
+    def __init__(self, pages):
+        self.pages = pages  # {"GET" or "Page$n": html}
+        self.calls = []
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1, jar=None):
+        self.calls.append((data, jar))
+        key = "GET" if data is None else data["__EVENTARGUMENT"]
+        if key not in self.pages:
+            raise FetchError("HTTP 500")
+        return self.pages[key].encode("utf-8")
+
+    def text(self, url, **kw):
+        return self.get(url, **kw).decode("utf-8")
+
+
+class Jordan(unittest.TestCase):
+    def setUp(self):
+        self.root = tempfile.mkdtemp("jordan")
+        self.addCleanup(shutil.rmtree, self.root)
+        self._pages = jordan.PAGES
+        jordan.PAGES = 3
+        self.addCleanup(setattr, jordan, "PAGES", self._pages)
+
+    def ctx(self, http, today=dt.date(2026, 10, 2)):
+        return Context("jo-awqaf", self.root, today, [].append, self.root, http=http)
+
+    def test_twelve_hour_times_are_read_as_the_days(self):
+        self.assertEqual(["04:07", "05:07", "11:07", "14:07", "17:07", "19:07"], jordan.day_times(["04:07:00", "05:07:00", "11:07:00", "02:07:00", "05:07:00", "07:07:00"]))
+        self.assertEqual("12:30", jordan.day_times(["04:07", "05:07", "12:30", "02:07", "05:07", "07:07"])[2], "a Dhuhr after noon stays")
+        with self.assertRaises(FetchError) as order:
+            jordan.day_times(["04:07", "05:07", "11:07", "06:07", "05:07", "07:07"])
+        self.assertIn("not in the day's order", str(order.exception))
+        with self.assertRaises(FetchError):
+            jordan.day_times(["04:07", "-", "11:07", "02:07", "05:07", "07:07"])
+
+    def test_a_walk_of_the_pager_within_one_session(self):
+        http = JordanHttp({"GET": jo_page(dt.date(2026, 10, 2), offered=(2, 3, 4), state="vs1"),
+                           "Page$2": jo_page(dt.date(2026, 10, 12), offered=(1, 3, 4), state="vs2"),
+                           "Page$3": jo_page(dt.date(2026, 10, 22), offered=(1, 2, 4), state="vs3")})
+        ctx = self.ctx(http)
+        tables = jordan.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+        self.assertEqual(["amman", "zarqa"], [t.key for t in tables])
+        self.assertEqual("jo.awqaf/jo.awqaf.amman", tables[0].entry)
+        self.assertEqual(("jo.awqaf", 32.07275, 36.08796), (tables[1].entry, tables[1].lat, tables[1].lon))
+        self.assertEqual(30, len(tables[0].rows))
+        self.assertEqual(("2026-10-02", "2026-10-31"), (tables[0].first(), tables[0].last()))
+        self.assertEqual(["04:02", "05:02", "11:02", "14:02", "17:02", "19:02"], tables[0].rows["2026-10-02"])
+        self.assertEqual(tables[0].rows, tables[1].rows, "one table for the region")
+        # One cookie jar for the whole walk; each postback carries the previous page's view state.
+        jars = {id(j) for _, j in http.calls}
+        self.assertEqual(1, len(jars))
+        self.assertIsNotNone(http.calls[0][1])
+        self.assertEqual(["vs1", "vs2"], [d["__VIEWSTATE"] for d, _ in http.calls[1:]])
+        self.assertEqual(["Page$2", "Page$3"], [d["__EVENTARGUMENT"] for d, _ in http.calls[1:]])
+        self.assertTrue(all(d["ctl00$MainContent$DropCompany"] == "1" and d["__EVENTTARGET"] == jordan.GRID for d, _ in http.calls[1:]))
+        self.assertEqual(3, len(tables[0].raw))
+        self.assertEqual([], tables[1].raw)
+
+    def test_a_page_that_does_not_read_as_expected_is_refused(self):
+        start = dt.date(2026, 10, 2)
+        for page, words in [
+            (jo_page(start, region="6", label="العقبة"), "region shown is 6"),
+            (jo_page(start, header=JO_HEADER.replace(jordan.HEADER[3], "x")), "header"),
+            (jo_page(dt.date(2026, 9, 20)), "not today"),
+        ]:
+            with self.assertRaises(FetchError) as caught:
+                jordan.fetch(self.ctx(JordanHttp({"GET": page})))
+            self.assertIn(words, str(caught.exception))
+        # A second page that does not carry on from the first stops the walk: the fetch is partial.
+        http = JordanHttp({"GET": jo_page(start, offered=(2, 3)), "Page$2": jo_page(dt.date(2026, 10, 20), offered=(1, 3))})
+        ctx = self.ctx(http)
+        tables = jordan.fetch(ctx)
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("page 2: the page starts on 2026-10-20, not 2026-10-12", ctx.errors[0])
+        self.assertEqual(10, len(tables[0].rows))
+        # A day out of order is left out alone, and no message quotes a cell.
+        bad = lambda d: ["04:00", "05:00", "11:00", "02:00", "05:00", "07:00"] if d.day != 5 else ["04:00", "05:00", "11:00", "06:00", "05:00", "07:00"]
+        ctx = self.ctx(JordanHttp({"GET": jo_page(start, cells=bad)}))
+        jordan.PAGES = 1
+        tables = jordan.fetch(ctx)
+        self.assertEqual(9, len(tables[0].rows))
+        self.assertTrue(any("2026-10-05" in e for e in ctx.errors))
+        self.assertFalse(any(TIME_SHAPE.search(e) for e in ctx.errors))
+
+    def test_the_year_ends_the_table_without_a_failure(self):
+        http = JordanHttp({"GET": jo_page(dt.date(2026, 12, 22), days=10, offered=())})
+        ctx = self.ctx(http, today=dt.date(2026, 12, 22))
+        tables = jordan.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+        self.assertTrue(any("ends with the year" in n for n in ctx.notes))
+        self.assertEqual("2026-12-31", tables[0].last())
+        # Before the year's end, a pager that stops short is a partial fetch.
+        ctx = self.ctx(JordanHttp({"GET": jo_page(dt.date(2026, 10, 2), offered=())}))
+        jordan.fetch(ctx)
+        self.assertIn("offers no page 2", ctx.errors[0])
+
+    def test_a_request_within_a_session_carries_the_cookies_and_never_goes_through_curl(self):
+        seen = []
+
+        class Opener:
+            def open(self, req, timeout=None):
+                seen.append(req.full_url)
+                return FakeResponse(b"ok")
+        built = []
+        real_build, real_urlopen = common.urllib.request.build_opener, common.urllib.request.urlopen
+        common.urllib.request.build_opener = lambda *handlers: built.append(handlers) or Opener()
+        common.urllib.request.urlopen = lambda *a, **k: self.fail("a session request goes through its opener")
+        self.addCleanup(setattr, common.urllib.request, "build_opener", real_build)
+        self.addCleanup(setattr, common.urllib.request, "urlopen", real_urlopen)
+        interval, common.MIN_INTERVAL = common.MIN_INTERVAL, 0
+        self.addCleanup(setattr, common, "MIN_INTERVAL", interval)
+        import http.cookiejar
+        jar = http.cookiejar.CookieJar()
+        client = Http([].append)
+        self.assertEqual(b"ok", client.get("https://awqaf.gov.jo/AR/Pages/PrayerTime", jar=jar))
+        self.assertEqual(1, len(built))
+        self.assertIs(jar, built[0][0].cookiejar)
+        with self.assertRaises(FetchError) as curl:
+            client._curl("https://awqaf.gov.jo/AR/Pages/PrayerTime", {}, None, 5, jar)
+        self.assertIn("not sent through curl", str(curl.exception))
