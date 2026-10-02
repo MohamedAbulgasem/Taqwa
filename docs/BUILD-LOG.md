@@ -1989,3 +1989,41 @@ one-month page's last day, and into November on a two-month page); `generate` fo
 and `build.py --check`; Toronto's English and Arabic one-month pages at 390 and 1440 px on the first
 day and the last evening; the one-month page printed on A4 and Letter in English, Arabic and Urdu,
 with and without the detailed view — one sheet each, with its foot.
+
+## October's proof, and twelve more cities (2 October)
+
+The monitor's October captures, gated. **Egypt first:** its capture of 2 October showed Dhuhr 720 min
+"early" on 30–31 October at 27 towns. Egypt's clock goes back on 30 October, Dhuhr then falls before
+noon, and Dar al-Ifta still labels it م, which `fetchers/egypt.py`'s 12-hour rule read as night. The
+page's ص/م is no longer read: each column is placed by its prayer (Fajr and Sunrise morning, Dhuhr
+midday, Asr to Isha afternoon), with tests on invented data under both Pythons (56/56). Both raw
+captures, re-parsed with it, differ from the first reading only on those two Dhuhrs, and the
+monitor's own check over them is green.
+
+**Pinned captures.** The gate's rows of 29 September read the monitor's live Diyanet files, which a
+fetch rewrites: they now read copies pinned as they were (`archive/tables/pinned/<source>/<date>/`), as
+does Dahab's Egyptian row, and the whole gate gave every stamp byte for byte as before. New rows read
+pinned copies too, except the MJC's, whose monitor capture is one file a month, kept.
+
+**New rows (91, all held out):** Diyanet's capture of 2 October (the same minutes as 28 September's
+on every day both hold; it adds 30 October – 1 November) for tr.diyanet's 22 districts, other.turkey,
+tr.diyanet.europe's 19 refreshed cities, and the cautious Oslo, Lyon, Lille, Stockholm, Helsinki,
+Copenhagen, Brussels, Antwerpen and Gent; the MJC's October as za.mjc and, with the community
+calendar's October (masjids.co.za's relay, every day, and Wembley's own 20 days) and Jamiat's Cape
+Town October, as za.cape at the Cape Town point; Egypt's September and October at all 30 towns. Every
+Diyanet Europe row passed on the committed curves, so nothing was refitted (the curve generator, run
+to a scratch file, gives the same curves). Whole gate: 802 rows, 157,590 place-days, 0 early, 0 late
+ends, none over its limit. The golden vector is unchanged; ProofStamps.kt is regenerated.
+
+**The cities.** The rule over every row of `cities.tsv` publishes 53 cities on 2 October, 12 more than
+on 1 October, each showing October alone until November is checked: Cape Town (za.cape, all three
+members), İstanbul and Ankara (tr.diyanet's own districts), Paris (fr.cautious, Diyanet's Paris unit
+now through 1 November), Oslo (no.cautious), and Cairo, Alexandria, Giza (Cairo's unit), Port Said,
+Suez, Luxor and Aswan (eg.esa). The eight held Egyptian and Cape Town rows are un-held; İstanbul,
+Ankara, Paris and Oslo were un-held already and come back by themselves. Brussels and Antwerp stay
+held (EMB's table ends 25 October), Morocco's three cities until about 13 October (ma.habous's next
+Hijri month), Amman and Zarqa, Hebron and Nablus for October's tables. Checked: tools jvmTest 266/0
+with the archive (ProvenTest's Cairo and İstanbul cases now pin October), the shared stamp, About,
+golden-vector and Diyanet tests, `checkStamps`, `build.py --check` (158 pages, 137 of them prayer
+times for 53 cities), `site/test_timetables.py` (18), and every new city's English page at a true
+390 px — Cape Town, İstanbul, Cairo and Oslo whole, the rest at the top.

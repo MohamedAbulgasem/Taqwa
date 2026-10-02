@@ -20,8 +20,8 @@
 # too once every day of it is checked. tools/timetables applies the rule on every build and holds a
 # row it rejects, with a notice, so a city whose timetable is not yet checked for this month holds
 # by itself (London Unified's ends 31 December 2026: gate the 2027 table before January) and comes
-# back at the first build after its month is checked (Diyanet's captures reach 29 October 2026:
-# İstanbul and Ankara wait for a capture that completes October). A held row comes back
+# back at the first build after its month is checked (Diyanet's captures reach 1 November 2026:
+# İstanbul and Ankara show October alone until a capture completes November). A held row comes back
 # by deleting its "# " once its stamp qualifies; a row the rule rejects is never published. The
 # proof is in tools/timetables/official/stamps and summarised at /prayer-times/how-taqwa-checks/.
 #
@@ -80,14 +80,15 @@ muscat-oman	287286	en ar ur
 # aden-yemen	415189	en ar
 
 # ---------------------------------------------------------------- North Africa
-# held: Egypt — eg.esa's stamp ends 30 September 2026 (Cairo, Alexandria, Giza, Port Said, Suez, Luxor, Aswan); Mansoura, Tanta and Assiut are outside its checked units (class D).
-# cairo-egypt	360630	en ar	en ar
-# alexandria-egypt	361058	en ar	ar
-# giza-egypt	360995	en ar
-# port-said-egypt	358619	en ar
-# suez-egypt	359796	en ar		ar=السويس
-# luxor-egypt	360502	en ar
-# aswan-egypt	359792	en ar		en=Aswan
+# Egypt: ESA (eg.esa, class B) at Cairo, Alexandria, Giza (Cairo's unit), Port Said, Suez, Luxor and Aswan, each its town's unit. Its stamp now covers October 2026 (the monitor's captures of 28 Sep and 2 Oct), so the pages show October alone until November is checked.
+cairo-egypt	360630	en ar	en ar
+alexandria-egypt	361058	en ar	ar
+giza-egypt	360995	en ar
+port-said-egypt	358619	en ar
+suez-egypt	359796	en ar		ar=السويس
+luxor-egypt	360502	en ar
+aswan-egypt	359792	en ar		en=Aswan
+# held: Mansoura, Tanta and Assiut — outside ESA's checked units (class D).
 # mansoura-egypt	360761	en ar		en=Mansoura;ar=المنصورة
 # tanta-egypt	347497	en ar
 # assiut-egypt	359783	en ar
@@ -127,7 +128,7 @@ algiers-algeria	2507480	en ar fr	fr	fr=Alger
 # port-sudan-sudan	377039	en ar
 
 # ---------------------------------------------------------------- Türkiye and Central Asia
-# Türkiye: Diyanet (tr.diyanet, class A) at İstanbul and Ankara. Its stamp begins 25 September 2026, so the generator holds both until 1 October, when the pages show October and November.
+# Türkiye: Diyanet (tr.diyanet, class A) at İstanbul and Ankara. Its stamp covers 25 September – 1 November 2026 and 2027, so the pages show October alone until November is checked.
 istanbul-turkiye	745044	en tr	en tr
 ankara-turkiye	323786	en tr	tr
 # held: İzmir, Bursa, Konya, Antalya, Gaziantep, Diyarbakır — outside Diyanet's checked districts (class D).
@@ -190,8 +191,8 @@ kota-bharu-malaysia	1736376	en
 bandar-seri-begawan-brunei	1820906	en
 
 # ---------------------------------------------------------------- Africa
-# held: Cape Town — za.cape's stamp covers September 2026 only.
-# cape-town-south-africa	3369157	en
+# South Africa: cautious times (za.cape, class C) at Cape Town: the MJC's, the community calendar's and Jamiat's tables, all three checked for September and October 2026, so the page shows October alone until November is checked.
+cape-town-south-africa	3369157	en
 # South Africa: Jamiatul Ulama (za.jamiat, class B) at Johannesburg, Pretoria and Durban, each its own unit.
 johannesburg-south-africa	993800	en
 pretoria-south-africa	964137	en
@@ -234,7 +235,7 @@ paris-france	2988507	en fr ar	fr
 # toulouse-france	2972315	en fr ar
 # lille-france	2998324	en fr ar
 # strasbourg-france	2973783	en fr tr
-# Belgium: cautious times (be.cautious, class C) at Brussels and Antwerp. Its stamp begins 25 September 2026, so the generator holds both until 1 October.
+# Belgium: cautious times (be.cautious, class C) at Brussels and Antwerp. The member EMB's held table ends 25 October 2026, so the generator holds both until October's last days are checked for it.
 brussels-belgium	2800866	en fr ar	fr
 antwerp-belgium	2803138	en fr ar
 # held: the Netherlands — cautious times (nl.cautious) not measured at the city.
