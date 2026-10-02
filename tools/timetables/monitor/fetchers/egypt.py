@@ -37,12 +37,23 @@ def text(page):
     return html.unescape(re.sub(r"\s+", " ", t)).replace("﻿", "")
 
 
-def h24(tok, ampm):
+# The half of the day each of the six columns (Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha) falls in. The
+# page's ص/م is not read: Dar al-Ifta labels a Dhuhr before noon م (once Egypt's clock goes back in
+# late October, 30 October in 2026, Dhuhr falls before 12:00) and has labelled one after noon ص, so a
+# 12-hour clock reading is placed by its prayer alone. Fajr and Sunrise are morning; Dhuhr is midday
+# (10 and 11 o'clock are before noon, 12 is noon, 1 to 9 after it); Asr, Maghrib and Isha are afternoon.
+MORNING, MIDDAY, AFTERNOON = "morning", "midday", "afternoon"
+HALVES = (MORNING, MORNING, MIDDAY, AFTERNOON, AFTERNOON, AFTERNOON)
+
+
+def h24(tok, half):
+    """A 12-hour reading `tok` ('11:47') of a prayer in `half` of the day, as a 24-hour time. An hour
+    above 12 is already on the 24-hour clock and is kept."""
     hh, mm = (int(x) for x in tok.split(":"))
-    if ampm == "م" and hh < 12:
-        hh += 12
-    if ampm == "ص" and hh == 12:
-        hh = 0
+    if hh <= 12:
+        hh %= 12
+        if half == AFTERNOON or (half == MIDDAY and hh < 10):
+            hh += 12
     return f"{hh:02d}:{mm:02d}"
 
 
@@ -52,7 +63,7 @@ def norm_city(n):
 
 
 def month_table(page):
-    """Dar al-Ifta's month table: {date: [6 times]} (a Dhuhr labelled a.m. by mistake is p.m.)."""
+    """Dar al-Ifta's month table: {date: [6 times]}, each time placed in its prayer's half of the day."""
     t = text(page)
     i = t.find("مواقيت الصلاة خلال الشهر")
     if i < 0:
@@ -63,10 +74,7 @@ def month_table(page):
         if g[1] not in MONTHS:
             continue
         date = f"{g[2]}-{MONTHS[g[1]]:02d}-{g[0]}"
-        vals = [h24(g[3 + 2 * k], g[4 + 2 * k]) for k in range(6)]
-        if int(vals[2][:2]) < 10:
-            vals[2] = f"{int(vals[2][:2]) + 12:02d}{vals[2][2:]}"
-        out[date] = vals
+        out[date] = [h24(g[3 + 2 * k], HALVES[k]) for k in range(6)]
     return out
 
 
@@ -85,7 +93,7 @@ def esa_day(page):
         if not m:
             break
         g = m.groups()
-        out.append((g[0].strip(), g[1], [h24(g[5 + 2 * k], g[6 + 2 * k]) for k in range(6)]))
+        out.append((g[0].strip(), g[1], [h24(g[5 + 2 * k], HALVES[k]) for k in range(6)]))
         pos = m.end()
     return out
 

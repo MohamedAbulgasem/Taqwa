@@ -182,6 +182,33 @@ class Parsers(unittest.TestCase):
         self.assertEqual("alexandria", {egypt.norm_city(n): u for u, n in egypt.TOWNS}.get(egypt.norm_city("الأسكندرية"), None) or
                          {egypt.norm_city(k): v for k, v in egypt.ALIASES.items()}[egypt.norm_city("الأسكندرية")])
 
+    def test_egypt_each_prayer_keeps_its_own_half_of_the_day(self):
+        # After the clock goes back Dhuhr falls before noon and the page still labels it م: it is
+        # morning, not night (the 720-minute "early" Dhuhr of 30-31 October 2026). Invented times.
+        page = ("<div>مواقيت الصلاة خلال الشهر اليوم الفجر الشروق الظهر العصر المغرب العشاء "
+                "29 أكتوبر 2026 م 5:13 ص 6:41 ص 12:38 م 3:51 م 6:22 م 7:44 م "
+                "30 أكتوبر 2026 م 4:14 ص 5:42 ص 11:38 م 2:51 م 5:21 م 6:43 م "
+                "31 أكتوبر 2026 م 4:15 ص 5:43 ص 11:37 ص 2:50 ص 5:20 م 6:42 م</div>")
+        rows = egypt.month_table(page)
+        self.assertEqual(["05:13", "06:41", "12:38", "15:51", "18:22", "19:44"], rows["2026-10-29"])
+        self.assertEqual(["04:14", "05:42", "11:38", "14:51", "17:21", "18:43"], rows["2026-10-30"])
+        self.assertEqual(["04:15", "05:43", "11:37", "14:50", "17:20", "18:42"], rows["2026-10-31"])
+        daily = ("<p>المدينة التاريخ الميلادي التاريخ الهجري فجر شروق ظهر عصر مغرب عشاء القاهرة 2026-10-30 18 جمادى الأولى 1448 "
+                 "4:14 ص 5:42 ص 11:38 م 2:51 م 5:21 م 6:43 م</p>")
+        self.assertEqual(["04:14", "05:42", "11:38", "14:51", "17:21", "18:43"], egypt.esa_day(daily)[0][2])
+
+    def test_egypt_h24_by_prayer(self):
+        h = egypt.h24
+        self.assertEqual("00:30", h("12:30", egypt.MORNING))
+        self.assertEqual("04:05", h("4:05", egypt.MORNING))
+        self.assertEqual("10:59", h("10:59", egypt.MIDDAY))
+        self.assertEqual("11:40", h("11:40", egypt.MIDDAY))
+        self.assertEqual("12:10", h("12:10", egypt.MIDDAY))
+        self.assertEqual("13:02", h("1:02", egypt.MIDDAY))
+        self.assertEqual("15:20", h("3:20", egypt.AFTERNOON))
+        self.assertEqual("20:01", h("20:01", egypt.AFTERNOON))
+        self.assertEqual(6, len(egypt.HALVES))
+
     def test_jakim(self):
         body = json.dumps({"prayerTime": [{"date": "01-Jan-2026", "fajr": "05:59:00", "syuruk": "07:19:00", "dhuhr": "13:16:00",
                                            "asr": "16:39:00", "maghrib": "19:14:00", "isha": "20:29:00"},
