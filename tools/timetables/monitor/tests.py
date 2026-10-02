@@ -3,6 +3,7 @@
 
     python3 -m unittest tools/timetables/monitor/tests.py
 """
+import calendar
 import datetime as dt
 import json
 import os
@@ -1195,3 +1196,109 @@ class Catalogue(unittest.TestCase):
         self.assertIn("za.cape", mine[0]["entries"])
         self.assertEqual("za-mjc", mjc.SOURCE)
         self.assertEqual("za.mjc/za.mjc", mjc.ENTRY, "the entry's one unit, as za-cape.tsv holds the MJC's table")
+
+
+# bonnetid.info as it has been since late September 2026: a searchable city list instead of a select,
+# and month replies that name neither the month nor the year (the month bar marks the month; the
+# weekdays fix the year). Every time invented: the day's number as the minutes of hours no Norwegian
+# table prints, in the day's order (ruling R69).
+IRN_WEEKDAYS = ["man", "tir", "ons", "tor", "fre", "lør", "søn"]
+
+
+def irn_home(cities=("Oslo", "Tromsø", "Trondheim - Jakobsli - Heimdal - Saupstad", "Drammen")):
+    options = "".join(f'<div class="city-option" data-value="{c}"><div class="city-name">{c}</div>'
+                      f'<div class="city-coords">1.000000°N, 2.000000°E</div></div>' for c in cities)
+    return ('<div class="prayer-table-wrapper"></div><form id="city-search-form"><div class="city-dropdown">' + options + "</div></form>"
+            '<script id="umer-script-js-extra">\nvar prayerAjax = {"ajaxurl":"https://bonnetid.info/wp-admin/admin-ajax.php","nonce":"n0nce"};\n</script>')
+
+
+def irn_reply(city, year, month, active=None, days=None, weekday_shift=0, reply_city=None):
+    days = days or calendar.monthrange(year, month)[1]
+    rows = "".join(
+        f'<tr class=""> <td>{d:02d}</td> <td>{IRN_WEEKDAYS[(dt.date(year, month, d).weekday() + weekday_shift) % 7]}</td>'
+        f"<td>01:{d:02d}</td><td>02:{d:02d}</td><td>10:{d:02d}</td><td>13:{d:02d}</td><td>14:{d:02d}</td><td>16:{d:02d}</td><td>22:{d:02d}</td></tr>"
+        for d in range(1, days + 1))
+    nav = "".join(f'<li><a href="#" data-month="{m}" class="month-link {"active" if m == (active or month) else ""}">M{m}</a></li>' for m in range(1, 13))
+    html = (f'<div class="api-card"><h2>{reply_city or city}</h2><table> <tr> <th>Dato</th> <th>Dag</th> <th>Fajr</th> <th>Solopp.</th>'
+            f" <th>Duhr</th> <th>Asr</th> <th>Asr 2x</th> <th>Maghrib</th> <th>Isha</th> </tr>{rows}</table></div>")
+    return json.dumps({"success": True, "data": {"html": html, "monthNav": f'<div class="scrollable-nav"><nav><ul>{nav}</ul></nav></div>',
+                                                 "city": reply_city or city}}).encode()
+
+
+class IrnAjaxHttp:
+    """bonnetid.info under test: the home page, and each month reply by the city and month posted."""
+
+    def __init__(self, home, reply):
+        self.home = home
+        self.reply = reply
+        self.posts = []
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1):
+        if data is None:
+            return self.home.encode("utf-8")
+        self.posts.append((data["city"], data["month"], data["nonce"]))
+        return self.reply(data["city"], data["month"])
+
+    def text(self, url, **kw):
+        return self.get(url, **kw).decode("utf-8")
+
+
+class IrnSearchList(unittest.TestCase):
+    def test_the_searchable_city_list_is_read_and_a_joint_name_found_by_its_first_part(self):
+        ajaxurl, nonce, cities = irn.page_config(irn_home())
+        self.assertEqual(("https://bonnetid.info/wp-admin/admin-ajax.php", "n0nce"), (ajaxurl, nonce))
+        self.assertEqual("Oslo", irn.find_city(cities, "oslo"))
+        self.assertEqual("Tromsø", irn.find_city(cities, "tromso"))
+        self.assertEqual("Trondheim - Jakobsli - Heimdal - Saupstad", irn.find_city(cities, "trondheim"))
+        self.assertIsNone(irn.find_city(cities, "bergen"))
+        # Two joint names starting alike: neither is guessed.
+        _, _, two = irn.page_config(irn_home(("Oslo", "Trondheim - Nord", "Trondheim - Sør")))
+        self.assertIsNone(irn.find_city(two, "trondheim"))
+        with self.assertRaises(FetchError):
+            irn.page_config(irn_home(("Bergen",)))
+
+    def test_the_year_is_the_one_the_weekdays_fall_in_and_the_month_the_bar_marks(self):
+        today = dt.date(2026, 12, 10)
+        rows, year = irn.parse_month(irn_reply("Oslo", 2027, 1), 1, city="Oslo", today=today)
+        self.assertEqual("2027", year, "January's weekdays as 2027 has them: next year's calendar, published in December")
+        self.assertEqual(31, len(rows))
+        self.assertEqual((1, ["01:01", "02:01", "10:01", "13:01", "16:01", "22:01", "14:01"]), rows[0], "Asr 2x is the seventh column")
+        self.assertEqual("2026", irn.parse_month(irn_reply("Oslo", 2026, 2), 2, city="Oslo", today=today)[1])
+        # October 2026 and January 2026 both begin on a Thursday with 31 days: the bar tells them apart.
+        with self.assertRaises(FetchError) as bar:
+            irn.parse_month(irn_reply("Oslo", 2026, 10), 1, city="Oslo", today=today)
+        self.assertIn("month bar marks month 10, not 1", str(bar.exception))
+        with self.assertRaises(FetchError) as weekdays:
+            irn.parse_month(irn_reply("Oslo", 2026, 3, weekday_shift=3), 3, city="Oslo", today=today)
+        self.assertIn("in no year around 2026", str(weekdays.exception))
+        with self.assertRaises(FetchError) as short:
+            irn.parse_month(irn_reply("Oslo", 2026, 4, days=29), 4, city="Oslo", today=today)
+        self.assertIn("29 days", str(short.exception))
+        with self.assertRaises(FetchError) as other:
+            irn.parse_month(irn_reply("Oslo", 2026, 5, reply_city="Bergen"), 5, city="Oslo", today=today)
+        self.assertIn("'Bergen', not 'Oslo'", str(other.exception))
+        for e in (bar.exception, weekdays.exception, short.exception, other.exception):
+            self.assertIsNone(TIME_SHAPE.search(str(e)), "no message quotes a cell")
+
+    def test_a_fetch_reads_twelve_months_for_each_city_under_the_names_the_site_uses(self):
+        lines = []
+        root = tempfile.mkdtemp("irn")
+        self.addCleanup(shutil.rmtree, root)
+        http = IrnAjaxHttp(irn_home(), lambda city, month: irn_reply(city, 2026, month))
+        ctx = Context("no-irn", root, dt.date(2026, 10, 2), lines.append, root, http=http)
+        tables = irn.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+        self.assertEqual(["oslo-2026", "trondheim-2026", "tromso-2026"], [t.key for t in tables])
+        self.assertEqual([365, 365, 365], [len(t.rows) for t in tables])
+        self.assertEqual("no.irn/no.irn.trondheim", tables[1].entry)
+        self.assertEqual(36, len(http.posts))
+        self.assertEqual({"Oslo", "Trondheim - Jakobsli - Heimdal - Saupstad", "Tromsø"}, {c for c, _, _ in http.posts})
+        self.assertTrue(all(n == "n0nce" for _, _, n in http.posts))
+        # One month for another city: that month alone is an error, the rest is kept (a partial fetch).
+        http = IrnAjaxHttp(irn_home(), lambda city, month: irn_reply(city, 2026, month, reply_city="Bergen" if (city, month) == ("Oslo", 3) else None))
+        ctx = Context("no-irn", root, dt.date(2026, 10, 2), lines.append, root, http=http)
+        tables = irn.fetch(ctx)
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("Oslo month 3", ctx.errors[0])
+        self.assertEqual(365 - 31, len(tables[0].rows))
