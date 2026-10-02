@@ -192,15 +192,22 @@ repository.
 
 ## Sources
 
-`sources.tsv` is the list. As of 30 September 2026 the fetchers cover Umm al-Qura, Diyanet
+`sources.tsv` is the list. As of 2 October 2026 the fetchers cover Umm al-Qura, Diyanet
 (Türkiye and nineteen European cities, Antwerpen, Gent, Lyon, Lille, Copenhagen, Helsinki and
 Trondheim among them), Kemenag (eighteen kab/kota, Surabaya, Medan, Semarang, Palembang and
 Yogyakarta among them), JAKIM, MUIS, Egypt (ESA via Dar al-Ifta, and ESA's daily page), Qatar (the
 ministry API and the Calendar House header), Libya (the Awqaf widget and api.ifta.ly), Tunisia (INM),
 Morocco (Habous), Jamiatul Ulama, the Muslim Judicial Council (mjc.org.za's current month for Cape
 Town, month-start, each month kept as `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
-unit and as za.cape's member there), IRN (bonnetid.info's own month tables, no token, ruling R95) and
-the surveyed Mawaqit calendars. IACAD Dubai (Cloudflare refuses scripted access), the Calendar
-House's printed calendar and Ramadan imsakiya (PDFs), and Sudan's, Gaza's and Mauritania's tables
-are read by hand. London Unified waits for the owner's London Prayer Times key: with it,
+unit and as za.cape's member there), IRN (bonnetid.info's own month tables, no token, ruling R95; its
+searchable city list and month bar since October 2026), and since 2 October 2026 Jordan's Ministry of
+Awqaf (awqaf.gov.jo's region table for Amman, Balqa, Zarqa and Madaba, walked by its pager within one
+session, checked at Amman's unit and at Zarqa), Toronto's three mosques (IFT's year CSV, IIT's month
+tables, MAC's Mawaqit calendar, each at its unit and as ca.toronto's member; a day printed on the
+wrong clock is the table's own fault, left out) and Chicago's three Masjidal tables (Makki, DarusSalam
+Lombard, the Mosque Foundation, as us.chicago's members; a convention member such as the 18° block is
+checked as its member row), and the surveyed Mawaqit calendars. IACAD Dubai (Cloudflare refuses
+scripted access), the Calendar House's printed calendar and Ramadan imsakiya (PDFs), EMB's yearly
+PDF, the PA Dar al-Iftaa's perpetual table and imsakiya, Chicago's other four mosques (PDFs and
+images), and Sudan's, Gaza's and Mauritania's tables are read by hand. London Unified waits for the owner's London Prayer Times key: with it,
 `--only gb-london-lupt` reads the coming year; without it the horizon reminds from 1 December.

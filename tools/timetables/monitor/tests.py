@@ -3,6 +3,7 @@
 
     python3 -m unittest tools/timetables/monitor/tests.py
 """
+import calendar
 import datetime as dt
 import json
 import os
@@ -20,7 +21,7 @@ from common import Context, FetchError, Http, Table, add_all, nearest_year, norm
 import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
-from fetchers import diyanet, egypt, irn, jakim, kemenag, london, mawaqit, mjc, morocco, muis, qatar  # noqa: E402
+from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, toronto  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -1222,3 +1223,466 @@ class Catalogue(unittest.TestCase):
         self.assertIn("za.cape", mine[0]["entries"])
         self.assertEqual("za-mjc", mjc.SOURCE)
         self.assertEqual("za.mjc/za.mjc", mjc.ENTRY, "the entry's one unit, as za-cape.tsv holds the MJC's table")
+
+
+# bonnetid.info as it has been since late September 2026: a searchable city list instead of a select,
+# and month replies that name neither the month nor the year (the month bar marks the month; the
+# weekdays fix the year). Every time invented: the day's number as the minutes of hours no Norwegian
+# table prints, in the day's order (ruling R69).
+IRN_WEEKDAYS = ["man", "tir", "ons", "tor", "fre", "lør", "søn"]
+
+
+def irn_home(cities=("Oslo", "Tromsø", "Trondheim - Jakobsli - Heimdal - Saupstad", "Drammen")):
+    options = "".join(f'<div class="city-option" data-value="{c}"><div class="city-name">{c}</div>'
+                      f'<div class="city-coords">1.000000°N, 2.000000°E</div></div>' for c in cities)
+    return ('<div class="prayer-table-wrapper"></div><form id="city-search-form"><div class="city-dropdown">' + options + "</div></form>"
+            '<script id="umer-script-js-extra">\nvar prayerAjax = {"ajaxurl":"https://bonnetid.info/wp-admin/admin-ajax.php","nonce":"n0nce"};\n</script>')
+
+
+def irn_reply(city, year, month, active=None, days=None, weekday_shift=0, reply_city=None):
+    days = days or calendar.monthrange(year, month)[1]
+    rows = "".join(
+        f'<tr class=""> <td>{d:02d}</td> <td>{IRN_WEEKDAYS[(dt.date(year, month, d).weekday() + weekday_shift) % 7]}</td>'
+        f"<td>01:{d:02d}</td><td>02:{d:02d}</td><td>10:{d:02d}</td><td>13:{d:02d}</td><td>14:{d:02d}</td><td>16:{d:02d}</td><td>22:{d:02d}</td></tr>"
+        for d in range(1, days + 1))
+    nav = "".join(f'<li><a href="#" data-month="{m}" class="month-link {"active" if m == (active or month) else ""}">M{m}</a></li>' for m in range(1, 13))
+    html = (f'<div class="api-card"><h2>{reply_city or city}</h2><table> <tr> <th>Dato</th> <th>Dag</th> <th>Fajr</th> <th>Solopp.</th>'
+            f" <th>Duhr</th> <th>Asr</th> <th>Asr 2x</th> <th>Maghrib</th> <th>Isha</th> </tr>{rows}</table></div>")
+    return json.dumps({"success": True, "data": {"html": html, "monthNav": f'<div class="scrollable-nav"><nav><ul>{nav}</ul></nav></div>',
+                                                 "city": reply_city or city}}).encode()
+
+
+class IrnAjaxHttp:
+    """bonnetid.info under test: the home page, and each month reply by the city and month posted."""
+
+    def __init__(self, home, reply):
+        self.home = home
+        self.reply = reply
+        self.posts = []
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1):
+        if data is None:
+            return self.home.encode("utf-8")
+        self.posts.append((data["city"], data["month"], data["nonce"]))
+        return self.reply(data["city"], data["month"])
+
+    def text(self, url, **kw):
+        return self.get(url, **kw).decode("utf-8")
+
+
+class IrnSearchList(unittest.TestCase):
+    def test_the_searchable_city_list_is_read_and_a_joint_name_found_by_its_first_part(self):
+        ajaxurl, nonce, cities = irn.page_config(irn_home())
+        self.assertEqual(("https://bonnetid.info/wp-admin/admin-ajax.php", "n0nce"), (ajaxurl, nonce))
+        self.assertEqual("Oslo", irn.find_city(cities, "oslo"))
+        self.assertEqual("Tromsø", irn.find_city(cities, "tromso"))
+        self.assertEqual("Trondheim - Jakobsli - Heimdal - Saupstad", irn.find_city(cities, "trondheim"))
+        self.assertIsNone(irn.find_city(cities, "bergen"))
+        # Two joint names starting alike: neither is guessed.
+        _, _, two = irn.page_config(irn_home(("Oslo", "Trondheim - Nord", "Trondheim - Sør")))
+        self.assertIsNone(irn.find_city(two, "trondheim"))
+        with self.assertRaises(FetchError):
+            irn.page_config(irn_home(("Bergen",)))
+
+    def test_the_year_is_the_one_the_weekdays_fall_in_and_the_month_the_bar_marks(self):
+        today = dt.date(2026, 12, 10)
+        rows, year = irn.parse_month(irn_reply("Oslo", 2027, 1), 1, city="Oslo", today=today)
+        self.assertEqual("2027", year, "January's weekdays as 2027 has them: next year's calendar, published in December")
+        self.assertEqual(31, len(rows))
+        self.assertEqual((1, ["01:01", "02:01", "10:01", "13:01", "16:01", "22:01", "14:01"]), rows[0], "Asr 2x is the seventh column")
+        self.assertEqual("2026", irn.parse_month(irn_reply("Oslo", 2026, 2), 2, city="Oslo", today=today)[1])
+        # October 2026 and January 2026 both begin on a Thursday with 31 days: the bar tells them apart.
+        with self.assertRaises(FetchError) as bar:
+            irn.parse_month(irn_reply("Oslo", 2026, 10), 1, city="Oslo", today=today)
+        self.assertIn("month bar marks month 10, not 1", str(bar.exception))
+        with self.assertRaises(FetchError) as weekdays:
+            irn.parse_month(irn_reply("Oslo", 2026, 3, weekday_shift=3), 3, city="Oslo", today=today)
+        self.assertIn("in no year around 2026", str(weekdays.exception))
+        with self.assertRaises(FetchError) as short:
+            irn.parse_month(irn_reply("Oslo", 2026, 4, days=29), 4, city="Oslo", today=today)
+        self.assertIn("29 days", str(short.exception))
+        with self.assertRaises(FetchError) as other:
+            irn.parse_month(irn_reply("Oslo", 2026, 5, reply_city="Bergen"), 5, city="Oslo", today=today)
+        self.assertIn("'Bergen', not 'Oslo'", str(other.exception))
+        for e in (bar.exception, weekdays.exception, short.exception, other.exception):
+            self.assertIsNone(TIME_SHAPE.search(str(e)), "no message quotes a cell")
+
+    def test_a_fetch_reads_twelve_months_for_each_city_under_the_names_the_site_uses(self):
+        lines = []
+        root = tempfile.mkdtemp("irn")
+        self.addCleanup(shutil.rmtree, root)
+        http = IrnAjaxHttp(irn_home(), lambda city, month: irn_reply(city, 2026, month))
+        ctx = Context("no-irn", root, dt.date(2026, 10, 2), lines.append, root, http=http)
+        tables = irn.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+        self.assertEqual(["oslo-2026", "trondheim-2026", "tromso-2026"], [t.key for t in tables])
+        self.assertEqual([365, 365, 365], [len(t.rows) for t in tables])
+        self.assertEqual("no.irn/no.irn.trondheim", tables[1].entry)
+        self.assertEqual(36, len(http.posts))
+        self.assertEqual({"Oslo", "Trondheim - Jakobsli - Heimdal - Saupstad", "Tromsø"}, {c for c, _, _ in http.posts})
+        self.assertTrue(all(n == "n0nce" for _, _, n in http.posts))
+        # One month for another city: that month alone is an error, the rest is kept (a partial fetch).
+        http = IrnAjaxHttp(irn_home(), lambda city, month: irn_reply(city, 2026, month, reply_city="Bergen" if (city, month) == ("Oslo", 3) else None))
+        ctx = Context("no-irn", root, dt.date(2026, 10, 2), lines.append, root, http=http)
+        tables = irn.fetch(ctx)
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("Oslo month 3", ctx.errors[0])
+        self.assertEqual(365 - 31, len(tables[0].rows))
+
+
+# awqaf.gov.jo's PrayerTime form as its markup has it: the region list, the paged table (ten days a page,
+# dd/mm/yyyy, 12-hour times with no AM or PM) and the pager's postback links. Every time invented: the
+# day of the month as the minutes of hours in the day's order (ruling R69).
+JO_HEADER = "".join(f'<th class="headrgv" scope="col"><p style="color: #fff">{h}</p></th>' for h in jordan.HEADER)
+
+
+def jo_page(first, days=10, region="1", label="عمان، البلقاء، الزرقاء، مادبا", offered=(), state="vs0", header=JO_HEADER, cells=None):
+    rows = ""
+    for i in range(days):
+        d = first + dt.timedelta(days=i)
+        times = cells(d) if cells else [f"04:{d.day:02d}", f"05:{d.day:02d}", f"11:{d.day:02d}", f"02:{d.day:02d}", f"05:{d.day:02d}", f"07:{d.day:02d}"]
+        rows += "<tr>" + f"<td><span>{d.day:02d}/{d.month:02d}/{d.year}</span></td>" + "".join(f"<td><span>{t}:00</span></td>" for t in times) + "</tr>"
+    pager = "".join(f"<td><a href=\"javascript:__doPostBack(&#39;ctl00$MainContent$gvWebparts&#39;,&#39;Page${n}&#39;)\">{n}</a></td>" for n in offered)
+    return (f'<form method="post" action="./PrayerTime" id="ctl01"><input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="{state}" />'
+            '<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="ev" />'
+            '<select name="ctl00$MainContent$DropCompany" id="MainContent_DropCompany"><option value="0">الرجاء الاختيار</option>'
+            f'<option selected="selected" value="{region}">{label}</option><option value="6">العقبة</option></select>'
+            '<table class="borderTable" id="MainContent_gvWebparts"><tr align="center">' + header + "</tr>" + rows
+            + f'<tr class="pagerGV"><td colspan="7"><table><tr>{pager}</tr></table></td></tr></table></form>')
+
+
+class JordanHttp:
+    """awqaf.gov.jo under test: the first page on a GET, each postback's page by its argument."""
+
+    def __init__(self, pages):
+        self.pages = pages  # {"GET" or "Page$n": html}
+        self.calls = []
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1, jar=None):
+        self.calls.append((data, jar))
+        key = "GET" if data is None else data["__EVENTARGUMENT"]
+        if key not in self.pages:
+            raise FetchError("HTTP 500")
+        return self.pages[key].encode("utf-8")
+
+    def text(self, url, **kw):
+        return self.get(url, **kw).decode("utf-8")
+
+
+class Jordan(unittest.TestCase):
+    def setUp(self):
+        self.root = tempfile.mkdtemp("jordan")
+        self.addCleanup(shutil.rmtree, self.root)
+        self._pages = jordan.PAGES
+        jordan.PAGES = 3
+        self.addCleanup(setattr, jordan, "PAGES", self._pages)
+
+    def ctx(self, http, today=dt.date(2026, 10, 2)):
+        return Context("jo-awqaf", self.root, today, [].append, self.root, http=http)
+
+    def test_twelve_hour_times_are_read_as_the_days(self):
+        self.assertEqual(["04:07", "05:07", "11:07", "14:07", "17:07", "19:07"], jordan.day_times(["04:07:00", "05:07:00", "11:07:00", "02:07:00", "05:07:00", "07:07:00"]))
+        self.assertEqual("12:30", jordan.day_times(["04:07", "05:07", "12:30", "02:07", "05:07", "07:07"])[2], "a Dhuhr after noon stays")
+        with self.assertRaises(FetchError) as order:
+            jordan.day_times(["04:07", "05:07", "11:07", "06:07", "05:07", "07:07"])
+        self.assertIn("not in the day's order", str(order.exception))
+        with self.assertRaises(FetchError):
+            jordan.day_times(["04:07", "-", "11:07", "02:07", "05:07", "07:07"])
+
+    def test_a_walk_of_the_pager_within_one_session(self):
+        http = JordanHttp({"GET": jo_page(dt.date(2026, 10, 2), offered=(2, 3, 4), state="vs1"),
+                           "Page$2": jo_page(dt.date(2026, 10, 12), offered=(1, 3, 4), state="vs2"),
+                           "Page$3": jo_page(dt.date(2026, 10, 22), offered=(1, 2, 4), state="vs3")})
+        ctx = self.ctx(http)
+        tables = jordan.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+        self.assertEqual(["amman", "zarqa"], [t.key for t in tables])
+        self.assertEqual("jo.awqaf/jo.awqaf.amman", tables[0].entry)
+        self.assertEqual(("jo.awqaf", 32.07275, 36.08796), (tables[1].entry, tables[1].lat, tables[1].lon))
+        self.assertEqual(30, len(tables[0].rows))
+        self.assertEqual(("2026-10-02", "2026-10-31"), (tables[0].first(), tables[0].last()))
+        self.assertEqual(["04:02", "05:02", "11:02", "14:02", "17:02", "19:02"], tables[0].rows["2026-10-02"])
+        self.assertEqual(tables[0].rows, tables[1].rows, "one table for the region")
+        # One cookie jar for the whole walk; each postback carries the previous page's view state.
+        jars = {id(j) for _, j in http.calls}
+        self.assertEqual(1, len(jars))
+        self.assertIsNotNone(http.calls[0][1])
+        self.assertEqual(["vs1", "vs2"], [d["__VIEWSTATE"] for d, _ in http.calls[1:]])
+        self.assertEqual(["Page$2", "Page$3"], [d["__EVENTARGUMENT"] for d, _ in http.calls[1:]])
+        self.assertTrue(all(d["ctl00$MainContent$DropCompany"] == "1" and d["__EVENTTARGET"] == jordan.GRID for d, _ in http.calls[1:]))
+        self.assertEqual(3, len(tables[0].raw))
+        self.assertEqual([], tables[1].raw)
+
+    def test_a_page_that_does_not_read_as_expected_is_refused(self):
+        start = dt.date(2026, 10, 2)
+        for page, words in [
+            (jo_page(start, region="6", label="العقبة"), "region shown is 6"),
+            (jo_page(start, header=JO_HEADER.replace(jordan.HEADER[3], "x")), "header"),
+            (jo_page(dt.date(2026, 9, 20)), "not today"),
+        ]:
+            with self.assertRaises(FetchError) as caught:
+                jordan.fetch(self.ctx(JordanHttp({"GET": page})))
+            self.assertIn(words, str(caught.exception))
+        # A second page that does not carry on from the first stops the walk: the fetch is partial.
+        http = JordanHttp({"GET": jo_page(start, offered=(2, 3)), "Page$2": jo_page(dt.date(2026, 10, 20), offered=(1, 3))})
+        ctx = self.ctx(http)
+        tables = jordan.fetch(ctx)
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("page 2: the page starts on 2026-10-20, not 2026-10-12", ctx.errors[0])
+        self.assertEqual(10, len(tables[0].rows))
+        # A day out of order is left out alone, and no message quotes a cell.
+        bad = lambda d: ["04:00", "05:00", "11:00", "02:00", "05:00", "07:00"] if d.day != 5 else ["04:00", "05:00", "11:00", "06:00", "05:00", "07:00"]
+        ctx = self.ctx(JordanHttp({"GET": jo_page(start, cells=bad)}))
+        jordan.PAGES = 1
+        tables = jordan.fetch(ctx)
+        self.assertEqual(9, len(tables[0].rows))
+        self.assertTrue(any("2026-10-05" in e for e in ctx.errors))
+        self.assertFalse(any(TIME_SHAPE.search(e) for e in ctx.errors))
+
+    def test_the_year_ends_the_table_without_a_failure(self):
+        http = JordanHttp({"GET": jo_page(dt.date(2026, 12, 22), days=10, offered=())})
+        ctx = self.ctx(http, today=dt.date(2026, 12, 22))
+        tables = jordan.fetch(ctx)
+        self.assertEqual([], ctx.errors)
+        self.assertTrue(any("ends with the year" in n for n in ctx.notes))
+        self.assertEqual("2026-12-31", tables[0].last())
+        # Before the year's end, a pager that stops short is a partial fetch.
+        ctx = self.ctx(JordanHttp({"GET": jo_page(dt.date(2026, 10, 2), offered=())}))
+        jordan.fetch(ctx)
+        self.assertIn("offers no page 2", ctx.errors[0])
+
+    def test_a_request_within_a_session_carries_the_cookies_and_never_goes_through_curl(self):
+        seen = []
+
+        class Opener:
+            def open(self, req, timeout=None):
+                seen.append(req.full_url)
+                return FakeResponse(b"ok")
+        built = []
+        real_build, real_urlopen = common.urllib.request.build_opener, common.urllib.request.urlopen
+        common.urllib.request.build_opener = lambda *handlers: built.append(handlers) or Opener()
+        common.urllib.request.urlopen = lambda *a, **k: self.fail("a session request goes through its opener")
+        self.addCleanup(setattr, common.urllib.request, "build_opener", real_build)
+        self.addCleanup(setattr, common.urllib.request, "urlopen", real_urlopen)
+        interval, common.MIN_INTERVAL = common.MIN_INTERVAL, 0
+        self.addCleanup(setattr, common, "MIN_INTERVAL", interval)
+        import http.cookiejar
+        jar = http.cookiejar.CookieJar()
+        client = Http([].append)
+        self.assertEqual(b"ok", client.get("https://awqaf.gov.jo/AR/Pages/PrayerTime", jar=jar))
+        self.assertEqual(1, len(built))
+        self.assertIs(jar, built[0][0].cookiejar)
+        with self.assertRaises(FetchError) as curl:
+            client._curl("https://awqaf.gov.jo/AR/Pages/PrayerTime", {}, None, 5, jar)
+        self.assertIn("not sent through curl", str(curl.exception))
+
+
+# The three Toronto tables as their sources print them, every time invented: the hours of the day's
+# order with the day of the month as the minutes, an hour less from 1 November (America/Toronto's
+# clock change) where `slip` days leave the table on the old clock (ruling R69).
+def toronto_times(d, slip=()):
+    back = 60 if d >= dt.date(2026, 11, 1) and d not in slip else 0
+    base = [5 * 60, 7 * 60, 13 * 60, 16 * 60, 19 * 60, 20 * 60 + 30]
+    return [f"{(m - back + d.day) // 60:02d}:{(m - back + d.day) % 60:02d}" for m in base]
+
+
+def toronto_ift_csv(year=2026, slip=(), days=None):
+    lines = ["PrayerDate,FajarBegins,Fajar,Sunrise,ZuharBegins,Zuhar,AsarBegins,Asar,Sunset,MagribBegins,IshaBegins,Isha"]
+    d = dt.date(year, 1, 1)
+    while d.year == year and (days is None or len(lines) <= days):
+        f, s, z, a, m, i = toronto_times(d, slip)
+        twelve = lambda t: f"{int(t[:2]) % 12 or 12}:{t[3:]}"
+        lines.append(",".join([d.isoformat(), twelve(f), twelve(f), twelve(s), twelve(z), twelve(z), twelve(a), twelve(a), twelve(m), twelve(m), twelve(i), twelve(i)]))
+        d += dt.timedelta(days=1)
+    return ("\r\n".join(lines) + "\r\n").encode()
+
+
+def toronto_iit_month(year, month, heading=None):
+    name = calendar.month_name[month]
+    rows = ""
+    for day in range(1, calendar.monthrange(year, month)[1] + 1):
+        d = dt.date(year, month, day)
+        f, s, z, a, m, i = toronto_times(d)
+        ap = lambda t: f"{int(t[:2]) % 12 or 12}:{t[3:]} {'pm' if int(t[:2]) >= 12 else 'am'}"
+        cells = [f"{name} {day}, {year} <p class=\"hijriDate\"> x</p>", d.strftime("%A"), ap(f), ap(f), ap(s), ap(z), ap(z), ap(a), ap(a), ap(a), ap(m), ap(m), ap(i), ap(i)]
+        rows += "<tr>" + "".join(f"<td>{c}</td>" for c in cells) + "</tr>"
+    return (f'<div class="dpt-monthly-table-wrapper"><table><thead class="prayerName"><th class="prayerName" colspan="2">{heading or name}</th></thead>'
+            + rows + "</table></div>").encode()
+
+
+def toronto_mac_page(lat=43.6554647, lon=-79.3857551):
+    cal = []
+    for month in range(1, 13):
+        cal.append({str(day): toronto_times(dt.date(2026, month, day)) for day in range(1, calendar.monthrange(2026, month)[1] + 1)})
+    conf = {"latitude": lat, "longitude": lon, "timezone": "America/Toronto", "calendar": cal}
+    return ("<script>var confData = " + json.dumps(conf) + ";</script>").encode()
+
+
+class TorontoHttp:
+    def __init__(self, answers):
+        self.answers = answers
+        self.urls = []
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1):
+        self.urls.append(url)
+        answer = self.answers(url)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+    def text(self, url, **kw):
+        return self.get(url, **kw).decode("utf-8")
+
+
+def toronto_answers(ift=None, iit=None, mac=None):
+    def answer(url):
+        if url == toronto.IFT_CSV:
+            return ift if ift is not None else toronto_ift_csv(slip={dt.date(2026, 11, 1), dt.date(2026, 11, 2)})
+        if url.startswith("https://islam.ca/"):
+            month = int(url.rsplit("=", 1)[1])
+            return (iit or (lambda m: toronto_iit_month(2026, m)))(month)
+        if url.endswith(toronto.MAC_SLUG):
+            return mac if mac is not None else toronto_mac_page()
+        return FetchError("no canned answer")
+    return answer
+
+
+class Toronto(unittest.TestCase):
+    def setUp(self):
+        self.root = tempfile.mkdtemp("toronto")
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def ctx(self, http, today=dt.date(2026, 10, 2)):
+        return Context("ca-toronto", self.root, today, [].append, self.root, http=http)
+
+    def test_a_fetch_keeps_the_three_tables_from_the_month_on_less_the_days_on_the_wrong_clock(self):
+        ctx = self.ctx(TorontoHttp(toronto_answers()))
+        tables = {t.key: t for t in toronto.fetch(ctx)}
+        self.assertEqual([], ctx.errors)
+        self.assertEqual({"ift-2026", "iit-2026", "mac-2026"}, set(tables))
+        self.assertEqual(("ca.ift/ca.ift", "hanafi"), (tables["ift-2026"].entry, tables["ift-2026"].school))
+        self.assertEqual(("ca.iit/ca.iit", "ca.mac/ca.mac"), (tables["iit-2026"].entry, tables["mac-2026"].entry))
+        for t in tables.values():
+            self.assertEqual("2026-10-01", t.first(), "the days from the first of the current month")
+            self.assertFalse(t.merge)
+        self.assertEqual(toronto_times(dt.date(2026, 10, 5)), tables["ift-2026"].rows["2026-10-05"], "12-hour cells read as the day's")
+        self.assertEqual(toronto_times(dt.date(2026, 10, 5)), tables["iit-2026"].rows["2026-10-05"])
+        self.assertEqual(toronto_times(dt.date(2026, 10, 5)), tables["mac-2026"].rows["2026-10-05"])
+        # IFT's file keeps the old clock on 1-2 November: those days (and its recorded 28-30 November) are left out, with notes.
+        left = {"2026-11-01", "2026-11-02", "2026-11-28", "2026-11-29", "2026-11-30"}
+        self.assertEqual(set(), left & set(tables["ift-2026"].rows))
+        self.assertEqual(92 - 5, len(tables["ift-2026"].rows))
+        self.assertEqual(92, len(tables["iit-2026"].rows))
+        self.assertTrue(any("2026-11-01 to 2026-11-02 are on the wrong clock" in n for n in ctx.notes), ctx.notes)
+        self.assertTrue(any("left out: IFT prints Isha" in n for n in ctx.notes))
+        self.assertEqual(1 + 12 + 1, len(ctx.http.urls))
+
+    def test_the_clock_check_reads_each_column_and_only_near_a_change(self):
+        rows = {}
+        d = dt.date(2026, 10, 20)
+        while d <= dt.date(2026, 11, 15):
+            times = toronto_times(d)
+            if d in (dt.date(2026, 11, 1), dt.date(2026, 11, 2)):
+                times[1] = toronto_times(d, slip={d})[1]  # the sunrise column alone a day late
+            rows[d.isoformat()] = times
+            d += dt.timedelta(days=1)
+        slips, notes = toronto.clock_slips(rows)
+        self.assertEqual({"2026-11-01", "2026-11-02"}, slips)
+        self.assertEqual("2026-11-02", notes[0][0])
+        # A table on the right clock leaves nothing out.
+        self.assertEqual(set(), toronto.clock_slips({k: toronto_times(dt.date.fromisoformat(k)) for k in rows})[0])
+
+    def test_tables_that_do_not_read_as_expected_are_refused(self):
+        # IFT: not one whole year.
+        ctx = self.ctx(TorontoHttp(toronto_answers(ift=toronto_ift_csv(days=200))))
+        tables = toronto.fetch(ctx)
+        self.assertTrue(any(e.startswith("IFT: the CSV holds 200 days of 2026") for e in ctx.errors), ctx.errors)
+        self.assertNotIn("ift-2026", [t.key for t in tables])
+        # IIT: a reply for another month.
+        ctx = self.ctx(TorontoHttp(toronto_answers(iit=lambda m: toronto_iit_month(2026, 5 if m == 6 else m))))
+        tables = toronto.fetch(ctx)
+        self.assertEqual(["IIT month 6: the table's heading is not month 6"], ctx.errors)
+        # MAC: another mosque's page.
+        ctx = self.ctx(TorontoHttp(toronto_answers(mac=toronto_mac_page(lat=45.5))))
+        tables = toronto.fetch(ctx)
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("MAC: the page's point", ctx.errors[0])
+        self.assertNotIn("mac-2026", [t.key for t in tables])
+        for e in ctx.errors:
+            self.assertIsNone(TIME_SHAPE.search(e), "no message quotes a cell")
+
+    def test_twelve_hour_cells(self):
+        self.assertEqual("13:05", toronto.twelve("1:05", True))
+        self.assertEqual("12:30", toronto.twelve("12:30", True))
+        self.assertEqual("06:05", toronto.twelve("6:05", False))
+        self.assertEqual(("00:10", "12:10", "18:05"), (toronto.ampm("12:10 am"), toronto.ampm("12:10 pm"), toronto.ampm("6:05PM")))
+        with self.assertRaises(FetchError):
+            toronto.ampm("6:05")
+        with self.assertRaises(FetchError):
+            toronto.ordered(["05:00", "04:00"], "x")
+
+
+# Masjidal's time/range reply as the API gives it, every time invented (toronto_times's, ruling R69).
+def masjidal_reply(start, end, weekday_shift=0, skip=None, status="success"):
+    days = []
+    d = start
+    while d <= end:
+        if d != skip:
+            f, s, z, a, m, i = toronto_times(d)
+            ap = lambda t: f"{int(t[:2]) % 12 or 12}:{t[3:]}{'PM' if int(t[:2]) >= 12 else 'AM'}"
+            name = calendar.day_name[(d.weekday() + weekday_shift) % 7]
+            days.append({"date": f"{name}, {d.strftime('%b')} {d.day}, {d.year}", "hijri_date": "1, 1448", "day": name,
+                         "fajr": ap(f), "sunrise": ap(s), "zuhr": ap(z), "asr": ap(a), "maghrib": ap(m), "isha": ap(i)})
+        d += dt.timedelta(days=1)
+    return json.dumps({"status": status, "data": {"salah": days, "iqamah": []}}).encode()
+
+
+class Masjidal(unittest.TestCase):
+    def setUp(self):
+        self.root = tempfile.mkdtemp("masjidal")
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def test_the_window_runs_from_this_month_to_the_end_of_the_month_after_next(self):
+        self.assertEqual((dt.date(2026, 10, 1), dt.date(2026, 12, 31)), masjidal.window(dt.date(2026, 10, 2)))
+        self.assertEqual((dt.date(2026, 11, 1), dt.date(2027, 1, 31)), masjidal.window(dt.date(2026, 11, 30)))
+        self.assertEqual((dt.date(2026, 12, 1), dt.date(2027, 2, 28)), masjidal.window(dt.date(2026, 12, 15)))
+
+    def test_a_reply_must_hold_the_days_asked_each_on_its_weekday(self):
+        start, end = dt.date(2026, 10, 1), dt.date(2026, 10, 31)
+        bad = []
+        rows = masjidal.parse(masjidal_reply(start, end), start, end, bad)
+        self.assertEqual(([], 31), (bad, len(rows)))
+        self.assertEqual(toronto_times(dt.date(2026, 10, 9)), rows["2026-10-09"])
+        for reply, words in [(masjidal_reply(start, end, weekday_shift=1), "printed on another weekday"),
+                             (masjidal_reply(start, end, skip=dt.date(2026, 10, 9)), "not the 31 asked"),
+                             (masjidal_reply(start, dt.date(2026, 10, 20)), "not the 31 asked"),
+                             (masjidal_reply(start, end, status="error"), "not a success")]:
+            with self.assertRaises(FetchError) as caught:
+                masjidal.parse(reply, start, end, [])
+            self.assertIn(words, str(caught.exception))
+            self.assertIsNone(TIME_SHAPE.search(str(caught.exception)))
+
+    def test_a_fetch_asks_each_mosque_once_and_checks_each_as_us_chicagos_member(self):
+        start, end = masjidal.window(dt.date(2026, 10, 2))
+        asked = []
+
+        class Answers:
+            owner = None
+
+            def get(self, url, headers=None, data=None, timeout=None, retries=1):
+                asked.append(url)
+                if "masjid_id=1QL0MDAZ" in url:
+                    raise FetchError("HTTP 500")
+                return masjidal_reply(start, end)
+        ctx = Context("us-chicago", self.root, dt.date(2026, 10, 2), [].append, self.root, http=Answers())
+        tables = masjidal.fetch(ctx)
+        self.assertEqual(3, len(asked))
+        self.assertTrue(all("from_date=2026-10-01&to_date=2026-12-31" in u for u in asked))
+        self.assertEqual([("makki-masjid-chicago", "us.chicago.eighteen"), ("mosque-foundation-bridgeview", "us.isna")], [(t.key, t.entry) for t in tables])
+        self.assertEqual({"hanafi"}, {t.school for t in tables})
+        self.assertEqual(92, len(tables[0].rows))
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("Masjid DarusSalam, Lombard, IL: HTTP 500", ctx.errors[0])

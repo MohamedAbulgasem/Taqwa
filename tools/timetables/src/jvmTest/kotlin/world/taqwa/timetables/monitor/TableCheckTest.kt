@@ -264,6 +264,21 @@ class TableCheckTest {
     }
 
     @Test
+    fun `a convention member's table is checked as the member row of the cautious entry automatic follows at its point`() {
+        // Chicago's 18° block is a member with no entry of its own; us-chicago.tsv holds Makki Masjid's table as us.chicago's member row.
+        val rows = rows(check.plan(table("us-chicago", "makki", "archive/t.txt", "us.chicago.eighteen", 41.9704, -87.7144, "America/Chicago", "US", "F+E S D A M I")))
+        assertEquals(1, rows.size, rows.toString())
+        assertEquals("us.chicago", rows.single().entry)
+        assertEquals("us.chicago.eighteen", rows.single().member)
+        assertEquals(41.9704 to -87.7144, rows.single().lat to rows.single().lon)
+        // Where Automatic follows no cautious entry with that member, or no point is given, the table is refused.
+        val elsewhere = check.plan(table("us-chicago", "x", "archive/t.txt", "us.chicago.eighteen", 29.7369, -95.4251, "America/Chicago", "US", "F+E S D A M I"))
+        assertTrue(elsewhere is TableCheck.Plan.Refused && "no member 'us.chicago.eighteen'" in elsewhere.reason, elsewhere.toString())
+        val pointless = check.plan(table("us-chicago", "x", "archive/t.txt", "us.chicago.eighteen", null, null, "America/Chicago", "US", "F+E S D A M I"))
+        assertTrue(pointless is TableCheck.Plan.Refused, pointless.toString())
+    }
+
+    @Test
     fun `a table automatic does not follow is checked as its own entry`() {
         // Inside the M25 Automatic follows London Unified; Diyanet's London table is still Diyanet's.
         val rows = rows(check.plan(table("tr-diyanet-europe", "london", "archive/t.txt", "tr.diyanet.europe", 51.5074, -0.1278, "Europe/London", "GB", "F+E S D A M I")))

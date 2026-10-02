@@ -126,8 +126,11 @@ class Http:
             self.tripped.add(host)
             self.log(f"  BREAKER {host}: {n} consecutive network failures, the rest of its requests are not tried")
 
-    def get(self, url, headers=None, data=None, timeout=TIMEOUT, retries=1):
-        """The body (bytes) of `url`; `data` (bytes or a dict) makes it a POST. Raises FetchError."""
+    def get(self, url, headers=None, data=None, timeout=TIMEOUT, retries=1, jar=None):
+        """The body (bytes) of `url`; `data` (bytes or a dict) makes it a POST. `jar` (an
+        http.cookiejar.CookieJar a fetcher keeps for one site) sends back the cookies that site set,
+        for a page whose form only answers within its session (awqaf.gov.jo's ASP.NET pager); no
+        other request carries cookies. Raises FetchError."""
         shown = redact(url)
         host = host_of(url)
         if self.budget_spent():
@@ -148,7 +151,8 @@ class Http:
             self._last = time.monotonic()
             try:
                 req = urllib.request.Request(url, data=body, headers=hdrs)
-                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                opener = urllib.request.urlopen if jar is None else urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar)).open
+                with opener(req, timeout=timeout) as resp:
                     out = resp.read()
                     if resp.headers.get("Content-Encoding") == "gzip":
                         out = gzip.decompress(out)
@@ -169,7 +173,7 @@ class Http:
                     # not know, habous.gov.ma; a protocol the Mac's LibreSSL lacks): curl verifies
                     # against the system's store and speaks the system's TLS, so the request goes
                     # through curl instead (review I7).
-                    return self._curl(url, hdrs, body, timeout)
+                    return self._curl(url, hdrs, body, timeout, jar)
                 self._network_failure(host)
                 last = FetchError(f"{type(e).__name__}: {getattr(e, 'reason', e)} from {shown}")
                 if attempt < retries and host not in self.tripped:
@@ -177,7 +181,7 @@ class Http:
                     continue
                 raise last
             except ssl.SSLError:
-                return self._curl(url, hdrs, body, timeout)
+                return self._curl(url, hdrs, body, timeout, jar)
             except (TimeoutError, OSError) as e:
                 self._network_failure(host)
                 last = FetchError(f"{type(e).__name__}: {getattr(e, 'reason', e)} from {shown}")
@@ -191,9 +195,12 @@ class Http:
                 raise FetchError(f"{type(e).__name__} for {shown}")
         raise last
 
-    def _curl(self, url, headers, body, timeout):
-        """The same request through curl (still verifying the certificate, against the system store)."""
+    def _curl(self, url, headers, body, timeout, jar=None):
+        """The same request through curl (still verifying the certificate, against the system store).
+        A request within a site's session (`jar`) is not sent this way: curl would not keep its cookies."""
         shown = redact(url)
+        if jar is not None:
+            raise FetchError(f"Python's TLS stack could not reach {host_of(url)}, and a request within its session is not sent through curl ({shown})")
         cmd = ["curl", "-sSL", "--compressed", "--max-time", str(timeout), "-o", "-", "-w", "\n%{http_code}"]
         for k, v in headers.items():
             cmd += ["-H", f"{k}: {v}"]
