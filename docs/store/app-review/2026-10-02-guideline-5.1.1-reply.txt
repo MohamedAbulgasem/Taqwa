@@ -1,0 +1,9 @@
+Hello, and thank you for the review.
+
+We have addressed Guideline 5.1.1(iv) in build 1.0.0 (35):
+
+- The screen shown before the location permission request now has a single button, "Continue", which always opens the system permission request. The second option that let people leave the screen without seeing the request has been removed.
+- The screen shown before the notification permission request now works the same way: a single "Continue" button that opens the system request, and no other option.
+- If someone declines location access in the system request, the app then offers its built-in city search, so Taqwa remains fully usable without location access. Location can be turned on later from the app's page in Settings.
+
+Thank you.
