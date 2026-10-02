@@ -158,7 +158,7 @@ private fun ScreenPreview(state: TodayUiState, exactAlarmsOff: Boolean = false) 
     TodayScreen(
         state = state,
         onChooseCity = {},
-        onAllowLocation = {},
+        onOpenLocationSettings = {},
         onOpenQibla = {},
         onOpenTasbeeh = {},
         exactAlarmsOff = exactAlarmsOff,

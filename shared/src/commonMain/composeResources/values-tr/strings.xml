@@ -12,11 +12,9 @@
     <string name="onboarding_welcome_cta">Başlayalım</string>
     <string name="onboarding_location_title">Neredesiniz?</string>
     <string name="onboarding_location_body">Namaz vakitleri tam konumunuza bağlıdır. Her şey cihazınızda hesaplanır. Konumunuz telefonunuzdan hiç çıkmaz.</string>
-    <string name="onboarding_location_cta">Konumumu kullan</string>
-    <string name="onboarding_location_secondary">Bunun yerine şehir seç</string>
+    <string name="onboarding_continue">Devam</string>
     <string name="onboarding_notifications_title">Hiçbir vakti kaçırmayın</string>
     <string name="onboarding_notifications_body">Her namaz vaktinde bir bildirim. Sesi her vakit için ayrı seçersiniz, dilediğiniz zaman da değiştirebilirsiniz.</string>
-    <string name="onboarding_notifications_cta">Bildirimleri aç</string>
     <string name="onboarding_notifications_secondary">Şimdi değil</string>
     <string name="onboarding_exact_title">Dakikası dakikasına</string>
     <string name="onboarding_exact_body">Android, tam namaz vaktinde ancak Taqwa için “Alarmlar ve hatırlatıcılar” izni verilmişse çalar. İzin olmadan bildirim bir saate kadar gecikebilir.</string>
@@ -46,7 +44,7 @@
     <string name="today_exact_alarms_body">Taqwa için “Alarmlar ve hatırlatıcılar” izni verilmediği sürece Android bir saate kadar geç çalabilir.</string>
     <string name="today_no_location_title">Henüz konum yok</string>
     <string name="today_choose_city">Şehir seç</string>
-    <string name="today_allow_location">Ya da konuma izin ver</string>
+    <string name="today_location_settings">Konumu Ayarlar’dan aç</string>
     <string name="today_jumuah">Cuma</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->

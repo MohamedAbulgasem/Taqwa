@@ -21,3 +21,11 @@ expect fun canOpenAppLanguageSettings(): Boolean
 
 /** Opens that page; a no-op where [canOpenAppLanguageSettings] is false. */
 expect fun openAppLanguageSettings()
+
+/**
+ * Taqwa's own page in the system's settings, where a refused location is turned back on. iOS
+ * shows its location prompt once, so after "Don't Allow" this page is the only way back; it is
+ * where Today's "No location yet" sends someone, and coming back with access is enough (the
+ * Prayer route fetches the location on return).
+ */
+expect fun openAppSettings()

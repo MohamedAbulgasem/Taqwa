@@ -1,0 +1,32 @@
+Thank you for reviewing Taqwa.
+
+1. Screen recording
+Our reply of 24 September attached a screen recording from a physical iPhone (iOS 27) of version 1.0.0 (32), from the Home Screen and first launch: onboarding and permissions, prayer times, the Qibla compass, the tasbeeh counter, adhan settings, Quran search and reading, a recitation download with lock-screen controls, and adding the widget. It predates the new prayer-times screens, read-aloud and build 35's permission screens. Taqwa has no account registration, login or account deletion, no user-generated content, and no paid content or in-app purchases.
+
+2. Purpose and audience
+Taqwa is a free companion for Muslims' daily worship: prayer times with adhan reminders, the Qibla, the Quran with translations and recitations, and a tasbeeh counter. It is for Muslims of any age, anywhere, who want one simple, private app. Taqwa calculates everything on the device, works offline, has no ads, and collects no data.
+
+3. Setup and main features
+No account, login or sample files are needed. On first launch, a Continue button opens each system request (location, then notifications); if location is declined, a built-in city search opens instead.
+- Prayer tab: today's times, the next prayer and the Hijri date; the (i) after the date says whose times these are. The Qibla card opens the compass (physical device needed) and the Tasbeeh card opens the counter.
+- Quran tab: all 114 surahs in Translation or Mushaf view, with search, bookmarks and sharing. Play at the top of a surah offers to download its recitation once, then plays it with lock-screen controls.
+- Settings tab: adhan notifications per prayer, the adhan voice, the prayer timetable, location, reciter and read-aloud, appearance, and seven interface languages.
+- Widgets: next prayer and today's times, and the ayah of the day, on the Home Screen; next prayer on the Lock Screen.
+
+4. External services
+Taqwa has no server of its own and no analytics, advertising, crash-reporting, authentication, payment or AI services. Its own engine calculates prayer times on the device; the open-source Adhan library gives the Qibla bearing. Reminders are local notifications; read-aloud uses the iPhone's on-device voices. The Quran text, translations, city list and fonts are bundled. The only network use is recitation: playing a surah not yet on the phone downloads its MP3 audio from a public GitHub release (github.com/MohamedAbulgasem/Taqwa-data) that mirrors Islamic Network's recitations unmodified, and the reciter list is refreshed there at most once a day.
+
+5. Regional differences
+Only the default prayer times differ by place. Where an authority publishes the timetable, or most local mosques follow one, Taqwa reproduces it on the device and names it under the (i) (About these times says Taqwa is not affiliated with the authority); where mosques differ, each prayer shows once all have begun it; elsewhere Taqwa calculates on the safe side. Users can choose another in Settings.
+
+6. Third-party material
+Taqwa is not in a regulated industry. Its content is used under each provider's published terms and credited in the app under Settings › Attribution & licences:
+- Quran text: Tanzil Project, reproduced verbatim as its licence requires (tanzil.net/docs/text_license)
+- Translations: Tanzil Project, for non-commercial use (tanzil.net/trans)
+- Recitations: Islamic Network, licensed by the reciters for free, non-commercial redistribution at the published bitrates (alquran.cloud/terms-and-conditions, section IV)
+- Quran font: KFGQPC Uthmanic Script Hafs (King Fahd Complex), free to use unmodified
+- Adhan audio: Wikimedia Commons (CC0, CC BY-SA 4.0, CC BY 3.0); city list: GeoNames (CC BY 4.0)
+Taqwa is free, with no ads or purchases, so it stays within these terms. Full list: github.com/MohamedAbulgasem/Taqwa/blob/main/docs/ATTRIBUTION.md.
+
+Privacy policy: https://taqwa.world/privacy/
+Support: support@taqwa.world

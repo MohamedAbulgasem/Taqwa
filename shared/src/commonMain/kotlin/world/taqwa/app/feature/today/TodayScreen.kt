@@ -88,7 +88,7 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.notifications_allow_exact_alarms
 import world.taqwa.app.resources.onboarding_location_body
 import world.taqwa.app.resources.qibla_title
-import world.taqwa.app.resources.today_allow_location
+import world.taqwa.app.resources.today_location_settings
 import world.taqwa.app.resources.today_choose_city
 import world.taqwa.app.resources.today_current_location
 import world.taqwa.app.resources.today_exact_alarms_body
@@ -118,7 +118,8 @@ private val Gutter = 24.dp
 fun TodayScreen(
     state: TodayUiState,
     onChooseCity: () -> Unit,
-    onAllowLocation: () -> Unit,
+    /** "No location yet"'s link: the app's own page in the system's settings. */
+    onOpenLocationSettings: () -> Unit,
     onOpenQibla: () -> Unit,
     onOpenTasbeeh: () -> Unit,
     /** Android with notifications on and "Alarms & reminders" off; see [ExactAlarmsCard]. */
@@ -143,7 +144,7 @@ fun TodayScreen(
     Box(Modifier.fillMaxSize().background(colors.background)) {
         when (state) {
             TodayUiState.Loading -> Unit
-            TodayUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onAllowLocation)
+            TodayUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onOpenLocationSettings)
             is TodayUiState.Ready -> ReadyBody(state, actions, exactAlarmsOff)
         }
     }
@@ -646,7 +647,7 @@ private fun ForwardChevron() {
 }
 
 @Composable
-private fun NeedsLocationBody(onChooseCity: () -> Unit, onAllowLocation: () -> Unit) {
+private fun NeedsLocationBody(onChooseCity: () -> Unit, onOpenLocationSettings: () -> Unit) {
     val colors = LocalTaqwaColors.current
     Column(
         Modifier
@@ -674,7 +675,10 @@ private fun NeedsLocationBody(onChooseCity: () -> Unit, onAllowLocation: () -> U
         Spacer(Modifier.height(28.dp))
         TaqwaPrimaryButton(stringResource(Res.string.today_choose_city), onChooseCity)
         Spacer(Modifier.height(4.dp))
-        TaqwaTextLink(stringResource(Res.string.today_allow_location), onAllowLocation)
+        // To the system's settings, never to the system prompt: iOS asks only once, so after a
+        // refusal the prompt cannot come back, and a screen that explains and then raises the
+        // prompt beside a second button is what App Review rejects (guideline 5.1.1(iv)).
+        TaqwaTextLink(stringResource(Res.string.today_location_settings), onOpenLocationSettings)
     }
 }
 

@@ -35,18 +35,4 @@ class NotificationOnboardingTest {
         assertEquals(false, enabledValue)
         assertFalse(rescheduled)
     }
-
-    @Test
-    fun decliningForNowDisablesNotificationsWithoutAskingTheSystemAtAll() = runTest {
-        var permissionAsked = false
-        var enabledValue: Boolean? = null
-        val onboarding = NotificationOnboarding(
-            requestSystemPermission = { permissionAsked = true; true },
-            setNotificationsEnabled = { enabledValue = it },
-            rescheduleIfEnabled = { },
-        )
-        onboarding.declineForNow()
-        assertFalse(permissionAsked)
-        assertEquals(false, enabledValue)
-    }
 }

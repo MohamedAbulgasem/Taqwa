@@ -14,6 +14,14 @@ actual fun openAppNotificationSettings() {
     runCatching { context.startActivity(intent) }
 }
 
+/** The app's info page: Permissions › Location there is where a refusal is undone. */
+actual fun openAppSettings() {
+    val context = appContext
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(intent) }
+}
+
 actual fun requestExactAlarmAccess() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
     val context = appContext

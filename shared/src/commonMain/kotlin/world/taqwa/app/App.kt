@@ -171,9 +171,9 @@ fun App(container: AppContainer) {
         openPlaying = openPlaying,
     )
 
-    // Reused by both onboarding's "Enable notifications" and "Not now": the system ask (if any)
-    // has already happened by the time this runs, so `requestSystemPermission` just returns the
-    // already-known answer rather than asking again.
+    // Onboarding's Continue on the notifications screen: the system ask has already happened by
+    // the time this runs, so `requestSystemPermission` just returns the already-known answer
+    // rather than asking again.
     fun notificationOnboarding(granted: Boolean) = NotificationOnboarding(
         requestSystemPermission = { granted },
         setNotificationsEnabled = { enabled ->
