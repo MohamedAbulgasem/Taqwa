@@ -36,6 +36,47 @@ class GateManifestTest {
     }
 
     @Test
+    fun `an excuse line names a member's days, where, why and the reason, and is no row`() {
+        // Ruling R117: dates and a reason only, never a printed time.
+        val m = parse(
+            "@excuse\tca.toronto\tca.ift\t*\t2026-11-01..2026-11-06\tfault\tthe table keeps daylight time",
+            "@excuse\tca.cautious\tca.fifteen\t53.6080,-113.5260\t2026-12-24\tunpublished\tno row that day",
+        )
+        assertTrue(m.rows.isEmpty())
+        val (all, one) = m.excuses
+        assertEquals("ca.toronto", all.entry)
+        assertEquals("ca.ift", all.member)
+        assertNull(all.at)
+        assertEquals(kotlinx.datetime.LocalDate(2026, 11, 1), all.days.start)
+        assertEquals(kotlinx.datetime.LocalDate(2026, 11, 6), all.days.endInclusive)
+        assertEquals(ExcuseKind.FAULT, all.kind)
+        assertEquals("the table keeps daylight time", all.reason)
+        assertEquals("test.tsv:2", all.where)
+        assertEquals("53.608,-113.526", pointKey(one.at!!))
+        assertEquals(one.days.start, one.days.endInclusive)
+        assertEquals(ExcuseKind.UNPUBLISHED, one.kind)
+        // A group's excuses go with its rows.
+        val group = GateManifest.parse("ca-x.tsv", header + "\n@excuse\ta\tb\t*\t2026-01-01\tfault\tr")
+        assertEquals(1, group.only(setOf("ca-x")).excuses.size)
+    }
+
+    @Test
+    fun `an excuse line without its reason, kind, dates or point is refused`() {
+        val error = assertFailsWith<GateError> {
+            parse(
+                "@excuse\tca.toronto\tca.ift\t*\t2026-11-01\tfault",
+                "@excuse\tca.toronto\tca.ift\t*\t2026-11-01\twrong\ta reason",
+                "@excuse\tca.toronto\tca.ift\t*\t2026-11-06..2026-11-01\tfault\ta reason",
+                "@excuse\tca.toronto\tca.ift\tsomewhere\t2026-11-01\tfault\ta reason",
+            )
+        }
+        assertEquals(4, error.problems.size, error.message)
+        assertTrue("test.tsv:3: 'wrong' (fault or unpublished)" in error.problems, error.message)
+        assertTrue("test.tsv:4: dates '2026-11-06..2026-11-01' (yyyy-mm-dd or from..to)" in error.problems, error.message)
+        assertTrue("test.tsv:5: point 'somewhere' (* or lat,lon)" in error.problems, error.message)
+    }
+
+    @Test
     fun `a hanafi row's A is the hanafi asr and a unit follows the entry`() {
         val row = parse("x.txt\tru.dumrt/kazan\t55.79\t49.12\tEurope/Moscow\tIm F S - A As M I\tdaily\thanafi\ttest\t").rows.single()
         assertEquals("ru.dumrt", row.entry)

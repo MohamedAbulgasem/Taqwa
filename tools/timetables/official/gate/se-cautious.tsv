@@ -19,6 +19,8 @@
 #   2026-09-28 for the rows above. The capture of 2 Oct 2026 (2026-10-02/) refreshed Stockholm, Helsinki and
 #   Copenhagen (29 Sep – 1 Nov 2026 and 2027, the same minutes on every day both hold): a row each, as above; it
 #   adds 30 October – 1 November. The other Nordic tables were not refetched.
+# Ruling R117: Rabita's fault day as the gate reads it (@excuse: entry, member, *, the date, fault, the reason).
+@excuse	se.cautious	se.rabita	*	2026-03-31	fault	Rabita's Asr on 31 March an hour before its neighbours'
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/nordic/off-ifis-stockholm-all.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	IFIS Stockholm	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Stockholm	tr.diyanet.europe

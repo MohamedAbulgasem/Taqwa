@@ -56,7 +56,9 @@ import kotlin.time.Instant
  * most-followed member's, so it is checked against that member's printed time alone, and a spread
  * date without the most-followed member's table is unchecked, which breaks the gate. With a single
  * member's table held, the engine's own members' Maghribs decide whether the date is a spread one.
- * The cap's gap to each member's printed Maghrib is recorded (spec §3.6).
+ * The cap's gap to each member's printed Maghrib is recorded (spec §3.6). A gate file's `@excuse`
+ * lines ([Excuse], ruling R117) record the days a member's rows leave out because its table does
+ * not publish them or publishes them wrongly; they excuse no cell, only say why a day is missing.
  *
  * Nothing unread passes. Without the archive root (CI) every row is skipped and counted; with it,
  * a table that is not there, or one that yields no day, is a mistake in the gate file, and a date a
@@ -136,8 +138,39 @@ class Gate(
             }
         }
         for (cell in cells.values) cell.account()
+        for (excuse in manifest.excuses) excuse(excuse, stats, problems)
         if (problems.isNotEmpty()) throw GateError(problems)
         return GateResult(roots, checked, skipped, stats)
+    }
+
+    /**
+     * Ruling R117: [excuse]'s days recorded for its member at each point its rows were read at (or
+     * at its one point), where those rows do not hold them. Checked like a row, archive or not: its
+     * entry must be cautious and the member one of its own. With the archive, a line that matches
+     * no row of the member, or excuses a day the gate compared for the member there, is a mistake
+     * in the gate file: a day is checked or excused, never both.
+     */
+    private fun excuse(excuse: Excuse, stats: Map<String, EntryStats>, problems: MutableList<String>) {
+        val entry = lookup(excuse.entry) ?: return Unit.also { problems += "${excuse.where}: no registry entry '${excuse.entry}'" }
+        val members = entry.members.map { it.id }
+        if (members.isEmpty()) return Unit.also { problems += "${excuse.where}: ${entry.id} is not cautious; only a member's days are excused" }
+        if (excuse.member !in members) {
+            return Unit.also { problems += "${excuse.where}: ${excuse.member} is not a member of ${entry.id} (${members.joinToString(" ")})" }
+        }
+        if (!roots.held) return
+        val s = stats[entry.id]
+        val points = s?.memberDays?.get(excuse.member).orEmpty().filterKeys { excuse.at == null || it == pointKey(excuse.at) }
+        if (s == null || points.isEmpty()) {
+            return Unit.also { problems += "${excuse.where}: no row of ${excuse.member} for ${entry.id}${excuse.at?.let { " at ${pointKey(it)}" } ?: ""}" }
+        }
+        for ((point, dates) in points) {
+            val both = dates.filter { it in excuse.days }
+            if (both.isNotEmpty()) {
+                problems += "${excuse.where}: ${excuse.member} is checked at $point on ${dateRanges(both).joinToString(", ")}, which this line excuses"
+                continue
+            }
+            s.excuse(excuse.member, point, excuse.kind, excuse.days)
+        }
     }
 
     /**
@@ -487,6 +520,21 @@ class EntryStats(val entry: RegistryEntry) {
      */
     val memberDays = sortedMapOf<String, SortedMap<String, SortedSet<LocalDate>>>()
 
+    /**
+     * A cautious entry's excused member days (ruling R117): by member, by point ([pointKey]) and by
+     * why ([ExcuseKind]), the days a gate file's `@excuse` lines leave out of the member's rows there.
+     */
+    val memberExcused = sortedMapOf<String, SortedMap<String, SortedMap<ExcuseKind, SortedSet<LocalDate>>>>()
+
+    internal fun excuse(member: String, point: String, kind: ExcuseKind, days: ClosedRange<LocalDate>) {
+        val into = memberExcused.getOrPut(member) { sortedMapOf() }.getOrPut(point) { sortedMapOf() }.getOrPut(kind) { sortedSetOf() }
+        var date = days.start
+        while (date <= days.endInclusive) {
+            into += date
+            date = date.plus(1, DateTimeUnit.DAY)
+        }
+    }
+
     /** The limits [event] was held to: "1", or "1/3" where its rows' units or classes differ. */
     fun effectiveLimit(event: Event): String = events[event]?.limits.orEmpty().joinToString("/")
 
@@ -712,6 +760,14 @@ class GateResult(
             if (s.outOfOrder > 0) append("  out of order: ${s.outOfOrder} days\n")
             for ((member, g) in s.maghribGaps) {
                 append("  Maghrib cap against $member: ${g.days} days (${g.capped} capped), shown ${g.least}..${g.most} min after its printed time\n")
+            }
+            for ((member, points) in s.memberExcused) {
+                for (kind in ExcuseKind.entries) {
+                    val at = points.values.mapNotNull { it[kind] }
+                    if (at.isEmpty()) continue
+                    val dates = dateRanges(at.flatten()).joinToString(", ")
+                    append("  excused for $member (${kind.words}, ruling R117): $dates, at ${at.size} point${if (at.size == 1) "" else "s"}\n")
+                }
             }
         }
         val violations = violations()

@@ -135,6 +135,7 @@
     "checks_rule_body": "A start is never before the authority’s own time, and sunrise and the end of eating never after it. Where mosques follow different timetables with no majority, Taqwa shows each prayer once they have all begun it (cautious times).",
     "checks_gate_h": "The gate",
     "checks_gate_body": "Before every release Taqwa replays its engine against every official table it holds: {tables} published tables, {days} place-days across {entries} timetables. Starts shown early: {early}. Sunrises or ends of eating shown late: {late}.",
+    "checks_gate_excused": "Days a timetable itself does not publish, or gets wrong, are left out of the check and named, with the reason.",
     "checks_survey_h": "Where mosques follow families of calendars",
     "checks_survey_body": "Where a city’s mosques follow calendars of one family rather than one published table, a survey of {calendars} mosque calendars stands in for the gate, each checked at its own mosque.",
     "checks_pages_h": "Which places have a page",

@@ -5,8 +5,9 @@ import kotlin.test.assertEquals
 import kotlin.time.Instant
 
 /**
- * The run summary's lines (spec §2, ruling R116): one notice per held city, and one per city shown
- * with its current month alone, naming the timetable and the first day that keep the next month off.
+ * The run summary's lines (spec §2, rulings R116, R117): one notice per held city, one per city
+ * shown with its current month alone, naming the timetable and the first day that keep the next
+ * month off, and one per member table excused on days a page shows.
  */
 class MainTest {
     private fun city(slug: String, cc: String, lat: Double, lon: Double, zone: String, admin1: String? = null) = City(
@@ -17,6 +18,7 @@ class MainTest {
     private val london = city("london-uk", "GB", 51.50853, -0.12574, "Europe/London", "England")
     private val tripoli = city("tripoli-libya", "LY", 32.88743, 13.18733, "Africa/Tripoli")
     private val toronto = city("toronto-canada", "CA", 43.70643, -79.39864, "America/Toronto", "Ontario")
+    private val istanbul = city("istanbul-turkiye", "TR", 41.01384, 28.94966, "Europe/Istanbul", "Istanbul")
     private val official = TestPaths.repoRoot.resolve("tools/timetables/official")
     private val document = Document(AppStrings(TestPaths.appResources), Stamp.load(official.resolve("stamps")), official)
 
@@ -28,16 +30,23 @@ class MainTest {
     }
 
     @Test fun aCityShownWithItsCurrentMonthAloneGetsANotice() {
-        // The first run of 1 October: Toronto's members leave 1–6 November unchecked (ruling R116).
-        val built = document.build(listOf(toronto), Instant.parse("2026-10-01T06:07:00Z"))
+        // The first run of 1 October: Diyanet's captures reach 1 November (ruling R116).
+        val built = document.build(listOf(istanbul), Instant.parse("2026-10-01T06:07:00Z"))
         assertEquals(
-            listOf(
-                "::notice::toronto-canada: showing October alone — the next month is not yet checked: " +
-                    "ca.ift (a member of ca.toronto), first unchecked day 1 Nov 2026",
-            ),
+            listOf("::notice::istanbul-turkiye: showing October alone — the next month is not yet checked: tr.diyanet, first unchecked day 2 Nov 2026"),
             notices(built),
         )
         assertEquals("Wrote 1 cities (0 held) and 1 pages", summary(built))
+    }
+
+    @Test fun aCityShownWithAMembersExcusedDaysGetsANotice() {
+        // Ruling R117: Toronto shows October and November from 1 October; IFT's nine fault days in
+        // November are excused (IIT's and MAC's tables are checked on them), and the run says so.
+        val built = document.build(listOf(toronto), Instant.parse("2026-10-01T06:07:00Z"))
+        assertEquals(
+            listOf("::notice::toronto-canada: 9 days excused: ca.ift (a member of ca.toronto) recorded faults"),
+            notices(built),
+        )
     }
 
     @Test fun aStampEndingWithTheNextMonthSaysNothingUntilThatMonthIsShownAlone() {

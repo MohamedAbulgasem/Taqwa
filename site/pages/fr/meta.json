@@ -135,6 +135,7 @@
     "checks_rule_body": "Un début n’est jamais avant l’heure propre de l’autorité, et le lever du soleil et la fin du repas jamais après. Là où les mosquées suivent des calendriers différents sans majorité, Taqwa affiche chaque prière une fois que tous l’ont commencée (horaires par précaution).",
     "checks_gate_h": "Le contrôle",
     "checks_gate_body": "Avant chaque version, Taqwa rejoue son moteur contre chaque calendrier officiel qu’elle détient : {tables} calendriers publiés, {days} jours vérifiés sur {entries} calendriers. Débuts affichés trop tôt : {early}. Levers du soleil ou fins du repas affichés trop tard : {late}.",
+    "checks_gate_excused": "Les jours qu’un calendrier ne publie pas lui-même, ou publie avec une erreur, sont exclus de la vérification et nommés, avec leur raison.",
     "checks_survey_h": "Là où les mosquées suivent des familles de calendriers",
     "checks_survey_body": "Là où les mosquées d’une ville suivent des calendriers d’une même famille plutôt qu’un seul calendrier publié, un relevé de {calendars} calendriers de mosquées tient lieu de contrôle, chacun vérifié dans sa propre mosquée.",
     "checks_pages_h": "Quels lieux ont une page",

@@ -48,7 +48,7 @@ fun main(args: Array<String>) {
  * its reason, and per city shown with its current month alone, naming the timetable that leaves a
  * day of the next month unchecked and that day. The second is also the month's notice to run the
  * gate on the authority's new table: unless it is checked by the first of next month, the city is
- * held then.
+ * held then. And per member table excused on days a page shows (ruling R117): how many, and why.
  */
 @Suppress("UNCHECKED_CAST")
 internal fun notices(document: Map<String, Any?>): List<String> {
@@ -60,7 +60,12 @@ internal fun notices(document: Map<String, Any?>): List<String> {
         val day = Proven.day(LocalDate.parse(next["day"] as String))
         "::notice::${city["slug"]}: showing $month alone — the next month is not yet checked: ${next["timetable"]}, first unchecked day $day"
     }
-    return held + alone
+    val excused = (document["cities"] as List<Map<String, Any?>>).flatMap { city ->
+        (city["excused"] as List<Map<String, Any?>>?).orEmpty().map {
+            "::notice::${city["slug"]}: ${it["days"]} days excused: ${it["timetable"]} ${it["why"]}"
+        }
+    }
+    return held + alone + excused
 }
 
 /** "Wrote N cities (M held) and P pages". */

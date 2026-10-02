@@ -962,7 +962,7 @@ class Timetables:
   <h2>{esc(t["checks_rule_h"])}</h2>
   <p>{esc(t["checks_rule_body"])}</p>
   <h2>{esc(t["checks_gate_h"])}</h2>
-  <p>{gate}</p>
+  <p>{gate} {esc(t["checks_gate_excused"])}</p>
   <h2>{esc(t["checks_survey_h"])}</h2>
   <p>{fill(t["checks_survey_body"], calendars=n(proof["surveyCalendars"]))}</p>
   <h2>{esc(t["checks_pages_h"])}</h2>

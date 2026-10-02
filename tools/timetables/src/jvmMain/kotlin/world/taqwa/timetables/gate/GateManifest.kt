@@ -1,6 +1,8 @@
 package world.taqwa.timetables.gate
 
+import kotlinx.datetime.LocalDate
 import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import java.io.File
 
@@ -70,14 +72,53 @@ data class GateRow(
     val clockZone: String get() = clock ?: zone
 }
 
+/** Why a cautious member's day is excused (ruling R117): its table does not publish it, or publishes it wrongly. */
+enum class ExcuseKind(val key: String, val words: String) {
+    /** The table prints the day wrongly: a fault recorded with its reason. */
+    FAULT("fault", "recorded faults"),
+
+    /** The table does not print the day at all. */
+    UNPUBLISHED("unpublished", "days it does not publish");
+
+    companion object {
+        fun byKey(key: String): ExcuseKind? = entries.firstOrNull { it.key == key }
+    }
+}
+
 /**
- * Every gate row, from the `official/gate/<group>.tsv` files; [sources] are the files read. An
- * exception to a late limit is not the gate file's to make: it lives with its registry entry or
- * unit (ruling R37, `LateLimit`), so that the gate proves and About states the same number.
+ * One `@excuse` line of a gate file (ruling R117): days a cautious [entry]'s [member] table leaves
+ * out of its rows for a recorded reason — it does not publish them, or publishes them wrongly
+ * ([kind]) — at [at] (one point of the member's rows, as the rows give it), or at every point its
+ * rows are read at (null, written `*`). [reason] says why in words: dates and differences only,
+ * never a printed time (ruling R69). The gate records each such day, per member and point, where
+ * the member's rows there do not hold it; a page shows the day only where another member's table
+ * was checked on it (spec §2).
+ *
+ *     @excuse  <entry>  <member>  <* | lat,lon>  <yyyy-mm-dd[..yyyy-mm-dd]>  <fault | unpublished>  <reason>
+ */
+data class Excuse(
+    val source: String,
+    val line: Int,
+    val entry: String,
+    val member: String,
+    val at: GeoPoint?,
+    val days: ClosedRange<LocalDate>,
+    val kind: ExcuseKind,
+    val reason: String,
+) {
+    val where: String get() = "$source:$line"
+}
+
+/**
+ * Every gate row, from the `official/gate/<group>.tsv` files; [sources] are the files read, and
+ * [excuses] their `@excuse` lines (ruling R117). An exception to a late limit is not the gate
+ * file's to make: it lives with its registry entry or unit (ruling R37, `LateLimit`), so that the
+ * gate proves and About states the same number.
  */
 data class GateManifest(
     val rows: List<GateRow>,
     val sources: List<String> = rows.map { it.source }.distinct(),
+    val excuses: List<Excuse> = emptyList(),
 ) {
 
     /**
@@ -96,6 +137,9 @@ data class GateManifest(
         return GateManifest(
             rows = inGroups.filter { entries.isEmpty() || it.entry in entries },
             sources = sources.filter { groups.isEmpty() || it.removeSuffix(".tsv") in groups },
+            excuses = excuses.filter { excuse ->
+                (groups.isEmpty() || excuse.source.removeSuffix(".tsv") in groups) && (entries.isEmpty() || excuse.entry in entries)
+            },
         )
     }
 
@@ -130,16 +174,18 @@ data class GateManifest(
         fun load(dir: File): GateManifest {
             val files = dir.listFiles { f -> f.isFile && f.name.endsWith(".tsv") }?.sortedBy { it.name } ?: emptyList()
             val parsed = files.map { parse(it.name, it.readText()) }
-            return GateManifest(parsed.flatMap { it.rows }, files.map { it.name })
+            return GateManifest(parsed.flatMap { it.rows }, files.map { it.name }, parsed.flatMap { it.excuses })
         }
 
         /**
-         * One gate file. Blank lines and `#` comments are skipped; the first other line is the
-         * header. Every problem is reported at once, with its line.
+         * One gate file. Blank lines and `#` comments are skipped, and `@excuse` lines read as
+         * [Excuse]s wherever they stand; the first other line is the header. Every problem is
+         * reported at once, with its line.
          */
         fun parse(source: String, text: String): GateManifest {
             val problems = mutableListOf<String>()
             val rows = mutableListOf<GateRow>()
+            val excuses = mutableListOf<Excuse>()
             var header: List<String>? = null
             var headerOk = false
             text.lines().forEachIndexed { index, raw ->
@@ -150,6 +196,7 @@ data class GateManifest(
                 when {
                     cells[0] == "@lateLimit" ->
                         problems += "$where: a late-limit exception lives with its registry entry or unit (ruling R37: LateLimit)"
+                    cells[0] == EXCUSE -> excuse(cells, source, line, problems)?.let(excuses::add)
                     cells[0].startsWith("@") -> problems += "$where: unknown directive ${cells[0]}"
                     header == null -> {
                         val missing = HEADER - cells.toSet()
@@ -177,7 +224,40 @@ data class GateManifest(
                 }
             }
             if (problems.isNotEmpty()) throw GateError(problems)
-            return GateManifest(rows, listOf(source))
+            return GateManifest(rows, listOf(source), excuses)
+        }
+
+        /** The directive of an [Excuse] line. */
+        const val EXCUSE = "@excuse"
+
+        private fun excuse(cells: List<String>, source: String, line: Int, problems: MutableList<String>): Excuse? {
+            val where = "$source:$line"
+            if (cells.size != 7 || cells.any { it.isEmpty() }) {
+                return null.also { problems += "$where: $EXCUSE <entry> <member> <* or lat,lon> <date or from..to> <fault or unpublished> <reason>" }
+            }
+            val atText = cells[3]
+            val at = if (atText == "*") {
+                null
+            } else {
+                val parts = atText.split(',').map { it.trim().toDoubleOrNull() }
+                val lat = parts.getOrNull(0)
+                val lon = parts.getOrNull(1)
+                if (parts.size != 2 || lat == null || lon == null || lat !in -90.0..90.0 || lon !in -180.0..180.0) {
+                    return null.also { problems += "$where: point '$atText' (* or lat,lon)" }
+                }
+                GeoPoint(lat, lon)
+            }
+            val days = runCatching {
+                val ends = cells[4].split("..")
+                require(ends.size in 1..2)
+                LocalDate.parse(ends.first())..LocalDate.parse(ends.last())
+            }.getOrNull()
+            if (days == null || days.start > days.endInclusive) {
+                return null.also { problems += "$where: dates '${cells[4]}' (yyyy-mm-dd or from..to)" }
+            }
+            val kind = ExcuseKind.byKey(cells[5])
+                ?: return null.also { problems += "$where: '${cells[5]}' (${ExcuseKind.entries.joinToString(" or ") { it.key }})" }
+            return Excuse(source, line, cells[1], cells[2], at, days, kind, cells[6])
         }
 
         private fun row(cells: Map<String, String>, source: String, line: Int, problems: MutableList<String>): GateRow? {

@@ -135,6 +135,7 @@
     "checks_rule_body": "Awal waktu tidak pernah sebelum waktu otoritasnya sendiri, dan terbit matahari serta imsak tidak pernah sesudahnya. Di tempat masjid-masjid mengikuti jadwal yang berbeda tanpa mayoritas, Taqwa menampilkan setiap salat setelah semuanya memasukinya (waktu ihtiyat).",
     "checks_gate_h": "Gerbang pemeriksaan",
     "checks_gate_body": "Sebelum setiap rilis, Taqwa mencocokkan kembali mesinnya dengan setiap jadwal resmi yang dimilikinya: {tables} jadwal terbitan, {days} hari pemeriksaan di {entries} jadwal. Awal waktu yang ditampilkan terlalu awal: {early}. Terbit matahari atau imsak yang ditampilkan terlambat: {late}.",
+    "checks_gate_excused": "Hari yang tidak diterbitkan oleh jadwal itu sendiri, atau diterbitkan keliru, dikeluarkan dari pemeriksaan dan disebutkan beserta alasannya.",
     "checks_survey_h": "Di tempat masjid mengikuti rumpun kalender",
     "checks_survey_body": "Di tempat masjid-masjid sebuah kota mengikuti kalender dari satu rumpun, bukan satu jadwal terbitan, survei atas {calendars} kalender masjid menggantikan gerbang itu; masing-masing diperiksa di masjidnya sendiri.",
     "checks_pages_h": "Tempat mana yang punya halaman",

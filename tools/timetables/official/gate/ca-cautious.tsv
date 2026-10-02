@@ -7,6 +7,15 @@
 # Maghribs are within minutes of sunset (shown up to 6 min after them). Faults left out in the Task 7g copies under
 # namerica/split-7g/ (proof.md). Not members (proof.md): IISC Calgary (10°/10°), Al-Medina and Assiddiq Edmonton,
 # Al-Rahmah Surrey (18°/15° Hanafi, one month), Burnaby's 2015 table and Eyup Sultan (Diyanet). Every row is held out.
+# Ruling R117: the faults the Task 7g copies leave out, named in their headers (proof.md), as the gate reads them
+# (@excuse: entry, member, the table's lat,lon, the dates, fault, the reason).
+@excuse	ca.cautious	ca.eighteen	53.6000,-113.4410	2026-11-01	fault	Al Omari: every time an hour off on the day the clock changes
+@excuse	ca.cautious	ca.eighteen	53.5606,-113.5300	2026-08-04	fault	Al Ansar: Asr 10 min after its neighbours
+@excuse	ca.cautious	ca.eighteen	53.5606,-113.5300	2026-11-01	fault	Al Ansar: every time an hour off on the day the clock changes
+@excuse	ca.cautious	ca.eighteen	53.4675,-113.4302	2026-03-08	fault	Al Farooq: Fajr an hour early on the day the clock changes
+@excuse	ca.cautious	ca.eighteen	53.4675,-113.4302	2026-09-18	fault	Al Farooq: Asr 8 min before its neighbours
+@excuse	ca.cautious	ca.eighteen	53.4675,-113.4302	2026-11-01	fault	Al Farooq: every time an hour off on the day the clock changes
+@excuse	ca.cautious	ca.fifteen	53.6080,-113.5260	2026-11-01..2026-12-31	fault	Markaz Al Imam Malik: every time an hour off from the day the clock changes
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/namerica/canada/cal-calgary-islamic-centre-sw.txt	ca.cautious	51.0395	-114.1685	America/Edmonton	F+E S D A - I	daily	standard	test	Calgary Islamic Centre SW, Calgary (SW)	ca.isha90
 archive/tables/moral-auth-world/namerica/split-7g/edm-al-omari-masjid.txt	ca.cautious	53.6000	-113.4410	America/Edmonton	F+E S D A M I	daily	standard	test	Al Omari Masjid, Edmonton	ca.eighteen

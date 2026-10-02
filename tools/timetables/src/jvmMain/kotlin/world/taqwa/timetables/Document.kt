@@ -134,6 +134,11 @@ class Document(
             // Why a page shows its current month alone (ruling R116): the first timetable that
             // leaves a day of the next month unchecked, and that day. Null where both are shown.
             "nextUnchecked" to p.published?.nextUnchecked?.let { linkedMapOf("timetable" to it.timetable, "day" to it.day.toString()) },
+            // Ruling R117: each member table excused on days the page shows, why, and on how many
+            // days (the build's notice); null where none is.
+            "excused" to p.published?.excused?.takeIf { it.isNotEmpty() }?.map {
+                linkedMapOf("timetable" to it.timetable, "why" to it.why, "days" to it.days)
+            },
             "days" to days.map { day ->
                 linkedMapOf<String, Any?>(
                     "date" to day.date.toString(),

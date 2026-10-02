@@ -15,6 +15,23 @@
 # every day and are read whole at their units; as ca.toronto's members they leave out IFT's fault days too, as the split
 # files do (split-7g/<mosque>-2026-q4-capture.txt), since a capped Maghrib follows IFT's table, which those days lack.
 # On every day both hold, each capture prints the same minutes as the split files.
+# Ruling R117: the fault days above as the gate reads them (@excuse: entry, member, * for every point its rows are
+# read at or one lat,lon, the dates, fault or unpublished, the reason). IIT's and MAC's member rows leave out IFT's
+# fault days with it (a capped Maghrib follows IFT's table, which those days lack); their own tables hold those days
+# and are checked whole at their units. A page shows such a day only where another member's table is checked on it.
+@excuse	ca.toronto	ca.ift	*	2026-03-08..2026-03-12	fault	IFT's table keeps standard time for 8-12 March (the clock changed on 8 March)
+@excuse	ca.toronto	ca.ift	*	2026-03-28	fault	IFT's Fajr on 28 March repeats 27 March's minute
+@excuse	ca.toronto	ca.ift	*	2026-11-01..2026-11-06	fault	IFT's table keeps daylight time for 1-6 November (the clock changed on 1 November)
+@excuse	ca.toronto	ca.ift	*	2026-11-28..2026-11-30	fault	IFT's Isha 5 min after its neighbours on 28-30 November (a bump in the table)
+@excuse	ca.toronto	ca.iit	*	2026-03-08	fault	IIT's Asr keeps standard time on 8 March, the day the clock changed (and IFT's fault that day)
+@excuse	ca.toronto	ca.iit	*	2026-03-09..2026-03-12	fault	left out with IFT's fault days
+@excuse	ca.toronto	ca.iit	*	2026-03-28	fault	left out with IFT's fault day
+@excuse	ca.toronto	ca.iit	*	2026-11-01..2026-11-06	fault	left out with IFT's fault days
+@excuse	ca.toronto	ca.iit	*	2026-11-28..2026-11-30	fault	left out with IFT's fault days
+@excuse	ca.toronto	ca.mac	*	2026-03-08..2026-03-12	fault	left out with IFT's fault days
+@excuse	ca.toronto	ca.mac	*	2026-03-28	fault	left out with IFT's fault day
+@excuse	ca.toronto	ca.mac	*	2026-11-01..2026-11-06	fault	left out with IFT's fault days
+@excuse	ca.toronto	ca.mac	*	2026-11-28..2026-11-30	fault	left out with IFT's fault days
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h1.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	fit	IFT January-June 2026
 archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	test	IFT July-December 2026

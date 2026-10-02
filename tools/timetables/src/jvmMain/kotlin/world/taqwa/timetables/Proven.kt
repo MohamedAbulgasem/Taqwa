@@ -12,6 +12,7 @@ import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Resolution
 import world.taqwa.app.prayer.engine.registry.Units
 import world.taqwa.app.prayer.engine.registry.distanceKm
+import world.taqwa.timetables.gate.ExcuseKind
 import world.taqwa.app.prayer.engine.registry.lateReachKm
 import java.io.File
 import java.time.format.DateTimeFormatter
@@ -42,7 +43,50 @@ class Checked(runs: List<ClosedRange<LocalDate>>) {
     /** The first checked date after [date], or null. */
     fun nextStartAfter(date: LocalDate): LocalDate? = runs.map { it.start }.filter { it > date }.minOrNull()
 
+    /** The days both hold. */
+    fun intersect(other: Checked): Checked = union(
+        listOf(
+            Checked(
+                runs.flatMap { a ->
+                    other.runs.mapNotNull { b ->
+                        val start = maxOf(a.start, b.start)
+                        val end = minOf(a.endInclusive, b.endInclusive)
+                        if (start <= end) start..end else null
+                    }
+                },
+            ),
+        ),
+    )
+
+    /** The days this holds and [other] does not. */
+    fun minus(other: Checked): Checked {
+        var left = runs
+        for (cut in other.runs) {
+            left = left.flatMap { run ->
+                if (cut.endInclusive < run.start || cut.start > run.endInclusive) {
+                    listOf(run)
+                } else {
+                    listOfNotNull(
+                        if (cut.start > run.start) run.start..cut.start.minus(1, DateTimeUnit.DAY) else null,
+                        if (cut.endInclusive < run.endInclusive) cut.endInclusive.plus(1, DateTimeUnit.DAY)..run.endInclusive else null,
+                    )
+                }
+            }
+        }
+        return Checked(left)
+    }
+
+    /** How many days of [first]..[last] this holds. */
+    fun daysIn(first: LocalDate, last: LocalDate): Int = runs.sumOf { run ->
+        val start = maxOf(run.start, first)
+        val end = minOf(run.endInclusive, last)
+        if (start <= end) end.toEpochDays().toLong() - start.toEpochDays().toLong() + 1L else 0L
+    }.toInt()
+
     companion object {
+        /** Nothing checked. */
+        val NONE = Checked(emptyList())
+
         /** A stamp's list of runs; absent, it reads as nothing checked (the safe side). */
         fun parse(value: Any?): Checked = Checked(
             (value as? List<*>).orEmpty().mapNotNull { run ->
@@ -110,6 +154,20 @@ class Stamp(private val root: Map<String, Any?>) {
         }
     }
 
+    /**
+     * A cautious stamp: the days [memberId]'s rows leave out for a reason the gate file records
+     * (ruling R117), by the point its rows were read at and by the kind of reason ("fault",
+     * "unpublished"); empty on a stamp without them.
+     */
+    fun memberExcused(memberId: String): Map<GeoPoint, Map<String, Checked>> {
+        val member = (root["members"] as? Map<String, Any?>)?.get(memberId) as? Map<String, Any?> ?: return emptyMap()
+        val points = member["excused"] as? Map<String, Any?> ?: return emptyMap()
+        return points.entries.associate { (key, kinds) ->
+            val (lat, lon) = key.split(',')
+            GeoPoint(lat.toDouble(), lon.toDouble()) to (kinds as Map<String, Any?>).mapValues { (_, runs) -> Checked.parse(runs) }
+        }
+    }
+
     /** Early starts over every event: 0 on a green stamp. */
     fun early(): Int = events.values.sumOf { ((it as Map<String, Any?>)["early"] as? Long ?: 0L).toInt() }
 
@@ -163,7 +221,8 @@ sealed interface Verdict {
      * is the worst lateness over the starts there — null for a cautious place, which claims no
      * such figure (ruling R105: the entry-wide worst would be another place's). [through] is the
      * last date of the checked run the days shown sit in (ruling R115): for a cautious place the
-     * earliest such date over its members.
+     * last of the run of days covered there (ruling R117). [excused] names each member whose table
+     * is excused on days shown, why, and on how many (ruling R117).
      */
     data class Published(
         val stamp: Stamp,
@@ -172,6 +231,7 @@ sealed interface Verdict {
         val through: LocalDate,
         val months: List<ClosedRange<LocalDate>>,
         val nextUnchecked: Unchecked? = null,
+        val excused: List<Excused> = emptyList(),
     ) : Verdict
 
     data class Held(val reason: String) : Verdict
@@ -181,13 +241,22 @@ sealed interface Verdict {
 data class Unchecked(val timetable: String, val day: LocalDate)
 
 /**
- * Spec §2 (rulings R101, R115, R116): a city has a page only where the stamps prove every day it
- * shows — class A, B or C at the city, measured there, a green stamp for the resolved entry and
- * its unit, and every shown date among the days the gate compared for every timetable the page's
- * times depend on: the place's unit (or the entry, where the stamp has no units), and for a
- * cautious place every member at that place. The page shows whole months only: the current one
- * when every day of it is checked (else the city is held), and the next as well only when every
- * day of that one is checked too.
+ * Ruling R117: a member [timetable] excused on [days] of the days a page shows, for [why] — its
+ * kind of reason in words ("recorded faults", "days it does not publish"); the words themselves
+ * stay in the gate file.
+ */
+data class Excused(val timetable: String, val why: String, val days: Int)
+
+/**
+ * Spec §2 (rulings R101, R115, R116, R117): a city has a page only where the stamps prove every
+ * day it shows — class A, B or C at the city, measured there, a green stamp for the resolved entry
+ * and its unit, and every shown date among the days the gate compared for every timetable the
+ * page's times depend on: the place's unit (or the entry, where the stamp has no units), and for a
+ * cautious place every member at that place — except a day a member's table does not publish or
+ * publishes wrongly, recorded with its reason in the gate file, so long as another member's table
+ * was checked on it (ruling R117). The page shows whole months only: the current one when every
+ * day of it is checked (else the city is held), and the next as well only when every day of that
+ * one is checked too.
  */
 object Proven {
     /** "26 Oct 2026": plain English months (en-GB's CLDR data abbreviates September as "Sept"). */
@@ -217,16 +286,9 @@ object Proven {
         } else {
             stamp.events
         }
-        // The timetables the page's times depend on, each with the days it was checked on here.
-        val proven: List<Pair<String, Checked>> = if (cls == EntryClass.C) {
-            resolution.members.map { member ->
-                val here = memberChecked(stamp, member, resolution.point, place, stamps)
-                    ?: return Verdict.Held("${member.id} (a member of ${stamp.entry}): no checked table at this place")
-                "${member.id} (a member of ${stamp.entry})" to here
-            }
-        } else {
-            listOf(stamp.entry to (if (unitId != null) stamp.unitChecked(unitId) else stamp.checked))
-        }
+        if (cls == EntryClass.C) return cautious(resolution, place, stamp, events, months, stamps)
+        // The timetable the page's times depend on, with the days it was checked on here.
+        val proven: List<Pair<String, Checked>> = listOf(stamp.entry to (if (unitId != null) stamp.unitChecked(unitId) else stamp.checked))
         // The current month, whole, or no page.
         val current = months.first()
         for ((who, checked) in proven) {
@@ -254,14 +316,90 @@ object Proven {
     }
 
     /**
-     * [member]'s checked days at [point] (ruling R115): the cautious [stamp]'s rows for it within
-     * class C's reach of the point (the registry's own rule for how far a member's proof reaches,
-     * `memberMeasured`), else — where the member is its own entry with a green unit covering
-     * [place] — that unit's rows; null where it has neither.
+     * A cautious place (rulings R115, R117): a day is shown only where, for every member, the
+     * member's table is checked there or excused there for a recorded reason, and at least one
+     * member's table is checked there. A day every member is excused on is a hole; so is a day a
+     * member's table simply lacks. The held reason and the next month's notice name the first day
+     * not covered, and the first member neither checked nor excused on it.
      */
-    private fun memberChecked(stamp: Stamp, member: Member, point: GeoPoint, place: Place, stamps: Map<String, Stamp>): Checked? {
-        val near = stamp.memberPoints(member.id).filter { (at, _) -> distanceKm(point, at) <= lateReachKm(at.lat, EntryClass.C) }.values
-        if (near.isNotEmpty()) return Checked.union(near)
+    private fun cautious(
+        resolution: Resolution,
+        place: Place,
+        stamp: Stamp,
+        events: Map<String, Any?>,
+        months: List<ClosedRange<LocalDate>>,
+        stamps: Map<String, Stamp>,
+    ): Verdict {
+        val here = resolution.members.map { member ->
+            memberHere(stamp, member, resolution.point, place, stamps)
+                ?: return Verdict.Held("${member.id} (a member of ${stamp.entry}): no checked table at this place")
+        }
+        val covered = here.fold(Checked.union(here.map { it.checked })) { days, member -> days.intersect(member.covered) }
+        /** Who leaves [day] uncovered: the first member neither checked nor excused on it, else every member excused. */
+        fun who(day: LocalDate): MemberHere? = here.firstOrNull { !it.covered.covers(day) }
+        val current = months.first()
+        covered.firstUncovered(current.start, current.endInclusive)?.let { day ->
+            val member = who(day)
+            return Verdict.Held(
+                if (member != null) {
+                    "${member.who}: no checked table day ${hole(member.covered, day, current.endInclusive)}"
+                } else {
+                    "${stamp.entry}: no member's table checked day ${hole(covered, day, current.endInclusive)} (every member's excused)"
+                },
+            )
+        }
+        var shown = 1
+        var nextUnchecked: Unchecked? = null
+        for (month in months.drop(1)) {
+            val day = covered.firstUncovered(month.start, month.endInclusive)
+            if (day != null) {
+                nextUnchecked = Unchecked(who(day)?.who ?: "${stamp.entry} (every member's table excused)", day)
+                break
+            }
+            shown++
+        }
+        val firstShown = current.start
+        val lastShown = months[shown - 1].endInclusive
+        val excused = here.flatMap { member ->
+            member.excused.mapNotNull { (kind, days) ->
+                days.daysIn(firstShown, lastShown).takeIf { it > 0 }?.let { Excused(member.who, ExcuseKind.byKey(kind)?.words ?: kind, it) }
+            }
+        }
+        return Verdict.Published(stamp, events, null, covered.endOf(lastShown)!!, months.take(shown), nextUnchecked, excused)
+    }
+
+    /**
+     * A cautious member at a place: the days its table is [checked] there, the days it is [checked]
+     * or excused there ([covered]), and its excused days by the kind of reason ([excused]).
+     */
+    private class MemberHere(val who: String, val checked: Checked, val covered: Checked, val excused: Map<String, Checked>)
+
+    /**
+     * [member] at [point] (rulings R115, R117): its checked days are the cautious [stamp]'s rows for
+     * it within class C's reach of the point (the registry's own rule for how far a member's proof
+     * reaches, `memberMeasured`), and its excused days those the gate file excuses there. Where it
+     * has no such rows, or on a day its rows there leave out for a recorded reason, its own green
+     * unit covering [place] — where the member is its own entry — stands in with that unit's
+     * checked days. Null where it has neither.
+     */
+    private fun memberHere(stamp: Stamp, member: Member, point: GeoPoint, place: Place, stamps: Map<String, Stamp>): MemberHere? {
+        val who = "${member.id} (a member of ${stamp.entry})"
+        fun near(at: GeoPoint) = distanceKm(point, at) <= lateReachKm(at.lat, EntryClass.C)
+        val rows = stamp.memberPoints(member.id).filterKeys(::near).values
+        val own = ownUnitChecked(member, place, stamps)
+        if (rows.isEmpty()) return own?.let { MemberHere(who, it, it, emptyMap()) }
+        val atRows = Checked.union(rows)
+        val excusedHere = stamp.memberExcused(member.id).filterKeys(::near).values
+            .flatMap { it.entries }
+            .groupBy({ it.key }, { it.value })
+            .mapValues { (_, runs) -> Checked.union(runs).minus(atRows) }
+        val anyExcused = Checked.union(excusedHere.values)
+        val checked = if (own == null) atRows else Checked.union(listOf(atRows, own.intersect(anyExcused)))
+        return MemberHere(who, checked, Checked.union(listOf(checked, anyExcused)), excusedHere.mapValues { (_, days) -> days.minus(checked) })
+    }
+
+    /** [member]'s own entry's checked days at the green unit covering [place], or null. */
+    private fun ownUnitChecked(member: Member, place: Place, stamps: Map<String, Stamp>): Checked? {
         val own = stamps[member.id] ?: return null
         val unit = Units.of(member.id)?.unitFor(place) ?: return null
         if (own.unitEvents(unit.id) == null || own.unitBroken(unit.id) != 0) return null
@@ -281,7 +419,7 @@ object Proven {
 
 /** The totals the "How Taqwa checks" page prints (spec §5), read from the files, never typed. */
 object ProofTotals {
-    /** The gate's rows: every `.tsv` under `gate`, read as `GateManifest.parse` reads it — `#` lines and blank lines skipped, the first other line the header. */
+    /** The gate's rows: every `.tsv` under `gate`, read as `GateManifest.parse` reads it — `#` lines, `@` directives (ruling R117's `@excuse`) and blank lines skipped, the first other line the header. */
     fun gateRows(official: File): Int = (official.resolve("gate").listFiles { f -> f.isFile && f.extension == "tsv" } ?: emptyArray())
         .sumOf { file -> rows(file) }
 
@@ -289,5 +427,5 @@ object ProofTotals {
     fun surveyCalendars(official: File): Int = (official.resolve("survey").listFiles { f -> f.isDirectory } ?: emptyArray())
         .sumOf { dir -> dir.resolve("calendars.tsv").takeIf { it.isFile }?.let { rows(it) } ?: 0 }
 
-    private fun rows(file: File): Int = file.readLines().filter { it.isNotBlank() && !it.startsWith("#") }.drop(1).size
+    private fun rows(file: File): Int = file.readLines().filter { it.isNotBlank() && !it.startsWith("#") && !it.startsWith("@") }.drop(1).size
 }

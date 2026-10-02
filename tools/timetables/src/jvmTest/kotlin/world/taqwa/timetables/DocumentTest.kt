@@ -32,6 +32,7 @@ class DocumentTest {
     private val cairo = city("cairo-egypt", "EG", 30.06263, 31.24967, "Africa/Cairo", linkedMapOf("en" to "Cairo", "ar" to "القاهرة"))
     private val london = city("london-uk", "GB", 51.50853, -0.12574, "Europe/London", linkedMapOf("en" to "London", "ar" to "لندن"), admin1 = "England")
     private val toronto = city("toronto-canada", "CA", 43.70643, -79.39864, "America/Toronto", linkedMapOf("en" to "Toronto", "ur" to "ٹورانٹو"), admin1 = "Ontario")
+    private val istanbul = city("istanbul-turkiye", "TR", 41.01384, 28.94966, "Europe/Istanbul", linkedMapOf("en" to "Istanbul", "tr" to "İstanbul"), admin1 = "Istanbul")
     private val newYork = city("new-york-usa", "US", 40.71427, -74.00597, "America/New_York", linkedMapOf("en" to "New York"))
 
     private val official = TestPaths.repoRoot.resolve("tools/timetables/official")
@@ -239,18 +240,19 @@ class DocumentTest {
 
     @Test
     fun aCityWhoseNextMonthIsUncheckedCarriesItsCurrentMonthAlone() {
-        // Built at the first run of 1 October: Toronto's members leave 1–6 November unchecked, so its
-        // page is October alone — the months, the facts' days and every page's days — and the
-        // document says why. November's clock change is on no day shown, so no page mentions it.
+        // Built at the first run of 1 October: Diyanet's captures reach 1 November, so İstanbul's page
+        // is October alone — the months, the facts' days and every page's days — and the document
+        // says why. Türkiye keeps one clock all year, so no page mentions a change.
         val october = Instant.parse("2026-10-01T06:07:00Z")
-        val built = document.build(listOf(toronto, london), october)
+        val built = document.build(listOf(istanbul, london), october)
         assertEquals(emptyList<Map<String, Any?>>(), built.list("held"))
-        val city = built.list("cities").first { it["slug"] == "toronto-canada" }
+        val city = built.list("cities").first { it["slug"] == "istanbul-turkiye" }
         assertEquals(listOf(linkedMapOf<String, Any?>("year" to 2026, "month" to 10, "days" to 31)), city.list("months"))
         assertEquals((1..31).map { LocalDate(2026, 10, it).toString() }, city.list("days").map { it["date"] })
-        assertEquals(mapOf("timetable" to "ca.ift (a member of ca.toronto)", "day" to "2026-11-01"), city["nextUnchecked"])
-        assertEquals("2026-10-31", city.map("proof")["through"])
-        for (language in listOf("en", "ur")) {
+        assertEquals(mapOf("timetable" to "tr.diyanet", "day" to "2026-11-02"), city["nextUnchecked"])
+        assertEquals("2026-11-01", city.map("proof")["through"])
+        assertNull(city["excused"])
+        for (language in listOf("en", "tr")) {
             val page = city.map("pages").map(language)
             assertEquals(1, page.list("months").size, language)
             assertEquals(31, page.list("days").size, language)
@@ -262,6 +264,20 @@ class DocumentTest {
         assertEquals(listOf(10, 11), london.list("months").map { it["month"] })
         assertEquals(61, london.list("days").size)
         assertNull(london["nextUnchecked"])
+    }
+
+    @Test
+    fun aCautiousCityShowsAMonthWithAMembersFaultDaysExcusedAndSaysSo() {
+        // Ruling R117: IFT's table is wrong on nine November days (recorded in ca-toronto.tsv); on them
+        // IIT's and MAC's tables are checked, so from 1 October Toronto shows October and November, and
+        // the document names the excused days for the build's notice.
+        val city = document.city(toronto, Instant.parse("2026-10-01T06:07:00Z"))
+        assertEquals(listOf(10, 11), city.list("months").map { it["month"] })
+        assertNull(city["nextUnchecked"])
+        assertEquals(
+            listOf(mapOf("timetable" to "ca.ift (a member of ca.toronto)", "why" to "recorded faults", "days" to 9)),
+            city["excused"],
+        )
     }
 
     @Test
@@ -418,13 +434,13 @@ class DocumentTest {
         assertEquals("C", toronto["class"])
         assertNull(toronto["atMost"]) // a cautious entry claims no "at most" (ruling R105); the page renders "—"
         assertEquals("Cautious times", toronto.map("names")["en"])
-        // Ruling R115: Toronto's members are checked through 31 October, then not again until
-        // 7 November, so the row says October, not the stamp's December. Ruling R114: the checks
-        // page has no country, so the date reads in the language's own form — British order, not
-        // en-CA's "October 31, 2026".
-        assertEquals("2026-10-31", toronto["through"])
-        assertEquals("31 October 2026", toronto.map("throughText")["en"])
-        assertEquals(Formats.forLanguage("ar").longDate(LocalDate(2026, 10, 31)), toronto.map("throughText")["ar"])
+        // Ruling R115: the row says through the end of the days covered at Toronto. Ruling R117: IFT's
+        // fault days in November are covered (IIT's and MAC's tables are checked on them), so through
+        // the members' December. Ruling R114: the checks page has no country, so the date reads in the
+        // language's own form — British order, not en-CA's "December 31, 2026".
+        assertEquals("2026-12-31", toronto["through"])
+        assertEquals("31 December 2026", toronto.map("throughText")["en"])
+        assertEquals(Formats.forLanguage("ar").longDate(LocalDate(2026, 12, 31)), toronto.map("throughText")["ar"])
         assertEquals(1, built.list("held").size)
     }
 }

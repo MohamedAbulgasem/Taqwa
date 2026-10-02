@@ -130,6 +130,36 @@ no day it holds, the Today card is that day's calendar leaf (weekday, day, month
 an empty ring and no countdown, Isha current as in the app; once that day is over, the page's own
 out-of-date line.
 
+**Amended by ruling R117 (the owner, 2 October; binding): a member's unpublished or misprinted day does
+not block a cautious page.** For class C, clause 4 reads: a shown day is covered when, for every member at
+the place, the member's table is checked there or **excused** there, and at least one member's table is
+actually checked there. A day is excused only where a gate file records why, with an `@excuse` line —
+`@excuse <entry> <member> <* | lat,lon> <date or from..to> <fault | unpublished> <reason>`, the reason in
+words (dates and differences, never a printed time, R69) — "fault" where the table publishes the day
+wrongly, "unpublished" where it does not publish it. The gate records each excused day per member and point,
+where the member's rows there do not hold it, in the stamp beside the checked runs (`members.<id>.excused.
+<point>.<fault|unpublished>`, dates only; the gate refuses a line that excuses a day the member's rows
+there hold, or matches no row of it), and nothing else in the gate changes: it excuses no cell. On a day a
+member's rows near the city leave out for a recorded reason, the member's own green unit covering the city,
+where it is its own entry, counts as checked if that unit's table holds the day (R115's own-unit reading,
+day by day). A day every member is excused on is a hole; a day a member's table simply lacks still holds
+the page; A and B pages are unchanged. The held reason and `nextUnchecked` name the first day not covered
+and the first member neither checked nor excused on it (or the entry, "every member's table excused").
+`through` for a cautious page is the end of the covered run. The document adds `excused` per city
+(`[{timetable, why, days}]` within the months shown, null where none), and each build prints
+`::notice::toronto-canada: 9 days excused: ca.ift (a member of ca.toronto) recorded faults`. The checks
+page says so in one sentence (`checks_gate_excused`, seven languages). Recorded on 2 October:
+`ca-toronto.tsv` — IFT keeps standard time 8–12 March, repeats a Fajr minute on 28 March, keeps daylight
+time 1–6 November, prints Isha 5 min after its neighbours 28–30 November; IIT's and MAC's member rows leave
+the same days out (a capped Maghrib follows IFT's table), IIT's Asr also 8 March — so from 2 October
+**Toronto and Mississauga show October and November** (and on 1 November, November and December, where
+before R117 both would have been held), IIT's and MAC's own tables being checked whole at their units on
+those days; `ca-cautious.tsv` (the Edmonton tables' clock-change and Asr misprints, Imam Malik's November–
+December) and `se-cautious.tsv` (Rabita's 31 March) are recorded too and change no page. Cape Town's
+community calendar needs no excuse (masjids.co.za's relay prints every day the Wembley calendar leaves out,
+so the member is checked every day); its November waits for the MJC's November, which the MJC has not yet
+published — a month not yet out is not a day the table does not publish.
+
 ### 2.1 Published (41 on 29 September; 38 from 1 October)
 
 *Final, under ruling R115 (the release build of 29 September):* **41 published** — the nine Saudi
@@ -603,6 +633,8 @@ and refuses (exit 1) a `cities.tsv` row whose slug is `how-taqwa-checks`. A Kotl
 with real stamps (London published; Cairo held for coverage; Tripoli held for class; Cape Town held for
 coverage; Birmingham held as not measured; a fake unit id held). *Amended by ruling R116 (§2): the
 verdict also says which months are shown, and the warning is a notice per city shown with one month.*
+*Amended by ruling R117 (§2): for class C the verdict covers a member's excused days where another member
+is checked, and names the excused days per member (`Verdict.Published.excused`, a notice each).*
 
 ### 9.3 The site (`site/`)
 

@@ -16,7 +16,9 @@
 # A row is un-held when the stamps prove every day its page shows (rulings R101, R115 and R116,
 # spec §2 in docs/superpowers/specs/2026-09-29-city-pages-design.md): the engine resolves the city
 # to a class A, B or C entry, measured at the city, with a green stamp for the entry and its unit,
-# and every day of this month checked for every timetable the page depends on; next month is shown
+# and every day of this month checked for every timetable the page depends on (ruling R117: a cautious
+# member's day its table does not publish or gets wrong, recorded in the gate file, does not block while
+# another member's table is checked that day); next month is shown
 # too once every day of it is checked. tools/timetables applies the rule on every build and holds a
 # row it rejects, with a notice, so a city whose timetable is not yet checked for this month holds
 # by itself (London Unified's ends 31 December 2026: gate the 2027 table before January) and comes

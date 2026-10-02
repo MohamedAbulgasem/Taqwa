@@ -10,7 +10,8 @@ import java.security.MessageDigest
  * The gate's stamps (spec §5): per entry, what was checked and how it came out, as statistics only.
  * A stamp never holds an official time: places, first and last date, the checked dates as runs
  * (for the entry, each unit and, for a cautious entry, each member at each point its rows were
- * read at — ruling R115: a page shows only days some table was checked on), place-days, Ramadan
+ * read at — ruling R115: a page shows only days some table was checked on — with the days the gate
+ * file excuses there and the kind of reason, never its words: ruling R117), place-days, Ramadan
  * days, early and late-end counts per event, the late histogram, the exact share, the worst late
  * minutes, the cells declared not followed and their dates (ruling R82), and the engine hash they
  * were measured on. Committed as `official/stamps/<entry>.json`; the same inputs always write the
@@ -70,11 +71,16 @@ object Stamps {
         ),
         // A cautious entry's members: each one's checked days, and by the point its rows were read at
         // (ruling R115: a place is proven only where every member's table was checked near it).
+        // Ruling R117: and the days its rows there leave out for a reason the gate file records, by
+        // point and by why ("fault": printed wrongly; "unpublished": not printed) — dates only.
         "members" to if (s.memberDays.isEmpty()) null else s.memberDays.entries.associate { (member, points) ->
             member to linkedMapOf(
                 "checked" to dateRanges(points.values.flatten()),
                 "points" to points.entries.associate { (point, dates) -> point to dateRanges(dates) },
-            )
+                "excused" to s.memberExcused[member]?.takeIf { it.isNotEmpty() }?.entries?.associate { (point, kinds) ->
+                    point to kinds.entries.associate { (kind, dates) -> kind.key to dateRanges(dates) }
+                },
+            ).filterValues { it != null }
         },
         // The limits the events were held to (rulings R37, R41): each event's exception from its unit,
         // else its entry, else its class's.

@@ -2073,3 +2073,43 @@ Checked: tools jvmTest 267/0 with the archive. The shared stamp, About and golde
 (25/0), and so did `checkStamps`. `build.py --check` passed (164 pages, 143 of them prayer times for
 55 cities), and `site/test_timetables.py` passed (18). Brussels and Chicago were looked at whole at a
 true 390 px, and Antwerp at the top.
+
+## A member's misprinted day no longer blocks a cautious page (2 October, night) — ruling R117
+
+The owner's ruling: a day a member timetable does not publish, or publishes wrongly, does not block a
+page, so long as the fault is recorded with its reason and another member's table is checked that day.
+A day every member is excused on is still a hole, and an unexplained gap still blocks.
+
+- **The gate files** say why a member's day is missing in an `@excuse` line: the entry, the member, `*`
+  (every point its rows are read at) or one point, the dates, `fault` or `unpublished`, and the reason
+  in words (dates and differences only). `ca-toronto.tsv` now records IFT's faults (standard time kept
+  8–12 March, a repeated Fajr minute on 28 March, daylight time kept 1–6 November, Isha 5 min after its
+  neighbours 28–30 November) and IIT's and MAC's member rows leaving the same days out, with IIT's own
+  8 March Asr. `ca-cautious.tsv` records the Edmonton tables' faults and `se-cautious.tsv` Rabita's
+  31 March, which were written only in comments and table headers until now.
+- **The gate** records each excused day per member and point in the stamp, by kind, dates only. It
+  refuses a line that excuses a day the member's rows there hold, or that matches no row. Nothing else
+  changes: still 828 rows and 157,851 place-days, 0 early, 0 late ends, none over its limit. Only the
+  three cautious stamps gained their `excused` days. ProofStamps.kt and the golden vector are
+  byte-identical.
+- **The proven rule** (Proven.kt): for class C, a shown day is covered when every member is checked or
+  excused there and at least one is checked. On a day a member's rows near the city leave out for a
+  recorded reason, its own green unit covering the city counts if it holds the day. That is R115's
+  own-unit reading, applied day by day. A and B are unchanged. The build prints a notice per member
+  excused on days shown, for example `toronto-canada: 9 days excused: ca.ift (a member of ca.toronto)
+  recorded faults`.
+- **The checks page** says in one sentence, in all seven languages, that days a timetable itself does
+  not publish or gets wrong are left out of the check and named, with the reason.
+
+**The cities.** The rule over every row un-held: on 2 October, **Toronto and Mississauga show October
+and November** (before: October alone). On 1 November they show November and December, where before
+R117 both would have been held. On those nine November days IIT's and MAC's own tables are checked
+whole at their units. The checks page's Toronto row now reads through 31 December. No other city
+changes. Cape Town's November is still held: its community calendar needed no excuse (masjids.co.za's
+relay prints every day the Wembley calendar leaves out), and the MJC's November is not yet published,
+which is not a day the table does not publish.
+
+Checked: tools jvmTest 281/0 with the archive. The shared ProofStamps and AboutTimes tests passed (24/0),
+and so did `checkStamps` (71 stamps). `build.py --check` passed (164 pages, 143 of them prayer times for
+55 cities), and `site/test_timetables.py` passed (18). Toronto's page was looked at whole at a true
+390 px, in English, with both months.

@@ -204,6 +204,80 @@ class CautiousGateTest {
         )
     }
 
+    // ── Ruling R117: a member's days left out for a recorded reason ──
+
+    private val point = "1.28967,103.85007"
+
+    private fun excuse(member: String, days: String, kind: String = "fault", at: String = "*") =
+        "@excuse\ttest.cautious\t$member\t$at\t$days\t$kind\ta made-up reason"
+
+    /** test.b's table three minutes later, without [left] (its fault days). */
+    private fun bWithout(vararg left: String): String {
+        val path = shifted("b.txt", 3)
+        val file = archive.resolve(path)
+        file.writeText(file.readLines().filter { line -> left.none { line.startsWith(it) } }.joinToString("\n"))
+        return path
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun members(result: GateResult) =
+        Stamps.stamp(result.entries.getValue("test.cautious"), "core")["members"] as Map<String, Map<String, Any?>>
+
+    @Test
+    fun `an excused member day is recorded at its point with its kind and nothing else changes`() {
+        val rows = arrayOf(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(bWithout("2026-02-16", "2026-02-17"), "test.b"))
+        val plain = gate(twoMembers).evaluate(manifest(*rows))
+        val excused = gate(twoMembers).evaluate(manifest(*rows, excuse("test.b", "2026-02-16"), excuse("test.b", "2026-02-17", "unpublished")))
+        assertEquals(mapOf(point to mapOf("fault" to listOf("2026-02-16"), "unpublished" to listOf("2026-02-17"))), members(excused).getValue("test.b")["excused"])
+        assertEquals(null, members(excused).getValue("test.a")["excused"])
+        assertEquals(listOf("2026-02-14..2026-02-15", "2026-02-18"), members(excused).getValue("test.b")["checked"])
+        // The excuse checks nothing and excuses no cell: the stamps differ in the excused days alone.
+        val withoutExcused = Stamps.stamp(excused.entries.getValue("test.cautious"), "core").toMutableMap().also { stamp ->
+            @Suppress("UNCHECKED_CAST")
+            stamp["members"] = (stamp["members"] as Map<String, Map<String, Any?>>).mapValues { (_, m) -> m - "excused" }
+        }
+        assertEquals(Stamps.stamp(plain.entries.getValue("test.cautious"), "core"), withoutExcused)
+        assertTrue("excused for test.b (recorded faults, ruling R117): 2026-02-16, at 1 point" in excused.report(), excused.report())
+    }
+
+    @Test
+    fun `an excuse at one point leaves the member's other points alone`() {
+        val far = "1.35,103.82"
+        val elsewhere = "open/SG-MUIS/muis-2026-02-a.txt\ttest.cautious\t1.35\t103.82\tAsia/Singapore\tF S D A M I\tdaily\tstandard\ttest\t\ttest.b"
+        val b = bWithout("2026-02-16")
+        val result = gate(twoMembers).evaluate(
+            manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(b, "test.b"), elsewhere, excuse("test.b", "2026-02-16", at = point)),
+        )
+        assertEquals(mapOf(point to mapOf("fault" to listOf("2026-02-16"))), members(result).getValue("test.b")["excused"])
+        @Suppress("UNCHECKED_CAST")
+        assertEquals(listOf("2026-02-14..2026-02-18"), (members(result).getValue("test.b")["points"] as Map<String, Any?>)[far])
+    }
+
+    @Test
+    fun `an excused day the member's rows hold is a mistake`() {
+        // A day is checked or excused, never both: the line contradicts the rows.
+        val error = assertFailsWith<GateError> {
+            gate(twoMembers).evaluate(manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), excuse("test.a", "2026-02-15..2026-02-16")))
+        }
+        assertTrue("c.tsv:3: test.a is checked at $point on 2026-02-15..2026-02-16, which this line excuses" in error.problems, error.message)
+    }
+
+    @Test
+    fun `an excuse names a member of a cautious entry with rows`() {
+        val a = row("open/SG-MUIS/muis-2026-02-a.txt", "test.a")
+        val unknown = assertFailsWith<GateError> { gate(twoMembers).evaluate(manifest(a, excuse("test.z", "2026-02-16"))) }
+        assertTrue("c.tsv:3: test.z is not a member of test.cautious (test.a test.b)" in unknown.problems, unknown.message)
+        val rowless = assertFailsWith<GateError> { gate(twoMembers).evaluate(manifest(a, excuse("test.b", "2026-02-16"))) }
+        assertTrue("c.tsv:3: no row of test.b for test.cautious" in rowless.problems, rowless.message)
+        val single = GateManifest.parse(
+            "s.tsv",
+            listOf(header, "open/SG-MUIS/muis-2026-02-a.txt\tsg.muis\t\t\tAsia/Singapore\tF\tdaily\t-\ttest\t\t", "@excuse\tsg.muis\tsg.muis\t*\t2026-02-16\tfault\tr")
+                .joinToString("\n"),
+        )
+        val notCautious = assertFailsWith<GateError> { Gate(roots).evaluate(single) }
+        assertTrue("s.tsv:3: sg.muis is not cautious; only a member's days are excused" in notCautious.problems, notCautious.message)
+    }
+
     @Test
     fun `a cautious row names its member and no other row does`() {
         val missing = assertFailsWith<GateError> { gate(twoMembers).evaluate(manifest(row("open/SG-MUIS/muis-2026-02-a.txt", null))) }

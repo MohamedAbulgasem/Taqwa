@@ -68,12 +68,25 @@ class ProvenTest {
         root["units"] = units
     }
 
-    /** Toronto's stamp with its members' checked runs by point replaced. */
-    private fun torontoMembers(vararg members: Pair<String, Map<String, List<String>>>) = stamp("ca.toronto") { root ->
+    /**
+     * Toronto's stamp with its members' checked runs by point replaced, and [excused] — by member,
+     * by point, the runs a gate file excuses as faults there (ruling R117).
+     */
+    private fun torontoMembers(
+        vararg members: Pair<String, Map<String, List<String>>>,
+        excused: Map<String, Map<String, List<String>>> = emptyMap(),
+    ) = stamp("ca.toronto") { root ->
         root["members"] = members.associate { (id, points) ->
-            id to mapOf("checked" to points.values.flatten(), "points" to points)
+            id to (
+                mapOf("checked" to points.values.flatten(), "points" to points) +
+                    excused[id]?.let { mapOf("excused" to it.mapValues { (_, runs) -> mapOf("fault" to runs) }) }.orEmpty()
+                )
         }
     }
+
+    /** A Toronto member's year without 1–6 November, and those days, as a gate file would excuse them. */
+    private val yearWithoutNov1to6 = listOf("2026-01-01..2026-10-31", "2026-11-07..2026-12-31")
+    private val nov1to6 = listOf("2026-11-01..2026-11-06")
 
     private val mosque = "43.798,-79.2417" // a Toronto mosque's point, as the gate file gives it
     private val trondheim = "63.43049,10.39506"
@@ -144,16 +157,26 @@ class ProvenTest {
         assertEquals(1400, v.stamp.placeDays)
     }
 
-    @Test fun torontoShowsOctoberAloneWhileNovemberIsUnchecked() {
-        // Its three member tables lack 1–6 and 28–30 November (review C1). Ruling R116: October is
-        // checked whole, so the page shows October alone and names the first member that leaves a
-        // November day unchecked; November joins the page when every day of it is checked.
+    @Test fun torontoShowsOctoberAndNovemberWithIftsFaultDaysExcused() {
+        // IFT's table keeps daylight time on 1–6 November and prints Isha 5 min after its neighbours on
+        // 28–30 November; ca-toronto.tsv records both as IFT's faults, and IIT's and MAC's member rows
+        // leave the same days out. Ruling R117: those days do not hold the page — on them IIT's and
+        // MAC's own tables are checked at their units — so from 1 October the page shows October and
+        // November, the nine days named as excused for IFT.
         val v = verdict(toronto, oct1)
         assertIs<Verdict.Published>(v)
-        assertEquals(listOf(oct1..oct31), v.months)
-        assertEquals(Unchecked("ca.ift (a member of ca.toronto)", nov1), v.nextUnchecked)
-        assertEquals(oct31, v.through)
+        assertEquals(months(oct1), v.months)
+        assertNull(v.nextUnchecked)
+        assertEquals(LocalDate(2026, 12, 31), v.through)
         assertNull(v.atMost)
+        assertEquals(listOf(Excused("ca.ift (a member of ca.toronto)", "recorded faults", 9)), v.excused)
+        // Without IIT's and MAC's own stamps no member is checked on those days: a hole, as before.
+        val alone = verdict(toronto, oct1, with = stamps - "ca.iit" - "ca.mac")
+        assertIs<Verdict.Published>(alone)
+        assertEquals(listOf(oct1..oct31), alone.months)
+        assertEquals(Unchecked("ca.toronto (every member's table excused)", nov1), alone.nextUnchecked)
+        assertEquals(oct31, alone.through)
+        assertEquals(emptyList(), alone.excused)
     }
 
     // ── Each clause on a synthetic stamp (built from a committed one; never a time) ──
@@ -318,6 +341,110 @@ class ProvenTest {
         val iit = stamps.getValue("ca.iit")
         val v = verdict(toronto, with = mapOf(cautious.entry to cautious, iit.entry to iit))
         assertIs<Verdict.Published>(v)
+    }
+
+    // ── Ruling R117: a member's day excused for a recorded reason ──
+
+    @Test fun aMembersExcusedDayIsCoveredWhereAnotherMemberIsChecked() {
+        val excused = torontoMembers(
+            "ca.ift" to mapOf(mosque to yearWithoutNov1to6),
+            "ca.iit" to mapOf(mosque to year),
+            "ca.mac" to mapOf(mosque to year),
+            excused = mapOf("ca.ift" to mapOf(mosque to nov1to6)),
+        )
+        val v = verdict(toronto, nov1, with = mapOf(excused.entry to excused))
+        assertIs<Verdict.Published>(v)
+        assertEquals(months(nov1), v.months)
+        assertNull(v.nextUnchecked)
+        assertEquals(LocalDate(2026, 12, 31), v.through)
+        assertEquals(listOf(Excused("ca.ift (a member of ca.toronto)", "recorded faults", 6)), v.excused)
+    }
+
+    @Test fun aDayEveryMemberIsExcusedOnIsAHole() {
+        // Every shown day needs one member actually checked: excused by all three, 1–6 November holds.
+        val all = torontoMembers(
+            "ca.ift" to mapOf(mosque to yearWithoutNov1to6),
+            "ca.iit" to mapOf(mosque to yearWithoutNov1to6),
+            "ca.mac" to mapOf(mosque to yearWithoutNov1to6),
+            excused = listOf("ca.ift", "ca.iit", "ca.mac").associateWith { mapOf(mosque to nov1to6) },
+        )
+        val with = mapOf(all.entry to all)
+        val v = verdict(toronto, nov1, with = with)
+        assertIs<Verdict.Held>(v)
+        assertEquals("ca.toronto: no member's table checked day 1 Nov 2026 – 6 Nov 2026 (every member's excused)", v.reason)
+        val october = verdict(toronto, oct1, with = with)
+        assertIs<Verdict.Published>(october)
+        assertEquals(listOf(oct1..oct31), october.months)
+        assertEquals(Unchecked("ca.toronto (every member's table excused)", nov1), october.nextUnchecked)
+        // Where a member's own unit was checked on those days (IIT's table, whole at its mosque), it is checked there.
+        val unit = verdict(toronto, nov1, with = with + ("ca.iit" to stamps.getValue("ca.iit")))
+        assertIs<Verdict.Published>(unit)
+        assertEquals(months(nov1), unit.months)
+        assertEquals(
+            listOf("ca.ift", "ca.mac").map { Excused("$it (a member of ca.toronto)", "recorded faults", 6) },
+            unit.excused,
+        )
+    }
+
+    @Test fun anUnrecordedGapStillHoldsTheCity() {
+        // Only 1–3 November are excused; 4–6 are simply missing: the member is named from 4 November.
+        val part = torontoMembers(
+            "ca.ift" to mapOf(mosque to yearWithoutNov1to6),
+            "ca.iit" to mapOf(mosque to year),
+            "ca.mac" to mapOf(mosque to year),
+            excused = mapOf("ca.ift" to mapOf(mosque to listOf("2026-11-01..2026-11-03"))),
+        )
+        val v = verdict(toronto, nov1, with = mapOf(part.entry to part))
+        assertIs<Verdict.Held>(v)
+        assertEquals("ca.ift (a member of ca.toronto): no checked table day 4 Nov 2026 – 6 Nov 2026", v.reason)
+    }
+
+    @Test fun anExcuseFarAwayExcusesNothingHere() {
+        // The excuse is the member's at the point its rows were read at: Trondheim's prove nothing at Toronto.
+        val far = torontoMembers(
+            "ca.ift" to mapOf(mosque to yearWithoutNov1to6),
+            "ca.iit" to mapOf(mosque to year),
+            "ca.mac" to mapOf(mosque to year),
+            excused = mapOf("ca.ift" to mapOf(trondheim to nov1to6)),
+        )
+        val v = verdict(toronto, nov1, with = mapOf(far.entry to far))
+        assertIs<Verdict.Held>(v)
+        assertEquals("ca.ift (a member of ca.toronto): no checked table day 1 Nov 2026 – 6 Nov 2026", v.reason)
+    }
+
+    @Test fun aClassAOrBPageIsUnchangedByExcuses() {
+        // Ruling R117 is a cautious place's: an A or B page needs its own unit checked on every day it shows,
+        // whatever a stamp says of members.
+        val holed = stamp("gb.london.lupt") { root ->
+            @Suppress("UNCHECKED_CAST")
+            val units = LinkedHashMap(root["units"] as Map<String, Any?>)
+            @Suppress("UNCHECKED_CAST")
+            units["gb.london.lupt"] = LinkedHashMap(units["gb.london.lupt"] as Map<String, Any?>).also {
+                it["checked"] = listOf("2026-01-01..2026-09-14", "2026-09-16..2026-12-31")
+            }
+            root["units"] = units
+            root["members"] = mapOf(
+                "gb.london.lupt" to mapOf("points" to mapOf("51.5,-0.12" to year), "excused" to mapOf("51.5,-0.12" to mapOf("fault" to listOf("2026-09-15")))),
+            )
+        }
+        val v = verdict(london, with = mapOf(holed.entry to holed))
+        assertIs<Verdict.Held>(v)
+        assertEquals("gb.london.lupt: no checked table day 15 Sep 2026 – 15 Sep 2026", v.reason)
+        val whole = verdict(london)
+        assertIs<Verdict.Published>(whole)
+        assertEquals(emptyList(), whole.excused)
+    }
+
+    @Test fun checkedRunsIntersectAndSubtract() {
+        val a = Checked.parse(listOf("2026-11-01..2026-11-30"))
+        val b = Checked.parse(listOf("2026-11-05..2026-11-07", "2026-11-20..2026-12-10"))
+        assertEquals(listOf(LocalDate(2026, 11, 5)..LocalDate(2026, 11, 7), LocalDate(2026, 11, 20)..LocalDate(2026, 11, 30)), a.intersect(b).runs)
+        assertEquals(
+            listOf(LocalDate(2026, 11, 1)..LocalDate(2026, 11, 4), LocalDate(2026, 11, 8)..LocalDate(2026, 11, 19)),
+            a.minus(b).runs,
+        )
+        assertEquals(6, b.daysIn(LocalDate(2026, 11, 1), LocalDate(2026, 11, 22)))
+        assertEquals(0, Checked.NONE.daysIn(LocalDate(2026, 11, 1), LocalDate(2026, 11, 22)))
     }
 
     // ── The figures ──
