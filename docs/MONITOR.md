@@ -162,9 +162,17 @@ row (za.cape's Jamiat member from `za-jamiat/cpt-{yyyy}` for the MJC's month). E
 split=test. What a row reads — columns, zone, format, school, clock — is never in the recipe: it is
 the family's, the latest row of the same file, entry, member and point that read an earlier capture
 of the same source and key; else such a row whose table prints the same tokens as the capture on
-every day both hold (the files prove the layout is the same); else the fetcher's own metadata in the
-monitor's index. So a convention changed in a gate file (a column no longer checked, a clock) is
-inherited by the next capture. Not in the recipes: the hand-read sources, the Mawaqit surveys, and
+every day both hold (the files prove the layout is the same); else such a row that reads another
+capture of the same source (a new year's key, `cpt-2027` after `cpt-2026`: one fetcher, one layout,
+and the index agrees when it still lists the old key); else, for a cautious member's row, the
+member's latest row of the same width (the gate file's own convention for that member, such as a
+Shafi'i reading of a two-school table, which the fetcher's metadata does not know); else the
+fetcher's own metadata in the monitor's index. So a convention changed in a gate file (a column no
+longer checked, a clock) is inherited by the next capture. A copied note keeps its words only when,
+its capture date replaced, it names no other month or date (a range would describe the family's
+days); otherwise the row's note is the capture's name and date. A capture that no recipe target
+picks up (a city new to a fetcher, or an index line naming no entry) is reported as left out, and is
+added by hand once. Not in the recipes: the hand-read sources, the Mawaqit surveys, and
 members no fetcher reads (Cape Town's community calendar: masjids.co.za's relay is read by hand each
 month; until it is, za.cape's members for a new MJC month are left out by the gate, as they should
 be, and za.mjc's own row is added).
@@ -180,9 +188,13 @@ or that the gate refuses (an `@excuse` contradicted) is found — each new row o
 checked with that entry's committed rows alone — removed again and reported with the gate's own
 words; nothing is ever loosened, and the gate runs again until it is green. An entry already red
 before prove (a hand-read member row committed ahead of the capture it leans on) passes only if its
-new rows together make it green; otherwise prove stops and writes nothing (exit 2). When green, the
-gate files and the stamps are written; pinned copies no kept row reads are removed. Run it twice and
-the second adds nothing.
+new rows together make it green; otherwise prove stops and writes nothing (exit 2). That stops every
+source for the week, on purpose: the stamps are written only from a whole gate that is green. A row
+the gate file's reader refuses on its own (an empty zone, a bad point) is left out before anything
+is written, and whatever stops prove midway removes the pinned copies it wrote and the folders they
+leave empty. When green, the gate files and the stamps are written; pinned copies no kept row reads
+are removed (a dry run keeps nothing, not even an empty folder). Run it twice and the second adds
+nothing.
 
     ./gradlew -p tools/timetables prove -Pofficial=<root> [-Pdate=yyyy-mm-dd] [-Ponly=a,b] [-Preport=<file>] [-PdryRun=true]
 
@@ -197,18 +209,34 @@ out with the reason: dates, counts and minutes), the generator's notices before 
 newly proven), and `changed`.
 
 **Publishing.** The private repository's commit step then commits the pinned copies with the run's
-other changes. Only when that push landed and prove's checks were green does the next step commit the
-public changes (gate files, stamps, `ProofStamps.kt`) in `taqwa/` with a message from
-`tools/timetables/monitor/proof.py message` (counts, gate files, entries and city slugs only; no
-time, no table date, no AI attribution) and push it to `MohamedAbulgasem/Taqwa` `main` with the
-secret `TAQWA_PUSH_TOKEN`: given to that step alone, masked, passed to git as an HTTP header for the
-push (never in a URL that is logged, never echoed); a rejected push is rebased onto `main` once,
-`checkStamps` must pass on the rebased tree, and it is retried once. Without the secret the step
-skips with a notice (safe before the token exists). The issue's body gains a `## Proof` section
-(rows added, rows left out with the reason, cities newly proven or newly held, and what happened to
-the push), also written to the step summary; a green week closes the issue as before, so the Proof
-section of a green week is in the run's summary and `monitor/proof/`. The job fails when prove could
-not run, a check failed after rows were added, or the public push did not land.
+other changes. Only when that push landed, its rebase brought in no change under `archive/tables/`
+from elsewhere (tables the proof may read; otherwise the proof is not published and the next run
+proves again), and prove's checks were green does the next step commit the public changes (gate
+files, stamps, `ProofStamps.kt`) in `taqwa/` and push them to `MohamedAbulgasem/Taqwa` `main`.
+Before the commit it refuses a staged change that touches any other file, or that adds a line with a
+clock time's shape (`h:mm`, ruling R69; a signed offset such as `UTC+02:00` is not one); the message
+comes from `tools/timetables/monitor/proof.py message` (counts, gate files, entries and city slugs
+only; no time, no table date, no AI attribution; refused, exit 3, if it ever had a time's shape). The
+secret `TAQWA_PUSH_TOKEN` is given to that step alone; it is turned into a masked HTTP header and
+unset at once, and the header reaches git through `GIT_CONFIG_*` on the push and fetch commands
+alone (never on a command line, in a URL, or in the environment of Python or Gradle; never echoed).
+A rejected push is retried once, rebased onto `main`, **only when main's new commits touch nothing
+the proof depends on** (`tools/`, `shared/`, `widgetcore/`, `scripts/`, `site/`, `gradle/`, the build
+files): a change there (a stricter gate limit, an engine fix) means the rows were judged by rules
+`main` no longer has, so nothing is pushed and the next run proves again on the new `main`. A push
+GitHub refuses for the token (401 or 403: revoked, expired, without Contents write) is not retried.
+
+**The issue.** Its body gains a `## Proof` section (rows added, rows left out with the reason,
+cities newly proven or newly held, and what happened to the push), also written to the step summary;
+a week where prove did not run says so (last week's `monitor/proof/` is removed when the job starts).
+What prove found counts as attention even on a green week: a row left out (above all an early start
+or a late end against the table: the comment says so in capitals), prove stopped or put back, a city
+newly held, or a push that did not land (the secret missing included). The body carries a fingerprint
+of those findings (`<!-- proof: … -->`, blind to dates and numbers); the issue is opened or updated
+when the fingerprint changes, and a green week closes it only when prove found nothing. The job
+fails when prove could not run, a check failed after rows were added, or the public push failed (a
+push skipped because `main` or the archive moved meanwhile does not fail it: the next run proves
+again).
 
 **The token (the owner, once).** On GitHub: Settings › Developer settings › Personal access tokens ›
 Fine-grained tokens › Generate new token. Name `Taqwa monitor push`; expiration 1 year (a calendar
@@ -219,7 +247,10 @@ it once. Then in `MohamedAbulgasem/Taqwa-official`: Settings › Secrets and var
 repository secret, name `TAQWA_PUSH_TOKEN`, paste, save. Copy this template to the private
 repository's `.github/workflows/monitor-weekly.yml` (as after any change to it). If `main` is
 protected, the token's pushes must be allowed by the rule (or the rule must allow this token's
-account to push). Revoking the token stops the pushes; the runs then skip with the notice.
+account to push). Deleting the secret makes the runs skip the push with the notice (and the issue says
+the proof was not pushed). A revoked or expired token whose secret is still set makes the push step
+fail every run ("GitHub refused the token"), with no retry, until the secret is replaced with a new
+token or deleted.
 
 ## Running by hand on the Mac
 

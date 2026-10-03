@@ -76,6 +76,125 @@ class Proof(unittest.TestCase):
             self.assertEqual([], after)
 
 
+class Attention(unittest.TestCase):
+    """What in prove's outcome reaches the issue even on a green week, and the message's time guard."""
+
+    CLEAN = dict(Proof.REPORT, leftOut=[])
+
+    def test_a_clean_outcome_needs_nothing(self):
+        self.assertEqual(("", False, ""), proof.attention(self.CLEAN, Proof.BEFORE, Proof.BEFORE, "pushed to main (abc1234)", "0"))
+        self.assertEqual(("", False, ""), proof.attention(None, [], [], "not run", ""))
+
+    def test_an_early_start_left_out_is_tier_one_and_its_fingerprint_ignores_numbers_and_dates(self):
+        fp, tier1, summary = proof.attention(Proof.REPORT, Proof.BEFORE, Proof.BEFORE, "pushed to main (abc1234)", "0")
+        self.assertTrue(fp)
+        self.assertTrue(tier1)
+        self.assertIn("1 rows left out (1 with an early start or a late end)", summary)
+        later = dict(Proof.REPORT, date="2026-11-09", leftOut=[{"row": Proof.REPORT["leftOut"][0]["row"], "reason": "xx.test fajr: 3 early\n    2026-11-10 fajr: 2 min early (q)"}])
+        self.assertEqual(fp, proof.attention(later, Proof.BEFORE, Proof.BEFORE, "pushed to main (def5678)", "0")[0])
+        other = dict(Proof.REPORT, leftOut=[{"row": "xx-test.tsv xx.test/gamma at unit from xx-test/gamma", "reason": "xx.test isha: 4 over the late limit"}])
+        fp2, tier1_2, _ = proof.attention(other, Proof.BEFORE, Proof.BEFORE, "", "0")
+        self.assertNotEqual(fp, fp2)
+        self.assertFalse(tier1_2)
+
+    def test_a_push_that_did_not_land_a_city_newly_held_or_prove_stopping_needs_the_owner(self):
+        self.assertTrue(proof.attention(self.CLEAN, Proof.BEFORE, Proof.BEFORE, "not pushed: the secret TAQWA_PUSH_TOKEN is not set", "0")[0])
+        _, _, summary = proof.attention(self.CLEAN, Proof.BEFORE, Proof.AFTER, "pushed to main (abc1234)", "0")
+        self.assertIn("cities newly held: delta-town", summary)
+        self.assertTrue(proof.attention(dict(self.CLEAN, failure="the gate is red before prove at xx.test"), [], [], "", "2")[0])
+        self.assertTrue(proof.attention(None, [], [], "", "2")[0])
+
+    def test_the_attention_command_writes_output_lines(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "proof.json"), "w", encoding="utf-8") as f:
+                json.dump(Proof.REPORT, f)
+            out = os.path.join(d, "out.txt")
+            stdout = sys.stdout
+            try:
+                with open(out, "w", encoding="utf-8") as sys.stdout:
+                    self.assertEqual(0, proof.main(["proof.py", "attention", d, "--pushed", "nothing to push", "--code", "0"]))
+            finally:
+                sys.stdout = stdout
+            lines = open(out, encoding="utf-8").read().splitlines()
+            self.assertEqual(["fingerprint", "tier1", "summary"], [line.split("=", 1)[0] for line in lines])
+            self.assertEqual("tier1=true", lines[1])
+
+    def test_a_commit_message_with_a_clock_time_is_refused(self):
+        self.assertEqual([], proof.timed_lines(proof.message(Proof.REPORT, Proof.BEFORE, Proof.AFTER)))
+        self.assertEqual(["Fajr 04:31"], proof.timed_lines("UTC+02:00\nFajr 04:31\n2026-11-02"))
+        timed = dict(Proof.REPORT, added=[dict(Proof.REPORT["added"][0], gate="xx 04:31.tsv")])
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "proof.json"), "w", encoding="utf-8") as f:
+                json.dump(timed, f)
+            stdout = sys.stdout
+            try:
+                with open(os.path.join(d, "out.txt"), "w", encoding="utf-8") as sys.stdout:
+                    code = proof.main(["proof.py", "message", d])
+            finally:
+                sys.stdout = stdout
+            self.assertEqual(3, code)
+
+
+class Workflow(unittest.TestCase):
+    """The workflow template's shell: every step parses, actions are pinned, and the push token stays in its place."""
+
+    PATH = os.path.join(HERE, "ci", "monitor-weekly.yml")
+
+    def steps(self):
+        """(name, run script) of every step, `${{ … }}` replaced by a placeholder."""
+        import re
+        with open(self.PATH, encoding="utf-8") as f:
+            lines = f.read().split("\n")
+        out, name, i = [], None, 0
+        while i < len(lines):
+            line = lines[i]
+            m = re.match(r"^\s*- name: (.*)$", line)
+            if m:
+                name = m.group(1)
+            m = re.match(r"^(\s*)run: \|\s*$", line)
+            if m:
+                indent = len(m.group(1))
+                body = []
+                i += 1
+                while i < len(lines) and (not lines[i].strip() or len(lines[i]) - len(lines[i].lstrip()) > indent):
+                    body.append(lines[i])
+                    i += 1
+                out.append((name, re.sub(r"\$\{\{[^}]*\}\}", "X", "\n".join(body))))
+                continue
+            i += 1
+        return out
+
+    def test_every_bash_step_parses(self):
+        import subprocess
+        steps = self.steps()
+        self.assertGreater(len(steps), 8)
+        for name, script in steps:
+            if "python3 - <<'PY'" in script:
+                script = script.split("python3 - <<'PY'")[0]
+            r = subprocess.run(["bash", "-n"], input=script, capture_output=True, text=True)
+            self.assertEqual(0, r.returncode, "%s: %s" % (name, r.stderr))
+
+    def test_actions_are_pinned_by_commit(self):
+        import re
+        with open(self.PATH, encoding="utf-8") as f:
+            lines = f.read().splitlines()
+        for line in lines:
+            if "uses:" in line:
+                self.assertRegex(line, r"uses: [\w.-]+/[\w.-]+@[0-9a-f]{40} # v", line)
+
+    def test_the_push_token_is_unset_before_anything_else_runs_and_never_on_a_command_line(self):
+        publish = dict(self.steps())["Push the proof to Taqwa's main"]
+        uses = [i for i, line in enumerate(publish.split("\n")) if "$TAQWA_PUSH_TOKEN" in line or "${TAQWA_PUSH_TOKEN" in line]
+        unset = [i for i, line in enumerate(publish.split("\n")) if "unset TAQWA_PUSH_TOKEN" in line]
+        self.assertTrue(unset)
+        self.assertTrue(all(i < max(unset) for i in uses), uses)
+        self.assertNotIn("git -c", publish)
+        self.assertNotIn("gradlew", publish)
+        self.assertIn("GIT_CONFIG_VALUE_0", publish)
+        # A retry only when main's new commits leave what the proof depends on alone.
+        self.assertIn("git diff --name-only \"$checked_out\" FETCH_HEAD", publish)
+
+
 class RecipesCatalogue(unittest.TestCase):
     """official/monitor/recipes.tsv: every source a source of sources.tsv, every gate file present, metadata only."""
 

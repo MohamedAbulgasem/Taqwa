@@ -18,6 +18,9 @@
 # A line whose capture is the bare `*` does not apply to a capture another line of the same source and gate file names
 # more specifically: Kemenag's fetcher names the five kota of the round of 29 September 2026 by their point alone, and
 # the gate holds them as units, so each is given its unit on a line of its own.
+# A source's own entry is read at a named point, never `all`: Amman's region table at Amman's point alone (ruling R30,
+# a table checked for the place it is printed for), however many other points jo.awqaf is read at; `all` is for the
+# cautious members, whose table is the member's for every point of the entry.
 # Not here: the hand-read sources (manual in sources.tsv), the Mawaqit surveys (calendars, checked by their surveys),
 # and members no fetcher reads (Cape Town's community calendar, masjids.co.za's relay: read by hand each month).
 source	capture	gate	entry	member	point	days	from
@@ -42,7 +45,7 @@ sg-muis	*	sg-muis.tsv	index	-	index	all	-
 eg-esa	*	eg-esa.tsv	index	-	index	all	-
 qa-calendarhouse	*	qa-calendarhouse.tsv	index	-	index	all	-
 ly-awqaf	*	ly-awqaf.tsv	index	-	index	all	-
-jo-awqaf	amman	jo-awqaf.tsv	jo.awqaf	-	all	all	-
+jo-awqaf	amman	jo-awqaf.tsv	jo.awqaf	-	31.955,35.945	all	-
 tn-inm	*	tn-inm.tsv	index	-	index	all	-
 ma-habous	*	ma-habous.tsv	index	-	index	all	-
 za-jamiat	*	za-jamiat.tsv	index	-	index	all	-

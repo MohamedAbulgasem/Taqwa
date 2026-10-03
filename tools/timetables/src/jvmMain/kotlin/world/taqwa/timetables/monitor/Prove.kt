@@ -29,8 +29,12 @@ import java.io.File
  * Every row takes what it reads from its family, never from the recipe: the latest row of the same
  * gate file, entry, member and point that reads an earlier capture of the same source and key;
  * else such a row reading any table that prints the same minutes as the capture on every day both
- * hold (the same layout, proven by the files themselves); else the fetcher's own metadata in the
- * monitor's index.
+ * hold (the same layout, proven by the files themselves); else such a row reading another capture
+ * of the same source (a new year's key: the fetcher writes every key alike, and the index agrees
+ * when it still lists the old key); else, for a cautious member's row, the member's latest row of
+ * the same width (the gate file's convention for that member); else the fetcher's own metadata in
+ * the monitor's index. A row the reader refuses, or a capture no recipe target picks up, is
+ * reported as left out; whatever stops prove midway removes the pinned copies it wrote.
  */
 class Prove(
     private val repo: File,
@@ -99,6 +103,25 @@ class Prove(
     private var texts: Map<String, String> = emptyMap()
 
     fun run(write: Boolean = true): Outcome {
+        val created = mutableListOf<File>()
+        try {
+            return run(write, created)
+        } catch (e: Throwable) {
+            // Whatever stops prove midway, the pinned copies it wrote are removed again (never left as orphans).
+            discard(created)
+            throw e
+        }
+    }
+
+    /** The rows prove would add and those it leaves out while planning, before any file is written or the gate runs (tests). */
+    fun plan(): Pair<List<Planned>, List<LeftOut>> {
+        val texts = gateDir.listFiles { f -> f.isFile && f.name.endsWith(".tsv") }!!.sortedBy { it.name }.associate { it.name to it.readText() }
+        this.texts = texts
+        val leftOut = mutableListOf<LeftOut>()
+        return plan(texts, manifest(texts), leftOut) to leftOut
+    }
+
+    private fun run(write: Boolean, created: MutableList<File>): Outcome {
         val texts = gateDir.listFiles { f -> f.isFile && f.name.endsWith(".tsv") }!!.sortedBy { it.name }.associate { it.name to it.readText() }
         this.texts = texts
         val baseManifest = manifest(texts)
@@ -112,8 +135,13 @@ class Prove(
         val baseRed = base.entries.values.filter { base.violations(it).isNotEmpty() }.associate { it.entry.id to base.violations(it).first().lineSequence().first() }
         val leftOut = mutableListOf<LeftOut>()
         var planned = plan(texts, baseManifest, leftOut)
+        // A row the gate file's reader refuses on its own (an empty zone, a bad point) is left out before anything is written.
+        planned = planned.filter { p ->
+            val problem = readable(p)
+            if (problem != null) leftOut += LeftOut(p.label, "refused by the gate's reader: $problem")
+            problem == null
+        }
         // Pinned copies: a path that exists with other content is never overwritten.
-        val created = mutableListOf<File>()
         planned = planned.filter { p ->
             val file = official.resolve(p.path)
             when {
@@ -154,7 +182,7 @@ class Prove(
                 val own = planned.filter { it.entry.substringBefore('/') == s.entry.id }
                 if (s.entry.id in baseRed) {
                     if (own.isEmpty()) {
-                        created.forEach { it.delete() }
+                        discard(created)
                         return fail("the gate is red before prove at ${s.entry.id} and no new row repairs it: ${baseRed.getValue(s.entry.id)}", baseManifest, base)
                     }
                     for (p in own) drop.putIfAbsent(p, "${s.entry.id} was red before prove and its new rows together do not make it green: ${evaluated.violations(s).first().lines().take(3).joinToString(" ")}")
@@ -185,14 +213,14 @@ class Prove(
         }
         if (planned.isEmpty()) {
             // Nothing kept: the pinned copies this run wrote are removed again, the gate files left alone.
-            created.forEach { it.delete() }
+            discard(created)
             if (baseRed.isNotEmpty()) {
                 return fail("the gate is red before prove and nothing added repairs it: ${baseRed.entries.take(5).joinToString("; ") { it.value }}", baseManifest, base)
             }
             return Outcome(null, emptyList(), leftOut, emptyList(), baseManifest.rows.size, baseManifest.rows.size, base.placeDays, base.placeDays, base)
         }
         val kept = planned.map { it.path }.toSet()
-        for (file in created) if (!write || file.relativeTo(official).invariantSeparatorsPath !in kept) file.delete()
+        discard(created.filter { !write || it.relativeTo(official).invariantSeparatorsPath !in kept })
         val (finalTexts, _) = append(texts, planned)
         val final = result!!
         if (write) {
@@ -203,6 +231,32 @@ class Prove(
             null, planned, leftOut, if (!write) emptyList() else created.map { it.relativeTo(official).invariantSeparatorsPath }.filter { it in kept }.sorted(),
             baseManifest.rows.size, baseManifest.rows.size + planned.size, base.placeDays, final.placeDays, final,
         )
+    }
+
+    /** Deletes [files] (pinned copies this run wrote) and every folder under pinned/ they leave empty. */
+    private fun discard(files: List<File>) {
+        val stop = official.resolve("archive/tables/pinned").canonicalFile
+        for (file in files) {
+            val parent = file.canonicalFile.parentFile
+            file.delete()
+            var dir = parent
+            while (dir != null && dir != stop && dir.startsWith(stop) && dir.list()?.isEmpty() == true) {
+                dir.delete()
+                dir = dir.parentFile
+            }
+        }
+    }
+
+    /** The problem the gate file's reader finds in [p]'s row on its own (under its file's header), or null. */
+    private fun readable(p: Planned): String? {
+        val header = header(texts.getValue(p.gate))
+        val row = header.joinToString("\t") { p.cells[it].orEmpty() }.trimEnd('\t')
+        return try {
+            GateManifest.parse(p.gate, header.joinToString("\t") + "\n" + row + "\n")
+            null
+        } catch (e: GateError) {
+            e.problems.joinToString("; ")
+        }
     }
 
     private fun fail(why: String, manifest: GateManifest, result: GateResult? = null) =
@@ -264,6 +318,9 @@ class Prove(
     /** Every row the recipes call for whose days the gate does not hold yet. */
     private fun plan(texts: Map<String, String>, manifest: GateManifest, leftOut: MutableList<LeftOut>): List<Planned> {
         val out = LinkedHashMap<String, Planned>()
+        // Each capture a recipe applies to, and whether any of its recipes found a row to add or hold it at (a capture none
+        // picks up, a city new to a fetcher or an index line naming no entry, is reported, never skipped in silence).
+        val picked = LinkedHashMap<String, Boolean>()
         for (recipe in recipes) {
             if (only.isNotEmpty() && recipe.source !in only) continue
             val text = texts[recipe.gate]
@@ -274,11 +331,15 @@ class Prove(
             val header = header(text)
             val rows = manifest.rows.filter { it.source == recipe.gate }
             for (capture in index.filter { it.source == recipe.source && it.survey == null && Recipes.applies(recipe, it.key, recipes) }.sortedBy { it.key }) {
+                picked.putIfAbsent(capture.id, false)
                 val table = if (recipe.from == "-") capture else from(recipe, capture) ?: run {
                     leftOut += LeftOut("${recipe.where} ${capture.id}", "no capture ${expand(recipe.from, capture.key)} in the monitor's index")
+                    picked[capture.id] = true
                     null
                 } ?: continue
-                for (target in targets(recipe, capture, table, rows)) {
+                val targets = targets(recipe, capture, table, rows)
+                if (targets.isNotEmpty()) picked[capture.id] = true
+                for (target in targets) {
                     val label = "${recipe.gate} ${target.entry}" + (target.member?.let { " member $it" } ?: "") + " at ${target.pointText} from ${table.id}"
                     try {
                         val p = planRow(recipe, header, rows, manifest, capture, table, target) ?: continue
@@ -288,6 +349,15 @@ class Prove(
                     }
                 }
             }
+        }
+        for ((id, any) in picked) {
+            if (any) continue
+            val capture = index.first { it.id == id }
+            leftOut += LeftOut(
+                id,
+                if (capture.entry == null) "no recipe line reads it: the monitor's index names no entry for it, and no gate row of this source and key exists to clone"
+                else "no recipe line reads it: no gate row of this source and key exists to clone (a capture new to its fetcher is added by hand once)",
+            )
         }
         return out.values.toList()
     }
@@ -311,11 +381,23 @@ class Prove(
     }
 
     /** Rows of [rows] that read an earlier capture of [table]'s source and key (pinned or live). */
-    private fun readsCapture(row: GateRow, table: MonitorTable): Boolean {
-        val m = Regex("""archive/tables/(?:pinned/([^/]+)/\d{4}-\d{2}-\d{2}|monitor/([^/]+))/([^/]+)\.txt""").matchEntire(row.path) ?: return false
-        val source = m.groupValues[1].ifEmpty { m.groupValues[2] }
-        val key = m.groupValues[3].substringBefore('.')
-        return source == table.source && key == table.key
+    private fun readsCapture(row: GateRow, table: MonitorTable): Boolean = captureOf(row) == table.source to table.key
+
+    /**
+     * Whether [row] reads a capture of [table]'s source under another key, in the layout the index gives [table]
+     * (when the index still lists that key; the fetcher writes every key of a source alike).
+     */
+    private fun readsSource(row: GateRow, table: MonitorTable): Boolean {
+        val (source, key) = captureOf(row) ?: return false
+        if (source != table.source || key == table.key) return false
+        val listed = index.firstOrNull { it.source == source && it.key == key } ?: return true
+        return listed.format == table.format && listed.columns == table.columns
+    }
+
+    /** The source and key of the monitor capture [row] reads (pinned or live), or null. */
+    private fun captureOf(row: GateRow): Pair<String, String>? {
+        val m = Regex("""archive/tables/(?:pinned/([^/]+)/\d{4}-\d{2}-\d{2}|monitor/([^/]+))/([^/]+)\.txt""").matchEntire(row.path) ?: return null
+        return m.groupValues[1].ifEmpty { m.groupValues[2] } to m.groupValues[3].substringBefore('.')
     }
 
     private fun entryText(row: GateRow): String = row.entry + (row.unit?.let { "/$it" } ?: "")
@@ -351,7 +433,16 @@ class Prove(
         // The family: the same key's earlier capture read at this target, else a row whose table prints the same as the capture.
         val sameKey = target.family ?: sameTarget.lastOrNull { readsCapture(it, table) }
         val sameLayout = if (sameKey != null) null else sameTarget.lastOrNull { agrees(it, captureLines, table) }
-        val family = sameKey ?: sameLayout
+        // A key no row of this target has read and no date in common (a new year's table): the latest row of the target
+        // that reads another capture of the same source, which its fetcher writes in the same layout (the index says so
+        // when it still lists that key) — za.cape's Jamiat member for January from the December slice.
+        val sameSource = if (sameKey != null || sameLayout != null) null else sameTarget.lastOrNull { readsSource(it, table) }
+        // A cautious member's row reads its member's table by the gate file's own convention for that member (a Shafi'i
+        // reading of a two-school table), which the fetcher's metadata does not know: the target's latest row of the same
+        // width, before the index. A row of the source's own entry falls back to the fetcher's description of its file.
+        val sameWidth = if (sameKey != null || sameLayout != null || sameSource != null || target.member == null) null
+        else sameTarget.lastOrNull { it.columns.size == table.columns.split(' ').count { c -> c.isNotEmpty() } }
+        val family = sameKey ?: sameLayout ?: sameSource ?: sameWidth
         val columns = family?.let { columnsText(it) } ?: table.columns
         val format = family?.format ?: table.format
         val school = family?.let { schoolText(it) } ?: table.school
@@ -396,10 +487,14 @@ class Prove(
             (listOf(note) + kept).joinToString("\n").trimEnd('\n') + "\n"
         }
         val dated = "the monitor capture of ${words(date)}"
+        // The family's note, its capture date replaced, only when nothing else in it names a month or a date (a range it
+        // gives would describe the family's days, not this row's); else the capture's name and date.
         val note = family?.note?.let { n ->
             val re = Regex("""the monitor('s)? capture of \d{1,2} [A-Z][a-z]{2} \d{4}""")
-            if (re.containsMatchIn(n)) re.replace(n, dated) else null
+            if (re.containsMatchIn(n) && !DATED.containsMatchIn(re.replace(n, ""))) re.replace(n, dated) else null
         } ?: "${table.name}, $dated (prove)"
+        // Defence in depth (ruling R69): a note is public, and a name the fetcher gave that reads like a time never goes in.
+        require(!TIME_SHAPE.containsMatchIn(note)) { "the note for this row would carry a time-shaped text (from the index's name); not written to a public file" }
         val cells = linkedMapOf(
             "path" to path, "entry" to target.entry, "lat" to (target.lat?.let(::num) ?: ""), "lon" to (target.lon?.let(::num) ?: ""), "zone" to zone,
             "columns" to columns, "format" to format, "school" to school, "split" to "test", "note" to note,
@@ -410,6 +505,8 @@ class Prove(
         val familyWhy = when {
             sameKey != null -> "the earlier capture's row ${sameKey.where}"
             sameLayout != null -> "${sameLayout.where}, whose table prints the same on every day both hold"
+            sameSource != null -> "${sameSource.where}, which reads another capture of the same source (the fetcher's one layout)"
+            sameWidth != null -> "${sameWidth.where}, the member's latest row of the same width (the gate file's convention for the member)"
             else -> "the fetcher's metadata (no row of this target reads the same layout)"
         }
         return Planned(recipe.gate, cells, content, table.id, recipe.where, days, familyWhy)
@@ -467,4 +564,13 @@ class Prove(
         return out
     }
 
+    companion object {
+        private const val MONTHS = "Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|June?|July?|Aug(ust)?|Sep(t|tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?"
+
+        /** A month's name or a date in a note (what a copied note must not keep: it would describe another row's days). */
+        private val DATED = Regex("""\b($MONTHS)\b|\b\d{4}-\d{2}(-\d{2})?\b""")
+
+        /** A clock time's shape, h:mm or hh:mm (ruling R69: never in a public file). */
+        val TIME_SHAPE = Regex("""(^|[^0-9+\-])[0-2]?[0-9]:[0-5][0-9]([^0-9]|$)""")
+    }
 }

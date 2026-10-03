@@ -120,6 +120,44 @@ class ProveTest {
         assertEquals(1, outcome.added.size)
         assertEquals(before, gateDir.resolve("sg-muis.tsv").readText())
         assertFalse(official.resolve("archive/tables/pinned/sg-muis/2026-10-05/singapore.txt").exists())
+        // Not even the dated folder it was written in stays behind.
+        assertFalse(official.resolve("archive/tables/pinned/sg-muis").exists())
+        assertFalse(stampsDir.exists())
+    }
+
+    @Test
+    fun `a pinned path that exists with other content is left out and never rewritten`() {
+        val index = setUp()
+        val pinned = official.resolve("archive/tables/pinned/sg-muis/2026-10-05/singapore.txt").apply { parentFile.mkdirs() }
+        pinned.writeText("# another copy\n")
+        val before = gateDir.resolve("sg-muis.tsv").readText()
+        val outcome = prove(index)
+        assertNull(outcome.failure)
+        assertEquals(0, outcome.added.size)
+        assertTrue("never rewritten" in outcome.leftOut.single().reason, outcome.leftOut.single().reason)
+        assertEquals("# another copy\n", pinned.readText())
+        assertEquals(before, gateDir.resolve("sg-muis.tsv").readText())
+    }
+
+    @Test
+    fun `a row the gate's reader refuses is left out before any pinned copy is written`() {
+        // A capture with no day in common with the held table and no family: its row would take the index's empty zone.
+        val index = listOf(setUp().single().copy(zone = ""))
+        write("archive/tables/monitor/sg-muis/singapore.txt", lines("muis-2026-02-b.txt").map { it.replaceFirst("2026-02-", "2026-03-") })
+        val outcome = prove(index)
+        assertNull(outcome.failure)
+        assertEquals(0, outcome.added.size)
+        assertTrue("zone is empty" in outcome.leftOut.single().reason, outcome.leftOut.single().reason)
+        assertFalse(official.resolve("archive/tables/pinned").exists())
+    }
+
+    @Test
+    fun `an entry red before prove whose new rows do not repair it fails, and leaves no pinned copy`() {
+        val index = setUp()
+        write("archive/tables/held/sg-a.txt", shifted(lines("muis-2026-02-a.txt"), +3))
+        val outcome = prove(index)
+        assertTrue(outcome.failure != null && "red before prove" in outcome.failure!!, outcome.failure)
+        assertFalse(official.resolve("archive/tables/pinned/sg-muis").exists())
         assertFalse(stampsDir.exists())
     }
 

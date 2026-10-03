@@ -50,7 +50,14 @@ fun main(args: Array<String>) {
     val only = all("--only").toSet()
     val unknown = only - recipes.map { it.source }.toSet()
     if (unknown.isNotEmpty()) fail("no recipe for ${unknown.sorted().joinToString(" ")}")
-    val outcome = Prove(repo, official, date, recipes, index, only).run(write = !dryRun)
+    val outcome = try {
+        Prove(repo, official, date, recipes, index, only).run(write = !dryRun)
+    } catch (e: Exception) {
+        // Prove removed the pinned copies it wrote; the report still says why it stopped, for the issue.
+        val why = "prove stopped: ${e.javaClass.simpleName}: ${(e.message ?: "").lineSequence().take(5).joinToString("; ")}"
+        one("--report")?.let { File(it).apply { parentFile?.mkdirs() }.writeText(Json.pretty(mapOf("failure" to why, "changed" to false, "date" to date.toString(), "dryRun" to dryRun))) }
+        fail(why)
+    }
     one("--report")?.let { File(it).apply { parentFile?.mkdirs() }.writeText(Json.pretty(outcome.json() + ("date" to date.toString()) + ("dryRun" to dryRun))) }
     if (outcome.failure != null) {
         System.err.println("prove: ${outcome.failure}")
