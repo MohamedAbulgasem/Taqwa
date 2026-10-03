@@ -48,6 +48,10 @@ class Proof(unittest.TestCase):
         failed = dict(self.REPORT, failure="the gate is red before prove at xx.test and no new row repairs it")
         self.assertIn("Prove could not run, so nothing was added: the gate is red", proof.section(failed, [], []))
         self.assertIn("Prove did not run", proof.section(None, [], []))
+        put_back = dict(self.REPORT, putBack="the tools' tests failed", changed=False)
+        text = proof.section(put_back, self.BEFORE, self.BEFORE)
+        self.assertIn("Prove added 2 rows with the whole gate green, but a check after it failed (the tools' tests failed), so everything was put back", text)
+        self.assertNotIn("2 rows added, 1 left out", text)
 
     def test_the_commit_message_names_counts_files_entries_and_cities_never_a_time_or_a_table_date(self):
         text = proof.message(self.REPORT, self.BEFORE, self.AFTER)

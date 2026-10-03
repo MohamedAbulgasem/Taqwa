@@ -190,8 +190,9 @@ the second adds nothing.
 `generateGoldenVector` to a scratch file, required **byte-identical** to the committed one (prove
 never changes the engine: if the vector moved, it stops); `checkStamps`; the tools' `jvmTest` with
 the archive; `CI=true generate`; `python3 site/build.py --check`; `python3 site/test_timetables.py`.
-Any failure puts back everything prove changed in the checkout and the pinned copies it wrote (exit
-1). Its outputs go to `monitor/proof/` in the private repository: `proof.json` (rows added and left
+Any failure puts back everything prove changed in the checkout and the pinned copies it wrote, and
+records which check failed in `proof.json` (exit 1; the issue's Proof section then says nothing was
+published and why). Its outputs go to `monitor/proof/` in the private repository: `proof.json` (rows added and left
 out with the reason: dates, counts and minutes), the generator's notices before and after (cities
 newly proven), and `changed`.
 

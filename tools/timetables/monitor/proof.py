@@ -59,8 +59,12 @@ def section(report, before, after, pushed=""):
         return "\n".join(lines) + "\n"
     added = report.get("added") or []
     left = report.get("leftOut") or []
-    lines.append("%d rows added, %d left out; the whole gate %s -> %s rows, %s -> %s place-days, green." % (
-        len(added), len(left), report.get("rowsBefore"), report.get("rowsAfter"), report.get("placeDaysBefore"), report.get("placeDaysAfter")))
+    if report.get("putBack"):
+        lines.append("Prove added %d rows with the whole gate green, but a check after it failed (%s), so everything was put back "
+                     "and nothing is published; the rows it would have added are listed below." % (len(added), report["putBack"]))
+    else:
+        lines.append("%d rows added, %d left out; the whole gate %s -> %s rows, %s -> %s place-days, green." % (
+            len(added), len(left), report.get("rowsBefore"), report.get("rowsAfter"), report.get("placeDaysBefore"), report.get("placeDaysAfter")))
     if pushed:
         lines.append("")
         lines.append("Public repository: " + pushed)

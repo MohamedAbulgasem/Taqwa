@@ -58,13 +58,22 @@ put_back() {
     git checkout -- tools/timetables/official/gate tools/timetables/official/stamps "$PROOF_STAMPS" "$GOLDEN" 2>/dev/null
     git clean -fq -- tools/timetables/official/stamps 2>/dev/null
     if [ -f "$OUT/proof.json" ]; then
-        "$PY" - "$OUT/proof.json" "$OFFICIAL" <<'PY'
+        # The pinned copies prove wrote are removed, and the report says why nothing it added stands.
+        "$PY" - "$OUT/proof.json" "$OFFICIAL" "$1" <<'PY'
 import json, os, sys
 report = json.load(open(sys.argv[1], encoding="utf-8"))
 for path in report.get("pinned") or []:
     full = os.path.join(sys.argv[2], path)
     if os.path.isfile(full):
         os.remove(full)
+        try:
+            os.rmdir(os.path.dirname(full))  # the dated folder, when this run's copies were all it held
+        except OSError:
+            pass
+report["putBack"] = sys.argv[3]
+report["changed"] = False
+with open(sys.argv[1], "w", encoding="utf-8") as f:
+    json.dump(report, f, indent=2)
 PY
     fi
     echo false > "$OUT/changed"
