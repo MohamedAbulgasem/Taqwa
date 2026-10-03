@@ -22,8 +22,16 @@
 # The job fails when the monitor itself failed: an exit other than 0 or 1, a result record missing
 # or older than the run's start, or a push that could not land.
 #
-# No secret is ever echoed: the one optional secret, LPT_API_KEY (London Prayer Times), reaches the
-# fetcher through the environment alone, and every URL and message the monitor writes is masked.
+# After a full run that is green or needs attention (never a partial run, never when the monitor itself
+# failed), scripts/prove.sh turns the new captures into proof (docs/MONITOR.md, "Prove"): pinned copies,
+# the recipes' rows, the whole gate green, the stamps, ProofStamps.kt, the golden vector byte-identical and
+# every check; the pinned copies are committed here with the run's other changes, and only then, when
+# prove changed the public checkout, the change is pushed to MohamedAbulgasem/Taqwa main with the secret
+# TAQWA_PUSH_TOKEN (skipped with a notice while it is not set). The issue gains a "Proof" section.
+#
+# No secret is ever echoed: LPT_API_KEY (London Prayer Times, optional) reaches the fetcher through the
+# environment alone, TAQWA_PUSH_TOKEN reaches git as a masked HTTP header in the push step alone, and
+# every URL and message the monitor writes is masked.
 # Every action is pinned by commit (its version beside it, as the public workflows do).
 name: Taqwa monitor
 
@@ -208,6 +216,30 @@ jobs:
           print("valid" if valid else "not valid", "-", summary[:300])
           PY
 
+      - name: Prove the new captures
+        id: prove
+        # Only after a FULL run whose record is sound and green or attention (never a partial run, never when the
+        # monitor itself failed). scripts/prove.sh pins each new capture under archive/ (committed by the next step),
+        # appends its recipe's rows, runs the whole gate (a failing new row is removed and reported, never loosened),
+        # and runs every check (ProofStamps.kt, the golden vector byte-identical, checkStamps, the tools' tests, the
+        # generator, the site's checks); on any failure it puts everything back. No token reaches this step.
+        if: always() && steps.options.outcome == 'success' && steps.options.outputs.partial != 'true' && steps.result.outputs.valid == 'true' && (steps.run.outputs.code == '0' || steps.run.outputs.code == '1')
+        env:
+          RUN_DATE: ${{ steps.result.outputs.date }}
+          PROVE_OUT: ${{ github.workspace }}/monitor/proof
+        run: |
+          set +e
+          rm -rf monitor/proof
+          # The site's checks need what the public Pages workflow installs (tzdata unpinned there too: the newest zones).
+          python3 -m pip install --quiet markdown==3.10.3 tzdata
+          taqwa/scripts/prove.sh --date "$RUN_DATE"
+          code=$?
+          changed="$(cat monitor/proof/changed 2>/dev/null || echo false)"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "Prove exited $code (public change: $changed)"
+          exit 0
+
       - name: Commit what the run added or changed
         id: commit
         if: always() && steps.options.outcome == 'success'
@@ -249,6 +281,74 @@ jobs:
           name: monitor-run-changes-${{ github.run_id }}
           path: monitor-run-changes.tgz
           retention-days: 90
+
+      - name: Push the proof to Taqwa's main
+        id: publish
+        # Only when prove changed the public checkout with every check green AND this run's archive commit (the
+        # pinned copies the new rows read) landed. The token (TAQWA_PUSH_TOKEN, a fine-grained token with Contents:
+        # write on MohamedAbulgasem/Taqwa alone) is given to this step only, reaches git as an HTTP header for the
+        # two commands that need it, is masked, and is never echoed nor put in a URL. Without the secret the step
+        # skips with a notice. A rejected push is rebased onto main and retried once, after checkStamps passes on
+        # the rebased tree (no archive needed); otherwise nothing is pushed and the job fails.
+        if: always() && steps.prove.outputs.code == '0' && steps.prove.outputs.changed == 'true' && steps.commit.outcome == 'success' && steps.commit.outputs.pushfailed != 'true'
+        env:
+          TAQWA_PUSH_TOKEN: ${{ secrets.TAQWA_PUSH_TOKEN }}
+        run: |
+          set -uo pipefail
+          if [ -z "${TAQWA_PUSH_TOKEN:-}" ]; then
+            echo "::notice::TAQWA_PUSH_TOKEN is not set: the proof was checked but not pushed to Taqwa (add the secret, docs/MONITOR.md)"
+            echo "state=not pushed: the secret TAQWA_PUSH_TOKEN is not set" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          basic="$(printf 'x-access-token:%s' "$TAQWA_PUSH_TOKEN" | base64 | tr -d '\n')"
+          echo "::add-mask::$basic"
+          header="http.https://github.com/.extraheader=AUTHORIZATION: basic $basic"
+          remote="https://github.com/MohamedAbulgasem/Taqwa.git"
+          cd taqwa
+          git config user.name "taqwa-monitor"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A tools/timetables/official/gate tools/timetables/official/stamps shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/registry/data/ProofStamps.kt
+          if git diff --cached --quiet; then
+            echo "state=nothing to push" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 tools/timetables/monitor/proof.py message "$GITHUB_WORKSPACE/monitor/proof" > "$RUNNER_TEMP/proof-message.txt" || exit 1
+          git commit -q -F "$RUNNER_TEMP/proof-message.txt" || exit 1
+          for attempt in 1 2; do
+            if git -c "$header" push -q "$remote" HEAD:main; then
+              echo "state=pushed to main ($(git rev-parse --short HEAD))" >> "$GITHUB_OUTPUT"
+              echo "Pushed $(git rev-parse --short HEAD) to Taqwa main"
+              exit 0
+            fi
+            [ "$attempt" = 2 ] && break
+            echo "The push was rejected; rebasing onto main once"
+            if ! git -c "$header" pull -q --rebase "$remote" main; then
+              git rebase --abort 2>/dev/null || true
+              break
+            fi
+            if ! ./gradlew --no-daemon -q -p tools/timetables checkStamps; then
+              echo "::error::after the rebase onto main the stamps no longer check (main changed the engine or the stamps): not pushed"
+              break
+            fi
+          done
+          echo "state=not pushed: the push to Taqwa main was rejected twice" >> "$GITHUB_OUTPUT"
+          echo "pushfailed=true" >> "$GITHUB_OUTPUT"
+          echo "::error::the proof could not be pushed to Taqwa main; it is in monitor/proof/ and the pinned copies are committed"
+
+      - name: Write the proof section
+        if: always() && steps.options.outcome == 'success' && steps.options.outputs.partial != 'true'
+        env:
+          PUSHED: ${{ steps.publish.outputs.state }}
+          PROVE_CODE: ${{ steps.prove.outputs.code }}
+        run: |
+          # The issue body (restricted repository) gains "## Proof": rows added, rows left out with the reason, cities
+          # newly proven (the generator's notices before and after), and whether the public push landed.
+          state="$PUSHED"
+          if [ -z "$state" ] && [ "$PROVE_CODE" = 1 ]; then state="not pushed: a check failed after rows were added, everything was put back (see the log)"; fi
+          if [ -z "$state" ] && [ "$PROVE_CODE" = 0 ]; then state="nothing to push"; fi
+          python3 taqwa/tools/timetables/monitor/proof.py section monitor/proof --pushed "${state:-not run}" > proof-section.md || echo "## Proof" > proof-section.md
+          if [ -f issue-body.md ]; then printf '\n' >> issue-body.md && cat proof-section.md >> issue-body.md; fi
+          cat proof-section.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Open, update or close the issue
         if: always() && steps.options.outcome == 'success'
@@ -302,12 +402,14 @@ jobs:
             echo "Opened the issue"
           fi
 
-      - name: Fail the job when the options were refused, the monitor itself failed, or its changes did not land
-        if: always() && (steps.options.outcome != 'success' || steps.result.outputs.valid != 'true' || steps.commit.outputs.pushfailed == 'true')
+      - name: Fail the job when the options were refused, the monitor itself failed, its changes did not land, or prove failed
+        if: always() && (steps.options.outcome != 'success' || steps.result.outputs.valid != 'true' || steps.commit.outputs.pushfailed == 'true' || (steps.prove.outputs.code != '' && steps.prove.outputs.code != '0') || steps.publish.outputs.pushfailed == 'true')
         run: |
           if [ "${{ steps.options.outcome }}" != "success" ]; then
             echo "::error::the dispatch options were refused (see the 'Check the options' step); nothing ran and nothing was touched"
-          else
+          elif [ "${{ steps.result.outputs.valid }}" != "true" ] || [ "${{ steps.commit.outputs.pushfailed }}" = "true" ]; then
             echo "::error::the monitor itself failed (exit ${{ steps.run.outputs.code }}, result valid: ${{ steps.result.outputs.valid }}, push failed: ${{ steps.commit.outputs.pushfailed }})"
+          else
+            echo "::error::prove did not publish (prove exit ${{ steps.prove.outputs.code }}, Taqwa push failed: ${{ steps.publish.outputs.pushfailed }}); the issue's Proof section says why"
           fi
           exit 1

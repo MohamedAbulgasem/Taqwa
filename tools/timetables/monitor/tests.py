@@ -22,6 +22,7 @@ import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
 from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, toronto  # noqa: E402
+from prove_tests import Proof, RecipesCatalogue  # noqa: E402,F401  (prove's half: proof.py and recipes.tsv)
 
 
 class Times(unittest.TestCase):

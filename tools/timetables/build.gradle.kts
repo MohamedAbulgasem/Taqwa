@@ -325,6 +325,39 @@ tasks.register<JavaExec>("monitor") {
     })
 }
 
+/**
+ * `prove` (docs/MONITOR.md): the monitor's new captures into proof. For each capture a recipe of
+ * `official/monitor/recipes.tsv` names whose days the gate does not hold yet: a copy pinned under
+ * `archive/tables/pinned/<source>/<date>/`, the recipe's rows appended (split test), the whole gate
+ * run, every new row that breaks a promise removed again and reported (never loosened), until green;
+ * then the gate files and the stamps written. `scripts/prove.sh` runs it and every check after it.
+ *
+ *     ./gradlew -p tools/timetables prove -Pofficial=<root> [-Pdate=yyyy-mm-dd] [-Ponly=a,b] [-Preport=<file>] [-PdryRun=true]
+ */
+tasks.register<JavaExec>("prove") {
+    group = "verification"
+    description = "Turns the monitor's new captures into gate rows, runs the whole gate and writes the stamps when green."
+    requireArchive()
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.monitor.ProveMainKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    maxHeapSize = "3g"
+    workingDir = repoRoot
+    val official = officialRoot
+    val date = providers.gradleProperty("date").orElse("")
+    val only = providers.gradleProperty("only").orElse("")
+    val report = providers.gradleProperty("report").orElse("")
+    val dryRun = providers.gradleProperty("dryRun").orElse("false")
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", root, "--official", official.get()) +
+            (if (date.get().isNotBlank()) listOf("--date", date.get()) else emptyList()) +
+            only.get().split(',').map { it.trim() }.filter { it.isNotEmpty() }.flatMap { listOf("--only", it) } +
+            (if (report.get().isNotBlank()) listOf("--report", report.get()) else emptyList()) +
+            (if (dryRun.get() == "true") listOf("--dry-run") else emptyList())
+    })
+}
+
 tasks.register<JavaExec>("checkStamps") {
     group = "verification"
     description = "Fails on a stale or red stamp, a missing one, or a stale ProofStamps.kt (spec §5). Needs no archive."

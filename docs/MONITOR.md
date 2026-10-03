@@ -141,6 +141,85 @@ touch nothing. The same body is the job's step summary. When the private reposit
 Informational. A Claude routine fired by that issue prepares fixes as pull requests (not set up
 yet).
 
+## Prove: new captures into proof, with no human
+
+After a **full** run whose record is sound and green or attention (never a partial run, never when
+the monitor itself failed), the workflow runs `taqwa/scripts/prove.sh --date <run date>`, which runs
+the `prove` task (`tools/timetables/.../monitor/Prove.kt`) and then every check a release of the
+proof needs. The owner chose to push the result **directly to Taqwa's `main`** when everything is
+green.
+
+**Recipes.** `tools/timetables/official/monitor/recipes.tsv` (metadata only: source ids, capture
+keys, gate files, entries, members, points; never a printed time) says, per monitor source, how a
+capture becomes gate rows: which gate file, which entry or unit (`index`: the capture's own entry
+from the index; `same`: clone every row of that gate file that read an earlier capture of the same
+source and key, its entry, member and point; or a named entry), which member (`index`: the capture's
+entry as a cautious entry's member), which point (`index`, `unit`, `all` — every point the file reads
+that entry and member at — or `lat,lon`), and which days (`all`; `month`, the month the capture's key
+names, for a cautious entry's members of the month a member published; `excused`, without the days
+the file's `@excuse` lines excuse for that member, ruling R117). `from` reads another capture for the
+row (za.cape's Jamiat member from `za-jamiat/cpt-{yyyy}` for the MJC's month). Every row is
+split=test. What a row reads — columns, zone, format, school, clock — is never in the recipe: it is
+the family's, the latest row of the same file, entry, member and point that read an earlier capture
+of the same source and key; else such a row whose table prints the same tokens as the capture on
+every day both hold (the files prove the layout is the same); else the fetcher's own metadata in the
+monitor's index. So a convention changed in a gate file (a column no longer checked, a clock) is
+inherited by the next capture. Not in the recipes: the hand-read sources, the Mawaqit surveys, and
+members no fetcher reads (Cape Town's community calendar: masjids.co.za's relay is read by hand each
+month; until it is, za.cape's members for a new MJC month are left out by the gate, as they should
+be, and za.mjc's own row is added).
+
+**What `prove` does.** For each capture a recipe names whose days are not all held already by rows
+of that file, entry, member and point: the capture is copied as it is to
+`archive/tables/pinned/<source>/<date>/<key>.txt` (a row with `month` or `excused` days reads its own
+cut copy beside it, `<key>.month-<yyyy-mm>.txt` or `<key>.excused-<member>.txt`, with a comment
+saying so), never over a pinned file with other content; the rows are appended to their gate files
+under a `# prove, <date>: …` comment; and the **whole** gate runs. A new row that breaks a promise
+(an early start, a late end, lateness over its limit, a capped Maghrib unchecked, a day out of order)
+or that the gate refuses (an `@excuse` contradicted) is found — each new row of a failing entry is
+checked with that entry's committed rows alone — removed again and reported with the gate's own
+words; nothing is ever loosened, and the gate runs again until it is green. An entry already red
+before prove (a hand-read member row committed ahead of the capture it leans on) passes only if its
+new rows together make it green; otherwise prove stops and writes nothing (exit 2). When green, the
+gate files and the stamps are written; pinned copies no kept row reads are removed. Run it twice and
+the second adds nothing.
+
+    ./gradlew -p tools/timetables prove -Pofficial=<root> [-Pdate=yyyy-mm-dd] [-Ponly=a,b] [-Preport=<file>] [-PdryRun=true]
+
+**What `scripts/prove.sh` checks after it** (when prove changed anything): `generateProofStamps`;
+`generateGoldenVector` to a scratch file, required **byte-identical** to the committed one (prove
+never changes the engine: if the vector moved, it stops); `checkStamps`; the tools' `jvmTest` with
+the archive; `CI=true generate`; `python3 site/build.py --check`; `python3 site/test_timetables.py`.
+Any failure puts back everything prove changed in the checkout and the pinned copies it wrote (exit
+1). Its outputs go to `monitor/proof/` in the private repository: `proof.json` (rows added and left
+out with the reason: dates, counts and minutes), the generator's notices before and after (cities
+newly proven), and `changed`.
+
+**Publishing.** The private repository's commit step then commits the pinned copies with the run's
+other changes. Only when that push landed and prove's checks were green does the next step commit the
+public changes (gate files, stamps, `ProofStamps.kt`) in `taqwa/` with a message from
+`tools/timetables/monitor/proof.py message` (counts, gate files, entries and city slugs only; no
+time, no table date, no AI attribution) and push it to `MohamedAbulgasem/Taqwa` `main` with the
+secret `TAQWA_PUSH_TOKEN`: given to that step alone, masked, passed to git as an HTTP header for the
+push (never in a URL that is logged, never echoed); a rejected push is rebased onto `main` once,
+`checkStamps` must pass on the rebased tree, and it is retried once. Without the secret the step
+skips with a notice (safe before the token exists). The issue's body gains a `## Proof` section
+(rows added, rows left out with the reason, cities newly proven or newly held, and what happened to
+the push), also written to the step summary; a green week closes the issue as before, so the Proof
+section of a green week is in the run's summary and `monitor/proof/`. The job fails when prove could
+not run, a check failed after rows were added, or the public push did not land.
+
+**The token (the owner, once).** On GitHub: Settings › Developer settings › Personal access tokens ›
+Fine-grained tokens › Generate new token. Name `Taqwa monitor push`; expiration 1 year (a calendar
+reminder to renew it); resource owner MohamedAbulgasem; Repository access › Only select repositories
+› `MohamedAbulgasem/Taqwa` (the public repository alone); Permissions › Repository permissions ›
+Contents: **Read and write** (Metadata: read-only is added by itself; nothing else). Generate, copy
+it once. Then in `MohamedAbulgasem/Taqwa-official`: Settings › Secrets and variables › Actions › New
+repository secret, name `TAQWA_PUSH_TOKEN`, paste, save. Copy this template to the private
+repository's `.github/workflows/monitor-weekly.yml` (as after any change to it). If `main` is
+protected, the token's pushes must be allowed by the rule (or the rule must allow this token's
+account to push). Revoking the token stops the pushes; the runs then skip with the notice.
+
 ## Running by hand on the Mac
 
     scripts/monitor.sh                          fetch, back up, check, report

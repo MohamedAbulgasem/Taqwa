@@ -1,0 +1,47 @@
+# How each monitor capture becomes gate rows (`prove`, docs/MONITOR.md): metadata only (source ids, capture keys,
+# gate files, entries, members, points), never a printed time. One line a row to add per capture whose days the gate
+# does not hold yet at that row's entry, member and point; every row is split=test (held out).
+# What a row reads is never written here: its columns, zone, format, school and clock come from its family, the latest
+# row of the same gate file, entry, member and point that reads an earlier capture of the same source and key; else
+# such a row whose table prints the same as the capture on every day both hold; else the fetcher's own metadata in the
+# monitor's index. A convention changed in a gate file is therefore inherited by the next capture.
+# - capture: the index keys (`*` any run of characters).
+# - entry: `index` (the capture's own entry as the index names it, read at its unit's point when it names one, else at
+#   its own), `same` (every row of the gate file that reads an earlier capture of this source and key, cloned: its
+#   entry, member and point; with member * and point same), or an entry (`id` or `id/unit`).
+# - member: `-`, `index` (the index's entry is the member: a cautious entry's member row), or a member id.
+# - point: `index`, `unit` (the unit's own point), `all` (every point the gate file reads this entry and member at),
+#   or `lat,lon`.
+# - days: `all`; `month` (the month the capture's key ends with, yyyy-mm: a cautious entry's members for the month a
+#   member published); `excused` (without the days the gate file's @excuse lines excuse for the member, ruling R117).
+# - from: `-` (the capture itself) or another capture, `<source>/<key>` with {yyyy} and {mm} from this capture's key.
+# Not here: the hand-read sources (manual in sources.tsv), the Mawaqit surveys (calendars, checked by their surveys),
+# and members no fetcher reads (Cape Town's community calendar, masjids.co.za's relay: read by hand each month).
+source	capture	gate	entry	member	point	days	from
+sa-ummalqura	*	sa-ummalqura.tsv	index	-	index	all	-
+tr-diyanet	*	tr-diyanet.tsv	same	*	same	all	-
+tr-diyanet-europe	*	tr-diyanet-europe.tsv	same	*	same	all	-
+tr-diyanet-europe	*	be-emb.tsv	same	*	same	all	-
+tr-diyanet-europe	*	fr-cautious.tsv	same	*	same	all	-
+tr-diyanet-europe	*	no-cautious.tsv	same	*	same	all	-
+tr-diyanet-europe	*	se-cautious.tsv	same	*	same	all	-
+tr-diyanet-europe	*	nl-cautious.tsv	same	*	same	all	-
+tr-diyanet-europe	*	de-cautious.tsv	same	*	same	all	-
+tr-diyanet-europe	*	au-cautious.tsv	same	*	same	all	-
+id-kemenag	*	id-kemenag.tsv	index	-	index	all	-
+my-jakim	*	my-jakim.tsv	index	-	index	all	-
+sg-muis	*	sg-muis.tsv	index	-	index	all	-
+eg-esa	*	eg-esa.tsv	index	-	index	all	-
+qa-calendarhouse	*	qa-calendarhouse.tsv	index	-	index	all	-
+ly-awqaf	*	ly-awqaf.tsv	index	-	index	all	-
+jo-awqaf	amman	jo-awqaf.tsv	jo.awqaf	-	all	all	-
+tn-inm	*	tn-inm.tsv	index	-	index	all	-
+ma-habous	*	ma-habous.tsv	index	-	index	all	-
+za-jamiat	*	za-jamiat.tsv	index	-	index	all	-
+za-mjc	cape-town-*	za-cape.tsv	index	-	index	all	-
+za-mjc	cape-town-*	za-cape.tsv	za.cape	index	all	all	-
+za-mjc	cape-town-*	za-cape.tsv	za.cape	za.jamiat.shafii	all	month	za-jamiat/cpt-{yyyy}
+ca-toronto	*	ca-toronto.tsv	index	-	index	all	-
+ca-toronto	*	ca-toronto.tsv	ca.toronto	index	all	excused	-
+no-irn	*	no-irn.tsv	index	-	index	all	-
+us-chicago	*	us-chicago.tsv	us.chicago	index	index	all	-
