@@ -4,7 +4,11 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
+import world.taqwa.app.prayer.engine.EngineSettings
+import world.taqwa.app.prayer.engine.PrayerEngine
+import world.taqwa.app.prayer.engine.TimetableChoice
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.GeoPoint
@@ -71,14 +75,23 @@ class LevantProofTest {
         assertEquals(EntryClass.D_AUTHORITY, entry.entryClass)
         assertTrue(entry.measured)
         assertOrdered("ps.iftaa", day("ps.iftaa", 31.7767, 35.2345, "Asia/Hebron", LocalDate(2026, 6, 21)))
-        // Every Palestinian town the offset list prints is its own unit at its own point, measured, class D.
+        // Every town the offset list prints is its own unit at its own point, measured, class D: the Palestinian
+        // towns, and the list's towns in Israel (units only for the places in Palestine nearer them).
         assertEquals(
             listOf(
                 "Jerusalem", "Ramallah", "Bethlehem", "Jenin", "Nablus", "Jericho", "Hebron", "Idhna", "Dura", "Beit Awwa",
                 "Tulkarm", "Qalqilya", "Gaza", "Rafah", "Khan Yunis", "Deir al-Balah",
             ),
-            Levant.paTowns.map { it.name },
+            Levant.paTowns.filter { it.country == "PS" }.map { it.name },
         )
+        assertEquals(
+            listOf(
+                "Nazareth", "Umm al-Fahm", "Tiberias", "Safed", "Beisan", "Haifa", "Acre", "Kafr Qasim", "Tayibe", "Lydd",
+                "Ramla", "Beersheba", "Jaffa",
+            ),
+            Levant.paTowns.filter { it.country == "IL" }.map { it.name },
+        )
+        assertEquals(setOf("PS"), entry.countries, "the entry's scope stays Palestine")
         for (town in Levant.paTowns) {
             val here = Registry.resolveEntry(entry, Place(town.point.lat, town.point.lon, zoneOf(town), "PS"))
             assertEquals(town.name, here.unitName, town.name)
@@ -103,7 +116,9 @@ class LevantProofTest {
             "Jerusalem" to (0 to 0), "Ramallah" to (0 to 0), "Bethlehem" to (0 to 0), "Jenin" to (0 to 0), "Nablus" to (0 to 0),
             "Jericho" to (-1 to -1), "Hebron" to (1 to 1), "Idhna" to (1 to 1), "Dura" to (1 to 1), "Beit Awwa" to (1 to 1),
             "Tulkarm" to (1 to 1), "Qalqilya" to (2 to 1), "Gaza" to (3 to 3), "Rafah" to (4 to 4), "Khan Yunis" to (4 to 4),
-            "Deir al-Balah" to (4 to 4),
+            "Deir al-Balah" to (4 to 4), "Nazareth" to (0 to 0), "Umm al-Fahm" to (0 to 0), "Tiberias" to (-1 to -1),
+            "Safed" to (-1 to -1), "Beisan" to (-1 to -1), "Haifa" to (1 to 1), "Acre" to (1 to 1), "Kafr Qasim" to (1 to 1),
+            "Tayibe" to (1 to 1), "Lydd" to (2 to 1), "Ramla" to (2 to 1), "Beersheba" to (2 to 2), "Jaffa" to (2 to 2),
         )
         var date = LocalDate(2027, 1, 1)
         while (date.year == 2027) {
@@ -129,7 +144,8 @@ class LevantProofTest {
     @Test
     fun `every palestinian place takes its nearest printed town's own table, never a neighbour's (ruling R118)`() {
         // The units share one reach, so the unit a place resolves to is the nearest printed town: a place between
-        // Tulkarm (+ 1) and Nablus (+ 0), or between Gaza (+ 3) and Deir al-Balah (+ 4), takes the nearer's own.
+        // Tulkarm (+ 1) and Nablus (+ 0), or between Gaza (+ 3) and Deir al-Balah (+ 4), takes the nearer's own, and a
+        // place nearer a town of the list in Israel (Lydd's + 1.5 by Ni'lin) takes that town's, never a farther one's.
         val entry = requireNotNull(Registry.byId("ps.iftaa"))
         val reach = requireNotNull(Units.of("ps.iftaa")).units.map { it.radiusKm }.toSet()
         assertEquals(1, reach.size, "one reach for every town")
@@ -147,7 +163,73 @@ class LevantProofTest {
         }
     }
 
-    private fun zoneOf(town: Levant.PaTown) = if (town.point.lon < 34.6) "Asia/Gaza" else "Asia/Hebron"
+    private fun zoneOf(town: Levant.PaTown) = when {
+        town.country == "IL" -> "Asia/Jerusalem"
+        town.point.lon < 34.6 -> "Asia/Gaza"
+        else -> "Asia/Hebron"
+    }
+
+    @Test
+    fun `west bank villages by the green line take the nearest printed town's figure through the app's engine`() {
+        // Review r2 of R118: these villages' nearest printed town is one of the list's towns in Israel. Through the
+        // app's own pipeline, with the PA's table chosen and on Automatic, each shows that town's table: al-Aqsa's day
+        // plus its figure (Lydd's minute and a half as + 2 on a start, + 1 on an end).
+        val entry = requireNotNull(Registry.byId("ps.iftaa"))
+        val villages = listOf(
+            Triple("Ni'lin", GeoPoint(31.951, 35.021), "Lydd"), Triple("Qibya", GeoPoint(31.976, 35.009), "Lydd"),
+            Triple("Barta'a ash-Sharqiya", GeoPoint(32.473, 35.087), "Umm al-Fahm"),
+            Triple("Bardala", GeoPoint(32.398, 35.553), "Beisan"), Triple("Ein al-Beida", GeoPoint(32.377, 35.548), "Beisan"),
+        )
+        val chosen = EngineSettings(timetable = TimetableChoice.Entry("ps.iftaa"), timetableConfirmed = true)
+        for ((name, point, townName) in villages) {
+            val town = Levant.paTowns.single { it.name == townName }
+            assertEquals(town, Levant.paTowns.minBy { distanceKm(point, it.point) }, "$name's nearest printed town")
+            val place = Place(point.lat, point.lon, "Asia/Hebron", "PS")
+            var date = LocalDate(2026, 1, 1)
+            while (date.year <= 2031) {
+                val viaApp = PrayerEngine.dayTimes(place, date, chosen)
+                assertEquals(townName, viaApp.effective.unitName, "$name with the PA's table chosen")
+                val automatic = PrayerEngine.dayTimes(place, date, EngineSettings())
+                assertEquals(townName, automatic.resolution.unitName, "$name on Automatic")
+                val aqsa = DayPipeline.day(entry, Place(Levant.aqsa.lat, Levant.aqsa.lon, "Asia/Hebron", "PS"), date)
+                for (shown in listOf(viaApp.day, automatic.day)) {
+                    val label = "$name $date"
+                    assertEquals(aqsa.fajr + town.startMinutes.minutes, shown.fajr, "$label fajr")
+                    assertEquals(aqsa.dhuhr + town.startMinutes.minutes, shown.dhuhr, "$label dhuhr")
+                    assertEquals(aqsa.asr + town.startMinutes.minutes, shown.asr, "$label asr")
+                    assertEquals(aqsa.maghrib + town.startMinutes.minutes, shown.maghrib, "$label maghrib")
+                    assertEquals(aqsa.isha + town.startMinutes.minutes, shown.isha, "$label isha")
+                    assertEquals(aqsa.sunrise + town.endMinutes.minutes, shown.sunrise, "$label sunrise")
+                    assertEquals(aqsa.endOfEating + town.endMinutes.minutes, shown.endOfEating, "$label end of eating")
+                }
+                date = date.plus(29, DateTimeUnit.DAY)
+            }
+        }
+    }
+
+    @Test
+    fun `a town's unprinted ends are never after the same method's ends at the place's own point`() {
+        // Review r2 of R118: a town's printed times come from al-Aqsa's table alone, but the ends the PA never prints
+        // (Asr's at the sunset, Maghrib's at the red twilight) stay bounded by the user's own sky (spec §3.5).
+        val entry = requireNotNull(Registry.byId("ps.iftaa"))
+        val points = Levant.paTowns.filter { it.country == "PS" }.map { it.point to zoneOf(it) } + listOf(
+            GeoPoint(31.86, 35.50) to "Asia/Hebron", GeoPoint(32.40, 35.40) to "Asia/Hebron",
+            GeoPoint(32.30, 35.37) to "Asia/Hebron", GeoPoint(31.40, 35.10) to "Asia/Hebron",
+            GeoPoint(31.25, 34.25) to "Asia/Gaza", GeoPoint(32.47, 35.09) to "Asia/Hebron",
+        )
+        for ((point, zone) in points) {
+            var date = LocalDate(2026, 1, 1)
+            while (date.year == 2026) {
+                val shown = DayPipeline.day(entry, Place(point.lat, point.lon, zone, "PS"), date)
+                val own = DayComputer.compute(Levant.paMethod, point, date, TimeZone.of(zone), AsrSchool.STANDARD, Registry.ramadanCalendar())
+                for (prayer in listOf(Prayer.ASR, Prayer.MAGHRIB)) {
+                    val end = requireNotNull(shown.ends[prayer]) { "$point $date $prayer" }
+                    assertTrue(end <= requireNotNull(own.ends[prayer]), "$point $date: $prayer's end after the place's own")
+                }
+                date = date.plus(1, DateTimeUnit.DAY)
+            }
+        }
+    }
 
     @Test
     fun `gaza's cautious entry ranks its ministry of awqaf over the pa`() {

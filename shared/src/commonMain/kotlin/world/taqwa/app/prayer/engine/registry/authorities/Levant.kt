@@ -143,10 +143,18 @@ object Levant {
      * One town of the PA's printed offset list: its unit [key], [name] and [point] (the app's city
      * point where the app lists the town), and its printed offset in minutes after Jerusalem as
      * whole minutes for the starts ([startMinutes]) and for the ends ([endMinutes]): the same figure,
-     * except Qalqilya's minute and a half, which a whole-minute clock shows as + 2 for a start (never
-     * before the half-minute instant) and + 1 for an end (never after it).
+     * except the minute and a half of Qalqilya, Lydd and Ramla, which a whole-minute clock shows as + 2
+     * for a start (never before the half-minute instant) and + 1 for an end (never after it). [country]
+     * is where the town lies today: PS, or IL for the list's towns in Israel.
      */
-    class PaTown(val key: String, val name: String, val point: GeoPoint, val startMinutes: Int, val endMinutes: Int = startMinutes)
+    class PaTown(
+        val key: String,
+        val name: String,
+        val point: GeoPoint,
+        val startMinutes: Int,
+        val endMinutes: Int = startMinutes,
+        val country: String = "PS",
+    )
 
     /**
      * Ruling R118 (owner, 2 Oct 2026): the authority's own printed town offsets apply to its al-Aqsa
@@ -155,9 +163,17 @@ object Levant {
      * blessed al-Aqsa Mosque (by the winter clock); those living outside it observe the time
      * differences as follows". Every Palestinian town of the list, as printed: Jerusalem, Ramallah,
      * Bethlehem, Jenin and Nablus + 0; Jericho − 1; Hebron, Idhna, Dura, Beit Awwa and Tulkarm + 1;
-     * Qalqilya + 1.5; Gaza + 3; Rafah, Khan Yunis and Deir al-Balah + 4. (The list's towns in Israel
-     * are outside the entry's scope, Palestine.) Beit Awwa is not among the app's cities: its point
-     * is approximate (from public maps), among neighbours (Dura, Idhna, Hebron) that all print + 1.
+     * Qalqilya + 1.5; Gaza + 3; Rafah, Khan Yunis and Deir al-Balah + 4. Beit Awwa is not among the
+     * app's cities: its point is approximate (from public maps), among neighbours (Dura, Idhna,
+     * Hebron) that all print + 1.
+     *
+     * The list's towns in Israel, as printed: Nazareth and Umm al-Fahm + 0; Tiberias, Safed and Beisan
+     * − 1; Haifa, Acre, Kafr Qasim and Tayibe + 1; Lydd and Ramla + 1.5; Beersheba and Jaffa + 2
+     * (points approximate, from public maps). The entry's scope stays Palestine (choosing it in Israel
+     * falls back to Automatic): these towns are units only so that a place in Palestine nearer one of
+     * them than any Palestinian town of the list (Ni'lin and Qibya by Lydd, Barta'a by Umm al-Fahm,
+     * Bardala by Beisan) takes that nearest printed town's own figure, never a farther town's (review
+     * r2 of R118).
      */
     val paTowns: List<PaTown> = listOf(
         PaTown("jerusalem", "Jerusalem", aqsa, 0),
@@ -176,6 +192,19 @@ object Levant {
         PaTown("rafah", "Rafah", GeoPoint(31.29722, 34.24357), 4),
         PaTown("khan-yunis", "Khan Yunis", GeoPoint(31.34018, 34.30627), 4),
         PaTown("deir-al-balah", "Deir al-Balah", GeoPoint(31.41834, 34.34933), 4),
+        PaTown("nazareth", "Nazareth", GeoPoint(32.7019, 35.3033), 0, country = "IL"),
+        PaTown("umm-al-fahm", "Umm al-Fahm", GeoPoint(32.5194, 35.1536), 0, country = "IL"),
+        PaTown("tiberias", "Tiberias", GeoPoint(32.7922, 35.5312), -1, country = "IL"),
+        PaTown("safed", "Safed", GeoPoint(32.9646, 35.496), -1, country = "IL"),
+        PaTown("beisan", "Beisan", GeoPoint(32.4973, 35.4973), -1, country = "IL"),
+        PaTown("haifa", "Haifa", GeoPoint(32.794, 34.9896), 1, country = "IL"),
+        PaTown("acre", "Acre", GeoPoint(32.9281, 35.082), 1, country = "IL"),
+        PaTown("kafr-qasim", "Kafr Qasim", GeoPoint(32.1146, 34.9762), 1, country = "IL"),
+        PaTown("tayibe", "Tayibe", GeoPoint(32.2662, 35.0089), 1, country = "IL"),
+        PaTown("lydd", "Lydd", GeoPoint(31.951, 34.8881), startMinutes = 2, endMinutes = 1, country = "IL"),
+        PaTown("ramla", "Ramla", GeoPoint(31.9293, 34.873), startMinutes = 2, endMinutes = 1, country = "IL"),
+        PaTown("beersheba", "Beersheba", GeoPoint(31.2518, 34.7913), 2, country = "IL"),
+        PaTown("jaffa", "Jaffa", GeoPoint(32.0504, 34.7522), 2, country = "IL"),
     )
 
     /**
@@ -183,8 +212,10 @@ object Levant {
      * minutes, computed at al-Aqsa alone ([FixedPointMode.TABLE]) with al-Aqsa's fitted margins. So
      * every town carries al-Aqsa's proven bound, and is never early against its own printed times by
      * construction: whole minutes added to a time already rounded never cross a minute. The end of
-     * eating follows the end minutes (the authority's Fajr minute moves it too, so Qalqilya's + 2 for
-     * its Fajr start is taken back a minute for its end of eating).
+     * eating follows the end minutes (the authority's Fajr minute moves it too, so a half minute's + 2
+     * for its Fajr start is taken back a minute for its end of eating). The ends the authority never
+     * prints (Asr's at the sunset, Maghrib's at the red twilight) stay bounded by the user's own sun
+     * too ([FixedPointMode.TABLE]).
      */
     private fun paTable(town: PaTown) = paMethod.copy(
         id = "ps.iftaa.${town.key}",
@@ -202,10 +233,10 @@ object Levant {
      * printed town's own table, never a neighbour's offset (the discipline of rulings R103 and R113):
      * every unit has the same reach (class D's at al-Aqsa's latitude, about 71 km), so the nearest
      * unit holding a place is the nearest town, and no town's reach takes a place nearer another
-     * printed town. Every place in Palestine is within about 20 km of a printed town. Beyond every
-     * reach (only a place outside Palestine whose Automatic lists the entry) the edge: the al-Aqsa
-     * method at the user's own point a minute later, the nearest town's point still bounding the ends
-     * (rulings R44, R45), no town's offset carried beyond its town.
+     * printed town, on either side of the Green Line. Every place in Palestine is within about 20 km
+     * of a printed town. Beyond every reach (only a place outside Palestine whose Automatic lists the
+     * entry) the edge: the al-Aqsa method at the user's own point a minute later, the nearest town's
+     * point still bounding the ends (rulings R44, R45), no town's offset carried beyond its town.
      */
     val paUnits: UnitSet = run {
         val reachKm = lateReachKm(aqsa.lat, EntryClass.D_AUTHORITY)

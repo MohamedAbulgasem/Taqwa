@@ -1,119 +1,119 @@
 {
   "entry": "ps.iftaa",
   "class": "D (authority)",
-  "engineHash": "5afa49cf2252c540",
+  "engineHash": "039a1f933719883e",
   "broken": 0,
-  "places": 16,
+  "places": 29,
   "first": "2012-01-01",
   "last": "2027-12-31",
   "checked": ["2012-01-01..2012-12-31", "2026-01-01..2027-12-31"],
-  "placeDays": 13144,
-  "heldOutDays": 12413,
-  "ramadanDays": 1072,
+  "placeDays": 22634,
+  "heldOutDays": 21903,
+  "ramadanDays": 1839,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 13150,
+      "checked": 22640,
       "early": 0,
       "late": {
-        "0": 2626,
-        "1": 6848,
-        "2": 2684,
-        "3+": 992
+        "0": 4667,
+        "1": 11645,
+        "2": 4530,
+        "3+": 1798
       },
-      "exactShare": 0.1997,
+      "exactShare": 0.2061,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 13150,
+      "checked": 22640,
       "lateEnd": 0,
       "late": {
-        "0": 1336,
-        "1": 4640,
-        "2": 6593,
-        "3+": 581
+        "0": 2389,
+        "1": 7773,
+        "2": 11429,
+        "3+": 1049
       },
-      "exactShare": 0.1016,
+      "exactShare": 0.1055,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 13150,
+      "checked": 22640,
       "early": 0,
       "late": {
-        "0": 9344,
-        "1": 3806,
+        "0": 16065,
+        "1": 6575,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7106,
+      "exactShare": 0.7096,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 13150,
+      "checked": 22640,
       "early": 0,
       "late": {
-        "0": 5783,
-        "1": 7255,
-        "2": 112,
+        "0": 9852,
+        "1": 12585,
+        "2": 203,
         "3+": 0
       },
-      "exactShare": 0.4398,
+      "exactShare": 0.4352,
       "worstLate": 2,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 13150,
+      "checked": 22640,
       "early": 0,
       "late": {
-        "0": 1512,
-        "1": 4052,
-        "2": 7050,
-        "3+": 536
+        "0": 2656,
+        "1": 6730,
+        "2": 12315,
+        "3+": 939
       },
-      "exactShare": 0.115,
+      "exactShare": 0.1173,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "isha": {
-      "checked": 13150,
+      "checked": 22640,
       "early": 0,
       "late": {
-        "0": 1280,
-        "1": 2944,
-        "2": 7054,
-        "3+": 1872
+        "0": 2294,
+        "1": 4881,
+        "2": 12124,
+        "3+": 3341
       },
-      "exactShare": 0.0973,
+      "exactShare": 0.1013,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 13150,
+      "checked": 22640,
       "lateEnd": 0,
       "late": {
-        "0": 1052,
-        "1": 2852,
-        "2": 6984,
-        "3+": 2262
+        "0": 1897,
+        "1": 4789,
+        "2": 11937,
+        "3+": 4017
       },
-      "exactShare": 0.08,
+      "exactShare": 0.0838,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
@@ -121,109 +121,109 @@
     }
   },
   "heldOut": {
-    "placeDays": 12413,
-    "ramadanDays": 1010,
+    "placeDays": 21903,
+    "ramadanDays": 1777,
     "events": {
       "fajr": {
-        "checked": 12419,
+        "checked": 21909,
         "early": 0,
         "late": {
-          "0": 2529,
-          "1": 6420,
-          "2": 2498,
-          "3+": 972
+          "0": 4570,
+          "1": 11217,
+          "2": 4344,
+          "3+": 1778
         },
-        "exactShare": 0.2036,
+        "exactShare": 0.2086,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 12419,
+        "checked": 21909,
         "lateEnd": 0,
         "late": {
-          "0": 1297,
-          "1": 4307,
-          "2": 6251,
-          "3+": 564
+          "0": 2350,
+          "1": 7440,
+          "2": 11087,
+          "3+": 1032
         },
-        "exactShare": 0.1044,
+        "exactShare": 0.1073,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 12419,
+        "checked": 21909,
         "early": 0,
         "late": {
-          "0": 8820,
-          "1": 3599,
+          "0": 15541,
+          "1": 6368,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7102,
+        "exactShare": 0.7093,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 12419,
+        "checked": 21909,
         "early": 0,
         "late": {
-          "0": 5434,
-          "1": 6877,
-          "2": 108,
+          "0": 9503,
+          "1": 12207,
+          "2": 199,
           "3+": 0
         },
-        "exactShare": 0.4376,
+        "exactShare": 0.4337,
         "worstLate": 2,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 12419,
+        "checked": 21909,
         "early": 0,
         "late": {
-          "0": 1448,
-          "1": 3752,
-          "2": 6705,
-          "3+": 514
+          "0": 2592,
+          "1": 6430,
+          "2": 11970,
+          "3+": 917
         },
-        "exactShare": 0.1166,
+        "exactShare": 0.1183,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "isha": {
-        "checked": 12419,
+        "checked": 21909,
         "early": 0,
         "late": {
-          "0": 1241,
-          "1": 2722,
-          "2": 6652,
-          "3+": 1804
+          "0": 2255,
+          "1": 4659,
+          "2": 11722,
+          "3+": 3273
         },
-        "exactShare": 0.0999,
+        "exactShare": 0.1029,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 12419,
+        "checked": 21909,
         "lateEnd": 0,
         "late": {
-          "0": 1026,
-          "1": 2648,
-          "2": 6568,
-          "3+": 2177
+          "0": 1871,
+          "1": 4585,
+          "2": 11521,
+          "3+": 3932
         },
-        "exactShare": 0.0826,
+        "exactShare": 0.0854,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
@@ -237,6 +237,360 @@
     }
   },
   "units": {
+    "ps.iftaa.acre": {
+      "name": "Acre",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.beersheba": {
+      "name": "Beersheba",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.beisan": {
+      "name": "Beisan",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
     "ps.iftaa.beit-awwa": {
       "name": "Beit Awwa",
       "placeDays": 730,
@@ -827,6 +1181,124 @@
         }
       }
     },
+    "ps.iftaa.haifa": {
+      "name": "Haifa",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
     "ps.iftaa.hebron": {
       "name": "Hebron",
       "placeDays": 1096,
@@ -947,6 +1419,124 @@
     },
     "ps.iftaa.idhna": {
       "name": "Idhna",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.jaffa": {
+      "name": "Jaffa",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
       "broken": 0,
@@ -1417,8 +2007,244 @@
         }
       }
     },
+    "ps.iftaa.kafr-qasim": {
+      "name": "Kafr Qasim",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
     "ps.iftaa.khan-yunis": {
       "name": "Khan Yunis",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.lydd": {
+      "name": "Lydd",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
       "broken": 0,
@@ -1646,6 +2472,124 @@
             "3+": 160
           },
           "exactShare": 0.062,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.nazareth": {
+      "name": "Nazareth",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -2007,8 +2951,598 @@
         }
       }
     },
+    "ps.iftaa.ramla": {
+      "name": "Ramla",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.safed": {
+      "name": "Safed",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.tayibe": {
+      "name": "Tayibe",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.tiberias": {
+      "name": "Tiberias",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
     "ps.iftaa.tulkarm": {
       "name": "Tulkarm",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 157,
+            "1": 369,
+            "2": 142,
+            "3+": 62
+          },
+          "exactShare": 0.2151,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 81,
+            "1": 241,
+            "2": 372,
+            "3+": 36
+          },
+          "exactShare": 0.111,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 517,
+            "1": 213,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7082,
+          "worstLate": 1,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 313,
+            "1": 410,
+            "2": 7,
+            "3+": 0
+          },
+          "exactShare": 0.4288,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 88,
+            "1": 206,
+            "2": 405,
+            "3+": 31
+          },
+          "exactShare": 0.1205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 730,
+          "early": 0,
+          "late": {
+            "0": 78,
+            "1": 149,
+            "2": 390,
+            "3+": 113
+          },
+          "exactShare": 0.1068,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 65,
+            "1": 149,
+            "2": 381,
+            "3+": 135
+          },
+          "exactShare": 0.089,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        }
+      }
+    },
+    "ps.iftaa.umm-al-fahm": {
+      "name": "Umm al-Fahm",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
       "broken": 0,

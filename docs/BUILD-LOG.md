@@ -2102,7 +2102,8 @@ Nablus, Hebron and Gaza at the app's city points, each with its own margins. The
 on 2012 and 2026. 2027, held out, was 1 min early on a few days, so those margins are widened to the
 three years' bound. The three towns run a further minute late: their printed offset is one figure all
 year while their own sun moves against al-Aqsa's through the seasons. Each carries its own 4-minute
-exception on those events (ruling R41). `PrintedTable` gained a `lateLimits` field to carry them.
+exception on those events (ruling R41). `PrintedTable` gained a `lateLimits` field to carry them
+(removed again on 3 October, review r2: no town needs an exception any more, so the field is gone).
 Gaza's cautious times now place their PA member at Gaza's own table.
 
 **Checked.** Whole gate: 839 rows, 162,157 place-days, 0 early, none over its limit, nothing broken.
@@ -2136,9 +2137,11 @@ minutes. Adding whole minutes to a time already rounded never crosses a minute b
 gets al-Aqsa's proven 3-minute bound, needs no margin or exception of its own, and is never early by
 construction. The towns' 4-minute exceptions are gone.
 
-The user's own sun no longer rides beside a town's table. The authority's construction does not use
-it, and it only added lateness. The sunset that Maghrib is held to moves with the town's figure, as
-every other time does. Without that, Jericho's − 1 put its Maghrib before al-Aqsa's sunset on 26 days,
+The user's own sun no longer rides beside a town's printed times. The authority's construction does
+not use it, and on those times it only added lateness. (Corrected the same day, review r2: it also
+kept the ends the PA never prints, Asr's and Maghrib's, from running later than the place's own sun,
+so it bounds those again; see below.) The sunset that Maghrib is held to moves with the town's figure,
+as every other time does. Without that, Jericho's − 1 put its Maghrib before al-Aqsa's sunset on 26 days,
 and the repair made it 4 minutes late.
 
 Qalqilya's minute and a half becomes + 2 on its starts (never before the half-minute instant) and
@@ -2173,5 +2176,60 @@ years' bound, −116 s. It is now never after the printed Fajr, and at most 3 mi
   (ruling R38, disclosed).
 - Tools jvmTest passed 267/0 with the archive. `:shared:testAndroidHostTest` passed 1,598/0, and
   `checkStamps` passed.
+
+**The cities.** Hebron and Nablus stay held, because the data supports class D. Gaza stays held too.
+
+## Palestine: the list's towns in Israel, and the ends the PA never prints (3 October) — ruling R118, review r2's fixes
+
+Review r2 of R118 found two more things.
+
+**A West Bank village could take a farther town's figure.** The PA's list also prints 13 towns in
+Israel: Nazareth and Umm al-Fahm + 0; Tiberias, Safed and Beisan − 1; Haifa, Acre, Kafr Qasim and
+Tayibe + 1; Lydd and Ramla + 1.5; Beersheba and Jaffa + 2. Only the 16 Palestinian towns were units,
+so a village by the Green Line resolved to a Palestinian town even where a listed town in Israel was
+nearer. Ni'lin and Qibya are 12 km from Lydd (+ 1.5) and 18–20 km from Ramallah (+ 0), and their Dhuhr
+came before Lydd's on every day. Barta'a ash-Sharqiya, by Umm al-Fahm (+ 0), took Tulkarm's + 1;
+Bardala and Ein al-Beida, by Beisan (− 1), took Jenin's + 0, so their sunrise and end of eating ran
+late against Beisan's. None of the app's 45 cities was affected.
+
+The 13 towns are now units too, at approximate points from public maps, with the same reach as every
+other. They are used only to decide which printed town a place in Palestine belongs to. The entry's
+scope stays Palestine: choosing it in Israel still falls back to Automatic. Lydd and Ramla's minute
+and a half is handled as Qalqilya's, + 2 on the starts and + 1 on the ends. The archive holds their
+derived tables (`pif_towns_il.py`), and the gate has a row for each town on 2026 and 2027.
+
+**The ends the PA never prints ran later than the place's own sun.** With a town's times taken from
+al-Aqsa alone, Asr's end (al-Aqsa's sunset plus the figure) and Maghrib's end (al-Aqsa's red twilight)
+lost the bound of the place's own sky that spec §3.5 asks of every end. Over 2026, Maghrib's end came
+out later than the place's own at Jericho on 283 days (+ 1 min), and at Jenin, Tubas, Nablus and
+Hebron on 39–141 days (up to + 2). Asr's end did at Jenin, Nablus, Tubas, Rafah and Hebron on 121–177
+days (up to + 2). Now, under `FixedPointMode.TABLE`, Asr's end is the earlier of that sunset and the
+place's own, and the red twilight is the earliest over al-Aqsa's sky and the place's. The printed
+times (every start, sunrise, the end of eating) stay al-Aqsa's plus the figure, and Maghrib stays held
+to the shifted table sunset, so Jericho's earlier repair is not undone. `PrayerDay.sunset`'s KDoc now
+says what the field holds under a table carried by a printed figure. Spec §3.5 carries an R118 note
+for the owner to confirm: a printed town takes its printed times from the table's point alone.
+
+`PrintedTable` is back to its form before R118 (its `lateLimits` field carried nothing any more).
+
+**Checked.**
+- Whole gate: 895 rows, 180,407 place-days, 0 early, 0 late ends, none over its limit, nothing broken.
+- `ps.iftaa`: 69 rows, 29 places, 22,634 place-days (21,903 held out). Every unit is worst 3 minutes
+  late on Fajr, sunrise, Maghrib, Isha and the end of eating, 2 on Asr and 1 on Dhuhr. No exception
+  anywhere.
+- Only `ps.iftaa.json` changed among the stamps beyond the engine hash. ProofStamps.kt is regenerated.
+- Golden vector: no row moved. Its rows hold the starts, sunrise, the day's sunset (Maghrib's floor),
+  the end of eating and imsak, not the prayers' ends, and its Palestinian seeds take the same towns as
+  before.
+- Every Palestinian city through the app's engine, 2026–2031, plus the five villages above (50
+  places, 109,550 place-days a mode): with `ps.iftaa` chosen, 0 early starts and 0 late ends against
+  the nearest printed town's table. On Automatic the West Bank's 37 places are the same. The Gaza
+  Strip's 13 places follow Gaza's cautious times, whose Maghrib is capped at the Ministry of Awqaf's
+  (ruling R38, disclosed).
+- New tests: the five villages take their nearest town's table through the app's engine on both
+  settings, and a town's Asr and Maghrib ends are never after the same method's at the place's own
+  point.
+- Tools jvmTest passed 267/0 with the archive. `:shared:testAndroidHostTest` passed 1,600/0, and
+  `checkStamps` passed. `site/build.py --check` passed: 55 cities.
 
 **The cities.** Hebron and Nablus stay held, because the data supports class D. Gaza stays held too.

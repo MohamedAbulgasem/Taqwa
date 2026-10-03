@@ -11,7 +11,9 @@ import kotlin.time.Instant
  * - [fajr] … [isha]: when each prayer begins in the authority's own words; [asrOther] is the other
  *   school's Asr.
  * - [sunset]: the astronomical sunset at the point, rounded down, for the invariants and the
- *   Maghrib cap.
+ *   Maghrib cap. Under a table the authority carries to a town by a printed figure
+ *   (`FixedPointMode.TABLE`, ruling R118) it is the table point's sunset plus that figure, the floor
+ *   Maghrib is held to; Asr's end in [ends] is then the earlier of it and the user's own sunset.
  * - [endOfEating]: when the fast begins, never after [fajr]; [imsak]: the authority's printed
  *   precaution, where it has one.
  * - [earliestStart] (cautious places) is filled by [Cautious]; [ends] by [DayComputer] and

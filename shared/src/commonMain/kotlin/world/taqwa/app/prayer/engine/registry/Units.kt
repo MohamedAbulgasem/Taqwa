@@ -119,17 +119,8 @@ internal fun lateReachKm(latitude: Double, entryClass: EntryClass): Double {
     return minutes * DEGREES_PER_MINUTE * rad(180.0) / 180.0 * EARTH_RADIUS_KM * cos(rad(latitude))
 }
 
-/**
- * One table an authority prints for one point: [key] names its unit, [method] where it differs from the
- * entry's, [lateLimits] the unit's own exceptions to the late limit (ruling R41).
- */
-internal class PrintedTable(
-    val key: String,
-    val name: String,
-    val point: GeoPoint,
-    val method: TimetableMethod? = null,
-    val lateLimits: List<LateLimit> = emptyList(),
-)
+/** One table an authority prints for one point: [key] names its unit, [method] where it differs from the entry's. */
+internal class PrintedTable(val key: String, val name: String, val point: GeoPoint, val method: TimetableMethod? = null)
 
 /**
  * Rulings R30, R44, R45: an authority's tables printed for one point each.
@@ -142,7 +133,7 @@ internal fun pointTables(entry: RegistryEntry, tables: List<PrintedTable>): Unit
     val method = requireNotNull(entry.method) { "${entry.id} has no single method" }
     val units = tables.map { t ->
         val id = if (tables.size == 1) entry.id else "${entry.id}.${t.key}"
-        AuthorityUnit(id, t.name, t.point, lateReachKm(t.point.lat, entry.entryClass), t.method, lateLimits = t.lateLimits)
+        AuthorityUnit(id, t.name, t.point, lateReachKm(t.point.lat, entry.entryClass), t.method)
     }
     return UnitSet(entry.id, units) { user ->
         val nearest = units.minBy { distanceKm(user, it.point) }
