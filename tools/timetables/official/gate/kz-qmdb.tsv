@@ -11,10 +11,27 @@
 # of eating carries its own margin and a recorded limit (CentralAsia.kt). Fix round (3 Oct 2026): QMDB's
 # 2026 and 2027 tables for Astana, Kokshetau, Kostanay, Pavlodar and Petropavl (54.9N), fetched from the
 # same API, broke Astana's -221 s (123 late ends, up to 2 min, Apr-Jun, mostly at Petropavl); the margin is
-# refitted on all of them (-374 s). Those tables are not yet in the archive, so they have no rows here:
-# to-do, archive them and add their rows (F+E S D A M I, fit) before Ramadan 1448.
+# refitted on all of them (-374 s).
+# Northern round (3 Oct 2026): those tables, with Almaty's 2027, are pinned as the kz-qmdb monitor fetched
+# them (archive/tables/pinned/kz-qmdb/2026-10-03/; raw JSON in archive/raw/monitor/kz-qmdb/2026-10-03/).
+# The Almaty and Astana 2026 captures equal the off_ala/off_ast tables above, so they get no second row.
+# At the 2026-only margins Astana's 2027 Fajr was 1 min early on 7 July days and the northern cities' Isha on
+# 4 August days, so the starts are refitted: Astana 2027, Kokshetau, Pavlodar and Petropavl are fit rows
+# (they decide Fajr, Isha, Asr and Maghrib, as they decided the end of eating); Almaty 2027 and Kostanay
+# (its own zone, the farthest west) are held out. Northern lateness grows to Petropavl and is recorded as
+# kz.qmdb's Fajr (8 min) and Isha (5 min) limits (CentralAsia.kt, proof 7f).
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/centralasia/off_ala_h1.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jan-Jun 2026 (below 48N)
 archive/tables/moral-auth-world/centralasia/off_ala_h2.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jul-Dec 2026 (folded in, see above)
 archive/tables/moral-auth-world/centralasia/off_ast_h1.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Astana, Jan-Jun 2026 (at/above 48N)
 archive/tables/moral-auth-world/centralasia/off_ast_h2.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Astana, Jul-Dec 2026 (folded in, see above)
+archive/tables/pinned/kz-qmdb/2026-10-03/almaty-2027.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Almaty, 2027 (below 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/astana-2027.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Astana, 2027 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/kokshetau-2026.txt	kz.qmdb	53.291667	69.391667	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Kokshetau, 2026 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/kokshetau-2027.txt	kz.qmdb	53.291667	69.391667	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Kokshetau, 2027 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/kostanay-2026.txt	kz.qmdb	53.219333	63.634194	Asia/Qostanay	F+E S D A M I	daily	hanafi	test	Kostanay, 2026 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/kostanay-2027.txt	kz.qmdb	53.219333	63.634194	Asia/Qostanay	F+E S D A M I	daily	hanafi	test	Kostanay, 2027 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/pavlodar-2026.txt	kz.qmdb	52.315556	76.956389	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Pavlodar, 2026 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/pavlodar-2027.txt	kz.qmdb	52.315556	76.956389	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Pavlodar, 2027 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/petropavl-2026.txt	kz.qmdb	54.862222	69.140833	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Petropavl, 2026 (at/above 48N, the northernmost table; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-03/petropavl-2027.txt	kz.qmdb	54.862222	69.140833	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Petropavl, 2027 (at/above 48N, the northernmost table; QMDB year API, monitor capture of 3 Oct 2026)

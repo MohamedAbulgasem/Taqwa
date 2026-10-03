@@ -50,15 +50,20 @@ object CentralAsia {
      * the AngleBased high-latitude rule, sunrise − 3 and Dhuhr, Asr, Maghrib + 3 below 48° N, − 5 and +
      * 5 at or above it. Margins fitted (task 7f, `kz-qmdb.tsv`, `proof/7f-asia.md`) over Almaty
      * (below 48°N) and Astana (at/above it) across the whole of 2026, one set of margins covering
-     * both authority-minute variants. The end of eating's margin is the exception: it differs by
-     * region ([variants]). Tables held for Almaty and Astana. Class D.
+     * both authority-minute variants, then refitted (fix round of 3 Oct 2026) with QMDB's 2026 and
+     * 2027 tables for Astana, Kokshetau, Pavlodar and Petropavl as fit rows, Almaty 2027 and Kostanay
+     * held out: Astana's 2027 July Fajr (+ 8 s) and the northern cities' August Isha (+ 11 s) were
+     * 1 min early at the 2026-only margins; sunrise, Asr and Maghrib moved to the fitted bounds too
+     * (sunrise earlier, Asr and Maghrib later). The end of eating's margin is the exception: it
+     * differs by region ([variants]). Tables held for Almaty, Astana, Kokshetau, Kostanay, Pavlodar
+     * and Petropavl (54.9°N). Class D.
      */
     val kazakhstanMethod = TimetableMethod(
         id = "kz.qmdb",
         fajrAngle = 15.0,
         isha = IshaRule.Angle(15.0),
         authorityMinutes = EventOffsets(sunrise = -3, dhuhr = 3, asr = 3, maghrib = 3),
-        margins = EventOffsets(fajr = -2, sunrise = 19, dhuhr = -22, asr = -11, maghrib = -17, isha = -3),
+        margins = EventOffsets(fajr = 8, sunrise = 14, dhuhr = -22, asr = -8, maghrib = -15, isha = 11),
         highLatitude = HighLatRule.Legacy("angle"),
     )
 
@@ -66,8 +71,18 @@ object CentralAsia {
         id = "kz.qmdb", nameKey = "authority_qmdb", entryClass = EntryClass.D_AUTHORITY, method = kazakhstanMethod,
         school = AsrSchool.HANAFI, countries = setOf("KZ"), measured = true,
         lateLimits = listOf(
-            LateLimit(5, "QMDB's AngleBased curve at Astana (≥48N) leaves a residual of up to 5 min in mid-May (task 7f)", setOf(TimedEvent.FAJR)),
-            LateLimit(4, "the same AngleBased residual at Astana, in mid-July, up to 4 min (task 7f)", setOf(TimedEvent.ISHA)),
+            LateLimit(
+                8,
+                "QMDB's AngleBased Fajr runs ahead of the model at and above 48N from late April to early June, more the farther " +
+                    "north: up to 5 min at Astana, 6 at Kokshetau, Kostanay and Pavlodar, 8 at Petropavl (task 7f, fix round of 3 Oct 2026)",
+                setOf(TimedEvent.FAJR),
+            ),
+            LateLimit(
+                5,
+                "the same AngleBased residual in Isha from July to mid-August, up to 5 min from Astana to Petropavl " +
+                    "(task 7f, fix round of 3 Oct 2026)",
+                setOf(TimedEvent.ISHA),
+            ),
             LateLimit(
                 8,
                 "at and above 48N the end of eating keeps clear of QMDB's spring AngleBased residual as far north as " +

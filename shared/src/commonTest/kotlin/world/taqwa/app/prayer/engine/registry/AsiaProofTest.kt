@@ -95,6 +95,9 @@ class AsiaProofTest {
         // 48N it keeps clear of QMDB's AngleBased residual (end-of-eating audit, 3 Oct 2026), while
         // below 48N it stays 0, since an end only ever moves earlier where it must.
         assertEquals(southMethod.margins, northMethod.margins)
+        // The northern round (3 Oct 2026): QMDB's 2027 and northern tables decide Fajr and Isha.
+        assertTrue(northMethod.margins.fajr >= 8, "fajr margin: ${northMethod.margins.fajr}")
+        assertTrue(northMethod.margins.isha >= 11, "isha margin: ${northMethod.margins.isha}")
         assertEquals(0, southMethod.endOfEatingMarginSeconds)
         assertTrue(northMethod.endOfEatingMarginSeconds <= -374, "north end-of-eating margin: ${northMethod.endOfEatingMarginSeconds}")
     }

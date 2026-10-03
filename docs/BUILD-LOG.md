@@ -2265,3 +2265,50 @@ so did `checkStamps` (71 entries). The monitor's Python tests passed (72, both P
 wrote 55 cities, with 2 held. `build.py --check` passed (164 pages, 143 of them prayer-time pages), and
 `site/test_timetables.py` passed (18). No city page changed. The engine change ships with the first
 update, not 1.0.0 (35).
+
+## Kazakhstan's starts north of Astana (3 October, the northern round)
+
+The end-of-eating round left two starts it could not move. QMDB's Fajr was 1 min early on 7 July days
+at Astana in 2027, and its Isha 1 min early on 4 August days at Petropavl, Kokshetau and Pavlodar.
+Both also went over their late limits in the north. This round fixes them, and the northern tables
+are now in the gate.
+
+**The tables.** The kz-qmdb monitor's capture of 3 October (QMDB's year API, 2026 and 2027 at six
+points) is pinned in the private archive as fetched: `archive/tables/pinned/kz-qmdb/2026-10-03/` (12
+tables) and `archive/raw/monitor/kz-qmdb/2026-10-03/` (12 raw JSON files). The Almaty and Astana 2026
+tables equal the archived ones day for day, so they get no second row. The other ten are new rows in
+`kz-qmdb.tsv` (`F+E S D A M I`). Fit rows: Astana 2027, and Kokshetau, Pavlodar and Petropavl over
+both years, which had already decided the end of eating. Held out: Almaty 2027 and Kostanay over both
+years (the farthest west, in its own zone).
+
+**The refit.** The fitter over the 11 fit rows asked for Fajr +8 s (was −2) and Isha +11 s (was −3).
+The earlier entry and proof 7f said +14 s for Isha; that was a misreading, and proof 7f now says
++11. Sunrise, Asr and Maghrib had 0 to 3 s of safety left, so they move to the fitted bounds too:
+sunrise +14 (was +19), Asr −8 (was −11), Maghrib −15 (was −17). Dhuhr stays −22, and the northern
+end of eating stays −374 s. Every start is later and sunrise earlier. The margins are one set for
+both variants, so Almaty's starts move by the same seconds. The held-out rows: 0 early, 0 late ends.
+
+**The late limits (R41).** The AngleBased residual deepens to the north. Fajr is late from late April
+to early June, up to 5 min at Astana, 6 at Kokshetau, Kostanay and Pavlodar, and 8 at Petropavl.
+Isha is late from July to mid-August, up to 5 min from Astana north. `kz.qmdb`'s Fajr limit is now 8
+min (was 5) and its Isha limit 5 (was 4), each with its reason. Neither comes near 10 min. Almaty's
+worst start is 1 min.
+
+**The About screen.** `kz.qmdb` has no units, so the screen shows the entry's stamp at every Kazakh
+place. It now reads 4,380 days at 6 places, checked through 31 Dec 2027, "at most 8 min after". That
+is true at each measured city. At Almaty, whose own worst is 1 min, it overstates.
+
+**What moved.** The whole gate: 838 rows and 161,501 place-days, 0 early, 0 late ends, none over its
+limit, nothing BROKEN. Only `kz.qmdb`'s stamp changed, with `ProofStamps.kt`. The golden vector moved
+on 15 of its 2,071 rows, all at the Kazakh seeds (5 at Almaty, 10 at Astana): Fajr, Isha, Asr and
+Maghrib 1 min later, sunrise 1 min earlier. `AsiaProofTest` now pins the Fajr and Isha margins at or
+above +8 and +11 s.
+
+Checked: tools `jvmTest` 281/0 with the archive. `:shared:testAndroidHostTest` with the Registry,
+GoldenVector, ProofStamps and AboutTimes filters passed (110/0), and `AsiaProofTest` passed (6/0).
+`checkStamps` passed (71 entries). No city page uses `kz.qmdb`.
+
+**Still open.** North of Petropavl, up to 55.4° N, every margin is an extrapolation. The Fajr and
+Isha limits may be a minute short there, and the end of eating's margin is on the unsafe side. The
+west (Oral, Aktobe, Atyrau, Aktau) is within the measured latitudes but has no table. The engine
+change ships with the first update, not 1.0.0 (35).
