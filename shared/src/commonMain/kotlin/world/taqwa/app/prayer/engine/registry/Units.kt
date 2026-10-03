@@ -96,7 +96,7 @@ object Units {
             Balkans.bosniaUnits, Balkans.albaniaUnits, Europe.austriaUnits, Europe.switzerlandUnits, Americas.fianzUnits,
         ).plus(Americas.torontoUnits).plus(Americas.lakembaUnits).plus(Europe.dublinTables).plus(SouthAfrica.capeTownTables)
             .plus(listOf(Europe.londonUnits, Europe.gmpUnits, Europe.embUnits, Europe.irnUnits, Diyanet.europeUnits))
-            .plus(Levant.jordanUnits)
+            .plus(Levant.jordanUnits).plus(Levant.paUnits)
             .associateBy { it.entryId }
     }
 

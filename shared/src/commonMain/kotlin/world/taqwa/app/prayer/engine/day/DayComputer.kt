@@ -131,8 +131,19 @@ object DayComputer {
         private val skies: HashMap<GeoPoint, Sky> = HashMap(),
     ) {
         // A fixed point never drops the user's own (spec §3.5): starts are the later of the two,
-        // sunrise, sunset and the end of eating the earlier.
-        private val here = listOfNotNull(method.fixedPoint, point).distinct()
+        // sunrise, sunset and the end of eating the earlier. Only a table point the authority itself
+        // carries to the place by a printed figure ([FixedPointMode.TABLE], ruling R118) stands alone
+        // for the printed times; the user's own sky ([ownEndsSky]) still bounds the ends it never prints.
+        private val tableOnly = method.fixedPointMode == FixedPointMode.TABLE && method.fixedPoint != null
+        private val here =
+            if (tableOnly) listOfNotNull(method.fixedPoint) else listOfNotNull(method.fixedPoint, point).distinct()
+
+        /**
+         * Under [FixedPointMode.TABLE], the user's own sky where it is not the table's point: Asr's end
+         * (the sunset) and Maghrib's red twilight are never after the user's own, as spec §3.5 asks of
+         * every end (review r2 of R118). Null under every other mode, where [here] holds the user's point.
+         */
+        private val ownEndsSky: Sky? get() = if (tableOnly && point !in here) sky(point) else null
 
         // Ruling R45: an ends-only fixed point (first in [here]) bounds the ends and not the starts.
         private val endsOnly = method.fixedPointMode == FixedPointMode.ENDS_ONLY && here.size == 2
@@ -932,8 +943,16 @@ object DayComputer {
                 }
             }
 
-            val sunset = endOf(sunsetHere)
-            val redTwilightEnd = skies
+            // A table carried to a town by a printed figure ([FixedPointMode.TABLE], ruling R118) moves its
+            // sunset with the town's figure for the ends (its sunrise minutes), as the authority moves every time.
+            // The ends it never prints stay bounded by the user's own sky ([ownEndsSky]): Asr's end at the
+            // earlier of that sunset and the user's own, the red twilight the earliest over both skies.
+            // Maghrib's own floor stays the table's shifted sunset ([PrayerDay.sunset]).
+            val tableShift = if (method.fixedPointMode == FixedPointMode.TABLE) offsets.authority(Prayer.SUNRISE) else 0
+            val sunset = endOf(sunsetHere + tableShift)
+            val own = ownEndsSky
+            val asrEnd = own?.sunset(date)?.let { minOf(sunset, endOf(it)) } ?: sunset
+            val redTwilightEnd = (skies + listOfNotNull(own))
                 .mapNotNull { it.altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
                 .minOrNull()?.let(::endOf)
             return PrayerDay(
@@ -953,7 +972,7 @@ object DayComputer {
                 ends = Ends.of(
                     sunrise = sunrise,
                     standardAsr = if (school == AsrSchool.STANDARD) asr else asrOther,
-                    sunset = sunset,
+                    sunset = asrEnd,
                     earliestIsha = isha,
                     maghribEndCap = redTwilightEnd,
                     nextEndOfEating = null,

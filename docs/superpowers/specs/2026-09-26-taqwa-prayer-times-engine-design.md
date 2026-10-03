@@ -170,6 +170,11 @@ a monitor source. Large tables are compact resources.
 - **Where the time is computed**: the unit's reference point; the zone's latest point for starts where
   the authority works that way (JAKIM, Bahrain); Umm al-Qura at the city and the user's point. Always
   also at the user's own point: a start never earlier, sunrise and end of eating never later.
+  *R118 note (3 Oct 2026, for the owner to confirm):* where the authority itself defines a town's
+  times as its table point's plus a printed figure (the PA's al-Aqsa table and its town offsets), the
+  printed times (every start, sunrise, the end of eating) are taken at the table's point alone, plus
+  the figure, so the town carries the table's proven bound exactly; the user's own point still bounds
+  the ends the authority never prints (Asr's end at the sunset, Maghrib's red twilight).
 - **Unknown reference point or horizon**: the unit's safe edge and the deepest plausible horizon; no
   "at most" figure is claimed for that unit.
 - **Near a unit or country border**: the envelope over the candidates within the location's
