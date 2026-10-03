@@ -273,7 +273,7 @@ class Prove(
             }
             val header = header(text)
             val rows = manifest.rows.filter { it.source == recipe.gate }
-            for (capture in index.filter { it.source == recipe.source && it.survey == null && recipe.matches(it.key) }.sortedBy { it.key }) {
+            for (capture in index.filter { it.source == recipe.source && it.survey == null && Recipes.applies(recipe, it.key, recipes) }.sortedBy { it.key }) {
                 val table = if (recipe.from == "-") capture else from(recipe, capture) ?: run {
                     leftOut += LeftOut("${recipe.where} ${capture.id}", "no capture ${expand(recipe.from, capture.key)} in the monitor's index")
                     null

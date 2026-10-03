@@ -143,6 +143,24 @@ class ProveTest {
     }
 
     @Test
+    fun `a bare star line gives way to a line naming the capture more specifically in the same gate file`() {
+        val all = Recipes.parse(
+            Recipes.HEADER.joinToString("\t") + "\n" +
+                "id-kemenag\t*\tid-kemenag.tsv\tindex\t-\tindex\tall\t-\n" +
+                "id-kemenag\tmedan-*\tid-kemenag.tsv\tid.kemenag/0228\t-\tunit\tall\t-\n" +
+                "za-mjc\tcape-town-*\tza-cape.tsv\tindex\t-\tindex\tall\t-\n" +
+                "za-mjc\tcape-town-*\tza-cape.tsv\tza.cape\tindex\tall\tall\t-\n",
+        )
+        val (star, medan, own, member) = all
+        assertFalse(Recipes.applies(star, "medan-2026", all))
+        assertTrue(Recipes.applies(medan, "medan-2026", all))
+        assertTrue(Recipes.applies(star, "jakarta-2026", all))
+        assertFalse(Recipes.applies(medan, "jakarta-2026", all))
+        // Two lines with the same specific pattern both apply (a capture's own row and its cautious member row).
+        assertTrue(Recipes.applies(own, "cape-town-2026-11", all) && Recipes.applies(member, "cape-town-2026-11", all))
+    }
+
+    @Test
     fun `the committed recipes read`() {
         val committed = Recipes.load(TestPaths.repoRoot.resolve("tools/timetables/official/monitor/recipes.tsv"))
         assertTrue(committed.size > 20)

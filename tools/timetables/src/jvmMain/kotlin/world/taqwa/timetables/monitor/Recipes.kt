@@ -51,6 +51,14 @@ object Recipes {
 
     fun load(file: File): List<Recipe> = parse(file.readText())
 
+    /**
+     * Whether [recipe] applies to the capture [key]: its pattern matches, and, for a line whose pattern is
+     * the bare `*`, no other line of [all] for the same source and gate file names the capture more
+     * specifically (a capture the fetcher names without its unit, given its unit on a line of its own).
+     */
+    fun applies(recipe: Recipe, key: String, all: List<Recipe>): Boolean =
+        recipe.matches(key) && (recipe.capture != "*" || all.none { it.source == recipe.source && it.gate == recipe.gate && it.capture != "*" && it.matches(key) })
+
     /** Every line, or every problem at once (with its line). */
     fun parse(text: String): List<Recipe> {
         val problems = mutableListOf<String>()
