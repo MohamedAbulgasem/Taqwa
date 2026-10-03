@@ -1,7 +1,7 @@
 {
   "entry": "kz.qmdb",
   "class": "D (authority)",
-  "engineHash": "b61616fadb2a2667",
+  "engineHash": "e4263ad6cf2cd3db",
   "broken": 0,
   "places": 2,
   "first": "2026-01-01",
@@ -108,14 +108,14 @@
       "checked": 730,
       "lateEnd": 0,
       "late": {
-        "0": 189,
-        "1": 192,
-        "2": 10,
-        "3+": 339
+        "0": 182,
+        "1": 183,
+        "2": 1,
+        "3+": 364
       },
-      "exactShare": 0.2589,
-      "worstLate": 5,
-      "lateLimit": 5,
+      "exactShare": 0.2493,
+      "worstLate": 8,
+      "lateLimit": 8,
       "lateLimitFrom": "entry kz.qmdb",
       "overLimit": 0
     }
@@ -133,13 +133,13 @@
       "reason": "the same AngleBased residual at Astana, in mid-July, up to 4 min (task 7f)",
       "events": ["isha"]
     },
-    "entry kz.qmdb: 5 min (endOfEating)": {
-      "reason": "at and above 48N the end of eating keeps clear of QMDB's mid-May AngleBased residual at Astana, so on its other days it comes up to 5 min before the printed Fajr (end-of-eating audit, 3 Oct 2026)",
-      "events": ["endOfEating"]
-    },
-    "entry kz.qmdb: 5 min (fajr)": {
+    "entry kz.qmdb: 5 min": {
       "reason": "QMDB's AngleBased curve at Astana (≥48N) leaves a residual of up to 5 min in mid-May (task 7f)",
       "events": ["fajr"]
+    },
+    "entry kz.qmdb: 8 min": {
+      "reason": "at and above 48N the end of eating keeps clear of QMDB's spring AngleBased residual as far north as Petropavl, so on its other days it comes up to 8 min before the printed Fajr (end-of-eating audit, 3 Oct 2026)",
+      "events": ["endOfEating"]
     }
   }
 }

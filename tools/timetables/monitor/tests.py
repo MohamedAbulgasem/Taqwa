@@ -21,7 +21,7 @@ from common import Context, FetchError, Http, Table, add_all, nearest_year, norm
 import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
-from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, toronto  # noqa: E402
+from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, qmdb, toronto  # noqa: E402
 
 
 class Times(unittest.TestCase):
@@ -255,6 +255,19 @@ class Parsers(unittest.TestCase):
         self.assertEqual(7, len(mawaqit.calendar_rows(seven, 2026, 7)["2026-01-01"]))
         page = 'x confData = {"name": "M", "calendar": [{"1": ["05:00", "07:00", "12:30", "15:00", "17:30", "19:00"]}], "s": "a}b"}; y'
         self.assertEqual("M", mawaqit.conf_data(page)["name"])
+
+    def test_qmdb(self):
+        # Invented times (ruling R69): the hour is the field's place, the minutes the day's number.
+        days = [{"Date": f"2027-01-0{d}", "imsak": "-", **{k: f"{i:02d}:{d:02d}" for i, k in enumerate(qmdb.FIELDS)},
+                 "sunset": "-", "midnight": "-"} for d in (1, 2)]
+        rows = qmdb.parse(json.dumps({"result": days, "latitude": "1", "longitude": "2", "year": 2027, "city": None}).encode())
+        self.assertEqual(["2027-01-01", "2027-01-02"], sorted(rows))
+        self.assertEqual(["00:02", "01:02", "02:02", "03:02", "04:02", "05:02"], rows["2027-01-02"])
+        with self.assertRaises(FetchError):
+            qmdb.parse(b'{"detail": "Not found."}')
+        self.assertEqual("kz-qmdb", qmdb.SOURCE)
+        self.assertEqual({"almaty", "astana", "kokshetau", "kostanay", "pavlodar", "petropavl"}, {p[0] for p in qmdb.POINTS})
+        self.assertTrue(all(float(p[2]) >= 48.0 for p in qmdb.POINTS if p[0] != "almaty"), "every point but Almaty is in the north variant")
 
     def test_qatar(self):
         body = json.dumps({"gregorianDate": {"year": 2026, "month": 9, "day": 28},

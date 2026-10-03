@@ -631,13 +631,13 @@ object ProofStamps {
             placeDays = 730,
             ramadanDays = 60,
             provenThrough = "2026-12-31",
-            worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 1, "sunrise" to 1),
+            worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 8, "fajr" to 5, "isha" to 4, "maghrib" to 1, "sunrise" to 1),
             worstLateByUnit = emptyMap(),
             lateLimits = listOf(
                 ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "maghrib", "sunrise")),
                 ProofLateLimit(minutes = 4, reason = "the same AngleBased residual at Astana, in mid-July, up to 4 min (task 7f)", events = listOf("isha")),
-                ProofLateLimit(minutes = 5, reason = "at and above 48N the end of eating keeps clear of QMDB's mid-May AngleBased residual at Astana, so on its other days it comes up to 5 min before the printed Fajr (end-of-eating audit, 3 Oct 2026)", events = listOf("endOfEating")),
                 ProofLateLimit(minutes = 5, reason = "QMDB's AngleBased curve at Astana (≥48N) leaves a residual of up to 5 min in mid-May (task 7f)", events = listOf("fajr")),
+                ProofLateLimit(minutes = 8, reason = "at and above 48N the end of eating keeps clear of QMDB's spring AngleBased residual as far north as Petropavl, so on its other days it comes up to 8 min before the printed Fajr (end-of-eating audit, 3 Oct 2026)", events = listOf("endOfEating")),
             ),
         ),
         ProofStamp(

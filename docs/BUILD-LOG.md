@@ -2212,3 +2212,56 @@ so did `checkStamps` (71 entries). `CI=true generate` wrote 55 cities, with 2 he
 passed (164 pages, 143 of them prayer-time pages), and `site/test_timetables.py` passed (18). No city
 page changed. The engine changes (Kazakhstan's northern end, Lebanon's −5 s) ship with the first
 update, not 1.0.0 (35).
+
+## The end of eating north of Astana (3 October, the audit's fix round)
+
+The audit's review asked what Astana's −221 s is worth north of Astana, where no QMDB table was held.
+For the end of eating, using Astana's margin further north is not like using its Fajr limit. A
+deeper AngleBased residual makes a Fajr start later, which is the safe side. It makes the end of
+eating late, which is the unsafe one. So QMDB's 2026 and 2027 tables were fetched from its API for
+Astana and four of its own northern cities: Kokshetau, Kostanay, Pavlodar and Petropavl (54.9° N).
+Astana's 2026 table came back identical to the archived one. The tables were checked in a scratch
+gate run. They are not in the archive yet, so they have no rows in `kz-qmdb.tsv`.
+
+**What it found.** At −221 s the end of eating came after QMDB's printed Fajr on 123 of 3,650 days.
+The gate's samples were at Petropavl from 30 April (2 min) and at Astana itself on 17 May 2027
+(1 min). It was refitted the existing way on all fourteen tables, and the fitter's bound is −374 s,
+decided at the north on 6 May 2027. With it there are no late ends in that run, and the whole gate
+is green. The end at and above 48° N now comes up to 8 min before the printed Fajr. That is recorded
+as `kz.qmdb`'s end-of-eating exception, now 8 min instead of 5 (R41). Almaty stays at 0.
+
+**What it found that this round could not fix.** In the same scratch run the starts fell short, and
+this round may not move a start:
+- Fajr was 1 min early on 7 days at Astana in July 2027, and up to 7 min late at Petropavl (over its
+  5 min limit on 92 days).
+- Isha was 1 min early on 4 days at Petropavl, Kokshetau and Pavlodar in August, and up to 5 min late
+  (over its 4 on 29 days).
+
+The fitter asks for Fajr −2 → +8 s and Isha −3 → +14 s. Those need their own round before the
+northern rows can go in green. The monitor now fetches the six QMDB points each month (source
+`kz-qmdb`, `fetchers/qmdb.py`, tested on invented data; a trial run into a scratch root gave the
+archived Almaty and Astana tables byte for byte). North of Petropavl, up to 55.4° N, the margin is
+an extrapolation, and for an end that is the unsafe side.
+
+**The other findings.**
+- Dawat-e-Islami's two rows (`in-karachi.tsv`, `pk-karachi.tsv`): the table rounds the source's
+  seconds up for Fajr, so as the end's reference it can be up to 59 s late. Both headers now say so.
+  No held day sits in that window, since the end is at least 1 min before the rounded Fajr every
+  day. A floored E column is a to-do for the next archive round.
+- JAKIM: proof 7c now says that the normalised tables hold no imsak and the raw e-solat captures do.
+  An `Im` column from them is a to-do for the next archive round.
+- `AsiaProofTest` now checks both end-of-eating margins: 0 at Almaty and −374 s or deeper at Astana.
+  The KDoc and the test comment now say that this margin differs by region.
+- Left as they were: `default.safe`'s 18° end, which is the owner's decision (above), and
+  `ps.iftaa`, which belongs to the Palestine track.
+
+**What moved.** The whole gate: 828 rows and 157,851 place-days, 0 early, 0 late ends, none over its
+limit, nothing BROKEN. Only `kz.qmdb`'s stamp changed (end of eating: worst 8, limit 8), with
+`ProofStamps.kt`. The golden vector moved on 16 of its 2,071 rows, all at the Astana seed and in the
+end of eating alone, 2 or 3 min earlier each.
+
+Checked: tools `jvmTest` 281/0 with the archive. `:shared:testAndroidHostTest` passed (1,597/0), and
+so did `checkStamps` (71 entries). The monitor's Python tests passed (72, both Pythons). `CI=true generate`
+wrote 55 cities, with 2 held. `build.py --check` passed (164 pages, 143 of them prayer-time pages), and
+`site/test_timetables.py` passed (18). No city page changed. The engine change ships with the first
+update, not 1.0.0 (35).

@@ -203,7 +203,7 @@ now also the end of eating (`F+E`). Whole gate, no start moved:
 
 | entry | days | late ends | worst, min before the printed Fajr | limit |
 | --- | --- | --- | --- | --- |
-| `kz.qmdb` | 730 | 0 (29 before the fix) | 5 (339 days at 3 or more) | 5, recorded |
+| `kz.qmdb` | 730 | 0 (29 before the fix) | 8 (364 days at 3 or more) | 8, recorded |
 | `uz.board` | 20 | 0 | 1 | 3 (class D) |
 | `kg.default` | 1 | 0 | 0 | 3 (class D) |
 | `in.karachi` | 30 | 0 | 3 | 3 (class D) |
@@ -215,11 +215,35 @@ AngleBased Fajr runs up to 5 min before the model's in mid-May, and the end of e
 plain dawn). Fixed the existing way: the fitter's end-of-eating bound over the whole year is −221 s,
 decided at Astana on 14 May; fitted on Almaty's rows alone it is +18 s. So the end of eating at and
 above 48° N carries −221 s (`CentralAsia.variants`, beside QMDB's ± 5 min there), and Almaty's
-stays 0: an end only ever moves earlier, and there it needs nothing. On Astana's other days the end
-now comes up to 5 min before the printed Fajr, recorded as a third exception (5 min, the end of
-eating alone). The golden vector's Astana seed moved on 16 days, the end of eating alone, 3 or 4 min
-earlier each. North of Astana (Petropavl, Kostanay, Pavlodar) no table is held: the margin is
-Astana's, as the Fajr limit is.
+stays 0: an end only ever moves earlier, and there it needs nothing.
+
+**North of Astana (fix round, 3 Oct 2026).** The review asked what Astana's −221 s is worth further
+north, where the AngleBased clamp runs for more of the year and cuts deeper. Using Astana's margin
+there is not the same as using its Fajr limit: a deeper residual makes a Fajr start later, the safe
+side, but makes the end of eating late, the unsafe one. So QMDB's 2026 and 2027 tables were fetched
+from the same API for Astana and for its own Kokshetau (53.3° N), Kostanay (53.2° N), Pavlodar
+(52.3° N) and Petropavl (54.9° N) — the Astana 2026 table came back identical to the archived one —
+and checked in a scratch gate run (the tables are not yet in the archive, so they have no rows in
+`kz-qmdb.tsv`). At −221 s the end of eating came after QMDB's printed Fajr on 123 of 3,650 days (among
+the gate's samples: Petropavl from 30 April 2026, 2 min, and Astana itself on 17 May 2027, 1 min);
+the refit needed 153 s more than Astana's 2026 bound. Refitted the same way on all fourteen tables (Almaty's, Astana's archived 2026 and the ten
+new ones), the fitter's bound is −374 s, decided at the north on 6 May 2027. With it there is no late
+end on any of the 4,015 place-days of that run, and the whole gate is green. The cost is on the safe
+side: on most days the end at and above 48° N now comes 3 or more minutes before the printed Fajr,
+up to 8 min, recorded as the third exception (8 min, the end of eating alone; it was 5). The golden
+vector's Astana seed moved on 16 days again, the end of eating alone, 2 or 3 min earlier than
+before this round.
+
+Two things stay open. North of Petropavl (to 55.4° N, the country's edge) the margin is an
+extrapolation, and for an end that is the unsafe side. And the northern tables must go into the
+archive and get their rows (`F+E S D A M I`, fit) before Ramadan 1448 (from about 8 February 2027):
+the monitor now fetches them each month (source `kz-qmdb`, `fetchers/qmdb.py`), and the gate will
+then hold the margin to account. The same scratch run found the starts there short too, which this
+end-of-eating round could not touch (no start may move): Fajr 1 min early on 7 days at Astana in July
+2027 and up to 7 min late at Petropavl (over the 5 min limit on 92 days), Isha 1 min early on 4 days
+at Petropavl, Kokshetau and Pavlodar in August and up to 5 min late (over its 4 on 29 days). The
+fitter asks for Fajr −2 → +8 s and Isha −3 → +14 s; those starts need their own fix round before the
+northern rows can be added green.
 
 `bd.ifb`'s October digitization (`off-ifb-dhaka.txt`) stays `F`: IFB's fast ends at its printed
 sehri, 6 min before its printed Fajr, which the year-round row checks (`E`); checked once against
