@@ -4,9 +4,11 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import world.taqwa.app.prayer.engine.EngineSettings
 import world.taqwa.app.prayer.engine.PrayerEngine
+import world.taqwa.app.prayer.engine.TimetableChoice
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.GeoPoint
+import world.taqwa.app.prayer.engine.registry.authorities.Levant
 import world.taqwa.app.prayer.engine.registry.data.AlgeriaWilayas
 import java.io.File
 import kotlin.test.Test
@@ -242,6 +244,41 @@ class RegistryCitiesTest {
             val eastOrSouth = city.lon > 18.5 || city.lat < 29.5
             val expected = if (eastOrSouth) EndOfEating.DawnAngle(19.5) else EndOfEating.SameAsFajrDawn
             assertEquals(expected, r.method!!.endOfEating, city.name)
+        }
+    }
+
+    @Test
+    fun `every palestinian city follows its own printed town's table through the app's engine (ruling R118)`() {
+        // The PA prints one offset for each town after al-Aqsa's table; a place takes its own town's table, or the
+        // nearest printed town's, never a neighbour's (Tulkarm's + 1 is not Nablus's + 0, Rafah's + 4 not Gaza's + 3).
+        val own = mapOf(
+            "East Jerusalem" to "Jerusalem", "Old City" to "Jerusalem", "Ramallah" to "Ramallah", "Bethlehem" to "Bethlehem",
+            "Janīn" to "Jenin", "Nablus" to "Nablus", "Jericho" to "Jericho", "Hebron" to "Hebron", "Idhnā" to "Idhna",
+            "Dūrā" to "Dura", "Ţūlkarm" to "Tulkarm", "Qalqīlyah" to "Qalqilya", "Gaza" to "Gaza", "Rafaḩ" to "Rafah",
+            "Khān Yūnis" to "Khan Yunis", "Dayr al Balaḩ" to "Deir al-Balah",
+        )
+        val palestine = cities.filter { it.countryCode == "PS" }
+        assertTrue(palestine.size >= 40, "only ${palestine.size} Palestinian cities read")
+        assertTrue(palestine.map { it.name }.containsAll(own.keys), "a printed town is missing from the city list")
+        val chosen = EngineSettings(timetable = TimetableChoice.Entry("ps.iftaa"), timetableConfirmed = true)
+        val date = LocalDate(2026, 10, 3)
+        for (city in palestine) {
+            // At the point the app computes, three decimals (ruling R113): Al Qararah lies 5 km from both Khan Yunis and
+            // Deir al-Balah (both + 4).
+            fun e3(degrees: Double) = kotlin.math.round(degrees * 1000.0) / 1000.0
+            val nearest = Levant.paTowns.minBy { distanceKm(GeoPoint(e3(city.lat), e3(city.lon)), it.point) }.name
+            own[city.name]?.let { assertEquals(it, nearest, "${city.name} is its own printed town") }
+            val viaApp = PrayerEngine.dayTimes(city.place, date, chosen)
+            assertEquals("ps.iftaa", viaApp.effectiveEntry.id, city.name)
+            assertEquals(nearest, viaApp.effective.unitName, "${city.name} with the PA's table chosen")
+            assertTrue(viaApp.effective.measured, city.name)
+            val automatic = PrayerEngine.dayTimes(city.place, date, EngineSettings()).resolution
+            if (city.region == "Gaza Strip") {
+                assertEquals("ps.gaza.cautious", automatic.entry.id, city.name)
+            } else {
+                assertEquals("ps.iftaa", automatic.entry.id, city.name)
+                assertEquals(nearest, automatic.unitName, "${city.name} on Automatic")
+            }
         }
     }
 }

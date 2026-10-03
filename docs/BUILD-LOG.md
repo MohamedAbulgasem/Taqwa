@@ -2105,12 +2105,73 @@ year while their own sun moves against al-Aqsa's through the seasons. Each carri
 exception on those events (ruling R41). `PrintedTable` gained a `lateLimits` field to carry them.
 Gaza's cautious times now place their PA member at Gaza's own table.
 
-**Checked.** Whole gate: 839 rows, 162,157 place-days, 0 early, 0 late ends, none over its limit,
-nothing broken. The stamps' engine hashes all moved, since `Units.kt` is core. ProofStamps.kt is
-regenerated. The golden vector moved only at its two Palestinian points (Ramallah's and Gaza City's
-jittered seeds), by 1–2 min, later starts and earlier sunrises. Tools jvmTest passed 267/0 with the
-archive, `:shared:testAndroidHostTest` passed 1,595/0, and `checkStamps` passed.
+**Checked.** Whole gate: 839 rows, 162,157 place-days, 0 early, none over its limit, nothing broken.
+"0 late ends" held only for sunrise: the end of eating was not gated against the PA's printed Fajr (the
+rows read `F`, not `F+E`), and it ran after that Fajr on 100–250 days a year across the West Bank, by up
+to 3 min (review r1, C2; fixed on 3 October, below). The stamps' engine hashes all moved, since
+`Units.kt` is core. ProofStamps.kt is regenerated. The golden vector moved only at its two Palestinian
+points (Ramallah's and Gaza City's jittered seeds), by 1–2 min: mostly later starts and earlier
+sunrises, but two rows the other way, Gaza's 2026-02-21 Fajr a minute earlier (to Gaza's own printed
+time, not before it) and Ramallah's 2028-12-21 end of eating a minute later (after the printed Fajr, an
+instance of C2) (corrected 3 October, review r1 M2). Tools jvmTest passed 267/0 with the archive,
+`:shared:testAndroidHostTest` passed 1,595/0, and `checkStamps` passed.
 
 **The cities.** The rule over every row on 2 October still publishes 55 cities. Hebron and Nablus stay
 held: the city-page rule needs class A, B or C, and the whole table supports D. Gaza stays held too,
 since its Ministry of Awqaf member is checked on six 2020 days only.
+
+## Palestine: every printed town, and the end of eating (3 October) — ruling R118, review r1's fixes
+
+Review r1 of R118 found two things wrong with the first version. Five towns the PA prints an offset for
+(Tulkarm + 1, Qalqilya + 1.5, Rafah, Khan Yunis and Deir al-Balah + 4) had no unit and took a
+neighbour's table, so they came out early. And the end of eating ran after the PA's printed Fajr, which
+the gate never checked.
+
+**Every printed town.** All 16 Palestinian towns on the list are now units, each at its own point:
+Jerusalem (at al-Aqsa), Ramallah, Bethlehem, Jenin, Nablus, Jericho, Hebron, Idhna, Dura, Beit Awwa,
+Tulkarm, Qalqilya, Gaza, Rafah, Khan Yunis and Deir al-Balah. A town's times are built the way the
+authority builds them: al-Aqsa's computed times plus the town's printed minutes. They are computed at
+al-Aqsa alone (a new `FixedPointMode.TABLE`), and the town's figure is applied as the authority's own
+minutes. Adding whole minutes to a time already rounded never crosses a minute boundary. So every town
+gets al-Aqsa's proven 3-minute bound, needs no margin or exception of its own, and is never early by
+construction. The towns' 4-minute exceptions are gone.
+
+The user's own sun no longer rides beside a town's table. The authority's construction does not use
+it, and it only added lateness. The sunset that Maghrib is held to moves with the town's figure, as
+every other time does. Without that, Jericho's − 1 put its Maghrib before al-Aqsa's sunset on 26 days,
+and the repair made it 4 minutes late.
+
+Qalqilya's minute and a half becomes + 2 on its starts (never before the half-minute instant) and
++ 1 on its ends (never after it). The archive holds two derived tables for it, one for each.
+
+**Each place takes its nearest printed town's table, never a neighbour's.** Every unit has the same
+reach, so the unit a place resolves to is simply the nearest printed town. Each of the app's 45
+Palestinian cities resolves to its own town, or to the nearest one. A new test walks them through the
+app's engine.
+
+**The end of eating.** The PA prints no imsak, so its Fajr is when the fast begins. The gate now reads
+every PA Fajr column as `F+E`. The end of eating has its own margin, fitted the gate's way: −96 s on
+2012 and 2026. Held out on 2027, that was 1 minute late on 7 April days, so it is widened to the three
+years' bound, −116 s. It is now never after the printed Fajr, and at most 3 minutes before it.
+
+**Checked.**
+- Whole gate: 865 rows, 170,917 place-days, 0 early, 0 late ends, none over its limit, nothing broken.
+- `ps.iftaa`: 39 rows, 16 places, 13,144 place-days (12,413 held out). Every unit is worst 3 minutes
+  late on Fajr, sunrise, Maghrib, Isha and the end of eating, 2 on Asr and 1 on Dhuhr. No exception
+  anywhere.
+- Only `ps.iftaa.json` changed among the stamps beyond the engine hash. ProofStamps.kt is regenerated.
+- Golden vector: 32 rows moved, all at the two Palestinian seeds, by 1–2 minutes.
+  - Ramallah's jittered seed: the end of eating 1–2 minutes earlier on 16 rows. On one row
+    (2028-09-22) Isha is 1 minute earlier.
+  - Gaza City's jittered seed (on Automatic, Gaza's cautious times) moved the other way on most rows.
+    Fajr, Asr and Isha are up to 1–2 minutes earlier, and sunrise 1 minute later on 10 rows. The
+    seed's own sun no longer rides beside Gaza's table.
+  - Every moved value is at or after the town's own printed start, and at or before its printed end.
+- Every Palestinian city through the app's engine, 2026–2031: with `ps.iftaa` chosen, 0 early starts
+  and 0 late ends at all 45 places. On Automatic the West Bank's 32 places are the same. The Gaza
+  Strip's 13 places follow Gaza's cautious times, whose Maghrib is capped at the Ministry of Awqaf's
+  (ruling R38, disclosed).
+- Tools jvmTest passed 267/0 with the archive. `:shared:testAndroidHostTest` passed 1,598/0, and
+  `checkStamps` passed.
+
+**The cities.** Hebron and Nablus stay held, because the data supports class D. Gaza stays held too.

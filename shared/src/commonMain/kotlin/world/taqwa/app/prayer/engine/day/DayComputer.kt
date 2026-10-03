@@ -131,8 +131,14 @@ object DayComputer {
         private val skies: HashMap<GeoPoint, Sky> = HashMap(),
     ) {
         // A fixed point never drops the user's own (spec §3.5): starts are the later of the two,
-        // sunrise, sunset and the end of eating the earlier.
-        private val here = listOfNotNull(method.fixedPoint, point).distinct()
+        // sunrise, sunset and the end of eating the earlier. Only a table point the authority itself
+        // carries to the place by a printed figure ([FixedPointMode.TABLE], ruling R118) stands alone.
+        private val here =
+            if (method.fixedPointMode == FixedPointMode.TABLE && method.fixedPoint != null) {
+                listOf(method.fixedPoint)
+            } else {
+                listOfNotNull(method.fixedPoint, point).distinct()
+            }
 
         // Ruling R45: an ends-only fixed point (first in [here]) bounds the ends and not the starts.
         private val endsOnly = method.fixedPointMode == FixedPointMode.ENDS_ONLY && here.size == 2
@@ -932,7 +938,10 @@ object DayComputer {
                 }
             }
 
-            val sunset = endOf(sunsetHere)
+            // A table carried to a town by a printed figure ([FixedPointMode.TABLE], ruling R118) moves its
+            // sunset with the town's figure for the ends (its sunrise minutes), as the authority moves every time.
+            val tableShift = if (method.fixedPointMode == FixedPointMode.TABLE) offsets.authority(Prayer.SUNRISE) else 0
+            val sunset = endOf(sunsetHere + tableShift)
             val redTwilightEnd = skies
                 .mapNotNull { it.altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
                 .minOrNull()?.let(::endOf)

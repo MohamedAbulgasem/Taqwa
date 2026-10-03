@@ -4,6 +4,7 @@ import world.taqwa.app.prayer.engine.astro.SunModel
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.EventOffsets
+import world.taqwa.app.prayer.engine.method.FixedPointMode
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
@@ -11,7 +12,6 @@ import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.CALCULATED_NAME
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
-import world.taqwa.app.prayer.engine.registry.PrintedTable
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.SAFE_START
 import world.taqwa.app.prayer.engine.registry.SAFE_SUNRISE
@@ -19,16 +19,18 @@ import world.taqwa.app.prayer.engine.registry.Scope
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.atEdge
+import world.taqwa.app.prayer.engine.registry.beyondTable
 import world.taqwa.app.prayer.engine.registry.cautious
+import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateReachKm
 import world.taqwa.app.prayer.engine.registry.margins
-import world.taqwa.app.prayer.engine.registry.pointTables
 import world.taqwa.app.prayer.engine.registry.single
 
 /**
- * Jordan, Palestine, Lebanon, Syria, Iraq and Yemen: class D with an authority (Palestine measured to
- * class B everywhere; Jordan class A at Amman, its only measured point, B elsewhere as the entry's
- * own class, D_AUTHORITY as any place beyond a checked unit reads; the rest still thin, spec §6.2 a).
+ * Jordan, Palestine, Lebanon, Syria, Iraq and Yemen: class D with an authority (Palestine measured at
+ * every town its offset list prints, class D since ruling R118; Jordan class A at Amman, its only
+ * measured point, B elsewhere as the entry's own class, D_AUTHORITY as any place beyond a checked unit
+ * reads; the rest still thin, spec §6.2 a).
  * Task 7e normalised the Levant and Iraq captures under `archive/tables/normalized-7e/` (git-ignored)
  * and gated each authority; the margins below are `Fitter.fit`'s never-early margins over the fit
  * rows, widened where a held-out row was early (never silently, see proof.md), never a first guess.
@@ -86,30 +88,30 @@ object Levant {
      * The PA's Dar al-Iftaa: its perpetual prayer table for al-Aqsa Mosque, printed on the perpetual
      * winter clock (UTC+02:00 all year: the gate's `clock` column, not this method) and reprinted
      * unchanged (the 2012 printing, the 2026 yearly calendar and the Ramadan 1447 imsakiya agree on
-     * every cell held), with a printed list of town offsets, one whole minute figure a town for every
-     * time alike: Jerusalem, Ramallah, Bethlehem, Jenin and Nablus + 0, Jericho − 1, Hebron, Dura,
-     * Idhna and Tulkarm + 1, Qalqilya + 1.5, Gaza + 3, Rafah, Khan Yunis and Deir al-Balah + 4.
-     * Fajr ≈ 18°, Isha ≈ 18°, sunrise and Maghrib behaving like a −2.25° horizon (6.7–7.5 min at
-     * 31.8° N), every event at the noon declination (SunModel.CLASSIC_NOON: over the whole table it
-     * narrows the spread against the sun, Fajr's from 3.1 to 2.4 min, Isha's from 2.9 to 2.6). A
-     * named timetable: also a member of Gaza's cautious times.
+     * every cell held), with a printed list of town offsets, one figure a town for every time alike,
+     * sunrise included ([paTowns]). Fajr ≈ 18°, Isha ≈ 18°, sunrise and Maghrib behaving like a
+     * −2.25° horizon (6.7–7.5 min at 31.8° N), every event at the noon declination
+     * (SunModel.CLASSIC_NOON: over the whole table it narrows the spread against the sun, Fajr's from
+     * 3.1 to 2.4 min, Isha's from 2.9 to 2.6). A named timetable: also a member of Gaza's cautious
+     * times.
      *
-     * Ruling R118 (owner, 2 Oct 2026): the authority's own printed town offsets apply to its al-Aqsa
-     * table, exactly as printed, for every town whose offset it prints (the earlier refusal for Gaza
-     * stands only where it prints none). So each town with a page is a table printed for one point
-     * ([paUnits], rulings R30, R44, R45): al-Aqsa's own, and Nablus, Hebron and Gaza at the al-Aqsa
-     * table plus their printed minutes, each checked at the town's own point. Margins fitted by the
-     * gate's fitter on the whole table, 366 days, mapped onto its printing year 2012 and onto 2026
-     * (the 2026 calendar's print), held out on 2027 and on the imsakiya's six dates
-     * (archive/tables/manual/ps-iftaa/2026-10-02/); where 2027 was early (by 1 min, on 1-11 days
-     * of Fajr, sunrise, Maghrib and Isha at al-Aqsa, Hebron and Gaza: the leap cycle's drift of a
-     * perpetual table) the margin is widened to the three years' bound, never silently.
+     * The PA prints no imsak: its Fajr is when the fast begins, so the end of eating is held to the
+     * printed Fajr (the gate's `F+E` column), never after it. One dawn cannot be both never before the
+     * printed Fajr (a start) and never after it (an end), the printed minutes wandering about 2.4 min
+     * against any smooth rule; so the end of eating has its own fitted margin
+     * ([TimetableMethod.endOfEatingMarginSeconds], ruling R39's "an end of its own").
      *
-     * Class D_AUTHORITY, not B (ruling R57): never early on any of the 4,384 place-days, but the
-     * table's own minutes wander about 2.4 min against any one smooth rule (Fajr in April and August
-     * a minute nearer the sun than in October), so one never-early margin per event runs 3 min late
-     * on some days of Fajr, sunrise, Maghrib and Isha even at al-Aqsa: four of six events would need
-     * an exception to stay B, and the class the data supports is D (at most 3 min late), like Libya's.
+     * Margins fitted by the gate's fitter at al-Aqsa on the whole table, 366 days, mapped onto its
+     * printing year 2012 and onto 2026 (the 2026 calendar's print), held out on 2027 and on the
+     * imsakiya's six dates (archive/tables/manual/ps-iftaa/2026-10-02/); where 2027 was early (by 1
+     * min, on 1-11 days of Fajr, sunrise, Maghrib and Isha: the leap cycle's drift of a perpetual
+     * table) the margin is widened to the three years' bound, never silently.
+     *
+     * Class D_AUTHORITY, not B (ruling R57): never early on any measured place-day, but the table's
+     * own minutes wander about 2.4 min against any one smooth rule (Fajr in April and August a minute
+     * nearer the sun than in October), so one never-early margin per event runs 3 min late on some
+     * days of Fajr, sunrise, Maghrib and Isha even at al-Aqsa: four of six events would need an
+     * exception to stay B, and the class the data supports is D (at most 3 min late), like Libya's.
      * Earlier (Task 7e) the entry was class B on 78 dates; the whole table disproves that.
      */
     val paMethod = TimetableMethod(
@@ -119,6 +121,7 @@ object Levant {
         sunModel = SunModel.CLASSIC_NOON,
         horizonDeg = -2.25,
         margins = margins(start = 0, sunrise = 191, fajr = 1, dhuhr = -37, asr = -21, maghrib = -2, isha = 59),
+        endOfEatingMarginSeconds = PA_END_OF_EATING_MARGIN,
     )
 
     val pa = single(
@@ -126,47 +129,92 @@ object Levant {
         school = AsrSchool.STANDARD, scope = Scope.GLOBAL, countries = setOf("PS"), measured = true,
     )
 
+    /**
+     * The end of eating's own margin (seconds), fitted by the gate's fitter at al-Aqsa on the printed
+     * Fajr as an end (the gate's `F+E`): − 96 s on 2012 and 2026; 2027 held out was 1 min late on 7
+     * days of April with it, so it is widened to the three years' bound, − 116 s, never silently.
+     */
+    private const val PA_END_OF_EATING_MARGIN = -116
+
     /** al-Aqsa Mosque, the point the perpetual table is printed for. */
     val aqsa = GeoPoint(31.7767, 35.2345)
 
-    /** A town's table: the al-Aqsa method with the town's own fitted margins. */
-    private fun paAt(key: String, fitted: EventOffsets) = paMethod.copy(id = "ps.iftaa.$key", margins = fitted)
+    /**
+     * One town of the PA's printed offset list: its unit [key], [name] and [point] (the app's city
+     * point where the app lists the town), and its printed offset in minutes after Jerusalem as
+     * whole minutes for the starts ([startMinutes]) and for the ends ([endMinutes]): the same figure,
+     * except Qalqilya's minute and a half, which a whole-minute clock shows as + 2 for a start (never
+     * before the half-minute instant) and + 1 for an end (never after it).
+     */
+    class PaTown(val key: String, val name: String, val point: GeoPoint, val startMinutes: Int, val endMinutes: Int = startMinutes)
 
     /**
-     * Ruling R118's one exception per town: its printed offset is one whole minute figure for every
-     * time, all year, while the town's own sun moves against al-Aqsa's through the seasons (Nablus 49
-     * km north, its summer evenings later and winter mornings earlier; Hebron and Gaza south and
-     * west), and never early at the town's own point costs a further minute over al-Aqsa's 3.
+     * Ruling R118 (owner, 2 Oct 2026): the authority's own printed town offsets apply to its al-Aqsa
+     * table, exactly as printed, for every town whose offset it prints (the earlier refusal for Gaza
+     * stands only where it prints none). The print (ssalah2012.pdf p. 2): "This timing is set for the
+     * blessed al-Aqsa Mosque (by the winter clock); those living outside it observe the time
+     * differences as follows". Every Palestinian town of the list, as printed: Jerusalem, Ramallah,
+     * Bethlehem, Jenin and Nablus + 0; Jericho − 1; Hebron, Idhna, Dura, Beit Awwa and Tulkarm + 1;
+     * Qalqilya + 1.5; Gaza + 3; Rafah, Khan Yunis and Deir al-Balah + 4. (The list's towns in Israel
+     * are outside the entry's scope, Palestine.) Beit Awwa is not among the app's cities: its point
+     * is approximate (from public maps), among neighbours (Dura, Idhna, Hebron) that all print + 1.
      */
-    private fun townOffset(town: String, events: Set<TimedEvent>) = listOf(
-        LateLimit(
-            4, "the PA's printed offset for $town is one whole minute figure for every time all year, while " +
-                "$town's own sun moves against al-Aqsa's through the seasons: never early there, a further minute late",
-            events,
-        ),
+    val paTowns: List<PaTown> = listOf(
+        PaTown("jerusalem", "Jerusalem", aqsa, 0),
+        PaTown("ramallah", "Ramallah", GeoPoint(31.89964, 35.20422), 0),
+        PaTown("bethlehem", "Bethlehem", GeoPoint(31.70487, 35.20376), 0),
+        PaTown("jenin", "Jenin", GeoPoint(32.45943, 35.30086), 0),
+        PaTown("nablus", "Nablus", GeoPoint(32.22111, 35.25444), 0),
+        PaTown("jericho", "Jericho", GeoPoint(31.86667, 35.45), -1),
+        PaTown("hebron", "Hebron", GeoPoint(31.52935, 35.0938), 1),
+        PaTown("idhna", "Idhna", GeoPoint(31.55874, 34.97436), 1),
+        PaTown("dura", "Dura", GeoPoint(31.50777, 35.02929), 1),
+        PaTown("beit-awwa", "Beit Awwa", GeoPoint(31.5075, 34.9497), 1),
+        PaTown("tulkarm", "Tulkarm", GeoPoint(32.31156, 35.0269), 1),
+        PaTown("qalqilya", "Qalqilya", GeoPoint(32.18966, 34.97063), startMinutes = 2, endMinutes = 1),
+        PaTown("gaza", "Gaza", GeoPoint(31.50161, 34.46672), 3),
+        PaTown("rafah", "Rafah", GeoPoint(31.29722, 34.24357), 4),
+        PaTown("khan-yunis", "Khan Yunis", GeoPoint(31.34018, 34.30627), 4),
+        PaTown("deir-al-balah", "Deir al-Balah", GeoPoint(31.41834, 34.34933), 4),
     )
 
-    val paUnits: UnitSet = pointTables(
-        pa,
-        listOf(
-            PrintedTable("jerusalem", "Jerusalem", aqsa),
-            PrintedTable(
-                "nablus", "Nablus", GeoPoint(32.22111, 35.25444),
-                paAt("nablus", margins(start = 0, sunrise = 194, fajr = 90, dhuhr = -32, asr = 41, maghrib = -3, isha = 13)),
-                townOffset("Nablus", setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.MAGHRIB, TimedEvent.ISHA)),
-            ),
-            PrintedTable(
-                "hebron", "Hebron", GeoPoint(31.52935, 35.0938),
-                paAt("hebron", margins(start = 0, sunrise = 197, fajr = 31, dhuhr = -11, asr = 17, maghrib = 41, isha = 121)),
-                townOffset("Hebron", setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.ISHA)),
-            ),
-            PrintedTable(
-                "gaza", "Gaza", GeoPoint(31.50161, 34.46672),
-                paAt("gaza", margins(start = 0, sunrise = 164, fajr = 0, dhuhr = -41, asr = -10, maghrib = 12, isha = 95)),
-                townOffset("Gaza", setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.ISHA)),
-            ),
+    /**
+     * A town's table, as the authority constructs it: al-Aqsa's own times plus the town's printed
+     * minutes, computed at al-Aqsa alone ([FixedPointMode.TABLE]) with al-Aqsa's fitted margins. So
+     * every town carries al-Aqsa's proven bound, and is never early against its own printed times by
+     * construction: whole minutes added to a time already rounded never cross a minute. The end of
+     * eating follows the end minutes (the authority's Fajr minute moves it too, so Qalqilya's + 2 for
+     * its Fajr start is taken back a minute for its end of eating).
+     */
+    private fun paTable(town: PaTown) = paMethod.copy(
+        id = "ps.iftaa.${town.key}",
+        authorityMinutes = EventOffsets(
+            fajr = town.startMinutes, sunrise = town.endMinutes, dhuhr = town.startMinutes,
+            asr = town.startMinutes, maghrib = town.startMinutes, isha = town.startMinutes,
         ),
+        endOfEatingMarginSeconds = paMethod.endOfEatingMarginSeconds + (town.endMinutes - town.startMinutes) * 60,
+        fixedPoint = aqsa,
+        fixedPointMode = FixedPointMode.TABLE,
     )
+
+    /**
+     * Every printed town a unit at its own point (rulings R30, R118). A place takes the nearest
+     * printed town's own table, never a neighbour's offset (the discipline of rulings R103 and R113):
+     * every unit has the same reach (class D's at al-Aqsa's latitude, about 71 km), so the nearest
+     * unit holding a place is the nearest town, and no town's reach takes a place nearer another
+     * printed town. Every place in Palestine is within about 20 km of a printed town. Beyond every
+     * reach (only a place outside Palestine whose Automatic lists the entry) the edge: the al-Aqsa
+     * method at the user's own point a minute later, the nearest town's point still bounding the ends
+     * (rulings R44, R45), no town's offset carried beyond its town.
+     */
+    val paUnits: UnitSet = run {
+        val reachKm = lateReachKm(aqsa.lat, EntryClass.D_AUTHORITY)
+        val units = paTowns.map { AuthorityUnit("ps.iftaa.${it.key}", it.name, it.point, reachKm, paTable(it)) }
+        UnitSet(pa.id, units) { user ->
+            val nearest = units.minBy { distanceKm(user, it.point) }
+            paMethod.beyondTable("ps.iftaa.edge", nearest.point, user, nearest.radiusKm)
+        }
+    }
 
     /**
      * Gaza's Ministry of Awqaf: Fajr ≈ 19.5° (the second adhan; the first is 30 min earlier), Isha ≈

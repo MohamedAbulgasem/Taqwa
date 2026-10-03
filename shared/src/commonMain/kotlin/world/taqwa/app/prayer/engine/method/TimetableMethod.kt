@@ -59,9 +59,13 @@ enum class DayRule { SAME_DAY, NEIGHBOURS_MUIS, LAG_DATES_UQ }
 /**
  * What a [TimetableMethod.fixedPoint] bounds (ruling R45): [BOTH] the starts (the later of it and the
  * user's point) and the ends (the earlier); [ENDS_ONLY] sunrise, sunset, the end of eating and imsak
- * alone, the starts staying at the user's point (beyond a point table's reach).
+ * alone, the starts staying at the user's point (beyond a point table's reach); [TABLE] every time at
+ * the fixed point alone (ruling R118): where the authority itself defines a town's times as its table
+ * point's plus a printed figure (the PA's al-Aqsa table and its town offsets), the user's own sun is
+ * not the authority's construction, and riding it only adds lateness to the town's own printed times;
+ * the sunset Maghrib is held to moves with the town's figure for the ends (its sunrise minutes).
  */
-enum class FixedPointMode { BOTH, ENDS_ONLY }
+enum class FixedPointMode { BOTH, ENDS_ONLY, TABLE }
 
 /** When the fast begins: the authority's printed column, never after the Fajr shown. */
 sealed interface EndOfEating {

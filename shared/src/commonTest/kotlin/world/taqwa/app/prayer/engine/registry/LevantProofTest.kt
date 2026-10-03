@@ -1,13 +1,18 @@
 package world.taqwa.app.prayer.engine.registry
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.GeoPoint
+import world.taqwa.app.prayer.engine.registry.authorities.Levant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Task 7e's proof for the Levant, Iraq and Yemen (docs/research/2026-09-prayer-times/proof/7e-levant.md).
@@ -60,34 +65,89 @@ class LevantProofTest {
     }
 
     @Test
-    fun `the pa's al-aqsa table is class D authority, measured at its printed towns (ruling R118)`() {
+    fun `the pa's al-aqsa table is class D authority, measured at every printed town (ruling R118)`() {
         // The whole perpetual table runs 3 min late on four events even at al-Aqsa (ruling R57): D.
         val entry = requireNotNull(Registry.byId("ps.iftaa"))
         assertEquals(EntryClass.D_AUTHORITY, entry.entryClass)
         assertTrue(entry.measured)
         assertOrdered("ps.iftaa", day("ps.iftaa", 31.7767, 35.2345, "Asia/Hebron", LocalDate(2026, 6, 21)))
-        // Each town with a page is its own printed table (the al-Aqsa table plus the town's printed
-        // minutes), measured at the town: Hebron and Nablus resolve to their units.
-        for ((name, lat, lon) in listOf(Triple("Hebron", 31.52935, 35.0938), Triple("Nablus", 32.22111, 35.25444))) {
-            val here = Registry.resolve(Place(lat, lon, "Asia/Hebron", "PS"))
-            assertEquals("ps.iftaa", here.entry.id, name)
-            assertEquals(name, here.unitName, name)
-            assertEquals(EntryClass.D_AUTHORITY, here.entryClass, name)
-            assertTrue(here.measured, name)
-        }
-        // Ramallah sits within al-Aqsa's reach: the Jerusalem table.
-        assertEquals("Jerusalem", Registry.resolve(Place(31.89964, 35.20422, "Asia/Hebron", "PS")).unitName)
-        // Gaza's cautious times place their PA member at Gaza's own printed table (+ 3).
-        val gaza = Registry.resolve(Place(31.50161, 34.46672, "Asia/Gaza", "PS"))
-        assertEquals("ps.gaza.cautious", gaza.entry.id)
-        // Only the three towns whose offset exceeds al-Aqsa's 3 min carry an exception, each its own.
-        val units = requireNotNull(Units.of("ps.iftaa")).units
+        // Every Palestinian town the offset list prints is its own unit at its own point, measured, class D.
         assertEquals(
-            setOf("ps.iftaa.nablus", "ps.iftaa.hebron", "ps.iftaa.gaza"),
-            units.filter { it.lateLimits.isNotEmpty() }.map { it.id }.toSet(),
+            listOf(
+                "Jerusalem", "Ramallah", "Bethlehem", "Jenin", "Nablus", "Jericho", "Hebron", "Idhna", "Dura", "Beit Awwa",
+                "Tulkarm", "Qalqilya", "Gaza", "Rafah", "Khan Yunis", "Deir al-Balah",
+            ),
+            Levant.paTowns.map { it.name },
         )
-        for (unit in units) for (limit in unit.lateLimits) assertTrue(limit.reason.isNotBlank(), unit.id)
+        for (town in Levant.paTowns) {
+            val here = Registry.resolveEntry(entry, Place(town.point.lat, town.point.lon, zoneOf(town), "PS"))
+            assertEquals(town.name, here.unitName, town.name)
+            assertEquals(EntryClass.D_AUTHORITY, here.entryClass, town.name)
+            assertTrue(here.measured, town.name)
+        }
+        // Gaza's cautious times place their PA member at Gaza's own printed table.
+        assertEquals("ps.gaza.cautious", Registry.resolve(Place(31.50161, 34.46672, "Asia/Gaza", "PS")).entry.id)
+        // A unit's exception, where one is ever given, carries its reason (ruling R41).
+        for (unit in requireNotNull(Units.of("ps.iftaa")).units) {
+            for (limit in unit.lateLimits) assertTrue(limit.reason.isNotBlank(), unit.id)
+        }
     }
+
+    @Test
+    fun `every printed town's day is al-aqsa's day plus the town's own printed minutes (ruling R118)`() {
+        // The authority's own construction: a town's times are al-Aqsa's plus its printed figure, one for every
+        // time. So wherever al-Aqsa's day is never early (the gate's proof), every town's is, and an end never
+        // later: Qalqilya's minute and a half is + 2 on a start (never before the half minute) and + 1 on an end.
+        val entry = requireNotNull(Registry.byId("ps.iftaa"))
+        val printed = mapOf(
+            "Jerusalem" to (0 to 0), "Ramallah" to (0 to 0), "Bethlehem" to (0 to 0), "Jenin" to (0 to 0), "Nablus" to (0 to 0),
+            "Jericho" to (-1 to -1), "Hebron" to (1 to 1), "Idhna" to (1 to 1), "Dura" to (1 to 1), "Beit Awwa" to (1 to 1),
+            "Tulkarm" to (1 to 1), "Qalqilya" to (2 to 1), "Gaza" to (3 to 3), "Rafah" to (4 to 4), "Khan Yunis" to (4 to 4),
+            "Deir al-Balah" to (4 to 4),
+        )
+        var date = LocalDate(2027, 1, 1)
+        while (date.year == 2027) {
+            for (town in Levant.paTowns) {
+                val zone = zoneOf(town)
+                val aqsa = DayPipeline.day(entry, Place(Levant.aqsa.lat, Levant.aqsa.lon, zone, "PS"), date)
+                val here = DayPipeline.day(entry, Place(town.point.lat, town.point.lon, zone, "PS"), date)
+                val (starts, ends) = requireNotNull(printed[town.name]) { town.name }
+                val label = "${town.name} $date"
+                assertEquals(aqsa.fajr + starts.minutes, here.fajr, "$label fajr")
+                assertEquals(aqsa.dhuhr + starts.minutes, here.dhuhr, "$label dhuhr")
+                assertEquals(aqsa.asr + starts.minutes, here.asr, "$label asr")
+                assertEquals(aqsa.maghrib + starts.minutes, here.maghrib, "$label maghrib")
+                assertEquals(aqsa.isha + starts.minutes, here.isha, "$label isha")
+                assertEquals(aqsa.sunrise + ends.minutes, here.sunrise, "$label sunrise")
+                assertEquals(aqsa.endOfEating + ends.minutes, here.endOfEating, "$label end of eating")
+                assertTrue(here.endOfEating <= here.fajr, "$label end of eating never after Fajr")
+            }
+            date = date.plus(9, DateTimeUnit.DAY)
+        }
+    }
+
+    @Test
+    fun `every palestinian place takes its nearest printed town's own table, never a neighbour's (ruling R118)`() {
+        // The units share one reach, so the unit a place resolves to is the nearest printed town: a place between
+        // Tulkarm (+ 1) and Nablus (+ 0), or between Gaza (+ 3) and Deir al-Balah (+ 4), takes the nearer's own.
+        val entry = requireNotNull(Registry.byId("ps.iftaa"))
+        val reach = requireNotNull(Units.of("ps.iftaa")).units.map { it.radiusKm }.toSet()
+        assertEquals(1, reach.size, "one reach for every town")
+        var lat = 31.20
+        while (lat <= 32.56) {
+            var lon = 34.20
+            while (lon <= 35.58) {
+                val nearest = Levant.paTowns.minBy { distanceKm(GeoPoint(lat, lon), it.point) }
+                val zone = if (lon < 34.6) "Asia/Gaza" else "Asia/Hebron"
+                val expected = nearest.name.takeIf { distanceKm(GeoPoint(lat, lon), nearest.point) <= reach.single() }
+                assertEquals(expected, Registry.resolveEntry(entry, Place(lat, lon, zone, "PS")).unitName, "$lat,$lon")
+                lon += 0.02
+            }
+            lat += 0.02
+        }
+    }
+
+    private fun zoneOf(town: Levant.PaTown) = if (town.point.lon < 34.6) "Asia/Gaza" else "Asia/Hebron"
 
     @Test
     fun `gaza's cautious entry ranks its ministry of awqaf over the pa`() {
