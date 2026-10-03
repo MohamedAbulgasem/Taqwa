@@ -19,7 +19,9 @@ class ProofStampsTest {
         assertTrue(stamp != null, "sa.ummalqura should have a generated row")
         assertEquals("sa.ummalqura", stamp.entryId)
         assertEquals(12, stamp.places)
-        assertEquals(13146, stamp.placeDays)
+        // At least the place-days of 2 October 2026: the weekly monitor's prove adds held-out rows as new captures
+        // arrive (docs/MONITOR.md, "Prove"), so the proof only grows; a regeneration that drops rows shows here.
+        assertTrue(stamp.placeDays >= 13146, "sa.ummalqura placeDays ${stamp.placeDays}")
         assertEquals("2030-12-31", stamp.provenThrough)
         assertEquals(1, stamp.worstLateMinutes["dhuhr"])
         assertEquals(2, stamp.worstLateMinutes["fajr"])

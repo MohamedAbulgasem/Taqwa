@@ -122,9 +122,26 @@ class ProvenTest {
         assertNull(september.nextUnchecked)
         val october = verdict(cairo, oct1)
         assertIs<Verdict.Published>(october)
-        assertEquals(listOf(oct1..oct31), october.months)
-        assertEquals(Unchecked("eg.esa", nov1), october.nextUnchecked)
-        assertEquals(oct31, october.through)
+        laterProofOnly(october, "eg.esa", nov1)
+    }
+
+    /**
+     * A page built on 1 October from the committed stamps, which on 2 October 2026 held October whole and
+     * November not from [firstUnchecked]: October alone, [firstUnchecked] named. The weekly monitor's prove
+     * (docs/MONITOR.md) only adds checked days, so from then on the page may also show November (ruling
+     * R116: whole months only) or name a later first unchecked day, never an earlier one.
+     */
+    private fun laterProofOnly(october: Verdict.Published, timetable: String, firstUnchecked: LocalDate) {
+        assertEquals(oct1..oct31, october.months.first())
+        assertTrue(october.months.size in 1..2, october.months.toString())
+        assertTrue(october.through >= oct31, october.through.toString())
+        val next = october.nextUnchecked
+        if (october.months.size == 1) {
+            assertTrue(next != null && next.timetable == timetable && next.day >= firstUnchecked, next.toString())
+        } else {
+            assertEquals(nov1..LocalDate(2026, 11, 30), october.months[1])
+            assertTrue(next == null || next.day > LocalDate(2026, 11, 30), next.toString())
+        }
     }
 
     @Test fun istanbulIsHeldInSeptemberAndShowsOctoberAloneUntilNovemberIsChecked() {
@@ -137,8 +154,7 @@ class ProvenTest {
         assertEquals("tr.diyanet: no checked table day 1 Sep 2026 – 24 Sep 2026", september.reason)
         val october = verdict(istanbul, oct1)
         assertIs<Verdict.Published>(october)
-        assertEquals(listOf(oct1..oct31), october.months)
-        assertEquals(Unchecked("tr.diyanet", LocalDate(2026, 11, 2)), october.nextUnchecked)
+        laterProofOnly(october, "tr.diyanet", LocalDate(2026, 11, 2))
     }
 
     @Test fun birminghamIsHeldAsNotMeasured() {
@@ -154,7 +170,8 @@ class ProvenTest {
         assertIs<Verdict.Published>(v)
         assertTrue(v.stamp.cautious)
         assertNull(v.atMost)
-        assertEquals(1400, v.stamp.placeDays)
+        // 1,400 on 2 October 2026; the weekly monitor's prove only adds rows (docs/MONITOR.md).
+        assertTrue(v.stamp.placeDays >= 1400, v.stamp.placeDays.toString())
     }
 
     @Test fun torontoShowsOctoberAndNovemberWithIftsFaultDaysExcused() {
@@ -167,7 +184,8 @@ class ProvenTest {
         assertIs<Verdict.Published>(v)
         assertEquals(months(oct1), v.months)
         assertNull(v.nextUnchecked)
-        assertEquals(LocalDate(2026, 12, 31), v.through)
+        // 31 December on 2 October 2026; later once the weekly monitor's prove holds IFT's next year.
+        assertTrue(v.through >= LocalDate(2026, 12, 31), v.through.toString())
         assertNull(v.atMost)
         assertEquals(listOf(Excused("ca.ift (a member of ca.toronto)", "recorded faults", 9)), v.excused)
         // Without IIT's and MAC's own stamps no member is checked on those days: a hole, as before.

@@ -87,8 +87,8 @@ class AboutTimesUiStateTest {
      * Rulings R100, R105, R111 and R112 (city-pages spec §10): a measured cautious place shows two
      * proof tiles — the stamp's place-days at its places, and the 0 starts before the timetable that
      * decides each of them — and a sentence with no date; the same figures the site's cautious page
-     * shows from the same stamp. Toronto's are the committed `ca.toronto` stamp's: 1,400 days at 6
-     * places.
+     * shows from the same stamp. Toronto's are the committed `ca.toronto` stamp's: on 2 October 2026
+     * 1,400 days at 6 places, at least that since (the weekly monitor's prove only adds rows).
      */
     @Test
     fun `a cautious place's proof is its stamp's place-days and places`() {
@@ -96,8 +96,10 @@ class AboutTimesUiStateTest {
         val state = stateFor(toronto)
         assertIs<AboutTimesUiState.Cautious>(state)
         assertTrue(state.resolution.measured)
-        val proof = requireNotNull(cautiousProof(state.resolution, state.stamp)) { "Toronto is measured and stamped" }
-        assertEquals(CautiousProof(placeDays = 1400, places = 6), proof)
+        val stamp = requireNotNull(state.stamp) { "Toronto is stamped" }
+        val proof = requireNotNull(cautiousProof(state.resolution, stamp)) { "Toronto is measured and stamped" }
+        assertEquals(CautiousProof(placeDays = stamp.placeDays, places = stamp.places), proof)
+        assertTrue(proof.placeDays >= 1400 && proof.places >= 6, proof.toString())
     }
 
     /**
