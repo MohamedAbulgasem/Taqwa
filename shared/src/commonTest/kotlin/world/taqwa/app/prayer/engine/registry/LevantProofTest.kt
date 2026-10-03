@@ -69,7 +69,7 @@ class LevantProofTest {
     }
 
     @Test
-    fun `the pa's al-aqsa table is class D authority, measured at every printed town (ruling R118)`() {
+    fun `the pa's al-aqsa table is class D authority and measured at every printed town under ruling R118`() {
         // The whole perpetual table runs 3 min late on four events even at al-Aqsa (ruling R57): D.
         val entry = requireNotNull(Registry.byId("ps.iftaa"))
         assertEquals(EntryClass.D_AUTHORITY, entry.entryClass)
@@ -107,7 +107,7 @@ class LevantProofTest {
     }
 
     @Test
-    fun `every printed town's day is al-aqsa's day plus the town's own printed minutes (ruling R118)`() {
+    fun `every printed town's day is al-aqsa's day plus the town's own printed minutes under ruling R118`() {
         // The authority's own construction: a town's times are al-Aqsa's plus its printed figure, one for every
         // time. So wherever al-Aqsa's day is never early (the gate's proof), every town's is, and an end never
         // later: Qalqilya's minute and a half is + 2 on a start (never before the half minute) and + 1 on an end.
@@ -142,7 +142,7 @@ class LevantProofTest {
     }
 
     @Test
-    fun `every palestinian place takes its nearest printed town's own table, never a neighbour's (ruling R118)`() {
+    fun `every palestinian place takes its nearest printed town's own table and never a neighbour's under ruling R118`() {
         // The units share one reach, so the unit a place resolves to is the nearest printed town: a place between
         // Tulkarm (+ 1) and Nablus (+ 0), or between Gaza (+ 3) and Deir al-Balah (+ 4), takes the nearer's own, and a
         // place nearer a town of the list in Israel (Lydd's + 1.5 by Ni'lin) takes that town's, never a farther one's.
