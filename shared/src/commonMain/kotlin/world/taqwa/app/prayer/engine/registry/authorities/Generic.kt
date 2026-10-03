@@ -204,10 +204,20 @@ object Generic {
      * region's 18°, so its real Isha comes up to about 8 min before this region's angle-based
      * estimate reaches 18° — a real, physical angle difference (never early: 18° is always later
      * than 17.5°), not a minutes-policy gap like the events above.
+     *
+     * The end of eating (end-of-eating audit, 3 Oct 2026) is checked against the printed Fajr of
+     * the samples whose dawn is 18° to 18.5° (Umm al-Qura, the Gulf, Kuwait, Diyanet, MARW, INM,
+     * Libya, JAKIM): never after it, up to 5 min before JAKIM's Subuh, printed for the zone's latest
+     * point and rounded up. It is not checked against the three samples whose own dawn is deeper
+     * than the 18° this region assumes (Dar al-Ifta Cairo's 19.5°, Kemenag's and MUIS's 20°): there
+     * the 18° end comes after their Fajr, a gap of this fallback left to the owner (safe-default.tsv's
+     * header, proof 7h §3). None of those countries is served by it, and their own entries' ends are
+     * checked, never after.
      */
     private val worldLateLimits = listOf(
         LateLimit(20, "no local convention is known here; nearby authorities elsewhere run deeper safety minutes than this region's flat 1986 baseline (Task 7h, safe-default.tsv)", setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.DHUHR, TimedEvent.ASR, TimedEvent.MAGHRIB)),
         LateLimit(15, "this region's 18° Isha is deeper (later) than some real authorities' own shallower Isha angle (Dar al-Ifta Cairo's 17.5°, Task 7h, safe-default.tsv) — never early, only later by more than the class default", setOf(TimedEvent.ISHA)),
+        LateLimit(5, "this region's fast begins 2 min before the 18° dawn, and JAKIM prints Kuala Lumpur's Subuh for its zone's latest point, rounded up: up to 5 min before it (end-of-eating audit, 3 Oct 2026, safe-default.tsv)", setOf(TimedEvent.END_OF_EATING)),
     )
 
     /** The safe default where nothing is known; the later Asr leads. */

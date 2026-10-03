@@ -5,5 +5,7 @@
 # every one of its 30 days -- a disagreement far too large and one-sided to be the same table's normal
 # variation, so it is not established as reliable evidence for this authority (see proof.md). Too thin
 # for any real split; the one row is fit, nothing held out.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): no imsak column is printed; the fast begins at the printed Fajr,
+# so the Fajr column is also checked as the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/normalized-7e/iq-sunni-baghdad-official.txt	iq.sunni	33.341	44.401	Asia/Baghdad	F S D A M I	daily	standard	fit	Baghdad, one official date, 4 Dec 2025
+archive/tables/normalized-7e/iq-sunni-baghdad-official.txt	iq.sunni	33.341	44.401	Asia/Baghdad	F+E S D A M I	daily	standard	fit	Baghdad, one official date, 4 Dec 2025

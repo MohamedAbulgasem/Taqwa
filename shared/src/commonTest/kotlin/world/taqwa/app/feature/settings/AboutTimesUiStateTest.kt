@@ -200,16 +200,18 @@ class AboutTimesUiStateTest {
      */
     @Test
     fun `the checked tile's at-most figure is the worst start measured at the user's own unit`() {
-        // Review I3. The committed my.jakim stamp's entry-wide worst is 3, Perlis's PLS01 sunrise:
-        // another zone's, and an end. Kuala Lumpur's own zone (WLY01) measured every start within a
-        // minute, and that is the figure its tile claims.
+        // Review I3. The committed my.jakim stamp's entry-wide worst is 4, the end of eating (each
+        // zone's Subuh is printed for its latest point; the end-of-eating audit of 3 Oct 2026), and
+        // before it was 3, Perlis's PLS01 sunrise: ends either way. Kuala Lumpur's own zone (WLY01)
+        // measured every start within a minute, and that is the figure its tile claims.
         val kualaLumpur = Place(3.1412, 101.68653, "Asia/Kuala_Lumpur", "MY")
         val state = stateFor(kualaLumpur)
         assertIs<AboutTimesUiState.AuthorityChecked>(state)
         assertEquals("my.jakim", state.resolution.entry.id)
         assertEquals("WLY01", state.resolution.unitId)
         val stamp = requireNotNull(state.stamp) { "my.jakim should carry a committed stamp" }
-        assertEquals(3, stamp.worstLateMinutes.values.max())
+        assertEquals(4, stamp.worstLateMinutes.values.max())
+        assertEquals(4, stamp.worstLateMinutes.getValue("endOfEating"))
         assertEquals(1, checkedAtMostMinutes(state.resolution, kualaLumpur, stamp))
     }
 

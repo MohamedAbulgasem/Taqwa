@@ -1,7 +1,7 @@
 {
   "entry": "lb.fatwa",
   "class": "D (authority)",
-  "engineHash": "1ec750ebee9678c8",
+  "engineHash": "a751c04fb018d96a",
   "broken": 0,
   "places": 1,
   "first": "2019-07-20",
@@ -103,6 +103,21 @@
       "lateLimit": 7,
       "lateLimitFrom": "entry lb.fatwa",
       "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 384,
+      "lateEnd": 0,
+      "late": {
+        "0": 45,
+        "1": 111,
+        "2": 52,
+        "3+": 176
+      },
+      "exactShare": 0.1172,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry lb.fatwa",
+      "overLimit": 0
     }
   },
   "heldOut": {
@@ -198,6 +213,21 @@
         "lateLimit": 7,
         "lateLimitFrom": "entry lb.fatwa",
         "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 19,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 2,
+          "2": 0,
+          "3+": 17
+        },
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry lb.fatwa",
+        "overLimit": 0
       }
     }
   },
@@ -208,6 +238,10 @@
     "entry lb.fatwa: 7 min": {
       "reason": "the same margin runs to 7 min late on Maghrib and Isha on their worst held-out day",
       "events": ["maghrib", "isha"]
+    },
+    "entry lb.fatwa: 8 min": {
+      "reason": "the fast begins at the 20° dawn, never after Dar al-Fatwa's printed Fajr, whose own dawn runs 19.1° to 20.0°: up to 8 min before it on the shallowest days (end-of-eating audit, 3 Oct 2026)",
+      "events": ["endOfEating"]
     },
     "entry lb.fatwa: 9 min": {
       "reason": "the perpetual table's single never-early margin, over 384 measured days across two sources and seven years, runs to 9 min late on Fajr on its worst day",

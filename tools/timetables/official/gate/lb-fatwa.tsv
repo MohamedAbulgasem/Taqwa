@@ -11,7 +11,10 @@
 # excluded (see proof.md): the first a genuine widget bug, the second real on every other event but
 # with a sunrise that would be 10 min late under the same reading, which no margin may ever be (an
 # end, not a start), and which is not worth 11 more minutes of everyone else's sunrise to accommodate.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): Dar al-Fatwa prints no end-of-eating column; the fast begins at its
+# printed Fajr, so the Fajr column is also checked as the end of eating (F+E). The 20 deg end, its fitted
+# margin and its recorded limit are in Levant.kt.
 path	entry	lat	lon	zone	clock	columns	format	school	split	note
-archive/tables/normalized-7e/lb-fatwa-beirut-2024.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F S D A M I	daily	standard	fit	Masjidi TV id 26 (Ras Beirut), 2024
-archive/tables/normalized-7e/lb-fatwa-beirut-dated.txt	lb.fatwa	33.894	35.502	Asia/Beirut		F S D A M I	daily	standard	test	Dar al-Fatwa homepage widget + Al-Liwaa, 2019-2026, held out
-archive/tables/normalized-7e/lb-fatwa-beirut-dated-2023-04-01.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F S D A M I	daily	standard	test	1 Apr 2023, Lebanon's decreed delay to the clock change that year
+archive/tables/normalized-7e/lb-fatwa-beirut-2024.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F+E S D A M I	daily	standard	fit	Masjidi TV id 26 (Ras Beirut), 2024
+archive/tables/normalized-7e/lb-fatwa-beirut-dated.txt	lb.fatwa	33.894	35.502	Asia/Beirut		F+E S D A M I	daily	standard	test	Dar al-Fatwa homepage widget + Al-Liwaa, 2019-2026, held out
+archive/tables/normalized-7e/lb-fatwa-beirut-dated-2023-04-01.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F+E S D A M I	daily	standard	test	1 Apr 2023, Lebanon's decreed delay to the clock change that year

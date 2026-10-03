@@ -362,6 +362,29 @@ superseded where an offset is printed (Gaza's is: + 3) and stands everywhere els
 - `ye.default` is left exactly as the prior draft: calculated by Taqwa (spec §6.2 c), the published
   minutes folded in as floors (§6.2 d). No gate row, no stamp, no class change.
 
+## The end of eating, audited (3 Oct 2026, before Ramadan 1448)
+
+No Levant table held prints an imsak or end-of-eating column (Jordan's and Lebanon's state it;
+Gaza's Fajr is its printed start, the second adhan), and the fast begins at the printed Fajr, yet
+no row checked the end of eating. Each row's Fajr column is now also the end of eating (`F+E`), for
+every entry here but `ps.iftaa` (another track's). Whole gate, nothing else moved:
+
+| entry | days | late ends | worst, min before the printed Fajr | limit |
+| --- | --- | --- | --- | --- |
+| `jo.awqaf` | 171 | 0 | 1 | 1 |
+| `lb.fatwa` | 384 | 0 | 8 (176 days at 3 or more) | 8, recorded |
+| `sy.awqaf` | 2 | 0 | 1 | 3 (class D) |
+| `iq.sunni` | 1 | 0 | 1 | 3 (class D) |
+| `ps.gaza.awqaf` | 6 | 0 | 2 | 3 (class D) |
+
+**Lebanon.** The end of eating keeps the spec's 20° dawn (no printed end to fit it to); Dar
+al-Fatwa's own dawn runs 19.1° to 20.0°, so on the shallowest days the end comes up to 8 min before
+the printed Fajr: recorded as a third exception (8 min, the end of eating alone). Never after it on
+any of the 384 days; the fitter's bound on the perpetual table, with its 5 s safety, is −5 s
+(decided by its 9 September row), so `endOfEatingMarginSeconds` is now −5: the end moves 5 s
+earlier. The golden vector's Beirut seed moved on 7 of its days, the end of eating alone, 1 min
+earlier each.
+
 ## What could not be proven, and why
 
 - **Yemen (Aden and everywhere else):** no data at all, as above.

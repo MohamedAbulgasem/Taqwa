@@ -118,6 +118,21 @@
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 348,
+      "lateEnd": 0,
+      "late": {
+        "0": 2,
+        "1": 265,
+        "2": 81,
+        "3+": 0
+      },
+      "exactShare": 0.0057,
+      "worstLate": 2,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
     }
   },
   "heldOut": {
@@ -228,12 +243,27 @@
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 227,
+        "lateEnd": 0,
+        "late": {
+          "0": 1,
+          "1": 171,
+          "2": 55,
+          "3+": 0
+        },
+        "exactShare": 0.0044,
+        "worstLate": 2,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
       }
     }
   },
   "lateLimits": {
     "class D (authority): 3 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha"]
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha", "endOfEating"]
     }
   },
   "units": {
@@ -244,7 +274,7 @@
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha"]
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha", "endOfEating"]
         }
       },
       "events": {
@@ -348,6 +378,21 @@
             "3+": 0
           },
           "exactShare": 0.2011,
+          "worstLate": 2,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 348,
+          "lateEnd": 0,
+          "late": {
+            "0": 2,
+            "1": 265,
+            "2": 81,
+            "3+": 0
+          },
+          "exactShare": 0.0057,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",

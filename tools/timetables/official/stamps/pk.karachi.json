@@ -120,16 +120,16 @@
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 91,
+      "checked": 121,
       "lateEnd": 0,
       "late": {
         "0": 70,
-        "1": 21,
-        "2": 0,
+        "1": 38,
+        "2": 13,
         "3+": 0
       },
-      "exactShare": 0.7692,
-      "worstLate": 1,
+      "exactShare": 0.5785,
+      "worstLate": 2,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0

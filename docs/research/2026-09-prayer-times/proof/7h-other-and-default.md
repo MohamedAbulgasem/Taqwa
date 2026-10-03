@@ -261,6 +261,28 @@ Isha runs later, never earlier, by more than the 3-minute class default).
   transition date for `Africa/Casablanca`, not a finding about the engine. Not re-included with a
   narrower date range, since the one held file's whole range straddles the change.
 
+### The end of eating (audit of 3 Oct 2026, before Ramadan 1448)
+
+Until this audit no `safe-default.tsv` row checked the end of eating. Each sample's Fajr is now also
+checked as the end of eating (`F+E`) where its authority's fast begins at its Fajr: Makkah, Riyadh,
+Al Wakrah, Kuwait, İstanbul (Diyanet's imsak is its Fajr), Kuala Lumpur, Algiers, Tunis and Tripoli,
+559 place-days. Never after any of them; up to 5 min before JAKIM's Subuh at Kuala Lumpur (printed
+for its zone's latest point and rounded up, on top of this region's own − 2 min), on 57 days over
+class D's 3 — recorded as `default.safe`'s third exception (5 min, the end of eating alone).
+
+Three samples are not checked for it, and the reason is a **genuine gap of the fallback**, reported
+here rather than hidden: Cairo (Dar al-Ifta's 19.5° dawn), Jakarta (Kemenag's 20°) and Singapore
+(MUIS's 20°). Their dawns are deeper than the 18° this region assumes where nothing is known, so its
+end of eating (18° − 2 min) came after their printed Fajr on every day held (30, 365 and 365 days).
+Checked once outside the gate against the two printed sehri columns the archive holds (Jamiat's
+Johannesburg 2026, IFB's permanent Dhaka table), it came after both on every day held as well: their
+fast ends before their Fajr. None of these countries is reached by `default.safe` (each has its own
+entry, whose end of eating is gated: `eg.esa`, `id.kemenag`, `sg.muis`, `za.jamiat`, `bd.ifb`). Where
+the fallback is reached (Iran, China, the unmapped countries), no table says which dawn the local
+fast follows. Moving the world default's end to the deepest dawn in use (20° − 2 min) would close the
+gap at the cost of ending the fast roughly 10 min or more before an 18° table's Fajr (an estimate,
+not measured); that is a change to spec §6.2 c, left to the owner.
+
 ### What could not be proven
 
 - **Iran** (the country this fallback's own comment names, "no Sunni authority found"): no official

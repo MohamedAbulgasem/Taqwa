@@ -90,9 +90,16 @@ class AsiaProofTest {
         val northMethod = assertNotNull(astana.method)
         assertEquals(EventOffsets(sunrise = -3, dhuhr = 3, asr = 3, maghrib = 3), southMethod.authorityMinutes)
         assertEquals(EventOffsets(sunrise = -5, dhuhr = 5, asr = 5, maghrib = 5), northMethod.authorityMinutes)
-        // Both places share the one set of fitted margins (task 7f, kz-qmdb.tsv): only the
-        // authority's own minutes differ by the region.
+        // Both places share the one set of fitted margins (task 7f, kz-qmdb.tsv). The authority's
+        // own minutes differ by the region, and so does the end of eating's margin: at and above
+        // 48N it keeps clear of QMDB's AngleBased residual (end-of-eating audit, 3 Oct 2026), while
+        // below 48N it stays 0, since an end only ever moves earlier where it must.
         assertEquals(southMethod.margins, northMethod.margins)
+        // The northern round (3 Oct 2026): QMDB's 2027 and northern tables decide Fajr and Isha.
+        assertTrue(northMethod.margins.fajr >= 8, "fajr margin: ${northMethod.margins.fajr}")
+        assertTrue(northMethod.margins.isha >= 11, "isha margin: ${northMethod.margins.isha}")
+        assertEquals(0, southMethod.endOfEatingMarginSeconds)
+        assertTrue(northMethod.endOfEatingMarginSeconds <= -374, "north end-of-eating margin: ${northMethod.endOfEatingMarginSeconds}")
     }
 
     @Test

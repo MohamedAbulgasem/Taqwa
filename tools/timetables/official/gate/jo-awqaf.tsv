@@ -6,7 +6,9 @@
 # The monitor's capture of 2 Oct 2026 (fetchers/jordan.py: the ministry's region table for Amman, Balqa, Zarqa and
 # Madaba, 2 October - 31 December 2026), read from its copy pinned as it was (archive/tables/pinned/jo-awqaf/2026-10-02/),
 # at the same Amman point, held out. Zarqa's capture is the same region table, line for line, so it is not a row of its own.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): no imsak or end-of-eating column is printed; the fast begins at the
+# printed Fajr, so the Fajr column is also checked as the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/normalized-7e/jo-awqaf-amman-2021-2024.txt	jo.awqaf	31.955	35.945	Asia/Amman	F S D A M I	daily	standard	fit	Amman, 2021-2024, awqaf.gov.jo calculator log
-archive/tables/normalized-7e/jo-awqaf-amman-2025.txt	jo.awqaf	31.955	35.945	Asia/Amman	F S D A M I	daily	standard	test	Amman, 2025, held out
-archive/tables/pinned/jo-awqaf/2026-10-02/amman.txt	jo.awqaf	31.955	35.945	Asia/Amman	F S D A M I	daily	standard	test	Amman, region 1, the monitor capture of 2 Oct 2026 (2 October-31 December 2026), held out
+archive/tables/normalized-7e/jo-awqaf-amman-2021-2024.txt	jo.awqaf	31.955	35.945	Asia/Amman	F+E S D A M I	daily	standard	fit	Amman, 2021-2024, awqaf.gov.jo calculator log
+archive/tables/normalized-7e/jo-awqaf-amman-2025.txt	jo.awqaf	31.955	35.945	Asia/Amman	F+E S D A M I	daily	standard	test	Amman, 2025, held out
+archive/tables/pinned/jo-awqaf/2026-10-02/amman.txt	jo.awqaf	31.955	35.945	Asia/Amman	F+E S D A M I	daily	standard	test	Amman, region 1, the monitor capture of 2 Oct 2026 (2 October-31 December 2026), held out

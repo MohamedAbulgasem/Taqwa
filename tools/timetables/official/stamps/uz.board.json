@@ -103,6 +103,21 @@
       "lateLimit": 4,
       "lateLimitFrom": "entry uz.board",
       "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 20,
+      "lateEnd": 0,
+      "late": {
+        "0": 7,
+        "1": 13,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.35,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
     }
   },
   "heldOut": {
@@ -112,7 +127,7 @@
   },
   "lateLimits": {
     "class D (authority): 3 min": {
-      "events": ["fajr", "asrHanafi", "maghrib"]
+      "events": ["fajr", "asrHanafi", "maghrib", "endOfEating"]
     },
     "entry uz.board: 4 min": {
       "reason": "the margin also covers both the 15° and 15.5° Isha eras together (task 7f)",

@@ -103,6 +103,21 @@
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 1,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 1,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0,
+      "worstLate": 1,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (authority)",
+      "overLimit": 0
     }
   },
   "heldOut": {
@@ -112,7 +127,7 @@
   },
   "lateLimits": {
     "class D (authority): 3 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
     }
   }
 }

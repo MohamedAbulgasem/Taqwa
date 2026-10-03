@@ -103,6 +103,21 @@
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 9489,
+      "lateEnd": 0,
+      "late": {
+        "0": 171,
+        "1": 3456,
+        "2": 4353,
+        "3+": 1509
+      },
+      "exactShare": 0.018,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry my.jakim",
+      "overLimit": 0
     }
   },
   "heldOut": {
@@ -198,12 +213,31 @@
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 4745,
+        "lateEnd": 0,
+        "late": {
+          "0": 103,
+          "1": 1725,
+          "2": 2162,
+          "3+": 755
+        },
+        "exactShare": 0.0217,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "entry my.jakim",
+        "overLimit": 0
       }
     }
   },
   "lateLimits": {
     "class B: 2 min": {
       "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+    },
+    "entry my.jakim: 4 min": {
+      "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+      "events": ["endOfEating"]
     },
     "unit PLS01: 3 min": {
       "reason": "Kangar's printed sunrise spreads a further minute beyond a plain classic-noon model across the seasons",
@@ -219,6 +253,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -311,6 +349,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 135,
+            "2": 594,
+            "3+": 1
+          },
+          "exactShare": 0,
+          "worstLate": 3,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -322,6 +375,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -414,6 +471,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 144,
+            "2": 539,
+            "3+": 47
+          },
+          "exactShare": 0,
+          "worstLate": 3,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -425,6 +497,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -517,6 +593,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 37,
+            "2": 620,
+            "3+": 73
+          },
+          "exactShare": 0,
+          "worstLate": 3,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -528,6 +619,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -620,6 +715,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 4,
+            "1": 675,
+            "2": 51,
+            "3+": 0
+          },
+          "exactShare": 0.0055,
+          "worstLate": 2,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -631,6 +741,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -723,6 +837,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 56,
+            "1": 666,
+            "2": 8,
+            "3+": 0
+          },
+          "exactShare": 0.0767,
+          "worstLate": 2,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -734,6 +863,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         },
         "unit PLS01: 3 min": {
           "reason": "Kangar's printed sunrise spreads a further minute beyond a plain classic-noon model across the seasons",
@@ -830,6 +963,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 729,
+          "lateEnd": 0,
+          "late": {
+            "0": 111,
+            "1": 503,
+            "2": 115,
+            "3+": 0
+          },
+          "exactShare": 0.1523,
+          "worstLate": 2,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -841,6 +989,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -933,6 +1085,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 181,
+            "2": 549,
+            "3+": 0
+          },
+          "exactShare": 0,
+          "worstLate": 2,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -944,6 +1111,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1036,6 +1207,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 45,
+            "2": 417,
+            "3+": 268
+          },
+          "exactShare": 0,
+          "worstLate": 3,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -1047,6 +1233,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1139,6 +1329,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 281,
+            "2": 443,
+            "3+": 6
+          },
+          "exactShare": 0,
+          "worstLate": 3,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -1150,6 +1355,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1242,6 +1451,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 285,
+            "2": 330,
+            "3+": 115
+          },
+          "exactShare": 0,
+          "worstLate": 3,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -1253,6 +1477,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1345,6 +1573,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 0,
+            "2": 34,
+            "3+": 696
+          },
+          "exactShare": 0,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -1356,6 +1599,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1448,6 +1695,21 @@
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 33,
+            "2": 394,
+            "3+": 303
+          },
+          "exactShare": 0,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
+          "overLimit": 0
         }
       }
     },
@@ -1459,6 +1721,10 @@
       "lateLimits": {
         "class B: 2 min": {
           "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "entry my.jakim: 4 min": {
+          "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1550,6 +1816,21 @@
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 730,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 471,
+            "2": 259,
+            "3+": 0
+          },
+          "exactShare": 0,
+          "worstLate": 2,
+          "lateLimit": 4,
+          "lateLimitFrom": "entry my.jakim",
           "overLimit": 0
         }
       }

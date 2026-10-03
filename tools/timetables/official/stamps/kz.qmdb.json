@@ -1,125 +1,250 @@
 {
   "entry": "kz.qmdb",
   "class": "D (authority)",
-  "engineHash": "f6c696494c066271",
+  "engineHash": "efa196d09cb87fa7",
   "broken": 0,
-  "places": 2,
+  "places": 6,
   "first": "2026-01-01",
-  "last": "2026-12-31",
-  "checked": ["2026-01-01..2026-12-31"],
-  "placeDays": 730,
-  "heldOutDays": 0,
-  "ramadanDays": 60,
+  "last": "2027-12-31",
+  "checked": ["2026-01-01..2027-12-31"],
+  "placeDays": 4380,
+  "heldOutDays": 1095,
+  "ramadanDays": 354,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 730,
+      "checked": 4380,
       "early": 0,
       "late": {
-        "0": 367,
-        "1": 334,
-        "2": 5,
-        "3+": 24
+        "0": 1472,
+        "1": 2491,
+        "2": 64,
+        "3+": 353
       },
-      "exactShare": 0.5027,
-      "worstLate": 5,
-      "lateLimit": 5,
+      "exactShare": 0.3361,
+      "worstLate": 8,
+      "lateLimit": 8,
       "lateLimitFrom": "entry kz.qmdb",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 730,
+      "checked": 4380,
       "lateEnd": 0,
       "late": {
-        "0": 604,
-        "1": 126,
+        "0": 3173,
+        "1": 1207,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.8274,
+      "exactShare": 0.7244,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 730,
+      "checked": 4380,
       "early": 0,
       "late": {
-        "0": 640,
-        "1": 90,
+        "0": 3813,
+        "1": 567,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.8767,
+      "exactShare": 0.8705,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "asrHanafi": {
-      "checked": 730,
+      "checked": 4380,
       "early": 0,
       "late": {
-        "0": 498,
-        "1": 232,
+        "0": 2775,
+        "1": 1605,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.6822,
+      "exactShare": 0.6336,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 730,
+      "checked": 4380,
       "early": 0,
       "late": {
-        "0": 584,
-        "1": 146,
+        "0": 3287,
+        "1": 1093,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.8,
+      "exactShare": 0.7505,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "isha": {
-      "checked": 730,
+      "checked": 4380,
       "early": 0,
       "late": {
-        "0": 363,
-        "1": 303,
-        "2": 38,
-        "3+": 26
+        "0": 1130,
+        "1": 2511,
+        "2": 332,
+        "3+": 407
       },
-      "exactShare": 0.4973,
-      "worstLate": 4,
-      "lateLimit": 4,
+      "exactShare": 0.258,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry kz.qmdb",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 4380,
+      "lateEnd": 0,
+      "late": {
+        "0": 396,
+        "1": 411,
+        "2": 96,
+        "3+": 3477
+      },
+      "exactShare": 0.0904,
+      "worstLate": 8,
+      "lateLimit": 8,
       "lateLimitFrom": "entry kz.qmdb",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 0,
-    "ramadanDays": 0,
-    "events": {}
+    "placeDays": 1095,
+    "ramadanDays": 88,
+    "events": {
+      "fajr": {
+        "checked": 1095,
+        "early": 0,
+        "late": {
+          "0": 378,
+          "1": 636,
+          "2": 11,
+          "3+": 70
+        },
+        "exactShare": 0.3452,
+        "worstLate": 6,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry kz.qmdb",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 1095,
+        "lateEnd": 0,
+        "late": {
+          "0": 789,
+          "1": 306,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.7205,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 1095,
+        "early": 0,
+        "late": {
+          "0": 952,
+          "1": 143,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.8694,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "asrHanafi": {
+        "checked": 1095,
+        "early": 0,
+        "late": {
+          "0": 676,
+          "1": 419,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.6174,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 1095,
+        "early": 0,
+        "late": {
+          "0": 807,
+          "1": 288,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.737,
+        "worstLate": 1,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (authority)",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 1095,
+        "early": 0,
+        "late": {
+          "0": 296,
+          "1": 635,
+          "2": 65,
+          "3+": 99
+        },
+        "exactShare": 0.2703,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry kz.qmdb",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 1095,
+        "lateEnd": 0,
+        "late": {
+          "0": 197,
+          "1": 178,
+          "2": 25,
+          "3+": 695
+        },
+        "exactShare": 0.1799,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry kz.qmdb",
+        "overLimit": 0
+      }
+    }
   },
   "lateLimits": {
     "class D (authority): 3 min": {
       "events": ["sunrise", "dhuhr", "asrHanafi", "maghrib"]
     },
-    "entry kz.qmdb: 4 min": {
-      "reason": "the same AngleBased residual at Astana, in mid-July, up to 4 min (task 7f)",
+    "entry kz.qmdb: 5 min": {
+      "reason": "the same AngleBased residual in Isha from July to mid-August, up to 5 min from Astana to Petropavl (task 7f, fix round of 3 Oct 2026)",
       "events": ["isha"]
     },
-    "entry kz.qmdb: 5 min": {
-      "reason": "QMDB's AngleBased curve at Astana (≥48N) leaves a residual of up to 5 min in mid-May (task 7f)",
+    "entry kz.qmdb: 8 min (endOfEating)": {
+      "reason": "at and above 48N the end of eating keeps clear of QMDB's spring AngleBased residual as far north as Petropavl, so on its other days it comes up to 8 min before the printed Fajr (end-of-eating audit, 3 Oct 2026)",
+      "events": ["endOfEating"]
+    },
+    "entry kz.qmdb: 8 min (fajr)": {
+      "reason": "QMDB's AngleBased Fajr runs ahead of the model at and above 48N from late April to early June, more the farther north: up to 5 min at Astana, 6 at Kokshetau, Kostanay and Pavlodar, 8 at Petropavl (task 7f, fix round of 3 Oct 2026)",
       "events": ["fajr"]
     }
   }

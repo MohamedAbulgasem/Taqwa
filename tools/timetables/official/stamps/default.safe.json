@@ -118,6 +118,21 @@
       "lateLimit": 15,
       "lateLimitFrom": "entry default.safe",
       "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 559,
+      "lateEnd": 0,
+      "late": {
+        "0": 7,
+        "1": 2,
+        "2": 253,
+        "3+": 297
+      },
+      "exactShare": 0.0125,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry default.safe",
+      "overLimit": 0
     }
   },
   "heldOut": {
@@ -228,10 +243,29 @@
         "lateLimit": 15,
         "lateLimitFrom": "entry default.safe",
         "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 559,
+        "lateEnd": 0,
+        "late": {
+          "0": 7,
+          "1": 2,
+          "2": 253,
+          "3+": 297
+        },
+        "exactShare": 0.0125,
+        "worstLate": 5,
+        "lateLimit": 5,
+        "lateLimitFrom": "entry default.safe",
+        "overLimit": 0
       }
     }
   },
   "lateLimits": {
+    "entry default.safe: 5 min": {
+      "reason": "this region's fast begins 2 min before the 18° dawn, and JAKIM prints Kuala Lumpur's Subuh for its zone's latest point, rounded up: up to 5 min before it (end-of-eating audit, 3 Oct 2026, safe-default.tsv)",
+      "events": ["endOfEating"]
+    },
     "entry default.safe: 15 min": {
       "reason": "this region's 18° Isha is deeper (later) than some real authorities' own shallower Isha angle (Dar al-Ifta Cairo's 17.5°, Task 7h, safe-default.tsv) — never early, only later by more than the class default",
       "events": ["isha"]

@@ -20,6 +20,10 @@
 # Split: fit on the 21 other cities' two days (25–26 Sep 2026); held out, Tripoli's days from March
 # 2025 to October 2026, every season, and its imsak, and the owner's two adhan rows (Benghazi and
 # Sabha, Fajr and Maghrib only).
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the owner's two adhan rows (Benghazi, Sabha) are checked as F+E, the
+# adhan the fast begins at in the east and south. The national rows there still leave the first column
+# out: the end of eating is the 19.5 deg dawn the mosques call, 5-6 min before the national table's Fajr
+# (never after it; over the class limit by design, ruling R73).
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-maghreb-libya/off-libya-alkomos.txt	ly.awqaf/khoms			Africa/Tripoli	F+E S D A M I Im	daily	standard	fit	Khoms, 25–26 Sep 2026
 archive/tables/round/data-maghreb-libya/off-libya-almarag.txt	ly.awqaf/marj			Africa/Tripoli	- S D A - I -	daily	standard	fit	Marj, 25–26 Sep 2026 (east); Fajr, Maghrib and imsak not checked (R73, see header)
@@ -50,8 +54,8 @@ archive/tables/moral-auth-mena/nile/tripoli.txt	ly.awqaf/tripoli			Africa/Tripol
 # (the owner's own data, open/LY-AWQAF-OWNER/ATTRIBUTION.md): a two-column table, Fajr and Maghrib,
 # one day each. Held out (there is nothing to fit it against): a "never before, at most a few minutes
 # after" proof, not a margin source.
-open/LY-AWQAF-OWNER/benghazi.txt	ly.awqaf/benghazi			Africa/Tripoli	F M	daily	standard	test	Benghazi, the owner's adhan, 27 Sep 2026
-open/LY-AWQAF-OWNER/sabha.txt	ly.awqaf/sabha			Africa/Tripoli	F M	daily	standard	test	Sabha, the owner's adhan, 27 Sep 2026
+open/LY-AWQAF-OWNER/benghazi.txt	ly.awqaf/benghazi			Africa/Tripoli	F+E M	daily	standard	test	Benghazi, the owner's adhan, 27 Sep 2026
+open/LY-AWQAF-OWNER/sabha.txt	ly.awqaf/sabha			Africa/Tripoli	F+E M	daily	standard	test	Sabha, the owner's adhan, 27 Sep 2026
 # The weekly monitor's capture of 28 Sep 2026: the widget's day for the 22 cities (28 Sep, its emsak the Im
 # column) and, for Tripoli, api.ifta.ly's eight days (28 Sep – 5 Oct, with its imsak; the five to 2 Oct the
 # same as nile/tripoli.txt's). Held out, each city's columns as its round row's (R73 east and south).

@@ -5,5 +5,7 @@
 # ps.iftaa) is not gated here: no dated printed table names Gaza specifically for the PA member (only
 # the qualitative "Gaza = Jerusalem + 3 min" claim in the research, which would mean inventing rows
 # from an offset rather than reading them) -- see proof.md.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the Fajr read here is the printed start (the second adhan), at which
+# the fast begins, and no imsak column is printed: the Fajr column is also the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/normalized-7e/ps-gaza-awqaf-2020.txt	ps.gaza.awqaf	31.502	34.467	Asia/Gaza	F S D A M I	daily	standard	fit	Gaza Awqaf imsakiya PDF, 1441/11 (Jun-Jul 2020)
+archive/tables/normalized-7e/ps-gaza-awqaf-2020.txt	ps.gaza.awqaf	31.502	34.467	Asia/Gaza	F+E S D A M I	daily	standard	fit	Gaza Awqaf imsakiya PDF, 1441/11 (Jun-Jul 2020)
