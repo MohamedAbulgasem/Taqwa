@@ -82,9 +82,24 @@ object Jakim {
 
     val units = UnitSet("my.jakim", zones) { p: GeoPoint -> if (p.lon >= BORNEO_WEST_LON) borneoEdge else peninsularEdge }
 
+    /**
+     * The end of eating against e-solat's Subuh (end-of-eating audit, 3 Oct 2026; my-jakim.tsv now
+     * checks it, F+E: the fast begins at Subuh, imsak is its precaution): never after it on any of
+     * the 9,489 zone-days held, but the Subuh printed is each zone's latest reference point rounded
+     * up, and the end the dawn at the place itself rounded down, so it comes up to 4 min before it.
+     * The fitter would move it later (+78 to +93 s at Johor and Kuala Lumpur); an end never moves
+     * later to close a gap, so the minutes are recorded instead.
+     */
+    private val endOfEatingLimit = LateLimit(
+        4,
+        "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the " +
+            "place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
+        setOf(TimedEvent.END_OF_EATING),
+    )
+
     val entry: RegistryEntry = single(
         id = "my.jakim", nameKey = "authority_jakim", entryClass = EntryClass.B, method = method,
-        school = AsrSchool.STANDARD, countries = setOf("MY"),
+        school = AsrSchool.STANDARD, countries = setOf("MY"), lateLimits = listOf(endOfEatingLimit),
     )
 
     val entries = listOf(entry)

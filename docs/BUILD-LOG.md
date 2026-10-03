@@ -2146,3 +2146,69 @@ release script requires fresh; no other app code changed since 34. Google has no
 Mohamed sent 35 to Play's closed track too, built from the same tag; its release notes are in
 `docs/store/release-notes/1.0.0-35.txt`.
 
+## The end of eating, audited before Ramadan (3 October)
+
+Ramadan 1448 begins around 8 February 2027. The Palestine review found that `ps.iftaa`'s rows never
+checked the end of eating (the engine's `endOfEating`, when sehri or suhoor stops) against the
+printed Fajr, so every gate entry was audited for the same gap. The gate checks it in one of two
+ways: a printed imsak or sehri column (`E`, or `Im` for an imsak the authority prints as a precaution),
+or the printed Fajr read as both (`F+E`) where the fast begins at Fajr. Palestine was left to its own
+track.
+
+**What the audit found.** 55 of the 71 gated entries already checked it, none with a late end.
+Sixteen did not, `ps.iftaa` among them. In four more (`pk.karachi`, `nl.cautious`, `za.cape` and
+Libya's two owner rows) some rows read Fajr alone. In every one of them the source prints
+no end-of-eating column the archive holds, and the fast begins at the printed Fajr. JAKIM's, Kemenag's
+and MORA's imsak is a 10-minute precaution before Subuh, the MJC's Fajr is also the end of sehri, and
+Jordan, Lebanon, Gaza, Syria, Iraq, Uzbekistan, Kyrgyzstan, Kazakhstan (whose API "imsak" comes after
+its Fajr) and Dawat-e-Islami print none. Those rows are now `F+E`: 106 rows in 17 gate files, each
+file's header saying why. Some rows were left as they were. In each case the fast ends at a time
+earlier than the Fajr the row reads, and another row already checks that time:
+- IFB's October digitization (the sehri);
+- Kosovo's Sabah, which is imsak + 20 (the imsak);
+- Jamiat's other publishers (Jamiat's sehri);
+- eastern Libya's national table, where the fast follows the 19.5° adhan (R73).
+
+IFB, Jamiat and Libya were each checked once outside the gate. The end was never after their Fajr,
+and it came 5 to 10 min early, by design.
+
+**One late end, fixed.** At Astana, `kz.qmdb`'s end of eating came after QMDB's printed Fajr on
+29 days of 2026, the first on 12 May, by up to 4 min. This mirrors the AngleBased residual that
+QMDB's Fajr limit already records. The fix was the existing one. The fitter's bound is −221 s,
+decided at Astana on 14 May. On Almaty's rows alone the bound is +18 s, so only QMDB's own region at
+and above 48° N carries −221 s, beside its ± 5 minutes. Almaty stays at 0.
+
+**Early ends, recorded (R41).** None of the following moved later: an end only ever moves earlier.
+- **`my.jakim`, 4 min.** e-solat prints each zone's Subuh for its latest reference point, rounded up,
+  while the fast here begins at the dawn of the place itself. Over 9,489 zone-days the end is never
+  after Subuh, but it is more than 2 min early on 1,509 of them.
+- **`lb.fatwa`, 8 min.** The 20° end against Dar al-Fatwa's own 19.1–20.0° dawn. Its margin is now the
+  fitter's −5 s, which moves it 5 s earlier.
+- **`kz.qmdb`, 5 min.** Astana's other days, after the fix above.
+- **`default.safe`, 5 min.** At Kuala Lumpur, the same JAKIM rounding plus this fallback's own − 2 min.
+
+Every other newly checked entry stays inside its class limit: `id.kemenag` 2, `bn.mora` 1,
+`jo.awqaf` 1, `in.karachi` 3, `uz.board` 1, `kg.default` 0, `sy.awqaf` 1, `iq.sunni` 1,
+`ps.gaza.awqaf` 2, `za.mjc` 1, `za.voc` 2, `pk.karachi` 2. `za.cape`, `nl.cautious` and Libya's
+owner rows are unchanged within theirs.
+
+**A gap left to Mohamed: the world fallback.** `default.safe` ends the fast at 18° less 2 min (spec
+§6.2 c), so its end came after the printed Fajr on every day held at Cairo (19.5°), Jakarta and
+Singapore (both 20°). Checked once, it was also after Jamiat's and IFB's printed sehri. None of these
+countries is served by the fallback, and each one's own entry is checked. On those rows the end is
+not gated. The reason is in `safe-default.tsv` and proof 7h §3. Ending the world fallback's fast at
+20° would close the gap, but it changes the spec.
+
+**What moved.** The whole gate: 828 rows and 157,851 place-days, 0 early, 0 late ends, none over its
+limit, nothing BROKEN. Outside the end of eating, every event table is identical to before. Stamps
+were regenerated for the 17 entries whose end-of-eating figures changed, along with
+`ProofStamps.kt`. The golden vector moved on 23 of its 2,071 rows, in the end of eating alone and
+always earlier: 7 days at the Beirut seed by 1 min, and 16 at the Astana seed by 3 or 4 min. One test
+pinned JAKIM's entry-wide worst, which is now 4, the end of eating, and another pinned Lebanon's
+exceptions; both were updated.
+
+Checked: tools `jvmTest` 281/0 with the archive. `:shared:testAndroidHostTest` passed (1,597/0), and
+so did `checkStamps` (71 entries). `CI=true generate` wrote 55 cities, with 2 held. `build.py --check`
+passed (164 pages, 143 of them prayer-time pages), and `site/test_timetables.py` passed (18). No city
+page changed. The engine changes (Kazakhstan's northern end, Lebanon's −5 s) ship with the first
+update, not 1.0.0 (35).

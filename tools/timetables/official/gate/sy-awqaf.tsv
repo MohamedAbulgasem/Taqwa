@@ -2,6 +2,8 @@
 # links to per-city pages, none of which were themselves captured), only two dated samples the
 # research found. Too thin for a real split; the earlier date fits, the later (Umayyad Mosque, a
 # slightly different point) is held out.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the samples print no imsak column; the fast begins at the printed
+# Fajr, so the Fajr column is also checked as the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/normalized-7e/sy-awqaf-damascus-fit.txt	sy.awqaf	33.5138	36.2765	Asia/Damascus	F S D A M I	daily	standard	fit	Damascus, Ramadan 1447 imsakiya sample
-archive/tables/normalized-7e/sy-awqaf-damascus-test.txt	sy.awqaf	33.5116	36.3064	Asia/Damascus	F S D A M I	daily	standard	test	Umayyad Mosque, held out
+archive/tables/normalized-7e/sy-awqaf-damascus-fit.txt	sy.awqaf	33.5138	36.2765	Asia/Damascus	F+E S D A M I	daily	standard	fit	Damascus, Ramadan 1447 imsakiya sample
+archive/tables/normalized-7e/sy-awqaf-damascus-test.txt	sy.awqaf	33.5116	36.3064	Asia/Damascus	F+E S D A M I	daily	standard	test	Umayyad Mosque, held out

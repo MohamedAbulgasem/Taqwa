@@ -1861,6 +1861,24 @@ exceptions on the end of eating, each for its R39 reason:
 | `ca.toronto` | 4 | each member's own dawn less its margin |
 | `ca.ift`, `ca.iit`, `ca.mac` | 3, 3, 1 | within class D's 3 min |
 
+### The end of eating, audited (3 Oct 2026, before Ramadan 1448)
+
+The audit of every gate entry found three more groups whose Fajr is where the fast begins but whose
+rows read Fajr alone. Each is now `F+E`; none shows a late end, none is over its limit, nothing else
+moved:
+
+| entry | rows | days | worst, min before the table's Fajr | limit |
+| --- | --- | --- | --- | --- |
+| `za.mjc` | the MJC's September and October (its Fajr is also the end of sehri, Radio 786) | 61 | 1 | 3 (class D) |
+| `za.voc` | the community calendar 2026–2027, masjids.co.za's relay, Wembley's page | 348 | 2 | 3 (class D) |
+| `za.cape` | its MJC and community-calendar members' rows, beside Jamiat's sehri (`E`) | 61 | 1 | 1 (unchanged: Jamiat's sehri stays the earliest member) |
+| `nl.cautious` | the Moroccan calendar's member row, beside Diyanet's | 31 | 1 | 2 (unchanged) |
+
+`za.jamiat`'s other publishers (Darul Ihsan's Pretoria and Durban, the masjids.co.za relays) stay
+`F`: Jamiat's fast ends at its printed sehri, 5 min before its Fajr, which every Jamiat row checks
+(`E`, 14,608 days); against those tables' Fajr, checked once outside the gate, the end came before
+it on every day, more than 2 min before on 974 (5–6 min in the report's samples), never after.
+
 ## Where a cautious entry is measured (review I3)
 
 A cautious entry now claims a measured figure only where the entry is measured and every member's own

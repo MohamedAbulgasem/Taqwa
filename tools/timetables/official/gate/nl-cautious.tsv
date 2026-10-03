@@ -9,6 +9,8 @@
 # Fajr over its 16 min on 262 days (up to 37; 26–29 October among them), Isha over its 6 on 303 (up to 131), the
 # end of eating over its 2 on 127 (up to 123 min early, in 2027). It waits for the Moroccan calendar's table for
 # the same days.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the Moroccan calendar's Fajr is also checked as the end of eating
+# (F+E; Morocco's imsak is a precaution before it), beside Diyanet's.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
-archive/tables/moral-auth-world/europe/split-7g/ihsane-2026-q4.txt	nl.cautious	52.37403	4.88969	Europe/Amsterdam	F S D A M I	daily	standard	test	Al-Ihsane, the Moroccan calendar	nl.moroccan
+archive/tables/moral-auth-world/europe/split-7g/ihsane-2026-q4.txt	nl.cautious	52.37403	4.88969	Europe/Amsterdam	F+E S D A M I	daily	standard	test	Al-Ihsane, the Moroccan calendar	nl.moroccan
 archive/tables/moral-auth-world/europe/split-7g/dy-amsterdam-2026.txt	nl.cautious	52.37403	4.88969	Europe/Amsterdam	F+E S D A M I	daily	standard	test	Diyanet Amsterdam	tr.diyanet.europe

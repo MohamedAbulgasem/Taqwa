@@ -6,6 +6,8 @@
 # September rows by up to a minute on a few days (site noise), which is exactly why it is kept
 # separate rather than folded into the fit. Belait, Tutong and Temburong's own minutes are
 # documented (mora.gov.bn), not checked against a table: they stay unmeasured (Muis.kt).
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): MORA's imsak (Subuh - 10) is a precaution these files do not hold;
+# the fast begins at Subuh, so the Fajr column is also checked as the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/moral-auth-world/sea/off-bn-2026-clean.txt	bn.mora/brunei-muara			Asia/Brunei	F S D A M I	daily	standard	fit	BSB, 356 days deduped
-archive/tables/moral-auth-world/sea/off-bn-2026-09.txt	bn.mora/brunei-muara			Asia/Brunei	F S D A M I	daily	standard	test	BSB, September re-capture
+archive/tables/moral-auth-world/sea/off-bn-2026-clean.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S D A M I	daily	standard	fit	BSB, 356 days deduped
+archive/tables/moral-auth-world/sea/off-bn-2026-09.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S D A M I	daily	standard	test	BSB, September re-capture

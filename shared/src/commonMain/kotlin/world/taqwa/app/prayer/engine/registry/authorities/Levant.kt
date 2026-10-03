@@ -156,6 +156,7 @@ object Levant {
         isha = IshaRule.Angle(18.0),
         margins = margins(start = -304, sunrise = -61, dhuhr = 53, asr = 47, maghrib = 392, isha = -4),
         endOfEating = EndOfEating.DawnAngle(20.0),
+        endOfEatingMarginSeconds = LEBANON_END_OF_EATING,
     )
 
     val lebanon = single(
@@ -171,8 +172,22 @@ object Levant {
                 7, "the same margin runs to 7 min late on Maghrib and Isha on their worst held-out day",
                 setOf(TimedEvent.MAGHRIB, TimedEvent.ISHA),
             ),
+            LateLimit(
+                8, "the fast begins at the 20° dawn, never after Dar al-Fatwa's printed Fajr, whose own dawn runs 19.1° to " +
+                    "20.0°: up to 8 min before it on the shallowest days (end-of-eating audit, 3 Oct 2026)",
+                setOf(TimedEvent.END_OF_EATING),
+            ),
         ),
     )
+
+    /**
+     * The 20° end of eating's margin (end-of-eating audit, 3 Oct 2026): Dar al-Fatwa prints no
+     * end-of-eating column, and the fast begins at its printed Fajr (lb-fatwa.tsv now checks the end
+     * against it, F+E). Never after it on any of the 384 days held; the fitter's bound on the
+     * perpetual table, with its 5 s safety, is −5 s (decided by its 9 September row), so the end moves
+     * 5 s earlier.
+     */
+    private const val LEBANON_END_OF_EATING = -5
 
     /**
      * Syria's Ministry of Awqaf: the MWL method plus a 2-minute tamkin, officially since 28 Feb 2025

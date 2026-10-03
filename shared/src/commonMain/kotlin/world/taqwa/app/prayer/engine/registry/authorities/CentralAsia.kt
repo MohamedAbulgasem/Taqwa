@@ -67,6 +67,12 @@ object CentralAsia {
         lateLimits = listOf(
             LateLimit(5, "QMDB's AngleBased curve at Astana (≥48N) leaves a residual of up to 5 min in mid-May (task 7f)", setOf(TimedEvent.FAJR)),
             LateLimit(4, "the same AngleBased residual at Astana, in mid-July, up to 4 min (task 7f)", setOf(TimedEvent.ISHA)),
+            LateLimit(
+                5,
+                "at and above 48N the end of eating keeps clear of QMDB's mid-May AngleBased residual at Astana, so on its " +
+                    "other days it comes up to 5 min before the printed Fajr (end-of-eating audit, 3 Oct 2026)",
+                setOf(TimedEvent.END_OF_EATING),
+            ),
         ),
     )
 
@@ -91,12 +97,26 @@ object CentralAsia {
         method = kyrgyzstanMethod, school = AsrSchool.HANAFI, countries = setOf("KG"),
     )
 
-    /** QMDB's minutes are ± 5 at and above 48° N. */
+    /**
+     * QMDB's minutes are ± 5 at and above 48° N. There the end of eating also starts
+     * [KAZAKH_NORTH_END_OF_EATING] before the model's dawn: QMDB's AngleBased Fajr at Astana runs up
+     * to 4 min before the model's in mid-May (the residual its Fajr limit records), and the fast
+     * begins at QMDB's printed Fajr, so the end of eating at the plain dawn came out up to 4 min after
+     * it (29 days of 2026, the first 12 May; end-of-eating audit, 3 Oct 2026). The margin is the
+     * fitter's bound over the whole year at Astana, decided by 14 May. Almaty's own bound (+18 s)
+     * needs nothing below 48° N, so the margin there stays 0: an end only ever moves earlier.
+     */
     val variants = listOf(
         MethodVariant("kz.qmdb", Regions.kazakhNorth) {
-            it.copy(authorityMinutes = EventOffsets(sunrise = -5, dhuhr = 5, asr = 5, maghrib = 5))
+            it.copy(
+                authorityMinutes = EventOffsets(sunrise = -5, dhuhr = 5, asr = 5, maghrib = 5),
+                endOfEatingMarginSeconds = KAZAKH_NORTH_END_OF_EATING,
+            )
         },
     )
+
+    /** The end of eating's margin at and above 48° N, in seconds (fitted at Astana, task 7f's rows). */
+    private const val KAZAKH_NORTH_END_OF_EATING = -221
 
     val entries = listOf(uzbekistan, kazakhstan, kyrgyzstan)
 }

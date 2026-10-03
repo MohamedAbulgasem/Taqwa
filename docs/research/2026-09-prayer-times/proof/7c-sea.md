@@ -307,6 +307,27 @@ exactly the item the coordinator routed to this task. No gate row checks `other.
 authority publishes "the old picker's method anywhere" as its own table); the change is a safety
 margin, not something fit against data.
 
+## The end of eating, audited (3 Oct 2026, before Ramadan 1448)
+
+None of the three entries' rows checked the end of eating until this audit: e-solat, Kemenag's
+schedule and MORA's list print an imsak 10 min before Subuh as a precaution, which these archive
+files do not hold, and the fast begins at Subuh. Every row's Fajr column is now also the end of
+eating (`F+E`). Whole gate, nothing else moved:
+
+| entry | days | late ends | worst, min before the printed Subuh | limit |
+| --- | --- | --- | --- | --- |
+| `my.jakim` | 9,489 | 0 | 4 (1,509 days at 3 or more) | 4, recorded |
+| `id.kemenag` | 6,570 | 0 | 2 | 2 (class B) |
+| `bn.mora` | 385 | 0 | 1 | 2 (class B) |
+
+**JAKIM's exception (4 min, the end of eating alone).** e-solat prints each zone's Subuh for its
+latest reference point, rounded up; the engine's end of eating is the dawn at the place itself,
+rounded down, never after it. The fitter would move it later (+93 s at WLY01, +78 s at JHR02), but
+an end only ever moves earlier, so the minutes are recorded instead (Jakim.kt). The imsak the app
+shows is that same dawn less 10 min, as JAKIM's own is its Subuh less 10, so the check of the end
+against Subuh carries to imsak; imsak itself is not gated (no column held). No margin changed; the
+golden vector did not move here.
+
 ## What is measured and what is not
 
 - **sg.muis**: measured, one point, three years (2024–2026) — the whole area (Singapore) is one

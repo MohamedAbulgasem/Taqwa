@@ -103,6 +103,21 @@
       "lateLimit": 1,
       "lateLimitFrom": "class A",
       "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 171,
+      "lateEnd": 0,
+      "late": {
+        "0": 123,
+        "1": 48,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 0.7193,
+      "worstLate": 1,
+      "lateLimit": 1,
+      "lateLimitFrom": "class A",
+      "overLimit": 0
     }
   },
   "heldOut": {
@@ -198,12 +213,27 @@
         "lateLimit": 1,
         "lateLimitFrom": "class A",
         "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 121,
+        "lateEnd": 0,
+        "late": {
+          "0": 83,
+          "1": 38,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.686,
+        "worstLate": 1,
+        "lateLimit": 1,
+        "lateLimitFrom": "class A",
+        "overLimit": 0
       }
     }
   },
   "lateLimits": {
     "class A: 1 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
     }
   },
   "units": {
@@ -214,7 +244,7 @@
       "broken": 0,
       "lateLimits": {
         "class A: 1 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
         }
       },
       "events": {
@@ -303,6 +333,21 @@
             "3+": 0
           },
           "exactShare": 0.7778,
+          "worstLate": 1,
+          "lateLimit": 1,
+          "lateLimitFrom": "class A",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 171,
+          "lateEnd": 0,
+          "late": {
+            "0": 123,
+            "1": 48,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.7193,
           "worstLate": 1,
           "lateLimit": 1,
           "lateLimitFrom": "class A",

@@ -194,6 +194,37 @@ event). No exceptions.
 event is exact on its single measured day, the entry stays class D and `measured = false`. Only
 Bishkek is measured, of 115 localities; regional spread across Kyrgyzstan is not checked at all.
 
+## The end of eating, audited (3 Oct 2026, before Ramadan 1448)
+
+Until this audit `pk.karachi`'s Banuri rows and `bd.ifb`'s sehri column were the only end-of-eating
+checks in this group. No other table here prints an imsak or sehri column (QMDB's API "imsak", after
+its Fajr, is not used), and the fast begins at the printed Fajr, so every other row's Fajr column is
+now also the end of eating (`F+E`). Whole gate, no start moved:
+
+| entry | days | late ends | worst, min before the printed Fajr | limit |
+| --- | --- | --- | --- | --- |
+| `kz.qmdb` | 730 | 0 (29 before the fix) | 5 (339 days at 3 or more) | 5, recorded |
+| `uz.board` | 20 | 0 | 1 | 3 (class D) |
+| `kg.default` | 1 | 0 | 0 | 3 (class D) |
+| `in.karachi` | 30 | 0 | 3 | 3 (class D) |
+| `pk.karachi` (with Dawat-e-Islami's Karachi row) | 121 | 0 | 2 | 3 (class D) |
+
+**Kazakhstan: the one late end found.** At Astana the end of eating came after QMDB's printed Fajr on
+29 days of 2026, the first 12 May, by up to 4 min: the mirror of the Fajr residual above (QMDB's
+AngleBased Fajr runs up to 5 min before the model's in mid-May, and the end of eating was the model's
+plain dawn). Fixed the existing way: the fitter's end-of-eating bound over the whole year is −221 s,
+decided at Astana on 14 May; fitted on Almaty's rows alone it is +18 s. So the end of eating at and
+above 48° N carries −221 s (`CentralAsia.variants`, beside QMDB's ± 5 min there), and Almaty's
+stays 0: an end only ever moves earlier, and there it needs nothing. On Astana's other days the end
+now comes up to 5 min before the printed Fajr, recorded as a third exception (5 min, the end of
+eating alone). The golden vector's Astana seed moved on 16 days, the end of eating alone, 3 or 4 min
+earlier each. North of Astana (Petropavl, Kostanay, Pavlodar) no table is held: the margin is
+Astana's, as the Fajr limit is.
+
+`bd.ifb`'s October digitization (`off-ifb-dhaka.txt`) stays `F`: IFB's fast ends at its printed
+sehri, 6 min before its printed Fajr, which the year-round row checks (`E`); checked once against
+the October rows' own Fajr, outside the gate, the end came 9–10 min before it, never after.
+
 ## Verification run
 
 ```

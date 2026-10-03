@@ -561,6 +561,19 @@ constant offsets from Khartoum; Taqwa computes each at its own point, not checke
 not close either gap: it only narrows Ramadan Isha, at Khartoum's own point, never asserting Maghrib
 + 90 as the Academy's actual method.
 
+## The end of eating, audited (3 Oct 2026, before Ramadan 1448)
+
+Every Maghreb entry already checks its end of eating: Fajr is `F+E` in `tn-inm`, `dz-marw`,
+`ma-habous`, `mr-ministry` and `sd-ministry`, and in Libya's western rows with its imsak (`Im`). The
+audit adds Libya's east and south: the owner's two adhan rows (Benghazi, Sabha, 27 Sep 2026) are now
+`F+E M`, the adhan the fast begins at there (ruling R73). Never after it (worst 1 min before, within
+class D's 3; `ly.awqaf` now 54 end-of-eating days). The national rows in the east and south still
+leave their first column out: checked once outside the gate, the end of eating there (the 19.5°
+dawn the mosques call) comes more than 3 min before the national table's Fajr on all 42 city-days
+held (5–6 min in the report's samples), never after it: over class D's limit by design, since that
+table is not what the mosques call.
+No margin changed.
+
 ## Recorded exceptions
 
 | entry / unit | events | minutes | reason |

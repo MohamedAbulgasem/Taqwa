@@ -6,8 +6,11 @@
 # Isha days at both cities (proof.md), so Jul-Dec is folded into the fit set too (a season the
 # solstice-adjacent half did not cover); nothing is held out. The API's own "imsak" field (= Fajr +
 # 10, undocumented) is not used.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the fast begins at QMDB's printed Fajr (the API's later "imsak" is
+# not used), so the Fajr column is also checked as the end of eating (F+E). At and above 48N the end
+# of eating carries its own margin, fitted at Astana, and a recorded limit (CentralAsia.kt).
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/moral-auth-world/centralasia/off_ala_h1.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F S D A M I	daily	hanafi	fit	Almaty, Jan-Jun 2026 (below 48N)
-archive/tables/moral-auth-world/centralasia/off_ala_h2.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F S D A M I	daily	hanafi	fit	Almaty, Jul-Dec 2026 (folded in, see above)
-archive/tables/moral-auth-world/centralasia/off_ast_h1.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F S D A M I	daily	hanafi	fit	Astana, Jan-Jun 2026 (at/above 48N)
-archive/tables/moral-auth-world/centralasia/off_ast_h2.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F S D A M I	daily	hanafi	fit	Astana, Jul-Dec 2026 (folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_ala_h1.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jan-Jun 2026 (below 48N)
+archive/tables/moral-auth-world/centralasia/off_ala_h2.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jul-Dec 2026 (folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_ast_h1.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Astana, Jan-Jun 2026 (at/above 48N)
+archive/tables/moral-auth-world/centralasia/off_ast_h2.txt	kz.qmdb	51.133333	71.433333	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Astana, Jul-Dec 2026 (folded in, see above)

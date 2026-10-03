@@ -9,8 +9,10 @@
 # Fajr start and the end of eating (F+E). Zawal is skipped: it prints the noon caution window, not
 # a Dhuhr start. Both Asr columns are printed in the Daimi table (As, Ah); the entry itself is
 # Hanafi.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): Dawat-e-Islami's Karachi Fajr is likewise the dawn at which sehri
+# ends, so its row is checked as F+E too.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-06.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, June 2026 (summer solstice)
 archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-12.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, December 2026 (winter solstice)
 archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, September 2026 (equinox; folded in, see above)
-archive/tables/moral-auth-world/southasia/off-di-karachi-2026-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F S D Ah M I	daily	-	fit	Dawat-e-Islami Karachi AJAX, September 2026 (a later member; folded in, see above)
+archive/tables/moral-auth-world/southasia/off-di-karachi-2026-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S D Ah M I	daily	-	fit	Dawat-e-Islami Karachi AJAX, September 2026 (a later member; folded in, see above)

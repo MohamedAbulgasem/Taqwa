@@ -14,19 +14,22 @@
 #   community calendar's October twice, masjids.co.za's relay (all 31 days, no sunrise, as in September) and the
 #   Wembley calendar's own rows (the 20 days it prints; a member printing a date twice keeps its stricter line), and
 #   Jamiat's Cape Town October with its Shafi'i Isha (slices in split-7g, as September's).
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the MJC's Fajr is also the end of sehri (Radio 786), and the
+# community calendar prints no sehri column: both members' Fajr columns are now also checked as the end
+# of eating (F+E), as Jamiat's printed sehri column (E) was. An end never after any Cape Town table's.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
-archive/tables/moral-auth-world/africaoceania/off-mjc-sep.txt	za.mjc/za.mjc			Africa/Johannesburg	F S D A M I	daily	standard	fit	MJC September 2026
-archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-2026.txt	za.voc/za.voc			Africa/Johannesburg	F S D A M I	daily	standard	fit	community calendar 2026, Shafi'i
+archive/tables/moral-auth-world/africaoceania/off-mjc-sep.txt	za.mjc/za.mjc			Africa/Johannesburg	F+E S D A M I	daily	standard	fit	MJC September 2026
+archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-2026.txt	za.voc/za.voc			Africa/Johannesburg	F+E S D A M I	daily	standard	fit	community calendar 2026, Shafi'i
 archive/tables/moral-auth-world/africaoceania/split-7g/wembley-H-2026.txt	za.voc/za.voc			Africa/Johannesburg	- - - Ah - -	daily	-	fit	community calendar 2026, Hanafi Asr
-archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-2027.txt	za.voc/za.voc			Africa/Johannesburg	F S D A M I	daily	standard	test	community calendar 2027, Shafi'i
+archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-2027.txt	za.voc/za.voc			Africa/Johannesburg	F+E S D A M I	daily	standard	test	community calendar 2027, Shafi'i
 archive/tables/moral-auth-world/africaoceania/split-7g/wembley-H-2027.txt	za.voc/za.voc			Africa/Johannesburg	- - - Ah - -	daily	-	test	community calendar 2027, Hanafi Asr
-archive/tables/moral-auth-world/africaoceania/masjids-cpt-S.txt	za.voc/za.voc			Africa/Johannesburg	F - D A M I	daily	standard	test	masjids.co.za relay, June-December 2026
-archive/tables/off-wembley-cpt.txt	za.voc/za.voc			Africa/Johannesburg	F S D A M I	daily	standard	test	Wembley 17 September-1 October 2026
-archive/tables/moral-auth-world/africaoceania/split-7g/mjc-sep2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F S D A M I	daily	standard	test	Cape Town, September 2026	za.mjc
-archive/tables/moral-auth-world/africaoceania/split-7g/voc-S-sep2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F - D A M I	daily	standard	test	Cape Town, September 2026	za.voc
+archive/tables/moral-auth-world/africaoceania/masjids-cpt-S.txt	za.voc/za.voc			Africa/Johannesburg	F+E - D A M I	daily	standard	test	masjids.co.za relay, June-December 2026
+archive/tables/off-wembley-cpt.txt	za.voc/za.voc			Africa/Johannesburg	F+E S D A M I	daily	standard	test	Wembley 17 September-1 October 2026
+archive/tables/moral-auth-world/africaoceania/split-7g/mjc-sep2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F+E S D A M I	daily	standard	test	Cape Town, September 2026	za.mjc
+archive/tables/moral-auth-world/africaoceania/split-7g/voc-S-sep2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F+E - D A M I	daily	standard	test	Cape Town, September 2026	za.voc
 archive/tables/moral-auth-world/africaoceania/split-7g/jamiat-cpt-sep2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	E F S D A - M I -	daily	standard	test	Cape Town, September 2026	za.jamiat.shafii
-archive/tables/monitor/za-mjc/cape-town-2026-10.txt	za.mjc/za.mjc			Africa/Johannesburg	F S D A M I	daily	standard	test	MJC October 2026, the monitor capture of 1 Oct 2026
-archive/tables/monitor/za-mjc/cape-town-2026-10.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F S D A M I	daily	standard	test	Cape Town, October 2026	za.mjc
-archive/tables/moral-auth-world/africaoceania/split-7g/voc-S-oct2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F - D A M I	daily	standard	test	Cape Town, October 2026 (masjids.co.za's relay)	za.voc
-archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-oct2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F S D A M I	daily	standard	test	Cape Town, October 2026 (the Wembley calendar's 20 days)	za.voc
+archive/tables/monitor/za-mjc/cape-town-2026-10.txt	za.mjc/za.mjc			Africa/Johannesburg	F+E S D A M I	daily	standard	test	MJC October 2026, the monitor capture of 1 Oct 2026
+archive/tables/monitor/za-mjc/cape-town-2026-10.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F+E S D A M I	daily	standard	test	Cape Town, October 2026	za.mjc
+archive/tables/moral-auth-world/africaoceania/split-7g/voc-S-oct2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F+E - D A M I	daily	standard	test	Cape Town, October 2026 (masjids.co.za's relay)	za.voc
+archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-oct2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F+E S D A M I	daily	standard	test	Cape Town, October 2026 (the Wembley calendar's 20 days)	za.voc
 archive/tables/moral-auth-world/africaoceania/split-7g/jamiat-cpt-oct2026.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	E F S D A - M I -	daily	standard	test	Cape Town, October 2026	za.jamiat.shafii

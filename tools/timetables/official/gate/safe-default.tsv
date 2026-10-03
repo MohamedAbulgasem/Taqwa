@@ -28,6 +28,15 @@
 #   after DUM RT's own (still real-crossing) printed Isha that one day; an extreme, single-day seam
 #   between two substitution rules at an extreme latitude, not a finding about the flat 2-minute
 #   policy this region otherwise uses.
+# - The end of eating (audit of 3 Oct 2026): each sample's Fajr is also checked as the end of eating (F+E),
+#   where its authority's fast begins at its Fajr, except three: Cairo (Dar al-Ifta's 19.5° dawn), Jakarta
+#   (Kemenag's 20°) and Singapore (MUIS's 20°). Their dawns are deeper than the 18° this fallback assumes where
+#   nothing is known (spec §6.2 c), so its end (18° − 2 min) comes after their Fajr on every day held — a genuine
+#   gap of the fallback against those conventions, never reached in production (each has its own entry, whose
+#   end is checked), recorded in proof.md §3 and left to the owner. Johannesburg (Jamiat) and Dhaka (IFB) are
+#   left as they were: their fast ends at a printed sehri before their Fajr, which these two files do not hold.
+#   Checked once (not a row) against the sehri columns the archive holds for both (jamiat-7g's Johannesburg
+#   2026, IFB's permanent table), the fallback's end came after both on every day held: the same gap.
 # Morocco (Habous) is left out: its one held table (Sep 20–Oct 12 2026) straddles the country's own
 # clock change on 20 Sep 2026 (spec §3.9), which this test's runtime tzdata may not yet carry for
 # that exact 2026 date — an environment artifact, not a finding about the engine (documented in
@@ -37,18 +46,18 @@
 # is the region's own convention (spec §3.7). archive/ rows are read from the shared official root
 # on this Mac (task-7-common); open/ rows are this checkout's own SG-MUIS and RU-DUMRT sets.
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/off-uq-makkah-3p.txt	default.safe	21.426666	39.831666	Asia/Riyadh	F S D A M -	daily	standard	test	Saudi Arabia (Umm al-Qura, Makkah), one September day; Isha not checked (Maghrib + 90, see header)
+archive/tables/off-uq-makkah-3p.txt	default.safe	21.426666	39.831666	Asia/Riyadh	F+E S D A M -	daily	standard	test	Saudi Arabia (Umm al-Qura, Makkah), one September day; Isha not checked (Maghrib + 90, see header)
 archive/tables/off-darifta-cairo-sep.txt	default.safe	30.0444	31.2357	Africa/Cairo	F S D A M I	daily	standard	test	Egypt (Dar al-Ifta, Cairo), September
-archive/tables/round/data-diyanet-kemenag/off-diyanet-istanbul.txt	default.safe	41.0082	28.9784	Europe/Istanbul	F - - - - -	daily	standard	test	Turkey (Diyanet, Istanbul), Sep 2026 to Dec 2027; only Fajr checked (temkin, see header)
-archive/tables/off-qch-riyadh.txt	default.safe	24.7136	46.6753	Asia/Riyadh	F S D A M -	daily	standard	test	Gulf (Calendar House, Riyadh), one September day; Isha not checked (Maghrib + 90, see header)
-archive/tables/off-qatarch-wakra.txt	default.safe	25.1715	51.6034	Asia/Qatar	F S D A M -	daily	standard	test	Qatar (Calendar House, Al Wakrah), one September day; Isha not checked (Maghrib + 90, see header)
-archive/tables/off-kuwait-25sep.txt	default.safe	29.3759	47.9774	Asia/Kuwait	F S D A M I	daily	standard	test	Kuwait (Awqaf), one September day
-archive/tables/off-jakim-kl.txt	default.safe	3.1390	101.6869	Asia/Kuala_Lumpur	F S D A M I	daily	standard	test	Malaysia (JAKIM, Kuala Lumpur), Sep-Oct
+archive/tables/round/data-diyanet-kemenag/off-diyanet-istanbul.txt	default.safe	41.0082	28.9784	Europe/Istanbul	F+E - - - - -	daily	standard	test	Turkey (Diyanet, Istanbul), Sep 2026 to Dec 2027; only Fajr checked (temkin, see header)
+archive/tables/off-qch-riyadh.txt	default.safe	24.7136	46.6753	Asia/Riyadh	F+E S D A M -	daily	standard	test	Gulf (Calendar House, Riyadh), one September day; Isha not checked (Maghrib + 90, see header)
+archive/tables/off-qatarch-wakra.txt	default.safe	25.1715	51.6034	Asia/Qatar	F+E S D A M -	daily	standard	test	Qatar (Calendar House, Al Wakrah), one September day; Isha not checked (Maghrib + 90, see header)
+archive/tables/off-kuwait-25sep.txt	default.safe	29.3759	47.9774	Asia/Kuwait	F+E S D A M I	daily	standard	test	Kuwait (Awqaf), one September day
+archive/tables/off-jakim-kl.txt	default.safe	3.1390	101.6869	Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Malaysia (JAKIM, Kuala Lumpur), Sep-Oct
 archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta.txt	default.safe	-6.2088	106.8456	Asia/Jakarta	F S D A M I	daily	standard	test	Indonesia (Kemenag, Jakarta), full year 2026
-archive/tables/off-alger.txt	default.safe	36.7538	3.0588	Africa/Algiers	F S D A M I	daily	standard	test	Algeria (MARW, Algiers), Sep-Oct
-archive/tables/off-tunis.txt	default.safe	36.8065	10.1815	Africa/Tunis	F - - A M I	daily	standard	test	Tunisia (INM, Tunis), Sep-Oct; no sunrise column; Dhuhr not checked (INM's own transit + 7/8, see header)
+archive/tables/off-alger.txt	default.safe	36.7538	3.0588	Africa/Algiers	F+E S D A M I	daily	standard	test	Algeria (MARW, Algiers), Sep-Oct
+archive/tables/off-tunis.txt	default.safe	36.8065	10.1815	Africa/Tunis	F+E - - A M I	daily	standard	test	Tunisia (INM, Tunis), Sep-Oct; no sunrise column; Dhuhr not checked (INM's own transit + 7/8, see header)
 archive/tables/off-jamiat-jhb-year-H.txt	default.safe	-26.2041	28.0473	Africa/Johannesburg	F S D A M I	daily	hanafi	test	South Africa (Jamiatul Ulama, Johannesburg), full year 2026, Hanafi column
 archive/tables/off-ifb-dhaka.txt	default.safe	23.8103	90.4125	Asia/Dhaka	F S D A M I	daily	hanafi	test	Bangladesh (Islamic Foundation, Dhaka), October sample days
-archive/tables/off-ifta-tripoli.txt	default.safe	32.8872	13.1913	Africa/Tripoli	F S D A M I	daily	standard	test	Libya (Ifta, Tripoli), Sep-Oct
+archive/tables/off-ifta-tripoli.txt	default.safe	32.8872	13.1913	Africa/Tripoli	F+E S D A M I	daily	standard	test	Libya (Ifta, Tripoli), Sep-Oct
 open/SG-MUIS/off-muis-singapore-2026.txt	default.safe	1.28967	103.85007	Asia/Singapore	F S D A M I	daily	standard	test	Singapore (MUIS), 2026, the app's own coordinates (not MUIS's fixed point)
 open/RU-DUMRT/off_kzn.txt	default.safe	55.7887	49.1221	Europe/Moscow	- S - A M -	daily	hanafi	test	Tatarstan (DUM RT, Kazan), 2026, Hanafi column; Fajr, Dhuhr and Isha not checked (see header: 7b's own finding on Dhuhr, plus the 5 May row and the white-nights seam)

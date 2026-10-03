@@ -89,10 +89,10 @@ class LevantProofTest {
     }
 
     @Test
-    fun `lebanon's late-limit exceptions cover exactly fajr and the two evening events`() {
+    fun `lebanon's late-limit exceptions cover exactly fajr and the two evening events and the end of eating`() {
         val entry = requireNotNull(Registry.byId("lb.fatwa"))
         val covered = entry.lateLimits.flatMap { it.events }.toSet()
-        assertEquals(setOf(TimedEvent.FAJR, TimedEvent.MAGHRIB, TimedEvent.ISHA), covered)
+        assertEquals(setOf(TimedEvent.FAJR, TimedEvent.MAGHRIB, TimedEvent.ISHA, TimedEvent.END_OF_EATING), covered)
         for (limit in entry.lateLimits) assertTrue(limit.reason.isNotBlank(), limit.events.toString())
     }
 

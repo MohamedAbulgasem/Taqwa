@@ -7,6 +7,8 @@
 # switch happened (2026-07-19 is the last capture on the old rule found; the new rule is confirmed
 # live by 2026-09-25). So both eras are folded into one fit set, and the entry's margins are the
 # ones never early against either; nothing is held out.
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the Board prints no imsak column; the fast begins at its printed
+# Fajr, so the Fajr column is also checked as the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
-archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F S D A M I	daily	hanafi	fit	muslim.uz live, 25-26 Sep 2026 (current rule)
-archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F S D A M I	daily	hanafi	fit	Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F+E S D A M I	daily	hanafi	fit	muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F+E S D A M I	daily	hanafi	fit	Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
