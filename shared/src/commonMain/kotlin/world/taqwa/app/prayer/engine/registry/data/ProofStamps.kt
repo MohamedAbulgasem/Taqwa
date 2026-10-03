@@ -1016,8 +1016,8 @@ object ProofStamps {
         ProofStamp(
             entryId = "sa.ummalqura",
             places = 12,
-            placeDays = 13146,
-            ramadanDays = 1080,
+            placeDays = 15336,
+            ramadanDays = 1254,
             provenThrough = "2030-12-31",
             worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
             worstLateByUnit = emptyMap(),

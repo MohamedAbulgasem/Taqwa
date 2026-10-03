@@ -19,3 +19,10 @@ archive/tables/round/data-umm-al-qura/off-uq-tabuk.txt	sa.ummalqura	28.4	36.58	A
 archive/tables/round/data-umm-al-qura/off-uq-makkah.txt	sa.ummalqura	21.426666	39.831666	Asia/Riyadh	F+E S D A M I	daily	standard	test	Makkah 2024–2030
 archive/tables/round/data-umm-al-qura/off-uq-riyadh.txt	sa.ummalqura	24.67	46.69	Asia/Riyadh	F+E S D A M I	daily	standard	test	Riyadh 2024–2030
 archive/tables/round/data-umm-al-qura/off-uq-turaif.txt	sa.ummalqura	31.68	38.66	Asia/Riyadh	F+E S D A M I	daily	standard	test	Turaif 2024 and 2026–2030, the far north
+# prove, 2026-10-03: the monitor's captures pinned as they were under archive/tables/pinned/{sa-ummalqura}/2026-10-03/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/sa-ummalqura/2026-10-03/al-kharkhir-2027.txt	sa.ummalqura	18.85	51.819	Asia/Riyadh	F+E S D A M I	daily	standard	test	Al Kharkhir 2027, the monitor capture of 3 Oct 2026 (prove)
+archive/tables/pinned/sa-ummalqura/2026-10-03/at-tuwal-2027.txt	sa.ummalqura	16.528	42.9685	Asia/Riyadh	F+E S D A M I	daily	standard	test	At Tuwal 2027, the monitor capture of 3 Oct 2026 (prove)
+archive/tables/pinned/sa-ummalqura/2026-10-03/haql-2027.txt	sa.ummalqura	29.3	34.95	Asia/Riyadh	F+E S D A M I	daily	standard	test	Haql 2027, the monitor capture of 3 Oct 2026 (prove)
+archive/tables/pinned/sa-ummalqura/2026-10-03/tabuk-2027.txt	sa.ummalqura	28.4	36.58	Asia/Riyadh	F+E S D A M I	daily	standard	test	Tabuk 2027, the monitor capture of 3 Oct 2026 (prove)
+archive/tables/pinned/sa-ummalqura/2026-10-03/taif-2027.txt	sa.ummalqura	21.25	40.4	Asia/Riyadh	F+E S D A M I	daily	standard	test	Taif 2027, the monitor capture of 3 Oct 2026 (prove)
+archive/tables/pinned/sa-ummalqura/2026-10-03/turaif-2027.txt	sa.ummalqura	31.68	38.66	Asia/Riyadh	F+E S D A M I	daily	standard	test	Turaif 2027, the monitor capture of 3 Oct 2026 (prove)
