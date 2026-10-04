@@ -210,6 +210,11 @@ def structured_data(langs: dict, lang: str, page: str, raw_body: str) -> str:
     }
     if cfg["brand"] != "Taqwa":
         app["alternateName"] = cfg["brand"]
+    # Each store the app is live in (site/stores.json): where to get it, and the same app's listing.
+    live = [address for address in (STORES["app_store"], STORES["google_play"]) if address]
+    if live:
+        app["downloadUrl"] = live if len(live) > 1 else live[0]
+        app["sameAs"] = APP["sameAs"] + live
     shot = re.search(r'<section class="wrap hero">.*?<img src="\{root\}(assets/img/[\w.-]+)"', raw_body, re.S)
     if shot:
         app["screenshot"] = f"{ORIGIN}/{shot.group(1)}"
