@@ -48,3 +48,13 @@ archive/tables/round/data-diyanet-kemenag/off-kemenag-surabaya-fit.txt	id.kemena
 archive/tables/round/data-diyanet-kemenag/off-kemenag-surabaya-test.txt	id.kemenag/1638			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Surabaya, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-yogyakarta-fit.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Yogyakarta, Jan-Sep 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-yogyakarta-test.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Yogyakarta, Oct-Dec 2026
+# prove, 2026-10-05: the monitor's captures pinned as they were under archive/tables/pinned/{id-kemenag}/2026-10-05/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/id-kemenag/2026-10-05/bandung-2027.txt	id.kemenag/1219			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Bandung 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/jakarta-2027.txt	id.kemenag/1301			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Jakarta 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/jayapura-2027.txt	id.kemenag/3329			Asia/Jayapura	F S D A M I	daily	standard	test	Kota Jayapura 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/makassar-2027.txt	id.kemenag/2622			Asia/Makassar	F S D A M I	daily	standard	test	Kota Makassar 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/malang-2027.txt	id.kemenag/1634			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Malang 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/medan-2027.txt	id.kemenag/0228			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Medan 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/semarang-2027.txt	id.kemenag/1433			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Semarang 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/surabaya-2027.txt	id.kemenag/1638			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Surabaya 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/yogyakarta-2027.txt	id.kemenag/1505			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Yogyakarta 2027, the monitor capture of 5 Oct 2026 (prove)
