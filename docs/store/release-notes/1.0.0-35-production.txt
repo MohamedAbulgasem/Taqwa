@@ -1,0 +1,56 @@
+<en-GB>
+Welcome to Taqwa, a quiet companion for every day:
+• Prayer times from the local timetable where Taqwa knows one, with a takbir or the opening of the adhan at each prayer
+• The whole Quran offline, with translations, and ten reciters to download
+• Qibla, tasbeeh counter, Hijri date and widgets
+• Seven languages: English, Arabic, French, Turkish, Indonesian, Urdu and Bengali
+Free, with no adverts, account or tracking.
+</en-GB>
+<ar>
+مرحبًا بك في تقوى، رفيقك الهادئ كل يوم:
+• مواقيت الصلاة من الجدول المحلي حيث يعرفه تقوى، مع تكبير أو مطلع الأذان عند كل صلاة
+• القرآن الكريم كاملًا دون إنترنت، مع الترجمات، وعشرة قرّاء يمكنك تنزيل تلاواتهم
+• القبلة، وعدّاد التسبيح، والتاريخ الهجري، وأدوات الشاشة الرئيسية
+• سبع لغات: العربية والإنجليزية والفرنسية والتركية والإندونيسية والأردية والبنغالية
+مجاني، بلا إعلانات ولا حساب ولا تتبّع.
+</ar>
+<fr-FR>
+Bienvenue dans Taqwa, un compagnon discret au quotidien :
+• Les horaires de prière du calendrier local, là où Taqwa en connaît un, avec un takbir ou le début de l’adhan à chaque prière
+• Le Coran entier hors ligne, avec des traductions, et dix récitateurs à télécharger
+• Qibla, compteur de tasbih, date hégirienne et widgets
+• Sept langues : français, anglais, arabe, turc, indonésien, ourdou et bengali
+Gratuit, sans publicité, sans compte ni suivi.
+</fr-FR>
+<tr-TR>
+Taqwa’ya hoş geldiniz; her gün yanınızda sakin bir yol arkadaşı:
+• Taqwa’nın yerel takvimini bildiği yerlerde o takvime göre namaz vakitleri; her vakitte bir tekbir ya da ezanın ilk saniyeleri
+• Kur’an’ın tamamı çevrimdışı, mealleriyle; on karinin tilaveti indirilebilir
+• Kıble, tesbih sayacı, hicri tarih ve widget’lar
+• Yedi dil: Türkçe, İngilizce, Arapça, Fransızca, Endonezce, Urduca ve Bengalce
+Ücretsiz; reklam yok, hesap yok, takip yok.
+</tr-TR>
+<id>
+Selamat datang di Taqwa, pendamping yang tenang untuk setiap hari:
+• Waktu salat dari jadwal setempat jika Taqwa memilikinya, dengan takbir atau awal azan pada setiap salat
+• Al-Qur’an lengkap yang tersedia offline, dengan terjemahan, serta tilawah sepuluh qari yang bisa diunduh
+• Kiblat, penghitung tasbih, tanggal Hijriah, dan widget
+• Tujuh bahasa: Indonesia, Inggris, Arab, Prancis, Turki, Urdu, dan Bengali
+Gratis, tanpa iklan, tanpa akun, tanpa pelacakan.
+</id>
+<ur>
+تقویٰ میں خوش آمدید، ہر دن کا ایک پُرسکون ساتھی:
+• نماز کے اوقات مقامی نقشۂ اوقات کے مطابق، جہاں تقویٰ کو وہ معلوم ہو، اور ہر نماز پر تکبیر یا اذان کا ابتدائی حصہ
+• پورا قرآن آف لائن، تراجم کے ساتھ، اور ڈاؤن لوڈ کے لیے دس قاریوں کی تلاوت
+• قبلہ، تسبیح، ہجری تاریخ اور ویجٹ
+• سات زبانیں: اردو، انگریزی، عربی، فرانسیسی، ترکی، انڈونیشی اور بنگالی
+مفت، نہ اشتہار، نہ اکاؤنٹ، نہ کوئی نگرانی۔
+</ur>
+<bn-BD>
+তাকওয়ায় স্বাগতম, প্রতিদিনের এক শান্ত সঙ্গী:
+• স্থানীয় সময়সূচি তাকওয়ার জানা থাকলে সেই অনুযায়ী নামাজের সময়, সঙ্গে প্রতি ওয়াক্তে তাকবীর বা আযানের শুরুর অংশ
+• ইন্টারনেট ছাড়াই পুরো কুরআন, অনুবাদসহ, আর ডাউনলোডের জন্য দশজন কারির তিলাওয়াত
+• কিবলা, তাসবিহ গণনা, হিজরি তারিখ ও উইজেট
+• সাতটি ভাষা: বাংলা, ইংরেজি, আরবি, ফরাসি, তুর্কি, ইন্দোনেশীয় ও উর্দু
+বিনামূল্যে; বিজ্ঞাপন নেই, অ্যাকাউন্ট নেই, ট্র্যাকিং নেই।
+</bn-BD>
