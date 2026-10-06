@@ -9,10 +9,10 @@ Taqwa: Salat, Qur’an & Kiblat
 Waktu salat, azan, Al-Qur’an 30 juz dengan tilawah, dan kiblat. Gratis, offline.
 
 ### Full description (4000)
-Taqwa menghadirkan hal-hal pokok dalam hari Anda di satu tempat yang tenang: waktu salat yang akurat di tempat Anda berada, azan saat waktunya tiba, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Berfungsi offline, tidak berbayar, tanpa iklan, dan tidak meminta akun.
+Taqwa menghadirkan hal-hal pokok dalam hari Anda di satu tempat yang tenang: waktu salat di tempat Anda berada, takbir atau awal azan pada setiap salat, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Berfungsi offline, tidak berbayar, tanpa iklan, dan tidak meminta akun.
 
 WAKTU SALAT
-• Waktu untuk lokasi Anda, dari GPS atau dari kota yang Anda pilih di antara lebih dari 34.000 kota.
+• Waktu untuk tempat Anda berada, dari lokasi ponsel Anda atau dari kota yang Anda pilih di antara lebih dari 34.000 kota.
 • Waktu menurut jadwal yang diikuti masjid di sekitar Anda. Jika Taqwa memiliki jadwal itu, Taqwa menghitungnya ulang dan mencocokkannya hari demi hari dengan jadwal terbitannya: pada setiap hari yang diperiksa, tidak ada salat yang dimulai sebelum waktu yang diterbitkan. Jika suatu jadwal belum diperiksa sepenuhnya, Taqwa menambahkan margin pengaman; jika masjid-masjid mengikuti jadwal yang berbeda, Taqwa menampilkan waktu ihtiyat, yaitu setiap salat setelah waktunya masuk di semua jadwal itu; dan jika tidak ada jadwal yang diketahui, Taqwa menghitung dengan memilih yang lebih aman.
 • Ketuk tombol (i) di layar Salat untuk melihat asal waktu ini, dan “Tentang waktu ini” untuk melihat cara waktu ini dihitung dan diperiksa. “Cocokkan dengan masjid saya” mencari jadwal masjid Anda dari dua waktu di papannya, dan metode perhitungan yang biasa (Liga Muslim Dunia, Mesir, Karachi, ISNA, dan lainnya) serta penyesuaian per salat juga tersedia.
 • Aturan untuk lintang tinggi, ketika malam terlalu pendek untuk sudut yang biasa.
@@ -48,7 +48,12 @@ Situs web: https://taqwa.world/id/
 Dukungan: support@taqwa.world
 
 ### Release notes (500)
-Rilis pertama.
+Selamat datang di Taqwa, pendamping yang tenang untuk setiap hari:
+• Waktu salat dari jadwal setempat jika Taqwa memilikinya, dengan takbir atau awal azan pada setiap salat
+• Al-Qur’an lengkap yang tersedia offline, dengan terjemahan, serta tilawah sepuluh qari yang bisa diunduh
+• Kiblat, penghitung tasbih, tanggal Hijriah, dan widget
+• Tujuh bahasa: Indonesia, Inggris, Arab, Prancis, Turki, Urdu, dan Bengali
+Gratis, tanpa iklan, tanpa akun, tanpa pelacakan.
 
 ## App Store
 
