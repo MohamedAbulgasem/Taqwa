@@ -12,10 +12,10 @@ Taqwa: Prayer, Quran & Qibla
 Prayer times, adhan, the whole Quran with recitation, and Qibla. Free, offline.
 
 ### Full description (4000)
-Taqwa gives you the essentials of the day in one quiet place: accurate prayer times where you are, the adhan when they arrive, the whole Quran to read and listen to, and the Qibla. It works offline, costs nothing, shows no adverts and asks for no account.
+Taqwa gives you the essentials of the day in one quiet place: prayer times where you are, a takbir or the opening of the adhan at each prayer, the whole Quran to read and listen to, and the Qibla. It works offline, costs nothing, shows no adverts and asks for no account.
 
 PRAYER TIMES
-• Times for where you are, from GPS or a city you choose from more than 34,000.
+• Times for where you are, from your phone's location or a city you choose from more than 34,000.
 • Times from the timetable the mosques near you follow. Where Taqwa holds it, it reproduces it and checks it day by day against the published tables: on every day checked, no prayer starts before the published time. Where a timetable is not yet fully checked, Taqwa adds a safety margin; where mosques follow different timetables, it shows cautious times, each prayer once all have begun it; and where no timetable is known, it calculates on the safe side.
 • Tap the (i) on the Prayer screen to see whose times these are, and About these times for how they are made and checked. Match my mosque looks for your mosque's timetable from two times on its board, and the usual calculation methods (Muslim World League, Egyptian, Karachi, ISNA and more) and a per-prayer adjustment are there too.
 • Rules for high latitudes, where the night is too short for the usual angles.
@@ -51,7 +51,12 @@ Website: https://taqwa.world
 Support: support@taqwa.world
 
 ### Release notes (500)
-First release.
+Welcome to Taqwa, a quiet companion for every day:
+• Prayer times from the local timetable where Taqwa knows one, with a takbir or the opening of the adhan at each prayer
+• The whole Quran offline, with translations, and ten reciters to download
+• Qibla, tasbeeh counter, Hijri date and widgets
+• Seven languages: English, Arabic, French, Turkish, Indonesian, Urdu and Bengali
+Free, with no adverts, account or tracking.
 
 ## App Store
 
