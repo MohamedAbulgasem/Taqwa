@@ -2585,3 +2585,76 @@ one column off (every one of the 39 pages held re-parses to its table unchanged)
 both Pythons, the same single failure; tools `jvmTest` 297/0; the whole gate again 949 rows, 190,445
 place-days, all zeros, `ma.habous`'s stamp byte-identical (the twelve engine hashes every Mac run
 rewrites, a known machine difference, restored).
+
+## Kazakhstan to its edges, and the curves' 0.1° step (6 October, the north-west round)
+
+The northern round left two gaps. North of Petropavl, up to 55.4° N, every margin was an
+extrapolation, and the west (Oral, Aktobe, Atyrau, Aktau) had no table at all. This round fills both
+from QMDB's own year API, which answers only at QMDB's own places.
+
+**The tables.** QMDB's city list (5,694 places, all on UTC+5) is kept in the private archive
+(`archive/raw/manual/kz-qmdb/2026-10-06/`). The kz-qmdb fetcher read 2026 and 2027 at 23 more of its
+places, pinned as fetched (`archive/tables/pinned/kz-qmdb/2026-10-06/`, raw JSON beside them in
+`archive/raw/monitor/kz-qmdb/2026-10-06/`):
+- north of Petropavl to the edge: Isakovka (55.4° N, QMDB's northernmost place), Krasny Yar and
+  Kulomzino;
+- the west and every zone of the app's Kazakh cities without a table: Oral, Aksay, Aktobe, Khromtau,
+  Shalqar, Atyrau, Makat, Oteshqali Atambayev, Aktau and Kyzylorda;
+- the south to QMDB's southernmost place: Shymkent and Zhenis (40.6° N);
+- from 46° to 48° N, Oteshqali Atambayev (QMDB's place nearest 48° N) and Ayagoz;
+- places just either side of the engine's 0.1° curve steps, below.
+
+The six places of 3 October came back day for day. QMDB's Maghrib less its own sunset is 5 min at or
+above 48° N and 3 below it everywhere, Shalqar (47.8° N, in the Aktobe region) included, so QMDB
+switches by latitude, as the engine does. All 46 new rows went in as test rows first.
+
+**What the current engine got wrong.**
+- **The end of eating, late.** At Kulomzino it came 1 min after QMDB's printed Fajr on 2 days of spring
+  2027. From 46° to 48° N, where its margin was 0, it came up to 3 min after it from late May to
+  mid-June, at Atyrau, Makat, Shalqar, Oteshqali Atambayev, Ayagoz and Mamyrsu. QMDB's AngleBased rule
+  binds there too around the solstice, from about 46.15° N.
+- **Isha, over its limit.** It was 6 min late, 1 over its 5, at Isakovka and Krasny Yar in August 2027.
+- **Fajr, early.** QMDB's rule is carried as an angle curve computed on a 0.1° latitude grid, and in the
+  north its moment moves by up to about a minute for every 0.1°. A place just short of a step reads
+  its curve up to 0.05° to its south, so its Fajr comes early. A place just past one reads it to its
+  north, so its end of eating comes late, which is what happened at Kulomzino. Nine of QMDB's own places
+  within 0.003° of a step were fetched and gated. Fajr was 1 min early at QMDB's own Bugrovoe
+  (14 days), Spasovka (11) and Oskemen (Ust-Kamenogorsk, 2), from the solstice to mid-August. At
+  Vagulino the end of eating was 1 min late on 2 days.
+
+No start was early at the other places, and the west at or above 48° N, the south, Aktau and
+Kyzylorda were green.
+
+**The fix.** It touches `kz.qmdb` alone, and every time moves later, or for an end earlier, or not at
+all.
+- QMDB's Fajr and Isha curves are now also computed at the place's own latitude. Each slot takes the
+  later start of the grid's curve and the place's own, and the end of eating the earlier dawn of the
+  two (`TwilightCurves.kt`). Both sides of each step are now green.
+- From 46° to 48° N the end of eating carries −150 s (`CentralAsia.kt`): the fitter's bound at the
+  band's top, decided at Oteshqali Atambayev and Ayagoz on 30 May 2027.
+- Asr moves from −8 to −6 s and Maghrib from −15 to −14 s, decided at Krasny Yar and Isakovka.
+  Fajr, Isha, Dhuhr, sunrise and the northern end of eating's −374 s are unchanged; with the curve
+  change the north asks only −366 s.
+- Isha's limit is now 6 min (R41), and the Fajr and end-of-eating limits' reasons name the band and
+  Isakovka.
+
+After it, the north reads Fajr up to 8 min late, Isha up to 6 and the end of eating up to 8 min early.
+From 46° to 48° N Fajr is up to 4 late and the end of eating up to 4 early. South of 46° N, Aktau,
+Kyzylorda, Shymkent and Zhenis are within 1 min, like Almaty. Proof 7f has the table for all 29 places.
+
+**What moved.** The whole gate: 966 rows and 206,322 place-days, 0 early, 0 late ends, none over its
+limit, nothing BROKEN. `kz.qmdb` has 60 rows, 21,170 place-days at 29 places. Only its figures changed.
+The golden vector moved on 3 of its 2,071 rows, at the Kazakh seeds and all in the other school's Asr,
+1 min later. About now shows 21,170 days at 29 places for every Kazakh place, "at most 8 min after".
+The monitor fetches all 29 places each month, and `kz-qmdb` now has a recipe, so `prove` adds a new
+year's rows by itself (the recipe test had been red since the source was added on 3 October).
+
+**The stamps.** On the Mac, `checkStamps` on `main` reported eleven stamps stale besides `kz.qmdb`:
+`be.emb`, `fr.gmp`, `ie.icci`, `no.irn` and seven cautious entries. The cloud's `prove` runs of 3 and
+5 October rewrote their `engineHash` alone. Those entries carry computed curves, and the Linux runner
+prints them with different last digits. This round writes the Mac's hashes back. The cloud will flip
+them again on its next run unless the fingerprint stops depending on the platform.
+
+Checked: tools `jvmTest` 297/0 with the archive. `:shared:testAndroidHostTest` passed 1,604/0, with
+`AsiaProofTest` at 8/0. `checkStamps` passed (71 entries), and the monitor's Python tests passed (77,
+both Pythons). The engine change ships with the first update, not 1.0.0 (35).

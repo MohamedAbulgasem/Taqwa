@@ -103,9 +103,12 @@ internal object TwilightCurves {
         }
     }
 
-    /** Per slot the value [angle] gives, [fallback] where the sun does not rise or set. */
-    private fun perSlot(latitude: Double, fallback: Double, angle: (Day) -> Double): DoubleArray {
-        val phi = SolarMath.rad(round(latitude * 10.0) / 10.0)
+    /**
+     * Per slot the value [angle] gives, [fallback] where the sun does not rise or set. The sun is
+     * taken at [latitude] rounded to 0.1° ([onGrid], every curve's default), or at [latitude] itself.
+     */
+    private fun perSlot(latitude: Double, fallback: Double, onGrid: Boolean = true, angle: (Day) -> Double): DoubleArray {
+        val phi = SolarMath.rad(if (onGrid) round(latitude * 10.0) / 10.0 else latitude)
         // Slots −1 .. 366: the days either side of the reference year, for the nights.
         val declinations = DoubleArray(SLOTS + 2) { i ->
             val noon = referenceStart.plus(i - 1, DateTimeUnit.DAY).toEpochDays() * SolarMath.SECONDS_PER_DAY + 12 * 3600.0
@@ -136,18 +139,20 @@ internal object TwilightCurves {
 
     /**
      * A Fajr never before [fraction] of the night before sunrise: the later (the smaller depression)
-     * of [angle] and that moment; [fraction] null on days the rule does not apply.
+     * of [angle] and that moment; [fraction] null on days the rule does not apply. [onGrid] as
+     * [perSlot]'s: the sun at the latitude rounded to 0.1°, unless false.
      */
-    fun fajr(latitude: Double, angle: Double, fraction: (Day) -> Double?): DoubleArray = fajrEnvelope(
-        perSlot(latitude, angle) { d -> fraction(d)?.let { min(angle, d.depression(it * d.morningNight)) } ?: angle },
+    fun fajr(latitude: Double, angle: Double, onGrid: Boolean = true, fraction: (Day) -> Double?): DoubleArray = fajrEnvelope(
+        perSlot(latitude, angle, onGrid) { d -> fraction(d)?.let { min(angle, d.depression(it * d.morningNight)) } ?: angle },
     )
 
     /**
      * An Isha no later than [fraction] of the night after sunset where the authority's code says so:
      * the earlier (the smaller depression) of [angle] and that moment, then the envelope's later.
+     * [onGrid] as [fajr]'s.
      */
-    fun isha(latitude: Double, angle: Double, fraction: (Day) -> Double?): DoubleArray = ishaEnvelope(
-        perSlot(latitude, angle) { d -> fraction(d)?.let { min(angle, d.depression(it * d.eveningNight)) } ?: angle },
+    fun isha(latitude: Double, angle: Double, onGrid: Boolean = true, fraction: (Day) -> Double?): DoubleArray = ishaEnvelope(
+        perSlot(latitude, angle, onGrid) { d -> fraction(d)?.let { min(angle, d.depression(it * d.eveningNight)) } ?: angle },
     )
 
     /**
@@ -384,11 +389,21 @@ internal object TwilightCurves {
  * vary by season: taking one put Isha up to 29 min early in spring).
  */
 internal object PlaceCurves {
+    /**
+     * [ownLatitude]: the [fajr] and [isha] curves are also computed at the place's own latitude, not
+     * only on the 0.1° grid, and each slot takes the later start of the two; the end of eating, where
+     * the method reads it from its Fajr dawn ([EndOfEating.SameAsFajrDawn]), becomes that dawn's
+     * earlier slot of the two ([EndOfEating.DawnAngle]). For a rule whose curve moves fast with
+     * latitude, the grid alone leaves a place up to 0.05° from its own curve: south of it the Fajr
+     * comes early, north of it the end of eating comes late (QMDB's AngleBased rule in northern
+     * Kazakhstan, kz-north-west round of 6 Oct 2026).
+     */
     private class Rule(
         val fajr: ((TwilightCurves.Day) -> Double?)? = null,
         val isha: ((TwilightCurves.Day) -> Double?)? = null,
         val moonsightingFajr: Boolean = false,
         val ishaAfterSunsetMinutes: ((TwilightCurves.Day) -> Double)? = null,
+        val ownLatitude: Boolean = false,
     )
 
     private fun TwilightCurves.Day.latitude() = SolarMath.deg(phi)
@@ -476,8 +491,16 @@ internal object PlaceCurves {
      */
     private val icci = Rule(fajr = { ICCI_FAJR_PORTION }, isha = { ICCI_ISHA_PORTION })
 
-    /** praytimes.js's AngleBased rule (QMDB): 15/60 of the night each side (its documented code). */
-    private val qmdb = Rule(fajr = { 15.0 / 60 }, isha = { 15.0 / 60 })
+    /**
+     * praytimes.js's AngleBased rule (QMDB): 15/60 of the night each side (its documented code). In
+     * northern Kazakhstan the rule's moment moves by up to about a minute for every 0.1° of latitude
+     * while it binds, so its curves are also read at the place's own latitude ([Rule.ownLatitude]):
+     * on the grid alone, QMDB's own Bugrovoe, Spasovka and Oskemen (each just short of a rounding
+     * step, so read about 0.05° south of itself) had a Fajr 1 min before QMDB's printed one on 14,
+     * 11 and 2 days of 2026–27, from the solstice to mid-August, and its Kulomzino and Vagulino (just
+     * past one, read 0.05° north) an end of eating 1 min after it on 2 days each in spring 2027.
+     */
+    private val qmdb = Rule(fajr = { 15.0 / 60 }, isha = { 15.0 / 60 }, ownLatitude = true)
 
     /**
      * IRN: its units carry their own curves (Europe.irnUnits: its Oslo and Trondheim calendars' own, ruling
@@ -671,9 +694,10 @@ internal object PlaceCurves {
             return method.copy(fajrAngleByDayOfYear = fajr, ishaAngleByDayOfYear = isha)
         }
         val rule = rules[keyOf(method.id, rules)] ?: return method
+        if (rule.ownLatitude) return ownLatitudeCurves(method, point, rule)
         val fajr = when {
             rule.moonsightingFajr -> TwilightCurves.moonsighting(point.lat).first
-            rule.fajr != null -> TwilightCurves.fajr(point.lat, method.fajrAngle, rule.fajr)
+            rule.fajr != null -> TwilightCurves.fajr(point.lat, method.fajrAngle, fraction = rule.fajr)
             else -> method.fajrAngleByDayOfYear
         }
         if (rule.ishaAfterSunsetMinutes != null) {
@@ -686,11 +710,38 @@ internal object PlaceCurves {
         }
         val ishaAngle = (method.isha as? IshaRule.Angle)?.degrees
         val isha = if (rule.isha != null && ishaAngle != null) {
-            TwilightCurves.isha(point.lat, ishaAngle, rule.isha)
+            TwilightCurves.isha(point.lat, ishaAngle, fraction = rule.isha)
         } else {
             method.ishaAngleByDayOfYear
         }
         return method.copy(fajrAngleByDayOfYear = fajr, ishaAngleByDayOfYear = isha)
+    }
+
+    /**
+     * [Rule.ownLatitude]'s curves at [point]: each of [rule]'s Fajr and Isha curves on the 0.1° grid
+     * and at the point's own latitude, each slot the later start of the two (the smaller Fajr
+     * depression, the larger Isha one), so no start is earlier than either; and an end of eating read
+     * from the Fajr dawn takes the earlier dawn of the two, so it is later than neither.
+     */
+    private fun ownLatitudeCurves(method: TimetableMethod, point: GeoPoint, rule: Rule): TimetableMethod {
+        val fajrRule = rule.fajr ?: return method
+        val grid = TwilightCurves.fajr(point.lat, method.fajrAngle, onGrid = true, fraction = fajrRule)
+        val own = TwilightCurves.fajr(point.lat, method.fajrAngle, onGrid = false, fraction = fajrRule)
+        val fajr = DoubleArray(grid.size) { i -> min(grid[i], own[i]) }
+        val ishaAngle = (method.isha as? IshaRule.Angle)?.degrees
+        val isha = if (rule.isha != null && ishaAngle != null) {
+            val ishaGrid = TwilightCurves.isha(point.lat, ishaAngle, onGrid = true, fraction = rule.isha)
+            val ishaOwn = TwilightCurves.isha(point.lat, ishaAngle, onGrid = false, fraction = rule.isha)
+            DoubleArray(ishaGrid.size) { i -> max(ishaGrid[i], ishaOwn[i]) }
+        } else {
+            method.ishaAngleByDayOfYear
+        }
+        val end = if (method.endOfEating == EndOfEating.SameAsFajrDawn) {
+            EndOfEating.DawnAngle(method.fajrAngle, DoubleArray(grid.size) { i -> max(grid[i], own[i]) })
+        } else {
+            method.endOfEating
+        }
+        return method.copy(fajrAngleByDayOfYear = fajr, ishaAngleByDayOfYear = isha, endOfEating = end)
     }
 
     private const val CURVE_ISHA = 18.0

@@ -11,6 +11,7 @@ import world.taqwa.app.prayer.engine.registry.MethodVariant
 import world.taqwa.app.prayer.engine.registry.Regions
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
+import world.taqwa.app.prayer.engine.registry.Where
 import world.taqwa.app.prayer.engine.registry.single
 
 /** Uzbekistan, Kazakhstan and Kyrgyzstan (research Central Asia sections). Hanafi throughout (spec §3.7). */
@@ -54,16 +55,20 @@ object CentralAsia {
      * 2027 tables for Astana, Kokshetau, Pavlodar and Petropavl as fit rows, Almaty 2027 and Kostanay
      * held out: Astana's 2027 July Fajr (+ 8 s) and the northern cities' August Isha (+ 11 s) were
      * 1 min early at the 2026-only margins; sunrise, Asr and Maghrib moved to the fitted bounds too
-     * (sunrise earlier, Asr and Maghrib later). The end of eating's margin is the exception: it
-     * differs by region ([variants]). Tables held for Almaty, Astana, Kokshetau, Kostanay, Pavlodar
-     * and Petropavl (54.9°N). Class D.
+     * (sunrise earlier, Asr and Maghrib later). The north-west round (6 Oct 2026) added QMDB's own
+     * places north of Petropavl to its northernmost (Isakovka, 55.4° N), the west and every zone
+     * without a table (Oral, Aksay, Aktobe, Khromtau, Shalqar, Atyrau, Makat, Aktau, Kyzylorda), the
+     * places nearest 48° N and places either side of the curves' 0.1° steps: 27 places in all. Its fit
+     * moved Asr to − 6 and Maghrib to − 14 (later, decided at Krasny Yar and Isakovka in 2027), and its
+     * curves are read at each place's own latitude as well as the grid ([PlaceCurves]'s qmdb rule).
+     * The end of eating's margin differs by region ([variants]). Class D.
      */
     val kazakhstanMethod = TimetableMethod(
         id = "kz.qmdb",
         fajrAngle = 15.0,
         isha = IshaRule.Angle(15.0),
         authorityMinutes = EventOffsets(sunrise = -3, dhuhr = 3, asr = 3, maghrib = 3),
-        margins = EventOffsets(fajr = 8, sunrise = 14, dhuhr = -22, asr = -8, maghrib = -15, isha = 11),
+        margins = EventOffsets(fajr = 8, sunrise = 14, dhuhr = -22, asr = -6, maghrib = -14, isha = 11),
         highLatitude = HighLatRule.Legacy("angle"),
     )
 
@@ -73,20 +78,22 @@ object CentralAsia {
         lateLimits = listOf(
             LateLimit(
                 8,
-                "QMDB's AngleBased Fajr runs ahead of the model at and above 48N from late April to early June, more the farther " +
-                    "north: up to 5 min at Astana, 6 at Kokshetau, Kostanay and Pavlodar, 8 at Petropavl (task 7f, fix round of 3 Oct 2026)",
+                "QMDB's AngleBased Fajr runs ahead of the model from about 46N, around the solstice there and from late April to " +
+                    "early June in the north, more the farther north: up to 4 min from 46N to 48N, 5 to 7 from 48N to 54.4N, " +
+                    "8 from 54.5N to Isakovka, QMDB's northernmost place (task 7f, fix rounds of 3 and 6 Oct 2026)",
                 setOf(TimedEvent.FAJR),
             ),
             LateLimit(
-                5,
-                "the same AngleBased residual in Isha from July to mid-August, up to 5 min from Astana to Petropavl " +
-                    "(task 7f, fix round of 3 Oct 2026)",
+                6,
+                "the same AngleBased residual in Isha from July to mid-August, up to 5 min from Astana to Pavlodar and 6 from " +
+                    "54.3N to QMDB's northernmost place, Isakovka (task 7f, fix rounds of 3 and 6 Oct 2026)",
                 setOf(TimedEvent.ISHA),
             ),
             LateLimit(
                 8,
-                "at and above 48N the end of eating keeps clear of QMDB's spring AngleBased residual as far north as " +
-                    "Petropavl, so on its other days it comes up to 8 min before the printed Fajr (end-of-eating audit, 3 Oct 2026)",
+                "the end of eating keeps clear of QMDB's AngleBased residual, so on its other days it comes up to 8 min before " +
+                    "the printed Fajr at and above 48N, as far north as Isakovka, and up to 4 from 46N to 48N " +
+                    "(end-of-eating audit, 3 Oct 2026; north-west round, 6 Oct 2026)",
                 setOf(TimedEvent.END_OF_EATING),
             ),
         ),
@@ -114,6 +121,14 @@ object CentralAsia {
     )
 
     /**
+     * Kazakhstan from 46° N to 48° N: QMDB's offsets are still ± 3 there, but its AngleBased Fajr binds
+     * around the summer solstice from about 46.15° N (north-west round, 6 Oct 2026). Kept here rather
+     * than in [Regions], beside [Regions.kazakhNorth], since it is this authority's alone; declared
+     * before [variants], which reads it.
+     */
+    private val kazakhMiddle = Where { it.lat >= 46.0 && it.lat < 48.0 }
+
+    /**
      * QMDB's minutes are ± 5 at and above 48° N. There the end of eating also starts
      * [KAZAKH_NORTH_END_OF_EATING] before the model's dawn: QMDB's AngleBased Fajr runs ahead of
      * the model's in spring and early summer (the residual its Fajr limit records), and the fast
@@ -122,10 +137,18 @@ object CentralAsia {
      * residual grows to the north. The margin is the fitter's bound over QMDB's 2026 and 2027 tables
      * for Astana, Kokshetau, Kostanay, Pavlodar and Petropavl (54.9° N), decided by 6 May 2027 at
      * the north; Astana's 2026 table alone asked for − 221 s, which the 2027 table and every city
-     * north of it break (fix round of 3 Oct 2026). North of Petropavl (to 55.4° N) the margin is an
-     * extrapolation, and for an end that is the unsafe side: a deeper residual there would be a late
-     * end that no held table can show. Almaty's own bound (+ 18 s) needs nothing below 48° N, so
-     * the margin there stays 0: an end only ever moves earlier.
+     * north of it break (fix round of 3 Oct 2026). The north-west round (6 Oct 2026) held it to
+     * account to the country's edge: QMDB's three northernmost places, to Isakovka (55.4° N), and
+     * the west at and above 48° N ask for − 366 s with the curves read at each place's own latitude
+     * (decided at Isakovka on 3 May 2027), so − 374 s stands.
+     *
+     * From 46° N to 48° N QMDB's minutes are ± 3, but its AngleBased Fajr binds there too, around
+     * the summer solstice (from about 46.15° N), and the end of eating at margin 0 came up to 3 min
+     * after QMDB's printed Fajr at Atyrau, Shalqar, Ayagoz, Oteshqali Atambayev, Mamyrsu and Makat
+     * (late May to mid-June, 2026 and 2027). Its margin, [KAZAKH_MIDDLE_END_OF_EATING], is the
+     * fitter's bound at the band's top (Oteshqali Atambayev, QMDB's place nearest 48° N, and
+     * Ayagoz), decided on 30 May 2027. Below 46° N the rule never binds, and Almaty's own bound
+     * (+ 18 s) needs nothing, so the margin there stays 0: an end only ever moves earlier.
      */
     val variants = listOf(
         MethodVariant("kz.qmdb", Regions.kazakhNorth) {
@@ -134,10 +157,14 @@ object CentralAsia {
                 endOfEatingMarginSeconds = KAZAKH_NORTH_END_OF_EATING,
             )
         },
+        MethodVariant("kz.qmdb", kazakhMiddle) { it.copy(endOfEatingMarginSeconds = KAZAKH_MIDDLE_END_OF_EATING) },
     )
 
-    /** The end of eating's margin at and above 48° N, in seconds (fitted from Astana to Petropavl, 2026 and 2027). */
+    /** The end of eating's margin at and above 48° N, in seconds (fitted from Astana to Isakovka, 2026 and 2027). */
     private const val KAZAKH_NORTH_END_OF_EATING = -374
+
+    /** The end of eating's margin from 46° N to 48° N, in seconds (fitted at Oteshqali Atambayev and Ayagoz, 2026 and 2027). */
+    private const val KAZAKH_MIDDLE_END_OF_EATING = -150
 
     val entries = listOf(uzbekistan, kazakhstan, kyrgyzstan)
 }

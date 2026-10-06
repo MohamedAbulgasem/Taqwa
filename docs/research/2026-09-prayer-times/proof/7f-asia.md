@@ -161,7 +161,10 @@ high summer (Jul–Sep) at both cities, each by exactly 1 min. Folded Jul–Dec 
 
 **Margins (fitted, seconds, shared across both variants):** fajr −2, sunrise +19, dhuhr −22, asr
 −11, maghrib −17, isha −3. Refitted on 3 Oct 2026 with the northern and 2027 tables (*The starts
-north of Astana*, below): fajr +8, sunrise +14, dhuhr −22, asr −8, maghrib −15, isha +11.
+north of Astana*, below): fajr +8, sunrise +14, dhuhr −22, asr −8, maghrib −15, isha +11. Refitted
+again on 6 Oct 2026 (*North of Petropavl, the west and the south*, below): asr −6 and maghrib −14
+(later), the others unchanged; from 46° to 48° N the end of eating carries −150 s, and the curves are
+read at each place's own latitude as well as on the 0.1° grid.
 
 **Gate (all 730 place-days, two cities):** 0 early, 0 late ends. Fajr (worst 5, mid-May, Astana)
 and Isha (worst 4, mid-July, Astana) exceed 3 min: both carry a `LateLimit` exception, since the
@@ -173,7 +176,8 @@ Sunrise, Dhuhr, Asr and Maghrib stay at 1 min.
 **Not proven:** only two of QMDB's 5,694 API places are measured (Almaty, Astana); `measured =
 true` (kept from Task 5) claims the whole country on the strength of the documented, reproduced
 algorithm plus these two points, not a nationwide fit. Since 3 Oct 2026 six are measured, over 2026
-and 2027 (below), from 43.2° N to 54.9° N.
+and 2027 (below), from 43.2° N to 54.9° N. Since 6 Oct 2026, 29 are, from QMDB's southernmost place
+(Zhenis, 40.6° N) to its northernmost (Isakovka, 55.4° N), in every zone the app's Kazakh cities use.
 
 ## kg.default — Kyrgyzstan
 
@@ -246,7 +250,9 @@ end-of-eating round could not touch (no start may move): Fajr 1 min early on 7 d
 at Petropavl, Kokshetau and Pavlodar in August and up to 5 min late (over its 4 on 29 days). The
 fitter asks for Fajr −2 → +8 s and Isha −3 → +11 s (first written here as + 14 s, a misreading of
 the fitter's output); those starts got their own fix round the same day (*The starts north of
-Astana*, below), and the northern rows are now in the gate.
+Astana*, below), and the northern rows are now in the gate. North of Petropavl was held to account on
+6 Oct 2026 (*North of Petropavl, the west and the south*, below): the end of eating there needed the
+curves read at each place's own latitude, not a deeper margin.
 
 `bd.ifb`'s October digitization (`off-ifb-dhaka.txt`) stays `F`: IFB's fast ends at its printed
 sehri, 6 min before its printed Fajr, which the year-round row checks (`E`); checked once against
@@ -282,7 +288,8 @@ All taken as fitted: every start later, sunrise earlier (it had 0 s of safety le
 2 s, Maghrib 3 s). The margins stay one set for both variants, so Almaty's starts move by the same
 seconds. On the held-out rows with these margins: 0 early, 0 late ends.
 
-**Lateness, by city (both years, minutes after QMDB's printed start):**
+**Lateness, by city (both years, minutes after QMDB's printed start; superseded by the north-west
+round's table below):**
 
 | city | lat | Fajr worst | Isha worst | other starts | end of eating, worst min before |
 | --- | --- | --- | --- | --- | --- |
@@ -309,11 +316,131 @@ whose own worst is 1 min, it overstates the lateness, the safe direction for a c
 would need units (`worstLateByUnit`), which the registry gives only to authorities that print a table
 per point; QMDB computes one rule for any point, so it stays one entry.
 
-**Still not proven.** North of Petropavl (to 55.4° N) every margin is an extrapolation: the Fajr and
-Isha lateness should grow, so the 8 and 5 min claims may be a minute short there, and the end of
-eating's margin, as above, is on the unsafe side of an extrapolation. The west (Oral, Aktobe, Atyrau,
-Aktau) lies within the measured latitudes but has no table; Kostanay, held out, is the nearest
-check of a western zone.
+**Still not proven** (as of this round; closed on 6 Oct 2026 by the next section). North of Petropavl
+(to 55.4° N) every margin was an extrapolation, and the west (Oral, Aktobe, Atyrau, Aktau) had no table.
+
+## North of Petropavl, the west and the south (6 Oct 2026, the north-west round)
+
+**Evidence.** QMDB's year API answers only at its own places, so its city list
+(`api.muftyat.kz/cities/`: 5,694 places, every one on UTC+5) was read first and kept in the archive
+(`archive/raw/manual/kz-qmdb/2026-10-06/cities.json.gz`). The kz-qmdb fetcher, its parsing unchanged,
+read 2026 and 2027 at 23 more of QMDB's own places, pinned as fetched in
+`archive/tables/pinned/kz-qmdb/2026-10-06/` (raw JSON in `archive/raw/monitor/kz-qmdb/2026-10-06/`):
+
+- north of Petropavl to the country's edge: Isakovka (55.4° N, the northernmost of QMDB's list),
+  Krasny Yar and Kulomzino;
+- the west and every zone of the app's Kazakh cities that had no table: Oral and Aksay (`Asia/Oral`),
+  Aktobe, Khromtau and Shalqar (`Asia/Aqtobe`), Atyrau, Makat and Oteshqali Atambayev (`Asia/Atyrau`),
+  Aktau (`Asia/Aqtau`), Kyzylorda (`Asia/Qyzylorda`);
+- the south: Shymkent and Zhenis (40.6° N, the southernmost of QMDB's list);
+- from 46° to 48° N: Oteshqali Atambayev (QMDB's place nearest 48° N) and Ayagoz, with Shalqar,
+  Atyrau, Mamyrsu and Makat;
+- places just either side of the engine's 0.1° curve steps (below): Vagulino, Bugrovoe, Pulemetovka,
+  Spasovka, Khromtau, Arkalyk, Oskemen (Ust-Kamenogorsk), Mamyrsu, Makat, and Kulomzino above.
+
+The first six places came back day for day as pinned on 3 Oct. Each table's Maghrib less its own
+sunset gives QMDB's minutes: 5 at every place at or above 48° N, 3 below it, Shalqar (47.8° N, in the
+Aktobe region) included, so QMDB switches by latitude, as the engine does.
+
+**Where the engine stood** (the margins of 3 Oct, every new row held out). No start was early at the
+fourteen places north, west, south and from 46° to 48° N. Isha went 1 min over its 5-min limit (6) at
+Isakovka (3 days) and Krasny Yar (1), in August 2027. The end of eating came after QMDB's printed Fajr
+at Kulomzino (2 days of spring 2027, 1 min) and, where its margin was 0 from 46° to 48° N, at Atyrau
+(9 days, 1 min), Makat (15, up to 2), Shalqar (27, up to 2), Oteshqali Atambayev (27, up to 3), Ayagoz
+(35, up to 3) and Mamyrsu (35, up to 3), from late May to mid-June of both years: QMDB's AngleBased
+rule binds there too around the solstice, from about 46.15° N. The west at and above 48° N (Oral,
+Aksay, Aktobe, Khromtau), the south (Shymkent, Zhenis), Aktau and Kyzylorda were green within their
+recorded limits.
+
+**The curve step.** QMDB's AngleBased rule is carried as a day-of-year angle curve computed on a 0.1°
+latitude grid (`TwilightCurves` rounds the latitude), and in the north, while the rule binds, its
+moment moves by up to about a minute for every 0.1°. A place just short of a step reads its curve up to
+0.05° to its south, which puts its Fajr early; one just past a step reads it 0.05° to its north, which
+puts its end of eating late (Kulomzino, above). Nine of QMDB's own places within 0.003° of a step were
+fetched and gated at their own points (and, outside the gate, 0.001° across their step): Fajr 1 min
+before QMDB's printed one at QMDB's own Bugrovoe (14 days), Spasovka (11) and Oskemen (2), from the
+solstice to mid-August; the end of eating 1 min late at Vagulino (2 days), as at Kulomzino; Isha 6 min
+at Bugrovoe and Spasovka. Any point just short of a step in the north was in the same case.
+
+**The fix** (kz.qmdb only; every time moves later, or for an end earlier, or not at all):
+
+1. QMDB's Fajr and Isha curves are also computed at the place's own latitude; each slot takes the later
+   start of the grid's curve and the place's own, and the end of eating, read from the Fajr dawn, the
+   earlier dawn of the two (`TwilightCurves.kt`, the qmdb rule's `ownLatitude`; no other entry's curves
+   change). Across a step the probes are now green on both sides.
+2. From 46° to 48° N, an end-of-eating margin of −150 s (`CentralAsia.kt`): the fitter's bound at the
+   band's top, Oteshqali Atambayev and Ayagoz, decided on 30 May 2027. Below 46° N the rule never binds
+   and the margin stays 0.
+3. The fitter over the fit rows (Isakovka and Krasny Yar at the edge, Oteshqali Atambayev and Ayagoz at
+   the band's top, and the eleven of 3 Oct) moved Asr from −8 to −6 s (decided at Krasny Yar, 1 Sep
+   2027) and Maghrib from −15 to −14 s (Isakovka, 13 Jan 2027), both later. Fajr (fitted −4 s) and Isha
+   (+11 s) stay at +8 and +11, Dhuhr at −22, sunrise at +14. At and above 48° N the end of eating's
+   −374 s stands: with the curve change the fitter asks −366 s (Isakovka, 3 May 2027).
+4. Isha's limit goes from 5 to 6 min (R41), with its reason; Fajr's 8 and the end of eating's 8 stand,
+   their reasons now naming the band and Isakovka.
+
+**Lateness, by place, after the fix** (both years, minutes after QMDB's printed start; the end of
+eating in minutes before the printed Fajr; `fit` rows decide the margins, `test` rows are held out):
+
+| place | lat | zone | row | Fajr | Isha | other starts | end of eating |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Zhenis | 40.6 | Almaty | test | 1 | 1 | 1 | 1 |
+| Shymkent | 42.4 | Almaty | test | 1 | 1 | 1 | 1 |
+| Almaty | 43.2 | Almaty | fit (2027 test) | 1 | 1 | 1 | 1 |
+| Aktau | 43.6 | Aqtau | test | 1 | 1 | 1 | 1 |
+| Kyzylorda | 44.8 | Qyzylorda | test | 1 | 1 | 1 | 1 |
+| Atyrau | 47.1 | Atyrau | test | 3 | 2 | 1 | 4 |
+| Makat | 47.6 | Atyrau | test | 3 | 3 | 1 | 4 |
+| Shalqar | 47.8 | Aqtobe | test | 4 | 3 | 1 | 4 |
+| Mamyrsu | 48.0 | Almaty | test | 4 | 3 | 1 | 4 |
+| Ayagoz | 48.0 | Almaty | fit | 4 | 3 | 1 | 4 |
+| Oteshqali Atambayev | 48.0 | Atyrau | fit | 4 | 3 | 1 | 4 |
+| Oskemen | 49.9 | Almaty | test | 5 | 5 | 1 | 8 |
+| Arkalyk | 50.2 | Qostanay | test | 5 | 5 | 1 | 8 |
+| Khromtau | 50.3 | Aqtobe | test | 6 | 4 | 1 | 7 |
+| Aktobe | 50.3 | Aqtobe | test | 6 | 4 | 1 | 7 |
+| Astana | 51.1 | Almaty | fit | 6 | 5 | 1 | 8 |
+| Aksay | 51.2 | Oral | test | 6 | 4 | 1 | 8 |
+| Oral | 51.2 | Oral | test | 6 | 4 | 1 | 7 |
+| Pavlodar | 52.3 | Almaty | fit | 7 | 5 | 1 | 8 |
+| Kostanay | 53.2 | Qostanay | test | 6 | 5 | 1 | 8 |
+| Kokshetau | 53.3 | Almaty | fit | 6 | 5 | 1 | 8 |
+| Spasovka | 54.3 | Almaty | test | 7 | 6 | 1 | 8 |
+| Pulemetovka | 54.6 | Almaty | test | 8 | 5 | 1 | 8 |
+| Petropavl | 54.9 | Almaty | fit | 8 | 6 | 1 | 8 |
+| Bugrovoe | 55.0 | Almaty | test | 8 | 6 | 1 | 8 |
+| Vagulino | 55.2 | Almaty | test | 8 | 6 | 1 | 8 |
+| Kulomzino | 55.3 | Almaty | test | 8 | 6 | 1 | 8 |
+| Krasny Yar | 55.4 | Almaty | fit | 8 | 6 | 1 | 8 |
+| Isakovka | 55.4 | Almaty | fit | 8 | 6 | 1 | 8 |
+
+Reading the curve at the place's own latitude costs a minute here and there, where the grid had read
+a place's curve to its south (Fajr) or north (Isha, the end of eating): Fajr at Astana (5 → 6),
+Pavlodar (6 → 7) and Shalqar (3 → 4), Isha at Petropavl, Kulomzino and Vagulino (5 → 6), and the end
+of eating at Kokshetau, Petropavl and Krasny Yar (7 → 8 min early). From 46° to 48° N Fajr is up to 4 min late
+and the end of eating up to 4 min early, over class D's plain 3, both within the entry's recorded
+limits (8, 8), whose reasons now say so.
+
+**Gate (whole, 966 rows, 206,322 place-days):** 0 early, 0 late ends, none over its limit, nothing
+BROKEN. `kz.qmdb`: 60 rows, 21,170 place-days at 29 places, 2026–2027 (14,965 held out, 1,711 in
+Ramadan); held out alone, 0 early and 0 late ends. Only `kz.qmdb`'s figures changed. The golden vector
+moved on 3 of its 2,071 rows, all at the Kazakh seeds and all the same field, the other school's
+(Standard) Asr, 1 min later: the Almaty seed on 8 Jan 2030, the Astana seed on 19 Jan 2029 and
+31 Oct 2027 (the Asr margin).
+
+**What the About screen says.** `kz.qmdb` still has no units, so the screen shows the entry's stamp at
+every Kazakh place: now 21,170 days at 29 places, checked through 31 Dec 2027, "at most 8 min after"
+(Fajr, from 54.5° N north). In the south, whose worst is 1 min, it overstates, the safe direction for a
+claim.
+
+**Still not proven.** No Kazakh city in the app's list now lies north of the northernmost table
+(Petropavl, at 54.87° N in the list, is 60 km south of Isakovka) or in a zone without one: all 84 are
+within the measured latitudes (40.6° N to 55.4° N) and zones. What remains: QMDB prints only for its
+own places, and the engine computes at the user's own point, so a user between them is checked through
+the nearest tables rather than their own; the residual of QMDB's AngleBased curve (its envelope over
+neighbouring days and its shorter night) keeps Fajr up to 8 min and Isha up to 6 min late in the north,
+and the end of eating up to 8 min early; and 2028 is not held (the monitor fetches all 29 places each
+month, and `prove` adds a new year's rows by itself, the source now having its recipe).
 
 ## Verification run
 
@@ -334,6 +461,17 @@ check of a western zone.
 ./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
 ./gradlew :shared:testAndroidHostTest --tests '*Registry*' --tests '*GoldenVector*' --tests '*ProofStamps*' --tests '*AboutTimes*'
   → 110/0 (and AsiaProofTest 6/0)
+
+# the north-west round, 6 Oct 2026 (the cloud's 9 Kemenag tables of 5 Oct read from the private
+# repository, the local copy not yet holding them)
+./gradlew -p tools/timetables gate -Pentry=kz.qmdb -Pfit=kz.qmdb -Pstamps=false
+  → fit on 19 rows (6,205 place-days): asr -6, maghrib -14, end of eating -366 (the north)
+./gradlew -p tools/timetables gate
+  → 966 rows, 206,322 place-days: 0 early, 0 late ends, none over its limit, nothing BROKEN
+./gradlew -p tools/timetables jvmTest       → 297/0, with the archive
+./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
+./gradlew :shared:testAndroidHostTest       → 1,604/0 (AsiaProofTest 8/0)
+python3 -m unittest tools/timetables/monitor/tests.py  → 77/0 (3.13 and the Mac's 3.9)
 ```
 
 ## Concerns (for the controller / other subtasks)

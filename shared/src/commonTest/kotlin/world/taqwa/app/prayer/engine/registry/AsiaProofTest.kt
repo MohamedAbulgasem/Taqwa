@@ -1,12 +1,17 @@
 package world.taqwa.app.prayer.engine.registry
 
+import kotlinx.datetime.LocalDate
 import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
+import world.taqwa.app.prayer.engine.method.curveSlot
+import world.taqwa.app.prayer.engine.registry.authorities.TwilightCurves
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -100,6 +105,49 @@ class AsiaProofTest {
         assertTrue(northMethod.margins.isha >= 11, "isha margin: ${northMethod.margins.isha}")
         assertEquals(0, southMethod.endOfEatingMarginSeconds)
         assertTrue(northMethod.endOfEatingMarginSeconds <= -374, "north end-of-eating margin: ${northMethod.endOfEatingMarginSeconds}")
+        // The north-west round (6 Oct 2026): QMDB's northernmost places and Ayagoz move Asr and Maghrib later.
+        assertTrue(northMethod.margins.asr >= -6, "asr margin: ${northMethod.margins.asr}")
+        assertTrue(northMethod.margins.maghrib >= -14, "maghrib margin: ${northMethod.margins.maghrib}")
+    }
+
+    @Test
+    fun `qmdb ends the fast earlier from 46 to 48 degrees north where its AngleBased Fajr binds`() {
+        // The north-west round (6 Oct 2026): at margin 0 the end of eating came up to 3 min after QMDB's
+        // printed Fajr around the solstice at Atyrau, Shalqar, Ayagoz and Oteshqali Atambayev. The band keeps
+        // QMDB's own minutes of 3 and carries its own end margin; below 46N the rule never binds.
+        val atyrau = assertNotNull(resolve(47.116667, 51.883333, "Asia/Atyrau", "KZ").method)
+        val edge = assertNotNull(resolve(46.0, 51.9, "Asia/Atyrau", "KZ").method)
+        val below = assertNotNull(resolve(45.99, 51.9, "Asia/Atyrau", "KZ").method)
+        val top = assertNotNull(resolve(47.994187, 51.622514, "Asia/Atyrau", "KZ").method)
+        for (method in listOf(atyrau, edge, top)) {
+            assertEquals(EventOffsets(sunrise = -3, dhuhr = 3, asr = 3, maghrib = 3), method.authorityMinutes)
+            assertTrue(method.endOfEatingMarginSeconds <= -150, "46-48N end-of-eating margin: ${method.endOfEatingMarginSeconds}")
+        }
+        assertEquals(0, below.endOfEatingMarginSeconds)
+    }
+
+    @Test
+    fun `qmdb reads its curves at the place's own latitude as well as the grid`() {
+        // QMDB's own Bugrovoe (55.049N) sits just short of a 0.1 degree step, so the grid alone read its curve
+        // at 55.0N, about 0.05 degrees to its south, and its Fajr came 1 min early against QMDB's printed one
+        // from the solstice to mid-August (north-west round, 6 Oct 2026). Each slot now takes the later start of
+        // the grid's curve and the place's own, and the end of eating the earlier dawn of the two.
+        val lat = 55.049091
+        val method = assertNotNull(resolve(lat, 69.724025, "Asia/Almaty", "KZ").method)
+        val grid = TwilightCurves.fajr(lat, 15.0) { 15.0 / 60 }
+        val own = TwilightCurves.fajr(lat, 15.0, onGrid = false) { 15.0 / 60 }
+        val fajr = assertNotNull(method.fajrAngleByDayOfYear)
+        val end = assertIs<EndOfEating.DawnAngle>(method.endOfEating)
+        val ends = assertNotNull(end.bySlot)
+        for (i in fajr.indices) {
+            assertTrue(fajr[i] <= minOf(grid[i], own[i]) + 1e-12, "slot $i: Fajr ${fajr[i]} deeper than a curve")
+            assertTrue(ends[i] >= maxOf(grid[i], own[i]) - 1e-12, "slot $i: end ${ends[i]} shallower than a curve")
+        }
+        // In mid-May the place's own curve is the shallower (the later Fajr): about 0.035 degrees, half a minute there.
+        val may = curveSlot(LocalDate(2026, 5, 15))
+        assertTrue(own[may] < grid[may] - 0.02, "15 May: own ${own[may]} vs grid ${grid[may]}")
+        assertEquals(own[may], fajr[may])
+        assertEquals(grid[may], ends[may])
     }
 
     @Test

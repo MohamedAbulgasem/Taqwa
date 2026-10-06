@@ -20,6 +20,24 @@
 # (they decide Fajr, Isha, Asr and Maghrib, as they decided the end of eating); Almaty 2027 and Kostanay
 # (its own zone, the farthest west) are held out. Northern lateness grows to Petropavl and is recorded as
 # kz.qmdb's Fajr (8 min) and Isha (5 min) limits (CentralAsia.kt, proof 7f).
+# North-west round (6 Oct 2026): 23 more of QMDB's own places from its city list (api.muftyat.kz/cities/), pinned as the
+# kz-qmdb fetcher read them on 6 Oct 2026 (archive/tables/pinned/kz-qmdb/2026-10-06/; raw JSON in
+# archive/raw/monitor/kz-qmdb/2026-10-06/, the city list in archive/raw/manual/kz-qmdb/2026-10-06/): north of Petropavl
+# to its northernmost (Isakovka 55.4N, Krasny Yar, Kulomzino); the west and every zone of the app's Kazakh cities (Oral
+# and Aksay, Asia/Oral; Aktobe, Khromtau and Shalqar, Asia/Aqtobe; Atyrau, Makat and Oteshqali Atambayev, Asia/Atyrau;
+# Aktau, Asia/Aqtau; Kyzylorda, Asia/Qyzylorda); the south to QMDB's southernmost (Shymkent; Zhenis, 40.6N); 46-48N,
+# where QMDB's offsets stay +-3 but its AngleBased rule binds around the solstice (Oteshqali Atambayev, QMDB's place
+# nearest 48N, and Ayagoz, with Shalqar, Atyrau, Mamyrsu and Makat); and places just either side of the engine's 0.1 deg
+# curve steps (Vagulino, Bugrovoe, Pulemetovka, Spasovka, Khromtau, Arkalyk, Oskemen, Mamyrsu, Makat, Kulomzino). All
+# went in first as test rows at the margins of 3 Oct: no start was early at the fourteen places north, west, south and
+# from 46 to 48N, but the end of eating came after QMDB's printed Fajr at Kulomzino (2 days, 1 min) and from 46 to 48N
+# (up to 3 min, late May to mid-June), and Isha went 1 min over its 5-min limit north of Petropavl; at the curve-step
+# places Fajr was 1 min early at QMDB's own Bugrovoe, Spasovka and Oskemen (27 days, the solstice to mid-August), whose
+# curve the 0.1 deg grid read about 0.05 deg south of them, and the end of eating 1 min late at Vagulino (2 days). Fixed
+# in the registry (CentralAsia.kt, TwilightCurves.kt, proof 7f): the curves are also read at each place's own latitude
+# (each slot the later start, the earlier end), a 46-48N end-of-eating margin (-150 s), Asr and Maghrib refitted later
+# (-6, -14), and Isha's limit 6 min. Fit rows: Isakovka and Krasny Yar (the edge) and Oteshqali Atambayev and Ayagoz
+# (the band's top); the other 19 are held out.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/centralasia/off_ala_h1.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jan-Jun 2026 (below 48N)
 archive/tables/moral-auth-world/centralasia/off_ala_h2.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jul-Dec 2026 (folded in, see above)
@@ -35,3 +53,49 @@ archive/tables/pinned/kz-qmdb/2026-10-03/pavlodar-2026.txt	kz.qmdb	52.315556	76.
 archive/tables/pinned/kz-qmdb/2026-10-03/pavlodar-2027.txt	kz.qmdb	52.315556	76.956389	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Pavlodar, 2027 (at/above 48N; QMDB year API, monitor capture of 3 Oct 2026)
 archive/tables/pinned/kz-qmdb/2026-10-03/petropavl-2026.txt	kz.qmdb	54.862222	69.140833	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Petropavl, 2026 (at/above 48N, the northernmost table; QMDB year API, monitor capture of 3 Oct 2026)
 archive/tables/pinned/kz-qmdb/2026-10-03/petropavl-2027.txt	kz.qmdb	54.862222	69.140833	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Petropavl, 2027 (at/above 48N, the northernmost table; QMDB year API, monitor capture of 3 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/isakovka-2026.txt	kz.qmdb	55.405802	68.935933	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Isakovka, 2026 (at/above 48N, QMDB's northernmost place; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/isakovka-2027.txt	kz.qmdb	55.405802	68.935933	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Isakovka, 2027 (at/above 48N, QMDB's northernmost place; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/krasny-yar-2026.txt	kz.qmdb	55.369280	69.367089	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Krasny Yar, 2026 (at/above 48N, north of Petropavl; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/krasny-yar-2027.txt	kz.qmdb	55.369280	69.367089	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Krasny Yar, 2027 (at/above 48N, north of Petropavl; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/kulomzino-2026.txt	kz.qmdb	55.250541	70.473193	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Kulomzino, 2026 (at/above 48N, north of Petropavl, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/kulomzino-2027.txt	kz.qmdb	55.250541	70.473193	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Kulomzino, 2027 (at/above 48N, north of Petropavl, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/oral-2026.txt	kz.qmdb	51.204019	51.370537	Asia/Oral	F+E S D A M I	daily	hanafi	test	Oral, 2026 (at/above 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/oral-2027.txt	kz.qmdb	51.204019	51.370537	Asia/Oral	F+E S D A M I	daily	hanafi	test	Oral, 2027 (at/above 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/aksay-2026.txt	kz.qmdb	51.164945	53.020868	Asia/Oral	F+E S D A M I	daily	hanafi	test	Aksay, 2026 (at/above 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/aksay-2027.txt	kz.qmdb	51.164945	53.020868	Asia/Oral	F+E S D A M I	daily	hanafi	test	Aksay, 2027 (at/above 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/aktobe-2026.txt	kz.qmdb	50.300377	57.154555	Asia/Aqtobe	F+E S D A M I	daily	hanafi	test	Aktobe, 2026 (at/above 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/aktobe-2027.txt	kz.qmdb	50.300377	57.154555	Asia/Aqtobe	F+E S D A M I	daily	hanafi	test	Aktobe, 2027 (at/above 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/shalqar-2026.txt	kz.qmdb	47.831392	59.619290	Asia/Aqtobe	F+E S D A M I	daily	hanafi	test	Shalqar, 2026 (46-48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/shalqar-2027.txt	kz.qmdb	47.831392	59.619290	Asia/Aqtobe	F+E S D A M I	daily	hanafi	test	Shalqar, 2027 (46-48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/atyrau-2026.txt	kz.qmdb	47.116667	51.883333	Asia/Atyrau	F+E S D A M I	daily	hanafi	test	Atyrau, 2026 (46-48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/atyrau-2027.txt	kz.qmdb	47.116667	51.883333	Asia/Atyrau	F+E S D A M I	daily	hanafi	test	Atyrau, 2027 (46-48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/aktau-2026.txt	kz.qmdb	43.635379	51.169135	Asia/Aqtau	F+E S D A M I	daily	hanafi	test	Aktau, 2026 (below 46N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/aktau-2027.txt	kz.qmdb	43.635379	51.169135	Asia/Aqtau	F+E S D A M I	daily	hanafi	test	Aktau, 2027 (below 46N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/kyzylorda-2026.txt	kz.qmdb	44.842544	65.502563	Asia/Qyzylorda	F+E S D A M I	daily	hanafi	test	Kyzylorda, 2026 (below 46N, its own zone; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/kyzylorda-2027.txt	kz.qmdb	44.842544	65.502563	Asia/Qyzylorda	F+E S D A M I	daily	hanafi	test	Kyzylorda, 2027 (below 46N, its own zone; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/shymkent-2026.txt	kz.qmdb	42.368009	69.612769	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Shymkent, 2026 (below 46N, the south; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/shymkent-2027.txt	kz.qmdb	42.368009	69.612769	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Shymkent, 2027 (below 46N, the south; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/zhenis-2026.txt	kz.qmdb	40.599543	68.504760	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Zhenis, 2026 (below 46N, QMDB's southernmost place; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/zhenis-2027.txt	kz.qmdb	40.599543	68.504760	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Zhenis, 2027 (below 46N, QMDB's southernmost place; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/oteshqali-2026.txt	kz.qmdb	47.994187	51.622514	Asia/Atyrau	F+E S D A M I	daily	hanafi	fit	Oteshqali Atambayev, 2026 (46-48N, QMDB's place nearest 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/oteshqali-2027.txt	kz.qmdb	47.994187	51.622514	Asia/Atyrau	F+E S D A M I	daily	hanafi	fit	Oteshqali Atambayev, 2027 (46-48N, QMDB's place nearest 48N, the west; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/ayagoz-2026.txt	kz.qmdb	47.966667	80.433333	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Ayagoz, 2026 (46-48N, the east; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/ayagoz-2027.txt	kz.qmdb	47.966667	80.433333	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Ayagoz, 2027 (46-48N, the east; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/vagulino-2026.txt	kz.qmdb	55.151518	69.262462	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Vagulino, 2026 (at/above 48N, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/vagulino-2027.txt	kz.qmdb	55.151518	69.262462	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Vagulino, 2027 (at/above 48N, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/bugrovoe-2026.txt	kz.qmdb	55.049091	69.724025	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Bugrovoe, 2026 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/bugrovoe-2027.txt	kz.qmdb	55.049091	69.724025	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Bugrovoe, 2027 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/pulemetovka-2026.txt	kz.qmdb	54.551120	70.421316	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Pulemetovka, 2026 (at/above 48N, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/pulemetovka-2027.txt	kz.qmdb	54.551120	70.421316	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Pulemetovka, 2027 (at/above 48N, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/spasovka-2026.txt	kz.qmdb	54.349933	67.721896	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Spasovka, 2026 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/spasovka-2027.txt	kz.qmdb	54.349933	67.721896	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Spasovka, 2027 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/khromtau-2026.txt	kz.qmdb	50.250278	58.434722	Asia/Aqtobe	F+E S D A M I	daily	hanafi	test	Khromtau, 2026 (at/above 48N, the west, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/khromtau-2027.txt	kz.qmdb	50.250278	58.434722	Asia/Aqtobe	F+E S D A M I	daily	hanafi	test	Khromtau, 2027 (at/above 48N, the west, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/arkalyk-2026.txt	kz.qmdb	50.248611	66.911389	Asia/Qostanay	F+E S D A M I	daily	hanafi	test	Arkalyk, 2026 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/arkalyk-2027.txt	kz.qmdb	50.248611	66.911389	Asia/Qostanay	F+E S D A M I	daily	hanafi	test	Arkalyk, 2027 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/oskemen-2026.txt	kz.qmdb	49.948325	82.627848	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Oskemen, 2026 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/oskemen-2027.txt	kz.qmdb	49.948325	82.627848	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Oskemen, 2027 (at/above 48N, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/mamyrsu-2026.txt	kz.qmdb	47.951147	80.382042	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Mamyrsu, 2026 (46-48N, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/mamyrsu-2027.txt	kz.qmdb	47.951147	80.382042	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Mamyrsu, 2027 (46-48N, just past a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/makat-2026.txt	kz.qmdb	47.647520	53.349220	Asia/Atyrau	F+E S D A M I	daily	hanafi	test	Makat, 2026 (46-48N, the west, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
+archive/tables/pinned/kz-qmdb/2026-10-06/makat-2027.txt	kz.qmdb	47.647520	53.349220	Asia/Atyrau	F+E S D A M I	daily	hanafi	test	Makat, 2027 (46-48N, the west, just short of a 0.1 deg curve step; QMDB year API, capture of 6 Oct 2026)
