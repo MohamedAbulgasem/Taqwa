@@ -2,7 +2,13 @@
 current Hijri month, for the ten cities ma-habous.tsv checks. The page prints the legal time, UTC+0
 all the year round since 20 September 2026 (ClockChanges), so the table is read with `clock` UTC
 like the gate's live rows. Habous prints no imsak: the fast begins at its Fajr (F+E). Restricted:
-archive only."""
+archive only.
+
+The Ministry publishes one Hijri month at a time, on the day it begins (after the sighting on the
+evening of the 29th), with 30 rows from its first day; nothing further ahead (no year table, PDF,
+month parameter or app data, 6 Oct 2026). Each city's file keeps every month fetched (the store
+merges), and the source's cadence `hijri-month` fetches the new month as it turns. The site's server
+omits its certificate's intermediate: common.EXTRA_CA completes the chain (monitor/certs/)."""
 import datetime as dt
 import html
 import re

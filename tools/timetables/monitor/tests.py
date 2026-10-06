@@ -1096,6 +1096,177 @@ class MonthStart(unittest.TestCase):
         self.assertEqual(None, due_at("2026-10-31T22:00:00Z"), "November begins at midnight in Cape Town")
 
 
+def hijri_month_rows(first, days=30):
+    """An invented Habous-shaped month: `days` rows from `first`, each time the day's number as minutes
+    of hours no Moroccan table prints (ruling R69)."""
+    out = {}
+    for i in range(days):
+        d = first + dt.timedelta(days=i)
+        out[d.isoformat()] = [f"0{h}:{d.day:02d}" for h in (1, 2, 3, 4, 5, 6)]
+    return out
+
+
+class HijriMonth(unittest.TestCase):
+    """The hijri-month cadence (Habous: the current Hijri month alone, 30 rows from its first day, published
+    the day it begins): weekly, and due on every run while the month turns, from the last day held to three
+    days after it; the workflow's daily check (`--month-turn`) asks the same question of the state alone."""
+
+    ROW = {"source": "ma-habous", "fetcher": "morocco", "cadence": "hijri-month"}
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-hijri")
+        os.makedirs(os.path.join(self.root, "archive"))
+        self.monitor = os.path.join(self.root, "monitor")
+
+    def tearDown(self):
+        shutil.rmtree(self.root)
+
+    def held(self, store, key, first, days=30, source="ma-habous"):
+        t = Table(key, key.title(), None, None, "Africa/Casablanca", "MA", "F+E S D A M I", entry=f"ma.habous/{key}", clock="UTC")
+        for d, times in hijri_month_rows(first, days).items():
+            t.add(d, times)
+        return store.record(source, t)
+
+    def test_the_turn_runs_from_the_last_day_held_to_three_days_after(self):
+        self.assertIn("hijri-month", CADENCES)
+        last = dt.date(2026, 10, 12)
+        self.assertFalse(fetch.month_turn_due(None, last), "nothing held: the weekly cadence fetches it")
+        self.assertFalse(fetch.month_turn_due(last, dt.date(2026, 10, 11)))
+        self.assertTrue(fetch.month_turn_due(last, last), "a 29-day month: the page's 30th row is the next month's first day")
+        self.assertTrue(fetch.month_turn_due(last, dt.date(2026, 10, 13)))
+        self.assertTrue(fetch.month_turn_due(last, dt.date(2026, 10, 15)))
+        self.assertFalse(fetch.month_turn_due(last, dt.date(2026, 10, 16)), "a page that has not moved is fetched weekly again")
+        self.assertEqual(3, fetch.MONTH_TURN_DAYS)
+
+    def test_due_weekly_and_while_the_month_turns(self):
+        def reason(today, last_fetch, held_last, retry=False, only=(), force=False):
+            return skip_reason(self.ROW, last_fetch, today, set(only), force, retry=retry, held_last=held_last)
+        held = dt.date(2026, 10, 12)
+        # Mid-month: weekly, six days after the last fetch.
+        self.assertEqual("not due", reason(dt.date(2026, 10, 2), dt.date(2026, 9, 28), held))
+        self.assertEqual(None, reason(dt.date(2026, 10, 5), dt.date(2026, 9, 28), held))
+        # The turn: due on every run, the day after a fetch included.
+        self.assertEqual(None, reason(dt.date(2026, 10, 12), dt.date(2026, 10, 11), held))
+        self.assertEqual(None, reason(dt.date(2026, 10, 13), dt.date(2026, 10, 12), held))
+        self.assertEqual(None, reason(dt.date(2026, 10, 15), dt.date(2026, 10, 14), held))
+        # Past the turn with the page unmoved: weekly again.
+        self.assertEqual("not due", reason(dt.date(2026, 10, 16), dt.date(2026, 10, 15), held))
+        self.assertEqual(None, reason(dt.date(2026, 10, 21), dt.date(2026, 10, 15), held))
+        # Never fetched, the retry, --only and --force, as for every cadence.
+        self.assertEqual(None, reason(dt.date(2026, 10, 2), None, None))
+        self.assertEqual(None, reason(dt.date(2026, 10, 2), dt.date(2026, 10, 1), held, retry=True))
+        self.assertEqual(None, reason(dt.date(2026, 10, 2), dt.date(2026, 10, 1), held, only=("ma-habous",)))
+        self.assertEqual(None, reason(dt.date(2026, 10, 2), dt.date(2026, 10, 1), held, force=True))
+        self.assertTrue(due(self.ROW, dt.date(2026, 10, 11), dt.date(2026, 10, 12), set(), False, held_last=held))
+        # Another cadence never reads the turn.
+        weekly = dict(self.ROW, cadence="weekly")
+        self.assertEqual("not due", skip_reason(weekly, dt.date(2026, 10, 11), dt.date(2026, 10, 12), set(), False, held_last=held))
+
+    def test_the_last_day_held_is_the_earliest_of_the_current_tables(self):
+        store = Store(self.root, self.monitor, dt.date(2026, 9, 28))
+        self.assertIsNone(store.held_last("ma-habous"))
+        self.held(store, "rabat", dt.date(2026, 9, 13))
+        self.held(store, "oujda", dt.date(2026, 9, 13))
+        self.assertEqual(dt.date(2026, 10, 12), store.held_last("ma-habous"))
+        # The next month for Rabat alone: Oujda's missing month keeps the turn open.
+        store.today = dt.date(2026, 10, 13)
+        self.held(store, "rabat", dt.date(2026, 10, 13))
+        self.assertEqual("2026-11-11", store.data["tables"]["ma-habous/rabat"]["last"])
+        self.assertEqual(dt.date(2026, 10, 12), store.held_last("ma-habous"))
+        self.held(store, "oujda", dt.date(2026, 10, 13))
+        self.assertEqual(dt.date(2026, 11, 11), store.held_last("ma-habous"))
+        # A city the page no longer lists, over 40 days behind the newest, no longer holds the turn open.
+        self.held(store, "gone", dt.date(2026, 8, 14))
+        self.assertEqual(dt.date(2026, 11, 11), store.held_last("ma-habous"))
+        # Another source's tables are not this source's.
+        self.held(store, "x", dt.date(2026, 9, 1), source="other")
+        self.assertEqual(dt.date(2026, 11, 11), store.held_last("ma-habous"))
+
+    def test_what_a_failed_turn_says_happens_next(self):
+        store = Store(self.root, self.monitor, dt.date(2026, 10, 13))
+        self.held(store, "rabat", dt.date(2026, 9, 13))
+        self.assertEqual("retried on the next run, once", fetch.next_time(store, self.ROW))
+        store.source_done("ma-habous", "failed", "a reason", 1)
+        self.assertIn("stays due on every run until 2026-10-15 (3 days after the last day held, 2026-10-12), then weekly",
+                      fetch.next_time(store, self.ROW))
+        store.today = dt.date(2026, 10, 20)
+        self.assertIn("waits for its cadence (weekly, and on every run from 2026-10-12", fetch.next_time(store, self.ROW))
+
+    def write_sources(self, extra=""):
+        path = os.path.join(self.root, "sources.tsv")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("source\tentries\tfetcher\tcadence\tnext_expected\tpoints\tnote\n")
+            f.write("ma-habous\tma.habous\tfakehijri\thijri-month\t-\tp\tn\n")
+            f.write("za-jamiat\tza.jamiat\tjamiat\tmonthly\t-\tp\tn\n")
+            f.write(extra)
+        return path
+
+    def month_turn(self, today, sources, official=None):
+        import contextlib
+        import io as _io
+        out = _io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = fetch.main(["--official", official or self.root, "--sources", sources, "--today", today, "--month-turn"])
+        return code, out.getvalue().split()
+
+    def test_the_daily_check_reads_the_state_alone_and_names_a_turning_source(self):
+        sources = self.write_sources("ma-print\tma.habous\tmanual\thijri-month\t2027-01\tp\tn\n")
+        store = Store(self.root, self.monitor, dt.date(2026, 9, 28))
+        self.held(store, "rabat", dt.date(2026, 9, 13))
+        store.save()
+        # The workflow's check has the state and no archive.
+        state_only = tempfile.mkdtemp("monitor-state-only")
+        try:
+            os.makedirs(os.path.join(state_only, "monitor"))
+            shutil.copy(os.path.join(self.monitor, "hashes.json"), os.path.join(state_only, "monitor", "hashes.json"))
+            self.assertEqual((0, []), self.month_turn("2026-10-11", sources, state_only))
+            self.assertEqual((0, ["ma-habous"]), self.month_turn("2026-10-12", sources, state_only), "a source read by hand is never named")
+            self.assertEqual((0, ["ma-habous"]), self.month_turn("2026-10-15", sources, state_only))
+            self.assertEqual((0, []), self.month_turn("2026-10-16", sources, state_only))
+            self.assertFalse(os.path.exists(os.path.join(state_only, "monitor", "fetch")), "the check writes nothing")
+            # No state at all: nothing turning.
+            self.assertEqual((0, []), self.month_turn("2026-10-12", sources, tempfile.gettempdir() + "/no-such-monitor-root"))
+        finally:
+            shutil.rmtree(state_only)
+
+    def test_a_run_at_the_turn_fetches_until_the_new_month_is_held(self):
+        import types
+        pages = {"first": dt.date(2026, 9, 13)}
+
+        def fake_fetch(ctx):
+            t = Table("rabat", "Rabat", None, None, "Africa/Casablanca", "MA", "F+E S D A M I", entry="ma.habous/rabat", clock="UTC")
+            for d, times in hijri_month_rows(pages["first"]).items():
+                t.add(d, times)
+            return [t]
+        module = types.ModuleType("fetchers.fakehijri")
+        module.fetch = fake_fetch
+        sys.modules["fetchers.fakehijri"] = module
+        sources = self.write_sources()
+        try:
+            def run(today):
+                code = fetch.main(["--official", self.root, "--sources", sources, "--today", today])
+                self.assertEqual(0, code)
+                with open(os.path.join(self.monitor, "fetch", "latest.json")) as f:
+                    return json.load(f)["sources"]["ma-habous"]
+            self.assertEqual("ok", run("2026-09-28")["status"], "never fetched: due")
+            self.assertEqual("not due", run("2026-10-02")["message"])
+            # 12 October, the last day held: the page still shows the old month (a 30-day month).
+            out = run("2026-10-12")
+            self.assertEqual(("ok", {"rabat": "unchanged"}), (out["status"], out["tables"]))
+            self.assertEqual((0, ["ma-habous"]), self.month_turn("2026-10-13", sources))
+            # 13 October: the new month is up, and held; the turn is over.
+            pages["first"] = dt.date(2026, 10, 13)
+            out = run("2026-10-13")
+            self.assertEqual(("ok", {"rabat": "changed"}), (out["status"], out["tables"]))
+            rows = read_table_rows(os.path.join(self.root, "archive", "tables", "monitor", "ma-habous", "rabat.txt"))
+            self.assertEqual(("2026-09-13", "2026-11-11", 60), (min(rows), max(rows), len(rows)), "the file keeps both months")
+            self.assertEqual("not due", run("2026-10-14")["message"])
+            self.assertEqual((0, []), self.month_turn("2026-10-14", sources))
+            self.assertEqual("ok", run("2026-10-19")["status"], "weekly as before")
+        finally:
+            del sys.modules["fetchers.fakehijri"]
+
+
 class Tls(unittest.TestCase):
     """habous.gov.ma sends its certificate without Sectigo's intermediate; the committed chain completes it
     for that host's requests alone, with verification on (the cloud run of 5 October 2026 failed on it)."""
@@ -1286,6 +1457,12 @@ class Catalogue(unittest.TestCase):
         self.assertIn("za.cape", mine[0]["entries"])
         self.assertEqual("za-mjc", mjc.SOURCE)
         self.assertEqual("za.mjc/za.mjc", mjc.ENTRY, "the entry's one unit, as za-cape.tsv holds the MJC's table")
+        habous = [r for r in rows if r["source"] == "ma-habous"]
+        self.assertEqual([("morocco", "hijri-month", "-")], [(r["fetcher"], r["cadence"], r["next_expected"]) for r in habous],
+                         "Habous publishes one Hijri month at a time, on its first day: fetched as the month turns")
+        self.assertEqual("ma-habous", morocco.SOURCE)
+        self.assertEqual("habous.gov.ma.pem", common.EXTRA_CA["www.habous.gov.ma"])
+        self.assertTrue(os.path.isfile(os.path.join(common.CERTS, common.EXTRA_CA["www.habous.gov.ma"])))
 
 
 # bonnetid.info as it has been since late September 2026: a searchable city list instead of a select,

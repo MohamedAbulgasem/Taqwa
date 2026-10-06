@@ -18,11 +18,16 @@ needs attention, so that a Claude session can act on it.
    budget of 90 minutes), normalised into the gate's layout under `<official>/archive/tables/monitor/<source>/`,
    with a content hash so an unchanged table is recognised. The raw responses of new or changed
    tables are kept gzipped under `archive/raw/monitor/<source>/<date>/`. A source's cadence is
-   weekly, monthly or month-start; one with cadence `manual` runs only when named; a source whose
-   fetcher is `manual` is read by hand. A month-start source is a page that shows the current month
-   alone and drops it when the next begins (the MJC's): it is due as soon as a new month has begun
-   in Africa/Johannesburg since its last complete fetch, so it stays due until that month is
-   captured whole, and each month is kept as its own capture. A fetcher that fails is a finding in
+   weekly, monthly, month-start or hijri-month; one with cadence `manual` runs only when named; a
+   source whose fetcher is `manual` is read by hand. A month-start source is a page that shows the
+   current month alone and drops it when the next begins (the MJC's): it is due as soon as a new month
+   has begun in Africa/Johannesburg since its last complete fetch, so it stays due until that month is
+   captured whole, and each month is kept as its own capture. A hijri-month source is a page that shows
+   the current Hijri month alone, from its first day, and turns on the day the new month begins, which
+   the moon's sighting decides (Habous's): it is weekly, and due besides on every run from the last day
+   its tables hold until three days after it, until the new month is held (`MONTH_TURN_DAYS` in
+   `fetch.py`; a page that has not moved by then is a fetch finding, fetched weekly again). Its
+   tables keep every month fetched. A fetcher that fails is a finding in
    the report, never a crash, and a driver that breaks is one too (what is held is still checked). A
    source that failed or came back in part is fetched once more on the next run, then waits for its
    cadence (one mosque gone from Mawaqit for good does not refetch all 125 calendars weekly; a
@@ -104,7 +109,8 @@ restricted archive and the monitor's state. Setting it up, once:
    else stops the job). The first run exercises every fetcher from GitHub's addresses; a site that
    refuses them stays `manual` in `sources.tsv`. Remember that `--only` is a partial run.
 
-Each run (Mondays 03:00 UTC, the 1st of each month 03:17 UTC, and on request) checks out the
+Each run (Mondays 03:00 UTC, the 1st of each month 03:17 UTC, the days a new Hijri month is due, and
+on request) checks out the
 private repository at its branch's head and the public one at `main` into `taqwa/` (neither
 checkout keeps a token; the commit step alone is given one), installs Temurin 21
 (with Gradle caching keyed on `gradle/libs.versions.toml` too) and Python, runs
@@ -126,6 +132,19 @@ that fetched, drops out on the 1st when its source is not due that day (the issu
 closed if that was all, and the next Monday raises it again); and when the 1st is a Monday the two
 runs queue, the second finds nothing new due and rewrites that day's report (the first's stays in
 the repository's history).
+
+**The daily check.** Habous (`ma-habous`) publishes one Hijri month at a time, on the day it begins,
+and a city page shows only days the gate has checked, so the new month is worth fetching the day it
+appears, not the Monday after. The workflow therefore also fires every day at 01:23 UTC (after midnight
+in Morocco), where a small first job, `due`, checks out only the archive repository's `monitor/` and
+the public repository's monitor code and runs `fetch.py --month-turn`: it reads `monitor/hashes.json`
+alone and prints each hijri-month source whose month is turning today. Only when it prints one does the
+full run follow, a normal one like the 1st's (whatever else is due is fetched too, then the check,
+prove and the push); on every other day the run stops there, touching nothing. Mondays, the 1st and a
+run by hand never ask. With the sighting deciding between two days, the turn is due from the last day
+held: on that day itself a 29-day month has already turned (the page's 30th row is the new month's
+first day), otherwise the next day's run finds it. GitHub may start a scheduled run hours late; the new
+month is still captured within about a day of its publication.
 
 **The issue.** One issue titled "Taqwa monitor", labelled `monitor-attention`, is open while
 something needs attention. Its body (at most 60,000 characters, always ending with the pointer to
@@ -262,6 +281,8 @@ token or deleted.
 
     python3 tools/timetables/monitor/fetch.py --official <root> [--only <source>] [--force] [--budget-minutes N]
                                               [--now <ISO 8601 moment: a month-start source's clock, for a test>]
+    python3 tools/timetables/monitor/fetch.py --official <root> --month-turn [--today yyyy-mm-dd]
+                                              (fetches nothing: the hijri-month sources whose new month is due)
     ./gradlew -p tools/timetables monitor -Pofficial=<root> [-PcheckAll=true] [-PskipFull=true] [-Ptoday=yyyy-mm-dd]
     python3 -m unittest tools/timetables/monitor/tests.py
     ./gradlew -p tools/timetables jvmTest --tests 'world.taqwa.timetables.monitor.*'
@@ -293,7 +314,8 @@ repository.
 ## Where things live
 
 - Code: `scripts/monitor.sh`; `tools/timetables/monitor/` (`fetch.py`, `backup.py`, `common.py`,
-  `fetchers/*.py`, `tests.py`, `ci/monitor-weekly.yml`); `tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/monitor/`
+  `fetchers/*.py`, `certs/` (public certificates that complete a server's incomplete chain), `tests.py`,
+  `ci/monitor-weekly.yml`); `tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/monitor/`
   (`MonitorMain`, `TableCheck`, `Horizons`, `Report`, `MonitorIndex`) and the `monitor` task in
   `tools/timetables/build.gradle.kts`.
 - Catalogue: `tools/timetables/official/monitor/sources.tsv` (committed, metadata only).
@@ -308,7 +330,9 @@ repository.
 Trondheim among them), Kemenag (eighteen kab/kota, Surabaya, Medan, Semarang, Palembang and
 Yogyakarta among them), JAKIM, MUIS, Egypt (ESA via Dar al-Ifta, and ESA's daily page), Qatar (the
 ministry API and the Calendar House header), Libya (the Awqaf widget and api.ifta.ly), Tunisia (INM),
-Morocco (Habous), Jamiatul Ulama, the Muslim Judicial Council (mjc.org.za's current month for Cape
+Morocco (Habous: the live Hijri month, fetched as each month turns; its server omits its
+certificate's intermediate, which `tools/timetables/monitor/certs/habous.gov.ma.pem` completes for that
+host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, the Muslim Judicial Council (mjc.org.za's current month for Cape
 Town, month-start, each month kept as `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
 unit and as za.cape's member there), IRN (bonnetid.info's own month tables, no token, ruling R95; its
 searchable city list and month bar since October 2026), and since 2 October 2026 Jordan's Ministry of

@@ -108,7 +108,7 @@ data class FetchLog(val date: LocalDate, val sources: List<SourceRun>, val error
 /**
  * One line of the committed catalogue `official/monitor/sources.tsv`: the source id, the
  * registry entries it proves, its fetcher (`manual` for a source read by hand), its cadence
- * (`weekly`, `monthly`, `month-start`, `manual`; the fetch half decides what is due), when its next
+ * (`weekly`, `monthly`, `month-start`, `hijri-month`, `manual`; the fetch half decides what is due), when its next
  * edition is expected (a date, or `-`), the points fetched and a note. Metadata only.
  */
 data class Source(

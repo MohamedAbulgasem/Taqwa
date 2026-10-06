@@ -49,7 +49,7 @@ class MonitorReportTest {
     fun `the committed catalogue reads and names every fetcher or manual`() {
         val sources = Source.load(TestPaths.repoRoot.resolve("tools/timetables/official/monitor/sources.tsv"))
         assertTrue(sources.size >= 10)
-        assertTrue(sources.all { it.cadence in setOf("weekly", "monthly", "month-start", "manual") }, sources.joinToString { it.cadence })
+        assertTrue(sources.all { it.cadence in setOf("weekly", "monthly", "month-start", "hijri-month", "manual") }, sources.joinToString { it.cadence })
         assertTrue(sources.all { !it.manual || it.nextExpected != null || it.fetcher != "manual" }, "a source read by hand names when its next edition is expected")
         val fetchers = TestPaths.repoRoot.resolve("tools/timetables/monitor/fetchers").listFiles { f -> f.extension == "py" }!!.map { it.nameWithoutExtension }.toSet()
         for (s in sources.filter { it.fetcher != "manual" }) assertTrue(s.fetcher in fetchers, "${s.id}: no fetcher ${s.fetcher}.py")
@@ -60,6 +60,10 @@ class MonitorReportTest {
         val mjc = sources.first { it.id == "za-mjc" }
         assertEquals("mjc" to "month-start", mjc.fetcher to mjc.cadence)
         assertTrue(!mjc.manual && mjc.nextExpected == null)
+        // Habous publishes one Hijri month at a time, on its first day: fetched as the month turns.
+        val habous = sources.first { it.id == "ma-habous" }
+        assertEquals("morocco" to "hijri-month", habous.fetcher to habous.cadence)
+        assertTrue(!habous.manual && habous.nextExpected == null)
         // Metadata only (ruling R69): no printed time in the catalogue.
         val time = Regex("""\b\d{1,2}:\d{2}\b""")
         assertTrue(sources.none { time.containsMatchIn(it.points) || time.containsMatchIn(it.note) })

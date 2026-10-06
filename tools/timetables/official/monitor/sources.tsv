@@ -4,8 +4,11 @@
 # `fetcher` names the module in tools/timetables/monitor/fetchers/ (`manual` for a source with no
 # working endpoint: PDFs, images, a site that refuses scripted access). `cadence` is weekly, monthly,
 # month-start (a page that shows the current month alone: due as soon as a new month has begun in
-# Africa/Johannesburg since the source's last complete fetch, so due until that month is captured whole)
-# or manual (a fetcher with cadence manual runs only when named with --only); `next_expected` (a date or a
+# Africa/Johannesburg since the source's last complete fetch, so due until that month is captured whole),
+# hijri-month (a page that shows the current Hijri month alone and turns on its first day: weekly, and
+# besides on every run from the last day its tables hold until the next month is held, at most three days
+# after it; the workflow's daily check starts a run for it) or manual (a fetcher with cadence manual runs
+# only when named with --only); `next_expected` (a date or a
 # month, or `-`) is when a source read by hand expects its next edition — the report says "due" once it
 # passes; move it on after the edition is in the archive. Every fetched table is checked as the entry
 # Automatic follows at its point: a cautious entry's member row beside the table's own entry.
@@ -23,7 +26,7 @@ qa-calendarhouse-print	qa.calendarhouse	manual	manual	2027-01	Calendar House's p
 ly-awqaf	ly.awqaf	libya	weekly	-	the 22 cities of awqaf.gov.ly's widget (today, with imsak) and api.ifta.ly's eight days for Tripoli	each run appends a day per city, so a full Tripoli year builds up (spec §6.3); east and south of R73's line Fajr, Maghrib and imsak are not checked
 jo-awqaf	jo.awqaf	jordan	weekly	-	Amman (jo.awqaf's unit) and Zarqa: the ministry's table for its region 1 (Amman, Balqa, Zarqa, Madaba), today and the 99 days after	awqaf.gov.jo AR/Pages/PrayerTime, an ASP.NET form walked by its own pager within one session (its date search fails server-side); 12-hour times without AM or PM; each run adds its days, so the months build up; restricted: archive only
 tn-inm	tn.inm	tunisia	weekly	-	the 6 delegations of tn-inm.tsv (Tunis, Sfax, Tabarka, Ben Guerdane, Tataouine, Tala): the coming 7 days, with INM's sunrise	meteo.tn horaire_gouvernorat and lever_coucher_gouvernorat, one request a day each; restricted: archive only
-ma-habous	ma.habous	morocco	weekly	-	the 10 cities of ma-habous.tsv: the live Hijri month page, printed in Morocco's legal time (UTC+0 all year since 20 Sep 2026)	habous.gov.ma prieres/index.php?ville=…; restricted: archive only
+ma-habous	ma.habous	morocco	hijri-month	-	the 10 cities of ma-habous.tsv: the live Hijri month page, printed in Morocco's legal time (UTC+0 all year since 20 Sep 2026)	habous.gov.ma prieres/index.php?ville=…, 30 rows from the month's first day; the Ministry publishes one Hijri month at a time, on the day it begins (its moon-sighting notice, مراقبة الأهلة, names the evening of the next sighting): no year table, PDF, month parameter or app data; the server omits its certificate's intermediate (monitor/certs/habous.gov.ma.pem completes it); no terms stated, so restricted: archive only
 za-jamiat	za.jamiat	jamiat	monthly	-	the 8 towns' perpetual CSVs, mapped onto the current year and the next	salaahtimes.starlite.za.net export (linked from jamiat.org.za); a perpetual table, so a changed file is the news
 kz-qmdb	kz.qmdb	qmdb	monthly	-	Almaty and Astana (the gate's two points) and QMDB's own Kokshetau, Kostanay, Pavlodar and Petropavl, the current year and the next	api.muftyat.kz/prayer-times/<year>/<lat>/<lon>, the year API muftyat.kz calls (terms not found; used only to fit and prove); the northern cities hold the end of eating's margin at and above 48N to account (end-of-eating fix round, 3 Oct 2026)
 za-mjc	za.mjc (and za.cape as its member)	mjc	month-start	-	Cape Town: the Muslim Judicial Council's "This Month" table, the current month only (calculated for Cape Town, SAST), each month kept as its own capture; checked at za.mjc's unit, its Cape Town point -33.92584, 18.42322, and there as za.cape's member	mjc.org.za/salaah-times/, a server-rendered WordPress page with no month parameter, form or API: the page drops a month when the next begins, so month-start (and the workflow's run on the 1st); the caption gives the month and year, the rows only a weekday and a day; restricted: archive only

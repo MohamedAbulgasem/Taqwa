@@ -8,6 +8,11 @@
 # the current month alone and drops it when the next begins (a month-start source in sources.tsv).
 # The run on the 1st is a normal full run: whatever is due is fetched, and the issue follows the same
 # rules; when the 1st is a Monday the second run waits for the first and finds nothing new due.
+# Every day at 01:23 UTC the job "due" asks the monitor's state alone (fetch.py --month-turn) whether a
+# source's new Hijri month is due today: habous.gov.ma publishes one Hijri month at a time, on the day
+# it begins, which the moon's sighting decides (a hijri-month source in sources.tsv, due from the last
+# day its tables hold until three days after). Only then does the full run follow, a normal one like
+# the 1st's; on every other day nothing runs past that check and nothing is touched.
 #
 # Each run checks out the archive repository at its branch's head and the public Taqwa repository
 # at main into taqwa/ (neither checkout keeps a token; the commit step alone is given one), runs
@@ -41,6 +46,7 @@ on:
   schedule:
     - cron: "0 3 * * 1" # Mondays 03:00 UTC
     - cron: "17 3 1 * *" # the 1st of each month, 03:17 UTC (two hours later in Cape Town): the MJC's new month
+    - cron: "23 1 * * *" # every day, 01:23 UTC: the daily check, a full run only when a new Hijri month is due (job "due")
   workflow_dispatch:
     inputs:
       options:
@@ -57,7 +63,60 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  due:
+    # The daily check (the cron "23 1 * * *" alone): the monitor's state and code, no archive, and
+    # fetch.py --month-turn, which prints each hijri-month source whose new month is due today. The full
+    # run follows only when it prints one. Mondays, the 1st and a run by hand go ahead without asking.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - name: Check out the monitor's state
+        if: github.event_name == 'schedule' && github.event.schedule == '23 1 * * *'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: false
+          sparse-checkout: monitor
+
+      - name: Check out Taqwa's monitor code
+        if: github.event_name == 'schedule' && github.event.schedule == '23 1 * * *'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: MohamedAbulgasem/Taqwa
+          ref: main
+          path: taqwa
+          persist-credentials: false
+          sparse-checkout: |
+            tools/timetables/monitor
+            tools/timetables/official/monitor
+
+      - name: Is a new month due today?
+        id: decide
+        env:
+          DAILY: ${{ github.event_name == 'schedule' && github.event.schedule == '23 1 * * *' }}
+        run: |
+          set -euo pipefail
+          if [ "$DAILY" != true ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Not the daily check: the run goes ahead"
+            exit 0
+          fi
+          turning="$(python3 taqwa/tools/timetables/monitor/fetch.py --official "$GITHUB_WORKSPACE" --month-turn | tr '\n' ' ' | sed 's/ *$//')"
+          if [ -n "$turning" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "A new month is due today ($turning): the full run goes ahead"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No source's new month is due today: nothing runs"
+          fi
+
   monitor:
+    needs: due
+    # Every event but the daily check runs whatever "due" did (unless the run was cancelled); the daily
+    # check runs only on its yes.
+    if: ${{ !cancelled() && (needs.due.outputs.run == 'true' || github.event_name != 'schedule' || github.event.schedule != '23 1 * * *') }}
     runs-on: ubuntu-latest
     timeout-minutes: 170
     env:

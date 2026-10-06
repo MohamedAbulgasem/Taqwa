@@ -2472,3 +2472,58 @@ GoldenVector, ProofStamps and AboutTimes filters passed (110/0), and `AsiaProofT
 Isha limits may be a minute short there, and the end of eating's margin is on the unsafe side. The
 west (Oral, Aktobe, Atyrau, Aktau) is within the measured latitudes but has no table. The engine
 change ships with the first update, not 1.0.0 (35).
+
+## Morocco's next Hijri month, fetched the day it appears (6–7 October, overnight)
+
+Morocco's city pages are held: the Habous capture covers 13 September to 12 October 2026 (Rabiʿ
+al-Akhir 1448), and a page shows only whole Gregorian months whose every day is checked (rulings R115,
+R116). This round asked whether the Ministry publishes further ahead, and makes the monitor fetch each
+new Hijri month as soon as it appears.
+
+**What the Ministry publishes.** One Hijri month at a time, on the day it begins. Each month's
+announcement in the moon-sighting section (مراقبة الأهلة) is dated its first day, links the live page
+`prieres/index.php?ville=…` (30 rows from the first day, for about 190 places), and names the evening
+of the next sighting: Jumada al-Ula 1448 is watched for on Sunday 11 October, so it begins on 12 or 13
+October. There is no yearly table, no PDF, and no month or year parameter: the old
+`horaire_hijri.php?mois=` pages are frozen in 1433 and 1434 AH, `horaire-api.php` is today's widget, and
+the Ministry's own app (Rakb Al Hajj) is for pilgrims. The pages state no terms of use, so the tables
+stay restricted, archive only. On 6 October the live page still showed Rabiʿ al-Akhir, identical cell
+for cell at all ten cities to the capture of 28 September. Nothing beyond 12 October exists to gate yet.
+
+**Why the cloud never fetched it.** The run of 5 October failed at every Habous city: the server sends
+its certificate without Sectigo's intermediate. The Mac's TLS stacks find it by themselves, so the
+capture of 28 September worked there; the runner's OpenSSL and curl do not. The two public certificates
+that complete the chain are now in `tools/timetables/monitor/certs/habous.gov.ma.pem` (the DV R36
+intermediate, valid to 2036, and the R46 root cross-signed by USERTrust, valid to 2038). `common.py`
+adds them to the trust store for habous.gov.ma's requests alone, with verification on. With a store
+that holds only the USERTrust root, the site now verifies; without the file it fails, as on the runner.
+Homebrew's Python 3.13, which failed before, now reaches the site without curl, as does the Mac's
+Python 3.9. The site's certificate runs to 9 February 2027: if its renewal comes from another
+intermediate, the fetch fails again with the same message.
+
+**The cadence.** `ma-habous` is now `hijri-month`. It stays weekly, and is due besides on every run from
+the last day its tables hold until three days after it, until the new month is held. Whether the month
+has 29 or 30 days is decided by the sighting. A 29-day month has already turned on the last day held
+(the page's 30th row is the next month's first day); a 30-day month turns the day after. So the rule
+needs no calendar. A page that has not moved three days after the last day held is a fetch finding,
+fetched weekly again. The workflow fires every day at 01:23 UTC too: a small job `due` checks out only
+the state and the monitor code, and `fetch.py --month-turn` prints each source whose month is turning.
+Only then does the full run follow, a normal one like the 1st's (fetch, check, prove, push). Against the
+cloud's own state of 5 October it says yes on 12–15 October and no on the other days. The private
+repository's workflow file needs the new template, copied after this change is on Taqwa's `main`
+(before that, the daily check would call a `--month-turn` that `main` does not have).
+
+**What the pages would show** (ruling R116 unchanged). With capture within a day, a Moroccan page
+(Casablanca, Rabat, Tangier, and any other Habous unit city) is held each month from the 1st until the
+Hijri month that reaches its last day is captured, about the 8th to the 14th. From 7 October 2026 to 6
+April 2027 (182 days) that is 117 to 129 days live and 53 to 65 held, over the 49 month sequences the
+sighting allows (each month at Umm al-Qura's start or a day later, as Morocco's four 1448 starts so far).
+A page that showed the checked days of its month, with the rest marked "not yet published", would be
+live 178 to 182 days; a rolling week, 138 to 144. The real generator, on a stamp given a simulated
+Jumada al-Ula capture, shows October alone from 12 October and holds every page on 1 November until the
+next capture, as the count assumes.
+
+Checked: the monitor's Python tests under Homebrew's 3.13 and the Mac's 3.9 (85 tests; the one failure,
+kz-qmdb without a recipe, is on `main` already), tools `jvmTest` 297/0 with the archive, and the whole
+gate: 920 rows, 189,575 place-days, 0 early, 0 late ends, none over its limit, nothing BROKEN. No stamp
+changed in substance.

@@ -182,6 +182,23 @@ class Workflow(unittest.TestCase):
             if "uses:" in line:
                 self.assertRegex(line, r"uses: [\w.-]+/[\w.-]+@[0-9a-f]{40} # v", line)
 
+    def test_the_daily_check_names_its_own_cron_and_gates_only_that_cron(self):
+        import re
+        with open(self.PATH, encoding="utf-8") as f:
+            text = f.read()
+        crons = re.findall(r'- cron: "([^"]+)"', text)
+        self.assertEqual(["0 3 * * 1", "17 3 1 * *", "23 1 * * *"], crons)
+        daily = "github.event.schedule == '23 1 * * *'"
+        # The two checkouts and the decision ask about the daily cron alone; the full run's job asks the same question.
+        self.assertEqual(3, text.count(daily), "the due job's two checkouts and its decision")
+        self.assertIn("github.event.schedule != '23 1 * * *'", text)
+        self.assertIn("needs: due", text)
+        self.assertIn("needs.due.outputs.run == 'true'", text)
+        decide = dict(self.steps())["Is a new month due today?"]
+        self.assertIn("fetch.py --official \"$GITHUB_WORKSPACE\" --month-turn", decide)
+        self.assertIn("run=true", decide)
+        self.assertIn("run=false", decide)
+
     def test_the_push_token_is_unset_before_anything_else_runs_and_never_on_a_command_line(self):
         publish = dict(self.steps())["Push the proof to Taqwa's main"]
         uses = [i for i, line in enumerate(publish.split("\n")) if "$TAQWA_PUSH_TOKEN" in line or "${TAQWA_PUSH_TOKEN" in line]
