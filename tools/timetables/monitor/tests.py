@@ -275,8 +275,23 @@ class Parsers(unittest.TestCase):
         with self.assertRaises(FetchError):
             qmdb.parse(b'{"detail": "Not found."}')
         self.assertEqual("kz-qmdb", qmdb.SOURCE)
-        self.assertEqual({"almaty", "astana", "kokshetau", "kostanay", "pavlodar", "petropavl"}, {p[0] for p in qmdb.POINTS})
-        self.assertTrue(all(float(p[2]) >= 48.0 for p in qmdb.POINTS if p[0] != "almaty"), "every point but Almaty is in the north variant")
+        keys = [p[0] for p in qmdb.POINTS]
+        self.assertEqual(len(keys), len(set(keys)), "a key names one place")
+        self.assertEqual({"almaty", "astana", "kokshetau", "kostanay", "pavlodar", "petropavl",
+                          "isakovka", "krasny-yar", "kulomzino", "oral", "aksay", "aktobe", "shalqar", "atyrau", "aktau",
+                          "kyzylorda", "oteshqali", "ayagoz", "vagulino", "bugrovoe", "pulemetovka", "spasovka", "khromtau",
+                          "arkalyk", "oskemen", "mamyrsu", "makat", "shymkent", "zhenis"}, set(keys))
+        # QMDB's offsets switch at 48N, its AngleBased rule binds from about 46N (kz-north-west round, 6 Oct 2026).
+        self.assertEqual({"almaty", "aktau", "kyzylorda", "shymkent", "zhenis"}, {p[0] for p in qmdb.POINTS if float(p[2]) < 46.0})
+        self.assertEqual({"shalqar", "atyrau", "oteshqali", "ayagoz", "mamyrsu", "makat"},
+                         {p[0] for p in qmdb.POINTS if 46.0 <= float(p[2]) < 48.0})
+        # North of Petropavl to the country's edge: Isakovka, 55.4N, the northernmost of QMDB's list.
+        self.assertEqual(55.405802, max(float(p[2]) for p in qmdb.POINTS))
+        # ... and to its southern edge: Zhenis, 40.6N, the southernmost of its list.
+        self.assertEqual(40.599543, min(float(p[2]) for p in qmdb.POINTS))
+        # Every zone the app's Kazakh cities use has a point (Asia/Almaty, Qostanay, Oral, Aqtobe, Atyrau, Aqtau, Qyzylorda).
+        self.assertEqual({"Asia/Almaty", "Asia/Qostanay", "Asia/Oral", "Asia/Aqtobe", "Asia/Atyrau", "Asia/Aqtau", "Asia/Qyzylorda"},
+                         {p[4] for p in qmdb.POINTS})
 
     def test_qatar(self):
         body = json.dumps({"gregorianDate": {"year": 2026, "month": 9, "day": 28},

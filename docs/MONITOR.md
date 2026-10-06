@@ -339,8 +339,10 @@ ministry API and the Calendar House header), Libya (the Awqaf widget and api.ift
 Morocco (Habous: the live Hijri month at its ten fitted cities and, since 6 October 2026, at 29 more of
 the app's cities, 28 at the edge (Fes, Marrakesh and Agadir among them) and Azrou at Ifrane's unit; fetched as each month turns; its server omits its
 certificate's intermediate, which `tools/timetables/monitor/certs/habous.gov.ma.pem` completes for that
-host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, the Muslim Judicial Council (mjc.org.za's current month for Cape
-Town, month-start, each month kept as `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
+host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, Kazakhstan's QMDB (its year API at 29 of its own
+places, monthly, from its southernmost to its northernmost; since 3 and 6 October 2026), the Muslim
+Judicial Council (mjc.org.za's current month for Cape Town, month-start, each month kept as
+`za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
 unit and as za.cape's member there), IRN (bonnetid.info's own month tables, no token, ruling R95; its
 searchable city list and month bar since October 2026), and since 2 October 2026 Jordan's Ministry of
 Awqaf (awqaf.gov.jo's region table for Amman, Balqa, Zarqa and Madaba, walked by its pager within one

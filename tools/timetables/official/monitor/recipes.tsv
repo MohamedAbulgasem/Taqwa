@@ -49,6 +49,7 @@ jo-awqaf	amman	jo-awqaf.tsv	jo.awqaf	-	31.955,35.945	all	-
 tn-inm	*	tn-inm.tsv	index	-	index	all	-
 ma-habous	*	ma-habous.tsv	index	-	index	all	-
 za-jamiat	*	za-jamiat.tsv	index	-	index	all	-
+kz-qmdb	*	kz-qmdb.tsv	index	-	index	all	-
 za-mjc	cape-town-*	za-cape.tsv	index	-	index	all	-
 za-mjc	cape-town-*	za-cape.tsv	za.cape	index	all	all	-
 za-mjc	cape-town-*	za-cape.tsv	za.cape	za.jamiat.shafii	all	month	za-jamiat/cpt-{yyyy}
