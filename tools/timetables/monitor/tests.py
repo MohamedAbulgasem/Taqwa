@@ -1096,6 +1096,55 @@ class MonthStart(unittest.TestCase):
         self.assertEqual(None, due_at("2026-10-31T22:00:00Z"), "November begins at midnight in Cape Town")
 
 
+class Tls(unittest.TestCase):
+    """habous.gov.ma sends its certificate without Sectigo's intermediate; the committed chain completes it
+    for that host's requests alone, with verification on (the cloud run of 5 October 2026 failed on it)."""
+
+    def setUp(self):
+        self.kwargs = []
+        self._urlopen = common.urllib.request.urlopen
+        self._sleep = common.time.sleep
+        self._interval = common.MIN_INTERVAL
+        common.time.sleep = lambda s: None
+        common.MIN_INTERVAL = 0
+
+        def urlopen(req, timeout=None, **kw):
+            self.kwargs.append((req.full_url, kw))
+            return FakeResponse(b"<html></html>")
+        common.urllib.request.urlopen = urlopen
+
+    def tearDown(self):
+        common.urllib.request.urlopen = self._urlopen
+        common.time.sleep = self._sleep
+        common.MIN_INTERVAL = self._interval
+
+    def test_the_chain_file_is_loaded_for_habous_alone(self):
+        self.assertIsNone(common.tls_context("api.example"))
+        ctx = common.tls_context("www.habous.gov.ma")
+        self.assertIs(ctx, common.tls_context("habous.gov.ma"), "one context per chain file")
+        self.assertEqual(common.ssl.CERT_REQUIRED, ctx.verify_mode)
+        self.assertTrue(ctx.check_hostname)
+        def cn(name):
+            return dict(x[0] for x in name).get("commonName")
+        self.assertIn("Sectigo Public Server Authentication CA DV R36", {cn(c["subject"]) for c in ctx.get_ca_certs()})
+        # The file alone: the intermediate, and Sectigo's R46 root as cross-signed by USERTrust (a store without R46
+        # still ends at a root it holds), both valid well past the leaf's renewals.
+        bare = common.ssl.SSLContext(common.ssl.PROTOCOL_TLS_CLIENT)
+        bare.load_verify_locations(cafile=os.path.join(common.CERTS, "habous.gov.ma.pem"))
+        held = sorted((cn(c["subject"]), cn(c["issuer"])) for c in bare.get_ca_certs())
+        self.assertEqual([("Sectigo Public Server Authentication CA DV R36", "Sectigo Public Server Authentication Root R46"),
+                          ("Sectigo Public Server Authentication Root R46", "USERTrust RSA Certification Authority")], held)
+        for c in bare.get_ca_certs():
+            self.assertGreater(common.ssl.cert_time_to_seconds(c["notAfter"]), dt.datetime(2036, 1, 1, tzinfo=dt.timezone.utc).timestamp())
+
+    def test_a_habous_request_carries_the_context_and_others_do_not(self):
+        http = Http(lambda line: None)
+        http.get("https://www.habous.gov.ma/prieres/index.php?ville=1")
+        http.get("https://api.example/x")
+        self.assertIs(common.tls_context("www.habous.gov.ma"), self.kwargs[0][1].get("context"))
+        self.assertEqual({}, self.kwargs[1][1], "every other request is made as before")
+
+
 class FakeResponse:
     def __init__(self, body):
         self.body = body

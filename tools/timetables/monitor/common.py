@@ -43,6 +43,30 @@ TIME_RE = re.compile(r"^(\d{1,2}):(\d{2})(?::\d{2})?$")
 # so a fixed offset is exact and needs no zone database. A month-start source counts its months here.
 JOHANNESBURG = dt.timezone(dt.timedelta(hours=2), "SAST")
 
+# Hosts whose server sends an incomplete certificate chain, and the file of public certificates that
+# completes it (tools/timetables/monitor/certs/; each file says where its certificates come from and
+# until when they are valid). habous.gov.ma sends its leaf without Sectigo's intermediate: the Mac's TLS
+# stacks find it by themselves, the cloud runner's OpenSSL does not, and every Habous request failed in
+# the run of 5 October 2026. The file is added to the trust store for these hosts' requests alone:
+# verification stays on, and the chain must still end at a root the system trusts.
+CERTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "certs")
+EXTRA_CA = {"www.habous.gov.ma": "habous.gov.ma.pem", "habous.gov.ma": "habous.gov.ma.pem"}
+_TLS_CONTEXTS = {}
+
+
+def tls_context(host):
+    """The TLS context for a request to `host`: None (urllib's own default) unless EXTRA_CA names the
+    host, else the default context with the host's chain file loaded too (made once per file)."""
+    name = EXTRA_CA.get(host)
+    if name is None:
+        return None
+    ctx = _TLS_CONTEXTS.get(name)
+    if ctx is None:
+        ctx = ssl.create_default_context()
+        ctx.load_verify_locations(cafile=os.path.join(CERTS, name))
+        _TLS_CONTEXTS[name] = ctx
+    return ctx
+
 
 class FetchError(Exception):
     """A request or a response the fetcher could not use; the message is what the report shows."""
@@ -151,7 +175,15 @@ class Http:
             self._last = time.monotonic()
             try:
                 req = urllib.request.Request(url, data=body, headers=hdrs)
-                opener = urllib.request.urlopen if jar is None else urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar)).open
+                tls = tls_context(host)
+                if jar is not None:
+                    handlers = [urllib.request.HTTPCookieProcessor(jar)] + ([urllib.request.HTTPSHandler(context=tls)] if tls else [])
+                    opener = urllib.request.build_opener(*handlers).open
+                elif tls is not None:
+                    def opener(r, timeout=None, _tls=tls):
+                        return urllib.request.urlopen(r, timeout=timeout, context=_tls)
+                else:
+                    opener = urllib.request.urlopen
                 with opener(req, timeout=timeout) as resp:
                     out = resp.read()
                     if resp.headers.get("Content-Encoding") == "gzip":
@@ -170,9 +202,9 @@ class Http:
             except urllib.error.URLError as e:
                 if isinstance(e.reason, ssl.SSLError):
                     # Python's own TLS stack cannot reach this site (a certificate chain its store does
-                    # not know, habous.gov.ma; a protocol the Mac's LibreSSL lacks): curl verifies
-                    # against the system's store and speaks the system's TLS, so the request goes
-                    # through curl instead (review I7).
+                    # not know and EXTRA_CA does not complete; a protocol the Mac's LibreSSL lacks):
+                    # curl verifies against the system's store and speaks the system's TLS, so the
+                    # request goes through curl instead (review I7).
                     return self._curl(url, hdrs, body, timeout, jar)
                 self._network_failure(host)
                 last = FetchError(f"{type(e).__name__}: {getattr(e, 'reason', e)} from {shown}")
