@@ -15,6 +15,11 @@
 # Split: fit on the ten cities' live month; held out, every Wayback page (2015–2025), Rabat's
 # 2022–2023 days and Ramadan 1445, and Imilchil. The per-city sunrise and Maghrib were then widened
 # where the held-out pages asked for more (proof/7d-maghreb-libya.md).
+# - 29 more places, read by hand on 6 Oct 2026 from the same live month (13 Sep–12 Oct 2026) before the page
+#   turned: the app's own Moroccan cities whose Arabic name is a place on Habous's list (archive/tables/manual/
+#   ma-habous/2026-10-06/), each at the app's city point. All but Azrou lie beyond the ten units and check the
+#   edge, the national margin most of Morocco takes; Azrou, 14 km from Ifrane, checks Ifrane's unit off its point.
+#   Held out.
 # Not rows: ma_casa_202501/202609.txt, ma_rabat_202402/202609.txt, ma_ifrane_202609.txt,
 # ma_laayoune_202405.txt and off-habous-casa.txt repeat the round files' days.
 path	entry	lat	lon	zone	clock	columns	format	school	split	note
@@ -41,3 +46,32 @@ archive/tables/round/data-maghreb-libya/off-habous-default.txt	ma.habous/rabat		
 archive/tables/moral-auth-mena/maghreb/ma_rabat_2022_2023.txt	ma.habous/rabat			Africa/Casablanca	Africa/Casablanca	F+E S D A M I	daily	standard	test	Rabat, five days 2022–2023
 archive/tables/moral-auth-mena/maghreb/ma_ramadan1445.txt	ma.habous/rabat			Africa/Casablanca	Africa/Casablanca	F+E S D A M I	daily	standard	test	Rabat, Ramadan 1445 (2024)
 archive/tables/moral-auth-mena/maghreb/ma_imilchil_202609.txt	ma.habous	32.155	-5.635	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Imilchil (about 2,150 m), beyond every unit: the edge, live month 13 Sep–12 Oct 2026
+archive/tables/manual/ma-habous/2026-10-06/fes.txt	ma.habous	34.03313	-5.00028	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Fes, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/marrakesh.txt	ma.habous	31.63416	-7.99994	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Marrakesh, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/agadir.txt	ma.habous	30.42018	-9.59815	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Agadir, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/meknes.txt	ma.habous	33.89352	-5.54727	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Meknes, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/kenitra.txt	ma.habous	34.26101	-6.5802	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Kenitra, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/tetouan.txt	ma.habous	35.57845	-5.36837	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Tétouan, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/al-hoceima.txt	ma.habous	35.25165	-3.93723	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Al Hoceïma, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/safi.txt	ma.habous	32.29939	-9.23718	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Safi, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/khouribga.txt	ma.habous	32.88108	-6.9063	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Khouribga, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/el-jadida.txt	ma.habous	33.25682	-8.50882	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	El Jadida, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/beni-mellal.txt	ma.habous	32.33725	-6.34983	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Beni Mellal, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/nador.txt	ma.habous	35.16813	-2.93352	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Nador, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/taza.txt	ma.habous	34.21	-4.01	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Taza, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/settat.txt	ma.habous	33.00103	-7.61662	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Settat, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/larache.txt	ma.habous	35.19321	-6.15572	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Larache, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/guelmim.txt	ma.habous	28.98696	-10.05738	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Guelmim, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/khenifra.txt	ma.habous	32.93492	-5.66167	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Khenifra, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/berkane.txt	ma.habous	34.92	-2.32	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Berkane, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/oued-zem.txt	ma.habous	32.8627	-6.57359	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Oued Zem, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/taroudant.txt	ma.habous	30.47028	-8.87695	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Taroudant, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/essaouira.txt	ma.habous	31.5125	-9.77	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Essaouira, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/tiznit.txt	ma.habous	29.69742	-9.73162	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Tiznit, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/tan-tan.txt	ma.habous	28.43799	-11.10321	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Tan-Tan, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/azrou.txt	ma.habous	33.43443	-5.22126	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Azrou, Ifrane's unit, 14 km off its point, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/chefchaouen.txt	ma.habous	35.16878	-5.2636	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Chefchaouen, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/boujdour.txt	ma.habous	26.13073	-14.48513	Africa/El_Aaiun	UTC	F+E S D A M I	daily	standard	test	Boujdour, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/smara.txt	ma.habous	26.73841	-11.67194	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Smara, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/sidi-ifni.txt	ma.habous	29.37975	-10.17299	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Sidi Ifni, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)
+archive/tables/manual/ma-habous/2026-10-06/goulmima.txt	ma.habous	31.69227	-4.95256	Africa/Casablanca	UTC	F+E S D A M I	daily	standard	test	Goulmima, beyond every unit: the edge, live month 13 Sep–12 Oct 2026 (read by hand 6 Oct 2026)

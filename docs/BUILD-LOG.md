@@ -2523,7 +2523,26 @@ live 178 to 182 days; a rolling week, 138 to 144. The real generator, on a stamp
 Jumada al-Ula capture, shows October alone from 12 October and holds every page on 1 November until the
 next capture, as the count assumes.
 
-Checked: the monitor's Python tests under Homebrew's 3.13 and the Mac's 3.9 (85 tests; the one failure,
+**The edge, checked at 29 more cities.** Until now the gate checked Habous's national margins (the
+edge, which answers everywhere beyond the ten fitted cities, so most of Morocco) at one town only,
+Imilchil. The live month disappears when the page turns, so it was read by hand on 6 October for the
+app's own Moroccan cities whose Arabic name is a place on Habous's list: Fes, Marrakesh, Agadir, Meknes,
+Kenitra, Tétouan, Al Hoceïma, Safi, Khouribga, El Jadida, Beni Mellal, Nador, Taza, Settat, Larache,
+Guelmim, Khenifra, Berkane, Oued Zem, Taroudant, Essaouira, Tiznit, Tan-Tan, Chefchaouen, Boujdour,
+Smara, Sidi Ifni, Goulmima, and Azrou inside Ifrane's unit. The pages and tables are new files in the
+private archive (`archive/raw/manual/ma-habous/2026-10-06/`, `archive/tables/manual/ma-habous/2026-10-06/`,
+29 rows in `MANIFEST.tsv`), and 29 held-out rows in `ma-habous.tsv`, each at the app's city point. The
+engine is never early at any of them: 0 early starts and 0 late ends over 870 place-days. Sunrise comes
+up to 7 min before Habous's and Maghrib up to 6 min after it at low towns, exactly the limits the
+registry records for the edge, and Asr up to 3 min on one day (the edge's class D limit is 3). Azrou
+shows sunrise up to 2 min early, within Ifrane's limit. The stamp now covers 40 places and 2,379
+place-days; the app's About gives no figure at the edge, so only the counts it shows at the ten fitted
+cities move. The fetcher reads the 29 every run too (`EDGE_PLACES`; a page that shows another place is
+left out), so prove adds their rows each month. Marrakesh, Fes and Agadir still have no page: they are
+class D at the edge, and only a unit fitted on their own tables (two or three months of them) can make
+them class B.
+
+Checked: the monitor's Python tests under Homebrew's 3.13 and the Mac's 3.9 (87 tests; the one failure,
 kz-qmdb without a recipe, is on `main` already), tools `jvmTest` 297/0 with the archive, and the whole
-gate: 920 rows, 189,575 place-days, 0 early, 0 late ends, none over its limit, nothing BROKEN. No stamp
-changed in substance.
+gate: 949 rows, 190,445 place-days, 0 early, 0 late ends, none over its limit, nothing BROKEN. Only
+`ma.habous`'s stamp changed, with `ProofStamps.kt`.

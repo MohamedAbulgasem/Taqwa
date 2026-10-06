@@ -1,5 +1,7 @@
 """Morocco, the Ministry of Habous and Islamic Affairs (habous.gov.ma): each city's live page, the
-current Hijri month, for the ten cities ma-habous.tsv checks. The page prints the legal time, UTC+0
+current Hijri month, for the ten cities ma-habous.tsv checks at their units, and for 29 more of the
+app's own Moroccan cities beyond them (EDGE_PLACES), each at the app's city point, where the edge's
+national margins answer most of Morocco. The page prints the legal time, UTC+0
 all the year round since 20 September 2026 (ClockChanges), so the table is read with `clock` UTC
 like the gate's live rows. Habous prints no imsak: the fast begins at its Fajr (F+E). Restricted:
 archive only.
@@ -25,6 +27,42 @@ CITIES = [
     ("casablanca", "Casablanca", 58), ("rabat", "Rabat", 1), ("oujda", "Oujda", 31), ("tangier", "Tangier", 14),
     ("laayoune", "Laayoune", 156), ("dakhla", "Dakhla", 165), ("figuig", "Figuig", 33), ("midelt", "Midelt", 136),
     ("lagouira", "Lagouira", 166), ("ifrane", "Ifrane", 100),
+]
+
+# The app's cities (shared/.../files/cities.csv, GeoNames) whose Arabic name is a place on Habous's list,
+# beyond the ten units but Azrou (inside Ifrane's): key, name, the site's ville id, the place the page must
+# show selected, the app's city point, its zone. Checked as ma.habous at that point, as ma-habous.tsv's rows
+# read the month first held by hand (archive/tables/manual/ma-habous/2026-10-06/).
+EDGE_PLACES = [
+    ("fes", "Fes", 81, "فاس", 34.03313, -5.00028, "Africa/Casablanca"),
+    ("marrakesh", "Marrakesh", 104, "مراكش", 31.63416, -7.99994, "Africa/Casablanca"),
+    ("agadir", "Agadir", 117, "أكادير", 30.42018, -9.59815, "Africa/Casablanca"),
+    ("meknes", "Meknes", 99, "مكناس", 33.89352, -5.54727, "Africa/Casablanca"),
+    ("kenitra", "Kenitra", 7, "القنيطرة", 34.26101, -6.5802, "Africa/Casablanca"),
+    ("tetouan", "Tétouan", 15, "تطوان", 35.57845, -5.36837, "Africa/Casablanca"),
+    ("al-hoceima", "Al Hoceïma", 23, "الحسيمة", 35.25165, -3.93723, "Africa/Casablanca"),
+    ("safi", "Safi", 111, "آسفي", 32.29939, -9.23718, "Africa/Casablanca"),
+    ("khouribga", "Khouribga", 79, "خريبكة", 32.88108, -6.9063, "Africa/Casablanca"),
+    ("el-jadida", "El Jadida", 66, "الجديدة", 33.25682, -8.50882, "Africa/Casablanca"),
+    ("beni-mellal", "Beni Mellal", 73, "بني ملال", 32.33725, -6.34983, "Africa/Casablanca"),
+    ("nador", "Nador", 39, "الناظور", 35.16813, -2.93352, "Africa/Casablanca"),
+    ("taza", "Taza", 89, "تازة", 34.21, -4.01, "Africa/Casablanca"),
+    ("settat", "Settat", 61, "سطات", 33.00103, -7.61662, "Africa/Casablanca"),
+    ("larache", "Larache", 16, "العرائش", 35.19321, -6.15572, "Africa/Casablanca"),
+    ("guelmim", "Guelmim", 149, "كلميم", 28.98696, -10.05738, "Africa/Casablanca"),
+    ("khenifra", "Khenifra", 70, "خنيفرة", 32.93492, -5.66167, "Africa/Casablanca"),
+    ("berkane", "Berkane", 32, "بركان", 34.92, -2.32, "Africa/Casablanca"),
+    ("oued-zem", "Oued Zem", 80, "وادي زم", 32.8627, -6.57359, "Africa/Casablanca"),
+    ("taroudant", "Taroudant", 118, "تارودانت", 30.47028, -8.87695, "Africa/Casablanca"),
+    ("essaouira", "Essaouira", 106, "الصويرة", 31.5125, -9.77, "Africa/Casablanca"),
+    ("tiznit", "Tiznit", 119, "تزنيت", 29.69742, -9.73162, "Africa/Casablanca"),
+    ("tan-tan", "Tan-Tan", 152, "طانطان", 28.43799, -11.10321, "Africa/Casablanca"),
+    ("azrou", "Azrou", 103, "آزرو", 33.43443, -5.22126, "Africa/Casablanca"),
+    ("chefchaouen", "Chefchaouen", 18, "شفشاون", 35.16878, -5.2636, "Africa/Casablanca"),
+    ("boujdour", "Boujdour", 158, "بوجدور", 26.13073, -14.48513, "Africa/El_Aaiun"),
+    ("smara", "Smara", 157, "السمارة", 26.73841, -11.67194, "Africa/Casablanca"),
+    ("sidi-ifni", "Sidi Ifni", 148, "سيدي إفني", 29.37975, -10.17299, "Africa/Casablanca"),
+    ("goulmima", "Goulmima", 132, "كلميمة", 31.69227, -4.95256, "Africa/Casablanca"),
 ]
 
 
@@ -83,7 +121,8 @@ def parse(page, today):
 
 def fetch(ctx):
     tables = []
-    for unit, name, ville in CITIES:
+    places = [(unit, name, ville, None, None, None, "Africa/Casablanca") for unit, name, ville in CITIES] + list(EDGE_PLACES)
+    for key, name, ville, label, lat, lon, zone in places:
         url = PAGE + str(ville)
         try:
             page = ctx.http.text(url)
@@ -92,8 +131,15 @@ def fetch(ctx):
             ctx.error(f"{name}: {e}")
             continue
         sel = re.findall(r"<option[^>]*selected[^>]*>([^<]*)", page)
-        t = Table(unit, name, None, None, "Africa/Casablanca", "MA", "F+E S D A M I", entry=f"ma.habous/{unit}", clock="UTC",
-                  source_line=f"Ministry of Habous and Islamic Affairs, Morocco: {url} (the current Hijri month, legal time UTC+0; page selected '{sel[0].strip() if sel else '?'}')",
+        selected = sel[0].strip() if sel else "?"
+        if label is not None and selected != label:
+            # A ville id that now names another place would check the wrong point.
+            ctx.error(f"{name}: the page shows another place (ville={ville}); left out")
+            continue
+        entry = f"ma.habous/{key}" if lat is None else "ma.habous"
+        cc = "EH" if zone == "Africa/El_Aaiun" else "MA"
+        t = Table(key, name, lat, lon, zone, cc, "F+E S D A M I", entry=entry, clock="UTC",
+                  source_line=f"Ministry of Habous and Islamic Affairs, Morocco: {url} (the current Hijri month, legal time UTC+0; page selected '{selected}')",
                   raw=[(f"habous-{ville}.html", page)])
         if add_all(ctx, t, rows, name):
             tables.append(t)

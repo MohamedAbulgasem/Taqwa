@@ -330,7 +330,8 @@ repository.
 Trondheim among them), Kemenag (eighteen kab/kota, Surabaya, Medan, Semarang, Palembang and
 Yogyakarta among them), JAKIM, MUIS, Egypt (ESA via Dar al-Ifta, and ESA's daily page), Qatar (the
 ministry API and the Calendar House header), Libya (the Awqaf widget and api.ifta.ly), Tunisia (INM),
-Morocco (Habous: the live Hijri month, fetched as each month turns; its server omits its
+Morocco (Habous: the live Hijri month at its ten fitted cities and, since 6 October 2026, at 29 more of
+the app's cities checked at the edge, Fes, Marrakesh and Agadir among them; fetched as each month turns; its server omits its
 certificate's intermediate, which `tools/timetables/monitor/certs/habous.gov.ma.pem` completes for that
 host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, the Muslim Judicial Council (mjc.org.za's current month for Cape
 Town, month-start, each month kept as `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its

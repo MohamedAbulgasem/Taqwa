@@ -1267,6 +1267,60 @@ class HijriMonth(unittest.TestCase):
             del sys.modules["fetchers.fakehijri"]
 
 
+class HabousPlaces(unittest.TestCase):
+    """The Morocco fetcher's ten units and its 29 edge cities: each edge page must show its own place, is
+    read at the app's city point as ma.habous, and has its row in ma-habous.tsv at that very point."""
+
+    @staticmethod
+    def page(label):
+        return ('<select name="ville"><option value=\'index.php?ville=1\' selected=selected >' + label + "</option></select>"
+                '<table id="horaire"><tr><th>الأيام</th><th>ربيع الآخر</th><th>شتنبر / أكتوبر</th><th>الصبح</th><th>الشروق</th>'
+                "<th>الظهر</th><th>العصر</th><th>المغرب</th><th>العشاء</th></tr>"
+                "<tr><td>الأحد</td><td>1</td><td>13</td><td>01:13</td><td>02:13</td><td>03:13</td><td>04:13</td><td>05:13</td><td>06:13</td></tr>"
+                "<tr><td>الإثنين</td><td>2</td><td>14</td><td>01:14</td><td>02:14</td><td>03:14</td><td>04:14</td><td>05:14</td><td>06:14</td></tr></table>").encode()
+
+    def test_edge_pages_are_read_at_the_apps_points_and_a_page_for_another_place_is_left_out(self):
+        answers = {morocco.PAGE + str(ville): self.page("x") for _, _, ville in morocco.CITIES}
+        for key, name, ville, label, lat, lon, zone in morocco.EDGE_PLACES:
+            answers[morocco.PAGE + str(ville)] = self.page(label)
+        answers[morocco.PAGE + "104"] = self.page("فاس")  # Marrakesh's id showing Fes's page
+
+        class ExactHttp(FakeHttp):
+            def get(self, url, **kw):
+                self.urls.append(url)
+                if url not in answers:
+                    raise FetchError("no canned answer")
+                return answers[url]
+        root = tempfile.mkdtemp("monitor-habous")
+        try:
+            ctx = Context("ma-habous", root, dt.date(2026, 9, 28), lambda line: None, root, http=ExactHttp([]))
+            tables = {t.key: t for t in morocco.fetch(ctx)}
+        finally:
+            shutil.rmtree(root)
+        self.assertEqual(10 + 29 - 1, len(tables))
+        self.assertNotIn("marrakesh", tables)
+        self.assertTrue(any("Marrakesh: the page shows another place" in e for e in ctx.errors), ctx.errors)
+        unit, fes, boujdour = tables["rabat"], tables["fes"], tables["boujdour"]
+        self.assertEqual(("ma.habous/rabat", None, None, "Africa/Casablanca", "UTC"), (unit.entry, unit.lat, unit.lon, unit.zone, unit.clock))
+        self.assertEqual(("ma.habous", 34.03313, -5.00028, "Africa/Casablanca", "MA", "UTC", "F+E S D A M I"),
+                         (fes.entry, fes.lat, fes.lon, fes.zone, fes.cc, fes.clock, fes.columns))
+        self.assertEqual(("Africa/El_Aaiun", "EH"), (boujdour.zone, boujdour.cc))
+        self.assertEqual(["2026-09-13", "2026-09-14"], sorted(fes.rows))
+
+    def test_every_edge_place_has_its_row_in_the_gate_at_its_own_point(self):
+        gate = os.path.join(HERE, "..", "official", "gate", "ma-habous.tsv")
+        with open(gate, encoding="utf-8") as f:
+            lines = [line.rstrip("\n").split("\t") for line in f if line.strip() and not line.startswith("#")]
+        header, rows = lines[0], [dict(zip(lines[0], r)) for r in lines[1:]]
+        self.assertIn("lat", header)
+        at = {(r["entry"], float(r["lat"]), float(r["lon"]), r["zone"], r["clock"], r["columns"]) for r in rows if r["lat"]}
+        for key, name, ville, label, lat, lon, zone in morocco.EDGE_PLACES:
+            self.assertIn(("ma.habous", lat, lon, zone, "UTC", "F+E S D A M I"), at, key)
+        self.assertEqual(29, len(morocco.EDGE_PLACES))
+        self.assertEqual(len(morocco.EDGE_PLACES), len({p[2] for p in morocco.EDGE_PLACES} | set()), "one place per ville id")
+        self.assertFalse({p[2] for p in morocco.EDGE_PLACES} & {c[2] for c in morocco.CITIES}, "no unit city twice")
+
+
 class Tls(unittest.TestCase):
     """habous.gov.ma sends its certificate without Sectigo's intermediate; the committed chain completes it
     for that host's requests alone, with verification on (the cloud run of 5 October 2026 failed on it)."""
