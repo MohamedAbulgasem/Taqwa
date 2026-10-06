@@ -12,10 +12,10 @@ Taqwa : Prière, Coran & Qibla
 Horaires de prière, adhan, Coran entier récité, qibla. Gratuit, hors ligne.
 
 ### Full description (4000)
-Taqwa réunit l’essentiel de la journée en un seul endroit paisible : des horaires de prière précis là où vous êtes, l’adhan quand ils arrivent, le Coran entier à lire et à écouter, et la qibla. Elle fonctionne hors ligne, ne coûte rien, n’affiche aucune publicité et ne demande aucun compte.
+Taqwa réunit l’essentiel de la journée en un seul endroit paisible : des horaires de prière là où vous êtes, un takbir ou le début de l’adhan à chaque prière, le Coran entier à lire et à écouter, et la qibla. Elle fonctionne hors ligne, ne coûte rien, n’affiche aucune publicité et ne demande aucun compte.
 
 HORAIRES DE PRIÈRE
-• Les horaires pour votre position, depuis le GPS ou une ville que vous choisissez parmi plus de 34 000.
+• Les horaires pour votre position, depuis la localisation de votre téléphone ou une ville que vous choisissez parmi plus de 34 000.
 • Les horaires du calendrier que suivent les mosquées proches de chez vous. Là où Taqwa le détient, elle le reproduit et le vérifie jour après jour d’après les tableaux publiés : pour chaque jour vérifié, aucune prière ne commence avant l’heure publiée. Là où un calendrier n’est pas encore entièrement vérifié, Taqwa ajoute une marge de sécurité ; là où les mosquées suivent des calendriers différents, elle affiche des horaires par précaution, chaque prière une fois que tous l’ont commencée ; et là où aucun calendrier n’est connu, elle calcule avec prudence.
 • Touchez le (i) sur l’écran Prière pour voir de qui viennent ces horaires, et « À propos de ces horaires » pour savoir comment ils sont établis et vérifiés. « Aligner sur ma mosquée » cherche le calendrier de votre mosquée à partir de deux horaires de son tableau, et les méthodes de calcul habituelles (Ligue islamique mondiale, égyptienne, Karachi, ISNA et d’autres) ainsi qu’un ajustement par prière sont aussi proposés.
 • Des règles pour les hautes latitudes, où la nuit est trop courte pour les angles habituels.
@@ -51,7 +51,12 @@ Site web : https://taqwa.world/fr/
 Assistance : support@taqwa.world
 
 ### Release notes (500)
-Première version.
+Bienvenue dans Taqwa, un compagnon discret au quotidien :
+• Les horaires de prière du calendrier local, là où Taqwa en connaît un, avec un takbir ou le début de l’adhan à chaque prière
+• Le Coran entier hors ligne, avec des traductions, et dix récitateurs à télécharger
+• Qibla, compteur de tasbih, date hégirienne et widgets
+• Sept langues : français, anglais, arabe, turc, indonésien, ourdou et bengali
+Gratuit, sans publicité, sans compte ni suivi.
 
 ## App Store
 
