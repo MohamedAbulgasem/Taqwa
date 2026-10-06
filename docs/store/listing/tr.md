@@ -12,10 +12,10 @@ Taqwa: Namaz, Kur’an ve Kıble
 Namaz vakitleri, ezan, tilavetli Kur’an’ın tamamı, Kıble. Ücretsiz, çevrimdışı.
 
 ### Full description (4000)
-Taqwa, günün temel ihtiyaçlarını tek bir sakin yerde toplar: bulunduğunuz yerin doğru namaz vakitleri, vakti gelince ezan, okumak ve dinlemek için Kur’an’ın tamamı ve Kıble. Çevrimdışı çalışır, hiçbir ücret istemez, reklam göstermez ve hesap açtırmaz.
+Taqwa, günün temel ihtiyaçlarını tek bir sakin yerde toplar: bulunduğunuz yerin namaz vakitleri, her vakitte bir tekbir ya da ezanın ilk saniyeleri, okumak ve dinlemek için Kur’an’ın tamamı ve Kıble. Çevrimdışı çalışır, hiçbir ücret istemez, reklam göstermez ve hesap açtırmaz.
 
 NAMAZ VAKİTLERİ
-• GPS’ten ya da 34.000’den fazla şehir arasından seçeceğiniz bir şehirden, konumunuza göre vakitler.
+• Telefonunuzun konumundan ya da 34.000’den fazla şehir arasından seçeceğiniz bir şehirden, bulunduğunuz yere göre vakitler.
 • Yakınınızdaki camilerin uyduğu takvime göre vakitler. Taqwa bu takvime sahipse onu yeniden hesaplar ve yayımlanan tablolarla gün gün karşılaştırır: karşılaştırılan her günde hiçbir namaz yayımlanan vakitten önce başlamaz. Takvim henüz tam doğrulanmadıysa Taqwa bir güvenlik payı ekler; camiler farklı takvimlere uyuyorsa ihtiyatlı vakitler gösterir, yani her namaz hepsinde vakit girdikten sonra görünür; hiçbir takvim bilinmiyorsa vakitleri ihtiyatlı biçimde hesaplar.
 • Vakitlerin kime ait olduğunu görmek için Namaz ekranındaki (i) simgesine dokunun; nasıl hesaplanıp doğrulandıkları “Bu vakitler hakkında” ekranında anlatılır. “Camimle eşleştir”, caminizin panosundaki iki vakitten takvimini bulmaya çalışır; alışılmış hesaplama yöntemleri (Dünya İslam Birliği, Mısır, Karaçi, ISNA ve daha fazlası) ve her namaz için ayrı düzeltme de mevcuttur.
 • Gecenin alışılmış açılar için fazla kısa kaldığı yüksek enlemler için kurallar.
@@ -51,7 +51,12 @@ Web sitesi: https://taqwa.world/tr/
 Destek: support@taqwa.world
 
 ### Release notes (500)
-İlk sürüm.
+Taqwa’ya hoş geldiniz; her gün yanınızda sakin bir yol arkadaşı:
+• Taqwa’nın yerel takvimini bildiği yerlerde o takvime göre namaz vakitleri; her vakitte bir tekbir ya da ezanın ilk saniyeleri
+• Kur’an’ın tamamı çevrimdışı, mealleriyle; on karinin tilaveti indirilebilir
+• Kıble, tesbih sayacı, hicri tarih ve widget’lar
+• Yedi dil: Türkçe, İngilizce, Arapça, Fransızca, Endonezce, Urduca ve Bengalce
+Ücretsiz; reklam yok, hesap yok, takip yok.
 
 ## App Store
 
