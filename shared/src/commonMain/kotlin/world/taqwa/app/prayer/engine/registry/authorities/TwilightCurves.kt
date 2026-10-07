@@ -396,7 +396,9 @@ internal object PlaceCurves {
      * earlier slot of the two ([EndOfEating.DawnAngle]). For a rule whose curve moves fast with
      * latitude, the grid alone leaves a place up to 0.05° from its own curve: south of it the Fajr
      * comes early, north of it the end of eating comes late (QMDB's AngleBased rule in northern
-     * Kazakhstan, kz-north-west round of 6 Oct 2026).
+     * Kazakhstan, kz-north-west round of 6 Oct 2026). Only for a rule with a Fajr fraction and no
+     * [moonsightingFajr] or [ishaAfterSunsetMinutes], which [ownLatitudeCurves] does not read: the
+     * check below refuses any other, so no curve can be dropped without a word.
      */
     private class Rule(
         val fajr: ((TwilightCurves.Day) -> Double?)? = null,
@@ -404,7 +406,13 @@ internal object PlaceCurves {
         val moonsightingFajr: Boolean = false,
         val ishaAfterSunsetMinutes: ((TwilightCurves.Day) -> Double)? = null,
         val ownLatitude: Boolean = false,
-    )
+    ) {
+        init {
+            require(!ownLatitude || (fajr != null && !moonsightingFajr && ishaAfterSunsetMinutes == null)) {
+                "ownLatitude reads only a Fajr fraction and an Isha fraction"
+            }
+        }
+    }
 
     private fun TwilightCurves.Day.latitude() = SolarMath.deg(phi)
 
@@ -722,9 +730,14 @@ internal object PlaceCurves {
      * and at the point's own latitude, each slot the later start of the two (the smaller Fajr
      * depression, the larger Isha one), so no start is earlier than either; and an end of eating read
      * from the Fajr dawn takes the earlier dawn of the two, so it is later than neither.
+     *
+     * That end is still read from the Fajr START envelopes (the shorter night, each slot widened late
+     * over the neighbouring days), not from the rule read as an end ([TwilightCurves.fajrAsEnd],
+     * rulings R39 and R80); the entry's region margins carry the difference (kz.qmdb's −374 s at and
+     * above 48° N and −150 s from 46° to 48° N, `CentralAsia.kt`, fitted to 0 late ends).
      */
     private fun ownLatitudeCurves(method: TimetableMethod, point: GeoPoint, rule: Rule): TimetableMethod {
-        val fajrRule = rule.fajr ?: return method
+        val fajrRule = requireNotNull(rule.fajr) { "an ownLatitude rule needs its Fajr fraction" }
         val grid = TwilightCurves.fajr(point.lat, method.fajrAngle, onGrid = true, fraction = fajrRule)
         val own = TwilightCurves.fajr(point.lat, method.fajrAngle, onGrid = false, fraction = fajrRule)
         val fajr = DoubleArray(grid.size) { i -> min(grid[i], own[i]) }

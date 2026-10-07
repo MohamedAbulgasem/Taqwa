@@ -392,9 +392,9 @@ eating in minutes before the printed Fajr; `fit` rows decide the margins, `test`
 | Atyrau | 47.1 | Atyrau | test | 3 | 2 | 1 | 4 |
 | Makat | 47.6 | Atyrau | test | 3 | 3 | 1 | 4 |
 | Shalqar | 47.8 | Aqtobe | test | 4 | 3 | 1 | 4 |
-| Mamyrsu | 48.0 | Almaty | test | 4 | 3 | 1 | 4 |
-| Ayagoz | 48.0 | Almaty | fit | 4 | 3 | 1 | 4 |
-| Oteshqali Atambayev | 48.0 | Atyrau | fit | 4 | 3 | 1 | 4 |
+| Mamyrsu | 47.95 | Almaty | test | 4 | 3 | 1 | 4 |
+| Ayagoz | 47.97 | Almaty | fit | 4 | 3 | 1 | 4 |
+| Oteshqali Atambayev | 47.99 | Atyrau | fit | 4 | 3 | 1 | 4 |
 | Oskemen | 49.9 | Almaty | test | 5 | 5 | 1 | 8 |
 | Arkalyk | 50.2 | Qostanay | test | 5 | 5 | 1 | 8 |
 | Khromtau | 50.3 | Aqtobe | test | 6 | 4 | 1 | 7 |
@@ -421,8 +421,9 @@ of eating at Kokshetau, Petropavl and Krasny Yar (7 → 8 min early). From 46° 
 and the end of eating up to 4 min early, over class D's plain 3, both within the entry's recorded
 limits (8, 8), whose reasons now say so.
 
-**Gate (whole, 966 rows, 206,322 place-days):** 0 early, 0 late ends, none over its limit, nothing
-BROKEN. `kz.qmdb`: 60 rows, 21,170 place-days at 29 places, 2026–2027 (14,965 held out, 1,711 in
+**Gate (whole, 966 rows, 206,365 place-days, the committed stamps; this Mac's unpulled archive, whose
+ly-awqaf and tn-inm live files are older than the cloud's, gives 206,322):** 0 early, 0 late ends,
+none over its limit, nothing BROKEN. `kz.qmdb`: 60 rows, 21,170 place-days at 29 places, 2026–2027 (14,965 held out, 1,711 in
 Ramadan); held out alone, 0 early and 0 late ends. Only `kz.qmdb`'s figures changed. The golden vector
 moved on 3 of its 2,071 rows, all at the Kazakh seeds and all the same field, the other school's
 (Standard) Asr, 1 min later: the Almaty seed on 8 Jan 2030, the Astana seed on 19 Jan 2029 and
@@ -467,7 +468,8 @@ month, and `prove` adds a new year's rows by itself, the source now having its r
 ./gradlew -p tools/timetables gate -Pentry=kz.qmdb -Pfit=kz.qmdb -Pstamps=false
   → fit on 19 rows (6,205 place-days): asr -6, maghrib -14, end of eating -366 (the north)
 ./gradlew -p tools/timetables gate
-  → 966 rows, 206,322 place-days: 0 early, 0 late ends, none over its limit, nothing BROKEN
+  → 966 rows, 206,365 place-days (the committed stamps; 206,322 on the unpulled local archive):
+    0 early, 0 late ends, none over its limit, nothing BROKEN
 ./gradlew -p tools/timetables jvmTest       → 297/0, with the archive
 ./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
 ./gradlew :shared:testAndroidHostTest       → 1,604/0 (AsiaProofTest 8/0)

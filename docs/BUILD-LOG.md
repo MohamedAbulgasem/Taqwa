@@ -2642,8 +2642,9 @@ After it, the north reads Fajr up to 8 min late, Isha up to 6 and the end of eat
 From 46° to 48° N Fajr is up to 4 late and the end of eating up to 4 early. South of 46° N, Aktau,
 Kyzylorda, Shymkent and Zhenis are within 1 min, like Almaty. Proof 7f has the table for all 29 places.
 
-**What moved.** The whole gate: 966 rows and 206,322 place-days, 0 early, 0 late ends, none over its
-limit, nothing BROKEN. `kz.qmdb` has 60 rows, 21,170 place-days at 29 places. Only its figures changed.
+**What moved.** The whole gate: 966 rows and 206,365 place-days (the committed stamps; 206,322 on
+this Mac's unpulled archive), 0 early, 0 late ends, none over its limit, nothing BROKEN. `kz.qmdb` has
+60 rows, 21,170 place-days at 29 places. Only its figures changed.
 The golden vector moved on 3 of its 2,071 rows, at the Kazakh seeds and all in the other school's Asr,
 1 min later. About now shows 21,170 days at 29 places for every Kazakh place, "at most 8 min after".
 The monitor fetches all 29 places each month, and `kz-qmdb` now has a recipe, so `prove` adds a new
