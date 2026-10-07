@@ -2498,18 +2498,28 @@ intermediate, valid to 2036, and the R46 root cross-signed by USERTrust, valid t
 adds them to the trust store for habous.gov.ma's requests alone, with verification on. With a store
 that holds only the USERTrust root, the site now verifies; without the file it fails, as on the runner.
 Homebrew's Python 3.13, which failed before, now reaches the site without curl, as does the Mac's
-Python 3.9. The site's certificate runs to 9 February 2027: if its renewal comes from another
+Python 3.9. Python 3.13 and later make any certificate in the store a trust anchor by default
+(`VERIFY_X509_PARTIAL_CHAIN`); the context clears that flag, so the chain must still end at a root
+the system trusts on every Python (with the chain file alone as the store, 3.13 now refuses the site).
+The Mac's own Python 3.9 asks the system keychain whatever its store holds, so there the system's roots
+decide. The site's certificate runs to 9 February 2027: if its renewal comes from another
 intermediate, the fetch fails again with the same message.
 
-**The cadence.** `ma-habous` is now `hijri-month`. It stays weekly, and is due besides on every run from
-the last day its tables hold until three days after it, until the new month is held. Whether the month
-has 29 or 30 days is decided by the sighting. A 29-day month has already turned on the last day held
-(the page's 30th row is the next month's first day); a 30-day month turns the day after. So the rule
-needs no calendar. A page that has not moved three days after the last day held is a fetch finding,
-fetched weekly again. The workflow fires every day at 01:23 UTC too: a small job `due` checks out only
+**The cadence.** `ma-habous` is now `hijri-month`. It stays weekly, and is due besides on every run
+while any of its tables' last day is today or one of the three days before. Whether the month has 29
+or 30 days is decided by the sighting. A 29-day month has already turned on the last day held (the
+page's 30th row is the next month's first day); a 30-day month turns the day after. So the rule needs
+no calendar. Any one table decides: one city missing from a turn keeps it open, and a city a month
+behind never hides the next turn (the first version took the earliest last day over the cities, so a
+single city stuck a month behind would have silenced the next month's daily check; the review found
+it). After a fetch, a page whose newest table still ends more than three days ago has not turned: the
+source is recorded as fetched in part, which the issue shows as a fetch finding, retried on the next
+run and then weekly. The workflow fires every day at 01:23 UTC too: a small job `due` checks out only
 the state and the monitor code, and `fetch.py --month-turn` prints each source whose month is turning.
 Only then does the full run follow, a normal one like the 1st's (fetch, check, prove, push). Against the
-cloud's own state of 5 October it says yes on 12–15 October and no on the other days. The private
+cloud's own state of 5 October it says yes on 12–15 October and no on the other days of October and
+November; on that state with 38 cities moved to 11 November and one left a month behind, it says yes on
+12–15 October and 11–14 November. The check costs about one billed runner-minute a day. The private
 repository's workflow file needs the new template, copied after this change is on Taqwa's `main`
 (before that, the daily check would call a `--month-turn` that `main` does not have).
 
@@ -2521,7 +2531,11 @@ sighting allows (each month at Umm al-Qura's start or a day later, as Morocco's 
 A page that showed the checked days of its month, with the rest marked "not yet published", would be
 live 178 to 182 days; a rolling week, 138 to 144. The real generator, on a stamp given a simulated
 Jumada al-Ula capture, shows October alone from 12 October and holds every page on 1 November until the
-next capture, as the count assumes.
+next capture, as the count assumes. Pages that would qualify with Casablanca, Rabat and Tangier, all
+inside Habous units, have no `cities.tsv` row yet: Oujda, Ifrane and Midelt (each needs its Arabic and
+French names in the row, Ifrane its French and Midelt both, or the generator refuses it), Azrou (inside
+Ifrane's unit, held for exactly the same reason), and Laayoune and Dakhla, which the app files as
+Western Sahara (EH): they also need a site region for EH, and are the owner's call.
 
 **The edge, checked at 29 more cities.** Until now the gate checked Habous's national margins (the
 edge, which answers everywhere beyond the ten fitted cities, so most of Morocco) at one town only,
@@ -2542,7 +2556,32 @@ left out), so prove adds their rows each month. Marrakesh, Fes and Agadir still 
 class D at the edge, and only a unit fitted on their own tables (two or three months of them) can make
 them class B.
 
+What the edge costs there, from the stamp's tallies (Azrou's 30 days sit in Ifrane's unit and stay
+within 2 min, so every 3-minute cell is at the 28 edge towns, 840 place-days): Maghrib is 3 or more
+minutes after Habous's on 722 of the 840 (86%), and sunrise 3 or more minutes before Habous's on 811
+(97%); Asr reaches 3 min on one day, Fajr, Dhuhr and Isha stay within 2. That is never early, but it
+misses the owner's "ideally within 3 min" on most days at Fes, Marrakesh, Agadir, Meknes, Kenitra and
+Tétouan, several million people. Units fitted on each city's own tables close it. The Wayback Machine
+holds Habous's own pages for them under today's ville ids (`horaire_hijri_2.php?ville=…`, the page the
+ten units' Wayback months came from): every one of the 29 places has its page of Muharram 1444 (late
+July to August 2022, a summer month; Fes's, opened, shows Fes selected and the six usual columns), and
+seven have a second month (Meknes September 2022, Kenitra and El Jadida May, Tétouan November, Al
+Hoceïma and Taroudant June, Chefchaouen April). Older captures use other ids and would have to be opened
+one by one to be placed; the French pages repeat August 2022. Read into the archive as held-out seasons,
+as the ten units' Wayback pages were (in the legal time of 2022, UTC+1 outside Ramadan), they would let
+units be fitted on a summer month, the autumn month held now and the winter months the fetcher
+captures, without waiting for mid-December.
+
 Checked: the monitor's Python tests under Homebrew's 3.13 and the Mac's 3.9 (87 tests; the one failure,
 kz-qmdb without a recipe, is on `main` already), tools `jvmTest` 297/0 with the archive, and the whole
 gate: 949 rows, 190,445 place-days, 0 early, 0 late ends, none over its limit, nothing BROKEN. Only
 `ma.habous`'s stamp changed, with `ProofStamps.kt`.
+
+The review round (no gate data or stamp changed): the turn rule now reads any table inside its turn,
+and an unturned page is a finding, as above; the TLS context clears `VERIFY_X509_PARTIAL_CHAIN`; and the
+Habous parser refuses a page whose six time columns are not headed as they are today (Fajr, sunrise,
+Dhuhr, Asr, Maghrib, Isha), so a Ramadan page with another column fails loudly instead of being read
+one column off (every one of the 39 pages held re-parses to its table unchanged). Python tests 90 under
+both Pythons, the same single failure; tools `jvmTest` 297/0; the whole gate again 949 rows, 190,445
+place-days, all zeros, `ma.habous`'s stamp byte-identical (the twelve engine hashes every Mac run
+rewrites, a known machine difference, restored).
