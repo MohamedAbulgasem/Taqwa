@@ -6,8 +6,9 @@
 # month-start (a page that shows the current month alone: due as soon as a new month has begun in
 # Africa/Johannesburg since the source's last complete fetch, so due until that month is captured whole),
 # hijri-month (a page that shows the current Hijri month alone and turns on its first day: weekly, and
-# besides on every run from the last day its tables hold until the next month is held, at most three days
-# after it; the workflow's daily check starts a run for it) or manual (a fetcher with cadence manual runs
+# besides on every run while any of its tables' last day is today or one of the three days before, so one
+# city missing from a turn keeps it open and a city a month behind never hides the next turn; a page still
+# unturned after that is a fetch finding; the workflow's daily check starts a run for it) or manual (a fetcher with cadence manual runs
 # only when named with --only); `next_expected` (a date or a
 # month, or `-`) is when a source read by hand expects its next edition — the report says "due" once it
 # passes; move it on after the edition is in the archive. Every fetched table is checked as the entry

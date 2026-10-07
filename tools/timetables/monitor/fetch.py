@@ -20,13 +20,16 @@ whose cadence is not due (monthly ones) is skipped unless `--only` names it or `
 month-start source (a page that shows the current month alone, the MJC's) is due as soon as a new
 month has begun in Africa/Johannesburg since its last complete fetch, judged on the clock (`--now`
 pins the moment for a test); a hijri-month source (a page that shows the current Hijri month alone,
-Habous's) is weekly, and due besides on every run from the last day its tables hold until the next
-month is held, for at most MONTH_TURN_DAYS days after that day; a source with cadence `manual` runs
-only when named; a source whose fetcher is `manual` is read by hand and never runs. A fetcher that
-fails is a finding in the report, never a crash: this exits 0 unless the driver itself breaks (2), and
-then `latest.json` carries the error so the report says so. `--month-turn` fetches nothing: it prints
-the hijri-month sources whose month is turning today, read from `hashes.json` alone, for the
-workflow's daily check, which starts a full run only when it prints one.
+Habous's) is weekly, and due besides on every run while any of its tables' last day is today or one of
+the MONTH_TURN_DAYS days before it: one city missing from a turn keeps it open, and a city a month
+behind never hides the next turn; after a fetch, a hijri-month source whose newest table still ends
+more than MONTH_TURN_DAYS days before today (its page has not turned) is recorded as fetched in part,
+a fetch finding; a source with cadence `manual` runs only when named; a source whose fetcher is
+`manual` is read by hand and never runs. A fetcher that fails is a finding in the report, never a
+crash: this exits 0 unless the driver itself breaks (2), and then `latest.json` carries the error so
+the report says so. `--month-turn` fetches nothing: it prints the hijri-month sources whose month is
+turning today, read from `hashes.json` alone, for the workflow's daily check, which starts a full run
+only when it prints one.
 The run has a time budget (review M3; 90 minutes unless given): once it is spent the remaining
 sources are recorded as not fetched. Python 3.9 or later, standard library only. The archive is
 git-ignored and restricted: nothing fetched is ever committed.
@@ -54,28 +57,49 @@ INDEX_HEADER = ["source", "key", "path", "name", "lat", "lon", "zone", "clock", 
 CADENCE_DAYS = {"weekly": 6, "monthly": 27, "hijri-month": 6}
 # Every cadence sources.tsv may name: weekly and monthly count days from the last fetch; month-start
 # counts months in Africa/Johannesburg from the last complete fetch; hijri-month is weekly and besides
-# due while its Hijri month turns (`month_turn_due`); manual runs only when named.
+# due while its Hijri month turns (`turn_last`); manual runs only when named.
 CADENCES = ("weekly", "monthly", "month-start", "hijri-month", "manual")
 DEFAULT_BUDGET_MINUTES = 90
 # A hijri-month source (habous.gov.ma: the current Hijri month alone, from its first day, published the
-# day it begins) turns on the new month's first day, which the moon's sighting puts on the day after its
-# held tables' last day or on that day itself (a 29-day month, where the page's 30th row is the next
-# month's first day). It is due on every run from that last day until the new month is held, for at most
-# this many days after it; beyond them a page that has not moved is the report's fetch finding, fetched
-# weekly, not every day.
+# day it begins) turns on the new month's first day, which the moon's sighting puts on the day after a
+# table's last day or on that day itself (a 29-day month, where the page's 30th row is the next month's
+# first day). It is due on every run while any of its tables' last day is today or one of this many days
+# before it: one city missing from a turn keeps it open, and a city a month behind (its last day long
+# past) never hides the next turn. After that, a fetch whose newest table still ends more than this many
+# days ago is recorded in part (`unturned`), the report's fetch finding: retried once, then weekly, not
+# every day.
 MONTH_TURN_DAYS = 3
-# A table more than this many days behind the source's newest (a city the page no longer lists) does not
-# hold the turn open: the source's current tables decide.
-MONTH_TURN_STALE_DAYS = 40
 
 
-def month_turn_due(held_last, today):
-    """Whether a hijri-month source's month is turning on `today`: on or after the last day its current
-    tables hold (`held_last`), at most MONTH_TURN_DAYS days after it. Nothing held: not by this rule
-    (the weekly cadence fetches a source never fetched)."""
-    if held_last is None:
+def month_turn_due(last, today):
+    """Whether a table whose last day is `last` holds its source's month turn open on `today`: on that
+    day or at most MONTH_TURN_DAYS days after it. No last day: not by this rule (the weekly cadence
+    fetches a source never fetched)."""
+    if last is None:
         return False
-    return 0 <= (today - held_last).days <= MONTH_TURN_DAYS
+    return 0 <= (today - last).days <= MONTH_TURN_DAYS
+
+
+def turn_last(lasts, today):
+    """The last day a hijri-month source's turn runs from on `today`: the latest of its tables' last days
+    (`lasts`) that holds the turn open (`month_turn_due`), None when none does. Any one table decides, so
+    one city missing from a turn keeps it open and a city a month behind never hides the next turn."""
+    inside = [d for d in lasts if month_turn_due(d, today)]
+    return max(inside) if inside else None
+
+
+def unturned(store, source, today):
+    """The finding for a hijri-month source whose page has not turned: after a fetch its newest table
+    still ends more than MONTH_TURN_DAYS days before today, so the next month has not appeared. None
+    otherwise, and when nothing is held."""
+    newest = store.newest_last(source)
+    if newest is None:
+        return None
+    n = (today - newest).days
+    if n <= MONTH_TURN_DAYS:
+        return None
+    return (f"the page still shows the Hijri month that ended {newest.isoformat()} ({n} days ago): "
+            "the next month has not appeared on the source's page")
 
 
 def read_sources(path):
@@ -94,7 +118,7 @@ def read_sources(path):
     return out
 
 
-def skip_reason(row, last_fetch, today, only, force, retry=False, last_complete=None, now=None, held_last=None):
+def skip_reason(row, last_fetch, today, only, force, retry=False, last_complete=None, now=None, turn=None):
     """Why a source is not fetched this run, or None when it is: a source read by hand (fetcher
     `manual`) never, named or not; one with cadence `manual` only when named; a weekly one every run
     (six days after its last fetch), a monthly one after 27 days; a month-start one (a page that
@@ -102,7 +126,7 @@ def skip_reason(row, last_fetch, today, only, force, retry=False, last_complete=
     begun in Africa/Johannesburg since its last complete fetch (`last_complete`, a moment; `now`, the
     clock unless given), so it stays due until the month is captured complete; a hijri-month one (a
     page that shows the current Hijri month alone) weekly, and on every run while its month turns
-    (`month_turn_due` on `held_last`, the last day its current tables hold); one whose last run
+    (`turn`, the source's `Store.turn_last` today, is a day, not None); one whose last run
     failed or came back in part once more (`retry`, review R3-M2), then on its cadence; `--only` and
     `--force` override."""
     if row["fetcher"] == "manual":
@@ -119,7 +143,7 @@ def skip_reason(row, last_fetch, today, only, force, retry=False, last_complete=
         if last_complete is None or month_of(now or utc_now()) > month_of(last_complete):
             return None
         return "not due"
-    if row["cadence"] == "hijri-month" and month_turn_due(held_last, today):
+    if row["cadence"] == "hijri-month" and turn is not None:
         return None
     days = CADENCE_DAYS.get(row["cadence"], 6)
     if last_fetch is None or (today - last_fetch).days >= days:
@@ -127,17 +151,17 @@ def skip_reason(row, last_fetch, today, only, force, retry=False, last_complete=
     return "not due"
 
 
-def due(row, last_fetch, today, only, force, retry=False, last_complete=None, now=None, held_last=None):
-    return skip_reason(row, last_fetch, today, only, force, retry, last_complete, now, held_last) is None
+def due(row, last_fetch, today, only, force, retry=False, last_complete=None, now=None, turn=None):
+    return skip_reason(row, last_fetch, today, only, force, retry, last_complete, now, turn) is None
 
 
 def month_turns(sources, store, today):
     """The sources whose page turns with its month and whose new month is due today: every
-    hijri-month source fetched by a fetcher (not by hand) inside its turn (`month_turn_due`). What
+    hijri-month source fetched by a fetcher (not by hand) inside its turn (`Store.turn_last`). What
     the workflow's daily check asks before it starts a full run."""
     return [row["source"] for row in sources
             if row["cadence"] == "hijri-month" and row["fetcher"] != "manual"
-            and month_turn_due(store.held_last(row["source"]), today)]
+            and store.turn_last(row["source"], today) is not None]
 
 
 class Store:
@@ -170,16 +194,20 @@ class Store:
         s = self.data["sources"].get(source, {}).get("lastComplete")
         return parse_moment(s) if s else None
 
-    def held_last(self, source):
-        """The last day the source's current tables all hold: the earliest of their last days, leaving
-        out a table more than MONTH_TURN_STALE_DAYS behind the newest (a city the page no longer lists),
-        so one city missing from a turn keeps it open; None when nothing is held."""
-        lasts = [dt.date.fromisoformat(t["last"]) for t in self.data["tables"].values()
-                 if t.get("source") == source and t.get("last")]
-        if not lasts:
-            return None
-        newest = max(lasts)
-        return min(d for d in lasts if (newest - d).days <= MONTH_TURN_STALE_DAYS)
+    def lasts(self, source):
+        """The last day of each table held for the source."""
+        return [dt.date.fromisoformat(t["last"]) for t in self.data["tables"].values()
+                if t.get("source") == source and t.get("last")]
+
+    def turn_last(self, source, today):
+        """The last day the source's month turn runs from on `today` (module `turn_last`: any table whose
+        last day is today or one of the MONTH_TURN_DAYS days before), None when no table holds it open."""
+        return turn_last(self.lasts(source), today)
+
+    def newest_last(self, source):
+        """The latest last day over the source's tables, None when nothing is held."""
+        lasts = self.lasts(source)
+        return max(lasts) if lasts else None
 
     @staticmethod
     def rel_path(source, key):
@@ -271,12 +299,14 @@ def next_time(store, row, now=None):
             return "this was the retry; a month-start source stays due on every run until its month is captured complete"
         return "this was the retry; this month is already captured, so the source now waits for the next month (month-start)"
     if row["cadence"] == "hijri-month":
-        last = store.held_last(row["source"])
-        if month_turn_due(last, store.today):
+        last = store.turn_last(row["source"], store.today)
+        if last is not None:
             until = last + dt.timedelta(days=MONTH_TURN_DAYS)
             return (f"this was the retry; its next Hijri month is not held yet, so it stays due on every run until {until.isoformat()} "
-                    f"({MONTH_TURN_DAYS} days after the last day held, {last.isoformat()}), then weekly")
-        after = f", and on every run from {last.isoformat()}, the last day held, while its next Hijri month turns" if last else ""
+                    f"({MONTH_TURN_DAYS} days after {last.isoformat()}, the last day a table holds), then weekly")
+        newest = store.newest_last(row["source"])
+        after = (f", and on every run from {newest.isoformat()}, the last day held, while its next Hijri month turns"
+                 if newest is not None and newest >= store.today else "")
         return f"this was the retry; the source now waits for its cadence (weekly{after})"
     return f"this was the retry; the source now waits for its cadence ({row['cadence']})"
 
@@ -371,7 +401,7 @@ def main(argv=None):
                 results[source] = {"status": "skipped", "message": "not selected", "requests": 0, "tables": {}}
                 continue
             why = skip_reason(row, store.last_fetch(source), today, only, args.force, retry=store.retry(source),
-                              last_complete=store.last_complete(source), now=pinned, held_last=store.held_last(source))
+                              last_complete=store.last_complete(source), now=pinned, turn=store.turn_last(source, today))
             if why:
                 results[source] = {"status": "skipped", "message": why, "requests": 0, "tables": {}}
                 print(f"{source}: skipped ({why})")
@@ -386,6 +416,12 @@ def main(argv=None):
             print(f"{source}: fetching …", flush=True)
             ctx = Context(source, official, today, log, monitor_dir, args.force, http=http, now=pinned)
             status, message, requests, statuses = run_source(row, store, ctx)
+            if row["cadence"] == "hijri-month" and status in ("ok", "partial"):
+                # A page that has not turned three days after its month ended is a finding, never silence.
+                stale = unturned(store, source, today)
+                if stale:
+                    status = "partial"
+                    message = (message + "; " if message else "") + stale
             if status in ("partial", "failed"):
                 # The report keeps naming the missing part (the errors above) and says what happens next.
                 message = (message + "; " if message else "") + next_time(store, row, pinned)

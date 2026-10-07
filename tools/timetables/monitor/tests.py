@@ -247,6 +247,14 @@ class Parsers(unittest.TestCase):
         rows = morocco.parse(page, dt.date(2026, 9, 28))
         self.assertEqual(["2026-09-13", "2026-10-02"], sorted(rows))
         self.assertEqual(["05:23", "06:48", "12:33", "16:00", "18:11", "19:29"], rows["2026-09-13"])
+        # A page headed with another column (an imsak before Fajr, say) is refused, never read one column off.
+        seven = ('<table id="horaire"><tr><th>الأيام</th><th>رمضان</th><th>فبراير / مارس</th><th>الإمساك</th><th>الصبح</th><th>الشروق</th>'
+                 "<th>الظهر</th><th>العصر</th><th>المغرب</th><th>العشاء</th></tr>"
+                 "<tr><td>الأحد</td><td>1</td><td>13</td><td>01:13</td><td>02:13</td><td>03:13</td><td>04:13</td><td>05:13</td><td>06:13</td><td>07:13</td></tr></table>")
+        with self.assertRaisesRegex(FetchError, "time columns are not the six expected"):
+            morocco.parse(seven, dt.date(2027, 2, 20))
+        with self.assertRaisesRegex(FetchError, "time columns are not the six expected"):
+            morocco.parse(page.replace("<th>الشروق</th>", "<th>الفجر</th>"), dt.date(2026, 9, 28))
 
     def test_mawaqit_takes_the_last_columns(self):
         six = {"calendar": [{"1": ["05:00", "07:00", "12:30", "15:00", "17:30", "19:00"]}]}
@@ -1139,9 +1147,9 @@ class HijriMonth(unittest.TestCase):
         self.assertEqual(3, fetch.MONTH_TURN_DAYS)
 
     def test_due_weekly_and_while_the_month_turns(self):
-        def reason(today, last_fetch, held_last, retry=False, only=(), force=False):
-            return skip_reason(self.ROW, last_fetch, today, set(only), force, retry=retry, held_last=held_last)
-        held = dt.date(2026, 10, 12)
+        def reason(today, last_fetch, lasts, retry=False, only=(), force=False):
+            return skip_reason(self.ROW, last_fetch, today, set(only), force, retry=retry, turn=fetch.turn_last(lasts, today))
+        held = [dt.date(2026, 10, 12)]
         # Mid-month: weekly, six days after the last fetch.
         self.assertEqual("not due", reason(dt.date(2026, 10, 2), dt.date(2026, 9, 28), held))
         self.assertEqual(None, reason(dt.date(2026, 10, 5), dt.date(2026, 9, 28), held))
@@ -1153,44 +1161,65 @@ class HijriMonth(unittest.TestCase):
         self.assertEqual("not due", reason(dt.date(2026, 10, 16), dt.date(2026, 10, 15), held))
         self.assertEqual(None, reason(dt.date(2026, 10, 21), dt.date(2026, 10, 15), held))
         # Never fetched, the retry, --only and --force, as for every cadence.
-        self.assertEqual(None, reason(dt.date(2026, 10, 2), None, None))
+        self.assertEqual(None, reason(dt.date(2026, 10, 2), None, []))
         self.assertEqual(None, reason(dt.date(2026, 10, 2), dt.date(2026, 10, 1), held, retry=True))
         self.assertEqual(None, reason(dt.date(2026, 10, 2), dt.date(2026, 10, 1), held, only=("ma-habous",)))
         self.assertEqual(None, reason(dt.date(2026, 10, 2), dt.date(2026, 10, 1), held, force=True))
-        self.assertTrue(due(self.ROW, dt.date(2026, 10, 11), dt.date(2026, 10, 12), set(), False, held_last=held))
+        self.assertTrue(due(self.ROW, dt.date(2026, 10, 11), dt.date(2026, 10, 12), set(), False, turn=dt.date(2026, 10, 12)))
         # Another cadence never reads the turn.
         weekly = dict(self.ROW, cadence="weekly")
-        self.assertEqual("not due", skip_reason(weekly, dt.date(2026, 10, 11), dt.date(2026, 10, 12), set(), False, held_last=held))
+        self.assertEqual("not due", skip_reason(weekly, dt.date(2026, 10, 11), dt.date(2026, 10, 12), set(), False, turn=dt.date(2026, 10, 12)))
 
-    def test_the_last_day_held_is_the_earliest_of_the_current_tables(self):
+    def test_any_table_inside_its_turn_holds_the_turn_open(self):
         store = Store(self.root, self.monitor, dt.date(2026, 9, 28))
-        self.assertIsNone(store.held_last("ma-habous"))
+        self.assertIsNone(store.turn_last("ma-habous", dt.date(2026, 10, 12)))
+        self.assertIsNone(store.newest_last("ma-habous"))
         self.held(store, "rabat", dt.date(2026, 9, 13))
         self.held(store, "oujda", dt.date(2026, 9, 13))
-        self.assertEqual(dt.date(2026, 10, 12), store.held_last("ma-habous"))
-        # The next month for Rabat alone: Oujda's missing month keeps the turn open.
+        self.assertIsNone(store.turn_last("ma-habous", dt.date(2026, 10, 11)))
+        self.assertEqual(dt.date(2026, 10, 12), store.turn_last("ma-habous", dt.date(2026, 10, 12)))
+        # The next month for Rabat alone: Oujda's missing month keeps the turn open to its third day.
         store.today = dt.date(2026, 10, 13)
         self.held(store, "rabat", dt.date(2026, 10, 13))
         self.assertEqual("2026-11-11", store.data["tables"]["ma-habous/rabat"]["last"])
-        self.assertEqual(dt.date(2026, 10, 12), store.held_last("ma-habous"))
+        self.assertEqual(dt.date(2026, 10, 12), store.turn_last("ma-habous", dt.date(2026, 10, 13)))
+        self.assertEqual(dt.date(2026, 10, 12), store.turn_last("ma-habous", dt.date(2026, 10, 15)))
+        self.assertIsNone(store.turn_last("ma-habous", dt.date(2026, 10, 16)))
+        self.assertEqual(dt.date(2026, 11, 11), store.newest_last("ma-habous"))
+        # Oujda a month behind never hides Rabat's next turn.
+        self.assertEqual(dt.date(2026, 11, 11), store.turn_last("ma-habous", dt.date(2026, 11, 11)))
         self.held(store, "oujda", dt.date(2026, 10, 13))
-        self.assertEqual(dt.date(2026, 11, 11), store.held_last("ma-habous"))
-        # A city the page no longer lists, over 40 days behind the newest, no longer holds the turn open.
+        self.assertIsNone(store.turn_last("ma-habous", dt.date(2026, 10, 13)))
+        # A table 60 days old holds nothing open, alone or beside the current ones.
+        self.held(store, "only", dt.date(2026, 8, 14), source="aged")
+        self.assertEqual(dt.date(2026, 9, 12), store.turn_last("aged", dt.date(2026, 9, 12)))
+        self.assertIsNone(store.turn_last("aged", dt.date(2026, 9, 12) + dt.timedelta(days=60)))
         self.held(store, "gone", dt.date(2026, 8, 14))
-        self.assertEqual(dt.date(2026, 11, 11), store.held_last("ma-habous"))
+        self.assertEqual(dt.date(2026, 11, 11), store.turn_last("ma-habous", dt.date(2026, 11, 11)))
+        self.assertIsNone(store.turn_last("ma-habous", dt.date(2026, 11, 15)))
         # Another source's tables are not this source's.
-        self.held(store, "x", dt.date(2026, 9, 1), source="other")
-        self.assertEqual(dt.date(2026, 11, 11), store.held_last("ma-habous"))
+        self.held(store, "x", dt.date(2026, 10, 3), source="other")
+        self.assertEqual(dt.date(2026, 11, 1), store.turn_last("other", dt.date(2026, 11, 2)))
+        self.assertIsNone(store.turn_last("ma-habous", dt.date(2026, 11, 2)))
+        self.assertEqual(dt.date(2026, 11, 11), store.newest_last("ma-habous"))
 
     def test_what_a_failed_turn_says_happens_next(self):
         store = Store(self.root, self.monitor, dt.date(2026, 10, 13))
         self.held(store, "rabat", dt.date(2026, 9, 13))
         self.assertEqual("retried on the next run, once", fetch.next_time(store, self.ROW))
         store.source_done("ma-habous", "failed", "a reason", 1)
-        self.assertIn("stays due on every run until 2026-10-15 (3 days after the last day held, 2026-10-12), then weekly",
+        self.assertIn("stays due on every run until 2026-10-15 (3 days after 2026-10-12, the last day a table holds), then weekly",
                       fetch.next_time(store, self.ROW))
+        # Past the turn with the page unmoved: weekly, no turn ahead to name.
         store.today = dt.date(2026, 10, 20)
-        self.assertIn("waits for its cadence (weekly, and on every run from 2026-10-12", fetch.next_time(store, self.ROW))
+        self.assertTrue(fetch.next_time(store, self.ROW).endswith("waits for its cadence (weekly)"), fetch.next_time(store, self.ROW))
+        # With the next month held, its own last day is the next turn.
+        self.held(store, "rabat", dt.date(2026, 10, 13))
+        self.assertIn("waits for its cadence (weekly, and on every run from 2026-11-11, the last day held", fetch.next_time(store, self.ROW))
+        # One city a month behind and the other inside its turn: the turn named is the latest.
+        self.held(store, "fes", dt.date(2026, 9, 13))
+        store.today = dt.date(2026, 11, 12)
+        self.assertIn("until 2026-11-14 (3 days after 2026-11-11, the last day a table holds)", fetch.next_time(store, self.ROW))
 
     def write_sources(self, extra=""):
         path = os.path.join(self.root, "sources.tsv")
@@ -1229,6 +1258,31 @@ class HijriMonth(unittest.TestCase):
         finally:
             shutil.rmtree(state_only)
 
+    def test_a_city_a_month_behind_never_hides_the_next_turn(self):
+        sources = self.write_sources()
+        store = Store(self.root, self.monitor, dt.date(2026, 10, 13))
+        self.held(store, "rabat", dt.date(2026, 10, 13))
+        self.held(store, "fes", dt.date(2026, 9, 13))
+        store.save()
+        self.assertEqual(("2026-11-11", "2026-10-12"), (store.data["tables"]["ma-habous/rabat"]["last"], store.data["tables"]["ma-habous/fes"]["last"]))
+        for today in ("2026-11-11", "2026-11-12", "2026-11-14"):
+            self.assertEqual((0, ["ma-habous"]), self.month_turn(today, sources), today)
+        for today in ("2026-11-15", "2026-11-02"):
+            self.assertEqual((0, []), self.month_turn(today, sources), today)
+        # Fes's own month turn still keeps the source due at the October turn.
+        self.assertEqual((0, ["ma-habous"]), self.month_turn("2026-10-15", sources))
+
+    def test_a_table_sixty_days_old_is_never_due(self):
+        sources = self.write_sources()
+        store = Store(self.root, self.monitor, dt.date(2026, 8, 14))
+        self.held(store, "rabat", dt.date(2026, 8, 14))
+        store.save()
+        self.assertEqual("2026-09-12", store.data["tables"]["ma-habous/rabat"]["last"])
+        self.assertEqual((0, ["ma-habous"]), self.month_turn("2026-09-12", sources))
+        self.assertEqual((0, []), self.month_turn("2026-11-11", sources))
+        self.assertEqual("not due", skip_reason(self.ROW, dt.date(2026, 11, 10), dt.date(2026, 11, 11), set(), False,
+                                                turn=store.turn_last("ma-habous", dt.date(2026, 11, 11))))
+
     def test_a_run_at_the_turn_fetches_until_the_new_month_is_held(self):
         import types
         pages = {"first": dt.date(2026, 9, 13)}
@@ -1263,6 +1317,47 @@ class HijriMonth(unittest.TestCase):
             self.assertEqual("not due", run("2026-10-14")["message"])
             self.assertEqual((0, []), self.month_turn("2026-10-14", sources))
             self.assertEqual("ok", run("2026-10-19")["status"], "weekly as before")
+        finally:
+            del sys.modules["fetchers.fakehijri"]
+
+    def test_a_page_that_has_not_turned_is_a_fetch_finding(self):
+        import types
+        pages = {"first": dt.date(2026, 9, 13)}
+
+        def fake_fetch(ctx):
+            t = Table("rabat", "Rabat", None, None, "Africa/Casablanca", "MA", "F+E S D A M I", entry="ma.habous/rabat", clock="UTC")
+            for d, times in hijri_month_rows(pages["first"]).items():
+                t.add(d, times)
+            return [t]
+        module = types.ModuleType("fetchers.fakehijri")
+        module.fetch = fake_fetch
+        sys.modules["fetchers.fakehijri"] = module
+        sources = self.write_sources()
+        try:
+            def run(today):
+                code = fetch.main(["--official", self.root, "--sources", sources, "--today", today])
+                self.assertEqual(0, code)
+                with open(os.path.join(self.monitor, "fetch", "latest.json")) as f:
+                    return json.load(f)["sources"]["ma-habous"]
+            out = run("2026-09-28")
+            self.assertEqual(("ok", ""), (out["status"], out["message"]))
+            # Inside the turn (the last day held, 12 October, and the three days after it), an unmoved page is no finding.
+            out = run("2026-10-13")
+            self.assertEqual(("ok", "", {"rabat": "unchanged"}), (out["status"], out["message"], out["tables"]))
+            # 19 October, the Monday after: still the month that ended on the 12th.
+            out = run("2026-10-19")
+            self.assertEqual(("partial", {"rabat": "unchanged"}), (out["status"], out["tables"]))
+            self.assertIn("the page still shows the Hijri month that ended 2026-10-12 (7 days ago): the next month has not appeared", out["message"])
+            self.assertTrue(out["message"].endswith("; retried on the next run, once"), out["message"])
+            # The retry the next run (outside the turn, due by the retry alone), then the cadence.
+            out = run("2026-10-20")
+            self.assertEqual("partial", out["status"])
+            self.assertTrue(out["message"].endswith("this was the retry; the source now waits for its cadence (weekly)"), out["message"])
+            self.assertEqual("not due", run("2026-10-21")["message"])
+            # The next month held: no finding again.
+            pages["first"] = dt.date(2026, 10, 21)
+            out = run("2026-10-26")
+            self.assertEqual(("ok", "", {"rabat": "changed"}), (out["status"], out["message"], out["tables"]))
         finally:
             del sys.modules["fetchers.fakehijri"]
 
@@ -1349,6 +1444,9 @@ class Tls(unittest.TestCase):
         self.assertIs(ctx, common.tls_context("habous.gov.ma"), "one context per chain file")
         self.assertEqual(common.ssl.CERT_REQUIRED, ctx.verify_mode)
         self.assertTrue(ctx.check_hostname)
+        if hasattr(common.ssl, "VERIFY_X509_PARTIAL_CHAIN"):
+            # Python 3.13+ sets it by default; off, the file's intermediate is never a trust anchor by itself.
+            self.assertFalse(ctx.verify_flags & common.ssl.VERIFY_X509_PARTIAL_CHAIN)
         def cn(name):
             return dict(x[0] for x in name).get("commonName")
         self.assertIn("Sectigo Public Server Authentication CA DV R36", {cn(c["subject"]) for c in ctx.get_ca_certs()})

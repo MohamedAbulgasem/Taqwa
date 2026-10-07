@@ -21,6 +21,10 @@ SOURCE = "ma-habous"
 PAGE = "https://www.habous.gov.ma/prieres/index.php?ville="
 MONTHS = {"يناير": 1, "فبراير": 2, "مارس": 3, "أبريل": 4, "ابريل": 4, "ماي": 5, "يونيو": 6, "يوليوز": 7, "غشت": 8,
           "شتنبر": 9, "أكتوبر": 10, "اكتوبر": 10, "نونبر": 11, "دجنبر": 12}
+# The six time columns the page heads, in the order the table reads them (F+E S D A M I): Fajr, sunrise,
+# Dhuhr, Asr, Maghrib, Isha. A page headed otherwise (a Ramadan page with an imsak column, say) is refused,
+# never read one column off.
+COLUMNS = ["الصبح", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"]
 
 # unit id (ma-habous.tsv), name, the site's ville id
 CITIES = [
@@ -85,6 +89,8 @@ def parse(page, today):
     if not rows:
         raise FetchError("no table on the page")
     hdr = rows[0]
+    if hdr[3:] != COLUMNS:
+        raise FetchError(f"the table's time columns are not the six expected ({' | '.join(hdr[3:])[:80]})")
     gm = [MONTHS.get(x.strip()) for x in (hdr[2].split("/") if len(hdr) > 2 else [])]
     gm = [m for m in gm if m]
     if not gm:

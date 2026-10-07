@@ -63,6 +63,10 @@ def tls_context(host):
     ctx = _TLS_CONTEXTS.get(name)
     if ctx is None:
         ctx = ssl.create_default_context()
+        if hasattr(ssl, "VERIFY_X509_PARTIAL_CHAIN"):
+            # Python 3.13+ sets it by default, which would make the file's intermediate a trust anchor on
+            # its own; cleared, the chain must still end at a root the system trusts, on every Python.
+            ctx.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
         ctx.load_verify_locations(cafile=os.path.join(CERTS, name))
         _TLS_CONTEXTS[name] = ctx
     return ctx

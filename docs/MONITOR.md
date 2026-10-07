@@ -24,10 +24,12 @@ needs attention, so that a Claude session can act on it.
    has begun in Africa/Johannesburg since its last complete fetch, so it stays due until that month is
    captured whole, and each month is kept as its own capture. A hijri-month source is a page that shows
    the current Hijri month alone, from its first day, and turns on the day the new month begins, which
-   the moon's sighting decides (Habous's): it is weekly, and due besides on every run from the last day
-   its tables hold until three days after it, until the new month is held (`MONTH_TURN_DAYS` in
-   `fetch.py`; a page that has not moved by then is a fetch finding, fetched weekly again). Its
-   tables keep every month fetched. A fetcher that fails is a finding in
+   the moon's sighting decides (Habous's): it is weekly, and due besides on every run while any of its
+   tables' last day is today or one of the three days before (`MONTH_TURN_DAYS` in `fetch.py`): one
+   city missing from a turn keeps it open, and a city a month behind never hides the next turn. A
+   fetch whose newest table still ends more than three days ago (the page has not turned) is recorded
+   as fetched in part, so it is a fetch finding in the report: retried on the next run, then weekly.
+   Its tables keep every month fetched. A fetcher that fails is a finding in
    the report, never a crash, and a driver that breaks is one too (what is held is still checked). A
    source that failed or came back in part is fetched once more on the next run, then waits for its
    cadence (one mosque gone from Mawaqit for good does not refetch all 125 calendars weekly; a
@@ -141,10 +143,14 @@ the public repository's monitor code and runs `fetch.py --month-turn`: it reads 
 alone and prints each hijri-month source whose month is turning today. Only when it prints one does the
 full run follow, a normal one like the 1st's (whatever else is due is fetched too, then the check,
 prove and the push); on every other day the run stops there, touching nothing. Mondays, the 1st and a
-run by hand never ask. With the sighting deciding between two days, the turn is due from the last day
-held: on that day itself a 29-day month has already turned (the page's 30th row is the new month's
-first day), otherwise the next day's run finds it. GitHub may start a scheduled run hours late; the new
-month is still captured within about a day of its publication.
+run by hand never ask. With the sighting deciding between two days, the turn is due from a table's last
+day: on that day itself a 29-day month has already turned (the page's 30th row is the new month's
+first day), otherwise the next day's run finds it. Any table inside its turn keeps the source due, so a
+city whose page failed keeps the turn open to its third day, and a city a month behind does not hide
+the others' next turn. A page still on the old month after those three days is a fetch finding in the
+issue, not silence. GitHub may start a scheduled run hours late; the new month is still captured
+within about a day of its publication. The check costs about one billed runner-minute a day (each job
+is rounded up to a minute), and a full run follows on two to four days of each Hijri month.
 
 **The issue.** One issue titled "Taqwa monitor", labelled `monitor-attention`, is open while
 something needs attention. Its body (at most 60,000 characters, always ending with the pointer to
@@ -331,7 +337,7 @@ Trondheim among them), Kemenag (eighteen kab/kota, Surabaya, Medan, Semarang, Pa
 Yogyakarta among them), JAKIM, MUIS, Egypt (ESA via Dar al-Ifta, and ESA's daily page), Qatar (the
 ministry API and the Calendar House header), Libya (the Awqaf widget and api.ifta.ly), Tunisia (INM),
 Morocco (Habous: the live Hijri month at its ten fitted cities and, since 6 October 2026, at 29 more of
-the app's cities checked at the edge, Fes, Marrakesh and Agadir among them; fetched as each month turns; its server omits its
+the app's cities, 28 at the edge (Fes, Marrakesh and Agadir among them) and Azrou at Ifrane's unit; fetched as each month turns; its server omits its
 certificate's intermediate, which `tools/timetables/monitor/certs/habous.gov.ma.pem` completes for that
 host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, the Muslim Judicial Council (mjc.org.za's current month for Cape
 Town, month-start, each month kept as `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
