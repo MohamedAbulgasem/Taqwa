@@ -10,6 +10,8 @@
 </p>
 
 <p align="center">
+  <a href="https://play.google.com/store/apps/details?id=world.taqwa.app">Google Play</a> ·
+  <a href="https://apps.apple.com/app/id6814975544">App Store</a> ·
   <a href="https://taqwa.world">taqwa.world</a> ·
   <a href="https://taqwa.world/ar/">العربية</a> ·
   <a href="PRIVACY.md">Privacy</a> ·
@@ -38,18 +40,6 @@
 ---
 
 Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatform codebase. It does a few things and tries to do them properly: tell you the prayer times where you are, call you to them, point you to Makkah, and carry the Quran with recitation. Everything is computed on the phone. There is no server, no sign-in, no analytics and nothing to pay for, now or later.
-
-<!-- beta:start -->
-## Join the Android beta
-
-Taqwa for iPhone is on the [App Store](https://apps.apple.com/app/id6814975544); Taqwa for Android follows on Google Play after its closed test. Google asks every new app for twelve testers over two weeks before it can be published. If you have an Android phone, joining takes a minute, and it is the biggest help Taqwa can get right now:
-
-1. [Join the testers group](https://groups.google.com/g/taqwa-testers) with the Google account that is on your phone. The group exists only so Google Play knows who the testers are.
-2. [Become a tester](https://play.google.com/apps/testing/world.taqwa.app) on Google Play's testing page.
-3. [Install from Google Play](https://play.google.com/store/apps/details?id=world.taqwa.app), and keep it installed for two weeks.
-
-Feedback is welcome at support@taqwa.world or in [Issues](https://github.com/MohamedAbulgasem/Taqwa/issues).
-<!-- beta:end -->
 
 ## What it does
 
@@ -120,7 +110,7 @@ All screenshots are from a Samsung Galaxy S23 Ultra running the current build.
 
 ## Get it
 
-Taqwa is on the [App Store](https://apps.apple.com/app/id6814975544) for iPhone. Google Play follows after its closed test; until then Android testers can join the beta above, and anyone can build it from source (below). The website at [taqwa.world](https://taqwa.world) carries each store's link from the day it is live.
+Taqwa is on [Google Play](https://play.google.com/store/apps/details?id=world.taqwa.app) for Android and the [App Store](https://apps.apple.com/app/id6814975544) for iPhone, and anyone can build it from source (below). The website at [taqwa.world](https://taqwa.world) links both stores.
 
 ## Roadmap
 

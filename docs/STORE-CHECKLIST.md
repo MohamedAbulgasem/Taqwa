@@ -86,7 +86,9 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   before it launches." stops being true: re-word it for Android in all seven languages in
   `tools/site-beta.py` (en: "Help test Taqwa for Android before it reaches Google Play.") and
   run `tools/site-beta.py add && python3 site/build.py` (`add` strips and re-inserts, so it can
-  run again).
+  run again). **Done 8 October 2026,** with Taqwa live on Google Play: the section is off all
+  seven home pages and the README's block is gone. `tools/site-beta.py add` puts the section back
+  for a future test.
 - **The site's store badges** come from `site/stores.json`, one address per store, `null` until
   live: set `google_play` to `https://play.google.com/store/apps/details?id=world.taqwa.app`
   when production opens, `app_store` to `https://apps.apple.com/app/id6814975544` when Apple
@@ -98,6 +100,8 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   city page (`site/timetables.py`, through `site/stores.py`, the same function as the hero) —
   switch with the same edit; the Today card's foot keeps its "Get Taqwa" pill, which points to
   `#app`. After the build open one city page and check the badge shows in the pitch and in `#app`.
+  **Done 8 October 2026:** `google_play` is set, so every home page and city page carries both
+  badges and no "coming" line. `exodus` stays `null` until the report is requested and published.
 - **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
   `scripts/bump-version.sh`. Settings › About shows the name alone; Mohamed tells testers which
   build they are on.
@@ -248,7 +252,8 @@ costs days.
 7. **Production**: Production → Countries/regions → add all → Releases → Create → add the bundle
    → release notes → Review → Start rollout (staged or 100 %, both fine). A new account's first
    production review can take up to a week. Then the listing is live at
-   https://play.google.com/store/apps/details?id=world.taqwa.app.
+   https://play.google.com/store/apps/details?id=world.taqwa.app. **Live by 8 October 2026**;
+   the site and README switched that day (§1).
 
 ## 6. App Store, in App Store Connect order
 
