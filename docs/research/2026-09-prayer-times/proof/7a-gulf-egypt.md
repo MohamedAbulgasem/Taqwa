@@ -151,6 +151,53 @@ the nearest, is checked only through the nearest unit's tables. Tayma's coordina
 correct. 2028 onwards waits for the monitor: the recipe adds each new year's rows at the 173 points, not
 at the app's points.
 
+## Umm al-Qura across each unit (10 Oct 2026, the review of the city-points branch)
+
+**Why.** Each unit's figure and its three point limits were proven at the unit's own point and the app's
+point for its city only. An independent review replayed the units' own tables inside their reach: out to
+half the radius 160 of the 173 figures were beaten, and beyond it 162. Riyadh's 1 became 2 at 5 to 10 km,
+and Makkah's and Jeddah's every start 2 at 10 km. At the edges, sunrise and the end of eating came 3
+before the table, against the lag dates' 2.
+
+**The reach rows** (`sa-ummalqura-reach.tsv`, `generateReachRows`). Each unit's own tables are
+replayed at 8 bearings and at half and 95 % of its radius, held out and tagged with the unit, a point
+the nearer place takes left out. That makes 4,031 rows at 2,046 of 2,768 points, for every unit. Each
+unit has a recipe line, so a new year of its table is read across its reach too. Against them: 0 early,
+0 late ends.
+
+| all 520 + 4,031 rows, 1,778,731 place-days | early / late end | 0 | 1 | 2 | 3+ | exact |
+|---|---|---|---|---|---|---|
+| Fajr | 0 | 1,095,670 | 658,642 | 24,171 | 248 | 61.6 % |
+| sunrise | 0 | 1,118,826 | 639,374 | 20,439 | 92 | 62.9 % |
+| Dhuhr | 0 | 1,166,286 | 602,311 | 10,134 | 0 | 65.6 % |
+| Asr | 0 | 1,119,751 | 640,678 | 18,282 | 20 | 62.9 % |
+| Maghrib, Isha | 0 | 1,120,085 | 640,267 | 18,335 | 44 | 63.0 % |
+| end of eating | 0 | 1,023,939 | 720,360 | 34,173 | 259 | 57.6 % |
+
+The days at 3+ are Tayma's (class D).
+
+**The limits** (ruling R41) replace the three point limits at Taif, Madinah and Al Hofuf, for the
+entry:
+- Fajr 2: the lag dates, and the reach.
+- Dhuhr, Asr, Maghrib and Isha 2: across a unit's reach, a minute of longitude, the start shown is the
+  later of the unit's table and the user's own sun.
+- Sunrise and the end of eating 3: the lag dates' earlier of two days and the reach's earlier of two
+  points.
+- Fajr 3 at nine units of the north and the east, where a lag date's later Fajr meets the reach's edge:
+  Al Qurayyat, Al Uwayqiliyah, Az Zulfi, Dhahran, Dumat al-Jandal, Haql, Khafji, Mawqaq and Turaif.
+- Tayma keeps Fajr 5, and 3 for every other event, its class D.
+
+**The figures** (About and the pages, the unit's worst start across its area): Makkah, Riyadh, Jeddah,
+Tabuk, Abha and Buraydah 1 → 2; Madinah and Taif stay 2; Dammam stays 1. Of the 173 units, 152 go from
+1 to 2, nine rise to 3 (the Fajr-3 units), 7 stay 1, 4 stay 2, and Tayma stays 5.
+
+**Naming.** A unit carries the app's city whose table it is (`UmmAlQuraCities.appCityOf`, 77 units), so
+About at Ash Shafa names Taif and at Sultanah Madinah, as the pages do.
+
+**Beyond every unit** the nearest place's table is a point table's edge (`beyondTable`, ruling R45): the
+user's own point a minute later, the end of eating at SAFE_END or earlier, and within three reaches the
+nearest place's point bounding sunrise and the end of eating.
+
 ## Qatar — `qa.calendarhouse`, class B
 
 **Evidence.** Calendar House's printed Doha calendar (16 Jun–11 Sep 2026, and a second copy to

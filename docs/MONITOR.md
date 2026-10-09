@@ -202,6 +202,14 @@ members no fetcher reads (Cape Town's community calendar: masjids.co.za's relay 
 month; until it is, za.cape's members for a new MJC month are left out by the gate, as they should
 be, and za.mjc's own row is added).
 
+Umm al-Qura's and QMDB's units (since 9 October 2026, the review's "prove it across the unit") have a
+line each, one per measured unit (260 in all): each new year of a unit's own table is added at every
+point its reach file reads the unit at (`sa-ummalqura-reach.tsv`, `kz-qmdb-reach.tsv`; point `all`),
+as well as at its own point (the source's `index` line). The pattern ends `-2*` so that one place's key
+never names another's. The reach rows grow the whole gate to some 8,000 rows and 2.9 million
+place-days, about 90 seconds on the Mac; the gate keeps only the last 64 points' computed days at
+once, so it stays within its 2 GB.
+
 **What `prove` does.** For each capture a recipe names whose days are not all held already by rows
 of that file, entry, member and point: the capture is copied as it is to
 `archive/tables/pinned/<source>/<date>/<key>.txt` (a row with `month` or `excused` days reads its own

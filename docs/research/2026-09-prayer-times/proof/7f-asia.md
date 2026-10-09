@@ -592,9 +592,10 @@ above:
 | none | Shchuchinsk, Zhitikara, Esik, both Abay (no table), Baikonur (a village's unit), Shalkar (beyond every reach) |
 
 The `baikonur` unit's own figure, measured now only at its own point, falls from 4 to 1. Where a place
-is not measured, About (class D's template) says that QMDB publishes the prayer times for the user's
-place, that Taqwa calculates them the way QMDB does with a safety margin, and that they are not measured
-there. The Today card's ⓘ reads as it does at every Kazakh place: "QMDB method, not yet fully checked".
+is not measured, About (class D's template) says that the Kazakh Muftiate (the app's name for QMDB)
+publishes the prayer times for the user's place, that Taqwa calculates them the way it does with a
+safety margin, and that they are not measured there. The Today card's ⓘ reads as it does at every
+Kazakh place: "Kazakh Muftiate method, not yet fully checked".
 
 **What it costs: a city's outer districts.** Twenty-four of the larger cities were sampled within 15 km
 of QMDB's point, on 10 rings and 16 bearings. Wherever a nearer place took the user, its times were
@@ -682,6 +683,54 @@ place, with only the fingerprint added: the reaches do not depend on which unit 
 own computed day, not their tables. A Linux run of the fingerprint is the cloud's first (the site's
 `jvmTest`).
 
+## Across each unit (10 Oct 2026, the review of the city-points branch)
+
+**Why.** A unit's figure and limits were proven at only two points: its own and the app's point for its
+city. An independent review replayed each unit's own tables inside its reach and beat 73 of the 86
+Kazakh figures out to half the radius, and nearly all beyond it. At Petropavl, 15 km out, Fajr came 9
+min after the city's table, Isha 8, and the end of eating 10 before it. Taraz's figure of 1 became Isha
+3, and Konaev's 1 became 4 near the edge. Lateness there also passed the entry's Fajr 8, Isha 6 and end
+of eating 8.
+
+**The reach rows** (`kz-qmdb-reach.tsv`, `generateReachRows`). Each measured unit's own tables are
+replayed at 8 bearings and at half and 95 % of its radius, held out and tagged with the unit. A point
+another unit takes (a nearer city, or a nearer place beyond every city's reach) is left out. That makes
+2,258 rows at 1,118 of the 1,376 points, for all 86 units. Each unit has a recipe line, so a new year
+of its table is read across its reach as well. Against them, with the units' own tables:
+0 early, 0 late ends.
+
+| reach rows, all 332 + 2,258 rows, 935,860 place-days | early / late end | 0 | 1 | 2 | 3+ | exact |
+|---|---|---|---|---|---|---|
+| Fajr | 0 | 193,617 | 540,243 | 141,031 | 60,969 | 20.7 % |
+| sunrise | 0 | 479,541 | 398,849 | 57,327 | 143 | 51.2 % |
+| Dhuhr | 0 | 610,159 | 300,615 | 25,086 | 0 | 65.2 % |
+| Asr (Hanafi) | 0 | 384,811 | 472,928 | 77,020 | 1,101 | 41.1 % |
+| Maghrib | 0 | 476,362 | 402,063 | 57,300 | 135 | 50.9 % |
+| Isha | 0 | 168,985 | 532,541 | 150,657 | 83,677 | 18.1 % |
+| end of eating | 0 | 124,437 | 204,589 | 59,141 | 547,693 | 13.3 % |
+
+**The limits** (ruling R41; `QmdbPlaces.reachLimits`, the reasons in `CentralAsia`). 37 units carry
+their own, each the gate's worst across the unit: Fajr 9 or 10 at nine northern units (Petropavl and
+Pulemetovka 10), Isha 7 or 8 at 32, and the end of eating 9 or 10 at 37. None passes 10.
+- At the reach's edge, QMDB's own AngleBased residual at the table, up to the entry's 8 and 6, adds to
+  the reach's 3 beyond the unit's own day. The observed worst is a minute or two short of their sum.
+- Dhuhr, Asr, Maghrib and sunrise stay within class D's 3 at every unit, so no start limit of 4 is
+  needed. The south's new figures of 4 are Fajr and Isha, within the entry's limits.
+- `BUILD-LOG.md` lists the units' limits and every app city's figure before and after.
+
+**The figures** rise across the unit: 1 → 4 at 24 southern cities (Taraz, Turkistan, Konaev …), 2 → 4
+at Almaty and Shymkent, 6 → 8 at Astana, 7 → 9 at Pavlodar, Kostanay, Kokshetau and Rudny, 8 → 10 at
+Petropavl. About's "up to N minutes after" now holds anywhere in the unit.
+
+**Beyond every reach** the nearest place's table is now a point table's edge (`beyondTable`, ruling R45),
+as other point tables' are. The user's own point comes a minute later. The end of eating is SAFE_END or
+earlier (−60 s at 45.99° N), and within three reaches the nearest place's point bounds sunrise and the
+end of eating. It is later at every start and earlier at every end than `main`.
+
+**Not proven.** Points between the half and the 95 % rings, and between the bearings, are read through
+`CityUnitsTest`'s rings (24 cities, to 15 km, now held to the limits: 0 over) and its edges (95 % at
+four bearings: 0 over), not through rows.
+
 ## Verification run
 
 ```
@@ -743,6 +792,16 @@ python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13
 ./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
 ./scripts/test.sh --no-daemon :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
   → shared 1,612/0 Android host, 1,489/0 iOS (AsiaProofTest 10/0), widgetcore 91/0 and 89/0
+python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13 and the Mac's 3.9)
+
+# across each unit, 10 Oct 2026
+./gradlew -p tools/timetables generateReachRows → sa.ummalqura 4,031 rows at 2,046 points, kz.qmdb 2,258 at 1,118
+./gradlew -p tools/timetables jvmTest gate
+  → jvmTest 306/0 with the archive (CityUnitsTest 8/0); 8,058 rows, 2,885,320 place-days: 0 early,
+    0 late ends, none over its limit, nothing BROKEN (kz.qmdb 2,590 rows, 935,860 place-days)
+./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
+./scripts/test.sh --no-daemon :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
+  → shared 1,614/0 Android host, 1,491/0 iOS, widgetcore 91/0 and 89/0
 python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13 and the Mac's 3.9)
 ```
 

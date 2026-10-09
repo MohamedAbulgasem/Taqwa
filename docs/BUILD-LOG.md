@@ -2751,8 +2751,9 @@ Buraydah 1; Madinah and Taif 2. Every Kazakh city's About figure used to be the 
 unit's: 1 at 30 cities (Taraz, Turkistan, Taldykorgan …), 2 at 8 (Almaty, Shymkent …), 3 to 7 farther
 north and west, 8 at Petropavl. No figure appears where nothing is measured. About now gives a place
 its own unit's last checked date, as its city page does (ruling R115): Madinah 31 December 2027,
-Makkah 31 December 2030. This also changes the date at a few Dubai, Kemenag, Tunisian and Jamiat
-units whose rows end before their entry's (a class D place shows no date). A city unit is called by the app's own name for the
+Makkah 31 December 2030. This also changes the date at a few Dubai, Kemenag, Tunisian and Libyan
+units whose rows end before their entry's (`ly.awqaf` is class D, so its places show no date; no Jamiat
+unit moved). A city unit is called by the app's own name for the
 city (`AuthorityUnit.named`), never "Mecca" or "Алматы қаласы". `ProofStamps.kt` is now written as one
 function per entry, with at most 40 units per function: the old single initializer passed the JVM's
 64 KB limit with 260 units.
@@ -2812,10 +2813,11 @@ under 1 km.
   nearest place, Akay or Toretam (3.5 km each), which is not measured: no figure, and its two gate rows
   against Baikonur's tables are gone. Shchuchinsk, Zhitikara, Esik and the two Abay are in their own
   unmeasured units as before, and Shalkar (Atyrau) is beyond every reach.
-- **What an unmeasured place says.** About (class D's template) says that QMDB publishes the prayer
-  times for the place, and that Taqwa calculates them the way QMDB does, with a safety margin. Then it
-  says they are not measured there, using the app's place name. The Today card's ⓘ is the same as at
-  every Kazakh place: "QMDB method, not yet fully checked".
+- **What an unmeasured place says.** About (class D's template) says that the Kazakh Muftiate (the
+  app's name for QMDB) publishes the prayer times for the place, and that Taqwa calculates them the way
+  it does, with a safety margin. Then it says they are not measured there, using the app's place name.
+  The Today card's ⓘ is the same as at every Kazakh place: "Kazakh Muftiate method, not yet fully
+  checked".
 
 **The cost: a city's outer districts.** Inside a city, a user nearer a suburb's or a village's QMDB
 place than the city's own takes that place's times. Twenty-four of the larger cities were sampled within
@@ -2843,7 +2845,7 @@ bands or curves, the generator must be re-run, since every reach depends on them
 | debug APK dex, uncompressed / compressed | 83,595,398 / 36,047,649 | +109,988 / +74,104 |
 | the iOS test binary | 65,990,648 | +262,960 |
 | nearest unit among 5,676 | 140 µs (a scan) | 1.25 µs (a grid index, `UnitSet` above 256 units) |
-| building the Kazakh set | | 12 ms, once, on the first Kazakh resolution (`Units.of` builds it lazily) |
+| building the Kazakh set | | about 10 ms (decode 2, build 8), once, on the first Kazakh resolution (`Units.of` builds it lazily) |
 | a resolution / a year's days | | 0.146 ms / 23–27 ms |
 
 The debug APK file itself grew 420,716 bytes, which includes the incremental packager's gaps. Also,
@@ -2931,3 +2933,110 @@ on iOS (AsiaProofTest 10/0), widgetcore 91/0 and 89/0; the monitor's Python test
 Pythons. `CI=true generate` writes 55 cities and 129 pages; the site builds 164 pages, all checks
 good, and its tests pass 18/0. The debug APK's content grew 2,973 bytes compressed. The engine change
 ships with the first update, not 1.0.0 (35).
+
+## Proven across the unit (10 October) — the review of the city-points branch
+
+An independent review confirmed never-early on the whole branch, and found one critical gap. About's
+per-unit "at most N after" was proven at only two points: the unit's own and the app's point for its
+city. Inside the unit a user can stand anywhere within its reach. Out to half the radius the figure was
+beaten at 160 of 173 Saudi and 73 of 86 Kazakh units, and beyond that at nearly all. Lateness inside
+the reach also passed the recorded limits. The owner chose London's precedent: prove it across the unit.
+
+**The reach rows** (`generateReachRows`, `official/gate/{sa-ummalqura,kz-qmdb}-reach.tsv`). Each
+measured unit's own tables, the rows its group file reads at the unit's point, are replayed at 8 bearings
+and at half and 95 % of its radius. The rows are held out and tagged with the unit. A point another unit
+takes (a nearer place, or a city whose reach holds it) is left out, since its user follows that unit's
+table. So each unit's stamp row now holds the lateness across its area, and About reads it.
+- Umm al-Qura: 4,031 rows at 2,046 of 2,768 points, all 173 units.
+- QMDB: 2,258 rows at 1,118 of 1,376 points, all 86 measured units.
+- The monitor's recipes have a line per unit (260), so `prove` adds each new year of a unit's table
+  across its reach too.
+- `CityUnitsTest` checks that every measured unit has its own tables at every kept point, and a recipe.
+  Its edge and ring tests now fail on a cell over its limit; the old "late limit not held" exception is
+  gone. The rings and edges pass with the limits below.
+- The whole gate: 8,058 rows and 2,885,320 place-days (from 1,769 and 500,703). 0 early, 0 late ends,
+  none over its limit, nothing BROKEN, in about 90 s. It ran out of its 2 GB at first: it kept every
+  point's computed days for the whole run. It now keeps the last 64 points' and stores a place-day as one
+  number, and the results are the same.
+
+**The limits** (ruling R41, each with its reason):
+- **Umm al-Qura**, for the entry: Fajr 2 (the lag dates and the reach), Dhuhr, Asr, Maghrib and Isha 2
+  (the reach), sunrise and the end of eating 3 (both). These replace the three point limits at Taif,
+  Madinah and Al Hofuf. Nine units of the north and the east need Fajr 3 at their edge, where a lag
+  date's later Fajr meets the reach: Al Qurayyat, Al Uwayqiliyah, Az Zulfi, Dhahran, Dumat al-Jandal,
+  Haql, Khafji, Mawqaq and Turaif. Az Zulfi's 3 is Fajr's, and its end of eating stays within the 3.
+  Tayma keeps Fajr 5 and now carries 3 for every other event (its class D), since the entry's 2 would
+  otherwise apply to it.
+- **QMDB**, per unit, 37 of the 86 (`QmdbPlaces.reachLimits`): Fajr 9 or 10 at nine northern units, Isha
+  7 or 8 at 32, and the end of eating 9 or 10 at 37. Each is the gate's worst there. None passes 10, so
+  no owner decision is needed for them. Dhuhr, Asr, Maghrib and sunrise stay within class D's 3
+  everywhere, so no start limit of 4 is needed. The south's new figures of 4 are Fajr and Isha, within
+  the entry's 8 and 6.
+
+  | Fajr / Isha / end of eating | units |
+  |---|---|
+  | 10 / 8 / 10 | Petropavl |
+  | 10 / 7 / 9 | Pulemetovka |
+  | 9 / 8 / 10 | Isakovka, Kokshetau, Kostanay, Krasny Yar, Kulomzino |
+  | 9 / 7 / 10 | Pavlodar, Rudny |
+  | 8 (entry) / 8 / 10 | Lisakovsk, Stepnogorsk |
+  | 8 / 7 / 10 | Akkol, Aksay, Aksu (Pavlodar), Aktobe, Altay, Arkalyk, Astana, Atbasar, Ekibastuz, Kalbatau, Makinsk, Oral, Oskemen, Ridder, Semey, Shemonaikha, Temirtau |
+  | 8 / 7 / 9 | Bugrovoe, Saran, Spasovka, Vagulino |
+  | 8 / 6 (entry) / 10 | Embi, Kandyagash, Karaganda, Khromtau |
+  | 8 / 6 / 9 | Shakhtinsk |
+
+**The figures** (About's worst start of the unit, now across its area):
+- **Saudi pages:** Makkah, Riyadh, Jeddah, Tabuk, Abha and Buraydah 1 → 2; Madinah and Taif stay 2;
+  Dammam stays 1. Of all 173 units, 152 go from 1 to 2, 9 rise to 3 (the Fajr-3 units above), 7 stay
+  1, 4 stay 2, and Tayma stays 5.
+- **Kazakh app cities:**
+
+  | before → after | cities |
+  |---|---|
+  | 1 → 3 | Talgar, Novokazalinsk, Mangystau, Aksu (Turkistan), Otegen Batyr |
+  | 1 → 4 | Taraz, Turkistan, Taldykorgan, Zhanaozen, Sarkand, Kentau, Konaev, Shu, Karatau, Arys, Zharkent, Zhanatas, Shiyeli, Shelek, Shardara, Saryagash, Zhanakorgan, Lenger, Burunday, Ushtobe, Zhosaly, Turar Ryskulov, Merke, Sarykemer |
+  | 2 → 4 | Almaty, Shymkent, Kyzylorda, Aktau, Tekeli, Tasbuget |
+  | 2 → 5 | Balkhash, Makanshy |
+  | 3 → 4 | Zhetysay |
+  | 3 → 5 | Atyrau, Kulsary, Aral, Balykshi |
+  | 4 → 5 | Satpayev, Ayagoz, Shalqar |
+  | 4 → 6 | Zhezkazgan, Zaysan |
+  | 4 → 7 | Embi |
+  | 5 → 6 | Karaganda |
+  | 5 → 7 | Altay, Saran, Shakhtinsk, Kandyagash, Kalbatau |
+  | 6 → 7 | Ust-Kamenogorsk, Temirtau, Arkalyk |
+  | 6 → 8 | Astana, Aktobe, Oral, Semey, Ekibastuz, Ridder, Aksu (Pavlodar), Lisakovsk, Aksay, Atbasar, Khromtau, Shemonaikha, Makinsk |
+  | 7 → 8 | Stepnogorsk, Akkol |
+  | 7 → 9 | Pavlodar, Kostanay, Kokshetau, Rudny |
+  | 8 → 10 | Petropavl |
+
+  Shchuchinsk, Zhitikara, Esik, both Abay, Baikonur and Shalkar (Atyrau) still claim none. Zhetysay's 3
+  (Zhenis's rows) is the owner's, accepted; the 25 QMDB towns off the app's list are not cities for now.
+
+**The minor findings.**
+- Umm al-Qura's units carry the app's city whose table each is (`UmmAlQuraCities.appCityOf`, 77 units),
+  as Kazakhstan's do, so About at Ash Shafa names Taif and at Sultanah Madinah. The site names a page's
+  unit city the same way (`Document`, `AppStrings.cityName`): a Balykshi page would read Atyrau, as the
+  app does.
+- About's first frame reads the name already loaded (`CityRepository.loadedDisplayName`), so it never
+  shows the location's name and then the city's. `aboutUnitCityId` and the lookup are tested.
+- Beyond every Saudi and Kazakh unit, the nearest place's table is now a point table's edge, as
+  `pointTables`' are (ruling R45, `beyondTable`). The user's own point comes a minute later. The end of
+  eating is at SAFE_END or earlier, and within three reaches the nearest place's point still bounds
+  sunrise and the end of eating. Every start is later and every end earlier than on `main`.
+- The docs' slips are corrected: the dates at Dubai, Kemenag, Tunisian and Libyan units (not Jamiat),
+  the spec's 86 measured places, and the Kazakh set's cold build. Measured on the Mac's JVM, the decode
+  takes 2 ms and the build 8, about 10 ms in all. The fingerprint's KDoc now says it is the same on every
+  machine practically, since its times are rounded from doubles.
+
+**What moved.** Every stamp's `engineHash` moved again (`Units.kt` is core). The golden vector moved
+on 44 of its 2,071 rows against `main`, every move safe, and on none against the commit before: its
+seeds are inside units, and limits do not move a time.
+
+Checked: the whole gate as above; tools `jvmTest` 306/0 with the archive (CityUnitsTest 8/0, the rings
+and edges held to the limits); `checkStamps` (71 entries) green; the fingerprint unchanged, so
+`generateQmdbPlaces` was not re-run; `scripts/test.sh` with its four tasks: shared 1,614/0 on the
+Android host and 1,491/0 on iOS, widgetcore 91/0 and 89/0; the monitor's Python tests 105/0 on both
+Pythons. `CI=true generate` writes 55 cities and 129 pages (the Saudi pages' figures as above); the site
+builds 164 pages, all checks good, and its tests pass 18/0. The debug APK's content grew 7,921 bytes
+compressed. The engine change ships with the first update, not 1.0.0 (35).
