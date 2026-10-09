@@ -25,6 +25,7 @@
 # and members no fetcher reads (Cape Town's community calendar, masjids.co.za's relay: read by hand each month).
 source	capture	gate	entry	member	point	days	from
 sa-ummalqura	*	sa-ummalqura.tsv	index	-	index	all	-
+sa-ummalqura-cities	*	sa-ummalqura.tsv	index	-	index	all	-
 tr-diyanet	*	tr-diyanet.tsv	same	*	same	all	-
 tr-diyanet-europe	*	tr-diyanet-europe.tsv	same	*	same	all	-
 tr-diyanet-europe	*	be-emb.tsv	same	*	same	all	-

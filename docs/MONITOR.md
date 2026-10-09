@@ -331,7 +331,9 @@ repository.
 
 ## Sources
 
-`sources.tsv` is the list. As of 2 October 2026 the fetchers cover Umm al-Qura, Diyanet
+`sources.tsv` is the list. As of 2 October 2026 the fetchers cover Umm al-Qura (its API weekly at twelve places of
+KACST's own city list and, since 9 October 2026, monthly at the other 161, `sa-ummalqura-cities`: 322 requests,
+about 8 minutes at the 1.5 s interval, on the run it falls due), Diyanet
 (Türkiye and nineteen European cities, Antwerpen, Gent, Lyon, Lille, Copenhagen, Helsinki and
 Trondheim among them), Kemenag (eighteen kab/kota, Surabaya, Medan, Semarang, Palembang and
 Yogyakarta among them), JAKIM, MUIS, Egypt (ESA via Dar al-Ifta, and ESA's daily page), Qatar (the
@@ -339,8 +341,9 @@ ministry API and the Calendar House header), Libya (the Awqaf widget and api.ift
 Morocco (Habous: the live Hijri month at its ten fitted cities and, since 6 October 2026, at 29 more of
 the app's cities, 28 at the edge (Fes, Marrakesh and Agadir among them) and Azrou at Ifrane's unit; fetched as each month turns; its server omits its
 certificate's intermediate, which `tools/timetables/monitor/certs/habous.gov.ma.pem` completes for that
-host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, Kazakhstan's QMDB (its year API at 29 of its own
-places, monthly, from its southernmost to its northernmost; since 3 and 6 October 2026), the Muslim
+host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, Kazakhstan's QMDB (its year API at 87 of its own
+places, monthly, from its southernmost to its northernmost, since 3 and 6 October 2026, and since 9 October 2026
+QMDB's place for every other city of the app's list: 174 requests, about 4.5 minutes), the Muslim
 Judicial Council (mjc.org.za's current month for Cape Town, month-start, each month kept as
 `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
 unit and as za.cape's member there), IRN (bonnetid.info's own month tables, no token, ruling R95; its

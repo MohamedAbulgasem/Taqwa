@@ -1,6 +1,8 @@
 """Saudi Arabia, Umm al-Qura (KACST): the prayer-times API the official page (ummulqura.org.sa)
 calls itself, GetPrayerByYear at each of the gate's twelve points (sa-ummalqura.tsv), the current
-year and the next. The API prints no end of eating: the fast begins at its Fajr (F+E). The raw JSON
+year and the next, weekly: twelve of the 173 places of KACST's own city list, whose coordinates the
+page passes to the API (`ummalqura_cities` fetches the other 161 monthly, the city-points round of
+9 Oct 2026). The API prints no end of eating: the fast begins at its Fajr (F+E). The raw JSON
 carries each day's Hijri month, which is what UmmAlQuraDates' Ramadan dates are regenerated from."""
 import json
 
@@ -10,7 +12,7 @@ SOURCE = "sa-ummalqura"
 BASE = "https://umqserv.kacst.gov.sa/api/v1/Prayer/GetPrayerByYear"
 HEADERS = {"Origin": "https://www.ummulqura.org.sa", "Referer": "https://www.ummulqura.org.sa/"}
 
-# key, name, lat, lon: the gate's own query points (derived parameters, sa-ummalqura.tsv).
+# key, name, lat, lon: the gate's own query points (sa-ummalqura.tsv), KACST's own coordinates for each place (cities.json).
 POINTS = [
     ("makkah", "Makkah", 21.426666, 39.831666),
     ("madinah", "Madinah", 24.54, 39.63),

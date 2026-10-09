@@ -1,5 +1,5 @@
 """Kazakhstan, QMDB (muftyat.kz): the year API its own site calls, api.muftyat.kz/prayer-times/<year>/<lat>/<lon>,
-the current year and the next, at 29 of QMDB's own places (the API answers only at its own places'
+the current year and the next, at 87 of QMDB's own places (the API answers only at its own places'
 coordinates, listed by api.muftyat.kz/cities/, 5,694 of them, every one on UTC+5):
 
 - the gate's first two cities, Almaty (below 48N) and Astana (at or above it), and four north of Astana
@@ -18,7 +18,13 @@ coordinates, listed by api.muftyat.kz/cities/, 5,694 of them, every one on UTC+5
   Shalqar, Atyrau, Makat and Mamyrsu;
 - places just either side of the engine's 0.1 deg curve steps (Vagulino, Bugrovoe, Pulemetovka, Spasovka,
   Khromtau, Arkalyk, Oskemen, Mamyrsu, Makat, and Kulomzino above), which proved the curves must also be
-  read at a place's own latitude (same round).
+  read at a place's own latitude (same round);
+- every other city of the app's own list, at QMDB's place for it (its "<name> қаласы" city entry where it lists
+  one, else the locality of that name): 58 more, the city-points round of 9 Oct 2026, so that each of the app's
+  Kazakh cities is a unit at QMDB's own point (ruling R44, CentralAsia.kt) and is checked there and at the app's
+  own point. 87 places in all, 174 requests a run. Not five whose coordinates another place of QMDB's list shares
+  (Shchuchinsk, Zhitikara, Esik, Abay in the Karaganda region and Abay in the Turkistan region, each listed twice):
+  there the year API answers HTTP 500 (9 Oct 2026), so QMDB publishes no table to check.
 
 The fast begins at the printed Fajr (the API's "imsak", after its Fajr, is not used), so the Fajr column
 is also the end of eating (F+E)."""
@@ -67,6 +73,65 @@ POINTS = [
     ("oskemen", "Oskemen", "49.948325", "82.627848", "Asia/Almaty"),
     ("mamyrsu", "Mamyrsu", "47.951147", "80.382042", "Asia/Almaty"),
     ("makat", "Makat", "47.647520", "53.349220", "Asia/Atyrau"),
+    # The app's other Kazakh cities, at QMDB's own place for each, north to south (9 Oct 2026).
+    ("akkol", "Akkol", "53.296079", "69.597040", "Asia/Almaty"),
+    ("rudny", "Rudny", "52.966667", "63.116667", "Asia/Qostanay"),
+    ("makinsk", "Makinsk", "52.632810", "70.417677", "Asia/Almaty"),
+    ("lisakovsk", "Lisakovsk", "52.544079", "62.492641", "Asia/Qostanay"),
+    ("stepnogorsk", "Stepnogorsk", "52.346944", "71.881667", "Asia/Almaty"),
+    ("aksu-pavlodar", "Aksu (Pavlodar)", "52.037890", "76.920582", "Asia/Almaty"),
+    ("atbasar", "Atbasar", "51.815761", "68.358335", "Asia/Almaty"),
+    ("ekibastuz", "Ekibastuz", "51.729778", "75.326583", "Asia/Almaty"),
+    ("shemonaikha", "Shemonaikha", "50.627624", "81.916697", "Asia/Almaty"),
+    ("semey", "Semey", "50.404976", "80.249235", "Asia/Almaty"),
+    ("ridder", "Ridder", "50.338860", "83.506329", "Asia/Almaty"),
+    ("temirtau", "Temirtau", "50.058756", "72.953424", "Asia/Almaty"),
+    ("karaganda", "Karaganda", "49.806406", "73.085485", "Asia/Almaty"),
+    ("saran", "Saran", "49.801993", "72.828387", "Asia/Almaty"),
+    ("altay", "Altay", "49.725218", "84.273562", "Asia/Almaty"),
+    ("shakhtinsk", "Shakhtinsk", "49.705868", "72.594637", "Asia/Almaty"),
+    ("kandyagash", "Kandyagash", "49.474444", "57.423333", "Asia/Aqtobe"),
+    ("kalbatau", "Kalbatau", "49.328084", "81.573693", "Asia/Almaty"),
+    ("embi", "Embi", "48.823344", "58.148397", "Asia/Aqtobe"),
+    ("satpayev", "Satpayev", "47.907455", "67.528112", "Asia/Almaty"),
+    ("zhezkazgan", "Zhezkazgan", "47.799711", "67.714090", "Asia/Almaty"),
+    ("zaysan", "Zaysan", "47.453008", "84.969846", "Asia/Almaty"),
+    ("kulsary", "Kulsary", "46.983333", "54.016667", "Asia/Atyrau"),
+    ("balkhash", "Balkhash", "46.843721", "74.977301", "Asia/Almaty"),
+    ("aral", "Aral", "46.797738", "61.660792", "Asia/Qyzylorda"),
+    ("makanshy", "Makanshy", "46.781629", "82.023857", "Asia/Almaty"),
+    ("baikonur", "Baikonur", "45.966111", "63.307778", "Asia/Qostanay"),
+    ("aiteke-bi", "Aiteke Bi (Novokazalinsk)", "45.835934", "62.148317", "Asia/Qyzylorda"),
+    ("zhosaly", "Zhosaly", "45.488495", "64.086675", "Asia/Qyzylorda"),
+    ("sarkand", "Sarkand", "45.413666", "79.916894", "Asia/Almaty"),
+    ("ushtobe", "Ushtobe", "45.251221", "77.980827", "Asia/Almaty"),
+    ("taldykorgan", "Taldykorgan", "45.017837", "78.382123", "Asia/Almaty"),
+    ("tekeli", "Tekeli", "44.863094", "78.764266", "Asia/Almaty"),
+    ("zharkent", "Zharkent", "44.169365", "80.003842", "Asia/Almaty"),
+    ("shiyeli", "Shiyeli", "44.167573", "66.736893", "Asia/Qyzylorda"),
+    ("zhanakorgan", "Zhanakorgan", "43.900451", "67.243723", "Asia/Qyzylorda"),
+    ("konaev", "Konaev", "43.883333", "77.083333", "Asia/Almaty"),
+    ("mangystau", "Mangystau", "43.691561", "51.305571", "Asia/Aqtau"),
+    ("shu", "Shu", "43.611782", "73.760237", "Asia/Almaty"),
+    ("shelek", "Shelek", "43.597525", "78.250618", "Asia/Almaty"),
+    ("zhanatas", "Zhanatas", "43.554650", "69.722525", "Asia/Almaty"),
+    ("kentau", "Kentau", "43.518131", "68.504652", "Asia/Almaty"),
+    ("otegen-batyr", "Otegen Batyr", "43.423782", "77.028020", "Asia/Almaty"),
+    ("boralday", "Boralday (Burunday)", "43.358094", "76.861006", "Asia/Almaty"),
+    ("zhanaozen", "Zhanaozen", "43.343266", "52.865792", "Asia/Aqtau"),
+    ("talgar", "Talgar", "43.302813", "77.239690", "Asia/Almaty"),
+    ("turkistan", "Turkistan", "43.302025", "68.268979", "Asia/Almaty"),
+    ("karatau", "Karatau", "43.166667", "70.466667", "Asia/Almaty"),
+    ("sarykemer", "Sarykemer", "43.007610", "71.515131", "Asia/Almaty"),
+    ("taraz", "Taraz", "42.883333", "71.366667", "Asia/Almaty"),
+    ("merke", "Merke", "42.872481", "73.190139", "Asia/Almaty"),
+    ("turar-ryskulov", "Turar Ryskulov", "42.534675", "70.350564", "Asia/Almaty"),
+    ("arys", "Arys", "42.432744", "68.813798", "Asia/Almaty"),
+    ("aksu-turkistan", "Aksu (Turkistan)", "42.420712", "69.828661", "Asia/Almaty"),
+    ("lenger", "Lenger", "42.182051", "69.882120", "Asia/Almaty"),
+    ("saryagash", "Saryagash", "41.466667", "69.166667", "Asia/Almaty"),
+    ("shardara", "Shardara", "41.254722", "67.969167", "Asia/Almaty"),
+    ("zhetysay", "Zhetysay", "40.775278", "68.327222", "Asia/Almaty"),
 ]
 
 FIELDS = ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")

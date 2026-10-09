@@ -22,6 +22,7 @@ import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
 from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, qmdb, toronto  # noqa: E402
+from fetchers import ummalqura, ummalqura_cities  # noqa: E402
 from prove_tests import Proof, RecipesCatalogue  # noqa: E402,F401  (prove's half: proof.py and recipes.tsv)
 
 
@@ -277,14 +278,22 @@ class Parsers(unittest.TestCase):
         self.assertEqual("kz-qmdb", qmdb.SOURCE)
         keys = [p[0] for p in qmdb.POINTS]
         self.assertEqual(len(keys), len(set(keys)), "a key names one place")
-        self.assertEqual({"almaty", "astana", "kokshetau", "kostanay", "pavlodar", "petropavl",
-                          "isakovka", "krasny-yar", "kulomzino", "oral", "aksay", "aktobe", "shalqar", "atyrau", "aktau",
-                          "kyzylorda", "oteshqali", "ayagoz", "vagulino", "bugrovoe", "pulemetovka", "spasovka", "khromtau",
-                          "arkalyk", "oskemen", "mamyrsu", "makat", "shymkent", "zhenis"}, set(keys))
+        self.assertEqual(len(qmdb.POINTS), len({(p[2], p[3]) for p in qmdb.POINTS}), "a point is one place")
+        first = {"almaty", "astana", "kokshetau", "kostanay", "pavlodar", "petropavl",
+                 "isakovka", "krasny-yar", "kulomzino", "oral", "aksay", "aktobe", "shalqar", "atyrau", "aktau",
+                 "kyzylorda", "oteshqali", "ayagoz", "vagulino", "bugrovoe", "pulemetovka", "spasovka", "khromtau",
+                 "arkalyk", "oskemen", "mamyrsu", "makat", "shymkent", "zhenis"}
+        self.assertEqual(first, set(keys[:29]))
+        # The city-points round (9 Oct 2026): QMDB's place for every other city of the app's list but the five whose
+        # point QMDB gives to two places (its year API answers HTTP 500 there).
+        self.assertEqual(87, len(keys))
+        self.assertTrue({"karaganda", "taraz", "semey", "turkistan", "baikonur", "zhanaozen"} <= set(keys))
+        self.assertEqual(set(), {"shchuchinsk", "zhitikara", "esik", "abay-karaganda", "abay-turkistan"} & set(keys))
         # QMDB's offsets switch at 48N, its AngleBased rule binds from about 46N (kz-north-west round, 6 Oct 2026).
-        self.assertEqual({"almaty", "aktau", "kyzylorda", "shymkent", "zhenis"}, {p[0] for p in qmdb.POINTS if float(p[2]) < 46.0})
+        self.assertEqual({"almaty", "aktau", "kyzylorda", "shymkent", "zhenis"},
+                         {p[0] for p in qmdb.POINTS[:29] if float(p[2]) < 46.0})
         self.assertEqual({"shalqar", "atyrau", "oteshqali", "ayagoz", "mamyrsu", "makat"},
-                         {p[0] for p in qmdb.POINTS if 46.0 <= float(p[2]) < 48.0})
+                         {p[0] for p in qmdb.POINTS[:29] if 46.0 <= float(p[2]) < 48.0})
         # North of Petropavl to the country's edge: Isakovka, 55.4N, the northernmost of QMDB's list.
         self.assertEqual(55.405802, max(float(p[2]) for p in qmdb.POINTS))
         # ... and to its southern edge: Zhenis, 40.6N, the southernmost of its list.
@@ -292,6 +301,18 @@ class Parsers(unittest.TestCase):
         # Every zone the app's Kazakh cities use has a point (Asia/Almaty, Qostanay, Oral, Aqtobe, Atyrau, Aqtau, Qyzylorda).
         self.assertEqual({"Asia/Almaty", "Asia/Qostanay", "Asia/Oral", "Asia/Aqtobe", "Asia/Atyrau", "Asia/Aqtau", "Asia/Qyzylorda"},
                          {p[4] for p in qmdb.POINTS})
+
+    def test_ummalqura_cities(self):
+        # KACST's own city list (173 places): the weekly source's twelve and this monthly source's 161, each once,
+        # each at a point inside Saudi Arabia, and read the same way (ummalqura.parse).
+        self.assertEqual("sa-ummalqura-cities", ummalqura_cities.SOURCE)
+        self.assertIs(ummalqura.parse, ummalqura_cities.parse)
+        self.assertEqual(161, len(ummalqura_cities.POINTS))
+        both = ummalqura.POINTS + ummalqura_cities.POINTS
+        self.assertEqual(173, len({p[0] for p in both}), "a key names one place")
+        self.assertEqual(173, len({(p[2], p[3]) for p in both}), "a point is one place")
+        for key, name, lat, lon in both:
+            self.assertTrue(16.0 <= lat <= 32.5 and 34.0 <= lon <= 56.0, key)
 
     def test_qatar(self):
         body = json.dumps({"gregorianDate": {"year": 2026, "month": 9, "day": 28},
