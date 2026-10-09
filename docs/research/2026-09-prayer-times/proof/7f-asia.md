@@ -613,11 +613,74 @@ those showed a start before the city's table or an end after it. The worst was 1
 Such a user's times are those of the nearer place: never before its own day, and never before the user's
 own point alone (the engine before units). If the user's mosque follows the city's table, though, they
 can be a minute or two early against it. The round above kept the city's table throughout its reach. The
-report puts this to the owner.
+owner then chose the city's table (the next section).
 
 **Not proven.** 5,589 places have no table checked. There, as at any user's own point, never-early rests
 on QMDB's method and margins at that point. A reach is measured with the method as it stands, so after
 any change to kz.qmdb's method, bands or curves, `generateQmdbPlaces` must be re-run.
+
+## The city's table (9 Oct 2026, the owner's decision)
+
+**The decision.** Inside a city's own reach, the city's place wins, even where a village or suburb of
+QMDB's list lies nearer. Where two cities' reaches hold a point, the nearer city wins. Everywhere else,
+the nearest place whose reach holds the user, as above.
+
+**Which places are cities** (`QmdbPlaces.appCities`). They are the places of the app's own Kazakh cities:
+83 of its 84 (Shalkar in the Atyrau region has no QMDB place) at 81 places, since Atyrau and Balykshi
+share Atyrau's and Kyzylorda and Tasbuget share Kyzylorda's. 76 of the 81 are measured; the other five
+are the cities QMDB serves no table for. These are the places a user picks by name, and the places whose
+tables the app's city points have been gated against since the round above. The gate's 11 villages
+(Isakovka, Zhenis, Mamyrsu …) are not cities. Nor are 25 of QMDB's own 89 "<name> қаласы" entries that
+are not on the app's list (Kaskelen and Alatau by Almaty, Kosshy by Astana, Tobyl by Kostanay, Kazaly by
+Aiteke Bi …). Inside an app city's reach they follow the app city like any village; the report puts
+them to the owner. A city's unit carries the app's city (`AuthorityUnit.cityId`, its GeoNames id).
+
+**The proof.**
+- **The rings** (`CityUnitsTest`, with the archive): 24 of the larger cities, 10 rings out to 15 km at
+  16 bearings, 3,840 points, all inside their city's reach. Each point follows its city, or a nearer city
+  where two reach: 94 points (Almaty's west to Boralday 14, Otegen Batyr 3 and Talgar 2; Aktau's 19 to
+  Mangystau; Kokshetau's 17 to Akkol; Shymkent's 10 to Aksu; Taraz's 10 to Sarykemer; Karaganda's 12 to
+  Saran, Abay and Temirtau; Zhezkazgan's 6 to Satpayev; Temirtau's 1 to Karaganda). Against the tables
+  of the city each point follows (2,801,740 place-days; 2 points in Abay, which has no table, unchecked),
+  there are 0 starts before and 0 ends after. The worst start is 9 min after the city's table and the
+  worst end 10 min before it, both in the north (Fajr and the end of eating, the north's allowance plus
+  the reach's 3). Dhuhr, Asr, Maghrib and sunrise stay within 2.
+- **The cost of the nearer city.** At the 94 points, against the farther ring city's own tables (for the
+  record, since the user there follows the nearer city's): 68,620 place-days, and a start before or an
+  end after the farther table, by up to 2 min, in 43,019 cells, Dhuhr and Maghrib above all.
+- **Villages inside a city's reach.** 1,389 of QMDB's places lie inside 74 cities' reaches and take the
+  city. On every day of 2026, at each one's own point, the time shown stays within the reach's bound of
+  the place's own day, of the city's own day and of the user's own point alone: Fajr 3, sunrise 2, Dhuhr
+  2, Asr 3, the other Asr 2, Maghrib 2, Isha 3, end of eating 3. No start is before any of them and no
+  end after, so nothing is earlier than the user's own point, which is the engine before units.
+- **Zhenis**, the one gate village inside a city's reach (24.6 km from Zhetysay), is held at its own
+  point against its own tables as before. It now takes Zhetysay's unit: 0 early and 0 late ends, Isha up
+  to 3 min after Zhenis's table and Fajr, Asr and Maghrib up to 2, within class D's 3. Zhetysay's figure
+  counts those rows too, so it rises from 1 to 3. Zhenis's own unit no longer claims a figure, since no
+  user inside Zhetysay's reach takes it. 86 units are measured, and the monitor still fetches all 87
+  places.
+- **The edges**, recounted: 400 units in the reach sample, the same worst minutes; against the archive's
+  tables, 261 edge points still in their own measured unit, 0 early and 0 late ends.
+- **About.** Inside a city's reach About measures the city with its own figure, and names it in the
+  reader's language even where the user's own nearest app city is another (`AboutTimesUiStateTest`: 8 km
+  north-east of QMDB's Almaty, 2 km from the village of Besagash, Almaty and its 2).
+
+**The figures** are those of the section above, but Zhetysay's is now 3.
+
+**The reaches' fingerprint.** `QmdbPlaceList.FINGERPRINT` records what the reaches were measured with
+(`QmdbReach.fingerprint`). It hashes the rule's constants, the codec's, and each event's time, in whole
+epoch seconds, on 26 days at 29 probe places either side of 46° and 48° N and in every zone: for a unit
+there, a user beside it and that user alone. Any change to the method, its margins, its bands, the
+curves or the way a unit's point rides beside the user's moves it, and `CityUnitsTest` then fails,
+naming `./gradlew -p tools/timetables generateQmdbPlaces`. No double is printed (coordinates in
+thousandths of a degree, the cap in metres, the times in whole seconds), and the probe's users are
+literal sums. So it cannot move with `Double.toString` or a maths routine's last bit, which is what
+moves the stamps' `engineHash` between the Mac and Linux. The regenerated list is the same, place for
+place, with only the fingerprint added: the reaches do not depend on which unit a user takes.
+
+**Not proven.** The 25 QMDB city entries off the app's list are proven as villages are, against their
+own computed day, not their tables. A Linux run of the fingerprint is the cloud's first (the site's
+`jvmTest`).
 
 ## Verification run
 
@@ -666,6 +729,17 @@ python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13
 ./gradlew -p tools/timetables jvmTest gate
   → jvmTest 301/0 with the archive (CityUnitsTest 4/0); 1,769 rows, 500,703 place-days: 0 early,
     0 late ends, none over its limit, nothing BROKEN (kz.qmdb 332 rows, 119,720 place-days)
+./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
+./scripts/test.sh --no-daemon :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
+  → shared 1,612/0 Android host, 1,489/0 iOS (AsiaProofTest 10/0), widgetcore 91/0 and 89/0
+python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13 and the Mac's 3.9)
+
+# the city's table and the reaches' fingerprint, 9 Oct 2026
+./gradlew -p tools/timetables generateQmdbPlaces → 5,676 places, the same place for place, and FINGERPRINT
+./gradlew -p tools/timetables jvmTest gate
+  → jvmTest 304/0 with the archive (CityUnitsTest 7/0: the rings 3,840 points, 2,801,740 place-days,
+    0 early, 0 late ends); 1,769 rows, 500,703 place-days: 0 early, 0 late ends, none over its limit,
+    nothing BROKEN
 ./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
 ./scripts/test.sh --no-daemon :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
   → shared 1,612/0 Android host, 1,489/0 iOS (AsiaProofTest 10/0), widgetcore 91/0 and 89/0

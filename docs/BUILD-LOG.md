@@ -2866,3 +2866,68 @@ Checked: tools `jvmTest` 301/0 with the archive (CityUnitsTest 4/0) and the whol
 1,489/0 on iOS (AsiaProofTest 10/0), widgetcore 91/0 and 89/0; the monitor's Python tests 105/0 on both
 Pythons. `CI=true generate` writes 55 cities and 129 pages; the site builds 164 pages, all checks
 good, and its tests pass 18/0. The engine change ships with the first update, not 1.0.0 (35).
+
+## The city's table, and a fingerprint for the reaches (9 October) — the owner's decisions
+
+**The city's table.** The owner's answer to the outer districts above: inside a city's own reach, the
+city's place wins, even where a suburb's or a village's lies nearer. Where two cities' reaches hold a
+point, the nearer city wins. Everywhere else, the nearest place.
+- **The cities** are the places of the app's own Kazakh cities (`QmdbPlaces.appCities`, which replaces
+  the anchors): 83 of the 84 cities at 81 places, 76 of them measured. The gate's 11 villages are not
+  cities. Neither are 25 of QMDB's own 89 "<name> қаласы" entries that are not on the app's list
+  (Kaskelen and Alatau by Almaty, Kosshy by Astana, Tobyl by Kostanay, Kazaly by Aiteke Bi …); inside an
+  app city's reach they take the app city like any village.
+- **The rings** (`CityUnitsTest`, with the archive): around 24 of the larger cities, 10 rings out to
+  15 km at 16 bearings, 3,840 points, all inside their city's reach. Each follows its city, or a nearer
+  city where two reach (94: Almaty's edges to Boralday, Otegen Batyr and Talgar, Aktau's north-east to
+  Mangystau, Kokshetau's east to Akkol, and five more cities'). Against the tables of the city it follows (2,801,740 place-days), there are 0
+  starts before them and 0 ends after. The worst start is 9 min after and the worst end 10 min before,
+  in the north's Fajr and end of eating; the rest stay within 2. At the 94, against the farther city's
+  own tables, a start or an end crosses that table by up to 2 min in 43,019 of their cells. That is the
+  cost of the nearer city.
+- **Villages inside a city's reach:** 1,389 places in 74 cities' reaches, every day of 2026. The worst
+  minutes beyond the place's own day, the city's own day or the user's own point: Fajr 3, sunrise 2,
+  Dhuhr 2, Asr 3, the other Asr 2, Maghrib 2, Isha 3, end of eating 3. Nothing is before any of them, so
+  nothing is earlier than the user's own point, which is the engine on `main`.
+- **Zhenis** lies inside Zhetysay's reach (24.6 km) and is the one gate village there. Its rows now hold
+  Zhetysay's unit against Zhenis's own table: 0 early, Isha up to 3 min after it, within class D's 3.
+  Zhetysay's About figure rises from 1 to 3. Every other city's is as before. Zhenis's own unit no longer
+  claims a figure (86 measured units; the monitor still fetches all 87 places).
+- **About** names and measures the city inside its reach. A city's unit carries the app's city
+  (`AuthorityUnit.cityId`, `Resolution.unitCityId`), and the About route looks its name up in the
+  reader's language, so a suburb's fix whose nearest app city is another still reads the city whose
+  table it follows. `AboutTimesUiStateTest`: 8 km north-east of QMDB's Almaty, 2 km from the village of
+  Besagash, About measures Almaty with its 2.
+- **Edges and speed.** The reach sample is now 400 units (Zhenis left the measured), with the same
+  worst minutes. Against the archive's tables, 261 edge points still in their own measured unit show
+  0 early and 0 late ends. The lookup checks the 81 cities before the grid: 2.9 µs a lookup, where it
+  was 1.25, and a resolution 0.16 ms.
+
+**The fingerprint.** The reaches are measured with kz.qmdb as it stands, so `QmdbPlaceList.kt` now
+records what with: `FINGERPRINT`, from `QmdbReach.fingerprint`. It is a SHA-256 over:
+- the reach rule's constants and the codec's;
+- each event's time, in whole epoch seconds, on 26 days at 29 probe places on either side of 46° and
+  48° N and in every zone, for a unit there, a user beside it, and that user alone.
+
+So a change to the method, its margins, its bands, the curves or the way a unit's point rides beside the
+user's moves it. `CityUnitsTest` then fails and names `./gradlew -p tools/timetables generateQmdbPlaces`.
+It prints no double: coordinates in thousandths of a degree, the cap in metres, times in whole seconds,
+and the probe's users as literal sums. So neither `Double.toString` nor a maths routine's last bit, which
+moves the stamps' `engineHash` between the Mac and Linux, can move it. The cloud's site job runs it on
+Linux. Regenerated, the list is the same place for place, with only the fingerprint added.
+
+**What moved.** The whole gate: 1,769 rows, 500,703 place-days, 0 early, 0 late ends, none over its
+limit, nothing BROKEN. Every stamp's `engineHash` moved (core files). In `kz.qmdb`, the `zhenis` unit's
+row is now `zhetysay`'s, and the entry's worst Asr and Maghrib rose from 1 to 2 min, with no limit
+changed. Against `main`, the golden vector moved on 44 of its 2,071 rows (Saudi 15, Kazakh 13 and 16),
+every move safe. That is exactly the round before every place was a unit. Its Kazakh seeds are again in
+a city's unit: Astana's, and Boralday's, the nearer city, 12 km from the seed by Almaty, whose times
+there match Almaty's to the minute. Against the commit before, 28 rows moved, the two Kazakh seeds
+coming back from the villages of Koksay and Shubar.
+
+Checked: tools `jvmTest` 304/0 with the archive (CityUnitsTest 7/0) and the whole gate; `checkStamps`
+(71 entries) green; `scripts/test.sh` with its four tasks: shared 1,612/0 on the Android host and 1,489/0
+on iOS (AsiaProofTest 10/0), widgetcore 91/0 and 89/0; the monitor's Python tests 105/0 on both
+Pythons. `CI=true generate` writes 55 cities and 129 pages; the site builds 164 pages, all checks
+good, and its tests pass 18/0. The debug APK's content grew 2,973 bytes compressed. The engine change
+ships with the first update, not 1.0.0 (35).
