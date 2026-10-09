@@ -5,6 +5,7 @@ import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.authorities.Americas
 import world.taqwa.app.prayer.engine.registry.authorities.Balkans
+import world.taqwa.app.prayer.engine.registry.authorities.CentralAsia
 import world.taqwa.app.prayer.engine.registry.authorities.Diyanet
 import world.taqwa.app.prayer.engine.registry.authorities.Egypt
 import world.taqwa.app.prayer.engine.registry.authorities.Europe
@@ -16,6 +17,7 @@ import world.taqwa.app.prayer.engine.registry.authorities.Maghreb
 import world.taqwa.app.prayer.engine.registry.authorities.Muis
 import world.taqwa.app.prayer.engine.registry.authorities.Russia
 import world.taqwa.app.prayer.engine.registry.authorities.SouthAfrica
+import world.taqwa.app.prayer.engine.registry.authorities.UmmAlQura
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
@@ -31,7 +33,10 @@ import kotlin.math.sqrt
  * proof, which then claims no "at most" figure. [entryClass], when set, is the class at this unit
  * whatever [measured] says (a unit with official days whose method is not yet rebuilt is still
  * class D). [lateLimits] are the unit's own exceptions to the late limit, each for its own events,
- * before its entry's ([lateLimitFor]).
+ * before its entry's ([lateLimitFor]). [named] is false for a city's own table (Umm al-Qura's and
+ * QMDB's places, ruling R44), whose unit is the user's city itself: About and the site then call the
+ * place by the app's own name for it in the reader's language ([Resolution.unitLabel]), not by the
+ * authority's spelling ("Mecca", "Алматы қаласы"), as they do outside every unit.
  * (Not named `Unit`: that would shadow kotlin.Unit.)
  */
 data class AuthorityUnit(
@@ -43,6 +48,7 @@ data class AuthorityUnit(
     val measured: Boolean = true,
     val entryClass: EntryClass? = null,
     val lateLimits: List<LateLimit> = emptyList(),
+    val named: Boolean = true,
 ) {
     init {
         requireEachEventOnce(lateLimits, id)
@@ -94,6 +100,7 @@ object Units {
             Gulf.awqafUnits, Gulf.qatarUnits, Gulf.omanUnits, Muis.bruneiUnits, Maghreb.libyaUnits, Maghreb.tunisiaUnits,
             Maghreb.algeriaUnits, Maghreb.moroccoUnits, SouthAfrica.units, Russia.dumRtUnits, Russia.dumRfUnits,
             Balkans.bosniaUnits, Balkans.albaniaUnits, Europe.austriaUnits, Europe.switzerlandUnits, Americas.fianzUnits,
+            UmmAlQura.units, CentralAsia.kazakhstanUnits,
         ).plus(Americas.torontoUnits).plus(Americas.lakembaUnits).plus(Europe.dublinTables).plus(SouthAfrica.capeTownTables)
             .plus(listOf(Europe.londonUnits, Europe.gmpUnits, Europe.embUnits, Europe.irnUnits, Diyanet.europeUnits))
             .plus(Levant.jordanUnits).plus(Levant.paUnits)

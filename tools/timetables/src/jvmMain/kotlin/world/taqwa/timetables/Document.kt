@@ -264,7 +264,7 @@ class Document(
         val stamp = p.published?.stamp
         val atMost = p.published?.atMost
         val authority = strings.timetable(language, effective.entry).orEmpty()
-        val unitLabel = effective.unitName ?: p.city.name(language)
+        val unitLabel = effective.unitLabel ?: p.city.name(language)
         val comma = MethodWords.listComma(language)
         val members = effective.members.map { strings.get(language, it.nameKey) }
         val through = p.published?.let { f.longDate(it.through) }

@@ -1,5 +1,7 @@
 package world.taqwa.app.prayer.engine.registry.data
 
+import world.taqwa.app.prayer.engine.registry.Registry
+import world.taqwa.app.prayer.engine.registry.Units
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -18,15 +20,19 @@ class ProofStampsTest {
         val stamp = ProofStamps.of("sa.ummalqura")
         assertTrue(stamp != null, "sa.ummalqura should have a generated row")
         assertEquals("sa.ummalqura", stamp.entryId)
-        assertEquals(12, stamp.places)
-        // At least the place-days of 2 October 2026: the weekly monitor's prove adds held-out rows as new captures
+        // KACST's 173 places and the app's own points for 94 Saudi cities (the city-points round of 9 Oct 2026).
+        assertEquals(267, stamp.places)
+        // At least the place-days of 9 October 2026: the weekly monitor's prove adds held-out rows as new captures
         // arrive (docs/MONITOR.md, "Prove"), so the proof only grows; a regeneration that drops rows shows here.
-        assertTrue(stamp.placeDays >= 13146, "sa.ummalqura placeDays ${stamp.placeDays}")
+        assertTrue(stamp.placeDays >= 210254, "sa.ummalqura placeDays ${stamp.placeDays}")
         assertEquals("2030-12-31", stamp.provenThrough)
         assertEquals(1, stamp.worstLateMinutes["dhuhr"])
-        assertEquals(2, stamp.worstLateMinutes["fajr"])
-        assertTrue(stamp.lateLimits.isNotEmpty(), "sa.ummalqura has a recorded late-limit exception (the lag dates)")
-        val lagLimit = stamp.lateLimits.first { "fajr" in it.events }
+        // One row per KACST place, each its own: Makkah's Fajr is not Tayma's (a table computed a degree north of it).
+        assertEquals(173, stamp.worstLateByUnit.size)
+        assertEquals(1, stamp.worstLateByUnit.getValue("makkah")["fajr"])
+        assertEquals(5, stamp.worstLateByUnit.getValue("tayma")["fajr"])
+        assertEquals(stamp.worstLateMinutes["fajr"], stamp.worstLateByUnit.values.mapNotNull { it["fajr"] }.max())
+        val lagLimit = stamp.lateLimits.first { "fajr" in it.events && it.reason?.contains("repeats the previous day") == true }
         assertEquals(2, lagLimit.minutes)
         assertTrue("endOfEating" in lagLimit.events)
     }
@@ -45,7 +51,22 @@ class ProofStampsTest {
         // Review M7: the class's own limit (B, 2 min) is a row with a null reason.
         assertTrue(stamp.lateLimits.any { it.reason == null && it.minutes == 2 })
         // An entry gated without units has none.
-        assertTrue(ProofStamps.of("sa.ummalqura")!!.worstLateByUnit.isEmpty())
+        assertTrue(ProofStamps.of("sg.muis")!!.worstLateByUnit.isEmpty())
+    }
+
+    @Test
+    fun `every measured unit of an entry checked by unit has a row of its own`() {
+        // About's checked template falls back to the class's minutes where a measured unit has no row
+        // (checkedAtMostMinutes): a figure the gate never measured there. The city-points round's 265 units
+        // (Umm al-Qura's and QMDB's) each have one.
+        val missing = mutableListOf<String>()
+        for (entry in Registry.entries) {
+            val units = Units.of(entry.id) ?: continue
+            val stamp = ProofStamps.of(entry.id) ?: continue
+            if (stamp.worstLateByUnit.isEmpty()) continue
+            for (unit in units.units) if (unit.measured && unit.id !in stamp.worstLateByUnit) missing += "${entry.id}/${unit.id}"
+        }
+        assertEquals(emptyList(), missing)
     }
 
     @Test

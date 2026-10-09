@@ -2,17 +2,24 @@ package world.taqwa.app.prayer.engine.registry.authorities
 
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EventOffsets
+import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.HighLatRule
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
+import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
 import world.taqwa.app.prayer.engine.registry.MethodVariant
 import world.taqwa.app.prayer.engine.registry.Regions
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
+import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.Where
+import world.taqwa.app.prayer.engine.registry.atEdge
+import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
+import world.taqwa.app.prayer.engine.registry.lateReachKm
 import world.taqwa.app.prayer.engine.registry.single
+import kotlin.math.min
 
 /** Uzbekistan, Kazakhstan and Kyrgyzstan (research Central Asia sections). Hanafi throughout (spec §3.7). */
 object CentralAsia {
@@ -154,11 +161,49 @@ object CentralAsia {
         MethodVariant("kz.qmdb", Regions.kazakhNorth) {
             it.copy(
                 authorityMinutes = EventOffsets(sunrise = -5, dhuhr = 5, asr = 5, maghrib = 5),
-                endOfEatingMarginSeconds = KAZAKH_NORTH_END_OF_EATING,
+                endOfEatingMarginSeconds = min(it.endOfEatingMarginSeconds, KAZAKH_NORTH_END_OF_EATING),
             )
         },
-        MethodVariant("kz.qmdb", kazakhMiddle) { it.copy(endOfEatingMarginSeconds = KAZAKH_MIDDLE_END_OF_EATING) },
+        MethodVariant("kz.qmdb", kazakhMiddle) {
+            it.copy(endOfEatingMarginSeconds = min(it.endOfEatingMarginSeconds, KAZAKH_MIDDLE_END_OF_EATING))
+        },
     )
+
+    /**
+     * [kazakhstanMethod] with the variants of [point]'s own band ([variants]): a unit's table is QMDB's at the
+     * unit's point, so its minutes and its end of eating's margin are that point's band's. The registry applies the
+     * user's own band on top ([Registry]'s variants, by the user's point): each variant only moves a start later and
+     * an end earlier, and keeps the earlier end of eating of the two (the min above), so where a unit reaches
+     * across 46° N or 48° N both bands' times are bounded, the city's table's and the user's own.
+     */
+    private fun kazakhstanAt(point: GeoPoint): TimetableMethod =
+        variants.fold(kazakhstanMethod) { method, variant -> if (variant.area.contains(point)) variant.change(method) else method }
+
+    /**
+     * Ruling R44 (the city-points round of 9 Oct 2026): QMDB prints a table for each of its 5,694 places (its city
+     * list), every mosque of a city follows the city's, and at the app's own point for a city a few kilometres from
+     * QMDB's the user's own sun began Fajr, Dhuhr, Asr, Maghrib or Isha up to a minute before the city's table (main
+     * at 705c4f7f: Oral on 121 days of 2026–27, Aktobe 70, Astana 14, Pavlodar 8, at Oskemen's city point a sunrise
+     * after the table's on 4). Each of [QmdbPlaces.all]' 87 places (the gate's 29 and QMDB's place for every other
+     * city of the app's list) is a unit at QMDB's own point, which rides as the fixed point beside the user's
+     * (ruling R15: starts the later, ends the earlier), within its R40 reach for class D, three minutes of
+     * longitude (48 to 59 km), with its own band's minutes ([kazakhstanAt]). Gated at its own point and at the app's
+     * point for its city (kz-qmdb.tsv). [QmdbPlaces.unanswered]' five, whose tables QMDB's API does not serve, are
+     * units too, so that their own point rides beside the user's and no neighbour's figure is claimed there, but
+     * they are not measured. Beyond every unit the user's own point with the entry's margins as before, the end of
+     * eating at SAFE_END below 46° N (ruling R44; the bands' own margins are earlier still), claiming no figure (spec
+     * §3.5). About and the site call the place by the app's name for it ([AuthorityUnit.named]).
+     */
+    val kazakhstanUnits = UnitSet(
+        "kz.qmdb",
+        (QmdbPlaces.all.map { it to true } + QmdbPlaces.unanswered.map { it to false }).map { (place, measured) ->
+            val point = GeoPoint(place.lat, place.lon)
+            AuthorityUnit(
+                place.key, place.name, point, lateReachKm(place.lat, EntryClass.D_AUTHORITY), method = kazakhstanAt(point),
+                measured = measured, named = false,
+            )
+        },
+    ) { kazakhstanMethod.atEdge("kz.qmdb.edge", kazakhstanMethod.margins) }
 
     /** The end of eating's margin at and above 48° N, in seconds (fitted from Astana to Isakovka, 2026 and 2027). */
     private const val KAZAKH_NORTH_END_OF_EATING = -374

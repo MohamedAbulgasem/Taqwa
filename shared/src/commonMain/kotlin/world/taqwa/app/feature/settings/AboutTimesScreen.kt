@@ -226,7 +226,7 @@ private fun AuthorityCheckedContent(
 ) {
     val resolution = state.resolution
     val authority = authorityShortName(resolution.entry.shortNameKey)
-    val unitLabel = resolution.unitName ?: cityLabel
+    val unitLabel = resolution.unitLabel ?: cityLabel
 
     SectionHeading(stringResource(Res.string.about_who_publishes))
     SectionBody(
@@ -257,7 +257,7 @@ private fun AuthorityCheckedContent(
                     stringResource(Res.string.about_stat_at_most_after),
             ),
         )
-        stamp.provenThrough?.let { through ->
+        checkedThrough(resolution, stamp)?.let { through ->
             SectionBody(
                 stringResource(Res.string.about_checked_through, authority, format.longDate(LocalDate.parse(through))),
             )
@@ -274,7 +274,7 @@ private fun AuthorityUncheckedContent(
 ) {
     val resolution = state.resolution
     val authority = authorityShortName(resolution.entry.shortNameKey)
-    val unitLabel = resolution.unitName ?: cityLabel
+    val unitLabel = resolution.unitLabel ?: cityLabel
     // "{Authority} publishes the prayer times for {place}" is said of an authority only: a
     // convention most mosques follow (Karachi, ISNA in the United States) and a chosen Other method
     // publish no one's times.
@@ -524,7 +524,7 @@ private fun AsrSection(resolution: Resolution, appliedSchool: AsrSchool, cityLab
     val schoolName = schoolDisplayName(if (hanafi) "hanafi" else "standard")
     // Named by its shadow, as Settings' Asr note does (spec §2.4): "Hanafi: twice the shadow, …".
     val shadow = stringResource(if (hanafi) Res.string.asr_shadow_hanafi else Res.string.asr_shadow_standard)
-    val regionLabel = resolution.unitName ?: cityLabel
+    val regionLabel = resolution.unitLabel ?: cityLabel
     val body = when {
         // The user chose the other school in Settings: the place's reason is not this school's.
         appliedSchool != resolution.entry.school ->
@@ -772,6 +772,16 @@ internal fun measuredStartsWorst(resolution: Resolution, stamp: ProofStamp): Int
 /** The starts among a stamp's event [keys], either Asr school counting as the one Asr. */
 private fun startsOf(keys: Set<String>): Set<String> =
     keys.filter { it in START_KEYS }.map { if (it.startsWith("asr")) "asr" else it }.toSet()
+
+/**
+ * The checked template's "checked against {authority}'s timetable through {date}": the user's own unit's last
+ * checked date where the stamp checks the entry by unit and that unit's rows end before the entry's (the
+ * city-points round of 9 Oct 2026: Madinah's own tables end with 2027, Makkah's with 2030), as the city page's date
+ * is its unit's (ruling R115); the entry's own last date otherwise. Pure so a test can check it against a
+ * committed stamp.
+ */
+internal fun checkedThrough(resolution: Resolution, stamp: ProofStamp): String? =
+    resolution.unitId?.takeIf { stamp.worstLateByUnit.isNotEmpty() }?.let { stamp.provenThroughByUnit[it] } ?: stamp.provenThrough
 
 /**
  * The unchecked template's "up to {worst} minutes after" (review I2): [measuredStartsWorst] at the

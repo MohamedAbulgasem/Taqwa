@@ -234,15 +234,79 @@ class AboutTimesUiStateTest {
 
     @Test
     fun `an entry checked without units claims its own worst start`() {
-        // Umm al-Qura is gated at twelve places with no units: its figure is the entry's own, over
+        // MUIS is gated at Singapore's own point with no units: its figure is the entry's own, over
         // the starts only.
-        val riyadh = Place(24.68773, 46.72185, "Asia/Riyadh", "SA")
-        val state = stateFor(riyadh)
+        val singapore = Place(1.28967, 103.85007, "Asia/Singapore", "SG")
+        val state = stateFor(singapore)
         assertIs<AboutTimesUiState.AuthorityChecked>(state)
+        assertEquals("sg.muis", state.resolution.entry.id)
         val stamp = requireNotNull(state.stamp)
         assertTrue(stamp.worstLateByUnit.isEmpty())
         val starts = listOf("fajr", "dhuhr", "asrStandard", "maghrib", "isha").mapNotNull { stamp.worstLateMinutes[it] }.max()
-        assertEquals(starts, checkedAtMostMinutes(state.resolution, riyadh, stamp))
+        assertEquals(starts, checkedAtMostMinutes(state.resolution, singapore, stamp))
+    }
+
+    @Test
+    fun `a saudi city claims its own city table's worst start and not another city's`() {
+        // Ruling R44 (city points, 9 Oct 2026): Riyadh is its KACST place's unit, checked there and at the app's own
+        // point; Tayma's Fajr (KACST computes its table a degree north of the town) is not Riyadh's.
+        val riyadh = Place(24.68773, 46.72185, "Asia/Riyadh", "SA")
+        val state = stateFor(riyadh)
+        assertIs<AboutTimesUiState.AuthorityChecked>(state)
+        assertEquals("riyadh", state.resolution.unitId)
+        val stamp = requireNotNull(state.stamp)
+        val own = stamp.worstLateByUnit.getValue("riyadh").filterKeys { it in setOf("fajr", "dhuhr", "asrStandard", "maghrib", "isha") }
+        assertEquals(own.values.max(), checkedAtMostMinutes(state.resolution, riyadh, stamp))
+        assertTrue(checkedAtMostMinutes(state.resolution, riyadh, stamp) < stamp.worstLateMinutes.getValue("fajr"))
+        // The unit is the user's own city: About names it as the app does, not by KACST's spelling.
+        assertNull(state.resolution.unitLabel)
+        assertEquals("Riyadh", state.resolution.unitName)
+    }
+
+    @Test
+    fun `a saudi city's checked-through date is its own unit's as on its city page`() {
+        // Ruling R115's date, per unit: Madinah's own tables end before Makkah's (KACST's 2024-2030 at Makkah), and
+        // About gives each city its own unit's last date, not the entry's latest.
+        val makkah = stateFor(Place(21.42664, 39.82563, "Asia/Riyadh", "SA"))
+        val madinah = stateFor(Place(24.46861, 39.61417, "Asia/Riyadh", "SA"))
+        assertIs<AboutTimesUiState.AuthorityChecked>(makkah)
+        assertIs<AboutTimesUiState.AuthorityChecked>(madinah)
+        val stamp = requireNotNull(makkah.stamp)
+        assertEquals(stamp.provenThrough, checkedThrough(makkah.resolution, stamp))
+        val own = requireNotNull(checkedThrough(madinah.resolution, stamp))
+        assertEquals(stamp.provenThroughByUnit.getValue("madinah"), own)
+        assertTrue(own < stamp.provenThrough!!, "Madinah through $own")
+    }
+
+    @Test
+    fun `a saudi place beyond every city unit and a kazakh city qmdb serves no table for claim no figure`() {
+        // Turubah: no KACST place within a minute's reach, so Umm al-Qura's method at the user's own point, class D.
+        val turubah = Place(28.25849, 42.92457, "Asia/Riyadh", "SA")
+        val beyond = stateFor(turubah)
+        assertIs<AboutTimesUiState.AuthorityUnchecked>(beyond)
+        assertFalse(beyond.resolution.measured)
+        assertNull(uncheckedWorstMinutes(beyond.resolution, beyond.stamp))
+        // Shchuchinsk: QMDB lists its point twice and its year API serves no table there; Makinsk's figure, 37 km
+        // off, is not claimed.
+        val shchuchinsk = Place(52.93592, 70.18895, "Asia/Almaty", "KZ")
+        val unserved = stateFor(shchuchinsk)
+        assertIs<AboutTimesUiState.AuthorityUnchecked>(unserved)
+        assertEquals("shchuchinsk", unserved.resolution.unitId)
+        assertFalse(unserved.resolution.measured)
+        assertNull(uncheckedWorstMinutes(unserved.resolution, unserved.stamp))
+    }
+
+    @Test
+    fun `a kazakh city claims its own unit's worst start`() {
+        // Almaty, a few kilometres from QMDB's own point: up to a minute after QMDB's Almaty table, not the north's 8.
+        val almaty = Place(43.25249, 76.9115, "Asia/Almaty", "KZ")
+        val state = stateFor(almaty)
+        assertIs<AboutTimesUiState.AuthorityUnchecked>(state)
+        assertEquals("almaty", state.resolution.unitId)
+        assertTrue(state.resolution.measured)
+        val stamp = requireNotNull(state.stamp)
+        val worst = requireNotNull(uncheckedWorstMinutes(state.resolution, stamp))
+        assertTrue(worst < stamp.worstLateMinutes.getValue("fajr"), "Almaty $worst")
     }
 
     @Test

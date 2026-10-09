@@ -122,6 +122,7 @@ object Registry {
             about = aboutFor(entryClass),
             unitPoint = here.unit?.point,
             unitId = here.unit?.id,
+            unitLabel = here.unit?.takeIf { it.named }?.name,
         )
     }
 
@@ -163,8 +164,10 @@ object Registry {
             if (variant.entryId == entryId && variant.area.contains(user)) method = variant.change(method)
         }
         // The curves follow the point the starts are read at (an ends-only fixed point leaves them at the user's).
+        // A rule read at each place's own latitude (QMDB's) holds for the user's latitude as well, so that a unit's
+        // point never makes the user's own start earlier than it is without the unit (PlaceCurves.at).
         val curvesAt = if (method.fixedPointMode == FixedPointMode.ENDS_ONLY) user else method.fixedPoint ?: user
-        return Placed(PlaceCurves.at(method, curvesAt), unit, isMeasured)
+        return Placed(PlaceCurves.at(method, curvesAt, also = user), unit, isMeasured)
     }
 
     /**

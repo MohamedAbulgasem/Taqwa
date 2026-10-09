@@ -643,9 +643,17 @@ internal object PlaceCurves {
         "ca.fifteen" to caFifteen,
     )
 
-    /** [method] as it applies at [point]: its curves for that latitude, and its own end of eating, where it has a rule. */
-    fun at(method: TimetableMethod, point: GeoPoint): TimetableMethod {
-        val placed = curvesAt(method, point)
+    /**
+     * [method] as it applies at [point]: its curves for that latitude, and its own end of eating, where it has a rule.
+     * [also] is the user's own point where [point] is a unit's (the method's fixed point, ruling R44): a rule read at
+     * each place's own latitude ([Rule.ownLatitude], QMDB's) is then read at both latitudes, each slot the later start
+     * and the earlier end, so that the unit's point never makes the user's own start earlier, or end later, than it
+     * is without the unit (the city-points round of 9 Oct 2026: a unit reaches about half a degree north and south of
+     * its point, and the AngleBased rule moves by up to a minute a tenth of a degree). Every other rule keeps the
+     * fixed point's curves alone.
+     */
+    fun at(method: TimetableMethod, point: GeoPoint, also: GeoPoint = point): TimetableMethod {
+        val placed = curvesAt(method, point, also)
         val key = keyOf(method.id, ends)
         val end = ends[key]?.invoke(point.lat) ?: return placed
         val rule = ownRuleEnds[key] ?: return placed.copy(endOfEating = end)
@@ -696,13 +704,13 @@ internal object PlaceCurves {
     /** A point table's edge ("<entry>.edge") keeps its authority's rules. */
     private fun keyOf(id: String, map: Map<String, *>): String = if (id in map) id else id.removeSuffix(".edge")
 
-    private fun curvesAt(method: TimetableMethod, point: GeoPoint): TimetableMethod {
+    private fun curvesAt(method: TimetableMethod, point: GeoPoint, also: GeoPoint): TimetableMethod {
         if (method.id == "other.moonsighting") {
             val (fajr, isha) = TwilightCurves.moonsighting(point.lat)
             return method.copy(fajrAngleByDayOfYear = fajr, ishaAngleByDayOfYear = isha)
         }
         val rule = rules[keyOf(method.id, rules)] ?: return method
-        if (rule.ownLatitude) return ownLatitudeCurves(method, point, rule)
+        if (rule.ownLatitude) return ownLatitudeCurves(method, listOf(point.lat, also.lat).distinct(), rule)
         val fajr = when {
             rule.moonsightingFajr -> TwilightCurves.moonsighting(point.lat).first
             rule.fajr != null -> TwilightCurves.fajr(point.lat, method.fajrAngle, fraction = rule.fajr)
@@ -726,31 +734,35 @@ internal object PlaceCurves {
     }
 
     /**
-     * [Rule.ownLatitude]'s curves at [point]: each of [rule]'s Fajr and Isha curves on the 0.1° grid
-     * and at the point's own latitude, each slot the later start of the two (the smaller Fajr
-     * depression, the larger Isha one), so no start is earlier than either; and an end of eating read
-     * from the Fajr dawn takes the earlier dawn of the two, so it is later than neither.
+     * [Rule.ownLatitude]'s curves at [latitudes] (a place's own, and the user's beside a unit's point,
+     * [at]): each of [rule]'s Fajr and Isha curves on the 0.1° grid and at each latitude's own value,
+     * each slot the later start of them all (the smallest Fajr depression, the largest Isha one), so no
+     * start is earlier than any; and an end of eating read from the Fajr dawn takes the earliest dawn of
+     * them all, so it is later than none.
      *
      * That end is still read from the Fajr START envelopes (the shorter night, each slot widened late
      * over the neighbouring days), not from the rule read as an end ([TwilightCurves.fajrAsEnd],
      * rulings R39 and R80); the entry's region margins carry the difference (kz.qmdb's −374 s at and
      * above 48° N and −150 s from 46° to 48° N, `CentralAsia.kt`, fitted to 0 late ends).
      */
-    private fun ownLatitudeCurves(method: TimetableMethod, point: GeoPoint, rule: Rule): TimetableMethod {
+    private fun ownLatitudeCurves(method: TimetableMethod, latitudes: List<Double>, rule: Rule): TimetableMethod {
         val fajrRule = requireNotNull(rule.fajr) { "an ownLatitude rule needs its Fajr fraction" }
-        val grid = TwilightCurves.fajr(point.lat, method.fajrAngle, onGrid = true, fraction = fajrRule)
-        val own = TwilightCurves.fajr(point.lat, method.fajrAngle, onGrid = false, fraction = fajrRule)
-        val fajr = DoubleArray(grid.size) { i -> min(grid[i], own[i]) }
+        val fajrs = latitudes.flatMap { lat ->
+            listOf(true, false).map { onGrid -> TwilightCurves.fajr(lat, method.fajrAngle, onGrid = onGrid, fraction = fajrRule) }
+        }
+        val slots = fajrs.first().size
+        val fajr = DoubleArray(slots) { i -> fajrs.minOf { it[i] } }
         val ishaAngle = (method.isha as? IshaRule.Angle)?.degrees
         val isha = if (rule.isha != null && ishaAngle != null) {
-            val ishaGrid = TwilightCurves.isha(point.lat, ishaAngle, onGrid = true, fraction = rule.isha)
-            val ishaOwn = TwilightCurves.isha(point.lat, ishaAngle, onGrid = false, fraction = rule.isha)
-            DoubleArray(ishaGrid.size) { i -> max(ishaGrid[i], ishaOwn[i]) }
+            val ishas = latitudes.flatMap { lat ->
+                listOf(true, false).map { onGrid -> TwilightCurves.isha(lat, ishaAngle, onGrid = onGrid, fraction = rule.isha) }
+            }
+            DoubleArray(slots) { i -> ishas.maxOf { it[i] } }
         } else {
             method.ishaAngleByDayOfYear
         }
         val end = if (method.endOfEating == EndOfEating.SameAsFajrDawn) {
-            EndOfEating.DawnAngle(method.fajrAngle, DoubleArray(grid.size) { i -> max(grid[i], own[i]) })
+            EndOfEating.DawnAngle(method.fajrAngle, DoubleArray(slots) { i -> fajrs.maxOf { it[i] } })
         } else {
             method.endOfEating
         }

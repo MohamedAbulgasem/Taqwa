@@ -74,6 +74,8 @@ private class ReadStamp(
     val worstLateMinutes: Map<String, Int>,
     val worstLateByUnit: Map<String, Map<String, Int>>,
     val lateLimits: List<Triple<Int, String?, List<String>>>,
+    /** Each unit's last checked date, where it is before the entry's own ([provenThrough]). */
+    val provenThroughByUnit: Map<String, String> = emptyMap(),
 )
 
 @Suppress("UNCHECKED_CAST")
@@ -87,6 +89,14 @@ private fun readStamp(file: File): ReadStamp {
     val worstByUnit = (root["units"] as? Map<String, Any?> ?: emptyMap()).entries.associate { (unit, stats) ->
         unit to worstOf((stats as Map<String, Any?>)["events"] as? Map<String, Any?> ?: emptyMap())
     }
+    // Ruling R115's checked runs per unit ("2025-01-01..2027-12-31"): a unit's own last date, where it is before the
+    // entry's, so that About says through which date the place's own unit was checked, as its city page does.
+    val last = root["last"] as? String
+    val throughByUnit = (root["units"] as? Map<String, Any?> ?: emptyMap()).entries.mapNotNull { (unit, stats) ->
+        val runs = (stats as Map<String, Any?>)["checked"] as? List<Any?> ?: return@mapNotNull null
+        val end = (runs.lastOrNull() as? String)?.substringAfter("..") ?: return@mapNotNull null
+        (unit to end).takeIf { last != null && end < last }
+    }.toMap()
     val lateLimitsRaw = root["lateLimits"] as? Map<String, Any?> ?: emptyMap()
     // A trailing " (event)" disambiguates two limits that share a source and minutes but differ
     // in reason (Stamps.limits); the reason and events come from the entry's own fields below, so
@@ -109,48 +119,78 @@ private fun readStamp(file: File): ReadStamp {
         worstLateMinutes = worstLate,
         worstLateByUnit = worstByUnit,
         lateLimits = lateLimits,
+        provenThroughByUnit = throughByUnit,
     )
 }
 
+/**
+ * Each entry's row is built in a function of its own, and an entry's units in functions of at most [UNITS_PER_FUNCTION]
+ * each: one initializer holding every row passes the JVM's 64 KB limit for a method once an entry has hundreds of
+ * units (Umm al-Qura's 173 and QMDB's 92 city units, the city-points round of 9 Oct 2026).
+ */
 private fun render(stamps: List<ReadStamp>): String = buildString {
+    val names = stamps.map { functionName(it.entryId) }
+    require(names.toSet().size == names.size) { "two entry ids share a function name: $names" }
     append(HEADER)
     append("object ProofStamps {\n")
     append("    /** One row per stamped entry (`tools/timetables/official/stamps/<id>.json`), sorted by id. */\n")
     append("    val byEntry: Map<String, ProofStamp> = listOf(\n")
-    for (s in stamps) {
-        append("        ProofStamp(\n")
-        append("            entryId = ${literal(s.entryId)},\n")
-        append("            places = ${s.places},\n")
-        append("            placeDays = ${s.placeDays},\n")
-        append("            ramadanDays = ${s.ramadanDays},\n")
-        append("            provenThrough = ${s.provenThrough?.let(::literal) ?: "null"},\n")
-        append("            worstLateMinutes = ${worstLiteral(s.worstLateMinutes)},\n")
-        if (s.worstLateByUnit.isEmpty()) {
-            append("            worstLateByUnit = emptyMap(),\n")
-        } else {
-            append("            worstLateByUnit = mapOf(\n")
-            for ((unit, worst) in s.worstLateByUnit.entries.sortedBy { it.key }) {
-                append("                ${literal(unit)} to ${worstLiteral(worst)},\n")
-            }
-            append("            ),\n")
-        }
-        val limits = s.lateLimits.sortedWith(compareBy({ it.first }, { it.third.firstOrNull() ?: "" }))
-        if (limits.isEmpty()) {
-            append("            lateLimits = emptyList(),\n")
-        } else {
-            append("            lateLimits = listOf(\n")
-            for ((minutes, reason, events) in limits) {
-                val eventsLiteral = events.sorted().joinToString(", ") { literal(it) }
-                append("                ProofLateLimit(minutes = $minutes, reason = ${reason?.let(::literal) ?: "null"}, events = listOf($eventsLiteral)),\n")
-            }
-            append("            ),\n")
-        }
-        append("        ),\n")
-    }
+    for (name in names) append("        $name(),\n")
     append("    ).associateBy { it.entryId }\n\n")
     append("    /** The stamp for [entryId], or null where the gate has not checked it (a class D unit still awaiting data). */\n")
     append("    fun of(entryId: String): ProofStamp? = byEntry[entryId]\n")
+    for ((s, name) in stamps.zip(names)) {
+        val chunks = s.worstLateByUnit.entries.sortedBy { it.key }.chunked(UNITS_PER_FUNCTION)
+        append("\n")
+        append("    private fun $name() = ProofStamp(\n")
+        append("        entryId = ${literal(s.entryId)},\n")
+        append("        places = ${s.places},\n")
+        append("        placeDays = ${s.placeDays},\n")
+        append("        ramadanDays = ${s.ramadanDays},\n")
+        append("        provenThrough = ${s.provenThrough?.let(::literal) ?: "null"},\n")
+        append("        worstLateMinutes = ${worstLiteral(s.worstLateMinutes)},\n")
+        when (chunks.size) {
+            0 -> append("        worstLateByUnit = emptyMap(),\n")
+            1 -> append("        worstLateByUnit = ${name}Units(),\n")
+            else -> append("        worstLateByUnit = ${chunks.indices.joinToString(" + ") { "${name}Units${it + 1}()" }},\n")
+        }
+        val limits = s.lateLimits.sortedWith(compareBy({ it.first }, { it.third.firstOrNull() ?: "" }))
+        if (limits.isEmpty()) {
+            append("        lateLimits = emptyList(),\n")
+        } else {
+            append("        lateLimits = listOf(\n")
+            for ((minutes, reason, events) in limits) {
+                val eventsLiteral = events.sorted().joinToString(", ") { literal(it) }
+                append("            ProofLateLimit(minutes = $minutes, reason = ${reason?.let(::literal) ?: "null"}, events = listOf($eventsLiteral)),\n")
+            }
+            append("        ),\n")
+        }
+        if (s.provenThroughByUnit.isNotEmpty()) append("        provenThroughByUnit = ${name}Through(),\n")
+        append("    )\n")
+        if (s.provenThroughByUnit.isNotEmpty()) {
+            append("\n")
+            append("    private fun ${name}Through(): Map<String, String> = mapOf(\n")
+            for ((unit, through) in s.provenThroughByUnit.entries.sortedBy { it.key }) append("        ${literal(unit)} to ${literal(through)},\n")
+            append("    )\n")
+        }
+        chunks.forEachIndexed { index, chunk ->
+            val suffix = if (chunks.size == 1) "" else "${index + 1}"
+            append("\n")
+            append("    private fun ${name}Units$suffix(): Map<String, Map<String, Int>> = mapOf(\n")
+            for ((unit, worst) in chunk) append("        ${literal(unit)} to ${worstLiteral(worst)},\n")
+            append("    )\n")
+        }
+    }
     append("}\n")
+}
+
+/** At most this many units' rows in one generated function (see [render]). */
+private const val UNITS_PER_FUNCTION = 40
+
+/** An entry id as a function name: "ae.iacad.dubai" → "aeIacadDubai". */
+private fun functionName(entryId: String): String {
+    val words = entryId.split('.', '-', '_').filter { it.isNotEmpty() }
+    return words.first() + words.drop(1).joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
 }
 
 private fun worstLiteral(worst: Map<String, Int>): String =
@@ -177,6 +217,8 @@ private val HEADER = """
      * and the late limits the gate held the entry to when the stamp was written ([ProofLateLimit],
      * ruling R41): the class's own (A 1, B 2, C 1 after the latest member, D 3), listed with a null
      * reason, and each recorded exception with its reason, each with the events it covered.
+     * `provenThroughByUnit` is each unit's own last checked date where it is before the entry's
+     * (`provenThrough`): the date About gives for a place in that unit, as its city page does (ruling R115).
      *
      * A unit or entry with no stamp file (an authority not yet gated, or a class with no official
      * days) has no row: [ProofStamps.of] returns null, and the screen reads that as "not yet compared"
@@ -191,6 +233,7 @@ private val HEADER = """
         val worstLateMinutes: Map<String, Int>,
         val worstLateByUnit: Map<String, Map<String, Int>>,
         val lateLimits: List<ProofLateLimit>,
+        val provenThroughByUnit: Map<String, String> = emptyMap(),
     )
 
     /**

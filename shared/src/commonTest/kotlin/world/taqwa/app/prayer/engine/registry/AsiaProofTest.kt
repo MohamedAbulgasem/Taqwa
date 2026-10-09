@@ -4,9 +4,11 @@ import kotlinx.datetime.LocalDate
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.EventOffsets
+import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.method.curveSlot
+import world.taqwa.app.prayer.engine.registry.authorities.PlaceCurves
 import world.taqwa.app.prayer.engine.registry.authorities.TwilightCurves
 import kotlin.math.abs
 import kotlin.test.Test
@@ -123,7 +125,43 @@ class AsiaProofTest {
             assertEquals(EventOffsets(sunrise = -3, dhuhr = 3, asr = 3, maghrib = 3), method.authorityMinutes)
             assertTrue(method.endOfEatingMarginSeconds <= -150, "46-48N end-of-eating margin: ${method.endOfEatingMarginSeconds}")
         }
-        assertEquals(0, below.endOfEatingMarginSeconds)
+        // Below 46N the band's margin is gone: 0 at a QMDB place's own unit (Aktau), and beyond every unit the
+        // edge's SAFE_END (ruling R44: a fitted margin applies at its tables' points only; city points, 9 Oct 2026).
+        assertEquals(0, assertNotNull(resolve(43.635379, 51.169135, "Asia/Aqtau", "KZ").method).endOfEatingMarginSeconds)
+        assertEquals(SAFE_END, below.endOfEatingMarginSeconds)
+    }
+
+    @Test
+    fun `a qmdb city unit bounds the user's own band and curves as well as its own`() {
+        // Ruling R44 (city points, 9 Oct 2026): QMDB's place rides as the fixed point beside the user's. North of 46N
+        // inside Baikonur's unit (its point 45.97N) the band's end-of-eating margin still applies, Baikonur's own
+        // minutes and band staying the city's.
+        val north = resolve(46.2, 63.3, "Asia/Qyzylorda", "KZ")
+        assertEquals("baikonur", north.unitId)
+        val m = assertNotNull(north.method)
+        assertEquals(GeoPoint(45.966111, 63.307778), m.fixedPoint)
+        assertEquals(EventOffsets(sunrise = -3, dhuhr = 3, asr = 3, maghrib = 3), m.authorityMinutes)
+        assertTrue(m.endOfEatingMarginSeconds <= -150, "46-48N end-of-eating margin: ${m.endOfEatingMarginSeconds}")
+        // North of 48N inside Oteshqali Atambayev's unit (its point 47.99N): QMDB's minutes of 5, the north's margin.
+        val over = resolve(48.2, 51.62, "Asia/Atyrau", "KZ")
+        assertEquals("oteshqali", over.unitId)
+        assertEquals(EventOffsets(sunrise = -5, dhuhr = 5, asr = 5, maghrib = 5), over.method!!.authorityMinutes)
+        assertTrue(over.method!!.endOfEatingMarginSeconds <= -374)
+        // 0.3 deg north of Pavlodar's point, inside its unit: each Fajr slot no deeper than the city's own curve and
+        // the user's own latitude's (a later start than either), each end-of-eating slot no shallower.
+        val user = resolve(52.6, 76.96, "Asia/Almaty", "KZ")
+        assertEquals("pavlodar", user.unitId)
+        val city = assertNotNull(resolve(52.315556, 76.956389, "Asia/Almaty", "KZ").method)
+        val own = PlaceCurves.at(Registry.byId("kz.qmdb")!!.method!!, GeoPoint(52.6, 76.96))
+        val here = assertNotNull(user.method)
+        val fajr = assertNotNull(here.fajrAngleByDayOfYear)
+        val end = assertIs<EndOfEating.DawnAngle>(here.endOfEating).bySlot!!
+        for (i in fajr.indices) {
+            assertTrue(fajr[i] <= city.fajrAngleByDayOfYear!![i] && fajr[i] <= own.fajrAngleByDayOfYear!![i], "Fajr slot $i")
+            val cityEnd = assertIs<EndOfEating.DawnAngle>(city.endOfEating).bySlot!![i]
+            val ownEnd = assertIs<EndOfEating.DawnAngle>(own.endOfEating).bySlot!![i]
+            assertTrue(end[i] >= cityEnd && end[i] >= ownEnd, "end of eating slot $i")
+        }
     }
 
     @Test

@@ -1,14 +1,18 @@
 package world.taqwa.app.prayer.engine.registry
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import world.taqwa.app.prayer.engine.EngineSettings
 import world.taqwa.app.prayer.engine.PrayerEngine
 import world.taqwa.app.prayer.engine.TimetableChoice
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.GeoPoint
+import world.taqwa.app.prayer.engine.registry.authorities.CentralAsia
 import world.taqwa.app.prayer.engine.registry.authorities.Levant
+import world.taqwa.app.prayer.engine.registry.authorities.PlaceCurves
 import world.taqwa.app.prayer.engine.registry.data.AlgeriaWilayas
 import java.io.File
 import kotlin.test.Test
@@ -235,6 +239,42 @@ class RegistryCitiesTest {
                 assertTrue(viaApp.resolution.measured, city.name)
             }
         }
+    }
+
+    @Test
+    fun `no saudi or kazakh city's time is earlier in its city unit than at its own point alone`() {
+        // Ruling R44 (city points, 9 Oct 2026): KACST's and QMDB's own place for a city rides beside the user's point
+        // (starts the later, ends the earlier), the city's band and curves beside the user's own (Kazakhstan's 46N
+        // and 48N, its AngleBased curves), so no start is earlier, and no sunrise or end of eating later, than the
+        // same method at the user's own point without any unit: what the app showed before the round, whichever
+        // table the user's mosque reads, the city's or a village's own. Through the app's engine, at three decimals.
+        val saudiAndKazakh = cities.filter { it.countryCode == "SA" || it.countryCode == "KZ" }
+        assertEquals(98 + 84, saudiAndKazakh.size)
+        val dates = generateSequence(LocalDate(2026, 1, 3)) { it.plus(9, DateTimeUnit.DAY) }.takeWhile { it.year == 2026 }.toList()
+        var inUnits = 0
+        for (city in saudiAndKazakh) {
+            val engine = PrayerEngine.dayTimes(city.place, dates.first(), EngineSettings())
+            val r = engine.resolution
+            assertEquals(Registry.resolve(city.place).unitId, r.unitId, "${city.name}: the app's engine and the registry agree")
+            if (r.unitId == null) continue
+            inUnits++
+            val p = r.point
+            val entry = r.entry
+            val alone = PlaceCurves.at(
+                CentralAsia.variants.fold(entry.method!!) { m, v -> if (v.entryId == entry.id && v.area.contains(p)) v.change(m) else m },
+                p,
+            )
+            val zone = TimeZone.of(city.zone)
+            for (date in dates) {
+                val shown = DayComputer.compute(r.method!!, p, date, zone, entry.school, Registry.ramadanCalendarFor(entry))
+                val own = DayComputer.compute(alone, p, date, zone, entry.school, Registry.ramadanCalendarFor(entry))
+                val where = "${city.name} on $date"
+                assertTrue(shown.fajr >= own.fajr && shown.dhuhr >= own.dhuhr && shown.asr >= own.asr, where)
+                assertTrue(shown.maghrib >= own.maghrib && shown.isha >= own.isha, where)
+                assertTrue(shown.sunrise <= own.sunrise && shown.endOfEating <= own.endOfEating, where)
+            }
+        }
+        assertEquals(93 + 1 + 83, inUnits, "Saudi cities in a KACST place's unit (Tayma by its own table), Kazakh in QMDB's")
     }
 
     @Test

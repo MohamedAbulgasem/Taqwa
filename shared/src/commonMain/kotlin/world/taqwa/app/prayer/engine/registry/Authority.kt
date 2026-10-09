@@ -158,6 +158,9 @@ internal fun requireEachEventOnce(limits: List<LateLimit>, owner: String) {
  *   Fajr follows a night fraction carries this latitude's curve); empty otherwise.
  * - [entryClass], [about]: the class at this place. Outside an authority's checked units an A or B
  *   entry is D_AUTHORITY here (spec §6.2 a).
+ * - [unitLabel]: what About and the site call the place: the unit's name, or null where the unit is
+ *   the user's own city ([AuthorityUnit.named] false) or there is none, for the app's own name of
+ *   the city in the reader's language.
  */
 data class Resolution(
     val entry: RegistryEntry,
@@ -172,6 +175,7 @@ data class Resolution(
     val about: AboutTemplate = entry.about,
     val unitPoint: GeoPoint? = null,
     val unitId: String? = null,
+    val unitLabel: String? = unitName,
 )
 
 /** The About template each class fills. */
