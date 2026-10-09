@@ -177,10 +177,13 @@ a monitor source. Large tables are compact resources.
   the ends the authority never prints (Asr's end at the sunset, Maghrib's red twilight).
   *City points (9 Oct 2026, ruling R44):* "the city and the user's point" is now each place of the
   authority's own city list as a unit. Umm al-Qura has KACST's 173 places (ummulqura.org.sa's
-  `cities.json`) within a minute's reach each. QMDB has its place for every city of the app's list and
-  the gate's 29, within three minutes. The unit's point rides beside the user's, the user's own band
-  and curves beside the unit's (Kazakhstan's 46° and 48° N), so no time is earlier than at the user's
-  own point alone. Beyond every unit the user's own point claims no figure.
+  `cities.json`) within a minute's reach each. QMDB has every place of its own list, 5,676 points
+  (the owner's decision, 9 Oct 2026). A user takes the nearest place whose reach holds them, and each
+  reach is measured by the engine's own rule: every time stays within 3 min of the place's own day and
+  of the user's own point alone (`QmdbReach`). Only the 87 places whose tables are read claim a
+  figure. The unit's point rides beside the user's, the user's own band and curves beside the unit's
+  (Kazakhstan's 46° and 48° N), so no time is earlier than at the user's own point alone. Beyond every
+  unit the user's own point claims no figure.
 - **Unknown reference point or horizon**: the unit's safe edge and the deepest plausible horizon; no
   "at most" figure is claimed for that unit.
 - **Near a unit or country border**: the envelope over the candidates within the location's

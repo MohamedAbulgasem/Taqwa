@@ -529,6 +529,96 @@ edges, and would push Baikonur (39 km from QMDB's own point) out of its unit.
 city's table. The five cities QMDB lists twice have no table to check. 2028 waits for the monitor: the
 recipe adds new years at the 87 points, not at the app's points.
 
+## Every QMDB place a unit (9 Oct 2026, the owner's decision)
+
+**The decision.** Every place of QMDB's own city list is a unit at QMDB's own point, and a user takes
+the nearest place whose reach holds them. Beyond every reach, the user's own point as before.
+
+**The units** (`data/QmdbPlaceList.kt`, generated). QMDB's list (`api.muftyat.kz/cities/`, 5,694 places,
+the capture of 6 Oct 2026 in `archive/raw/manual/kz-qmdb/2026-10-06/`) has 5,676 distinct points. Where
+two places share a point, it is one unit, under the lower id. The 87 places whose tables this proof reads
+are measured units, as in the round above. The other 5,589 claim no figure, among them the five QMDB
+serves no table for. A unit is called by the app's own name for the place where one maps to it, and
+never by QMDB's.
+
+**The reach** (`QmdbReach`, in the tools). A unit reaches as far as every time shown stays within 3 min
+of both the unit's own day and the user's own point alone. That holds for every event, on every fourth
+day of 2026 and its solstices and equinoxes, at eight bearings. The times come from the engine's own
+rule: the unit's point beside the user's (R15), the AngleBased curves on the 0.1° grid and at both
+latitudes, and both bands. So latitude counts as well as R40's longitude slope. The radius is found by
+bisection between 0 and class D's R40 reach, and 90 % of it is kept, floored to 0.1 km. The median is
+22.9 km. It runs from 36 km at 40° N down to 18 km at 55° N, and under 5 km for 30 places within about
+0.05° of 46° or 48° N, where the band's margins step. The 9 places within 0.01° of 48° N reach under
+1 km, down to the floor's 0.1 km.
+
+| latitude | units | median reach, km |
+|---|---|---|
+| 40–42° N | 347 | 35–36 |
+| 42–45° N | 1,357 | 30–33 |
+| 45–48° N | 576 | 25–28 (down to 0.1 next to 48° N) |
+| 48–52° N | 1,919 | 21–24 |
+| 52–56° N | 1,477 | 18–20 |
+
+**The edges.** `CityUnitsTest` checks 402 units on every day of 2026, at eight bearings and 98 % of the
+reach. The sample is all 87 measured places, 40 north of 54.5° N, 40 each within 0.3° of 48° and of 46° N,
+40 west of 56° E, 30 south of 41.5° N, the 40 farthest from any other place, and a stride through the
+rest. No start comes before either the unit's own day or the user's own point, and no end after.
+The most minutes beyond either: Fajr 3, sunrise 2, Dhuhr 2, Asr 3, the other Asr 2, Maghrib 2, Isha 3,
+the end of eating 3. Against the archive's tables, at 95 % of a measured unit's reach, a nearer place
+now takes most edge points. The 52 still in their own unit show 0 early and 0 late ends. The worst start
+there is 9 min after the city's table and the worst end 10 min before it: the north's own Fajr and
+end-of-eating allowance, plus up to the reach's 3 (the round above's edges reached 12 and 15).
+
+**The app's cities.** An app city's own point takes its city's place wherever that place's reach holds
+it (`QmdbPlaces.anchors`: the app's point, within 1 km). Otherwise it takes the nearest place, so a
+village a few hundred metres nearer cannot take the city's own point. 77 of the 84 cities resolve to their
+city's measured unit, gated at their own point against its tables: 156 rows, 0 early, 0 late ends. Five
+are in their own unmeasured unit, as before. Baikonur's own point is 39 km from QMDB's place of that name,
+beyond its 5.2 km reach. It takes the nearest place, Akay or Toretam (3.5 km each; Toretam at the app's
+rounded point), which is not measured. Its two rows against Baikonur's tables are gone, and so is its
+figure. Shalkar in the Atyrau region is beyond every reach. The figures are otherwise those of the round
+above:
+
+| figure | cities |
+|---|---|
+| 1 | Taraz, Turkistan, Taldykorgan, Zhanaozen, Sarkand, Kentau, Talgar, Konaev, Shu, Karatau, Zhetysay, Arys, Novokazalinsk, Zharkent, Zhanatas, Mangystau, Shiyeli, Shelek, Aksu (Turkistan), Shardara, Saryagash, Zhanakorgan, Lenger, Burunday, Ushtobe, Zhosaly, Otegen Batyr, Turar Ryskulov, Merke, Sarykemer |
+| 2 | Almaty, Shymkent, Kyzylorda, Aktau, Balkhash, Tekeli, Makanshy, Tasbuget |
+| 3 | Atyrau, Kulsary, Aral, Balykshi |
+| 4 | Zhezkazgan, Satpayev, Ayagoz, Shalqar, Embi, Zaysan |
+| 5 | Karaganda, Altay, Saran, Shakhtinsk, Kandyagash, Kalbatau |
+| 6 | Astana, Aktobe, Oral, Ust-Kamenogorsk, Semey, Temirtau, Ekibastuz, Ridder, Aksu (Pavlodar), Arkalyk, Lisakovsk, Aksay, Atbasar, Khromtau, Shemonaikha, Makinsk |
+| 7 | Pavlodar, Kostanay, Kokshetau, Rudny, Stepnogorsk, Akkol |
+| 8 | Petropavl |
+| none | Shchuchinsk, Zhitikara, Esik, both Abay (no table), Baikonur (a village's unit), Shalkar (beyond every reach) |
+
+The `baikonur` unit's own figure, measured now only at its own point, falls from 4 to 1. Where a place
+is not measured, About (class D's template) says that QMDB publishes the prayer times for the user's
+place, that Taqwa calculates them the way QMDB does with a safety margin, and that they are not measured
+there. The Today card's ⓘ reads as it does at every Kazakh place: "QMDB method, not yet fully checked".
+
+**What it costs: a city's outer districts.** Twenty-four of the larger cities were sampled within 15 km
+of QMDB's point, on 10 rings and 16 bearings. Wherever a nearer place took the user, its times were
+replayed against the city's own tables. 1,464 of the 3,840 points took a nearer place, and 1,354 of
+those showed a start before the city's table or an end after it. The worst was 1 min within 10 km and
+2 min from 12 km.
+
+| from about | cities |
+|---|---|
+| 2–3 km | Rudny, Kostanay, Petropavl, Aktau, Balkhash, Kentau |
+| 4–5 km | Taraz, Oral, Pavlodar, Kyzylorda, Temirtau, Karaganda, Oskemen, Turkistan, Kokshetau |
+| 6–8 km | Almaty, Shymkent, Taldykorgan, Astana, Semey |
+| 10–15 km | Zhezkazgan, Aktobe, Atyrau |
+| not within 15 km | Ekibastuz |
+
+Such a user's times are those of the nearer place: never before its own day, and never before the user's
+own point alone (the engine before units). If the user's mosque follows the city's table, though, they
+can be a minute or two early against it. The round above kept the city's table throughout its reach. The
+report puts this to the owner.
+
+**Not proven.** 5,589 places have no table checked. There, as at any user's own point, never-early rests
+on QMDB's method and margins at that point. A reach is measured with the method as it stands, so after
+any change to kz.qmdb's method, bands or curves, `generateQmdbPlaces` must be re-run.
+
 ## Verification run
 
 ```
@@ -569,6 +659,16 @@ python3 -m unittest tools/timetables/monitor/tests.py  → 77/0 (3.13 and the Ma
 ./gradlew -p tools/timetables jvmTest       → 300/0, with the archive (CityUnitsTest 3/0)
 ./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
 ./scripts/test.sh                           → shared 1,611/0 Android host, 1,488/0 iOS (AsiaProofTest 9/0)
+python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13 and the Mac's 3.9)
+
+# every QMDB place a unit, 9 Oct 2026
+./gradlew -p tools/timetables generateQmdbPlaces → 5,676 places, about 150 s on the Mac's cores
+./gradlew -p tools/timetables jvmTest gate
+  → jvmTest 301/0 with the archive (CityUnitsTest 4/0); 1,769 rows, 500,703 place-days: 0 early,
+    0 late ends, none over its limit, nothing BROKEN (kz.qmdb 332 rows, 119,720 place-days)
+./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
+./scripts/test.sh --no-daemon :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
+  → shared 1,612/0 Android host, 1,489/0 iOS (AsiaProofTest 10/0), widgetcore 91/0 and 89/0
 python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13 and the Mac's 3.9)
 ```
 
