@@ -2659,3 +2659,120 @@ them again on its next run unless the fingerprint stops depending on the platfor
 Checked: tools `jvmTest` 297/0 with the archive. `:shared:testAndroidHostTest` passed 1,604/0, with
 `AsiaProofTest` at 8/0. `checkStamps` passed (71 entries), and the monitor's Python tests passed (77,
 both Pythons). The engine change ships with the first update, not 1.0.0 (35).
+
+## Each city's own table: Umm al-Qura's and QMDB's places as units (9 October) — ruling R44
+
+Umm al-Qura and QMDB compute their times for any point, but each publishes one table per place of its
+own city list, and a city's mosques follow the city's table. The engine computed both at the user's
+own point, so a user a few kilometres from the authority's point for their city could see a start
+before the city's table. Replaying each gate row's table at the app's own point for the same city
+(`cities.csv`, within 20 km, the same name where possible) found, on `main`:
+- **Umm al-Qura.** Riyadh, 3.8 km east of KACST's point: Fajr, Dhuhr, Asr, Maghrib or Isha 1 min
+  before Riyadh's table on 27 days of 2024–2030 (39 cells). Madinah, 8 km away: sunrise and the end of
+  eating 1 min after Madinah's on 38 days (40 cells). Makkah, Jeddah, Dammam, Abha, Taif, Tabuk, Haql
+  and Turaif were clean.
+- **QMDB.** Oral (3.8 km east of QMDB's point) 121 cells on 116 days of 2026–27, Aktobe 70, Astana 14,
+  Pavlodar 8 early starts, and Oskemen 4 late sunrises at the app's Ust-Kamenogorsk. The other places
+  were clean.
+- **Elsewhere**, the same replay found early starts or late ends where a row is one mosque's own table
+  at the mosque and the app's city point is another part of town (ISNA's and the cautious entries'
+  mosques), where the table's point is no city (Kosovo's BIK base), and at two city tables of thin
+  entries: India's Dawat-e-Islami for Delhi (one month) and the Uzbek Board's Tashkent (19 days),
+  whose own city points are not held. None is changed here; they are the owner's (cells over all the
+  row's days; "over" is lateness past the limit, not early):
+
+  | entry | the row's table | the app's city, km from it | early | late ends | over |
+  |---|---|---|---|---|---|
+  | ca.isna | an Ottawa mosque | Ottawa, 10.1 (7.6 east) | 64 | 0 | 2 |
+  | ca.isna | a Montreal mosque | Snowdon, 1.7 | 0 | 1 | 0 |
+  | us.isna | a mosque in Houston | Houston, 6.7 | 13 | 0 | 1 |
+  | us.isna | a mosque in Irving | Irving, 6.6 | 8 | 0 | 0 |
+  | us.isna | a mosque in Plano | Plano, 6.6 | 1 | 0 | 0 |
+  | us.isna | a mosque near Sterling | Sterling, 5.2 | 0 | 75 | 9 |
+  | us.isna | a mosque near Manassas | Manassas, 12.3 | 0 | 0 | 14 |
+  | ca.cautious | Calgary Islamic Centre SW | Calgary, 5.9 | 8 | 0 | 0 |
+  | ca.cautious | a Surrey mosque | Surrey, 5.0 | 1 | 0 | 0 |
+  | in.karachi | Dawat-e-Islami's Delhi | Delhi, 4.8 | 3 | 0 | 4 |
+  | uz.board | muslim.uz's Tashkent | Tashkent, 4.4 | 0 | 1 | 0 |
+  | xk.bik | BIK's base table (a nominal point) | Shtime, 8.1 | 16 | 0 | 0 |
+  | au.cautious | Lakemba Mosque | Sydney, 13.5 | 0 | 0 | 15 |
+  | ie.cautious | Dublin's two tables | Dublin, 2.0 | 0 | 0 | 3 |
+  | tr.diyanet.europe | Lille | Lille, 0.5 | 0 | 0 | 2 |
+
+**The units.** Ruling R44: a table printed for one point is a unit carrying that point as its fixed
+point, beside the user's own (ruling R15: each start the later of the two, each end the earlier),
+within its R40 reach.
+- **Umm al-Qura**: all 173 places of KACST's own city list (`ummulqura.org.sa/assets/data/cities.json`,
+  the coordinates the official page passes to the API: each region's capital, its governorates and five
+  centres; `data/UmmAlQuraCities.kt`), within one minute of longitude (24 to 27 km, class A). The gate's
+  twelve points were already KACST's own.
+- **QMDB**: its place for every city of the app's list (its "<name> қаласы" entry where it lists one)
+  and the gate's 29 places: 87, within three minutes of longitude (48 to 59 km, class D;
+  `data/QmdbPlaces.kt`). Five more cities (Shchuchinsk, Zhitikara, Esik and the two Abay) share their
+  point with another of QMDB's places, and there its year API answers HTTP 500, so those five are
+  units that claim no figure.
+- A unit carries its own band's minutes (QMDB's ±5 at and above 48° N, ±3 below; the end-of-eating
+  margins at 46° and 48° N), and the user's own band applies on top, so where a unit reaches across
+  46° or 48° N both bands' times bound the day. QMDB's curves are read at the user's latitude as well
+  as the unit's, each slot the later start and the earlier end (`TwilightCurves.kt`). So a unit never
+  makes any time earlier than the user's own point gave it before (`RegistryCitiesTest`, at every
+  Saudi and Kazakh city of the app's list), whichever table the user's mosque reads.
+- Beyond every unit, the user's own point with the entry's margins as before, but the end of eating
+  at SAFE_END (ruling R44: a fitted end margin applies at its tables' points only). Umm al-Qura is
+  class D there, and neither entry claims a figure.
+- KACST's list puts Tayma a degree north of the town (28.63° N against 27.62°). At the town, its own
+  sun began Asr, Maghrib and Isha up to 3 min, and Fajr up to 2, before KACST's Tayma table on about
+  150 days a year. The town now takes that table's unit. Its times there run up to 5 min after the
+  table at Fajr, so the unit is class D with that limit.
+
+**The tables.** The new monthly source `sa-ummalqura-cities` fetched 2026 and 2027 at KACST's other 161
+places (322 requests, 8 min), and `kz-qmdb` at QMDB's 58 new places. Both are pinned under
+`archive/tables/pinned/{sa-ummalqura-cities,kz-qmdb}/2026-10-09/`, with the raw JSON in
+`archive/raw/monitor/` and KACST's list in `archive/raw/manual/sa-ummalqura/2026-10-09/`. Every new row
+is held out. At their own points all 161 Saudi places were green at the current margins, and so were
+all 58 Kazakh places. No margin was refitted.
+
+**The app's own points.** Each Saudi and Kazakh city is gated at the app's own point against its
+unit's tables, as `<entry>/<unit>`: 94 Saudi cities (180 rows) and 78 Kazakh (158 rows). There, 0
+early and 0 late ends. Three Saudi units passed class A's minute. West and south of KACST's point, the
+start is the user's own sun, so Maghrib and Isha (Asr at Taif) came 2 min after the city's table on 1
+to 3 days: Taif at the app's Ash Shafa (21 km off), Madinah at Sultanah (7 km) and Al Hofuf at its
+own app point (5 km). Each unit records that as a late limit with its reason (R41). The CityUnitsTest
+edge check (the archive's tables at 95 % of every unit's radius, north, east, south and west) also
+found 0 early and 0 late ends. There Umm al-Qura's starts run up to 2 min after the city's table. In
+the north of Kazakhstan, where the AngleBased rule moves fast with latitude and the band can change,
+Dhuhr runs up to 4 min after it and Fajr up to 12. About shows each unit's own measured figure, so near
+those edges the figure reads better than the sun gives (ruling R40's accepted cost); the report puts
+the radius to the owner.
+
+**What About and the site show.** Each city's own unit figure, through the existing per-unit
+machinery. The Saudi pages go from 2 min to: Makkah, Riyadh, Jeddah, Dammam, Tabuk, Abha and
+Buraydah 1; Madinah and Taif 2. Every Kazakh city's About figure used to be the entry's 8. It is now its
+unit's: 1 at 30 cities (Taraz, Turkistan, Taldykorgan …), 2 at 8 (Almaty, Shymkent …), 3 to 7 farther
+north and west, 8 at Petropavl. No figure appears where nothing is measured. About now gives a place
+its own unit's last checked date, as its city page does (ruling R115): Madinah 31 December 2027,
+Makkah 31 December 2030. This also changes the date at a few Dubai, Kemenag, Tunisian and Jamiat
+units whose rows end before their entry's (a class D place shows no date). A city unit is called by the app's own name for the
+city (`AuthorityUnit.named`), never "Mecca" or "Алматы қаласы". `ProofStamps.kt` is now written as one
+function per entry, with at most 40 units per function: the old single initializer passed the JVM's
+64 KB limit with 260 units.
+
+**What moved.** The whole gate: 1,771 rows, 501,433 place-days, 0 early, 0 late ends, none over its
+limit, nothing BROKEN (995 rows and 207,235 place-days before). `sa.ummalqura` has 520 rows and 210,254
+place-days at 267 points. `kz.qmdb` has 334 rows and 120,450 place-days at 165 points. Every stamp's
+`engineHash` moved, since `Units.kt` and `Registry.kt` are core. The eleven curve entries now carry the
+Mac's hash, which the cloud's next `prove` flips. The golden vector moved on 44 of its 2,071 rows, at
+its three Saudi and Kazakh seeds inside a unit only, every time in the safe direction: a start up to
+2 min later, a sunrise, sunset or end of eating 1 min earlier. Because the user's own point always
+stays beside the unit's, nothing moved earlier.
+
+**The monitor.** `sa-ummalqura-cities` (monthly, 322 requests, about 8 min) and `kz-qmdb` (now 174
+requests, about 4.5 min) add about 11 minutes to the run they fall due on, within the 90-minute budget.
+Their recipes let `prove` add each new year's rows at the units' own points; the app-point rows are not
+extended. Every unit is a point the monitor fetches, which `CityUnitsTest` checks.
+
+Checked: tools `jvmTest` 300/0 with the archive (CityUnitsTest 3/0) and the whole gate; `scripts/test.sh`:
+shared 1,611/0 on the Android host and 1,488/0 on iOS, widgetcore 91/0 and 89/0; `checkStamps` (71
+entries) green; the monitor's Python tests 105/0 on both Pythons. `CI=true generate` writes 55 cities
+and 129 pages; the site builds 164 pages, all checks good, and its tests pass 18/0. The engine change
+ships with the first update, not 1.0.0 (35).

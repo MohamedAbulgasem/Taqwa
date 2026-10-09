@@ -78,6 +78,79 @@ remove the exception, but needs a day-rule change in the engine core (see the re
 **Not proven.** The lag list after 2030 (and any change KACST makes to it); the API's terms of use
 (unread: Cloudflare 403); Task 8's "Fajr 5 minutes later" option, which is not this entry's.
 
+## Umm al-Qura's city points (9 Oct 2026, ruling R44)
+
+**Why.** The official page (ummulqura.org.sa) lists 173 places, each region's capital, its governorates
+and five centres, in its own `assets/data/cities.json`, and for each it passes those coordinates to KACST's
+GetPrayerByYear: one table per place, which a city's mosques follow. The gate's twelve points are twelve of
+them. The engine computed the user's own point, and on `main` (705c4f7f) the app's Riyadh point, 3.8 km
+east of KACST's, began Fajr, Dhuhr, Asr, Maghrib or Isha a minute before Riyadh's table on 27 days of
+2024–2030 (39 cells). At the app's Madinah point, 8 km away, sunrise and the end of eating came a minute
+after Madinah's on 38 days (40 cells).
+
+**The units** (`UmmAlQura.units`, `data/UmmAlQuraCities.kt`). Each of the 173 places is a unit at KACST's
+own point, which rides beside the user's (ruling R15: starts the later, ends the earlier). Its reach is
+one minute of longitude (R40 for class A: 24 to 27 km). The nearest unit within its reach holds a place. A
+unit is called by the app's own name for the city. Beyond every unit the method is used at the user's
+own point, the end of eating at SAFE_END (R44), class D and no figure. Of the app's 98 Saudi cities, 94
+are in a unit. 89 of them are within 10 km of its point, and Ash Shafa (21 km), Qaisumah (18), At Taraf
+(13) and Safwa (11) are farther. Tayma is the special case below. Turubah, King
+Khalid Military City, Al Mash'iliyah and one of the two Al 'Aqiq have no KACST place within a minute's
+reach.
+
+**Tayma.** KACST's list places Tayma at 28.63° N, a degree north of the town (27.62° N, the same
+longitude). So the official Tayma table is the API's answer 111 km north, and at the town's own point the
+user's own sun began Asr, Maghrib and Isha up to 3 min, and Fajr up to 2, before it on about 150 days a
+year. Within a minute's reach of the town, a place now takes that table's unit (`UnitSet.choose`). Its
+times are the later of the table's and the town's own, up to 5 min after the table at Fajr and 3 at
+sunrise, Asr, Maghrib and Isha. So the unit is class D (R57), with a 5-min Fajr limit and a 3-min limit
+on sunrise and the end of eating (above the entry's lag-date 2).
+
+**Evidence.** The new monthly source `sa-ummalqura-cities` (the same API and parser as
+`sa-ummalqura`) read 2026 and 2027 at the other 161 places on 9 Oct 2026. The captures are pinned under
+`archive/tables/pinned/sa-ummalqura-cities/2026-10-09/`, with the raw JSON in
+`archive/raw/monitor/sa-ummalqura-cities/2026-10-09/` and the list in
+`archive/raw/manual/sa-ummalqura/2026-10-09/`. Every row is held out. At their own points, 322 tables
+and 117,530 place-days, the current margins gave 0 early, 0 late ends and none over the limit. Then each
+Saudi city of the app's list was gated at the app's own point against its unit's tables (180 rows,
+77,388 place-days, `sa.ummalqura/<unit>`): 0 early, 0 late ends.
+
+**The app's points beyond class A's minute.** West and south of KACST's point, the start is the user's
+own sun. Three units' app points passed the minute by one, on 1 to 3 days, and record it as unit late
+limits (R41):
+
+| unit | the app's point | events | worst | days |
+|---|---|---|---|---|
+| taif | Ash Shafa, 21 km south-south-west | Asr, Maghrib, Isha | 2 | 3 (2026–27) |
+| madinah | Sultanah, 7 km south-west | Maghrib, Isha | 2 | 1 (2025–27) |
+| al-hofuf | Al Hufuf, 5 km south-west | Maghrib, Isha | 2 | 1 (2026–27) |
+
+At 95 % of every unit's radius, north, east, south and west (CityUnitsTest, the archive's tables), there
+are 0 early and 0 late ends. Starts run up to 2 min after the city's table, and sunrise and the end of
+eating up to 3 min before it.
+
+**The figures.** Each Saudi page and About now show the city's own unit's worst start. Before, every
+place showed the entry's 2. Now Makkah, Riyadh, Jeddah, Dammam, Tabuk, Abha and Buraydah read 1, and
+Madinah and Taif read 2. The page's date and About's are the unit's own last checked day: 31 Dec 2030 at
+Makkah and Riyadh, 31 Dec 2027 at the others.
+
+| all 520 rows, 210,254 place-days | early / late end | 0 | 1 | 2 | 3+ | exact |
+|---|---|---|---|---|---|---|
+| Fajr | 0 | 168,479 | 41,433 | 108 | 234 | 80.1 % |
+| sunrise | 0 | 171,064 | 38,774 | 387 | 29 | 81.4 % |
+| Dhuhr | 0 | 173,161 | 37,093 | 0 | 0 | 82.4 % |
+| Asr | 0 | 171,084 | 38,987 | 163 | 20 | 81.4 % |
+| Maghrib, Isha | 0 | 171,204 | 38,843 | 163 | 44 | 81.4 % |
+| end of eating | 0 | 159,250 | 50,502 | 502 | 0 | 75.7 % |
+
+The days at 2 and 3+ minutes are Tayma's (class D) and the three units above, and the lag dates' Fajr,
+sunrise and end of eating. No margin changed.
+
+**Not proven.** A place between KACST's places, or one whose mosques read another place's table than
+the nearest, is checked only through the nearest unit's tables. Tayma's coordinate is KACST's to
+correct. 2028 onwards waits for the monitor: the recipe adds each new year's rows at the 173 points, not
+at the app's points.
+
 ## Qatar — `qa.calendarhouse`, class B
 
 **Evidence.** Calendar House's printed Doha calendar (16 Jun–11 Sep 2026, and a second copy to

@@ -443,6 +443,92 @@ neighbouring days and its shorter night) keeps Fajr up to 8 min and Isha up to 6
 and the end of eating up to 8 min early; and 2028 is not held (the monitor fetches all 29 places each
 month, and `prove` adds a new year's rows by itself, the source now having its recipe).
 
+## The city points (9 Oct 2026, ruling R44)
+
+**Why.** QMDB prints a table for each of its 5,694 places, and a city's mosques follow the city's. The
+engine computed the user's own point. On `main` (705c4f7f), replaying each gate row's table at the app's
+own point for the same city (`cities.csv`) found early starts at Oral (3.8 km east of QMDB's point: 121
+cells on 116 days of 2026–27, Dhuhr above all), Aktobe (3.7 km east: 70), Astana (14) and Pavlodar (8),
+and 4 sunrises after the table at the app's Ust-Kamenogorsk (QMDB's Oskemen, 3 km away).
+
+**The units** (`CentralAsia.kazakhstanUnits`, `data/QmdbPlaces.kt`). QMDB's place for every city of the
+app's list is a unit at QMDB's own point: its "<name> қаласы" city entry where it lists one, else the
+locality of that name. So are the gate's 29 places, 87 in all. QMDB's point rides beside the user's (R15:
+starts the later, ends the earlier), within three minutes of longitude (R40 for class D: 48 to 59 km).
+- **Its band.** The unit's method carries its own point's band, QMDB's ±5 at and above 48° N and ±3
+  below, with the end-of-eating margin of 46° to 48° N and of the north. The user's own band applies on
+  top, and each band's end-of-eating margin now keeps the earlier of the two (`min`). So where a unit
+  reaches across 46° or 48° N, as Shalqar's, Ayagoz's, Zhezkazgan's, Satpayev's, Baikonur's and five
+  more do, both bands' times bound the day.
+- **Its curves.** The AngleBased curves are read at the user's latitude as well as the unit's, on the
+  grid and at each latitude's own value (`PlaceCurves.at`'s `also`). Each slot takes the later start,
+  and the end of eating the earlier dawn. A unit reaches about half a degree north and south of its
+  point, and while the rule binds it moves by up to a minute a tenth of a degree.
+
+So no start is earlier, and no end later, than the same method at the user's own point without units.
+`RegistryCitiesTest` checks this at every Kazakh city of the app's list, every ninth day of 2026,
+through the app's engine. It holds whichever table the user's mosque reads, the city's or a village's
+own.
+- **Five without a table.** Shchuchinsk, Zhitikara, Esik, Abay (Karaganda region) and Abay (Turkistan
+  region) share their point in QMDB's list with another of its places (each city and a locality of
+  the same name, Abay's Duanshy, and the Turkistan Abay twice). There QMDB's year API answers HTTP 500
+  (9 Oct 2026), so it publishes no table to check. These are units that are not measured
+  (`QmdbPlaces.unanswered`), so no neighbour's figure (Makinsk's, 37 km from Shchuchinsk) is claimed
+  there.
+- **Beyond every unit**, the user's own point as before, with the end of eating at SAFE_END below 46° N
+  (R44), and no figure. Only Shalkar in the Atyrau region, whose nearest QMDB place is another village
+  16 km off, is beyond every unit among the app's 84 cities.
+
+**Evidence.** The kz-qmdb fetcher read 2026 and 2027 at the 58 new places on 9 Oct 2026, pinned under
+`archive/tables/pinned/kz-qmdb/2026-10-09/` with the raw JSON in `archive/raw/monitor/kz-qmdb/2026-10-09/`.
+The 29 places held before came back day for day. Every row is held out. At their own points, 116
+tables and 42,340 place-days, the margins of 6 Oct gave 0 early, 0 late ends and none over the limits.
+At the app's own points, 78 cities, 158 rows and 56,940 place-days against the unit's tables
+(`kz.qmdb/<unit>`), there were 0 early and 0 late ends. Gated against a neighbour's tables before those
+units existed, Shchuchinsk went over the north's limits against Makinsk's (Fajr 9 min, Isha 8, the end of
+eating 9 early) and Abay (Karaganda) against Saran's at the end of eating: a neighbour's table, not theirs,
+and now not claimed.
+
+| all 334 rows, 120,450 place-days | early / late end | 0 | 1 | 2 | 3+ | exact |
+|---|---|---|---|---|---|---|
+| Fajr | 0 | 39,433 | 74,932 | 1,584 | 4,501 | 32.7 % |
+| sunrise | 0 | 86,973 | 33,400 | 77 | 0 | 72.2 % |
+| Dhuhr | 0 | 103,166 | 17,284 | 0 | 0 | 85.7 % |
+| Asr (Hanafi) | 0 | 71,219 | 49,078 | 153 | 0 | 59.1 % |
+| Maghrib | 0 | 86,905 | 33,483 | 62 | 0 | 72.2 % |
+| Isha | 0 | 33,628 | 76,683 | 5,392 | 4,747 | 27.9 % |
+| end of eating | 0 | 26,573 | 28,188 | 1,510 | 64,179 | 22.1 % |
+
+The limits are unchanged: Fajr 8, Isha 6, end of eating 8, class D's 3 elsewhere. No margin changed.
+
+**About, per city** (the worst start of the city's own unit, over its own and the app's point; before
+this round every Kazakh place read the entry's 8):
+
+| figure | cities |
+|---|---|
+| 1 | Taraz, Turkistan, Taldykorgan, Zhanaozen, Sarkand, Kentau, Talgar, Konaev, Shu, Karatau, Zhetysay, Arys, Novokazalinsk, Zharkent, Zhanatas, Mangystau, Shiyeli, Shelek, Aksu (Turkistan), Shardara, Saryagash, Zhanakorgan, Lenger, Burunday, Ushtobe, Zhosaly, Otegen Batyr, Turar Ryskulov, Merke, Sarykemer |
+| 2 | Almaty, Shymkent, Kyzylorda, Aktau, Balkhash, Tekeli, Makanshy, Tasbuget |
+| 3 | Atyrau, Kulsary, Aral, Balykshi |
+| 4 | Zhezkazgan, Baikonur, Satpayev, Ayagoz, Shalqar, Embi, Zaysan |
+| 5 | Karaganda, Altay, Saran, Shakhtinsk, Kandyagash, Kalbatau |
+| 6 | Astana, Aktobe, Oral, Ust-Kamenogorsk, Semey, Temirtau, Ekibastuz, Ridder, Aksu (Pavlodar), Arkalyk, Lisakovsk, Aksay, Atbasar, Khromtau, Shemonaikha, Makinsk |
+| 7 | Pavlodar, Kostanay, Kokshetau, Rudny, Stepnogorsk, Akkol |
+| 8 | Petropavl |
+| none | Shchuchinsk, Zhitikara, Esik, both Abay (no table), Shalkar (beyond every unit) |
+
+**The edges.** At 95 % of every unit's radius, north, east, south and west (CityUnitsTest, the archive's
+tables), there are 0 early and 0 late ends. The start runs up to the class's three minutes after the
+city's table, plus its own lateness and, in the north, the AngleBased rule's change with latitude:
+Dhuhr and Asr up to 4 min, Maghrib 5, Isha 11, Fajr 12, and the end of eating up to 15 min early. About
+shows the unit's figure, measured at its point and the app's, so near a unit's north or south edge in
+summer the figure reads better than the times run (ruling R40's cost, larger for class D's three
+minutes than class A's one). A one-minute reach would still leave Dhuhr up to 3 and Fajr up to 9 at its
+edges, and would push Baikonur (39 km from QMDB's own point) out of its unit.
+
+**Not proven.** A village with its own QMDB table inside a city's unit is checked only through the
+city's table. The five cities QMDB lists twice have no table to check. 2028 waits for the monitor: the
+recipe adds new years at the 87 points, not at the app's points.
+
 ## Verification run
 
 ```
@@ -474,6 +560,16 @@ month, and `prove` adds a new year's rows by itself, the source now having its r
 ./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
 ./gradlew :shared:testAndroidHostTest       → 1,604/0 (AsiaProofTest 8/0)
 python3 -m unittest tools/timetables/monitor/tests.py  → 77/0 (3.13 and the Mac's 3.9)
+
+# the city points, 9 Oct 2026
+./gradlew -p tools/timetables gate -PgateGroup=kz-qmdb -Pstamps=false
+  → 334 rows, 120,450 place-days: 0 early, 0 late ends, none over its limit
+./gradlew -p tools/timetables gate
+  → 1,771 rows, 501,433 place-days: 0 early, 0 late ends, none over its limit, nothing BROKEN
+./gradlew -p tools/timetables jvmTest       → 300/0, with the archive (CityUnitsTest 3/0)
+./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
+./scripts/test.sh                           → shared 1,611/0 Android host, 1,488/0 iOS (AsiaProofTest 9/0)
+python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13 and the Mac's 3.9)
 ```
 
 ## Concerns (for the controller / other subtasks)
