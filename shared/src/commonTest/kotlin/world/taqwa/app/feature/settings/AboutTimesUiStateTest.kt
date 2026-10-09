@@ -294,6 +294,15 @@ class AboutTimesUiStateTest {
         assertEquals("shchuchinsk", unserved.resolution.unitId)
         assertFalse(unserved.resolution.measured)
         assertNull(uncheckedWorstMinutes(unserved.resolution, unserved.stamp))
+        // Baikonur's own point takes the nearest of QMDB's places, a village 3.5 km off (Akay, or Toretam at the app's
+        // rounded point), whose table is not checked: no figure, and About calls the place by the app's own name for
+        // it, not by the unit's.
+        val village = stateFor(Place(45.61667, 63.31667, "Asia/Qostanay", "KZ"))
+        assertIs<AboutTimesUiState.AuthorityUnchecked>(village)
+        assertTrue(village.resolution.unitId in setOf("qmdb-9351", "qmdb-9368"), village.resolution.unitId)
+        assertFalse(village.resolution.measured)
+        assertNull(village.resolution.unitLabel)
+        assertNull(uncheckedWorstMinutes(village.resolution, village.stamp))
     }
 
     @Test

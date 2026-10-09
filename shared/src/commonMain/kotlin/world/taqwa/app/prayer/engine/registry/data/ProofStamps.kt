@@ -798,11 +798,11 @@ object ProofStamps {
 
     private fun kzQmdb() = ProofStamp(
         entryId = "kz.qmdb",
-        places = 165,
-        placeDays = 120450,
-        ramadanDays = 9735,
+        places = 164,
+        placeDays = 119720,
+        ramadanDays = 9676,
         provenThrough = "2027-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 1, "endOfEating" to 8, "fajr" to 8, "isha" to 6, "maghrib" to 2, "sunrise" to 2),
+        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 8, "fajr" to 8, "isha" to 6, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = kzQmdbUnits1() + kzQmdbUnits2() + kzQmdbUnits3(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "maghrib", "sunrise")),
@@ -829,7 +829,7 @@ object ProofStamps {
         "atbasar" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 8, "fajr" to 6, "isha" to 5, "maghrib" to 1, "sunrise" to 1),
         "atyrau" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 3, "isha" to 2, "maghrib" to 1, "sunrise" to 1),
         "ayagoz" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 4, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
-        "baikonur" to mapOf("asrHanafi" to 2, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 4, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
+        "baikonur" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "balkhash" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 2, "isha" to 2, "maghrib" to 1, "sunrise" to 1),
         "boralday" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "bugrovoe" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 8, "fajr" to 8, "isha" to 6, "maghrib" to 1, "sunrise" to 1),

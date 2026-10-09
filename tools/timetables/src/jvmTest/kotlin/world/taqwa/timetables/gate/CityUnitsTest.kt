@@ -1,11 +1,13 @@
 package world.taqwa.timetables.gate
 
 import world.taqwa.app.prayer.engine.method.GeoPoint
+import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.Units
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.timetables.TestPaths
+import world.taqwa.timetables.units.QmdbReach
 import java.io.File
 import kotlin.math.PI
 import kotlin.math.asin
@@ -19,11 +21,12 @@ import kotlin.test.fail
 
 /**
  * Ruling R44's city units for the two authorities that print one table per place of their own city lists, Umm
- * al-Qura (KACST's 173) and QMDB (87 of its 5,694, and five more it serves no table for), the city-points round
- * of 9 Oct 2026:
+ * al-Qura (KACST's 173) and QMDB (every one of its 5,694 places since the owner's decision of 9 Oct 2026, 87 of
+ * them measured), the city-points round of 9 Oct 2026:
  *
  * - every measured unit is a point the monitor fetches (the fetchers' own lists), and every point it fetches is a
  *   unit, so no unit goes unchecked when a new year's table appears and no capture lands outside its unit;
+ * - QMDB's reaches, measured by the engine's own rule (QmdbReach), hold at the edges of a large sample of units;
  * - every Saudi and Kazakh city of the app's list is inside a unit but the few no place of the authority's list
  *   is near, which this names;
  * - with the archive: at the four edges of every unit's reach (north, east, south and west, 95 % of the radius),
@@ -92,6 +95,46 @@ class CityUnitsTest {
         val la2 = asin(sin(la1) * cos(d) + cos(la1) * sin(d) * cos(b))
         val lo2 = lo1 + atan2(sin(b) * sin(d) * cos(la1), cos(d) - sin(la1) * sin(la2))
         return GeoPoint(la2 * 180 / PI, lo2 * 180 / PI)
+    }
+
+    /**
+     * The owner's decision of 9 Oct 2026 (every QMDB place a unit): a unit reaches as far as every time shown stays
+     * within three minutes of the unit's own day and of the user's own point alone (QmdbReach). Checked here on every
+     * day of 2026 at eight bearings, 98 % of the reach, for all 87 checked places and some 300 more: the north from
+     * 54.5° N, the bands either side of 46° N and 48° N, the west's zones, the far south, the sparsest steppe (the
+     * places farthest from any other) and a stride through the rest. No archive needed: the engine against itself.
+     */
+    @Test
+    fun `at the reach's edge of a large sample of qmdb units every time stays within three minutes`() {
+        val units = requireNotNull(Units.of("kz.qmdb")).units
+        val others = units.filter { !it.measured }
+        fun nearestOther(u: AuthorityUnit) = units.asSequence().filter { it !== u }.minOf { distanceKm(it.point, u.point) }
+        val sample = (
+            units.filter { it.measured } +
+                others.filter { it.point.lat >= 54.5 }.take(40) +
+                others.filter { kotlin.math.abs(it.point.lat - 48.0) < 0.3 }.take(40) +
+                others.filter { kotlin.math.abs(it.point.lat - 46.0) < 0.3 }.take(40) +
+                others.filter { it.point.lon < 56.0 }.take(40) +
+                others.filter { it.point.lat < 41.5 }.take(30) +
+                others.sortedByDescending { nearestOther(it) }.take(40) +
+                others.filterIndexed { i, _ -> i % 60 == 0 }
+            ).distinctBy { it.id }
+        assertTrue(sample.size >= 350, "only ${sample.size} units sampled")
+        val results = sample.parallelStream().map { it to QmdbReach.edges(it) }.toList()
+        val worst = IntArray(QmdbReach.events.size)
+        for ((_, e) in results) for (i in worst.indices) worst[i] = maxOf(worst[i], e.extra[i])
+        println(
+            "kz.qmdb: ${sample.size} units, 8 edges each, every day of 2026; worst minutes beyond the unit's own day or " +
+                "the user's own point: " + QmdbReach.events.indices.joinToString { "${QmdbReach.events[it].first} ${worst[it]}" },
+        )
+        val broken = results.flatMap { (u, e) -> e.broken.map { "${u.id}: $it" } }
+        if (broken.isNotEmpty()) fail("${broken.size} broken at the edges:\n" + broken.take(20).joinToString("\n"))
+        val over = results.filter { (_, e) -> e.extra.any { it > QmdbReach.LIMIT_MINUTES } }
+        if (over.isNotEmpty()) {
+            fail("${over.size} units over ${QmdbReach.LIMIT_MINUTES} min at their edge:\n" + over.take(20).joinToString("\n") { (u, e) ->
+                "${u.id} (${u.point.lat}, ${u.point.lon}, ${u.radiusKm} km): " + e.extra.joinToString(" ")
+            })
+        }
     }
 
     @Test

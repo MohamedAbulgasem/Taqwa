@@ -221,6 +221,31 @@ tasks.register<JavaExec>("generateGoldenVector") {
 }
 
 /**
+ * Writes `QmdbPlaceList.kt`: every distinct point of QMDB's own city list as a kz.qmdb unit, each with its reach
+ * measured by the engine's own rule (`units/GenerateQmdbPlaces.kt`; the owner's decision of 9 Oct 2026). Re-run after
+ * any change to kz.qmdb's method, bands or curves, then run the gate and commit. Takes a few minutes on every core.
+ *
+ *     ./gradlew -p tools/timetables generateQmdbPlaces [-Pcities=<cities.json.gz>] [-Pout=<file>] [-Pthreads=N]
+ */
+tasks.register<JavaExec>("generateQmdbPlaces") {
+    group = "application"
+    description = "Writes QmdbPlaceList.kt: QMDB's places as kz.qmdb units, each reach measured."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.GenerateQmdbPlacesKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "4g"
+    val cities = providers.gradleProperty("cities").orElse(officialRoot.map { "$it/archive/raw/manual/kz-qmdb/2026-10-06/cities.json.gz" })
+    val out = providers.gradleProperty("out").orElse("")
+    val threads = providers.gradleProperty("threads").orElse("")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", repoRoot.path, "--cities", cities.get()) +
+            (if (out.get().isNotBlank()) listOf("--out", out.get()) else emptyList()) +
+            (if (threads.get().isNotBlank()) listOf("--threads", threads.get()) else emptyList())
+    })
+}
+
+/**
  * Writes `DiyanetEuropeCurves.kt`, the per-city curves of Diyanet's European tables, from every held
  * capture of each city (restricted, read from the official root); the generator's KDoc says how a
  * slot is derived. Re-run when a capture is added to the archive, then run the gate and commit.

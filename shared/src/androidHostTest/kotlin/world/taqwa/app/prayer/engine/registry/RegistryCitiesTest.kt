@@ -255,7 +255,9 @@ class RegistryCitiesTest {
         for (city in saudiAndKazakh) {
             val engine = PrayerEngine.dayTimes(city.place, dates.first(), EngineSettings())
             val r = engine.resolution
-            assertEquals(Registry.resolve(city.place).unitId, r.unitId, "${city.name}: the app's engine and the registry agree")
+            // The app resolves its point rounded to 0.001 deg (PrayerEngine.canonical); between two villages a few metres
+            // apart that can be the other one (Baikonur, between Akay and Toretam).
+            assertEquals(Registry.resolve(city.place.copy(lat = r.point.lat, lon = r.point.lon)).unitId, r.unitId, "${city.name}: the app's engine and the registry agree")
             if (r.unitId == null) continue
             inUnits++
             val p = r.point

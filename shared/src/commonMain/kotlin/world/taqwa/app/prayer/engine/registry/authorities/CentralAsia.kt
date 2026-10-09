@@ -16,8 +16,9 @@ import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.Where
 import world.taqwa.app.prayer.engine.registry.atEdge
+import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
-import world.taqwa.app.prayer.engine.registry.lateReachKm
+import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.single
 import kotlin.math.min
 
@@ -176,34 +177,70 @@ object CentralAsia {
      * an end earlier, and keeps the earlier end of eating of the two (the min above), so where a unit reaches
      * across 46° N or 48° N both bands' times are bounded, the city's table's and the user's own.
      */
-    private fun kazakhstanAt(point: GeoPoint): TimetableMethod =
+    internal fun kazakhstanAt(point: GeoPoint): TimetableMethod = when {
+        Regions.kazakhNorth.contains(point) -> northMethod
+        kazakhMiddle.contains(point) -> middleMethod
+        else -> southMethod
+    }
+
+    private fun banded(point: GeoPoint): TimetableMethod =
         variants.fold(kazakhstanMethod) { method, variant -> if (variant.area.contains(point)) variant.change(method) else method }
 
+    // One method per band, shared by every unit in it (5,676 units, three methods).
+    private val northMethod by lazy { banded(GeoPoint(48.0, 70.0)) }
+    private val middleMethod by lazy { banded(GeoPoint(47.0, 70.0)) }
+    private val southMethod by lazy { banded(GeoPoint(43.0, 70.0)) }
+
     /**
-     * Ruling R44 (the city-points round of 9 Oct 2026): QMDB prints a table for each of its 5,694 places (its city
-     * list), every mosque of a city follows the city's, and at the app's own point for a city a few kilometres from
-     * QMDB's the user's own sun began Fajr, Dhuhr, Asr, Maghrib or Isha up to a minute before the city's table (main
-     * at 705c4f7f: Oral on 121 days of 2026–27, Aktobe 70, Astana 14, Pavlodar 8, at Oskemen's city point a sunrise
-     * after the table's on 4). Each of [QmdbPlaces.all]' 87 places (the gate's 29 and QMDB's place for every other
-     * city of the app's list) is a unit at QMDB's own point, which rides as the fixed point beside the user's
-     * (ruling R15: starts the later, ends the earlier), within its R40 reach for class D, three minutes of
-     * longitude (48 to 59 km), with its own band's minutes ([kazakhstanAt]). Gated at its own point and at the app's
-     * point for its city (kz-qmdb.tsv). [QmdbPlaces.unanswered]' five, whose tables QMDB's API does not serve, are
-     * units too, so that their own point rides beside the user's and no neighbour's figure is claimed there, but
-     * they are not measured. Beyond every unit the user's own point with the entry's margins as before, the end of
-     * eating at SAFE_END below 46° N (ruling R44; the bands' own margins are earlier still), claiming no figure (spec
-     * §3.5). About and the site call the place by the app's name for it ([AuthorityUnit.named]).
+     * Ruling R44 and the owner's decision of 9 Oct 2026 ("every QMDB place a unit"): QMDB prints a table for each
+     * of its 5,694 places (its city list), a place's mosques follow its own, and the engine computed the user's own
+     * point: at the app's own point for a city a few kilometres from QMDB's, Fajr, Dhuhr, Asr, Maghrib or Isha began
+     * up to a minute before the city's table (main at 705c4f7f: Oral on 121 days of 2026–27, Aktobe 70, Astana 14,
+     * Pavlodar 8, and at Oskemen's city point a sunrise after the table's on 4).
+     *
+     * Every distinct point of QMDB's list ([QmdbPlaceList], 5,676) is a unit at QMDB's own point, which rides as the
+     * fixed point beside the user's (ruling R15: starts the later, ends the earlier), with its own band's minutes
+     * ([kazakhstanAt]). A user takes the nearest place whose reach holds them, so a village's user follows the
+     * village's own table and nobody a city tens of kilometres off. Each reach is measured with the engine's own
+     * rule (QmdbReach in tools/timetables: the unit's point beside the user's, the AngleBased curves on the grid and
+     * at both latitudes, the bands either side of 46° N and 48° N): as far as every time shown stays within 3 min of
+     * the unit's own day and of the user's own point alone. An app city's own point takes its city's place where its
+     * reach holds it ([QmdbPlaces.anchors]).
+     *
+     * The 87 places whose tables are checked ([QmdbPlaces.all]: the gate's 29 and QMDB's place for every other city
+     * of the app's list) are measured, gated at their own point and at the app's point for the city (kz-qmdb.tsv).
+     * Every other place, the five QMDB serves no table for ([QmdbPlaces.unanswered]) among them, is a unit that
+     * claims no figure. Beyond every reach the user's own point with the entry's margins as before, the end of eating
+     * at SAFE_END below 46° N (ruling R44; the bands' own margins are earlier still), claiming no figure (spec §3.5).
+     * About and the site call the place by the app's name for it ([AuthorityUnit.named]).
      */
-    val kazakhstanUnits = UnitSet(
-        "kz.qmdb",
-        (QmdbPlaces.all.map { it to true } + QmdbPlaces.unanswered.map { it to false }).map { (place, measured) ->
-            val point = GeoPoint(place.lat, place.lon)
+    val kazakhstanUnits: UnitSet by lazy {
+        val measured = QmdbPlaces.all.associateBy { it.qmdbId }
+        val unanswered = QmdbPlaces.unanswered.associateBy { it.qmdbId }
+        val units = QmdbPlaceList.places.map { place ->
+            val named = measured[place.qmdbId] ?: unanswered[place.qmdbId]
+            val point = if (named != null) GeoPoint(named.lat, named.lon) else GeoPoint(place.lat, place.lon)
             AuthorityUnit(
-                place.key, place.name, point, lateReachKm(place.lat, EntryClass.D_AUTHORITY), method = kazakhstanAt(point),
-                measured = measured, named = false,
+                id = named?.key ?: "qmdb-${place.qmdbId}", name = named?.name ?: "QMDB ${place.qmdbId}", point = point,
+                radiusKm = place.reachKm, method = kazakhstanAt(point), measured = place.qmdbId in measured, named = false,
             )
-        },
-    ) { kazakhstanMethod.atEdge("kz.qmdb.edge", kazakhstanMethod.margins) }
+        }
+        val byKey = units.associateBy { it.id }
+        val anchors = QmdbPlaces.anchors.map { GeoPoint(it.lat, it.lon) to byKey.getValue(it.key) }
+        UnitSet(
+            "kz.qmdb",
+            units,
+            choose = { place ->
+                val user = GeoPoint(place.lat, place.lon)
+                anchors.firstOrNull { (at, unit) ->
+                    distanceKm(user, at) <= ANCHOR_KM && distanceKm(user, unit.point) <= unit.radiusKm
+                }?.second
+            },
+        ) { kazakhstanMethod.atEdge("kz.qmdb.edge", kazakhstanMethod.margins) }
+    }
+
+    /** How near an app city's own point a user takes its city's place (the app rounds a point to 0.001°). */
+    private const val ANCHOR_KM = 1.0
 
     /** The end of eating's margin at and above 48° N, in seconds (fitted from Astana to Isakovka, 2026 and 2027). */
     private const val KAZAKH_NORTH_END_OF_EATING = -374

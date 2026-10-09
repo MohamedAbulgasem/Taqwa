@@ -145,29 +145,38 @@ object Registry {
      */
     private fun placed(entryId: String, base: TimetableMethod, measured: Boolean, place: Place): Placed {
         val user = GeoPoint(place.lat, place.lon)
-        var method = base
-        var unit: AuthorityUnit? = null
-        var isMeasured = measured
-        val units = Units.of(entryId)
-        if (units != null) {
-            unit = units.unitFor(place)
-            if (unit != null) {
-                val own = unit.method ?: base
-                method = if (own.fixedPoint == null) own.copy(fixedPoint = unit.point) else own
-                isMeasured = unit.measured
-            } else {
-                method = units.outside(user)
-                isMeasured = false
-            }
-        }
+        val units = Units.of(entryId) ?: return Placed(methodAlone(entryId, base, user), null, measured)
+        val unit = units.unitFor(place) ?: return Placed(finish(entryId, units.outside(user), user), null, false)
+        return Placed(methodInUnit(entryId, base, unit, user), unit, unit.measured)
+    }
+
+    /**
+     * Entry [entryId]'s method [base] for a user at [user] inside [unit], whichever unit the place would resolve to:
+     * the unit's own method carrying the unit's point as its fixed point (ruling R15; a method with a fixed point of
+     * its own keeps it), then the regional variants and curves ([finish]). The reach of QMDB's units is measured
+     * with it (the city-points round of 9 Oct 2026, `tools/timetables`' QmdbReach).
+     */
+    internal fun methodInUnit(entryId: String, base: TimetableMethod, unit: AuthorityUnit, user: GeoPoint): TimetableMethod {
+        val own = unit.method ?: base
+        return finish(entryId, if (own.fixedPoint == null) own.copy(fixedPoint = unit.point) else own, user)
+    }
+
+    /** Entry [entryId]'s method [base] at [user] as if it had no units: the user's own point alone, then [finish]. */
+    internal fun methodAlone(entryId: String, base: TimetableMethod, user: GeoPoint): TimetableMethod = finish(entryId, base, user)
+
+    /**
+     * [method] with entry [entryId]'s regional variants for [user] and its curves for the point the starts are
+     * read at (an ends-only fixed point leaves them at the user's). A rule read at each place's own latitude
+     * (QMDB's) holds for the user's latitude as well, so that a unit's point never makes the user's own start
+     * earlier than it is without the unit (PlaceCurves.at).
+     */
+    private fun finish(entryId: String, method: TimetableMethod, user: GeoPoint): TimetableMethod {
+        var m = method
         for (variant in variants) {
-            if (variant.entryId == entryId && variant.area.contains(user)) method = variant.change(method)
+            if (variant.entryId == entryId && variant.area.contains(user)) m = variant.change(m)
         }
-        // The curves follow the point the starts are read at (an ends-only fixed point leaves them at the user's).
-        // A rule read at each place's own latitude (QMDB's) holds for the user's latitude as well, so that a unit's
-        // point never makes the user's own start earlier than it is without the unit (PlaceCurves.at).
-        val curvesAt = if (method.fixedPointMode == FixedPointMode.ENDS_ONLY) user else method.fixedPoint ?: user
-        return Placed(PlaceCurves.at(method, curvesAt, also = user), unit, isMeasured)
+        val curvesAt = if (m.fixedPointMode == FixedPointMode.ENDS_ONLY) user else m.fixedPoint ?: user
+        return PlaceCurves.at(m, curvesAt, also = user)
     }
 
     /**

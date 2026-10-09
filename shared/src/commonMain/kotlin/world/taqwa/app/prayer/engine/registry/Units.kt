@@ -19,8 +19,10 @@ import world.taqwa.app.prayer.engine.registry.authorities.Russia
 import world.taqwa.app.prayer.engine.registry.authorities.SouthAfrica
 import world.taqwa.app.prayer.engine.registry.authorities.UmmAlQura
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.asin
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -77,18 +79,63 @@ class UnitSet(
     /** The unit with id [id]. */
     fun unit(id: String): AuthorityUnit = units.first { it.id == id }
 
-    /** The nearest unit whose radius holds [point], or null. */
+    /** The nearest unit whose radius holds [point], or null; ties go to the unit listed first. */
     fun nearest(point: GeoPoint): AuthorityUnit? {
         var best: AuthorityUnit? = null
         var bestKm = Double.MAX_VALUE
-        for (unit in units) {
+        for (unit in index?.near(point) ?: units) {
             val km = distanceKm(point, unit.point)
-            if (km <= unit.radiusKm && km < bestKm) {
+            if (km <= unit.radiusKm && (km < bestKm || (km == bestKm && order.getValue(unit.id) < order.getValue(best!!.id)))) {
                 best = unit
                 bestKm = km
             }
         }
         return best
+    }
+
+    private val order: Map<String, Int> by lazy { units.withIndex().associate { (i, u) -> u.id to i } }
+
+    /** For a set of many units (QMDB's 5,676), a grid of cells at least as wide as the largest radius. */
+    private val index: Grid? by lazy { if (units.size > GRID_FROM) Grid(units) else null }
+
+    /**
+     * Units by cell of [cellDeg] degrees, latitude and longitude alike, wide enough that every unit whose radius
+     * holds a point lies in the point's cell or one of its eight neighbours.
+     */
+    private class Grid(units: List<AuthorityUnit>) {
+        private val cellDeg: Double
+        private val cells: Map<Long, List<AuthorityUnit>>
+
+        init {
+            val maxRadius = units.maxOf { it.radiusKm }
+            val maxLat = units.maxOf { abs(it.point.lat) } + maxRadius / KM_PER_DEGREE
+            // A degree of longitude is shortest at the highest latitude a radius reaches.
+            cellDeg = GRID_SAFETY * maxRadius / (KM_PER_DEGREE * cos(rad(min(maxLat, 89.0))))
+            cells = units.groupBy { key(cell(it.point.lat), cell(it.point.lon)) }
+        }
+
+        private fun cell(deg: Double) = floor(deg / cellDeg).toLong()
+
+        private fun key(lat: Long, lon: Long) = lat * 1_000_000L + lon
+
+        fun near(point: GeoPoint): List<AuthorityUnit> {
+            val la = cell(point.lat)
+            val lo = cell(point.lon)
+            val out = ArrayList<AuthorityUnit>()
+            for (dLat in -1L..1L) for (dLon in -1L..1L) cells[key(la + dLat, lo + dLon)]?.let { out += it }
+            return out
+        }
+    }
+
+    private companion object {
+        /** Above this many units a set is searched through its grid. */
+        const val GRID_FROM = 256
+
+        /** A cell a little wider than it must be, for the haversine's curvature over a cell. */
+        const val GRID_SAFETY = 1.01
+
+        /** Kilometres in a degree of latitude, on the mean earth radius [distanceKm] uses (a little more than a degree spans). */
+        const val KM_PER_DEGREE = 111.19
     }
 }
 
@@ -100,15 +147,21 @@ object Units {
             Gulf.awqafUnits, Gulf.qatarUnits, Gulf.omanUnits, Muis.bruneiUnits, Maghreb.libyaUnits, Maghreb.tunisiaUnits,
             Maghreb.algeriaUnits, Maghreb.moroccoUnits, SouthAfrica.units, Russia.dumRtUnits, Russia.dumRfUnits,
             Balkans.bosniaUnits, Balkans.albaniaUnits, Europe.austriaUnits, Europe.switzerlandUnits, Americas.fianzUnits,
-            UmmAlQura.units, CentralAsia.kazakhstanUnits,
+            UmmAlQura.units,
         ).plus(Americas.torontoUnits).plus(Americas.lakembaUnits).plus(Europe.dublinTables).plus(SouthAfrica.capeTownTables)
             .plus(listOf(Europe.londonUnits, Europe.gmpUnits, Europe.embUnits, Europe.irnUnits, Diyanet.europeUnits))
             .plus(Levant.jordanUnits).plus(Levant.paUnits)
             .associateBy { it.entryId }
     }
 
+    /**
+     * Sets built only when their entry is first resolved: QMDB's 5,676 units (decoded from QmdbPlaceList, about 20 ms
+     * on a cold JVM) wait for the first place in Kazakhstan.
+     */
+    private val built: Map<String, Lazy<UnitSet>> = mapOf("kz.qmdb" to lazy { CentralAsia.kazakhstanUnits })
+
     /** The units of entry [entryId], or null when it has none. */
-    fun of(entryId: String): UnitSet? = sets[entryId]
+    fun of(entryId: String): UnitSet? = sets[entryId] ?: built[entryId]?.value
 }
 
 /**

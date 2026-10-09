@@ -104,16 +104,24 @@ internal object TwilightCurves {
     }
 
     /**
+     * The sun's noon declination (radians) for slots −1 .. 366 of the reference year: the days either side of it,
+     * for the nights. The same for every latitude, so computed once (a QMDB place's curves are read at two
+     * latitudes, on the grid and at their own, for each of its 5,676 units; the city-points round of 9 Oct 2026).
+     */
+    private val referenceDeclinations: DoubleArray by lazy {
+        DoubleArray(SLOTS + 2) { i ->
+            val noon = referenceStart.plus(i - 1, DateTimeUnit.DAY).toEpochDays() * SolarMath.SECONDS_PER_DAY + 12 * 3600.0
+            SolarMath.rad(SolarMath.sun(SolarMath.julianDay(noon)).declinationDeg)
+        }
+    }
+
+    /**
      * Per slot the value [angle] gives, [fallback] where the sun does not rise or set. The sun is
      * taken at [latitude] rounded to 0.1° ([onGrid], every curve's default), or at [latitude] itself.
      */
     private fun perSlot(latitude: Double, fallback: Double, onGrid: Boolean = true, angle: (Day) -> Double): DoubleArray {
         val phi = SolarMath.rad(if (onGrid) round(latitude * 10.0) / 10.0 else latitude)
-        // Slots −1 .. 366: the days either side of the reference year, for the nights.
-        val declinations = DoubleArray(SLOTS + 2) { i ->
-            val noon = referenceStart.plus(i - 1, DateTimeUnit.DAY).toEpochDays() * SolarMath.SECONDS_PER_DAY + 12 * 3600.0
-            SolarMath.rad(SolarMath.sun(SolarMath.julianDay(noon)).declinationDeg)
-        }
+        val declinations = referenceDeclinations
         val halfDays = DoubleArray(SLOTS + 2) { i -> hourAngle(phi, declinations[i], HORIZON) ?: Double.NaN }
         return DoubleArray(SLOTS) { i ->
             val h0 = halfDays[i + 1]
