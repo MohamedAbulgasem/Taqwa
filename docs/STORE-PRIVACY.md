@@ -52,6 +52,10 @@ store-readiness sweep (targetSdk 36, 0.16.0).
     constraint, and keeping the CPU awake while a surah is being written.
   - `world.taqwa.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — a signature-level permission
     androidx.core defines for its own runtime receivers; no other app can hold it.
+  - Exodus's report of the APK Google Play delivers (9 October 2026, 1.0.0 (35)) lists a 13th,
+    `com.android.vending.CHECK_LICENSE`, which is not in the merged manifest above: Google Play
+    adds it when it builds the APKs it serves from the bundle (most likely Play Console's automatic
+    protection, under App integrity). It is a Play licensing check, not a tracker; Exodus found 0.
 - **Package visibility (1.0.0 (33)):** one `<queries>` element, an intent for
   `android.intent.action.TTS_SERVICE` (`androidApp/src/main/AndroidManifest.xml`), lets read-aloud
   see the phone's text-to-speech engines (Google's, Samsung's) from Android 11 on. It is not a

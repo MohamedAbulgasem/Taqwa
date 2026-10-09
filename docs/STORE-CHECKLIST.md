@@ -101,7 +101,12 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   switch with the same edit; the Today card's foot keeps its "Get Taqwa" pill, which points to
   `#app`. After the build open one city page and check the badge shows in the pitch and in `#app`.
   **Done 8 October 2026:** `google_play` is set, so every home page and city page carries both
-  badges and no "coming" line. `exodus` stays `null` until the report is requested and published.
+  badges and no "coming" line. **Done 9 October 2026:** Exodus's report of the Play build 1.0.0
+  (35) (report 787937: 0 trackers, 13 permissions) is published, and `exodus` points to the
+  package's latest report (`/reports/world.taqwa.app/latest/`, no language prefix, so Exodus
+  serves the reader's language where it has one and each new Play version's report replaces it).
+  Request a new analysis at reports.exodus-privacy.eu.org/en/analysis/submit/ after each Play
+  release so the latest report is the current version.
 - **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
   `scripts/bump-version.sh`. Settings › About shows the name alone; Mohamed tells testers which
   build they are on.
