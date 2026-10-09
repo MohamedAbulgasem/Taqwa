@@ -166,18 +166,36 @@ class AsiaProofTest {
     }
 
     @Test
-    fun `every qmdb place is a unit and a user takes the nearest whose reach holds them`() {
-        // The owner's decision of 9 Oct 2026: QMDB's 5,676 distinct points, the 87 checked places measured.
+    fun `every qmdb place is a unit and a user takes the city whose reach holds them else the nearest place`() {
+        // The owner's decisions of 9 Oct 2026: QMDB's 5,676 distinct points, the checked places measured, and the
+        // places of 83 of the app's 84 Kazakh cities (81 places) the cities.
         val units = Units.of("kz.qmdb")!!.units
         assertEquals(5676, units.size)
-        assertEquals(87, units.count { it.measured })
-        // A village's user follows the village's own place: Baikonur's own point (the app's city list) lies 39 km
-        // from QMDB's Baikonur, beyond its reach, and 3.5 km from the villages of Akay and Toretam, which claim no figure.
+        // Zhenis, checked but inside Zhetysay's reach, is Zhetysay's: its own unit claims no figure.
+        assertEquals(86, units.count { it.measured })
+        assertTrue(!units.single { it.id == "zhenis" }.measured)
+        assertEquals("zhetysay", resolve(40.599543, 68.504760, "Asia/Almaty", "KZ").unitId)
+        assertEquals(81, units.count { it.cityId != null })
+        // A village's user beyond every city's reach follows the village's own place: Baikonur's own point (the app's
+        // city list) lies 39 km from QMDB's Baikonur, beyond its reach, and 3.5 km from the villages of Akay and
+        // Toretam, which claim no figure.
         val baikonur = resolve(45.61667, 63.31667, "Asia/Qostanay", "KZ")
         assertTrue(baikonur.unitId in setOf("qmdb-9351", "qmdb-9368"), baikonur.unitId)
         assertTrue(!baikonur.measured)
-        // Oral's own point is nearer two villages than QMDB's Oral, and takes Oral's place (QmdbPlaces.anchors).
+        assertEquals(null, baikonur.unitCityId)
+        // Oral's own point is nearer two villages than QMDB's Oral, and takes Oral's place.
         assertEquals("oral", resolve(51.24601, 51.42558, "Asia/Oral", "KZ").unitId)
+        // Inside a city's reach the city's place wins over a nearer village: 8 km north-east of QMDB's Almaty, 2 km
+        // from the village of Besagash, a user follows Almaty's table, named for the app's Almaty (GeoNames 1526384).
+        val suburb = resolve(43.289, 77.015, "Asia/Almaty", "KZ")
+        assertEquals("almaty", suburb.unitId)
+        assertTrue(suburb.measured)
+        assertEquals(1526384, suburb.unitCityId)
+        // Inside two cities' reaches, the nearer: 16 km west of QMDB's Almaty and 12 km from QMDB's Boralday (the
+        // app's Burunday), Boralday's; and QMDB's Saran is 18.5 km west of Karaganda's.
+        assertEquals("boralday", resolve(43.283, 76.754, "Asia/Almaty", "KZ").unitId)
+        assertEquals("saran", resolve(49.80, 72.86, "Asia/Almaty", "KZ").unitId)
+        assertEquals("karaganda", resolve(49.80, 73.05, "Asia/Almaty", "KZ").unitId)
         // Every reach keeps its unit's times within 3 min (QmdbReach); none is wider than class D's R40 reach.
         for (u in units) assertTrue(u.radiusKm in 0.1..lateReachKm(u.point.lat, EntryClass.D_AUTHORITY), u.id)
     }

@@ -200,12 +200,17 @@ object CentralAsia {
      *
      * Every distinct point of QMDB's list ([QmdbPlaceList], 5,676) is a unit at QMDB's own point, which rides as the
      * fixed point beside the user's (ruling R15: starts the later, ends the earlier), with its own band's minutes
-     * ([kazakhstanAt]). A user takes the nearest place whose reach holds them, so a village's user follows the
-     * village's own table and nobody a city tens of kilometres off. Each reach is measured with the engine's own
-     * rule (QmdbReach in tools/timetables: the unit's point beside the user's, the AngleBased curves on the grid and
-     * at both latitudes, the bands either side of 46° N and 48° N): as far as every time shown stays within 3 min of
-     * the unit's own day and of the user's own point alone. An app city's own point takes its city's place where its
-     * reach holds it ([QmdbPlaces.anchors]).
+     * ([kazakhstanAt]). Each reach is measured with the engine's own rule (QmdbReach in tools/timetables: the unit's
+     * point beside the user's, the AngleBased curves on the grid and at both latitudes, the bands either side of
+     * 46° N and 48° N): as far as every time shown stays within 3 min of the unit's own day and of the user's own
+     * point alone ([QmdbPlaceList.FINGERPRINT] records what it was measured with).
+     *
+     * The city's table (the owner's decision of 9 Oct 2026): inside the reach of one of the app's cities' places
+     * ([QmdbPlaces.appCities], 81 places for 83 of the app's 84 Kazakh cities), a user takes the city's place even
+     * where a village or suburb of QMDB's list lies nearer, since a city's mosques follow the city's table; inside
+     * two cities' reaches, the nearer city. Everywhere else, the nearest place whose reach holds the user, so a
+     * village's user follows the village's own table and nobody a city tens of kilometres off. A city's unit
+     * carries the app's own city ([AuthorityUnit.cityId]), so About names the city whose table it is.
      *
      * The 87 places whose tables are checked ([QmdbPlaces.all]: the gate's 29 and QMDB's place for every other city
      * of the app's list) are measured, gated at their own point and at the app's point for the city (kz-qmdb.tsv).
@@ -217,30 +222,40 @@ object CentralAsia {
     val kazakhstanUnits: UnitSet by lazy {
         val measured = QmdbPlaces.all.associateBy { it.qmdbId }
         val unanswered = QmdbPlaces.unanswered.associateBy { it.qmdbId }
-        val units = QmdbPlaceList.places.map { place ->
+        // Each city's place and the app's city it is the table of (the first of the app's cities naming it).
+        val cityOf = QmdbPlaces.appCities.reversed().associate { it.key to it.geonamesId }
+        val places = QmdbPlaceList.places.map { place ->
             val named = measured[place.qmdbId] ?: unanswered[place.qmdbId]
             val point = if (named != null) GeoPoint(named.lat, named.lon) else GeoPoint(place.lat, place.lon)
             AuthorityUnit(
                 id = named?.key ?: "qmdb-${place.qmdbId}", name = named?.name ?: "QMDB ${place.qmdbId}", point = point,
                 radiusKm = place.reachKm, method = kazakhstanAt(point), measured = place.qmdbId in measured, named = false,
+                cityId = named?.key?.let { cityOf[it] },
             )
         }
-        val byKey = units.associateBy { it.id }
-        val anchors = QmdbPlaces.anchors.map { GeoPoint(it.lat, it.lon) to byKey.getValue(it.key) }
-        UnitSet(
-            "kz.qmdb",
-            units,
-            choose = { place ->
-                val user = GeoPoint(place.lat, place.lon)
-                anchors.firstOrNull { (at, unit) ->
-                    distanceKm(user, at) <= ANCHOR_KM && distanceKm(user, unit.point) <= unit.radiusKm
-                }?.second
-            },
-        ) { kazakhstanMethod.atEdge("kz.qmdb.edge", kazakhstanMethod.margins) }
+        val cities = places.filter { it.cityId != null }
+        check(cities.size == cityOf.size) { "kz.qmdb: an app city's place is not a unit of QMDB's list" }
+        // A checked place inside a city's reach (Zhenis, in Zhetysay's) is the city's: its table is held against the
+        // city's times (kz-qmdb.tsv), and its own unit, which no user inside the city's reach takes, claims no figure.
+        val units = places.map { if (it.measured && it.cityId == null && cityHolding(cities, it.point) != null) it.copy(measured = false) else it }
+        UnitSet("kz.qmdb", units, choose = { place -> cityHolding(cities, GeoPoint(place.lat, place.lon)) }) {
+            kazakhstanMethod.atEdge("kz.qmdb.edge", kazakhstanMethod.margins)
+        }
     }
 
-    /** How near an app city's own point a user takes its city's place (the app rounds a point to 0.001°). */
-    private const val ANCHOR_KM = 1.0
+    /** The nearest of [cities] whose reach holds [user], or null (then the nearest place of all). */
+    private fun cityHolding(cities: List<AuthorityUnit>, user: GeoPoint): AuthorityUnit? {
+        var best: AuthorityUnit? = null
+        var bestKm = Double.MAX_VALUE
+        for (city in cities) {
+            val km = distanceKm(user, city.point)
+            if (km <= city.radiusKm && km < bestKm) {
+                best = city
+                bestKm = km
+            }
+        }
+        return best
+    }
 
     /** The end of eating's margin at and above 48° N, in seconds (fitted from Astana to Isakovka, 2026 and 2027). */
     private const val KAZAKH_NORTH_END_OF_EATING = -374

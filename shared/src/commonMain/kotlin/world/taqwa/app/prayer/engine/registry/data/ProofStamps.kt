@@ -802,7 +802,7 @@ object ProofStamps {
         placeDays = 119720,
         ramadanDays = 9676,
         provenThrough = "2027-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 8, "fajr" to 8, "isha" to 6, "maghrib" to 1, "sunrise" to 1),
+        worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 1, "endOfEating" to 8, "fajr" to 8, "isha" to 6, "maghrib" to 2, "sunrise" to 1),
         worstLateByUnit = kzQmdbUnits1() + kzQmdbUnits2() + kzQmdbUnits3(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "maghrib", "sunrise")),
@@ -902,8 +902,7 @@ object ProofStamps {
         "zhanaozen" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "zhanatas" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "zharkent" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
-        "zhenis" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
-        "zhetysay" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        "zhetysay" to mapOf("asrHanafi" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 1),
         "zhezkazgan" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 4, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
         "zhosaly" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
     )

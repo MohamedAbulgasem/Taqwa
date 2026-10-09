@@ -288,11 +288,18 @@ internal fun AboutTimesRoute(
     val state = remember(engineDay, place, today) {
         aboutTimesUiState(engineDay, place, today, prayerSettings.hijriOffsetDays)
     }
+    // A city's own table (QMDB's cities, the owner's decision of 9 Oct 2026): About names the city whose
+    // table the times follow, in the reader's language, also where the location's own nearest city is
+    // another (a suburb's fix inside the city's reach). The location's own city needs no lookup.
+    val unitCityId = state.resolution.unitCityId?.takeIf { it != loc.cityId }
+    val unitCityName by produceState<String?>(null, unitCityId, cityDisplayName) {
+        value = unitCityId?.let { container.cityRepository.displayName(it) }
+    }
     AboutTimesScreen(
         state = state,
         engineDay = engineDay,
         place = place,
-        cityLabel = cityDisplayName ?: stringResource(Res.string.today_current_location),
+        cityLabel = unitCityName ?: cityDisplayName ?: stringResource(Res.string.today_current_location),
         zone = zone,
         onBack = { navigator.pop() },
         onMatchMyMosque = { navigator.push(Screen.MatchMyMosque) },

@@ -103,11 +103,13 @@ archive/tables/pinned/kz-qmdb/2026-10-06/makat-2027.txt	kz.qmdb	47.647520	53.349
 # the city's, so each place this file reads, and QMDB's own place for every other city of the app's list (its
 # "<name> қаласы" city entry where it lists one, else the locality of that name), is a unit of kz.qmdb at QMDB's own
 # point (CentralAsia.kazakhstanUnits, with its own band's minutes): 87 places whose tables this file reads. Since the
-# owner's decision of 9 Oct 2026 every other place of QMDB's list is a unit too, which claims no figure, and a user
-# takes the nearest place whose reach holds them (each reach measured, QmdbPlaceList: every time within 3 min of the
-# unit's own day and of the user's own point alone; the generator's QmdbReach, the edges in CityUnitsTest). The 58 new
-# places' 2026 and 2027 tables, as the kz-qmdb fetcher read them on 9 Oct 2026 (archive/tables/pinned/kz-qmdb/
-# 2026-10-09/; raw JSON in archive/raw/monitor/kz-qmdb/2026-10-09/), held out at their own points. Five cities have
+# owner's decisions of 9 Oct 2026 every other place of QMDB's list is a unit too, which claims no figure; inside the
+# reach of one of the app's cities' places a user takes the city's (the nearer city's where two reach), elsewhere the
+# nearest place whose reach holds them (each reach measured, QmdbPlaceList: every time within 3 min of the unit's own
+# day and of the user's own point alone; the generator's QmdbReach, the edges and rings in CityUnitsTest). Zhenis
+# lies inside Zhetysay's reach, so its rows here hold the times of Zhetysay's unit against Zhenis's own table. The
+# 58 new places' 2026 and 2027 tables, as the kz-qmdb fetcher read them on 9 Oct 2026 (archive/tables/pinned/
+# kz-qmdb/2026-10-09/; raw JSON in archive/raw/monitor/kz-qmdb/2026-10-09/), held out at their own points. Five cities have
 # no table to read: QMDB lists each twice at one point (Shchuchinsk, Zhitikara, Esik, and Abay in the Karaganda and
 # the Turkistan regions), and there its year API answers HTTP 500.
 archive/tables/pinned/kz-qmdb/2026-10-09/akkol-2026.txt	kz.qmdb	53.296079	69.597040	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Akkol, 2026 (QMDB's own place for the app's city; QMDB year API, capture of 9 Oct 2026)
@@ -227,12 +229,11 @@ archive/tables/pinned/kz-qmdb/2026-10-09/shardara-2027.txt	kz.qmdb	41.254722	67.
 archive/tables/pinned/kz-qmdb/2026-10-09/zhetysay-2026.txt	kz.qmdb	40.775278	68.327222	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Zhetysay, 2026 (QMDB's own place for the app's city; QMDB year API, capture of 9 Oct 2026)
 archive/tables/pinned/kz-qmdb/2026-10-09/zhetysay-2027.txt	kz.qmdb	40.775278	68.327222	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Zhetysay, 2027 (QMDB's own place for the app's city; QMDB year API, capture of 9 Oct 2026)
 # The app's own points (9 Oct 2026): each Kazakh city of the app's list (shared/.../files/cities.csv, GeoNames) is held
-# out at its own point against the tables of the unit it resolves to, the nearest of QMDB's places within its reach,
-# as `kz.qmdb/<unit>` (the gate checks the point resolves there; a city's own point takes its city's place where the
-# place's reach holds it, QmdbPlaces.anchors): 77 of the 84. Shchuchinsk, Zhitikara, Esik and the two Abay are in
-# their own units, which QMDB serves no table for (above) and which claim no figure. Baikonur's own point is 39 km from
-# QMDB's place of that name, beyond its reach, and takes the nearest place, Akay or Toretam (both 3.5 km), which
-# claim none either.
+# out at its own point against the tables of the unit it resolves to, its own city's place (QmdbPlaces.appCities),
+# as `kz.qmdb/<unit>` (the gate checks the point resolves there): 77 of the 84. Shchuchinsk, Zhitikara, Esik and the
+# two Abay are in their own units, which QMDB serves no table for (above) and which claim no figure. Baikonur's own
+# point is 39 km from QMDB's place of that name, beyond its reach and every other city's, and takes the nearest
+# place, Akay or Toretam (both 3.5 km), which claim none either.
 # Shalkar in the Atyrau region is beyond every reach, at the user's own point.
 archive/tables/moral-auth-world/centralasia/off_ala_h1.txt	kz.qmdb/almaty	43.25249	76.9115	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Almaty, the app's own point (3.2 km from QMDB's), against Almaty, Jan-Jun 2026
 archive/tables/moral-auth-world/centralasia/off_ala_h2.txt	kz.qmdb/almaty	43.25249	76.9115	Asia/Almaty	F+E S D A M I	daily	hanafi	test	Almaty, the app's own point (3.2 km from QMDB's), against Almaty, Jul-Dec 2026

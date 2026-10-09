@@ -12,8 +12,11 @@ import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.Resolution
+import world.taqwa.app.prayer.engine.registry.authorities.CentralAsia
+import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceCodec
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateReachKm
+import java.security.MessageDigest
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.atan2
@@ -89,12 +92,16 @@ object QmdbReach {
         return days.associateWith { day(method, unit.point, it) }
     }
 
-    /** Each event's most minutes beyond [unit]'s own day and the user's own point alone, at [at], over [days]. */
+    /**
+     * Each event's most minutes beyond [unit]'s own day and the user's own point alone, at [at], over [days], and
+     * beyond [also] where given (another place's own day: a village's, inside a city's reach).
+     */
     fun extraMinutes(
         unit: AuthorityUnit,
         at: GeoPoint,
         own: Map<LocalDate, PrayerDay> = unitDays(unit),
         days: List<LocalDate> = dates,
+        also: Map<LocalDate, PrayerDay>? = null,
     ): Extra {
         val inUnit = Registry.methodInUnit(entry.id, entry.method!!, unit, at)
         val alone = Registry.methodAlone(entry.id, entry.method!!, at)
@@ -102,15 +109,13 @@ object QmdbReach {
         val broken = mutableListOf<String>()
         for (date in days) {
             val shown = day(inUnit, at, date)
-            val unitDay = own.getValue(date)
-            val aloneDay = day(alone, at, date)
+            val references = listOfNotNull(own.getValue(date), day(alone, at, date), also?.getValue(date))
             for ((i, e) in events.withIndex()) {
                 val (name, start) = e
                 val s = shown.at(i)
-                val vsUnit = ((if (start) s - unitDay.at(i) else unitDay.at(i) - s).inWholeMinutes).toInt()
-                val vsAlone = ((if (start) s - aloneDay.at(i) else aloneDay.at(i) - s).inWholeMinutes).toInt()
-                if (vsUnit < 0 || vsAlone < 0) broken += "$date $name at ${at.lat},${at.lon}: ${minOf(vsUnit, vsAlone)} min"
-                extra[i] = max(extra[i], max(vsUnit, vsAlone))
+                val beyond = references.map { ((if (start) s - it.at(i) else it.at(i) - s).inWholeMinutes).toInt() }
+                if (beyond.any { it < 0 }) broken += "$date $name at ${at.lat},${at.lon}: ${beyond.min()} min"
+                extra[i] = max(extra[i], beyond.max())
             }
         }
         return Extra(extra, broken)
@@ -154,6 +159,65 @@ object QmdbReach {
     }
 
     private const val BISECTIONS = 7
+
+    /**
+     * What every reach was measured with, as one hash: the generator writes it into QmdbPlaceList.kt
+     * ([QmdbPlaceList.FINGERPRINT][world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList.FINGERPRINT]) and
+     * `CityUnitsTest` fails when it no longer matches. It covers this object's own rule (the limit, the share kept,
+     * the bisection, the bearings, the days, the events, the class D cap), the codec, and kz.qmdb's method, bands
+     * and curves through what they give: each event's time, in whole seconds, on [PROBE_DAYS] at [PROBE_POINTS]
+     * (straddling 46° N and 48° N and every zone), for a unit there, for a user beside it and for that user alone.
+     * Any change to the method, its margins, its bands, the AngleBased curves or the engine's way of riding a
+     * unit's point beside the user's moves some of them.
+     *
+     * The same on every machine: no double is printed (the cap in metres, the coordinates as literal sums, the
+     * times as whole epoch seconds), so neither `Double.toString` nor a maths routine's last bit can move it.
+     */
+    fun fingerprint(): String {
+        val text = StringBuilder()
+        text.append("rule ").append(LIMIT_MINUTES).append(' ').append(Math.round(SAFETY * 1000)).append(' ').append(BISECTIONS)
+        text.append(" bearings ").append(bearings.joinToString(",") { Math.round(it * 1000).toString() })
+        text.append(" days ").append(dates.joinToString(",")).append(" zone ").append(zone.id)
+        text.append(" events ").append(events.joinToString(",") { "${it.first}:${it.second}" })
+        text.append(" cap ").append((40..56).joinToString(",") { Math.round(lateReachKm(it.toDouble(), EntryClass.D_AUTHORITY) * 1000).toString() })
+        text.append("\ncodec ").append(QmdbPlaceCodec.WIDTH).append(' ').append(Math.round(QmdbPlaceCodec.LAT_BASE * 1000))
+            .append(' ').append(Math.round(QmdbPlaceCodec.LON_BASE * 1000)).append(' ').append(QmdbPlaceCodec.SCALE)
+            .append(' ').append(QmdbPlaceCodec.DIGITS)
+        for ((lat, lon) in PROBE_POINTS) {
+            val point = GeoPoint(lat, lon)
+            val unit = AuthorityUnit("probe", "probe", point, lateReachKm(lat, EntryClass.D_AUTHORITY), method = CentralAsia.kazakhstanAt(point), named = false)
+            val user = GeoPoint(lat + PROBE_STEP_LAT, lon + PROBE_STEP_LON)
+            val ownMethod = Registry.methodInUnit(entry.id, entry.method!!, unit, point)
+            val inUnit = Registry.methodInUnit(entry.id, entry.method!!, unit, user)
+            val alone = Registry.methodAlone(entry.id, entry.method!!, user)
+            text.append("\nprobe ").append(Math.round(lat * 1000)).append(',').append(Math.round(lon * 1000))
+            for (date in PROBE_DAYS) {
+                for ((method, at) in listOf(ownMethod to point, inUnit to user, alone to user)) {
+                    val day = day(method, at, date)
+                    text.append(' ').append(events.indices.joinToString(",") { day.at(it).epochSeconds.toString() })
+                }
+            }
+        }
+        val digest = MessageDigest.getInstance("SHA-256").digest(text.toString().toByteArray())
+        return digest.joinToString("") { "%02x".format(it) }.take(16)
+    }
+
+    /** The probe's places: either side of 46° N and 48° N, the north to Isakovka, the west's zones, the far south. */
+    private val PROBE_POINTS: List<Pair<Double, Double>> = listOf(
+        40.6 to 68.5, 41.3 to 69.0, 42.3 to 69.6, 42.9 to 71.4, 43.24 to 76.95, 43.6 to 51.2, 44.8 to 65.5,
+        45.0 to 78.4, 45.95 to 63.3, 46.0 to 61.7, 46.05 to 74.98, 46.5 to 54.0, 47.12 to 51.88, 47.5 to 84.9,
+        47.95 to 80.43, 47.99 to 51.62, 48.0 to 67.5, 48.02 to 67.7, 48.8 to 58.1, 49.8 to 73.1, 50.3 to 57.2,
+        50.4 to 80.2, 51.13 to 71.43, 51.2 to 51.4, 52.3 to 76.96, 53.2 to 63.6, 54.0 to 69.0, 54.86 to 69.14,
+        55.4 to 68.9,
+    )
+
+    /** The probe's user, beside each place: north-east of it, across 46° N and 48° N from the places just below. */
+    private const val PROBE_STEP_LAT = 0.09
+    private const val PROBE_STEP_LON = 0.11
+
+    /** The 1st and the 15th of each month of 2026, and the solstices. */
+    private val PROBE_DAYS: List<LocalDate> =
+        ((1..12).flatMap { listOf(LocalDate(2026, it, 1), LocalDate(2026, it, 15)) } + listOf(LocalDate(2026, 6, 21), LocalDate(2026, 12, 21))).sorted()
 
     /** The worst extra per event at the four edges ([edgeBearings]) of [unit]'s reach, every day of 2026. */
     fun edges(unit: AuthorityUnit, share: Double = 0.98, edgeBearings: List<Double> = bearings): Extra {

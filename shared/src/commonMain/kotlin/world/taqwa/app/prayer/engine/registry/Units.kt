@@ -38,7 +38,10 @@ import kotlin.math.sqrt
  * before its entry's ([lateLimitFor]). [named] is false for a city's own table (Umm al-Qura's and
  * QMDB's places, ruling R44), whose unit is the user's city itself: About and the site then call the
  * place by the app's own name for it in the reader's language ([Resolution.unitLabel]), not by the
- * authority's spelling ("Mecca", "Алматы қаласы"), as they do outside every unit.
+ * authority's spelling ("Mecca", "Алматы қаласы"), as they do outside every unit. [cityId], when set, is
+ * the app's own city (its id in the app's city list) whose table the unit is: About then calls the place
+ * by that city's name in the reader's language, even where the user's own nearest city is another (a
+ * suburb's fix inside the city's reach, the owner's decision of 9 Oct 2026 for QMDB's cities).
  * (Not named `Unit`: that would shadow kotlin.Unit.)
  */
 data class AuthorityUnit(
@@ -51,6 +54,7 @@ data class AuthorityUnit(
     val entryClass: EntryClass? = null,
     val lateLimits: List<LateLimit> = emptyList(),
     val named: Boolean = true,
+    val cityId: Int? = null,
 ) {
     init {
         requireEachEventOnce(lateLimits, id)

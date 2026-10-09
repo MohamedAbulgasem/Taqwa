@@ -4,7 +4,7 @@ package world.taqwa.app.prayer.engine.registry.data
  * The QMDB places kz.qmdb's units name (ruling R44, `CentralAsia.kazakhstanUnits`; every place of QMDB's list is a
  * unit, [QmdbPlaceList]), at the coordinates of QMDB's city list, api.muftyat.kz/cities/ (5,694 places, captured
  * 6 Oct 2026), the only points its year API answers at: the places whose tables are checked ([all]), the five it
- * serves none for ([unanswered]), and the app's own cities' points ([anchors]). Derived facts, never a time:
+ * serves none for ([unanswered]), and the app's own cities ([appCities]). Derived facts, never a time:
  * [QmdbPlace.qmdbId] is the list's own id, [QmdbPlace.key] the unit's id (the monitor's capture key),
  * [QmdbPlace.name] an English name for it.
  */
@@ -122,98 +122,100 @@ object QmdbPlaces {
         QmdbPlace(10460, "abay-turkistan", "Abay (Turkistan)", 41.346802, 68.950432),
     )
 
-    /** An app city's own point ([lat], [lon], the app's city list) and the [key] of its QMDB place's unit. */
-    class Anchor(val key: String, val lat: Double, val lon: Double)
+    /** An app city: the [key] of its QMDB place's unit, its id in the app's city list, and the point the app gives it. */
+    class AppCity(val key: String, val geonamesId: Int, val lat: Double, val lon: Double)
 
     /**
-     * Each Kazakh city of the app's own list (`cities.csv`, GeoNames) at the point the app gives it, with its QMDB
-     * place: a user there takes that place's unit, where its reach holds the point, even where a village of QMDB's
-     * list lies nearer (Oral's own point is 3 km from the village of Asan and 6 from QMDB's Oral). Shalkar in the
-     * Atyrau region has no QMDB place of its name, so no anchor.
+     * Each Kazakh city of the app's own list (`cities.csv`, GeoNames), with its QMDB place: these places are the
+     * cities (`CentralAsia.kazakhstanUnits`, the owner's decision of 9 Oct 2026): inside a city's reach a user takes
+     * the city's place even where a village or suburb of QMDB's list lies nearer (Oral's own point is 3 km from the
+     * village of Asan and 6 from QMDB's Oral), the nearer city where two reach. Atyrau and Balykshi share Atyrau's
+     * place, and Kyzylorda and Tasbuget Kyzylorda's; the first named is the unit's city. Shalkar in the Atyrau region
+     * has no QMDB place of its name, so it is not here.
      */
-    val anchors: List<Anchor> = listOf(
-        Anchor("almaty", 43.25249, 76.9115), // Almaty (GeoNames 1526384)
-        Anchor("astana", 51.1801, 71.44598), // Astana (GeoNames 1526273)
-        Anchor("shymkent", 42.30988, 69.60042), // Shymkent (GeoNames 1518980)
-        Anchor("aktobe", 50.27969, 57.20718), // Aktobe (GeoNames 610611)
-        Anchor("karaganda", 49.80187, 73.10211), // Karagandy (GeoNames 609655)
-        Anchor("taraz", 42.89799, 71.37334), // Taraz (GeoNames 1516905)
-        Anchor("kyzylorda", 44.85278, 65.50917), // Kyzylorda (GeoNames 1519922)
-        Anchor("oral", 51.24601, 51.42558), // Oral (GeoNames 608668)
-        Anchor("pavlodar", 52.27601, 76.96881), // Pavlodar (GeoNames 1520240)
-        Anchor("oskemen", 49.97143, 82.60586), // Ust-Kamenogorsk (GeoNames 1520316)
-        Anchor("semey", 50.42064, 80.25025), // Semey (GeoNames 1519422)
-        Anchor("atyrau", 47.1048, 51.88427), // Atyrau (GeoNames 610529)
-        Anchor("turkistan", 43.29458, 68.25685), // Turkistan (GeoNames 1517945)
-        Anchor("kostanay", 53.21435, 63.62463), // Kostanay (GeoNames 1519928)
-        Anchor("petropavl", 54.87343, 69.15065), // Petropavl (GeoNames 1520172)
-        Anchor("temirtau", 50.05197, 72.95497), // Temirtau (GeoNames 1518262)
-        Anchor("kokshetau", 53.28414, 69.39364), // Kokshetau (GeoNames 1522203)
-        Anchor("aktau", 43.66105, 51.17392), // Aktau (GeoNames 610612)
-        Anchor("rudny", 52.97244, 63.11055), // Rudnyy (GeoNames 1519843)
-        Anchor("ekibastuz", 51.72371, 75.32287), // Ekibastuz (GeoNames 1524325)
-        Anchor("taldykorgan", 45.01556, 78.37389), // Taldykorgan (GeoNames 1518542)
-        Anchor("zhezkazgan", 47.79411, 67.70628), // Zhezqazghan (GeoNames 1516589)
-        Anchor("zhanaozen", 43.34116, 52.86192), // Zhanaozen (GeoNames 607610)
-        Anchor("balkhash", 46.84546, 74.98213), // Balqash (GeoNames 1525798)
-        Anchor("sarkand", 45.41322, 79.91713), // Sarqant (GeoNames 1519691)
-        Anchor("baikonur", 45.61667, 63.31667), // Baikonur (GeoNames 1521368)
-        Anchor("satpayev", 47.90409, 67.54112), // Satpayev (GeoNames 1520692)
-        Anchor("kentau", 43.51672, 68.50463), // Kentau (GeoNames 1522751)
-        Anchor("ridder", 50.34524, 83.51562), // Ridder (GeoNames 1521370)
-        Anchor("kulsary", 46.95307, 54.01978), // Qulsary (GeoNames 609123)
-        Anchor("shchuchinsk", 52.93592, 70.18895), // Shchuchinsk (GeoNames 1519244)
-        Anchor("stepnogorsk", 52.35062, 71.88161), // Stepnogorsk (GeoNames 1537939)
-        Anchor("altay", 49.73626, 84.25416), // Altay (GeoNames 1516438)
-        Anchor("aksu-pavlodar", 52.04023, 76.92748), // Aksu (GeoNames 1524298)
-        Anchor("zhitikara", 52.19019, 61.19894), // Zhitikara (GeoNames 1516601)
-        Anchor("saran", 49.80245, 72.83186), // Saran (GeoNames 1519725)
-        Anchor("talgar", 43.30235, 77.23811), // Talghar (GeoNames 1518518)
-        Anchor("konaev", 43.86681, 77.06304), // Konayev (GeoNames 1519948)
-        Anchor("arkalyk", 50.25031, 66.90384), // Arkalyk (GeoNames 1526193)
-        Anchor("shakhtinsk", 49.70713, 72.59321), // Shakhtinsk (GeoNames 1519327)
-        Anchor("lisakovsk", 52.54488, 62.49893), // Lisakovsk (GeoNames 1521315)
-        Anchor("shu", 43.60507, 73.76221), // Shu (GeoNames 1519030)
-        Anchor("karatau", 43.17959, 70.4592), // Karatau (GeoNames 1519938)
-        Anchor("zhetysay", 40.77631, 68.32774), // Zhetysay (GeoNames 1524385)
-        Anchor("arys", 42.43015, 68.8087), // Arys (GeoNames 1526168)
-        Anchor("aiteke-bi", 45.84806, 62.15254), // Novokazalinsk (GeoNames 1516789)
-        Anchor("abay-karaganda", 49.63539, 72.86523), // Abay (GeoNames 1526970)
-        Anchor("aksay", 51.1681, 52.99782), // Aqsay (GeoNames 610613)
-        Anchor("atbasar", 51.80854, 68.35823), // Atbasar (GeoNames 1526038)
-        Anchor("zharkent", 44.16619, 80.00736), // Zharkent (GeoNames 1520253)
-        Anchor("zhanatas", 43.56274, 69.73209), // Zhangatas (GeoNames 1516788)
-        Anchor("ayagoz", 47.96447, 80.43437), // Ayagoz (GeoNames 1525988)
-        Anchor("aral", 46.80174, 61.66312), // Aral (GeoNames 1526265)
-        Anchor("esik", 43.3552, 77.45245), // Esik (GeoNames 1523741)
-        Anchor("mangystau", 43.69088, 51.32237), // Mangistau (GeoNames 608880)
-        Anchor("shiyeli", 44.17057, 66.73376), // Shiyeli (GeoNames 1524801)
-        Anchor("shelek", 43.59623, 78.25745), // Shelek (GeoNames 1519230)
-        Anchor("kandyagash", 49.46917, 57.41865), // Kandyagash (GeoNames 608679)
-        Anchor("shalqar", 47.83154, 59.61926), // Shalqar (GeoNames 608359)
-        Anchor("tekeli", 44.8678, 78.72807), // Tekeli (GeoNames 1518296)
-        Anchor("aksu-turkistan", 42.42193, 69.82709), // Aksu (GeoNames 1525462)
-        Anchor("shardara", 41.25832, 67.96991), // Shardara (GeoNames 1524889)
-        Anchor("saryagash", 41.46042, 69.16791), // Saryaghash (GeoNames 1519673)
-        Anchor("abay-turkistan", 41.34682, 68.9504), // Abay (GeoNames 1526973)
-        Anchor("khromtau", 50.25161, 58.43574), // Khromtau (GeoNames 609404)
-        Anchor("kalbatau", 49.33009, 81.57275), // Kalbatau (GeoNames 1524245)
-        Anchor("zhanakorgan", 43.90652, 67.24637), // Zhangaqorghan (GeoNames 1517323)
-        Anchor("lenger", 42.18152, 69.88582), // Lenger (GeoNames 1521379)
-        Anchor("boralday", 43.35567, 76.85477), // Burunday (GeoNames 1524958)
-        Anchor("ushtobe", 45.25258, 77.98284), // Ushtobe (GeoNames 1517637)
-        Anchor("shemonaikha", 50.62899, 81.91092), // Shemonaikha (GeoNames 1519226)
-        Anchor("zhosaly", 45.48778, 64.07806), // Zhosaly (GeoNames 1516519)
-        Anchor("atyrau", 47.06667, 51.86667), // Balykshi (GeoNames 610445)
-        Anchor("otegen-batyr", 43.41845, 77.02187), // Otegen Batyra (GeoNames 1524308)
-        Anchor("embi", 48.82981, 58.15042), // Embi (GeoNames 609924)
-        Anchor("makanshy", 46.78166, 82.02258), // Maqanshy (GeoNames 1521126)
-        Anchor("turar-ryskulov", 42.5334, 70.3496), // Turar Ryskulov (GeoNames 1517501)
-        Anchor("makinsk", 52.6329, 70.41911), // Makinsk (GeoNames 1521230)
-        Anchor("zaysan", 47.46657, 84.87144), // Zaysan (GeoNames 1517060)
-        Anchor("akkol", 53.29617, 69.59997), // Akkol (GeoNames 1526797)
-        Anchor("kyzylorda", 44.77018, 65.55461), // Tasbuget (GeoNames 1518431)
-        Anchor("merke", 42.87183, 73.19648), // Merke (GeoNames 1520969)
-        Anchor("sarykemer", 43.00929, 71.5101), // Sarykemer (GeoNames 1520947)
+    val appCities: List<AppCity> = listOf(
+        AppCity("almaty", 1526384, 43.25249, 76.9115), // Almaty
+        AppCity("astana", 1526273, 51.1801, 71.44598), // Astana
+        AppCity("shymkent", 1518980, 42.30988, 69.60042), // Shymkent
+        AppCity("aktobe", 610611, 50.27969, 57.20718), // Aktobe
+        AppCity("karaganda", 609655, 49.80187, 73.10211), // Karagandy
+        AppCity("taraz", 1516905, 42.89799, 71.37334), // Taraz
+        AppCity("kyzylorda", 1519922, 44.85278, 65.50917), // Kyzylorda
+        AppCity("oral", 608668, 51.24601, 51.42558), // Oral
+        AppCity("pavlodar", 1520240, 52.27601, 76.96881), // Pavlodar
+        AppCity("oskemen", 1520316, 49.97143, 82.60586), // Ust-Kamenogorsk
+        AppCity("semey", 1519422, 50.42064, 80.25025), // Semey
+        AppCity("atyrau", 610529, 47.1048, 51.88427), // Atyrau
+        AppCity("turkistan", 1517945, 43.29458, 68.25685), // Turkistan
+        AppCity("kostanay", 1519928, 53.21435, 63.62463), // Kostanay
+        AppCity("petropavl", 1520172, 54.87343, 69.15065), // Petropavl
+        AppCity("temirtau", 1518262, 50.05197, 72.95497), // Temirtau
+        AppCity("kokshetau", 1522203, 53.28414, 69.39364), // Kokshetau
+        AppCity("aktau", 610612, 43.66105, 51.17392), // Aktau
+        AppCity("rudny", 1519843, 52.97244, 63.11055), // Rudnyy
+        AppCity("ekibastuz", 1524325, 51.72371, 75.32287), // Ekibastuz
+        AppCity("taldykorgan", 1518542, 45.01556, 78.37389), // Taldykorgan
+        AppCity("zhezkazgan", 1516589, 47.79411, 67.70628), // Zhezqazghan
+        AppCity("zhanaozen", 607610, 43.34116, 52.86192), // Zhanaozen
+        AppCity("balkhash", 1525798, 46.84546, 74.98213), // Balqash
+        AppCity("sarkand", 1519691, 45.41322, 79.91713), // Sarqant
+        AppCity("baikonur", 1521368, 45.61667, 63.31667), // Baikonur
+        AppCity("satpayev", 1520692, 47.90409, 67.54112), // Satpayev
+        AppCity("kentau", 1522751, 43.51672, 68.50463), // Kentau
+        AppCity("ridder", 1521370, 50.34524, 83.51562), // Ridder
+        AppCity("kulsary", 609123, 46.95307, 54.01978), // Qulsary
+        AppCity("shchuchinsk", 1519244, 52.93592, 70.18895), // Shchuchinsk
+        AppCity("stepnogorsk", 1537939, 52.35062, 71.88161), // Stepnogorsk
+        AppCity("altay", 1516438, 49.73626, 84.25416), // Altay
+        AppCity("aksu-pavlodar", 1524298, 52.04023, 76.92748), // Aksu
+        AppCity("zhitikara", 1516601, 52.19019, 61.19894), // Zhitikara
+        AppCity("saran", 1519725, 49.80245, 72.83186), // Saran
+        AppCity("talgar", 1518518, 43.30235, 77.23811), // Talghar
+        AppCity("konaev", 1519948, 43.86681, 77.06304), // Konayev
+        AppCity("arkalyk", 1526193, 50.25031, 66.90384), // Arkalyk
+        AppCity("shakhtinsk", 1519327, 49.70713, 72.59321), // Shakhtinsk
+        AppCity("lisakovsk", 1521315, 52.54488, 62.49893), // Lisakovsk
+        AppCity("shu", 1519030, 43.60507, 73.76221), // Shu
+        AppCity("karatau", 1519938, 43.17959, 70.4592), // Karatau
+        AppCity("zhetysay", 1524385, 40.77631, 68.32774), // Zhetysay
+        AppCity("arys", 1526168, 42.43015, 68.8087), // Arys
+        AppCity("aiteke-bi", 1516789, 45.84806, 62.15254), // Novokazalinsk
+        AppCity("abay-karaganda", 1526970, 49.63539, 72.86523), // Abay
+        AppCity("aksay", 610613, 51.1681, 52.99782), // Aqsay
+        AppCity("atbasar", 1526038, 51.80854, 68.35823), // Atbasar
+        AppCity("zharkent", 1520253, 44.16619, 80.00736), // Zharkent
+        AppCity("zhanatas", 1516788, 43.56274, 69.73209), // Zhangatas
+        AppCity("ayagoz", 1525988, 47.96447, 80.43437), // Ayagoz
+        AppCity("aral", 1526265, 46.80174, 61.66312), // Aral
+        AppCity("esik", 1523741, 43.3552, 77.45245), // Esik
+        AppCity("mangystau", 608880, 43.69088, 51.32237), // Mangistau
+        AppCity("shiyeli", 1524801, 44.17057, 66.73376), // Shiyeli
+        AppCity("shelek", 1519230, 43.59623, 78.25745), // Shelek
+        AppCity("kandyagash", 608679, 49.46917, 57.41865), // Kandyagash
+        AppCity("shalqar", 608359, 47.83154, 59.61926), // Shalqar
+        AppCity("tekeli", 1518296, 44.8678, 78.72807), // Tekeli
+        AppCity("aksu-turkistan", 1525462, 42.42193, 69.82709), // Aksu
+        AppCity("shardara", 1524889, 41.25832, 67.96991), // Shardara
+        AppCity("saryagash", 1519673, 41.46042, 69.16791), // Saryaghash
+        AppCity("abay-turkistan", 1526973, 41.34682, 68.9504), // Abay
+        AppCity("khromtau", 609404, 50.25161, 58.43574), // Khromtau
+        AppCity("kalbatau", 1524245, 49.33009, 81.57275), // Kalbatau
+        AppCity("zhanakorgan", 1517323, 43.90652, 67.24637), // Zhangaqorghan
+        AppCity("lenger", 1521379, 42.18152, 69.88582), // Lenger
+        AppCity("boralday", 1524958, 43.35567, 76.85477), // Burunday
+        AppCity("ushtobe", 1517637, 45.25258, 77.98284), // Ushtobe
+        AppCity("shemonaikha", 1519226, 50.62899, 81.91092), // Shemonaikha
+        AppCity("zhosaly", 1516519, 45.48778, 64.07806), // Zhosaly
+        AppCity("atyrau", 610445, 47.06667, 51.86667), // Balykshi
+        AppCity("otegen-batyr", 1524308, 43.41845, 77.02187), // Otegen Batyra
+        AppCity("embi", 609924, 48.82981, 58.15042), // Embi
+        AppCity("makanshy", 1521126, 46.78166, 82.02258), // Maqanshy
+        AppCity("turar-ryskulov", 1517501, 42.5334, 70.3496), // Turar Ryskulov
+        AppCity("makinsk", 1521230, 52.6329, 70.41911), // Makinsk
+        AppCity("zaysan", 1517060, 47.46657, 84.87144), // Zaysan
+        AppCity("akkol", 1526797, 53.29617, 69.59997), // Akkol
+        AppCity("kyzylorda", 1518431, 44.77018, 65.55461), // Tasbuget
+        AppCity("merke", 1520969, 42.87183, 73.19648), // Merke
+        AppCity("sarykemer", 1520947, 43.00929, 71.5101), // Sarykemer
     )
 }

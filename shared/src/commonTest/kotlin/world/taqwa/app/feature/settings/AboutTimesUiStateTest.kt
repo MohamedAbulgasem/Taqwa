@@ -302,7 +302,20 @@ class AboutTimesUiStateTest {
         assertTrue(village.resolution.unitId in setOf("qmdb-9351", "qmdb-9368"), village.resolution.unitId)
         assertFalse(village.resolution.measured)
         assertNull(village.resolution.unitLabel)
+        assertNull(village.resolution.unitCityId)
         assertNull(uncheckedWorstMinutes(village.resolution, village.stamp))
+        // Inside a city's reach the city's table wins over a nearer village's (the owner's decision of 9 Oct 2026):
+        // 8 km north-east of QMDB's Almaty and 2 km from the village of Besagash, About measures Almaty, with Almaty's
+        // own figure, and names the app's Almaty (the route looks GeoNames 1526384 up in the reader's language).
+        val suburb = stateFor(Place(43.289, 77.015, "Asia/Almaty", "KZ"))
+        assertIs<AboutTimesUiState.AuthorityUnchecked>(suburb)
+        assertEquals("almaty", suburb.resolution.unitId)
+        assertTrue(suburb.resolution.measured)
+        assertEquals(1526384, suburb.resolution.unitCityId)
+        val almaty = stateFor(Place(43.238293, 76.945465, "Asia/Almaty", "KZ"))
+        assertIs<AboutTimesUiState.AuthorityUnchecked>(almaty)
+        assertEquals(uncheckedWorstMinutes(almaty.resolution, almaty.stamp), uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
+        assertEquals(2, uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
     }
 
     @Test

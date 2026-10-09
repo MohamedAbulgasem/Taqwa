@@ -161,6 +161,8 @@ internal fun requireEachEventOnce(limits: List<LateLimit>, owner: String) {
  * - [unitLabel]: what About and the site call the place: the unit's name, or null where the unit is
  *   the user's own city ([AuthorityUnit.named] false) or there is none, for the app's own name of
  *   the city in the reader's language.
+ * - [unitCityId]: the app's own city whose table the unit is ([AuthorityUnit.cityId]), whose name
+ *   About gives the place, in the reader's language; null for every other unit.
  */
 data class Resolution(
     val entry: RegistryEntry,
@@ -176,6 +178,7 @@ data class Resolution(
     val unitPoint: GeoPoint? = null,
     val unitId: String? = null,
     val unitLabel: String? = unitName,
+    val unitCityId: Int? = null,
 )
 
 /** The About template each class fills. */

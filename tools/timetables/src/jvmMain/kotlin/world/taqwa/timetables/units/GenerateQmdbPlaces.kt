@@ -24,7 +24,8 @@ import kotlin.system.exitProcess
  * `cities` defaults to the private archive's capture of QMDB's list (`archive/raw/manual/kz-qmdb/2026-10-06/
  * cities.json.gz`, api.muftyat.kz/cities/ read page by page); coordinates are derived facts, never a time. A point
  * two places share is one unit, its lowest id. Re-run after any change to kz.qmdb's method, bands or curves (a reach
- * is measured with them), then run the gate and commit; `CityUnitsTest` checks a large sample's edges.
+ * is measured with them, and the file records what with: [QmdbReach.fingerprint], which `CityUnitsTest` compares),
+ * then run the gate and commit; `CityUnitsTest` checks a large sample's edges.
  */
 fun main(args: Array<String>) {
     val options = mutableMapOf<String, String>()
@@ -50,7 +51,7 @@ fun main(args: Array<String>) {
             println("  $done / $total reaches measured (${"%.0f".format(s)} s)")
         }
     }
-    out.writeText(QmdbList.render(reaches, list.firstOrNull()?.source ?: ""))
+    out.writeText(QmdbList.render(reaches, list.firstOrNull()?.source ?: "", QmdbReach.fingerprint()))
     println("Wrote ${reaches.size} places to ${out.relativeTo(repo).invariantSeparatorsPath}")
 }
 
@@ -106,7 +107,7 @@ object QmdbList {
     /** The places per string part, under a JVM string constant's 64 KB. */
     private const val PER_PART = 3000
 
-    fun render(places: List<Reached>, source: String): String = buildString {
+    fun render(places: List<Reached>, source: String, fingerprint: String): String = buildString {
         val lat0 = (QmdbPlaceCodec.LAT_BASE * QmdbPlaceCodec.SCALE).toLong()
         val lon0 = (QmdbPlaceCodec.LON_BASE * QmdbPlaceCodec.SCALE).toLong()
         val packed = places.map { p ->
@@ -130,6 +131,11 @@ object QmdbList {
         append("object QmdbPlaceList {\n")
         append("    class Place(val qmdbId: Int, val lat: Double, val lon: Double, val reachKm: Double)\n\n")
         append("    const val COUNT = ${places.size}\n\n")
+        append("    /**\n")
+        append("     * What the reaches were measured with (QmdbReach.fingerprint: kz.qmdb's method, bands and curves, the rule\n")
+        append("     * and the codec). `CityUnitsTest` fails when it no longer matches: run the generator again.\n")
+        append("     */\n")
+        append("    const val FINGERPRINT = \"$fingerprint\"\n\n")
         append("    val places: List<Place> by lazy { QmdbPlaceCodec.decode(listOf(${parts.indices.joinToString(", ") { "part${it + 1}" }}).joinToString(\"\")) }\n")
         // Seven places a line, so that a reach that moves shows as one changed line.
         for ((k, part) in parts.withIndex()) {

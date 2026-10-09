@@ -1,14 +1,20 @@
 package world.taqwa.timetables.gate
 
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.Units
+import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList
+import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.timetables.TestPaths
 import world.taqwa.timetables.units.QmdbReach
 import java.io.File
+import java.util.concurrent.Executors
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.atan2
@@ -24,15 +30,20 @@ import kotlin.test.fail
  * al-Qura (KACST's 173) and QMDB (every one of its 5,694 places since the owner's decision of 9 Oct 2026, 87 of
  * them measured), the city-points round of 9 Oct 2026:
  *
- * - every measured unit is a point the monitor fetches (the fetchers' own lists), and every point it fetches is a
- *   unit, so no unit goes unchecked when a new year's table appears and no capture lands outside its unit;
- * - QMDB's reaches, measured by the engine's own rule (QmdbReach), hold at the edges of a large sample of units;
+ * - every checked unit (the measured, and Zhenis, which is Zhetysay's) is a point the monitor fetches (the fetchers'
+ *   own lists), and every point it fetches is a unit, so no table goes unchecked when a new year's appears and no
+ *   capture lands outside its unit;
+ * - QMDB's reaches, measured by the engine's own rule (QmdbReach), hold at the edges of a large sample of units,
+ *   and were measured with kz.qmdb as it stands (QmdbPlaceList.FINGERPRINT);
+ * - inside a Kazakh city's reach the city's table wins (the owner's decision of 9 Oct 2026): a village's user there
+ *   stays within three minutes of the village's own day and is never before their own point;
  * - every Saudi and Kazakh city of the app's list is inside a unit but the few no place of the authority's list
  *   is near, which this names;
  * - with the archive: at the four edges of every unit's reach (north, east, south and west, 95 % of the radius),
  *   the engine is never early and no end is late against the unit's own city tables, the tables the gate reads at
  *   the unit's point. The gate's late limit is not held there (ruling R40: near a radius's edge the start is the
- *   user's own sun, up to the class's minute later than the city's table); the worst lateness is printed.
+ *   user's own sun, up to the class's minute later than the city's table); the worst lateness is printed. And on
+ *   rings around 24 of the larger Kazakh cities, out to 15 km, against the city's own tables.
  */
 class CityUnitsTest {
 
@@ -46,10 +57,15 @@ class CityUnitsTest {
         return tuple.findAll(block).map { Triple(it.groupValues[1], it.groupValues[2].toDouble(), it.groupValues[3].toDouble()) }.toList()
     }
 
+    /** The units whose tables the gate reads: the measured, and Zhenis, a checked place inside Zhetysay's reach. */
+    private fun checked(entry: String): List<AuthorityUnit> = requireNotNull(Units.of(entry)) { "$entry has no units" }.units.filter {
+        it.measured || (entry == "kz.qmdb" && QmdbPlaces.all.any { p -> p.key == it.id })
+    }
+
     private fun assertSame(entry: String, fetched: List<Triple<String, Double, Double>>) {
         // A unit the authority serves no table for (QMDB's five doubled points) is not measured, and not fetched.
-        val units = requireNotNull(Units.of(entry)) { "$entry has no units" }.units.filter { it.measured }
-        assertEquals(units.size, fetched.size, "$entry: as many measured units as fetched points")
+        val units = checked(entry)
+        assertEquals(units.size, fetched.size, "$entry: as many checked units as fetched points")
         assertEquals(units.map { it.id }.toSet(), fetched.map { it.first }.toSet(), "$entry: each unit is the monitor's capture key")
         for ((key, lat, lon) in fetched) {
             val unit = units.single { it.id == key }
@@ -173,5 +189,195 @@ class CityUnitsTest {
         }
         val broken = result.entries.values.flatMap { result.neverEarly(it) }
         if (broken.isNotEmpty()) fail("${broken.size} broken at the edges:\n" + broken.joinToString("\n"))
+    }
+
+    @Test
+    fun `the qmdb reaches were measured with kz qmdb as it stands`() {
+        assertEquals(
+            QmdbPlaceList.FINGERPRINT,
+            QmdbReach.fingerprint(),
+            "kz.qmdb's method, bands or curves, QmdbReach's rule or QmdbPlaceCodec changed since QmdbPlaceList.kt was " +
+                "generated, so its reaches are stale: run ./gradlew -p tools/timetables generateQmdbPlaces, then the gate, " +
+                "and commit the new file",
+        )
+    }
+
+    private val kazakhstan get() = requireNotNull(Registry.byId("kz.qmdb"))
+
+    private fun kazakhUnitAt(at: GeoPoint, zone: String = "Asia/Almaty"): String? =
+        Registry.resolveEntry(kazakhstan, Place(at.lat, at.lon, zone, "KZ")).unitId
+
+    /**
+     * The owner's decision of 9 Oct 2026 (the city's table): inside a city's reach the city's place wins over a
+     * nearer village's. At a village inside a city's reach, every day of 2026, the time shown stays within three
+     * minutes of the village's own day, of the city's own day and of the user's own point alone, and nothing comes
+     * before any of them (the engine before units is the user's own point alone). A village with its own table
+     * (Zhenis, in Zhetysay's reach) is held against that table by its gate rows as well.
+     */
+    @Test
+    fun `inside a city's reach a village stays within three minutes of its own day and never before its own point`() {
+        val units = requireNotNull(Units.of("kz.qmdb")).units
+        val cities = units.filter { it.cityId != null }.associateBy { it.id }
+        val year = generateSequence(LocalDate(2026, 1, 1)) { it.plus(1, DateTimeUnit.DAY) }.takeWhile { it.year == 2026 }.toList()
+        val villages = units.filter { it.cityId == null }.mapNotNull { v -> cities[kazakhUnitAt(v.point)]?.let { v to it } }
+        assertTrue(villages.size >= 300, "only ${villages.size} villages inside a city's reach")
+        val cityDays = villages.map { it.second }.distinct().parallelStream().map { it.id to QmdbReach.unitDays(it, year) }.toList().toMap()
+        val results = villages.parallelStream().map { (v, city) ->
+            Triple(v, city, QmdbReach.extraMinutes(city, v.point, cityDays.getValue(city.id), year, also = QmdbReach.unitDays(v, year)))
+        }.toList()
+        val worst = IntArray(QmdbReach.events.size)
+        for ((_, _, e) in results) for (i in worst.indices) worst[i] = maxOf(worst[i], e.extra[i])
+        println(
+            "kz.qmdb: ${villages.size} places (${villages.count { v -> QmdbPlaces.all.any { it.key == v.first.id } }} checked) inside ${villages.map { it.second }.distinct().size} " +
+                "cities' reaches, every day of 2026; worst minutes beyond the place's own day, the city's or the user's own point: " +
+                QmdbReach.events.indices.joinToString { "${QmdbReach.events[it].first} ${worst[it]}" },
+        )
+        val broken = results.flatMap { (v, c, e) -> e.broken.map { "${v.id} in ${c.id}: $it" } }
+        if (broken.isNotEmpty()) fail("${broken.size} before a reference:\n" + broken.take(20).joinToString("\n"))
+        val over = results.filter { (_, _, e) -> e.extra.any { it > QmdbReach.LIMIT_MINUTES } }
+        if (over.isNotEmpty()) {
+            fail("${over.size} places over ${QmdbReach.LIMIT_MINUTES} min:\n" + over.take(20).joinToString("\n") { (v, c, e) ->
+                "${v.id} in ${c.id} (${"%.1f".format(distanceKm(v.point, c.point))} km): " + e.extra.joinToString(" ")
+            })
+        }
+    }
+
+    /** The 24 larger cities of the ring check, each a measured city unit. */
+    private val ringCities = listOf(
+        "almaty", "astana", "shymkent", "karaganda", "aktobe", "taraz", "pavlodar", "oskemen", "semey", "oral",
+        "kostanay", "petropavl", "atyrau", "kyzylorda", "aktau", "turkistan", "temirtau", "kokshetau", "taldykorgan",
+        "ekibastuz", "rudny", "zhezkazgan", "balkhash", "kentau",
+    )
+
+    /**
+     * The owner's decision of 9 Oct 2026 (the city's table), with the archive: on 10 rings out to 15 km and 16
+     * bearings around 24 of the larger cities, every point inside the city's reach follows the city's place, or the
+     * nearer city's where two reach, and against that city's own tables no start comes before them and no end after.
+     */
+    @Test
+    fun `on rings inside a city's reach no start comes before the city's table and no end after it`() {
+        val official = File(System.getProperty("taqwa.official") ?: error("taqwa.official not set"))
+        val roots = OfficialRoots(official, TestPaths.repoRoot.resolve("tools/timetables/official"))
+        val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate")).only(groups = setOf("kz-qmdb"))
+        val units = requireNotNull(Units.of("kz.qmdb")).units.associateBy { it.id }
+        fun ownRows(unit: AuthorityUnit) = manifest.rows.filter { it.entry == "kz.qmdb" && it.lat == unit.point.lat && it.lon == unit.point.lon }
+        // One city at a time, four at once: the gate keeps every place-day it checks, and the 24 cities' rings hold
+        // some three million.
+        val pool = Executors.newFixedThreadPool(4)
+        val rings = try {
+            ringCities.map { id -> pool.submit<Ring> { ring(roots, units, units.getValue(id), ::ownRows, roots.held) } }.map { it.get() }
+        } finally {
+            pool.shutdown()
+        }
+        if (!roots.held) return
+        val held = Tally()
+        val farther = Tally()
+        for (r in rings) {
+            held.add(r.held)
+            farther.add(r.farther)
+        }
+        println(
+            "kz.qmdb rings: ${rings.sumOf { it.points }} points around ${ringCities.size} cities (${rings.sumOf { it.nearer }} in a nearer " +
+                "city's reach, ${rings.sumOf { it.unchecked }} in a city with no table), ${held.placeDays} place-days; worst start " +
+                "${held.worst.filterKeys { it.isStart }.values.maxOrNull()} min after the city's table, worst end " +
+                "${held.worst.filterKeys { !it.isStart }.values.maxOrNull()} min before it",
+        )
+        for ((event, worst) in held.worst) println("  ${event.key}: worst $worst min, ${held.late.getValue(event).joinToString("/")} days at 0/1/2/3+ min")
+        println(
+            "  in a nearer city's reach, against the farther ring city's own tables (for the record, not held): " +
+                "${rings.sumOf { it.nearer }} points, ${farther.placeDays} place-days, ${farther.cells.values.sum()} cells before or after " +
+                "them (worst ${farther.worstEarly} min" + farther.cells.entries.filter { it.value > 0 }.joinToString("") { "; ${it.key.key} ${it.value}" } + ")",
+        )
+        for (r in rings.filter { it.nearer > 0 }) println("    ${r.city}: ${r.nearer} points in ${r.takers.joinToString()}")
+        val broken = held.broken
+        if (broken.isNotEmpty()) fail("${broken.size} broken on the rings:\n" + broken.joinToString("\n"))
+    }
+
+    /** One ring city's sample: its points, those a nearer city took (and which), and the gate's results. */
+    private class Ring(
+        val city: String,
+        val points: Int,
+        val nearer: Int,
+        val unchecked: Int,
+        val takers: List<String>,
+        val held: Tally,
+        val farther: Tally,
+    )
+
+    /**
+     * The rings around [city]: each point's unit checked (the city's, or a nearer city's where two reach), then, when
+     * [evaluate], the tables of the city it follows gated there, and where a nearer city took it, [city]'s own too.
+     */
+    private fun ring(
+        roots: OfficialRoots,
+        units: Map<String, AuthorityUnit>,
+        city: AuthorityUnit,
+        ownRows: (AuthorityUnit) -> List<GateRow>,
+        evaluate: Boolean,
+    ): Ring {
+        val zone = ownRows(city).first().zone
+        var points = 0
+        var nearer = 0
+        var unchecked = 0
+        val takers = sortedMapOf<String, Int>()
+        val rows = mutableListOf<GateRow>()
+        val farther = mutableListOf<GateRow>()
+        for (km in listOf(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0)) {
+            for (bearing in (0 until 16).map { it * 22.5 }) {
+                val at = moved(city.point, km, bearing)
+                val where = "${city.id} ring $km km $bearing"
+                assertTrue(distanceKm(at, city.point) <= city.radiusKm, "$where: beyond the city's reach")
+                val holder = units.getValue(requireNotNull(kazakhUnitAt(at, zone)) { "$where: in no unit" })
+                assertTrue(holder.cityId != null, "$where: ${holder.id}, not a city, took a point inside the city's reach")
+                points++
+                if (holder.id != city.id) {
+                    nearer++
+                    takers.merge(holder.id, 1, Int::plus)
+                    assertTrue(distanceKm(at, holder.point) <= distanceKm(at, city.point), "$where: ${holder.id} is not nearer")
+                    farther += ownRows(city).map { it.copy(lat = at.lat, lon = at.lon, unit = holder.id, split = Split.TEST, note = "$where in ${holder.id}") }
+                }
+                val own = ownRows(holder)
+                if (own.isEmpty()) unchecked++
+                rows += own.map { it.copy(lat = at.lat, lon = at.lon, unit = holder.id, split = Split.TEST, note = where) }
+            }
+        }
+        // Each result is tallied at once and let go: the gate keeps every place-day it checked.
+        fun gate(r: List<GateRow>) = Tally().also { if (evaluate && r.isNotEmpty()) it.add(Gate(roots).evaluate(GateManifest(r))) }
+        return Ring(city.id, points, nearer, unchecked, takers.map { "${it.key} ${it.value}" }, gate(rows), gate(farther))
+    }
+
+    /** The gate's counts over several results, by event. */
+    private class Tally {
+        var placeDays = 0
+        val worst = sortedMapOf<Event, Int>()
+        val late = sortedMapOf<Event, IntArray>()
+        val cells = sortedMapOf<Event, Int>()
+        var worstEarly = 0
+        val broken = mutableListOf<String>()
+
+        fun add(result: GateResult?) {
+            val s = result?.entries?.get("kz.qmdb") ?: return
+            placeDays += s.placeDayCount
+            for ((event, e) in s.events) {
+                worst.merge(event, e.worst) { a, b -> maxOf(a, b) }
+                val hist = late.getOrPut(event) { IntArray(4) }
+                for (i in hist.indices) hist[i] += e.late[i]
+                cells.merge(event, e.early + e.lateEnd, Int::plus)
+                worstEarly = maxOf(worstEarly, e.worstEarly)
+            }
+            broken += result.neverEarly(s)
+        }
+
+        fun add(other: Tally) {
+            placeDays += other.placeDays
+            for ((event, w) in other.worst) worst.merge(event, w) { a, b -> maxOf(a, b) }
+            for ((event, hist) in other.late) {
+                val mine = late.getOrPut(event) { IntArray(4) }
+                for (i in mine.indices) mine[i] += hist[i]
+            }
+            for ((event, n) in other.cells) cells.merge(event, n, Int::plus)
+            worstEarly = maxOf(worstEarly, other.worstEarly)
+            broken += other.broken
+        }
     }
 }

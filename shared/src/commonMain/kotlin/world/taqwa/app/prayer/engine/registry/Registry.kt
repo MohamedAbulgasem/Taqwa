@@ -123,6 +123,7 @@ object Registry {
             unitPoint = here.unit?.point,
             unitId = here.unit?.id,
             unitLabel = here.unit?.takeIf { it.named }?.name,
+            unitCityId = here.unit?.cityId,
         )
     }
 

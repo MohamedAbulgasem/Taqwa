@@ -17,6 +17,12 @@ object QmdbPlaceList {
 
     const val COUNT = 5676
 
+    /**
+     * What the reaches were measured with (QmdbReach.fingerprint: kz.qmdb's method, bands and curves, the rule
+     * and the codec). `CityUnitsTest` fails when it no longer matches: run the generator again.
+     */
+    const val FINGERPRINT = "6eaeb8bda1ef0fa0"
+
     val places: List<Place> by lazy { QmdbPlaceCodec.decode(listOf(part1, part2).joinToString("")) }
 
     private val part1 =
