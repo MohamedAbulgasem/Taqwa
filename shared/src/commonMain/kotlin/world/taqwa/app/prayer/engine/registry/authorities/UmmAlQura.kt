@@ -17,7 +17,7 @@ import world.taqwa.app.prayer.engine.registry.SAFE_SUNRISE
 import world.taqwa.app.prayer.engine.registry.Scope
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
-import world.taqwa.app.prayer.engine.registry.atEdge
+import world.taqwa.app.prayer.engine.registry.beyondTable
 import world.taqwa.app.prayer.engine.registry.data.UmmAlQuraCities
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateReachKm
@@ -47,17 +47,56 @@ import world.taqwa.app.prayer.engine.registry.single
  */
 object UmmAlQura {
     /**
-     * The one exception to class A's minute (rulings R37, R41): on a lag date the API prints the
-     * previous day's times, and Taqwa shows the later of the two days' starts and the earlier of
-     * their sunrises and ends of eating, which is a minute more than the class allows on a few days
-     * (over 13,146 place-days: Fajr on 1, sunrise on 9, the end of eating on 21, every one a lag
-     * date). Dhuhr, Asr, Maghrib and Isha never passed it.
+     * Class A's minute was passed at the tables' own points on the lag dates alone (rulings R37, R41): on a lag date
+     * the API prints the previous day's times, and Taqwa shows the later of the two days' starts and the earlier of
+     * their sunrises and ends of eating, a minute more than the class allows on a few days (over 13,146 place-days:
+     * Fajr on 1, sunrise on 9, the end of eating on 21, every one a lag date). Across a unit's reach (one minute of
+     * longitude, ruling R40) the start shown is the later of the unit's table and the user's own sun, and the ends the
+     * earlier, so a minute more again at its edge: each unit's own tables, replayed at 8 bearings and at half and
+     * 95 % of its radius (sa-ummalqura-reach.tsv, the review of 9 Oct 2026, "prove it across the unit"), came up to
+     * 2 min after it at every start ([lagDateLimit], [reachStartsLimit]) and 3 before it at sunrise and the end of
+     * eating ([reachEndsLimit]); at nine units of the north and the east, Fajr up to 3 ([reachFajrLimit]).
      */
     val lagDateLimit = LateLimit(
         2,
-        "on the few dates a year Umm al-Qura's calendar repeats the previous day's times, Taqwa shows the later start and " +
-            "the earlier sunrise and end of eating of the two days, so as never to be early if the calendar stops repeating them",
-        setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.END_OF_EATING),
+        "on the few dates a year Umm al-Qura's calendar repeats the previous day's times, Taqwa shows the later Fajr of " +
+            "the two days, so as never to be early if the calendar stops repeating them; and across a unit's reach the " +
+            "later of the unit's table and the user's own sun (the reach rows, 9 Oct 2026)",
+        setOf(TimedEvent.FAJR),
+    )
+
+    /** Across a unit's reach, the later of its table's start and the user's own sun ([lagDateLimit]'s KDoc). */
+    val reachStartsLimit = LateLimit(
+        2,
+        "within a unit's reach, a minute of longitude, the start shown is the later of the unit's table and the user's " +
+            "own sun, so toward the reach's edge it comes up to 2 min after the table (ruling R40; each unit's own tables " +
+            "replayed across its reach, 9 Oct 2026)",
+        setOf(TimedEvent.DHUHR, TimedEvent.ASR, TimedEvent.MAGHRIB, TimedEvent.ISHA),
+    )
+
+    /** The lag dates' earlier sunrise and end of eating, and across a unit's reach the earlier of its table's and the user's own. */
+    val reachEndsLimit = LateLimit(
+        3,
+        "on the lag dates Taqwa shows the earlier sunrise and end of eating of the two days, and within a unit's reach the " +
+            "earlier of the unit's table and the user's own, so toward the reach's edge they come up to 3 min before the " +
+            "table (each unit's own tables replayed across its reach, 9 Oct 2026)",
+        setOf(TimedEvent.SUNRISE, TimedEvent.END_OF_EATING),
+    )
+
+    /**
+     * Nine units of the north and the east, where a lag date's later Fajr and the reach's later sun meet at the edge:
+     * Fajr up to 3 min after the unit's table there (the reach rows, 9 Oct 2026).
+     */
+    private val reachFajrLimit = LateLimit(
+        3,
+        "at this unit's reach's edge a lag date's later Fajr of the two days and the user's own later dawn meet, so Fajr " +
+            "comes up to 3 min after the unit's table there (each unit's own tables replayed across its reach, 9 Oct 2026)",
+        setOf(TimedEvent.FAJR),
+    )
+
+    /** The units whose reach's edge needs [reachFajrLimit] (the gate, sa-ummalqura-reach.tsv). */
+    private val reachFajr = setOf(
+        "al-qurayyat", "al-uwayqiliyah", "az-zulfi", "dhahran", "dumah-al-jandal", "haql", "khafji", "mawqaq", "turaif",
     )
 
     /** Umm al-Qura's Fajr declination bias (degrees), by day of year. */
@@ -79,41 +118,16 @@ object UmmAlQura {
 
     val entry: RegistryEntry = single(
         id = "sa.ummalqura", nameKey = "authority_umm_al_qura", entryClass = EntryClass.A, method = method,
-        school = AsrSchool.STANDARD, countries = setOf("SA"), measured = true, lateLimits = listOf(lagDateLimit),
-    )
-
-    /**
-     * Rulings R40 and R41: within a unit's reach, west and south of KACST's point, the start shown is the user's own
-     * sun (ruling R15), up to the class's minute after the city's table besides the table's own rounding; the gate
-     * measures it at the app's own city points, and where it passed class A's minute the unit records it, for those
-     * events (the city-points round of 9 Oct 2026; sa-ummalqura.tsv).
-     */
-    private val displaced: Map<String, LateLimit> = mapOf(
-        "taif" to LateLimit(
-            2,
-            "21 km south-south-west of KACST's point for Taif, at the app's Ash Shafa, the user's own sun sets later than " +
-                "at Taif's point, so Asr, Maghrib and Isha come up to 2 min after Taif's table on 3 days of 2026-27",
-            setOf(TimedEvent.ASR, TimedEvent.MAGHRIB, TimedEvent.ISHA),
-        ),
-        "madinah" to LateLimit(
-            2,
-            "7 km south-west of KACST's point for Madinah, at the app's Sultanah, the user's own sun sets later than at " +
-                "Madinah's point, so Maghrib and Isha come 2 min after Madinah's table on 1 day of 2025-27",
-            setOf(TimedEvent.MAGHRIB, TimedEvent.ISHA),
-        ),
-        "al-hofuf" to LateLimit(
-            2,
-            "5 km south-west of KACST's point for Al Hofuf, at the app's own point for the city, the user's own sun sets " +
-                "later than at KACST's, so Maghrib and Isha come 2 min after Al Hofuf's table on 1 day of 2026-27",
-            setOf(TimedEvent.MAGHRIB, TimedEvent.ISHA),
-        ),
+        school = AsrSchool.STANDARD, countries = setOf("SA"), measured = true,
+        lateLimits = listOf(lagDateLimit, reachStartsLimit, reachEndsLimit),
     )
 
     /**
      * Tayma ([taymaTown]): the town's times are the later of its own sun and KACST's Tayma table, computed a degree
      * north of it, so they run up to 5 min after that table at Fajr and 3 at sunrise, Asr, Maghrib and Isha over
      * 2026-27 (the app's point for Tayma, sa-ummalqura.tsv): class D there (ruling R57), with Fajr's own limit, and
-     * sunrise's and the end of eating's at the class's 3 rather than the entry's lag-date 2.
+     * every other event at the class's 3 rather than the entry's 2 (its own limits, which the entry's would
+     * otherwise give).
      */
     private val taymaLimits = listOf(
         LateLimit(
@@ -126,9 +140,9 @@ object UmmAlQura {
         LateLimit(
             3,
             "the same table computed a degree north of Tayma: the sunrise and the end of eating shown in the town, the " +
-                "earlier of that table's and the town's own, come up to 3 min before the table's (class D's 3, not the " +
-                "lag dates' 2; city-points round, 9 Oct 2026)",
-            setOf(TimedEvent.SUNRISE, TimedEvent.END_OF_EATING),
+                "earlier of that table's and the town's own, come up to 3 min before the table's, and Dhuhr, Asr, Maghrib " +
+                "and Isha up to 3 after it (class D's 3, not the entry's 2; city-points round, 9 Oct 2026)",
+            setOf(TimedEvent.SUNRISE, TimedEvent.END_OF_EATING, TimedEvent.DHUHR, TimedEvent.ASR, TimedEvent.MAGHRIB, TimedEvent.ISHA),
         ),
     )
 
@@ -137,7 +151,12 @@ object UmmAlQura {
         AuthorityUnit(
             city.key, city.name, GeoPoint(city.lat, city.lon), lateReachKm(city.lat, EntryClass.A),
             entryClass = if (tayma) EntryClass.D_AUTHORITY else null,
-            lateLimits = if (tayma) taymaLimits else listOfNotNull(displaced[city.key]), named = false,
+            lateLimits = when {
+                tayma -> taymaLimits
+                city.key in reachFajr -> listOf(reachFajrLimit)
+                else -> emptyList()
+            },
+            named = false, cityId = UmmAlQuraCities.appCityOf[city.key],
         )
     }
 
@@ -149,12 +168,17 @@ object UmmAlQura {
      * sunrise and the end of eating came a minute after Madinah's on 38 days (40 cells; main at 705c4f7f). Each of
      * [UmmAlQuraCities]' 173 places is a unit at KACST's own point, which rides as the fixed point beside the user's
      * (ruling R15: starts the later, ends the earlier), within its R40 reach for class A, one minute of longitude
-     * (24 to 27 km); gated at its own point and at the app's point for each Saudi city (sa-ummalqura.tsv). Beyond
-     * every unit the user's own point with the entry's margins as before, but the end of eating without its fitted
-     * 47 s (ruling R44: a margin fitted at a table's point applies there only, so SAFE_END), claiming no figure
-     * (spec §3.5). About and the site call the place by the app's name for it ([AuthorityUnit.named]).
+     * (24 to 27 km); gated at its own point, at the app's point for each Saudi city (sa-ummalqura.tsv) and across its
+     * reach (sa-ummalqura-reach.tsv). Beyond every unit, the nearest place's table as a point table's edge
+     * ([beyondTable], rulings R44 and R45): the user's own point a minute later, the end of eating without its fitted
+     * 47 s (a margin fitted at a table's point applies there only, so SAFE_END), and within three reaches of the
+     * nearest place its point still bounding sunrise and the end of eating; no figure (spec §3.5). About and the site
+     * call the place by the app's name for the city whose table it is ([AuthorityUnit.named], [AuthorityUnit.cityId]).
      */
-    val units = UnitSet("sa.ummalqura", cityUnits, choose = ::taymaTown) { method.atEdge("sa.ummalqura.edge", method.margins) }
+    val units = UnitSet("sa.ummalqura", cityUnits, choose = ::taymaTown) { user ->
+        val nearest = cityUnits.minBy { distanceKm(user, it.point) }
+        method.beyondTable("sa.ummalqura.edge", nearest.point, user, nearest.radiusKm)
+    }
 
     /**
      * KACST's list places Tayma at 28.63° N, a degree north of the town (the app's city list and every map put it at

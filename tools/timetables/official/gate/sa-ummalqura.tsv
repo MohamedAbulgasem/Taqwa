@@ -360,7 +360,7 @@ archive/tables/pinned/sa-ummalqura-cities/2026-10-09/sakaka-2027.txt	sa.ummalqur
 # as `sa.ummalqura/<unit>` (the gate checks the point resolves there): 94 of the 98. Tayma takes KACST's Tayma table,
 # which KACST's list computes a degree north of the town (UmmAlQura.units). The four outside every unit (Turubah,
 # King Khalid Military City, Al Mash'iliyah and one of the two Al 'Aqiq, no KACST place within a minute's reach)
-# keep the user's own point and claim no figure.
+# take the nearest place's table as a point table's edge (rulings R44, R45) and claim no figure.
 archive/tables/round/data-umm-al-qura/off-uq-jeddah.txt	sa.ummalqura/jeddah	21.49012	39.18624	Asia/Riyadh	F+E S D A M I	daily	standard	test	Jeddah, the app's own point (2.0 km from KACST's), against Jeddah 2025–2027
 archive/tables/round/data-umm-al-qura/off-uq-riyadh.txt	sa.ummalqura/riyadh	24.68773	46.72185	Asia/Riyadh	F+E S D A M I	daily	standard	test	Riyadh, the app's own point (3.8 km from KACST's), against Riyadh 2024–2030
 archive/tables/round/data-umm-al-qura/off-uq-makkah.txt	sa.ummalqura/makkah	21.42664	39.82563	Asia/Riyadh	F+E S D A M I	daily	standard	test	Makkah, the app's own point (0.6 km from KACST's), against Makkah 2024–2030

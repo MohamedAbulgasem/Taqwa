@@ -125,9 +125,10 @@ class AsiaProofTest {
             assertTrue(method.endOfEatingMarginSeconds <= -150, "46-48N end-of-eating margin: ${method.endOfEatingMarginSeconds}")
         }
         // Below 46N the band's margin is gone: 0 at a QMDB place's own unit (Aktau), and beyond every unit the
-        // edge's SAFE_END (ruling R44: a fitted margin applies at its tables' points only; city points, 9 Oct 2026).
+        // nearest place's table as a point table's edge, SAFE_END or earlier (rulings R44 and R45: a fitted margin
+        // applies at its tables' points only, and the edge widens every margin by a minute; the review of 9 Oct 2026).
         assertEquals(0, assertNotNull(resolve(43.635379, 51.169135, "Asia/Aqtau", "KZ").method).endOfEatingMarginSeconds)
-        assertEquals(SAFE_END, below.endOfEatingMarginSeconds)
+        assertTrue(below.endOfEatingMarginSeconds <= SAFE_END, "beyond every unit: ${below.endOfEatingMarginSeconds}")
     }
 
     @Test

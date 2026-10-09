@@ -45,6 +45,9 @@ class CityRepository(
      */
     private var foldedNames: Map<Int, String> = emptyMap()
 
+    /** What [data] last returned, with its language: read without the lock by [loadedDisplayName]. */
+    private var snapshot: Loaded? = null
+
     /** Guards the one-time parse so two concurrent callers cannot each build the 34k-row list. */
     private val cacheLock = Mutex()
 
@@ -72,7 +75,7 @@ class CityRepository(
             foldedNames = localizedNames.mapValues { (_, name) -> CityText.fold(name) }
             loadedLanguage = language
         }
-        Loaded(cities, localizedNames, foldedNames)
+        Loaded(cities, localizedNames, foldedNames, language).also { snapshot = it }
     }
 
     /** The three structures a search needs, resolved together under one lock acquisition. */
@@ -80,6 +83,7 @@ class CityRepository(
         val cities: List<City>,
         val names: Map<Int, String>,
         val folded: Map<Int, String>,
+        val language: String,
     )
 
     /**
@@ -103,6 +107,16 @@ class CityRepository(
                 .take(limit)
                 .toList()
         }
+    }
+
+    /**
+     * [displayName] from what is already loaded, without suspending: null until a lookup has read the list in the
+     * current language. For a screen's first frame, so that it never shows one name and then another (About's unit
+     * city: by the time About opens, the app has read the list for the location's own name).
+     */
+    fun loadedDisplayName(cityId: Int): String? {
+        val loaded = snapshot?.takeIf { it.language == wantedLanguage } ?: return null
+        return loaded.names[cityId] ?: loaded.cities.firstOrNull { it.id == cityId }?.name
     }
 
     /**

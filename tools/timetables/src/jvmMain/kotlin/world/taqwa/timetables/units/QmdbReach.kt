@@ -170,8 +170,9 @@ object QmdbReach {
      * Any change to the method, its margins, its bands, the AngleBased curves or the engine's way of riding a
      * unit's point beside the user's moves some of them.
      *
-     * The same on every machine: no double is printed (the cap in metres, the coordinates as literal sums, the
-     * times as whole epoch seconds), so neither `Double.toString` nor a maths routine's last bit can move it.
+     * The same on every machine, practically: no double is printed (the cap in metres, the coordinates as literal
+     * sums, the times as whole epoch seconds), so `Double.toString` cannot move it, and a maths routine's last bit
+     * only where a time, rounded from doubles to the second, lies within about 1e-12 s of a whole one.
      */
     fun fingerprint(): String {
         val text = StringBuilder()

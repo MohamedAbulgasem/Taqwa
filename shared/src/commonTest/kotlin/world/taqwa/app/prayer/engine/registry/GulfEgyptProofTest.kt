@@ -63,15 +63,23 @@ class GulfEgyptProofTest {
     }
 
     @Test
-    fun `umm al qura's one exception is its lag dates at fajr sunrise and the end of eating`() {
+    fun `umm al qura's exceptions are its lag dates and its units' reach`() {
+        // Class A's minute is passed on the lag dates at the tables' own points, and across a unit's reach (its own
+        // tables replayed there, sa-ummalqura-reach.tsv, the review of 9 Oct 2026): every start up to 2 min after
+        // the unit's table, sunrise and the end of eating up to 3 before it.
         val uq = assertNotNull(Registry.byId("sa.ummalqura"))
         assertEquals(EntryClass.A, uq.entryClass)
-        for (event in listOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.END_OF_EATING)) {
+        for (event in listOf(TimedEvent.FAJR, TimedEvent.DHUHR, TimedEvent.ASR, TimedEvent.MAGHRIB, TimedEvent.ISHA)) {
             assertEquals(2, lateLimitFor(event, null, uq)?.minutes, "$event")
         }
-        for (event in listOf(TimedEvent.DHUHR, TimedEvent.ASR, TimedEvent.MAGHRIB, TimedEvent.ISHA, TimedEvent.IMSAK)) {
-            assertNull(lateLimitFor(event, null, uq), "$event")
+        for (event in listOf(TimedEvent.SUNRISE, TimedEvent.END_OF_EATING)) {
+            assertEquals(3, lateLimitFor(event, null, uq)?.minutes, "$event")
         }
+        assertNull(lateLimitFor(TimedEvent.IMSAK, null, uq))
+        // Nine units of the north and the east, where a lag date's later Fajr and the reach's edge meet: Fajr 3.
+        val haql = Units.of("sa.ummalqura")!!.units.single { it.id == "haql" }
+        assertEquals(3, lateLimitFor(TimedEvent.FAJR, haql, uq)?.minutes)
+        assertEquals(2, lateLimitFor(TimedEvent.DHUHR, haql, uq)?.minutes)
         // The Other method keeps the plain safe rounding and no exception (ruling R31).
         val other = assertNotNull(Registry.byId("other.ummalqura"))
         assertTrue(other.lateLimits.isEmpty())

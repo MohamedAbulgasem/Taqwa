@@ -3,6 +3,7 @@ package world.taqwa.app.city
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class CityRepositoryTest {
@@ -44,6 +45,22 @@ class CityRepositoryTest {
     )
 
     private val repo = repository()
+
+    @Test
+    fun aLoadedNameIsThereWithoutWaitingOnceTheListIsReadInTheLanguage() = runTest {
+        // About's first frame (SettingsRoutes): the unit city's name from what is loaded, never a name and then another.
+        val r = repository()
+        r.setLanguage("ar")
+        assertNull(r.loadedDisplayName(360630))
+        assertEquals("القاهرة", r.displayName(360630))
+        assertEquals("القاهرة", r.loadedDisplayName(360630))
+        assertEquals("Londrina", r.loadedDisplayName(3458449))
+        assertNull(r.loadedDisplayName(1))
+        r.setLanguage("fr")
+        assertNull(r.loadedDisplayName(360630))
+        assertEquals("Le Caire", r.displayName(360630))
+        assertEquals("Le Caire", r.loadedDisplayName(360630))
+    }
 
     @Test
     fun searchIsCaseInsensitiveAndPrefixMatched() = runTest {

@@ -159,8 +159,8 @@ object Units {
     }
 
     /**
-     * Sets built only when their entry is first resolved: QMDB's 5,676 units (decoded from QmdbPlaceList, about 20 ms
-     * on a cold JVM) wait for the first place in Kazakhstan.
+     * Sets built only when their entry is first resolved: QMDB's 5,676 units (decoded from QmdbPlaceList and built,
+     * about 10 ms on a cold JVM) wait for the first place in Kazakhstan.
      */
     private val built: Map<String, Lazy<UnitSet>> = mapOf("kz.qmdb" to lazy { CentralAsia.kazakhstanUnits })
 

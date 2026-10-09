@@ -784,6 +784,15 @@ internal fun checkedThrough(resolution: Resolution, stamp: ProofStamp): String? 
     resolution.unitId?.takeIf { stamp.worstLateByUnit.isNotEmpty() }?.let { stamp.provenThroughByUnit[it] } ?: stamp.provenThrough
 
 /**
+ * The app city About names the place by instead of the location's own ([locationCityId], the location's city in the
+ * app's list): the city whose table the unit is ([Resolution.unitCityId], Umm al-Qura's and QMDB's places), where
+ * that is another (Ash Shafa follows Taif's table; a suburb's fix inside Almaty's reach, Almaty's). Null where the
+ * location's own name stands.
+ */
+internal fun aboutUnitCityId(resolution: Resolution, locationCityId: Int?): Int? =
+    resolution.unitCityId?.takeIf { it != locationCityId }
+
+/**
  * The unchecked template's "up to {worst} minutes after" (review I2): [measuredStartsWorst] at the
  * user's own unit, and null, so no figure at all, where that unit is not measured (spec §3.5) or
  * [stamp] holds no row for it.

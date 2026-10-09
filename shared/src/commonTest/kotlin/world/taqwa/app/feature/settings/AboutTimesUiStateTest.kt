@@ -315,12 +315,28 @@ class AboutTimesUiStateTest {
         val almaty = stateFor(Place(43.238293, 76.945465, "Asia/Almaty", "KZ"))
         assertIs<AboutTimesUiState.AuthorityUnchecked>(almaty)
         assertEquals(uncheckedWorstMinutes(almaty.resolution, almaty.stamp), uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
-        assertEquals(2, uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
+        // Almaty's own figure across its reach (its own tables replayed there, the review of 9 Oct 2026).
+        assertEquals(4, uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
+    }
+
+    @Test
+    fun `about names the city whose table the unit is where that is not the location's own`() {
+        // Ash Shafa (GeoNames 410096) takes KACST's Taif, the app's Taif (107968): About names Taif there, and the
+        // location's own name at Taif itself. Sultanah (101760) takes Madinah's (109223).
+        val ashShafa = stateFor(Place(21.07268, 40.31842, "Asia/Riyadh", "SA"))
+        assertEquals("taif", ashShafa.resolution.unitId)
+        assertEquals(107968, aboutUnitCityId(ashShafa.resolution, 410096))
+        assertNull(aboutUnitCityId(stateFor(Place(21.27028, 40.41583, "Asia/Riyadh", "SA")).resolution, 107968))
+        assertEquals(109223, aboutUnitCityId(stateFor(Place(24.49258, 39.58572, "Asia/Riyadh", "SA")).resolution, 101760))
+        // A location with no city of the app's list (a fix the app could not name) still reads the unit's city.
+        assertEquals(1526384, aboutUnitCityId(stateFor(Place(43.289, 77.015, "Asia/Almaty", "KZ")).resolution, null))
+        // Beyond every unit, and at a village's unit, the location's own name.
+        assertNull(aboutUnitCityId(stateFor(Place(45.61667, 63.31667, "Asia/Qostanay", "KZ")).resolution, 1521368))
     }
 
     @Test
     fun `a kazakh city claims its own unit's worst start`() {
-        // Almaty, a few kilometres from QMDB's own point: up to a minute after QMDB's Almaty table, not the north's 8.
+        // Almaty, a few kilometres from QMDB's own point: its own unit's worst start across its reach, not the north's.
         val almaty = Place(43.25249, 76.9115, "Asia/Almaty", "KZ")
         val state = stateFor(almaty)
         assertIs<AboutTimesUiState.AuthorityUnchecked>(state)

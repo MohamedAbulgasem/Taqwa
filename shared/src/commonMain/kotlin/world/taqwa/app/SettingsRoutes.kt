@@ -32,6 +32,7 @@ import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.recitation.RecitationState
 import world.taqwa.app.feature.recitation.reciterName
 import world.taqwa.app.feature.settings.AboutTimesScreen
+import world.taqwa.app.feature.settings.aboutUnitCityId
 import world.taqwa.app.feature.settings.AppearanceSettingsScreen
 import world.taqwa.app.feature.settings.AttributionScreen
 import world.taqwa.app.feature.settings.CitySearchScreen
@@ -288,11 +289,12 @@ internal fun AboutTimesRoute(
     val state = remember(engineDay, place, today) {
         aboutTimesUiState(engineDay, place, today, prayerSettings.hijriOffsetDays)
     }
-    // A city's own table (QMDB's cities, the owner's decision of 9 Oct 2026): About names the city whose
-    // table the times follow, in the reader's language, also where the location's own nearest city is
-    // another (a suburb's fix inside the city's reach). The location's own city needs no lookup.
-    val unitCityId = state.resolution.unitCityId?.takeIf { it != loc.cityId }
-    val unitCityName by produceState<String?>(null, unitCityId, cityDisplayName) {
+    // A city's own table (Umm al-Qura's and QMDB's places): About names the city whose table the times
+    // follow, in the reader's language, also where the location's own nearest city is another (a suburb's
+    // fix inside the city's reach). The first frame reads the name already loaded, so it never shows the
+    // location's name and then the city's.
+    val unitCityId = aboutUnitCityId(state.resolution, loc.cityId)
+    val unitCityName by produceState(unitCityId?.let { container.cityRepository.loadedDisplayName(it) }, unitCityId, cityDisplayName) {
         value = unitCityId?.let { container.cityRepository.displayName(it) }
     }
     AboutTimesScreen(

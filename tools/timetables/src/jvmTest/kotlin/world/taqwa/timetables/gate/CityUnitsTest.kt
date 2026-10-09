@@ -12,7 +12,9 @@ import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.timetables.TestPaths
+import world.taqwa.timetables.monitor.Recipes
 import world.taqwa.timetables.units.QmdbReach
+import world.taqwa.timetables.units.ReachRows
 import java.io.File
 import java.util.concurrent.Executors
 import kotlin.math.PI
@@ -40,10 +42,10 @@ import kotlin.test.fail
  * - every Saudi and Kazakh city of the app's list is inside a unit but the few no place of the authority's list
  *   is near, which this names;
  * - with the archive: at the four edges of every unit's reach (north, east, south and west, 95 % of the radius),
- *   the engine is never early and no end is late against the unit's own city tables, the tables the gate reads at
- *   the unit's point. The gate's late limit is not held there (ruling R40: near a radius's edge the start is the
- *   user's own sun, up to the class's minute later than the city's table); the worst lateness is printed. And on
- *   rings around 24 of the larger Kazakh cities, out to 15 km, against the city's own tables.
+ *   the engine is never early, no end is late and nothing passes its late limit (the unit's own, ruling R41, which
+ *   the reach rows of 9 Oct 2026 measured across the unit) against the unit's own city tables, the tables the gate
+ *   reads at the unit's point; the worst lateness is printed. And so on rings around 24 of the larger Kazakh
+ *   cities, out to 15 km, against the city's own tables.
  */
 class CityUnitsTest {
 
@@ -154,7 +156,7 @@ class CityUnitsTest {
     }
 
     @Test
-    fun `at the four edges of every city unit no start is early and no end late against its city's tables`() {
+    fun `at the four edges of every city unit no start is early no end late and none over its limit against its city's tables`() {
         val official = File(System.getProperty("taqwa.official") ?: error("taqwa.official not set"))
         val roots = OfficialRoots(official, TestPaths.repoRoot.resolve("tools/timetables/official"))
         val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate"))
@@ -187,8 +189,42 @@ class CityUnitsTest {
             println("$id: ${points[id]} edge points, ${s.placeDayCount} place-days; worst start $starts min after the city's table, worst end $ends min before it")
             for ((event, e) in s.events) println("  ${event.key}: worst ${e.worst} min, ${e.late.joinToString("/")} days at 0/1/2/3+ min")
         }
-        val broken = result.entries.values.flatMap { result.neverEarly(it) }
+        val broken = result.entries.values.flatMap { result.neverEarly(it) + result.overLimit(it) }
         if (broken.isNotEmpty()) fail("${broken.size} broken at the edges:\n" + broken.joinToString("\n"))
+    }
+
+    /**
+     * The review of 9 Oct 2026 ("prove it across the unit"): every measured Umm al-Qura and QMDB unit's own tables are
+     * replayed across its reach (the reach files, `generateReachRows`), every own table at every point kept, each point
+     * inside the unit's reach, and the monitor's recipes extend each unit's rows with each new year of its table.
+     */
+    @Test
+    fun `every measured unit's own tables are replayed across its reach`() {
+        val gate = TestPaths.repoRoot.resolve("tools/timetables/official/gate")
+        val manifest = GateManifest.load(gate)
+        val recipes = Recipes.load(TestPaths.repoRoot.resolve("tools/timetables/official/monitor/recipes.tsv"))
+        for (spec in ReachRows.SPECS) {
+            val reach = manifest.rows.filter { it.source == "${spec.group}-reach.tsv" }
+            for (unit in requireNotNull(Units.of(spec.entry)).units.filter { it.measured }) {
+                val own = ReachRows.ownRows(manifest, spec, unit)
+                val mine = reach.filter { it.entry == spec.entry && it.unit == unit.id }
+                val points = mine.map { GeoPoint(it.lat!!, it.lon!!) }.distinct()
+                assertTrue(points.isNotEmpty(), "${spec.entry}/${unit.id}: no reach row")
+                for (p in points) {
+                    assertTrue(distanceKm(p, unit.point) <= unit.radiusKm, "${spec.entry}/${unit.id}: $p beyond its reach")
+                    val paths = mine.filter { it.lat == p.lat && it.lon == p.lon }.map { it.path }.toSet()
+                    assertEquals(own.map { it.path }.toSet(), paths, "${spec.entry}/${unit.id} at $p: not its own tables")
+                }
+                val fetched = own.mapNotNull { Regex("""archive/tables/pinned/([a-z-]+)/[0-9-]+/(.+)-\d{4}\.txt""").matchEntire(it.path) }
+                    .map { it.groupValues[1] to it.groupValues[2] }.distinct()
+                for ((source, place) in fetched) {
+                    assertTrue(
+                        recipes.any { it.source == source && it.gate == "${spec.group}-reach.tsv" && it.entry == "${spec.entry}/${unit.id}" && it.matches("$place-2030") },
+                        "${spec.entry}/${unit.id}: no recipe grows its reach rows from $source/$place",
+                    )
+                }
+            }
+        }
     }
 
     @Test
@@ -255,7 +291,7 @@ class CityUnitsTest {
      * nearer city's where two reach, and against that city's own tables no start comes before them and no end after.
      */
     @Test
-    fun `on rings inside a city's reach no start comes before the city's table and no end after it`() {
+    fun `on rings inside a city's reach no start comes before the city's table no end after it and none over its limit`() {
         val official = File(System.getProperty("taqwa.official") ?: error("taqwa.official not set"))
         val roots = OfficialRoots(official, TestPaths.repoRoot.resolve("tools/timetables/official"))
         val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate")).only(groups = setOf("kz-qmdb"))
@@ -365,7 +401,7 @@ class CityUnitsTest {
                 cells.merge(event, e.early + e.lateEnd, Int::plus)
                 worstEarly = maxOf(worstEarly, e.worstEarly)
             }
-            broken += result.neverEarly(s)
+            broken += result.neverEarly(s) + result.overLimit(s)
         }
 
         fun add(other: Tally) {

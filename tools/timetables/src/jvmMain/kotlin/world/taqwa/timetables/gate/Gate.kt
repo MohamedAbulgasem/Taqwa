@@ -79,8 +79,13 @@ class Gate(
         val skipped = mutableListOf<GateRow>()
         var checked = 0
         val cells = LinkedHashMap<String, CautiousCell>()
-        // Rows at the same point of the same entry (a year per file, a table in two files) share days.
-        val computed = HashMap<String, Days>()
+        // Rows at the same point of the same entry (a year per file, a table in two files) share days. Only the last
+        // few points are kept: each holds every day it computed, and the reach rows (sa-ummalqura-reach.tsv,
+        // kz-qmdb-reach.tsv) read some three thousand points, which the whole gate could not hold at once. A point
+        // read again later is computed again, to the same days.
+        val computed = object : LinkedHashMap<String, Days>(256, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Days>): Boolean = size > DAYS_KEPT
+        }
 
         for (row in manifest.rows) {
             // Every row is checked for its entry, unit, point and zone, held or not, so that CI
@@ -252,6 +257,9 @@ class Gate(
     }
 
     companion object {
+        /** How many points' computed days [evaluate] keeps at once (rows of one point stand together). */
+        private const val DAYS_KEPT = 64
+
         /**
          * [row] made ready to check: the entry by id, the table's point (its own, else its unit's
          * reference point, else the method's fixed point), the entry resolved there (the unit logic
@@ -454,7 +462,9 @@ class EntryStats(val entry: RegistryEntry) {
     val heldOut = sortedMapOf<Event, EventStats>()
     var unreadable = 0
     var duplicates = 0
-    private val placeDays = HashSet<String>()
+    /** Each place-day once: its group's index (below) in the high half, its epoch day in the low. */
+    private val placeDays = HashSet<Long>()
+    private val groups = HashMap<String, Int>()
     var ramadanDays = 0
         private set
     var testDays = 0
@@ -482,7 +492,7 @@ class EntryStats(val entry: RegistryEntry) {
     val placeDayCount: Int get() = placeDays.size
 
     /** Every date checked, whatever the point (a one-row manifest's coverage; the monitor names the holes). */
-    val dates: Set<LocalDate> get() = placeDays.mapTo(sortedSetOf()) { LocalDate.parse(it.substringAfter('|')) }
+    val dates: Set<LocalDate> get() = placeDays.mapTo(sortedSetOf()) { LocalDate.fromEpochDays((it and 0xFFFFFFFFL).toInt()) }
 
     /**
      * Early starts, late ends, cells over the limit, days out of order and cautious Maghribs that
@@ -554,7 +564,8 @@ class EntryStats(val entry: RegistryEntry) {
         if (member != null && point != null) {
             memberDays.getOrPut(member) { sortedMapOf() }.getOrPut(pointKey(point)) { sortedSetOf() } += date
         }
-        if (!placeDays.add("$group|$date")) return
+        val key = (groups.getOrPut(group) { groups.size }.toLong() shl 32) or (date.toEpochDays().toLong() and 0xFFFFFFFFL)
+        if (!placeDays.add(key)) return
         if (ramadan) ramadanDays++
         if (split == Split.TEST) testDays++
         if (split == Split.TEST && ramadan) testRamadanDays++

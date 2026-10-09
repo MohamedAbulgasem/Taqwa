@@ -15,7 +15,7 @@ import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.Where
-import world.taqwa.app.prayer.engine.registry.atEdge
+import world.taqwa.app.prayer.engine.registry.beyondTable
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
 import world.taqwa.app.prayer.engine.registry.distanceKm
@@ -215,22 +215,26 @@ object CentralAsia {
      * The 87 places whose tables are checked ([QmdbPlaces.all]: the gate's 29 and QMDB's place for every other city
      * of the app's list) are measured, gated at their own point and at the app's point for the city (kz-qmdb.tsv).
      * Every other place, the five QMDB serves no table for ([QmdbPlaces.unanswered]) among them, is a unit that
-     * claims no figure. Beyond every reach the user's own point with the entry's margins as before, the end of eating
-     * at SAFE_END below 46° N (ruling R44; the bands' own margins are earlier still), claiming no figure (spec §3.5).
-     * About and the site call the place by the app's name for it ([AuthorityUnit.named]).
+     * claims no figure. A measured place whose own tables, replayed across its reach (kz-qmdb-reach.tsv), pass the
+     * entry's Fajr, Isha or end-of-eating limit carries its own ([QmdbPlaces.reachLimits], [reachLateLimits]).
+     * Beyond every reach, the nearest place's table as a point table's edge ([beyondTable], rulings R44 and R45): the
+     * user's own point a minute later, the end of eating at SAFE_END or the bands' own earlier margins, and within
+     * three reaches of the nearest place its point still bounding sunrise and the end of eating; no figure (spec
+     * §3.5). About and the site call the place by the app's name for it ([AuthorityUnit.named]).
      */
     val kazakhstanUnits: UnitSet by lazy {
         val measured = QmdbPlaces.all.associateBy { it.qmdbId }
         val unanswered = QmdbPlaces.unanswered.associateBy { it.qmdbId }
         // Each city's place and the app's city it is the table of (the first of the app's cities naming it).
         val cityOf = QmdbPlaces.appCities.reversed().associate { it.key to it.geonamesId }
+        val limits = QmdbPlaces.reachLimits.associate { it.key to reachLateLimits(it) }
         val places = QmdbPlaceList.places.map { place ->
             val named = measured[place.qmdbId] ?: unanswered[place.qmdbId]
             val point = if (named != null) GeoPoint(named.lat, named.lon) else GeoPoint(place.lat, place.lon)
             AuthorityUnit(
                 id = named?.key ?: "qmdb-${place.qmdbId}", name = named?.name ?: "QMDB ${place.qmdbId}", point = point,
                 radiusKm = place.reachKm, method = kazakhstanAt(point), measured = place.qmdbId in measured, named = false,
-                cityId = named?.key?.let { cityOf[it] },
+                cityId = named?.key?.let { cityOf[it] }, lateLimits = named?.key?.let { limits[it] }.orEmpty(),
             )
         }
         val cities = places.filter { it.cityId != null }
@@ -238,10 +242,42 @@ object CentralAsia {
         // A checked place inside a city's reach (Zhenis, in Zhetysay's) is the city's: its table is held against the
         // city's times (kz-qmdb.tsv), and its own unit, which no user inside the city's reach takes, claims no figure.
         val units = places.map { if (it.measured && it.cityId == null && cityHolding(cities, it.point) != null) it.copy(measured = false) else it }
-        UnitSet("kz.qmdb", units, choose = { place -> cityHolding(cities, GeoPoint(place.lat, place.lon)) }) {
-            kazakhstanMethod.atEdge("kz.qmdb.edge", kazakhstanMethod.margins)
+        UnitSet("kz.qmdb", units, choose = { place -> cityHolding(cities, GeoPoint(place.lat, place.lon)) }) { user ->
+            val nearest = units.minBy { distanceKm(user, it.point) }
+            (nearest.method ?: kazakhstanMethod).beyondTable("kz.qmdb.edge", nearest.point, user, nearest.radiusKm)
         }
     }
+
+    /** A measured place's own limits across its reach ([QmdbPlaces.reachLimits]), each event's with its reason (R41). */
+    private fun reachLateLimits(r: QmdbPlaces.ReachLimit): List<LateLimit> = listOfNotNull(
+        r.fajr?.let {
+            LateLimit(
+                it,
+                "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased " +
+                    "Fajr residual at the place's own table and the later of the place's dawn and the user's own add up, so " +
+                    "Fajr comes up to $it min after the place's table",
+                setOf(TimedEvent.FAJR),
+            )
+        },
+        r.isha?.let {
+            LateLimit(
+                it,
+                "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased " +
+                    "Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so " +
+                    "Isha comes up to $it min after the place's table",
+                setOf(TimedEvent.ISHA),
+            )
+        },
+        r.endOfEating?.let {
+            LateLimit(
+                it,
+                "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating " +
+                    "kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so " +
+                    "it comes up to $it min before the place's printed Fajr",
+                setOf(TimedEvent.END_OF_EATING),
+            )
+        },
+    )
 
     /** The nearest of [cities] whose reach holds [user], or null (then the nearest place of all). */
     private fun cityHolding(cities: List<AuthorityUnit>, user: GeoPoint): AuthorityUnit? {

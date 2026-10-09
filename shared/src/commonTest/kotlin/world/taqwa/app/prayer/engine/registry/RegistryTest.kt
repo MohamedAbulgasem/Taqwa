@@ -979,9 +979,11 @@ class RegistryTest {
             AuthorityUnit("u", "U", GeoPoint(0.0, 0.0), 1.0, lateLimits = listOf(unitDhuhr, entryDhuhr))
         }
         val uq = Registry.byId("sa.ummalqura")!!
-        // Umm al-Qura's lag dates (Task 7a) lift Fajr, sunrise and the end of eating only.
+        // Umm al-Qura's lag dates (Task 7a) and its units' reach (the review of 9 Oct 2026) lift every event but imsak.
         assertEquals(2, lateLimitFor(TimedEvent.FAJR, null, uq)?.minutes)
-        assertNull(lateLimitFor(TimedEvent.DHUHR, null, uq))
+        assertEquals(2, lateLimitFor(TimedEvent.DHUHR, null, uq)?.minutes)
+        assertEquals(3, lateLimitFor(TimedEvent.SUNRISE, null, uq)?.minutes)
+        assertNull(lateLimitFor(TimedEvent.IMSAK, null, uq))
     }
 
     @Test

@@ -200,4 +200,90 @@ object UmmAlQuraCities {
         UmmAlQuraCity(208, "suwayr", "Suwayr", 30.1147, 40.3803),
         UmmAlQuraCity(1013, "sakaka", "Sakaka", 29.97, 40.2),
     )
+
+    /**
+     * The app's own city (its GeoNames id in `cities.csv`) whose table each place is: the app's city of the place's
+     * name among those whose own point takes the place's unit (Ash Shafa and Taif both take Taif's, which is Taif's),
+     * so About names the city whose table a user follows, in the reader's language, as Kazakhstan's do (the review of
+     * 9 Oct 2026). Tayma's is the town's own (`UmmAlQura`'s Tayma rule). A place no app city takes has none.
+     */
+    val appCityOf: Map<String, Int> = mapOf(
+        "ad-diriyah" to 110312, // Ad Dir‘īyah
+        "afif" to 110250, // Afif
+        "al-kharj" to 109353, // Al Kharj
+        "as-sulayyil" to 108048, // As Sulayyil
+        "az-zulfi" to 107781, // Az Zulfī
+        "al-duwadimi" to 110325, // Ad Dawādimī
+        "howtat-bani-tamim" to 13631408, // Ḥawṭah Banī Tamīm
+        "rumah" to 102744, // Rumāḩ
+        "shagra" to 102170, // Shaqra
+        "ad-dilam" to 110314, // Ad Dilam
+        "layla" to 104716, // Laylá
+        "riyadh" to 108410, // Riyadh
+        "al-jumum" to 109417, // Al Jumūm
+        "al-khurma" to 109306, // Al Khurmah
+        "al-lith" to 109253, // Al Līth
+        "jeddah" to 105343, // Jeddah
+        "khulais" to 104923, // Khulayş
+        "rabigh" to 103035, // Rābigh
+        "ranyah" to 12546009, // Ranyah
+        "taif" to 107968, // Ta’if
+        "turbah" to 101322, // Turabah
+        "thuwal" to 409682, // Thuwal
+        "makkah" to 104515, // Makkah
+        "mahd-al-thahab" to 104578, // Mahd adh Dhahab
+        "al-ula" to 108841, // Al-`Ula
+        "badr" to 107744, // Badr Ḩunayn
+        "yanbu" to 100425, // Yanbu
+        "madinah" to 109223, // Madinah
+        "al-badayea" to 397833, // Al Badā’i‘ al Wusţá
+        "al-bukayriyah" to 109878, // Al Bukayrīyah
+        "al-mithnab" to 109131, // Al Mithnab
+        "ar-rass" to 108435, // Ar Rass
+        "unayzah" to 101732, // Unaizah
+        "uyun-al-jawa" to 108782, // ‘Uyūn al Jiwā’
+        "riyadh-al-khabra" to 11835536, // Riyāḑ al Khabrā’
+        "buraydah" to 107304, // Buraydah
+        "abqaiq" to 107312, // Abqaiq
+        "al-hofuf" to 109571, // Al Hufūf
+        "hafar-al-batin" to 106297, // Hafar Al-Batin
+        "al-jubail" to 109435, // Al Jubayl
+        "khafji" to 109380, // Al Khafjī
+        "al-khobar" to 109323, // Khobar
+        "al-qatif" to 108927, // Al Qaţīf
+        "ras-tanura" to 102891, // Ras Tanura
+        "dhahran" to 107797, // Dhahran
+        "tarut" to 101554, // Tārūt
+        "dammam" to 110336, // Dammam
+        "al-namas" to 108617, // An Nimas
+        "belqarn" to 11670045, // Sabt Alalayah
+        "bishah" to 103369, // Bīshah
+        "khamis-mushait" to 105072, // Khamis Mushait
+        "sarat-abidah" to 12500245, // Sarāt ‘Abīdah
+        "bariq" to 12495725, // Bariq
+        "abha" to 110690, // Abha
+        "al-wajh" to 108773, // Al Wajh
+        "umluj" to 100926, // Umluj
+        "duba" to 106909, // Duba
+        "haql" to 106102, // Ḩaql
+        "tayma" to 101516, // Taymā’
+        "tabuk" to 101628, // Tabuk
+        "baqaa" to 107588, // Baq‘ā’
+        "hail" to 106281, // Ha'il
+        "turaif" to 101312, // Turaif
+        "arar" to 108512, // Arar
+        "abu-arish" to 110619, // Abū ‘Arīsh
+        "damad" to 107117, // Ḑamad
+        "sabya" to 102651, // Şabyā
+        "samtah" to 102451, // Şāmitah
+        "fayfa" to 106667, // Fayfā’
+        "jazan" to 105299, // Jizan
+        "najran" to 103630, // Najrān
+        "al-aqiq" to 110060, // Al ‘Aqīq
+        "baljurashi" to 107692, // Baljurashi
+        "al-bahah" to 109953, // Al Bahah
+        "al-qurayyat" to 108648, // Qurayyat
+        "tubarjal" to 101631, // Ţubarjal
+        "sakaka" to 102527, // Sakakah
+    )
 }

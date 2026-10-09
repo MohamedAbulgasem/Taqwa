@@ -264,7 +264,11 @@ class Document(
         val stamp = p.published?.stamp
         val atMost = p.published?.atMost
         val authority = strings.timetable(language, effective.entry).orEmpty()
-        val unitLabel = effective.unitLabel ?: p.city.name(language)
+        // As the app's About names it: the unit's own name, else the app's city whose table it is where that is not the
+        // page's own (a page inside another city's unit, Balykshi in Atyrau's), else the page's city.
+        val unitLabel = effective.unitLabel
+            ?: effective.unitCityId?.takeIf { it != p.city.id }?.let { strings.cityName(language, it) }
+            ?: p.city.name(language)
         val comma = MethodWords.listComma(language)
         val members = effective.members.map { strings.get(language, it.nameKey) }
         val through = p.published?.let { f.longDate(it.through) }

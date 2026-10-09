@@ -246,6 +246,25 @@ tasks.register<JavaExec>("generateQmdbPlaces") {
 }
 
 /**
+ * Writes `official/gate/sa-ummalqura-reach.tsv` and `kz-qmdb-reach.tsv`: each measured Umm al-Qura and QMDB unit's
+ * own tables replayed across its area (`units/GenerateReachRows.kt`, the review of 9 Oct 2026). No archive needed: it
+ * reads the gate files and the registry only. Re-run after a unit or its reach changes, then run the gate and commit.
+ *
+ *     ./gradlew -p tools/timetables generateReachRows
+ */
+tasks.register<JavaExec>("generateReachRows") {
+    group = "application"
+    description = "Writes the reach rows: each measured Umm al-Qura and QMDB unit's own tables across its area."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.GenerateReachRowsKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "2g"
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", root) })
+}
+
+/**
  * Writes `DiyanetEuropeCurves.kt`, the per-city curves of Diyanet's European tables, from every held
  * capture of each city (restricted, read from the official root); the generator's KDoc says how a
  * slot is derived. Re-run when a capture is added to the archive, then run the gate and commit.

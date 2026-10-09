@@ -19,8 +19,9 @@ class DocumentTest {
         names: Map<String, String>,
         featured: Set<String> = emptySet(),
         admin1: String? = null,
+        id: Int = 1,
     ) = City(
-        slug = slug, id = 1, countryCode = country, region = "north-africa", latitude = lat, longitude = lon,
+        slug = slug, id = id, countryCode = country, region = "north-africa", latitude = lat, longitude = lon,
         timeZone = zone, languages = names.keys.toList(), featured = featured,
         names = names, admin1 = admin1,
     )
@@ -306,6 +307,18 @@ class DocumentTest {
         // A held city still builds on its own (for these tests), with no proof to show.
         assertNull(document.city(tripoli, friday)["proof"])
         assertEquals("D_AUTHORITY", document.city(tripoli, friday)["entryClass"])
+    }
+
+    @Test
+    fun aPageInsideAnotherCitysUnitNamesTheCityWhoseTableItFollowsAsTheAppDoes() {
+        // The app's Balykshi takes QMDB's Atyrau (its unit's city, GeoNames 610529): the app's About names Atyrau, in
+        // the reader's language, and so does the page; Atyrau's own page names itself.
+        val balykshi = city("balykshi-kazakhstan", "KZ", 47.06667, 51.86667, "Asia/Atyrau", linkedMapOf("en" to "Balykshi", "ar" to "بالىقشى"), id = 610445)
+        assertEquals("Kazakh Muftiate publishes the prayer times used in Atyrau.", page(balykshi, "en").map("strings")["whoPublishesBody"])
+        val arabic = page(balykshi, "ar").map("strings")["whoPublishesBody"] as String
+        assertTrue("أتيراو" in arabic && "بالىقشى" !in arabic, arabic)
+        val atyrau = city("atyrau-kazakhstan", "KZ", 47.1048, 51.88427, "Asia/Atyrau", linkedMapOf("en" to "Atyrau City"), id = 610529)
+        assertEquals("Kazakh Muftiate publishes the prayer times used in Atyrau City.", page(atyrau, "en").map("strings")["whoPublishesBody"])
     }
 
     @Test

@@ -46,6 +46,27 @@ class AppStrings(private val resources: File) {
         },
     )
 
+    private val cityNames = mutableMapOf<String, Map<Int, String>>()
+
+    /**
+     * The app's own name for city [id] (its GeoNames id in `files/cities.csv`) in [language], as the app's
+     * `CityRepository.displayName` gives it: the language's `files/city-names-<lang>.csv` name, else the English one;
+     * null where the app has no such city.
+     */
+    fun cityName(language: String, id: Int): String? {
+        // As the app reads them: the list's second column; a translation is the whole rest of its line.
+        fun read(file: File, name: (String) -> String): Map<Int, String> = if (!file.isFile) emptyMap() else
+            file.readLines().drop(1).filter { it.contains(',') }.mapNotNull { line ->
+                line.substringBefore(',').trim().toIntOrNull()?.let { it to name(line.substringAfter(',')).trim() }
+            }.filter { it.second.isNotEmpty() }.toMap()
+        val english = cityNames.getOrPut("en") { read(File(resources, "files/cities.csv")) { it.substringBefore(',') } }
+        val local = if (language == "en") emptyMap() else {
+            val file = if (language == "id") "in" else language
+            cityNames.getOrPut(language) { read(File(resources, "files/city-names-$language.csv")) { it }.ifEmpty { read(File(resources, "files/city-names-$file.csv")) { it } } }
+        }
+        return local[id] ?: english[id]
+    }
+
     private fun table(language: String): Map<String, String> = byLanguage.getOrPut(language) {
         val file = candidates(language).map { File(resources, "$it/strings.xml") }.firstOrNull { it.isFile }
             ?: error("The app has no strings for language '$language' under $resources")

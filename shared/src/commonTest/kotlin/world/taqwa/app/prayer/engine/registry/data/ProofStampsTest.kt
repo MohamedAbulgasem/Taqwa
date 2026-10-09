@@ -20,21 +20,25 @@ class ProofStampsTest {
         val stamp = ProofStamps.of("sa.ummalqura")
         assertTrue(stamp != null, "sa.ummalqura should have a generated row")
         assertEquals("sa.ummalqura", stamp.entryId)
-        // KACST's 173 places and the app's own points for 94 Saudi cities (the city-points round of 9 Oct 2026).
-        assertEquals(267, stamp.places)
+        // KACST's 173 places, the app's own points for 94 Saudi cities (the city-points round of 9 Oct 2026) and
+        // each place's own tables across its reach (sa-ummalqura-reach.tsv, the review of 9 Oct 2026).
+        assertEquals(2313, stamp.places)
         // At least the place-days of 9 October 2026: the weekly monitor's prove adds held-out rows as new captures
         // arrive (docs/MONITOR.md, "Prove"), so the proof only grows; a regeneration that drops rows shows here.
-        assertTrue(stamp.placeDays >= 210254, "sa.ummalqura placeDays ${stamp.placeDays}")
+        assertTrue(stamp.placeDays >= 1778731, "sa.ummalqura placeDays ${stamp.placeDays}")
         assertEquals("2030-12-31", stamp.provenThrough)
-        assertEquals(1, stamp.worstLateMinutes["dhuhr"])
+        assertEquals(2, stamp.worstLateMinutes["dhuhr"])
         // One row per KACST place, each its own: Makkah's Fajr is not Tayma's (a table computed a degree north of it).
         assertEquals(173, stamp.worstLateByUnit.size)
-        assertEquals(1, stamp.worstLateByUnit.getValue("makkah")["fajr"])
+        assertEquals(2, stamp.worstLateByUnit.getValue("makkah")["fajr"])
         assertEquals(5, stamp.worstLateByUnit.getValue("tayma")["fajr"])
         assertEquals(stamp.worstLateMinutes["fajr"], stamp.worstLateByUnit.values.mapNotNull { it["fajr"] }.max())
         val lagLimit = stamp.lateLimits.first { "fajr" in it.events && it.reason?.contains("repeats the previous day") == true }
         assertEquals(2, lagLimit.minutes)
-        assertTrue("endOfEating" in lagLimit.events)
+        assertEquals(listOf("fajr"), lagLimit.events)
+        val ends = stamp.lateLimits.first { "endOfEating" in it.events }
+        assertEquals(3, ends.minutes)
+        assertTrue("sunrise" in ends.events)
     }
 
     @Test
