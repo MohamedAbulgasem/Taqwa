@@ -245,6 +245,11 @@ published and why). Its outputs go to `monitor/proof/` in the private repository
 out with the reason: dates, counts and minutes), the generator's notices before and after (cities
 newly proven), and `changed`.
 
+The stamps the runner writes carry the same `engineHash` a Mac run writes for the same engine and
+methods. Their fingerprint prints no double: every one is whole millionths (`Canonical`, since 11
+October 2026). Until then, `sin` and `cos` gave different last bits on the runner's CPU and the
+Mac's, so each cloud run left twelve stamps stale for the Mac's `release.sh`.
+
 **Publishing.** The private repository's commit step then commits the pinned copies with the run's
 other changes. Only when that push landed, its rebase brought in no change under `archive/tables/`
 from elsewhere (tables the proof may read; otherwise the proof is not published and the next run

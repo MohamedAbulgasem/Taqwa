@@ -11,8 +11,9 @@ import world.taqwa.app.domain.Prayer
  * nights are), at every point it computes at: each start the latest, each end the earliest.
  *
  * The rule itself lives in the registry beside its authority; this is only the hook. An
- * implementation is a data class (or prints its parameters), so that a method's `toString`, which
- * the proof stamps fingerprint, is the same on every run.
+ * implementation is a data class of plain values (numbers, strings, enums, lists, sets, maps and
+ * other such classes), which the proof stamps fingerprint field by field (the tools' `Canonical`),
+ * the same on every run and every machine; a lambda or a lazy value there is refused.
  */
 interface ClockRule {
     /** The rule's times on [date] at [point] in [zone]. */

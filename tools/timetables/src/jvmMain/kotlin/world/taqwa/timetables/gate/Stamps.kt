@@ -20,7 +20,8 @@ import java.security.MessageDigest
  * The engine hash covers the engine's core (everything under `prayer/engine/` but the authority
  * files and their data, plus the Umm al-Qura dates, the `Prayer` keys and the Hijri calendar every
  * Ramadan falls back to) and the entry's own methods as resolved at each checked point, so one
- * authority's change leaves every other entry's stamp as it was.
+ * authority's change leaves every other entry's stamp as it was. The methods are hashed in [Canonical]
+ * words, so the Mac and the Linux runner write the same hash for the same engine.
  */
 object Stamps {
 
@@ -178,23 +179,25 @@ object Stamps {
         return hex(digest.digest()).take(16)
     }
 
-    /** What decided a row's days: the class, the points and each method, stable across runs. */
+    /**
+     * What decided a row's days: the class, the points and each method, the same on every run and every
+     * machine ([Canonical]: no double printed, so neither `Double.toString` nor a maths routine's last bit
+     * can move it).
+     */
     fun fingerprint(resolution: Resolution): String = buildString {
         append(resolution.entry.id).append(' ').append(resolution.entryClass).append(' ').append(resolution.entry.school)
-        append(" at ").append(resolution.point).append(" unit ").append(resolution.unitName).append(' ').append(resolution.unitPoint)
+        append(" at ").append(Canonical.of(resolution.point))
+        append(" unit ").append(Canonical.of(resolution.unitName)).append(' ').append(Canonical.of(resolution.unitPoint))
         resolution.method?.let { append(' ').append(fingerprint(it)) }
         resolution.members.forEach { append(" member ").append(it.id).append('#').append(it.shareRank).append(' ').append(fingerprint(it.method)) }
     }
 
-    /** [method] in words; its arrays by content (a data class prints an array's identity). */
-    fun fingerprint(method: TimetableMethod): String = buildString {
-        append(method.copy(fajrAngleByDayOfYear = null, ishaAngleByDayOfYear = null, monthlyOffsets = null))
-        method.fajrAngleByDayOfYear?.let { append(" fajrCurve=").append(it.contentToString()) }
-        method.ishaAngleByDayOfYear?.let { append(" ishaCurve=").append(it.contentToString()) }
-        method.monthlyOffsets?.entries?.sortedBy { it.key }?.forEach { (prayer, values) ->
-            append(" monthly.").append(prayer).append('=').append(values.contentToString())
-        }
-    }
+    /**
+     * [method] in [Canonical] words: every field by name, its curves by content in whole millionths of a
+     * degree, its clock rule's constants likewise. It once printed through the data class's `toString`,
+     * whose doubles, with every digit, carried the last bits `sin` and `cos` give on each CPU.
+     */
+    fun fingerprint(method: TimetableMethod): String = Canonical.of(method)
 
     private fun hex(bytes: ByteArray) = bytes.joinToString("") { "%02x".format(it) }
 }

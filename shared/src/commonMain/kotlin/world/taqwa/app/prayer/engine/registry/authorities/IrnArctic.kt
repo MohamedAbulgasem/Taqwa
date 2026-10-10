@@ -57,7 +57,7 @@ import kotlin.time.Instant
  * IRN's dates do move a day earlier and its line is the wall clock's, as this rule's is. IRN's other
  * Arctic calendars (Bodø, Narvik, Alta …) are not held: the rule stays inside the Tromsø unit.
  *
- * A data class: every constant is in its `toString`, which the proof stamps fingerprint.
+ * A data class of plain values: the proof stamps fingerprint every constant, field by field.
  */
 data class IrnArctic(
     val windowShiftDays: List<Int> = listOf(0),

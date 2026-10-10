@@ -676,12 +676,13 @@ curves or the way a unit's point rides beside the user's moves it, and `CityUnit
 naming `./gradlew -p tools/timetables generateQmdbPlaces`. No double is printed (coordinates in
 thousandths of a degree, the cap in metres, the times in whole seconds), and the probe's users are
 literal sums. So it cannot move with `Double.toString` or a maths routine's last bit, which is what
-moves the stamps' `engineHash` between the Mac and Linux. The regenerated list is the same, place for
+moved the stamps' `engineHash` between the Mac and Linux until 11 October (their fingerprint now writes
+its doubles as whole millionths too, BUILD-LOG). The regenerated list is the same, place for
 place, with only the fingerprint added: the reaches do not depend on which unit a user takes.
 
 **Not proven.** The 25 QMDB city entries off the app's list are proven as villages are, against their
-own computed day, not their tables. A Linux run of the fingerprint is the cloud's first (the site's
-`jvmTest`).
+own computed day, not their tables. The site's `jvmTest` runs the fingerprint's test on Linux at every
+push to `main` and every six hours: green on all five runs since it reached `main` on 10 October.
 
 ## Across each unit (10 Oct 2026, the review of the city-points branch)
 
