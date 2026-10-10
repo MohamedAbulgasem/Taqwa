@@ -185,9 +185,11 @@ a monitor source. Large tables are compact resources.
   measured places claim a figure (Zhenis, inside Zhetysay's reach, is Zhetysay's). The unit's point
   rides beside the user's, the user's own band and curves beside the unit's (Kazakhstan's 46° and
   48° N), so no time is earlier than at the user's own point alone. Each measured unit's own tables
-  are gated across its reach too (8 bearings at half and 95 % of its radius, the review of 9 Oct
-  2026), so its figure and its late limits hold for the whole unit. Beyond every unit, the nearest
-  place's table as a point table's edge (rulings R44 and R45), with no figure.
+  are gated across its reach too, on a grid and at each event's worst point of a dense sweep, and
+  checked on a third grid offset from both (the reviews of 9 and 10 Oct 2026). So its figure and its
+  late limits hold for the whole unit, and its own point stays held to the limits it had before.
+  Beyond every unit, a point table's edge with R45's end bound kept within one reach, so the user's
+  own point a minute later, with no figure.
 - **Unknown reference point or horizon**: the unit's safe edge and the deepest plausible horizon; no
   "at most" figure is claimed for that unit.
 - **Near a unit or country border**: the envelope over the candidates within the location's

@@ -194,9 +194,23 @@ Tabuk, Abha and Buraydah 1 → 2; Madinah and Taif stay 2; Dammam stays 1. Of th
 **Naming.** A unit carries the app's city whose table it is (`UmmAlQuraCities.appCityOf`, 77 units), so
 About at Ash Shafa names Taif and at Sultanah Madinah, as the pages do.
 
-**Beyond every unit** the nearest place's table is a point table's edge (`beyondTable`, ruling R45): the
-user's own point a minute later, the end of eating at SAFE_END or earlier, and within three reaches the
-nearest place's point bounding sunrise and the end of eating.
+**Beyond every unit** a point table's edge (`beyondTable`, ruling R45): the user's own point a minute
+later and the end of eating at SAFE_END or earlier. The nearest place's end bound is kept within one reach
+only (a unit's own minute bounds it there), so beyond every unit it never applies. Within three reaches
+it had cost up to 6 min of sunrise against the user's own point; now starts are up to 1 min later than
+`main` and ends up to 2 min earlier.
+
+**Each unit's true worst** (10 Oct 2026, the review's re-verify). Off the rows, the reviewer beat nine
+Saudi figures by a minute: Dammam, Malham and Ras Tanura 1 → 2 (Maghrib, Isha); Rumah, Marat, Al Quwarah,
+Qaryat al Ulya, Al Bada and Tabuk 2 → 3 (Fajr). `generateReachRows` now sweeps each unit against its own
+tables: 40 bearings × 6 shares, 29,487 points inside their unit, nothing early. It adds each event's
+worst point to the rows: 915 points, 5,828 rows in all. On the reviewer's own grid, offset from both
+(`CityUnitsTest`: 8,076 points, 6,191,779 place-days), there are 0 early, 0 late ends, none over a limit,
+and no start past a unit's figure. Fajr 3 now holds at 15 units (those six added).
+- The final figures: Makkah, Riyadh, Jeddah, Dammam, Abha and Buraydah 2, Tabuk 3, Madinah and Taif 2.
+- Of the 173 units: 151 go from 1 to 2, 15 reach 3, 2 stay 1, 4 stay 2, and Tayma stays 5.
+- The rows at each unit's own point and the app's city point stay held to class A's minute, the lag
+  dates' 2 and the three app points' 2 (`CityUnitsTest`), so a regression at a city's own point fails.
 
 ## Qatar — `qa.calendarhouse`, class B
 

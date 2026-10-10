@@ -2949,7 +2949,7 @@ takes (a nearer place, or a city whose reach holds it) is left out, since its us
 table. So each unit's stamp row now holds the lateness across its area, and About reads it.
 - Umm al-Qura: 4,031 rows at 2,046 of 2,768 points, all 173 units.
 - QMDB: 2,258 rows at 1,118 of 1,376 points, all 86 measured units.
-- The monitor's recipes have a line per unit (260), so `prove` adds each new year of a unit's table
+- The monitor's recipes have a line per unit (259), so `prove` adds each new year of a unit's table
   across its reach too.
 - `CityUnitsTest` checks that every measured unit has its own tables at every kept point, and a recipe.
   Its edge and ring tests now fail on a cell over its limit; the old "late limit not held" exception is
@@ -3040,3 +3040,110 @@ Android host and 1,491/0 on iOS, widgetcore 91/0 and 89/0; the monitor's Python 
 Pythons. `CI=true generate` writes 55 cities and 129 pages (the Saudi pages' figures as above); the site
 builds 164 pages, all checks good, and its tests pass 18/0. The debug APK's content grew 7,921 bytes
 compressed. The engine change ships with the first update, not 1.0.0 (35).
+
+## Each unit's true worst (10 October) — the review's re-verify
+
+The reviewer re-ran the branch, swept the units off the reach rows, and found two gaps. On 16 bearings
+offset by 11.25° at a quarter, three quarters, 90 % and 99 % of the radius (12,628 points), nothing was
+early. But 26 of the 259 units' figures were beaten by a minute, and 22 units had 91 cells over their
+recorded limits. The worst sits near the very edge and between the grid's bearings.
+
+**The sweep.** `generateReachRows` now sweeps each measured unit against its own tables in the archive.
+The sweep is 40 bearings from 4.5° by 9°, at 35, 60, 80, 93, 97 and 99.5 % of the radius: 240 points a
+unit, 46,142 of them inside their unit. It adds each event's worst point to the unit's reach rows, beside
+the fixed grid. Nothing in the sweep was early.
+- Umm al-Qura: 915 worst points, 5,828 rows.
+- QMDB: 546 worst points, 3,364 rows.
+- It takes about 2 minutes on the Mac's cores.
+- The whole gate is now 10,961 rows and 3,988,749 place-days (1.4 times the last round), about 110 s
+  on the Mac. 0 early, 0 late ends, none over its limit, nothing BROKEN.
+
+**The proof, on a third grid.** `CityUnitsTest` replaces its four-edge test with the reviewer's own
+grid, offset from both the rows' grid and the sweep: 16 bearings from 11.25° by 22.5°, at 25, 75, 90 and
+99 % of the radius, each unit's own tables. It found 0 early, 0 late ends, none over a limit, and no start
+past any unit's figure:
+- Umm al-Qura: 8,076 points, 6,191,779 place-days; worst Fajr 3, sunrise 3, the other starts 2, end of
+  eating 3.
+- QMDB: 4,552 points, 3,322,960 place-days; worst Fajr 10, sunrise 3, Dhuhr 2, Asr 3, Maghrib 3, Isha 8,
+  end of eating 11.
+
+**The limits, re-derived from the gate.**
+- **Umm al-Qura:** the entry's are unchanged (Fajr 2, every other start 2, sunrise and the end of eating
+  3). Fajr 3 now holds at 15 units: the nine above, plus Al Bada, Al Quwarah, Marat, Qaryat al Ulya, Rumah
+  and Tabuk.
+- **QMDB**, per unit (37 units):
+
+  | Fajr / Isha / end of eating | units |
+  |---|---|
+  | 10 / 8 / 10 | Petropavl |
+  | 10 / 7 / 9 | Pulemetovka |
+  | 9 / 8 / 11 | Lisakovsk, Makinsk |
+  | 9 / 8 / 10 | Akkol, Aksu (Pavlodar), Atbasar, Bugrovoe, Isakovka, Kokshetau, Kostanay, Krasny Yar, Kulomzino, Pavlodar |
+  | 9 / 7 / 11 | Ekibastuz |
+  | 9 / 7 / 10 | Rudny |
+  | 8 (entry) / 8 / 11 | Stepnogorsk |
+  | 8 / 7 / 11 | Arkalyk, Astana, Oskemen, Ridder |
+  | 8 / 7 / 10 | Aksay, Aktobe, Altay, Embi, Kalbatau, Kandyagash, Khromtau, Oral, Semey, Shemonaikha, Temirtau |
+  | 8 / 7 / 9 | Saran, Spasovka, Vagulino |
+  | 8 / 6 (entry) / 10 | Karaganda, Shakhtinsk |
+
+  The end of eating needs 11 at eight units. That is the entry's 8 at the table plus the reach's 3, and
+  it is above the review's 10, so the report puts it to the owner. It is recorded so that the gate states
+  it; the alternative is a smaller reach at those eight units.
+
+**The figures**, final (About's worst start of the unit across its area, against the round before the
+reach rows):
+- **Saudi pages:** Makkah, Riyadh, Jeddah, Dammam, Abha and Buraydah 1 → 2; Tabuk 1 → 3; Madinah and Taif
+  stay 2. Of the 173 units, 151 go from 1 to 2, 15 rise to 3, 2 stay 1, 4 stay 2, and Tayma stays 5.
+- **Kazakh app cities:**
+
+  | before → after | cities |
+  |---|---|
+  | 1 → 3 | Talgar, Novokazalinsk |
+  | 1 → 4 | Taraz, Turkistan, Taldykorgan, Zhanaozen, Sarkand, Kentau, Konaev, Shu, Karatau, Arys, Zharkent, Zhanatas, Mangystau, Shiyeli, Shelek, Aksu (Turkistan), Shardara, Saryagash, Zhanakorgan, Lenger, Burunday, Ushtobe, Zhosaly, Otegen Batyr, Turar Ryskulov, Merke, Sarykemer |
+  | 2 → 4 | Almaty, Shymkent, Kyzylorda, Aktau, Tekeli, Tasbuget |
+  | 2 → 5 | Balkhash, Makanshy |
+  | 3 → 4 | Zhetysay |
+  | 3 → 5 | Atyrau, Aral, Balykshi |
+  | 3 → 6 | Kulsary |
+  | 4 → 5 | Satpayev, Ayagoz, Shalqar |
+  | 4 → 6 | Zhezkazgan, Zaysan |
+  | 4 → 7 | Embi |
+  | 5 → 7 | Karaganda, Saran, Shakhtinsk |
+  | 5 → 8 | Altay, Kandyagash, Kalbatau |
+  | 6 → 7 | Temirtau |
+  | 6 → 8 | Astana, Aktobe, Oral, Ust-Kamenogorsk, Semey, Ridder, Arkalyk, Aksay, Khromtau, Shemonaikha |
+  | 6 → 9 | Ekibastuz, Aksu (Pavlodar), Lisakovsk, Atbasar, Makinsk |
+  | 7 → 8 | Stepnogorsk |
+  | 7 → 9 | Pavlodar, Kostanay, Kokshetau, Rudny, Akkol |
+  | 8 → 10 | Petropavl |
+
+**The own points' guard.** The reach's limits are wider than a table's own point needs. Umm al-Qura's
+starts 2 and ends 3, for example, against class A's minute. So `CityUnitsTest` holds the rows at each
+unit's own point and at the app's city point (the group files) to the limits they kept before the reach
+rows. A one-minute regression at a city's own point now fails:
+- Umm al-Qura: class A's 1, the lag dates' 2 at Fajr, sunrise and the end of eating, the three app
+  points west of KACST's, and Tayma's own.
+- QMDB: the entry's 8, 6 and 8, and class D's 3.
+
+**Beyond every unit** (ruling R45). Within three reaches, the nearest place's end bound cost up to
+12 min in Kazakhstan and 6 in Saudi Arabia against the user's own point. It is now kept within one reach
+only. For QMDB a reach is exactly where every time stays within 3 min of the user's own point, and for
+Umm al-Qura a minute of longitude. So beyond every unit it never applies, and the user's own point stands
+a minute later. Kazakhstan's edge now uses the user's own band, as on `main`, not the nearest place's.
+
+The measured cost against `main` at 400 random points beyond every unit in each country, every ninth day
+of 2026: starts up to 1 min later. Sunrise is up to 1 min earlier. The end of eating is up to 1 min
+earlier in Kazakhstan and 2 in Saudi Arabia, whose fitted 47 s is gone. No end comes after `main`'s.
+
+**Minors.** `CityRepository`'s snapshot and language are `@Volatile`. The recipes have 259 per-unit lines,
+one for each unit. The last round's commit message and docs said 260; the docs now say 259.
+
+**What moved.** Every stamp's `engineHash` moved (`Units.kt` is core). The golden vector moved on 44 of
+2,071 rows against `main`, every move safe, and on none against the commit before.
+
+Checked: the whole gate as above; tools `jvmTest` 307/0 with the archive (CityUnitsTest 9/0); `checkStamps`
+(71 entries) green; the fingerprint unchanged; `scripts/test.sh` with its four tasks: shared 1,614/0 on the
+Android host and 1,491/0 on iOS, widgetcore 91/0 and 89/0; the monitor's Python tests 105/0 on both
+Pythons. `CI=true generate` writes 55 cities and 129 pages; the site builds 164 pages, all checks good,
+and its tests pass 18/0. The engine change ships with the first update, not 1.0.0 (35).

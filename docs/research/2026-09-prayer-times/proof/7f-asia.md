@@ -731,6 +731,37 @@ end of eating. It is later at every start and earlier at every end than `main`.
 `CityUnitsTest`'s rings (24 cities, to 15 km, now held to the limits: 0 over) and its edges (95 % at
 four bearings: 0 over), not through rows.
 
+## Each unit's true worst (10 Oct 2026, the review's re-verify)
+
+The reviewer swept the units off the rows (16 bearings offset by 11.25°, at 25, 75, 90 and 99 % of the
+radius). Nothing was early, but 17 Kazakh figures were beaten by a minute: Atbasar, Ekibastuz,
+Lisakovsk, Aksu (Pavlodar), Makinsk, Akkol and Bugrovoe 8 → 9; Oskemen, Arkalyk, Altay, Kalbatau and
+Kandyagash 7 → 8; Karaganda 6 → 7; Kulsary 5 → 6; Otegen Batyr, Mangystau and Aksu (Turkistan) 3 → 4.
+Cells also passed their limits (the end of eating 11 against 10, among others).
+
+**The sweep.** `generateReachRows` now sweeps each unit against its own tables: 40 bearings from 4.5° by
+9°, at 35, 60, 80, 93, 97 and 99.5 % of the radius. It found 16,655 points inside their unit, nothing
+early, and adds each event's worst point to the rows: 546 points, 3,364 rows in all.
+
+**The proof on a third grid.** `CityUnitsTest` uses the reviewer's grid, offset from both: 4,552 points
+and 3,322,960 place-days. It found 0 early, 0 late ends, none over a limit, and no start past a unit's
+figure. Worst: Fajr 10, sunrise 3, Dhuhr 2, Asr 3, Maghrib 3, Isha 8, end of eating 11.
+
+**The limits** (`QmdbPlaces.reachLimits`, 37 units): Fajr 9 or 10 at 16 units, Isha 7 or 8 at 35, and the
+end of eating 9, 10 or 11 at all 37. The 11 falls at Astana, Arkalyk, Ekibastuz, Lisakovsk, Makinsk,
+Oskemen, Ridder and Stepnogorsk: the entry's 8 at the table plus the reach's 3. That is above the
+review's 10, so it is the owner's (BUILD-LOG lists every unit's limits). The rows at each unit's own
+point and the app's city point stay held to the entry's own 8, 6, 8 and class D's 3 (`CityUnitsTest`).
+
+**The figures** (final, against the round before the reach rows): 1 → 4 at 27 southern cities (Taraz,
+Turkistan, Konaev, Mangystau, Otegen Batyr …), 2 → 4 at Almaty and Shymkent, 6 → 8 at Astana, 6 → 9 at
+Ekibastuz, Lisakovsk, Atbasar, Makinsk and Aksu (Pavlodar), 7 → 9 at Pavlodar, Kostanay, Kokshetau,
+Rudny and Akkol, 8 → 10 at Petropavl. BUILD-LOG has every city.
+
+**Beyond every reach** R45's end bound is kept within one reach only, where a unit's 3 min bound it, so
+it never applies there. The edge uses the user's own band. Against `main`, starts are up to 1 min later
+and ends up to 1 min earlier; within three reaches, the bound had cost up to 12 min.
+
 ## Verification run
 
 ```
@@ -799,6 +830,17 @@ python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13
 ./gradlew -p tools/timetables jvmTest gate
   → jvmTest 306/0 with the archive (CityUnitsTest 8/0); 8,058 rows, 2,885,320 place-days: 0 early,
     0 late ends, none over its limit, nothing BROKEN (kz.qmdb 2,590 rows, 935,860 place-days)
+./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
+./scripts/test.sh --no-daemon :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
+  → shared 1,614/0 Android host, 1,491/0 iOS, widgetcore 91/0 and 89/0
+python3 -m unittest tests prove_tests (tools/timetables/monitor) → 105/0 (3.13 and the Mac's 3.9)
+
+# each unit's true worst, 10 Oct 2026
+./gradlew -p tools/timetables generateReachRows → kz.qmdb 16,655 points swept, 546 worst points, 3,364 rows (about 2 min)
+./gradlew -p tools/timetables jvmTest gate
+  → jvmTest 307/0 with the archive (CityUnitsTest 9/0: the third grid 4,552 Kazakh points, 0 early,
+    0 over, none past a figure); 10,961 rows, 3,988,749 place-days: 0 early, 0 late ends, none over
+    its limit, nothing BROKEN
 ./gradlew -p tools/timetables checkStamps   → 71 entries, every stamp fresh and green
 ./scripts/test.sh --no-daemon :shared:allTests :widgetcore:allTests :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
   → shared 1,614/0 Android host, 1,491/0 iOS, widgetcore 91/0 and 89/0
