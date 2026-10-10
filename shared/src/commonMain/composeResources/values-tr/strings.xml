@@ -90,6 +90,9 @@
     <string name="settings_language">Dil</string>
     <string name="settings_about">Taqwa hakkında</string>
     <string name="settings_attribution">Kaynaklar ve lisanslar</string>
+    <string name="settings_rate">Taqwa’yı değerlendir</string>
+    <string name="settings_share">Taqwa’yı paylaş</string>
+    <string name="settings_share_message">Taqwa: namaz vakitleri, Kur’an ve kıble. Ücretsiz, reklamsız, hesapsız.</string>
     <string name="settings_not_set">Belirlenmedi</string>
     <string name="settings_notifications_off">Kapalı</string>
     <string name="settings_notifications_on_count">%1$s açık</string>

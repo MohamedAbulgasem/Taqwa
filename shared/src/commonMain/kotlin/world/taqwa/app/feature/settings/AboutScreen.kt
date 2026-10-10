@@ -39,7 +39,6 @@ import world.taqwa.app.design.LocalTaqwaDark
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaRow
-import world.taqwa.app.design.components.drawExternalLink
 import world.taqwa.app.feature.onboarding.drawMihrab
 import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.resources.Res
@@ -142,18 +141,6 @@ fun AboutScreen(onBack: () -> Unit) {
             }
         }
     }
-}
-
-/** A row that leaves the app: the external-link glyph in the trailing slot says so before the tap. */
-@Composable
-private fun LinkRow(label: String, value: String?, forward: Boolean, onClick: () -> Unit) {
-    val tint = LocalTaqwaColors.current.textTertiary
-    TaqwaRow(
-        label,
-        value = value,
-        onClick = onClick,
-        trailing = { Canvas(Modifier.size(16.dp)) { drawExternalLink(tint, forward) } },
-    )
 }
 
 /**

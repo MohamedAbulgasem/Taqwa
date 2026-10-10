@@ -85,6 +85,9 @@
     <string name="settings_language">زبان</string>
     <string name="settings_about">تقویٰ کے بارے میں</string>
     <string name="settings_attribution">اعتراف اور لائسنس</string>
+    <string name="settings_rate">تقویٰ کو ریٹ کریں</string>
+    <string name="settings_share">تقویٰ شیئر کریں</string>
+    <string name="settings_share_message">تقویٰ: نماز کے اوقات، قرآن اور قبلہ۔ مفت، نہ اشتہار، نہ اکاؤنٹ۔</string>
     <string name="settings_not_set">مقرر نہیں</string>
     <string name="settings_notifications_off">بند</string>
     <string name="settings_notifications_on_count">%1$s فعال</string>
