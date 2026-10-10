@@ -776,8 +776,43 @@ class RoundTwo(unittest.TestCase):
             f.write("LPT_API_KEY=a b/c\n")
         http = FakeHttp([(london.API, FetchError("HTTP 404"))])
         self.assertEqual([], london.fetch(self.ctx("gb-london-lupt", http=http)))
-        self.assertEqual(1, len(http.urls), "a year the API lacks stops after its first month")
+        self.assertEqual(2, len(http.urls), "a year the API lacks stops after its first month and the probe")
         self.assertIn("key=a%20b%2Fc&", http.urls[0])
+
+    def lupt_ctx(self, answers):
+        with open(os.path.join(self.monitor, "keys.env"), "w") as f:
+            f.write("LPT_API_KEY=testkey123\n")
+        http = FakeHttp([(f"{london.API}?format=json&key=testkey123&{query}", body) for query, body in answers])
+        return self.ctx("gb-london-lupt", http=http), http
+
+    def test_a_year_not_yet_on_the_api_is_a_note_when_the_current_month_reads(self):
+        # As on 10 Oct 2026: the API answers 2027 without its days; October 2026 reads.
+        month = {"city": "london", "times": {"2026-10-01": {"fajr": "05:31", "sunrise": "07:06", "dhuhr": "12:52",
+                                                           "asr": "15:56", "magrib": "18:32", "isha": "19:55", "asr_2": "16:24"}}}
+        ctx, http = self.lupt_ctx([("year=2027", json.dumps({"city": "london", "times": {}}).encode()),
+                                   ("year=2026&month=10", json.dumps(month).encode())])
+        self.assertEqual([], london.fetch(ctx))
+        self.assertEqual([], ctx.errors)
+        self.assertEqual(1, len(ctx.notes))
+        self.assertIn("2027 is not on the API yet", ctx.notes[0])
+        self.assertIn("the current month reads fine", ctx.notes[0])
+        self.assertEqual(2, len(http.urls))
+
+    def test_an_answer_that_never_reads_is_an_error_with_its_shape_and_never_a_time(self):
+        refused = json.dumps({"error": "Invalid API key", "times": {}}).encode()
+        ctx, http = self.lupt_ctx([("year=2027", refused), ("year=2026&month=10", refused)])
+        self.assertEqual([], london.fetch(ctx))
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("'Invalid API key'", ctx.errors[0])
+        self.assertIn("the current month does not read either", ctx.errors[0])
+        self.assertIsNone(TIME_SHAPE.search(ctx.errors[0]), ctx.errors[0])
+
+    def test_a_shape_names_keys_and_types_never_values(self):
+        day = {"fajr": "05:31", "sunrise": "07:06", "date": "2026-10-01"}
+        text = london.shape({"city": "london", "times": {"2026-10-01": day}, "note": "x" * 200, "list": [1, 2]})
+        self.assertIsNone(TIME_SHAPE.search(text), text)
+        self.assertIn("city: str", text)
+        self.assertIn("list: [2 items]", text)
 
 
 class RoundThree(unittest.TestCase):

@@ -6,7 +6,16 @@ reminds from 1 December that the next year is wanted. The key travels in the que
 masked wherever a URL is written (common.redact). The API's shape here follows its published
 parameters (year, month, format=json, 24hours=true); it has not been exercised without a key, so
 the first run with one may need a fix: a month whose response lacks a field is an error, never a
-silent "-", and a year the API does not have yet stops after its first month."""
+silent "-", and a year the API does not have yet stops after its first month.
+
+The first run with a key (10 Oct 2026) found no dated times in any month of 2027: London Prayer
+Times adds the next year in late October ("2025 times added (24th Oct 2024)" on its API page), and
+until then the API answers without the year's days instead of an HTTP error. So when the coming
+year's first month holds no days, the current month is read once as a probe: if it reads, the
+parser and the key are fine and the year is simply not out yet (a note, not a failure); if it does
+not, both answers are an error, each with the response's shape (its keys and value types, and a
+short error message where the API gives one, never a time) so a key the API refuses or a changed
+format can be seen in the issue."""
 import json
 import urllib.parse
 
@@ -34,11 +43,35 @@ def find_times(obj):
     return None
 
 
+MESSAGE_KEYS = ("error", "message", "msg", "status", "detail")
+
+
+def shape(obj, depth=0):
+    """What a response holds, for a finding: its keys and the types of their values, and a short
+    error message where the API gives one; never a time or any other value."""
+    if isinstance(obj, dict):
+        if depth >= 2:
+            return "{…}" if obj else "{}"
+        parts = []
+        for k in list(obj)[:8]:
+            v = obj[k]
+            if isinstance(v, str) and str(k).lower() in MESSAGE_KEYS and len(v) <= 80:
+                parts.append(f"{k}: {v!r}")
+            else:
+                parts.append(f"{k}: {shape(v, depth + 1)}")
+        more = f", … {len(obj) - 8} more" if len(obj) > 8 else ""
+        return "{" + ", ".join(parts) + more + "}"
+    if isinstance(obj, list):
+        return f"[{len(obj)} items]"
+    return type(obj).__name__
+
+
 def month_rows(body):
     """{date: [7 times]} of one month's response; a day lacking a field is an error (review Q4)."""
-    times = find_times(json.loads(body.decode("utf-8", "replace")))
+    data = json.loads(body.decode("utf-8", "replace"))
+    times = find_times(data)
     if not times:
-        raise FetchError("no dated times in the response")
+        raise FetchError(f"no dated times in the response (it holds {shape(data)})")
     rows = {}
     for date, v in times.items():
         missing = [n for n in NAMES if not v.get(n)]
@@ -46,6 +79,16 @@ def month_rows(body):
             raise FetchError(f"{date}: no {', '.join(missing)} in the response (fields: {', '.join(sorted(v))})")
         rows[date] = [v[n] for n in NAMES]
     return rows
+
+
+def current_month(ctx, quoted):
+    """The probe: None when this month's days read, else what went wrong (the key is masked by the
+    context wherever the answer is written)."""
+    url = f"{API}?format=json&key={quoted}&year={ctx.today.year}&month={ctx.today.month}&24hours=true"
+    try:
+        return None if month_rows(ctx.http.get(url)) else "no days"
+    except (FetchError, ValueError) as e:
+        return str(e)
 
 
 def fetch(ctx):
@@ -65,8 +108,14 @@ def fetch(ctx):
                 t.add(date, times)
             t.raw.append((f"lpt-{year}-{month:02d}.json", body))
         except (FetchError, ValueError) as e:
-            if month == 1 and str(e).startswith("HTTP 4"):
-                ctx.note(f"{year} is not on the API yet ({e}); nothing fetched")
+            if month == 1 and (str(e).startswith("HTTP 4") or str(e).startswith("no dated times")):
+                probe = current_month(ctx, quoted)
+                if probe is None:
+                    ctx.note(f"{year} is not on the API yet ({e}); the current month reads fine, so the key and "
+                             f"the parser work; nothing fetched")
+                else:
+                    ctx.error(f"{year}-01: {e}; and the current month does not read either ({probe}): "
+                              f"the key or the API's format needs a look")
                 return []
             ctx.error(f"{year}-{month:02d}: {e}")
     t.merge = False
