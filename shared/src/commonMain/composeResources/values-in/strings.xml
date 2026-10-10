@@ -9,13 +9,13 @@
     <string name="onboarding_welcome_body">Waktu salat, kiblat, dan Al-Qur’an. Gratis selamanya. Tanpa iklan, tanpa akun, berfungsi offline.</string>
     <string name="onboarding_welcome_cta">Mulai</string>
     <string name="onboarding_location_title">Di mana Anda berada?</string>
-    <string name="onboarding_location_body">Waktu salat bergantung pada posisi Anda yang tepat. Semuanya dihitung di perangkat Anda. Lokasi Anda tidak pernah keluar dari ponsel.</string>
+    <string name="onboarding_location_body">Waktu salat bergantung pada posisi Anda. Semuanya dihitung di perangkat Anda. Lokasi Anda tidak pernah keluar dari ponsel.</string>
     <string name="onboarding_continue">Lanjutkan</string>
-    <string name="onboarding_notifications_title">Jangan lewatkan satu salat pun</string>
+    <string name="onboarding_notifications_title">Notifikasi salat</string>
     <string name="onboarding_notifications_body">Notifikasi pada setiap waktu salat. Anda memilih suaranya untuk tiap salat secara terpisah, dan bisa menggantinya kapan saja.</string>
     <string name="onboarding_notifications_secondary">Nanti saja</string>
-    <string name="onboarding_exact_title">Tepat pada waktunya</string>
-    <string name="onboarding_exact_body">Android hanya berbunyi tepat pada waktu salat jika izin “Alarm &amp; pengingat” diberikan untuk Taqwa. Tanpa izin itu, notifikasi bisa terlambat sampai satu jam.</string>
+    <string name="onboarding_exact_title">Alarm &amp; pengingat</string>
+    <string name="onboarding_exact_body">Android hanya bisa berbunyi tepat pada waktu salat jika izin “Alarm &amp; pengingat” diberikan untuk Taqwa. Tanpa izin itu, notifikasi bisa terlambat sampai satu jam.</string>
     <string name="onboarding_widget_title">Di layar utama Anda</string>
     <string name="onboarding_widget_body">Widget Taqwa menampilkan salat berikutnya dan hitung mundur yang terus berjalan, tanpa membuka aplikasi.</string>
     <string name="onboarding_widget_body_ios">Widget Taqwa menampilkan salat berikutnya dan hitung mundur yang terus berjalan, tanpa membuka aplikasi. Untuk menambahkannya, sentuh dan tahan ikon Taqwa di layar utama, lalu pilih ukuran widget.</string>
@@ -459,7 +459,7 @@
     <string name="qibla_cardinal_east">T</string>
     <string name="qibla_cardinal_south">S</string>
     <string name="qibla_cardinal_west">B</string>
-    <string name="notifications_exact_alarms_off">Alarm tepat waktu dimatikan untuk Taqwa, sehingga notifikasi bisa terlambat sampai satu jam. Izinkan “Alarm &amp; pengingat” untuk memperbaikinya.</string>
+    <string name="notifications_exact_alarms_off">Alarm tepat waktu dimatikan untuk Taqwa, sehingga notifikasi bisa terlambat sampai satu jam. Izinkan “Alarm &amp; pengingat” agar notifikasi bisa berbunyi tepat pada menitnya.</string>
     <string name="notifications_allow_exact_alarms">Izinkan alarm tepat waktu</string>
     <string name="notifications_blocked">Notifikasi dimatikan untuk Taqwa di pengaturan sistem, sehingga tidak ada peringatan salat yang bisa muncul sampai notifikasi diizinkan lagi.</string>
     <string name="notifications_open_settings">Buka pengaturan notifikasi</string>
