@@ -3199,3 +3199,71 @@ against 7 and Shakhtinsk 7 against 6. The sweep stopped at 99.5 %, and a reach h
 - On the two grids: 36,817 points and 27.7 million place-days, 0 early, 0 late ends, none over a limit,
   and no start past a figure. The whole gate is unchanged in size (10,997 rows, 4,001,889 place-days), and
   the golden vector did not move.
+
+## The app's own words, and the distance's thousands mark (10–11 October) — for 1.0.1
+
+The store listings and the site lost their accuracy and on-time promises on 6–9 October; the app's own
+strings waited for the next build. They follow now, in all seven languages, each the smallest change
+that makes the sentence true, in the words the site's support page already uses.
+
+**Onboarding.**
+- The location screen says prayer times depend on where you are. "Your exact position" was not true:
+  the app reads only approximate location, coarse on Android and reduced accuracy on iOS.
+- The notifications screen is headed with the app's own name for them, Prayer notifications (the
+  master toggle's words), not "Never miss a prayer".
+- Android's exact-alarm screen is headed with the permission it asks for, Alarms & reminders, not "On
+  time, to the minute". Its body says Android *can* ring at the exact prayer time only with it: with
+  it, a battery saver can still hold a notification back.
+
+**Elsewhere in the app.**
+- Settings › Notifications, exact alarms off: "Allow Alarms & reminders to fix this" becomes "… so it
+  can ring at the exact minute".
+- The clock-change sheet in Turkish, Urdu and Bengali said alerts come (ring) at the right time only on
+  an automatic clock; it now says they are right only then, the English's weaker claim. Arabic, French
+  and Indonesian already did.
+- Bengali Match my mosque writes আযান, the app's own spelling, not আজান.
+- The iOS location prompt (Info.plist and the seven InfoPlist.strings) no longer says "accurate".
+
+Every other string was read in every language against the same rules. The qibla's "the bearing and
+distance shown are correct" stays: it is about the bearing, which needs no sensor. The Indonesian and
+Urdu names of the exact-alarm switch ("alarm tepat waktu", "عین وقت کے الارم") stay too: they name
+Android's setting, and the site's support page quotes them.
+
+**The distance to Makkah.** It was grouped with a comma in every language. A Turkish or Indonesian
+reader writes the decimal with a comma, so "Mekke’ye 2,916 km" read as under three kilometres. The new
+`DigitGrouping` (shared `i18n`) picks the thousands mark from the reader's language and the digits the
+platform draws:
+- Turkish and Indonesian: a point, 2.916.
+- French: a narrow no-break space (U+202F), as the French strings already use before ? and :.
+- Arabic-Indic digits, and Urdu's Extended Arabic-Indic ones where a phone draws them: U+066C, the
+  Arabic thousands separator, ٢٬٩١٦. A Latin comma has the shape of the Arabic decimal ٫.
+- A comma everywhere else: English, Urdu in Western digits (Pakistan), Bengali (২,৯১৬), and Arabic in
+  Western digits (Libya, the Maghreb).
+
+Each mark is the partner of the decimal mark the app already writes for the same reader in a
+recitation's size (`NumberStyle`). So no reader sees one mark used for both, and a test holds every
+pair to that. Arabic in Western digits keeps the comma because the app writes "58.2 MB" there. CLDR
+would have a point for ar-LY, ar-MA, ar-DZ and ar-TN, where it also writes the decimal with a comma.
+The site's generator now compiles `DigitGrouping.kt` (and runs its test), and `Formats.distance` calls
+it. The app and a city page therefore cannot group a distance two ways.
+- City pages that change: every Turkish, Indonesian and French page whose distance runs to four
+  digits, and every such Arabic page in Arabic-Indic digits. That is 32 of the 129: 15 Arabic, 9
+  Indonesian, 6 French, 2 Turkish.
+- English, Urdu, Bengali and Western-digit Arabic pages are unchanged.
+
+**Checks.**
+- `./scripts/check-strings.sh` is clean, and values-in is values-id's copy.
+- The shared host tests pass: 1,633, 0 failures, with the new `DigitGroupingTest` (13),
+  `QiblaDistanceTest` (5) and `DownloadCopyTest`'s pairing test. `:shared:compileTestKotlinIosSimulatorArm64`
+  builds.
+- The tools' JVM tests pass (321), and the whole gate is unchanged: 10,997 rows, 4,001,889 place-days,
+  0 early, 0 late ends, none over its limit, nothing BROKEN. No stamp moved.
+- The site generates and builds (164 pages, all checks good), and its tests pass (18).
+
+**Screenshots that now show an old distance** (not re-shot):
+- `docs/store/screenshots/appstore/{fr,tr,id}/*-01.png` and `*-08.png`.
+- `docs/store/screenshots/play/{fr,tr,id}/*-01.png`, `*-06.png` and `*-08.png`.
+- The site's `site/assets/img/prayer-{light,dark}-{fr,tr,id}.webp`.
+
+No screenshot shows a changed sentence: the onboarding is in none, and the exact-alarm warning shows
+only with the permission off.
