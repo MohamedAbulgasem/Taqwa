@@ -214,24 +214,27 @@ internal fun pointTable(entry: RegistryEntry, name: String, point: GeoPoint): Un
  * user's point a minute later (the edge), the end of eating with no fitted margin (atEdge: SAFE_END or
  * lower), and, within [ENDS_REACH_FACTOR] reaches, the table's point still bounding sunrise, the end
  * of eating and imsak (an ends-only fixed point). Farther, the user's point alone: there the table's
- * sunrise would be more than three times the class's minutes before the user's own. [endsReachFactor]
- * narrows that where a unit's reach already bounds every time against the user's own point (Umm al-Qura's
- * and QMDB's places: one reach, so beyond every unit the user's point alone).
+ * sunrise would be more than three times the class's minutes before the user's own.
  */
-internal fun TimetableMethod.beyondTable(
-    id: String,
-    tablePoint: GeoPoint,
-    user: GeoPoint,
-    reachKm: Double,
-    endsReachFactor: Double = ENDS_REACH_FACTOR,
-): TimetableMethod {
+internal fun TimetableMethod.beyondTable(id: String, tablePoint: GeoPoint, user: GeoPoint, reachKm: Double): TimetableMethod {
     val edge = atEdge(id, margins.widened(BEYOND_REACH_SECONDS))
-    return if (distanceKm(user, tablePoint) <= reachKm * endsReachFactor) {
+    return if (distanceKm(user, tablePoint) <= reachKm * ENDS_REACH_FACTOR) {
         edge.copy(fixedPoint = tablePoint, fixedPointMode = FixedPointMode.ENDS_ONLY)
     } else {
         edge.copy(fixedPoint = null)
     }
 }
+
+/**
+ * [this] beyond every unit of an authority whose every place is a unit, Umm al-Qura's and QMDB's (rulings R44 and
+ * R45, the reviews of 10 Oct 2026): [beyondTable]'s edge, the user's point a minute later and the end of eating with
+ * no fitted margin, but no table's point bounding an end. R45 keeps that bound within one reach only there, where a
+ * unit's own bound covers its cost (QMDB's reach is where every time stays within 3 min of the user's own point,
+ * Umm al-Qura's a minute of longitude), and a user beyond every unit is beyond every reach; within three it had cost
+ * up to 12 min.
+ */
+internal fun TimetableMethod.beyondEveryUnit(id: String): TimetableMethod =
+    atEdge(id, margins.widened(BEYOND_REACH_SECONDS)).copy(fixedPoint = null)
 
 /** How many reaches a point table's point still bounds the ends beyond its reach (ruling R45). */
 internal const val ENDS_REACH_FACTOR = 3.0

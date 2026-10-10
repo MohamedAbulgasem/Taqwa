@@ -1,27 +1,27 @@
 {
   "entry": "kz.qmdb",
   "class": "D (authority)",
-  "engineHash": "706c6b3b7b6be3e9",
+  "engineHash": "7917fb3c743cd17e",
   "broken": 0,
-  "places": 1828,
+  "places": 1832,
   "first": "2026-01-01",
   "last": "2027-12-31",
   "checked": ["2026-01-01..2027-12-31"],
-  "placeDays": 1334440,
-  "heldOutDays": 1328235,
-  "ramadanDays": 107852,
+  "placeDays": 1337360,
+  "heldOutDays": 1331155,
+  "ramadanDays": 108088,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 1334440,
+      "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 244260,
-        "1": 734204,
-        "2": 251070,
-        "3+": 104906
+        "0": 244738,
+        "1": 735751,
+        "2": 251569,
+        "3+": 105302
       },
       "exactShare": 0.183,
       "worstLate": 10,
@@ -30,58 +30,58 @@
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 1334440,
+      "checked": 1337360,
       "lateEnd": 0,
       "late": {
-        "0": 720303,
-        "1": 540477,
-        "2": 73429,
-        "3+": 231
+        "0": 721733,
+        "1": 541658,
+        "2": 73737,
+        "3+": 232
       },
-      "exactShare": 0.5398,
+      "exactShare": 0.5397,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 1334440,
+      "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 783952,
-        "1": 506836,
-        "2": 43652,
+        "0": 785483,
+        "1": 508183,
+        "2": 43694,
         "3+": 0
       },
-      "exactShare": 0.5875,
+      "exactShare": 0.5873,
       "worstLate": 2,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "asrHanafi": {
-      "checked": 1334440,
+      "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 492987,
-        "1": 686474,
-        "2": 153099,
+        "0": 494232,
+        "1": 687931,
+        "2": 153317,
         "3+": 1880
       },
-      "exactShare": 0.3694,
+      "exactShare": 0.3696,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 1334440,
+      "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 615073,
-        "1": 607567,
-        "2": 111462,
-        "3+": 338
+        "0": 616416,
+        "1": 608864,
+        "2": 111729,
+        "3+": 351
       },
       "exactShare": 0.4609,
       "worstLate": 3,
@@ -90,30 +90,30 @@
       "overLimit": 0
     },
     "isha": {
-      "checked": 1334440,
+      "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 213951,
-        "1": 733027,
-        "2": 250116,
-        "3+": 137346
+        "0": 214233,
+        "1": 734246,
+        "2": 250577,
+        "3+": 138304
       },
-      "exactShare": 0.1603,
+      "exactShare": 0.1602,
       "worstLate": 8,
       "lateLimit": 8,
       "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 1334440,
+      "checked": 1337360,
       "lateEnd": 0,
       "late": {
-        "0": 184482,
-        "1": 283962,
-        "2": 81383,
-        "3+": 784613
+        "0": 184509,
+        "1": 283950,
+        "2": 81529,
+        "3+": 787372
       },
-      "exactShare": 0.1382,
+      "exactShare": 0.138,
       "worstLate": 11,
       "lateLimit": 11,
       "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit karaganda, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shakhtinsk, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
@@ -121,17 +121,17 @@
     }
   },
   "heldOut": {
-    "placeDays": 1328235,
-    "ramadanDays": 107350,
+    "placeDays": 1331155,
+    "ramadanDays": 107586,
     "events": {
       "fajr": {
-        "checked": 1328235,
+        "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 242293,
-          "1": 730592,
-          "2": 250960,
-          "3+": 104390
+          "0": 242771,
+          "1": 732139,
+          "2": 251459,
+          "3+": 104786
         },
         "exactShare": 0.1824,
         "worstLate": 10,
@@ -140,58 +140,58 @@
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 1328235,
+        "checked": 1331155,
         "lateEnd": 0,
         "late": {
-          "0": 715765,
-          "1": 538810,
-          "2": 73429,
-          "3+": 231
+          "0": 717195,
+          "1": 539991,
+          "2": 73737,
+          "3+": 232
         },
-        "exactShare": 0.5389,
+        "exactShare": 0.5388,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 1328235,
+        "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 778548,
-          "1": 506035,
-          "2": 43652,
+          "0": 780079,
+          "1": 507382,
+          "2": 43694,
           "3+": 0
         },
-        "exactShare": 0.5862,
+        "exactShare": 0.586,
         "worstLate": 2,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "asrHanafi": {
-        "checked": 1328235,
+        "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 489210,
-          "1": 684046,
-          "2": 153099,
+          "0": 490455,
+          "1": 685503,
+          "2": 153317,
           "3+": 1880
         },
-        "exactShare": 0.3683,
+        "exactShare": 0.3684,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 1328235,
+        "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 610513,
-          "1": 605922,
-          "2": 111462,
-          "3+": 338
+          "0": 611856,
+          "1": 607219,
+          "2": 111729,
+          "3+": 351
         },
         "exactShare": 0.4596,
         "worstLate": 3,
@@ -200,30 +200,30 @@
         "overLimit": 0
       },
       "isha": {
-        "checked": 1328235,
+        "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 212401,
-          "1": 729444,
-          "2": 249640,
-          "3+": 136750
+          "0": 212683,
+          "1": 730663,
+          "2": 250101,
+          "3+": 137708
         },
-        "exactShare": 0.1599,
+        "exactShare": 0.1598,
         "worstLate": 8,
         "lateLimit": 8,
         "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 1328235,
+        "checked": 1331155,
         "lateEnd": 0,
         "late": {
-          "0": 184247,
-          "1": 283634,
-          "2": 81217,
-          "3+": 779137
+          "0": 184274,
+          "1": 283622,
+          "2": 81363,
+          "3+": 781896
         },
-        "exactShare": 0.1387,
+        "exactShare": 0.1384,
         "worstLate": 11,
         "lateLimit": 11,
         "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit karaganda, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shakhtinsk, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
@@ -1148,13 +1148,13 @@
           "checked": 10220,
           "early": 0,
           "late": {
-            "0": 2848,
-            "1": 6473,
-            "2": 899,
-            "3+": 0
+            "0": 2772,
+            "1": 6294,
+            "2": 1153,
+            "3+": 1
           },
-          "exactShare": 0.2787,
-          "worstLate": 2,
+          "exactShare": 0.2712,
+          "worstLate": 3,
           "lateLimit": 8,
           "lateLimitFrom": "entry kz.qmdb",
           "overLimit": 0
@@ -1163,12 +1163,12 @@
           "checked": 10220,
           "lateEnd": 0,
           "late": {
-            "0": 5396,
-            "1": 4494,
+            "0": 5571,
+            "1": 4319,
             "2": 330,
             "3+": 0
           },
-          "exactShare": 0.528,
+          "exactShare": 0.5451,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1178,12 +1178,12 @@
           "checked": 10220,
           "early": 0,
           "late": {
-            "0": 6595,
-            "1": 3624,
-            "2": 1,
+            "0": 5947,
+            "1": 4230,
+            "2": 43,
             "3+": 0
           },
-          "exactShare": 0.6453,
+          "exactShare": 0.5819,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1193,12 +1193,12 @@
           "checked": 10220,
           "early": 0,
           "late": {
-            "0": 4290,
-            "1": 5303,
-            "2": 627,
+            "0": 3990,
+            "1": 5386,
+            "2": 844,
             "3+": 0
           },
-          "exactShare": 0.4198,
+          "exactShare": 0.3904,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1208,12 +1208,12 @@
           "checked": 10220,
           "early": 0,
           "late": {
-            "0": 5290,
-            "1": 4112,
-            "2": 813,
-            "3+": 5
+            "0": 4881,
+            "1": 4245,
+            "2": 1076,
+            "3+": 18
           },
-          "exactShare": 0.5176,
+          "exactShare": 0.4776,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1223,12 +1223,12 @@
           "checked": 10220,
           "early": 0,
           "late": {
-            "0": 1736,
-            "1": 5891,
-            "2": 1833,
-            "3+": 760
+            "0": 1506,
+            "1": 5589,
+            "2": 2131,
+            "3+": 994
           },
-          "exactShare": 0.1699,
+          "exactShare": 0.1474,
           "worstLate": 4,
           "lateLimit": 6,
           "lateLimitFrom": "entry kz.qmdb",
@@ -1238,12 +1238,12 @@
           "checked": 10220,
           "lateEnd": 0,
           "late": {
-            "0": 3045,
-            "1": 5620,
-            "2": 1336,
+            "0": 3069,
+            "1": 5549,
+            "2": 1383,
             "3+": 219
           },
-          "exactShare": 0.2979,
+          "exactShare": 0.3003,
           "worstLate": 4,
           "lateLimit": 8,
           "lateLimitFrom": "entry kz.qmdb",
@@ -1798,12 +1798,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 3255,
-            "1": 9915,
-            "2": 4105,
+            "0": 3258,
+            "1": 9910,
+            "2": 4107,
             "3+": 975
           },
-          "exactShare": 0.1784,
+          "exactShare": 0.1785,
           "worstLate": 5,
           "lateLimit": 8,
           "lateLimitFrom": "entry kz.qmdb",
@@ -1813,13 +1813,13 @@
           "checked": 18250,
           "lateEnd": 0,
           "late": {
-            "0": 9514,
-            "1": 7772,
-            "2": 964,
-            "3+": 0
+            "0": 9209,
+            "1": 7777,
+            "2": 1263,
+            "3+": 1
           },
-          "exactShare": 0.5213,
-          "worstLate": 2,
+          "exactShare": 0.5046,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -1843,12 +1843,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 6344,
-            "1": 9445,
+            "0": 6366,
+            "1": 9423,
             "2": 2452,
             "3+": 9
           },
-          "exactShare": 0.3476,
+          "exactShare": 0.3488,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1858,12 +1858,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 8167,
-            "1": 8348,
+            "0": 8217,
+            "1": 8298,
             "2": 1734,
             "3+": 1
           },
-          "exactShare": 0.4475,
+          "exactShare": 0.4502,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1873,12 +1873,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2820,
-            "1": 10074,
-            "2": 4144,
-            "3+": 1212
+            "0": 2889,
+            "1": 10111,
+            "2": 4070,
+            "3+": 1180
           },
-          "exactShare": 0.1545,
+          "exactShare": 0.1583,
           "worstLate": 5,
           "lateLimit": 6,
           "lateLimitFrom": "entry kz.qmdb",
@@ -7128,12 +7128,12 @@
           "checked": 7300,
           "early": 0,
           "late": {
-            "0": 469,
-            "1": 3664,
-            "2": 1619,
-            "3+": 1548
+            "0": 480,
+            "1": 3640,
+            "2": 1630,
+            "3+": 1550
           },
-          "exactShare": 0.0642,
+          "exactShare": 0.0658,
           "worstLate": 10,
           "lateLimit": 10,
           "lateLimitFrom": "unit pulemetovka",
@@ -7143,13 +7143,13 @@
           "checked": 7300,
           "lateEnd": 0,
           "late": {
-            "0": 5235,
-            "1": 2065,
-            "2": 0,
+            "0": 5142,
+            "1": 2157,
+            "2": 1,
             "3+": 0
           },
-          "exactShare": 0.7171,
-          "worstLate": 1,
+          "exactShare": 0.7044,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -7173,12 +7173,12 @@
           "checked": 7300,
           "early": 0,
           "late": {
-            "0": 1545,
-            "1": 4653,
+            "0": 1565,
+            "1": 4633,
             "2": 1102,
             "3+": 0
           },
-          "exactShare": 0.2116,
+          "exactShare": 0.2144,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -7188,12 +7188,12 @@
           "checked": 7300,
           "early": 0,
           "late": {
-            "0": 2539,
-            "1": 4294,
+            "0": 2565,
+            "1": 4268,
             "2": 467,
             "3+": 0
           },
-          "exactShare": 0.3478,
+          "exactShare": 0.3514,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -7203,12 +7203,12 @@
           "checked": 7300,
           "early": 0,
           "late": {
-            "0": 606,
-            "1": 3629,
-            "2": 1462,
-            "3+": 1603
+            "0": 615,
+            "1": 3625,
+            "2": 1456,
+            "3+": 1604
           },
-          "exactShare": 0.083,
+          "exactShare": 0.0842,
           "worstLate": 7,
           "lateLimit": 7,
           "lateLimitFrom": "unit pulemetovka",
@@ -7219,9 +7219,9 @@
           "lateEnd": 0,
           "late": {
             "0": 13,
-            "1": 132,
-            "2": 223,
-            "3+": 6932
+            "1": 122,
+            "2": 225,
+            "3+": 6940
           },
           "exactShare": 0.0018,
           "worstLate": 9,
@@ -9335,105 +9335,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 4380,
+          "checked": 5110,
           "early": 0,
           "late": {
-            "0": 535,
-            "1": 2970,
-            "2": 336,
-            "3+": 539
+            "0": 581,
+            "1": 3518,
+            "2": 383,
+            "3+": 628
           },
-          "exactShare": 0.1221,
+          "exactShare": 0.1137,
           "worstLate": 8,
           "lateLimit": 8,
           "lateLimitFrom": "entry kz.qmdb",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 4380,
+          "checked": 5110,
           "lateEnd": 0,
           "late": {
-            "0": 3185,
-            "1": 1195,
+            "0": 3725,
+            "1": 1385,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7272,
+          "exactShare": 0.729,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 4380,
+          "checked": 5110,
           "early": 0,
           "late": {
-            "0": 2865,
-            "1": 1515,
+            "0": 3257,
+            "1": 1853,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6541,
+          "exactShare": 0.6374,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrHanafi": {
-          "checked": 4380,
+          "checked": 5110,
           "early": 0,
           "late": {
-            "0": 1634,
-            "1": 2739,
-            "2": 7,
+            "0": 1851,
+            "1": 3251,
+            "2": 8,
             "3+": 0
           },
-          "exactShare": 0.3731,
+          "exactShare": 0.3622,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 4380,
+          "checked": 5110,
           "early": 0,
           "late": {
-            "0": 2188,
-            "1": 2179,
-            "2": 13,
+            "0": 2455,
+            "1": 2640,
+            "2": 15,
             "3+": 0
           },
-          "exactShare": 0.4995,
+          "exactShare": 0.4804,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 4380,
+          "checked": 5110,
           "early": 0,
           "late": {
-            "0": 439,
-            "1": 2490,
-            "2": 464,
-            "3+": 987
+            "0": 455,
+            "1": 2928,
+            "2": 547,
+            "3+": 1180
           },
-          "exactShare": 0.1002,
+          "exactShare": 0.089,
           "worstLate": 7,
           "lateLimit": 7,
           "lateLimitFrom": "unit spasovka",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 4380,
+          "checked": 5110,
           "lateEnd": 0,
           "late": {
-            "0": 4,
-            "1": 81,
-            "2": 157,
-            "3+": 4138
+            "0": 5,
+            "1": 94,
+            "2": 182,
+            "3+": 4829
           },
-          "exactShare": 9.0E-4,
+          "exactShare": 0.001,
           "worstLate": 9,
           "lateLimit": 9,
           "lateLimitFrom": "unit spasovka",
@@ -10635,105 +10635,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 2190,
+          "checked": 4380,
           "early": 0,
           "late": {
-            "0": 537,
-            "1": 1242,
-            "2": 120,
-            "3+": 291
+            "0": 1031,
+            "1": 2449,
+            "2": 305,
+            "3+": 595
           },
-          "exactShare": 0.2452,
+          "exactShare": 0.2354,
           "worstLate": 8,
           "lateLimit": 8,
           "lateLimitFrom": "entry kz.qmdb",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2190,
+          "checked": 4380,
           "lateEnd": 0,
           "late": {
-            "0": 1367,
-            "1": 823,
-            "2": 0,
+            "0": 2480,
+            "1": 1892,
+            "2": 8,
             "3+": 0
           },
-          "exactShare": 0.6242,
-          "worstLate": 1,
+          "exactShare": 0.5662,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2190,
+          "checked": 4380,
           "early": 0,
           "late": {
-            "0": 1857,
-            "1": 333,
+            "0": 3644,
+            "1": 736,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8479,
+          "exactShare": 0.832,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrHanafi": {
-          "checked": 2190,
+          "checked": 4380,
           "early": 0,
           "late": {
-            "0": 1314,
-            "1": 876,
+            "0": 2600,
+            "1": 1780,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6,
+          "exactShare": 0.5936,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2190,
+          "checked": 4380,
           "early": 0,
           "late": {
-            "0": 1444,
-            "1": 746,
-            "2": 0,
+            "0": 2853,
+            "1": 1525,
+            "2": 2,
             "3+": 0
           },
-          "exactShare": 0.6594,
-          "worstLate": 1,
+          "exactShare": 0.6514,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 2190,
+          "checked": 4380,
           "early": 0,
           "late": {
-            "0": 435,
-            "1": 1069,
-            "2": 199,
-            "3+": 487
+            "0": 853,
+            "1": 2119,
+            "2": 359,
+            "3+": 1049
           },
-          "exactShare": 0.1986,
+          "exactShare": 0.1947,
           "worstLate": 7,
           "lateLimit": 7,
           "lateLimitFrom": "unit vagulino",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2190,
+          "checked": 4380,
           "lateEnd": 0,
           "late": {
-            "0": 17,
-            "1": 64,
-            "2": 65,
-            "3+": 2044
+            "0": 19,
+            "1": 120,
+            "2": 137,
+            "3+": 4104
           },
-          "exactShare": 0.0078,
+          "exactShare": 0.0043,
           "worstLate": 9,
           "lateLimit": 9,
           "lateLimitFrom": "unit vagulino",

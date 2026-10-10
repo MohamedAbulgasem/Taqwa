@@ -17,7 +17,7 @@ import world.taqwa.app.prayer.engine.registry.SAFE_SUNRISE
 import world.taqwa.app.prayer.engine.registry.Scope
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
-import world.taqwa.app.prayer.engine.registry.beyondTable
+import world.taqwa.app.prayer.engine.registry.beyondEveryUnit
 import world.taqwa.app.prayer.engine.registry.data.UmmAlQuraCities
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateReachKm
@@ -170,18 +170,14 @@ object UmmAlQura {
      * [UmmAlQuraCities]' 173 places is a unit at KACST's own point, which rides as the fixed point beside the user's
      * (ruling R15: starts the later, ends the earlier), within its R40 reach for class A, one minute of longitude
      * (24 to 27 km); gated at its own point, at the app's point for each Saudi city (sa-ummalqura.tsv) and across its
-     * reach (sa-ummalqura-reach.tsv). Beyond every unit, a point table's edge ([beyondTable], rulings R44 and R45):
-     * the user's own point a minute later, the end of eating without its fitted 47 s (a margin fitted at a table's
-     * point applies there only, so SAFE_END), and no figure (spec §3.5). R45's end bound, the nearest place's point,
-     * is kept within one reach only, as far as a unit's own minute bounds it: within three reaches it cost up to
-     * 6 min of sunrise against the user's own point (the review of 10 Oct 2026), and beyond every unit it never
-     * applies. About and the site call the place by the app's name for the city whose table it is
+     * reach (sa-ummalqura-reach.tsv). Beyond every unit, a point table's edge with no end bound ([beyondEveryUnit],
+     * rulings R44 and R45): the user's own point a minute later, the end of eating without its fitted 47 s (a margin
+     * fitted at a table's point applies there only, so SAFE_END), and no figure (spec §3.5); within three reaches the
+     * nearest place's end bound had cost up to 6 min of sunrise (the review of 10 Oct 2026). About and the site call
+     * the place by the app's name for the city whose table it is
      * ([AuthorityUnit.named], [AuthorityUnit.cityId]).
      */
-    val units = UnitSet("sa.ummalqura", cityUnits, choose = ::taymaTown) { user ->
-        val nearest = cityUnits.minBy { distanceKm(user, it.point) }
-        method.beyondTable("sa.ummalqura.edge", nearest.point, user, nearest.radiusKm, endsReachFactor = 1.0)
-    }
+    val units = UnitSet("sa.ummalqura", cityUnits, choose = ::taymaTown) { method.beyondEveryUnit("sa.ummalqura.edge") }
 
     /**
      * KACST's list places Tayma at 28.63° N, a degree north of the town (the app's city list and every map put it at

@@ -15,7 +15,7 @@ import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.Where
-import world.taqwa.app.prayer.engine.registry.beyondTable
+import world.taqwa.app.prayer.engine.registry.beyondEveryUnit
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
 import world.taqwa.app.prayer.engine.registry.distanceKm
@@ -217,12 +217,10 @@ object CentralAsia {
      * Every other place, the five QMDB serves no table for ([QmdbPlaces.unanswered]) among them, is a unit that
      * claims no figure. A measured place whose own tables, replayed across its reach (kz-qmdb-reach.tsv), pass the
      * entry's Fajr, Isha or end-of-eating limit carries its own ([QmdbPlaces.reachLimits], [reachLateLimits]).
-     * Beyond every reach, a point table's edge ([beyondTable], rulings R44 and R45): the user's own point a minute
-     * later, the end of eating at SAFE_END or the bands' own earlier margins, and no figure (spec §3.5). R45's end
-     * bound, the nearest place's point, is kept within one reach only: a reach is where every time stays within 3 min
-     * of the user's own point, and within three reaches the bound cost up to 12 min (the review of 10 Oct 2026), so
-     * beyond every reach it never applies. About and the site call the place by the app's name for it
-     * ([AuthorityUnit.named]).
+     * Beyond every reach, a point table's edge with no end bound ([beyondEveryUnit], rulings R44 and R45): the user's
+     * own point a minute later, the end of eating at SAFE_END or the bands' own earlier margins, and no figure (spec
+     * §3.5); within three reaches the nearest place's end bound had cost up to 12 min (the review of 10 Oct 2026).
+     * About and the site call the place by the app's name for it ([AuthorityUnit.named]).
      */
     val kazakhstanUnits: UnitSet by lazy {
         val measured = QmdbPlaces.all.associateBy { it.qmdbId }
@@ -244,10 +242,9 @@ object CentralAsia {
         // A checked place inside a city's reach (Zhenis, in Zhetysay's) is the city's: its table is held against the
         // city's times (kz-qmdb.tsv), and its own unit, which no user inside the city's reach takes, claims no figure.
         val units = places.map { if (it.measured && it.cityId == null && cityHolding(cities, it.point) != null) it.copy(measured = false) else it }
-        // The user's own band, not the nearest place's, as on main: the registry applies it ([variants], by the user).
-        UnitSet("kz.qmdb", units, choose = { place -> cityHolding(cities, GeoPoint(place.lat, place.lon)) }) { user ->
-            val nearest = units.minBy { distanceKm(user, it.point) }
-            kazakhstanMethod.beyondTable("kz.qmdb.edge", nearest.point, user, nearest.radiusKm, endsReachFactor = 1.0)
+        // The user's own band, not a place's, as on main: the registry applies it ([variants], by the user).
+        UnitSet("kz.qmdb", units, choose = { place -> cityHolding(cities, GeoPoint(place.lat, place.lon)) }) {
+            kazakhstanMethod.beyondEveryUnit("kz.qmdb.edge")
         }
     }
 

@@ -272,6 +272,27 @@ tasks.register<JavaExec>("generateReachRows") {
 }
 
 /**
+ * Writes `official/own-points-worst.tsv`: each own-point row's own worst lateness per event (Umm al-Qura's and QMDB's
+ * group files; `units/OwnPointWorst.kt`), which `CityUnitsTest` holds every such row to. Re-run when a change is meant
+ * to move an own point's lateness, or to take in rows `prove` added, then commit.
+ *
+ *     ./gradlew -p tools/timetables generateOwnPointWorst
+ */
+tasks.register<JavaExec>("generateOwnPointWorst") {
+    group = "application"
+    description = "Writes each Umm al-Qura and QMDB own-point row's worst lateness, which CityUnitsTest holds."
+    requireArchive()
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.OwnPointWorstKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "2g"
+    val root = repoRoot.path
+    val official = officialRoot
+    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", root, "--official", official.get()) })
+}
+
+/**
  * Writes `DiyanetEuropeCurves.kt`, the per-city curves of Diyanet's European tables, from every held
  * capture of each city (restricted, read from the official root); the generator's KDoc says how a
  * slot is derived. Re-run when a capture is added to the archive, then run the gate and commit.

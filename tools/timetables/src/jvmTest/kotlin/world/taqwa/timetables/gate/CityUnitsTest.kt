@@ -14,6 +14,7 @@ import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.timetables.TestPaths
 import world.taqwa.timetables.monitor.Recipes
+import world.taqwa.timetables.units.OwnPointWorst
 import world.taqwa.timetables.units.QmdbReach
 import world.taqwa.timetables.units.ReachRows
 import java.io.File
@@ -157,9 +158,8 @@ class CityUnitsTest {
     }
 
     /**
-     * With the archive, the review of 10 Oct 2026: every measured unit's own tables on a grid of its own, offset from
-     * both the reach rows' grid and their sweep ([SWEEP_BEARINGS] × [SWEEP_SHARES]: 16 bearings from 11.25° by 22.5°,
-     * at a quarter, three quarters, 90 % and 99 % of the radius), a point another unit takes left out. Never early, no
+     * With the archive, the reviews of 10 Oct 2026: every measured unit's own tables on the review's two grids
+     * ([GRIDS], one offset from the reach rows' grid and every sweep), a point another unit takes left out. Never early, no
      * end late, nothing over its limit, and no start beyond the unit's own figure (its committed stamp row, which
      * About reads): the reach rows found each unit's true worst.
      */
@@ -176,7 +176,8 @@ class CityUnitsTest {
                 requireNotNull(Units.of(spec.entry)).units.filter { it.measured }.map { unit ->
                     pool.submit<Checked> {
                         val own = ReachRows.ownRows(manifest, spec, unit)
-                        val points = ReachRows.points(spec, unit, own.first().zone, SWEEP_SHARES, SWEEP_BEARINGS)
+                        val points = GRIDS.flatMap { (bearings, shares) -> ReachRows.points(spec, unit, own.first().zone, shares, bearings) }
+                            .distinctBy { it.at }
                         val tally = Tally()
                         val beyond = mutableListOf<String>()
                         if (roots.held) {
@@ -210,19 +211,32 @@ class CityUnitsTest {
     }
 
     /**
-     * The review of 10 Oct 2026: the reach's limits are wider than a table's own point needs (Umm al-Qura's starts 2 and
-     * ends 3 for the reach, against class A's minute), so the rows at each unit's own point and at the app's point for
-     * its city (the group files, without the reach files) are held here to the limits they kept before the reach rows:
-     * a one-minute regression at a city's own point fails.
+     * The reviews of 10 Oct 2026: the reach's limits are wider than a table's own point needs (Umm al-Qura's starts 2
+     * and ends 3 for the reach, against class A's minute; QMDB's per unit), so every row at a unit's own point and at
+     * the app's point for its city (the group files, without the reach files) is held here, each on its own, to its own
+     * worst per event as `generateOwnPointWorst` measured it (official/own-points-worst.tsv): a one-minute regression
+     * at a city's own point fails, at Almaty as at Petropavl. Each row also stays within the limits the own points kept
+     * before the reach rows (the documented exceptions, [pointLimit]); a row `prove` adds since is held to those alone.
      */
     @Test
-    fun `at each unit's own point and the app's city point the limits from before the reach hold`() {
+    fun `at each unit's own point and the app's city point every row keeps its own worst`() {
         val official = File(System.getProperty("taqwa.official") ?: error("taqwa.official not set"))
         val roots = OfficialRoots(official, TestPaths.repoRoot.resolve("tools/timetables/official"))
         val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate"))
-        val result = Gate(roots).evaluate(manifest.only(groups = setOf("sa-ummalqura", "kz-qmdb")))
+        val baseline = OwnPointWorst.read(TestPaths.repoRoot.resolve(OwnPointWorst.FILE))
         if (!roots.held) return
+        val now = OwnPointWorst.measure(roots, manifest)
         val over = mutableListOf<String>()
+        var unbaselined = 0
+        for ((key, events) in now) {
+            val before = baseline[key]
+            if (before == null) unbaselined++
+            for ((event, worst) in events) {
+                val was = before?.get(event)
+                if (was != null && worst > was) over += "$key $event: $worst min, its own worst $was"
+            }
+        }
+        val result = Gate(roots).evaluate(manifest.only(groups = OwnPointWorst.GROUPS.toSet()))
         for ((entry, s) in result.entries) {
             for ((unit, u) in s.units) {
                 for ((event, e) in u.events) {
@@ -231,7 +245,8 @@ class CityUnitsTest {
                 }
             }
         }
-        if (over.isNotEmpty()) fail("${over.size} over the own point's limits:\n" + over.joinToString("\n"))
+        println("own points: ${now.size} rows, ${now.size - unbaselined} held to their own worst, $unbaselined to the limits alone")
+        if (over.isNotEmpty()) fail("${over.size} over an own point's worst or limit (./gradlew -p tools/timetables generateOwnPointWorst where meant):\n" + over.joinToString("\n"))
     }
 
     /**
@@ -257,9 +272,15 @@ class CityUnitsTest {
 
     private val STARTS = setOf("fajr", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha")
 
-    /** The independent grid: 16 bearings from 11.25° by 22.5°, offset from the reach rows' 45° and their sweep's 9°. */
-    private val SWEEP_BEARINGS = (0 until 16).map { 11.25 + 22.5 * it }
-    private val SWEEP_SHARES = listOf(0.25, 0.75, 0.9, 0.99)
+    /**
+     * The review's two grids (10 Oct 2026): 16 bearings from 11.25° by 22.5° at a quarter, three quarters, 90 % and
+     * 99 % of the radius, offset from the reach rows' grid and from every sweep of generateReachRows; and 24 bearings
+     * from 7.5° by 15° at 40, 85 and 99.5 %, which the sweep now includes.
+     */
+    private val GRIDS: List<Pair<List<Double>, List<Double>>> = listOf(
+        (0 until 16).map { 11.25 + 22.5 * it } to listOf(0.25, 0.75, 0.9, 0.99),
+        (0 until 24).map { 7.5 + 15.0 * it } to listOf(0.4, 0.85, 0.995),
+    )
 
     /**
      * The review of 9 Oct 2026 ("prove it across the unit"): every measured Umm al-Qura and QMDB unit's own tables are

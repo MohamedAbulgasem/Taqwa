@@ -25,9 +25,10 @@ import kotlin.system.exitProcess
  * with the unit (`<entry>/<unit>`, so the gate checks the point resolves there):
  *
  * - at [BEARINGS] bearings and [SHARES] of its radius, a fixed grid the monitor's recipes extend each new year;
- * - and at each event's worst point of a dense sweep ([SWEEP_BEARINGS] × [SWEEP_SHARES], 240 points a unit, against
- *   the unit's own tables in the archive): the lateness that decides the unit's figure and limits sits near the edge
- *   and between bearings, where a sparse grid misses it by a minute.
+ * - and at each event's worst point of a dense sweep ([sweep]: 312 points a unit, and a finer sweep of 1,320 more
+ *   where fewer than [MIN_SWEPT] of them fall inside the unit, against the unit's own tables in the archive): the
+ *   lateness that decides the unit's figure and limits sits near the edge and between bearings, and in a unit that
+ *   other units hem in (Fayfa: 15 of a 72-point grid inside it), where a sparse grid misses it by a minute.
  *
  * A point another unit takes (a nearer place, or a city whose reach holds it) is left out: its user follows that
  * unit's table. The unit's stamp row then holds the lateness across its area, which About reads. `CityUnitsTest`
@@ -52,7 +53,7 @@ fun main(args: Array<String>) {
         repo.resolve("tools/timetables/official/gate/${spec.group}-reach.tsv").writeText(text.file)
         println(
             "${spec.entry}: ${text.units} units, ${text.points} points kept of ${text.tried} on the grid and ${text.worst} " +
-                "worst points of the sweep (${text.swept} swept), ${text.rows} rows, ${text.broken} cells early or late in the " +
+                "worst points of the sweep (${text.swept} swept, ${text.fine} units finely), ${text.rows} rows, ${text.broken} cells early or late in the " +
                 "sweep, ${"%.0f".format((System.nanoTime() - started) / 1e9)} s",
         )
         if (text.broken > 0) fail("${spec.entry}: the sweep found ${text.broken} cells early or late")
@@ -75,9 +76,30 @@ object ReachRows {
     val BEARINGS: List<Double> = (0 until 8).map { it * 45.0 }
     val SHARES: List<Double> = listOf(0.5, 0.95)
 
-    /** The sweep: 40 bearings from 4.5° by 9°, at six shares to just short of the edge. */
-    val SWEEP_BEARINGS: List<Double> = (0 until 40).map { 4.5 + 9.0 * it }
-    val SWEEP_SHARES: List<Double> = listOf(0.35, 0.6, 0.8, 0.93, 0.97, 0.995)
+    /**
+     * The sweep's grids, as (bearings, shares): 40 bearings from 4.5° by 9° at six shares to just short of the edge,
+     * and the review's fourth grid, 24 bearings from 7.5° by 15° at 40, 85 and 99.5 % (10 Oct 2026). `CityUnitsTest`
+     * checks the rows on that grid and on another, offset from all of these.
+     */
+    val SWEEP: List<Pair<List<Double>, List<Double>>> = listOf(
+        (0 until 40).map { 4.5 + 9.0 * it } to listOf(0.35, 0.6, 0.8, 0.93, 0.97, 0.995),
+        (0 until 24).map { 7.5 + 15.0 * it } to listOf(0.4, 0.85, 0.995),
+    )
+
+    /** The finer sweep where fewer than [MIN_SWEPT] points of [SWEEP] fall inside the unit: 120 bearings from 1.5° by 3°. */
+    val FINE: Pair<List<Double>, List<Double>> =
+        (0 until 120).map { 1.5 + 3.0 * it } to listOf(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.92, 0.97, 0.995)
+
+    /** Half of [SWEEP]'s 312 points. */
+    const val MIN_SWEPT = 156
+
+    /** The points of the sweep around [unit] inside it, the finer sweep's too where [SWEEP]'s are few. */
+    fun sweep(spec: Spec, unit: AuthorityUnit, zone: String): Pair<List<Point>, Boolean> {
+        val coarse = SWEEP.flatMap { (bearings, shares) -> points(spec, unit, zone, shares, bearings) }
+        val fine = coarse.size < MIN_SWEPT
+        val all = if (fine) coarse + points(spec, unit, zone, FINE.second, FINE.first) else coarse
+        return all.distinctBy { it.at } to fine
+    }
 
     /** A unit's own rows: its group file's rows of the entry itself (no unit named) at the unit's own point. */
     fun ownRows(manifest: GateManifest, spec: Spec, unit: AuthorityUnit): List<GateRow> = manifest.rows.filter {
@@ -103,10 +125,10 @@ object ReachRows {
         own.map { it.copy(lat = at.lat, lon = at.lon, unit = unit.id, split = Split.TEST) }
 
     /** Each event's worst point of the sweep around [unit] (the first reached where several tie), and the sweep's broken cells. */
-    class Worst(val points: Map<Point, List<Event>>, val swept: Int, val broken: Int)
+    class Worst(val points: Map<Point, List<Event>>, val swept: Int, val broken: Int, val fine: Boolean)
 
     fun worst(spec: Spec, unit: AuthorityUnit, own: List<GateRow>, roots: OfficialRoots): Worst {
-        val swept = points(spec, unit, own.first().zone, SWEEP_SHARES, SWEEP_BEARINGS)
+        val (swept, fine) = sweep(spec, unit, own.first().zone)
         val best = LinkedHashMap<Event, Pair<Point, Int>>()
         var broken = 0
         for (p in swept) {
@@ -118,10 +140,20 @@ object ReachRows {
         }
         val points = LinkedHashMap<Point, MutableList<Event>>()
         for ((event, pw) in best) points.getOrPut(pw.first) { mutableListOf() } += event
-        return Worst(points, swept.size, broken)
+        return Worst(points, swept.size, broken, fine)
     }
 
-    class Rendered(val file: String, val units: Int, val points: Int, val tried: Int, val worst: Int, val swept: Int, val rows: Int, val broken: Int)
+    class Rendered(
+        val file: String,
+        val units: Int,
+        val points: Int,
+        val tried: Int,
+        val worst: Int,
+        val swept: Int,
+        val rows: Int,
+        val broken: Int,
+        val fine: Int,
+    )
 
     fun render(spec: Spec, gate: File, roots: OfficialRoots, threads: Int): Rendered {
         val manifest = GateManifest.load(gate).only(groups = setOf(spec.group))
@@ -148,8 +180,9 @@ object ReachRows {
         out.append("# grid's rows each new year through official/monitor/recipes.tsv. ").append(spec.entry).append("'s measured units, each\n")
         out.append("# unit's own tables (").append(spec.group).append(".tsv's rows at its point) replayed across its area: at ")
         out.append(BEARINGS.size).append(" bearings and ").append(SHARES.joinToString(" and ") { "${(it * 100).toInt()} %" })
-        out.append(" of its radius, and at\n# each event's worst point of a sweep of ").append(SWEEP_BEARINGS.size * SWEEP_SHARES.size)
-        out.append(" points a unit; held out and tagged with the unit, a point another unit takes left out\n")
+        out.append(" of its radius, and at\n# each event's worst point of a sweep of ").append(SWEEP.sumOf { it.first.size * it.second.size })
+        out.append(" points a unit (and a finer one where few fall inside it); held out and tagged with the unit, a point another\n")
+        out.append("# unit takes left out\n")
         out.append("# (the reviews of 9 and 10 Oct 2026, \"prove it across the unit\"). Coordinates and the tables' own paths only,\n")
         out.append("# never a time.\n")
         out.append(header).append('\n')
@@ -188,6 +221,6 @@ object ReachRows {
             for (p in grid) emit(p, "on the grid")
             for ((p, events) in extra) emit(p, "at the sweep's worst for ${events.joinToString("/") { it.key }}")
         }
-        return Rendered(out.toString(), withRows, points, tried, worstPoints, swept, rows, broken)
+        return Rendered(out.toString(), withRows, points, tried, worstPoints, swept, rows, broken, worsts.count { it.fine })
     }
 }
