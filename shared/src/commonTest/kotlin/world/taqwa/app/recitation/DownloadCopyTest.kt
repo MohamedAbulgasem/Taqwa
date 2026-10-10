@@ -1,5 +1,6 @@
 package world.taqwa.app.recitation
 
+import world.taqwa.app.i18n.DigitGrouping
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -91,6 +92,23 @@ class DownloadCopyTest {
         assertEquals(NumberStyle.WESTERN, NumberStyle.of("ur-PK", "0"))
         assertEquals(NumberStyle.WESTERN, NumberStyle.of("en-GB", "0"))
         assertTrue(NumberStyle.entries.all { it.apply("9.3").length == 3 })
+    }
+
+    @Test
+    fun theDistancesThousandsMarkIsNeverTheDecimalMarkTheSameReaderSeesInASize() {
+        // DigitGrouping's mark is the partner of this decimal: "2,916 km" beside "58.2 MB" for an
+        // English or Libyan reader, "2.916 km" beside "58,2 MB" for a Turkish one, never one mark
+        // meaning both. The pairs are every interface language with the digits its platform draws.
+        val readers = listOf(
+            "en-GB" to "0", "ar-LY" to "0", "ar-MA" to "0", "ar-EG" to "٠", "ar-SA" to "٠",
+            "fr-FR" to "0", "tr-TR" to "0", "id-ID" to "0", "in-ID" to "0", "ur-PK" to "0",
+            "ur-IN" to "۰", "bn-BD" to "০", "bn-BD" to "0", "de-DE" to "0",
+        )
+        for ((tag, zero) in readers) {
+            val decimal = NumberStyle.of(tag, zero).apply(".")
+            val thousands = DigitGrouping.separator(tag, zero).toString()
+            assertTrue(decimal != thousands, "$tag writes both its decimal and its thousands as $decimal")
+        }
     }
 
     private companion object {

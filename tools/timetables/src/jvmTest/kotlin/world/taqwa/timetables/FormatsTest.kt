@@ -1,6 +1,7 @@
 package world.taqwa.timetables
 
 import kotlinx.datetime.LocalDate
+import world.taqwa.app.i18n.DigitGrouping
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -90,11 +91,29 @@ class FormatsTest {
 
     @Test
     fun distancesAreGroupedAsTheAppGroupsThem() {
-        // The app's localizedGroupedKm: truncated, a comma every three digits, local digits.
+        // The app's localizedGroupedKm, which is DigitGrouping: truncated, local digits, and the
+        // thousands mark of the page's language and digits.
+        val nnbsp = DigitGrouping.NARROW_NO_BREAK_SPACE
+        val arabicMark = DigitGrouping.ARABIC_THOUSANDS_SEPARATOR
         assertEquals("2,916", Formats("en", "LY").distance(2916.9))
-        assertEquals("٢,٩١٦", Formats("ar", "EG").distance(2916.2))
-        assertEquals("12,345", Formats("fr", "FR").distance(12345.0))
+        assertEquals("2.916", Formats("tr", "TR").distance(2916.9))
+        assertEquals("2.916", Formats("id", "ID").distance(2916.9))
+        assertEquals("12${nnbsp}345", Formats("fr", "FR").distance(12345.0))
+        assertEquals("2${nnbsp}916", Formats("fr", "TN").distance(2916.0))
+        assertEquals("٢${arabicMark}٩١٦", Formats("ar", "EG").distance(2916.2))
+        assertEquals("2,916", Formats("ar", "TN").distance(2916.2))
+        assertEquals("2,916", Formats("ur", "PK").distance(2916.2))
+        assertEquals("২,৯১৬", Formats("bn", "BD").distance(2916.2))
         assertEquals("৯৮৭", Formats("bn", "BD").distance(987.0))
+    }
+
+    @Test
+    fun aPagesDistanceIsTheAppsForAReaderWithThatPagesDigits() {
+        // App = site: the page passes its own locale and digits to the function the app calls.
+        for ((language, country) in listOf("en" to "GB", "ar" to "EG", "ar" to "LY", "fr" to "FR", "tr" to "TR", "id" to "ID", "ur" to "PK", "bn" to "BD")) {
+            val f = Formats(language, country)
+            assertEquals(DigitGrouping.group(4793, f.locale.toLanguageTag(), f::digits), f.distance(4793.4), "$language-$country")
+        }
     }
 
     @Test

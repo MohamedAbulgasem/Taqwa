@@ -23,6 +23,7 @@ val appSources = listOf(
     "world/taqwa/app/hijri/HijriMonthNames.kt",
     "world/taqwa/app/i18n/UiLanguage.kt",
     "world/taqwa/app/i18n/CountdownDigits.kt",
+    "world/taqwa/app/i18n/DigitGrouping.kt",
 )
 
 /** The app's own tests for those files, run here on the JVM to prove this build computes what
@@ -31,6 +32,7 @@ val appTests = listOf(
     "world/taqwa/app/prayer/PrayerTimesEngineTest.kt",
     "world/taqwa/app/qibla/QiblaMathTest.kt",
     "world/taqwa/app/hijri/TabularHijriCalendarTest.kt",
+    "world/taqwa/app/i18n/DigitGroupingTest.kt",
 )
 
 val repoRoot: File = rootDir.resolve("../..").canonicalFile

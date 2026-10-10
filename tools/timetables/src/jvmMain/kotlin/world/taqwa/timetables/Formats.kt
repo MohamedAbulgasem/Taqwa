@@ -3,6 +3,7 @@ package world.taqwa.timetables
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
 import world.taqwa.app.hijri.HijriMonthNames
+import world.taqwa.app.i18n.DigitGrouping
 import world.taqwa.app.i18n.UiLanguage
 import java.text.NumberFormat
 import java.time.YearMonth
@@ -79,17 +80,11 @@ class Formats(val language: String, country: String) {
 
     /**
      * The distance to Makkah exactly as the app writes it (`localizedGroupedKm`): whole kilometres,
-     * truncated, a comma every three digits whatever the language, each digit in the page's own.
+     * truncated, each digit in the page's own, grouped by the app's own [DigitGrouping] for the
+     * page's locale — so a Turkish page reads 2.916, a French one 2 916 (a narrow no-break space),
+     * an Egyptian Arabic one ٢٬٩١٦, as the app does for the same reader.
      */
-    fun distance(km: Double): String {
-        val whole = km.toLong().toString()
-        return buildString {
-            whole.forEachIndexed { i, c ->
-                if (i > 0 && (whole.length - i) % 3 == 0) append(',')
-                append(plain.format(c - '0'))
-            }
-        }
-    }
+    fun distance(km: Double): String = DigitGrouping.group(km.toLong(), locale.toLanguageTag(), ::digits)
 
     /** The Qibla bearing as the app writes it: the degrees truncated, in the page's digits. */
     fun bearing(degrees: Double): String = "${plain.format(degrees.toInt())}°"
