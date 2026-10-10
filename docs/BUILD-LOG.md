@@ -3147,3 +3147,41 @@ Checked: the whole gate as above; tools `jvmTest` 307/0 with the archive (CityUn
 Android host and 1,491/0 on iOS, widgetcore 91/0 and 89/0; the monitor's Python tests 105/0 on both
 Pythons. `CI=true generate` writes 55 cities and 129 pages; the site builds 164 pages, all checks good,
 and its tests pass 18/0. The engine change ships with the first update, not 1.0.0 (35).
+
+## The last miss, the own points' guard per row (10 October) — the review's final check
+
+The reviewer's final check passed everything but one point. On a fourth grid (24 bearings from 7.5° by
+15°, at 40, 85 and 99.5 % of the radius), Fayfa showed "at most 1", yet 40 % of its reach out, at
+bearing 307.5°, Fajr came 2 min after Fayfa's table on 1 day of 730. Other units hem Fayfa in: only 15
+of that grid's 72 points fall inside it, and the sweep's nearest points missed this one. The owner
+accepts the end of eating's 11 at the eight Kazakh units, with its reason.
+
+- **The sweep** now includes the reviewer's fourth grid, 312 points a unit in all. Where fewer than
+  half of those fall inside the unit, it also adds a finer sweep of 120 bearings from 1.5° by 3° at 11
+  shares: 48 Saudi and 13 Kazakh units. It found 91,795 points inside their unit, nothing early, and
+  929 + 550 worst points. The reach rows are now 5,856 Saudi and 3,372 Kazakh. The whole gate is 10,997
+  rows and 4,001,889 place-days.
+- **The proof.** `CityUnitsTest` sweeps both of the reviewer's grids: 17,114 Saudi points and 9,594
+  Kazakh, 20.1 million place-days. It found 0 early, 0 late ends, none over a limit, and no start past
+  a figure.
+- **The figures that moved** (against the commit before): Fayfa 1 → 2 (Fajr and Asr 2) and Tarut 1 → 2
+  (Fajr 2). Inside their figures and limits, Dhuhr, Asr, sunrise or the end of eating rose by a minute
+  at Addayer, Al Badayea, Al Busur, Al Farshah, Al Uyaynah, Bani Hasan, Buraydah and Rawdat Sudayr, and
+  at QMDB's Aksu (Turkistan), Aral, Pulemetovka and Vagulino. No limit moved.
+- **The own points' guard, per row.** Held to the entry's caps, a regression far below them (at Almaty or
+  Taraz, say) would pass. So `generateOwnPointWorst` now records each own-point and app-point row's own
+  worst lateness per event in `official/own-points-worst.tsv`: 852 rows, in minutes only. `CityUnitsTest`
+  holds each row, on its own, to that worst, and still to the documented limits. A row `prove` adds since
+  is held to the limits until the file is regenerated.
+- **Beyond every unit** the dead branch is gone. With one reach, the nearest place's end bound could
+  never apply there, since a user beyond every unit is beyond every reach. Umm al-Qura's and QMDB's edges
+  are now `beyondEveryUnit`, the user's point a minute later with no end bound, and `beyondTable` is as
+  it was. The times are unchanged.
+
+What moved: every stamp's `engineHash` (`Units.kt` is core). The golden vector moved on 44 rows against
+`main`, all safe, and on none against the commit before.
+
+Checked: the whole gate as above; tools `jvmTest` 307/0 with the archive (CityUnitsTest 9/0); `checkStamps`
+(71 entries) green; `scripts/test.sh` with its four tasks: shared 1,614/0 on the Android host and 1,491/0
+on iOS, widgetcore 91/0 and 89/0; the monitor's Python tests 105/0 on both Pythons. `CI=true generate`
+writes 55 cities and 129 pages; the site builds 164 pages, all checks good, and its tests pass 18/0.

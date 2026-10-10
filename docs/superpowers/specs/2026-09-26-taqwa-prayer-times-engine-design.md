@@ -187,9 +187,10 @@ a monitor source. Large tables are compact resources.
   48° N), so no time is earlier than at the user's own point alone. Each measured unit's own tables
   are gated across its reach too, on a grid and at each event's worst point of a dense sweep, and
   checked on a third grid offset from both (the reviews of 9 and 10 Oct 2026). So its figure and its
-  late limits hold for the whole unit, and its own point stays held to the limits it had before.
-  Beyond every unit, a point table's edge with R45's end bound kept within one reach, so the user's
-  own point a minute later, with no figure.
+  late limits hold for the whole unit, and each own-point row stays held to its own worst.
+  Beyond every unit, a point table's edge with no end bound (a user there is beyond every reach,
+  where R45's bound would cost more than a unit's own): the user's own point a minute later, with
+  no figure.
 - **Unknown reference point or horizon**: the unit's safe edge and the deepest plausible horizon; no
   "at most" figure is claimed for that unit.
 - **Near a unit or country border**: the envelope over the candidates within the location's

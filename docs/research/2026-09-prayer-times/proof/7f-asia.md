@@ -762,6 +762,14 @@ Rudny and Akkol, 8 → 10 at Petropavl. BUILD-LOG has every city.
 it never applies there. The edge uses the user's own band. Against `main`, starts are up to 1 min later
 and ends up to 1 min earlier; within three reaches, the bound had cost up to 12 min.
 
+**The final check** (10 Oct 2026). The owner accepts the end of eating's 11 at the eight units. The sweep
+now includes the reviewer's fourth grid and adds a finer sweep at the 13 units it covers least. On both
+of the reviewer's grids (9,594 Kazakh points) there is nothing early, nothing over a limit, and no start
+past a figure. No Kazakh figure moved. Aksu (Turkistan)'s Fajr, Aral's sunrise, and Pulemetovka's and
+Vagulino's sunrise each rose a minute, within their figures and limits. Every own-point row is now held to
+its own worst (`own-points-worst.tsv`), so a regression at Almaty's or Taraz's own point fails however
+far below the entry's limits.
+
 ## Verification run
 
 ```

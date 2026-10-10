@@ -212,6 +212,13 @@ and no start past a unit's figure. Fajr 3 now holds at 15 units (those six added
 - The rows at each unit's own point and the app's city point stay held to class A's minute, the lag
   dates' 2 and the three app points' 2 (`CityUnitsTest`), so a regression at a city's own point fails.
 
+On the reviewer's fourth grid (24 bearings × 40/85/99.5 %), Fayfa's "1" was beaten once: Fajr 2 at
+40 % of its reach on 1 day of 730, where other units leave few points inside it. The sweep now includes
+that grid, and adds a finer one (120 bearings × 11 shares) at the 48 units it covers least. Fayfa's and
+Tarut's figures become 2. Every own-point row is now held to its own worst (`own-points-worst.tsv`). On
+both of the reviewer's grids (17,114 Saudi points) there is nothing early, nothing over a limit, and no
+start past a figure.
+
 ## Qatar — `qa.calendarhouse`, class B
 
 **Evidence.** Calendar House's printed Doha calendar (16 Jun–11 Sep 2026, and a second copy to

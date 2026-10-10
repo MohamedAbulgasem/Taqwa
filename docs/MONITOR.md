@@ -210,7 +210,9 @@ never names another's. A recipe grows the rows at every point the reach file rea
 and each event's worst point of the generator's sweep alike. The reach rows grow the whole gate to
 some 11,000 rows and 4.0 million place-days, about 110 seconds on the Mac. The gate keeps only the
 last 64 points' computed days at once, so it stays within its 2 GB. `generateReachRows` (archive
-needed, about 2 minutes) is re-run when a unit, its reach or its tables change.
+needed, about 5 minutes) is re-run when a unit, its reach or its tables change, and
+`generateOwnPointWorst` (seconds) when a change is meant to move an own point's lateness, or to hold the
+own-point rows prove added to their own worst rather than to the documented limits alone.
 
 **What `prove` does.** For each capture a recipe names whose days are not all held already by rows
 of that file, entry, member and point: the capture is copied as it is to
