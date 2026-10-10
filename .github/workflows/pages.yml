@@ -24,6 +24,8 @@ on:
       - "shared/src/commonMain/kotlin/world/taqwa/app/qibla/**"
       - "shared/src/commonMain/kotlin/world/taqwa/app/hijri/**"
       - "shared/src/commonMain/kotlin/world/taqwa/app/i18n/CountdownDigits.kt"
+      - "shared/src/commonMain/kotlin/world/taqwa/app/i18n/DigitGrouping.kt"
+      - "shared/src/commonTest/kotlin/world/taqwa/app/i18n/DigitGroupingTest.kt"
       - "widgetcore/src/commonMain/kotlin/world/taqwa/app/i18n/UiLanguage.kt"
       - "shared/src/commonTest/kotlin/world/taqwa/app/prayer/**"
       - "shared/src/commonTest/kotlin/world/taqwa/app/qibla/**"

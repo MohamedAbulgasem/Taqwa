@@ -212,6 +212,8 @@ method (the app has no exact Jaʿfari method), anything using the reader's locat
   `DigitGrouping` (shared `i18n`) picks the thousands mark by language and digit set — a point in
   Turkish and Indonesian, a narrow no-break space in French, U+066C beside Arabic-Indic and Extended
   Arabic-Indic digits, a comma in English, Urdu, Bengali and Arabic written in Western digits, each
-  the partner of the decimal mark the app's `NumberStyle` already writes for that reader. The
+  the partner of the decimal mark the app's `NumberStyle` already writes for that reader (Extended
+  Arabic-Indic aside: `NumberStyle` still writes those readers' sizes in Western digits with a
+  point, a different mark from ٬ but not its partner). The
   generator compiles that file and `Formats.distance` calls it, so the app and the site cannot
   group a distance two ways.

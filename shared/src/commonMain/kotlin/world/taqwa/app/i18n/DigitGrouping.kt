@@ -22,7 +22,9 @@ package world.taqwa.app.i18n
  * - Arabic-Indic digits (Arabic in Egypt, the Gulf, the Levant) and the Extended Arabic-Indic
  *   digits Urdu and Persian use where a phone draws them: U+066C ARABIC THOUSANDS SEPARATOR,
  *   "٢٬٩١٦", the mark the platform itself writes beside those digits. A Latin comma there has the
- *   shape of the Arabic decimal separator ٫, which `NumberStyle` writes in "٩٫٣".
+ *   shape of the Arabic decimal separator ٫, which `NumberStyle` writes in "٩٫٣". `NumberStyle`
+ *   has no Extended Arabic-Indic case yet, so a ur-IN or Persian reader's recitation sizes stay
+ *   in Western digits with a point ("58.2"): not the partner of ٬, but never the same mark either.
  * - Bengali digits: a comma, "২,৯১৬", as Bangladesh writes them and CLDR has them.
  *
  * The digit set decides before the language does, as it does in `NumberStyle`: a Samsung phone in
