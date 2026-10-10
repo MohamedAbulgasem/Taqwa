@@ -453,8 +453,8 @@
     <string name="qibla_interference_title">مقناطیسی مداخلت</string>
     <string name="qibla_interference_help">دھات، مقناطیس، کور اور کیبل سے دور ہٹ جائیں۔ جب تک قریب کوئی زیادہ طاقتور مقناطیسی اثر موجود ہے، قطب نما زمین کا مقناطیسی میدان نہیں پڑھ سکتا۔</string>
     <string name="qibla_best_effort_title">قطب نما دستیاب نہیں</string>
-    <string name="qibla_best_effort_calibration">اس فون کے قطب نما کو درست نہیں کیا جا سکا۔ دکھایا گیا رخ اور فاصلہ درست ہے — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
-    <string name="qibla_best_effort_interference">یہاں مقناطیسی مداخلت اس فون کے قطب نما کی سکت سے زیادہ ہے۔ دکھایا گیا رخ اور فاصلہ درست ہے — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
+    <string name="qibla_best_effort_calibration">اس فون کے قطب نما کو درست نہیں کیا جا سکا۔ دکھایا گیا رخ اور فاصلہ درست ہیں — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
+    <string name="qibla_best_effort_interference">یہاں مقناطیسی مداخلت اس فون کے قطب نما کی سکت سے زیادہ ہے۔ دکھایا گیا رخ اور فاصلہ درست ہیں — انہیں کسی الگ قطب نما کے ساتھ استعمال کریں۔</string>
     <string name="qibla_distance">مکہ مکرمہ · %1$s کلومیٹر دور</string>
     <string name="qibla_bearing">%1$s°</string>
     <string name="qibla_cardinal_north">ش</string>
