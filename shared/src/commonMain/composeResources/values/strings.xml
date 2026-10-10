@@ -14,7 +14,7 @@
     <string name="onboarding_location_body">Prayer times depend on where you are. Everything is calculated on your device. Your location never leaves your phone.</string>
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_notifications_title">Prayer notifications</string>
-    <string name="onboarding_notifications_body">A notification at each prayer time. You pick the sound for every prayer separately, and can change it whenever you like.</string>
+    <string name="onboarding_notifications_body">A notification for each prayer. You pick the sound for every prayer separately, and can change it whenever you like.</string>
     <string name="onboarding_notifications_secondary">Not now</string>
     <string name="onboarding_exact_title">Alarms &amp; reminders</string>
     <string name="onboarding_exact_body">Android can ring at the exact prayer time only if “Alarms &amp; reminders” is allowed for Taqwa. Without it, a notification can arrive up to an hour late.</string>

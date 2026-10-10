@@ -14,7 +14,7 @@
     <string name="onboarding_location_body">Namaz vakitleri konumunuza bağlıdır. Her şey cihazınızda hesaplanır. Konumunuz telefonunuzdan hiç çıkmaz.</string>
     <string name="onboarding_continue">Devam</string>
     <string name="onboarding_notifications_title">Namaz bildirimleri</string>
-    <string name="onboarding_notifications_body">Her namaz vaktinde bir bildirim. Sesi her vakit için ayrı seçersiniz, dilediğiniz zaman da değiştirebilirsiniz.</string>
+    <string name="onboarding_notifications_body">Her namaz için bir bildirim. Sesi her vakit için ayrı seçersiniz, dilediğiniz zaman da değiştirebilirsiniz.</string>
     <string name="onboarding_notifications_secondary">Şimdi değil</string>
     <string name="onboarding_exact_title">Alarmlar ve hatırlatıcılar</string>
     <string name="onboarding_exact_body">Android, tam namaz vaktinde ancak Taqwa için “Alarmlar ve hatırlatıcılar” izni verilmişse çalabilir. İzin olmadan bildirim bir saate kadar gecikebilir.</string>

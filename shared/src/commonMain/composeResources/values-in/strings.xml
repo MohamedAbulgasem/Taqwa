@@ -12,7 +12,7 @@
     <string name="onboarding_location_body">Waktu salat bergantung pada posisi Anda. Semuanya dihitung di perangkat Anda. Lokasi Anda tidak pernah keluar dari ponsel.</string>
     <string name="onboarding_continue">Lanjutkan</string>
     <string name="onboarding_notifications_title">Notifikasi salat</string>
-    <string name="onboarding_notifications_body">Notifikasi pada setiap waktu salat. Anda memilih suaranya untuk tiap salat secara terpisah, dan bisa menggantinya kapan saja.</string>
+    <string name="onboarding_notifications_body">Notifikasi untuk setiap salat. Anda memilih suaranya untuk tiap salat secara terpisah, dan bisa menggantinya kapan saja.</string>
     <string name="onboarding_notifications_secondary">Nanti saja</string>
     <string name="onboarding_exact_title">Alarm &amp; pengingat</string>
     <string name="onboarding_exact_body">Android hanya bisa berbunyi tepat pada waktu salat jika izin “Alarm &amp; pengingat” diberikan untuk Taqwa. Tanpa izin itu, notifikasi bisa terlambat sampai satu jam.</string>

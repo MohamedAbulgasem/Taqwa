@@ -12,7 +12,7 @@
     <string name="onboarding_location_body">নামাজের সময় আপনার অবস্থানের উপর নির্ভর করে। সব হিসাব আপনার ডিভাইসেই হয়, আর আপনার অবস্থান কখনো ফোন ছেড়ে যায় না।</string>
     <string name="onboarding_continue">চালিয়ে যান</string>
     <string name="onboarding_notifications_title">নামাজের নোটিফিকেশন</string>
-    <string name="onboarding_notifications_body">প্রতি ওয়াক্তে একটি নোটিফিকেশন। প্রতিটি নামাজের শব্দ আলাদা করে বেছে নিতে পারেন, আর যখন খুশি বদলাতেও পারেন।</string>
+    <string name="onboarding_notifications_body">প্রতিটি নামাজের জন্য একটি নোটিফিকেশন। প্রতিটি নামাজের শব্দ আলাদা করে বেছে নিতে পারেন, আর যখন খুশি বদলাতেও পারেন।</string>
     <string name="onboarding_notifications_secondary">এখন নয়</string>
     <string name="onboarding_exact_title">অ্যালার্ম ও রিমাইন্ডার</string>
     <string name="onboarding_exact_body">তাকওয়াকে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি দিলে তবেই অ্যান্ড্রয়েড ঠিক ওয়াক্তে বাজতে পারে। এটি ছাড়া নোটিফিকেশন এক ঘণ্টা পর্যন্ত দেরিতে আসতে পারে।</string>

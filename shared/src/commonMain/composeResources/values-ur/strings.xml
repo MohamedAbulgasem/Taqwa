@@ -12,7 +12,7 @@
     <string name="onboarding_location_body">نماز کے اوقات آپ کے مقام پر منحصر ہیں۔ سارا حساب آپ کے فون پر ہوتا ہے، اور آپ کا مقام کبھی فون سے باہر نہیں جاتا۔</string>
     <string name="onboarding_continue">جاری رکھیں</string>
     <string name="onboarding_notifications_title">نماز کی اطلاعات</string>
-    <string name="onboarding_notifications_body">ہر نماز کے وقت ایک اطلاع۔ ہر نماز کی آواز آپ الگ الگ چن سکتے ہیں، اور جب چاہیں بدل سکتے ہیں۔</string>
+    <string name="onboarding_notifications_body">ہر نماز کے لیے ایک اطلاع۔ ہر نماز کی آواز آپ الگ الگ چن سکتے ہیں، اور جب چاہیں بدل سکتے ہیں۔</string>
     <string name="onboarding_notifications_secondary">ابھی نہیں</string>
     <string name="onboarding_exact_title">الارم اور یاد دہانیاں</string>
     <string name="onboarding_exact_body">اینڈرائیڈ عین نماز کے وقت پر تبھی بج سکتا ہے جب تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت ہو۔ اس کے بغیر اطلاع ایک گھنٹے تک دیر سے آ سکتی ہے۔</string>
