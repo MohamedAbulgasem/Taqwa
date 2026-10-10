@@ -3185,3 +3185,17 @@ Checked: the whole gate as above; tools `jvmTest` 307/0 with the archive (CityUn
 (71 entries) green; `scripts/test.sh` with its four tasks: shared 1,614/0 on the Android host and 1,491/0
 on iOS, widgetcore 91/0 and 89/0; the monitor's Python tests 105/0 on both Pythons. `CI=true generate`
 writes 55 cities and 129 pages; the site builds 164 pages, all checks good, and its tests pass 18/0.
+
+**To the edge itself** (the reviewer's approval, with one residual). On grids at 99.9 % of the radius,
+Isha passed a recorded limit by a minute on a single day at three units: Rudny 8 against 7, Ekibastuz 8
+against 7 and Shakhtinsk 7 against 6. The sweep stopped at 99.5 %, and a reach holds its edge
+(`distance <= radius`).
+- The sweep and `CityUnitsTest`'s two grids now run to 99.9 % and 100 %. The sweep has 392 points a unit,
+  plus 1,560 finer ones where fewer than half fall inside.
+- The limits re-derived from the gate are Rudny's and Ekibastuz's Isha 8 and Shakhtinsk's 7. No figure
+  moved. Inside their figures and limits, Wadi al Fara's end of eating rose to 3, and Atbasar's and
+  Kandyagash's sunrise to 3.
+- Aiteke Bi's Dhuhr of 2 at the edge is within its figure of 3 and class D's limit.
+- On the two grids: 36,817 points and 27.7 million place-days, 0 early, 0 late ends, none over a limit,
+  and no start past a figure. The whole gate is unchanged in size (10,997 rows, 4,001,889 place-days), and
+  the golden vector did not move.

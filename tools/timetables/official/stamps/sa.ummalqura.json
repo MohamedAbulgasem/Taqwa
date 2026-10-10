@@ -1,7 +1,7 @@
 {
   "entry": "sa.ummalqura",
   "class": "A/D (authority)",
-  "engineHash": "d3f894772e10100c",
+  "engineHash": "2d8fb7f01224b96b",
   "broken": 0,
   "places": 3242,
   "first": "2024-01-01",
@@ -18,8 +18,8 @@
       "checked": 2493800,
       "early": 0,
       "late": {
-        "0": 1511493,
-        "1": 954368,
+        "0": 1511502,
+        "1": 954359,
         "2": 27675,
         "3+": 264
       },
@@ -33,12 +33,12 @@
       "checked": 2493800,
       "lateEnd": 0,
       "late": {
-        "0": 1609165,
-        "1": 857146,
-        "2": 27340,
-        "3+": 149
+        "0": 1608622,
+        "1": 857579,
+        "2": 27449,
+        "3+": 150
       },
-      "exactShare": 0.6453,
+      "exactShare": 0.645,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "entry sa.ummalqura, unit tayma",
@@ -63,12 +63,12 @@
       "checked": 2493800,
       "early": 0,
       "late": {
-        "0": 1571946,
-        "1": 902369,
+        "0": 1571991,
+        "1": 902324,
         "2": 19465,
         "3+": 20
       },
-      "exactShare": 0.6303,
+      "exactShare": 0.6304,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "entry sa.ummalqura, unit tayma",
@@ -78,8 +78,8 @@
       "checked": 2493800,
       "early": 0,
       "late": {
-        "0": 1568922,
-        "1": 904833,
+        "0": 1568950,
+        "1": 904805,
         "2": 20001,
         "3+": 44
       },
@@ -93,8 +93,8 @@
       "checked": 2493800,
       "early": 0,
       "late": {
-        "0": 1568922,
-        "1": 904833,
+        "0": 1568950,
+        "1": 904805,
         "2": 20001,
         "3+": 44
       },
@@ -108,12 +108,12 @@
       "checked": 2493800,
       "lateEnd": 0,
       "late": {
-        "0": 1468861,
-        "1": 975875,
-        "2": 48610,
-        "3+": 454
+        "0": 1468400,
+        "1": 976143,
+        "2": 48802,
+        "3+": 455
       },
-      "exactShare": 0.589,
+      "exactShare": 0.5888,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "entry sa.ummalqura, unit tayma",
@@ -128,8 +128,8 @@
         "checked": 2487595,
         "early": 0,
         "late": {
-          "0": 1506409,
-          "1": 953247,
+          "0": 1506418,
+          "1": 953238,
           "2": 27675,
           "3+": 264
         },
@@ -143,12 +143,12 @@
         "checked": 2487595,
         "lateEnd": 0,
         "late": {
-          "0": 1603969,
-          "1": 856138,
-          "2": 27339,
-          "3+": 149
+          "0": 1603426,
+          "1": 856571,
+          "2": 27448,
+          "3+": 150
         },
-        "exactShare": 0.6448,
+        "exactShare": 0.6446,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "entry sa.ummalqura, unit tayma",
@@ -173,8 +173,8 @@
         "checked": 2487595,
         "early": 0,
         "late": {
-          "0": 1566843,
-          "1": 901267,
+          "0": 1566888,
+          "1": 901222,
           "2": 19465,
           "3+": 20
         },
@@ -188,12 +188,12 @@
         "checked": 2487595,
         "early": 0,
         "late": {
-          "0": 1563799,
-          "1": 903751,
+          "0": 1563827,
+          "1": 903723,
           "2": 20001,
           "3+": 44
         },
-        "exactShare": 0.6286,
+        "exactShare": 0.6287,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "entry sa.ummalqura, unit tayma",
@@ -203,12 +203,12 @@
         "checked": 2487595,
         "early": 0,
         "late": {
-          "0": 1563799,
-          "1": 903751,
+          "0": 1563827,
+          "1": 903723,
           "2": 20001,
           "3+": 44
         },
-        "exactShare": 0.6286,
+        "exactShare": 0.6287,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "entry sa.ummalqura, unit tayma",
@@ -218,12 +218,12 @@
         "checked": 2487595,
         "lateEnd": 0,
         "late": {
-          "0": 1464059,
-          "1": 974480,
-          "2": 48602,
-          "3+": 454
+          "0": 1463598,
+          "1": 974748,
+          "2": 48794,
+          "3+": 455
         },
-        "exactShare": 0.5885,
+        "exactShare": 0.5884,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "entry sa.ummalqura, unit tayma",
@@ -8100,12 +8100,12 @@
           "checked": 10220,
           "lateEnd": 0,
           "late": {
-            "0": 6343,
-            "1": 3734,
-            "2": 142,
+            "0": 6355,
+            "1": 3721,
+            "2": 143,
             "3+": 1
           },
-          "exactShare": 0.6206,
+          "exactShare": 0.6218,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "entry sa.ummalqura",
@@ -8176,8 +8176,8 @@
           "lateEnd": 0,
           "late": {
             "0": 5846,
-            "1": 4121,
-            "2": 253,
+            "1": 4115,
+            "2": 259,
             "3+": 0
           },
           "exactShare": 0.572,
@@ -21924,12 +21924,12 @@
           "checked": 16790,
           "early": 0,
           "late": {
-            "0": 10111,
-            "1": 6463,
+            "0": 10120,
+            "1": 6454,
             "2": 216,
             "3+": 0
           },
-          "exactShare": 0.6022,
+          "exactShare": 0.6027,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "entry sa.ummalqura",
@@ -21939,12 +21939,12 @@
           "checked": 16790,
           "lateEnd": 0,
           "late": {
-            "0": 10544,
-            "1": 5991,
-            "2": 253,
-            "3+": 2
+            "0": 9989,
+            "1": 6437,
+            "2": 361,
+            "3+": 3
           },
-          "exactShare": 0.628,
+          "exactShare": 0.5949,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "entry sa.ummalqura",
@@ -21969,12 +21969,12 @@
           "checked": 16790,
           "early": 0,
           "late": {
-            "0": 10119,
-            "1": 6502,
+            "0": 10164,
+            "1": 6457,
             "2": 169,
             "3+": 0
           },
-          "exactShare": 0.6027,
+          "exactShare": 0.6054,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "entry sa.ummalqura",
@@ -21984,12 +21984,12 @@
           "checked": 16790,
           "early": 0,
           "late": {
-            "0": 10097,
-            "1": 6518,
+            "0": 10125,
+            "1": 6490,
             "2": 175,
             "3+": 0
           },
-          "exactShare": 0.6014,
+          "exactShare": 0.603,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "entry sa.ummalqura",
@@ -21999,12 +21999,12 @@
           "checked": 16790,
           "early": 0,
           "late": {
-            "0": 10097,
-            "1": 6518,
+            "0": 10125,
+            "1": 6490,
             "2": 175,
             "3+": 0
           },
-          "exactShare": 0.6014,
+          "exactShare": 0.603,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "entry sa.ummalqura",
@@ -22014,13 +22014,13 @@
           "checked": 16790,
           "lateEnd": 0,
           "late": {
-            "0": 9348,
-            "1": 7019,
-            "2": 423,
-            "3+": 0
+            "0": 8887,
+            "1": 7293,
+            "2": 609,
+            "3+": 1
           },
-          "exactShare": 0.5568,
-          "worstLate": 2,
+          "exactShare": 0.5293,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "entry sa.ummalqura",
           "overLimit": 0

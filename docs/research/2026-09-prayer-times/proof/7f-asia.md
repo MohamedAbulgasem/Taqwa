@@ -770,6 +770,10 @@ Vagulino's sunrise each rose a minute, within their figures and limits. Every ow
 its own worst (`own-points-worst.tsv`), so a regression at Almaty's or Taraz's own point fails however
 far below the entry's limits.
 
+**To the edge itself** (10 Oct 2026): the sweep and the test's grids now reach 99.9 % and 100 % of the
+radius, which a reach holds. Rudny's and Ekibastuz's Isha limits become 8 and Shakhtinsk's 7; no figure
+moved.
+
 ## Verification run
 
 ```

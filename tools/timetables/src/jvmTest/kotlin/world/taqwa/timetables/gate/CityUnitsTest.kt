@@ -275,11 +275,12 @@ class CityUnitsTest {
     /**
      * The review's two grids (10 Oct 2026): 16 bearings from 11.25° by 22.5° at a quarter, three quarters, 90 % and
      * 99 % of the radius, offset from the reach rows' grid and from every sweep of generateReachRows; and 24 bearings
-     * from 7.5° by 15° at 40, 85 and 99.5 %, which the sweep now includes.
+     * from 7.5° by 15° at 40, 85 and 99.5 %, which the sweep now includes; both out to 99.9 % and the edge itself, which
+     * a reach holds (the review's last check, 10 Oct 2026).
      */
     private val GRIDS: List<Pair<List<Double>, List<Double>>> = listOf(
-        (0 until 16).map { 11.25 + 22.5 * it } to listOf(0.25, 0.75, 0.9, 0.99),
-        (0 until 24).map { 7.5 + 15.0 * it } to listOf(0.4, 0.85, 0.995),
+        (0 until 16).map { 11.25 + 22.5 * it } to listOf(0.25, 0.75, 0.9, 0.99, 0.999, 1.0),
+        (0 until 24).map { 7.5 + 15.0 * it } to listOf(0.4, 0.85, 0.995, 0.999, 1.0),
     )
 
     /**

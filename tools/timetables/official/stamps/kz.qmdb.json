@@ -1,7 +1,7 @@
 {
   "entry": "kz.qmdb",
   "class": "D (authority)",
-  "engineHash": "7917fb3c743cd17e",
+  "engineHash": "d4a918421e998683",
   "broken": 0,
   "places": 1832,
   "first": "2026-01-01",
@@ -18,10 +18,10 @@
       "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 244738,
-        "1": 735751,
-        "2": 251569,
-        "3+": 105302
+        "0": 244723,
+        "1": 735458,
+        "2": 251813,
+        "3+": 105366
       },
       "exactShare": 0.183,
       "worstLate": 10,
@@ -33,12 +33,12 @@
       "checked": 1337360,
       "lateEnd": 0,
       "late": {
-        "0": 721733,
-        "1": 541658,
-        "2": 73737,
-        "3+": 232
+        "0": 721256,
+        "1": 541632,
+        "2": 74238,
+        "3+": 234
       },
-      "exactShare": 0.5397,
+      "exactShare": 0.5393,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
@@ -48,12 +48,12 @@
       "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 785483,
-        "1": 508183,
+        "0": 784698,
+        "1": 508968,
         "2": 43694,
         "3+": 0
       },
-      "exactShare": 0.5873,
+      "exactShare": 0.5868,
       "worstLate": 2,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
@@ -63,12 +63,12 @@
       "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 494232,
-        "1": 687931,
-        "2": 153317,
+        "0": 494126,
+        "1": 687778,
+        "2": 153576,
         "3+": 1880
       },
-      "exactShare": 0.3696,
+      "exactShare": 0.3695,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
@@ -78,9 +78,9 @@
       "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 616416,
-        "1": 608864,
-        "2": 111729,
+        "0": 616352,
+        "1": 608476,
+        "2": 112181,
         "3+": 351
       },
       "exactShare": 0.4609,
@@ -93,15 +93,15 @@
       "checked": 1337360,
       "early": 0,
       "late": {
-        "0": 214233,
-        "1": 734246,
-        "2": 250577,
-        "3+": 138304
+        "0": 214193,
+        "1": 733838,
+        "2": 250951,
+        "3+": 138378
       },
       "exactShare": 0.1602,
       "worstLate": 8,
       "lateLimit": 8,
-      "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
+      "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shakhtinsk, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
       "overLimit": 0
     },
     "endOfEating": {
@@ -109,9 +109,9 @@
       "lateEnd": 0,
       "late": {
         "0": 184509,
-        "1": 283950,
-        "2": 81529,
-        "3+": 787372
+        "1": 283946,
+        "2": 81522,
+        "3+": 787383
       },
       "exactShare": 0.138,
       "worstLate": 11,
@@ -128,10 +128,10 @@
         "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 242771,
-          "1": 732139,
-          "2": 251459,
-          "3+": 104786
+          "0": 242756,
+          "1": 731846,
+          "2": 251703,
+          "3+": 104850
         },
         "exactShare": 0.1824,
         "worstLate": 10,
@@ -143,12 +143,12 @@
         "checked": 1331155,
         "lateEnd": 0,
         "late": {
-          "0": 717195,
-          "1": 539991,
-          "2": 73737,
-          "3+": 232
+          "0": 716718,
+          "1": 539965,
+          "2": 74238,
+          "3+": 234
         },
-        "exactShare": 0.5388,
+        "exactShare": 0.5384,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
@@ -158,12 +158,12 @@
         "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 780079,
-          "1": 507382,
+          "0": 779294,
+          "1": 508167,
           "2": 43694,
           "3+": 0
         },
-        "exactShare": 0.586,
+        "exactShare": 0.5854,
         "worstLate": 2,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
@@ -173,9 +173,9 @@
         "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 490455,
-          "1": 685503,
-          "2": 153317,
+          "0": 490349,
+          "1": 685350,
+          "2": 153576,
           "3+": 1880
         },
         "exactShare": 0.3684,
@@ -188,9 +188,9 @@
         "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 611856,
-          "1": 607219,
-          "2": 111729,
+          "0": 611792,
+          "1": 606831,
+          "2": 112181,
           "3+": 351
         },
         "exactShare": 0.4596,
@@ -203,15 +203,15 @@
         "checked": 1331155,
         "early": 0,
         "late": {
-          "0": 212683,
-          "1": 730663,
-          "2": 250101,
-          "3+": 137708
+          "0": 212643,
+          "1": 730255,
+          "2": 250475,
+          "3+": 137782
         },
-        "exactShare": 0.1598,
+        "exactShare": 0.1597,
         "worstLate": 8,
         "lateLimit": 8,
-        "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
+        "lateLimitFrom": "entry kz.qmdb, unit akkol, unit aksay, unit aksu-pavlodar, unit aktobe, unit altay, unit arkalyk, unit astana, unit atbasar, unit bugrovoe, unit ekibastuz, unit embi, unit isakovka, unit kalbatau, unit kandyagash, unit khromtau, unit kokshetau, unit kostanay, unit krasny-yar, unit kulomzino, unit lisakovsk, unit makinsk, unit oral, unit oskemen, unit pavlodar, unit petropavl, unit pulemetovka, unit ridder, unit rudny, unit saran, unit semey, unit shakhtinsk, unit shemonaikha, unit spasovka, unit stepnogorsk, unit temirtau, unit vagulino",
         "overLimit": 0
       },
       "endOfEating": {
@@ -219,9 +219,9 @@
         "lateEnd": 0,
         "late": {
           "0": 184274,
-          "1": 283622,
-          "2": 81363,
-          "3+": 781896
+          "1": 283618,
+          "2": 81356,
+          "3+": 781907
         },
         "exactShare": 0.1384,
         "worstLate": 11,
@@ -335,8 +335,8 @@
       "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so it comes up to 10 min before the place's printed Fajr",
       "events": ["endOfEating"]
     },
-    "unit ekibastuz: 7 min": {
-      "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 7 min after the place's table",
+    "unit ekibastuz: 8 min": {
+      "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 8 min after the place's table",
       "events": ["isha"]
     },
     "unit ekibastuz: 9 min": {
@@ -527,8 +527,8 @@
       "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so it comes up to 11 min before the place's printed Fajr",
       "events": ["endOfEating"]
     },
-    "unit rudny: 7 min": {
-      "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 7 min after the place's table",
+    "unit rudny: 8 min": {
+      "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 8 min after the place's table",
       "events": ["isha"]
     },
     "unit rudny: 9 min": {
@@ -554,6 +554,10 @@
     "unit semey: 10 min": {
       "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so it comes up to 10 min before the place's printed Fajr",
       "events": ["endOfEating"]
+    },
+    "unit shakhtinsk: 7 min": {
+      "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 7 min after the place's table",
+      "events": ["isha"]
     },
     "unit shakhtinsk: 10 min": {
       "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so it comes up to 10 min before the place's printed Fajr",
@@ -1799,8 +1803,8 @@
           "early": 0,
           "late": {
             "0": 3258,
-            "1": 9910,
-            "2": 4107,
+            "1": 9908,
+            "2": 4109,
             "3+": 975
           },
           "exactShare": 0.1785,
@@ -1813,12 +1817,12 @@
           "checked": 18250,
           "lateEnd": 0,
           "late": {
-            "0": 9209,
-            "1": 7777,
-            "2": 1263,
+            "0": 9225,
+            "1": 7778,
+            "2": 1246,
             "3+": 1
           },
-          "exactShare": 0.5046,
+          "exactShare": 0.5055,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1873,12 +1877,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2889,
-            "1": 10111,
-            "2": 4070,
-            "3+": 1180
+            "0": 2884,
+            "1": 10100,
+            "2": 4083,
+            "3+": 1183
           },
-          "exactShare": 0.1583,
+          "exactShare": 0.158,
           "worstLate": 5,
           "lateLimit": 6,
           "lateLimitFrom": "entry kz.qmdb",
@@ -2318,12 +2322,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2950,
-            "1": 9182,
-            "2": 3524,
+            "0": 2976,
+            "1": 9148,
+            "2": 3532,
             "3+": 2594
           },
-          "exactShare": 0.1616,
+          "exactShare": 0.1631,
           "worstLate": 9,
           "lateLimit": 9,
           "lateLimitFrom": "unit atbasar",
@@ -2333,13 +2337,13 @@
           "checked": 18250,
           "lateEnd": 0,
           "late": {
-            "0": 9811,
-            "1": 7599,
-            "2": 840,
-            "3+": 0
+            "0": 9509,
+            "1": 7650,
+            "2": 1090,
+            "3+": 1
           },
-          "exactShare": 0.5376,
-          "worstLate": 2,
+          "exactShare": 0.521,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -2363,12 +2367,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 6162,
-            "1": 9855,
+            "0": 6192,
+            "1": 9825,
             "2": 2231,
             "3+": 2
           },
-          "exactShare": 0.3376,
+          "exactShare": 0.3393,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -2378,12 +2382,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 8175,
-            "1": 8570,
+            "0": 8296,
+            "1": 8449,
             "2": 1505,
             "3+": 0
           },
-          "exactShare": 0.4479,
+          "exactShare": 0.4546,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -2393,12 +2397,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2761,
-            "1": 8743,
-            "2": 3253,
-            "3+": 3493
+            "0": 2839,
+            "1": 8708,
+            "2": 3265,
+            "3+": 3438
           },
-          "exactShare": 0.1513,
+          "exactShare": 0.1556,
           "worstLate": 8,
           "lateLimit": 8,
           "lateLimitFrom": "unit atbasar",
@@ -3210,8 +3214,8 @@
         "class D (authority): 3 min": {
           "events": ["sunrise", "dhuhr", "asrHanafi", "maghrib"]
         },
-        "unit ekibastuz: 7 min": {
-          "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 7 min after the place's table",
+        "unit ekibastuz: 8 min": {
+          "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 8 min after the place's table",
           "events": ["isha"]
         },
         "unit ekibastuz: 9 min": {
@@ -3228,12 +3232,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 3060,
-            "1": 9331,
-            "2": 3394,
-            "3+": 2465
+            "0": 3049,
+            "1": 9212,
+            "2": 3497,
+            "3+": 2492
           },
-          "exactShare": 0.1677,
+          "exactShare": 0.1671,
           "worstLate": 9,
           "lateLimit": 9,
           "lateLimitFrom": "unit ekibastuz",
@@ -3243,12 +3247,12 @@
           "checked": 18250,
           "lateEnd": 0,
           "late": {
-            "0": 9587,
-            "1": 7748,
+            "0": 9574,
+            "1": 7761,
             "2": 915,
             "3+": 0
           },
-          "exactShare": 0.5253,
+          "exactShare": 0.5246,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3258,12 +3262,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 10916,
-            "1": 7039,
+            "0": 10734,
+            "1": 7221,
             "2": 295,
             "3+": 0
           },
-          "exactShare": 0.5981,
+          "exactShare": 0.5882,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3273,12 +3277,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 6498,
-            "1": 9617,
-            "2": 2134,
+            "0": 6446,
+            "1": 9568,
+            "2": 2235,
             "3+": 1
           },
-          "exactShare": 0.3561,
+          "exactShare": 0.3532,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3288,12 +3292,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 8099,
-            "1": 8799,
-            "2": 1352,
+            "0": 8032,
+            "1": 8717,
+            "2": 1501,
             "3+": 0
           },
-          "exactShare": 0.4438,
+          "exactShare": 0.4401,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3303,14 +3307,14 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2817,
-            "1": 8907,
-            "2": 3052,
-            "3+": 3474
+            "0": 2793,
+            "1": 8787,
+            "2": 3146,
+            "3+": 3524
           },
-          "exactShare": 0.1544,
-          "worstLate": 7,
-          "lateLimit": 7,
+          "exactShare": 0.153,
+          "worstLate": 8,
+          "lateLimit": 8,
           "lateLimitFrom": "unit ekibastuz",
           "overLimit": 0
         },
@@ -3320,8 +3324,8 @@
           "late": {
             "0": 0,
             "1": 8,
-            "2": 117,
-            "3+": 18125
+            "2": 116,
+            "3+": 18126
           },
           "exactShare": 0,
           "worstLate": 11,
@@ -3748,12 +3752,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2706,
-            "1": 9696,
-            "2": 3733,
-            "3+": 2115
+            "0": 2728,
+            "1": 9669,
+            "2": 3731,
+            "3+": 2122
           },
-          "exactShare": 0.1483,
+          "exactShare": 0.1495,
           "worstLate": 8,
           "lateLimit": 8,
           "lateLimitFrom": "entry kz.qmdb",
@@ -3763,13 +3767,13 @@
           "checked": 18250,
           "lateEnd": 0,
           "late": {
-            "0": 10030,
-            "1": 7355,
-            "2": 865,
-            "3+": 0
+            "0": 9718,
+            "1": 7397,
+            "2": 1134,
+            "3+": 1
           },
-          "exactShare": 0.5496,
-          "worstLate": 2,
+          "exactShare": 0.5325,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -3793,12 +3797,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 6719,
-            "1": 9488,
+            "0": 6744,
+            "1": 9463,
             "2": 2040,
             "3+": 3
           },
-          "exactShare": 0.3682,
+          "exactShare": 0.3695,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3808,12 +3812,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 8179,
-            "1": 8554,
+            "0": 8304,
+            "1": 8429,
             "2": 1517,
             "3+": 0
           },
-          "exactShare": 0.4482,
+          "exactShare": 0.455,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3823,12 +3827,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2471,
-            "1": 9723,
-            "2": 3688,
-            "3+": 2368
+            "0": 2542,
+            "1": 9735,
+            "2": 3659,
+            "3+": 2314
           },
-          "exactShare": 0.1354,
+          "exactShare": 0.1393,
           "worstLate": 7,
           "lateLimit": 7,
           "lateLimitFrom": "unit kandyagash",
@@ -7370,8 +7374,8 @@
         "class D (authority): 3 min": {
           "events": ["sunrise", "dhuhr", "asrHanafi", "maghrib"]
         },
-        "unit rudny: 7 min": {
-          "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 7 min after the place's table",
+        "unit rudny: 8 min": {
+          "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 8 min after the place's table",
           "events": ["isha"]
         },
         "unit rudny: 9 min": {
@@ -7388,10 +7392,10 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 2695,
-            "1": 9712,
-            "2": 3208,
-            "3+": 2635
+            "0": 2696,
+            "1": 9591,
+            "2": 3295,
+            "3+": 2668
           },
           "exactShare": 0.1477,
           "worstLate": 9,
@@ -7403,12 +7407,12 @@
           "checked": 18250,
           "lateEnd": 0,
           "late": {
-            "0": 9652,
-            "1": 7829,
+            "0": 9628,
+            "1": 7853,
             "2": 769,
             "3+": 0
           },
-          "exactShare": 0.5289,
+          "exactShare": 0.5276,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -7418,12 +7422,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 11548,
-            "1": 6520,
+            "0": 11438,
+            "1": 6630,
             "2": 182,
             "3+": 0
           },
-          "exactShare": 0.6328,
+          "exactShare": 0.6267,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -7433,12 +7437,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 7167,
-            "1": 9779,
-            "2": 1304,
+            "0": 7152,
+            "1": 9729,
+            "2": 1369,
             "3+": 0
           },
-          "exactShare": 0.3927,
+          "exactShare": 0.3919,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -7448,12 +7452,12 @@
           "checked": 18250,
           "early": 0,
           "late": {
-            "0": 8623,
-            "1": 8767,
-            "2": 860,
+            "0": 8596,
+            "1": 8664,
+            "2": 990,
             "3+": 0
           },
-          "exactShare": 0.4725,
+          "exactShare": 0.471,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -7464,13 +7468,13 @@
           "early": 0,
           "late": {
             "0": 2653,
-            "1": 9143,
-            "2": 2790,
-            "3+": 3664
+            "1": 9037,
+            "2": 2854,
+            "3+": 3706
           },
           "exactShare": 0.1454,
-          "worstLate": 7,
-          "lateLimit": 7,
+          "worstLate": 8,
+          "lateLimit": 8,
           "lateLimitFrom": "unit rudny",
           "overLimit": 0
         },
@@ -7479,9 +7483,9 @@
           "lateEnd": 0,
           "late": {
             "0": 0,
-            "1": 82,
-            "2": 339,
-            "3+": 17829
+            "1": 78,
+            "2": 333,
+            "3+": 17839
           },
           "exactShare": 0,
           "worstLate": 10,
@@ -8280,13 +8284,13 @@
         "class D (authority): 3 min": {
           "events": ["sunrise", "dhuhr", "asrHanafi", "maghrib"]
         },
-        "entry kz.qmdb: 6 min": {
-          "reason": "the same AngleBased residual in Isha from July to mid-August, up to 5 min from Astana to Pavlodar and 6 from 54.3N to QMDB's northernmost place, Isakovka (task 7f, fix rounds of 3 and 6 Oct 2026)",
-          "events": ["isha"]
-        },
         "entry kz.qmdb: 8 min": {
           "reason": "QMDB's AngleBased Fajr runs ahead of the model from about 46N, around the solstice there and from late April to early June in the north, more the farther north: up to 4 min from 46N to 48N, 5 to 7 from 48N to 54.4N, 8 from 54.5N to Isakovka, QMDB's northernmost place (task 7f, fix rounds of 3 and 6 Oct 2026)",
           "events": ["fajr"]
+        },
+        "unit shakhtinsk: 7 min": {
+          "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), QMDB's AngleBased Isha residual at the place's own table and the later of the place's dusk and the user's own add up, so Isha comes up to 7 min after the place's table",
+          "events": ["isha"]
         },
         "unit shakhtinsk: 10 min": {
           "reason": "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so it comes up to 10 min before the place's printed Fajr",
@@ -8298,12 +8302,12 @@
           "checked": 13140,
           "early": 0,
           "late": {
-            "0": 1589,
-            "1": 6776,
-            "2": 3257,
-            "3+": 1518
+            "0": 1536,
+            "1": 6786,
+            "2": 3303,
+            "3+": 1515
           },
-          "exactShare": 0.1209,
+          "exactShare": 0.1169,
           "worstLate": 7,
           "lateLimit": 8,
           "lateLimitFrom": "entry kz.qmdb",
@@ -8313,12 +8317,12 @@
           "checked": 13140,
           "lateEnd": 0,
           "late": {
-            "0": 8624,
-            "1": 4495,
-            "2": 21,
+            "0": 8782,
+            "1": 4338,
+            "2": 20,
             "3+": 0
           },
-          "exactShare": 0.6563,
+          "exactShare": 0.6683,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -8328,12 +8332,12 @@
           "checked": 13140,
           "early": 0,
           "late": {
-            "0": 6750,
-            "1": 6100,
+            "0": 6257,
+            "1": 6593,
             "2": 290,
             "3+": 0
           },
-          "exactShare": 0.5137,
+          "exactShare": 0.4762,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -8343,12 +8347,12 @@
           "checked": 13140,
           "early": 0,
           "late": {
-            "0": 3854,
-            "1": 7449,
-            "2": 1836,
+            "0": 3760,
+            "1": 7450,
+            "2": 1929,
             "3+": 1
           },
-          "exactShare": 0.2933,
+          "exactShare": 0.2861,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -8358,12 +8362,12 @@
           "checked": 13140,
           "early": 0,
           "late": {
-            "0": 4866,
-            "1": 7137,
-            "2": 1137,
+            "0": 4650,
+            "1": 7180,
+            "2": 1310,
             "3+": 0
           },
-          "exactShare": 0.3703,
+          "exactShare": 0.3539,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -8373,15 +8377,15 @@
           "checked": 13140,
           "early": 0,
           "late": {
-            "0": 1593,
-            "1": 6851,
-            "2": 2858,
-            "3+": 1838
+            "0": 1433,
+            "1": 6703,
+            "2": 3078,
+            "3+": 1926
           },
-          "exactShare": 0.1212,
-          "worstLate": 6,
-          "lateLimit": 6,
-          "lateLimitFrom": "entry kz.qmdb",
+          "exactShare": 0.1091,
+          "worstLate": 7,
+          "lateLimit": 7,
+          "lateLimitFrom": "unit shakhtinsk",
           "overLimit": 0
         },
         "endOfEating": {

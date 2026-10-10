@@ -25,7 +25,7 @@ import kotlin.system.exitProcess
  * with the unit (`<entry>/<unit>`, so the gate checks the point resolves there):
  *
  * - at [BEARINGS] bearings and [SHARES] of its radius, a fixed grid the monitor's recipes extend each new year;
- * - and at each event's worst point of a dense sweep ([sweep]: 312 points a unit, and a finer sweep of 1,320 more
+ * - and at each event's worst point of a dense sweep ([sweep]: 392 points a unit, and a finer sweep of 1,560 more
  *   where fewer than [MIN_SWEPT] of them fall inside the unit, against the unit's own tables in the archive): the
  *   lateness that decides the unit's figure and limits sits near the edge and between bearings, and in a unit that
  *   other units hem in (Fayfa: 15 of a 72-point grid inside it), where a sparse grid misses it by a minute.
@@ -77,21 +77,22 @@ object ReachRows {
     val SHARES: List<Double> = listOf(0.5, 0.95)
 
     /**
-     * The sweep's grids, as (bearings, shares): 40 bearings from 4.5° by 9° at six shares to just short of the edge,
+     * The sweep's grids, as (bearings, shares): 40 bearings from 4.5° by 9° at eight shares out to the edge itself
+     * (a reach holds its edge; the review found Isha's worst at 99.9 %, 10 Oct 2026),
      * and the review's fourth grid, 24 bearings from 7.5° by 15° at 40, 85 and 99.5 % (10 Oct 2026). `CityUnitsTest`
      * checks the rows on that grid and on another, offset from all of these.
      */
     val SWEEP: List<Pair<List<Double>, List<Double>>> = listOf(
-        (0 until 40).map { 4.5 + 9.0 * it } to listOf(0.35, 0.6, 0.8, 0.93, 0.97, 0.995),
+        (0 until 40).map { 4.5 + 9.0 * it } to listOf(0.35, 0.6, 0.8, 0.93, 0.97, 0.995, 0.999, 1.0),
         (0 until 24).map { 7.5 + 15.0 * it } to listOf(0.4, 0.85, 0.995),
     )
 
     /** The finer sweep where fewer than [MIN_SWEPT] points of [SWEEP] fall inside the unit: 120 bearings from 1.5° by 3°. */
     val FINE: Pair<List<Double>, List<Double>> =
-        (0 until 120).map { 1.5 + 3.0 * it } to listOf(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.92, 0.97, 0.995)
+        (0 until 120).map { 1.5 + 3.0 * it } to listOf(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.92, 0.97, 0.995, 0.999, 1.0)
 
-    /** Half of [SWEEP]'s 312 points. */
-    const val MIN_SWEPT = 156
+    /** Half of [SWEEP]'s 392 points. */
+    const val MIN_SWEPT = 196
 
     /** The points of the sweep around [unit] inside it, the finer sweep's too where [SWEEP]'s are few. */
     fun sweep(spec: Spec, unit: AuthorityUnit, zone: String): Pair<List<Point>, Boolean> {
