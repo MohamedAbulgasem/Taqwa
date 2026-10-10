@@ -214,11 +214,19 @@ internal fun pointTable(entry: RegistryEntry, name: String, point: GeoPoint): Un
  * user's point a minute later (the edge), the end of eating with no fitted margin (atEdge: SAFE_END or
  * lower), and, within [ENDS_REACH_FACTOR] reaches, the table's point still bounding sunrise, the end
  * of eating and imsak (an ends-only fixed point). Farther, the user's point alone: there the table's
- * sunrise would be more than three times the class's minutes before the user's own.
+ * sunrise would be more than three times the class's minutes before the user's own. [endsReachFactor]
+ * narrows that where a unit's reach already bounds every time against the user's own point (Umm al-Qura's
+ * and QMDB's places: one reach, so beyond every unit the user's point alone).
  */
-internal fun TimetableMethod.beyondTable(id: String, tablePoint: GeoPoint, user: GeoPoint, reachKm: Double): TimetableMethod {
+internal fun TimetableMethod.beyondTable(
+    id: String,
+    tablePoint: GeoPoint,
+    user: GeoPoint,
+    reachKm: Double,
+    endsReachFactor: Double = ENDS_REACH_FACTOR,
+): TimetableMethod {
     val edge = atEdge(id, margins.widened(BEYOND_REACH_SECONDS))
-    return if (distanceKm(user, tablePoint) <= reachKm * ENDS_REACH_FACTOR) {
+    return if (distanceKm(user, tablePoint) <= reachKm * endsReachFactor) {
         edge.copy(fixedPoint = tablePoint, fixedPointMode = FixedPointMode.ENDS_ONLY)
     } else {
         edge.copy(fixedPoint = null)

@@ -126,16 +126,18 @@ object QmdbPlaces {
     class ReachLimit(val key: String, val fajr: Int?, val isha: Int?, val endOfEating: Int?)
 
     /**
-     * The measured places whose own tables, replayed across their reach (official/gate/kz-qmdb-reach.tsv: 8 bearings,
-     * half and 95 % of the radius; the review of 9 Oct 2026, "prove it across the unit"), pass the entry's Fajr 8, Isha
+     * The measured places whose own tables, replayed across their reach (official/gate/kz-qmdb-reach.tsv: a grid and
+     * each event's worst point of a dense sweep; the reviews of 9 and 10 Oct 2026, "prove it across the unit"), pass the
+     * entry's Fajr 8, Isha
      * 6 or end of eating 8: each one's limits for those events, the gate's worst there (ruling R41; the reasons are
-     * `CentralAsia`'s). None passes 10. Dhuhr, Asr, Maghrib and sunrise stay within class D's 3 everywhere.
+     * `CentralAsia`'s). The end of eating reaches 11 at eight units (the entry's 8 and the reach's 3), the owner's to
+     * accept. Dhuhr, Asr, Maghrib and sunrise stay within class D's 3 everywhere.
      */
     val reachLimits: List<ReachLimit> = listOf(
-        ReachLimit("astana", fajr = null, isha = 7, endOfEating = 10),
+        ReachLimit("astana", fajr = null, isha = 7, endOfEating = 11),
         ReachLimit("kokshetau", fajr = 9, isha = 8, endOfEating = 10),
         ReachLimit("kostanay", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("pavlodar", fajr = 9, isha = 7, endOfEating = 10),
+        ReachLimit("pavlodar", fajr = 9, isha = 8, endOfEating = 10),
         ReachLimit("petropavl", fajr = 10, isha = 8, endOfEating = 10),
         ReachLimit("isakovka", fajr = 9, isha = 8, endOfEating = 10),
         ReachLimit("krasny-yar", fajr = 9, isha = 8, endOfEating = 10),
@@ -144,31 +146,31 @@ object QmdbPlaces {
         ReachLimit("aksay", fajr = null, isha = 7, endOfEating = 10),
         ReachLimit("aktobe", fajr = null, isha = 7, endOfEating = 10),
         ReachLimit("vagulino", fajr = null, isha = 7, endOfEating = 9),
-        ReachLimit("bugrovoe", fajr = null, isha = 7, endOfEating = 9),
+        ReachLimit("bugrovoe", fajr = 9, isha = 8, endOfEating = 10),
         ReachLimit("pulemetovka", fajr = 10, isha = 7, endOfEating = 9),
         ReachLimit("spasovka", fajr = null, isha = 7, endOfEating = 9),
-        ReachLimit("khromtau", fajr = null, isha = null, endOfEating = 10),
-        ReachLimit("arkalyk", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("oskemen", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("akkol", fajr = null, isha = 7, endOfEating = 10),
+        ReachLimit("khromtau", fajr = null, isha = 7, endOfEating = 10),
+        ReachLimit("arkalyk", fajr = null, isha = 7, endOfEating = 11),
+        ReachLimit("oskemen", fajr = null, isha = 7, endOfEating = 11),
+        ReachLimit("akkol", fajr = 9, isha = 8, endOfEating = 10),
         ReachLimit("rudny", fajr = 9, isha = 7, endOfEating = 10),
-        ReachLimit("makinsk", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("lisakovsk", fajr = null, isha = 8, endOfEating = 10),
-        ReachLimit("stepnogorsk", fajr = null, isha = 8, endOfEating = 10),
-        ReachLimit("aksu-pavlodar", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("atbasar", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("ekibastuz", fajr = null, isha = 7, endOfEating = 10),
+        ReachLimit("makinsk", fajr = 9, isha = 8, endOfEating = 11),
+        ReachLimit("lisakovsk", fajr = 9, isha = 8, endOfEating = 11),
+        ReachLimit("stepnogorsk", fajr = null, isha = 8, endOfEating = 11),
+        ReachLimit("aksu-pavlodar", fajr = 9, isha = 8, endOfEating = 10),
+        ReachLimit("atbasar", fajr = 9, isha = 8, endOfEating = 10),
+        ReachLimit("ekibastuz", fajr = 9, isha = 7, endOfEating = 11),
         ReachLimit("shemonaikha", fajr = null, isha = 7, endOfEating = 10),
         ReachLimit("semey", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("ridder", fajr = null, isha = 7, endOfEating = 10),
+        ReachLimit("ridder", fajr = null, isha = 7, endOfEating = 11),
         ReachLimit("temirtau", fajr = null, isha = 7, endOfEating = 10),
         ReachLimit("karaganda", fajr = null, isha = null, endOfEating = 10),
         ReachLimit("saran", fajr = null, isha = 7, endOfEating = 9),
         ReachLimit("altay", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("shakhtinsk", fajr = null, isha = null, endOfEating = 9),
-        ReachLimit("kandyagash", fajr = null, isha = null, endOfEating = 10),
+        ReachLimit("shakhtinsk", fajr = null, isha = null, endOfEating = 10),
+        ReachLimit("kandyagash", fajr = null, isha = 7, endOfEating = 10),
         ReachLimit("kalbatau", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("embi", fajr = null, isha = null, endOfEating = 10),
+        ReachLimit("embi", fajr = null, isha = 7, endOfEating = 10),
     )
 
     /** An app city: the [key] of its QMDB place's unit, its id in the app's city list, and the point the app gives it. */

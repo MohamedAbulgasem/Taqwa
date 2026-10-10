@@ -8,6 +8,7 @@ import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.Units
+import world.taqwa.app.prayer.engine.registry.data.ProofStamps
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
 import world.taqwa.app.prayer.engine.registry.distanceKm
@@ -41,11 +42,11 @@ import kotlin.test.fail
  *   stays within three minutes of the village's own day and is never before their own point;
  * - every Saudi and Kazakh city of the app's list is inside a unit but the few no place of the authority's list
  *   is near, which this names;
- * - with the archive: at the four edges of every unit's reach (north, east, south and west, 95 % of the radius),
- *   the engine is never early, no end is late and nothing passes its late limit (the unit's own, ruling R41, which
- *   the reach rows of 9 Oct 2026 measured across the unit) against the unit's own city tables, the tables the gate
- *   reads at the unit's point; the worst lateness is printed. And so on rings around 24 of the larger Kazakh
- *   cities, out to 15 km, against the city's own tables.
+ * - with the archive: across every unit, on a grid offset from the reach rows', the engine is never early, no end
+ *   is late, nothing passes its late limit (the unit's own, ruling R41, which the reach rows measured across the
+ *   unit) and no start passes the unit's own figure, against the unit's own tables; and at each unit's own point and
+ *   the app's city point the limits from before the reach rows still hold. And so on rings around 24 of the larger
+ *   Kazakh cities, out to 15 km, against the city's own tables.
  */
 class CityUnitsTest {
 
@@ -155,43 +156,110 @@ class CityUnitsTest {
         }
     }
 
+    /**
+     * With the archive, the review of 10 Oct 2026: every measured unit's own tables on a grid of its own, offset from
+     * both the reach rows' grid and their sweep ([SWEEP_BEARINGS] × [SWEEP_SHARES]: 16 bearings from 11.25° by 22.5°,
+     * at a quarter, three quarters, 90 % and 99 % of the radius), a point another unit takes left out. Never early, no
+     * end late, nothing over its limit, and no start beyond the unit's own figure (its committed stamp row, which
+     * About reads): the reach rows found each unit's true worst.
+     */
     @Test
-    fun `at the four edges of every city unit no start is early no end late and none over its limit against its city's tables`() {
+    fun `across every unit off the reach rows no start is early or beyond its figure and none over its limit`() {
         val official = File(System.getProperty("taqwa.official") ?: error("taqwa.official not set"))
         val roots = OfficialRoots(official, TestPaths.repoRoot.resolve("tools/timetables/official"))
         val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate"))
-            .only(groups = setOf("sa-ummalqura", "kz-qmdb"))
-        val edges = mutableListOf<GateRow>()
-        val points = mutableMapOf<String, Int>()
-        for (entry in listOf("sa.ummalqura", "kz.qmdb")) {
-            for (unit in requireNotNull(Units.of(entry)).units.filter { it.measured }) {
-                // The unit's own city tables: the rows read at its point.
-                val own = manifest.rows.filter {
-                    it.entry.substringBefore('/') == entry && it.lat == unit.point.lat && it.lon == unit.point.lon
+        class Checked(val entry: String, val unit: String, val points: Int, val tally: Tally, val beyond: List<String>)
+        val pool = Executors.newFixedThreadPool(4)
+        val checked = try {
+            ReachRows.SPECS.flatMap { spec ->
+                val figures = requireNotNull(ProofStamps.of(spec.entry)).worstLateByUnit
+                requireNotNull(Units.of(spec.entry)).units.filter { it.measured }.map { unit ->
+                    pool.submit<Checked> {
+                        val own = ReachRows.ownRows(manifest, spec, unit)
+                        val points = ReachRows.points(spec, unit, own.first().zone, SWEEP_SHARES, SWEEP_BEARINGS)
+                        val tally = Tally()
+                        val beyond = mutableListOf<String>()
+                        if (roots.held) {
+                            val figure = figures[unit.id]?.filterKeys { it in STARTS }?.values?.maxOrNull()
+                            for (p in points) {
+                                val result = Gate(roots).evaluate(GateManifest(ReachRows.rowsAt(own, unit, p.at)))
+                                tally.add(result, spec.entry)
+                                val s = result.entries[spec.entry] ?: continue
+                                val worst = s.events.filterKeys { it.isStart }.values.maxOfOrNull { it.worst } ?: continue
+                                if (figure == null || worst > figure) beyond += "${spec.entry}/${unit.id} at ${p.at}: a start $worst min after, its figure $figure"
+                            }
+                        }
+                        Checked(spec.entry, unit.id, points.size, tally, beyond)
+                    }
                 }
-                assertTrue(own.isNotEmpty(), "$entry/${unit.id}: no gate row at the unit's own point")
-                for (bearing in listOf(0.0, 90.0, 180.0, 270.0)) {
-                    val at = moved(unit.point, unit.radiusKm * 0.95, bearing)
-                    assertTrue(distanceKm(at, unit.point) <= unit.radiusKm)
-                    val here = Registry.resolveEntry(Registry.byId(entry)!!, Place(at.lat, at.lon, own.first().zone, entry.take(2).uppercase()))
-                    // Where a nearer unit takes the point, that unit's own reach is the one checked.
-                    if (here.unitId != unit.id) continue
-                    points[entry] = (points[entry] ?: 0) + 1
-                    edges += own.map { it.copy(lat = at.lat, lon = at.lon, unit = unit.id, split = Split.TEST, note = "${unit.id} edge $bearing") }
+            }.map { it.get() }
+        } finally {
+            pool.shutdown()
+        }
+        if (!roots.held) return
+        for (entry in ReachRows.SPECS.map { it.entry }) {
+            val mine = checked.filter { it.entry == entry }
+            val all = Tally().also { t -> mine.forEach { t.add(it.tally) } }
+            println(
+                "$entry off the reach rows: ${mine.sumOf { it.points }} points of ${mine.size} units, ${all.placeDays} place-days; worst " +
+                    all.worst.entries.joinToString { "${it.key.key} ${it.value}" },
+            )
+        }
+        val broken = checked.flatMap { it.tally.broken.map { b -> "${it.entry}/${it.unit}: $b" } } + checked.flatMap { it.beyond }
+        if (broken.isNotEmpty()) fail("${broken.size} broken off the reach rows:\n" + broken.take(40).joinToString("\n"))
+    }
+
+    /**
+     * The review of 10 Oct 2026: the reach's limits are wider than a table's own point needs (Umm al-Qura's starts 2 and
+     * ends 3 for the reach, against class A's minute), so the rows at each unit's own point and at the app's point for
+     * its city (the group files, without the reach files) are held here to the limits they kept before the reach rows:
+     * a one-minute regression at a city's own point fails.
+     */
+    @Test
+    fun `at each unit's own point and the app's city point the limits from before the reach hold`() {
+        val official = File(System.getProperty("taqwa.official") ?: error("taqwa.official not set"))
+        val roots = OfficialRoots(official, TestPaths.repoRoot.resolve("tools/timetables/official"))
+        val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate"))
+        val result = Gate(roots).evaluate(manifest.only(groups = setOf("sa-ummalqura", "kz-qmdb")))
+        if (!roots.held) return
+        val over = mutableListOf<String>()
+        for ((entry, s) in result.entries) {
+            for ((unit, u) in s.units) {
+                for ((event, e) in u.events) {
+                    val limit = pointLimit(entry, unit, event.key)
+                    if (e.worst > limit) over += "$entry/$unit ${event.key}: ${e.worst} min, its own point's limit $limit"
                 }
             }
         }
-        val result = Gate(roots).evaluate(GateManifest(edges))
-        if (!roots.held) return
-        for ((id, s) in result.entries) {
-            val starts = s.events.filterKeys { it.isStart }.values.maxOfOrNull { it.worst }
-            val ends = s.events.filterKeys { !it.isStart }.values.maxOfOrNull { it.worst }
-            println("$id: ${points[id]} edge points, ${s.placeDayCount} place-days; worst start $starts min after the city's table, worst end $ends min before it")
-            for ((event, e) in s.events) println("  ${event.key}: worst ${e.worst} min, ${e.late.joinToString("/")} days at 0/1/2/3+ min")
-        }
-        val broken = result.entries.values.flatMap { result.neverEarly(it) + result.overLimit(it) }
-        if (broken.isNotEmpty()) fail("${broken.size} broken at the edges:\n" + broken.joinToString("\n"))
+        if (over.isNotEmpty()) fail("${over.size} over the own point's limits:\n" + over.joinToString("\n"))
     }
+
+    /**
+     * The limits the tables' own points and the app's city points kept before the reach rows: Umm al-Qura class A's
+     * minute, the lag dates' 2 at Fajr, sunrise and the end of eating, the three app points west and south of KACST's
+     * (Ash Shafa at Taif, Sultanah at Madinah, Al Hufuf), and Tayma's own; QMDB the entry's Fajr 8, Isha 6, end of
+     * eating 8 and class D's 3.
+     */
+    private fun pointLimit(entry: String, unit: String, event: String): Int = when (entry) {
+        "sa.ummalqura" -> when {
+            unit == "tayma" -> if (event == "fajr") 5 else 3
+            event in setOf("fajr", "sunrise", "endOfEating") -> 2
+            unit == "taif" && event in setOf("asrStandard", "maghrib", "isha") -> 2
+            unit in setOf("madinah", "al-hofuf") && event in setOf("maghrib", "isha") -> 2
+            else -> 1
+        }
+        else -> when (event) {
+            "fajr", "endOfEating" -> 8
+            "isha" -> 6
+            else -> 3
+        }
+    }
+
+    private val STARTS = setOf("fajr", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha")
+
+    /** The independent grid: 16 bearings from 11.25° by 22.5°, offset from the reach rows' 45° and their sweep's 9°. */
+    private val SWEEP_BEARINGS = (0 until 16).map { 11.25 + 22.5 * it }
+    private val SWEEP_SHARES = listOf(0.25, 0.75, 0.9, 0.99)
 
     /**
      * The review of 9 Oct 2026 ("prove it across the unit"): every measured Umm al-Qura and QMDB unit's own tables are
@@ -391,8 +459,8 @@ class CityUnitsTest {
         var worstEarly = 0
         val broken = mutableListOf<String>()
 
-        fun add(result: GateResult?) {
-            val s = result?.entries?.get("kz.qmdb") ?: return
+        fun add(result: GateResult?, entry: String = "kz.qmdb") {
+            val s = result?.entries?.get(entry) ?: return
             placeDays += s.placeDayCount
             for ((event, e) in s.events) {
                 worst.merge(event, e.worst) { a, b -> maxOf(a, b) }

@@ -247,21 +247,28 @@ tasks.register<JavaExec>("generateQmdbPlaces") {
 
 /**
  * Writes `official/gate/sa-ummalqura-reach.tsv` and `kz-qmdb-reach.tsv`: each measured Umm al-Qura and QMDB unit's
- * own tables replayed across its area (`units/GenerateReachRows.kt`, the review of 9 Oct 2026). No archive needed: it
- * reads the gate files and the registry only. Re-run after a unit or its reach changes, then run the gate and commit.
+ * own tables replayed across its area, on a fixed grid and at each event's worst point of a dense sweep against the
+ * archive's tables (`units/GenerateReachRows.kt`, the reviews of 9 and 10 Oct 2026). Re-run after a unit, its reach
+ * or its tables change, then run the gate and commit. Takes a few minutes on every core.
  *
- *     ./gradlew -p tools/timetables generateReachRows
+ *     ./gradlew -p tools/timetables generateReachRows [-Pthreads=N]
  */
 tasks.register<JavaExec>("generateReachRows") {
     group = "application"
     description = "Writes the reach rows: each measured Umm al-Qura and QMDB unit's own tables across its area."
+    requireArchive()
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.units.GenerateReachRowsKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
     workingDir = repoRoot
-    maxHeapSize = "2g"
+    maxHeapSize = "4g"
     val root = repoRoot.path
-    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", root) })
+    val official = officialRoot
+    val threads = providers.gradleProperty("threads").orElse("")
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", root, "--official", official.get()) +
+            (if (threads.get().isNotBlank()) listOf("--threads", threads.get()) else emptyList())
+    })
 }
 
 /**

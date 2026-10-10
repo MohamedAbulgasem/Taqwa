@@ -5,6 +5,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import world.taqwa.app.location.LocationRepository
+import kotlin.concurrent.Volatile
 
 /**
  * Searches the bundled GeoNames extract. The CSV is pre-sorted by population descending, so
@@ -32,6 +33,7 @@ class CityRepository(
     private var cache: List<City>? = null
 
     /** The language asked for, "" for English or anything the bundle has no file for. */
+    @Volatile
     private var wantedLanguage: String = ""
 
     /** The language [localizedNames] was built from; null while nothing has been loaded yet. */
@@ -46,6 +48,7 @@ class CityRepository(
     private var foldedNames: Map<Int, String> = emptyMap()
 
     /** What [data] last returned, with its language: read without the lock by [loadedDisplayName]. */
+    @Volatile
     private var snapshot: Loaded? = null
 
     /** Guards the one-time parse so two concurrent callers cannot each build the 34k-row list. */

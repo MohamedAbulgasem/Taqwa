@@ -55,7 +55,7 @@ object UmmAlQura {
      * earlier, so a minute more again at its edge: each unit's own tables, replayed at 8 bearings and at half and
      * 95 % of its radius (sa-ummalqura-reach.tsv, the review of 9 Oct 2026, "prove it across the unit"), came up to
      * 2 min after it at every start ([lagDateLimit], [reachStartsLimit]) and 3 before it at sunrise and the end of
-     * eating ([reachEndsLimit]); at nine units of the north and the east, Fajr up to 3 ([reachFajrLimit]).
+     * eating ([reachEndsLimit]); at fifteen units, Fajr up to 3 ([reachFajrLimit]).
      */
     val lagDateLimit = LateLimit(
         2,
@@ -84,8 +84,8 @@ object UmmAlQura {
     )
 
     /**
-     * Nine units of the north and the east, where a lag date's later Fajr and the reach's later sun meet at the edge:
-     * Fajr up to 3 min after the unit's table there (the reach rows, 9 Oct 2026).
+     * Fifteen units, where a lag date's later Fajr and the reach's later sun meet at the edge: Fajr up to 3 min after
+     * the unit's table there (the reach rows and their sweep, 9 and 10 Oct 2026).
      */
     private val reachFajrLimit = LateLimit(
         3,
@@ -96,7 +96,8 @@ object UmmAlQura {
 
     /** The units whose reach's edge needs [reachFajrLimit] (the gate, sa-ummalqura-reach.tsv). */
     private val reachFajr = setOf(
-        "al-qurayyat", "al-uwayqiliyah", "az-zulfi", "dhahran", "dumah-al-jandal", "haql", "khafji", "mawqaq", "turaif",
+        "al-bada", "al-qurayyat", "al-quwarah", "al-uwayqiliyah", "az-zulfi", "dhahran", "dumah-al-jandal", "haql",
+        "khafji", "marat", "mawqaq", "qaryat-al-ulya", "rumah", "tabuk", "turaif",
     )
 
     /** Umm al-Qura's Fajr declination bias (degrees), by day of year. */
@@ -169,15 +170,17 @@ object UmmAlQura {
      * [UmmAlQuraCities]' 173 places is a unit at KACST's own point, which rides as the fixed point beside the user's
      * (ruling R15: starts the later, ends the earlier), within its R40 reach for class A, one minute of longitude
      * (24 to 27 km); gated at its own point, at the app's point for each Saudi city (sa-ummalqura.tsv) and across its
-     * reach (sa-ummalqura-reach.tsv). Beyond every unit, the nearest place's table as a point table's edge
-     * ([beyondTable], rulings R44 and R45): the user's own point a minute later, the end of eating without its fitted
-     * 47 s (a margin fitted at a table's point applies there only, so SAFE_END), and within three reaches of the
-     * nearest place its point still bounding sunrise and the end of eating; no figure (spec §3.5). About and the site
-     * call the place by the app's name for the city whose table it is ([AuthorityUnit.named], [AuthorityUnit.cityId]).
+     * reach (sa-ummalqura-reach.tsv). Beyond every unit, a point table's edge ([beyondTable], rulings R44 and R45):
+     * the user's own point a minute later, the end of eating without its fitted 47 s (a margin fitted at a table's
+     * point applies there only, so SAFE_END), and no figure (spec §3.5). R45's end bound, the nearest place's point,
+     * is kept within one reach only, as far as a unit's own minute bounds it: within three reaches it cost up to
+     * 6 min of sunrise against the user's own point (the review of 10 Oct 2026), and beyond every unit it never
+     * applies. About and the site call the place by the app's name for the city whose table it is
+     * ([AuthorityUnit.named], [AuthorityUnit.cityId]).
      */
     val units = UnitSet("sa.ummalqura", cityUnits, choose = ::taymaTown) { user ->
         val nearest = cityUnits.minBy { distanceKm(user, it.point) }
-        method.beyondTable("sa.ummalqura.edge", nearest.point, user, nearest.radiusKm)
+        method.beyondTable("sa.ummalqura.edge", nearest.point, user, nearest.radiusKm, endsReachFactor = 1.0)
     }
 
     /**
