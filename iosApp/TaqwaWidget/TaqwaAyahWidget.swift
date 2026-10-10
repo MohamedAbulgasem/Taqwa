@@ -440,7 +440,7 @@ struct TaqwaAyahWidgetView: View {
         let localized = Bundle.main.localizedString(forKey: key, value: key, table: nil)
         guard localized == key else { return localized }
         let arabic = Locale.current.language.languageCode?.identifier.hasPrefix("ar") ?? false
-        return arabic ? "افتح تقوى مرة لتحميل آية اليوم" : "Open Taqwa once to load today's ayah"
+        return arabic ? "افتح تقوى مرة لتحميل آية اليوم" : "Open Taqwa once to load today’s ayah"
     }
 
     private var placeholder: some View {
