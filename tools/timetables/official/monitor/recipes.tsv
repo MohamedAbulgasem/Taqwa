@@ -25,6 +25,8 @@
 # and members no fetcher reads (Cape Town's community calendar, masjids.co.za's relay: read by hand each month).
 source	capture	gate	entry	member	point	days	from
 sa-ummalqura	*	sa-ummalqura.tsv	index	-	index	all	-
+# London Unified: one table for the whole M25 (ruling R44), so a new year is read at every point the gate file reads LUPT at, the unit's own and the twelve edges, as the 2026 rows are.
+gb-london-lupt	elm-*	gb-london-lupt.tsv	gb.london.lupt/gb.london.lupt	-	all	all	-
 sa-ummalqura-cities	*	sa-ummalqura.tsv	index	-	index	all	-
 tr-diyanet	*	tr-diyanet.tsv	same	*	same	all	-
 tr-diyanet-europe	*	tr-diyanet-europe.tsv	same	*	same	all	-

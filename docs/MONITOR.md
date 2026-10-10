@@ -103,9 +103,9 @@ restricted archive and the monitor's state. Setting it up, once:
    public checkout.
 3. Copy `tools/timetables/monitor/ci/monitor-weekly.yml` from the public repository to
    `.github/workflows/monitor-weekly.yml` there and push.
-4. Optional: add the repository secret `LPT_API_KEY` (Settings › Secrets and variables › Actions)
-   once London Prayer Times has issued a key; the fetcher reads it from the environment. Nothing
-   else is secret.
+4. Add the repository secret `LPT_API_KEY` (Settings › Secrets and variables › Actions) with the
+   key London Prayer Times issues by hand (done 10 October 2026); the fetcher reads it from the
+   environment. Nothing else is secret.
 5. Run it once by hand: Actions › Taqwa monitor › Run workflow (the `options` field takes only
    `--no-fetch`, `--check-all`, `--verbose` and `--only <a source id of sources.tsv>`; anything
    else stops the job). The first run exercises every fetcher from GitHub's addresses; a site that
@@ -368,5 +368,11 @@ Lombard, the Mosque Foundation, as us.chicago's members; a convention member suc
 checked as its member row), and the surveyed Mawaqit calendars. IACAD Dubai (Cloudflare refuses
 scripted access), the Calendar House's printed calendar and Ramadan imsakiya (PDFs), EMB's yearly
 PDF, the PA Dar al-Iftaa's perpetual table and imsakiya, Chicago's other four mosques (PDFs and
-images), and Sudan's, Gaza's and Mauritania's tables are read by hand. London Unified waits for the owner's London Prayer Times key: with it,
-`--only gb-london-lupt` reads the coming year; without it the horizon reminds from 1 December.
+images), and Sudan's, Gaza's and Mauritania's tables are read by hand. London Unified runs on its own
+since the owner added the London Prayer Times key as the secret `LPT_API_KEY` (10 October 2026): monthly,
+it reads the coming year from October (the year itself before then). Until London Prayer Times adds that
+year (late October: "2025 times added (24th Oct 2024)" on its API page) the API answers its months
+without days, so a probe of the current month tells "not out yet" (a note) from a refused key or a changed
+format (an error with the answer's shape); prove then gates the new year at every point the gate file reads
+LUPT at, the unit's own and the twelve M25 edges (one table for the whole M25, ruling R44). The first run
+with the key (10 Oct 2026) confirmed the key and the parser on October 2026.

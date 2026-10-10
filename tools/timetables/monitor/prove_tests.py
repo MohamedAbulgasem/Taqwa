@@ -231,7 +231,7 @@ class RecipesCatalogue(unittest.TestCase):
             self.assertTrue(os.path.isfile(os.path.join(official, "gate", cells[2])), cells)
             if cells[7] != "-":
                 self.assertIn(cells[7].split("/")[0], sources, cells)
-        fetched = {r[0] for r in rows[1:] if r[2] not in ("manual", "mawaqit", "london")}
+        fetched = {r[0] for r in rows[1:] if r[2] not in ("manual", "mawaqit")}
         self.assertEqual(set(), fetched - {cells[0] for cells in lines[1:]}, "a fetched source without a recipe")
 
 

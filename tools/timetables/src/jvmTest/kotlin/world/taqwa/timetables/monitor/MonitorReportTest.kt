@@ -53,10 +53,13 @@ class MonitorReportTest {
         assertTrue(sources.all { !it.manual || it.nextExpected != null || it.fetcher != "manual" }, "a source read by hand names when its next edition is expected")
         val fetchers = TestPaths.repoRoot.resolve("tools/timetables/monitor/fetchers").listFiles { f -> f.extension == "py" }!!.map { it.nameWithoutExtension }.toSet()
         for (s in sources.filter { it.fetcher != "manual" }) assertTrue(s.fetcher in fetchers, "${s.id}: no fetcher ${s.fetcher}.py")
-        // IRN runs on its own (ruling R95); London waits for the owner's key; the MJC's page is due each new month.
+        // IRN runs on its own (ruling R95); London too, monthly, since the owner's key (10 Oct 2026); the MJC's
+        // page is due each new month.
         assertEquals("irn", sources.first { it.id == "no-irn" }.fetcher)
         assertTrue(!sources.first { it.id == "no-irn" }.manual)
-        assertTrue(sources.first { it.id == "gb-london-lupt" }.manual)
+        val london = sources.first { it.id == "gb-london-lupt" }
+        assertEquals("london" to "monthly", london.fetcher to london.cadence)
+        assertTrue(!london.manual && london.nextExpected == null)
         val mjc = sources.first { it.id == "za-mjc" }
         assertEquals("mjc" to "month-start", mjc.fetcher to mjc.cadence)
         assertTrue(!mjc.manual && mjc.nextExpected == null)
@@ -309,12 +312,13 @@ class MonitorReportTest {
     }
 
     @Test
-    fun `london unified falls due as a manual source once its date passes`() {
+    fun `a manual source falls due once its date passes`() {
+        // Belgium's EMB, its next yearly table expected in December (a month alone means its first day).
         invented()
-        val run = run("2026-12-05", only = setOf("gb-london-lupt"))
+        val run = run("2026-12-05", only = setOf("be-emb"))
         assertEquals(1, run.exitCode, run.report)
-        assertTrue("Manual source due — gb-london-lupt: its next edition was expected by 2026-12-01" in run.report, run.report)
-        assertTrue("Manual source due" !in run("2026-11-30", only = setOf("gb-london-lupt")).report, "not due before its date")
+        assertTrue("Manual source due — be-emb: its next edition was expected by 2026-12-01" in run.report, run.report)
+        assertTrue("Manual source due" !in run("2026-11-30", only = setOf("be-emb")).report, "not due before its date")
     }
 
     @Test
