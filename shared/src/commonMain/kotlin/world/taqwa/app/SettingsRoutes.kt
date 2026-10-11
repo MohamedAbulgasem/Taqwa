@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -230,6 +229,7 @@ private val newTimesRefresh = Mutex()
 @Composable
 internal fun PrayerTimesSettingsRoute(
     prayerSettingsState: State<PrayerSettings>,
+    clockFormatState: State<ClockFormat>,
     locationState: State<GeoLocation?>,
     cityDisplayNameState: State<String?>,
     today: LocalDate,
@@ -241,7 +241,9 @@ internal fun PrayerTimesSettingsRoute(
     val prayerSettings by prayerSettingsState
     val location by locationState
     val cityDisplayName by cityDisplayNameState
-    val clockFormat by settings.clockFormat.collectAsState(initial = ClockFormat.TWENTY_FOUR_HOUR)
+    // App's state, collected since launch, as the prayer settings are: a collector of its own
+    // here would start at 24-hour and show a 12-hour reader "24-hour" for a frame.
+    val clockFormat by clockFormatState
     fun write(change: suspend () -> Unit) {
         scope.launch {
             change()

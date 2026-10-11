@@ -69,8 +69,10 @@ fun App(container: AppContainer) {
     val themeModeState = settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val themeMode by themeModeState
     // How clock times are written. It is an input to the one format every screen reads (below),
-    // so a change in Prayer times reaches every time on screen at once.
-    val clockFormat by settings.clockFormat.collectAsState(initial = ClockFormat.TWENTY_FOUR_HOUR)
+    // so a change in Prayer times reaches every time on screen at once; the Prayer times screen
+    // reads its row from this same state.
+    val clockFormatState = settings.clockFormat.collectAsState(initial = ClockFormat.TWENTY_FOUR_HOUR)
+    val clockFormat by clockFormatState
     val prayerSettingsState = settings.prayerSettings.collectAsState(initial = PrayerSettings())
     val notificationSettingsState = settings.notificationSettings.collectAsState(initial = NotificationSettings())
     val widgetBackgroundState = settings.widgetBackground.collectAsState(
@@ -472,6 +474,7 @@ fun App(container: AppContainer) {
 
                         Screen.PrayerTimesSettings -> PrayerTimesSettingsRoute(
                             prayerSettingsState = prayerSettingsState,
+                            clockFormatState = clockFormatState,
                             locationState = locationState,
                             cityDisplayNameState = cityDisplayNameState,
                             today = today,
