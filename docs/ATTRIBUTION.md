@@ -13,7 +13,7 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
 - **Prayer time calculation**: Taqwa's own engine (`shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/`), part of Taqwa's GPL-3.0 source. The **Qibla bearing** uses [Adhan](https://github.com/batoulapps/adhan-kotlin) by Batoul Apps, MIT licence.
 - **City database**: [GeoNames](https://www.geonames.org/) `cities15000`, CC BY 4.0.
 - **Magnetic declination (iOS compass)**: the [World Magnetic Model 2025](https://www.ncei.noaa.gov/products/world-magnetic-model) by NOAA's National Centers for Environmental Information and the British Geological Survey, for the US National Geospatial-Intelligence Agency and the UK Defence Geographic Centre. Public domain, not subject to copyright; its coefficient file is embedded in `WorldMagneticModel.kt`.
-- **Manrope** typeface: SIL Open Font Licence 1.1; the licence text is in `docs/licences/OFL-1.1-Manrope.txt`, as the OFL requires of every copy.
+- **Manrope** typeface: SIL Open Font Licence 1.1; the licence text is in `docs/licences/OFL-1.1-Manrope.txt`, as the OFL requires of every copy. The website serves the app's own Manrope files from taqwa.world, and `site/build.py` puts the same licence text beside them (`taqwa.world/assets/fonts/OFL-1.1-Manrope.txt`).
 - **Adhan and takbir audio**, three recordings, one chosen in Settings under Notifications, Adhan:
   - *Original*: "Beautiful adhan" by Adam-synagda, CC0 1.0, via Wikimedia Commons.
   - *Aaqib Azeez*: "The Adhan – Muslim Call to Prayer – Aaqib Azeez", CC BY-SA 4.0, via Wikimedia Commons. The clips Taqwa bundles are trimmed and loudness-matched excerpts, and are themselves released under CC BY-SA 4.0 as that licence requires.

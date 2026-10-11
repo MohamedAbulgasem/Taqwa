@@ -1,6 +1,17 @@
 /* taqwa.world — the app's own palette and type, on the web.
    Tokens are the values in shared/.../design/Palette.kt and Type.kt; keep them in step. */
 
+/* Manrope from taqwa.world itself, not from a font service: the app's own files, which build.py
+   copies into assets/fonts/ with their OFL licence, so no page asks another host for anything.
+   These are the four weights the app bundles (Type.kt's manropeFamily). The 500 and 700 the rules
+   below ask for are drawn in Regular and ExtraBold, the faces CSS font matching picks for them,
+   as the app's own font matching does for its Medium and Bold. Text shows in the fallback stack
+   until its face has arrived. */
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 300; font-display: swap; src: url("fonts/Manrope-Light.ttf") format("truetype"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Manrope-Regular.ttf") format("truetype"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Manrope-SemiBold.ttf") format("truetype"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 800; font-display: swap; src: url("fonts/Manrope-ExtraBold.ttf") format("truetype"); }
+
 :root {
   color-scheme: light dark;
   --bg: #FBFAF7;
@@ -203,6 +214,7 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
 }
 .get h1 { font-size: clamp(40px, 6vw, 56px); }
 .get .lede { max-width: 40ch; text-wrap: balance; }
+.get .lede span { display: block; }
 .get .stores { justify-content: center; margin-top: 8px; }
 .get .soon { flex-basis: 100%; }
 .get .more { font-size: 15px; font-weight: 700; }

@@ -32,6 +32,9 @@ on:
       - "shared/src/commonMain/composeResources/values*/strings.xml"
       - "shared/src/commonMain/composeResources/files/cities.csv"
       - "shared/src/commonMain/composeResources/files/city-names-*.csv"
+      # The app's Manrope files and their licence, which site/build.py serves as the site's type.
+      - "shared/src/commonMain/composeResources/font/Manrope-*.ttf"
+      - "docs/licences/OFL-1.1-Manrope.txt"
   schedule:
     - cron: "7 */6 * * *"
   workflow_dispatch:

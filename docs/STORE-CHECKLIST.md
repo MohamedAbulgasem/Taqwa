@@ -416,7 +416,8 @@ costs days.
   seven languages; iPhone-only (`TARGETED_DEVICE_FAMILY 1`, `tools/configure-store-targets.rb`);
   `arm64`; export compliance answered in `Info.plist`.
 - **Content and licences**: `NOTICE` and `docs/ATTRIBUTION.md` say the GPL covers the code only;
-  the Manrope OFL text is in `docs/licences/`; the Mixkit source clip is no longer in the
+  the Manrope OFL text is in `docs/licences/` (and beside the fonts the site serves itself, which
+  `site/build.py` copies from the app); the Mixkit source clip is no longer in the
   repository; the privacy policy is live at taqwa.world in seven languages and the About screen
   opens it.
 - **Store assets in the repo**: 512 px icon `androidApp/src/main/ic_launcher-playstore.png`;

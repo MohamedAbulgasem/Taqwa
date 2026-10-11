@@ -25,6 +25,10 @@ tools/site-og.py). The download links under /get/ (one per channel in site/campa
 site/campaigns.py) are pages of their own, in English, kept out of the sitemap and the search
 indexes.
 
+Manrope, the app's typeface, is served from taqwa.world itself: the build copies the app's own
+font files (FONTS) and their licence into assets/fonts/, and --check fails on any page that loads
+anything from another host.
+
     ./gradlew -p tools/timetables generate   # writes _data/timetables.json (JDK 21)
     python3 site/build.py                    # writes _site/ next to the repo root
     python3 site/build.py --check            # builds, then fails on dangling links, missing
@@ -105,6 +109,14 @@ def load_languages() -> dict:
     return langs
 
 
+# Manrope, from the app's own resources rather than a copy beside the site's: the four weights the
+# app bundles, which are the four the stylesheet's weights resolve to (its @font-face rules say
+# how), and the OFL licence the app ships with them (docs/licences), which travels with the files.
+FONT_DIR = os.path.join(ROOT, "shared", "src", "commonMain", "composeResources", "font")
+FONTS = ("Manrope-Light.ttf", "Manrope-Regular.ttf", "Manrope-SemiBold.ttf", "Manrope-ExtraBold.ttf")
+FONT_LICENCE = os.path.join(ROOT, "docs", "licences", "OFL-1.1-Manrope.txt")
+
+
 def copy_static() -> None:
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
@@ -118,6 +130,10 @@ def copy_static() -> None:
             shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", ".*"))
         else:
             shutil.copy2(src, dst)
+    fonts = os.path.join(OUT, "assets", "fonts")
+    os.makedirs(fonts)
+    for path in [os.path.join(FONT_DIR, name) for name in FONTS] + [FONT_LICENCE]:
+        shutil.copy2(path, fonts)
 
 
 def render_markdown(path: str) -> str:
@@ -412,7 +428,7 @@ GET_DIR = "get/"
 GET_BODY = """<main class="wrap get">
   <div class="icon-tile" aria-hidden="true">{mark}</div>
   <h1>Taqwa</h1>
-  <p class="lede">Prayer times, Qibla and the Quran. Free forever, with no ads and no account.</p>
+  <p class="lede">Prayer times, Qibla and the Quran. <span>Free forever, with no ads and no account.</span></p>
   {stores}
   <a class="more" href="{home}">More on taqwa.world</a>
 </main>"""
@@ -520,13 +536,37 @@ def write_robots() -> None:
         f.write(f"User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n")
 
 
+# The link relations that make a browser fetch or connect to their address as the page loads; a
+# canonical or alternate link only names one.
+LOADING_RELS = {"stylesheet", "preconnect", "dns-prefetch", "preload", "modulepreload", "prefetch", "icon",
+                "apple-touch-icon", "manifest"}
+
+
+def third_party_loads(doc: str) -> list:
+    """Every address on another host that a page (or a stylesheet, `doc` being its text) makes
+    the browser load: a stylesheet, script, image, font or frame, or a connection opened ahead.
+    The site promises no tracking, and anything fetched from elsewhere tells that host who read
+    which page; links a reader follows are theirs to choose and are not counted."""
+    found = []
+    for tag in re.findall(r"<(?:link|script|img|source|iframe|video|audio|embed|object)\b[^>]*>", doc):
+        rel = re.search(r'\brel="([^"]*)"', tag)
+        if tag.startswith("<link") and not (rel and set(rel.group(1).split()) & LOADING_RELS):
+            continue
+        for value in re.findall(r'\b(?:href|src|srcset|data)="([^"]*)"', tag):
+            found += [ref for ref in (c.strip().split(" ")[0] for c in value.split(",")) if ref]
+    found += re.findall(r"url\(\s*[\"']?([^\"')\s]+)", doc)
+    found += re.findall(r"@import\s+[\"']([^\"']+)", doc)
+    return [ref for ref in found if re.match(r"(https?:)?//", ref) and not ref.startswith(ORIGIN + "/")]
+
+
 def check_site(data: timetables.Timetables) -> int:
     """Fails the build on: a relative or root-relative href/src that points at nothing, a
     template placeholder left in a page, an address Cloudflare would rewrite, an image of this
     site named by absolute address that does not exist, structured data that is not valid JSON,
     a sitemap that disagrees with the pages built, an hreflang alternate the other page does not
-    return, a timetable page that is not whole (see timetables.check_page), and a download link
-    under /get/ that is missing, indexable or tagged for another channel (check_get_pages)."""
+    return, a timetable page that is not whole (see timetables.check_page), a download link
+    under /get/ that is missing, indexable or tagged for another channel (check_get_pages), and a
+    page or the stylesheet loading anything from another host or a font that is not there."""
     problems = 0
 
     def problem(message: str) -> None:
@@ -586,6 +626,8 @@ def check_site(data: timetables.Timetables) -> int:
                         f"it while the App Store is {'live' if STORES['app_store'] else 'not live'}")
             for address in unshielded_emails(doc):
                 problem(f"unshielded email: {rel_path} -> {address}")
+            for ref in third_party_loads(doc):
+                problem(f"third party: {rel_path} loads {ref}")
             for kind, ref in re.findall(r'(href|src|srcset)="([^"]*)"', doc):
                 if not ref or re.match(r"^(https?:|mailto:|data:)", ref):
                     continue
@@ -633,6 +675,14 @@ def check_site(data: timetables.Timetables) -> int:
             problem(f"sitemap: no page for {loc}")
     if len(locs) != len(pages) or len(set(locs)) != len(locs):
         problem(f"sitemap: {len(locs)} addresses ({len(set(locs))} distinct) for {len(pages)} pages")
+    # The stylesheet's own references (the fonts) are files of the site, and nothing from elsewhere.
+    with open(os.path.join(OUT, "assets", "style.css"), encoding="utf-8") as f:
+        css = f.read()
+    for ref in third_party_loads(css):
+        problem(f"third party: assets/style.css loads {ref}")
+    for ref in re.findall(r"url\(\s*[\"']?([^\"')\s]+)", css):
+        if not re.match(r"(https?:|data:|#)", ref) and not os.path.exists(os.path.join(OUT, "assets", ref.partition("?")[0])):
+            problem(f"dangling: assets/style.css -> {ref}")
     with open(os.path.join(OUT, "robots.txt"), encoding="utf-8") as f:
         if f"Sitemap: {ORIGIN}/sitemap.xml" not in f.read():
             problem("robots.txt: no Sitemap line")
