@@ -15,7 +15,7 @@ data class WidgetContent(
      * (spec §4.5) rather than showing plain numbers alone. */
     val ringProgress: Float,
     /** The fully-formed, already-localised "next prayer in" phrase (e.g. "Dhuhr in" /
-     * "متبقٍ على الظهر"). Both widget targets show this verbatim instead of composing their own
+     * "متبقٍّ على الظهر"). Both widget targets show this verbatim instead of composing their own
      * suffix, so a hardcoded English "IN" never leaks into a non-English locale again. */
     val countdownLabel: String,
 )

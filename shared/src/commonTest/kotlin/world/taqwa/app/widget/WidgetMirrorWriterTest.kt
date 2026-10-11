@@ -85,7 +85,7 @@ class WidgetMirrorWriterTest {
     }
 
     // The exact phrase `Res.string.prayer_next_in` renders for the Prayer screen's ring — "Asr in"
-    // in English, "متبقٍ على العصر" in Arabic — for the next prayer. This is what proves the mirror
+    // in English, "متبقٍّ على العصر" in Arabic — for the next prayer. This is what proves the mirror
     // writes the localised sentence itself, never a hardcoded English suffix it composes on its
     // own (that bug is this fix's whole reason to exist), and that it responds to the device's
     // language rather than being pinned to one.
@@ -100,7 +100,7 @@ class WidgetMirrorWriterTest {
     fun countdownLabelSwitchesToArabicWithTheDeviceLanguage() {
         val store = FakeKeyValueStore()
         WidgetMirrorWriter.write(store, today, "UTC", FakePlatformFormat("ar"))
-        assertEquals("متبقٍ على العصر", WidgetMirrorWriter.read(store)!!.countdownLabel)
+        assertEquals("متبقٍّ على العصر", WidgetMirrorWriter.read(store)!!.countdownLabel)
     }
 
     // -- C5: the ring is the one field that used to change every second -----------------------

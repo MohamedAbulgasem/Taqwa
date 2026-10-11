@@ -31,7 +31,7 @@ object WidgetMirrorWriter {
 
     /**
      * Mirrors the exact copy `Res.string.prayer_next_in` renders for the Prayer screen's ring
-     * ("%1$s in" / "متبقٍ على %1$s") as plain Kotlin instead of a resource lookup — for the same
+     * ("%1$s in" / "متبقٍّ على %1$s") as plain Kotlin instead of a resource lookup — for the same
      * reason [world.taqwa.app.notifications.LocalizedNotificationCopy] is: this runs from a plain,
      * non-composable writer, which is what makes it testable without a resource loader. That
      * matters concretely here, not just stylistically — Compose Multiplatform's non-composable

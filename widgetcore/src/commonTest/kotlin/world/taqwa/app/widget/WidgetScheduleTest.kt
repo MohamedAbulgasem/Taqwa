@@ -138,7 +138,7 @@ class WidgetScheduleTest {
     fun theLabelFollowsTheMirrorsLanguage() {
         val arabic = snapshot.copy(languageTag = "ar")
         val content = WidgetContentBuilder.build(arabic, midnight + 19 * hour)
-        assertEquals("متبقٍ على العشاء", content.countdownLabel)
+        assertEquals("متبقٍّ على العشاء", content.countdownLabel)
         assertEquals("العشاء", content.nextPrayerDisplayName)
     }
 }

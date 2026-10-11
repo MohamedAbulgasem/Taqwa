@@ -8,7 +8,7 @@ import world.taqwa.app.domain.Prayer
  * target needs a JSON dependency for eight fixed fields. [ringProgress] exists only for iOS's
  * lock-screen circular complication, which the spec asks to show as a ring, not just numbers.
  * [countdownLabel] is the fully-formed, already-localised "next prayer in" phrase (e.g. "Dhuhr
- * in" / "متبقٍ على الظهر") — written once here so neither widget target has to hardcode an
+ * in" / "متبقٍّ على الظهر") — written once here so neither widget target has to hardcode an
  * English "in" suffix or reach into `shared`'s Compose resources itself.
  */
 data class WidgetSnapshot(

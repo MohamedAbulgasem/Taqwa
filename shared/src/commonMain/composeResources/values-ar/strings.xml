@@ -34,7 +34,7 @@
 
     <!-- Prayer screen -->
     <string name="prayer_current_location">الموقع الحالي</string>
-    <string name="prayer_next_in">متبقٍ على %1$s</string>
+    <string name="prayer_next_in">متبقٍّ على %1$s</string>
     <string name="prayer_exact_alarms_label">المنبهات الدقيقة معطّلة</string>
     <string name="prayer_exact_alarms_body">قد يتأخر التنبيه حتى ساعة ما لم يُسمح لتقوى بـ«المنبهات والتذكيرات».</string>
     <string name="prayer_no_location_title">لا يوجد موقع بعد</string>

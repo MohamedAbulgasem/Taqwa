@@ -29,7 +29,7 @@ private val NAMES: Map<UiLanguage, Map<Prayer, String>> = mapOf(
  */
 private val COUNTDOWN: Map<UiLanguage, String> = mapOf(
     UiLanguage.ENGLISH to "{prayer} in",
-    UiLanguage.ARABIC to "متبقٍ على {prayer}",
+    UiLanguage.ARABIC to "متبقٍّ على {prayer}",
     UiLanguage.FRENCH to "{prayer} dans",
     UiLanguage.TURKISH to "{prayer} vaktine",
     UiLanguage.INDONESIAN to "Menuju {prayer}",
