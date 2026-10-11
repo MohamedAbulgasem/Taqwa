@@ -8,6 +8,9 @@
   "creator-id-2": {"utm_source": "indonesian-creators", "utm_medium": "creator", "utm_campaign": "creator-id-2"},
   "creator-id-3": {"utm_source": "indonesian-creators", "utm_medium": "creator", "utm_campaign": "creator-id-3"},
   "github": {"utm_source": "github", "utm_medium": "readme", "utm_campaign": "github"},
+  "linkedin": {"utm_source": "linkedin", "utm_medium": "social", "utm_campaign": "linkedin"},
+  "instagram": {"utm_source": "instagram", "utm_medium": "social", "utm_campaign": "instagram"},
+  "facebook": {"utm_source": "facebook", "utm_medium": "social", "utm_campaign": "facebook"},
   "share": {"utm_source": "taqwa-app", "utm_medium": "share", "utm_campaign": "share"},
   "site-home": {"utm_source": "taqwa.world", "utm_medium": "website", "utm_campaign": "site-home"},
   "site-city": {"utm_source": "taqwa.world", "utm_medium": "website", "utm_campaign": "site-city"}
