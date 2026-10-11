@@ -194,6 +194,19 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
 .foot nav { display: flex; flex-wrap: wrap; gap: 18px; }
 .foot a { color: var(--t2); }
 
+/* ── Download links (/get/) ───────────────────────────── */
+/* What a computer sees at taqwa.world/get/<channel>/ (a phone goes on to its store): the app's
+   tile and name, one line, the badges and the way home, alone in the middle of the window. */
+.get {
+  min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; padding-block: 48px; text-align: center;
+}
+.get h1 { font-size: clamp(40px, 6vw, 56px); }
+.get .lede { max-width: 40ch; text-wrap: balance; }
+.get .stores { justify-content: center; margin-top: 8px; }
+.get .soon { flex-basis: 100%; }
+.get .more { font-size: 15px; font-weight: 700; }
+
 /* ── Prayer times: city pages, the index, the home section ─ */
 /* Laid out as the app's Prayer screen is: the ring and the five prayers, then the month. */
 .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

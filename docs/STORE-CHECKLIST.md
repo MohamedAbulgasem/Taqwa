@@ -107,6 +107,37 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   serves the reader's language where it has one and each new Play version's report replaces it).
   Request a new analysis at reports.exodus-privacy.eu.org/en/analysis/submit/ after each Play
   release so the latest report is the current version.
+- **Campaign tags on the badges, and the download links (since 11 October 2026):** the badges
+  appear in three places: every home page's hero, the two app places on every city page (the
+  desktop pitch and `#app`), and the download links at `taqwa.world/get/` and
+  `taqwa.world/get/<channel>/` (English, one per channel). Each place's badges lead to the stores
+  with that place's tags from `site/campaigns.json`, built in `site/campaigns.py` from the bare
+  addresses in `site/stores.json` (whose validation stays strict: never put a tagged link there):
+  the home pages as channel `site-home`, the city pages as `site-city`, each `/get/<channel>/`
+  page as its channel, and `/get/` itself untagged. On a phone a `/get/` page goes straight on to
+  the phone's store; a computer sees the two badges. Google Play's link carries the tags in
+  `&referrer=` (Play Console's acquisition reports, by UTM source and UTM campaign; only visits in
+  the Play Store app count, not play.google.com in a browser). The structured data keeps the bare
+  addresses, and so does Safari's Smart App Banner: Apple documents no syntax for campaign tokens
+  there (see `app_banner` in `site/stores.py`). The pages count no one (no cookie, no analytics,
+  nothing stored); the stores count, in aggregate, in their own consoles.
+  **The App Store provider token** (only Mohamed can do this): in App Store Connect open Taqwa in
+  Analytics → Acquisition → Campaigns → **+**, name a campaign `poster`, and copy the generated
+  link. Its `pt=` number is the provider token, the same for every campaign of the account (Apple
+  shows the button only once the app has analytics data). Set it in `site/stores.json` as a string
+  of digits, `"app_store_provider_token": "123456789"`, run `python3 site/test_campaigns.py &&
+  python3 site/build.py --check`, and push. Until then every App Store link stays the bare address,
+  since a campaign token without the provider token counts nothing; from then the App Store badges
+  and `/get/` links carry `pt`, `ct=<channel>` and `mt=8`. App Store Connect shows a campaign's
+  figures only once they reach Apple's minimum (five, in its help).
+  **Adding a channel:** one line in `site/campaigns.json`. The name becomes the address
+  `taqwa.world/get/<name>/` and the App Store's campaign token, so it is at most 30 characters of
+  a-z, 0-9 and single hyphens; give it `utm_source` (where the link sits), `utm_medium` (what kind of
+  place) and `utm_campaign` (the name itself, so both consoles list the same name), all lower case.
+  The build refuses anything malformed, a name used twice, and two channels with the same three
+  tags. Run the two commands above and push; the page is live after the Pages run. A channel whose
+  address is printed or posted is never renamed or removed: its page would be gone (a 404) under
+  every poster and post that carries it.
 - **Version until production:** the name stays 1.0.0 and only the code moves (28, 29, …); see
   `scripts/bump-version.sh`. Settings › About shows the name alone; Mohamed tells testers which
   build they are on.

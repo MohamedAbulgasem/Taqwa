@@ -70,6 +70,10 @@ jobs:
       # The page code's own tests (the clock correction, the minute ruler, a page of one month or
       # two, and its script on the last evening in the runner's Chrome); standard library only.
       - run: python3 site/test_timetables.py
+      # The store links' campaign tags (Google Play's referrer, Apple's campaign link, the
+      # validation of campaigns.json and stores.json) and the /get/ pages' script, in the
+      # runner's Node; standard library only.
+      - run: python3 site/test_campaigns.py
       - run: python3 site/build.py --check
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:

@@ -30,6 +30,7 @@ import re
 import unicodedata
 import zoneinfo
 
+import campaigns
 from stores import block as store_block
 
 SECTION = "prayer-times/"
@@ -491,7 +492,7 @@ class Timetables:
                   f'<span aria-hidden="true">{sep}</span><span aria-current="page">{esc(page["city"])}</span></nav>')
         # The pitch shows on desktop beside the card; on phones the app section carries it (CSS).
         pitch = (f'<div class="pitch"><p><b>{esc(t["pitch_title"])}</b> <span>{esc(t["pitch_body"])}</span></p>'
-                 f'{store_block(cfg, lang, beta_anchor=False)}</div>')
+                 f'{store_block(cfg, lang, beta_anchor=False, channel=campaigns.CITY)}</div>')
         hero = f'''<div class="city-hero">
     <div class="city-copy">
       {crumbs}
@@ -722,7 +723,7 @@ class Timetables:
       <h2 id="app-h">{esc(t["app_title"])}</h2>
       <p>{fill(t["app_body"], **values)}</p>
       <ul class="points">{points}</ul>
-      {store_block(cfg, lang, beta_anchor=False)}
+      {store_block(cfg, lang, beta_anchor=False, channel=campaigns.CITY)}
       <p class="platforms">{esc(t["app_platforms"])}</p>
     </section>'''
 

@@ -21,7 +21,9 @@ appears on every page. Going live is that one edit and a push.
 It also writes sitemap.xml (every page with its language alternates), robots.txt, and the
 404.html GitHub Pages serves for any address it has nothing for; each language's home page
 carries JSON-LD for the app, and every page a share card from site/assets/og/ (drawn by
-tools/site-og.py).
+tools/site-og.py). The download links under /get/ (one per channel in site/campaigns.json, see
+site/campaigns.py) are pages of their own, in English, kept out of the sitemap and the search
+indexes.
 
     ./gradlew -p tools/timetables generate   # writes _data/timetables.json (JDK 21)
     python3 site/build.py                    # writes _site/ next to the repo root
@@ -44,15 +46,17 @@ import xml.etree.ElementTree as ET
 
 import markdown
 
+import campaigns
 import timetables
-from stores import STORES, block as store_block, app_banner
+from stores import CAMPAIGNS, STORES, block as store_block, app_banner
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "site")
 OUT = os.path.join(ROOT, "_site")
 ORIGIN = "https://taqwa.world"
 
-SKIP = {"build.py", "timetables.py", "test_timetables.py", "stores.py", "cities.tsv", "stores.json", "templates", "pages", "README.md", "__pycache__"}
+SKIP = {"build.py", "timetables.py", "test_timetables.py", "stores.py", "cities.tsv", "stores.json", "campaigns.py",
+        "campaigns.json", "test_campaigns.py", "templates", "pages", "README.md", "__pycache__"}
 
 # The order the picker lists them in: English first, then the app's own order.
 LANGUAGE_ORDER = ["en", "ar", "fr", "tr", "id", "ur", "bn"]
@@ -348,7 +352,7 @@ def build_page(langs: dict, lang: str, page: str, template: str, data: timetable
     body = raw_body
     if page == "home":
         body = body.replace(timetables.HOME_MARKER, data.home_section(lang))
-        body = body.replace(STORES_MARKER, store_block(cfg, lang, beta_anchor='id="beta"' in body))
+        body = body.replace(STORES_MARKER, store_block(cfg, lang, beta_anchor='id="beta"' in body, channel=campaigns.HOME))
         row = exodus_row(cfg) if STORES["exodus"] else ""
         body = re.sub(r"\n[ \t]*" + re.escape(EXODUS_MARKER), lambda m: ("\n        " + row) if row else "", body)
         if not data.cities:
@@ -404,6 +408,92 @@ def build_404(langs: dict, template: str) -> None:
         f.write(render(template, values))
 
 
+GET_DIR = "get/"
+GET_BODY = """<main class="wrap get">
+  <div class="icon-tile" aria-hidden="true">{mark}</div>
+  <h1>Taqwa</h1>
+  <p class="lede">Prayer times, Qibla and the Quran. Free forever, with no ads and no account.</p>
+  {stores}
+  <a class="more" href="{home}">More on taqwa.world</a>
+</main>"""
+
+
+def get_dir(channel) -> str:
+    """Where a channel's download link lives: /get/<channel>/, and /get/ itself for no channel."""
+    return GET_DIR + (f"{channel}/" if channel else "")
+
+
+def build_get_pages(langs: dict) -> None:
+    """taqwa.world/get/ and one page per channel in site/campaigns.json (site/campaigns.py): the
+    address on a poster, in a post or in a bio. A phone goes straight on to its store with the
+    channel's tags (the page's one script, in the head, before anything is drawn); a computer, or
+    a phone whose store the app is not in, sees the app's name, one line, the stores block in
+    English (the same badges as everywhere else, tagged for this channel) and the way home. The
+    badges are plain markup, so with script off a phone gets them too and a tap still reaches the
+    store with the tags.
+
+    Each page is small: its head, that script and the badges, on the site's own stylesheet; no
+    header, footer or language row, no analytics, no cookie, nothing stored. It asks not to be indexed and stays out
+    of the sitemap and the hreflang sets: it is a way in, not a page to find. Its share card is the
+    home page's, so a link pasted into a chat previews as Taqwa."""
+    cfg = langs["en"]
+    home = cfg["pages"]["home"]
+    with open(os.path.join(SITE, "templates", "get.html"), encoding="utf-8") as f:
+        template = f.read()
+    for channel in (None, *CAMPAIGNS):
+        out_dir = get_dir(channel)
+        links = page_links(cfg, out_dir)
+        values = {
+            "title": "Get Taqwa",
+            "description": html.escape(home["description"]),
+            "og_title": html.escape(home["og_title"]),
+            "url": f"{ORIGIN}/{out_dir}",
+            "og_image": f"{ORIGIN}/assets/og/en.jpg",
+            "app_banner": app_banner(),
+            "redirect": campaigns.redirect_script(campaigns.links(STORES, CAMPAIGNS, channel)),
+            **asset_versions(),
+            "root": links["root"],
+            "body": GET_BODY.replace("{mark}", timetables.MIHRAB_LIT).replace("{home}", links["home"])
+                            .replace("{stores}", store_block(cfg, "en", beta_anchor=False, channel=channel))
+                            .replace("{root}", links["root"]),
+        }
+        page = template
+        for key, value in values.items():
+            page = page.replace("{" + key + "}", value)
+        os.makedirs(os.path.join(OUT, out_dir), exist_ok=True)
+        with open(os.path.join(OUT, out_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(page)
+
+
+def check_get_pages() -> list:
+    """What --check asks of the download links: a page for /get/ and for every channel, each
+    asking not to be indexed, in no hreflang set and not in the sitemap, and sending each kind of
+    phone, and the badges, to exactly that channel's store links."""
+    found = []
+    with open(os.path.join(OUT, "sitemap.xml"), encoding="utf-8") as f:
+        sitemap = f.read()
+    for channel in (None, *CAMPAIGNS):
+        out_dir = get_dir(channel)
+        path = os.path.join(OUT, out_dir, "index.html")
+        if not os.path.exists(path):
+            found.append(f"get: no page for {out_dir}")
+            continue
+        with open(path, encoding="utf-8") as f:
+            doc = f.read()
+        if '<meta name="robots" content="noindex">' not in doc:
+            found.append(f"get: {out_dir} is not marked noindex")
+        if "hreflang" in doc or f"{ORIGIN}/{out_dir}<" in sitemap:
+            found.append(f"get: {out_dir} is in an hreflang set or the sitemap")
+        to = campaigns.links(STORES, CAMPAIGNS, channel)
+        if campaigns.redirect_script(to) not in doc:
+            found.append(f"get: {out_dir} does not send phones to {channel or 'the bare'} store links")
+        badges = [html.unescape(href) for href in re.findall(r'<a class="badge" href="([^"]*)"', doc)]
+        wanted = [to[store] for store in ("google_play", "app_store") if to[store]]
+        if badges != wanted:
+            found.append(f"get: {out_dir} badges lead to {badges}, not {wanted}")
+    return found
+
+
 def write_sitemap() -> None:
     """Every page written, each listing its twins in the other languages: the same alternates the
     pages carry in their heads. No lastmod: Google only trusts one that is exact, and the build
@@ -435,7 +525,8 @@ def check_site(data: timetables.Timetables) -> int:
     template placeholder left in a page, an address Cloudflare would rewrite, an image of this
     site named by absolute address that does not exist, structured data that is not valid JSON,
     a sitemap that disagrees with the pages built, an hreflang alternate the other page does not
-    return, and a timetable page that is not whole (see timetables.check_page)."""
+    return, a timetable page that is not whole (see timetables.check_page), and a download link
+    under /get/ that is missing, indexable or tagged for another channel (check_get_pages)."""
     problems = 0
 
     def problem(message: str) -> None:
@@ -473,10 +564,13 @@ def check_site(data: timetables.Timetables) -> int:
                 continue
             path = os.path.join(dirpath, name)
             rel_path = os.path.relpath(path, OUT)
-            if name == "index.html":
-                pages.append(rel_path)
             with open(path, encoding="utf-8") as f:
                 doc = f.read()
+            # A page that asks not to be indexed (the download links under /get/) has no place in
+            # the sitemap; check_get_pages holds it to that.
+            listed = name == "index.html" and '<meta name="robots" content="noindex">' not in doc
+            if listed:
+                pages.append(rel_path)
             # The live data the page script reads carries sentence templates with their
             # placeholders on purpose (a cautious page's stop-eating line and Fajr ruler for the
             # reader's today); everywhere else a placeholder is a sentence left unfilled.
@@ -517,7 +611,7 @@ def check_site(data: timetables.Timetables) -> int:
                     json.loads(block)
                 except ValueError as error:
                     problem(f"structured data: {rel_path} -> {error}")
-            if name == "index.html":
+            if listed:
                 here = f"{ORIGIN}/{os.path.dirname(rel_path)}/".replace(f"{ORIGIN}//", f"{ORIGIN}/")
                 alternates[here] = dict(re.findall(r'<link rel="alternate" hreflang="([\w-]+)" href="([^"]+)">', doc))
                 for message in timetables.check_page(rel_path, doc, data):
@@ -545,6 +639,8 @@ def check_site(data: timetables.Timetables) -> int:
     with open(os.path.join(OUT, "404.html"), encoding="utf-8") as f:
         if 'content="noindex"' not in f.read():
             problem("404.html: not marked noindex")
+    for message in check_get_pages():
+        problem(message)
     return problems
 
 
@@ -560,12 +656,13 @@ if __name__ == "__main__":
             build_page(langs, lang, page, template, data)
     data.build(template, write_page)
     build_404(langs, template)
+    build_get_pages(langs)
     write_sitemap()
     write_robots()
-    pages = sum(1 for _, _, files in os.walk(OUT) for f in files if f == "index.html")
+    pages = len(SITEMAP)
     print(f"built _site: {pages} pages in {len(langs)} languages ({', '.join(langs)}), "
           f"{data.page_count} of them prayer-time pages for {len(data.cities)} cities, "
-          "plus 404.html, sitemap.xml and robots.txt")
+          f"plus {len(CAMPAIGNS) + 1} download links under /{GET_DIR}, 404.html, sitemap.xml and robots.txt")
     if "--check" in sys.argv:
         broken = check_site(data)
         print("check: links, assets, structured data, sitemap and timetables all good" if not broken else f"check: {broken} problems")

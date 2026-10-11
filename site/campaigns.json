@@ -1,0 +1,14 @@
+{
+  "poster": {"utm_source": "cape-town-masjids", "utm_medium": "print", "utm_campaign": "poster"},
+  "reddit": {"utm_source": "reddit", "utm_medium": "social", "utm_campaign": "reddit"},
+  "isoc": {"utm_source": "uk-isocs", "utm_medium": "community", "utm_campaign": "isoc"},
+  "alternativeto": {"utm_source": "alternativeto", "utm_medium": "referral", "utm_campaign": "alternativeto"},
+  "whatsapp": {"utm_source": "whatsapp", "utm_medium": "messaging", "utm_campaign": "whatsapp"},
+  "creator-id-1": {"utm_source": "indonesian-creators", "utm_medium": "creator", "utm_campaign": "creator-id-1"},
+  "creator-id-2": {"utm_source": "indonesian-creators", "utm_medium": "creator", "utm_campaign": "creator-id-2"},
+  "creator-id-3": {"utm_source": "indonesian-creators", "utm_medium": "creator", "utm_campaign": "creator-id-3"},
+  "github": {"utm_source": "github", "utm_medium": "readme", "utm_campaign": "github"},
+  "share": {"utm_source": "taqwa-app", "utm_medium": "share", "utm_campaign": "share"},
+  "site-home": {"utm_source": "taqwa.world", "utm_medium": "website", "utm_campaign": "site-home"},
+  "site-city": {"utm_source": "taqwa.world", "utm_medium": "website", "utm_campaign": "site-city"}
+}
