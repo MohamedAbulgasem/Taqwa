@@ -137,8 +137,8 @@ object ProofStamps {
     private fun aeIacadDubai() = ProofStamp(
         entryId = "ae.iacad.dubai",
         places = 12,
-        placeDays = 20067,
-        ramadanDays = 1690,
+        placeDays = 20797,
+        ramadanDays = 1748,
         provenThrough = "2029-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 3, "fajr" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = aeIacadDubaiUnits(),
@@ -151,7 +151,7 @@ object ProofStamps {
     )
 
     private fun aeIacadDubaiThrough(): Map<String, String> = mapOf(
-        "dubai-rural" to "2026-12-31",
+        "dubai-rural" to "2027-12-31",
     )
 
     private fun aeIacadDubaiUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -237,9 +237,9 @@ object ProofStamps {
     private fun baIz() = ProofStamp(
         entryId = "ba.iz",
         places = 3,
-        placeDays = 1095,
-        ramadanDays = 90,
-        provenThrough = "2026-12-31",
+        placeDays = 2190,
+        ramadanDays = 177,
+        provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 3, "sunrise" to 2),
         worstLateByUnit = baIzUnits(),
         lateLimits = listOf(
@@ -258,16 +258,17 @@ object ProofStamps {
     private fun bdIfb() = ProofStamp(
         entryId = "bd.ifb",
         places = 1,
-        placeDays = 71,
-        ramadanDays = 6,
-        provenThrough = "2026-12-30",
-        worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 4, "isha" to 4, "maghrib" to 3, "sunrise" to 3),
+        placeDays = 142,
+        ramadanDays = 11,
+        provenThrough = "2027-12-30",
+        worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 2, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 3, "sunrise" to 4),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "maghrib", "sunrise")),
-            ProofLateLimit(minutes = 4, reason = "the district edge makes the fitted sehri end run up to a minute earlier still (task 7f); an early end is the safe side", events = listOf("endOfEating")),
-            ProofLateLimit(minutes = 4, reason = "the true-dawn precaution swings across the year and the district edge stacks on it (task 7f)", events = listOf("fajr")),
+            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "maghrib")),
             ProofLateLimit(minutes = 4, reason = "IFB's Isha angle is only documented as about 18° + 1..4 min, and the district edge stacks on it (task 7f)", events = listOf("isha")),
+            ProofLateLimit(minutes = 4, reason = "the district edge puts sunrise up to a minute before Dhaka's (task 7f), and the permanent table against the leap cycle a minute more on a day of 2027; an early end is the safe side", events = listOf("sunrise")),
+            ProofLateLimit(minutes = 5, reason = "the district edge makes the fitted sehri end run up to a minute earlier still (task 7f), and the permanent table against the leap cycle a minute more on a day of 2027; an early end is the safe side", events = listOf("endOfEating")),
+            ProofLateLimit(minutes = 5, reason = "the true-dawn precaution swings across the year and the district edge stacks on it (task 7f); the permanent table prints the same month-day times every year while the sun shifts through the leap cycle, a minute more on a day of 2027", events = listOf("fajr")),
         ),
     )
 
@@ -631,27 +632,14 @@ object ProofStamps {
     private fun idKemenag() = ProofStamp(
         entryId = "id.kemenag",
         places = 18,
-        placeDays = 9855,
-        ramadanDays = 801,
+        placeDays = 13140,
+        ramadanDays = 1062,
         provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = idKemenagUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        provenThroughByUnit = idKemenagThrough(),
-    )
-
-    private fun idKemenagThrough(): Map<String, String> = mapOf(
-        "0119" to "2026-12-31",
-        "0313" to "2026-12-31",
-        "0816" to "2026-12-31",
-        "1208" to "2026-12-31",
-        "1222" to "2026-12-31",
-        "1429" to "2026-12-31",
-        "1630" to "2026-12-31",
-        "1709" to "2026-12-31",
-        "3308" to "2026-12-31",
     )
 
     private fun idKemenagUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -664,7 +652,7 @@ object ProofStamps {
         "1222" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1301" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1429" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
-        "1433" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        "1433" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1505" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1630" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1634" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
@@ -713,9 +701,9 @@ object ProofStamps {
     private fun ieIfi() = ProofStamp(
         entryId = "ie.ifi",
         places = 1,
-        placeDays = 365,
-        ramadanDays = 30,
-        provenThrough = "2026-12-31",
+        placeDays = 1460,
+        ramadanDays = 117,
+        provenThrough = "2029-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = ieIfiUnits(),
         lateLimits = listOf(
@@ -999,9 +987,9 @@ object ProofStamps {
     private fun lbFatwa() = ProofStamp(
         entryId = "lb.fatwa",
         places = 1,
-        placeDays = 382,
-        ramadanDays = 31,
-        provenThrough = "2026-10-01",
+        placeDays = 747,
+        ramadanDays = 60,
+        provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 3, "endOfEating" to 8, "fajr" to 9, "isha" to 7, "maghrib" to 7, "sunrise" to 3),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -1287,9 +1275,9 @@ object ProofStamps {
     private fun pkKarachi() = ProofStamp(
         entryId = "pk.karachi",
         places = 1,
-        placeDays = 91,
+        placeDays = 182,
         ramadanDays = 0,
-        provenThrough = "2026-12-31",
+        provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 3, "asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -1358,9 +1346,9 @@ object ProofStamps {
     private fun qaCalendarhouse() = ProofStamp(
         entryId = "qa.calendarhouse",
         places = 8,
-        placeDays = 2963,
-        ramadanDays = 243,
-        provenThrough = "2026-12-31",
+        placeDays = 5883,
+        ramadanDays = 475,
+        provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 3, "maghrib" to 3, "sunrise" to 1),
         worstLateByUnit = qaCalendarhouseUnits(),
         lateLimits = listOf(
@@ -2146,9 +2134,9 @@ object ProofStamps {
     private fun xkBik() = ProofStamp(
         entryId = "xk.bik",
         places = 2,
-        placeDays = 730,
-        ramadanDays = 60,
-        provenThrough = "2026-12-31",
+        placeDays = 1460,
+        ramadanDays = 118,
+        provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 6, "dhuhr" to 4, "endOfEating" to 3, "fajr" to 1, "isha" to 3, "maghrib" to 5, "sunrise" to 5),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -2177,8 +2165,8 @@ object ProofStamps {
     private fun zaJamiat() = ProofStamp(
         entryId = "za.jamiat",
         places = 9,
-        placeDays = 14973,
-        ramadanDays = 1198,
+        placeDays = 15338,
+        ramadanDays = 1227,
         provenThrough = "2029-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 1, "asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 2, "maghrib" to 2, "sunrise" to 1),
         worstLateByUnit = zaJamiatUnits(),
@@ -2189,7 +2177,7 @@ object ProofStamps {
     )
 
     private fun zaJamiatThrough(): Map<String, String> = mapOf(
-        "pretoria" to "2026-12-31",
+        "pretoria" to "2027-12-31",
     )
 
     private fun zaJamiatUnits(): Map<String, Map<String, Int>> = mapOf(
