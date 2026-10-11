@@ -93,6 +93,12 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
         }
+        iosTest.dependencies {
+            // Compose UI tests — semantics assertions on the shared controls — run on the iOS
+            // simulator target, the one target where a Compose scene composes under kotlin.test
+            // without Robolectric. scripts/test.sh reaches them through :shared:allTests.
+            implementation(libs.compose.ui.test)
+        }
         getByName("androidHostTest") {
             dependencies {
                 implementation(libs.sqldelight.sqlite)
