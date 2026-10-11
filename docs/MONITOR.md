@@ -221,8 +221,11 @@ are the research's hand-read captures, which no fetcher reads, so no recipe grow
 those tables is added by hand at its own point, and `generateReachRows` re-run. The app's own cities inside
 those units, and inside Canada's families', Chicago's 18° block's and the city tables' (Delhi, Tashkent,
 Karachi, Bishkek, Manchester Central, Gaza, Beirut, Damascus, Baghdad), are rows of the group files
-themselves, held to their own worst by `own-points-worst.tsv`. The whole gate is now some 13,000 rows and
-4.4 million place-days, about two and a half minutes on the Mac.
+themselves, held to their own worst by `own-points-worst.tsv`; each Damascus city is read against both of the
+Ministry's samples, since both are its one table. `own-points-worst.tsv` also holds the three cautious groups
+whose limits that audit raised (`au-cautious`, `ie-cautious`, `tr-diyanet-europe`), so their own tables keep
+their own worst. The whole gate is now some 13,000 rows and 4.4 million place-days, about two and a half
+minutes on the Mac.
 
 **What `prove` does.** For each capture a recipe names whose days are not all held already by rows
 of that file, entry, member and point: the capture is copied as it is to

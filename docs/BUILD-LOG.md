@@ -3232,18 +3232,27 @@ cautious times. The widened audit found early starts or late ends against the ne
 
 **The units** (`tablesAtTheirPoints`, rulings R30, R40 and R44). Each such table is now a unit at its own
 point. The nearest whose reach holds the user takes them, and its point rides as the method's fixed point
-beside the user's own: starts the later, sunrise and the ends the earlier.
+beside the user's own: starts the later, sunrise and the ends the earlier. So the time shown is never before
+the nearest table whose reach holds the user, nor any end after it. Where two tables' reaches overlap, a
+place follows the nearest only and can still be on the wrong side of the other (the fix round below: Ottawa
+against Abrar Masjid, an owner's question); Damascus's two samples of one table read both points.
 - The tables: ISNA's 35 US and 18 Canadian mosques, Canada's three families' 6 mosques, Chicago's 18°
   block's 3, and the city tables of Delhi, Karachi, Tashkent, Bishkek, Gaza, Beirut, Damascus (two),
   Baghdad and Manchester Central's Wifaqul table, plus BIK's base point.
-- **The reach.** A mosque's or a city's table reaches a minute of longitude (R40 at class A's minute,
-  17 to 24 km), its own neighbourhood. Farther out, a user's own mosque prints for its own point, as the
-  method computes. With class D's three minutes the cost was up to 5 min at a US Fajr and 8 to 10 at the
-  Canadian families' Isha and end of eating.
+- **The reach.** A mosque's or a city's table reaches a minute of longitude (class A's minute, 17 to 24
+  km), its own neighbourhood. Farther out, a user's own mosque prints for its own point, as the method
+  computes. With class D's three minutes the cost was up to 5 min at a US Fajr and 8 to 10 at the Canadian
+  families' Isha and end of eating. That narrows R40, which takes a unit's reach from its entry's class
+  limit: us.isna, ca.isna and every city table's entry (in.karachi, pk.karachi, uz.board, kg.default,
+  gb.wifaqul, ps.gaza.awqaf, lb.fatwa, sy.awqaf, iq.sunni) are class D, and Canada's families and Chicago's
+  18° block are members of class C entries: three minutes (about 61 km) each, not one. A proposed ruling,
+  for the owner; its cost is the cities just beyond the minute (the fix round below).
 - BIK applies one base table to all of Kosovo with one whole-minute offset per town, whatever the town's
   latitude, so its base point reaches as far as class D, about 61 km. BIK's offset list is not held.
 - Beyond every reach, the method at the user's own point exactly as on `main`, with no edge minute. These
-  margins hold every table at its own point and were always meant for any point. No figure is claimed
+  margins hold every table at its own point and were always meant for any point. So R44's edge minute and
+  SAFE_END, and R45's bound of the ends by the nearest table, are suspended there (the same proposed
+  ruling). No figure is claimed
   there, as beyond every other unit. A cautious convention member keeps its own measured reach
   (`measuredBeyond`), so Canada's cautious About shows its proof where it did. Chicago's ISNA member is the
   US entry itself, not measured beyond its mosques' reach, so 65 of the region's 173 app cities (Aurora,
@@ -3278,11 +3287,13 @@ beside the user's own: starts the later, sunrise and the ends the earlier.
   - BIK's base: Fajr, Zuhr and Isha 7, sunrise, Asr and Maghrib 8, the end of eating 9.
   - Delhi's end of eating 4, Tashkent's sunrise 6, and Beirut's sunrise 4, Maghrib 8 and end of eating 9.
   - Sydney's sunrise 9, Dublin's Maghrib 3, and Lille's Isha 4 (its August takdir step).
-- **The audits again.** On the widened audit every entry above now shows 0 early and 0 late ends, but
-  fr.cautious, se.cautious and au.cautious, which are not changed here. Ten Canadian pairs remain, 18 to 20
-  km out (Calgary's north-east against Calgary Islamic Centre SW, Vancouver's west against Surrey Jamea),
-  just beyond a minute's reach. The old pairing still shows Ottawa against Abrar Masjid, 10 km south-west:
-  Ottawa now follows the Ottawa South Mosque, 2.2 km away, against which it is gated and clean.
+- **The audits again.** On the widened audit every entry above now shows 0 early and 0 late ends but
+  five: fr.cautious, se.cautious and au.cautious, which are not changed here, and two just beyond a
+  minute's reach. Ten Canadian pairs remain, 18 to 20 km out (Calgary's north-east against Calgary Islamic
+  Centre SW, Vancouver's west against Surrey Jamea), and eight gb.wifaqul towns 17 to 20 km from
+  Manchester Central (corrected in the fix round below). The old pairing still shows Ottawa against Abrar
+  Masjid, 10 km south-west: Ottawa now follows the Ottawa South Mosque, 2.2 km away, against which it is
+  gated and clean, but it is still early against Abrar's, inside Abrar's reach (the fix round below).
 - **Never earlier than `main`.** The first run's comparison (3,571 points, two a country elsewhere) missed
   the point-7 bound's moves inside other authorities' units. The re-run's own comparison is below: 0 starts
   earlier, and no sunrise, sunset, end of eating or imsak later, with nothing moved outside the 12 countries
@@ -3295,6 +3306,11 @@ where the whole country showed 7:
   country's 7. The re-run counted the app's US cities: 2,708 of them say "Not measured" now; inside a unit
   293 keep 7, 168 show 6, 31 show 5, 13 show 4 and 20 show 8. In ca.isna's two regions, Saint-Jérôme,
   Mirabel and Buckingham lie beyond every mosque's reach and say "Not measured", where `main` said 5.
+- What a place beyond every reach loses with its figure (`Resolution.measured` false there): About's
+  "how it is checked" section (its figure and tiles), the adjustment warning's margin (`marginMinutes`), and
+  in Chicago's region the cautious proof tiles (`cautiousProof`). The Today card does not change: it reads
+  the class alone (`WhoseTimes.of`), and us.isna, ca.isna and xk.bik are class D (authority) on `main` and
+  here alike, inside and beyond the units (the fix round below checked it).
 
 Canada's ISNA units show 3 to 7, where Montreal and Ottawa showed 5: Ottawa 4 (Ottawa South), Montreal 3
 (As-Salam) and Snowdon 7 (Taiba). Kosovo's base unit shows 8, where `main` showed 6. Every Kosovan city of
@@ -3401,15 +3417,21 @@ At each, Automatic and every entry the place may choose (the global "other." met
   a village's or a neighbouring town's table. St Albans and Sevenoaks, outside the M25, follow the UK's
   cautious times; LUPT is only chosen there, under R45's edge.
 - The widened pairing (every app city within 20 km that follows the entry and has the table as its
-  nearest). On `main`, 17 entries had an early start or a late end. Here 4 have, three of them as on
-  `main`: au.cautious (14 late sunrises), fr.cautious (767 late ends of eating) and se.cautious (59). The
-  fourth is ca.cautious, with 10 pairs 18 to 20 km out (109 early, 134 late ends), where `main` had 43 pairs
-  (346 and 224). The per-row probe names each table:
+  nearest). On `main`, 17 entries had an early start or a late end. Here 5 have (4 as first written here;
+  the fix round below counted the fifth), three of them as on `main`: au.cautious (14 late sunrises),
+  fr.cautious (767 late ends of eating) and se.cautious (59). The fourth is ca.cautious, with 10 pairs 18 to
+  20 km out (109 early, 134 late ends), where `main` had 43 pairs (346 and 224). The fifth is gb.wifaqul,
+  with 8 towns 16.8 to 19.6 km from Manchester Central (56 early, 42 late ends), where `main` had 37 (149 and
+  107). The per-row probe names each table:
   - Calgary's north-east (Taradale, Saddle Ridge, McKenzie Towne) against Calgary Islamic Centre SW: Fajr
     up to 2 min before it on 3 to 53 days.
   - Vancouver's west (Sunset, Broadmoor, Richmond …) against Surrey Jamea: sunrise a minute after it on 13
     to 23 days.
-  - Both lie just beyond a minute's reach, where the user's own mosque prints for its own point.
+  - Manchester Central's Wifaqul table: early at Saddleworth 16, Glossop 19, New Mills 14 and Rochdale 7
+    (Fajr, the Hanafi Asr, Isha), late ends at Tyldesley 11, Atherton 13, Leigh 14 and Bolton 4 (sunrise,
+    the end of eating). Automatic there is gb.cautious, whose latest member keeps it clean at those towns;
+    only a user who chooses Wifaqul is hit.
+  - All three lie just beyond a minute's reach, where the user's own mosque prints for its own point.
 
 **Tried and left: Rabita Helsinki.** The widened audit's se.cautious line is Rabita's own calendar, printed
 for Helsinki. The per-row probe found the end of eating a minute or two after Rabita's Fajr, which begins
@@ -3429,3 +3451,90 @@ over, nothing BROKEN; the stamps unchanged but every `engineHash`); tools `jvmTe
 no monitor code changed). `CI=true generate` writes 55 cities and 129 pages, the site builds 164 pages, all
 checks good, and its tests pass 18/0. `scripts/test.sh` is the controller's, at integration. The engine change
 ships with the first update.
+
+## Tables at their own points, the fix round (11 October, overnight) — the two reviews answered
+
+**Damascus: two samples of one table.** `sy-awqaf.tsv` holds two dated samples of the Ministry's one Damascus
+table, the Ramadan 1447 imsakiya (fitted) and a held-out day read at the Umayyad Mosque, 2.8 km east. The
+branch had made them two units, each place following the nearer alone. Seven of the eight app cities in the
+Umayyad Mosque's unit (al-Yarmūk, Babīlā, Jaramānā, ʿIrbīn, Ḩarastā, At Tall, Dūmā) lie inside the imsakiya's
+reach too, and were a minute before it: Fajr on its one day at all seven and Isha at six, 13 cells, as on
+`main`. Now each unit reads the other sample's point for its starts as well (`OwnTable.method`,
+`TimetableMethod.startPoints`): never before either sample. Every Damascus-region app city is gated against
+both samples (14 rows more, `sy.awqaf/<the unit it resolves to>`, held out). With the builder's `Levant.kt`
+those rows show the 13 early cells (the gate refuses them); with the fix, 0 early and 0 late ends. The ends
+stay the nearest sample's and the user's own. The Ministry's end-of-eating margin (none) is above its Fajr
+margin (−47 s), so the end of eating, rounded down, never passes the Fajr shown at either point, and the later
+Fajr never loosens it: against the builder's branch no end moved at all (below).
+
+**The audits, complete.** The round's audit re-run on `main` and here, every entry, every app city within 20 km
+of a table printed for its own point, each resolved as the app resolves it (with the region the app passes,
+`PrayerTimesEngine.placeOf`), summed three ways for the cities whose Automatic is the entry or one of its
+members:
+- **The table each city follows** (its unit's own table; where it is in no unit, the nearest table). On
+  `main` 17 entries had an early start or a late end. Here 5 have, none of them inside a new unit's reach: the
+  three cautious lines left as on `main` (au.cautious 14 late sunrises, fr.cautious 767 late ends of eating,
+  se.cautious 59, against tables this round did not make units), and just beyond a minute's reach Canada's
+  families at 10 pairs 18 to 20 km out (109 early, 134 late ends) and gb.wifaqul at 8 towns 17 to 20 km out
+  (56, 42; gb.cautious, Automatic there, is clean at all eight). Damascus is clean.
+- **Another table within a minute's reach, where the city is in a nearer unit** (the overlaps). In the new
+  units: ca.isna 100 pairs with an issue (3,227 early, 1,269 late ends), us.isna 40 (889, 387), us.chicago 14
+  (217, 0), ca.cautious 2 (4, 0); sy.awqaf 0, from 7 (13 early). The app's Ottawa is still 64 times early
+  against Abrar Masjid, 10.1 km off and inside its reach, as on `main`: it follows the Ottawa South Mosque, 2.2
+  km off, and is clean against it. Carrollton and University Park against ICI Irving (111 and 273 early, mostly
+  Dhuhr), Gaithersburg against ADAMS (77 early) and Oak Hill, Chantilly and South Riding against ADAMS (late
+  ends up to 118) are the same case. Whether a place inside several mosques' reaches should ride every one of
+  them is the owner's question. In the older units the same pairing shows each district or town against its
+  neighbour's table (Saudi and Kazakh cities against a village's, R44 and the owner's decision of 9 Oct;
+  Palestine's towns against another town's, R118; JAKIM's zones, Kemenag's regencies, Jamiat's towns): by
+  design, each follows its own.
+- Nothing else within 20 km moved against `main` but the new units' own.
+
+**Three wrong-district lines, read again.** The second review found Rouiba, Sengkurong and Sidi Taibi in the
+wrong district's unit. The gate and the audit resolve a point alone; the app passes the nearest list city's
+region, which Algeria's and Brunei's units read (`UnitSet.choose`). With it, Rouiba (Algiers wilaya) resolves
+to Algiers and Sengkurong (Brunei-Muara) to Brunei-Muara, and both are clean against their own tables (0 early,
+0 late ends, worst 2 at each). Sidi Taibi is real: Morocco's ten fitted cities reach 25 km and choose by
+nothing else, so Sidi Taibi, in Kénitra province and 12.4 km from Kénitra, is in Rabat's unit (23.6 km), and
+its sunrise is a minute after Kénitra's Habous table on 6 days, its end of eating on 7, as on `main`
+(Automatic). Not this round's class of fault: left for a Morocco round.
+
+**What the review's other points came to.**
+- The Today card does not change beyond the reaches: it reads the class alone (`WhoseTimes.of`), and the
+  class is the same on `main` and here at every point compared below (class D, authority, for us.isna,
+  ca.isna, xk.bik and the city tables' entries; C for the cautious ones). What changes there
+  is `measured`: About's check section, the adjustment warning's margin, Chicago's cautious tiles. The US
+  count also takes in the territories, which fall back to us.isna: 31 app cities in Puerto Rico, Guam, the
+  US Virgin Islands, American Samoa and the Northern Mariana Islands lose their figure too (measured on
+  `main`, not here).
+- `RegistryCitiesTest` now covers all 16 new unit sets in the 12 countries (Karachi, Bishkek, Manchester
+  Central, Gaza, Beirut, Damascus and Baghdad added), both Asr schools, and sunset and imsak with the rest.
+- `own-points-worst.tsv` now holds au-cautious, ie-cautious and tr-diyanet-europe too, whose limits the audit
+  raised (Sydney's sunrise 9, Dublin's Maghrib 3, Lille's Isha 4): 2,315 rows, each table row held to its own
+  worst.
+- BIK's base reach takes in North Macedonian towns and Gaza's takes in Ashkelon, Netivot and Sderot, but
+  neither entry applies there (no entry but the default at the comparison's MK and IL points, R50).
+- The narrowed R40 and the R44 and R45 suspension beyond the reach are named above and in spec §3.5 as a
+  proposed ruling.
+
+**Never earlier than `main`, the fix round's own comparison.** 2,764 points of a new seed: every Syrian app
+city (89), 300 within 1.6 reaches of the two Damascus samples, 120 Syrian cities moved up to 25 km, 10 within
+1.6 reaches of each of the other 71 tables, 1,320 app cities of 18 affected and neighbouring countries moved up
+to 25 km, and one city of every other country. Automatic and every entry the place may choose, every day of
+2026, 15 values a day, with the region the app passes: 24.2 million cells.
+- 0 starts earlier; no sunrise, sunset, end of eating or imsak later; no end of Fajr, Asr or Isha later; no
+  class moved.
+- Dhuhr's and Maghrib's window ends move later where Asr or Isha does, and in the cautious entries where a
+  member's does; 10 Wifaqul Maghrib-end cells near Manchester are left unexplained, as the re-run found.
+- Syria against `main`: starts 1 to 2 min later, ends 1 to 2 earlier. Against the builder's branch only the
+  Umayyad Mosque's unit moved (all 80 of its sampled points, up to 185 days of the year): starts a minute
+  later, no end moved, nothing outside Syria.
+
+Checked (the fix round): the whole gate, 13,008 rows and 4,393,717 place-days over 71 entries, 0 early, 0 late
+ends, none over, nothing BROKEN; only sy.awqaf's stamp moved beyond every `engineHash`; ProofStamps.kt and
+own-points-worst.tsv regenerated, the golden vector unchanged (183 of its 2,071 rows moved against `main`, as
+before); tools `jvmTest` 307/0 with the archive and `checkStamps` green; `:shared:testAndroidHostTest` 1,618/0
+(RegistryTest's Damascus case, RegistryCitiesTest widened) and `:shared:compileTestKotlinIosSimulatorArm64`;
+`CI=true generate` writes 55 cities and 129 pages, the site builds 164 pages, all checks good, tests 18/0; against
+the builder's generation at the same moment only the totals moved (13,008 tables, 4,393,717 place-days). The
+monitor's code did not change. `scripts/test.sh` is the controller's, at integration.
