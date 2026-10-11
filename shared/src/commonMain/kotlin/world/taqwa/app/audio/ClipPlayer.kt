@@ -19,6 +19,11 @@ expect class ClipPlayer() {
      * Plays [bytes] from the start, stopping whatever this player was playing. MP3. [onEnd] is
      * called once, on the main thread, when the clip plays out by itself — not when [stop] cuts
      * it — so the picker can hand the audio back to a recitation it paused for the audition.
+     *
+     * A clip that cannot be played at all (a file that will not write, bytes that will not
+     * decode, nothing to play) ends at once: [onEnd] is called, possibly before this returns,
+     * because a caller that marked itself as playing and waits for the end would otherwise wait
+     * for ever, in silence.
      */
     fun play(bytes: ByteArray, onEnd: () -> Unit = {})
 

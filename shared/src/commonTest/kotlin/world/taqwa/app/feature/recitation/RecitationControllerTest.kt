@@ -249,23 +249,42 @@ class RecitationControllerTest {
 
         /** The bytes each play was asked for, in order. */
         val heard = mutableListOf<ByteArray>()
-        private var onEnd: (() -> Unit)? = null
+
+        /**
+         * Every end callback ever handed in, in order, and **kept after the clip is stopped or
+         * replaced**: a real player's completion can already be posted to the main thread when
+         * the stop arrives, so the end of a dead clip may reach the controller late. [finish]
+         * honours a stop; [deliver] does not, to put exactly that end in front of the controller.
+         */
+        val ends = mutableListOf<() -> Unit>()
+        private var live: Int? = null
+
+        /** A clip that cannot be played: the platform players call the end before `play` returns. */
+        var endsAtOnce = false
         override fun play(bytes: ByteArray, onEnd: () -> Unit) {
             played++
             heard += bytes
-            this.onEnd = onEnd
+            ends += onEnd
+            if (endsAtOnce) {
+                onEnd()
+            } else {
+                live = ends.lastIndex
+            }
         }
         override fun stop() {
             stopped++
-            onEnd = null
+            live = null
         }
 
         /** The clip playing out by itself; a stopped clip has nobody left to tell. */
         fun finish() {
-            val end = onEnd
-            onEnd = null
-            end?.invoke()
+            val index = live ?: return
+            live = null
+            ends[index]()
         }
+
+        /** The end of the [index]th clip played, whether or not it was stopped or replaced since. */
+        fun deliver(index: Int) = ends[index]()
     }
 
     /**
@@ -2131,8 +2150,8 @@ class RecitationControllerTest {
 
             assertEquals(stoppedBefore + 1, harness.clips.stopped)
             assertFalse(controller.adhkarPlaying.value)
-            // The clip it cut has nobody left to tell, and an end arriving late changes nothing.
-            harness.clips.finish()
+            // The end of the clip it cut, arriving late, changes nothing.
+            harness.clips.deliver(0)
             assertFalse(controller.adhkarPlaying.value)
             assertEquals(0, harness.player.stops)
         }
@@ -2219,6 +2238,12 @@ class RecitationControllerTest {
             // Once: a second stop, as the screen's own dispose makes, gives nothing back twice.
             controller.stopAdhkar()
             assertEquals(2, harness.player.plays)
+            // And the end of the clip it cut, arriving late, does not resume what the reader has
+            // paused since.
+            harness.player.pause()
+            harness.clips.deliver(0)
+            assertEquals(2, harness.player.plays)
+            assertFalse(harness.player.state.value.playing)
         }
 
     @Test
@@ -2270,11 +2295,94 @@ class RecitationControllerTest {
 
             controller.playKursi()
             controller.playKursi()
+            // The end of the first clip, which the second replaced, reaches the controller late: it
+            // is not the end of the clip now playing.
+            harness.clips.deliver(0)
+
+            assertTrue(controller.adhkarPlaying.value)
+            assertEquals(1, harness.player.plays)
+
             harness.clips.finish()
 
             // The recitation was paused by the first tap and is given back by the last end.
             assertEquals(1, harness.player.pauses)
             assertEquals(2, harness.player.plays)
             assertFalse(controller.adhkarPlaying.value)
+        }
+
+    @Test
+    fun `an ordinary play over a live clip ends the clip and owns the player`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(36, 37))
+            harness.bundleKursi()
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(36, 1)
+            controller.playKursi()
+            assertTrue(controller.adhkarPlaying.value)
+            assertFalse(harness.player.state.value.playing)
+            val stoppedBefore = harness.clips.stopped
+
+            // The lock screen's Next, arriving through the player's skips while the clip sounds.
+            controller.requestPlay(37, 1)
+
+            assertEquals(stoppedBefore + 1, harness.clips.stopped)
+            assertFalse(controller.adhkarPlaying.value)
+            assertEquals(Triple("ar.alafasy", 37, 1), harness.player.loads.last())
+            assertTrue(harness.player.state.value.playing)
+
+            // The reader pauses 37; the clip's end, reaching the controller late, resumes nothing.
+            harness.player.pause()
+            val playsBefore = harness.player.plays
+            harness.clips.deliver(0)
+
+            assertEquals(playsBefore, harness.player.plays)
+            assertFalse(harness.player.state.value.playing)
+            assertEquals(37, harness.player.state.value.surah)
+            assertFalse(controller.adhkarPlaying.value)
+        }
+
+    @Test
+    fun `a passage played through the player over a live clip ends the clip too`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(36, 112))
+            harness.bundleKursi()
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(36, 1)
+            controller.playKursi()
+            val stoppedBefore = harness.clips.stopped
+
+            controller.requestPlayAyahs(112, listOf(1, 2, 3, 4), "Morning adhkar", "Al-Ikhlas 112")
+
+            assertEquals(stoppedBefore + 1, harness.clips.stopped)
+            assertEquals(Triple("ar.alafasy", 112, 1), harness.player.loads.last())
+            // The passage in the player is what adhkarPlaying reports now, and the clip's end
+            // reaching the controller late neither ends it nor resumes the surah before it.
+            val playsBefore = harness.player.plays
+            harness.clips.deliver(0)
+
+            assertTrue(controller.adhkarPlaying.value)
+            assertEquals(playsBefore, harness.player.plays)
+            assertEquals(112, harness.player.state.value.surah)
+        }
+
+    @Test
+    fun `a clip that cannot start ends at once and gives the recitation back`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(36))
+            harness.bundleKursi()
+            harness.clips.endsAtOnce = true
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(36, 1)
+
+            controller.playKursi()
+
+            assertEquals(1, harness.clips.played)
+            assertFalse(controller.adhkarPlaying.value)
+            assertTrue(harness.player.state.value.playing)
+            assertEquals(1, harness.player.pauses)
+            assertEquals(2, harness.player.plays)
         }
 }

@@ -13,8 +13,9 @@ cutter cannot excuse itself) and compares byte for byte:
     where the container carries them, else each ayah's own full decode; the decoded length, not
     ffprobe's, since the files carry Xing headers; skipped with a note if ffmpeg is not at the
     path `verify.py` uses);
-  - the folder holds exactly the four clips (dot-files and `*.part` aside; a `.part` is reported),
-    and they total under the 2 MB the plan promised.
+  - the folder holds exactly the four clips (dot-files aside), no leftover `*.part` from a cutter
+    run that was interrupted or is still going (the build would bundle it, so it fails the
+    check and is named on its own line), and they total under the 2 MB the plan promised.
 
 The four clips and the ayahs each is are written out below (`EXPECTED`), not imported from
 `adhkar_clips.py`: the checker holds the cutter to a table of its own.
@@ -119,17 +120,17 @@ def main():
         print("  FAIL", msg)
 
     # The folder is bundled whole, so it must hold exactly the expected files. Dot-files (a
-    # Finder's `.DS_Store`) are not part of that, and a `.part` is a cutter run in flight or
-    # interrupted: neither fails the check, and a `.part` is named on its own line because the
-    # build would bundle it if it stayed.
+    # Finder's `.DS_Store`) are not part of that and are ignored. A `.part` is a cutter run in
+    # flight or interrupted, and the build would bundle it if it stayed: it fails the check, on
+    # a line of its own so that it is not mistaken for a stray clip.
     names = os.listdir(CLIP_DIR) if os.path.isdir(CLIP_DIR) else []
     partial = sorted(n for n in names if n.endswith(".part") and not n.startswith("."))
     present = sorted(n for n in names if not n.startswith(".") and not n.endswith(".part"))
     if present != sorted(EXPECTED):
         fail(f"{CLIP_DIR} holds {present}, expected {sorted(EXPECTED)}")
     if partial:
-        print(f"  note: partial file(s) {partial} in the clip folder: a cutter run in progress, or "
-              f"one that was interrupted; delete them before building")
+        fail(f"partial file(s) {partial} in {CLIP_DIR}: a cutter run still going, or one that was "
+             f"interrupted; wait for it or delete them, the build would bundle them")
 
     for name, (surah, wanted) in EXPECTED.items():
         path = os.path.join(CLIP_DIR, name)

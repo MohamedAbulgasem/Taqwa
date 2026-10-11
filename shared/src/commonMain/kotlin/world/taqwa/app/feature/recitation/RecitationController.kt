@@ -1100,6 +1100,7 @@ class RecitationController(
         val playWith = voice ?: reciter.value ?: return
         // A whole surah, whatever was loaded before: its end goes on to the next one again.
         adhkarSurah.value = null
+        abandonAdhkarClip()
         loading.value = true
         try {
             val speech = spokenFor(surah)
@@ -1126,6 +1127,7 @@ class RecitationController(
         val playWith = reciter.value ?: return
         val stopsBefore = stopCount
         adhkarSurah.value = surah
+        abandonAdhkarClip()
         loading.value = true
         try {
             player.load(playWith, surah, passage.ayahs.min(), passage.text, null, passage.ayahs)
@@ -1186,7 +1188,7 @@ class RecitationController(
             adhkarClipBytes(voice.id, surah, ayah)
         } catch (cancelled: CancellationException) {
             throw cancelled
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
         // The page turned, or the screen was left, while the file was being read: that stop found
@@ -1220,6 +1222,20 @@ class RecitationController(
         val paused = pausedForClip
         pausedForClip = false
         if (paused && player.state.value.surah != null) player.play()
+    }
+
+    /**
+     * An ordinary play — [start], or a passage in the player — has taken the player, so a clip
+     * still sounding is over and what it paused is not to be given back: the new play owns the
+     * player now, in whatever state the reader leaves it, and a clip's end resuming the surah the
+     * reader has since paused would be a press they never made. The way [toggle] ends an audition
+     * with `resume = false`. Nothing when no clip is playing.
+     */
+    private fun abandonAdhkarClip() {
+        if (!adhkarClip.value) return
+        adhkarClip.value = false
+        pausedForClip = false
+        clips.stop()
     }
 
     /**
