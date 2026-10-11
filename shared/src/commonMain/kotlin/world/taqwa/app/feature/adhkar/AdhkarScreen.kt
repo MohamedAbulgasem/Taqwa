@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -111,10 +112,15 @@ import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_play
 import world.taqwa.app.resources.tasbeeh_hint
 
-/** The foot's ring and the count inside it (spec §3.1): a small cousin of the tasbeeh's. */
+/**
+ * The foot's ring and the count inside it (spec §3.1): a small cousin of the tasbeeh's. The count
+ * shrinks to fit the ring's 44 dp, and its floor is in dp, not sp, so it is the same 8 dp at every
+ * text size: a floor in sp grows with the font, and at 200 % a 12 sp floor was 24 dp, too wide for
+ * "100", which lost its last digit. At 100 % the count still settles on [CountSize].
+ */
 private val RingDiameter = 64.dp
 private val CountSize = 22.sp
-private val CountMinSize = 12.sp
+private val CountMinSize = 8.dp
 private val CountStep = 0.5.sp
 
 /** One tap's bump, the tasbeeh's: 1 → 1.06 → 1 over 120 ms. */
@@ -368,12 +374,14 @@ private fun Header(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         BackChevron(onBack)
+        // Two lines each, not one: at a 200 % font, or in a longer language beside the speaker, a
+        // single line cut the caption's time off ("until 12:5…"). At 100 % both fit on one.
         Column(Modifier.weight(1f).padding(start = 4.dp, end = 4.dp, top = 8.dp)) {
             Text(
                 stringResource(if (state.set == AdhkarSet.EVENING) Res.string.adhkar_evening else Res.string.adhkar_morning),
                 style = TaqwaText.rowLabel.copy(fontWeight = FontWeight.ExtraBold),
                 color = colors.textPrimary,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             if (state.loaded) {
@@ -381,7 +389,7 @@ private fun Header(
                     phaseCaption(state),
                     style = TaqwaText.caption.copy(fontSize = 12.sp),
                     color = colors.textSecondary,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -551,7 +559,11 @@ private fun Counter(page: AdhkarPageUi?, progress: Float, scale: Float) {
                     textAlign = TextAlign.Center,
                 ),
                 maxLines = 1,
-                autoSize = TextAutoSize.StepBased(minFontSize = CountMinSize, maxFontSize = CountSize, stepSize = CountStep),
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = with(LocalDensity.current) { CountMinSize.toSp() },
+                    maxFontSize = CountSize,
+                    stepSize = CountStep,
+                ),
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .graphicsLayer { scaleX = scale; scaleY = scale }

@@ -3,6 +3,7 @@ package world.taqwa.app.feature.adhkar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -14,11 +15,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -36,6 +40,9 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.getPluralString
 import org.jetbrains.compose.resources.getString
@@ -78,6 +85,7 @@ import world.taqwa.app.resources.tasbeeh_hint
 import world.taqwa.app.resources.ui_language
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -469,6 +477,58 @@ class AdhkarScreenTest {
             assertEquals(reading.copy(transliteration = true), changes.last())
             assertEquals(2, changes.size)
         }
+    }
+
+    /**
+     * The scene at a larger text size — 2 is the device pass's 200 % font, and iOS's largest
+     * accessibility sizes go past 3 — in a column [width] wide. The density is the scene's own with
+     * only the font scale changed.
+     */
+    @Composable
+    private fun Scaled(shown: AdhkarUiState, width: Dp, fontScale: Float = 2f) {
+        val density = LocalDensity.current
+        CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
+            Box(Modifier.width(width)) { Screen(Calls(), shown) }
+        }
+    }
+
+    private fun ComposeUiTest.layoutOf(node: SemanticsNodeInteraction): TextLayoutResult {
+        val layouts = mutableListOf<TextLayoutResult>()
+        node.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        return layouts.single()
+    }
+
+    /**
+     * At a large font a count of 100 stays whole in the ring. The device pass saw "10" at 200 %:
+     * the count shrank only as far as a 12 sp floor, which grows with the font — 24 dp there — and
+     * three digits at that size do not fit the ring's 44 dp, so the last one broke onto a line that
+     * one line cannot show. The floor is 8 dp now, at every size.
+     */
+    @Test
+    fun aCountOfAHundredStaysWholeAtLargeTextSizes() = runComposeUiTest {
+        val hundred = state.copy(pages = listOf(state.pages[0].copy(count = 100, target = 100)))
+        var scale by mutableStateOf(2f)
+        setContent { Scaled(hundred, width = 400.dp, fontScale = scale) }
+        for (each in listOf(2f, 3f)) {
+            scale = each
+            waitForIdle()
+            val count = layoutOf(onNodeWithText("100", useUnmergedTree = true))
+            assertEquals(3, count.getLineEnd(0), "at font scale $each")
+            assertFalse(count.didOverflowHeight, "at font scale $each")
+        }
+    }
+
+    /**
+     * At a 200 % font in a narrow column the phase caption wraps onto a second line rather than
+     * losing its time to an ellipsis ("After sunrise · until 12:5…" on the device).
+     */
+    @Test
+    fun thePhaseCaptionWrapsRatherThanLosingItsTimeAtTwiceTheTextSize() = runComposeUiTest {
+        val makeup = state.copy(phase = AdhkarPhase.MAKEUP, until = "12:53")
+        setContent { Scaled(makeup, width = 320.dp) }
+        val caption = layoutOf(onNodeWithText("12:53", substring = true, useUnmergedTree = true))
+        assertFalse(caption.isLineEllipsized(caption.lineCount - 1))
+        assertTrue(caption.lineCount > 1)
     }
 
     private fun hasCustomAction(label: String) = SemanticsMatcher("has custom action $label") { node ->
