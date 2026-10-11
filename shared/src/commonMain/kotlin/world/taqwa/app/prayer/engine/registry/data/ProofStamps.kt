@@ -1939,24 +1939,19 @@ object ProofStamps {
     private fun syAwqaf() = ProofStamp(
         entryId = "sy.awqaf",
         places = 16,
-        placeDays = 16,
-        ramadanDays = 7,
+        placeDays = 30,
+        ramadanDays = 15,
         provenThrough = "2026-10-01",
-        worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 0, "isha" to 1, "maghrib" to 2, "sunrise" to 1),
+        worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 2, "sunrise" to 1),
         worstLateByUnit = syAwqafUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        provenThroughByUnit = syAwqafThrough(),
-    )
-
-    private fun syAwqafThrough(): Map<String, String> = mapOf(
-        "damascus" to "2026-02-19",
     )
 
     private fun syAwqafUnits(): Map<String, Map<String, Int>> = mapOf(
-        "damascus" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 2, "sunrise" to 0),
-        "umayyad-mosque" to mapOf("asrStandard" to 0, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 0, "isha" to 1, "maghrib" to 0, "sunrise" to 1),
+        "damascus" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 2, "sunrise" to 1),
+        "umayyad-mosque" to mapOf("asrStandard" to 1, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 0, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
     )
 
     private fun tnInm() = ProofStamp(

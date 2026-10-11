@@ -44,11 +44,14 @@ object OwnPointWorst {
 
     /**
      * Umm al-Qura's and QMDB's group files; and since the city-point audit of 10–11 Oct 2026 the groups whose tables printed
-     * for their own points became units (`tablesAtTheirPoints`), each with the app's own points beside them.
+     * for their own points became units (`tablesAtTheirPoints`), each with the app's own points beside them, and the three
+     * cautious groups whose recorded limits that audit raised for the app's points beside their tables (Sydney's sunrise
+     * 9, Dublin's Maghrib 3, Lille's Isha 4: the fix round of 11 Oct 2026), so their own tables' rows keep their own worst.
      */
     val GROUPS = listOf(
         "sa-ummalqura", "kz-qmdb", "us-isna", "ca-isna", "ca-cautious", "us-chicago", "in-karachi", "uz-board", "xk-bik",
         "pk-karachi", "kg-default", "gb-wifaqul", "ps-gaza", "lb-fatwa", "sy-awqaf", "iq-sunni",
+        "au-cautious", "ie-cautious", "tr-diyanet-europe",
     )
 
     /** The events in the file's order. */

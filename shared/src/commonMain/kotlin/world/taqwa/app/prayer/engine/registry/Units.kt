@@ -224,8 +224,18 @@ internal fun pointTables(entry: RegistryEntry, tables: List<PrintedTable>): Unit
 internal fun pointTable(entry: RegistryEntry, name: String, point: GeoPoint): UnitSet =
     pointTables(entry, listOf(PrintedTable(entry.id, name, point)))
 
-/** One table printed for its own [point] ([tablesAtTheirPoints]): [key] names its unit, [lateLimits] its own exceptions (R41). */
-internal class OwnTable(val key: String, val name: String, val point: GeoPoint, val lateLimits: List<LateLimit> = emptyList())
+/**
+ * One table printed for its own [point] ([tablesAtTheirPoints]): [key] names its unit, [lateLimits] its own exceptions (R41).
+ * [method], when set, is the unit's own method in place of the set's (two samples of one authority's table at two points:
+ * the Syrian Awqaf's Damascus, whose units read each other's point for the starts too, [TimetableMethod.startPoints]).
+ */
+internal class OwnTable(
+    val key: String,
+    val name: String,
+    val point: GeoPoint,
+    val lateLimits: List<LateLimit> = emptyList(),
+    val method: TimetableMethod? = null,
+)
 
 /**
  * Rulings R30, R40 and R44 for an entry or a cautious member that is computed at the user's own point and checked against
@@ -235,22 +245,29 @@ internal class OwnTable(val key: String, val name: String, val point: GeoPoint, 
  * Awqaf, Dar al-Fatwa's Beirut, the Syrian Awqaf's two Damascus tables, the Sunni Endowment's Baghdad), an authority's
  * base point (BIK's Takvimi). Each table is a unit at its point, reaching as far as [reach]'s [lateReachKm]; the nearest
  * whose reach holds the user takes them, and its point rides as the method's fixed point beside the user's own (ruling
- * R15: starts the later, sunrise and the ends the earlier). So nowhere in its reach is the time shown before that
- * table, nor any end after it, and nowhere is a start earlier, or an end later, than the user's own point alone gave
- * it. On main the app's own Houston, Sterling, Calgary, Delhi or Shtime, a few kilometres from such a table, had a
- * time a minute on the wrong side of it on some days.
+ * R15: starts the later, sunrise and the ends the earlier). So the time shown is never before the nearest table whose
+ * reach holds the user, nor any end after it, and nowhere is a start earlier, or an end later, than the user's own point
+ * alone gave it. Where two tables' reaches overlap, a place follows the nearest only, and can still be on the wrong side
+ * of the other (the app's Ottawa, in the Ottawa South Mosque's unit, against Abrar Masjid 10 km off: an owner's
+ * question, the fix round of 11 Oct 2026); two samples of one table (Damascus) instead read each other's point for the
+ * starts ([OwnTable.method]). On main the app's own Houston, Sterling, Calgary, Delhi or Shtime, a few kilometres from
+ * such a table, had a time a minute on the wrong side of it on some days.
  *
  * [reach]: a mosque's or a city's table serves its own neighbourhood, a minute of longitude (class A's, about 17 to 24
  * km), where the user's own sun is within a minute of the table's; farther out a user's own mosque or town prints for
- * its own point, as the method computes. An authority that applies one table to a whole area by whole-minute offsets
- * (BIK) reaches as far as its entry's class.
+ * its own point, as the method computes. That narrows ruling R40, which takes a unit's reach from its entry's class
+ * limit (class D's and C's three minutes, about 61 km, for ISNA, the city tables and Canada's families): a proposed
+ * ruling for the owner, whose cost is the cities just beyond the minute (Calgary's north-east, Vancouver's west, the
+ * Wifaqul towns 17 to 20 km from Manchester Central). An authority that applies one table to a whole area by
+ * whole-minute offsets (BIK) reaches as far as its entry's class.
  *
  * Beyond every reach the method at the user's own point exactly as before ([method]): unlike one point table's fit
  * ([pointTables], whose edge [beyondTable] widens), these margins hold every table at its own point and are meant for any
- * point. As beyond every other unit, no figure is claimed there, except that a cautious member keeps its own measured
- * reach ([measuredBeyond], [Member.measuredAt]). [measured] is false for an entry that claims no figure anywhere
- * (every city table's above). The units carry no name of their own ([AuthorityUnit.named]): About calls the place by
- * the app's own name for it, never a mosque's.
+ * point, so ruling R44's edge minute and SAFE_END and R45's bound of the ends by the nearest table do not apply there
+ * (the same proposed ruling). As beyond every other unit, no figure is claimed there, except that a cautious member
+ * keeps its own measured reach ([measuredBeyond], [Member.measuredAt]). [measured] is false for an entry that claims no
+ * figure anywhere (every city table's above). The units carry no name of their own ([AuthorityUnit.named]): About calls
+ * the place by the app's own name for it, never a mosque's.
  */
 internal fun tablesAtTheirPoints(
     entryId: String,
@@ -262,8 +279,8 @@ internal fun tablesAtTheirPoints(
 ): UnitSet {
     val units = tables.map { t ->
         AuthorityUnit(
-            t.key, t.name, t.point, lateReachKm(t.point.lat, reach), measured = measured, lateLimits = t.lateLimits, named = false,
-            endsBoundAtUserPoint = true,
+            t.key, t.name, t.point, lateReachKm(t.point.lat, reach), method = t.method, measured = measured,
+            lateLimits = t.lateLimits, named = false, endsBoundAtUserPoint = true,
         )
     }
     return UnitSet(entryId, units, measuredBeyond = measuredBeyond) { method }

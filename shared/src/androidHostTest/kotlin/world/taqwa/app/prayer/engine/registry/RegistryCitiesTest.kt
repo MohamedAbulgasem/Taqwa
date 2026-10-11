@@ -282,17 +282,24 @@ class RegistryCitiesTest {
     @Test
     fun `no city's time is earlier beside a table printed for its own point than at its own point alone`() {
         // The city-point audit of 10–11 Oct 2026 (rulings R30, R40 and R44): ISNA's mosques, Canada's families, Chicago's
-        // 18° block, Dawat-e-Islami's Delhi, the Board's Tashkent and BIK's base table ride beside the user's point within
-        // their reach (tablesAtTheirPoints), so no start is earlier, and no sunrise or end of eating later, than the same
-        // method at the user's own point alone, as the app showed before (the Canadian families' curves read at both
-        // latitudes, PlaceCurves' userLatitude). Every app city of the five countries inside such a unit, every ninth day.
-        val sets = listOf("us.isna", "ca.isna", "us.chicago.eighteen", "ca.eighteen", "ca.fifteen", "ca.isha90", "in.karachi", "uz.board", "xk.bik")
+        // 18° block, the city tables (Delhi, Karachi, Tashkent, Bishkek, Manchester Central's Wifaqul table, Gaza, Beirut,
+        // Damascus's two samples, Baghdad) and BIK's base table ride beside the user's point within their reach
+        // (tablesAtTheirPoints), so no start is earlier, and no sunrise, sunset, end of eating or imsak later, than the
+        // same method at the user's own point alone, as the app showed before (the Canadian families' curves read at both
+        // latitudes, PlaceCurves' userLatitude; Damascus's units read the other sample's point for the starts too). Every
+        // app city of the twelve countries inside such a unit, every ninth day, under both Asr schools (the fix round of
+        // 11 Oct 2026 added the seven city tables, the Hanafi school, sunset and imsak).
+        val sets = listOf(
+            "us.isna", "ca.isna", "us.chicago.eighteen", "ca.eighteen", "ca.fifteen", "ca.isha90", "in.karachi", "uz.board", "xk.bik",
+            "pk.karachi", "kg.default", "gb.wifaqul", "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni",
+        )
+        val countries = setOf("US", "CA", "IN", "UZ", "XK", "PK", "KG", "GB", "PS", "LB", "SY", "IQ")
         val methods = sets.associateWith { id ->
             Registry.byId(id)?.method ?: Registry.entries.flatMap { it.members }.first { it.id == id }.method
         }
         val dates = generateSequence(LocalDate(2026, 1, 3)) { it.plus(9, DateTimeUnit.DAY) }.takeWhile { it.year == 2026 }.toList()
         val inUnits = sortedMapOf<String, Int>()
-        for (city in cities.filter { it.countryCode in setOf("US", "CA", "IN", "UZ", "XK") }) {
+        for (city in cities.filter { it.countryCode in countries }) {
             for (id in sets) {
                 val unit = Units.of(id)!!.unitFor(city.place) ?: continue
                 inUnits.merge(id, 1, Int::plus)
@@ -301,14 +308,21 @@ class RegistryCitiesTest {
                 val shownMethod = Registry.methodInUnit(id, base, unit, p)
                 val alone = Registry.methodAlone(id, base, p)
                 val zone = TimeZone.of(city.zone)
-                val school = world.taqwa.app.prayer.engine.method.AsrSchool.HANAFI
-                for (date in dates) {
-                    val shown = DayComputer.compute(shownMethod, p, date, zone, school, Registry.ramadanCalendar())
-                    val own = DayComputer.compute(alone, p, date, zone, school, Registry.ramadanCalendar())
-                    val where = "${city.name} in $id/${unit.id} on $date"
-                    assertTrue(shown.fajr >= own.fajr && shown.dhuhr >= own.dhuhr && shown.asr >= own.asr, where)
-                    assertTrue(shown.maghrib >= own.maghrib && shown.isha >= own.isha, where)
-                    assertTrue(shown.sunrise <= own.sunrise && shown.endOfEating <= own.endOfEating, where)
+                for (school in world.taqwa.app.prayer.engine.method.AsrSchool.entries) {
+                    for (date in dates) {
+                        val shown = DayComputer.compute(shownMethod, p, date, zone, school, Registry.ramadanCalendar())
+                        val own = DayComputer.compute(alone, p, date, zone, school, Registry.ramadanCalendar())
+                        val where = "${city.name} in $id/${unit.id} on $date under $school"
+                        assertTrue(shown.fajr >= own.fajr && shown.dhuhr >= own.dhuhr && shown.asr >= own.asr, where)
+                        assertTrue(shown.asrOther >= own.asrOther, where)
+                        assertTrue(shown.maghrib >= own.maghrib && shown.isha >= own.isha, where)
+                        assertTrue(shown.sunrise <= own.sunrise && shown.endOfEating <= own.endOfEating, where)
+                        assertTrue(shown.sunset <= own.sunset, where)
+                        val imsakShown = shown.imsak
+                        val imsakOwn = own.imsak
+                        assertEquals(imsakOwn == null, imsakShown == null, "$where: imsak shown where it was, and only there")
+                        if (imsakShown != null && imsakOwn != null) assertTrue(imsakShown <= imsakOwn, where)
+                    }
                 }
             }
         }

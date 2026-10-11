@@ -428,11 +428,27 @@ object Levant {
         "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, " +
             "where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each " +
             "end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table"
+
+    // The two Damascus samples' points (sy-awqaf.tsv), declared before the units that read them.
+    private val DAMASCUS_IMSAKIYA = GeoPoint(33.5138, 36.2765)
+    private val UMAYYAD_MOSQUE = GeoPoint(33.5116, 36.3064)
+
+    /**
+     * The Syrian Awqaf's two Damascus samples are one table, the Ministry's for Damascus (its Ramadan 1447 imsakiya, and a
+     * day read at the Umayyad Mosque, 2.8 km east), so a place in either unit reads the other's point for its starts too
+     * ([TimetableMethod.startPoints]): never before either sample. The nearest sample alone left the app's al-Yarmūk,
+     * Babīlā, Jaramānā, ʿIrbīn, Ḩarastā, At Tall and Dūmā, all in the Umayyad Mosque's unit and within the imsakiya's
+     * reach, a minute before the imsakiya's Fajr on a day and its Isha on another (the fix round of 11 Oct 2026; as on
+     * main). The ends stay the nearest sample's and the user's own; each city is gated against both samples.
+     */
     val syriaUnits: UnitSet = tablesAtTheirPoints(
         syria.id, EntryClass.A, syriaMethod,
         listOf(
-            OwnTable("damascus", "Damascus", GeoPoint(33.5138, 36.2765)),
-            OwnTable("umayyad-mosque", "the Umayyad Mosque, Damascus", GeoPoint(33.5116, 36.3064)),
+            OwnTable("damascus", "Damascus", DAMASCUS_IMSAKIYA, method = syriaMethod.copy(startPoints = listOf(UMAYYAD_MOSQUE))),
+            OwnTable(
+                "umayyad-mosque", "the Umayyad Mosque, Damascus", UMAYYAD_MOSQUE,
+                method = syriaMethod.copy(startPoints = listOf(DAMASCUS_IMSAKIYA)),
+            ),
         ),
         measured = false,
     )

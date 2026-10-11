@@ -519,6 +519,26 @@ class RegistryTest {
     }
 
     @Test
+    fun `the syrian awqaf's two damascus samples are one table so each unit reads the other's point for its starts`() {
+        // The fix round of 11 Oct 2026: with the nearest sample alone, the app's Jaramana (in the Umayyad Mosque's unit, within
+        // the imsakiya's reach) came a minute before the imsakiya's Fajr on a day and its Isha on another.
+        val imsakiya = GeoPoint(33.5138, 36.2765)
+        val umayyad = GeoPoint(33.5116, 36.3064)
+        val jaramana = resolve(33.4862, 36.34614, "Asia/Damascus", "SY")
+        assertEquals("umayyad-mosque", jaramana.unitId)
+        assertEquals(umayyad, jaramana.method?.fixedPoint)
+        assertEquals(listOf(imsakiya), jaramana.method?.startPoints)
+        val darayya = resolve(33.45835, 36.23256, "Asia/Damascus", "SY")
+        assertEquals("damascus", darayya.unitId)
+        assertEquals(imsakiya, darayya.method?.fixedPoint)
+        assertEquals(listOf(umayyad), darayya.method?.startPoints)
+        // Beyond both reaches the Ministry's method at the user's own point, exactly as before the units.
+        val homs = resolve(34.72405, 36.72559, "Asia/Damascus", "SY")
+        assertNull(homs.unitId)
+        assertSame(Registry.byId("sy.awqaf")!!.method, homs.method)
+    }
+
+    @Test
     fun `new york follows isna fifteen and fifteen with the standard asr`() {
         val r = resolve(40.71427, -74.00597, "America/New_York", "US")
         assertEquals("us.isna", r.entry.id)
