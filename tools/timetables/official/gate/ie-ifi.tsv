@@ -14,7 +14,7 @@ archive/tables/moral-auth-world/ukfr/ifi_dublin_local.txt	ie.ifi/ie.ifi			Europe
 # to the date's own sun (no sunrise after the sun's, no Maghrib before the minute after its sunset). So these rows are not
 # held-out years (review of track T4): each compares the 2026 computation, moved, with the 2026 table re-dated; what they
 # check is the move itself on each year's own clock, its clock-change days, and the date's own sun's bounds, a minute late
-# where the sun has moved past the table (March 2028). Fit.
+# where the sun has moved past the table (19 sunrises of March 2028, 65 Maghribs of February to April 2028 and 2029). Fit.
 archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2027.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	fit	IFI Dublin, the fixed GMT table on 2027
 archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2028.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	fit	IFI Dublin, the fixed GMT table on 2028
 archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2029.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	fit	IFI Dublin, the fixed GMT table on 2029
