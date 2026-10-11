@@ -440,10 +440,10 @@ object ProofStamps {
     private fun chFids() = ProofStamp(
         entryId = "ch.fids",
         places = 1,
-        placeDays = 32,
-        ramadanDays = 0,
-        provenThrough = "2026-10-26",
-        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        placeDays = 403,
+        ramadanDays = 29,
+        provenThrough = "2027-12-31",
+        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = chFidsUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
@@ -451,7 +451,7 @@ object ProofStamps {
     )
 
     private fun chFidsUnits(): Map<String, Map<String, Int>> = mapOf(
-        "ch.fids" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        "ch.fids" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
     )
 
     private fun deCautious() = ProofStamp(
@@ -632,9 +632,9 @@ object ProofStamps {
     private fun idKemenag() = ProofStamp(
         entryId = "id.kemenag",
         places = 18,
-        placeDays = 13140,
-        ramadanDays = 1062,
-        provenThrough = "2027-12-31",
+        placeDays = 19728,
+        ramadanDays = 1584,
+        provenThrough = "2028-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = idKemenagUnits(),
         lateLimits = listOf(
@@ -987,8 +987,8 @@ object ProofStamps {
     private fun lbFatwa() = ProofStamp(
         entryId = "lb.fatwa",
         places = 1,
-        placeDays = 747,
-        ramadanDays = 60,
+        placeDays = 1469,
+        ramadanDays = 119,
         provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 3, "endOfEating" to 8, "fajr" to 9, "isha" to 7, "maghrib" to 7, "sunrise" to 3),
         worstLateByUnit = emptyMap(),

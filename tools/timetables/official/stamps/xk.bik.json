@@ -1,14 +1,14 @@
 {
   "entry": "xk.bik",
   "class": "D (authority)",
-  "engineHash": "e9a6eb585c24603a",
+  "engineHash": "3f23334ba163080a",
   "broken": 0,
   "places": 2,
   "first": "2026-01-01",
   "last": "2027-12-31",
   "checked": ["2026-01-01..2027-12-31"],
   "placeDays": 1460,
-  "heldOutDays": 1095,
+  "heldOutDays": 365,
   "ramadanDays": 118,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
@@ -121,47 +121,32 @@
     }
   },
   "heldOut": {
-    "placeDays": 1095,
-    "ramadanDays": 88,
+    "placeDays": 365,
+    "ramadanDays": 30,
     "events": {
-      "fajr": {
-        "checked": 365,
-        "early": 0,
-        "late": {
-          "0": 248,
-          "1": 117,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.6795,
-        "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
       "sunrise": {
-        "checked": 1095,
+        "checked": 365,
         "lateEnd": 0,
         "late": {
-          "0": 88,
-          "1": 413,
-          "2": 326,
-          "3+": 268
+          "0": 44,
+          "1": 134,
+          "2": 103,
+          "3+": 84
         },
-        "exactShare": 0.0804,
-        "worstLate": 5,
+        "exactShare": 0.1205,
+        "worstLate": 4,
         "lateLimit": 5,
         "lateLimitFrom": "entry xk.bik",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 1095,
+        "checked": 365,
         "early": 0,
         "late": {
           "0": 0,
-          "1": 309,
-          "2": 593,
-          "3+": 193
+          "1": 75,
+          "2": 214,
+          "3+": 76
         },
         "exactShare": 0,
         "worstLate": 4,
@@ -170,60 +155,60 @@
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 1095,
+        "checked": 365,
         "early": 0,
         "late": {
-          "0": 8,
-          "1": 347,
-          "2": 379,
-          "3+": 361
+          "0": 4,
+          "1": 100,
+          "2": 131,
+          "3+": 130
         },
-        "exactShare": 0.0073,
+        "exactShare": 0.011,
         "worstLate": 6,
         "lateLimit": 6,
         "lateLimitFrom": "entry xk.bik",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 1095,
+        "checked": 365,
         "early": 0,
         "late": {
-          "0": 8,
-          "1": 445,
-          "2": 521,
-          "3+": 121
+          "0": 4,
+          "1": 116,
+          "2": 195,
+          "3+": 50
         },
-        "exactShare": 0.0073,
+        "exactShare": 0.011,
         "worstLate": 5,
         "lateLimit": 5,
         "lateLimitFrom": "entry xk.bik",
         "overLimit": 0
       },
       "isha": {
-        "checked": 1095,
+        "checked": 365,
         "early": 0,
         "late": {
-          "0": 378,
-          "1": 485,
-          "2": 202,
-          "3+": 30
+          "0": 71,
+          "1": 178,
+          "2": 101,
+          "3+": 15
         },
-        "exactShare": 0.3452,
+        "exactShare": 0.1945,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 1095,
+        "checked": 365,
         "lateEnd": 0,
         "late": {
-          "0": 66,
-          "1": 640,
-          "2": 303,
-          "3+": 86
+          "0": 33,
+          "1": 178,
+          "2": 111,
+          "3+": 43
         },
-        "exactShare": 0.0603,
+        "exactShare": 0.0904,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",

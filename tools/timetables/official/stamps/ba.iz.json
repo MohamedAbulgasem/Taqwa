@@ -1,14 +1,14 @@
 {
   "entry": "ba.iz",
   "class": "B",
-  "engineHash": "ffff56054e7e6b92",
+  "engineHash": "86345aedf60d6f71",
   "broken": 0,
   "places": 3,
   "first": "2026-01-01",
   "last": "2027-12-31",
   "checked": ["2026-01-01..2027-12-31"],
   "placeDays": 2190,
-  "heldOutDays": 1095,
+  "heldOutDays": 0,
   "ramadanDays": 177,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
@@ -121,112 +121,112 @@
     }
   },
   "heldOut": {
-    "placeDays": 1095,
-    "ramadanDays": 87,
+    "placeDays": 0,
+    "ramadanDays": 0,
     "events": {
       "fajr": {
-        "checked": 1097,
+        "checked": 2,
         "early": 0,
         "late": {
-          "0": 1055,
-          "1": 38,
-          "2": 4,
+          "0": 2,
+          "1": 0,
+          "2": 0,
           "3+": 0
         },
-        "exactShare": 0.9617,
-        "worstLate": 2,
+        "exactShare": 1,
+        "worstLate": 0,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 1097,
+        "checked": 2,
         "lateEnd": 0,
         "late": {
-          "0": 591,
-          "1": 471,
-          "2": 35,
-          "3+": 0
-        },
-        "exactShare": 0.5387,
-        "worstLate": 2,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 1097,
-        "early": 0,
-        "late": {
-          "0": 946,
-          "1": 151,
+          "0": 1,
+          "1": 1,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.8624,
+        "exactShare": 0.5,
         "worstLate": 1,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
-      "asrStandard": {
-        "checked": 1097,
+      "dhuhr": {
+        "checked": 2,
         "early": 0,
         "late": {
-          "0": 409,
-          "1": 538,
-          "2": 148,
-          "3+": 2
+          "0": 2,
+          "1": 0,
+          "2": 0,
+          "3+": 0
         },
-        "exactShare": 0.3728,
-        "worstLate": 3,
-        "lateLimit": 3,
-        "lateLimitFrom": "class B, unit banja-luka, unit bihac",
+        "exactShare": 1,
+        "worstLate": 0,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 2,
+        "early": 0,
+        "late": {
+          "0": 2,
+          "1": 0,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 1,
+        "worstLate": 0,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 1097,
+        "checked": 2,
         "early": 0,
         "late": {
-          "0": 551,
-          "1": 482,
-          "2": 62,
-          "3+": 2
+          "0": 1,
+          "1": 1,
+          "2": 0,
+          "3+": 0
         },
-        "exactShare": 0.5023,
-        "worstLate": 3,
-        "lateLimit": 3,
-        "lateLimitFrom": "class B, unit banja-luka, unit bihac",
+        "exactShare": 0.5,
+        "worstLate": 1,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "isha": {
-        "checked": 1097,
+        "checked": 2,
         "early": 0,
         "late": {
-          "0": 1064,
-          "1": 26,
-          "2": 7,
+          "0": 2,
+          "1": 0,
+          "2": 0,
           "3+": 0
         },
-        "exactShare": 0.9699,
-        "worstLate": 2,
+        "exactShare": 1,
+        "worstLate": 0,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 1097,
+        "checked": 2,
         "lateEnd": 0,
         "late": {
-          "0": 318,
-          "1": 763,
-          "2": 13,
-          "3+": 3
+          "0": 1,
+          "1": 1,
+          "2": 0,
+          "3+": 0
         },
-        "exactShare": 0.2899,
-        "worstLate": 3,
-        "lateLimit": 3,
-        "lateLimitFrom": "class B, unit banja-luka, unit bihac",
+        "exactShare": 0.5,
+        "worstLate": 1,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
         "overLimit": 0
       }
     }
