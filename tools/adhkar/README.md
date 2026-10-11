@@ -97,6 +97,21 @@ an-Nasa'i al-Kubra 9743 for Hisn 90, an-Nasa'i ʿAmal al-Yawm 24 for Hisn 92. Gr
 works (Sahih at-Targhib, as-Silsilah as-Sahihah) are not sources and are not listed; the
 app shows no grades.
 
+**A source's number is digits and reference punctuation only** (`2:255`, `1/562`). The app
+shows a reference as the collection's name in the interface language and the number in its
+digits, and nothing else in the number is translated, so a word there would reach an
+Arabic, Urdu or Bengali line in Latin letters (the store screenshots for 1.1.0 showed
+«النسائي al-Kubra 10731»). Where a citation names the book as well as the author, the book
+is a collection of its own with a `source_<collection>` string in every language:
+an-Nasa'i's as-Sunan al-Kubra is `nasai_kubra` (10731, 9743) and his ʿAmal al-Yawm
+wa-l-Layla `nasai_amal` (24). The collection ids are `quran`, `bukhari`, `muslim`,
+`abu_dawud`, `tirmidhi`, `ibn_majah`, `nasai`, `nasai_kubra`, `nasai_amal`, `hakim` and
+`ahmad`; `build_items.py` stops on an unknown one or a worded number, `check_items.py`
+fails on either, and `AdhkarReferencesTest` holds the bundled file to both and to a name in
+`sourceNameRes` for every collection it cites. A new collection needs its id in both
+scripts' `COLLECTIONS`, a `source_<id>` string in all eight folders and a line in
+`sourceNameRes` (`AdhkarPage.kt`).
+
 **Counts and sets** match the spec, OpenDua's `times` and hisnmuslim.com's `REPEAT` for
 all 19 items. Morning: 18 pages; evening: 15. Hisn 93, 94, 95 and 90 are morning only,
 97 evening only, and 96 (100 a day) is one counter shared by both sets
@@ -126,7 +141,8 @@ Allah’s forgiveness and I turn to Him in repentance." Hisn 85 is published as 
 and shirk of the devil" under an Arabic that reads وَشَرَكِهِ, "his snares"; shipped as
 "the evil and snares of the devil", so the English says what the Arabic on screen says
 (the owner's decision, 11 October 2026; the five translations follow the same reading).
-Every other English text is OpenDua's as published. Left as published, for a reviewer to decide: Hisn 79's "I abide
+Both are `TRANSLATION_REPAIRS` in `build_items.py`, so a rebuild writes the shipped
+`en.json` byte for byte. Every other English text is OpenDua's as published. Left as published, for a reviewer to decide: Hisn 79's "I abide
 to Your covenant" and "the evil of which I have committed", and Hisn 90's "Ibraheem".
 
 **Translations** (bn, fr, id, tr, ur). OpenDua publishes English only, so the other five

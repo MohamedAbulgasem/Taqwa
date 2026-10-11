@@ -22,6 +22,7 @@ newline), so a rebuild from the same input is byte-identical.
 
 import json
 import os
+import re
 import sys
 import unicodedata
 
@@ -86,8 +87,15 @@ QURAN_OPEN = chr(0xFD3F)  # the ornate parenthesis OpenDua and Hisn put round Qu
 # sources and the app shows no grades. Numbers the spec names only by collection come from
 # the R1 canon notes: al-Hakim 1/562 (Hisn 75's own footnote), Ahmad 15360 and an-Nasa'i
 # al-Kubra 9743 (Hisn 90), an-Nasa'i 'Amal al-Yawm 24 (Hisn 92).
+#
+# A number is digits and reference punctuation only (NUMBER): the app translates the
+# collection's name and only the digits of its number, so a word there would show in Latin
+# letters on an Arabic, Urdu or Bengali line. So where a citation names the book as well as
+# its author, the book is a collection of its own, named in every language: an-Nasa'i's
+# as-Sunan al-Kubra is nasai_kubra and his 'Amal al-Yawm wa-l-Layla nasai_amal, each cited
+# by its own numbering.
 SOURCES = {
-    "hisn-075": [("quran", "2:255"), ("nasai", "al-Kubra 10731"), ("hakim", "1/562")],
+    "hisn-075": [("quran", "2:255"), ("nasai_kubra", "10731"), ("hakim", "1/562")],
     "hisn-076a": [("quran", "112"), ("abu_dawud", "5082"), ("tirmidhi", "3575")],
     "hisn-076b": [("quran", "113"), ("abu_dawud", "5082"), ("tirmidhi", "3575")],
     "hisn-076c": [("quran", "114"), ("abu_dawud", "5082"), ("tirmidhi", "3575")],
@@ -98,16 +106,21 @@ SOURCES = {
     "hisn-085": [("tirmidhi", "3392"), ("abu_dawud", "5067")],
     "hisn-086": [("abu_dawud", "5088"), ("tirmidhi", "3388"), ("ibn_majah", "3869")],
     "hisn-088": [("hakim", "1/545")],
-    "hisn-090": [("ahmad", "15360"), ("nasai", "al-Kubra 9743")],
+    "hisn-090": [("ahmad", "15360"), ("nasai_kubra", "9743")],
     "hisn-091": [("muslim", "2692")],
-    "hisn-092": [("nasai", "ʿAmal al-Yawm 24"), ("abu_dawud", "5077")],
+    "hisn-092": [("nasai_amal", "24"), ("abu_dawud", "5077")],
     "hisn-093": [("bukhari", "6403"), ("muslim", "2691")],
     "hisn-094": [("muslim", "2726")],
     "hisn-095": [("ibn_majah", "925")],
     "hisn-096": [("bukhari", "6307"), ("muslim", "2702")],
     "hisn-097": [("abu_dawud", "3898"), ("ibn_majah", "3518")],
 }
-COLLECTIONS = {"quran", "bukhari", "muslim", "abu_dawud", "tirmidhi", "ibn_majah", "nasai", "hakim", "ahmad"}
+# Each one is a source_<collection> string in all seven languages (AdhkarPage.sourceNameRes).
+COLLECTIONS = {
+    "quran", "bukhari", "muslim", "abu_dawud", "tirmidhi", "ibn_majah", "nasai", "nasai_kubra", "nasai_amal",
+    "hakim", "ahmad",
+}
+NUMBER = re.compile(r"[0-9]+([:/-][0-9]+)*")
 
 # Read-through repairs of OpenDua's transliteration (its generator drops a long vowel
 # where the Arabic leaves the vowel unwritten, and splits kalima as if it began with the
@@ -122,8 +135,11 @@ TRANSLITERATION_REPAIRS = {
     ("hisn-094", BOTH): [("ka-li-mātih", "kalimātih")],
     ("hisn-097", BOTH): [("bi-ka-li-māti", "bi-kalimāti")],
 }
-# OpenDua's English for Hisn 96 alone is wrapped in quotation marks and spells "Allaah".
+# OpenDua's English for Hisn 96 alone is wrapped in quotation marks and spells "Allaah". Its
+# Hisn 85 says "shirk" under an Arabic that reads وَشَرَكِهِ, "his snares": the English says what
+# the Arabic on screen says (the owner's decision, 11 October 2026; see the README).
 TRANSLATION_REPAIRS = {
+    ("hisn-085", BOTH): [("shirk of the devil", "snares of the devil")],
     ("hisn-096", BOTH): [("‘I seek Allaah’s", "I seek Allah’s"), ("repentance.’", "repentance.")],
 }
 
@@ -208,6 +224,8 @@ def build(entries):
         sources = SOURCES[item_id]
         if any(c not in COLLECTIONS for c, _ in sources):
             fail(f"{item_id}: unknown collection in {sources}")
+        if any(not NUMBER.fullmatch(n) for _, n in sources):
+            fail(f"{item_id}: a number that is not digits and reference punctuation in {sources}")
         item = {
             "id": item_id,
             "hisn": int(ref),

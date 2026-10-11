@@ -640,6 +640,9 @@
     <string name="source_tirmidhi">Tirmidzi</string>
     <string name="source_ibn_majah">Ibnu Majah</string>
     <string name="source_nasai">An-Nasa’i</string>
+    <!-- an-Nasa’i’s as-Sunan al-Kubra and ʿAmal al-Yawm wa-l-Layla, each numbered on its own: the book is part of the name, so the reference line’s number is digits only (“An-Nasa’i dalam Al-Kubra 10731”). -->
+    <string name="source_nasai_kubra">An-Nasa’i dalam Al-Kubra</string>
+    <string name="source_nasai_amal">An-Nasa’i dalam ‘Amal al-Yaum wal-Lailah</string>
     <string name="source_hakim">Al-Hakim</string>
     <string name="source_ahmad">Ahmad</string>
     <string name="adhkar_done_morning">Zikir pagi · selesai</string>

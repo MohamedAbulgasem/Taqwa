@@ -9,8 +9,10 @@ structural checks still run and the text comparison is skipped with a warning; a
 that is given but does not exist is a failure. Exit status 1 on any failure.
 
 Structure (always): the 19 ids in the book's order with the spec's kind, sets, count,
-daily flag and Quran reference; 18 morning and 15 evening pages; sources from the nine
-known collections; every set of every du'a resolves to an Arabic text and a
+daily flag and Quran reference; 18 morning and 15 evening pages; sources from the eleven
+known collections, each number digits and reference punctuation only (2:255, 1/562: the
+app translates a collection's name and a number's digits, never a word in the number);
+every set of every du'a resolves to an Arabic text and a
 transliteration; no empty strings; every Arabic string carries tashkeel (U+064B-U+0652);
 the Arabic is OpenDua's, byte for byte (tools/adhkar/opendua-morning-evening.json); no
 file starts with a BOM.
@@ -91,7 +93,11 @@ EXPECTED = [
     ("hisn-096", 96, "dua", ME, 100, True, None),
     ("hisn-097", 97, "dua", (E,), 3, False, None),
 ]
-COLLECTIONS = {"quran", "bukhari", "muslim", "abu_dawud", "tirmidhi", "ibn_majah", "nasai", "hakim", "ahmad"}
+COLLECTIONS = {
+    "quran", "bukhari", "muslim", "abu_dawud", "tirmidhi", "ibn_majah", "nasai", "nasai_kubra", "nasai_amal",
+    "hakim", "ahmad",
+}
+NUMBER = re.compile(r"[0-9]+([:/-][0-9]+)*")
 
 # Known difference 4: (hisnmuslim words, OpenDua words, why it is not a real difference).
 ALLOWED = {
@@ -222,6 +228,8 @@ def check_structure(items_doc, extract):
         sources = item.get("sources") or []
         if not sources or any(set(s) != {"collection", "number"} or s["collection"] not in COLLECTIONS for s in sources):
             fail(f"{item_id}: bad sources {sources}")
+        elif any(not NUMBER.fullmatch(s["number"]) for s in sources):
+            fail(f"{item_id}: a source number that is not digits and reference punctuation in {sources}")
         arabic = item.get("arabic", {})
         for key, text in arabic.items():
             if not any(c in TASHKEEL for c in text):

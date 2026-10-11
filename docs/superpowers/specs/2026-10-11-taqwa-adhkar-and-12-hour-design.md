@@ -348,10 +348,13 @@ Compose resources, not a database: `files/adhkar/items.json` — per item `id`, 
 (`surah`, `ayah?`, `prefix`: `istiadhah` | `basmala` | none), `arabic` (`morning`, `evening`
 variants or one text), `transliteration` (same shape), `sources` (list of `{collection, number}`) —
 and `files/adhkar/text/<lang>.json` for `en`, `bn`, `fr`, `id`, `tr`, `ur` (per item a translation
-pair). Parsed once with `ignoreUnknownKeys`, like the audio manifest. A `commonTest` checks the
-structure (every shipped language has every du'a id, no empty strings, counts and sets as the
-table, 18 morning and 15 evening pages); an `androidHostTest` resolves every Quran reference
-against the bundled `quran.db`.
+pair). A source's `number` is digits joined by `:`, `/` or `-`, never a word: a book cited beside
+its author is a collection of its own (`nasai_kubra` for an-Nasa'i's as-Sunan al-Kubra,
+`nasai_amal` for his ʿAmal al-Yawm wa-l-Layla), so the book's name is translated with the author's
+and no Latin word reaches an Arabic, Urdu or Bengali line. Parsed once with `ignoreUnknownKeys`,
+like the audio manifest. A `commonTest` checks the structure (every shipped language has every du'a
+id, no empty strings, counts and sets as the table, 18 morning and 15 evening pages); an
+`androidHostTest` resolves every Quran reference against the bundled `quran.db`.
 
 ## 5. Reminder
 
@@ -389,10 +392,11 @@ typographic apostrophes; Bengali in NFC. Keys: `prayer_open_adhkar`, `adhkar_mor
 `adhkar_window_evening`, `adhkar_done_morning`, `adhkar_done_evening`, `adhkar_next_evening`,
 `adhkar_next_morning`, `adhkar_back`, `adhkar_reading`, `adhkar_translation`, `adhkar_of`,
 `adhkar_a11y_count`, `adhkar_opens_at`, `source_bukhari`, `source_muslim`, `source_abu_dawud`,
-`source_tirmidhi`, `source_ibn_majah`, `source_nasai`, `source_hakim`, `source_ahmad`,
-`notifications_adhkar`, `notifications_adhkar_detail`, `prayer_times_time_format`,
-`time_format_24`, `time_format_12`, `credit_adhkar`, `credit_adhkar_detail`. `tasbeeh_hint` is reused. The translations are mine and
-are listed for Mohamed's review in the report.
+`source_tirmidhi`, `source_ibn_majah`, `source_nasai`, `source_nasai_kubra`, `source_nasai_amal`,
+`source_hakim`, `source_ahmad`, `notifications_adhkar`, `notifications_adhkar_detail`,
+`prayer_times_time_format`, `time_format_24`, `time_format_12`, `credit_adhkar`,
+`credit_adhkar_detail`. `tasbeeh_hint` is reused. The translations are mine and are listed for
+Mohamed's review in the report.
 
 The debug screenshot harness gains `"adhkar"` in `DebugScreenRequests`.
 
