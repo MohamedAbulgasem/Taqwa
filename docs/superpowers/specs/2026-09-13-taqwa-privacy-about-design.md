@@ -380,6 +380,23 @@ Taqwa repo is public; that is a release-day step, not a code one.
 - Device: screenshots of the About screen in English light and Arabic dark on the emulator
   and the simulator, each link tapped once on the emulator to see Chrome open.
 
+### 6.5 Rate and Share rows (added 11 October 2026)
+
+The ABOUT card on the Settings root ends with two more rows after "Attribution & licences",
+each behind a `CardDivider`. **Rate Taqwa** shows the store's own name as its value ("App
+Store" on iOS, "Google Play" on Android: proper names, constants in `AboutLinks`, not strings)
+and the external-link glyph, through the same `LinkRow` About's links use. A tap opens the
+store's page for leaving a rating: `https://apps.apple.com/app/id6814975544?action=write-review`
+on iOS; on Android `market://details?id=world.taqwa.app`, then the Play web listing when
+nothing answers that scheme. **Share Taqwa** shows the share glyph and hands the share sheet
+the translated one-line description (`settings_share_message`), a newline, and the site in
+the app's language (`AboutLinks.shareMessage`).
+
+There is no review prompt, no in-app review API and no counter deciding when to ask, and
+nothing is stored: until one of these rows is tapped, nothing happens. The owner's reason: an
+in-app review prompt breaks the premise of a quiet app. No dependency was added for either
+row.
+
 ---
 
 ## 7. Copy fixes across the repo

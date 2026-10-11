@@ -85,6 +85,9 @@
     <string name="settings_language">ভাষা</string>
     <string name="settings_about">তাকওয়া সম্পর্কে</string>
     <string name="settings_attribution">কৃতজ্ঞতা ও লাইসেন্স</string>
+    <string name="settings_rate">তাকওয়াকে রেটিং দিন</string>
+    <string name="settings_share">তাকওয়া শেয়ার করুন</string>
+    <string name="settings_share_message">তাকওয়া: নামাজের সময়, কুরআন ও কিবলা। বিনামূল্যে, বিজ্ঞাপন নেই, অ্যাকাউন্ট নেই।</string>
     <string name="settings_not_set">নির্ধারিত নয়</string>
     <string name="settings_notifications_off">বন্ধ</string>
     <string name="settings_notifications_on_count">%1$sটি চালু</string>

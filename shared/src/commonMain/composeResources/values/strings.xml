@@ -98,6 +98,9 @@
     <string name="settings_language">Language</string>
     <string name="settings_about">About Taqwa</string>
     <string name="settings_attribution">Attribution &amp; licences</string>
+    <string name="settings_rate">Rate Taqwa</string>
+    <string name="settings_share">Share Taqwa</string>
+    <string name="settings_share_message">Taqwa: prayer times, the Quran and the Qibla. Free, with no ads and no account.</string>
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>

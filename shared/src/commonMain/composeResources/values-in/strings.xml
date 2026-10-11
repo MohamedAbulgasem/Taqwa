@@ -85,6 +85,9 @@
     <string name="settings_language">Bahasa</string>
     <string name="settings_about">Tentang Taqwa</string>
     <string name="settings_attribution">Atribusi &amp; lisensi</string>
+    <string name="settings_rate">Beri nilai Taqwa</string>
+    <string name="settings_share">Bagikan Taqwa</string>
+    <string name="settings_share_message">Taqwa: waktu salat, Al-Qur’an, dan kiblat. Gratis, tanpa iklan dan tanpa akun.</string>
     <string name="settings_not_set">Belum diatur</string>
     <string name="settings_notifications_off">Nonaktif</string>
     <string name="settings_notifications_on_count">%1$s aktif</string>

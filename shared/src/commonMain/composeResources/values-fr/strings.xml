@@ -88,6 +88,9 @@
     <string name="settings_language">Langue</string>
     <string name="settings_about">À propos de Taqwa</string>
     <string name="settings_attribution">Attributions et licences</string>
+    <string name="settings_rate">Noter Taqwa</string>
+    <string name="settings_share">Partager Taqwa</string>
+    <string name="settings_share_message">Taqwa : les horaires de prière, le Coran et la qibla. Gratuite, sans publicité ni compte.</string>
     <string name="settings_not_set">Non définie</string>
     <string name="settings_notifications_off">Désactivées</string>
     <string name="settings_notifications_on_count">%1$s activées</string>

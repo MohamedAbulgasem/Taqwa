@@ -157,7 +157,9 @@ Root, in three groups:
 
 - **Prayer** — Location, Prayer times, Notifications
 - **App** — Appearance, Language
-- **About** — About Taqwa, Attribution & licences
+- **About** — About Taqwa, Attribution & licences, then Rate Taqwa and Share Taqwa (amended
+  11 October 2026: rows the reader taps, never a review prompt; see
+  `2026-09-13-taqwa-privacy-about-design.md` §6.5)
 
 **Prayer times:** calculation method, high-latitude rule, manual adjustments, Asr madhab (segmented Standard/Hanafi), Hijri date (segmented −1 / Umm al-Qura / +1, with the resulting date shown beneath), show sunrise toggle.
 
