@@ -147,7 +147,7 @@ object Registry {
     private fun placed(entryId: String, base: TimetableMethod, measured: Boolean, place: Place): Placed {
         val user = GeoPoint(place.lat, place.lon)
         val units = Units.of(entryId) ?: return Placed(methodAlone(entryId, base, user), null, measured)
-        val unit = units.unitFor(place) ?: return Placed(finish(entryId, units.outside(user), user), null, false)
+        val unit = units.unitFor(place) ?: return Placed(finish(entryId, units.outside(user), user), null, measured && units.measuredBeyond)
         return Placed(methodInUnit(entryId, base, unit, user), unit, unit.measured)
     }
 

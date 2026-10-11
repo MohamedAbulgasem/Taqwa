@@ -191,6 +191,25 @@ a monitor source. Large tables are compact resources.
   Beyond every unit, a point table's edge with no end bound (a user there is beyond every reach,
   where R45's bound would cost more than a unit's own): the user's own point a minute later, with
   no figure.
+  *Tables at their own points (the city-point audit, 10–11 Oct 2026):* an entry or a cautious member
+  that is computed at the user's point, but checked against tables printed each for its own point,
+  now carries those tables as units (`tablesAtTheirPoints`, rulings R30, R40 and R44). They are ISNA's
+  mosques in the United States (35) and Canada (18), Canada's three families (6 mosques), Chicago's
+  18° block (3), Manchester Central's Wifaqul table, the city tables of Delhi, Karachi, Tashkent,
+  Bishkek, Gaza, Beirut, Damascus (two) and Baghdad, and BIK's base point. The nearest
+  table whose reach holds the user rides as the fixed point beside the user's own, so the time shown is
+  never before that table there, nor any end after it, and never earlier than the user's own point
+  alone. A mosque's or a city's table reaches a minute of longitude, 17 to 24 km, its neighbourhood;
+  beyond that a user's own mosque prints for its own point, as the method computes. BIK, which applies
+  one base table to the whole of Kosovo with whole-minute town offsets, reaches as far as class D. The
+  Canadian families' night-fraction curves are read at both latitudes there. Beyond every reach the
+  method stands at the user's own point as before, with no edge minute, since these margins hold every
+  table at its own point. No figure is claimed there, but a cautious member keeps its own measured
+  reach. The app's own cities inside each new unit are gated at their own points, and the units that
+  show a figure (ISNA's, BIK's) are gated across their reach as Umm al-Qura's and QMDB's are. Where a
+  fixed point rides for the starts too, the ends shown are also never after those the same method shows
+  at the user's point alone (`DayComputer`'s point 7): the end of eating is held to the Fajr shown, the
+  later of the two points', which under a Fajr margin below the end's had let it come a minute late.
 - **Unknown reference point or horizon**: the unit's safe edge and the deepest plausible horizon; no
   "at most" figure is claimed for that unit.
 - **Near a unit or country border**: the envelope over the candidates within the location's

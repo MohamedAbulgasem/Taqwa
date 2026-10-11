@@ -7,3 +7,9 @@
 # so the Fajr column is also checked as the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/centralasia/off_kg_bishkek.txt	kg.default	42.8746	74.5698	Asia/Bishkek	F+E S D A M I	daily	hanafi	fit	muftiyat.kg homepage JSON, Bishkek, 26 Sep 2026
+
+# The app's own points (the city-point audit of 10–11 Oct 2026, rulings R30, R40 and R44): every Kyrgyz city of the app's list within a minute's reach of
+# the Muftiate's Bishkek point (CentralAsia.kyrgyzstanUnits), held out at its own point against its tables, as `kg.default/bishkek`.
+archive/tables/moral-auth-world/centralasia/off_kg_bishkek.txt	kg.default/bishkek	42.87	74.59	Asia/Bishkek	F+E S D A M I	daily	hanafi	test	Bishkek, the app's own point (1.7 km from Bishkek), against muftiyat.kg homepage JSON, Bishkek, 26 Sep 2026
+archive/tables/moral-auth-world/centralasia/off_kg_bishkek.txt	kg.default/bishkek	42.88454	74.67819	Asia/Bishkek	F+E S D A M I	daily	hanafi	test	Lebedinovka, the app's own point (8.9 km from Bishkek), against muftiyat.kg homepage JSON, Bishkek, 26 Sep 2026
+archive/tables/moral-auth-world/centralasia/off_kg_bishkek.txt	kg.default/bishkek	42.87378	74.44058	Asia/Bishkek	F+E S D A M I	daily	hanafi	test	Kojomkul, the app's own point (10.5 km from Bishkek), against muftiyat.kg homepage JSON, Bishkek, 26 Sep 2026

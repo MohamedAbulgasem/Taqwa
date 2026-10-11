@@ -200,17 +200,17 @@ object ProofStamps {
 
     private fun auCautious() = ProofStamp(
         entryId = "au.cautious",
-        places = 2,
-        placeDays = 380,
-        ramadanDays = 28,
+        places = 3,
+        placeDays = 729,
+        ramadanDays = 56,
         provenThrough = "2027-06-05",
-        worstLateMinutes = mapOf("asrStandard" to 18, "dhuhr" to 4, "endOfEating" to 2, "fajr" to 2, "isha" to 10, "maghrib" to 1, "sunrise" to 8),
+        worstLateMinutes = mapOf("asrStandard" to 18, "dhuhr" to 4, "endOfEating" to 2, "fajr" to 2, "isha" to 10, "maghrib" to 1, "sunrise" to 9),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 1, reason = null, events = listOf("maghrib")),
             ProofLateLimit(minutes = 2, reason = "Fajr and the end of eating keep each member's own margins: up to 2 min from the tables'.", events = listOf("endOfEating", "fajr")),
             ProofLateLimit(minutes = 4, reason = "Zuhr is the later member's: the TURKEY preset's (+ 5) and LMA's (+ 2 to + 7 by month), up to 4 min after the earlier table's.", events = listOf("dhuhr")),
-            ProofLateLimit(minutes = 8, reason = "Sunrise is the earlier member's, the TURKEY preset's (the sun's less 7 min): up to 8 min before LMA's.", events = listOf("sunrise")),
+            ProofLateLimit(minutes = 9, reason = "Sunrise is the earlier member's, the TURKEY preset's (the sun's less 7 min): up to 8 min before LMA's at Lakemba, and up to 9 at the app's own Sydney, 12 km east of it, where the user's own sun rises earlier.", events = listOf("sunrise")),
             ProofLateLimit(minutes = 10, reason = "Isha is the later member's, the TURKEY preset's 17° or LMA's Maghrib + 90: up to 10 min after the other's.", events = listOf("isha")),
             ProofLateLimit(minutes = 18, reason = "Asr is the later member's: LMA's, on its per-month offsets up to 15 min after its own table, and the TURKEY preset's with its allowance for Diyanet's daily model (subtask 7b): up to 18 min after the earlier table's.", events = listOf("asrStandard")),
         ),
@@ -338,17 +338,18 @@ object ProofStamps {
 
     private fun caCautious() = ProofStamp(
         entryId = "ca.cautious",
-        places = 6,
-        placeDays = 1788,
-        ramadanDays = 149,
+        places = 55,
+        placeDays = 7607,
+        ramadanDays = 538,
         provenThrough = "2026-12-31",
-        worstLateMinutes = mapOf("asrStandard" to 5, "dhuhr" to 5, "endOfEating" to 38, "fajr" to 36, "isha" to 77, "maghrib" to 5, "sunrise" to 4),
+        worstLateMinutes = mapOf("asrStandard" to 5, "dhuhr" to 6, "endOfEating" to 39, "fajr" to 36, "isha" to 77, "maghrib" to 6, "sunrise" to 5),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 4, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Sunrise, the earliest family's, up to 4 min before the others'.", events = listOf("sunrise")),
-            ProofLateLimit(minutes = 5, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Al Farooq's Zuhr + 5, Al Omari's Maghrib + 6 from August, Asr up to 3 min after the exact one): Zuhr, Asr and Maghrib up to 5 min after the others'.", events = listOf("asrStandard", "dhuhr", "maghrib")),
+            ProofLateLimit(minutes = 5, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Asr up to 3 min after the exact one): Asr up to 5 min after the others'.", events = listOf("asrStandard")),
+            ProofLateLimit(minutes = 5, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Sunrise, the earliest family's, up to 4 min before the others' at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 5.", events = listOf("sunrise")),
+            ProofLateLimit(minutes = 6, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Al Farooq's Zuhr + 5, Al Omari's Maghrib + 6 from August): Zuhr and Maghrib up to 5 min after the others' at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 6.", events = listOf("dhuhr", "maghrib")),
             ProofLateLimit(minutes = 36, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Fajr, the 15° families', never before theirs, runs up to 36 min after the 18° family's.", events = listOf("fajr")),
-            ProofLateLimit(minutes = 38, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. The end of eating, the 18° family's dawn, never after it, runs up to 38 min before the 15° families' Fajr.", events = listOf("endOfEating")),
+            ProofLateLimit(minutes = 39, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. The end of eating, the 18° family's dawn, never after it, runs up to 38 min before the 15° families' Fajr at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 39.", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 77, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Isha is the latest family's: Imam Malik's 16.5° (up to 28 % of the night) in spring and autumn, the 18° family's in winter, up to 77 min after Calgary Islamic Centre SW's Maghrib + 90 and the 18° family's spring Isha.", events = listOf("isha")),
         ),
     )
@@ -390,17 +391,42 @@ object ProofStamps {
 
     private fun caIsna() = ProofStamp(
         entryId = "ca.isna",
-        places = 18,
-        placeDays = 6414,
-        ramadanDays = 510,
+        places = 232,
+        placeDays = 82531,
+        ramadanDays = 6540,
         provenThrough = "2026-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 4, "asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 5, "sunrise" to 5),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrHanafi" to 5, "asrStandard" to 5, "dhuhr" to 3, "endOfEating" to 5, "fajr" to 7, "isha" to 5, "maghrib" to 5, "sunrise" to 5),
+        worstLateByUnit = caIsnaUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("dhuhr")),
-            ProofLateLimit(minutes = 4, reason = "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr and Isha up to 4 min after the others'.", events = listOf("asrHanafi", "asrStandard", "isha")),
+            ProofLateLimit(minutes = 4, reason = "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.", events = listOf("isha")),
+            ProofLateLimit(minutes = 5, reason = "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.", events = listOf("asrHanafi", "asrStandard")),
             ProofLateLimit(minutes = 5, reason = "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.", events = listOf("endOfEating", "fajr", "maghrib", "sunrise")),
+            ProofLateLimit(minutes = 5, reason = "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Isha up to 5 min after its table there.", events = listOf("isha")),
+            ProofLateLimit(minutes = 6, reason = "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Fajr up to 6 min after its table there.", events = listOf("fajr")),
+            ProofLateLimit(minutes = 7, reason = "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Fajr up to 7 min after its table there.", events = listOf("fajr")),
         ),
+    )
+
+    private fun caIsnaUnits(): Map<String, Map<String, Int>> = mapOf(
+        "abrar" to mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 4, "isha" to 5, "maghrib" to 4, "sunrise" to 5),
+        "aim" to mapOf("asrStandard" to 4, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 4, "isha" to 3, "maghrib" to 4, "sunrise" to 5),
+        "aisha" to mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 5, "isha" to 3, "maghrib" to 4, "sunrise" to 5),
+        "al-andalous" to mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 4, "isha" to 3, "maghrib" to 4, "sunrise" to 4),
+        "al-madinah" to mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 4, "isha" to 3, "maghrib" to 4, "sunrise" to 4),
+        "al-rawdah" to mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 4, "isha" to 4, "maghrib" to 5, "sunrise" to 5),
+        "as-salam" to mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 3, "sunrise" to 4),
+        "badr" to mapOf("asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 5, "fajr" to 4, "isha" to 4, "maghrib" to 4, "sunrise" to 5),
+        "canadian-islamic-center" to mapOf("asrStandard" to 5, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 5, "isha" to 4, "maghrib" to 4, "sunrise" to 4),
+        "ccml" to mapOf("asrStandard" to 5, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 4, "isha" to 3, "maghrib" to 3, "sunrise" to 5),
+        "dar-al-arkam" to mapOf("asrStandard" to 5, "dhuhr" to 2, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 4, "sunrise" to 4),
+        "jami-omar" to mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 5, "isha" to 3, "maghrib" to 4, "sunrise" to 5),
+        "kanata" to mapOf("asrStandard" to 5, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 5, "isha" to 4, "maghrib" to 4, "sunrise" to 4),
+        "laval" to mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 4, "isha" to 4, "maghrib" to 4, "sunrise" to 4),
+        "oma" to mapOf("asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 5, "fajr" to 4, "isha" to 4, "maghrib" to 4, "sunrise" to 5),
+        "ottawa-south" to mapOf("asrStandard" to 4, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 3, "isha" to 4, "maghrib" to 4, "sunrise" to 5),
+        "taiba" to mapOf("asrStandard" to 4, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 7, "isha" to 3, "maghrib" to 4, "sunrise" to 4),
+        "west-island" to mapOf("asrHanafi" to 5, "dhuhr" to 3, "endOfEating" to 2, "fajr" to 6, "isha" to 3, "maghrib" to 4, "sunrise" to 5),
     )
 
     private fun caMac() = ProofStamp(
@@ -616,16 +642,20 @@ object ProofStamps {
 
     private fun gbWifaqul() = ProofStamp(
         entryId = "gb.wifaqul",
-        places = 1,
-        placeDays = 7,
+        places = 38,
+        placeDays = 266,
         ramadanDays = 0,
         provenThrough = "2026-09-30",
-        worstLateMinutes = mapOf("asrHanafi" to 0, "dhuhr" to 5, "endOfEating" to 0, "fajr" to 1, "isha" to 0, "maghrib" to 6, "sunrise" to 1),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 5, "endOfEating" to 1, "fajr" to 2, "isha" to 1, "maghrib" to 6, "sunrise" to 1),
+        worstLateByUnit = gbWifaqulUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "endOfEating", "fajr", "isha", "sunrise")),
             ProofLateLimit(minutes = 6, reason = "Wifaqul Ulama documents Zuhr at the meridian + 4 and Maghrib at sunset + 5; Manchester Central Mosque, the only table of theirs held, prints the meridian and sunset themselves, so against it Dhuhr runs up to 5 min and Maghrib up to 6 min late.", events = listOf("dhuhr", "maghrib")),
         ),
+    )
+
+    private fun gbWifaqulUnits(): Map<String, Map<String, Int>> = mapOf(
+        "manchester-central" to mapOf("asrHanafi" to 1, "dhuhr" to 5, "endOfEating" to 1, "fajr" to 2, "isha" to 1, "maghrib" to 6, "sunrise" to 1),
     )
 
     private fun idKemenag() = ProofStamp(
@@ -677,16 +707,17 @@ object ProofStamps {
 
     private fun ieCautious() = ProofStamp(
         entryId = "ie.cautious",
-        places = 1,
-        placeDays = 365,
-        ramadanDays = 30,
+        places = 2,
+        placeDays = 730,
+        ramadanDays = 60,
         provenThrough = "2026-12-31",
-        worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 5, "maghrib" to 2, "sunrise" to 2),
+        worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 5, "maghrib" to 3, "sunrise" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 1, reason = null, events = listOf("dhuhr")),
-            ProofLateLimit(minutes = 2, reason = "Each member keeps its own margins (IFI's times at its table's minute, the ICCI's rounding), and Maghrib is capped at IFI's where the two spread: starts up to 2 min after the later table's, sunrise up to 2 before the earlier's.", events = listOf("asrStandard", "fajr", "maghrib", "sunrise")),
+            ProofLateLimit(minutes = 2, reason = "Each member keeps its own margins (IFI's times at its table's minute, the ICCI's rounding): starts up to 2 min after the later table's, sunrise up to 2 before the earlier's.", events = listOf("asrStandard", "fajr", "sunrise")),
             ProofLateLimit(minutes = 3, reason = "The end of eating is the earlier member's: the ICCI's own rule read as an end (ruling R80), but for most of June, when IFI's own dawn is the earlier; the ICCI's, taken by month and day over the leap cycle, runs up to 3 min before the earlier of the two tables' Fajr in July and August.", events = listOf("endOfEating")),
+            ProofLateLimit(minutes = 3, reason = "Each member keeps its own margins, and Maghrib is capped at IFI's where the two spread: up to 2 min after the later table's at the tables' point, and at the app's own Dublin, 2 km south-east of it, where the tables' point rides beside the user's (rulings R30, R44), up to 3.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 5, reason = "Isha is the later member's; the ICCI's rule on the curve's slots (ruling R28) runs up to 5 min after its table in May.", events = listOf("isha")),
         ),
     )
@@ -729,28 +760,37 @@ object ProofStamps {
 
     private fun inKarachi() = ProofStamp(
         entryId = "in.karachi",
-        places = 1,
-        placeDays = 30,
+        places = 80,
+        placeDays = 2400,
         ramadanDays = 0,
         provenThrough = "2026-09-30",
-        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
+        worstLateByUnit = inKarachiUnits(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
+            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "fajr", "isha", "maghrib", "sunrise")),
+            ProofLateLimit(minutes = 4, reason = "Dawat-e-Islami prints no sehri time: the end of eating keeps the sunrise margin, and within a minute's reach of Delhi's point the earlier of its dawn and the user's own is shown (rulings R30 and R44): up to 4 min before its Fajr; an early end is the safe side", events = listOf("endOfEating")),
         ),
+    )
+
+    private fun inKarachiUnits(): Map<String, Map<String, Int>> = mapOf(
+        "delhi" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
     )
 
     private fun iqSunni() = ProofStamp(
         entryId = "iq.sunni",
-        places = 1,
-        placeDays = 1,
+        places = 4,
+        placeDays = 4,
         ramadanDays = 0,
         provenThrough = "2025-12-04",
-        worstLateMinutes = mapOf("asrStandard" to 0, "dhuhr" to 0, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 0, "sunrise" to 0),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 0, "endOfEating" to 1, "fajr" to 0, "isha" to 1, "maghrib" to 1, "sunrise" to 0),
+        worstLateByUnit = iqSunniUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+    )
+
+    private fun iqSunniUnits(): Map<String, Map<String, Int>> = mapOf(
+        "baghdad" to mapOf("asrStandard" to 1, "dhuhr" to 0, "endOfEating" to 1, "fajr" to 0, "isha" to 1, "maghrib" to 1, "sunrise" to 0),
     )
 
     private fun joAwqaf() = ProofStamp(
@@ -772,15 +812,19 @@ object ProofStamps {
 
     private fun kgDefault() = ProofStamp(
         entryId = "kg.default",
-        places = 1,
-        placeDays = 1,
+        places = 4,
+        placeDays = 4,
         ramadanDays = 0,
         provenThrough = "2026-09-26",
-        worstLateMinutes = mapOf("asrHanafi" to 0, "dhuhr" to 0, "endOfEating" to 0, "fajr" to 0, "isha" to 0, "maghrib" to 0, "sunrise" to 0),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrHanafi" to 0, "dhuhr" to 0, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 0, "sunrise" to 0),
+        worstLateByUnit = kgDefaultUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+    )
+
+    private fun kgDefaultUnits(): Map<String, Map<String, Int>> = mapOf(
+        "bishkek" to mapOf("asrHanafi" to 0, "dhuhr" to 0, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 0, "sunrise" to 0),
     )
 
     private fun kwAwqaf() = ProofStamp(
@@ -998,18 +1042,24 @@ object ProofStamps {
 
     private fun lbFatwa() = ProofStamp(
         entryId = "lb.fatwa",
-        places = 1,
-        placeDays = 382,
-        ramadanDays = 31,
+        places = 5,
+        placeDays = 1910,
+        ramadanDays = 155,
         provenThrough = "2026-10-01",
-        worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 3, "endOfEating" to 8, "fajr" to 9, "isha" to 7, "maghrib" to 7, "sunrise" to 3),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 3, "endOfEating" to 9, "fajr" to 9, "isha" to 7, "maghrib" to 8, "sunrise" to 4),
+        worstLateByUnit = lbFatwaUnits(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "sunrise")),
-            ProofLateLimit(minutes = 7, reason = "the same margin runs to 7 min late on Maghrib and Isha on their worst held-out day", events = listOf("isha", "maghrib")),
-            ProofLateLimit(minutes = 8, reason = "the fast begins at the 20° dawn, never after Dar al-Fatwa's printed Fajr, whose own dawn runs 19.1° to 20.0°: up to 8 min before it on the shallowest days (end-of-eating audit, 3 Oct 2026)", events = listOf("endOfEating")),
+            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr")),
+            ProofLateLimit(minutes = 4, reason = "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table", events = listOf("sunrise")),
+            ProofLateLimit(minutes = 7, reason = "the same margin runs to 7 min late on Maghrib and Isha on their worst held-out day", events = listOf("isha")),
+            ProofLateLimit(minutes = 8, reason = "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table", events = listOf("maghrib")),
+            ProofLateLimit(minutes = 9, reason = "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 9, reason = "the perpetual table's single never-early margin, over 384 measured days across two sources and seven years, runs to 9 min late on Fajr on its worst day", events = listOf("fajr")),
         ),
+    )
+
+    private fun lbFatwaUnits(): Map<String, Map<String, Int>> = mapOf(
+        "beirut" to mapOf("asrStandard" to 3, "dhuhr" to 3, "endOfEating" to 9, "fajr" to 9, "isha" to 7, "maghrib" to 8, "sunrise" to 4),
     )
 
     private fun lyAwqaf() = ProofStamp(
@@ -1286,28 +1336,36 @@ object ProofStamps {
 
     private fun pkKarachi() = ProofStamp(
         entryId = "pk.karachi",
-        places = 1,
-        placeDays = 91,
+        places = 6,
+        placeDays = 546,
         ramadanDays = 0,
         provenThrough = "2026-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 3, "asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrHanafi" to 3, "asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
+        worstLateByUnit = pkKarachiUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
     )
 
+    private fun pkKarachiUnits(): Map<String, Map<String, Int>> = mapOf(
+        "karachi" to mapOf("asrHanafi" to 3, "asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
+    )
+
     private fun psGazaAwqaf() = ProofStamp(
         entryId = "ps.gaza.awqaf",
-        places = 1,
-        placeDays = 6,
+        places = 13,
+        placeDays = 78,
         ramadanDays = 0,
         provenThrough = "2020-07-21",
-        worstLateMinutes = mapOf("asrStandard" to 0, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 0),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        worstLateByUnit = psGazaAwqafUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+    )
+
+    private fun psGazaAwqafUnits(): Map<String, Map<String, Int>> = mapOf(
+        "gaza" to mapOf("asrStandard" to 1, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
     )
 
     private fun psIftaa() = ProofStamp(
@@ -1880,15 +1938,25 @@ object ProofStamps {
 
     private fun syAwqaf() = ProofStamp(
         entryId = "sy.awqaf",
-        places = 2,
-        placeDays = 2,
-        ramadanDays = 1,
+        places = 16,
+        placeDays = 16,
+        ramadanDays = 7,
         provenThrough = "2026-10-01",
-        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 1, "sunrise" to 1),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 0, "isha" to 1, "maghrib" to 2, "sunrise" to 1),
+        worstLateByUnit = syAwqafUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        provenThroughByUnit = syAwqafThrough(),
+    )
+
+    private fun syAwqafThrough(): Map<String, String> = mapOf(
+        "damascus" to "2026-02-19",
+    )
+
+    private fun syAwqafUnits(): Map<String, Map<String, Int>> = mapOf(
+        "damascus" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 2, "sunrise" to 0),
+        "umayyad-mosque" to mapOf("asrStandard" to 0, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 0, "isha" to 1, "maghrib" to 0, "sunrise" to 1),
     )
 
     private fun tnInm() = ProofStamp(
@@ -1952,9 +2020,9 @@ object ProofStamps {
 
     private fun trDiyanetEurope() = ProofStamp(
         entryId = "tr.diyanet.europe",
-        places = 33,
-        placeDays = 13174,
-        ramadanDays = 957,
+        places = 34,
+        placeDays = 13573,
+        ramadanDays = 986,
         provenThrough = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 70, "fajr" to 7, "isha" to 7, "maghrib" to 126, "sunrise" to 129),
         worstLateByUnit = trDiyanetEuropeUnits(),
@@ -1977,6 +2045,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 4, reason = "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("fajr")),
             ProofLateLimit(minutes = 4, reason = "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("fajr")),
             ProofLateLimit(minutes = 4, reason = "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("fajr")),
+            ProofLateLimit(minutes = 4, reason = "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("isha")),
             ProofLateLimit(minutes = 4, reason = "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("isha")),
             ProofLateLimit(minutes = 4, reason = "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("isha")),
             ProofLateLimit(minutes = 4, reason = "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("isha")),
@@ -2072,7 +2141,7 @@ object ProofStamps {
         "tr.diyanet.europe.goteborg" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 1, "sunrise" to 1),
         "tr.diyanet.europe.helsinki" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 1, "sunrise" to 11),
         "tr.diyanet.europe.kristiansand" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 1, "sunrise" to 1),
-        "tr.diyanet.europe.lille" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 4, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
+        "tr.diyanet.europe.lille" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 4, "isha" to 4, "maghrib" to 1, "sunrise" to 1),
         "tr.diyanet.europe.london" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 4, "isha" to 4, "maghrib" to 1, "sunrise" to 1),
         "tr.diyanet.europe.lulea" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 70, "fajr" to 7, "isha" to 7, "maghrib" to 126, "sunrise" to 129),
         "tr.diyanet.europe.lyon" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 2, "maghrib" to 1, "sunrise" to 1),
@@ -2096,67 +2165,134 @@ object ProofStamps {
 
     private fun usChicago() = ProofStamp(
         entryId = "us.chicago",
-        places = 7,
-        placeDays = 1253,
-        ramadanDays = 30,
+        places = 133,
+        placeDays = 26209,
+        ramadanDays = 600,
         provenThrough = "2026-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 5, "dhuhr" to 6, "endOfEating" to 32, "fajr" to 31, "isha" to 5, "maghrib" to 6, "sunrise" to 3),
+        worstLateMinutes = mapOf("asrHanafi" to 6, "dhuhr" to 7, "endOfEating" to 33, "fajr" to 32, "isha" to 7, "maghrib" to 7, "sunrise" to 4),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 3, reason = "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Sunrise up to 3 min before theirs.", events = listOf("sunrise")),
-            ProofLateLimit(minutes = 5, reason = "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Asr and Isha up to 5 min.", events = listOf("asrHanafi", "isha")),
-            ProofLateLimit(minutes = 6, reason = "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Zuhr and Maghrib up to 6 min.", events = listOf("dhuhr", "maghrib")),
-            ProofLateLimit(minutes = 31, reason = "Chicago's mosques differ on Fajr: the 15° mosques' Fajr, never before it, runs up to 31 min after the 18° block's (Villa Park, Makki, DarusSalam).", events = listOf("fajr")),
-            ProofLateLimit(minutes = 32, reason = "Chicago's mosques differ on Fajr: the end of eating is the 18° block's dawn, never after it, up to 32 min before the 15° mosques' Fajr (MCC, MEC, Mosque Foundation, Orland Park).", events = listOf("endOfEating")),
+            ProofLateLimit(minutes = 4, reason = "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Sunrise up to 3 min before theirs at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 4.", events = listOf("sunrise")),
+            ProofLateLimit(minutes = 6, reason = "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Asr up to 5 min at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 6.", events = listOf("asrHanafi")),
+            ProofLateLimit(minutes = 7, reason = "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Zuhr and Maghrib up to 6 min at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 7.", events = listOf("dhuhr", "maghrib")),
+            ProofLateLimit(minutes = 7, reason = "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Isha up to 5 min at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 7.", events = listOf("isha")),
+            ProofLateLimit(minutes = 32, reason = "Chicago's mosques differ on Fajr: the 15° mosques' Fajr, never before it, runs up to 31 min after the 18° block's (Villa Park, Makki, DarusSalam) at their mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 32.", events = listOf("fajr")),
+            ProofLateLimit(minutes = 33, reason = "Chicago's mosques differ on Fajr: the end of eating is the 18° block's dawn, never after it, up to 32 min before the 15° mosques' Fajr (MCC, MEC, Mosque Foundation, Orland Park) at their mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 33.", events = listOf("endOfEating")),
         ),
     )
 
     private fun usIsna() = ProofStamp(
         entryId = "us.isna",
-        places = 35,
-        placeDays = 8617,
-        ramadanDays = 628,
+        places = 1198,
+        placeDays = 272278,
+        ramadanDays = 19006,
         provenThrough = "2026-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 5, "asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 6, "sunrise" to 4),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrHanafi" to 6, "asrStandard" to 6, "dhuhr" to 8, "endOfEating" to 5, "fajr" to 6, "isha" to 7, "maghrib" to 7, "sunrise" to 5),
+        worstLateByUnit = usIsnaUnits(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 4, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: ADAMS moves Fajr and sunrise 2 min earlier (its safe direction): Fajr up to 4 min after its, and sunrise and the end of eating, never after its, up to 4 min before the others'.", events = listOf("endOfEating", "fajr", "sunrise")),
-            ProofLateLimit(minutes = 5, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Asr and Isha, a minute or two after the angle at some tables (ADAMS's Isha 2 min later by its rule), up to 5 min after the others'.", events = listOf("asrHanafi", "asrStandard", "isha")),
-            ProofLateLimit(minutes = 6, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Maghrib up to 6 min after the tables that add nothing.", events = listOf("maghrib")),
+            ProofLateLimit(minutes = 4, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: ADAMS moves Fajr 2 min earlier (its safe direction): Fajr up to 4 min after its.", events = listOf("fajr")),
+            ProofLateLimit(minutes = 5, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: ADAMS moves sunrise 2 min earlier (its safe direction): sunrise and the end of eating, never after its, up to 4 min before the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44: east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk), up to 5.", events = listOf("endOfEating", "sunrise")),
+            ProofLateLimit(minutes = 6, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Asr and Isha, a minute or two after the angle at some tables (ADAMS's Isha 2 min later by its rule), up to 5 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44: east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk), up to 6.", events = listOf("asrHanafi", "asrStandard", "isha")),
+            ProofLateLimit(minutes = 6, reason = "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. ADAMS moves its Fajr 2 min earlier (its safe direction): Fajr up to 6 min after its table there.", events = listOf("fajr")),
             ProofLateLimit(minutes = 7, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Zuhr up to 7 min after the tables that add nothing.", events = listOf("dhuhr")),
+            ProofLateLimit(minutes = 7, reason = "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Isha up to 7 min after its table there.", events = listOf("isha")),
+            ProofLateLimit(minutes = 7, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Maghrib up to 6 min after the tables that add nothing at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44: east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk), up to 7.", events = listOf("maghrib")),
+            ProofLateLimit(minutes = 8, reason = "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Zuhr up to 8 min after its table there.", events = listOf("dhuhr")),
+            ProofLateLimit(minutes = 8, reason = "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Zuhr up to 8 min after its table there.", events = listOf("dhuhr")),
         ),
+        provenThroughByUnit = usIsnaThrough(),
+    )
+
+    private fun usIsnaThrough(): Map<String, String> = mapOf(
+        "dar-us-salaam" to "2026-09-30",
+        "dearborn" to "2026-10-11",
+        "epic" to "2026-09-30",
+        "icsgv" to "2026-09-25",
+        "isgh" to "2026-04-30",
+        "king-fahad" to "2026-09-30",
+        "mcc-chicago" to "2026-10-31",
+        "mcc-silver-spring" to "2026-09-30",
+        "mec" to "2026-10-31",
+        "ocif" to "2026-09-30",
+        "orland-park" to "2026-09-30",
+        "unity-center" to "2026-09-25",
+    )
+
+    private fun usIsnaUnits(): Map<String, Map<String, Int>> = mapOf(
+        "adams" to mapOf("asrStandard" to 4, "dhuhr" to 6, "endOfEating" to 2, "fajr" to 6, "isha" to 3, "maghrib" to 5, "sunrise" to 2),
+        "al-iman" to mapOf("asrStandard" to 6, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 3, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "at-taqwa" to mapOf("asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "bay-ridge" to mapOf("asrStandard" to 6, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "dar-al-hijrah" to mapOf("asrStandard" to 4, "dhuhr" to 6, "endOfEating" to 5, "fajr" to 3, "isha" to 5, "maghrib" to 7, "sunrise" to 5),
+        "dar-al-noor" to mapOf("asrStandard" to 6, "dhuhr" to 8, "endOfEating" to 4, "fajr" to 4, "isha" to 6, "maghrib" to 5, "sunrise" to 4),
+        "dar-us-salaam" to mapOf("asrStandard" to 4, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 3, "isha" to 4, "maghrib" to 6, "sunrise" to 4),
+        "dearborn" to mapOf("asrStandard" to 4, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 3, "isha" to 4, "maghrib" to 6, "sunrise" to 4),
+        "ecic" to mapOf("asrHanafi" to 5, "dhuhr" to 8, "endOfEating" to 5, "fajr" to 4, "isha" to 6, "maghrib" to 7, "sunrise" to 5),
+        "epic" to mapOf("asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 5, "fajr" to 4, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "frisco" to mapOf("asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 5, "fajr" to 4, "isha" to 6, "maghrib" to 7, "sunrise" to 4),
+        "iagd" to mapOf("asrHanafi" to 4, "dhuhr" to 7, "endOfEating" to 5, "fajr" to 3, "isha" to 6, "maghrib" to 7, "sunrise" to 4),
+        "iant" to mapOf("asrStandard" to 4, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 3, "isha" to 4, "maghrib" to 6, "sunrise" to 4),
+        "ici" to mapOf("asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 5, "fajr" to 4, "isha" to 5, "maghrib" to 4, "sunrise" to 4),
+        "icnv" to mapOf("asrHanafi" to 5, "dhuhr" to 7, "endOfEating" to 3, "fajr" to 3, "isha" to 5, "maghrib" to 7, "sunrise" to 3),
+        "icoi" to mapOf("asrStandard" to 4, "dhuhr" to 6, "endOfEating" to 5, "fajr" to 3, "isha" to 4, "maghrib" to 6, "sunrise" to 5),
+        "icsgv" to mapOf("asrStandard" to 5, "dhuhr" to 6, "endOfEating" to 3, "fajr" to 3, "isha" to 4, "maghrib" to 6, "sunrise" to 3),
+        "iioc" to mapOf("asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 3, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "isgh" to mapOf("asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 5, "fajr" to 3, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "isoc" to mapOf("asrStandard" to 6, "dhuhr" to 7, "endOfEating" to 3, "fajr" to 4, "isha" to 5, "maghrib" to 4, "sunrise" to 3),
+        "jamaica" to mapOf("asrHanafi" to 4, "dhuhr" to 6, "endOfEating" to 5, "fajr" to 2, "isha" to 3, "maghrib" to 5, "sunrise" to 5),
+        "king-fahad" to mapOf("asrStandard" to 3, "dhuhr" to 6, "endOfEating" to 4, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 2),
+        "maryam" to mapOf("asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 3, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "masjid-manhattan" to mapOf("asrStandard" to 6, "dhuhr" to 7, "endOfEating" to 3, "fajr" to 3, "isha" to 5, "maghrib" to 7, "sunrise" to 3),
+        "mca" to mapOf("asrStandard" to 5, "dhuhr" to 4, "endOfEating" to 5, "fajr" to 4, "isha" to 5, "maghrib" to 4, "sunrise" to 4),
+        "mcc-chicago" to mapOf("asrHanafi" to 6, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 6, "sunrise" to 4),
+        "mcc-silver-spring" to mapOf("asrHanafi" to 4, "dhuhr" to 2, "endOfEating" to 3, "fajr" to 3, "isha" to 4, "maghrib" to 4, "sunrise" to 4),
+        "mec" to mapOf("asrHanafi" to 6, "dhuhr" to 7, "endOfEating" to 5, "fajr" to 4, "isha" to 7, "maghrib" to 6, "sunrise" to 4),
+        "mishkah" to mapOf("asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "mosque-foundation" to mapOf("asrHanafi" to 4, "dhuhr" to 6, "endOfEating" to 5, "fajr" to 2, "isha" to 5, "maghrib" to 6, "sunrise" to 4),
+        "ocif" to mapOf("asrStandard" to 3, "dhuhr" to 6, "endOfEating" to 4, "fajr" to 3, "isha" to 2, "maghrib" to 4, "sunrise" to 2),
+        "orland-park" to mapOf("asrHanafi" to 5, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "plano-masjid" to mapOf("asrStandard" to 4, "dhuhr" to 7, "endOfEating" to 5, "fajr" to 3, "isha" to 5, "maghrib" to 4, "sunrise" to 4),
+        "tawheed" to mapOf("asrStandard" to 6, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 7, "sunrise" to 4),
+        "unity-center" to mapOf("asrStandard" to 6, "dhuhr" to 6, "endOfEating" to 3, "fajr" to 3, "isha" to 5, "maghrib" to 6, "sunrise" to 3),
     )
 
     private fun uzBoard() = ProofStamp(
         entryId = "uz.board",
-        places = 1,
-        placeDays = 19,
+        places = 7,
+        placeDays = 133,
         ramadanDays = 0,
         provenThrough = "2026-09-26",
-        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 6, "endOfEating" to 1, "fajr" to 1, "isha" to 4, "maghrib" to 1, "sunrise" to 5),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 6, "endOfEating" to 2, "fajr" to 1, "isha" to 4, "maghrib" to 2, "sunrise" to 6),
+        worstLateByUnit = uzBoardUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "endOfEating", "fajr", "maghrib")),
             ProofLateLimit(minutes = 4, reason = "the margin also covers both the 15° and 15.5° Isha eras together (task 7f)", events = listOf("isha")),
-            ProofLateLimit(minutes = 5, reason = "the margin also covers the pre-Jul-2026 rule's earlier sunrise (task 7f); an early end is the safe side", events = listOf("sunrise")),
             ProofLateLimit(minutes = 6, reason = "the margin also covers the pre-Jul-2026 rule's Dhuhr + 5 min next to the new rule's own (task 7f)", events = listOf("dhuhr")),
+            ProofLateLimit(minutes = 6, reason = "the margin also covers the pre-Jul-2026 rule's earlier sunrise (task 7f), and within a minute's reach of Tashkent's point the earlier of its sunrise and the user's own is shown (rulings R30 and R44): up to 6 min before its table's; an early end is the safe side", events = listOf("sunrise")),
         ),
+    )
+
+    private fun uzBoardUnits(): Map<String, Map<String, Int>> = mapOf(
+        "tashkent" to mapOf("asrHanafi" to 1, "dhuhr" to 6, "endOfEating" to 2, "fajr" to 1, "isha" to 4, "maghrib" to 2, "sunrise" to 6),
     )
 
     private fun xkBik() = ProofStamp(
         entryId = "xk.bik",
-        places = 2,
-        placeDays = 730,
-        ramadanDays = 60,
+        places = 44,
+        placeDays = 16060,
+        ramadanDays = 1320,
         provenThrough = "2026-12-31",
-        worstLateMinutes = mapOf("asrStandard" to 6, "dhuhr" to 4, "endOfEating" to 3, "fajr" to 1, "isha" to 3, "maghrib" to 5, "sunrise" to 5),
-        worstLateByUnit = emptyMap(),
+        worstLateMinutes = mapOf("asrStandard" to 8, "dhuhr" to 7, "endOfEating" to 9, "fajr" to 7, "isha" to 7, "maghrib" to 8, "sunrise" to 8),
+        worstLateByUnit = xkBikUnits(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 3, reason = null, events = listOf("endOfEating", "fajr", "isha")),
-            ProofLateLimit(minutes = 4, reason = "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.", events = listOf("dhuhr")),
-            ProofLateLimit(minutes = 5, reason = "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.", events = listOf("maghrib", "sunrise")),
-            ProofLateLimit(minutes = 6, reason = "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.", events = listOf("asrStandard")),
+            ProofLateLimit(minutes = 7, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("dhuhr", "fajr", "isha")),
+            ProofLateLimit(minutes = 8, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("asrStandard", "maghrib", "sunrise")),
+            ProofLateLimit(minutes = 9, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("endOfEating")),
         ),
+    )
+
+    private fun xkBikUnits(): Map<String, Map<String, Int>> = mapOf(
+        "base" to mapOf("asrStandard" to 8, "dhuhr" to 7, "endOfEating" to 9, "fajr" to 7, "isha" to 7, "maghrib" to 8, "sunrise" to 8),
     )
 
     private fun zaCape() = ProofStamp(

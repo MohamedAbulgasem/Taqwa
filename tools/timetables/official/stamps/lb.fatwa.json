@@ -1,57 +1,57 @@
 {
   "entry": "lb.fatwa",
   "class": "D (authority)",
-  "engineHash": "6cc2e272c4641568",
+  "engineHash": "96371f92702af7e7",
   "broken": 0,
-  "places": 1,
+  "places": 5,
   "first": "2019-07-20",
   "last": "2026-10-01",
   "checked": ["2019-07-20", "2022-06-14", "2023-02-02", "2023-03-08", "2023-04-01", "2023-05-09", "2023-07-02", "2023-09-12", "2023-09-21", "2024-01-01..2024-02-28", "2024-03-01..2024-12-31", "2025-09-01", "2025-10-30", "2025-11-01", "2025-12-20", "2026-01-01", "2026-03-31", "2026-09-25", "2026-10-01"],
-  "placeDays": 382,
-  "heldOutDays": 17,
-  "ramadanDays": 31,
+  "placeDays": 1910,
+  "heldOutDays": 1545,
+  "ramadanDays": 155,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 384,
+      "checked": 1920,
       "early": 0,
       "late": {
-        "0": 3,
-        "1": 21,
-        "2": 36,
-        "3+": 324
+        "0": 13,
+        "1": 106,
+        "2": 178,
+        "3+": 1623
       },
-      "exactShare": 0.0078,
+      "exactShare": 0.0068,
       "worstLate": 9,
       "lateLimit": 9,
       "lateLimitFrom": "entry lb.fatwa",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 384,
+      "checked": 1920,
       "lateEnd": 0,
       "late": {
-        "0": 139,
-        "1": 124,
-        "2": 83,
-        "3+": 38
+        "0": 536,
+        "1": 674,
+        "2": 468,
+        "3+": 242
       },
-      "exactShare": 0.362,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.2792,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit beirut",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 384,
+      "checked": 1920,
       "early": 0,
       "late": {
         "0": 0,
-        "1": 132,
-        "2": 229,
-        "3+": 23
+        "1": 648,
+        "2": 1151,
+        "3+": 121
       },
       "exactShare": 0,
       "worstLate": 3,
@@ -60,192 +60,340 @@
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 384,
+      "checked": 1920,
       "early": 0,
       "late": {
-        "0": 63,
-        "1": 87,
-        "2": 219,
-        "3+": 15
+        "0": 307,
+        "1": 434,
+        "2": 1097,
+        "3+": 82
       },
-      "exactShare": 0.1641,
+      "exactShare": 0.1599,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 384,
+      "checked": 1920,
       "early": 0,
       "late": {
-        "0": 60,
-        "1": 59,
-        "2": 58,
-        "3+": 207
+        "0": 294,
+        "1": 298,
+        "2": 289,
+        "3+": 1039
       },
-      "exactShare": 0.1563,
-      "worstLate": 7,
-      "lateLimit": 7,
-      "lateLimitFrom": "entry lb.fatwa",
+      "exactShare": 0.1531,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "unit beirut",
       "overLimit": 0
     },
     "isha": {
-      "checked": 384,
+      "checked": 1920,
       "early": 0,
       "late": {
-        "0": 41,
-        "1": 61,
-        "2": 40,
-        "3+": 242
+        "0": 199,
+        "1": 304,
+        "2": 203,
+        "3+": 1214
       },
-      "exactShare": 0.1068,
+      "exactShare": 0.1036,
       "worstLate": 7,
       "lateLimit": 7,
       "lateLimitFrom": "entry lb.fatwa",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 384,
+      "checked": 1920,
       "lateEnd": 0,
       "late": {
-        "0": 45,
-        "1": 111,
-        "2": 52,
-        "3+": 176
+        "0": 167,
+        "1": 537,
+        "2": 285,
+        "3+": 931
       },
-      "exactShare": 0.1172,
-      "worstLate": 8,
-      "lateLimit": 8,
-      "lateLimitFrom": "entry lb.fatwa",
+      "exactShare": 0.087,
+      "worstLate": 9,
+      "lateLimit": 9,
+      "lateLimitFrom": "unit beirut",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 17,
-    "ramadanDays": 1,
+    "placeDays": 1545,
+    "ramadanDays": 125,
     "events": {
       "fajr": {
-        "checked": 19,
+        "checked": 1555,
         "early": 0,
         "late": {
-          "0": 3,
-          "1": 4,
-          "2": 1,
-          "3+": 11
+          "0": 13,
+          "1": 89,
+          "2": 143,
+          "3+": 1310
         },
-        "exactShare": 0.1579,
-        "worstLate": 6,
+        "exactShare": 0.0084,
+        "worstLate": 9,
         "lateLimit": 9,
         "lateLimitFrom": "entry lb.fatwa",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 19,
+        "checked": 1555,
         "lateEnd": 0,
         "late": {
-          "0": 3,
-          "1": 9,
-          "2": 6,
-          "3+": 1
+          "0": 400,
+          "1": 559,
+          "2": 391,
+          "3+": 205
         },
-        "exactShare": 0.1579,
+        "exactShare": 0.2572,
+        "worstLate": 4,
+        "lateLimit": 4,
+        "lateLimitFrom": "unit beirut",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 1555,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 529,
+          "2": 928,
+          "3+": 98
+        },
+        "exactShare": 0,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
-      "dhuhr": {
-        "checked": 19,
-        "early": 0,
-        "late": {
-          "0": 0,
-          "1": 13,
-          "2": 6,
-          "3+": 0
-        },
-        "exactShare": 0,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
       "asrStandard": {
-        "checked": 19,
+        "checked": 1555,
         "early": 0,
         "late": {
-          "0": 3,
-          "1": 12,
-          "2": 4,
-          "3+": 0
+          "0": 247,
+          "1": 359,
+          "2": 882,
+          "3+": 67
         },
-        "exactShare": 0.1579,
-        "worstLate": 2,
+        "exactShare": 0.1588,
+        "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 19,
+        "checked": 1555,
         "early": 0,
         "late": {
-          "0": 0,
-          "1": 2,
-          "2": 0,
-          "3+": 17
+          "0": 234,
+          "1": 241,
+          "2": 231,
+          "3+": 849
         },
-        "exactShare": 0,
-        "worstLate": 7,
-        "lateLimit": 7,
-        "lateLimitFrom": "entry lb.fatwa",
+        "exactShare": 0.1505,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "unit beirut",
         "overLimit": 0
       },
       "isha": {
-        "checked": 19,
+        "checked": 1555,
         "early": 0,
         "late": {
-          "0": 0,
-          "1": 2,
-          "2": 3,
-          "3+": 14
+          "0": 158,
+          "1": 245,
+          "2": 166,
+          "3+": 986
         },
-        "exactShare": 0,
+        "exactShare": 0.1016,
         "worstLate": 7,
         "lateLimit": 7,
         "lateLimitFrom": "entry lb.fatwa",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 19,
+        "checked": 1555,
         "lateEnd": 0,
         "late": {
-          "0": 0,
-          "1": 2,
-          "2": 0,
-          "3+": 17
+          "0": 122,
+          "1": 428,
+          "2": 233,
+          "3+": 772
         },
-        "exactShare": 0,
-        "worstLate": 8,
-        "lateLimit": 8,
-        "lateLimitFrom": "entry lb.fatwa",
+        "exactShare": 0.0785,
+        "worstLate": 9,
+        "lateLimit": 9,
+        "lateLimitFrom": "unit beirut",
         "overLimit": 0
       }
     }
   },
   "lateLimits": {
     "class D (authority): 3 min": {
-      "events": ["sunrise", "dhuhr", "asrStandard"]
+      "events": ["dhuhr", "asrStandard"]
     },
     "entry lb.fatwa: 7 min": {
       "reason": "the same margin runs to 7 min late on Maghrib and Isha on their worst held-out day",
-      "events": ["maghrib", "isha"]
-    },
-    "entry lb.fatwa: 8 min": {
-      "reason": "the fast begins at the 20° dawn, never after Dar al-Fatwa's printed Fajr, whose own dawn runs 19.1° to 20.0°: up to 8 min before it on the shallowest days (end-of-eating audit, 3 Oct 2026)",
-      "events": ["endOfEating"]
+      "events": ["isha"]
     },
     "entry lb.fatwa: 9 min": {
       "reason": "the perpetual table's single never-early margin, over 384 measured days across two sources and seven years, runs to 9 min late on Fajr on its worst day",
       "events": ["fajr"]
+    },
+    "unit beirut: 4 min": {
+      "reason": "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table",
+      "events": ["sunrise"]
+    },
+    "unit beirut: 8 min": {
+      "reason": "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table",
+      "events": ["maghrib"]
+    },
+    "unit beirut: 9 min": {
+      "reason": "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table",
+      "events": ["endOfEating"]
+    }
+  },
+  "units": {
+    "beirut": {
+      "name": "Beirut",
+      "placeDays": 382,
+      "checked": ["2019-07-20", "2022-06-14", "2023-02-02", "2023-03-08", "2023-04-01", "2023-05-09", "2023-07-02", "2023-09-12", "2023-09-21", "2024-01-01..2024-02-28", "2024-03-01..2024-12-31", "2025-09-01", "2025-10-30", "2025-11-01", "2025-12-20", "2026-01-01", "2026-03-31", "2026-09-25", "2026-10-01"],
+      "broken": 0,
+      "lateLimits": {
+        "class D (authority): 3 min": {
+          "events": ["dhuhr", "asrStandard"]
+        },
+        "entry lb.fatwa: 7 min": {
+          "reason": "the same margin runs to 7 min late on Maghrib and Isha on their worst held-out day",
+          "events": ["isha"]
+        },
+        "entry lb.fatwa: 9 min": {
+          "reason": "the perpetual table's single never-early margin, over 384 measured days across two sources and seven years, runs to 9 min late on Fajr on its worst day",
+          "events": ["fajr"]
+        },
+        "unit beirut: 4 min": {
+          "reason": "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table",
+          "events": ["sunrise"]
+        },
+        "unit beirut: 8 min": {
+          "reason": "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table",
+          "events": ["maghrib"]
+        },
+        "unit beirut: 9 min": {
+          "reason": "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table",
+          "events": ["endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 1920,
+          "early": 0,
+          "late": {
+            "0": 13,
+            "1": 106,
+            "2": 178,
+            "3+": 1623
+          },
+          "exactShare": 0.0068,
+          "worstLate": 9,
+          "lateLimit": 9,
+          "lateLimitFrom": "entry lb.fatwa",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 1920,
+          "lateEnd": 0,
+          "late": {
+            "0": 536,
+            "1": 674,
+            "2": 468,
+            "3+": 242
+          },
+          "exactShare": 0.2792,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit beirut",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 1920,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 648,
+            "2": 1151,
+            "3+": 121
+          },
+          "exactShare": 0,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 1920,
+          "early": 0,
+          "late": {
+            "0": 307,
+            "1": 434,
+            "2": 1097,
+            "3+": 82
+          },
+          "exactShare": 0.1599,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "class D (authority)",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 1920,
+          "early": 0,
+          "late": {
+            "0": 294,
+            "1": 298,
+            "2": 289,
+            "3+": 1039
+          },
+          "exactShare": 0.1531,
+          "worstLate": 8,
+          "lateLimit": 8,
+          "lateLimitFrom": "unit beirut",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 1920,
+          "early": 0,
+          "late": {
+            "0": 199,
+            "1": 304,
+            "2": 203,
+            "3+": 1214
+          },
+          "exactShare": 0.1036,
+          "worstLate": 7,
+          "lateLimit": 7,
+          "lateLimitFrom": "entry lb.fatwa",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 1920,
+          "lateEnd": 0,
+          "late": {
+            "0": 167,
+            "1": 537,
+            "2": 285,
+            "3+": 931
+          },
+          "exactShare": 0.087,
+          "worstLate": 9,
+          "lateLimit": 9,
+          "lateLimitFrom": "unit beirut",
+          "overLimit": 0
+        }
+      }
     }
   }
 }

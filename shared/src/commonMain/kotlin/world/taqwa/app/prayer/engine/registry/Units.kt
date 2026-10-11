@@ -17,6 +17,7 @@ import world.taqwa.app.prayer.engine.registry.authorities.Maghreb
 import world.taqwa.app.prayer.engine.registry.authorities.Muis
 import world.taqwa.app.prayer.engine.registry.authorities.Russia
 import world.taqwa.app.prayer.engine.registry.authorities.SouthAfrica
+import world.taqwa.app.prayer.engine.registry.authorities.SouthAsia
 import world.taqwa.app.prayer.engine.registry.authorities.UmmAlQura
 import kotlin.math.PI
 import kotlin.math.abs
@@ -65,12 +66,15 @@ data class AuthorityUnit(
  * An authority's units, and the method for a place beyond all of them: the authority's method at
  * the user's point with the unit's safe-edge margin and the deepest plausible horizon (spec §3.5).
  * [choose], when given, picks the unit instead of the nearest point (districts whose minutes differ,
- * where the nearest seat can be the wrong district).
+ * where the nearest seat can be the wrong district). [measuredBeyond]: beyond every unit a place keeps
+ * whether it was measured before the units (a cautious member's own reach, [Member.measuredAt]); else it
+ * is not measured there.
  */
 class UnitSet(
     val entryId: String,
     val units: List<AuthorityUnit>,
     val choose: ((Place) -> AuthorityUnit?)? = null,
+    val measuredBeyond: Boolean = false,
     val outside: (GeoPoint) -> TimetableMethod,
 ) {
     init {
@@ -155,6 +159,13 @@ object Units {
         ).plus(Americas.torontoUnits).plus(Americas.lakembaUnits).plus(Europe.dublinTables).plus(SouthAfrica.capeTownTables)
             .plus(listOf(Europe.londonUnits, Europe.gmpUnits, Europe.embUnits, Europe.irnUnits, Diyanet.europeUnits))
             .plus(Levant.jordanUnits).plus(Levant.paUnits)
+            // The city-point audit of 10–11 Oct 2026: tables printed for their own points, of entries and cautious members
+            // computed at the user's point (tablesAtTheirPoints).
+            .plus(listOf(Americas.usaUnits, Americas.canadaIsnaUnits, Americas.chicagoBlockUnits))
+            .plus(Americas.canadaFamilyUnits)
+            .plus(listOf(SouthAsia.indiaUnits, CentralAsia.uzbekistanUnits, Balkans.kosovoUnits))
+            .plus(listOf(SouthAsia.pakistanUnits, CentralAsia.kyrgyzstanUnits, Europe.wifaqulUnits))
+            .plus(listOf(Levant.gazaAwqafUnits, Levant.lebanonUnits, Levant.syriaUnits, Levant.iraqUnits))
             .associateBy { it.entryId }
     }
 
@@ -208,6 +219,50 @@ internal fun pointTables(entry: RegistryEntry, tables: List<PrintedTable>): Unit
 /** A table printed for one [point] ([pointTables]). */
 internal fun pointTable(entry: RegistryEntry, name: String, point: GeoPoint): UnitSet =
     pointTables(entry, listOf(PrintedTable(entry.id, name, point)))
+
+/** One table printed for its own [point] ([tablesAtTheirPoints]): [key] names its unit, [lateLimits] its own exceptions (R41). */
+internal class OwnTable(val key: String, val name: String, val point: GeoPoint, val lateLimits: List<LateLimit> = emptyList())
+
+/**
+ * Rulings R30, R40 and R44 for an entry or a cautious member that is computed at the user's own point and checked against
+ * tables printed each for its own point (the city-point audit of 10–11 Oct 2026): a mosque's own (ISNA's in the United
+ * States and Canada, Canada's three families, Chicago's 18° block, Manchester Central's Wifaqul table), a city's
+ * (Dawat-e-Islami's Delhi, the Karachi tables, the Muslim Board's Tashkent, the Kyrgyz Muftiate's Bishkek, Gaza's
+ * Awqaf, Dar al-Fatwa's Beirut, the Syrian Awqaf's two Damascus tables, the Sunni Endowment's Baghdad), an authority's
+ * base point (BIK's Takvimi). Each table is a unit at its point, reaching as far as [reach]'s [lateReachKm]; the nearest
+ * whose reach holds the user takes them, and its point rides as the method's fixed point beside the user's own (ruling
+ * R15: starts the later, sunrise and the ends the earlier). So nowhere in its reach is the time shown before that
+ * table, nor any end after it, and nowhere is a start earlier, or an end later, than the user's own point alone gave
+ * it. On main the app's own Houston, Sterling, Calgary, Delhi or Shtime, a few kilometres from such a table, had a
+ * time a minute on the wrong side of it on some days.
+ *
+ * [reach]: a mosque's or a city's table serves its own neighbourhood, a minute of longitude (class A's, about 17 to 24
+ * km), where the user's own sun is within a minute of the table's; farther out a user's own mosque or town prints for
+ * its own point, as the method computes. An authority that applies one table to a whole area by whole-minute offsets
+ * (BIK) reaches as far as its entry's class.
+ *
+ * Beyond every reach the method at the user's own point exactly as before ([method]): unlike one point table's fit
+ * ([pointTables], whose edge [beyondTable] widens), these margins hold every table at its own point and are meant for any
+ * point. As beyond every other unit, no figure is claimed there, except that a cautious member keeps its own measured
+ * reach ([measuredBeyond], [Member.measuredAt]). [measured] is false for an entry that claims no figure anywhere
+ * (every city table's above). The units carry no name of their own ([AuthorityUnit.named]): About calls the place by
+ * the app's own name for it, never a mosque's.
+ */
+internal fun tablesAtTheirPoints(
+    entryId: String,
+    reach: EntryClass,
+    method: TimetableMethod,
+    tables: List<OwnTable>,
+    measured: Boolean = true,
+    measuredBeyond: Boolean = false,
+): UnitSet {
+    val units = tables.map { t ->
+        AuthorityUnit(
+            t.key, t.name, t.point, lateReachKm(t.point.lat, reach), measured = measured, lateLimits = t.lateLimits, named = false,
+        )
+    }
+    return UnitSet(entryId, units, measuredBeyond = measuredBeyond) { method }
+}
 
 /**
  * Rulings R44 and R45: [this] beyond its table's reach ([reachKm] from [tablePoint]): starts at the

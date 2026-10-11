@@ -154,7 +154,7 @@ object Diyanet {
             europeTable("munich", "München", GeoPoint(48.13743, 11.57549)),
             europeTable("wien", "Wien", GeoPoint(48.20849, 16.37208)),
             europeTable("paris", "Paris", GeoPoint(48.85341, 2.3488)),
-            europeTable("lille", "Lille", GeoPoint(50.6292, 3.0573), lateLimits = listOf(springFajr(4), springEnd(4))),
+            europeTable("lille", "Lille", GeoPoint(50.6292, 3.0573), lateLimits = listOf(springFajr(4), springIsha(4), springEnd(4))),
             europeTable("brussels", "Brussels", GeoPoint(50.85045, 4.34878), lateLimits = steps(4, 4, 4)),
             europeTable("gent", "Gent", GeoPoint(51.0543, 3.7174), lateLimits = listOf(springFajr(4), springEnd(4))),
             europeTable("antwerpen", "Antwerpen", GeoPoint(51.2194, 4.4025), lateLimits = steps(4, 4, 4)),

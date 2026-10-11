@@ -14,6 +14,7 @@ import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
 import world.taqwa.app.prayer.engine.registry.MethodVariant
+import world.taqwa.app.prayer.engine.registry.OwnTable
 import world.taqwa.app.prayer.engine.registry.Regions
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.SAFE_END
@@ -38,6 +39,7 @@ import world.taqwa.app.prayer.engine.registry.margins
 import world.taqwa.app.prayer.engine.registry.pointTable
 import world.taqwa.app.prayer.engine.registry.pointTables
 import world.taqwa.app.prayer.engine.registry.single
+import world.taqwa.app.prayer.engine.registry.tablesAtTheirPoints
 import world.taqwa.app.prayer.engine.registry.widened
 
 /**
@@ -150,6 +152,19 @@ object Europe {
                 setOf(TimedEvent.DHUHR, TimedEvent.MAGHRIB),
             ),
         ),
+    )
+
+    /**
+     * Manchester Central Mosque's table is printed for the mosque (gb-wifaqul.tsv; rulings R30, R40 and R44): within a
+     * minute's reach of it (about 16 km) its point rides beside the user's, so the app is never before it there, nor
+     * any end after it (tablesAtTheirPoints). On main, at the app's own towns around Manchester, a start came a minute
+     * before it or an end after it on some days (the city-point audit of 10–11 Oct 2026: Ashton-under-Lyne, Stockport,
+     * Sale, Altrincham). No figure is claimed, there or elsewhere.
+     */
+    val wifaqulUnits: UnitSet = tablesAtTheirPoints(
+        wifaqul.id, EntryClass.A, wifaqul.method!!,
+        listOf(OwnTable("manchester-central", "Manchester Central Mosque", GeoPoint(53.4631, -2.2285))),
+        measured = false,
     )
 
     /**
@@ -338,10 +353,16 @@ object Europe {
         lateLimits = listOf(
             LateLimit(
                 2,
-                "Each member keeps its own margins (IFI's times at its table's minute, the ICCI's rounding), and Maghrib " +
-                    "is capped at IFI's where the two spread: starts up to 2 min after the later table's, sunrise up to 2 " +
-                    "before the earlier's.",
-                setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.ASR, TimedEvent.MAGHRIB),
+                "Each member keeps its own margins (IFI's times at its table's minute, the ICCI's rounding): starts up to " +
+                    "2 min after the later table's, sunrise up to 2 before the earlier's.",
+                setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.ASR),
+            ),
+            LateLimit(
+                3,
+                "Each member keeps its own margins, and Maghrib is capped at IFI's where the two spread: up to 2 min after " +
+                    "the later table's at the tables' point, and at the app's own Dublin, 2 km south-east of it, where the " +
+                    "tables' point rides beside the user's (rulings R30, R44), up to 3.",
+                setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
                 5,

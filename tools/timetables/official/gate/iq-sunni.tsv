@@ -9,3 +9,9 @@
 # so the Fajr column is also checked as the end of eating (F+E).
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/normalized-7e/iq-sunni-baghdad-official.txt	iq.sunni	33.341	44.401	Asia/Baghdad	F+E S D A M I	daily	standard	fit	Baghdad, one official date, 4 Dec 2025
+
+# The app's own points (the city-point audit of 10–11 Oct 2026, rulings R30, R40 and R44): every Iraqi city of the app's list within a minute's reach of
+# the Endowment's Baghdad point (Levant.iraqUnits), held out at its own point against its tables, as `iq.sunni/baghdad`.
+archive/tables/normalized-7e/iq-sunni-baghdad-official.txt	iq.sunni/baghdad	33.34058	44.40088	Asia/Baghdad	F+E S D A M I	daily	standard	test	Baghdad, the app's own point (0.0 km from Baghdad), against Baghdad, one official date, 4 Dec 2025
+archive/tables/normalized-7e/iq-sunni-baghdad-official.txt	iq.sunni/baghdad	33.3889	44.4583	Asia/Baghdad	F+E S D A M I	daily	standard	test	Sadr City, the app's own point (7.5 km from Baghdad), against Baghdad, one official date, 4 Dec 2025
+archive/tables/normalized-7e/iq-sunni-baghdad-official.txt	iq.sunni/baghdad	33.30563	44.18477	Asia/Baghdad	F+E S D A M I	daily	standard	test	Abū Ghurayb, the app's own point (20.5 km from Baghdad), against Baghdad, one official date, 4 Dec 2025

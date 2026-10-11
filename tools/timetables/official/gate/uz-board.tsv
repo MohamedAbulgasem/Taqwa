@@ -12,3 +12,19 @@
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F+E S D A M I	daily	hanafi	fit	muslim.uz live, 25-26 Sep 2026 (current rule)
 archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board	41.2995	69.2401	Asia/Tashkent	F+E S D A M I	daily	hanafi	fit	Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
+
+# The app's own points (the city-point audit of 10–11 Oct 2026, rulings R30, R40 and R44): every Uzbek city of the app's list within a minute's reach of the Board's
+# Tashkent point (CentralAsia.uzbekistanUnits), held out at its own point against its tables, as
+# `uz.board/tashkent`.
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board/tashkent	41.26465	69.21627	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Tashkent, the app's own point (4.4 km from Tashkent), against muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board/tashkent	41.26465	69.21627	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Tashkent, the app's own point (4.4 km from Tashkent), against Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board/tashkent	41.37139	69.27944	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Yunusobod, the app's own point (8.6 km from Tashkent), against muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board/tashkent	41.37139	69.27944	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Yunusobod, the app's own point (8.6 km from Tashkent), against Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board/tashkent	41.28194	69.18111	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Chilanzar, the app's own point (5.3 km from Tashkent), against muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board/tashkent	41.28194	69.18111	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Chilanzar, the app's own point (5.3 km from Tashkent), against Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board/tashkent	41.19833	69.22222	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Sergeli, the app's own point (11.3 km from Tashkent), against muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board/tashkent	41.19833	69.22222	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Sergeli, the app's own point (11.3 km from Tashkent), against Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board/tashkent	41.20972	69.33417	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Bektemir, the app's own point (12.7 km from Tashkent), against muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board/tashkent	41.20972	69.33417	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Bektemir, the app's own point (12.7 km from Tashkent), against Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)
+archive/tables/moral-auth-world/centralasia/off_tas3.txt	uz.board/tashkent	41.375	69.352	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Salor, the app's own point (12.6 km from Tashkent), against muslim.uz live, 25-26 Sep 2026 (current rule)
+archive/tables/moral-auth-world/centralasia/off_tas2.txt	uz.board/tashkent	41.375	69.352	Asia/Tashkent	F+E S D A M I	daily	hanafi	test	Salor, the app's own point (12.6 km from Tashkent), against Wayback captures, Jul 2024 - Sep 2026 (older rule; folded in, see above)

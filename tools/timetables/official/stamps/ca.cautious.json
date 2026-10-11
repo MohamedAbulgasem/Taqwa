@@ -1,231 +1,231 @@
 {
   "entry": "ca.cautious",
   "class": "C",
-  "engineHash": "818f0388870a20ed",
+  "engineHash": "c02f57f1808cdb7b",
   "broken": 0,
-  "places": 6,
+  "places": 55,
   "first": "2026-01-01",
   "last": "2026-12-31",
   "checked": ["2026-01-01..2026-12-31"],
-  "placeDays": 1788,
-  "heldOutDays": 1788,
-  "ramadanDays": 149,
+  "placeDays": 7607,
+  "heldOutDays": 7607,
+  "ramadanDays": 538,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 1788,
+      "checked": 7607,
       "early": 0,
       "late": {
-        "0": 45,
-        "1": 44,
-        "2": 174,
-        "3+": 1525
+        "0": 429,
+        "1": 456,
+        "2": 1132,
+        "3+": 5590
       },
-      "exactShare": 0.0252,
+      "exactShare": 0.0564,
       "worstLate": 36,
       "lateLimit": 36,
       "lateLimitFrom": "entry ca.cautious",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 1788,
+      "checked": 7607,
       "lateEnd": 0,
       "late": {
-        "0": 137,
-        "1": 390,
-        "2": 865,
-        "3+": 396
+        "0": 995,
+        "1": 1927,
+        "2": 3245,
+        "3+": 1440
       },
-      "exactShare": 0.0766,
-      "worstLate": 4,
-      "lateLimit": 4,
-      "lateLimitFrom": "entry ca.cautious",
-      "overLimit": 0
-    },
-    "dhuhr": {
-      "checked": 1788,
-      "early": 0,
-      "late": {
-        "0": 301,
-        "1": 61,
-        "2": 56,
-        "3+": 1370
-      },
-      "exactShare": 0.1683,
+      "exactShare": 0.1308,
       "worstLate": 5,
       "lateLimit": 5,
       "lateLimitFrom": "entry ca.cautious",
       "overLimit": 0
     },
-    "asrStandard": {
-      "checked": 1788,
+    "dhuhr": {
+      "checked": 7607,
       "early": 0,
       "late": {
-        "0": 62,
-        "1": 351,
-        "2": 532,
-        "3+": 843
+        "0": 602,
+        "1": 122,
+        "2": 78,
+        "3+": 6805
       },
-      "exactShare": 0.0347,
+      "exactShare": 0.0791,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry ca.cautious",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 7607,
+      "early": 0,
+      "late": {
+        "0": 108,
+        "1": 745,
+        "2": 1899,
+        "3+": 4855
+      },
+      "exactShare": 0.0142,
       "worstLate": 5,
       "lateLimit": 5,
       "lateLimitFrom": "entry ca.cautious",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 1119,
+      "checked": 3650,
       "early": 0,
       "late": {
-        "0": 111,
-        "1": 150,
-        "2": 85,
-        "3+": 773
+        "0": 182,
+        "1": 422,
+        "2": 223,
+        "3+": 2823
       },
-      "exactShare": 0.0992,
-      "worstLate": 5,
-      "lateLimit": 5,
+      "exactShare": 0.0499,
+      "worstLate": 6,
+      "lateLimit": 6,
       "lateLimitFrom": "entry ca.cautious",
       "overLimit": 0
     },
     "isha": {
-      "checked": 1788,
+      "checked": 7607,
       "early": 0,
       "late": {
-        "0": 2,
-        "1": 2,
-        "2": 16,
-        "3+": 1768
+        "0": 45,
+        "1": 35,
+        "2": 78,
+        "3+": 7449
       },
-      "exactShare": 0.0011,
+      "exactShare": 0.0059,
       "worstLate": 77,
       "lateLimit": 77,
       "lateLimitFrom": "entry ca.cautious",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 1788,
+      "checked": 7607,
       "lateEnd": 0,
       "late": {
-        "0": 45,
-        "1": 55,
-        "2": 13,
-        "3+": 1675
+        "0": 85,
+        "1": 123,
+        "2": 30,
+        "3+": 7369
       },
-      "exactShare": 0.0252,
-      "worstLate": 38,
-      "lateLimit": 38,
+      "exactShare": 0.0112,
+      "worstLate": 39,
+      "lateLimit": 39,
       "lateLimitFrom": "entry ca.cautious",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 1788,
-    "ramadanDays": 149,
+    "placeDays": 7607,
+    "ramadanDays": 538,
     "events": {
       "fajr": {
-        "checked": 1788,
+        "checked": 7607,
         "early": 0,
         "late": {
-          "0": 45,
-          "1": 44,
-          "2": 174,
-          "3+": 1525
+          "0": 429,
+          "1": 456,
+          "2": 1132,
+          "3+": 5590
         },
-        "exactShare": 0.0252,
+        "exactShare": 0.0564,
         "worstLate": 36,
         "lateLimit": 36,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 1788,
+        "checked": 7607,
         "lateEnd": 0,
         "late": {
-          "0": 137,
-          "1": 390,
-          "2": 865,
-          "3+": 396
+          "0": 995,
+          "1": 1927,
+          "2": 3245,
+          "3+": 1440
         },
-        "exactShare": 0.0766,
-        "worstLate": 4,
-        "lateLimit": 4,
-        "lateLimitFrom": "entry ca.cautious",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 1788,
-        "early": 0,
-        "late": {
-          "0": 301,
-          "1": 61,
-          "2": 56,
-          "3+": 1370
-        },
-        "exactShare": 0.1683,
+        "exactShare": 0.1308,
         "worstLate": 5,
         "lateLimit": 5,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
-      "asrStandard": {
-        "checked": 1788,
+      "dhuhr": {
+        "checked": 7607,
         "early": 0,
         "late": {
-          "0": 62,
-          "1": 351,
-          "2": 532,
-          "3+": 843
+          "0": 602,
+          "1": 122,
+          "2": 78,
+          "3+": 6805
         },
-        "exactShare": 0.0347,
+        "exactShare": 0.0791,
+        "worstLate": 6,
+        "lateLimit": 6,
+        "lateLimitFrom": "entry ca.cautious",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 7607,
+        "early": 0,
+        "late": {
+          "0": 108,
+          "1": 745,
+          "2": 1899,
+          "3+": 4855
+        },
+        "exactShare": 0.0142,
         "worstLate": 5,
         "lateLimit": 5,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 1119,
+        "checked": 3650,
         "early": 0,
         "late": {
-          "0": 111,
-          "1": 150,
-          "2": 85,
-          "3+": 773
+          "0": 182,
+          "1": 422,
+          "2": 223,
+          "3+": 2823
         },
-        "exactShare": 0.0992,
-        "worstLate": 5,
-        "lateLimit": 5,
+        "exactShare": 0.0499,
+        "worstLate": 6,
+        "lateLimit": 6,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "isha": {
-        "checked": 1788,
+        "checked": 7607,
         "early": 0,
         "late": {
-          "0": 2,
-          "1": 2,
-          "2": 16,
-          "3+": 1768
+          "0": 45,
+          "1": 35,
+          "2": 78,
+          "3+": 7449
         },
-        "exactShare": 0.0011,
+        "exactShare": 0.0059,
         "worstLate": 77,
         "lateLimit": 77,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 1788,
+        "checked": 7607,
         "lateEnd": 0,
         "late": {
-          "0": 45,
-          "1": 55,
-          "2": 13,
-          "3+": 1675
+          "0": 85,
+          "1": 123,
+          "2": 30,
+          "3+": 7369
         },
-        "exactShare": 0.0252,
-        "worstLate": 38,
-        "lateLimit": 38,
+        "exactShare": 0.0112,
+        "worstLate": 39,
+        "lateLimit": 39,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       }
@@ -235,10 +235,10 @@
     "uncheckedDays": 0,
     "members": {
       "ca.eighteen": {
-        "days": 1119,
-        "cappedDays": 1119,
+        "days": 3650,
+        "cappedDays": 3650,
         "leastGap": 0,
-        "mostGap": 5
+        "mostGap": 6
       }
     }
   },
@@ -246,10 +246,50 @@
     "ca.eighteen": {
       "checked": ["2026-01-01..2026-10-31", "2026-11-02..2026-12-31"],
       "points": {
+        "49.02049,-122.79507": ["2026-09-01..2026-09-30"],
+        "49.05,-122.79167": ["2026-09-01..2026-09-30"],
+        "49.08917,-123.05322": ["2026-09-01..2026-09-30"],
+        "49.08938,-123.08241": ["2026-09-01..2026-09-30"],
+        "49.10107,-122.65883": ["2026-09-01..2026-09-30"],
+        "49.10635,-122.82509": ["2026-09-01..2026-09-30"],
+        "49.10797,-122.7276": ["2026-09-01..2026-09-30"],
+        "49.12624,-122.67995": ["2026-09-01..2026-09-30"],
+        "49.13333,-122.85": ["2026-09-01..2026-09-30"],
+        "49.13333,-122.88333": ["2026-09-01..2026-09-30"],
         "49.1342,-122.8787": ["2026-09-01..2026-09-30"],
+        "49.16473,-122.64042": ["2026-09-01..2026-09-30"],
+        "49.16667,-122.8": ["2026-09-01..2026-09-30"],
+        "49.16667,-122.91667": ["2026-09-01..2026-09-30"],
+        "49.17917,-122.86667": ["2026-09-01..2026-09-30"],
+        "49.18542,-122.84659": ["2026-09-01..2026-09-30"],
+        "49.19167,-122.8": ["2026-09-01..2026-09-30"],
+        "49.2,-122.78333": ["2026-09-01..2026-09-30"],
+        "49.20678,-122.91092": ["2026-09-01..2026-09-30"],
+        "49.21392,-122.93992": ["2026-09-01..2026-09-30"],
+        "49.21667,-123.06667": ["2026-09-01..2026-09-30"],
+        "49.22119,-122.68965": ["2026-09-01..2026-09-30"],
+        "49.22219,-123.00588": ["2026-09-01..2026-09-30"],
+        "49.225,-123.0": ["2026-09-01..2026-09-30"],
+        "49.22594,-123.04282": ["2026-09-01..2026-09-30"],
+        "49.23839,-122.86676": ["2026-09-01..2026-09-30"],
+        "49.245,-123.03758": ["2026-09-01..2026-09-30"],
+        "49.2481,-122.89236": ["2026-09-01..2026-09-30"],
+        "49.25,-122.88333": ["2026-09-01..2026-09-30"],
+        "49.25448,-123.03159": ["2026-09-01..2026-09-30"],
+        "49.25702,-122.87883": ["2026-09-01..2026-09-30"],
+        "49.26028,-122.83815": ["2026-09-01..2026-09-30"],
+        "49.26636,-122.95263": ["2026-09-01..2026-09-30"],
+        "49.26637,-122.76932": ["2026-09-01..2026-09-30"],
+        "49.27697,-122.79669": ["2026-09-01..2026-09-30"],
+        "49.28124,-122.82457": ["2026-09-01..2026-09-30"],
+        "49.2846,-122.78217": ["2026-09-01..2026-09-30"],
         "53.4675,-113.4302": ["2026-01-01..2026-03-07", "2026-03-09..2026-09-17", "2026-09-19..2026-10-31", "2026-11-02..2026-12-31"],
+        "53.51684,-113.3187": ["2026-01-01..2026-03-07", "2026-03-09..2026-09-17", "2026-09-19..2026-10-31", "2026-11-02..2026-12-31"],
+        "53.54306,-113.52222": ["2026-01-01..2026-08-03", "2026-08-05..2026-10-31", "2026-11-02..2026-12-31"],
+        "53.55014,-113.46871": ["2026-01-01..2026-08-03", "2026-08-05..2026-10-31", "2026-11-02..2026-12-31"],
         "53.5606,-113.53": ["2026-01-01..2026-08-03", "2026-08-05..2026-10-31", "2026-11-02..2026-12-31"],
-        "53.6,-113.441": ["2026-01-01..2026-10-31", "2026-11-02..2026-12-31"]
+        "53.6,-113.441": ["2026-01-01..2026-10-31", "2026-11-02..2026-12-31"],
+        "53.63344,-113.63533": ["2026-01-01..2026-08-03", "2026-08-05..2026-10-31", "2026-11-02..2026-12-31"]
       },
       "excused": {
         "53.4675,-113.4302": {
@@ -266,7 +306,10 @@
     "ca.fifteen": {
       "checked": ["2026-01-01..2026-10-31"],
       "points": {
-        "53.608,-113.526": ["2026-01-01..2026-10-31"]
+        "53.54306,-113.52222": ["2026-01-01..2026-10-31"],
+        "53.55014,-113.46871": ["2026-01-01..2026-10-31"],
+        "53.608,-113.526": ["2026-01-01..2026-10-31"],
+        "53.63344,-113.63533": ["2026-01-01..2026-10-31"]
       },
       "excused": {
         "53.608,-113.526": {
@@ -277,25 +320,38 @@
     "ca.isha90": {
       "checked": ["2026-01-01..2026-12-31"],
       "points": {
-        "51.0395,-114.1685": ["2026-01-01..2026-12-31"]
+        "50.92917,-114.1": ["2026-01-01..2026-12-31"],
+        "51.0395,-114.1685": ["2026-01-01..2026-12-31"],
+        "51.03951,-114.07087": ["2026-01-01..2026-12-31"],
+        "51.04512,-114.07431": ["2026-01-01..2026-12-31"],
+        "51.05011,-114.08529": ["2026-01-01..2026-12-31"],
+        "51.12432,-114.24494": ["2026-01-01..2026-12-31"],
+        "51.12561,-114.14881": ["2026-01-01..2026-12-31"],
+        "51.15286,-114.081": ["2026-01-01..2026-12-31"],
+        "51.16398,-114.12297": ["2026-01-01..2026-12-31"],
+        "51.16869,-114.05903": ["2026-01-01..2026-12-31"]
       }
     }
   },
   "lateLimits": {
-    "entry ca.cautious: 4 min": {
-      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Sunrise, the earliest family's, up to 4 min before the others'.",
+    "entry ca.cautious: 5 min (asrStandard)": {
+      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Asr up to 3 min after the exact one): Asr up to 5 min after the others'.",
+      "events": ["asrStandard"]
+    },
+    "entry ca.cautious: 5 min (sunrise)": {
+      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Sunrise, the earliest family's, up to 4 min before the others' at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 5.",
       "events": ["sunrise"]
     },
-    "entry ca.cautious: 5 min": {
-      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Al Farooq's Zuhr + 5, Al Omari's Maghrib + 6 from August, Asr up to 3 min after the exact one): Zuhr, Asr and Maghrib up to 5 min after the others'.",
-      "events": ["dhuhr", "asrStandard", "maghrib"]
+    "entry ca.cautious: 6 min": {
+      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Al Farooq's Zuhr + 5, Al Omari's Maghrib + 6 from August): Zuhr and Maghrib up to 5 min after the others' at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 6.",
+      "events": ["dhuhr", "maghrib"]
     },
     "entry ca.cautious: 36 min": {
       "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Fajr, the 15° families', never before theirs, runs up to 36 min after the 18° family's.",
       "events": ["fajr"]
     },
-    "entry ca.cautious: 38 min": {
-      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. The end of eating, the 18° family's dawn, never after it, runs up to 38 min before the 15° families' Fajr.",
+    "entry ca.cautious: 39 min": {
+      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. The end of eating, the 18° family's dawn, never after it, runs up to 38 min before the 15° families' Fajr at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 39.",
       "events": ["endOfEating"]
     },
     "entry ca.cautious: 77 min": {

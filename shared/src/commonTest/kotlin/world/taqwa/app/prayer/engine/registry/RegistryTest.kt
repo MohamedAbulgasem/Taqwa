@@ -29,6 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 /** EMB's summer Fajr floor at Brussels, minutes after 00:00 UTC (TwilightCurves' own constant, Task 7g). */
@@ -491,6 +492,33 @@ class RegistryTest {
     }
 
     @Test
+    fun `a table printed for its own point rides beside the user's within a minute's reach and nowhere else`() {
+        // The city-point audit of 10–11 Oct 2026 (tablesAtTheirPoints, rulings R30, R40 and R44).
+        val houston = resolve(29.76328, -95.36327, "America/Chicago", "US")
+        assertEquals("isgh", houston.unitId)
+        assertEquals(GeoPoint(29.7369, -95.4251), houston.method?.fixedPoint)
+        assertTrue(houston.measured)
+        assertNull(houston.unitLabel, "About calls the place by the app's own name, never a mosque's")
+        // Phoenix is beyond every mosque's reach: the convention at the user's own point, exactly as before.
+        val phoenix = resolve(33.44838, -112.07404, "America/Phoenix", "US")
+        assertNull(phoenix.unitId)
+        assertFalse(phoenix.measured)
+        assertSame(Registry.byId("us.isna")!!.method, phoenix.method)
+        // Calgary's own point is within a minute of Calgary Islamic Centre SW: that family's member rides there. The
+        // cautious entry is not measured there, as before: the Edmonton families' tables are 280 km away.
+        val calgary = resolve(51.05011, -114.08529, "America/Edmonton", "CA")
+        assertEquals("ca.cautious", calgary.entry.id)
+        assertFalse(calgary.measured)
+        assertEquals(GeoPoint(51.0395, -114.1685), calgary.members.single { it.id == "ca.isha90" }.method.fixedPoint)
+        assertNull(calgary.members.single { it.id == "ca.eighteen" }.method.fixedPoint)
+        // BIK's base table reaches as far as class D: Pejë, 61 km west of it, rides its point; Delhi's table claims nothing.
+        assertEquals("base", resolve(42.65913, 20.28828, "Europe/Belgrade", "XK").unitId)
+        val delhi = resolve(28.65195, 77.23149, "Asia/Kolkata", "IN")
+        assertEquals("delhi", delhi.unitId)
+        assertFalse(delhi.measured)
+    }
+
+    @Test
     fun `new york follows isna fifteen and fifteen with the standard asr`() {
         val r = resolve(40.71427, -74.00597, "America/New_York", "US")
         assertEquals("us.isna", r.entry.id)
@@ -896,11 +924,21 @@ class RegistryTest {
     @Test
     fun `beyond its units an authority's end of eating moves as far as its sunrise and takes no fitted margin`() {
         // Ruling R44: a margin fitted at a table's point applies there only; elsewhere SAFE_END or lower.
+        // The city-point audit of 10–11 Oct 2026 (tablesAtTheirPoints): an entry computed at the user's own point whose
+        // tables became units keeps its own method beyond every reach, exactly as before the units.
+        val ownMethodBeyond = setOf(
+            "us.isna", "ca.isna", "in.karachi", "uz.board", "xk.bik", "pk.karachi", "kg.default", "gb.wifaqul",
+            "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni",
+        )
         var checked = 0
         for (entry in Registry.entries) {
             val base = entry.method ?: continue
             val units = Units.of(entry.id) ?: continue
             val edge = units.outside(GeoPoint(0.0, 0.0))
+            if (entry.id in ownMethodBeyond) {
+                assertSame(base, edge, "${entry.id}: its own method beyond every reach")
+                continue
+            }
             assertEquals(
                 minOf(base.endOfEatingMarginSeconds + (edge.margins.sunrise - base.margins.sunrise), SAFE_END),
                 edge.endOfEatingMarginSeconds,

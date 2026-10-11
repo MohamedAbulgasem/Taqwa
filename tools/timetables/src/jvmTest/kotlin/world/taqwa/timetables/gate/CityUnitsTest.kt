@@ -48,6 +48,10 @@ import kotlin.test.fail
  *   unit) and no start passes the unit's own figure, against the unit's own tables; and at each unit's own point and
  *   the app's city point the limits from before the reach rows still hold. And so on rings around 24 of the larger
  *   Kazakh cities, out to 15 km, against the city's own tables.
+ *
+ * Since the city-point audit of 10–11 Oct 2026 the same reach and own-point checks cover the units of the tables printed
+ * for their own points (`tablesAtTheirPoints`): ISNA's mosques in the United States and Canada and BIK's base across
+ * their reach ([ReachRows.SPECS]), and every such group's own points and app points ([OwnPointWorst.GROUPS]).
  */
 class CityUnitsTest {
 
@@ -263,10 +267,16 @@ class CityUnitsTest {
             unit in setOf("madinah", "al-hofuf") && event in setOf("maghrib", "isha") -> 2
             else -> 1
         }
-        else -> when (event) {
+        "kz.qmdb" -> when (event) {
             "fajr", "endOfEating" -> 8
             "isha" -> 6
             else -> 3
+        }
+        // The city-point audit's units (tablesAtTheirPoints): their recorded limits, the per-row worst above holding the rest.
+        else -> {
+            val registry = requireNotNull(Registry.byId(entry))
+            val own = Units.of(entry)?.units?.firstOrNull { it.id == unit }
+            Gate.lateLimit(requireNotNull(Event.byKey(event)), own, registry, own?.entryClass ?: registry.entryClass).minutes
         }
     }
 

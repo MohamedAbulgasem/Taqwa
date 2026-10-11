@@ -10,6 +10,7 @@ import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
+import world.taqwa.app.prayer.engine.registry.OwnTable
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
@@ -18,6 +19,7 @@ import world.taqwa.app.prayer.engine.registry.lateReachKm
 import world.taqwa.app.prayer.engine.registry.data.BalkanCurves
 import world.taqwa.app.prayer.engine.registry.margins
 import world.taqwa.app.prayer.engine.registry.single
+import world.taqwa.app.prayer.engine.registry.tablesAtTheirPoints
 import world.taqwa.app.prayer.engine.registry.widened
 
 /**
@@ -212,6 +214,35 @@ object Balkans {
             LateLimit(6, PERPETUAL_STEPS, setOf(TimedEvent.ASR)),
         ),
     )
+
+    /**
+     * The Takvimi's base table is printed for its own point, 42.5° N 21° E (xk-bik.tsv; rulings R30, R40 and R44): within
+     * class D's reach of it (about 61 km, most of Kosovo) that point rides beside the user's, so the app is never before
+     * the base table there, nor before a town's own table that is the base less some minutes (Prishtina's, a minute less).
+     * The city-point audit of 10–11 Oct 2026 found the app's own Shtime, 8 km from the base point, an Isha a minute before
+     * it on 16 days, and Kosovo Polje's and Glogovac's Fajr before it on more; BIK's offset list, which says which towns
+     * print the base table itself, is not held. A town BIK prints later than the base (the west's) is not covered by it.
+     * Beyond the reach, the method at the user's own point as before, no figure claimed.
+     */
+    val kosovoUnits: UnitSet = tablesAtTheirPoints(
+        kosovo.id, EntryClass.D_AUTHORITY, kosovoMethod,
+        listOf(
+            OwnTable(
+                "base", "the Takvimi's base point", GeoPoint(42.5, 21.0),
+                listOf(
+                    LateLimit(7, BASE_REACH, setOf(TimedEvent.FAJR, TimedEvent.DHUHR, TimedEvent.ISHA)),
+                    LateLimit(8, BASE_REACH, setOf(TimedEvent.SUNRISE, TimedEvent.ASR, TimedEvent.MAGHRIB)),
+                    LateLimit(9, BASE_REACH, setOf(TimedEvent.END_OF_EATING)),
+                ),
+            ),
+        ),
+    )
+
+    private const val BASE_REACH =
+        "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): " +
+            "west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the " +
+            "night's length moves the dawn and the dusk, so against the base table itself the times run up to this many " +
+            "minutes from it, on top of its own uneven steps."
 
     private const val PERPETUAL_STEPS =
         "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each " +

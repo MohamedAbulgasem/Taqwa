@@ -5,14 +5,18 @@ import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
+import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
+import world.taqwa.app.prayer.engine.registry.OwnTable
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.SAFE_START
 import world.taqwa.app.prayer.engine.registry.SAFE_SUNRISE
 import world.taqwa.app.prayer.engine.registry.TimedEvent
+import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.margins
 import world.taqwa.app.prayer.engine.registry.single
+import world.taqwa.app.prayer.engine.registry.tablesAtTheirPoints
 
 /** Pakistan, India and Bangladesh (research South Asia sections; spec §6.2). */
 object SouthAsia {
@@ -56,6 +60,16 @@ object SouthAsia {
     )
 
     /**
+     * The Banuri Daimi and Dawat-e-Islami's Karachi tables are printed for Karachi (pk-karachi.tsv), as [indiaUnits]: on
+     * main, at the app's own PECHS, 6.5 km east of their point, a start came a minute before them on some days (the
+     * city-point audit of 10–11 Oct 2026). No figure is claimed, there or elsewhere.
+     */
+    val pakistanUnits: UnitSet = tablesAtTheirPoints(
+        pakistan.id, EntryClass.A, pakistanMethod, listOf(OwnTable("karachi", "Karachi", GeoPoint(24.8607, 67.0011))),
+        measured = false,
+    )
+
+    /**
      * India: no authority found; the only verified table is Dawat-e-Islami Delhi (18°/18° Hanafi,
      * with elevation, 701 ft). Margins fitted (task 7f) on its September 2026 AJAX capture alone
      * (`in-karachi.tsv`): Delhi's elevation widens sunrise/Maghrib well beyond Karachi's own fit, so
@@ -75,6 +89,32 @@ object SouthAsia {
     val india: RegistryEntry = single(
         id = "in.karachi", nameKey = "authority_karachi", entryClass = EntryClass.D_AUTHORITY,
         method = indiaMethod, school = AsrSchool.HANAFI, countries = setOf("IN"),
+    )
+
+    /**
+     * Dawat-e-Islami's Delhi table is printed for Delhi (in-karachi.tsv; rulings R30, R40 and R44): within a minute's reach
+     * of it (about 24 km) its point rides beside the user's, so the app is never before it there, nor any end after it
+     * ([world.taqwa.app.prayer.engine.registry.tablesAtTheirPoints]). On main, at the app's own Delhi, 4.8 km north-east
+     * of it, the Fajr shown was a minute before it on 3 days (the city-point audit of 10–11 Oct 2026). No figure is
+     * claimed, there or elsewhere (one month of one source).
+     */
+    val indiaUnits: UnitSet = tablesAtTheirPoints(
+        india.id, EntryClass.A, indiaMethod,
+        listOf(
+            OwnTable(
+                "delhi", "Delhi", GeoPoint(28.6139, 77.2090),
+                listOf(
+                    LateLimit(
+                        4,
+                        "Dawat-e-Islami prints no sehri time: the end of eating keeps the sunrise margin, and within a minute's " +
+                            "reach of Delhi's point the earlier of its dawn and the user's own is shown (rulings R30 and R44): " +
+                            "up to 4 min before its Fajr; an early end is the safe side",
+                        setOf(TimedEvent.END_OF_EATING),
+                    ),
+                ),
+            ),
+        ),
+        measured = false,
     )
 
     /**

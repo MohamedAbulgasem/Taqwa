@@ -70,7 +70,8 @@ import kotlin.time.Instant
  *    order can show is declared in [PrayerDay.notFollowed].
  * 7. **The fixed point's own day** (ruling R89): where a table's point rides beside the user's, the
  *    sunrise, end of eating and imsak shown are never after those the same method shows at that
- *    point alone, after every step above.
+ *    point alone, after every step above; where it rides for the starts too, nor after those it shows
+ *    at the user's point alone (the city-point audit of 10–11 Oct 2026).
  * 8. **Fajr before the sunrise shown** (ruling R90), last of all: where the Fajr shown is not before
  *    the sunrise shown (an authority's sunrise printed minutes before the sun's, or a Fajr its own
  *    rule puts after sunrise, at the polar edge), the sunrise moves later to the minute after Fajr,
@@ -156,6 +157,21 @@ object DayComputer {
         private val atFixedPoint: Place? =
             if (here.size == 2) Place(method, here.first(), zone, school, ramadan, lagDates, lagDatesUntil, skies) else null
 
+        /**
+         * Ruling R15 completed (the city-point audit of 10–11 Oct 2026): the same method at the user's point alone, where a
+         * fixed point rides beside it for the starts too ([FixedPointMode.BOTH]), which bounds the ends shown here as
+         * [atFixedPoint]'s day does. Each end is already the earlier over the two points, but the end of eating is then
+         * held to the Fajr shown, the later of the two, while at the user's point alone it is held to the user's own Fajr:
+         * under a Fajr margin below the end's (the Kyrgyz Muftiate's, at Bishkek's suburbs), the table's later Fajr let
+         * the end of eating come a minute after the user's own point alone gave it.
+         */
+        private val atUserAlone: Place? =
+            if (here.size == 2 && !endsOnly) {
+                Place(method.copy(fixedPoint = null), point, zone, school, ramadan, lagDates, lagDatesUntil, skies)
+            } else {
+                null
+            }
+
         private fun sky(point: GeoPoint): Sky = skies.getOrPut(point) { Sky(method, point, zone) }
 
         /**
@@ -173,7 +189,8 @@ object DayComputer {
         fun day(date: LocalDate, capIsha: Boolean = true): PrayerDay {
             val own = clocked(date, banded(date, limited(date, unlimited(date), capIsha)))
             val table = atFixedPoint?.day(date, capIsha)
-            val bounded = if (table != null) own.endsNoLaterThan(table) else own
+            val alone = atUserAlone?.day(date, capIsha)
+            val bounded = listOfNotNull(table, alone).fold(own) { day, other -> day.endsNoLaterThan(other) }
             return bounded.fajrBeforeSunrise(date).ishaAfterMaghrib()
         }
 

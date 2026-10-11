@@ -17,9 +17,11 @@ import java.util.concurrent.Executors
 import kotlin.system.exitProcess
 
 /**
- * Writes the reach rows of the two authorities whose every place is a unit, Umm al-Qura's (KACST's 173 places) and
- * QMDB's (its 86 measured places): `official/gate/sa-ummalqura-reach.tsv` and `kz-qmdb-reach.tsv` (the reviews of
- * 9 and 10 Oct 2026, "prove it across the unit", London's precedent). A unit's figure was proven at its own point and
+ * Writes the reach rows of the units that claim a figure ([ReachRows.SPECS]): Umm al-Qura's (KACST's 173 places) and
+ * QMDB's (its 86 measured places), `official/gate/sa-ummalqura-reach.tsv` and `kz-qmdb-reach.tsv` (the reviews of
+ * 9 and 10 Oct 2026, "prove it across the unit", London's precedent); and since the city-point audit of 10–11 Oct
+ * 2026 ISNA's mosques in the United States and Canada and BIK's base table (`us-isna-reach.tsv`, `ca-isna-reach.tsv`,
+ * `xk-bik-reach.tsv`). A unit's figure was proven at its own point and
  * at the app's point for its city only; inside the unit a user can be up to its reach from both. So each measured
  * unit's own tables (the rows its group file reads at the unit's point) are replayed, held out (split=test) and tagged
  * with the unit (`<entry>/<unit>`, so the gate checks the point resolves there):
@@ -70,7 +72,16 @@ object ReachRows {
     /** One authority: its entry, its group file (the unit's own rows) and its country. */
     class Spec(val entry: String, val group: String, val country: String)
 
-    val SPECS = listOf(Spec("sa.ummalqura", "sa-ummalqura", "SA"), Spec("kz.qmdb", "kz-qmdb", "KZ"))
+    /**
+     * Umm al-Qura's and QMDB's places; and, since the city-point audit of 10–11 Oct 2026, the entries whose tables printed
+     * for their own points became units (`tablesAtTheirPoints`) and claim a figure there: ISNA's mosques in the United
+     * States and Canada, and BIK's base table. (Dawat-e-Islami's Delhi and the Uzbek Board's Tashkent claim none, and the
+     * cautious members' tables show none.)
+     */
+    val SPECS = listOf(
+        Spec("sa.ummalqura", "sa-ummalqura", "SA"), Spec("kz.qmdb", "kz-qmdb", "KZ"),
+        Spec("us.isna", "us-isna", "US"), Spec("ca.isna", "ca-isna", "CA"), Spec("xk.bik", "xk-bik", "XK"),
+    )
 
     /** The fixed grid. */
     val BEARINGS: List<Double> = (0 until 8).map { it * 45.0 }

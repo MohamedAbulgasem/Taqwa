@@ -6,3 +6,8 @@
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/ukfr/ifi_dublin_local.txt	ie.cautious	53.3498	-6.2603	Europe/Dublin	F+E S D A M I	daily	standard	test	IFI Dublin 2026	ie.ifi
 archive/tables/moral-auth-world/ukfr/icci_year.txt	ie.cautious	53.3498	-6.2603	Europe/Dublin	F+E S D A M I	daily	standard	test	ICCI 2026	ie.icci
+
+# The app's own point (the city-point audit of 10–11 Oct 2026): Dublin, 2.0 km south-east of the two tables' point,
+# against both, each riding there as its unit (ie.ifi, ie.icci).
+archive/tables/moral-auth-world/ukfr/ifi_dublin_local.txt	ie.cautious	53.33306	-6.24889	Europe/Dublin	F+E S D A M I	daily	standard	test	Dublin, the app's own point (2.0 km from the table's), against IFI Dublin 2026	ie.ifi
+archive/tables/moral-auth-world/ukfr/icci_year.txt	ie.cautious	53.33306	-6.24889	Europe/Dublin	F+E S D A M I	daily	standard	test	Dublin, the app's own point (2.0 km from the table's), against ICCI 2026	ie.icci

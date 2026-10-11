@@ -1,29 +1,29 @@
 {
   "entry": "tr.diyanet.europe",
   "class": "D (authority)",
-  "engineHash": "8400b85f08591274",
+  "engineHash": "a0b702d6d1cfa61d",
   "broken": 0,
-  "places": 33,
+  "places": 34,
   "first": "2026-09-25",
   "last": "2027-12-31",
   "checked": ["2026-09-25..2026-11-01", "2027-01-01..2027-12-31"],
-  "placeDays": 13174,
-  "heldOutDays": 10798,
-  "ramadanDays": 957,
+  "placeDays": 13573,
+  "heldOutDays": 11197,
+  "ramadanDays": 986,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 25689,
+      "checked": 26484,
       "early": 0,
       "late": {
-        "0": 11325,
-        "1": 7380,
-        "2": 2592,
-        "3+": 4392
+        "0": 11682,
+        "1": 7652,
+        "2": 2694,
+        "3+": 4456
       },
-      "exactShare": 0.4409,
+      "exactShare": 0.4411,
       "worstLate": 7,
       "lateLimit": 7,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -32,92 +32,92 @@
       "declaredDates": ["2027-05-28..2027-07-15"]
     },
     "sunrise": {
-      "checked": 25797,
+      "checked": 26592,
       "lateEnd": 0,
       "late": {
-        "0": 16358,
-        "1": 8755,
+        "0": 16860,
+        "1": 9048,
         "2": 17,
         "3+": 667
       },
-      "exactShare": 0.6341,
+      "exactShare": 0.634,
       "worstLate": 129,
       "lateLimit": 129,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 25797,
+      "checked": 26592,
       "early": 0,
       "late": {
-        "0": 18947,
-        "1": 6850,
+        "0": 19493,
+        "1": 7099,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7345,
+      "exactShare": 0.733,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 25797,
+      "checked": 26592,
       "early": 0,
       "late": {
-        "0": 18472,
-        "1": 7325,
+        "0": 19055,
+        "1": 7537,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7161,
+      "exactShare": 0.7166,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 25797,
+      "checked": 26592,
       "early": 0,
       "late": {
-        "0": 19395,
-        "1": 5960,
+        "0": 20015,
+        "1": 6135,
         "2": 15,
         "3+": 427
       },
-      "exactShare": 0.7518,
+      "exactShare": 0.7527,
       "worstLate": 126,
       "lateLimit": 126,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea",
       "overLimit": 0
     },
     "isha": {
-      "checked": 25696,
+      "checked": 26491,
       "early": 0,
       "late": {
-        "0": 11504,
-        "1": 8201,
-        "2": 2603,
-        "3+": 3388
+        "0": 11888,
+        "1": 8466,
+        "2": 2703,
+        "3+": 3434
       },
-      "exactShare": 0.4477,
+      "exactShare": 0.4488,
       "worstLate": 7,
       "lateLimit": 7,
-      "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
+      "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
       "overLimit": 0,
       "declared": 101,
       "declaredDates": ["2027-05-31..2027-07-14"]
     },
     "endOfEating": {
-      "checked": 25797,
+      "checked": 26592,
       "lateEnd": 0,
       "late": {
-        "0": 10522,
-        "1": 8482,
-        "2": 2330,
-        "3+": 4463
+        "0": 10882,
+        "1": 8745,
+        "2": 2434,
+        "3+": 4531
       },
-      "exactShare": 0.4079,
+      "exactShare": 0.4092,
       "worstLate": 70,
       "lateLimit": 70,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -125,19 +125,19 @@
     }
   },
   "heldOut": {
-    "placeDays": 10798,
-    "ramadanDays": 783,
+    "placeDays": 11197,
+    "ramadanDays": 812,
     "events": {
       "fajr": {
-        "checked": 23313,
+        "checked": 24108,
         "early": 0,
         "late": {
-          "0": 10285,
-          "1": 6577,
-          "2": 2321,
-          "3+": 4130
+          "0": 10642,
+          "1": 6849,
+          "2": 2423,
+          "3+": 4194
         },
-        "exactShare": 0.4412,
+        "exactShare": 0.4414,
         "worstLate": 7,
         "lateLimit": 7,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -146,11 +146,11 @@
         "declaredDates": ["2027-05-28..2027-07-15"]
       },
       "sunrise": {
-        "checked": 23421,
+        "checked": 24216,
         "lateEnd": 0,
         "late": {
-          "0": 14817,
-          "1": 7921,
+          "0": 15319,
+          "1": 8214,
           "2": 16,
           "3+": 667
         },
@@ -161,77 +161,77 @@
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 23421,
+        "checked": 24216,
         "early": 0,
         "late": {
-          "0": 17160,
-          "1": 6261,
+          "0": 17706,
+          "1": 6510,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7327,
+        "exactShare": 0.7312,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 23421,
+        "checked": 24216,
         "early": 0,
         "late": {
-          "0": 16724,
-          "1": 6697,
+          "0": 17307,
+          "1": 6909,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7141,
+        "exactShare": 0.7147,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 23421,
+        "checked": 24216,
         "early": 0,
         "late": {
-          "0": 17498,
-          "1": 5481,
+          "0": 18118,
+          "1": 5656,
           "2": 15,
           "3+": 427
         },
-        "exactShare": 0.7471,
+        "exactShare": 0.7482,
         "worstLate": 126,
         "lateLimit": 126,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea",
         "overLimit": 0
       },
       "isha": {
-        "checked": 23320,
+        "checked": 24115,
         "early": 0,
         "late": {
-          "0": 10301,
-          "1": 7409,
-          "2": 2384,
-          "3+": 3226
+          "0": 10685,
+          "1": 7674,
+          "2": 2484,
+          "3+": 3272
         },
-        "exactShare": 0.4417,
+        "exactShare": 0.4431,
         "worstLate": 7,
         "lateLimit": 7,
-        "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
+        "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
         "overLimit": 0,
         "declared": 101,
         "declaredDates": ["2027-05-31..2027-07-14"]
       },
       "endOfEating": {
-        "checked": 23421,
+        "checked": 24216,
         "lateEnd": 0,
         "late": {
-          "0": 9426,
-          "1": 7640,
-          "2": 2125,
-          "3+": 4230
+          "0": 9786,
+          "1": 7903,
+          "2": 2229,
+          "3+": 4298
         },
-        "exactShare": 0.4025,
+        "exactShare": 0.4041,
         "worstLate": 70,
         "lateLimit": 70,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -402,6 +402,10 @@
     "unit tr.diyanet.europe.lille: 4 min (fajr)": {
       "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
       "events": ["fajr"]
+    },
+    "unit tr.diyanet.europe.lille: 4 min (isha)": {
+      "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+      "events": ["isha"]
     },
     "unit tr.diyanet.europe.london: 4 min (endOfEating)": {
       "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
@@ -2318,7 +2322,7 @@
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
-          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
         },
         "unit tr.diyanet.europe.lille: 4 min (endOfEating)": {
           "reason": "In spring Diyanet's takdir moves the dawn by several minutes a day here, in steps; the end of eating takes the earliest of three neighbouring days so that the leap cycle cannot make it late, and so comes before the printed time by as much as a day's step on those days.",
@@ -2327,45 +2331,49 @@
         "unit tr.diyanet.europe.lille: 4 min (fajr)": {
           "reason": "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
           "events": ["fajr"]
+        },
+        "unit tr.diyanet.europe.lille: 4 min (isha)": {
+          "reason": "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.",
+          "events": ["isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 795,
+          "checked": 1590,
           "early": 0,
           "late": {
-            "0": 359,
-            "1": 270,
-            "2": 102,
-            "3+": 64
+            "0": 716,
+            "1": 542,
+            "2": 204,
+            "3+": 128
           },
-          "exactShare": 0.4516,
+          "exactShare": 0.4503,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.lille",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 795,
+          "checked": 1590,
           "lateEnd": 0,
           "late": {
-            "0": 510,
-            "1": 285,
+            "0": 1012,
+            "1": 578,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6415,
+          "exactShare": 0.6365,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 795,
+          "checked": 1590,
           "early": 0,
           "late": {
-            "0": 546,
-            "1": 249,
+            "0": 1092,
+            "1": 498,
             "2": 0,
             "3+": 0
           },
@@ -2376,60 +2384,60 @@
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 795,
+          "checked": 1590,
           "early": 0,
           "late": {
-            "0": 585,
-            "1": 210,
+            "0": 1168,
+            "1": 422,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7358,
+          "exactShare": 0.7346,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 795,
+          "checked": 1590,
           "early": 0,
           "late": {
-            "0": 626,
-            "1": 169,
+            "0": 1246,
+            "1": 344,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7874,
+          "exactShare": 0.7836,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 795,
+          "checked": 1590,
           "early": 0,
           "late": {
-            "0": 394,
-            "1": 257,
-            "2": 104,
-            "3+": 40
+            "0": 778,
+            "1": 522,
+            "2": 204,
+            "3+": 86
           },
-          "exactShare": 0.4956,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4893,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit tr.diyanet.europe.lille",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 795,
+          "checked": 1590,
           "lateEnd": 0,
           "late": {
-            "0": 362,
-            "1": 263,
-            "2": 102,
-            "3+": 68
+            "0": 722,
+            "1": 526,
+            "2": 206,
+            "3+": 136
           },
-          "exactShare": 0.4553,
+          "exactShare": 0.4541,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.lille",

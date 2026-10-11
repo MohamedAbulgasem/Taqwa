@@ -12,6 +12,7 @@ import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.CALCULATED_NAME
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
+import world.taqwa.app.prayer.engine.registry.OwnTable
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.SAFE_START
 import world.taqwa.app.prayer.engine.registry.SAFE_SUNRISE
@@ -25,6 +26,7 @@ import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateReachKm
 import world.taqwa.app.prayer.engine.registry.margins
 import world.taqwa.app.prayer.engine.registry.single
+import world.taqwa.app.prayer.engine.registry.tablesAtTheirPoints
 
 /**
  * Jordan, Palestine, Lebanon, Syria, Iraq and Yemen: class D with an authority (Palestine measured at
@@ -393,6 +395,49 @@ object Levant {
     val yemen = single(
         id = "ye.default", nameKey = CALCULATED_NAME, entryClass = EntryClass.D_NONE, method = yemenMethod,
         school = AsrSchool.STANDARD, countries = setOf("YE"),
+    )
+
+    /**
+     * The tables these four authorities are checked against are each printed for one point: Gaza's Awqaf imsakiya, Dar
+     * al-Fatwa's Beirut, the Syrian Awqaf's Damascus and its Umayyad Mosque, the Sunni Endowment's Baghdad (ruling R44).
+     * As at Delhi and Tashkent (SouthAsia.indiaUnits), within a minute's reach of each its point rides beside the user's,
+     * so the app is never before it there, nor any end after it (tablesAtTheirPoints). On main, at the app's own cities
+     * a few kilometres away, a start came a minute before it or an end after it on some days (the city-point audit of
+     * 10–11 Oct 2026: Jounieh and Aley by Beirut, Darayya by Damascus, Sadr City by Baghdad, Jabalia by Gaza). No figure
+     * is claimed, there or elsewhere.
+     */
+    val gazaAwqafUnits: UnitSet = tablesAtTheirPoints(
+        gazaAwqaf.id, EntryClass.A, gazaAwqaf.method!!, listOf(OwnTable("gaza", "Gaza", GeoPoint(31.502, 34.467))), measured = false,
+    )
+    val lebanonUnits: UnitSet = tablesAtTheirPoints(
+        lebanon.id, EntryClass.A, lebanonMethod,
+        listOf(
+            OwnTable(
+                "beirut", "Beirut", GeoPoint(33.894, 35.502),
+                listOf(
+                    LateLimit(4, BEIRUT_REACH, setOf(TimedEvent.SUNRISE)),
+                    LateLimit(8, BEIRUT_REACH, setOf(TimedEvent.MAGHRIB)),
+                    LateLimit(9, BEIRUT_REACH, setOf(TimedEvent.END_OF_EATING)),
+                ),
+            ),
+        ),
+        measured = false,
+    )
+
+    private const val BEIRUT_REACH =
+        "the perpetual table's single never-early margin (as the entry's own), and within a minute's reach of Beirut's point, " +
+            "where it rides beside the user's (rulings R30, R44), each start the later of its sun and the user's own and each " +
+            "end the earlier: at the app's own towns near it (Jounieh, Aley) up to this many minutes from the table"
+    val syriaUnits: UnitSet = tablesAtTheirPoints(
+        syria.id, EntryClass.A, syriaMethod,
+        listOf(
+            OwnTable("damascus", "Damascus", GeoPoint(33.5138, 36.2765)),
+            OwnTable("umayyad-mosque", "the Umayyad Mosque, Damascus", GeoPoint(33.5116, 36.3064)),
+        ),
+        measured = false,
+    )
+    val iraqUnits: UnitSet = tablesAtTheirPoints(
+        iraq.id, EntryClass.A, iraqMethod, listOf(OwnTable("baghdad", "Baghdad", GeoPoint(33.341, 44.401))), measured = false,
     )
 
     val entries = listOf(jordan, pa, gazaAwqaf, gaza, lebanon, syria, iraq, yemen)

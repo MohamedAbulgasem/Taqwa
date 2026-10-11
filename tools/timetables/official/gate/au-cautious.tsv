@@ -9,3 +9,8 @@ path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/africaoceania/lma-1448.txt	au.cautious	-33.92	151.0756	Australia/Sydney	F+E S D A M I	daily	standard	test	LMA 1448 AH	au.lma
 archive/tables/moral-auth-world/africaoceania/diy-syd.txt	au.cautious	-33.92	151.0756	Australia/Sydney	F+E S D A M I	daily	standard	test	Diyanet Sydney	other.turkey
 archive/tables/moral-auth-world/africaoceania/diy-mel.txt	au.cautious	-37.8136	144.9631	Australia/Melbourne	F+E S D A - I	daily	standard	test	Diyanet Melbourne	other.turkey
+
+# The app's own point (the city-point audit of 10–11 Oct 2026): Sydney, 13.5 km east of Lakemba Mosque, against both
+# tables above, Lakemba's table riding there as its unit (au.lma), the Diyanet member at Sydney's own point.
+archive/tables/moral-auth-world/africaoceania/lma-1448.txt	au.cautious	-33.86785	151.20732	Australia/Sydney	F+E S D A M I	daily	standard	test	Sydney, the app's own point (13.5 km from the table's), against LMA 1448 AH	au.lma
+archive/tables/moral-auth-world/africaoceania/diy-syd.txt	au.cautious	-33.86785	151.20732	Australia/Sydney	F+E S D A M I	daily	standard	test	Sydney, the app's own point (13.5 km from the table's), against Diyanet Sydney	other.turkey
