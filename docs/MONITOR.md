@@ -214,6 +214,15 @@ needed, about 5 minutes) is re-run when a unit, its reach or its tables change, 
 `generateOwnPointWorst` (seconds) when a change is meant to move an own point's lateness, or to hold the
 own-point rows prove added to their own worst rather than to the documented limits alone.
 
+Since the city-point audit (10–11 October 2026), ISNA's mosques in the United States and Canada and BIK's
+base table are units too, gated across their reach the same way (`us-isna-reach.tsv`, `ca-isna-reach.tsv`,
+`xk-bik-reach.tsv`, written by the same `generateReachRows`; about 12 minutes for all five now). Their tables
+are the research's hand-read captures, which no fetcher reads, so no recipe grows them: a new year of one of
+those tables is added by hand at its own point, and `generateReachRows` re-run. The app's own cities inside
+those units, and inside Canada's families', Chicago's 18° block's, Dawat-e-Islami's Delhi and the Uzbek
+Board's Tashkent, are rows of the group files themselves, held to their own worst by `own-points-worst.tsv`.
+The whole gate is now some 13,000 rows and 4.4 million place-days, about three minutes on the Mac.
+
 **What `prove` does.** For each capture a recipe names whose days are not all held already by rows
 of that file, entry, member and point: the capture is copied as it is to
 `archive/tables/pinned/<source>/<date>/<key>.txt` (a row with `month` or `excused` days reads its own
