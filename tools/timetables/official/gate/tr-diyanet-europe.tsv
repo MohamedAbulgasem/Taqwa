@@ -95,3 +95,8 @@ archive/tables/pinned/tr-diyanet-europe/2026-10-02/antwerpen.txt	tr.diyanet.euro
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/copenhagen.txt	tr.diyanet.europe/tr.diyanet.europe.copenhagen			Europe/Copenhagen	F+E S D A M I	daily	standard	test	Copenhagen, its own point table (the monitor capture of 2 Oct 2026)
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/helsinki.txt	tr.diyanet.europe/tr.diyanet.europe.helsinki			Europe/Helsinki	F+E S D A M I	daily	standard	test	Helsinki, its own point table (the monitor capture of 2 Oct 2026)
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/trondheim.txt	tr.diyanet.europe/tr.diyanet.europe.trondheim			Europe/Oslo	F+E S D A M I	daily	standard	test	Trondheim, its own point table (the monitor capture of 2 Oct 2026)
+
+# The app's own point (the city-point audit of 10–11 Oct 2026): Lille, 0.5 km from Diyanet's own Lille point, against
+# its tables, as `tr.diyanet.europe/tr.diyanet.europe.lille`.
+archive/tables/pinned/tr-diyanet-europe/2026-09-28/lille.txt	tr.diyanet.europe/tr.diyanet.europe.lille	50.63391	3.05512	Europe/Paris	F+E S D A M I	daily	standard	test	Lille, the app's own point (0.5 km from the table's), against Lille, its own point table (the monitor capture of 28 Sep 2026)
+archive/tables/pinned/tr-diyanet-europe/2026-10-02/lille.txt	tr.diyanet.europe/tr.diyanet.europe.lille	50.63391	3.05512	Europe/Paris	F+E S D A M I	daily	standard	test	Lille, the app's own point (0.5 km from the table's), against Lille, its own point table (the monitor capture of 2 Oct 2026)

@@ -14,6 +14,7 @@ import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.atEdge
+import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateReachKm
 import world.taqwa.app.prayer.engine.registry.data.BalkanCurves
 import world.taqwa.app.prayer.engine.registry.margins
@@ -235,6 +236,111 @@ object Balkans {
             LateLimit(6, PERPETUAL_STEPS, setOf(TimedEvent.ASR)),
         ),
     )
+
+    /** The Takvimi's base point. */
+    private val BIK_BASE = GeoPoint(42.5, 21.0)
+
+    private val DRAGASH = GeoPoint(42.0265, 20.65333)
+    private val SHTERPCE = GeoPoint(42.2394, 21.0272)
+
+    /** One place of BIK's town list: [minutes] after the Takvim (its "T"), at [point], the app's city of that name. */
+    private class BikTown(val name: String, val point: GeoPoint, val minutes: Int)
+
+    /** BIK's towns printed earlier than the Takvim (the Takvimi's "Diferenca e vendeve"). */
+    private val earlierTowns = listOf(
+        BikTown("Ferizaj", GeoPoint(42.37056, 21.15528), -1),
+        BikTown("Gjilan", GeoPoint(42.46045, 21.46986), -1),
+        BikTown("Prishtina", GeoPoint(42.67272, 21.16688), -1),
+        BikTown("Podujeva", GeoPoint(42.91056, 21.19306), -1),
+        BikTown("Vushtrri", GeoPoint(42.82306, 20.9675), -1),
+        BikTown("Presheva", GeoPoint(42.3092, 21.6497), -2),
+    )
+
+    /**
+     * The Takvimi's base table is printed for its own point, 42.5° N 21° E (xk-bik.tsv; rulings R30, R40 and R44): within
+     * class D's reach of it (about 61 km, most of Kosovo) that point rides beside the user's, so the app is never before
+     * the base table there. The city-point audit of 10–11 Oct 2026 found the app's own Shtime, 8 km from the base point, an
+     * Isha a minute before it on 16 days, and Kosovo Polje's and Glogovac's Fajr before it on more.
+     *
+     * BIK's own town list (the Takvimi's "Diferenca e vendeve", p. 5 of its 2024 and 2026 prints, held at
+     * archive/raw/manual/xk-bik/2026-10-11/): the Takvim applies to the whole of Kosovo, with small differences in a few
+     * places, "T" plus or minus whole minutes: Sharri T + 2; Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T − 1;
+     * Presheva T − 2. Every other place prints the Takvim itself (the west's Peja, Gjakova and Prizren included, whose own
+     * sun is later). So, like the PA's printed town figures (rulings R118, R120), a town's table is the base table plus
+     * its figure, and that table rides beside the user's own point (the owner's rule, 11 Oct 2026: rather late, never
+     * early, and never earlier than before): anywhere in Kosovo the base point rides for every start and end; in Sharri a
+     * start point at the base's latitude [SHARRI_WEST_DEG] west of it gives the Takvim plus two minutes (with a few
+     * seconds to spare for the rounding); within [BIK_TOWN_KM] of a town BIK prints earlier, an end point east of it gives
+     * the Takvim less that town's minutes for sunrise and the end of eating. "Sharri" is read both ways it is used, the
+     * Sharr (Dragash) municipality, Kosovo's south-west tip, and Shtërpcë under the Sharr mountains: either way its starts
+     * are never before T + 2. The figure stays the base unit's, within class D's reach; beyond it, out to [KOSOVO_KM]
+     * (every place in Kosovo), the same construction with no figure, where the first round had the user's own point alone
+     * (Leposaviq, Istok and Dragash's south a minute or more before the Takvim on some days, the review's probe).
+     */
+    val kosovoUnits: UnitSet = run {
+        val unit = AuthorityUnit(
+            "base", "the Takvimi's base point", BIK_BASE, lateReachKm(BIK_BASE.lat, EntryClass.D_AUTHORITY),
+            named = false, endsBoundAtUserPoint = true,
+            lateLimits = listOf(
+                LateLimit(7, BASE_REACH, setOf(TimedEvent.FAJR, TimedEvent.DHUHR, TimedEvent.ISHA)),
+                LateLimit(8, BASE_REACH, setOf(TimedEvent.SUNRISE, TimedEvent.ASR, TimedEvent.MAGHRIB)),
+                LateLimit(9, BASE_REACH, setOf(TimedEvent.END_OF_EATING)),
+            ),
+        )
+        UnitSet(kosovo.id, listOf(unit), around = { user, _, placed -> withTownFigures(placed, user) }) { user ->
+            if (distanceKm(user, BIK_BASE) > KOSOVO_KM) {
+                kosovoMethod
+            } else {
+                withTownFigures(kosovoMethod.copy(fixedPoint = BIK_BASE, endsBoundAtUserPoint = true), user)
+            }
+        }
+    }
+
+    /** Whether [user] is in Sharri, which BIK prints at the Takvim plus two minutes: the Sharr (Dragash) municipality or Shtërpcë. */
+    private fun inSharri(user: GeoPoint): Boolean =
+        (distanceKm(user, DRAGASH) <= SHARRI_KM && user.lat <= SHARRI_NORTH_LAT) || distanceKm(user, SHTERPCE) <= SHTERPCE_KM
+
+    /**
+     * [placed] (the base point riding beside [user]) with BIK's town figures: in Sharri a start point giving the Takvim
+     * plus two minutes; near a town BIK prints earlier, an end point giving the Takvim less its minutes.
+     */
+    private fun withTownFigures(placed: TimetableMethod, user: GeoPoint): TimetableMethod {
+        val starts = if (inSharri(user)) listOf(GeoPoint(BIK_BASE.lat, BIK_BASE.lon - SHARRI_WEST_DEG)) else emptyList()
+        val earliest = earlierTowns.filter { distanceKm(user, it.point) <= BIK_TOWN_KM }.minOfOrNull { it.minutes }
+        val ends = earliest?.let { listOf(GeoPoint(BIK_BASE.lat, BIK_BASE.lon + (-it + TOWN_FIGURE_SPARE_MINUTES) * DEG_PER_MINUTE)) }
+            ?: emptyList()
+        if (starts.isEmpty() && ends.isEmpty()) return placed
+        return placed.copy(startPoints = placed.startPoints + starts, endPoints = placed.endPoints + ends)
+    }
+
+    /** The Sharr (Dragash) municipality: Kosovo's south-west tip, within this many km of Dragash and south of [SHARRI_NORTH_LAT]. */
+    private const val SHARRI_KM = 25.0
+    private const val SHARRI_NORTH_LAT = 42.15
+
+    /** Shtërpcë's municipality, under the Sharr mountains, within this many km of the town. */
+    private const val SHTERPCE_KM = 12.0
+
+    /** How near a town BIK prints earlier its earlier ends apply (a municipality's extent, generously: an earlier end is safe). */
+    private const val BIK_TOWN_KM = 20.0
+
+    /** Every place in Kosovo is within this many km of the base point (its farthest corners about 90). */
+    private const val KOSOVO_KM = 100.0
+
+    /** A minute of time is a quarter degree of longitude at one latitude. */
+    private const val DEG_PER_MINUTE = 0.25
+
+    /** A town figure's point lies this many minutes farther, so that its whole minutes survive the rounding. */
+    private const val TOWN_FIGURE_SPARE_MINUTES = 0.04
+
+    /** Sharri's two minutes, with [TOWN_FIGURE_SPARE_MINUTES] to spare, as degrees west of the base point. */
+    private const val SHARRI_WEST_DEG = (2 + TOWN_FIGURE_SPARE_MINUTES) * DEG_PER_MINUTE
+
+    private const val BASE_REACH =
+        "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures " +
+            "(the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, " +
+            "Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every " +
+            "start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against " +
+            "the base table itself the times run up to this many minutes from it, on top of its own uneven steps."
 
     private const val PERPETUAL_STEPS =
         "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each " +

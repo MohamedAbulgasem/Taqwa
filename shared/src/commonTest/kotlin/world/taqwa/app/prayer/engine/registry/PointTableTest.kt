@@ -14,10 +14,12 @@ import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 
 /** Rulings R44 and R45: tables printed for one point, near their point and beyond its reach. */
 class PointTableTest {
@@ -173,6 +175,33 @@ class PointTableTest {
                     date = date.plus(1, DateTimeUnit.DAY)
                 }
             }
+        }
+    }
+
+    /**
+     * DayComputer's point 7 (the city-point audit of 10–11 Oct 2026): only a table printed for its own point that rides
+     * beside a method computed at the user's own point (tablesAtTheirPoints: the Kyrgyz Muftiate's Bishkek, ISNA's
+     * mosques …) also holds the ends to the user's point alone, as the app showed them before. An authority's own unit
+     * keeps its table's ends: 9 km north-east of DUM RT's Kazan point, on the days its white nights begin and end, the
+     * user's point alone has no 18° dawn while the city's point has one, and bounding the end there by the user's point
+     * alone had put the end of eating more than two hours before the city's own (a review of the first run's branch).
+     */
+    @Test
+    fun `only a table at its own point holds the ends to the user's point alone`() {
+        val bishkekSuburb = at("kg.default", 42.8746, 74.6900, "Asia/Bishkek")
+        assertEquals("bishkek", bishkekSuburb.unitId)
+        assertTrue(bishkekSuburb.method!!.endsBoundAtUserPoint)
+        val kazanTable = Registry.resolveEntry(Registry.byId("ru.dumrt")!!, Place(55.78874, 49.12214, "Europe/Moscow", "RU"))
+        val kazanSuburb = Registry.resolveEntry(Registry.byId("ru.dumrt")!!, Place(55.859454, 49.198336, "Europe/Moscow", "RU"))
+        assertEquals("kazan", kazanSuburb.unitId)
+        assertEquals(GeoPoint(55.78874, 49.12214), kazanSuburb.method!!.fixedPoint)
+        assertFalse(kazanSuburb.method!!.endsBoundAtUserPoint)
+        val zone = TimeZone.of("Europe/Moscow")
+        for (date in listOf(LocalDate(2026, 5, 4), LocalDate(2026, 5, 5), LocalDate(2026, 8, 7), LocalDate(2026, 8, 8))) {
+            val shown = DayPipeline.unended(kazanSuburb, date, zone)
+            val table = DayPipeline.unended(kazanTable, date, zone)
+            assertTrue(shown.endOfEating <= table.endOfEating, "$date: never after the city's own")
+            assertTrue(table.endOfEating - shown.endOfEating <= 15.minutes, "$date: ${table.endOfEating - shown.endOfEating} before the city's own")
         }
     }
 

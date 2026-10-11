@@ -330,7 +330,37 @@ object Maghreb {
             habous("Lagouira", 20.9331, -17.0347, -118, 201),
             habous("Ifrane", 33.5228, -5.1106, -403, 421, IFRANE_SAFETY),
         ),
+        around = { user, unit, placed -> nearerHabousTable(user, unit)?.let { placed.copy(endPoints = placed.endPoints + it) } ?: placed },
     ) { moroccoMethod.atEdge("ma.habous.edge", moroccoMethod.margins.widened(60).copy(sunrise = -510, maghrib = 510)) }
+
+    /**
+     * The Habous cities whose own tables the gate holds beyond the fitted ones (ma-habous.tsv's edge rows, at the app's
+     * points for them): Habous prints a table for each, and a place nearer one of them than its unit's city may follow
+     * that city's table.
+     */
+    private val heldHabousCities = listOf(
+        GeoPoint(32.155, -5.635), GeoPoint(34.03313, -5.00028), GeoPoint(31.63416, -7.99994), GeoPoint(30.42018, -9.59815),
+        GeoPoint(33.89352, -5.54727), GeoPoint(34.26101, -6.5802), GeoPoint(35.57845, -5.36837), GeoPoint(35.25165, -3.93723),
+        GeoPoint(32.29939, -9.23718), GeoPoint(32.88108, -6.9063), GeoPoint(33.25682, -8.50882), GeoPoint(32.33725, -6.34983),
+        GeoPoint(35.16813, -2.93352), GeoPoint(34.21, -4.01), GeoPoint(33.00103, -7.61662), GeoPoint(35.19321, -6.15572),
+        GeoPoint(28.98696, -10.05738), GeoPoint(32.93492, -5.66167), GeoPoint(34.92, -2.32), GeoPoint(32.8627, -6.57359),
+        GeoPoint(30.47028, -8.87695), GeoPoint(31.5125, -9.77), GeoPoint(29.69742, -9.73162), GeoPoint(28.43799, -11.10321),
+        GeoPoint(35.16878, -5.2636), GeoPoint(26.13073, -14.48513), GeoPoint(26.73841, -11.67194), GeoPoint(29.37975, -10.17299),
+        GeoPoint(31.69227, -4.95256),
+    )
+
+    /**
+     * The city-point round of 11 Oct 2026 (the owner's rule, never a late end): a place inside a fitted city's unit
+     * ([moroccoUnits], 25 km, the nearest fitted city alone) but nearer another Habous city whose table is held also
+     * ends no later than the unit's method at that city's point: sunrise, the end of eating and imsak the earliest of
+     * the two. Sidi Taibi, in Kénitra province 12.4 km from Kénitra and 23.6 km from Rabat, is in Rabat's unit, and its
+     * sunrise was a minute after Kénitra's own Habous table on 6 days and its end of eating on 7 (the second review of
+     * the city-point fix round).
+     */
+    private fun nearerHabousTable(user: GeoPoint, unit: AuthorityUnit): GeoPoint? {
+        val own = distanceKm(user, unit.point)
+        return heldHabousCities.filter { distanceKm(user, it) < own }.minByOrNull { distanceKm(user, it) }
+    }
 
     val morocco: RegistryEntry = single(
         id = "ma.habous", nameKey = "authority_habous", entryClass = EntryClass.B, method = moroccoMethod,

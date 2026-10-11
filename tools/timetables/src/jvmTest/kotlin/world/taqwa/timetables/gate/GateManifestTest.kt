@@ -36,6 +36,15 @@ class GateManifestTest {
     }
 
     @Test
+    fun `a row of an envelope file is held to the promise alone`() {
+        // The city-point round 2 review: a table replayed where the place may follow another is no unit's figure.
+        val line = "open/SG-MUIS/a.txt\tsg.muis\t1.3\t103.8\tAsia/Singapore\tF+E S D A M I\tdaily\tstandard\ttest\tnote"
+        val text = (listOf(header) + line).joinToString("\n")
+        assertTrue(GateManifest.parse("us-isna-envelope.tsv", text).rows.single().promiseOnly)
+        assertTrue(!GateManifest.parse("us-isna.tsv", text).rows.single().promiseOnly)
+    }
+
+    @Test
     fun `an excuse line names a member's days, where, why and the reason, and is no row`() {
         // Ruling R117: dates and a reason only, never a printed time.
         val m = parse(

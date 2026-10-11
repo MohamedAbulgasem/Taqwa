@@ -64,15 +64,35 @@ class LondonUnifiedTest {
     }
 
     @Test
-    fun `outside the m25 the table's point still bounds the ends nearby`() {
+    fun `outside the m25 a user who chooses the table follows it nearby for every start and end`() {
+        // The city-point round of 11 Oct 2026: within R45's three reaches the table's point rides both ways.
         val luton = Registry.resolveEntry(Registry.byId("gb.london.lupt")!!, Place(51.87967, -0.41748, "Europe/London", "GB"))
         assertNull(luton.unitName)
         val method = luton.method!!
         assertEquals(point, method.fixedPoint)
-        assertEquals(FixedPointMode.ENDS_ONLY, method.fixedPointMode)
+        assertEquals(FixedPointMode.BOTH, method.fixedPointMode)
         assertTrue(method.endOfEatingMarginSeconds <= SAFE_END)
-        // Far from London (Manchester) the user's own point alone.
+        // Far from London (Manchester) the user's own point, with London's beside it for the starts and the ends.
         val manchester = Registry.resolveEntry(Registry.byId("gb.london.lupt")!!, Place(53.48095, -2.23743, "Europe/London", "GB"))
         assertNull(manchester.method!!.fixedPoint)
+        assertTrue(point in manchester.method!!.startPoints && point in manchester.method!!.endPoints)
+    }
+
+    @Test
+    fun `beyond a hundred kilometres a user who chooses the table is never before it and no end is after it`() {
+        // Round 2's review of the city-point round: Dover and Southampton, beyond R45's three reaches, had starts before
+        // LUPT's table and a sunrise and an end of eating after it.
+        val entry = Registry.byId("gb.london.lupt")!!
+        val table = resolve(point.lat, point.lon)
+        for ((lat, lon) in listOf(51.12598 to 1.31257, 50.90395 to -1.40428)) {
+            val far = Registry.resolveEntry(entry, Place(lat, lon, "Europe/London", "GB"))
+            assertNull(far.method!!.fixedPoint)
+            for (date in dates) {
+                val atTable = day(table, date)
+                val shown = day(far, date)
+                shown.starts().zip(atTable.starts()).forEach { (s, printed) -> assertTrue(s >= printed, "$lat $date") }
+                assertTrue(shown.sunrise <= atTable.sunrise && shown.endOfEating <= atTable.endOfEating, "$lat $date")
+            }
+        }
     }
 }

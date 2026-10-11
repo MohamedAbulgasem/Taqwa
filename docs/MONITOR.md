@@ -214,6 +214,24 @@ needed, about 5 minutes) is re-run when a unit, its reach or its tables change, 
 `generateOwnPointWorst` (seconds) when a change is meant to move an own point's lateness, or to hold the
 own-point rows prove added to their own worst rather than to the documented limits alone.
 
+Since the city-point audit (10–11 October 2026), ISNA's mosques in the United States and Canada and BIK's
+base table are units too, gated across their reach the same way (`us-isna-reach.tsv`, `ca-isna-reach.tsv`,
+`xk-bik-reach.tsv`, written by the same `generateReachRows`; about 12 minutes for all five now). Their tables
+are the research's hand-read captures, which no fetcher reads, so no recipe grows them: a new year of one of
+those tables is added by hand at its own point, and `generateReachRows` re-run, then `generateEnvelopeRows`
+(seconds, no archive needed). That one writes the envelope's promise-only rows (round 2's fix, 11 October 2026,
+`official/gate/<group>-envelope.tsv`): every table printed for its own point at every app city within its bound
+reach, whichever table the city follows, and the round's named claims (the Takvim in Kosovo, Kénitra's table at
+Sidi Taibi, Lakemba's at Sydney's west, LUPT and IACAD chosen outside their areas). The gate checks those rows for
+the promise alone, so a recipe never targets an envelope file; it is regenerated from the group files instead. The app's own cities inside
+those units, and inside Canada's families', Chicago's 18° block's and the city tables' (Delhi, Tashkent,
+Karachi, Bishkek, Manchester Central, Gaza, Beirut, Damascus, Baghdad), are rows of the group files
+themselves, held to their own worst by `own-points-worst.tsv`; each Damascus city is read against both of the
+Ministry's samples, since both are its one table. `own-points-worst.tsv` also holds the three cautious groups
+whose limits that audit raised (`au-cautious`, `ie-cautious`, `tr-diyanet-europe`), so their own tables keep
+their own worst. The whole gate is now some 13,000 rows and 4.4 million place-days, about two and a half
+minutes on the Mac.
+
 **What `prove` does.** For each capture a recipe names whose days are not all held already by rows
 of that file, entry, member and point: the capture is copied as it is to
 `archive/tables/pinned/<source>/<date>/<key>.txt` (a row with `month` or `excused` days reads its own

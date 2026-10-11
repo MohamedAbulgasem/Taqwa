@@ -204,6 +204,44 @@ al-Qura's lag dates, MUIS's neighbours, and Kemenag's step at the March equinox 
   Beyond every unit, a point table's edge with no end bound (a user there is beyond every reach,
   where R45's bound would cost more than a unit's own): the user's own point a minute later, with
   no figure.
+  *Tables at their own points (the city-point audit, 10–11 Oct 2026):* an entry or a cautious member
+  that is computed at the user's point, but checked against tables printed each for its own point,
+  now carries those tables as units (`tablesAtTheirPoints`, rulings R30, R40 and R44). They are ISNA's
+  mosques in the United States (35) and Canada (18), Canada's three families (6 mosques), Chicago's
+  18° block (3), Manchester Central's Wifaqul table, the city tables of Delhi, Karachi, Tashkent,
+  Bishkek, Gaza, Beirut, Damascus (two) and Baghdad, and BIK's base point. The nearest
+  table whose reach holds the user rides as the fixed point beside the user's own, so the time shown is
+  never before that nearest table, nor any end after it, and never earlier than the user's own point
+  alone. *Round 2 (11 Oct 2026, the owner's rule "rather late, never early"):* every other table of
+  the set within R40's class reach of the user (three minutes, 52 to 72 km) rides beside it too, the
+  envelope (`TimetableMethod.envelopePoints`): every start the latest and every end the earliest over
+  all of them, each end never after any of them alone; the Ottawa-Abrar-Kanata overlap is clean. The Syrian Awqaf's two Damascus samples are one
+  table, so each of their units reads the other's point for the starts too (`startPoints`). A mosque's
+  or a city's table reaches a minute of longitude, 17 to 24 km, its neighbourhood; beyond that a user's
+  own mosque prints for its own point, as the method computes. That narrows R40, whose reach is the
+  entry's class limit (three minutes, about 61 km, for these class D entries and class C members): a
+  proposed ruling, for the owner. BIK, which applies one base table to the whole of Kosovo with
+  whole-minute town offsets, reaches as far as class D. The Canadian families' night-fraction curves are
+  read at every latitude in play. Beyond every minute's reach but within a table's class reach, the
+  nearest such table rides as the fixed point and the rest beside it, for the starts too (round 2: the
+  review's probe had found Calgary's north-east, Delhi's edge and the Wifaqul towns a minute or two
+  before the nearest table); beyond every class reach the method stands at the user's own point as
+  before, with no edge minute. No figure is claimed beyond the minute's reach, but a cautious convention
+  member keeps its own measured reach. BIK's own town list (the Takvimi's "Diferenca e vendeve": Sharri
+  T + 2, five towns T − 1, Presheva T − 2, every other town T) is carried as start and end points beside
+  the base point, which rides everywhere in Kosovo (rulings R118 and R120's construction, beside the
+  user's own point). A named table chosen outside its area rides its table's point: London Unified as the
+  fixed point within R45's three reaches and farther as a start point and an end point beside the user's own
+  (whose own curves are kept), IACAD its nearest table's anywhere, with Dubai's main table beside it; Rabita's
+  calendar is held across the Helsinki region (45 km) by wider margins (the fix round of 11 Oct 2026). The
+  envelope and these named claims are gated as promise-only rows (`official/gate/<group>-envelope.tsv`):
+  an early start or a late end there breaks the gate, but their lateness is no unit's figure and no limit's. The app's own cities inside each new unit are gated at their own points, and the units
+  that show a figure (ISNA's, BIK's) are gated across their reach as Umm al-Qura's and QMDB's are. Where
+  such a table rides for the starts too, the ends shown are also never after those the same method shows
+  at the user's point alone (`DayComputer`'s point 7, `TimetableMethod.endsBoundAtUserPoint`): the end of
+  eating is held to the Fajr shown, the later of the two points', which under a Fajr margin below the
+  end's had let it come a minute late. Only there: an authority's own unit keeps its table's ends, since
+  its user's point alone can read a rule its table does not (DUM RT's white nights, up to two hours).
 - **Unknown reference point or horizon**: the unit's safe edge and the deepest plausible horizon; no
   "at most" figure is claimed for that unit.
 - **Near a unit or country border**: the envelope over the candidates within the location's

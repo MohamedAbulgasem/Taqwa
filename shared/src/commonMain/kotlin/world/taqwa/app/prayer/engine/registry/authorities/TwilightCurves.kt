@@ -830,10 +830,14 @@ internal object PlaceCurves {
         val moonsightingFajr: Boolean = false,
         val ishaAfterSunsetMinutes: ((TwilightCurves.Day) -> Double)? = null,
         val ownLatitude: Boolean = false,
+        val userLatitude: Boolean = false,
     ) {
         init {
             require(!ownLatitude || (fajr != null && !moonsightingFajr && ishaAfterSunsetMinutes == null)) {
                 "ownLatitude reads only a Fajr fraction and an Isha fraction"
+            }
+            require(!userLatitude || (fajr != null && !moonsightingFajr && ishaAfterSunsetMinutes == null && !ownLatitude)) {
+                "userLatitude reads only a Fajr fraction and an Isha fraction, on the grid"
             }
         }
     }
@@ -964,12 +968,16 @@ internal object PlaceCurves {
      * sixth of the night after sunset (its spring and autumn tables stay within it; in summer, Maghrib + 90
      * covers them). Edmonton's 15° family (Markaz Al Imam Malik) keeps its Fajr no earlier than a quarter of
      * the night and its Isha (16.5°) no later than 28 % of the night after sunset.
+     *
+     * Each family's tables are units at their mosques (Americas.canadaFamilyUnits, the city-point audit of 10–11 Oct
+     * 2026), so these curves are also read at the user's own latitude beside a mosque's ([Rule.userLatitude]).
      */
-    private val caIsha90 = Rule(fajr = { CA_ISHA90_FAJR_FRACTION })
-    private val caFifteen = Rule(fajr = { CA_FIFTEEN_FAJR_FRACTION }, isha = { CA_FIFTEEN_ISHA_FRACTION })
+    private val caIsha90 = Rule(fajr = { CA_ISHA90_FAJR_FRACTION }, userLatitude = true)
+    private val caFifteen = Rule(fajr = { CA_FIFTEEN_FAJR_FRACTION }, isha = { CA_FIFTEEN_ISHA_FRACTION }, userLatitude = true)
     private val caEighteen = Rule(
         fajr = { d -> max(CA_EIGHTEEN_FAJR_FRACTION, TwilightCurves.fractionAt45(d, 18.0)) },
         isha = { CA_EIGHTEEN_ISHA_FRACTION },
+        userLatitude = true,
     )
 
     /**
@@ -1100,17 +1108,25 @@ internal object PlaceCurves {
      * each place's own latitude ([Rule.ownLatitude], QMDB's) is then read at both latitudes, each slot the later start
      * and the earlier end, so that the unit's point never makes the user's own start earlier, or end later, than it
      * is without the unit (the city-points round of 9 Oct 2026: a unit reaches about half a degree north and south of
-     * its point, and the AngleBased rule moves by up to a minute a tenth of a degree). Every other rule keeps the
-     * fixed point's curves alone.
+     * its point, and the AngleBased rule moves by up to a minute a tenth of a degree). [others] are the other tables'
+     * points riding beside it ([TimetableMethod.envelopePoints]): a [Rule.userLatitude] rule is read at their latitudes
+     * too, so that no table's point makes any start earlier, or end later, than its own curves give. Every other rule
+     * keeps the fixed point's curves alone.
      *
      * [zoneId]: the user's time zone (an IANA id), where known; the Moonsighting Committee's rule (its Other method's
      * and the Grande Mosquée de Paris's) is read at each civil date's own noon in it, which east of 180° in UTC+12 is
      * the solar day before the UTC date's (TwilightCurves.CivilNoons). Every other rule is read by month and day at
      * 12:00 UTC, and no other rule looks the zone up.
      */
-    fun at(method: TimetableMethod, point: GeoPoint, also: GeoPoint = point, zoneId: String? = null): TimetableMethod {
+    fun at(
+        method: TimetableMethod,
+        point: GeoPoint,
+        also: GeoPoint = point,
+        others: List<GeoPoint> = emptyList(),
+        zoneId: String? = null,
+    ): TimetableMethod {
         if (method.id == MOONSIGHTING_ID) return moonsightingAt(method, point, zoneOf(zoneId))
-        val placed = curvesAt(method, point, also, zoneId)
+        val placed = curvesAt(method, point, also, others, zoneId)
         val key = keyOf(method.id, ends)
         val end = ends[key]?.invoke(point) ?: return placed
         val rule = ownRuleEnds[key] ?: return placed.copy(endOfEating = end)
@@ -1164,9 +1180,11 @@ internal object PlaceCurves {
     /** A point table's edge ("<entry>.edge") keeps its authority's rules. */
     private fun keyOf(id: String, map: Map<String, *>): String = if (id in map) id else id.removeSuffix(".edge")
 
-    private fun curvesAt(method: TimetableMethod, point: GeoPoint, also: GeoPoint, zoneId: String?): TimetableMethod {
+    private fun curvesAt(method: TimetableMethod, point: GeoPoint, also: GeoPoint, others: List<GeoPoint>, zoneId: String?): TimetableMethod {
         val rule = rules[keyOf(method.id, rules)] ?: return method
         if (rule.ownLatitude) return ownLatitudeCurves(method, listOf(point.lat, also.lat).distinct(), rule)
+        val latitudes = (listOf(point.lat, also.lat) + others.map { it.lat }).distinct()
+        if (rule.userLatitude && latitudes.size > 1) return userLatitudeCurves(method, latitudes, rule)
         val fajr = when {
             rule.moonsightingFajr && method.fixedPoint == point -> TwilightCurves.moonsightingGridFajr(point.lat)
             rule.moonsightingFajr -> TwilightCurves.moonsightingFajr(point.lat, point.lon, zoneOf(zoneId))
@@ -1220,6 +1238,33 @@ internal object PlaceCurves {
         }
         val end = if (method.endOfEating == EndOfEating.SameAsFajrDawn) {
             EndOfEating.DawnAngle(method.fajrAngle, DoubleArray(slots) { i -> fajrs.maxOf { it[i] } })
+        } else {
+            method.endOfEating
+        }
+        return method.copy(fajrAngleByDayOfYear = fajr, ishaAngleByDayOfYear = isha, endOfEating = end)
+    }
+
+    /**
+     * [Rule.userLatitude]'s curves where a unit's point rides beside the user's ([at]): [rule]'s Fajr and Isha curves on
+     * the 0.1° grid at both [latitudes] (the unit's and the user's), each slot the later start of the two (the smaller Fajr
+     * depression, the larger Isha one), and an end of eating read from the Fajr dawn the earlier dawn of the two. Read at
+     * the unit's latitude alone, a fraction of the night's moment carried to the user's would move with the user's
+     * night; so neither start is earlier, nor the end later, than the user's own point alone gives (the city-point audit
+     * of 10–11 Oct 2026, Canada's families). With no unit, a place's own curves, as before.
+     */
+    private fun userLatitudeCurves(method: TimetableMethod, latitudes: List<Double>, rule: Rule): TimetableMethod {
+        val fajrRule = requireNotNull(rule.fajr) { "a userLatitude rule needs its Fajr fraction" }
+        val fajrs = latitudes.map { lat -> TwilightCurves.fajr(lat, method.fajrAngle, fraction = fajrRule) }
+        val fajr = DoubleArray(fajrs.first().size) { i -> fajrs.minOf { it[i] } }
+        val ishaAngle = (method.isha as? IshaRule.Angle)?.degrees
+        val isha = if (rule.isha != null && ishaAngle != null) {
+            val ishas = latitudes.map { lat -> TwilightCurves.isha(lat, ishaAngle, fraction = rule.isha) }
+            DoubleArray(fajr.size) { i -> ishas.maxOf { it[i] } }
+        } else {
+            method.ishaAngleByDayOfYear
+        }
+        val end = if (method.endOfEating == EndOfEating.SameAsFajrDawn) {
+            EndOfEating.DawnAngle(method.fajrAngle, DoubleArray(fajr.size) { i -> fajrs.maxOf { it[i] } })
         } else {
             method.endOfEating
         }

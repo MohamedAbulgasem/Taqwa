@@ -147,7 +147,8 @@ object Registry {
     private fun placed(entryId: String, base: TimetableMethod, measured: Boolean, place: Place): Placed {
         val user = GeoPoint(place.lat, place.lon)
         val units = Units.of(entryId) ?: return Placed(methodAlone(entryId, base, user, place.zoneId), null, measured)
-        val unit = units.unitFor(place) ?: return Placed(finish(entryId, units.outside(user), user, place.zoneId), null, false)
+        val unit = units.unitFor(place)
+            ?: return Placed(finish(entryId, units.outside(user), user, place.zoneId), null, measured && units.measuredBeyond)
         return Placed(methodInUnit(entryId, base, unit, user, place.zoneId), unit, unit.measured)
     }
 
@@ -159,7 +160,14 @@ object Registry {
      */
     internal fun methodInUnit(entryId: String, base: TimetableMethod, unit: AuthorityUnit, user: GeoPoint, zoneId: String? = null): TimetableMethod {
         val own = unit.method ?: base
-        return finish(entryId, if (own.fixedPoint == null) own.copy(fixedPoint = unit.point) else own, user, zoneId)
+        val placed = if (own.fixedPoint == null) {
+            own.copy(fixedPoint = unit.point, endsBoundAtUserPoint = unit.endsBoundAtUserPoint)
+        } else {
+            own
+        }
+        // The other tables whose reach holds the user, or the authority's town figures (UnitSet.around).
+        val around = Units.of(entryId)?.around?.invoke(user, unit, placed) ?: placed
+        return finish(entryId, around, user, zoneId)
     }
 
     /** Entry [entryId]'s method [base] at [user] as if it had no units: the user's own point alone, then [finish]. */
@@ -180,7 +188,7 @@ object Registry {
             if (variant.entryId == entryId && variant.area.contains(user)) m = variant.change(m)
         }
         val curvesAt = if (m.fixedPointMode == FixedPointMode.ENDS_ONLY) user else m.fixedPoint ?: user
-        return PlaceCurves.at(m, curvesAt, also = user, zoneId = zoneId)
+        return PlaceCurves.at(m, curvesAt, also = user, others = m.envelopePoints, zoneId = zoneId)
     }
 
     /**

@@ -1,236 +1,377 @@
 {
   "entry": "xk.bik",
   "class": "D (authority)",
-  "engineHash": "99339cb038a30f17",
+  "engineHash": "54a84ba399ff048a",
   "broken": 0,
-  "places": 2,
+  "places": 44,
   "first": "2026-01-01",
   "last": "2027-12-31",
   "checked": ["2026-01-01..2027-12-31"],
-  "placeDays": 1460,
-  "heldOutDays": 365,
-  "ramadanDays": 118,
+  "placeDays": 25185,
+  "heldOutDays": 24090,
+  "ramadanDays": 2045,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 730,
+      "checked": 24820,
       "early": 0,
       "late": {
-        "0": 496,
-        "1": 234,
-        "2": 0,
-        "3+": 0
+        "0": 8043,
+        "1": 6658,
+        "2": 4225,
+        "3+": 5894
       },
-      "exactShare": 0.6795,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.3241,
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "unit base",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 1460,
+      "checked": 25550,
       "lateEnd": 0,
       "late": {
-        "0": 88,
-        "1": 558,
-        "2": 446,
-        "3+": 368
+        "0": 0,
+        "1": 5371,
+        "2": 7424,
+        "3+": 12755
       },
-      "exactShare": 0.0603,
-      "worstLate": 5,
-      "lateLimit": 5,
-      "lateLimitFrom": "entry xk.bik",
+      "exactShare": 0,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "unit base",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 1460,
+      "checked": 25550,
       "early": 0,
       "late": {
         "0": 0,
-        "1": 468,
-        "2": 758,
-        "3+": 234
+        "1": 5207,
+        "2": 7553,
+        "3+": 12790
       },
       "exactShare": 0,
-      "worstLate": 4,
-      "lateLimit": 4,
-      "lateLimitFrom": "entry xk.bik",
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "unit base",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 1460,
+      "checked": 25550,
       "early": 0,
       "late": {
-        "0": 8,
-        "1": 494,
-        "2": 496,
-        "3+": 462
+        "0": 0,
+        "1": 4721,
+        "2": 5811,
+        "3+": 15018
       },
-      "exactShare": 0.0055,
-      "worstLate": 6,
-      "lateLimit": 6,
-      "lateLimitFrom": "entry xk.bik",
+      "exactShare": 0,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "unit base",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 1460,
+      "checked": 25550,
       "early": 0,
       "late": {
-        "0": 8,
-        "1": 658,
-        "2": 652,
-        "3+": 142
+        "0": 0,
+        "1": 6655,
+        "2": 7256,
+        "3+": 11639
       },
-      "exactShare": 0.0055,
-      "worstLate": 5,
-      "lateLimit": 5,
-      "lateLimitFrom": "entry xk.bik",
+      "exactShare": 0,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "unit base",
       "overLimit": 0
     },
     "isha": {
-      "checked": 1460,
+      "checked": 25550,
       "early": 0,
       "late": {
-        "0": 614,
-        "1": 614,
-        "2": 202,
-        "3+": 30
+        "0": 6717,
+        "1": 6722,
+        "2": 5609,
+        "3+": 6502
       },
-      "exactShare": 0.4205,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.2629,
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "unit base",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 1460,
+      "checked": 25550,
       "lateEnd": 0,
       "late": {
-        "0": 66,
-        "1": 924,
-        "2": 384,
-        "3+": 86
+        "0": 0,
+        "1": 10409,
+        "2": 7946,
+        "3+": 7195
       },
-      "exactShare": 0.0452,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0,
+      "worstLate": 9,
+      "lateLimit": 9,
+      "lateLimitFrom": "unit base",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 365,
-    "ramadanDays": 30,
+    "placeDays": 24090,
+    "ramadanDays": 1957,
     "events": {
+      "fajr": {
+        "checked": 24090,
+        "early": 0,
+        "late": {
+          "0": 7547,
+          "1": 6424,
+          "2": 4225,
+          "3+": 5894
+        },
+        "exactShare": 0.3133,
+        "worstLate": 7,
+        "lateLimit": 7,
+        "lateLimitFrom": "unit base",
+        "overLimit": 0
+      },
       "sunrise": {
-        "checked": 365,
+        "checked": 24455,
         "lateEnd": 0,
         "late": {
-          "0": 44,
-          "1": 134,
-          "2": 103,
-          "3+": 84
+          "0": 0,
+          "1": 5239,
+          "2": 7018,
+          "3+": 12198
         },
-        "exactShare": 0.1205,
-        "worstLate": 4,
-        "lateLimit": 5,
-        "lateLimitFrom": "entry xk.bik",
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "unit base",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 365,
+        "checked": 24455,
         "early": 0,
         "late": {
           "0": 0,
-          "1": 75,
-          "2": 214,
-          "3+": 76
+          "1": 4889,
+          "2": 7064,
+          "3+": 12502
         },
         "exactShare": 0,
-        "worstLate": 4,
-        "lateLimit": 4,
-        "lateLimitFrom": "entry xk.bik",
+        "worstLate": 7,
+        "lateLimit": 7,
+        "lateLimitFrom": "unit base",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 365,
+        "checked": 24455,
         "early": 0,
         "late": {
-          "0": 4,
-          "1": 100,
-          "2": 131,
-          "3+": 130
+          "0": 0,
+          "1": 4427,
+          "2": 5430,
+          "3+": 14598
         },
-        "exactShare": 0.011,
-        "worstLate": 6,
-        "lateLimit": 6,
-        "lateLimitFrom": "entry xk.bik",
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "unit base",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 365,
+        "checked": 24455,
         "early": 0,
         "late": {
-          "0": 4,
-          "1": 116,
-          "2": 195,
-          "3+": 50
+          "0": 0,
+          "1": 6229,
+          "2": 6781,
+          "3+": 11445
         },
-        "exactShare": 0.011,
-        "worstLate": 5,
-        "lateLimit": 5,
-        "lateLimitFrom": "entry xk.bik",
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 8,
+        "lateLimitFrom": "unit base",
         "overLimit": 0
       },
       "isha": {
-        "checked": 365,
+        "checked": 24455,
         "early": 0,
         "late": {
-          "0": 71,
-          "1": 178,
-          "2": 101,
-          "3+": 15
+          "0": 6245,
+          "1": 6278,
+          "2": 5445,
+          "3+": 6487
         },
-        "exactShare": 0.1945,
-        "worstLate": 3,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "exactShare": 0.2554,
+        "worstLate": 7,
+        "lateLimit": 7,
+        "lateLimitFrom": "unit base",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 365,
+        "checked": 24455,
         "lateEnd": 0,
         "late": {
-          "0": 33,
-          "1": 178,
-          "2": 111,
-          "3+": 43
+          "0": 0,
+          "1": 10220,
+          "2": 7257,
+          "3+": 6978
         },
-        "exactShare": 0.0904,
-        "worstLate": 3,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "exactShare": 0,
+        "worstLate": 9,
+        "lateLimit": 9,
+        "lateLimitFrom": "unit base",
         "overLimit": 0
       }
     }
   },
   "lateLimits": {
-    "class D (authority): 3 min": {
-      "events": ["fajr", "isha", "endOfEating"]
+    "unit base: 7 min": {
+      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+      "events": ["fajr", "dhuhr", "isha"]
     },
-    "entry xk.bik: 4 min": {
-      "reason": "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.",
-      "events": ["dhuhr"]
+    "unit base: 8 min": {
+      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+      "events": ["sunrise", "asrStandard", "maghrib"]
     },
-    "entry xk.bik: 5 min": {
-      "reason": "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.",
-      "events": ["sunrise", "maghrib"]
-    },
-    "entry xk.bik: 6 min": {
-      "reason": "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.",
-      "events": ["asrStandard"]
+    "unit base: 9 min": {
+      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+      "events": ["endOfEating"]
+    }
+  },
+  "units": {
+    "base": {
+      "name": "the Takvimi's base point",
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
+      "broken": 0,
+      "lateLimits": {
+        "unit base: 7 min": {
+          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+          "events": ["fajr", "dhuhr", "isha"]
+        },
+        "unit base: 8 min": {
+          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+          "events": ["sunrise", "asrStandard", "maghrib"]
+        },
+        "unit base: 9 min": {
+          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+          "events": ["endOfEating"]
+        }
+      },
+      "events": {
+        "fajr": {
+          "checked": 24820,
+          "early": 0,
+          "late": {
+            "0": 8043,
+            "1": 6658,
+            "2": 4225,
+            "3+": 5894
+          },
+          "exactShare": 0.3241,
+          "worstLate": 7,
+          "lateLimit": 7,
+          "lateLimitFrom": "unit base",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 25550,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 5371,
+            "2": 7424,
+            "3+": 12755
+          },
+          "exactShare": 0,
+          "worstLate": 8,
+          "lateLimit": 8,
+          "lateLimitFrom": "unit base",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 25550,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 5207,
+            "2": 7553,
+            "3+": 12790
+          },
+          "exactShare": 0,
+          "worstLate": 7,
+          "lateLimit": 7,
+          "lateLimitFrom": "unit base",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 25550,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 4721,
+            "2": 5811,
+            "3+": 15018
+          },
+          "exactShare": 0,
+          "worstLate": 8,
+          "lateLimit": 8,
+          "lateLimitFrom": "unit base",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 25550,
+          "early": 0,
+          "late": {
+            "0": 0,
+            "1": 6655,
+            "2": 7256,
+            "3+": 11639
+          },
+          "exactShare": 0,
+          "worstLate": 8,
+          "lateLimit": 8,
+          "lateLimitFrom": "unit base",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 25550,
+          "early": 0,
+          "late": {
+            "0": 6717,
+            "1": 6722,
+            "2": 5609,
+            "3+": 6502
+          },
+          "exactShare": 0.2629,
+          "worstLate": 7,
+          "lateLimit": 7,
+          "lateLimitFrom": "unit base",
+          "overLimit": 0
+        },
+        "endOfEating": {
+          "checked": 25550,
+          "lateEnd": 0,
+          "late": {
+            "0": 0,
+            "1": 10409,
+            "2": 7946,
+            "3+": 7195
+          },
+          "exactShare": 0,
+          "worstLate": 9,
+          "lateLimit": 9,
+          "lateLimitFrom": "unit base",
+          "overLimit": 0
+        }
+      }
     }
   }
 }

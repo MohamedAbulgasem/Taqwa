@@ -10,6 +10,7 @@ import world.taqwa.app.prayer.engine.registry.AuthorityUnit
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
 import world.taqwa.app.prayer.engine.registry.MethodVariant
+import world.taqwa.app.prayer.engine.registry.OwnTable
 import world.taqwa.app.prayer.engine.registry.Regions
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
@@ -20,6 +21,7 @@ import world.taqwa.app.prayer.engine.registry.data.QmdbPlaceList
 import world.taqwa.app.prayer.engine.registry.data.QmdbPlaces
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.single
+import world.taqwa.app.prayer.engine.registry.tablesAtTheirPoints
 import kotlin.math.min
 
 /** Uzbekistan, Kazakhstan and Kyrgyzstan (research Central Asia sections). Hanafi throughout (spec §3.7). */
@@ -52,6 +54,32 @@ object CentralAsia {
             LateLimit(6, "the margin also covers the pre-Jul-2026 rule's Dhuhr + 5 min next to the new rule's own (task 7f)", setOf(TimedEvent.DHUHR)),
             LateLimit(4, "the margin also covers both the 15° and 15.5° Isha eras together (task 7f)", setOf(TimedEvent.ISHA)),
         ),
+    )
+
+    /**
+     * The Board's Tashkent table is printed for Tashkent (uz-board.tsv; rulings R30, R40 and R44): within a minute's reach of
+     * it (about 21 km) its point rides beside the user's, so the app is never before it there and no end comes after it
+     * ([world.taqwa.app.prayer.engine.registry.tablesAtTheirPoints]). On main, at the app's own Tashkent, 4.4 km south-west
+     * of it, a sunrise came a minute after its table's (the city-point audit of 10–11 Oct 2026). No figure is claimed,
+     * there or elsewhere.
+     */
+    val uzbekistanUnits: UnitSet = tablesAtTheirPoints(
+        uzbekistan.id, EntryClass.A, uzbekistanMethod,
+        listOf(
+            OwnTable(
+                "tashkent", "Tashkent", GeoPoint(41.2995, 69.2401),
+                listOf(
+                    LateLimit(
+                        6,
+                        "the margin also covers the pre-Jul-2026 rule's earlier sunrise (task 7f), and within a minute's reach of " +
+                            "Tashkent's point the earlier of its sunrise and the user's own is shown (rulings R30 and R44): up " +
+                            "to 6 min before its table's; an early end is the safe side",
+                        setOf(TimedEvent.SUNRISE),
+                    ),
+                ),
+            ),
+        ),
+        measured = false,
     )
 
     /**
@@ -126,6 +154,16 @@ object CentralAsia {
     val kyrgyzstan: RegistryEntry = single(
         id = "kg.default", nameKey = "authority_kyrgyz_muftiate", entryClass = EntryClass.D_AUTHORITY,
         method = kyrgyzstanMethod, school = AsrSchool.HANAFI, countries = setOf("KG"),
+    )
+
+    /**
+     * The Muftiate's Bishkek table is printed for Bishkek (kg-default.tsv), as [uzbekistanUnits]: on main, at the app's own
+     * Lebedinovka, 9 km east of it, a start came a minute before it on some days (the city-point audit of 10–11 Oct 2026).
+     * No figure is claimed, there or elsewhere.
+     */
+    val kyrgyzstanUnits: UnitSet = tablesAtTheirPoints(
+        "kg.default", EntryClass.A, kyrgyzstanMethod, listOf(OwnTable("bishkek", "Bishkek", GeoPoint(42.8746, 74.5698))),
+        measured = false,
     )
 
     /**
