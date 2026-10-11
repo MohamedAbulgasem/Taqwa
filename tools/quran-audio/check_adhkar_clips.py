@@ -13,7 +13,11 @@ cutter cannot excuse itself) and compares byte for byte:
     where the container carries them, else each ayah's own full decode; the decoded length, not
     ffprobe's, since the files carry Xing headers; skipped with a note if ffmpeg is not at the
     path `verify.py` uses);
-  - the folder holds exactly the four clips, and they total under the 2 MB the plan promised.
+  - the folder holds exactly the four clips (dot-files and `*.part` aside; a `.part` is reported),
+    and they total under the 2 MB the plan promised.
+
+The four clips and the ayahs each is are written out below (`EXPECTED`), not imported from
+`adhkar_clips.py`: the checker holds the cutter to a table of its own.
 
 Exits 1 on any difference. The containers are read from the pipeline cache (`containers/ar.alafasy/`
 under `WORK`, `TAQWA_AUDIO_WORK` to point elsewhere) and fetched into it if absent, which is what
@@ -31,9 +35,22 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from adhkar_clips import (  # noqa: E402
-    BUDGET_BYTES, CLIP_DIR, CLIPS, RID, container_name, ensure_container, manifest_entry,
+    BUDGET_BYTES, CLIP_DIR, RID, container_name, ensure_container, manifest_entry,
 )
 from verify import FFMPEG, measure  # noqa: E402
+
+# What the app expects the folder to hold, written out here and NOT taken from the cutter's own
+# `CLIPS`: a checker that imports its answer from the script it checks agrees with it whatever
+# that script does. Clip file name -> (surah, the ayahs it is). The three short surahs are whole
+# (112 has four ayahs, 113 five, 114 six; the container must say so too), and the controller asks
+# for a clip by exactly these names (`adhkarClipBytes`: `002-255.mp3` for one ayah, `112.mp3` for
+# a whole surah).
+EXPECTED = {
+    "002-255.mp3": (2, [255]),
+    "112.mp3": (112, [1, 2, 3, 4]),
+    "113.mp3": (113, [1, 2, 3, 4, 5]),
+    "114.mp3": (114, [1, 2, 3, 4, 5, 6]),
+}
 
 # Half a second over a clip, as check_previews.py, plus a join's worth for every ayah after the
 # first. An ayah decoded alone has its encoder delay and its Xing/Info frame dropped; inside the
@@ -101,11 +118,20 @@ def main():
         bad += 1
         print("  FAIL", msg)
 
-    present = sorted(os.listdir(CLIP_DIR)) if os.path.isdir(CLIP_DIR) else []
-    if present != sorted(name for name, _, _ in CLIPS):
-        fail(f"{CLIP_DIR} holds {present}, expected {sorted(name for name, _, _ in CLIPS)}")
+    # The folder is bundled whole, so it must hold exactly the expected files. Dot-files (a
+    # Finder's `.DS_Store`) are not part of that, and a `.part` is a cutter run in flight or
+    # interrupted: neither fails the check, and a `.part` is named on its own line because the
+    # build would bundle it if it stayed.
+    names = os.listdir(CLIP_DIR) if os.path.isdir(CLIP_DIR) else []
+    partial = sorted(n for n in names if n.endswith(".part") and not n.startswith("."))
+    present = sorted(n for n in names if not n.startswith(".") and not n.endswith(".part"))
+    if present != sorted(EXPECTED):
+        fail(f"{CLIP_DIR} holds {present}, expected {sorted(EXPECTED)}")
+    if partial:
+        print(f"  note: partial file(s) {partial} in the clip folder: a cutter run in progress, or "
+              f"one that was interrupted; delete them before building")
 
-    for name, surah, wanted in CLIPS:
+    for name, (surah, wanted) in EXPECTED.items():
         path = os.path.join(CLIP_DIR, name)
         print(f"{name}  (from {container_name(surah)})")
         try:
@@ -114,9 +140,13 @@ def main():
         except (SystemExit, ValueError, OSError) as e:
             fail(f"container: {e}")
             continue
-        picked = [r for r in rows if wanted is None or r[0] in wanted]
-        if [r[0] for r in picked] != (wanted if wanted is not None else [r[0] for r in rows]):
+        picked = [r for r in rows if r[0] in wanted]
+        if [r[0] for r in picked] != wanted:
             fail(f"container lacks some of the wanted ayahs {wanted}")
+            continue
+        # A name without an ayah is a whole surah: the container must have exactly these ayahs.
+        if "-" not in name and [r[0] for r in rows] != wanted:
+            fail(f"{name} is a whole surah of {len(wanted)} ayahs, the container has {len(rows)}")
             continue
         expected = b"".join(b for _, b, _ in picked)
         if not os.path.exists(path):

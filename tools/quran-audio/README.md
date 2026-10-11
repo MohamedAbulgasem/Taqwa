@@ -3,8 +3,12 @@
 Mirrors the Islamic Network per-ayah recitation corpus, verifies it, packs one `.taqa` container
 per (reciter, surah) with the MP3 bytes untouched, and publishes the containers on the
 `Taqwa-data` GitHub releases. Each script's docstring says what it does and how to run it;
-`common.py` holds the shared configuration, including the cache root `WORK` (override it with
-`TAQWA_AUDIO_WORK`).
+`common.py` holds the shared configuration, including the cache root `WORK`. Its default is a
+scratch path from an earlier session that no longer exists, so always set `TAQWA_AUDIO_WORK` to a
+scratch directory of your own, outside the repository (the four adhkar containers below are
+about 59 MB together, almost all of it Al-Baqarah), for example:
+
+    TAQWA_AUDIO_WORK=$HOME/taqwa-audio-work python3 -I adhkar_clips.py
 
 ## Adhkar first-run clips
 

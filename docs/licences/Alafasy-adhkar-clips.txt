@@ -16,11 +16,11 @@ app bundles those four items in the voice of the default reciter, Mishary Rashid
 They play only when Alafasy is the reciter the reader chose and the surah is not downloaded.
 
 What they are. The clips are byte-identical cuts of the corpus's own files, with no re-encoding.
-Each is the ayah MP3s of the surah named below, taken from Alafasy's `.taqa` container and
-concatenated in ayah order, the way the app's recitation previews are cut (the preview for each
-reciter is the raw bytes of Al-Fatiha 1:1 followed by 1:2). Nothing was decoded, trimmed,
-re-tagged or re-encoded; every byte of a clip is a byte the Islamic Network published, at the
-bitrate they published.
+Each clip is made of the ayah MP3s of the passage named in the list above, taken from
+Alafasy's `.taqa` container and concatenated in ayah order, the way the app's recitation
+previews are cut (the preview for each reciter is the raw bytes of Al-Fatiha 1:1 followed by
+1:2). Nothing was decoded, trimmed, re-tagged or re-encoded; every byte of a clip is a byte the
+Islamic Network published, at the bitrate they published.
 
 Where the bytes came from. The Islamic Network corpus, as Taqwa mirrors it on the public GitHub
 release audio-ar.alafasy-v1 of MohamedAbulgasem/Taqwa-data
@@ -74,11 +74,14 @@ same bytes, and tools/quran-audio/check_adhkar_clips.py re-derives each clip fro
 containers and compares byte for byte (it exits 1 on any difference).
 
 Licence. The terms are the ones docs/ATTRIBUTION.md records for every recitation Taqwa
-carries: the recordings are licensed to the Islamic Network by the reciters or their estates for
-free, non-commercial redistribution at the bitrates they publish
-(https://alquran.cloud/terms-and-conditions, section IV); copyright lies with the reciters, and
-any of them may ask to be removed. The clips are redistributed on exactly those terms, at the
-published bitrate, unmodified. They are not covered by Taqwa's GPL-3.0.
+carries. Its Recitations entry opens with this sentence, quoted verbatim (the Markdown is the
+file's own):
+
+    "**Recitations**: per-ayah recordings from the [Islamic Network](https://alquran.cloud) (`cdn.islamic.network`), licensed to them by the reciters or their estates for free, non-commercial redistribution at the bitrates they publish ([terms](https://alquran.cloud/terms-and-conditions), §IV)."
+
+The clips are redistributed on exactly those terms: free, non-commercial redistribution at the
+bitrate the Islamic Network publishes, unmodified. Copyright lies with the reciters, and any of
+them may ask to be removed. They are not covered by Taqwa's GPL-3.0.
 The verbatim text of section IV, as read on 12 September 2026, is quoted in
 docs/superpowers/specs/2026-09-12-taqwa-quran-recitation-investigation.md.
 
