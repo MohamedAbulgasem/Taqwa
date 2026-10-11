@@ -78,19 +78,19 @@ class LocalizedNotificationCopyTest {
     // two: the noun then takes the singular (English, French) or Arabic's singular and dual.
     @Test
     fun aReminderWithOneOrTwoMinutesLeftTakesTheLanguagesOwnNumber() {
-        val c = "[clock]"
+        val c = "05:35" // a 24-hour time, set bare (the 12-hour work isolates anything else)
         val en = LocalizedNotificationCopy(StubFormat("en-GB", arabicIndic = false))
-        assertEquals("Fajr · الفجر in 1 minute · [clock]", en.body(Prayer.FAJR, NotificationKind.REMINDER, c, 1))
-        assertEquals("Fajr · الفجر in 2 minutes · [clock]", en.body(Prayer.FAJR, NotificationKind.REMINDER, c, 2))
+        assertEquals("Fajr · الفجر in 1 minute · 05:35", en.body(Prayer.FAJR, NotificationKind.REMINDER, c, 1))
+        assertEquals("Fajr · الفجر in 2 minutes · 05:35", en.body(Prayer.FAJR, NotificationKind.REMINDER, c, 2))
         val fr = LocalizedNotificationCopy(StubFormat("fr-FR", arabicIndic = false))
         assertTrue(fr.body(Prayer.ISHA, NotificationKind.REMINDER, c, 1).contains("dans 1 minute ·"))
         assertTrue(fr.body(Prayer.ISHA, NotificationKind.REMINDER, c, 2).contains("dans 2 minutes ·"))
         val ar = LocalizedNotificationCopy(StubFormat("ar-EG", arabicIndic = true))
-        assertEquals("العشاء بعد دقيقة · [clock]", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 1))
-        assertEquals("العشاء بعد دقيقتين · [clock]", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 2))
-        assertEquals("العشاء بعد ٣ دقائق · [clock]", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 3))
-        assertEquals("العشاء بعد ١٢ دقيقة · [clock]", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 12))
-        assertEquals("Isha in 1 minute · [clock]", EnglishNotificationCopy.body(Prayer.ISHA, NotificationKind.REMINDER, c, 1))
+        assertEquals("العشاء بعد دقيقة · 05:35", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 1))
+        assertEquals("العشاء بعد دقيقتين · 05:35", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 2))
+        assertEquals("العشاء بعد ٣ دقائق · 05:35", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 3))
+        assertEquals("العشاء بعد ١٢ دقيقة · 05:35", ar.body(Prayer.ISHA, NotificationKind.REMINDER, c, 12))
+        assertEquals("Isha in 1 minute · 05:35", EnglishNotificationCopy.body(Prayer.ISHA, NotificationKind.REMINDER, c, 1))
         for (tag in listOf("tr-TR", "id-ID", "ur-PK", "bn-BD")) {
             val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
             val one = copy.body(Prayer.ISHA, NotificationKind.REMINDER, c, 1)
