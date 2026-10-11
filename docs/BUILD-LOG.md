@@ -3208,7 +3208,7 @@ every year, as its 2027. Three of those showed the engine early in 2027: Kemenag
 Foundation of Ireland and the IZ BiH vaktija. Qatar's ministry was early on one day of Ramadan 1448,
 and BIK's end of eating ran past its limit once.
 
-- **Kemenag's step at the March equinox.** myQuran published Kemenag's 2027 on 5 October. That day's
+- **Kemenag's step at the March equinox.** The weekly monitor first read Kemenag's 2027 on 5 October. That day's
   prove added nine of the 18 kab/kota and left the other nine out. Eight were a minute early on 21 or
   22 March 2027, at Dhuhr, Maghrib or Isha, and Palembang's Asr on 30 September. Kemenag's own tables
   step at the equinox: on 21 and 22 March a printed Dhuhr, Maghrib or Isha lags the smooth curve by
@@ -3264,8 +3264,8 @@ What did not move, and why (the stamps' last day as before):
 - **No 2027 source:** Kuwait, Syria, Kyrgyzstan, Uzbekistan (computed in the browser), the UAE's
   Awqaf (its API answers 401), Montenegro, DUM RF, Wifaqul, Dawat-e-Islami's India, the ICCI (its
   site computes in the browser).
-- **Cautious entries:** Ireland, Toronto, Chicago, Canada and the US ISNA, Germany, the Netherlands
-  and Switzerland wait for every member's 2027. Against Diyanet's Berlin 2027 alone, Germany's members'
+- **Cautious entries:** Ireland, Toronto, Chicago, Canada and the US ISNA, Germany and the Netherlands
+  wait for every member's 2027 (Switzerland's FIDS, not cautious, was carried by the review, below). Against Diyanet's Berlin 2027 alone, Germany's members'
   spread reads as lateness far over the limits (Isha up to 144 min, end of eating 147 min before), as
   the Netherlands' did. That is not the engine's error, so nothing is recorded.
 
@@ -3287,3 +3287,89 @@ Checked: tools `jvmTest` 307/0 with the archive; `checkStamps` (71 entries) gree
 the Android host, with the iOS test compile; the monitor's Python tests 108/0 on both Pythons.
 `CI=true generate` writes 55 cities, the site builds 164 pages with every check good, and its tests
 pass 18/0.
+
+### The review's fixes (11 October, track T4's fixer)
+
+The review found the fixed tables' days blind to the date's own sun, Switzerland a minute early in
+2027 against a table the archive held, Kemenag's 2028 already published, Lebanon's late 2026 unchecked
+and the held-out counts overstated.
+
+- **A fixed table's day is held to the date's own sun.** `fixedTableYear` moved 2026's whole day onto the
+  date, its sunset too, so neither the invariants nor the Maghrib cap saw the date's own sun. Against the
+  plain sun at the same points, IFI's Dublin showed a sunrise a minute after the sun's on 19 days of March
+  2028, and a Maghrib on the minute the sun set on 41 days of March and April 2028 and 24 of February to
+  April 2029. Ireland's automatic entry inherited both through its IFI member. The day now keeps:
+  - the sunrise shown, and Fajr's end, never after the sun's own sunrise;
+  - Maghrib never before the minute after the sun's own sunset, and Isha after it;
+  - the date's own sunset, Asr's end and red twilight.
+
+  `DayComputerTest` runs IFI and Ireland's automatic entry at Dublin through 2026–2030 against the plain
+  sun; it fails without the bounds. At the three Bosnian towns and in Kosovo neither bound binds from
+  2027 to 2030, so their figures do not move. At IFI no worst figure moves either; the exact shares of
+  sunrise and Maghrib fall from 67.4 to 66.1 % and 58.1 to 53.8 %.
+- **29 February.** The table's year, 2026, has none, and the builder's day showed 28 February's.
+  vaktija.ba's own February 2028 (its six raw answers are in the archive) prints 29 February between 28
+  February and 1 March: Asr, Maghrib and Isha a minute after 28 February's, sunrise a minute before. So 28
+  February alone was a minute early at Sarajevo's Isha and a minute late at its sunrise. The day is now
+  the safe side of 28 February and of the would-be 29 February: the day after it on 2026's sun, read
+  with February's monthly offsets and 29 February's curve slot, as a town of base table plus month's
+  offset prints it. Checked outside the committed rows (2028 is past the stamps): never early at the
+  three towns. Isha is up to 3 min late at Banja Luka and Bihać, whose curves carry 1 March's offset
+  change, over class B's 2 that one day.
+- **Bosnia's edge keeps the real dawn.** Beyond the three towns the edge inherited the fixed year, and its
+  Fajr ran up to 60 s before the year's own at Mostar, Trebinje, Tuzla and Novi Pazar. `fixedTableOwnDawn`
+  (on `ba.iz.edge` only) keeps Fajr no earlier, and the end of eating no later, than the year's own 18°
+  dawn gives. Over 2027–2030 that moves Fajr a minute later on 274 days at Mostar and 307 at Tuzla, most
+  in 2028, and the end of eating a minute earlier on 231 and 240. No gate row reads the edge.
+- **Switzerland.** FIDS prints Diyanet Zürich's table, and the archive held Diyanet Zürich to 31 December
+  2027. Against it, the margins fitted on FIDS's one month were a minute early at Maghrib on 5 days of
+  2027 and a minute late at sunrise on 9. Zürich's unit now takes Diyanet Zürich's own method and margins,
+  green on both rows: 403 place-days, worst 3 (Fajr, Isha and the end of eating, as Diyanet's own unit).
+  The exact shares over the larger set: sunrise 65.9 %, Dhuhr and Asr 75.2 %, Maghrib 84.5 %. A fit over
+  both rows would have taken sunrise 12 s later, Dhuhr 4 s, Asr 5 s, Fajr 8 s, Isha 3 s and the end of
+  eating 15 s, and Maghrib not at all. The row is fit, not held out, since Diyanet's margins were fitted on
+  its Zürich table of the same days. The stamp now reads through 31 December 2027 (an owner decision). The
+  edge beyond Zürich's reach keeps FIDS's month-fitted margins, a minute more. A `recipes.tsv` line now
+  clones each new Diyanet Zürich capture into `ch-fids.tsv` as well, as `be-emb.tsv` and the cautious files
+  already take Diyanet's.
+- **Kemenag's 2028.** myQuran answers 2024 and 2028 already. 2028 was read for all eighteen with the
+  monitor's own `kemenag.py` code (place-name check included), and pinned under
+  `tables/pinned/id-kemenag/2026-10-11/` with its 216 raw answers. It agrees on every day with the review's
+  own fetch. Averaged over the eighteen, the step falls on 21 and 22 March in 2024, 2026 and 2027 and on 21
+  March alone in 2028, never on 20 March, so `LAG_EQUINOX_KEMENAG`'s two dates cover the leap years. 2028
+  is the held-out year, never fitted on: 6,588 place-days, 0 early, 0 late ends, worst 1 but the end of
+  eating's 2. Every 2026 and 2027 row is now fit, since the margins were fitted over all of them.
+- **Lebanon.** The perpetual table was mapped onto 2024 (fit) and 2027, so 2 October to 31 December 2026
+  was claimed but unchecked. It is mapped onto 2025 and 2026 too, derived exactly as the 2027 file (the
+  same script reproduces that file byte for byte). Green: 1,469 place-days, every worst within its
+  recorded limit, nothing new recorded.
+- **Held out means held out.** Under `fixedTableYear` the 2027–2029 rows of IFI, the vaktija and BIK
+  compare the 2026 computation, moved, with the 2026 table re-dated. They check the clock-change days, the
+  move and the sun's bounds, not a new year, so they are now fit. Qatar's 2027 set its Dhuhr (+42) and its
+  Ramadan Maghrib, so it is fit too. Held-out days: Kemenag 6,588 (was 8,226), Qatar 2,845 (5,765), IFI and
+  Bosnia 0 (1,095), Kosovo 365 (1,095).
+- **Qatar's seconds.** Gated at whole seconds, Ramadan's Maghrib is a minute early on 25 February 2027 at
+  all five places with 0 or 1 s more and clean from 2 s. The 8 s shipped leave 6.
+- Wording: Kosovo's 2027 is a derived table, not a printed one (Balkans.kt); the 2027+ fixed-table rows say
+  what they check (`ie-ifi.tsv`, `ba-iz.tsv`, `xk-bik.tsv`).
+
+The whole gate is 11,061 rows and 4,020,317 place-days: 0 early, 0 late ends, none over a limit, nothing
+broken. Before the review it was 11,040 and 4,012,636. Stamps that moved: `ch.fids` (through 2027-12-31),
+`id.kemenag` (through 2028-12-31), `lb.fatwa` (1,469 place-days), IFI's two exact shares, and the
+held-out counts above. The golden vector moved on 29 rows against the builder's:
+- 7 at Zürich, for Diyanet's margins;
+- the 29 February rows of Mostar, Preševo and Dublin (Dublin's with its sun bounds);
+- the edge's Fajr a minute later or its end of eating a minute earlier on 6 rows at Mostar and Sandžak;
+- the sunset back to the date's own (as on `main`) on 17 rows, on 13 of them alone.
+
+Against `main` it moved on 55 rows.
+
+The archive gained, as new files only: Kemenag's eighteen 2028 tables (`tables/pinned/id-kemenag/2026-10-11/`)
+and their 216 raw answers (`raw/monitor/id-kemenag/2026-10-11/`); Lebanon's 2025 and 2026 mappings
+(`tables/normalized-7e/`, listed in `MANIFEST.tsv`); and vaktija.ba's February and March 2028 for the
+three towns, six raw answers (`raw/manual/ba-iz/2026-10-11/`), the 29 February evidence.
+
+Checked: tools `jvmTest` 307/0 with the archive, and the prove and city-unit tests again after the recipe
+line; `checkStamps` (71 entries) green; shared 1,620/0 on the Android host, with the iOS test compile; the
+monitor's Python tests 108/0 on both Pythons; `CI=true generate` 55 cities, the site 164 pages with every
+check good, its tests 18/0.

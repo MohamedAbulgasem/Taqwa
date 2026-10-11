@@ -165,7 +165,12 @@ Two kinds of table say so in their method (track T4, 11 October 2026). A table t
 the same every year, month and day for month and day on a fixed clock (the Islamic Foundation of
 Ireland's, the IZ BiH vaktija, BIK's Takvimi), is computed as the year it was fitted on and moved onto
 the date at the same moment of the UTC day (`fixedTableYear`), so that each year shows the table's
-own times and the leap cycle cannot drift a start early. A table that holds the day before's times on
+own times and the leap cycle cannot drift a start early. The date's own sun still bounds what the
+table's year cannot know (the review of track T4): no sunrise after the sun's, no Maghrib before the
+minute after its sunset, the date's own sunset, Asr's end and red twilight; and a 29 February the
+table's year lacks is the later start and earlier end of its 28 February and of the day after read as
+February. Where no table is held and Taqwa keeps the real dawn (IZ BiH's edge), Fajr is also never
+before the date's own (`fixedTableOwnDawn`). A table that holds the day before's times on
 known dates says so in its day rule, starts the later of the two days and ends the earlier: Umm
 al-Qura's lag dates, MUIS's neighbours, and Kemenag's step at the March equinox (21 and 22 March).
 
