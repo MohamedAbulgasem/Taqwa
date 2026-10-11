@@ -3325,10 +3325,15 @@ and the held-out counts overstated.
   2027. Against it, the margins fitted on FIDS's one month were a minute early at Maghrib on 5 days of
   2027 and a minute late at sunrise on 9. Zürich's unit now takes Diyanet Zürich's own method and margins,
   green on both rows: 403 place-days, worst 3 (Fajr, Isha and the end of eating, as Diyanet's own unit).
+  Diyanet's margins take `ch.fids`'s worst Fajr, Isha and end of eating to 3 min, class D's limit, up from
+  1 with FIDS's month-fitted margins.
   The exact shares over the larger set: sunrise 65.9 %, Dhuhr and Asr 75.2 %, Maghrib 84.5 %. A fit over
   both rows would have taken sunrise 12 s later, Dhuhr 4 s, Asr 5 s, Fajr 8 s, Isha 3 s and the end of
   eating 15 s, and Maghrib not at all. The row is fit, not held out, since Diyanet's margins were fitted on
-  its Zürich table of the same days. The stamp now reads through 31 December 2027 (an owner decision). The
+  its Zürich table of the same days (pre-existing, and the same of Diyanet's own unit: `tr-diyanet-europe.tsv`'s
+  two Zürich capture rows, held out, repeat `dy-zurich.txt`, fit, on 393 of their 393 shared days, so they
+  hold out nothing). The stamp now reads through 31 December 2027 (an owner decision); no Zürich table holds
+  2 November to 31 December 2026, so About says 1 November 2026 until 2027 (the re-verify's fixes, below). The
   edge beyond Zürich's reach keeps FIDS's month-fitted margins, a minute more. A `recipes.tsv` line now
   clones each new Diyanet Zürich capture into `ch-fids.tsv` as well, as `be-emb.tsv` and the cautious files
   already take Diyanet's.
@@ -3373,3 +3378,51 @@ Checked: tools `jvmTest` 307/0 with the archive, and the prove and city-unit tes
 line; `checkStamps` (71 entries) green; shared 1,620/0 on the Android host, with the iOS test compile; the
 monitor's Python tests 108/0 on both Pythons; `CI=true generate` 55 cities, the site 164 pages with every
 check good, its tests 18/0.
+
+### The re-verify's fixes (11 October, track T4's second fixer)
+
+- **About's date stops at the first unchecked day.** The checked template's "checked against {authority}'s
+  timetable through {date}" gave the stamp's `last`, the end of its envelope, but the checked runs (ruling
+  R115) can have holes. Zürich's tables jump from 1 November 2026 to 1 January 2027: FIDS's month ends on 26
+  October, and both Diyanet Zürich captures and `dy-zurich.txt` hold no day between. So `ch.fids` claimed 31
+  December 2027 across two unchecked months. Diyanet's own entries have the same hole (Türkiye's thirteen
+  units and the European cities; `main` already had it at Diyanet's Zürich unit). `ProofStamps` now carries
+  each entry's checked runs, and a unit's own where they differ. About's date is the end of the run holding
+  the day it is read on, so it never runs past a day the place's own table was not checked on, as the city
+  page's date never does. On a day no run holds it gives the end of the latest run before it, a date already
+  past; before the first run, no date. Counted from the stamp's first day instead, the rule would have dated
+  Jordan's About 8 January 2021 and Tunisia's 10 November 2019, whose stamps begin with sampled survey days.
+  So it counts from the day About is shown. `ProofStamp.provenThrough` is renamed `lastChecked`: it is still
+  the stamp's `last`, the end of the envelope, and no longer read as a claim. The stamps themselves are
+  unchanged.
+
+  The dates that move, read on 11 October 2026. The app shows them at class A and B places only; a cautious
+  or class D place says no date.
+  - `tr.diyanet` (Türkiye, class A), at all thirteen units: 31 December 2027 to 1 November 2026, and 31
+    December 2027 again from 1 January 2027.
+  - `om.mara` (Oman, B): 30 September 2031 to 31 December 2026. Nothing from 2027 to 2030 is checked; the
+    two 2031 months are spot checks.
+  - `bn.mora` (Brunei, B): 31 December 2026 to 13 December 2026, since no row holds 14 December.
+  - `tn.inm` at Ben Guerdane, Tabarka and Tala (B): 30 December 2026 to the latest of their every-third-day
+    checks (11 October 2026 on that day).
+  - No date shown: `ch.fids`, `other.turkey`, `be.cautious` and `tr.diyanet.europe` (19 units) to 1
+    November 2026, and its other 14 units, Danish, Norwegian, Swedish and Finnish towns from Aalborg to
+    Uppsala, to 29 October 2026; `ie.ifi` to 28 February 2028 (no row
+    holds 29 February 2028); `au.lma` and `au.cautious` to 1 December 2026; `ca.ift` and `ca.toronto` to 31
+    October 2026; `za.voc` to 31 October 2026; `at.iggo`, `nz.fianz` and `pk.karachi` to 30 September 2026;
+    `bd.ifb` to its latest sampled day (6 October 2026).
+- **Kemenag's note.** The comment on the other nine 2027 rows in `id-kemenag.tsv` said split=test. Those rows
+  are fit, as is the header.
+- **Zürich's margins.** The Switzerland bullet above now says that Diyanet's margins take `ch.fids`'s worst
+  to 3 min, up from 1. It also says that Diyanet's own Zürich capture rows repeat its fit file (pre-existing).
+- **Follow-up for 2028, not gated yet.** vaktija.ba's 29 February 2028 Isha comes 3 min late at Banja Luka and
+  Bihać under the new 29 February rule, over class B's 2 (the 29 February bullet above). It is recorded here,
+  not as an R41 limit. A `LateLimit` has no date, so one would loosen Isha at both towns on every day, and
+  About's "at most" figure with it, for one day that no row gates. When 2028 is gated, either the rule for
+  that day brings Isha back within 2, or a limit is recorded then with its reason.
+
+The whole gate is still 11,061 rows and 4,020,317 place-days: 0 early, 0 late ends, none over a limit, nothing
+broken. No stamp and no golden-vector row moved; `ProofStamps.kt` gained the runs.
+
+Checked: `checkStamps` (71 entries) green; tools `jvmTest` 307/0 with the archive; shared 1,621/0 on the
+Android host; `CI=true generate` 55 cities, the site 164 pages with every check good, its tests 18/0.
