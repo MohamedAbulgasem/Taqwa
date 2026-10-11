@@ -320,16 +320,17 @@ private fun CityAndDates(
     // The horizon and the misbaha (spec Tasbeeh §5; adhkar spec §2.2) sit on the city's line at the
     // end of the block, and only there: the dates below run the block's whole width, gutter to
     // gutter, as they did before the horizon came. They are laid over the block's top corner rather
-    // than put in a Row beside the city, for two reasons. A Row would be 44 dp tall against a city
-    // line of about 33 and so push the dates 11 dp lower, where it is the *text* column that sets
-    // the block's height, the buttons being aligned to the city's line rather than stretched. And
-    // they stay outside the block's clickable, so a tap on one never opens the ⓘ's card and neither
-    // joins its 48 dp target or its one screen-reader label.
+    // than put in a Row beside the city, so they stay outside the block's clickable: a tap on one
+    // never opens the ⓘ's card, and neither joins its 48 dp target or its one screen-reader label.
+    // Laid over, they take no height of their own, so it is the city's line, held just clear of
+    // their targets ([CityLineMinHeight]), that keeps the dates below them rather than inside them.
     Box(
         Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp),
     ) {
-        // The whole city-and-date block is the ⓘ's 48 dp target (spec §2.1). No ripple, like
-        // every surface on this screen: the card opening is the feedback.
+        // The whole city-and-date block is the ⓘ's target, never under 48 dp (spec §2.1). With the
+        // city's line held to [CityLineMinHeight] it is always taller than that; the floor keeps
+        // the promise should that minimum ever go. No ripple, like every surface on this screen:
+        // the card opening is the feedback.
         Column(
             Modifier
                 .fillMaxWidth()
@@ -345,16 +346,21 @@ private fun CityAndDates(
                     onClick = { whoseOpen = true },
                 ),
         ) {
-            Text(
-                // Resolved by the view model, in the interface's language; `location.cityName` stays
-                // the English snapshot and is only what this falls back to.
-                place,
-                // The city shares its line with the two glyphs, so it stops short of them (and wraps
-                // there when it is long); the dates below do not.
-                modifier = Modifier.padding(end = HeaderGlyphSize * 2),
-                style = TaqwaText.screenTitle,
-                color = colors.textPrimary,
-            )
+            // The minimum sits on a box around the city rather than on its Text, so the city's own
+            // bounds stay those of its words, which is what the header tests read as its lines; on
+            // screen the two are the same.
+            Box(Modifier.defaultMinSize(minHeight = CityLineMinHeight)) {
+                Text(
+                    // Resolved by the view model, in the interface's language; `location.cityName`
+                    // stays the English snapshot and is only what this falls back to.
+                    place,
+                    // The city shares its line with the two glyphs, so it stops short of them (and
+                    // wraps there when it is long); the dates below do not.
+                    modifier = Modifier.padding(end = HeaderGlyphSize * 2),
+                    style = TaqwaText.screenTitle,
+                    color = colors.textPrimary,
+                )
+            }
             // Hijri first, then the Gregorian a step quieter: one line, the two calendars read
             // as a pair. The separator is punctuation, not a translated string, so it is the
             // same in both languages; the bidi algorithm orders the halves under Arabic.
@@ -419,6 +425,22 @@ private const val INFO_GLYPH = "info"
 /** The side of a header glyph's square target; the city stops two of them short of the block's end. */
 private val HeaderGlyphSize = 44.dp
 
+/** How far each header glyph is lifted above the block's top, onto the city's line ([HeaderGlyphButton]). */
+private val HeaderGlyphNudge = 4.dp
+
+/** The air between the bottom of the glyphs' targets and the top of the dates. */
+private val HeaderGlyphGap = 2.dp
+
+/**
+ * The least height of the city's line: down to where the glyphs' targets end, then
+ * [HeaderGlyphGap]. A one-line city is shorter than the targets reach (29 dp in English on the
+ * iPhone, 30 in Arabic, against 40), so without it the dates would begin inside the glyphs'
+ * targets, and a tap on the ⓘ that ends their first line, which can fall under either glyph, could
+ * open the adhkar or the tasbeeh instead of its card. A minimum and not a padding, so a city line
+ * already that tall (two lines, or a text size from about 1.45 times up) gets nothing added.
+ */
+private val CityLineMinHeight = HeaderGlyphSize - HeaderGlyphNudge + HeaderGlyphGap
+
 /**
  * What sits between the prayer list and the Qibla card, each only where it applies (spec §2.1):
  * the "Cautious times ›" line and, on a polar day, the line that says some times follow a nearby
@@ -477,15 +499,17 @@ private fun UnderTheList(state: TodayUiState.Ready, actions: ReadyActions) {
  * and the Qibla card — the pushed screen is the feedback. It carries a content description
  * because it is a glyph with no words beside it.
  *
- * Nudged up by 4 dp so the 22 dp glyph sits on the city's own line rather than on the block's
- * centre, which the two lines of dates below would otherwise pull it down to.
+ * Nudged up by [HeaderGlyphNudge], which puts the 22 dp glyph's centre 18 dp down the block rather
+ * than 22, on the city's own line rather than low against it. The target then ends 40 dp down,
+ * deeper than a one-line city reaches, which is why the city's line is held to
+ * [CityLineMinHeight]: the dates start [HeaderGlyphGap] below the target, never inside it.
  */
 @Composable
 private fun HeaderGlyphButton(description: String, onOpen: () -> Unit, draw: DrawScope.(Color) -> Unit) {
     val colors = LocalTaqwaColors.current
     Box(
         Modifier
-            .offset(y = (-4).dp)
+            .offset(y = -HeaderGlyphNudge)
             .size(HeaderGlyphSize)
             .clip(CircleShape)
             .clickable(

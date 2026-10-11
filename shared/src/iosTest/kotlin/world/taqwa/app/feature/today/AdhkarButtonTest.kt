@@ -4,8 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ComposeUiTest
@@ -21,7 +27,10 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -56,8 +65,9 @@ import kotlin.time.Instant
  * 44 dp target. Run upright and sideways, and in both layout directions, because the landscape body
  * shares the header row and "the misbaha keeps the corner" must hold under Arabic too.
  *
- * They sit on the city's line and nowhere else: the dates below run the block's whole width, the
- * glyphs are not part of the ⓘ's target, and a tap on one never opens the ⓘ's card.
+ * They sit on the city's line and nowhere else: the dates below run the block's whole width and
+ * start 2 dp below the glyphs' targets, the glyphs are not part of the ⓘ's target, and a tap on
+ * one never opens the ⓘ's card.
  *
  * Expected descriptions come from the resources, not from literals: the simulator's language
  * decides every word on screen.
@@ -107,12 +117,15 @@ class AdhkarButtonTest {
         width: Dp,
         height: Dp,
         state: TodayUiState.Ready = ready(),
+        fontScale: Float = 1f,
     ) {
         // Not TaqwaTheme: it also installs the system-bar and keep-screen-on effects, which crash
         // the simulator test process. The colours are all the screen reads from it.
+        val density = LocalDensity.current
         CompositionLocalProvider(
             LocalTaqwaColors provides LightColors,
             LocalLayoutDirection provides direction,
+            LocalDensity provides Density(density.density, fontScale),
         ) {
             Box(Modifier.size(width, height)) {
                 TodayScreen(
@@ -179,6 +192,10 @@ class AdhkarButtonTest {
         val misbaha = onNodeWithContentDescription(tasbeeh).fetchSemanticsNode().boundsInRoot
         // Side by side on one line, not stacked.
         assertEquals(horizon.top, misbaha.top)
+        // On the city's line, lifted by the nudge above its top, upright and sideways alike.
+        val cityTop = onNode(hasText(city), useUnmergedTree = true).getUnclippedBoundsInRoot().top.value
+        val glyphTop = onNodeWithContentDescription(adhkar).getUnclippedBoundsInRoot().top.value
+        assertEquals(cityTop - GLYPH_NUDGE, glyphTop, 0.5f, "the glyphs should sit $GLYPH_NUDGE dp above the city's top")
         when (direction) {
             LayoutDirection.Ltr -> assertTrue(horizon.right <= misbaha.left, "LTR: $horizon should end before $misbaha starts")
             LayoutDirection.Rtl -> assertTrue(misbaha.right <= horizon.left, "RTL: $misbaha should end before $horizon starts")
@@ -286,8 +303,10 @@ class AdhkarButtonTest {
         // The city leaves the two glyphs' 88 dp; the dates do not.
         assertTrue(title.width.value <= block.width.value - 88f + 1f, "city $title in block $block")
         assertTrue(dates.width.value > block.width.value - 88f + 1f, "dates $dates should use the room under the glyphs, block $block")
-        // The dates sit straight under the city's own lines, not under a 44 dp row of glyphs.
-        assertEquals(title.bottom.value, dates.top.value, 0.5f, "dates $dates under city $title")
+        // The dates sit straight under the city's own lines, which wrap here to well below the
+        // glyphs' targets, not under a 44 dp row of glyphs.
+        val header = header(longCity, hijri)
+        assertEquals(header.datesBelong, dates.top.value, 0.5f, "dates $dates under city $header")
         // The glyphs are the block's end corner, the horizon beside the misbaha.
         when (direction) {
             LayoutDirection.Ltr -> {
@@ -314,17 +333,146 @@ class AdhkarButtonTest {
     }
 
     @Test
-    fun theGlyphsDoNotSetTheBlocksHeight() = runComposeUiTest {
-        // The glyphs are 44 dp tall against a city line of about 33; the text sets the height.
+    fun theGlyphsHoldTheDatesOnlyBelowTheirOwnReach() = runComposeUiTest {
+        // The glyphs' targets reach 40 dp down the block (44 dp, lifted 4) against a one-line city
+        // of about 29: they hold the dates 2 dp below that reach and add nothing else.
         setContent { Screen(Taps(), LayoutDirection.Ltr, upright.first, upright.second) }
         val title = onNode(hasText(city), useUnmergedTree = true).getUnclippedBoundsInRoot()
         val dates = onNode(hasText("29 Rabi’ al-Awwal 1448", substring = true), useUnmergedTree = true)
             .getUnclippedBoundsInRoot()
         val block = onNodeWithText(city).getUnclippedBoundsInRoot()
-        assertEquals(title.bottom.value, dates.top.value, 0.5f)
-        // The two lines of text, or the block's 48 dp target if they are shorter; never the glyphs' 44 dp
-        // on top of the dates.
+        val header = header(city, "29 Rabi’ al-Awwal 1448")
+        assertEquals(header.datesBelong, dates.top.value, 0.5f, "$header")
+        // The city's line and the dates, or the block's 48 dp target if they are shorter; never the
+        // glyphs' 44 dp stacked on top of the dates.
         val text = dates.bottom.value - title.top.value
         assertTrue(abs(block.height.value - maxOf(48f, text)) < 1f, "block $block title $title dates $dates")
+    }
+
+    // ---- The dates start below the glyphs' targets, and no lower than that needs ---------------
+
+    /**
+     * The block's own words as the app shows them under Arabic: the city and both dates in Arabic,
+     * Eastern Arabic digits. The rest of the screen keeps the simulator's language.
+     */
+    private fun arabic(city: String = "إسطنبول") =
+        ready(city = city, hijri = "٢٩ ربيع الأول ١٤٤٨", gregorian = "١١ أكتوبر ٢٠٢٦")
+
+    /** Where the header's lines and targets fall, down the root, in dp. */
+    private data class Header(
+        val cityTop: Float,
+        /** The bottom of the city's own lines, above whatever room the line's minimum adds. */
+        val cityTextBottom: Float,
+        val cityLines: Int,
+        val datesTop: Float,
+        /** The horizon's and the misbaha's tops. */
+        val targetsTops: List<Float>,
+        /** The lower of the two glyph targets' bottoms. */
+        val targetsBottom: Float,
+    ) {
+        /** Under the city's own lines, or [DATES_GAP] under the targets where those reach lower. */
+        val datesBelong: Float get() = maxOf(cityTextBottom, targetsBottom + DATES_GAP)
+    }
+
+    private suspend fun ComposeUiTest.header(city: String, hijri: String): Header {
+        // The city's own node is its text and nothing more; the line's minimum lies outside it.
+        val cityNode = onNode(hasText(city), useUnmergedTree = true)
+        val layouts = mutableListOf<TextLayoutResult>()
+        cityNode.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        val title = cityNode.getUnclippedBoundsInRoot()
+        val dates = onNode(hasText(hijri, substring = true), useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val horizon = onNodeWithContentDescription(getString(Res.string.today_open_adhkar)).getUnclippedBoundsInRoot()
+        val misbaha = onNodeWithContentDescription(getString(Res.string.today_open_tasbeeh)).getUnclippedBoundsInRoot()
+        return Header(
+            cityTop = title.top.value,
+            cityTextBottom = title.bottom.value,
+            cityLines = layouts.single().lineCount,
+            datesTop = dates.top.value,
+            targetsTops = listOf(horizon.top.value, misbaha.top.value),
+            targetsBottom = maxOf(horizon.bottom, misbaha.bottom).value,
+        )
+    }
+
+    /**
+     * The glyphs' targets reach 40 dp down the block (44 dp, lifted 4), deeper than a one-line city
+     * (29 dp in English, 30 in Arabic), so dates straight under the city would start inside them,
+     * and a tap on the ⓘ that ends their first line, which can fall under either glyph, could open
+     * the adhkar or the tasbeeh instead of its card. The dates start 2 dp below both targets, and no
+     * lower than that or the city's own lines need: at the default size a one-line city puts them
+     * exactly 2 dp below, and at twice the text size the city line clears the targets by itself and
+     * gets nothing added. The glyphs keep their place on the city's line throughout.
+     *
+     * One composition walks every size, so each case is the same screen re-laid out.
+     */
+    private suspend fun ComposeUiTest.datesStartBelowTheGlyphTargets(direction: LayoutDirection, state: TodayUiState.Ready) {
+        var width by mutableStateOf(360.dp)
+        var fontScale by mutableFloatStateOf(1f)
+        setContent { Screen(Taps(), direction, width, 760.dp, state, fontScale) }
+        val city = state.cityDisplayName!!
+        for (scale in listOf(1f, 2f)) {
+            for (each in listOf(360.dp, 411.dp)) {
+                fontScale = scale
+                width = each
+                waitForIdle()
+                val header = header(city, state.hijri)
+                val case = "$direction at $each and font scale $scale: $header"
+                assertTrue(
+                    header.datesTop >= header.targetsBottom + DATES_GAP - 0.5f,
+                    "the dates start inside a glyph's target or within $DATES_GAP dp of it, $case",
+                )
+                assertEquals(header.datesBelong, header.datesTop, 0.5f, "the dates are not where they belong, $case")
+                // Read from the targets and not from the city's bounds, so it holds wherever the
+                // line's minimum sits: a one-line city leaves the dates just the gap below them.
+                if (scale == 1f) {
+                    assertEquals(header.targetsBottom + DATES_GAP, header.datesTop, 0.5f, "the dates sit lower than the gap needs, $case")
+                }
+                for (top in header.targetsTops) {
+                    assertEquals(header.cityTop - GLYPH_NUDGE, top, 0.5f, "a glyph left the city's line, $case")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun theDatesStartBelowBothGlyphTargetsInEnglish() = runComposeUiTest {
+        datesStartBelowTheGlyphTargets(LayoutDirection.Ltr, ready())
+    }
+
+    @Test
+    fun theDatesStartBelowBothGlyphTargetsInArabic() = runComposeUiTest {
+        datesStartBelowTheGlyphTargets(LayoutDirection.Rtl, arabic())
+    }
+
+    /** A city long enough to wrap already reaches below the targets: the dates follow it with no gap. */
+    private suspend fun ComposeUiTest.aCityThatWrapsIsFollowedByTheDatesDirectly(direction: LayoutDirection, state: TodayUiState.Ready) {
+        setContent { Screen(Taps(), direction, 360.dp, 760.dp, state) }
+        val header = header(state.cityDisplayName!!, state.hijri)
+        assertTrue(header.cityLines >= 2, "the city should wrap at 360 dp: $header")
+        assertTrue(header.cityTextBottom > header.targetsBottom + DATES_GAP, "the wrapped city should reach below the targets: $header")
+        assertEquals(header.cityTextBottom, header.datesTop, 0.5f, "the dates should follow the city's lines directly: $header")
+    }
+
+    @Test
+    fun aCityThatWrapsIsFollowedByTheDatesDirectlyInEnglish() = runComposeUiTest {
+        aCityThatWrapsIsFollowedByTheDatesDirectly(
+            LayoutDirection.Ltr,
+            ready(city = "Saint Petersburg Saint Petersburg Saint Petersburg"),
+        )
+    }
+
+    @Test
+    fun aCityThatWrapsIsFollowedByTheDatesDirectlyInArabic() = runComposeUiTest {
+        aCityThatWrapsIsFollowedByTheDatesDirectly(
+            LayoutDirection.Rtl,
+            arabic(city = "سانت بطرسبرغ سانت بطرسبرغ سانت بطرسبرغ"),
+        )
+    }
+
+    private companion object {
+        /** The air the dates keep below the glyphs' targets. */
+        const val DATES_GAP = 2f
+
+        /** How far the glyphs' targets are lifted above the city's top. */
+        const val GLYPH_NUDGE = 4f
     }
 }

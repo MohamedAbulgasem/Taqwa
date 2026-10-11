@@ -122,13 +122,25 @@ to (14, 12); a half sun, the upper arc of radius 3.4 centred on (8, 12); three r
 
 ### 2.2 The button
 
-`AdhkarButton` beside `TasbeehButton` in `CityAndDates`: the same 44 dp circle, 22 dp glyph in
-`textPrimary`, the same −4 dp nudge, no ripple, `contentDescription = today_open_adhkar` ("Adhkar").
+The horizon's `HeaderGlyphButton` beside the misbaha's in `CityAndDates`: the same 44 dp circle
+(`HeaderGlyphSize`), 22 dp glyph in `textPrimary`, the same −4 dp nudge (`HeaderGlyphNudge`), no
+ripple, `contentDescription = today_open_adhkar` ("Adhkar").
 Order at the end of the city's row: the city, then the horizon, then the misbaha. The two buttons
 overlay the city's row only (the title keeps 88 dp clear for them); the date line beneath spans the
 block's full width, as it did before the second button, so the glyphs never change how the date is
-displayed (the owner's rule, 11 October 2026). Both the portrait and landscape bodies carry it. Nothing else on the Prayer screen changes: no line, no
-card, no count, no tint.
+displayed (the owner's rule, 11 October 2026). It does start lower, at the owner's request after an
+iPhone pass the same day: the targets reach 40 dp down the block (44 dp, nudged up 4) against a
+one-line city of 29 dp in English and 30 in Arabic, so the date line began inside the glyphs'
+targets, and on the owner's iPhone the ⓘ at its end sat inside the horizon's, where a tap on it
+could open the adhkar. The city's line is held to at least the targets' reach plus 2 dp
+(`CityLineMinHeight`), which moves the date down 13 dp in English and 12 in Arabic on the iPhone
+and everything below it 11, the block's 48 dp minimum having already held the other 1–2 dp, so the
+air between the date and the ring is now the 36 dp the portrait body plans for rather than 38 (37
+in Arabic). A two-line city, or a text size from about 1.45× up, already clears the targets and
+moves nothing; in between, the minimum adds less the larger the text: 9–10 dp at 1.1×, 3–5 at
+1.3×, 0–2 at 1.4×. Both the portrait and landscape bodies carry it; sideways the left pane is
+centred, so there the block's 11 dp shows as the city and both glyphs rising 6 dp and the ring
+dropping 5. Nothing else on the Prayer screen changes: no line, no card, no count, no tint.
 
 ### 2.3 What it opens
 
