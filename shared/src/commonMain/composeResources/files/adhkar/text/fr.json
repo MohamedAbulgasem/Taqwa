@@ -6,7 +6,7 @@
     },
     "hisn-078": {
       "evening": "Ô Allah, c’est par Toi que nous sommes parvenus au soir et par Toi que nous sommes parvenus au matin. Par Toi nous vivons et par Toi nous mourons, et vers Toi est le retour.",
-      "morning": "Ô Allah, c’est par Toi que nous sommes parvenus au matin et par Toi que nous sommes parvenus au soir. Par Toi nous vivons et par Toi nous mourons, et vers Toi est la résurrection."
+      "morning": "Ô Allah, c’est par Toi que nous sommes parvenus au matin et par Toi que nous sommes parvenus au soir. Par Toi nous vivons et par Toi nous mourons, et vers Toi est la Résurrection."
     },
     "hisn-079": {
       "both": "Ô Allah, Tu es mon Seigneur, il n’y a de dieu que Toi. Tu m’as créé et je suis Ton serviteur. Je reste fidèle à Ton pacte et à Ta promesse autant que je le peux. Je cherche refuge auprès de Toi contre le mal de ce que j’ai fait. Je reconnais devant Toi Ton bienfait envers moi, et je reconnais mon péché, pardonne-moi donc, car nul autre que Toi ne pardonne les péchés."
@@ -21,7 +21,7 @@
       "both": "Au nom d’Allah, avec le nom duquel rien ne peut nuire, ni sur la terre ni dans le ciel, et Il est l’Audient, l’Omniscient."
     },
     "hisn-088": {
-      "both": "Ô Vivant, ô Toi qui subsistes par Toi-même, c’est par Ta miséricorde que j’implore secours. Arrange pour moi toutes mes affaires et ne m’abandonne pas à moi-même, ne serait-ce que le temps d’un clin d’œil."
+      "both": "Ô Vivant, ô Toi qui subsistes par Toi-même, c’est par Ta miséricorde que j’implore secours. Améliore pour moi toutes mes affaires et ne m’abandonne pas à moi-même, ne serait-ce que le temps d’un clin d’œil."
     },
     "hisn-090": {
       "morning": "Nous voici au matin sur la nature originelle de l’islam, sur la parole de la sincérité, sur la religion de notre Prophète Muhammad ﷺ et sur la voie de notre père Abraham, qui était un monothéiste pur, musulman, et n’était pas du nombre des associateurs."
@@ -36,7 +36,7 @@
       "both": "Il n’y a de dieu qu’Allah, seul, sans associé, à Lui la royauté et à Lui la louange, et Il est capable de toute chose."
     },
     "hisn-094": {
-      "both": "Gloire et louange à Allah, selon le nombre de Ses créatures, Son propre agrément, le poids de Son Trône et l’encre de Ses paroles."
+      "both": "Gloire et louange à Allah, à la mesure du nombre de Ses créatures, de Son propre agrément, du poids de Son Trône et de l’encre de Ses paroles."
     },
     "hisn-095": {
       "both": "Ô Allah, je Te demande une science utile, une subsistance pure et une œuvre acceptée."
@@ -49,5 +49,5 @@
     }
   },
   "language": "fr",
-  "reviewed": false
+  "reviewed": true
 }

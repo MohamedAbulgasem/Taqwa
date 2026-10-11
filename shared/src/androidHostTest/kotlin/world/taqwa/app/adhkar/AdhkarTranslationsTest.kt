@@ -22,14 +22,14 @@ import kotlin.test.assertTrue
 class AdhkarTranslationsTest {
 
     private companion object {
-        /** OpenDua's published English. */
-        val REVIEWED = listOf("en", "bn")
+        /** OpenDua's published English, and every language whose reviewer has passed it (tools/adhkar/review/). */
+        val REVIEWED = listOf("en", "bn", "fr", "id", "tr", "ur")
 
         /**
          * Drafted 11 October 2026 and awaiting one reviewer each (tools/adhkar/TRANSLATIONS-FOR-REVIEW.md).
          * A reviewer who flips a file to `"reviewed": true` moves its language from here to [REVIEWED].
          */
-        val DRAFTS = listOf("fr", "id", "tr", "ur")
+        val DRAFTS = emptyList<String>()
     }
 
     private fun resource(name: String): File {
