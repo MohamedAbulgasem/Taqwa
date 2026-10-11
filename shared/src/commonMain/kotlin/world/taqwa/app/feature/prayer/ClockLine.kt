@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -42,15 +42,15 @@ import world.taqwa.app.i18n.isolated
 import world.taqwa.app.prayer.ClockIssue
 import world.taqwa.app.prayer.ClockWarning
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.today_card_ok
-import world.taqwa.app.resources.today_clock_line
-import world.taqwa.app.resources.today_clock_manual_early
-import world.taqwa.app.resources.today_clock_manual_late
-import world.taqwa.app.resources.today_clock_region_british_columbia
-import world.taqwa.app.resources.today_clock_region_kazakhstan
-import world.taqwa.app.resources.today_clock_region_morocco
-import world.taqwa.app.resources.today_clock_stale_early
-import world.taqwa.app.resources.today_clock_stale_late
+import world.taqwa.app.resources.prayer_card_ok
+import world.taqwa.app.resources.prayer_clock_line
+import world.taqwa.app.resources.prayer_clock_manual_early
+import world.taqwa.app.resources.prayer_clock_manual_late
+import world.taqwa.app.resources.prayer_clock_region_british_columbia
+import world.taqwa.app.resources.prayer_clock_region_kazakhstan
+import world.taqwa.app.resources.prayer_clock_region_morocco
+import world.taqwa.app.resources.prayer_clock_stale_early
+import world.taqwa.app.resources.prayer_clock_stale_late
 
 /**
  * True when the phone's clock is set by hand, false when it follows the network, null where the
@@ -86,7 +86,7 @@ internal fun ClockLine(onClick: () -> Unit, horizontalPadding: Dp) {
         InfoGlyph(colors.accent, Modifier.size(16.dp))
         Spacer(Modifier.width(10.dp))
         Text(
-            stringResource(Res.string.today_clock_line),
+            stringResource(Res.string.prayer_clock_line),
             modifier = Modifier.weight(1f),
             style = TaqwaText.caption.copy(fontSize = 13.sp, lineHeight = 18.sp),
             color = colors.textPrimary,
@@ -107,14 +107,14 @@ internal fun ClockSheet(warning: ClockWarning, onDismiss: () -> Unit) {
     val format = LocalPlatformFormat.current
     val body: StringResource = when (warning.issue) {
         ClockIssue.STALE_ZONE_DATA ->
-            if (warning.timesEarly) Res.string.today_clock_stale_early else Res.string.today_clock_stale_late
+            if (warning.timesEarly) Res.string.prayer_clock_stale_early else Res.string.prayer_clock_stale_late
         ClockIssue.SET_BY_HAND ->
-            if (warning.timesEarly) Res.string.today_clock_manual_early else Res.string.today_clock_manual_late
+            if (warning.timesEarly) Res.string.prayer_clock_manual_early else Res.string.prayer_clock_manual_late
     }
     val region = when (warning.change.id) {
-        "morocco" -> Res.string.today_clock_region_morocco
-        "british_columbia" -> Res.string.today_clock_region_british_columbia
-        else -> Res.string.today_clock_region_kazakhstan
+        "morocco" -> Res.string.prayer_clock_region_morocco
+        "british_columbia" -> Res.string.prayer_clock_region_british_columbia
+        else -> Res.string.prayer_clock_region_kazakhstan
     }
     TaqwaBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -125,7 +125,7 @@ internal fun ClockSheet(warning: ClockWarning, onDismiss: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(
-                stringResource(Res.string.today_clock_line),
+                stringResource(Res.string.prayer_clock_line),
                 style = TaqwaText.screenTitle.copy(fontSize = 20.sp),
                 color = colors.textPrimary,
             )
@@ -139,7 +139,7 @@ internal fun ClockSheet(warning: ClockWarning, onDismiss: () -> Unit) {
                 color = colors.textSecondary,
             )
             TaqwaPrimaryButton(
-                stringResource(Res.string.today_card_ok),
+                stringResource(Res.string.prayer_card_ok),
                 onClick = onDismiss,
                 modifier = Modifier.padding(top = 6.dp),
             )

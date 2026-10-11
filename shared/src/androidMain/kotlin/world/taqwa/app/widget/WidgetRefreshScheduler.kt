@@ -10,7 +10,7 @@ import android.content.Intent
  * The rolling, low-cost half of the Android widget's refresh cadence.
  *
  * Glance only re-renders when something asks it to. Until now the only askers were the app's own
- * mirror writes (which stop the moment the Today screen closes) and `updatePeriodMillis`, whose
+ * mirror writes (which stop the moment the Prayer screen closes) and `updatePeriodMillis`, whose
  * floor is 30 minutes and which the platform is free to stretch further. Since I8 the countdown is
  * computed from the device clock *at draw time*, so between two draws the number on the home
  * screen is simply frozen — "ASR IN 1:32" stays on screen long after it stopped being true.

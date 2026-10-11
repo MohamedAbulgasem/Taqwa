@@ -31,7 +31,7 @@ import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.feature.common.authorityShortName
-import world.taqwa.app.feature.today.formatClock
+import world.taqwa.app.feature.prayer.formatClock
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.isolatedClock
@@ -111,7 +111,7 @@ import world.taqwa.app.resources.asr_shadow_standard
 import world.taqwa.app.resources.timetable_calculated
 import world.taqwa.app.resources.timetable_cautious
 import world.taqwa.app.resources.timetable_match_mosque
-import world.taqwa.app.resources.today_whose_unchecked_body
+import world.taqwa.app.resources.prayer_whose_unchecked_body
 import kotlin.time.Instant
 
 /**
@@ -287,7 +287,7 @@ private fun AuthorityUncheckedContent(
         when (kind) {
             TimetableKind.AUTHORITY -> stringResource(Res.string.about_authority_unchecked_body, authority, unitLabel)
             TimetableKind.MAJORITY -> stringResource(Res.string.about_majority_unchecked_body, authority, unitLabel)
-            TimetableKind.METHOD -> stringResource(Res.string.today_whose_unchecked_body, authority, unitLabel)
+            TimetableKind.METHOD -> stringResource(Res.string.prayer_whose_unchecked_body, authority, unitLabel)
         },
     )
 

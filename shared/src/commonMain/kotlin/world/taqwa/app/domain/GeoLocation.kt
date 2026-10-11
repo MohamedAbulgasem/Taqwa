@@ -8,7 +8,7 @@ package world.taqwa.app.domain
  * [cityId] is the GeoNames id of the bundled city this location came from, and is what lets the
  * name be re-rendered in the reader's own language on every language change. It is null for a
  * location stored by a build older than this one (resolved once from the coordinates and written
- * back — see `TodayViewModel.migrateCityId`) and for a fix whose coordinates match no bundled
+ * back — see `PrayerViewModel.migrateCityId`) and for a fix whose coordinates match no bundled
  * city at all, which simply keeps showing [cityName].
  *
  * [region] is that city's first-level region (admin-1) as the bundled city list spells it

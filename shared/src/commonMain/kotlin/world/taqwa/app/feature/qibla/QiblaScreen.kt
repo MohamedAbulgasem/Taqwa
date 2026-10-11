@@ -56,7 +56,8 @@ import world.taqwa.app.resources.qibla_title
  * a narrow space in French, the Arabic thousands mark beside Arabic-Indic digits, a comma
  * elsewhere — with digits run through [PlatformFormat] one at a time (the same trick
  * `CountdownFormatter.padTwo` uses) so ar-EG reads Arabic-Indic and ar-LY reads Western, matching
- * how Today formats every other number. A city page groups its distance with the same function.
+ * how the Prayer screen formats every other number. A city page groups its distance with the same
+ * function.
  */
 internal fun localizedGroupedKm(km: Double, format: PlatformFormat): String =
     DigitGrouping.group(km.toLong(), format.languageTag(), format::localizedDigits)
@@ -212,8 +213,8 @@ private fun Readout(bearingDegrees: Double, distanceKm: Double) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
     Spacer(Modifier.height(24.dp))
-    // The mockup sets the bearing at 27px against Today's 29px countdown — the same tier, which
-    // in this app's type scale is `countdown` itself.
+    // The mockup sets the bearing at 27px against the Prayer screen's 29px countdown — the same
+    // tier, which in this app's type scale is `countdown` itself.
     Text(
         stringResource(Res.string.qibla_bearing, format.localizedDigits(bearingDegrees.toInt())),
         style = TaqwaText.countdown,

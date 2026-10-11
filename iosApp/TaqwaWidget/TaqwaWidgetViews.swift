@@ -118,8 +118,8 @@ struct TaqwaEntry: TimelineEntry {
     /// Built through the shared `WidgetDigits` against the mirror's recorded choice, so this
     /// countdown, the Android one and the app all agree (D2 — it used to ask `NumberFormatter` for
     /// the locale default instead, which is the guess the mirror now replaces). Minute-granular and
-    /// redrawn at most once a minute, so the Today ring's per-second tabular-jitter exception
-    /// (spec §4.2) does not apply.
+    /// redrawn at most once a minute, so the per-second tabular-jitter exception of the Prayer
+    /// screen's ring (spec §4.2) does not apply.
     var countdownText: String {
         let m = max(0, countdownMinutes)
         let text = String(format: "%d:%02d", m / 60, m % 60)
@@ -440,7 +440,7 @@ struct TaqwaLockScreenWidgetView: View {
             switch family {
             case .accessoryCircular:
                 // Spec §4.5: ring + abbreviation + countdown — a real progress ring, the same
-                // motif CountdownRing uses on Today, fed by the model's `ringProgress`.
+                // motif CountdownRing uses on the Prayer screen, fed by the model's `ringProgress`.
                 ZStack {
                     AccessoryWidgetBackground()
                     Gauge(value: Double(content.ringProgress).clamped01()) {

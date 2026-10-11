@@ -17,7 +17,7 @@ data class WidgetSnapshot(
      * The countdown as it stood **when the mirror was written**. Kept for wire compatibility with
      * mirrors written before [nextPrayerEpochSeconds] existed, and as the value iOS's timeline
      * extrapolates from; it must never be rendered verbatim, because the mirror is only written
-     * while the Today screen is open and can be hours old by the time a widget draws (I8).
+     * while the Prayer screen is open and can be hours old by the time a widget draws (I8).
      */
     val countdownMinutes: Long,
     val nextClockTime: String,
@@ -44,9 +44,9 @@ data class WidgetSnapshot(
      * absolute instant with its clock string, and any start of the day before that falls after
      * the day of writing's midnight (a high-latitude Isha, spec §3.3). This is what lets a widget
      * keep counting *across* prayers without the app: the next prayer is whichever entry is first
-     * after the widget's own clock, not whichever one was next when the app last had Today open.
-     * Empty on a mirror from a build before this field existed, in which case the older fields
-     * carry the render.
+     * after the widget's own clock, not whichever one was next when the app last had the Prayer
+     * screen open. Empty on a mirror from a build before this field existed, in which case the
+     * older fields carry the render.
      */
     val schedule: List<ScheduledPrayer> = emptyList(),
     /**

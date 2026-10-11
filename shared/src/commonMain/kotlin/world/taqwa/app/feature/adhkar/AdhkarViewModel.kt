@@ -35,7 +35,7 @@ import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
-import world.taqwa.app.feature.today.formatClock
+import world.taqwa.app.feature.prayer.formatClock
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.qibla.Haptics

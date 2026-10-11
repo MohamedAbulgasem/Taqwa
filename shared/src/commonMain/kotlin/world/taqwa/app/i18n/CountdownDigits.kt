@@ -1,9 +1,10 @@
 package world.taqwa.app.i18n
 
 /**
- * Which digits the Today ring's countdown is written in. It lives apart from [CountdownFormatter],
- * which needs `PlatformFormat` and so Compose, so that the website's timetable generator
- * (`tools/timetables`) can compile the same rule and a city page counts down in the app's digits.
+ * Which digits the countdown in the Prayer screen's ring is written in. It lives apart from
+ * [CountdownFormatter], which needs `PlatformFormat` and so Compose, so that the website's
+ * timetable generator (`tools/timetables`) can compile the same rule and a city page counts down in
+ * the app's digits.
  */
 object CountdownDigits {
 

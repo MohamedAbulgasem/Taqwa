@@ -204,9 +204,9 @@ private fun PlatformFormat.sampleTime(prayer: Prayer): String =
 
 /**
  * A representative afternoon, in the UI's own language, for when the mirror has not been written
- * yet: onboarding runs before Today has ever been shown, and Appearance can be opened on a fresh
- * install before a location exists. Names go through the same [PrayerNaming] rule as the real
- * widget, so an Arabic UI previews Arabic-alone names and an English one the bilingual pair.
+ * yet: onboarding runs before the Prayer screen has ever been shown, and Appearance can be opened
+ * on a fresh install before a location exists. Names go through the same [PrayerNaming] rule as the
+ * real widget, so an Arabic UI previews Arabic-alone names and an English one the bilingual pair.
  */
 @Composable
 private fun sampleContent(): WidgetContent {

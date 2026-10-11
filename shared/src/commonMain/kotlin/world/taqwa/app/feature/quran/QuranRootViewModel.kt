@@ -180,7 +180,7 @@ private fun juzNumberFor(surah: Int, ayah: Int, juzRows: List<JuzRow>): Int {
 /**
  * The Quran tab root (spec §2.1, spec 2b §2.1-§2.2): the surah, juz and bookmark lists, the
  * current filter and tab, the debounced ayah search the filter also drives, and the
- * continue-reading card when a last-read position exists. Follows [world.taqwa.app.feature.today.TodayViewModel]'s
+ * continue-reading card when a last-read position exists. Follows [world.taqwa.app.feature.prayer.PrayerViewModel]'s
  * shape — a plain class over a [MutableStateFlow], no platform ViewModel base class — so it is
  * usable, and testable, from `commonMain`/`commonTest` alike.
  *

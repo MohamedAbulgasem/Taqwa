@@ -61,7 +61,7 @@ import world.taqwa.app.notifications.openAppNotificationSettings
 import world.taqwa.app.notifications.requestExactAlarmAccess
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.today_current_location
+import world.taqwa.app.resources.prayer_current_location
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.WidgetMirrorRefresher
@@ -89,7 +89,7 @@ internal fun SettingsRootRoute(
         cityName = if (location == null) {
             null
         } else {
-            cityDisplayName ?: stringResource(Res.string.today_current_location)
+            cityDisplayName ?: stringResource(Res.string.prayer_current_location)
         },
         methodName = timetableDisplayName(prayerSettings.timetable),
         themeName = themeDisplayName(themeMode),
@@ -322,7 +322,7 @@ internal fun AboutTimesRoute(
         state = state,
         engineDay = engineDay,
         place = place,
-        cityLabel = unitCityName ?: cityDisplayName ?: stringResource(Res.string.today_current_location),
+        cityLabel = unitCityName ?: cityDisplayName ?: stringResource(Res.string.prayer_current_location),
         zone = zone,
         onBack = { navigator.pop() },
         onMatchMyMosque = { navigator.push(Screen.MatchMyMosque) },

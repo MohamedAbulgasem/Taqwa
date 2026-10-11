@@ -8,7 +8,7 @@ import kotlin.test.assertNull
 
 /**
  * Finding I8: the Android widget rendered `countdownMinutes` verbatim, and the mirror is only ever
- * written while the Today screen is open. The half-hourly `APPWIDGET_UPDATE` then re-rendered the
+ * written while the Prayer screen is open. The half-hourly `APPWIDGET_UPDATE` then re-rendered the
  * same frozen number, so a widget could sit on the home screen all afternoon insisting a prayer
  * was forty minutes away.
  *
@@ -51,10 +51,10 @@ class WidgetCountdownTest {
         assertEquals(1L, WidgetCountdown.remainingMinutesAt(writtenAtT, writtenAt + 39 * 60L))
     }
 
-    // Truncation, matching `TodayState.countdown.inWholeMinutes`, so the widget and the Today
+    // Truncation, matching `TodayState.countdown.inWholeMinutes`, so the widget and the Prayer
     // screen never disagree about the same moment by a minute.
     @Test
-    fun partMinutesTruncateTheSameWayTheTodayScreenTruncates() {
+    fun partMinutesTruncateTheSameWayThePrayerScreenTruncates() {
         assertEquals(39L, WidgetCountdown.remainingMinutesAt(writtenAtT, writtenAt + 59L))
         assertEquals(0L, WidgetCountdown.remainingMinutesAt(writtenAtT, writtenAt + fortyMinutes - 1L))
         assertEquals(0L, WidgetCountdown.remainingMinutesAt(writtenAtT, writtenAt + fortyMinutes))

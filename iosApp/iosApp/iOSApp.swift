@@ -178,7 +178,7 @@ struct iOSApp: App {
 
 	/// `refreshWidgets()` is `expect`/`actual` in shared code, but `WidgetCenter` is Swift-only, so
 	/// the iOS actual is a hook the app fills in here — the one place that can actually make the
-	/// call. `TodayViewModel.refresh()` runs once a second, so the hook does the de-duplication
+	/// call. `PrayerViewModel.refresh()` runs once a second, so the hook does the de-duplication
 	/// Kotlin cannot: it reloads only when the serialised snapshot has genuinely changed.
 	static func installWidgetRefreshHook() {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
@@ -225,7 +225,7 @@ struct iOSApp: App {
 	/// later. Anything a widget reads out of the App Group has to be represented here.
 	private static var lastMirrorKey: String?
 
-	/// `reloadWidgets()` is reached from a Kotlin-invoked closure (`TodayViewModel.refresh()` runs
+	/// `reloadWidgets()` is reached from a Kotlin-invoked closure (`PrayerViewModel.refresh()` runs
 	/// on whatever dispatcher it is collected on) and from the background-task queue in
 	/// `handleAppRefresh`, so neither the `lastSnapshot` dedupe nor `WidgetCenter` can assume the
 	/// main thread. Everything below therefore runs on it: inline when it already is, and
@@ -247,7 +247,7 @@ struct iOSApp: App {
 			let snapshot = defaults?.string(forKey: taqwaSnapshotKey)
 			let background = defaults?.string(forKey: taqwaBackgroundKey)
 			// The ayah pool mirror is ~30 KB, so it is folded in by hash and length rather than
-			// concatenated whole — this key is rebuilt once a second by `TodayViewModel.refresh()`.
+			// concatenated whole — this key is rebuilt once a second by `PrayerViewModel.refresh()`.
 			// `hashValue` is per-process seeded, which is fine: `lastMirrorKey` never outlives the
 			// process either, and a fresh process reloading once more is the harmless direction.
 			let ayah = defaults?.string(forKey: AyahPoolMirror.companion.KEY) ?? ""

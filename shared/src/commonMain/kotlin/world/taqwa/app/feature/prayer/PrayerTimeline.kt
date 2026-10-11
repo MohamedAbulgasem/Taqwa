@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,8 +44,8 @@ import world.taqwa.app.i18n.PrayerNaming
 import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.today_jumuah
-import world.taqwa.app.resources.today_set_by_rule
+import world.taqwa.app.resources.prayer_jumuah
+import world.taqwa.app.resources.prayer_set_by_rule
 
 /** Gutter holding the pips; the rail runs down its centre. */
 private val GutterWidth = 26.dp
@@ -231,8 +231,8 @@ private fun PrayerRow(
                         color = colors.textTertiary,
                     )
                 }
-                if (row.isJumuah) OutlinedPill(stringResource(Res.string.today_jumuah))
-                if (setByRule) OutlinedPill(stringResource(Res.string.today_set_by_rule))
+                if (row.isJumuah) OutlinedPill(stringResource(Res.string.prayer_jumuah))
+                if (setByRule) OutlinedPill(stringResource(Res.string.prayer_set_by_rule))
             }
             Text(
                 formatTime(row),

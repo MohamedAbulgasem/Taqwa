@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

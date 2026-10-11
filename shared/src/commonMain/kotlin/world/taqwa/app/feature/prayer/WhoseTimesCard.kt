@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -54,16 +54,16 @@ import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.timetable_calculated
 import world.taqwa.app.resources.timetable_cautious
-import world.taqwa.app.resources.today_about_a11y
-import world.taqwa.app.resources.today_about_these_times
-import world.taqwa.app.resources.today_times_by
-import world.taqwa.app.resources.today_whose_a11y
-import world.taqwa.app.resources.today_whose_calculated_body
-import world.taqwa.app.resources.today_whose_cautious_body
-import world.taqwa.app.resources.today_whose_checked_body
-import world.taqwa.app.resources.today_whose_checked_title
-import world.taqwa.app.resources.today_whose_unchecked_body
-import world.taqwa.app.resources.today_whose_unchecked_title
+import world.taqwa.app.resources.prayer_about_a11y
+import world.taqwa.app.resources.prayer_about_these_times
+import world.taqwa.app.resources.prayer_times_by
+import world.taqwa.app.resources.prayer_whose_a11y
+import world.taqwa.app.resources.prayer_whose_calculated_body
+import world.taqwa.app.resources.prayer_whose_cautious_body
+import world.taqwa.app.resources.prayer_whose_checked_body
+import world.taqwa.app.resources.prayer_whose_checked_title
+import world.taqwa.app.resources.prayer_whose_unchecked_body
+import world.taqwa.app.resources.prayer_whose_unchecked_title
 import kotlin.math.max
 
 /**
@@ -86,9 +86,9 @@ data class WhoseTimes(val shortNameKey: String, val entryClass: EntryClass) {
 private fun whoseTitle(whose: WhoseTimes): String {
     val name = isolated(authorityShortName(whose.shortNameKey))
     return when (whose.entryClass) {
-        EntryClass.A, EntryClass.B -> stringResource(Res.string.today_whose_checked_title, name)
+        EntryClass.A, EntryClass.B -> stringResource(Res.string.prayer_whose_checked_title, name)
         EntryClass.C -> stringResource(Res.string.timetable_cautious)
-        EntryClass.D_AUTHORITY -> stringResource(Res.string.today_whose_unchecked_title, name)
+        EntryClass.D_AUTHORITY -> stringResource(Res.string.prayer_whose_unchecked_title, name)
         EntryClass.D_NONE -> stringResource(Res.string.timetable_calculated)
     }
 }
@@ -98,10 +98,10 @@ private fun whoseTitle(whose: WhoseTimes): String {
 private fun whoseSentence(whose: WhoseTimes, place: String): String {
     val name = isolated(authorityShortName(whose.shortNameKey))
     return when (whose.entryClass) {
-        EntryClass.A, EntryClass.B -> stringResource(Res.string.today_whose_checked_body, name, isolated(place))
-        EntryClass.C -> stringResource(Res.string.today_whose_cautious_body)
-        EntryClass.D_AUTHORITY -> stringResource(Res.string.today_whose_unchecked_body, name, isolated(place))
-        EntryClass.D_NONE -> stringResource(Res.string.today_whose_calculated_body)
+        EntryClass.A, EntryClass.B -> stringResource(Res.string.prayer_whose_checked_body, name, isolated(place))
+        EntryClass.C -> stringResource(Res.string.prayer_whose_cautious_body)
+        EntryClass.D_AUTHORITY -> stringResource(Res.string.prayer_whose_unchecked_body, name, isolated(place))
+        EntryClass.D_NONE -> stringResource(Res.string.prayer_whose_calculated_body)
     }
 }
 
@@ -110,13 +110,13 @@ private fun whoseSentence(whose: WhoseTimes, place: String): String {
 private fun whoseSpoken(whose: WhoseTimes): String = when (whose.entryClass) {
     EntryClass.C -> stringResource(Res.string.timetable_cautious)
     EntryClass.D_NONE -> stringResource(Res.string.timetable_calculated)
-    else -> stringResource(Res.string.today_times_by, isolated(authorityShortName(whose.shortNameKey)))
+    else -> stringResource(Res.string.prayer_times_by, isolated(authorityShortName(whose.shortNameKey)))
 }
 
 /** The ⓘ's one label (spec §2.4): "Times by Diyanet, İstanbul. Opens whose times these are". */
 @Composable
 internal fun whoseLabel(whose: WhoseTimes, place: String): String =
-    stringResource(Res.string.today_whose_a11y, whoseSpoken(whose), isolated(place))
+    stringResource(Res.string.prayer_whose_a11y, whoseSpoken(whose), isolated(place))
 
 /**
  * The ⓘ at the end of the date: a 1 em circled i, drawn rather than typed so it has the same
@@ -231,7 +231,7 @@ private fun AboutLink(onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            stringResource(Res.string.today_about_these_times),
+            stringResource(Res.string.prayer_about_these_times),
             style = TaqwaText.caption.copy(fontSize = 14.sp, fontWeight = FontWeight.ExtraBold),
             color = colors.accent,
         )
@@ -321,4 +321,4 @@ internal fun TertiaryLine(
 /** The source line's label (spec §2.4): "Cautious times, Toronto. Opens About these times". */
 @Composable
 internal fun aboutLabel(whose: WhoseTimes, place: String): String =
-    stringResource(Res.string.today_about_a11y, whoseSpoken(whose), isolated(place))
+    stringResource(Res.string.prayer_about_a11y, whoseSpoken(whose), isolated(place))

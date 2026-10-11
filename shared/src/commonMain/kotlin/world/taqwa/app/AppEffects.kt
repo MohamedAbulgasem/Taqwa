@@ -49,9 +49,9 @@ internal fun PlayingLaunchRequests(
 
 /**
  * A tap on an adhkar reminder (adhkar spec §5): that set's session, on the Prayer tab where the
- * Adhkar button lives, so Back lands on Today. Waits for onboarding exactly as the widget's and
- * the player's requests do, so a cold tap is not pushed only to be wiped by the onboarding
- * replaceAll; consumed once acted on.
+ * Adhkar button lives, so Back lands on the Prayer screen. Waits for onboarding exactly as the
+ * widget's and the player's requests do, so a cold tap is not pushed only to be wiped by the
+ * onboarding replaceAll; consumed once acted on.
  */
 @Composable
 internal fun AdhkarLaunchRequests(
@@ -150,12 +150,12 @@ internal fun LanguageChangeReschedule(
 ) {
     // The other two things written in the interface language outside the composition: the
     // notifications already armed (title, body and channel names are baked at schedule time)
-    // and the prayer widgets' mirror (written by Today's view model, which only exists while the
-    // Prayer tab is on screen). Both would otherwise keep the previous language after an in-place
-    // switch — the normal case on Android 13+, where the per-app language page returns to a
-    // process that is still alive — until the next cold start or the twice-daily top-up. Skipped
-    // on the first composition: the cold-start path already reschedules and Today writes its
-    // own mirror.
+    // and the prayer widgets' mirror (written by the Prayer screen's view model, which only exists
+    // while the Prayer tab is on screen). Both would otherwise keep the previous language after an
+    // in-place switch — the normal case on Android 13+, where the per-app language page returns to
+    // a process that is still alive — until the next cold start or the twice-daily top-up. Skipped
+    // on the first composition: the cold-start path already reschedules and the Prayer screen
+    // writes its own mirror.
     val languageAtStart = remember { uiLanguage }
     var lastLanguageApplied by remember { mutableStateOf(languageAtStart) }
     LaunchedEffect(uiLanguage) {
@@ -225,7 +225,7 @@ internal fun WidgetLaunchRequests(
     navigator: Navigator,
 ) {
     // Widget tap launch requests (design spec §8). Waits for onboarding to be known complete before
-    // collecting: on a cold start the back stack still shows Screen.Today until the onboarding
+    // collecting: on a cold start the back stack still shows Screen.Prayer until the onboarding
     // effect above has read DataStore and (if needed) replaced it with Screen.Onboarding, so acting
     // on a pending request before that point would push a screen only to have replaceAll wipe it out
     // right after. Once onboarding is known complete it can never become incomplete again in this

@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -83,7 +83,7 @@ private fun previewState(
     clockWarning: ClockWarning? = null,
     otherAsr: OtherAsr? = null,
     differ: DifferLine? = null,
-): TodayUiState.Ready {
+): PrayerUiState.Ready {
     val zone = TimeZone.of(zoneId)
     val instants = FivePrayers.zip(times.map { localInstant(date, it, zone) })
     val nowInstant = localInstant(date, now, zone)
@@ -101,7 +101,7 @@ private fun previewState(
     val next = instants.firstOrNull { it.second > nowInstant }
         ?.let { PrayerTime(it.first, it.second) }
         ?: PrayerTime(Prayer.FAJR, localInstant(date.plus(1, DateTimeUnit.DAY), times.first(), zone))
-    return TodayUiState.Ready(
+    return PrayerUiState.Ready(
         location = GeoLocation(0.0, 0.0, zoneId, city, countryCode),
         cityDisplayName = city,
         hijri = hijri,
@@ -154,8 +154,8 @@ private fun PreviewSurface(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun ScreenPreview(state: TodayUiState, exactAlarmsOff: Boolean = false) = PreviewSurface {
-    TodayScreen(
+private fun ScreenPreview(state: PrayerUiState, exactAlarmsOff: Boolean = false) = PreviewSurface {
+    PrayerScreen(
         state = state,
         onChooseCity = {},
         onOpenLocationSettings = {},

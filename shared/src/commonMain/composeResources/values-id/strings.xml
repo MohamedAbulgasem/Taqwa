@@ -32,46 +32,46 @@
     <string name="prayer_maghrib">Maghrib</string>
     <string name="prayer_isha">Isya</string>
 
-    <!-- Today -->
-    <string name="today_current_location">Lokasi saat ini</string>
-    <string name="today_next_in">Menuju %1$s</string>
-    <string name="today_exact_alarms_label">ALARM TEPAT WAKTU NONAKTIF</string>
-    <string name="today_exact_alarms_body">Android bisa terlambat sampai satu jam selama izin “Alarm &amp; pengingat” belum diberikan untuk Taqwa.</string>
-    <string name="today_no_location_title">Belum ada lokasi</string>
-    <string name="today_choose_city">Pilih kota</string>
-    <string name="today_location_settings">Aktifkan lokasi di Pengaturan</string>
-    <string name="today_jumuah">Jumat</string>
+    <!-- Prayer screen -->
+    <string name="prayer_current_location">Lokasi saat ini</string>
+    <string name="prayer_next_in">Menuju %1$s</string>
+    <string name="prayer_exact_alarms_label">ALARM TEPAT WAKTU NONAKTIF</string>
+    <string name="prayer_exact_alarms_body">Android bisa terlambat sampai satu jam selama izin “Alarm &amp; pengingat” belum diberikan untuk Taqwa.</string>
+    <string name="prayer_no_location_title">Belum ada lokasi</string>
+    <string name="prayer_choose_city">Pilih kota</string>
+    <string name="prayer_location_settings">Aktifkan lokasi di Pengaturan</string>
+    <string name="prayer_jumuah">Jumat</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
-    <string name="today_whose_checked_title">Jadwal %1$s</string>
-    <string name="today_whose_checked_body">Waktu %1$s untuk %2$s, dihitung ulang oleh Taqwa dan dicocokkan dengan jadwal terbitannya.</string>
-    <string name="today_whose_unchecked_title">Metode %1$s, belum diperiksa sepenuhnya</string>
-    <string name="today_whose_unchecked_body">Taqwa menghitung waktu untuk %2$s dengan metode %1$s, ditambah margin pengaman.</string>
-    <string name="today_whose_cautious_body">Masjid di sini mengikuti jadwal yang berbeda, jadi Taqwa menampilkan setiap salat setelah waktunya masuk di semua jadwal itu.</string>
-    <string name="today_whose_calculated_body">Belum ada jadwal setempat yang diketahui di sini, jadi Taqwa menghitung waktu ini dengan memilih yang lebih aman.</string>
-    <string name="today_about_these_times">Tentang waktu ini</string>
-    <string name="today_times_by">Waktu menurut %1$s</string>
-    <string name="today_whose_a11y">%1$s, %2$s. Membuka sumber waktu ini</string>
-    <string name="today_about_a11y">%1$s, %2$s. Membuka Tentang waktu ini</string>
-    <string name="today_set_by_rule">Menurut aturan</string>
-    <string name="today_polar_line">Hari ini matahari tidak terbit maupun terbenam di sini, jadi sebagian waktu mengikuti lintang terdekat tempat matahari masih terbit dan terbenam.</string>
-    <string name="today_card_cautious_title">Masjid di sini mengikuti jadwal yang berbeda</string>
-    <string name="today_card_cautious_body">Taqwa menampilkan setiap salat setelah waktunya masuk di semua jadwal itu.</string>
-    <string name="today_card_sunni_title">Ini waktu salat Sunni</string>
-    <string name="today_card_sunni_body">Dalam praktik Syiah (Ja’fari), Maghrib dan waktu berbuka lebih lambat.</string>
-    <string name="today_match_my_mosque">Cocokkan dengan masjid saya</string>
-    <string name="today_card_ok">Oke</string>
-    <string name="today_clock_line">Jam ponsel Anda mungkin selisih satu jam</string>
-    <string name="today_clock_stale_early">%1$s mengubah jamnya pada %2$s dan ponsel Anda belum mengikutinya, jadi waktu salat bisa satu jam terlalu awal. Pasang pembaruan sistem terbaru dan biarkan tanggal dan waktu diatur otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
-    <string name="today_clock_stale_late">%1$s mengubah jamnya pada %2$s dan ponsel Anda belum mengikutinya, jadi waktu salat bisa satu jam terlambat. Pasang pembaruan sistem terbaru dan biarkan tanggal dan waktu diatur otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
-    <string name="today_clock_manual_early">%1$s mengubah jamnya pada %2$s. Jika Anda mengatur jam secara manual, waktu salat bisa satu jam terlalu awal. Nyalakan tanggal dan waktu otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
-    <string name="today_clock_manual_late">%1$s mengubah jamnya pada %2$s. Jika Anda mengatur jam secara manual, waktu salat bisa satu jam terlambat. Nyalakan tanggal dan waktu otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
-    <string name="today_clock_region_morocco">Maroko</string>
-    <string name="today_clock_region_british_columbia">British Columbia</string>
-    <string name="today_clock_region_kazakhstan">Kazakhstan</string>
-    <string name="today_differ_before">%2$s menurut %1$s mulai pukul %3$s</string>
-    <string name="today_differ_after">%2$s menurut %1$s sudah masuk · Taqwa menampilkannya mulai %3$s</string>
-    <string name="today_other_asr">%1$s %2$s</string>
+    <string name="prayer_whose_checked_title">Jadwal %1$s</string>
+    <string name="prayer_whose_checked_body">Waktu %1$s untuk %2$s, dihitung ulang oleh Taqwa dan dicocokkan dengan jadwal terbitannya.</string>
+    <string name="prayer_whose_unchecked_title">Metode %1$s, belum diperiksa sepenuhnya</string>
+    <string name="prayer_whose_unchecked_body">Taqwa menghitung waktu untuk %2$s dengan metode %1$s, ditambah margin pengaman.</string>
+    <string name="prayer_whose_cautious_body">Masjid di sini mengikuti jadwal yang berbeda, jadi Taqwa menampilkan setiap salat setelah waktunya masuk di semua jadwal itu.</string>
+    <string name="prayer_whose_calculated_body">Belum ada jadwal setempat yang diketahui di sini, jadi Taqwa menghitung waktu ini dengan memilih yang lebih aman.</string>
+    <string name="prayer_about_these_times">Tentang waktu ini</string>
+    <string name="prayer_times_by">Waktu menurut %1$s</string>
+    <string name="prayer_whose_a11y">%1$s, %2$s. Membuka sumber waktu ini</string>
+    <string name="prayer_about_a11y">%1$s, %2$s. Membuka Tentang waktu ini</string>
+    <string name="prayer_set_by_rule">Menurut aturan</string>
+    <string name="prayer_polar_line">Hari ini matahari tidak terbit maupun terbenam di sini, jadi sebagian waktu mengikuti lintang terdekat tempat matahari masih terbit dan terbenam.</string>
+    <string name="prayer_card_cautious_title">Masjid di sini mengikuti jadwal yang berbeda</string>
+    <string name="prayer_card_cautious_body">Taqwa menampilkan setiap salat setelah waktunya masuk di semua jadwal itu.</string>
+    <string name="prayer_card_sunni_title">Ini waktu salat Sunni</string>
+    <string name="prayer_card_sunni_body">Dalam praktik Syiah (Ja’fari), Maghrib dan waktu berbuka lebih lambat.</string>
+    <string name="prayer_match_my_mosque">Cocokkan dengan masjid saya</string>
+    <string name="prayer_card_ok">Oke</string>
+    <string name="prayer_clock_line">Jam ponsel Anda mungkin selisih satu jam</string>
+    <string name="prayer_clock_stale_early">%1$s mengubah jamnya pada %2$s dan ponsel Anda belum mengikutinya, jadi waktu salat bisa satu jam terlalu awal. Pasang pembaruan sistem terbaru dan biarkan tanggal dan waktu diatur otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
+    <string name="prayer_clock_stale_late">%1$s mengubah jamnya pada %2$s dan ponsel Anda belum mengikutinya, jadi waktu salat bisa satu jam terlambat. Pasang pembaruan sistem terbaru dan biarkan tanggal dan waktu diatur otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
+    <string name="prayer_clock_manual_early">%1$s mengubah jamnya pada %2$s. Jika Anda mengatur jam secara manual, waktu salat bisa satu jam terlalu awal. Nyalakan tanggal dan waktu otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
+    <string name="prayer_clock_manual_late">%1$s mengubah jamnya pada %2$s. Jika Anda mengatur jam secara manual, waktu salat bisa satu jam terlambat. Nyalakan tanggal dan waktu otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
+    <string name="prayer_clock_region_morocco">Maroko</string>
+    <string name="prayer_clock_region_british_columbia">British Columbia</string>
+    <string name="prayer_clock_region_kazakhstan">Kazakhstan</string>
+    <string name="prayer_differ_before">%2$s menurut %1$s mulai pukul %3$s</string>
+    <string name="prayer_differ_after">%2$s menurut %1$s sudah masuk · Taqwa menampilkannya mulai %3$s</string>
+    <string name="prayer_other_asr">%1$s %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">Pengaturan</string>
@@ -472,7 +472,7 @@
     <string name="tab_quran">Al-Qur’an</string>
     <string name="tab_settings">Pengaturan</string>
     <!-- Prayer screen's Qibla card -->
-    <string name="today_qibla_detail">%1$s° · %2$s km ke Makkah</string>
+    <string name="prayer_qibla_detail">%1$s° · %2$s km ke Makkah</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">Al-Qur’an</string>
     <string name="quran_search_hint">Cari di Al-Qur’an</string>
@@ -517,7 +517,7 @@
     <string name="quran_a11y_read_aloud">Sedang dibacakan</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbih</string>
-    <string name="today_open_tasbeeh">Tasbih</string>
+    <string name="prayer_open_tasbeeh">Tasbih</string>
     <string name="tasbeeh_add_custom">Tambah zikir</string>
     <string name="tasbeeh_round">PUTARAN %1$s</string>
     <string name="tasbeeh_of">dari %1$s</string>
@@ -612,7 +612,7 @@
     <string name="prayer_times_time_format">Format waktu</string>
     <string name="time_format_24">24 jam</string>
     <string name="time_format_12">12 jam</string>
-    <string name="today_open_adhkar">Zikir</string>
+    <string name="prayer_open_adhkar">Zikir</string>
     <string name="adhkar_morning">Zikir pagi</string>
     <string name="adhkar_evening">Zikir petang</string>
     <string name="adhkar_segment_morning">Pagi</string>

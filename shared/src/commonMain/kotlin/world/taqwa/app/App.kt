@@ -81,7 +81,7 @@ fun App(container: AppContainer) {
     val locationState = settings.location.collectAsState(initial = null)
     val location by locationState
     val locationSourceState = settings.locationSource.collectAsState(initial = LocationSource.MANUAL)
-    val navigator = remember { Navigator(Screen.Today) }
+    val navigator = remember { Navigator(Screen.Prayer) }
     val backStackState = navigator.backStack.collectAsState()
     val backStack by backStackState
     val scope = rememberCoroutineScope()
@@ -198,8 +198,8 @@ fun App(container: AppContainer) {
     // navigates away to the city search, which would otherwise reset the flow to its first page.
     val onboardingStepState = remember { mutableStateOf(OnboardingStep.WELCOME) }
 
-    // Resolved before anything renders, so a returning user never sees Today flash behind
-    // onboarding on launch.
+    // Resolved before anything renders, so a returning user never sees the Prayer screen flash
+    // behind onboarding on launch.
     var startResolved by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         if (!settings.onboardingComplete.first()) {
@@ -250,7 +250,7 @@ fun App(container: AppContainer) {
     }
 
     // Both the Hijri preview and the adjusted times in manual adjustments are "today" in the
-    // location's own zone, which is the zone Today's rows are already drawn in.
+    // location's own zone, which is the zone the Prayer screen's rows are already drawn in.
     val zone = remember(location) {
         location?.let { TimeZone.of(it.timeZoneId) } ?: TimeZone.currentSystemDefault()
     }
@@ -373,8 +373,8 @@ fun App(container: AppContainer) {
                             exactAlarmsAllowedState = exactAlarmsAllowedState,
                         )
 
-                        Screen.Today -> {
-                            TodayRoute(
+                        Screen.Prayer -> {
+                            PrayerRoute(
                                 languageTag = languageTag,
                                 container = container,
                                 settings = settings,

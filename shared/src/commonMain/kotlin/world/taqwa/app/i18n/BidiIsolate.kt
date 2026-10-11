@@ -17,8 +17,8 @@ fun isolated(text: String): String = "\u2068$text\u2069"
  * spliced bare and reads correctly in every language the app speaks, so it comes back exactly as
  * it was given: under the default setting every sentence that splices a time is byte for byte what
  * it was before this helper. The notifications, the adhkar caption, the timetable and Match my
- * mosque lines and About these times splice through here; Today's sub-lines, which isolated every
- * time from the start, keep [isolated] itself.
+ * mosque lines and About these times splice through here; the Prayer screen's sub-lines, which
+ * isolated every time from the start, keep [isolated] itself.
  */
 fun isolatedClock(clockTime: String): String =
     if (clockTime.all { it.isDigit() || it == ':' }) clockTime else isolated(clockTime)

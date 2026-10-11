@@ -32,46 +32,46 @@
     <string name="prayer_maghrib">مغرب</string>
     <string name="prayer_isha">عشاء</string>
 
-    <!-- Today -->
-    <string name="today_current_location">موجودہ مقام</string>
-    <string name="today_next_in">%1$s میں باقی</string>
-    <string name="today_exact_alarms_label">عین وقت کے الارم بند</string>
-    <string name="today_exact_alarms_body">جب تک تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت نہ ہو، اینڈرائیڈ ایک گھنٹے تک دیر سے بجا سکتا ہے۔</string>
-    <string name="today_no_location_title">ابھی کوئی مقام نہیں</string>
-    <string name="today_choose_city">شہر چنیں</string>
-    <string name="today_location_settings">ترتیبات سے مقام فعال کریں</string>
-    <string name="today_jumuah">جمعہ</string>
+    <!-- Prayer screen -->
+    <string name="prayer_current_location">موجودہ مقام</string>
+    <string name="prayer_next_in">%1$s میں باقی</string>
+    <string name="prayer_exact_alarms_label">عین وقت کے الارم بند</string>
+    <string name="prayer_exact_alarms_body">جب تک تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت نہ ہو، اینڈرائیڈ ایک گھنٹے تک دیر سے بجا سکتا ہے۔</string>
+    <string name="prayer_no_location_title">ابھی کوئی مقام نہیں</string>
+    <string name="prayer_choose_city">شہر چنیں</string>
+    <string name="prayer_location_settings">ترتیبات سے مقام فعال کریں</string>
+    <string name="prayer_jumuah">جمعہ</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
-    <string name="today_whose_checked_title">%1$s کا نقشۂ اوقات</string>
-    <string name="today_whose_checked_body">%2$s کے لیے %1$s کے اوقات، جنہیں تقویٰ نے دوبارہ حساب کر کے شائع شدہ نقشۂ اوقات سے ملا کر جانچا ہے۔</string>
-    <string name="today_whose_unchecked_title">%1$s کا طریقہ، ابھی پوری طرح جانچا نہیں گیا</string>
-    <string name="today_whose_unchecked_body">تقویٰ %2$s کے اوقات %1$s کے طریقے سے نکالتا ہے، اور احتیاط کی کچھ گنجائش رکھتا ہے۔</string>
-    <string name="today_whose_cautious_body">یہاں کی مساجد کے نقشۂ اوقات مختلف ہیں، اس لیے تقویٰ ہر نماز تب دکھاتا ہے جب سب کے ہاں اس کا وقت شروع ہو چکا ہو۔</string>
-    <string name="today_whose_calculated_body">یہاں کا کوئی مقامی نقشۂ اوقات معلوم نہیں، اس لیے تقویٰ یہ اوقات احتیاط کے ساتھ نکالتا ہے۔</string>
-    <string name="today_about_these_times">ان اوقات کے بارے میں</string>
-    <string name="today_times_by">%1$s کے اوقات</string>
-    <string name="today_whose_a11y">%1$s، %2$s۔ اوقات کا ماخذ کھولتا ہے</string>
-    <string name="today_about_a11y">%1$s، %2$s۔ ”ان اوقات کے بارے میں“ کھولتا ہے</string>
-    <string name="today_set_by_rule">تقدیری</string>
-    <string name="today_polar_line">آج یہاں سورج نہ طلوع ہوتا ہے نہ غروب، اس لیے کچھ اوقات اُس قریب ترین عرض بلد کے مطابق ہیں جہاں سورج طلوع اور غروب ہوتا ہے۔</string>
-    <string name="today_card_cautious_title">یہاں کی مساجد کے نقشۂ اوقات مختلف ہیں</string>
-    <string name="today_card_cautious_body">تقویٰ ہر نماز تب دکھاتا ہے جب سب کے ہاں اس کا وقت شروع ہو چکا ہو۔</string>
-    <string name="today_card_sunni_title">یہ اہلِ سنت کے اوقاتِ نماز ہیں</string>
-    <string name="today_card_sunni_body">شیعہ (جعفری) فقہ میں مغرب اور افطار بعد میں ہوتے ہیں۔</string>
-    <string name="today_match_my_mosque">اپنی مسجد سے ملائیں</string>
-    <string name="today_card_ok">ٹھیک ہے</string>
-    <string name="today_clock_line">ہو سکتا ہے آپ کے فون کی گھڑی ایک گھنٹہ آگے پیچھے ہو</string>
-    <string name="today_clock_stale_early">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا اور آپ کے فون کو ابھی اس کا علم نہیں، اس لیے نماز کے اوقات ایک گھنٹہ پہلے دکھائی دے سکتے ہیں۔ تازہ ترین سسٹم اپ ڈیٹ انسٹال کریں، اور تاریخ اور وقت کو خودکار رکھیں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
-    <string name="today_clock_stale_late">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا اور آپ کے فون کو ابھی اس کا علم نہیں، اس لیے نماز کے اوقات ایک گھنٹہ بعد دکھائی دے سکتے ہیں۔ تازہ ترین سسٹم اپ ڈیٹ انسٹال کریں، اور تاریخ اور وقت کو خودکار رکھیں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
-    <string name="today_clock_manual_early">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا۔ اگر آپ نے گھڑی خود ملائی ہے تو نماز کے اوقات ایک گھنٹہ پہلے دکھائی دے سکتے ہیں۔ خودکار تاریخ اور وقت آن کریں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
-    <string name="today_clock_manual_late">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا۔ اگر آپ نے گھڑی خود ملائی ہے تو نماز کے اوقات ایک گھنٹہ بعد دکھائی دے سکتے ہیں۔ خودکار تاریخ اور وقت آن کریں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
-    <string name="today_clock_region_morocco">مراکش</string>
-    <string name="today_clock_region_british_columbia">برٹش کولمبیا</string>
-    <string name="today_clock_region_kazakhstan">قازقستان</string>
-    <string name="today_differ_before">%1$s کے مطابق %2$s کا وقت %3$s پر شروع ہوتا ہے</string>
-    <string name="today_differ_after">%1$s کے مطابق %2$s کا وقت شروع ہو چکا ہے · تقویٰ اسے %3$s سے دکھاتا ہے</string>
-    <string name="today_other_asr">عصرِ %1$s %2$s</string>
+    <string name="prayer_whose_checked_title">%1$s کا نقشۂ اوقات</string>
+    <string name="prayer_whose_checked_body">%2$s کے لیے %1$s کے اوقات، جنہیں تقویٰ نے دوبارہ حساب کر کے شائع شدہ نقشۂ اوقات سے ملا کر جانچا ہے۔</string>
+    <string name="prayer_whose_unchecked_title">%1$s کا طریقہ، ابھی پوری طرح جانچا نہیں گیا</string>
+    <string name="prayer_whose_unchecked_body">تقویٰ %2$s کے اوقات %1$s کے طریقے سے نکالتا ہے، اور احتیاط کی کچھ گنجائش رکھتا ہے۔</string>
+    <string name="prayer_whose_cautious_body">یہاں کی مساجد کے نقشۂ اوقات مختلف ہیں، اس لیے تقویٰ ہر نماز تب دکھاتا ہے جب سب کے ہاں اس کا وقت شروع ہو چکا ہو۔</string>
+    <string name="prayer_whose_calculated_body">یہاں کا کوئی مقامی نقشۂ اوقات معلوم نہیں، اس لیے تقویٰ یہ اوقات احتیاط کے ساتھ نکالتا ہے۔</string>
+    <string name="prayer_about_these_times">ان اوقات کے بارے میں</string>
+    <string name="prayer_times_by">%1$s کے اوقات</string>
+    <string name="prayer_whose_a11y">%1$s، %2$s۔ اوقات کا ماخذ کھولتا ہے</string>
+    <string name="prayer_about_a11y">%1$s، %2$s۔ ”ان اوقات کے بارے میں“ کھولتا ہے</string>
+    <string name="prayer_set_by_rule">تقدیری</string>
+    <string name="prayer_polar_line">آج یہاں سورج نہ طلوع ہوتا ہے نہ غروب، اس لیے کچھ اوقات اُس قریب ترین عرض بلد کے مطابق ہیں جہاں سورج طلوع اور غروب ہوتا ہے۔</string>
+    <string name="prayer_card_cautious_title">یہاں کی مساجد کے نقشۂ اوقات مختلف ہیں</string>
+    <string name="prayer_card_cautious_body">تقویٰ ہر نماز تب دکھاتا ہے جب سب کے ہاں اس کا وقت شروع ہو چکا ہو۔</string>
+    <string name="prayer_card_sunni_title">یہ اہلِ سنت کے اوقاتِ نماز ہیں</string>
+    <string name="prayer_card_sunni_body">شیعہ (جعفری) فقہ میں مغرب اور افطار بعد میں ہوتے ہیں۔</string>
+    <string name="prayer_match_my_mosque">اپنی مسجد سے ملائیں</string>
+    <string name="prayer_card_ok">ٹھیک ہے</string>
+    <string name="prayer_clock_line">ہو سکتا ہے آپ کے فون کی گھڑی ایک گھنٹہ آگے پیچھے ہو</string>
+    <string name="prayer_clock_stale_early">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا اور آپ کے فون کو ابھی اس کا علم نہیں، اس لیے نماز کے اوقات ایک گھنٹہ پہلے دکھائی دے سکتے ہیں۔ تازہ ترین سسٹم اپ ڈیٹ انسٹال کریں، اور تاریخ اور وقت کو خودکار رکھیں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
+    <string name="prayer_clock_stale_late">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا اور آپ کے فون کو ابھی اس کا علم نہیں، اس لیے نماز کے اوقات ایک گھنٹہ بعد دکھائی دے سکتے ہیں۔ تازہ ترین سسٹم اپ ڈیٹ انسٹال کریں، اور تاریخ اور وقت کو خودکار رکھیں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
+    <string name="prayer_clock_manual_early">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا۔ اگر آپ نے گھڑی خود ملائی ہے تو نماز کے اوقات ایک گھنٹہ پہلے دکھائی دے سکتے ہیں۔ خودکار تاریخ اور وقت آن کریں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
+    <string name="prayer_clock_manual_late">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا۔ اگر آپ نے گھڑی خود ملائی ہے تو نماز کے اوقات ایک گھنٹہ بعد دکھائی دے سکتے ہیں۔ خودکار تاریخ اور وقت آن کریں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
+    <string name="prayer_clock_region_morocco">مراکش</string>
+    <string name="prayer_clock_region_british_columbia">برٹش کولمبیا</string>
+    <string name="prayer_clock_region_kazakhstan">قازقستان</string>
+    <string name="prayer_differ_before">%1$s کے مطابق %2$s کا وقت %3$s پر شروع ہوتا ہے</string>
+    <string name="prayer_differ_after">%1$s کے مطابق %2$s کا وقت شروع ہو چکا ہے · تقویٰ اسے %3$s سے دکھاتا ہے</string>
+    <string name="prayer_other_asr">عصرِ %1$s %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">ترتیبات</string>
@@ -474,7 +474,7 @@
     <string name="tab_quran">قرآن</string>
     <string name="tab_settings">ترتیبات</string>
     <!-- Prayer screen's Qibla card -->
-    <string name="today_qibla_detail">%1$s° · مکہ مکرمہ تک %2$s کلومیٹر</string>
+    <string name="prayer_qibla_detail">%1$s° · مکہ مکرمہ تک %2$s کلومیٹر</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">قرآن</string>
     <string name="quran_search_hint">قرآن میں تلاش کریں</string>
@@ -519,7 +519,7 @@
     <string name="quran_a11y_read_aloud">سنایا جا رہا ہے</string>
     <!-- Tasbeeh -->
     <string name="tasbeeh_title">تسبیح</string>
-    <string name="today_open_tasbeeh">تسبیح</string>
+    <string name="prayer_open_tasbeeh">تسبیح</string>
     <string name="tasbeeh_add_custom">ذکر شامل کریں</string>
     <string name="tasbeeh_round">چکر %1$s</string>
     <string name="tasbeeh_of">از %1$s</string>
@@ -614,7 +614,7 @@
     <string name="prayer_times_time_format">وقت کا فارمیٹ</string>
     <string name="time_format_24">24 گھنٹے</string>
     <string name="time_format_12">12 گھنٹے</string>
-    <string name="today_open_adhkar">اذکار</string>
+    <string name="prayer_open_adhkar">اذکار</string>
     <string name="adhkar_morning">صبح کے اذکار</string>
     <string name="adhkar_evening">شام کے اذکار</string>
     <string name="adhkar_segment_morning">صبح</string>

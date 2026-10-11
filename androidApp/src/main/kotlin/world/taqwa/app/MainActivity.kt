@@ -44,7 +44,8 @@ class MainActivity : ComponentActivity() {
      *
      * The two extras are plain ints put on the intent by the ayah widget's click action. Both
      * must be present and positive: a launch from the app icon or from a prayer widget carries
-     * neither, and a half-filled intent is a bug that should open Today rather than a surah zero.
+     * neither, and a half-filled intent is a bug that should open the Prayer screen rather than a
+     * surah zero.
      */
     private fun recordAyahRequest(intent: Intent?) {
         val surah = intent?.getIntExtra(EXTRA_OPEN_SURAH, 0) ?: 0

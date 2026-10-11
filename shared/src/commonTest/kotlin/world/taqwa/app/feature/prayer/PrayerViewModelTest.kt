@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -83,7 +83,7 @@ private class ArabicPlatformFormat : PlatformFormat by EnglishPlatformFormat {
 }
 
 /**
- * A [TodayViewModel] whose clock is driven by hand and whose two widget side effects — the mirror
+ * A [PrayerViewModel] whose clock is driven by hand and whose two widget side effects — the mirror
  * write and the platform nudge — are counted instead of performed.
  *
  * `start()`'s own one-second loop is not used: it never terminates under `runTest`. Advancing
@@ -95,7 +95,7 @@ private class WidgetTrafficProbe(private val location: GeoLocation, private val 
         private set
     var now: Instant = Instant.parse("2026-09-06T14:30:00Z")
 
-    val viewModel = TodayViewModel(
+    val viewModel = PrayerViewModel(
         engine = PrayerTimesEngine(),
         settings = repo,
         locationOf = { location },
@@ -106,7 +106,7 @@ private class WidgetTrafficProbe(private val location: GeoLocation, private val 
     )
 }
 
-class TodayViewModelTest {
+class PrayerViewModelTest {
 
     // Same absolute-path rule as SettingsRepositoryTest: DataStore's OkioStorage rejects relative
     // paths at runtime on iosSimulatorArm64Test. One file per test keeps the cases isolated, and
@@ -122,7 +122,7 @@ class TodayViewModelTest {
     }
 
     private fun freshStorePath(name: String): Path {
-        val path = "/tmp/taqwa-test-today-$name.preferences_pb".toPath()
+        val path = "/tmp/taqwa-test-prayer-$name.preferences_pb".toPath()
         FileSystem.SYSTEM.delete(path, mustExist = false)
         return path
     }
@@ -141,10 +141,10 @@ class TodayViewModelTest {
         location: GeoLocation?,
         now: Instant,
         hijriOffset: Int = 0,
-    ): TodayViewModel {
+    ): PrayerViewModel {
         val repo = settings(store)
         repo.setHijriOffsetDays(hijriOffset)
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { location },
@@ -156,28 +156,28 @@ class TodayViewModelTest {
 
     // Each case gets its own store file: DataStore refuses two live instances over one path,
     // and two tests sharing a name would collide inside a single test binary.
-    private suspend fun TestScope.todayViewModelWithNoLocation() =
+    private suspend fun TestScope.prayerViewModelWithNoLocation() =
         viewModel("no-location", null, Instant.parse("2026-09-06T14:30:00Z"))
 
-    private suspend fun TestScope.todayViewModelForLondon(
+    private suspend fun TestScope.prayerViewModelForLondon(
         store: String,
         now: Instant = Instant.parse("2026-09-06T14:30:00Z"),
         hijriOffset: Int = 0,
     ) = viewModel(store, london, now, hijriOffset)
 
-    private suspend fun TestScope.todayViewModelForTromso(store: String, now: Instant) =
+    private suspend fun TestScope.prayerViewModelForTromso(store: String, now: Instant) =
         viewModel(store, tromso, now)
 
     @Test
     fun withoutALocationTheScreenAsksForOneRatherThanShowingNothing() = runTest {
-        val vm = todayViewModelWithNoLocation()
-        assertEquals(TodayUiState.NeedsLocation, vm.state.first { it !is TodayUiState.Loading })
+        val vm = prayerViewModelWithNoLocation()
+        assertEquals(PrayerUiState.NeedsLocation, vm.state.first { it !is PrayerUiState.Loading })
     }
 
     @Test
     fun withALocationTheScreenIsReadyAndNamesTheNextPrayer() = runTest {
-        val vm = todayViewModelForLondon("ready", now = Instant.parse("2026-09-06T14:30:00Z"))
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val vm = prayerViewModelForLondon("ready", now = Instant.parse("2026-09-06T14:30:00Z"))
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertEquals(5, ready.today.rows.size)
         assertTrue(ready.hijri.isNotBlank())
     }
@@ -186,8 +186,8 @@ class TodayViewModelTest {
     // so the state has to supply the Gregorian date in the location's zone and the geometry.
     @Test
     fun readyCarriesTheGregorianDateAndTheQiblaGeometry() = runTest {
-        val vm = todayViewModelForLondon("ready-extras", now = Instant.parse("2026-09-06T14:30:00Z"))
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val vm = prayerViewModelForLondon("ready-extras", now = Instant.parse("2026-09-06T14:30:00Z"))
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertEquals("6 September 2026", ready.gregorian)
         // London to Makkah: roughly 119 degrees and 4,700 km (spec §12 quotes 118.9°).
         assertTrue(ready.qiblaBearingDegrees in 118.0..120.0, "bearing ${ready.qiblaBearingDegrees}")
@@ -205,14 +205,14 @@ class TodayViewModelTest {
         repo.setTimetable("other.mwl")
         repo.setTimetableConfirmed("other.mwl", PrayerTimesEngine().automaticEntryId(oslo))
         repo.setLegacyHighLatitude(HighLatitudePreference.SEVENTH_OF_NIGHT)
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { oslo },
             now = { Instant.parse("2026-06-21T12:00:00Z") },
         )
         vm.refresh()
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertTrue(Prayer.FAJR in ready.setByRule && Prayer.ISHA in ready.setByRule, "${ready.setByRule}")
         assertFalse(ready.polar)
     }
@@ -223,14 +223,14 @@ class TodayViewModelTest {
         // ends Isha's twilight does not, so Isha alone is set by rule. (Oslo itself follows IRN's and
         // Diyanet's own calendars' curves since Task 7g, so nothing there is set by rule.)
         val vm = viewModel("bergen-own-rule", bergen, Instant.parse("2026-06-21T12:00:00Z"))
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertEquals(setOf(Prayer.ISHA), ready.setByRule)
     }
 
     @Test
     fun aPolarDayShowsItsLineAndNoPills() = runTest {
         val vm = viewModel("longyearbyen-polar", longyearbyen, Instant.parse("2026-06-21T12:00:00Z"))
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertTrue(ready.polar)
         assertTrue(ready.setByRule.isEmpty(), "${ready.setByRule}")
     }
@@ -239,8 +239,8 @@ class TodayViewModelTest {
     fun underTromsosMidnightSunIrnsMakkahTimeShowsItsEstimatesAsSetByRule() = runTest {
         // Ruling R82: IRN's rule gives the whole day, so nothing follows the nearest latitude and no
         // polar line says so; its Makkah-time estimates carry the pill, its noon Dhuhr does not.
-        val vm = todayViewModelForTromso("tromso-makkah-time", Instant.parse("2026-06-21T12:00:00Z"))
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val vm = prayerViewModelForTromso("tromso-makkah-time", Instant.parse("2026-06-21T12:00:00Z"))
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertFalse(ready.polar)
         assertTrue(ready.setByRule.containsAll(listOf(Prayer.FAJR, Prayer.MAGHRIB, Prayer.ISHA)), "${ready.setByRule}")
         assertFalse(Prayer.DHUHR in ready.setByRule)
@@ -257,7 +257,7 @@ class TodayViewModelTest {
         location: GeoLocation,
         session: OneTimeCardSession = OneTimeCardSession(),
         repo: SettingsRepository = settings(store),
-    ) = TodayViewModel(
+    ) = PrayerViewModel(
         engine = PrayerTimesEngine(),
         settings = repo,
         locationOf = { location },
@@ -269,7 +269,7 @@ class TodayViewModelTest {
     fun istanbulNamesDiyanetAsAClassATimetableWithNoCard() = runTest {
         val vm = cardViewModel("istanbul-whose", istanbul)
         vm.refresh()
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertEquals(WhoseTimes("authority_diyanet", EntryClass.A), ready.whose)
         assertNull(ready.oneTimeCard)
     }
@@ -280,18 +280,18 @@ class TodayViewModelTest {
         val session = OneTimeCardSession()
         val vm = cardViewModel("toronto-card", toronto, session, repo)
         vm.refresh()
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertTrue(ready.whose.cautious)
         assertEquals(OneTimeCard.CAUTIOUS, ready.oneTimeCard)
         // Once-only: stored as seen as soon as it is shown, and still on screen this launch.
         assertTrue(repo.cautiousCardSeen.first())
         vm.refresh()
-        assertEquals(OneTimeCard.CAUTIOUS, (vm.state.value as TodayUiState.Ready).oneTimeCard)
+        assertEquals(OneTimeCard.CAUTIOUS, (vm.state.value as PrayerUiState.Ready).oneTimeCard)
 
         vm.answerOneTimeCard(OneTimeCard.CAUTIOUS)
-        assertNull((vm.state.value as TodayUiState.Ready).oneTimeCard)
+        assertNull((vm.state.value as PrayerUiState.Ready).oneTimeCard)
         vm.refresh()
-        assertNull((vm.state.value as TodayUiState.Ready).oneTimeCard)
+        assertNull((vm.state.value as PrayerUiState.Ready).oneTimeCard)
     }
 
     @Test
@@ -299,17 +299,17 @@ class TodayViewModelTest {
         val repo = settings("toronto-unanswered")
         val first = cardViewModel("toronto-unanswered", toronto, OneTimeCardSession(), repo)
         first.refresh()
-        assertEquals(OneTimeCard.CAUTIOUS, (first.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard)
+        assertEquals(OneTimeCard.CAUTIOUS, (first.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready).oneTimeCard)
         val nextLaunch = cardViewModel("toronto-unanswered", toronto, OneTimeCardSession(), repo)
         nextLaunch.refresh()
-        assertNull((nextLaunch.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard)
+        assertNull((nextLaunch.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready).oneTimeCard)
     }
 
     @Test
     fun dammamShowsTheSunniCard() = runTest {
         val vm = cardViewModel("dammam-card", dammam)
         vm.refresh()
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertEquals(OneTimeCard.SUNNI, ready.oneTimeCard)
     }
 
@@ -322,12 +322,12 @@ class TodayViewModelTest {
         first.answerOneTimeCard(OneTimeCard.CAUTIOUS)
         val second = cardViewModel("launch-dammam", dammam, session)
         second.refresh()
-        assertNull((second.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard)
+        assertNull((second.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready).oneTimeCard)
         val nextLaunch = cardViewModel("launch-dammam-next", dammam, OneTimeCardSession())
         nextLaunch.refresh()
         assertEquals(
             OneTimeCard.SUNNI,
-            (nextLaunch.state.first { it is TodayUiState.Ready } as TodayUiState.Ready).oneTimeCard,
+            (nextLaunch.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready).oneTimeCard,
         )
     }
 
@@ -338,12 +338,12 @@ class TodayViewModelTest {
         location: GeoLocation,
         now: Instant,
         configure: suspend (SettingsRepository) -> Unit,
-    ): TodayUiState.Ready {
+    ): PrayerUiState.Ready {
         val repo = settings(store)
         configure(repo)
-        val vm = TodayViewModel(engine = PrayerTimesEngine(), settings = repo, locationOf = { location }, now = { now })
+        val vm = PrayerViewModel(engine = PrayerTimesEngine(), settings = repo, locationOf = { location }, now = { now })
         vm.refresh()
-        return vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        return vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
     }
 
     @Test
@@ -399,8 +399,8 @@ class TodayViewModelTest {
 
     private val casablanca = GeoLocation(33.5731, -7.5898, "Africa/Casablanca", "Casablanca", "MA")
 
-    private suspend fun TestScope.casablancaReady(store: String, phoneOffset: Int, setByHand: Boolean?): TodayUiState.Ready {
-        val vm = TodayViewModel(
+    private suspend fun TestScope.casablancaReady(store: String, phoneOffset: Int, setByHand: Boolean?): PrayerUiState.Ready {
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = settings(store),
             locationOf = { casablanca },
@@ -409,7 +409,7 @@ class TodayViewModelTest {
             zoneOffsetSeconds = { _, _ -> phoneOffset },
         )
         vm.refresh()
-        return vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        return vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
     }
 
     @Test
@@ -431,9 +431,9 @@ class TodayViewModelTest {
 
     @Test
     fun theHijriOffsetShiftsTheDisplayedDate() = runTest {
-        val zero = todayViewModelForLondon("hijri-0", hijriOffset = 0).state.first { it is TodayUiState.Ready }
-        val plus = todayViewModelForLondon("hijri-1", hijriOffset = 1).state.first { it is TodayUiState.Ready }
-        assertTrue((zero as TodayUiState.Ready).hijri != (plus as TodayUiState.Ready).hijri)
+        val zero = prayerViewModelForLondon("hijri-0", hijriOffset = 0).state.first { it is PrayerUiState.Ready }
+        val plus = prayerViewModelForLondon("hijri-1", hijriOffset = 1).state.first { it is PrayerUiState.Ready }
+        assertTrue((zero as PrayerUiState.Ready).hijri != (plus as PrayerUiState.Ready).hijri)
     }
 
     // -- C5: the once-per-second widget refresh storm ------------------------------------------
@@ -459,7 +459,7 @@ class TodayViewModelTest {
      */
     private suspend fun WidgetTrafficProbe.anchorAtFortyMinutesThirtySeconds() {
         viewModel.refresh()
-        val ready = viewModel.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = viewModel.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         now = ready.today.next.instant - 40.minutes - 30.seconds
     }
 
@@ -496,10 +496,11 @@ class TodayViewModelTest {
     }
 
     /**
-     * The device-level claim behind C5, asserted in code: 90 seconds with Today open must cost a
-     * handful of widget updates, not ninety. Ninety seconds crosses one or two whole minutes, and
-     * the ring — quantised to 1/120 of the gap between prayers — may add a step of its own, so the
-     * ceiling is deliberately loose. What matters is that it is nowhere near the tick count.
+     * The device-level claim behind C5, asserted in code: 90 seconds with the Prayer screen open
+     * must cost a handful of widget updates, not ninety. Ninety seconds crosses one or two whole
+     * minutes, and the ring — quantised to 1/120 of the gap between prayers — may add a step of its
+     * own, so the ceiling is deliberately loose. What matters is that it is nowhere near the tick
+     * count.
      */
     @Test
     fun ninetySecondsOfTickingCostsAHandfulOfWidgetUpdatesNotNinety() = runTest {
@@ -521,9 +522,9 @@ class TodayViewModelTest {
     // -- the lifecycle-gated tick -----------------------------------------------------------
     //
     // `tickWhileActive()` replaced `start(scope)`: it owns no scope and no `launch` of its own,
-    // so it runs only for as long as its *caller's* coroutine survives. In `App.kt` that caller is
-    // `repeatOnLifecycle(STARTED) { … }`, which cancels the block the moment the activity is
-    // stopped (screen off, Home pressed) rather than merely leaving composition. This is the
+    // so it runs only for as long as its *caller's* coroutine survives. In `PrayerRoutes.kt` that
+    // caller is `repeatOnLifecycle(STARTED) { … }`, which cancels the block the moment the activity
+    // is stopped (screen off, Home pressed) rather than merely leaving composition. This is the
     // behaviour-level guard for that: drive the loop from a child job, let it tick for real
     // (through a minute boundary, so the dedupe in `refresh()` doesn't hide a stalled loop),
     // cancel the job, and prove nothing it does — mirror write or widget nudge — continues.
@@ -535,7 +536,7 @@ class TodayViewModelTest {
         val store = CountingKeyValueStore()
         var refreshes = 0
         val base = Instant.parse("2026-09-06T14:30:00Z")
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { london },
@@ -551,11 +552,11 @@ class TodayViewModelTest {
 
         val job = launch { vm.tickWhileActive() }
         // The loop refreshes once immediately, before its first delay — the screen must be
-        // correct the instant Today appears, not a second late. Awaited through the state flow
+        // correct the instant it appears, not a second late. Awaited through the state flow
         // rather than `runCurrent()`: the settings DataStore's first read is real (non-virtual)
         // I/O, which a scheduler advance does not wait out, but suspending on the state this
         // refresh produces does.
-        vm.state.first { it is TodayUiState.Ready }
+        vm.state.first { it is PrayerUiState.Ready }
         assertEquals(1, store.writes, "entry must write the mirror once before the first tick")
 
         // Tick through whole-minute boundaries the dedupe cannot collapse into the first write.
@@ -626,10 +627,10 @@ class TodayViewModelTest {
         location: GeoLocation,
         format: PlatformFormat,
         cityRepository: CityRepository = cities(),
-    ): TodayUiState.Ready {
+    ): PrayerUiState.Ready {
         val repo = settings(store)
         repo.setHijriOffsetDays(0)
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { location },
@@ -638,7 +639,7 @@ class TodayViewModelTest {
             format = format,
         )
         vm.refresh()
-        return vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        return vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
     }
 
     @Test
@@ -676,7 +677,7 @@ class TodayViewModelTest {
         repo.setLocation(london)
         assertNull(repo.location.first()!!.cityId, "the fixture must start without an id")
 
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { repo.location.first() },
@@ -688,7 +689,7 @@ class TodayViewModelTest {
 
         assertEquals(2643743, repo.location.first()!!.cityId, "the id must be written back")
         // And the header follows immediately, without waiting for the next launch.
-        val ready = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val ready = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         assertEquals("لندن", ready.cityDisplayName)
     }
 
@@ -699,7 +700,7 @@ class TodayViewModelTest {
         repo.setHijriOffsetDays(0)
         repo.setLocation(londonWithId.copy(countryCode = null, region = null))
         var refreshes = 0
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { repo.location.first() },
@@ -730,7 +731,7 @@ class TodayViewModelTest {
         repo.setHijriOffsetDays(0)
         repo.setLocation(singapore)
         var parses = 0
-        val first = TodayViewModel(
+        val first = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { repo.location.first() },
@@ -758,7 +759,7 @@ class TodayViewModelTest {
         val repo = settings("city-by-id-backfill")
         repo.setHijriOffsetDays(0)
         repo.setLocation(london.copy(cityId = 2643743))
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { repo.location.first() },
@@ -777,7 +778,7 @@ class TodayViewModelTest {
         repo.setHijriOffsetDays(0)
         repo.setLocation(london.copy(region = "England"))
         var refreshes = 0
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { repo.location.first() },
@@ -803,7 +804,7 @@ class TodayViewModelTest {
 
         val repo = settings("city-language-swap-en")
         repo.setHijriOffsetDays(0)
-        val successor = TodayViewModel(
+        val successor = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { londonWithId },
@@ -816,7 +817,7 @@ class TodayViewModelTest {
         assertEquals(outgoing, successor.state.value)
 
         successor.refresh()
-        val ready = successor.state.value as TodayUiState.Ready
+        val ready = successor.state.value as PrayerUiState.Ready
         assertEquals("London", ready.cityDisplayName, "and then the new language's name")
         assertEquals(outgoing.today.rows.size, ready.today.rows.size)
     }
@@ -831,7 +832,7 @@ class TodayViewModelTest {
         val repo = settings("city-id-migration-lag")
         repo.setHijriOffsetDays(0)
         repo.setLocation(london)
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { london }, // a store that never reports the id back
@@ -842,13 +843,13 @@ class TodayViewModelTest {
         vm.refresh()
         assertEquals(
             "\u0644\u0646\u062F\u0646",
-            (vm.state.value as TodayUiState.Ready).cityDisplayName,
+            (vm.state.value as PrayerUiState.Ready).cityDisplayName,
         )
 
         repeat(3) { vm.refresh() }
         assertEquals(
             "\u0644\u0646\u062F\u0646",
-            (vm.state.value as TodayUiState.Ready).cityDisplayName,
+            (vm.state.value as PrayerUiState.Ready).cityDisplayName,
             "the header fell back to the English snapshot while the store caught up",
         )
     }
@@ -868,7 +869,7 @@ class TodayViewModelTest {
         val store = settings("city-name-stale")
         store.setHijriOffsetDays(0)
         var current = londonWithId
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = store,
             locationOf = { current },
@@ -879,7 +880,7 @@ class TodayViewModelTest {
 
         // Everything the state flow publishes, captured before the race rather than sampled after
         // it: the corrupt value the missing guard produced was overwritten by the next tick.
-        val seen = mutableListOf<TodayUiState>()
+        val seen = mutableListOf<PrayerUiState>()
         val watcher = launch(start = CoroutineStart.UNDISPATCHED) { vm.state.toList(seen) }
 
         val first = launch { vm.refresh() } // publishes London, then blocks in the lookup
@@ -893,11 +894,11 @@ class TodayViewModelTest {
         second.join()
         watcher.cancel()
 
-        val misattributed = seen.filterIsInstance<TodayUiState.Ready>().filter {
+        val misattributed = seen.filterIsInstance<PrayerUiState.Ready>().filter {
             it.location == cairoWithId && it.cityDisplayName == "\u0644\u0646\u062F\u0646"
         }
         assertTrue(misattributed.isEmpty(), "London's Arabic name was published under Cairo")
-        assertEquals("Cairo", (vm.state.value as TodayUiState.Ready).cityDisplayName)
+        assertEquals("Cairo", (vm.state.value as PrayerUiState.Ready).cityDisplayName)
     }
 
     // -- D1: the header remembers its translated name -------------------------------------------
@@ -918,7 +919,7 @@ class TodayViewModelTest {
         location: GeoLocation,
         cityRepository: CityRepository,
         format: PlatformFormat,
-    ) = TodayViewModel(
+    ) = PrayerViewModel(
         engine = PrayerTimesEngine(),
         settings = repo,
         locationOf = { location },
@@ -934,7 +935,7 @@ class TodayViewModelTest {
         repo.setLocation(londonWithId, ResolvedCityName("\u0644\u0646\u062F\u0646", "ar-LY"))
 
         val vm = viewModelFor(repo, londonWithId, noCityListAtAll(), ArabicPlatformFormat())
-        val seen = mutableListOf<TodayUiState>()
+        val seen = mutableListOf<PrayerUiState>()
         val watcher = launch(start = CoroutineStart.UNDISPATCHED) { vm.state.toList(seen) }
         vm.refresh()
         // The collector is resumed by the scheduler, not by the emission itself: without this it
@@ -942,7 +943,7 @@ class TodayViewModelTest {
         runCurrent()
         watcher.cancel()
 
-        val ready = seen.filterIsInstance<TodayUiState.Ready>()
+        val ready = seen.filterIsInstance<PrayerUiState.Ready>()
         assertEquals(
             "\u0644\u0646\u062F\u0646",
             ready.first().cityDisplayName,
@@ -973,7 +974,7 @@ class TodayViewModelTest {
         // Awaited through the state rather than with `runCurrent()`: the settings store's first
         // read is real I/O, which advancing the scheduler does not wait out. The lookup is still
         // held at the gate, so this is genuinely the state the first frame would paint.
-        val first = vm.state.first { it is TodayUiState.Ready } as TodayUiState.Ready
+        val first = vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready
         // Today's behaviour, kept on purpose for exactly this case: a stored English name must not
         // be printed to a reader in Arabic, so this one launch flickers as it always did.
         assertEquals("London", first.cityDisplayName)
@@ -982,7 +983,7 @@ class TodayViewModelTest {
         refreshing.join()
         assertEquals(
             "\u0644\u0646\u062F\u0646",
-            (vm.state.value as TodayUiState.Ready).cityDisplayName,
+            (vm.state.value as PrayerUiState.Ready).cityDisplayName,
         )
         // And the next launch will not: the Arabic name is now what is stored.
         assertEquals(
@@ -1025,7 +1026,7 @@ class TodayViewModelTest {
         val repo = settings("city-id-migration-once")
         repo.setHijriOffsetDays(0)
         repo.setLocation(london)
-        val vm = TodayViewModel(
+        val vm = PrayerViewModel(
             engine = PrayerTimesEngine(),
             settings = repo,
             locationOf = { repo.location.first() },
@@ -1037,8 +1038,8 @@ class TodayViewModelTest {
         assertEquals(2643743, repo.location.first()!!.cityId)
 
         // Put the store back the way an old install left it. Ninety more ticks — a minute and a
-        // half with Today open — must not scan the city list or write the id again, which is what
-        // the id staying absent proves.
+        // half with the Prayer screen open — must not scan the city list or write the id again,
+        // which is what the id staying absent proves.
         repo.setLocation(london)
         repeat(90) { vm.refresh() }
         assertNull(repo.location.first()!!.cityId, "the backfill ran more than once")

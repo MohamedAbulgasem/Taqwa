@@ -35,48 +35,48 @@
     <string name="prayer_maghrib">Akşam</string>
     <string name="prayer_isha">Yatsı</string>
 
-    <!-- Bugün -->
-    <string name="today_current_location">Mevcut konum</string>
+    <!-- Namaz ekranı -->
+    <string name="prayer_current_location">Mevcut konum</string>
     <!-- Geri sayım halkasının etiketi. Halka bu metni büyük harfe çevirir; Türkçedeki İ’lerin
          doğru kalması için burada zaten büyük harfle yazılmıştır. -->
-    <string name="today_next_in">%1$s vaktine</string>
-    <string name="today_exact_alarms_label">TAM ALARMLAR KAPALI</string>
-    <string name="today_exact_alarms_body">Taqwa için “Alarmlar ve hatırlatıcılar” izni verilmediği sürece Android bir saate kadar geç çalabilir.</string>
-    <string name="today_no_location_title">Henüz konum yok</string>
-    <string name="today_choose_city">Şehir seç</string>
-    <string name="today_location_settings">Konumu Ayarlar’dan aç</string>
-    <string name="today_jumuah">Cuma</string>
+    <string name="prayer_next_in">%1$s vaktine</string>
+    <string name="prayer_exact_alarms_label">TAM ALARMLAR KAPALI</string>
+    <string name="prayer_exact_alarms_body">Taqwa için “Alarmlar ve hatırlatıcılar” izni verilmediği sürece Android bir saate kadar geç çalabilir.</string>
+    <string name="prayer_no_location_title">Henüz konum yok</string>
+    <string name="prayer_choose_city">Şehir seç</string>
+    <string name="prayer_location_settings">Konumu Ayarlar’dan aç</string>
+    <string name="prayer_jumuah">Cuma</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
-    <string name="today_whose_checked_title">%1$s takvimi</string>
-    <string name="today_whose_checked_body">%2$s için %1$s vakitleri; Taqwa bunları yeniden hesaplayıp yayımlanan takvimle karşılaştırdı.</string>
-    <string name="today_whose_unchecked_title">%1$s yöntemi, henüz tam doğrulanmadı</string>
-    <string name="today_whose_unchecked_body">Taqwa, %2$s vakitlerini %1$s yöntemiyle, bir güvenlik payı ekleyerek hesaplar.</string>
-    <string name="today_whose_cautious_body">Buradaki camiler farklı takvimlere uyuyor; Taqwa her namazı, hepsinde vakit girdikten sonra gösterir.</string>
-    <string name="today_whose_calculated_body">Burada bilinen yerel bir takvim yok; Taqwa bu vakitleri ihtiyatlı biçimde hesaplar.</string>
-    <string name="today_about_these_times">Bu vakitler hakkında</string>
-    <string name="today_times_by">%1$s vakitleri</string>
-    <string name="today_whose_a11y">%1$s, %2$s. Vakitlerin kaynağını açar</string>
-    <string name="today_about_a11y">%1$s, %2$s. “Bu vakitler hakkında” sayfasını açar</string>
-    <string name="today_set_by_rule">Takdirî</string>
-    <string name="today_polar_line">Güneş bugün burada ne doğuyor ne batıyor; bu yüzden bazı vakitler, güneşin doğup battığı en yakın enleme göre belirlenir.</string>
-    <string name="today_card_cautious_title">Buradaki camiler farklı takvimlere uyuyor</string>
-    <string name="today_card_cautious_body">Taqwa her namazı, hepsinde vakit girdikten sonra gösterir.</string>
-    <string name="today_card_sunni_title">Bunlar Sünni namaz vakitleridir</string>
-    <string name="today_card_sunni_body">Şii (Caferî) uygulamasında akşam namazı ve iftar daha geçtir.</string>
-    <string name="today_match_my_mosque">Camimle eşleştir</string>
-    <string name="today_card_ok">Tamam</string>
-    <string name="today_clock_line">Telefonunuzun saati bir saat farklı olabilir</string>
-    <string name="today_clock_stale_early">%1$s, %2$s tarihinde resmî saatini değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat erken görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
-    <string name="today_clock_stale_late">%1$s, %2$s tarihinde resmî saatini değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat geç görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
-    <string name="today_clock_manual_early">%1$s, %2$s tarihinde resmî saatini değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat erken görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
-    <string name="today_clock_manual_late">%1$s, %2$s tarihinde resmî saatini değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat geç görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
-    <string name="today_clock_region_morocco">Fas</string>
-    <string name="today_clock_region_british_columbia">Britanya Kolumbiyası</string>
-    <string name="today_clock_region_kazakhstan">Kazakistan</string>
-    <string name="today_differ_before">%1$s takviminde %2$s %3$s itibarıyla başlıyor</string>
-    <string name="today_differ_after">%1$s takviminde %2$s başladı · Taqwa %3$s itibarıyla gösteriyor</string>
-    <string name="today_other_asr">%1$s %2$s</string>
+    <string name="prayer_whose_checked_title">%1$s takvimi</string>
+    <string name="prayer_whose_checked_body">%2$s için %1$s vakitleri; Taqwa bunları yeniden hesaplayıp yayımlanan takvimle karşılaştırdı.</string>
+    <string name="prayer_whose_unchecked_title">%1$s yöntemi, henüz tam doğrulanmadı</string>
+    <string name="prayer_whose_unchecked_body">Taqwa, %2$s vakitlerini %1$s yöntemiyle, bir güvenlik payı ekleyerek hesaplar.</string>
+    <string name="prayer_whose_cautious_body">Buradaki camiler farklı takvimlere uyuyor; Taqwa her namazı, hepsinde vakit girdikten sonra gösterir.</string>
+    <string name="prayer_whose_calculated_body">Burada bilinen yerel bir takvim yok; Taqwa bu vakitleri ihtiyatlı biçimde hesaplar.</string>
+    <string name="prayer_about_these_times">Bu vakitler hakkında</string>
+    <string name="prayer_times_by">%1$s vakitleri</string>
+    <string name="prayer_whose_a11y">%1$s, %2$s. Vakitlerin kaynağını açar</string>
+    <string name="prayer_about_a11y">%1$s, %2$s. “Bu vakitler hakkında” sayfasını açar</string>
+    <string name="prayer_set_by_rule">Takdirî</string>
+    <string name="prayer_polar_line">Güneş bugün burada ne doğuyor ne batıyor; bu yüzden bazı vakitler, güneşin doğup battığı en yakın enleme göre belirlenir.</string>
+    <string name="prayer_card_cautious_title">Buradaki camiler farklı takvimlere uyuyor</string>
+    <string name="prayer_card_cautious_body">Taqwa her namazı, hepsinde vakit girdikten sonra gösterir.</string>
+    <string name="prayer_card_sunni_title">Bunlar Sünni namaz vakitleridir</string>
+    <string name="prayer_card_sunni_body">Şii (Caferî) uygulamasında akşam namazı ve iftar daha geçtir.</string>
+    <string name="prayer_match_my_mosque">Camimle eşleştir</string>
+    <string name="prayer_card_ok">Tamam</string>
+    <string name="prayer_clock_line">Telefonunuzun saati bir saat farklı olabilir</string>
+    <string name="prayer_clock_stale_early">%1$s, %2$s tarihinde resmî saatini değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat erken görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="prayer_clock_stale_late">%1$s, %2$s tarihinde resmî saatini değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat geç görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="prayer_clock_manual_early">%1$s, %2$s tarihinde resmî saatini değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat erken görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="prayer_clock_manual_late">%1$s, %2$s tarihinde resmî saatini değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat geç görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="prayer_clock_region_morocco">Fas</string>
+    <string name="prayer_clock_region_british_columbia">Britanya Kolumbiyası</string>
+    <string name="prayer_clock_region_kazakhstan">Kazakistan</string>
+    <string name="prayer_differ_before">%1$s takviminde %2$s %3$s itibarıyla başlıyor</string>
+    <string name="prayer_differ_after">%1$s takviminde %2$s başladı · Taqwa %3$s itibarıyla gösteriyor</string>
+    <string name="prayer_other_asr">%1$s %2$s</string>
 
     <!-- Ayarlar kökü -->
     <string name="settings_title">Ayarlar</string>
@@ -489,7 +489,7 @@
     <string name="tab_quran">Kur’an</string>
     <string name="tab_settings">Ayarlar</string>
     <!-- Namaz ekranındaki Kıble kartı: kuzeyden açı, sonra büyük daire mesafesi. -->
-    <string name="today_qibla_detail">%1$s° · Mekke’ye %2$s km</string>
+    <string name="prayer_qibla_detail">%1$s° · Mekke’ye %2$s km</string>
     <!-- Kur’an sekmesinin kökü (dilim 2a görev 5) -->
     <string name="quran_title">Kur’an</string>
     <string name="quran_search_hint">Kur’an’da ara</string>
@@ -536,7 +536,7 @@
     <string name="quran_a11y_read_aloud">Sesli okunuyor</string>
     <!-- Tesbih -->
     <string name="tasbeeh_title">Tesbih</string>
-    <string name="today_open_tasbeeh">Tesbih</string>
+    <string name="prayer_open_tasbeeh">Tesbih</string>
     <string name="tasbeeh_add_custom">Zikir ekle</string>
     <string name="tasbeeh_round">%1$s. TUR</string>
     <string name="tasbeeh_of">/ %1$s</string>
@@ -633,7 +633,7 @@
     <string name="prayer_times_time_format">Saat biçimi</string>
     <string name="time_format_24">24 saat</string>
     <string name="time_format_12">12 saat</string>
-    <string name="today_open_adhkar">Zikirler</string>
+    <string name="prayer_open_adhkar">Zikirler</string>
     <string name="adhkar_morning">Sabah zikirleri</string>
     <string name="adhkar_evening">Akşam zikirleri</string>
     <string name="adhkar_segment_morning">Sabah</string>

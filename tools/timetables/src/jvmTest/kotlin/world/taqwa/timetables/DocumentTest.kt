@@ -350,7 +350,7 @@ class DocumentTest {
         assertEquals("Stop eating by {time} today.", s["stopEating"])
         // The Arabic page says the same in the app's Arabic.
         val ar = page(london, "ar").map("strings")
-        assertEquals(strings.format("ar", "today_whose_checked_title", strings.get("ar", "authority_london_unified")), ar["whoseTitle"])
+        assertEquals(strings.format("ar", "prayer_whose_checked_title", strings.get("ar", "authority_london_unified")), ar["whoseTitle"])
     }
 
     @Test

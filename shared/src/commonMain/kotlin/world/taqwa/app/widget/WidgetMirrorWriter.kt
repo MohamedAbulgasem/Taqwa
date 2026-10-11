@@ -30,9 +30,9 @@ object WidgetMirrorWriter {
     }
 
     /**
-     * Mirrors the exact copy `Res.string.today_next_in` renders for Today's ring ("%1$s in" /
-     * "متبقٍ على %1$s") as plain Kotlin instead of a resource lookup — for the same reason
-     * [world.taqwa.app.notifications.LocalizedNotificationCopy] is: this runs from a plain,
+     * Mirrors the exact copy `Res.string.prayer_next_in` renders for the Prayer screen's ring
+     * ("%1$s in" / "متبقٍ على %1$s") as plain Kotlin instead of a resource lookup — for the same
+     * reason [world.taqwa.app.notifications.LocalizedNotificationCopy] is: this runs from a plain,
      * non-composable writer, which is what makes it testable without a resource loader. That
      * matters concretely here, not just stylistically — Compose Multiplatform's non-composable
      * `getString` calls `Resources.getSystem()` unconditionally on Android, which the local JVM
@@ -49,7 +49,7 @@ object WidgetMirrorWriter {
      * Every other field in a [WidgetSnapshot] is minute-granular — `countdownMinutes` is
      * `inWholeMinutes`, the clock strings are `HH:mm` — but `TodayState.ringProgress` is
      * elapsed/total in *seconds*, so it takes a different value on every one of
-     * `TodayViewModel`'s 1 Hz ticks. That single field is what made the serialised snapshot
+     * `PrayerViewModel`'s 1 Hz ticks. That single field is what made the serialised snapshot
      * differ every second, which defeated iOS's `lastSnapshot` dedupe and burned WidgetKit's
      * ~40-70 reloads/day budget in under a minute, after which the widget froze for the day.
      *
@@ -112,9 +112,10 @@ object WidgetMirrorWriter {
             languageTag = format.languageTag(),
             ringProgress = quantisedRing(today.ringProgress),
             countdownLabel = countdownLabel(today.next.prayer, format.languageTag()),
-            // Absolute instants, not elapsed durations. The mirror is only written while Today is
-            // open, so anything relative in it is a lie the moment the screen closes; a widget
-            // holding the instant can recompute against its own clock whenever it happens to draw.
+            // Absolute instants, not elapsed durations. The mirror is only written while the Prayer
+            // screen is open, so anything relative in it is a lie the moment the screen closes; a
+            // widget holding the instant can recompute against its own clock whenever it happens to
+            // draw.
             nextPrayerEpochSeconds = today.next.instant.epochSeconds,
             previousPrayerEpochSeconds = previousObligatoryInstant(today),
             schedule = schedule,
@@ -146,7 +147,7 @@ object WidgetMirrorWriter {
     /**
      * The exact string [write] would store. Exposed so a caller that recomputes once a second can
      * compare it against what it last wrote and skip both the store write and `refreshWidgets()`
-     * when nothing a widget could show has actually changed (see `TodayViewModel.refresh`).
+     * when nothing a widget could show has actually changed (see `PrayerViewModel.refresh`).
      */
     fun serializedSnapshot(
         today: TodayState,

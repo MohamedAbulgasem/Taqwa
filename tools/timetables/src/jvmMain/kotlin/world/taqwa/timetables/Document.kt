@@ -203,11 +203,11 @@ class Document(
             "otherSchool" to strings.school(language, p.source.school.other),
             "members" to p.effective.members.map { strings.get(language, it.nameKey) },
             "prayers" to prayers,
-            "nextIn" to prayers.map { strings.format(language, "today_next_in", it) },
-            "jumuah" to strings.get(language, "today_jumuah"),
+            "nextIn" to prayers.map { strings.format(language, "prayer_next_in", it) },
+            "jumuah" to strings.get(language, "prayer_jumuah"),
             "qibla" to strings.get(language, "qibla_title"),
             "qiblaDetail" to strings.format(
-                language, "today_qibla_detail", f.digits(qibla.bearing.toInt()), f.distance(qibla.km),
+                language, "prayer_qibla_detail", f.digits(qibla.bearing.toInt()), f.distance(qibla.km),
             ),
             "bearing" to f.bearing(qibla.bearing),
             "distance" to f.distance(qibla.km),
@@ -274,7 +274,7 @@ class Document(
         val through = p.published?.let { f.longDate(it.through) }
         fun checked(key: String, vararg args: String) = if (cautious) "" else strings.format(language, key, *args)
         return linkedMapOf(
-            "whoseTitle" to if (cautious) strings.get(language, "timetable_cautious") else strings.format(language, "today_whose_checked_title", authority),
+            "whoseTitle" to if (cautious) strings.get(language, "timetable_cautious") else strings.format(language, "prayer_whose_checked_title", authority),
             "notAffiliated" to checked("about_not_affiliated", authority),
             "checkedThrough" to when {
                 through == null -> ""
@@ -299,8 +299,8 @@ class Document(
             "maghribCapTemplate" to (if (cautious) strings.get(language, "about_cautious_maghrib_cap") else ""),
             "whichDecides" to strings.get(language, "about_which_decides"),
             "matchMosque" to strings.get(language, "timetable_match_mosque"),
-            "setByRule" to strings.get(language, "today_set_by_rule"),
-            "polarLine" to strings.get(language, "today_polar_line"),
+            "setByRule" to strings.get(language, "prayer_set_by_rule"),
+            "polarLine" to strings.get(language, "prayer_polar_line"),
             "stopEating" to strings.get(language, "about_stop_eating").replace("%1\$s", "{time}"),
         )
     }

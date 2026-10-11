@@ -41,7 +41,7 @@ class AppStringsTest {
 
     @Test
     fun placeholdersAreFilledInOrder() {
-        assertEquals("109° · 2,916 km to Makkah", strings.format("en", "today_qibla_detail", "109", "2,916"))
+        assertEquals("109° · 2,916 km to Makkah", strings.format("en", "prayer_qibla_detail", "109", "2,916"))
     }
 
     @Test

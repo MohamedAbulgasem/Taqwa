@@ -157,8 +157,8 @@ fun AppearanceSettingsScreen(
         SectionLabel(stringResource(Res.string.appearance_prayer_widget_preview_label))
         val systemIsDark = isSystemInDarkTheme()
         // Read once per composition rather than observed live: the mirror only changes when
-        // Today refreshes (once a second while it's open), and re-reading it here on every
-        // recomposition would be wasted work for a preview whose only job is to react to
+        // the Prayer screen refreshes (once a second while it's open), and re-reading it here on
+        // every recomposition would be wasted work for a preview whose only job is to react to
         // [widgetBackground] changing.
         val mirrorContent: WidgetContent? = remember {
             WidgetMirrorWriter.read(createWidgetKeyValueStore())?.let(WidgetContentBuilder::build)

@@ -16,10 +16,10 @@ interface PlatformFormat {
      * created with [ClockFormat.TWELVE_HOUR].
      *
      * The hour is *not* zero-padded and the minute always is — "3:42", "٣:٤٢", "15:07". That is
-     * the shape the spec quotes for a Libyan user and the shape Today already showed before this
-     * task, so migrating to CLDR digits does not silently reformat every English screen. (The
-     * brief's sketch padded both fields; padding the hour would have turned every existing
-     * "3:42" into "03:42".)
+     * the shape the spec quotes for a Libyan user and the shape the Prayer screen already showed
+     * before this task, so migrating to CLDR digits does not silently reformat every English
+     * screen. (The brief's sketch padded both fields; padding the hour would have turned every
+     * existing "3:42" into "03:42".)
      */
     fun clockTime(hour: Int, minute: Int): String
 

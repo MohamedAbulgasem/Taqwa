@@ -130,7 +130,7 @@ class CityRepository(
      * with no name for this city, or an English interface, pays the linear scan. That is
      * deliberate: an id→city index would be a second 34k-entry structure held for the life of
      * the process to serve a lookup that happens when the location or the language changes, and
-     * both callers ([TodayViewModel] and `App.kt`) cache the string they get back.
+     * both callers ([PrayerViewModel] and `App.kt`) cache the string they get back.
      */
     suspend fun displayName(cityId: Int): String? = withContext(Dispatchers.Default) {
         val loaded = data()

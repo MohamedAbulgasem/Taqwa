@@ -10,7 +10,8 @@ enum class LocationAnswer {
     /**
      * Declined: the city search opens straight away. App Review asks that the alternative come
      * after the system prompt rather than beside it (guideline 5.1.1(iv)), and a prayer app with
-     * no place has nothing to show, so a city is what a refusal leads to, not an empty Today.
+     * no place has nothing to show, so a city is what a refusal leads to, not an empty Prayer
+     * screen.
      */
     CHOOSE_CITY,
 

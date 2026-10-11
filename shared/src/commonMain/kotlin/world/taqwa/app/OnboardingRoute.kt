@@ -45,7 +45,7 @@ internal fun OnboardingRoute(
         onComplete = {
             scope.launch {
                 settings.setOnboardingComplete(true)
-                navigator.replaceAll(Screen.Today)
+                navigator.replaceAll(Screen.Prayer)
             }
         },
         exactAlarmsNeeded = !exactAlarmsAllowed,

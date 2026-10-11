@@ -10,12 +10,12 @@ class NavigatorTest {
 
     @Test
     fun startsOnTheGivenScreen() {
-        assertEquals(Screen.Today, Navigator(Screen.Today).current)
+        assertEquals(Screen.Prayer, Navigator(Screen.Prayer).current)
     }
 
     @Test
     fun pushAndPopReturnToWhereYouWere() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.push(Screen.Settings)
         n.push(Screen.Appearance)
         assertEquals(Screen.Appearance, n.current)
@@ -25,14 +25,14 @@ class NavigatorTest {
 
     @Test
     fun popAtTheRootIsRefusedSoTheAppNeverEmptiesItself() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         assertFalse(n.pop())
-        assertEquals(Screen.Today, n.current)
+        assertEquals(Screen.Prayer, n.current)
     }
 
     @Test
     fun selectingATabLandsOnItsRootWithNothingBehindIt() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.selectTab(Tab.SETTINGS)
         assertEquals(Screen.Settings, n.current)
         assertEquals(Tab.SETTINGS, n.currentTab)
@@ -42,7 +42,7 @@ class NavigatorTest {
 
     @Test
     fun aSubScreenStacksOnTheTabRootAndPopReturnsToIt() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.selectTab(Tab.SETTINGS)
         n.push(Screen.PrayerTimesSettings)
         n.push(Screen.Timetable)
@@ -56,18 +56,18 @@ class NavigatorTest {
 
     @Test
     fun selectingATabFromASubScreenReplacesTheWholeStack() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.selectTab(Tab.SETTINGS)
         n.push(Screen.LocationSettings)
         n.push(Screen.CitySearch)
         n.selectTab(Tab.PRAYER)
-        assertEquals(Screen.Today, n.current)
-        assertEquals(listOf<Screen>(Screen.Today), n.backStack.value)
+        assertEquals(Screen.Prayer, n.current)
+        assertEquals(listOf<Screen>(Screen.Prayer), n.backStack.value)
     }
 
     @Test
     fun exactlyThreeScreensAreTabRoots() {
-        val roots = listOf(Screen.Today, Screen.Quran, Screen.Settings)
+        val roots = listOf(Screen.Prayer, Screen.Quran, Screen.Settings)
         roots.forEach { assertTrue(isTabRoot(it), "$it should be a tab root") }
         listOf(
             Screen.Onboarding,
@@ -92,7 +92,7 @@ class NavigatorTest {
 
     @Test
     fun pushingReaderAndMushafOnTheQuranTabKeepsItCurrent() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.selectTab(Tab.QURAN)
         n.push(Screen.Reader(2, 1))
         n.push(Screen.Mushaf(2))
@@ -111,14 +111,14 @@ class NavigatorTest {
     fun replaceAllClearsHistory() {
         val n = Navigator(Screen.Onboarding)
         n.push(Screen.Settings)
-        n.replaceAll(Screen.Today)
-        assertEquals(Screen.Today, n.current)
+        n.replaceAll(Screen.Prayer)
+        assertEquals(Screen.Prayer, n.current)
         assertFalse(n.pop())
     }
 
     @Test
     fun replaceSwapsTheTopScreenWithoutTouchingWhatIsBehindIt() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.selectTab(Tab.QURAN)
         n.push(Screen.Reader(2, 1))
         n.replace(Screen.Mushaf(2))
@@ -130,7 +130,7 @@ class NavigatorTest {
 
     @Test
     fun replaceAtTheRootBehavesLikeReplaceAll() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.replace(Screen.Settings)
         assertEquals(listOf<Screen>(Screen.Settings), n.backStack.value)
     }

@@ -35,46 +35,46 @@
     <string name="prayer_maghrib">Maghrib</string>
     <string name="prayer_isha">Isha</string>
 
-    <!-- Today -->
-    <string name="today_current_location">Position actuelle</string>
-    <string name="today_next_in">%1$s dans</string>
-    <string name="today_exact_alarms_label">ALARMES EXACTES DÉSACTIVÉES</string>
-    <string name="today_exact_alarms_body">Android peut sonner jusqu’à une heure en retard tant que « Alarmes et rappels » n’est pas autorisé pour Taqwa.</string>
-    <string name="today_no_location_title">Pas encore de position</string>
-    <string name="today_choose_city">Choisir une ville</string>
-    <string name="today_location_settings">Activer la position dans les paramètres</string>
-    <string name="today_jumuah">Joumouʿa</string>
+    <!-- Prayer screen -->
+    <string name="prayer_current_location">Position actuelle</string>
+    <string name="prayer_next_in">%1$s dans</string>
+    <string name="prayer_exact_alarms_label">ALARMES EXACTES DÉSACTIVÉES</string>
+    <string name="prayer_exact_alarms_body">Android peut sonner jusqu’à une heure en retard tant que « Alarmes et rappels » n’est pas autorisé pour Taqwa.</string>
+    <string name="prayer_no_location_title">Pas encore de position</string>
+    <string name="prayer_choose_city">Choisir une ville</string>
+    <string name="prayer_location_settings">Activer la position dans les paramètres</string>
+    <string name="prayer_jumuah">Joumouʿa</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
-    <string name="today_whose_checked_title">Calendrier %1$s</string>
-    <string name="today_whose_checked_body">Horaires %1$s pour %2$s, reproduits par Taqwa et vérifiés d’après le calendrier publié.</string>
-    <string name="today_whose_unchecked_title">Méthode %1$s, pas encore entièrement vérifiée</string>
-    <string name="today_whose_unchecked_body">Taqwa calcule les horaires pour %2$s selon la méthode %1$s, avec une marge de sécurité.</string>
-    <string name="today_whose_cautious_body">Les mosquées d’ici suivent des calendriers différents : Taqwa affiche chaque prière une fois qu’elles l’ont toutes commencée.</string>
-    <string name="today_whose_calculated_body">Aucun calendrier local n’est connu ici : Taqwa calcule donc ces horaires avec prudence.</string>
-    <string name="today_about_these_times">À propos de ces horaires</string>
-    <string name="today_times_by">Horaires selon %1$s</string>
-    <string name="today_whose_a11y">%1$s, %2$s. Ouvre la provenance de ces horaires</string>
-    <string name="today_about_a11y">%1$s, %2$s. Ouvre « À propos de ces horaires »</string>
-    <string name="today_set_by_rule">Fixé par règle</string>
-    <string name="today_polar_line">Le soleil ne se lève ni ne se couche ici aujourd’hui : certains horaires suivent la latitude la plus proche où c’est le cas.</string>
-    <string name="today_card_cautious_title">Les mosquées d’ici suivent des calendriers différents</string>
-    <string name="today_card_cautious_body">Taqwa affiche chaque prière une fois qu’elles l’ont toutes commencée.</string>
-    <string name="today_card_sunni_title">Ce sont des horaires de prière sunnites</string>
-    <string name="today_card_sunni_body">Dans la pratique chiite (jaʿfarite), le Maghrib et l’iftar sont plus tardifs.</string>
-    <string name="today_match_my_mosque">Aligner sur ma mosquée</string>
-    <string name="today_card_ok">OK</string>
-    <string name="today_clock_line">L’horloge de votre téléphone a peut-être une heure d’écart</string>
-    <string name="today_clock_stale_early">%1$s a changé d’heure le %2$s et votre téléphone ne le sait pas encore : les horaires de prière peuvent avoir une heure d’avance. Installez la dernière mise à jour du système et laissez la date et l’heure en automatique : les alertes ne sont justes qu’avec l’heure automatique.</string>
-    <string name="today_clock_stale_late">%1$s a changé d’heure le %2$s et votre téléphone ne le sait pas encore : les horaires de prière peuvent avoir une heure de retard. Installez la dernière mise à jour du système et laissez la date et l’heure en automatique : les alertes ne sont justes qu’avec l’heure automatique.</string>
-    <string name="today_clock_manual_early">%1$s a changé d’heure le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure d’avance. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique.</string>
-    <string name="today_clock_manual_late">%1$s a changé d’heure le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure de retard. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique.</string>
-    <string name="today_clock_region_morocco">Le Maroc</string>
-    <string name="today_clock_region_british_columbia">La Colombie-Britannique</string>
-    <string name="today_clock_region_kazakhstan">Le Kazakhstan</string>
-    <string name="today_differ_before">Selon %1$s, %2$s commence à %3$s</string>
-    <string name="today_differ_after">Selon %1$s, %2$s a commencé · Taqwa l’affiche dès %3$s</string>
-    <string name="today_other_asr">%1$s %2$s</string>
+    <string name="prayer_whose_checked_title">Calendrier %1$s</string>
+    <string name="prayer_whose_checked_body">Horaires %1$s pour %2$s, reproduits par Taqwa et vérifiés d’après le calendrier publié.</string>
+    <string name="prayer_whose_unchecked_title">Méthode %1$s, pas encore entièrement vérifiée</string>
+    <string name="prayer_whose_unchecked_body">Taqwa calcule les horaires pour %2$s selon la méthode %1$s, avec une marge de sécurité.</string>
+    <string name="prayer_whose_cautious_body">Les mosquées d’ici suivent des calendriers différents : Taqwa affiche chaque prière une fois qu’elles l’ont toutes commencée.</string>
+    <string name="prayer_whose_calculated_body">Aucun calendrier local n’est connu ici : Taqwa calcule donc ces horaires avec prudence.</string>
+    <string name="prayer_about_these_times">À propos de ces horaires</string>
+    <string name="prayer_times_by">Horaires selon %1$s</string>
+    <string name="prayer_whose_a11y">%1$s, %2$s. Ouvre la provenance de ces horaires</string>
+    <string name="prayer_about_a11y">%1$s, %2$s. Ouvre « À propos de ces horaires »</string>
+    <string name="prayer_set_by_rule">Fixé par règle</string>
+    <string name="prayer_polar_line">Le soleil ne se lève ni ne se couche ici aujourd’hui : certains horaires suivent la latitude la plus proche où c’est le cas.</string>
+    <string name="prayer_card_cautious_title">Les mosquées d’ici suivent des calendriers différents</string>
+    <string name="prayer_card_cautious_body">Taqwa affiche chaque prière une fois qu’elles l’ont toutes commencée.</string>
+    <string name="prayer_card_sunni_title">Ce sont des horaires de prière sunnites</string>
+    <string name="prayer_card_sunni_body">Dans la pratique chiite (jaʿfarite), le Maghrib et l’iftar sont plus tardifs.</string>
+    <string name="prayer_match_my_mosque">Aligner sur ma mosquée</string>
+    <string name="prayer_card_ok">OK</string>
+    <string name="prayer_clock_line">L’horloge de votre téléphone a peut-être une heure d’écart</string>
+    <string name="prayer_clock_stale_early">%1$s a changé d’heure le %2$s et votre téléphone ne le sait pas encore : les horaires de prière peuvent avoir une heure d’avance. Installez la dernière mise à jour du système et laissez la date et l’heure en automatique : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="prayer_clock_stale_late">%1$s a changé d’heure le %2$s et votre téléphone ne le sait pas encore : les horaires de prière peuvent avoir une heure de retard. Installez la dernière mise à jour du système et laissez la date et l’heure en automatique : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="prayer_clock_manual_early">%1$s a changé d’heure le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure d’avance. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="prayer_clock_manual_late">%1$s a changé d’heure le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure de retard. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique.</string>
+    <string name="prayer_clock_region_morocco">Le Maroc</string>
+    <string name="prayer_clock_region_british_columbia">La Colombie-Britannique</string>
+    <string name="prayer_clock_region_kazakhstan">Le Kazakhstan</string>
+    <string name="prayer_differ_before">Selon %1$s, %2$s commence à %3$s</string>
+    <string name="prayer_differ_after">Selon %1$s, %2$s a commencé · Taqwa l’affiche dès %3$s</string>
+    <string name="prayer_other_asr">%1$s %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">Paramètres</string>
@@ -489,7 +489,7 @@
     <string name="tab_quran">Coran</string>
     <string name="tab_settings">Paramètres</string>
     <!-- Prayer screen's Qibla card: bearing from north, then the great-circle distance. -->
-    <string name="today_qibla_detail">%1$s° · %2$s km jusqu’à La Mecque</string>
+    <string name="prayer_qibla_detail">%1$s° · %2$s km jusqu’à La Mecque</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">Coran</string>
     <string name="quran_search_hint">Rechercher dans le Coran</string>
@@ -536,7 +536,7 @@
     <string name="quran_a11y_read_aloud">Lecture à voix haute en cours</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbih</string>
-    <string name="today_open_tasbeeh">Tasbih</string>
+    <string name="prayer_open_tasbeeh">Tasbih</string>
     <string name="tasbeeh_add_custom">Ajouter un dhikr</string>
     <string name="tasbeeh_round">SÉRIE %1$s</string>
     <string name="tasbeeh_of">sur %1$s</string>
@@ -633,7 +633,7 @@
     <string name="prayer_times_time_format">Format de l’heure</string>
     <string name="time_format_24">24 heures</string>
     <string name="time_format_12">12 heures</string>
-    <string name="today_open_adhkar">Adhkar</string>
+    <string name="prayer_open_adhkar">Adhkar</string>
     <string name="adhkar_morning">Adhkar du matin</string>
     <string name="adhkar_evening">Adhkar du soir</string>
     <string name="adhkar_segment_morning">Matin</string>
