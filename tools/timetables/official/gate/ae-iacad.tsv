@@ -57,3 +57,7 @@ archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2028.txt	ae.iacad.dubai	
 archive/tables/round/data-gulf-egypt/off-ae-iacad-dubai-2029.txt	ae.iacad.dubai	25.11985	55.38718	Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Silicon Oasis, Dubai's table mapped onto 2029
 archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural-2026.txt	ae.iacad.dubai	25.03763	55.59135	Asia/Dubai	F+E S D A M I	daily	standard	test	Lahbab, Dubai Rural's table mapped onto 2026
 archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural.txt	ae.iacad.dubai	25.03763	55.59135	Asia/Dubai	F+E S D A M I	daily	standard	test	Lahbab, Dubai Rural's captured table 2022–2025
+# 2027 (track T4, 11 Oct 2026): Dubai Rural's perpetual table assigned to 2027 too (archive: off-ae-iacad-dubairural-2027.txt, derived, as
+# Dubai's and Hatta's 2027-2029), held out at its unit and at Lahbab.
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural-2027.txt	ae.iacad.dubai/dubai-rural			Asia/Dubai	F+E S D A M I	daily	standard	test	Dubai Rural, mapped onto 2027
+archive/tables/round/data-gulf-egypt/off-ae-iacad-dubairural-2027.txt	ae.iacad.dubai	25.03763	55.59135	Asia/Dubai	F+E S D A M I	daily	standard	test	Lahbab, Dubai Rural's table mapped onto 2027

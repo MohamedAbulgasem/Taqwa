@@ -22,3 +22,8 @@ archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-06.txt	p
 archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-12.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, December 2026 (winter solstice)
 archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	fit	Banuri Daimi, September 2026 (equinox; folded in, see above)
 archive/tables/moral-auth-world/southasia/off-di-karachi-2026-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S D Ah M I	daily	-	fit	Dawat-e-Islami Karachi AJAX, September 2026 (a later member; folded in, see above)
+# 2027 (track T4, 11 Oct 2026): the same Daimi (permanent) pages assigned to 2027 dates (archive: off-banuri-daimi-karachi-2027-<mm>.txt,
+# derived; a permanent timetable prints the same month-day times every year), held out: the engine against the year's own sun.
+archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2027-06.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	test	Banuri Daimi, June 2027 (assigned)
+archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2027-09.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	test	Banuri Daimi, September 2027 (assigned)
+archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2027-12.txt	pk.karachi	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	test	Banuri Daimi, December 2027 (assigned)
