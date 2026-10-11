@@ -961,4 +961,64 @@ class DayComputerTest {
         assertTrue(Invariants.holds(day) && !day.repaired)
         day.everyInstant().forEach { assertEquals(0L, it.epochSeconds % 60) }
     }
+
+    @Test
+    fun `kemenag's equinox rule lags starts on 21 and 22 march alone`() {
+        val jakarta = GeoPoint(-6.21462, 106.84513)
+        val zone = TimeZone.of("Asia/Jakarta")
+        val sameDay = plain("test.equinox")
+        val lagging = sameDay.copy(dayRule = DayRule.LAG_EQUINOX_KEMENAG)
+        for (year in listOf(2026, 2027, 2028)) {
+            for (day in listOf(21, 22)) {
+                val date = LocalDate(year, 3, day)
+                val today = compute(sameDay, jakarta, date, zone)
+                val yesterday = compute(sameDay, jakarta, date.minus(1, DateTimeUnit.DAY), zone)
+                val shown = compute(lagging, jakarta, date, zone)
+                today.starts().zip(yesterday.starts()).zip(shown.starts()).forEach { (pair, start) ->
+                    assertEquals(maxOf(pair.first, pair.second + 1.days), start, "$date")
+                }
+                assertEquals(minOf(today.sunrise, yesterday.sunrise + 1.days), shown.sunrise, "$date")
+                assertEquals(minOf(today.endOfEating, yesterday.endOfEating + 1.days), shown.endOfEating, "$date")
+            }
+            for (date in listOf(LocalDate(year, 3, 20), LocalDate(year, 3, 23), LocalDate(year, 9, 22))) {
+                assertEquals(
+                    compute(sameDay, jakarta, date, zone).copy(methodId = "x"),
+                    compute(lagging, jakarta, date, zone).copy(methodId = "x"),
+                    "$date",
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `a fixed table shows its year's times on every year at the same UTC moment`() {
+        val dublin = GeoPoint(53.3498, -6.2603)
+        val zone = TimeZone.of("Europe/Dublin")
+        val fixed = plain("test.fixed").copy(fixedTableYear = 2026)
+        val own = plain("test.fixed")
+        for (target in listOf(LocalDate(2027, 1, 3), LocalDate(2027, 3, 28), LocalDate(2028, 8, 15), LocalDate(2029, 10, 30))) {
+            val reference = LocalDate(2026, target.month, target.day)
+            val shift = (target.toEpochDays() - reference.toEpochDays()).days
+            val table = compute(own, dublin, reference, zone)
+            val shown = compute(fixed, dublin, target, zone)
+            assertEquals(target, shown.date)
+            table.everyInstant().zip(shown.everyInstant()).forEach { (printed, moved) -> assertEquals(printed + shift, moved, "$target") }
+        }
+        // Its own year is computed as it always was.
+        val date = LocalDate(2026, 6, 21)
+        assertEquals(compute(own, dublin, date, zone).copy(methodId = "x"), compute(fixed, dublin, date, zone).copy(methodId = "x"))
+        // 29 February, which 2026 lacks, is its 28 February a day on.
+        val leap = compute(fixed, dublin, LocalDate(2028, 2, 29), zone)
+        val feb28 = compute(own, dublin, LocalDate(2026, 2, 28), zone)
+        val shift = (LocalDate(2028, 2, 29).toEpochDays() - LocalDate(2026, 2, 28).toEpochDays()).days
+        assertEquals(feb28.fajr + shift, leap.fajr)
+        assertEquals(LocalDate(2028, 2, 29), leap.date)
+    }
+
+    @Test
+    fun `a fixed table refuses rules that read another date`() {
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, dayRule = DayRule.LAG_DATES_UQ) }
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, ramadan = RamadanRule(maghribExtraSeconds = 60)) }
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, phaseYear = 2026) }
+    }
 }

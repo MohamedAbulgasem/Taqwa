@@ -53,8 +53,11 @@ data class EventOffsets(
  * - [LAG_DATES_UQ]: on listed dates Umm al-Qura prints the previous day's astronomy, so starts take
  *   the later of the day and the day before, and sunrise the earlier; after the last date the list
  *   covers, every day (ruling R71).
+ * - [LAG_EQUINOX_KEMENAG]: on 21 and 22 March Kemenag's tables hold a time where the day before put
+ *   it (its step at the March equinox, seen in 2026 and 2027), so on those two dates starts take the
+ *   later of the day and the day before, and the ends the earlier, as [LAG_DATES_UQ] does.
  */
-enum class DayRule { SAME_DAY, NEIGHBOURS_MUIS, LAG_DATES_UQ }
+enum class DayRule { SAME_DAY, NEIGHBOURS_MUIS, LAG_DATES_UQ, LAG_EQUINOX_KEMENAG }
 
 /**
  * What a [TimetableMethod.fixedPoint] bounds (ruling R45): [BOTH] the starts (the later of it and the
@@ -195,6 +198,12 @@ sealed interface HighLatRule {
  *   sunset); such a day shows Isha the minute after Maghrib and declares it not followed
  *   (DayComputer's point 9). Off, an Isha at or before Maghrib stays out of order for
  *   [world.taqwa.app.prayer.engine.day.Invariants.repair] and the gate to flag (review D round 1).
+ * - [fixedTableYear]: the authority prints one fixed table, the same month-day times every year,
+ *   on a fixed clock (the Islamic Foundation of Ireland's, in GMT): every date is computed as the
+ *   same month and day of this year, the table's own, and moved onto the date at the same instant
+ *   of the UTC day, so that each year shows the table's times and not the year's own sun (a 29
+ *   February the year lacks is its 28 February). Only for a method whose rules read no other date:
+ *   no Ramadan rule, day rule, clock rule or phase year.
  *
  * The arrays compare by reference in [equals]; methods are registry singletons.
  */
@@ -228,6 +237,7 @@ data class TimetableMethod(
     val clockRule: ClockRule? = null,
     val dayAroundDhuhrMinutes: Int? = null,
     val declaresIshaBeforeMaghrib: Boolean = false,
+    val fixedTableYear: Int? = null,
 ) {
     init {
         require(dayAroundDhuhrMinutes == null || dayAroundDhuhrMinutes in 1 until 12 * 60) {
@@ -247,6 +257,9 @@ data class TimetableMethod(
         }
         require(fixedDhuhrLocalMinutes == null || fixedDhuhrLocalMinutes in 0 until 24 * 60) {
             "$id: fixedDhuhrLocalMinutes is a local time of day"
+        }
+        require(fixedTableYear == null || (ramadan == null && dayRule == DayRule.SAME_DAY && clockRule == null && phaseYear == null)) {
+            "$id: a fixed table's year reads no other date's rules (Ramadan, day, clock, phase year)"
         }
     }
 

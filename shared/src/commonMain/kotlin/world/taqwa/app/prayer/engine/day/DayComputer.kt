@@ -113,7 +113,27 @@ object DayComputer {
         ramadan: RamadanCalendar,
         lagDates: Set<LocalDate> = UmmAlQuraDates.lagDates,
         lagDatesUntil: LocalDate = UmmAlQuraDates.lastDate,
-    ): PrayerDay = Place(method, point, zone, school, ramadan, lagDates, lagDatesUntil).day(date)
+    ): PrayerDay {
+        val place = Place(method, point, zone, school, ramadan, lagDates, lagDatesUntil)
+        val year = method.fixedTableYear
+        if (year == null || date.year == year) return place.day(date)
+        // A fixed table (TimetableMethod.fixedTableYear): the same month and day of the table's year, at the
+        // same instant of the UTC day; a 29 February the table's year lacks is its 28 February.
+        val ref = LocalDate(year, date.month, if (date.month == Month.FEBRUARY && date.day == 29 && !isLeap(year)) 28 else date.day)
+        return place.day(ref).movedTo(date, (date.toEpochDays() - ref.toEpochDays()).days)
+    }
+
+    private fun isLeap(year: Int): Boolean = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
+
+    /** [this] day of a fixed table's year, every instant moved by [by] onto [date]. */
+    private fun PrayerDay.movedTo(date: LocalDate, by: Duration): PrayerDay = copy(
+        date = date,
+        fajr = fajr + by, sunrise = sunrise + by, dhuhr = dhuhr + by, asr = asr + by, asrOther = asrOther + by,
+        maghrib = maghrib + by, isha = isha + by, sunset = sunset + by,
+        endOfEating = endOfEating + by, imsak = imsak?.plus(by),
+        earliestStart = earliestStart.mapValues { it.value + by },
+        ends = ends.mapValues { it.value + by },
+    )
 
     /**
      * One method at one point and zone. The days it computes share its skies, and with them every
@@ -826,6 +846,7 @@ object DayComputer {
                 DayRule.SAME_DAY -> SAME_DAY
                 DayRule.NEIGHBOURS_MUIS -> NEIGHBOURS
                 DayRule.LAG_DATES_UQ -> if (lagsOn(date)) LAG else SAME_DAY
+                DayRule.LAG_EQUINOX_KEMENAG -> if (date.month == Month.MARCH && date.day in 21..22) LAG else SAME_DAY
             }
             // Ruling R29: a phase year has no 29 February of its own, so that date is both the phase
             // year's 28 February (its own clock) and its 1 March (the next date's, moved back a day).
