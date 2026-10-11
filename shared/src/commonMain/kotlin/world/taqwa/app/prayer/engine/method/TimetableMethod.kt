@@ -203,7 +203,7 @@ sealed interface HighLatRule {
  *   same month and day of this year, the table's own, and moved onto the date at the same instant
  *   of the UTC day, so that each year shows the table's times and not the year's own sun (a 29
  *   February the year lacks is its 28 February). Only for a method whose rules read no other date:
- *   no Ramadan rule, day rule, clock rule or phase year.
+ *   no Ramadan rule (nor an Isha counted otherwise in Ramadan), day rule, clock rule or phase year.
  *
  * The arrays compare by reference in [equals]; methods are registry singletons.
  */
@@ -258,7 +258,12 @@ data class TimetableMethod(
         require(fixedDhuhrLocalMinutes == null || fixedDhuhrLocalMinutes in 0 until 24 * 60) {
             "$id: fixedDhuhrLocalMinutes is a local time of day"
         }
-        require(fixedTableYear == null || (ramadan == null && dayRule == DayRule.SAME_DAY && clockRule == null && phaseYear == null)) {
+        require(
+            fixedTableYear == null || (
+                ramadan == null && dayRule == DayRule.SAME_DAY && clockRule == null && phaseYear == null &&
+                    (isha !is IshaRule.AfterMaghrib || isha.ramadanMinutes == isha.minutes)
+                ),
+        ) {
             "$id: a fixed table's year reads no other date's rules (Ramadan, day, clock, phase year)"
         }
     }

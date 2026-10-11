@@ -1020,5 +1020,6 @@ class DayComputerTest {
         assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, dayRule = DayRule.LAG_DATES_UQ) }
         assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, ramadan = RamadanRule(maghribExtraSeconds = 60)) }
         assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, phaseYear = 2026) }
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, isha = IshaRule.AfterMaghrib(90, 120)) }
     }
 }
