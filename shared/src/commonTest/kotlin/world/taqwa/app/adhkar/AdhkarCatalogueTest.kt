@@ -33,6 +33,9 @@ class AdhkarCatalogueTest {
         assertEquals("hisn-075", morning.first().id)
         assertEquals("hisn-096", morning.last().id)
         assertEquals(15, items.pagesFor(AdhkarSet.EVENING).size)
+        // The istighfar, one counter shared by both sets, is a page of each.
+        assertTrue("hisn-096" in items.pagesFor(AdhkarSet.MORNING).map { it.id })
+        assertTrue("hisn-096" in items.pagesFor(AdhkarSet.EVENING).map { it.id })
     }
 
     @Test fun `the evening set drops the morning only items and adds the night refuge`() {

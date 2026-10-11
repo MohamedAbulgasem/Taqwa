@@ -30,7 +30,8 @@ class AdhkarStoreTest {
         assertNull(store.progress(AdhkarSet.MORNING).first())
         assertNull(store.progress(AdhkarSet.EVENING).first())
         assertNull(store.istighfar().first())
-        assertFalse(store.translation.first())
+        // The translation is on until a reader turns it off (spec 3.6).
+        assertTrue(store.translation.first())
     }
 
     @Test fun `each set keeps its own progress`() = runTest {
@@ -60,12 +61,12 @@ class AdhkarStoreTest {
         assertEquals("2026-10-11|58", store.istighfar().first())
     }
 
-    @Test fun `the translation switch round trips`() = runTest {
+    @Test fun `the translation switch round trips and an off is not mistaken for nothing stored`() = runTest {
         val store = DataStoreAdhkarStore(dataStore())
-        store.setTranslation(true)
-        assertTrue(store.translation.first())
         store.setTranslation(false)
         assertFalse(store.translation.first())
+        store.setTranslation(true)
+        assertTrue(store.translation.first())
     }
 
     @Test fun `the keys are the ones the spec names`() = runTest {

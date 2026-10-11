@@ -1,7 +1,9 @@
 package world.taqwa.app.adhkar
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.Prayer
@@ -24,8 +26,10 @@ data class AdhkarWindow(val set: AdhkarSet, val phase: AdhkarPhase, val until: I
  *
  * Every function takes the times of the day the set belongs to and compares instants, never clock
  * times, so a window that crosses midnight (an Isha after twelve at a high latitude) needs no
- * special case. The caller picks the day: before Fajr it is still last evening, so it hands in
- * yesterday's times if it wants that evening's window.
+ * special case. Which day that is, is [dayFor]'s decision and nobody else's: between midnight and
+ * Fajr it is still last evening, so [dayFor] hands back yesterday's times, and [setFor],
+ * [windowFor] and [dateKey] given that result all agree. Fed today's times at 00:30 instead, the
+ * evening set would be dated by today's Asr and its make-up window would be over.
  *
  * A [DayPrayerTimes] always carries all six times, polar days included (the engine falls back to
  * a rule rather than leaving one out), so there is no sunrise-less day to handle. A sunrise at or
@@ -33,6 +37,22 @@ data class AdhkarWindow(val set: AdhkarSet, val phase: AdhkarPhase, val until: I
  * whole morning make-up: no instant is both at or after Fajr and before sunrise.
  */
 object AdhkarWindows {
+    /**
+     * The day's times the adhkar are read against at [now]: the local date's own, unless [now] is
+     * before that day's Fajr, in which case yesterday's. Between midnight and Fajr the night is still
+     * yesterday's evening, with its make-up window running until yesterday's Isha (which, at a high
+     * latitude, can be after midnight) and its progress dated by yesterday's Asr. Without this the
+     * calendar date alone would put 00:30 on today's times, where nothing is open and the evening set
+     * would be keyed to an Asr that has not happened yet.
+     *
+     * Pure: [timesFor] is the caller's way to the engine (it is asked for at most two dates).
+     */
+    fun dayFor(now: Instant, zone: TimeZone, timesFor: (LocalDate) -> DayPrayerTimes): DayPrayerTimes {
+        val date = now.toLocalDateTime(zone).date
+        val today = timesFor(date)
+        return if (now < today.time(Prayer.FAJR)) timesFor(date.minus(1, DateTimeUnit.DAY)) else today
+    }
+
     /** The half day it is: [AdhkarSet.MORNING] from Fajr until Asr, [AdhkarSet.EVENING] otherwise. */
     fun setFor(now: Instant, today: DayPrayerTimes): AdhkarSet =
         if (now >= today.time(Prayer.FAJR) && now < today.time(Prayer.ASR)) AdhkarSet.MORNING else AdhkarSet.EVENING

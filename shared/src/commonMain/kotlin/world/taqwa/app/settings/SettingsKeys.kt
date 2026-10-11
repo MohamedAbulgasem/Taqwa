@@ -124,7 +124,7 @@ internal object SettingsKeys {
     /** The daily istighfar, "<date>|<count>": one counter for both sets, not one per set. */
     val ADHKAR_ISTIGHFAR = stringPreferencesKey("adhkar_istighfar")
 
-    /** Whether the adhkar pages show the translation under the Arabic; off until switched on. */
+    /** Whether the adhkar pages show the translation under the Arabic; absent means on (spec §3.6). */
     val ADHKAR_TRANSLATION = booleanPreferencesKey("adhkar_translation")
 
     /** The voice the reader listens in; absent until one is picked, which is what makes Alafasy

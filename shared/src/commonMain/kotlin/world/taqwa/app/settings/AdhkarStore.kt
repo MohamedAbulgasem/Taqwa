@@ -32,7 +32,7 @@ interface AdhkarStore {
 
     suspend fun saveIstighfar(date: LocalDate, count: Int)
 
-    /** Whether the translation shows under the Arabic; off until the reader switches it on. */
+    /** Whether the translation shows under the Arabic; on until the reader switches it off (spec §3.6). */
     val translation: Flow<Boolean>
 
     suspend fun setTranslation(on: Boolean)
@@ -61,7 +61,7 @@ class DataStoreAdhkarStore(private val store: DataStore<Preferences>) : AdhkarSt
         store.edit { it[SettingsKeys.ADHKAR_ISTIGHFAR] = AdhkarProgress(date, listOf(count)).encode() }
     }
 
-    override val translation: Flow<Boolean> = store.data.map { it[SettingsKeys.ADHKAR_TRANSLATION] ?: false }
+    override val translation: Flow<Boolean> = store.data.map { it[SettingsKeys.ADHKAR_TRANSLATION] ?: true }
 
     override suspend fun setTranslation(on: Boolean) {
         store.edit { it[SettingsKeys.ADHKAR_TRANSLATION] = on }

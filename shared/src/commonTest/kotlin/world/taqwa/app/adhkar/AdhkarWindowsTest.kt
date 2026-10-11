@@ -23,14 +23,15 @@ class AdhkarWindowsTest {
         on.atTime(hour, minute).toInstant(zone)
 
     private fun day(
-        fajr: Instant = local(5, 12),
-        sunrise: Instant = local(6, 30),
-        dhuhr: Instant = local(12, 45),
-        asr: Instant = local(16, 0),
-        maghrib: Instant = local(18, 30),
-        isha: Instant = local(19, 45),
+        on: LocalDate = date,
+        fajr: Instant = local(5, 12, on = on),
+        sunrise: Instant = local(6, 30, on = on),
+        dhuhr: Instant = local(12, 45, on = on),
+        asr: Instant = local(16, 0, on = on),
+        maghrib: Instant = local(18, 30, on = on),
+        isha: Instant = local(19, 45, on = on),
     ) = DayPrayerTimes(
-        date = date,
+        date = on,
         times = listOf(
             PrayerTime(Prayer.FAJR, fajr),
             PrayerTime(Prayer.SUNRISE, sunrise),
@@ -175,5 +176,77 @@ class AdhkarWindowsTest {
         assertEquals(date, AdhkarWindows.dateKey(AdhkarSet.EVENING, nz, auckland))
         assertEquals(LocalDate(2026, 10, 10), AdhkarWindows.dateKey(AdhkarSet.MORNING, nz, TimeZone.UTC))
         assertEquals(date, AdhkarWindows.dateKey(AdhkarSet.EVENING, nz, TimeZone.UTC))
+    }
+
+    // dayFor: which day's times a given instant is read against.
+
+    @Test fun `after fajr the day is the local date's own and yesterday is never asked for`() {
+        val asked = mutableListOf<LocalDate>()
+        val times: (LocalDate) -> DayPrayerTimes = { asked += it; day(on = it) }
+        val morning = AdhkarWindows.dayFor(local(5, 30), tripoli, times)
+        assertEquals(date, morning.date)
+        assertEquals(listOf(date), asked)
+        // Fajr itself is the first instant of the day, and the evening is the same day's too.
+        assertEquals(date, AdhkarWindows.dayFor(local(5, 12), tripoli, times).date)
+        assertEquals(date, AdhkarWindows.dayFor(local(22, 0), tripoli, times).date)
+    }
+
+    @Test fun `between midnight and fajr the day is yesterday's and the evening is keyed to it`() {
+        val asked = mutableListOf<LocalDate>()
+        val times: (LocalDate) -> DayPrayerTimes = { asked += it; day(on = it) }
+        val now = local(0, 30, on = nextDay)
+        val yesterday = AdhkarWindows.dayFor(now, tripoli, times)
+        assertEquals(date, yesterday.date)
+        assertEquals(listOf(nextDay, date), asked)
+        // All three functions agree on yesterday's evening: it is the evening set, dated by
+        // yesterday's Asr, and (Isha being at 19:45) its window is over.
+        assertEquals(AdhkarSet.EVENING, AdhkarWindows.setFor(now, yesterday))
+        assertEquals(date, AdhkarWindows.dateKey(AdhkarSet.EVENING, yesterday, tripoli))
+        assertEquals(AdhkarPhase.NONE, window(AdhkarSet.EVENING, now, yesterday).phase)
+        // Fed today's times instead, the key would be an Asr that has not happened yet.
+        assertEquals(nextDay, AdhkarWindows.dateKey(AdhkarSet.EVENING, day(on = nextDay), tripoli))
+    }
+
+    @Test fun `the local date decides the day and not the date at Greenwich`() {
+        // 23:30 UTC on the 10th is 01:30 on the 11th in Tripoli: before Fajr, so the 10th's times.
+        val now = Instant.parse("2026-10-10T23:30:00Z")
+        val asked = mutableListOf<LocalDate>()
+        val result = AdhkarWindows.dayFor(now, tripoli) { asked += it; day(on = it) }
+        assertEquals(LocalDate(2026, 10, 10), result.date)
+        assertEquals(listOf(date, LocalDate(2026, 10, 10)), asked)
+    }
+
+    @Test fun `an isha after midnight is reached through dayFor`() {
+        // Tromso, as above: the 11th's Isha is 00:41 on the 12th, after midnight and before the
+        // 12th's own Fajr (01:09). At 00:20 the local date is the 12th, but the evening that is
+        // open is the 11th's, and only dayFor gets there.
+        val oslo = TimeZone.of("Europe/Oslo")
+        val eleventh = day(
+            on = date,
+            fajr = local(1, 7, oslo),
+            sunrise = local(1, 8, oslo),
+            dhuhr = local(12, 52, oslo),
+            asr = local(18, 55, oslo),
+            maghrib = local(0, 13, oslo, nextDay),
+            isha = local(0, 41, oslo, nextDay),
+        )
+        val twelfth = day(
+            on = nextDay,
+            fajr = local(1, 9, oslo, nextDay),
+            sunrise = local(1, 10, oslo, nextDay),
+            dhuhr = local(12, 52, oslo, nextDay),
+            asr = local(18, 58, oslo, nextDay),
+            maghrib = local(0, 40, oslo, LocalDate(2026, 10, 13)),
+            isha = local(1, 5, oslo, LocalDate(2026, 10, 13)),
+        )
+        val now = local(0, 20, oslo, nextDay)
+        val chosen = AdhkarWindows.dayFor(now, oslo) { if (it == date) eleventh else twelfth }
+        assertEquals(date, chosen.date)
+        assertEquals(AdhkarSet.EVENING, AdhkarWindows.setFor(now, chosen))
+        assertEquals(
+            AdhkarWindow(AdhkarSet.EVENING, AdhkarPhase.MAKEUP, local(0, 41, oslo, nextDay)),
+            window(AdhkarSet.EVENING, now, chosen),
+        )
+        assertEquals(date, AdhkarWindows.dateKey(AdhkarSet.EVENING, chosen, oslo))
     }
 }
