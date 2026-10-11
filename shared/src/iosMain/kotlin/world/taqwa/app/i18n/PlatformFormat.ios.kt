@@ -15,9 +15,16 @@ import platform.Foundation.currentLocale
 import platform.Foundation.localizedStringForLanguageCode
 import platform.Foundation.preferredLanguages
 
-private class IosPlatformFormat(private val clockFormat: ClockFormat) : PlatformFormat {
-
-    private val currentLocale = NSLocale.currentLocale
+/**
+ * `internal`, and taking the locale and the preferred language, so the simulator test can build it
+ * for a given locale, as `AndroidPlatformFormatTest` does on Android; the app only ever reaches it
+ * through [createPlatformFormat], with the device's own.
+ */
+internal class IosPlatformFormat(
+    private val clockFormat: ClockFormat,
+    private val currentLocale: NSLocale = NSLocale.currentLocale,
+    preferredLanguage: String = (NSLocale.preferredLanguages.firstOrNull() as? String) ?: "en",
+) : PlatformFormat {
 
     private val plainFormatter = NSNumberFormatter().apply {
         setLocale(currentLocale)
@@ -41,12 +48,11 @@ private class IosPlatformFormat(private val clockFormat: ClockFormat) : Platform
      * report "ar" and miss the Arabic-Indic default that same device actually formats with.
      */
     private val tag: String = run {
-        val preferred = (NSLocale.preferredLanguages.firstOrNull() as? String) ?: "en"
-        if (preferred.contains('-')) {
-            preferred
+        if (preferredLanguage.contains('-')) {
+            preferredLanguage
         } else {
             val region = currentLocale.objectForKey(NSLocaleCountryCode) as? String
-            if (region.isNullOrBlank()) preferred else "$preferred-$region"
+            if (region.isNullOrBlank()) preferredLanguage else "$preferredLanguage-$region"
         }
     }
 
