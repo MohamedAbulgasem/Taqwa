@@ -66,7 +66,7 @@ A city matches when its folded English name **or** its folded name in the loaded
 
 - Picking a city, and the GPS path's nearest-city lookup, both set `cityId`.
 - **Migration**: a location saved before this change has a name but no id. The first time it is read with the city list available, the id is resolved from its coordinates with the existing `nearest` lookup and written back once. A location whose coordinates match no city keeps a null id and shows `cityName`.
-- The header's localisation happens where the state is built: `TodayViewModel` resolves the display name for `cityId` in the current language and puts it in `TodayUiState.Ready`, so the header re-renders on a language change like every other string. The same resolution serves the Settings and Location rows through `App.kt`.
+- The header's localisation happens where the state is built: `PrayerViewModel` resolves the display name for `cityId` in the current language and puts it in `PrayerUiState.Ready`, so the header re-renders on a language change like every other string. The same resolution serves the Settings and Location rows through `App.kt`.
 
 **Amended 10 September 2026:** the language change swaps the view model (its format is fixed at construction), so the incoming one is seeded with the outgoing one's state rather than starting at `Loading` — otherwise the whole Prayer screen empties for the length of one refresh. The backfilled id is also held in the view model until `settings.location` re-emits it, so an upgraded install does not flicker Arabic → English → Arabic on the tick after the write.
 
