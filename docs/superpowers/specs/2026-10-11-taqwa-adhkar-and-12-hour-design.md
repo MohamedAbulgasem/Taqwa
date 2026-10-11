@@ -196,8 +196,8 @@ The whole page body is one ripple-less tap surface; a tap counts, a drag scrolls
   visited**, so "done" is true when it shows.
 - Every tap is written at once: `adhkar_morning` / `adhkar_evening` = `"<date>|c1,c2,…"` (counts
   in page order) and `adhkar_istighfar` = `"<date>|n"` (one counter shared by both sets, keyed by
-  the local calendar date). A set's date is the local date of its own prayer (that Fajr, that Asr);
-  a new date overwrites, nothing is kept, no history.
+  the day's own date, the local date of its Fajr, like the sets). A set's date is the local date
+  of its own prayer (that Fajr, that Asr); a new date overwrites, nothing is kept, no history.
 - **Done page**: after the last page, a page with a 44 dp accent-0.18 halo holding the 20 dp
   `CheckMark`, "Morning adhkar · done" in `rowLabel`, a caption naming when the other set opens
   ("Evening adhkar open after Asr"), and `TaqwaTextLink("Back to prayer times")` that pops. The

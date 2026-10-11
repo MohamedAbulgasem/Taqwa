@@ -103,6 +103,8 @@ internal fun AdhkarPageView(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
+                // "Double-tap to count", not to "activate".
+                onClickLabel = countLabel,
                 onClick = onTap,
             )
             .semantics(mergeDescendants = true) {

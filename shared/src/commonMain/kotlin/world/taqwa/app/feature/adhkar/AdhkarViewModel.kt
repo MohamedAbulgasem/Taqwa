@@ -33,6 +33,7 @@ import world.taqwa.app.adhkar.QuranPrefix
 import world.taqwa.app.adhkar.pagesFor
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.today.formatClock
 import world.taqwa.app.i18n.PlatformFormat
@@ -129,9 +130,15 @@ data class AdhkarUiState(
  * never be overtaken by an earlier one, and a load that reads the store waits for the writes ahead
  * of it.
  *
- * **The daily istighfar** is one counter for both sets, kept by the local calendar date
- * ([AdhkarStore.istighfar]). Its slot in a set's own list is written as 0: the count lives in the
- * one place, and a set read without it would otherwise carry a stale copy.
+ * **The daily istighfar** is one counter for both sets ([AdhkarStore.istighfar]), kept by the same
+ * day as the sets: [AdhkarWindows.dayFor]'s day, the local date of its Fajr. Between midnight and
+ * Fajr the evening set and its istighfar page are last evening's together; keyed by the calendar,
+ * "14 of 15" at 00:30 would open on an istighfar page back at 0. Its slot in a set's own list is
+ * written as 0: the count lives in the one place, and a set read without it would otherwise carry
+ * a stale copy.
+ *
+ * **Haptics.** A count is the light tick; a page said in full is a part of the session, the double
+ * pulse; the last undone page completing is the session done, the firm one, once.
  *
  * Failures are swallowed rather than allowed to take the process down — a full disk loses a count,
  * not the app — as [world.taqwa.app.feature.tasbeeh.TasbeehViewModel] does. [scope] is the screen's;
@@ -230,9 +237,13 @@ class AdhkarViewModel(
         val id = page.item.id
         val preset = TasbeehPreset(id, listOf(DhikrPart(Dhikr(id, page.arabic ?: ""), page.target)))
         val (next, event) = TasbeehEngine.tap(TasbeehState(id, page.count, 1), preset)
-        if (event == TapEvent.SetComplete) haptics.setComplete() else haptics.count()
         val counted = page.copy(count = next.count, done = next.count >= page.target)
         val pages = current.pages.toMutableList().also { it[index] = counted }
+        when {
+            event != TapEvent.SetComplete -> haptics.count()
+            pages.all { it.done } -> haptics.setComplete()
+            else -> haptics.partComplete()
+        }
         _state.value = current.copy(pages = pages, completed = pages.count { it.done })
         persist(session, counted, pages)
         if (counted.done) advanceFrom(index, session)
@@ -246,15 +257,16 @@ class AdhkarViewModel(
     /**
      * Once a minute while the screen is in front: the phase and its time move with the clock. The
      * set on screen stays the one that was opened. When the day the set is kept under has moved on
-     * — the screen left open across Fajr, or across midnight for the istighfar — the set is opened
-     * afresh, since the counts on screen belong to a date that is over.
+     * — the screen left open across Fajr, the one boundary the sets and the istighfar share;
+     * midnight is not one — the set is opened afresh, since the counts on screen belong to a date
+     * that is over.
      */
     fun tick() {
         val session = session ?: return
         val instant = now()
         val day = dayAt(instant, session.location, session.zone, session.prayerSettings)
         val dateKey = AdhkarWindows.dateKey(session.set, day, session.zone)
-        val istighfarDate = instant.toLocalDateTime(session.zone).date
+        val istighfarDate = istighfarDateOf(day, session.zone)
         if (dateKey != session.dateKey || istighfarDate != session.istighfarDate) {
             open(session.set)
             return
@@ -274,9 +286,13 @@ class AdhkarViewModel(
         val instant = now()
         val day = dayAt(instant, location, zone, prayerSettings)
         val set = requested ?: AdhkarWindows.setFor(instant, day)
+        // Named before the heavier reads, so an evening open never shows "Morning adhkar" first.
+        // Only on a first open: a set switch keeps the old set's name with the old set's pages
+        // until the new ones are in, rather than naming one set over the other's pages.
+        if (!_state.value.loaded) _state.update { it.copy(set = set) }
         val window = AdhkarWindows.windowFor(set, instant, day)
         val dateKey = AdhkarWindows.dateKey(set, day, zone)
-        val istighfarDate = instant.toLocalDateTime(zone).date
+        val istighfarDate = istighfarDateOf(day, zone)
 
         val pages = (items ?: catalogue().also { items = it }).pagesFor(set)
         val text = translations()
@@ -314,6 +330,13 @@ class AdhkarViewModel(
             )
         }
     }
+
+    /**
+     * The date the shared istighfar is kept under: the day's own, the local date of its Fajr — the
+     * same day the sets are read against, so the two never disagree between midnight and Fajr.
+     */
+    private fun istighfarDateOf(day: DayPrayerTimes, zone: TimeZone): LocalDate =
+        day.time(Prayer.FAJR).toLocalDateTime(zone).date
 
     /** The binding rule: one [AdhkarWindows.dayFor] answer per question, never "today's" before Fajr. */
     private fun dayAt(instant: Instant, location: GeoLocation, zone: TimeZone, prayerSettings: PrayerSettings): DayPrayerTimes =

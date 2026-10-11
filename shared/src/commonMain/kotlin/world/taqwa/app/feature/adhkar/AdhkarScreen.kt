@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,9 +34,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +60,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.adhkar.AdhkarPhase
@@ -186,19 +192,7 @@ fun AdhkarScreen(
             // than sliding there from wherever this one was.
             key(state.set) {
                 val pagerState = rememberPagerState(initialPage = state.currentPage) { state.pages.size + 1 }
-                // The view model moves the page (a completed page advancing, a chevron); the pager
-                // follows. Asked only when the two disagree, so a page the pager settled on by
-                // itself is not animated to a second time.
-                LaunchedEffect(state.currentPage) {
-                    if (pagerState.currentPage != state.currentPage) pagerState.animateScrollToPage(state.currentPage)
-                }
-                // The reader moves the page (a swipe); the view model follows — on the *settled*
-                // page, not the current one: `currentPage` passes through every page an animation
-                // crosses, and reporting those would retarget the very animation that crosses them.
-                val goTo by rememberUpdatedState(onGoTo)
-                LaunchedEffect(pagerState) {
-                    snapshotFlow { pagerState.settledPage }.collect { goTo(it) }
-                }
+                SessionPagerSync(pagerState, state.currentPage, onGoTo)
                 HorizontalPager(state = pagerState, modifier = Modifier.weight(1f).fillMaxWidth()) { index ->
                     val shown = state.pages.getOrNull(index)
                     if (shown == null) {
@@ -228,6 +222,44 @@ fun AdhkarScreen(
             }
             Foot(state, page, progress, bump.value, onGoTo)
         }
+    }
+}
+
+/**
+ * Keeps the pager and the session's page in step, both ways: the view model moves the page (a
+ * completed page advancing, a chevron) and the pager follows; the reader swipes and the view model
+ * follows the page the pager settles on.
+ *
+ * **The pager always lands.** Every new [page] is animated to without asking first whether the
+ * pager is already there — `animateScrollToPage` returns at once when it is exactly on the page,
+ * and "already there" by `currentPage` alone is true of a pager stopped 40 % of the way off it.
+ *
+ * **While the session is moving the pager, the pager does not report.** A scroll that starts
+ * while another is running records the page it was passing as "settled", so a second page change
+ * arriving mid-animation would report that half-way page; the view model would move back to it,
+ * that would cancel the animation, and the pager would rest between two pages. So the settled
+ * page is ignored while a target of the session's is pending. The target is cleared when its
+ * animation finishes, or when a finger takes the pager (the mutation is cancelled under an effect
+ * that is still active) — the swipe is then the reader's, and is reported when it settles. An
+ * effect cancelled by the next target leaves the target to that one.
+ */
+@Composable
+internal fun SessionPagerSync(pagerState: PagerState, page: Int, onSettled: (Int) -> Unit) {
+    var pendingTarget by remember(pagerState) { mutableStateOf<Int?>(null) }
+    LaunchedEffect(pagerState, page) {
+        pendingTarget = page
+        try {
+            pagerState.animateScrollToPage(page)
+        } catch (interrupted: CancellationException) {
+            if (!isActive) throw interrupted
+        }
+        pendingTarget = null
+    }
+    val settled by rememberUpdatedState(onSettled)
+    LaunchedEffect(pagerState) {
+        snapshotFlow { if (pendingTarget == null) pagerState.settledPage else null }
+            .filterNotNull()
+            .collect { settled(it) }
     }
 }
 

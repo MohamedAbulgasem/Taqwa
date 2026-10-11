@@ -27,7 +27,11 @@ interface AdhkarStore {
     /** Writes [progress] as the set's one stored value, replacing whatever date was there. */
     suspend fun save(set: AdhkarSet, progress: AdhkarProgress)
 
-    /** The daily istighfar, `"<date>|n"` — one counter for both sets — or null. */
+    /**
+     * The daily istighfar, `"<date>|n"` — one counter for both sets — or null. The date is the
+     * day's own, the local date of its Fajr, as the sets' are: between midnight and Fajr it is
+     * still yesterday's.
+     */
     fun istighfar(): Flow<String?>
 
     suspend fun saveIstighfar(date: LocalDate, count: Int)

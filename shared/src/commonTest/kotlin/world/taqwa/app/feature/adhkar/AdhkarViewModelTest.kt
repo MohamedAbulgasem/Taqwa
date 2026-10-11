@@ -1,6 +1,7 @@
 package world.taqwa.app.feature.adhkar
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -10,8 +11,11 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import okio.FileSystem
 import okio.Path.Companion.toPath
@@ -129,7 +133,12 @@ class AdhkarViewModelTest {
      * One file per test, removed first, with absolute paths and the store's writes on the test's
      * own scheduler — TodayViewModelTest's rules, for TodayViewModelTest's reasons.
      */
-    private suspend fun TestScope.rig(name: String, at: (DayPrayerTimes) -> Instant, location: GeoLocation? = tripoli): Rig {
+    private suspend fun TestScope.rig(
+        name: String,
+        at: (DayPrayerTimes) -> Instant,
+        location: GeoLocation? = tripoli,
+        catalogue: suspend () -> List<AdhkarItem> = { items },
+    ): Rig {
         val path = "/tmp/taqwa-test-adhkar-$name.preferences_pb".toPath()
         FileSystem.SYSTEM.delete(path, mustExist = false)
         val settings = SettingsRepository(PreferenceDataStoreFactory.createWithPath(scope = backgroundScope) { path })
@@ -141,7 +150,7 @@ class AdhkarViewModelTest {
         val store = MemoryAdhkarStore()
         val haptics = RecordingHaptics()
         val viewModel = AdhkarViewModel(
-            catalogue = { items },
+            catalogue = catalogue,
             textFor = { language: String -> if (language == "en") AdhkarCatalogue.parseText(EN_JSON) else null },
             quran = quran,
             store = store,
@@ -195,6 +204,18 @@ class AdhkarViewModelTest {
         assertEquals(eveningPages.map { it.id }, rig.viewModel.state.value.pages.map { it.item.id })
     }
 
+    @Test fun `an evening open names the evening before its pages are in`() = runTest {
+        val pagesHeld = CompletableDeferred<Unit>()
+        val rig = rig("named-first", { day -> day.time(Prayer.ASR) + 10.minutes }, catalogue = { pagesHeld.await(); items })
+        rig.viewModel.open(null)
+        runCurrent()
+        // The catalogue has not been read yet, but the header already says which set this is.
+        assertFalse(rig.viewModel.state.value.loaded)
+        assertEquals(AdhkarSet.EVENING, rig.viewModel.state.value.set)
+        pagesHeld.complete(Unit)
+        assertEquals(eveningPages.size, loaded(rig, AdhkarSet.EVENING).pages.size)
+    }
+
     @Test fun `opens on the first undone page`() = runTest {
         val rig = rig("first-undone", ::tenPastFajr)
         rig.store.save(AdhkarSet.MORNING, counts(AdhkarSet.MORNING, 1, 3))
@@ -218,7 +239,9 @@ class AdhkarViewModelTest {
 
         repeat(3) { rig.viewModel.tap() }
         runCurrent()
-        assertEquals(listOf("count", "count", "setComplete"), rig.haptics.fired)
+        // A page is a part of the session, not the whole of it: the light tick per count, the
+        // double pulse when the page is said in full.
+        assertEquals(listOf("count", "count", "partComplete"), rig.haptics.fired)
         val counted = rig.viewModel.state.value
         assertEquals(3, counted.pages[1].count)
         assertTrue(counted.pages[1].done)
@@ -233,6 +256,29 @@ class AdhkarViewModelTest {
         advanceTimeBy(2)
         runCurrent()
         assertEquals(2, rig.viewModel.state.value.currentPage)
+    }
+
+    @Test fun `the last undone page fires the set haptic once and lands on the done page`() = runTest {
+        val rig = rig("last-page", ::tenPastFajr)
+        // Every page said but Al-Ikhlas (three times), the session's last undone page.
+        val full = morningPages.mapIndexed { index, item -> if (index == 1 || item.countDaily) 0 else item.count }
+        rig.store.save(AdhkarSet.MORNING, AdhkarProgress(date, full))
+        rig.store.saveIstighfar(date, 100)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        loaded(rig, AdhkarSet.MORNING)
+        assertEquals(1, rig.viewModel.state.value.currentPage)
+
+        repeat(3) { rig.viewModel.tap() }
+        runCurrent()
+        assertEquals(listOf("count", "count", "setComplete"), rig.haptics.fired)
+        assertEquals(morningPages.size, rig.viewModel.state.value.completed)
+        advanceTimeBy(401)
+        runCurrent()
+        assertEquals(morningPages.size, rig.viewModel.state.value.currentPage)
+        // The done page takes the tap and nothing fires again.
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(1, rig.haptics.fired.count { it == "setComplete" })
     }
 
     @Test fun `taps on a completed page do nothing`() = runTest {
@@ -359,6 +405,43 @@ class AdhkarViewModelTest {
             AdhkarProgress(yesterday, listOf(1, 1) + List(size - 2) { 0 }).encode(),
             rig.store.progress.getValue(AdhkarSet.EVENING).value,
         )
+    }
+
+    @Test fun `before fajr the istighfar is the day's not the calendar's`() = runTest {
+        val rig = rig("istighfar-day", { day -> day.time(Prayer.FAJR) - 30.minutes })
+        val yesterday = date.minus(1, DateTimeUnit.DAY)
+        // Counted last evening; after midnight and before Fajr it is still last evening's count.
+        rig.store.saveIstighfar(yesterday, 14)
+        rig.viewModel.open(null)
+        val state = loaded(rig, AdhkarSet.EVENING)
+        val index = eveningPages.indexOfFirst { it.countDaily }
+        assertEquals(14, state.pages[index].count)
+        rig.viewModel.goTo(index)
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(AdhkarProgress(yesterday, listOf(15)).encode(), rig.store.istighfar.value)
+    }
+
+    @Test fun `a tick across midnight keeps the evening and its istighfar`() = runTest {
+        val yesterday = date.minus(1, DateTimeUnit.DAY)
+        val rig = rig("midnight", { LocalDateTime(yesterday, LocalTime(23, 50)).toInstant(zone) })
+        rig.viewModel.open(null)
+        loaded(rig, AdhkarSet.EVENING)
+        val index = eveningPages.indexOfFirst { it.countDaily }
+        rig.viewModel.goTo(index)
+        repeat(5) { rig.viewModel.tap() }
+        runCurrent()
+
+        rig.clock.now = LocalDateTime(date, LocalTime(0, 10)).toInstant(zone)
+        rig.viewModel.tick()
+        runCurrent()
+        val after = rig.viewModel.state.value
+        assertEquals(AdhkarSet.EVENING, after.set)
+        assertEquals(index, after.currentPage)
+        assertEquals(5, after.pages[index].count)
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(AdhkarProgress(yesterday, listOf(6)).encode(), rig.store.istighfar.value)
     }
 
     @Test fun `a stored count above its target is shown as the target`() = runTest {
