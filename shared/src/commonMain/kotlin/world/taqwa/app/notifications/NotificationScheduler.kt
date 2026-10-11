@@ -9,6 +9,14 @@ package world.taqwa.app.notifications
 interface NotificationScheduler {
     fun scheduleAll(plan: List<ScheduledNotification>)
     fun cancelAll()
+
+    /**
+     * Withdraws these entries, by [ScheduledNotification.id], whether still pending or already on
+     * screen, and leaves the rest of the plan armed. For a reminder whose point has passed early:
+     * a set of adhkar finished before its notification is due (adhkar spec §5). An id that is not
+     * armed is ignored.
+     */
+    fun cancel(ids: Set<String>)
 }
 
 expect fun createNotificationScheduler(): NotificationScheduler

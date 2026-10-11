@@ -76,12 +76,23 @@ object NotificationChannels {
             .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.TAHAJJUD) } }
             .distinct()
 
-    // A reminder rides its prayer's own Notification channel, as it always has; only Tahajjud
-    // leaves the prayer's namespace.
+    /**
+     * Every channel the adhkar reminder could ever have had, for the reason Tahajjud has its own
+     * (adhkar spec §5): a reminder to read filed under "Fajr" or "Asr" could not be silenced
+     * without silencing the adhan. Morning and evening share one channel, as they share one
+     * setting, so whichever [NotificationKind] asks, the ids are the same.
+     */
+    fun allAdhkarChannelIds(): List<String> =
+        PrayerSound.entries
+            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.ADHKAR_MORNING) } }
+            .distinct()
+
+    // A reminder rides its prayer's own Notification channel, as it always has; only Tahajjud and
+    // the adhkar reminder leave the prayer's namespace.
     private fun base(prayer: Prayer, sound: PrayerSound, kind: NotificationKind = NotificationKind.PRAYER): String =
-        if (kind == NotificationKind.TAHAJJUD) {
-            "tahajjud_${sound.name.lowercase()}"
-        } else {
-            "prayer_${prayer.name.lowercase()}_${sound.name.lowercase()}"
+        when (kind) {
+            NotificationKind.TAHAJJUD -> "tahajjud_${sound.name.lowercase()}"
+            NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING -> "adhkar_${sound.name.lowercase()}"
+            NotificationKind.PRAYER, NotificationKind.REMINDER -> "prayer_${prayer.name.lowercase()}_${sound.name.lowercase()}"
         }
 }

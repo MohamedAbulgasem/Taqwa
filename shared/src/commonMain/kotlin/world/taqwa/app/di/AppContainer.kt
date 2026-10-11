@@ -151,11 +151,15 @@ class AppContainer {
     // added and removed outside the app.
     val widgetPlacementSource = createWidgetPlacementSource()
     val locationRefresher = LocationRefresher(locationRepository, cityRepository, settingsRepository)
+
+    /** The one platform scheduler: the coordinator arms whole plans with it, and a finished set of
+     * adhkar withdraws its own reminder through it (adhkar spec §5) without a reschedule. */
+    val notificationScheduler = createNotificationScheduler()
     val notificationCoordinator = NotificationCoordinator(
         engine = prayerTimesEngine,
         settingsRepository = settingsRepository,
         locationOf = { settingsRepository.location.first() },
-        scheduler = createNotificationScheduler(),
+        scheduler = notificationScheduler,
         now = { Clock.System.now() },
         locationFor = { locationRefresher.refreshFor(it) },
     )

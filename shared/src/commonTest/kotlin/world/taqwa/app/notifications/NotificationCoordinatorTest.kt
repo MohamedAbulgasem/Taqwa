@@ -21,6 +21,8 @@ private class FakeScheduler : NotificationScheduler {
     var cancelCalls = 0
     override fun scheduleAll(plan: List<ScheduledNotification>) { scheduledCalls += plan }
     override fun cancelAll() { cancelCalls++ }
+    val cancelledIds = mutableListOf<Set<String>>()
+    override fun cancel(ids: Set<String>) { cancelledIds += ids }
 }
 
 class NotificationCoordinatorTest {

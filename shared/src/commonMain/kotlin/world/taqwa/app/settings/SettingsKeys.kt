@@ -92,6 +92,11 @@ internal object SettingsKeys {
     val TAHAJJUD_ENABLED = booleanPreferencesKey("tahajjud_enabled")
     val TAHAJJUD_SOUND = stringPreferencesKey("tahajjud_sound")
 
+    /** The adhkar reminder (adhkar spec §5) and its sound. Named for the reminder rather than as
+     * `ADHKAR_*`, which is the reading progress below; absent means off and the chime. */
+    val ADHKAR_REMINDER_ENABLED = booleanPreferencesKey("adhkar_reminder_enabled")
+    val ADHKAR_REMINDER_SOUND = stringPreferencesKey("adhkar_reminder_sound")
+
     val QURAN_MODE = stringPreferencesKey("quran_mode")
     val QURAN_SIZE = intPreferencesKey("quran_size")
     val QURAN_TRANSLITERATION = booleanPreferencesKey("quran_transliteration")

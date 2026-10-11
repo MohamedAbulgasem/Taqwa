@@ -1,16 +1,33 @@
 package world.taqwa.app.notifications
 
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import kotlin.time.Instant
 
 /**
- * [TAHAJJUD] is the one entry that is not about its [ScheduledNotification.prayer]'s own time:
- * it carries [world.taqwa.app.domain.Prayer.FAJR], the prayer its night ends at and the clock
- * time its body quotes, and is told apart everywhere by this kind (spec §17.6).
+ * [TAHAJJUD] is not about its [ScheduledNotification.prayer]'s own time: it carries
+ * [world.taqwa.app.domain.Prayer.FAJR], the prayer its night ends at and the clock time its body
+ * quotes, and is told apart everywhere by this kind (spec §17.6).
+ *
+ * [ADHKAR_MORNING] and [ADHKAR_EVENING] are the same kind of stand-in (adhkar spec §5): they
+ * carry FAJR and ASR, the prayers they follow by half an hour, and their bodies quote the time
+ * their window ends (sunrise, Maghrib) rather than that prayer's own.
  */
-enum class NotificationKind { PRAYER, REMINDER, TAHAJJUD }
+enum class NotificationKind { PRAYER, REMINDER, TAHAJJUD, ADHKAR_MORNING, ADHKAR_EVENING }
+
+/** The set an adhkar reminder is for, which a tap on it opens; null for every other kind. */
+val NotificationKind.adhkarSet: AdhkarSet?
+    get() = when (this) {
+        NotificationKind.ADHKAR_MORNING -> AdhkarSet.MORNING
+        NotificationKind.ADHKAR_EVENING -> AdhkarSet.EVENING
+        NotificationKind.PRAYER, NotificationKind.REMINDER, NotificationKind.TAHAJJUD -> null
+    }
+
+/** Either half of the adhkar reminder: one setting, one channel, one tier of the plan. */
+val NotificationKind.isAdhkar: Boolean
+    get() = adhkarSet != null
 
 /**
  * One notification, fully decided. Title and body are baked in at schedule time so that no

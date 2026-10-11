@@ -775,6 +775,36 @@ class NotificationSettingsStorageTest {
     }
 
     @Test
+    fun `the adhkar reminder is off until someone turns it on`() = runTest {
+        val s = repo("adhkar-reminder-default").notificationSettings.first()
+        assertEquals(false, s.adhkar)
+        assertEquals(PrayerSound.NOTIFICATION, s.adhkarSound)
+    }
+
+    @Test
+    fun `the adhkar reminder and its sound round trip`() = runTest {
+        val r = repo("adhkar-reminder-roundtrip")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(adhkar = true, adhkarSound = PrayerSound.SILENT),
+        )
+        val s = r.notificationSettings.first()
+        assertEquals(true, s.adhkar)
+        assertEquals(PrayerSound.SILENT, s.adhkarSound)
+        // Its own keys: neither Tahajjud nor the adhkar progress is touched by it.
+        assertEquals(false, s.tahajjud)
+        assertEquals(PrayerSound.NOTIFICATION, s.tahajjudSound)
+    }
+
+    @Test
+    fun `a stored adhkar sound it does not offer falls back to the chime`() = runTest {
+        val r = repo("adhkar-reminder-adhan")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(adhkar = true, adhkarSound = PrayerSound.ADHAN),
+        )
+        assertEquals(PrayerSound.NOTIFICATION, r.notificationSettings.first().adhkarSound)
+    }
+
+    @Test
     fun theAdhanVoiceRoundTrips() = runTest {
         val r = repo("voice-roundtrip")
         r.setNotificationSettings(r.notificationSettings.first().copy(voice = AdhanVoice.AZEEZ))

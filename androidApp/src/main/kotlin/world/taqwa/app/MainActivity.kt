@@ -57,11 +57,15 @@ class MainActivity : ComponentActivity() {
         if (intent?.getBooleanExtra(LaunchRequests.ANDROID_EXTRA_OPEN_PLAYING, false) == true) {
             LaunchRequests.openPlaying()
         }
+        // An adhkar reminder's tap (adhkar spec §5): "morning" or "evening", that set's session.
+        // Untrusted like the rest, so anything else is dropped inside LaunchRequests.
+        LaunchRequests.openAdhkarFromExtra(intent?.getStringExtra(LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR))
         // Stripped once recorded, so an activity recreated from a saved instance state — which
         // hands onCreate the same intent back — never re-reads these and replays the tap.
         intent?.removeExtra(EXTRA_OPEN_SURAH)
         intent?.removeExtra(EXTRA_OPEN_AYAH)
         intent?.removeExtra(LaunchRequests.ANDROID_EXTRA_OPEN_PLAYING)
+        intent?.removeExtra(LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR)
     }
 
     private companion object {

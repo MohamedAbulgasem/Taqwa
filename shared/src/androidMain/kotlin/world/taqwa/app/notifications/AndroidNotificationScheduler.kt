@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.net.Uri
+import androidx.core.app.NotificationManagerCompat
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
@@ -74,6 +75,21 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
     }
 
     /**
+     * The alarm and, if it has already fired, the notification on screen, for each id. Both are
+     * found by the request code the id was armed under; an id that never had one was never armed
+     * here, so there is nothing to cancel and no code is handed out for it. The id stays in
+     * [KEY_IDS]: cancelling an alarm that is no longer set, on the next full replace, is harmless.
+     */
+    override fun cancel(ids: Set<String>) {
+        val shown = NotificationManagerCompat.from(context)
+        ids.forEach { id ->
+            if (prefs.getInt(KEY_CODE_PREFIX + id, -1) < 0) return@forEach
+            alarmManager.cancel(pendingIntentFor(id))
+            shown.cancel(requestCodeFor(id))
+        }
+    }
+
+    /**
      * A stable, collision-free request code per notification id.
      *
      * `id.hashCode()` was neither: `String.hashCode` is a 32-bit fold, so two ids can collide,
@@ -115,12 +131,18 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      * idle phone overnight is hours rather than minutes — and Fajr is the prayer people most rely
      * on being told about. `setAndAllowWhileIdle` is the one inexact form the platform still
      * delivers in Doze.
+     *
+     * The adhkar reminder is always inexact (adhkar spec §5), granted or not: it is a nudge into a
+     * window that stays open until sunrise or Maghrib, not the start of a prayer, and an exact
+     * alarm is a cost the platform asks apps to keep for what has to be on the minute. The price
+     * is the platform's own bound on an inexact alarm, which from Android 12 is "within an hour"
+     * of the time asked for.
      */
     private fun schedule(entry: ScheduledNotification) {
         val at = entry.instant.toEpochMilliseconds()
         val pendingIntent = pendingIntentFor(entry.id, entry)
         runCatching {
-            if (canScheduleExactAlarms()) {
+            if (!entry.kind.isAdhkar && canScheduleExactAlarms()) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
             } else {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
@@ -164,7 +186,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      */
     private fun ensureChannels(plan: List<ScheduledNotification>) {
         val copy = LocalizedNotificationCopy(createPlatformFormat())
-        val live = plan.map { ChannelKey(it.prayer, it.sound, it.voice, channelKind(it.kind)) }.toSet()
+        val live = plan.map(::channelKeyOf).toSet()
         live.forEach { (prayer, sound, voice, kind) ->
             val id = NotificationChannels.channelId(prayer, sound, voice, kind)
             val existing = notificationManager.getNotificationChannel(id)
@@ -189,17 +211,18 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         val liveIds = live.map { (prayer, sound, voice, kind) ->
             NotificationChannels.channelId(prayer, sound, voice, kind)
         }.toSet()
-        // Tahajjud's channels are swept on every plan, in it or not: a prayer missing from a plan
-        // is a rarity to leave alone, but Tahajjud missing means it is switched off, and someone
-        // who never asked for it, or has stopped, should not find its channel in system settings.
-        val candidates = live.filter { it.kind != NotificationKind.TAHAJJUD }
+        // Tahajjud's and the adhkar reminder's channels are swept on every plan, in it or not: a
+        // prayer missing from a plan is a rarity to leave alone, but either of these missing means
+        // it is switched off, and someone who never asked for it, or has stopped, should not find
+        // its channel in system settings.
+        val candidates = live.filter { it.kind == NotificationKind.PRAYER }
             .flatMap { NotificationChannels.allChannelIdsFor(it.prayer) }
-            .toSet() + NotificationChannels.allTahajjudChannelIds()
+            .toSet() + NotificationChannels.allTahajjudChannelIds() + NotificationChannels.allAdhkarChannelIds()
         candidates.filterNot { it in liveIds }
             .forEach { runCatching { notificationManager.deleteNotificationChannel(it) } }
     }
 
-    /** A channel's identity. A reminder shares its prayer's channels, so it folds into PRAYER. */
+    /** A channel's identity: one [ChannelKey] per channel id, so each is created once a plan. */
     private data class ChannelKey(
         val prayer: Prayer,
         val sound: PrayerSound,
@@ -207,8 +230,18 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         val kind: NotificationKind,
     )
 
-    private fun channelKind(kind: NotificationKind): NotificationKind =
-        if (kind == NotificationKind.TAHAJJUD) NotificationKind.TAHAJJUD else NotificationKind.PRAYER
+    /**
+     * A reminder shares its prayer's channels, so it folds into PRAYER. Both adhkar kinds share
+     * one channel whatever prayer they follow, so they fold into one key too — two keys for one
+     * id would create the channel twice a plan.
+     */
+    private fun channelKeyOf(entry: ScheduledNotification): ChannelKey = when (entry.kind) {
+        NotificationKind.TAHAJJUD -> ChannelKey(entry.prayer, entry.sound, entry.voice, NotificationKind.TAHAJJUD)
+        NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING ->
+            ChannelKey(Prayer.FAJR, entry.sound, entry.voice, NotificationKind.ADHKAR_MORNING)
+        NotificationKind.PRAYER, NotificationKind.REMINDER ->
+            ChannelKey(entry.prayer, entry.sound, entry.voice, NotificationKind.PRAYER)
+    }
 
     private fun configureSound(channel: NotificationChannel, sound: PrayerSound, voice: AdhanVoice) {
         val attrs = AudioAttributes.Builder()

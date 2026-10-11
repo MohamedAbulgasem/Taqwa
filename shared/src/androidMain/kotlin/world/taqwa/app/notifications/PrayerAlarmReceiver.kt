@@ -11,10 +11,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.di.appContainer
+import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.widget.WidgetMirrorRefresher
 import world.taqwa.app.widget.androidWidgetUpdateHook
 
@@ -55,7 +57,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-            .setContentIntent(openAppIntent(context, notificationId))
+            .setContentIntent(openAppIntent(context, notificationId, kind.adhkarSet))
             .build()
         NotificationManagerCompat.from(context).notify(notificationId, notification)
 
@@ -66,10 +68,16 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
      * Tapping the notification opens the app. The launcher intent rather than `MainActivity`
      * by name: `shared` cannot see androidApp's classes, and the launcher intent is what the
      * home screen icon fires, so the result is the same as opening the app by hand.
+     *
+     * An adhkar reminder's tap goes one step further, to that set's session (adhkar spec §5):
+     * `MainActivity` reads [LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR] and strips it, as it does
+     * the media notification's. Each notification's intent is its own (the request code is the
+     * notification's), so the extra never leaks onto another notification's tap.
      */
-    private fun openAppIntent(context: Context, requestCode: Int): PendingIntent? {
+    private fun openAppIntent(context: Context, requestCode: Int, adhkar: AdhkarSet?): PendingIntent? {
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return null
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        if (adhkar != null) launch.putExtra(LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR, LaunchRequests.adhkarExtra(adhkar))
         return PendingIntent.getActivity(
             context,
             requestCode,

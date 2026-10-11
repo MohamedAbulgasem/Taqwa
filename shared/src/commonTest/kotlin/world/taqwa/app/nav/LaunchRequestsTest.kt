@@ -1,5 +1,8 @@
 package world.taqwa.app.nav
 
+import kotlinx.datetime.LocalDate
+import world.taqwa.app.adhkar.AdhkarSet
+import world.taqwa.app.notifications.NotificationPlanner
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -53,5 +56,47 @@ class LaunchRequestsTest {
         assertEquals(true, LaunchRequests.pendingPlaying.value)
         LaunchRequests.consumePlaying()
         assertEquals(false, LaunchRequests.pendingPlaying.value)
+    }
+
+    @Test
+    fun `an adhkar reminder tap is pending until consumed`() {
+        LaunchRequests.consumeAdhkar()
+        assertNull(LaunchRequests.pendingAdhkar.value)
+        LaunchRequests.openAdhkar(AdhkarSet.EVENING)
+        assertEquals(AdhkarSet.EVENING, LaunchRequests.pendingAdhkar.value)
+        LaunchRequests.consumeAdhkar()
+        assertNull(LaunchRequests.pendingAdhkar.value)
+    }
+
+    @Test
+    fun `the android extra names the set and nothing else gets through`() {
+        LaunchRequests.consumeAdhkar()
+        assertEquals("morning", LaunchRequests.adhkarExtra(AdhkarSet.MORNING))
+        assertEquals("evening", LaunchRequests.adhkarExtra(AdhkarSet.EVENING))
+        // The launcher activity is exported: any other value is ignored, as an out-of-range ayah is.
+        for (value in listOf(null, "", "MORNING", "night", "morning ")) {
+            LaunchRequests.openAdhkarFromExtra(value)
+            assertNull(LaunchRequests.pendingAdhkar.value, "$value")
+        }
+        for (set in AdhkarSet.entries) {
+            LaunchRequests.openAdhkarFromExtra(LaunchRequests.adhkarExtra(set))
+            assertEquals(set, LaunchRequests.pendingAdhkar.value)
+        }
+        LaunchRequests.consumeAdhkar()
+    }
+
+    @Test
+    fun `a notification id opens its adhkar set and any other id opens nothing`() {
+        LaunchRequests.consumeAdhkar()
+        val date = LocalDate(2026, 10, 11)
+        for (set in AdhkarSet.entries) {
+            LaunchRequests.openAdhkarForNotification(NotificationPlanner.adhkarId(set, date))
+            assertEquals(set, LaunchRequests.pendingAdhkar.value)
+            LaunchRequests.consumeAdhkar()
+        }
+        for (id in listOf("FAJR-PRAYER-$date", "ASR-REMINDER-$date", "TAHAJJUD-$date", "ADHKAR-", "")) {
+            LaunchRequests.openAdhkarForNotification(id)
+            assertNull(LaunchRequests.pendingAdhkar.value, id)
+        }
     }
 }

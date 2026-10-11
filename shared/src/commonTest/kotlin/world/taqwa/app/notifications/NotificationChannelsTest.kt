@@ -152,4 +152,29 @@ class NotificationChannelsTest {
             }
         }
     }
+
+    @Test
+    fun `the adhkar reminder has one channel of its own for morning and evening`() {
+        val morning = NotificationChannels.channelId(Prayer.FAJR, PrayerSound.NOTIFICATION, kind = NotificationKind.ADHKAR_MORNING)
+        assertEquals("adhkar_notification_chime3", morning)
+        assertEquals(morning, NotificationChannels.channelId(Prayer.ASR, PrayerSound.NOTIFICATION, kind = NotificationKind.ADHKAR_EVENING))
+        assertEquals("adhkar_silent", NotificationChannels.channelId(Prayer.ASR, PrayerSound.SILENT, kind = NotificationKind.ADHKAR_EVENING))
+        assertEquals("adhkar_takbir_azeez", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.TAKBIR, AdhanVoice.AZEEZ, NotificationKind.ADHKAR_MORNING))
+        val prayers = NotificationChannels.allChannelIdsFor(Prayer.FAJR) + NotificationChannels.allChannelIdsFor(Prayer.ASR)
+        assertTrue(NotificationChannels.allAdhkarChannelIds().none { it in prayers || it in NotificationChannels.allTahajjudChannelIds() })
+    }
+
+    @Test
+    fun `every adhkar channel is one the sweep can delete`() {
+        val all = NotificationChannels.allAdhkarChannelIds()
+        for (kind in listOf(NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING)) {
+            for (prayer in listOf(Prayer.FAJR, Prayer.ASR)) {
+                PrayerSound.entries.forEach { sound ->
+                    AdhanVoice.entries.forEach { voice ->
+                        assertTrue(NotificationChannels.channelId(prayer, sound, voice, kind) in all, "$kind $prayer $sound $voice")
+                    }
+                }
+            }
+        }
+    }
 }

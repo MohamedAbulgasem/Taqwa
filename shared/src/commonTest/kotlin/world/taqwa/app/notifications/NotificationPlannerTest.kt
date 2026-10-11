@@ -6,6 +6,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
@@ -361,5 +362,130 @@ class NotificationPlannerTest {
             sounds = defaults.sounds + (Prayer.ISHA to PrayerSound.SILENT),
         ))
         assertFalse(plan.none { it.prayer == Prayer.ISHA })
+    }
+
+    // ── The adhkar reminder (spec §5) ──────────────────────────────────────────────────────
+    // Planned from 01:30 in London on 6 September, so the whole of that day is still ahead.
+
+    private val adhkarOn = defaults.copy(adhkar = true, adhkarSound = PrayerSound.SILENT)
+    private val sixth = LocalDate(2026, 9, 6)
+
+    @Test
+    fun `adhkar entries sit half an hour after fajr and asr`() {
+        val times = engine.timesFor(london, sixth, PrayerSettings())
+        val plan = planFor(notifications = adhkarOn, windowDays = 1)
+        val morning = plan.single { it.id == "ADHKAR-MORNING-$sixth" }
+        val evening = plan.single { it.id == "ADHKAR-EVENING-$sixth" }
+        // Preconditions: the half hour is inside both windows, so neither clamp is in play.
+        assertTrue(times.time(Prayer.FAJR) + 35.minutes < times.time(Prayer.SUNRISE))
+        assertTrue(times.time(Prayer.ASR) + 35.minutes < times.time(Prayer.MAGHRIB))
+
+        assertEquals(times.time(Prayer.FAJR) + 30.minutes, morning.instant)
+        assertEquals(NotificationKind.ADHKAR_MORNING, morning.kind)
+        assertEquals(Prayer.FAJR, morning.prayer)
+        assertEquals(times.time(Prayer.ASR) + 30.minutes, evening.instant)
+        assertEquals(NotificationKind.ADHKAR_EVENING, evening.kind)
+        assertEquals(Prayer.ASR, evening.prayer)
+        for (entry in listOf(morning, evening)) {
+            assertEquals(PrayerSound.SILENT, entry.sound)
+            assertEquals("Europe/London", entry.timeZoneId)
+        }
+        // The one spelling of the id, which a finished set cancels by and a tap is read from.
+        assertEquals(morning.id, NotificationPlanner.adhkarId(AdhkarSet.MORNING, sixth))
+        assertEquals(evening.id, NotificationPlanner.adhkarId(AdhkarSet.EVENING, sixth))
+        // Each body quotes where its window ends: sunrise for the morning, Maghrib for the evening.
+        assertEquals("Morning adhkar", morning.title)
+        assertEquals("Until sunrise · ${isoClockTime(times.time(Prayer.SUNRISE), london.timeZoneId)}", morning.body)
+        assertEquals("Evening adhkar", evening.title)
+        assertEquals("Until Maghrib · ${isoClockTime(times.time(Prayer.MAGHRIB), london.timeZoneId)}", evening.body)
+    }
+
+    @Test
+    fun `adhkar entries are clamped inside the best window`() {
+        // Fajr and Asr moved later by hand until each sits twenty minutes before the time that
+        // ends its window: half an hour after either would be past it, so each entry is pulled
+        // back to five minutes before sunrise and five minutes before Maghrib.
+        val natural = engine.timesFor(london, sixth, PrayerSettings())
+        val fajrGap = (natural.time(Prayer.SUNRISE) - natural.time(Prayer.FAJR)).inWholeMinutes.toInt()
+        val asrGap = (natural.time(Prayer.MAGHRIB) - natural.time(Prayer.ASR)).inWholeMinutes.toInt()
+        val late = PrayerSettings(minuteAdjustments = mapOf(Prayer.FAJR to fajrGap - 20, Prayer.ASR to asrGap - 20))
+        val times = engine.timesFor(london, sixth, late)
+        assertEquals(times.time(Prayer.FAJR) + 20.minutes, times.time(Prayer.SUNRISE))
+        assertEquals(times.time(Prayer.ASR) + 20.minutes, times.time(Prayer.MAGHRIB))
+
+        val plan = NotificationPlanner.plan(
+            location = london, settings = late, notifications = adhkarOn, engine = engine,
+            from = Instant.parse("2026-09-06T00:30:00Z"), windowDays = 1, capacity = 64,
+        )
+        assertEquals(times.time(Prayer.SUNRISE) - 5.minutes, plan.single { it.id == "ADHKAR-MORNING-$sixth" }.instant)
+        assertEquals(times.time(Prayer.MAGHRIB) - 5.minutes, plan.single { it.id == "ADHKAR-EVENING-$sixth" }.instant)
+    }
+
+    @Test
+    fun `a window too short to hold one gets no adhkar entry`() {
+        // Sunrise three minutes after Fajr, and Maghrib five after Asr: five minutes before the
+        // end of either window is not after its start.
+        val natural = engine.timesFor(london, sixth, PrayerSettings())
+        val fajrGap = (natural.time(Prayer.SUNRISE) - natural.time(Prayer.FAJR)).inWholeMinutes.toInt()
+        val asrGap = (natural.time(Prayer.MAGHRIB) - natural.time(Prayer.ASR)).inWholeMinutes.toInt()
+        val squeezed = PrayerSettings(minuteAdjustments = mapOf(Prayer.FAJR to fajrGap - 3, Prayer.ASR to asrGap - 5))
+        val plan = NotificationPlanner.plan(
+            location = london, settings = squeezed, notifications = adhkarOn, engine = engine,
+            from = Instant.parse("2026-09-06T00:30:00Z"), windowDays = 1, capacity = 64,
+        )
+        assertTrue(plan.none { it.id == "ADHKAR-MORNING-$sixth" }, plan.map { it.id }.toString())
+        assertTrue(plan.none { it.id == "ADHKAR-EVENING-$sixth" }, plan.map { it.id }.toString())
+        assertTrue(plan.any { it.id == "FAJR-PRAYER-$sixth" } && plan.any { it.id == "ASR-PRAYER-$sixth" })
+    }
+
+    @Test
+    fun `adhkar never displaces a prayer within the capacity`() {
+        // Two days with reminders on: ten prayers, ten reminders and four adhkar entries for
+        // twelve slots. Every prayer is kept, a before-prayer reminder outranks adhkar too, so the
+        // two slots left go to the two soonest reminders, and no adhkar entry is armed at all.
+        val withReminders = adhkarOn.copy(remindBeforeMinutes = 10)
+        val plan = planFor(notifications = withReminders, windowDays = 2, capacity = 12)
+        val unlimited = planFor(notifications = withReminders, windowDays = 2, capacity = 64)
+        assertEquals(10, unlimited.count { it.kind == NotificationKind.PRAYER })
+        assertEquals(12, plan.size)
+        assertEquals(unlimited.filter { it.kind == NotificationKind.PRAYER }, plan.filter { it.kind == NotificationKind.PRAYER })
+        assertEquals(
+            unlimited.filter { it.kind == NotificationKind.REMINDER }.take(2),
+            plan.filter { it.kind == NotificationKind.REMINDER },
+        )
+        assertTrue(plan.none { it.id.startsWith("ADHKAR-") }, plan.map { it.id }.toString())
+        assertEquals(plan.sortedBy { it.instant }, plan)
+
+        // Without reminders the slots left over are adhkar's, the soonest first: the sixth's two,
+        // not the seventh's, though the seventh's Maghrib and Isha come after them.
+        val noReminders = planFor(notifications = adhkarOn, windowDays = 2, capacity = 12)
+        assertEquals(10, noReminders.count { it.kind == NotificationKind.PRAYER })
+        assertEquals(
+            listOf("ADHKAR-MORNING-$sixth", "ADHKAR-EVENING-$sixth"),
+            noReminders.filter { it.id.startsWith("ADHKAR-") }.map { it.id },
+        )
+        assertEquals(noReminders.sortedBy { it.instant }, noReminders)
+    }
+
+    @Test
+    fun `window days count the adhkar entries`() {
+        // Five prayers and two adhkar a day: 64 / 7.
+        assertEquals(9, NotificationPlanner.windowDaysFor(64, defaults.copy(adhkar = true)))
+        // Ten with reminders, one Tahajjud, two adhkar: 64 / 13.
+        assertEquals(4, NotificationPlanner.windowDaysFor(64, defaults.copy(adhkar = true, remindBeforeMinutes = 10, tahajjud = true)))
+    }
+
+    @Test
+    fun `nobody gets an adhkar reminder who has not asked for one`() {
+        assertFalse(NotificationSettings().adhkar)
+        assertTrue(planFor().none { it.id.startsWith("ADHKAR-") })
+    }
+
+    @Test
+    fun `the prayers and their reminders are untouched by the adhkar reminder`() {
+        val without = planFor(notifications = defaults.copy(remindBeforeMinutes = 10), windowDays = 3)
+        val with = planFor(notifications = adhkarOn.copy(remindBeforeMinutes = 10), windowDays = 3)
+        assertEquals(without, with.filterNot { it.id.startsWith("ADHKAR-") })
+        assertEquals(6, with.count { it.id.startsWith("ADHKAR-") })
     }
 }

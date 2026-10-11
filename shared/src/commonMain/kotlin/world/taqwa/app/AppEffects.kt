@@ -47,6 +47,28 @@ internal fun PlayingLaunchRequests(
     }
 }
 
+/**
+ * A tap on an adhkar reminder (adhkar spec §5): that set's session, on the Prayer tab where the
+ * Adhkar button lives, so Back lands on Today. Waits for onboarding exactly as the widget's and
+ * the player's requests do, so a cold tap is not pushed only to be wiped by the onboarding
+ * replaceAll; consumed once acted on.
+ */
+@Composable
+internal fun AdhkarLaunchRequests(
+    settings: SettingsRepository,
+    navigator: Navigator,
+) {
+    LaunchedEffect(Unit) {
+        settings.onboardingComplete.filter { it }.first()
+        LaunchRequests.pendingAdhkar.collect { set ->
+            set ?: return@collect
+            navigator.selectTab(Tab.PRAYER)
+            navigator.push(Screen.Adhkar(set))
+            LaunchRequests.consumeAdhkar()
+        }
+    }
+}
+
 @Composable
 internal fun DebugScreenRequests(
     settings: SettingsRepository,
