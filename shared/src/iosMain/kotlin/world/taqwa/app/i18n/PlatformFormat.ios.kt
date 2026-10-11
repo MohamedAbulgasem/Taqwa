@@ -15,7 +15,7 @@ import platform.Foundation.currentLocale
 import platform.Foundation.localizedStringForLanguageCode
 import platform.Foundation.preferredLanguages
 
-private class IosPlatformFormat : PlatformFormat {
+private class IosPlatformFormat(private val clockFormat: ClockFormat) : PlatformFormat {
 
     private val currentLocale = NSLocale.currentLocale
 
@@ -49,6 +49,15 @@ private class IosPlatformFormat : PlatformFormat {
             if (region.isNullOrBlank()) preferred else "$preferred-$region"
         }
     }
+
+    // The day-period symbols of the *language* locale, not `currentLocale`: the marker is a
+    // language question ("pm" in British English, "PM" in American), while the digits above
+    // are a region question (spec §1.2).
+    private val amPm: Pair<String, String> = NSDateFormatter().run {
+        setLocale(NSLocale(localeIdentifier = tag))
+        (AMSymbol ?: "AM") to (PMSymbol ?: "PM")
+    }
+    private val markerFirst = TwelveHourClock.markerFirst(tag)
 
     // Explicitly Gregorian on both the components and the formatter: a user who has switched
     // their iPhone to the Umm al-Qura calendar would otherwise get a Hijri date here, next to the
@@ -91,11 +100,15 @@ private class IosPlatformFormat : PlatformFormat {
     }
 
     override fun clockTime(hour: Int, minute: Int): String {
-        val h = plainFormatter.stringFromNumber(NSNumber(int = hour)) ?: hour.toString()
-        val m = twoDigitFormatter.stringFromNumber(NSNumber(int = minute))
-            ?: minute.toString().padStart(2, '0')
-        return "$h:$m"
+        val m = twoDigitFormatter.stringFromNumber(NSNumber(int = minute)) ?: minute.toString().padStart(2, '0')
+        if (clockFormat == ClockFormat.TWENTY_FOUR_HOUR) {
+            val h = plainFormatter.stringFromNumber(NSNumber(int = hour)) ?: hour.toString()
+            return "$h:$m"
+        }
+        val (hour12, pm) = twelveHourParts(hour)
+        val h = plainFormatter.stringFromNumber(NSNumber(int = hour12)) ?: hour12.toString()
+        return TwelveHourClock.render(h, m, if (pm) amPm.second else amPm.first, markerFirst)
     }
 }
 
-actual fun createPlatformFormat(): PlatformFormat = IosPlatformFormat()
+actual fun createPlatformFormat(clockFormat: ClockFormat): PlatformFormat = IosPlatformFormat(clockFormat)

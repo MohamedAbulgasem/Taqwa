@@ -11,7 +11,9 @@ interface PlatformFormat {
     fun localizedDigits(number: Int): String
 
     /**
-     * A 24-hour clock time using the platform's own locale formatting and digit set.
+     * A clock time using the platform's own locale formatting and digit set: 24-hour, or the
+     * 12-hour form ("6:32 pm", marker from the platform's own symbols) when the formatter was
+     * created with [ClockFormat.TWELVE_HOUR].
      *
      * The hour is *not* zero-padded and the minute always is — "3:42", "٣:٤٢", "15:07". That is
      * the shape the spec quotes for a Libyan user and the shape Today already showed before this
@@ -51,7 +53,12 @@ interface PlatformFormat {
     fun languageNameInSentence(code: String): String = languageName(code)
 }
 
-expect fun createPlatformFormat(): PlatformFormat
+/**
+ * The device's formatter, writing clock times in [clockFormat]. The default is declared here and
+ * only here — Kotlin forbids a default on an `actual` — so every existing `createPlatformFormat()`
+ * call keeps its 24-hour behaviour.
+ */
+expect fun createPlatformFormat(clockFormat: ClockFormat = ClockFormat.TWENTY_FOUR_HOUR): PlatformFormat
 
 /**
  * Built once per process rather than per composable: constructing a locale-aware number
