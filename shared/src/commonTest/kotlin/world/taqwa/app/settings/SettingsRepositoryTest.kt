@@ -16,6 +16,7 @@ import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
@@ -118,6 +119,20 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun clockFormatDefaultsToTwentyFourHourSoNoUpgradeChangesAScreen() = runTest {
+        assertEquals(ClockFormat.TWENTY_FOUR_HOUR, repo("clock-default").clockFormat.first())
+    }
+
+    @Test
+    fun clockFormatRoundTrips() = runTest {
+        val r = repo("clock-roundtrip")
+        r.setClockFormat(ClockFormat.TWELVE_HOUR)
+        assertEquals(ClockFormat.TWELVE_HOUR, r.clockFormat.first())
+        r.setClockFormat(ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals(ClockFormat.TWENTY_FOUR_HOUR, r.clockFormat.first())
+    }
+
+    @Test
     fun theHijriOffsetRoundTripsWithinTheRangeTheScreenOffers() = runTest {
         val r = repo("hijri-offset")
         assertEquals(0, r.prayerSettings.first().hijriOffsetDays)
@@ -146,6 +161,16 @@ class SettingsRepositoryTest {
         // simulate a value written by a future version
         r.writeRawThemeForTest("PLAID")
         assertEquals(ThemeMode.SYSTEM, r.themeMode.first())
+    }
+
+    @Test
+    fun anUnknownStoredClockFormatFallsBackToTwentyFourHourRatherThanCrashing() = runTest {
+        val store = freshStore("clock-corrupt")
+        val r = SettingsRepository(store)
+        r.setClockFormat(ClockFormat.TWELVE_HOUR)
+        // simulate a value written by a future version
+        store.edit { it[SettingsKeys.CLOCK_FORMAT] = "SWATCH_BEATS" }
+        assertEquals(ClockFormat.TWENTY_FOUR_HOUR, r.clockFormat.first())
     }
 
     @Test

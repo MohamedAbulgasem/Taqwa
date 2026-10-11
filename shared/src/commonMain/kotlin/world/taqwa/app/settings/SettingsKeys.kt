@@ -114,6 +114,19 @@ internal object SettingsKeys {
      * is free text in any script and may contain any punctuation a reader can type. */
     val TASBEEH_CUSTOM = stringSetPreferencesKey("tasbeeh_custom")
 
+    /**
+     * Morning & Evening Adhkar progress, one string per set: "<date>|<count of page 1>,<count of
+     * page 2>,…" (see AdhkarProgress). Only the latest date is kept; a new date overwrites it.
+     */
+    val ADHKAR_MORNING = stringPreferencesKey("adhkar_morning")
+    val ADHKAR_EVENING = stringPreferencesKey("adhkar_evening")
+
+    /** The daily istighfar, "<date>|<count>": one counter for both sets, not one per set. */
+    val ADHKAR_ISTIGHFAR = stringPreferencesKey("adhkar_istighfar")
+
+    /** Whether the adhkar pages show the translation under the Arabic; off until switched on. */
+    val ADHKAR_TRANSLATION = booleanPreferencesKey("adhkar_translation")
+
     /** The voice the reader listens in; absent until one is picked, which is what makes Alafasy
      * the default for everyone who never does (spec 3a §12.1). */
     val RECITATION_RECITER = stringPreferencesKey("recitation_reciter")

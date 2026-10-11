@@ -30,7 +30,9 @@ import world.taqwa.app.recitation.createRecitationLibrary
 import world.taqwa.app.recitation.createRecitationPaths
 import world.taqwa.app.recitation.recitationPreviewBytes
 import world.taqwa.app.resources.Res
+import world.taqwa.app.settings.AdhkarStore
 import world.taqwa.app.settings.BookmarkStore
+import world.taqwa.app.settings.DataStoreAdhkarStore
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.TasbeehStore
 import world.taqwa.app.settings.createDataStore
@@ -45,6 +47,7 @@ class AppContainer {
     val settingsRepository = SettingsRepository(dataStore)
     val bookmarkStore = BookmarkStore(dataStore)
     val tasbeehStore = TasbeehStore(dataStore)
+    val adhkarStore: AdhkarStore by lazy { DataStoreAdhkarStore(dataStore) }
     val cityRepository = CityRepository(
         loadCsv = { Res.readBytes("files/cities.csv").decodeToString() },
         // `Res.readBytes` throws rather than returning null for a file that is not bundled, and

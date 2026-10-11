@@ -8,6 +8,7 @@ dataset and checked against the Hisn text.
 |------|------------|
 | `build_items.py` | Extracts OpenDua's 24 morning-and-evening entries and builds the two resources |
 | `check_items.py` | Checks the resources against the spec's table and the hisnmuslim.com text |
+| `embed_test_fixture.py` | Copies the two resources into `AdhkarFixtures.kt`, which the catalogue tests parse (`Res.readBytes` does not run in tests) |
 | `opendua-morning-evening.json` | The 24 entries (Hisn 75–98), verbatim, under OpenDua's attribution: the build's input |
 | `../../shared/src/commonMain/composeResources/files/adhkar/items.json` | The 19 items, book order (schema 1) |
 | `../../shared/src/commonMain/composeResources/files/adhkar/text/en.json` | English for the 15 du'a items |
@@ -21,9 +22,10 @@ Licence: `docs/licences/OpenDua-CC-BY-4.0.txt` (CC BY 4.0, attribution verbatim)
 python3 -I tools/adhkar/build_items.py <catalogue.json>   # extract + build
 python3 -I tools/adhkar/build_items.py                    # rebuild from the checked-in extract
 python3 -I tools/adhkar/check_items.py <hisnmuslim-27.json>
+python3 -I tools/adhkar/embed_test_fixture.py             # after a rebuild: refresh the tests' copy
 ```
 
-Both scripts use the standard library only. The build is deterministic (sorted keys,
+The scripts use the standard library only. The build is deterministic (sorted keys,
 UTF-8 without BOM, two-space indent, trailing newline): a rebuild from the same input
 is byte-identical. `check_items.py` exits 1 on any failure; without the hisnmuslim file
 it runs the structural checks only and prints a warning that the Arabic was not
