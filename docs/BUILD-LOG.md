@@ -3264,8 +3264,8 @@ its top:
    app.
 3. **Urdu hisn-078.** تیرے ساتھ ہم نے صبح کی, or the literal تجھ ہی سے.
 
-**Checked.** The last `scripts/test.sh` on `98ead498`: shared 1,782/0 on the Android host and 1,675/0 on iOS,
-widgetcore 97/0 and 95/0. `scripts/check-strings.sh` is clean. `:androidApp:assembleDebug` and
+**Checked.** The last `scripts/test.sh` on `15daf9c2`, after the fix wave: shared 1,789/0 on the Android host
+and 1,690/0 on iOS, widgetcore 97/0 and 95/0. `scripts/check-strings.sh` is clean. `:androidApp:assembleDebug` and
 `scripts/ios-build.sh` succeed (TaqwaWidget.appex 3 MB).
 
 **On a device: emulator-5560**, a throwaway Pixel 8 Pro image (Android 16, `-read-only`), London. The builds
@@ -3295,11 +3295,19 @@ scratchpad.
 - **The reader's "Aa" sheet** works in both modes. In Translation mode the slider is enabled. In Mushaf mode
   it is disabled, with its note.
 
-**What looked wrong** (steps and screenshots in the task 14 report). The fix wave after the final review fixed
-the first three and the Arabic digits, with the review's own findings (Urdu's "PM" inside sentences, the Turkish
-make-up captions), and checked them on emulator-5560: pixel-identical at 100 % text, whole at 200 %. On iOS they
-are covered by the simulator tests only; the iOS device pass is still not done. The evening question and the
-preview's cut are still open:
+**What looked wrong** (steps and screenshots in the task 14 report). The fix wave after the final review
+(`37276add..15daf9c2`, twelve commits) fixed the first three and the Arabic-Indic digits in the time-format
+labels, together with the review's own findings: Urdu's "PM" landing before the digits inside sentences (one bidi
+isolate in `i18n` for every spliced clock time), the Turkish make-up captions' fixed dative ("en geç", listed for
+the Turkish reviewer), a clip still being read that an ordinary play did not abandon, a second speaker tap while
+a passage loads, the English adhkar credit and the licence file ("the Arabic text and its arrangement"), the dead
+`format` parameter of `refreshForNewTimes`, the reminder withdrawn even when the done mark cannot be written, the
+Prayer times screen reading the clock format from App's state, and an iOS simulator test of the 12-hour markers
+(Turkish, Arabic, English). Checked on emulator-5560: the Quran root, the reader's sheet, the Adhkar screen and
+the 100× page are pixel-identical at 100 % text and whole at 200 %; the Urdu Timetable and Adhkar captions in
+12-hour; the Arabic labels were not re-shot. On iOS the fixes are covered by the simulator tests only; the iOS
+device pass is still not done. The evening question, the preview's cut and one pre-existing 200 % cut are still
+open:
 - **At 200 % text a count of 100 shows as "10".** The ring's text has `maxLines = 1`, and the 12 sp floor at
   2× cannot fit three digits, so the last one wraps out of sight. It is fine at 150 %.
 - **At 200 % text the Morning | Evening labels are cut at the bottom.** `TaqwaSegmented` has a fixed 44 dp
@@ -3308,6 +3316,8 @@ preview's cut are still open:
 - **An evening set finished before Asr counts as that day's evening.** `dateKey` keys it by that day's Asr.
   Finished at 07:12, it withdrew the 16:55 reminder, and the evening would open on its done page after Asr.
   This is a design question for Mohamed.
+- **At 200 % text the Quran list's surah-number circles are cut at the bottom.** Seen in the wave's Quran root
+  shot; the screen was not touched by this branch. One for the accessibility round.
 - **"24 ساعة" and "12 ساعة" keep Western digits** under Egyptian Arabic, beside "٦:٣٢ م".
 - **Not caused by the 12-hour clock:** the Arabic Appearance preview cuts the medium widget's clock line. It
   does the same in 24-hour.
