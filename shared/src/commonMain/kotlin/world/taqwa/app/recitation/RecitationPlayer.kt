@@ -109,6 +109,25 @@ expect class RecitationPlayer(library: RecitationLibrary) {
     suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation? = null)
 
     /**
+     * [load], or — with [ayahs] — only those ayahs of the surah: an adhkar page's passage (adhkar
+     * spec §3.5), the queue [RecitationQueue.passage] describes — in reading order, the reciter's
+     * gap between them, and no translation whatever [speech] says. When the last of them has
+     * played, the surah ends exactly as a whole one does, through [surahEnds]. A passage with no
+     * ayah the container has is nothing to load, and does nothing.
+     *
+     * An overload rather than a sixth defaulted parameter on [load]: Swift sees no Kotlin
+     * defaults, and the iOS debug harness calls the five-argument form by name.
+     */
+    suspend fun load(
+        reciter: Reciter,
+        surah: Int,
+        startAyah: Int,
+        text: NowPlayingText,
+        speech: SpokenTranslation?,
+        ayahs: List<Int>?,
+    )
+
+    /**
      * Read-aloud turned on or off, or another translation chosen, while a surah is loaded
      * (read-aloud spec §2): the queue is rebuilt around the ayah being heard — inside an ayah it
      * carries on where it is; in a translation or a silence it moves to the next ayah.

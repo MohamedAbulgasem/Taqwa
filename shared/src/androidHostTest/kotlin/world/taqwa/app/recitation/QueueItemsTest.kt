@@ -80,4 +80,41 @@ class QueueItemsTest {
         assertNull(queueItemsOf(emptyList()))
         assertNull(queueItemsOf(listOf(gapUri(300L), speechUri(3L, 1, 1))))
     }
+
+    /**
+     * An adhkar page's passage (adhkar spec §3.5): the session counts its ayahs from one, but each
+     * id names the real ayah — so [TaqaDataSource] reads ayah 255's bytes, not ayah 1's — and the
+     * session's buttons, which move by index alone, give the app's own answers at every index.
+     */
+    @Test
+    fun aPassageIsAddressedByItsRealAyahsAndMovesByTheAppsIndices() {
+        val one = RecitationQueue(2, listOf(255), gapMs = 300L)
+        assertEquals(listOf("taqa://ar.alafasy/2/255"), idsOf(one))
+        assertSameIndexArithmetic(one)
+
+        val run = RecitationQueue(2, listOf(255, 256, 257), gapMs = 300L)
+        assertEquals(
+            listOf(
+                "taqa://ar.alafasy/2/255", "silence://300",
+                "taqa://ar.alafasy/2/256", "silence://300",
+                "taqa://ar.alafasy/2/257",
+            ),
+            idsOf(run),
+        )
+        assertSameIndexArithmetic(run)
+    }
+
+    /** What `AyahPlayer` asks of its rebuilt queue: indices only, never an ayah's number. */
+    private fun assertSameIndexArithmetic(app: RecitationQueue) {
+        val rebuilt = RecitationQueue(0, assertNotNull(queueItemsOf(idsOf(app))))
+        assertEquals(app.size, rebuilt.size)
+        for (i in app.items.indices) {
+            assertEquals(app.isAyah(i), rebuilt.isAyah(i), "isAyah($i)")
+            assertEquals(app.isGap(i), rebuilt.isGap(i), "isGap($i)")
+            assertEquals(app.ayahIndexAt(i), rebuilt.ayahIndexAt(i), "ayahIndexAt($i)")
+            assertEquals(app.next(i), rebuilt.next(i), "next($i)")
+            assertEquals(app.previous(i, 0L), rebuilt.previous(i, 0L), "previous($i) at its start")
+            assertEquals(app.previous(i, 5_000L), rebuilt.previous(i, 5_000L), "previous($i) late in it")
+        }
+    }
 }

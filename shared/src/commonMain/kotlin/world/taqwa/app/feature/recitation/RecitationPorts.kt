@@ -43,7 +43,16 @@ interface PlayerPort {
 
     /** A surah that has played out, held by the player for the decision (spec §16.1). */
     val surahEnds: Flow<Int>
-    suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?)
+
+    /** [ayahs] limits the queue to an adhkar page's passage (adhkar spec §3.5); null is the whole surah. */
+    suspend fun load(
+        reciter: Reciter,
+        surah: Int,
+        startAyah: Int,
+        text: NowPlayingText,
+        speech: SpokenTranslation?,
+        ayahs: List<Int>? = null,
+    )
     fun setSpeech(speech: SpokenTranslation?)
     fun play()
     fun pause()
@@ -128,8 +137,14 @@ fun RecitationPlayer.asPort(): PlayerPort = object : PlayerPort {
     override val state: StateFlow<PlaybackState> get() = this@asPort.state
     override val skips: Flow<SurahSkip> get() = this@asPort.skips
     override val surahEnds: Flow<Int> get() = this@asPort.surahEnds
-    override suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) =
-        this@asPort.load(reciter, surah, startAyah, text, speech)
+    override suspend fun load(
+        reciter: Reciter,
+        surah: Int,
+        startAyah: Int,
+        text: NowPlayingText,
+        speech: SpokenTranslation?,
+        ayahs: List<Int>?,
+    ) = this@asPort.load(reciter, surah, startAyah, text, speech, ayahs)
     override fun setSpeech(speech: SpokenTranslation?) = this@asPort.setSpeech(speech)
     override fun play() = this@asPort.play()
     override fun pause() = this@asPort.pause()

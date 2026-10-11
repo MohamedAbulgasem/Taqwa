@@ -239,26 +239,40 @@ actual class RecitationPlayer actual constructor(
     /** The app icon, made into artwork once: `UIImage` decoding is not free and it never changes. */
     private var cachedArtwork: MPMediaItemArtwork? = null
 
-    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) {
+    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) =
+        load(reciter, surah, startAyah, text, speech, ayahs = null)
+
+    actual suspend fun load(
+        reciter: Reciter,
+        surah: Int,
+        startAyah: Int,
+        text: NowPlayingText,
+        speech: SpokenTranslation?,
+        ayahs: List<Int>?,
+    ) {
         // First of all, before the split: a load is the answer the hold was waiting for, and the
         // hold must not lapse into a stop while Al-Baqarah is still being written out.
         leaveHold()
         val file = library.fileFor(reciter.id, surah)
+        // A passage (adhkar spec §3.5) splits out only its own ayahs: Ayat al-Kursi is one file,
+        // not Al-Baqarah's 286. It is never read aloud.
+        val wanted = ayahs?.toSet()
+        val reads = if (wanted != null) null else speech
         val split = withContext(Dispatchers.Default) {
-            runCatching { split(reciter.id, surah, file) }.getOrNull()
+            runCatching { split(reciter.id, surah, file, only = wanted) }.getOrNull()
         } ?: return
         if (split.files.isEmpty()) return
         val built = RecitationQueue(
             surah = surah,
             ayahs = split.files.keys.sorted(),
             gapMs = reciter.gapMs.toLong(),
-            spoken = speech?.spoken.orEmpty(),
+            spoken = reads?.spoken.orEmpty(),
         )
-        val clock = SurahTimeline.of(built, { split.durationsMs[it] ?: 0L }) { speech?.estimateMs(it) ?: 0L }
+        val clock = SurahTimeline.of(built, { split.durationsMs[it] ?: 0L }) { reads?.estimateMs(it) ?: 0L }
         withContext(Dispatchers.Main) {
             queue = built
             timeline = clock
-            this@RecitationPlayer.speech = speech
+            this@RecitationPlayer.speech = reads
             gapMs = reciter.gapMs.toLong()
             ayahDurations = split.durationsMs
             files = split.files
@@ -666,8 +680,12 @@ actual class RecitationPlayer actual constructor(
      * reusing any file already there whose size is the one the index publishes. The bytes written
      * are the corpus's own MP3s, untouched — the licence forbids re-encoding and nothing here
      * decodes anything.
+     *
+     * With [only], just those ayahs — an adhkar page's passage — and only those are returned, so
+     * the queue built from [Split.files] is the passage and nothing else. Every other file of the
+     * surah already in the cache is left where it is.
      */
-    private fun split(reciterId: String, surah: Int, container: Path): Split {
+    private fun split(reciterId: String, surah: Int, container: Path, only: Set<Int>? = null): Split {
         val fs = FileSystem.SYSTEM
         val taqa = TaqaFile(container, fs)
         val index = taqa.index()
@@ -676,6 +694,7 @@ actual class RecitationPlayer actual constructor(
         fs.createDirectories(dir)
         val written = LinkedHashMap<Int, String>(index.ayahs.size)
         index.ayahs.forEach { ayah ->
+            if (only != null && ayah.n !in only) return@forEach
             val out = dir / "${ayah.n}.mp3"
             val existing = fs.metadataOrNull(out)?.size
             if (existing != ayah.len) {

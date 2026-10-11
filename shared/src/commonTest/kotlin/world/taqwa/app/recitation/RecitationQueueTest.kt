@@ -3,6 +3,7 @@ package world.taqwa.app.recitation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -267,5 +268,53 @@ class RecitationQueueTest {
             listOf(QueueItem.Ayah(1), QueueItem.Ayah(2), QueueItem.Gap(SPEECH_BREATH_MS), QueueItem.Speech(2)),
             queue.items,
         )
+    }
+
+    // ── A passage: one ayah or a few, for an adhkar page (adhkar spec §3.5) ─────────────────
+
+    @Test
+    fun `one ayah from the middle of a surah is one item and no gap`() {
+        val queue = RecitationQueue(2, listOf(255), 300, emptySet())
+        assertEquals(listOf(QueueItem.Ayah(255)), queue.items)
+        assertFalse(queue.hasGaps)
+        assertEquals(listOf(255), queue.ayahs)
+        assertEquals(0, queue.indexOfAyah(255))
+        assertEquals(255, queue.ayahAt(0))
+        assertNull(queue.next(0))
+        assertEquals(0, queue.previous(0, positionMs = 100L))
+        assertEquals(0, queue.previous(0, positionMs = 5_000L))
+    }
+
+    private val ikhlasIndex = TaqaIndex(
+        reciter = "ar.alafasy",
+        surah = 112,
+        kbps = 64,
+        ayahs = listOf(
+            TaqaAyah(1, 0L, 100L),
+            TaqaAyah(2, 100L, 100L),
+            TaqaAyah(3, 200L, 100L),
+            TaqaAyah(4, 300L, 100L),
+        ),
+        dataStart = 128L,
+    )
+
+    @Test
+    fun `a passage keeps only the ayahs the container has in reading order`() {
+        val queue = assertNotNull(RecitationQueue.passage(ikhlasIndex, listOf(3, 9, 1, 3), gapMs = 300L))
+        assertEquals(112, queue.surah)
+        assertEquals(listOf(1, 3), queue.ayahs)
+        assertEquals(listOf(QueueItem.Ayah(1), QueueItem.Gap(300L), QueueItem.Ayah(3)), queue.items)
+    }
+
+    @Test
+    fun `a passage of one ayah from a container is that ayah alone`() {
+        val queue = assertNotNull(RecitationQueue.passage(ikhlasIndex, listOf(2), gapMs = 300L))
+        assertEquals(listOf(QueueItem.Ayah(2)), queue.items)
+    }
+
+    @Test
+    fun `a passage the container has none of is no queue`() {
+        assertNull(RecitationQueue.passage(ikhlasIndex, listOf(9), gapMs = 300L))
+        assertNull(RecitationQueue.passage(ikhlasIndex, emptyList(), gapMs = 300L))
     }
 }
