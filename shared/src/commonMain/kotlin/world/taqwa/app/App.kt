@@ -34,6 +34,7 @@ import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.settings.AboutScreen
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
@@ -67,6 +68,11 @@ fun App(container: AppContainer) {
     val settings = container.settingsRepository
     val themeModeState = settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val themeMode by themeModeState
+    // How clock times are written. It is an input to the one format every screen reads (below),
+    // so a change in Prayer times reaches every time on screen at once; the Prayer times screen
+    // reads its row from this same state.
+    val clockFormatState = settings.clockFormat.collectAsState(initial = ClockFormat.TWENTY_FOUR_HOUR)
+    val clockFormat by clockFormatState
     val prayerSettingsState = settings.prayerSettings.collectAsState(initial = PrayerSettings())
     val notificationSettingsState = settings.notificationSettings.collectAsState(initial = NotificationSettings())
     val widgetBackgroundState = settings.widgetBackground.collectAsState(
@@ -111,7 +117,7 @@ fun App(container: AppContainer) {
     // Quran screens', the widget mirror's — reads its language from this one value, so there is
     // exactly one place that decides what language the app is in.
     val uiLanguage = stringResource(Res.string.ui_language)
-    val platformFormat = remember(uiLanguage) { createPlatformFormat() }
+    val platformFormat = remember(uiLanguage, clockFormat) { createPlatformFormat(clockFormat) }
     // From the resolved strings, not the locale tag, for the reason given on isRtlLocale(): the
     // tree mirrors exactly when the words on it are Arabic.
     val layoutDirection = if (isRtlLocale()) LayoutDirection.Rtl else LayoutDirection.Ltr
@@ -160,6 +166,10 @@ fun App(container: AppContainer) {
     PlayingLaunchRequests(
         settings = settings,
         openPlaying = openPlaying,
+    )
+    AdhkarLaunchRequests(
+        settings = settings,
+        navigator = navigator,
     )
     DebugScreenRequests(
         settings = settings,
@@ -234,7 +244,7 @@ fun App(container: AppContainer) {
                 // A location save no longer writes a calculation method (spec §8): the never-early
                 // engine's Automatic timetable already follows the resolved place on its own.
                 // The alarms and widgets armed for the old place follow it now (ruling R53).
-                refreshForNewTimes(container, settings, platformFormat)
+                refreshForNewTimes(container, settings)
             }
         }
     }
@@ -464,6 +474,7 @@ fun App(container: AppContainer) {
 
                         Screen.PrayerTimesSettings -> PrayerTimesSettingsRoute(
                             prayerSettingsState = prayerSettingsState,
+                            clockFormatState = clockFormatState,
                             locationState = locationState,
                             cityDisplayNameState = cityDisplayNameState,
                             today = today,
@@ -581,6 +592,14 @@ fun App(container: AppContainer) {
                             TasbeehRoute(
                                 container = container,
                                 navigator = navigator,
+                            )
+                        }
+
+                        is Screen.Adhkar -> {
+                            AdhkarRoute(
+                                container = container,
+                                navigator = navigator,
+                                set = screen.set,
                             )
                         }
                     }

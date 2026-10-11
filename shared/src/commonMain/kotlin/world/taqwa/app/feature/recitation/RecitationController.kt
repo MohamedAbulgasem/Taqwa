@@ -63,6 +63,11 @@ class RecitationController(
     private val clips: ClipPort,
     /** The bundled fifteen-second clip for a reciter, or null when this build has none. */
     private val previewBytes: suspend (String) -> ByteArray?,
+    /**
+     * The bundled clip of an adhkar Quran page for a reciter (reciter id, surah, ayah or null for
+     * a whole surah), or null when this build has none (adhkar spec §3.5, first run).
+     */
+    private val adhkarClipBytes: suspend (String, Int, Int?) -> ByteArray?,
     private val scope: CoroutineScope,
     /**
      * Privacy spec §2.2: recorded, fire-and-forget, at the first line of every entry point.
@@ -111,6 +116,44 @@ class RecitationController(
     private var sheetAyah = 1
 
     /**
+     * The adhkar passage the open sheet was opened for (adhkar spec §3.5), so a confirm plays
+     * the passage and not the surah from its first ayah. Set wherever [sheetAyah] is.
+     */
+    private var sheetPassage: AdhkarPassage? = null
+
+    /**
+     * The surah of the adhkar passage loaded or loading (adhkar spec §3.5), or null for an
+     * ordinary recitation or none. Its end is the end ([advance]); [start] clears it, so an
+     * ordinary play after a passage goes on from surah to surah again.
+     */
+    private val adhkarSurah = MutableStateFlow<Int?>(null)
+
+    /**
+     * True while an adhkar page's bundled clip is playing (adhkar spec §3.5, first run): a session
+     * of its own, which never touches the player and never goes on — see [playAdhkarClip].
+     */
+    private val adhkarClip = MutableStateFlow(false)
+
+    /** True while the clip paused a recitation that its end, or the page turning, gives back. */
+    private var pausedForClip = false
+
+    /** Which clip is the current one, so the end of one the reader has replaced is not heard. */
+    private var adhkarClipRun = 0
+
+    /**
+     * How many times a clip has been stopped or abandoned ([stopAdhkar], [abandonAdhkarClip]): a
+     * clip still being read finds it changed.
+     */
+    private var adhkarStops = 0
+
+    /**
+     * How many times [stop] has been asked for. A passage's load reads it on both sides: a stop
+     * that overtook the load — the page turned, the screen left, before the service had even
+     * bound — arrived when there was nothing to stop, and is made again once there is.
+     */
+    private var stopCount = 0
+
+    /**
      * The move to the next surah after one has played out (spec §16.1), while it is still in its
      * breath. Cancelled by anything the reader does that starts or stops a recitation, because a
      * tap during the breath is an answer to the question the breath was asking.
@@ -151,7 +194,12 @@ class RecitationController(
         val surah: Int,
         val ayah: Int,
         val follow: Boolean = false,
+        /** An adhkar page's passage, played as one when the surah lands (adhkar spec §3.5). */
+        val passage: AdhkarPassage? = null,
     )
+
+    /** Which ayahs of the surah an adhkar page plays, and what its lock screen says. */
+    private data class AdhkarPassage(val ayahs: List<Int>, val text: NowPlayingText)
 
     /**
      * True while a preview is playing over a recitation this controller paused for it (spec
@@ -270,6 +318,16 @@ class RecitationController(
     ) { catalogue, playing, surface, spoken ->
         assemble(catalogue, playing, surface, spoken)
     }.stateIn(scope, SharingStarted.Eagerly, RecitationState())
+
+    /**
+     * True while an adhkar page's passage is being heard (adhkar spec §3.5): the speaker in the
+     * adhkar header becomes the equaliser. An ordinary recitation playing is not a passage, and
+     * a passage paused — a call, the headphones pulled out — is not playing. A bundled clip is
+     * playing for as long as it plays: it has no pause, and its end is the end.
+     */
+    val adhkarPlaying: StateFlow<Boolean> = combine(player.state, adhkarSurah, adhkarClip) { playback, surah, clip ->
+        clip || (surah != null && playback.surah == surah && playback.playing)
+    }.stateIn(scope, SharingStarted.Eagerly, false)
 
     private class Catalogue(
         val manifest: RecitationManifest?,
@@ -443,6 +501,7 @@ class RecitationController(
                 surfacedFailures += key
                 if (sheetSurah.value == null) {
                     sheetAyah = waiting.ayah
+                    sheetPassage = waiting.passage
                     sheetSurah.value = waiting.surah
                 }
             }
@@ -454,6 +513,13 @@ class RecitationController(
                 if (waiting.surah !in owned) return@collect
                 pending = null
                 sheetSurah.value = null
+                sheetPassage = null
+                // An adhkar page's passage (adhkar spec §3.5) is played as the page asked for it,
+                // whatever else is loaded: it is never a switch.
+                waiting.passage?.let { passage ->
+                    startPassage(waiting.surah, passage)
+                    return@collect
+                }
                 // A switch (spec §14.3) picks up where the old voice has got to, and in the state
                 // the listener left it: a surah they had paused does not start reading itself
                 // out in a new voice because a download finished — and a surah that has since
@@ -555,28 +621,73 @@ class RecitationController(
     }
 
     /**
+     * An adhkar page's speaker (adhkar spec §3.5): [ayahs] of [surah] — Ayat al-Kursi, or a whole
+     * short surah — in the chosen voice, with [title] and [subtitle] on the lock screen, never
+     * read aloud, and stopping at its end rather than going on to the next surah. A surah not on
+     * the phone is offered on the download sheet, and the confirm plays the passage when it
+     * lands — unless Alafasy is the voice and the build carries his clip of it, which plays at
+     * once ([playAdhkarClip]).
+     *
+     * A second tap while this surah's passage is still loading is a stop: the speaker shows Play
+     * until the passage sounds, and another load would start it over audibly. Only while it loads
+     * — a passage that is loaded and paused (a phone call) shows Play too, and that tap plays it.
+     */
+    fun requestPlayAyahs(surah: Int, ayahs: List<Int>, title: String, subtitle: String) {
+        if (ayahs.isEmpty()) return
+        if (loading.value && adhkarSurah.value == surah) {
+            stopAdhkar()
+            return
+        }
+        engage()
+        playOrOffer(surah, ayahs.min(), AdhkarPassage(ayahs, NowPlayingText(title, subtitle)))
+    }
+
+    /**
+     * The adhkar page turned, or the screen was left (adhkar spec §3.5). A passage playing stops,
+     * and so does a bundled clip — handing back the recitation it paused; one still waiting on
+     * its download is forgotten, its sheet with it, and the download goes on. Anything else — a
+     * surah the reader was listening to before opening the adhkar — is left alone.
+     */
+    fun stopAdhkar() {
+        adhkarStops++
+        endAdhkarClip(cut = true)
+        if (pending?.passage != null) pending = null
+        if (sheetPassage != null) {
+            sheetPassage = null
+            sheetSurah.value = null
+        }
+        if (adhkarSurah.value != null) stop()
+    }
+
+    /**
      * [requestPlay] without the engagement mark, for [onHeaderTap], which has already made it.
      *
      * A surah the reader owns plays. One they do not is offered on the sheet — or, once they
      * have said "without asking" (spec §15.3), fetched at once and played the moment it lands,
      * the header's ring being the only thing that moves in between.
+     *
+     * An adhkar [passage] always asks: the adhkar screen has no ring to show a surah arriving,
+     * and a speaker that answered a tap with a silent 58 MB fetch would look like a dead button.
      */
-    private fun playOrOffer(surah: Int, ayah: Int) {
+    private fun playOrOffer(surah: Int, ayah: Int, passage: AdhkarPassage? = null) {
         advancing?.cancel()
         scope.launch {
             if (surah in downloaded.value) {
                 pending = null
-                start(surah, ayah)
+                if (passage != null) startPassage(surah, passage) else start(surah, ayah)
                 return@launch
             }
+            // The first run (adhkar spec §3.5): not on the phone yet, but the build carries it.
+            if (passage != null && playAdhkarClip(surah, passage.ayahs)) return@launch
             picker.value = false
             val voice = reciter.value
-            if (voice != null && settings.settings.first().autoDownload) {
+            if (passage == null && voice != null && settings.settings.first().autoDownload) {
                 pending = PendingPlay(voice.id, surah, ayah)
                 downloader.enqueue(DownloadKey(voice.id, surah), allowMobileOnce = false)
                 return@launch
             }
             sheetAyah = ayah
+            sheetPassage = passage
             sheetSurah.value = surah
         }
     }
@@ -585,13 +696,25 @@ class RecitationController(
      * The bar's next and previous, and the lock screen's (spec §15.1): the neighbouring surah
      * from its first ayah, through the same path as a tap on its header, so a surah not on the
      * phone is offered or fetched exactly as it would be there. At the ends of the Quran, nothing.
+     *
+     * During an adhkar page's passage (adhkar spec §3.5) a skip stops it and starts nothing: the
+     * passage was all that was asked for, and a press on the lock screen is no request for
+     * Al-Imran after Ayat al-Kursi.
      */
     fun nextSurah() {
+        if (adhkarSurah.value != null) {
+            stopAdhkar()
+            return
+        }
         val playing = state.value.bar?.surah ?: return
         if (playing < LAST_SURAH) requestPlay(playing + 1, 1)
     }
 
     fun previousSurah() {
+        if (adhkarSurah.value != null) {
+            stopAdhkar()
+            return
+        }
         val playing = state.value.bar?.surah ?: return
         if (playing > 1) requestPlay(playing - 1, 1)
     }
@@ -607,8 +730,21 @@ class RecitationController(
      *
      * A move during the breath — a seek back into the surah from the lock screen, a tap on another
      * ayah — leaves the player playing something, and that wins: the breath then ends nothing.
+     *
+     * An adhkar page's passage (adhkar spec §3.5) never goes on: it was the whole of what was
+     * asked for, and its end stops the player. An end reported for some other surah while a
+     * passage is loaded is one the passage has already replaced, and is answered with nothing.
      */
     private fun advance(ended: Int) {
+        val passage = adhkarSurah.value
+        if (passage != null) {
+            if (passage == ended) {
+                advancing?.cancel()
+                adhkarSurah.value = null
+                player.stop()
+            }
+            return
+        }
         advancing?.cancel()
         advancing = scope.launch {
             val next = ended + 1
@@ -652,8 +788,16 @@ class RecitationController(
         // The sheet's switch (spec §15.3), written whatever position it is in: a confirm is the
         // moment the reader has been asked.
         scope.launch { settings.setAutoDownload(autoDownload) }
-        // Another voice reciting this surah right now is what makes this a switch (spec §14.3).
-        pending = PendingPlay(voice.id, surah, sheetAyah, follow = player.state.value.surah == surah)
+        // Another voice reciting this surah right now is what makes this a switch (spec §14.3) —
+        // unless the sheet was opened for an adhkar passage, which is never a switch.
+        val passage = sheetPassage
+        pending = PendingPlay(
+            voice.id,
+            surah,
+            sheetAyah,
+            follow = passage == null && player.state.value.surah == surah,
+            passage = passage,
+        )
         downloader.enqueue(DownloadKey(voice.id, surah), allowMobileOnce)
     }
 
@@ -680,6 +824,8 @@ class RecitationController(
      * surah arrives, and the header button's ring is what keeps the download visible. */
     fun dismissSheet() {
         sheetSurah.value = null
+        // A confirmed passage waits in [pending], and a failure reopens the sheet from there.
+        sheetPassage = null
     }
 
     // ── The whole Quran (spec §5.4, §12.8) ──────────────────────────────────────────────
@@ -813,6 +959,8 @@ class RecitationController(
     fun stop() {
         advancing?.cancel()
         pending = null
+        adhkarSurah.value = null
+        stopCount++
         player.stop()
     }
 
@@ -877,6 +1025,7 @@ class RecitationController(
                 return@launch
             }
             sheetAyah = playback.ayah ?: 1
+            sheetPassage = null
             sheetSurah.value = surah
         }
     }
@@ -960,6 +1109,9 @@ class RecitationController(
 
     private suspend fun start(surah: Int, ayah: Int, voice: Reciter? = null) {
         val playWith = voice ?: reciter.value ?: return
+        // A whole surah, whatever was loaded before: its end goes on to the next one again.
+        adhkarSurah.value = null
+        abandonAdhkarClip()
         loading.value = true
         try {
             val speech = spokenFor(surah)
@@ -975,6 +1127,130 @@ class RecitationController(
         // surah; this call catches it up. The key guard makes it a no-op itself when nothing
         // changed, so a plain load is never followed by a redundant `setSpeech`.
         applyReadAloud()
+    }
+
+    /**
+     * An adhkar page's passage (adhkar spec §3.5), loaded as a session of its own: only its
+     * ayahs, under the page's own lock-screen text, never read aloud, and marked so that its end
+     * stops the player ([advance]).
+     */
+    private suspend fun startPassage(surah: Int, passage: AdhkarPassage) {
+        val playWith = reciter.value ?: return
+        val stopsBefore = stopCount
+        adhkarSurah.value = surah
+        abandonAdhkarClip()
+        loading.value = true
+        try {
+            player.load(playWith, surah, passage.ayahs.min(), passage.text, null, passage.ayahs)
+        } finally {
+            loading.value = false
+        }
+        // The speech bookkeeping is the loaded surah's, so it follows the passage only once the
+        // passage is what is loaded: a container that could not be read leaves the recitation
+        // before it read aloud as it was, and the bar saying so.
+        if (player.state.value.surah == surah) {
+            speechKind = null
+            appliedSpeech = keyOf(surah, null)
+        }
+        if (stopCount != stopsBefore) {
+            // The page turned or the screen was left while it loaded — on Android the first
+            // play binds the service, long enough for a swipe — and that stop found nothing to
+            // stop. Left playing, the passage would sound over the next page unmarked, and go
+            // on into the next surah at its end.
+            player.stop()
+            return
+        }
+        if (player.state.value.surah != surah) {
+            // The container could not be read, so nothing was loaded and whatever was before is
+            // still there. That is not this passage: it keeps going on at its end, and it is not
+            // resumed by a play meant for the passage.
+            if (adhkarSurah.value == surah) adhkarSurah.value = null
+            return
+        }
+        player.play()
+    }
+
+    /**
+     * The first run (adhkar spec §3.5): an adhkar passage of a surah that is not on the phone,
+     * played from the clip this build carries for it — Alafasy's, and only when Alafasy is the
+     * voice the reader chose, so nobody hears a voice they did not pick. The clip is a whole ayah
+     * or a whole short surah, which is why a passage of several ayahs must start at the first.
+     *
+     * A session of its own, and everything a passage's session is not: the clip never loads the
+     * player, so it has no lock screen, no bar and no end to go on from — it plays out and that is
+     * all ([adhkarClip]). A recitation that was playing is paused for it and given back at its
+     * end, the way an audition does ([previewReciter]); one the reader had already paused stays
+     * paused. Nothing it plays is counted.
+     *
+     * @return true when the request has been answered: the clip is playing, or the page turned
+     * while it was being read and there is nothing to play and nothing to offer. False when there
+     * is no clip — another voice, or one this build does not carry — and the request goes on to
+     * the download sheet.
+     */
+    private suspend fun playAdhkarClip(surah: Int, ayahs: List<Int>): Boolean {
+        val voice = reciter.value?.takeIf { it.id == RecitationManifest.DEFAULT_RECITER } ?: return false
+        val ayah = when {
+            ayahs.size == 1 -> ayahs.single()
+            ayahs.min() == 1 -> null
+            else -> return false
+        }
+        val stopsBefore = adhkarStops
+        val bytes = try {
+            adhkarClipBytes(voice.id, surah, ayah)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            null
+        }
+        // The page turned, the screen was left, or an ordinary play took the player while the file
+        // was being read: that stop found no clip to stop. Playing now would sound over the next
+        // page, unmarked, or pause the recitation the reader has just started.
+        if (adhkarStops != stopsBefore) return true
+        if (bytes == null) return false
+        // A passage in the player gives way to the clip.
+        if (adhkarSurah.value != null) stop()
+        if (!adhkarClip.value && player.state.value.playing) {
+            pausedForClip = true
+            player.pause()
+        }
+        adhkarClip.value = true
+        val run = ++adhkarClipRun
+        clips.play(bytes) {
+            scope.launch { if (adhkarClipRun == run) endAdhkarClip(cut = false) }
+        }
+        return true
+    }
+
+    /**
+     * The clip is over: it played out ([cut] false) or the page turned and it was stopped. Gives
+     * back the recitation the clip paused — once, and only if there is still one loaded to give
+     * it back to: the reader may have dismissed the bar in the meantime. Nothing at all when no
+     * clip is playing, so a stop for a passage in the player leaves an audition's clip alone.
+     */
+    private fun endAdhkarClip(cut: Boolean) {
+        if (!adhkarClip.value) return
+        adhkarClip.value = false
+        if (cut) clips.stop()
+        val paused = pausedForClip
+        pausedForClip = false
+        if (paused && player.state.value.surah != null) player.play()
+    }
+
+    /**
+     * An ordinary play — [start], or a passage in the player — has taken the player, so a clip
+     * still sounding is over and what it paused is not to be given back: the new play owns the
+     * player now, in whatever state the reader leaves it, and a clip's end resuming the surah the
+     * reader has since paused would be a press they never made. The way [toggle] ends an audition
+     * with `resume = false`. A clip whose bytes are still being read is abandoned too, before it
+     * sounds: [adhkarStops] moves first, which [playAdhkarClip] reads when the read returns, since
+     * until then there is no clip playing to end.
+     */
+    private fun abandonAdhkarClip() {
+        adhkarStops++
+        if (!adhkarClip.value) return
+        adhkarClip.value = false
+        pausedForClip = false
+        clips.stop()
     }
 
     /**
@@ -1006,11 +1282,13 @@ class RecitationController(
     private suspend fun applyReadAloud() {
         val surah = player.state.value.surah ?: return
         if (loading.value) return
+        // An adhkar passage is never read aloud (adhkar spec §3.5), whatever the switch says.
+        if (adhkarSurah.value != null) return
         val speech = spokenFor(surah)
         // Stale by the time the suspension above returns: the surah changed under it, or a fresh
         // `start()` (same surah or not) began and will call this itself when it finishes — either
         // way this call must not overwrite `appliedSpeech` for a build that raced it.
-        if (loading.value || player.state.value.surah != surah) return
+        if (loading.value || adhkarSurah.value != null || player.state.value.surah != surah) return
         val key = keyOf(surah, speech)
         if (key == appliedSpeech) return
         appliedSpeech = key

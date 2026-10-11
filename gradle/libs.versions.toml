@@ -41,6 +41,9 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 jetbrains-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "jetbrains-lifecycle" }
 # The @Preview annotation in common code, for the Prayer screen's states.
 compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
+# Compose UI tests on the iOS simulator target (shared/src/iosTest): semantics assertions on the
+# shared controls. Through the catalog rather than `compose.uiTest`, which the plugin deprecates.
+compose-ui-test = { module = "org.jetbrains.compose.ui:ui-test", version.ref = "compose-multiplatform" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }

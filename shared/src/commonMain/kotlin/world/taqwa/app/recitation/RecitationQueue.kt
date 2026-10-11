@@ -151,6 +151,17 @@ class RecitationQueue(
             spoken = spoken,
         )
 
+        /**
+         * One ayah of the container's surah, or a few: an adhkar page's passage (adhkar spec
+         * §3.5) — Ayat al-Kursi out of Al-Baqarah, say — in reading order, with the reciter's gap
+         * between them and never a translation. An ayah the container does not have is dropped,
+         * and a passage with nothing left is null: the player then has nothing to load.
+         */
+        fun passage(index: TaqaIndex, ayahs: List<Int>, gapMs: Long): RecitationQueue? {
+            val present = ayahs.distinct().filter { index.ayah(it) != null }.sorted()
+            return if (present.isEmpty()) null else RecitationQueue(index.surah, present, gapMs, emptySet())
+        }
+
         private fun build(ayahs: List<Int>, gapMs: Long, spoken: Set<Int>): List<QueueItem> = buildList {
             ayahs.forEachIndexed { position, n ->
                 add(QueueItem.Ayah(n))

@@ -12,7 +12,9 @@ import java.io.File
  * the temp file wins on plainness.
  *
  * One file per player instance, overwritten each preview: two previews cannot overlap ([play]
- * stops the last one first), so there is never a second reader of it.
+ * stops the last one first), so there is never a second reader of it. A clip that cannot be
+ * written or prepared ends at once — [onEnd] is called and the `MediaPlayer` released — rather
+ * than leaving a caller waiting for an end that is never coming.
  */
 actual class ClipPlayer actual constructor() {
 
@@ -24,9 +26,17 @@ actual class ClipPlayer actual constructor() {
         val path = runCatching {
             file.writeBytes(bytes)
             file.absolutePath
-        }.getOrNull() ?: return
-        player = runCatching {
-            MediaPlayer().apply {
+        }.getOrNull()
+        // Built outside the `try` below so that a failure past it can release what it built: the
+        // `MediaPlayer` holds a native player that nothing else will ever free.
+        val started = if (path != null) runCatching { MediaPlayer() }.getOrNull() else null
+        if (path == null || started == null) {
+            // Nothing could be played, which is an end like any other to whoever is waiting.
+            onEnd()
+            return
+        }
+        try {
+            started.apply {
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -42,7 +52,12 @@ actual class ClipPlayer actual constructor() {
                 prepare()
                 start()
             }
-        }.getOrNull()
+            player = started
+        } catch (_: Exception) {
+            runCatching { started.release() }
+            player = null
+            onEnd()
+        }
     }
 
     actual fun stop() {

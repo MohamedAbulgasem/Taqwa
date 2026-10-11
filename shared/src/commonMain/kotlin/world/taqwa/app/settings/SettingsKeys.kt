@@ -20,6 +20,8 @@ internal object SettingsKeys {
     val HIGH_LAT = stringPreferencesKey("high_latitude")
     val HIJRI_OFFSET = intPreferencesKey("hijri_offset_days")
     val SHOW_SUNRISE = booleanPreferencesKey("show_sunrise")
+    /** 24-hour or 12-hour clock times (spec §1.1). Absent means 24-hour, so no upgrade changes a screen. */
+    val CLOCK_FORMAT = stringPreferencesKey("clock_format")
     // One string rather than a key per prayer: the map is written and read as a unit, and a
     // single preference keeps the removal of an offset from leaving a stale key behind.
     val MINUTE_ADJUSTMENTS = stringPreferencesKey("minute_adjustments")
@@ -90,6 +92,11 @@ internal object SettingsKeys {
     val TAHAJJUD_ENABLED = booleanPreferencesKey("tahajjud_enabled")
     val TAHAJJUD_SOUND = stringPreferencesKey("tahajjud_sound")
 
+    /** The adhkar reminder (adhkar spec §5) and its sound. Named for the reminder rather than as
+     * `ADHKAR_*`, which is the reading progress below; absent means off and the chime. */
+    val ADHKAR_REMINDER_ENABLED = booleanPreferencesKey("adhkar_reminder_enabled")
+    val ADHKAR_REMINDER_SOUND = stringPreferencesKey("adhkar_reminder_sound")
+
     val QURAN_MODE = stringPreferencesKey("quran_mode")
     val QURAN_SIZE = intPreferencesKey("quran_size")
     val QURAN_TRANSLITERATION = booleanPreferencesKey("quran_transliteration")
@@ -111,6 +118,27 @@ internal object SettingsKeys {
     /** Custom phrases as "<id>\u001F<phrase>\u001F<target>" entries. U+001F because the phrase
      * is free text in any script and may contain any punctuation a reader can type. */
     val TASBEEH_CUSTOM = stringSetPreferencesKey("tasbeeh_custom")
+
+    /**
+     * Morning & Evening Adhkar progress, one string per set: "<date>|<count of page 1>,<count of
+     * page 2>,…" (see AdhkarProgress). Only the latest date is kept; a new date overwrites it.
+     */
+    val ADHKAR_MORNING = stringPreferencesKey("adhkar_morning")
+    val ADHKAR_EVENING = stringPreferencesKey("adhkar_evening")
+
+    /** The daily istighfar, "<date>|<count>": one counter for both sets, not one per set. */
+    val ADHKAR_ISTIGHFAR = stringPreferencesKey("adhkar_istighfar")
+
+    /** Whether the adhkar pages show the translation under the Arabic; absent means on (spec §3.6). */
+    val ADHKAR_TRANSLATION = booleanPreferencesKey("adhkar_translation")
+
+    /**
+     * The date a set was last said in full, "<date>" (the set's own: that Fajr's, that Asr's), so
+     * that a reschedule never arms the reminder for a set already said (spec §5). One date per
+     * set; a later one overwrites it.
+     */
+    val ADHKAR_DONE_MORNING = stringPreferencesKey("adhkar_done_morning")
+    val ADHKAR_DONE_EVENING = stringPreferencesKey("adhkar_done_evening")
 
     /** The voice the reader listens in; absent until one is picked, which is what makes Alafasy
      * the default for everyone who never does (spec 3a §12.1). */

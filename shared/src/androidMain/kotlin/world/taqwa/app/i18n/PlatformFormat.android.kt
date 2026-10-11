@@ -2,6 +2,7 @@ package world.taqwa.app.i18n
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
+import java.text.DateFormatSymbols
 import java.text.NumberFormat
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
@@ -10,8 +11,14 @@ import java.time.format.DecimalStyle
 import java.time.format.FormatStyle
 import java.util.Locale
 
-private class AndroidPlatformFormat : PlatformFormat {
-    private val locale: Locale = Locale.getDefault()
+/**
+ * `internal` with a locale parameter so the host test can build it for a given locale; the app
+ * only ever reaches it through [createPlatformFormat], with the device's default.
+ */
+internal class AndroidPlatformFormat(
+    private val locale: Locale = Locale.getDefault(),
+    private val clockFormat: ClockFormat = ClockFormat.TWENTY_FOUR_HOUR,
+) : PlatformFormat {
 
     // NumberFormat is not thread-safe, but every call here is on the UI thread and one instance
     // avoids re-resolving the locale's numbering system on every tick of the countdown.
@@ -20,6 +27,11 @@ private class AndroidPlatformFormat : PlatformFormat {
         minimumIntegerDigits = 2
         isGroupingUsed = false
     }
+
+    // CLDR's abbreviated day periods for this locale — "AM"/"PM" in American English, "am"/"pm"
+    // in British, "ص"/"م" in Arabic, "ÖÖ"/"ÖS" in Turkish. Never our own strings (spec §1.2).
+    private val amPm: Array<String> = DateFormatSymbols.getInstance(locale).amPmStrings
+    private val markerFirst = TwelveHourClock.markerFirst(locale.toLanguageTag())
 
     // CLDR's LONG date is "full month, day, year, no weekday" in the locale's own field order
     // ("6 September 2026" for en-GB, "September 6, 2026" for en-US). Pure java.time rather than
@@ -44,8 +56,15 @@ private class AndroidPlatformFormat : PlatformFormat {
 
     override fun localizedDigits(number: Int): String = plainFormat.format(number)
 
-    override fun clockTime(hour: Int, minute: Int): String =
-        "${plainFormat.format(hour)}:${twoDigitFormat.format(minute)}"
+    override fun clockTime(hour: Int, minute: Int): String {
+        if (clockFormat == ClockFormat.TWENTY_FOUR_HOUR) {
+            return "${plainFormat.format(hour)}:${twoDigitFormat.format(minute)}"
+        }
+        val (h, pm) = twelveHourParts(hour)
+        return TwelveHourClock.render(
+            plainFormat.format(h), twoDigitFormat.format(minute), amPm[if (pm) 1 else 0], markerFirst,
+        )
+    }
 
     // CLDR returns these lowercase in several locales (French "anglais", Indonesian "inggris"),
     // and this name is a list label, so the first character is titlecased in the display locale's
@@ -71,4 +90,4 @@ private class AndroidPlatformFormat : PlatformFormat {
     }
 }
 
-actual fun createPlatformFormat(): PlatformFormat = AndroidPlatformFormat()
+actual fun createPlatformFormat(clockFormat: ClockFormat): PlatformFormat = AndroidPlatformFormat(clockFormat = clockFormat)

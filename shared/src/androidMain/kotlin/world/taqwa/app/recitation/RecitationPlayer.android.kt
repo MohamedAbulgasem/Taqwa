@@ -149,7 +149,17 @@ actual class RecitationPlayer actual constructor(
     /** The controller, but only while it is any use. */
     private val live: MediaController? get() = controller?.takeIf { it.isConnected }
 
-    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) {
+    actual suspend fun load(reciter: Reciter, surah: Int, startAyah: Int, text: NowPlayingText, speech: SpokenTranslation?) =
+        load(reciter, surah, startAyah, text, speech, ayahs = null)
+
+    actual suspend fun load(
+        reciter: Reciter,
+        surah: Int,
+        startAyah: Int,
+        text: NowPlayingText,
+        speech: SpokenTranslation?,
+        ayahs: List<Int>?,
+    ) {
         // First of all, before the container is even read: a load is the answer the hold was
         // waiting for, and the hold must not lapse into a stop while the answer is under way.
         leaveHold()
@@ -160,17 +170,25 @@ actual class RecitationPlayer actual constructor(
             }.getOrNull()
         } ?: return
         val (index, durations) = opened
-        val built = RecitationQueue.of(index, reciter.gapMs.toLong(), speech?.spoken.orEmpty())
+        // A passage (adhkar spec §3.5) is never read aloud. Its media ids still name the real
+        // ayahs (`taqa://<reciter>/2/255`), which is what [TaqaDataSource] reads the bytes by; the
+        // session's own rebuild counts them from one, but it only ever moves by index.
+        val reads = if (ayahs != null) null else speech
+        val built = if (ayahs != null) {
+            RecitationQueue.passage(index, ayahs, reciter.gapMs.toLong()) ?: return
+        } else {
+            RecitationQueue.of(index, reciter.gapMs.toLong(), reads?.spoken.orEmpty())
+        }
         // The clock counts what is heard (read-aloud spec §2): the breath before each
         // translation, and the translation's own slot as estimated from its length.
-        val clock = SurahTimeline.of(built, { durations[it] ?: 0L }) { speech?.estimateMs(it) ?: 0L }
+        val clock = SurahTimeline.of(built, { durations[it] ?: 0L }) { reads?.estimateMs(it) ?: 0L }
         val startIndex = built.indexOfAyah(startAyah) ?: 0
         val bound = runCatching { connect() }.getOrNull() ?: return
 
         queue = built
         timeline = clock
         reciterId = reciter.id
-        this.speech = speech
+        this.speech = reads
         generation++
         nowText = text
         gapMs = reciter.gapMs.toLong()

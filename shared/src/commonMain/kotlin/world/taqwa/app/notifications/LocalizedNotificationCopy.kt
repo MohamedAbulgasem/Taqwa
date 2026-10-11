@@ -5,6 +5,7 @@ import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.PrayerNaming
 import world.taqwa.app.i18n.UiLanguage
+import world.taqwa.app.i18n.isolatedClock
 
 /**
  * The localised replacement for [EnglishNotificationCopy]. No platform code ever localises a
@@ -28,6 +29,14 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
         /** The night prayer's own name, and what its notification says: `{prayer}` is Fajr. */
         val tahajjud: String,
         val tahajjudBody: String,
+        /** The adhkar reminder's titles, each language's `adhkar_morning` / `adhkar_evening`. */
+        val adhkarMorning: String,
+        val adhkarEvening: String,
+        /** `{time}` is where the window ends: sunrise for the morning, Maghrib for the evening. */
+        val adhkarMorningBody: String,
+        val adhkarEveningBody: String,
+        /** The one channel both adhkar kinds post into, named as `notifications_adhkar` is. */
+        val adhkarChannel: String,
         val silent: String,
         val notification: String,
         val takbir: String,
@@ -41,8 +50,12 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
     private fun name(prayer: Prayer) =
         PrayerNaming.display(prayer, format.languageTag(), PrayerNaming.name(prayer, format.languageTag()))
 
-    override fun title(prayer: Prayer, kind: NotificationKind): String =
-        if (kind == NotificationKind.TAHAJJUD) words.tahajjud else name(prayer)
+    override fun title(prayer: Prayer, kind: NotificationKind): String = when (kind) {
+        NotificationKind.TAHAJJUD -> words.tahajjud
+        NotificationKind.ADHKAR_MORNING -> words.adhkarMorning
+        NotificationKind.ADHKAR_EVENING -> words.adhkarEvening
+        NotificationKind.PRAYER, NotificationKind.REMINDER -> name(prayer)
+    }
 
     override fun body(
         prayer: Prayer,
@@ -54,13 +67,15 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
         return when (kind) {
             NotificationKind.PRAYER -> words.prayerBody
                 .replace("{prayer}", n)
-                .replace("{time}", clockTime)
+                .replace("{time}", isolatedClock(clockTime))
             NotificationKind.REMINDER -> reminder(n, minutesBefore, clockTime)
             // Fajr by its one name in this language, not the paired «Fajr · الفجر» a title
             // wears: inside a sentence that already has a separator the pair reads as a list.
             NotificationKind.TAHAJJUD -> words.tahajjudBody
                 .replace("{prayer}", PrayerNaming.name(prayer, format.languageTag()))
-                .replace("{time}", clockTime)
+                .replace("{time}", isolatedClock(clockTime))
+            NotificationKind.ADHKAR_MORNING -> words.adhkarMorningBody.replace("{time}", isolatedClock(clockTime))
+            NotificationKind.ADHKAR_EVENING -> words.adhkarEveningBody.replace("{time}", isolatedClock(clockTime))
         }
     }
 
@@ -79,7 +94,7 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
         } else {
             words.reminderBody
         }
-        return body.replace("{prayer}", prayerName).replace("{minutes}", minutes).replace("{time}", clockTime)
+        return body.replace("{prayer}", prayerName).replace("{minutes}", minutes).replace("{time}", isolatedClock(clockTime))
     }
 
     // Not read from string resources: a channel is created from the Android scheduler, which can
@@ -92,7 +107,10 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
             PrayerSound.TAKBIR -> words.takbir
             PrayerSound.ADHAN -> words.adhan
         }
-        return "${title(prayer, kind)} · $soundName"
+        // Both adhkar kinds post into one channel (NotificationChannels), so it is named for both:
+        // "Morning adhkar · Notification" over the evening's notifications would be wrong half the day.
+        val channel = if (kind.isAdhkar) words.adhkarChannel else title(prayer, kind)
+        return "$channel · $soundName"
     }
 
     private companion object {
@@ -104,6 +122,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 reminderBodyOne = "{prayer} in {minutes} minute · {time}",
                 tahajjud = "Tahajjud",
                 tahajjudBody = "The last third of the night has begun · {prayer} at {time}",
+                adhkarMorning = "Morning adhkar",
+                adhkarEvening = "Evening adhkar",
+                adhkarMorningBody = "Until sunrise · {time}",
+                adhkarEveningBody = "Until Maghrib · {time}",
+                adhkarChannel = "Morning and evening adhkar",
                 silent = "Silent", notification = "Notification", takbir = "Takbir", adhan = "Adhan",
             ),
             UiLanguage.ARABIC to Words(
@@ -111,6 +134,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 reminderBody = "{prayer} بعد {minutes} دقيقة · {time}",
                 tahajjud = "التهجد",
                 tahajjudBody = "بدأ الثلث الأخير من الليل · {prayer} {time}",
+                adhkarMorning = "أذكار الصباح",
+                adhkarEvening = "أذكار المساء",
+                adhkarMorningBody = "حتى الشروق · {time}",
+                adhkarEveningBody = "حتى المغرب · {time}",
+                adhkarChannel = "أذكار الصباح والمساء",
                 silent = "صامت", notification = "نغمة التنبيه", takbir = "تكبير", adhan = "أذان",
             ),
             UiLanguage.FRENCH to Words(
@@ -119,6 +147,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 reminderBodyOne = "{prayer} dans {minutes} minute · {time}",
                 tahajjud = "Tahajjud",
                 tahajjudBody = "Le dernier tiers de la nuit a commencé · {prayer} à {time}",
+                adhkarMorning = "Adhkar du matin",
+                adhkarEvening = "Adhkar du soir",
+                adhkarMorningBody = "Jusqu’au lever du soleil · {time}",
+                adhkarEveningBody = "Jusqu’au Maghrib · {time}",
+                adhkarChannel = "Adhkar du matin et du soir",
                 silent = "Silencieux", notification = "Tonalité", takbir = "Takbir", adhan = "Adhan",
             ),
             UiLanguage.TURKISH to Words(
@@ -126,6 +159,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 reminderBody = "{prayer} vaktine {minutes} dakika · {time}",
                 tahajjud = "Teheccüd",
                 tahajjudBody = "Gecenin son üçte biri başladı · {prayer} {time}",
+                adhkarMorning = "Sabah zikirleri",
+                adhkarEvening = "Akşam zikirleri",
+                adhkarMorningBody = "Güneş doğana kadar · {time}",
+                adhkarEveningBody = "Akşama kadar · {time}",
+                adhkarChannel = "Sabah ve akşam zikirleri",
                 silent = "Sessiz", notification = "Bildirim", takbir = "Tekbir", adhan = "Ezan",
             ),
             UiLanguage.INDONESIAN to Words(
@@ -133,6 +171,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 reminderBody = "{prayer} {minutes} menit lagi · {time}",
                 tahajjud = "Tahajud",
                 tahajjudBody = "Sepertiga malam terakhir telah tiba · {prayer} pukul {time}",
+                adhkarMorning = "Zikir pagi",
+                adhkarEvening = "Zikir petang",
+                adhkarMorningBody = "Hingga matahari terbit · {time}",
+                adhkarEveningBody = "Hingga Maghrib · {time}",
+                adhkarChannel = "Zikir pagi dan petang",
                 silent = "Senyap", notification = "Nada notifikasi", takbir = "Takbir", adhan = "Azan",
             ),
             UiLanguage.URDU to Words(
@@ -140,6 +183,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 reminderBody = "{prayer} میں {minutes} منٹ باقی · {time}",
                 tahajjud = "تہجد",
                 tahajjudBody = "رات کا آخری تہائی حصہ شروع ہو گیا · {prayer} {time}",
+                adhkarMorning = "صبح کے اذکار",
+                adhkarEvening = "شام کے اذکار",
+                adhkarMorningBody = "طلوعِ آفتاب تک · {time}",
+                adhkarEveningBody = "مغرب تک · {time}",
+                adhkarChannel = "صبح و شام کے اذکار",
                 silent = "خاموش", notification = "اطلاعی ٹون", takbir = "تکبیر", adhan = "اذان",
             ),
             UiLanguage.BENGALI to Words(
@@ -147,6 +195,11 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 reminderBody = "{minutes} মিনিট পর {prayer} · {time}",
                 tahajjud = "তাহাজ্জুদ",
                 tahajjudBody = "রাতের শেষ তৃতীয়াংশ শুরু হয়েছে · {prayer} {time}",
+                adhkarMorning = "সকালের আযকার",
+                adhkarEvening = "সন্ধ্যার আযকার",
+                adhkarMorningBody = "সূর্যোদয় পর্যন্ত · {time}",
+                adhkarEveningBody = "মাগরিব পর্যন্ত · {time}",
+                adhkarChannel = "সকাল ও সন্ধ্যার আযকার",
                 silent = "নীরব", notification = "নোটিফিকেশন সুর", takbir = "তাকবীর", adhan = "আযান",
             ),
         )

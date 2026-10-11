@@ -1,5 +1,7 @@
 package world.taqwa.app.nav
 
+import world.taqwa.app.adhkar.AdhkarSet
+
 sealed interface Screen {
     data object Onboarding : Screen
     data object Today : Screen
@@ -55,4 +57,11 @@ sealed interface Screen {
 
     /** The dhikr counter, pushed from the misbaha in the Prayer screen's header (spec §4). */
     data object Tasbeeh : Screen
+
+    /**
+     * The morning and evening adhkar (adhkar spec §3), pushed from the horizon beside the misbaha in
+     * the Prayer screen's header. [set] is the set to open on; null lets the screen pick the one the
+     * location's own day is in (adhkar spec §2.3), which is what the header button asks for.
+     */
+    data class Adhkar(val set: AdhkarSet? = null) : Screen
 }

@@ -15,9 +15,16 @@ import platform.Foundation.currentLocale
 import platform.Foundation.localizedStringForLanguageCode
 import platform.Foundation.preferredLanguages
 
-private class IosPlatformFormat : PlatformFormat {
-
-    private val currentLocale = NSLocale.currentLocale
+/**
+ * `internal`, and taking the locale and the preferred language, so the simulator test can build it
+ * for a given locale, as `AndroidPlatformFormatTest` does on Android; the app only ever reaches it
+ * through [createPlatformFormat], with the device's own.
+ */
+internal class IosPlatformFormat(
+    private val clockFormat: ClockFormat,
+    private val currentLocale: NSLocale = NSLocale.currentLocale,
+    preferredLanguage: String = (NSLocale.preferredLanguages.firstOrNull() as? String) ?: "en",
+) : PlatformFormat {
 
     private val plainFormatter = NSNumberFormatter().apply {
         setLocale(currentLocale)
@@ -41,14 +48,22 @@ private class IosPlatformFormat : PlatformFormat {
      * report "ar" and miss the Arabic-Indic default that same device actually formats with.
      */
     private val tag: String = run {
-        val preferred = (NSLocale.preferredLanguages.firstOrNull() as? String) ?: "en"
-        if (preferred.contains('-')) {
-            preferred
+        if (preferredLanguage.contains('-')) {
+            preferredLanguage
         } else {
             val region = currentLocale.objectForKey(NSLocaleCountryCode) as? String
-            if (region.isNullOrBlank()) preferred else "$preferred-$region"
+            if (region.isNullOrBlank()) preferredLanguage else "$preferredLanguage-$region"
         }
     }
+
+    // The day-period symbols of the *language* locale, not `currentLocale`: the marker is a
+    // language question ("pm" in British English, "PM" in American), while the digits above
+    // are a region question (spec §1.2).
+    private val amPm: Pair<String, String> = NSDateFormatter().run {
+        setLocale(NSLocale(localeIdentifier = tag))
+        AMSymbol to PMSymbol
+    }
+    private val markerFirst = TwelveHourClock.markerFirst(tag)
 
     // Explicitly Gregorian on both the components and the formatter: a user who has switched
     // their iPhone to the Umm al-Qura calendar would otherwise get a Hijri date here, next to the
@@ -91,11 +106,15 @@ private class IosPlatformFormat : PlatformFormat {
     }
 
     override fun clockTime(hour: Int, minute: Int): String {
-        val h = plainFormatter.stringFromNumber(NSNumber(int = hour)) ?: hour.toString()
-        val m = twoDigitFormatter.stringFromNumber(NSNumber(int = minute))
-            ?: minute.toString().padStart(2, '0')
-        return "$h:$m"
+        val m = twoDigitFormatter.stringFromNumber(NSNumber(int = minute)) ?: minute.toString().padStart(2, '0')
+        if (clockFormat == ClockFormat.TWENTY_FOUR_HOUR) {
+            val h = plainFormatter.stringFromNumber(NSNumber(int = hour)) ?: hour.toString()
+            return "$h:$m"
+        }
+        val (hour12, pm) = twelveHourParts(hour)
+        val h = plainFormatter.stringFromNumber(NSNumber(int = hour12)) ?: hour12.toString()
+        return TwelveHourClock.render(h, m, if (pm) amPm.second else amPm.first, markerFirst)
     }
 }
 
-actual fun createPlatformFormat(): PlatformFormat = IosPlatformFormat()
+actual fun createPlatformFormat(clockFormat: ClockFormat): PlatformFormat = IosPlatformFormat(clockFormat)

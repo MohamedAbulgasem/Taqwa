@@ -9,8 +9,9 @@ carries alongside the code: the Quran text (Tanzil, CC BY 3.0, verbatim), the tr
 (Tanzil, non-commercial), the KFGQPC Uthmanic Hafs typeface (free to use and distribute
 unmodified only), the Manrope typeface (SIL OFL 1.1), the GeoNames city data (CC BY 4.0),
 the adhan recordings (Wikimedia Commons, CC0 / CC BY-SA 4.0 / CC BY 3.0), the notification
-chime (Mixkit licence) and the recitation previews (Islamic Network, non-commercial
-redistribution). Each is redistributed under its own licence, listed with its source in
-docs/ATTRIBUTION.md; licence texts that must accompany a copy are in docs/licences/.
-If you redistribute a derivative of Taqwa, those works come with their own terms or must
-be replaced.
+chime (Mixkit licence), the recitation previews and four Quranic adhkar clips (Islamic
+Network, non-commercial redistribution), and the morning and evening adhkar (the OpenDua
+dataset, based on Hisn al-Muslim, CC BY 4.0). Each is redistributed under its own licence,
+listed with its source in docs/ATTRIBUTION.md; licence texts that must accompany a copy are
+in docs/licences/. If you redistribute a derivative of Taqwa, those works come with their
+own terms or must be replaced.

@@ -4,6 +4,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.DayPrayerTimes
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
@@ -24,13 +25,34 @@ object NotificationPlanner {
     /**
      * How many whole days of prayers fit in [capacity]. Five obligatory prayers a day, doubled
      * when a reminder precedes each one — so 64 slots is twelve days, or six with reminders on —
-     * and one more a day when Tahajjud is on.
+     * one more a day when Tahajjud is on, and two more when the adhkar reminder is.
      */
     fun windowDaysFor(capacity: Int, notifications: NotificationSettings): Int {
         val perDay = ObligatoryPrayers.size * (if (notifications.remindBeforeMinutes > 0) 2 else 1) +
-            if (notifications.tahajjud) 1 else 0
+            (if (notifications.tahajjud) 1 else 0) +
+            (if (notifications.adhkar) 2 else 0)
         return (capacity / perDay).coerceAtLeast(1)
     }
+
+    /**
+     * The order the plan is filled in when [plan]'s capacity runs out (adhkar spec §5): every
+     * prayer first, then the before-prayer reminders, then Tahajjud, then the adhkar reminder —
+     * morning and evening as one tier, since they are one setting. Within a tier the soonest win.
+     * A voluntary nudge therefore never takes the slot of an obligatory prayer's adhan on iOS's 64.
+     * Every kind must have a tier, or it is never armed at all; a test holds it to that.
+     */
+    internal val FILL_ORDER: List<Set<NotificationKind>> = listOf(
+        setOf(NotificationKind.PRAYER),
+        setOf(NotificationKind.REMINDER),
+        setOf(NotificationKind.TAHAJJUD),
+        setOf(NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING),
+    )
+
+    /** Half an hour after Fajr and after Asr is when the adhkar reminder is meant to land. */
+    private val ADHKAR_AFTER = 30.minutes
+
+    /** It never lands later than this before sunrise or Maghrib, which close the two windows. */
+    private val ADHKAR_BEFORE_END = 5.minutes
 
     fun plan(
         location: GeoLocation,
@@ -42,6 +64,11 @@ object NotificationPlanner {
         capacity: Int,
         copy: NotificationCopy = EnglishNotificationCopy,
         formatClockTime: (Instant, String) -> String = ::isoClockTime,
+        /**
+         * The adhkar reminders whose set has already been said ([adhkarNotificationId]s): never
+         * planned, so a reschedule after a set is finished does not bring its reminder back.
+         */
+        doneAdhkar: Set<String> = emptySet(),
     ): List<ScheduledNotification> {
         if (!notifications.enabled) return emptyList()
 
@@ -114,6 +141,37 @@ object NotificationPlanner {
             }
             previousDay = if (notifications.tahajjud) times else null
 
+            if (notifications.adhkar) {
+                // Morning adhkar are read between Fajr and sunrise, evening adhkar between Asr and
+                // Maghrib (adhkar spec §5). Half an hour in, but never later than five minutes
+                // before the window closes; where even that is not after the window opens (a
+                // far-northern summer, or a hand-moved Fajr or Asr) the day has no reminder.
+                for (set in AdhkarSet.entries) {
+                    val morning = set == AdhkarSet.MORNING
+                    val kind = if (morning) NotificationKind.ADHKAR_MORNING else NotificationKind.ADHKAR_EVENING
+                    val prayer = if (morning) Prayer.FAJR else Prayer.ASR
+                    val opens = times.time(prayer)
+                    val closes = times.time(if (morning) Prayer.SUNRISE else Prayer.MAGHRIB)
+                    val at = minOf(opens + ADHKAR_AFTER, closes - ADHKAR_BEFORE_END)
+                    val id = adhkarNotificationId(set, date)
+                    if (at > opens && at > from && id !in doneAdhkar) {
+                        out += ScheduledNotification(
+                            id = id,
+                            prayer = prayer,
+                            kind = kind,
+                            instant = at,
+                            timeZoneId = location.timeZoneId,
+                            sound = notifications.adhkarSound,
+                            voice = notifications.voice,
+                            title = copy.title(prayer, kind),
+                            // The time the window closes, which is what the reader needs to know.
+                            body = copy.body(prayer, kind, formatClockTime(closes, location.timeZoneId), 0),
+                            windowEnd = closes,
+                        )
+                    }
+                }
+            }
+
             ObligatoryPrayers.forEach { prayer ->
                 val at = times.time(prayer)
                 val clock = formatClockTime(at, location.timeZoneId)
@@ -174,6 +232,15 @@ object NotificationPlanner {
             }
         }
 
-        return out.sortedBy { it.instant }.take(capacity)
+        // Filled tier by tier (FILL_ORDER), the soonest first within each, then put back in time
+        // order. Where everything fits — the usual case, since windowDaysFor sizes the window to
+        // the capacity — this is exactly the plan sorted by time; it only differs when something
+        // has to go, and then what goes is the least important and the furthest away.
+        val byTime = out.sortedBy { it.instant }
+        val kept = mutableListOf<ScheduledNotification>()
+        for (tier in FILL_ORDER) {
+            kept += byTime.filter { it.kind in tier }.take((capacity - kept.size).coerceAtLeast(0))
+        }
+        return kept.sortedBy { it.instant }
     }
 }

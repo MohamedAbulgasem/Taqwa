@@ -61,6 +61,14 @@ class IosNotificationScheduler : NotificationScheduler {
         center.removeAllPendingNotificationRequests()
     }
 
+    /** Pending and delivered alike: a reminder already in Notification Centre is withdrawn too. */
+    override fun cancel(ids: Set<String>) {
+        if (ids.isEmpty()) return
+        val identifiers = ids.toList()
+        center.removePendingNotificationRequestsWithIdentifiers(identifiers)
+        center.removeDeliveredNotificationsWithIdentifiers(identifiers)
+    }
+
     private fun schedule(entry: ScheduledNotification) {
         val content = UNMutableNotificationContent().apply {
             setTitle(entry.title)

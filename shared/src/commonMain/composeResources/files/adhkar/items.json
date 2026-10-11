@@ -1,0 +1,514 @@
+{
+  "attribution": "OpenDua dataset v0.0.4 (https://opendua.org), by Ihsan Labs at the Human Development Fund. Based on Hisn al-Muslim by Sa'id ibn Ali ibn Wahf al-Qahtani. OpenDua editorial text and dataset structure are licensed CC BY 4.0. Recitation by Muhammad Jumah for OpenDua. OpenDua makes no ownership claim over the underlying religious texts.",
+  "items": [
+    {
+      "arabic": {
+        "both": "أَعُوذُ بِاللَّهِ مِنَ الشَّيطَانِ الرَّجِيمِ"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 75,
+      "id": "hisn-075",
+      "kind": "quran",
+      "quran": {
+        "ayah": 255,
+        "prefix": "istiadhah",
+        "surah": 2
+      },
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "quran",
+          "number": "2:255"
+        },
+        {
+          "collection": "nasai",
+          "number": "al-Kubra 10731"
+        },
+        {
+          "collection": "hakim",
+          "number": "1/562"
+        }
+      ]
+    },
+    {
+      "count": 3,
+      "countDaily": false,
+      "hisn": 76,
+      "id": "hisn-076a",
+      "kind": "quran",
+      "quran": {
+        "prefix": "basmala",
+        "surah": 112
+      },
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "quran",
+          "number": "112"
+        },
+        {
+          "collection": "abu_dawud",
+          "number": "5082"
+        },
+        {
+          "collection": "tirmidhi",
+          "number": "3575"
+        }
+      ]
+    },
+    {
+      "count": 3,
+      "countDaily": false,
+      "hisn": 76,
+      "id": "hisn-076b",
+      "kind": "quran",
+      "quran": {
+        "prefix": "basmala",
+        "surah": 113
+      },
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "quran",
+          "number": "113"
+        },
+        {
+          "collection": "abu_dawud",
+          "number": "5082"
+        },
+        {
+          "collection": "tirmidhi",
+          "number": "3575"
+        }
+      ]
+    },
+    {
+      "count": 3,
+      "countDaily": false,
+      "hisn": 76,
+      "id": "hisn-076c",
+      "kind": "quran",
+      "quran": {
+        "prefix": "basmala",
+        "surah": 114
+      },
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "quran",
+          "number": "114"
+        },
+        {
+          "collection": "abu_dawud",
+          "number": "5082"
+        },
+        {
+          "collection": "tirmidhi",
+          "number": "3575"
+        }
+      ]
+    },
+    {
+      "arabic": {
+        "evening": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+        "morning": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 77,
+      "id": "hisn-077",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "muslim",
+          "number": "2723"
+        }
+      ],
+      "transliteration": {
+        "evening": "Amsaynā wa amsā l-mulku li-llāhi wa-l-ḥamdu li-llāhi, lā ilāha illā llāhu waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu wahuwa ʿalā kulli shayʾin qadīrun, rabbi asʾaluka khayra mā fī hādhihi l-laylati wa khayra mā baʿdahā, wa aʿūdhu bika min sharri mā fī hādhihi l-laylati washarri mā baʿdahā, rabbi aʿūdhu bika mina l-kasali wa sūʾi l-kibari, rabbi aʿūdhu bika min ʿadhābin fī an-nāri wa ʿadhābin fī l-qabr",
+        "morning": "Aṣbaḥnā wa aṣbaḥa l-mulku li-llāhi wa-l-ḥamdu li-llāhi, lā ilāha illā llāhu waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu wahuwa ʿalā kulli shayʾin qadīrun, rabbi asʾaluka khayra mā fī hādhā l-yawmi wa khayra mā baʿdahu wa aʿūdhu bika min sharri mā fī hādhā l-yawmi washarri mā baʿdahu, rabbi aʿūdhu bika mina l-kasali wa sūʾi l-kibari, rabbi aʿūdhu bika min ʿadhābin fī an-nāri wa ʿadhābin fī l-qabr"
+      }
+    },
+    {
+      "arabic": {
+        "evening": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ",
+        "morning": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 78,
+      "id": "hisn-078",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "abu_dawud",
+          "number": "5068"
+        },
+        {
+          "collection": "tirmidhi",
+          "number": "3391"
+        },
+        {
+          "collection": "ibn_majah",
+          "number": "3868"
+        }
+      ],
+      "transliteration": {
+        "evening": "Allāhumma bika amsaynā, wabika aṣbaḥnā, wabika naḥyā, wabika namūtu, wa ilayka l-maṣīr",
+        "morning": "Allāhumma bika aṣbaḥnā, wabika amsaynā, wabika naḥyā, wabika namūtu, wa ilayka an-nushūr"
+      }
+    },
+    {
+      "arabic": {
+        "both": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنوبَ إِلاَّ أَنْتَ"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 79,
+      "id": "hisn-079",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "bukhari",
+          "number": "6306"
+        }
+      ],
+      "transliteration": {
+        "both": "Allāhumma anta rabbī lā ilāha illā anta, khalaqtanī wa anā ʿabduka, wa anā ʿalā ʿahdika wa waʿdika mā istaṭaʿtu, aʿūdhu bika min sharri mā ṣanaʿtu, abūʾu laka bi-niʿmatika ʿalayya, wa abūʾu bi-dhanbī fa ighfir lī fa innahu lā yaghfiru adh-dhunūba illā ant"
+      }
+    },
+    {
+      "arabic": {
+        "both": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ: فِي دِينِي وَدُنْيَايَ وَأَهْلِي، وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي، وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَينِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 84,
+      "id": "hisn-084",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "abu_dawud",
+          "number": "5074"
+        },
+        {
+          "collection": "ibn_majah",
+          "number": "3871"
+        }
+      ],
+      "transliteration": {
+        "both": "Allāhumma innī asʾaluka l-ʿafwa wa-l-ʿāfiyata fī ad-dunyā wa-l-ʾākhirati, allāhumma innī asʾaluka l-ʿafwa wa-l-ʿāfiyata: fī dīnī wa dunyāya wa ahlī, wa mālī, allāhumma istur ʿawrātī, wa āmin rawʿātī, allāhumma iḥfaẓnī min bayni yadayya, wamin khalfī, waʿan yamīnī, waʿan shimālī, wamin fawqī, wa aʿūdhu bi-ʿaẓamatika an ughtāla min taḥtī"
+      }
+    },
+    {
+      "arabic": {
+        "both": "اللَّهُمَّ عَالِمَ الغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 85,
+      "id": "hisn-085",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "tirmidhi",
+          "number": "3392"
+        },
+        {
+          "collection": "abu_dawud",
+          "number": "5067"
+        }
+      ],
+      "transliteration": {
+        "both": "Allāhumma ʿālima l-ghaybi wa ash-shahādati fāṭira as-samāwāti wa-l-ʾarḍi, rabba kulli shayʾin wa malīkahu, ashhadu an lā ilāha illā anta, aʿūdhu bika min sharri nafsī, wamin sharri ash-shayṭāni wa sharakihi, waʾan aqtarifa ʿalā nafsī sūʾan, aw ajurrahu ilā muslim"
+      }
+    },
+    {
+      "arabic": {
+        "both": "بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلاَ فِي السّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ"
+      },
+      "count": 3,
+      "countDaily": false,
+      "hisn": 86,
+      "id": "hisn-086",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "abu_dawud",
+          "number": "5088"
+        },
+        {
+          "collection": "tirmidhi",
+          "number": "3388"
+        },
+        {
+          "collection": "ibn_majah",
+          "number": "3869"
+        }
+      ],
+      "transliteration": {
+        "both": "Bismi llāhi alladhī lā yaḍurru maʿa ismihi shayʾun fī l-ʾarḍi walā fī as-samāʾi wahuwa as-samīʿu l-ʿalīm"
+      }
+    },
+    {
+      "arabic": {
+        "both": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغيثُ أَصْلِحْ لِي شَأْنِيَ كُلَّهُ وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 88,
+      "id": "hisn-088",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "hakim",
+          "number": "1/545"
+        }
+      ],
+      "transliteration": {
+        "both": "Yā ḥayyu yā qayyūmu bi-raḥmatika astaghīthu aṣliḥ lī shaʾniya kullahu walā takilnī ilā nafsī ṭarfata ʿayn"
+      }
+    },
+    {
+      "arabic": {
+        "morning": "أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلاَمِ، وَعَلَى كَلِمَةِ الْإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صلى الله عليه وسلم، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ، حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 90,
+      "id": "hisn-090",
+      "kind": "dua",
+      "sets": [
+        "morning"
+      ],
+      "sources": [
+        {
+          "collection": "ahmad",
+          "number": "15360"
+        },
+        {
+          "collection": "nasai",
+          "number": "al-Kubra 9743"
+        }
+      ],
+      "transliteration": {
+        "morning": "Aṣbaḥnā ʿalā fiṭrati l-ʾislāmi, wa ʿalā kalimati l-ʾikhlāṣi, wa ʿalā dīni nabiyyinā muḥammadin ṣallā llāh ʿalayhi wa sallam, wa ʿalā millati abīnā ibrāhīma, ḥanīfan musliman wamā kāna mina l-mushrikīn"
+      }
+    },
+    {
+      "arabic": {
+        "both": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ"
+      },
+      "count": 100,
+      "countDaily": false,
+      "hisn": 91,
+      "id": "hisn-091",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "muslim",
+          "number": "2692"
+        }
+      ],
+      "transliteration": {
+        "both": "Subḥāna llāhi wa bi-ḥamdih"
+      }
+    },
+    {
+      "arabic": {
+        "both": "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ"
+      },
+      "count": 10,
+      "countDaily": false,
+      "hisn": 92,
+      "id": "hisn-092",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "nasai",
+          "number": "ʿAmal al-Yawm 24"
+        },
+        {
+          "collection": "abu_dawud",
+          "number": "5077"
+        }
+      ],
+      "transliteration": {
+        "both": "Lā ilāha illā llāhu waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu, wahuwa ʿalā kulli shayʾin qadīr"
+      }
+    },
+    {
+      "arabic": {
+        "both": "لاَ إِلَهَ إِلاَّ اللَّهُ، وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ"
+      },
+      "count": 100,
+      "countDaily": false,
+      "hisn": 93,
+      "id": "hisn-093",
+      "kind": "dua",
+      "sets": [
+        "morning"
+      ],
+      "sources": [
+        {
+          "collection": "bukhari",
+          "number": "6403"
+        },
+        {
+          "collection": "muslim",
+          "number": "2691"
+        }
+      ],
+      "transliteration": {
+        "both": "Lā ilāha illā llāhu, waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu wahuwa ʿalā kulli shayʾin qadīr"
+      }
+    },
+    {
+      "arabic": {
+        "both": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ: عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ"
+      },
+      "count": 3,
+      "countDaily": false,
+      "hisn": 94,
+      "id": "hisn-094",
+      "kind": "dua",
+      "sets": [
+        "morning"
+      ],
+      "sources": [
+        {
+          "collection": "muslim",
+          "number": "2726"
+        }
+      ],
+      "transliteration": {
+        "both": "Subḥāna llāhi wa bi-ḥamdihi: ʿadada khalqihi, wa riḍā nafsihi, wa zinata ʿarshihi, wa midāda kalimātih"
+      }
+    },
+    {
+      "arabic": {
+        "both": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً"
+      },
+      "count": 1,
+      "countDaily": false,
+      "hisn": 95,
+      "id": "hisn-095",
+      "kind": "dua",
+      "sets": [
+        "morning"
+      ],
+      "sources": [
+        {
+          "collection": "ibn_majah",
+          "number": "925"
+        }
+      ],
+      "transliteration": {
+        "both": "Allāhumma innī asʾaluka ʿilman nāfiʿan, wa rizqan ṭayyiban, wa ʿamalan mutaqabbalā"
+      }
+    },
+    {
+      "arabic": {
+        "both": "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ"
+      },
+      "count": 100,
+      "countDaily": true,
+      "hisn": 96,
+      "id": "hisn-096",
+      "kind": "dua",
+      "sets": [
+        "morning",
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "bukhari",
+          "number": "6307"
+        },
+        {
+          "collection": "muslim",
+          "number": "2702"
+        }
+      ],
+      "transliteration": {
+        "both": "Astaghfiru llāha wa atūbu ilayh"
+      }
+    },
+    {
+      "arabic": {
+        "both": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ"
+      },
+      "count": 3,
+      "countDaily": false,
+      "hisn": 97,
+      "id": "hisn-097",
+      "kind": "dua",
+      "sets": [
+        "evening"
+      ],
+      "sources": [
+        {
+          "collection": "abu_dawud",
+          "number": "3898"
+        },
+        {
+          "collection": "ibn_majah",
+          "number": "3518"
+        }
+      ],
+      "transliteration": {
+        "both": "Aʿūdhu bi-kalimāti llāhi at-tāmmāti min sharri mā khalaq"
+      }
+    }
+  ],
+  "schema": 1
+}

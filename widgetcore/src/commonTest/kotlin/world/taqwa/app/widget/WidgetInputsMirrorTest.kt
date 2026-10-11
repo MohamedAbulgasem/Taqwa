@@ -29,6 +29,30 @@ class WidgetInputsMirrorTest {
         assertEquals(snapshot, restored)
     }
 
+    // The 12-hour option puts a space and a day-period marker into every clock string. The wire
+    // separators are `|`, `;`, `=` and `@`, none of which is a space, so a time with a marker must
+    // come back whole - from the headline, the five rows and the two-day schedule alike, whether
+    // the space is the ordinary one or the no-break one the platforms emit (spec §1.2).
+    @Test
+    fun twelveHourClockStringsRoundTripThroughSerialization() {
+        val twelveHour = snapshot.copy(
+            nextClockTime = "5:10 PM",
+            allClockTimes = mapOf(
+                Prayer.FAJR to "12:05 AM", Prayer.DHUHR to "12:34\u00A0PM", Prayer.ASR to "5:10 PM",
+                Prayer.MAGHRIB to "6:20\u00A0PM", Prayer.ISHA to "ÖS\u00A07:50",
+            ),
+            schedule = listOf(
+                ScheduledPrayer(Prayer.FAJR, 1_757_120_700L, "12:05 AM", 0),
+                ScheduledPrayer(Prayer.ASR, 1_757_173_200L, "5:10\u00A0PM", 0),
+                ScheduledPrayer(Prayer.FAJR, 1_757_207_100L, "٥:١٠\u00A0م", 1),
+            ),
+        )
+        val restored = WidgetInputsMirror.deserialize(WidgetInputsMirror.serialize(twelveHour))
+        assertEquals(twelveHour, restored)
+        assertEquals("12:05 AM", restored?.allClockTimes?.get(Prayer.FAJR))
+        assertEquals("5:10 PM", restored?.nextClockTime)
+    }
+
     @Test
     fun theArabicIndicDigitChoiceRoundTripsThroughSerialization() {
         val arabicIndic = snapshot.copy(languageTag = "ar-LY", arabicIndicDigits = true)

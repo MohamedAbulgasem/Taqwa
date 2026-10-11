@@ -19,6 +19,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.domain.WidgetBackground
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
@@ -117,6 +118,9 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     val themeMode: Flow<ThemeMode> =
         store.data.map { it[SettingsKeys.THEME].toEnumOr(ThemeMode.SYSTEM) }
 
+    val clockFormat: Flow<ClockFormat> =
+        store.data.map { it[SettingsKeys.CLOCK_FORMAT].toEnumOr(ClockFormat.TWENTY_FOUR_HOUR) }
+
     val onboardingComplete: Flow<Boolean> =
         store.data.map { it[SettingsKeys.ONBOARDED] ?: false }
 
@@ -166,6 +170,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             // A stored level Tahajjud does not offer — a hand-edited file — is the default again.
             tahajjudSound = p[SettingsKeys.TAHAJJUD_SOUND].toEnumOr(PrayerSound.NOTIFICATION)
                 .takeIf { it in NotificationSettings.TahajjudSounds } ?: PrayerSound.NOTIFICATION,
+            adhkar = p[SettingsKeys.ADHKAR_REMINDER_ENABLED] ?: false,
+            // The same guard: a level the adhkar reminder does not offer is the default again.
+            adhkarSound = p[SettingsKeys.ADHKAR_REMINDER_SOUND].toEnumOr(PrayerSound.NOTIFICATION)
+                .takeIf { it in NotificationSettings.AdhkarSounds } ?: PrayerSound.NOTIFICATION,
         )
     }
 
@@ -319,6 +327,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
 
     suspend fun setThemeMode(mode: ThemeMode) {
         store.edit { it[SettingsKeys.THEME] = mode.name }
+    }
+
+    suspend fun setClockFormat(format: ClockFormat) {
+        store.edit { it[SettingsKeys.CLOCK_FORMAT] = format.name }
     }
 
     suspend fun setOnboardingComplete(value: Boolean) {
@@ -534,6 +546,8 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             e[SettingsKeys.ADHAN_VOICE] = settings.voice.name
             e[SettingsKeys.TAHAJJUD_ENABLED] = settings.tahajjud
             e[SettingsKeys.TAHAJJUD_SOUND] = settings.tahajjudSound.name
+            e[SettingsKeys.ADHKAR_REMINDER_ENABLED] = settings.adhkar
+            e[SettingsKeys.ADHKAR_REMINDER_SOUND] = settings.adhkarSound.name
         }
     }
 

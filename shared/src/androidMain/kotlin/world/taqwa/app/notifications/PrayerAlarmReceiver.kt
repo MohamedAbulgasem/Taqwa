@@ -11,12 +11,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.di.appContainer
+import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.widget.WidgetMirrorRefresher
 import world.taqwa.app.widget.androidWidgetUpdateHook
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /** Set once from `TaqwaApplication` — `shared` cannot see androidApp's generated `R` class. */
 var notificationSmallIconResId: Int = android.R.drawable.ic_popup_reminder
@@ -49,15 +53,33 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         // to the same 32-bit hash used to overwrite each other's notification.
         val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
 
-        val notification = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice, kind))
+        // The adhkar reminder's window (it closes at sunrise or Maghrib), carried because its alarm
+        // is inexact and can arrive up to an hour late. Absent on every other kind.
+        val windowEnd = intent.getLongExtra(EXTRA_WINDOW_END, 0L)
+            .takeIf { it > 0L }
+            ?.let { Instant.fromEpochMilliseconds(it) }
+        val now = Clock.System.now()
+        if (windowEnd != null && !AdhkarReminderDelivery.shouldPost(now, windowEnd)) {
+            // "Until sunrise" after sunrise would be wrong, so nothing is posted. The alarm still
+            // woke the process, and the widget and the plan's top-up are as worth doing as ever.
+            afterAlarm(context)
+            return
+        }
+
+        val builder = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice, kind))
             .setSmallIcon(notificationSmallIconResId)
             .setContentTitle(title)
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-            .setContentIntent(openAppIntent(context, notificationId))
-            .build()
-        NotificationManagerCompat.from(context).notify(notificationId, notification)
+            .setContentIntent(openAppIntent(context, notificationId, kind.adhkarSet))
+        // And it leaves the shade when its window closes, rather than staying to say "Until
+        // sunrise" about a sunrise that has passed.
+        windowEnd?.let { AdhkarReminderDelivery.timeout(now, it) }
+            ?.let { builder.setTimeoutAfter(it.inWholeMilliseconds.coerceAtLeast(1L)) }
+        // Tagged with its id for the adhkar reminder, so a finished set can withdraw it from the
+        // shade by id alone (AndroidNotificationScheduler.cancel). Null, as always, for the rest.
+        NotificationManagerCompat.from(context).notify(AdhkarReminderDelivery.tagFor(kind, id), notificationId, builder.build())
 
         afterAlarm(context)
     }
@@ -66,10 +88,16 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
      * Tapping the notification opens the app. The launcher intent rather than `MainActivity`
      * by name: `shared` cannot see androidApp's classes, and the launcher intent is what the
      * home screen icon fires, so the result is the same as opening the app by hand.
+     *
+     * An adhkar reminder's tap goes one step further, to that set's session (adhkar spec §5):
+     * `MainActivity` reads [LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR] and strips it, as it does
+     * the media notification's. Each notification's intent is its own (the request code is the
+     * notification's), so the extra never leaks onto another notification's tap.
      */
-    private fun openAppIntent(context: Context, requestCode: Int): PendingIntent? {
+    private fun openAppIntent(context: Context, requestCode: Int, adhkar: AdhkarSet?): PendingIntent? {
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return null
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        if (adhkar != null) launch.putExtra(LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR, LaunchRequests.adhkarExtra(adhkar))
         return PendingIntent.getActivity(
             context,
             requestCode,

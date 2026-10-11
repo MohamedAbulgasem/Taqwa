@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.audio.ClipPlayer
 import world.taqwa.app.feature.recitation.RecitationController
 import world.taqwa.app.feature.recitation.asPort
@@ -16,6 +17,7 @@ import world.taqwa.app.location.LocationRefresher
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.createLocationProvider
 import world.taqwa.app.notifications.NotificationCoordinator
+import world.taqwa.app.notifications.adhkarNotificationId
 import world.taqwa.app.notifications.createNotificationScheduler
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.quran.QuranRepository
@@ -23,6 +25,7 @@ import world.taqwa.app.recitation.ManifestRefresher
 import world.taqwa.app.recitation.RecitationEngagement
 import world.taqwa.app.recitation.RecitationPlayer
 import world.taqwa.app.recitation.SpeechVoices
+import world.taqwa.app.recitation.adhkarClipBytes
 import world.taqwa.app.recitation.createManifestProvider
 import world.taqwa.app.recitation.createSpeechVoices
 import world.taqwa.app.recitation.createSurahDownloader
@@ -30,7 +33,9 @@ import world.taqwa.app.recitation.createRecitationLibrary
 import world.taqwa.app.recitation.createRecitationPaths
 import world.taqwa.app.recitation.recitationPreviewBytes
 import world.taqwa.app.resources.Res
+import world.taqwa.app.settings.AdhkarStore
 import world.taqwa.app.settings.BookmarkStore
+import world.taqwa.app.settings.DataStoreAdhkarStore
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.TasbeehStore
 import world.taqwa.app.settings.createDataStore
@@ -45,6 +50,7 @@ class AppContainer {
     val settingsRepository = SettingsRepository(dataStore)
     val bookmarkStore = BookmarkStore(dataStore)
     val tasbeehStore = TasbeehStore(dataStore)
+    val adhkarStore: AdhkarStore by lazy { DataStoreAdhkarStore(dataStore) }
     val cityRepository = CityRepository(
         loadCsv = { Res.readBytes("files/cities.csv").decodeToString() },
         // `Res.readBytes` throws rather than returning null for a file that is not bundled, and
@@ -116,6 +122,7 @@ class AppContainer {
             quran = quranRepository,
             clips = ClipPlayer().asPort(),
             previewBytes = ::recitationPreviewBytes,
+            adhkarClipBytes = ::adhkarClipBytes,
             // The handler, not just the SupervisorJob: a supervisor stops a failed child taking
             // its siblings, but an uncaught throw still reaches the default handler and the
             // process with it.
@@ -148,13 +155,22 @@ class AppContainer {
     // added and removed outside the app.
     val widgetPlacementSource = createWidgetPlacementSource()
     val locationRefresher = LocationRefresher(locationRepository, cityRepository, settingsRepository)
+
+    /** The one platform scheduler: the coordinator arms whole plans with it, and a finished set of
+     * adhkar withdraws its own reminder through it (adhkar spec §5) without a reschedule. */
+    val notificationScheduler = createNotificationScheduler()
     val notificationCoordinator = NotificationCoordinator(
         engine = prayerTimesEngine,
         settingsRepository = settingsRepository,
         locationOf = { settingsRepository.location.first() },
-        scheduler = createNotificationScheduler(),
+        scheduler = notificationScheduler,
         now = { Clock.System.now() },
         locationFor = { locationRefresher.refreshFor(it) },
+        // A set said in full has no reminder armed for it again (adhkar spec §5): its id, from
+        // the date the set was last finished. An old date names a day the plan no longer reaches.
+        doneAdhkar = {
+            AdhkarSet.entries.mapNotNull { set -> adhkarStore.done(set).first()?.let { adhkarNotificationId(set, it) } }.toSet()
+        },
     )
 }
 

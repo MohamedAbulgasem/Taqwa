@@ -46,9 +46,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
@@ -71,6 +73,7 @@ import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.CountdownRing
 import world.taqwa.app.design.components.CountdownRingSize
 import world.taqwa.app.design.components.TaqwaCard
+import world.taqwa.app.design.components.drawHorizon
 import world.taqwa.app.design.components.drawMisbaha
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.TaqwaTextLink
@@ -83,6 +86,7 @@ import world.taqwa.app.feature.qibla.localizedGroupedKm
 import world.taqwa.app.i18n.CountdownFormatter
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.isolated
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.notifications_allow_exact_alarms
@@ -101,6 +105,7 @@ import world.taqwa.app.resources.today_differ_before
 import world.taqwa.app.resources.today_polar_line
 import world.taqwa.app.resources.today_next_in
 import world.taqwa.app.resources.today_no_location_title
+import world.taqwa.app.resources.today_open_adhkar
 import world.taqwa.app.resources.today_open_tasbeeh
 import world.taqwa.app.resources.today_other_asr
 import world.taqwa.app.resources.today_qibla_detail
@@ -121,6 +126,8 @@ fun TodayScreen(
     /** "No location yet"'s link: the app's own page in the system's settings. */
     onOpenLocationSettings: () -> Unit,
     onOpenQibla: () -> Unit,
+    /** The horizon button in the header: the morning and evening adhkar. */
+    onOpenAdhkar: () -> Unit,
     onOpenTasbeeh: () -> Unit,
     /** Android with notifications on and "Alarms & reminders" off; see [ExactAlarmsCard]. */
     exactAlarmsOff: Boolean = false,
@@ -135,6 +142,7 @@ fun TodayScreen(
     val colors = LocalTaqwaColors.current
     val actions = ReadyActions(
         onOpenQibla = onOpenQibla,
+        onOpenAdhkar = onOpenAdhkar,
         onOpenTasbeeh = onOpenTasbeeh,
         onAllowExactAlarms = onAllowExactAlarms,
         onOpenAboutTimes = onOpenAboutTimes,
@@ -153,6 +161,7 @@ fun TodayScreen(
 /** Everything the ready screen can be asked to do, passed down as one. */
 private class ReadyActions(
     val onOpenQibla: () -> Unit,
+    val onOpenAdhkar: () -> Unit,
     val onOpenTasbeeh: () -> Unit,
     val onAllowExactAlarms: () -> Unit,
     val onOpenAboutTimes: () -> Unit,
@@ -308,18 +317,22 @@ private fun CityAndDates(
     var blockLeft by remember { mutableFloatStateOf(0f) }
     var blockWidth by remember { mutableIntStateOf(0) }
     var infoCentre by remember { mutableStateOf<Float?>(null) }
-    // A Row now, for the misbaha at its end (spec Tasbeeh §5). The text keeps the weight and the
-    // block keeps its own paddings, so the 36 dp of air above the ring is untouched: the button is
-    // 44 dp tall against a city line of about 32, and it is the *text* column that still sets the
-    // block's height, because the button is aligned to the city's line rather than stretched.
-    Row(
+    // The horizon and the misbaha (spec Tasbeeh §5; adhkar spec §2.2) sit on the city's line at the
+    // end of the block, and only there: the dates below run the block's whole width, gutter to
+    // gutter, as they did before the horizon came. They are laid over the block's top corner rather
+    // than put in a Row beside the city, for two reasons. A Row would be 44 dp tall against a city
+    // line of about 33 and so push the dates 11 dp lower, where it is the *text* column that sets
+    // the block's height, the buttons being aligned to the city's line rather than stretched. And
+    // they stay outside the block's clickable, so a tap on one never opens the ⓘ's card and neither
+    // joins its 48 dp target or its one screen-reader label.
+    Box(
         Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp),
     ) {
         // The whole city-and-date block is the ⓘ's 48 dp target (spec §2.1). No ripple, like
         // every surface on this screen: the card opening is the feedback.
         Column(
             Modifier
-                .weight(1f)
+                .fillMaxWidth()
                 .onGloballyPositioned {
                     blockLeft = it.positionInWindow().x
                     blockWidth = it.size.width
@@ -336,6 +349,9 @@ private fun CityAndDates(
                 // Resolved by the view model, in the interface's language; `location.cityName` stays
                 // the English snapshot and is only what this falls back to.
                 place,
+                // The city shares its line with the two glyphs, so it stops short of them (and wraps
+                // there when it is long); the dates below do not.
+                modifier = Modifier.padding(end = HeaderGlyphSize * 2),
                 style = TaqwaText.screenTitle,
                 color = colors.textPrimary,
             )
@@ -389,11 +405,19 @@ private fun CityAndDates(
                 )
             }
         }
-        TasbeehButton(actions.onOpenTasbeeh)
+        // The horizon before the misbaha, so the misbaha keeps the corner it has always had. After
+        // the block in the Box, so they are drawn and hit-tested on top of it.
+        Row(Modifier.align(Alignment.TopEnd)) {
+            HeaderGlyphButton(stringResource(Res.string.today_open_adhkar), actions.onOpenAdhkar) { drawHorizon(it) }
+            HeaderGlyphButton(stringResource(Res.string.today_open_tasbeeh), actions.onOpenTasbeeh) { drawMisbaha(it) }
+        }
     }
 }
 
 private const val INFO_GLYPH = "info"
+
+/** The side of a header glyph's square target; the city stops two of them short of the block's end. */
+private val HeaderGlyphSize = 44.dp
 
 /**
  * What sits between the prayer list and the Qibla card, each only where it applies (spec §2.1):
@@ -448,21 +472,21 @@ private fun UnderTheList(state: TodayUiState.Ready, actions: ReadyActions) {
 }
 
 /**
- * The way to the tasbeeh: the misbaha glyph at the tab bar's 22 dp, in a 44 dp target at the end
- * of the header row. No ripple, like the tab bar and the Qibla card — the pushed screen is the
- * feedback. It carries a content description because it is a glyph with no words beside it.
+ * A glyph at the end of the city's line: [draw] at the tab bar's 22 dp, in a 44 dp target — the
+ * misbaha that opens the tasbeeh, the horizon that opens the adhkar. No ripple, like the tab bar
+ * and the Qibla card — the pushed screen is the feedback. It carries a content description
+ * because it is a glyph with no words beside it.
  *
  * Nudged up by 4 dp so the 22 dp glyph sits on the city's own line rather than on the block's
  * centre, which the two lines of dates below would otherwise pull it down to.
  */
 @Composable
-private fun TasbeehButton(onOpen: () -> Unit) {
+private fun HeaderGlyphButton(description: String, onOpen: () -> Unit, draw: DrawScope.(Color) -> Unit) {
     val colors = LocalTaqwaColors.current
-    val description = stringResource(Res.string.today_open_tasbeeh)
     Box(
         Modifier
             .offset(y = (-4).dp)
-            .size(44.dp)
+            .size(HeaderGlyphSize)
             .clip(CircleShape)
             .clickable(
                 interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
@@ -472,7 +496,7 @@ private fun TasbeehButton(onOpen: () -> Unit) {
             .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(Modifier.size(22.dp)) { drawMisbaha(colors.textPrimary) }
+        Canvas(Modifier.size(22.dp)) { draw(colors.textPrimary) }
     }
 }
 

@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.LocalDate
 import okio.Path.Companion.toPath
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.settings.SettingsRepository
@@ -21,6 +23,8 @@ private class FakeScheduler : NotificationScheduler {
     var cancelCalls = 0
     override fun scheduleAll(plan: List<ScheduledNotification>) { scheduledCalls += plan }
     override fun cancelAll() { cancelCalls++ }
+    val cancelledIds = mutableListOf<Set<String>>()
+    override fun cancel(ids: Set<String>) { cancelledIds += ids }
 }
 
 class NotificationCoordinatorTest {
@@ -130,5 +134,25 @@ class NotificationCoordinatorTest {
         val fullWindow = coordinator.reschedule(RescheduleTrigger.APP_FOREGROUND)
         assertTrue(!coordinator.needsTopUp(fullWindow.maxOf { it.instant }))
         assertTrue(coordinator.needsTopUp(now + 1.days))
+    }
+
+    @Test
+    fun aSetAlreadySaidIsNotArmedAgainByAReschedule() = runTest {
+        // The morning set of the 6th was finished at Fajr; the app is then opened again, and the
+        // foreground reschedule must not bring its reminder back.
+        val scheduler = FakeScheduler()
+        val r = repo("adhkar-done")
+        r.setNotificationSettings(r.notificationSettings.first().copy(enabled = true, adhkar = true))
+        val sixth = LocalDate(2026, 9, 6)
+        val done = adhkarNotificationId(AdhkarSet.MORNING, sixth)
+        val coordinator = NotificationCoordinator(
+            engine = engine, settingsRepository = r,
+            locationOf = { london }, scheduler = scheduler, now = { now },
+            doneAdhkar = { setOf(done) },
+        )
+        val plan = coordinator.reschedule(RescheduleTrigger.APP_FOREGROUND)
+        assertTrue(plan.none { it.id == done })
+        assertTrue(plan.any { it.id == adhkarNotificationId(AdhkarSet.EVENING, sixth) })
+        assertTrue(plan.any { it.id == adhkarNotificationId(AdhkarSet.MORNING, LocalDate(2026, 9, 7)) })
     }
 }

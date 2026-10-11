@@ -22,6 +22,7 @@ import world.taqwa.app.hijri.HijriFormatter
 import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.prayer.ClockChanges
 import world.taqwa.app.prayer.ClockWarning
 import world.taqwa.app.prayer.PrayerTimesEngine
@@ -120,7 +121,9 @@ class TodayViewModel(
     // until a refresh actually has something new to publish — and so a test can count the writes
     // and the refreshes this loop provokes.
     private val widgetStore: () -> KeyValueStore = { createWidgetKeyValueStore() },
-    private val widgetFormat: () -> PlatformFormat = { world.taqwa.app.i18n.createPlatformFormat() },
+    // Suspending because its default reads the stored clock format, and its one caller, refresh(),
+    // already suspends: the mirror's clock strings are written in the format the reader chose.
+    private val widgetFormat: suspend () -> PlatformFormat = { createPlatformFormat(settings.clockFormat.first()) },
     private val onWidgetsChanged: () -> Unit = { refreshWidgets() },
     /**
      * Called once the one-time backfill has written a location's country or region, which can

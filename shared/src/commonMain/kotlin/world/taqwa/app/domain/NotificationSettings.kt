@@ -22,6 +22,13 @@ data class NotificationSettings(
      */
     val tahajjud: Boolean = false,
     val tahajjudSound: PrayerSound = PrayerSound.NOTIFICATION,
+    /**
+     * A reminder for the morning and evening adhkar, half an hour after Fajr and after Asr
+     * (adhkar spec §5). Off until someone turns it on, like Tahajjud: it is a nudge towards
+     * something voluntary, and nobody's plan changes until they ask for it.
+     */
+    val adhkar: Boolean = false,
+    val adhkarSound: PrayerSound = PrayerSound.NOTIFICATION,
 ) {
     /** Takbir is the default for every prayer, including one the map has never held. */
     fun soundFor(prayer: Prayer): PrayerSound = sounds[prayer] ?: PrayerSound.TAKBIR
@@ -32,5 +39,8 @@ data class NotificationSettings(
 
         /** What Tahajjud may sound like. Not the adhan: no adhan is called for a night prayer. */
         val TahajjudSounds = listOf(PrayerSound.SILENT, PrayerSound.NOTIFICATION, PrayerSound.TAKBIR)
+
+        /** What the adhkar reminder may sound like: Tahajjud's levels, for the same reason. */
+        val AdhkarSounds = TahajjudSounds
     }
 }

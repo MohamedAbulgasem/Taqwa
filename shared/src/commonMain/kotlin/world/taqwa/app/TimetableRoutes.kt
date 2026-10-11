@@ -93,7 +93,6 @@ private fun rememberTimetableChooser(
     container: AppContainer,
     done: () -> Unit,
 ): TimetableChooser {
-    val format = LocalPlatformFormat.current
     val screenScope = rememberCoroutineScope()
     return remember(location, prayerSettings, today) {
         TimetableChooser(
@@ -104,7 +103,7 @@ private fun rememberTimetableChooser(
                 appScope.launch {
                     // Bound to this place's Automatic (ruling R70): abroad it waits to be confirmed again.
                     settings.chooseTimetable(id, if (confirmed) container.prayerTimesEngine.automaticEntryId(location) else null)
-                    refreshForNewTimes(container, settings, format)
+                    refreshForNewTimes(container, settings)
                 }
                 done()
             },
@@ -321,7 +320,7 @@ internal fun MatchMyMosqueRoute(
             // "Use this timetable" after the warning is "Follow it": the choice is confirmed.
             scope.launch {
                 settings.chooseTimetable(id, if (id != AUTOMATIC_TIMETABLE) engine.automaticEntryId(location) else null)
-                refreshForNewTimes(container, settings, format)
+                refreshForNewTimes(container, settings)
             }
             navigator.pop()
         },

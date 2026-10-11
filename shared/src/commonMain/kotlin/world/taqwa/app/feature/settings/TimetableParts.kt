@@ -48,6 +48,7 @@ import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.feature.common.authorityShortName
 import world.taqwa.app.feature.today.formatClock
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.resources.Res
@@ -129,9 +130,9 @@ internal fun timesToday(times: OwnTimes, zone: TimeZone): String {
     val format = LocalPlatformFormat.current
     return stringResource(
         Res.string.timetable_times_today,
-        formatClock(times.fajr, zone, format),
-        formatClock(times.maghrib, zone, format),
-        formatClock(times.isha, zone, format),
+        isolatedClock(formatClock(times.fajr, zone, format)),
+        isolatedClock(formatClock(times.maghrib, zone, format)),
+        isolatedClock(formatClock(times.isha, zone, format)),
     )
 }
 

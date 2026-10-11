@@ -119,6 +119,24 @@ internal fun DrawScope.drawMisbaha(tint: Color) {
     drawPath(flare, tint, style = Stroke(width = tassel, cap = StrokeCap.Round, join = StrokeJoin.Round))
 }
 
+/**
+ * A sun on the horizon: the way to the morning and evening adhkar (adhkar spec §2.1), the one glyph
+ * that means both halves of the day. A horizon line, the upper half of a disc resting on it,
+ * and three rays — all at the glyph stroke, on the 16-unit grid.
+ */
+internal fun DrawScope.drawHorizon(tint: Color) {
+    val u = size.width / 16f
+    val stroke = glyphStroke()
+    drawLine(tint, Offset(2f * u, 12f * u), Offset(14f * u, 12f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
+    drawArc(
+        tint, startAngle = 180f, sweepAngle = 180f, useCenter = false,
+        topLeft = Offset(4.6f * u, 8.6f * u), size = Size(6.8f * u, 6.8f * u), style = stroke,
+    )
+    drawLine(tint, Offset(8f * u, 5.6f * u), Offset(8f * u, 3.4f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
+    drawLine(tint, Offset(3.9f * u, 8.2f * u), Offset(2.5f * u, 6.8f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
+    drawLine(tint, Offset(12.1f * u, 8.2f * u), Offset(13.5f * u, 6.8f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
+}
+
 /** A plus in a ring, as the tasbeeh mockup's top-corner button draws it: add a dhikr of your own. */
 internal fun DrawScope.drawPlus(tint: Color) {
     val u = size.width / 16f

@@ -42,6 +42,12 @@ class NotificationCoordinator(
      */
     private val locationFor: suspend (RescheduleTrigger) -> GeoLocation? = { locationOf() },
     private val planning: CoroutineDispatcher = Dispatchers.Default,
+    /**
+     * The adhkar reminders whose set has already been said ([adhkarNotificationId]s, from the
+     * sets' done markers), read on every reschedule so that none of them is armed again (adhkar
+     * spec §5). None for callers with no adhkar store to hand.
+     */
+    private val doneAdhkar: suspend () -> Set<String> = { emptySet() },
 ) {
     private val rescheduling = Mutex()
 
@@ -71,8 +77,11 @@ class NotificationCoordinator(
         val windowDays = NotificationPlanner.windowDaysFor(capacity, notificationSettings)
         // Resolved here, at schedule time, rather than injected: a reschedule can be triggered
         // from a boot receiver or a background task, where there is no composition to read a
-        // locale from and the device's own default is the only truth available.
-        val format = createPlatformFormat()
+        // locale from and the device's own default is the only truth available. The clock format
+        // is read from the repository for the same reason: the times baked into the notification
+        // text are written now, days before they fire, in the format the reader has chosen.
+        val format = createPlatformFormat(settingsRepository.clockFormat.first())
+        val done = if (notificationSettings.adhkar) doneAdhkar() else emptySet()
         return NotificationPlanner.plan(
             location = location,
             settings = prayerSettings,
@@ -83,6 +92,7 @@ class NotificationCoordinator(
             capacity = capacity,
             copy = LocalizedNotificationCopy(format),
             formatClockTime = { instant, tz -> localizedClockTime(instant, tz, format) },
+            doneAdhkar = done,
         )
     }
 

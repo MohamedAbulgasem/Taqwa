@@ -8,13 +8,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,13 +36,17 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
+import world.taqwa.app.design.components.TaqwaBottomSheet
+import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.hijri.HijriFormatter
 import world.taqwa.app.hijri.TabularHijriCalendar
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.i18n.highLatitudeDisplayName
 import world.taqwa.app.i18n.schoolDisplayName
 import world.taqwa.app.i18n.timetableDisplayName
@@ -64,6 +75,7 @@ import world.taqwa.app.resources.prayer_times_high_latitude
 import world.taqwa.app.resources.prayer_times_manual
 import world.taqwa.app.resources.prayer_times_paused_value
 import world.taqwa.app.resources.prayer_times_show_sunrise
+import world.taqwa.app.resources.prayer_times_time_format
 import world.taqwa.app.resources.prayer_times_timetable
 import world.taqwa.app.resources.saudi_fajr_later
 import world.taqwa.app.resources.saudi_fajr_later_detail
@@ -72,6 +84,8 @@ import world.taqwa.app.resources.show_both_asr
 import world.taqwa.app.resources.show_where_differ
 import world.taqwa.app.resources.show_where_differ_detail
 import world.taqwa.app.resources.show_where_differ_detail_here
+import world.taqwa.app.resources.time_format_12
+import world.taqwa.app.resources.time_format_24
 import world.taqwa.app.resources.timetable_automatic_named
 import world.taqwa.app.resources.timetable_checking
 import world.taqwa.app.resources.timetable_keep_current
@@ -95,7 +109,8 @@ private val SCHOOLS = listOf("automatic", "standard", "hanafi")
  *   (ruling R50) or waits to be confirmed (ruling R52).
  * - Asr: Automatic, Standard, Hanafi, with a note naming the school by its shadow; the switches
  *   for both Asr times and, where mosques differ, where their timetables differ.
- * - Hijri date and Show sunrise, unchanged, and About these times at the foot.
+ * - Hijri date, then Show sunrise and Time format (24-hour or 12-hour, chosen in a sheet): both
+ *   say how the list is shown, neither changes a time. About these times at the foot.
  *
  * [status] is null without a location: the rows then name the stored choice alone.
  */
@@ -106,6 +121,8 @@ fun PrayerTimesSettingsScreen(
     adjustmentsPaused: Boolean,
     placeName: String?,
     today: LocalDate,
+    clockFormat: ClockFormat,
+    onClockFormat: (ClockFormat) -> Unit,
     onSchool: (String) -> Unit,
     onHijriOffset: (Int) -> Unit,
     onShowSunrise: (Boolean) -> Unit,
@@ -118,6 +135,7 @@ fun PrayerTimesSettingsScreen(
     onOpenManualAdjustments: () -> Unit,
     onOpenAboutTimes: () -> Unit,
 ) {
+    var timeFormatOpen by remember { mutableStateOf(false) }
     SettingsScaffold(stringResource(Res.string.settings_prayer_times), onBack) {
         SettingsCard {
             TaqwaRow(
@@ -224,7 +242,60 @@ fun PrayerTimesSettingsScreen(
                 trailing = { TaqwaToggle(settings.showSunrise, onShowSunrise) },
             )
             CardDivider()
+            // The screen's other display preference sits with "Show sunrise": both say how the
+            // list is shown, neither changes a time.
+            TaqwaRow(
+                stringResource(Res.string.prayer_times_time_format),
+                value = clockFormatName(clockFormat),
+                onClick = { timeFormatOpen = true },
+            )
+            CardDivider()
             ChevronRow(stringResource(Res.string.prayer_times_about_row), onClick = onOpenAboutTimes)
+        }
+    }
+    if (timeFormatOpen) {
+        TaqwaBottomSheet(onDismissRequest = { timeFormatOpen = false }) {
+            TimeFormatSheet(
+                current = clockFormat,
+                onPick = { onClockFormat(it); timeFormatOpen = false },
+            )
+        }
+    }
+}
+
+@Composable
+private fun clockFormatName(format: ClockFormat): String = when (format) {
+    ClockFormat.TWENTY_FOUR_HOUR -> stringResource(Res.string.time_format_24)
+    ClockFormat.TWELVE_HOUR -> stringResource(Res.string.time_format_12)
+}
+
+/**
+ * Two option rows in the "Remind me before" idiom, each showing the same sample time, 18:32, the
+ * way that format writes it, so the reader sees "٦:٣٢ م" or "ÖS 6:32" before committing.
+ */
+@Composable
+private fun TimeFormatSheet(current: ClockFormat, onPick: (ClockFormat) -> Unit) {
+    val colors = LocalTaqwaColors.current
+    Column(
+        Modifier
+            .padding(horizontal = SettingsGutter)
+            .padding(bottom = 24.dp)
+            .windowInsetsPadding(WindowInsets.navigationBars),
+    ) {
+        Text(stringResource(Res.string.prayer_times_time_format), style = TaqwaText.screenTitle, color = colors.textPrimary)
+        Spacer(Modifier.height(16.dp))
+        TaqwaCard {
+            ClockFormat.entries.forEachIndexed { index, option ->
+                if (index > 0) CardDivider()
+                val sample = remember(option) { createPlatformFormat(option).clockTime(18, 32) }
+                TaqwaRow(
+                    clockFormatName(option),
+                    subtitle = sample,
+                    onClick = { onPick(option) },
+                    selectable = true,
+                    trailing = { if (option == current) CheckMark() },
+                )
+            }
         }
     }
 }

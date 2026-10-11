@@ -66,7 +66,15 @@ internal class WidgetRender(
     val arabicIndicDigits: Boolean,
     /** The snapshot's language tag, which picks the digit set [arabicIndicDigits] stands for. */
     val languageTag: String,
-)
+) {
+    /**
+     * Whether the times on this card carry a 12-hour day-period marker. The widget is only given
+     * the strings the app wrote, so this is read from them; it decides which of the two widths the
+     * two-column layout is sized for, and a card of 24-hour times, the default, is sized exactly
+     * as it was before the option existed.
+     */
+    val twelveHour: Boolean = content?.carriesDayPeriodMarker() == true
+}
 
 /**
  * [redrawRevision] is deliberately unused: it exists so that reading [WidgetRedraw.prayerRevision]
@@ -123,8 +131,20 @@ private val TINY_MAX_WIDTH = 100.dp
  * guessed: the smallest countdown block is 61 dp, the longest row needs 11.5 sp x 10.1 em beside
  * it, plus padding and gaps, which comes to about 230 dp. A Pixel's 2x2 is 190 dp and stays a
  * stacked card; a 3x2 or 4x2 on any launcher measured so far clears it.
+ *
+ * This is the width for a card of 24-hour times, the default. A card whose times carry a 12-hour
+ * marker needs [TWO_COLUMN_MIN_WIDTH_12_HOUR]; see [WidgetRender.twelveHour].
  */
 private val TWO_COLUMN_MIN_WIDTH = 230.dp
+
+/**
+ * The same threshold for a card showing 12-hour times ("6:32 PM"), whose longest row is
+ * [LONGEST_ROW_EM] + [DAY_PERIOD_MARKER_EM] = 11.68 em instead of 10.1: the smallest countdown
+ * block is 61 dp, the row needs 11.5 sp x 11.68 em (134.3 dp), plus the same 8 dp of slack,
+ * 2 x 16 dp of padding and 12 dp gap: 61 + 134.3 + 8 + 32 + 12 = 247.3, which comes to about
+ * 250 dp. Chosen per card, so a 24-hour widget keeps the 230 dp it always had.
+ */
+private val TWO_COLUMN_MIN_WIDTH_12_HOUR = 250.dp
 
 /** "12:34" in the widget face: two digits, a colon and two more, in em. The two-column card
  * sizes its countdown block to this worst case so the prayer list beside it never moves. */
@@ -141,6 +161,17 @@ private fun countdownEm(text: String): Float =
 
 /** The longest prayer row, "Maghrib · المغرب" in bold and "18:32" beside it, in em. */
 private const val LONGEST_ROW_EM = 10.1f
+
+/**
+ * What a 12-hour time adds to that row, "6:32 PM" against "18:32": two capitals at about 0.65 em
+ * each and a space at 0.28 em. Added only to a card whose times carry a marker
+ * ([WidgetRender.twelveHour]), so a card of 24-hour times is laid out with exactly the numbers it
+ * had before the 12-hour option existed.
+ */
+private const val DAY_PERIOD_MARKER_EM = 1.58f
+
+private fun twoColumnMinWidth(render: WidgetRender): Dp =
+    if (render.twelveHour) TWO_COLUMN_MIN_WIDTH_12_HOUR else TWO_COLUMN_MIN_WIDTH
 
 /** One prayer row at the smallest row size (11 sp) with its line height, in dp. */
 private const val MIN_ROW_HEIGHT_DP = 15f
@@ -175,9 +206,11 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
     val listInset = ((listHeight - 5f * MIN_ROW_HEIGHT_DP) / 2f).coerceIn(0f, 8f).dp
     val innerHeight = listHeight - listInset.value * 2
     val rowByHeight = innerHeight / 5f * 0.58f
-    // "Maghrib · المغرب" in bold plus its time is about ten em; a row is sized so that fits the
-    // list column whole, and the height only ever makes it larger, never the width smaller.
-    val rowByWidth = (available.value - leftWidth.value - 8f) / LONGEST_ROW_EM
+    // "Maghrib · المغرب" in bold plus its time is about ten em, and a 12-hour time's marker adds
+    // about one and a half more; a row is sized so that fits the list column whole, and the
+    // height only ever makes it larger, never the width smaller.
+    val longestRowEm = if (render.twelveHour) LONGEST_ROW_EM + DAY_PERIOD_MARKER_EM else LONGEST_ROW_EM
+    val rowByWidth = (available.value - leftWidth.value - 8f) / longestRowEm
     val rowText = minOf(rowByHeight, rowByWidth).sp(11f, 15f)
 
     Row(
@@ -408,7 +441,7 @@ internal fun TaqwaWidgetContent(render: WidgetRender) {
         when {
             size.height < STRIP_MAX_HEIGHT && size.width < TINY_MAX_WIDTH -> TinyCard(render, size)
             size.height < STRIP_MAX_HEIGHT -> StripCard(render, size)
-            size.width >= TWO_COLUMN_MIN_WIDTH -> TwoColumnCard(render, size)
+            size.width >= twoColumnMinWidth(render) -> TwoColumnCard(render, size)
             else -> StackedCard(render, size)
         }
     }

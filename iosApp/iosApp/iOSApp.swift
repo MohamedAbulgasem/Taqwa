@@ -38,6 +38,21 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 		completionHandler([.banner, .list, .sound])
 	}
 
+	/// A tap on a notification. An adhkar reminder's opens its set's session (adhkar spec §5);
+	/// Kotlin reads the identifier and ignores every other one, so a prayer's tap still just brings
+	/// the app forward. Recorded in `LaunchRequests`, not acted on here: on a cold launch this
+	/// arrives before `ContentView`'s composition exists to navigate, as a widget's link does.
+	func userNotificationCenter(
+		_ center: UNUserNotificationCenter,
+		didReceive response: UNNotificationResponse,
+		withCompletionHandler completionHandler: @escaping () -> Void
+	) {
+		if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+			LaunchRequests_iosKt.openAdhkarFromNotification(identifier: response.notification.request.identifier)
+		}
+		completionHandler()
+	}
+
 	func application(
 		_ application: UIApplication,
 		handleEventsForBackgroundURLSession identifier: String,

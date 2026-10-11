@@ -2,6 +2,8 @@ package world.taqwa.app.nav
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import world.taqwa.app.adhkar.AdhkarSet
+import world.taqwa.app.notifications.adhkarSetOfNotificationId
 
 /**
  * The one-shot channel a widget tap uses to ask the app to open an ayah (design spec §8): the
@@ -58,13 +60,51 @@ object LaunchRequests {
     /** The Android intent extra the media session's tap carries; read by `MainActivity`. */
     const val ANDROID_EXTRA_OPEN_PLAYING = "open_playing"
 
+    private val _pendingAdhkar = MutableStateFlow<AdhkarSet?>(null)
+
+    /**
+     * A tap on an adhkar reminder (adhkar spec §5): open that set's session on the Prayer tab.
+     * Set from `MainActivity` on Android (the [ANDROID_EXTRA_OPEN_ADHKAR] extra) and from the
+     * notification-centre delegate on iOS ([openAdhkarForNotification]); collected by
+     * `AdhkarLaunchRequests` once onboarding is out of the way, cold or warm, as [pendingAyah] is.
+     */
+    val pendingAdhkar: StateFlow<AdhkarSet?> get() = _pendingAdhkar
+
+    /** Overwrites any request still pending: only the most recent tap matters. */
+    fun openAdhkar(set: AdhkarSet) {
+        _pendingAdhkar.value = set
+    }
+
+    fun consumeAdhkar() {
+        _pendingAdhkar.value = null
+    }
+
+    /** The Android intent extra an adhkar reminder's tap carries, valued by [adhkarExtra]. */
+    const val ANDROID_EXTRA_OPEN_ADHKAR = "open_adhkar"
+
+    /** What [ANDROID_EXTRA_OPEN_ADHKAR] carries for [set]: "morning" or "evening". */
+    fun adhkarExtra(set: AdhkarSet): String = set.name.lowercase()
+
+    /**
+     * Records the set an [ANDROID_EXTRA_OPEN_ADHKAR] value names. The launcher activity is
+     * exported, so the value is untrusted: anything but one of [adhkarExtra]'s is ignored.
+     */
+    fun openAdhkarFromExtra(value: String?) {
+        AdhkarSet.entries.firstOrNull { adhkarExtra(it) == value }?.let(::openAdhkar)
+    }
+
+    /** A tapped notification's id, on iOS: an adhkar reminder's opens its set, any other nothing. */
+    fun openAdhkarForNotification(id: String) {
+        adhkarSetOfNotificationId(id)?.let(::openAdhkar)
+    }
+
     private val _pendingScreen = MutableStateFlow<String?>(null)
 
     /**
      * A screen asked for by name — "prayer", "quran", "settings", "notifications", "qibla",
-     * "tasbeeh", "appearance" — by the debug harnesses only (the store-screenshot runs open every
-     * screen in every language without a finger on the glass). Nothing in a release build calls
-     * [openScreen]; an unknown name is ignored by the collector.
+     * "tasbeeh", "adhkar", "appearance" — by the debug harnesses only (the store-screenshot runs
+     * open every screen in every language without a finger on the glass). Nothing in a release
+     * build calls [openScreen]; an unknown name is ignored by the collector.
      */
     val pendingScreen: StateFlow<String?> get() = _pendingScreen
 

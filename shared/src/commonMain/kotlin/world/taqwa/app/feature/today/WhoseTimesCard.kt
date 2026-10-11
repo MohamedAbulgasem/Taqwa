@@ -48,6 +48,7 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.feature.common.authorityShortName
+import world.taqwa.app.i18n.isolated
 import world.taqwa.app.prayer.engine.EngineDay
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.resources.Res
@@ -79,12 +80,6 @@ data class WhoseTimes(val shortNameKey: String, val entryClass: EntryClass) {
         fun of(day: EngineDay): WhoseTimes = WhoseTimes(day.effectiveEntry.shortNameKey, day.effective.entryClass)
     }
 }
-
-/**
- * A name inside a sentence of the other direction stays whole (spec §2.4): "Umm al-Qura" in an
- * Arabic sentence, «أم القرى» in an English one.
- */
-internal fun isolated(text: String): String = "\u2068$text\u2069"
 
 /** The card's title: "Diyanet timetable", "Cautious times", "ISNA method, not yet fully checked", "Calculated by Taqwa". */
 @Composable

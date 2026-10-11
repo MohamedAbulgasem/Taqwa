@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -75,10 +76,92 @@ import kotlin.math.roundToInt
 private const val FALLBACK_TRANSLATION_NAME = "Saheeh International"
 private const val FALLBACK_TRANSLATION_ID = "en.sahih"
 
-/** The slider's discrete stops between 22 and 40 sp in steps of 2 (spec §2.5): nine values, so
- * eight steps between the two ends — [Slider]'s own `steps` counts only the stops strictly
+/** The slider's discrete stops between 22 and 40 sp in steps of 2 (spec §2.5): ten sizes, so
+ * eight stops between the two ends — [Slider]'s own `steps` counts only the stops strictly
  * between [ReadingSettings.MIN_SIZE] and [ReadingSettings.MAX_SIZE]. */
 private val SliderSteps = (ReadingSettings.MAX_SIZE - ReadingSettings.MIN_SIZE) / ReadingSettings.SIZE_STEP - 1
+
+/**
+ * The Arabic size row and its slider (spec §2.5): one knob for the whole app, drawn by this one
+ * composable wherever it appears — the reader's sheet ([ReadingSheet]) and the adhkar's (adhkar
+ * spec §3.6) — so the two can never drift apart.
+ *
+ * The drag moves only the number in the row and, through [onLiveChange], whatever preview the
+ * caller draws; [onChange] is called once, when the drag ends (`Slider.onValueChangeFinished`), with
+ * the whole of [settings] and the new size, so scrubbing never writes to disk on every frame and a
+ * commit never drops the mode, the translation or the transliteration. [enabled] false (the
+ * Mushaf, whose pages are images of a fixed size) draws it faded and still.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun ReadingSizeSlider(
+    settings: ReadingSettings,
+    enabled: Boolean,
+    onLiveChange: (Int) -> Unit = {},
+    onChange: (ReadingSettings) -> Unit,
+) {
+    val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+
+    // Re-keyed to the persisted value: a commit from this same slider round-trips back through
+    // [onChange] and settles here again, and an external settings change (another device, a
+    // future sync) should also snap the slider to the new truth rather than keep a stale drag.
+    var liveSize by remember(settings.arabicSizeSp) { mutableStateOf(settings.arabicSizeSp.toFloat()) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        TaqwaRow(
+            label = stringResource(Res.string.quran_sheet_size),
+            value = format.localizedDigits(liveSize.roundToInt()),
+        )
+        val sliderInteractions = remember { MutableInteractionSource() }
+        val sliderColors = SliderDefaults.colors(
+            thumbColor = colors.accent,
+            activeTrackColor = colors.accent,
+            inactiveTrackColor = colors.hairline,
+            activeTickColor = Color.Transparent,
+            inactiveTickColor = Color.Transparent,
+            disabledThumbColor = colors.accent.copy(alpha = 0.4f),
+            disabledActiveTrackColor = colors.accent.copy(alpha = 0.4f),
+            disabledInactiveTrackColor = colors.hairline.copy(alpha = 0.4f),
+            disabledActiveTickColor = Color.Transparent,
+            disabledInactiveTickColor = Color.Transparent,
+        )
+        Slider(
+            value = liveSize,
+            onValueChange = {
+                liveSize = it
+                onLiveChange(it.roundToInt())
+            },
+            onValueChangeFinished = { onChange(settings.copy(arabicSizeSp = liveSize.roundToInt())) },
+            valueRange = ReadingSettings.MIN_SIZE.toFloat()..ReadingSettings.MAX_SIZE.toFloat(),
+            steps = SliderSteps,
+            enabled = enabled,
+            colors = sliderColors,
+            interactionSource = sliderInteractions,
+            // A plain round dot and an unbroken line (spec §2.5's mockup), not material3's own
+            // default "expressive" thumb (a thin vertical bar with a gap opening around it) or
+            // its stop-indicator dot at the track's end.
+            thumb = {
+                SliderDefaults.Thumb(
+                    interactionSource = sliderInteractions,
+                    colors = sliderColors,
+                    enabled = enabled,
+                    thumbSize = DpSize(20.dp, 20.dp),
+                )
+            },
+            track = { sliderState ->
+                SliderDefaults.Track(
+                    sliderState = sliderState,
+                    colors = sliderColors,
+                    enabled = enabled,
+                    drawStopIndicator = null,
+                    thumbTrackGapSize = 0.dp,
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
 
 /** [CheckMark]'s own canvas size, reserved on every translation row so the rows' language labels
  * share one right edge whether or not the row is the selected one. */
@@ -128,10 +211,9 @@ fun ReadingSheet(
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
 
-    // Re-keyed to the persisted value: a commit from this same slider round-trips back through
-    // [onChange] and settles here again, and an external settings change (another device, a
-    // future sync) should also snap the slider to the new truth rather than keep a stale drag.
-    var liveSize by remember(settings.arabicSizeSp) { mutableStateOf(settings.arabicSizeSp.toFloat()) }
+    // The size the preview is drawn at: the slider's while it is dragged, the stored one
+    // otherwise — re-keyed to it as the slider's own value is (see [ReadingSizeSlider]).
+    var liveSize by remember(settings.arabicSizeSp) { mutableIntStateOf(settings.arabicSizeSp) }
     var translationExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -148,53 +230,11 @@ fun ReadingSheet(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            TaqwaRow(
-                label = stringResource(Res.string.quran_sheet_size),
-                value = format.localizedDigits(liveSize.roundToInt()),
-            )
-            val sliderInteractions = remember { MutableInteractionSource() }
-            val sliderColors = SliderDefaults.colors(
-                thumbColor = colors.accent,
-                activeTrackColor = colors.accent,
-                inactiveTrackColor = colors.hairline,
-                activeTickColor = Color.Transparent,
-                inactiveTickColor = Color.Transparent,
-                disabledThumbColor = colors.accent.copy(alpha = 0.4f),
-                disabledActiveTrackColor = colors.accent.copy(alpha = 0.4f),
-                disabledInactiveTrackColor = colors.hairline.copy(alpha = 0.4f),
-                disabledActiveTickColor = Color.Transparent,
-                disabledInactiveTickColor = Color.Transparent,
-            )
-            Slider(
-                value = liveSize,
-                onValueChange = { liveSize = it },
-                onValueChangeFinished = { onChange(settings.copy(arabicSizeSp = liveSize.roundToInt())) },
-                valueRange = ReadingSettings.MIN_SIZE.toFloat()..ReadingSettings.MAX_SIZE.toFloat(),
-                steps = SliderSteps,
+            ReadingSizeSlider(
+                settings = settings,
                 enabled = !mushafMode,
-                colors = sliderColors,
-                interactionSource = sliderInteractions,
-                // A plain round dot and an unbroken line (spec §2.5's mockup), not material3's own
-                // default "expressive" thumb (a thin vertical bar with a gap opening around it) or
-                // its stop-indicator dot at the track's end.
-                thumb = {
-                    SliderDefaults.Thumb(
-                        interactionSource = sliderInteractions,
-                        colors = sliderColors,
-                        enabled = !mushafMode,
-                        thumbSize = DpSize(20.dp, 20.dp),
-                    )
-                },
-                track = { sliderState ->
-                    SliderDefaults.Track(
-                        sliderState = sliderState,
-                        colors = sliderColors,
-                        enabled = !mushafMode,
-                        drawStopIndicator = null,
-                        thumbTrackGapSize = 0.dp,
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
+                onLiveChange = { liveSize = it },
+                onChange = onChange,
             )
             if (mushafMode) {
                 Text(
@@ -217,7 +257,7 @@ fun ReadingSheet(
                         withStyle(SpanStyle(color = colors.accent)) { append(marker) }
                     },
                     fontFamily = mushafFamily(),
-                    style = TaqwaText.quran(liveSize.roundToInt()).copy(textAlign = TextAlign.Center),
+                    style = TaqwaText.quran(liveSize).copy(textAlign = TextAlign.Center),
                     color = colors.textPrimary,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
                 )

@@ -23,6 +23,9 @@ import platform.darwin.NSObject
  * `RecitationPlayer`'s own `AVPlayer`, and deactivating at the end of a fifteen-second clip would
  * silence the surah. Whoever is still playing keeps it. When nobody is, holding an active
  * `.playback` session with nothing playing keeps other apps' audio ducked for no reason.
+ *
+ * A clip that cannot be played — empty, not audio, or refused by the session — ends at once:
+ * `onEnd` is called, so a caller waiting for the end is not left waiting in silence.
  */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual class ClipPlayer actual constructor() {
@@ -35,7 +38,9 @@ actual class ClipPlayer actual constructor() {
 
     actual fun play(bytes: ByteArray, onEnd: () -> Unit) {
         if (bytes.isEmpty()) {
+            // Nothing to play is an end like any other to whoever is waiting for one.
             stop()
+            onEnd()
             return
         }
         // Not `stop()`: that hands the session back, and the next three lines claim it again.
@@ -48,7 +53,19 @@ actual class ClipPlayer actual constructor() {
         val session = AVAudioSession.sharedInstance()
         session.setCategory(AVAudioSessionCategoryPlayback, null)
         session.setActive(true, null)
-        val started = AVAudioPlayer(data = data, error = null)
+        // The initialiser answers nil for bytes that are not audio, and Kotlin/Native turns that
+        // nil into a NullPointerException (measured on the simulator, `ClipPlayerTest`): it is the
+        // end of a clip that never began.
+        val started = try {
+            AVAudioPlayer(data = data, error = null)
+        } catch (_: NullPointerException) {
+            null
+        }
+        if (started == null) {
+            releaseSession()
+            onEnd()
+            return
+        }
         val ended = object : NSObject(), AVAudioPlayerDelegateProtocol {
             override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
                 // Only the clip still in the player: a stopped one has already been let go of.
@@ -64,7 +81,13 @@ actual class ClipPlayer actual constructor() {
         started.setDelegate(ended)
         player = started
         started.prepareToPlay()
-        started.play()
+        if (!started.play()) {
+            // The session refused it (an interruption, say): no delegate call is coming.
+            player = null
+            delegate = null
+            releaseSession()
+            onEnd()
+        }
     }
 
     actual fun stop() {

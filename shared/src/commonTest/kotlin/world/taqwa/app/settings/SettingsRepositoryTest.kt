@@ -16,6 +16,7 @@ import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
@@ -118,6 +119,20 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun clockFormatDefaultsToTwentyFourHourSoNoUpgradeChangesAScreen() = runTest {
+        assertEquals(ClockFormat.TWENTY_FOUR_HOUR, repo("clock-default").clockFormat.first())
+    }
+
+    @Test
+    fun clockFormatRoundTrips() = runTest {
+        val r = repo("clock-roundtrip")
+        r.setClockFormat(ClockFormat.TWELVE_HOUR)
+        assertEquals(ClockFormat.TWELVE_HOUR, r.clockFormat.first())
+        r.setClockFormat(ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals(ClockFormat.TWENTY_FOUR_HOUR, r.clockFormat.first())
+    }
+
+    @Test
     fun theHijriOffsetRoundTripsWithinTheRangeTheScreenOffers() = runTest {
         val r = repo("hijri-offset")
         assertEquals(0, r.prayerSettings.first().hijriOffsetDays)
@@ -146,6 +161,16 @@ class SettingsRepositoryTest {
         // simulate a value written by a future version
         r.writeRawThemeForTest("PLAID")
         assertEquals(ThemeMode.SYSTEM, r.themeMode.first())
+    }
+
+    @Test
+    fun anUnknownStoredClockFormatFallsBackToTwentyFourHourRatherThanCrashing() = runTest {
+        val store = freshStore("clock-corrupt")
+        val r = SettingsRepository(store)
+        r.setClockFormat(ClockFormat.TWELVE_HOUR)
+        // simulate a value written by a future version
+        store.edit { it[SettingsKeys.CLOCK_FORMAT] = "SWATCH_BEATS" }
+        assertEquals(ClockFormat.TWENTY_FOUR_HOUR, r.clockFormat.first())
     }
 
     @Test
@@ -747,6 +772,36 @@ class NotificationSettingsStorageTest {
             r.notificationSettings.first().copy(tahajjud = true, tahajjudSound = PrayerSound.ADHAN),
         )
         assertEquals(PrayerSound.NOTIFICATION, r.notificationSettings.first().tahajjudSound)
+    }
+
+    @Test
+    fun `the adhkar reminder is off until someone turns it on`() = runTest {
+        val s = repo("adhkar-reminder-default").notificationSettings.first()
+        assertEquals(false, s.adhkar)
+        assertEquals(PrayerSound.NOTIFICATION, s.adhkarSound)
+    }
+
+    @Test
+    fun `the adhkar reminder and its sound round trip`() = runTest {
+        val r = repo("adhkar-reminder-roundtrip")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(adhkar = true, adhkarSound = PrayerSound.SILENT),
+        )
+        val s = r.notificationSettings.first()
+        assertEquals(true, s.adhkar)
+        assertEquals(PrayerSound.SILENT, s.adhkarSound)
+        // Its own keys: neither Tahajjud nor the adhkar progress is touched by it.
+        assertEquals(false, s.tahajjud)
+        assertEquals(PrayerSound.NOTIFICATION, s.tahajjudSound)
+    }
+
+    @Test
+    fun `a stored adhkar sound it does not offer falls back to the chime`() = runTest {
+        val r = repo("adhkar-reminder-adhan")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(adhkar = true, adhkarSound = PrayerSound.ADHAN),
+        )
+        assertEquals(PrayerSound.NOTIFICATION, r.notificationSettings.first().adhkarSound)
     }
 
     @Test

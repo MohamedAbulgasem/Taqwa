@@ -35,6 +35,8 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
   - Ahmed Al-Ajmi · أحمد العجمي (128 kbps)
 
   The list above is the launch set; the app's Attribution screen names whichever of them the catalogue in force actually carries.
+
+  - Four clips of the first voice's recitation, Al-Baqarah 2:255 and Surahs 112, 113 and 114, are bundled for the first run of the Morning & Evening Adhkar and play only while Mishary Rashid Alafasy is the chosen reciter and the surah is not downloaded. Each is a raw byte range of his `.taqa` container on the Taqwa-data release, so they are the corpus's own bytes at the published 64 kbps, without re-encoding, on the terms above. Unlike the downloadable catalogue, these four files travel inside the app and can be withdrawn only with an app update; a release already installed keeps playing them. Provenance, containers and byte ranges: `docs/licences/Alafasy-adhkar-clips.txt`; `tools/quran-audio/adhkar_clips.py` cuts them and `check_adhkar_clips.py` proves them byte for byte.
 - **Translations and transliteration**: bundled from the [Tanzil Project](https://tanzil.net/trans) for non-commercial use, each translator credited below:
   - Saheeh International: Saheeh International (English)
   - التفسير الميسر: مجمع الملك فهد لطباعة المصحف الشريف (Arabic)
@@ -46,3 +48,8 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
   - Transliteration: Tanzil Project (English)
 
   Tanzil's own Bengali and Indonesian files are damaged in places: 44 Bengali rows lost letters in a font conversion and 11 Indonesian rows carry OCR slips. The build repairs those rows from the printed translation and Kemenag's text, and `TRANSLATION_REPAIRS` in `tools/build-quran-db.py` lists every change.
+- **Morning & Evening Adhkar**: based on *Hisn al-Muslim* by Saʿid ibn ʿAli ibn Wahf al-Qahtani, through the [OpenDua](https://opendua.org) dataset v0.0.4 by Ihsan Labs at the Human Development Fund, [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). The Arabic of the supplications, their arrangement, counts and morning and evening variants, the English translations and the transliterations come from OpenDua, which makes no ownership claim over the religious texts themselves; its recordings are not used. Taqwa reshapes the dataset into its own schema, corrects eight transliteration typos and edits the English of two items (one word of Hisn 85, the quotation marks and a spelling in Hisn 96); every change is listed in `tools/adhkar/README.md`. OpenDua's attribution, which must travel with every copy, is in `docs/licences/OpenDua-CC-BY-4.0.txt`, verbatim:
+
+  > OpenDua dataset v0.0.4 (https://opendua.org), by Ihsan Labs at the Human Development Fund. Based on Hisn al-Muslim by Sa'id ibn Ali ibn Wahf al-Qahtani. OpenDua editorial text and dataset structure are licensed CC BY 4.0. Recitation by Muhammad Jumah for OpenDua. OpenDua makes no ownership claim over the underlying religious texts.
+
+  The Quran among the adhkar (Ayat al-Kursi and the three Quls) is read from the Tanzil text above, not from OpenDua. The Bengali, French, Indonesian, Turkish and Urdu translations of the supplications are Taqwa's own, and each language's are shown only once a reader of that language has reviewed them.

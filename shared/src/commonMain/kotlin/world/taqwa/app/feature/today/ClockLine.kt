@@ -38,6 +38,7 @@ import world.taqwa.app.design.components.TaqwaBottomSheet
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.isolated
 import world.taqwa.app.prayer.ClockIssue
 import world.taqwa.app.prayer.ClockWarning
 import world.taqwa.app.resources.Res
