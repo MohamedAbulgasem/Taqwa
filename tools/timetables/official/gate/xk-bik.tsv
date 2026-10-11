@@ -9,3 +9,10 @@ path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/europe/verify/bik-imsak.txt	xk.bik	42.5	21.0	Europe/Belgrade	E S D A M I	daily	standard	fit	the base table, imsak
 archive/tables/moral-auth-world/europe/verify/bik-sabah.txt	xk.bik	42.5	21.0	Europe/Belgrade	F - - - - -	daily	-	fit	the base table, Sabah
 archive/tables/moral-auth-world/europe/verify/bik-prishtina.txt	xk.bik	42.67272	21.16688	Europe/Belgrade	E S D A M I	daily	standard	test	Prishtina 2026, imsak
+# 2027 (track T4, 11 Oct 2026): the Takvimi is perpetual: BIK's 2024 and 2026 editions print the same month-day times
+# in standard time (only the summer hour moves with the calendar; both PDFs in archive/raw/manual/xk-bik/2026-10-11/),
+# so its 2027 is the same table with 2027's summer hour (archive: bik-*-2027.txt, derived, as ae-iacad.tsv's perpetual
+# tables), held out.
+archive/tables/moral-auth-world/europe/verify/bik-imsak-2027.txt	xk.bik	42.5	21.0	Europe/Belgrade	E S D A M I	daily	standard	test	the base table, imsak, 2027
+archive/tables/moral-auth-world/europe/verify/bik-sabah-2027.txt	xk.bik	42.5	21.0	Europe/Belgrade	F - - - - -	daily	-	test	the base table, Sabah, 2027
+archive/tables/moral-auth-world/europe/verify/bik-prishtina-2027.txt	xk.bik	42.67272	21.16688	Europe/Belgrade	E S D A M I	daily	standard	test	Prishtina 2027, imsak

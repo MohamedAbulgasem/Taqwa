@@ -278,6 +278,12 @@ object Europe {
      * sunrise 1–5 min early, Maghrib 0–6 min late, Standard Asr, up to 6 min after MWL's; Dhuhr about
      * ± 3. Its sunrise, Dhuhr, Asr and Maghrib move with the season: per-month offsets fitted on its 2026
      * Dublin table (Task 7g, seconds after the authority's minutes).
+     *
+     * The table is fixed: it prints the same month-day times every year, so every year is computed as
+     * 2026, the year it was fitted on ([TimetableMethod.fixedTableYear]; track T4, 11 Oct 2026). Against
+     * its own sun 2027 was a minute early on 52 starts (Maghrib 37, Asr 14, Dhuhr 1) and a minute late
+     * on 29 ends against the table mapped onto 2027, and 2028, a leap year, by up to 70 s more; each
+     * year now shows the table's own times, checked against the table on 2027, 2028 and 2029.
      */
     val ifi: RegistryEntry = single(
         id = "ie.ifi", nameKey = "authority_ifi", entryClass = EntryClass.D_AUTHORITY,
@@ -293,6 +299,7 @@ object Europe {
             ),
             endOfEatingMarginSeconds = -54,
             fajrAngleByDayOfYear = IfiCurve.fajr, ishaAngleByDayOfYear = IfiCurve.isha,
+            fixedTableYear = 2026,
         ),
         school = AsrSchool.STANDARD, scope = Scope.GLOBAL, countries = setOf("IE"),
     )
