@@ -23,13 +23,13 @@ class AdhkarTranslationsTest {
 
     private companion object {
         /** OpenDua's published English. */
-        val REVIEWED = listOf("en")
+        val REVIEWED = listOf("en", "bn")
 
         /**
          * Drafted 11 October 2026 and awaiting one reviewer each (tools/adhkar/TRANSLATIONS-FOR-REVIEW.md).
          * A reviewer who flips a file to `"reviewed": true` moves its language from here to [REVIEWED].
          */
-        val DRAFTS = listOf("bn", "fr", "id", "tr", "ur")
+        val DRAFTS = listOf("fr", "id", "tr", "ur")
     }
 
     private fun resource(name: String): File {
