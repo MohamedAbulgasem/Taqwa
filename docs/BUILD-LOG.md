@@ -3199,3 +3199,127 @@ against 7 and Shakhtinsk 7 against 6. The sweep stopped at 99.5 %, and a reach h
 - On the two grids: 36,817 points and 27.7 million place-days, 0 early, 0 late ends, none over a limit,
   and no start past a figure. The whole gate is unchanged in size (10,997 rows, 4,001,889 place-days), and
   the golden vector did not move.
+
+## Morning and evening adhkar, and the 12-hour clock (11–12 October) — branch `adhkar-12h`
+
+Two features, built overnight on the branch `adhkar-12h` from spec
+`docs/superpowers/specs/2026-10-11-taqwa-adhkar-and-12-hour-design.md` and plan
+`docs/superpowers/plans/2026-10-11-taqwa-adhkar-and-12-hour.md`. Each task was a subagent with its own review;
+the ledger is `.superpowers/sdd/2026-10-11-taqwa-adhkar-and-12-hour/progress.md`. Nothing is pushed: the Lead
+merges with Mohamed's OK.
+
+**The 12-hour clock.**
+- Settings › Prayer times, last card: **Time format**, 24-hour or 12-hour. The sheet shows 18:32 in each
+  format. The default is 24-hour, so nothing on any screen changes until someone picks 12-hour.
+- The day-period marker is the platform's own: Android's `DateFormatSymbols`, iOS's `NSDateFormatter`
+  `AMSymbol`/`PMSymbol` on the language locale. It is joined with a no-break space: "6:32 PM", "pm" in British
+  English, "٦:٣٢ م" in Egyptian Arabic with its own digits, "৪:২৫ PM" in Bengali. Turkish puts it first:
+  "ÖS 6:32".
+- It is one seam, `PlatformFormat.clockTime`, so every surface follows with no code of its own: the ring, the
+  timeline, the Timetable sentences, the notification bodies (the time inside bidi isolates), both widgets and
+  the Appearance preview. The Glance widget's two-column thresholds widen only when a marker is present, so a
+  24-hour widget is unchanged.
+
+**Adhkar.**
+- **The way in** is a horizon glyph beside the misbaha on the Prayer header, labelled "Adhkar". It opens the
+  half day's set: morning from Fajr until Asr, evening from Asr until the next Fajr.
+- **The session** is one dhikr a page, Morning | Evening at the top. A tap anywhere counts, on the Tasbeeh
+  engine; the ring and "of 3" sit below. A page advances 400 ms after its target. Progress is counted, never
+  visited, and a set ends on a done page. The caption names the phase in the chosen clock: "Until sunrise ·
+  7:15 AM", "After sunrise · until 12:53 PM", "Asr to Maghrib".
+- **The content** is Hisn al-Muslim's 19 undisputed morning-and-evening items (Hisn 75–79, 84–86, 88, 90–97):
+  18 morning pages and 15 evening pages. The Arabic is OpenDua v0.0.4's, checked word by word against
+  hisnmuslim.com's chapter text by `tools/adhkar/check_items.py`. Ayat al-Kursi and the three Quls come from
+  quran.db by reference, with the reader's translation. The day's 100 istighfar is one counter shared by both
+  sets.
+- **The translations are gated.** English is OpenDua's. Bengali, French, Indonesian, Turkish and Urdu are
+  drafts that travel in the build but stay hidden: each of their text files says `"reviewed": false`, and the
+  loader treats such a file as absent. Those five languages show the Arabic, the transliteration (Latin UIs)
+  and the Quran pages' own translation. A language ships when its reviewer has passed it and its flag is
+  flipped, and nothing else ships it.
+- **The reading sheet ("Aa")** has the Arabic size slider, now one composable shared with the reader's sheet,
+  Transliteration, and a Translation switch (on by default, absent under Arabic).
+- **The speaker** on a Quran page plays the passage with the chosen reciter: an ayah subset that never chains
+  into the next surah. A surah not downloaded opens the download sheet. For Alafasy, four clips travel with
+  the app so the first run is not silent: `002-255.mp3`, `112.mp3`, `113.mp3` and `114.mp3`, 1,063,464 bytes,
+  byte-identical cuts of his own containers (`tools/quran-audio`). They play only while Alafasy is the chosen
+  reciter and the surah is not downloaded.
+- **The reminder** is a card in Settings › Notifications after Tahajjud, off by default. It fires half an hour
+  after Fajr, clamped to five minutes before sunrise, and half an hour after Asr, clamped to five minutes
+  before Maghrib. On Android its alarms are inexact. It is planned after every prayer, so it never displaces
+  one. A finished set withdraws that day's reminder, and a reminder that arrives after its window is dropped.
+- **The credit** is a row in Settings › Attribution & licences: "Adhkar", opendua.org.
+
+**Licences.** Two new files: `docs/licences/OpenDua-CC-BY-4.0.txt` (OpenDua's attribution verbatim, CC BY 4.0)
+and `docs/licences/Alafasy-adhkar-clips.txt` (what the four clips are, where they come from, and that only an
+app update can withdraw them). `docs/ATTRIBUTION.md`, `NOTICE` and the README carry the credits.
+
+**Before the drafts ship.** `tools/adhkar/TRANSLATIONS-FOR-REVIEW.md` needs one reviewer per language: tick or
+correct each draft, then run `check_items.py`, then flip `reviewed`. Three content decisions for Mohamed are at
+its top:
+1. **hisn-085.** The shipped Arabic and the five drafts read وَشَرَكِهِ, "his snares". OpenDua's English reads
+   وَشِرْكِهِ, "his shirk". Today the English disagrees with the Arabic. Whichever is chosen, all seven texts
+   must agree.
+2. **Bengali য or জ** for Arabic loanwords (আযাব and রিযিক, but জমিন). One convention, ideally for the whole
+   app.
+3. **Urdu hisn-078.** تیرے ساتھ ہم نے صبح کی, or the literal تجھ ہی سے.
+
+**Checked.** The last `scripts/test.sh` on `98ead498`: shared 1,782/0 on the Android host and 1,675/0 on iOS,
+widgetcore 97/0 and 95/0. `scripts/check-strings.sh` is clean. `:androidApp:assembleDebug` and
+`scripts/ios-build.sh` succeed (TaqwaWidget.appex 3 MB).
+
+**On a device: emulator-5560**, a throwaway Pixel 8 Pro image (Android 16, `-read-only`), London. The builds
+were `7c261a00`, then `98ead498` for the clip fix and the last checks. Screenshots are in the session
+scratchpad.
+- **12-hour.** Checked: the row and the sheet; the Prayer screen, the Timetable sentences, the Appearance
+  preview, and the medium widget on the home screen (2×2 and 3×2, two columns). Under Arabic (ar-EG) the times
+  read "٥:٤٤ ص", under Turkish "ÖÖ 5:44", under Bengali "৫:৪৪ AM". A posted Tahajjud notification's body read
+  "Fajr at ⁨5:46 AM⁩" with the isolates, and likewise in all three languages. The Prayer screen, the row and the
+  sheet were checked at 200 % text too.
+- **Back to 24-hour.** The Prayer screen is pixel-identical to the one before the round trip, the status bar
+  aside. The only differences are the countdown's seconds and the ring's tip, which moved with the 26 s
+  between the shots.
+- **Adhkar.**
+  - Counting through three pages, the ring and auto-advance.
+  - Leaving and returning by the glyph resumes the session.
+  - Evening counted in full to its done page, and the shared istighfar showing in the morning.
+  - The reading sheet's slider and switches.
+  - The speaker with Alafasy: An-Nas's clip with no download, on both builds, and the Media3 recitation
+    of An-Nas and Al-Ikhlas once downloaded. A media Next during a clip abandons it on `98ead498`, with one
+    voice.
+  - The reminder's alarms: ADHKAR-MORNING and ADHKAR-EVENING ids through 19 October, at Fajr + 30 and
+    Asr + 30, each with a 1 h window.
+  - The TalkBack tree: the glyph's "Adhkar"; a Quran page says its reference and never the Quran; the count's
+    "0 of 3".
+  - Arabic, mirrored, with the pager's right swipe going forward; 200 % text; the 360 × 640 dp shape.
+- **The reader's "Aa" sheet** works in both modes. In Translation mode the slider is enabled. In Mushaf mode
+  it is disabled, with its note.
+
+**What looked wrong**, for the fix wave (steps and screenshots in the task 14 report):
+- **At 200 % text a count of 100 shows as "10".** The ring's text has `maxLines = 1`, and the 12 sp floor at
+  2× cannot fit three digits, so the last one wraps out of sight. It is fine at 150 %.
+- **At 200 % text the Morning | Evening labels are cut at the bottom.** `TaqwaSegmented` has a fixed 44 dp
+  height.
+- **At 200 % text the caption is cut to "After sunrise · until 12:5…".**
+- **An evening set finished before Asr counts as that day's evening.** `dateKey` keys it by that day's Asr.
+  Finished at 07:12, it withdrew the 16:55 reminder, and the evening would open on its done page after Asr.
+  This is a design question for Mohamed.
+- **"24 ساعة" and "12 ساعة" keep Western digits** under Egyptian Arabic, beside "٦:٣٢ م".
+- **Not caused by the 12-hour clock:** the Arabic Appearance preview cuts the medium widget's clock line. It
+  does the same in 24-hour.
+
+**The header** (a design call for Mohamed). With the second glyph, the English date line wraps at 360 dp. At
+411 and 448 dp it fits on one line. A tight variant at a 36 dp pitch gives the date column 8 dp more (232
+against 224 dp at 360). The line needs about 267–273 dp, so the variant still wraps at 360 dp. Arabic fits on one
+line at both widths in both variants. Screenshots of both variants are `header-*.png` in the scratchpad.
+
+**Not done.**
+- **The iOS device pass.** A dedicated simulator, "Taqwa adhkar" (iPhone 17 Pro, iOS 26.2), booted, and the
+  build installed and launched in Turkish and Arabic. The Simulator tool's per-device access was not granted,
+  so nothing past onboarding was reached. That leaves unseen on iOS: the 12-hour markers on screen, the adhkar,
+  the clips and the reminder card. The markers come from Foundation, which on this Mac answers ÖÖ/ÖS for
+  Turkish, ص/م for Arabic and am/pm for en_GB.
+- **A posted adhkar reminder on Android.** The harness cannot fire one, and the next was due at 16:55. The
+  planned alarms and the unit tests cover it.
+
+**For the stores:** one new screenshot of the Adhkar screen, and release notes that name both features.

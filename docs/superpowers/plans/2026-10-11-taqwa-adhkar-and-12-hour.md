@@ -291,7 +291,7 @@ In `PlatformFormat.ios.kt`: `private class IosPlatformFormat(private val clockFo
     // are a region question (spec §1.2).
     private val amPm: Pair<String, String> = NSDateFormatter().run {
         setLocale(NSLocale(localeIdentifier = tag))
-        (AMSymbol ?: "AM") to (PMSymbol ?: "PM")
+        AMSymbol to PMSymbol // (the getters are non-null, so no fallback literals: spec §1.2)
     }
     private val markerFirst = TwelveHourClock.markerFirst(tag)
 ```

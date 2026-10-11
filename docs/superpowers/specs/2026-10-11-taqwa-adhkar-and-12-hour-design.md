@@ -188,9 +188,10 @@ The whole page body is one ripple-less tap surface; a tap counts, a drag scrolls
 
 ### 3.3 Counting and progress
 
-- Each page is a one-part `TasbeehPreset`; a tap runs `TasbeehEngine.tap`: `Tick` → `Haptics.count()`,
-  `SetComplete` → `Haptics.setComplete()`; the count bumps 1.06× for 120 ms and the arc tweens 250 ms
-  (snapped under reduced motion), as Tasbeeh does.
+- Each page is a one-part `TasbeehPreset`; a tap runs `TasbeehEngine.tap`: `Tick` → `Haptics.count()`;
+  a page's completion fires `Haptics.partComplete()`, and the last undone page's completion fires
+  `Haptics.setComplete()` instead, once (the session is the set). The count bumps 1.06× for 120 ms
+  and the arc tweens 250 ms (snapped under reduced motion), as Tasbeeh does.
 - At the target the page waits about 400 ms and advances to the next undone page. Taps on a
   completed page do nothing. Swiping past a page leaves it undone: **progress is counted, never
   visited**, so "done" is true when it shows.
