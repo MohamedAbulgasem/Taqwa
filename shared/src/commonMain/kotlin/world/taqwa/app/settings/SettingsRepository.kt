@@ -19,6 +19,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.domain.WidgetBackground
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingPosition
 import world.taqwa.app.quran.ReadingSettings
@@ -116,6 +117,9 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
 
     val themeMode: Flow<ThemeMode> =
         store.data.map { it[SettingsKeys.THEME].toEnumOr(ThemeMode.SYSTEM) }
+
+    val clockFormat: Flow<ClockFormat> =
+        store.data.map { it[SettingsKeys.CLOCK_FORMAT].toEnumOr(ClockFormat.TWENTY_FOUR_HOUR) }
 
     val onboardingComplete: Flow<Boolean> =
         store.data.map { it[SettingsKeys.ONBOARDED] ?: false }
@@ -319,6 +323,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
 
     suspend fun setThemeMode(mode: ThemeMode) {
         store.edit { it[SettingsKeys.THEME] = mode.name }
+    }
+
+    suspend fun setClockFormat(format: ClockFormat) {
+        store.edit { it[SettingsKeys.CLOCK_FORMAT] = format.name }
     }
 
     suspend fun setOnboardingComplete(value: Boolean) {
