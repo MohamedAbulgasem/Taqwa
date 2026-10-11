@@ -654,4 +654,32 @@
     <string name="today_open_adhkar">Adhkar</string>
     <string name="adhkar_morning">Morning adhkar</string>
     <string name="adhkar_evening">Evening adhkar</string>
+    <string name="adhkar_segment_morning">Morning</string>
+    <string name="adhkar_segment_evening">Evening</string>
+    <string name="adhkar_progress">%1$s of %2$s</string>
+    <string name="adhkar_once">ONCE</string>
+    <plurals name="adhkar_times">
+        <item quantity="one">%1$s TIME</item>
+        <item quantity="other">%1$s TIMES</item>
+    </plurals>
+    <string name="adhkar_times_today">%1$s TIMES TODAY</string>
+    <string name="adhkar_of">of %1$s</string>
+    <string name="adhkar_until_sunrise">Until sunrise · %1$s</string>
+    <string name="adhkar_after_sunrise">After sunrise · until %1$s</string>
+    <string name="adhkar_until_maghrib">Until Maghrib · %1$s</string>
+    <string name="adhkar_after_maghrib">After Maghrib · until %1$s</string>
+    <string name="adhkar_window_morning">Fajr to sunrise</string>
+    <string name="adhkar_window_evening">Asr to Maghrib</string>
+    <string name="adhkar_a11y_count">Count</string>
+    <string name="adhkar_a11y_previous">Previous</string>
+    <string name="adhkar_a11y_next">Next</string>
+    <string name="source_quran">Quran</string>
+    <string name="source_bukhari">Bukhari</string>
+    <string name="source_muslim">Muslim</string>
+    <string name="source_abu_dawud">Abu Dawud</string>
+    <string name="source_tirmidhi">Tirmidhi</string>
+    <string name="source_ibn_majah">Ibn Majah</string>
+    <string name="source_nasai">an-Nasa’i</string>
+    <string name="source_hakim">al-Hakim</string>
+    <string name="source_ahmad">Ahmad</string>
 </resources>

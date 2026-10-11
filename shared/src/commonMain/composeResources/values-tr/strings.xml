@@ -633,4 +633,32 @@
     <string name="today_open_adhkar">Zikirler</string>
     <string name="adhkar_morning">Sabah zikirleri</string>
     <string name="adhkar_evening">Akşam zikirleri</string>
+    <string name="adhkar_segment_morning">Sabah</string>
+    <string name="adhkar_segment_evening">Akşam</string>
+    <string name="adhkar_progress">%1$s / %2$s</string>
+    <string name="adhkar_once">BİR KEZ</string>
+    <plurals name="adhkar_times">
+        <item quantity="one">%1$s KEZ</item>
+        <item quantity="other">%1$s KEZ</item>
+    </plurals>
+    <string name="adhkar_times_today">BUGÜN %1$s KEZ</string>
+    <string name="adhkar_of">/ %1$s</string>
+    <string name="adhkar_until_sunrise">Güneş doğana kadar · %1$s</string>
+    <string name="adhkar_after_sunrise">Güneş doğduktan sonra · %1$s’e kadar</string>
+    <string name="adhkar_until_maghrib">Akşama kadar · %1$s</string>
+    <string name="adhkar_after_maghrib">Akşamdan sonra · %1$s’e kadar</string>
+    <string name="adhkar_window_morning">Sabahtan güneş doğana kadar</string>
+    <string name="adhkar_window_evening">İkindiden akşama kadar</string>
+    <string name="adhkar_a11y_count">Say</string>
+    <string name="adhkar_a11y_previous">Önceki</string>
+    <string name="adhkar_a11y_next">Sonraki</string>
+    <string name="source_quran">Kur’an</string>
+    <string name="source_bukhari">Buhârî</string>
+    <string name="source_muslim">Müslim</string>
+    <string name="source_abu_dawud">Ebû Dâvûd</string>
+    <string name="source_tirmidhi">Tirmizî</string>
+    <string name="source_ibn_majah">İbn Mâce</string>
+    <string name="source_nasai">Nesâî</string>
+    <string name="source_hakim">Hâkim</string>
+    <string name="source_ahmad">Ahmed</string>
 </resources>

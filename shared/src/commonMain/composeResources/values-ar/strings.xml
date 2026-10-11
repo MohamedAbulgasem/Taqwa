@@ -622,4 +622,36 @@
     <string name="today_open_adhkar">الأذكار</string>
     <string name="adhkar_morning">أذكار الصباح</string>
     <string name="adhkar_evening">أذكار المساء</string>
+    <string name="adhkar_segment_morning">صباح</string>
+    <string name="adhkar_segment_evening">مساء</string>
+    <string name="adhkar_progress">%1$s من %2$s</string>
+    <string name="adhkar_once">مرة واحدة</string>
+    <plurals name="adhkar_times">
+        <item quantity="zero">%1$s مرة</item>
+        <item quantity="one">%1$s مرة</item>
+        <item quantity="two">%1$s مرتان</item>
+        <item quantity="few">%1$s مرات</item>
+        <item quantity="many">%1$s مرة</item>
+        <item quantity="other">%1$s مرة</item>
+    </plurals>
+    <string name="adhkar_times_today">%1$s مرة في اليوم</string>
+    <string name="adhkar_of">من %1$s</string>
+    <string name="adhkar_until_sunrise">حتى الشروق · %1$s</string>
+    <string name="adhkar_after_sunrise">بعد الشروق · حتى %1$s</string>
+    <string name="adhkar_until_maghrib">حتى المغرب · %1$s</string>
+    <string name="adhkar_after_maghrib">بعد المغرب · حتى %1$s</string>
+    <string name="adhkar_window_morning">من الفجر إلى الشروق</string>
+    <string name="adhkar_window_evening">من العصر إلى المغرب</string>
+    <string name="adhkar_a11y_count">عدّ</string>
+    <string name="adhkar_a11y_previous">السابق</string>
+    <string name="adhkar_a11y_next">التالي</string>
+    <string name="source_quran">القرآن</string>
+    <string name="source_bukhari">البخاري</string>
+    <string name="source_muslim">مسلم</string>
+    <string name="source_abu_dawud">أبو داود</string>
+    <string name="source_tirmidhi">الترمذي</string>
+    <string name="source_ibn_majah">ابن ماجه</string>
+    <string name="source_nasai">النسائي</string>
+    <string name="source_hakim">الحاكم</string>
+    <string name="source_ahmad">أحمد</string>
 </resources>

@@ -1,6 +1,7 @@
 package world.taqwa.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
@@ -12,13 +13,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import world.taqwa.app.adhkar.AdhkarCatalogue
 import world.taqwa.app.adhkar.AdhkarSet
+import world.taqwa.app.design.KeepScreenOn
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.feature.adhkar.AdhkarScreen
+import world.taqwa.app.feature.adhkar.AdhkarViewModel
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
 import world.taqwa.app.feature.tasbeeh.TasbeehScreen
@@ -28,7 +33,9 @@ import world.taqwa.app.feature.today.TodayUiState
 import world.taqwa.app.feature.today.TodayViewModel
 import world.taqwa.app.feature.today.OneTimeCardSession
 import world.taqwa.app.feature.today.clockSetByHand
+import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
@@ -166,8 +173,70 @@ internal fun QiblaRoute(
 
 @Composable
 internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: AdhkarSet?) {
-    AdhkarScreen(set = set, onBack = { navigator.pop() })   // Task 8 replaces this with the view model
+    // A set read with the phone in the hand is minutes without a touch on some pages; the display
+    // staying on is what Tasbeeh and the compass do. Here rather than in the screen, so the screen
+    // composes under the iOS UI test, where this effect cannot run.
+    KeepScreenOn()
+
+    val format = LocalPlatformFormat.current
+    val language = uiLanguage().code
+    val scope = rememberCoroutineScope()
+    // Rebuilt when the language or the clock format changes, as TodayRoute's view model is: the
+    // phase's time is written by the format, and the du'a translations are the language's. Nothing
+    // on screen is lost — every count is already on disk — and the set the reader had switched to
+    // is the one the new view model opens. Keyed on [set]: a new request (a reminder naming the
+    // other set) is opened as asked. A plain holder, not state: it is written after every frame and
+    // read only when an effect below restarts.
+    val shown = remember(set) { ShownAdhkarSet() }
+    val viewModel = remember(format, language) {
+        AdhkarViewModel(
+            catalogue = { AdhkarCatalogue.load() },
+            textFor = { AdhkarCatalogue.loadText(it) },
+            quran = container.quranRepository,
+            store = container.adhkarStore,
+            settings = container.settingsRepository,
+            engine = container.prayerTimesEngine,
+            haptics = createHaptics(),
+            now = { Clock.System.now() },
+            format = format,
+            language = language,
+            scope = scope,
+        )
+    }
+    DisposableEffect(viewModel) { onDispose { viewModel.close() } }
+    // Read here, in the composition that restarts the effect, not inside it: the SideEffect below
+    // runs before the effect does and would hand a new request the old set.
+    val reopen = shown.set ?: set
+    LaunchedEffect(viewModel, set) { viewModel.open(reopen) }
+    // The phase caption moves with the clock, once a minute while the screen is in front, and
+    // straight away on coming back to it (Today's lifecycle gate, for Today's reasons).
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+                viewModel.tick()
+                delay(MINUTE_MS - Clock.System.now().toEpochMilliseconds() % MINUTE_MS)
+            }
+        }
+    }
+    val state by viewModel.state.collectAsState()
+    SideEffect { if (state.loaded) shown.set = state.set }
+    AdhkarScreen(
+        state = state,
+        onBack = { navigator.pop() },
+        onSelectSet = viewModel::selectSet,
+        onGoTo = viewModel::goTo,
+        onTap = viewModel::tap,
+        onPlay = null,
+        playing = false,
+        onOpenReading = { /* the reading sheet arrives with the done page */ },
+    )
 }
+
+private const val MINUTE_MS = 60_000L
+
+/** The set the adhkar screen last showed, for a view model rebuilt under it (see [AdhkarRoute]). */
+private class ShownAdhkarSet(var set: AdhkarSet? = null)
 
 @Composable
 internal fun TasbeehRoute(

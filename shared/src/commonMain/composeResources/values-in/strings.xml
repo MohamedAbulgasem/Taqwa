@@ -612,4 +612,31 @@
     <string name="today_open_adhkar">Zikir</string>
     <string name="adhkar_morning">Zikir pagi</string>
     <string name="adhkar_evening">Zikir petang</string>
+    <string name="adhkar_segment_morning">Pagi</string>
+    <string name="adhkar_segment_evening">Petang</string>
+    <string name="adhkar_progress">%1$s dari %2$s</string>
+    <string name="adhkar_once">SEKALI</string>
+    <plurals name="adhkar_times">
+        <item quantity="other">%1$s KALI</item>
+    </plurals>
+    <string name="adhkar_times_today">%1$s KALI HARI INI</string>
+    <string name="adhkar_of">dari %1$s</string>
+    <string name="adhkar_until_sunrise">Hingga matahari terbit · %1$s</string>
+    <string name="adhkar_after_sunrise">Setelah matahari terbit · hingga %1$s</string>
+    <string name="adhkar_until_maghrib">Hingga Maghrib · %1$s</string>
+    <string name="adhkar_after_maghrib">Setelah Maghrib · hingga %1$s</string>
+    <string name="adhkar_window_morning">Subuh hingga matahari terbit</string>
+    <string name="adhkar_window_evening">Asar hingga Maghrib</string>
+    <string name="adhkar_a11y_count">Hitung</string>
+    <string name="adhkar_a11y_previous">Sebelumnya</string>
+    <string name="adhkar_a11y_next">Berikutnya</string>
+    <string name="source_quran">Al-Qur’an</string>
+    <string name="source_bukhari">Bukhari</string>
+    <string name="source_muslim">Muslim</string>
+    <string name="source_abu_dawud">Abu Dawud</string>
+    <string name="source_tirmidhi">Tirmidzi</string>
+    <string name="source_ibn_majah">Ibnu Majah</string>
+    <string name="source_nasai">An-Nasa’i</string>
+    <string name="source_hakim">Al-Hakim</string>
+    <string name="source_ahmad">Ahmad</string>
 </resources>
