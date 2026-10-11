@@ -160,6 +160,7 @@ private fun ScreenPreview(state: TodayUiState, exactAlarmsOff: Boolean = false) 
         onChooseCity = {},
         onOpenLocationSettings = {},
         onOpenQibla = {},
+        onOpenAdhkar = {},
         onOpenTasbeeh = {},
         exactAlarmsOff = exactAlarmsOff,
     )

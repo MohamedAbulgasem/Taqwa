@@ -611,4 +611,7 @@
     <string name="prayer_times_time_format">وقت کا فارمیٹ</string>
     <string name="time_format_24">24 گھنٹے</string>
     <string name="time_format_12">12 گھنٹے</string>
+    <string name="today_open_adhkar">اذکار</string>
+    <string name="adhkar_morning">صبح کے اذکار</string>
+    <string name="adhkar_evening">شام کے اذکار</string>
 </resources>

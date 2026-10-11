@@ -616,4 +616,7 @@
     <string name="prayer_times_time_format">সময়ের ফরম্যাট</string>
     <string name="time_format_24">২৪ ঘণ্টা</string>
     <string name="time_format_12">১২ ঘণ্টা</string>
+    <string name="today_open_adhkar">আযকার</string>
+    <string name="adhkar_morning">সকালের আযকার</string>
+    <string name="adhkar_evening">সন্ধ্যার আযকার</string>
 </resources>

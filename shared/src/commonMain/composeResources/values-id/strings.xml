@@ -609,4 +609,7 @@
     <string name="prayer_times_time_format">Format waktu</string>
     <string name="time_format_24">24 jam</string>
     <string name="time_format_12">12 jam</string>
+    <string name="today_open_adhkar">Zikir</string>
+    <string name="adhkar_morning">Zikir pagi</string>
+    <string name="adhkar_evening">Zikir petang</string>
 </resources>

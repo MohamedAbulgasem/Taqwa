@@ -619,4 +619,7 @@
     <string name="prayer_times_time_format">تنسيق الوقت</string>
     <string name="time_format_24">24 ساعة</string>
     <string name="time_format_12">12 ساعة</string>
+    <string name="today_open_adhkar">الأذكار</string>
+    <string name="adhkar_morning">أذكار الصباح</string>
+    <string name="adhkar_evening">أذكار المساء</string>
 </resources>

@@ -62,9 +62,9 @@ object LaunchRequests {
 
     /**
      * A screen asked for by name — "prayer", "quran", "settings", "notifications", "qibla",
-     * "tasbeeh", "appearance" — by the debug harnesses only (the store-screenshot runs open every
-     * screen in every language without a finger on the glass). Nothing in a release build calls
-     * [openScreen]; an unknown name is ignored by the collector.
+     * "tasbeeh", "adhkar", "appearance" — by the debug harnesses only (the store-screenshot runs
+     * open every screen in every language without a finger on the glass). Nothing in a release
+     * build calls [openScreen]; an unknown name is ignored by the collector.
      */
     val pendingScreen: StateFlow<String?> get() = _pendingScreen
 

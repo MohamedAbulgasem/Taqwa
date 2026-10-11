@@ -630,4 +630,7 @@
     <string name="prayer_times_time_format">Saat biçimi</string>
     <string name="time_format_24">24 saat</string>
     <string name="time_format_12">12 saat</string>
+    <string name="today_open_adhkar">Zikirler</string>
+    <string name="adhkar_morning">Sabah zikirleri</string>
+    <string name="adhkar_evening">Akşam zikirleri</string>
 </resources>

@@ -66,6 +66,7 @@ internal fun DebugScreenRequests(
                 "appearance" -> { navigator.selectTab(Tab.SETTINGS); navigator.push(Screen.Appearance) }
                 "qibla" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Qibla) }
                 "tasbeeh" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Tasbeeh) }
+                "adhkar" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Adhkar()) }
             }
             LaunchRequests.consumeScreen()
         }

@@ -630,4 +630,7 @@
     <string name="prayer_times_time_format">Format de l’heure</string>
     <string name="time_format_24">24 heures</string>
     <string name="time_format_12">12 heures</string>
+    <string name="today_open_adhkar">Adhkar</string>
+    <string name="adhkar_morning">Adhkar du matin</string>
+    <string name="adhkar_evening">Adhkar du soir</string>
 </resources>

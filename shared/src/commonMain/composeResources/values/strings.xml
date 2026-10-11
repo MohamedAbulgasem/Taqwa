@@ -651,4 +651,7 @@
     <string name="prayer_times_time_format">Time format</string>
     <string name="time_format_24">24-hour</string>
     <string name="time_format_12">12-hour</string>
+    <string name="today_open_adhkar">Adhkar</string>
+    <string name="adhkar_morning">Morning adhkar</string>
+    <string name="adhkar_evening">Evening adhkar</string>
 </resources>

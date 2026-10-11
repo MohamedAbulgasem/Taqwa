@@ -14,9 +14,11 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
+import world.taqwa.app.feature.adhkar.AdhkarScreen
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
 import world.taqwa.app.feature.tasbeeh.TasbeehScreen
@@ -113,6 +115,7 @@ internal fun TodayRoute(
         onChooseCity = { navigator.push(Screen.CitySearch) },
         onOpenLocationSettings = ::openAppSettings,
         onOpenQibla = { navigator.push(Screen.Qibla) },
+        onOpenAdhkar = { navigator.push(Screen.Adhkar()) },
         onOpenTasbeeh = { navigator.push(Screen.Tasbeeh) },
         // Only while there are notifications to be exact about; the flag
         // is re-read on every foreground, so the card leaves by itself.
@@ -159,6 +162,11 @@ internal fun QiblaRoute(
         val qiblaState by vm.state.collectAsState()
         QiblaScreen(qiblaState, onBack = { navigator.pop() })
     }
+}
+
+@Composable
+internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: AdhkarSet?) {
+    AdhkarScreen(set = set, onBack = { navigator.pop() })   // Task 8 replaces this with the view model
 }
 
 @Composable

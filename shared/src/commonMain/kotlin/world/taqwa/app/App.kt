@@ -587,6 +587,14 @@ fun App(container: AppContainer) {
                                 navigator = navigator,
                             )
                         }
+
+                        is Screen.Adhkar -> {
+                            AdhkarRoute(
+                                container = container,
+                                navigator = navigator,
+                                set = screen.set,
+                            )
+                        }
                     }
                 }
 
