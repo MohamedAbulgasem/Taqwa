@@ -97,6 +97,7 @@ Première version.
 6. Trouvez la qibla
 7. Comptez vos dhikr
 8. Sombre, et en sept langues
+9. Adhkar du matin et du soir
 
 ## Review notes (App Store and Play, English only)
 No account or sign-in. Location is optional: Settings › Location lets a reviewer choose any city instead. Everything works offline except recitation downloads, which fetch audio from a public GitHub release on request. To see the lock-screen player, play a surah and lock the phone. Widgets are added from the home screen's widget gallery. Nothing is collected or sent anywhere; the privacy policy is at https://taqwa.world/privacy/.

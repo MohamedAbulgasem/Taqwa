@@ -27,6 +27,7 @@ for L in "$@"; do
   want 5-recitation && { url "taqwa://recite/mode?name=translation" 1; url "taqwa://ayah/2/255" 3; url "taqwa://recite/load?surah=2&ayah=255&reciter=ar.alafasy" 5; shot 5-recitation; url "taqwa://recite/stop" 1; }
   want 6-qibla && { url "taqwa://recite/screen?name=qibla" 4; shot 6-qibla; }
   want 7-tasbeeh && { url "taqwa://recite/screen?name=tasbeeh" 3; shot 7-tasbeeh; }
+  want 9-adhkar && { url "taqwa://recite/screen?name=adhkar" 3; shot 9-adhkar; }
   want 8-dark && { url "taqwa://recite/theme?name=dark" 2; url "taqwa://recite/screen?name=prayer" 3; shot 8-dark; }
   url "taqwa://recite/theme?name=system" 1
   echo "  $(ls $D | wc -l | tr -d ' ') files"

@@ -31,6 +31,7 @@ for L in "$@"; do
   want 5-recitation && { h --es cmd mode --es name translation; ayah 2 255; W=6 h --es cmd load --ei surah 2 --ei ayah 255 --es reciter ar.alafasy; shot 5-recitation; h --es cmd stop; }
   want 6-qibla && { h --es cmd screen --es name qibla; shot 6-qibla 3; }
   want 7-tasbeeh && { h --es cmd screen --es name tasbeeh; shot 7-tasbeeh 2; }
+  want 9-adhkar && { h --es cmd screen --es name adhkar; shot 9-adhkar 2; }
   want 8-dark && { h --es cmd theme --es name dark; h --es cmd screen --es name prayer; shot 8-dark 2; }
   echo "  $(ls $L_DIR | wc -l | tr -d ' ') files"
 done
