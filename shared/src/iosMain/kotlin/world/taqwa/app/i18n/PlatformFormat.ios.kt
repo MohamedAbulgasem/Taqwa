@@ -55,7 +55,7 @@ private class IosPlatformFormat(private val clockFormat: ClockFormat) : Platform
     // are a region question (spec §1.2).
     private val amPm: Pair<String, String> = NSDateFormatter().run {
         setLocale(NSLocale(localeIdentifier = tag))
-        (AMSymbol ?: "AM") to (PMSymbol ?: "PM")
+        AMSymbol to PMSymbol
     }
     private val markerFirst = TwelveHourClock.markerFirst(tag)
 

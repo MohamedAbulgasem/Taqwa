@@ -22,6 +22,10 @@ class AndroidPlatformFormatTest {
     fun `twenty four hour is unchanged`() {
         assertEquals("18:32", format("en-US", ClockFormat.TWENTY_FOUR_HOUR).clockTime(18, 32))
         assertEquals("3:07", format("en-GB", ClockFormat.TWENTY_FOUR_HOUR).clockTime(3, 7))
+        // The digit-set guard: 24-hour mode must keep each locale's own numerals, with no marker.
+        assertEquals("١٨:٣٢", format("ar-EG", ClockFormat.TWENTY_FOUR_HOUR).clockTime(18, 32))
+        assertEquals("১৮:৩২", format("bn-BD", ClockFormat.TWENTY_FOUR_HOUR).clockTime(18, 32))
+        assertEquals("18:32", format("tr-TR", ClockFormat.TWENTY_FOUR_HOUR).clockTime(18, 32))
     }
 
     @Test
