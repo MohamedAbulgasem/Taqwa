@@ -3233,6 +3233,10 @@ that makes the sentence true, in the words the site's support page already uses.
 - The Urdu compass-unavailable sheets say the bearing and the distance درست ہیں, the plural their two
   subjects want, not ہے.
 
+**In the docs.** `docs/STORE-PRIVACY.md` said a notification without Alarms & reminders is "at worst a
+few minutes late and never missing", a promise the app itself does not make. It now says up to an hour
+late, as the app's own note beside the button does.
+
 Every other string was read in every language against the same rules. Two kinds stay on purpose:
 - The Qibla's "the bearing and distance shown are correct", shown when the compass cannot be used.
   Its point is that neither figure depends on the compass, which is true. A wording that says only
@@ -3263,8 +3267,8 @@ recitation's size (`NumberStyle`). So no reader sees one mark used for both, and
 pair to that. (`NumberStyle` has no Extended Arabic-Indic case yet: a ur-IN reader's sizes stay
 "58.2", Western digits and a point, beside a distance of ۲٬۹۱۶. A different mark, though not its
 partner; that pre-dates this round.) Arabic in Western digits keeps the comma because the app
-writes "58.2 MB" there. CLDR
-would have a point for ar-LY, ar-MA, ar-DZ and ar-TN, where it also writes the decimal with a comma.
+writes "58.2 MB" there; CLDR would have a point for ar-LY, ar-MA, ar-DZ and ar-TN, where it also
+writes the decimal with a comma.
 The site's generator now compiles `DigitGrouping.kt` (and runs its test), and `Formats.distance` calls
 it. The app and a city page therefore cannot group a distance two ways. The site's workflow
 (`pages.yml`) lists both files among the app files whose change rebuilds the site, as it lists
@@ -3297,8 +3301,22 @@ it. The app and a city page therefore cannot group a distance two ways. The site
 - French puts a plain space between every number and its unit (km, min, Mo), in the app and on the
   site; a no-break space would be one pass over both.
 - `NumberStyle`'s Extended Arabic-Indic case, above.
-- Whether Arabic in Western digits in Morocco, Algeria and Tunisia should keep the comma; the
-  owner's question.
+- Whether Arabic in Western digits in Libya, Morocco, Algeria and Tunisia should keep the comma (and
+  the point in its sizes) or take CLDR's point and comma for both; the owner's question.
+- Nine Arabic and ten Bengali strings write their numbers in the language's own digits rather than
+  the reader's: `saudi_fajr_later` and its detail (٥, ৫), `timetable_checking` (١٢, ১২), the
+  timetable names 12°, 15°, 18°, Chicago 18°, Chicago 18°/15° and 90-minute Isha, and Bengali
+  `adjustments_one` (১টি). An ar-LY reader sees ١٢ among Western digits, and an iPhone, which draws
+  Bengali in Western digits, sees ১২ beside 12. Each would take a placeholder filled by
+  `localizedDigits`, and the timetable names are also read by the site, so app and site would change
+  together.
+
+**Not changed, for the owner.** "Taqwa shows each prayer once they have all begun it", on the
+cautious-times card, behind the ⓘ and under Timetable › Automatic (`today_card_cautious_body`,
+`today_whose_cautious_body`, `timetable_auto_cautious`), is not true of Maghrib on a day the Maghrib cap
+decides it (Toronto, Oslo, Belgium, Australia): Maghrib then follows the most-followed timetable, and
+another is later. About these times says so on that day (R91), and the site's description and support
+page carry the same sentence, so it could only change in the app and on the site together.
 
 **Screenshots that now show an old distance** (not re-shot):
 - `docs/store/screenshots/appstore/{fr,tr,id}/*-01.png` and `*-08.png`.
