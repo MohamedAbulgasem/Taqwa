@@ -1,0 +1,56 @@
+<en-GB>
+What's new in 1.1.0:
+• Morning and evening adhkar: count them on screen, hear the Quranic ones from your reciter, and set a reminder if you like
+• A 12-hour clock, in Settings
+• Prayer times follow your own city's timetable more closely in Saudi Arabia, Kazakhstan, Palestine, Syria, North America and more
+• Rate and share Taqwa from Settings
+• Clearer wording, and distances written the way your language writes numbers
+</en-GB>
+<ar>
+الجديد في الإصدار 1.1.0:
+• أذكار الصباح والمساء: عُدّها على الشاشة، واستمع إلى ما فيها من آيات بصوت قارئك، وفعّل لها تذكيرًا إن شئت
+• عرض الوقت بنظام ١٢ ساعة، من «تنسيق الوقت» في الإعدادات
+• مواقيت الصلاة أقرب إلى جدول مدينتك نفسها في السعودية وكازاخستان وفلسطين وسوريا وأمريكا الشمالية وغيرها
+• قيّم تقوى وشاركه من الإعدادات
+• صياغة أوضح، والمسافات تُكتب على طريقة لغتك في كتابة الأرقام
+</ar>
+<fr-FR>
+Nouveautés de la 1.1.0 :
+• Adhkar du matin et du soir : comptez-les à l’écran, écoutez ceux du Coran par votre récitateur et activez un rappel si vous voulez
+• Le format 12 heures, dans les Paramètres
+• Des horaires plus proches du calendrier de votre ville en Arabie saoudite, au Kazakhstan, en Palestine, en Syrie, en Amérique du Nord et ailleurs
+• Notez et partagez Taqwa dans les Paramètres
+• Des textes plus clairs et des distances écrites comme dans votre langue
+</fr-FR>
+<tr-TR>
+1.1.0 sürümündeki yenilikler:
+• Sabah ve akşam zikirleri: ekranda sayın, Kur’an’dan olanları seçtiğiniz karinin sesinden dinleyin, dilerseniz hatırlatma kurun
+• Ayarlar’da 12 saat biçimi
+• Namaz vakitleri Suudi Arabistan, Kazakistan, Filistin, Suriye, Kuzey Amerika ve daha birçok yerde şehrinizin kendi takvimini daha yakından izliyor
+• Taqwa’yı Ayarlar’dan değerlendirin ve paylaşın
+• Daha anlaşılır ifadeler; mesafeler de dilinizdeki sayı yazımıyla gösteriliyor
+</tr-TR>
+<id>
+Yang baru di versi 1.1.0:
+• Zikir pagi dan petang: hitung di layar, dengarkan ayat Al-Qur’an di dalamnya dengan suara qari pilihan Anda, dan pasang pengingat bila Anda mau
+• Format waktu 12 jam, di Pengaturan
+• Waktu salat kini lebih sesuai dengan jadwal kota Anda sendiri di Arab Saudi, Kazakhstan, Palestina, Suriah, Amerika Utara, dan lainnya
+• Beri nilai dan bagikan Taqwa dari Pengaturan
+• Kata-kata yang lebih jelas, dan angka jarak ditulis sesuai bahasa Anda
+</id>
+<ur>
+1.1.0 میں نیا کیا ہے:
+• صبح و شام کے اذکار: انہیں اسکرین پر گنیں، قرآنی اذکار اپنے چنے ہوئے قاری کی آواز میں سنیں، اور چاہیں تو یاد دہانی لگا لیں
+• 12 گھنٹے کی گھڑی، ترتیبات میں ”وقت کا فارمیٹ“ سے
+• نماز کے اوقات اب سعودی عرب، قازقستان، فلسطین، شام، شمالی امریکہ اور کئی دوسرے علاقوں میں آپ کے اپنے شہر کے نقشۂ اوقات کے زیادہ مطابق ہیں
+• ترتیبات سے تقویٰ کو ریٹ اور شیئر کریں
+• زیادہ واضح الفاظ، اور فاصلوں کے اعداد آپ کی زبان کے انداز میں
+</ur>
+<bn-BD>
+1.1.0 সংস্করণে যা নতুন:
+• সকাল ও সন্ধ্যার আযকার: পর্দায় গুনে নিন, যেগুলো কুরআনের সেগুলো আপনার কারির কণ্ঠে শুনুন, আর চাইলে রিমাইন্ডার চালু করুন
+• ১২ ঘণ্টার ঘড়ি, সেটিংসের “সময়ের ফরম্যাট”-এ
+• সৌদি আরব, কাজাখস্তান, ফিলিস্তিন, সিরিয়া, উত্তর আমেরিকা ও আরও কিছু জায়গায় নামাজের সময় আপনার নিজের শহরের সময়সূচি আরও ঘনিষ্ঠভাবে অনুসরণ করে
+• সেটিংস থেকে তাকওয়াকে রেটিং দিন ও শেয়ার করুন
+• আরও স্পষ্ট শব্দচয়ন, আর আপনার ভাষায় যেভাবে সংখ্যা লেখা হয়, দূরত্ব এখন সেভাবেই লেখা
+</bn-BD>
