@@ -57,6 +57,7 @@ import world.taqwa.app.design.LightColors
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.i18n.uppercaseIn
 import world.taqwa.app.quran.ReadingMode
@@ -70,11 +71,13 @@ import world.taqwa.app.resources.adhkar_done_evening
 import world.taqwa.app.resources.adhkar_done_morning
 import world.taqwa.app.resources.adhkar_next_evening
 import world.taqwa.app.resources.adhkar_next_morning
+import world.taqwa.app.resources.adhkar_opens_at
 import world.taqwa.app.resources.adhkar_progress
 import world.taqwa.app.resources.adhkar_reading
 import world.taqwa.app.resources.adhkar_times
 import world.taqwa.app.resources.adhkar_translation
 import world.taqwa.app.resources.adhkar_until_sunrise
+import world.taqwa.app.resources.adhkar_window_evening
 import world.taqwa.app.resources.quran_reader_aa
 import world.taqwa.app.resources.quran_sheet_size
 import world.taqwa.app.resources.quran_sheet_transliteration
@@ -399,6 +402,36 @@ class AdhkarScreenTest {
         onNodeWithText(getString(Res.string.adhkar_done_evening)).assertIsDisplayed()
         onNodeWithText(getString(Res.string.adhkar_next_morning)).assertIsDisplayed()
         onAllNodesWithText(getString(Res.string.adhkar_done_morning)).assertCountEquals(0)
+    }
+
+    /**
+     * Before Asr the evening set is a free read (spec §3.3): the caption under the title says when
+     * it opens — Asr's time, isolated as every spliced clock time is, so a 12-hour marker keeps its
+     * place — rather than the plain window it shows at other hours.
+     */
+    @Test
+    fun beforeAsrTheCaptionSaysWhenTheEveningOpens() = runComposeUiTest {
+        val early = state.copy(set = AdhkarSet.EVENING, phase = AdhkarPhase.NONE, until = null, opensAt = "4:55 PM")
+        setContent { Screen(Calls(), early) }
+        onNodeWithText(getString(Res.string.adhkar_opens_at, isolatedClock("4:55 PM"))).assertIsDisplayed()
+        onAllNodesWithText(getString(Res.string.adhkar_window_evening)).assertCountEquals(0)
+    }
+
+    /**
+     * An evening read through before Asr ends on the done page — the reader did read it — but the
+     * page does not call it the day's evening: in place of "Evening adhkar · done" it says, as the
+     * header does, when the evening opens.
+     */
+    @Test
+    fun anEveningFinishedBeforeAsrSaysWhenItOpensAndNotThatItIsDone() = runComposeUiTest {
+        val calls = Calls()
+        val early = finished(AdhkarSet.EVENING).copy(phase = AdhkarPhase.NONE, until = null, opensAt = "16:55")
+        setContent { Screen(calls, early) }
+        onAllNodesWithText(getString(Res.string.adhkar_done_evening)).assertCountEquals(0)
+        // Once under the title and once on the done page.
+        onAllNodesWithText(getString(Res.string.adhkar_opens_at, "16:55")).assertCountEquals(2)
+        onNodeWithText(getString(Res.string.adhkar_back)).assertIsDisplayed().performClick()
+        assertEquals(1, calls.backs)
     }
 
     /**

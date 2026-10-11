@@ -199,6 +199,18 @@ The whole page body is one ripple-less tap surface; a tap counts, a drag scrolls
   in page order) and `adhkar_istighfar` = `"<date>|n"` (one counter shared by both sets, keyed by
   the day's own date, the local date of its Fajr, like the sets). A set's date is the local date
   of its own prayer (that Fajr, that Asr); a new date overwrites, nothing is kept, no history.
+- **A set counts from its opening prayer** (the Lead's ruling, 11 Oct, after the device pass saw an
+  evening set finished at 07:12 withdraw that day's 16:55 reminder): the morning from Fajr, the
+  evening from Asr, of the day `dayFor` reads against; the closing is unchanged, the make-up phases
+  still count. Before it — only ever the evening, between Fajr and Asr, since `dayFor` never gives
+  a day whose Fajr is ahead — the set is a free read: the pager, counting, ring, advance and
+  haptics work, nothing of the set is written, no done mark, no reminder withdrawn, and leaving
+  (or switching sets) starts it again from the first page. The header caption says "From Asr ·
+  16:55" (`adhkar_opens_at`, the time through `formatClock` and `isolatedClock`), and a free read
+  finished shows its done page with that caption in place of "Evening adhkar · done". The open
+  check is made per tap: the first tap after Asr writes the whole of a read begun before it and
+  from then on it is the day's set; a read finished before Asr has no tap left and stays a free
+  read. The istighfar keeps its day count either way.
 - **Done page**: after the last page, a page with a 44 dp accent-0.18 halo holding the 20 dp
   `CheckMark`, "Morning adhkar · done" in `rowLabel`, a caption naming when the other set opens
   ("Evening adhkar open after Asr"), and `TaqwaTextLink("Back to prayer times")` that pops. The
@@ -340,7 +352,8 @@ against the bundled `quran.db`.
   languages ("Morning adhkar" / "Until sunrise · {time}", "Evening adhkar" / "Until Maghrib ·
   {time}"), `{time}` isolated.
 - Done → no nag: when a set completes, the day's pending adhkar notification is cancelled by id on
-  both schedulers (`NotificationScheduler.cancel(ids)`).
+  both schedulers (`NotificationScheduler.cancel(ids)`). A set finished before it opens (3.3) is
+  not the day's set and does not withdraw its reminder.
 - Tap: Android content intent carries `open_adhkar = morning | evening`, stripped in
   `MainActivity` like `open_playing`, surfaced as a one-shot `LaunchRequests.pendingAdhkar`,
   consumed in `AppEffects` as `selectTab(PRAYER); push(Screen.Adhkar(set))`. iOS: a

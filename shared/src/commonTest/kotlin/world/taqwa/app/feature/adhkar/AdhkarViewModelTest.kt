@@ -182,7 +182,11 @@ class AdhkarViewModelTest {
                 format = EnglishPlatformFormat,
                 language = "en",
                 scope = backgroundScope,
-                onSetCompleted = { set, day -> completed += set to day },
+                // As the route does: the set reported is marked done, so a test can see the mark.
+                onSetCompleted = { set, day ->
+                    completed += set to day
+                    store.markDone(set, day)
+                },
             )
         }
         return Rig(build(), store, haptics, day, clock, build, completed)
@@ -201,6 +205,32 @@ class AdhkarViewModelTest {
     }
 
     private fun tenPastFajr(day: DayPrayerTimes): Instant = day.time(Prayer.FAJR) + 10.minutes
+
+    /** An hour after Fajr: the morning's time, and the evening set not yet open. */
+    private fun anHourAfterFajr(day: DayPrayerTimes): Instant = day.time(Prayer.FAJR) + 1.hours
+
+    private fun anHourAfterAsr(day: DayPrayerTimes): Instant = day.time(Prayer.ASR) + 1.hours
+
+    /**
+     * Reads the set on screen through from the page it is on, each page counted to its target and
+     * the pager left to move on by itself, until the done page. Bounded, so a tap that stopped
+     * counting fails the test rather than hanging it.
+     */
+    private fun TestScope.readThrough(viewModel: AdhkarViewModel) {
+        repeat(viewModel.state.value.pages.size + 1) {
+            val state = viewModel.state.value
+            val page = state.pages.getOrNull(state.currentPage) ?: return
+            repeat(page.target - page.count) { viewModel.tap() }
+            runCurrent()
+            advanceTimeBy(AdhkarViewModel.ADVANCE_DELAY_MS + 1)
+            runCurrent()
+        }
+        assertEquals(viewModel.state.value.pages.size, viewModel.state.value.currentPage, "the read did not reach the done page")
+    }
+
+    /** The evening set's own list as a finished read writes it: every page at its target, the istighfar's slot 0. */
+    private fun eveningSaid(on: LocalDate): String =
+        AdhkarProgress(on, eveningPages.map { if (it.countDaily) 0 else it.count }).encode()
 
     private fun clock(instant: Instant): String {
         val local = instant.toLocalDateTime(zone)
@@ -499,7 +529,8 @@ class AdhkarViewModelTest {
     }
 
     @Test fun `switching sets keeps each set's progress`() = runTest {
-        val rig = rig("switch", ::tenPastFajr)
+        // After Asr, when both sets count: before it the evening is a free read and keeps nothing.
+        val rig = rig("switch", { day -> day.time(Prayer.ASR) + 10.minutes })
         rig.viewModel.open(AdhkarSet.MORNING)
         loaded(rig, AdhkarSet.MORNING)
         rig.viewModel.tap()
@@ -730,5 +761,158 @@ class AdhkarViewModelTest {
             loaded = true,
         )
         assertEquals("w1 w2 w3 w4 w5 w6", state.readingPreview)
+    }
+
+    // A set counts only from its opening prayer (spec §3.3): the evening from Asr. Before it the
+    // evening set is a free read, counted on screen and kept nowhere.
+
+    @Test fun `an evening read before asr counts on screen and keeps nothing`() = runTest {
+        val rig = rig("free-read", ::anHourAfterFajr)
+        rig.viewModel.open(AdhkarSet.EVENING)
+        val opened = loaded(rig, AdhkarSet.EVENING)
+        // The header says when the evening opens, in the clock setting's form.
+        assertEquals(clock(rig.day.time(Prayer.ASR)), opened.opensAt)
+        assertEquals(AdhkarPhase.NONE, opened.phase)
+        readThrough(rig.viewModel)
+
+        // The reader did read it: every page counted, the done page, the haptics as on any day.
+        val state = rig.viewModel.state.value
+        assertEquals(eveningPages.size, state.completed)
+        val expected = eveningPages.flatMapIndexed { index, item ->
+            List(item.count - 1) { "count" } + (if (index == eveningPages.lastIndex) "setComplete" else "partComplete")
+        }
+        assertEquals(expected, rig.haptics.fired)
+        // Not the day's evening: no progress, no done mark, nothing reported to withdraw a reminder.
+        assertEquals(clock(rig.day.time(Prayer.ASR)), state.opensAt)
+        assertNull(rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        assertNull(rig.store.done.getValue(AdhkarSet.EVENING).value)
+        assertEquals(emptyList(), rig.completed)
+        // The istighfar is the day's count, not the set's, and keeps its rule.
+        val istighfar = eveningPages.single { it.countDaily }.count
+        assertEquals(AdhkarProgress(date, listOf(istighfar)).encode(), rig.store.istighfar.value)
+        // The minute's tick before Asr changes none of it.
+        rig.clock.now = rig.day.time(Prayer.ASR) - 1.minutes
+        rig.viewModel.tick()
+        runCurrent()
+        assertEquals(clock(rig.day.time(Prayer.ASR)), rig.viewModel.state.value.opensAt)
+        assertEquals(eveningPages.size, rig.viewModel.state.value.currentPage)
+    }
+
+    @Test fun `leaving an evening read before asr and coming back starts from the first page`() = runTest {
+        val rig = rig("free-read-again", ::anHourAfterFajr)
+        rig.viewModel.open(AdhkarSet.EVENING)
+        loaded(rig, AdhkarSet.EVENING)
+        // The first page said, the second twice of its three; the reader leaves.
+        rig.viewModel.tap()
+        runCurrent()
+        advanceTimeBy(AdhkarViewModel.ADVANCE_DELAY_MS + 1)
+        runCurrent()
+        repeat(2) { rig.viewModel.tap() }
+        runCurrent()
+        assertEquals(2, rig.viewModel.state.value.pages[1].count)
+        rig.viewModel.close()
+
+        val again = rig.reopen()
+        again.open(AdhkarSet.EVENING)
+        val state = loaded(again, AdhkarSet.EVENING)
+        assertEquals(0, state.currentPage)
+        assertEquals(0, state.completed)
+        assertTrue(state.pages.all { it.count == 0 })
+        assertNull(rig.store.progress.getValue(AdhkarSet.EVENING).value)
+    }
+
+    @Test fun `the same evening read after asr is the day's and withdraws its reminder`() = runTest {
+        val rig = rig("after-asr", ::anHourAfterAsr)
+        rig.viewModel.open(AdhkarSet.EVENING)
+        assertNull(loaded(rig, AdhkarSet.EVENING).opensAt)
+        readThrough(rig.viewModel)
+        assertEquals(eveningSaid(date), rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        assertEquals(listOf(AdhkarSet.EVENING to date), rig.completed)
+        assertEquals(date, rig.store.done.getValue(AdhkarSet.EVENING).value)
+        assertEquals(1, rig.haptics.fired.count { it == "setComplete" })
+    }
+
+    @Test fun `a read begun before asr is kept whole from its first tap after asr`() = runTest {
+        val rig = rig("crossing", { day -> day.time(Prayer.ASR) - 10.minutes })
+        rig.viewModel.open(AdhkarSet.EVENING)
+        loaded(rig, AdhkarSet.EVENING)
+        // The first page said before Asr: on screen, not on disk.
+        rig.viewModel.tap()
+        runCurrent()
+        advanceTimeBy(AdhkarViewModel.ADVANCE_DELAY_MS + 1)
+        runCurrent()
+        assertNull(rig.store.progress.getValue(AdhkarSet.EVENING).value)
+
+        // Asr comes with the screen open. The minute's tick moves the phase and keeps nothing: the
+        // counts on screen are still the free read's until the reader counts again.
+        rig.clock.now = rig.day.time(Prayer.ASR) + 1.minutes
+        rig.viewModel.tick()
+        runCurrent()
+        assertEquals(AdhkarPhase.BEST, rig.viewModel.state.value.phase)
+        assertEquals(clock(rig.day.time(Prayer.ASR)), rig.viewModel.state.value.opensAt)
+        assertNull(rig.store.progress.getValue(AdhkarSet.EVENING).value)
+
+        // The first tap after Asr writes everything on screen, the page said before Asr with it.
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(counts(AdhkarSet.EVENING, 1, 1).encode(), rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        assertNull(rig.viewModel.state.value.opensAt)
+        // From there it is the day's evening as on any day.
+        readThrough(rig.viewModel)
+        assertEquals(eveningSaid(date), rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        assertEquals(listOf(AdhkarSet.EVENING to date), rig.completed)
+    }
+
+    @Test fun `the first tap after asr on the istighfar keeps the rest of the read too`() = runTest {
+        val rig = rig("crossing-istighfar", { day -> day.time(Prayer.ASR) - 10.minutes })
+        rig.viewModel.open(AdhkarSet.EVENING)
+        loaded(rig, AdhkarSet.EVENING)
+        rig.viewModel.tap()
+        runCurrent()
+        rig.clock.now = rig.day.time(Prayer.ASR) + 1.minutes
+        val index = eveningPages.indexOfFirst { it.countDaily }
+        rig.viewModel.goTo(index)
+        rig.viewModel.tap()
+        runCurrent()
+        // The istighfar is written as always, and the set's own list with it: the first page, said
+        // before Asr, is not lost because the tap that carried the read over was the daily one.
+        assertEquals(AdhkarProgress(date, listOf(1)).encode(), rig.store.istighfar.value)
+        assertEquals(counts(AdhkarSet.EVENING, 1).encode(), rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        assertNull(rig.viewModel.state.value.opensAt)
+    }
+
+    @Test fun `an evening finished before asr stays a free read after asr`() = runTest {
+        val rig = rig("finished-early", { day -> day.time(Prayer.ASR) - 30.minutes })
+        rig.viewModel.open(AdhkarSet.EVENING)
+        loaded(rig, AdhkarSet.EVENING)
+        readThrough(rig.viewModel)
+        // Asr comes with the done page on screen; the done page takes no tap, so nothing carries
+        // the read over: it was read before the evening opened, and is not the day's evening.
+        rig.clock.now = rig.day.time(Prayer.ASR) + 1.minutes
+        rig.viewModel.tick()
+        rig.viewModel.tap()
+        runCurrent()
+        assertNull(rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        assertEquals(emptyList(), rig.completed)
+        assertEquals(clock(rig.day.time(Prayer.ASR)), rig.viewModel.state.value.opensAt)
+        rig.viewModel.close()
+
+        // Opened again after Asr it is the day's evening, from its first page.
+        val again = rig.reopen()
+        again.open(AdhkarSet.EVENING)
+        val state = loaded(again, AdhkarSet.EVENING)
+        assertNull(state.opensAt)
+        assertEquals(0, state.currentPage)
+        assertEquals(0, state.pages[0].count)
+    }
+
+    @Test fun `the morning is never a free read`() = runTest {
+        // At Fajr itself, the first instant dayFor gives the new day, the morning already counts.
+        val rig = rig("morning-open", { day -> day.time(Prayer.FAJR) })
+        rig.viewModel.open(AdhkarSet.MORNING)
+        assertNull(loaded(rig, AdhkarSet.MORNING).opensAt)
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(counts(AdhkarSet.MORNING, 1).encode(), rig.store.progress.getValue(AdhkarSet.MORNING).value)
     }
 }

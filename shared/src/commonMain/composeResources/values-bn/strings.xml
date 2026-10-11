@@ -658,4 +658,5 @@
     <string name="notifications_adhkar_subtitle">ফজর ও আসরের আধা ঘণ্টা পরে</string>
     <string name="credit_adhkar">আযকার</string>
     <string name="credit_adhkar_detail">সাঈদ ইবনে আলী ইবনে ওয়াহফ আল-কাহতানীর হিসনুল মুসলিম থেকে সকাল ও সন্ধ্যার আযকার; আরবি পাঠ ও তার বিন্যাস, ইংরেজি অনুবাদ ও উচ্চারণ OpenDua ডেটাসেট (Human Development Fund) থেকে, CC BY 4.0 লাইসেন্স; ছোটখাটো সম্পাদনার বিবরণ রিপোজিটরিতে লেখা আছে।</string>
+    <string name="adhkar_opens_at">আসর থেকে · %1$s</string>
 </resources>

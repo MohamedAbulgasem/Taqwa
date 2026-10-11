@@ -73,11 +73,30 @@ object AdhkarWindows {
         }
     }
 
+    /** [set]'s opening prayer on [today]: that Fajr for the morning, that Asr for the evening. */
+    fun opensAt(set: AdhkarSet, today: DayPrayerTimes): Instant =
+        today.time(if (set == AdhkarSet.MORNING) Prayer.FAJR else Prayer.ASR)
+
+    /**
+     * Whether [set] counts at [now] as [today]'s (spec §3.3): from its opening prayer on — the
+     * morning from Fajr, the evening from Asr. Before it the set is a free read: it can be read and
+     * counted on screen, but it is not the day's set, so nothing is kept and its reminder stands.
+     *
+     * Only the opening is a boundary. The make-up phases count, as does the rest of the half day
+     * after them, as they always have: the day the set belongs to ends where [dayFor] ends it.
+     *
+     * The morning needs no rule of its own: [dayFor] never hands back a day whose Fajr is still
+     * ahead, so for the day it chooses the morning is always open (AdhkarWindowsTest proves it
+     * rather than this function special-casing it). Only the evening, between Fajr and Asr, is ever
+     * read before it opens.
+     */
+    fun isOpen(set: AdhkarSet, now: Instant, today: DayPrayerTimes): Boolean = now >= opensAt(set, today)
+
     /**
      * The date a set's progress is kept under: the local date of that set's own prayer — that
      * Fajr, that Asr — so the evening read after midnight still belongs to the day it began on, and
      * a new date is a new set with nothing counted.
      */
     fun dateKey(set: AdhkarSet, today: DayPrayerTimes, zone: TimeZone): LocalDate =
-        today.time(if (set == AdhkarSet.MORNING) Prayer.FAJR else Prayer.ASR).toLocalDateTime(zone).date
+        opensAt(set, today).toLocalDateTime(zone).date
 }

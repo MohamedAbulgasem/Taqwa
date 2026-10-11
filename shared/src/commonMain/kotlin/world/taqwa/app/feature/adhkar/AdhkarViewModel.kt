@@ -134,6 +134,10 @@ data class AdhkarPageUi(
  * @property completed the pages counted to their target — counted, never visited (spec §3.3).
  * @property loaded false until a location and the set's pages are in; the screen then shows its
  * title and nothing else.
+ * @property opensAt while the counts on screen are a free read — the set was opened before its
+ * opening prayer (spec §3.3), and no tap since that prayer has made them the day's — the clock time
+ * the set opens at, in the same form as [until]; null otherwise. The header says it in place of the
+ * phase, and the done page in place of "done".
  */
 data class AdhkarUiState(
     val set: AdhkarSet = AdhkarSet.MORNING,
@@ -146,6 +150,7 @@ data class AdhkarUiState(
     val arabicSizeSp: Int = ReadingSettings().arabicSizeSp,
     val transliteration: Boolean = false,
     val loaded: Boolean = false,
+    val opensAt: String? = null,
 ) {
     /**
      * The reading sheet's preview line (spec §3.6): the first [PREVIEW_WORDS] words of the du'a on
@@ -192,11 +197,19 @@ data class AdhkarUiState(
  * **Haptics.** A count is the light tick; a page said in full is a part of the session, the double
  * pulse; the last undone page completing is the session done, the firm one, once.
  *
+ * **A set counts from its opening prayer** (spec §3.3): the morning from Fajr, the evening from
+ * Asr ([AdhkarWindows.isOpen]). Opened before that — in practice the evening, between Fajr and Asr
+ * — the set is a free read: the pager, the counting, the ring, the advance and the haptics all work,
+ * but nothing of the set is written and nothing is reported, so its reminder stands, and the screen
+ * says when the set opens ([AdhkarUiState.opensAt]). The free read lives in this load alone:
+ * leaving, switching sets or a rebuilt view model starts it again from the first page. The
+ * istighfar is the day's count, not the set's, and is written as on any day.
+ *
  * **A set said in full** is reported once, by the tap that completes its last undone page, to
  * [onSetCompleted] with the set's own date (that Fajr's, that Asr's; last evening's between
  * midnight and Fajr): the route marks it done and withdraws the day's reminder for it (spec §5).
- * Opening a finished set, and the done page, report nothing. Like a count, the report is started
- * before the tap returns and finished even if the screen leaves.
+ * Opening a finished set, the done page, and a free read report nothing. Like a count, the report
+ * is started before the tap returns and finished even if the screen leaves.
  *
  * Failures are swallowed rather than allowed to take the process down — a full disk loses a count,
  * not the app — as [world.taqwa.app.feature.tasbeeh.TasbeehViewModel] does. [scope] is the screen's;
@@ -231,14 +244,20 @@ class AdhkarViewModel(
      * What the pages on screen were loaded against. Null while a load is under way and when there
      * is no location: a tap then does nothing, so a tap can never be counted against a set that is
      * about to be replaced by what the store held a moment before it.
+     *
+     * [freeRead] is true while the counts on screen are not the day's: the set was loaded before it
+     * opened, and no tap since its opening has carried them over. It belongs to the load, so a new
+     * load starts it again.
      */
     private class Session(
         val set: AdhkarSet,
         val location: GeoLocation,
         val zone: TimeZone,
         val prayerSettings: PrayerSettings,
+        val day: DayPrayerTimes,
         val dateKey: LocalDate,
         val istighfarDate: LocalDate,
+        var freeRead: Boolean,
     )
 
     private var session: Session? = null
@@ -285,6 +304,12 @@ class AdhkarViewModel(
      * Counts the page on screen. A page is a one-part [TasbeehPreset]; [TasbeehEngine.tap] decides
      * what the tap meant, and a completed page waits [ADVANCE_DELAY_MS] and moves to the next undone
      * one. A completed page, the done page and a screen still loading do nothing.
+     *
+     * Whether the set has opened is asked here, at each tap (spec §3.3). Before its opening prayer
+     * the tap counts on screen alone; the first tap after it makes the read the day's, writing every
+     * count on screen — those made before the opening too — and from then on each tap is the day's
+     * as always. A read finished before the opening has no tap left to carry it over, so it stays a
+     * free read; opened again, the set starts as the day's from its first page.
      */
     fun tap() {
         val session = session ?: return
@@ -303,9 +328,18 @@ class AdhkarViewModel(
             pages.all { it.done } -> haptics.setComplete()
             else -> haptics.partComplete()
         }
-        _state.value = current.copy(pages = pages, completed = pages.count { it.done })
-        persist(session, counted, pages)
-        if (event == TapEvent.SetComplete && pages.all { it.done }) completed(session)
+        val open = AdhkarWindows.isOpen(session.set, now(), session.day)
+        // The tap that carries a free read over writes the set's whole list, even on the istighfar
+        // page, whose own taps otherwise write the daily counter alone.
+        val carriesOver = open && session.freeRead
+        if (open) session.freeRead = false
+        _state.value = current.copy(
+            pages = pages,
+            completed = pages.count { it.done },
+            opensAt = if (session.freeRead) current.opensAt else null,
+        )
+        persist(session, counted, pages, keepSet = open && (carriesOver || !counted.item.countDaily))
+        if (open && event == TapEvent.SetComplete && pages.all { it.done }) completed(session)
         if (counted.done) advanceFrom(index, session)
     }
 
@@ -319,7 +353,8 @@ class AdhkarViewModel(
      * set on screen stays the one that was opened. When the day the set is kept under has moved on
      * — the screen left open across Fajr, the one boundary the sets and the istighfar share;
      * midnight is not one — the set is opened afresh, since the counts on screen belong to a date
-     * that is over.
+     * that is over. A free read is left as it is when its set opens: only a tap carries it over
+     * (see [tap]), so a read finished before the opening never becomes the day's by the clock.
      */
     fun tick() {
         val session = session ?: return
@@ -338,7 +373,9 @@ class AdhkarViewModel(
     private suspend fun load(requested: AdhkarSet?) {
         val location = settings.location.first()
         if (location == null) {
-            _state.update { it.copy(pages = emptyList(), currentPage = 0, completed = 0, loaded = false, phase = AdhkarPhase.NONE, until = null) }
+            _state.update {
+                it.copy(pages = emptyList(), currentPage = 0, completed = 0, loaded = false, phase = AdhkarPhase.NONE, until = null, opensAt = null)
+            }
             return
         }
         val prayerSettings = settings.prayerSettings.first()
@@ -353,6 +390,9 @@ class AdhkarViewModel(
         val window = AdhkarWindows.windowFor(set, instant, day)
         val dateKey = AdhkarWindows.dateKey(set, day, zone)
         val istighfarDate = istighfarDateOf(day, zone)
+        // Before its opening prayer the set is a free read (spec §3.3): it starts from its first
+        // page whatever the store holds, and says when it opens.
+        val open = AdhkarWindows.isOpen(set, instant, day)
 
         val pages = (items ?: catalogue().also { items = it }).pagesFor(set)
         val text = translations()
@@ -360,7 +400,7 @@ class AdhkarViewModel(
         val quranTranslation = readerTranslation(reading.translationId)
         // Behind the writes, so a count still on its way to disk is read back as counted.
         val (progress, istighfar) = writes.withLock {
-            AdhkarProgress.forDate(store.progress(set).first(), dateKey, pages.size) to
+            AdhkarProgress.forDate(if (open) store.progress(set).first() else null, dateKey, pages.size) to
                 AdhkarProgress.forDate(store.istighfar().first(), istighfarDate, 1).counts.single()
         }
         val ui = pages.mapIndexed { index, item ->
@@ -377,7 +417,7 @@ class AdhkarViewModel(
                 done = count >= item.count,
             )
         }
-        session = Session(set, location, zone, prayerSettings, dateKey, istighfarDate)
+        session = Session(set, location, zone, prayerSettings, day, dateKey, istighfarDate, freeRead = !open)
         _state.update {
             it.copy(
                 set = set,
@@ -387,6 +427,7 @@ class AdhkarViewModel(
                 currentPage = ui.indexOfFirst { page -> !page.done }.takeIf { first -> first >= 0 } ?: ui.size,
                 completed = ui.count { page -> page.done },
                 loaded = true,
+                opensAt = if (open) null else formatClock(AdhkarWindows.opensAt(set, day), zone, format),
             )
         }
     }
@@ -466,21 +507,24 @@ class AdhkarViewModel(
         }
     }
 
-    /** Writes the page just counted: the daily counter for the istighfar, the set's list for the rest. */
-    private fun persist(session: Session, counted: AdhkarPageUi, pages: List<AdhkarPageUi>) {
-        val snapshot = if (counted.item.countDaily) {
-            null
-        } else {
+    /**
+     * Writes the page just counted: the daily counter for the istighfar, whenever it is counted —
+     * it is the day's count, not the set's — and the set's list, whole, when [keepSet] says so.
+     * A tap of a free read writes the istighfar alone, or nothing.
+     */
+    private fun persist(session: Session, counted: AdhkarPageUi, pages: List<AdhkarPageUi>, keepSet: Boolean) {
+        val istighfar = counted.item.countDaily
+        val snapshot = if (keepSet) {
             AdhkarProgress(session.dateKey, pages.map { if (it.item.countDaily) 0 else it.count })
+        } else {
+            null
         }
+        if (!istighfar && snapshot == null) return
         work.launch(start = CoroutineStart.UNDISPATCHED) {
             withContext(NonCancellable) {
                 writes.withLock {
-                    if (snapshot == null) {
-                        store.saveIstighfar(session.istighfarDate, counted.count)
-                    } else {
-                        store.save(session.set, snapshot)
-                    }
+                    if (istighfar) store.saveIstighfar(session.istighfarDate, counted.count)
+                    if (snapshot != null) store.save(session.set, snapshot)
                 }
             }
         }

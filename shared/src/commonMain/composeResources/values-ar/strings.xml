@@ -665,4 +665,5 @@
     <string name="notifications_adhkar_subtitle">بعد الفجر والعصر بنصف ساعة</string>
     <string name="credit_adhkar">الأذكار</string>
     <string name="credit_adhkar_detail">أذكار الصباح والمساء من «حصن المسلم» لسعيد بن علي بن وهف القحطاني؛ النص العربي وترتيبه والترجمة الإنجليزية والنطق بالحروف اللاتينية من مجموعة بيانات OpenDua (Human Development Fund)، رخصة CC BY 4.0، مع تعديلات طفيفة مدوّنة في المستودع.</string>
+    <string name="adhkar_opens_at">من العصر · %1$s</string>
 </resources>

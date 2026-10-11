@@ -101,6 +101,7 @@ import world.taqwa.app.resources.adhkar_morning
 import world.taqwa.app.resources.adhkar_next_evening
 import world.taqwa.app.resources.adhkar_next_morning
 import world.taqwa.app.resources.adhkar_of
+import world.taqwa.app.resources.adhkar_opens_at
 import world.taqwa.app.resources.adhkar_progress
 import world.taqwa.app.resources.adhkar_segment_evening
 import world.taqwa.app.resources.adhkar_segment_morning
@@ -221,7 +222,7 @@ fun AdhkarScreen(
                 HorizontalPager(state = pagerState, modifier = Modifier.weight(1f).fillMaxWidth()) { index ->
                     val shown = state.pages.getOrNull(index)
                     if (shown == null) {
-                        DonePage(state.set, onBack)
+                        DonePage(state.set, state.opensAt, onBack)
                     } else {
                         AdhkarPageView(
                             page = shown,
@@ -307,11 +308,15 @@ internal fun SessionPagerSync(pagerState: PagerState, page: Int, onSettled: (Int
  * nothing to share — the set is said, and that is all it says. It takes no tap: there is nothing
  * left to count.
  *
+ * A free read finished before its set opened ([opensAt] not null) was read, so it has its done
+ * page, but it is not the day's set: in place of "done" the page says when the set opens, as the
+ * header does.
+ *
  * Centred in the pager's height, and scrolling when that height is short — landscape, or a
  * 200 % font — rather than clipping (spec §3.7).
  */
 @Composable
-private fun DonePage(set: AdhkarSet, onBack: () -> Unit) {
+private fun DonePage(set: AdhkarSet, opensAt: String?, onBack: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val morning = set == AdhkarSet.MORNING
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -335,7 +340,11 @@ private fun DonePage(set: AdhkarSet, onBack: () -> Unit) {
             }
             Spacer(Modifier.height(16.dp))
             Text(
-                stringResource(if (morning) Res.string.adhkar_done_morning else Res.string.adhkar_done_evening),
+                if (opensAt != null) {
+                    opensAtCaption(opensAt)
+                } else {
+                    stringResource(if (morning) Res.string.adhkar_done_morning else Res.string.adhkar_done_evening)
+                },
                 style = TaqwaText.rowLabel,
                 color = colors.textPrimary,
                 textAlign = TextAlign.Center,
@@ -446,10 +455,12 @@ private fun HeaderButton(description: String, onClick: () -> Unit, content: @Com
 
 /**
  * Where the set's time stands (spec §3.4): "Until sunrise · 6:12" in its best time, "After sunrise ·
- * until 12:46" in its make-up time, and the plain window outside both.
+ * until 12:46" in its make-up time, and the plain window outside both. A free read — the set opened
+ * before its opening prayer (spec §3.3) — says when the set opens instead: "From Asr · 16:55".
  */
 @Composable
 private fun phaseCaption(state: AdhkarUiState): String {
+    state.opensAt?.let { return opensAtCaption(it) }
     val morning = state.set == AdhkarSet.MORNING
     // Isolated when it carries a marker: Urdu's Latin "PM" would otherwise land before the digits.
     val until = state.until?.let(::isolatedClock)
@@ -461,6 +472,14 @@ private fun phaseCaption(state: AdhkarUiState): String {
         else -> stringResource(if (morning) Res.string.adhkar_window_morning else Res.string.adhkar_window_evening)
     }
 }
+
+/**
+ * When a set read before it opens does open: [clockTime] is its opening prayer's, isolated as the
+ * phase's time is. Only the evening is ever read before it opens, so the words name Asr.
+ */
+@Composable
+private fun opensAtCaption(clockTime: String): String =
+    stringResource(Res.string.adhkar_opens_at, isolatedClock(clockTime))
 
 /** "4 of 18" and the continue-reading card's 3 dp bar: pages counted over pages. */
 @Composable

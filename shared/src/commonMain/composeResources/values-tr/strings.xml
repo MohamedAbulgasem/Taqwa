@@ -672,4 +672,5 @@
     <string name="notifications_adhkar_subtitle">Sabah ve ikindiden yarım saat sonra</string>
     <string name="credit_adhkar">Zikirler</string>
     <string name="credit_adhkar_detail">Sabah ve akşam zikirleri, Saîd b. Ali b. Vehf el-Kahtânî’nin Hısnü’l-Müslim’inden; Arapça metin ve yapısı, İngilizce çeviri ve okunuş OpenDua veri setinden (Human Development Fund), CC BY 4.0 lisansı; küçük düzeltmeler depoda kayıtlıdır.</string>
+    <string name="adhkar_opens_at">İkindiden itibaren · %1$s</string>
 </resources>

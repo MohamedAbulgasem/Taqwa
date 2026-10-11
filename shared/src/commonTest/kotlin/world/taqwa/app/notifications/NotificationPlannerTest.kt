@@ -2,9 +2,12 @@ package world.taqwa.app.notifications
 
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.AdhanVoice
@@ -512,6 +515,21 @@ class NotificationPlannerTest {
         assertTrue(plan.any { it.id == "ADHKAR-MORNING-${sixth.plus(1, DateTimeUnit.DAY)}" })
         // The id of a day the plan does not reach changes nothing.
         assertEquals(all, planFor(notifications = adhkarOn, windowDays = 3, doneAdhkar = setOf("ADHKAR-MORNING-2026-01-01")))
+    }
+
+    @Test
+    fun `an evening read before asr leaves that evening's reminder planned`() {
+        // A set read before it opens is never marked done (spec §3.3), so the planner is given only
+        // the sets said in full: here the sixth's morning. Planned at 07:12 that day, after the
+        // morning was said and the evening read early, the evening's reminder still lands at Asr
+        // and a half hour; the free read must never find its way into doneAdhkar.
+        val times = engine.timesFor(london, sixth, PrayerSettings())
+        val sevenTwelve = LocalDateTime(sixth, LocalTime(7, 12)).toInstant(TimeZone.of(london.timeZoneId))
+        val done = setOf(adhkarNotificationId(AdhkarSet.MORNING, sixth))
+        val plan = planFor(notifications = adhkarOn, from = sevenTwelve, windowDays = 1, doneAdhkar = done)
+        val evening = plan.single { it.id == adhkarNotificationId(AdhkarSet.EVENING, sixth) }
+        assertEquals(times.time(Prayer.ASR) + 30.minutes, evening.instant)
+        assertTrue(plan.none { it.id in done })
     }
 
     @Test

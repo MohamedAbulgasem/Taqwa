@@ -10,6 +10,9 @@ import world.taqwa.app.domain.PrayerTime
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
@@ -248,5 +251,58 @@ class AdhkarWindowsTest {
             window(AdhkarSet.EVENING, now, chosen),
         )
         assertEquals(date, AdhkarWindows.dateKey(AdhkarSet.EVENING, chosen, oslo))
+    }
+
+    // isOpen: a set counts only from its opening prayer (spec §3.3).
+
+    @Test fun `the evening counts only from asr and on through its make up and after`() {
+        // The device pass's case: an evening set read at 07:12 is not that day's evening.
+        assertFalse(AdhkarWindows.isOpen(AdhkarSet.EVENING, local(5, 12) + 1.hours, today))
+        assertFalse(AdhkarWindows.isOpen(AdhkarSet.EVENING, local(16, 0) - 1.minutes, today))
+        // Asr is the first instant it counts; the closing is unchanged, so the make-up after
+        // Maghrib counts as it always has, and so does the rest of the night.
+        assertTrue(AdhkarWindows.isOpen(AdhkarSet.EVENING, local(16, 0), today))
+        assertTrue(AdhkarWindows.isOpen(AdhkarSet.EVENING, local(18, 30) + 1.hours, today))
+        assertTrue(AdhkarWindows.isOpen(AdhkarSet.EVENING, local(19, 45) + 1.minutes, today))
+        assertEquals(local(16, 0), AdhkarWindows.opensAt(AdhkarSet.EVENING, today))
+    }
+
+    @Test fun `the morning counts from fajr and until the next fajr is still the previous day's`() {
+        assertTrue(AdhkarWindows.isOpen(AdhkarSet.MORNING, local(5, 12), today))
+        assertTrue(AdhkarWindows.isOpen(AdhkarSet.MORNING, local(12, 45) + 1.hours, today))
+        assertEquals(local(5, 12), AdhkarWindows.opensAt(AdhkarSet.MORNING, today))
+        // At 03:00 the day is yesterday's, and both of yesterday's sets have long opened.
+        val threeAm = local(3, 0, on = nextDay)
+        val previous = AdhkarWindows.dayFor(threeAm, tripoli) { day(on = it) }
+        assertEquals(date, previous.date)
+        assertTrue(AdhkarWindows.isOpen(AdhkarSet.MORNING, threeAm, previous))
+        assertTrue(AdhkarWindows.isOpen(AdhkarSet.EVENING, threeAm, previous))
+    }
+
+    @Test fun `dayFor never hands back a day whose fajr is still ahead so a morning is never early`() {
+        // The proof that the morning needs no rule of its own: whatever the instant, the day dayFor
+        // picks has its Fajr at or before it. Every seven minutes over three days in Tripoli, and
+        // over the Tromso days whose Fajr is at one in the morning.
+        val oslo = TimeZone.of("Europe/Oslo")
+        val tromso: (LocalDate) -> DayPrayerTimes = { on ->
+            day(
+                on = on,
+                fajr = local(1, 7, oslo, on),
+                sunrise = local(1, 8, oslo, on),
+                dhuhr = local(12, 52, oslo, on),
+                asr = local(18, 55, oslo, on),
+                maghrib = local(23, 50, oslo, on),
+                isha = local(23, 58, oslo, on),
+            )
+        }
+        val cases = listOf(Triple(tripoli, local(0, 0), { on: LocalDate -> day(on = on) }), Triple(oslo, local(0, 0, oslo), tromso))
+        for ((zone, start, timesFor) in cases) {
+            var now = start
+            while (now < start + 72.hours) {
+                val chosen = AdhkarWindows.dayFor(now, zone, timesFor)
+                assertTrue(AdhkarWindows.isOpen(AdhkarSet.MORNING, now, chosen), "morning not open at " + now)
+                now += 7.minutes
+            }
+        }
     }
 }

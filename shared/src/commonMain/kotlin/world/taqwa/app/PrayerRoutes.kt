@@ -213,7 +213,9 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
             scope = scope,
             // A set said in full (spec §5): marked, so no later reschedule arms its reminder again,
             // and the day's reminder withdrawn at once, pending or already on screen — withdrawn
-            // even if the mark cannot be written (a full disk): the set is said either way.
+            // even if the mark cannot be written (a full disk): the set is said either way. Only
+            // the day's set is reported: an evening read before Asr is a free read (spec §3.3)
+            // that never reaches here, so its reminder stands.
             onSetCompleted = { finished, date ->
                 try {
                     container.adhkarStore.markDone(finished, date)
