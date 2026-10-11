@@ -5,10 +5,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -29,13 +31,19 @@ import world.taqwa.app.design.LocalTaqwaColors
  * with the accent. The selected label uses `colors.background` rather than a literal white — the
  * same choice the prayer-times method switch already makes — so it stays legible against the
  * accent in both themes rather than only in light mode.
+ *
+ * 44 dp tall, and taller only when a label needs it — a 200 % font, or a label that wraps — so
+ * the text is never cut. The height is the tallest label's own (`IntrinsicSize.Min`) with 44 dp as
+ * the floor, never "as tall as allowed": the adhkar screen hands the switch a bounded height, and
+ * the options' `fillMaxHeight` would stretch a pill sized only by a minimum to fill it.
  */
 @Composable
 fun TaqwaSegmented(options: List<String>, selectedIndex: Int, onSelect: (Int) -> Unit) {
     val colors = LocalTaqwaColors.current
     Row(
         Modifier
-            .height(44.dp)
+            .heightIn(min = 44.dp)
+            .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(percent = 50))
             .background(colors.surface)
             .border(1.dp, colors.hairline, RoundedCornerShape(percent = 50)),
