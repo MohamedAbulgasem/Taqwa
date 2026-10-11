@@ -2060,7 +2060,7 @@ private val CASES_10: Array<String> = arrayOf(
     "-6293;106790;Asia/Jakarta;ID;;2029-03-20;CHOSEN:other.ummalqura;-133;-64;301;492;559;665;755;663;-135;-;0",
     "24785;46675;Asia/Riyadh;SA;;2026-02-21;CHOSEN:other.karachi;128;202;549;746;795;892;968;891;126;-;0",
     "24785;46675;Asia/Riyadh;SA;;2029-06-21;CHOSEN:other.karachi;37;124;537;738;819;946;1036;945;35;-;0",
-    "51420;-181;Europe/London;GB;;2027-03-20;CHOSEN:other.moonsighting;272;363;734;977;927;1097;1172;1093;270;-;0",
+    "51420;-181;Europe/London;GB;;2027-03-20;CHOSEN:other.moonsighting;273;363;734;977;927;1097;1172;1093;270;-;0",
     "51420;-181;Europe/London;GB;;2029-09-22;CHOSEN:other.moonsighting;255;346;719;963;913;1083;1157;1078;253;-;0",
     "43635;-79540;America/Toronto;CA;;2027-06-21;CHOSEN:other.turkey;435;569;1046;1366;1292;1511;1635;1503;433;-;0",
     "43635;-79540;America/Toronto;CA;;2029-12-21;CHOSEN:other.turkey;665;760;1042;1208;1173;1312;1403;1303;663;-;0",

@@ -3492,3 +3492,254 @@ The Arabic and Urdu store shots, `prayer-dark-ar.webp` and `prayer-{light,dark}-
 are in Western digits, which keep the comma. The Bengali ones keep it too (২,৯১৬), and the English
 ones are unchanged. No screenshot shows a changed sentence: the onboarding is in none, and the
 exact-alarm warning shows only with the permission off.
+
+## The Moonsighting Committee's own rule, to the edge of the midnight sun (11 October) — the T3 round
+
+The kz-north-west round's probe of the curves' 0.1° grid found Settings › Other › Moonsighting
+Committee early near 55° N, in build 35 and on `main`, for anyone who chose it. Its curves were read
+at the latitude rounded to 0.1°, and so was its switch to a seventh of the night at 55°. From 54.95° to
+55° N, at Newcastle upon Tyne, Gateshead, South Shields, Derry and Omsk, the seventh therefore took
+the seasonal rule's place.
+
+**The reference.** The Committee's own tables (moonsighting.com's praytable for 2026) were fetched at 23
+places, from Newcastle to Tromsø and from Ushuaia to Esperanza. They are in the private archive
+(`raw/manual/mcw/2026-10-11/`, `tables/manual/mcw/2026-10-11/`) with 23 rows in `MANIFEST.tsv`, and
+the archive's Toronto table was added to them. They settle three points where adhan2's preset, the old
+engine's, differs or is silent:
+- The switch is at the place's own latitude, as adhan2 has it. Newcastle (54.97° N) has the seasonal
+  rule, and Gosforth (55.0°) and Tynemouth (55.02°) have the seventh.
+- The seventh begins at 55° S too, where adhan2's preset has none. At Isla Hornos, in the Drake Passage,
+  at Orcadas and at Esperanza, the Committee's Fajr is up to 102 min after adhan2's and its Isha up to
+  53 min before it.
+- Fajr's seventh counts the night before sunrise; adhan2 counts the night after. From 55° to 66° N the
+  night before matches the Committee's tables to the minute on 72–88 % of their days, and the night
+  after on 42–82 %.
+
+The engine now follows the Committee's own rule. Where adhan2 has that rule too, the engine is also
+held to adhan2's figures.
+
+**What `main` got wrong.** Each time was checked against the rule computed with this core's own sun
+at the place itself, every 0.01° from 66° S to 66° N on every day of 2026, and against the Committee's
+own tables:
+- From 54.95° to 55° N, Isha came up to 24 min early on 70–71 days a year, May to July: 24 min before
+  the Committee's own printed Isha at Newcastle. Fajr came up to 68 min late there.
+- Between the 0.1° steps, near the sun's lowest point:
+  - Fajr up to 5 min early from 64.6° N, and up to 8 min south of 54° S, on the poleward side of a step.
+  - Isha up to 2 min early near 65.9° N.
+- From 65.3° N the end of eating came up to 7 min after the rule, and 6 min after the Committee's own
+  printed Fajr at Luleå and Akureyri. Its cap, a quarter of a degree short of the sun's lowest, lay
+  above the horizon there.
+- South of 55° S, Fajr was up to 91 min before the Committee's own (at Orcadas). Beyond 62° S, adhan2's
+  seasonal Isha falls after the middle of the night, and the curve cannot reach it.
+
+**The fix** (`TwilightCurves.kt`, `PlaceCurves`):
+- The switch at 55° is decided at the place's own latitude, north and south.
+- Each start curve is read twice, and each slot takes the later start:
+  - on the grid, as before;
+  - at the place's own latitude, with the sun at its own local noon (at 150° E, 12:00 UTC is ten hours
+    off, which with the leap cycle's drift put Fajr a minute early near 65° N in July).
+- Where the night is short (the sun no lower than 3° on some night of the cycle), each start is read a
+  third time: on every day of the leap cycle, with the sun's declination at the moment. On the edge of
+  the midnight sun the reference year's own day can have no night, and the curve then took a
+  neighbour's deeper dawn. Fajr came 2 min before the rule at 65.8° N on 16 June 2027.
+- Every slot is held to what the sun reaches there: the least the sun sinks that night in any year of
+  the cycle, less two thousandths of a degree (the night before the civil date's sunrise in the place's
+  zone; the review's fix round below).
+  - A Fajr dawn is capped there.
+  - An Isha deeper than that is left unreached (18°), so the high-latitude rule sets it, later than the
+    rule's own.
+- The end is the rule read as an end, on the grid and at the place itself (at the place's own noon,
+  each civil date's in its zone since the review's fix round).
+  It counts the longer of the nights around the day, so it is the earlier of the two definitions. A
+  slot the sun does not reach is read as the middle of the night: `EndOfEating.DawnOrMiddle` now takes
+  a curve.
+- The sun's declination over the cycle is computed once, every 6 h, and interpolated. A resolution
+  costs 1.5 ms on the Mac, against 0.8 before, once per place and cached.
+- The Grande Mosquée de Paris keeps its gated grid curve at its table's own point. Read in full there,
+  its Fajr went a minute later on at least 85 of the 303 checked days. Beyond its reach, its Fajr reads
+  the Committee's rule in full, and its end floors (in and beyond the reach) read it at the place's
+  own latitude and longitude.
+
+**What it gives now.**
+- Against the rule with this core's sun (Fajr the later of the two nights' for starts, the
+  Committee's own for ends), every 0.01° from 66° S to 66° N on every day of 2025–2028 (on the prime
+  meridian, at 150° E and 120° W, and in Helsinki's and London's own zones):
+  - no early Fajr or Isha and no late sunrise;
+  - no end after the Committee's own Fajr;
+  - at worst the shown minute is 6 s before the rule's exact moment, which a table prints as that
+    minute.
+- On a few days at the edge of the midnight sun (65.7–66°), the rule's Fajr is within a minute or two
+  of sunrise. There the Fajr shown is declared not followed (ruling R90).
+- Against adhan2's own night-after Fajr, the end comes 1–4 min after it on one day a year, at a few
+  latitudes from 65.78° to 66° N and S. That is the first night after the midnight sun: the night has
+  more than tripled overnight, and adhan2 puts its Fajr before the middle of the night just ended, so
+  no dawn that night is earlier.
+- Against the Committee's own tables:
+  - no early start and no late end at any of 19 places, from 43.7° N to 65.7° N and from 54.8° S to
+    63.4° S;
+  - at Kemi, Boden, Tornio and Usinsk (65.7–66.0° N), 2–4 cells each differ, on the days next to the
+    midnight sun. On those days the tables' sunrise and sunset are up to 51 min from the sun's own, and
+    the tables contradict themselves: an Isha 80 min after a Maghrib on a night of minutes, a Fajr
+    130 min before sunrise.
+- Lateness against the Committee's own tables:
+
+  | Where | Fajr up to | Isha up to |
+  |---|---|---|
+  | Newcastle | 4 min | 2 min |
+  | Oslo | 5 min | 3 min |
+  | Luleå | 7 min | 6 min |
+  | Akureyri | 7 min | 9 min |
+
+  Akureyri's Isha was 5 min on `main`. The extra minutes are June's short nights, where the
+  high-latitude rule sets Isha.
+
+**Tests.** `MoonsightingCommitteeTest` (common) covers:
+- Newcastle all year;
+- the switch either side of 55° N;
+- Isla Hornos;
+- Luleå and Kemi over 16 months.
+
+`MoonsightingSweepTest` (JVM) checks 6.8 million place-days in under a minute. Both fail on `main`'s
+engine, in all five tests. `CommitteeRule` is their reference.
+
+**What moved.** Branch against `main`, every 0.01° on every day of 2026 at 0° in UTC, along the UK's
+1.6° W in 2027, and along Paris's meridian for the Grande Mosquée and France's cautious entry:
+- Settings › Other › Moonsighting Committee:
+  - From 54.95° to 55° N, Isha is later by up to 25 min and Fajr earlier by up to 66 min, to the
+    Committee's own.
+  - From 40° to 64° N and S, Fajr and Isha are later on 1.6–12 % of the days, by a minute (up to 3 at
+    64° N), and never earlier. The end is a minute earlier on 2–29 % (2 min from 60° N) and never later.
+  - From 64° to 66°:
+    - Fajr is later by up to 30 min near the midnight sun;
+    - Isha is later by up to 26 min, and earlier on 34 place-days by up to 7, never before the rule's
+      or adhan2's;
+    - sunrise is later by up to 5 min on 118 place-days, where R90's precaution gives way, never after
+      the sun's;
+    - the end is earlier by up to 34 min, the middle of the night.
+  - South of 55° S, to the Committee's own:
+    - Fajr later by up to 98 min;
+    - Isha earlier by up to 68;
+    - the end later by up to 96 min.
+
+    Beyond 62° S, where `main` was far off, they also move the other way: Fajr up to 24 min earlier,
+    Isha up to 26 later, the end up to 35 earlier. Nobody in the app's city list lives there; its southernmost city is Ushuaia, at
+    54.8° S.
+- The Grande Mosquée: unchanged at its table's point. Beyond its reach, Fajr is a minute later on 1–4 %
+  of days, and the end a minute earlier on under 0.2 %.
+- France's cautious entry: unchanged.
+
+The golden vector moved on 1 of its 2,071 rows: the Committee at the London seed, 20 March 2027, Fajr
+1 min later. No stamp's figures moved. Every stamp's `engineHash` did, because `DayComputer.kt` and
+`TimetableMethod.kt` are core.
+
+Checked:
+- the whole gate: 10,997 rows and 4,001,889 place-days, 0 early, 0 late ends, none over a limit,
+  nothing BROKEN;
+- tools `jvmTest` 307/0 with the archive;
+- `checkStamps` (71 entries) green;
+- `:shared:testAndroidHostTest` 1,619/0, and `:shared:compileTestKotlinIosSimulatorArm64`;
+- `CI=true generate`; the site builds 164 pages, all checks good; the site tests pass 18/18.
+
+The engine change ships with the first update, not 1.0.0 (35).
+
+## The Committee's own noon across the date line (11 October) — the T3 review's fix round
+
+The review swept the T3 round's engine in real zones the round had not used, and found one place where
+it still broke never-early.
+
+**What the review found.** The round's own reads at the place took each civil date's noon as 12:00 local
+mean time on the UTC date. Where the zone puts the civil date a day from the solar one, that is a day
+off. East of 180° in Chukotka's UTC+12 (Asia/Anadyr: Provideniya, Lavrentiya, Lorino and Sireniki, at
+169–174° W), each civil date's noon is the solar day before the UTC date's. The grid's read at 12:00 UTC
+is then 12.5 h off, on top of the leap cycle's drift, which the envelope's day either side does not
+cover. Against the rule every 0.05° from 58° to 66° N at 173.23° W, on every day of 2025–2028:
+- Fajr was 1–2 min before the rule's printed minute on 1,095 place-days, July to September, from
+  58.45° N up;
+- the end of eating was 1–2 min after the Committee's own Fajr on 932 place-days, April to June;
+- with the legacy "seventh" choice, there were 264 early Fajr and 175 late ends.
+
+`main` fails the same sweep worse: Fajr up to 8 min early on 1,666 place-days, and ends up to 11 min
+late on 12,465.
+
+**The fix** (`TwilightCurves.CivilNoons`; `Registry` and `PlaceCurves` pass the user's zone):
+- Each of the place's own reads takes the civil date's own noon in the place's zone, as the engine's
+  own clock snaps its transit onto the civil date. That covers the start curves, the leap-cycle third
+  read and the end's own read.
+- The zone's offset is sampled every 30 days over the cycle. Where every sample gives the same shift,
+  with local mean noon at least 3 h from midnight, that shift holds every day. Elsewhere it is looked
+  up day by day.
+- Every zone whose civil date is the solar one has a shift of 0, so nothing moves there. The zones that
+  do shift lie near the date line: Chukotka east of 180°, Samoa, Tonga, Tokelau, Kiribati's Phoenix and
+  Line Islands, Wallis, eastern Fiji and the Chatham Islands, plus Attu in the Aleutians the other way.
+- The reach caps (`shallowestNights`) read the night before the civil date's own sunrise. Chukotka's
+  lowest point already lay inside their window. Where a zone puts it within an hour of the window's
+  ends, the window now also takes an hour either side of the place's own. That covers the Line Islands'
+  UTC+14.
+- The Grande Mosquée de Paris's Committee reads take the zone too. Paris's shift is 0, so its figures
+  do not move.
+- The comments that said "at any longitude" now say which nights are held.
+
+**The entry's equator curves.** `Generic.moonsighting` built its own method's curves at the equator
+when the registry first loaded. No resolution reads them: every one places the method at the user's
+point. That build cost every user's first use of the registry the Committee's whole read, for a method
+few choose. The entry's method now carries no curves.
+
+Measured on the Mac, in a fresh test JVM (not on a phone):
+- the Committee's reads at the equator, done cold after the registry: 12–14 ms;
+- the registry's first use: 58 ms, against 68–71 ms with the T3 round's engine and 65–88 ms on `main`
+  (the runs are noisy);
+- a warm resolution of the Other method at Newcastle: 1.7–1.9 ms, against 1.6 in the T3 round and 0.8
+  on `main`. With a zone look-up on every day it was 2.1–2.3 ms, hence the sampling.
+
+**The Committee's rounding.** At its 18 places off the midnight sun's edge, the 2026 tables print Fajr,
+sunrise and Isha within 30 s of the rule's exact moment (with this core's sun) on 85–89 % of 19,709
+cells. They fall as often on either side, and every Fajr and Isha is within 75 s. That is
+nearest-minute rounding, with their sun a few tens of seconds from this core's. A floor or a ceiling
+would put them all on one side. The tests' "printed minute" is therefore the nearest one, and the sweep
+test says so.
+
+**What moved.** These are the date-line places only; the 23 Committee table places dump byte for byte
+as in the T3 round. Every shown Fajr, sunrise, Isha and end of eating was dumped on every day of
+2025–2028.
+- Against `main`, at Provideniya, Lavrentiya, Lorino and Sireniki, times move only the safe way: Fajr
+  and Isha are later by up to 4 min, and the end earlier by up to 9.
+- Against the T3 round's engine, they move both ways by up to 4 min. The round's own read had been a
+  day off.
+- Along 173.23° W from 58° to 66° N, against `main`, the pattern is the T3 round's at 0° from 64° N:
+  - Fajr later by up to 30 min near the midnight sun, and earlier on 2 place-days, by 3 min (where
+    `main` had declared it not followed) and by 1 min, never before the rule;
+  - Isha later by up to 26 min, and earlier on 22 place-days by up to 9, never before the rule;
+  - sunrise later on 93 place-days by up to 5 min, where ruling R90's precaution gives way, never after
+    the sun's own;
+  - the end earlier by up to 35 min.
+- In the app's city list only Apia, Nukuʻalofa and Mata-Utu are in shifting zones. Against `main`
+  their Isha is a minute later on 6, 15 and 16 days of the four years, and nothing else moves. Against
+  the T3 round their Isha moves a minute either way on 22–28 days.
+- The Chatham Islands and Attu: Fajr and Isha a minute later, the end a minute earlier, against `main`.
+
+The golden vector did not move; it has no place in a shifting zone. No stamp's figures moved. Every
+stamp's `engineHash` moved again, because `Registry.kt` is core.
+
+**Tests.**
+- `MoonsightingCommitteeTest` adds Provideniya from April 2026 to September 2027, and it fails on the
+  T3 round's engine.
+- `MoonsightingSweepTest` now also sweeps three places:
+  - Asia/Anadyr at 173.23° W, 58–66° N every 0.05°;
+  - the Chatham Islands at 176.5° W, 40–47° S every 0.05°, with summer time;
+  - Alaska's summer time at 149.9° W, 55–66° N every 0.1°.
+
+  That is 7.4 million place-days in 58 s on four threads. It failed at 455 places on the T3 round's
+  engine. It now passes, with 40 Fajr declared under R90 and 10 first-night ends after adhan2's.
+- The review's own wider sweep (the Tyne every 0.002°, Punta Arenas, Reykjavik, Yakutsk, Magadan, the
+  legacy choices) gives the same counts as in the T3 round everywhere else.
+
+Checked:
+- the whole gate: 10,997 rows and 4,001,889 place-days, 0 early, 0 late ends, none over a limit,
+  nothing BROKEN;
+- tools `jvmTest` 307/0 with the archive;
+- `:shared:testAndroidHostTest` 1,620/0, and `:shared:compileTestKotlinIosSimulatorArm64`.
+
+**Left to the owner** (the report's decisions):
+- the midnight-sun-edge cells where the engine and the Committee's own 2026 tables disagree;
+- the lateness the high-latitude rule adds there (Akureyri's Isha up to 9 min);
+- the new minute of sunrise after the table's at Tornio on 12 June.

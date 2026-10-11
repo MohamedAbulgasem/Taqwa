@@ -102,9 +102,22 @@ sealed interface EndOfEating {
      * does not get that low, the middle of the night (last sunset to sunrise), whatever the method's
      * own high-latitude rule. The UK's 18° families print their summer Fajr, which is also when
      * their fast begins, at the middle of the night on the nights without 18° (research-uk, ruling
-     * R75), while their Fajr start keeps its own rule.
+     * R75), while their Fajr start keeps its own rule. With [bySlot], 366 depressions by month and
+     * day at [curveSlot] replacing [degrees], as [DawnAngle]'s (the Moonsighting Committee's own Fajr
+     * read as an end, whose slots on the edge of the midnight sun the sun does not reach: there the
+     * middle of the night, T3 round of 11 Oct 2026).
      */
-    data class DawnOrMiddle(val degrees: Double) : EndOfEating
+    data class DawnOrMiddle(val degrees: Double, val bySlot: DoubleArray? = null) : EndOfEating {
+        init {
+            require(bySlot == null || bySlot.size == 366) { "an end-of-eating curve needs 366 values" }
+        }
+
+        /** The depression on [date]. */
+        fun degreesOn(date: LocalDate): Double = bySlot?.get(curveSlot(date)) ?: degrees
+
+        /** The deepest depression it reads on any day. */
+        val deepest: Double get() = bySlot?.max() ?: degrees
+    }
 }
 
 /**
