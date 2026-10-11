@@ -127,7 +127,8 @@ import kotlin.time.Instant
 sealed interface AboutTimesUiState {
     val resolution: Resolution
 
-    data class AuthorityChecked(override val resolution: Resolution, val stamp: ProofStamp?) : AboutTimesUiState
+    /** [date] is the day About is read on: the "checked through" date is the end of the checked run holding it ([checkedThrough]). */
+    data class AuthorityChecked(override val resolution: Resolution, val stamp: ProofStamp?, val date: LocalDate) : AboutTimesUiState
     data class AuthorityUnchecked(override val resolution: Resolution, val stamp: ProofStamp?) : AboutTimesUiState
 
     /**
@@ -164,7 +165,7 @@ sealed interface AboutTimesUiState {
 fun aboutTimesUiState(engineDay: EngineDay, place: Place, date: LocalDate, hijriOffsetDays: Int = 0): AboutTimesUiState {
     val resolution = engineDay.effective
     return when (resolution.about) {
-        AboutTemplate.AUTHORITY_CHECKED -> AboutTimesUiState.AuthorityChecked(resolution, ProofStamps.of(resolution.entry.id))
+        AboutTemplate.AUTHORITY_CHECKED -> AboutTimesUiState.AuthorityChecked(resolution, ProofStamps.of(resolution.entry.id), date)
         AboutTemplate.AUTHORITY_UNCHECKED -> AboutTimesUiState.AuthorityUnchecked(resolution, ProofStamps.of(resolution.entry.id))
         AboutTemplate.CAUTIOUS -> {
             val zone = TimeZone.of(place.zoneId)
@@ -257,7 +258,7 @@ private fun AuthorityCheckedContent(
                     stringResource(Res.string.about_stat_at_most_after),
             ),
         )
-        checkedThrough(resolution, stamp)?.let { through ->
+        checkedThrough(resolution, stamp, state.date)?.let { through ->
             SectionBody(
                 stringResource(Res.string.about_checked_through, authority, format.longDate(LocalDate.parse(through))),
             )
@@ -774,14 +775,30 @@ private fun startsOf(keys: Set<String>): Set<String> =
     keys.filter { it in START_KEYS }.map { if (it.startsWith("asr")) "asr" else it }.toSet()
 
 /**
- * The checked template's "checked against {authority}'s timetable through {date}": the user's own unit's last
- * checked date where the stamp checks the entry by unit and that unit's rows end before the entry's (the
- * city-points round of 9 Oct 2026: Madinah's own tables end with 2027, Makkah's with 2030), as the city page's date
- * is its unit's (ruling R115); the entry's own last date otherwise. Pure so a test can check it against a
- * committed stamp.
+ * The checked template's "checked against {authority}'s timetable through {date}" on [date] (ruling R115, as the city
+ * page's date): the end of the checked run holding [date] in the user's own unit's runs where the stamp checks the
+ * entry by unit (Madinah's own tables end with 2027, Makkah's with 2030), the entry's runs otherwise. So the date
+ * never runs past a day no table was checked on: Zürich's and Türkiye's tables are checked to 1 November 2026 and
+ * again from 1 January 2027, and About says 1 November 2026 until then, never 31 December 2027. On a day no run
+ * holds, the end of the latest run before it (a date already past, claiming nothing of the days ahead); null where
+ * every run is after it. Pure so a test can check it against a committed stamp.
  */
-internal fun checkedThrough(resolution: Resolution, stamp: ProofStamp): String? =
-    resolution.unitId?.takeIf { stamp.worstLateByUnit.isNotEmpty() }?.let { stamp.provenThroughByUnit[it] } ?: stamp.provenThrough
+internal fun checkedThrough(resolution: Resolution, stamp: ProofStamp, date: LocalDate): String? {
+    val runs = resolution.unitId?.takeIf { stamp.worstLateByUnit.isNotEmpty() }?.let { stamp.checkedByUnit[it] } ?: stamp.checked
+    return checkedRunEnd(runs, date)
+}
+
+/** [runs] as a stamp writes them ("2026-09-25..2026-11-01", or one date): see [checkedThrough]. */
+internal fun checkedRunEnd(runs: List<String>, date: LocalDate): String? {
+    var before: LocalDate? = null
+    for (run in runs) {
+        val start = LocalDate.parse(run.substringBefore(".."))
+        val end = LocalDate.parse(run.substringAfter(".."))
+        if (date in start..end) return end.toString()
+        if (end < date && (before == null || end > before)) before = end
+    }
+    return before?.toString()
+}
 
 /**
  * The app city About names the place by instead of the location's own ([locationCityId], the location's city in the

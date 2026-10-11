@@ -70,12 +70,14 @@ private class ReadStamp(
     val places: Int,
     val placeDays: Int,
     val ramadanDays: Int,
-    val provenThrough: String?,
+    val lastChecked: String?,
     val worstLateMinutes: Map<String, Int>,
     val worstLateByUnit: Map<String, Map<String, Int>>,
     val lateLimits: List<Triple<Int, String?, List<String>>>,
-    /** Each unit's last checked date, where it is before the entry's own ([provenThrough]). */
-    val provenThroughByUnit: Map<String, String> = emptyMap(),
+    /** The entry's checked days as the stamp writes its runs ("2026-09-25..2026-11-01", or one date). */
+    val checked: List<String> = emptyList(),
+    /** Each unit's own runs, where they are not the entry's. */
+    val checkedByUnit: Map<String, List<String>> = emptyMap(),
 )
 
 @Suppress("UNCHECKED_CAST")
@@ -89,13 +91,14 @@ private fun readStamp(file: File): ReadStamp {
     val worstByUnit = (root["units"] as? Map<String, Any?> ?: emptyMap()).entries.associate { (unit, stats) ->
         unit to worstOf((stats as Map<String, Any?>)["events"] as? Map<String, Any?> ?: emptyMap())
     }
-    // Ruling R115's checked runs per unit ("2025-01-01..2027-12-31"): a unit's own last date, where it is before the
-    // entry's, so that About says through which date the place's own unit was checked, as its city page does.
-    val last = root["last"] as? String
-    val throughByUnit = (root["units"] as? Map<String, Any?> ?: emptyMap()).entries.mapNotNull { (unit, stats) ->
-        val runs = (stats as Map<String, Any?>)["checked"] as? List<Any?> ?: return@mapNotNull null
-        val end = (runs.lastOrNull() as? String)?.substringAfter("..") ?: return@mapNotNull null
-        (unit to end).takeIf { last != null && end < last }
+    // Ruling R115's checked runs ("2026-09-25..2026-11-01"), the entry's and each unit's where they differ: About's
+    // date is the end of the run holding the day it is read on, so it never runs past a day no table was checked on
+    // (ch.fids's and Diyanet's November and December 2026), as the city page's date never does.
+    fun runsOf(value: Any?): List<String> = (value as? List<Any?>).orEmpty().map { it as String }
+    val checked = runsOf(root["checked"])
+    val checkedByUnit = (root["units"] as? Map<String, Any?> ?: emptyMap()).entries.mapNotNull { (unit, stats) ->
+        val runs = runsOf((stats as Map<String, Any?>)["checked"])
+        (unit to runs).takeIf { runs.isNotEmpty() && runs != checked }
     }.toMap()
     val lateLimitsRaw = root["lateLimits"] as? Map<String, Any?> ?: emptyMap()
     // A trailing " (event)" disambiguates two limits that share a source and minutes but differ
@@ -115,11 +118,12 @@ private fun readStamp(file: File): ReadStamp {
         places = (root["places"] as? Long ?: 0L).toInt(),
         placeDays = (root["placeDays"] as? Long ?: 0L).toInt(),
         ramadanDays = (root["ramadanDays"] as? Long ?: 0L).toInt(),
-        provenThrough = root["last"] as? String,
+        lastChecked = root["last"] as? String,
         worstLateMinutes = worstLate,
         worstLateByUnit = worstByUnit,
         lateLimits = lateLimits,
-        provenThroughByUnit = throughByUnit,
+        checked = checked,
+        checkedByUnit = checkedByUnit,
     )
 }
 
@@ -147,7 +151,7 @@ private fun render(stamps: List<ReadStamp>): String = buildString {
         append("        places = ${s.places},\n")
         append("        placeDays = ${s.placeDays},\n")
         append("        ramadanDays = ${s.ramadanDays},\n")
-        append("        provenThrough = ${s.provenThrough?.let(::literal) ?: "null"},\n")
+        append("        lastChecked = ${s.lastChecked?.let(::literal) ?: "null"},\n")
         append("        worstLateMinutes = ${worstLiteral(s.worstLateMinutes)},\n")
         when (chunks.size) {
             0 -> append("        worstLateByUnit = emptyMap(),\n")
@@ -165,12 +169,19 @@ private fun render(stamps: List<ReadStamp>): String = buildString {
             }
             append("        ),\n")
         }
-        if (s.provenThroughByUnit.isNotEmpty()) append("        provenThroughByUnit = ${name}Through(),\n")
+        append("        checked = ${runsLiteral(s.checked)},\n")
+        val runChunks = s.checkedByUnit.entries.sortedBy { it.key }.chunked(UNITS_PER_FUNCTION)
+        when (runChunks.size) {
+            0 -> {}
+            1 -> append("        checkedByUnit = ${name}Checked(),\n")
+            else -> append("        checkedByUnit = ${runChunks.indices.joinToString(" + ") { "${name}Checked${it + 1}()" }},\n")
+        }
         append("    )\n")
-        if (s.provenThroughByUnit.isNotEmpty()) {
+        runChunks.forEachIndexed { index, chunk ->
+            val suffix = if (runChunks.size == 1) "" else "${index + 1}"
             append("\n")
-            append("    private fun ${name}Through(): Map<String, String> = mapOf(\n")
-            for ((unit, through) in s.provenThroughByUnit.entries.sortedBy { it.key }) append("        ${literal(unit)} to ${literal(through)},\n")
+            append("    private fun ${name}Checked$suffix(): Map<String, List<String>> = mapOf(\n")
+            for ((unit, runs) in chunk) append("        ${literal(unit)} to ${runsLiteral(runs)},\n")
             append("    )\n")
         }
         chunks.forEachIndexed { index, chunk ->
@@ -196,6 +207,9 @@ private fun functionName(entryId: String): String {
 private fun worstLiteral(worst: Map<String, Int>): String =
     "mapOf(" + worst.entries.sortedBy { it.key }.joinToString(", ") { (k, v) -> "${literal(k)} to $v" } + ")"
 
+private fun runsLiteral(runs: List<String>): String =
+    if (runs.isEmpty()) "emptyList()" else "listOf(" + runs.joinToString(", ") { literal(it) } + ")"
+
 private fun literal(s: String): String = "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 private val HEADER = """
@@ -209,16 +223,19 @@ private val HEADER = """
 
     /**
      * One registry entry's proof, as the About-times screen shows it (spec §2.3, task 11): how many
-     * place-days and places the gate has checked it on, the last date it holds (`provenThrough`, null
-     * before any stamp exists), the worst lateness seen per event over the whole entry
+     * place-days and places the gate has checked it on, the last date any row holds (`lastChecked`, the
+     * stamp's `last`, null before any stamp exists: the end of the envelope, never a "checked through"
+     * claim, since the days before it may have holes), the worst lateness seen per event over the whole entry
      * (`worstLateMinutes`, event keys as the gate writes them: "fajr", "sunrise", "dhuhr", "asr" or
      * "asrStandard"/"asrHanafi", "maghrib", "isha", "endOfEating", "imsak") and per authority unit
      * (`worstLateByUnit`, keyed by the unit's id; empty for an entry the gate checks without units),
      * and the late limits the gate held the entry to when the stamp was written ([ProofLateLimit],
      * ruling R41): the class's own (A 1, B 2, C 1 after the latest member, D 3), listed with a null
      * reason, and each recorded exception with its reason, each with the events it covered.
-     * `provenThroughByUnit` is each unit's own last checked date where it is before the entry's
-     * (`provenThrough`): the date About gives for a place in that unit, as its city page does (ruling R115).
+     * `checked` is the days any row compared, as the stamp's runs ("2026-09-25..2026-11-01", or one
+     * date), and `checkedByUnit` a unit's own runs where they are not the entry's (ruling R115): About's
+     * "checked through" date is the end of the run holding the day it is read on, so it never runs past a
+     * day the place's own table was not checked on, as its city page's date never does.
      *
      * A unit or entry with no stamp file (an authority not yet gated, or a class with no official
      * days) has no row: [ProofStamps.of] returns null, and the screen reads that as "not yet compared"
@@ -229,11 +246,12 @@ private val HEADER = """
         val places: Int,
         val placeDays: Int,
         val ramadanDays: Int,
-        val provenThrough: String?,
+        val lastChecked: String?,
         val worstLateMinutes: Map<String, Int>,
         val worstLateByUnit: Map<String, Map<String, Int>>,
         val lateLimits: List<ProofLateLimit>,
-        val provenThroughByUnit: Map<String, String> = emptyMap(),
+        val checked: List<String> = emptyList(),
+        val checkedByUnit: Map<String, List<String>> = emptyMap(),
     )
 
     /**

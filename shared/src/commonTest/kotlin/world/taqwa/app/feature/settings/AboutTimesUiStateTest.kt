@@ -266,16 +266,37 @@ class AboutTimesUiStateTest {
     @Test
     fun `a saudi city's checked-through date is its own unit's as on its city page`() {
         // Ruling R115's date, per unit: Madinah's own tables end before Makkah's (KACST's 2024-2030 at Makkah), and
-        // About gives each city its own unit's last date, not the entry's latest.
+        // About gives each city the end of its own unit's checked run, not the entry's latest.
         val makkah = stateFor(Place(21.42664, 39.82563, "Asia/Riyadh", "SA"))
         val madinah = stateFor(Place(24.46861, 39.61417, "Asia/Riyadh", "SA"))
         assertIs<AboutTimesUiState.AuthorityChecked>(makkah)
         assertIs<AboutTimesUiState.AuthorityChecked>(madinah)
         val stamp = requireNotNull(makkah.stamp)
-        assertEquals(stamp.provenThrough, checkedThrough(makkah.resolution, stamp))
-        val own = requireNotNull(checkedThrough(madinah.resolution, stamp))
-        assertEquals(stamp.provenThroughByUnit.getValue("madinah"), own)
-        assertTrue(own < stamp.provenThrough!!, "Madinah through $own")
+        assertEquals(stamp.lastChecked, checkedThrough(makkah.resolution, stamp, makkah.date))
+        val own = requireNotNull(checkedThrough(madinah.resolution, stamp, madinah.date))
+        assertEquals(stamp.checkedByUnit.getValue("madinah").last().substringAfter(".."), own)
+        assertTrue(own < stamp.lastChecked!!, "Madinah through $own")
+    }
+
+    @Test
+    fun `the checked-through date never runs past a day no table was checked on`() {
+        // Diyanet's tables are checked from 25 September to 1 November 2026 and through 2027, not between: Istanbul's
+        // About says 1 November 2026 until 2027 begins, never 31 December 2027 (the review of track T4's fix).
+        val istanbul = stateFor(Place(41.0082, 28.9784, "Europe/Istanbul", "TR"))
+        assertIs<AboutTimesUiState.AuthorityChecked>(istanbul)
+        val stamp = requireNotNull(istanbul.stamp)
+        assertEquals("2027-12-31", stamp.lastChecked)
+        assertEquals("2026-11-01", checkedThrough(istanbul.resolution, stamp, istanbul.date))
+        assertEquals("2026-11-01", checkedThrough(istanbul.resolution, stamp, LocalDate(2026, 12, 15)))
+        assertEquals("2027-12-31", checkedThrough(istanbul.resolution, stamp, LocalDate(2027, 1, 1)))
+        // A run of one day, a hole, a day past every run, and a day before every run.
+        val runs = listOf("2026-01-01..2026-03-31", "2026-04-02", "2026-05-01..2026-05-31")
+        assertEquals("2026-03-31", checkedRunEnd(runs, LocalDate(2026, 3, 31)))
+        assertEquals("2026-03-31", checkedRunEnd(runs, LocalDate(2026, 4, 1)))
+        assertEquals("2026-04-02", checkedRunEnd(runs, LocalDate(2026, 4, 2)))
+        assertEquals("2026-04-02", checkedRunEnd(runs, LocalDate(2026, 4, 30)))
+        assertEquals("2026-05-31", checkedRunEnd(runs, LocalDate(2026, 7, 1)))
+        assertNull(checkedRunEnd(runs, LocalDate(2025, 12, 31)))
     }
 
     @Test
@@ -434,7 +455,7 @@ class AboutTimesUiStateTest {
         places = 22,
         placeDays = 67,
         ramadanDays = 3,
-        provenThrough = "2026-10-02",
+        lastChecked = "2026-10-02",
         worstLateMinutes = mapOf(
             "fajr" to 2, "sunrise" to 3, "dhuhr" to 2, "asrStandard" to 3, "maghrib" to 2, "isha" to 3,
             "endOfEating" to 1, "imsak" to 2,
