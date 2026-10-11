@@ -26,8 +26,8 @@ site/campaigns.py) are pages of their own, in English, kept out of the sitemap a
 indexes.
 
 Manrope, the app's typeface, is served from taqwa.world itself: the build copies the app's own
-font files (FONTS) and their licence into assets/fonts/, and --check fails on any page that loads
-anything from another host.
+font files (FONTS) and their licence into assets/fonts/, beside the site's own Bold, and --check
+fails on any page that loads anything from another host.
 
     ./gradlew -p tools/timetables generate   # writes _data/timetables.json (JDK 21)
     python3 site/build.py                    # writes _site/ next to the repo root
@@ -109,11 +109,15 @@ def load_languages() -> dict:
     return langs
 
 
-# Manrope, from the app's own resources rather than a copy beside the site's: the four weights the
-# app bundles, which are the four the stylesheet's weights resolve to (its @font-face rules say
-# how), and the OFL licence the app ships with them (docs/licences), which travels with the files.
+# Manrope, from the app's own resources rather than a copy beside the site's, with the OFL licence
+# the app ships with them (docs/licences), which travels with the files. The site's four weights
+# are the four it loaded from Google Fonts before it served its own (400, 600, 700 and 800), so
+# the pages look as they did: Regular, SemiBold and ExtraBold are the app's files, and Bold, which
+# the app does not bundle, is the site's own copy in site/assets/fonts/ (copied with the rest of
+# the site), taken from the same Google Fonts release (Version 4.504). The app's Light is not
+# served: the site never had it, and its few 300 rules have always drawn in Regular.
 FONT_DIR = os.path.join(ROOT, "shared", "src", "commonMain", "composeResources", "font")
-FONTS = ("Manrope-Light.ttf", "Manrope-Regular.ttf", "Manrope-SemiBold.ttf", "Manrope-ExtraBold.ttf")
+FONTS = ("Manrope-Regular.ttf", "Manrope-SemiBold.ttf", "Manrope-ExtraBold.ttf")
 FONT_LICENCE = os.path.join(ROOT, "docs", "licences", "OFL-1.1-Manrope.txt")
 
 
@@ -131,7 +135,7 @@ def copy_static() -> None:
         else:
             shutil.copy2(src, dst)
     fonts = os.path.join(OUT, "assets", "fonts")
-    os.makedirs(fonts)
+    os.makedirs(fonts, exist_ok=True)  # site/assets/fonts/ (Bold) was copied in above
     for path in [os.path.join(FONT_DIR, name) for name in FONTS] + [FONT_LICENCE]:
         shutil.copy2(path, fonts)
 

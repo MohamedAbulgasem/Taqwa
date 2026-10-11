@@ -1,15 +1,15 @@
 /* taqwa.world — the app's own palette and type, on the web.
    Tokens are the values in shared/.../design/Palette.kt and Type.kt; keep them in step. */
 
-/* Manrope from taqwa.world itself, not from a font service: the app's own files, which build.py
-   copies into assets/fonts/ with their OFL licence, so no page asks another host for anything.
-   These are the four weights the app bundles (Type.kt's manropeFamily). The 500 and 700 the rules
-   below ask for are drawn in Regular and ExtraBold, the faces CSS font matching picks for them,
-   as the app's own font matching does for its Medium and Bold. Text shows in the fallback stack
-   until its face has arrived. */
-@font-face { font-family: "Manrope"; font-style: normal; font-weight: 300; font-display: swap; src: url("fonts/Manrope-Light.ttf") format("truetype"); }
+/* Manrope from taqwa.world itself, not from a font service, so no page asks another host for
+   anything. These are the four weights the site loaded from Google Fonts before (400, 600, 700,
+   800), so the pages look as they did: Regular, SemiBold and ExtraBold are the app's own files,
+   and Bold is the site's own copy of the same release (build.py says where each comes from). The
+   300 and 500 the rules below ask for are drawn in Regular, as they always were. Text shows in
+   the fallback stack until its face has arrived. */
 @font-face { font-family: "Manrope"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Manrope-Regular.ttf") format("truetype"); }
 @font-face { font-family: "Manrope"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Manrope-SemiBold.ttf") format("truetype"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/Manrope-Bold.ttf") format("truetype"); }
 @font-face { font-family: "Manrope"; font-style: normal; font-weight: 800; font-display: swap; src: url("fonts/Manrope-ExtraBold.ttf") format("truetype"); }
 
 :root {
