@@ -15,7 +15,9 @@ archive/tables/off-vaktija-sarajevo.txt	ba.iz/sarajevo			Europe/Sarajevo	F+E S D
 # 2027 (track T4, 11 Oct 2026): vaktija.ba's own API answers 2027 (api.vaktija.ba/vaktija/v1/<id>/2027/<month>, read on
 # 11 Oct 2026; archive/tables/manual/ba-iz/2026-10-11/), and for each town every 2027 day equals 2026's by month and day
 # in standard time, the summer hour alone following the calendar: the vaktija is a fixed table, and the method is
-# one now (Balkans.kt, TimetableMethod.fixedTableYear). Held out.
-archive/tables/manual/ba-iz/2026-10-11/vk-sarajevo-2027.txt	ba.iz/sarajevo			Europe/Sarajevo	F+E S D A M I	daily	standard	test	Sarajevo 2027 (vaktija.ba's API)
-archive/tables/manual/ba-iz/2026-10-11/vk-banjaluka-2027.txt	ba.iz/banja-luka			Europe/Sarajevo	F+E S D A M I	daily	standard	test	Banja Luka 2027 (vaktija.ba's API)
-archive/tables/manual/ba-iz/2026-10-11/vk-bihac-2027.txt	ba.iz/bihac			Europe/Sarajevo	F+E S D A M I	daily	standard	test	Bihać 2027 (vaktija.ba's API)
+# one now (Balkans.kt, TimetableMethod.fixedTableYear). Not a held-out year (review of track T4): under the fixed table
+# each 2027 day is the 2026 computation, moved, against the 2026 table's same day on all but the 7 days the clock
+# changes on other dates; the rows check those days, the move and the date's own sun's bounds. Fit.
+archive/tables/manual/ba-iz/2026-10-11/vk-sarajevo-2027.txt	ba.iz/sarajevo			Europe/Sarajevo	F+E S D A M I	daily	standard	fit	Sarajevo 2027 (vaktija.ba's API)
+archive/tables/manual/ba-iz/2026-10-11/vk-banjaluka-2027.txt	ba.iz/banja-luka			Europe/Sarajevo	F+E S D A M I	daily	standard	fit	Banja Luka 2027 (vaktija.ba's API)
+archive/tables/manual/ba-iz/2026-10-11/vk-bihac-2027.txt	ba.iz/bihac			Europe/Sarajevo	F+E S D A M I	daily	standard	fit	Bihać 2027 (vaktija.ba's API)

@@ -1,8 +1,8 @@
 # Ireland: the Islamic Foundation of Ireland's fixed table (islamicfoundation.ie, printed in GMT for 28 towns; Dublin's
 # column as local time), the table for Dublin (ruling R44). No imsak is printed: Fajr is also the start of the fast.
-# IFI's Fajr and Isha curves (IfiCurve) are fitted to this same table, and it repeats every year, so nothing was held
-# out (since 11 Oct 2026, the table mapped onto 2027-2029 below is). Lucan's copy differs only in its summer Isha (its
-# own, earlier); the second Dublin capture (ifi_dublin_b) is another town's column, unnamed, and is not used.
+# IFI's Fajr and Isha curves (IfiCurve) are fitted to this same table, and it repeats every year, so nothing is held
+# out. Lucan's copy differs only in its summer Isha (its own, earlier); the second Dublin capture (ifi_dublin_b) is
+# another town's column, unnamed, and is not used.
 path	entry	lat	lon	zone	clock	columns	format	school	split	note
 archive/tables/moral-auth-world/ukfr/ifi_dublin_local.txt	ie.ifi/ie.ifi			Europe/Dublin		F+E S D A M I	daily	standard	fit	IFI Dublin 2026
 # 2027-2029 (track T4, 11 Oct 2026): the fixed table as IFI prints it, in GMT all year (ifi_dublin_a.txt, identical to the local
@@ -10,7 +10,11 @@ archive/tables/moral-auth-world/ukfr/ifi_dublin_local.txt	ie.ifi/ie.ifi			Europe
 # derived; no 29 February is printed), the rest of the leap cycle, as ae-iacad.tsv's perpetual tables, each read on its own clock,
 # UTC+00:00, so that each year's clock changes fall where Ireland's do. Computed with each year's own sun, 2027 was a minute
 # early on 52 starts (Maghrib 37, Asr 14, Dhuhr 1) and a minute late on 29 ends, and 2028 worse: the method is now the fixed
-# table it is (TimetableMethod.fixedTableYear = 2026, Europe.kt), every year computed as the year it was fitted on.
-archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2027.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	test	IFI Dublin, the fixed GMT table on 2027
-archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2028.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	test	IFI Dublin, the fixed GMT table on 2028
-archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2029.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	test	IFI Dublin, the fixed GMT table on 2029
+# table it is (TimetableMethod.fixedTableYear = 2026, Europe.kt), every year computed as the year it was fitted on and held
+# to the date's own sun (no sunrise after the sun's, no Maghrib before the minute after its sunset). So these rows are not
+# held-out years (review of track T4): each compares the 2026 computation, moved, with the 2026 table re-dated; what they
+# check is the move itself on each year's own clock, its clock-change days, and the date's own sun's bounds, a minute late
+# where the sun has moved past the table (March 2028). Fit.
+archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2027.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	fit	IFI Dublin, the fixed GMT table on 2027
+archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2028.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	fit	IFI Dublin, the fixed GMT table on 2028
+archive/tables/moral-auth-world/ukfr/ifi_dublin_gmt_2029.txt	ie.ifi/ie.ifi			Europe/Dublin	UTC+00:00	F+E S D A M I	daily	standard	fit	IFI Dublin, the fixed GMT table on 2029

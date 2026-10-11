@@ -51,20 +51,21 @@ archive/tables/moral-auth-mena/gulfB/off-qch-derived-2026.txt	qa.calendarhouse	2
 # 2027 (track T4, 11 Oct 2026): the ministry API answers every date of 2027 (read on 11 Oct 2026 with the monitor's own
 # fetchers/qatar.py, one request a day; pinned under archive/tables/pinned/qa-calendarhouse/2026-10-11/), checked as its
 # 2026 is: at F S M I, and Dhuhr and Asr against the derived calendar (the API's own plus the calendar's minute), at Doha's
-# unit and the seven east-coast towns. Held out.
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse/doha			Asia/Qatar	F+E S - - M I	daily	standard	test	Doha, the ministry API, all 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse/doha			Asia/Qatar	- - D A - -	daily	standard	test	Doha, all 2027: the API's Dhuhr and Asr plus the calendar's minute (derived)
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	F+E S - - M I	daily	standard	test	Al Khor, the ministry API for Doha, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	- - D A - -	daily	standard	test	Al Khor, Doha's derived calendar Dhuhr and Asr, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	F+E S - - M I	daily	standard	test	Az Za'ayin, the ministry API for Doha, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	- - D A - -	daily	standard	test	Az Za'ayin, Doha's derived calendar Dhuhr and Asr, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	F+E S - - M I	daily	standard	test	Lusail, the ministry API for Doha, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	- - D A - -	daily	standard	test	Lusail, Doha's derived calendar Dhuhr and Asr, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	F+E S - - M I	daily	standard	test	Umm Salal Muhammad, the ministry API for Doha, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	- - D A - -	daily	standard	test	Umm Salal Muhammad, Doha's derived calendar Dhuhr and Asr, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	F+E S - - M I	daily	standard	test	Ar Rayyan, the ministry API for Doha, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	- - D A - -	daily	standard	test	Ar Rayyan, Doha's derived calendar Dhuhr and Asr, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	F+E S - - M I	daily	standard	test	Mu'aydhir, the ministry API for Doha, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	- - D A - -	daily	standard	test	Mu'aydhir, Doha's derived calendar Dhuhr and Asr, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	F+E S - - M I	daily	standard	test	Al Wakrah, the ministry API for Doha, 2027
-archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	- - D A - -	daily	standard	test	Al Wakrah, Doha's derived calendar Dhuhr and Asr, 2027
+# unit and the seven east-coast towns. Fit, not held out (review of track T4): its 8 January set Dhuhr's +42 and its 25
+# February Ramadan's Maghrib 8 s (Gulf.kt).
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse/doha			Asia/Qatar	F+E S - - M I	daily	standard	fit	Doha, the ministry API, all 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse/doha			Asia/Qatar	- - D A - -	daily	standard	fit	Doha, all 2027: the API's Dhuhr and Asr plus the calendar's minute (derived)
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	F+E S - - M I	daily	standard	fit	Al Khor, the ministry API for Doha, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.68389	51.50583	Asia/Qatar	- - D A - -	daily	standard	fit	Al Khor, Doha's derived calendar Dhuhr and Asr, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	F+E S - - M I	daily	standard	fit	Az Za'ayin, the ministry API for Doha, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.57744	51.48306	Asia/Qatar	- - D A - -	daily	standard	fit	Az Za'ayin, Doha's derived calendar Dhuhr and Asr, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	F+E S - - M I	daily	standard	fit	Lusail, the ministry API for Doha, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.4175	51.5075	Asia/Qatar	- - D A - -	daily	standard	fit	Lusail, Doha's derived calendar Dhuhr and Asr, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	F+E S - - M I	daily	standard	fit	Umm Salal Muhammad, the ministry API for Doha, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.41524	51.40647	Asia/Qatar	- - D A - -	daily	standard	fit	Umm Salal Muhammad, Doha's derived calendar Dhuhr and Asr, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	F+E S - - M I	daily	standard	fit	Ar Rayyan, the ministry API for Doha, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.29194	51.42444	Asia/Qatar	- - D A - -	daily	standard	fit	Ar Rayyan, Doha's derived calendar Dhuhr and Asr, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	F+E S - - M I	daily	standard	fit	Mu'aydhir, the ministry API for Doha, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.2617	51.39684	Asia/Qatar	- - D A - -	daily	standard	fit	Mu'aydhir, Doha's derived calendar Dhuhr and Asr, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-ministry-2027.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	F+E S - - M I	daily	standard	fit	Al Wakrah, the ministry API for Doha, 2027
+archive/tables/pinned/qa-calendarhouse/2026-10-11/doha-derived-2027.txt	qa.calendarhouse	25.17151	51.60337	Asia/Qatar	- - D A - -	daily	standard	fit	Al Wakrah, Doha's derived calendar Dhuhr and Asr, 2027
