@@ -3,7 +3,6 @@ package world.taqwa.app.prayer.engine.registry.authorities
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.EventOffsets
-import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.ADHAN2_ASR_ALLOWANCE
@@ -65,7 +64,10 @@ object Generic {
      * takes 18°'s place, north and south, as the Committee's own tables have it (adhan2 has it north
      * only; TwilightCurves.moonsighting, T3 round of 11 Oct 2026). The functions are minutes from
      * sunrise or sunset, so they are expressed here as day-of-year angle curves for the place's
-     * latitude and longitude ([PlaceCurves]); the entry's own method carries the equator's curves.
+     * latitude and longitude ([PlaceCurves]), at every resolution. The entry's own method carries none:
+     * no resolution reads it unplaced, and its equator curves made every user's first use of the
+     * registry run the Committee's whole read (a leap cycle's sun every 6 h, eight leap-cycle reads,
+     * 12–14 ms cold on the Mac's JVM), for a method few choose (the T3 review of 11 Oct 2026).
      */
     private val moonsightingBase = TimetableMethod(
         id = "other.moonsighting",
@@ -78,7 +80,7 @@ object Generic {
 
     val moonsighting = single(
         id = "other.moonsighting", nameKey = "method_moonsighting", entryClass = EntryClass.D_AUTHORITY,
-        method = PlaceCurves.at(moonsightingBase, GeoPoint(0.0, 0.0)), school = AsrSchool.STANDARD, scope = Scope.GLOBAL,
+        method = moonsightingBase, school = AsrSchool.STANDARD, scope = Scope.GLOBAL,
     )
 
     // The class D safe default (spec §6.2 c).
