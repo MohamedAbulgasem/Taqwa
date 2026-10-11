@@ -308,8 +308,9 @@ class AdhkarViewModel(
      * Whether the set has opened is asked here, at each tap (spec §3.3). Before its opening prayer
      * the tap counts on screen alone; the first tap after it makes the read the day's, writing every
      * count on screen — those made before the opening too — and from then on each tap is the day's
-     * as always. A read finished before the opening has no tap left to carry it over, so it stays a
-     * free read; opened again, the set starts as the day's from its first page.
+     * as always, whatever the clock says later. A read finished before the opening has no tap left
+     * to carry it over, so it stays a free read; opened again, the set starts as the day's from its
+     * first page.
      */
     fun tap() {
         val session = session ?: return
@@ -328,7 +329,9 @@ class AdhkarViewModel(
             pages.all { it.done } -> haptics.setComplete()
             else -> haptics.partComplete()
         }
-        val open = AdhkarWindows.isOpen(session.set, now(), session.day)
+        // Latched: once the read is the day's — loaded open, or carried over — it stays the day's,
+        // even if the phone's clock is then set back before the opening.
+        val open = !session.freeRead || AdhkarWindows.isOpen(session.set, now(), session.day)
         // The tap that carries a free read over writes the set's whole list, even on the istighfar
         // page, whose own taps otherwise write the daily counter alone.
         val carriesOver = open && session.freeRead

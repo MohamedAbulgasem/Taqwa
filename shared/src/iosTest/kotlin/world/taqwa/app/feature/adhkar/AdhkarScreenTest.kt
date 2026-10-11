@@ -57,8 +57,8 @@ import world.taqwa.app.design.LightColors
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
-import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.UiLanguage
+import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.uppercaseIn
 import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings

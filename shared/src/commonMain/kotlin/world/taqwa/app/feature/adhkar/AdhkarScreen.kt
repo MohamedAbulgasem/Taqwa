@@ -455,8 +455,8 @@ private fun HeaderButton(description: String, onClick: () -> Unit, content: @Com
 
 /**
  * Where the set's time stands (spec §3.4): "Until sunrise · 6:12" in its best time, "After sunrise ·
- * until 12:46" in its make-up time, and the plain window outside both. A free read — the set opened
- * before its opening prayer (spec §3.3) — says when the set opens instead: "From Asr · 16:55".
+ * until 12:46" in its make-up time, and the plain window outside both. A free read — the set was
+ * opened before its opening prayer (spec §3.3) — says when the set opens instead: "From Asr · 16:55".
  */
 @Composable
 private fun phaseCaption(state: AdhkarUiState): String {

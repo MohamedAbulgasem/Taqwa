@@ -193,10 +193,11 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
     val scope = rememberCoroutineScope()
     // Rebuilt when the language or the clock format changes, as TodayRoute's view model is: the
     // phase's time is written by the format, and the du'a translations are the language's. Nothing
-    // on screen is lost — every count is already on disk — and the set the reader had switched to
-    // is the one the new view model opens. Keyed on [set]: a new request (a reminder naming the
-    // other set) is opened as asked. A plain holder, not state: it is written after every frame and
-    // read only when an effect below restarts.
+    // on screen is lost — every count is already on disk, except a free read's (spec §3.3), which
+    // starts again from its first page — and the set the reader had switched to is the one the new
+    // view model opens. Keyed on [set]: a new request (a reminder naming the other set) is opened
+    // as asked. A plain holder, not state: it is written after every frame and read only when an
+    // effect below restarts.
     val shown = remember(set) { ShownAdhkarSet() }
     val viewModel = remember(format, language) {
         AdhkarViewModel(

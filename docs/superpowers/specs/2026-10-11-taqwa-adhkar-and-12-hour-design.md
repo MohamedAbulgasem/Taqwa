@@ -195,10 +195,11 @@ The whole page body is one ripple-less tap surface; a tap counts, a drag scrolls
 - At the target the page waits about 400 ms and advances to the next undone page. Taps on a
   completed page do nothing. Swiping past a page leaves it undone: **progress is counted, never
   visited**, so "done" is true when it shows.
-- Every tap is written at once: `adhkar_morning` / `adhkar_evening` = `"<date>|c1,c2,…"` (counts
-  in page order) and `adhkar_istighfar` = `"<date>|n"` (one counter shared by both sets, keyed by
-  the day's own date, the local date of its Fajr, like the sets). A set's date is the local date
-  of its own prayer (that Fajr, that Asr); a new date overwrites, nothing is kept, no history.
+- Every tap is written at once, once the set is open (below; the istighfar always): `adhkar_morning`
+  / `adhkar_evening` = `"<date>|c1,c2,…"` (counts in page order) and `adhkar_istighfar` =
+  `"<date>|n"` (one counter shared by both sets, keyed by the day's own date, the local date of its
+  Fajr, like the sets). A set's date is the local date of its own prayer (that Fajr, that Asr); a
+  new date overwrites, nothing is kept, no history.
 - **A set counts from its opening prayer** (the Lead's ruling, 11 Oct, after the device pass saw an
   evening set finished at 07:12 withdraw that day's 16:55 reminder): the morning from Fajr, the
   evening from Asr, of the day `dayFor` reads against; the closing is unchanged, the make-up phases
@@ -226,9 +227,10 @@ says), in the location's zone:
 
 The header caption says the phase through `formatClock` (so it follows the clock setting): "Until
 sunrise · 6:12", "After sunrise · until 12:46", "Until Maghrib · 18:37", "After Maghrib · until
-19:56", and outside both windows the plain window name ("Fajr to sunrise", "Asr to Maghrib").
-Nothing locks: a set opened at any hour reads as usual. On a polar day without a sunrise the
-morning window runs to Dhuhr.
+19:56", and outside both windows the plain window name ("Fajr to sunrise", "Asr to Maghrib") —
+except before the set opens, when a free read says when it does ("From Asr · 16:55", 3.3).
+Nothing locks: a set opened at any hour reads as usual, but before its opening prayer it is a free
+read that keeps nothing (3.3). On a polar day without a sunrise the morning window runs to Dhuhr.
 
 ### 3.5 Quran pages and the reciter
 
@@ -372,10 +374,10 @@ typographic apostrophes; Bengali in NFC. Keys: `today_open_adhkar`, `adhkar_morn
 `adhkar_after_sunrise`, `adhkar_until_maghrib`, `adhkar_after_maghrib`, `adhkar_window_morning`,
 `adhkar_window_evening`, `adhkar_done_morning`, `adhkar_done_evening`, `adhkar_next_evening`,
 `adhkar_next_morning`, `adhkar_back`, `adhkar_reading`, `adhkar_translation`, `adhkar_of`,
-`adhkar_a11y_count`, `source_bukhari`, `source_muslim`, `source_abu_dawud`, `source_tirmidhi`,
-`source_ibn_majah`, `source_nasai`, `source_hakim`, `source_ahmad`, `notifications_adhkar`,
-`notifications_adhkar_detail`, `prayer_times_time_format`, `time_format_24`, `time_format_12`,
-`credit_adhkar`, `credit_adhkar_detail`. `tasbeeh_hint` is reused. The translations are mine and
+`adhkar_a11y_count`, `adhkar_opens_at`, `source_bukhari`, `source_muslim`, `source_abu_dawud`,
+`source_tirmidhi`, `source_ibn_majah`, `source_nasai`, `source_hakim`, `source_ahmad`,
+`notifications_adhkar`, `notifications_adhkar_detail`, `prayer_times_time_format`,
+`time_format_24`, `time_format_12`, `credit_adhkar`, `credit_adhkar_detail`. `tasbeeh_hint` is reused. The translations are mine and
 are listed for Mohamed's review in the report.
 
 The debug screenshot harness gains `"adhkar"` in `DebugScreenRequests`.

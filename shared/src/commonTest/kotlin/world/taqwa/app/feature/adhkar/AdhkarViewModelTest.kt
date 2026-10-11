@@ -906,6 +906,49 @@ class AdhkarViewModelTest {
         assertEquals(0, state.pages[0].count)
     }
 
+    @Test fun `a read carried over at asr keeps writing if the clock is set back before it`() = runTest {
+        val rig = rig("carried-latch", { day -> day.time(Prayer.ASR) - 10.minutes })
+        rig.viewModel.open(AdhkarSet.EVENING)
+        loaded(rig, AdhkarSet.EVENING)
+        // The first tap is after Asr: the read is the day's from here.
+        rig.clock.now = rig.day.time(Prayer.ASR) + 1.minutes
+        rig.viewModel.tap()
+        runCurrent()
+        advanceTimeBy(AdhkarViewModel.ADVANCE_DELAY_MS + 1)
+        runCurrent()
+        assertEquals(counts(AdhkarSet.EVENING, 1).encode(), rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        // The phone's clock is then set back before Asr (by hand, or a zone change): a read that
+        // is the day's stays the day's, and the next tap is written like the one before it.
+        rig.clock.now = rig.day.time(Prayer.ASR) - 5.minutes
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(counts(AdhkarSet.EVENING, 1, 1).encode(), rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        assertNull(rig.viewModel.state.value.opensAt)
+    }
+
+    @Test fun `a free read starts from its first page whatever the store holds for the day`() = runTest {
+        val rig = rig("free-read-ignores-store", ::anHourAfterFajr)
+        // The evening's progress under this date's own Asr, as a build before the rule wrote it
+        // from a read before Asr: the first two pages said.
+        val stored = counts(AdhkarSet.EVENING, 1, 3).encode()
+        rig.store.progress.getValue(AdhkarSet.EVENING).value = stored
+        rig.viewModel.open(AdhkarSet.EVENING)
+        val early = loaded(rig, AdhkarSet.EVENING)
+        assertEquals(0, early.currentPage)
+        assertEquals(0, early.completed)
+        assertTrue(early.pages.all { it.count == 0 })
+        assertEquals(stored, rig.store.progress.getValue(AdhkarSet.EVENING).value)
+        rig.viewModel.close()
+
+        // After Asr the same stored progress is the day's evening and is read back.
+        rig.clock.now = anHourAfterAsr(rig.day)
+        val again = rig.reopen()
+        again.open(AdhkarSet.EVENING)
+        val state = loaded(again, AdhkarSet.EVENING)
+        assertEquals(2, state.currentPage)
+        assertEquals(2, state.completed)
+    }
+
     @Test fun `the morning is never a free read`() = runTest {
         // At Fajr itself, the first instant dayFor gives the new day, the morning already counts.
         val rig = rig("morning-open", { day -> day.time(Prayer.FAJR) })
