@@ -6,6 +6,7 @@ import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
+import world.taqwa.app.prayer.engine.method.RamadanRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.ADHAN2_ASR_ALLOWANCE
 import world.taqwa.app.prayer.engine.registry.AuthorityUnit
@@ -154,13 +155,20 @@ object Gulf {
      * 5 s, +15 (the fit said +18).
      * Held out, 0 early and 0 late ends on 2,845 place-days (the API's 2026, the website's 2023–2026
      * and Doha's table at seven towns of the east coast and the metro). Class B.
+     * 2027 (track T4, 11 Oct 2026): the API answers every date of 2027, and there Maghrib and Isha were a
+     * minute early on 25 February 2027, Ramadan 1448's eighteenth day, at Doha and four of the towns. The
+     * calendar's Ramadan Maghrib is its latest (above), and the fit over every row held asks 8 s more on
+     * that day alone: Ramadan's Maghrib, and the Isha counted from it, take 8 s more ([RamadanRule]), the rest
+     * of the year keeping −28 (raised all year, 13 summer days at Doha reached 3 min, over class B's 2). Dhuhr
+     * +42, its 8 January 2027 inside the 5 s.
      */
     val qatarMethod = TimetableMethod(
         id = "qa.calendarhouse",
         fajrAngle = 18.0,
         isha = IshaRule.AfterMaghrib(90),
         authorityMinutes = EventOffsets(maghrib = 3),
-        margins = margins(start = -28, sunrise = 15, fajr = -63, dhuhr = 37, asr = 40),
+        margins = margins(start = -28, sunrise = 15, fajr = -63, dhuhr = 42, asr = 40),
+        ramadan = RamadanRule(maghribExtraSeconds = 8),
         endOfEatingMarginSeconds = -54,
     )
 
