@@ -84,8 +84,8 @@ internal class AyahWidgetRender(
  * `standard` activity that starts a *second* `MainActivity` on top of the one already in the
  * task, and the older instance's composition is still alive underneath: its own collector on
  * `LaunchRequests` took the request and consumed it before the newly created, visible instance
- * ever composed, so the tap opened the app on Today. `CLEAR_TOP or SINGLE_TOP` is the fix —
- * the existing `MainActivity` is brought forward and handed the intent through `onNewIntent`
+ * ever composed, so the tap opened the app on the Prayer screen. `CLEAR_TOP or SINGLE_TOP` is the
+ * fix — the existing `MainActivity` is brought forward and handed the intent through `onNewIntent`
  * instead of being duplicated — and only the `Intent` overload lets those flags be set.
  *
  * The data URI is per-ayah and makes the `PendingIntent` distinct by `Intent.filterEquals`,

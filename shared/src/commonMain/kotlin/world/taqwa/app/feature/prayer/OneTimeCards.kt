@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,13 +31,13 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.today_about_these_times
-import world.taqwa.app.resources.today_card_cautious_body
-import world.taqwa.app.resources.today_card_cautious_title
-import world.taqwa.app.resources.today_card_ok
-import world.taqwa.app.resources.today_card_sunni_body
-import world.taqwa.app.resources.today_card_sunni_title
-import world.taqwa.app.resources.today_match_my_mosque
+import world.taqwa.app.resources.prayer_about_these_times
+import world.taqwa.app.resources.prayer_card_cautious_body
+import world.taqwa.app.resources.prayer_card_cautious_title
+import world.taqwa.app.resources.prayer_card_ok
+import world.taqwa.app.resources.prayer_card_sunni_body
+import world.taqwa.app.resources.prayer_card_sunni_title
+import world.taqwa.app.resources.prayer_match_my_mosque
 
 /** The cards the Prayer screen shows once, below the prayer list (spec §2.1). */
 enum class OneTimeCard {
@@ -107,14 +107,14 @@ internal fun OneTimeCardView(
     val shape = RoundedCornerShape(18.dp)
     val (title, body, action) = when (card) {
         OneTimeCard.CAUTIOUS -> Triple(
-            Res.string.today_card_cautious_title,
-            Res.string.today_card_cautious_body,
-            Res.string.today_match_my_mosque,
+            Res.string.prayer_card_cautious_title,
+            Res.string.prayer_card_cautious_body,
+            Res.string.prayer_match_my_mosque,
         )
         OneTimeCard.SUNNI -> Triple(
-            Res.string.today_card_sunni_title,
-            Res.string.today_card_sunni_body,
-            Res.string.today_about_these_times,
+            Res.string.prayer_card_sunni_title,
+            Res.string.prayer_card_sunni_body,
+            Res.string.prayer_about_these_times,
         )
     }
     Column(
@@ -139,7 +139,7 @@ internal fun OneTimeCardView(
         )
         FlowRow(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             CardAction(stringResource(action), colors.accent, onAction)
-            CardAction(stringResource(Res.string.today_card_ok), colors.textSecondary, onOk)
+            CardAction(stringResource(Res.string.prayer_card_ok), colors.textSecondary, onOk)
         }
     }
 }

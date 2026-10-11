@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import android.provider.Settings
 import world.taqwa.app.settings.appContext

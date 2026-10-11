@@ -46,7 +46,7 @@ import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.TaqwaTextLink
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.feature.common.authorityShortName
-import world.taqwa.app.feature.today.formatClock
+import world.taqwa.app.feature.prayer.formatClock
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.localizedPrayerName

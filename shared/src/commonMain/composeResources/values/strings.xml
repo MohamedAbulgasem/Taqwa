@@ -35,56 +35,56 @@
     <string name="prayer_maghrib">Maghrib</string>
     <string name="prayer_isha">Isha</string>
 
-    <!-- Today -->
-    <string name="today_current_location">Current location</string>
-    <string name="today_next_in">%1$s in</string>
-    <string name="today_exact_alarms_label">EXACT ALARMS OFF</string>
-    <string name="today_exact_alarms_body">Android can ring up to an hour late until “Alarms &amp; reminders” is allowed for Taqwa.</string>
-    <string name="today_no_location_title">No location yet</string>
-    <string name="today_choose_city">Choose a city</string>
-    <string name="today_location_settings">Turn on location in Settings</string>
+    <!-- Prayer screen -->
+    <string name="prayer_current_location">Current location</string>
+    <string name="prayer_next_in">%1$s in</string>
+    <string name="prayer_exact_alarms_label">EXACT ALARMS OFF</string>
+    <string name="prayer_exact_alarms_body">Android can ring up to an hour late until “Alarms &amp; reminders” is allowed for Taqwa.</string>
+    <string name="prayer_no_location_title">No location yet</string>
+    <string name="prayer_choose_city">Choose a city</string>
+    <string name="prayer_location_settings">Turn on location in Settings</string>
     <!-- The pill beside Dhuhr on a Friday, the chosen city's own Friday. -->
-    <string name="today_jumuah">Jumuʿah</string>
+    <string name="prayer_jumuah">Jumuʿah</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
     <!-- The card the ⓘ after the date opens (spec §2.1): whose times these are, by the entry's class. %1$s is the timetable's short name, %2$s the place. -->
-    <string name="today_whose_checked_title">%1$s timetable</string>
-    <string name="today_whose_checked_body">%1$s’s times for %2$s, reproduced by Taqwa and checked against its published timetable.</string>
-    <string name="today_whose_unchecked_title">%1$s method, not yet fully checked</string>
-    <string name="today_whose_unchecked_body">Taqwa calculates the times for %2$s by the %1$s method, with a safety margin.</string>
-    <string name="today_whose_cautious_body">Mosques here follow different timetables, so Taqwa shows each prayer once they have all begun it.</string>
-    <string name="today_whose_calculated_body">No local timetable is known here, so Taqwa calculates these times on the safe side.</string>
+    <string name="prayer_whose_checked_title">%1$s timetable</string>
+    <string name="prayer_whose_checked_body">%1$s’s times for %2$s, reproduced by Taqwa and checked against its published timetable.</string>
+    <string name="prayer_whose_unchecked_title">%1$s method, not yet fully checked</string>
+    <string name="prayer_whose_unchecked_body">Taqwa calculates the times for %2$s by the %1$s method, with a safety margin.</string>
+    <string name="prayer_whose_cautious_body">Mosques here follow different timetables, so Taqwa shows each prayer once they have all begun it.</string>
+    <string name="prayer_whose_calculated_body">No local timetable is known here, so Taqwa calculates these times on the safe side.</string>
     <!-- The link to About these times; the screen adds the chevron. -->
-    <string name="today_about_these_times">About these times</string>
+    <string name="prayer_about_these_times">About these times</string>
     <!-- Screen-reader labels (spec §2.4): %1$s names the times ("Times by Diyanet", "Cautious times"), %2$s the place. -->
-    <string name="today_times_by">Times by %1$s</string>
-    <string name="today_whose_a11y">%1$s, %2$s. Opens whose times these are</string>
-    <string name="today_about_a11y">%1$s, %2$s. Opens About these times</string>
+    <string name="prayer_times_by">Times by %1$s</string>
+    <string name="prayer_whose_a11y">%1$s, %2$s. Opens whose times these are</string>
+    <string name="prayer_about_a11y">%1$s, %2$s. Opens About these times</string>
     <!-- The pill after a prayer's name when a high-latitude rule set its time (spec §2.1, the Jumuʿah pill's style); approved terms in §2.4. -->
-    <string name="today_set_by_rule">Set by rule</string>
+    <string name="prayer_set_by_rule">Set by rule</string>
     <!-- On a polar day, one line under the prayer list instead of the pills; it opens About these times. Some times, not all, follow the nearby latitude. -->
-    <string name="today_polar_line">The sun does not rise or set here today, so some times follow the nearest latitude where it does.</string>
+    <string name="prayer_polar_line">The sun does not rise or set here today, so some times follow the nearest latitude where it does.</string>
     <!-- One-time cards below the prayer list (spec §2.1): the cautious-times card, then the Sunni card on a later launch. -->
-    <string name="today_card_cautious_title">Mosques here follow different timetables</string>
-    <string name="today_card_cautious_body">Taqwa shows each prayer once they have all begun it.</string>
-    <string name="today_card_sunni_title">These are Sunni prayer times</string>
-    <string name="today_card_sunni_body">In Shia (Ja’fari) practice, Maghrib and iftar are later.</string>
-    <string name="today_match_my_mosque">Match my mosque</string>
-    <string name="today_card_ok">OK</string>
+    <string name="prayer_card_cautious_title">Mosques here follow different timetables</string>
+    <string name="prayer_card_cautious_body">Taqwa shows each prayer once they have all begun it.</string>
+    <string name="prayer_card_sunni_title">These are Sunni prayer times</string>
+    <string name="prayer_card_sunni_body">In Shia (Ja’fari) practice, Maghrib and iftar are later.</string>
+    <string name="prayer_match_my_mosque">Match my mosque</string>
+    <string name="prayer_card_ok">OK</string>
     <!-- The clock line above the ring (spec §3.9) and its sheet: %1$s the place whose clocks changed, %2$s the date of the change. -->
-    <string name="today_clock_line">Your phone’s clock may be an hour off</string>
-    <string name="today_clock_stale_early">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour early. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
-    <string name="today_clock_stale_late">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour late. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
-    <string name="today_clock_manual_early">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour early. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
-    <string name="today_clock_manual_late">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour late. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
-    <string name="today_clock_region_morocco">Morocco</string>
-    <string name="today_clock_region_british_columbia">British Columbia</string>
-    <string name="today_clock_region_kazakhstan">Kazakhstan</string>
+    <string name="prayer_clock_line">Your phone’s clock may be an hour off</string>
+    <string name="prayer_clock_stale_early">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour early. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_stale_late">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour late. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_manual_early">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour early. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_manual_late">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour late. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_region_morocco">Morocco</string>
+    <string name="prayer_clock_region_british_columbia">British Columbia</string>
+    <string name="prayer_clock_region_kazakhstan">Kazakhstan</string>
     <!-- "Show where timetables differ", under the current prayer (spec §2.1): %1$s a timetable's short name, %2$s the next prayer, %3$s a time. -->
-    <string name="today_differ_before">%1$s’s %2$s begins at %3$s</string>
-    <string name="today_differ_after">%1$s’s %2$s has begun · Taqwa shows it from %3$s</string>
+    <string name="prayer_differ_before">%1$s’s %2$s begins at %3$s</string>
+    <string name="prayer_differ_after">%1$s’s %2$s has begun · Taqwa shows it from %3$s</string>
     <!-- "Show both Asr times": the other school’s Asr under Asr ("Standard 16:24"). %1$s is the school (madhab_standard or madhab_hanafi), %2$s its time; one string, so each language puts them in its own order. -->
-    <string name="today_other_asr">%1$s %2$s</string>
+    <string name="prayer_other_asr">%1$s %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">Settings</string>
@@ -510,7 +510,7 @@
     <string name="tab_quran">Quran</string>
     <string name="tab_settings">Settings</string>
     <!-- Prayer screen's Qibla card: bearing from north, then the great-circle distance. -->
-    <string name="today_qibla_detail">%1$s° · %2$s km to Makkah</string>
+    <string name="prayer_qibla_detail">%1$s° · %2$s km to Makkah</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">Quran</string>
     <string name="quran_search_hint">Search the Quran</string>
@@ -557,7 +557,7 @@
     <string name="quran_a11y_read_aloud">Being read aloud</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbeeh</string>
-    <string name="today_open_tasbeeh">Tasbeeh</string>
+    <string name="prayer_open_tasbeeh">Tasbeeh</string>
     <string name="tasbeeh_add_custom">Add a dhikr</string>
     <string name="tasbeeh_round">ROUND %1$s</string>
     <string name="tasbeeh_of">of %1$s</string>
@@ -654,7 +654,7 @@
     <string name="prayer_times_time_format">Time format</string>
     <string name="time_format_24">24-hour</string>
     <string name="time_format_12">12-hour</string>
-    <string name="today_open_adhkar">Adhkar</string>
+    <string name="prayer_open_adhkar">Adhkar</string>
     <string name="adhkar_morning">Morning adhkar</string>
     <string name="adhkar_evening">Evening adhkar</string>
     <string name="adhkar_segment_morning">Morning</string>

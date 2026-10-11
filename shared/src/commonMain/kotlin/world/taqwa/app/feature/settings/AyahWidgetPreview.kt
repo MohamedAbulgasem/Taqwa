@@ -58,7 +58,7 @@ private const val CardAspectRatio = 320f / 236f
  * A Compose stand-in of the ayah widget's 4×3 card (design spec §2, §9), drawn over the same
  * [PreviewWallpaper] frame [WidgetPreview] uses, in its own frame below it. Shows today's pool
  * entry when the app has already written the mirror; otherwise a fixed sample so the preview
- * still means something on a fresh install, before Today has ever run.
+ * still means something on a fresh install, before the Prayer screen has ever run.
  */
 @Composable
 fun AyahWidgetPreview(
@@ -67,9 +67,9 @@ fun AyahWidgetPreview(
     modifier: Modifier = Modifier,
 ) {
     val colors = WidgetPalette.colorsFor(background, systemIsDark)
-    // Read once per composition, like the prayer preview: the mirror only changes when Today
-    // rewrites it, so re-reading on every recomposition would be wasted work for a preview whose
-    // only job here is to react to [background] changing.
+    // Read once per composition, like the prayer preview: the mirror only changes when the Prayer
+    // screen rewrites it, so re-reading on every recomposition would be wasted work for a preview
+    // whose only job here is to react to [background] changing.
     val (mirror, seed) = remember {
         val store = createWidgetKeyValueStore()
         AyahPoolMirror.read(store) to (AyahPoolMirror.seed(store) ?: 0L)
@@ -294,8 +294,8 @@ private fun translationSizeFor(translation: String) =
 
 /**
  * Ar-Ra'd 13:28, its Saheeh International translation, for when the mirror has not been written
- * yet: onboarding runs before Today has ever shown, and Appearance can be opened on a fresh
- * install before the pool exists.
+ * yet: onboarding runs before the Prayer screen has ever shown, and Appearance can be opened on a
+ * fresh install before the pool exists.
  */
 private val SampleEntry = AyahPoolEntry(
     surah = 13,

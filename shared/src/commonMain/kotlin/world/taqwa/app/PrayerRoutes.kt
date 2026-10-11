@@ -34,11 +34,11 @@ import world.taqwa.app.feature.qibla.QiblaViewModel
 import world.taqwa.app.feature.recitation.rememberSurahName
 import world.taqwa.app.feature.tasbeeh.TasbeehScreen
 import world.taqwa.app.feature.tasbeeh.TasbeehViewModel
-import world.taqwa.app.feature.today.TodayScreen
-import world.taqwa.app.feature.today.TodayUiState
-import world.taqwa.app.feature.today.TodayViewModel
-import world.taqwa.app.feature.today.OneTimeCardSession
-import world.taqwa.app.feature.today.clockSetByHand
+import world.taqwa.app.feature.prayer.PrayerScreen
+import world.taqwa.app.feature.prayer.PrayerUiState
+import world.taqwa.app.feature.prayer.PrayerViewModel
+import world.taqwa.app.feature.prayer.OneTimeCardSession
+import world.taqwa.app.feature.prayer.clockSetByHand
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.uiLanguage
@@ -57,7 +57,7 @@ import world.taqwa.app.settings.SettingsRepository
 import kotlin.time.Clock
 
 @Composable
-internal fun TodayRoute(
+internal fun PrayerRoute(
     languageTag: String,
     container: AppContainer,
     settings: SettingsRepository,
@@ -72,13 +72,13 @@ internal fun TodayRoute(
     // The last state this screen showed, carried across the view-model
     // swap below. Plain `remember`, so a language change — which does not
     // recreate the composition — leaves it standing.
-    val lastState = remember { mutableStateOf<TodayUiState>(TodayUiState.Loading) }
+    val lastState = remember { mutableStateOf<PrayerUiState>(PrayerUiState.Loading) }
     // Rebuilt when the language changes, with a format that reports the
     // new one, because the header's city name, the Hijri and Gregorian
     // dates and the high-latitude note all read their language from it.
     // The cost is one extra widget-mirror write per language change.
     val viewModel = remember(languageTag) {
-        TodayViewModel(
+        PrayerViewModel(
             engine = container.prayerTimesEngine,
             settings = settings,
             locationOf = { settings.location.first() },
@@ -99,13 +99,13 @@ internal fun TodayRoute(
             cardSession = OneTimeCardSession.process,
         )
     }
-    // Gated on the *lifecycle*, not just composition: leaving Today for another
+    // Gated on the *lifecycle*, not just composition: leaving the Prayer screen for another
     // tab cancels this via composition alone, but the activity being merely
     // stopped (screen off, Home pressed) does not tear down the composable —
     // it stays composed and a plain LaunchedEffect would keep ticking, writing
     // the widget mirror once a minute, for as long as the process lives.
     // repeatOnLifecycle suspends the block on STOP and restarts it on the next
-    // START, so the tick truly runs only while Today is on screen.
+    // START, so the tick truly runs only while the Prayer screen is showing.
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(viewModel, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -116,10 +116,10 @@ internal fun TodayRoute(
     SideEffect { lastState.value = state }
     val scope = rememberCoroutineScope()
 
-    // "No location yet" sends someone to the system's settings (see TodayScreen), so coming back
+    // "No location yet" sends someone to the system's settings (see PrayerScreen), so coming back
     // with location allowed has to be enough: the fix is fetched on every return while there is
     // still no place, and on arriving here with access already granted but no fix yet.
-    val needsLocation = state is TodayUiState.NeedsLocation
+    val needsLocation = state is PrayerUiState.NeedsLocation
     LaunchedEffect(needsLocation, lifecycleOwner) {
         if (!needsLocation) return@LaunchedEffect
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -127,7 +127,7 @@ internal fun TodayRoute(
         }
     }
 
-    TodayScreen(
+    PrayerScreen(
         state = state,
         onChooseCity = { navigator.push(Screen.CitySearch) },
         onOpenLocationSettings = ::openAppSettings,
@@ -163,7 +163,7 @@ internal fun QiblaRoute(
                 haptics = createHaptics(),
             )
         }
-        // Lifecycle-gated for the same reason Today's tick is: leaving the
+        // Lifecycle-gated for the same reason the Prayer screen's tick is: leaving the
         // screen cancels this through composition, but the activity merely
         // stopping (screen off, Home pressed) does not, and a plain
         // LaunchedEffect kept the magnetometer registered at
@@ -191,7 +191,7 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
     val format = LocalPlatformFormat.current
     val language = uiLanguage().code
     val scope = rememberCoroutineScope()
-    // Rebuilt when the language or the clock format changes, as TodayRoute's view model is: the
+    // Rebuilt when the language or the clock format changes, as PrayerRoute's view model is: the
     // phase's time is written by the format, and the du'a translations are the language's. Nothing
     // on screen is lost — every count is already on disk, except a free read's (spec §3.3), which
     // starts again from its first page — and the set the reader had switched to is the one the new
@@ -232,7 +232,7 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
     val reopen = shown.set ?: set
     LaunchedEffect(viewModel, set) { viewModel.open(reopen) }
     // The phase caption moves with the clock, once a minute while the screen is in front, and
-    // straight away on coming back to it (Today's lifecycle gate, for Today's reasons).
+    // straight away on coming back to it (the Prayer screen's lifecycle gate, for its reasons).
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(viewModel, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {

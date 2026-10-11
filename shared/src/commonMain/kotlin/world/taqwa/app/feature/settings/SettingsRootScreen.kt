@@ -79,7 +79,7 @@ import world.taqwa.app.resources.language_name
 import world.taqwa.app.share.shareText
 import world.taqwa.app.widget.isIosPlatform
 
-/** The horizontal inset every settings screen shares with Today's cards. */
+/** The horizontal inset every settings screen shares with the Prayer screen's cards. */
 internal val SettingsGutter = 24.dp
 
 /**

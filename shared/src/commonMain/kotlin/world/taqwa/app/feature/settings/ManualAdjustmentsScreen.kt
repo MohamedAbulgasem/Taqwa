@@ -40,7 +40,7 @@ import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.common.authorityShortName
-import world.taqwa.app.feature.today.formatClock
+import world.taqwa.app.feature.prayer.formatClock
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.prayer.engine.EngineDay

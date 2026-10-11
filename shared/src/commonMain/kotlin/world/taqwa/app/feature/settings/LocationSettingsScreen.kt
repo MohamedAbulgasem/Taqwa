@@ -28,7 +28,7 @@ import world.taqwa.app.resources.location_privacy_note
 import world.taqwa.app.resources.location_timezone
 import world.taqwa.app.resources.location_use_my_location
 import world.taqwa.app.resources.settings_location
-import world.taqwa.app.resources.today_current_location
+import world.taqwa.app.resources.prayer_current_location
 
 /**
  * The timezone is on screen deliberately: when prayer times look wrong by a whole hour, a city
@@ -84,7 +84,7 @@ fun LocationSettingsScreen(
             // both languages, and a country code or an IANA id is never translated either.
             TaqwaRow(
                 stringResource(Res.string.location_city),
-                value = cityName ?: stringResource(Res.string.today_current_location),
+                value = cityName ?: stringResource(Res.string.prayer_current_location),
             )
             CardDivider()
             TaqwaRow(stringResource(Res.string.location_country), value = location?.countryCode ?: "-")

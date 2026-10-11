@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,9 +44,9 @@ import world.taqwa.app.widget.createWidgetKeyValueStore
 import world.taqwa.app.widget.refreshWidgets
 import kotlin.time.Instant
 
-sealed interface TodayUiState {
-    data object Loading : TodayUiState
-    data object NeedsLocation : TodayUiState
+sealed interface PrayerUiState {
+    data object Loading : PrayerUiState
+    data object NeedsLocation : PrayerUiState
     data class Ready(
         val location: GeoLocation,
         /**
@@ -86,7 +86,7 @@ sealed interface TodayUiState {
         /** For the Qibla card: pure geometry from the location, no sensor involved. */
         val qiblaBearingDegrees: Double,
         val qiblaDistanceKm: Double,
-    ) : TodayUiState
+    ) : PrayerUiState
 }
 
 /** The other school's Asr, "Standard 16:24" under a Hanafi Asr (spec §2.1). */
@@ -106,7 +106,7 @@ data class DifferLine(
     val begun: Boolean,
 )
 
-class TodayViewModel(
+class PrayerViewModel(
     private val engine: PrayerTimesEngine,
     private val settings: SettingsRepository,
     private val locationOf: suspend () -> GeoLocation?,
@@ -150,10 +150,10 @@ class TodayViewModel(
      * emptied to its spinner for the length of one refresh every time the phone's language
      * changed; with it the same rows simply re-render in the new language.
      */
-    initialState: TodayUiState = TodayUiState.Loading,
+    initialState: PrayerUiState = PrayerUiState.Loading,
 ) {
     private val _state = MutableStateFlow(initialState)
-    val state: StateFlow<TodayUiState> = _state.asStateFlow()
+    val state: StateFlow<PrayerUiState> = _state.asStateFlow()
 
     /**
      * The last string actually written to the widget mirror, so [refresh] can tell a tick that
@@ -206,8 +206,8 @@ class TodayViewModel(
 
     /**
      * Runs the one-second tick until the calling coroutine is cancelled. No owned scope and no
-     * `launch` of its own: the caller (`repeatOnLifecycle(STARTED) { … }` in `App.kt`) is what
-     * ties this to the screen actually being on screen, not merely composed.
+     * `launch` of its own: the caller (`repeatOnLifecycle(STARTED) { … }` in `PrayerRoutes.kt`) is
+     * what ties this to the screen actually being on screen, not merely composed.
      *
      * `LaunchedEffect` alone was not enough — Android stops an activity (screen off, Home
      * pressed) without destroying it, so the composable, and the effect, stayed alive and this
@@ -232,7 +232,7 @@ class TodayViewModel(
         val ticket = ++latestRefresh
         val location = locationOf()
         if (location == null) {
-            _state.value = TodayUiState.NeedsLocation
+            _state.value = PrayerUiState.NeedsLocation
             return
         }
         // Before the state below is built, because it is what that state's header prints on a
@@ -280,7 +280,7 @@ class TodayViewModel(
         // tick racing this one cannot pick a second card, and stored as seen below (once-only).
         val firstShown = card?.takeIf { cardSession.shown == null }
         if (firstShown != null) cardSession.shown = firstShown
-        _state.value = TodayUiState.Ready(
+        _state.value = PrayerUiState.Ready(
             location = location,
             cityDisplayName = cachedCityName(location),
             hijri = HijriFormatter.format(hijri, format),
@@ -395,7 +395,7 @@ class TodayViewModel(
     suspend fun answerOneTimeCard(card: OneTimeCard) {
         cardSession.answered = true
         val current = _state.value
-        if (current is TodayUiState.Ready && current.oneTimeCard != null) {
+        if (current is PrayerUiState.Ready && current.oneTimeCard != null) {
             _state.value = current.copy(oneTimeCard = null)
         }
         markSeen(card)
@@ -481,7 +481,7 @@ class TodayViewModel(
         // suspends on a 1.6 MB parse; a city picked, or a fix taken, while it was running has
         // already published a state about somewhere else, and republishing this name over it
         // would put the old city's name under the new city's times.
-        if (current !is TodayUiState.Ready || current.location != location) return
+        if (current !is PrayerUiState.Ready || current.location != location) return
         if (current.cityDisplayName != resolved) {
             _state.value = current.copy(cityDisplayName = resolved)
         }
@@ -533,7 +533,7 @@ class TodayViewModel(
         migratedCityId = id
         val migrated = location.copy(cityId = id)
         val current = _state.value
-        if (current is TodayUiState.Ready && current.location == location) {
+        if (current is PrayerUiState.Ready && current.location == location) {
             _state.value = current.copy(location = migrated)
             // Now that there is an id, the name it stands for — this is the first tick on which
             // an upgraded install can show the header in the reader's own language.

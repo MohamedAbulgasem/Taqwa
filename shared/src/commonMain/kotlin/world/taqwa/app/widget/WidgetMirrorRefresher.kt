@@ -16,11 +16,11 @@ import kotlin.time.Instant
 /**
  * Rewrites the widget mirror from the stored location and settings, with no screen involved.
  *
- * `TodayViewModel` writes the mirror while Today is open, and the mirror's two-day schedule lets a
- * widget count across prayers on its own after that. This is what pushes the horizon forward when
- * the app has not been opened: Android calls it from the prayer alarm and the boot/time-change
- * receiver, iOS from its daily background refresh. Cheap (three days of prayer times) and quiet:
- * no location fix is requested, and a missing location simply writes nothing.
+ * `PrayerViewModel` writes the mirror while the Prayer screen is open, and the mirror's two-day
+ * schedule lets a widget count across prayers on its own after that. This is what pushes the
+ * horizon forward when the app has not been opened: Android calls it from the prayer alarm and the
+ * boot/time-change receiver, iOS from its daily background refresh. Cheap (three days of prayer
+ * times) and quiet: no location fix is requested, and a missing location simply writes nothing.
  */
 object WidgetMirrorRefresher {
 

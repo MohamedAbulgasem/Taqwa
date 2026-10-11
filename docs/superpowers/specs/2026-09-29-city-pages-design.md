@@ -273,7 +273,7 @@ One template for every class, in seven languages, at `/prayer-times/<slug>/` (En
      14 px amber dot; past rows `--t2` 500. **Current-prayer rule as the app's** (spec §2.1): the last
      obligatory prayer that has begun, except that Fajr stops being current at sunrise and Asr at sunset;
      before Fajr nothing is current. Set-by-rule pill (`.tag`, "Set by rule") after the prayer's name
-     where the day's `setByRule` names it; on a polar day the app's `today_polar_line` under the list.
+     where the day's `setByRule` names it; on a polar day the app's `prayer_polar_line` under the list.
    - `.today-foot` (hairline above): the mihrab glyph, "**This card is the app's Prayer screen.** Same
      minutes, same countdown." (14 px) and a quiet 40 px pill **"Get Taqwa"** → `#app` on the same page
      (R98: the app section carries the coming-soon state until launch, the badges after).
@@ -314,7 +314,7 @@ hidden (`summary::-webkit-details-marker { display: none }`).
 **The summary** (visible, three lines, `--t2` 14/15 px, the title in `--t1` 700):
 
 - Checked (A/B): `<b>{London Unified timetable}</b> · reproduced and checked by Taqwa · Taqwa is not
-  affiliated with London Unified.` — the title is the app's `today_whose_checked_title`, the middle a site
+  affiliated with London Unified.` — the title is the app's `prayer_whose_checked_title`, the middle a site
   sentence (`reproduced`), the tail the app's `about_not_affiliated`.
 - Cautious (C): `<b>Cautious times</b> · MJC, Cape community calendar and Jamiatul Ulama, combined and
   checked by Taqwa · Taqwa is not affiliated with any of them.` — `timetable_cautious`, the members joined
@@ -486,14 +486,14 @@ blocks carry the same keys (the build fails otherwise). New site keys and their 
 | `checks_*` | the checks page (§5) |
 
 Removed keys: `method`, `asr`, `why`, `note`, `high_latitude`, `cta_label`, `cta_title`, `cta_body`,
-`description`. App strings the document carries, filled per language: `today_whose_checked_title`,
+`description`. App strings the document carries, filled per language: `prayer_whose_checked_title`,
 `timetable_cautious`, `about_not_affiliated`, `about_checked_through`, `about_cautious_checked`,
 `about_who_publishes`, `about_who_publishes_body`, `about_how_reproduces`, `about_method_intro` (+ the
 `about_method_*` parts), `about_how_checked`, `about_stat_days_at_places`, `about_stat_never_before`,
 `about_stat_never_before_decider`, `about_stat_minutes_value`, `about_stat_at_most_after`,
 `about_cautious_body`, `about_cautious_maghrib_cap`,
-`about_which_decides`, `about_stop_eating`, `timetable_match_mosque`, `today_set_by_rule`,
-`today_polar_line`, `today_next_in`, `today_jumuah`, `madhab_standard`, `madhab_hanafi`, the prayer names
+`about_which_decides`, `about_stop_eating`, `timetable_match_mosque`, `prayer_set_by_rule`,
+`prayer_polar_line`, `prayer_next_in`, `prayer_jumuah`, `madhab_standard`, `madhab_hanafi`, the prayer names
 and the authority short names. Translations of new site sentences follow the app's terms (Cautious times =
 الأوقات الأحوط / İhtiyatlı vakitler / احتیاطی اوقات / সতর্কতামূলক সময় / Horaires par précaution; Set by rule
 = تقديري / Takdirî / تقدیری) and the site's existing register in each language.

@@ -627,7 +627,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
 
     /**
      * Records the name the header is now showing, for the language it was resolved in. Written by
-     * the one place that resolves it — `TodayViewModel` — and only when the answer or the language
+     * the one place that resolves it — `PrayerViewModel` — and only when the answer or the language
      * has actually changed: the Prayer screen ticks once a second and this must not be a write per
      * tick. Leaves the rest of the location alone for the same reason [backfillLocation] does.
      */

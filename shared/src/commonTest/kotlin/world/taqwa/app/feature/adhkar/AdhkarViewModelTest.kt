@@ -150,7 +150,7 @@ class AdhkarViewModelTest {
 
     /**
      * One file per test, removed first, with absolute paths and the store's writes on the test's
-     * own scheduler — TodayViewModelTest's rules, for TodayViewModelTest's reasons.
+     * own scheduler — PrayerViewModelTest's rules, for PrayerViewModelTest's reasons.
      */
     private suspend fun TestScope.rig(
         name: String,
@@ -195,7 +195,7 @@ class AdhkarViewModelTest {
     /**
      * Waits for a load of [set] to land. The view model works on `backgroundScope`, which
      * `advanceUntilIdle` does not wait for; suspending on the state it produces does, and lets any
-     * real (non-virtual) DataStore read finish, as TodayViewModelTest explains.
+     * real (non-virtual) DataStore read finish, as PrayerViewModelTest explains.
      */
     private suspend fun TestScope.loaded(rig: Rig, set: AdhkarSet): AdhkarUiState = loaded(rig.viewModel, set)
 

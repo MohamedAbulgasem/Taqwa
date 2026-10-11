@@ -6,7 +6,7 @@ package world.taqwa.app.widget
  * here at launch (`iOSApp.swift`) and Kotlin invokes it whenever the mirror has just been
  * rewritten — a real reload, routed through the one language that can make it.
  *
- * `TodayViewModel.refresh()` runs once a second while the Today screen is on screen, so the Swift
+ * `PrayerViewModel.refresh()` runs once a second while the Prayer screen is showing, so the Swift
  * side is responsible for ignoring calls where the serialised snapshot has not actually changed.
  */
 object WidgetRefreshBridge {

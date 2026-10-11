@@ -84,8 +84,8 @@ class WidgetMirrorWriterTest {
         assertEquals(0.3f, snapshot.ringProgress)
     }
 
-    // The exact phrase `Res.string.today_next_in` renders for Today's ring — "Asr in" in
-    // English, "متبقٍ على العصر" in Arabic — for the next prayer. This is what proves the mirror
+    // The exact phrase `Res.string.prayer_next_in` renders for the Prayer screen's ring — "Asr in"
+    // in English, "متبقٍ على العصر" in Arabic — for the next prayer. This is what proves the mirror
     // writes the localised sentence itself, never a hardcoded English suffix it composes on its
     // own (that bug is this fix's whole reason to exist), and that it responds to the device's
     // language rather than being pinned to one.
@@ -121,7 +121,7 @@ class WidgetMirrorWriterTest {
 
     // One second of a three-hour gap moves raw `elapsed / total` by about 1/10800 — far below one
     // 1/120 step — so the two snapshots must serialise to the identical string. That equality is
-    // exactly what `TodayViewModel` compares to decide whether to write and nudge at all.
+    // exactly what `PrayerViewModel` compares to decide whether to write and nudge at all.
     @Test
     fun oneSecondOfProgressAcrossATypicalPrayerGapSerialisesIdentically() {
         val total = 3 * 60 * 60f

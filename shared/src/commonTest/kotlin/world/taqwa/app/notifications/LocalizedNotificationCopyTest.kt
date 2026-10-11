@@ -110,7 +110,8 @@ class LocalizedNotificationCopyTest {
 
     // "5:10 PM" is Latin digits, a space and a marker, in a sentence that may run the other way;
     // unisolated, the neighbouring "·" and words reorder its pieces. Wrapped in FSI…PDI, the same
-    // isolate Today's sub-lines use, it reads as one unit whatever the sentence's direction.
+    // isolate the Prayer screen's sub-lines use, it reads as one unit whatever the sentence's
+    // direction.
     @Test
     fun theTimeIsIsolatedInsideTheBody() {
         val body = LocalizedNotificationCopy(StubFormat("ur", arabicIndic = false))

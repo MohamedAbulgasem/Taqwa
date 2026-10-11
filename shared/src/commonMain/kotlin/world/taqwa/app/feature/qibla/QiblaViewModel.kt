@@ -63,7 +63,7 @@ class QiblaViewModel(
      * sensors to the screen actually being on screen, not merely composed — a plain
      * `LaunchedEffect` kept the magnetometer registered at `SENSOR_DELAY_GAME` behind the lock
      * screen, because Android stops an activity without destroying it and the composable stayed
-     * composed. The same reasoning, and the same shape, as `TodayViewModel.tickWhileActive`.
+     * composed. The same reasoning, and the same shape, as `PrayerViewModel.tickWhileActive`.
      *
      * Both the filter and the gate are reset on every (re)entry: after a spell in the background
      * the last heading is stale, and a device that was mid-calibration should be judged on what

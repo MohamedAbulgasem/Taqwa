@@ -47,14 +47,14 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // `api`, not `implementation`: the widget model's types are part of `shared`'s own
-            // public surface (SettingsRepository, TodayViewModel, androidApp's Glance widgets),
+            // public surface (SettingsRepository, PrayerViewModel, androidApp's Glance widgets),
             // and `export` above requires an `api` dependency.
             api(project(":widgetcore"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.components.resources)
-            // repeatOnLifecycle + LocalLifecycleOwner for common code: gates TodayViewModel's
+            // repeatOnLifecycle + LocalLifecycleOwner for common code: gates PrayerViewModel's
             // tick loop on Lifecycle.State.STARTED so it stops the moment the screen is stopped
             // (backgrounded, screen off) instead of running for as long as the process lives.
             implementation(libs.jetbrains.lifecycle.runtime.compose)

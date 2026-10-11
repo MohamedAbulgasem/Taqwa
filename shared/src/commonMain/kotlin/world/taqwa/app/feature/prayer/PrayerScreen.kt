@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.defaultMinSize
@@ -92,36 +92,36 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.notifications_allow_exact_alarms
 import world.taqwa.app.resources.onboarding_location_body
 import world.taqwa.app.resources.qibla_title
-import world.taqwa.app.resources.today_location_settings
-import world.taqwa.app.resources.today_choose_city
-import world.taqwa.app.resources.today_current_location
-import world.taqwa.app.resources.today_exact_alarms_body
-import world.taqwa.app.resources.today_exact_alarms_label
+import world.taqwa.app.resources.prayer_location_settings
+import world.taqwa.app.resources.prayer_choose_city
+import world.taqwa.app.resources.prayer_current_location
+import world.taqwa.app.resources.prayer_exact_alarms_body
+import world.taqwa.app.resources.prayer_exact_alarms_label
 import world.taqwa.app.resources.madhab_hanafi
 import world.taqwa.app.resources.madhab_standard
-import world.taqwa.app.resources.today_about_these_times
-import world.taqwa.app.resources.today_differ_after
-import world.taqwa.app.resources.today_differ_before
-import world.taqwa.app.resources.today_polar_line
-import world.taqwa.app.resources.today_next_in
-import world.taqwa.app.resources.today_no_location_title
-import world.taqwa.app.resources.today_open_adhkar
-import world.taqwa.app.resources.today_open_tasbeeh
-import world.taqwa.app.resources.today_other_asr
-import world.taqwa.app.resources.today_qibla_detail
+import world.taqwa.app.resources.prayer_about_these_times
+import world.taqwa.app.resources.prayer_differ_after
+import world.taqwa.app.resources.prayer_differ_before
+import world.taqwa.app.resources.prayer_polar_line
+import world.taqwa.app.resources.prayer_next_in
+import world.taqwa.app.resources.prayer_no_location_title
+import world.taqwa.app.resources.prayer_open_adhkar
+import world.taqwa.app.resources.prayer_open_tasbeeh
+import world.taqwa.app.resources.prayer_other_asr
+import world.taqwa.app.resources.prayer_qibla_detail
 import kotlin.time.Instant
 
 /** The page gutter, shared with every settings screen. */
 private val Gutter = 24.dp
 
 /**
- * The Prayer tab (iteration 8; still `Today` in code, see `Tab`). City and both dates, the
+ * The Prayer tab (iteration 8). City and both dates, the
  * countdown ring free on the page, the timeline in a card, and beneath it the Qibla card that
  * opens the compass — the compass stopped being a tab so that the bar could stay small.
  */
 @Composable
-fun TodayScreen(
-    state: TodayUiState,
+fun PrayerScreen(
+    state: PrayerUiState,
     onChooseCity: () -> Unit,
     /** "No location yet"'s link: the app's own page in the system's settings. */
     onOpenLocationSettings: () -> Unit,
@@ -151,9 +151,9 @@ fun TodayScreen(
     )
     Box(Modifier.fillMaxSize().background(colors.background)) {
         when (state) {
-            TodayUiState.Loading -> Unit
-            TodayUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onOpenLocationSettings)
-            is TodayUiState.Ready -> ReadyBody(state, actions, exactAlarmsOff)
+            PrayerUiState.Loading -> Unit
+            PrayerUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onOpenLocationSettings)
+            is PrayerUiState.Ready -> ReadyBody(state, actions, exactAlarmsOff)
         }
     }
 }
@@ -171,7 +171,7 @@ private class ReadyActions(
 
 @Composable
 private fun ReadyBody(
-    state: TodayUiState.Ready,
+    state: PrayerUiState.Ready,
     actions: ReadyActions,
     exactAlarmsOff: Boolean,
 ) {
@@ -203,7 +203,7 @@ private fun ReadyBody(
 /** Upright: exactly what this screen has always been, now capped to the shared content width. */
 @Composable
 private fun PortraitBody(
-    state: TodayUiState.Ready,
+    state: PrayerUiState.Ready,
     zone: TimeZone,
     format: PlatformFormat,
     actions: ReadyActions,
@@ -251,7 +251,7 @@ private fun PortraitBody(
  */
 @Composable
 private fun LandscapeBody(
-    state: TodayUiState.Ready,
+    state: PrayerUiState.Ready,
     zone: TimeZone,
     format: PlatformFormat,
     width: Dp,
@@ -304,14 +304,14 @@ private fun LandscapeBody(
  */
 @Composable
 private fun CityAndDates(
-    state: TodayUiState.Ready,
+    state: PrayerUiState.Ready,
     actions: ReadyActions,
     horizontalPadding: Dp = Gutter,
     topPadding: Dp = TabRootTitleTop,
 ) {
     val colors = LocalTaqwaColors.current
     val density = LocalDensity.current
-    val place = state.cityDisplayName ?: stringResource(Res.string.today_current_location)
+    val place = state.cityDisplayName ?: stringResource(Res.string.prayer_current_location)
     var whoseOpen by remember { mutableStateOf(false) }
     // Where the block and the ⓘ sit in the window, for the card's width and its caret.
     var blockLeft by remember { mutableFloatStateOf(0f) }
@@ -414,8 +414,8 @@ private fun CityAndDates(
         // The horizon before the misbaha, so the misbaha keeps the corner it has always had. After
         // the block in the Box, so they are drawn and hit-tested on top of it.
         Row(Modifier.align(Alignment.TopEnd)) {
-            HeaderGlyphButton(stringResource(Res.string.today_open_adhkar), actions.onOpenAdhkar) { drawHorizon(it) }
-            HeaderGlyphButton(stringResource(Res.string.today_open_tasbeeh), actions.onOpenTasbeeh) { drawMisbaha(it) }
+            HeaderGlyphButton(stringResource(Res.string.prayer_open_adhkar), actions.onOpenAdhkar) { drawHorizon(it) }
+            HeaderGlyphButton(stringResource(Res.string.prayer_open_tasbeeh), actions.onOpenTasbeeh) { drawMisbaha(it) }
         }
     }
 }
@@ -448,9 +448,9 @@ private val CityLineMinHeight = HeaderGlyphSize - HeaderGlyphNudge + HeaderGlyph
  * exact-alarms card keeps its place under the Qibla card.
  */
 @Composable
-private fun UnderTheList(state: TodayUiState.Ready, actions: ReadyActions) {
-    val place = state.cityDisplayName ?: stringResource(Res.string.today_current_location)
-    val about = stringResource(Res.string.today_about_these_times)
+private fun UnderTheList(state: PrayerUiState.Ready, actions: ReadyActions) {
+    val place = state.cityDisplayName ?: stringResource(Res.string.prayer_current_location)
+    val about = stringResource(Res.string.prayer_about_these_times)
     val anyLine = state.whose.cautious || state.polar
     if (anyLine) Spacer(Modifier.height(2.dp))
     if (state.whose.cautious) {
@@ -463,7 +463,7 @@ private fun UnderTheList(state: TodayUiState.Ready, actions: ReadyActions) {
         )
     }
     if (state.polar) {
-        val sentence = stringResource(Res.string.today_polar_line)
+        val sentence = stringResource(Res.string.prayer_polar_line)
         TertiaryLine(
             text = sentence,
             label = sentence,
@@ -526,7 +526,7 @@ private fun HeaderGlyphButton(description: String, onOpen: () -> Unit, draw: Dra
 
 @Composable
 private fun Countdown(
-    state: TodayUiState.Ready,
+    state: PrayerUiState.Ready,
     zone: TimeZone,
     format: PlatformFormat,
     diameter: Dp = CountdownRingSize,
@@ -534,7 +534,7 @@ private fun Countdown(
     CountdownRing(
         progress = state.today.ringProgress,
         label = stringResource(
-            Res.string.today_next_in,
+            Res.string.prayer_next_in,
             localizedPrayerName(state.today.next.prayer),
         ),
         countdown = CountdownFormatter.countdown(
@@ -548,7 +548,7 @@ private fun Countdown(
 }
 
 @Composable
-private fun TimelineCard(state: TodayUiState.Ready, zone: TimeZone, format: PlatformFormat) {
+private fun TimelineCard(state: PrayerUiState.Ready, zone: TimeZone, format: PlatformFormat) {
     TaqwaCard(Modifier.padding(horizontal = Gutter)) {
         Spacer(Modifier.height(4.dp))
         PrayerTimeline(
@@ -569,22 +569,22 @@ private fun TimelineCard(state: TodayUiState.Ready, zone: TimeZone, format: Plat
  * its own direction inside the other script's sentence.
  */
 @Composable
-private fun subLines(state: TodayUiState.Ready, zone: TimeZone, format: PlatformFormat): Map<Prayer, List<String>> {
+private fun subLines(state: PrayerUiState.Ready, zone: TimeZone, format: PlatformFormat): Map<Prayer, List<String>> {
     val lines = mutableMapOf<Prayer, MutableList<String>>()
     state.otherAsr?.let { other ->
         val school = stringResource(
             if (other.school == AsrSchool.HANAFI) Res.string.madhab_hanafi else Res.string.madhab_standard,
         )
         lines.getOrPut(Prayer.ASR) { mutableListOf() } +=
-            stringResource(Res.string.today_other_asr, school, isolated(formatClock(other.instant, zone, format)))
+            stringResource(Res.string.prayer_other_asr, school, isolated(formatClock(other.instant, zone, format)))
     }
     state.differ?.let { d ->
         val member = isolated(authorityShortName(d.memberNameKey))
         val prayer = localizedPrayerName(d.prayer)
         val line = if (d.begun) {
-            stringResource(Res.string.today_differ_after, member, prayer, isolated(formatClock(d.shownStart, zone, format)))
+            stringResource(Res.string.prayer_differ_after, member, prayer, isolated(formatClock(d.shownStart, zone, format)))
         } else {
-            stringResource(Res.string.today_differ_before, member, prayer, isolated(formatClock(d.memberStart, zone, format)))
+            stringResource(Res.string.prayer_differ_before, member, prayer, isolated(formatClock(d.memberStart, zone, format)))
         }
         lines.getOrPut(d.under) { mutableListOf() } += line
     }
@@ -613,13 +613,13 @@ private fun ExactAlarmsCard(onAllow: () -> Unit) {
                 .padding(16.dp),
         ) {
             Text(
-                stringResource(Res.string.today_exact_alarms_label),
+                stringResource(Res.string.prayer_exact_alarms_label),
                 style = TaqwaText.sectionLabel,
                 color = colors.accent,
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                stringResource(Res.string.today_exact_alarms_body),
+                stringResource(Res.string.prayer_exact_alarms_body),
                 style = TaqwaText.caption,
                 color = colors.textSecondary,
             )
@@ -659,7 +659,7 @@ private fun QiblaCard(bearingDegrees: Double, distanceKm: Double, format: Platfo
                 Text(stringResource(Res.string.qibla_title), style = TaqwaText.rowLabel, color = colors.textPrimary)
                 Text(
                     stringResource(
-                        Res.string.today_qibla_detail,
+                        Res.string.prayer_qibla_detail,
                         format.localizedDigits(bearingDegrees.toInt()),
                         localizedGroupedKm(distanceKm, format),
                     ),
@@ -707,7 +707,7 @@ private fun NeedsLocationBody(onChooseCity: () -> Unit, onOpenLocationSettings: 
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            stringResource(Res.string.today_no_location_title),
+            stringResource(Res.string.prayer_no_location_title),
             style = TaqwaText.screenTitle,
             color = colors.textPrimary,
         )
@@ -721,12 +721,12 @@ private fun NeedsLocationBody(onChooseCity: () -> Unit, onOpenLocationSettings: 
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(28.dp))
-        TaqwaPrimaryButton(stringResource(Res.string.today_choose_city), onChooseCity)
+        TaqwaPrimaryButton(stringResource(Res.string.prayer_choose_city), onChooseCity)
         Spacer(Modifier.height(4.dp))
         // To the system's settings, never to the system prompt: iOS asks only once, so after a
         // refusal the prompt cannot come back, and a screen that explains and then raises the
         // prompt beside a second button is what App Review rejects (guideline 5.1.1(iv)).
-        TaqwaTextLink(stringResource(Res.string.today_location_settings), onOpenLocationSettings)
+        TaqwaTextLink(stringResource(Res.string.prayer_location_settings), onOpenLocationSettings)
     }
 }
 

@@ -32,46 +32,46 @@
     <string name="prayer_maghrib">المغرب</string>
     <string name="prayer_isha">العشاء</string>
 
-    <!-- Today -->
-    <string name="today_current_location">الموقع الحالي</string>
-    <string name="today_next_in">متبقٍ على %1$s</string>
-    <string name="today_exact_alarms_label">المنبهات الدقيقة معطّلة</string>
-    <string name="today_exact_alarms_body">قد يتأخر التنبيه حتى ساعة ما لم يُسمح لتقوى بـ«المنبهات والتذكيرات».</string>
-    <string name="today_no_location_title">لا يوجد موقع بعد</string>
-    <string name="today_choose_city">اختر مدينة</string>
-    <string name="today_location_settings">تفعيل الموقع من الإعدادات</string>
-    <string name="today_jumuah">الجمعة</string>
+    <!-- Prayer screen -->
+    <string name="prayer_current_location">الموقع الحالي</string>
+    <string name="prayer_next_in">متبقٍ على %1$s</string>
+    <string name="prayer_exact_alarms_label">المنبهات الدقيقة معطّلة</string>
+    <string name="prayer_exact_alarms_body">قد يتأخر التنبيه حتى ساعة ما لم يُسمح لتقوى بـ«المنبهات والتذكيرات».</string>
+    <string name="prayer_no_location_title">لا يوجد موقع بعد</string>
+    <string name="prayer_choose_city">اختر مدينة</string>
+    <string name="prayer_location_settings">تفعيل الموقع من الإعدادات</string>
+    <string name="prayer_jumuah">الجمعة</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
-    <string name="today_whose_checked_title">جدول %1$s</string>
-    <string name="today_whose_checked_body">مواقيت %1$s في %2$s، أعاد تقوى حسابها وتحقّق منها مقارنةً بالجدول المنشور.</string>
-    <string name="today_whose_unchecked_title">طريقة %1$s، لم يُتحقَّق منها كاملًا بعد</string>
-    <string name="today_whose_unchecked_body">يحسب تقوى مواقيت %2$s بطريقة %1$s، مع هامش احتياط.</string>
-    <string name="today_whose_cautious_body">تتبع المساجد هنا جداول مختلفة، لذا يعرض تقوى كل صلاة بعد دخول وقتها فيها جميعًا.</string>
-    <string name="today_whose_calculated_body">لا يُعرف هنا جدول محلي، لذا يحسب تقوى هذه المواقيت احتياطًا.</string>
-    <string name="today_about_these_times">عن هذه المواقيت</string>
-    <string name="today_times_by">مواقيت %1$s</string>
-    <string name="today_whose_a11y">%1$s، %2$s. يفتح مصدر هذه المواقيت</string>
-    <string name="today_about_a11y">%1$s، %2$s. يفتح «عن هذه المواقيت»</string>
-    <string name="today_set_by_rule">تقديري</string>
-    <string name="today_polar_line">لا تشرق الشمس ولا تغرب هنا اليوم، لذا تتبع بعض المواقيت أقرب خط عرض تشرق فيه وتغرب.</string>
-    <string name="today_card_cautious_title">تتبع المساجد هنا جداول مختلفة</string>
-    <string name="today_card_cautious_body">يعرض تقوى كل صلاة بعد دخول وقتها فيها جميعًا.</string>
-    <string name="today_card_sunni_title">هذه مواقيت الصلاة عند أهل السنة</string>
-    <string name="today_card_sunni_body">عند الشيعة (الجعفرية) يتأخر المغرب والإفطار.</string>
-    <string name="today_match_my_mosque">مطابقة مواقيت مسجدي</string>
-    <string name="today_card_ok">حسنًا</string>
-    <string name="today_clock_line">قد يكون توقيت هاتفك مختلفًا بساعة</string>
-    <string name="today_clock_stale_early">تغيّر التوقيت الرسمي في %1$s يوم %2$s ولم يُحدَّث هاتفك بعد، لذا قد تظهر مواقيت الصلاة مبكرة بساعة. ثبّت آخر تحديث للنظام، واترك التاريخ والوقت على الضبط التلقائي: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
-    <string name="today_clock_stale_late">تغيّر التوقيت الرسمي في %1$s يوم %2$s ولم يُحدَّث هاتفك بعد، لذا قد تظهر مواقيت الصلاة متأخرة بساعة. ثبّت آخر تحديث للنظام، واترك التاريخ والوقت على الضبط التلقائي: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
-    <string name="today_clock_manual_early">تغيّر التوقيت الرسمي في %1$s يوم %2$s. إن كنت ضبطت الساعة يدويًا فقد تظهر مواقيت الصلاة مبكرة بساعة. فعّل ضبط التاريخ والوقت تلقائيًا: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
-    <string name="today_clock_manual_late">تغيّر التوقيت الرسمي في %1$s يوم %2$s. إن كنت ضبطت الساعة يدويًا فقد تظهر مواقيت الصلاة متأخرة بساعة. فعّل ضبط التاريخ والوقت تلقائيًا: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
-    <string name="today_clock_region_morocco">المغرب</string>
-    <string name="today_clock_region_british_columbia">كولومبيا البريطانية</string>
-    <string name="today_clock_region_kazakhstan">كازاخستان</string>
-    <string name="today_differ_before">يبدأ %2$s حسب %1$s الساعة %3$s</string>
-    <string name="today_differ_after">دخل %2$s حسب %1$s · يعرضه تقوى من الساعة %3$s</string>
-    <string name="today_other_asr">عصر %1$s %2$s</string>
+    <string name="prayer_whose_checked_title">جدول %1$s</string>
+    <string name="prayer_whose_checked_body">مواقيت %1$s في %2$s، أعاد تقوى حسابها وتحقّق منها مقارنةً بالجدول المنشور.</string>
+    <string name="prayer_whose_unchecked_title">طريقة %1$s، لم يُتحقَّق منها كاملًا بعد</string>
+    <string name="prayer_whose_unchecked_body">يحسب تقوى مواقيت %2$s بطريقة %1$s، مع هامش احتياط.</string>
+    <string name="prayer_whose_cautious_body">تتبع المساجد هنا جداول مختلفة، لذا يعرض تقوى كل صلاة بعد دخول وقتها فيها جميعًا.</string>
+    <string name="prayer_whose_calculated_body">لا يُعرف هنا جدول محلي، لذا يحسب تقوى هذه المواقيت احتياطًا.</string>
+    <string name="prayer_about_these_times">عن هذه المواقيت</string>
+    <string name="prayer_times_by">مواقيت %1$s</string>
+    <string name="prayer_whose_a11y">%1$s، %2$s. يفتح مصدر هذه المواقيت</string>
+    <string name="prayer_about_a11y">%1$s، %2$s. يفتح «عن هذه المواقيت»</string>
+    <string name="prayer_set_by_rule">تقديري</string>
+    <string name="prayer_polar_line">لا تشرق الشمس ولا تغرب هنا اليوم، لذا تتبع بعض المواقيت أقرب خط عرض تشرق فيه وتغرب.</string>
+    <string name="prayer_card_cautious_title">تتبع المساجد هنا جداول مختلفة</string>
+    <string name="prayer_card_cautious_body">يعرض تقوى كل صلاة بعد دخول وقتها فيها جميعًا.</string>
+    <string name="prayer_card_sunni_title">هذه مواقيت الصلاة عند أهل السنة</string>
+    <string name="prayer_card_sunni_body">عند الشيعة (الجعفرية) يتأخر المغرب والإفطار.</string>
+    <string name="prayer_match_my_mosque">مطابقة مواقيت مسجدي</string>
+    <string name="prayer_card_ok">حسنًا</string>
+    <string name="prayer_clock_line">قد يكون توقيت هاتفك مختلفًا بساعة</string>
+    <string name="prayer_clock_stale_early">تغيّر التوقيت الرسمي في %1$s يوم %2$s ولم يُحدَّث هاتفك بعد، لذا قد تظهر مواقيت الصلاة مبكرة بساعة. ثبّت آخر تحديث للنظام، واترك التاريخ والوقت على الضبط التلقائي: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
+    <string name="prayer_clock_stale_late">تغيّر التوقيت الرسمي في %1$s يوم %2$s ولم يُحدَّث هاتفك بعد، لذا قد تظهر مواقيت الصلاة متأخرة بساعة. ثبّت آخر تحديث للنظام، واترك التاريخ والوقت على الضبط التلقائي: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
+    <string name="prayer_clock_manual_early">تغيّر التوقيت الرسمي في %1$s يوم %2$s. إن كنت ضبطت الساعة يدويًا فقد تظهر مواقيت الصلاة مبكرة بساعة. فعّل ضبط التاريخ والوقت تلقائيًا: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
+    <string name="prayer_clock_manual_late">تغيّر التوقيت الرسمي في %1$s يوم %2$s. إن كنت ضبطت الساعة يدويًا فقد تظهر مواقيت الصلاة متأخرة بساعة. فعّل ضبط التاريخ والوقت تلقائيًا: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
+    <string name="prayer_clock_region_morocco">المغرب</string>
+    <string name="prayer_clock_region_british_columbia">كولومبيا البريطانية</string>
+    <string name="prayer_clock_region_kazakhstan">كازاخستان</string>
+    <string name="prayer_differ_before">يبدأ %2$s حسب %1$s الساعة %3$s</string>
+    <string name="prayer_differ_after">دخل %2$s حسب %1$s · يعرضه تقوى من الساعة %3$s</string>
+    <string name="prayer_other_asr">عصر %1$s %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">الإعدادات</string>
@@ -482,7 +482,7 @@
     <string name="tab_quran">القرآن</string>
     <string name="tab_settings">الإعدادات</string>
     <!-- Prayer screen's Qibla card -->
-    <string name="today_qibla_detail">%1$s° · %2$s كم إلى مكة</string>
+    <string name="prayer_qibla_detail">%1$s° · %2$s كم إلى مكة</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">القرآن</string>
     <string name="quran_search_hint">ابحث في القرآن</string>
@@ -527,7 +527,7 @@
     <string name="quran_a11y_read_aloud">جارٍ القراءة صوتيًا</string>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">التسبيح</string>
-    <string name="today_open_tasbeeh">التسبيح</string>
+    <string name="prayer_open_tasbeeh">التسبيح</string>
     <string name="tasbeeh_add_custom">إضافة ذكر</string>
     <string name="tasbeeh_round">الجولة %1$s</string>
     <string name="tasbeeh_of">من %1$s</string>
@@ -622,7 +622,7 @@
     <string name="prayer_times_time_format">تنسيق الوقت</string>
     <string name="time_format_24">٢٤ ساعة</string>
     <string name="time_format_12">١٢ ساعة</string>
-    <string name="today_open_adhkar">الأذكار</string>
+    <string name="prayer_open_adhkar">الأذكار</string>
     <string name="adhkar_morning">أذكار الصباح</string>
     <string name="adhkar_evening">أذكار المساء</string>
     <string name="adhkar_segment_morning">صباح</string>

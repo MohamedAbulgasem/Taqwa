@@ -29,11 +29,11 @@ private val widgetRefreshScope = CoroutineScope(SupervisorJob() + Dispatchers.De
 
 /**
  * Deliberately fire-and-forget. This used to be `runBlocking { hook() }`, which ran on whatever
- * dispatcher the caller was on — and the caller is `TodayViewModel.refresh()`, launched from
- * `App.kt`'s `LaunchedEffect` on the composition's **Main** dispatcher. So the UI thread blocked
- * on a SharedPreferences write plus two full Glance recompositions plus `AppWidgetManager` IPC,
- * on the app's primary screen. Nothing awaits the result of a widget update, so there is no
- * reason for the caller to wait for it.
+ * dispatcher the caller was on — and the caller is `PrayerViewModel.refresh()`, launched from
+ * `PrayerRoutes.kt`'s `LaunchedEffect` on the composition's **Main** dispatcher. So the UI thread
+ * blocked on a SharedPreferences write plus two full Glance recompositions plus
+ * `AppWidgetManager` IPC, on the app's primary screen. Nothing awaits the result of a widget
+ * update, so there is no reason for the caller to wait for it.
  *
  * The `runCatching` matters: an exception escaping a bare `launch` on a scope with no handler
  * reaches the thread's default handler and takes the process down. A widget that failed to redraw

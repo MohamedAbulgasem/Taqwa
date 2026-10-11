@@ -19,10 +19,10 @@ package world.taqwa.app.widget
  * `CountdownFormatter`'s narrower two-locale test.
  *
  * Unlike `CountdownFormatter`, there is no tabular-jitter fallback here. That fallback exists
- * only for the in-app Today ring, whose countdown ticks every second and would visibly jitter in
- * the system Arabic font's non-tabular Arabic-Indic digits (spec §4.2). A widget countdown is
- * minute-granular and redrawn at most once a minute — the jitter that fallback guards against
- * cannot occur here, so the exception does not apply (I9).
+ * only for the in-app ring on the Prayer screen, whose countdown ticks every second and would
+ * visibly jitter in the system Arabic font's non-tabular Arabic-Indic digits (spec §4.2). A widget
+ * countdown is minute-granular and redrawn at most once a minute — the jitter that fallback guards
+ * against cannot occur here, so the exception does not apply (I9).
  *
  * `fa` (Persian) and `ur` (Urdu) are left on Western digits. Neither `PlatformFormat` nor
  * `CountdownFormatter` gives either language a non-Western digit set anywhere in this app today

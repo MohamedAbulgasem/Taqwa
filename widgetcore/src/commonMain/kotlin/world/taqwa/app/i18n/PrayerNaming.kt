@@ -24,8 +24,8 @@ private val NAMES: Map<UiLanguage, Map<Prayer, String>> = mapOf(
 )
 
 /**
- * The "next prayer in" heading Today's ring and the widgets render, `{prayer}` standing for the
- * name. Kept in step with `Res.string.today_next_in` of each language by hand.
+ * The "next prayer in" heading the Prayer screen's ring and the widgets render, `{prayer}` standing
+ * for the name. Kept in step with `Res.string.prayer_next_in` of each language by hand.
  */
 private val COUNTDOWN: Map<UiLanguage, String> = mapOf(
     UiLanguage.ENGLISH to "{prayer} in",

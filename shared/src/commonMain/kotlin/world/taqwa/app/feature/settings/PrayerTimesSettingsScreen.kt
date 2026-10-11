@@ -222,8 +222,8 @@ fun PrayerTimesSettingsScreen(
             onSelect = onHijriOffset,
         )
         Spacer(Modifier.height(10.dp))
-        // The offset shifts the Gregorian date before conversion, exactly as Today does it —
-        // never the Hijri day number, which can produce a day 0 or a day 31.
+        // The offset shifts the Gregorian date before conversion, exactly as the Prayer screen does
+        // it — never the Hijri day number, which can produce a day 0 or a day 31.
         SettingsNote(
             HijriFormatter.format(
                 TabularHijriCalendar.fromGregorian(today.plus(settings.hijriOffsetDays, DateTimeUnit.DAY)),

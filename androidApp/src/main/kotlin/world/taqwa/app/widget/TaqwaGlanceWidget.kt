@@ -97,9 +97,9 @@ private fun readWidgetRender(
     val nowEpochSeconds = System.currentTimeMillis() / 1_000L
     return WidgetRender(
         // Worked out for *now* from the mirror's two-day schedule (next prayer, current prayer,
-        // the rows), not read as it stood when the app last had Today open: the render runs on
-        // the half-hourly APPWIDGET_UPDATE, the rolling five-minute alarm, the prayer alarm and
-        // the unlock receiver, and after Isha it has to say "Fajr in" without the app's help.
+        // the rows), not read as it stood when the app last had the Prayer screen open: the render
+        // runs on the half-hourly APPWIDGET_UPDATE, the rolling five-minute alarm, the prayer alarm
+        // and the unlock receiver, and after Isha it has to say "Fajr in" without the app's help.
         content = snapshot?.let { WidgetContentBuilder.build(it, nowEpochSeconds) },
         remainingMinutes = snapshot?.let { WidgetCountdown.remainingMinutesAt(it, nowEpochSeconds) },
         colors = WidgetPalette.colorsFor(background, systemIsDark),
@@ -415,8 +415,8 @@ private fun launchIntent(context: Context) = Intent(context, MainActivity::class
 @Composable
 internal fun WidgetCard(
     colors: WidgetPaletteColors,
-    // The whole card is one target, and what that target opens is the caller's business: Today
-    // for the prayer widgets, the ayah itself for the ayah widget (spec §8).
+    // The whole card is one target, and what that target opens is the caller's business: the
+    // Prayer screen for the prayer widgets, the ayah itself for the ayah widget (spec §8).
     onClick: Action = actionStartActivity(launchIntent(LocalContext.current)),
     content: @Composable () -> Unit,
 ) {

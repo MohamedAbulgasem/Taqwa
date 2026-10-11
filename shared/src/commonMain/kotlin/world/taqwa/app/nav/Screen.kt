@@ -4,7 +4,7 @@ import world.taqwa.app.adhkar.AdhkarSet
 
 sealed interface Screen {
     data object Onboarding : Screen
-    data object Today : Screen
+    data object Prayer : Screen
     data object Quran : Screen
     /**
      * [selectAyah] opens the reader with [ayah] already selected — its card tinted and its copy,

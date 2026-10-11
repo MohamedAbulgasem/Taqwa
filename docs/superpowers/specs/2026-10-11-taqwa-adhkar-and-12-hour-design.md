@@ -74,7 +74,7 @@ The four bare `createPlatformFormat()` call sites take the stored value:
 `App.kt` (the `remember(uiLanguage)` becomes `remember(uiLanguage, clockFormat)` with the flow
 collected beside the language), `NotificationCoordinator.plan` (reads `clockFormat.first()`),
 `WidgetMirrorRefresher.refresh` (its default format is built from the setting, or callers pass
-one built the same way) and `TodayViewModel.widgetFormat`. Every surface in the pipeline then
+one built the same way) and `PrayerViewModel.widgetFormat`. Every surface in the pipeline then
 follows with no per-surface code: the ring's clock, the timeline rows, the sub-lines, the Timetable
 "times today" rows, About these times, Match my mosque's sentences, Manual adjustments, the
 notification bodies, both widgets (they draw the strings the app writes into the mirror), and the
@@ -124,7 +124,7 @@ to (14, 12); a half sun, the upper arc of radius 3.4 centred on (8, 12); three r
 
 The horizon's `HeaderGlyphButton` beside the misbaha's in `CityAndDates`: the same 44 dp circle
 (`HeaderGlyphSize`), 22 dp glyph in `textPrimary`, the same −4 dp nudge (`HeaderGlyphNudge`), no
-ripple, `contentDescription = today_open_adhkar` ("Adhkar").
+ripple, `contentDescription = prayer_open_adhkar` ("Adhkar").
 Order at the end of the city's row: the city, then the horizon, then the misbaha. The two buttons
 overlay the city's row only (the title keeps 88 dp clear for them); the date line beneath spans the
 block's full width, as it did before the second button, so the glyphs never change how the date is
@@ -382,7 +382,7 @@ against the bundled `quran.db`.
 Every new Compose string in all eight folders (`values`, `-ar`, `-bn`, `-fr`, `-id`, `-in`, `-tr`,
 `-ur`; `values-in` byte-identical to `values-id`), appended at the end of each file so other
 branches' additions after `settings_attribution` never collide; `scripts/check-strings.sh` clean;
-typographic apostrophes; Bengali in NFC. Keys: `today_open_adhkar`, `adhkar_morning`,
+typographic apostrophes; Bengali in NFC. Keys: `prayer_open_adhkar`, `adhkar_morning`,
 `adhkar_evening`, `adhkar_segment_morning`, `adhkar_segment_evening`, `adhkar_times` (plural),
 `adhkar_once`, `adhkar_times_today`, `adhkar_progress`, `adhkar_until_sunrise`,
 `adhkar_after_sunrise`, `adhkar_until_maghrib`, `adhkar_after_maghrib`, `adhkar_window_morning`,

@@ -14,7 +14,7 @@ class OpenReadingTest {
 
     @Test
     fun aWidgetTapFromThePrayerTabPutsTheQuranRootUnderTheReader() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
 
         n.openReading(Screen.Reader(2, 255, selectAyah = true))
 
@@ -24,7 +24,7 @@ class OpenReadingTest {
 
     @Test
     fun fromASettingsSubScreenTheWholeStackIsReplaced() {
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.selectTab(Tab.SETTINGS)
         n.push(Screen.Appearance)
 
@@ -56,7 +56,7 @@ class OpenReadingTest {
     fun aReadingScreenLeftOnTopOfAnotherTabIsStraightenedOut() {
         // The stack shape the old widget path produced: the reader on a Quran root pushed over
         // Prayer. A second tap must not preserve it by replacing in place.
-        val n = Navigator(Screen.Today)
+        val n = Navigator(Screen.Prayer)
         n.push(Screen.Quran)
         n.push(Screen.Reader(2, 1))
 

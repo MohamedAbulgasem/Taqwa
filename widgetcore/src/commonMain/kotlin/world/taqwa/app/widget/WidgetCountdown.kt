@@ -4,7 +4,7 @@ package world.taqwa.app.widget
  * Derives "how long until the next prayer" from the widget's **own** clock at the moment it draws,
  * rather than from the number that happened to be true when the mirror was last written.
  *
- * The distinction is the whole of finding I8. The mirror is only ever written while the Today
+ * The distinction is the whole of finding I8. The mirror is only ever written while the Prayer
  * screen is open; the Android widget is otherwise re-rendered by a half-hourly `APPWIDGET_UPDATE`
  * that hands it the *same* mirror again. Rendering [WidgetSnapshot.countdownMinutes] verbatim
  * therefore meant: open the app at 14:00 with Asr forty minutes away, close it, and at 17:00 the

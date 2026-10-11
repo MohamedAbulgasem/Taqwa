@@ -59,8 +59,8 @@ private class IosLocationProvider : LocationProvider {
             // iOS calls this once when the manager is created, before the user has seen the
             // dialog, with the status still "not determined". Taking that as the answer sent
             // onboarding on to the next screen with no location while the dialog was still on
-            // screen, and the Allow the user then tapped reached nobody: Today opened saying
-            // location was off, and only its own button, asked with the permission already
+            // screen, and the Allow the user then tapped reached nobody: the Prayer screen opened
+            // saying location was off, and only its own button, asked with the permission already
             // granted, got a fix. The answer is the first status that is *not* undetermined.
             val status = map(CLLocationManager.authorizationStatus())
             if (status == LocationPermission.NOT_REQUESTED) return

@@ -1,4 +1,4 @@
-package world.taqwa.app.feature.today
+package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -47,9 +47,9 @@ import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.domain.TodayState
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.today_about_these_times
-import world.taqwa.app.resources.today_open_adhkar
-import world.taqwa.app.resources.today_open_tasbeeh
+import world.taqwa.app.resources.prayer_about_these_times
+import world.taqwa.app.resources.prayer_open_adhkar
+import world.taqwa.app.resources.prayer_open_tasbeeh
 import kotlin.test.Test
 import kotlin.math.abs
 import kotlin.test.assertEquals
@@ -85,7 +85,7 @@ class AdhkarButtonTest {
         city: String = "Istanbul",
         hijri: String = "29 Rabi’ al-Awwal 1448",
         gregorian: String = "11 October 2026",
-    ): TodayUiState.Ready {
+    ): PrayerUiState.Ready {
         val fajr = Instant.parse("2026-10-11T02:45:00Z")
         val times = listOf(
             Prayer.FAJR to fajr,
@@ -98,7 +98,7 @@ class AdhkarButtonTest {
             TimelineRow(prayer, instant, if (prayer == Prayer.DHUHR) PrayerStatus.CURRENT else PrayerStatus.UPCOMING)
         }
         val next = PrayerTime(Prayer.ASR, fajr + 660.minutes)
-        return TodayUiState.Ready(
+        return PrayerUiState.Ready(
             location = GeoLocation(41.0082, 28.9784, "Europe/Istanbul", "Istanbul", "TR"),
             cityDisplayName = city,
             hijri = hijri,
@@ -116,7 +116,7 @@ class AdhkarButtonTest {
         direction: LayoutDirection,
         width: Dp,
         height: Dp,
-        state: TodayUiState.Ready = ready(),
+        state: PrayerUiState.Ready = ready(),
         fontScale: Float = 1f,
     ) {
         // Not TaqwaTheme: it also installs the system-bar and keep-screen-on effects, which crash
@@ -128,7 +128,7 @@ class AdhkarButtonTest {
             LocalDensity provides Density(density.density, fontScale),
         ) {
             Box(Modifier.size(width, height)) {
-                TodayScreen(
+                PrayerScreen(
                     state = state,
                     onChooseCity = {},
                     onOpenLocationSettings = {},
@@ -147,8 +147,8 @@ class AdhkarButtonTest {
     private suspend fun ComposeUiTest.bothButtonsReportToTheirOwnCallbackOnly(direction: LayoutDirection, size: Pair<Dp, Dp>) {
         val taps = Taps()
         setContent { Screen(taps, direction, size.first, size.second) }
-        val adhkar = getString(Res.string.today_open_adhkar)
-        val tasbeeh = getString(Res.string.today_open_tasbeeh)
+        val adhkar = getString(Res.string.prayer_open_adhkar)
+        val tasbeeh = getString(Res.string.prayer_open_tasbeeh)
 
         // One of each: the header row carries both, the sideways pane included.
         onAllNodesWithContentDescription(adhkar).assertCountEquals(1)
@@ -176,8 +176,8 @@ class AdhkarButtonTest {
     @Test
     fun bothButtonsAreTheFortyFourDpTarget() = runComposeUiTest {
         setContent { Screen(Taps(), LayoutDirection.Ltr, upright.first, upright.second) }
-        val adhkar = getString(Res.string.today_open_adhkar)
-        val tasbeeh = getString(Res.string.today_open_tasbeeh)
+        val adhkar = getString(Res.string.prayer_open_adhkar)
+        val tasbeeh = getString(Res.string.prayer_open_tasbeeh)
         for (description in listOf(adhkar, tasbeeh)) {
             onNodeWithContentDescription(description).assertWidthIsEqualTo(44.dp).assertHeightIsEqualTo(44.dp)
         }
@@ -186,8 +186,8 @@ class AdhkarButtonTest {
     /** The horizon comes first in reading order, so the misbaha keeps the end corner. */
     private suspend fun ComposeUiTest.horizonSitsBeforeTheMisbaha(direction: LayoutDirection, size: Pair<Dp, Dp>) {
         setContent { Screen(Taps(), direction, size.first, size.second) }
-        val adhkar = getString(Res.string.today_open_adhkar)
-        val tasbeeh = getString(Res.string.today_open_tasbeeh)
+        val adhkar = getString(Res.string.prayer_open_adhkar)
+        val tasbeeh = getString(Res.string.prayer_open_tasbeeh)
         val horizon = onNodeWithContentDescription(adhkar).fetchSemanticsNode().boundsInRoot
         val misbaha = onNodeWithContentDescription(tasbeeh).fetchSemanticsNode().boundsInRoot
         // Side by side on one line, not stacked.
@@ -223,7 +223,7 @@ class AdhkarButtonTest {
 
     /** Nothing but the ⓘ's own card has this text, so its presence says the card is open. */
     private suspend fun ComposeUiTest.cardIsOpen(): Boolean =
-        onAllNodesWithText(getString(Res.string.today_about_these_times)).fetchSemanticsNodes().isNotEmpty()
+        onAllNodesWithText(getString(Res.string.prayer_about_these_times)).fetchSemanticsNodes().isNotEmpty()
 
     @Test
     fun aTapOnTheHorizonOpensTheAdhkarAndNotTheWhoseTimesCard() = runComposeUiTest {
@@ -231,7 +231,7 @@ class AdhkarButtonTest {
         setContent { Screen(taps, LayoutDirection.Ltr, upright.first, upright.second) }
         assertFalse(cardIsOpen(), "the card is shut before any tap")
 
-        onNodeWithContentDescription(getString(Res.string.today_open_adhkar)).performClick()
+        onNodeWithContentDescription(getString(Res.string.prayer_open_adhkar)).performClick()
         waitForIdle()
 
         assertEquals(1, taps.adhkar)
@@ -244,7 +244,7 @@ class AdhkarButtonTest {
         val taps = Taps()
         setContent { Screen(taps, LayoutDirection.Ltr, upright.first, upright.second) }
 
-        onNodeWithContentDescription(getString(Res.string.today_open_tasbeeh)).performClick()
+        onNodeWithContentDescription(getString(Res.string.prayer_open_tasbeeh)).performClick()
         waitForIdle()
 
         assertEquals(0, taps.adhkar)
@@ -268,8 +268,8 @@ class AdhkarButtonTest {
     @Test
     fun theGlyphsAreTheirOwnTargetsAndNotPartOfTheInfoBlock() = runComposeUiTest {
         setContent { Screen(Taps(), LayoutDirection.Ltr, upright.first, upright.second) }
-        val adhkar = getString(Res.string.today_open_adhkar)
-        val tasbeeh = getString(Res.string.today_open_tasbeeh)
+        val adhkar = getString(Res.string.prayer_open_adhkar)
+        val tasbeeh = getString(Res.string.prayer_open_tasbeeh)
 
         onNodeWithContentDescription(adhkar).assertHasClickAction()
         onNodeWithContentDescription(tasbeeh).assertHasClickAction()
@@ -295,8 +295,8 @@ class AdhkarButtonTest {
         val block = onNodeWithText(longCity).getUnclippedBoundsInRoot()
         val title = onNode(hasText(longCity), useUnmergedTree = true).getUnclippedBoundsInRoot()
         val dates = onNode(hasText(hijri, substring = true), useUnmergedTree = true).getUnclippedBoundsInRoot()
-        val horizon = onNodeWithContentDescription(getString(Res.string.today_open_adhkar)).getUnclippedBoundsInRoot()
-        val misbaha = onNodeWithContentDescription(getString(Res.string.today_open_tasbeeh)).getUnclippedBoundsInRoot()
+        val horizon = onNodeWithContentDescription(getString(Res.string.prayer_open_adhkar)).getUnclippedBoundsInRoot()
+        val misbaha = onNodeWithContentDescription(getString(Res.string.prayer_open_tasbeeh)).getUnclippedBoundsInRoot()
 
         // The whole block is the 312 dp column (360 less the two 24 dp gutters).
         assertEquals(312f, block.width.value, 1f, "block $block")
@@ -381,8 +381,8 @@ class AdhkarButtonTest {
         cityNode.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
         val title = cityNode.getUnclippedBoundsInRoot()
         val dates = onNode(hasText(hijri, substring = true), useUnmergedTree = true).getUnclippedBoundsInRoot()
-        val horizon = onNodeWithContentDescription(getString(Res.string.today_open_adhkar)).getUnclippedBoundsInRoot()
-        val misbaha = onNodeWithContentDescription(getString(Res.string.today_open_tasbeeh)).getUnclippedBoundsInRoot()
+        val horizon = onNodeWithContentDescription(getString(Res.string.prayer_open_adhkar)).getUnclippedBoundsInRoot()
+        val misbaha = onNodeWithContentDescription(getString(Res.string.prayer_open_tasbeeh)).getUnclippedBoundsInRoot()
         return Header(
             cityTop = title.top.value,
             cityTextBottom = title.bottom.value,
@@ -404,7 +404,7 @@ class AdhkarButtonTest {
      *
      * One composition walks every size, so each case is the same screen re-laid out.
      */
-    private suspend fun ComposeUiTest.datesStartBelowTheGlyphTargets(direction: LayoutDirection, state: TodayUiState.Ready) {
+    private suspend fun ComposeUiTest.datesStartBelowTheGlyphTargets(direction: LayoutDirection, state: PrayerUiState.Ready) {
         var width by mutableStateOf(360.dp)
         var fontScale by mutableFloatStateOf(1f)
         setContent { Screen(Taps(), direction, width, 760.dp, state, fontScale) }
@@ -444,7 +444,7 @@ class AdhkarButtonTest {
     }
 
     /** A city long enough to wrap already reaches below the targets: the dates follow it with no gap. */
-    private suspend fun ComposeUiTest.aCityThatWrapsIsFollowedByTheDatesDirectly(direction: LayoutDirection, state: TodayUiState.Ready) {
+    private suspend fun ComposeUiTest.aCityThatWrapsIsFollowedByTheDatesDirectly(direction: LayoutDirection, state: PrayerUiState.Ready) {
         setContent { Screen(Taps(), direction, 360.dp, 760.dp, state) }
         val header = header(state.cityDisplayName!!, state.hijri)
         assertTrue(header.cityLines >= 2, "the city should wrap at 360 dp: $header")

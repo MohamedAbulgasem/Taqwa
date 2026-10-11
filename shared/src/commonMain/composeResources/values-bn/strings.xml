@@ -32,46 +32,46 @@
     <string name="prayer_maghrib">মাগরিব</string>
     <string name="prayer_isha">এশা</string>
 
-    <!-- Today -->
-    <string name="today_current_location">বর্তমান অবস্থান</string>
-    <string name="today_next_in">%1$s পর্যন্ত বাকি</string>
-    <string name="today_exact_alarms_label">সুনির্দিষ্ট অ্যালার্ম বন্ধ</string>
-    <string name="today_exact_alarms_body">তাকওয়াকে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি না দেওয়া পর্যন্ত অ্যান্ড্রয়েড এক ঘণ্টা পর্যন্ত দেরিতে বাজতে পারে।</string>
-    <string name="today_no_location_title">এখনো কোনো অবস্থান নেই</string>
-    <string name="today_choose_city">শহর বেছে নিন</string>
-    <string name="today_location_settings">সেটিংসে অবস্থান চালু করুন</string>
-    <string name="today_jumuah">জুমা</string>
+    <!-- Prayer screen -->
+    <string name="prayer_current_location">বর্তমান অবস্থান</string>
+    <string name="prayer_next_in">%1$s পর্যন্ত বাকি</string>
+    <string name="prayer_exact_alarms_label">সুনির্দিষ্ট অ্যালার্ম বন্ধ</string>
+    <string name="prayer_exact_alarms_body">তাকওয়াকে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি না দেওয়া পর্যন্ত অ্যান্ড্রয়েড এক ঘণ্টা পর্যন্ত দেরিতে বাজতে পারে।</string>
+    <string name="prayer_no_location_title">এখনো কোনো অবস্থান নেই</string>
+    <string name="prayer_choose_city">শহর বেছে নিন</string>
+    <string name="prayer_location_settings">সেটিংসে অবস্থান চালু করুন</string>
+    <string name="prayer_jumuah">জুমা</string>
 
     <!-- Prayer engine: the Prayer screen (Task 10) -->
-    <string name="today_whose_checked_title">%1$s-এর সময়সূচি</string>
-    <string name="today_whose_checked_body">%2$s-এর জন্য %1$s-এর সময়, তাকওয়া নিজে হিসাব করে প্রকাশিত সময়সূচির সঙ্গে মিলিয়ে দেখেছে।</string>
-    <string name="today_whose_unchecked_title">%1$s-এর পদ্ধতি, এখনো পুরোপুরি যাচাই হয়নি</string>
-    <string name="today_whose_unchecked_body">তাকওয়া %1$s-এর পদ্ধতিতে %2$s-এর সময় হিসাব করে, সঙ্গে নিরাপত্তার জন্য কিছুটা বাড়তি সময় রাখে।</string>
-    <string name="today_whose_cautious_body">এখানকার মসজিদগুলো ভিন্ন ভিন্ন সময়সূচি মানে, তাই সবগুলোতে ওয়াক্ত শুরু হওয়ার পরই তাকওয়া প্রতিটি নামাজ দেখায়।</string>
-    <string name="today_whose_calculated_body">এখানকার কোনো স্থানীয় সময়সূচি জানা নেই, তাই তাকওয়া সাবধানতার সঙ্গে এই সময়গুলো হিসাব করে।</string>
-    <string name="today_about_these_times">এই সময়গুলো সম্পর্কে</string>
-    <string name="today_times_by">%1$s-এর সময়</string>
-    <string name="today_whose_a11y">%1$s, %2$s। এই সময়গুলোর উৎস খোলে</string>
-    <string name="today_about_a11y">%1$s, %2$s। “এই সময়গুলো সম্পর্কে” খোলে</string>
-    <string name="today_set_by_rule">নিয়মে নির্ধারিত</string>
-    <string name="today_polar_line">আজ এখানে সূর্য ওঠেও না, অস্তও যায় না, তাই কিছু সময় সেই নিকটতম অক্ষাংশ ধরে দেওয়া, যেখানে সূর্য ওঠে ও অস্ত যায়।</string>
-    <string name="today_card_cautious_title">এখানকার মসজিদগুলো ভিন্ন ভিন্ন সময়সূচি মানে</string>
-    <string name="today_card_cautious_body">সবগুলোতে ওয়াক্ত শুরু হওয়ার পরই তাকওয়া প্রতিটি নামাজ দেখায়।</string>
-    <string name="today_card_sunni_title">এগুলো সুন্নি নামাজের সময়</string>
-    <string name="today_card_sunni_body">শিয়া (জাফরি) মতে মাগরিব ও ইফতার আরও পরে হয়।</string>
-    <string name="today_match_my_mosque">আমার মসজিদের সঙ্গে মেলান</string>
-    <string name="today_card_ok">ঠিক আছে</string>
-    <string name="today_clock_line">আপনার ফোনের ঘড়ি হয়তো এক ঘণ্টা ভুল</string>
-    <string name="today_clock_stale_early">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে, কিন্তু আপনার ফোন এখনো তা জানে না, তাই নামাজের সময় এক ঘণ্টা আগে দেখাতে পারে। সর্বশেষ সিস্টেম আপডেট ইনস্টল করুন এবং তারিখ ও সময় স্বয়ংক্রিয় রাখুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
-    <string name="today_clock_stale_late">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে, কিন্তু আপনার ফোন এখনো তা জানে না, তাই নামাজের সময় এক ঘণ্টা পরে দেখাতে পারে। সর্বশেষ সিস্টেম আপডেট ইনস্টল করুন এবং তারিখ ও সময় স্বয়ংক্রিয় রাখুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
-    <string name="today_clock_manual_early">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে। আপনি হাতে ঘড়ি ঠিক করে থাকলে নামাজের সময় এক ঘণ্টা আগে দেখাতে পারে। স্বয়ংক্রিয় তারিখ ও সময় চালু করুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
-    <string name="today_clock_manual_late">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে। আপনি হাতে ঘড়ি ঠিক করে থাকলে নামাজের সময় এক ঘণ্টা পরে দেখাতে পারে। স্বয়ংক্রিয় তারিখ ও সময় চালু করুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
-    <string name="today_clock_region_morocco">মরক্কো</string>
-    <string name="today_clock_region_british_columbia">ব্রিটিশ কলাম্বিয়া</string>
-    <string name="today_clock_region_kazakhstan">কাজাখস্তান</string>
-    <string name="today_differ_before">%1$s অনুযায়ী %2$s শুরু হয় %3$s-এ</string>
-    <string name="today_differ_after">%1$s অনুযায়ী %2$s শুরু হয়ে গেছে · তাকওয়া দেখায় %3$s থেকে</string>
-    <string name="today_other_asr">%1$s আসর %2$s</string>
+    <string name="prayer_whose_checked_title">%1$s-এর সময়সূচি</string>
+    <string name="prayer_whose_checked_body">%2$s-এর জন্য %1$s-এর সময়, তাকওয়া নিজে হিসাব করে প্রকাশিত সময়সূচির সঙ্গে মিলিয়ে দেখেছে।</string>
+    <string name="prayer_whose_unchecked_title">%1$s-এর পদ্ধতি, এখনো পুরোপুরি যাচাই হয়নি</string>
+    <string name="prayer_whose_unchecked_body">তাকওয়া %1$s-এর পদ্ধতিতে %2$s-এর সময় হিসাব করে, সঙ্গে নিরাপত্তার জন্য কিছুটা বাড়তি সময় রাখে।</string>
+    <string name="prayer_whose_cautious_body">এখানকার মসজিদগুলো ভিন্ন ভিন্ন সময়সূচি মানে, তাই সবগুলোতে ওয়াক্ত শুরু হওয়ার পরই তাকওয়া প্রতিটি নামাজ দেখায়।</string>
+    <string name="prayer_whose_calculated_body">এখানকার কোনো স্থানীয় সময়সূচি জানা নেই, তাই তাকওয়া সাবধানতার সঙ্গে এই সময়গুলো হিসাব করে।</string>
+    <string name="prayer_about_these_times">এই সময়গুলো সম্পর্কে</string>
+    <string name="prayer_times_by">%1$s-এর সময়</string>
+    <string name="prayer_whose_a11y">%1$s, %2$s। এই সময়গুলোর উৎস খোলে</string>
+    <string name="prayer_about_a11y">%1$s, %2$s। “এই সময়গুলো সম্পর্কে” খোলে</string>
+    <string name="prayer_set_by_rule">নিয়মে নির্ধারিত</string>
+    <string name="prayer_polar_line">আজ এখানে সূর্য ওঠেও না, অস্তও যায় না, তাই কিছু সময় সেই নিকটতম অক্ষাংশ ধরে দেওয়া, যেখানে সূর্য ওঠে ও অস্ত যায়।</string>
+    <string name="prayer_card_cautious_title">এখানকার মসজিদগুলো ভিন্ন ভিন্ন সময়সূচি মানে</string>
+    <string name="prayer_card_cautious_body">সবগুলোতে ওয়াক্ত শুরু হওয়ার পরই তাকওয়া প্রতিটি নামাজ দেখায়।</string>
+    <string name="prayer_card_sunni_title">এগুলো সুন্নি নামাজের সময়</string>
+    <string name="prayer_card_sunni_body">শিয়া (জাফরি) মতে মাগরিব ও ইফতার আরও পরে হয়।</string>
+    <string name="prayer_match_my_mosque">আমার মসজিদের সঙ্গে মেলান</string>
+    <string name="prayer_card_ok">ঠিক আছে</string>
+    <string name="prayer_clock_line">আপনার ফোনের ঘড়ি হয়তো এক ঘণ্টা ভুল</string>
+    <string name="prayer_clock_stale_early">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে, কিন্তু আপনার ফোন এখনো তা জানে না, তাই নামাজের সময় এক ঘণ্টা আগে দেখাতে পারে। সর্বশেষ সিস্টেম আপডেট ইনস্টল করুন এবং তারিখ ও সময় স্বয়ংক্রিয় রাখুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
+    <string name="prayer_clock_stale_late">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে, কিন্তু আপনার ফোন এখনো তা জানে না, তাই নামাজের সময় এক ঘণ্টা পরে দেখাতে পারে। সর্বশেষ সিস্টেম আপডেট ইনস্টল করুন এবং তারিখ ও সময় স্বয়ংক্রিয় রাখুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
+    <string name="prayer_clock_manual_early">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে। আপনি হাতে ঘড়ি ঠিক করে থাকলে নামাজের সময় এক ঘণ্টা আগে দেখাতে পারে। স্বয়ংক্রিয় তারিখ ও সময় চালু করুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
+    <string name="prayer_clock_manual_late">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে। আপনি হাতে ঘড়ি ঠিক করে থাকলে নামাজের সময় এক ঘণ্টা পরে দেখাতে পারে। স্বয়ংক্রিয় তারিখ ও সময় চালু করুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
+    <string name="prayer_clock_region_morocco">মরক্কো</string>
+    <string name="prayer_clock_region_british_columbia">ব্রিটিশ কলাম্বিয়া</string>
+    <string name="prayer_clock_region_kazakhstan">কাজাখস্তান</string>
+    <string name="prayer_differ_before">%1$s অনুযায়ী %2$s শুরু হয় %3$s-এ</string>
+    <string name="prayer_differ_after">%1$s অনুযায়ী %2$s শুরু হয়ে গেছে · তাকওয়া দেখায় %3$s থেকে</string>
+    <string name="prayer_other_asr">%1$s আসর %2$s</string>
 
     <!-- Settings root -->
     <string name="settings_title">সেটিংস</string>
@@ -477,7 +477,7 @@
     <string name="tab_quran">কুরআন</string>
     <string name="tab_settings">সেটিংস</string>
     <!-- Prayer screen's Qibla card -->
-    <string name="today_qibla_detail">%1$s° · মক্কা %2$s কিমি</string>
+    <string name="prayer_qibla_detail">%1$s° · মক্কা %2$s কিমি</string>
     <!-- Quran tab root -->
     <string name="quran_title">কুরআন</string>
     <string name="quran_search_hint">কুরআনে খুঁজুন</string>
@@ -523,7 +523,7 @@
     <string name="quran_a11y_read_aloud">পড়ে শোনানো হচ্ছে</string>
     <!-- Tasbeeh -->
     <string name="tasbeeh_title">তাসবিহ</string>
-    <string name="today_open_tasbeeh">তাসবিহ</string>
+    <string name="prayer_open_tasbeeh">তাসবিহ</string>
     <string name="tasbeeh_add_custom">জিকির যোগ করুন</string>
     <string name="tasbeeh_round">রাউন্ড %1$s</string>
     <string name="tasbeeh_of">মোট %1$s</string>
@@ -619,7 +619,7 @@
     <string name="prayer_times_time_format">সময়ের ফরম্যাট</string>
     <string name="time_format_24">২৪ ঘণ্টা</string>
     <string name="time_format_12">১২ ঘণ্টা</string>
-    <string name="today_open_adhkar">আযকার</string>
+    <string name="prayer_open_adhkar">আযকার</string>
     <string name="adhkar_morning">সকালের আযকার</string>
     <string name="adhkar_evening">সন্ধ্যার আযকার</string>
     <string name="adhkar_segment_morning">সকাল</string>
