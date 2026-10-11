@@ -9,13 +9,13 @@
       "morning": "Allah’ım! Seninle sabaha erdik ve Seninle akşama erdik. Seninle yaşar, Seninle ölürüz ve diriliş Sanadır."
     },
     "hisn-079": {
-      "both": "Allah’ım! Sen benim Rabbimsin, Senden başka ilah yoktur. Beni yarattın, ben de Senin kulunum. Gücüm yettiğince Senin ahdin ve vaadin üzereyim. Yaptıklarımın şerrinden Sana sığınırım. Bana verdiğin nimeti Sana itiraf ederim, günahımı da itiraf ederim, öyleyse beni bağışla, çünkü günahları ancak Sen bağışlarsın."
+      "both": "Allah’ım! Sen benim Rabbimsin, Senden başka ilah yoktur. Beni yarattın, ben de Senin kulunum. Gücüm yettiğince Senin ahdin ve vaadin üzereyim. Yaptıklarımın şerrinden Sana sığınırım. Bana verdiğin nimeti Sana ikrar ederim, günahımı da itiraf ederim, öyleyse beni bağışla, çünkü günahları ancak Sen bağışlarsın."
     },
     "hisn-084": {
       "both": "Allah’ım! Dünyada ve ahirette Senden af ve afiyet isterim. Allah’ım! Dinimde, dünyamda, ailemde ve malımda Senden af ve afiyet isterim. Allah’ım! Ayıplarımı ört, korkularımdan beni emin kıl. Allah’ım! Beni önümden, arkamdan, sağımdan, solumdan ve üstümden koru, altımdan ansızın helak edilmekten de azametine sığınırım."
     },
     "hisn-085": {
-      "both": "Ey görülmeyeni ve görüleni bilen, gökleri ve yeri yaratan, her şeyin Rabbi ve Maliki olan Allah’ım! Senden başka ilah olmadığına şahitlik ederim. Nefsimin şerrinden, şeytanın şerrinden ve tuzağından, kendime bir kötülük yapmaktan ya da onu bir Müslümana sürüklemekten Sana sığınırım."
+      "both": "Ey görülmeyeni ve görüleni bilen, gökleri ve yeri yaratan, her şeyin Rabbi ve Maliki olan Allah’ım! Senden başka ilah olmadığına şahitlik ederim. Nefsimin şerrinden, şeytanın şerrinden ve tuzağından, kendime bir kötülük yapmaktan ya da onu bir Müslümana bulaştırmaktan Sana sığınırım."
     },
     "hisn-086": {
       "both": "İsmiyle birlikte yerde ve gökte hiçbir şeyin zarar veremediği Allah’ın ismiyle. O, her şeyi işitendir, her şeyi bilendir."
@@ -24,7 +24,7 @@
       "both": "Ey daima diri olan, ey her şeyi ayakta tutan! Rahmetinle yardım dilerim. Bütün işlerimi düzelt ve beni göz açıp kapayıncaya kadar bile nefsime bırakma."
     },
     "hisn-090": {
-      "morning": "İslam fıtratı, ihlas kelimesi, Peygamberimiz Muhammed’in ﷺ dini ve hanif bir Müslüman olan, müşriklerden olmayan babamız İbrahim’in milleti üzere sabaha erdik."
+      "morning": "İslam fıtratı, ihlas kelimesi, Peygamberimiz Muhammed’in ﷺ dini ve hanif bir Müslüman olan, müşriklerden olmayan babamız İbrahim’in yolu üzere sabaha erdik."
     },
     "hisn-091": {
       "both": "Allah’ı hamd ile tenzih ederim."
@@ -39,7 +39,7 @@
       "both": "Allah’ı, yarattıklarının sayısınca, kendi rızası kadar, Arş’ının ağırlığınca ve kelimelerinin mürekkebi miktarınca hamd ile tenzih ederim."
     },
     "hisn-095": {
-      "both": "Allah’ım! Senden faydalı ilim, temiz rızık ve kabul edilmiş amel isterim."
+      "both": "Allah’ım! Senden faydalı ilim, temiz rızık ve makbul amel isterim."
     },
     "hisn-096": {
       "both": "Allah’tan bağışlanma dilerim ve O’na tövbe ederim."
@@ -49,5 +49,5 @@
     }
   },
   "language": "tr",
-  "reviewed": false
+  "reviewed": true
 }
