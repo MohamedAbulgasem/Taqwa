@@ -236,6 +236,27 @@ def lead(sentence: str, **values) -> str:
     return f"<b>{fill(head, **values)}</b>{fill(rest, **values)}"
 
 
+# French writes "de" as "d’" before a word that begins with a vowel: "chaque jour d’octobre",
+# "Près d’Anvers". A sentence in meta.json says "de {month}" or "de {city}" because the word that
+# follows is known only once the page is built, so the choice is made on the filled sentence, with
+# the typographic apostrophe the French pages use everywhere. An h is left as it is written, since
+# the word decides (d’Helsinki, de Hambourg), and so are a y (de Yaoundé) and a digit (de 41 villes).
+# French's own text is already elided where it should be, so only the junctions with a value change.
+ELISIONS = {"fr": (re.compile(r"\b([Dd])e (?=[aeiouàâäéèêëîïôöùûüœæAEIOUÀÂÄÉÈÊËÎÏÔÖÙÛÜŒÆ])"), r"\1’")}
+# The French site sentences that put a value which can begin with a letter after "de"; every other
+# "de {…}" in French is followed by a number. test_timetables.py holds meta.json to this list, so
+# a new one cannot go out unelided.
+ELIDED = ("description_checked", "description_cautious", "nearby")
+
+
+def elide(lang: str, sentence: str) -> str:
+    """A filled sentence with the page language's elisions made (French alone has any here)."""
+    if lang not in ELISIONS:
+        return sentence
+    pattern, replacement = ELISIONS[lang]
+    return pattern.sub(replacement, sentence)
+
+
 def list_comma(lang: str) -> str:
     """The comma between the members of a list, as the app joins them (MethodWords.listComma)."""
     return "، " if lang in ("ar", "ur") else ", "
@@ -435,7 +456,7 @@ class Timetables:
         month = page["months"][0]["title"]
         values = self.sentence_values(city, lang)
         described = "description_cautious" if city["entryClass"] == "C" else "description_checked"
-        description = plain(t[described], **values, month=month)
+        description = elide(lang, plain(t[described], **values, month=month))
         if not at_kaaba(city):
             description += plain(t["description_qibla"], **values)
         meta = {
@@ -849,7 +870,7 @@ class Timetables:
         if same:
             groups.append(f'<div><h2>{fill(t["other_cities"], **values)}</h2><div class="chips">{chips(same[:MAX_SAME_COUNTRY])}</div></div>')
         if near:
-            groups.append(f'<div><h2>{fill(t["nearby"], **values)}</h2><div class="chips">{chips(near)}</div></div>')
+            groups.append(f'<div><h2>{elide(lang, fill(t["nearby"], **values))}</h2><div class="chips">{chips(near)}</div></div>')
         groups.append(f'<div><h2>{esc(t["more_times"])}</h2><div class="chips"><a class="all" href="../">{esc(t["all_cities"])}</a>'
                       f'<a href="../{CHECKS_PAGE_SLUG}/">{esc(t["checks_nav"])}</a></div></div>')
         groups.append(f'<div><h2>{esc(t["questions"])}</h2><div class="chips"><a href="{{support}}">{esc(cfg["nav_support"])}</a>'

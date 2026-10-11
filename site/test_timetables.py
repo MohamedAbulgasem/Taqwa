@@ -1,8 +1,9 @@
 """Tests of site/timetables.py and assets/timetable.js that need no generated document: the clock
-correction (review I4), the minute ruler (review I1, M1, M9), and a made-up city's page shown with
-one month or two (ruling R116) — its markup, check_page, and the page script on the page's last
-evening, run with a fixed clock in headless Chrome where there is one (skipped where there is
-not). Standard library only; the Pages workflow runs them before the build, and so can anyone:
+correction (review I4), the minute ruler (review I1, M1, M9), French's "d’" before a vowel, and a
+made-up city's page shown with one month or two (ruling R116) — its markup, check_page, and the
+page script on the page's last evening, run with a fixed clock in headless Chrome where there is
+one (skipped where there is not). Standard library only; the Pages workflow runs them before the
+build, and so can anyone:
 
     python3 site/test_timetables.py
 
@@ -309,6 +310,66 @@ class OneMonthPageTest(unittest.TestCase):
         emptied = re.sub(r'(<table class="tt" data-month="0">.*?<tbody>).*?(</tbody>)', r"\1\2", one, flags=re.S)
         problems = timetables.check_page(REL, emptied, one_data)  # an empty table
         self.assertTrue(any("0 rows for 31 days" in p for p in problems), problems)
+
+
+class FrenchElisionTest(unittest.TestCase):
+    """French writes "de" as "d’" before a vowel: "chaque jour d’octobre", "Près d’Anvers"."""
+
+    FRENCH_MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre",
+                     "novembre", "décembre"]
+
+    def page(self, city: str, month: str) -> dict:
+        """The made-up city's French page, named `city`, showing `month`, beside a neighbour across
+        a border (so "Près de …" has cities to list): its meta and body as write_page gets them."""
+        doc = made_up_document([OCTOBER], "2026-10-29")
+        here = doc["cities"][0]
+        page = here["pages"].pop("en")
+        here["pages"] = {"fr": dict(page, city=city, months=[dict(m, title=month) for m in page["months"]])}
+        here["languages"] = ["fr"]
+        neighbour = copy.deepcopy(here)
+        neighbour.update(slug="made-up-town", country="NL")
+        neighbour["pages"]["fr"]["city"] = "Utrecht"
+        doc["cities"].append(neighbour)
+        data = timetables.Timetables({"fr": language("fr")}, doc)
+        written = {}
+        data.build_city(data.cities[0], "fr", "", lambda *_, **page: written.update(page), {"fr": "fr/prayer-times/x/"})
+        return written
+
+    def test_de_is_elided_before_a_vowel_and_nowhere_else(self):
+        for written, said in (("chaque jour de octobre 2026", "chaque jour d’octobre 2026"),
+                              ("chaque jour de août", "chaque jour d’août"), ("De avril", "D’avril"),
+                              ("Près de Anvers", "Près d’Anvers"), ("Près de Île-de-France", "Près d’Île-de-France"),
+                              ("chaque jour de novembre", "chaque jour de novembre"), ("Près de Hambourg", "Près de Hambourg"),
+                              ("Près de Yaoundé", "Près de Yaoundé"), ("Les horaires de 41 villes", "Les horaires de 41 villes"),
+                              ("le monde entier", "le monde entier"), ("Moscou de Octobre", "Moscou d’Octobre")):
+            self.assertEqual(said, timetables.elide("fr", written))
+        self.assertEqual("de octobre", timetables.elide("en", "de octobre"))  # French alone
+
+    def test_every_month_after_de_in_the_description(self):
+        for month in self.FRENCH_MONTHS:
+            description = self.page("Paris", f"{month} 2026")["meta"]["description"]
+            elided = month[0] in "aeiouéèêâ"
+            self.assertIn(f"chaque jour {'d’' if elided else 'de '}{month} 2026", description)
+        self.assertEqual(["avril", "août", "octobre"], [m for m in self.FRENCH_MONTHS if m[0] in "aeiouéèêâ"])
+
+    def test_near_a_city_whose_name_begins_with_a_vowel(self):
+        self.assertIn("<h2>Près d’Anvers</h2>", self.page("Anvers", "octobre 2026")["body"])
+        self.assertIn("<h2>Près de Bruxelles</h2>", self.page("Bruxelles", "octobre 2026")["body"])
+
+    def test_every_french_sentence_with_a_word_after_de_is_one_the_pages_elide(self):
+        numbers = {"count", "calendars"}  # "de 41 villes": a number never elides
+
+        def sentences(node, key=""):
+            if isinstance(node, dict):
+                for k, v in node.items():
+                    yield from sentences(v, k)
+            elif isinstance(node, str):
+                yield key, node
+
+        words = {key for key, text in sentences(language("fr"))
+                 if set(re.findall(r"\b[Dd]e \{(\w+)\}", text)) - numbers}
+        # A new one: put it through timetables.elide where it is filled, and add it to ELIDED.
+        self.assertEqual(set(timetables.ELIDED), words)
 
 
 def find_chrome():
