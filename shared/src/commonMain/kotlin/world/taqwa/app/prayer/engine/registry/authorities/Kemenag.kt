@@ -35,8 +35,8 @@ import world.taqwa.app.prayer.engine.registry.widened
  * every other place to cover the tightest one (Kota Jakarta's own sunrise had 0 s of slack left
  * under the shared margin fitted to Bukittinggi's wider swing; each place now keeps its own).
  *
- * The March equinox (track T4, 11 Oct 2026). myQuran published Kemenag's 2027 tables on 5 Oct
- * 2026, and against them the 2026-fitted margins were one minute early on 21 or 22 March 2027 at
+ * The March equinox (track T4, 11 Oct 2026). The weekly monitor first read Kemenag's 2027 tables on
+ * 5 Oct 2026, and against them the 2026-fitted margins were one minute early on 21 or 22 March 2027 at
  * eight kab/kota (Dhuhr, Maghrib or Isha at Banda Aceh, Bukittinggi, Garut, Bogor, Wonosobo, Batu,
  * Denpasar and Jayawijaya). Kemenag's own tables step there: on 21 and 22 March a printed time lags
  * the smooth curve by about a day's change (some 17 s for Dhuhr, 30 s for Maghrib and Isha), which
@@ -48,9 +48,11 @@ import world.taqwa.app.prayer.engine.registry.widened
  * margins the step had held up fall back (Maghrib and Isha by up to 30 s at most places), so the
  * shown minute is the printed one on more days than before; a few rise by up to 3 s, and
  * Palembang's Asr by 8 s for its 2027 table's 30 September. [method]'s own margins, which the edge
- * widens, are kept as they were, the largest of the 2026 fit. Whether the step follows the calendar
- * date or the equinox itself (a leap year moves the equinox to 20 March) is not known yet: 2028's
- * tables, once published, are the check.
+ * widens, are kept as they were, the largest of the 2026 fit. The step follows the calendar date, not
+ * the equinox (a leap year moves the equinox to 20 March): myQuran answers 2024 and 2028 too (read
+ * on 11 Oct 2026), and averaged over the eighteen places the step falls on 21 and 22 March in 2024 and
+ * on 21 March alone in 2028, never on 20 March. 2028, never fitted on, is the held-out year: 0 early
+ * and 0 late ends on its 6,588 place-days, worst a minute (the end of eating 2, as in the fitted years).
  *
  * Units are the 18 fitted kab/kota: the 13 of the research round and, since the monitor round of
  * 29 Sep 2026, Kota Medan, Palembang, Semarang, Surabaya and Yogyakarta, whose tables the weekly
