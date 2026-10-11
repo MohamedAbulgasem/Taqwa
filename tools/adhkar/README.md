@@ -122,8 +122,11 @@ as if it began with the preposition *ka-*:
 | hisn-097 | bi-ka-li-māti | bi-kalimāti |
 
 English: Hisn 96 alone is wrapped in ‘…’ and spells "Allaah"; shipped as "I seek
-Allah’s forgiveness and I turn to Him in repentance." Every other English text is
-OpenDua's as published. Left as published, for a reviewer to decide: Hisn 79's "I abide
+Allah’s forgiveness and I turn to Him in repentance." Hisn 85 is published as "the evil
+and shirk of the devil" under an Arabic that reads وَشَرَكِهِ, "his snares"; shipped as
+"the evil and snares of the devil", so the English says what the Arabic on screen says
+(the owner's decision, 11 October 2026; the five translations follow the same reading).
+Every other English text is OpenDua's as published. Left as published, for a reviewer to decide: Hisn 79's "I abide
 to Your covenant" and "the evil of which I have committed", and Hisn 90's "Ibraheem".
 
 **Translations** (bn, fr, id, tr, ur). OpenDua publishes English only, so the other five

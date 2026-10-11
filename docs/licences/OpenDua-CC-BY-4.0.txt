@@ -23,6 +23,7 @@ Used for: the Arabic text and its arrangement, the English translations and the 
 Changes made (CC BY 4.0, section 3(a)(1)(B)): the 24 morning-and-evening entries are
 reshaped into Taqwa's own schema and 19 of them are kept; the three Quls of Hisn 76 become
 three items, and no Quranic text is taken from OpenDua (the app reads the Quran from its
-own Tanzil text, by reference); eight transliteration typos are corrected, and the
-quotation marks and the spelling "Allaah" are removed from the English of Hisn 96. The
+own Tanzil text, by reference); eight transliteration typos are corrected, the
+quotation marks and the spelling "Allaah" are removed from the English of Hisn 96, and one
+word of the English of Hisn 85 ("shirk") becomes "snares", which is what its Arabic says. The
 Arabic is OpenDua's, unchanged. Every change is listed in tools/adhkar/README.md.
