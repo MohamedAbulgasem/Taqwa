@@ -391,9 +391,9 @@ object ProofStamps {
 
     private fun caIsna() = ProofStamp(
         entryId = "ca.isna",
-        places = 232,
-        placeDays = 82531,
-        ramadanDays = 6540,
+        places = 204,
+        placeDays = 72922,
+        ramadanDays = 5820,
         provenThrough = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 5, "asrStandard" to 6, "dhuhr" to 3, "endOfEating" to 6, "fajr" to 7, "isha" to 5, "maghrib" to 5, "sunrise" to 5),
         worstLateByUnit = caIsnaUnits(),
@@ -1906,16 +1906,16 @@ object ProofStamps {
 
     private fun seCautious() = ProofStamp(
         entryId = "se.cautious",
-        places = 14,
-        placeDays = 6034,
-        ramadanDays = 447,
+        places = 23,
+        placeDays = 9310,
+        ramadanDays = 717,
         provenThrough = "2027-12-31",
-        worstLateMinutes = mapOf("asrStandard" to 6, "dhuhr" to 4, "endOfEating" to 154, "fajr" to 109, "isha" to 170, "maghrib" to 126, "sunrise" to 129),
+        worstLateMinutes = mapOf("asrStandard" to 7, "dhuhr" to 5, "endOfEating" to 154, "fajr" to 111, "isha" to 170, "maghrib" to 126, "sunrise" to 129),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 5, reason = "Zuhr is the later member's, Diyanet's (+ 5): up to 5 min after Rabita's at Helsinki.", events = listOf("dhuhr")),
             ProofLateLimit(minutes = 7, reason = "Asr is the later member's, in the later school (the school is not known): Diyanet's, up to 7 min after Rabita's at Helsinki.", events = listOf("asrStandard")),
-            ProofLateLimit(minutes = 109, reason = "Fajr is the later member's, Diyanet's European takdir on its own city curves (Helsinki's and Copenhagen's since the monitor round): up to 109 min after Rabita's Helsinki calendar in summer; at Stockholm 6. Rabita's own Fajr follows its calendar.", events = listOf("fajr")),
+            ProofLateLimit(minutes = 111, reason = "Fajr is the later member's, Diyanet's European takdir on its own city curves (Helsinki's and Copenhagen's since the monitor round): up to 109 min after Rabita's Helsinki calendar in summer, and 111 at the towns of the Helsinki region its calendar is held at; at Stockholm 6. Rabita's own Fajr follows its calendar.", events = listOf("fajr")),
             ProofLateLimit(minutes = 126, reason = "Maghrib is capped at Diyanet's (its sunset + 7) where the members spread: up to 2 min after it, and from late May to late July, where Diyanet holds its tables' day to nineteen hours around Dhuhr and prints its Maghrib before the sun sets, never before the real sunset: up to 4 min after its Turku table and 126 after its Luleå table.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 129, reason = "Sunrise is the earlier member's, Diyanet's (the sun's less 7): up to 6 min before Rabita's at Helsinki, and from late May to late July, where Diyanet holds its tables' day to nineteen hours around Dhuhr and prints its sunrise after the sun's, up to 11 min before its Helsinki table and 129 before its Luleå table (the app keeps the sun's, the safe side).", events = listOf("sunrise")),
             ProofLateLimit(minutes = 154, reason = "The end of eating is the earlier member's: Rabita's own earliest dawns, near the middle of the night from April to August (ruling R39), applied at Copenhagen and Stockholm, up to 137 and 136 min before Diyanet's imsak there, and up to 154 before its Malmö and Aarhus tables in August; at Helsinki up to 25 min before Rabita's own Fajr.", events = listOf("endOfEating")),
@@ -2179,9 +2179,9 @@ object ProofStamps {
 
     private fun usIsna() = ProofStamp(
         entryId = "us.isna",
-        places = 1198,
-        placeDays = 272278,
-        ramadanDays = 19006,
+        places = 1110,
+        placeDays = 251779,
+        ramadanDays = 17541,
         provenThrough = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 7, "asrStandard" to 7, "dhuhr" to 8, "endOfEating" to 8, "fajr" to 7, "isha" to 8, "maghrib" to 9, "sunrise" to 6),
         worstLateByUnit = usIsnaUnits(),
@@ -2279,9 +2279,9 @@ object ProofStamps {
         worstLateMinutes = mapOf("asrStandard" to 8, "dhuhr" to 7, "endOfEating" to 9, "fajr" to 7, "isha" to 7, "maghrib" to 8, "sunrise" to 8),
         worstLateByUnit = xkBikUnits(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 7, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("dhuhr", "fajr", "isha")),
-            ProofLateLimit(minutes = 8, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("asrStandard", "maghrib", "sunrise")),
-            ProofLateLimit(minutes = 9, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("endOfEating")),
+            ProofLateLimit(minutes = 7, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("dhuhr", "fajr", "isha")),
+            ProofLateLimit(minutes = 8, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("asrStandard", "maghrib", "sunrise")),
+            ProofLateLimit(minutes = 9, reason = "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.", events = listOf("endOfEating")),
         ),
     )
 

@@ -79,6 +79,10 @@ class Gate(
         val skipped = mutableListOf<GateRow>()
         var checked = 0
         val cells = LinkedHashMap<String, CautiousCell>()
+        // A promise-only file's cautious cells ([GateRow.promiseOnly]), accounted as soon as its rows move to another point:
+        // its rows stand together by entry and point, and a gate over every app city could not hold them all at once.
+        val promiseCells = LinkedHashMap<String, CautiousCell>()
+        var promiseGroup: String? = null
         // Rows at the same point of the same entry (a year per file, a table in two files) share days. Only the last
         // few points are kept: each holds every day it computed, and the reach rows (sa-ummalqura-reach.tsv,
         // kz-qmdb-reach.tsv) read some three thousand points, which the whole gate could not hold at once. A point
@@ -100,12 +104,14 @@ class Gate(
             checked++
             val s = stats.getOrPut(entry.id) { EntryStats(entry) }
             val limits = row.columns.flatten().associateWith { lateLimit(it, setup.unit, resolution.entry, resolution.entryClass) }
-            val unit = setup.unit?.let { UnitKey(it.id, it.name) }
+            val promiseOnly = row.promiseOnly
+            val unit = if (promiseOnly) null else setup.unit?.let { UnitKey(it.id, it.name) }
             s.rows += row.where
             s.unreadable += table.unreadable
             s.duplicates += table.duplicates
             s.fingerprints += Stamps.fingerprint(resolution)
-            s.places += point
+            // A promise-only row's place is no place the entry's proof names (its stamp's places and days).
+            if (!promiseOnly) s.places += point
             val cautious = resolution.entryClass == EntryClass.C
             val mostFollowed = resolution.members.minByOrNull { it.shareRank }?.id
             val days = computed.getOrPut("${entry.id}|${row.unit}|${point.lat},${point.lon}|${row.zone}") { Days(resolution, zone) }
@@ -116,24 +122,33 @@ class Gate(
                 val day = days.day(official.date)
                 // A place-day is the entry at one point on one date, however many tables hold it.
                 val group = "${entry.id}@${pointKey(point)}"
-                s.placeDay(group, official.date, row.split, ramadan.isRamadan(official.date), day, unit, row.member, point)
+                if (promiseOnly && group != promiseGroup) {
+                    for (cell in promiseCells.values) cell.account()
+                    promiseCells.clear()
+                    promiseGroup = group
+                }
+                if (promiseOnly) {
+                    s.promiseDay(group, official.date, day)
+                } else {
+                    s.placeDay(group, official.date, row.split, ramadan.isRamadan(official.date), day, unit, row.member, point)
+                }
                 row.columns.forEachIndexed { column, events ->
                     val minutes = official.minutes[column] ?: return@forEachIndexed
                     for (event in events) {
                         val at = officialInstant(official.date, minutes, event, setup.clock, zone)
                         val shown = shown(day, event, entry.school)
                         if (shown == null) {
-                            s.event(event).absent++
+                            if (!promiseOnly) s.event(event).absent++
                             continue
                         }
                         if (event.declarable in day.notFollowed) {
-                            s.declare(event, official.date, row.split, unit)
+                            if (!promiseOnly) s.declare(event, official.date, row.split, unit)
                             continue
                         }
                         val observation = Observation(official.date, event, shown, at, resolution.entryClass, row, limits.getValue(event), unit)
                         if (cautious) {
-                            cells.getOrPut("$group|${official.date}|${event.key}") {
-                                CautiousCell(s, mostFollowed!!) { days.memberSpread(official.date) }
+                            (if (promiseOnly) promiseCells else cells).getOrPut("$group|${official.date}|${event.key}") {
+                                CautiousCell(s, mostFollowed!!, promiseOnly) { days.memberSpread(official.date) }
                             }.add(observation)
                         } else {
                             s.account(observation)
@@ -143,6 +158,7 @@ class Gate(
             }
         }
         for (cell in cells.values) cell.account()
+        for (cell in promiseCells.values) cell.account()
         for (excuse in manifest.excuses) excuse(excuse, stats, problems)
         if (problems.isNotEmpty()) throw GateError(problems)
         return GateResult(roots, checked, skipped, stats)
@@ -220,6 +236,8 @@ class Gate(
     private class CautiousCell(
         private val stats: EntryStats,
         private val mostFollowed: String,
+        /** A promise-only file's cell ([GateRow.promiseOnly]): no Maghrib gap recorded, an unchecked Maghrib not counted. */
+        private val promiseOnly: Boolean,
         private val engineSpread: () -> Duration,
     ) {
         /** Each member's observation; a member printing the date twice keeps its stricter line. */
@@ -247,10 +265,13 @@ class Gate(
                 // the engine left Maghrib uncapped: its own members' spread may still have capped it.
                 (printed != null && printed > Cautious.MAGHRIB_AGREEMENT) || engineSpread() > Cautious.MAGHRIB_AGREEMENT
             }
-            for ((member, o) in byMember) stats.maghribGap(member, (o.shown - o.official).inWholeMinutes.toInt(), capped)
+            if (!promiseOnly) for ((member, o) in byMember) stats.maghribGap(member, (o.shown - o.official).inWholeMinutes.toInt(), capped)
             when {
                 !capped -> stats.account(all.maxBy { it.official })
                 mostFollowed in byMember -> stats.account(byMember.getValue(mostFollowed))
+                // A table the place does not follow, on a date the members spread: its Maghrib is capped at the
+                // most-followed member's there, which another file's rows check.
+                promiseOnly -> Unit
                 else -> stats.maghribUnchecked(first, mostFollowed)
             }
         }
@@ -491,6 +512,10 @@ class EntryStats(val entry: RegistryEntry) {
 
     val placeDayCount: Int get() = placeDays.size
 
+    /** Place-days of promise-only rows alone ([GateRow.promiseOnly], [promiseDay]): checked for the promise, in no stamp. */
+    private val promiseDays = HashSet<Long>()
+    val promisePlaceDayCount: Int get() = promiseDays.size
+
     /** Every date checked, whatever the point (a one-row manifest's coverage; the monitor names the holes). */
     val dates: Set<LocalDate> get() = placeDays.mapTo(sortedSetOf()) { LocalDate.fromEpochDays((it and 0xFFFFFFFFL).toInt()) }
 
@@ -566,6 +591,7 @@ class EntryStats(val entry: RegistryEntry) {
         }
         val key = (groups.getOrPut(group) { groups.size }.toLong() shl 32) or (date.toEpochDays().toLong() and 0xFFFFFFFFL)
         if (!placeDays.add(key)) return
+        promiseDays.remove(key)
         if (ramadan) ramadanDays++
         if (split == Split.TEST) testDays++
         if (split == Split.TEST && ramadan) testRamadanDays++
@@ -575,6 +601,21 @@ class EntryStats(val entry: RegistryEntry) {
             outOfOrder++
             if (outOfOrderSamples.size < SAMPLES) {
                 outOfOrderSamples += "$date: " + (if (day.repaired) "repaired into order" else "Isha not before the next end of eating") + " ($group)"
+            }
+        }
+    }
+
+    /**
+     * A place-day of a promise-only row ([GateRow.promiseOnly]): counted apart from the entry's own place-days (its
+     * stamp's), where no row of the entry's own files holds it, and a day out of order breaks the promise as anywhere.
+     */
+    internal fun promiseDay(group: String, date: LocalDate, day: PrayerDay) {
+        val key = (groups.getOrPut(group) { groups.size }.toLong() shl 32) or (date.toEpochDays().toLong() and 0xFFFFFFFFL)
+        if (key in placeDays || !promiseDays.add(key)) return
+        if (day.repaired || Prayer.ISHA !in day.ends) {
+            outOfOrder++
+            if (outOfOrderSamples.size < SAMPLES) {
+                outOfOrderSamples += "$date: " + (if (day.repaired) "repaired into order" else "Isha not before the next end of eating") + " ($group, promise-only)"
             }
         }
     }
@@ -591,15 +632,21 @@ class EntryStats(val entry: RegistryEntry) {
     }
 
     internal fun account(o: Observation) {
-        classes += o.entryClass
+        // A promise-only row's class (a place beyond the entry's own area) is none of the entry's proof.
+        if (!o.row.promiseOnly) classes += o.entryClass
         tally(event(o.event), o)
         if (o.row.split == Split.TEST) tally(heldOut.getOrPut(o.event) { EventStats() }, o)
         o.unit?.let { unit -> tally(units.getValue(unit.id).events.getOrPut(o.event) { EventStats() }, o) }
     }
 
     private fun tally(e: EventStats, o: Observation) {
-        e.checked++
-        e.applied["${o.limit.source} ${o.limit.minutes}"] = o.limit
+        // A promise-only row ([GateRow.promiseOnly]) is held to the promise alone: an early start or a late end counts as
+        // anywhere; no cell checked, no limit applied and no lateness recorded in the entry's tally (its stamp's).
+        val promiseOnly = o.row.promiseOnly
+        if (!promiseOnly) {
+            e.checked++
+            e.applied["${o.limit.source} ${o.limit.minutes}"] = o.limit
+        }
         val seconds = (o.shown - o.official).inWholeSeconds
         // Minutes on the safe side: late for a start, early for an end. Both are whole minutes.
         val safe = if (o.event.isStart) seconds else -seconds
@@ -610,6 +657,7 @@ class EntryStats(val entry: RegistryEntry) {
             sample(e.broken, o, if (o.event.isStart) "${-safe / 60} min early" else "${-safe / 60} min late (an end)")
             return
         }
+        if (promiseOnly) return
         val minutes = (safe / 60).toInt()
         e.late[minOf(minutes, 3)]++
         if (minutes > e.worst) e.worst = minutes
@@ -681,6 +729,9 @@ class GateResult(
 ) {
     val placeDays: Int get() = entries.values.sumOf { it.placeDayCount }
 
+    /** Place-days checked by promise-only rows alone ([GateRow.promiseOnly]): the envelope's, in no entry's stamp. */
+    val promisePlaceDays: Int get() = entries.values.sumOf { it.promisePlaceDayCount }
+
     /**
      * Every broken promise: early starts, late ends and days out of order ([neverEarly]), lateness
      * over the limit ([overLimit]) and cautious Maghribs left unchecked ([unchecked]), in that order.
@@ -732,6 +783,7 @@ class GateResult(
     /** A table per entry and event: days, early, late ends, 0/1/2/3+ minutes late, exact share. */
     fun report(): String = buildString {
         append("Gate over ${roots.archive.path}: $checkedRows rows checked ($placeDays place-days)")
+        if (promisePlaceDays > 0) append(" and $promisePlaceDays more place-days held to the promise alone (the envelope's rows)")
         append(if (roots.held) "\n" else ", ${skippedRows.size} rows skipped (no archive there)\n")
         for (s in entries.values) {
             append('\n')

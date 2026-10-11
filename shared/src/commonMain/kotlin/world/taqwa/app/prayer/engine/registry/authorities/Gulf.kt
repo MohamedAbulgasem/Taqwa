@@ -101,9 +101,18 @@ object Gulf {
         // A user who chooses IACAD beyond its zones (Sharjah, Ajman) follows its nearest table (the city-point round of
         // 11 Oct 2026): the zone edge as before, with that table's point riding for every start and end (followedBeyond),
         // so never before Dubai's own table, nor any end after it. Nearer Dubai Rural's or Hatta's point, the same edge
-        // rides there (their own margins differ from the edge's; the edge's is never earlier than before).
+        // rides there (their own margins differ from the edge's; the edge's is never earlier than before). Dubai's own
+        // point also rides beside it wherever another table is the nearest, for every start and end (round 2's review:
+        // Fujairah, nearest Hatta, and Al Ain, nearest Dubai Rural, had been up to 3 and 2 min before Dubai's own table),
+        // so a user who chooses IACAD is never before Dubai's main table either, nor any end after it.
         val nearest = DUBAI_TABLES.minBy { distanceKm(user, it) }
-        dubaiMethod.followedBeyond("ae.iacad.dubai.edge", nearest, dubaiZoneEdge)
+        val followed = dubaiMethod.followedBeyond("ae.iacad.dubai.edge", nearest, dubaiZoneEdge)
+        val dubai = DUBAI_TABLES.first()
+        if (nearest == dubai) {
+            followed
+        } else {
+            followed.copy(startPoints = (followed.startPoints + dubai).distinct(), endPoints = (followed.endPoints + dubai).distinct())
+        }
     }
 
     /** IACAD's three tables' points: Dubai's, Dubai Rural's (the latitude its sun fits best) and Hatta's. */

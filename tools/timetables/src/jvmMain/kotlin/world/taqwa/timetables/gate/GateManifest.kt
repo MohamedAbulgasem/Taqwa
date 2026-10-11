@@ -70,6 +70,21 @@ data class GateRow(
 
     /** The zone the printed times are read in. */
     val clockZone: String get() = clock ?: zone
+
+    /**
+     * A row of a `<group>-envelope.tsv` file (the city-point round 2 review, 11 Oct 2026): a table printed for its own point
+     * replayed at an app city its bound reach holds, whichever table the city follows, or none, so that the gate guards the
+     * envelope ("never before any table whose reach holds the place, nor any end after it"). Only the promise is checked:
+     * an early start, a late end or a day out of order breaks the gate as anywhere, but the lateness against a table the
+     * place does not follow is not the place's figure: it is recorded in no unit, held to no late limit and kept out of
+     * the members' checked days and Maghrib gaps (those are the place's own tables' to say).
+     */
+    val promiseOnly: Boolean get() = source.endsWith(PROMISE_ONLY_SUFFIX)
+
+    companion object {
+        /** The file-name ending of the promise-only gate files ([promiseOnly]). */
+        const val PROMISE_ONLY_SUFFIX = "-envelope.tsv"
+    }
 }
 
 /** Why a cautious member's day is excused (ruling R117): its table does not publish it, or publishes it wrongly. */

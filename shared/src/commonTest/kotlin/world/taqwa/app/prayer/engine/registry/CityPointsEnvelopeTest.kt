@@ -109,6 +109,23 @@ class CityPointsEnvelopeTest {
         assertNull(sharjah.unitName)
         assertEquals(GeoPoint(25.07725, 55.30927), sharjah.method!!.fixedPoint)
         assertEquals(FixedPointMode.BOTH, sharjah.method!!.fixedPointMode)
+        // Fujairah follows Hatta's table, the nearest, and is never before Dubai's main table either (round 2's review).
+        val fujairah = at("ae.iacad.dubai", 25.11641, 56.34141, "Asia/Dubai", "AE")
+        assertEquals(GeoPoint(24.80073, 56.12726), fujairah.method!!.fixedPoint)
+        assertTrue(GeoPoint(25.07725, 55.30927) in fujairah.method!!.startPoints && GeoPoint(25.07725, 55.30927) in fujairah.method!!.endPoints)
+        assertTrue(sharjah.method!!.startPoints.isEmpty())
+    }
+
+    @Test
+    fun `rabita's calendar is held across the helsinki region`() {
+        // Round 2's review: Sipoo's Isha a minute before Rabita's calendar on 84 days, Espoonlahti's end of eating up to
+        // 2 min after it on 31. Within 45 km of Helsinki the member's Isha a minute later and its end of eating 2 earlier.
+        fun rabita(lat: Double, lon: Double) =
+            Registry.resolve(Place(lat, lon, "Europe/Helsinki", "FI")).members.first { it.id == "se.rabita" }.method
+        val sipoo = rabita(60.37643, 25.27156)
+        val turku = rabita(60.4518, 22.2666)
+        assertEquals(turku.margins.isha + 60, sipoo.margins.isha)
+        assertEquals(turku.endOfEatingMarginSeconds - 120, sipoo.endOfEatingMarginSeconds)
     }
 
     @Test

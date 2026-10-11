@@ -11,6 +11,7 @@ import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.ADHAN2_ASR_ALLOWANCE
 import world.taqwa.app.prayer.engine.registry.AuthorityUnit
+import world.taqwa.app.prayer.engine.registry.Circle
 import world.taqwa.app.prayer.engine.registry.ENDS_REACH_FACTOR
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
@@ -127,15 +128,25 @@ object Europe {
             listOf(m25),
             choose = { place -> m25.takeIf { Regions.londonM25.contains(GeoPoint(place.lat, place.lon)) } },
         ) { user ->
-            // Chosen outside the M25 (the city-point round of 11 Oct 2026): within R45's three reaches (about 100 km:
-            // Basildon, Sevenoaks, St Albans, Reading, Luton) the table's point rides for every start and end; farther,
-            // the user's own point with the edge's minute, as before, where London's table is no plausible one (the
-            // never-earlier comparison found its point's dawn holding the end of eating later in Scotland's summer).
+            // Chosen outside the M25 (the city-point round of 11 Oct 2026, the owner's rule: a user who chooses a table
+            // follows it, wherever it is chosen): within R45's three reaches (about 100 km: Basildon, Sevenoaks, St Albans,
+            // Reading, Luton) the table's point rides as the fixed point for every start and end. Farther (Ipswich,
+            // Dover, Norwich, Southampton, Birmingham, Scotland: round 2's review) the user's own point with the edge's
+            // minute, and London's point rides beside it as a start point and an end point: read with the user's own
+            // curves, unlike a fixed point (whose dawn held the end of eating later in Scotland's summer), so every start
+            // is never before LUPT's table nor before the user's own, and every end never after either: each end is also
+            // held to the user's point alone (endsBoundAtUserPoint, DayComputer's point 7), where on the north's summer
+            // nights London's later Fajr would otherwise hold the end of eating later than before.
             val reach = lateReachKm(point.lat, london.entryClass)
             if (distanceKm(user, point) <= reach * ENDS_REACH_FACTOR) {
                 londonMethod.followedBeyond("gb.london.lupt.edge", point)
             } else {
-                londonMethod.beyondTable("gb.london.lupt.edge", point, user, reach)
+                londonMethod.beyondTable("gb.london.lupt.edge", point, user, reach).let { m ->
+                    m.copy(
+                        startPoints = (m.startPoints + point).distinct(), endPoints = (m.endPoints + point).distinct(),
+                        endsBoundAtUserPoint = true,
+                    )
+                }
             }
         }
     }
@@ -290,6 +301,17 @@ object Europe {
      * + 7.6 on one day). England, Wales and Northern Ireland keep the family's own minutes.
      */
     val variants = listOf(
+        // Rabita Helsinki's calendar across the Helsinki region (the city-point round 2 review, the owner's rule: rather
+        // late, never early): within 45 km of Helsinki its Isha a minute later and its end of eating two minutes earlier,
+        // so no town is before the calendar's Isha (Sipoo, Kerava, Järvenpää) or after its end of eating (Lauttasaari,
+        // Kaarela, Matinkylä, Olari, Espoonlahti, Nurmijärvi). A per-point method, the table's own day bounding the
+        // user's, is a later round's.
+        MethodVariant("se.rabita", Circle(GeoPoint(60.1699, 24.9384), RABITA_REGION_KM)) { method ->
+            method.copy(
+                margins = method.margins.copy(isha = method.margins.isha + RABITA_REGION_ISHA_SECONDS),
+                endOfEatingMarginSeconds = method.endOfEatingMarginSeconds - RABITA_REGION_EATING_SECONDS,
+            )
+        },
         MethodVariant("gb.fifteen", Regions.scotland) { method ->
             method.copy(
                 authorityMinutes = method.authorityMinutes.copy(asr = 0),
@@ -1180,10 +1202,11 @@ object Europe {
         measured = true, named = { it != "se.rabita" },
         lateLimits = listOf(
             LateLimit(
-                109,
+                111,
                 "Fajr is the later member's, Diyanet's European takdir on its own city curves (Helsinki's and " +
-                    "Copenhagen's since the monitor round): up to 109 min after Rabita's Helsinki calendar in summer; at " +
-                    "Stockholm 6. Rabita's own Fajr follows its calendar.",
+                    "Copenhagen's since the monitor round): up to 109 min after Rabita's Helsinki calendar in summer, " +
+                    "and 111 at the towns of the Helsinki region its calendar is held at; at Stockholm 6. Rabita's own " +
+                    "Fajr follows its calendar.",
                 setOf(TimedEvent.FAJR),
             ),
             LateLimit(
@@ -1252,6 +1275,16 @@ object Europe {
      * every end before it.
      */
     private const val RABITA_END = -300
+
+    /**
+     * Rabita's Helsinki region ([variants], the city-point round 2 review): how far from Helsinki its calendar is held by
+     * the wider margins, and by how much. Before them (as on main) the app's Sipoo had Isha a minute before the calendar on
+     * 84 days, Kerava 14 and Järvenpää 18, and Espoonlahti, Matinkylä, Lauttasaari, Kaarela, Olari and Nurmijärvi the end of
+     * eating 1 to 2 min after it on 3 to 31 days.
+     */
+    private const val RABITA_REGION_KM = 45.0
+    private const val RABITA_REGION_ISHA_SECONDS = 60
+    private const val RABITA_REGION_EATING_SECONDS = 120
 
     /** Why the ICCI's Fajr and Isha run late (Task 7g's gate, proof.md). */
     private const val ICCI_RULE = "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no " +

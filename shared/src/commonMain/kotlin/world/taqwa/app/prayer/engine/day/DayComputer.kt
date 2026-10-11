@@ -201,10 +201,19 @@ object DayComputer {
          * under a Fajr margin below the end's (the Kyrgyz Muftiate's, at Bishkek's suburbs), the table's later Fajr let
          * the end of eating come a minute after the user's own point alone gave it. Only there: inside an authority's own
          * unit (DUM RT's, IRN's, EMB's, Umm al-Qura's …) the ends stay its table's, as they were before.
+         *
+         * And where no fixed point rides but a table's point rides beside the user's own as a start and an end point
+         * ([TimetableMethod.startPoints], [TimetableMethod.endPoints], with [TimetableMethod.endsBoundAtUserPoint]: London
+         * Unified chosen beyond R45's three reaches, round 2's fix of 11 Oct 2026), the same method at the user's point
+         * with no other point beside it: on the north's summer nights, where the user's own dawn is not reached, the
+         * table's point dropped the night rule's end of eating and its later Fajr held the end later than before.
          */
         private val atUserAlone: Place? =
             if (here.size == 2 && !endsOnly && method.endsBoundAtUserPoint) {
                 val alone = withoutOthers.copy(fixedPoint = null, endsBoundAtUserPoint = false)
+                Place(alone, point, zone, school, ramadan, lagDates, lagDatesUntil, skies)
+            } else if (method.fixedPoint == null && method.endsBoundAtUserPoint && (extraStarts.isNotEmpty() || extraEnds.isNotEmpty())) {
+                val alone = method.copy(startPoints = emptyList(), endPoints = emptyList(), envelopePoints = emptyList(), endsBoundAtUserPoint = false)
                 Place(alone, point, zone, school, ramadan, lagDates, lagDatesUntil, skies)
             } else {
                 null

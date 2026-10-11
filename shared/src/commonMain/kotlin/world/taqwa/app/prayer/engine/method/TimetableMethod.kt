@@ -176,7 +176,10 @@ sealed interface HighLatRule {
  * for the starts too, the ends shown are also never after those this method shows at the user's
  * point alone (DayComputer's point 7); set only on a table printed for its own point riding beside a
  * method that is computed at the user's own point (`tablesAtTheirPoints`, the city-point audit of
- * 10–11 Oct 2026), never on an authority's own unit, whose ends follow its table (ruling R89).
+ * 10–11 Oct 2026), never on an authority's own unit, whose ends follow its table (ruling R89); and, with
+ * no fixed point, where a table's point rides beside the user's as a start and an end point (London Unified
+ * chosen beyond R45's three reaches, round 2's fix of 11 Oct 2026), the ends never after those the method
+ * shows at the user's point with no other point beside it.
  *
  * - [twilightDipDeg] deepens the Fajr and Isha angles (INM, JAKIM highland zones).
  * - [fajrDeclinationBias] (degrees, by day of year) is added to the sun's declination for Fajr, and

@@ -1,7 +1,7 @@
 {
   "entry": "xk.bik",
   "class": "D (authority)",
-  "engineHash": "a7418154fe2ca06a",
+  "engineHash": "3cc34d02de538571",
   "broken": 0,
   "places": 44,
   "first": "2026-01-01",
@@ -233,15 +233,15 @@
   },
   "lateLimits": {
     "unit base: 7 min": {
-      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
       "events": ["fajr", "dhuhr", "isha"]
     },
     "unit base: 8 min": {
-      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
       "events": ["sunrise", "asrStandard", "maghrib"]
     },
     "unit base: 9 min": {
-      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+      "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
       "events": ["endOfEating"]
     }
   },
@@ -253,15 +253,15 @@
       "broken": 0,
       "lateLimits": {
         "unit base: 7 min": {
-          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
           "events": ["fajr", "dhuhr", "isha"]
         },
         "unit base: 8 min": {
-          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
           "events": ["sunrise", "asrStandard", "maghrib"]
         },
         "unit base: 9 min": {
-          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
+          "reason": "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures (the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against the base table itself the times run up to this many minutes from it, on top of its own uneven steps.",
           "events": ["endOfEating"]
         }
       },

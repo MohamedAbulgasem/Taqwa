@@ -272,6 +272,26 @@ tasks.register<JavaExec>("generateReachRows") {
 }
 
 /**
+ * Writes the envelope's promise-only rows, `official/gate/<group>-envelope.tsv`: every table printed for its own point
+ * replayed at every app city within its bound reach, whichever table the city follows, and the round's named claims
+ * (`units/GenerateEnvelopeRows.kt`, the city-point round 2 review of 11 Oct 2026). Reads only the gate files and the
+ * app's cities. Re-run after such a table, its rows or its reach change, then run the gate and commit.
+ *
+ *     ./gradlew -p tools/timetables generateEnvelopeRows
+ */
+tasks.register<JavaExec>("generateEnvelopeRows") {
+    group = "application"
+    description = "Writes the envelope's promise-only rows: each table printed for its own point at every app city its bound reach holds."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.GenerateEnvelopeRowsKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "2g"
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", root) })
+}
+
+/**
  * Writes `official/own-points-worst.tsv`: each own-point row's own worst lateness per event (Umm al-Qura's and QMDB's
  * group files; `units/OwnPointWorst.kt`), which `CityUnitsTest` holds every such row to. Re-run when a change is meant
  * to move an own point's lateness, or to take in rows `prove` added, then commit.

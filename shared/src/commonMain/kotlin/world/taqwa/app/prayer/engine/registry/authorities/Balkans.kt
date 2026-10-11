@@ -313,10 +313,11 @@ object Balkans {
     private const val SHARRI_WEST_DEG = (2 + TOWN_FIGURE_SPARE_MINUTES) * DEG_PER_MINUTE
 
     private const val BASE_REACH =
-        "The base table's point rides across Kosovo beside the user's (rulings R30 and R44; BIK's town offsets are not held): " +
-            "west of it, where BIK prints the base plus minutes, the user's own sun is later, and north or south of it the " +
-            "night's length moves the dawn and the dusk, so against the base table itself the times run up to this many " +
-            "minutes from it, on top of its own uneven steps."
+        "The base table's point rides across Kosovo beside the user's (rulings R30 and R44), with BIK's own town figures " +
+            "(the Takvimi's \"Diferenca e vendeve\": Sharri T + 2, Ferizaj, Gjilani, Prishtina, Podujeva and Vushtrria T - 1, " +
+            "Presheva T - 2): west of it, where BIK prints the Takvim itself, the user's own sun is later, in Sharri every " +
+            "start is at least T + 2, and north or south of it the night's length moves the dawn and the dusk, so against " +
+            "the base table itself the times run up to this many minutes from it, on top of its own uneven steps."
 
     private const val PERPETUAL_STEPS =
         "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each " +
