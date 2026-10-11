@@ -34,6 +34,7 @@ import world.taqwa.app.feature.common.authorityShortName
 import world.taqwa.app.feature.today.formatClock
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.i18n.schoolDisplayName
 import world.taqwa.app.i18n.uiLanguage
@@ -468,7 +469,7 @@ private fun CautiousTable(members: List<Pair<Member, PrayerDay>>, day: PrayerDay
                 // Not `joinToString { }`: its transform parameter is nullable, so the Compose
                 // compiler cannot treat the lambda as inlined into this composable's context.
                 val extraNames = disagreeing.map { (member, memberDay) ->
-                    "${authorityShortName(member.nameKey)} ${formatClock(memberDay.instantFor(prayer), zone, format)}"
+                    "${authorityShortName(member.nameKey)} ${isolatedClock(formatClock(memberDay.instantFor(prayer), zone, format))}"
                 }
                 val semicolon = listSemicolon()
                 val extra = extraNames.joinToString(semicolon)
@@ -546,7 +547,7 @@ private fun SunniSection(shiaRegion: Boolean) {
 @Composable
 private fun FastingSection(endOfEating: Instant, zone: TimeZone, format: PlatformFormat) {
     SectionHeading(stringResource(Res.string.about_if_fasting))
-    SectionBody(stringResource(Res.string.about_stop_eating, formatClock(endOfEating, zone, format)))
+    SectionBody(stringResource(Res.string.about_stop_eating, isolatedClock(formatClock(endOfEating, zone, format))))
 }
 
 @Composable

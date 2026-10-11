@@ -87,6 +87,7 @@ import world.taqwa.app.design.contentWidth
 import world.taqwa.app.feature.settings.BackChevron
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
+import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.adhkar_a11y_next
 import world.taqwa.app.resources.adhkar_a11y_previous
@@ -450,7 +451,8 @@ private fun HeaderButton(description: String, onClick: () -> Unit, content: @Com
 @Composable
 private fun phaseCaption(state: AdhkarUiState): String {
     val morning = state.set == AdhkarSet.MORNING
-    val until = state.until
+    // Isolated when it carries a marker: Urdu's Latin "PM" would otherwise land before the digits.
+    val until = state.until?.let(::isolatedClock)
     return when {
         state.phase == AdhkarPhase.BEST && until != null ->
             stringResource(if (morning) Res.string.adhkar_until_sunrise else Res.string.adhkar_until_maghrib, until)

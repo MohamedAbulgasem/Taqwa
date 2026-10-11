@@ -86,6 +86,7 @@ import world.taqwa.app.feature.qibla.localizedGroupedKm
 import world.taqwa.app.i18n.CountdownFormatter
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.isolated
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.notifications_allow_exact_alarms

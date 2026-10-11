@@ -43,6 +43,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.feature.common.authorityShortName
 import world.taqwa.app.feature.today.formatClock
 import world.taqwa.app.i18n.LocalPlatformFormat
+import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.match_both
 import world.taqwa.app.resources.match_fajr_begins
@@ -161,12 +162,16 @@ private fun MatchResultBlock(
                         if (match is MosqueMatch.Both) {
                             stringResource(
                                 Res.string.match_both,
-                                formatClock(times.dhuhr, zone, format),
-                                formatClock(times.asr, zone, format),
-                                formatClock(times.maghrib, zone, format),
+                                isolatedClock(formatClock(times.dhuhr, zone, format)),
+                                isolatedClock(formatClock(times.asr, zone, format)),
+                                isolatedClock(formatClock(times.maghrib, zone, format)),
                             )
                         } else {
-                            stringResource(Res.string.match_hour_apart, formatClock(times.fajr, zone, format), formatClock(times.isha, zone, format))
+                            stringResource(
+                                Res.string.match_hour_apart,
+                                isolatedClock(formatClock(times.fajr, zone, format)),
+                                isolatedClock(formatClock(times.isha, zone, format)),
+                            )
                         },
                         style = TaqwaText.caption,
                         color = colors.textSecondary,
@@ -213,9 +218,9 @@ private fun MatchResultBlock(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         if (match.matched == Prayer.FAJR) {
-                            stringResource(Res.string.match_one_fajr, formatClock(times.isha, zone, format))
+                            stringResource(Res.string.match_one_fajr, isolatedClock(formatClock(times.isha, zone, format)))
                         } else {
-                            stringResource(Res.string.match_one_isha, formatClock(times.fajr, zone, format))
+                            stringResource(Res.string.match_one_isha, isolatedClock(formatClock(times.fajr, zone, format)))
                         },
                         style = TaqwaText.caption,
                         color = colors.textSecondary,
@@ -263,7 +268,11 @@ private fun CandidateRow(option: TimetableOption, zone: TimeZone) {
         option.today?.let { times ->
             Spacer(Modifier.height(2.dp))
             Text(
-                stringResource(Res.string.match_fajr_isha, formatClock(times.fajr, zone, format), formatClock(times.isha, zone, format)),
+                stringResource(
+                    Res.string.match_fajr_isha,
+                    isolatedClock(formatClock(times.fajr, zone, format)),
+                    isolatedClock(formatClock(times.isha, zone, format)),
+                ),
                 style = TaqwaText.caption,
                 color = colors.textSecondary,
             )
