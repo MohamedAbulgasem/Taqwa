@@ -1,7 +1,7 @@
 {
   "entry": "us.chicago",
   "class": "C",
-  "engineHash": "a686d637c5e0c369",
+  "engineHash": "40039a958b9d5ae4",
   "broken": 0,
   "places": 133,
   "first": "2025-10-01",
@@ -18,14 +18,14 @@
       "checked": 26209,
       "early": 0,
       "late": {
-        "0": 1690,
-        "1": 5309,
-        "2": 5970,
-        "3+": 13240
+        "0": 123,
+        "1": 4184,
+        "2": 5537,
+        "3+": 16365
       },
-      "exactShare": 0.0645,
-      "worstLate": 32,
-      "lateLimit": 32,
+      "exactShare": 0.0047,
+      "worstLate": 34,
+      "lateLimit": 34,
       "lateLimitFrom": "entry us.chicago",
       "overLimit": 0
     },
@@ -33,12 +33,12 @@
       "checked": 26209,
       "lateEnd": 0,
       "late": {
-        "0": 876,
-        "1": 3886,
-        "2": 15304,
-        "3+": 6143
+        "0": 711,
+        "1": 2583,
+        "2": 8691,
+        "3+": 14224
       },
-      "exactShare": 0.0334,
+      "exactShare": 0.0271,
       "worstLate": 4,
       "lateLimit": 4,
       "lateLimitFrom": "entry us.chicago",
@@ -48,12 +48,12 @@
       "checked": 26209,
       "early": 0,
       "late": {
-        "0": 838,
-        "1": 5003,
-        "2": 1145,
-        "3+": 19223
+        "0": 0,
+        "1": 0,
+        "2": 5520,
+        "3+": 20689
       },
-      "exactShare": 0.032,
+      "exactShare": 0,
       "worstLate": 7,
       "lateLimit": 7,
       "lateLimitFrom": "entry us.chicago",
@@ -64,13 +64,13 @@
       "early": 0,
       "late": {
         "0": 0,
-        "1": 206,
-        "2": 7555,
-        "3+": 18448
+        "1": 0,
+        "2": 2774,
+        "3+": 23435
       },
       "exactShare": 0,
-      "worstLate": 6,
-      "lateLimit": 6,
+      "worstLate": 7,
+      "lateLimit": 7,
       "lateLimitFrom": "entry us.chicago",
       "overLimit": 0
     },
@@ -79,9 +79,9 @@
       "early": 0,
       "late": {
         "0": 0,
-        "1": 269,
-        "2": 5997,
-        "3+": 19943
+        "1": 0,
+        "2": 397,
+        "3+": 25812
       },
       "exactShare": 0,
       "worstLate": 7,
@@ -95,8 +95,8 @@
       "late": {
         "0": 0,
         "1": 0,
-        "2": 3549,
-        "3+": 22660
+        "2": 1441,
+        "3+": 24768
       },
       "exactShare": 0,
       "worstLate": 7,
@@ -108,14 +108,14 @@
       "checked": 26209,
       "lateEnd": 0,
       "late": {
-        "0": 139,
-        "1": 3908,
-        "2": 7427,
-        "3+": 14735
+        "0": 0,
+        "1": 2253,
+        "2": 5313,
+        "3+": 18643
       },
-      "exactShare": 0.0053,
-      "worstLate": 33,
-      "lateLimit": 33,
+      "exactShare": 0,
+      "worstLate": 34,
+      "lateLimit": 34,
       "lateLimitFrom": "entry us.chicago",
       "overLimit": 0
     }
@@ -128,14 +128,14 @@
         "checked": 26209,
         "early": 0,
         "late": {
-          "0": 1690,
-          "1": 5309,
-          "2": 5970,
-          "3+": 13240
+          "0": 123,
+          "1": 4184,
+          "2": 5537,
+          "3+": 16365
         },
-        "exactShare": 0.0645,
-        "worstLate": 32,
-        "lateLimit": 32,
+        "exactShare": 0.0047,
+        "worstLate": 34,
+        "lateLimit": 34,
         "lateLimitFrom": "entry us.chicago",
         "overLimit": 0
       },
@@ -143,12 +143,12 @@
         "checked": 26209,
         "lateEnd": 0,
         "late": {
-          "0": 876,
-          "1": 3886,
-          "2": 15304,
-          "3+": 6143
+          "0": 711,
+          "1": 2583,
+          "2": 8691,
+          "3+": 14224
         },
-        "exactShare": 0.0334,
+        "exactShare": 0.0271,
         "worstLate": 4,
         "lateLimit": 4,
         "lateLimitFrom": "entry us.chicago",
@@ -158,12 +158,12 @@
         "checked": 26209,
         "early": 0,
         "late": {
-          "0": 838,
-          "1": 5003,
-          "2": 1145,
-          "3+": 19223
+          "0": 0,
+          "1": 0,
+          "2": 5520,
+          "3+": 20689
         },
-        "exactShare": 0.032,
+        "exactShare": 0,
         "worstLate": 7,
         "lateLimit": 7,
         "lateLimitFrom": "entry us.chicago",
@@ -174,13 +174,13 @@
         "early": 0,
         "late": {
           "0": 0,
-          "1": 206,
-          "2": 7555,
-          "3+": 18448
+          "1": 0,
+          "2": 2774,
+          "3+": 23435
         },
         "exactShare": 0,
-        "worstLate": 6,
-        "lateLimit": 6,
+        "worstLate": 7,
+        "lateLimit": 7,
         "lateLimitFrom": "entry us.chicago",
         "overLimit": 0
       },
@@ -189,9 +189,9 @@
         "early": 0,
         "late": {
           "0": 0,
-          "1": 269,
-          "2": 5997,
-          "3+": 19943
+          "1": 0,
+          "2": 397,
+          "3+": 25812
         },
         "exactShare": 0,
         "worstLate": 7,
@@ -205,8 +205,8 @@
         "late": {
           "0": 0,
           "1": 0,
-          "2": 3549,
-          "3+": 22660
+          "2": 1441,
+          "3+": 24768
         },
         "exactShare": 0,
         "worstLate": 7,
@@ -218,14 +218,14 @@
         "checked": 26209,
         "lateEnd": 0,
         "late": {
-          "0": 139,
-          "1": 3908,
-          "2": 7427,
-          "3+": 14735
+          "0": 0,
+          "1": 2253,
+          "2": 5313,
+          "3+": 18643
         },
-        "exactShare": 0.0053,
-        "worstLate": 33,
-        "lateLimit": 33,
+        "exactShare": 0,
+        "worstLate": 34,
+        "lateLimit": 34,
         "lateLimitFrom": "entry us.chicago",
         "overLimit": 0
       }
@@ -237,13 +237,13 @@
       "us.chicago.eighteen": {
         "days": 17716,
         "cappedDays": 78,
-        "leastGap": 1,
+        "leastGap": 2,
         "mostGap": 6
       },
       "us.isna": {
         "days": 14914,
         "cappedDays": 78,
-        "leastGap": 1,
+        "leastGap": 2,
         "mostGap": 7
       }
     }
@@ -459,8 +459,8 @@
       "reason": "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Sunrise up to 3 min before theirs at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 4.",
       "events": ["sunrise"]
     },
-    "entry us.chicago: 6 min": {
-      "reason": "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Asr up to 5 min at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 6.",
+    "entry us.chicago: 7 min (asrHanafi)": {
+      "reason": "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Asr up to 5 min at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 6, and beside every other mosque's table of the same member within class D's reach of the user (about 61 km), where a user may still follow it (the owner's rule: never before any of them), up to 7.",
       "events": ["asrHanafi"]
     },
     "entry us.chicago: 7 min (dhuhr)": {
@@ -471,13 +471,13 @@
       "reason": "Both members keep the US floors (Zuhr up to + 5, Maghrib up to + 5 at some US mosques, Makki's Zuhr + 5 among them), after the Chicago tables that add less: Isha up to 5 min at the mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 7.",
       "events": ["isha"]
     },
-    "entry us.chicago: 32 min": {
-      "reason": "Chicago's mosques differ on Fajr: the 15° mosques' Fajr, never before it, runs up to 31 min after the 18° block's (Villa Park, Makki, DarusSalam) at their mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 32.",
-      "events": ["fajr"]
-    },
-    "entry us.chicago: 33 min": {
-      "reason": "Chicago's mosques differ on Fajr: the end of eating is the 18° block's dawn, never after it, up to 32 min before the 15° mosques' Fajr (MCC, MEC, Mosque Foundation, Orland Park) at their mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 33.",
+    "entry us.chicago: 34 min (endOfEating)": {
+      "reason": "Chicago's mosques differ on Fajr: the end of eating is the 18° block's dawn, never after it, up to 32 min before the 15° mosques' Fajr (MCC, MEC, Mosque Foundation, Orland Park) at their mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 33, and beside every other mosque's table of the same member within class D's reach of the user (about 61 km), where a user may still follow it (the owner's rule: never before any of them), up to 34.",
       "events": ["endOfEating"]
+    },
+    "entry us.chicago: 34 min (fajr)": {
+      "reason": "Chicago's mosques differ on Fajr: the 15° mosques' Fajr, never before it, runs up to 31 min after the 18° block's (Villa Park, Makki, DarusSalam) at their mosques; within a minute's reach of a mosque its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 32, and beside every other mosque's table of the same member within class D's reach of the user (about 61 km), where a user may still follow it (the owner's rule: never before any of them), up to 34.",
+      "events": ["fajr"]
     }
   }
 }

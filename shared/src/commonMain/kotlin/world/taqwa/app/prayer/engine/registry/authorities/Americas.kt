@@ -15,6 +15,7 @@ import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.SAFE_START
 import world.taqwa.app.prayer.engine.registry.SAFE_SUNRISE
 import world.taqwa.app.prayer.engine.registry.Scope
+import world.taqwa.app.prayer.engine.registry.TableEnvelope
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.atEdge
@@ -55,28 +56,47 @@ object Americas {
         ),
         school = AsrSchool.STANDARD, scope = Scope.GLOBAL, countries = setOf("US", "PR", "VI", "GU", "AS", "MP", "UM"), measured = true,
         lateLimits = listOf(
-            LateLimit(7, US_FLOORS + " Zuhr up to 7 min after the tables that add nothing.", setOf(TimedEvent.DHUHR)),
             LateLimit(
-                7,
-                US_FLOORS + " Maghrib up to 6 min after the tables that add nothing at their mosques, " + US_REACH + " 7.",
+                8,
+                US_FLOORS + " Zuhr up to 7 min after the tables that add nothing (8 at Dar Al Noor's and East Cobb's), " +
+                    US_ENVELOPE + " 8.",
+                setOf(TimedEvent.DHUHR),
+            ),
+            LateLimit(
+                9,
+                US_FLOORS + " Maghrib up to 6 min after the tables that add nothing at their mosques, " + US_REACH + " 7, " +
+                    US_ENVELOPE + " 9.",
                 setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
-                6,
-                US_FLOORS + " Asr and Isha, a minute or two after the angle at some tables (ADAMS's Isha 2 min later by its " +
-                    "rule), up to 5 min after the others' at their mosques, " + US_REACH + " 6.",
-                setOf(TimedEvent.ASR, TimedEvent.ISHA),
+                7,
+                US_FLOORS + " Asr, a minute or two after the angle at some tables, up to 5 min after the others' at their " +
+                    "mosques, " + US_REACH + " 6, " + US_ENVELOPE + " 7.",
+                setOf(TimedEvent.ASR),
             ),
             LateLimit(
-                4,
-                US_FLOORS + " ADAMS moves Fajr 2 min earlier (its safe direction): Fajr up to 4 min after its.",
+                8,
+                US_FLOORS + " Isha, a minute or two after the angle at some tables (ADAMS's Isha 2 min later by its rule), up " +
+                    "to 5 min after the others' at their mosques, " + US_REACH + " 7 (MEC's), " + US_ENVELOPE + " 8.",
+                setOf(TimedEvent.ISHA),
+            ),
+            LateLimit(
+                7,
+                US_FLOORS + " ADAMS moves Fajr 2 min earlier (its safe direction): Fajr up to 4 min after its, " + US_REACH +
+                    " 6, " + US_ENVELOPE + " 7.",
                 setOf(TimedEvent.FAJR),
             ),
             LateLimit(
-                5,
-                US_FLOORS + " ADAMS moves sunrise 2 min earlier (its safe direction): sunrise and the end of eating, never " +
-                    "after its, up to 4 min before the others' at their mosques, " + US_REACH + " 5.",
-                setOf(TimedEvent.SUNRISE, TimedEvent.END_OF_EATING),
+                6,
+                US_FLOORS + " ADAMS moves sunrise 2 min earlier (its safe direction): sunrise, never after its, up to 4 min " +
+                    "before the others' at their mosques, " + US_REACH + " 5, " + US_ENVELOPE + " 6.",
+                setOf(TimedEvent.SUNRISE),
+            ),
+            LateLimit(
+                8,
+                US_FLOORS + " ADAMS moves its dawn 2 min earlier (its safe direction): the end of eating, never after its " +
+                    "Fajr, up to 4 min before the others' at their mosques, " + US_REACH + " 5, " + US_ENVELOPE + " 8.",
+                setOf(TimedEvent.END_OF_EATING),
             ),
         ),
     )
@@ -92,23 +112,14 @@ object Americas {
     val usaUnits: UnitSet = tablesAtTheirPoints(
         "us.isna", EntryClass.A, usa.method!!,
         listOf(
-            OwnTable(
-                "adams", "ADAMS Center, Sterling", GeoPoint(39.037, -77.383),
-                listOf(isnaReach(6, "ADAMS moves its Fajr 2 min earlier (its safe direction): Fajr", TimedEvent.FAJR)),
-            ),
+            OwnTable("adams", "ADAMS Center, Sterling", GeoPoint(39.037, -77.383)),
             OwnTable("dar-al-hijrah", "Dar Al-Hijrah, Falls Church", GeoPoint(38.8614, -77.1467)),
-            OwnTable(
-                "dar-al-noor", "Dar Al Noor, Manassas", GeoPoint(38.6767, -77.3703),
-                listOf(isnaReach(8, "Zuhr", TimedEvent.DHUHR)),
-            ),
+            OwnTable("dar-al-noor", "Dar Al Noor, Manassas", GeoPoint(38.6767, -77.3703)),
             OwnTable("icnv", "Islamic Center of Northern Virginia, Fairfax", GeoPoint(38.8459, -77.3413)),
             OwnTable("al-iman", "Al-Iman Mosque, Astoria", GeoPoint(40.7684, -73.9116)),
             OwnTable("tawheed", "Tawheed Center, Detroit", GeoPoint(42.3436, -83.2227)),
             OwnTable("iagd", "IAGD, Rochester Hills", GeoPoint(42.6356, -83.1495)),
-            OwnTable(
-                "ecic", "East Cobb Islamic Center, Marietta", GeoPoint(33.97849, -84.48726),
-                listOf(isnaReach(8, "Zuhr", TimedEvent.DHUHR)),
-            ),
+            OwnTable("ecic", "East Cobb Islamic Center, Marietta", GeoPoint(33.97849, -84.48726)),
             OwnTable("mcc-chicago", "MCC, Chicago", GeoPoint(41.9603, -87.7291)),
             OwnTable("isgh", "ISGH, Houston", GeoPoint(29.7369, -95.4251)),
             OwnTable("ici", "Islamic Center of Irving", GeoPoint(32.8427, -97.0107)),
@@ -123,10 +134,7 @@ object Americas {
             OwnTable("dearborn", "American Moslem Society, Dearborn", GeoPoint(42.3043, -83.1436)),
             OwnTable("unity-center", "Muslim Unity Center, Bloomfield Hills", GeoPoint(42.605, -83.3158)),
             OwnTable("at-taqwa", "Masjid At-Taqwa, Ann Arbor", GeoPoint(42.2499, -83.6610)),
-            OwnTable(
-                "mec", "MEC, Morton Grove", GeoPoint(42.0381, -87.7708),
-                listOf(isnaReach(7, "Isha", TimedEvent.ISHA)),
-            ),
+            OwnTable("mec", "MEC, Morton Grove", GeoPoint(42.0381, -87.7708)),
             OwnTable("mosque-foundation", "Mosque Foundation, Bridgeview", GeoPoint(41.7229, -87.8030)),
             OwnTable("orland-park", "The Prayer Center of Orland Park", GeoPoint(41.5896, -87.8724)),
             OwnTable("maryam", "Maryam Islamic Center, Sugar Land", GeoPoint(29.59449, -95.683845)),
@@ -181,16 +189,17 @@ object Americas {
         named = { it == "us.isna" },
         lateLimits = listOf(
             LateLimit(
-                32,
+                34,
                 "Chicago's mosques differ on Fajr: the 15° mosques' Fajr, never before it, runs up to 31 min after the " +
-                    "18° block's (Villa Park, Makki, DarusSalam) at their mosques; " + CHICAGO_REACH + " 32.",
+                    "18° block's (Villa Park, Makki, DarusSalam) at their mosques; " + CHICAGO_REACH + " 32, " +
+                    CHICAGO_ENVELOPE + " 34.",
                 setOf(TimedEvent.FAJR),
             ),
             LateLimit(
-                33,
+                34,
                 "Chicago's mosques differ on Fajr: the end of eating is the 18° block's dawn, never after it, up to 32 min " +
                     "before the 15° mosques' Fajr (MCC, MEC, Mosque Foundation, Orland Park) at their mosques; " +
-                    CHICAGO_REACH + " 33.",
+                    CHICAGO_REACH + " 33, " + CHICAGO_ENVELOPE + " 34.",
                 setOf(TimedEvent.END_OF_EATING),
             ),
             LateLimit(
@@ -198,7 +207,11 @@ object Americas {
                 CHICAGO_FLOORS + " Zuhr and Maghrib up to 6 min at the mosques; " + CHICAGO_REACH + " 7.",
                 setOf(TimedEvent.DHUHR, TimedEvent.MAGHRIB),
             ),
-            LateLimit(6, CHICAGO_FLOORS + " Asr up to 5 min at the mosques; " + CHICAGO_REACH + " 6.", setOf(TimedEvent.ASR)),
+            LateLimit(
+                7,
+                CHICAGO_FLOORS + " Asr up to 5 min at the mosques; " + CHICAGO_REACH + " 6, " + CHICAGO_ENVELOPE + " 7.",
+                setOf(TimedEvent.ASR),
+            ),
             LateLimit(7, CHICAGO_FLOORS + " Isha up to 5 min at the mosques; " + CHICAGO_REACH + " 7.", setOf(TimedEvent.ISHA)),
             LateLimit(4, CHICAGO_FLOORS + " Sunrise up to 3 min before theirs at the mosques; " + CHICAGO_REACH + " 4.", setOf(TimedEvent.SUNRISE)),
         ),
@@ -220,12 +233,19 @@ object Americas {
         ),
         school = AsrSchool.STANDARD, scope = Scope.CITY, countries = setOf("CA"), measured = true,
         lateLimits = listOf(
-            LateLimit(5, CANADA_FLOORS + " Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-                setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.MAGHRIB, TimedEvent.END_OF_EATING)),
+            LateLimit(5, CANADA_FLOORS + " Fajr, Maghrib and sunrise up to 5 min from the others'.",
+                setOf(TimedEvent.FAJR, TimedEvent.SUNRISE, TimedEvent.MAGHRIB)),
             LateLimit(
-                5,
+                6,
+                CANADA_FLOORS + " The end of eating up to 5 min from the others', and beside every other mosque's table within " +
+                    "class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+                setOf(TimedEvent.END_OF_EATING),
+            ),
+            LateLimit(
+                6,
                 CANADA_FLOORS + " Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, " +
-                    "where its point rides beside the user's (rulings R30 and R44), up to 5.",
+                    "where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's " +
+                    "table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
                 setOf(TimedEvent.ASR),
             ),
             LateLimit(4, CANADA_FLOORS + " Isha up to 4 min after the others'.", setOf(TimedEvent.ISHA)),
@@ -520,6 +540,27 @@ object Americas {
     val lakembaUnits: UnitSet = pointTable(lakemba, "Lakemba Mosque", GeoPoint(-33.92, 151.0756))
 
     /**
+     * Diyanet's Sydney table (au-cautious.tsv's "Diyanet Sydney", au.cautious's second member, the TURKEY preset) is
+     * printed for a point Diyanet does not publish: read at Lakemba's in the gate, it could as well be the city's own
+     * (Sydney's centre, where Diyanet's city tables usually sit) or the Turkish community's (the Gallipoli Mosque,
+     * Auburn). The city-point round of 11 Oct 2026 (the owner's rule: safe against every plausible point): within class
+     * D's reach of any of the three the member rides them all beside the user's own point ([TableEnvelope], every start
+     * the latest and every end the earliest), so no time is before Diyanet's table, nor any end after it, wherever its
+     * point is among them. The first round found the sunrise a minute after the table at Fairfield, Cabramatta,
+     * Liverpool, Casula and Prestons, 13 to 19 km west of Lakemba, on 1 to 6 days. Beyond them, and everywhere else the
+     * TURKEY preset is followed, the method at the user's own point as before, measured as before.
+     */
+    val sydneyDiyanetUnits: UnitSet = run {
+        val points = listOf(
+            AuthorityUnit("sydney-lakemba", "Lakemba", GeoPoint(-33.92, 151.0756), 0.0, named = false, endsBoundAtUserPoint = true),
+            AuthorityUnit("sydney-centre", "Sydney", GeoPoint(-33.86785, 151.20732), 0.0, named = false, endsBoundAtUserPoint = true),
+            AuthorityUnit("sydney-auburn", "Auburn", GeoPoint(-33.8494, 151.0331), 0.0, named = false, endsBoundAtUserPoint = true),
+        )
+        val envelope = TableEnvelope(points, EntryClass.D_AUTHORITY)
+        UnitSet(Diyanet.other.id, emptyList(), measuredBeyond = true) { user -> envelope.beyond(user, Diyanet.other.method!!) }
+    }
+
+    /**
      * Australia: no dominant table (HIGH): Lakemba's, and Diyanet's per-suburb tables (the TURKEY preset ± 1).
      * Maghrib is capped at LMA's (the most followed) where the two spread, 5–6 min before Diyanet's
      * (its sunset + 7), as the spec's cautious Maghrib (Task 7g's gate, proof.md).
@@ -597,6 +638,15 @@ object Americas {
     private const val US_REACH = "and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and " +
         "R44: east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk), up to"
 
+    /**
+     * Why the US times run later still where several mosques' tables reach a place (the city-point round of 11 Oct 2026,
+     * the owner's rule: rather late, never early): every other mosque table within class D's reach of the user rides
+     * beside the nearest's ([TableEnvelope]), each start the latest and each end the earliest of them all.
+     */
+    private const val US_ENVELOPE = "and beside every other mosque's table within class D's reach of the user (ruling R40's, " +
+        "about 52 to 72 km), where a user may still follow it (the owner's rule of 11 Oct 2026: never before any of them, nor " +
+        "any end after one), up to"
+
     /** One ISNA mosque's own exception within its reach (ruling R41): [what] up to [minutes] min after its table there. */
     private fun isnaReach(minutes: Int, what: String, event: TimedEvent) = LateLimit(
         minutes,
@@ -620,6 +670,10 @@ object Americas {
     /** Why Chicago's times run later still at the app's own points near its tables (the city-point audit of 10–11 Oct 2026). */
     private const val CHICAGO_REACH = "within a minute's reach of a mosque its point rides beside the user's (rulings R30 and " +
         "R44), and at the app's own cities near them, east, west, north or south of the mosque, up to"
+
+    /** Why Chicago's times run later still where several of its mosques' tables reach a place (the city-point round of 11 Oct 2026). */
+    private const val CHICAGO_ENVELOPE = "and beside every other mosque's table of the same member within class D's reach of the " +
+        "user (about 61 km), where a user may still follow it (the owner's rule: never before any of them), up to"
 
     /** Why Canada's cautious times run later still at the app's own points near the families' tables (the same audit). */
     private const val FAMILIES_REACH = "within a minute's reach of a family's table its point rides beside the user's (rulings " +

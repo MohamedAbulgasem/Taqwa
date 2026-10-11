@@ -19,6 +19,8 @@ import world.taqwa.app.prayer.engine.registry.Scope
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.atEdge
+import world.taqwa.app.prayer.engine.registry.distanceKm
+import world.taqwa.app.prayer.engine.registry.followedBeyond
 import world.taqwa.app.prayer.engine.registry.margins
 import world.taqwa.app.prayer.engine.registry.single
 import world.taqwa.app.prayer.engine.registry.widened
@@ -95,7 +97,17 @@ object Gulf {
             AuthorityUnit("dubai-rural", "Dubai Rural", GeoPoint(24.80, 55.60), 30.0, method = ruralMethod, entryClass = EntryClass.D_AUTHORITY),
             AuthorityUnit("hatta", "Hatta", GeoPoint(24.80073, 56.12726), 12.0, method = hattaMethod),
         ),
-    ) { dubaiMethod.atEdge("ae.iacad.dubai.edge", dubaiZoneEdge) }
+    ) { user ->
+        // A user who chooses IACAD beyond its zones (Sharjah, Ajman) follows its nearest table (the city-point round of
+        // 11 Oct 2026): the zone edge as before, with that table's point riding for every start and end (followedBeyond),
+        // so never before Dubai's own table, nor any end after it. Nearer Dubai Rural's or Hatta's point, the same edge
+        // rides there (their own margins differ from the edge's; the edge's is never earlier than before).
+        val nearest = DUBAI_TABLES.minBy { distanceKm(user, it) }
+        dubaiMethod.followedBeyond("ae.iacad.dubai.edge", nearest, dubaiZoneEdge)
+    }
+
+    /** IACAD's three tables' points: Dubai's, Dubai Rural's (the latitude its sun fits best) and Hatta's. */
+    private val DUBAI_TABLES = listOf(GeoPoint(25.07725, 55.30927), GeoPoint(24.66, 55.60), GeoPoint(24.80073, 56.12726))
 
     val dubai: RegistryEntry = single(
         id = "ae.iacad.dubai", nameKey = "authority_iacad", entryClass = EntryClass.B, method = dubaiMethod,

@@ -50,7 +50,8 @@ import kotlin.time.Instant
  *    and where the rule is read at the user's own point every night takes the latest Fajr and Isha
  *    and the earliest end of sahur across a band of latitude (R65).
  * 2. Starts take the latest candidate; sunrise, sunset, the end of eating and imsak the earliest
- *    over the given and the fixed point (never the start points).
+ *    over the given and the fixed point and the [TimetableMethod.endPoints] (never the start points);
+ *    the other tables' [TimetableMethod.envelopePoints] count for both.
  * 3. The authority's offsets (minutes, monthly seconds, Ramadan seconds) and our margins are added,
  *    then starts are rounded up and ends down to the minute. An [IshaRule.AfterMaghrib] counts its
  *    minutes from the authority's Maghrib: raw sunset plus the authority's Maghrib offsets,
@@ -73,6 +74,8 @@ import kotlin.time.Instant
  *    point alone, after every step above; where it rides for the starts too beside a method computed
  *    at the user's own point ([TimetableMethod.endsBoundAtUserPoint], a table printed for its own
  *    point), nor after those it shows at the user's point alone (the city-point audit of 10–11 Oct
+ *    2026); nor after those it shows at each other table's own point alone, where those ride too
+ *    ([TimetableMethod.endPoints], [TimetableMethod.envelopePoints], the city-point round of 11 Oct
  *    2026). An authority's own unit keeps its table's ends: there the user's point alone would read
  *    rules its table does not (DUM RT's white nights end the fast up to two hours earlier).
  * 8. **Fajr before the sunrise shown** (ruling R90), last of all: where the Fajr shown is not before
@@ -154,11 +157,40 @@ object DayComputer {
         private val startHere = if (endsOnly) here.drop(1) else here
 
         /**
+         * The points read for the starts besides [startHere] ([TimetableMethod.startPoints] and the other tables'
+         * [TimetableMethod.envelopePoints]), and for the ends besides [here] ([TimetableMethod.endPoints] and the
+         * envelope's): starts the latest over all of them, ends the earliest.
+         */
+        private val extraStarts: List<GeoPoint> = (method.startPoints + method.envelopePoints).distinct() - startHere.toSet()
+        private val extraEnds: List<GeoPoint> = (method.endPoints + method.envelopePoints).distinct() - here.toSet()
+
+        /** [here] and [extraEnds]: every point an end is read at. */
+        private val endsHere: List<GeoPoint> = here + extraEnds
+
+        /** The method with no other table's point beside its own: what a table's own point, or the user's, shows alone. */
+        private val withoutOthers: TimetableMethod =
+            if (method.endPoints.isEmpty() && method.envelopePoints.isEmpty()) method else method.copy(endPoints = emptyList(), envelopePoints = emptyList())
+
+        /**
          * Ruling R89: the same method at the fixed point alone, where one rides beside the user's point:
          * the day the table's own point shows, which bounds the ends shown here ([day]).
          */
         private val atFixedPoint: Place? =
-            if (here.size == 2) Place(method, here.first(), zone, school, ramadan, lagDates, lagDatesUntil, skies) else null
+            if (here.size == 2) Place(withoutOthers, here.first(), zone, school, ramadan, lagDates, lagDatesUntil, skies) else null
+
+        /**
+         * Point 7 for each other table beside the fixed point ([TimetableMethod.envelopePoints], [TimetableMethod.endPoints]):
+         * the same method at that table's own point alone, no fixed point, start point or other table beside it, whose
+         * ends bound the ends shown here as [atFixedPoint]'s do (the end of eating is held to the latest Fajr over every
+         * point, which can be after that table's own).
+         */
+        private val atOtherTables: List<Place> = extraEnds.map { p ->
+            val alone = method.copy(
+                fixedPoint = null, fixedPointMode = FixedPointMode.BOTH, startPoints = emptyList(), endPoints = emptyList(),
+                envelopePoints = emptyList(), endsBoundAtUserPoint = false,
+            )
+            Place(alone, p, zone, school, ramadan, lagDates, lagDatesUntil, skies)
+        }
 
         /**
          * Ruling R15 completed (the city-point audit of 10–11 Oct 2026): the same method at the user's point alone, where a
@@ -172,7 +204,7 @@ object DayComputer {
          */
         private val atUserAlone: Place? =
             if (here.size == 2 && !endsOnly && method.endsBoundAtUserPoint) {
-                val alone = method.copy(fixedPoint = null, endsBoundAtUserPoint = false)
+                val alone = withoutOthers.copy(fixedPoint = null, endsBoundAtUserPoint = false)
                 Place(alone, point, zone, school, ramadan, lagDates, lagDatesUntil, skies)
             } else {
                 null
@@ -196,7 +228,8 @@ object DayComputer {
             val own = clocked(date, banded(date, limited(date, unlimited(date), capIsha)))
             val table = atFixedPoint?.day(date, capIsha)
             val alone = atUserAlone?.day(date, capIsha)
-            val bounded = listOfNotNull(table, alone).fold(own) { day, other -> day.endsNoLaterThan(other) }
+            val others = atOtherTables.map { it.day(date, capIsha) }
+            val bounded = (listOfNotNull(table, alone) + others).fold(own) { day, other -> day.endsNoLaterThan(other) }
             return bounded.fajrBeforeSunrise(date).ishaAfterMaghrib()
         }
 
@@ -291,9 +324,9 @@ object DayComputer {
          */
         private fun clocked(date: LocalDate, day: PrayerDay): PrayerDay {
             val rule = method.clockRule ?: return day
-            val at = (here + method.startPoints).distinct().associateWith { rule.on(date, it, zone) }
-            val forStarts = (startHere + method.startPoints).map { at.getValue(it) }
-            val forEnds = here.map { at.getValue(it) }
+            val at = (endsHere + extraStarts).distinct().associateWith { rule.on(date, it, zone) }
+            val forStarts = (startHere + extraStarts).distinct().map { at.getValue(it) }
+            val forEnds = endsHere.map { at.getValue(it) }
             val setByRule = day.setByRule.toMutableSet()
             val notFollowed = day.notFollowed.toMutableSet()
             at.values.forEach { notFollowed += it.notFollowed }
@@ -362,7 +395,7 @@ object DayComputer {
                 listOfNotNull(day.endOfEating, ruleEating, fajr).min()
             }
             // Red twilight ends Maghrib only where it is after the Maghrib shown (a rule's Maghrib can be later).
-            val redTwilight = here.mapNotNull { sky(it).altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
+            val redTwilight = endsHere.mapNotNull { sky(it).altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
                 .minOrNull()?.let(::endOf)?.takeIf { it > maghrib }
             val starts = mapOf(Prayer.FAJR to fajr, Prayer.DHUHR to dhuhr, Prayer.ASR to asr, Prayer.MAGHRIB to maghrib)
             val ends = Ends.of(
@@ -462,7 +495,7 @@ object DayComputer {
         /** The day before the rate limit. */
         private fun unlimited(date: LocalDate): PrayerDay {
             val offsets = Offsets(method, date, ramadan)
-            return computeAt(here, method.startPoints, date, offsets) ?: polarDay(date, offsets)
+            return computeAt(here, extraStarts, extraEnds, date, offsets) ?: polarDay(date, offsets)
         }
 
         // --- The daily rate limit ---------------------------------------------------------------
@@ -575,7 +608,7 @@ object DayComputer {
             }
             val bias = method.fajrDeclinationBias?.let { h -> abs(h.c0) + h.terms.sumOf { (a, b) -> abs(a) + abs(b) } } ?: 0.0
             val deepest = maxOf(fajr, isha, eating, 1.0)
-            (here + method.startPoints).all { 90.0 - abs(it.lat) - MAX_DECLINATION_DEG - bias >= deepest + 1.0 }
+            (endsHere + extraStarts).all { 90.0 - abs(it.lat) - MAX_DECLINATION_DEG - bias >= deepest + 1.0 }
         }
 
         /**
@@ -584,7 +617,7 @@ object DayComputer {
          * there. Days whose sun surely gives the sign are passed over without a crossing.
          */
         private fun missingLately(date: LocalDate, days: Int, evening: Boolean): Boolean {
-            val points = if (evening) startHere + method.startPoints else here
+            val points = if (evening) startHere + extraStarts else endsHere
             val twilight = if (evening) ishaTwilight else eatingTwilight
             return (0..days).any { k ->
                 val d = date.minus(k, DateTimeUnit.DAY)
@@ -613,11 +646,11 @@ object DayComputer {
 
         /** The sun's lower culmination after [date]'s noon, the latest over every point. */
         private fun middleOfTonight(date: LocalDate): Double =
-            (startHere + method.startPoints).maxOf { sky(it).clock(date).transit() } + SolarMath.SECONDS_PER_DAY / 2
+            (startHere + extraStarts).maxOf { sky(it).clock(date).transit() } + SolarMath.SECONDS_PER_DAY / 2
 
         /** The sun's lower culmination before [date]'s noon, the earliest over the given and fixed points. */
         private fun middleOfLastNight(date: LocalDate): Double =
-            here.minOf { sky(it).clock(date).transit() } - SolarMath.SECONDS_PER_DAY / 2
+            endsHere.minOf { sky(it).clock(date).transit() } - SolarMath.SECONDS_PER_DAY / 2
 
         /**
          * How far past the middle of its night a shown Isha can lie, from any source: a real dusk is
@@ -672,8 +705,9 @@ object DayComputer {
             while (true) {
                 val degrees = POLAR_STEP_DEG * steps
                 val nearer = here.map { towardsEquator(it, degrees) }
-                val startPoints = method.startPoints.map { towardsEquator(it, degrees) }
-                val day = computeAt(nearer, startPoints, date, offsets)
+                val startPoints = extraStarts.map { towardsEquator(it, degrees) }
+                val endPoints = extraEnds.map { towardsEquator(it, degrees) }
+                val day = computeAt(nearer, startPoints, endPoints, date, offsets)
                 if (day != null) return atThePlace(day, date, offsets)
                 check(nearer.any { it.lat != 0.0 }) { "${method.id}: no day at the equator on $date" }
                 steps++
@@ -698,8 +732,10 @@ object DayComputer {
          * A time counts as given only where every point it is read at gives it.
          */
         private fun atThePlace(substitute: PrayerDay, date: LocalDate, offsets: Offsets): PrayerDay {
-            val own = here.map { ownSigns(sky(it), date) }
-            val ownStarts = (if (endsOnly) own.drop(1) else own) + method.startPoints.map { ownSigns(sky(it), date) }
+            val atHere = here.map { ownSigns(sky(it), date) }
+            // The ends are read at every end point too ([extraEnds]), the starts at every start point ([extraStarts]).
+            val own = atHere + extraEnds.map { ownSigns(sky(it), date) }
+            val ownStarts = (if (endsOnly) atHere.drop(1) else atHere) + extraStarts.map { ownSigns(sky(it), date) }
             val setByRule = mutableSetOf<Prayer>()
             val borrowed = mutableSetOf<Prayer>()
 
@@ -842,9 +878,16 @@ object DayComputer {
 
         /**
          * The day at the points [here] (every time; one point, or a fixed point and the user's) and
-         * [startPoints] (starts only), or null where [date] has no sunrise or no sunset there.
+         * [startPoints] (starts only) and [endPoints] (sunrise, sunset, the end of eating, imsak and the red twilight
+         * only), or null where [date] has no sunrise or no sunset at any of them.
          */
-        private fun computeAt(here: List<GeoPoint>, startPoints: List<GeoPoint>, date: LocalDate, offsets: Offsets): PrayerDay? {
+        private fun computeAt(
+            here: List<GeoPoint>,
+            startPoints: List<GeoPoint>,
+            endPoints: List<GeoPoint>,
+            date: LocalDate,
+            offsets: Offsets,
+        ): PrayerDay? {
             val ruleShifts = when (method.dayRule) {
                 DayRule.SAME_DAY -> SAME_DAY
                 DayRule.NEIGHBOURS_MUIS -> NEIGHBOURS
@@ -863,10 +906,12 @@ object DayComputer {
                 val sky = sky(p)
                 shifts.map { rawEvents(sky, date, it) ?: return null }
             }
-            val sunsetHere = skies.minOf { it.sunset(date) ?: return null }
+            val endSkies = endPoints.map { sky(it) }
+            val forEnds = atHere + endSkies.flatMap { sky -> shifts.map { rawEvents(sky, date, it) ?: return null } }
+            val sunsetHere = (skies + endSkies).minOf { it.sunset(date) ?: return null }
 
             fun latest(event: (RawEvents) -> Double) = forStarts.maxOf(event)
-            fun earliest(event: (RawEvents) -> Double) = atHere.minOf(event)
+            fun earliest(event: (RawEvents) -> Double) = forEnds.minOf(event)
             fun total(prayer: Prayer) = offsets.total(prayer)
             val ramadanMaghrib = offsets.ramadanMaghrib
 
@@ -975,7 +1020,7 @@ object DayComputer {
             val sunset = endOf(sunsetHere + tableShift)
             val own = ownEndsSky
             val asrEnd = own?.sunset(date)?.let { minOf(sunset, endOf(it)) } ?: sunset
-            val redTwilightEnd = (skies + listOfNotNull(own))
+            val redTwilightEnd = (skies + endSkies + listOfNotNull(own))
                 .mapNotNull { it.altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
                 .minOrNull()?.let(::endOf)
             return PrayerDay(

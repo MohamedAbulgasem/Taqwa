@@ -1,5 +1,6 @@
 package world.taqwa.app.prayer.engine.registry
 
+import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.FixedPointMode
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.TimetableMethod
@@ -72,13 +73,16 @@ data class AuthorityUnit(
  * [choose], when given, picks the unit instead of the nearest point (districts whose minutes differ,
  * where the nearest seat can be the wrong district). [measuredBeyond]: beyond every unit a place keeps
  * whether it was measured before the units (a cautious member's own reach, [Member.measuredAt]); else it
- * is not measured there.
+ * is not measured there. [around], when given, adds what else bounds a user inside a unit, after the
+ * unit's point is set as the fixed point: the other tables whose reach holds the user
+ * ([tablesAtTheirPoints]' envelope), or an authority's printed town figures (BIK's, Balkans.kosovoUnits).
  */
 class UnitSet(
     val entryId: String,
     val units: List<AuthorityUnit>,
     val choose: ((Place) -> AuthorityUnit?)? = null,
     val measuredBeyond: Boolean = false,
+    val around: ((user: GeoPoint, unit: AuthorityUnit, method: TimetableMethod) -> TimetableMethod)? = null,
     val outside: (GeoPoint) -> TimetableMethod,
 ) {
     init {
@@ -170,6 +174,8 @@ object Units {
             .plus(listOf(SouthAsia.indiaUnits, CentralAsia.uzbekistanUnits, Balkans.kosovoUnits))
             .plus(listOf(SouthAsia.pakistanUnits, CentralAsia.kyrgyzstanUnits, Europe.wifaqulUnits))
             .plus(listOf(Levant.gazaAwqafUnits, Levant.lebanonUnits, Levant.syriaUnits, Levant.iraqUnits))
+            // The city-point round of 11 Oct 2026: Diyanet's Sydney table at every plausible point of its, near Sydney only.
+            .plus(Americas.sydneyDiyanetUnits)
             .associateBy { it.entryId }
     }
 
@@ -247,10 +253,10 @@ internal class OwnTable(
  * whose reach holds the user takes them, and its point rides as the method's fixed point beside the user's own (ruling
  * R15: starts the later, sunrise and the ends the earlier). So the time shown is never before the nearest table whose
  * reach holds the user, nor any end after it, and nowhere is a start earlier, or an end later, than the user's own point
- * alone gave it. Where two tables' reaches overlap, a place follows the nearest only, and can still be on the wrong side
- * of the other (the app's Ottawa, in the Ottawa South Mosque's unit, against Abrar Masjid 10 km off: an owner's
- * question, the fix round of 11 Oct 2026); two samples of one table (Damascus) instead read each other's point for the
- * starts ([OwnTable.method]). On main the app's own Houston, Sterling, Calgary, Delhi or Shtime, a few kilometres from
+ * alone gave it. Every other table whose [bound] reach holds the user rides beside the nearest ([TableEnvelope], round 2
+ * of 11 Oct 2026, the owner's rule: the app's Ottawa, in the Ottawa South Mosque's unit, had been early against Abrar
+ * Masjid and Kanata's tables); two samples of one table (Damascus) also read each other's point for the starts
+ * ([OwnTable.method]). On main the app's own Houston, Sterling, Calgary, Delhi or Shtime, a few kilometres from
  * such a table, had a time a minute on the wrong side of it on some days.
  *
  * [reach]: a mosque's or a city's table serves its own neighbourhood, a minute of longitude (class A's, about 17 to 24
@@ -261,10 +267,11 @@ internal class OwnTable(
  * Wifaqul towns 17 to 20 km from Manchester Central). An authority that applies one table to a whole area by
  * whole-minute offsets (BIK) reaches as far as its entry's class.
  *
- * Beyond every reach the method at the user's own point exactly as before ([method]): unlike one point table's fit
+ * Beyond every minute's reach, the tables whose [bound] reach holds the user ride as there ([TableEnvelope.beyond]), and
+ * beyond every bound reach the method at the user's own point exactly as before ([method]): unlike one point table's fit
  * ([pointTables], whose edge [beyondTable] widens), these margins hold every table at its own point and are meant for any
- * point, so ruling R44's edge minute and SAFE_END and R45's bound of the ends by the nearest table do not apply there
- * (the same proposed ruling). As beyond every other unit, no figure is claimed there, except that a cautious member
+ * point, so ruling R44's edge minute and SAFE_END do not apply there (the same proposed ruling). As beyond every other
+ * unit, no figure is claimed there, except that a cautious member
  * keeps its own measured reach ([measuredBeyond], [Member.measuredAt]). [measured] is false for an entry that claims no
  * figure anywhere (every city table's above). The units carry no name of their own ([AuthorityUnit.named]): About calls
  * the place by the app's own name for it, never a mosque's.
@@ -276,6 +283,7 @@ internal fun tablesAtTheirPoints(
     tables: List<OwnTable>,
     measured: Boolean = true,
     measuredBeyond: Boolean = false,
+    bound: EntryClass = EntryClass.D_AUTHORITY,
 ): UnitSet {
     val units = tables.map { t ->
         AuthorityUnit(
@@ -283,7 +291,50 @@ internal fun tablesAtTheirPoints(
             lateLimits = t.lateLimits, named = false, endsBoundAtUserPoint = true,
         )
     }
-    return UnitSet(entryId, units, measuredBeyond = measuredBeyond) { method }
+    val envelope = TableEnvelope(units, bound)
+    return UnitSet(
+        entryId, units, measuredBeyond = measuredBeyond,
+        around = { user, unit, placed -> envelope.around(user, unit, placed) },
+    ) { user -> envelope.beyond(user, method) }
+}
+
+/**
+ * The owner's rule for the city-point round of 11 Oct 2026, "rather late, never early": a place is never before any
+ * table printed for its own point whose [bound] reach holds it, nor any end after it, not only its nearest. That reach is
+ * ruling R40's own, the entry's class limit (three minutes of longitude, about 61 km at 41° N, for the class D entries and
+ * class C members of [tablesAtTheirPoints]), where a user may still follow that table, and also the three reaches R45
+ * bounds a point table's ends to. The unit (its figure, About's name) stays the nearest within a minute's reach; the
+ * other tables ride beside it ([TimetableMethod.envelopePoints]): every start the latest and every end the earliest over
+ * all of them and the user's own point, each end never after any of them alone. Beyond every unit but within a table's
+ * bound reach, the nearest such table rides as the fixed point and the rest beside it, with no figure (the review's probe
+ * found the times just beyond the minute's reach before the nearest table on some days: Calgary's north-east, Delhi's
+ * edge, Faridabad). Beyond every bound reach, the method at the user's own point alone, as before.
+ */
+internal class TableEnvelope(private val units: List<AuthorityUnit>, private val bound: EntryClass) {
+    private val reachKm: Map<String, Double> = units.associate { it.id to lateReachKm(it.point.lat, bound) }
+
+    /** The tables whose bound reach holds [user], nearest first. */
+    fun holding(user: GeoPoint): List<AuthorityUnit> =
+        units.map { it to distanceKm(user, it.point) }.filter { (u, km) -> km <= reachKm.getValue(u.id) }
+            .sortedBy { it.second }.map { it.first }
+
+    /** [placed] (the unit's method at its point) with every other table holding [user] beside it. */
+    fun around(user: GeoPoint, unit: AuthorityUnit, placed: TimetableMethod): TimetableMethod {
+        val others = holding(user).filter { it.id != unit.id }.map { it.point }
+        return if (others.isEmpty()) placed else placed.copy(envelopePoints = (placed.envelopePoints + others).distinct())
+    }
+
+    /** [method] beyond every unit: the nearest table holding [user] as its fixed point, the others beside it, else alone. */
+    fun beyond(user: GeoPoint, method: TimetableMethod): TimetableMethod {
+        val held = holding(user)
+        val nearest = held.firstOrNull() ?: return method
+        val own = nearest.method ?: method
+        val others = held.drop(1).map { it.point }
+        return own.copy(
+            fixedPoint = nearest.point, endsBoundAtUserPoint = true,
+            envelopePoints = (own.envelopePoints + others).distinct(),
+        )
+    }
 }
 
 /**
@@ -301,6 +352,18 @@ internal fun TimetableMethod.beyondTable(id: String, tablePoint: GeoPoint, user:
         edge.copy(fixedPoint = null)
     }
 }
+
+/**
+ * A named city timetable a user chooses beyond its own area (London Unified outside the M25, IACAD's Dubai tables in
+ * the other emirates): the city-point round of 11 Oct 2026, the owner's rule, a user who chooses a table follows it, so
+ * the time shown is never before that table, nor any end after it, wherever it is chosen. [beyondTable]'s edge (the
+ * user's own point a minute later, the end of eating with no fitted margin), with the table's point riding as the fixed
+ * point for every start and end ([FixedPointMode.BOTH]), where R45 bounded only the ends (St Albans, Sevenoaks and
+ * Basildon had a start before LUPT's on some days; Sharjah and Ajman before Dubai's). London rides it within R45's three
+ * reaches; IACAD at any distance.
+ */
+internal fun TimetableMethod.followedBeyond(id: String, tablePoint: GeoPoint, edge: EventOffsets = margins.widened(BEYOND_REACH_SECONDS)): TimetableMethod =
+    atEdge(id, edge).copy(fixedPoint = tablePoint, fixedPointMode = FixedPointMode.BOTH)
 
 /**
  * [this] beyond every unit of an authority whose every place is a unit, Umm al-Qura's and QMDB's (rulings R44 and

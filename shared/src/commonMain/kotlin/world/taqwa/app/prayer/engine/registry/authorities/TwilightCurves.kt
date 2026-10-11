@@ -665,11 +665,13 @@ internal object PlaceCurves {
      * each place's own latitude ([Rule.ownLatitude], QMDB's) is then read at both latitudes, each slot the later start
      * and the earlier end, so that the unit's point never makes the user's own start earlier, or end later, than it
      * is without the unit (the city-points round of 9 Oct 2026: a unit reaches about half a degree north and south of
-     * its point, and the AngleBased rule moves by up to a minute a tenth of a degree). Every other rule keeps the
-     * fixed point's curves alone.
+     * its point, and the AngleBased rule moves by up to a minute a tenth of a degree). [others] are the other tables'
+     * points riding beside it ([TimetableMethod.envelopePoints]): a [Rule.userLatitude] rule is read at their latitudes
+     * too, so that no table's point makes any start earlier, or end later, than its own curves give. Every other rule
+     * keeps the fixed point's curves alone.
      */
-    fun at(method: TimetableMethod, point: GeoPoint, also: GeoPoint = point): TimetableMethod {
-        val placed = curvesAt(method, point, also)
+    fun at(method: TimetableMethod, point: GeoPoint, also: GeoPoint = point, others: List<GeoPoint> = emptyList()): TimetableMethod {
+        val placed = curvesAt(method, point, also, others)
         val key = keyOf(method.id, ends)
         val end = ends[key]?.invoke(point.lat) ?: return placed
         val rule = ownRuleEnds[key] ?: return placed.copy(endOfEating = end)
@@ -720,14 +722,15 @@ internal object PlaceCurves {
     /** A point table's edge ("<entry>.edge") keeps its authority's rules. */
     private fun keyOf(id: String, map: Map<String, *>): String = if (id in map) id else id.removeSuffix(".edge")
 
-    private fun curvesAt(method: TimetableMethod, point: GeoPoint, also: GeoPoint): TimetableMethod {
+    private fun curvesAt(method: TimetableMethod, point: GeoPoint, also: GeoPoint, others: List<GeoPoint>): TimetableMethod {
         if (method.id == "other.moonsighting") {
             val (fajr, isha) = TwilightCurves.moonsighting(point.lat)
             return method.copy(fajrAngleByDayOfYear = fajr, ishaAngleByDayOfYear = isha)
         }
         val rule = rules[keyOf(method.id, rules)] ?: return method
         if (rule.ownLatitude) return ownLatitudeCurves(method, listOf(point.lat, also.lat).distinct(), rule)
-        if (rule.userLatitude && also.lat != point.lat) return userLatitudeCurves(method, listOf(point.lat, also.lat), rule)
+        val latitudes = (listOf(point.lat, also.lat) + others.map { it.lat }).distinct()
+        if (rule.userLatitude && latitudes.size > 1) return userLatitudeCurves(method, latitudes, rule)
         val fajr = when {
             rule.moonsightingFajr -> TwilightCurves.moonsighting(point.lat).first
             rule.fajr != null -> TwilightCurves.fajr(point.lat, method.fajrAngle, fraction = rule.fajr)

@@ -1,7 +1,7 @@
 {
   "entry": "au.cautious",
   "class": "C",
-  "engineHash": "d3c5775940c2083c",
+  "engineHash": "ac68b5655b7c43e1",
   "broken": 0,
   "places": 3,
   "first": "2026-06-16",
@@ -18,12 +18,12 @@
       "checked": 729,
       "early": 0,
       "late": {
-        "0": 30,
-        "1": 529,
-        "2": 170,
+        "0": 0,
+        "1": 222,
+        "2": 507,
         "3+": 0
       },
-      "exactShare": 0.0412,
+      "exactShare": 0,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "entry au.cautious",
@@ -33,12 +33,12 @@
       "checked": 729,
       "lateEnd": 0,
       "late": {
-        "0": 14,
-        "1": 76,
-        "2": 3,
+        "0": 0,
+        "1": 89,
+        "2": 4,
         "3+": 636
       },
-      "exactShare": 0.0192,
+      "exactShare": 0,
       "worstLate": 9,
       "lateLimit": 9,
       "lateLimitFrom": "entry au.cautious",
@@ -48,12 +48,12 @@
       "checked": 729,
       "early": 0,
       "late": {
-        "0": 122,
-        "1": 243,
-        "2": 260,
-        "3+": 104
+        "0": 84,
+        "1": 186,
+        "2": 304,
+        "3+": 155
       },
-      "exactShare": 0.1674,
+      "exactShare": 0.1152,
       "worstLate": 4,
       "lateLimit": 4,
       "lateLimitFrom": "entry au.cautious",
@@ -63,12 +63,12 @@
       "checked": 729,
       "early": 0,
       "late": {
-        "0": 75,
-        "1": 55,
-        "2": 56,
-        "3+": 543
+        "0": 72,
+        "1": 58,
+        "2": 48,
+        "3+": 551
       },
-      "exactShare": 0.1029,
+      "exactShare": 0.0988,
       "worstLate": 18,
       "lateLimit": 18,
       "lateLimitFrom": "entry au.cautious",
@@ -93,12 +93,12 @@
       "checked": 729,
       "early": 0,
       "late": {
-        "0": 343,
-        "1": 233,
-        "2": 14,
-        "3+": 139
+        "0": 338,
+        "1": 232,
+        "2": 16,
+        "3+": 143
       },
-      "exactShare": 0.4705,
+      "exactShare": 0.4636,
       "worstLate": 10,
       "lateLimit": 10,
       "lateLimitFrom": "entry au.cautious",
@@ -108,12 +108,12 @@
       "checked": 729,
       "lateEnd": 0,
       "late": {
-        "0": 159,
-        "1": 538,
-        "2": 32,
+        "0": 29,
+        "1": 652,
+        "2": 48,
         "3+": 0
       },
-      "exactShare": 0.2181,
+      "exactShare": 0.0398,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "entry au.cautious",
@@ -128,12 +128,12 @@
         "checked": 729,
         "early": 0,
         "late": {
-          "0": 30,
-          "1": 529,
-          "2": 170,
+          "0": 0,
+          "1": 222,
+          "2": 507,
           "3+": 0
         },
-        "exactShare": 0.0412,
+        "exactShare": 0,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "entry au.cautious",
@@ -143,12 +143,12 @@
         "checked": 729,
         "lateEnd": 0,
         "late": {
-          "0": 14,
-          "1": 76,
-          "2": 3,
+          "0": 0,
+          "1": 89,
+          "2": 4,
           "3+": 636
         },
-        "exactShare": 0.0192,
+        "exactShare": 0,
         "worstLate": 9,
         "lateLimit": 9,
         "lateLimitFrom": "entry au.cautious",
@@ -158,12 +158,12 @@
         "checked": 729,
         "early": 0,
         "late": {
-          "0": 122,
-          "1": 243,
-          "2": 260,
-          "3+": 104
+          "0": 84,
+          "1": 186,
+          "2": 304,
+          "3+": 155
         },
-        "exactShare": 0.1674,
+        "exactShare": 0.1152,
         "worstLate": 4,
         "lateLimit": 4,
         "lateLimitFrom": "entry au.cautious",
@@ -173,12 +173,12 @@
         "checked": 729,
         "early": 0,
         "late": {
-          "0": 75,
-          "1": 55,
-          "2": 56,
-          "3+": 543
+          "0": 72,
+          "1": 58,
+          "2": 48,
+          "3+": 551
         },
-        "exactShare": 0.1029,
+        "exactShare": 0.0988,
         "worstLate": 18,
         "lateLimit": 18,
         "lateLimitFrom": "entry au.cautious",
@@ -203,12 +203,12 @@
         "checked": 729,
         "early": 0,
         "late": {
-          "0": 343,
-          "1": 233,
-          "2": 14,
-          "3+": 139
+          "0": 338,
+          "1": 232,
+          "2": 16,
+          "3+": 143
         },
-        "exactShare": 0.4705,
+        "exactShare": 0.4636,
         "worstLate": 10,
         "lateLimit": 10,
         "lateLimitFrom": "entry au.cautious",
@@ -218,12 +218,12 @@
         "checked": 729,
         "lateEnd": 0,
         "late": {
-          "0": 159,
-          "1": 538,
-          "2": 32,
+          "0": 29,
+          "1": 652,
+          "2": 48,
           "3+": 0
         },
-        "exactShare": 0.2181,
+        "exactShare": 0.0398,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "entry au.cautious",

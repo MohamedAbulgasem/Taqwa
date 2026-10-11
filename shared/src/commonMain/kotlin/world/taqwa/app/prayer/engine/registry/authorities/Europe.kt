@@ -11,6 +11,7 @@ import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.ADHAN2_ASR_ALLOWANCE
 import world.taqwa.app.prayer.engine.registry.AuthorityUnit
+import world.taqwa.app.prayer.engine.registry.ENDS_REACH_FACTOR
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
 import world.taqwa.app.prayer.engine.registry.MethodVariant
@@ -25,6 +26,7 @@ import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.atEdge
 import world.taqwa.app.prayer.engine.registry.beyondTable
+import world.taqwa.app.prayer.engine.registry.followedBeyond
 import world.taqwa.app.prayer.engine.registry.cautious
 import world.taqwa.app.prayer.engine.registry.convention
 import world.taqwa.app.prayer.engine.registry.data.DeLateDawnCurve
@@ -124,7 +126,18 @@ object Europe {
             "gb.london.lupt",
             listOf(m25),
             choose = { place -> m25.takeIf { Regions.londonM25.contains(GeoPoint(place.lat, place.lon)) } },
-        ) { user -> londonMethod.beyondTable("gb.london.lupt.edge", point, user, lateReachKm(point.lat, london.entryClass)) }
+        ) { user ->
+            // Chosen outside the M25 (the city-point round of 11 Oct 2026): within R45's three reaches (about 100 km:
+            // Basildon, Sevenoaks, St Albans, Reading, Luton) the table's point rides for every start and end; farther,
+            // the user's own point with the edge's minute, as before, where London's table is no plausible one (the
+            // never-earlier comparison found its point's dawn holding the end of eating later in Scotland's summer).
+            val reach = lateReachKm(point.lat, london.entryClass)
+            if (distanceKm(user, point) <= reach * ENDS_REACH_FACTOR) {
+                londonMethod.followedBeyond("gb.london.lupt.edge", point)
+            } else {
+                londonMethod.beyondTable("gb.london.lupt.edge", point, user, reach)
+            }
+        }
     }
 
     /**

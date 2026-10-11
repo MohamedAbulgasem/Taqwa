@@ -64,12 +64,13 @@ class LondonUnifiedTest {
     }
 
     @Test
-    fun `outside the m25 the table's point still bounds the ends nearby`() {
+    fun `outside the m25 a user who chooses the table follows it nearby for every start and end`() {
+        // The city-point round of 11 Oct 2026: within R45's three reaches the table's point rides both ways.
         val luton = Registry.resolveEntry(Registry.byId("gb.london.lupt")!!, Place(51.87967, -0.41748, "Europe/London", "GB"))
         assertNull(luton.unitName)
         val method = luton.method!!
         assertEquals(point, method.fixedPoint)
-        assertEquals(FixedPointMode.ENDS_ONLY, method.fixedPointMode)
+        assertEquals(FixedPointMode.BOTH, method.fixedPointMode)
         assertTrue(method.endOfEatingMarginSeconds <= SAFE_END)
         // Far from London (Manchester) the user's own point alone.
         val manchester = Registry.resolveEntry(Registry.byId("gb.london.lupt")!!, Place(53.48095, -2.23743, "Europe/London", "GB"))

@@ -1,7 +1,7 @@
 {
   "entry": "ca.isna",
   "class": "D (authority)",
-  "engineHash": "e925e370d9604bd1",
+  "engineHash": "4621c20faea53413",
   "broken": 0,
   "places": 232,
   "first": "2026-01-01",
@@ -18,12 +18,12 @@
       "checked": 82531,
       "early": 0,
       "late": {
-        "0": 35,
-        "1": 586,
-        "2": 38251,
-        "3+": 43659
+        "0": 21,
+        "1": 113,
+        "2": 8143,
+        "3+": 74254
       },
-      "exactShare": 4.0E-4,
+      "exactShare": 3.0E-4,
       "worstLate": 7,
       "lateLimit": 7,
       "lateLimitFrom": "entry ca.isna, unit taiba, unit west-island",
@@ -33,12 +33,12 @@
       "checked": 82531,
       "lateEnd": 0,
       "late": {
-        "0": 16,
-        "1": 647,
-        "2": 1498,
-        "3+": 80370
+        "0": 0,
+        "1": 54,
+        "2": 1014,
+        "3+": 81463
       },
-      "exactShare": 2.0E-4,
+      "exactShare": 0,
       "worstLate": 5,
       "lateLimit": 5,
       "lateLimitFrom": "entry ca.isna",
@@ -48,12 +48,12 @@
       "checked": 82531,
       "early": 0,
       "late": {
-        "0": 18234,
-        "1": 57239,
-        "2": 7023,
-        "3+": 35
+        "0": 1643,
+        "1": 38027,
+        "2": 42364,
+        "3+": 497
       },
-      "exactShare": 0.2209,
+      "exactShare": 0.0199,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
@@ -63,14 +63,14 @@
       "checked": 77056,
       "early": 0,
       "late": {
-        "0": 3110,
-        "1": 22103,
-        "2": 31517,
-        "3+": 20326
+        "0": 555,
+        "1": 9625,
+        "2": 25769,
+        "3+": 41107
       },
-      "exactShare": 0.0404,
-      "worstLate": 5,
-      "lateLimit": 5,
+      "exactShare": 0.0072,
+      "worstLate": 6,
+      "lateLimit": 6,
       "lateLimitFrom": "entry ca.isna",
       "overLimit": 0
     },
@@ -80,12 +80,12 @@
       "late": {
         "0": 0,
         "1": 0,
-        "2": 1583,
-        "3+": 3892
+        "2": 1424,
+        "3+": 4051
       },
       "exactShare": 0,
       "worstLate": 5,
-      "lateLimit": 5,
+      "lateLimit": 6,
       "lateLimitFrom": "entry ca.isna",
       "overLimit": 0
     },
@@ -93,12 +93,12 @@
       "checked": 82531,
       "early": 0,
       "late": {
-        "0": 100,
-        "1": 632,
-        "2": 17628,
-        "3+": 64171
+        "0": 33,
+        "1": 378,
+        "2": 3444,
+        "3+": 78676
       },
-      "exactShare": 0.0012,
+      "exactShare": 4.0E-4,
       "worstLate": 5,
       "lateLimit": 5,
       "lateLimitFrom": "entry ca.isna",
@@ -108,12 +108,12 @@
       "checked": 82531,
       "early": 0,
       "late": {
-        "0": 413,
-        "1": 6776,
-        "2": 62492,
-        "3+": 12850
+        "0": 168,
+        "1": 1551,
+        "2": 29406,
+        "3+": 51406
       },
-      "exactShare": 0.005,
+      "exactShare": 0.002,
       "worstLate": 5,
       "lateLimit": 5,
       "lateLimitFrom": "entry ca.isna, unit abrar",
@@ -123,14 +123,14 @@
       "checked": 82531,
       "lateEnd": 0,
       "late": {
-        "0": 2931,
-        "1": 5325,
-        "2": 45159,
-        "3+": 29116
+        "0": 605,
+        "1": 3189,
+        "2": 20645,
+        "3+": 58092
       },
-      "exactShare": 0.0355,
-      "worstLate": 5,
-      "lateLimit": 5,
+      "exactShare": 0.0073,
+      "worstLate": 6,
+      "lateLimit": 6,
       "lateLimitFrom": "entry ca.isna",
       "overLimit": 0
     }
@@ -143,12 +143,12 @@
         "checked": 79250,
         "early": 0,
         "late": {
-          "0": 22,
-          "1": 430,
-          "2": 36635,
-          "3+": 42163
+          "0": 14,
+          "1": 85,
+          "2": 7810,
+          "3+": 71341
         },
-        "exactShare": 3.0E-4,
+        "exactShare": 2.0E-4,
         "worstLate": 7,
         "lateLimit": 7,
         "lateLimitFrom": "entry ca.isna, unit taiba, unit west-island",
@@ -158,12 +158,12 @@
         "checked": 79250,
         "lateEnd": 0,
         "late": {
-          "0": 12,
-          "1": 509,
-          "2": 1161,
-          "3+": 77568
+          "0": 0,
+          "1": 42,
+          "2": 775,
+          "3+": 78433
         },
-        "exactShare": 2.0E-4,
+        "exactShare": 0,
         "worstLate": 5,
         "lateLimit": 5,
         "lateLimitFrom": "entry ca.isna",
@@ -173,12 +173,12 @@
         "checked": 79250,
         "early": 0,
         "late": {
-          "0": 17132,
-          "1": 55298,
-          "2": 6785,
-          "3+": 35
+          "0": 1568,
+          "1": 36516,
+          "2": 40690,
+          "3+": 476
         },
-        "exactShare": 0.2162,
+        "exactShare": 0.0198,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
@@ -188,14 +188,14 @@
         "checked": 74140,
         "early": 0,
         "late": {
-          "0": 2915,
-          "1": 21091,
-          "2": 30296,
-          "3+": 19838
+          "0": 555,
+          "1": 9228,
+          "2": 24679,
+          "3+": 39678
         },
-        "exactShare": 0.0393,
-        "worstLate": 5,
-        "lateLimit": 5,
+        "exactShare": 0.0075,
+        "worstLate": 6,
+        "lateLimit": 6,
         "lateLimitFrom": "entry ca.isna",
         "overLimit": 0
       },
@@ -205,12 +205,12 @@
         "late": {
           "0": 0,
           "1": 0,
-          "2": 1443,
-          "3+": 3667
+          "2": 1305,
+          "3+": 3805
         },
         "exactShare": 0,
         "worstLate": 5,
-        "lateLimit": 5,
+        "lateLimit": 6,
         "lateLimitFrom": "entry ca.isna",
         "overLimit": 0
       },
@@ -218,12 +218,12 @@
         "checked": 79250,
         "early": 0,
         "late": {
-          "0": 61,
-          "1": 470,
-          "2": 16579,
-          "3+": 62140
+          "0": 22,
+          "1": 280,
+          "2": 3132,
+          "3+": 75816
         },
-        "exactShare": 8.0E-4,
+        "exactShare": 3.0E-4,
         "worstLate": 5,
         "lateLimit": 5,
         "lateLimitFrom": "entry ca.isna",
@@ -233,12 +233,12 @@
         "checked": 79250,
         "early": 0,
         "late": {
-          "0": 295,
-          "1": 6226,
-          "2": 60123,
-          "3+": 12606
+          "0": 135,
+          "1": 1330,
+          "2": 28286,
+          "3+": 49499
         },
-        "exactShare": 0.0037,
+        "exactShare": 0.0017,
         "worstLate": 5,
         "lateLimit": 5,
         "lateLimitFrom": "entry ca.isna, unit abrar",
@@ -248,14 +248,14 @@
         "checked": 79250,
         "lateEnd": 0,
         "late": {
-          "0": 2650,
-          "1": 4877,
-          "2": 43403,
-          "3+": 28320
+          "0": 550,
+          "1": 2889,
+          "2": 19480,
+          "3+": 56331
         },
-        "exactShare": 0.0334,
-        "worstLate": 5,
-        "lateLimit": 5,
+        "exactShare": 0.0069,
+        "worstLate": 6,
+        "lateLimit": 6,
         "lateLimitFrom": "entry ca.isna",
         "overLimit": 0
       }
@@ -269,13 +269,17 @@
       "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
       "events": ["isha"]
     },
-    "entry ca.isna: 5 min (asrHanafi)": {
-      "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+    "entry ca.isna: 5 min": {
+      "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+      "events": ["fajr", "sunrise", "maghrib"]
+    },
+    "entry ca.isna: 6 min (asrHanafi)": {
+      "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
       "events": ["asrStandard", "asrHanafi"]
     },
-    "entry ca.isna: 5 min (endOfEating)": {
-      "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-      "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+    "entry ca.isna: 6 min (endOfEating)": {
+      "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+      "events": ["endOfEating"]
     },
     "unit abrar: 5 min": {
       "reason": "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Isha up to 5 min after its table there.",
@@ -300,13 +304,17 @@
         "class D (authority): 3 min": {
           "events": ["dhuhr"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         },
         "unit abrar: 5 min": {
           "reason": "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Isha up to 5 min after its table there.",
@@ -318,13 +326,13 @@
           "checked": 1092,
           "early": 0,
           "late": {
-            "0": 35,
-            "1": 303,
-            "2": 539,
-            "3+": 215
+            "0": 21,
+            "1": 63,
+            "2": 678,
+            "3+": 330
           },
-          "exactShare": 0.0321,
-          "worstLate": 4,
+          "exactShare": 0.0192,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -334,9 +342,9 @@
           "lateEnd": 0,
           "late": {
             "0": 0,
-            "1": 132,
-            "2": 552,
-            "3+": 408
+            "1": 18,
+            "2": 420,
+            "3+": 654
           },
           "exactShare": 0,
           "worstLate": 5,
@@ -348,13 +356,13 @@
           "checked": 1092,
           "early": 0,
           "late": {
-            "0": 624,
-            "1": 468,
-            "2": 0,
+            "0": 201,
+            "1": 879,
+            "2": 12,
             "3+": 0
           },
-          "exactShare": 0.5714,
-          "worstLate": 1,
+          "exactShare": 0.1841,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -363,14 +371,14 @@
           "checked": 1092,
           "early": 0,
           "late": {
-            "0": 156,
-            "1": 542,
-            "2": 386,
-            "3+": 8
+            "0": 0,
+            "1": 471,
+            "2": 555,
+            "3+": 66
           },
-          "exactShare": 0.1429,
+          "exactShare": 0,
           "worstLate": 3,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -378,13 +386,13 @@
           "checked": 1092,
           "early": 0,
           "late": {
-            "0": 73,
-            "1": 283,
-            "2": 464,
-            "3+": 272
+            "0": 33,
+            "1": 210,
+            "2": 426,
+            "3+": 423
           },
-          "exactShare": 0.0668,
-          "worstLate": 4,
+          "exactShare": 0.0302,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -393,12 +401,12 @@
           "checked": 1092,
           "early": 0,
           "late": {
-            "0": 131,
-            "1": 433,
-            "2": 226,
-            "3+": 302
+            "0": 30,
+            "1": 397,
+            "2": 305,
+            "3+": 360
           },
-          "exactShare": 0.12,
+          "exactShare": 0.0275,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "unit abrar",
@@ -409,13 +417,13 @@
           "lateEnd": 0,
           "late": {
             "0": 0,
-            "1": 99,
-            "2": 194,
-            "3+": 799
+            "1": 36,
+            "2": 153,
+            "3+": 903
           },
           "exactShare": 0,
-          "worstLate": 5,
-          "lateLimit": 5,
+          "worstLate": 6,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -434,13 +442,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -450,8 +462,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2220,
-            "3+": 1795
+            "2": 14,
+            "3+": 4001
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -478,13 +490,13 @@
           "checked": 4015,
           "early": 0,
           "late": {
-            "0": 1221,
-            "1": 2794,
-            "2": 0,
+            "0": 0,
+            "1": 1661,
+            "2": 2354,
             "3+": 0
           },
-          "exactShare": 0.3041,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -493,14 +505,14 @@
           "checked": 4015,
           "early": 0,
           "late": {
-            "0": 180,
-            "1": 1501,
-            "2": 1602,
-            "3+": 732
+            "0": 0,
+            "1": 396,
+            "2": 1485,
+            "3+": 2134
           },
-          "exactShare": 0.0448,
+          "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -510,8 +522,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1083,
-            "3+": 2932
+            "2": 0,
+            "3+": 4015
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -524,12 +536,12 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 457,
-            "2": 3470,
-            "3+": 88
+            "1": 0,
+            "2": 880,
+            "3+": 3135
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -540,12 +552,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2362,
-            "3+": 1653
+            "2": 1740,
+            "3+": 2275
           },
           "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -564,13 +576,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -580,8 +596,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 3346,
-            "3+": 3224
+            "2": 0,
+            "3+": 6570
           },
           "exactShare": 0,
           "worstLate": 5,
@@ -608,13 +624,13 @@
           "checked": 6570,
           "early": 0,
           "late": {
-            "0": 2031,
-            "1": 4539,
-            "2": 0,
+            "0": 0,
+            "1": 1584,
+            "2": 4986,
             "3+": 0
           },
-          "exactShare": 0.3091,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -624,13 +640,13 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 1975,
-            "2": 4208,
-            "3+": 387
+            "1": 0,
+            "2": 1818,
+            "3+": 4752
           },
           "exactShare": 0,
-          "worstLate": 3,
-          "lateLimit": 5,
+          "worstLate": 4,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -640,8 +656,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1812,
-            "3+": 4758
+            "2": 0,
+            "3+": 6570
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -654,12 +670,12 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 705,
-            "2": 5692,
-            "3+": 173
+            "1": 0,
+            "2": 324,
+            "3+": 6246
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -670,12 +686,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 4249,
-            "3+": 2321
+            "2": 2049,
+            "3+": 4521
           },
           "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -694,13 +710,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -710,8 +730,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1049,
-            "3+": 776
+            "2": 20,
+            "3+": 1805
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -729,7 +749,7 @@
             "3+": 1825
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -738,13 +758,13 @@
           "checked": 1825,
           "early": 0,
           "late": {
-            "0": 461,
-            "1": 1364,
-            "2": 0,
+            "0": 0,
+            "1": 1210,
+            "2": 615,
             "3+": 0
           },
-          "exactShare": 0.2526,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -754,13 +774,13 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 644,
-            "2": 990,
-            "3+": 191
+            "1": 90,
+            "2": 1030,
+            "3+": 705
           },
           "exactShare": 0,
-          "worstLate": 3,
-          "lateLimit": 5,
+          "worstLate": 4,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -770,8 +790,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 501,
-            "3+": 1324
+            "2": 0,
+            "3+": 1825
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -784,9 +804,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 222,
-            "2": 1543,
-            "3+": 60
+            "1": 0,
+            "2": 970,
+            "3+": 855
           },
           "exactShare": 0,
           "worstLate": 3,
@@ -800,12 +820,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1379,
-            "3+": 446
+            "2": 40,
+            "3+": 1785
           },
           "exactShare": 0,
-          "worstLate": 3,
-          "lateLimit": 5,
+          "worstLate": 4,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -824,13 +844,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -840,8 +864,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1075,
-            "3+": 1115
+            "2": 0,
+            "3+": 2190
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -868,13 +892,13 @@
           "checked": 2190,
           "early": 0,
           "late": {
-            "0": 549,
-            "1": 1641,
-            "2": 0,
+            "0": 0,
+            "1": 636,
+            "2": 1554,
             "3+": 0
           },
-          "exactShare": 0.2507,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -884,13 +908,13 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 510,
-            "2": 1676,
-            "3+": 4
+            "1": 0,
+            "2": 624,
+            "3+": 1566
           },
           "exactShare": 0,
           "worstLate": 3,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -900,8 +924,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 518,
-            "3+": 1672
+            "2": 0,
+            "3+": 2190
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -914,12 +938,12 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 197,
-            "2": 1926,
-            "3+": 67
+            "1": 0,
+            "2": 198,
+            "3+": 1992
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -930,12 +954,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1692,
-            "3+": 498
+            "2": 702,
+            "3+": 1488
           },
           "exactShare": 0,
-          "worstLate": 3,
-          "lateLimit": 5,
+          "worstLate": 4,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -954,13 +978,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -969,12 +997,12 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 235,
-            "2": 1241,
-            "3+": 696
+            "1": 42,
+            "2": 618,
+            "3+": 1512
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -983,12 +1011,12 @@
           "checked": 2172,
           "lateEnd": 0,
           "late": {
-            "0": 16,
-            "1": 515,
-            "2": 946,
-            "3+": 695
+            "0": 0,
+            "1": 36,
+            "2": 594,
+            "3+": 1542
           },
-          "exactShare": 0.0074,
+          "exactShare": 0,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
@@ -998,12 +1026,12 @@
           "checked": 2172,
           "early": 0,
           "late": {
-            "0": 702,
-            "1": 1469,
-            "2": 1,
+            "0": 48,
+            "1": 1794,
+            "2": 330,
             "3+": 0
           },
-          "exactShare": 0.3232,
+          "exactShare": 0.0221,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1013,14 +1041,14 @@
           "checked": 2172,
           "early": 0,
           "late": {
-            "0": 51,
-            "1": 794,
-            "2": 1272,
-            "3+": 55
+            "0": 0,
+            "1": 414,
+            "2": 1218,
+            "3+": 540
           },
-          "exactShare": 0.0235,
+          "exactShare": 0,
           "worstLate": 3,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1028,12 +1056,12 @@
           "checked": 2172,
           "early": 0,
           "late": {
-            "0": 27,
-            "1": 349,
-            "2": 532,
-            "3+": 1264
+            "0": 0,
+            "1": 168,
+            "2": 492,
+            "3+": 1512
           },
-          "exactShare": 0.0124,
+          "exactShare": 0,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
@@ -1043,12 +1071,12 @@
           "checked": 2172,
           "early": 0,
           "late": {
-            "0": 282,
-            "1": 502,
-            "2": 674,
-            "3+": 714
+            "0": 138,
+            "1": 444,
+            "2": 624,
+            "3+": 966
           },
-          "exactShare": 0.1298,
+          "exactShare": 0.0635,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "entry ca.isna",
@@ -1058,14 +1086,14 @@
           "checked": 2172,
           "lateEnd": 0,
           "late": {
-            "0": 5,
-            "1": 268,
-            "2": 849,
-            "3+": 1050
+            "0": 0,
+            "1": 18,
+            "2": 282,
+            "3+": 1872
           },
-          "exactShare": 0.0023,
-          "worstLate": 4,
-          "lateLimit": 5,
+          "exactShare": 0,
+          "worstLate": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1084,13 +1112,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1100,11 +1132,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1398,
-            "3+": 792
+            "2": 0,
+            "3+": 2190
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1128,13 +1160,13 @@
           "checked": 2190,
           "early": 0,
           "late": {
-            "0": 644,
-            "1": 1546,
-            "2": 0,
+            "0": 0,
+            "1": 582,
+            "2": 1608,
             "3+": 0
           },
-          "exactShare": 0.2941,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -1143,14 +1175,14 @@
           "checked": 2190,
           "early": 0,
           "late": {
-            "0": 22,
-            "1": 818,
-            "2": 1168,
-            "3+": 182
+            "0": 0,
+            "1": 0,
+            "2": 810,
+            "3+": 1380
           },
-          "exactShare": 0.01,
-          "worstLate": 3,
-          "lateLimit": 5,
+          "exactShare": 0,
+          "worstLate": 4,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1160,11 +1192,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 611,
-            "3+": 1579
+            "2": 0,
+            "3+": 2190
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1174,12 +1206,12 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 166,
-            "2": 1893,
-            "3+": 131
+            "1": 0,
+            "2": 150,
+            "3+": 2040
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1190,12 +1222,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1613,
-            "3+": 577
+            "2": 738,
+            "3+": 1452
           },
           "exactShare": 0,
-          "worstLate": 3,
-          "lateLimit": 5,
+          "worstLate": 4,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1214,13 +1246,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1230,11 +1266,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 4073,
-            "3+": 3592
+            "2": 0,
+            "3+": 7665
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1258,12 +1294,12 @@
           "checked": 7665,
           "early": 0,
           "late": {
-            "0": 1586,
-            "1": 5778,
-            "2": 301,
+            "0": 0,
+            "1": 2688,
+            "2": 4977,
             "3+": 0
           },
-          "exactShare": 0.2069,
+          "exactShare": 0,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1273,14 +1309,14 @@
           "checked": 7665,
           "early": 0,
           "late": {
-            "0": 293,
-            "1": 2537,
-            "2": 3010,
-            "3+": 1825
+            "0": 0,
+            "1": 168,
+            "2": 3311,
+            "3+": 4186
           },
-          "exactShare": 0.0382,
+          "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1290,11 +1326,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1448,
-            "3+": 6217
+            "2": 0,
+            "3+": 7665
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1304,9 +1340,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 472,
-            "2": 5429,
-            "3+": 1764
+            "1": 5,
+            "2": 2300,
+            "3+": 5360
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -1320,12 +1356,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 4295,
-            "3+": 3370
+            "2": 2763,
+            "3+": 4902
           },
           "exactShare": 0,
           "worstLate": 5,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1344,13 +1380,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1379,7 +1419,7 @@
             "3+": 7665
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1410,7 +1450,7 @@
           },
           "exactShare": 0.0351,
           "worstLate": 5,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1434,9 +1474,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 259,
-            "2": 5033,
-            "3+": 2373
+            "1": 224,
+            "2": 5005,
+            "3+": 2436
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -1450,12 +1490,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 5731,
-            "3+": 1934
+            "2": 0,
+            "3+": 7665
           },
           "exactShare": 0,
-          "worstLate": 4,
-          "lateLimit": 5,
+          "worstLate": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1474,13 +1514,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1490,11 +1534,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 5096,
-            "3+": 2934
+            "2": 0,
+            "3+": 8030
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1518,13 +1562,13 @@
           "checked": 8030,
           "early": 0,
           "late": {
-            "0": 2751,
-            "1": 5279,
-            "2": 0,
-            "3+": 0
+            "0": 0,
+            "1": 0,
+            "2": 7568,
+            "3+": 462
           },
-          "exactShare": 0.3426,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -1534,13 +1578,13 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 877,
-            "2": 2720,
-            "3+": 4433
+            "1": 0,
+            "2": 88,
+            "3+": 7942
           },
           "exactShare": 0,
-          "worstLate": 5,
-          "lateLimit": 5,
+          "worstLate": 6,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1550,11 +1594,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2471,
-            "3+": 5559
+            "2": 0,
+            "3+": 8030
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1564,12 +1608,12 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 761,
-            "2": 6957,
-            "3+": 312
+            "1": 0,
+            "2": 88,
+            "3+": 7942
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1580,12 +1624,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 3438,
-            "3+": 4592
+            "2": 3281,
+            "3+": 4749
           },
           "exactShare": 0,
           "worstLate": 5,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1604,13 +1648,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1620,11 +1668,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2255,
-            "3+": 1760
+            "2": 0,
+            "3+": 4015
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1648,12 +1696,12 @@
           "checked": 4015,
           "early": 0,
           "late": {
-            "0": 875,
-            "1": 3139,
-            "2": 1,
+            "0": 0,
+            "1": 1518,
+            "2": 2497,
             "3+": 0
           },
-          "exactShare": 0.2179,
+          "exactShare": 0,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1664,13 +1712,13 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 317,
-            "2": 1354,
-            "3+": 2344
+            "1": 0,
+            "2": 374,
+            "3+": 3641
           },
           "exactShare": 0,
-          "worstLate": 5,
-          "lateLimit": 5,
+          "worstLate": 6,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1680,8 +1728,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 890,
-            "3+": 3125
+            "2": 0,
+            "3+": 4015
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -1694,9 +1742,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 285,
-            "2": 3410,
-            "3+": 320
+            "1": 0,
+            "2": 1297,
+            "3+": 2718
           },
           "exactShare": 0,
           "worstLate": 3,
@@ -1710,12 +1758,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 3009,
-            "3+": 1006
+            "2": 1529,
+            "3+": 2486
           },
           "exactShare": 0,
           "worstLate": 3,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1734,13 +1782,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1749,9 +1801,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 48,
-            "2": 1793,
-            "3+": 1141
+            "1": 8,
+            "2": 1344,
+            "3+": 1630
           },
           "exactShare": 0,
           "worstLate": 5,
@@ -1778,12 +1830,12 @@
           "checked": 2982,
           "early": 0,
           "late": {
-            "0": 696,
-            "1": 2195,
-            "2": 91,
+            "0": 26,
+            "1": 2684,
+            "2": 272,
             "3+": 0
           },
-          "exactShare": 0.2334,
+          "exactShare": 0.0087,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -1793,14 +1845,14 @@
           "checked": 2982,
           "early": 0,
           "late": {
-            "0": 40,
-            "1": 1708,
-            "2": 1190,
-            "3+": 44
+            "0": 0,
+            "1": 1079,
+            "2": 1767,
+            "3+": 136
           },
-          "exactShare": 0.0134,
+          "exactShare": 0,
           "worstLate": 3,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1810,8 +1862,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 259,
-            "3+": 2723
+            "2": 55,
+            "3+": 2927
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -1824,9 +1876,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 113,
-            "2": 2361,
-            "3+": 508
+            "1": 0,
+            "2": 1270,
+            "3+": 1712
           },
           "exactShare": 0,
           "worstLate": 3,
@@ -1840,12 +1892,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1276,
-            "3+": 1706
+            "2": 193,
+            "3+": 2789
           },
           "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1864,13 +1916,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -1899,7 +1955,7 @@
             "3+": 6205
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -1930,7 +1986,7 @@
           },
           "exactShare": 0.0461,
           "worstLate": 5,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -1970,12 +2026,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 4467,
-            "3+": 1738
+            "2": 0,
+            "3+": 6205
           },
           "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -1994,13 +2050,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -2010,8 +2070,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2506,
-            "3+": 2604
+            "2": 818,
+            "3+": 4292
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2029,7 +2089,7 @@
             "3+": 5110
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -2038,12 +2098,12 @@
           "checked": 5110,
           "early": 0,
           "late": {
-            "0": 766,
-            "1": 3940,
-            "2": 404,
+            "0": 26,
+            "1": 4664,
+            "2": 420,
             "3+": 0
           },
-          "exactShare": 0.1499,
+          "exactShare": 0.0051,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -2054,13 +2114,13 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 1182,
-            "2": 3166,
-            "3+": 762
+            "1": 615,
+            "2": 3283,
+            "3+": 1212
           },
           "exactShare": 0,
           "worstLate": 3,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -2070,8 +2130,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 653,
-            "3+": 4457
+            "2": 73,
+            "3+": 5037
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2084,9 +2144,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 138,
-            "2": 3096,
-            "3+": 1876
+            "1": 31,
+            "2": 2858,
+            "3+": 2221
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2100,12 +2160,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 3417,
-            "3+": 1693
+            "2": 0,
+            "3+": 5110
           },
           "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -2124,13 +2184,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -2140,8 +2204,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2320,
-            "3+": 2060
+            "2": 0,
+            "3+": 4380
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2168,12 +2232,12 @@
           "checked": 4380,
           "early": 0,
           "late": {
-            "0": 901,
-            "1": 3351,
-            "2": 128,
+            "0": 0,
+            "1": 2484,
+            "2": 1896,
             "3+": 0
           },
-          "exactShare": 0.2057,
+          "exactShare": 0,
           "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -2183,14 +2247,14 @@
           "checked": 4380,
           "early": 0,
           "late": {
-            "0": 290,
-            "1": 1417,
-            "2": 1425,
-            "3+": 1248
+            "0": 0,
+            "1": 719,
+            "2": 1533,
+            "3+": 2128
           },
-          "exactShare": 0.0662,
+          "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -2200,8 +2264,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 674,
-            "3+": 3706
+            "2": 0,
+            "3+": 4380
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2214,9 +2278,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 214,
-            "2": 3036,
-            "3+": 1130
+            "1": 0,
+            "2": 1729,
+            "3+": 2651
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2230,12 +2294,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2726,
-            "3+": 1654
+            "2": 2094,
+            "3+": 2286
           },
           "exactShare": 0,
           "worstLate": 5,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -2254,13 +2318,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["fajr", "sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["fajr", "sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         }
       },
       "events": {
@@ -2270,11 +2338,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 4689,
-            "3+": 2246
+            "2": 0,
+            "3+": 6935
           },
           "exactShare": 0,
-          "worstLate": 3,
+          "worstLate": 4,
           "lateLimit": 5,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
@@ -2298,13 +2366,13 @@
           "checked": 6935,
           "early": 0,
           "late": {
-            "0": 2022,
-            "1": 4913,
-            "2": 0,
+            "0": 0,
+            "1": 2090,
+            "2": 4845,
             "3+": 0
           },
-          "exactShare": 0.2916,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -2313,14 +2381,14 @@
           "checked": 6935,
           "early": 0,
           "late": {
-            "0": 1503,
-            "1": 1721,
-            "2": 1375,
-            "3+": 2336
+            "0": 0,
+            "1": 1425,
+            "2": 1843,
+            "3+": 3667
           },
-          "exactShare": 0.2167,
-          "worstLate": 4,
-          "lateLimit": 5,
+          "exactShare": 0,
+          "worstLate": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -2330,8 +2398,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 2103,
-            "3+": 4832
+            "2": 0,
+            "3+": 6935
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2344,9 +2412,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 620,
-            "2": 5728,
-            "3+": 587
+            "1": 0,
+            "2": 1589,
+            "3+": 5346
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2365,7 +2433,7 @@
           },
           "exactShare": 0,
           "worstLate": 5,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -2384,13 +2452,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrStandard)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrStandard)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrStandard"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         },
         "unit taiba: 7 min": {
           "reason": "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Fajr up to 7 min after its table there.",
@@ -2432,13 +2504,13 @@
           "checked": 4015,
           "early": 0,
           "late": {
-            "0": 1063,
-            "1": 2952,
-            "2": 0,
+            "0": 0,
+            "1": 2035,
+            "2": 1980,
             "3+": 0
           },
-          "exactShare": 0.2648,
-          "worstLate": 1,
+          "exactShare": 0,
+          "worstLate": 2,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
@@ -2447,14 +2519,14 @@
           "checked": 4015,
           "early": 0,
           "late": {
-            "0": 20,
-            "1": 1510,
-            "2": 1771,
-            "3+": 714
+            "0": 0,
+            "1": 198,
+            "2": 1826,
+            "3+": 1991
           },
-          "exactShare": 0.005,
+          "exactShare": 0,
           "worstLate": 4,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -2464,8 +2536,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 881,
-            "3+": 3134
+            "2": 0,
+            "3+": 4015
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2478,9 +2550,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 427,
-            "2": 3400,
-            "3+": 188
+            "1": 0,
+            "2": 1166,
+            "3+": 2849
           },
           "exactShare": 0,
           "worstLate": 3,
@@ -2492,14 +2564,14 @@
           "checked": 4015,
           "lateEnd": 0,
           "late": {
-            "0": 2926,
-            "1": 1089,
-            "2": 0,
+            "0": 605,
+            "1": 3135,
+            "2": 275,
             "3+": 0
           },
-          "exactShare": 0.7288,
-          "worstLate": 1,
-          "lateLimit": 5,
+          "exactShare": 0.1507,
+          "worstLate": 2,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }
@@ -2518,13 +2590,17 @@
           "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Isha up to 4 min after the others'.",
           "events": ["isha"]
         },
-        "entry ca.isna: 5 min (asrHanafi)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5.",
+        "entry ca.isna: 5 min": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise up to 5 min from the others'.",
+          "events": ["sunrise", "maghrib"]
+        },
+        "entry ca.isna: 6 min (asrHanafi)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr up to 4 min after the others' at their mosques, and within a minute's reach of a mosque, where its point rides beside the user's (rulings R30 and R44), up to 5, and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
           "events": ["asrHanafi"]
         },
-        "entry ca.isna: 5 min (endOfEating)": {
-          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.",
-          "events": ["sunrise", "maghrib", "endOfEating"]
+        "entry ca.isna: 6 min (endOfEating)": {
+          "reason": "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: The end of eating up to 5 min from the others', and beside every other mosque's table within class D's reach of the user (the city-point round of 11 Oct 2026), up to 6.",
+          "events": ["endOfEating"]
         },
         "unit west-island: 6 min": {
           "reason": "Within a minute's reach of this mosque its point rides beside the user's (rulings R30 and R44): east of it the time shown is the mosque's, north or south of it the night's length moves the dawn and the dusk. Fajr up to 6 min after its table there.",
@@ -2567,8 +2643,8 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 1302,
-            "2": 4138,
+            "1": 949,
+            "2": 4491,
             "3+": 35
           },
           "exactShare": 0,
@@ -2583,12 +2659,12 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1583,
-            "3+": 3892
+            "2": 1424,
+            "3+": 4051
           },
           "exactShare": 0,
           "worstLate": 5,
-          "lateLimit": 5,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         },
@@ -2598,8 +2674,8 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 1262,
-            "3+": 4213
+            "2": 932,
+            "3+": 4543
           },
           "exactShare": 0,
           "worstLate": 4,
@@ -2612,9 +2688,9 @@
           "early": 0,
           "late": {
             "0": 0,
-            "1": 526,
-            "2": 4584,
-            "3+": 365
+            "1": 171,
+            "2": 4619,
+            "3+": 685
           },
           "exactShare": 0,
           "worstLate": 3,
@@ -2627,13 +2703,13 @@
           "lateEnd": 0,
           "late": {
             "0": 0,
-            "1": 3869,
-            "2": 1606,
-            "3+": 0
+            "1": 0,
+            "2": 1950,
+            "3+": 3525
           },
           "exactShare": 0,
-          "worstLate": 2,
-          "lateLimit": 5,
+          "worstLate": 4,
+          "lateLimit": 6,
           "lateLimitFrom": "entry ca.isna",
           "overLimit": 0
         }

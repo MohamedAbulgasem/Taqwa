@@ -167,7 +167,12 @@ sealed interface HighLatRule {
  * the point given and, when set, at [fixedPoint] beside it (MUIS): starts take the later of the
  * two, sunrise, sunset and the end of eating the earlier (spec §3.5); with [fixedPointMode]
  * [FixedPointMode.ENDS_ONLY] the fixed point bounds the ends alone. Starts are also computed at
- * each of [startPoints] and the latest is taken. [endsBoundAtUserPoint]: where the fixed point rides
+ * each of [startPoints] and the latest is taken; sunrise, sunset, the end of eating and imsak at each
+ * of [endPoints] and the earliest is taken. [envelopePoints] are both: other tables' own points, each
+ * printed for its point, whose reach holds the user beside the fixed point's (the city-point round of
+ * 11 Oct 2026, the owner's rule "rather late, never early"): every start the latest and every end the
+ * earliest over them too, and each end never after this method at that point alone (DayComputer's
+ * point 7). [endsBoundAtUserPoint]: where the fixed point rides
  * for the starts too, the ends shown are also never after those this method shows at the user's
  * point alone (DayComputer's point 7); set only on a table printed for its own point riding beside a
  * method that is computed at the user's own point (`tablesAtTheirPoints`, the city-point audit of
@@ -224,6 +229,8 @@ data class TimetableMethod(
     val fajrAfterDawnMinutes: Int = 0,
     val highLatitude: HighLatRule = HighLatRule.Standard,
     val startPoints: List<GeoPoint> = emptyList(),
+    val endPoints: List<GeoPoint> = emptyList(),
+    val envelopePoints: List<GeoPoint> = emptyList(),
     val fixedPoint: GeoPoint? = null,
     val fixedPointMode: FixedPointMode = FixedPointMode.BOTH,
     val endsBoundAtUserPoint: Boolean = false,

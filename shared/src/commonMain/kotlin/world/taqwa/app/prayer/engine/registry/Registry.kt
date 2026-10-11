@@ -164,7 +164,9 @@ object Registry {
         } else {
             own
         }
-        return finish(entryId, placed, user)
+        // The other tables whose reach holds the user, or the authority's town figures (UnitSet.around).
+        val around = Units.of(entryId)?.around?.invoke(user, unit, placed) ?: placed
+        return finish(entryId, around, user)
     }
 
     /** Entry [entryId]'s method [base] at [user] as if it had no units: the user's own point alone, then [finish]. */
@@ -182,7 +184,7 @@ object Registry {
             if (variant.entryId == entryId && variant.area.contains(user)) m = variant.change(m)
         }
         val curvesAt = if (m.fixedPointMode == FixedPointMode.ENDS_ONLY) user else m.fixedPoint ?: user
-        return PlaceCurves.at(m, curvesAt, also = user)
+        return PlaceCurves.at(m, curvesAt, also = user, others = m.envelopePoints)
     }
 
     /**
