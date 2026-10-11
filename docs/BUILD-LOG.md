@@ -3295,7 +3295,11 @@ scratchpad.
 - **The reader's "Aa" sheet** works in both modes. In Translation mode the slider is enabled. In Mushaf mode
   it is disabled, with its note.
 
-**What looked wrong**, for the fix wave (steps and screenshots in the task 14 report):
+**What looked wrong** (steps and screenshots in the task 14 report). The fix wave after the final review fixed
+the first three and the Arabic digits, with the review's own findings (Urdu's "PM" inside sentences, the Turkish
+make-up captions), and checked them on emulator-5560: pixel-identical at 100 % text, whole at 200 %. On iOS they
+are covered by the simulator tests only; the iOS device pass is still not done. The evening question and the
+preview's cut are still open:
 - **At 200 % text a count of 100 shows as "10".** The ring's text has `maxLines = 1`, and the 12 sp floor at
   2× cannot fit three digits, so the last one wraps out of sight. It is fine at 150 %.
 - **At 200 % text the Morning | Evening labels are cut at the bottom.** `TaqwaSegmented` has a fixed 44 dp
