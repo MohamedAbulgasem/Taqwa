@@ -714,6 +714,14 @@ Hisn al-Muslim 97, read evening only, said 3 times.
 - **Draft:** Yarattığı şeylerin şerrinden Allah’ın eksiksiz kelimelerine sığınırım.
 - **Review:** [ ] correct as drafted · correction:
 
+### tr · the Adhkar screen’s make-up captions (wording changed, reviewer to confirm)
+
+Two interface strings in `shared/src/commonMain/composeResources/values-tr/strings.xml`, not du‘a: the line under the set’s name while its make-up time runs, ending at Dhuhr for the morning and at Isha for the evening. They are not behind the release switch above; they ship with the interface. The first wording put a fixed dative “’e” after the time (“%1$s’e kadar”), but Turkish dative harmony follows the last number as it is spoken (“12:40’a”, “19:56’ya”), so the fixed suffix was wrong for most minutes, and for a 12-hour time such as “ÖS 7:30”. The new wording has no suffix to agree: “en geç” (“at the latest”), keeping both halves of the English.
+
+- **`adhkar_after_sunrise`.** English: After sunrise · until 12:53. Was: Güneş doğduktan sonra · 12:53’e kadar. Now: **Güneş doğduktan sonra · en geç 12:53**
+- **`adhkar_after_maghrib`.** English: After Maghrib · until 19:40. Was: Akşamdan sonra · 19:40’e kadar (where “kırk” takes ’a). Now: **Akşamdan sonra · en geç 19:40**
+- **Review:** [ ] correct as changed · correction:
+
 ---
 
 ## Urdu (ur)

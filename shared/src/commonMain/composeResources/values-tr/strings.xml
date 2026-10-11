@@ -644,9 +644,9 @@
     <string name="adhkar_times_today">BUGÜN %1$s KEZ</string>
     <string name="adhkar_of">/ %1$s</string>
     <string name="adhkar_until_sunrise">Güneş doğana kadar · %1$s</string>
-    <string name="adhkar_after_sunrise">Güneş doğduktan sonra · %1$s’e kadar</string>
+    <string name="adhkar_after_sunrise">Güneş doğduktan sonra · en geç %1$s</string>
     <string name="adhkar_until_maghrib">Akşama kadar · %1$s</string>
-    <string name="adhkar_after_maghrib">Akşamdan sonra · %1$s’e kadar</string>
+    <string name="adhkar_after_maghrib">Akşamdan sonra · en geç %1$s</string>
     <string name="adhkar_window_morning">Sabahtan güneş doğana kadar</string>
     <string name="adhkar_window_evening">İkindiden akşama kadar</string>
     <string name="adhkar_a11y_count">Say</string>
