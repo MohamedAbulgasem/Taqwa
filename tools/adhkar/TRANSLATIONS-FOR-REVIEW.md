@@ -2,16 +2,25 @@
 
 Drafts by Claude, 11 October 2026, for one reviewer per language; a language ships only after review.
 
+**The release switch.** Every file in `shared/src/commonMain/composeResources/files/adhkar/text/` travels in every build, but the app shows a language’s du‘a translations only when its file says `"reviewed": true`; a file that says `false` reads exactly as no file. The five drafts say `false`. Once a language’s reviewer has passed it and the corrections are in, flipping its `reviewed` to `true` is what ships it, and nothing else does (move the language from `DRAFTS` to `REVIEWED` in `AdhkarTranslationsTest` in the same change). `en.json`, OpenDua’s published English, is `true`.
+
+## Decisions for the owner
+
+1. **hisn-085: شَرَكِهِ or شِرْكِهِ.** The shipped Arabic is vowelled وَشَرَكِهِ, *sharakihi*, “his snares”, as OpenDua vowels it and hisnmuslim.com prints it, and the five drafts follow it (pièges, perangkap, tuzak, جال, ফাঁদ). The commentaries’ first reading is وَشِرْكِهِ, *shirkihi*, “his shirk” (what he calls to: associating partners with Allah), and that is what OpenDua’s English in `en.json` says (“the evil and shirk of the devil”). Today the English disagrees with the Arabic. Whichever reading is chosen, the Arabic and all six languages must say the same thing.
+2. **Bengali loanword spelling: য or জ.** The drafts write আযাব and রিযিক with য but জমিন with জ, as common use does; the app itself already mixes the two (নামাজ, জিকির but আযান, আযকার). One convention for the adhkar, ideally for the whole app.
+3. **Urdu hisn-078: بِكَ أَصْبَحْنَا.** The draft has **تیرے ساتھ ہم نے صبح کی**. It is literal, but تیرے ساتھ can read as “together with You” rather than “by You”; **تجھ ہی سے** is the literal alternative, and تیری ہی توفیق سے or تیرے ہی حکم سے would be glosses (additions the rules leave out).
+
+## About the drafts
+
 The 15 du‘a of the Morning & Evening Adhkar (Hisn al-Muslim 77–97), translated into Bengali, French, Indonesian, Turkish and Urdu **from the Arabic**, with OpenDua’s English (CC BY 4.0) as a cross-check only. The four Quran items (Ayat al-Kursi and the three Quls) have no entry: the app shows its own Quran translation for them.
 
-Rules the drafts follow: “Allah” untranslated (আল্লাহ, اللہ); ﷺ after the Prophet’s name; the language’s usual word for رب; no explanatory additions; the Arabic’s sentence boundaries; typographic apostrophes; the register of a careful mosque booklet. Hisn 77 and 78 have a morning and an evening wording, both listed; Hisn 90 is read in the morning only.
+Rules the drafts follow: “Allah” untranslated (আল্লাহ, اللہ); ﷺ after the Prophet’s name; the language’s usual word for رب; no explanatory additions; the Arabic’s sentence boundaries; typographic apostrophes; the register of a careful mosque booklet. Hisn 77 and 78 have a morning and an evening wording, both listed; Hisn 90 is read in the morning only. A first reader’s corrections (the same day) are already in; that reading is not the review.
 
-**How to review.** Each draft is followed by a review line. Tick it if the draft is right as it stands, or write the corrected text after “correction:”. Sign the language’s header when done. The drafts live in `shared/src/commonMain/composeResources/files/adhkar/text/<lang>.json`; corrections go there (keep the keys), then `python3 -I tools/adhkar/check_items.py` must pass. The app bundles every file in that folder, so a language that has not been reviewed must have its file taken out before a release is cut.
+**How to review.** Each draft is followed by a review line. Tick it if the draft is right as it stands, or write the corrected text after “correction:”. Sign the language’s header when done. Corrections go into `text/<lang>.json` (keep the keys), then `python3 -I tools/adhkar/check_items.py` must pass. Only then is `reviewed` flipped to `true` (see the release switch above).
 
 ## Points for every reviewer
 
-- **hisn-085 وَشَرَكِهِ.** The Arabic is vowelled *sharakihi*, “his snares” (OpenDua and hisnmuslim.com agree), and the drafts follow it (pièges, perangkap, tuzak, جال, ফাঁদ). OpenDua’s English reads the other transmitted wording, وَشِرْكِهِ, “his shirk”. If a reviewer prefers *shirk*, say so: the shipped Arabic’s vowelling would then need the same decision.
-- **hisn-084 أَنْ أُغْتَالَ مِنْ تَحْتِي.** The drafts keep the literal sense, “seized unawares from beneath me”. OpenDua’s English gives the narrator’s explanation instead (“lest I be swallowed up by the earth”).
+- **hisn-084 أَنْ أُغْتَالَ مِنْ تَحْتِي.** The drafts keep the sense of being destroyed unawares from beneath. OpenDua’s English gives the narrator’s explanation instead (“lest I be swallowed up by the earth”).
 - **hisn-078 بِكَ أَصْبَحْنَا.** The drafts keep the literal “by You”. Some booklets gloss it as “by Your power” or “by Your grace”; that is an addition the rules leave out, but say if the literal form reads badly.
 - **hisn-077 وَأَصْبَحَ الْمُلْكُ لِلَّهِ.** OpenDua’s English shortens this to “all sovereignty belongs to Allah”; the drafts keep that the dominion too has entered the morning (evening), belonging to Allah, as far as the language allows.
 - **Sentences.** Each draft breaks where the Arabic does, like the English, except hisn-079, which is five sentences at its five clauses (the English has two), and hisn-088, which ends a sentence before the imperative أَصْلِحْ.
@@ -29,7 +38,7 @@ Rules the drafts follow: “Allah” untranslated (আল্লাহ, اللہ)
 
 ## Bengali (bn)
 
-বাংলা · `shared/src/commonMain/composeResources/files/adhkar/text/bn.json`
+বাংলা · `shared/src/commonMain/composeResources/files/adhkar/text/bn.json` · `"reviewed": false` (not shown in the app)
 
 Reviewer: ______________________ Date: ____________
 
@@ -37,10 +46,10 @@ Verdict: [ ] ships as drafted [ ] ships with the corrections below [ ] does not 
 
 **Choices to weigh**
 
-- رب is **রব** (as Bengali Hisn al-Muslim booklets print it), not Muhiuddin Khan’s পালনকর্তা; Allah is addressed as **আপনি**; شر is অনিষ্ট throughout, عذاب আযাব, النار জাহান্নাম.
-- Spelling of Arabic loans: **আযাব, রিযিক** with য but **জমিন** with জ. The app itself mixes the two (নামাজ, জিকির but আযান, আযকার); please settle one convention.
+- رب is **রব** (as Bengali Hisn al-Muslim booklets print it), not Muhiuddin Khan’s পালনকর্তা; Allah is addressed as **আপনি**; شر is অনিষ্ট throughout, kept apart from سوء الكبر, **বার্ধক্যের মন্দ অবস্থা**; عذاب আযাব, النار জাহান্নাম.
+- hisn-085 عالم is **জ্ঞাতা**; hisn-095 متقبلا is **কবুলকৃত** (accepted); hisn-097 is refuge *in* the words, **বাণীসমূহের আশ্রয়**.
 - hisn-078 **আপনার দ্বারাই** is the literal “by You”; আপনারই অনুগ্রহে would be the gloss.
-- hisn-090 writes **মুহাম্মাদ ﷺ-এর** (the case ending after the sign). Typed in NFC (য় as য + ়).
+- The য/জ spelling of Arabic loans is a decision for the owner (above). hisn-090 writes **মুহাম্মাদ ﷺ-এর** (the case ending after the sign). Typed in NFC (য় as য + ়).
 
 ### bn · hisn-077, morning wording
 
@@ -48,7 +57,7 @@ Hisn al-Muslim 77, read morning and evening, said once.
 
 - **Arabic:** أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ
 - **English (OpenDua):** We have entered the morning, and all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah alone, without partner. To Him belong all sovereignty and praise, and He has power over all things. My Lord, I ask You for the good of this day and what follows it. I seek refuge in You from the evil of this day and what follows it. My Lord, I seek refuge in You from laziness and the evils of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.
-- **Draft:** আমরা সকালে উপনীত হয়েছি, আর আল্লাহর রাজত্বও সকালে উপনীত হয়েছে। সমস্ত প্রশংসা আল্লাহর জন্য। আল্লাহ ছাড়া কোনো ইলাহ নেই, তিনি একক, তাঁর কোনো শরিক নেই। রাজত্ব তাঁরই এবং প্রশংসাও তাঁরই, আর তিনি সবকিছুর ওপর ক্ষমতাবান। হে আমার রব! আমি আপনার কাছে এই দিনের কল্যাণ এবং এর পরে যা আসে তার কল্যাণ চাই। আমি এই দিনের অনিষ্ট এবং এর পরে যা আসে তার অনিষ্ট থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি অলসতা ও বার্ধক্যের অনিষ্ট থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি জাহান্নামের আযাব ও কবরের আযাব থেকে আপনার আশ্রয় চাই।
+- **Draft:** আমরা সকালে উপনীত হয়েছি, আর আল্লাহর রাজত্বও সকালে উপনীত হয়েছে। সমস্ত প্রশংসা আল্লাহর জন্য। আল্লাহ ছাড়া কোনো ইলাহ নেই, তিনি একক, তাঁর কোনো শরিক নেই। রাজত্ব তাঁরই এবং প্রশংসাও তাঁরই, আর তিনি সবকিছুর ওপর ক্ষমতাবান। হে আমার রব! আমি আপনার কাছে এই দিনের কল্যাণ এবং এর পরে যা আসে তার কল্যাণ চাই। আমি এই দিনের অনিষ্ট এবং এর পরে যা আসে তার অনিষ্ট থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি অলসতা ও বার্ধক্যের মন্দ অবস্থা থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি জাহান্নামের আযাব ও কবরের আযাব থেকে আপনার আশ্রয় চাই।
 - **Review:** [ ] correct as drafted · correction:
 
 ### bn · hisn-077, evening wording
@@ -57,7 +66,7 @@ Hisn al-Muslim 77, read morning and evening, said once.
 
 - **Arabic:** أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ
 - **English (OpenDua):** We have entered the evening, and all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah alone, without partner. To Him belong all sovereignty and praise, and He has power over all things. My Lord, I ask You for the good of this night and what follows it. I seek refuge in You from the evil of this night and what follows it. My Lord, I seek refuge in You from laziness and the evils of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.
-- **Draft:** আমরা সন্ধ্যায় উপনীত হয়েছি, আর আল্লাহর রাজত্বও সন্ধ্যায় উপনীত হয়েছে। সমস্ত প্রশংসা আল্লাহর জন্য। আল্লাহ ছাড়া কোনো ইলাহ নেই, তিনি একক, তাঁর কোনো শরিক নেই। রাজত্ব তাঁরই এবং প্রশংসাও তাঁরই, আর তিনি সবকিছুর ওপর ক্ষমতাবান। হে আমার রব! আমি আপনার কাছে এই রাতের কল্যাণ এবং এর পরে যা আসে তার কল্যাণ চাই। আমি এই রাতের অনিষ্ট এবং এর পরে যা আসে তার অনিষ্ট থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি অলসতা ও বার্ধক্যের অনিষ্ট থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি জাহান্নামের আযাব ও কবরের আযাব থেকে আপনার আশ্রয় চাই।
+- **Draft:** আমরা সন্ধ্যায় উপনীত হয়েছি, আর আল্লাহর রাজত্বও সন্ধ্যায় উপনীত হয়েছে। সমস্ত প্রশংসা আল্লাহর জন্য। আল্লাহ ছাড়া কোনো ইলাহ নেই, তিনি একক, তাঁর কোনো শরিক নেই। রাজত্ব তাঁরই এবং প্রশংসাও তাঁরই, আর তিনি সবকিছুর ওপর ক্ষমতাবান। হে আমার রব! আমি আপনার কাছে এই রাতের কল্যাণ এবং এর পরে যা আসে তার কল্যাণ চাই। আমি এই রাতের অনিষ্ট এবং এর পরে যা আসে তার অনিষ্ট থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি অলসতা ও বার্ধক্যের মন্দ অবস্থা থেকে আপনার আশ্রয় চাই। হে আমার রব! আমি জাহান্নামের আযাব ও কবরের আযাব থেকে আপনার আশ্রয় চাই।
 - **Review:** [ ] correct as drafted · correction:
 
 ### bn · hisn-078, morning wording
@@ -102,7 +111,7 @@ Hisn al-Muslim 85, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ عَالِمَ الغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ
 - **English (OpenDua):** O Allah, Knower of the unseen and the seen, Creator of the heavens and the Earth, Lord and Sovereign of all things, I bear witness that none has the right to be worshipped except You. I take refuge in You from the evil of my soul and from the evil and shirk of the devil, and from committing wrong against my soul or bringing such upon another Muslim.
-- **Draft:** হে আল্লাহ! অদৃশ্য ও দৃশ্যের জ্ঞানী, আসমান ও জমিনের স্রষ্টা, সবকিছুর রব ও মালিক! আমি সাক্ষ্য দিচ্ছি যে, আপনি ছাড়া কোনো ইলাহ নেই। আমি আমার নফসের অনিষ্ট থেকে, শয়তানের অনিষ্ট ও তার ফাঁদ থেকে, এবং নিজের ওপর কোনো মন্দ কাজ করা অথবা তা কোনো মুসলিমের দিকে টেনে আনা থেকে আপনার আশ্রয় চাই।
+- **Draft:** হে আল্লাহ! অদৃশ্য ও দৃশ্যের জ্ঞাতা, আসমান ও জমিনের স্রষ্টা, সবকিছুর রব ও মালিক! আমি সাক্ষ্য দিচ্ছি যে, আপনি ছাড়া কোনো ইলাহ নেই। আমি আমার নফসের অনিষ্ট থেকে, শয়তানের অনিষ্ট ও তার ফাঁদ থেকে, এবং নিজের ওপর কোনো মন্দ কাজ করা অথবা তা কোনো মুসলিমের দিকে টেনে আনা থেকে আপনার আশ্রয় চাই।
 - **Review:** [ ] correct as drafted · correction:
 
 ### bn · hisn-086
@@ -174,7 +183,7 @@ Hisn al-Muslim 95, read morning only, said once.
 
 - **Arabic:** اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً
 - **English (OpenDua):** O Allah, I ask You for knowledge which is beneficial and sustenance which is good, and deeds which are acceptable.
-- **Draft:** হে আল্লাহ! আমি আপনার কাছে উপকারী জ্ঞান, পবিত্র রিযিক এবং কবুলযোগ্য আমল চাই।
+- **Draft:** হে আল্লাহ! আমি আপনার কাছে উপকারী জ্ঞান, পবিত্র রিযিক এবং কবুলকৃত আমল চাই।
 - **Review:** [ ] correct as drafted · correction:
 
 ### bn · hisn-096
@@ -192,14 +201,14 @@ Hisn al-Muslim 97, read evening only, said 3 times.
 
 - **Arabic:** أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ
 - **English (OpenDua):** I take refuge in Allah’s perfect words from the evil He has created.
-- **Draft:** আমি আল্লাহর পরিপূর্ণ বাণীসমূহের মাধ্যমে আশ্রয় চাই, তিনি যা সৃষ্টি করেছেন তার অনিষ্ট থেকে।
+- **Draft:** আমি আল্লাহর পরিপূর্ণ বাণীসমূহের আশ্রয় চাই, তিনি যা সৃষ্টি করেছেন তার অনিষ্ট থেকে।
 - **Review:** [ ] correct as drafted · correction:
 
 ---
 
 ## French (fr)
 
-Français · `shared/src/commonMain/composeResources/files/adhkar/text/fr.json`
+Français · `shared/src/commonMain/composeResources/files/adhkar/text/fr.json` · `"reviewed": false` (not shown in the app)
 
 Reviewer: ______________________ Date: ____________
 
@@ -208,8 +217,8 @@ Verdict: [ ] ships as drafted [ ] ships with the corrections below [ ] does not 
 **Choices to weigh**
 
 - رب is **Seigneur**; Allah is addressed as **Tu/Toi/Ton** with capitals; “Il n’y a de dieu qu’Allah” as the app already writes it.
-- hisn-090 has **Abraham**, the French name Hamidullah’s translation in the app uses; Ibrahim is the alternative. كلمة الإخلاص is the literal **la parole de la sincérité**; “la parole du monothéisme pur” would gloss it.
-- السميع العليم is **l’Audient, l’Omniscient** (Hamidullah); القيوم is “Toi qui subsistes par Toi-même”.
+- hisn-090 has **Abraham**, the French name Hamidullah’s translation in the app uses (Ibrahim is the alternative), and **monothéiste pur, musulman** for حنيفا مسلما. كلمة الإخلاص is the literal **la parole de la sincérité**; “la parole du monothéisme pur” would gloss it.
+- hisn-084 أُغْتَالَ is **anéanti à l’improviste**; hisn-088 أَصْلِحْ لِي is **Arrange pour moi**; hisn-096 أَتُوبُ إِلَيْهِ is **je reviens à Lui repentant**. السميع العليم is **l’Audient, l’Omniscient** (Hamidullah).
 - No : ; ! ? appear, so no narrow no-break space is needed; a correction that adds one should use U+202F as the app’s French strings do.
 
 ### fr · hisn-077, morning wording
@@ -263,7 +272,7 @@ Hisn al-Muslim 84, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ: فِي دِينِي وَدُنْيَايَ وَأَهْلِي، وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي، وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَينِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي
 - **English (OpenDua):** O Allah, I ask You for pardon and well-being in this life and the next. O Allah, I ask You for pardon and well-being in my religious and worldly affairs, and my family and my wealth. O Allah, veil my weaknesses and set at ease my dismay. O Allah, preserve me from the front and from behind and on my right and on my left and from above, and I take refuge with You lest I be swallowed up by the earth.
-- **Draft:** Ô Allah, je Te demande le pardon et la préservation dans ce monde et dans l’au-delà. Ô Allah, je Te demande le pardon et la préservation dans ma religion, ma vie d’ici-bas, ma famille et mes biens. Ô Allah, voile mes défauts et apaise mes frayeurs. Ô Allah, protège-moi par-devant et par-derrière, à ma droite et à ma gauche, et par en haut, et je cherche refuge auprès de Ta grandeur pour ne pas être pris à l’improviste par en bas.
+- **Draft:** Ô Allah, je Te demande le pardon et la préservation dans ce monde et dans l’au-delà. Ô Allah, je Te demande le pardon et la préservation dans ma religion, ma vie d’ici-bas, ma famille et mes biens. Ô Allah, voile mes défauts et apaise mes frayeurs. Ô Allah, protège-moi par-devant et par-derrière, à ma droite et à ma gauche, et par en haut, et je cherche refuge auprès de Ta grandeur pour ne pas être anéanti à l’improviste par en bas.
 - **Review:** [ ] correct as drafted · correction:
 
 ### fr · hisn-085
@@ -290,7 +299,7 @@ Hisn al-Muslim 88, read morning and evening, said once.
 
 - **Arabic:** يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغيثُ أَصْلِحْ لِي شَأْنِيَ كُلَّهُ وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ
 - **English (OpenDua):** O Ever Living, O Self-Subsisting and Supporter of all, by Your mercy I seek assistance, rectify for me all of my affairs and do not leave me to myself, even for the blink of an eye.
-- **Draft:** Ô Vivant, ô Toi qui subsistes par Toi-même, c’est par Ta miséricorde que j’implore secours. Améliore toutes mes affaires et ne m’abandonne pas à moi-même, ne serait-ce que le temps d’un clin d’œil.
+- **Draft:** Ô Vivant, ô Toi qui subsistes par Toi-même, c’est par Ta miséricorde que j’implore secours. Arrange pour moi toutes mes affaires et ne m’abandonne pas à moi-même, ne serait-ce que le temps d’un clin d’œil.
 - **Review:** [ ] correct as drafted · correction:
 
 ### fr · hisn-090, morning wording only
@@ -299,7 +308,7 @@ Hisn al-Muslim 90, read morning only, said once.
 
 - **Arabic:** أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلاَمِ، وَعَلَى كَلِمَةِ الْإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صلى الله عليه وسلم، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ، حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ
 - **English (OpenDua):** We have entered the morning upon the natural way of Islam, the declaration of sincere faith, the religion of our Prophet Muhammad (may Allah’s peace and blessings be upon him), and the faith of our forefather Ibraheem, who was upright, a Muslim, and not among those who associate partners with Allah.
-- **Draft:** Nous voici au matin sur la nature originelle de l’islam, sur la parole de la sincérité, sur la religion de notre Prophète Muhammad ﷺ et sur la voie de notre père Abraham, qui était un monothéiste pur, soumis, et n’était pas du nombre des associateurs.
+- **Draft:** Nous voici au matin sur la nature originelle de l’islam, sur la parole de la sincérité, sur la religion de notre Prophète Muhammad ﷺ et sur la voie de notre père Abraham, qui était un monothéiste pur, musulman, et n’était pas du nombre des associateurs.
 - **Review:** [ ] correct as drafted · correction:
 
 ### fr · hisn-091
@@ -353,7 +362,7 @@ Hisn al-Muslim 96, read morning and evening, said 100 times a day.
 
 - **Arabic:** أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ
 - **English (OpenDua):** I seek Allah’s forgiveness and I turn to Him in repentance.
-- **Draft:** Je demande pardon à Allah et je me repens à Lui.
+- **Draft:** Je demande pardon à Allah et je reviens à Lui repentant.
 - **Review:** [ ] correct as drafted · correction:
 
 ### fr · hisn-097
@@ -369,7 +378,7 @@ Hisn al-Muslim 97, read evening only, said 3 times.
 
 ## Indonesian (id)
 
-Bahasa Indonesia · `shared/src/commonMain/composeResources/files/adhkar/text/id.json`
+Bahasa Indonesia · `shared/src/commonMain/composeResources/files/adhkar/text/id.json` · `"reviewed": false` (not shown in the app)
 
 Reviewer: ______________________ Date: ____________
 
@@ -380,7 +389,7 @@ Verdict: [ ] ships as drafted [ ] ships with the corrections below [ ] does not 
 - رب is **Tuhan** (“Ya Tuhanku”); Allah is addressed as **Engkau / -Mu**; the first person is **aku**, as in the app’s strings.
 - KBBI spellings: **Mahakuasa, Mahahidup** (joined before a root word), **Maha Mendengar, Maha Mengetahui** (apart before an affixed one), gaib, setan, keridaan, Arasy, bertobat.
 - hisn-084 عوراتي is **aib-aibku** (faults), not “auratku”, which in Indonesian means the body’s private parts. hisn-077 is “dan pada pagi ini kerajaan milik Allah”; many booklets write “dan kerajaan hanya milik Allah”.
-- hisn-088 القيوم is **Yang Maha Berdiri Sendiri**; Kemenag’s 2:255 has “terus menerus mengurus (makhluk-Nya)”.
+- hisn-079 شر ما صنعت is **keburukan apa yang telah kuperbuat** (the evil *of what* I did); hisn-094 رضا نفسه is **keridaan diri-Nya**; hisn-088 القيوم is **Yang Maha Berdiri Sendiri** (Kemenag’s 2:255 has “terus menerus mengurus (makhluk-Nya)”).
 
 ### id · hisn-077, morning wording
 
@@ -424,7 +433,7 @@ Hisn al-Muslim 79, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنوبَ إِلاَّ أَنْتَ
 - **English (OpenDua):** O Allah, You are my Lord, none has the right to be worshipped except You, You created me and I am Your servant and I abide to Your covenant and promise as best I can, I take refuge in You from the evil of which I have committed. I acknowledge Your favour upon me and I acknowledge my sin, so forgive me, for verily none can forgive sin except You.
-- **Draft:** Ya Allah, Engkau Tuhanku, tiada tuhan selain Engkau. Engkau telah menciptakanku dan aku adalah hamba-Mu. Aku menetapi perjanjian-Mu dan janji-Mu semampuku. Aku berlindung kepada-Mu dari keburukan yang telah kuperbuat. Aku mengakui di hadapan-Mu nikmat-Mu kepadaku, dan aku mengakui dosaku, maka ampunilah aku, karena tidak ada yang mengampuni dosa-dosa selain Engkau.
+- **Draft:** Ya Allah, Engkau Tuhanku, tiada tuhan selain Engkau. Engkau telah menciptakanku dan aku adalah hamba-Mu. Aku menetapi perjanjian-Mu dan janji-Mu semampuku. Aku berlindung kepada-Mu dari keburukan apa yang telah kuperbuat. Aku mengakui di hadapan-Mu nikmat-Mu kepadaku, dan aku mengakui dosaku, maka ampunilah aku, karena tidak ada yang mengampuni dosa-dosa selain Engkau.
 - **Review:** [ ] correct as drafted · correction:
 
 ### id · hisn-084
@@ -505,7 +514,7 @@ Hisn al-Muslim 94, read morning only, said 3 times.
 
 - **Arabic:** سُبْحَانَ اللَّهِ وَبِحَمْدِهِ: عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ
 - **English (OpenDua):** How perfect Allah is and I praise Him by the number of His creation and His pleasure, and by the weight of His throne, and the ink of His words.
-- **Draft:** Mahasuci Allah dan segala puji bagi-Nya, sebanyak bilangan makhluk-Nya, sesuai keridaan-Nya, seberat Arasy-Nya, dan sebanyak tinta kalimat-kalimat-Nya.
+- **Draft:** Mahasuci Allah dan segala puji bagi-Nya, sebanyak bilangan makhluk-Nya, sesuai keridaan diri-Nya, seberat Arasy-Nya, dan sebanyak tinta kalimat-kalimat-Nya.
 - **Review:** [ ] correct as drafted · correction:
 
 ### id · hisn-095
@@ -539,7 +548,7 @@ Hisn al-Muslim 97, read evening only, said 3 times.
 
 ## Turkish (tr)
 
-Türkçe · `shared/src/commonMain/composeResources/files/adhkar/text/tr.json`
+Türkçe · `shared/src/commonMain/composeResources/files/adhkar/text/tr.json` · `"reviewed": false` (not shown in the app)
 
 Reviewer: ______________________ Date: ____________
 
@@ -548,9 +557,9 @@ Verdict: [ ] ships as drafted [ ] ships with the corrections below [ ] does not 
 **Choices to weigh**
 
 - رب is **Rab** (“Rabbim!”); Allah is addressed as **Sen** with capitals, **O’nun / O’na** with the apostrophe as Diyanet writes them; vocatives end in “!” as Turkish du‘a books print them.
-- hisn-090: **Muhammed’in ﷺ dini** (the suffix on the name, the sign after it) and **babamız İbrahim’in milleti** (the classical term); “yolu” would be the modern word for millet.
-- النار is **cehennem**; السميع العليم is “her şeyi işitendir, her şeyi bilendir” (Diyanet often has “hakkıyla işiten, hakkıyla bilen”).
-- hisn-086 is two sentences: Turkish puts the relative clause before “Allah’ın ismiyle”.
+- hisn-077 الحمد لله is **Hamd yalnızca Allah’a mahsustur**, the Tasbeeh screen’s wording; hisn-079 فاغفر لي is **öyleyse beni bağışla**; hisn-085 أجره is **sürüklemekten**.
+- hisn-090: **Muhammed’in ﷺ dini** (the suffix on the name, the sign after it) and **babamız İbrahim’in milleti** (the classical term); “yolu” would be the modern word for millet. النار is **cehennem**.
+- السميع العليم is “her şeyi işitendir, her şeyi bilendir” (Diyanet often has “hakkıyla işiten, hakkıyla bilen”). hisn-086 is two sentences: Turkish puts the relative clause before “Allah’ın ismiyle”.
 
 ### tr · hisn-077, morning wording
 
@@ -558,7 +567,7 @@ Hisn al-Muslim 77, read morning and evening, said once.
 
 - **Arabic:** أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ
 - **English (OpenDua):** We have entered the morning, and all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah alone, without partner. To Him belong all sovereignty and praise, and He has power over all things. My Lord, I ask You for the good of this day and what follows it. I seek refuge in You from the evil of this day and what follows it. My Lord, I seek refuge in You from laziness and the evils of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.
-- **Draft:** Sabaha erdik, mülk de Allah’a ait olarak sabaha erdi. Hamd Allah’a mahsustur. Allah’tan başka ilah yoktur, O tektir, ortağı yoktur. Mülk O’nundur, hamd O’na mahsustur ve O her şeye kadirdir. Rabbim! Bu günde olanın hayrını ve ondan sonra gelenin hayrını Senden isterim. Bu günde olanın şerrinden ve ondan sonra gelenin şerrinden Sana sığınırım. Rabbim! Tembellikten ve yaşlılığın kötülüğünden Sana sığınırım. Rabbim! Cehennemdeki azaptan ve kabirdeki azaptan Sana sığınırım.
+- **Draft:** Sabaha erdik, mülk de Allah’a ait olarak sabaha erdi. Hamd yalnızca Allah’a mahsustur. Allah’tan başka ilah yoktur, O tektir, ortağı yoktur. Mülk O’nundur, hamd O’na mahsustur ve O her şeye kadirdir. Rabbim! Bu günde olanın hayrını ve ondan sonra gelenin hayrını Senden isterim. Bu günde olanın şerrinden ve ondan sonra gelenin şerrinden Sana sığınırım. Rabbim! Tembellikten ve yaşlılığın kötülüğünden Sana sığınırım. Rabbim! Cehennemdeki azaptan ve kabirdeki azaptan Sana sığınırım.
 - **Review:** [ ] correct as drafted · correction:
 
 ### tr · hisn-077, evening wording
@@ -567,7 +576,7 @@ Hisn al-Muslim 77, read morning and evening, said once.
 
 - **Arabic:** أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ
 - **English (OpenDua):** We have entered the evening, and all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah alone, without partner. To Him belong all sovereignty and praise, and He has power over all things. My Lord, I ask You for the good of this night and what follows it. I seek refuge in You from the evil of this night and what follows it. My Lord, I seek refuge in You from laziness and the evils of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.
-- **Draft:** Akşama erdik, mülk de Allah’a ait olarak akşama erdi. Hamd Allah’a mahsustur. Allah’tan başka ilah yoktur, O tektir, ortağı yoktur. Mülk O’nundur, hamd O’na mahsustur ve O her şeye kadirdir. Rabbim! Bu gecede olanın hayrını ve ondan sonra gelenin hayrını Senden isterim. Bu gecede olanın şerrinden ve ondan sonra gelenin şerrinden Sana sığınırım. Rabbim! Tembellikten ve yaşlılığın kötülüğünden Sana sığınırım. Rabbim! Cehennemdeki azaptan ve kabirdeki azaptan Sana sığınırım.
+- **Draft:** Akşama erdik, mülk de Allah’a ait olarak akşama erdi. Hamd yalnızca Allah’a mahsustur. Allah’tan başka ilah yoktur, O tektir, ortağı yoktur. Mülk O’nundur, hamd O’na mahsustur ve O her şeye kadirdir. Rabbim! Bu gecede olanın hayrını ve ondan sonra gelenin hayrını Senden isterim. Bu gecede olanın şerrinden ve ondan sonra gelenin şerrinden Sana sığınırım. Rabbim! Tembellikten ve yaşlılığın kötülüğünden Sana sığınırım. Rabbim! Cehennemdeki azaptan ve kabirdeki azaptan Sana sığınırım.
 - **Review:** [ ] correct as drafted · correction:
 
 ### tr · hisn-078, morning wording
@@ -594,7 +603,7 @@ Hisn al-Muslim 79, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنوبَ إِلاَّ أَنْتَ
 - **English (OpenDua):** O Allah, You are my Lord, none has the right to be worshipped except You, You created me and I am Your servant and I abide to Your covenant and promise as best I can, I take refuge in You from the evil of which I have committed. I acknowledge Your favour upon me and I acknowledge my sin, so forgive me, for verily none can forgive sin except You.
-- **Draft:** Allah’ım! Sen benim Rabbimsin, Senden başka ilah yoktur. Beni yarattın, ben de Senin kulunum. Gücüm yettiğince Senin ahdin ve vaadin üzereyim. Yaptıklarımın şerrinden Sana sığınırım. Bana verdiğin nimeti Sana itiraf ederim, günahımı da itiraf ederim, beni bağışla, çünkü günahları ancak Sen bağışlarsın.
+- **Draft:** Allah’ım! Sen benim Rabbimsin, Senden başka ilah yoktur. Beni yarattın, ben de Senin kulunum. Gücüm yettiğince Senin ahdin ve vaadin üzereyim. Yaptıklarımın şerrinden Sana sığınırım. Bana verdiğin nimeti Sana itiraf ederim, günahımı da itiraf ederim, öyleyse beni bağışla, çünkü günahları ancak Sen bağışlarsın.
 - **Review:** [ ] correct as drafted · correction:
 
 ### tr · hisn-084
@@ -612,7 +621,7 @@ Hisn al-Muslim 85, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ عَالِمَ الغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ
 - **English (OpenDua):** O Allah, Knower of the unseen and the seen, Creator of the heavens and the Earth, Lord and Sovereign of all things, I bear witness that none has the right to be worshipped except You. I take refuge in You from the evil of my soul and from the evil and shirk of the devil, and from committing wrong against my soul or bringing such upon another Muslim.
-- **Draft:** Ey görülmeyeni ve görüleni bilen, gökleri ve yeri yaratan, her şeyin Rabbi ve Maliki olan Allah’ım! Senden başka ilah olmadığına şahitlik ederim. Nefsimin şerrinden, şeytanın şerrinden ve tuzağından, kendime bir kötülük yapmaktan ya da onu bir Müslümana bulaştırmaktan Sana sığınırım.
+- **Draft:** Ey görülmeyeni ve görüleni bilen, gökleri ve yeri yaratan, her şeyin Rabbi ve Maliki olan Allah’ım! Senden başka ilah olmadığına şahitlik ederim. Nefsimin şerrinden, şeytanın şerrinden ve tuzağından, kendime bir kötülük yapmaktan ya da onu bir Müslümana sürüklemekten Sana sığınırım.
 - **Review:** [ ] correct as drafted · correction:
 
 ### tr · hisn-086
@@ -709,7 +718,7 @@ Hisn al-Muslim 97, read evening only, said 3 times.
 
 ## Urdu (ur)
 
-اردو · `shared/src/commonMain/composeResources/files/adhkar/text/ur.json`
+اردو · `shared/src/commonMain/composeResources/files/adhkar/text/ur.json` · `"reviewed": false` (not shown in the app)
 
 Reviewer: ______________________ Date: ____________
 
@@ -717,10 +726,10 @@ Verdict: [ ] ships as drafted [ ] ships with the corrections below [ ] does not 
 
 **Choices to weigh**
 
-- رب is **رب** (“اے میرے رب!”); Allah is addressed as **تو / تیرا** as classical Urdu du‘a does; verbs are masculine, as booklets print them.
-- hisn-078 **تیرے ساتھ** is the literal “by/with You”; تیری ہی توفیق سے or تیرے ہی حکم سے would be glosses.
+- رب is **رب** (“اے میرے رب!”); Allah is addressed as **تو / تیرا** as classical Urdu du‘a does, imperatives in the plain تو-form (**حفاظت کر**, **بخش دے**); verbs are masculine, as booklets print them.
+- hisn-078 **تیرے ساتھ** is literal but can read as “together with You”; **تجھ ہی سے** is the literal alternative (a decision for the owner, above).
+- hisn-079 شر ما صنعت is **میں اپنے کیے کے شر سے**; hisn-085 أقترف is **کروں**. hisn-091 and 094 open with the app’s own “اللہ پاک ہے اور اسی کی تعریف ہے”.
 - Orthography: ی ے ک ہ ھ throughout (no Arabic ي ك ه), ۔ and ، for punctuation, کلمۂ with ۂ; a script checked every letter.
-- hisn-091 and 094 open with the app’s own “اللہ پاک ہے اور اسی کی تعریف ہے”.
 
 ### ur · hisn-077, morning wording
 
@@ -764,7 +773,7 @@ Hisn al-Muslim 79, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنوبَ إِلاَّ أَنْتَ
 - **English (OpenDua):** O Allah, You are my Lord, none has the right to be worshipped except You, You created me and I am Your servant and I abide to Your covenant and promise as best I can, I take refuge in You from the evil of which I have committed. I acknowledge Your favour upon me and I acknowledge my sin, so forgive me, for verily none can forgive sin except You.
-- **Draft:** اے اللہ! تو میرا رب ہے، تیرے سوا کوئی معبود نہیں۔ تو نے مجھے پیدا کیا اور میں تیرا بندہ ہوں۔ میں اپنی استطاعت بھر تیرے عہد اور تیرے وعدے پر قائم ہوں۔ میں نے جو کچھ کیا اس کے شر سے تیری پناہ چاہتا ہوں۔ میں تیرے سامنے اپنے اوپر تیری نعمت کا اعتراف کرتا ہوں اور اپنے گناہ کا اعتراف کرتا ہوں، پس مجھے بخش دے، کیونکہ تیرے سوا گناہوں کو کوئی نہیں بخشتا۔
+- **Draft:** اے اللہ! تو میرا رب ہے، تیرے سوا کوئی معبود نہیں۔ تو نے مجھے پیدا کیا اور میں تیرا بندہ ہوں۔ میں اپنی استطاعت بھر تیرے عہد اور تیرے وعدے پر قائم ہوں۔ میں اپنے کیے کے شر سے تیری پناہ چاہتا ہوں۔ میں تیرے سامنے اپنے اوپر تیری نعمت کا اعتراف کرتا ہوں اور اپنے گناہ کا اعتراف کرتا ہوں، پس مجھے بخش دے، کیونکہ تیرے سوا گناہوں کو کوئی نہیں بخشتا۔
 - **Review:** [ ] correct as drafted · correction:
 
 ### ur · hisn-084
@@ -773,7 +782,7 @@ Hisn al-Muslim 84, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ: فِي دِينِي وَدُنْيَايَ وَأَهْلِي، وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي، وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَينِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي
 - **English (OpenDua):** O Allah, I ask You for pardon and well-being in this life and the next. O Allah, I ask You for pardon and well-being in my religious and worldly affairs, and my family and my wealth. O Allah, veil my weaknesses and set at ease my dismay. O Allah, preserve me from the front and from behind and on my right and on my left and from above, and I take refuge with You lest I be swallowed up by the earth.
-- **Draft:** اے اللہ! میں تجھ سے دنیا اور آخرت میں معافی اور عافیت کا سوال کرتا ہوں۔ اے اللہ! میں تجھ سے اپنے دین، اپنی دنیا، اپنے گھر والوں اور اپنے مال میں معافی اور عافیت کا سوال کرتا ہوں۔ اے اللہ! میرے عیبوں پر پردہ ڈال دے اور میری گھبراہٹوں کو امن دے۔ اے اللہ! میرے آگے سے، میرے پیچھے سے، میری دائیں جانب سے، میری بائیں جانب سے اور میرے اوپر سے میری حفاظت فرما، اور میں تیری عظمت کی پناہ چاہتا ہوں اس سے کہ اپنے نیچے سے اچانک ہلاک کیا جاؤں۔
+- **Draft:** اے اللہ! میں تجھ سے دنیا اور آخرت میں معافی اور عافیت کا سوال کرتا ہوں۔ اے اللہ! میں تجھ سے اپنے دین، اپنی دنیا، اپنے گھر والوں اور اپنے مال میں معافی اور عافیت کا سوال کرتا ہوں۔ اے اللہ! میرے عیبوں پر پردہ ڈال دے اور میری گھبراہٹوں کو امن دے۔ اے اللہ! میرے آگے سے، میرے پیچھے سے، میری دائیں جانب سے، میری بائیں جانب سے اور میرے اوپر سے میری حفاظت کر، اور میں تیری عظمت کی پناہ چاہتا ہوں اس سے کہ اپنے نیچے سے اچانک ہلاک کیا جاؤں۔
 - **Review:** [ ] correct as drafted · correction:
 
 ### ur · hisn-085
@@ -782,7 +791,7 @@ Hisn al-Muslim 85, read morning and evening, said once.
 
 - **Arabic:** اللَّهُمَّ عَالِمَ الغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ
 - **English (OpenDua):** O Allah, Knower of the unseen and the seen, Creator of the heavens and the Earth, Lord and Sovereign of all things, I bear witness that none has the right to be worshipped except You. I take refuge in You from the evil of my soul and from the evil and shirk of the devil, and from committing wrong against my soul or bringing such upon another Muslim.
-- **Draft:** اے اللہ! پوشیدہ اور ظاہر کو جاننے والے، آسمانوں اور زمین کو پیدا کرنے والے، ہر چیز کے رب اور اس کے مالک! میں گواہی دیتا ہوں کہ تیرے سوا کوئی معبود نہیں۔ میں اپنے نفس کے شر سے، شیطان کے شر اور اس کے جال سے، اور اس سے کہ اپنی جان پر کوئی برائی کر بیٹھوں یا اسے کسی مسلمان کی طرف کھینچ لاؤں، تیری پناہ چاہتا ہوں۔
+- **Draft:** اے اللہ! پوشیدہ اور ظاہر کو جاننے والے، آسمانوں اور زمین کو پیدا کرنے والے، ہر چیز کے رب اور اس کے مالک! میں گواہی دیتا ہوں کہ تیرے سوا کوئی معبود نہیں۔ میں اپنے نفس کے شر سے، شیطان کے شر اور اس کے جال سے، اور اس سے کہ اپنی جان پر کوئی برائی کروں یا اسے کسی مسلمان کی طرف کھینچ لاؤں، تیری پناہ چاہتا ہوں۔
 - **Review:** [ ] correct as drafted · correction:
 
 ### ur · hisn-086

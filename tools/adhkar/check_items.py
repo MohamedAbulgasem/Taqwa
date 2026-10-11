@@ -10,15 +10,18 @@ that is given but does not exist is a failure. Exit status 1 on any failure.
 
 Structure (always): the 19 ids in the book's order with the spec's kind, sets, count,
 daily flag and Quran reference; 18 morning and 15 evening pages; sources from the nine
-known collections; every set of every du'a resolves to an Arabic text, a transliteration
-and an English translation (the 15 du'a ids, and only those, in text/en.json); no empty
-strings; every Arabic string carries tashkeel (U+064B-U+0652); the Arabic is OpenDua's,
-byte for byte (tools/adhkar/opendua-morning-evening.json); no file starts with a BOM.
+known collections; every set of every du'a resolves to an Arabic text and a
+transliteration; no empty strings; every Arabic string carries tashkeel (U+064B-U+0652);
+the Arabic is OpenDua's, byte for byte (tools/adhkar/opendua-morning-evening.json); no
+file starts with a BOM.
 
-Languages (always): every text/<lang>.json present (a language may have no file) is
-{"language": "<lang>", "items": ...} carrying exactly the 15 du'a ids, each with exactly
+Languages (always): text/en.json is required and every other text/<lang>.json present
+is checked the same way (a language may have no file): {"language": "<lang>",
+"reviewed": true|false, "items": ...} carrying exactly the 15 du'a ids, each with exactly
 its Arabic's keys (morning/evening or both), no empty or padded string, every string NFC
-and no ASCII apostrophe (typographic ’ only).
+and no ASCII apostrophe (typographic ’ only). "reviewed" is the release switch: the app
+shows a language's translations only when it is true. en.json, OpenDua's published
+English, must be true; a drafted language stays false until its reviewer flips it.
 
 Text (with the witness): each du'a's morning or "both" Arabic is compared word by word,
 letter and mark, with the dhikr of the hisnmuslim entry of the same ID; the
@@ -54,7 +57,6 @@ EXTRACT = os.path.join(HERE, "opendua-morning-evening.json")
 RESOURCES = os.path.join(ROOT, "shared", "src", "commonMain", "composeResources", "files", "adhkar")
 ITEMS_JSON = os.path.join(RESOURCES, "items.json")
 TEXT_DIR = os.path.join(RESOURCES, "text")
-EN_JSON = os.path.join(TEXT_DIR, "en.json")
 
 ATTRIBUTION = (
     "OpenDua dataset v0.0.4 (https://opendua.org), by Ihsan Labs at the Human Development Fund. "
@@ -193,9 +195,8 @@ def opendua_forms(extract):
     return out
 
 
-def check_structure(items_doc, en_doc, extract):
+def check_structure(items_doc, extract):
     walk_strings(items_doc, "items.json")
-    walk_strings(en_doc, "en.json")
     if set(items_doc) != {"schema", "attribution", "items"} or items_doc["schema"] != 1:
         fail(f"items.json top level: {sorted(items_doc)} schema {items_doc.get('schema')}")
     if items_doc["attribution"] != ATTRIBUTION:
@@ -253,32 +254,37 @@ def check_structure(items_doc, en_doc, extract):
             for key, text in arabic.items():
                 if text != od[hisn].get(key):
                     fail(f"{item_id}: {key} Arabic is not OpenDua's {key} variation byte for byte")
-            translation = en_doc.get("items", {}).get(item_id, {})
-            check_forms(item_id, sets, translation, "English translation")
-            if set(translation) != set(arabic):
-                fail(f"{item_id}: en.json keys {sorted(translation)} differ from the Arabic's {sorted(arabic)}")
             if E in arabic:
                 check_evening_marks(item_id, arabic)
-    if en_doc.get("language") != "en" or set(en_doc) != {"language", "items"}:
-        fail(f"en.json top level {sorted(en_doc)} language {en_doc.get('language')!r}")
-    if sorted(en_doc.get("items", {})) != sorted(dua_ids) or len(dua_ids) != 15:
-        fail(f"en.json has {sorted(en_doc.get('items', {}))}, expected the 15 du'a ids {sorted(dua_ids)}")
     print(f"structure: {len(items)} items, {len(dua_ids)} du'a, {morning} morning pages, {evening} evening pages")
 
 
-def check_languages(items_doc, en_doc):
-    """Every text/<lang>.json present carries every du'a id with exactly its Arabic's keys."""
+def check_languages(items_doc):
+    """Every text/<lang>.json present (en.json required) carries every du'a id with exactly its
+    Arabic's keys, and says whether a reviewer has passed it. English is checked here and only here."""
+    before = len(failures)
     duas = {i["id"]: i for i in items_doc["items"] if i.get("kind") == "dua"}
-    languages = []
-    for name in sorted(n for n in os.listdir(TEXT_DIR) if n.endswith(".json")):
+    reviewed, drafts = [], []
+    names = sorted(n for n in os.listdir(TEXT_DIR) if n.endswith(".json"))
+    if "en.json" not in names:
+        fail("text/en.json is missing: OpenDua's English is required")
+    for name in names:
         lang, where = name[:-len(".json")], f"text/{name}"
-        languages.append(lang)
-        doc = en_doc if lang == "en" else load(os.path.join(TEXT_DIR, name))
-        if lang != "en":  # check_structure has walked en.json already
-            walk_strings(doc, where)
-        if set(doc) != {"language", "items"} or doc.get("language") != lang:
-            fail(f"{where}: top level {sorted(doc)} language {doc.get('language')!r}, expected {lang!r}")
-        items = doc.get("items", {})
+        doc = load(os.path.join(TEXT_DIR, name))
+        if not isinstance(doc, dict) or not isinstance(doc.get("items"), dict):
+            fail(f"{where}: not an object with an \"items\" object")
+            continue
+        walk_strings(doc, where)
+        if set(doc) != {"language", "reviewed", "items"} or doc.get("language") != lang:
+            fail(f"{where}: top level {sorted(doc)} language {doc.get('language')!r}, "
+                 f"expected language, reviewed and items with language {lang!r}")
+        flag = doc.get("reviewed")
+        if "reviewed" in doc and not isinstance(flag, bool):  # a missing flag is the top-level failure above
+            fail(f"{where}: \"reviewed\" must be true or false, not {flag!r}")
+        elif lang == "en" and flag is False:
+            fail(f"{where}: OpenDua's English is the reviewed text; \"reviewed\" must be true")
+        (reviewed if flag is True else drafts).append(lang)
+        items = doc["items"]
         missing, extra = sorted(set(duas) - set(items)), sorted(set(items) - set(duas))
         if missing or extra:
             fail(f"{where}: missing du'a ids {missing}, ids that are not du'a {extra}")
@@ -297,7 +303,11 @@ def check_languages(items_doc, en_doc):
                     fail(f"{where}: {item_id} {key} is not NFC")
                 elif "'" in text:
                     fail(f"{where}: {item_id} {key} has an ASCII apostrophe; use ’")
-    print(f"languages: {' '.join(languages)}; each file present carries the {len(duas)} du'a ids with their Arabic's keys")
+    if len(failures) > before:
+        print(f"languages: {len(failures) - before} failure(s) in text/")
+    else:
+        print(f"languages: each of {' '.join(n[:-len('.json')] for n in names)} carries the {len(duas)} du'a ids with their Arabic's keys; "
+              f"reviewed (shown): {' '.join(reviewed) or 'none'}; drafts (not shown): {' '.join(drafts) or 'none'}")
 
 
 def check_evening_marks(item_id, arabic):
@@ -411,9 +421,9 @@ def main():
     if len(sys.argv) > 2:
         print("usage: check_items.py [hisnmuslim-chapter-27.json]")
         return 2
-    items_doc, en_doc, extract = load(ITEMS_JSON), load(EN_JSON), load(EXTRACT)
-    check_structure(items_doc, en_doc, extract)
-    check_languages(items_doc, en_doc)
+    items_doc, extract = load(ITEMS_JSON), load(EXTRACT)
+    check_structure(items_doc, extract)
+    check_languages(items_doc)
     witness = sys.argv[1] if len(sys.argv) == 2 else None
     if witness is None:
         print("WARNING: hisnmuslim chapter JSON not given; the Arabic was NOT compared with the Hisn text")

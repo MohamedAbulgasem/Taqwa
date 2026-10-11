@@ -571,6 +571,7 @@ internal val EN_JSON = """{
       "both": "I take refuge in Allah’s perfect words from the evil He has created."
     }
   },
-  "language": "en"
+  "language": "en",
+  "reviewed": true
 }
 """

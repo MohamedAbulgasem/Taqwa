@@ -8,7 +8,7 @@ into tools/adhkar/opendua-morning-evening.json under OpenDua's required attribut
 Without a path, that checked-in extract is the input. Either way the script then writes
 
     shared/src/commonMain/composeResources/files/adhkar/items.json     (19 items, book order)
-    shared/src/commonMain/composeResources/files/adhkar/text/en.json   (15 du'a translations)
+    shared/src/commonMain/composeResources/files/adhkar/text/en.json   (15 du'a translations, reviewed)
 
 The Arabic, transliteration and English come from OpenDua; the sets, the daily flag,
 the Quran references and the hadith sources come from the tables below (spec section
@@ -260,7 +260,9 @@ def main():
         fail(f"{EXTRACT} is not the OpenDua v{DATA_VERSION} extract")
     items, translations = build(source["entries"])
     write_json(ITEMS_JSON, {"schema": 1, "attribution": ATTRIBUTION, "items": items})
-    write_json(EN_JSON, {"language": "en", "items": translations})
+    # "reviewed": OpenDua's published English is the reviewed text; the app shows a language's
+    # translations only when its file says so (the drafted languages carry false until a reviewer flips it).
+    write_json(EN_JSON, {"language": "en", "reviewed": True, "items": translations})
     morning = sum(1 for i in items if MORNING in i["sets"])
     evening = sum(1 for i in items if EVENING in i["sets"])
     print(f"{len(items)} items ({len(translations)} du'a, {len(items) - len(translations)} Quran); "

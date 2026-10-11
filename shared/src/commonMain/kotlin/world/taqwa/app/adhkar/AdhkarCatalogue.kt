@@ -10,7 +10,8 @@ import kotlin.coroutines.cancellation.CancellationException
  * Reading the adhkar the build ships: `files/adhkar/items.json` (the items, the Arabic, the
  * transliteration, the counts and sources, built by `tools/adhkar`) and one
  * `files/adhkar/text/<language>.json` per translated language. Both are bundled, so the page works
- * offline and nothing is fetched.
+ * offline and nothing is fetched. A language's file is read only once a reviewer has marked it
+ * `"reviewed": true` (see [loadText]).
  *
  * The parsing is separate from the reading ([parse], [parseText]) so tests and the pipeline checks
  * can hand it a string.
@@ -41,18 +42,38 @@ object AdhkarCatalogue {
         return file.items.map { it.toItem() }
     }
 
-    /** @throws SerializationException if [json] is not a translation file. */
+    /**
+     * Any well-formed translation file, reviewed or not: the content checks read the drafts too.
+     * Nothing the reader sees comes through here; the app reads through [loadText], which is where
+     * a file that has not been reviewed is turned away.
+     *
+     * @throws SerializationException if [json] is not a translation file.
+     */
     fun parseText(json: String): AdhkarText {
         val file = format.decodeFromString(TextFile.serializer(), json)
         return AdhkarText(file.language, file.items)
     }
 
+    /**
+     * Whether [json]'s `reviewed` is `true`. Absent, `false` or `null` all mean not reviewed.
+     *
+     * @throws SerializationException if [json] is not a translation file.
+     */
+    internal fun isReviewed(json: String): Boolean =
+        format.decodeFromString(TextFile.serializer(), json).reviewed == true
+
     suspend fun load(): List<AdhkarItem> = load { Res.readBytes(it) }
 
     /**
-     * [language]'s translations, or null when the build has no file for it — the caller falls back
-     * to English, or shows the Arabic alone. A file that is there and does not parse is not
-     * "absent" and is thrown (see [parseText]), so a broken translation cannot pass as a missing one.
+     * [language]'s translations, or null when the build has no file for it or its file has not been
+     * reviewed — the caller falls back to English, or shows the Arabic alone. A file that is there
+     * and does not parse is not "absent" and is thrown (see [parseText]), so a broken translation
+     * cannot pass as a missing one.
+     *
+     * Why a reviewed flag and not a missing file: every file in `files/adhkar/text/` travels in every
+     * build, including the drafts waiting for their reviewer, and an unreviewed translation of a
+     * du'a must never reach a reader. A draft carries `"reviewed": false` and reads exactly as no
+     * file; the reviewer's sign-off is flipping it to `true`, the one switch that ships a language.
      */
     suspend fun loadText(language: String): AdhkarText? = loadText(language) { Res.readBytes(it) }
 
@@ -73,7 +94,8 @@ object AdhkarCatalogue {
         } catch (missing: Exception) {
             return null
         }
-        return parseText(bytes.decodeToString())
+        val file = format.decodeFromString(TextFile.serializer(), bytes.decodeToString())
+        return if (file.reviewed == true) AdhkarText(file.language, file.items) else null
     }
 
     private const val ITEMS_PATH = "files/adhkar/items.json"
@@ -112,7 +134,12 @@ private class QuranDto(val surah: Int, val ayah: Int? = null, val prefix: String
 private class SourceDto(val collection: String, val number: String)
 
 @Serializable
-private class TextFile(val language: String, val items: Map<String, Map<String, String>> = emptyMap())
+private class TextFile(
+    val language: String,
+    val items: Map<String, Map<String, String>> = emptyMap(),
+    // Nullable and absent-means-no: only an explicit `true` ships a language (see loadText).
+    val reviewed: Boolean? = null,
+)
 
 private fun ItemDto.toItem() = AdhkarItem(
     id = id,

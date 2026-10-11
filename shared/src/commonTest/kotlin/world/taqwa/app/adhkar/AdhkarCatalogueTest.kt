@@ -166,6 +166,21 @@ class AdhkarCatalogueTest {
         }
     }
 
+    @Test fun `a language file reaches the reader only once it is marked reviewed`() = runTest {
+        // `flag` goes in before "items". A draft reads exactly as no file: false, null and no flag at all.
+        fun file(flag: String) = """{"language": "xx", $flag "items": {"hisn-096": {"both": "draft"}}}"""
+        suspend fun loaded(flag: String) = AdhkarCatalogue.loadText("xx") { file(flag).encodeToByteArray() }
+        assertNull(loaded(""""reviewed": false,"""))
+        assertNull(loaded(""""reviewed": null,"""))
+        assertNull(loaded(""))
+        assertEquals("draft", loaded(""""reviewed": true,""")!!.translationFor("hisn-096", AdhkarSet.MORNING))
+        // The parser still reads a draft, so the content checks can see it; the gate is the loader's.
+        assertEquals("draft", AdhkarCatalogue.parseText(file(""""reviewed": false,""")).translationFor("hisn-096", AdhkarSet.EVENING))
+        assertFalse(AdhkarCatalogue.isReviewed(file("")))
+        // OpenDua's English, as bundled, is reviewed.
+        assertTrue(AdhkarCatalogue.isReviewed(EN_JSON))
+    }
+
     @Test fun `a schema this build does not know is refused`() {
         assertFailsWith<SerializationException> {
             AdhkarCatalogue.parse("""{"schema": 2, "items": []}""")

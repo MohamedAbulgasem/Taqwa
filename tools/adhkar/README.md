@@ -12,8 +12,8 @@ dataset and checked against the Hisn text.
 | `opendua-morning-evening.json` | The 24 entries (Hisn 75–98), verbatim, under OpenDua's attribution: the build's input |
 | `TRANSLATIONS-FOR-REVIEW.md` | The five drafted translations beside the Arabic and the English, one section per language, for the reviewers to mark up |
 | `../../shared/src/commonMain/composeResources/files/adhkar/items.json` | The 19 items, book order (schema 1) |
-| `../../shared/src/commonMain/composeResources/files/adhkar/text/en.json` | English for the 15 du'a items (OpenDua's) |
-| `../../shared/src/commonMain/composeResources/files/adhkar/text/{bn,fr,id,tr,ur}.json` | Bengali, French, Indonesian, Turkish and Urdu for the 15 du'a items: drafts awaiting review (see Translations below) |
+| `../../shared/src/commonMain/composeResources/files/adhkar/text/en.json` | English for the 15 du'a items (OpenDua's), `"reviewed": true` |
+| `../../shared/src/commonMain/composeResources/files/adhkar/text/{bn,fr,id,tr,ur}.json` | Bengali, French, Indonesian, Turkish and Urdu for the 15 du'a items: drafts, `"reviewed": false` until their reviewer flips it (see Translations below) |
 
 Licence: `docs/licences/OpenDua-CC-BY-4.0.txt` (CC BY 4.0, attribution verbatim).
 
@@ -32,10 +32,11 @@ UTF-8 without BOM, two-space indent, trailing newline): a rebuild from the same 
 is byte-identical. `check_items.py` exits 1 on any failure; without the hisnmuslim file
 it runs the structural checks only and prints a warning that the Arabic was not
 compared (a path that is given but missing is a failure, not a warning). It also checks
-every `text/<lang>.json` present: exactly the 15 du'a ids, each with exactly its Arabic's
-keys (`morning`/`evening` for Hisn 77 and 78, `morning` for Hisn 90, `both` otherwise), no
-empty string, NFC, and typographic apostrophes only. A language may have no file
-(`AdhkarCatalogue.loadText` then returns null).
+`text/en.json` and every other `text/<lang>.json` present: a `"reviewed"` true or false
+(`en.json` true), exactly the 15 du'a ids, each with exactly its Arabic's keys
+(`morning`/`evening` for Hisn 77 and 78, `morning` for Hisn 90, `both` otherwise), no empty
+string, NFC, and typographic apostrophes only; it prints which languages are reviewed
+(shown) and which are drafts (not shown). A language may have no file.
 
 ## Inputs
 
@@ -131,12 +132,20 @@ English as a cross-check: "Allah" untranslated (আল্লাহ, اللہ), �
 name, the language's usual word for رب, no explanatory additions, the Arabic's sentence
 boundaries, typographic apostrophes. They are drafts: `TRANSLATIONS-FOR-REVIEW.md` sets
 each one beside the Arabic and the English, with the choices a reviewer should weigh,
-and a language ships only after one reviewer has read it. The app bundles whatever is
-in `text/`, so before a release is cut, a language not yet reviewed has its file taken
-out (the check allows a missing language). A reviewer's corrections go straight into
-`text/<lang>.json`; `build_items.py` never writes those files. Indonesian is `id.json`
-only: the `values-in` twin is an Android resource rule, not a file rule. The Quran items
-need no entry; the app shows its own Quran translation for them.
+and a language ships only after one reviewer has read it. A reviewer's corrections go
+straight into `text/<lang>.json`; of the files in `text/`, `build_items.py` writes only
+`en.json`. Indonesian is `id.json` only: the `values-in` twin is an Android resource
+rule, not a file rule. The Quran items need no entry; the app shows its own Quran
+translation for them.
+
+**The release switch is `"reviewed"`.** Every file in `text/` travels in every build, so
+each carries `"reviewed": true|false`, and `AdhkarCatalogue.loadText` reads a file whose
+flag is not `true` exactly as a missing one: the reader never sees a draft. `en.json`
+(OpenDua's published English, written by `build_items.py`) is `true`; the five drafts are
+`false`. When a language's reviewer has passed it and the corrections are in, flipping its
+flag to `true` ships it, one language at a time, and nothing else does; the same change
+moves the language from `DRAFTS` to `REVIEWED` in `AdhkarTranslationsTest`, which asserts
+every draft loads as null and every reviewed language loads.
 
 ## Updating to a new OpenDua release
 
