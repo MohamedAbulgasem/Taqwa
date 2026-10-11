@@ -291,10 +291,10 @@ support@taqwa.world.
   never-early and lateness; checks each Automatic Asr against the place's mosque tables; and checks that
   no class-D Fajr begins before the Fajr of most mosque tables held for the place.
 - **Stamps** per unit: places, dates, place-days, Ramadan coverage, worst minutes, class,
-  `provenThrough`, keyed on a hash of the engine and registry, the same on every machine (the methods in
-  canonical words, every double as whole millionths, so a CPU's last bits cannot move it). A unit with
-  no official days has no "at most" figure. About states the range and, after it, "not yet checked after
-  {date}". `release.sh` and
+  `provenThrough`, keyed on a hash of the engine and registry that a CPU's last bits do not move (the
+  methods in canonical words, every double as whole millionths; only a value within its last bits of a
+  rounding edge could, BUILD-LOG 10–11 October). A unit with no official days has no "at most" figure.
+  About states the range and, after it, "not yet checked after {date}". `release.sh` and
   `ios-release.sh` refuse to build on a stale or red stamp; the Ramadan release also refuses unless every
   A/B unit's proof covers Ramadan 1448 or the gate has demoted it.
 - **The monitor** (slice 2): a scheduled local job, not public CI, that fetches each entry's newest

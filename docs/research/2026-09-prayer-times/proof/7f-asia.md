@@ -681,8 +681,9 @@ its doubles as whole millionths too, BUILD-LOG). The regenerated list is the sam
 place, with only the fingerprint added: the reaches do not depend on which unit a user takes.
 
 **Not proven.** The 25 QMDB city entries off the app's list are proven as villages are, against their
-own computed day, not their tables. The site's `jvmTest` runs the fingerprint's test on Linux at every
-push to `main` and every six hours: green on all five runs since it reached `main` on 10 October.
+own computed day, not their tables. The site's `jvmTest` runs the fingerprint's test on Linux at each
+push to `main` that touches its paths, and every six hours: green on all five runs since it reached
+`main` on 10 October.
 
 ## Across each unit (10 Oct 2026, the review of the city-points branch)
 

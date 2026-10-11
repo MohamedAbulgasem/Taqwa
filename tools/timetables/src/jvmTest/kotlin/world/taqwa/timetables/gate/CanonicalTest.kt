@@ -21,8 +21,8 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 /**
- * The stamps' fingerprint ([Stamps.fingerprint], in [Canonical] words) is the same on every machine and still
- * moves with every real change of a method.
+ * The stamps' fingerprint ([Stamps.fingerprint], in [Canonical] words) does not move with a double's last bits,
+ * so that it can be the same on every machine, and still moves with every real change of a method.
  *
  * It once printed each method through its data class's `toString`, every double with every digit. The curves a
  * method carries are computed with `sin` and `cos`, whose last bits HotSpot's own routines give differently on
@@ -30,7 +30,10 @@ import kotlin.test.assertTrue
  * entries, each rewriting the other's (BUILD-LOG, 6 October), and `checkStamps` called a stamp stale after
  * every cloud `prove`. With the maths routines switched off on this Mac (the JDK's portable ones instead), the
  * old fingerprint moved those twelve hashes alone, through 46,381 values up to 4e-14 of a degree apart; the
- * canonical one moves none.
+ * canonical one moves none. The portable routines are a stand-in for another CPU, not the runner's own maths
+ * (at the cloud's 5 October commit the three give three different old hashes), which no test here runs; the
+ * runner's first measurement is a weekly `prove` with new captures after this reached `main` (BUILD-LOG, 10–11
+ * October).
  *
  * The samples: Paris (fr.gmp: computed Fajr and Isha curves and an end-of-eating curve), Tromsø (no.irn: IRN's
  * clock rule), Astana (kz.qmdb: its curves at a user's latitude) and Tataouine (tn.inm: monthly offsets).
@@ -65,10 +68,13 @@ class CanonicalTest {
 
     @Test
     fun `a doubles last bits leave the fingerprint as it is`() {
-        // Each value moved by up to 16 units in its last place, alternately up and down: four times the widest
-        // difference measured between two machines' maths routines (4e-14 of a degree, about 10 at 16 degrees).
+        // Each curve value moved by up to 16 units in its last place, alternately up and down, and then by up to
+        // 2.6e-13 of a degree: past the widest difference measured with every maths routine's answer moved by up
+        // to 16 units in its last place (2.4e-13), and seven times the widest the JDK's portable routines gave
+        // against this Mac's (3.7e-14, up to 58 units in the last place of a small value).
         fun jitter(curve: DoubleArray) = DoubleArray(curve.size) { i ->
-            curve[i] + (if (i % 2 == 0) 1 else -1) * ((i % 16) + 1) * Math.ulp(curve[i])
+            val sign = if (i % 2 == 0) 1 else -1
+            curve[i] + sign * ((i % 16) + 1) * Math.ulp(curve[i]) + sign * ((i % 16) + 1) * 1.6e-14
         }
         for (m in listOf(paris, astana, tromso)) {
             val moved = m.copy(

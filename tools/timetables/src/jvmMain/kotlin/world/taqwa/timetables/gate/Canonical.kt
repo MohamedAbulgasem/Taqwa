@@ -11,17 +11,21 @@ import kotlin.math.abs
  *
  * A data class's `toString` was not that. It prints a double with every digit. The curves a method
  * carries (its Fajr and Isha angles by day, its end-of-eating depressions) are computed with `sin` and
- * `cos`, and HotSpot's own routines for those give different last bits on each CPU. On the stamps'
- * 46,381 such values they differ by up to 3.7e-14 of a degree, enough to move every hash that holds
- * one: the twelve curve entries the cloud's `prove` rewrote on 3 and 5 October, and the Mac back.
- * Here instead:
+ * `cos`, and HotSpot's own routines for those give different last bits on each CPU, enough to move
+ * every hash that holds one: the twelve curve entries the cloud's `prove` rewrote on 3 and 5 October,
+ * and the Mac back. The runner's own values were never measured here. Against the JDK's portable
+ * routines, a stand-in for another CPU's and not the runner's (at the cloud's 5 October commit the
+ * runner, the Mac and the portable routines give three different hashes for each of the twelve),
+ * 46,381 of the stamps' values differ, by up to 3.7e-14 of a degree. Here instead:
  *
  * - every double is written as a whole number of millionths ([MILLIONTHS]): a millionth of a degree
  *   for an angle or a point, a millionth of a night for a fraction. That is the finest step any
- *   method value is written to in the registry (Umm al-Qura's declination bias has six decimals; only
- *   a few coordinates have more, below 0.11 m), so no literal loses a digit that matters. A
- *   micro-degree moves a twilight time by under a millisecond at the tables' latitudes (about 0.4 ms
- *   at 50° N), where the margins are whole seconds and the times whole minutes;
+ *   method value is written to in the registry (Umm al-Qura's declination bias has six decimals).
+ *   QMDB's points are kept to 1e-7 of a degree (`QmdbPlaceCodec.SCALE`) and a few Umm al-Qura points
+ *   to 1e-8; a millionth drops at most 0.11 m of them, so no literal loses a digit that matters. A
+ *   micro-degree moves a twilight time by about 0.4 ms at 50° N; more only on the days near persistent
+ *   twilight in the north, where the sun's depression barely changes. The margins are whole seconds
+ *   and the times whole minutes;
  * - every array and list by its elements in order, a set by its elements and a map by its keys, each
  *   sorted by its own canonical words;
  * - an enum by its type and name, a string quoted, a record (a data class, a data object, a `Pair`)
@@ -32,9 +36,14 @@ import kotlin.math.abs
  *
  * Rounding to the nearest millionth can still flip a computed value, but only where it lies within its
  * last-bit difference of a half-millionth. Of the 77,866 distinct values the fingerprints held on 11
- * October 2026, the closest lay 5.4e-12 of a degree from one: 144 times the widest difference
- * measured. Over the whole manifest that is about 2e-4 expected crossings (the summed differences,
- * 2.4e-10, over a millionth). A literal never crosses, since it parses to the same double everywhere.
+ * October 2026, the closest lay 5.4e-12 of a degree from one: 144 times the widest difference the
+ * portable routines gave, and 22 times the widest with every `sin`, `cos`, `tan`, `exp`, `log`,
+ * `log10` and `pow` answer moved by up to 16 units in its last place (2.4e-13). Over the whole manifest
+ * that is about 2e-4 expected crossings with the portable routines' differences (summed 2.4e-10, over
+ * a millionth), and about 2e-3 if every maths answer can differ by up to 2 units in its last place
+ * (summed 2.4e-9). With the portable routines, and with the moved answers on four seeds, all 71
+ * engine hashes stayed the same (BUILD-LOG, 10–11 October). Neither is the runner's own maths, which
+ * was never run here. A literal never crosses, since it parses to the same double everywhere.
  */
 object Canonical {
 

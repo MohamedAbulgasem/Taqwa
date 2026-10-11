@@ -3209,19 +3209,29 @@ Germany, France, Ireland, Norway, Sweden). Each whole gate on the Mac wrote them
 stamps carry the Mac's hashes, so Monday's run would have flipped them again.
 
 **The cause.** The fingerprint printed each method through its data class's `toString`. Kotlin prints
-a data class's arrays by content, so no identity was printed: none of the 5,612 fingerprints holds one.
+a data class's arrays by content, so no identity was printed: none of the 5,540 fingerprints holds one.
 The doubles were the trouble. These twelve entries carry curves computed at the point: Fajr and Isha
 angles by day, and end-of-eating depressions, all from `sin` and `cos`. HotSpot computes those with its
-own routine for each CPU, and the last bits differ. This was reproduced on the Mac by switching `sin`
-and `cos` to the JDK's portable routines (`-XX:DisableIntrinsic=_dsin,_dcos`). The old fingerprint then
-moved exactly those twelve hashes. 46,381 curve values moved, by a median of 5e-15° and at most 3.7e-14°.
-A whole gate run that way changed the twelve `engineHash` lines and not one other byte, over the same
-10,997 rows and 4,001,889 place-days. Switching off `tan`, `log`, `exp` and `pow` instead moved nothing.
+own routine for each CPU, and the last bits differ. On the Mac, switching `sin` and `cos` to the JDK's
+portable routines (`-XX:DisableIntrinsic=_dsin,_dcos`) made the old fingerprint move exactly those
+twelve hashes. 46,381 curve values moved, by a median of 5e-15° and at most 3.7e-14°. A whole gate run
+that way changed the twelve `engineHash` lines and not one other byte, over the same 10,997 rows and
+4,001,889 place-days. The portable routines are a third set of last bits, not the runner's. At the
+cloud's 5 October commit (`1a93ddc5`), the runner's hash, the Mac's and the portable routines' are three
+different hashes for each of the twelve. So the switch shows which values depend on the CPU, not the
+runner's own values. Switching off `tan`, `log`, `exp` and `pow` instead moved nothing, and that says
+nothing about the runner's `tan`, `exp`, `log` or `pow`: on this Mac's arm64 JVMs only `sin` and `cos`
+differ from the portable routines (about one answer in fifteen; none of 60 million for `tan`,
+`exp`, `log`, `log10`, `pow`, `asin`, `acos` or `atan2`), so that switch changes nothing here, while
+x86_64 HotSpot, by its source, has routines of its own for all seven of `sin`, `cos`, `tan`, `exp`, `log`, `log10` and
+`pow`.
 
 **The fix.** `Stamps.fingerprint` now writes every method in `Canonical` words:
 - every double as whole millionths: a millionth of a degree for an angle or a point. No method value
-  in the registry is written finer (Umm al-Qura's bias has six decimals; a few coordinates have more,
-  below 0.11 m). At 50° N a micro-degree moves a twilight time by about 0.4 ms;
+  in the registry is written finer (Umm al-Qura's bias has six decimals). QMDB's points are kept to
+  1e-7 of a degree (`QmdbPlaceCodec.SCALE`) and a few Umm al-Qura points to 1e-8; a millionth drops at
+  most 0.11 m of them. A micro-degree moves a twilight time by about 0.4 ms at 50° N; more only on the
+  days near persistent twilight in the north, where the sun's depression barely changes;
 - arrays and lists in order, sets and maps sorted by their canonical words, enums by type and name,
   strings quoted;
 - a record (a data class, a data object, a `Pair`) by its type and every instance field, sorted by
@@ -3231,23 +3241,39 @@ A whole gate run that way changed the twelve `engineHash` lines and not one othe
 
 Rounding to the nearest millionth can flip only where a value lies within its last-bit difference of
 a half-millionth. Of the 77,866 distinct values the fingerprints hold, the closest lies 5.4e-12° from
-one, 144 times the widest difference measured. Over the whole manifest that is about 2e-4 expected
-crossings (the summed differences, 2.4e-10, over a millionth). A literal never crosses, since it parses
-to the same double everywhere.
+one: 144 times the widest difference the portable routines gave, and 22 times the widest with every
+maths answer moved by up to 16 units in its last place (below). Over the whole manifest that is about
+2e-4 expected crossings with the portable routines' differences (summed 2.4e-10, over a millionth),
+and about 2e-3 if every maths answer can differ by up to 2 units in its last place (summed 2.4e-9).
+A literal never crosses, since it parses to the same double everywhere.
 
 **Measured.** Four setups on this Mac gave byte-identical fingerprints for all 71 entries: Temurin
 21.0.12, Android Studio's JBR 25, Homebrew's OpenJDK 26, and Temurin 21 with the maths routines off.
 The whole gate with the routines off wrote all 71 stamps byte-identical to the normal run, and
-`checkStamps` run that way is green on the Mac's stamps.
+`checkStamps` run that way is green on the Mac's stamps. The routines-off setup is a stand-in for
+another CPU, not the runner (above).
+
+The review then tried a harder stand-in, and the fixer reproduced it: the tools' classes rewritten so
+that every `Math.sin`, `cos`, `tan`, `exp`, `log`, `log10` and `pow` answer (76 call sites in 11
+classes, the engine's included) is moved by up to 2 units in its last place, the amount fixed by the
+argument as any real routine's is, on three seeds, and by up to 16 on a fourth. Under 2, between
+217,125 and 219,003 curve values moved, by at most 5.7e-14°; under 16, 241,270 moved, by at most
+2.4e-13°. Every one was a curve value of the same twelve entries, no point moved, and no value crossed
+a rounding edge. All 71 engine hashes stayed those of the committed stamps, and `checkStamps` run on
+the rewritten classes was green on every seed.
 
 This Mac holds no x86_64 JVM (every one installed is arm64), and none was downloaded. So Linux equality
 is argued and simulated, not measured. The cloud's weekly `prove` on Monday 12 October is its first
-real test. If a stamp's `engineHash` moves there, that commit's diff will show it.
+real test, but only if this fix is on `main` before 03:00 UTC that day and `prove` has new captures to
+prove. A run with nothing new to prove, or one that puts its rows back, commits no stamps and measures
+nothing, so a quiet Monday is not a pass. The thing to check is that run's "Gate: the weekly monitor's
+captures … proven" commit: none of the twelve curve entries' `engineHash` lines may change unless that
+entry's own rows changed.
 
 `QmdbPlaceList.FINGERPRINT` is measured on Linux already. The Website workflow runs the tools' `jvmTest`
-on ubuntu (Temurin 21) at each push and every six hours. That includes `CityUnitsTest`'s comparison,
-which has passed there on all five runs since it reached `main` on 10 October. It is also unchanged
-here with the routines off.
+on ubuntu (Temurin 21) at each push that touches its paths, and every six hours. That includes
+`CityUnitsTest`'s comparison, which has passed there on all five runs since it reached `main` on 10
+October. It is also unchanged here with the routines off.
 
 The other generated files were checked for the same flaw, and none needed a change:
 - `ProofStamps.kt` holds no hash and no double;
@@ -3258,8 +3284,8 @@ The other generated files were checked for the same flaw, and none needed a chan
 
 **Tests.** `CanonicalTest` works on real samples: Paris (fr.gmp's three curves), Tromsø (IRN's clock
 rule), Astana (kz.qmdb) and Tataouine (tn.inm's monthly Asr). It checks four things:
-- the fingerprint stays the same when every curve value moves by up to 16 units in its last place, and
-  the angles and points by one;
+- the fingerprint stays the same when every curve value moves by up to 16 units in its last place and
+  2.6e-13° more (past the widest difference above), and the angles and points by one unit;
 - it changes with each of 13 changes, including a second of margin, a hundredth of an angle, and one
   curve slot by a thousandth or by a millionth. It also changes with a clock-rule depression or window,
   and with one month's Asr offset;
@@ -3272,7 +3298,7 @@ On `main`'s fingerprint, the three tests aimed at the flaw fail.
 (core) now says what an implementation must be. Nothing else in any stamp moved, and the gate's report
 is identical. `ProofStamps.kt` did not change, and the golden vector is byte-identical. The monitor's
 engine signature moves with the two comments (`ClockRule.kt`, `IrnArctic.kt`) and its checker hash with
-`Stamps.kt`, so its next run checks every held table once more.
+`Stamps.kt` and `Canonical.kt`, so its next run checks every held table once more.
 
 Checked: the whole gate, 10,997 rows and 4,001,889 place-days, 0 early, 0 late ends, none over its
 limit, nothing BROKEN; `checkStamps` (71 entries) green, and `release.sh`'s own stamp-check line
@@ -3280,3 +3306,12 @@ passes; tools `jvmTest` 313/0 with the archive; `:shared:testAndroidHostTest` 1,
 `:shared:compileTestKotlinIosSimulatorArm64` built (the shared change is two comments). `CI=true
 generate` writes 55 cities and 129 pages; the site builds 164 pages, all checks good, and its tests
 pass 18/0.
+
+After the review (11 October), the account of the evidence above was corrected: the portable routines
+and the moved answers are stand-ins for the runner, not the runner; the expected crossings; the count
+of fingerprints, the coordinates, the micro-degree and when the Website workflow runs. The three
+hashes at `1a93ddc5` (twelve entries, three each) and the harder stand-in were both reproduced, and
+`CanonicalTest`'s last-bits test now also moves each curve value by up to 2.6e-13°. No stamp,
+`ProofStamps.kt` or golden-vector line moved: the whole gate is again 10,997 rows and 4,001,889
+place-days, 0 early, 0 late ends, none over its limit, nothing BROKEN, with its report line-identical
+and its stamps byte-identical; `checkStamps` is green, and tools `jvmTest` 313/0 with the archive.

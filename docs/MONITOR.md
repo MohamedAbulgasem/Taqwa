@@ -245,10 +245,16 @@ published and why). Its outputs go to `monitor/proof/` in the private repository
 out with the reason: dates, counts and minutes), the generator's notices before and after (cities
 newly proven), and `changed`.
 
-The stamps the runner writes carry the same `engineHash` a Mac run writes for the same engine and
-methods. Their fingerprint prints no double: every one is whole millionths (`Canonical`, since 11
+The stamps the runner writes should carry the same `engineHash` a Mac run writes for the same engine
+and methods. Their fingerprint prints no double: every one is whole millionths (`Canonical`, since 11
 October 2026). Until then, `sin` and `cos` gave different last bits on the runner's CPU and the
-Mac's, so each cloud run left twelve stamps stale for the Mac's `release.sh`.
+Mac's, so each cloud run left twelve stamps stale for the Mac's `release.sh`. That the two now agree
+is argued and tested on the Mac only (BUILD-LOG, 10–11 October). The first run to measure it is the
+first weekly run after the fix reached `main` that has new captures to prove: a run with nothing new
+to prove, or one that puts its rows back, commits no stamps and measures nothing. In that run's
+"Gate: the weekly monitor's captures … proven" commit, no entry's `engineHash` may change unless that
+entry's own rows changed (watch the twelve curve entries: `be.emb`, `fr.gmp`, `ie.icci`, `no.irn`,
+`kz.qmdb` and the cautious entries of Belgium, Canada, Germany, France, Ireland, Norway and Sweden).
 
 **Publishing.** The private repository's commit step then commits the pinned copies with the run's
 other changes. Only when that push landed, its rebase brought in no change under `archive/tables/`
