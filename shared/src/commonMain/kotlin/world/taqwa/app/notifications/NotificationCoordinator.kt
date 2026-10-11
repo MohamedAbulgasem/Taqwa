@@ -71,8 +71,10 @@ class NotificationCoordinator(
         val windowDays = NotificationPlanner.windowDaysFor(capacity, notificationSettings)
         // Resolved here, at schedule time, rather than injected: a reschedule can be triggered
         // from a boot receiver or a background task, where there is no composition to read a
-        // locale from and the device's own default is the only truth available.
-        val format = createPlatformFormat()
+        // locale from and the device's own default is the only truth available. The clock format
+        // is read from the repository for the same reason: the times baked into the notification
+        // text are written now, days before they fire, in the format the reader has chosen.
+        val format = createPlatformFormat(settingsRepository.clockFormat.first())
         return NotificationPlanner.plan(
             location = location,
             settings = prayerSettings,

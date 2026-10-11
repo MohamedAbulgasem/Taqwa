@@ -48,13 +48,13 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
         return when (kind) {
             NotificationKind.PRAYER -> words.prayerBody
                 .replace("{prayer}", n)
-                .replace("{time}", clockTime)
+                .replace("{time}", isolated(clockTime))
             NotificationKind.REMINDER -> reminder(n, minutesBefore, clockTime)
             // Fajr by its one name in this language, not the paired «Fajr · الفجر» a title
             // wears: inside a sentence that already has a separator the pair reads as a list.
             NotificationKind.TAHAJJUD -> words.tahajjudBody
                 .replace("{prayer}", PrayerNaming.name(prayer, format.languageTag()))
-                .replace("{time}", clockTime)
+                .replace("{time}", isolated(clockTime))
         }
     }
 
@@ -66,8 +66,22 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
         } else {
             words.reminderBody
         }
-        return body.replace("{prayer}", prayerName).replace("{minutes}", minutes).replace("{time}", clockTime)
+        return body.replace("{prayer}", prayerName).replace("{minutes}", minutes).replace("{time}", isolated(clockTime))
     }
+
+    /**
+     * A 12-hour time ("5:10 PM", "٥:١٠ م", "ÖS 5:10") is digits, a space and a marker, often in a
+     * different script from the sentence around it. Left bare, the bidi algorithm lets the "·" and
+     * the words beside it reorder those pieces, and "5:10 PM" can come out "PM 5:10" in an Arabic
+     * or Urdu notification. Wrapped in a first-strong isolate and its pop (U+2068 … U+2069), the
+     * same isolate Today's sub-lines use, it stays one unit whichever way the sentence runs.
+     *
+     * Only a time that has more than digits and a colon is wrapped. A 24-hour time has always
+     * shipped bare and reads correctly in every language here, so it is left exactly as it was:
+     * the notifications armed under the default setting stay byte for byte what they were.
+     */
+    private fun isolated(clockTime: String): String =
+        if (clockTime.all { it.isDigit() || it == ':' }) clockTime else "\u2068$clockTime\u2069"
 
     // Not read from string resources: a channel is created from the Android scheduler, which can
     // be running inside a boot receiver where no Compose resource lookup exists — the same reason

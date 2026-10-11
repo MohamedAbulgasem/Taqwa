@@ -34,6 +34,7 @@ import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.settings.AboutScreen
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
@@ -67,6 +68,9 @@ fun App(container: AppContainer) {
     val settings = container.settingsRepository
     val themeModeState = settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val themeMode by themeModeState
+    // How clock times are written. It is an input to the one format every screen reads (below),
+    // so a change in Prayer times reaches every time on screen at once.
+    val clockFormat by settings.clockFormat.collectAsState(initial = ClockFormat.TWENTY_FOUR_HOUR)
     val prayerSettingsState = settings.prayerSettings.collectAsState(initial = PrayerSettings())
     val notificationSettingsState = settings.notificationSettings.collectAsState(initial = NotificationSettings())
     val widgetBackgroundState = settings.widgetBackground.collectAsState(
@@ -111,7 +115,7 @@ fun App(container: AppContainer) {
     // Quran screens', the widget mirror's — reads its language from this one value, so there is
     // exactly one place that decides what language the app is in.
     val uiLanguage = stringResource(Res.string.ui_language)
-    val platformFormat = remember(uiLanguage) { createPlatformFormat() }
+    val platformFormat = remember(uiLanguage, clockFormat) { createPlatformFormat(clockFormat) }
     // From the resolved strings, not the locale tag, for the reason given on isRtlLocale(): the
     // tree mirrors exactly when the words on it are Arabic.
     val layoutDirection = if (isRtlLocale()) LayoutDirection.Rtl else LayoutDirection.Ltr

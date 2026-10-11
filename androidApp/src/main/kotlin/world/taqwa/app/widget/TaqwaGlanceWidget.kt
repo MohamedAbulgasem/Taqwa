@@ -120,11 +120,13 @@ private val TINY_MAX_WIDTH = 100.dp
 
 /**
  * From this width the card has room for the prayer list beside the countdown. Derived, not
- * guessed: the smallest countdown block is 61 dp, the longest row needs 11.5 sp x 10.1 em beside
- * it, plus padding and gaps, which comes to about 230 dp. A Pixel's 2x2 is 190 dp and stays a
- * stacked card; a 3x2 or 4x2 on any launcher measured so far clears it.
+ * guessed: the smallest countdown block is 61 dp, the longest row needs 11.5 sp x 11.7 em beside
+ * it (134.6 dp, the 12-hour marker included, see [LONGEST_ROW_EM]), plus 8 dp of slack, 2 x 16 dp
+ * of padding and a 12 dp gap: 61 + 134.6 + 8 + 32 + 12 = 247.6, which comes to about 250 dp.
+ * With the 10.1 em row of a 24-hour time alone it was 229, hence the 230 this replaces. A
+ * Pixel's 2x2 is 190 dp and stays a stacked card.
  */
-private val TWO_COLUMN_MIN_WIDTH = 230.dp
+private val TWO_COLUMN_MIN_WIDTH = 250.dp
 
 /** "12:34" in the widget face: two digits, a colon and two more, in em. The two-column card
  * sizes its countdown block to this worst case so the prayer list beside it never moves. */
@@ -139,8 +141,14 @@ private const val COUNTDOWN_EM = 2.51f
 private fun countdownEm(text: String): Float =
     text.count { it.isDigit() } * 0.56f + text.count { !it.isDigit() } * 0.28f
 
-/** The longest prayer row, "Maghrib · المغرب" in bold and "18:32" beside it, in em. */
-private const val LONGEST_ROW_EM = 10.1f
+/**
+ * The longest prayer row, "Maghrib · المغرب" in bold and its time beside it, in em. With a
+ * 24-hour time ("18:32") that is 10.1. A 12-hour time carries its day-period marker as well,
+ * "6:32 PM": two capitals at about 0.65 em each and a space at 0.28 em add 1.58 em, which makes
+ * 11.7. The widget reads strings and cannot tell which format wrote them, so the estimate is the
+ * wider of the two.
+ */
+private const val LONGEST_ROW_EM = 11.7f
 
 /** One prayer row at the smallest row size (11 sp) with its line height, in dp. */
 private const val MIN_ROW_HEIGHT_DP = 15f
@@ -175,8 +183,9 @@ private fun TwoColumnCard(render: WidgetRender, size: DpSize) {
     val listInset = ((listHeight - 5f * MIN_ROW_HEIGHT_DP) / 2f).coerceIn(0f, 8f).dp
     val innerHeight = listHeight - listInset.value * 2
     val rowByHeight = innerHeight / 5f * 0.58f
-    // "Maghrib · المغرب" in bold plus its time is about ten em; a row is sized so that fits the
-    // list column whole, and the height only ever makes it larger, never the width smaller.
+    // "Maghrib · المغرب" in bold plus its time, marker included, is about eleven and a half em;
+    // a row is sized so that fits the list column whole, and the height only ever makes it
+    // larger, never the width smaller.
     val rowByWidth = (available.value - leftWidth.value - 8f) / LONGEST_ROW_EM
     val rowText = minOf(rowByHeight, rowByWidth).sp(11f, 15f)
 

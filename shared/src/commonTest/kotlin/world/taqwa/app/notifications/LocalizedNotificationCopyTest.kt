@@ -11,6 +11,10 @@ import kotlin.test.assertTrue
 
 private const val ARABIC_INDIC = "٠١٢٣٤٥٦٧٨٩"
 
+// First-strong isolate and pop-directional isolate: the pair that makes a run its own direction.
+private const val FSI = "\u2068"
+private const val PDI = "\u2069"
+
 private class StubFormat(private val tag: String, private val arabicIndic: Boolean) : PlatformFormat {
     override fun languageTag() = tag
     override fun localizedDigits(number: Int): String =
@@ -80,6 +84,46 @@ class LocalizedNotificationCopyTest {
         )
     }
 
+    // "5:10 PM" is Latin digits, a space and a marker, in a sentence that may run the other way;
+    // unisolated, the neighbouring "·" and words reorder its pieces. Wrapped in FSI…PDI, the same
+    // isolate Today's sub-lines use, it reads as one unit whatever the sentence's direction.
+    @Test
+    fun theTimeIsIsolatedInsideTheBody() {
+        val body = LocalizedNotificationCopy(StubFormat("ur", arabicIndic = false))
+            .body(Prayer.FAJR, NotificationKind.PRAYER, "5:10 PM", 0)
+        assertTrue(body.contains(FSI + "5:10 PM" + PDI), body)
+    }
+
+    @Test
+    fun everyKindAndLanguageIsolatesATwelveHourTime() {
+        for (tag in listOf("en-GB", "ar-LY", "fr-FR", "tr-TR", "id-ID", "ur-PK", "bn-BD")) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            for (time in listOf("5:10\u00A0PM", "٥:١٠\u00A0م", "ÖS\u00A05:10")) {
+                for (kind in NotificationKind.entries) {
+                    val body = copy.body(Prayer.FAJR, kind, time, 10)
+                    assertTrue(body.contains(FSI + time + PDI), "$tag $kind: $body")
+                    assertFalse(body.contains("{time}"), "$tag $kind: $body")
+                }
+            }
+        }
+    }
+
+    // What shipped before the 12-hour option: a 24-hour time is digits and a colon, which the
+    // sentence already carries correctly, so it is set bare and the armed notifications read byte
+    // for byte as they always did.
+    @Test
+    fun aTwentyFourHourTimeIsSetBareExactlyAsBefore() {
+        for (tag in listOf("en-GB", "ar-LY", "fr-FR", "tr-TR", "id-ID", "ur-PK", "bn-BD")) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            for (time in listOf("05:35", "٢٠:١٥", "০৫:৩৫")) {
+                for (kind in NotificationKind.entries) {
+                    val body = copy.body(Prayer.FAJR, kind, time, 10)
+                    assertTrue(body.contains(time), "$tag $kind: $body")
+                    assertFalse(body.contains(FSI) || body.contains(PDI), "$tag $kind: $body")
+                }
+            }
+        }
+    }
 
     @Test
     fun everyLanguageRendersBothBodiesWithNoPlaceholderLeftBehind() {

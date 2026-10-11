@@ -24,11 +24,18 @@ import kotlin.time.Instant
  */
 object WidgetMirrorRefresher {
 
+    /**
+     * [format] is the app's own, when a caller already holds one in the language it wants written.
+     * Null builds one from the stored clock format, the device's default language and
+     * [settings] - what the alarm and boot receivers and iOS's background refresh pass, and what
+     * a caller that has just changed the clock format passes so the mirror is not written with
+     * the format the composition has yet to rebuild.
+     */
     suspend fun refresh(
         settings: SettingsRepository,
         engine: PrayerTimesEngine,
         store: KeyValueStore = createWidgetKeyValueStore(),
-        format: PlatformFormat = createPlatformFormat(),
+        format: PlatformFormat? = null,
         now: Instant = Clock.System.now(),
     ): Boolean {
         val location = settings.location.first() ?: return false
@@ -41,7 +48,8 @@ object WidgetMirrorRefresher {
         // Today's highlight rule: the widgets change in the Ramadan release (ruling R8); the next
         // prayer looks across yesterday's, which the mirror carries past midnight (spec §3.3).
         val timeline = TimelineBuilder.buildForWidgets(yesterday, today, tomorrow, now, prefs.showSunrise, zone)
-        WidgetMirrorWriter.write(store, timeline, location.timeZoneId, format, listOf(today, tomorrow), yesterday)
+        val fmt = format ?: createPlatformFormat(settings.clockFormat.first())
+        WidgetMirrorWriter.write(store, timeline, location.timeZoneId, fmt, listOf(today, tomorrow), yesterday)
         return true
     }
 }
