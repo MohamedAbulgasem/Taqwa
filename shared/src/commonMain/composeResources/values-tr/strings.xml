@@ -67,10 +67,10 @@
     <string name="today_match_my_mosque">Camimle eşleştir</string>
     <string name="today_card_ok">Tamam</string>
     <string name="today_clock_line">Telefonunuzun saati bir saat farklı olabilir</string>
-    <string name="today_clock_stale_early">%1$s, %2$s tarihinde saat uygulamasını değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat erken görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
-    <string name="today_clock_stale_late">%1$s, %2$s tarihinde saat uygulamasını değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat geç görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
-    <string name="today_clock_manual_early">%1$s, %2$s tarihinde saat uygulamasını değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat erken görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
-    <string name="today_clock_manual_late">%1$s, %2$s tarihinde saat uygulamasını değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat geç görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="today_clock_stale_early">%1$s, %2$s tarihinde resmî saatini değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat erken görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="today_clock_stale_late">%1$s, %2$s tarihinde resmî saatini değiştirdi ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat geç görünebilir. En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="today_clock_manual_early">%1$s, %2$s tarihinde resmî saatini değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat erken görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
+    <string name="today_clock_manual_late">%1$s, %2$s tarihinde resmî saatini değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat geç görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
     <string name="today_clock_region_morocco">Fas</string>
     <string name="today_clock_region_british_columbia">Britanya Kolumbiyası</string>
     <string name="today_clock_region_kazakhstan">Kazakistan</string>

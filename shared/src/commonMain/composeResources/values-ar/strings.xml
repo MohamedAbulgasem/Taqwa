@@ -12,7 +12,7 @@
     <string name="onboarding_location_body">تعتمد المواقيت على موقعك. كل الحساب يجري على جهازك، وموقعك لا يغادر هاتفك.</string>
     <string name="onboarding_continue">متابعة</string>
     <string name="onboarding_notifications_title">إشعارات الصلاة</string>
-    <string name="onboarding_notifications_body">إشعار عند كل صلاة. تختار الصوت لكل صلاة على حدة، ويمكنك تغييره متى شئت.</string>
+    <string name="onboarding_notifications_body">إشعار لكل صلاة. تختار الصوت لكل صلاة على حدة، ويمكنك تغييره متى شئت.</string>
     <string name="onboarding_notifications_secondary">ليس الآن</string>
     <string name="onboarding_exact_title">المنبهات والتذكيرات</string>
     <string name="onboarding_exact_body">لا يمكن أن يرنّ أندرويد في وقت الصلاة بالضبط إلا إذا سُمح لتقوى بـ«المنبهات والتذكيرات». بدونها قد يتأخر الإشعار حتى ساعة.</string>
