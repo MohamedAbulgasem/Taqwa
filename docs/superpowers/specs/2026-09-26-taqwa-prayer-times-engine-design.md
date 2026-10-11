@@ -199,21 +199,26 @@ a monitor source. Large tables are compact resources.
   Bishkek, Gaza, Beirut, Damascus (two) and Baghdad, and BIK's base point. The nearest
   table whose reach holds the user rides as the fixed point beside the user's own, so the time shown is
   never before that nearest table, nor any end after it, and never earlier than the user's own point
-  alone. Where two tables' reaches overlap, a place follows the nearest only and can still be on the
-  wrong side of the other (the app's Ottawa against Abrar Masjid, 10 km off, inside its reach: an
-  owner's question, the fix round of 11 Oct 2026). The Syrian Awqaf's two Damascus samples are one
+  alone. *Round 2 (11 Oct 2026, the owner's rule "rather late, never early"):* every other table of
+  the set within R40's class reach of the user (three minutes, 52 to 72 km) rides beside it too, the
+  envelope (`TimetableMethod.envelopePoints`): every start the latest and every end the earliest over
+  all of them, each end never after any of them alone; the Ottawa-Abrar-Kanata overlap is clean. The Syrian Awqaf's two Damascus samples are one
   table, so each of their units reads the other's point for the starts too (`startPoints`). A mosque's
   or a city's table reaches a minute of longitude, 17 to 24 km, its neighbourhood; beyond that a user's
   own mosque prints for its own point, as the method computes. That narrows R40, whose reach is the
   entry's class limit (three minutes, about 61 km, for these class D entries and class C members): a
   proposed ruling, for the owner. BIK, which applies one base table to the whole of Kosovo with
   whole-minute town offsets, reaches as far as class D. The Canadian families' night-fraction curves are
-  read at both latitudes there. Beyond every reach the method stands at the user's own point as before,
-  with no edge minute, since these margins hold every table at its own point: R44's edge minute and
-  SAFE_END and R45's bound of the ends by the nearest table are suspended there (the same proposed
-  ruling; the cost measured is Calgary's north-east, Vancouver's west and the Wifaqul towns 17 to 20 km
-  from Manchester Central, a minute or two on the wrong side of the nearest table on some days). No
-  figure is claimed there, but a cautious convention member keeps its own measured reach. The app's own cities inside each new unit are gated at their own points, and the units
+  read at every latitude in play. Beyond every minute's reach but within a table's class reach, the
+  nearest such table rides as the fixed point and the rest beside it, for the starts too (round 2: the
+  review's probe had found Calgary's north-east, Delhi's edge and the Wifaqul towns a minute or two
+  before the nearest table); beyond every class reach the method stands at the user's own point as
+  before, with no edge minute. No figure is claimed beyond the minute's reach, but a cautious convention
+  member keeps its own measured reach. BIK's own town list (the Takvimi's "Diferenca e vendeve": Sharri
+  T + 2, five towns T − 1, Presheva T − 2, every other town T) is carried as start and end points beside
+  the base point, which rides everywhere in Kosovo (rulings R118 and R120's construction, beside the
+  user's own point). A named table chosen outside its area (London Unified within R45's three reaches,
+  IACAD anywhere) rides its table's point both ways. The app's own cities inside each new unit are gated at their own points, and the units
   that show a figure (ISNA's, BIK's) are gated across their reach as Umm al-Qura's and QMDB's are. Where
   such a table rides for the starts too, the ends shown are also never after those the same method shows
   at the user's point alone (`DayComputer`'s point 7, `TimetableMethod.endsBoundAtUserPoint`): the end of
