@@ -132,6 +132,29 @@ suspend fun recitationPreviewBytes(reciterId: String): ByteArray? = try {
     null
 }
 
+/**
+ * The reciter's bundled clip for an adhkar Quran page (adhkar spec §3.5), or null when this build
+ * has none: [ayah] set is one ayah (`002-255.mp3`, Ayat al-Kursi), null is a whole short surah
+ * (`112.mp3`). The names are the ones `tools/quran-audio/adhkar_clips.py` writes, and
+ * `check_adhkar_clips.py` holds the folder to them.
+ *
+ * Today only Alafasy's four are in the tree, which is what the first run plays before his surah is
+ * downloaded. Like [recitationPreviewBytes] it answers null for a file that is not bundled, and
+ * for a reciter id that is not a plain path segment: the id is a path here, and the catalogue it
+ * usually comes from can be fetched.
+ */
+suspend fun adhkarClipBytes(reciterId: String, surah: Int, ayah: Int?): ByteArray? {
+    if (!RecitationManifest.isPlainSegment(reciterId)) return null
+    val name = if (ayah != null) "${surah.toString().padStart(3, '0')}-$ayah.mp3" else "$surah.mp3"
+    return try {
+        Res.readBytes("files/adhkar/clips/$reciterId/$name")
+    } catch (cancelled: kotlin.coroutines.cancellation.CancellationException) {
+        throw cancelled
+    } catch (missing: Exception) {
+        null
+    }
+}
+
 /** The provider the app runs on. */
 fun createManifestProvider(paths: RecitationPaths = createRecitationPaths()): ManifestProvider =
     ManifestProvider(paths, FileSystem.SYSTEM, ::bundledManifestBytes)

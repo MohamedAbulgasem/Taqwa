@@ -25,6 +25,7 @@ import world.taqwa.app.recitation.ManifestRefresher
 import world.taqwa.app.recitation.RecitationEngagement
 import world.taqwa.app.recitation.RecitationPlayer
 import world.taqwa.app.recitation.SpeechVoices
+import world.taqwa.app.recitation.adhkarClipBytes
 import world.taqwa.app.recitation.createManifestProvider
 import world.taqwa.app.recitation.createSpeechVoices
 import world.taqwa.app.recitation.createSurahDownloader
@@ -121,6 +122,7 @@ class AppContainer {
             quran = quranRepository,
             clips = ClipPlayer().asPort(),
             previewBytes = ::recitationPreviewBytes,
+            adhkarClipBytes = ::adhkarClipBytes,
             // The handler, not just the SupervisorJob: a supervisor stops a failed child taking
             // its siblings, but an uncaught throw still reaches the default handler and the
             // process with it.
