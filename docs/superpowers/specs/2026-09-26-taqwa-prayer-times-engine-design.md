@@ -161,6 +161,14 @@ high-latitude rule, reference points, scope, `validFrom`/`validTo` per version (
 Europe 2023, ESA 2025, Uzbekistan 2026 …), each printed column's meaning quoted from the authority, and
 a monitor source. Large tables are compact resources.
 
+Two kinds of table say so in their method (track T4, 11 October 2026). A table the authority prints
+the same every year, month and day for month and day on a fixed clock (the Islamic Foundation of
+Ireland's, the IZ BiH vaktija, BIK's Takvimi), is computed as the year it was fitted on and moved onto
+the date at the same moment of the UTC day (`fixedTableYear`), so that each year shows the table's
+own times and the leap cycle cannot drift a start early. A table that holds the day before's times on
+known dates says so in its day rule, starts the later of the two days and ends the earlier: Umm
+al-Qura's lag dates, MUIS's neighbours, and Kemenag's step at the March equinox (21 and 22 March).
+
 ### 3.5 Places
 
 - **Store only the point** (lat, lon, zone; the city id for a picked city). Resolve country, admin-1
