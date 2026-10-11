@@ -1,0 +1,1264 @@
+{
+  "attribution": "OpenDua dataset v0.0.4 (https://opendua.org), by Ihsan Labs at the Human Development Fund. Based on Hisn al-Muslim by Sa'id ibn Ali ibn Wahf al-Qahtani. OpenDua editorial text and dataset structure are licensed CC BY 4.0. Recitation by Muhammad Jumah for OpenDua. OpenDua makes no ownership claim over the underlying religious texts.",
+  "dataVersion": "0.0.4",
+  "entries": [
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000075",
+      "references": [],
+      "slug": "morning-and-evening-1",
+      "sourceReference": "75",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (1 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيطَانِ الرَّجِيمِ ﴿اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاء وَسِعَ كُرْسِيُّهُ السَّمَوَاتِ وَالْأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ﴾",
+                    "id": "dua-000081",
+                    "references": [],
+                    "translation": "I seek refuge in Allah from Satan, the rejected. Allah—there is no deity except Him, the Ever-Living, the Sustainer of all. Neither drowsiness nor sleep overtakes Him. Everything in the heavens and on the earth belongs to Him. Who can intercede with Him except by His permission? He knows what lies before people and what lies beyond them, while they grasp nothing of His knowledge except what He wills. His Kursi extends over the heavens and the earth, and preserving them does not tire Him. He is the Most High, the Magnificent.",
+                    "transliteration": "Aʿūdhu bi-llāhi mina ash-shayṭāni ar-rajīmi llāhu lā ilāha illā huwa l-ḥayyu l-qayyūmu lā taʾkhudhuhu sinatun walā nawmun llahu mā fī as-samawāti wamā fī l-ʾarḍi man dhā alladhī yashfaʿu ʿindahu illā bi-idhnihi yaʿlamu mā bayna aydīhim wamā khalfahum walā yuḥīṭūna bi-shayʾin mmin ʿilmihi illā bimā shāʾ wasiʿa kursiyyuhu as-samawāti wa-l-ʾarḍa walā yaʾūduhu ḥifẓuhumā wahuwa l-ʿaliyyu l-ʿaẓīm"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 84,
+                  "id": "recording-000073",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-075.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000076",
+      "references": [],
+      "slug": "morning-and-evening-2",
+      "sourceReference": "76",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (2 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "بسم الله الرحمن الرحيم ﴿قُلْ هُوَ اللَّهُ أَحَدٌ* اللَّهُ الصَّمَدُ* لَمْ يَلِدْ وَلَمْ يُولَدْ* وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾. بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ* مِن شَرِّ مَا خَلَقَ* وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ* وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ* وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾. بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ* مَلِكِ النَّاسِ* إِلَهِ النَّاسِ* مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ* الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ* مِنَ الْجِنَّةِ وَ النَّاسِ﴾",
+                    "id": "dua-000082",
+                    "references": [],
+                    "translation": "In the name of Allah, the Most Compassionate, the Most Merciful. 112:1 Say: He is Allah, the One. 112:2 Allah, the One on whom all depend. 112:3 He neither begets nor was born. 112:4 Nothing is comparable to Him. In the name of Allah, the Most Compassionate, the Most Merciful. 113:1 Say: I seek refuge in the Lord of daybreak, 113:2 from the evil of what He created, 113:3 from the evil of darkness when it settles, 113:4 from the evil of those who blow upon knots, 113:5 and from the evil of an envier when he envies. In the name of Allah, the Most Compassionate, the Most Merciful. 114:1 Say: I seek refuge in the Lord of humankind, 114:2 the King of humankind, 114:3 the God of humankind, 114:4 from the evil of the retreating whisperer, 114:5 who whispers into people’s hearts, 114:6 whether from the jinn or humankind.",
+                    "transliteration": "Bismi llāh ar-raḥmān ar-raḥīm qul huwa llāhu aḥadun allāhu aṣ-ṣamadu lam yalid walam yūlad walam yakun llahu kufūan aḥadun bismi llāh ar-raḥmān ar-raḥīm qul aʿūdhu birabbi l-falaqi min sharri mā khalaqa wamin sharri ghāsiqin idhā waqaba wamin sharri an-naffāthāti fī l-ʿuqadi wamin sharri ḥāsidin idhā ḥasada bismi llāh ar-raḥmān ar-raḥīm qul aʿūdhu birabbi an-nāsi maliki an-nāsi ilāhi an-nāsi min sharri l-waswāsi l-khannāsi alladhī yuwaswisu fī ṣudūri an-nāsi mina l-jinnati wa an-nās"
+                  },
+                  "times": 3
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 92,
+                  "id": "recording-000074",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-076.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000077",
+      "references": [],
+      "slug": "morning-and-evening-3",
+      "sourceReference": "77",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (3 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "condition": "In the morning",
+          "id": "morning",
+          "label": "Morning",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+                    "id": "dua-000083",
+                    "references": [],
+                    "translation": "We have entered the morning, and all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah alone, without partner. To Him belong all sovereignty and praise, and He has power over all things. My Lord, I ask You for the good of this day and what follows it. I seek refuge in You from the evil of this day and what follows it. My Lord, I seek refuge in You from laziness and the evils of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.",
+                    "transliteration": "Aṣbaḥnā wa aṣbaḥa l-mulku li-llāhi wa-l-ḥamdu li-llāhi, lā ilāha illā llāhu waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu wahuwa ʿalā kulli shayʾin qadīrun, rabbi asʾaluka khayra mā fī hādhā l-yawmi wa khayra mā baʿdahu wa aʿūdhu bika min sharri mā fī hādhā l-yawmi washarri mā baʿdahu, rabbi aʿūdhu bika mina l-kasali wa sūʾi l-kibari, rabbi aʿūdhu bika min ʿadhābin fī an-nāri wa ʿadhābin fī l-qabr"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 78,
+                  "id": "recording-000075",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-077-1.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        },
+        {
+          "condition": "In the evening",
+          "id": "evening",
+          "label": "Evening",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+                    "id": "dua-000084",
+                    "references": [],
+                    "translation": "We have entered the evening, and all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah alone, without partner. To Him belong all sovereignty and praise, and He has power over all things. My Lord, I ask You for the good of this night and what follows it. I seek refuge in You from the evil of this night and what follows it. My Lord, I seek refuge in You from laziness and the evils of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.",
+                    "transliteration": "Amsaynā wa amsā l-mulku li-llāhi wa-l-ḥamdu li-llāhi, lā ilāha illā llāhu waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu wahuwa ʿalā kulli shayʾin qadīrun, rabbi asʾaluka khayra mā fī hādhihi l-laylati wa khayra mā baʿdahā, wa aʿūdhu bika min sharri mā fī hādhihi l-laylati washarri mā baʿdahā, rabbi aʿūdhu bika mina l-kasali wa sūʾi l-kibari, rabbi aʿūdhu bika min ʿadhābin fī an-nāri wa ʿadhābin fī l-qabr"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 83,
+                  "id": "recording-000076",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-077-2.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000078",
+      "references": [],
+      "slug": "morning-and-evening-4",
+      "sourceReference": "78",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (4 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "condition": "In the morning",
+          "id": "morning",
+          "label": "Morning",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ",
+                    "id": "dua-000085",
+                    "references": [],
+                    "translation": "O Allah, by You we enter the morning, and by You we enter the evening. By You we live and by You we die, and to You is the resurrection.",
+                    "transliteration": "Allāhumma bika aṣbaḥnā, wabika amsaynā, wabika naḥyā, wabika namūtu, wa ilayka an-nushūr"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 19,
+                  "id": "recording-000077",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-078-1.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        },
+        {
+          "condition": "In the evening",
+          "id": "evening",
+          "label": "Evening",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ",
+                    "id": "dua-000086",
+                    "references": [],
+                    "translation": "O Allah, by You we enter the evening, and by You we enter the morning. By You we live and by You we die, and to You is our return.",
+                    "transliteration": "Allāhumma bika amsaynā, wabika aṣbaḥnā, wabika naḥyā, wabika namūtu, wa ilayka l-maṣīr"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 21,
+                  "id": "recording-000078",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-078-2.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000079",
+      "references": [],
+      "slug": "morning-and-evening-5",
+      "sourceReference": "79",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (5 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنوبَ إِلاَّ أَنْتَ",
+                    "id": "dua-000087",
+                    "references": [],
+                    "translation": "O Allah, You are my Lord, none has the right to be worshipped except You, You created me and I am Your servant and I abide to Your covenant and promise as best I can, I take refuge in You from the evil of which I have committed. I acknowledge Your favour upon me and I acknowledge my sin, so forgive me, for verily none can forgive sin except You.",
+                    "transliteration": "Allāhumma anta rabbī lā ilāha illā anta, khalaqtanī wa anā ʿabduka, wa anā ʿalā ʿahdika wa waʿdika mā istaṭaʿtu, aʿūdhu bika min sharri mā ṣanaʿtu, abūʾu laka bi-niʿmatika ʿalayya, wa abūʾu bi-dhanbī fa ighfir lī fa innahu lā yaghfiru adh-dhunwba illā ant"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 50,
+                  "id": "recording-000079",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-079.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000080",
+      "references": [],
+      "slug": "morning-and-evening-6",
+      "sourceReference": "80",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (6 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "condition": "In the morning",
+          "id": "morning",
+          "label": "Morning",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ إِنِّي أَصْبَحْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلاَئِكَتِكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلاَّ أَنْتَ وَحْدَكَ لاَ شَرِيكَ لَكَ، وَأَنَّ مُحَمَّداً عَبْدُكَ وَرَسُولُكَ",
+                    "id": "dua-000088",
+                    "references": [],
+                    "translation": "O Allah, I have entered the morning, and I call You, the bearers of Your Throne, Your angels, and all Your creation to witness that You are Allah. None has the right to be worshipped except You alone, without partner, and Muhammad is Your servant and messenger.",
+                    "transliteration": "Allāhumma innī aṣbaḥtu ushhiduka, wa ushhidu ḥamalata ʿarshika, wa malāʾikatika, wa jamīʿa khalqika, annaka anta llāhu lā ilāha illā anta waḥdaka lā sharīka laka, waʾanna muḥammadan ʿabduka wa rasūluk"
+                  },
+                  "times": 4
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 42,
+                  "id": "recording-000080",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-080-1.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        },
+        {
+          "condition": "In the evening",
+          "id": "evening",
+          "label": "Evening",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلاَئِكَتِكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلاَّ أَنْتَ وَحْدَكَ لاَ شَرِيكَ لَكَ، وَأَنَّ مُحَمَّداً عَبْدُكَ وَرَسُولُكَ",
+                    "id": "dua-000089",
+                    "references": [],
+                    "translation": "O Allah, I have entered the evening, and I call You, the bearers of Your Throne, Your angels, and all Your creation to witness that You are Allah. None has the right to be worshipped except You alone, without partner, and Muhammad is Your servant and messenger.",
+                    "transliteration": "Allāhumma innī amsaytu ushhiduka, wa ushhidu ḥamalata ʿarshika, wa malāʾikatika, wa jamīʿa khalqika, annaka anta llāhu lā ilāha illā anta waḥdaka lā sharīka laka, waʾanna muḥammadan ʿabduka wa rasūluk"
+                  },
+                  "times": 4
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 47,
+                  "id": "recording-000081",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-080-2.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000081",
+      "references": [],
+      "slug": "morning-and-evening-7",
+      "sourceReference": "81",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (7 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "condition": "In the morning",
+          "id": "morning",
+          "label": "Morning",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لاَ شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ",
+                    "id": "dua-000090",
+                    "references": [],
+                    "translation": "O Allah, whatever blessing has come to me or to any of Your creation this morning is from You alone, without partner. To You belongs all praise, and to You belongs all thanks.",
+                    "transliteration": "Allāhumma mā aṣbaḥa bī min niʿmatin aw bi-aḥadin min khalqika fa minka waḥdaka lā sharīka laka, falaka l-ḥamdu walaka ash-shukr"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 23,
+                  "id": "recording-000082",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-081-1.mp3"
+                }
+              ],
+              "type": "recitation"
+            },
+            {
+              "text": "Whoever says this in the morning has fulfilled the gratitude due for that day, and whoever says it in the evening has fulfilled the gratitude due for that night.",
+              "type": "narration"
+            }
+          ]
+        },
+        {
+          "condition": "In the evening",
+          "id": "evening",
+          "label": "Evening",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لاَ شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ",
+                    "id": "dua-000091",
+                    "references": [],
+                    "translation": "O Allah, whatever blessing has come to me or to any of Your creation this evening is from You alone, without partner. To You belongs all praise, and to You belongs all thanks.",
+                    "transliteration": "Allāhumma mā amsā bī min niʿmatin aw bi-aḥadin min khalqika fa minka waḥdaka lā sharīka laka, falaka l-ḥamdu walaka ash-shukr"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 20,
+                  "id": "recording-000083",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-081-2.mp3"
+                }
+              ],
+              "type": "recitation"
+            },
+            {
+              "text": "Whoever says this in the morning has fulfilled the gratitude due for that day, and whoever says it in the evening has fulfilled the gratitude due for that night.",
+              "type": "narration"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000082",
+      "references": [],
+      "slug": "morning-and-evening-8",
+      "sourceReference": "82",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (8 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ القَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ",
+                    "id": "dua-000092",
+                    "references": [],
+                    "translation": "O Allah, grant my body health, O Allah, grant my hearing health, O Allah, grant my sight health. None has the right to be worshipped except You. O Allah, I take refuge with You from disbelief and poverty, and I take refuge with You from the punishment of the grave. None has the right to be worshipped except You.",
+                    "transliteration": "Allāhumma ʿāfinī fī badanī, allāhumma ʿāfinī fī samʿī, allāhumma ʿāfinī fī baṣarī, lā ilāha illā ant. allāhumma innī aʿūdhu bika mina l-kufri, wa-l-faqri, wa aʿūdhu bika min ʿadhābi l-qabri, lā ilāha illā ant"
+                  },
+                  "times": 3
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 53,
+                  "id": "recording-000084",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-082.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000083",
+      "references": [],
+      "slug": "morning-and-evening-9",
+      "sourceReference": "83",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (9 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيهِ تَوَكَّلتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+                    "id": "dua-000093",
+                    "references": [],
+                    "translation": "Allah is Sufficient for me, none has the right to be worshipped except Him, upon Him I rely and He is Lord of the exalted throne.",
+                    "transliteration": "Ḥasbiya llāhu lā ilāha illā huwa ʿalayhi tawakkaltu wahuwa rabbu l-ʿarshi l-ʿaẓīm"
+                  },
+                  "times": 7
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 14,
+                  "id": "recording-000085",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-083.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000084",
+      "references": [],
+      "slug": "morning-and-evening-10",
+      "sourceReference": "84",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (10 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ: فِي دِينِي وَدُنْيَايَ وَأَهْلِي، وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي، وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَينِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي",
+                    "id": "dua-000094",
+                    "references": [],
+                    "translation": "O Allah, I ask You for pardon and well-being in this life and the next. O Allah, I ask You for pardon and well-being in my religious and worldly affairs, and my family and my wealth. O Allah, veil my weaknesses and set at ease my dismay. O Allah, preserve me from the front and from behind and on my right and on my left and from above, and I take refuge with You lest I be swallowed up by the earth.",
+                    "transliteration": "Allāhumma innī asʾaluka l-ʿafwa wa-l-ʿāfiyata fī ad-dunyā wa-l-ʾākhirati, allāhumma innī asʾaluka l-ʿafwa wa-l-ʿāfiyata: fī dīnī wa dunyāya wa ahlī, wa mālī, allāhumma istur ʿawrātī, wa āmin rawʿātī, allāhumma iḥfaẓnī min bayni yadayya, wamin khalfī, waʿan yamīnī, waʿan shimālī, wamin fawqī, wa aʿūdhu bi-ʿaẓamatika an ughtāla min taḥtī"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 72,
+                  "id": "recording-000086",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-084.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000085",
+      "references": [],
+      "slug": "morning-and-evening-11",
+      "sourceReference": "85",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (11 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ عَالِمَ الغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ",
+                    "id": "dua-000095",
+                    "references": [],
+                    "translation": "O Allah, Knower of the unseen and the seen, Creator of the heavens and the Earth, Lord and Sovereign of all things, I bear witness that none has the right to be worshipped except You. I take refuge in You from the evil of my soul and from the evil and shirk of the devil, and from committing wrong against my soul or bringing such upon another Muslim.",
+                    "transliteration": "Allāhumma ʿālima l-ghaybi wa ash-shahādati fāṭira as-samawāti wa-l-ʾarḍi, rabba kulli shayʾin wa malīkahu, ashhadu an lā ilāha illā anta, aʿūdhu bika min sharri nafsī, wamin sharri ash-shayṭni wa sharakihi, waʾan aqtarifa ʿalā nafsī sūʾan, aw ajurrahu ilā muslim"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 36,
+                  "id": "recording-000087",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-085.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000086",
+      "references": [],
+      "slug": "morning-and-evening-12",
+      "sourceReference": "86",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (12 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلاَ فِي السّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+                    "id": "dua-000096",
+                    "references": [],
+                    "translation": "In the name of Allah with whose name nothing is harmed on earth nor in the heavens, and He is the All-Hearing, the All-Knowing.",
+                    "transliteration": "Bismi llāhi alladhī lā yaḍurru maʿa ismihi shayʾun fī l-ʾarḍi walā fī as-smāʾi wahuwa as-samīʿu l-ʿalīm"
+                  },
+                  "times": 3
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 16,
+                  "id": "recording-000088",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-086.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000087",
+      "references": [],
+      "slug": "morning-and-evening-13",
+      "sourceReference": "87",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (13 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "رَضِيتُ بِاللَّهِ رَبَّاً، وَبِالْإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ صلى الله عليه وسلم نَبِيّاً",
+                    "id": "dua-000097",
+                    "references": [],
+                    "translation": "I am pleased with Allah as Lord, with Islam as religion, and with Muhammad as Prophet.",
+                    "transliteration": "Raḍītu bi-llāhi rabbā, wa bi-l-ʾislāmi dīnan, wa bi-muḥammadin ṣallā llāh ʿalayhi wa sallam nabīā"
+                  },
+                  "times": 3
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 17,
+                  "id": "recording-000089",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-087.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000088",
+      "references": [],
+      "slug": "morning-and-evening-14",
+      "sourceReference": "88",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (14 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغيثُ أَصْلِحْ لِي شَأْنِيَ كُلَّهُ وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+                    "id": "dua-000098",
+                    "references": [],
+                    "translation": "O Ever Living, O Self-Subsisting and Supporter of all, by Your mercy I seek assistance, rectify for me all of my affairs and do not leave me to myself, even for the blink of an eye.",
+                    "transliteration": "Yā ḥayyu yā qayyūmu bi-raḥmatika astaghythu aṣliḥ lī shaʾniya kullahu walā takilnī ilā nafsī ṭarfata ʿayn"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 24,
+                  "id": "recording-000090",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-088.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000089",
+      "references": [],
+      "slug": "morning-and-evening-15",
+      "sourceReference": "89",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (15 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "condition": "In the morning",
+          "id": "morning",
+          "label": "Morning",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ، اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذَا الْيَوْمِ: فَتْحَهُ، وَنَصْرَهُ، وَنُورَهُ، وَبَرَكَتَهُ، وَهُدَاهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهِ وَشَرِّ مَا بَعْدَهُ",
+                    "id": "dua-000099",
+                    "references": [],
+                    "translation": "We have entered the morning, and all sovereignty belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this day: its success, victory, light, blessing, and guidance. I seek refuge in You from the evil within it and the evil that follows it.",
+                    "transliteration": "Aṣbaḥnā wa aṣbaḥa l-mulku li-llāhi rabbi l-ʿālamīna, allāhumma innī asʾaluka khayra hādhā l-yawmi: fatḥahu, wa naṣrahu, wa nūrahu, wa barakatahu, wa hudāhu, wa aʿūdhu bika min sharri mā fīhi washarri mā baʿdah"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 38,
+                  "id": "recording-000091",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-089-1.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        },
+        {
+          "condition": "In the evening",
+          "id": "evening",
+          "label": "Evening",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ، اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذِهِ اللَّيْلَةِ: فَتْحَهَا، وَنَصْرَهَا، وَنُورَهَا، وَبَرَكَتَهَا، وَهُدَاهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهَا وَشَرِّ مَا بَعْدَهَا",
+                    "id": "dua-000100",
+                    "references": [],
+                    "translation": "We have entered the evening, and all sovereignty belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this night: its success, victory, light, blessing, and guidance. I seek refuge in You from the evil within it and the evil that follows it.",
+                    "transliteration": "Amsaynā wa amsā l-mulku li-llāhi rabbi l-ʿālamīna, allāhumma innī asʾaluka khayra hādhihi l-laylati: fatḥahā, wa naṣrahā, wa nūrahā, wa barakatahā, wa hudāhā, wa aʿūdhu bika min sharri mā fīhā washarri mā baʿdahā"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 36,
+                  "id": "recording-000092",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-089-2.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000090",
+      "references": [],
+      "slug": "morning-and-evening-16",
+      "sourceReference": "90",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (16 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "condition": "In the morning",
+          "id": "morning",
+          "label": "Morning",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلاَمِ، وَعَلَى كَلِمَةِ الْإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صلى الله عليه وسلم، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ، حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
+                    "id": "dua-000101",
+                    "references": [],
+                    "translation": "We have entered the morning upon the natural way of Islam, the declaration of sincere faith, the religion of our Prophet Muhammad (may Allah’s peace and blessings be upon him), and the faith of our forefather Ibraheem, who was upright, a Muslim, and not among those who associate partners with Allah.",
+                    "transliteration": "Aṣbaḥnā ʿalā fiṭrati l-ʾislāmi, wa ʿalā ka-limati l-ʾikhlāṣi, wa ʿalā dīni nabiyyinā muḥammadin ṣallā llāh ʿalayhi wa sallam, wa ʿalā millati abīnā ibrāhīma, ḥanīfan musliman wamā kāna mina l-mushrikīn"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 47,
+                  "id": "recording-000093",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-090-1.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        },
+        {
+          "condition": "In the evening",
+          "id": "evening",
+          "label": "Evening",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَمْسَيْنَا عَلَى فِطْرَةِ الْإِسْلاَمِ، وَعَلَى كَلِمَةِ الْإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صلى الله عليه وسلم، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ، حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
+                    "id": "dua-000102",
+                    "references": [],
+                    "translation": "We have entered the evening upon the natural way of Islam, the declaration of sincere faith, the religion of our Prophet Muhammad (may Allah’s peace and blessings be upon him), and the faith of our forefather Ibraheem, who was upright, a Muslim, and not among those who associate partners with Allah.",
+                    "transliteration": "Amsaynā ʿalā fiṭrati l-ʾislāmi, wa ʿalā ka-limati l-ʾikhlāṣi, wa ʿalā dīni nabiyyinā muḥammadin ṣallā llāh ʿalayhi wa sallam, wa ʿalā millati abīnā ibrāhīma, ḥanīfan musliman wamā kāna mina l-mushrikīn"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 46,
+                  "id": "recording-000094",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-090-2.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000091",
+      "references": [],
+      "slug": "morning-and-evening-17",
+      "sourceReference": "91",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (17 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+                    "id": "dua-000103",
+                    "references": [],
+                    "translation": "How perfect Allah is and I praise Him.",
+                    "transliteration": "Subḥāna llāhi wa bi-ḥamdih"
+                  },
+                  "times": 100
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 4,
+                  "id": "recording-000095",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-091.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000092",
+      "references": [],
+      "slug": "morning-and-evening-18",
+      "sourceReference": "92",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (18 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+                    "id": "dua-000104",
+                    "references": [],
+                    "translation": "None has the right to be worshipped except Allah, alone, without partner, to Him belongs all sovereignty and praise, and He is over all things omnipotent.",
+                    "transliteration": "Lā ilāha illā llāhu waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu, wahuwa ʿalā kulli shayʾin qadīr"
+                  },
+                  "times": 10
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 18,
+                  "id": "recording-000096",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-092.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000093",
+      "references": [],
+      "slug": "morning-and-evening-19",
+      "sourceReference": "93",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (19 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "لاَ إِلَهَ إِلاَّ اللَّهُ، وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+                    "id": "dua-000105",
+                    "references": [],
+                    "translation": "None has the right to be worshipped except Allah, alone, without partner, to Him belongs all sovereignty and praise, and He is over all things omnipotent.",
+                    "transliteration": "Lā ilāha illā llāhu, waḥdahu lā sharīka lahu, lahu l-mulku walahu l-ḥamdu wahuwa ʿalā kulli shayʾin qadīr"
+                  },
+                  "times": 100
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 18,
+                  "id": "recording-000097",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-093.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000094",
+      "references": [],
+      "slug": "morning-and-evening-20",
+      "sourceReference": "94",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (20 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ: عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+                    "id": "dua-000106",
+                    "references": [],
+                    "translation": "How perfect Allah is and I praise Him by the number of His creation and His pleasure, and by the weight of His throne, and the ink of His words.",
+                    "transliteration": "Subḥāna llāhi wa bi-ḥamdihi: ʿadada khalqihi, wa riḍā nafsihi, wa zinata ʿarshihi, wa midāda ka-li-mātih"
+                  },
+                  "times": 3
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 18,
+                  "id": "recording-000098",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-094.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000095",
+      "references": [],
+      "slug": "morning-and-evening-21",
+      "sourceReference": "95",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (21 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً",
+                    "id": "dua-000107",
+                    "references": [],
+                    "translation": "O Allah, I ask You for knowledge which is beneficial and sustenance which is good, and deeds which are acceptable.",
+                    "transliteration": "Allāhumma innī asʾaluka ʿilman nāfiʿan, wa rizqan ṭayyiban, wa ʿamalan mutaqabbalā"
+                  }
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 18,
+                  "id": "recording-000099",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-095.mp3"
+                }
+              ],
+              "type": "recitation"
+            },
+            {
+              "arabic": "إذا أصبحَ",
+              "text": "Say this in the morning.",
+              "type": "instruction"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000096",
+      "references": [],
+      "slug": "morning-and-evening-22",
+      "sourceReference": "96",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (22 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+                    "id": "dua-000108",
+                    "references": [],
+                    "translation": "‘I seek Allaah’s forgiveness and I turn to Him in repentance.’",
+                    "transliteration": "Astaghfiru llāha wa atūbu ilayh"
+                  },
+                  "times": 100
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 6,
+                  "id": "recording-000100",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-096.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000097",
+      "references": [],
+      "slug": "morning-and-evening-23",
+      "sourceReference": "97",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (23 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+                    "id": "dua-000109",
+                    "references": [],
+                    "translation": "I take refuge in Allah’s perfect words from the evil He has created.",
+                    "transliteration": "Aʿūdhu bi-ka-li-māti llāhi at-tāmmāti min sharri mā khalaq"
+                  },
+                  "times": 3
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 9,
+                  "id": "recording-000101",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-097.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapterId": "chapter-000027",
+      "collectionId": "hisn-al-muslim",
+      "id": "entry-000098",
+      "references": [],
+      "slug": "morning-and-evening-24",
+      "sourceReference": "98",
+      "tags": [
+        "morning-and-evening",
+        "protection-and-refuge"
+      ],
+      "title": "Words of remembrance for morning and evening (24 of 24)",
+      "type": "invocation",
+      "variations": [
+        {
+          "id": "standard",
+          "steps": [
+            {
+              "items": [
+                {
+                  "dua": {
+                    "arabic": "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+                    "id": "dua-000110",
+                    "references": [],
+                    "translation": "‘O Allaah, send prayers and peace upon our Prophet Muhammad.’",
+                    "transliteration": "Allāhumma ṣalli wa sallim ʿalā nabiyyinā muḥammad"
+                  },
+                  "times": 10
+                }
+              ],
+              "recordings": [
+                {
+                  "durationSeconds": 9,
+                  "id": "recording-000102",
+                  "reciterId": "reciter-0001",
+                  "url": "https://audio.opendua.org/hisn/v0.0.2/OD-098.mp3"
+                }
+              ],
+              "type": "recitation"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "licences": {
+    "audio": {
+      "name": "OpenDua Audio Licence",
+      "url": "https://opendua.org/licence/audio"
+    },
+    "data": {
+      "name": "OpenDua Data Licence",
+      "url": "https://opendua.org/licence/data"
+    }
+  },
+  "released": "2026-09-09",
+  "schemaVersion": "2.0.0",
+  "source": "https://opendua.org/v0.0.4/catalogue.json, entries tagged morning-and-evening"
+}

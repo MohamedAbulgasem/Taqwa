@@ -1,0 +1,28 @@
+OpenDua dataset v0.0.4 (Hisn al-Muslim), Creative Commons Attribution 4.0
+https://opendua.org
+
+Taqwa's Morning & Evening Adhkar (shared/src/commonMain/composeResources/files/adhkar)
+are built from the OpenDua dataset by tools/adhkar/build_items.py. OpenDua's required
+attribution, copied verbatim from attribution.txt on its developers page:
+
+OpenDua dataset v0.0.4 (https://opendua.org), by Ihsan Labs at the Human Development Fund. Based on Hisn al-Muslim by Sa'id ibn Ali ibn Wahf al-Qahtani. OpenDua editorial text and dataset structure are licensed CC BY 4.0. Recitation by Muhammad Jumah for OpenDua. OpenDua makes no ownership claim over the underlying religious texts.
+
+Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+Developers page: https://opendua.org/developers
+Its "Licence and attribution" paragraph, verbatim:
+
+OpenDua’s independently authored English, transliteration, editorial metadata and dataset structure are licensed under CC BY 4.0. OpenDua makes no ownership claim over the underlying Quranic, hadith or supplication text. The recitation was recorded for OpenDua under a separate written agreement and is not offered under the dataset licence. Credit Hisn al-Muslim as the collection and paste the attribution below when reusing OpenDua material.
+
+Dataset version: v0.0.4 (released 9 September 2026), https://opendua.org/v0.0.4/catalogue.json
+Date retrieved: 11 October 2026
+
+Used for: the Arabic structure, English translations and transliterations of the 19 morning-and-evening items in `files/adhkar`; the recordings are not used.
+
+Changes made (CC BY 4.0, section 3(a)(1)(B)): the 24 morning-and-evening entries are
+reshaped into Taqwa's own schema and 19 of them are kept; the three Quls of Hisn 76 become
+three items, and no Quranic text is taken from OpenDua (the app reads the Quran from its
+own Tanzil text, by reference); eight transliteration typos are corrected, and the
+quotation marks and the spelling "Allaah" are removed from the English of Hisn 96. The
+Arabic is OpenDua's, unchanged. Every change is listed in tools/adhkar/README.md.
