@@ -98,6 +98,26 @@ class MoonsightingCommitteeTest {
     }
 
     @Test
+    fun `east of the date line in chukotka the fajr and the end of eating keep to the committee's own`() {
+        // Provideniya, at 173.2 W, keeps Chukotka's UTC+12 (Asia/Anadyr): each civil date's noon there is the solar day
+        // before the UTC date's, so curves read at that UTC date's own noon took the sun a day late. Its Fajr came up
+        // to 2 min before the Committee's own from July to September and its end of eating up to 2 min after it from
+        // April to June (the T3 review of 11 Oct 2026).
+        val provideniya = Spot(64.4234, -173.2258, "Asia/Anadyr", "RU")
+        for ((day, rule) in days(provideniya, LocalDate(2026, 4, 1), LocalDate(2027, 9, 30))) {
+            rule ?: continue
+            if (day.fajr.epochSeconds < CommitteeRule.printed(rule.laterFajr)) {
+                // Ruling R90: shown before the rule's only where the day declares it.
+                assertTrue(Prayer.FAJR in day.notFollowed && rule.sunrise - rule.laterFajr < 3 * 60, "${day.date}: Fajr early")
+            }
+            if (Prayer.ISHA !in day.notFollowed) {
+                assertTrue(day.isha.epochSeconds >= CommitteeRule.printed(rule.isha), "${day.date}: Isha early")
+            }
+            assertTrue(day.endOfEating.epochSeconds <= CommitteeRule.printed(rule.committeeFajr), "${day.date}: end after the Committee's Fajr")
+        }
+    }
+
+    @Test
     fun `on the edge of the midnight sun the fast still begins by the committee's fajr`() {
         // At Luleå and Kemi the whole June night lies within a quarter of a degree of the sun's lowest point:
         // the end, capped a quarter of a degree short of it, came after sunrise and the fast began at the Fajr

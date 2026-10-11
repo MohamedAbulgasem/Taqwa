@@ -26,15 +26,24 @@ import kotlin.test.assertTrue
  * 64° of latitude north and south every hundredth of a degree, nearer the equator every twentieth, in
  * 2027 and 2028 (a common year and the curves' leap reference year); from 64° to 66° every hundredth in
  * every year of the leap cycle (2025–2028), where on the edge of the midnight sun the night changes by
- * minutes a day; all on the prime meridian in UTC; and from 40° to 66° every tenth at 150° E and
- * 120° W, where 12:00 UTC is far from the local noon, over the leap cycle. About 6.8 million place-days,
- * under a minute on four threads. (The round's own probe ran every hundredth from 66° S to 66° N on
- * all four years, and at 25° E and 1.6° W in their own zones, the same way.) Each day is held to
- * [CommitteeRule], the Committee's rule with this core's own sun at the place itself:
+ * minutes a day; all on the prime meridian in UTC; from 40° to 66° every tenth at 150° E and 120° W,
+ * where 12:00 UTC is far from the local noon, over the leap cycle; and in real zones over the leap
+ * cycle: east of 180° in Chukotka's UTC+12 (173.23° W, 58° to 66° N every twentieth), where each civil
+ * date's noon is the solar day before the UTC date's, on the Chatham Islands (176.5° W, UTC+12:45 with
+ * summer time, 40° to 47° S every twentieth), and in Alaska's summer time (149.9° W, 55° to 66° N every
+ * tenth). About 7.4 million place-days, about a minute on four threads. (The round's own probe ran
+ * every hundredth from 66° S to 66° N on all four years, and at 25° E and 1.6° W in their own zones, the
+ * same way.) Each day is held to [CommitteeRule], the Committee's rule with this core's own sun at the
+ * place itself:
  * - no Fajr before the later of the Committee's own Fajr and adhan2's, no Isha before the Committee's,
  *   no sunrise after the sun's, as a table prints them (to the nearest minute), except a Fajr the day
  *   declares not followed (ruling R90: the rule's Fajr within a minute or two of sunrise, on the edge of
- *   the midnight sun);
+ *   the midnight sun). The nearest minute is the Committee's own rounding: at its 18 places off the
+ *   midnight sun's edge (2026, the archive) its printed Fajr, sunrise and Isha lie within 30 s of the
+ *   rule's exact moment with this core's sun on 85–89 % of 19,709 cells, as many either side, every
+ *   Fajr and Isha within 75 s (a floor or a ceiling would put them on one side). A start shown may so
+ *   lie up to 29 s before the rule's exact moment; against those tables none came before their printed
+ *   minute;
  * - no end of eating after the Committee's own Fajr; nor after adhan2's, but on the first nights after
  *   the midnight sun, where the night has more than tripled overnight and adhan2, counting the night to
  *   the next sunrise, puts its Fajr before the middle of the night just ended (no dawn that night comes
@@ -43,6 +52,9 @@ import kotlin.test.assertTrue
  *   adhan2 has no seventh of the night), no Fajr or Isha before adhan2's own printed minute either.
  * On main before this round: Isha up to 24 min early from 54.95° to 55° N, Fajr up to 5 min early
  * between the steps north of 64° N and 8 min south of 54° S, the end up to 6 min late from 65.3° N.
+ * Before the T3 review's fix, in Chukotka's UTC+12 east of 180°: Fajr up to 2 min early on 1,095
+ * place-days from July to September, from 58.45° N up, and the end up to 2 min after the Committee's
+ * Fajr on 932, April to June (TwilightCurves.CivilNoons).
  */
 class MoonsightingSweepTest {
     private val entry = Registry.byId("other.moonsighting")!!
@@ -136,6 +148,12 @@ class MoonsightingSweepTest {
             // Far from the prime meridian, where 12:00 UTC is far from the local noon.
             Sweep(bothHemispheres(steps(40.0, 66.0, 0.1)), 150.0, "UTC+10:00", 2025..2028),
             Sweep(bothHemispheres(steps(40.0, 66.0, 0.1)), -120.0, "UTC-08:00", 2025..2028),
+            // Real zones. East of 180 in Chukotka's UTC+12 each civil date's noon is the solar day before the UTC date's
+            // (Provideniya, Lavrentiya, Lorino, Sireniki), and on the Chatham Islands, a quarter of an hour further, too,
+            // with summer time; Alaska's summer time on the other side of the line.
+            Sweep(steps(58.0, 66.0, 0.05), -173.23, "Asia/Anadyr", 2025..2028),
+            Sweep(steps(-47.0, -40.0, 0.05), -176.5, "Pacific/Chatham", 2025..2028),
+            Sweep(steps(55.0, 66.0, 0.1), -149.9, "America/Anchorage", 2025..2028),
         )
         val pool = Executors.newFixedThreadPool(THREADS)
         val total = Tally()
