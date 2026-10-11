@@ -17,6 +17,7 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.registry.AboutTemplate
@@ -84,6 +85,7 @@ private fun Frame(dark: Boolean = false, content: @Composable () -> Unit) {
 private fun PrayerTimes(settings: PrayerSettings, status: TimetableStatus?, placeName: String?, adjustmentsPaused: Boolean = false) =
     PrayerTimesSettingsScreen(
         settings = settings, status = status, adjustmentsPaused = adjustmentsPaused, placeName = placeName, today = day,
+        clockFormat = ClockFormat.TWENTY_FOUR_HOUR, onClockFormat = {},
         onSchool = {}, onHijriOffset = {}, onShowSunrise = {}, onShowBothAsr = {}, onShowWhereDiffer = {}, onSaudiFajrLater = {},
         onBack = {}, onOpenTimetable = {}, onOpenHighLatitudePicker = {}, onOpenManualAdjustments = {}, onOpenAboutTimes = {},
     )

@@ -627,4 +627,7 @@
     <string name="recitation_gigabytes">%1$s GB</string>
     <string name="credit_recitations">Tilavetler</string>
     <string name="credit_recitations_detail">Ayet ayet tilavetler Islamic Network’ten (alquran.cloud); kariler bu kuruma, yayımladıkları bit hızlarında ücretsiz ve ticari olmayan yeniden dağıtım için lisans vermiştir. Aynı bit hızlarında, değiştirilmeden yansıtıldı.</string>
+    <string name="prayer_times_time_format">Saat biçimi</string>
+    <string name="time_format_24">24 saat</string>
+    <string name="time_format_12">12 saat</string>
 </resources>

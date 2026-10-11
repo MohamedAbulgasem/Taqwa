@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ import world.taqwa.app.feature.settings.highLatitudeNeedsCheck
 import world.taqwa.app.feature.settings.timetableName
 import world.taqwa.app.feature.settings.aboutTimesUiState
 import world.taqwa.app.feature.settings.themeDisplayName
+import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.timetableDisplayName
@@ -199,7 +201,10 @@ internal suspend fun refreshForNewTimes(container: AppContainer, settings: Setti
     newTimesRefresh.withLock {
         container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
         withContext(Dispatchers.Default) {
-            WidgetMirrorRefresher.refresh(settings, container.prayerTimesEngine, format = format)
+            // Null, not the caller's [format]: that is the composition's, rebuilt on a new clock
+            // format only a frame after the write that just happened, so it can still be the old
+            // one. Null builds the mirror's from the stored setting, which is always current.
+            WidgetMirrorRefresher.refresh(settings, container.prayerTimesEngine, format = null)
         }
         refreshWidgets()
     }
@@ -227,6 +232,7 @@ internal fun PrayerTimesSettingsRoute(
     val location by locationState
     val cityDisplayName by cityDisplayNameState
     val format = LocalPlatformFormat.current
+    val clockFormat by settings.clockFormat.collectAsState(initial = ClockFormat.TWENTY_FOUR_HOUR)
     fun write(change: suspend () -> Unit) {
         scope.launch {
             change()
@@ -242,6 +248,10 @@ internal fun PrayerTimesSettingsRoute(
         adjustmentsPaused = day?.pausedAdjustments?.isNotEmpty() == true,
         placeName = cityDisplayName.takeIf { location != null },
         today = today,
+        clockFormat = clockFormat,
+        // Re-plans the notifications and rewrites the widget mirror, like every write here: the
+        // clock format is part of how both are worded.
+        onClockFormat = { write { settings.setClockFormat(it) } },
         onSchool = { write { settings.setSchool(it) } },
         onHijriOffset = { write { settings.setHijriOffsetDays(it) } },
         onShowSunrise = { write { settings.setShowSunrise(it) } },

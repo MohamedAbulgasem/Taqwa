@@ -606,4 +606,7 @@
     <string name="recitation_gigabytes">%1$s GB</string>
     <string name="credit_recitations">Tilawah</string>
     <string name="credit_recitations_detail">Tilawah per ayat dari Islamic Network (alquran.cloud), dilisensikan kepada mereka oleh para qari untuk penyebaran ulang gratis dan nonkomersial pada bitrate yang mereka terbitkan. Disalin tanpa perubahan, pada bitrate yang sama.</string>
+    <string name="prayer_times_time_format">Format waktu</string>
+    <string name="time_format_24">24 jam</string>
+    <string name="time_format_12">12 jam</string>
 </resources>

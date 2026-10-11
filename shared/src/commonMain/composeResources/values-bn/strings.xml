@@ -613,4 +613,7 @@
     <string name="recitation_gigabytes">%1$s জিবি</string>
     <string name="credit_recitations">তিলাওয়াত</string>
     <string name="credit_recitations_detail">ইসলামিক নেটওয়ার্ক (alquran.cloud) থেকে আয়াতভিত্তিক তিলাওয়াত; কারিরা নিজেদের প্রকাশিত বিটরেটে বিনামূল্যে ও অবাণিজ্যিক পুনর্বিতরণের অনুমতি দিয়েছেন। একই বিটরেটে, অপরিবর্তিতভাবে মিরর করা।</string>
+    <string name="prayer_times_time_format">সময়ের ফরম্যাট</string>
+    <string name="time_format_24">২৪ ঘণ্টা</string>
+    <string name="time_format_12">১২ ঘণ্টা</string>
 </resources>

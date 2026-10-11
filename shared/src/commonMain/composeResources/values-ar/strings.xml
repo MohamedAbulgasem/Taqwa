@@ -616,4 +616,7 @@
     <string name="recitation_gigabytes">%1$s ج.ب</string>
     <string name="credit_recitations">التلاوات</string>
     <string name="credit_recitations_detail">تلاوات آية بآية من الشبكة الإسلامية (alquran.cloud)، مرخّصة لها من القرّاء للتوزيع المجاني غير التجاري بمعدلات البت التي تنشرها. منسوخة دون تعديل وبالمعدلات نفسها.</string>
+    <string name="prayer_times_time_format">تنسيق الوقت</string>
+    <string name="time_format_24">24 ساعة</string>
+    <string name="time_format_12">12 ساعة</string>
 </resources>

@@ -608,4 +608,7 @@
     <string name="recitation_gigabytes">%1$s جی بی</string>
     <string name="credit_recitations">تلاوتیں</string>
     <string name="credit_recitations_detail">آیت بہ آیت تلاوتیں اسلامک نیٹ ورک (alquran.cloud) سے، جنہیں قاریوں نے اُنہی بٹ ریٹس پر مفت، غیر تجارتی تقسیم کے لیے لائسنس دیا ہے جن پر وہ شائع کرتے ہیں۔ بغیر ترمیم کے، انہی بٹ ریٹس پر نقل کی گئیں۔</string>
+    <string name="prayer_times_time_format">وقت کا فارمیٹ</string>
+    <string name="time_format_24">24 گھنٹے</string>
+    <string name="time_format_12">12 گھنٹے</string>
 </resources>

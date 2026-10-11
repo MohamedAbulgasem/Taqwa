@@ -627,4 +627,7 @@
     <string name="recitation_gigabytes">%1$s Go</string>
     <string name="credit_recitations">Récitations</string>
     <string name="credit_recitations_detail">Récitations verset par verset de l’Islamic Network (alquran.cloud), que les récitateurs lui ont concédées pour une rediffusion gratuite et non commerciale aux débits qu’il publie. Copiées sans modification, à ces mêmes débits.</string>
+    <string name="prayer_times_time_format">Format de l’heure</string>
+    <string name="time_format_24">24 heures</string>
+    <string name="time_format_12">12 heures</string>
 </resources>

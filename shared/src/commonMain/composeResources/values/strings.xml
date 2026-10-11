@@ -648,4 +648,7 @@
     <string name="recitation_gigabytes">%1$s GB</string>
     <string name="credit_recitations">Recitations</string>
     <string name="credit_recitations_detail">Per-ayah recitations from the Islamic Network (alquran.cloud), licensed to them by the reciters for free, non-commercial redistribution at the bitrates they publish. Mirrored unmodified, at those bitrates.</string>
+    <string name="prayer_times_time_format">Time format</string>
+    <string name="time_format_24">24-hour</string>
+    <string name="time_format_12">12-hour</string>
 </resources>
