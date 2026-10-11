@@ -317,19 +317,22 @@ private fun CityAndDates(
     var blockLeft by remember { mutableFloatStateOf(0f) }
     var blockWidth by remember { mutableIntStateOf(0) }
     var infoCentre by remember { mutableStateOf<Float?>(null) }
-    // A Row now, for the horizon and the misbaha at its end (spec Tasbeeh §5; adhkar spec §2.2).
-    // The text keeps the weight and the block keeps its own paddings, so the 36 dp of air above the
-    // ring is untouched: the buttons are 44 dp tall against a city line of about 32, and it is the
-    // *text* column that still sets the block's height, because they are aligned to the city's line
-    // rather than stretched.
-    Row(
+    // The horizon and the misbaha (spec Tasbeeh §5; adhkar spec §2.2) sit on the city's line at the
+    // end of the block, and only there: the dates below run the block's whole width, gutter to
+    // gutter, as they did before the horizon came. They are laid over the block's top corner rather
+    // than put in a Row beside the city, for two reasons. A Row would be 44 dp tall against a city
+    // line of about 33 and so push the dates 11 dp lower, where it is the *text* column that sets
+    // the block's height, the buttons being aligned to the city's line rather than stretched. And
+    // they stay outside the block's clickable, so a tap on one never opens the ⓘ's card and neither
+    // joins its 48 dp target or its one screen-reader label.
+    Box(
         Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(top = topPadding, bottom = 4.dp),
     ) {
         // The whole city-and-date block is the ⓘ's 48 dp target (spec §2.1). No ripple, like
         // every surface on this screen: the card opening is the feedback.
         Column(
             Modifier
-                .weight(1f)
+                .fillMaxWidth()
                 .onGloballyPositioned {
                     blockLeft = it.positionInWindow().x
                     blockWidth = it.size.width
@@ -346,6 +349,9 @@ private fun CityAndDates(
                 // Resolved by the view model, in the interface's language; `location.cityName` stays
                 // the English snapshot and is only what this falls back to.
                 place,
+                // The city shares its line with the two glyphs, so it stops short of them (and wraps
+                // there when it is long); the dates below do not.
+                modifier = Modifier.padding(end = HeaderGlyphSize * 2),
                 style = TaqwaText.screenTitle,
                 color = colors.textPrimary,
             )
@@ -399,13 +405,19 @@ private fun CityAndDates(
                 )
             }
         }
-        // The horizon before the misbaha, so the misbaha keeps the corner it has always had.
-        HeaderGlyphButton(stringResource(Res.string.today_open_adhkar), actions.onOpenAdhkar) { drawHorizon(it) }
-        HeaderGlyphButton(stringResource(Res.string.today_open_tasbeeh), actions.onOpenTasbeeh) { drawMisbaha(it) }
+        // The horizon before the misbaha, so the misbaha keeps the corner it has always had. After
+        // the block in the Box, so they are drawn and hit-tested on top of it.
+        Row(Modifier.align(Alignment.TopEnd)) {
+            HeaderGlyphButton(stringResource(Res.string.today_open_adhkar), actions.onOpenAdhkar) { drawHorizon(it) }
+            HeaderGlyphButton(stringResource(Res.string.today_open_tasbeeh), actions.onOpenTasbeeh) { drawMisbaha(it) }
+        }
     }
 }
 
 private const val INFO_GLYPH = "info"
+
+/** The side of a header glyph's square target; the city stops two of them short of the block's end. */
+private val HeaderGlyphSize = 44.dp
 
 /**
  * What sits between the prayer list and the Qibla card, each only where it applies (spec §2.1):
@@ -460,7 +472,7 @@ private fun UnderTheList(state: TodayUiState.Ready, actions: ReadyActions) {
 }
 
 /**
- * A glyph at the end of the header row: [draw] at the tab bar's 22 dp, in a 44 dp target — the
+ * A glyph at the end of the city's line: [draw] at the tab bar's 22 dp, in a 44 dp target — the
  * misbaha that opens the tasbeeh, the horizon that opens the adhkar. No ripple, like the tab bar
  * and the Qibla card — the pushed screen is the feedback. It carries a content description
  * because it is a glyph with no words beside it.
@@ -474,7 +486,7 @@ private fun HeaderGlyphButton(description: String, onOpen: () -> Unit, draw: Dra
     Box(
         Modifier
             .offset(y = (-4).dp)
-            .size(44.dp)
+            .size(HeaderGlyphSize)
             .clip(CircleShape)
             .clickable(
                 interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
