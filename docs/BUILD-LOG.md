@@ -3258,14 +3258,18 @@ app update can withdraw them). `docs/ATTRIBUTION.md`, `NOTICE` and the README ca
 correct each draft, then run `check_items.py`, then flip `reviewed`. Three content decisions for Mohamed are at
 its top:
 1. **hisn-085.** The shipped Arabic and the five drafts read وَشَرَكِهِ, "his snares". OpenDua's English reads
-   وَشِرْكِهِ, "his shirk". Today the English disagrees with the Arabic. Whichever is chosen, all seven texts
-   must agree.
-2. **Bengali য or জ** for Arabic loanwords (আযাব and রিযিক, but জমিন). One convention, ideally for the whole
-   app.
-3. **Urdu hisn-078.** تیرے ساتھ ہم نے صبح کی, or the literal تجھ ہی سے.
+   وَشِرْكِهِ, "his shirk". Decided on 11 October: the Arabic stays as OpenDua has it and every translation
+   says "his snares"; the English was changed to match (`b37d7b35`, recorded in `tools/adhkar/README.md`, the
+   licence file and ATTRIBUTION).
+2. **Bengali য or জ** for Arabic loanwords (আযাব and রিযিক, but জমিন). Decided on 11 October: য, as the
+   app's আযান; the Bengali reviewer applies it.
+3. **Urdu hisn-078.** تیرے ساتھ ہم نے صبح کی, or the literal تجھ ہی سے. Left to the Urdu reviewer.
+The five drafts are being reviewed by the Lead's native-level review agents on a branch off this one, which
+flips each `reviewed` flag as its language passes.
 
-**Checked.** The last `scripts/test.sh` on `15daf9c2`, after the fix wave: shared 1,789/0 on the Android host
-and 1,690/0 on iOS, widgetcore 97/0 and 95/0. `scripts/check-strings.sh` is clean. `:androidApp:assembleDebug` and
+**Checked.** The last `scripts/test.sh` on `c206a25d`, after the morning's three follow-ups (Hisn 85, the
+opening-prayer rule, the header): shared 1,802/0 on the Android host and 1,712/0 on iOS, widgetcore 97/0 and
+95/0. `scripts/check-strings.sh` is clean. `:androidApp:assembleDebug` and
 `scripts/ios-build.sh` succeed (TaqwaWidget.appex 3 MB).
 
 **On a device: emulator-5560**, a throwaway Pixel 8 Pro image (Android 16, `-read-only`), London. The builds
@@ -3313,11 +3317,22 @@ open:
 - **At 200 % text the Morning | Evening labels are cut at the bottom.** `TaqwaSegmented` has a fixed 44 dp
   height.
 - **At 200 % text the caption is cut to "After sunrise · until 12:5…".**
-- **An evening set finished before Asr counts as that day's evening.** `dateKey` keys it by that day's Asr.
+- **An evening set finished before Asr counted as that day's evening.** `dateKey` keyed it by that day's Asr.
   Finished at 07:12, it withdrew the 16:55 reminder, and the evening would open on its done page after Asr.
-  This is a design question for Mohamed.
+  Decided on 11 October (the Lead): a set counts only from its opening prayer, evening from Asr and morning
+  from Fajr. Before that it is a free read: the caption says "From Asr · 16:55", counting works, nothing is
+  persisted, no done mark is written, the reminder stays, and leaving starts again at the first page
+  (`f12f4c39`; spec §3.3 and §5).
 - **At 200 % text the Quran list's surah-number circles are cut at the bottom.** Seen in the wave's Quran root
   shot; the screen was not touched by this branch. One for the accessibility round.
+- **The date line wrapped at 360 dp beside the two glyphs.** Both glyph buttons sat on the city's line, yet
+  the whole block, date included, was narrowed by both. Mohamed on 11 October: the glyph must not change how
+  the date is displayed. `c206a25d` overlays the two buttons on the city's row and gives the date line the
+  block's full width: at 411 and 448 dp the date's pixels are main's, and at 360 dp it is one line in all
+  seven languages where main's English and French already wrapped. Two consequences, both at 360 dp only: a
+  long city name wraps 44 dp earlier than on main ("Santiago de Compostela" takes two title lines), and the
+  whose-times card follows the block's width (312 dp instead of 268). Main-against-ours strips for en, ar,
+  bn and fr at the three widths are in the session scratchpad (`followup/header/hdr-compare-*.png`).
 - **"24 ساعة" and "12 ساعة" keep Western digits** under Egyptian Arabic, beside "٦:٣٢ م".
 - **Not caused by the 12-hour clock:** the Arabic Appearance preview cuts the medium widget's clock line. It
   does the same in 24-hour.

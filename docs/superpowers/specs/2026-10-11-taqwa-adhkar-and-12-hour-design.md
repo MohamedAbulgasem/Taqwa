@@ -124,8 +124,10 @@ to (14, 12); a half sun, the upper arc of radius 3.4 centred on (8, 12); three r
 
 `AdhkarButton` beside `TasbeehButton` in `CityAndDates`: the same 44 dp circle, 22 dp glyph in
 `textPrimary`, the same −4 dp nudge, no ripple, `contentDescription = today_open_adhkar` ("Adhkar").
-Order at the end of the header row: the city column, then the horizon, then the misbaha. Both the
-portrait and landscape bodies carry it. Nothing else on the Prayer screen changes: no line, no
+Order at the end of the city's row: the city, then the horizon, then the misbaha. The two buttons
+overlay the city's row only (the title keeps 88 dp clear for them); the date line beneath spans the
+block's full width, as it did before the second button, so the glyphs never change how the date is
+displayed (the owner's rule, 11 October 2026). Both the portrait and landscape bodies carry it. Nothing else on the Prayer screen changes: no line, no
 card, no count, no tint.
 
 ### 2.3 What it opens
