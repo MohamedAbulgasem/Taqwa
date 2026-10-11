@@ -1,4 +1,11 @@
 # Switzerland, FIDS: its Zürich page for 25 September-26 October 2026 (fids.ch; equal to Diyanet Zürich),
 # a point table at Zürich (ruling R44). Its Fajr is also its imsak (F+E). One month: fit, nothing held out.
+# 2027 (review of track T4, 11 Oct 2026): FIDS prints Diyanet Zürich's table under its own name (31 of 31 days equal,
+# Europe.kt), and fids.ch shows Diyanet Zürich's month, so Diyanet's own Zürich table, pinned from the monitor on
+# 2 Oct 2026 (29 September 2026 to 31 December 2027), is read as FIDS's to come, at the same unit. With the margins
+# fitted on FIDS's one month, Maghrib was a minute early on five days of 2027 and sunrise a minute late on nine; the
+# unit now takes Diyanet Zürich's own method and margins (Europe.kt). Fit, not held out: Diyanet's margins were fitted
+# (subtask 7b) on its Zürich table of the same days (dy-zurich.txt, tr-diyanet-europe.tsv).
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/europe/verify/fids-zh.txt	ch.fids/ch.fids			Europe/Zurich	F+E S D A M I	daily	standard	fit	FIDS Zürich, September-October 2026
+archive/tables/pinned/tr-diyanet-europe/2026-10-02/zurich.txt	ch.fids/ch.fids			Europe/Zurich	F+E S D A M I	daily	standard	fit	Diyanet Zürich, which FIDS prints (Europe.kt), the monitor capture of 2 Oct 2026

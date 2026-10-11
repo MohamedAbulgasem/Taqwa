@@ -1,6 +1,7 @@
 package world.taqwa.app.prayer.engine.registry.authorities
 
 import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.method.DayRule
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
@@ -25,14 +26,33 @@ import world.taqwa.app.prayer.engine.registry.widened
  * as an end, not our rounded start).
  *
  * Task 7c: each of the 13 fitted kab/kota carries its own margins (`Fitter.fit("id.kemenag/<id>")`,
- * over the whole of myQuran's only captured year, 2026, split Jan–Sep fit / Oct–Dec test, safety
- * 5 s), not one shared national value. A single shared margin (the 2025-era shipping figures, kept
+ * over the whole of 2026, then myQuran's only captured year, split Jan–Sep fit / Oct–Dec test,
+ * safety 5 s; since 11 Oct 2026 over 2026 and 2027, below), not one shared national value. A single shared margin (the 2025-era shipping figures, kept
  * as [method]'s own for the unfitted "outside" edge) has 2 gaps over the 13 places' 4,745 days,
  * both by a handful of seconds inside the 5 s safety pad (an early Fajr at Banda Aceh on 21 Mar
  * 2026, the Ramadan-adjacent anomaly the old research notes; a late sunrise at Bukittinggi on
  * 8 Feb 2026): fitting per kab/kota removes both, and removes the squeeze a shared value forces on
  * every other place to cover the tightest one (Kota Jakarta's own sunrise had 0 s of slack left
  * under the shared margin fitted to Bukittinggi's wider swing; each place now keeps its own).
+ *
+ * The March equinox (track T4, 11 Oct 2026). The weekly monitor first read Kemenag's 2027 tables on
+ * 5 Oct 2026, and against them the 2026-fitted margins were one minute early on 21 or 22 March 2027 at
+ * eight kab/kota (Dhuhr, Maghrib or Isha at Banda Aceh, Bukittinggi, Garut, Bogor, Wonosobo, Batu,
+ * Denpasar and Jayawijaya). Kemenag's own tables step there: on 21 and 22 March a printed time lags
+ * the smooth curve by about a day's change (some 17 s for Dhuhr, 30 s for Maghrib and Isha), which
+ * the rounding makes a whole minute on whichever day it crosses one; in 2026 the step had decided
+ * most places' Maghrib and Isha margins, and the Banda Aceh Fajr gap above is the same step. The
+ * method now says so ([DayRule.LAG_EQUINOX_KEMENAG]: on those two dates each start is the later of
+ * the day's and the day before's, each end the earlier), and every unit's margins are fitted over
+ * both published years with it (safety 5 s): never early on any of their 13,140 days, and the
+ * margins the step had held up fall back (Maghrib and Isha by up to 30 s at most places), so the
+ * shown minute is the printed one on more days than before; a few rise by up to 3 s, and
+ * Palembang's Asr by 8 s for its 2027 table's 30 September. [method]'s own margins, which the edge
+ * widens, are kept as they were, the largest of the 2026 fit. The step follows the calendar date, not
+ * the equinox (a leap year moves the equinox to 20 March): myQuran answers 2024 and 2028 too (read
+ * on 11 Oct 2026), and averaged over the eighteen places the step falls on 21 and 22 March in 2024 and
+ * on 21 March alone in 2028, never on 20 March. 2028, never fitted on, is the held-out year: 0 early
+ * and 0 late ends on its 6,588 place-days, worst a minute (the end of eating 2, as in the fitted years).
  *
  * Units are the 18 fitted kab/kota: the 13 of the research round and, since the monitor round of
  * 29 Sep 2026, Kota Medan, Palembang, Semarang, Surabaya and Yogyakarta, whose tables the weekly
@@ -75,6 +95,7 @@ object Kemenag {
         authorityMinutes = ihtiyat,
         margins = margins(start = 0, sunrise = -10, fajr = 35, dhuhr = 84, asr = 27, maghrib = 37, isha = 35),
         imsakMinutesBeforeFajr = 10,
+        dayRule = DayRule.LAG_EQUINOX_KEMENAG,
     )
 
     val outside = method.atEdge("id.kemenag.edge", method.margins.widened(EDGE_SECONDS)).copy(horizonDeg = -2.0)
@@ -93,25 +114,25 @@ object Kemenag {
         EventOffsets(fajr = fajr, sunrise = sunrise, dhuhr = dhuhr, asr = asr, maghrib = maghrib, isha = isha)
 
     private val fitted = listOf(
-        Kabkota("1301", "Kota Jakarta", -6.21462, 106.84513, highland = false, radiusKm = JAKARTA_CORE_KM, m(14, -9, 76, 23, 28, 33)),
-        Kabkota("0119", "Kota Banda Aceh", 5.54167, 95.33333, highland = false, radiusKm = 0.9, m(35, -5, 74, 26, 18, 12)),
-        Kabkota("2622", "Kota Makassar", -5.14861, 119.43194, highland = false, radiusKm = 4.0, m(12, -7, 71, 19, 13, 31)),
-        Kabkota("1709", "Kota Denpasar", -8.65, 115.21667, highland = false, radiusKm = 3.3, m(9, -9, 68, 20, 31, 12)),
-        Kabkota("3329", "Kota Jayapura", -2.53371, 140.71813, highland = false, radiusKm = 8.9, m(12, -4, 73, 20, 13, 14)),
-        Kabkota("1634", "Kota Malang", -7.9797, 112.6304, highland = false, radiusKm = 2.6, m(8, -8, 84, 19, 37, 30)),
-        Kabkota("1219", "Kota Bandung", -6.92222, 107.60694, highland = true, radiusKm = 3.8, m(8, -8, 79, 19, 30, 32)),
-        Kabkota("3308", "Kab. Jayawijaya", -4.09583, 138.94806, highland = true, radiusKm = 13.3, m(9, -8, 70, 16, 12, 7)),
-        Kabkota("1630", "Kota Batu", -7.87, 112.52833, highland = true, radiusKm = 3.4, m(8, -7, 78, 19, 11, 35)),
-        Kabkota("0313", "Kota Bukittinggi", -0.30907, 100.37055, highland = true, radiusKm = 0.1, m(17, -10, 82, 22, 8, 5)),
-        Kabkota("1222", "Kota Bogor", -6.59444, 106.78917, highland = true, radiusKm = 1.3, m(12, -5, 80, 26, 13, 18)),
-        Kabkota("1208", "Kab. Garut", -7.245, 107.921, highland = true, radiusKm = 3.8, m(14, -5, 74, 27, 15, 15)),
-        Kabkota("1429", "Kab. Wonosobo", -7.35889, 109.90306, highland = true, radiusKm = 9.9, m(8, -9, 69, 18, 11, 9)),
+        Kabkota("1301", "Kota Jakarta", -6.21462, 106.84513, highland = false, radiusKm = JAKARTA_CORE_KM, m(16, -9, 71, 25, 13, 14)),
+        Kabkota("0119", "Kota Banda Aceh", 5.54167, 95.33333, highland = false, radiusKm = 0.9, m(12, -5, 70, 27, 12, 12)),
+        Kabkota("2622", "Kota Makassar", -5.14861, 119.43194, highland = false, radiusKm = 4.0, m(13, -7, 72, 20, 10, 11)),
+        Kabkota("1709", "Kota Denpasar", -8.65, 115.21667, highland = false, radiusKm = 3.3, m(9, -9, 68, 20, 9, 10)),
+        Kabkota("3329", "Kota Jayapura", -2.53371, 140.71813, highland = false, radiusKm = 8.9, m(12, -4, 73, 21, 13, 14)),
+        Kabkota("1634", "Kota Malang", -7.9797, 112.6304, highland = false, radiusKm = 2.6, m(8, -8, 69, 19, 7, 9)),
+        Kabkota("1219", "Kota Bandung", -6.92222, 107.60694, highland = true, radiusKm = 3.8, m(8, -8, 67, 19, 9, 8)),
+        Kabkota("3308", "Kab. Jayawijaya", -4.09583, 138.94806, highland = true, radiusKm = 13.3, m(9, -8, 70, 16, 9, 10)),
+        Kabkota("1630", "Kota Batu", -7.87, 112.52833, highland = true, radiusKm = 3.4, m(8, -7, 69, 19, 9, 9)),
+        Kabkota("0313", "Kota Bukittinggi", -0.30907, 100.37055, highland = true, radiusKm = 0.1, m(8, -10, 67, 22, 8, 6)),
+        Kabkota("1222", "Kota Bogor", -6.59444, 106.78917, highland = true, radiusKm = 1.3, m(12, -5, 72, 28, 13, 14)),
+        Kabkota("1208", "Kab. Garut", -7.245, 107.921, highland = true, radiusKm = 3.8, m(14, -5, 74, 27, 13, 14)),
+        Kabkota("1429", "Kab. Wonosobo", -7.35889, 109.90306, highland = true, radiusKm = 9.9, m(8, -9, 69, 19, 8, 9)),
         // Monitor round (29 Sep 2026, ruling R104): five more lowland kota, fitted over the whole of 2026 like the 13.
-        Kabkota("0228", "Kota Medan", 3.58333, 98.66667, highland = false, radiusKm = 3.3, m(4, -14, 62, 27, 4, 4)),
-        Kabkota("0816", "Kota Palembang", -2.91673, 104.7458, highland = false, radiusKm = 0.6, m(8, -18, 70, 16, 23, 19)),
-        Kabkota("1433", "Kota Semarang", -6.99306, 110.42083, highland = false, radiusKm = 7.3, m(3, -14, 63, 12, 16, 17)),
-        Kabkota("1638", "Kota Surabaya", -7.24917, 112.75083, highland = false, radiusKm = 8.0, m(22, -8, 77, 36, 36, 33)),
-        Kabkota("1505", "Kota Yogyakarta", -7.80139, 110.36472, highland = false, radiusKm = 1.3, m(9, -10, 80, 18, 34, 27)),
+        Kabkota("0228", "Kota Medan", 3.58333, 98.66667, highland = false, radiusKm = 3.3, m(2, -14, 63, 18, 4, 4)),
+        Kabkota("0816", "Kota Palembang", -2.91673, 104.7458, highland = false, radiusKm = 0.6, m(10, -18, 64, 24, 10, 11)),
+        Kabkota("1433", "Kota Semarang", -6.99306, 110.42083, highland = false, radiusKm = 7.3, m(3, -14, 63, 12, 2, 2)),
+        Kabkota("1638", "Kota Surabaya", -7.24917, 112.75083, highland = false, radiusKm = 8.0, m(23, -8, 77, 36, 22, 24)),
+        Kabkota("1505", "Kota Yogyakarta", -7.80139, 110.36472, highland = false, radiusKm = 1.3, m(9, -10, 67, 19, 7, 6)),
     )
 
     private fun unitsFor(base: TimetableMethod, idPrefix: String) = fitted.map { k ->

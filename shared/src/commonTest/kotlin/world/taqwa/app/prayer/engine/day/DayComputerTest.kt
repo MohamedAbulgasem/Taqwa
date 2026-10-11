@@ -10,6 +10,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
@@ -25,6 +26,8 @@ import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.RamadanRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.method.curveSlot
+import world.taqwa.app.prayer.engine.registry.Place
+import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.data.UmmAlQuraDates
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -33,6 +36,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -960,5 +964,159 @@ class DayComputerTest {
         assertTrue(day.endOfEating <= day.fajr)
         assertTrue(Invariants.holds(day) && !day.repaired)
         day.everyInstant().forEach { assertEquals(0L, it.epochSeconds % 60) }
+    }
+
+    @Test
+    fun `kemenag's equinox rule lags starts on 21 and 22 march alone`() {
+        val jakarta = GeoPoint(-6.21462, 106.84513)
+        val zone = TimeZone.of("Asia/Jakarta")
+        val sameDay = plain("test.equinox")
+        val lagging = sameDay.copy(dayRule = DayRule.LAG_EQUINOX_KEMENAG)
+        for (year in listOf(2026, 2027, 2028)) {
+            for (day in listOf(21, 22)) {
+                val date = LocalDate(year, 3, day)
+                val today = compute(sameDay, jakarta, date, zone)
+                val yesterday = compute(sameDay, jakarta, date.minus(1, DateTimeUnit.DAY), zone)
+                val shown = compute(lagging, jakarta, date, zone)
+                today.starts().zip(yesterday.starts()).zip(shown.starts()).forEach { (pair, start) ->
+                    assertEquals(maxOf(pair.first, pair.second + 1.days), start, "$date")
+                }
+                assertEquals(minOf(today.sunrise, yesterday.sunrise + 1.days), shown.sunrise, "$date")
+                assertEquals(minOf(today.endOfEating, yesterday.endOfEating + 1.days), shown.endOfEating, "$date")
+            }
+            for (date in listOf(LocalDate(year, 3, 20), LocalDate(year, 3, 23), LocalDate(year, 9, 22))) {
+                assertEquals(
+                    compute(sameDay, jakarta, date, zone).copy(methodId = "x"),
+                    compute(lagging, jakarta, date, zone).copy(methodId = "x"),
+                    "$date",
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `a fixed table shows its year's times on every year at the same UTC moment where the sun allows`() {
+        val dublin = GeoPoint(53.3498, -6.2603)
+        val zone = TimeZone.of("Europe/Dublin")
+        val fixed = plain("test.fixed").copy(fixedTableYear = 2026)
+        val own = plain("test.fixed")
+        for (target in listOf(LocalDate(2027, 1, 3), LocalDate(2027, 3, 28), LocalDate(2028, 3, 15), LocalDate(2028, 8, 15), LocalDate(2029, 10, 30))) {
+            val reference = LocalDate(2026, target.month, target.day)
+            val shift = (target.toEpochDays() - reference.toEpochDays()).days
+            val table = compute(own, dublin, reference, zone)
+            val sun = compute(own, dublin, target, zone)
+            val shown = compute(fixed, dublin, target, zone)
+            assertEquals(target, shown.date)
+            // The table's own minutes, moved: every start the sun does not bound, and the end of eating.
+            assertEquals(table.fajr + shift, shown.fajr, "$target")
+            assertEquals(table.dhuhr + shift, shown.dhuhr, "$target")
+            assertEquals(table.asr + shift, shown.asr, "$target")
+            assertEquals(table.endOfEating + shift, shown.endOfEating, "$target")
+            // The date's own sun bounds the rest: sunrise never after it, Maghrib after it has set.
+            assertEquals(minOf(table.sunrise + shift, sun.sunrise), shown.sunrise, "$target")
+            assertEquals(sun.sunset, shown.sunset, "$target")
+            assertEquals(maxOf(table.maghrib + shift, sun.sunset + 1.minutes), shown.maghrib, "$target")
+            assertEquals(maxOf(table.isha + shift, shown.maghrib + 1.minutes), shown.isha, "$target")
+            assertEquals(sun.sunset, shown.ends[Prayer.ASR], "$target")
+            assertTrue(Invariants.holds(shown), "$target")
+        }
+        // Its own year is computed as it always was.
+        val date = LocalDate(2026, 6, 21)
+        assertEquals(compute(own, dublin, date, zone).copy(methodId = "x"), compute(fixed, dublin, date, zone).copy(methodId = "x"))
+    }
+
+    @Test
+    fun `a 29 february the table's year lacks is the safe side of its 28 february and the day after read as february`() {
+        val dublin = GeoPoint(53.3498, -6.2603)
+        val zone = TimeZone.of("Europe/Dublin")
+        // A town whose Asr offset changes on 1 March, as IZ BiH's do: two minutes later from March.
+        val february = mapOf(Prayer.ASR to IntArray(12) { 0 })
+        val own = plain("test.fixed").copy(monthlyOffsets = mapOf(Prayer.ASR to IntArray(12) { if (it == 2) 120 else 0 }))
+        val fixed = own.copy(fixedTableYear = 2026)
+        val leapDay = LocalDate(2028, 2, 29)
+        val feb28 = LocalDate(2026, 2, 28)
+        val mar1 = LocalDate(2026, 3, 1)
+        val from28 = (leapDay.toEpochDays() - feb28.toEpochDays()).days
+        val from1 = (leapDay.toEpochDays() - mar1.toEpochDays()).days
+        val before = compute(own, dublin, feb28, zone)
+        // The would-be 29 February: the day after 28 February on 2026's sun, with February's offsets.
+        val after = compute(own.copy(monthlyOffsets = february), dublin, mar1, zone)
+        val march = compute(own, dublin, mar1, zone)
+        val shown = compute(fixed, dublin, leapDay, zone)
+        val sun = compute(own, dublin, leapDay, zone)
+        assertEquals(leapDay, shown.date)
+        // Fajr comes earlier and Asr later from one day to the next in late February: each start is the later.
+        assertEquals(before.fajr + from28, shown.fajr)
+        assertEquals(maxOf(before.dhuhr + from28, after.dhuhr + from1), shown.dhuhr)
+        assertEquals(after.asr + from1, shown.asr)
+        assertTrue(before.asr + from28 < shown.asr && shown.asr < march.asr + from1, "Asr between 28 February and 1 March as printed")
+        // The ends the earlier, and the sunrise never after the date's own sun.
+        assertEquals(minOf(before.endOfEating + from28, after.endOfEating + from1), shown.endOfEating)
+        assertEquals(minOf(before.sunrise + from28, after.sunrise + from1, sun.sunrise), shown.sunrise)
+        assertTrue(shown.maghrib > sun.sunset && Invariants.holds(shown))
+    }
+
+    @Test
+    fun `a fixed table never ends after the real sunrise nor starts Maghrib at the real sunset`() {
+        // The Islamic Foundation of Ireland's table at Dublin through the leap cycle, against the plain sun at the same points.
+        val dublin = Place(53.3498, -6.2603, "Europe/Dublin", "IE")
+        val ifi = Registry.resolveEntry(assertNotNull(Registry.byId("ie.ifi")), dublin)
+        val method = assertNotNull(ifi.method)
+        assertEquals(2026, method.fixedTableYear)
+        val zone = TimeZone.of(dublin.zoneId)
+        val sun = plain("test.sun").copy(fixedPoint = method.fixedPoint, fixedPointMode = method.fixedPointMode)
+        // Ireland's automatic entry, IFI one of its members, at the user's own point.
+        val cautious = Registry.resolveEntry(assertNotNull(Registry.byId("ie.cautious")), dublin)
+        val own = plain("test.sun")
+        var date = LocalDate(2026, 1, 1)
+        while (date.year <= 2030) {
+            val shown = compute(method, ifi.point, date, zone)
+            val real = compute(sun, ifi.point, date, zone)
+            assertTrue(shown.sunrise <= real.sunrise, "sunrise on $date")
+            assertTrue(shown.ends.getValue(Prayer.FAJR) <= real.sunrise, "Fajr's end on $date")
+            assertTrue(shown.maghrib >= real.maghrib && shown.maghrib > real.sunset, "Maghrib on $date")
+            assertEquals(real.sunset, shown.sunset, "sunset on $date")
+            assertTrue(Invariants.holds(shown), "order on $date")
+            val combined = DayPipeline.unended(cautious, date, zone)
+            val here = compute(own, cautious.point, date, zone)
+            assertTrue(combined.sunrise <= here.sunrise && combined.maghrib > here.sunset, "ie.cautious on $date")
+            date = date.plus(1, DateTimeUnit.DAY)
+        }
+    }
+
+    @Test
+    fun `a fixed table that keeps its own dawn never starts Fajr before the year's own`() {
+        val sarajevo = GeoPoint(43.84864, 18.35644)
+        val zone = TimeZone.of("Europe/Sarajevo")
+        val base = plain("test.dawn").copy(endOfEating = EndOfEating.DawnAngle(18.0), endOfEatingMarginSeconds = -73)
+        val fixed = base.copy(fixedTableYear = 2026)
+        val keeping = fixed.copy(fixedTableOwnDawn = true)
+        var before = 0
+        var date = LocalDate(2027, 1, 1)
+        while (date.year <= 2028) {
+            val own = compute(base, sarajevo, date, zone)
+            val table = compute(fixed, sarajevo, date, zone)
+            val shown = compute(keeping, sarajevo, date, zone)
+            if (table.fajr < own.fajr) before++
+            assertEquals(maxOf(table.fajr, own.fajr), shown.fajr, "$date")
+            assertEquals(minOf(table.endOfEating, own.endOfEating), shown.endOfEating, "$date")
+            assertEquals(table.dhuhr, shown.dhuhr, "$date")
+            assertEquals(table.maghrib, shown.maghrib, "$date")
+            date = date.plus(1, DateTimeUnit.DAY)
+        }
+        // The table's year alone runs before the year's own dawn on some days of the leap cycle.
+        assertTrue(before > 0, "the table's year never ran before the year's own Fajr")
+    }
+
+    @Test
+    fun `a fixed table refuses rules that read another date`() {
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, dayRule = DayRule.LAG_DATES_UQ) }
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, ramadan = RamadanRule(maghribExtraSeconds = 60)) }
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, phaseYear = 2026) }
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableYear = 2026, isha = IshaRule.AfterMaghrib(90, 120)) }
+        assertFailsWith<IllegalArgumentException> {
+            plain("test.fixed").copy(fixedTableYear = 2026, fixedPoint = GeoPoint(53.0, -6.0), fixedPointMode = FixedPointMode.TABLE)
+        }
+        assertFailsWith<IllegalArgumentException> { plain("test.fixed").copy(fixedTableOwnDawn = true) }
     }
 }

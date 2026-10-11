@@ -52,7 +52,7 @@ data class NextYearRule(val entryId: String, val fromMonth: Int, val fromDay: In
  * - each clock change's `until` ([ClockChanges.table]) from eight weeks before it until it passes;
  * - London Unified's next year not held by 1 December, IRN's (Tromsø's 2027 calendar, ruling R82)
  *   by 1 November ([NEXT_YEAR]);
- * - any stamp whose `last` (About's `provenThrough`) is older than twelve months;
+ * - any stamp whose `last` (ProofStamps' `lastChecked`) is older than twelve months;
  * - from eight weeks before each Ramadan (the tabular calendar) to its end, the A/B entries whose
  *   proof does not cover it (spec §5's Ramadan release rule).
  */

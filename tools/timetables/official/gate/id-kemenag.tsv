@@ -1,6 +1,6 @@
 # Indonesia, Kemenag: 18 fitted kab/kota, myQuran's republication of bimasislam.kemenag.go.id
-# (api.myquran.com/v2/sholat/jadwal/<id>/<yyyy>/<mm>), the only year published (2026). No second year
-# exists yet for a forward split, so each place's own 365-day file is split by date, forward in time:
+# (api.myquran.com/v2/sholat/jadwal/<id>/<yyyy>/<mm>): 2026, 2027 and 2028 are rows (myQuran answers 2024 too). When 2026
+# was the only year held, no second year existed for a forward split, so each place's own 365-day file is split by date, forward in time:
 # fit on Jan-Sep (273 days), test on Oct-Dec (92 days) — a better split than "no split at all", the
 # only one profiles-tested.md ran. The 13 of the research round were fetched on 25 Sep 2026; the five
 # kota the weekly monitor first met on 28 Sep 2026 (Medan, Palembang, Semarang, Surabaya, Yogyakarta)
@@ -11,50 +11,91 @@
 # not (identical on all 61 days), so they are not rows here.
 # End of eating (audit of 3 Oct 2026, before Ramadan 1448): Kemenag's imsak (Subuh - 10) is a precaution these files do not hold;
 # the fast begins at Subuh, so the Fajr column is also checked as the end of eating (F+E).
+# 2027 (track T4, 11 Oct 2026): the weekly monitor first read Kemenag's 2027 on 5 Oct 2026; every place's 2027 table is a
+# row below (the prove of 5 Oct 2026 added nine; the other nine were one minute early on 21 or 22 March 2027, and at
+# Palembang's Asr on 30 September 2027). Kemenag's tables lag a day's change on 21 and 22 March (its step at the
+# equinox): the method now carries that step (DayRule.LAG_EQUINOX_KEMENAG) and every unit's margins are fitted over
+# every 2026 and 2027 row alike (Kemenag.kt), so all of them are fit, Oct-Dec 2026 too, and none is held out.
+# 2028 (review of track T4, 11 Oct 2026): myQuran answers 2028 already, for all eighteen (read with the monitor's own
+# fetchers/kemenag.py code, the place-name check included; pinned under archive/tables/pinned/id-kemenag/2026-10-11/,
+# the raw answers under archive/raw/monitor/id-kemenag/2026-10-11/): the held-out year, never fitted on. Averaged over
+# the eighteen places, its step falls on 21 March alone (in 2024, the other leap year held, on 21 and 22 March as in
+# 2026 and 2027), never on 20 March, so the rule's two dates cover it.
+# The 2027 rows check the end of eating as the 2026 rows do (F+E): the prove rows of 5 Oct 2026 had taken the
+# fetcher's F, which the fetcher now gives as F+E.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta-fit.txt	id.kemenag/1301			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Jakarta, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta-test.txt	id.kemenag/1301			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Jakarta, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta-test.txt	id.kemenag/1301			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Jakarta, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-bandaaceh-fit.txt	id.kemenag/0119			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Banda Aceh, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-bandaaceh-test.txt	id.kemenag/0119			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Banda Aceh, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bandaaceh-test.txt	id.kemenag/0119			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Banda Aceh, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-makassar-fit.txt	id.kemenag/2622			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Makassar, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-makassar-test.txt	id.kemenag/2622			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Makassar, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-makassar-test.txt	id.kemenag/2622			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Makassar, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-denpasar-fit.txt	id.kemenag/1709			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Denpasar, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-denpasar-test.txt	id.kemenag/1709			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Denpasar, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-denpasar-test.txt	id.kemenag/1709			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Denpasar, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-jayapura-fit.txt	id.kemenag/3329			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Jayapura, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-jayapura-test.txt	id.kemenag/3329			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kota Jayapura, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jayapura-test.txt	id.kemenag/3329			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Jayapura, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-malang-fit.txt	id.kemenag/1634			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Malang, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-malang-test.txt	id.kemenag/1634			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Malang, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-malang-test.txt	id.kemenag/1634			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Malang, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-bandung-fit.txt	id.kemenag/1219			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bandung, Jan-Sep 2026, highland
-archive/tables/round/data-diyanet-kemenag/off-kemenag-bandung-test.txt	id.kemenag/1219			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bandung, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bandung-test.txt	id.kemenag/1219			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bandung, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-jayawijaya-fit.txt	id.kemenag/3308			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Jayawijaya, Jan-Sep 2026, highland
-archive/tables/round/data-diyanet-kemenag/off-kemenag-jayawijaya-test.txt	id.kemenag/3308			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Jayawijaya, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jayawijaya-test.txt	id.kemenag/3308			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Jayawijaya, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-batu-fit.txt	id.kemenag/1630			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Batu, Jan-Sep 2026, highland
-archive/tables/round/data-diyanet-kemenag/off-kemenag-batu-test.txt	id.kemenag/1630			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Batu, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-batu-test.txt	id.kemenag/1630			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Batu, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-bukittinggi-fit.txt	id.kemenag/0313			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bukittinggi, Jan-Sep 2026, highland
-archive/tables/round/data-diyanet-kemenag/off-kemenag-bukittinggi-test.txt	id.kemenag/0313			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bukittinggi, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bukittinggi-test.txt	id.kemenag/0313			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bukittinggi, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-bogor-fit.txt	id.kemenag/1222			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bogor, Jan-Sep 2026, highland
-archive/tables/round/data-diyanet-kemenag/off-kemenag-bogor-test.txt	id.kemenag/1222			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bogor, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-bogor-test.txt	id.kemenag/1222			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bogor, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-garut-fit.txt	id.kemenag/1208			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Garut, Jan-Sep 2026, highland
-archive/tables/round/data-diyanet-kemenag/off-kemenag-garut-test.txt	id.kemenag/1208			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Garut, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-garut-test.txt	id.kemenag/1208			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Garut, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-wonosobo-fit.txt	id.kemenag/1429			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Wonosobo, Jan-Sep 2026, highland
-archive/tables/round/data-diyanet-kemenag/off-kemenag-wonosobo-test.txt	id.kemenag/1429			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Wonosobo, Oct-Dec 2026, highland
+archive/tables/round/data-diyanet-kemenag/off-kemenag-wonosobo-test.txt	id.kemenag/1429			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Wonosobo, Oct-Dec 2026, highland
 archive/tables/round/data-diyanet-kemenag/off-kemenag-medan-fit.txt	id.kemenag/0228			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Medan, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-medan-test.txt	id.kemenag/0228			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Medan, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-medan-test.txt	id.kemenag/0228			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Medan, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-palembang-fit.txt	id.kemenag/0816			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Palembang, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-palembang-test.txt	id.kemenag/0816			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Palembang, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-palembang-test.txt	id.kemenag/0816			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Palembang, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-semarang-fit.txt	id.kemenag/1433			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Semarang, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-semarang-test.txt	id.kemenag/1433			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Semarang, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-semarang-test.txt	id.kemenag/1433			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Semarang, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-surabaya-fit.txt	id.kemenag/1638			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Surabaya, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-surabaya-test.txt	id.kemenag/1638			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Surabaya, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-surabaya-test.txt	id.kemenag/1638			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Surabaya, Oct-Dec 2026
 archive/tables/round/data-diyanet-kemenag/off-kemenag-yogyakarta-fit.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Yogyakarta, Jan-Sep 2026
-archive/tables/round/data-diyanet-kemenag/off-kemenag-yogyakarta-test.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Yogyakarta, Oct-Dec 2026
+archive/tables/round/data-diyanet-kemenag/off-kemenag-yogyakarta-test.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Yogyakarta, Oct-Dec 2026
 # prove, 2026-10-05: the monitor's captures pinned as they were under archive/tables/pinned/{id-kemenag}/2026-10-05/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
-archive/tables/pinned/id-kemenag/2026-10-05/bandung-2027.txt	id.kemenag/1219			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Bandung 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/jakarta-2027.txt	id.kemenag/1301			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Jakarta 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/jayapura-2027.txt	id.kemenag/3329			Asia/Jayapura	F S D A M I	daily	standard	test	Kota Jayapura 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/makassar-2027.txt	id.kemenag/2622			Asia/Makassar	F S D A M I	daily	standard	test	Kota Makassar 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/malang-2027.txt	id.kemenag/1634			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Malang 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/medan-2027.txt	id.kemenag/0228			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Medan 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/semarang-2027.txt	id.kemenag/1433			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Semarang 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/surabaya-2027.txt	id.kemenag/1638			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Surabaya 2027, the monitor capture of 5 Oct 2026 (prove)
-archive/tables/pinned/id-kemenag/2026-10-05/yogyakarta-2027.txt	id.kemenag/1505			Asia/Jakarta	F S D A M I	daily	standard	test	Kota Yogyakarta 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/bandung-2027.txt	id.kemenag/1219			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bandung 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/jakarta-2027.txt	id.kemenag/1301			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Jakarta 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/jayapura-2027.txt	id.kemenag/3329			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Jayapura 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/makassar-2027.txt	id.kemenag/2622			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Makassar 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/malang-2027.txt	id.kemenag/1634			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Malang 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/medan-2027.txt	id.kemenag/0228			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Medan 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/semarang-2027.txt	id.kemenag/1433			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Semarang 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/surabaya-2027.txt	id.kemenag/1638			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Surabaya 2027, the monitor capture of 5 Oct 2026 (prove)
+archive/tables/pinned/id-kemenag/2026-10-05/yogyakarta-2027.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Yogyakarta 2027, the monitor capture of 5 Oct 2026 (prove)
+# The other nine 2027 tables (11 Oct 2026): the monitor captures of 5 Oct 2026 (equal on every day to a fresh fetch of 11 Oct 2026), pinned as they were under archive/tables/pinned/id-kemenag/2026-10-11/. Prove of 5 Oct 2026 left them out: one minute early on 21 or 22 March 2027 at eight places (Dhuhr, Maghrib or Isha; Kemenag's equinox step, see the header) and Asr at Palembang on 30 September 2027; the method carries the step and the margins are refitted over 2026 and 2027 (Kemenag.kt); the rows are split=fit, as the header says.
+archive/tables/pinned/id-kemenag/2026-10-11/bandaaceh-2027.txt	id.kemenag/0119			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Banda Aceh 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/bukittinggi-2027.txt	id.kemenag/0313			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bukittinggi 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/palembang-2027.txt	id.kemenag/0816			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Palembang 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/garut-2027.txt	id.kemenag/1208			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Garut 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/bogor-2027.txt	id.kemenag/1222			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bogor 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/wonosobo-2027.txt	id.kemenag/1429			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Wonosobo 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/batu-2027.txt	id.kemenag/1630			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Batu 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/denpasar-2027.txt	id.kemenag/1709			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Denpasar 2027, the monitor capture of 5 Oct 2026
+archive/tables/pinned/id-kemenag/2026-10-11/jayawijaya-2027.txt	id.kemenag/3308			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Jayawijaya 2027, the monitor capture of 5 Oct 2026
+# 2028, held out (review of track T4, 11 Oct 2026): every kab/kota at its unit, as its 2026 and 2027 rows.
+archive/tables/pinned/id-kemenag/2026-10-11/jakarta-2028.txt	id.kemenag/1301			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Jakarta 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/bandaaceh-2028.txt	id.kemenag/0119			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Banda Aceh 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/makassar-2028.txt	id.kemenag/2622			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Makassar 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/denpasar-2028.txt	id.kemenag/1709			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Denpasar 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/jayapura-2028.txt	id.kemenag/3329			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kota Jayapura 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/malang-2028.txt	id.kemenag/1634			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Malang 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/bandung-2028.txt	id.kemenag/1219			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bandung 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/jayawijaya-2028.txt	id.kemenag/3308			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Jayawijaya 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/batu-2028.txt	id.kemenag/1630			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Batu 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/bukittinggi-2028.txt	id.kemenag/0313			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bukittinggi 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/bogor-2028.txt	id.kemenag/1222			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bogor 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/garut-2028.txt	id.kemenag/1208			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Garut 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/wonosobo-2028.txt	id.kemenag/1429			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Wonosobo 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/surabaya-2028.txt	id.kemenag/1638			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Surabaya 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/medan-2028.txt	id.kemenag/0228			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Medan 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/semarang-2028.txt	id.kemenag/1433			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Semarang 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/palembang-2028.txt	id.kemenag/0816			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Palembang 2028, read from myQuran on 11 Oct 2026 (held out)
+archive/tables/pinned/id-kemenag/2026-10-11/yogyakarta-2028.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Yogyakarta 2028, read from myQuran on 11 Oct 2026 (held out)

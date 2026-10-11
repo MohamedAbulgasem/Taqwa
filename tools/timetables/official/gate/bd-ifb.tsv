@@ -8,3 +8,6 @@
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/southasia/off-ifb-perm-2026.txt	bd.ifb	23.7104	90.4074	Asia/Dhaka	E F D A M I S	daily	hanafi	fit	IFB permanent Dhaka table, year-round (2026 dates)
 archive/tables/off-ifb-dhaka.txt	bd.ifb	23.7104	90.4074	Asia/Dhaka	F S D A M I	daily	hanafi	test	IFB permanent Dhaka table, October rows (independent digitization, held out)
+# 2027 (track T4, 11 Oct 2026): the same permanent table assigned to 2027 dates (archive: off-ifb-perm-2027.txt, derived; a permanent
+# table prints the same month-day times every year), held out: the engine against the year's own sun.
+archive/tables/moral-auth-world/southasia/off-ifb-perm-2027.txt	bd.ifb	23.7104	90.4074	Asia/Dhaka	E F D A M I S	daily	hanafi	test	IFB permanent Dhaka table, assigned to 2027 dates

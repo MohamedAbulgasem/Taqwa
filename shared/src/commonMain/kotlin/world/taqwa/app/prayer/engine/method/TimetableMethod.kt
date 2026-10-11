@@ -53,8 +53,12 @@ data class EventOffsets(
  * - [LAG_DATES_UQ]: on listed dates Umm al-Qura prints the previous day's astronomy, so starts take
  *   the later of the day and the day before, and sunrise the earlier; after the last date the list
  *   covers, every day (ruling R71).
+ * - [LAG_EQUINOX_KEMENAG]: on 21 and 22 March Kemenag's tables hold a time where the day before put
+ *   it (its step at the March equinox, on those dates in 2024, 2026 and 2027 and on 21 March alone in
+ *   2028, never 20 March), so on those two dates starts take the later of the day and the day before,
+ *   and the ends the earlier, as [LAG_DATES_UQ] does.
  */
-enum class DayRule { SAME_DAY, NEIGHBOURS_MUIS, LAG_DATES_UQ }
+enum class DayRule { SAME_DAY, NEIGHBOURS_MUIS, LAG_DATES_UQ, LAG_EQUINOX_KEMENAG }
 
 /**
  * What a [TimetableMethod.fixedPoint] bounds (ruling R45): [BOTH] the starts (the later of it and the
@@ -208,6 +212,20 @@ sealed interface HighLatRule {
  *   sunset); such a day shows Isha the minute after Maghrib and declares it not followed
  *   (DayComputer's point 9). Off, an Isha at or before Maghrib stays out of order for
  *   [world.taqwa.app.prayer.engine.day.Invariants.repair] and the gate to flag (review D round 1).
+ * - [fixedTableYear]: the authority prints one fixed table, the same month-day times every year,
+ *   on a fixed clock (the Islamic Foundation of Ireland's, in GMT): every date is computed as the
+ *   same month and day of this year, the table's own, and moved onto the date at the same instant
+ *   of the UTC day, so that each year shows the table's times and not the year's own sun (a 29
+ *   February the year lacks is both its 28 February and its 1 March, as ruling R29 reads a phase
+ *   year: starts the later, ends the earlier). The date's own sun still bounds what the table's
+ *   year cannot know: the sunrise shown never after the sun's own, Maghrib never before the minute
+ *   after the sun's own sunset, the sunset, Asr's end and the red twilight the date's own
+ *   (DayComputer). Only for a method whose rules read no other date: no Ramadan rule (nor an Isha
+ *   counted otherwise in Ramadan), day rule, clock rule or phase year, and no table carried to a
+ *   town by a printed figure ([FixedPointMode.TABLE]), whose sunset is the table's.
+ * - [fixedTableOwnDawn]: under [fixedTableYear], the dawn is also the date's own: Fajr never before,
+ *   and the end of eating and imsak never after, what the method gives on the date's own sun (IZ
+ *   BiH's edge, where no table is held and Taqwa keeps the real dawn, spec §10.8).
  *
  * The arrays compare by reference in [equals]; methods are registry singletons.
  */
@@ -241,6 +259,8 @@ data class TimetableMethod(
     val clockRule: ClockRule? = null,
     val dayAroundDhuhrMinutes: Int? = null,
     val declaresIshaBeforeMaghrib: Boolean = false,
+    val fixedTableYear: Int? = null,
+    val fixedTableOwnDawn: Boolean = false,
 ) {
     init {
         require(dayAroundDhuhrMinutes == null || dayAroundDhuhrMinutes in 1 until 12 * 60) {
@@ -260,6 +280,20 @@ data class TimetableMethod(
         }
         require(fixedDhuhrLocalMinutes == null || fixedDhuhrLocalMinutes in 0 until 24 * 60) {
             "$id: fixedDhuhrLocalMinutes is a local time of day"
+        }
+        require(
+            fixedTableYear == null || (
+                ramadan == null && dayRule == DayRule.SAME_DAY && clockRule == null && phaseYear == null &&
+                    (isha !is IshaRule.AfterMaghrib || isha.ramadanMinutes == isha.minutes)
+                ),
+        ) {
+            "$id: a fixed table's year reads no other date's rules (Ramadan, day, clock, phase year)"
+        }
+        require(fixedTableYear == null || fixedPointMode != FixedPointMode.TABLE) {
+            "$id: a fixed table's day is held to the date's own sunset, not a table point's carried by a printed figure"
+        }
+        require(!fixedTableOwnDawn || fixedTableYear != null) {
+            "$id: fixedTableOwnDawn bounds a fixed table's dawn (fixedTableYear)"
         }
     }
 

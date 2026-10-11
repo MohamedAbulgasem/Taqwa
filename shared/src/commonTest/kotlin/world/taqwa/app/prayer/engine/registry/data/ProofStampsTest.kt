@@ -26,7 +26,7 @@ class ProofStampsTest {
         // At least the place-days of 9 October 2026: the weekly monitor's prove adds held-out rows as new captures
         // arrive (docs/MONITOR.md, "Prove"), so the proof only grows; a regeneration that drops rows shows here.
         assertTrue(stamp.placeDays >= 2493800, "sa.ummalqura placeDays ${stamp.placeDays}")
-        assertEquals("2030-12-31", stamp.provenThrough)
+        assertEquals("2030-12-31", stamp.lastChecked)
         assertEquals(2, stamp.worstLateMinutes["dhuhr"])
         // One row per KACST place, each its own: Makkah's Fajr is not Tayma's (a table computed a degree north of it).
         assertEquals(173, stamp.worstLateByUnit.size)

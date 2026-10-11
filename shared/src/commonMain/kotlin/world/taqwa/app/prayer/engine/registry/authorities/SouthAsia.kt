@@ -106,9 +106,25 @@ object SouthAsia {
         id = "bd.ifb", nameKey = "authority_ifb", entryClass = EntryClass.D_AUTHORITY, method = bangladeshMethod,
         school = AsrSchool.HANAFI, countries = setOf("BD"),
         lateLimits = listOf(
-            LateLimit(4, "the true-dawn precaution swings across the year and the district edge stacks on it (task 7f)", setOf(TimedEvent.FAJR)),
+            LateLimit(
+                5,
+                "the true-dawn precaution swings across the year and the district edge stacks on it (task 7f); the permanent table " +
+                    "prints the same month-day times every year while the sun shifts through the leap cycle, a minute more on a day of 2027",
+                setOf(TimedEvent.FAJR),
+            ),
             LateLimit(4, "IFB's Isha angle is only documented as about 18° + 1..4 min, and the district edge stacks on it (task 7f)", setOf(TimedEvent.ISHA)),
-            LateLimit(4, "the district edge makes the fitted sehri end run up to a minute earlier still (task 7f); an early end is the safe side", setOf(TimedEvent.END_OF_EATING)),
+            LateLimit(
+                5,
+                "the district edge makes the fitted sehri end run up to a minute earlier still (task 7f), and the permanent table " +
+                    "against the leap cycle a minute more on a day of 2027; an early end is the safe side",
+                setOf(TimedEvent.END_OF_EATING),
+            ),
+            LateLimit(
+                4,
+                "the district edge puts sunrise up to a minute before Dhaka's (task 7f), and the permanent table against the leap " +
+                    "cycle a minute more on a day of 2027; an early end is the safe side",
+                setOf(TimedEvent.SUNRISE),
+            ),
         ),
     )
 

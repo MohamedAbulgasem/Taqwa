@@ -8,16 +8,19 @@ package world.taqwa.app.prayer.engine.registry.data
 
 /**
  * One registry entry's proof, as the About-times screen shows it (spec §2.3, task 11): how many
- * place-days and places the gate has checked it on, the last date it holds (`provenThrough`, null
- * before any stamp exists), the worst lateness seen per event over the whole entry
+ * place-days and places the gate has checked it on, the last date any row holds (`lastChecked`, the
+ * stamp's `last`, null before any stamp exists: the end of the envelope, never a "checked through"
+ * claim, since the days before it may have holes), the worst lateness seen per event over the whole entry
  * (`worstLateMinutes`, event keys as the gate writes them: "fajr", "sunrise", "dhuhr", "asr" or
  * "asrStandard"/"asrHanafi", "maghrib", "isha", "endOfEating", "imsak") and per authority unit
  * (`worstLateByUnit`, keyed by the unit's id; empty for an entry the gate checks without units),
  * and the late limits the gate held the entry to when the stamp was written ([ProofLateLimit],
  * ruling R41): the class's own (A 1, B 2, C 1 after the latest member, D 3), listed with a null
  * reason, and each recorded exception with its reason, each with the events it covered.
- * `provenThroughByUnit` is each unit's own last checked date where it is before the entry's
- * (`provenThrough`): the date About gives for a place in that unit, as its city page does (ruling R115).
+ * `checked` is the days any row compared, as the stamp's runs ("2026-09-25..2026-11-01", or one
+ * date), and `checkedByUnit` a unit's own runs where they are not the entry's (ruling R115): About's
+ * "checked through" date is the end of the run holding the day it is read on, so it never runs past a
+ * day the place's own table was not checked on, as its city page's date never does.
  *
  * A unit or entry with no stamp file (an authority not yet gated, or a class with no official
  * days) has no row: [ProofStamps.of] returns null, and the screen reads that as "not yet compared"
@@ -28,11 +31,12 @@ data class ProofStamp(
     val places: Int,
     val placeDays: Int,
     val ramadanDays: Int,
-    val provenThrough: String?,
+    val lastChecked: String?,
     val worstLateMinutes: Map<String, Int>,
     val worstLateByUnit: Map<String, Map<String, Int>>,
     val lateLimits: List<ProofLateLimit>,
-    val provenThroughByUnit: Map<String, String> = emptyMap(),
+    val checked: List<String> = emptyList(),
+    val checkedByUnit: Map<String, List<String>> = emptyMap(),
 )
 
 /**
@@ -126,20 +130,21 @@ object ProofStamps {
         places = 10,
         placeDays = 10,
         ramadanDays = 0,
-        provenThrough = "2026-09-25",
+        lastChecked = "2026-09-25",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 3, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 3),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-25"),
     )
 
     private fun aeIacadDubai() = ProofStamp(
         entryId = "ae.iacad.dubai",
         places = 12,
-        placeDays = 20067,
-        ramadanDays = 1690,
-        provenThrough = "2029-12-31",
+        placeDays = 20797,
+        ramadanDays = 1748,
+        lastChecked = "2029-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 3, "fajr" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = aeIacadDubaiUnits(),
         lateLimits = listOf(
@@ -147,11 +152,13 @@ object ProofStamps {
             ProofLateLimit(minutes = 3, reason = "Dubai's one table serves the whole city, and Taqwa also keeps each place's own dawn, about a minute earlier in the city's north-east in June", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        provenThroughByUnit = aeIacadDubaiThrough(),
+        checked = listOf("2022-01-01..2025-06-26", "2026-01-01..2029-12-31"),
+        checkedByUnit = aeIacadDubaiChecked(),
     )
 
-    private fun aeIacadDubaiThrough(): Map<String, String> = mapOf(
-        "dubai-rural" to "2026-12-31",
+    private fun aeIacadDubaiChecked(): Map<String, List<String>> = mapOf(
+        "dubai-rural" to listOf("2022-01-01..2025-06-26", "2026-01-01..2027-12-31"),
+        "hatta" to listOf("2023-01-01..2025-06-26", "2026-01-01..2029-12-31"),
     )
 
     private fun aeIacadDubaiUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -165,13 +172,14 @@ object ProofStamps {
         places = 3,
         placeDays = 780,
         ramadanDays = 63,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = alKmshUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 1, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2027-12-31"),
     )
 
     private fun alKmshUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -183,7 +191,7 @@ object ProofStamps {
         places = 1,
         placeDays = 184,
         ramadanDays = 19,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = atIggoUnits(),
         lateLimits = listOf(
@@ -192,6 +200,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 4, reason = "In spring Diyanet's takdir moves Fajr by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Fajr early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("fajr")),
             ProofLateLimit(minutes = 4, reason = "In spring and in August Diyanet's takdir moves Isha by several minutes a day here, in steps; its curve takes the latest of three neighbouring days so that the leap cycle cannot make Isha early, and so runs after the printed time by as much as a day's step on those days. On its takdir days the curve is the latest moment Diyanet's own could be under its rounding to the minute, so that the next year's rounding cannot make it early, and shows the printed minute or the one after.", events = listOf("isha")),
         ),
+        checked = listOf("2026-03-01..2026-03-31", "2026-05-01..2026-07-31", "2026-09-01..2026-09-30", "2026-12-01..2026-12-31"),
     )
 
     private fun atIggoUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -203,7 +212,7 @@ object ProofStamps {
         places = 2,
         placeDays = 380,
         ramadanDays = 28,
-        provenThrough = "2027-06-05",
+        lastChecked = "2027-06-05",
         worstLateMinutes = mapOf("asrStandard" to 18, "dhuhr" to 4, "endOfEating" to 2, "fajr" to 2, "isha" to 10, "maghrib" to 1, "sunrise" to 8),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -214,6 +223,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 10, reason = "Isha is the later member's, the TURKEY preset's 17° or LMA's Maghrib + 90: up to 10 min after the other's.", events = listOf("isha")),
             ProofLateLimit(minutes = 18, reason = "Asr is the later member's: LMA's, on its per-month offsets up to 15 min after its own table, and the TURKEY preset's with its allowance for Diyanet's daily model (subtask 7b): up to 18 min after the earlier table's.", events = listOf("asrStandard")),
         ),
+        checked = listOf("2026-06-16..2026-12-01", "2026-12-03", "2026-12-05..2026-12-31", "2027-01-02..2027-01-30", "2027-02-01..2027-03-01", "2027-03-03..2027-04-29", "2027-05-01..2027-06-05"),
     )
 
     private fun auLma() = ProofStamp(
@@ -221,13 +231,14 @@ object ProofStamps {
         places = 1,
         placeDays = 349,
         ramadanDays = 28,
-        provenThrough = "2027-06-05",
+        lastChecked = "2027-06-05",
         worstLateMinutes = mapOf("asrStandard" to 15, "dhuhr" to 3, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = auLmaUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 15, reason = "LMA's Asr runs from 12 min before to 22 min after the Shafi'i Asr on a smooth seasonal curve no rule here reproduces; per-month offsets keep it never early, up to 15 min after it within its fastest-moving months (October, December and January).", events = listOf("asrStandard")),
         ),
+        checked = listOf("2026-06-16..2026-12-01", "2026-12-03", "2026-12-05..2026-12-31", "2027-01-02..2027-01-30", "2027-02-01..2027-03-01", "2027-03-03..2027-04-29", "2027-05-01..2027-06-05"),
     )
 
     private fun auLmaUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -237,9 +248,9 @@ object ProofStamps {
     private fun baIz() = ProofStamp(
         entryId = "ba.iz",
         places = 3,
-        placeDays = 1095,
-        ramadanDays = 90,
-        provenThrough = "2026-12-31",
+        placeDays = 2190,
+        ramadanDays = 177,
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 3, "sunrise" to 2),
         worstLateByUnit = baIzUnits(),
         lateLimits = listOf(
@@ -247,6 +258,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 3, reason = "IZ BiH prints this town as Sarajevo plus a whole-minute offset for each month, which drifts from the sun within the month; the app follows the month's offset on the safe side, up to 3 min from the printed time.", events = listOf("asrStandard", "endOfEating", "maghrib")),
             ProofLateLimit(minutes = 3, reason = "IZ BiH prints this town as Sarajevo plus a whole-minute offset for each month, which drifts from the sun within the month; the app follows the month's offset on the safe side, up to 3 min from the printed time.", events = listOf("asrStandard", "endOfEating", "maghrib")),
         ),
+        checked = listOf("2026-01-01..2027-12-31"),
     )
 
     private fun baIzUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -258,17 +270,19 @@ object ProofStamps {
     private fun bdIfb() = ProofStamp(
         entryId = "bd.ifb",
         places = 1,
-        placeDays = 71,
-        ramadanDays = 6,
-        provenThrough = "2026-12-30",
-        worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 4, "isha" to 4, "maghrib" to 3, "sunrise" to 3),
+        placeDays = 142,
+        ramadanDays = 11,
+        lastChecked = "2027-12-30",
+        worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 2, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 3, "sunrise" to 4),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
-            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "maghrib", "sunrise")),
-            ProofLateLimit(minutes = 4, reason = "the district edge makes the fitted sehri end run up to a minute earlier still (task 7f); an early end is the safe side", events = listOf("endOfEating")),
-            ProofLateLimit(minutes = 4, reason = "the true-dawn precaution swings across the year and the district edge stacks on it (task 7f)", events = listOf("fajr")),
+            ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "maghrib")),
             ProofLateLimit(minutes = 4, reason = "IFB's Isha angle is only documented as about 18° + 1..4 min, and the district edge stacks on it (task 7f)", events = listOf("isha")),
+            ProofLateLimit(minutes = 4, reason = "the district edge puts sunrise up to a minute before Dhaka's (task 7f), and the permanent table against the leap cycle a minute more on a day of 2027; an early end is the safe side", events = listOf("sunrise")),
+            ProofLateLimit(minutes = 5, reason = "the district edge makes the fitted sehri end run up to a minute earlier still (task 7f), and the permanent table against the leap cycle a minute more on a day of 2027; an early end is the safe side", events = listOf("endOfEating")),
+            ProofLateLimit(minutes = 5, reason = "the true-dawn precaution swings across the year and the district edge stacks on it (task 7f); the permanent table prints the same month-day times every year while the sun shifts through the leap cycle, a minute more on a day of 2027", events = listOf("fajr")),
         ),
+        checked = listOf("2026-01-01", "2026-01-06", "2026-01-12", "2026-01-18", "2026-01-24", "2026-01-30", "2026-02-01", "2026-02-06", "2026-02-12", "2026-02-18", "2026-02-24", "2026-03-01", "2026-03-06", "2026-03-12", "2026-03-18", "2026-03-24", "2026-03-30", "2026-04-01", "2026-04-06", "2026-04-12", "2026-04-18", "2026-04-24", "2026-04-30..2026-05-01", "2026-05-06", "2026-05-12", "2026-05-18", "2026-05-24", "2026-05-30", "2026-06-01", "2026-06-06", "2026-06-12", "2026-06-18", "2026-06-24", "2026-06-30..2026-07-01", "2026-07-06", "2026-07-12", "2026-07-18", "2026-07-24", "2026-07-30", "2026-08-01", "2026-08-06", "2026-08-12", "2026-08-18", "2026-08-24", "2026-08-30", "2026-09-01", "2026-09-06", "2026-09-12", "2026-09-18", "2026-09-24", "2026-09-30..2026-10-01", "2026-10-06", "2026-10-12", "2026-10-18", "2026-10-24", "2026-10-30", "2026-11-01", "2026-11-06", "2026-11-12", "2026-11-18", "2026-11-24", "2026-11-30..2026-12-01", "2026-12-06", "2026-12-12", "2026-12-18", "2026-12-24", "2026-12-30", "2027-01-01", "2027-01-06", "2027-01-12", "2027-01-18", "2027-01-24", "2027-01-30", "2027-02-01", "2027-02-06", "2027-02-12", "2027-02-18", "2027-02-24", "2027-03-01", "2027-03-06", "2027-03-12", "2027-03-18", "2027-03-24", "2027-03-30", "2027-04-01", "2027-04-06", "2027-04-12", "2027-04-18", "2027-04-24", "2027-04-30..2027-05-01", "2027-05-06", "2027-05-12", "2027-05-18", "2027-05-24", "2027-05-30", "2027-06-01", "2027-06-06", "2027-06-12", "2027-06-18", "2027-06-24", "2027-06-30..2027-07-01", "2027-07-06", "2027-07-12", "2027-07-18", "2027-07-24", "2027-07-30", "2027-08-01", "2027-08-06", "2027-08-12", "2027-08-18", "2027-08-24", "2027-08-30", "2027-09-01", "2027-09-06", "2027-09-12", "2027-09-18", "2027-09-24", "2027-09-30..2027-10-01", "2027-10-06", "2027-10-12", "2027-10-18", "2027-10-24", "2027-10-30", "2027-11-01", "2027-11-06", "2027-11-12", "2027-11-18", "2027-11-24", "2027-11-30..2027-12-01", "2027-12-06", "2027-12-12", "2027-12-18", "2027-12-24", "2027-12-30"),
     )
 
     private fun beCautious() = ProofStamp(
@@ -276,7 +290,7 @@ object ProofStamps {
         places = 3,
         placeDays = 1201,
         ramadanDays = 87,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 65, "fajr" to 4, "isha" to 53, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -285,6 +299,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 53, reason = "Isha is the later member's, EMB's (18°, in summer its clock cap and proportion from 45°): up to 53 min after Diyanet's Antwerpen and Gent tables in July, whose takdir Isha is earlier.", events = listOf("isha")),
             ProofLateLimit(minutes = 65, reason = "The end of eating is the earlier member's, EMB's own dawns (ruling R39): up to 65 min before Diyanet's Antwerpen and Gent imsak in late April and May, when Diyanet's takdir has moved its dawn later.", events = listOf("endOfEating")),
         ),
+        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
     )
 
     private fun beEmb() = ProofStamp(
@@ -292,7 +307,7 @@ object ProofStamps {
         places = 1,
         placeDays = 360,
         ramadanDays = 30,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 7, "fajr" to 7, "isha" to 9, "maghrib" to 1, "sunrise" to 2),
         worstLateByUnit = beEmbUnits(),
         lateLimits = listOf(
@@ -300,6 +315,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 7, reason = "From mid-May to 1 August EMB holds Fajr at one clock time, and its fast begins then; the curves carry a clock time as the sun's depression, which the day-either-side envelope (ruling R28) moves by a day's change: Fajr up to 7 min after EMB's, the end of eating up to 7 min before it, in May.", events = listOf("endOfEating", "fajr")),
             ProofLateLimit(minutes = 9, reason = "From May to August EMB's Isha stops at a clock time (a few minutes later from July) or follows its own proportion from 45° (about 0.26 of the night in June); the curve takes the later of the clock time and the 45° proportion of 17.5°, never before EMB's, and runs up to 9 min after it in May.", events = listOf("isha")),
         ),
+        checked = listOf("2026-01-01..2026-02-01", "2026-02-03..2026-05-07", "2026-05-09..2026-06-04", "2026-06-06..2026-06-23", "2026-06-25..2026-07-05", "2026-07-07..2026-12-31"),
     )
 
     private fun beEmbUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -311,12 +327,13 @@ object ProofStamps {
         places = 9,
         placeDays = 3195,
         ramadanDays = 261,
-        provenThrough = "2027-06-05",
+        lastChecked = "2027-06-05",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-06-16..2027-06-05"),
     )
 
     private fun bnMora() = ProofStamp(
@@ -324,12 +341,13 @@ object ProofStamps {
         places = 1,
         placeDays = 355,
         ramadanDays = 29,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = bnMoraUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2026-01-21", "2026-01-23..2026-03-16", "2026-03-18..2026-03-23", "2026-03-25..2026-04-07", "2026-04-09..2026-04-22", "2026-04-24..2026-06-17", "2026-06-19..2026-07-15", "2026-07-17..2026-08-04", "2026-08-06..2026-08-10", "2026-08-12..2026-12-13", "2026-12-15..2026-12-31"),
     )
 
     private fun bnMoraUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -341,7 +359,7 @@ object ProofStamps {
         places = 6,
         placeDays = 1788,
         ramadanDays = 149,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 5, "dhuhr" to 5, "endOfEating" to 38, "fajr" to 36, "isha" to 77, "maghrib" to 5, "sunrise" to 4),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -351,6 +369,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 38, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. The end of eating, the 18° family's dawn, never after it, runs up to 38 min before the 15° families' Fajr.", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 77, reason = "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Isha is the latest family's: Imam Malik's 16.5° (up to 28 % of the night) in spring and autumn, the 18° family's in winter, up to 77 min after Calgary Islamic Centre SW's Maghrib + 90 and the 18° family's spring Isha.", events = listOf("isha")),
         ),
+        checked = listOf("2026-01-01..2026-12-31"),
     )
 
     private fun caIft() = ProofStamp(
@@ -358,12 +377,13 @@ object ProofStamps {
         places = 1,
         placeDays = 350,
         ramadanDays = 25,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = caIftUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-10-31", "2026-11-07..2026-11-27", "2026-12-01..2026-12-31"),
     )
 
     private fun caIftUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -375,13 +395,14 @@ object ProofStamps {
         places = 1,
         placeDays = 359,
         ramadanDays = 25,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 4, "maghrib" to 4, "sunrise" to 4),
         worstLateByUnit = caIitUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr")),
             ProofLateLimit(minutes = 4, reason = "IIT's own table drifts over its year: its sunrise from 2 min before to 2 min after the sun's, its Maghrib from sunset to sunset + 2.5 (and Isha, 90 min after it, with it); the margins hold it never early all year, so in spring they run up to 4 min.", events = listOf("isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-12-31"),
     )
 
     private fun caIitUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -393,7 +414,7 @@ object ProofStamps {
         places = 18,
         placeDays = 6414,
         ramadanDays = 510,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 4, "asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 5, "fajr" to 5, "isha" to 4, "maghrib" to 5, "sunrise" to 5),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -401,6 +422,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 4, reason = "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Asr and Isha up to 4 min after the others'.", events = listOf("asrHanafi", "asrStandard", "isha")),
             ProofLateLimit(minutes = 5, reason = "Montreal's and Ottawa's 15°/15° tables differ among themselves: MAC's two (Al-Rawdah, Abrar) wander around the rule (Fajr from 14.6° to 15.3°, Maghrib from 2 min before sunset to 3 min after, sunrise up to 3.6 min before the sun's), and Asr runs from a minute before the exact one (Dar Al Arkam, CCML) to 2 min after it (Ottawa South). The app is never before any of them, and sunrise and the end of eating never after any: Fajr, Maghrib and sunrise and the end of eating up to 5 min from the others'.", events = listOf("endOfEating", "fajr", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2026-12-31"),
     )
 
     private fun caMac() = ProofStamp(
@@ -408,12 +430,13 @@ object ProofStamps {
         places = 1,
         placeDays = 359,
         ramadanDays = 25,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = caMacUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-12-31"),
     )
 
     private fun caMacUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -425,7 +448,7 @@ object ProofStamps {
         places = 6,
         placeDays = 1400,
         ramadanDays = 50,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 6, "asrStandard" to 6, "dhuhr" to 5, "endOfEating" to 4, "fajr" to 6, "isha" to 7, "maghrib" to 5, "sunrise" to 3),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -434,23 +457,25 @@ object ProofStamps {
             ProofLateLimit(minutes = 6, reason = "Toronto's three tables round and offset their times irregularly against their own rules (IFT's Fajr and Isha up to 80 s after them, IIT's Asr up to 107 s, IIT's own Maghrib drifting over the year), so each member keeps its table's widest margin and the latest of them runs up to 4 min after the latest printed time at the mosques. West of the mosques the user's own sun is later (at Milton by 2.5 min), and Dhuhr, Asr and Maghrib shown follow it: up to 5, 6 and 5 min.", events = listOf("asrHanafi", "asrStandard", "dhuhr", "maghrib")),
             ProofLateLimit(minutes = 7, reason = "Toronto's three tables round and offset their times irregularly against their own rules (IFT's Fajr and Isha up to 80 s after them, IIT's Asr up to 107 s, IIT's own Maghrib drifting over the year), so each member keeps its table's widest margin and the latest of them runs up to 4 min after the latest printed time at the mosques. West of the mosques the user's own sun is later than the tables' points (at Milton, the reach's western end, by 2.5 min), and Fajr and Isha shown follow it: up to 6 and 7 min.", events = listOf("fajr", "isha")),
         ),
+        checked = listOf("2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-10-31", "2026-11-07..2026-11-27", "2026-12-01..2026-12-31"),
     )
 
     private fun chFids() = ProofStamp(
         entryId = "ch.fids",
         places = 1,
-        placeDays = 32,
-        ramadanDays = 0,
-        provenThrough = "2026-10-26",
-        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        placeDays = 403,
+        ramadanDays = 29,
+        lastChecked = "2027-12-31",
+        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = chFidsUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
     )
 
     private fun chFidsUnits(): Map<String, Map<String, Int>> = mapOf(
-        "ch.fids" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        "ch.fids" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
     )
 
     private fun deCautious() = ProofStamp(
@@ -458,7 +483,7 @@ object ProofStamps {
         places = 1,
         placeDays = 61,
         ramadanDays = 0,
-        provenThrough = "2026-10-31",
+        lastChecked = "2026-10-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 5, "fajr" to 43, "isha" to 11, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -468,6 +493,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 11, reason = "Isha is the later member's, VIKZ's: Diyanet's Isha + 10 min by VIKZ's own rule (no VIKZ table is held), up to 11 min after Diyanet's Berlin table.", events = listOf("isha")),
             ProofLateLimit(minutes = 44, reason = "Fajr is the latest member's: the late-dawn family's 13° from September to April (ruling R87), up to 44 min after Diyanet's Berlin table in early September, as its takdir ends, and about 30 in October; in summer VIKZ's, Diyanet's generic European method (VIKZ has no city curves of its own), no earlier than 19 % of the night, up to 12 min after the table.", events = listOf("fajr")),
         ),
+        checked = listOf("2026-09-01..2026-10-31"),
     )
 
     private fun defaultSafe() = ProofStamp(
@@ -475,7 +501,7 @@ object ProofStamps {
         places = 15,
         placeDays = 2054,
         ramadanDays = 149,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 4, "asrStandard" to 4, "dhuhr" to 6, "endOfEating" to 5, "fajr" to 12, "isha" to 8, "maghrib" to 6, "sunrise" to 7),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -483,6 +509,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 15, reason = "this region's 18° Isha is deeper (later) than some real authorities' own shallower Isha angle (Dar al-Ifta Cairo's 17.5°, Task 7h, safe-default.tsv) — never early, only later by more than the class default", events = listOf("isha")),
             ProofLateLimit(minutes = 20, reason = "no local convention is known here; nearby authorities elsewhere run deeper safety minutes than this region's flat 1986 baseline (Task 7h, safe-default.tsv)", events = listOf("asrHanafi", "asrStandard", "dhuhr", "fajr", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2027-12-31"),
     )
 
     private fun dzMarw() = ProofStamp(
@@ -490,7 +517,7 @@ object ProofStamps {
         places = 5,
         placeDays = 1783,
         ramadanDays = 145,
-        provenThrough = "2027-06-05",
+        lastChecked = "2027-06-05",
         worstLateMinutes = mapOf("asrStandard" to 6, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 3, "sunrise" to 3),
         worstLateByUnit = dzMarwUnits(),
         lateLimits = listOf(
@@ -498,6 +525,15 @@ object ProofStamps {
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 6, reason = "The ministry prints Tamanrasset as Adrar's table plus one difference each half month, which does not follow Tamanrasset's own Asr through the half month; so that the Asr computed at its seat is never before that printed time, it is up to 6 min after it on some days.", events = listOf("asrStandard")),
         ),
+        checked = listOf("2025-06-27", "2025-07-01", "2025-07-04", "2025-07-10", "2025-11-22", "2025-11-26", "2025-12-01", "2025-12-05", "2026-06-16..2027-06-05"),
+        checkedByUnit = dzMarwChecked(),
+    )
+
+    private fun dzMarwChecked(): Map<String, List<String>> = mapOf(
+        "1" to listOf("2026-06-16..2027-06-05"),
+        "11" to listOf("2026-06-16..2027-06-05"),
+        "17" to listOf("2026-06-16..2027-06-05"),
+        "31" to listOf("2026-06-16..2027-06-05"),
     )
 
     private fun dzMarwUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -513,13 +549,47 @@ object ProofStamps {
         places = 30,
         placeDays = 2637,
         ramadanDays = 30,
-        provenThrough = "2026-10-31",
+        lastChecked = "2026-10-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 3),
         worstLateByUnit = egEsaUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 3, reason = "ESA computes Taba's table about half a degree west of Taba, and Taqwa keeps Taba's own earlier sunrise and dawn", events = listOf("endOfEating", "sunrise")),
         ),
+        checked = listOf("2025-01-08", "2025-02-12", "2025-04-01..2025-07-31", "2025-08-18", "2025-09-01..2025-10-31", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30..2026-03-31", "2026-06-01..2026-06-30", "2026-08-01..2026-10-31"),
+        checkedByUnit = egEsaChecked(),
+    )
+
+    private fun egEsaChecked(): Map<String, List<String>> = mapOf(
+        "alexandria" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "aswan" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "bawiti" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "dahab" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "damietta" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "edfu" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "el-arish" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "el-dabaa" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "el-tor" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "farafra" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "halaib" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "hurghada" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "kharga" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "luxor" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "marsa-matruh" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "mut" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "nuweiba" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "port-said" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "quseir" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "rafah" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "ras-gharib" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "saint-catherine" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "sallum" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "shalatin" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "sharm-el-sheikh" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "sidi-barrani" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "siwa" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "suez" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
+        "taba" to listOf("2025-01-08", "2025-02-12", "2025-04-29", "2025-07-05", "2025-08-18", "2025-09-12", "2025-09-29", "2025-11-12", "2025-11-14", "2025-11-17", "2025-11-30", "2025-12-23", "2026-02-11", "2026-03-20", "2026-06-12", "2026-09-01..2026-10-31"),
     )
 
     private fun egEsaUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -560,7 +630,7 @@ object ProofStamps {
         places = 3,
         placeDays = 1163,
         ramadanDays = 88,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 77, "fajr" to 56, "isha" to 88, "maghrib" to 3, "sunrise" to 8),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -572,6 +642,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 77, reason = "The end of eating is the earliest member's: from late April to August the flat 15° family's 15° dawn, which Al-Amel's table (the family's one held) leaves for a later summer Fajr of its own, up to 29 min before the earliest printed Fajr of the three tables in June at Paris and up to 77 min before Diyanet's own Lille table's imsak in late May, when its takdir has moved its dawn later; the rest of the year Diyanet's table's dawn (its 18° and takdir, a member since ruling R87), up to 26 min before the Grande Mosquée's own Fajr in April and August and about 12 in winter, and where the Grande Mosquée's page changes method its own dawn (ruling R80: 16 min on 1 and 2 January, 8 on 29 and 30 September).", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 88, reason = "The flat 15° family prints Isha at 15° (in a Paris June after midnight), while the Grande Mosquée's is sunset + 90 and Drancy's and Al-Amel's summer Isha follow earlier rules of their own; Isha is the latest member's, so in summer it runs up to 38 min after the latest of those three tables at Paris, and up to 88 min after Diyanet's own Lille table in June, whose takdir Isha is earlier still.", events = listOf("isha")),
         ),
+        checked = listOf("2026-01-01..2027-12-31"),
     )
 
     private fun frGmp() = ProofStamp(
@@ -579,7 +650,7 @@ object ProofStamps {
         places = 1,
         placeDays = 374,
         ramadanDays = 30,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 16, "fajr" to 2, "isha" to 5, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = frGmpUnits(),
         lateLimits = listOf(
@@ -587,6 +658,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 5, reason = "From October the Grande Mosquée's page still carries its earlier method, whose Isha moves from about 15.3° to 16° over October; Isha is taken at the later of its 2026 method and 16°, never before either, and so runs up to 5 min after the earlier method's in early October.", events = listOf("isha")),
             ProofLateLimit(minutes = 16, reason = "The GMP prints no imsak, so the fast begins at its own Fajr (ruling R80), within 4 min of it (the end holds for everyone within its table's reach, where its rule's dawn to the south comes up to 2 min earlier in June) but where its page changes method (the Moonsighting Committee's from January to September, its earlier method from October): each change is carried over the two days either side, so the end comes up to 16 min before its printed Fajr on 1 and 2 January and 8 before it on 29 and 30 September.", events = listOf("endOfEating")),
         ),
+        checked = listOf("2025-10-01..2025-10-02", "2025-10-05", "2025-10-10", "2025-10-15", "2025-10-20", "2025-10-25..2025-10-26", "2025-10-31", "2026-01-01..2026-12-31"),
     )
 
     private fun frGmpUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -598,7 +670,7 @@ object ProofStamps {
         places = 11,
         placeDays = 4015,
         ramadanDays = 330,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 3, "asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 4, "fajr" to 5, "isha" to 5, "maghrib" to 3, "sunrise" to 3),
         worstLateByUnit = gbLondonLuptUnits(),
         lateLimits = listOf(
@@ -608,6 +680,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 4, reason = "The M25 follows one table computed at its point; at its eastern edge the user's own dawn is 1.7 min earlier, and at its northern edge up to 3 min earlier in summer, and the end of eating shown follows it.", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 5, reason = "The M25 follows one table computed at its point, and Fajr and Isha shown are the later of the point's and the user's own: at the M25's southern and western edges the user's Fajr, and at its northern and north-western edges the user's Isha, at the table's depression run up to 3 min later than the point's in summer.", events = listOf("fajr", "isha")),
         ),
+        checked = listOf("2026-01-01..2026-12-31"),
     )
 
     private fun gbLondonLuptUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -619,39 +692,28 @@ object ProofStamps {
         places = 1,
         placeDays = 7,
         ramadanDays = 0,
-        provenThrough = "2026-09-30",
+        lastChecked = "2026-09-30",
         worstLateMinutes = mapOf("asrHanafi" to 0, "dhuhr" to 5, "endOfEating" to 0, "fajr" to 1, "isha" to 0, "maghrib" to 6, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "endOfEating", "fajr", "isha", "sunrise")),
             ProofLateLimit(minutes = 6, reason = "Wifaqul Ulama documents Zuhr at the meridian + 4 and Maghrib at sunset + 5; Manchester Central Mosque, the only table of theirs held, prints the meridian and sunset themselves, so against it Dhuhr runs up to 5 min and Maghrib up to 6 min late.", events = listOf("dhuhr", "maghrib")),
         ),
+        checked = listOf("2026-09-01", "2026-09-05", "2026-09-10", "2026-09-15", "2026-09-20", "2026-09-25", "2026-09-30"),
     )
 
     private fun idKemenag() = ProofStamp(
         entryId = "id.kemenag",
         places = 18,
-        placeDays = 9855,
-        ramadanDays = 801,
-        provenThrough = "2027-12-31",
+        placeDays = 19728,
+        ramadanDays = 1584,
+        lastChecked = "2028-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = idKemenagUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        provenThroughByUnit = idKemenagThrough(),
-    )
-
-    private fun idKemenagThrough(): Map<String, String> = mapOf(
-        "0119" to "2026-12-31",
-        "0313" to "2026-12-31",
-        "0816" to "2026-12-31",
-        "1208" to "2026-12-31",
-        "1222" to "2026-12-31",
-        "1429" to "2026-12-31",
-        "1630" to "2026-12-31",
-        "1709" to "2026-12-31",
-        "3308" to "2026-12-31",
+        checked = listOf("2026-01-01..2028-12-31"),
     )
 
     private fun idKemenagUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -664,7 +726,7 @@ object ProofStamps {
         "1222" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1301" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1429" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
-        "1433" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        "1433" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1505" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1630" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         "1634" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
@@ -680,7 +742,7 @@ object ProofStamps {
         places = 1,
         placeDays = 365,
         ramadanDays = 30,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 5, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -689,6 +751,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 3, reason = "The end of eating is the earlier member's: the ICCI's own rule read as an end (ruling R80), but for most of June, when IFI's own dawn is the earlier; the ICCI's, taken by month and day over the leap cycle, runs up to 3 min before the earlier of the two tables' Fajr in July and August.", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 5, reason = "Isha is the later member's; the ICCI's rule on the curve's slots (ruling R28) runs up to 5 min after its table in May.", events = listOf("isha")),
         ),
+        checked = listOf("2026-01-01..2026-12-31"),
     )
 
     private fun ieIcci() = ProofStamp(
@@ -696,7 +759,7 @@ object ProofStamps {
         places = 1,
         placeDays = 365,
         ramadanDays = 30,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 7, "isha" to 5, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = ieIcciUnits(),
         lateLimits = listOf(
@@ -704,6 +767,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 5, reason = "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no later than 17/60 after sunset (adhan-js's TwilightAngle rule); on the curve's slots each is widened over the day before and after (ruling R28), most when the rule takes over, in late April and May: Isha up to 5 min after its table.", events = listOf("isha")),
             ProofLateLimit(minutes = 7, reason = "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no later than 17/60 after sunset (adhan-js's TwilightAngle rule); on the curve's slots each is widened over the day before and after (ruling R28), most when the rule takes over, in late April and May: Fajr up to 7 min after its table.", events = listOf("fajr")),
         ),
+        checked = listOf("2026-01-01..2026-12-31"),
     )
 
     private fun ieIcciUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -713,14 +777,15 @@ object ProofStamps {
     private fun ieIfi() = ProofStamp(
         entryId = "ie.ifi",
         places = 1,
-        placeDays = 365,
-        ramadanDays = 30,
-        provenThrough = "2026-12-31",
+        placeDays = 1460,
+        ramadanDays = 117,
+        lastChecked = "2029-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = ieIfiUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-01-01..2028-02-28", "2028-03-01..2029-12-31"),
     )
 
     private fun ieIfiUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -732,12 +797,13 @@ object ProofStamps {
         places = 1,
         placeDays = 30,
         ramadanDays = 0,
-        provenThrough = "2026-09-30",
+        lastChecked = "2026-09-30",
         worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-01..2026-09-30"),
     )
 
     private fun iqSunni() = ProofStamp(
@@ -745,12 +811,13 @@ object ProofStamps {
         places = 1,
         placeDays = 1,
         ramadanDays = 0,
-        provenThrough = "2025-12-04",
+        lastChecked = "2025-12-04",
         worstLateMinutes = mapOf("asrStandard" to 0, "dhuhr" to 0, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 0, "sunrise" to 0),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2025-12-04"),
     )
 
     private fun joAwqaf() = ProofStamp(
@@ -758,12 +825,13 @@ object ProofStamps {
         places = 1,
         placeDays = 171,
         ramadanDays = 2,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = joAwqafUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 1, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2021-01-08", "2021-01-14", "2021-01-31", "2021-02-06", "2021-04-16", "2021-06-03", "2021-06-26", "2021-07-19", "2021-08-11", "2021-09-09", "2022-07-09", "2022-08-01", "2022-08-24", "2022-09-16", "2022-10-09", "2022-11-09", "2022-11-26", "2022-12-02", "2022-12-25", "2022-12-31", "2023-01-17", "2023-02-09", "2023-03-04", "2023-04-21", "2023-05-14", "2023-05-20", "2023-06-06", "2023-06-12", "2023-07-05", "2023-07-28", "2024-04-24..2024-05-03", "2024-12-08..2024-12-17", "2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"),
     )
 
     private fun joAwqafUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -775,12 +843,13 @@ object ProofStamps {
         places = 1,
         placeDays = 1,
         ramadanDays = 0,
-        provenThrough = "2026-09-26",
+        lastChecked = "2026-09-26",
         worstLateMinutes = mapOf("asrHanafi" to 0, "dhuhr" to 0, "endOfEating" to 0, "fajr" to 0, "isha" to 0, "maghrib" to 0, "sunrise" to 0),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-26"),
     )
 
     private fun kwAwqaf() = ProofStamp(
@@ -788,12 +857,13 @@ object ProofStamps {
         places = 1,
         placeDays = 25,
         ramadanDays = 4,
-        provenThrough = "2026-09-25",
+        lastChecked = "2026-09-25",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2019-02-27", "2019-11-11", "2019-11-23", "2019-12-11", "2020-05-16", "2021-03-02", "2021-04-18", "2021-11-01..2021-11-02", "2022-01-28", "2022-07-06", "2022-09-28", "2023-01-17..2023-01-18", "2023-08-13", "2025-12-29", "2026-02-03", "2026-02-07", "2026-03-04", "2026-03-13", "2026-03-23", "2026-04-09", "2026-06-01", "2026-07-23", "2026-09-25"),
     )
 
     private fun kzQmdb() = ProofStamp(
@@ -801,7 +871,7 @@ object ProofStamps {
         places = 1832,
         placeDays = 1337360,
         ramadanDays = 108088,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 3, "dhuhr" to 2, "endOfEating" to 11, "fajr" to 10, "isha" to 8, "maghrib" to 3, "sunrise" to 3),
         worstLateByUnit = kzQmdbUnits1() + kzQmdbUnits2() + kzQmdbUnits3(),
         lateLimits = listOf(
@@ -899,6 +969,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 11, reason = "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so it comes up to 11 min before the place's printed Fajr", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 11, reason = "across this place's reach, toward its edge (its own tables replayed there, 9 Oct 2026), the end of eating kept clear of QMDB's AngleBased Fajr and the earlier of the place's dawn and the user's own add up, so it comes up to 11 min before the place's printed Fajr", events = listOf("endOfEating")),
         ),
+        checked = listOf("2026-01-01..2027-12-31"),
     )
 
     private fun kzQmdbUnits1(): Map<String, Map<String, Int>> = mapOf(
@@ -999,9 +1070,9 @@ object ProofStamps {
     private fun lbFatwa() = ProofStamp(
         entryId = "lb.fatwa",
         places = 1,
-        placeDays = 382,
-        ramadanDays = 31,
-        provenThrough = "2026-10-01",
+        placeDays = 1469,
+        ramadanDays = 119,
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 3, "endOfEating" to 8, "fajr" to 9, "isha" to 7, "maghrib" to 7, "sunrise" to 3),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -1010,6 +1081,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 8, reason = "the fast begins at the 20° dawn, never after Dar al-Fatwa's printed Fajr, whose own dawn runs 19.1° to 20.0°: up to 8 min before it on the shallowest days (end-of-eating audit, 3 Oct 2026)", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 9, reason = "the perpetual table's single never-early margin, over 384 measured days across two sources and seven years, runs to 9 min late on Fajr on its worst day", events = listOf("fajr")),
         ),
+        checked = listOf("2019-07-20", "2022-06-14", "2023-02-02", "2023-03-08", "2023-04-01", "2023-05-09", "2023-07-02", "2023-09-12", "2023-09-21", "2024-01-01..2024-02-28", "2024-03-01..2027-12-31"),
     )
 
     private fun lyAwqaf() = ProofStamp(
@@ -1017,37 +1089,38 @@ object ProofStamps {
         places = 22,
         placeDays = 119,
         ramadanDays = 3,
-        provenThrough = "2026-10-12",
+        lastChecked = "2026-10-12",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 3),
         worstLateByUnit = lyAwqafUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "imsak", "isha", "maghrib", "sunrise")),
         ),
-        provenThroughByUnit = lyAwqafThrough(),
+        checked = listOf("2025-03-23", "2025-04-13", "2025-04-19", "2025-06-22", "2025-07-18", "2025-08-03", "2025-09-16", "2025-10-06", "2025-11-17", "2025-12-07", "2026-01-24", "2026-02-18", "2026-03-12", "2026-04-18", "2026-06-16", "2026-09-25..2026-10-12"),
+        checkedByUnit = lyAwqafChecked(),
     )
 
-    private fun lyAwqafThrough(): Map<String, String> = mapOf(
-        "ajdabiya" to "2026-10-05",
-        "awjila" to "2026-10-05",
-        "bani-walid" to "2026-10-05",
-        "bayda" to "2026-10-05",
-        "benghazi" to "2026-10-05",
-        "brega" to "2026-10-05",
-        "derna" to "2026-10-05",
-        "emsaed" to "2026-10-05",
-        "ghadames" to "2026-10-05",
-        "hun" to "2026-10-05",
-        "jalu" to "2026-10-05",
-        "khoms" to "2026-10-05",
-        "kufra" to "2026-10-05",
-        "marj" to "2026-10-05",
-        "misrata" to "2026-10-05",
-        "ras-lanuf" to "2026-10-05",
-        "sabha" to "2026-10-05",
-        "sirte" to "2026-10-05",
-        "tobruk" to "2026-10-05",
-        "zawiya" to "2026-10-05",
-        "zliten" to "2026-10-05",
+    private fun lyAwqafChecked(): Map<String, List<String>> = mapOf(
+        "ajdabiya" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "awjila" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "bani-walid" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "bayda" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "benghazi" to listOf("2026-09-25..2026-09-28", "2026-10-05"),
+        "brega" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "derna" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "emsaed" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "ghadames" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "hun" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "jalu" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "khoms" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "kufra" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "marj" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "misrata" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "ras-lanuf" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "sabha" to listOf("2026-09-25..2026-09-28", "2026-10-05"),
+        "sirte" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "tobruk" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "zawiya" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "zliten" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
     )
 
     private fun lyAwqafUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1080,7 +1153,7 @@ object ProofStamps {
         places = 40,
         placeDays = 2379,
         ramadanDays = 126,
-        provenThrough = "2026-10-12",
+        lastChecked = "2026-10-12",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "isha" to 2, "maghrib" to 6, "sunrise" to 7),
         worstLateByUnit = maHabousUnits(),
         lateLimits = listOf(
@@ -1099,6 +1172,21 @@ object ProofStamps {
             ProofLateLimit(minutes = 6, reason = "Beyond the cities whose own Habous table Taqwa fits, the place's elevation is not known, so Maghrib takes a national margin that covers the highest town checked (Imilchil, about 2,150 m): at a low town it is up to 6 min after Habous's Maghrib.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 7, reason = "Beyond the cities whose own Habous table Taqwa fits, the place's elevation is not known, so sunrise takes a national margin that covers the highest town checked (Imilchil, about 2,150 m): at a low town it is up to 7 min before Habous's sunrise.", events = listOf("sunrise")),
         ),
+        checked = listOf("2015-02-20..2015-03-21", "2017-05-27..2017-06-25", "2019-03-08..2019-05-06", "2019-06-05..2019-10-31", "2020-01-01..2020-01-27", "2020-02-01..2020-06-30", "2020-10-01..2020-10-17", "2021-02-13..2021-03-14", "2021-04-14..2021-05-12", "2021-10-08..2021-10-31", "2022-01-04..2022-02-02", "2022-06-01..2022-06-30", "2022-07-30..2022-08-28", "2022-09-10", "2023-06-01", "2023-07-15", "2023-11-01", "2024-02-11..2024-04-10", "2024-05-10..2024-06-07", "2025-01-02..2025-02-28", "2026-09-13..2026-10-12"),
+        checkedByUnit = maHabousChecked(),
+    )
+
+    private fun maHabousChecked(): Map<String, List<String>> = mapOf(
+        "casablanca" to listOf("2015-02-20..2015-03-21", "2017-05-27..2017-06-25", "2022-01-04..2022-02-02", "2022-06-01..2022-06-30", "2022-07-30..2022-08-28", "2025-01-02..2025-01-31", "2026-09-13..2026-10-12"),
+        "dakhla" to listOf("2022-07-30..2022-08-28", "2026-09-13..2026-10-12"),
+        "figuig" to listOf("2019-03-08..2019-04-06", "2019-07-04..2019-08-02", "2020-03-26..2020-04-24", "2026-09-13..2026-10-12"),
+        "ifrane" to listOf("2026-09-13..2026-10-12"),
+        "laayoune" to listOf("2019-08-03..2019-08-31", "2019-09-30..2019-10-29", "2020-10-01..2020-10-17", "2021-02-13..2021-03-14", "2022-07-30..2022-08-28", "2024-05-10..2024-06-07", "2025-01-31..2025-02-28", "2026-09-13..2026-10-12"),
+        "lagouira" to listOf("2022-07-30..2022-08-28", "2026-09-13..2026-10-12"),
+        "midelt" to listOf("2022-07-30..2022-08-28", "2026-09-13..2026-10-12"),
+        "oujda" to listOf("2022-07-30..2022-08-28", "2026-09-13..2026-10-12"),
+        "rabat" to listOf("2019-04-07..2019-05-06", "2019-06-05..2019-10-31", "2020-01-01..2020-01-27", "2020-02-01..2020-06-30", "2021-02-13..2021-03-14", "2021-04-14..2021-05-12", "2021-10-08..2021-10-31", "2022-01-04..2022-02-02", "2022-06-26", "2022-07-30..2022-08-28", "2022-09-10", "2023-06-01", "2023-07-15", "2023-11-01", "2024-02-11..2024-04-10", "2026-09-13..2026-10-12"),
+        "tangier" to listOf("2022-07-30..2022-08-28", "2026-09-13..2026-10-12"),
     )
 
     private fun maHabousUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1119,12 +1207,13 @@ object ProofStamps {
         places = 1,
         placeDays = 30,
         ramadanDays = 0,
-        provenThrough = "2026-09-30",
+        lastChecked = "2026-09-30",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-01..2026-09-30"),
     )
 
     private fun mrMinistry() = ProofStamp(
@@ -1132,12 +1221,13 @@ object ProofStamps {
         places = 2,
         placeDays = 38,
         ramadanDays = 38,
-        provenThrough = "2024-04-09",
+        lastChecked = "2024-04-09",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "imsak" to 2, "isha" to 2, "maghrib" to 1, "sunrise" to 3),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "imsak", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2023-03-23", "2023-03-27", "2023-03-31", "2023-04-04", "2023-04-08", "2023-04-12", "2023-04-16", "2023-04-21", "2024-03-11..2024-04-09"),
     )
 
     private fun myJakim() = ProofStamp(
@@ -1145,7 +1235,7 @@ object ProofStamps {
         places = 13,
         placeDays = 9489,
         ramadanDays = 766,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 3),
         worstLateByUnit = myJakimUnits(),
         lateLimits = listOf(
@@ -1153,6 +1243,12 @@ object ProofStamps {
             ProofLateLimit(minutes = 3, reason = "Kangar's printed sunrise spreads a further minute beyond a plain classic-noon model across the seasons", events = listOf("sunrise")),
             ProofLateLimit(minutes = 4, reason = "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)", events = listOf("endOfEating")),
         ),
+        checked = listOf("2025-01-01..2026-12-31"),
+        checkedByUnit = myJakimChecked(),
+    )
+
+    private fun myJakimChecked(): Map<String, List<String>> = mapOf(
+        "PLS01" to listOf("2025-01-01..2025-02-28", "2025-03-02..2026-12-31"),
     )
 
     private fun myJakimUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1176,7 +1272,7 @@ object ProofStamps {
         places = 1,
         placeDays = 31,
         ramadanDays = 0,
-        provenThrough = "2026-10-25",
+        lastChecked = "2026-10-25",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 16, "isha" to 6, "maghrib" to 8, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -1186,6 +1282,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 8, reason = "Maghrib is capped at the Moroccan member's, which carries the Turkish and Arab calendars' Maghrib as a floor (ruling R87: 7 of 12 surveyed calendars print Diyanet's, sunset + 6 in spring to + 9 in autumn on the exact sun), so against the Moroccan calendar, which prints sunset + 1..4, it runs up to 8 min late.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 16, reason = "The Moroccan calendar's Fajr moves from about 16° in winter to 14° in May and August; its member takes 14°, the calendar's latest, never before it, and so runs up to 16 min after it in autumn (Task 7g checked it at Amsterdam from 25 September to 25 October).", events = listOf("fajr")),
         ),
+        checked = listOf("2026-09-25..2026-10-25"),
     )
 
     private fun noCautious() = ProofStamp(
@@ -1193,7 +1290,7 @@ object ProofStamps {
         places = 5,
         placeDays = 2648,
         ramadanDays = 205,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 7, "asrStandard" to 7, "dhuhr" to 6, "endOfEating" to 57, "fajr" to 101, "isha" to 135, "maghrib" to 4, "sunrise" to 58),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -1205,6 +1302,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 101, reason = "Fajr is the later member's. At IRN's own calendars Diyanet's European takdir on its own city curves: up to 54 min after IRN's Trondheim calendar in June and 48 after its Oslo calendar. Beyond them, at Diyanet's Kristiansand, Stavanger and Bergen tables (their own units since the monitor round), IRN's edge (its hour before sunrise from April to September, else 16°) is the later: up to 101 min after Diyanet's 18° in spring and autumn.", events = listOf("fajr")),
             ProofLateLimit(minutes = 135, reason = "Isha is the later member's. At IRN's own calendars Diyanet's European takdir on its own city curves: up to 34 min after IRN's calendars (Trondheim's in spring, Oslo's 29). Beyond them, at Diyanet's Kristiansand, Stavanger and Bergen tables, IRN's edge (15°, else the proportion from 45°) is the later: up to 135 min after Diyanet's takdir Isha in spring and summer.", events = listOf("isha")),
         ),
+        checked = listOf("2026-01-01..2027-12-31"),
     )
 
     private fun noIrn() = ProofStamp(
@@ -1212,7 +1310,7 @@ object ProofStamps {
         places = 3,
         placeDays = 1095,
         ramadanDays = 90,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 7, "asrStandard" to 10, "dhuhr" to 6, "endOfEating" to 235, "fajr" to 11, "isha" to 237, "maghrib" to 313, "sunrise" to 42),
         worstLateByUnit = noIrnUnits(),
         lateLimits = listOf(
@@ -1229,6 +1327,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 237, reason = "Where IRN's Makkah-time Isha comes before the real sunset at Tromsø (late April to mid-August), Isha follows the Maghrib shown, up to 237 min after IRN's; otherwise, with the window dates taken a day either way, up to 12 on the Isha blends' edge days (23 April, 19-20 August) and 5 in the winter blends, and up to 65 in early November of a year whose clocks go back on 31 October (2027, 2032, 2038), when the day-early blend starts on summer time.", events = listOf("isha")),
             ProofLateLimit(minutes = 313, reason = "From mid-April to late August IRN's Maghrib at Tromsø is Makkah's sunset + 5, while the sun there sets hours later: Maghrib never comes before the real sunset, up to 313 min after IRN's (mid-May and late July); in the winter blends, with the window dates taken a day either way, up to 12, and in early November of a year whose clocks go back on 31 October (2027, 2032, 2038), when the day-early blend starts on summer time, up to 71.", events = listOf("maghrib")),
         ),
+        checked = listOf("2026-01-01..2026-12-31"),
     )
 
     private fun noIrnUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1242,12 +1341,13 @@ object ProofStamps {
         places = 1,
         placeDays = 122,
         ramadanDays = 19,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = nzFianzUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-03-01..2026-03-31", "2026-06-01..2026-06-30", "2026-09-01..2026-09-30", "2026-12-01..2026-12-31"),
     )
 
     private fun nzFianzUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1259,12 +1359,13 @@ object ProofStamps {
         places = 1,
         placeDays = 488,
         ramadanDays = 30,
-        provenThrough = "2031-09-30",
+        lastChecked = "2031-09-30",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = omMaraUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2021-01-01..2021-01-31", "2021-07-01..2021-07-31", "2026-01-01..2026-12-31", "2031-03-01..2031-03-31", "2031-09-01..2031-09-30"),
     )
 
     private fun omMaraUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1276,25 +1377,27 @@ object ProofStamps {
         places = 6,
         placeDays = 2418,
         ramadanDays = 174,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
     )
 
     private fun pkKarachi() = ProofStamp(
         entryId = "pk.karachi",
         places = 1,
-        placeDays = 91,
+        placeDays = 182,
         ramadanDays = 0,
-        provenThrough = "2026-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 3, "asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-06-01..2026-06-30", "2026-09-01..2026-09-30", "2026-12-01..2026-12-31", "2027-06-01..2027-06-30", "2027-09-01..2027-09-30", "2027-12-01..2027-12-31"),
     )
 
     private fun psGazaAwqaf() = ProofStamp(
@@ -1302,12 +1405,13 @@ object ProofStamps {
         places = 1,
         placeDays = 6,
         ramadanDays = 0,
-        provenThrough = "2020-07-21",
+        lastChecked = "2020-07-21",
         worstLateMinutes = mapOf("asrStandard" to 0, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 0),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2020-06-22", "2020-06-26", "2020-07-03", "2020-07-10", "2020-07-17", "2020-07-21"),
     )
 
     private fun psIftaa() = ProofStamp(
@@ -1315,12 +1419,42 @@ object ProofStamps {
         places = 29,
         placeDays = 22634,
         ramadanDays = 1839,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 3, "sunrise" to 3),
         worstLateByUnit = psIftaaUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2012-01-01..2012-12-31", "2026-01-01..2027-12-31"),
+        checkedByUnit = psIftaaChecked(),
+    )
+
+    private fun psIftaaChecked(): Map<String, List<String>> = mapOf(
+        "ps.iftaa.acre" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.beersheba" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.beisan" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.beit-awwa" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.bethlehem" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.deir-al-balah" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.dura" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.haifa" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.idhna" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.jaffa" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.jenin" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.jericho" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.kafr-qasim" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.khan-yunis" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.lydd" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.nazareth" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.qalqilya" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.rafah" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.ramallah" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.ramla" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.safed" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.tayibe" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.tiberias" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.tulkarm" to listOf("2026-01-01..2027-12-31"),
+        "ps.iftaa.umm-al-fahm" to listOf("2026-01-01..2027-12-31"),
     )
 
     private fun psIftaaUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1358,15 +1492,21 @@ object ProofStamps {
     private fun qaCalendarhouse() = ProofStamp(
         entryId = "qa.calendarhouse",
         places = 8,
-        placeDays = 2963,
-        ramadanDays = 243,
-        provenThrough = "2026-12-31",
+        placeDays = 5883,
+        ramadanDays = 475,
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 3, "maghrib" to 3, "sunrise" to 1),
         worstLateByUnit = qaCalendarhouseUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 3, reason = "Al Khor follows Doha's calendar, and Taqwa also keeps Al Khor's own later summer sunset with the calendar's Maghrib + 3 (its Ramadan Maghrib, kept all year)", events = listOf("isha", "maghrib")),
         ),
+        checked = listOf("2023-02-03", "2023-02-24", "2023-03-25", "2023-06-09..2023-06-10", "2023-09-23", "2023-12-10", "2024-02-21", "2024-05-21", "2024-05-27", "2024-06-15", "2024-06-17", "2024-07-04", "2024-08-02", "2024-08-06", "2024-08-08", "2024-09-15", "2024-11-05..2024-11-06", "2024-11-09", "2024-11-14", "2024-12-03", "2024-12-17", "2025-01-26", "2025-02-12", "2025-02-16", "2025-02-21", "2025-03-01", "2025-03-28", "2025-03-30", "2025-04-05", "2025-04-16", "2025-05-20", "2025-05-27", "2025-06-24", "2025-07-13", "2025-07-15", "2025-08-05", "2025-09-10", "2025-10-18", "2025-10-23", "2025-11-14", "2025-12-12", "2026-01-01..2027-12-31"),
+        checkedByUnit = qaCalendarhouseChecked(),
+    )
+
+    private fun qaCalendarhouseChecked(): Map<String, List<String>> = mapOf(
+        "al-khor" to listOf("2026-01-01..2027-12-31"),
     )
 
     private fun qaCalendarhouseUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1379,7 +1519,7 @@ object ProofStamps {
         places = 1,
         placeDays = 107,
         ramadanDays = 0,
-        provenThrough = "2026-09-25",
+        lastChecked = "2026-09-25",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 1, "sunrise" to 2),
         worstLateByUnit = ruDumrfUnits(),
         lateLimits = listOf(
@@ -1388,6 +1528,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 4, reason = "From May to August DUM RF's Fajr is sunrise − 0.30 of the night, when the sun stands up to a quarter of a degree higher or lower than the day before; the app takes the latest of the neighbouring days so that it holds in every year of the leap cycle (ruling R28), up to 4 min after the printed time (May, and late July to mid-August).", events = listOf("fajr")),
             ProofLateLimit(minutes = 5, reason = "From May to August DUM RF's Isha is sunset + a fraction of the night that it steps every few days (0.25 in early May, 0.30 in June, 0.25 again by August); between its held days the app takes the largest fraction within three days and the latest of the neighbouring days (ruling R28), up to 5 min after the printed time (early and mid-May).", events = listOf("isha")),
         ),
+        checked = listOf("2025-05-01", "2025-06-01..2025-06-30", "2025-10-01", "2025-12-07", "2025-12-10", "2025-12-13", "2025-12-17", "2025-12-20", "2025-12-23", "2025-12-26", "2026-05-13", "2026-05-19", "2026-06-11", "2026-06-13", "2026-06-25", "2026-07-01..2026-08-31", "2026-09-25"),
     )
 
     private fun ruDumrfUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1399,7 +1540,7 @@ object ProofStamps {
         places = 19,
         placeDays = 6935,
         ramadanDays = 570,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 2, "dhuhr" to 0, "endOfEating" to 132, "fajr" to 126, "isha" to 62, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = ruDumrtUnits(),
         lateLimits = listOf(
@@ -1412,6 +1553,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 126, reason = "On a night whose sun sinks to within 0.01° of 18° at the town (Zelenodolsk 5 May and Yelabuga 8 August in 2026), whether DUM RT applies its white-night rule turns on its own sun, which the app cannot match that closely, so each time takes its safe side: Fajr at sunrise − 121, the end of sahur at the sun's lowest point and Isha at the later of Maghrib + 90 and the 15° dusk, up to this many minutes from the time printed.", events = listOf("fajr")),
             ProofLateLimit(minutes = 132, reason = "On a night whose sun sinks to within 0.01° of 18° at the town (Zelenodolsk 5 May and Yelabuga 8 August in 2026), whether DUM RT applies its white-night rule turns on its own sun, which the app cannot match that closely, so each time takes its safe side: Fajr at sunrise − 121, the end of sahur at the sun's lowest point and Isha at the later of Maghrib + 90 and the 15° dusk, up to this many minutes from the time printed.", events = listOf("endOfEating")),
         ),
+        checked = listOf("2026-01-01..2026-12-31"),
     )
 
     private fun ruDumrtUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1441,7 +1583,7 @@ object ProofStamps {
         places = 3242,
         placeDays = 2493800,
         ramadanDays = 201850,
-        provenThrough = "2030-12-31",
+        lastChecked = "2030-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 3, "fajr" to 5, "isha" to 3, "maghrib" to 3, "sunrise" to 3),
         worstLateByUnit = saUmmalquraUnits1() + saUmmalquraUnits2() + saUmmalquraUnits3() + saUmmalquraUnits4() + saUmmalquraUnits5(),
         lateLimits = listOf(
@@ -1466,180 +1608,194 @@ object ProofStamps {
             ProofLateLimit(minutes = 3, reason = "the same table computed a degree north of Tayma: the sunrise and the end of eating shown in the town, the earlier of that table's and the town's own, come up to 3 min before the table's, and Dhuhr, Asr, Maghrib and Isha up to 3 after it (class D's 3, not the entry's 2; city-points round, 9 Oct 2026)", events = listOf("asrStandard", "dhuhr", "endOfEating", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 5, reason = "KACST's list places Tayma a degree north of the town, so its Tayma table is computed 111 km north of it, and the Fajr shown in the town, the later of that table's and the town's own, comes up to 5 min after the table in spring and autumn (city-points round, 9 Oct 2026)", events = listOf("fajr")),
         ),
-        provenThroughByUnit = saUmmalquraThrough(),
+        checked = listOf("2024-01-01..2030-12-31"),
+        checkedByUnit = saUmmalquraChecked1() + saUmmalquraChecked2() + saUmmalquraChecked3() + saUmmalquraChecked4() + saUmmalquraChecked5(),
     )
 
-    private fun saUmmalquraThrough(): Map<String, String> = mapOf(
-        "abanat" to "2027-12-31",
-        "abha" to "2027-12-31",
-        "abqaiq" to "2027-12-31",
-        "abu-arish" to "2027-12-31",
-        "ad-dilam" to "2027-12-31",
-        "ad-diriyah" to "2027-12-31",
-        "addayer" to "2027-12-31",
-        "adham" to "2027-12-31",
-        "afif" to "2027-12-31",
-        "ahad-al-masarihah" to "2027-12-31",
-        "ahad-rafidah" to "2027-12-31",
-        "al-aflaj" to "2027-12-31",
-        "al-ahsa" to "2027-12-31",
-        "al-amwah" to "2027-12-31",
-        "al-aqiq" to "2027-12-31",
-        "al-ardhiyat" to "2027-12-31",
-        "al-aridhah" to "2027-12-31",
-        "al-bada" to "2027-12-31",
-        "al-badayea" to "2027-12-31",
-        "al-bahah" to "2027-12-31",
-        "al-bayda" to "2027-12-31",
-        "al-birk" to "2027-12-31",
-        "al-bukayriyah" to "2027-12-31",
-        "al-busur" to "2027-12-31",
-        "al-duwadimi" to "2027-12-31",
-        "al-edabi" to "2027-12-31",
-        "al-farshah" to "2027-12-31",
-        "al-ghat" to "2027-12-31",
-        "al-ghazalah" to "2027-12-31",
-        "al-hait" to "2027-12-31",
-        "al-hajrah" to "2027-12-31",
-        "al-harajah" to "2027-12-31",
-        "al-hariq" to "2027-12-31",
-        "al-hayr" to "2027-12-31",
-        "al-henakiyah" to "2027-12-31",
-        "al-hofuf" to "2027-12-31",
-        "al-is" to "2027-12-31",
-        "al-jubail" to "2027-12-31",
-        "al-jumum" to "2027-12-31",
-        "al-kamil" to "2027-12-31",
-        "al-kharj" to "2027-12-31",
-        "al-kharkhir" to "2027-12-31",
-        "al-khobar" to "2027-12-31",
-        "al-khurma" to "2027-12-31",
-        "al-lith" to "2027-12-31",
-        "al-majmaah" to "2027-12-31",
-        "al-makhwah" to "2027-12-31",
-        "al-mithnab" to "2027-12-31",
-        "al-mubarraz" to "2027-12-31",
-        "al-muwayh" to "2027-12-31",
-        "al-muzahimiyah" to "2027-12-31",
-        "al-namas" to "2027-12-31",
-        "al-qatif" to "2027-12-31",
-        "al-qunfudhah" to "2027-12-31",
-        "al-qurayyat" to "2027-12-31",
-        "al-quwaiiyah" to "2027-12-31",
-        "al-quwarah" to "2027-12-31",
-        "al-reeth" to "2027-12-31",
-        "al-udayd" to "2027-12-31",
-        "al-ula" to "2027-12-31",
-        "al-uwayqiliyah" to "2027-12-31",
-        "al-uyaynah" to "2027-12-31",
-        "al-wajh" to "2027-12-31",
-        "alasyah" to "2027-12-31",
-        "aldarb" to "2027-12-31",
-        "alharth" to "2027-12-31",
-        "almajaridah" to "2027-12-31",
-        "almandaq" to "2027-12-31",
-        "alqura" to "2027-12-31",
-        "an-nabhaniyah" to "2027-12-31",
-        "ar-rass" to "2027-12-31",
-        "ar-rayn" to "2027-12-31",
-        "arar" to "2027-12-31",
-        "as-sulaymi" to "2027-12-31",
-        "as-sulayyil" to "2027-12-31",
-        "ash-shamli" to "2027-12-31",
-        "ash-shimasiyah" to "2027-12-31",
-        "ash-shinan" to "2027-12-31",
-        "at-tuwal" to "2027-12-31",
-        "az-zulfi" to "2027-12-31",
-        "badr" to "2027-12-31",
-        "badr-al-janoub" to "2027-12-31",
-        "bahrah" to "2027-12-31",
-        "baish" to "2027-12-31",
-        "baljurashi" to "2027-12-31",
-        "bani-hasan" to "2027-12-31",
-        "baqaa" to "2027-12-31",
-        "bariq" to "2027-12-31",
-        "belqarn" to "2027-12-31",
-        "bishah" to "2027-12-31",
-        "buraydah" to "2027-12-31",
-        "damad" to "2027-12-31",
-        "dammam" to "2027-12-31",
-        "dariyah" to "2027-12-31",
-        "dhahban" to "2027-12-31",
-        "dhahran" to "2027-12-31",
-        "dhahran-al-janub" to "2027-12-31",
-        "dhurma" to "2027-12-31",
-        "duba" to "2027-12-31",
-        "dumah-al-jandal" to "2027-12-31",
-        "farasan-island" to "2027-12-31",
-        "fayfa" to "2027-12-31",
-        "ghamid-az-zinad" to "2027-12-31",
-        "hafar-al-batin" to "2027-12-31",
-        "hail" to "2027-12-31",
-        "haql" to "2027-12-31",
-        "harub" to "2027-12-31",
-        "hawtat-sudayr" to "2027-12-31",
-        "howtat-bani-tamim" to "2027-12-31",
-        "hubuna" to "2027-12-31",
-        "huraymila" to "2027-12-31",
-        "jalajil" to "2027-12-31",
-        "jazan" to "2027-12-31",
-        "jeddah" to "2027-12-31",
-        "khafji" to "2027-12-31",
-        "khamis-mushait" to "2027-12-31",
-        "khaybar" to "2027-12-31",
-        "khbash" to "2027-12-31",
-        "khulais" to "2027-12-31",
-        "layla" to "2027-12-31",
-        "madinah" to "2027-12-31",
-        "mahd-al-thahab" to "2027-12-31",
-        "malham" to "2027-12-31",
-        "marat" to "2027-12-31",
-        "mawqaq" to "2027-12-31",
-        "maysan" to "2027-12-31",
-        "muhayil" to "2027-12-31",
-        "nairyah" to "2027-12-31",
-        "najran" to "2027-12-31",
-        "qaryat-al-ulya" to "2027-12-31",
-        "qilwah" to "2027-12-31",
-        "rabigh" to "2027-12-31",
-        "rafha" to "2027-12-31",
-        "ranyah" to "2027-12-31",
-        "ras-tannurah" to "2027-12-31",
-        "ras-tanura" to "2027-12-31",
-        "rawdat-sudayr" to "2027-12-31",
-        "riyadh-al-khabra" to "2027-12-31",
-        "rojal" to "2027-12-31",
-        "rumah" to "2027-12-31",
-        "sabya" to "2027-12-31",
-        "sakaka" to "2027-12-31",
-        "samtah" to "2027-12-31",
-        "sarat-abidah" to "2027-12-31",
-        "shagra" to "2027-12-31",
-        "sharorah" to "2027-12-31",
-        "simira" to "2027-12-31",
-        "sudus" to "2027-12-31",
-        "suwayr" to "2027-12-31",
-        "tabuk" to "2027-12-31",
-        "taif" to "2027-12-31",
-        "tanumah" to "2027-12-31",
-        "tarib" to "2027-12-31",
-        "tarut" to "2027-12-31",
-        "tathleeth" to "2027-12-31",
-        "tayma" to "2027-12-31",
-        "thadig" to "2027-12-31",
-        "thar" to "2027-12-31",
-        "thuwal" to "2027-12-31",
-        "tubarjal" to "2027-12-31",
-        "tumair" to "2027-12-31",
-        "turbah" to "2027-12-31",
-        "umluj" to "2027-12-31",
-        "unayzah" to "2027-12-31",
-        "uqlat-as-suqur" to "2027-12-31",
-        "uyun-al-jawa" to "2027-12-31",
-        "wadi-ad-dawasir" to "2027-12-31",
-        "wadi-al-fara" to "2027-12-31",
-        "yadamah" to "2027-12-31",
-        "yanbu" to "2027-12-31",
+    private fun saUmmalquraChecked1(): Map<String, List<String>> = mapOf(
+        "abanat" to listOf("2026-01-01..2027-12-31"),
+        "abha" to listOf("2025-01-01..2027-12-31"),
+        "abqaiq" to listOf("2026-01-01..2027-12-31"),
+        "abu-arish" to listOf("2026-01-01..2027-12-31"),
+        "ad-dilam" to listOf("2026-01-01..2027-12-31"),
+        "ad-diriyah" to listOf("2026-01-01..2027-12-31"),
+        "addayer" to listOf("2026-01-01..2027-12-31"),
+        "adham" to listOf("2026-01-01..2027-12-31"),
+        "afif" to listOf("2026-01-01..2027-12-31"),
+        "ahad-al-masarihah" to listOf("2026-01-01..2027-12-31"),
+        "ahad-rafidah" to listOf("2026-01-01..2027-12-31"),
+        "al-aflaj" to listOf("2026-01-01..2027-12-31"),
+        "al-ahsa" to listOf("2026-01-01..2027-12-31"),
+        "al-amwah" to listOf("2026-01-01..2027-12-31"),
+        "al-aqiq" to listOf("2026-01-01..2027-12-31"),
+        "al-ardhiyat" to listOf("2026-01-01..2027-12-31"),
+        "al-aridhah" to listOf("2026-01-01..2027-12-31"),
+        "al-bada" to listOf("2026-01-01..2027-12-31"),
+        "al-badayea" to listOf("2026-01-01..2027-12-31"),
+        "al-bahah" to listOf("2026-01-01..2027-12-31"),
+        "al-bayda" to listOf("2026-01-01..2027-12-31"),
+        "al-birk" to listOf("2026-01-01..2027-12-31"),
+        "al-bukayriyah" to listOf("2026-01-01..2027-12-31"),
+        "al-busur" to listOf("2026-01-01..2027-12-31"),
+        "al-duwadimi" to listOf("2026-01-01..2027-12-31"),
+        "al-edabi" to listOf("2026-01-01..2027-12-31"),
+        "al-farshah" to listOf("2026-01-01..2027-12-31"),
+        "al-ghat" to listOf("2026-01-01..2027-12-31"),
+        "al-ghazalah" to listOf("2026-01-01..2027-12-31"),
+        "al-hait" to listOf("2026-01-01..2027-12-31"),
+        "al-hajrah" to listOf("2026-01-01..2027-12-31"),
+        "al-harajah" to listOf("2026-01-01..2027-12-31"),
+        "al-hariq" to listOf("2026-01-01..2027-12-31"),
+        "al-hayr" to listOf("2026-01-01..2027-12-31"),
+        "al-henakiyah" to listOf("2026-01-01..2027-12-31"),
+        "al-hofuf" to listOf("2026-01-01..2027-12-31"),
+        "al-is" to listOf("2026-01-01..2027-12-31"),
+        "al-jubail" to listOf("2026-01-01..2027-12-31"),
+        "al-jumum" to listOf("2026-01-01..2027-12-31"),
+        "al-kamil" to listOf("2026-01-01..2027-12-31"),
+    )
+
+    private fun saUmmalquraChecked2(): Map<String, List<String>> = mapOf(
+        "al-kharj" to listOf("2026-01-01..2027-12-31"),
+        "al-kharkhir" to listOf("2026-01-01..2027-12-31"),
+        "al-khobar" to listOf("2026-01-01..2027-12-31"),
+        "al-khurma" to listOf("2026-01-01..2027-12-31"),
+        "al-lith" to listOf("2026-01-01..2027-12-31"),
+        "al-majmaah" to listOf("2026-01-01..2027-12-31"),
+        "al-makhwah" to listOf("2026-01-01..2027-12-31"),
+        "al-mithnab" to listOf("2026-01-01..2027-12-31"),
+        "al-mubarraz" to listOf("2026-01-01..2027-12-31"),
+        "al-muwayh" to listOf("2026-01-01..2027-12-31"),
+        "al-muzahimiyah" to listOf("2026-01-01..2027-12-31"),
+        "al-namas" to listOf("2026-01-01..2027-12-31"),
+        "al-qatif" to listOf("2026-01-01..2027-12-31"),
+        "al-qunfudhah" to listOf("2026-01-01..2027-12-31"),
+        "al-qurayyat" to listOf("2026-01-01..2027-12-31"),
+        "al-quwaiiyah" to listOf("2026-01-01..2027-12-31"),
+        "al-quwarah" to listOf("2026-01-01..2027-12-31"),
+        "al-reeth" to listOf("2026-01-01..2027-12-31"),
+        "al-udayd" to listOf("2026-01-01..2027-12-31"),
+        "al-ula" to listOf("2026-01-01..2027-12-31"),
+        "al-uwayqiliyah" to listOf("2026-01-01..2027-12-31"),
+        "al-uyaynah" to listOf("2026-01-01..2027-12-31"),
+        "al-wajh" to listOf("2026-01-01..2027-12-31"),
+        "alasyah" to listOf("2026-01-01..2027-12-31"),
+        "aldarb" to listOf("2026-01-01..2027-12-31"),
+        "alharth" to listOf("2026-01-01..2027-12-31"),
+        "almajaridah" to listOf("2026-01-01..2027-12-31"),
+        "almandaq" to listOf("2026-01-01..2027-12-31"),
+        "alqura" to listOf("2026-01-01..2027-12-31"),
+        "an-nabhaniyah" to listOf("2026-01-01..2027-12-31"),
+        "ar-rass" to listOf("2026-01-01..2027-12-31"),
+        "ar-rayn" to listOf("2026-01-01..2027-12-31"),
+        "arar" to listOf("2026-01-01..2027-12-31"),
+        "as-sulaymi" to listOf("2026-01-01..2027-12-31"),
+        "as-sulayyil" to listOf("2026-01-01..2027-12-31"),
+        "ash-shamli" to listOf("2026-01-01..2027-12-31"),
+        "ash-shimasiyah" to listOf("2026-01-01..2027-12-31"),
+        "ash-shinan" to listOf("2026-01-01..2027-12-31"),
+        "at-tuwal" to listOf("2026-01-01..2027-12-31"),
+        "az-zulfi" to listOf("2026-01-01..2027-12-31"),
+    )
+
+    private fun saUmmalquraChecked3(): Map<String, List<String>> = mapOf(
+        "badr" to listOf("2026-01-01..2027-12-31"),
+        "badr-al-janoub" to listOf("2026-01-01..2027-12-31"),
+        "bahrah" to listOf("2026-01-01..2027-12-31"),
+        "baish" to listOf("2026-01-01..2027-12-31"),
+        "baljurashi" to listOf("2026-01-01..2027-12-31"),
+        "bani-hasan" to listOf("2026-01-01..2027-12-31"),
+        "baqaa" to listOf("2026-01-01..2027-12-31"),
+        "bariq" to listOf("2026-01-01..2027-12-31"),
+        "belqarn" to listOf("2026-01-01..2027-12-31"),
+        "bishah" to listOf("2026-01-01..2027-12-31"),
+        "buraydah" to listOf("2026-01-01..2027-12-31"),
+        "damad" to listOf("2026-01-01..2027-12-31"),
+        "dammam" to listOf("2025-01-01..2027-12-31"),
+        "dariyah" to listOf("2026-01-01..2027-12-31"),
+        "dhahban" to listOf("2026-01-01..2027-12-31"),
+        "dhahran" to listOf("2026-01-01..2027-12-31"),
+        "dhahran-al-janub" to listOf("2026-01-01..2027-12-31"),
+        "dhurma" to listOf("2026-01-01..2027-12-31"),
+        "duba" to listOf("2026-01-01..2027-12-31"),
+        "dumah-al-jandal" to listOf("2026-01-01..2027-12-31"),
+        "farasan-island" to listOf("2026-01-01..2027-12-31"),
+        "fayfa" to listOf("2026-01-01..2027-12-31"),
+        "ghamid-az-zinad" to listOf("2026-01-01..2027-12-31"),
+        "hafar-al-batin" to listOf("2026-01-01..2027-12-31"),
+        "hail" to listOf("2026-01-01..2027-12-31"),
+        "haql" to listOf("2026-01-01..2027-12-31"),
+        "harub" to listOf("2026-01-01..2027-12-31"),
+        "hawtat-sudayr" to listOf("2026-01-01..2027-12-31"),
+        "howtat-bani-tamim" to listOf("2026-01-01..2027-12-31"),
+        "hubuna" to listOf("2026-01-01..2027-12-31"),
+        "huraymila" to listOf("2026-01-01..2027-12-31"),
+        "jalajil" to listOf("2026-01-01..2027-12-31"),
+        "jazan" to listOf("2026-01-01..2027-12-31"),
+        "jeddah" to listOf("2025-01-01..2027-12-31"),
+        "khafji" to listOf("2026-01-01..2027-12-31"),
+        "khamis-mushait" to listOf("2026-01-01..2027-12-31"),
+        "khaybar" to listOf("2026-01-01..2027-12-31"),
+        "khbash" to listOf("2026-01-01..2027-12-31"),
+        "khulais" to listOf("2026-01-01..2027-12-31"),
+        "layla" to listOf("2026-01-01..2027-12-31"),
+    )
+
+    private fun saUmmalquraChecked4(): Map<String, List<String>> = mapOf(
+        "madinah" to listOf("2025-01-01..2027-12-31"),
+        "mahd-al-thahab" to listOf("2026-01-01..2027-12-31"),
+        "malham" to listOf("2026-01-01..2027-12-31"),
+        "marat" to listOf("2026-01-01..2027-12-31"),
+        "mawqaq" to listOf("2026-01-01..2027-12-31"),
+        "maysan" to listOf("2026-01-01..2027-12-31"),
+        "muhayil" to listOf("2026-01-01..2027-12-31"),
+        "nairyah" to listOf("2026-01-01..2027-12-31"),
+        "najran" to listOf("2026-01-01..2027-12-31"),
+        "qaryat-al-ulya" to listOf("2026-01-01..2027-12-31"),
+        "qilwah" to listOf("2026-01-01..2027-12-31"),
+        "rabigh" to listOf("2026-01-01..2027-12-31"),
+        "rafha" to listOf("2026-01-01..2027-12-31"),
+        "ranyah" to listOf("2026-01-01..2027-12-31"),
+        "ras-tannurah" to listOf("2026-01-01..2027-12-31"),
+        "ras-tanura" to listOf("2026-01-01..2027-12-31"),
+        "rawdat-sudayr" to listOf("2026-01-01..2027-12-31"),
+        "riyadh-al-khabra" to listOf("2026-01-01..2027-12-31"),
+        "rojal" to listOf("2026-01-01..2027-12-31"),
+        "rumah" to listOf("2026-01-01..2027-12-31"),
+        "sabya" to listOf("2026-01-01..2027-12-31"),
+        "sakaka" to listOf("2026-01-01..2027-12-31"),
+        "samtah" to listOf("2026-01-01..2027-12-31"),
+        "sarat-abidah" to listOf("2026-01-01..2027-12-31"),
+        "shagra" to listOf("2026-01-01..2027-12-31"),
+        "sharorah" to listOf("2026-01-01..2027-12-31"),
+        "simira" to listOf("2026-01-01..2027-12-31"),
+        "sudus" to listOf("2026-01-01..2027-12-31"),
+        "suwayr" to listOf("2026-01-01..2027-12-31"),
+        "tabuk" to listOf("2026-01-01..2027-12-31"),
+        "taif" to listOf("2026-01-01..2027-12-31"),
+        "tanumah" to listOf("2026-01-01..2027-12-31"),
+        "tarib" to listOf("2026-01-01..2027-12-31"),
+        "tarut" to listOf("2026-01-01..2027-12-31"),
+        "tathleeth" to listOf("2026-01-01..2027-12-31"),
+        "tayma" to listOf("2026-01-01..2027-12-31"),
+        "thadig" to listOf("2026-01-01..2027-12-31"),
+        "thar" to listOf("2026-01-01..2027-12-31"),
+        "thuwal" to listOf("2026-01-01..2027-12-31"),
+        "tubarjal" to listOf("2026-01-01..2027-12-31"),
+    )
+
+    private fun saUmmalquraChecked5(): Map<String, List<String>> = mapOf(
+        "tumair" to listOf("2026-01-01..2027-12-31"),
+        "turaif" to listOf("2024-01-01..2024-12-31", "2026-01-01..2030-12-31"),
+        "turbah" to listOf("2026-01-01..2027-12-31"),
+        "umluj" to listOf("2026-01-01..2027-12-31"),
+        "unayzah" to listOf("2026-01-01..2027-12-31"),
+        "uqlat-as-suqur" to listOf("2026-01-01..2027-12-31"),
+        "uyun-al-jawa" to listOf("2026-01-01..2027-12-31"),
+        "wadi-ad-dawasir" to listOf("2026-01-01..2027-12-31"),
+        "wadi-al-fara" to listOf("2026-01-01..2027-12-31"),
+        "yadamah" to listOf("2026-01-01..2027-12-31"),
+        "yanbu" to listOf("2026-01-01..2027-12-31"),
     )
 
     private fun saUmmalquraUnits1(): Map<String, Map<String, Int>> = mapOf(
@@ -1835,7 +1991,7 @@ object ProofStamps {
         places = 1,
         placeDays = 30,
         ramadanDays = 30,
-        provenThrough = "2022-05-01",
+        lastChecked = "2022-05-01",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 7, "fajr" to 2, "isha" to 20, "maghrib" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -1843,6 +1999,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 7, reason = "News reports of Sudan's 2026 imsakiya, not the table itself, put its dawn near 19.4°, earlier than the 18.3° of the one table held (Khartoum, Ramadan 1443); until a current table is held the fast begins at the 19.5° dawn, up to 7 min before that table's Fajr.", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 20, reason = "A 2026 Ramadan imsakiya circulating under the Fiqh Academy's name (not the verified 2022 table) puts Isha at Maghrib + 90; on the entry's Ramadan dates only, Isha never earlier than that, up to 20 min after the 2022 table's 18.0° angle.", events = listOf("isha")),
         ),
+        checked = listOf("2022-04-02..2022-05-01"),
     )
 
     private fun seCautious() = ProofStamp(
@@ -1850,7 +2007,7 @@ object ProofStamps {
         places = 14,
         placeDays = 6034,
         ramadanDays = 447,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 6, "dhuhr" to 4, "endOfEating" to 154, "fajr" to 109, "isha" to 170, "maghrib" to 126, "sunrise" to 129),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -1862,6 +2019,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 154, reason = "The end of eating is the earlier member's: Rabita's own earliest dawns, near the middle of the night from April to August (ruling R39), applied at Copenhagen and Stockholm, up to 137 and 136 min before Diyanet's imsak there, and up to 154 before its Malmö and Aarhus tables in August; at Helsinki up to 25 min before Rabita's own Fajr.", events = listOf("endOfEating")),
             ProofLateLimit(minutes = 170, reason = "Isha is the later member's, Rabita's own model: 17° while the sun reaches it, near midnight in late spring and late summer, up to 155 min after Rabita's calendar at Helsinki and 136 after Diyanet's Stockholm table, 170 after Diyanet's Luleå table in April and September (its takdir Isha comes earlier the further north).", events = listOf("isha")),
         ),
+        checked = listOf("2025-12-01..2026-03-30", "2026-04-01..2027-12-31"),
     )
 
     private fun sgMuis() = ProofStamp(
@@ -1869,13 +2027,14 @@ object ProofStamps {
         places = 1,
         placeDays = 1096,
         ramadanDays = 89,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 3, reason = "MUIS's own Standard Asr is not reproduced to the minute; a further minute of drift near the equinoxes past class B's own margin", events = listOf("asrStandard")),
         ),
+        checked = listOf("2024-01-01..2026-12-31"),
     )
 
     private fun syAwqaf() = ProofStamp(
@@ -1883,12 +2042,13 @@ object ProofStamps {
         places = 2,
         placeDays = 2,
         ramadanDays = 1,
-        provenThrough = "2026-10-01",
+        lastChecked = "2026-10-01",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 0, "isha" to 0, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-02-19", "2026-10-01"),
     )
 
     private fun tnInm() = ProofStamp(
@@ -1896,19 +2056,22 @@ object ProofStamps {
         places = 7,
         placeDays = 1546,
         ramadanDays = 124,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 2, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = tnInmUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        provenThroughByUnit = tnInmThrough(),
+        checked = listOf("2019-11-10", "2019-12-21", "2020-01-15", "2020-03-20", "2020-05-10", "2020-06-21", "2020-08-01", "2020-09-25", "2020-11-10", "2020-12-21", "2021-01-15", "2021-03-20", "2021-05-10", "2021-06-21", "2021-08-01", "2021-09-25", "2021-11-10", "2021-12-21", "2022-01-15", "2022-03-20", "2022-05-10", "2022-06-21", "2022-08-01", "2022-09-25", "2022-11-10", "2022-12-21", "2023-01-15", "2023-03-20", "2023-05-10", "2023-06-21", "2023-08-01", "2023-09-25", "2023-11-10", "2023-12-21", "2024-01-15", "2024-03-20", "2024-05-10", "2024-06-21", "2024-08-01", "2024-09-25", "2024-11-10", "2024-12-21", "2025-01-15", "2025-03-20", "2025-05-10", "2025-06-21", "2025-08-01", "2025-09-25", "2025-11-10", "2025-12-21", "2026-01-01..2026-12-31"),
+        checkedByUnit = tnInmChecked(),
     )
 
-    private fun tnInmThrough(): Map<String, String> = mapOf(
-        "ben-guerdane" to "2026-12-30",
-        "tabarka" to "2026-12-30",
-        "tala" to "2026-12-30",
+    private fun tnInmChecked(): Map<String, List<String>> = mapOf(
+        "ben-guerdane" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-11", "2026-10-13", "2026-10-16", "2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
+        "sfax" to listOf("2026-01-01..2026-12-31"),
+        "tabarka" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-11", "2026-10-13", "2026-10-16", "2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
+        "tala" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-11", "2026-10-13", "2026-10-16", "2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
+        "tataouine" to listOf("2026-01-01..2026-12-31"),
     )
 
     private fun tnInmUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1925,13 +2088,14 @@ object ProofStamps {
         places = 22,
         placeDays = 8866,
         ramadanDays = 638,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = trDiyanetUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 1, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
     )
 
     private fun trDiyanetUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1955,7 +2119,7 @@ object ProofStamps {
         places = 33,
         placeDays = 13174,
         ramadanDays = 957,
-        provenThrough = "2027-12-31",
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 70, "fajr" to 7, "isha" to 7, "maghrib" to 126, "sunrise" to 129),
         worstLateByUnit = trDiyanetEuropeUnits(),
         lateLimits = listOf(
@@ -2056,6 +2220,34 @@ object ProofStamps {
             ProofLateLimit(minutes = 126, reason = "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its Maghrib before the sun sets; Maghrib never comes before the real sunset (the sun's plus Diyanet's 7 min): up to 126 min after Diyanet's.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 129, reason = "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its sunrise after the sun's own; the app keeps the sun's, the safe side: up to 129 min before Diyanet's.", events = listOf("sunrise")),
         ),
+        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
+        checkedByUnit = trDiyanetEuropeChecked(),
+    )
+
+    private fun trDiyanetEuropeChecked(): Map<String, List<String>> = mapOf(
+        "tr.diyanet.europe.aalborg" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.aarhus" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.antwerpen" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.bergen" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.copenhagen" to listOf("2026-09-26..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.gent" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.goteborg" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.helsinki" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.kristiansand" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.lille" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.lulea" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.lyon" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.malmo" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.oulu" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.stavanger" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.sundsvall" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.tampere" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.trondheim" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.turku" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.umea" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.uppsala" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.wien" to listOf("2026-09-26..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.zurich" to listOf("2026-09-26..2026-11-01", "2027-01-01..2027-12-31"),
     )
 
     private fun trDiyanetEuropeUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -2099,7 +2291,7 @@ object ProofStamps {
         places = 7,
         placeDays = 1253,
         ramadanDays = 30,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 5, "dhuhr" to 6, "endOfEating" to 32, "fajr" to 31, "isha" to 5, "maghrib" to 6, "sunrise" to 3),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -2109,6 +2301,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 31, reason = "Chicago's mosques differ on Fajr: the 15° mosques' Fajr, never before it, runs up to 31 min after the 18° block's (Villa Park, Makki, DarusSalam).", events = listOf("fajr")),
             ProofLateLimit(minutes = 32, reason = "Chicago's mosques differ on Fajr: the end of eating is the 18° block's dawn, never after it, up to 32 min before the 15° mosques' Fajr (MCC, MEC, Mosque Foundation, Orland Park).", events = listOf("endOfEating")),
         ),
+        checked = listOf("2025-10-01..2025-10-31", "2025-12-01..2026-12-31"),
     )
 
     private fun usIsna() = ProofStamp(
@@ -2116,7 +2309,7 @@ object ProofStamps {
         places = 35,
         placeDays = 8617,
         ramadanDays = 628,
-        provenThrough = "2026-12-31",
+        lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 5, "asrStandard" to 5, "dhuhr" to 7, "endOfEating" to 4, "fajr" to 4, "isha" to 5, "maghrib" to 6, "sunrise" to 4),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -2125,6 +2318,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 6, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Maghrib up to 6 min after the tables that add nothing.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 7, reason = "The US mosques that follow 15°/15° add their own minutes (Zuhr up to + 5 at Irving and MCC Silver Spring, Maghrib up to + 5 at King Fahad and Dar Al Noor, ADAMS 2 min in the safe direction); the app is never before any of them: Zuhr up to 7 min after the tables that add nothing.", events = listOf("dhuhr")),
         ),
+        checked = listOf("2025-02-01..2025-03-31", "2025-05-01..2026-12-31"),
     )
 
     private fun uzBoard() = ProofStamp(
@@ -2132,7 +2326,7 @@ object ProofStamps {
         places = 1,
         placeDays = 19,
         ramadanDays = 0,
-        provenThrough = "2026-09-26",
+        lastChecked = "2026-09-26",
         worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 6, "endOfEating" to 1, "fajr" to 1, "isha" to 4, "maghrib" to 1, "sunrise" to 5),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -2141,14 +2335,15 @@ object ProofStamps {
             ProofLateLimit(minutes = 5, reason = "the margin also covers the pre-Jul-2026 rule's earlier sunrise (task 7f); an early end is the safe side", events = listOf("sunrise")),
             ProofLateLimit(minutes = 6, reason = "the margin also covers the pre-Jul-2026 rule's Dhuhr + 5 min next to the new rule's own (task 7f)", events = listOf("dhuhr")),
         ),
+        checked = listOf("2024-07-31", "2024-08-14", "2024-08-28", "2024-09-11", "2024-09-23", "2024-10-30", "2024-11-13", "2024-11-30", "2024-12-28", "2025-01-12", "2025-01-26", "2026-04-11", "2026-05-10", "2026-06-05", "2026-06-07", "2026-06-14", "2026-07-19", "2026-09-25..2026-09-26"),
     )
 
     private fun xkBik() = ProofStamp(
         entryId = "xk.bik",
         places = 2,
-        placeDays = 730,
-        ramadanDays = 60,
-        provenThrough = "2026-12-31",
+        placeDays = 1460,
+        ramadanDays = 118,
+        lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 6, "dhuhr" to 4, "endOfEating" to 3, "fajr" to 1, "isha" to 3, "maghrib" to 5, "sunrise" to 5),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -2157,6 +2352,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 5, reason = "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.", events = listOf("maghrib", "sunrise")),
             ProofLateLimit(minutes = 6, reason = "The Takvimi is an old perpetual table whose minutes step unevenly from day to day; the app follows each month of it on the safe side, with half a minute more for the towns' whole-minute offsets, and so runs up to this many minutes from its printed time on some days.", events = listOf("asrStandard")),
         ),
+        checked = listOf("2026-01-01..2027-12-31"),
     )
 
     private fun zaCape() = ProofStamp(
@@ -2164,7 +2360,7 @@ object ProofStamps {
         places = 1,
         placeDays = 61,
         ramadanDays = 0,
-        provenThrough = "2026-10-31",
+        lastChecked = "2026-10-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 4, "sunrise" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -2172,24 +2368,26 @@ object ProofStamps {
             ProofLateLimit(minutes = 2, reason = "Sunrise is the earliest of the three members', each a little before its own table's: up to 2 min before the MJC's printed sunrise.", events = listOf("sunrise")),
             ProofLateLimit(minutes = 4, reason = "The three tables print Maghrib from sunset to sunset + 3; Maghrib is the latest member's, never before any, so on the days the MJC prints it 3 min before the others it runs up to 4 min after the MJC's.", events = listOf("maghrib")),
         ),
+        checked = listOf("2026-09-01..2026-10-31"),
     )
 
     private fun zaJamiat() = ProofStamp(
         entryId = "za.jamiat",
         places = 9,
-        placeDays = 14973,
-        ramadanDays = 1198,
-        provenThrough = "2029-12-31",
+        placeDays = 15338,
+        ramadanDays = 1227,
+        lastChecked = "2029-12-31",
         worstLateMinutes = mapOf("asrHanafi" to 1, "asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 2, "maghrib" to 2, "sunrise" to 1),
         worstLateByUnit = zaJamiatUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrHanafi", "asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        provenThroughByUnit = zaJamiatThrough(),
+        checked = listOf("2025-01-01..2029-12-31"),
+        checkedByUnit = zaJamiatChecked(),
     )
 
-    private fun zaJamiatThrough(): Map<String, String> = mapOf(
-        "pretoria" to "2026-12-31",
+    private fun zaJamiatChecked(): Map<String, List<String>> = mapOf(
+        "pretoria" to listOf("2026-01-01..2027-12-31"),
     )
 
     private fun zaJamiatUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -2209,12 +2407,13 @@ object ProofStamps {
         places = 1,
         placeDays = 61,
         ramadanDays = 0,
-        provenThrough = "2026-10-31",
+        lastChecked = "2026-10-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = zaMjcUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-09-01..2026-10-31"),
     )
 
     private fun zaMjcUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -2226,12 +2425,13 @@ object ProofStamps {
         places = 1,
         placeDays = 271,
         ramadanDays = 15,
-        provenThrough = "2027-06-05",
+        lastChecked = "2027-06-05",
         worstLateMinutes = mapOf("asrHanafi" to 2, "asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 3, "sunrise" to 2),
         worstLateByUnit = zaVocUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
+        checked = listOf("2026-06-01..2026-07-15", "2026-07-20", "2026-07-22", "2026-07-24..2026-07-27", "2026-07-29", "2026-07-31", "2026-08-02..2026-08-03", "2026-08-05", "2026-08-07..2026-08-10", "2026-08-12", "2026-08-19", "2026-08-21..2026-08-24", "2026-08-26", "2026-08-28..2026-10-31", "2026-11-02", "2026-11-04", "2026-11-06..2026-11-09", "2026-11-15..2026-11-16", "2026-11-18", "2026-11-20..2026-11-23", "2026-11-25", "2026-11-27..2026-12-31", "2027-01-02..2027-01-04", "2027-01-06", "2027-01-08", "2027-01-13", "2027-01-15..2027-01-18", "2027-01-20", "2027-01-22..2027-01-25", "2027-01-27", "2027-01-29..2027-01-31", "2027-02-03", "2027-02-05..2027-02-07", "2027-02-12", "2027-02-19..2027-02-22", "2027-02-24", "2027-02-26..2027-03-01", "2027-03-03", "2027-03-05..2027-03-08", "2027-03-14..2027-03-15", "2027-03-17", "2027-03-19..2027-03-22", "2027-03-24", "2027-03-26..2027-03-29", "2027-03-31", "2027-04-02..2027-04-05", "2027-04-07", "2027-04-14", "2027-04-16..2027-04-19", "2027-04-21", "2027-04-23..2027-04-26", "2027-04-28", "2027-04-30..2027-05-03", "2027-05-05", "2027-05-07", "2027-05-14..2027-05-17", "2027-05-19", "2027-05-21..2027-05-24", "2027-05-26", "2027-05-28..2027-05-31", "2027-06-02", "2027-06-04..2027-06-05"),
     )
 
     private fun zaVocUnits(): Map<String, Map<String, Int>> = mapOf(

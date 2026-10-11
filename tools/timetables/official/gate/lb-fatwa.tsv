@@ -18,3 +18,10 @@ path	entry	lat	lon	zone	clock	columns	format	school	split	note
 archive/tables/normalized-7e/lb-fatwa-beirut-2024.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F+E S D A M I	daily	standard	fit	Masjidi TV id 26 (Ras Beirut), 2024
 archive/tables/normalized-7e/lb-fatwa-beirut-dated.txt	lb.fatwa	33.894	35.502	Asia/Beirut		F+E S D A M I	daily	standard	test	Dar al-Fatwa homepage widget + Al-Liwaa, 2019-2026, held out
 archive/tables/normalized-7e/lb-fatwa-beirut-dated-2023-04-01.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F+E S D A M I	daily	standard	test	1 Apr 2023, Lebanon's decreed delay to the clock change that year
+# 2025-2027 (track T4 and its review, 11 Oct 2026): the same perpetual table assigned to 2025, 2026 and 2027 dates (archive:
+# lb-fatwa-beirut-<yyyy>.txt, derived exactly as the 2027 file is from the 2024 mapping; on its fixed UTC+02:00 clock, as
+# the 2024 row), so that every year of the leap cycle the stamp claims, 2 October to 31 December 2026 among them, is
+# checked against the table: held out, the engine against each year's own sun.
+archive/tables/normalized-7e/lb-fatwa-beirut-2025.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F+E S D A M I	daily	standard	test	Masjidi TV id 26 (Ras Beirut), the perpetual table on 2025
+archive/tables/normalized-7e/lb-fatwa-beirut-2026.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F+E S D A M I	daily	standard	test	Masjidi TV id 26 (Ras Beirut), the perpetual table on 2026
+archive/tables/normalized-7e/lb-fatwa-beirut-2027.txt	lb.fatwa	33.894	35.502	Asia/Beirut	UTC+02:00	F+E S D A M I	daily	standard	test	Masjidi TV id 26 (Ras Beirut), the perpetual table on 2027

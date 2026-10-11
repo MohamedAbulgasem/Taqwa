@@ -55,3 +55,7 @@ archive/tables/moral-auth-world/africaoceania/di-pta-S.txt	za.jamiat/pretoria			
 archive/tables/moral-auth-world/africaoceania/di-dbn-H.txt	za.jamiat/durban			Africa/Johannesburg	F S D A M I	daily	hanafi	test	Darul Ihsan Durban 2026, Hanafi columns
 archive/tables/moral-auth-world/africaoceania/masjids-durban-H.txt	za.jamiat/durban			Africa/Johannesburg	F - - A M I	daily	hanafi	test	Jamiat KZN Durban via masjids.co.za, Mar-Dec 2026
 archive/tables/moral-auth-world/africaoceania/masjids-johannesburg-H.txt	za.jamiat/johannesburg			Africa/Johannesburg	F - - A M I	daily	hanafi	test	Jamiat Johannesburg via masjids.co.za, Mar-Dec 2026
+# 2027 (track T4, 11 Oct 2026): Darul Ihsan's Pretoria tables assigned to 2027 (archive: di-pta-<H|S>-2027.txt, derived;
+# Jamiat's system is perpetual, as the CSVs' 2025-2029 mappings above), held out at the Pretoria unit.
+archive/tables/moral-auth-world/africaoceania/di-pta-H-2027.txt	za.jamiat/pretoria			Africa/Johannesburg	F S D A M I	daily	hanafi	test	Darul Ihsan Pretoria, assigned to 2027, Hanafi columns
+archive/tables/moral-auth-world/africaoceania/di-pta-S-2027.txt	za.jamiat/pretoria			Africa/Johannesburg	- - - A - -	daily	standard	test	Darul Ihsan Pretoria, assigned to 2027, the Standard Asr

@@ -278,6 +278,17 @@ object Europe {
      * sunrise 1–5 min early, Maghrib 0–6 min late, Standard Asr, up to 6 min after MWL's; Dhuhr about
      * ± 3. Its sunrise, Dhuhr, Asr and Maghrib move with the season: per-month offsets fitted on its 2026
      * Dublin table (Task 7g, seconds after the authority's minutes).
+     *
+     * The table is fixed: it prints the same month-day times every year, so every year is computed as
+     * 2026, the year it was fitted on ([TimetableMethod.fixedTableYear]; track T4, 11 Oct 2026). Against
+     * its own sun 2027 was a minute early on 52 starts (Maghrib 37, Asr 14, Dhuhr 1) and a minute late
+     * on 29 ends against the table mapped onto 2027, and 2028, a leap year, by up to 70 s more; each
+     * year now shows the table's own times, held to the date's own sun (review of track T4): where the
+     * leap cycle moves the sun past the table, the table's sunrise would come after the real one (19 days
+     * of March 2028) or its Maghrib on the minute the sun sets (41 days of March and April 2028, 24 of
+     * February to April 2029), and the day shows the sun's minute instead, a minute from the table on the
+     * safe side. The table mapped onto 2027–2029 checks that (gate rows, fit: the table re-dated, not
+     * held-out years).
      */
     val ifi: RegistryEntry = single(
         id = "ie.ifi", nameKey = "authority_ifi", entryClass = EntryClass.D_AUTHORITY,
@@ -293,6 +304,7 @@ object Europe {
             ),
             endOfEatingMarginSeconds = -54,
             fajrAngleByDayOfYear = IfiCurve.fajr, ishaAngleByDayOfYear = IfiCurve.isha,
+            fixedTableYear = 2026,
         ),
         school = AsrSchool.STANDARD, scope = Scope.GLOBAL, countries = setOf("IE"),
     )
@@ -817,10 +829,10 @@ object Europe {
 
     /**
      * Switzerland: FIDS's times equal Diyanet Zürich (31 of 31 days); majority not established. Zürich's
-     * table is the one held: a point table (ruling R44) on Diyanet's own Zürich curves (subtask 7b), its
-     * margins fitted by Task 7g on FIDS's own Zürich month; the end of eating keeps Diyanet's own curve
-     * margin (one autumn month is too thin to fit an end on). Beyond Zürich's reach the edge applies:
-     * Diyanet's generic European method, a minute more.
+     * table is the one held: a point table (ruling R44) on Diyanet's own Zürich method, its curves (subtask
+     * 7b) and, since the review of track T4 (11 Oct 2026), its margins too ([switzerlandUnits]). Beyond
+     * Zürich's reach the edge applies: Diyanet's generic European method with the margins Task 7g fitted on
+     * FIDS's own Zürich month, a minute more.
      */
     val switzerland: RegistryEntry = single(
         id = "ch.fids", nameKey = "authority_fids", entryClass = EntryClass.D_AUTHORITY,
@@ -831,12 +843,13 @@ object Europe {
         school = AsrSchool.STANDARD, countries = setOf("CH"),
     )
 
-    val switzerlandUnits: UnitSet = cityTable(
-        switzerland, "Zürich", GeoPoint(47.36667, 8.55),
-        diyanetCity("zurich", "ch.fids.zurich").copy(
-            margins = margins(start = -20, sunrise = 33, fajr = -25, asr = -23, maghrib = -23, isha = -29),
-        ),
-    )
+    /**
+     * Zürich's unit is Diyanet Zürich's own method, margins and all (review of track T4, 11 Oct 2026): FIDS prints
+     * Diyanet Zürich's table, and the margins Task 7g fitted on FIDS's one autumn month were, against Diyanet's
+     * Zürich table for 2027 (FIDS's to come, ch-fids.tsv), a minute early at Maghrib on five days and a minute
+     * late at sunrise on nine. Diyanet's own are green on both, as on Diyanet's own rows at the same point.
+     */
+    val switzerlandUnits: UnitSet = cityTable(switzerland, "Zürich", GeoPoint(47.36667, 8.55), diyanetCity("zurich", "ch.fids.zurich"))
 
     /**
      * A point table (rulings R30, R44) on its own [method] at [point]; beyond its reach the edge takes the
