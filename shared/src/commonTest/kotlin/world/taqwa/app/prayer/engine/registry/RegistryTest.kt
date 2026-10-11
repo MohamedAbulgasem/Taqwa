@@ -943,12 +943,17 @@ class RegistryTest {
         val genevaMethod = assertNotNull(geneva.method)
         assertEquals(fids.margins.fajr + 60, genevaMethod.margins.fajr)
         assertNotNull(genevaMethod.fajrAngleByDayOfYear, "the edge keeps Diyanet's European Fajr curve")
-        // At Zürich itself, Diyanet's own Zürich curves (subtask 7b) with FIDS's fitted margins (Task 7g).
+        // At Zürich itself, Diyanet's own Zürich method, curves (subtask 7b) and margins alike (review of track T4:
+        // the margins fitted on FIDS's one month were early against Diyanet's Zürich 2027, which FIDS prints).
         val zurich = resolve(47.36667, 8.55, "Europe/Zurich", "CH")
         assertEquals("Zürich", zurich.unitName)
         val zurichMethod = assertNotNull(zurich.method)
         assertEquals("ch.fids.zurich", zurichMethod.id)
-        assertEquals(-25, zurichMethod.margins.fajr)
+        val diyanetZurich = assertNotNull(
+            Registry.resolveEntry(Registry.byId("tr.diyanet.europe")!!, Place(47.36667, 8.55, "Europe/Zurich", "CH")).method,
+        )
+        assertEquals("tr.diyanet.europe.zurich", diyanetZurich.id)
+        assertEquals(diyanetZurich.copy(id = zurichMethod.id), zurichMethod)
         assertNotNull(zurichMethod.ishaAngleByDayOfYear, "Zürich keeps Diyanet's own Isha curve")
     }
 

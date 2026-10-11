@@ -37,6 +37,8 @@ tr-diyanet-europe	*	se-cautious.tsv	same	*	same	all	-
 tr-diyanet-europe	*	nl-cautious.tsv	same	*	same	all	-
 tr-diyanet-europe	*	de-cautious.tsv	same	*	same	all	-
 tr-diyanet-europe	*	au-cautious.tsv	same	*	same	all	-
+# FIDS prints Diyanet Zürich's table (Europe.kt, the review of track T4): each new Zürich capture is FIDS's too.
+tr-diyanet-europe	*	ch-fids.tsv	same	*	same	all	-
 id-kemenag	*	id-kemenag.tsv	index	-	index	all	-
 id-kemenag	medan-*	id-kemenag.tsv	id.kemenag/0228	-	unit	all	-
 id-kemenag	palembang-*	id-kemenag.tsv	id.kemenag/0816	-	unit	all	-
