@@ -104,6 +104,76 @@ never after adhan2's Fajr from 2026 to 2029, and 26 to 29 s before its exact mom
 `EuropeAmericasAfricaProofTest` checks London, Manchester, Edinburgh, Toronto and Cape Town over a leap
 cycle. The Fajr start is unchanged.
 
+### The Moonsighting Committee across its range (11 Oct, the T3 round)
+
+The sampling above stepped over the band where the method went wrong. Its curves were read at the
+latitude rounded to 0.1°, and its switch to a seventh of the night at 55° was read there too, so from
+54.95° to 55° N (Newcastle upon Tyne, Gateshead, South Shields, Derry, Omsk) the seventh replaced the
+seasonal rule: Isha up to 24 min early from May to July, on 70 to 71 days a year, and Fajr up to 68 min
+late. Between the 0.1° steps, where the rule's moment lies near the sun's lowest point, Fajr was up to
+5 min early from 64.6° N and up to 8 min south of 54° S, and Isha up to 2 min early near 65.9° N.
+The end of eating's cap, a quarter of a degree short of the sun's lowest, lay above the horizon near
+65.5° N in June, so the end came up to 7 min after the rule. South of 62° S, adhan2's seasonal Isha
+falls after the middle of the night, where no evening dusk is.
+
+**The reference is now the Committee's own**, as its own tables print it: moonsighting.com's praytable
+for 2026 at 23 places, held in the private archive (`archive/raw/manual/mcw/2026-10-11/`,
+`archive/tables/manual/mcw/2026-10-11/`, listed in `MANIFEST.tsv`), with the archive's earlier Toronto
+table. Each table is to the minute of the rule, as computed below, on 72 to 92 % of its days.
+- The switch to the seventh is at the place's own latitude, as adhan2 has it: the seasonal rule at
+  Newcastle (54.97° N), the seventh at Gosforth (55.0°) and Tynemouth (55.02°).
+- The seventh begins at 55° S too, which adhan2's preset does not do: at Isla Hornos, in the Drake
+  Passage at 58° S, at Orcadas and at Esperanza the Committee's Fajr is up to 102 min after adhan2's and
+  its Isha up to 53 min before it.
+- For Fajr, the seventh counts the night before sunrise; adhan2 counts the night after. From 55° to
+  66° N the night before fits the tables to the minute on 72 to 88 % of their days, and the night after
+  on 42 to 82 %.
+
+**The method now** (`TwilightCurves.moonsighting`, `moonsightingAsEnd`; `PlaceCurves`):
+- The switch is decided at the place's own latitude, north and south.
+- Each start is read twice, and each slot takes the later start: on the grid, as before, and at the
+  place's own latitude with the sun at its own local noon (at 150° E, 12:00 UTC is ten hours off).
+  Where a night is short, the sun no lower than 3° on some night of the cycle, it is read a third time:
+  on every day of a leap cycle at the place itself, with the sun's declination at the moment. On the
+  edge of the midnight sun the reference year's own day can have no night, and the curve then took a
+  neighbour's deeper dawn.
+- A start is held to what the sun reaches there: a Fajr dawn is never deeper than the least the sun
+  sinks that night in any year, at any longitude. An Isha deeper than that is left to the high-latitude
+  rule, which sets it later than the rule's own.
+- The end is the rule read as an end, on the grid and at the place itself (the declination at the
+  place's own noon), counting the longer of the nights around the day. Where it is deeper than the sun
+  sinks, the end is the middle of the night (`EndOfEating.DawnOrMiddle`, which now takes a curve).
+- A Fajr start thus never comes before either night's rule. The end of eating never comes after the
+  Committee's own Fajr, and it comes after adhan2's only where noted below.
+
+**Measured.** The reference is the rule computed with this core's own sun at the place itself
+(`CommitteeRule`, in the common tests). The round swept every 0.01° from 66° S to 66° N, on every day
+of 2025 to 2028, at 0°, 150° E and 120° W, and in Helsinki's and London's own zones.
+- No Fajr or Isha came before the rule's printed minute. No sunrise and no end of eating came after
+  the Committee's own Fajr.
+- On a few days at the edge of the midnight sun (65.7° to 66°) the rule's Fajr is within a minute or
+  two of sunrise. There the Fajr shown is the minute before sunrise and is declared not followed
+  (ruling R90).
+- Against adhan2's night-after Fajr, the end is 1 to 4 min after it on one day a year at a few
+  latitudes from 65.78° to 66° N and S. That day is the first night after the midnight sun: the night
+  has more than tripled overnight, and adhan2 puts its Fajr before the middle of the night just ended,
+  so no dawn of that night comes earlier.
+- Against the Committee's own tables there was no early start and no late end at the 19 places from
+  43.7° N to 65.7° N and from 54.8° S to 63.4° S.
+- At Kemi, Boden, Tornio and Usinsk (65.7° to 66.0° N), 2 to 4 cells each differ on the days next to
+  the midnight sun. On those days the table's printed sunrise and sunset are up to 51 min from the sun's
+  own, and the table contradicts itself: an Isha 80 min after a Maghrib on a night of minutes, a Fajr
+  130 min before sunrise.
+
+`MoonsightingCommitteeTest` (common) covers:
+- Newcastle, all year;
+- the switch either side of 55° N;
+- Isla Hornos;
+- Luleå and Kemi, over 16 months.
+
+`MoonsightingSweepTest` (JVM) covers 6.8 million of those place-days. Both fail on the engine before
+this round.
+
 ## 2. The legacy high-latitude choice
 
 Settings keep `legacyHighLatitude: HighLatitudePreference?` (`AUTOMATIC`, `MIDDLE_OF_NIGHT`,
