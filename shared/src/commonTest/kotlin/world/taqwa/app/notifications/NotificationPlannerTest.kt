@@ -391,8 +391,13 @@ class NotificationPlannerTest {
             assertEquals("Europe/London", entry.timeZoneId)
         }
         // The one spelling of the id, which a finished set cancels by and a tap is read from.
-        assertEquals(morning.id, NotificationPlanner.adhkarId(AdhkarSet.MORNING, sixth))
-        assertEquals(evening.id, NotificationPlanner.adhkarId(AdhkarSet.EVENING, sixth))
+        assertEquals(morning.id, adhkarNotificationId(AdhkarSet.MORNING, sixth))
+        assertEquals(evening.id, adhkarNotificationId(AdhkarSet.EVENING, sixth))
+        assertEquals(AdhkarSet.MORNING, adhkarSetOfNotificationId(morning.id))
+        assertEquals(AdhkarSet.EVENING, adhkarSetOfNotificationId(evening.id))
+        // Each carries where its window ends, so a late Android delivery can be dropped there.
+        assertEquals(times.time(Prayer.SUNRISE), morning.windowEnd)
+        assertEquals(times.time(Prayer.MAGHRIB), evening.windowEnd)
         // Each body quotes where its window ends: sunrise for the morning, Maghrib for the evening.
         assertEquals("Morning adhkar", morning.title)
         assertEquals("Until sunrise · ${isoClockTime(times.time(Prayer.SUNRISE), london.timeZoneId)}", morning.body)
@@ -487,5 +492,14 @@ class NotificationPlannerTest {
         val with = planFor(notifications = adhkarOn.copy(remindBeforeMinutes = 10), windowDays = 3)
         assertEquals(without, with.filterNot { it.id.startsWith("ADHKAR-") })
         assertEquals(6, with.count { it.id.startsWith("ADHKAR-") })
+        // Only the adhkar reminder has a window to close; nothing else is ever dropped for lateness.
+        assertTrue(without.all { it.windowEnd == null })
+    }
+
+    @Test
+    fun `every kind has exactly one place in the fill order`() {
+        // A kind left out of FILL_ORDER would never be armed at all, however much room there was.
+        assertEquals(NotificationKind.entries.toSet(), NotificationPlanner.FILL_ORDER.flatten().toSet())
+        assertEquals(NotificationKind.entries.size, NotificationPlanner.FILL_ORDER.sumOf { it.size })
     }
 }

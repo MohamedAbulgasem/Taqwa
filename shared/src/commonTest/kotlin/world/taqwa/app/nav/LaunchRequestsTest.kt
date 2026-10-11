@@ -2,7 +2,7 @@ package world.taqwa.app.nav
 
 import kotlinx.datetime.LocalDate
 import world.taqwa.app.adhkar.AdhkarSet
-import world.taqwa.app.notifications.NotificationPlanner
+import world.taqwa.app.notifications.adhkarNotificationId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -90,7 +90,7 @@ class LaunchRequestsTest {
         LaunchRequests.consumeAdhkar()
         val date = LocalDate(2026, 10, 11)
         for (set in AdhkarSet.entries) {
-            LaunchRequests.openAdhkarForNotification(NotificationPlanner.adhkarId(set, date))
+            LaunchRequests.openAdhkarForNotification(adhkarNotificationId(set, date))
             assertEquals(set, LaunchRequests.pendingAdhkar.value)
             LaunchRequests.consumeAdhkar()
         }

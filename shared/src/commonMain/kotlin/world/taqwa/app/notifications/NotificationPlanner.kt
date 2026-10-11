@@ -1,7 +1,6 @@
 package world.taqwa.app.notifications
 
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
@@ -40,8 +39,9 @@ object NotificationPlanner {
      * prayer first, then the before-prayer reminders, then Tahajjud, then the adhkar reminder —
      * morning and evening as one tier, since they are one setting. Within a tier the soonest win.
      * A voluntary nudge therefore never takes the slot of an obligatory prayer's adhan on iOS's 64.
+     * Every kind must have a tier, or it is never armed at all; a test holds it to that.
      */
-    private val FILL_ORDER: List<Set<NotificationKind>> = listOf(
+    internal val FILL_ORDER: List<Set<NotificationKind>> = listOf(
         setOf(NotificationKind.PRAYER),
         setOf(NotificationKind.REMINDER),
         setOf(NotificationKind.TAHAJJUD),
@@ -53,16 +53,6 @@ object NotificationPlanner {
 
     /** It never lands later than this before sunrise or Maghrib, which close the two windows. */
     private val ADHKAR_BEFORE_END = 5.minutes
-
-    /**
-     * The id of [set]'s reminder on [date] — `ADHKAR-MORNING-2026-10-11` — the one spelling the
-     * plan arms, a finished set cancels by and a tapped notification is read back from.
-     */
-    fun adhkarId(set: AdhkarSet, date: LocalDate): String = "ADHKAR-${set.name}-$date"
-
-    /** The set an [adhkarId] belongs to; null for every other notification's id. */
-    fun adhkarSetOf(id: String): AdhkarSet? =
-        AdhkarSet.entries.firstOrNull { id.startsWith("ADHKAR-${it.name}-") }
 
     fun plan(
         location: GeoLocation,
@@ -160,7 +150,7 @@ object NotificationPlanner {
                     val at = minOf(opens + ADHKAR_AFTER, closes - ADHKAR_BEFORE_END)
                     if (at > opens && at > from) {
                         out += ScheduledNotification(
-                            id = adhkarId(set, date),
+                            id = adhkarNotificationId(set, date),
                             prayer = prayer,
                             kind = kind,
                             instant = at,
@@ -170,6 +160,7 @@ object NotificationPlanner {
                             title = copy.title(prayer, kind),
                             // The time the window closes, which is what the reader needs to know.
                             body = copy.body(prayer, kind, formatClockTime(closes, location.timeZoneId), 0),
+                            windowEnd = closes,
                         )
                     }
                 }

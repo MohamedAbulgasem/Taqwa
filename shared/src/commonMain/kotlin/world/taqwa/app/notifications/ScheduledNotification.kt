@@ -1,5 +1,6 @@
 package world.taqwa.app.notifications
 
+import kotlinx.datetime.LocalDate
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.Prayer
@@ -30,6 +31,16 @@ val NotificationKind.isAdhkar: Boolean
     get() = adhkarSet != null
 
 /**
+ * The id of [set]'s reminder on [date] — `ADHKAR-MORNING-2026-10-11` — the one spelling the plan
+ * arms, a finished set cancels by and a tapped notification is read back from.
+ */
+fun adhkarNotificationId(set: AdhkarSet, date: LocalDate): String = "ADHKAR-${set.name}-$date"
+
+/** The set an [adhkarNotificationId] belongs to; null for every other notification's id. */
+fun adhkarSetOfNotificationId(id: String): AdhkarSet? =
+    AdhkarSet.entries.firstOrNull { id.startsWith("ADHKAR-${it.name}-") }
+
+/**
  * One notification, fully decided. Title and body are baked in at schedule time so that no
  * platform code — a broadcast receiver, a background task — ever has to resolve a string
  * resource or know what language the user reads.
@@ -46,4 +57,11 @@ data class ScheduledNotification(
     val voice: AdhanVoice = AdhanVoice.ORIGINAL,
     val title: String,
     val body: String,
+    /**
+     * When what this notification announces stops being true: the adhkar reminder's sunrise or
+     * Maghrib. Android delivers that reminder inexactly, up to an hour late, so its receiver drops
+     * one that arrives at or after this and lets an earlier one leave the shade here (see
+     * [AdhkarReminderDelivery]). Null for every other kind, which is never dropped for lateness.
+     */
+    val windowEnd: Instant? = null,
 )

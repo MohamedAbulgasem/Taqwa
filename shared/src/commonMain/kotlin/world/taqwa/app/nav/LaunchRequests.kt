@@ -3,7 +3,7 @@ package world.taqwa.app.nav
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import world.taqwa.app.adhkar.AdhkarSet
-import world.taqwa.app.notifications.NotificationPlanner
+import world.taqwa.app.notifications.adhkarSetOfNotificationId
 
 /**
  * The one-shot channel a widget tap uses to ask the app to open an ayah (design spec §8): the
@@ -95,7 +95,7 @@ object LaunchRequests {
 
     /** A tapped notification's id, on iOS: an adhkar reminder's opens its set, any other nothing. */
     fun openAdhkarForNotification(id: String) {
-        NotificationPlanner.adhkarSetOf(id)?.let(::openAdhkar)
+        adhkarSetOfNotificationId(id)?.let(::openAdhkar)
     }
 
     private val _pendingScreen = MutableStateFlow<String?>(null)

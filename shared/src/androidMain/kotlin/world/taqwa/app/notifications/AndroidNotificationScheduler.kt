@@ -40,6 +40,9 @@ const val EXTRA_KIND = "kind"
 const val EXTRA_TITLE = "title"
 const val EXTRA_BODY = "body"
 
+/** [ScheduledNotification.windowEnd] as epoch millis; absent on every entry without one. */
+const val EXTRA_WINDOW_END = "window_end"
+
 /**
  * `AlarmManager`-backed [NotificationScheduler]. `scheduleAll` is a full replace: everything
  * previously scheduled by this class is cancelled first, using the request-code set persisted
@@ -75,17 +78,37 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
     }
 
     /**
-     * The alarm and, if it has already fired, the notification on screen, for each id. Both are
-     * found by the request code the id was armed under; an id that never had one was never armed
-     * here, so there is nothing to cancel and no code is handed out for it. The id stays in
-     * [KEY_IDS]: cancelling an alarm that is no longer set, on the next full replace, is harmless.
+     * The alarm, if it is still pending, and the notification, if it is already on screen, for
+     * each id.
+     *
+     * The alarm is found by the request code the id was armed under. An id without one has no
+     * alarm here: it was never armed, or it fired and a reschedule since then has forgotten its
+     * code ([forgetRequestCodesOutside], on every [scheduleAll], so on every cold start). No code
+     * is handed out for it. A cancelled id stays in [KEY_IDS]; cancelling an alarm that is no
+     * longer set, on the next full replace, does nothing.
+     *
+     * The notification is found by its tag, not by that code: [PrayerAlarmReceiver] posts an
+     * adhkar reminder under its own id ([AdhkarReminderDelivery.tagFor]). A reminder that fired
+     * before the app was last opened is still found and withdrawn when its set is finished. The
+     * other kinds post untagged and are found only while their code is remembered, which is why
+     * this is only ever called for the adhkar reminder.
      */
     override fun cancel(ids: Set<String>) {
+        if (ids.isEmpty()) return
         val shown = NotificationManagerCompat.from(context)
         ids.forEach { id ->
-            if (prefs.getInt(KEY_CODE_PREFIX + id, -1) < 0) return@forEach
+            val code = prefs.getInt(KEY_CODE_PREFIX + id, -1)
+            if (code < 0) return@forEach
             alarmManager.cancel(pendingIntentFor(id))
-            shown.cancel(requestCodeFor(id))
+            shown.cancel(code)
+        }
+        // minSdk 26, so activeNotifications (API 23) is always there. Guarded all the same: a
+        // notification that could not be withdrawn is not a reason to fail the caller, which is
+        // a set of adhkar being marked done.
+        runCatching {
+            notificationManager.activeNotifications
+                .filter { it.tag != null && it.tag in ids }
+                .forEach { notificationManager.cancel(it.tag, it.id) }
         }
     }
 
@@ -136,7 +159,8 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      * window that stays open until sunrise or Maghrib, not the start of a prayer, and an exact
      * alarm is a cost the platform asks apps to keep for what has to be on the minute. The price
      * is the platform's own bound on an inexact alarm, which from Android 12 is "within an hour"
-     * of the time asked for.
+     * of the time asked for. One that arrives after its window has closed is dropped by the
+     * receiver ([AdhkarReminderDelivery]), so lateness can cost a reminder but never post a wrong one.
      */
     private fun schedule(entry: ScheduledNotification) {
         val at = entry.instant.toEpochMilliseconds()
@@ -165,6 +189,8 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
                 putExtra(EXTRA_KIND, entry.kind.name)
                 putExtra(EXTRA_TITLE, entry.title)
                 putExtra(EXTRA_BODY, entry.body)
+                // Only the adhkar reminder has a window that closes (sunrise, Maghrib).
+                entry.windowEnd?.let { putExtra(EXTRA_WINDOW_END, it.toEpochMilliseconds()) }
             }
         }
         return PendingIntent.getBroadcast(

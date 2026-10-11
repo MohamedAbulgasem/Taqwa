@@ -11,10 +11,12 @@ interface NotificationScheduler {
     fun cancelAll()
 
     /**
-     * Withdraws these entries, by [ScheduledNotification.id], whether still pending or already on
-     * screen, and leaves the rest of the plan armed. For a reminder whose point has passed early:
-     * a set of adhkar finished before its notification is due (adhkar spec §5). An id that is not
-     * armed is ignored.
+     * Withdraws these adhkar reminders, by [ScheduledNotification.id], whether still pending or
+     * already on screen, and leaves the rest of the plan armed. The case is a set of adhkar
+     * finished before, or after, its reminder (adhkar spec §5). Both platforms find an adhkar
+     * reminder on screen by its id whatever has been rescheduled since it fired: iOS keeps the
+     * identifier, and Android posts it under its id as the tag. An id that is neither pending nor
+     * shown is ignored.
      */
     fun cancel(ids: Set<String>)
 }

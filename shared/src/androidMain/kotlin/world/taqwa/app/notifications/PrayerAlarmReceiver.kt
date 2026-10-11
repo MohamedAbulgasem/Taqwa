@@ -19,6 +19,8 @@ import world.taqwa.app.di.appContainer
 import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.widget.WidgetMirrorRefresher
 import world.taqwa.app.widget.androidWidgetUpdateHook
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /** Set once from `TaqwaApplication` — `shared` cannot see androidApp's generated `R` class. */
 var notificationSmallIconResId: Int = android.R.drawable.ic_popup_reminder
@@ -51,15 +53,33 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         // to the same 32-bit hash used to overwrite each other's notification.
         val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
 
-        val notification = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice, kind))
+        // The adhkar reminder's window (it closes at sunrise or Maghrib), carried because its alarm
+        // is inexact and can arrive up to an hour late. Absent on every other kind.
+        val windowEnd = intent.getLongExtra(EXTRA_WINDOW_END, 0L)
+            .takeIf { it > 0L }
+            ?.let { Instant.fromEpochMilliseconds(it) }
+        val now = Clock.System.now()
+        if (windowEnd != null && !AdhkarReminderDelivery.shouldPost(now, windowEnd)) {
+            // "Until sunrise" after sunrise would be wrong, so nothing is posted. The alarm still
+            // woke the process, and the widget and the plan's top-up are as worth doing as ever.
+            afterAlarm(context)
+            return
+        }
+
+        val builder = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice, kind))
             .setSmallIcon(notificationSmallIconResId)
             .setContentTitle(title)
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(openAppIntent(context, notificationId, kind.adhkarSet))
-            .build()
-        NotificationManagerCompat.from(context).notify(notificationId, notification)
+        // And it leaves the shade when its window closes, rather than staying to say "Until
+        // sunrise" about a sunrise that has passed.
+        windowEnd?.let { AdhkarReminderDelivery.timeout(now, it) }
+            ?.let { builder.setTimeoutAfter(it.inWholeMilliseconds.coerceAtLeast(1L)) }
+        // Tagged with its id for the adhkar reminder, so a finished set can withdraw it from the
+        // shade by id alone (AndroidNotificationScheduler.cancel). Null, as always, for the rest.
+        NotificationManagerCompat.from(context).notify(AdhkarReminderDelivery.tagFor(kind, id), notificationId, builder.build())
 
         afterAlarm(context)
     }
