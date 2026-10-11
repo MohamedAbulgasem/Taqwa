@@ -661,4 +661,11 @@
     <string name="source_nasai">Nesâî</string>
     <string name="source_hakim">Hâkim</string>
     <string name="source_ahmad">Ahmed</string>
+    <string name="adhkar_done_morning">Sabah zikirleri · tamamlandı</string>
+    <string name="adhkar_done_evening">Akşam zikirleri · tamamlandı</string>
+    <string name="adhkar_next_evening">Akşam zikirleri ikindiden sonra</string>
+    <string name="adhkar_next_morning">Sabah zikirleri sabah namazından sonra</string>
+    <string name="adhkar_back">Namaz vakitlerine dön</string>
+    <string name="adhkar_reading">Okuma</string>
+    <string name="adhkar_translation">Çeviri</string>
 </resources>

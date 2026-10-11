@@ -169,9 +169,11 @@ internal fun AdhkarPageView(
  * which; 1.8× leading for the harakat, and no tracking — tracking a cursive script breaks it.
  *
  * [voiced] false leaves it out of the page's spoken group, where the translation speaks for it.
+ * The reading sheet's preview line is drawn by this too, centred ([textAlign]), so the size it
+ * shows is the size the page will use.
  */
 @Composable
-private fun DuaArabic(arabic: String, sizeSp: Int, voiced: Boolean) {
+internal fun DuaArabic(arabic: String, sizeSp: Int, voiced: Boolean, textAlign: TextAlign = TextAlign.Right) {
     val colors = LocalTaqwaColors.current
     val size = sizeSp - DUA_SIZE_STEP
     val text = remember(arabic) {
@@ -186,7 +188,7 @@ private fun DuaArabic(arabic: String, sizeSp: Int, voiced: Boolean) {
                 lineHeight = (size * DUA_LEADING).sp,
                 letterSpacing = 0.sp,
             ),
-            textAlign = TextAlign.Right,
+            textAlign = textAlign,
             color = colors.textPrimary,
             modifier = Modifier.fillMaxWidth().then(if (voiced) Modifier else Modifier.clearAndSetSemantics {}),
         )

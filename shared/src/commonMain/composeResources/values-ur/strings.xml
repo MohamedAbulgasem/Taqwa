@@ -642,4 +642,11 @@
     <string name="source_nasai">نسائی</string>
     <string name="source_hakim">حاکم</string>
     <string name="source_ahmad">احمد</string>
+    <string name="adhkar_done_morning">صبح کے اذکار · مکمل</string>
+    <string name="adhkar_done_evening">شام کے اذکار · مکمل</string>
+    <string name="adhkar_next_evening">عصر کے بعد شام کے اذکار</string>
+    <string name="adhkar_next_morning">فجر کے بعد صبح کے اذکار</string>
+    <string name="adhkar_back">نماز کے اوقات پر واپس</string>
+    <string name="adhkar_reading">پڑھائی</string>
+    <string name="adhkar_translation">ترجمہ</string>
 </resources>

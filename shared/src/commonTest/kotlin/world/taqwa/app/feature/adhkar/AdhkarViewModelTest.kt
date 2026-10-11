@@ -41,6 +41,7 @@ import world.taqwa.app.settings.SettingsRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
@@ -119,12 +120,17 @@ class AdhkarViewModelTest {
         ),
     )
 
+    /**
+     * [reopen] is the screen opened again: a new view model over the same store, settings, clock
+     * and haptics, as the route builds one each time the screen is pushed.
+     */
     private class Rig(
         val viewModel: AdhkarViewModel,
         val store: MemoryAdhkarStore,
         val haptics: RecordingHaptics,
         val day: DayPrayerTimes,
         val clock: Clock,
+        val reopen: () -> AdhkarViewModel,
     )
 
     private class Clock(var now: Instant)
@@ -149,20 +155,22 @@ class AdhkarViewModelTest {
         val clock = Clock(at(day))
         val store = MemoryAdhkarStore()
         val haptics = RecordingHaptics()
-        val viewModel = AdhkarViewModel(
-            catalogue = catalogue,
-            textFor = { language: String -> if (language == "en") AdhkarCatalogue.parseText(EN_JSON) else null },
-            quran = quran,
-            store = store,
-            settings = settings,
-            engine = engine,
-            haptics = haptics,
-            now = { clock.now },
-            format = EnglishPlatformFormat,
-            language = "en",
-            scope = backgroundScope,
-        )
-        return Rig(viewModel, store, haptics, day, clock)
+        val build = {
+            AdhkarViewModel(
+                catalogue = catalogue,
+                textFor = { language: String -> if (language == "en") AdhkarCatalogue.parseText(EN_JSON) else null },
+                quran = quran,
+                store = store,
+                settings = settings,
+                engine = engine,
+                haptics = haptics,
+                now = { clock.now },
+                format = EnglishPlatformFormat,
+                language = "en",
+                scope = backgroundScope,
+            )
+        }
+        return Rig(build(), store, haptics, day, clock, build)
     }
 
     /**
@@ -170,9 +178,11 @@ class AdhkarViewModelTest {
      * `advanceUntilIdle` does not wait for; suspending on the state it produces does, and lets any
      * real (non-virtual) DataStore read finish, as TodayViewModelTest explains.
      */
-    private suspend fun TestScope.loaded(rig: Rig, set: AdhkarSet): AdhkarUiState {
+    private suspend fun TestScope.loaded(rig: Rig, set: AdhkarSet): AdhkarUiState = loaded(rig.viewModel, set)
+
+    private suspend fun TestScope.loaded(viewModel: AdhkarViewModel, set: AdhkarSet): AdhkarUiState {
         runCurrent()
-        return rig.viewModel.state.first { it.loaded && it.set == set }
+        return viewModel.state.first { it.loaded && it.set == set }
     }
 
     private fun tenPastFajr(day: DayPrayerTimes): Instant = day.time(Prayer.FAJR) + 10.minutes
@@ -279,6 +289,78 @@ class AdhkarViewModelTest {
         rig.viewModel.tap()
         runCurrent()
         assertEquals(1, rig.haptics.fired.count { it == "setComplete" })
+    }
+
+    @Test fun `completing the last page fires the firm haptic once and lands on the done page`() = runTest {
+        val rig = rig("whole-set", ::tenPastFajr)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        loaded(rig, AdhkarSet.MORNING)
+        // The whole set read in order on a fresh day, each page counted to its target and the
+        // pager left to move on by itself.
+        morningPages.forEachIndexed { index, item ->
+            assertEquals(index, rig.viewModel.state.value.currentPage)
+            repeat(item.count) { rig.viewModel.tap() }
+            runCurrent()
+            advanceTimeBy(AdhkarViewModel.ADVANCE_DELAY_MS + 1)
+            runCurrent()
+        }
+        val state = rig.viewModel.state.value
+        assertEquals(morningPages.size, state.currentPage)
+        assertEquals(morningPages.size, state.completed)
+        // A page said in full is the double pulse; the last page is the set done, the firm one.
+        val expected = morningPages.flatMapIndexed { index, item ->
+            List(item.count - 1) { "count" } + (if (index == morningPages.lastIndex) "setComplete" else "partComplete")
+        }
+        assertEquals(expected, rig.haptics.fired)
+        assertEquals(1, rig.haptics.fired.count { it == "setComplete" })
+    }
+
+    @Test fun `reopening a finished set opens on the done page`() = runTest {
+        val rig = rig("reopen-done", ::tenPastFajr)
+        // Every page said but Al-Ikhlas; the reader says it, and leaves.
+        val full = morningPages.mapIndexed { index, item -> if (index == 1 || item.countDaily) 0 else item.count }
+        rig.store.save(AdhkarSet.MORNING, AdhkarProgress(date, full))
+        rig.store.saveIstighfar(date, 100)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        loaded(rig, AdhkarSet.MORNING)
+        repeat(3) { rig.viewModel.tap() }
+        runCurrent()
+        rig.viewModel.close()
+
+        val again = rig.reopen()
+        again.open(AdhkarSet.MORNING)
+        val state = loaded(again, AdhkarSet.MORNING)
+        assertEquals(morningPages.size, state.currentPage)
+        assertEquals(morningPages.size, state.completed)
+        assertTrue(state.pages.all { it.done })
+        // Opening on the done page is not finishing the set again: the firm haptic was the first
+        // visit's alone.
+        assertEquals(1, rig.haptics.fired.count { it == "setComplete" })
+    }
+
+    @Test fun `leaving mid-way and coming back resumes on the same page and count`() = runTest {
+        val rig = rig("resume", ::tenPastFajr)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        loaded(rig, AdhkarSet.MORNING)
+        // Ayat al-Kursi said once; then Al-Ikhlas twice of its three, and the reader leaves.
+        rig.viewModel.tap()
+        runCurrent()
+        advanceTimeBy(AdhkarViewModel.ADVANCE_DELAY_MS + 1)
+        runCurrent()
+        repeat(2) { rig.viewModel.tap() }
+        runCurrent()
+        rig.viewModel.close()
+
+        val again = rig.reopen()
+        again.open(AdhkarSet.MORNING)
+        val state = loaded(again, AdhkarSet.MORNING)
+        assertEquals(1, state.currentPage)
+        assertEquals(2, state.pages[1].count)
+        assertEquals(1, state.completed)
+        // The third time is the one that completes it, not a fourth.
+        again.tap()
+        runCurrent()
+        assertTrue(again.state.value.pages[1].done)
     }
 
     @Test fun `taps on a completed page do nothing`() = runTest {
@@ -507,5 +589,48 @@ class AdhkarViewModelTest {
         runCurrent()
         assertFalse(rig.store.translation.first())
         assertFalse(rig.viewModel.state.value.showTranslation)
+    }
+
+    @Test fun `the translation toggle persists`() = runTest {
+        val rig = rig("translation-persists", ::tenPastFajr)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        loaded(rig, AdhkarSet.MORNING)
+        rig.viewModel.setTranslation(false)
+        runCurrent()
+        rig.viewModel.close()
+
+        val again = rig.reopen()
+        again.open(AdhkarSet.MORNING)
+        loaded(again, AdhkarSet.MORNING)
+        runCurrent()
+        assertFalse(again.state.value.showTranslation)
+    }
+
+    @Test fun `the reading preview is the first six words of the du'a on screen`() = runTest {
+        val rig = rig("preview", ::tenPastFajr)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        val state = loaded(rig, AdhkarSet.MORNING)
+
+        // The catalogue's Arabic is single-spaced, so its words are what lies between the spaces.
+        fun words(index: Int): List<String> = state.pages[index].arabic!!.split(' ')
+
+        // Ayat al-Kursi opens the set: the Quran is not the du'a face's to show, so the set's
+        // first du'a stands in for it — a long one, cut to its first six words.
+        val firstDua = state.pages.indexOfFirst { it.arabic != null }
+        assertEquals(0, state.currentPage)
+        assertNull(state.pages[0].arabic)
+        assertTrue(words(firstDua).size > 6)
+        assertEquals(words(firstDua).take(6).joinToString(" "), state.readingPreview)
+
+        // The istighfar is four words, and shown whole.
+        val lastDua = state.pages.indexOfLast { it.arabic != null }
+        assertNotEquals(firstDua, lastDua)
+        assertTrue(words(lastDua).size < 6)
+        rig.viewModel.goTo(lastDua)
+        assertEquals(state.pages[lastDua].arabic, rig.viewModel.state.value.readingPreview)
+
+        // The done page has no words of its own either.
+        rig.viewModel.goTo(state.pages.size)
+        assertEquals(words(firstDua).take(6).joinToString(" "), rig.viewModel.state.value.readingPreview)
     }
 }

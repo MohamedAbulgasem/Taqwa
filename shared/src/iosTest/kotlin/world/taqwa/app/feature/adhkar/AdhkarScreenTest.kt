@@ -13,7 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -26,11 +27,15 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.getPluralString
 import org.jetbrains.compose.resources.getString
 import world.taqwa.app.adhkar.AdhkarItem
@@ -46,18 +51,29 @@ import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.i18n.uppercaseIn
+import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.adhkar_a11y_count
 import world.taqwa.app.resources.adhkar_a11y_next
 import world.taqwa.app.resources.adhkar_a11y_previous
+import world.taqwa.app.resources.adhkar_back
+import world.taqwa.app.resources.adhkar_done_evening
+import world.taqwa.app.resources.adhkar_done_morning
+import world.taqwa.app.resources.adhkar_next_evening
+import world.taqwa.app.resources.adhkar_next_morning
 import world.taqwa.app.resources.adhkar_progress
+import world.taqwa.app.resources.adhkar_reading
 import world.taqwa.app.resources.adhkar_times
+import world.taqwa.app.resources.adhkar_translation
 import world.taqwa.app.resources.adhkar_until_sunrise
+import world.taqwa.app.resources.quran_sheet_size
+import world.taqwa.app.resources.quran_sheet_transliteration
 import world.taqwa.app.resources.source_quran
 import world.taqwa.app.resources.tasbeeh_hint
 import world.taqwa.app.resources.ui_language
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * The session screen on a two-page fixture: page one said three times and counted once, page two
@@ -69,6 +85,7 @@ class AdhkarScreenTest {
 
     private class Calls {
         var taps = 0
+        var backs = 0
         val goTo = mutableListOf<Int>()
     }
 
@@ -101,17 +118,33 @@ class AdhkarScreenTest {
         loaded = true,
     )
 
+    /** [state] with every page said: the session opens on the done page after them. */
+    private fun finished(set: AdhkarSet) = state.copy(
+        set = set,
+        pages = state.pages.map { it.copy(count = it.target, done = true) },
+        currentPage = state.pages.size,
+        completed = state.pages.size,
+    )
+
+    /**
+     * Not TaqwaTheme: it also installs the system-bar and keep-screen-on effects, which crash the
+     * simulator test process. The colours are all the screen reads from it.
+     */
     @Composable
-    private fun Screen(calls: Calls) {
-        // Not TaqwaTheme: it also installs the system-bar and keep-screen-on effects, which crash
-        // the simulator test process. The colours are all the screen reads from it.
+    private fun Themed(content: @Composable () -> Unit) {
         CompositionLocalProvider(
             LocalTaqwaColors provides LightColors,
             LocalPlatformFormat provides EnglishPlatformFormat,
-        ) {
+            content = content,
+        )
+    }
+
+    @Composable
+    private fun Screen(calls: Calls, shown: AdhkarUiState = state) {
+        Themed {
             AdhkarScreen(
-                state = state,
-                onBack = {},
+                state = shown,
+                onBack = { calls.backs++ },
                 onSelectSet = {},
                 onGoTo = { calls.goTo += it },
                 onTap = { calls.taps++ },
@@ -259,10 +292,116 @@ class AdhkarScreenTest {
         assertEquals(0f, state.currentPageOffsetFraction)
     }
 
+    /**
+     * A finger taking the pager while the session is moving it: nothing is reported while the
+     * finger is down — the page the animation set out from is not where the reader is, and the
+     * session would move back to it — and once the swipe settles, the page it settled on is.
+     */
+    @Test
+    fun aFingerTakingThePagerMidAnimationIsReportedOnlyOnceItSettles() = runComposeUiTest {
+        var page by mutableStateOf(0)
+        val reported = mutableListOf<Int>()
+        var pager: PagerState? = null
+        setContent {
+            val pagerState = rememberPagerState { 8 }
+            pager = pagerState
+            SessionPagerSync(pagerState, page) { reported += it; page = it }
+            HorizontalPager(pagerState, Modifier.size(400.dp, 300.dp).testTag(PAGER)) { index ->
+                Box(Modifier.fillMaxSize()) { Text("page $index") }
+            }
+        }
+        waitForIdle()
+        reported.clear()
+        mainClock.autoAdvance = false
+        runOnUiThread { page = 3 }
+        mainClock.advanceTimeByFrame()
+        mainClock.advanceTimeBy(120)
+        // The finger lands mid-animation, drags on, and stays down for a while.
+        onNodeWithTag(PAGER).performTouchInput {
+            down(center)
+            moveBy(Offset(-40f, 0f))
+            moveBy(Offset(-40f, 0f))
+        }
+        mainClock.advanceTimeBy(200)
+        assertEquals(emptyList(), reported)
+        assertEquals(3, page)
+
+        onNodeWithTag(PAGER).performTouchInput { up() }
+        mainClock.autoAdvance = true
+        waitForIdle()
+        val state = pager!!
+        assertEquals(0f, state.currentPageOffsetFraction)
+        assertEquals(state.currentPage, page)
+        assertTrue(reported.isNotEmpty())
+        assertEquals(listOf(state.currentPage), reported.distinct())
+    }
+
+    @Test
+    fun theDonePageNamesTheSetAndItsLinkGoesBack() = runComposeUiTest {
+        val calls = Calls()
+        setContent { Screen(calls, finished(AdhkarSet.MORNING)) }
+        onNodeWithText(getString(Res.string.adhkar_done_morning)).assertIsDisplayed()
+        // The morning done, the caption says when the evening opens.
+        onNodeWithText(getString(Res.string.adhkar_next_evening)).assertIsDisplayed()
+        onNodeWithText(getString(Res.string.adhkar_back)).assertIsDisplayed().performClick()
+        assertEquals(1, calls.backs)
+        // Nothing to count on the done page.
+        assertEquals(0, calls.taps)
+    }
+
+    @Test
+    fun theEveningDonePageSaysWhenTheMorningOpens() = runComposeUiTest {
+        setContent { Screen(Calls(), finished(AdhkarSet.EVENING)) }
+        onNodeWithText(getString(Res.string.adhkar_done_evening)).assertIsDisplayed()
+        onNodeWithText(getString(Res.string.adhkar_next_morning)).assertIsDisplayed()
+        onAllNodesWithText(getString(Res.string.adhkar_done_morning)).assertCountEquals(0)
+    }
+
+    /**
+     * The sheet's rows follow the interface (spec §3.6): transliteration under a Latin interface
+     * only, the translation switch under every interface but Arabic. The simulator's language
+     * decides which branch runs; the expectations are read from the same resources.
+     */
+    @Test
+    fun theReadingSheetShowsTheSizeThePreviewAndTheInterfacesToggles() = runComposeUiTest {
+        val switched = mutableListOf<Boolean>()
+        setContent {
+            Themed {
+                AdhkarReadingContent(
+                    settings = ReadingSettings(arabicSizeSp = 28, transliteration = true),
+                    showTranslation = true,
+                    preview = "بِسْمِ اللَّهِ",
+                    onChange = {},
+                    onTranslation = { switched += it },
+                )
+            }
+        }
+        val language = UiLanguage.of(getString(Res.string.ui_language))
+        onNodeWithText(getString(Res.string.adhkar_reading)).assertIsDisplayed()
+        onNodeWithText(getString(Res.string.quran_sheet_size)).assertIsDisplayed()
+        onNodeWithText("28").assertIsDisplayed()
+        // The preview is a picture of the size, not words for a screen reader to say.
+        onAllNodesWithText("بِسْمِ اللَّهِ", substring = true).assertCountEquals(0)
+
+        val transliteration = onAllNodesWithText(getString(Res.string.quran_sheet_transliteration))
+        transliteration.assertCountEquals(if (language.latinScript) 1 else 0)
+        val translation = onAllNodesWithText(getString(Res.string.adhkar_translation))
+        if (language == UiLanguage.ARABIC) {
+            translation.assertCountEquals(0)
+        } else {
+            translation.assertCountEquals(1)
+            // The translation switch is the last control on the sheet.
+            onAllNodes(hasClickAction()).onLast().performClick()
+            assertEquals(listOf(false), switched)
+        }
+    }
+
     private fun hasCustomAction(label: String) = SemanticsMatcher("has custom action $label") { node ->
         node.config.getOrNull(SemanticsActions.CustomActions)?.any { it.label == label } == true
     }
 }
+
+private const val PAGER = "pager"
 
 /** The opening of 2:255 as `quran.db` spells it, and the istiʿadhah Hisn prints before it. */
 private const val KURSI = "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ"

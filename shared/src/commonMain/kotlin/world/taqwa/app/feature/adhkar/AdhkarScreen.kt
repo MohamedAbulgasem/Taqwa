@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -24,10 +26,12 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -62,6 +67,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -69,9 +75,11 @@ import world.taqwa.app.adhkar.AdhkarPhase
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
+import world.taqwa.app.design.components.CheckMark
 import world.taqwa.app.design.components.Equaliser
 import world.taqwa.app.design.components.RingArc
 import world.taqwa.app.design.components.TaqwaSegmented
+import world.taqwa.app.design.components.TaqwaTextLink
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.design.components.drawSpeaker
 import world.taqwa.app.design.contentWidth
@@ -83,8 +91,13 @@ import world.taqwa.app.resources.adhkar_a11y_next
 import world.taqwa.app.resources.adhkar_a11y_previous
 import world.taqwa.app.resources.adhkar_after_maghrib
 import world.taqwa.app.resources.adhkar_after_sunrise
+import world.taqwa.app.resources.adhkar_back
+import world.taqwa.app.resources.adhkar_done_evening
+import world.taqwa.app.resources.adhkar_done_morning
 import world.taqwa.app.resources.adhkar_evening
 import world.taqwa.app.resources.adhkar_morning
+import world.taqwa.app.resources.adhkar_next_evening
+import world.taqwa.app.resources.adhkar_next_morning
 import world.taqwa.app.resources.adhkar_of
 import world.taqwa.app.resources.adhkar_progress
 import world.taqwa.app.resources.adhkar_segment_evening
@@ -110,6 +123,9 @@ private const val BumpHalfMillis = 60
 
 /** The ring's tween to a new count, the tasbeeh's. */
 private const val ProgressMillis = 250
+
+/** The done page's halo behind the check (spec §3.3). */
+private const val DoneHaloAlpha = 0.18f
 
 /**
  * The adhkar session (spec §3.1): one dhikr at a time on the Tasbeeh grammar — a header naming the
@@ -196,8 +212,7 @@ fun AdhkarScreen(
                 HorizontalPager(state = pagerState, modifier = Modifier.weight(1f).fillMaxWidth()) { index ->
                     val shown = state.pages.getOrNull(index)
                     if (shown == null) {
-                        // The done page (Task 9 draws it).
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("done") }
+                        DonePage(state.set, onBack)
                     } else {
                         AdhkarPageView(
                             page = shown,
@@ -240,7 +255,11 @@ fun AdhkarScreen(
  * that would cancel the animation, and the pager would rest between two pages. So the settled
  * page is ignored while a target of the session's is pending. The target is cleared when its
  * animation finishes, or when a finger takes the pager (the mutation is cancelled under an effect
- * that is still active) — the swipe is then the reader's, and is reported when it settles. An
+ * that is still active) — the swipe is then the reader's, and is reported when it settles: the
+ * target is held until the finger's scroll has stopped, since while it runs `settledPage` is still
+ * the page the animation set out from, and reporting that would send the session back to it under
+ * the reader's finger. The finger's scroll is given a frame to start first: the animation is
+ * cancelled before the scroll that cancelled it begins, and in between nothing is scrolling. An
  * effect cancelled by the next target leaves the target to that one.
  */
 @Composable
@@ -252,6 +271,8 @@ internal fun SessionPagerSync(pagerState: PagerState, page: Int, onSettled: (Int
             pagerState.animateScrollToPage(page)
         } catch (interrupted: CancellationException) {
             if (!isActive) throw interrupted
+            withFrameNanos { }
+            snapshotFlow { pagerState.isScrollInProgress }.first { scrolling -> !scrolling }
         }
         pendingTarget = null
     }
@@ -260,6 +281,59 @@ internal fun SessionPagerSync(pagerState: PagerState, page: Int, onSettled: (Int
         snapshotFlow { if (pendingTarget == null) pagerState.settledPage else null }
             .filterNotNull()
             .collect { settled(it) }
+    }
+}
+
+/**
+ * The page after the last (spec §3.3): a check in a faint accent halo, "Morning adhkar · done",
+ * when the other set opens, and the way back to the prayer times. No button, no streak, no total,
+ * nothing to share — the set is said, and that is all it says. It takes no tap: there is nothing
+ * left to count.
+ *
+ * Centred in the pager's height, and scrolling when that height is short — landscape, or a
+ * 200 % font — rather than clipping (spec §3.7).
+ */
+@Composable
+private fun DonePage(set: AdhkarSet, onBack: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    val morning = set == AdhkarSet.MORNING
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .heightIn(min = maxHeight)
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Box(
+                Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(colors.accent.copy(alpha = DoneHaloAlpha)),
+                contentAlignment = Alignment.Center,
+            ) {
+                CheckMark()
+            }
+            Spacer(Modifier.height(16.dp))
+            Text(
+                stringResource(if (morning) Res.string.adhkar_done_morning else Res.string.adhkar_done_evening),
+                style = TaqwaText.rowLabel,
+                color = colors.textPrimary,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(6.dp))
+            // The other set, and when it opens: the morning done points to the evening after Asr.
+            Text(
+                stringResource(if (morning) Res.string.adhkar_next_evening else Res.string.adhkar_next_morning),
+                style = TaqwaText.caption,
+                color = colors.textSecondary,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(28.dp))
+            TaqwaTextLink(stringResource(Res.string.adhkar_back), onBack)
+        }
     }
 }
 

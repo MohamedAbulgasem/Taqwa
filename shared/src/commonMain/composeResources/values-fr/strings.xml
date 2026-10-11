@@ -661,4 +661,11 @@
     <string name="source_nasai">An-Nasa’i</string>
     <string name="source_hakim">Al-Hakim</string>
     <string name="source_ahmad">Ahmad</string>
+    <string name="adhkar_done_morning">Adhkar du matin · terminés</string>
+    <string name="adhkar_done_evening">Adhkar du soir · terminés</string>
+    <string name="adhkar_next_evening">Adhkar du soir après l’Asr</string>
+    <string name="adhkar_next_morning">Adhkar du matin après le Fajr</string>
+    <string name="adhkar_back">Retour aux horaires de prière</string>
+    <string name="adhkar_reading">Lecture</string>
+    <string name="adhkar_translation">Traduction</string>
 </resources>

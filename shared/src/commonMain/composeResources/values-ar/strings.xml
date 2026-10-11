@@ -654,4 +654,11 @@
     <string name="source_nasai">النسائي</string>
     <string name="source_hakim">الحاكم</string>
     <string name="source_ahmad">أحمد</string>
+    <string name="adhkar_done_morning">أذكار الصباح · تمّت</string>
+    <string name="adhkar_done_evening">أذكار المساء · تمّت</string>
+    <string name="adhkar_next_evening">أذكار المساء بعد العصر</string>
+    <string name="adhkar_next_morning">أذكار الصباح بعد الفجر</string>
+    <string name="adhkar_back">العودة إلى مواقيت الصلاة</string>
+    <string name="adhkar_reading">القراءة</string>
+    <string name="adhkar_translation">الترجمة</string>
 </resources>

@@ -10,10 +10,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import world.taqwa.app.adhkar.AdhkarCatalogue
@@ -22,6 +24,7 @@ import world.taqwa.app.design.KeepScreenOn
 import world.taqwa.app.di.AppContainer
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
+import world.taqwa.app.feature.adhkar.AdhkarReadingSheet
 import world.taqwa.app.feature.adhkar.AdhkarScreen
 import world.taqwa.app.feature.adhkar.AdhkarViewModel
 import world.taqwa.app.feature.qibla.QiblaScreen
@@ -221,6 +224,13 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
     }
     val state by viewModel.state.collectAsState()
     SideEffect { if (state.loaded) shown.set = state.set }
+    // The "Aa" sheet (spec §3.6). It edits the reader's own settings and writes them back whole, so
+    // it is given them whole, as stored — never a copy built from defaults, which would overwrite
+    // the reader's translation and mode with its first change. Null until read; the sheet waits.
+    var readingOpen by remember { mutableStateOf(false) }
+    val reading by remember(format) {
+        container.settingsRepository.readingSettings(format.languageTag()).distinctUntilChanged()
+    }.collectAsState(initial = null)
     AdhkarScreen(
         state = state,
         onBack = { navigator.pop() },
@@ -229,8 +239,19 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
         onTap = viewModel::tap,
         onPlay = null,
         playing = false,
-        onOpenReading = { /* the reading sheet arrives with the done page */ },
+        onOpenReading = { readingOpen = true },
     )
+    val current = reading
+    if (readingOpen && current != null) {
+        AdhkarReadingSheet(
+            settings = current,
+            showTranslation = state.showTranslation,
+            preview = state.readingPreview,
+            onChange = { changed -> scope.launch { container.settingsRepository.setReadingSettings(changed) } },
+            onTranslation = viewModel::setTranslation,
+            onDismiss = { readingOpen = false },
+        )
+    }
 }
 
 private const val MINUTE_MS = 60_000L

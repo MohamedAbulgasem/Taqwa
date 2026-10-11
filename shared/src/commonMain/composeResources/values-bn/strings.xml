@@ -647,4 +647,11 @@
     <string name="source_nasai">নাসাঈ</string>
     <string name="source_hakim">হাকিম</string>
     <string name="source_ahmad">আহমাদ</string>
+    <string name="adhkar_done_morning">সকালের আযকার · সম্পন্ন</string>
+    <string name="adhkar_done_evening">সন্ধ্যার আযকার · সম্পন্ন</string>
+    <string name="adhkar_next_evening">আসরের পরে সন্ধ্যার আযকার</string>
+    <string name="adhkar_next_morning">ফজরের পরে সকালের আযকার</string>
+    <string name="adhkar_back">নামাজের সময়ে ফিরে যান</string>
+    <string name="adhkar_reading">পড়া</string>
+    <string name="adhkar_translation">অনুবাদ</string>
 </resources>

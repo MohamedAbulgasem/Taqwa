@@ -682,4 +682,11 @@
     <string name="source_nasai">an-Nasa’i</string>
     <string name="source_hakim">al-Hakim</string>
     <string name="source_ahmad">Ahmad</string>
+    <string name="adhkar_done_morning">Morning adhkar · done</string>
+    <string name="adhkar_done_evening">Evening adhkar · done</string>
+    <string name="adhkar_next_evening">Evening adhkar open after Asr</string>
+    <string name="adhkar_next_morning">Morning adhkar open after Fajr</string>
+    <string name="adhkar_back">Back to prayer times</string>
+    <string name="adhkar_reading">Reading</string>
+    <string name="adhkar_translation">Translation</string>
 </resources>

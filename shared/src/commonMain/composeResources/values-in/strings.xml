@@ -639,4 +639,11 @@
     <string name="source_nasai">An-Nasa’i</string>
     <string name="source_hakim">Al-Hakim</string>
     <string name="source_ahmad">Ahmad</string>
+    <string name="adhkar_done_morning">Zikir pagi · selesai</string>
+    <string name="adhkar_done_evening">Zikir petang · selesai</string>
+    <string name="adhkar_next_evening">Zikir petang setelah Asar</string>
+    <string name="adhkar_next_morning">Zikir pagi setelah Subuh</string>
+    <string name="adhkar_back">Kembali ke waktu salat</string>
+    <string name="adhkar_reading">Bacaan</string>
+    <string name="adhkar_translation">Terjemahan</string>
 </resources>
