@@ -3,7 +3,8 @@ schedule: the current month and the next for the eighteen fitted kab/kota (id-ke
 five of the round of 29 September 2026 among them, checked at their own points so the registry's
 unit for each is found whichever way the rounds merge); from October, the whole next year once it
 appears (probed on the first place, then fetched for every place that lacks it). Six columns as the
-gate's rows (the API's imsak, a precaution, is not kept). The place name each response carries is
+gate's rows (the API's imsak, a precaution, is not kept); the fast begins at Subuh, so the Fajr column is
+also the end of eating (F+E), as id-kemenag.tsv reads it since the audit of 3 October 2026. The place name each response carries is
 checked against the kota asked for, so a renumbered id never checks another kota's table (review M10)."""
 import calendar
 import json
@@ -77,7 +78,7 @@ def fetch(ctx):
     def table(key, name, zone, entry, lat, lon, year):
         tid = f"{key}-{year}"
         if tid not in tables:
-            tables[tid] = Table(tid, f"{name} {year}", lat, lon, zone, "ID", "F S D A M I", entry=entry,
+            tables[tid] = Table(tid, f"{name} {year}", lat, lon, zone, "ID", "F+E S D A M I", entry=entry,
                                 source_line=f"Kemenag as api.myquran.com republishes it ({BASE}/<id>/<yyyy>/<mm>, {name})")
         return tables[tid]
 

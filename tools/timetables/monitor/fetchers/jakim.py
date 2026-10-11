@@ -1,6 +1,7 @@
 """Malaysia, JAKIM e-solat: the year table of each of the thirteen fitted zones (my-jakim.tsv) from
 e-solat's own API, and from October the year ahead from the public mirror api.waktusolat.app once
-it appears (probed on WLY01: a 404 is "not yet")."""
+it appears (probed on WLY01: a 404 is "not yet"). The fast begins at Subuh (e-solat's imsak is a precaution),
+so the Fajr column is also the end of eating (F+E), as my-jakim.tsv reads it since the audit of 3 October 2026."""
 import datetime as dt
 import json
 
@@ -60,7 +61,7 @@ def fetch(ctx):
         for date, times in rows.items():
             by_year.setdefault(date[:4], {})[date] = times
         for year, days in by_year.items():
-            t = Table(f"{zone}-{year}", f"{name} {zone} {year}", None, None, tz, "MY", "F S D A M I", entry=f"my.jakim/{zone}",
+            t = Table(f"{zone}-{year}", f"{name} {zone} {year}", None, None, tz, "MY", "F+E S D A M I", entry=f"my.jakim/{zone}",
                       source_line=f"JAKIM e-solat {url} (serverTime {server})", raw=[(f"esolat-{zone}-{year}.json", body)])
             if add_all(ctx, t, days, f"{zone} {year}"):
                 tables.append(t)
@@ -78,7 +79,7 @@ def fetch(ctx):
                 held = ctx.held(f"{zone}-{nxt}")
                 if len(held) >= 365:
                     continue
-                t = Table(f"{zone}-{nxt}", f"{name} {zone} {nxt} (mirror)", None, None, tz, "MY", "F S D A M I", entry=f"my.jakim/{zone}",
+                t = Table(f"{zone}-{nxt}", f"{name} {zone} {nxt} (mirror)", None, None, tz, "MY", "F+E S D A M I", entry=f"my.jakim/{zone}",
                           source_line=f"JAKIM e-solat via the public mirror {MIRROR}{zone}?year={nxt}&month=1..12 (times as Unix seconds, shown in UTC+8)")
                 for month in range(1, 13):
                     try:
