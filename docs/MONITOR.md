@@ -219,9 +219,10 @@ base table are units too, gated across their reach the same way (`us-isna-reach.
 `xk-bik-reach.tsv`, written by the same `generateReachRows`; about 12 minutes for all five now). Their tables
 are the research's hand-read captures, which no fetcher reads, so no recipe grows them: a new year of one of
 those tables is added by hand at its own point, and `generateReachRows` re-run. The app's own cities inside
-those units, and inside Canada's families', Chicago's 18° block's, Dawat-e-Islami's Delhi and the Uzbek
-Board's Tashkent, are rows of the group files themselves, held to their own worst by `own-points-worst.tsv`.
-The whole gate is now some 13,000 rows and 4.4 million place-days, about three minutes on the Mac.
+those units, and inside Canada's families', Chicago's 18° block's and the city tables' (Delhi, Tashkent,
+Karachi, Bishkek, Manchester Central, Gaza, Beirut, Damascus, Baghdad), are rows of the group files
+themselves, held to their own worst by `own-points-worst.tsv`. The whole gate is now some 13,000 rows and
+4.4 million place-days, about two and a half minutes on the Mac.
 
 **What `prove` does.** For each capture a recipe names whose days are not all held already by rows
 of that file, entry, member and point: the capture is copied as it is to

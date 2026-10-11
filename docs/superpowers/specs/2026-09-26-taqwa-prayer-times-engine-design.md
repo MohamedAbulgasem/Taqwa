@@ -204,12 +204,14 @@ a monitor source. Large tables are compact resources.
   one base table to the whole of Kosovo with whole-minute town offsets, reaches as far as class D. The
   Canadian families' night-fraction curves are read at both latitudes there. Beyond every reach the
   method stands at the user's own point as before, with no edge minute, since these margins hold every
-  table at its own point. No figure is claimed there, but a cautious member keeps its own measured
-  reach. The app's own cities inside each new unit are gated at their own points, and the units that
-  show a figure (ISNA's, BIK's) are gated across their reach as Umm al-Qura's and QMDB's are. Where a
-  fixed point rides for the starts too, the ends shown are also never after those the same method shows
-  at the user's point alone (`DayComputer`'s point 7): the end of eating is held to the Fajr shown, the
-  later of the two points', which under a Fajr margin below the end's had let it come a minute late.
+  table at its own point. No figure is claimed there, but a cautious convention member keeps its own
+  measured reach. The app's own cities inside each new unit are gated at their own points, and the units
+  that show a figure (ISNA's, BIK's) are gated across their reach as Umm al-Qura's and QMDB's are. Where
+  such a table rides for the starts too, the ends shown are also never after those the same method shows
+  at the user's point alone (`DayComputer`'s point 7, `TimetableMethod.endsBoundAtUserPoint`): the end of
+  eating is held to the Fajr shown, the later of the two points', which under a Fajr margin below the
+  end's had let it come a minute late. Only there: an authority's own unit keeps its table's ends, since
+  its user's point alone can read a rule its table does not (DUM RT's white nights, up to two hours).
 - **Unknown reference point or horizon**: the unit's safe edge and the deepest plausible horizon; no
   "at most" figure is claimed for that unit.
 - **Near a unit or country border**: the envelope over the candidates within the location's
