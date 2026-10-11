@@ -670,4 +670,6 @@
     <string name="adhkar_translation">Traduction</string>
     <string name="notifications_adhkar">Adhkar du matin et du soir</string>
     <string name="notifications_adhkar_subtitle">Une demi-heure après le Fajr et l’Asr</string>
+    <string name="credit_adhkar">Adhkar</string>
+    <string name="credit_adhkar_detail">Adhkar du matin et du soir tirés de Hisn al-Muslim de Sa‘id ibn ‘Ali ibn Wahf al-Qahtani ; texte arabe et sa structure, traduction anglaise et translittération issus du jeu de données OpenDua (Human Development Fund), CC BY 4.0, avec de légères retouches consignées dans le dépôt.</string>
 </resources>

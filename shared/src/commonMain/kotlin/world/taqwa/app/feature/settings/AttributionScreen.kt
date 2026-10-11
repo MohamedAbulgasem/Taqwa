@@ -27,6 +27,8 @@ import world.taqwa.app.quran.TextKind
 import world.taqwa.app.quran.TranslationInfo
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.attribution_intro
+import world.taqwa.app.resources.credit_adhkar
+import world.taqwa.app.resources.credit_adhkar_detail
 import world.taqwa.app.resources.credit_audio
 import world.taqwa.app.resources.credit_audio_detail
 import world.taqwa.app.resources.credit_chime
@@ -125,6 +127,13 @@ private fun credits(translations: List<TranslationInfo>, reciters: List<Reciter>
         extra = uiLanguage().arabicScript.let { arabic ->
             reciters.joinToString(if (arabic) "، " else ", ") { if (arabic) it.nameAr else it.nameEn }
         }.takeIf { it.isNotBlank() },
+    ),
+    // The morning and evening adhkar (adhkar spec §4.2): Hisn al-Muslim through the OpenDua
+    // dataset, whose CC BY 4.0 asks for exactly this — the collection, the dataset and its licence.
+    Credit(
+        what = stringResource(Res.string.credit_adhkar),
+        detail = stringResource(Res.string.credit_adhkar_detail),
+        source = "opendua.org",
     ),
 ) + translations.map { translation ->
     // Read from the database, never hardcoded, so this list can never drift from what is

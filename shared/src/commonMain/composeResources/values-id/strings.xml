@@ -648,4 +648,6 @@
     <string name="adhkar_translation">Terjemahan</string>
     <string name="notifications_adhkar">Zikir pagi dan petang</string>
     <string name="notifications_adhkar_subtitle">Setengah jam setelah Subuh dan Asar</string>
+    <string name="credit_adhkar">Zikir</string>
+    <string name="credit_adhkar_detail">Zikir pagi dan petang dari Hisnul Muslim karya Sa‘id bin ‘Ali bin Wahf al-Qahthani; teks Arab beserta strukturnya, terjemahan bahasa Inggris, dan transliterasi dari dataset OpenDua (Human Development Fund), CC BY 4.0, dengan sedikit suntingan yang dicatat di repositori.</string>
 </resources>

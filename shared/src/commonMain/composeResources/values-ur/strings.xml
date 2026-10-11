@@ -651,4 +651,6 @@
     <string name="adhkar_translation">ترجمہ</string>
     <string name="notifications_adhkar">صبح و شام کے اذکار</string>
     <string name="notifications_adhkar_subtitle">فجر اور عصر کے آدھے گھنٹے بعد</string>
+    <string name="credit_adhkar">اذکار</string>
+    <string name="credit_adhkar_detail">صبح و شام کے اذکار، سعید بن علی بن وہف القحطانی کی کتاب حصن المسلم سے؛ عربی متن اور اس کی ترتیب، انگریزی ترجمہ اور رومن نقل OpenDua ڈیٹا سیٹ (Human Development Fund) سے، CC BY 4.0؛ معمولی ترامیم ریپوزٹری میں درج ہیں۔</string>
 </resources>
