@@ -1,9 +1,11 @@
 package world.taqwa.app.i18n
 
 /**
- * A whole number with its thousands grouped the way the reader's language groups them: the
- * distance to Makkah on the Prayer screen's Qibla card and on the Qibla screen, and the same
- * distance on a city page. It lives apart from the Qibla screen, which is Compose, so that the
+ * A whole number below 100,000 with its thousands grouped the way the reader's language groups
+ * them: the distance to Makkah on the Prayer screen's Qibla card and on the Qibla screen, and the
+ * same distance on a city page, which never reaches six digits. From 100,000 on, Bengali and Urdu
+ * group the lakh in twos (CLDR's `#,##,##0`: 1,23,456), which this does not; a caller with larger
+ * numbers needs that first. It lives apart from the Qibla screen, which is Compose, so that the
  * website's timetable generator (`tools/timetables`) compiles this very file: the app and the site
  * cannot group a number two ways.
  *
@@ -16,7 +18,9 @@ package world.taqwa.app.i18n
  * - English, Urdu in Western digits, and Arabic in Western digits (Libya, the Maghreb, and any
  *   phone set to Latin numerals): a comma, "2,916". The app writes their decimals with a point.
  * - French: a narrow no-break space, "2 916", French typography's own and CLDR's for French; it
- *   is also what the app's French strings already put before ? : ; and inside « ».
+ *   is also what the app's French strings already put before ? : ; and inside « ». Every French
+ *   region takes it, though CLDR has a point for fr-MA and U+00A0 for fr-CA: a space is never a
+ *   decimal mark, and the app and the site write the same.
  * - Turkish and Indonesian: a point, "2.916". Both write the decimal with a comma, so "2,916 km"
  *   read as two point nine kilometres there.
  * - Arabic-Indic digits (Arabic in Egypt, the Gulf, the Levant) and the Extended Arabic-Indic
@@ -25,7 +29,8 @@ package world.taqwa.app.i18n
  *   shape of the Arabic decimal separator ٫, which `NumberStyle` writes in "٩٫٣". `NumberStyle`
  *   has no Extended Arabic-Indic case yet, so a ur-IN or Persian reader's recitation sizes stay
  *   in Western digits with a point ("58.2"): not the partner of ٬, but never the same mark either.
- * - Bengali digits: a comma, "২,৯১৬", as Bangladesh writes them and CLDR has them.
+ * - Bengali digits: a comma, "২,৯১৬", as Bangladesh writes them and CLDR has them below 100,000
+ *   (CLDR's bn and ur group the lakh in twos above it; no distance reaches it).
  *
  * The digit set decides before the language does, as it does in `NumberStyle`: a Samsung phone in
  * ar-LY draws Arabic-Indic digits, and its distance then takes the Arabic mark with them.
