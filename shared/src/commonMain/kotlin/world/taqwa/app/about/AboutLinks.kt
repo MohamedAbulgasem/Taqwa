@@ -38,9 +38,11 @@ object AboutLinks {
      *
      * On iOS one link: the listing with `action=write-review`, Apple's documented way in, which the
      * App Store app opens on its write-a-review page rather than at the top of the listing. On
-     * Android the `market://` scheme first, which goes straight to the Play Store app; a phone
-     * without Google Play (a de-Googled ROM, an emulator image without it) has nothing that
-     * answers that scheme, so the listing's web address follows, which any browser opens.
+     * Android the `market://` scheme first, which goes straight to the Play Store app. A phone
+     * with no store app at all (an emulator image without Play) has nothing that answers that
+     * scheme, so the listing's web address follows, which any browser opens. Other stores
+     * (F-Droid, Aurora, AppGallery) also answer `market://`, so on a phone with one of those
+     * instead of Play the row opens that store's page for Taqwa.
      */
     fun rateLinks(isIos: Boolean): List<String> = if (isIos) {
         listOf("https://apps.apple.com/app/id$APP_STORE_ID?action=write-review")
