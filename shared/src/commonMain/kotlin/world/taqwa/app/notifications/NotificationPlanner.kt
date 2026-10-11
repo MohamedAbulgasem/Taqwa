@@ -64,6 +64,11 @@ object NotificationPlanner {
         capacity: Int,
         copy: NotificationCopy = EnglishNotificationCopy,
         formatClockTime: (Instant, String) -> String = ::isoClockTime,
+        /**
+         * The adhkar reminders whose set has already been said ([adhkarNotificationId]s): never
+         * planned, so a reschedule after a set is finished does not bring its reminder back.
+         */
+        doneAdhkar: Set<String> = emptySet(),
     ): List<ScheduledNotification> {
         if (!notifications.enabled) return emptyList()
 
@@ -148,9 +153,10 @@ object NotificationPlanner {
                     val opens = times.time(prayer)
                     val closes = times.time(if (morning) Prayer.SUNRISE else Prayer.MAGHRIB)
                     val at = minOf(opens + ADHKAR_AFTER, closes - ADHKAR_BEFORE_END)
-                    if (at > opens && at > from) {
+                    val id = adhkarNotificationId(set, date)
+                    if (at > opens && at > from && id !in doneAdhkar) {
                         out += ScheduledNotification(
-                            id = adhkarNotificationId(set, date),
+                            id = id,
                             prayer = prayer,
                             kind = kind,
                             instant = at,

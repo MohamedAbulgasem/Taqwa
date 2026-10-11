@@ -668,4 +668,6 @@
     <string name="adhkar_back">Retour aux horaires de prière</string>
     <string name="adhkar_reading">Lecture</string>
     <string name="adhkar_translation">Traduction</string>
+    <string name="notifications_adhkar">Adhkar du matin et du soir</string>
+    <string name="notifications_adhkar_subtitle">Une demi-heure après le Fajr et l’Asr</string>
 </resources>

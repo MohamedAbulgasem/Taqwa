@@ -646,4 +646,6 @@
     <string name="adhkar_back">Kembali ke waktu salat</string>
     <string name="adhkar_reading">Bacaan</string>
     <string name="adhkar_translation">Terjemahan</string>
+    <string name="notifications_adhkar">Zikir pagi dan petang</string>
+    <string name="notifications_adhkar_subtitle">Setengah jam setelah Subuh dan Asar</string>
 </resources>

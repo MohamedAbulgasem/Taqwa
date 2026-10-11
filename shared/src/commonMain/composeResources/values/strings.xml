@@ -689,4 +689,6 @@
     <string name="adhkar_back">Back to prayer times</string>
     <string name="adhkar_reading">Reading</string>
     <string name="adhkar_translation">Translation</string>
+    <string name="notifications_adhkar">Morning and evening adhkar</string>
+    <string name="notifications_adhkar_subtitle">Half an hour after Fajr and Asr</string>
 </resources>

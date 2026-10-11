@@ -166,6 +166,18 @@ internal fun NotificationSettingsRoute(
                 container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
             }
         },
+        onToggleAdhkar = { on ->
+            scope.launch {
+                settings.setNotificationSettings(notificationSettings.copy(adhkar = on))
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
+        onPickAdhkarSound = { sound ->
+            scope.launch {
+                settings.setNotificationSettings(notificationSettings.copy(adhkarSound = sound))
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
         onPickVoice = { voice ->
             scope.launch {
                 settings.setNotificationSettings(notificationSettings.copy(voice = voice))

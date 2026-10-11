@@ -40,6 +40,16 @@ interface AdhkarStore {
     val translation: Flow<Boolean>
 
     suspend fun setTranslation(on: Boolean)
+
+    /**
+     * The date [set] was last said in full — its own date, that Fajr's or that Asr's — or null. The
+     * notification planner reads it so that a set already said has no reminder armed for it
+     * (spec §5); a stored value that is not a date reads as null.
+     */
+    fun done(set: AdhkarSet): Flow<LocalDate?>
+
+    /** Marks [set] said in full on [date], replacing any earlier date. */
+    suspend fun markDone(set: AdhkarSet, date: LocalDate)
 }
 
 /** The app's [AdhkarStore]: the process-wide DataStore beside [TasbeehStore] and [BookmarkStore]. */
@@ -69,5 +79,18 @@ class DataStoreAdhkarStore(private val store: DataStore<Preferences>) : AdhkarSt
 
     override suspend fun setTranslation(on: Boolean) {
         store.edit { it[SettingsKeys.ADHKAR_TRANSLATION] = on }
+    }
+
+    override fun done(set: AdhkarSet): Flow<LocalDate?> = store.data.map { prefs ->
+        prefs[doneKey(set)]?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+    }
+
+    override suspend fun markDone(set: AdhkarSet, date: LocalDate) {
+        store.edit { it[doneKey(set)] = date.toString() }
+    }
+
+    private fun doneKey(set: AdhkarSet) = when (set) {
+        AdhkarSet.MORNING -> SettingsKeys.ADHKAR_DONE_MORNING
+        AdhkarSet.EVENING -> SettingsKeys.ADHKAR_DONE_EVENING
     }
 }

@@ -668,4 +668,6 @@
     <string name="adhkar_back">Namaz vakitlerine dön</string>
     <string name="adhkar_reading">Okuma</string>
     <string name="adhkar_translation">Çeviri</string>
+    <string name="notifications_adhkar">Sabah ve akşam zikirleri</string>
+    <string name="notifications_adhkar_subtitle">Sabah ve ikindiden yarım saat sonra</string>
 </resources>

@@ -45,6 +45,7 @@ import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
+import world.taqwa.app.notifications.adhkarNotificationId
 import world.taqwa.app.notifications.openAppSettings
 import world.taqwa.app.notifications.requestExactAlarmAccess
 import world.taqwa.app.qibla.createCompassSource
@@ -210,6 +211,12 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
             format = format,
             language = language,
             scope = scope,
+            // A set said in full (spec §5): marked, so no later reschedule arms its reminder again,
+            // and the day's reminder withdrawn at once, pending or already on screen.
+            onSetCompleted = { finished, date ->
+                container.adhkarStore.markDone(finished, date)
+                container.notificationScheduler.cancel(setOf(adhkarNotificationId(finished, date)))
+            },
         )
     }
     DisposableEffect(viewModel) { onDispose { viewModel.close() } }

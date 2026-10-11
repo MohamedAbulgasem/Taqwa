@@ -192,6 +192,12 @@ data class AdhkarUiState(
  * **Haptics.** A count is the light tick; a page said in full is a part of the session, the double
  * pulse; the last undone page completing is the session done, the firm one, once.
  *
+ * **A set said in full** is reported once, by the tap that completes its last undone page, to
+ * [onSetCompleted] with the set's own date (that Fajr's, that Asr's; last evening's between
+ * midnight and Fajr): the route marks it done and withdraws the day's reminder for it (spec §5).
+ * Opening a finished set, and the done page, report nothing. Like a count, the report is started
+ * before the tap returns and finished even if the screen leaves.
+ *
  * Failures are swallowed rather than allowed to take the process down — a full disk loses a count,
  * not the app — as [world.taqwa.app.feature.tasbeeh.TasbeehViewModel] does. [scope] is the screen's;
  * leaving the screen cancels everything but a write already under way.
@@ -208,6 +214,7 @@ class AdhkarViewModel(
     private val format: PlatformFormat,
     private val language: String,
     scope: CoroutineScope,
+    private val onSetCompleted: suspend (AdhkarSet, LocalDate) -> Unit,
 ) {
     private val _state = MutableStateFlow(AdhkarUiState())
     val state: StateFlow<AdhkarUiState> = _state.asStateFlow()
@@ -298,6 +305,7 @@ class AdhkarViewModel(
         }
         _state.value = current.copy(pages = pages, completed = pages.count { it.done })
         persist(session, counted, pages)
+        if (event == TapEvent.SetComplete && pages.all { it.done }) completed(session)
         if (counted.done) advanceFrom(index, session)
     }
 
@@ -475,6 +483,13 @@ class AdhkarViewModel(
                     }
                 }
             }
+        }
+    }
+
+    /** The set said in full: reported once, and seen through even if the screen leaves under it. */
+    private fun completed(session: Session) {
+        work.launch(start = CoroutineStart.UNDISPATCHED) {
+            withContext(NonCancellable) { onSetCompleted(session.set, session.dateKey) }
         }
     }
 

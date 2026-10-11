@@ -44,6 +44,8 @@ import world.taqwa.app.notifications.rememberNotificationPermissionRequester
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.adhan_voice_row
 import world.taqwa.app.resources.minutes_count
+import world.taqwa.app.resources.notifications_adhkar
+import world.taqwa.app.resources.notifications_adhkar_subtitle
 import world.taqwa.app.resources.notifications_allow_exact_alarms
 import world.taqwa.app.resources.notifications_blocked
 import world.taqwa.app.resources.notifications_exact_alarms_off
@@ -111,9 +113,14 @@ fun NotificationSettingsScreen(
     /** Tahajjud on or off, and what it sounds like (spec §17.6). Both reschedule. */
     onToggleTahajjud: (Boolean) -> Unit = {},
     onPickTahajjudSound: (PrayerSound) -> Unit = {},
+    /** The morning and evening adhkar reminder on or off, and its sound (adhkar spec §5). Both
+     * reschedule. */
+    onToggleAdhkar: (Boolean) -> Unit = {},
+    onPickAdhkarSound: (PrayerSound) -> Unit = {},
 ) {
     var soundSheetFor by remember { mutableStateOf<Prayer?>(null) }
     var tahajjudSheetOpen by remember { mutableStateOf(false) }
+    var adhkarSheetOpen by remember { mutableStateOf(false) }
     var remindSheetOpen by remember { mutableStateOf(false) }
     var voiceSheetOpen by remember { mutableStateOf(false) }
 
@@ -215,6 +222,31 @@ fun NotificationSettingsScreen(
                 }
             }
         }
+
+        // The adhkar reminder (adhkar spec §5), built as the Tahajjud card is and for the same
+        // reasons: off until asked for, and its sound row there only while it is on.
+        Spacer(Modifier.height(28.dp))
+        SettingsCard {
+            TaqwaRow(
+                stringResource(Res.string.notifications_adhkar),
+                subtitle = stringResource(Res.string.notifications_adhkar_subtitle),
+                trailing = { TaqwaToggle(checked = settings.adhkar, onCheckedChange = onToggleAdhkar) },
+            )
+            AnimatedVisibility(
+                visible = settings.adhkar,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                Column {
+                    CardDivider()
+                    TaqwaRow(
+                        stringResource(Res.string.notifications_tahajjud_sound),
+                        value = soundDisplayName(settings.adhkarSound),
+                        onClick = { adhkarSheetOpen = true },
+                    )
+                }
+            }
+        }
     }
 
     if (remindSheetOpen) {
@@ -262,6 +294,19 @@ fun NotificationSettingsScreen(
                 onPick = { sound -> onPickTahajjudSound(sound); tahajjudSheetOpen = false },
                 onPreview = onPreviewSound,
                 options = NotificationSettings.TahajjudSounds,
+            )
+        }
+    }
+
+    if (adhkarSheetOpen) {
+        DisposableEffect(Unit) { onDispose { onStopPreview() } }
+        TaqwaBottomSheet(onDismissRequest = { adhkarSheetOpen = false }) {
+            SoundSheet(
+                current = settings.adhkarSound,
+                voice = settings.voice,
+                onPick = { sound -> onPickAdhkarSound(sound); adhkarSheetOpen = false },
+                onPreview = onPreviewSound,
+                options = NotificationSettings.AdhkarSounds,
             )
         }
     }

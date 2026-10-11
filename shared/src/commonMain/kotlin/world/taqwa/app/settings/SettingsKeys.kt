@@ -132,6 +132,14 @@ internal object SettingsKeys {
     /** Whether the adhkar pages show the translation under the Arabic; absent means on (spec §3.6). */
     val ADHKAR_TRANSLATION = booleanPreferencesKey("adhkar_translation")
 
+    /**
+     * The date a set was last said in full, "<date>" (the set's own: that Fajr's, that Asr's), so
+     * that a reschedule never arms the reminder for a set already said (spec §5). One date per
+     * set; a later one overwrites it.
+     */
+    val ADHKAR_DONE_MORNING = stringPreferencesKey("adhkar_done_morning")
+    val ADHKAR_DONE_EVENING = stringPreferencesKey("adhkar_done_evening")
+
     /** The voice the reader listens in; absent until one is picked, which is what makes Alafasy
      * the default for everyone who never does (spec 3a §12.1). */
     val RECITATION_RECITER = stringPreferencesKey("recitation_reciter")

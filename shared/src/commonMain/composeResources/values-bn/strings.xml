@@ -654,4 +654,6 @@
     <string name="adhkar_back">নামাজের সময়ে ফিরে যান</string>
     <string name="adhkar_reading">পড়া</string>
     <string name="adhkar_translation">অনুবাদ</string>
+    <string name="notifications_adhkar">সকাল ও সন্ধ্যার আযকার</string>
+    <string name="notifications_adhkar_subtitle">ফজর ও আসরের আধা ঘণ্টা পরে</string>
 </resources>

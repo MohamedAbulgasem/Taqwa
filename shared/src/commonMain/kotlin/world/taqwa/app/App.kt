@@ -165,6 +165,10 @@ fun App(container: AppContainer) {
         settings = settings,
         openPlaying = openPlaying,
     )
+    AdhkarLaunchRequests(
+        settings = settings,
+        navigator = navigator,
+    )
     DebugScreenRequests(
         settings = settings,
         navigator = navigator,

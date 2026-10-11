@@ -222,4 +222,31 @@ class LocalizedNotificationCopyTest {
         val english = LocalizedNotificationCopy(StubFormat("en-GB", arabicIndic = false))
         assertEquals("Morning and evening adhkar · Takbir", english.channelName(Prayer.FAJR, PrayerSound.TAKBIR, NotificationKind.ADHKAR_MORNING))
     }
+
+    /**
+     * The channel the system lists is named as the switch that turns it on: each language's
+     * `notifications_adhkar`, the Settings › Notifications row. A commonTest cannot read the
+     * resources, so the seven texts are written out here as the strings files have them.
+     */
+    private val adhkarSwitch = mapOf(
+        "en-GB" to "Morning and evening adhkar",
+        "ar-LY" to "أذكار الصباح والمساء",
+        "fr-FR" to "Adhkar du matin et du soir",
+        "tr-TR" to "Sabah ve akşam zikirleri",
+        "id-ID" to "Zikir pagi dan petang",
+        "ur-PK" to "صبح و شام کے اذکار",
+        "bn-BD" to "সকাল ও সন্ধ্যার আযকার",
+    )
+
+    @Test
+    fun `every language names the adhkar channel as its notifications switch`() {
+        assertEquals(adhkarTitles.keys, adhkarSwitch.keys)
+        for ((tag, name) in adhkarSwitch) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            for (kind in listOf(NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING)) {
+                val channel = copy.channelName(Prayer.FAJR, PrayerSound.SILENT, kind)
+                assertTrue(channel.startsWith("$name · "), "$tag: $channel")
+            }
+        }
+    }
 }

@@ -649,4 +649,6 @@
     <string name="adhkar_back">نماز کے اوقات پر واپس</string>
     <string name="adhkar_reading">پڑھائی</string>
     <string name="adhkar_translation">ترجمہ</string>
+    <string name="notifications_adhkar">صبح و شام کے اذکار</string>
+    <string name="notifications_adhkar_subtitle">فجر اور عصر کے آدھے گھنٹے بعد</string>
 </resources>

@@ -35,6 +35,7 @@ class NotificationPlannerTest {
         from: Instant = Instant.parse("2026-09-06T00:30:00Z"),
         windowDays: Int = 12,
         capacity: Int = 64,
+        doneAdhkar: Set<String> = emptySet(),
     ) = NotificationPlanner.plan(
         location = location,
         settings = PrayerSettings(),
@@ -43,6 +44,7 @@ class NotificationPlannerTest {
         from = from,
         windowDays = windowDays,
         capacity = capacity,
+        doneAdhkar = doneAdhkar,
     )
 
     @Test
@@ -494,6 +496,22 @@ class NotificationPlannerTest {
         assertEquals(6, with.count { it.id.startsWith("ADHKAR-") })
         // Only the adhkar reminder has a window to close; nothing else is ever dropped for lateness.
         assertTrue(without.all { it.windowEnd == null })
+    }
+
+    @Test
+    fun `a set already said gets no reminder and the rest are planned as before`() {
+        // The morning set of the sixth is finished before its reminder: a reschedule after that
+        // (a cold start, a settings change) must not arm it again. The evening of the sixth and
+        // every later morning are still planned.
+        val done = setOf(adhkarNotificationId(AdhkarSet.MORNING, sixth))
+        val all = planFor(notifications = adhkarOn, windowDays = 3)
+        val plan = planFor(notifications = adhkarOn, windowDays = 3, doneAdhkar = done)
+        assertTrue(all.any { it.id == "ADHKAR-MORNING-$sixth" })
+        assertEquals(all.filterNot { it.id in done }, plan)
+        assertTrue(plan.any { it.id == "ADHKAR-EVENING-$sixth" })
+        assertTrue(plan.any { it.id == "ADHKAR-MORNING-${sixth.plus(1, DateTimeUnit.DAY)}" })
+        // The id of a day the plan does not reach changes nothing.
+        assertEquals(all, planFor(notifications = adhkarOn, windowDays = 3, doneAdhkar = setOf("ADHKAR-MORNING-2026-01-01")))
     }
 
     @Test

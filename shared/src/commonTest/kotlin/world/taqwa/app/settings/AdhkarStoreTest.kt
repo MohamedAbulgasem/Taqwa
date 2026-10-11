@@ -69,6 +69,32 @@ class AdhkarStoreTest {
         assertTrue(store.translation.first())
     }
 
+    @Test fun `a set's done marker round trips and is the set's own`() = runTest {
+        val ds = dataStore()
+        val store = DataStoreAdhkarStore(ds)
+        assertNull(store.done(AdhkarSet.MORNING).first())
+        assertNull(store.done(AdhkarSet.EVENING).first())
+
+        store.markDone(AdhkarSet.MORNING, today)
+        assertEquals(today, store.done(AdhkarSet.MORNING).first())
+        assertNull(store.done(AdhkarSet.EVENING).first())
+        // A later day overwrites the marker: only the latest date is kept, as for the progress.
+        store.markDone(AdhkarSet.MORNING, LocalDate(2026, 10, 12))
+        assertEquals(LocalDate(2026, 10, 12), store.done(AdhkarSet.MORNING).first())
+        store.markDone(AdhkarSet.EVENING, today)
+        assertEquals(today, store.done(AdhkarSet.EVENING).first())
+
+        val stored = ds.data.first()
+        assertEquals("2026-10-12", stored[stringPreferencesKey("adhkar_done_morning")])
+        assertEquals("2026-10-11", stored[stringPreferencesKey("adhkar_done_evening")])
+    }
+
+    @Test fun `a marker that is not a date reads as none`() = runTest {
+        val ds = dataStore()
+        ds.edit { it[stringPreferencesKey("adhkar_done_morning")] = "yesterday" }
+        assertNull(DataStoreAdhkarStore(ds).done(AdhkarSet.MORNING).first())
+    }
+
     @Test fun `the keys are the ones the spec names`() = runTest {
         val ds = dataStore()
         val store = DataStoreAdhkarStore(ds)

@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
+import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.audio.ClipPlayer
 import world.taqwa.app.feature.recitation.RecitationController
 import world.taqwa.app.feature.recitation.asPort
@@ -16,6 +17,7 @@ import world.taqwa.app.location.LocationRefresher
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.createLocationProvider
 import world.taqwa.app.notifications.NotificationCoordinator
+import world.taqwa.app.notifications.adhkarNotificationId
 import world.taqwa.app.notifications.createNotificationScheduler
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.quran.QuranRepository
@@ -162,6 +164,11 @@ class AppContainer {
         scheduler = notificationScheduler,
         now = { Clock.System.now() },
         locationFor = { locationRefresher.refreshFor(it) },
+        // A set said in full has no reminder armed for it again (adhkar spec §5): its id, from
+        // the date the set was last finished. An old date names a day the plan no longer reaches.
+        doneAdhkar = {
+            AdhkarSet.entries.mapNotNull { set -> adhkarStore.done(set).first()?.let { adhkarNotificationId(set, it) } }.toSet()
+        },
     )
 }
 

@@ -661,4 +661,6 @@
     <string name="adhkar_back">العودة إلى مواقيت الصلاة</string>
     <string name="adhkar_reading">القراءة</string>
     <string name="adhkar_translation">الترجمة</string>
+    <string name="notifications_adhkar">أذكار الصباح والمساء</string>
+    <string name="notifications_adhkar_subtitle">بعد الفجر والعصر بنصف ساعة</string>
 </resources>

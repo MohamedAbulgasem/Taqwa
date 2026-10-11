@@ -57,8 +57,18 @@ private class MemoryAdhkarStore : AdhkarStore {
     )
     val istighfar = MutableStateFlow<String?>(null)
     private val translationOn = MutableStateFlow(true)
+    val done = mapOf(
+        AdhkarSet.MORNING to MutableStateFlow<LocalDate?>(null),
+        AdhkarSet.EVENING to MutableStateFlow<LocalDate?>(null),
+    )
 
     override fun progress(set: AdhkarSet): Flow<String?> = progress.getValue(set)
+
+    override fun done(set: AdhkarSet): Flow<LocalDate?> = done.getValue(set)
+
+    override suspend fun markDone(set: AdhkarSet, date: LocalDate) {
+        done.getValue(set).value = date
+    }
 
     override suspend fun save(set: AdhkarSet, progress: AdhkarProgress) {
         this.progress.getValue(set).value = progress.encode()
@@ -132,6 +142,8 @@ class AdhkarViewModelTest {
         val day: DayPrayerTimes,
         val clock: Clock,
         val reopen: () -> AdhkarViewModel,
+        /** Every set the view model reported finished, with its date, in order. */
+        val completed: MutableList<Pair<AdhkarSet, LocalDate>>,
     )
 
     private class Clock(var now: Instant)
@@ -156,6 +168,7 @@ class AdhkarViewModelTest {
         val clock = Clock(at(day))
         val store = MemoryAdhkarStore()
         val haptics = RecordingHaptics()
+        val completed = mutableListOf<Pair<AdhkarSet, LocalDate>>()
         val build = {
             AdhkarViewModel(
                 catalogue = catalogue,
@@ -169,9 +182,10 @@ class AdhkarViewModelTest {
                 format = EnglishPlatformFormat,
                 language = "en",
                 scope = backgroundScope,
+                onSetCompleted = { set, day -> completed += set to day },
             )
         }
-        return Rig(build(), store, haptics, day, clock, build)
+        return Rig(build(), store, haptics, day, clock, build, completed)
     }
 
     /**
@@ -314,6 +328,49 @@ class AdhkarViewModelTest {
         }
         assertEquals(expected, rig.haptics.fired)
         assertEquals(1, rig.haptics.fired.count { it == "setComplete" })
+    }
+
+    @Test fun `finishing the set reports it once with the set's own date`() = runTest {
+        val rig = rig("set-completed", ::tenPastFajr)
+        // Every page said but Al-Ikhlas (three times), the session's last undone page.
+        val full = morningPages.mapIndexed { index, item -> if (index == 1 || item.countDaily) 0 else item.count }
+        rig.store.save(AdhkarSet.MORNING, AdhkarProgress(date, full))
+        rig.store.saveIstighfar(date, 100)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        loaded(rig, AdhkarSet.MORNING)
+
+        repeat(2) { rig.viewModel.tap() }
+        runCurrent()
+        assertEquals(emptyList(), rig.completed)
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(listOf(AdhkarSet.MORNING to date), rig.completed)
+
+        // The done page takes a tap and reports nothing; nor does opening the finished set again.
+        advanceTimeBy(AdhkarViewModel.ADVANCE_DELAY_MS + 1)
+        runCurrent()
+        rig.viewModel.tap()
+        runCurrent()
+        rig.viewModel.close()
+        val again = rig.reopen()
+        again.open(AdhkarSet.MORNING)
+        loaded(again, AdhkarSet.MORNING)
+        runCurrent()
+        assertEquals(listOf(AdhkarSet.MORNING to date), rig.completed)
+    }
+
+    @Test fun `an evening finished after midnight is reported under its own asr's date`() = runTest {
+        val rig = rig("set-completed-night", { day -> day.time(Prayer.FAJR) - 30.minutes })
+        val yesterday = date.minus(1, DateTimeUnit.DAY)
+        // Last evening's set with every page said but the first.
+        val full = eveningPages.mapIndexed { index, item -> if (index == 0 || item.countDaily) 0 else item.count }
+        rig.store.save(AdhkarSet.EVENING, AdhkarProgress(yesterday, full))
+        rig.store.saveIstighfar(yesterday, 100)
+        rig.viewModel.open(null)
+        loaded(rig, AdhkarSet.EVENING)
+        rig.viewModel.tap()
+        runCurrent()
+        assertEquals(listOf(AdhkarSet.EVENING to yesterday), rig.completed)
     }
 
     @Test fun `reopening a finished set opens on the done page`() = runTest {
