@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.adhkar.AdhkarCatalogue
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.design.KeepScreenOn
@@ -27,8 +28,10 @@ import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.feature.adhkar.AdhkarReadingSheet
 import world.taqwa.app.feature.adhkar.AdhkarScreen
 import world.taqwa.app.feature.adhkar.AdhkarViewModel
+import world.taqwa.app.feature.adhkar.recited
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.feature.recitation.rememberSurahName
 import world.taqwa.app.feature.tasbeeh.TasbeehScreen
 import world.taqwa.app.feature.tasbeeh.TasbeehViewModel
 import world.taqwa.app.feature.today.TodayScreen
@@ -46,6 +49,9 @@ import world.taqwa.app.notifications.openAppSettings
 import world.taqwa.app.notifications.requestExactAlarmAccess
 import world.taqwa.app.qibla.createCompassSource
 import world.taqwa.app.qibla.createHaptics
+import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.adhkar_evening
+import world.taqwa.app.resources.adhkar_morning
 import world.taqwa.app.settings.SettingsRepository
 import kotlin.time.Clock
 
@@ -231,14 +237,33 @@ internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: Adh
     val reading by remember(format) {
         container.settingsRepository.readingSettings(format.languageTag()).distinctUntilChanged()
     }.collectAsState(initial = null)
+    // The Quran pages' speaker (spec §3.5): the page's passage in the voice chosen in Settings ›
+    // Recitation, through the one player, with the set and the passage on the lock screen. A
+    // surah not on the phone is offered on the download sheet, which the app hosts over every
+    // screen. The passage stops when the page turns — a swipe, a chevron, a counted page moving
+    // on, the other set — and when the screen is left. Nothing it plays is counted.
+    val recitation = container.recitationController
+    val playing by recitation.adhkarPlaying.collectAsState()
+    LaunchedEffect(recitation, state.set, state.currentPage) { recitation.stopAdhkar() }
+    DisposableEffect(recitation) { onDispose { recitation.stopAdhkar() } }
+    val passage = state.pages.getOrNull(state.currentPage)?.recited
+    val surahName = rememberSurahName(passage?.surah) { container.quranRepository.surah(it) }
+    val setTitle = stringResource(if (state.set == AdhkarSet.EVENING) Res.string.adhkar_evening else Res.string.adhkar_morning)
     AdhkarScreen(
         state = state,
         onBack = { navigator.pop() },
         onSelectSet = viewModel::selectSet,
         onGoTo = viewModel::goTo,
         onTap = viewModel::tap,
-        onPlay = null,
-        playing = false,
+        onPlay = {
+            // Pause is stop here: a passage is a few seconds to a minute, and is started again.
+            if (recitation.adhkarPlaying.value) {
+                recitation.stopAdhkar()
+            } else if (passage != null) {
+                recitation.requestPlayAyahs(passage.surah, passage.ayahs, setTitle, passage.subtitle(surahName, format))
+            }
+        },
+        playing = playing,
         onOpenReading = { readingOpen = true },
     )
     val current = reading

@@ -136,9 +136,11 @@ private const val DoneHaloAlpha = 0.18f
  * keeps only what is purely visual — the count's bump and the ring's tween. There is no reduced-
  * motion signal in the app to read yet (see `Equaliser`), so both run as the tasbeeh's do.
  *
- * [onPlay] is the Quran pages' speaker, null where there is nothing to play (and until recitation
- * is wired in); [onOpenReading] is the "Aa" button. `KeepScreenOn` is the route's, not this
- * screen's, so the screen can be composed under a UI test.
+ * [onPlay] is the speaker's tap, play or stop for the page on screen, and [playing] turns the
+ * speaker into the equaliser. The speaker is drawn on a Quran page only — a page with a
+ * [recited] passage — and never when [onPlay] is null; a du'a has no audio (spec §3.5).
+ * [onOpenReading] is the "Aa" button. `KeepScreenOn` is the route's, not this screen's, so the
+ * screen can be composed under a UI test.
  *
  * Landscape is the same column, capped to the content width; the pager takes whatever height is
  * left, and a page scrolls.
@@ -187,7 +189,7 @@ fun AdhkarScreen(
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .contentWidth(),
         ) {
-            Header(state, onBack, onPlay, playing, onOpenReading)
+            Header(state, onBack, onPlay.takeIf { page?.recited != null }, playing, onOpenReading)
             if (!state.loaded) return@Column
 
             Spacer(Modifier.height(12.dp))

@@ -68,8 +68,11 @@ import world.taqwa.app.resources.adhkar_reading
 import world.taqwa.app.resources.adhkar_times
 import world.taqwa.app.resources.adhkar_translation
 import world.taqwa.app.resources.adhkar_until_sunrise
+import world.taqwa.app.resources.quran_reader_aa
 import world.taqwa.app.resources.quran_sheet_size
 import world.taqwa.app.resources.quran_sheet_transliteration
+import world.taqwa.app.resources.recitation_a11y_pause
+import world.taqwa.app.resources.recitation_play
 import world.taqwa.app.resources.source_quran
 import world.taqwa.app.resources.tasbeeh_hint
 import world.taqwa.app.resources.ui_language
@@ -118,6 +121,29 @@ class AdhkarScreenTest {
         arabicSizeSp = 28,
         transliteration = true,
         loaded = true,
+    )
+
+    /** Ayat al-Kursi as the view model hands it over: no du'a text, the passage from `quran.db`. */
+    private val kursiPage = AdhkarPageUi(
+        item = AdhkarItem(
+            id = "hisn-075",
+            hisn = 75,
+            kind = AdhkarKind.QURAN,
+            sets = setOf(AdhkarSet.MORNING, AdhkarSet.EVENING),
+            count = 1,
+            countDaily = false,
+            quran = QuranRef(2, 255, QuranPrefix.ISTIADHAH),
+            arabic = mapOf("both" to ISTIADHAH),
+            transliteration = emptyMap(),
+            sources = listOf(Source("quran", "2:255")),
+        ),
+        arabic = null,
+        transliteration = null,
+        translation = null,
+        quran = QuranPageText(ISTIADHAH, listOf(KURSI to 255), "Allah - there is no deity except Him", "en"),
+        count = 0,
+        target = 1,
+        done = false,
     )
 
     /** [state] with every page said: the session opens on the done page after them. */
@@ -217,32 +243,7 @@ class AdhkarScreenTest {
      */
     @Test
     fun aQuranPageSaysItsReferenceAndNoneOfTheQuran() = runComposeUiTest {
-        val kursi = AdhkarItem(
-            id = "hisn-075",
-            hisn = 75,
-            kind = AdhkarKind.QURAN,
-            sets = setOf(AdhkarSet.MORNING, AdhkarSet.EVENING),
-            count = 1,
-            countDaily = false,
-            quran = QuranRef(2, 255, QuranPrefix.ISTIADHAH),
-            arabic = mapOf("both" to ISTIADHAH),
-            transliteration = emptyMap(),
-            sources = listOf(Source("quran", "2:255")),
-        )
-        val quranState = state.copy(
-            pages = listOf(
-                AdhkarPageUi(
-                    item = kursi,
-                    arabic = null,
-                    transliteration = null,
-                    translation = null,
-                    quran = QuranPageText(ISTIADHAH, listOf(KURSI to 255), "Allah - there is no deity except Him", "en"),
-                    count = 0,
-                    target = 1,
-                    done = false,
-                ),
-            ),
-        )
+        val quranState = state.copy(pages = listOf(kursiPage))
         setContent {
             CompositionLocalProvider(
                 LocalTaqwaColors provides LightColors,
@@ -260,6 +261,39 @@ class AdhkarScreenTest {
             onAllNodesWithText(word, substring = true).assertCountEquals(0)
             onAllNodesWithContentDescription(word, substring = true).assertCountEquals(0)
         }
+    }
+
+    /**
+     * The speaker belongs to the Quran pages (spec §3.5): on Ayat al-Kursi it is there, named for
+     * what a tap does, and the tap reaches the route; while the passage plays it is the pause. On
+     * a du'a page there is none, though recitation is wired in all the same — a du'a has no audio.
+     */
+    @Test
+    fun aQuranPageShowsTheSpeakerAndADuaPageDoesNot() = runComposeUiTest {
+        var plays = 0
+        var shown by mutableStateOf(state.copy(pages = listOf(kursiPage) + state.pages))
+        var playing by mutableStateOf(false)
+        setContent {
+            Themed {
+                AdhkarScreen(shown, {}, {}, {}, {}, onPlay = { plays++ }, playing = playing, onOpenReading = {})
+            }
+        }
+        val play = getString(Res.string.recitation_play)
+        val pause = getString(Res.string.recitation_a11y_pause)
+        onNodeWithContentDescription(play).assertIsDisplayed().performClick()
+        assertEquals(1, plays)
+        playing = true
+        onNodeWithContentDescription(pause).assertIsDisplayed()
+        onAllNodesWithContentDescription(play).assertCountEquals(0)
+
+        // The next page is a du'a.
+        playing = false
+        shown = shown.copy(currentPage = 1)
+        waitForIdle()
+        onAllNodesWithContentDescription(play).assertCountEquals(0)
+        onAllNodesWithContentDescription(pause).assertCountEquals(0)
+        // "Aa" is still there: only the speaker is the Quran's.
+        onNodeWithContentDescription(getString(Res.string.quran_reader_aa)).assertIsDisplayed()
     }
 
     /**

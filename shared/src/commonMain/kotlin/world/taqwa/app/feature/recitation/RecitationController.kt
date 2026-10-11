@@ -489,6 +489,7 @@ class RecitationController(
                 if (waiting.surah !in owned) return@collect
                 pending = null
                 sheetSurah.value = null
+                sheetPassage = null
                 // An adhkar page's passage (adhkar spec §3.5) is played as the page asked for it,
                 // whatever else is loaded: it is never a switch.
                 waiting.passage?.let { passage ->
@@ -658,13 +659,25 @@ class RecitationController(
      * The bar's next and previous, and the lock screen's (spec §15.1): the neighbouring surah
      * from its first ayah, through the same path as a tap on its header, so a surah not on the
      * phone is offered or fetched exactly as it would be there. At the ends of the Quran, nothing.
+     *
+     * During an adhkar page's passage (adhkar spec §3.5) a skip stops it and starts nothing: the
+     * passage was all that was asked for, and a press on the lock screen is no request for
+     * Al-Imran after Ayat al-Kursi.
      */
     fun nextSurah() {
+        if (adhkarSurah.value != null) {
+            stopAdhkar()
+            return
+        }
         val playing = state.value.bar?.surah ?: return
         if (playing < LAST_SURAH) requestPlay(playing + 1, 1)
     }
 
     fun previousSurah() {
+        if (adhkarSurah.value != null) {
+            stopAdhkar()
+            return
+        }
         val playing = state.value.bar?.surah ?: return
         if (playing > 1) requestPlay(playing - 1, 1)
     }
@@ -774,6 +787,8 @@ class RecitationController(
      * surah arrives, and the header button's ring is what keeps the download visible. */
     fun dismissSheet() {
         sheetSurah.value = null
+        // A confirmed passage waits in [pending], and a failure reopens the sheet from there.
+        sheetPassage = null
     }
 
     // ── The whole Quran (spec §5.4, §12.8) ──────────────────────────────────────────────
@@ -1087,11 +1102,16 @@ class RecitationController(
         adhkarSurah.value = surah
         loading.value = true
         try {
-            speechKind = null
-            appliedSpeech = keyOf(surah, null)
             player.load(playWith, surah, passage.ayahs.min(), passage.text, null, passage.ayahs)
         } finally {
             loading.value = false
+        }
+        // The speech bookkeeping is the loaded surah's, so it follows the passage only once the
+        // passage is what is loaded: a container that could not be read leaves the recitation
+        // before it read aloud as it was, and the bar saying so.
+        if (player.state.value.surah == surah) {
+            speechKind = null
+            appliedSpeech = keyOf(surah, null)
         }
         if (stopCount != stopsBefore) {
             // The page turned or the screen was left while it loaded — on Android the first

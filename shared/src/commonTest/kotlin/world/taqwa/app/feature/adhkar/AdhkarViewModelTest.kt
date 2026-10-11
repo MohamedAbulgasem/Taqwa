@@ -21,6 +21,7 @@ import okio.FileSystem
 import okio.Path.Companion.toPath
 import world.taqwa.app.adhkar.AdhkarCatalogue
 import world.taqwa.app.adhkar.AdhkarItem
+import world.taqwa.app.adhkar.AdhkarKind
 import world.taqwa.app.adhkar.AdhkarPhase
 import world.taqwa.app.adhkar.AdhkarProgress
 import world.taqwa.app.adhkar.AdhkarSet
@@ -578,6 +579,32 @@ class AdhkarViewModelTest {
         assertEquals((1..4).map { "ikhlas-$it" to it }, ikhlas.lines)
         assertEquals((1..4).joinToString(" ") { "ikhlas translation $it" }, ikhlas.translation)
         assertEquals(3, pages[1].target)
+    }
+
+    @Test fun `the speaker plays ayat al-kursi alone and each qul whole`() = runTest {
+        val rig = rig("recited", ::tenPastFajr)
+        rig.viewModel.open(AdhkarSet.MORNING)
+        val pages = loaded(rig, AdhkarSet.MORNING).pages
+        val recited = pages.filter { it.item.kind == AdhkarKind.QURAN }.map { it.recited }
+        assertEquals(
+            listOf(
+                RecitedPassage(2, listOf(255), wholeSurah = false),
+                RecitedPassage(112, (1..4).toList(), wholeSurah = true),
+                RecitedPassage(113, (1..5).toList(), wholeSurah = true),
+                RecitedPassage(114, (1..6).toList(), wholeSurah = true),
+            ),
+            recited,
+        )
+        // A du'a has no audio of any kind, so its page has no speaker.
+        assertTrue(pages.filter { it.item.kind == AdhkarKind.DUA }.all { it.recited == null })
+    }
+
+    @Test fun `the lock screen names the surah and the passage`() {
+        val kursi = RecitedPassage(2, listOf(255), wholeSurah = false)
+        assertEquals("Al-Baqarah · 2:255", kursi.subtitle("Al-Baqarah", EnglishPlatformFormat))
+        assertEquals("Al-Ikhlas · 112", RecitedPassage(112, (1..4).toList(), wholeSurah = true).subtitle("Al-Ikhlas", EnglishPlatformFormat))
+        // Before the name has been read, the reference stands alone rather than after a bare dot.
+        assertEquals("2:255", kursi.subtitle("", EnglishPlatformFormat))
     }
 
     @Test fun `the translation switch is the store's`() = runTest {

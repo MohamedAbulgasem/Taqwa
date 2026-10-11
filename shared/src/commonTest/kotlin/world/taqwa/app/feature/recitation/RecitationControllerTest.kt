@@ -105,6 +105,10 @@ class RecitationControllerTest {
          * returned — while it drives the controller from the outside. */
         var loadGate: CompletableDeferred<Unit>? = null
 
+        /** Surahs whose container cannot be read: their `load` returns having loaded nothing,
+         * and whatever was loaded before is still there, as on the platforms. */
+        var unreadable: Set<Int> = emptySet()
+
         override suspend fun load(
             reciter: Reciter,
             surah: Int,
@@ -113,6 +117,7 @@ class RecitationControllerTest {
             speech: SpokenTranslation?,
             ayahs: List<Int>?,
         ) {
+            if (surah in unreadable) return
             loads += Triple(reciter.id, surah, startAyah)
             speeches += speech
             passages += ayahs
@@ -1898,4 +1903,84 @@ class RecitationControllerTest {
         assertEquals(listOf<SpokenTranslation?>(null), harness.player.speeches)
         assertTrue(harness.player.speechUpdates.isEmpty())
     }
+
+    @Test
+    fun `a lock screen skip during a passage stops the passage and starts nothing`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1, 2, 3))
+            val controller = controller(harness, backgroundScope)
+
+            controller.playKursi()
+            harness.player.press(SurahSkip.NEXT)
+
+            assertEquals(1, harness.player.loads.size)
+            assertEquals(1, harness.player.stops)
+            assertFalse(controller.adhkarPlaying.value)
+            assertNull(controller.state.value.bar)
+
+            controller.playKursi()
+            harness.player.press(SurahSkip.PREVIOUS)
+
+            assertEquals(2, harness.player.loads.size)
+            assertEquals(2, harness.player.stops)
+            assertNull(controller.state.value.sheet)
+        }
+
+    @Test
+    fun `a passage that cannot be loaded leaves the recitation before it as it was`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(1, 2))
+            harness.settings.stored.value = harness.settings.stored.value.copy(readAloud = true)
+            harness.player.unreadable = setOf(2)
+            val c = controller(harness, backgroundScope, readAloud = FakeReadAloud(), quran = readingQuran)
+            c.setLanguageTag("en")
+            c.requestPlay(1, 1)
+            harness.player.emit(harness.player.state.value.copy(speaking = true))
+            assertEquals(TextKind.TRANSLATION, c.state.value.bar?.readingAloud)
+
+            c.playKursi()
+            // The surah being heard goes on to its next ayah, and the bar is drawn again.
+            harness.player.emit(harness.player.state.value.copy(ayah = 2))
+
+            assertEquals(listOf(Triple("ar.alafasy", 1, 1)), harness.player.loads)
+            assertFalse(c.adhkarPlaying.value)
+            // It is still being read aloud, and the bar still says so.
+            assertEquals(1, c.state.value.bar?.surah)
+            assertEquals(TextKind.TRANSLATION, c.state.value.bar?.readingAloud)
+            assertEquals(0, harness.player.stops)
+        }
+
+    @Test
+    fun `a passage whose download fails plays only the passage once the retry lands`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(3))
+            val controller = controller(harness, backgroundScope)
+            controller.playKursi()
+            controller.confirmDownload(allowMobileOnce = false)
+            // The reader puts the sheet away while it downloads; the failure brings it back.
+            controller.dismissSheet()
+            harness.downloader.emit(
+                mapOf(DownloadKey("ar.alafasy", 2) to DownloadState.Failed(DownloadFailure.NO_NETWORK)),
+            )
+            assertEquals(SheetPhase.Failed(DownloadFailure.NO_NETWORK), controller.state.value.sheet?.phase)
+
+            controller.retryDownload()
+            assertEquals(DownloadKey("ar.alafasy", 2) to false, harness.downloader.enqueued.last())
+            harness.downloader.emit(mapOf(DownloadKey("ar.alafasy", 2) to DownloadState.Queued))
+            harness.library.put("ar.alafasy", setOf(2, 3))
+
+            assertEquals(listOf(Triple("ar.alafasy", 2, 255)), harness.player.loads)
+            assertEquals(listOf<List<Int>?>(listOf(255)), harness.player.passages)
+            assertEquals(kursiText, harness.player.lastText)
+            assertNull(controller.state.value.sheet)
+            assertTrue(controller.adhkarPlaying.value)
+
+            harness.player.playOut()
+            advanceTimeBy(SURAH_BREATH_MS + 1)
+            assertEquals(1, harness.player.loads.size)
+            assertEquals(1, harness.player.stops)
+        }
 }

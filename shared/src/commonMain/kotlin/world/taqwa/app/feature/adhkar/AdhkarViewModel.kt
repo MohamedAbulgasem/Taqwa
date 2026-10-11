@@ -73,6 +73,39 @@ data class QuranPageText(
 )
 
 /**
+ * What a Quran page's speaker plays (spec §3.5): [ayahs] of [surah], in reading order — Ayat
+ * al-Kursi alone, or a short surah from its first ayah to its last ([wholeSurah]).
+ */
+data class RecitedPassage(val surah: Int, val ayahs: List<Int>, val wholeSurah: Boolean) {
+    /**
+     * The lock screen's second line: "Al-Baqarah · 2:255", "Al-Ikhlas · 112" — the surah as the
+     * reader names it ([surahName], empty until it has been read, when the reference stands alone)
+     * and the numbers in the interface's digits.
+     */
+    fun subtitle(surahName: String, format: PlatformFormat): String {
+        val number = format.localizedDigits(surah)
+        val reference = when {
+            wholeSurah -> number
+            ayahs.size == 1 -> "$number:${format.localizedDigits(ayahs.single())}"
+            else -> "$number:${format.localizedDigits(ayahs.first())}–${format.localizedDigits(ayahs.last())}"
+        }
+        return if (surahName.isEmpty()) reference else "$surahName · $reference"
+    }
+}
+
+/**
+ * The passage this page's speaker plays, or null for a page with nothing to play: a du'a, or a
+ * whole surah whose ayahs did not load. A single ayah is the item's own reference; a whole surah
+ * is the ayahs the page shows, which are the ones `quran.db` has.
+ */
+val AdhkarPageUi.recited: RecitedPassage?
+    get() {
+        val ref = item.quran ?: return null
+        val ayahs = ref.ayah?.let { listOf(it) } ?: quran?.lines?.mapNotNull { it.second }.orEmpty()
+        return if (ayahs.isEmpty()) null else RecitedPassage(ref.surah, ayahs, wholeSurah = ref.ayah == null)
+    }
+
+/**
  * One page of the pager: the item and everything the page draws, already chosen for the set and
  * the language. [count] is clamped to [target] — a stored count above it reads as done, never as
  * "5 of 3" ([AdhkarProgress.decode] does not clamp).
