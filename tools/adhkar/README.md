@@ -7,11 +7,13 @@ dataset and checked against the Hisn text.
 | File | What it is |
 |------|------------|
 | `build_items.py` | Extracts OpenDua's 24 morning-and-evening entries and builds the two resources |
-| `check_items.py` | Checks the resources against the spec's table and the hisnmuslim.com text |
+| `check_items.py` | Checks the resources against the spec's table and the hisnmuslim.com text, and every language file |
 | `embed_test_fixture.py` | Copies the two resources into `AdhkarFixtures.kt`, which the catalogue tests parse (`Res.readBytes` does not run in tests) |
 | `opendua-morning-evening.json` | The 24 entries (Hisn 75–98), verbatim, under OpenDua's attribution: the build's input |
+| `TRANSLATIONS-FOR-REVIEW.md` | The five drafted translations beside the Arabic and the English, one section per language, for the reviewers to mark up |
 | `../../shared/src/commonMain/composeResources/files/adhkar/items.json` | The 19 items, book order (schema 1) |
-| `../../shared/src/commonMain/composeResources/files/adhkar/text/en.json` | English for the 15 du'a items |
+| `../../shared/src/commonMain/composeResources/files/adhkar/text/en.json` | English for the 15 du'a items (OpenDua's) |
+| `../../shared/src/commonMain/composeResources/files/adhkar/text/{bn,fr,id,tr,ur}.json` | Bengali, French, Indonesian, Turkish and Urdu for the 15 du'a items: drafts awaiting review (see Translations below) |
 
 Licence: `docs/licences/OpenDua-CC-BY-4.0.txt` (CC BY 4.0, attribution verbatim).
 
@@ -29,7 +31,11 @@ The scripts use the standard library only. The build is deterministic (sorted ke
 UTF-8 without BOM, two-space indent, trailing newline): a rebuild from the same input
 is byte-identical. `check_items.py` exits 1 on any failure; without the hisnmuslim file
 it runs the structural checks only and prints a warning that the Arabic was not
-compared.
+compared (a path that is given but missing is a failure, not a warning). It also checks
+every `text/<lang>.json` present: exactly the 15 du'a ids, each with exactly its Arabic's
+keys (`morning`/`evening` for Hisn 77 and 78, `morning` for Hisn 90, `both` otherwise), no
+empty string, NFC, and typographic apostrophes only. A language may have no file
+(`AdhkarCatalogue.loadText` then returns null).
 
 ## Inputs
 
@@ -119,10 +125,23 @@ Allah’s forgiveness and I turn to Him in repentance." Every other English text
 OpenDua's as published. Left as published, for a reviewer to decide: Hisn 79's "I abide
 to Your covenant" and "the evil of which I have committed", and Hisn 90's "Ibraheem".
 
+**Translations** (bn, fr, id, tr, ur). OpenDua publishes English only, so the other five
+languages were drafted by Claude on 11 October 2026 from the Arabic, with OpenDua's
+English as a cross-check: "Allah" untranslated (আল্লাহ, اللہ), ﷺ after the Prophet's
+name, the language's usual word for رب, no explanatory additions, the Arabic's sentence
+boundaries, typographic apostrophes. They are drafts: `TRANSLATIONS-FOR-REVIEW.md` sets
+each one beside the Arabic and the English, with the choices a reviewer should weigh,
+and a language ships only after one reviewer has read it. The app bundles whatever is
+in `text/`, so before a release is cut, a language not yet reviewed has its file taken
+out (the check allows a missing language). A reviewer's corrections go straight into
+`text/<lang>.json`; `build_items.py` never writes those files. Indonesian is `id.json`
+only: the `values-in` twin is an Android resource rule, not a file rule. The Quran items
+need no entry; the app shows its own Quran translation for them.
+
 ## Updating to a new OpenDua release
 
-Change `DATA_VERSION` and `ATTRIBUTION` in both scripts (and the licence file), run the
-build with the new catalogue, then the check with a fresh copy of the hisnmuslim
-chapter. A repair OpenDua has fixed upstream stops the build; delete it from the table.
-A new difference from the hisnmuslim text stops the check; resolve it by the rule above
-and record it here.
+Change `DATA_VERSION` in `build_items.py` and `ATTRIBUTION` in both scripts (and the
+licence file), run the build with the new catalogue, then the check with a fresh copy of
+the hisnmuslim chapter. A repair OpenDua has fixed upstream stops the build; delete it
+from the table. A new difference from the hisnmuslim text stops the check; resolve it by
+the rule above and record it here.

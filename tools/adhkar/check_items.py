@@ -5,15 +5,20 @@
 The argument is hisnmuslim.com's chapter 27, "أذكار الصباح والمساء"
 (http://www.hisnmuslim.com/api/ar/27.json, UTF-8 with a BOM). It is a verification
 witness only: it carries no licence, so it is never checked in. Without it the
-structural checks still run and the text comparison is skipped with a warning.
-Exit status 1 on any failure.
+structural checks still run and the text comparison is skipped with a warning; a path
+that is given but does not exist is a failure. Exit status 1 on any failure.
 
 Structure (always): the 19 ids in the book's order with the spec's kind, sets, count,
 daily flag and Quran reference; 18 morning and 15 evening pages; sources from the nine
 known collections; every set of every du'a resolves to an Arabic text, a transliteration
 and an English translation (the 15 du'a ids, and only those, in text/en.json); no empty
 strings; every Arabic string carries tashkeel (U+064B-U+0652); the Arabic is OpenDua's,
-byte for byte (tools/adhkar/opendua-morning-evening.json).
+byte for byte (tools/adhkar/opendua-morning-evening.json); no file starts with a BOM.
+
+Languages (always): every text/<lang>.json present (a language may have no file) is
+{"language": "<lang>", "items": ...} carrying exactly the 15 du'a ids, each with exactly
+its Arabic's keys (morning/evening or both), no empty or padded string, every string NFC
+and no ASCII apostrophe (typographic ’ only).
 
 Text (with the witness): each du'a's morning or "both" Arabic is compared word by word,
 letter and mark, with the dhikr of the hisnmuslim entry of the same ID; the
@@ -48,7 +53,8 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 EXTRACT = os.path.join(HERE, "opendua-morning-evening.json")
 RESOURCES = os.path.join(ROOT, "shared", "src", "commonMain", "composeResources", "files", "adhkar")
 ITEMS_JSON = os.path.join(RESOURCES, "items.json")
-EN_JSON = os.path.join(RESOURCES, "text", "en.json")
+TEXT_DIR = os.path.join(RESOURCES, "text")
+EN_JSON = os.path.join(TEXT_DIR, "en.json")
 
 ATTRIBUTION = (
     "OpenDua dataset v0.0.4 (https://opendua.org), by Ihsan Labs at the Human Development Fund. "
@@ -146,7 +152,8 @@ def load(path):
         raw = f.read()
     if raw.startswith(b"\xef\xbb\xbf"):
         fail(f"{os.path.relpath(path, ROOT)} starts with a BOM")
-    return json.loads(raw.decode("utf-8"))
+    # utf-8-sig: the BOM is recorded above; reading past it lets the other checks still run.
+    return json.loads(raw.decode("utf-8-sig"))
 
 
 def walk_strings(value, where):
@@ -257,6 +264,40 @@ def check_structure(items_doc, en_doc, extract):
     if sorted(en_doc.get("items", {})) != sorted(dua_ids) or len(dua_ids) != 15:
         fail(f"en.json has {sorted(en_doc.get('items', {}))}, expected the 15 du'a ids {sorted(dua_ids)}")
     print(f"structure: {len(items)} items, {len(dua_ids)} du'a, {morning} morning pages, {evening} evening pages")
+
+
+def check_languages(items_doc, en_doc):
+    """Every text/<lang>.json present carries every du'a id with exactly its Arabic's keys."""
+    duas = {i["id"]: i for i in items_doc["items"] if i.get("kind") == "dua"}
+    languages = []
+    for name in sorted(n for n in os.listdir(TEXT_DIR) if n.endswith(".json")):
+        lang, where = name[:-len(".json")], f"text/{name}"
+        languages.append(lang)
+        doc = en_doc if lang == "en" else load(os.path.join(TEXT_DIR, name))
+        if lang != "en":  # check_structure has walked en.json already
+            walk_strings(doc, where)
+        if set(doc) != {"language", "items"} or doc.get("language") != lang:
+            fail(f"{where}: top level {sorted(doc)} language {doc.get('language')!r}, expected {lang!r}")
+        items = doc.get("items", {})
+        missing, extra = sorted(set(duas) - set(items)), sorted(set(items) - set(duas))
+        if missing or extra:
+            fail(f"{where}: missing du'a ids {missing}, ids that are not du'a {extra}")
+        for item_id, item in duas.items():
+            forms = items.get(item_id)
+            if forms is None:
+                continue
+            if not isinstance(forms, dict) or set(forms) != set(item["arabic"]):
+                fail(f"{where}: {item_id} keys {sorted(forms) if isinstance(forms, dict) else forms!r}, "
+                     f"expected the Arabic's {sorted(item['arabic'])}")
+                continue
+            for key, text in forms.items():  # walk_strings has reported empty and padded strings
+                if not isinstance(text, str):
+                    fail(f"{where}: {item_id} {key} is not a string")
+                elif unicodedata.normalize("NFC", text) != text:
+                    fail(f"{where}: {item_id} {key} is not NFC")
+                elif "'" in text:
+                    fail(f"{where}: {item_id} {key} has an ASCII apostrophe; use ’")
+    print(f"languages: {' '.join(languages)}; each file present carries the {len(duas)} du'a ids with their Arabic's keys")
 
 
 def check_evening_marks(item_id, arabic):
@@ -372,12 +413,15 @@ def main():
         return 2
     items_doc, en_doc, extract = load(ITEMS_JSON), load(EN_JSON), load(EXTRACT)
     check_structure(items_doc, en_doc, extract)
+    check_languages(items_doc, en_doc)
     witness = sys.argv[1] if len(sys.argv) == 2 else None
-    if witness and os.path.exists(witness):
-        check_witness(witness, items_doc)
+    if witness is None:
+        print("WARNING: hisnmuslim chapter JSON not given; the Arabic was NOT compared with the Hisn text")
+    elif not os.path.isfile(witness):
+        # A path that was meant to be checked against and is not there must not pass as a skipped check.
+        fail(f"hisnmuslim chapter JSON not found at {witness}; the Arabic was NOT compared with the Hisn text")
     else:
-        print(f"WARNING: hisnmuslim chapter JSON {'not found at ' + witness if witness else 'not given'}; "
-              "the Arabic was NOT compared with the Hisn text")
+        check_witness(witness, items_doc)
     print(f"check_items: {len(failures)} failure(s)")
     return 1 if failures else 0
 
