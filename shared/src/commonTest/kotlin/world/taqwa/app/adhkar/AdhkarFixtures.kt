@@ -31,8 +31,8 @@ internal val ITEMS_JSON = """{
           "number": "2:255"
         },
         {
-          "collection": "nasai",
-          "number": "al-Kubra 10731"
+          "collection": "nasai_kubra",
+          "number": "10731"
         },
         {
           "collection": "hakim",
@@ -334,8 +334,8 @@ internal val ITEMS_JSON = """{
           "number": "15360"
         },
         {
-          "collection": "nasai",
-          "number": "al-Kubra 9743"
+          "collection": "nasai_kubra",
+          "number": "9743"
         }
       ],
       "transliteration": {
@@ -380,8 +380,8 @@ internal val ITEMS_JSON = """{
       ],
       "sources": [
         {
-          "collection": "nasai",
-          "number": "ʿAmal al-Yawm 24"
+          "collection": "nasai_amal",
+          "number": "24"
         },
         {
           "collection": "abu_dawud",

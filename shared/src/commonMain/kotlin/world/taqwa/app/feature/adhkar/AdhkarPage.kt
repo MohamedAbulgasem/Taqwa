@@ -34,6 +34,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.adhkar.QuranPrefix
@@ -61,6 +62,8 @@ import world.taqwa.app.resources.source_hakim
 import world.taqwa.app.resources.source_ibn_majah
 import world.taqwa.app.resources.source_muslim
 import world.taqwa.app.resources.source_nasai
+import world.taqwa.app.resources.source_nasai_amal
+import world.taqwa.app.resources.source_nasai_kubra
 import world.taqwa.app.resources.source_quran
 import world.taqwa.app.resources.source_tirmidhi
 
@@ -281,6 +284,11 @@ internal fun pageLabel(page: AdhkarPageUi): String {
  * "Abu Dawud 5088 · Tirmidhi 3388": each collection by its name in the interface language, each
  * number with the interface's digits. A collection this build has no name for is shown as the
  * file spells it rather than dropped — a reference is never silently lost.
+ *
+ * The number is only ever digits and reference punctuation ("2:255", "1/562"): anything in words
+ * would reach an Arabic, Urdu or Bengali line in Latin letters, so a book cited beside its author
+ * is a collection of its own (`nasai_kubra`, an-Nasa'i's as-Sunan al-Kubra), named in every
+ * language. `AdhkarReferencesTest` holds the bundled file to both rules.
  */
 @Composable
 internal fun referenceLine(sources: List<Source>): String {
@@ -295,17 +303,22 @@ internal fun referenceLine(sources: List<Source>): String {
 }
 
 @Composable
-private fun sourceName(collection: String): String = when (collection) {
-    "quran" -> stringResource(Res.string.source_quran)
-    "bukhari" -> stringResource(Res.string.source_bukhari)
-    "muslim" -> stringResource(Res.string.source_muslim)
-    "abu_dawud" -> stringResource(Res.string.source_abu_dawud)
-    "tirmidhi" -> stringResource(Res.string.source_tirmidhi)
-    "ibn_majah" -> stringResource(Res.string.source_ibn_majah)
-    "nasai" -> stringResource(Res.string.source_nasai)
-    "hakim" -> stringResource(Res.string.source_hakim)
-    "ahmad" -> stringResource(Res.string.source_ahmad)
-    else -> collection
+private fun sourceName(collection: String): String = sourceNameRes(collection)?.let { stringResource(it) } ?: collection
+
+/** The name of a collection as `items.json` spells it (`abu_dawud`), or null for one this build does not know. */
+internal fun sourceNameRes(collection: String): StringResource? = when (collection) {
+    "quran" -> Res.string.source_quran
+    "bukhari" -> Res.string.source_bukhari
+    "muslim" -> Res.string.source_muslim
+    "abu_dawud" -> Res.string.source_abu_dawud
+    "tirmidhi" -> Res.string.source_tirmidhi
+    "ibn_majah" -> Res.string.source_ibn_majah
+    "nasai" -> Res.string.source_nasai
+    "nasai_kubra" -> Res.string.source_nasai_kubra
+    "nasai_amal" -> Res.string.source_nasai_amal
+    "hakim" -> Res.string.source_hakim
+    "ahmad" -> Res.string.source_ahmad
+    else -> null
 }
 
 /** The du'a's Arabic sits this far under the reader's Arabic size (spec §3.2). */

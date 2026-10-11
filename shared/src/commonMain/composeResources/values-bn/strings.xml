@@ -648,6 +648,9 @@
     <string name="source_tirmidhi">তিরমিযী</string>
     <string name="source_ibn_majah">ইবনে মাজাহ</string>
     <string name="source_nasai">নাসাঈ</string>
+    <!-- an-Nasa’i’s as-Sunan al-Kubra and ʿAmal al-Yawm wa-l-Layla, each numbered on its own: the book is part of the name, so the reference line’s number is digits only (“নাসাঈ, আস-সুনানুল কুবরা 10731”). -->
+    <string name="source_nasai_kubra">নাসাঈ, আস-সুনানুল কুবরা</string>
+    <string name="source_nasai_amal">নাসাঈ, আমালুল ইয়াওমি ওয়াল লাইলাহ</string>
     <string name="source_hakim">হাকিম</string>
     <string name="source_ahmad">আহমাদ</string>
     <string name="adhkar_done_morning">সকালের আযকার · সম্পন্ন</string>

@@ -389,7 +389,7 @@ typographic apostrophes; Bengali in NFC. Keys: `prayer_open_adhkar`, `adhkar_mor
 `adhkar_window_evening`, `adhkar_done_morning`, `adhkar_done_evening`, `adhkar_next_evening`,
 `adhkar_next_morning`, `adhkar_back`, `adhkar_reading`, `adhkar_translation`, `adhkar_of`,
 `adhkar_a11y_count`, `adhkar_opens_at`, `source_bukhari`, `source_muslim`, `source_abu_dawud`,
-`source_tirmidhi`, `source_ibn_majah`, `source_nasai`, `source_hakim`, `source_ahmad`,
+`source_tirmidhi`, `source_ibn_majah`, `source_nasai`, `source_nasai_kubra`, `source_nasai_amal`, `source_hakim`, `source_ahmad`,
 `notifications_adhkar`, `notifications_adhkar_detail`, `prayer_times_time_format`,
 `time_format_24`, `time_format_12`, `credit_adhkar`, `credit_adhkar_detail`. `tasbeeh_hint` is reused. The translations are mine and
 are listed for Mohamed's review in the report.
