@@ -9,10 +9,10 @@ bunları denetler. Her bloğu konsola olduğu gibi kopyalayın.
 Taqwa: Namaz, Kur’an ve Kıble
 
 ### Short description (80)
-Namaz vakitleri, ezan, tilavetli Kur’an’ın tamamı, Kıble. Ücretsiz, çevrimdışı.
+Namaz vakitleri, ezan, tilavetli Kur’an, zikirler, Kıble. Çevrimdışı çalışır.
 
 ### Full description (4000)
-Taqwa, günün temel ihtiyaçlarını tek bir sakin yerde toplar: bulunduğunuz yerin namaz vakitleri, her vakitte bir tekbir ya da ezanın ilk saniyeleri, okumak ve dinlemek için Kur’an’ın tamamı ve Kıble. Çevrimdışı çalışır, hiçbir ücret istemez, reklam göstermez ve hesap açtırmaz.
+Taqwa, günün temel ihtiyaçlarını tek bir sakin yerde toplar: bulunduğunuz yerin namaz vakitleri, her vakitte bir tekbir ya da ezanın ilk saniyeleri, okumak ve dinlemek için Kur’an’ın tamamı, sabah ve akşam zikirleri ve Kıble. Çevrimdışı çalışır, hiçbir ücret istemez, reklam göstermez ve hesap açtırmaz.
 
 NAMAZ VAKİTLERİ
 • Telefonunuzun konumundan ya da 34.000’den fazla şehir arasından seçeceğiniz bir şehirden, bulunduğunuz yere göre vakitler.
@@ -21,6 +21,7 @@ NAMAZ VAKİTLERİ
 • Gecenin alışılmış açılar için fazla kısa kaldığı yüksek enlemler için kurallar.
 • Her namaz için bir bildirim: net bir uyarı tonu, bir tekbir ya da farklı seslerden birinin okuduğu ezanın ilk saniyeleri; dilerseniz öncesinde bir hatırlatmayla.
 • Cuma günleri öğle vaktinde Cuma etiketi, günün vakitlerini ve sonraki vakte geri sayımı gösteren ana ekran widget’ları, miladi tarihin yanında hicri tarih.
+• Tercihinize göre 24 saat ya da 12 saat biçimi.
 
 KUR’AN
 • Medine Mushafı ile aynı hatta eksiksiz Osmanî metin; basılı Mushaf’tan okur gibi okumak istediğinizde geleneksel sayfa düzeni.
@@ -34,6 +35,10 @@ KUR’AN
 KIBLE
 • Mekke’yi gösteren bir pusula; açı ve mesafeyle birlikte, telefonun pusulasına güvenilemediğinde de dürüst bir uyarı.
 
+ZİKİRLER
+• Sabah ve akşam zikirleri Arapça aslıyla ve dilinizdeki çevirisiyle; her birinin tekrarları ekranda sayılır.
+• Kur’an’dan olanları seçtiğiniz karinin sesinden dinleyin; dilerseniz sabah ve akşam için birer hatırlatma kurun.
+
 TESBİH
 • Namaz sonrası tesbihatı hazır gelen bir zikir sayacı.
 
@@ -45,7 +50,7 @@ GÜVENİLMEK İÇİN YAPILDI
 
 Türkçe, Arapça, İngilizce, Fransızca, Endonezce, Urduca ve Bengalce olarak sunulur.
 
-Namaz vakitleri Taqwa’nın kendi motoruyla hesaplanır; Kıble yönü Adhan kütüphanesiyle. Kur’an metni Tanzil Projesi’nden. Tilavetler, karilerin ücretsiz dağıtım için lisansladığı Islamic Network kayıtlarından. Taqwa’nın, takvimlerini izlediği dinî kurumlarla bir bağı yoktur.
+Namaz vakitleri Taqwa’nın kendi motoruyla hesaplanır; Kıble yönü Adhan kütüphanesiyle. Kur’an metni Tanzil Projesi’nden. Zikir metinleri OpenDua’dan. Tilavetler, karilerin ücretsiz dağıtım için lisansladığı Islamic Network kayıtlarından. Taqwa’nın, takvimlerini izlediği dinî kurumlarla bir bağı yoktur.
 
 Web sitesi: https://taqwa.world/tr/
 Destek: support@taqwa.world
@@ -71,7 +76,7 @@ Ezan ve zikirmatik, reklamsız
 (From the next version. In 1.0.0: "Namaz vakitleri, Kur’an, Kıble". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
-Camilerinizin takvimine göre namaz vakitleri; Taqwa takvime sahipse gün gün karşılaştırılır. Ezan, tilavetli Kur’an’ın tamamı ve Kıble. Ücretsiz, reklamsız.
+Camilerinizin takvimine göre namaz vakitleri; Taqwa takvime sahipse gün gün karşılaştırılır. Ezan, tilavetli Kur’an, sabah ve akşam zikirleri ve Kıble.
 
 (Proposal of 29 September, the owner's to take or leave; editable at any time. Until then: "Bulunduğunuz yerin namaz vakitleri, vakti gelince ezan, okumak ve dinlemek için Kur’an’ın tamamı ve Kıble. Ücretsiz, çevrimdışı, hesapsız ve reklamsız.")
 
@@ -86,7 +91,12 @@ kuran,vakitleri,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,islam,m�
 (Yukarıdaki Play tam açıklamasıyla aynı metin.)
 
 ### What's new (4000)
-İlk sürüm.
+1.1.0 sürümündeki yenilikler:
+• Sabah ve akşam zikirleri: ekranda sayın, Kur’an’dan olanları seçtiğiniz karinin sesinden dinleyin, dilerseniz hatırlatma kurun
+• Ayarlar’da 12 saat biçimi
+• Namaz vakitleri Suudi Arabistan, Kazakistan, Filistin, Suriye, Kuzey Amerika ve daha birçok yerde şehrinizin kendi takvimini daha yakından izliyor
+• Taqwa’yı Ayarlar’dan değerlendirin ve paylaşın
+• Daha anlaşılır ifadeler; mesafeler de dilinizdeki sayı yazımıyla gösteriliyor
 
 ## Screenshot captions (her biri tek kısa satır, çerçeveli ekran görüntüsünün üstünde)
 1. Bulunduğunuz yerin namaz vakti

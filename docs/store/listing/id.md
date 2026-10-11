@@ -6,10 +6,10 @@
 Taqwa: Salat, Qur’an & Kiblat
 
 ### Short description (80)
-Waktu salat, azan, Al-Qur’an 30 juz dengan tilawah, dan kiblat. Gratis, offline.
+Waktu salat, azan, Al-Qur’an dengan tilawah, zikir, dan kiblat. Tanpa internet.
 
 ### Full description (4000)
-Taqwa menghadirkan hal-hal pokok dalam hari Anda di satu tempat yang tenang: waktu salat di tempat Anda berada, takbir atau awal azan pada setiap salat, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Berfungsi offline, tidak berbayar, tanpa iklan, dan tidak meminta akun.
+Taqwa menghadirkan hal-hal pokok dalam hari Anda di satu tempat yang tenang: waktu salat di tempat Anda berada, takbir atau awal azan pada setiap salat, Al-Qur’an lengkap untuk dibaca dan didengarkan, zikir pagi dan petang, serta kiblat. Berfungsi offline, tidak berbayar, tanpa iklan, dan tidak meminta akun.
 
 WAKTU SALAT
 • Waktu untuk tempat Anda berada, dari lokasi ponsel Anda atau dari kota yang Anda pilih di antara lebih dari 34.000 kota.
@@ -18,6 +18,7 @@ WAKTU SALAT
 • Aturan untuk lintang tinggi, ketika malam terlalu pendek untuk sudut yang biasa.
 • Notifikasi untuk setiap salat: nada yang jelas, takbir, atau awal azan dalam beberapa pilihan suara, dengan pengingat sebelumnya bila Anda mau.
 • Tanda Jumat pada Dzuhur hari Jumat, widget layar utama dengan waktu salat hari ini dan hitung mundur ke salat berikutnya, serta tanggal Hijriah di samping tanggal Masehi.
+• Format waktu 24 jam atau 12 jam, sesuai pilihan Anda.
 
 AL-QUR’AN
 • Teks Utsmani lengkap, dengan huruf yang sama seperti Mushaf Madinah, serta tata letak halaman tradisional ketika Anda ingin membaca seperti dari Mushaf cetak.
@@ -31,6 +32,10 @@ AL-QUR’AN
 KIBLAT
 • Kompas yang menunjuk ke Makkah, dengan arah dan jarak, serta penjelasan yang jujur ketika kompas ponsel tidak bisa dipercaya.
 
+ZIKIR
+• Zikir pagi dan petang dalam bahasa Arab, dengan terjemahan dalam bahasa Anda, masing-masing dihitung di layar.
+• Ayat Al-Qur’an di dalamnya dibacakan qari pilihan Anda, dan setiap rangkaian bisa diberi pengingat bila Anda mau.
+
 TASBIH
 • Penghitung zikir dengan rangkaian zikir setelah salat yang sudah tersedia di dalamnya.
 
@@ -42,7 +47,7 @@ DIBUAT UNTUK DIPERCAYA
 
 Tersedia dalam bahasa Inggris, Arab, Prancis, Turki, Indonesia, Urdu, dan Bengali.
 
-Waktu salat dari mesin milik Taqwa sendiri; arah kiblat memakai pustaka Adhan. Teks Al-Qur’an dari Tanzil Project. Tilawah dari Islamic Network, dilisensikan oleh para qari untuk penyebaran gratis. Taqwa tidak berafiliasi dengan otoritas keagamaan yang jadwalnya diikutinya.
+Waktu salat dari mesin milik Taqwa sendiri; arah kiblat memakai pustaka Adhan. Teks Al-Qur’an dari Tanzil Project. Teks zikir dari OpenDua. Tilawah dari Islamic Network, dilisensikan oleh para qari untuk penyebaran gratis. Taqwa tidak berafiliasi dengan otoritas keagamaan yang jadwalnya diikutinya.
 
 Situs web: https://taqwa.world/id/
 Dukungan: support@taqwa.world
@@ -68,7 +73,7 @@ Azan & tasbih, tanpa iklan
 (From the next version. In 1.0.0: "Waktu Salat, Al-Qur’an, Kiblat". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
-Waktu salat menurut jadwal masjid Anda, dicocokkan hari demi hari jika Taqwa memiliki jadwalnya. Azan, Al-Qur’an lengkap dengan tilawah, dan kiblat. Gratis, tanpa iklan.
+Waktu salat menurut jadwal masjid Anda, dicocokkan hari demi hari jika Taqwa memiliki jadwalnya. Azan, Al-Qur’an dengan tilawah, zikir pagi dan petang, serta kiblat.
 
 (Proposal of 29 September, the owner's to take or leave; editable at any time. Until then: "Waktu salat di tempat Anda berada, azan saat waktunya tiba, Al-Qur’an lengkap untuk dibaca dan didengarkan, serta kiblat. Gratis, offline, tanpa akun, dan tanpa iklan.")
 
@@ -83,7 +88,12 @@ sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,masjid,arah,isla
 (Teks yang sama dengan deskripsi lengkap Play di atas.)
 
 ### What's new (4000)
-Rilis pertama.
+Yang baru di versi 1.1.0:
+• Zikir pagi dan petang: hitung di layar, dengarkan ayat Al-Qur’an di dalamnya dengan suara qari pilihan Anda, dan pasang pengingat bila Anda mau
+• Format waktu 12 jam, di Pengaturan
+• Waktu salat kini lebih sesuai dengan jadwal kota Anda sendiri di Arab Saudi, Kazakhstan, Palestina, Suriah, Amerika Utara, dan lainnya
+• Beri nilai dan bagikan Taqwa dari Pengaturan
+• Kata-kata yang lebih jelas, dan angka jarak ditulis sesuai bahasa Anda
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Waktu salat di tempat Anda

@@ -9,30 +9,35 @@ les vérifie. Copiez chaque bloc tel quel dans la console.
 Taqwa : Prière, Coran & Qibla
 
 ### Short description (80)
-Horaires de prière, adhan, Coran entier récité, qibla. Gratuit, hors ligne.
+Horaires de prière, adhan, Coran récité, adhkar et qibla. Fonctionne hors ligne.
 
 ### Full description (4000)
-Taqwa réunit l’essentiel de la journée en un seul endroit paisible : des horaires de prière là où vous êtes, un takbir ou le début de l’adhan à chaque prière, le Coran entier à lire et à écouter, et la qibla. Elle fonctionne hors ligne, ne coûte rien, n’affiche aucune publicité et ne demande aucun compte.
+Taqwa réunit l’essentiel de la journée en un seul endroit paisible : des horaires de prière là où vous êtes, un takbir ou le début de l’adhan à chaque prière, le Coran entier à lire et à écouter, les adhkar du matin et du soir, et la qibla. Elle fonctionne hors ligne, ne coûte rien, n’affiche aucune publicité et ne demande aucun compte.
 
 HORAIRES DE PRIÈRE
-• Les horaires pour votre position, depuis la localisation de votre téléphone ou une ville que vous choisissez parmi plus de 34 000.
+• Les horaires là où vous êtes, par la localisation du téléphone ou une ville parmi plus de 34 000.
 • Les horaires du calendrier que suivent les mosquées proches de chez vous. Là où Taqwa le détient, elle le reproduit et le vérifie jour après jour d’après les tableaux publiés : pour chaque jour vérifié, aucune prière ne commence avant l’heure publiée. Là où un calendrier n’est pas encore entièrement vérifié, Taqwa ajoute une marge de sécurité ; là où les mosquées suivent des calendriers différents, elle affiche des horaires par précaution, chaque prière une fois que tous l’ont commencée ; et là où aucun calendrier n’est connu, elle calcule avec prudence.
-• Touchez le (i) sur l’écran Prière pour voir de qui viennent ces horaires, et « À propos de ces horaires » pour savoir comment ils sont établis et vérifiés. « Aligner sur ma mosquée » cherche le calendrier de votre mosquée à partir de deux horaires de son tableau, et les méthodes de calcul habituelles (Ligue islamique mondiale, égyptienne, Karachi, ISNA et d’autres) ainsi qu’un ajustement par prière sont aussi proposés.
+• Le (i) de l’écran Prière indique de qui viennent ces horaires, et « À propos de ces horaires », comment ils sont établis et vérifiés. « Aligner sur ma mosquée » cherche le calendrier de votre mosquée d’après deux horaires de son tableau ; les méthodes de calcul habituelles (Ligue islamique mondiale, égyptienne, Karachi, ISNA…) et un ajustement par prière sont aussi proposés.
 • Des règles pour les hautes latitudes, où la nuit est trop courte pour les angles habituels.
-• Une notification pour chaque prière : une tonalité claire, un takbir ou le début de l’adhan, avec plusieurs voix au choix, et un rappel facultatif avant.
-• Une pastille Joumou’a sur le Dhuhr du vendredi, des widgets sur l’écran d’accueil avec les horaires du jour et le compte à rebours jusqu’à la prochaine prière, et la date hégirienne à côté de la date grégorienne.
+• Une notification pour chaque prière : une tonalité claire, un takbir ou le début de l’adhan, en plusieurs voix au choix, et un rappel facultatif avant.
+• Une pastille Joumou’a sur le Dhuhr du vendredi, des widgets d’écran d’accueil avec les horaires du jour et le compte à rebours de la prochaine prière, et la date hégirienne à côté de la grégorienne.
+• Le format 24 ou 12 heures, au choix.
 
 LE CORAN
-• Le texte othmanien complet, dans la même graphie que le Mushaf de Médine, avec la mise en page traditionnelle quand vous voulez lire comme dans le Mushaf imprimé.
-• Des traductions en anglais, français, turc, indonésien, ourdou et bengali, ainsi qu’un tafsir en arabe, affichées sous chaque verset.
-• La recherche dans le texte arabe et dans les traductions.
+• Le texte othmanien complet, dans la graphie du Mushaf de Médine, avec la mise en page traditionnelle pour lire comme dans le Mushaf imprimé.
+• Des traductions en anglais, français, turc, indonésien, ourdou et bengali, et un tafsir en arabe, sous chaque verset.
+• La recherche dans le texte arabe et les traductions.
 • Des signets, la copie et le partage, et une carte qui vous ramène là où vous vous êtes arrêté.
-• La récitation par dix récitateurs, téléchargée une fois par sourate et lue hors ligne, avec les commandes de l’écran verrouillé ; quand une sourate se termine, la suivante enchaîne.
-• Pendant la récitation, la voix de votre téléphone peut lire à voix haute la traduction ou le tafsir après chaque verset, si le téléphone dispose d’une voix pour cette langue.
+• La récitation par dix récitateurs, téléchargée une fois par sourate et lue hors ligne, avec les commandes de l’écran verrouillé ; à la fin d’une sourate, la suivante enchaîne.
+• Pendant la récitation, la voix du téléphone peut lire la traduction ou le tafsir après chaque verset, s’il a une voix pour cette langue.
 • Un widget du verset du jour.
 
 QIBLA
-• Une boussole pointant vers La Mecque, avec l’azimut et la distance, et un mot honnête quand la boussole du téléphone n’est pas fiable.
+• Une boussole pointant vers La Mecque, avec l’azimut et la distance, et un mot honnête quand celle du téléphone n’est pas fiable.
+
+ADHKAR
+• Les adhkar du matin et du soir en arabe, traduits dans votre langue et comptés à l’écran.
+• Ceux du Coran récités par votre récitateur, et un rappel pour chaque série si vous voulez.
 
 TASBIH
 • Un compteur de dhikr, avec la série d’après la prière intégrée.
@@ -40,12 +45,12 @@ TASBIH
 CONÇUE POUR ÊTRE DIGNE DE CONFIANCE
 • Sans compte, sans publicité, sans mesure d’audience et sans suivi d’aucune sorte.
 • Votre position sert, sur votre téléphone, à calculer les horaires, et n’est jamais envoyée nulle part.
-• Internet ne sert qu’à la récitation : l’audio que vous demandez, et une vérification quotidienne de la liste des récitateurs une fois que vous l’avez utilisée.
-• Gratuite et libre sous licence GPL, chaque source et chaque licence étant créditées dans l’application.
+• Internet ne sert qu’à la récitation : l’audio demandé et, dès lors, une vérification quotidienne de la liste des récitateurs.
+• Gratuite et libre (GPL), avec chaque source et licence créditée dans l’application.
 
 Disponible en anglais, arabe, français, turc, indonésien, ourdou et bengali.
 
-Horaires de prière calculés par le moteur propre à Taqwa ; la direction de la qibla utilise la bibliothèque Adhan. Texte du Coran du Projet Tanzil. Récitations de l’Islamic Network, concédées par les récitateurs pour une diffusion gratuite. Taqwa n’est pas affiliée aux autorités religieuses dont elle suit les calendriers.
+Horaires calculés par le moteur propre à Taqwa ; direction de la qibla par la bibliothèque Adhan. Texte du Coran du Projet Tanzil. Textes des adhkar d’OpenDua. Récitations de l’Islamic Network, concédées par les récitateurs pour une diffusion gratuite. Taqwa n’est pas affiliée aux autorités religieuses dont elle suit les calendriers.
 
 Site web : https://taqwa.world/fr/
 Assistance : support@taqwa.world
@@ -71,7 +76,7 @@ Adhan & tasbih, sans publicité
 (From the next version. In 1.0.0: "Prière, Coran & Qibla". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
-Les horaires du calendrier de vos mosquées, vérifiés jour après jour là où Taqwa le détient. L’adhan, le Coran entier récité, et la qibla. Gratuit, sans publicité.
+Les horaires du calendrier de vos mosquées, vérifiés jour après jour là où Taqwa le détient. L’adhan, le Coran récité, les adhkar du matin et du soir, et la qibla.
 
 (Proposal of 29 September, the owner's to take or leave; editable at any time. Until then: "Les horaires de prière là où vous êtes, l’adhan quand ils arrivent, le Coran entier à lire et à écouter, et la qibla. Gratuit, hors ligne, sans compte ni publicité.")
 
@@ -86,7 +91,12 @@ horaires,salat,azan,quran,mushaf,mosquée,islam,musulman,récitation,chapelet,dh
 (Le même texte que la description complète Play ci-dessus.)
 
 ### What's new (4000)
-Première version.
+Nouveautés de la 1.1.0 :
+• Adhkar du matin et du soir : comptez-les à l’écran, écoutez ceux du Coran par votre récitateur et activez un rappel si vous voulez
+• Le format 12 heures, dans les Paramètres
+• Des horaires plus proches du calendrier de votre ville en Arabie saoudite, au Kazakhstan, en Palestine, en Syrie, en Amérique du Nord et ailleurs
+• Notez et partagez Taqwa dans les Paramètres
+• Des textes plus clairs et des distances écrites comme dans votre langue
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Les horaires là où vous êtes

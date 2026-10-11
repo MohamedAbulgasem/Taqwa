@@ -9,10 +9,12 @@ enforces them. Copy each block into the console as it is.
 Taqwa: Prayer, Quran & Qibla
 
 ### Short description (80)
-Prayer times, adhan, the whole Quran with recitation, and Qibla. Free, offline.
+Prayer times, adhan, Quran with recitation, adhkar and Qibla. Works offline.
+
+(No price or promotion words here: Play flags them in the short description and may not promote the app.)
 
 ### Full description (4000)
-Taqwa gives you the essentials of the day in one quiet place: prayer times where you are, a takbir or the opening of the adhan at each prayer, the whole Quran to read and listen to, and the Qibla. It works offline, costs nothing, shows no adverts and asks for no account.
+Taqwa gives you the essentials of the day in one quiet place: prayer times where you are, a takbir or the opening of the adhan at each prayer, the whole Quran to read and listen to, the morning and evening adhkar, and the Qibla. It works offline, costs nothing, shows no adverts and asks for no account.
 
 PRAYER TIMES
 • Times for where you are, from your phone's location or a city you choose from more than 34,000.
@@ -21,6 +23,7 @@ PRAYER TIMES
 • Rules for high latitudes, where the night is too short for the usual angles.
 • A notification for each prayer: a clear tone, a takbir, or the opening of the adhan in a choice of voices, with an optional reminder before it.
 • A Jumu'ah pill on Friday's Dhuhr, home-screen widgets with today's times and the countdown to the next prayer, and the Hijri date alongside the Gregorian one.
+• A 24-hour or 12-hour clock, as you prefer.
 
 THE QURAN
 • The complete Uthmani text, in the same script as the Madinah Mushaf, with the traditional page layout when you want to read as from the printed Mushaf.
@@ -34,6 +37,10 @@ THE QURAN
 QIBLA
 • A compass pointing to Makkah, with the bearing and distance, and an honest word when the phone's compass cannot be trusted.
 
+ADHKAR
+• The morning and evening adhkar in Arabic, with a translation in your language, each counted on screen.
+• The Quranic ones recited by your chosen reciter, and a reminder for each set if you want one.
+
 TASBEEH
 • A dhikr counter with the post-prayer set built in.
 
@@ -45,7 +52,7 @@ MADE TO BE TRUSTED
 
 Available in English, Arabic, French, Turkish, Indonesian, Urdu and Bengali.
 
-Prayer times from Taqwa's own engine; the Qibla bearing uses the Adhan library. Quran text from the Tanzil Project. Recitations from the Islamic Network, licensed by the reciters for free distribution. Taqwa is not affiliated with the religious authorities whose timetables it follows.
+Prayer times from Taqwa's own engine; the Qibla bearing uses the Adhan library. Quran text from the Tanzil Project. Adhkar texts from OpenDua. Recitations from the Islamic Network, licensed by the reciters for free distribution. Taqwa is not affiliated with the religious authorities whose timetables it follows.
 
 Website: https://taqwa.world
 Support: support@taqwa.world
@@ -71,7 +78,7 @@ Muslim Adhan & Tasbeeh, No Ads
 (From the next version. In 1.0.0: "Prayer times, Quran & Qibla". Names and subtitles change only with a new version.)
 
 ### Promotional text (170)
-Prayer times from the timetable your mosques follow, checked day by day where Taqwa holds it. The adhan, the whole Quran with recitation, and the Qibla. Free, no ads.
+Prayer times from the timetable your mosques follow, checked day by day where Taqwa holds it. The adhan, the Quran with recitation, morning and evening adhkar, the Qibla.
 
 (Proposal of 29 September, the owner's to take or leave; editable at any time, even after release. Until then: "Prayer times where you are, the adhan when they arrive, the whole Quran to read and listen to, and the Qibla. Free, offline, no account and no adverts.")
 
@@ -86,7 +93,12 @@ times,salah,salat,azan,athan,koran,islam,recitation,tasbih,mosque,dhikr,ramadan,
 (The same text as the Play full description above.)
 
 ### What's new (4000)
-First release.
+What's new in 1.1.0:
+• Morning and evening adhkar: count them on screen, hear the Quranic ones from your reciter, and set a reminder if you like
+• A 12-hour clock, in Settings
+• Prayer times follow your own city's timetable more closely in Saudi Arabia, Kazakhstan, Palestine, Syria, North America and more
+• Rate and share Taqwa from Settings
+• Clearer wording, and distances written the way your language writes numbers
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are
