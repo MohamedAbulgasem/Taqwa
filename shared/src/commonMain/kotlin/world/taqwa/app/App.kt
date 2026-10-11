@@ -242,7 +242,7 @@ fun App(container: AppContainer) {
                 // A location save no longer writes a calculation method (spec §8): the never-early
                 // engine's Automatic timetable already follows the resolved place on its own.
                 // The alarms and widgets armed for the old place follow it now (ruling R53).
-                refreshForNewTimes(container, settings, platformFormat)
+                refreshForNewTimes(container, settings)
             }
         }
     }

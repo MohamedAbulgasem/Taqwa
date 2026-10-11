@@ -52,8 +52,6 @@ import world.taqwa.app.feature.settings.timetableName
 import world.taqwa.app.feature.settings.aboutTimesUiState
 import world.taqwa.app.feature.settings.themeDisplayName
 import world.taqwa.app.i18n.ClockFormat
-import world.taqwa.app.i18n.LocalPlatformFormat
-import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.timetableDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
@@ -209,13 +207,13 @@ internal fun NotificationSettingsRoute(
  * change, are computed off the main thread (the coordinator plans on the default dispatcher, and
  * so does the mirror here).
  */
-internal suspend fun refreshForNewTimes(container: AppContainer, settings: SettingsRepository, format: PlatformFormat) {
+internal suspend fun refreshForNewTimes(container: AppContainer, settings: SettingsRepository) {
     newTimesRefresh.withLock {
         container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
         withContext(Dispatchers.Default) {
-            // Null, not the caller's [format]: that is the composition's, rebuilt on a new clock
-            // format only a frame after the write that just happened, so it can still be the old
-            // one. Null builds the mirror's from the stored setting, which is always current.
+            // Null, not the composition's format: that is rebuilt on a new clock format only a
+            // frame after the write that just happened, so it can still be the old one. Null
+            // builds the mirror's from the stored setting, which is always current.
             WidgetMirrorRefresher.refresh(settings, container.prayerTimesEngine, format = null)
         }
         refreshWidgets()
@@ -243,12 +241,11 @@ internal fun PrayerTimesSettingsRoute(
     val prayerSettings by prayerSettingsState
     val location by locationState
     val cityDisplayName by cityDisplayNameState
-    val format = LocalPlatformFormat.current
     val clockFormat by settings.clockFormat.collectAsState(initial = ClockFormat.TWENTY_FOUR_HOUR)
     fun write(change: suspend () -> Unit) {
         scope.launch {
             change()
-            refreshForNewTimes(container, settings, format)
+            refreshForNewTimes(container, settings)
         }
     }
     // Today's day as the Prayer screen has it (the engine's cache already holds it): what applies
@@ -348,7 +345,6 @@ internal fun HighLatitudePickerRoute(
 ) {
     val prayerSettings by prayerSettingsState
     val location by locationState
-    val format = LocalPlatformFormat.current
     val screenScope = rememberCoroutineScope()
     val current = prayerSettings.legacyHighLatitude ?: HighLatitudePreference.AUTOMATIC
     val timetable = prayerSettings.timetable
@@ -367,7 +363,7 @@ internal fun HighLatitudePickerRoute(
                     if (confirmed) {
                         settings.setTimetableConfirmed(timetable, location?.let { container.prayerTimesEngine.automaticEntryId(it) })
                     }
-                    refreshForNewTimes(container, settings, format)
+                    refreshForNewTimes(container, settings)
                 }
                 navigator.pop()
             },
@@ -398,7 +394,6 @@ internal fun ManualAdjustmentsRoute(
 ) {
     val prayerSettings by prayerSettingsState
     val location by locationState
-    val format = LocalPlatformFormat.current
     val state = location?.let { AdjustmentsState.of(container.prayerTimesEngine.dayFor(it, today, prayerSettings), prayerSettings, TimeZone.of(it.timeZoneId)) }
         ?: AdjustmentsState()
     ManualAdjustmentsScreen(
@@ -408,7 +403,7 @@ internal fun ManualAdjustmentsRoute(
         onSet = { prayer, minutes, confirmUnder ->
             scope.launch {
                 settings.setMinuteAdjustment(prayer, minutes, confirmUnder)
-                refreshForNewTimes(container, settings, format)
+                refreshForNewTimes(container, settings)
             }
         },
         onOpenTimetable = { navigator.push(Screen.Timetable) },
@@ -453,7 +448,6 @@ internal fun CitySearchRoute(
 ) {
     val backStack by backStackState
     var onboardingStep by onboardingStepState
-    val format = LocalPlatformFormat.current
     CitySearchScreen(
         cityRepository = container.cityRepository,
         onPick = { city ->
@@ -474,7 +468,7 @@ internal fun CitySearchRoute(
                 // A location save no longer writes a calculation method (spec §8): the
                 // never-early engine's Automatic timetable already follows the picked city.
                 // The alarms and widgets armed for the old city follow it now (ruling R53).
-                refreshForNewTimes(container, settings, format)
+                refreshForNewTimes(container, settings)
             }
             // Reached from onboarding, a successful pick answers the location
             // question, so the flow continues rather than re-asking it.

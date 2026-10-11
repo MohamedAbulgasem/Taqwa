@@ -88,7 +88,7 @@ internal fun TodayRoute(
             cityRepository = container.cityRepository,
             format = platformFormat,
             // A backfilled country or region can change the timetable (ruling R53).
-            onLocationBackfilled = { refreshForNewTimes(container, settings, platformFormat) },
+            onLocationBackfilled = { refreshForNewTimes(container, settings) },
             // A language change swaps the view model; without this the
             // new one would start at Loading and blank the whole screen
             // until its first refresh landed.
