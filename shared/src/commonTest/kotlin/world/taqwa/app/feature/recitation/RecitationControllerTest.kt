@@ -2385,4 +2385,95 @@ class RecitationControllerTest {
             assertEquals(1, harness.player.pauses)
             assertEquals(2, harness.player.plays)
         }
+
+    @Test
+    fun `an ordinary play while the clip is still being read abandons the clip before it sounds`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(37))
+            harness.bundleKursi()
+            val gate = CompletableDeferred<Unit>()
+            harness.adhkarClips.gate = gate
+            val controller = controller(harness, backgroundScope)
+            controller.playKursi()
+
+            // An ordinary play arrives while the clip's bytes are still being read: there is no
+            // clip playing yet for it to end, but the clip is over all the same.
+            controller.requestPlay(37, 1)
+            gate.complete(Unit)
+
+            assertEquals(0, harness.clips.played)
+            assertEquals(0, harness.player.pauses)
+            assertTrue(harness.player.state.value.playing)
+            assertEquals(37, harness.player.state.value.surah)
+            assertFalse(controller.adhkarPlaying.value)
+            assertNull(controller.state.value.sheet)
+        }
+
+    @Test
+    fun `a clip after an abandoned one does not resume the surah the reader paused`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(36, 37))
+            harness.bundleKursi()
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(36, 1)
+            // The clip pauses 36, then an ordinary play abandons the clip, and what it paused is
+            // not to be given back.
+            controller.playKursi()
+            controller.requestPlay(37, 1)
+            // The reader pauses 37 and plays the clip again.
+            harness.player.pause()
+            val playsBefore = harness.player.plays
+            controller.playKursi()
+
+            harness.clips.finish()
+
+            // The second clip paused nothing, so its end gives nothing back.
+            assertEquals(playsBefore, harness.player.plays)
+            assertFalse(harness.player.state.value.playing)
+            assertEquals(37, harness.player.state.value.surah)
+        }
+
+    // ── The speaker tapped while its passage loads ─────────────────────────────────────
+
+    @Test
+    fun `a second tap on the speaker while its passage is still loading stops it`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(2))
+            val gate = CompletableDeferred<Unit>()
+            harness.player.loadGate = gate
+            val controller = controller(harness, backgroundScope)
+            controller.playKursi()
+
+            // On a device the speaker still shows Play while the passage loads, so the second tap
+            // asks for the same passage again: it means stop, not a second load.
+            controller.playKursi()
+            gate.complete(Unit)
+
+            assertEquals(1, harness.player.loads.size)
+            assertEquals(0, harness.player.plays)
+            assertFalse(controller.adhkarPlaying.value)
+            assertNull(controller.state.value.bar)
+        }
+
+    @Test
+    fun `a tap on a passage paused by a call plays it again rather than stopping it`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.library.put("ar.alafasy", setOf(2))
+            val controller = controller(harness, backgroundScope)
+            controller.playKursi()
+            // A phone call pauses the passage; the speaker shows Play again.
+            harness.player.pause()
+            assertFalse(controller.adhkarPlaying.value)
+
+            controller.playKursi()
+
+            assertEquals(2, harness.player.loads.size)
+            assertEquals(2, harness.player.plays)
+            assertEquals(0, harness.player.stops)
+            assertTrue(controller.adhkarPlaying.value)
+        }
 }

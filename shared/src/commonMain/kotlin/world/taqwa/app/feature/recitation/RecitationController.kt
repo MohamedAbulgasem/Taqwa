@@ -140,7 +140,10 @@ class RecitationController(
     /** Which clip is the current one, so the end of one the reader has replaced is not heard. */
     private var adhkarClipRun = 0
 
-    /** How many times [stopAdhkar] has been asked for: a clip still being read finds it changed. */
+    /**
+     * How many times a clip has been stopped or abandoned ([stopAdhkar], [abandonAdhkarClip]): a
+     * clip still being read finds it changed.
+     */
     private var adhkarStops = 0
 
     /**
@@ -624,9 +627,17 @@ class RecitationController(
      * the phone is offered on the download sheet, and the confirm plays the passage when it
      * lands — unless Alafasy is the voice and the build carries his clip of it, which plays at
      * once ([playAdhkarClip]).
+     *
+     * A second tap while this surah's passage is still loading is a stop: the speaker shows Play
+     * until the passage sounds, and another load would start it over audibly. Only while it loads
+     * — a passage that is loaded and paused (a phone call) shows Play too, and that tap plays it.
      */
     fun requestPlayAyahs(surah: Int, ayahs: List<Int>, title: String, subtitle: String) {
         if (ayahs.isEmpty()) return
+        if (loading.value && adhkarSurah.value == surah) {
+            stopAdhkar()
+            return
+        }
         engage()
         playOrOffer(surah, ayahs.min(), AdhkarPassage(ayahs, NowPlayingText(title, subtitle)))
     }
@@ -1191,8 +1202,9 @@ class RecitationController(
         } catch (_: Exception) {
             null
         }
-        // The page turned, or the screen was left, while the file was being read: that stop found
-        // no clip to stop. Playing now would sound over the next page, unmarked.
+        // The page turned, the screen was left, or an ordinary play took the player while the file
+        // was being read: that stop found no clip to stop. Playing now would sound over the next
+        // page, unmarked, or pause the recitation the reader has just started.
         if (adhkarStops != stopsBefore) return true
         if (bytes == null) return false
         // A passage in the player gives way to the clip.
@@ -1229,9 +1241,12 @@ class RecitationController(
      * still sounding is over and what it paused is not to be given back: the new play owns the
      * player now, in whatever state the reader leaves it, and a clip's end resuming the surah the
      * reader has since paused would be a press they never made. The way [toggle] ends an audition
-     * with `resume = false`. Nothing when no clip is playing.
+     * with `resume = false`. A clip whose bytes are still being read is abandoned too, before it
+     * sounds: [adhkarStops] moves first, which [playAdhkarClip] reads when the read returns, since
+     * until then there is no clip playing to end.
      */
     private fun abandonAdhkarClip() {
+        adhkarStops++
         if (!adhkarClip.value) return
         adhkarClip.value = false
         pausedForClip = false
