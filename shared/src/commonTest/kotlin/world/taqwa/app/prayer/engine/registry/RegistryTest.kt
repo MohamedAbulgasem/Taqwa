@@ -861,11 +861,12 @@ class RegistryTest {
             for (i in end.indices) assertTrue(end[i] >= start[i] - 0.02, "$lat slot $i: end ${end[i]} before start ${start[i]}")
         }
         // At Propriano (the edge) the Paris dawns carried south by the fraction of the night fall short of that
-        // rule in January; the end takes the rule there, and never less than it on any day.
+        // rule in January; the end takes the rule there (read at Propriano's own noon, T3 round), and never less
+        // than it on any day.
         val lat = 41.676
         val gmp = Registry.resolveEntry(Registry.byId("fr.gmp")!!, Place(lat, 8.903, "Europe/Paris", "FR"))
         val end = assertNotNull((gmp.method!!.endOfEating as EndOfEating.DawnAngle).bySlot)
-        val rule = TwilightCurves.moonsightingAsEnd(lat)
+        val rule = TwilightCurves.moonsightingAsEnd(lat, 8.903)
         val carried = TwilightCurves.endOfEating(lat, EndOfEatingDawns.gmpParis.latitude, EndOfEatingDawns.gmpParis.depressions)
         for (i in end.indices) assertTrue(end[i] >= rule[i] && end[i] >= carried[i], "slot $i: ${end[i]}")
         val january = curveSlot(LocalDate(2027, 1, 11))

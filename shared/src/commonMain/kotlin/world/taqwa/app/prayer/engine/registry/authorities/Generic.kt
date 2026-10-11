@@ -61,10 +61,11 @@ object Generic {
     /**
      * Moonsighting Committee Worldwide (moonsighting.com, how-we.html; adhan2's preset): Zuhr + 5,
      * Maghrib + 3, Fajr the later of 18° and the seasonal morning function, Isha the earlier of 18°
-     * and the seasonal evening function (shafaq general); from 55° N a seventh of the night takes
-     * 18°'s place. The functions are minutes from sunrise or sunset, so they are expressed here
-     * as day-of-year angle curves for the place's latitude ([PlaceCurves]); the entry's own method
-     * carries the equator's curves.
+     * and the seasonal evening function (shafaq general); from 55° of latitude a seventh of the night
+     * takes 18°'s place, north and south, as the Committee's own tables have it (adhan2 has it north
+     * only; TwilightCurves.moonsighting, T3 round of 11 Oct 2026). The functions are minutes from
+     * sunrise or sunset, so they are expressed here as day-of-year angle curves for the place's
+     * latitude and longitude ([PlaceCurves]); the entry's own method carries the equator's curves.
      */
     private val moonsightingBase = TimetableMethod(
         id = "other.moonsighting",

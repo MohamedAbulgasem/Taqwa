@@ -456,7 +456,7 @@ object DayComputer {
         /** The sign the end of eating is read from: the Fajr dawn, or the method's own dawn angle. */
         private val eatingTwilight: Twilight = when (val rule = method.endOfEating) {
             is EndOfEating.DawnAngle -> Twilight(morning = true, degreesOn = { d -> rule.degreesOn(d) })
-            is EndOfEating.DawnOrMiddle -> Twilight(morning = true, degreesOn = { rule.degrees })
+            is EndOfEating.DawnOrMiddle -> Twilight(morning = true, degreesOn = { d -> rule.degreesOn(d) })
             else -> fajrTwilight
         }
 
@@ -547,7 +547,7 @@ object DayComputer {
             }
             val eating = when (val rule = method.endOfEating) {
                 is EndOfEating.DawnAngle -> rule.deepest
-                is EndOfEating.DawnOrMiddle -> rule.degrees
+                is EndOfEating.DawnOrMiddle -> rule.deepest
                 else -> 0.0
             }
             val bias = method.fajrDeclinationBias?.let { h -> abs(h.c0) + h.terms.sumOf { (a, b) -> abs(a) + abs(b) } } ?: 0.0

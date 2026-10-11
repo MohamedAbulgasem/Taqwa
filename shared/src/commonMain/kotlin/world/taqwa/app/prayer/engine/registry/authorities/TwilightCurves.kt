@@ -19,6 +19,7 @@ import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.asin
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
@@ -79,6 +80,13 @@ internal object TwilightCurves {
         /** The night from the day's sunset to the next sunrise, in minutes (adhan-js's for the day's Fajr). */
         val followingNight: Double get() = nightAfter
 
+        /**
+         * The longer of the nights around the day, in minutes: a morning rule whose authorities count
+         * different nights, read as an end (the earlier dawn of the two; the Moonsighting Committee's own
+         * tables count the night before for their Fajr, adhan2 the night after).
+         */
+        val longerNight: Double get() = max(nightBefore, nightAfter)
+
         /** From sunrise to the transit, in minutes: half the sun's own day. */
         val halfDayMinutes: Double get() = h0 * 4.0
 
@@ -101,6 +109,13 @@ internal object TwilightCurves {
             val h = h0Here + minutes / 4.0
             return depressionAt(phi, delta - deltaPerDay * h / 360.0, h)
         }
+
+        /** [morningDepression]'s mirror after sunset: the sun's depression [minutes] after it, with the declination at sunset and at that moment. */
+        fun eveningDepression(minutes: Double): Double {
+            val h0Here = hourAngle(phi, delta + deltaPerDay * h0 / 360.0, HORIZON) ?: h0
+            val h = h0Here + minutes / 4.0
+            return depressionAt(phi, delta + deltaPerDay * h / 360.0, h)
+        }
     }
 
     /**
@@ -116,12 +131,58 @@ internal object TwilightCurves {
     }
 
     /**
-     * Per slot the value [angle] gives, [fallback] where the sun does not rise or set. The sun is
-     * taken at [latitude] rounded to 0.1° ([onGrid], every curve's default), or at [latitude] itself.
+     * The sun's declination (degrees) every 6 h from 00:00 UTC on 30 December before the [leapCycle] to
+     * 4 January after it, computed once: the Moonsighting Committee's reads take the sun at many moments
+     * of every day of the cycle at each place ([moonsighting], [moonsightingAsEnd]), about 36,000
+     * positions a place otherwise (5.5 ms on the Mac, T3 round of 11 Oct 2026). Read by straight lines
+     * between samples ([declinationAt]), off the sun by under a ten-thousandth of a degree.
      */
-    private fun perSlot(latitude: Double, fallback: Double, onGrid: Boolean = true, angle: (Day) -> Double): DoubleArray {
+    private val cycleDeclinations: DoubleArray by lazy {
+        val start = cycleStartSeconds()
+        DoubleArray(cycleSamples()) { k -> SolarMath.sun(SolarMath.julianDay(start + k * CYCLE_STEP_SECONDS)).declinationDeg }
+    }
+
+    private val cycleStart: Double by lazy { cycleStartSeconds() }
+
+    private fun cycleStartSeconds(): Double = LocalDate(LEAP_CYCLE_FIRST - 1, 12, 30).toEpochDays() * SolarMath.SECONDS_PER_DAY
+
+    private fun cycleSamples(): Int =
+        ((LocalDate(CURVE_REFERENCE_YEAR + 1, 1, 4).toEpochDays() - LocalDate(LEAP_CYCLE_FIRST - 1, 12, 30).toEpochDays()) * 4 + 1).toInt()
+
+    /** The sun's declination (degrees) at [epochSeconds], from [cycleDeclinations] where it holds the moment, else the sun itself. */
+    private fun declinationAt(epochSeconds: Double): Double {
+        val table = cycleDeclinations
+        val x = (epochSeconds - cycleStart) / CYCLE_STEP_SECONDS
+        val k = floor(x).toInt()
+        if (k < 0 || k + 1 >= table.size) return SolarMath.sun(SolarMath.julianDay(epochSeconds)).declinationDeg
+        return table[k] + (table[k + 1] - table[k]) * (x - k)
+    }
+
+    /**
+     * [referenceDeclinations]' days, with the sun at the local noon at [longitude] rather than at 12:00 UTC
+     * (from [cycleDeclinations]): at 150° E 12:00 UTC is ten hours after the local noon, and with the leap
+     * cycle's own drift that put the Moonsighting Committee's Fajr, read at the place itself, a minute early
+     * near 65° N in July and August (T3 round of 11 Oct 2026).
+     */
+    private fun localNoonDeclinations(longitude: Double): DoubleArray = DoubleArray(SLOTS + 2) { i ->
+        val noon = (referenceStart.toEpochDays() + i - 1) * SolarMath.SECONDS_PER_DAY + (12.0 - longitude / 15.0) * 3600.0
+        SolarMath.rad(declinationAt(noon))
+    }
+
+    /**
+     * Per slot the value [angle] gives, [fallback] where the sun does not rise or set. The sun is
+     * taken at [latitude] rounded to 0.1° ([onGrid], every curve's default), or at [latitude] itself,
+     * and at 12:00 UTC, or at the local noon at [longitude] where given.
+     */
+    private fun perSlot(
+        latitude: Double,
+        fallback: Double,
+        onGrid: Boolean = true,
+        longitude: Double? = null,
+        angle: (Day) -> Double,
+    ): DoubleArray {
         val phi = SolarMath.rad(if (onGrid) round(latitude * 10.0) / 10.0 else latitude)
-        val declinations = referenceDeclinations
+        val declinations = if (longitude == null) referenceDeclinations else localNoonDeclinations(longitude)
         val halfDays = DoubleArray(SLOTS + 2) { i -> hourAngle(phi, declinations[i], HORIZON) ?: Double.NaN }
         return DoubleArray(SLOTS) { i ->
             val h0 = halfDays[i + 1]
@@ -184,27 +245,36 @@ internal object TwilightCurves {
 
     /**
      * The Moonsighting Committee's Fajr read as an end, as [fajrAsEnd] reads a night rule (by month
-     * and day over a leap cycle, the declination at the moment, never deeper than the sun sinks): the
-     * later of 18° and its seasonal minutes before sunrise, from 55° N the later of a seventh of the
-     * night and those minutes, as adhan2's code has them (the minutes at [latitude] itself, from each
-     * date's own day of the year and year's length; the night from sunset to the next sunrise). Its
-     * minutes are neither an angle nor a fraction of the night, so no other latitude's dawns carry it
-     * ([endOfEating]): the Grande Mosquée de Paris's end is floored with it where it applies
-     * (PlaceCurves, ruling R80's fix round).
+     * and day over a leap cycle, the declination at the moment): the later of 18° and its seasonal
+     * minutes before sunrise, from 55° of latitude, north or south, the later of a seventh of the night
+     * and those minutes ([moonsighting]; the minutes at [latitude] itself, from each date's own day of
+     * the year and year's length). Its minutes are neither an angle nor a fraction of the night, so no
+     * other latitude's dawns carry it ([endOfEating]): the Grande Mosquée de Paris's end is floored with
+     * it where it applies (PlaceCurves, ruling R80's fix round).
+     *
+     * T3 round of 11 Oct 2026 ([CommitteeReads.end]):
+     * - the seventh counts the longer of the nights around the day, the earlier dawn: the Committee's
+     *   own tables count the night before for their Fajr (to the minute on 72–88 % of their days from
+     *   55° to 66° N, where the night after fits 42–82 %), adhan2's code the night after;
+     * - read twice, with the sun on the 0.1° grid and at [latitude] and [longitude] itself (the
+     *   declination at the place's own noon), each slot the earlier end of the two: on the grid alone
+     *   a place just past a step read the sun a twentieth of a degree from itself (its end up to 38 s
+     *   after the rule's own moment near 64° N), and 12:00 UTC is ten hours off the local noon at
+     *   150° E (a minute late near 65.5° N in May and June);
+     * - never deeper than the sun sinks those nights at [latitude] ([shallowestNights], two thousandths
+     *   of a degree short of it); where the rule's dawn is deeper than that in some year of the cycle,
+     *   on the edge of the midnight sun, the slot is left unreached (18°), and the end is then read as
+     *   the middle of the night (PlaceCurves' DawnOrMiddle). [REACH_SPARE_DEG]'s quarter of a degree had
+     *   put the end after sunrise near 65.5° N in June, where the whole night lies within it of the
+     *   sun's lowest, so the fast began at the Fajr shown, up to 6 min after the Committee's own printed
+     *   Fajr at Luleå and Akureyri.
      */
-    fun moonsightingAsEnd(latitude: Double): DoubleArray = ruleAsEnd(latitude, MOONSIGHTING_ANGLE) { d ->
-        val minutes = morningMinutes(latitude, daysSinceSolstice(d.date, latitude))
-        if (latitude >= SEVENTH_FROM_LATITUDE) {
-            d.morningDepression(min(d.followingNight / 7, minutes))
-        } else {
-            min(MOONSIGHTING_ANGLE, d.morningDepression(minutes))
-        }
-    }
+    fun moonsightingAsEnd(latitude: Double, longitude: Double = 0.0): DoubleArray = CommitteeReads(latitude, longitude).end
 
     /**
-     * A morning rule read as an end ([fajrAsEnd], [moonsightingAsEnd]): each slot the largest
-     * [depression] of that month and day over the [leapCycle], never deeper than the sun sinks those
-     * nights less [REACH_SPARE_DEG]; [angle] where the sun does not rise or set on one of them.
+     * A morning rule read as an end ([fajrAsEnd]): each slot the largest [depression] of that month
+     * and day over the [leapCycle], never deeper than the sun sinks those nights less
+     * [REACH_SPARE_DEG]; [angle] where the sun does not rise or set on one of them.
      */
     private fun ruleAsEnd(latitude: Double, angle: Double, depression: (Day) -> Double): DoubleArray {
         val days = leapCycle.map { year -> daysIn(year, latitude) }
@@ -222,23 +292,72 @@ internal object TwilightCurves {
     }
 
     /**
-     * Each slot's month and day in [year] (29 February, in a common year, on the 28th) at a latitude,
-     * with its noon declination and how fast it moves; null where the sun does not rise or set. For
-     * [year] 2028 the same days as [perSlot].
+     * Per slot, the least the sun sinks at [latitude] on the night before that month and day's
+     * sunrise, in any year of the [leapCycle] and at any longitude, less [END_REACH_SPARE_DEG]: so a
+     * dawn no deeper is reached that night. The night's lowest point lies between 10:00 UTC the day
+     * before and 14:00 UTC on the day, whatever the longitude (the transit less 12 h, as the engine
+     * looks for it, with the equation of time and the zones a little either side); the sun is taken
+     * at its declination furthest towards the pole in that window, at the window's ends and at every
+     * one of [cycleDeclinations]' samples between them (its straight lines have their extremes there).
+     * For the evening ([morning] false), the night after that day's sunset, a day later. NaN where the
+     * sun does not rise or set on one of them.
      */
-    private fun daysIn(year: Int, latitude: Double): Array<Day?> {
-        val phi = SolarMath.rad(round(latitude * 10.0) / 10.0)
+    private fun shallowestNights(latitude: Double, morning: Boolean): DoubleArray {
+        val phi = SolarMath.rad(latitude)
+        val towardsPole = if (latitude >= 0) 1.0 else -1.0
+        val samples = if (morning) LOWEST_POINT_SAMPLES_HOURS else LOWEST_POINT_SAMPLES_HOURS.map { it + 24.0 }
+        val years = leapCycle.map { year ->
+            val length = LocalDate(year, 12, 31).dayOfYear
+            DoubleArray(SLOTS) { i ->
+                val midnight = slotDate(year, length, i).toEpochDays() * SolarMath.SECONDS_PER_DAY
+                val noon = SolarMath.rad(declinationAt(midnight + 12 * 3600.0))
+                if (hourAngle(phi, noon, HORIZON) == null) return@DoubleArray Double.NaN
+                val furthest = samples.maxOf { h -> towardsPole * declinationAt(midnight + h * 3600.0) }
+                depressionAt(phi, SolarMath.rad(towardsPole * furthest), 180.0)
+            }
+        }
+        return DoubleArray(SLOTS) { i -> years.minOf { it[i] } - END_REACH_SPARE_DEG }
+    }
+
+    /** Slot [i]'s month and day in [year], [length] days long (29 February, in a common year, on the 28th). */
+    private fun slotDate(year: Int, length: Int, i: Int): LocalDate {
+        cycleSlotDates[year]?.let { return it[i] }
+        val slot = referenceStart.plus(i, DateTimeUnit.DAY)
+        return if (length != SLOTS && slot.month.number == 2 && slot.day == 29) LocalDate(year, 2, 28) else LocalDate(year, slot.month, slot.day)
+    }
+
+    /** Every slot's date in each year of the [leapCycle], made once. */
+    private val cycleSlotDates: Map<Int, Array<LocalDate>> by lazy {
+        leapCycle.associateWith { year ->
+            val length = LocalDate(year, 12, 31).dayOfYear
+            Array(SLOTS) { i ->
+                val slot = referenceStart.plus(i, DateTimeUnit.DAY)
+                if (length != SLOTS && slot.month.number == 2 && slot.day == 29) LocalDate(year, 2, 28) else LocalDate(year, slot.month, slot.day)
+            }
+        }
+    }
+
+    /**
+     * Each slot's month and day in [year] (29 February, in a common year, on the 28th) at a latitude
+     * (rounded to 0.1° where [onGrid]), with its noon declination and how fast it moves; null where the
+     * sun does not rise or set. Noon is 12:00 UTC (for [year] 2028 the same days as [perSlot]), or the
+     * local noon at [longitude] (the Moonsighting Committee's own reads: at 150° E, 12:00 UTC is ten
+     * hours after the local noon, and the sun's declination that far off put the end of eating a
+     * minute after the rule's own moment near 65.5° N in May and June). [cycled]: the declination read
+     * from [cycleDeclinations] rather than the sun's own model each time.
+     */
+    private fun daysIn(year: Int, latitude: Double, onGrid: Boolean = true, longitude: Double = 0.0, cycled: Boolean = false): Array<Day?> {
+        val phi = SolarMath.rad(if (onGrid) round(latitude * 10.0) / 10.0 else latitude)
         val length = LocalDate(year, 12, 31).dayOfYear
-        val first = LocalDate(year, 1, 1)
+        val firstDay = LocalDate(year, 1, 1).toEpochDays()
         // By day of the year, 0 .. length + 1: the days either side of the year, for the nights.
         val declinations = DoubleArray(length + 2) { k ->
-            val noon = first.plus(k - 1, DateTimeUnit.DAY).toEpochDays() * SolarMath.SECONDS_PER_DAY + 12 * 3600.0
-            SolarMath.rad(SolarMath.sun(SolarMath.julianDay(noon)).declinationDeg)
+            val noon = (firstDay + k - 1) * SolarMath.SECONDS_PER_DAY + (12.0 - longitude / 15.0) * 3600.0
+            SolarMath.rad(if (cycled) declinationAt(noon) else SolarMath.sun(SolarMath.julianDay(noon)).declinationDeg)
         }
         val halfDays = DoubleArray(length + 2) { k -> hourAngle(phi, declinations[k], HORIZON) ?: Double.NaN }
         return Array(SLOTS) { i ->
-            val slot = referenceStart.plus(i, DateTimeUnit.DAY)
-            val date = if (length != SLOTS && slot.month.number == 2 && slot.day == 29) LocalDate(year, 2, 28) else LocalDate(year, slot.month, slot.day)
+            val date = slotDate(year, length, i)
             val k = date.dayOfYear
             val h0 = halfDays[k]
             if (h0.isNaN()) {
@@ -307,28 +426,183 @@ internal object TwilightCurves {
     /**
      * Moonsighting Committee's seasonal twilight (adhan2's seasonAdjustedMorningTwilight and
      * seasonAdjustedEveningTwilight, shafaq general): the Fajr the later of 18° and the morning
-     * function, the Isha the earlier of 18° and the evening function; from 55° N a seventh of the
-     * night takes 18°'s place.
+     * function, the Isha the earlier of 18° and the evening function; from 55° of latitude a seventh
+     * of the night takes 18°'s place.
+     *
+     * The rule followed is the Committee's own, as its own tables print it (moonsighting.com's
+     * praytable, 2026, at 24 places from 43.7° N to 69.6° N and from 54.8° S to 63.4° S, held in the
+     * archive; T3 round of 11 Oct 2026):
+     * - the switch to the seventh is at the place's own latitude, as adhan2 has it: the seasonal rule
+     *   at Newcastle upon Tyne (54.97° N), the seventh at Gosforth (55.0° N) and Tynemouth (55.02° N);
+     * - it switches in the south too, from 55° S, where adhan2's preset does not: at Isla Hornos, in the
+     *   Drake Passage, at Orcadas and Esperanza the Committee's Fajr is up to 102 min after adhan2's
+     *   and its Isha up to 53 min before it, and the engine follows the Committee's;
+     * - its Fajr's seventh counts the night before; a start takes the shorter night around the day
+     *   ([Day.morningNight]), so it is never before adhan2's either, which counts the night after.
+     *
+     * Each start curve is read twice, each slot the later start of the two (the smallest Fajr
+     * depression, the largest Isha one; [CommitteeReads]): with the sun and the minutes on the 0.1°
+     * grid and at [latitude] itself; and where the night is short (the sun no lower than
+     * [SHORT_NIGHT_DEG] on some night of the cycle) a third time, on each day of the leap cycle at
+     * [latitude] and [longitude] itself. The switch at 55° is decided at [latitude] itself in every
+     * read. On the grid alone, with
+     * the switch read there too, a place from 54.95° to 55° N read the seventh of the night (its
+     * latitude rounds to 55.0): its Isha came up to 24 min before the Committee's own printed one from
+     * May to July at Newcastle, and its Fajr up to 68 min after it (found in the kz-north-west round of
+     * 7 Oct 2026). Where the rule's moment lies near the sun's lowest point (from about 64° N, and south
+     * of about 54° S) a twentieth of a degree of latitude moved the Fajr by up to 5 min in the north
+     * and 8 in the south, early on the poleward side of a step. Then each slot is held to what the sun
+     * reaches there ([shallowestNights]): a Fajr dawn no deeper, an Isha deeper than that left unreached
+     * (18°), so that the method's high-latitude rule sets it, later than the rule's (on the edge of the
+     * midnight sun, where the neighbouring day's dusk the envelope takes can lie below the sun's lowest
+     * of the night, which put Isha up to 2 min early).
      */
-    fun moonsighting(latitude: Double): Pair<DoubleArray, DoubleArray> {
-        val lat = round(latitude * 10.0) / 10.0
-        val fajr = perSlot(lat, MOONSIGHTING_ANGLE) { d ->
-            val minutes = morningMinutes(lat, daysSinceSolstice(d.date, lat))
-            if (lat >= SEVENTH_FROM_LATITUDE) {
-                d.depression(min(d.morningNight / 7, minutes))
-            } else {
-                min(MOONSIGHTING_ANGLE, d.depression(minutes))
+    fun moonsighting(latitude: Double, longitude: Double = 0.0): Pair<DoubleArray, DoubleArray> =
+        CommitteeReads(latitude, longitude).let { it.fajr to it.isha }
+
+    /** [moonsighting]'s Fajr curve alone (the Grande Mosquée de Paris's Fajr beyond its table's reach, PlaceCurves). */
+    fun moonsightingFajr(latitude: Double, longitude: Double = 0.0): DoubleArray = CommitteeReads(latitude, longitude).fajr
+
+    /**
+     * [moonsighting]'s Fajr as the grid alone reads it, the curve before the T3 round: the Grande Mosquée de
+     * Paris's at its own table's point, where the gate holds it to the table itself (PlaceCurves).
+     */
+    fun moonsightingGridFajr(latitude: Double): DoubleArray = CommitteeReads(latitude, 0.0).gridFajr
+
+    /** [moonsighting]'s Fajr and Isha curves and [moonsightingAsEnd]'s end at one place, from the same reads. */
+    fun moonsightingCurves(latitude: Double, longitude: Double = 0.0): Triple<DoubleArray, DoubleArray, DoubleArray> =
+        CommitteeReads(latitude, longitude).let { Triple(it.fajr, it.isha, it.end) }
+
+    /**
+     * The Moonsighting Committee's reads at one place ([moonsighting], [moonsightingAsEnd]), each made
+     * once and shared by its curves.
+     */
+    private class CommitteeReads(private val latitude: Double, private val longitude: Double) {
+        private val seventh = abs(latitude) >= SEVENTH_FROM_LATITUDE
+
+        /** The leap cycle's days at [latitude] and [longitude] itself, and on the 0.1° grid (at 12:00 UTC). */
+        private val ownDays by lazy { leapCycle.map { daysIn(it, latitude, onGrid = false, longitude = longitude, cycled = true) } }
+        private val gridDays by lazy { leapCycle.map { daysIn(it, latitude, onGrid = true, cycled = true) } }
+        private val dawns by lazy { shallowestNights(latitude, morning = true) }
+        private val dusks by lazy { shallowestNights(latitude, morning = false) }
+
+        /** The Fajr start curve on the grid alone ([moonsightingGridFajr]). */
+        val gridFajr: DoubleArray by lazy { startFajr(onGrid = true) }
+
+        val fajr: DoubleArray by lazy {
+            val grid = gridFajr
+            val own = startFajr(onGrid = false)
+            val years by lazy { cycleStarts(morning = true) }
+            DoubleArray(SLOTS) { i ->
+                val read = min(grid[i], own[i])
+                val value = if (shortNight(dawns[i])) min(read, years[i]) else read
+                if (dawns[i].isNaN()) value else min(value, dawns[i])
             }
         }
-        val isha = perSlot(lat, MOONSIGHTING_ANGLE) { d ->
-            val minutes = eveningMinutes(lat, daysSinceSolstice(d.date, lat))
-            if (lat >= SEVENTH_FROM_LATITUDE) {
-                d.depression(min(d.eveningNight / 7, minutes))
-            } else {
-                min(MOONSIGHTING_ANGLE, d.depression(minutes))
+
+        val isha: DoubleArray by lazy {
+            val grid = startIsha(onGrid = true)
+            val own = startIsha(onGrid = false)
+            val years by lazy { cycleStarts(morning = false) }
+            DoubleArray(SLOTS) { i ->
+                val read = max(grid[i], own[i])
+                val value = if (shortNight(dusks[i])) max(read, years[i]) else read
+                if (dusks[i].isNaN() || value <= dusks[i]) value else MOONSIGHTING_ANGLE
             }
         }
-        return fajrEnvelope(fajr) to ishaEnvelope(isha)
+
+        /**
+         * Whether a slot's night is short enough for [cycleStarts] to matter: the sun no lower than
+         * [SHORT_NIGHT_DEG] on it in some year of the cycle, or not setting at all (NaN). Elsewhere the
+         * reference year's curve, widened a day either side, already holds every year, and the third read
+         * would only add seconds of lateness (a minute on up to a third of the days from 40° to 64° N).
+         */
+        private fun shortNight(shallowest: Double): Boolean = !(shallowest >= SHORT_NIGHT_DEG)
+
+        /** [moonsightingAsEnd]: the earlier end of the grid's read and the place's own, held to what the sun reaches. */
+        val end: DoubleArray by lazy {
+            val grid = endValues(gridDays)
+            val own = endValues(ownDays)
+            DoubleArray(SLOTS) { i ->
+                val value = max(grid[i], own[i])
+                when {
+                    value.isNaN() -> MOONSIGHTING_ANGLE
+                    dawns[i].isNaN() || value <= dawns[i] -> value
+                    else -> MOONSIGHTING_ANGLE
+                }
+            }
+        }
+
+        /**
+         * The Fajr start curve on the reference year, with the sun and the minutes on the grid at 12:00 UTC
+         * ([onGrid]), or at [latitude] itself at its own local noon.
+         */
+        private fun startFajr(onGrid: Boolean): DoubleArray {
+            val lat = if (onGrid) round(latitude * 10.0) / 10.0 else latitude
+            return fajrEnvelope(
+                perSlot(lat, MOONSIGHTING_ANGLE, onGrid = false, longitude = if (onGrid) null else longitude) { d ->
+                    val minutes = morningMinutes(lat, daysSinceSolstice(d.date, lat))
+                    if (seventh) d.depression(min(d.morningNight / 7, minutes)) else min(MOONSIGHTING_ANGLE, d.depression(minutes))
+                },
+            )
+        }
+
+        /** [startFajr]'s Isha. */
+        private fun startIsha(onGrid: Boolean): DoubleArray {
+            val lat = if (onGrid) round(latitude * 10.0) / 10.0 else latitude
+            return ishaEnvelope(
+                perSlot(lat, MOONSIGHTING_ANGLE, onGrid = false, longitude = if (onGrid) null else longitude) { d ->
+                    val minutes = eveningMinutes(lat, daysSinceSolstice(d.date, lat))
+                    if (seventh) d.depression(min(d.eveningNight / 7, minutes)) else min(MOONSIGHTING_ANGLE, d.depression(minutes))
+                },
+            )
+        }
+
+        /**
+         * The third read: the rule on each month and day of every year of the [leapCycle] at the place
+         * itself, with the sun's declination at the moment ([Day.morningDepression],
+         * [Day.eveningDepression]), each slot the smallest Fajr ([morning]) or the largest Isha depression
+         * of the day and the day either side over those years; ±∞ where none has a night. The reference
+         * year's curves, widened over the day either side, cover the leap cycle's drift where the night
+         * changes slowly; on the edge of the midnight sun it changes by minutes a day and the reference
+         * year's own day can have no night at all (its curve then took a neighbour's dawn, deeper than
+         * the same day's in another year: Fajr 2 min before the rule's own at 65.8° N on 16 June 2027).
+         */
+        private fun cycleStarts(morning: Boolean): DoubleArray {
+            val values = DoubleArray(SLOTS) { if (morning) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY }
+            for (days in ownDays) {
+                for (i in 0 until SLOTS) {
+                    val d = days[i] ?: continue
+                    val k = daysSinceSolstice(d.date, latitude)
+                    val value = if (morning) {
+                        val minutes = morningMinutes(latitude, k)
+                        if (seventh) d.morningDepression(min(d.morningNight / 7, minutes)) else min(MOONSIGHTING_ANGLE, d.morningDepression(minutes))
+                    } else {
+                        val minutes = eveningMinutes(latitude, k)
+                        if (seventh) d.eveningDepression(min(d.eveningNight / 7, minutes)) else min(MOONSIGHTING_ANGLE, d.eveningDepression(minutes))
+                    }
+                    for (j in i - 1..i + 1) {
+                        val s = (j + SLOTS) % SLOTS
+                        values[s] = if (morning) min(values[s], value) else max(values[s], value)
+                    }
+                }
+            }
+            return values
+        }
+
+        /**
+         * Each slot the deepest dawn of the rule read as an end over the leap cycle's [days] (the minutes
+         * at [latitude] itself; the seventh counting the longer night around the day, [Day.longerNight]);
+         * NaN where the sun does not rise or set on one of them.
+         */
+        private fun endValues(days: List<Array<Day?>>): DoubleArray = DoubleArray(SLOTS) { i ->
+            days.maxOf { year ->
+                year[i]?.let { d ->
+                    val minutes = morningMinutes(latitude, daysSinceSolstice(d.date, latitude))
+                    if (seventh) d.morningDepression(min(d.longerNight / 7, minutes)) else min(MOONSIGHTING_ANGLE, d.morningDepression(minutes))
+                } ?: Double.NaN
+            }
+        }
     }
 
     private fun hourAngle(phi: Double, delta: Double, altitude: Double): Double? {
@@ -381,8 +655,33 @@ internal object TwilightCurves {
     /** How far short of the sun's deepest an end-of-eating depression stays, so that it is reached. */
     private const val REACH_SPARE_DEG = 0.25
 
+    /**
+     * How far short of the least the sun sinks at the latitude itself ([shallowestNights]) the Moonsighting
+     * Committee's end stays: that lowest is computed from the sun's own declination over the whole window
+     * the night's lowest point can fall in, so only rounding is left to cover.
+     */
+    private const val END_REACH_SPARE_DEG = 0.002
+
+    /**
+     * The Moonsighting Committee's starts take their leap-cycle read where the sun sinks no lower than
+     * this on some night of the cycle ([CommitteeReads]): within about 3° of the midnight sun's latitude
+     * (63.6° N and S at the solstice), where the night's length changes by minutes a day.
+     */
+    private const val SHORT_NIGHT_DEG = 3.0
+
+    /**
+     * Hours from 00:00 UTC on a date at which [shallowestNights] reads the sun: 10:00 UTC the day before
+     * to 14:00 UTC, and [cycleDeclinations]' samples between them.
+     */
+    private val LOWEST_POINT_SAMPLES_HOURS = listOf(-14.0, -12.0, -6.0, 0.0, 6.0, 12.0, 14.0)
+
     /** One leap cycle: the sun on a month and day moves by up to about three quarters of a day across it. */
-    private val leapCycle = listOf(2025, 2026, 2027, CURVE_REFERENCE_YEAR)
+    private val leapCycle = listOf(LEAP_CYCLE_FIRST, 2026, 2027, CURVE_REFERENCE_YEAR)
+
+    private const val LEAP_CYCLE_FIRST = 2025
+
+    /** [cycleDeclinations]' step: 6 h. */
+    private const val CYCLE_STEP_SECONDS = 21600.0
 }
 
 /**
@@ -562,6 +861,14 @@ internal object PlaceCurves {
      * page still carries its earlier method (Isha about 16°, Fajr about 18°), so there Isha is the later
      * of sunset + 90 and 16°, never before either. Fitted to its 2026 table and its October 2025 rows
      * (not committed).
+     *
+     * Its Fajr at its table's own point (the method's fixed point, inside its reach) is the Committee's
+     * curve on the 0.1° grid alone, the one its margins were fitted on and the gate holds to the table
+     * itself; beyond its reach, at the user's own point, it is the Committee's rule read in full
+     * ([TwilightCurves.moonsighting]: also at the place's own latitude and on each day of the leap
+     * cycle). Read in full at the table's point too, it moved the Fajr shown a minute later on at least
+     * 85 of its 303 checked days (the exact share from 57 % to 29 %) and was never earlier (T3 round of
+     * 11 Oct 2026).
      */
     private val gmp = Rule(
         moonsightingFajr = true,
@@ -617,29 +924,46 @@ internal object PlaceCurves {
     }
 
     /**
-     * The Moonsighting Committee's Other method prints no imsak either: its fast begins at its own Fajr,
-     * the rule itself read as an end ([TwilightCurves.moonsightingAsEnd]). Its start curve, widened late
-     * over the neighbouring days and on the shorter night, came after adhan2's own Fajr from about 47° N in
-     * April and May (up to 62 s at London, 85 at Manchester, two minutes in Scotland, where a seventh of the
-     * night takes 18°'s place).
+     * The Moonsighting Committee's Other method at [point]: its Fajr and Isha curves and its end, from one
+     * set of reads ([TwilightCurves.moonsightingCurves]). It prints no imsak either: its fast begins at its
+     * own Fajr, the rule itself read as an end ([TwilightCurves.moonsightingAsEnd]). Its start curve,
+     * widened late over the neighbouring days and on the shorter night, came after adhan2's own Fajr from
+     * about 47° N in April and May (up to 62 s at London, 85 at Manchester, two minutes in Scotland, where
+     * a seventh of the night takes 18°'s place).
+     *
+     * On the edge of the midnight sun (from about 65.7°) the rule's moment can lie within a thousandth of a
+     * degree of the sun's lowest point, closer than one curve can hold for every year of a leap cycle;
+     * there the end's slots are left unreached and the end is the middle of the night
+     * ([EndOfEating.DawnOrMiddle], whatever a migrated high-latitude preference says): never after the
+     * Committee's own Fajr, which counts the night before, and after adhan2's only on the first night
+     * after the midnight sun, where adhan2, counting the night to the next sunrise, puts its Fajr before
+     * the middle of the night just ended (T3 round of 11 Oct 2026, its report).
      */
-    private val moonsightingEnd: (Double) -> EndOfEating = { lat ->
-        EndOfEating.DawnAngle(MOONSIGHTING_FAJR_ANGLE, TwilightCurves.moonsightingAsEnd(lat))
+    private fun moonsightingAt(method: TimetableMethod, point: GeoPoint): TimetableMethod {
+        val (fajr, isha, end) = TwilightCurves.moonsightingCurves(point.lat, point.lon)
+        return method.copy(
+            fajrAngleByDayOfYear = fajr,
+            ishaAngleByDayOfYear = isha,
+            endOfEating = EndOfEating.DawnOrMiddle(MOONSIGHTING_FAJR_ANGLE, end),
+        )
     }
 
-    private val ends: Map<String, (Double) -> EndOfEating?> = mapOf(
-        "other.moonsighting" to moonsightingEnd,
-        "ru.dumrf" to dumRfEnd, "ru.dumrf.edge" to dumRfEnd, "ru.bashkortostan" to dumRfEnd,
-        "tr.diyanet.europe" to diyanetEuropeEnd, "de.vikz" to diyanetEuropeEnd, "at.iggo" to diyanetEuropeEnd,
-        "at.iggo.edge" to diyanetEuropeEnd, "ch.fids" to diyanetEuropeEnd, "ch.fids.edge" to diyanetEuropeEnd,
-        "be.emb" to ownDawns(EndOfEatingDawns.embBrussels, 18.0), "no.irn" to irnEnd,
-        "se.rabita" to ownDawns(EndOfEatingDawns.rabitaHelsinki, 18.0),
-        "fr.gmp" to ownDawns(EndOfEatingDawns.gmpParis, 18.0), "ie.icci" to icciEnd,
+    /** An end that depends on the latitude alone, read at a point. */
+    private fun ((Double) -> EndOfEating?).byLatitude(): (GeoPoint) -> EndOfEating? = { point -> this(point.lat) }
+
+    private val ends: Map<String, (GeoPoint) -> EndOfEating?> = mapOf(
+        "ru.dumrf" to dumRfEnd.byLatitude(), "ru.dumrf.edge" to dumRfEnd.byLatitude(), "ru.bashkortostan" to dumRfEnd.byLatitude(),
+        "tr.diyanet.europe" to diyanetEuropeEnd.byLatitude(), "de.vikz" to diyanetEuropeEnd.byLatitude(),
+        "at.iggo" to diyanetEuropeEnd.byLatitude(), "at.iggo.edge" to diyanetEuropeEnd.byLatitude(),
+        "ch.fids" to diyanetEuropeEnd.byLatitude(), "ch.fids.edge" to diyanetEuropeEnd.byLatitude(),
+        "be.emb" to ownDawns(EndOfEatingDawns.embBrussels, 18.0).byLatitude(), "no.irn" to irnEnd.byLatitude(),
+        "se.rabita" to ownDawns(EndOfEatingDawns.rabitaHelsinki, 18.0).byLatitude(),
+        "fr.gmp" to ownDawns(EndOfEatingDawns.gmpParis, 18.0).byLatitude(), "ie.icci" to icciEnd.byLatitude(),
     )
 
     /** The authorities whose [ends] are also floored at their own rule read as an end ([flooredAt]). */
-    private val ownRuleEnds: Map<String, (Double) -> DoubleArray> = mapOf(
-        "fr.gmp" to TwilightCurves::moonsightingAsEnd,
+    private val ownRuleEnds: Map<String, (GeoPoint) -> DoubleArray> = mapOf(
+        "fr.gmp" to { point -> TwilightCurves.moonsightingAsEnd(point.lat, point.lon) },
     )
 
     private val rules: Map<String, Rule> = mapOf(
@@ -661,31 +985,32 @@ internal object PlaceCurves {
      * fixed point's curves alone.
      */
     fun at(method: TimetableMethod, point: GeoPoint, also: GeoPoint = point): TimetableMethod {
+        if (method.id == MOONSIGHTING_ID) return moonsightingAt(method, point)
         val placed = curvesAt(method, point, also)
         val key = keyOf(method.id, ends)
-        val end = ends[key]?.invoke(point.lat) ?: return placed
+        val end = ends[key]?.invoke(point) ?: return placed
         val rule = ownRuleEnds[key] ?: return placed.copy(endOfEating = end)
-        return placed.copy(endOfEating = flooredAt(end, rule, zoneLatitudes(method, point)))
+        return placed.copy(endOfEating = flooredAt(end, rule, zonePoints(method, point)))
     }
 
     /**
      * Ruling R80's fix round: an authority whose Fajr follows a rule that [TwilightCurves.endOfEating]
      * cannot carry to another latitude (the Moonsighting Committee's seasonal minutes: the Grande
      * Mosquée de Paris's from January to September) also ends no later than that rule read as an end at
-     * each of [latitudes], each slot the larger depression. At its table's own latitude the two nearly
+     * each of [points], each slot the larger depression. At its table's own latitude the two nearly
      * agree (its dawns are that rule's, printed to the minute); away from it the table's dawns carried
      * by the fraction of the night come after the rule's own on some days (southern Corsica in January,
      * by up to 45 s). In the other hemisphere the end is already the table's deepest dawn, deeper than
      * the rule's 18°.
      */
-    private fun flooredAt(end: EndOfEating, rule: (Double) -> DoubleArray, latitudes: List<Double>): EndOfEating {
+    private fun flooredAt(end: EndOfEating, rule: (GeoPoint) -> DoubleArray, points: List<GeoPoint>): EndOfEating {
         val own = (end as? EndOfEating.DawnAngle)?.bySlot ?: return end
-        val floors = latitudes.map(rule)
+        val floors = points.map(rule)
         return EndOfEating.DawnAngle(end.degrees, DoubleArray(own.size) { i -> max(own[i], floors.maxOf { it[i] }) })
     }
 
     /**
-     * The latitudes an end read at [point] must hold for: [point]'s own and, where [point] is a table's
+     * The points (on [point]'s meridian) an end read at [point] must hold for: [point] and, where [point] is a table's
      * fixed point (ruling R44; the end the earlier of that point's and the user's, both read on this
      * one curve, for every user within its reach), the south and north of that reach too, class D's
      * (the widest): spec 3.3's dawn at the earliest point of its zone. Within the Grande Mosquée's reach,
@@ -694,10 +1019,10 @@ internal object PlaceCurves {
      * mosque's own point up to a minute more from February to May and in August and two in June and July
      * (up to 4 min before its printed Fajr, not 2).
      */
-    private fun zoneLatitudes(method: TimetableMethod, point: GeoPoint): List<Double> {
-        if (method.fixedPoint != point || method.fixedPointMode != FixedPointMode.BOTH) return listOf(point.lat)
+    private fun zonePoints(method: TimetableMethod, point: GeoPoint): List<GeoPoint> {
+        if (method.fixedPoint != point || method.fixedPointMode != FixedPointMode.BOTH) return listOf(point)
         val reach = lateReachKm(point.lat, EntryClass.D_AUTHORITY) / distanceKm(GeoPoint(0.0, 0.0), GeoPoint(1.0, 0.0))
-        return listOf(point.lat - reach, point.lat, point.lat + reach)
+        return listOf(GeoPoint(point.lat - reach, point.lon), point, GeoPoint(point.lat + reach, point.lon))
     }
 
     /**
@@ -713,14 +1038,11 @@ internal object PlaceCurves {
     private fun keyOf(id: String, map: Map<String, *>): String = if (id in map) id else id.removeSuffix(".edge")
 
     private fun curvesAt(method: TimetableMethod, point: GeoPoint, also: GeoPoint): TimetableMethod {
-        if (method.id == "other.moonsighting") {
-            val (fajr, isha) = TwilightCurves.moonsighting(point.lat)
-            return method.copy(fajrAngleByDayOfYear = fajr, ishaAngleByDayOfYear = isha)
-        }
         val rule = rules[keyOf(method.id, rules)] ?: return method
         if (rule.ownLatitude) return ownLatitudeCurves(method, listOf(point.lat, also.lat).distinct(), rule)
         val fajr = when {
-            rule.moonsightingFajr -> TwilightCurves.moonsighting(point.lat).first
+            rule.moonsightingFajr && method.fixedPoint == point -> TwilightCurves.moonsightingGridFajr(point.lat)
+            rule.moonsightingFajr -> TwilightCurves.moonsightingFajr(point.lat, point.lon)
             rule.fajr != null -> TwilightCurves.fajr(point.lat, method.fajrAngle, fraction = rule.fajr)
             else -> method.fajrAngleByDayOfYear
         }
@@ -787,6 +1109,7 @@ internal object PlaceCurves {
 
     /** The Moonsighting Committee's Fajr angle, where its seasonal minutes do not take over. */
     private const val MOONSIGHTING_FAJR_ANGLE = 18.0
+    private const val MOONSIGHTING_ID = "other.moonsighting"
 
     /** adhan-js's TwilightAngle rule for the ICCI's MWL angles: 18/60 and 17/60 of the night. */
     private const val ICCI_FAJR_ANGLE = 18.0
