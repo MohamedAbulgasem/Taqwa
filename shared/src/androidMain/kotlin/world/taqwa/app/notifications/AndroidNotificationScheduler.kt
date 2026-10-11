@@ -106,8 +106,9 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      * `SCHEDULE_EXACT_ALARM` is user-revocable from API 31, and the app does not ask for
      * `USE_EXACT_ALARM` (Play restricts it to alarm-clock and calendar apps), so a user who has
      * not granted "Alarms & reminders" would otherwise take a `SecurityException` straight out of
-     * `NotificationCoordinator.reschedule` on every cold start. A few minutes' slop on the adhan
-     * is far better than an unrecoverable crash loop, and `runCatching` covers the remaining race
+     * `NotificationCoordinator.reschedule` on every cold start. An inexact adhan, up to an hour
+     * late as the app's own note says, is far better than an unrecoverable crash loop, and
+     * `runCatching` covers the remaining race
      * where the permission is revoked between the check and the call.
      *
      * The fallback is `setAndAllowWhileIdle`, not `setWindow`: both are inexact and neither fires

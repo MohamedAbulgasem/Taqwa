@@ -36,8 +36,9 @@ store-readiness sweep (targetSdk 36, 0.16.0).
   on 13 September 2026 because Play limits it to alarm-clock, timer and calendar apps and refuses
   the rest at review. Taqwa instead asks for "Alarms & reminders" from Settings › Notifications
   (a button opens the system screen; the note disappears once granted) and, until it is granted,
-  schedules an inexact alarm that still fires in Doze, so a notification is at worst a few minutes
-  late and never missing. No Play declaration form applies to `SCHEDULE_EXACT_ALARM`.
+  schedules an inexact alarm that still fires in Doze, so a notification can arrive up to an hour
+  late, as that note itself says. No Play declaration form applies to
+  `SCHEDULE_EXACT_ALARM`.
 - **Permissions in the merged manifest** (all of them, i.e. what ships):
   - `INTERNET` — recitation downloads and the catalogue check, on request only.
   - `ACCESS_COARSE_LOCATION` — optional; prayer times and Qibla. Fine location is not declared.

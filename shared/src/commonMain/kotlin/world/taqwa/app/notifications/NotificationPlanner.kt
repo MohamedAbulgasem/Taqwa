@@ -147,7 +147,12 @@ object NotificationPlanner {
                         // can land before Maghrib has even been called, which reads as a wrong
                         // time rather than as a nudge.
                         val remindAt = maxOf(at - lead.minutes, previousPrayerInstant ?: Instant.DISTANT_PAST)
-                        if (remindAt > from) {
+                        // The minutes it says are the minutes really left when it rings: the lead,
+                        // or fewer where the clamp moved it later (every prayer instant is a whole
+                        // minute, so this is exact). One the clamp pushed onto or past its own
+                        // prayer has nothing left to remind of, and is not planned.
+                        val minutesLeft = (at - remindAt).inWholeMinutes.toInt()
+                        if (remindAt > from && minutesLeft > 0) {
                             out += ScheduledNotification(
                                 id = "${prayer.name}-REMINDER-$date",
                                 prayer = prayer,
@@ -160,7 +165,7 @@ object NotificationPlanner {
                                 // plan carries the setting it was planned under.
                                 voice = notifications.voice,
                                 title = copy.title(prayer, NotificationKind.REMINDER),
-                                body = copy.body(prayer, NotificationKind.REMINDER, clock, lead),
+                                body = copy.body(prayer, NotificationKind.REMINDER, clock, minutesLeft),
                             )
                         }
                     }

@@ -31,6 +31,7 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.feature.settings.BackChevron
+import world.taqwa.app.i18n.DigitGrouping
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.qibla.CompassLowReason
@@ -51,19 +52,14 @@ import world.taqwa.app.resources.qibla_no_sensor_title
 import world.taqwa.app.resources.qibla_title
 
 /**
- * Thousands separators without `java.text` — commonMain has no number formatter — with digits run
- * through [PlatformFormat] one at a time (the same trick `CountdownFormatter.padTwo` uses) so
- * ar-EG reads Arabic-Indic and ar-LY reads Western, matching how Today formats every other number.
+ * The whole kilometres, truncated, grouped by [DigitGrouping] — a point in Turkish and Indonesian,
+ * a narrow space in French, the Arabic thousands mark beside Arabic-Indic digits, a comma
+ * elsewhere — with digits run through [PlatformFormat] one at a time (the same trick
+ * `CountdownFormatter.padTwo` uses) so ar-EG reads Arabic-Indic and ar-LY reads Western, matching
+ * how Today formats every other number. A city page groups its distance with the same function.
  */
-internal fun localizedGroupedKm(km: Double, format: PlatformFormat): String {
-    val digits = km.toLong().toString()
-    return buildString {
-        digits.forEachIndexed { i, c ->
-            if (i > 0 && (digits.length - i) % 3 == 0) append(',')
-            append(format.localizedDigits(c - '0'))
-        }
-    }
-}
+internal fun localizedGroupedKm(km: Double, format: PlatformFormat): String =
+    DigitGrouping.group(km.toLong(), format.languageTag(), format::localizedDigits)
 
 @Composable
 fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {

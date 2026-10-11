@@ -45,7 +45,8 @@ object EnglishNotificationCopy : NotificationCopy {
         minutesBefore: Int,
     ): String = when (kind) {
         NotificationKind.PRAYER -> "It is time for ${name(prayer)} · $clockTime"
-        NotificationKind.REMINDER -> "${name(prayer)} in $minutesBefore minutes · $clockTime"
+        NotificationKind.REMINDER ->
+            "${name(prayer)} in $minutesBefore ${if (minutesBefore == 1) "minute" else "minutes"} · $clockTime"
         NotificationKind.TAHAJJUD -> "The last third of the night has begun · ${name(prayer)} at $clockTime"
     }
 

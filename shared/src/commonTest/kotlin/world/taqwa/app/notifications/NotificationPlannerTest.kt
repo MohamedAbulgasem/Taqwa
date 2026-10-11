@@ -76,6 +76,52 @@ class NotificationPlannerTest {
         }
         assertEquals(maghrib, reminder.instant)
         assertTrue(reminder.instant >= maghrib, "reminder for Isha preceded Maghrib")
+        // It rings at Maghrib, so it says the minutes really left to Isha, not the 30 asked for.
+        val left = (isha - maghrib).inWholeMinutes.toInt()
+        assertEquals(
+            EnglishNotificationCopy.body(Prayer.ISHA, NotificationKind.REMINDER, isoClockTime(isha, london.timeZoneId), left),
+            reminder.body,
+        )
+        assertTrue("in $left minutes" in reminder.body, reminder.body)
+        assertFalse("30 minutes" in reminder.body, reminder.body)
+    }
+
+    @Test
+    fun aReminderClampedToTheMinuteBeforeItsPrayerSaysOneMinute() {
+        // The adjustments' full hour each way pulls London's Maghrib and Isha past each other;
+        // Adjustments stops the later Maghrib a minute before the earlier Isha, so the clamped
+        // reminder rings at Maghrib with one minute left, in the singular.
+        val date = LocalDate(2026, 9, 6)
+        val londonEntry = engine.dayFor(london, date, PrayerSettings()).effectiveEntry.id
+        val touching = PrayerSettings(
+            minuteAdjustments = mapOf(Prayer.MAGHRIB to 60, Prayer.ISHA to -60),
+            confirmedAdjustments = mapOf(Prayer.ISHA to londonEntry),
+        )
+        val times = engine.timesFor(london, date, touching)
+        val maghrib = times.time(Prayer.MAGHRIB)
+        val isha = times.time(Prayer.ISHA)
+        // Precondition: without this the assertions below would pass for the wrong reason.
+        assertEquals(1.minutes, isha - maghrib)
+
+        val plan = NotificationPlanner.plan(
+            location = london,
+            settings = touching,
+            notifications = defaults.copy(remindBeforeMinutes = 10),
+            engine = engine,
+            from = date.atStartOfDayIn(TimeZone.of(london.timeZoneId)),
+            windowDays = 1,
+            capacity = 64,
+        )
+        val reminder = plan.single { it.id == "ISHA-REMINDER-$date" }
+        assertEquals(maghrib, reminder.instant)
+        assertEquals("Isha in 1 minute · ${isoClockTime(isha, london.timeZoneId)}", reminder.body)
+        // Every reminder in the plan says exactly the minutes between it and its prayer.
+        plan.filter { it.kind == NotificationKind.REMINDER }.forEach { r ->
+            val prayerAt = plan.single { it.id == r.id.replace("-REMINDER-", "-PRAYER-") }.instant
+            val n = (prayerAt - r.instant).inWholeMinutes.toInt()
+            assertTrue(n > 0, r.id)
+            assertEquals(EnglishNotificationCopy.body(r.prayer, NotificationKind.REMINDER, isoClockTime(prayerAt, london.timeZoneId), n), r.body)
+        }
     }
 
     @Test
@@ -177,6 +223,13 @@ class NotificationPlannerTest {
         assertTrue(plan.any { it.id == "FAJR-PRAYER-$date" }, "that morning's Fajr should be untouched")
         val nextDate = date.plus(1, DateTimeUnit.DAY)
         assertTrue(plan.any { it.id == "FAJR-PRAYER-$nextDate" }, "the next morning's Fajr should still ring")
+        // The next Fajr's reminder is clamped to that Isha, at or after Fajr itself: it is not
+        // planned, rather than ringing once Fajr has begun.
+        assertTrue(plan.none { it.id == "FAJR-REMINDER-$nextDate" }, "a Fajr reminder was planned at or after Fajr")
+        plan.filter { it.kind == NotificationKind.REMINDER }.forEach { r ->
+            val prayerAt = plan.single { it.id == r.id.replace("-REMINDER-", "-PRAYER-") }.instant
+            assertTrue(r.instant < prayerAt, "${r.id} is not before its prayer")
+        }
     }
 
     @Test

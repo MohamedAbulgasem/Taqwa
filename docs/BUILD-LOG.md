@@ -3315,3 +3315,180 @@ hashes at `1a93ddc5` (twelve entries, three each) and the harder stand-in were b
 `ProofStamps.kt` or golden-vector line moved: the whole gate is again 10,997 rows and 4,001,889
 place-days, 0 early, 0 late ends, none over its limit, nothing BROKEN, with its report line-identical
 and its stamps byte-identical; `checkStamps` is green, and tools `jvmTest` 313/0 with the archive.
+
+## The app's own words, and the distance's thousands mark (10–11 October) — for 1.0.1
+
+The store listings and the site lost their accuracy and on-time promises on 6–9 October; the app's own
+strings waited for the next build. They follow now, in all seven languages, each the smallest change
+that makes the sentence true, in the words the site's support page already uses.
+
+**Onboarding.**
+- The location screen says prayer times depend on where you are. "Your exact position" was not true:
+  the app reads only approximate location, coarse on Android and reduced accuracy on iOS.
+- The notifications screen is headed with the app's own name for them, Prayer notifications (the
+  master toggle's words), not "Never miss a prayer". Its body offers a notification *for* each prayer,
+  the words of each language's listing, not one *at* each prayer time. That is English, Turkish,
+  Indonesian, Urdu and Bengali in the first pass, and French ("pour chaque prière") and Arabic
+  ("إشعار لكل صلاة") after the review, which read their listings' notification line, not the takbir
+  line the first pass had matched.
+- Android's exact-alarm screen is headed with the permission it asks for, Alarms & reminders, not "On
+  time, to the minute". Its body says Android *can* ring at the exact prayer time only with it: with
+  it, a battery saver can still hold a notification back.
+
+**Elsewhere in the app.**
+- Settings › Notifications, exact alarms off: "Allow Alarms & reminders to fix this" becomes "… so it
+  can ring at the exact minute". The Arabic says it with ليتمكّن من الرنين, so حتى no longer means
+  "up to" in one sentence and "so that" in the next.
+- The clock-change sheet in Turkish, Urdu and Bengali said alerts come (ring) at the right time only on
+  an automatic clock; it now says they are right only then, the English's weaker claim (Turkish
+  "doğru çalışır", work correctly; Urdu without the doubled ہی). The Arabic said precise (دقيقة, the
+  same word as "minute") and now says right (صحيحة). French and Indonesian already said right.
+  The Turkish sheets also opened "saat uygulamasını değiştirdi", which a reader on a phone takes
+  for the Clock app; they now say the country changed its official time, "resmî saatini
+  değiştirdi" (the app's own spelling of resmî, and the Arabic sheet's meaning). No page reads them.
+- Bengali Match my mosque writes আযান, the app's own spelling, not আজান.
+- The iOS location prompt (Info.plist and the seven InfoPlist.strings) no longer says "accurate".
+- The widget gallery and placeholder words (Android's English, iOS's English and Turkish, and the
+  Swift fallback that mirrors them) take the app's curly apostrophe: today’s, Taqwa’yı.
+- The Urdu compass-unavailable sheets say the bearing and the distance درست ہیں, the plural their two
+  subjects want, not ہے.
+- French: the two About sentences that still had a plain space before high punctuation
+  (`about_not_followed_irn_tromso` before ;, `about_cautious_maghrib_cap` before :) take the narrow
+  no-break space every other one has, so neither line can break before the mark. The French pages
+  of Paris, Brussels and Antwerp carry the second, and change by that one character.
+
+**The reminder's minutes.** A reminder is clamped so it never rings before the prayer before it:
+with the 30-minute lead and a Maghrib–Isha gap under 30 minutes (a summer night far north, or the
+user's own adjustments) Isha's reminder rings at Maghrib. It still said the lead asked for, "Isha in
+30 minutes", with fewer left, on both platforms and with exact alarms too. It now says the minutes
+really left (exact: every prayer instant is a whole minute). One and two minutes, which no lead
+offered and a clamp can, take the singular in English and French ("in 1 minute", "dans 1 minute")
+and Arabic's singular and dual ("بعد دقيقة", "بعد دقيقتين"); Turkish, Indonesian, Urdu and Bengali
+count with the same noun at every number. A reminder the clamp would push onto or past its own
+prayer is no longer planned: it had nothing left to remind of. On a night whose Isha reaches the
+next Fajr (R83's shape; `NotificationPlannerTest` builds one at an invented point at 66.5° N on Umm
+al-Qura's global method) the next Fajr's reminder was planned at that Isha, at or after the Fajr it
+announced, saying "in 10 minutes".
+`NotificationPlannerTest` holds the clamped reminder's words and a one-minute case; the copy test
+holds the singular and dual in each language.
+
+**In the docs.** `docs/STORE-PRIVACY.md` said a notification without Alarms & reminders is "at worst a
+few minutes late and never missing", a promise the app itself does not make. It now says up to an hour
+late, as the app's own note beside the button does. The two code comments a later writer would copy
+from (`ExactAlarms.kt`, and the Android scheduler's `schedule`) said "a few minutes late" and "a few
+minutes' slop" too, and now say up to an hour.
+
+Every other string was read in every language against the same rules. The first reading missed
+one figure, the reminder's minutes (above, and for the owner below). Two kinds stay on purpose:
+- The Qibla's "the bearing and distance shown are correct", shown when the compass cannot be used.
+  Its point is that neither figure depends on the compass, which is true. A wording that says only
+  that ("do not need the compass") is a later option.
+- The app's own labels for the exact-alarm state: EXACT ALARMS OFF and Allow exact alarms, "alarmes
+  exactes", "alarm tepat waktu", "tam alarmlar", "عین وقت کے الارم", "المنبهات الدقيقة",
+  "সুনির্দিষ্ট অ্যালার্ম". They are not the setting's name, which is Alarms & reminders in every
+  language and is quoted so in the sentences beside them. They follow Android's own word for the
+  exact-alarm permission (`permlab_schedule_exact_alarm` in the SDK's android-36 `android.jar`:
+  Indonesian "Menjadwalkan tindakan tepat waktu", Turkish "Zamanı tam olarak belirli işlemler
+  planlama", Arabic "… بدقة", Urdu "عین مطابق بر وقت …", Bengali "সুনির্দিষ্ট সময় …"). They name a
+  kind of alarm rather than promise a prayer time, and every language's support page quotes them
+  word for word, so they could only change together with those pages.
+
+**The distance to Makkah.** It was grouped with a comma in every language. A Turkish or Indonesian
+reader writes the decimal with a comma, so "Mekke’ye 2,916 km" read as under three kilometres. The new
+`DigitGrouping` (shared `i18n`) picks the thousands mark from the reader's language and the digits the
+platform draws:
+- Turkish and Indonesian: a point, 2.916.
+- French: a narrow no-break space (U+202F), as the French strings already use before ? and :.
+- Arabic-Indic digits, and Urdu's Extended Arabic-Indic ones where a phone draws them: U+066C, the
+  Arabic thousands separator, ٢٬٩١٦. A Latin comma has the shape of the Arabic decimal ٫.
+- A comma everywhere else: English, Urdu in Western digits (Pakistan), Bengali (২,৯১৬), and Arabic in
+  Western digits (Libya, the Maghreb).
+
+Each mark is the partner of the decimal mark the app already writes for the same reader in a
+recitation's size (`NumberStyle`). So no reader sees one mark used for both, and a test holds every
+pair to that. (`NumberStyle` has no Extended Arabic-Indic case yet: a ur-IN reader's sizes stay
+"58.2", Western digits and a point, beside a distance of ۲٬۹۱۶. A different mark, though not its
+partner; that pre-dates this round.) Arabic in Western digits keeps the comma because the app
+writes "58.2 MB" there; CLDR would have a point for ar-LY, ar-MA, ar-DZ and ar-TN, where it also
+writes the decimal with a comma. CLDR differs for French in two regions as well (JDK 25): a point
+for fr-MA and U+00A0 for fr-CA. `DigitGrouping` writes U+202F for every French reader on purpose: a
+space is never a decimal mark, and the app and the site write the same. The Moroccan pages and
+Montreal, the one Canadian French page, are held. And the grouping is in threes, which Bengali and
+Urdu use only below 100,000: from 1,00,000 on they group the lakh in twos (CLDR's `#,##,##0`). No
+distance to Makkah reaches six digits, and the KDoc says so for any later caller.
+The site's generator now compiles `DigitGrouping.kt` (and runs its test), and `Formats.distance` calls
+it. The app and a city page therefore cannot group a distance two ways. The site's workflow
+(`pages.yml`) lists both files among the app files whose change rebuilds the site, as it lists
+`CountdownDigits.kt`; without that a change to the mark alone would wait for the six-hourly run.
+- City pages that change: every Turkish, Indonesian and French page whose distance runs to four
+  digits, and every such Arabic page in Arabic-Indic digits. That is 32 of the 129: 15 Arabic, 9
+  Indonesian, 6 French, 2 Turkish.
+- English, Urdu, Bengali and Western-digit Arabic pages are unchanged.
+- The site deploys on every push to main, so those 32 pages take the new mark as soon as this is
+  pushed, while phones keep 1.0.0's comma until 1.0.1 is out in both stores. Only the separator
+  differs in that window, never a digit, a time or a proof figure.
+
+**Checks.**
+- `./scripts/check-strings.sh` is clean, and values-in is values-id's copy.
+- The shared host tests pass, re-run after the review's changes: 1,633, 0 failures, with the new
+  `DigitGroupingTest` (13), `QiblaDistanceTest` (5) and `DownloadCopyTest`'s pairing test.
+  `:shared:compileTestKotlinIosSimulatorArm64` builds.
+- The tools' JVM tests pass (320: `FormatsTest`'s second distance test, which held
+  `Formats.distance` to `DigitGrouping.group` called with the same arguments, proved nothing and is
+  gone; its literals are the app's `QiblaDistanceTest`'s). The whole gate is unchanged: 10,997 rows,
+  4,001,889 place-days, 0 early, 0 late ends, none over its limit, nothing BROKEN. No stamp moved.
+- The site generates and builds (164 pages, all checks good), and its tests pass (18).
+
+**Left for a later round** (none breaks this round's rules):
+- Arabic `about_stat_minutes_value` is one form for every number, so a worst of 3 reads ٣ دقيقة
+  where Arabic wants دقائق; the site reads the same string, so app and site change together.
+- Urdu `about_check_mosque_body` (درست کریں, "correct", where the English says adjust).
+- French puts a plain space between every number and its unit (km, min, Mo), in the app and on the
+  site; a no-break space would be one pass over both.
+- `NumberStyle`'s Extended Arabic-Indic case, above.
+- Whether Arabic in Western digits in Libya, Morocco, Algeria and Tunisia should keep the comma (and
+  the point in its sizes) or take CLDR's point and comma for both; the owner's question. CLDR groups
+  all four with a point and writes their decimal with a comma (JDK 25; Apple's ICU agrees, per the
+  review), so "3,196 كم" on the Algiers, Tunis and Sfax Arabic pages, and in the app on a phone in
+  ar-DZ or ar-TN, carries the ambiguity this round removed for Turkish and Indonesian. If Libya
+  moves too, every Arabic store screenshot (Tripoli, in Western digits) joins the re-shoot list.
+- Nine Arabic and ten Bengali strings write their numbers in the language's own digits rather than
+  the reader's: `saudi_fajr_later` and its detail (٥, ৫), `timetable_checking` (١٢, ১২), the
+  timetable names 12°, 15°, 18°, Chicago 18°, Chicago 18°/15° and 90-minute Isha, and Bengali
+  `adjustments_one` (১টি). An ar-LY reader sees ١٢ among Western digits, and an iPhone, which draws
+  Bengali in Western digits, sees ১২ beside 12. Each would take a placeholder filled by
+  `localizedDigits`, and the timetable names are also read by the site, so app and site would change
+  together.
+
+**Not changed, for the owner.** "Taqwa shows each prayer once they have all begun it", on the
+cautious-times card, behind the ⓘ and under Timetable › Automatic (`today_card_cautious_body`,
+`today_whose_cautious_body`, `timetable_auto_cautious`), is not true of Maghrib on a day the Maghrib cap
+decides it (Toronto, Oslo, Belgium, Australia): Maghrib then follows the most-followed timetable, and
+another is later. About these times says so on that day (R91), and the site's description and support
+page carry the same sentence, so it could only change in the app and on the site together.
+
+A reminder that arrives late. The reminder ("{prayer} in {minutes} minutes · {time}", and its six
+translations in `LocalizedNotificationCopy`) is written when it is scheduled, like every
+notification, and Android's `PrayerAlarmReceiver` posts it unchanged. Without Alarms & reminders
+it can arrive up to an hour late, so a 10-minute reminder can say "in 10 minutes" after its prayer
+has begun. Two ways out:
+- the receiver drops a reminder that fires at or after its prayer's start, and says the minutes
+  left at delivery when it fires late (the prayer's instant would travel in the intent's extras);
+- or wording with no count, which stays true however late it arrives ("Reminder · {prayer} at
+  {time}").
+The first keeps the reminder useful; either is a change to the notification path, so it waits for
+the owner.
+
+**Screenshots that now show an old distance** (not re-shot):
+- `docs/store/screenshots/appstore/{fr,tr,id}/*-01.png` and `*-08.png`.
+- `docs/store/screenshots/play/{fr,tr,id}/*-01.png`, `*-06.png` and `*-08.png`.
+- The site's `site/assets/img/prayer-{light,dark}-{fr,tr,id}.webp`.
+- The Arabic-Indic capture: `site/assets/img/prayer-arabic.webp`, on every language's home page, and
+  its README twin `docs/screenshots/prayer-arabic.png`. Its Qibla card reads ٢,٩١٦ with a Latin
+  comma, where the app now writes ٢٬٩١٦. A re-shoot needs a phone that draws Arabic-Indic digits, as
+  the one it was taken on did.
+
+The Arabic and Urdu store shots, `prayer-dark-ar.webp` and `prayer-{light,dark}-ur.webp` stay: they
+are in Western digits, which keep the comma. The Bengali ones keep it too (২,৯১৬), and the English
+ones are unchanged. No screenshot shows a changed sentence: the onboarding is in none, and the
+exact-alarm warning shows only with the permission off.

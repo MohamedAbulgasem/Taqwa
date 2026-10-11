@@ -3,7 +3,7 @@
 "ayah_widget_description" = "Günün ayeti ve meali.";
 
 /* Shown on the card until the app has run once and written the pool mirror (design spec §2). */
-"ayah_widget_placeholder" = "Günün ayetini yüklemek için Taqwa'yı bir kez açın";
+"ayah_widget_placeholder" = "Günün ayetini yüklemek için Taqwa’yı bir kez açın";
 
 /* The two prayer widgets as they appear in the widget gallery. */
 "home_widget_name" = "Taqwa";
@@ -13,7 +13,7 @@
 
 /* Shown on the prayer cards until the app has run once and written the snapshot mirror. */
 "prayer_widget_placeholder_title" = "Taqwa";
-"prayer_widget_placeholder_body" = "Namaz vakitlerinizi yüklemek için Taqwa'yı açın.";
+"prayer_widget_placeholder_body" = "Namaz vakitlerinizi yüklemek için Taqwa’yı açın.";
 
 /* The prayer after the next one on the rectangular complication; %@ is its display name. */
 "lock_widget_then" = "sonra %@";

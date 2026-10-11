@@ -207,6 +207,13 @@ method (the app has no exact Jaʿfari method), anything using the reader's locat
   the site reads every clock from the newest tzdata package and rewrites any city where the JDK
   is behind. Stopping the build instead, as first built, would have frozen the whole site on
   1 October (Alberta) and on 1 January 2027 (Ramadan in view).
-- **The distance to Makkah** keeps the app's comma grouping ("2,916 km") in every language, which
-  reads as a decimal in French, Turkish and Indonesian. It is the app's formatting to fix, and the
-  generator's `Formats.distance` mirrors it by hand, so both change together.
+- **The distance to Makkah** was grouped with a comma in every language ("2,916 km"), which reads
+  as a decimal in French, Turkish and Indonesian. Fixed in the app for 1.0.1: the app's
+  `DigitGrouping` (shared `i18n`) picks the thousands mark by language and digit set — a point in
+  Turkish and Indonesian, a narrow no-break space in French, U+066C beside Arabic-Indic and Extended
+  Arabic-Indic digits, a comma in English, Urdu, Bengali and Arabic written in Western digits, each
+  the partner of the decimal mark the app's `NumberStyle` already writes for that reader (Extended
+  Arabic-Indic aside: `NumberStyle` still writes those readers' sizes in Western digits with a
+  point, a different mark from ٬ but not its partner). The
+  generator compiles that file and `Formats.distance` calls it, so the app and the site cannot
+  group a distance two ways.

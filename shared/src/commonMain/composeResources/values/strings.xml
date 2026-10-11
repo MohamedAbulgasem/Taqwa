@@ -11,13 +11,13 @@
     <string name="onboarding_welcome_body">Prayer times, qibla and the Quran. Free forever. No ads, no account, works offline.</string>
     <string name="onboarding_welcome_cta">Get started</string>
     <string name="onboarding_location_title">Where are you?</string>
-    <string name="onboarding_location_body">Prayer times depend on your exact position. Everything is calculated on your device. Your location never leaves your phone.</string>
+    <string name="onboarding_location_body">Prayer times depend on where you are. Everything is calculated on your device. Your location never leaves your phone.</string>
     <string name="onboarding_continue">Continue</string>
-    <string name="onboarding_notifications_title">Never miss a prayer</string>
-    <string name="onboarding_notifications_body">A notification at each prayer time. You pick the sound for every prayer separately, and can change it whenever you like.</string>
+    <string name="onboarding_notifications_title">Prayer notifications</string>
+    <string name="onboarding_notifications_body">A notification for each prayer. You pick the sound for every prayer separately, and can change it whenever you like.</string>
     <string name="onboarding_notifications_secondary">Not now</string>
-    <string name="onboarding_exact_title">On time, to the minute</string>
-    <string name="onboarding_exact_body">Android rings at the exact prayer time only if “Alarms &amp; reminders” is allowed for Taqwa. Without it, a notification can arrive up to an hour late.</string>
+    <string name="onboarding_exact_title">Alarms &amp; reminders</string>
+    <string name="onboarding_exact_body">Android can ring at the exact prayer time only if “Alarms &amp; reminders” is allowed for Taqwa. Without it, a notification can arrive up to an hour late.</string>
     <string name="onboarding_widget_title">On your home screen</string>
     <string name="onboarding_widget_body">The Taqwa widget shows the next prayer and a live countdown, without opening the app.</string>
     <string name="onboarding_widget_body_ios">The Taqwa widget shows the next prayer and a live countdown, without opening the app. To add it, touch and hold the Taqwa icon on your home screen and choose a widget size.</string>
@@ -496,7 +496,7 @@
     <string name="qibla_cardinal_east">E</string>
     <string name="qibla_cardinal_south">S</string>
     <string name="qibla_cardinal_west">W</string>
-    <string name="notifications_exact_alarms_off">Exact alarms are turned off for Taqwa, so a notification can arrive up to an hour late. Allow “Alarms &amp; reminders” to fix this.</string>
+    <string name="notifications_exact_alarms_off">Exact alarms are turned off for Taqwa, so a notification can arrive up to an hour late. Allow “Alarms &amp; reminders” so it can ring at the exact minute.</string>
     <string name="notifications_allow_exact_alarms">Allow exact alarms</string>
     <string name="notifications_blocked">Notifications are turned off for Taqwa in system settings, so no prayer alert can be shown until they are allowed again.</string>
     <string name="notifications_open_settings">Open notification settings</string>

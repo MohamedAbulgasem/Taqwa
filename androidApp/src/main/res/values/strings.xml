@@ -6,6 +6,6 @@
     <string name="widget_medium_label">Prayer times</string>
     <string name="widget_ayah_label">Ayah of the day</string>
     <string name="widget_small_description">Next prayer and a live countdown.</string>
-    <string name="widget_medium_description">Next prayer, countdown and today\'s times.</string>
+    <string name="widget_medium_description">Next prayer, countdown and today’s times.</string>
     <string name="widget_ayah_description">Today’s ayah, with its translation.</string>
 </resources>
