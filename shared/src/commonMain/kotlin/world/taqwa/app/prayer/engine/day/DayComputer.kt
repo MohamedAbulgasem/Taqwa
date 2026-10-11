@@ -70,8 +70,11 @@ import kotlin.time.Instant
  *    order can show is declared in [PrayerDay.notFollowed].
  * 7. **The fixed point's own day** (ruling R89): where a table's point rides beside the user's, the
  *    sunrise, end of eating and imsak shown are never after those the same method shows at that
- *    point alone, after every step above; where it rides for the starts too, nor after those it shows
- *    at the user's point alone (the city-point audit of 10–11 Oct 2026).
+ *    point alone, after every step above; where it rides for the starts too beside a method computed
+ *    at the user's own point ([TimetableMethod.endsBoundAtUserPoint], a table printed for its own
+ *    point), nor after those it shows at the user's point alone (the city-point audit of 10–11 Oct
+ *    2026). An authority's own unit keeps its table's ends: there the user's point alone would read
+ *    rules its table does not (DUM RT's white nights end the fast up to two hours earlier).
  * 8. **Fajr before the sunrise shown** (ruling R90), last of all: where the Fajr shown is not before
  *    the sunrise shown (an authority's sunrise printed minutes before the sun's, or a Fajr its own
  *    rule puts after sunrise, at the polar edge), the sunrise moves later to the minute after Fajr,
@@ -159,15 +162,18 @@ object DayComputer {
 
         /**
          * Ruling R15 completed (the city-point audit of 10–11 Oct 2026): the same method at the user's point alone, where a
-         * fixed point rides beside it for the starts too ([FixedPointMode.BOTH]), which bounds the ends shown here as
+         * table printed for its own point rides beside a method computed at the user's point, for the starts too
+         * ([TimetableMethod.endsBoundAtUserPoint], [FixedPointMode.BOTH]), which bounds the ends shown here as
          * [atFixedPoint]'s day does. Each end is already the earlier over the two points, but the end of eating is then
          * held to the Fajr shown, the later of the two, while at the user's point alone it is held to the user's own Fajr:
          * under a Fajr margin below the end's (the Kyrgyz Muftiate's, at Bishkek's suburbs), the table's later Fajr let
-         * the end of eating come a minute after the user's own point alone gave it.
+         * the end of eating come a minute after the user's own point alone gave it. Only there: inside an authority's own
+         * unit (DUM RT's, IRN's, EMB's, Umm al-Qura's …) the ends stay its table's, as they were before.
          */
         private val atUserAlone: Place? =
-            if (here.size == 2 && !endsOnly) {
-                Place(method.copy(fixedPoint = null), point, zone, school, ramadan, lagDates, lagDatesUntil, skies)
+            if (here.size == 2 && !endsOnly && method.endsBoundAtUserPoint) {
+                val alone = method.copy(fixedPoint = null, endsBoundAtUserPoint = false)
+                Place(alone, point, zone, school, ramadan, lagDates, lagDatesUntil, skies)
             } else {
                 null
             }

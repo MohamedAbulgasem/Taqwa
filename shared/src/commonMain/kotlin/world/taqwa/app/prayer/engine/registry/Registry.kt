@@ -159,7 +159,12 @@ object Registry {
      */
     internal fun methodInUnit(entryId: String, base: TimetableMethod, unit: AuthorityUnit, user: GeoPoint): TimetableMethod {
         val own = unit.method ?: base
-        return finish(entryId, if (own.fixedPoint == null) own.copy(fixedPoint = unit.point) else own, user)
+        val placed = if (own.fixedPoint == null) {
+            own.copy(fixedPoint = unit.point, endsBoundAtUserPoint = unit.endsBoundAtUserPoint)
+        } else {
+            own
+        }
+        return finish(entryId, placed, user)
     }
 
     /** Entry [entryId]'s method [base] at [user] as if it had no units: the user's own point alone, then [finish]. */

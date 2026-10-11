@@ -43,6 +43,9 @@ import kotlin.math.sqrt
  * the app's own city (its id in the app's city list) whose table the unit is: About then calls the place
  * by that city's name in the reader's language, even where the user's own nearest city is another (a
  * suburb's fix inside the city's reach, the owner's decision of 9 Oct 2026 for QMDB's cities).
+ * [endsBoundAtUserPoint] is true for a table printed for its own point beside a method computed at the user's own
+ * point ([tablesAtTheirPoints]): its method then carries [TimetableMethod.endsBoundAtUserPoint], so no end shown is
+ * after the method at the user's point alone, as it was before the unit.
  * (Not named `Unit`: that would shadow kotlin.Unit.)
  */
 data class AuthorityUnit(
@@ -56,6 +59,7 @@ data class AuthorityUnit(
     val lateLimits: List<LateLimit> = emptyList(),
     val named: Boolean = true,
     val cityId: Int? = null,
+    val endsBoundAtUserPoint: Boolean = false,
 ) {
     init {
         requireEachEventOnce(lateLimits, id)
@@ -259,6 +263,7 @@ internal fun tablesAtTheirPoints(
     val units = tables.map { t ->
         AuthorityUnit(
             t.key, t.name, t.point, lateReachKm(t.point.lat, reach), measured = measured, lateLimits = t.lateLimits, named = false,
+            endsBoundAtUserPoint = true,
         )
     }
     return UnitSet(entryId, units, measuredBeyond = measuredBeyond) { method }

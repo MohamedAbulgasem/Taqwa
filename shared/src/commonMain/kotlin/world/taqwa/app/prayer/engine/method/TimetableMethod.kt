@@ -167,7 +167,11 @@ sealed interface HighLatRule {
  * the point given and, when set, at [fixedPoint] beside it (MUIS): starts take the later of the
  * two, sunrise, sunset and the end of eating the earlier (spec §3.5); with [fixedPointMode]
  * [FixedPointMode.ENDS_ONLY] the fixed point bounds the ends alone. Starts are also computed at
- * each of [startPoints] and the latest is taken.
+ * each of [startPoints] and the latest is taken. [endsBoundAtUserPoint]: where the fixed point rides
+ * for the starts too, the ends shown are also never after those this method shows at the user's
+ * point alone (DayComputer's point 7); set only on a table printed for its own point riding beside a
+ * method that is computed at the user's own point (`tablesAtTheirPoints`, the city-point audit of
+ * 10–11 Oct 2026), never on an authority's own unit, whose ends follow its table (ruling R89).
  *
  * - [twilightDipDeg] deepens the Fajr and Isha angles (INM, JAKIM highland zones).
  * - [fajrDeclinationBias] (degrees, by day of year) is added to the sun's declination for Fajr, and
@@ -222,6 +226,7 @@ data class TimetableMethod(
     val startPoints: List<GeoPoint> = emptyList(),
     val fixedPoint: GeoPoint? = null,
     val fixedPointMode: FixedPointMode = FixedPointMode.BOTH,
+    val endsBoundAtUserPoint: Boolean = false,
     val fajrAngleByDayOfYear: DoubleArray? = null,
     val ishaAngleByDayOfYear: DoubleArray? = null,
     val monthlyOffsets: Map<Prayer, IntArray>? = null,
