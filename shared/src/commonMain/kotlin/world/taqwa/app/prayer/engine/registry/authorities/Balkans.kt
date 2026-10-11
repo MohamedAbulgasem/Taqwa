@@ -90,7 +90,9 @@ object Balkans {
      * 2027 cell of its three towns equal to 2026's, but the hour on the 7 days the clock changes on other
      * dates). So every year is computed as 2026, the year its curves and offsets were fitted on
      * ([TimetableMethod.fixedTableYear]), and shows the table's own times; the year's own sun would
-     * drift from them by up to a minute through the leap cycle.
+     * drift from them by up to a minute through the leap cycle. The date's own sun still bounds the
+     * sunrise and Maghrib shown (DayComputer); at the three towns neither binds from 2027 to 2030, the
+     * vaktija's sunrise being minutes before the sun's and its akšam minutes after.
      */
     val bosniaMethod = TimetableMethod(
         id = "ba.iz",
@@ -140,7 +142,12 @@ object Balkans {
         ),
     )
 
-    private val bosniaEdge = bosniaMethod.copy(id = "ba.iz.edge")
+    /**
+     * Beyond the three held towns: the fixed table's year as theirs, and the real dawn kept on the date's own
+     * sun ([TimetableMethod.fixedTableOwnDawn]): its Fajr never before, nor its end of eating after, what
+     * 2027's or 2028's own 18° dawn gives (review of track T4: the table's year alone ran up to 60 s before it).
+     */
+    private val bosniaEdge = bosniaMethod.copy(id = "ba.iz.edge", fixedTableOwnDawn = true)
 
     /** A town south of Sarajevo in the app's list: IZ's own offsets there are not held (spec §10.8). */
     private fun southern(id: String, name: String, lat: Double, lon: Double) = AuthorityUnit(
@@ -194,8 +201,9 @@ object Balkans {
      * Perpetual in fact (track T4, 11 Oct 2026): BIK's 2024 and 2026 editions print the same month-day times
      * in standard time, the summer hour alone following the calendar, so every year is computed as 2026,
      * the year it was fitted on ([TimetableMethod.fixedTableYear]), and shows the table's own times
-     * (against the year's own sun, 2027's end of eating ran 4 min before its printed imsak at Prishtina on
-     * 2 July, over class D's 3).
+     * (against the year's own sun, 2027's end of eating ran 4 min before the imsak of Prishtina's table
+     * mapped onto 2027 on 2 July, over class D's 3; no 2027 Takvimi is printed, the mapping is derived
+     * from the 2024 and 2026 editions).
      */
     private val kosovoBase = TimetableMethod(
         id = "xk.bik",

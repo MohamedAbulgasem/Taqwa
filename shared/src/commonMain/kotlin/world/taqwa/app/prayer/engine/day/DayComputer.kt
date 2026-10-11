@@ -13,6 +13,7 @@ import kotlinx.datetime.toInstant
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.method.CURVE_REFERENCE_YEAR
 import world.taqwa.app.prayer.engine.method.ClockRule
 import world.taqwa.app.prayer.engine.method.ClockTime
 import world.taqwa.app.prayer.engine.method.ClockTimes
@@ -89,6 +90,11 @@ import kotlin.time.Instant
  * where the day has both, in half-degree steps on the same meridian, bound by the place's own real
  * signs: no start before the place's own, no end after it (ruling R19); only the borrowed times and
  * the place's own estimates are set by rule (ruling R21).
+ *
+ * A fixed table ([TimetableMethod.fixedTableYear]) computes every other year's date as the table's
+ * year's, moved onto the date at the same moment of the UTC day, and then holds it to the date's own
+ * sun: no sunrise after the sun's, no Maghrib before the minute after its sunset, the date's own
+ * sunset, Asr's end and red twilight (`Place.fixedDay`).
  */
 object DayComputer {
 
@@ -117,13 +123,33 @@ object DayComputer {
         val place = Place(method, point, zone, school, ramadan, lagDates, lagDatesUntil)
         val year = method.fixedTableYear
         if (year == null || date.year == year) return place.day(date)
-        // A fixed table (TimetableMethod.fixedTableYear): the same month and day of the table's year, at the
-        // same instant of the UTC day; a 29 February the table's year lacks is its 28 February.
-        val ref = LocalDate(year, date.month, if (date.month == Month.FEBRUARY && date.day == 29 && !isLeap(year)) 28 else date.day)
-        return place.day(ref).movedTo(date, (date.toEpochDays() - ref.toEpochDays()).days)
+        return place.fixedDay(date, year)
     }
 
     private fun isLeap(year: Int): Boolean = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
+
+    /**
+     * [this] reading a table's year that has no 29 February as if it had one, on the day after its 28
+     * February (its 1 March, which this computes): February's monthly offsets and 29 February's curve
+     * slot. A town that is a base table plus a month's offset prints its 29 February with February's
+     * (the IZ BiH vaktija on 29 February 2028, between 28 February and 1 March, a minute from each at
+     * Sarajevo and up to 3 from 1 March at Banja Luka and Bihać, whose offsets change on 1 March).
+     * Against vaktija.ba's own February 2028 (review of track T4, checked outside the gate's rows, as
+     * 2028 is past the stamps), 28 February alone was a minute early at Sarajevo's Isha; the safe side
+     * of the two is never early, and up to 3 min late at Banja Luka's and Bihać's Isha that day.
+     */
+    private fun TimetableMethod.asLeapDay(): TimetableMethod {
+        val march = Month.MARCH.number - 1
+        val slot = curveSlot(LocalDate(CURVE_REFERENCE_YEAR, 3, 1))
+        fun DoubleArray.leap() = copyOf().also { it[slot] = this[slot - 1] }
+        val eating = endOfEating
+        return copy(
+            monthlyOffsets = monthlyOffsets?.mapValues { (_, values) -> values.copyOf().also { it[march] = values[march - 1] } },
+            fajrAngleByDayOfYear = fajrAngleByDayOfYear?.leap(),
+            ishaAngleByDayOfYear = ishaAngleByDayOfYear?.leap(),
+            endOfEating = if (eating is EndOfEating.DawnAngle && eating.bySlot != null) eating.copy(bySlot = eating.bySlot.leap()) else eating,
+        )
+    }
 
     /** [this] day of a fixed table's year, every instant moved by [by] onto [date]. */
     private fun PrayerDay.movedTo(date: LocalDate, by: Duration): PrayerDay = copy(
@@ -134,6 +160,44 @@ object DayComputer {
         earliestStart = earliestStart.mapValues { it.value + by },
         ends = ends.mapValues { it.value + by },
     )
+
+    /**
+     * The safe side of two days that stand for one date: each start the later, sunrise, sunset, the
+     * end of eating, imsak and each end the earlier (an end only where both have it); a time is set by
+     * rule where the day it is taken from sets it.
+     */
+    private fun PrayerDay.safest(other: PrayerDay): PrayerDay {
+        val setByRule = Prayer.entries.filter { prayer ->
+            val mine = timeOf(prayer)
+            val theirs = other.timeOf(prayer)
+            val from = when {
+                mine == theirs -> listOf(this, other)
+                (mine > theirs) == (prayer != Prayer.SUNRISE) -> listOf(this)
+                else -> listOf(other)
+            }
+            from.all { prayer in it.setByRule }
+        }.toSet()
+        return copy(
+            fajr = maxOf(fajr, other.fajr), sunrise = minOf(sunrise, other.sunrise), dhuhr = maxOf(dhuhr, other.dhuhr),
+            asr = maxOf(asr, other.asr), asrOther = maxOf(asrOther, other.asrOther), maghrib = maxOf(maghrib, other.maghrib),
+            isha = maxOf(isha, other.isha), sunset = minOf(sunset, other.sunset), endOfEating = minOf(endOfEating, other.endOfEating),
+            imsak = imsak?.let { mine -> other.imsak?.let { minOf(mine, it) } ?: mine } ?: other.imsak,
+            ends = ends.mapNotNull { (prayer, end) -> other.ends[prayer]?.let { prayer to minOf(end, it) } }.toMap(),
+            setByRule = setByRule,
+            polar = polar || other.polar,
+            repaired = repaired || other.repaired,
+            notFollowed = notFollowed + other.notFollowed,
+        )
+    }
+
+    private fun PrayerDay.timeOf(prayer: Prayer): Instant = when (prayer) {
+        Prayer.FAJR -> fajr
+        Prayer.SUNRISE -> sunrise
+        Prayer.DHUHR -> dhuhr
+        Prayer.ASR -> asr
+        Prayer.MAGHRIB -> maghrib
+        Prayer.ISHA -> isha
+    }
 
     /**
      * One method at one point and zone. The days it computes share its skies, and with them every
@@ -195,6 +259,93 @@ object DayComputer {
             val table = atFixedPoint?.day(date, capIsha)
             val bounded = if (table != null) own.endsNoLaterThan(table) else own
             return bounded.fajrBeforeSunrise(date).ishaAfterMaghrib()
+        }
+
+        /**
+         * [date]'s day under a fixed table ([TimetableMethod.fixedTableYear]): the same month and day of
+         * the table's [year], moved onto [date] at the same moment of the UTC day, then held to [date]'s
+         * own sun ([onOwnSun]), which the table's year cannot know (review of track T4: through the leap
+         * cycle Dublin's moved sunrise came a minute after the sun's on 19 days of March 2028, and its
+         * Maghrib on the minute the sun set on 41 days of 2028). A 29 February the table's year lacks
+         * shows the safe side of its 28 February and of its would-be 29 February (the day after,
+         * [asLeapDay]): each start the later, each end the earlier.
+         */
+        fun fixedDay(date: LocalDate, year: Int): PrayerDay {
+            fun moved(day: PrayerDay, from: LocalDate) = day.movedTo(date, (date.toEpochDays() - from.toEpochDays()).days)
+            val table = if (date.month == Month.FEBRUARY && date.day == 29 && !isLeap(year)) {
+                val feb28 = LocalDate(year, 2, 28)
+                val after = LocalDate(year, 3, 1)
+                val leapDay = Place(method.asLeapDay(), point, zone, school, ramadan, lagDates, lagDatesUntil, skies)
+                moved(day(feb28), feb28).safest(moved(leapDay.day(after), after))
+            } else {
+                val ref = LocalDate(year, date.month, date.day)
+                moved(day(ref), ref)
+            }
+            return table.onOwnSun(date)
+        }
+
+        /**
+         * [this], a fixed table's day moved onto [date], held to [date]'s own sun at the place's points:
+         * - the sunrise shown, and Fajr's end, never after the sun's own sunrise, rounded down, the
+         *   earliest over [here] (an end never after the sun's);
+         * - the sunset the date's own, rounded down, the earliest over [here] ([PrayerDay.sunset], the
+         *   invariants' and the Maghrib cap's), and Asr's end with it;
+         * - Maghrib never before the minute after the sun's own sunset, rounded down, the latest over the
+         *   start points (the sun has set wherever the start is read), and Isha after the Maghrib shown;
+         * - Maghrib's end the earlier of the Isha shown and the date's own red twilight;
+         * - under [TimetableMethod.fixedTableOwnDawn], Fajr never before, and the end of eating and imsak
+         *   never after, what the method gives on the date's own sun.
+         * A bound the date's own sun cannot give (no sunrise or sunset) leaves the moved time as it is.
+         */
+        private fun PrayerDay.onOwnSun(date: LocalDate): PrayerDay {
+            val rises = here.map { sky(it).sunrise(date) }
+            val sets = here.map { sky(it).sunset(date) }
+            val setsForStarts = (startHere + method.startPoints).map { sky(it).sunset(date) }
+            val sunriseShown = if (rises.all { it != null }) minOf(sunrise, endOf(rises.minOf { it!! })) else sunrise
+            val sunsetShown = if (sets.all { it != null }) endOf(sets.minOf { it!! }) else sunset
+            val maghribShown = if (setsForStarts.all { it != null }) {
+                maxOf(maghrib, endOf(setsForStarts.maxOf { it!! }) + 1.minutes)
+            } else {
+                maghrib
+            }
+            val ishaShown = maxOf(isha, maghribShown + 1.minutes)
+            val redTwilight = here.mapNotNull { sky(it).altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
+                .minOrNull()?.let(::endOf)
+            var fajrShown = fajr
+            var eating = endOfEating
+            var imsakShown = imsak
+            var rule = setByRule
+            if (method.fixedTableOwnDawn) {
+                val own = day(date)
+                if (own.fajr > fajrShown) {
+                    fajrShown = own.fajr
+                    rule = if (Prayer.FAJR in own.setByRule) rule + Prayer.FAJR else rule - Prayer.FAJR
+                }
+                eating = minOf(eating, own.endOfEating)
+                imsakShown = imsakShown?.let { mine -> own.imsak?.let { minOf(mine, it) } ?: mine }
+            }
+            val starts = mapOf(
+                Prayer.FAJR to fajrShown, Prayer.DHUHR to dhuhr, Prayer.ASR to asr, Prayer.MAGHRIB to maghribShown, Prayer.ISHA to ishaShown,
+            )
+            val endsShown = ends.mapValues { (prayer, end) ->
+                when (prayer) {
+                    Prayer.FAJR -> minOf(end, sunriseShown)
+                    Prayer.ASR -> sunsetShown
+                    Prayer.MAGHRIB -> redTwilight?.let { minOf(ishaShown, it) } ?: ishaShown
+                    else -> end
+                }
+            }.filter { (prayer, end) -> starts[prayer]?.let { end > it } ?: true }
+            return copy(
+                fajr = fajrShown,
+                sunrise = sunriseShown,
+                maghrib = maghribShown,
+                isha = ishaShown,
+                sunset = sunsetShown,
+                endOfEating = minOf(eating, fajrShown),
+                imsak = imsakShown?.let { minOf(it, fajrShown) },
+                ends = endsShown,
+                setByRule = rule,
+            )
         }
 
         /**

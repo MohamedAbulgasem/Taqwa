@@ -283,7 +283,12 @@ object Europe {
      * 2026, the year it was fitted on ([TimetableMethod.fixedTableYear]; track T4, 11 Oct 2026). Against
      * its own sun 2027 was a minute early on 52 starts (Maghrib 37, Asr 14, Dhuhr 1) and a minute late
      * on 29 ends against the table mapped onto 2027, and 2028, a leap year, by up to 70 s more; each
-     * year now shows the table's own times, checked against the table on 2027, 2028 and 2029.
+     * year now shows the table's own times, held to the date's own sun (review of track T4): where the
+     * leap cycle moves the sun past the table, the table's sunrise would come after the real one (19 days
+     * of March 2028) or its Maghrib on the minute the sun sets (41 days of March and April 2028, 24 of
+     * February to April 2029), and the day shows the sun's minute instead, a minute from the table on the
+     * safe side. The table mapped onto 2027–2029 checks that (gate rows, fit: the table re-dated, not
+     * held-out years).
      */
     val ifi: RegistryEntry = single(
         id = "ie.ifi", nameKey = "authority_ifi", entryClass = EntryClass.D_AUTHORITY,
