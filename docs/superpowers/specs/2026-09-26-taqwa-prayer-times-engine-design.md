@@ -217,8 +217,12 @@ a monitor source. Large tables are compact resources.
   member keeps its own measured reach. BIK's own town list (the Takvimi's "Diferenca e vendeve": Sharri
   T + 2, five towns T − 1, Presheva T − 2, every other town T) is carried as start and end points beside
   the base point, which rides everywhere in Kosovo (rulings R118 and R120's construction, beside the
-  user's own point). A named table chosen outside its area (London Unified within R45's three reaches,
-  IACAD anywhere) rides its table's point both ways. The app's own cities inside each new unit are gated at their own points, and the units
+  user's own point). A named table chosen outside its area rides its table's point: London Unified as the
+  fixed point within R45's three reaches and farther as a start point and an end point beside the user's own
+  (whose own curves are kept), IACAD its nearest table's anywhere, with Dubai's main table beside it; Rabita's
+  calendar is held across the Helsinki region (45 km) by wider margins (the fix round of 11 Oct 2026). The
+  envelope and these named claims are gated as promise-only rows (`official/gate/<group>-envelope.tsv`):
+  an early start or a late end there breaks the gate, but their lateness is no unit's figure and no limit's. The app's own cities inside each new unit are gated at their own points, and the units
   that show a figure (ISNA's, BIK's) are gated across their reach as Umm al-Qura's and QMDB's are. Where
   such a table rides for the starts too, the ends shown are also never after those the same method shows
   at the user's point alone (`DayComputer`'s point 7, `TimetableMethod.endsBoundAtUserPoint`): the end of

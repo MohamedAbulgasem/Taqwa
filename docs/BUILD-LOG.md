@@ -3604,19 +3604,23 @@ Leposaviq, Gjakovë, Gjilan and Podujeva: 0 early, 0 late ends against the Takvi
 - **Diyanet's Sydney table.** Its point is not published, so it now rides every plausible one beside the user's own:
   Lakemba, Sydney's centre and the Gallipoli Mosque at Auburn (`Americas.sydneyDiyanetUnits`). That applies within
   class D's reach of them only; what is measured stays as before (`measuredBeyond`). Fairfield, Cabramatta, Liverpool, Casula and
-  Prestons are now 0 late against it (1 to 6 late sunrises before).
+  Prestons are now 0 late against it (1 to 6 late sunrises before). *Corrected by the fix round below:* au.cautious is
+  never before Diyanet's Sydney table at every plausible point of it; Diyanet's preset chosen on its own in Sydney is
+  not measured, and its own rule runs up to 16 min before Diyanet's Sydney Asr and 12 min before its Isha (as on main).
 - **A named table chosen outside its area.** A user who chooses a table follows it (`followedBeyond`). London Unified
   outside the M25, within R45's three reaches (about 100 km: Basildon, Sevenoaks, St Albans, Luton, Reading), and
   IACAD in the other emirates, at any distance from its nearest table: the edge as before, now with the table's point
-  for every start and end. Beyond 100 km LUPT keeps the user's own point. The comparison found London's point holding
-  the end of eating up to 26 min later in Scotland's summer.
-- **Rabita Helsinki, tried again and left.** The fix needs Rabita's own curves at Helsinki and the user's at the
-  user's point. The engine reads one latitude's curves at every point. Taking the larger Isha depression of the two
-  latitudes fails near the solstice: one latitude's depression is not reached at the other, and the night-fraction
-  estimate comes before Maghrib + 91. Both a fixed point at Helsinki alone and an ends-only one break "never earlier
-  than before". A per-point method (the table's own day bounding the user's, at the day level) is the way. As on the
-  fix branch: the end of eating 1 to 2 min after the calendar at Lauttasaari, Kaarela, Matinkylä, Olari and
-  Espoonlahti on 4 to 31 days, and Isha a minute before it at Kerava and Järvenpää on 14 and 18 days.
+  for every start and end. *Corrected by the fix round below:* beyond 100 km London's point rides as a start and an end
+  point, keeping the user's own curves, so the times are never before LUPT's table and no end is after it wherever LUPT
+  is chosen, and none is earlier than main. (As a fixed point there, its dawn had held the end of eating up to 26 min
+  later in Scotland's summer.)
+- **Rabita Helsinki.** Its calendar is held across the Helsinki region by margins (a variant of se.rabita within 45 km
+  of Helsinki, the fix round below): Isha a minute later, the end of eating two minutes earlier. Before, as on main,
+  the end of eating was 1 to 2 min after the calendar at Lauttasaari, Kaarela, Matinkylä, Olari, Espoonlahti and
+  Nurmijärvi (3 to 31 days), and Isha a minute before it at Sipoo (84 days), Kerava (14) and Järvenpää (18). Now all
+  of the app's cities within 45 km: 0 early, 0 late ends. The per-point method (the table's own day bounding the
+  user's) is left for a later round: a fixed point at Helsinki alone, or an ends-only one, breaks "never earlier than
+  before" near the solstice, since the engine reads one latitude's curves at every point.
 
 **Never earlier than `main` 7533d29c.** 2,223 points of this round's own seed:
 - 840 within the bound reach of every table printed for its own point;
@@ -3655,3 +3659,156 @@ entries) green; `:shared:testAndroidHostTest` on the prayer packages 446/0 (`Cit
 edge case now both ways); the probes and the comparison
 above. Not run here: `scripts/test.sh` (the controller's, at integration), the iOS test compile, the site generation and
 the monitor's Python tests (no monitor or site code changed).
+
+## Tables at their own points, round 2's fix (11 October)
+
+Round 2's two reviews asked for changes; each is decided by the owner's rule, "rather late, never early".
+
+**London Unified, chosen anywhere in Great Britain.** A user who chooses a table follows it. Within R45's three reaches
+(about 100 km) London's point still rides as the fixed point. Farther, it now rides as a start point and an end point
+beside the user's own point. Those keep the user's own curves; a fixed point would read London's, whose dawn had held
+the end of eating up to 26 min later in Scotland's summer. So the times are never before LUPT's table and no end is
+after it wherever LUPT is chosen, and none is earlier than main. The review's probe had found Ipswich (107 km), Margate
+and Dover early on 20,000 to 21,000 cells each, Peterborough and Norwich too, and Southampton's sunrise after LUPT's on
+every day, its end of eating up to 13 min after it. Each end is also held to the user's own point alone
+(`endsBoundAtUserPoint`, `DayComputer`'s point 7, extended to a method with no fixed point): on the north's summer
+nights, where the user's own dawn is not reached, London's point had dropped the night rule's end of eating, and its
+later Fajr held the end up to 96 min later than main.
+- Probe (the app's resolution with each city's own zone, against `elm2026_std.txt`'s days): 19 towns within 100 km
+  (6,935 place-days) and 29 beyond it, from Ipswich, Margate, Dover and Folkestone to Glasgow, Aberdeen, Inverness,
+  Lerwick, Belfast and Penzance (10,585 place-days): 0 early, 0 late ends.
+- What it costs against main beyond 100 km (worst minutes at the comparison's points, every third day of 2026):
+  - England: Fajr up to 97 min later on the north's summer nights, Asr 18, Maghrib 17, Isha 11, Zuhr 8; the end of
+    eating up to 48 min earlier, sunset (Asr's end) 34, sunrise 31;
+  - Scotland: Fajr up to 98 min later, Asr 33, Maghrib 32, Isha 9; sunset up to 73 min earlier, sunrise 67, the end of
+    eating 46;
+  - Wales: Fajr up to 22 min later; sunset up to 27 min earlier, sunrise 26, the end of eating 20;
+  - Northern Ireland: Fajr up to 77 min later; the end of eating up to 62 min earlier, sunset 51, sunrise 48.
+
+  That is London's own table wherever its times are later, or its ends earlier, than the user's own sun: a user in
+  Glasgow who chooses LUPT sees London's winter sunrise, about an hour before Glasgow's. Within 100 km, as round 2
+  built it: Fajr up to 14 min later in June 80 to 100 km north of London (Huntingdon, near Cambridge; the review's
+  comparison).
+
+**Rabita Helsinki.** Its calendar is held across the Helsinki region by margins: a variant of se.rabita within 45 km of
+Helsinki (`Europe.variants`), Isha a minute later and the end of eating two minutes earlier. It only moves a start later
+and an end earlier, so nothing is earlier than main.
+- Probe against `rabita-2026.txt` (its `@excuse` day left out): Helsinki, Lauttasaari, Kaarela, Matinkylä, Olari,
+  Espoonlahti, Espoo, Vantaa, Kerava, Järvenpää, Tuusula, Sipoo, Nurmijärvi and Kirkkonummi: 0 early, 0 late ends.
+  Before, as on main: Sipoo's Isha a minute early on 84 days, Järvenpää 18, Kerava 14; the end of eating 1 to 2 min
+  late at Espoonlahti (31 days), Matinkylä (14), Lauttasaari (6), Kaarela (4), Olari (4) and Nurmijärvi (3).
+- Gated: Rabita's 2026 calendar at the app's Lauttasaari, Kaarela, Olari, Matinkylä, Espoonlahti, Sibbo, Kerava,
+  Nurmijärvi and Järvenpää, as rows of `se-cautious.tsv`. These towns are inside Rabita's measured reach, so the rows
+  count towards the figure. Diyanet's later Fajr there runs up to 111 min after Rabita's calendar, so se.cautious's
+  Fajr limit and figure go 109 → 111 (its reason says so); its Asr figure goes 6 → 7 and Zuhr 4 → 5, within their limits.
+- Porvoo (47 km, not measured) is still up to 3 min before the calendar on some days (Fajr, Isha, Asr): the cliff below.
+- The per-point method (the table's own day bounding the user's) is still left for a later round.
+
+**IACAD chosen outside its zones.** A user who chooses IACAD there follows its nearest table (round 2). Now Dubai's main
+table's point also rides beside it, for every start and end, wherever another table is the nearest: Hatta's for
+Fujairah, Kalba, Khor Fakkan and Dibba, Dubai Rural's for Al Ain and Zayed City.
+- Probe: all 15 emirate cities probed, Sharjah to Ar Ruways, 0 early and 0 late ends against Dubai's own table (21,915
+  place-days; before, Fujairah up to 3 min early and Al Ain 2); the Hatta-nearest cities against Hatta's table, and Al
+  Ain and Zayed City against Dubai Rural's: 0 early, 0 late ends.
+- Against main: starts up to 7 min later in the eastern emirates and Al Ain. In western Abu Dhabi (Al Dhafra), where
+  Dubai Rural's point rides, sunrise, sunset and the end of eating come up to 13 to 15 min earlier (the safe side), so
+  Asr ends there up to 15 min before Maghrib begins.
+
+**Diyanet's preset in Sydney: stated, not fitted.** au.cautious is never before Diyanet's Sydney table at every
+plausible point of it (the round's construction, now gated at Fairfield, Liverpool, Blacktown and Parramatta). Diyanet's
+preset (other.turkey) chosen on its own in Sydney is not measured. Its own rule runs up to 16 min before Diyanet's
+Sydney Asr (120 to 126 days) and 12 min before its Isha (264 to 272 days), as on main (the review's probe). Fitting the
+preset to that table would also make au.cautious's own Asr and Isha later wherever Diyanet's would then pass LMA's, so
+it is left as an owner's question.
+
+**The envelope in the gate.** Nothing in the gate had held a place against a table other than the one it follows.
+`generateEnvelopeRows` (new; seconds, no archive needed) writes `official/gate/<group>-envelope.tsv`:
+- every table printed for its own point (`tablesAtTheirPoints`: ISNA's US and Canadian mosques, Canada's three
+  families, Chicago's 18° block, Wifaqul, Delhi, Karachi, Tashkent, Bishkek, Gaza, Beirut, Damascus, Baghdad), at every
+  app city of its entry's countries within its bound reach, whichever table the city follows, or none;
+- by name: the Takvim at the app's Kosovo cities, Kénitra's Habous table at Sidi Taibi, Lakemba's tables at Fairfield,
+  Liverpool, Blacktown and Parramatta, LUPT chosen at 18 towns from Basildon to Glasgow and Edinburgh, IACAD's Dubai
+  table at Sharjah, Ajman, Fujairah and Al Ain, Hatta's at Fujairah and Dubai Rural's at Al Ain.
+
+The first generation is 6,579 rows across 18 files: us-isna 3,631 rows at 1,069 cities, us-chicago 1,371 at 183,
+ca-isna 971 at 99, gb-london-lupt 270 at 18, gb-wifaqul 78, ca-cautious 67, in-karachi 46, lb-fatwa 30, ae-iacad 27,
+uz-board 26, sy-awqaf 17, ps-gaza 12, iq-sunni 9, au-cautious 8, pk-karachi 8, kg-default 5, xk-bik 2, ma-habous 1.
+They add 312,262 place-days that no other row holds. Every one: 0 early, 0 late ends. A city that a group file
+already reads at its own point is not written again, and a US table's reach is not replayed in Canada. Round 2's
+second review audited the same claim without the country limit: 1,646 cities, 7,050 city-table pairs and 1,629,338
+place-days, also clean.
+
+The gate holds those rows to the promise alone (`GateRow.promiseOnly`: the file name ends in `-envelope.tsv`). An
+early start, a late end or a day out of order breaks the gate as anywhere. Their lateness, against a table the city
+may not follow, is kept out of every unit and every limit, and out of the stamp's places, place-days, class, members'
+checked days and Maghrib gaps. Without that, every About figure inside a unit would have taken in its neighbours'
+tables, and London's page would have counted Glasgow. The gate's report gives those place-days apart. If
+`TableEnvelope.around` returned its method unchanged, Ottawa's rows against Abrar's and Kanata's tables would now break
+the gate.
+- Sidi Taibi's evidence is one month: the gate holds 30 days of Kénitra's Habous table.
+- The Takvim rows check the base table itself, not BIK's town figures (the gate has no offsets). Sharri's T + 2 stays
+  in `CityPointsEnvelopeTest`; the review's construction check also covered the earlier towns' T − 1 and T − 2.
+
+**Reach rows regenerated** under round 2's engine (the sweep's worst points had been chosen under round 1's):
+us-isna-reach.tsv is now 442 rows (323 grid points and 119 sweep worst points) and ca-isna-reach.tsv 102 (54 and 48).
+xk-bik-reach.tsv, sa-ummalqura-reach.tsv and kz-qmdb-reach.tsv came out byte-identical. No sweep had a cell early or
+late, and no unit's figure moved.
+
+**BIK's late-limit reason** now names its own town list (Sharri T + 2; Ferizaj, Gjilani, Prishtina, Podujeva and
+Vushtrria T - 1; Presheva T - 2; the west at T) instead of "BIK's town offsets are not held".
+
+**Which audits ran.** The builder's: up to 16 app cities near each table (1,174 checks). Round 2's second review's:
+every app city held by any own-point table (above). Now committed: the envelope rows, which the whole gate checks on
+every run.
+
+**Never earlier than main 7533d29c**, over the countries this fix touches. This fix's own seed gave 738 points:
+- 260 app cities of Great Britain, and 80 each of Finland, the UAE and Australia, moved up to 20 km;
+- every app city within 60 km of Helsinki and of Dubai;
+- rings around London (80 to 600 km), Helsinki, Sydney and Dubai Rural;
+- one control city in each of 40 other countries.
+
+At each, Automatic and every entry the place may choose (other.turkey included), every third day of 2026: 4,571,085
+values.
+- 0 starts earlier. No sunrise, sunset, end of eating or imsak later, and no end of Fajr, Asr or Isha later. No class
+  or measured flag moved, and nothing moved at the 40 control points.
+- Dhuhr's and Maghrib's window ends are later on 26,651 cells, where the next start moved later (the class earlier
+  rounds accepted).
+- Worst added lateness: Wifaqul chosen near Manchester on the knife-edge summer nights, Fajr up to 131 min later and
+  Isha 112 (Isha's end up to 108 earlier); the UK's cautious (Automatic) Isha 84 there; then LUPT beyond 100 km, as
+  above.
+
+**About's figures.** Only se.cautious's moved (Fajr 109 → 111, Asr 6 → 7, Zuhr 4 → 5). No unit's figure moved, and no
+place's "Not measured" changed.
+
+**App cost.** A year of days on the JVM (the Mac, warm, `DayPipeline.day` for each of 365 days) takes 78 ms at
+Washington, 64 at Los Angeles, 64 at Detroit and 79 at Ottawa, against 6 ms at each on main (Toronto 41, against 39).
+The envelope's extra table points make each day there about ten times as costly. Timing a year's Timetable on the iOS
+simulator and a low-end Android at Washington and Los Angeles is left for release testing (no simulator or device in
+this round).
+
+**Owner's questions left open** (the reviews' words, with numbers):
+- Just past the bound (3.0 to 3.6 minutes of longitude from a table, 52 to 80 km), times are back at the user's own
+  point. There they run up to 4 to 5 min before the nearest table on some days: Winchester and Martinsburg against
+  ADAMS, Cochrane against Calgary SW, Montréal's south-east against CCML (Isha, about 200 days), north of Gatineau
+  against OMA (Fajr, 130 days), Olmaliq against Tashkent, Tokmok against Bishkek, Porvoo against Rabita (Fajr 3 min,
+  313 days). Accept the bound as the plausible distance, or extend the nearest table's ride (no figure) out to 5
+  reaches at more lateness?
+- Automatic in Lancashire and West Yorkshire (Preston, Bolton, Blackburn, Burnley, Bradford, Huddersfield) shows Isha up
+  to 84 min later than main on the knife-edge nights around 28 May and 15 July, because Manchester Central's Wifaqul
+  table now rides within about 50 km (Wifaqul chosen: up to about two hours). Accept, or narrow Wifaqul's bound to its
+  minute's reach with only the ends bounded beyond?
+- LUPT chosen far from London now shows London's table wherever it is later or ends earlier: in Scotland Fajr up to 98
+  min later and sunrise and sunset up to 67 and 73 min earlier than the user's own sun. Keep that, or stop the ride at
+  some distance, with the user's own sun and no figure beyond it?
+- Diyanet's preset chosen in Sydney: fit it to Diyanet's Sydney table (Asr about 16 min and Isha about 12 min later
+  there), or leave it a preset that claims no figure?
+
+Checked: the whole gate writing stamps, after the last change (archive linked): 19,480 rows, 4,366,885 place-days and
+312,262 more held to the promise alone, 71 entries, 0 early, 0 late ends, none over its limit, nothing BROKEN, about 4
+minutes. Also: `generateReachRows` (14 minutes on 4 threads), `generateEnvelopeRows`, `generateProofStamps`,
+`generateOwnPointWorst` (2,315 rows, unchanged) and `generateGoldenVector` (16 Helsinki rows moved: Isha a minute later
+and the end of eating up to two earlier); `checkStamps`, 71 fresh and green. Tools `jvmTest` with the archive 308/0
+(`GateManifestTest`'s promise-only row is new); `:shared:testAndroidHostTest` on the prayer packages 448/0
+(`LondonUnifiedTest`'s Dover and Southampton and `CityPointsEnvelopeTest`'s Rabita region and Fujairah are new). Not
+run here: the controller's integration test script, the iOS test compile (the new test names have no commas or
+parentheses), the site generation and the monitor's Python tests (no site or monitor code changed).
