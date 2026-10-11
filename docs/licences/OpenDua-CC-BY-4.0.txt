@@ -18,7 +18,7 @@ OpenDua’s independently authored English, transliteration, editorial metadata 
 Dataset version: v0.0.4 (released 9 September 2026), https://opendua.org/v0.0.4/catalogue.json
 Date retrieved: 11 October 2026
 
-Used for: the Arabic structure, English translations and transliterations of the 19 morning-and-evening items in `files/adhkar`; the recordings are not used.
+Used for: the Arabic text and its arrangement, the English translations and the transliterations of the 19 morning-and-evening items in `files/adhkar`; the recordings are not used.
 
 Changes made (CC BY 4.0, section 3(a)(1)(B)): the 24 morning-and-evening entries are
 reshaped into Taqwa's own schema and 19 of them are kept; the three Quls of Hisn 76 become
