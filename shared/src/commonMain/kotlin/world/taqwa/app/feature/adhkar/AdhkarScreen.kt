@@ -259,8 +259,16 @@ fun AdhkarScreen(
  * target is held until the finger's scroll has stopped, since while it runs `settledPage` is still
  * the page the animation set out from, and reporting that would send the session back to it under
  * the reader's finger. The finger's scroll is given a frame to start first: the animation is
- * cancelled before the scroll that cancelled it begins, and in between nothing is scrolling. An
- * effect cancelled by the next target leaves the target to that one.
+ * cancelled before the scroll that cancelled it begins, and in between nothing is scrolling.
+ *
+ * **Do not drop the `withFrameNanos`.** `MutatorMutex` cancels the animation and runs its `finally`
+ * (`isScrollInProgress` false, the mutex released) before the finger's scroll is resumed to take
+ * the mutex, so this catch block runs in that gap, and a bare wait for "not scrolling" returns at
+ * once. The one-frame wait relies on chained resumptions — the finger's scroll resuming after the
+ * release — running before the next frame on the Compose UI dispatchers, which they do: they are
+ * plain dispatches, and a frame is only taken once those are drained. Without it,
+ * `aFingerTakingThePagerMidAnimationIsReportedOnlyOnceItSettles` fails, reporting the page the
+ * animation set out from. An effect cancelled by the next target leaves the target to that one.
  */
 @Composable
 internal fun SessionPagerSync(pagerState: PagerState, page: Int, onSettled: (Int) -> Unit) {

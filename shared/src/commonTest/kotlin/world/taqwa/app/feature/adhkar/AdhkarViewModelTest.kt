@@ -633,4 +633,18 @@ class AdhkarViewModelTest {
         rig.viewModel.goTo(state.pages.size)
         assertEquals(words(firstDua).take(6).joinToString(" "), rig.viewModel.state.value.readingPreview)
     }
+
+    @Test fun `the reading preview splits on any whitespace`() {
+        // Today's catalogue is single-spaced; a line break or a doubled space in a later one must
+        // neither count as a word nor reach the preview.
+        val newline = Char(10)
+        val tab = Char(9)
+        val arabic = "w1${newline}w2${tab}w3  w4 w5$newline${newline}w6 w7"
+        val item = items.first { it.id == "hisn-086" }
+        val state = AdhkarUiState(
+            pages = listOf(AdhkarPageUi(item, arabic, null, null, null, count = 0, target = 3, done = false)),
+            loaded = true,
+        )
+        assertEquals("w1 w2 w3 w4 w5 w6", state.readingPreview)
+    }
 }

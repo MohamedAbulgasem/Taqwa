@@ -116,18 +116,20 @@ data class AdhkarUiState(
 ) {
     /**
      * The reading sheet's preview line (spec §3.6): the first [PREVIEW_WORDS] words of the du'a on
-     * screen, all of it when it is shorter. A Quran page and the done page have no du'a of their
-     * own — the Quran is drawn in another face, and the preview is the du'a face's — so the set's
-     * first du'a stands in. Empty until the pages are in.
+     * screen, all of it when it is shorter, joined by single spaces whatever whitespace separated
+     * them. A Quran page and the done page have no du'a of their own — the Quran is drawn in another
+     * face, and the preview is the du'a face's — so the set's first du'a stands in. Empty until the
+     * pages are in.
      */
     val readingPreview: String
         get() {
             val arabic = pages.getOrNull(currentPage)?.arabic ?: pages.firstNotNullOfOrNull { it.arabic } ?: return ""
-            return arabic.split(' ').filter { it.isNotEmpty() }.take(PREVIEW_WORDS).joinToString(" ")
+            return arabic.split(WHITESPACE).filter { it.isNotEmpty() }.take(PREVIEW_WORDS).joinToString(" ")
         }
 
     private companion object {
         const val PREVIEW_WORDS = 6
+        val WHITESPACE = Regex("""\s+""")
     }
 }
 

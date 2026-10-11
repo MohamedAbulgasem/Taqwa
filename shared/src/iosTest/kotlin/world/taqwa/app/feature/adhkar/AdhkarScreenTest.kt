@@ -27,6 +27,7 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -51,6 +52,7 @@ import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.i18n.uppercaseIn
+import world.taqwa.app.quran.ReadingMode
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.adhkar_a11y_count
@@ -393,6 +395,45 @@ class AdhkarScreenTest {
             // The translation switch is the last control on the sheet.
             onAllNodes(hasClickAction()).onLast().performClick()
             assertEquals(listOf(false), switched)
+        }
+    }
+
+    /**
+     * The sheet writes the reader's settings back whole, so each change must carry everything else
+     * as it was: a size commit or a transliteration switch that dropped the mode or the translation
+     * would change the reader's Quran under it. The mode here is the Mushaf, which the adhkar never
+     * shows, so a default in its place could not pass for it.
+     */
+    @Test
+    fun theSheetsSizeAndTransliterationEachWriteTheWholeSettings() = runComposeUiTest {
+        val reading = ReadingSettings(
+            mode = ReadingMode.MUSHAF,
+            arabicSizeSp = 28,
+            transliteration = false,
+            translationId = "fr.hamidullah",
+        )
+        val changes = mutableListOf<ReadingSettings>()
+        setContent {
+            Themed {
+                AdhkarReadingContent(
+                    settings = reading,
+                    showTranslation = true,
+                    preview = "بِسْمِ اللَّهِ",
+                    onChange = { changes += it },
+                    onTranslation = {},
+                )
+            }
+        }
+        onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
+            .assertIsEnabled()
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(32f) }
+        assertEquals(listOf(reading.copy(arabicSizeSp = 32)), changes)
+
+        if (UiLanguage.of(getString(Res.string.ui_language)).latinScript) {
+            // The transliteration switch is the first control after the slider.
+            onAllNodes(hasClickAction()).onFirst().performClick()
+            assertEquals(reading.copy(transliteration = true), changes.last())
+            assertEquals(2, changes.size)
         }
     }
 
