@@ -19,6 +19,12 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
     private class Words(
         val prayerBody: String,
         val reminderBody: String,
+        /**
+         * The reminder with one minute left, where the language's noun takes the singular. A
+         * reminder clamped to the prayer before it (the planner's own rule) can say any count
+         * under its lead, one included; the leads themselves (5, 10, 15, 30) never needed it.
+         */
+        val reminderBodyOne: String = reminderBody,
         /** The night prayer's own name, and what its notification says: `{prayer}` is Fajr. */
         val tahajjud: String,
         val tahajjudBody: String,
@@ -61,8 +67,15 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
     private fun reminder(prayerName: String, minutesBefore: Int, clockTime: String): String {
         val minutes = format.localizedDigits(minutesBefore)
         val body = if (language == UiLanguage.ARABIC) {
-            // "بعد ١٠ دقائق" — Arabic counts 3–10 with the plural, 11+ with the singular.
-            "{prayer} بعد {minutes} ${if (minutesBefore in 3..10) "دقائق" else "دقيقة"} · {time}"
+            // "بعد ١٠ دقائق" — Arabic counts 3–10 with the plural, 11+ with the singular; one and
+            // two are said without a numeral, the singular and the dual.
+            when (minutesBefore) {
+                1 -> "{prayer} بعد دقيقة · {time}"
+                2 -> "{prayer} بعد دقيقتين · {time}"
+                else -> "{prayer} بعد {minutes} ${if (minutesBefore in 3..10) "دقائق" else "دقيقة"} · {time}"
+            }
+        } else if (minutesBefore == 1) {
+            words.reminderBodyOne
         } else {
             words.reminderBody
         }
@@ -88,6 +101,7 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
             UiLanguage.ENGLISH to Words(
                 prayerBody = "It is time for {prayer} · {time}",
                 reminderBody = "{prayer} in {minutes} minutes · {time}",
+                reminderBodyOne = "{prayer} in {minutes} minute · {time}",
                 tahajjud = "Tahajjud",
                 tahajjudBody = "The last third of the night has begun · {prayer} at {time}",
                 silent = "Silent", notification = "Notification", takbir = "Takbir", adhan = "Adhan",
@@ -102,6 +116,7 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
             UiLanguage.FRENCH to Words(
                 prayerBody = "C’est l’heure de la prière : {prayer} · {time}",
                 reminderBody = "{prayer} dans {minutes} minutes · {time}",
+                reminderBodyOne = "{prayer} dans {minutes} minute · {time}",
                 tahajjud = "Tahajjud",
                 tahajjudBody = "Le dernier tiers de la nuit a commencé · {prayer} à {time}",
                 silent = "Silencieux", notification = "Tonalité", takbir = "Takbir", adhan = "Adhan",
