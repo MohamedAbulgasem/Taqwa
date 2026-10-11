@@ -35,6 +35,8 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
   - Ahmed Al-Ajmi · أحمد العجمي (128 kbps)
 
   The list above is the launch set; the app's Attribution screen names whichever of them the catalogue in force actually carries.
+
+  - Four clips of the first voice's recitation, Al-Baqarah 2:255 and Surahs 112, 113 and 114, are bundled for the first run of the Morning & Evening Adhkar and play only while Mishary Rashid Alafasy is the chosen reciter and the surah is not downloaded. Each is a raw byte range of his `.taqa` container on the Taqwa-data release, so they are the corpus's own bytes at the published 64 kbps, without re-encoding, on the terms above. Provenance, containers and byte ranges: `docs/licences/Alafasy-adhkar-clips.txt`; `tools/quran-audio/adhkar_clips.py` cuts them and `check_adhkar_clips.py` proves them byte for byte.
 - **Translations and transliteration**: bundled from the [Tanzil Project](https://tanzil.net/trans) for non-commercial use, each translator credited below:
   - Saheeh International: Saheeh International (English)
   - التفسير الميسر: مجمع الملك فهد لطباعة المصحف الشريف (Arabic)

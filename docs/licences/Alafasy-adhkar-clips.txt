@@ -1,0 +1,88 @@
+Mishary Rashid Alafasy: the four Quranic clips bundled for the first run of the adhkar
+Source: Islamic Network per-ayah recitation corpus (https://alquran.cloud, cdn.islamic.network)
+
+Taqwa's Morning & Evening Adhkar (shared/src/commonMain/composeResources/files/adhkar) have four
+Quranic items. So that a reader's first session is not silent before anything is downloaded, the
+app bundles those four items in the voice of the default reciter, Mishary Rashid Alafasy
+(ar.alafasy, 64 kbps), under
+
+    shared/src/commonMain/composeResources/files/adhkar/clips/ar.alafasy/
+
+    002-255.mp3   Al-Baqarah 2:255 (Ayat al-Kursi), one ayah
+    112.mp3       Al-Ikhlas, ayahs 1-4
+    113.mp3       Al-Falaq, ayahs 1-5
+    114.mp3       An-Nas, ayahs 1-6
+
+They play only when Alafasy is the reciter the reader chose and the surah is not downloaded.
+
+What they are. The clips are byte-identical cuts of the corpus's own files, with no re-encoding.
+Each is the ayah MP3s of the surah named below, taken from Alafasy's `.taqa` container and
+concatenated in ayah order, the way the app's recitation previews are cut (the preview for each
+reciter is the raw bytes of Al-Fatiha 1:1 followed by 1:2). Nothing was decoded, trimmed,
+re-tagged or re-encoded; every byte of a clip is a byte the Islamic Network published, at the
+bitrate they published.
+
+Where the bytes came from. The Islamic Network corpus, as Taqwa mirrors it on the public GitHub
+release audio-ar.alafasy-v1 of MohamedAbulgasem/Taqwa-data
+(https://github.com/MohamedAbulgasem/Taqwa-data/releases/tag/audio-ar.alafasy-v1), one
+`.taqa` container per surah, in which every ayah is the corpus's download byte for byte. The
+four containers, each checked against the byte size and SHA-256 that
+shared/src/commonMain/composeResources/files/recitation/manifest.json publishes for it
+(manifest generated 2026-09-13T15:30:51Z) before anything was cut:
+
+    ar.alafasy-002.taqa   58,538,153 bytes  953dcf2cde54eb5d8195e0a3f2488d42045ff8e52e428ee0e305cb1514a0b6e8
+    ar.alafasy-112.taqa      112,778 bytes  44217c20abb682ae3f4e597e1bb86990132e3927c698b2c107783d16039170ca
+    ar.alafasy-113.taqa      198,053 bytes  34d876a1d2aa05f783aadb71f6144b7b5a409f8245acfe2cce3ae3db06940379
+    ar.alafasy-114.taqa      336,199 bytes  8a191395575bd79ae4c24a7858070ba54ebca1bbd93d44231c0cae8443b205ba
+
+The ranges. Offsets are absolute byte positions in the container, first and last byte
+inclusive (a `.taqa` is a 12-byte header, a JSON index, then the MP3s back to back; the index
+gives each ayah's offset and length). The corpus's own name for each file is its global ayah
+number, https://cdn.islamic.network/quran/audio/64/ar.alafasy/<global ayah>.mp3.
+
+    002-255.mp3   417,111 bytes   from ar.alafasy-002.taqa
+                  ayah 255 (global ayah 262)   bytes 49,603,002-50,020,112
+                  sha256 7e7b11ff03f958ba0f0509f337ac54a88d376529cab52c52c1104ba237dfb3bf
+
+    112.mp3       112,586 bytes   from ar.alafasy-112.taqa (global ayahs 6222-6225)
+                  ayah 1   bytes 192-25,464
+                  ayah 2   bytes 25,465-47,184
+                  ayah 3   bytes 47,185-72,457
+                  ayah 4   bytes 72,458-112,777
+                  sha256 e80e66abc84372048659f00a71fe308a83c6f01f197975aafdc1d6404ff3be77
+
+    113.mp3       197,827 bytes   from ar.alafasy-113.taqa (global ayahs 6226-6230)
+                  ayah 1   bytes 226-29,467
+                  ayah 2   bytes 29,468-59,963
+                  ayah 3   bytes 59,964-101,743
+                  ayah 4   bytes 101,744-151,256
+                  ayah 5   bytes 151,257-198,052
+                  sha256 efc74ec6b2e0c01ab4bfadea61aace02463641503054f58c96dffbfb06f3f1ca
+
+    114.mp3       335,940 bytes   from ar.alafasy-114.taqa (global ayahs 6231-6236)
+                  ayah 1   bytes 259-50,606
+                  ayah 2   bytes 50,607-94,266
+                  ayah 3   bytes 94,267-138,553
+                  ayah 4   bytes 138,554-203,947
+                  ayah 5   bytes 203,948-268,714
+                  ayah 6   bytes 268,715-336,198
+                  sha256 f8985f4cc4e3c45f8fcf7987f02df8825e6b5bb07fc6f6b38bfaf8d4412550ad
+
+Total 1,063,464 bytes. Cut on 11 October 2026 by tools/quran-audio/adhkar_clips.py; the
+clips are a pure function of the four containers, so re-running it on any machine writes the
+same bytes, and tools/quran-audio/check_adhkar_clips.py re-derives each clip from the
+containers and compares byte for byte (it exits 1 on any difference).
+
+Licence. The terms are the ones docs/ATTRIBUTION.md records for every recitation Taqwa
+carries: the recordings are licensed to the Islamic Network by the reciters or their estates for
+free, non-commercial redistribution at the bitrates they publish
+(https://alquran.cloud/terms-and-conditions, section IV); copyright lies with the reciters, and
+any of them may ask to be removed. The clips are redistributed on exactly those terms, at the
+published bitrate, unmodified. They are not covered by Taqwa's GPL-3.0.
+The verbatim text of section IV, as read on 12 September 2026, is quoted in
+docs/superpowers/specs/2026-09-12-taqwa-quran-recitation-investigation.md.
+
+Withdrawal. The downloadable catalogue can drop a reciter without an app update; these four
+files cannot, because they travel inside the app. If Alafasy, his estate or the Islamic Network
+asks for the recitation to be removed, the clips/ar.alafasy folder is deleted from the next
+release.
