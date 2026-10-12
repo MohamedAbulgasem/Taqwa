@@ -37,7 +37,12 @@ class DocumentTest {
     private val newYork = city("new-york-usa", "US", 40.71427, -74.00597, "America/New_York", linkedMapOf("en" to "New York"))
 
     private val official = TestPaths.repoRoot.resolve("tools/timetables/official")
-    private val stamps = Stamp.load(official.resolve("stamps"))
+
+    // London's and Toronto's proof through 2026 (StampsAsOf), so the dates these cases pin stand however far the
+    // monitor has proven LUPT and the Toronto mosques since; every figure is the committed stamps' own, read below.
+    private val stamps = StampsAsOf.londonAndTorontoThrough2026(official, Stamp.load(official.resolve("stamps")))
+    private val lupt = stamps.getValue("gb.london.lupt")
+    private val luptAtMost = lupt.worstStarts(lupt.unitEvents("gb.london.lupt")!!)
     private val strings = AppStrings(TestPaths.appResources)
     private val document = Document(strings, stamps, official)
     private val friday = Instant.parse("2026-09-25T00:07:00Z")
@@ -187,12 +192,14 @@ class DocumentTest {
         assertEquals("gb.london.lupt", city["unitId"])
         assertEquals("London (M25)", city["unitName"])
         val proof = city.map("proof")
-        assertEquals(4015, proof["placeDays"])
-        assertEquals(11, proof["places"])
-        assertEquals(330, proof["ramadanDays"])
-        assertEquals("2026-01-01", proof["first"])
+        // The entry's figures and its unit's "at most", read from the stamp: 4,015 days at 11 places, 330 in Ramadan,
+        // from 1 January 2026, at most 5 minutes on 12 October 2026, the counts growing as prove holds LUPT's next months.
+        assertEquals(lupt.placeDays, proof["placeDays"])
+        assertEquals(lupt.places, proof["places"])
+        assertEquals(lupt.ramadanDays, proof["ramadanDays"])
+        assertEquals(lupt.first.toString(), proof["first"])
         assertEquals("2026-12-31", proof["through"])
-        assertEquals(5, proof["atMost"])
+        assertEquals(luptAtMost, proof["atMost"])
         assertEquals(false, proof["cautious"])
         val shares = proof.map("fajrShares")
         assertEquals(listOf("0", "1", "2", "3+"), shares.keys.toList())
@@ -261,7 +268,7 @@ class DocumentTest {
             assertEquals(emptyList<Map<String, Any?>>(), page.list("clockChanges"), language)
         }
         assertEquals("October 2026", city.map("pages").map("en").list("months").single()["title"])
-        // London is checked through December: October and November, and nothing to say.
+        // London is checked through December (its 2026 proof): October and November, and nothing to say.
         val london = built.list("cities").first { it["slug"] == "london-uk" }
         assertEquals(listOf(10, 11), london.list("months").map { it["month"] })
         assertEquals(61, london.list("days").size)
@@ -337,10 +344,10 @@ class DocumentTest {
         val intro = s["methodIntro"] as String
         assertTrue(intro.startsWith("The way London Unified calculates: dawn (Fajr) at a twilight angle") && intro.endsWith("down)."), intro)
         assertEquals("How it was checked", s["howChecked"])
-        assertEquals("4015", s["statDaysValue"]) // the app's localizedDigits: no thousands grouping
-        assertEquals("days at 11 places", s["statDays"])
+        assertEquals(lupt.placeDays.toString(), s["statDaysValue"]) // the app's localizedDigits: no thousands grouping ("4015")
+        assertEquals("days at ${lupt.places} places", s["statDays"])
         assertEquals("starts before London Unified’s", s["statNever"])
-        assertEquals("5 min", s["statMinutes"])
+        assertEquals("$luptAtMost min", s["statMinutes"])
         assertEquals("at most after", s["statAtMost"])
         assertEquals("", s["cautiousBody"])
         assertEquals("", s["maghribCap"])
@@ -363,7 +370,8 @@ class DocumentTest {
         val proof = city.map("proof")
         assertEquals(true, proof["cautious"])
         assertNull(proof["atMost"]) // ruling R105
-        assertEquals(1400, proof["placeDays"])
+        val stamp = stamps.getValue("ca.toronto") // 1,400 days at 6 places on 12 October 2026
+        assertEquals(stamp.placeDays, proof["placeDays"])
         val page = city.map("pages").map("en")
         val members = listOf("Islamic Foundation Toronto", "Islamic Institute", "MAC Masjid")
         assertEquals(members, page["members"])
@@ -374,8 +382,8 @@ class DocumentTest {
         assertEquals("", s["statMinutes"])
         assertEquals("", s["statAtMost"])
         assertEquals("", s["statNever"])
-        assertEquals("days at 6 places", s["statDays"])
-        assertEquals("1400", s["statDaysValue"])
+        assertEquals("days at ${stamp.places} places", s["statDays"])
+        assertEquals(stamp.placeDays.toString(), s["statDaysValue"])
         assertEquals(
             "Mosques in Toronto follow different timetables in good faith, and none is followed by most. " +
                 "Taqwa combines Islamic Foundation Toronto, Islamic Institute, MAC Masjid: each prayer once all have begun it.",
@@ -436,11 +444,11 @@ class DocumentTest {
         assertEquals(listOf("ca.toronto", "gb.london.lupt"), published.map { it["entry"] })
         val london = published[1]
         assertEquals("B", london["class"])
-        assertEquals(4015, london["placeDays"])
-        assertEquals(11, london["places"])
-        assertEquals("2026-01-01", london["first"])
+        assertEquals(lupt.placeDays, london["placeDays"])
+        assertEquals(lupt.places, london["places"])
+        assertEquals(lupt.first.toString(), london["first"])
         assertEquals("2026-12-31", london["through"])
-        assertEquals(5, london["atMost"])
+        assertEquals(luptAtMost, london["atMost"])
         assertEquals("London Unified", london.map("names")["en"])
         assertEquals(SITE_LANGUAGES.toSet(), london.map("names").keys)
         assertEquals("31 December 2026", london.map("throughText")["en"])

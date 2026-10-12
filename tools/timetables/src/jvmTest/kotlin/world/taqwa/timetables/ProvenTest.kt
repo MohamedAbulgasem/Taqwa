@@ -16,8 +16,10 @@ import kotlin.test.assertTrue
  * The proven rule (spec §2, rulings R101, R115 and R116), clause by clause, against the committed
  * stamps, and which of its two months a page shows.
  * Only entries no other track rewrites tonight are pinned by figure (gb.london.lupt, ca.toronto,
- * ly.awqaf, eg.esa, tr.diyanet); the totals are computed from the files, never typed. The dates
- * pinned here are the tables' own coverage — dates only, never a time (ruling R69).
+ * ly.awqaf, eg.esa, tr.diyanet); the totals are computed from the files, never typed. What the
+ * weekly monitor's prove grows (place-days, places, how far a table is checked) is pinned as a
+ * floor, never exactly: prove only adds rows (docs/MONITOR.md). The dates pinned here are the
+ * tables' own coverage — dates only, never a time (ruling R69).
  */
 class ProvenTest {
     private val official = TestPaths.repoRoot.resolve("tools/timetables/official")
@@ -97,10 +99,13 @@ class ProvenTest {
     @Test fun londonIsPublishedWithItsUnitsFigures() {
         val v = verdict(london)
         assertIs<Verdict.Published>(v)
-        assertEquals(5, v.atMost) // the M25 unit's worst over the starts (Fajr and Isha)
-        assertEquals(4015, v.stamp.placeDays)
-        assertEquals(11, v.stamp.places)
-        assertEquals(LocalDate(2026, 12, 31), v.through)
+        // The M25 unit's worst over the starts (Fajr and Isha), at their limit: prove keeps no row over it.
+        assertEquals(5, v.atMost)
+        // 4,015 days at 11 places, checked through 31 December 2026, on 12 October 2026; more as prove holds
+        // LUPT's next months (the LPT API, monthly).
+        assertTrue(v.stamp.placeDays >= 4015, v.stamp.placeDays.toString())
+        assertTrue(v.stamp.places >= 11, v.stamp.places.toString())
+        assertTrue(v.through >= LocalDate(2026, 12, 31), v.through.toString())
         assertEquals(false, v.stamp.cautious)
         assertEquals(months(sep1), v.months) // September and October, both checked
         assertNull(v.nextUnchecked)
@@ -298,7 +303,7 @@ class ProvenTest {
         val v = verdict(london, with = mapOf(holed.entry to holed))
         assertIs<Verdict.Published>(v)
         assertEquals(LocalDate(2026, 10, 31), v.through)
-        assertEquals(LocalDate(2026, 12, 31), v.stamp.last)
+        assertTrue(v.stamp.last > v.through, v.stamp.last.toString()) // 31 December 2026 on 12 October 2026, later as LUPT is proven further
     }
 
     @Test fun aStampWithoutCheckedRunsHoldsTheCity() {
@@ -472,11 +477,15 @@ class ProvenTest {
         val shares = london.shares(london.unitEvents("gb.london.lupt")!!, "fajr")
         assertEquals(listOf("0", "1", "2", "3+"), shares.keys.toList())
         assertEquals(1.0, shares.values.sum(), 0.001)
-        // The "same minute" share is the stamp's own exactShare, to the four decimals it keeps.
-        assertEquals(0.3077, shares.getValue("0"), 0.00001)
+        // The "same minute" share is the stamp's own exactShare, to the four decimals it keeps (0.3077 on
+        // 12 October 2026; each new row moves it).
+        @Suppress("UNCHECKED_CAST")
+        val fajr = london.unitEvents("gb.london.lupt")!!.getValue("fajr") as Map<String, Any?>
+        assertEquals((fajr.getValue("exactShare") as Number).toDouble(), shares.getValue("0"), 0.00001)
     }
 
     @Test fun theEntryWideWorstIsOverTheStartsOnly() {
+        // Each at its limit, which prove never loosens and no row it keeps exceeds.
         val toronto = stamps.getValue("ca.toronto")
         assertEquals(7, toronto.worstStarts(toronto.events)) // Isha 7, not the end of eating's 4
         val london = stamps.getValue("gb.london.lupt")
