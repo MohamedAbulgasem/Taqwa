@@ -243,9 +243,10 @@ class DocumentTest {
     fun aCityWhoseNextMonthIsUncheckedCarriesItsCurrentMonthAlone() {
         // Built at the first run of 1 October: Diyanet's captures reach 1 November, so İstanbul's page
         // is October alone — the months, the facts' days and every page's days — and the document
-        // says why. Türkiye keeps one clock all year, so no page mentions a change.
+        // says why. Türkiye keeps one clock all year, so no page mentions a change. The stamps are that
+        // morning's (StampsAsOf), so the case stands however far the monitor has proven Diyanet since.
         val october = Instant.parse("2026-10-01T06:07:00Z")
-        val built = document.build(listOf(istanbul, london), october)
+        val built = Document(strings, StampsAsOf.firstOctober(official, stamps), official).build(listOf(istanbul, london), october)
         assertEquals(emptyList<Map<String, Any?>>(), built.list("held"))
         val city = built.list("cities").first { it["slug"] == "istanbul-turkiye" }
         assertEquals(listOf(linkedMapOf<String, Any?>("year" to 2026, "month" to 10, "days" to 31)), city.list("months"))

@@ -30,8 +30,10 @@ class MainTest {
     }
 
     @Test fun aCityShownWithItsCurrentMonthAloneGetsANotice() {
-        // The first run of 1 October: Diyanet's captures reach 1 November (ruling R116).
-        val built = document.build(listOf(istanbul), Instant.parse("2026-10-01T06:07:00Z"))
+        // The first run of 1 October: Diyanet's captures reach 1 November (ruling R116), with that
+        // morning's stamps (StampsAsOf), however far the monitor has proven Diyanet since.
+        val asOf = Document(AppStrings(TestPaths.appResources), StampsAsOf.firstOctober(official, Stamp.load(official.resolve("stamps"))), official)
+        val built = asOf.build(listOf(istanbul), Instant.parse("2026-10-01T06:07:00Z"))
         assertEquals(
             listOf("::notice::istanbul-turkiye: showing October alone — the next month is not yet checked: tr.diyanet, first unchecked day 2 Nov 2026"),
             notices(built),
