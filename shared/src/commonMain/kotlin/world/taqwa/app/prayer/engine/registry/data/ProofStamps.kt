@@ -288,7 +288,7 @@ object ProofStamps {
     private fun beCautious() = ProofStamp(
         entryId = "be.cautious",
         places = 3,
-        placeDays = 1201,
+        placeDays = 1231,
         ramadanDays = 87,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 65, "fajr" to 4, "isha" to 53, "maghrib" to 1, "sunrise" to 1),
@@ -299,7 +299,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 53, reason = "Isha is the later member's, EMB's (18°, in summer its clock cap and proportion from 45°): up to 53 min after Diyanet's Antwerpen and Gent tables in July, whose takdir Isha is earlier.", events = listOf("isha")),
             ProofLateLimit(minutes = 65, reason = "The end of eating is the earlier member's, EMB's own dawns (ruling R39): up to 65 min before Diyanet's Antwerpen and Gent imsak in late April and May, when Diyanet's takdir has moved its dawn later.", events = listOf("endOfEating")),
         ),
-        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-11", "2027-01-01..2027-12-31"),
     )
 
     private fun beEmb() = ProofStamp(
@@ -497,7 +497,7 @@ object ProofStamps {
     private fun chFids() = ProofStamp(
         entryId = "ch.fids",
         places = 1,
-        placeDays = 403,
+        placeDays = 413,
         ramadanDays = 29,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
@@ -505,7 +505,7 @@ object ProofStamps {
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-11", "2027-01-01..2027-12-31"),
     )
 
     private fun chFidsUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -662,7 +662,7 @@ object ProofStamps {
     private fun frCautious() = ProofStamp(
         entryId = "fr.cautious",
         places = 3,
-        placeDays = 1163,
+        placeDays = 1183,
         ramadanDays = 88,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 77, "fajr" to 56, "isha" to 88, "maghrib" to 3, "sunrise" to 8),
@@ -1145,40 +1145,40 @@ object ProofStamps {
     private fun lyAwqaf() = ProofStamp(
         entryId = "ly.awqaf",
         places = 22,
-        placeDays = 119,
+        placeDays = 147,
         ramadanDays = 3,
-        lastChecked = "2026-10-12",
+        lastChecked = "2026-10-19",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 2, "isha" to 3, "maghrib" to 2, "sunrise" to 3),
         worstLateByUnit = lyAwqafUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "imsak", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2025-03-23", "2025-04-13", "2025-04-19", "2025-06-22", "2025-07-18", "2025-08-03", "2025-09-16", "2025-10-06", "2025-11-17", "2025-12-07", "2026-01-24", "2026-02-18", "2026-03-12", "2026-04-18", "2026-06-16", "2026-09-25..2026-10-12"),
+        checked = listOf("2025-03-23", "2025-04-13", "2025-04-19", "2025-06-22", "2025-07-18", "2025-08-03", "2025-09-16", "2025-10-06", "2025-11-17", "2025-12-07", "2026-01-24", "2026-02-18", "2026-03-12", "2026-04-18", "2026-06-16", "2026-09-25..2026-10-19"),
         checkedByUnit = lyAwqafChecked(),
     )
 
     private fun lyAwqafChecked(): Map<String, List<String>> = mapOf(
-        "ajdabiya" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "awjila" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "bani-walid" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "bayda" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "benghazi" to listOf("2026-09-25..2026-09-28", "2026-10-05"),
-        "brega" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "derna" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "emsaed" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "ghadames" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "hun" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "jalu" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "khoms" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "kufra" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "marj" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "misrata" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "ras-lanuf" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "sabha" to listOf("2026-09-25..2026-09-28", "2026-10-05"),
-        "sirte" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "tobruk" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "zawiya" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
-        "zliten" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05"),
+        "ajdabiya" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "awjila" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "bani-walid" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "bayda" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "benghazi" to listOf("2026-09-25..2026-09-28", "2026-10-05", "2026-10-12"),
+        "brega" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "derna" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "emsaed" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "ghadames" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "hun" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "jalu" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "khoms" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "kufra" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "marj" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "misrata" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "ras-lanuf" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "sabha" to listOf("2026-09-25..2026-09-28", "2026-10-05", "2026-10-12"),
+        "sirte" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "tobruk" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "zawiya" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
+        "zliten" to listOf("2026-09-25..2026-09-26", "2026-09-28", "2026-10-05", "2026-10-12"),
     )
 
     private fun lyAwqafUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -1188,22 +1188,22 @@ object ProofStamps {
         "bayda" to mapOf("asrStandard" to 3, "dhuhr" to 2, "isha" to 2, "sunrise" to 0),
         "benghazi" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
         "brega" to mapOf("asrStandard" to 2, "dhuhr" to 2, "isha" to 2, "sunrise" to 2),
-        "derna" to mapOf("asrStandard" to 1, "dhuhr" to 2, "isha" to 1, "sunrise" to 2),
+        "derna" to mapOf("asrStandard" to 2, "dhuhr" to 2, "isha" to 2, "sunrise" to 2),
         "emsaed" to mapOf("asrStandard" to 2, "dhuhr" to 1, "isha" to 1, "sunrise" to 2),
-        "ghadames" to mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "imsak" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
+        "ghadames" to mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "imsak" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
         "hun" to mapOf("asrStandard" to 1, "dhuhr" to 1, "isha" to 1, "sunrise" to 3),
         "jalu" to mapOf("asrStandard" to 1, "dhuhr" to 1, "isha" to 2, "sunrise" to 2),
         "khoms" to mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
-        "kufra" to mapOf("asrStandard" to 1, "dhuhr" to 1, "isha" to 1, "sunrise" to 2),
+        "kufra" to mapOf("asrStandard" to 2, "dhuhr" to 1, "isha" to 1, "sunrise" to 2),
         "marj" to mapOf("asrStandard" to 2, "dhuhr" to 2, "isha" to 2, "sunrise" to 2),
         "misrata" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
-        "ras-lanuf" to mapOf("asrStandard" to 2, "dhuhr" to 1, "isha" to 1, "sunrise" to 2),
-        "sabha" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 0, "fajr" to 2, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
-        "sirte" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
+        "ras-lanuf" to mapOf("asrStandard" to 2, "dhuhr" to 1, "isha" to 2, "sunrise" to 2),
+        "sabha" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 0, "fajr" to 2, "isha" to 2, "maghrib" to 1, "sunrise" to 2),
+        "sirte" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 2, "maghrib" to 1, "sunrise" to 2),
         "tobruk" to mapOf("asrStandard" to 1, "dhuhr" to 1, "isha" to 1, "sunrise" to 2),
         "tripoli" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 3, "maghrib" to 2, "sunrise" to 2),
         "zawiya" to mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 1, "maghrib" to 2, "sunrise" to 1),
-        "zliten" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 2, "maghrib" to 1, "sunrise" to 2),
+        "zliten" to mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 1, "fajr" to 2, "imsak" to 1, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
     )
 
     private fun maHabous() = ProofStamp(
@@ -1349,7 +1349,7 @@ object ProofStamps {
         placeDays = 2648,
         ramadanDays = 205,
         lastChecked = "2027-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 7, "asrStandard" to 7, "dhuhr" to 6, "endOfEating" to 57, "fajr" to 101, "isha" to 135, "maghrib" to 4, "sunrise" to 58),
+        worstLateMinutes = mapOf("asrHanafi" to 7, "asrStandard" to 6, "dhuhr" to 6, "endOfEating" to 57, "fajr" to 101, "isha" to 135, "maghrib" to 4, "sunrise" to 58),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 4, reason = "Maghrib is capped at IRN's (the most followed) where the members spread: up to 4 min after it (at Trondheim in June, where IRN's monthly minutes run ahead of its calendar).", events = listOf("maghrib")),
@@ -1433,7 +1433,7 @@ object ProofStamps {
     private fun otherTurkey() = ProofStamp(
         entryId = "other.turkey",
         places = 6,
-        placeDays = 2418,
+        placeDays = 2478,
         ramadanDays = 174,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
@@ -1441,7 +1441,7 @@ object ProofStamps {
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-11", "2027-01-01..2027-12-31"),
     )
 
     private fun pkKarachi() = ProofStamp(
@@ -2071,7 +2071,7 @@ object ProofStamps {
     private fun seCautious() = ProofStamp(
         entryId = "se.cautious",
         places = 23,
-        placeDays = 9310,
+        placeDays = 9330,
         ramadanDays = 717,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 7, "dhuhr" to 5, "endOfEating" to 154, "fajr" to 111, "isha" to 170, "maghrib" to 126, "sunrise" to 129),
@@ -2125,7 +2125,7 @@ object ProofStamps {
     private fun tnInm() = ProofStamp(
         entryId = "tn.inm",
         places = 7,
-        placeDays = 1546,
+        placeDays = 1561,
         ramadanDays = 124,
         lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 1, "isha" to 2, "maghrib" to 1, "sunrise" to 1),
@@ -2138,10 +2138,10 @@ object ProofStamps {
     )
 
     private fun tnInmChecked(): Map<String, List<String>> = mapOf(
-        "ben-guerdane" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-11", "2026-10-13", "2026-10-16", "2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
+        "ben-guerdane" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
         "sfax" to listOf("2026-01-01..2026-12-31"),
-        "tabarka" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-11", "2026-10-13", "2026-10-16", "2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
-        "tala" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-11", "2026-10-13", "2026-10-16", "2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
+        "tabarka" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
+        "tala" to listOf("2026-01-01", "2026-01-04", "2026-01-07", "2026-01-10", "2026-01-13", "2026-01-16", "2026-01-19", "2026-01-22", "2026-01-25", "2026-01-28", "2026-01-31", "2026-02-03", "2026-02-06", "2026-02-09", "2026-02-12", "2026-02-15", "2026-02-18", "2026-02-21", "2026-02-24", "2026-02-27", "2026-03-02", "2026-03-05", "2026-03-08", "2026-03-11", "2026-03-14", "2026-03-17", "2026-03-20", "2026-03-23", "2026-03-26", "2026-03-29", "2026-04-01", "2026-04-04", "2026-04-07", "2026-04-10", "2026-04-13", "2026-04-16", "2026-04-19", "2026-04-22", "2026-04-25", "2026-04-28", "2026-05-01", "2026-05-04", "2026-05-07", "2026-05-10", "2026-05-13", "2026-05-16", "2026-05-19", "2026-05-22", "2026-05-25", "2026-05-28", "2026-05-31", "2026-06-03", "2026-06-06", "2026-06-09", "2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-09", "2026-07-12", "2026-07-15", "2026-07-18", "2026-07-21", "2026-07-24", "2026-07-27", "2026-07-30", "2026-08-02", "2026-08-05", "2026-08-08", "2026-08-11", "2026-08-14", "2026-08-17", "2026-08-20", "2026-08-23", "2026-08-26", "2026-08-29", "2026-09-01", "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-13", "2026-09-16", "2026-09-19", "2026-09-22", "2026-09-25", "2026-09-28..2026-10-19", "2026-10-22", "2026-10-25", "2026-10-28", "2026-10-31", "2026-11-03", "2026-11-06", "2026-11-09", "2026-11-12", "2026-11-15", "2026-11-18", "2026-11-21", "2026-11-24", "2026-11-27", "2026-11-30", "2026-12-03", "2026-12-06", "2026-12-09", "2026-12-12", "2026-12-15", "2026-12-18", "2026-12-21", "2026-12-24", "2026-12-27", "2026-12-30"),
         "tataouine" to listOf("2026-01-01..2026-12-31"),
     )
 
@@ -2157,7 +2157,7 @@ object ProofStamps {
     private fun trDiyanet() = ProofStamp(
         entryId = "tr.diyanet",
         places = 22,
-        placeDays = 8866,
+        placeDays = 9086,
         ramadanDays = 638,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
@@ -2166,7 +2166,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 1, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-11", "2027-01-01..2027-12-31"),
     )
 
     private fun trDiyanetUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -2188,7 +2188,7 @@ object ProofStamps {
     private fun trDiyanetEurope() = ProofStamp(
         entryId = "tr.diyanet.europe",
         places = 34,
-        placeDays = 13573,
+        placeDays = 13773,
         ramadanDays = 986,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 70, "fajr" to 7, "isha" to 7, "maghrib" to 126, "sunrise" to 129),
@@ -2292,34 +2292,34 @@ object ProofStamps {
             ProofLateLimit(minutes = 126, reason = "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its Maghrib before the sun sets; Maghrib never comes before the real sunset (the sun's plus Diyanet's 7 min): up to 126 min after Diyanet's.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 129, reason = "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its sunrise after the sun's own; the app keeps the sun's, the safe side: up to 129 min before Diyanet's.", events = listOf("sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-01", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-11", "2027-01-01..2027-12-31"),
         checkedByUnit = trDiyanetEuropeChecked(),
     )
 
     private fun trDiyanetEuropeChecked(): Map<String, List<String>> = mapOf(
         "tr.diyanet.europe.aalborg" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.aarhus" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.antwerpen" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.antwerpen" to listOf("2026-09-29..2026-11-11", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.bergen" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.copenhagen" to listOf("2026-09-26..2026-11-01", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.gent" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.copenhagen" to listOf("2026-09-26..2026-11-11", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.gent" to listOf("2026-09-29..2026-11-11", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.goteborg" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.helsinki" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.helsinki" to listOf("2026-09-29..2026-11-11", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.kristiansand" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.lille" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.lille" to listOf("2026-09-29..2026-11-11", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.lulea" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.lyon" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.lyon" to listOf("2026-09-29..2026-11-11", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.malmo" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.oulu" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.stavanger" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.sundsvall" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.tampere" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.trondheim" to listOf("2026-09-29..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.trondheim" to listOf("2026-09-29..2026-11-11", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.turku" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.umea" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.uppsala" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.wien" to listOf("2026-09-26..2026-11-01", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.zurich" to listOf("2026-09-26..2026-11-01", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.wien" to listOf("2026-09-26..2026-11-11", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.zurich" to listOf("2026-09-26..2026-11-11", "2027-01-01..2027-12-31"),
     )
 
     private fun trDiyanetEuropeUnits(): Map<String, Map<String, Int>> = mapOf(

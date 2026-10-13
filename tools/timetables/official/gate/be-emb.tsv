@@ -29,3 +29,7 @@ archive/tables/pinned/tr-diyanet-europe/2026-10-02/antwerpen.txt	be.cautious	51.
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/gent.txt	be.cautious	51.0543	3.7174	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Gent (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/brussels.txt	be.cautious	50.8467	4.3525	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Brussels (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/split-7g/emb-2026-q4-late.txt	be.cautious	50.8467	4.3525	Europe/Brussels	F+E S D A M I	daily	standard	test	EMB, 26 October-1 November 2026	be.emb
+# prove, 2026-10-12: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-12/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/tr-diyanet-europe/2026-10-12/antwerpen.txt	be.cautious	51.2194	4.4025	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Antwerpen (the monitor capture of 12 Oct 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-10-12/brussels.txt	be.cautious	50.8467	4.3525	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Brussels (the monitor capture of 12 Oct 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-10-12/gent.txt	be.cautious	51.0543	3.7174	Europe/Brussels	F+E S D A - I	daily	standard	test	Diyanet Gent (the monitor capture of 12 Oct 2026)	tr.diyanet.europe

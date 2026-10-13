@@ -29,3 +29,5 @@ archive/tables/pinned/tr-diyanet-europe/2026-09-28/stavanger.txt	no.cautious	58.
 archive/tables/pinned/tr-diyanet-europe/2026-09-28/bergen.txt	no.cautious	60.39299	5.32415	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Bergen (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-09-28/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
+# prove, 2026-10-12: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-12/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/tr-diyanet-europe/2026-10-12/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 12 Oct 2026)	tr.diyanet.europe
