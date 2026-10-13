@@ -205,7 +205,8 @@ class AboutTimesUiStateTest {
         // Review I3. The committed my.jakim stamp's entry-wide worst is 4, the end of eating (each
         // zone's Subuh is printed for its latest point; the end-of-eating audit of 3 Oct 2026), and
         // before it was 3, Perlis's PLS01 sunrise: ends either way. Kuala Lumpur's own zone (WLY01)
-        // measured every start within a minute, and that is the figure its tile claims.
+        // measured every start within a minute (on 12 October 2026; the weekly monitor's prove adds
+        // JAKIM's next year to the row), and its row's worst start is the figure its tile claims.
         val kualaLumpur = Place(3.1412, 101.68653, "Asia/Kuala_Lumpur", "MY")
         val state = stateFor(kualaLumpur)
         assertIs<AboutTimesUiState.AuthorityChecked>(state)
@@ -214,7 +215,10 @@ class AboutTimesUiStateTest {
         val stamp = requireNotNull(state.stamp) { "my.jakim should carry a committed stamp" }
         assertEquals(4, stamp.worstLateMinutes.values.max())
         assertEquals(4, stamp.worstLateMinutes.getValue("endOfEating"))
-        assertEquals(1, checkedAtMostMinutes(state.resolution, kualaLumpur, stamp))
+        val wly01Starts = stamp.worstLateByUnit.getValue("WLY01")
+            .filterKeys { it in setOf("fajr", "dhuhr", "asrStandard", "maghrib", "isha") }.values.max()
+        assertEquals(wly01Starts, checkedAtMostMinutes(state.resolution, kualaLumpur, stamp))
+        assertTrue(wly01Starts <= 2, "WLY01's starts within class B's 2 minutes: $wly01Starts")
     }
 
     @Test
@@ -277,7 +281,9 @@ class AboutTimesUiStateTest {
         assertEquals(stamp.lastChecked, checkedThrough(makkah.resolution, stamp, makkah.date))
         val own = requireNotNull(checkedThrough(madinah.resolution, stamp, madinah.date))
         assertEquals(stamp.checkedByUnit.getValue("madinah").last().substringAfter(".."), own)
-        assertTrue(own < stamp.lastChecked!!, "Madinah through $own")
+        // 31 December 2027 on 12 October 2026, before Makkah's 2030; the same day only once the weekly monitor's prove
+        // holds Madinah's tables through 2030, so never after it.
+        assertTrue(own <= stamp.lastChecked!!, "Madinah through $own")
     }
 
     @Test
@@ -354,8 +360,11 @@ class AboutTimesUiStateTest {
         val almaty = stateFor(Place(43.238293, 76.945465, "Asia/Almaty", "KZ"))
         assertIs<AboutTimesUiState.AuthorityUnchecked>(almaty)
         assertEquals(uncheckedWorstMinutes(almaty.resolution, almaty.stamp), uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
-        // Almaty's own figure across its reach (its own tables replayed there, the review of 9 Oct 2026).
-        assertEquals(4, uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
+        // Almaty's own figure across its reach (its own tables replayed there, the review of 9 Oct 2026): its row's worst
+        // start, 4 on 12 October 2026, moving only as the weekly monitor's prove holds QMDB's next years.
+        val almatyStarts = requireNotNull(suburb.stamp).worstLateByUnit.getValue("almaty")
+            .filterKeys { it in setOf("fajr", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha") }.values.max()
+        assertEquals(almatyStarts, uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
     }
 
     @Test
