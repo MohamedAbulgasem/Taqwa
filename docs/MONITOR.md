@@ -257,6 +257,11 @@ nothing.
 `generateGoldenVector` to a scratch file, required **byte-identical** to the committed one (prove
 never changes the engine: if the vector moved, it stops); `checkStamps`; the tools' `jvmTest` with
 the archive; `CI=true generate`; `python3 site/build.py --check`; `python3 site/test_timetables.py`.
+It does not run the app's own tests, though `ProofStamps.kt` is app source: so a test anywhere that
+reads the proof holds its rule, never the live proof's figures or dates, which move every time prove
+adds rows (`StampsAsOf` in the tools' tests holds a case that needs fixed dates; a figure is read from
+the stamp, and one prove grows is pinned as a floor). On 12 October 2026 that broke twice: two tools
+tests failed prove itself, and `AboutTimesUiStateTest` failed main's tests on the published commit.
 Any failure puts back everything prove changed in the checkout and the pinned copies it wrote, and
 records which check failed in `proof.json` (exit 1; the issue's Proof section then says nothing was
 published and why). Its outputs go to `monitor/proof/` in the private repository: `proof.json` (rows added and left

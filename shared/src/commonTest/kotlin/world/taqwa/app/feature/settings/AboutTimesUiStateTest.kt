@@ -1,6 +1,8 @@
 package world.taqwa.app.feature.settings
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.EngineSettings
 import world.taqwa.app.prayer.engine.PrayerEngine
@@ -280,15 +282,31 @@ class AboutTimesUiStateTest {
 
     @Test
     fun `the checked-through date never runs past a day no table was checked on`() {
-        // Diyanet's tables are checked from 25 September to 1 November 2026 and through 2027, not between: Istanbul's
-        // About says 1 November 2026 until 2027 begins, never 31 December 2027 (the review of track T4's fix).
+        // Diyanet's tables are checked in runs with holes between them (from 25 September into November 2026, then
+        // through 2027): Istanbul's About says the end of the run holding the day, and on a day in a hole the end of
+        // the run before it, never a later run's (the review of track T4's fix). Read off the committed stamp's own
+        // runs, so the rule is held whatever the monitor has proven since (on 12 October the first run grew from
+        // 1 to 11 November, and the fixed dates this test once named stopped being true).
         val istanbul = stateFor(Place(41.0082, 28.9784, "Europe/Istanbul", "TR"))
         assertIs<AboutTimesUiState.AuthorityChecked>(istanbul)
         val stamp = requireNotNull(istanbul.stamp)
-        assertEquals("2027-12-31", stamp.lastChecked)
-        assertEquals("2026-11-01", checkedThrough(istanbul.resolution, stamp, istanbul.date))
-        assertEquals("2026-11-01", checkedThrough(istanbul.resolution, stamp, LocalDate(2026, 12, 15)))
-        assertEquals("2027-12-31", checkedThrough(istanbul.resolution, stamp, LocalDate(2027, 1, 1)))
+        // The unit's own runs where the stamp keeps them by unit, else the entry's (as checkedThrough reads them).
+        val stampRuns = istanbul.resolution.unitId?.let { stamp.checkedByUnit[it] } ?: stamp.checked
+        assertTrue(stampRuns.isNotEmpty(), "Diyanet's stamp has checked runs")
+        val ownRuns = stampRuns.map { run ->
+            LocalDate.parse(run.substringBefore("..")) to LocalDate.parse(run.substringAfter(".."))
+        }
+        assertEquals(ownRuns.maxOf { it.second }.toString(), stamp.lastChecked)
+        for ((i, run) in ownRuns.withIndex()) {
+            val (start, end) = run
+            assertEquals(end.toString(), checkedThrough(istanbul.resolution, stamp, start), "in the run from $start")
+            assertEquals(end.toString(), checkedThrough(istanbul.resolution, stamp, end), "on the run's last day $end")
+            val next = ownRuns.getOrNull(i + 1)?.first ?: continue
+            val inHole = end.plus(1, DateTimeUnit.DAY)
+            if (inHole < next) {
+                assertEquals(end.toString(), checkedThrough(istanbul.resolution, stamp, inHole), "in the hole after $end")
+            }
+        }
         // A run of one day, a hole, a day past every run, and a day before every run.
         val runs = listOf("2026-01-01..2026-03-31", "2026-04-02", "2026-05-01..2026-05-31")
         assertEquals("2026-03-31", checkedRunEnd(runs, LocalDate(2026, 3, 31)))
