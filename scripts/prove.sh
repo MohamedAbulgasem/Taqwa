@@ -6,8 +6,10 @@
 # when green), then every check a release of the proof needs: ProofStamps.kt regenerated, the golden
 # vector regenerated and required byte-identical (the engine did not change; if it moved, stop), the
 # stamps checked, the tools' tests with the archive, the website's generator (CI=true), its build
-# --check and its timetable tests. When a check fails, everything prove changed in this checkout and the
-# pinned copies it wrote are put back, and the exit is 1.
+# --check and its timetable tests, and last the app's own tests on the new ProofStamps.kt (the shared
+# module's Android host tests: they need the Android SDK, whose platform the workflow installs as
+# tests.yml does). When a check fails, everything prove changed in this checkout and the pinned copies
+# it wrote are put back, and the exit is 1.
 #
 #   scripts/prove.sh [--date yyyy-mm-dd] [--only <source>]...
 #
@@ -51,6 +53,32 @@ notices() {
     CI=true gradle generate "-Pout=$TMP/timetables-$1.json" > "$TMP/generate-$1.log" 2>&1 || { cat "$TMP/generate-$1.log" >&2; return 1; }
     grep '::notice::' "$TMP/generate-$1.log" | sed 's/^.*::notice:://' > "$OUT/notices-$1.txt"
     grep -v '::notice::' "$TMP/generate-$1.log" | grep -v '^WARNING' | tail -1
+}
+
+APP_RESULTS="shared/build/test-results/testAndroidHostTest"
+app_failures() {
+    # The end of put_back's reason (the issue quotes it, so no message): ": " and the app's failing test classes,
+    # or that none failed, so Gradle stopped outside the tests (a download, the SDK, memory); each failing test,
+    # class and name, to the log.
+    "$PY" - "$APP_RESULTS" <<'PY'
+import glob, os, sys, xml.etree.ElementTree as ET
+failed = []
+for path in sorted(glob.glob(os.path.join(sys.argv[1], "*.xml"))):
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError:
+        print("prove.sh: unreadable result %s" % os.path.basename(path), file=sys.stderr)
+        continue
+    cases = [c.get("name") for c in root.iter("testcase") if c.find("failure") is not None or c.find("error") is not None]
+    if cases:
+        failed.append(root.get("name", "").rsplit(".", 1)[-1])
+        for case in cases:
+            print("prove.sh: failed: %s > %s" % (root.get("name"), case), file=sys.stderr)
+if failed:
+    print(": " + ", ".join(failed[:5]) + (" and %d more" % (len(failed) - 5) if len(failed) > 5 else ""), end="")
+else:
+    print(" (no test failed: Gradle stopped outside the tests; see the log)", end="")
+PY
 }
 
 put_back() {
@@ -120,6 +148,14 @@ CI=true gradle generate > /dev/null 2>&1 || put_back "the generator failed writi
 echo "== the website"
 "$PY" site/build.py --check || put_back "site/build.py --check failed"
 "$PY" site/test_timetables.py || put_back "site/test_timetables.py failed"
+
+echo "== the app's tests, on the new ProofStamps.kt"
+# ProofStamps.kt is app source: the proof of 12 October 2026's captures was published and then failed main's
+# Tests and iOS, because AboutTimesUiStateTest named the old proof's reach. The Android host tests run the common
+# tests the iOS ones do, with CI=true as main's Tests runs them (a timing budget is asserted only off CI); last,
+# on the ProofStamps.kt every other check has passed.
+rm -rf "$APP_RESULTS"
+CI=true "$GRADLE" --no-daemon -q :shared:testAndroidHostTest || put_back "the app's tests did not pass with the new ProofStamps.kt$(app_failures)"
 
 echo true > "$OUT/changed"
 echo "Proven: the checkout holds the new rows, stamps and ProofStamps.kt"

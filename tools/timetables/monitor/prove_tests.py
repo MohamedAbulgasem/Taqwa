@@ -211,6 +211,32 @@ class Workflow(unittest.TestCase):
         # A retry only when main's new commits leave what the proof depends on alone.
         self.assertIn("git diff --name-only \"$checked_out\" FETCH_HEAD", publish)
 
+    def test_prove_runs_the_apps_tests_on_the_platform_the_app_compiles_against(self):
+        # prove.sh's last check is the app's own tests on the new ProofStamps.kt (the proof of 12 October 2026's
+        # captures failed main's Tests and iOS once published), so the monitor installs the Android SDK platform of
+        # compileSdk just before prove, by the package name tests.yml installs: a compileSdk moved in one place fails
+        # here, not on a run. The step runs when prove does and never fails the job (a missing platform puts back).
+        import re
+        root = os.path.join(HERE, "..", "..", "..")
+        with open(os.path.join(root, "gradle", "libs.versions.toml"), encoding="utf-8") as f:
+            sdk = re.search(r'^android-compileSdk = "(\d+)"$', f.read(), re.M).group(1)
+        package = '"platforms;android-%s.0"' % sdk
+        with open(self.PATH, encoding="utf-8") as f:
+            text = f.read()
+        with open(os.path.join(root, ".github", "workflows", "tests.yml"), encoding="utf-8") as f:
+            self.assertIn(package, f.read())
+        install = text.index("- name: Android SDK platform %s\n" % sdk)
+        prove = text.index("- name: Prove the new captures")
+        self.assertIn(package, text[install:prove])
+        conditions = re.findall(r"^        if: (.*)$", text[install:], re.M)
+        self.assertEqual(conditions[0], conditions[1], "the install's condition is prove's")
+        self.assertIn("        continue-on-error: true\n", text[install:prove])
+        with open(os.path.join(root, "scripts", "prove.sh"), encoding="utf-8") as f:
+            script = f.read()
+        self.assertRegex(script, r'\nCI=true "\$GRADLE" --no-daemon -q :shared:testAndroidHostTest \|\| put_back ')
+        self.assertLess(script.index("site/test_timetables.py ||"), script.index(":shared:testAndroidHostTest ||"))
+        self.assertLess(script.index(":shared:testAndroidHostTest ||"), script.index('echo true > "$OUT/changed"'))
+
 
 class RecipesCatalogue(unittest.TestCase):
     """official/monitor/recipes.tsv: every source a source of sources.tsv, every gate file present, metadata only."""

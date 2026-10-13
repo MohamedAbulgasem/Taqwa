@@ -30,9 +30,10 @@
 # After a full run that is green or needs attention (never a partial run, never when the monitor itself
 # failed), scripts/prove.sh turns the new captures into proof (docs/MONITOR.md, "Prove"): pinned copies,
 # the recipes' rows, the whole gate green, the stamps, ProofStamps.kt, the golden vector byte-identical and
-# every check; the pinned copies are committed here with the run's other changes, and only then, when
-# prove changed the public checkout, the change is pushed to MohamedAbulgasem/Taqwa main with the secret
-# TAQWA_PUSH_TOKEN (skipped with a notice while it is not set). The issue gains a "Proof" section.
+# every check, the app's own tests last (on the Android SDK platform tests.yml installs, installed just
+# before prove the same way); the pinned copies are committed here with the run's other changes, and only
+# then, when prove changed the public checkout, the change is pushed to MohamedAbulgasem/Taqwa main with
+# the secret TAQWA_PUSH_TOKEN (skipped with a notice while it is not set). The issue gains a "Proof" section.
 #
 # No secret is ever echoed: LPT_API_KEY (London Prayer Times, optional) reaches the fetcher through the
 # environment alone, TAQWA_PUSH_TOKEN reaches git as a masked HTTP header in the push step alone, and
@@ -144,10 +145,15 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: gradle
+          # The app's build scripts too, for prove's last check: a cache saved under the tools' alone is not saved
+          # again until one of those files changes, so it does not hold the app's dependencies.
           cache-dependency-path: |
             taqwa/gradle/libs.versions.toml
             taqwa/gradle/wrapper/gradle-wrapper.properties
             taqwa/tools/timetables/*.gradle.kts
+            taqwa/*.gradle.kts
+            taqwa/shared/build.gradle.kts
+            taqwa/widgetcore/build.gradle.kts
 
       - name: Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
@@ -280,13 +286,25 @@ jobs:
           print("valid" if valid else "not valid", "-", summary[:300])
           PY
 
+      - name: Android SDK platform 37
+        # prove's last check is the app's own tests on the new ProofStamps.kt (the shared module's Android host
+        # tests), and compileSdk 37 is newer than the runner's image may carry: the platform tests.yml installs, by
+        # the same name (android-37.0, not android-37; docs/BUILD-LOG.md). Only when prove runs, and never failing
+        # the job: without the platform prove's last check fails and puts back, and the issue says Gradle stopped
+        # outside the tests (the log says why). Five minutes at most, so a stalled download cannot eat prove's time.
+        if: always() && steps.options.outcome == 'success' && steps.options.outputs.partial != 'true' && steps.result.outputs.valid == 'true' && (steps.run.outputs.code == '0' || steps.run.outputs.code == '1')
+        continue-on-error: true
+        timeout-minutes: 5
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" > /dev/null
+
       - name: Prove the new captures
         id: prove
         # Only after a FULL run whose record is sound and green or attention (never a partial run, never when the
         # monitor itself failed). scripts/prove.sh pins each new capture under archive/ (committed by the next step),
         # appends its recipe's rows, runs the whole gate (a failing new row is removed and reported, never loosened),
         # and runs every check (ProofStamps.kt, the golden vector byte-identical, checkStamps, the tools' tests, the
-        # generator, the site's checks); on any failure it puts everything back. No token reaches this step.
+        # generator, the site's checks, the app's tests); on any failure it puts everything back. No token reaches
+        # this step.
         if: always() && steps.options.outcome == 'success' && steps.options.outputs.partial != 'true' && steps.result.outputs.valid == 'true' && (steps.run.outputs.code == '0' || steps.run.outputs.code == '1')
         env:
           RUN_DATE: ${{ steps.result.outputs.date }}

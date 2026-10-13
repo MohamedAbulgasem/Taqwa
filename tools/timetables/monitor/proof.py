@@ -116,7 +116,7 @@ def message(report, before, after):
         "Written by scripts/prove.sh in the monitor's workflow, with the whole gate green: each capture a",
         "recipe of tools/timetables/official/monitor/recipes.tsv names, pinned in the archive and checked as",
         "split=test rows; stamps and ProofStamps.kt regenerated, the golden vector byte-identical, checkStamps,",
-        "the tools' tests, the generator and the site's checks green.",
+        "the tools' tests, the generator, the site's checks and the app's tests green.",
         "",
         "Gate files: " + (", ".join(files) or "none") + ".",
         "Entries: " + (", ".join(entries) or "none") + ".",
