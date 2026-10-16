@@ -1,0 +1,86 @@
+name: Something isn't working
+description: A crash, a wrong screen, a notification that doesn't arrive, or anything else that's broken.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        - **A prayer time differs from your mosque?** Use the [prayer times form](https://github.com/MohamedAbulgasem/Taqwa/issues/new?template=prayer-times.yml) instead.
+        - **A security problem?** Report it privately, as [SECURITY.md](https://github.com/MohamedAbulgasem/Taqwa/blob/main/SECURITY.md) describes, not here.
+        - **The adhan came late or not at all?** Check [The adhan came late, or not at all](https://taqwa.world/support/#late) first. The phone's battery settings are the usual cause.
+        - **The app crashed?** It keeps a report on the phone. Settings › About Taqwa › Report a problem emails it to support with your phone model, and nothing else is sent. Say below that you have sent it.
+
+        **Issues are public**, so leave out anything personal, such as your address or exact location.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to make it happen
+      placeholder: |
+        1. Open …
+        2. Tap …
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Phone
+      options:
+        - Android
+        - iPhone
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Phone model
+      placeholder: Samsung Galaxy S23, iPhone 13
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS version
+      placeholder: Android 16, iOS 26.1
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Settings › About Taqwa
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: App language
+      options:
+        - English
+        - العربية (Arabic)
+        - Français (French)
+        - Türkçe (Turkish)
+        - Bahasa Indonesia (Indonesian)
+        - اردو (Urdu)
+        - বাংলা (Bengali)
+    validations:
+      required: true
+  - type: checkboxes
+    id: accessibility
+    attributes:
+      label: Accessibility
+      options:
+        - label: This is about a screen reader, text size, contrast or another accessibility setting.
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or a screen recording
+      description: Paste or drag them here.

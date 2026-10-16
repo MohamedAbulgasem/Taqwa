@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and help
+    url: https://taqwa.world/support/
+    about: Answers to common questions, and the support email for anything else.
+  - name: Report a security vulnerability
+    url: https://github.com/MohamedAbulgasem/Taqwa/security/advisories/new
+    about: Privately, never in a public issue.

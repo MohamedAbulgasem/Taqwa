@@ -1,0 +1,128 @@
+name: Prayer times don't match my mosque
+description: A prayer time in Taqwa differs from the timetable your mosque follows.
+title: "Prayer times: "
+labels: ["prayer-times"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for checking Taqwa against your mosque. Reports like this are how the times get better.
+
+        Before you start, [A prayer time looks wrong](https://taqwa.world/support/#prayer-time) explains where Taqwa's times come from and covers the usual causes.
+
+        **Issues are public.** Give the city, never your address or exact location.
+
+        If Taqwa shows a prayer **earlier** than the published time of the timetable it says it follows, put "earlier" in the title. That is the most serious kind of bug the app can have, and it is looked at first.
+  - type: input
+    id: city
+    attributes:
+      label: City
+      description: As Taqwa shows it in Settings › Location. The city only, never an address or coordinates.
+      placeholder: Cape Town
+    validations:
+      required: true
+  - type: input
+    id: country
+    attributes:
+      label: Country
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date
+      description: The day the times differ, as YYYY-MM-DD.
+      placeholder: "2026-10-17"
+    validations:
+      required: true
+  - type: checkboxes
+    id: prayers
+    attributes:
+      label: Which times differ?
+      options:
+        - label: Fajr
+        - label: Sunrise
+        - label: Dhuhr
+        - label: Asr
+        - label: Maghrib
+        - label: Isha
+  - type: textarea
+    id: times
+    attributes:
+      label: Taqwa's times and the published times
+      description: For each prayer that differs, the time Taqwa shows and the published time, on the date above.
+      placeholder: "Fajr: Taqwa 4:52, published 4:44"
+    validations:
+      required: true
+  - type: input
+    id: timetable
+    attributes:
+      label: The timetable or mosque you follow
+      description: The mosque's name, or the authority or council whose timetable it uses.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link to the published timetable
+      description: Where the timetable is published, such as the mosque's or the authority's own page. Please link to it rather than paste or photograph the whole table, because most timetables may not be republished. If it isn't online, say where it is published (a printed calendar, the mosque's board) under "Anything else".
+      placeholder: https://
+  - type: textarea
+    id: about
+    attributes:
+      label: About these times
+      description: On the Prayer screen, tap the (i) after the date, then About these times. Paste a screenshot here, or copy its text. It shows which timetable Taqwa is following and how it was checked.
+    validations:
+      required: true
+  - type: dropdown
+    id: timetable-setting
+    attributes:
+      label: Timetable setting
+      description: Settings › Prayer times › Timetable
+      options:
+        - Automatic
+        - Match my mosque
+        - A method under Other methods
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: asr
+    attributes:
+      label: Asr setting
+      description: Settings › Prayer times › Asr
+      options:
+        - Automatic
+        - Standard
+        - Hanafi
+        - Not sure
+  - type: dropdown
+    id: adjustments
+    attributes:
+      label: Manual adjustments
+      description: Settings › Prayer times › Manual adjustments
+      options:
+        - None
+        - Some minutes added or removed
+        - Not sure
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Phone
+      options:
+        - Android
+        - iPhone
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Settings › About Taqwa
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else

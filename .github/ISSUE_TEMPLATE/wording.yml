@@ -1,0 +1,66 @@
+name: Wording or translation
+description: Text that's wrong, unclear or badly translated, in the app, a Quran translation or tafsir, or the adhkar.
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For the app's own text, a pull request is welcome too: see [Translations](https://github.com/MohamedAbulgasem/Taqwa/blob/main/CONTRIBUTING.md#translations).
+
+        **Religious text is handled with care:**
+
+        - **The Quran's Arabic** is the [Tanzil](https://tanzil.net) text, verbatim, and is never edited here. If it *displays* wrongly in the app (a missing mark, a broken word), report that as a [bug](https://github.com/MohamedAbulgasem/Taqwa/issues/new?template=bug.yml) with a screenshot. If you believe the text itself has an error, report it to Tanzil.
+        - **A Quran translation or tafsir** is corrected only against a printed witness, such as the King Fahd Complex print of that translation. Give the edition and the page.
+        - **The adhkar** are [OpenDua](https://opendua.org)'s texts (CC BY 4.0), based on Hisn al-Muslim. A correction needs its source: the hadith reference or the printed edition and page.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of text
+      options:
+        - The app's own text (screens, settings, notifications, widgets)
+        - A Quran translation or tafsir
+        - The adhkar or their translation
+        - The website
+        - The store listing
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options:
+        - English
+        - العربية (Arabic)
+        - Français (French)
+        - Türkçe (Turkish)
+        - Bahasa Indonesia (Indonesian)
+        - اردو (Urdu)
+        - বাংলা (Bengali)
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where is it?
+      placeholder: Settings › Prayer times, or Surah 2, ayah 255
+    validations:
+      required: true
+  - type: textarea
+    id: now
+    attributes:
+      label: What it says now
+    validations:
+      required: true
+  - type: textarea
+    id: should
+    attributes:
+      label: What it should say
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Why, and the source
+      description: For the app's own text, a short reason is enough. For a Quran translation, tafsir or the adhkar, give the printed edition and page, or the hadith reference.
+    validations:
+      required: true

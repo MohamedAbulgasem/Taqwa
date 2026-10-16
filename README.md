@@ -197,15 +197,7 @@ The design specs the app is built from are in [`docs/superpowers/specs`](docs/su
 
 ## Contributing
 
-Contributions are welcome, from a typo in the Arabic strings to an authority's timetable.
-
-1. **Open an issue first** for anything beyond a small fix, so the approach can be agreed before you spend time on it. Bug reports are most useful with the device, OS version, language, and a screenshot; without a GitHub account, email support@taqwa.world instead.
-2. **Fork and branch** from `main`.
-3. **Keep the constraints.** No network calls beyond the recitation downloads the person asked for, no third-party SDKs that phone home, no new colour outside the palette in `Palette.kt`, and every language must be checked as carefully as English, the right-to-left ones (Arabic, Urdu) especially. If a change touches the UI, include screenshots of English and Arabic in both themes.
-4. **Run `./scripts/test.sh`** and add tests for domain logic. Prayer times are held to the gate: `./gradlew -p tools/timetables jvmTest gate` replays the engine against every official timetable held and writes the proof stamps in `tools/timetables/official/stamps/`, and `./gradlew -p tools/timetables checkStamps`, which the release scripts run first, refuses a stale or red stamp. Most of those timetables may not be republished, so they live in a local archive and the maintainer runs the gate; `checkStamps` needs no archive and tells you whether a change needs a new gate run. To propose an authority's timetable, open an issue with where it is published. Qibla changes need known-answer tests against published values.
-5. **Open a pull request** against `main` describing what changed and why. Small, focused PRs are reviewed quickly; large ones are split.
-
-Translations: one `strings.xml` per language under `shared/src/commonMain/composeResources/` (`values/` for English, then `values-ar`, `values-fr`, `values-tr`, `values-in`, `values-ur`, `values-bn`), and `scripts/check-strings.sh` checks that every file carries the same keys. New languages are welcome as long as every string is covered, and the website and privacy policy should follow in the same language.
+Contributions are welcome, from a typo in the Arabic strings to an authority's timetable. Open an issue first for anything beyond a small fix, keep the constraints (no network calls beyond the recitation downloads the person asked for, no third-party SDKs that phone home), and run `./scripts/test.sh`. [CONTRIBUTING.md](CONTRIBUTING.md) has the whole guide: the constraints, the prayer-time gate, translations and the licence. Report a prayer time that differs from your mosque with the [prayer times form](https://github.com/MohamedAbulgasem/Taqwa/issues/new?template=prayer-times.yml), and a security problem privately, as [SECURITY.md](SECURITY.md) describes.
 
 ## Privacy
 
