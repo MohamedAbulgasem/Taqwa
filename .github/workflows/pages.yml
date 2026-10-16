@@ -44,9 +44,12 @@ on:
 permissions:
   contents: read
 
+# One run at a time, and a run in progress is never cancelled: a newer one waits for it (GitHub's own
+# advice for Pages, a deploy cut off midway helps no one). Cancelling marked main's commit failed
+# whenever a push met a scheduled run (13 October 2026), with nothing wrong.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -92,9 +95,19 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_again.outputs.page_url }}
     steps:
+      # Once more after a minute when GitHub's Pages service errors (15 October 2026: "Failed to create
+      # deployment (status: 500)" on a build that was fine). The action cancels a deployment it gives up
+      # on, so the second is a fresh one; a failure that persists still fails the job.
       - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        continue-on-error: true
+      - name: Wait a minute before deploying again
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+      - id: deployment_again
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
 
   keepalive:
