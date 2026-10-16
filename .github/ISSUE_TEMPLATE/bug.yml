@@ -8,7 +8,7 @@ body:
         - **A prayer time differs from your mosque?** Use the [prayer times form](https://github.com/MohamedAbulgasem/Taqwa/issues/new?template=prayer-times.yml) instead.
         - **A security problem?** Report it privately, as [SECURITY.md](https://github.com/MohamedAbulgasem/Taqwa/blob/main/SECURITY.md) describes, not here.
         - **The adhan came late or not at all?** Check [The adhan came late, or not at all](https://taqwa.world/support/#late) first. The phone's battery settings are the usual cause.
-        - **The app crashed?** It keeps a report on the phone. Settings › About Taqwa › Report a problem emails it to support with your phone model, and nothing else is sent. Say below that you have sent it.
+        - **The app crashed?** It keeps a report on the phone. Settings › About Taqwa › Report a problem opens an email to support with the saved report. It contains the app version, your phone model and the error, nothing else. Say below that you have sent it.
 
         **Issues are public**, so leave out anything personal, such as your address or exact location.
   - type: textarea

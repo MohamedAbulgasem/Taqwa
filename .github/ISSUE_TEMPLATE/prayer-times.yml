@@ -18,7 +18,7 @@ body:
     attributes:
       label: City
       description: As Taqwa shows it in Settings › Location. The city only, never an address or coordinates.
-      placeholder: Cape Town
+      placeholder: Istanbul
     validations:
       required: true
   - type: input
@@ -51,7 +51,7 @@ body:
     attributes:
       label: Taqwa's times and the published times
       description: For each prayer that differs, the time Taqwa shows and the published time, on the date above.
-      placeholder: "Fajr: Taqwa 4:52, published 4:44"
+      placeholder: "Fajr: Taqwa 5:41, published 5:38"
     validations:
       required: true
   - type: input
@@ -81,6 +81,7 @@ body:
       description: Settings › Prayer times › Timetable
       options:
         - Automatic
+        - A timetable under Also used nearby
         - Match my mosque
         - A method under Other methods
         - Not sure
