@@ -51,7 +51,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
@@ -77,7 +77,7 @@ jobs:
           ./scripts/ios-build.sh build CODE_SIGNING_ALLOWED=NO
           # The script skips the size check when there is no extension to measure; here there must be one.
           test -d build/ios-dd/Build/Products/Debug-iphonesimulator/Taqwa.app/PlugIns/TaqwaWidget.appex
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: ios-test-reports
