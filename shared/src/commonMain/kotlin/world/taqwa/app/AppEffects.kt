@@ -23,7 +23,7 @@ import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.Tab
-import world.taqwa.app.nav.ayahWidgetTarget
+import world.taqwa.app.nav.openWidgetAyah
 import world.taqwa.app.notifications.returnToFrontReschedules
 import world.taqwa.app.recitation.foregroundReturnsToRecitation
 import world.taqwa.app.settings.SettingsRepository
@@ -257,25 +257,21 @@ internal fun WidgetLaunchRequests(
         settings.onboardingComplete.filter { it }.first()
         LaunchRequests.pendingAyah.collect { pending ->
             val (surah, ayah) = pending ?: return@collect
-            runCatching {
-                // The reader the user actually reads in, with the tapped ayah already picked out:
-                // selected and showing its actions in translation mode, highlighted with its
-                // reference bar in Mushaf mode. Resolved before the navigator is touched at all,
-                // because `pageOf` is itself a database read that can fail and a failure must
-                // leave the back stack exactly as it found it rather than half-applying a push.
-                val reading = settings.readingSettings(platformFormat.languageTag()).first()
-                // Stamped with the tap's own number, so a second tap for the same ayah over the
-                // screen the first one opened lands on its ayah again.
-                val target = ayahWidgetTarget(reading.mode, surah, ayah, request = LaunchRequests.count) { s, a ->
-                    container.quranRepository.pageOf(s, a)
-                }
-                // On the Quran tab, with the Quran root at the bottom of the stack: a tap from
-                // the Prayer tab used to push the root and the reader on top of Prayer, which
-                // kept the tab current at Prayer and so hid the player bar (spec §5.3 draws it
-                // only on the Quran tab) until the tab was left and re-entered. `openReading`
-                // also keeps the D3 rule: one Back from the reader reaches the surah list.
-                openReading(target)
-            }
+            // The reader the user actually reads in, with the tapped ayah already picked out:
+            // selected and showing its actions in translation mode, highlighted with its reference
+            // bar in Mushaf mode (openWidgetAyah). On the Quran tab, with the Quran root at the
+            // bottom of the stack: a tap from the Prayer tab used to push the root and the reader
+            // on top of Prayer, which kept the tab current at Prayer and so hid the player bar
+            // (spec §5.3 draws it only on the Quran tab) until the tab was left and re-entered.
+            // `openReading` also keeps the D3 rule: one Back from the reader reaches the surah list.
+            openWidgetAyah(
+                surah = surah,
+                ayah = ayah,
+                mode = { settings.readingSettings(platformFormat.languageTag()).first().mode },
+                requestsMade = { LaunchRequests.count },
+                pageOf = container.quranRepository::pageOf,
+                openReading = openReading,
+            )
             // Consumed unconditionally: a bad request (e.g. a database failure resolving the page)
             // must not be retried forever on every future emission.
             LaunchRequests.consume()

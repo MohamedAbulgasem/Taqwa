@@ -143,21 +143,26 @@ class ReaderScreenStateTest {
     }
 
     /**
-     * The reading sheet is the app's to hold, so it stays open when the reader under it is
-     * replaced by the voice moving on to the next surah: the reader's finger is on it, and the
-     * Mushaf, which no surah change replaces, keeps its sheet the same way.
+     * The reading sheet is the app's to hold, so it is still open on the reader that replaces this
+     * one when the voice moves on to the next surah, as the Mushaf, which no surah change replaces,
+     * keeps its own. The new reader starts loading, as the app's does, and the sheet comes back
+     * once it has loaded: it is drawn with the surah's content.
      */
     @Test
-    fun aReadingSheetHeldByTheAppStaysOpenWhenTheReaderIsReplaced() = runComposeUiTest {
+    fun aReadingSheetHeldByTheAppIsBackOnceTheReplacingReaderHasLoaded() = runComposeUiTest {
         val sheet = mutableStateOf(false)
         var screen by mutableStateOf(1)
-        setContent { key(screen) { Reader(ready(), QuranRecitation(), sheetOpenState = sheet) } }
+        var state by mutableStateOf<ReaderUiState>(ready())
+        setContent { key(screen) { Reader(state, QuranRecitation(), sheetOpenState = sheet) } }
         waitForIdle()
         onNodeWithContentDescription(getString(Res.string.quran_reader_aa)).performClick()
         waitForIdle()
         onNodeWithText(getString(Res.string.quran_sheet_size)).assertIsDisplayed()
 
         screen = 2
+        state = ReaderUiState.Loading
+        waitForIdle()
+        state = ready()
         waitForIdle()
 
         onNodeWithText(getString(Res.string.quran_sheet_size)).assertIsDisplayed()

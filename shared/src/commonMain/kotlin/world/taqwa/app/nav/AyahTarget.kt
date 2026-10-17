@@ -48,3 +48,25 @@ suspend fun recitationTarget(
 } else {
     Screen.Reader(surah, ayah, followVoice = true)
 }
+
+/**
+ * One tap on the ayah widget (design spec §8): the reader the user reads in, at the tapped ayah,
+ * stamped with the tap's own request number ([requestsMade], already counted for this tap) so a
+ * second tap for the same ayah over the screen the first one opened is a screen of its own.
+ *
+ * Resolved before the navigator is touched at all, because [pageOf] is a database read that can
+ * fail, and a failure must leave the back stack exactly as it found it rather than half-applying
+ * a push.
+ */
+suspend fun openWidgetAyah(
+    surah: Int,
+    ayah: Int,
+    mode: suspend () -> ReadingMode,
+    requestsMade: () -> Long,
+    pageOf: suspend (Int, Int) -> Int,
+    openReading: (Screen) -> Unit,
+) {
+    val target = runCatching { ayahWidgetTarget(mode(), surah, ayah, request = requestsMade(), pageOf = pageOf) }
+        .getOrNull() ?: return
+    openReading(target)
+}

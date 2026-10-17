@@ -62,4 +62,37 @@ class AyahTargetTest {
         navigator.openReading(ayahWidgetTarget(ReadingMode.MUSHAF, 18, 10, request = 2) { _, _ -> 294 })
         assertNotEquals(opened, navigator.backStack.value)
     }
+
+    /**
+     * Two taps of the same widget ayah, the second over the Mushaf the first opened, each go through
+     * the widget's own handling: the second still changes the back stack, so the page opens on its
+     * ayah again. It is the tap's request number, stamped where the tap is handled, that does it.
+     */
+    @Test fun aSecondTapOfTheSameWidgetAyahOpensItAgain() = runTest {
+        val navigator = Navigator(Screen.Quran)
+        suspend fun tap() {
+            LaunchRequests.openAyah(18, 10)
+            openWidgetAyah(
+                surah = 18,
+                ayah = 10,
+                mode = { ReadingMode.MUSHAF },
+                requestsMade = { LaunchRequests.count },
+                pageOf = { _, _ -> 294 },
+                openReading = navigator::openReading,
+            )
+            LaunchRequests.consume()
+        }
+        tap()
+        val first = navigator.backStack.value
+        tap()
+        assertNotEquals(first, navigator.backStack.value)
+    }
+
+    /** A page that cannot be looked up leaves the back stack as it was. */
+    @Test fun aWidgetTapWhosePageCannotBeFoundLeavesTheStackAlone() = runTest {
+        val navigator = Navigator(Screen.Quran)
+        val before = navigator.backStack.value
+        openWidgetAyah(18, 10, mode = { ReadingMode.MUSHAF }, requestsMade = { 1L }, pageOf = { _, _ -> error("no page") }, openReading = navigator::openReading)
+        assertEquals(before, navigator.backStack.value)
+    }
 }
