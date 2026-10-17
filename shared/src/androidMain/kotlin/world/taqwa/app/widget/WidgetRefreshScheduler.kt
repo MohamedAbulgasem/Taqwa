@@ -58,10 +58,12 @@ object WidgetRefreshScheduler {
 
     const val ACTION_WIDGET_REFRESH: String = "world.taqwa.app.WIDGET_REFRESH"
 
-    /** Distinct from every request code [world.taqwa.app.notifications.AndroidNotificationScheduler]
-     * hands out (those start at 1 and count up), so the two alarm families cannot collide on a
-     * `PendingIntent`. */
-    private const val REQUEST_CODE = 0x7A9A
+    /** The request codes [world.taqwa.app.notifications.AndroidNotificationScheduler] hands out
+     * start at 1 and count up, so one day they pass this one, harmlessly: theirs are broadcasts to
+     * another receiver under another action, and `Intent.filterEquals` keeps the two alarm
+     * families apart whatever the numbers. Apart from the app's other fixed numbers all the same
+     * (`RecitationService.REQUEST_OPEN_PLAYING` lists them). */
+    internal const val REQUEST_CODE = 0x7A9A
 
     /**
      * The next epoch-aligned [intervalMillis] boundary strictly after [nowMillis].

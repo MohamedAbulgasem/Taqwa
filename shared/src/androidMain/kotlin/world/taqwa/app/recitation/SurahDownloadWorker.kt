@@ -296,7 +296,7 @@ class SurahDownloadWorker(
          * are numbered from 1. When the last worker finishes, WorkManager takes the notification
          * down with the foreground service, as before.
          */
-        private const val NOTIFICATION_ID = 770_000
+        internal const val NOTIFICATION_ID = 770_000
 
         /** Idempotent, and re-created deliberately so a locale change relabels it. */
         fun ensureChannel(context: Context, languageTag: String) {

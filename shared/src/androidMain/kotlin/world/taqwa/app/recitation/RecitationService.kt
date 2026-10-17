@@ -147,11 +147,13 @@ class RecitationService : MediaSessionService() {
         }
         // Media3's own default small icon is a generic music note. The status bar should say
         // Taqwa, and the mark the prayer notifications already use is the one it should say it
-        // with; `:androidApp` puts the id there in `TaqwaApplication.onCreate`.
+        // with; `:androidApp` puts the id there in `TaqwaApplication.onCreate`. And a notification
+        // id of its own, since Media3's default is one the prayers reach (MEDIA_NOTIFICATION_ID).
         setMediaNotificationProvider(
-            DefaultMediaNotificationProvider.Builder(this).build().apply {
-                setSmallIcon(notificationSmallIconResId)
-            },
+            DefaultMediaNotificationProvider.Builder(this)
+                .setNotificationId(MEDIA_NOTIFICATION_ID)
+                .build()
+                .apply { setSmallIcon(notificationSmallIconResId) },
         )
     }
 
@@ -421,7 +423,48 @@ class RecitationService : MediaSessionService() {
         const val PHASE_SILENCE = 1
         const val PHASE_SPEECH = 2
 
-        private const val REQUEST_OPEN_PLAYING = 31
+        /**
+         * [sessionActivity]'s request code, in the far family the download notification's
+         * 770_000 opened ([SurahDownloadWorker.NOTIFICATION_ID]).
+         *
+         * It was 31 (B22). `AndroidNotificationScheduler` numbers the prayer alarms 1, 2, 3, …
+         * and never starts again, and `PrayerAlarmReceiver` makes each one's notification tap
+         * from this same launcher intent under the alarm's number. A `PendingIntent` is told
+         * apart by its request code and `Intent.filterEquals`, which ignores extras and flags, so
+         * whenever prayer 31's notification sat in the shade beside a recitation, the two taps
+         * were one `PendingIntent`: `FLAG_UPDATE_CURRENT` gave both the extras of whichever was
+         * made last (the player's tap opened no surah, or the prayer's opened the recited one)
+         * and kept the flags of whichever was made first.
+         *
+         * The sequential numbers grow by one per new notification id, 5 to 13 a day, and by at
+         * most a plan's 64 when a switch turned off is turned back on: at 13 a day 770_000 is 160
+         * years away, and still 27 with a whole plan re-armed every day on top.
+         *
+         * Every number the Android code gives a `PendingIntent` or a notification, so the next
+         * one can be chosen clear of them (`RequestCodesAndNotificationIdsTest` keeps the fixed
+         * ones apart):
+         *  - 1, 2, 3, …: each prayer alarm's broadcast, its notification's id and its tap's
+         *    request code (`AndroidNotificationScheduler`); `PrayerAlarmReceiver` falls back to
+         *    the id's hash only for an alarm armed before those numbers, which no store build did;
+         *  - 0x7A9A and 0x7A9B: the prayer widgets' redraw and the ayah widget's midnight alarm
+         *    (`WidgetRefreshScheduler`, androidApp's `AyahWidgetScheduler`), broadcasts to
+         *    receivers of their own, so the sequential numbers can pass them harmlessly;
+         *  - 0 with a data URI of each view's own: every widget tap, numbered by Glance;
+         *  - 770_000: the download notification ([SurahDownloadWorker.NOTIFICATION_ID]);
+         *  - 770_031: this; 770_100: the media notification ([MEDIA_NOTIFICATION_ID]).
+         */
+        internal const val REQUEST_OPEN_PLAYING = 770_031
+
+        /**
+         * The media notification's id, handed to Media3's provider rather than left at Media3's
+         * default, 1001, which is one of the prayer alarms' sequential numbers (B22). A prayer
+         * numbered 1001 that came in during a recitation posted its notification under the
+         * player's id: it took the player's place in the shade, transport controls and all, until
+         * Media3's next update took the prayer's place in turn. In the family
+         * [REQUEST_OPEN_PLAYING] lists, and apart from the download notification's 770_000,
+         * which can be up at the same time.
+         */
+        internal const val MEDIA_NOTIFICATION_ID = 770_100
     }
 }
 
