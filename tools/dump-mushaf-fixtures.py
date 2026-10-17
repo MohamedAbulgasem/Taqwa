@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Regenerate shared/src/commonTest/.../MushafPageFixtures.kt from the bundled quran.db: pages
-1, 2 and 3 copied verbatim, never retyped. Run after every pipeline change that touches
+1, 2, 3 and 293 copied verbatim, never retyped. Run after every pipeline change that touches
 page_line or line_word."""
 import sqlite3
 from pathlib import Path
@@ -17,7 +17,7 @@ import world.taqwa.app.quran.MushafLine
 import world.taqwa.app.quran.MushafPage
 
 /**
- * Pages 1, 2 and 3 of the Madinah Mushaf, copied verbatim out of the bundled
+ * Pages 1, 2, 3 and 293 of the Madinah Mushaf, copied verbatim out of the bundled
  * `quran.db` (`page`, `page_line` and `line_word`) by `tools/dump-mushaf-fixtures.py` rather than
  * typed: the global rule is that Quran text is never retyped, and that holds for test fixtures too.
  * Regenerate, never edit.
@@ -26,7 +26,8 @@ import world.taqwa.app.quran.MushafPage
  * handle: page 1 is Al-Faatiha's short, vertically centred page with a `SURAH` band and a line
  * that ends a surah; page 2 adds a `BASMALA` line; page 3 is an ordinary 15-line text page whose
  * first line starts at 2:6 - which is what the reader has to return to when the mode toggle goes
- * back to translation.
+ * back to translation. Page 293 is one of the 51 pages two surahs share: Al-Isra 105-111, then
+ * Al-Kahf's band, basmala and 1-4.
  */
 '''
 
@@ -42,7 +43,7 @@ def kint(v):
 def main():
     conn = sqlite3.connect(DB)
     out = [HEADER]
-    for page in (1, 2, 3):
+    for page in (1, 2, 3, 293):
         number, first_surah, first_ayah = conn.execute("SELECT number, first_surah, first_ayah FROM page WHERE number=?", (page,)).fetchone()
         juz = conn.execute("SELECT juz FROM ayah WHERE surah=? AND number=?", (first_surah, first_ayah)).fetchone()[0]
         out.append(f"\ninternal val MUSHAF_PAGE_{page} = MushafPage({number}, {first_surah}, {first_ayah}, {juz}, listOf(\n")

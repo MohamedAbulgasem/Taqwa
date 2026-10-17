@@ -6,8 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.v2.runComposeUiTest
 import org.jetbrains.compose.resources.getString
 import world.taqwa.app.design.LightColors
@@ -20,6 +22,7 @@ import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_a11y_recitation
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,17 +37,27 @@ class MushafScreenStateTest {
 
     private val fatiha = Surah(1, "الفاتحة", "Al-Faatiha", "The Opening", Revelation.MAKKI, ayahCount = 7, startPage = 1, startJuz = 1)
     private val baqarah = Surah(2, "البقرة", "Al-Baqarah", "The Cow", Revelation.MADANI, ayahCount = 286, startPage = 2, startJuz = 1)
-    private val pages = mapOf(1 to MUSHAF_PAGE_1, 2 to MUSHAF_PAGE_2, 3 to MUSHAF_PAGE_3)
+    private val isra = Surah(17, "الإسراء", "Al-Isra", "The Night Journey", Revelation.MAKKI, ayahCount = 111, startPage = 282, startJuz = 15)
+    private val kahf = Surah(18, "الكهف", "Al-Kahf", "The Cave", Revelation.MAKKI, ayahCount = 110, startPage = 293, startJuz = 15)
+    private val pages = mapOf(1 to MUSHAF_PAGE_1, 2 to MUSHAF_PAGE_2, 3 to MUSHAF_PAGE_3, 293 to MUSHAF_PAGE_293)
+
+    /** The printed page of each ayah these tests use: page 293 is Al-Isra 105-111 and Al-Kahf 1-4. */
+    private fun pageOf(surah: Int, ayah: Int): Int = when (surah) {
+        2 -> if (ayah >= 6) 3 else 2
+        17 -> 293
+        18 -> if (ayah <= 4) 293 else if (ayah <= 15) 294 else 295
+        else -> 1
+    }
 
     private fun ready(page: Int) = MushafUiState.Ready(
         currentPage = page,
-        surah = if (page == 1) fatiha else baqarah,
+        surah = when (page) { 1 -> fatiha; 293 -> isra; else -> baqarah },
         juz = 1,
         settings = ReadingSettings(mode = ReadingMode.MUSHAF),
         translations = emptyList(),
         previewAyah = "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ",
         basmala = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-        surahsByNumber = mapOf(1 to fatiha, 2 to baqarah),
+        surahsByNumber = mapOf(1 to fatiha, 2 to baqarah, 17 to isra, 18 to kahf),
         bookmarked = emptySet(),
     )
 
@@ -72,7 +85,7 @@ class MushafScreenStateTest {
                 onToggleBookmark = { _, _ -> },
                 shareTextFor = { _, _ -> null },
                 recitation = recitation,
-                pageOfAyah = { surah, ayah -> if (surah == 2 && ayah >= 6) 3 else if (surah == 2) 2 else 1 },
+                pageOfAyah = ::pageOf,
             )
         }
     }
@@ -128,5 +141,80 @@ class MushafScreenStateTest {
         onNodeWithContentDescription(getString(Res.string.recitation_a11y_recitation)).performClick()
 
         assertEquals(listOf(2 to 6), taps)
+    }
+
+    /**
+     * The tapped ayah is left behind on a page turn: tapped on page 1, then the reader turns to
+     * page 3 and the header starts at 2:6, the first ayah printed there.
+     */
+    @Test
+    fun headerPlayStartsOnThePageTurnedToNotAtTheAyahTappedBefore() = runComposeUiTest {
+        val taps = mutableListOf<Pair<Int, Int>>()
+        setContent { Mushaf(startPage = 1, recitation = QuranRecitation(onHeader = { s, a -> taps += s to a }), initialHighlight = 1 to 3) }
+        waitForIdle()
+
+        onNode(hasScrollToIndexAction()).performScrollToIndex(2)
+        waitForIdle()
+        onNodeWithContentDescription(getString(Res.string.recitation_a11y_recitation)).performClick()
+
+        assertEquals(listOf(2 to 6), taps)
+    }
+
+    /**
+     * Page 293 is Al-Isra 105-111 and then Al-Kahf 1-4. With Al-Kahf 18:2 being recited on it the
+     * header shows Pause, and its tap pauses: before, a tapped ayah left on page 294 fell back to
+     * the page's first ayah, and Pause started Al-Isra 105 instead.
+     */
+    @Test
+    fun onAPageTwoSurahsShareTheHeaderAnswersTheVoiceItShows() = runComposeUiTest {
+        val headers = mutableListOf<Pair<Int, Int>>()
+        val plays = mutableListOf<Pair<Int, Int>>()
+        setContent {
+            Mushaf(
+                startPage = 293,
+                recitation = QuranRecitation(
+                    playing = 18 to 2,
+                    live = true,
+                    onHeader = { s, a -> headers += s to a },
+                    onPlayAyah = { s, a -> plays += s to a },
+                ),
+                initialHighlight = 18 to 7,
+            )
+        }
+        waitForIdle()
+
+        onNodeWithContentDescription(getString(Res.string.recitation_a11y_pause)).performClick()
+
+        assertEquals(listOf(18 to 2), headers)
+        assertEquals(emptyList(), plays)
+    }
+
+    /**
+     * The same page with Al-Kahf recited further on (18:20, page 295): the header is the page's own
+     * surah's, Al-Isra, and shows Play. With 18:2 tapped on the page, the tap plays from 18:2: it
+     * used to pause Al-Kahf under the Play icon.
+     */
+    @Test
+    fun onAPageTwoSurahsSharePlayStartsTheTappedAyahOfTheRecitedSurah() = runComposeUiTest {
+        val headers = mutableListOf<Pair<Int, Int>>()
+        val plays = mutableListOf<Pair<Int, Int>>()
+        setContent {
+            Mushaf(
+                startPage = 293,
+                recitation = QuranRecitation(
+                    playing = 18 to 20,
+                    live = true,
+                    onHeader = { s, a -> headers += s to a },
+                    onPlayAyah = { s, a -> plays += s to a },
+                ),
+                initialHighlight = 18 to 2,
+            )
+        }
+        waitForIdle()
+
+        onNodeWithContentDescription(getString(Res.string.recitation_a11y_recitation)).performClick()
+
+        assertEquals(listOf(18 to 2), plays)
+        assertEquals(emptyList(), headers)
     }
 }

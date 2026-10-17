@@ -163,12 +163,26 @@ fun MushafScreen(
             onOpenSheet = { showSheet = true },
             recitation = headerState,
             onRecitation = {
-                // The tapped ayah while it is on the page being read — it is the ayah the reader is
-                // looking at — otherwise the first ayah printed on the page. A tapped ayah the
-                // reader has paged away from would start off screen, or pause another surah.
-                // Before the page has loaded, the tapped ayah is all there is to go on.
-                val start = highlighted?.takeIf { pageAyahs?.contains(it) ?: true } ?: pageStart
-                if (start != null) recitation.onHeader(start.first, start.second)
+                // The tap does what the icon says, and the icon is [headerState]. Pause or Play for
+                // the recitation itself (its ayah is on this page, or the page is its surah's) is
+                // answered by the recitation: on a page two surahs share, the page's first ayah is
+                // the other surah's, and Pause used to start it.
+                val voice = playing
+                if (voice != null && (headerState == HeaderState.Playing || headerState == HeaderState.Paused)) {
+                    recitation.onHeader(voice.first, voice.second)
+                    return@ReaderHeader
+                }
+                // Otherwise Play starts here: the tapped ayah while it is on the page being read,
+                // the ayah the reader is looking at, or else the first ayah printed on the page. A
+                // tapped ayah the reader has paged away from would start off screen. Before the page
+                // has loaded, the tapped ayah is all there is to go on. An ayah of the surah being
+                // recited is played from, not toggled: the icon shows Play for the page's own surah.
+                val start = highlighted?.takeIf { pageAyahs?.contains(it) ?: true } ?: pageStart ?: return@ReaderHeader
+                if (voice != null && voice.first == start.first) {
+                    recitation.onPlayAyah(start.first, start.second)
+                } else {
+                    recitation.onHeader(start.first, start.second)
+                }
             },
         )
 
