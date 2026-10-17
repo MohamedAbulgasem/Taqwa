@@ -179,6 +179,18 @@ class RecitationStateTest {
         assertEquals(Follow.LEAVE_ALONE, following.decide(away = 0))
     }
 
+    /**
+     * A list or pager reports that it is not moving as soon as it is laid out, before anyone has
+     * touched it: a screen just opened (from the bar, the media notification, a widget tap) is
+     * armed, so the next ayah boundary within a screen is followed.
+     */
+    @Test
+    fun `the first report that nothing is moving is not a touch`() {
+        val following = FollowingState { 10_000L }
+        following.moved(scrolling = false)
+        assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
     @Test
     fun `following offers the pill rather than dragging the reader back a screen`() {
         val following = FollowingState { 0L }

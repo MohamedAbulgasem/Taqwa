@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
@@ -279,6 +280,10 @@ fun ReaderScreen(
                 following.pill = null
                 return@LaunchedEffect
             }
+            // Not before the list's first layout: until then nothing is on screen and every ayah
+            // reads as zero screens away, so a reader just opened far from the voice would follow
+            // it there. Opening used to count as a touch, which hid this.
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }.first { it }
             when (following.decide(screensAway(target))) {
                 Follow.SCROLL -> {
                     following.pill = null

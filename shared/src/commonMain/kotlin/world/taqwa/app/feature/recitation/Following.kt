@@ -38,6 +38,11 @@ enum class Follow {
  * to count as a touch, so for four seconds after every scroll of its own the page stayed put. On
  * the S23 an ayah that came within those four seconds (short ones, and every ayah with read-aloud
  * off in Juz ʿAmma) was not followed at all.
+ *
+ * [othersMoving] is the same rule for the start of the screen's life. The list reports that it is
+ * not moving as soon as it is laid out, before anything has moved; that report used to count as a
+ * touch, so a screen just opened was not followed for its first four seconds. A stop counts only
+ * after a start that was somebody else's, or a scroll of ours that a finger took over.
  */
 @Stable
 class FollowingState(private val now: () -> Long) {
@@ -48,6 +53,7 @@ class FollowingState(private val now: () -> Long) {
     private var lastTouch = 0L
     private var selfMoving = false
     private var ownStop = false
+    private var othersMoving = false
 
     /** Called whenever the list or pager starts or stops moving: [scrolling] is which. */
     fun moved(scrolling: Boolean) {
@@ -57,8 +63,11 @@ class FollowingState(private val now: () -> Long) {
             ownStop = false
             return
         }
+        // Nothing of anyone's was moving: the list's first report as it is laid out.
+        if (!scrolling && !othersMoving) return
         // A start is somebody else's scroll, and any stop still owed to one of ours was never
         // going to be heard: it ended within a frame.
+        othersMoving = scrolling
         ownStop = false
         lastTouch = now()
     }
@@ -79,11 +88,15 @@ class FollowingState(private val now: () -> Long) {
      */
     suspend fun move(block: suspend () -> Unit) {
         selfMoving = true
+        var finished = false
         try {
             block()
             ownStop = true
+            finished = true
         } finally {
             selfMoving = false
+            // Cancelled part way: a finger took the scroll over, and its stop is a touch.
+            if (!finished) othersMoving = true
         }
     }
 
