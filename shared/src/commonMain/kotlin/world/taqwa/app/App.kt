@@ -435,9 +435,11 @@ fun App(container: AppContainer) {
 
                         // Keyed by the screen: a Reader replaced by another Reader (the next surah, a
                         // widget tap, a surah skip) or a Mushaf by another Mushaf composes at the same
-                        // place, and without the key it kept the old one's state - its highlighted
-                        // ayah and reference bar, its list or pager position, an open reading sheet,
-                        // two frames of the old page.
+                        // place, and without the key it kept what the old one held above its content:
+                        // the Mushaf's tapped ayah and reference bar, the header's starting point, an
+                        // open reading sheet, and two frames of the old page. The list and the pager
+                        // were rebuilt anyway, with the new view model. The reader's sheet is held
+                        // here, above the key, so the voice moving on keeps it open.
                         is Screen.Reader -> key(screen) {
                             ReaderRoute(
                                 screen = screen,

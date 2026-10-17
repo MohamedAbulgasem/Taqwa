@@ -140,9 +140,10 @@ fun ReaderScreen(
     // Where the header button would start playing from: whatever ayah the reader has scrolled to
     // (spec §5.1). Tracked here rather than in the view model because the header is drawn before
     // the list exists and the first value has to be the ayah the screen was opened at. Keyed on
-    // the surah, not the state: the view model issues a new state for every bookmark and settings
-    // change, and a fresh value here would go back to the opening ayah while the list went on
-    // reporting its scrolling to the old one.
+    // the surah, not the state: the view model issues a new state whenever the reader stops on a
+    // new ayah (the caption) and for every bookmark and settings change, and a fresh value here
+    // would go back to the opening ayah while the list went on reporting its scrolling to the old
+    // one.
     var headerAyah by remember(ready?.surah?.number) { mutableStateOf(initialAyah) }
     // The "show me the recited ayah" token is the app's and outlives every reader that has
     // answered it (spec §15.5). This reader answers a request made while it is open, not the last
