@@ -180,6 +180,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     val widgetBackground: Flow<WidgetBackground> =
         store.data.map { it[SettingsKeys.WIDGET_BACKGROUND].toEnumOr(WidgetBackground.FOLLOW_THEME) }
 
+    /**
+     * The zone is read through [ZoneIds.resolvable]: a city whose zone is newer than the phone's
+     * time zone data is stored as picked and read as a zone the phone can parse.
+     */
     val location: Flow<GeoLocation?> = store.data.map { p ->
         val lat = p[SettingsKeys.LOCATION_LAT]
         val lon = p[SettingsKeys.LOCATION_LON]
@@ -188,7 +192,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         else GeoLocation(
             latitude = lat,
             longitude = lon,
-            timeZoneId = tz,
+            timeZoneId = ZoneIds.resolvable(tz),
             cityName = p[SettingsKeys.LOCATION_CITY],
             countryCode = p[SettingsKeys.LOCATION_COUNTRY],
             cityId = p[SettingsKeys.LOCATION_CITY_ID],

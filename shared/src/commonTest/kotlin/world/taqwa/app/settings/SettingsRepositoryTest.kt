@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.TimeZone
 import okio.Path.Companion.toPath
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.domain.AsrMadhab
@@ -185,6 +186,22 @@ class SettingsRepositoryTest {
         val got = r.location.first()!!
         assertEquals("Europe/London", got.timeZoneId)
         assertEquals("London", got.cityName)
+    }
+
+    /**
+     * A city whose zone is newer than the phone's time zone data (Kyiv on Android 9) is stored as
+     * picked, and read as a zone the phone can parse: every reader of the location parses it, the
+     * prayer engine included, and one that cannot crashes on every launch.
+     */
+    @Test
+    fun aStoredZoneThePhoneCannotParseReadsAsOneItCan() = runTest {
+        val r = repo("loc-unparseable-zone")
+        r.setLocation(GeoLocation(50.4501, 30.5234, "Mars/Olympus_Mons", "Kyiv", "UA"))
+
+        val got = r.location.first()!!
+
+        assertEquals(TimeZone.currentSystemDefault().id, got.timeZoneId)
+        assertEquals("UA", got.countryCode)
     }
 
     @Test
