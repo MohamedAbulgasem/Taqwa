@@ -99,4 +99,33 @@ class LaunchRequestsTest {
             assertNull(LaunchRequests.pendingAdhkar.value, id)
         }
     }
+
+    /**
+     * Every request that moves the screen is counted, consumed or not, so the app coming back to
+     * the front can tell whether one arrived since it left: the iOS return to a playing recitation
+     * yields to a widget tap or an adhkar reminder that brought the app back.
+     */
+    @Test
+    fun `every request that moves the screen is counted`() {
+        val before = LaunchRequests.count
+        LaunchRequests.openAyah(18, 46)
+        LaunchRequests.consume()
+        LaunchRequests.openAdhkar(AdhkarSet.MORNING)
+        LaunchRequests.consumeAdhkar()
+        LaunchRequests.openPlaying()
+        LaunchRequests.consumePlaying()
+        LaunchRequests.openScreen("prayer")
+        LaunchRequests.consumeScreen()
+        assertEquals(before + 4, LaunchRequests.count)
+    }
+
+    /** A request dropped as not one of the app's own moves nothing, so it is not counted either. */
+    @Test
+    fun `a request that is dropped is not counted`() {
+        val before = LaunchRequests.count
+        LaunchRequests.openAyah(115, 1)
+        LaunchRequests.openAdhkarFromExtra("night")
+        LaunchRequests.openAdhkarForNotification("FAJR-PRAYER-2026-10-17")
+        assertEquals(before, LaunchRequests.count)
+    }
 }

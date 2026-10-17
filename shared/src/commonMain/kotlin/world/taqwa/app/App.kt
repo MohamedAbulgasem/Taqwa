@@ -40,6 +40,7 @@ import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.design.components.TaqwaTabScaffold
+import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.nav.openReading
 import world.taqwa.app.nav.recitationTarget
 import world.taqwa.app.nav.Navigator
@@ -139,12 +140,16 @@ fun App(container: AppContainer) {
     // notification's tap, or - on iOS, which has no such tap - the app coming to the front with
     // a voice going. A screen already showing the surah is asked to scroll (the token); any other
     // is replaced or pushed with the reader the user reads in, at the ayah, following armed.
+    // A return to the front passes the request count from when the app left, and the jump is
+    // dropped if any request has arrived since, before its reading settings load or after: the
+    // adhkar reminder or the widget tap that brought the app back wins.
     val jumpTokenState = remember { mutableStateOf(0) }
     var jumpToken by jumpTokenState
     val jumpScope = rememberCoroutineScope()
-    val openPlaying: () -> Unit = {
+    val openPlaying: (yieldToRequestsSince: Long?) -> Unit = { since ->
         val playing = recitation.state.value.bar
-        if (playing != null) {
+        fun yielded() = since != null && LaunchRequests.count != since
+        if (playing != null && !yielded()) {
             jumpScope.launch {
                 val current = navigator.current
                 val onQuran = navigator.currentTab == Tab.QURAN
@@ -157,7 +162,7 @@ fun App(container: AppContainer) {
                         val target = recitationTarget(reading.mode, playing.surah, playing.ayah) { s, a ->
                             container.quranRepository.pageOf(s, a)
                         }
-                        navigator.openReading(target)
+                        if (!yielded()) navigator.openReading(target)
                     }
                 }
             }
@@ -179,6 +184,7 @@ fun App(container: AppContainer) {
         refreshPermissions = ::refreshPermissions,
         recitation = recitation,
         openPlaying = openPlaying,
+        reschedule = { scope.launch { container.notificationCoordinator.reschedule(RescheduleTrigger.APP_FOREGROUND) } },
     )
 
     // Onboarding's Continue on the notifications screen: the system ask has already happened by
@@ -354,7 +360,7 @@ fun App(container: AppContainer) {
                                     onOpenPicker = recitation::openPicker,
                                     onDismiss = recitation::dismissBar,
                                     incomingSurahName = incomingSurahName,
-                                    onOpenPlaying = openPlaying,
+                                    onOpenPlaying = { openPlaying(null) },
                                     onSeek = recitation::seekToFraction,
                                 )
                             }

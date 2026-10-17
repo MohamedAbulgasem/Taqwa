@@ -25,6 +25,7 @@ import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.Tab
 import world.taqwa.app.nav.ayahWidgetTarget
 import world.taqwa.app.nav.openReading
+import world.taqwa.app.notifications.returnToFrontReschedules
 import world.taqwa.app.recitation.foregroundReturnsToRecitation
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.AyahPoolMirrorWriter
@@ -34,13 +35,13 @@ import world.taqwa.app.widget.refreshWidgets
 @Composable
 internal fun PlayingLaunchRequests(
     settings: SettingsRepository,
-    openPlaying: () -> Unit,
+    openPlaying: (yieldToRequestsSince: Long?) -> Unit,
 ) {
     LaunchedEffect(Unit) {
         settings.onboardingComplete.filter { it }.first()
         LaunchRequests.pendingPlaying.collect { asked ->
             if (asked) {
-                openPlaying()
+                openPlaying(null)
                 LaunchRequests.consumePlaying()
             }
         }
@@ -95,11 +96,25 @@ internal fun DebugScreenRequests(
     }
 }
 
+/**
+ * What the app does each time it is active again, and each time it is back in front.
+ *
+ * Active again, after Control Center or a system alert as much as after the background: the
+ * permissions are read afresh, and a voice that was missing is asked about again.
+ *
+ * Back in front from the background, on iOS only (see [foregroundReturnsToRecitation] and
+ * [returnToFrontReschedules]): with a recitation playing, the ayah being recited is opened, unless
+ * a request has asked for another screen since the app left (an adhkar reminder or a widget tap,
+ * which can arrive just before the return or just after it); and the notifications are planned
+ * again. Neither happens for Control Center, Notification Center or an alert, which leave the app
+ * in front: they used to move the reader to the recited ayah on every pull.
+ */
 @Composable
 internal fun ForegroundEffect(
     refreshPermissions: suspend () -> Unit,
     recitation: RecitationController,
-    openPlaying: () -> Unit,
+    openPlaying: (yieldToRequestsSince: Long?) -> Unit,
+    reschedule: () -> Unit,
 ) {
     val appLifecycle = LocalLifecycleOwner.current
     LaunchedEffect(appLifecycle) {
@@ -108,7 +123,12 @@ internal fun ForegroundEffect(
             // Back from the phone's voice installer, perhaps (read-aloud spec §4): a voice that was
             // Missing is asked about again, and nothing else is.
             recitation.onForeground()
-            if (foregroundReturnsToRecitation && recitation.state.value.bar?.playing == true) openPlaying()
+        }
+    }
+    LaunchedEffect(appLifecycle) {
+        appLifecycle.lifecycle.onEachReturnToFront(requestsMade = { LaunchRequests.count }) { requestsWhenItLeft ->
+            if (foregroundReturnsToRecitation && recitation.state.value.bar?.playing == true) openPlaying(requestsWhenItLeft)
+            if (returnToFrontReschedules) reschedule()
         }
     }
 }

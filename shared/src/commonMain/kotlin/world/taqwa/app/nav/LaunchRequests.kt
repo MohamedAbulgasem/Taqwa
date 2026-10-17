@@ -2,6 +2,7 @@ package world.taqwa.app.nav
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.notifications.adhkarSetOfNotificationId
 
@@ -14,6 +15,21 @@ import world.taqwa.app.notifications.adhkarSetOfNotificationId
  * request is set before `App` ever composes) and warm (the app is already open).
  */
 object LaunchRequests {
+
+    private val _count = MutableStateFlow(0L)
+
+    /**
+     * How many requests that move the screen have been made since the process started, consumed
+     * or not. Read twice, it says whether one arrived in between: on iOS, the app coming back to
+     * the front with a recitation playing opens the recited ayah only if nothing asked for another
+     * screen since the app left (a widget tap, an adhkar reminder).
+     */
+    val count: Long get() = _count.value
+
+    private fun counted() {
+        _count.update { it + 1 }
+    }
+
     private val _pendingAyah = MutableStateFlow<Pair<Int, Int>?>(null)
 
     /** The surah-to-ayah reference an in-flight widget tap wants opened, or null when there is
@@ -33,6 +49,7 @@ object LaunchRequests {
     fun openAyah(surah: Int, ayah: Int) {
         if (surah !in 1..SURAH_COUNT || ayah !in 1..LONGEST_SURAH) return
         _pendingAyah.value = surah to ayah
+        counted()
     }
 
     /** Clears the pending request once it has been acted on. */
@@ -51,6 +68,7 @@ object LaunchRequests {
 
     fun openPlaying() {
         _pendingPlaying.value = true
+        counted()
     }
 
     fun consumePlaying() {
@@ -73,6 +91,7 @@ object LaunchRequests {
     /** Overwrites any request still pending: only the most recent tap matters. */
     fun openAdhkar(set: AdhkarSet) {
         _pendingAdhkar.value = set
+        counted()
     }
 
     fun consumeAdhkar() {
@@ -110,6 +129,7 @@ object LaunchRequests {
 
     fun openScreen(name: String) {
         _pendingScreen.value = name
+        counted()
     }
 
     fun consumeScreen() {
