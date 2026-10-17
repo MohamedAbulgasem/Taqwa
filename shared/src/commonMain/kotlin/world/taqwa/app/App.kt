@@ -44,6 +44,7 @@ import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.design.components.TaqwaTabScaffold
 import world.taqwa.app.nav.LaunchRequests
 import world.taqwa.app.nav.ReaderSheet
+import world.taqwa.app.nav.followSurahSkip
 import world.taqwa.app.nav.ownLinkUriHandler
 import world.taqwa.app.nav.openReading
 import world.taqwa.app.nav.recitationTarget
@@ -363,10 +364,7 @@ fun App(container: AppContainer) {
                     if (playingSurah == null) return@LaunchedEffect
                     followedSurah = playingSurah
                     if (before == null || before == playingSurah) return@LaunchedEffect
-                    val current = navigator.current
-                    if (current is Screen.Reader && current.surah == before) {
-                        navigator.replace(Screen.Reader(playingSurah, 1))
-                    }
+                    navigator.followSurahSkip(before, playingSurah)
                 }
                 TaqwaTabScaffold(
                     tab,

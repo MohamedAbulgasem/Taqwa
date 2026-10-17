@@ -27,3 +27,16 @@ fun Navigator.openReading(target: Screen) {
     if (current != Screen.Quran) push(Screen.Quran)
     push(target)
 }
+
+/**
+ * The voice moving on from surah [before] to [now] (spec §15.1), by playing on or by a skip from
+ * the bar, the lock screen or a headset: a reader on the surah that was playing is moved to the
+ * one now playing, at its first ayah, and follows it from the moment it opens, as a reader the
+ * voice opened does ([Screen.Reader.followVoice]). The voice moved it there, not a touch, and the
+ * short first ayahs of Juz ʿAmma would otherwise go unfollowed for the four seconds. A reader on
+ * any other surah, and the Mushaf, which follows by page on its own, are left where they are.
+ */
+fun Navigator.followSurahSkip(before: Int, now: Int) {
+    val top = current
+    if (top is Screen.Reader && top.surah == before) replace(Screen.Reader(now, 1, followVoice = true))
+}
