@@ -64,7 +64,7 @@ class IosNotificationSchedulerTest {
      *
      * What is asserted instead is the property that makes the device calendar irrelevant: the
      * components the trigger is built from carry their own Gregorian calendar and their own zone,
-     * UTC. The first two assertions are the control, showing the shape of the old failure — the
+     * UTC. The first three assertions are the control, showing the shape of the old failure — the
      * same instant read through an Umm al-Qura calendar yields a year around 1448, which the
      * trigger would then interpret as Gregorian 1448 and never fire.
      *
@@ -106,12 +106,13 @@ class IosNotificationSchedulerTest {
      * second pass (Tahajjud's "the last third of the night has begun" in Madrid, London or Toronto
      * on that night) fired an hour early when its trigger was built from that zone's components.
      *
-     * Each zone's next fall-back is found at run time, so the instants are always ahead of
-     * `nextTriggerDate()`, which is nil for a past date, and a zone that stopped keeping summer
-     * time fails here instead of quietly testing nothing. 51 minutes before the transition and 9
-     * minutes after are the same minute of the wall clock, once on each pass. Each is checked on a
-     * device in Dubai, which keeps no summer time, and on a device in the city's own zone, where a
-     * trigger built in the device's zone has the same repeated hour to get wrong.
+     * Each zone's next fall-back at least an hour from now is found at run time, so both instants
+     * are always ahead (`nextTriggerDate()` is nil for a past date), even for a run inside the
+     * repeated hour itself, and a zone that stopped keeping summer time fails here instead of
+     * quietly testing nothing. 51 minutes before the transition and 9 minutes after are the same
+     * minute of the wall clock, once on each pass. Each is checked on a device in Dubai, which
+     * keeps no summer time, and on a device in the city's own zone, where a trigger built in the
+     * device's zone has the same repeated hour to get wrong.
      */
     @Test
     fun aReminderOnEitherPassOfAFallBackNightFiresAtItsOwnSecond() {
@@ -141,9 +142,12 @@ class IosNotificationSchedulerTest {
         }
     }
 
-    /** [zone]'s next transition that sets the clocks back, which is at most two transitions away. */
+    /**
+     * [zone]'s next transition that sets the clocks back, at most two transitions away, searched
+     * from an hour ahead so the first pass before it, 51 minutes earlier, is still in the future.
+     */
     private fun nextFallBack(zone: NSTimeZone, name: String): NSDate {
-        var from = NSDate()
+        var from = NSDate().dateByAddingTimeInterval(3600.0)
         repeat(2) {
             val transition = zone.nextDaylightSavingTimeTransitionAfterDate(from)
                 ?: fail("$name keeps no summer time any more")
