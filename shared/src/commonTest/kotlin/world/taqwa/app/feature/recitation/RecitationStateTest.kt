@@ -181,14 +181,29 @@ class RecitationStateTest {
 
     /**
      * A list or pager reports that it is not moving as soon as it is laid out, before anyone has
-     * touched it: a screen just opened (from the bar, the media notification, a widget tap) is
-     * armed, so the next ayah boundary within a screen is followed.
+     * touched it. A screen opened at the voice (the bar's words, the media notification, an iOS
+     * return with a voice going) is armed: that report is not a touch, and it follows at once.
      */
     @Test
-    fun `the first report that nothing is moving is not a touch`() {
-        val following = FollowingState { 10_000L }
+    fun `a screen opened at the voice is armed as it is laid out`() {
+        val following = FollowingState(armedOnEntry = true) { 10_000L }
         following.moved(scrolling = false)
         assertEquals(Follow.SCROLL, following.decide(away = 0))
+    }
+
+    /**
+     * A screen opened any other way (a widget tap, a bookmark, Continue, the lists, a search hit,
+     * the mode toggle) was opened by a touch, and its first report counts as one: it is not pulled
+     * to a voice a page away as it opens, and follows only once the four seconds are over.
+     */
+    @Test
+    fun `a screen opened any other way counts its opening as a touch`() {
+        var now = 10_000L
+        val following = FollowingState { now }
+        following.moved(scrolling = false)
+        assertEquals(Follow.LEAVE_ALONE, following.decide(away = 1))
+        now += FOLLOW_GRACE_MS
+        assertEquals(Follow.SCROLL, following.decide(away = 1))
     }
 
     @Test

@@ -76,6 +76,8 @@ fun MushafScreen(
     /** The ayah to open already highlighted, as a tap on the page would leave it; null when the
      * page itself is what was asked for. */
     initialHighlight: Pair<Int, Int>? = null,
+    /** Opened at the voice, so it follows the recitation at once (Screen.Mushaf.followVoice). */
+    followVoice: Boolean = false,
     pageLoader: suspend (Int) -> MushafPage,
     onBack: () -> Unit,
     onToggleMode: () -> Unit,
@@ -208,7 +210,7 @@ fun MushafScreen(
         // Following the voice across page turns (spec §5.3), under the same four-second rule the
         // reader's list uses — and the same refusal to move the page when the reciter is more
         // than a page away from where the reader actually is.
-        val following = rememberFollowing()
+        val following = rememberFollowing(armedOnEntry = followVoice)
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.isScrollInProgress }.collect { following.moved(scrolling = it) }
         }

@@ -133,6 +133,7 @@ internal fun ReaderRoute(
         state = readerState,
         initialAyah = screen.ayah,
         selectInitialAyah = screen.selectAyah,
+        followVoice = screen.followVoice,
         onBack = { navigator.pop() },
         onToggleMode = {
             scope.launch {
@@ -211,6 +212,7 @@ internal fun MushafRoute(
         initialHighlight = screen.highlightSurah?.let { sur ->
             screen.highlightAyah?.let { a -> sur to a }
         },
+        followVoice = screen.followVoice,
         pageLoader = viewModel::page,
         onBack = { navigator.pop() },
         onToggleMode = {

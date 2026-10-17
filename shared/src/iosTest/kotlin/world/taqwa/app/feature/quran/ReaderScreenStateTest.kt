@@ -69,6 +69,9 @@ class ReaderScreenStateTest {
         recitation: QuranRecitation,
         onFirstVisibleAyah: (Int) -> Unit = {},
         sheetOpenState: MutableState<Boolean> = remember { mutableStateOf(false) },
+        initialAyah: Int = 1,
+        selectInitialAyah: Boolean = false,
+        followVoice: Boolean = false,
     ) {
         CompositionLocalProvider(
             LocalTaqwaColors provides LightColors,
@@ -76,7 +79,9 @@ class ReaderScreenStateTest {
         ) {
             ReaderScreen(
                 state = state,
-                initialAyah = 1,
+                initialAyah = initialAyah,
+                selectInitialAyah = selectInitialAyah,
+                followVoice = followVoice,
                 onBack = {},
                 onToggleMode = {},
                 onChangeSettings = {},
@@ -156,5 +161,49 @@ class ReaderScreenStateTest {
         waitForIdle()
 
         onNodeWithText(getString(Res.string.quran_sheet_size)).assertIsDisplayed()
+    }
+
+    /**
+     * A reader opened by a widget tap at 2:30, with the voice at 2:34 a few cards down, stays where
+     * it opened: the selected card the widget asked for stays in view rather than being scrolled
+     * off the top as the screen opens.
+     */
+    @Test
+    fun aReaderOpenedNearTheVoiceStaysWhereItOpened() = runComposeUiTest {
+        var firstVisible = 0
+        setContent {
+            Reader(
+                state = ready(),
+                recitation = QuranRecitation(playing = 2 to 34, live = true),
+                onFirstVisibleAyah = { firstVisible = it },
+                initialAyah = 30,
+                selectInitialAyah = true,
+            )
+        }
+        waitForIdle()
+        mainClock.advanceTimeBy(2_000)
+        waitForIdle()
+
+        assertTrue(firstVisible in 29..30, "the reader moved off the ayah it was opened at: $firstVisible")
+    }
+
+    /** The same reader opened at the voice follows it at once, to the resting line. */
+    @Test
+    fun aReaderOpenedAtTheVoiceFollowsItAtOnce() = runComposeUiTest {
+        var firstVisible = 0
+        setContent {
+            Reader(
+                state = ready(),
+                recitation = QuranRecitation(playing = 2 to 34, live = true),
+                onFirstVisibleAyah = { firstVisible = it },
+                initialAyah = 30,
+                followVoice = true,
+            )
+        }
+        waitForIdle()
+        mainClock.advanceTimeBy(2_000)
+        waitForIdle()
+
+        assertTrue(firstVisible > 30, "the reader opened at the voice did not follow it: $firstVisible")
     }
 }

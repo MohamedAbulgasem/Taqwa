@@ -36,11 +36,11 @@ class AyahTargetTest {
 
     @Test fun theRecitedAyahOpensUnselectedInEitherMode() = runTest {
         assertEquals(
-            Screen.Reader(2, 255),
+            Screen.Reader(2, 255, followVoice = true),
             recitationTarget(ReadingMode.TRANSLATION, 2, 255) { _, _ -> error("not asked") },
         )
         assertEquals(
-            Screen.Mushaf(page = 42),
+            Screen.Mushaf(page = 42, followVoice = true),
             recitationTarget(ReadingMode.MUSHAF, 2, 255) { s, a -> if (s == 2 && a == 255) 42 else 0 },
         )
     }

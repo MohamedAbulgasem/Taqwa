@@ -39,13 +39,17 @@ enum class Follow {
  * the S23 an ayah that came within those four seconds (short ones, and every ayah with read-aloud
  * off in Juz ʿAmma) was not followed at all.
  *
- * [othersMoving] is the same rule for the start of the screen's life. The list reports that it is
- * not moving as soon as it is laid out, before anything has moved; that report used to count as a
- * touch, so a screen just opened was not followed for its first four seconds. A stop counts only
+ * [armedOnEntry] is the start of the screen's life. The list reports that it is not moving as
+ * soon as it is laid out, before anything has moved. A screen opened at the voice (the bar's words,
+ * the media notification, an iOS return with a voice going) is armed: that report is not a touch,
+ * and it follows at once. A screen opened any other way (a widget tap, a bookmark, Continue, the
+ * lists, a search hit, the mode toggle) was opened by a touch, and the report counts as that touch:
+ * armed, a Mushaf opened a page from the voice turned to the voice's page as it opened, leaving the
+ * widget's ayah behind and the saved place overwritten. After that first report, a stop counts only
  * after a start that was somebody else's, or a scroll of ours that a finger took over.
  */
 @Stable
-class FollowingState(private val now: () -> Long) {
+class FollowingState(armedOnEntry: Boolean = false, private val now: () -> Long) {
 
     /** The ayah the pill is offering to return to, or null when it is not showing. */
     var pill: Int? by mutableStateOf(null)
@@ -53,7 +57,7 @@ class FollowingState(private val now: () -> Long) {
     private var lastTouch = 0L
     private var selfMoving = false
     private var ownStop = false
-    private var othersMoving = false
+    private var othersMoving = !armedOnEntry
 
     /** Called whenever the list or pager starts or stops moving: [scrolling] is which. */
     fun moved(scrolling: Boolean) {
@@ -63,7 +67,8 @@ class FollowingState(private val now: () -> Long) {
             ownStop = false
             return
         }
-        // Nothing of anyone's was moving: the list's first report as it is laid out.
+        // Nothing of anyone's was moving: the list's first report as it is laid out, on a screen
+        // opened at the voice.
         if (!scrolling && !othersMoving) return
         // A start is somebody else's scroll, and any stop still owed to one of ours was never
         // going to be heard: it ended within a frame.
@@ -141,6 +146,7 @@ fun followOffset(rest: Int, room: Int, card: Int?, edge: Int): Int =
  */
 const val PILL_SETTLE_MS = 300L
 
+/** [armedOnEntry]: the screen was opened at the voice (see [FollowingState]). */
 @Composable
-fun rememberFollowing(): FollowingState =
-    remember { FollowingState { Clock.System.now().toEpochMilliseconds() } }
+fun rememberFollowing(armedOnEntry: Boolean = false): FollowingState =
+    remember { FollowingState(armedOnEntry) { Clock.System.now().toEpochMilliseconds() } }

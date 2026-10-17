@@ -68,6 +68,7 @@ class MushafScreenStateTest {
         recitation: QuranRecitation,
         initialHighlight: Pair<Int, Int>? = null,
         onPageShown: (Int) -> Unit = {},
+        followVoice: Boolean = false,
     ) {
         CompositionLocalProvider(
             LocalTaqwaColors provides LightColors,
@@ -77,6 +78,7 @@ class MushafScreenStateTest {
                 state = ready(startPage),
                 startPage = startPage,
                 initialHighlight = initialHighlight,
+                followVoice = followVoice,
                 pageLoader = { number -> pages[number] ?: MUSHAF_PAGE_3.copy(number = number) },
                 onBack = {},
                 onToggleMode = {},
@@ -216,5 +218,47 @@ class MushafScreenStateTest {
 
         assertEquals(listOf(18 to 2), plays)
         assertEquals(emptyList(), headers)
+    }
+
+    /**
+     * A Mushaf opened a page from the voice by a widget tap (or a bookmark, Continue, the lists, a
+     * search hit) stays on the page asked for: the voice on page 2, the widget's 1:3 on page 1.
+     * Armed as it opened, it turned to page 2 at once, leaving 1:3 behind and Continue overwritten.
+     */
+    @Test
+    fun aMushafOpenedAPageFromTheVoiceStaysOnThePageAskedFor() = runComposeUiTest {
+        val shown = mutableListOf<Int>()
+        setContent {
+            Mushaf(
+                startPage = 1,
+                recitation = QuranRecitation(playing = 2 to 1, live = true),
+                initialHighlight = 1 to 3,
+                onPageShown = { shown += it },
+            )
+        }
+        waitForIdle()
+        mainClock.advanceTimeBy(2_000)
+        waitForIdle()
+
+        assertEquals(listOf(1), shown.distinct())
+    }
+
+    /** The same page opened at the voice (the bar, the media notification) turns to it at once. */
+    @Test
+    fun aMushafOpenedAtTheVoiceFollowsItAtOnce() = runComposeUiTest {
+        val shown = mutableListOf<Int>()
+        setContent {
+            Mushaf(
+                startPage = 1,
+                recitation = QuranRecitation(playing = 2 to 1, live = true),
+                onPageShown = { shown += it },
+                followVoice = true,
+            )
+        }
+        waitForIdle()
+        mainClock.advanceTimeBy(2_000)
+        waitForIdle()
+
+        assertEquals(2, shown.last())
     }
 }

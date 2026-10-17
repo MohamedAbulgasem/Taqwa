@@ -144,8 +144,8 @@ fun App(container: AppContainer) {
     // notification's tap, or - on iOS, which has no such tap - the app in front again with a
     // voice going (jumpToPlaying). A screen already showing the surah is asked to scroll (the
     // token); any other is replaced or pushed with the reader the user reads in, at the ayah, and
-    // follows the voice from its first ayah boundary, as any screen just opened does
-    // (FollowingState: the list's first report is not a touch). A return to the front passes the
+    // follows the voice from the moment it opens (recitationTarget marks it followVoice), where a
+    // screen opened any other way counts its opening as a touch. A return to the front passes the
     // request count from when the app left, and the jump yields to any request counted since.
     val jumpTokenState = remember { mutableStateOf(0) }
     var jumpToken by jumpTokenState

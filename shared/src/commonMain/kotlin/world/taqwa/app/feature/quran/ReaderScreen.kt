@@ -102,6 +102,8 @@ fun ReaderScreen(
     state: ReaderUiState,
     initialAyah: Int,
     selectInitialAyah: Boolean = false,
+    /** Opened at the voice, so it follows the recitation at once (Screen.Reader.followVoice). */
+    followVoice: Boolean = false,
     onBack: () -> Unit,
     onToggleMode: () -> Unit,
     onChangeSettings: (ReadingSettings) -> Unit,
@@ -205,7 +207,7 @@ fun ReaderScreen(
         }
 
         val playingAyah = recitation.ayahIn(ready.surah.number)
-        val following = rememberFollowing()
+        val following = rememberFollowing(armedOnEntry = followVoice)
         val scope = rememberCoroutineScope()
         // The item index of an ayah: the basmala, when there is one, occupies index 0.
         fun itemIndexOf(ayah: Int): Int? =

@@ -15,19 +15,30 @@ sealed interface Screen {
      * day): a second tap over the reader the first one opened is a screen of its own, so it opens
      * on its ayah again rather than being taken for the reader already open. 0 for any screen not
      * opened by a request.
+     *
+     * [followVoice] marks a reader opened at the voice (the bar's words, the media notification, an
+     * iOS return with a voice going): it follows the recitation at once. A reader opened any other
+     * way was opened by a touch and waits out the four seconds (FollowingState).
      */
-    data class Reader(val surah: Int, val ayah: Int, val selectAyah: Boolean = false, val request: Long = 0) : Screen
+    data class Reader(
+        val surah: Int,
+        val ayah: Int,
+        val selectAyah: Boolean = false,
+        val request: Long = 0,
+        val followVoice: Boolean = false,
+    ) : Screen
 
     /**
      * [highlightSurah] and [highlightAyah] open the page with that ayah already highlighted and
      * its reference bar showing, the state a tap on the page itself would produce. Both null when
-     * the page, not an ayah, is what was asked for. [request] is as on [Reader].
+     * the page, not an ayah, is what was asked for. [request] and [followVoice] are as on [Reader].
      */
     data class Mushaf(
         val page: Int,
         val highlightSurah: Int? = null,
         val highlightAyah: Int? = null,
         val request: Long = 0,
+        val followVoice: Boolean = false,
     ) : Screen
     data object Settings : Screen
     data object PrayerTimesSettings : Screen
