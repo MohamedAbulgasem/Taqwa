@@ -1,7 +1,8 @@
 # The 591 zone ids in the time zone data Android 9 ships (tzdata2018e), read from the index of
 # /system/usr/share/zoneinfo/tzdata in the API 28 Google Play system image. Before Android 10 the
-# data is not updated through Google Play, so this is what a phone that never got an OEM update
-# has. CityZonesOnOldPhonesTest checks the bundled city list against it.
+# data is updated only by the phone's maker, never through Google Play, so this is what an Android 9
+# phone without such an update has; Android 8 ships an older release. CityZonesOnOldPhonesTest
+# checks the bundled city list against it.
 Africa/Abidjan
 Africa/Accra
 Africa/Addis_Ababa

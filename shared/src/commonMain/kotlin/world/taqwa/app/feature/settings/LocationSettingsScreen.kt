@@ -88,7 +88,9 @@ fun LocationSettingsScreen(
             CardDivider()
             TaqwaRow(stringResource(Res.string.location_country), value = location?.countryCode ?: "-")
             CardDivider()
-            TaqwaRow(stringResource(Res.string.location_timezone), value = location?.timeZoneId ?: "-")
+            // The zone as picked: Kyiv is named Europe/Kyiv even where an old phone draws its
+            // times in Europe/Kiev.
+            TaqwaRow(stringResource(Res.string.location_timezone), value = location?.pickedTimeZoneId ?: "-")
         }
 
         Spacer(Modifier.height(16.dp))

@@ -6,8 +6,9 @@ import kotlin.test.assertEquals
 
 /**
  * [ZoneIds.resolvable] turns a stored zone id into one this phone's time zone data can parse. The
- * phones it exists for (Android 8 and 9 ship tzdata 2018e) cannot be run here, so `known` stands in
- * for their data where a test needs one; the default `known` is this platform's own.
+ * phones it exists for (Android 9 ships tzdata 2018e, Android 8 an older release) cannot be run
+ * here, so `known` stands in for their data where a test needs one; the default `known` is this
+ * platform's own.
  */
 class ZoneIdsTest {
 

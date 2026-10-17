@@ -11,6 +11,9 @@ import kotlin.test.assertTrue
  * does not have (the next rename, or a zone split off later) fails here until it has an old name,
  * instead of crashing on every launch for the people who pick that city. Here because it reads
  * files, like `ZoneCountriesTest`.
+ *
+ * Android 8's older data is not checked here. An old name it lacks as well reads as the phone's own
+ * zone, as any unparseable id does (ZoneIdsTest), so it costs the right clock there, never a launch.
  */
 class CityZonesOnOldPhonesTest {
 

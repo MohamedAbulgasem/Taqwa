@@ -16,6 +16,11 @@ package world.taqwa.app.domain
  * prayer engine decides by it (ruling R32). Null for a location stored before regions were, until
  * the Prayer screen backfills it from the nearest city; [countryCode] likewise, and the engine
  * then reads the country from the zone.
+ *
+ * [timeZoneId] is the zone every time is drawn and scheduled in, always one this phone can parse;
+ * [pickedTimeZoneId] is the zone the place was stored with, which the Location screen names and
+ * which is stored again. They differ only where the phone's zone data is older than the place's
+ * zone (`ZoneIds`): Kyiv on an Android 9 phone is drawn in Europe/Kiev and named Europe/Kyiv.
  */
 data class GeoLocation(
     val latitude: Double,
@@ -25,4 +30,5 @@ data class GeoLocation(
     val countryCode: String? = null,
     val cityId: Int? = null,
     val region: String? = null,
+    val pickedTimeZoneId: String = timeZoneId,
 )

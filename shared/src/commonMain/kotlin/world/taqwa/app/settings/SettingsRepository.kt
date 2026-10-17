@@ -182,7 +182,8 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
 
     /**
      * The zone is read through [ZoneIds.resolvable]: a city whose zone is newer than the phone's
-     * time zone data is stored as picked and read as a zone the phone can parse.
+     * time zone data is stored as picked and read as a zone the phone can parse, with the picked
+     * one beside it ([GeoLocation.pickedTimeZoneId]) for the Location screen and for [setLocation].
      */
     val location: Flow<GeoLocation?> = store.data.map { p ->
         val lat = p[SettingsKeys.LOCATION_LAT]
@@ -197,6 +198,7 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             countryCode = p[SettingsKeys.LOCATION_COUNTRY],
             cityId = p[SettingsKeys.LOCATION_CITY_ID],
             region = p[SettingsKeys.LOCATION_REGION],
+            pickedTimeZoneId = tz,
         )
     }
 
@@ -580,7 +582,9 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             // scale, and a GPS fix's metre precision is not something the file should hold.
             it[SettingsKeys.LOCATION_LAT] = location.latitude.roundedTo3dp()
             it[SettingsKeys.LOCATION_LON] = location.longitude.roundedTo3dp()
-            it[SettingsKeys.LOCATION_TZ] = location.timeZoneId
+            // The zone as picked, not the one this phone reads it as: a location read and written
+            // back must not store the stand-in (see ZoneIds).
+            it[SettingsKeys.LOCATION_TZ] = location.pickedTimeZoneId
             // Cleared, not skipped, when absent: a GPS fix has no city name, and leaving the
             // previously chosen city's label in place would caption the new coordinates with
             // the old city's name.

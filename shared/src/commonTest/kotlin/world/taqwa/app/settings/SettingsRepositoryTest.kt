@@ -204,6 +204,34 @@ class SettingsRepositoryTest {
         assertEquals("UA", got.countryCode)
     }
 
+    /**
+     * The zone the city was picked in is what the Location screen names and what is stored again:
+     * the stand-in is for the arithmetic only. A location read and written back keeps the picked
+     * zone, so a phone whose zone data is updated later still finds it.
+     */
+    @Test
+    fun theZoneAsPickedIsKeptBesideTheOneThePhoneCanParse() = runTest {
+        val r = repo("loc-picked-zone")
+        r.setLocation(GeoLocation(50.4501, 30.5234, "Mars/Olympus_Mons", "Kyiv", "UA"))
+
+        r.setLocation(r.location.first()!!)
+        val got = r.location.first()!!
+
+        assertEquals("Mars/Olympus_Mons", got.pickedTimeZoneId)
+        assertEquals(TimeZone.currentSystemDefault().id, got.timeZoneId)
+    }
+
+    @Test
+    fun aZoneThePhoneParsesIsTheZoneAsPickedToo() = runTest {
+        val r = repo("loc-picked-zone-known")
+        r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB"))
+
+        val got = r.location.first()!!
+
+        assertEquals("Europe/London", got.pickedTimeZoneId)
+        assertEquals("Europe/London", got.timeZoneId)
+    }
+
     @Test
     fun theCityIdRoundTripsAlongsideTheEnglishName() = runTest {
         val r = repo("loc-city-id-roundtrip")
