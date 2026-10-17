@@ -134,8 +134,15 @@ fun ReaderScreen(
     val clipboard = LocalClipboardManager.current
     // Where the header button would start playing from: whatever ayah the reader has scrolled to
     // (spec §5.1). Tracked here rather than in the view model because the header is drawn before
-    // the list exists and the first value has to be the ayah the screen was opened at.
-    var headerAyah by remember(state) { mutableStateOf(initialAyah) }
+    // the list exists and the first value has to be the ayah the screen was opened at. Keyed on
+    // the surah, not the state: the view model issues a new state for every bookmark and settings
+    // change, and a fresh value here would go back to the opening ayah while the list went on
+    // reporting its scrolling to the old one.
+    var headerAyah by remember(ready?.surah?.number) { mutableStateOf(initialAyah) }
+    // The "show me the recited ayah" token is the app's and outlives every reader that has
+    // answered it (spec §15.5). This reader answers a request made while it is open, not the last
+    // one made anywhere: remembered before the surah loads, so a bump while it loads still counts.
+    var answeredJump by remember { mutableStateOf(recitation.jumpToken) }
 
     // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout move
     // to the left and right edges, and only safeDrawing reports those.
@@ -166,9 +173,9 @@ fun ReaderScreen(
             mutableStateOf(initialAyah.takeIf { selectInitialAyah })
         }
 
-        // Runs once per surah (the reader is re-created — a fresh view model — whenever the
-        // surah changes, via App.kt's `remember(screen)`), so a settings change from the sheet
-        // does not re-trigger the jump and fight the user's own scrolling.
+        // Runs once per surah (the reader is composed afresh, with a fresh view model, whenever
+        // its screen changes, by App.kt's `key(screen)`), so a settings change from the sheet does
+        // not re-trigger the jump and fight the user's own scrolling.
         LaunchedEffect(ready.surah.number) {
             if (initialAyah > 1) {
                 val ayahIndex = ready.ayahs.indexOfFirst { it.number == initialAyah }
@@ -258,7 +265,8 @@ fun ReaderScreen(
         // The bar or the media notification asking for the recited ayah (spec §15.5): the pill's
         // own answer, on request.
         LaunchedEffect(recitation.jumpToken) {
-            if (recitation.jumpToken == 0) return@LaunchedEffect
+            if (recitation.jumpToken == answeredJump) return@LaunchedEffect
+            answeredJump = recitation.jumpToken
             val target = playingAyah?.let(::itemIndexOf) ?: return@LaunchedEffect
             following.rearm()
             following.pill = null

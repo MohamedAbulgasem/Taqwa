@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -419,7 +420,12 @@ fun App(container: AppContainer) {
                             )
                         }
 
-                        is Screen.Reader -> {
+                        // Keyed by the screen: a Reader replaced by another Reader (the next surah, a
+                        // widget tap, a surah skip) or a Mushaf by another Mushaf composes at the same
+                        // place, and without the key it kept the old one's state - its highlighted
+                        // ayah and reference bar, its list or pager position, an open reading sheet,
+                        // two frames of the old page.
+                        is Screen.Reader -> key(screen) {
                             ReaderRoute(
                                 screen = screen,
                                 container = container,
@@ -436,7 +442,7 @@ fun App(container: AppContainer) {
                             )
                         }
 
-                        is Screen.Mushaf -> {
+                        is Screen.Mushaf -> key(screen) {
                             MushafRoute(
                                 screen = screen,
                                 container = container,

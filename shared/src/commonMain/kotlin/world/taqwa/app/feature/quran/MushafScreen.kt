@@ -110,6 +110,13 @@ fun MushafScreen(
     // §5.1). Hoisted above the header because the header is drawn before the pager exists, and
     // filled in by the effect below as soon as the settled page's lines have loaded.
     var pageStart by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    // Every ayah printed on that page, filled in with it: a tapped ayah is where the header starts
+    // only while it is on the page being read. Null until the page has loaded.
+    var pageAyahs by remember { mutableStateOf<Set<Pair<Int, Int>>?>(null) }
+    // The "show me the recited ayah" token is the app's and outlives every Mushaf that has
+    // answered it (spec §15.5). This one answers a request made while it is open, not the last one
+    // made anywhere: remembered before the page loads, so a bump while it loads still counts.
+    var answeredJump by remember { mutableStateOf(recitation.jumpToken) }
 
     // Which printed page the voice is on. Hoisted above the header for the same reason
     // [pageStart] is: the header's state depends on it, and the pager that follows the voice with
@@ -156,9 +163,11 @@ fun MushafScreen(
             onOpenSheet = { showSheet = true },
             recitation = headerState,
             onRecitation = {
-                // The tapped ayah if there is one — it is the ayah the reader is looking at —
-                // otherwise the first ayah printed on the page.
-                val start = highlighted ?: pageStart
+                // The tapped ayah while it is on the page being read — it is the ayah the reader is
+                // looking at — otherwise the first ayah printed on the page. A tapped ayah the
+                // reader has paged away from would start off screen, or pause another surah.
+                // Before the page has loaded, the tapped ayah is all there is to go on.
+                val start = highlighted?.takeIf { pageAyahs?.contains(it) ?: true } ?: pageStart
                 if (start != null) recitation.onHeader(start.first, start.second)
             },
         )
@@ -175,10 +184,10 @@ fun MushafScreen(
         }
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.settledPage }.collect { index ->
-                pageStart = runCatching { pageLoader(index + 1) }.getOrNull()
-                    ?.lines?.firstOrNull { it.type == LineType.TEXT }
-                    ?.words?.firstOrNull()
-                    ?.let { it.surah to it.ayah }
+                val text = runCatching { pageLoader(index + 1) }.getOrNull()
+                    ?.lines?.filter { it.type == LineType.TEXT }
+                pageStart = text?.firstOrNull()?.words?.firstOrNull()?.let { it.surah to it.ayah }
+                pageAyahs = text?.flatMapTo(mutableSetOf()) { line -> line.words.map { it.surah to it.ayah } }
             }
         }
 
@@ -191,7 +200,8 @@ fun MushafScreen(
         }
         // The bar or the media notification asking for the recited ayah (spec §15.5).
         LaunchedEffect(recitation.jumpToken) {
-            if (recitation.jumpToken == 0) return@LaunchedEffect
+            if (recitation.jumpToken == answeredJump) return@LaunchedEffect
+            answeredJump = recitation.jumpToken
             val page = playingPage ?: return@LaunchedEffect
             if (page !in 1..MUSHAF_PAGES) return@LaunchedEffect
             following.rearm()
