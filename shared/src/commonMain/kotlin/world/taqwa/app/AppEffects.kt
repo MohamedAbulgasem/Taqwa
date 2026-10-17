@@ -24,7 +24,6 @@ import world.taqwa.app.nav.Navigator
 import world.taqwa.app.nav.Screen
 import world.taqwa.app.nav.Tab
 import world.taqwa.app.nav.ayahWidgetTarget
-import world.taqwa.app.nav.openReading
 import world.taqwa.app.notifications.returnToFrontReschedules
 import world.taqwa.app.recitation.foregroundReturnsToRecitation
 import world.taqwa.app.settings.SettingsRepository
@@ -245,7 +244,7 @@ internal fun WidgetLaunchRequests(
     settings: SettingsRepository,
     platformFormat: PlatformFormat,
     container: AppContainer,
-    navigator: Navigator,
+    openReading: (Screen) -> Unit,
 ) {
     // Widget tap launch requests (design spec §8). Waits for onboarding to be known complete before
     // collecting: on a cold start the back stack still shows Screen.Prayer until the onboarding
@@ -273,7 +272,7 @@ internal fun WidgetLaunchRequests(
                 // kept the tab current at Prayer and so hid the player bar (spec §5.3 draws it
                 // only on the Quran tab) until the tab was left and re-entered. `openReading`
                 // also keeps the D3 rule: one Back from the reader reaches the surah list.
-                navigator.openReading(target)
+                openReading(target)
             }
             // Consumed unconditionally: a bad request (e.g. a database failure resolving the page)
             // must not be retried forever on every future emission.

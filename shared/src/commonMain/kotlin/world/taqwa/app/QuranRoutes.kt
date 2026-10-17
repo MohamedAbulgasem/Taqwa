@@ -110,6 +110,7 @@ internal fun ReaderRoute(
     barSpace: Dp,
     jumpTokenState: State<Int>,
     recitation: RecitationController,
+    sheetOpenState: MutableState<Boolean>,
 ) {
     // Read-aloud (spec §4): the phone is asked about the reading language's voice the first time a
     // reader opens on it, so the sheet's switch is ready and the first play does not wait. Only
@@ -155,6 +156,7 @@ internal fun ReaderRoute(
                 )
             }
         },
+        sheetOpenState = sheetOpenState,
         recitation = QuranRecitation(
             header = recitationState.header(screen.surah),
             playing = bar?.let { it.surah to it.ayah },

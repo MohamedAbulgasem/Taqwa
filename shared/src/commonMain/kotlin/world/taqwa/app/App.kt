@@ -149,6 +149,16 @@ fun App(container: AppContainer) {
     // request count from when the app left, and the jump yields to any request counted since.
     val jumpTokenState = remember { mutableStateOf(0) }
     var jumpToken by jumpTokenState
+    // The reader's reading-settings sheet, held here rather than in the reader so it stays open
+    // when the voice moving on to the next surah replaces the reader under the reader's finger
+    // (the follow below), as the Mushaf, which no surah change replaces, keeps its own. A reading
+    // screen opened on purpose (a widget tap, the bar, the media notification) opens without it,
+    // and leaving the reader closes it.
+    val readerSheetOpenState = remember { mutableStateOf(false) }
+    val openReading: (Screen) -> Unit = { target ->
+        readerSheetOpenState.value = false
+        navigator.openReading(target)
+    }
     val jumpScope = rememberCoroutineScope()
     val openPlaying: (yieldToRequestsSince: Long?) -> Unit = { since ->
         jumpScope.launch {
@@ -166,7 +176,7 @@ fun App(container: AppContainer) {
                     val reading = settings.readingSettings(platformFormat.languageTag()).first()
                     recitationTarget(reading.mode, surah, ayah) { s, a -> container.quranRepository.pageOf(s, a) }
                 },
-                open = navigator::openReading,
+                open = openReading,
             )
         }
     }
@@ -250,7 +260,7 @@ fun App(container: AppContainer) {
         settings = settings,
         platformFormat = platformFormat,
         container = container,
-        navigator = navigator,
+        openReading = openReading,
     )
 
     fun useGpsFix() {
@@ -310,6 +320,8 @@ fun App(container: AppContainer) {
             Box(Modifier.fillMaxSize().background(LocalTaqwaColors.current.background)) {
                 if (!startResolved) return@Box
                 val screen = backStack.last()
+                val readerOnTop = screen is Screen.Reader
+                LaunchedEffect(readerOnTop) { if (!readerOnTop) readerSheetOpenState.value = false }
                 // The bar belongs to the three tab roots. A pushed sub-screen keeps the whole
                 // screen and the back link it already had; onboarding has neither.
                 val tab = tabOf(screen)
@@ -440,6 +452,7 @@ fun App(container: AppContainer) {
                                 barSpace = barSpace,
                                 jumpTokenState = jumpTokenState,
                                 recitation = recitation,
+                                sheetOpenState = readerSheetOpenState,
                             )
                         }
 

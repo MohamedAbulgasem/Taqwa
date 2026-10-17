@@ -2,12 +2,17 @@ package world.taqwa.app.feature.quran
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.v2.runComposeUiTest
@@ -22,6 +27,8 @@ import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.quran_reader_aa
+import world.taqwa.app.resources.quran_sheet_size
 import world.taqwa.app.resources.recitation_a11y_recitation
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -61,6 +68,7 @@ class ReaderScreenStateTest {
         state: ReaderUiState,
         recitation: QuranRecitation,
         onFirstVisibleAyah: (Int) -> Unit = {},
+        sheetOpenState: MutableState<Boolean> = remember { mutableStateOf(false) },
     ) {
         CompositionLocalProvider(
             LocalTaqwaColors provides LightColors,
@@ -77,6 +85,7 @@ class ReaderScreenStateTest {
                 onToggleBookmark = {},
                 shareTextFor = { null },
                 recitation = recitation,
+                sheetOpenState = sheetOpenState,
             )
         }
     }
@@ -126,5 +135,26 @@ class ReaderScreenStateTest {
         token = 4
         waitForIdle()
         assertTrue(firstVisible > 40, "the reader did not answer a jump asked for while it was open: $firstVisible")
+    }
+
+    /**
+     * The reading sheet is the app's to hold, so it stays open when the reader under it is
+     * replaced by the voice moving on to the next surah: the reader's finger is on it, and the
+     * Mushaf, which no surah change replaces, keeps its sheet the same way.
+     */
+    @Test
+    fun aReadingSheetHeldByTheAppStaysOpenWhenTheReaderIsReplaced() = runComposeUiTest {
+        val sheet = mutableStateOf(false)
+        var screen by mutableStateOf(1)
+        setContent { key(screen) { Reader(ready(), QuranRecitation(), sheetOpenState = sheet) } }
+        waitForIdle()
+        onNodeWithContentDescription(getString(Res.string.quran_reader_aa)).performClick()
+        waitForIdle()
+        onNodeWithText(getString(Res.string.quran_sheet_size)).assertIsDisplayed()
+
+        screen = 2
+        waitForIdle()
+
+        onNodeWithText(getString(Res.string.quran_sheet_size)).assertIsDisplayed()
     }
 }

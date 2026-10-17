@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -113,6 +114,9 @@ fun ReaderScreen(
     /** The recitation surface (spec 3a §5): the header button, the ayah row's Play, the lit ayah
      * and the room the player bar takes at the foot. */
     recitation: QuranRecitation = QuranRecitation(),
+    /** Whether the reading-settings sheet is open: held by the app rather than here, so the sheet
+     * stays open when the voice moving on to the next surah replaces this reader (App.kt). */
+    sheetOpenState: MutableState<Boolean> = remember { mutableStateOf(false) },
 ) {
     val colors = LocalTaqwaColors.current
     val arabic = isRtlLocale()
@@ -121,7 +125,7 @@ fun ReaderScreen(
     // The reading-settings sheet (task 7, spec §2.5) is hosted here rather than by the caller: the
     // Aa button is this screen's own affordance, and the Mushaf screen (task 8) will host its own
     // instance of [ReadingSheet] the same way, since only each screen knows its own [mushafMode].
-    var showSheet by remember { mutableStateOf(false) }
+    var showSheet by sheetOpenState
     // The sheet opening is read-aloud's own cue to ask the phone about its voices again (spec §6):
     // the reader may have just come back from installing one.
     LaunchedEffect(showSheet) { if (showSheet) recitation.onSheetOpened() }
