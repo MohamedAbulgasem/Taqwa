@@ -88,6 +88,8 @@
     <string name="prayer_clock_manual_late">%1$s %2$s তারিখে ঘড়ির সময় বদলেছে। আপনি হাতে ঘড়ি ঠিক করে থাকলে নামাজের সময় এক ঘণ্টা পরে দেখাতে পারে। স্বয়ংক্রিয় তারিখ ও সময় চালু করুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে।</string>
     <string name="prayer_clock_region_morocco">মরক্কো</string>
     <string name="prayer_clock_region_british_columbia">ব্রিটিশ কলাম্বিয়া</string>
+    <string name="prayer_clock_region_alberta">আলবার্টা</string>
+    <string name="prayer_clock_region_manitoba">ম্যানিটোবা</string>
     <string name="prayer_clock_region_kazakhstan">কাজাখস্তান</string>
     <string name="prayer_differ_before">%1$s অনুযায়ী %2$s শুরু হয় %3$s-এ</string>
     <string name="prayer_differ_after">%1$s অনুযায়ী %2$s শুরু হয়ে গেছে · তাকওয়া দেখায় %3$s থেকে</string>

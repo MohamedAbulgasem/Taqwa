@@ -96,6 +96,8 @@
     <string name="prayer_clock_manual_late">تغيّر التوقيت الرسمي في %1$s يوم %2$s. إن كنت ضبطت الساعة يدويًا فقد تظهر مواقيت الصلاة متأخرة بساعة. فعّل ضبط التاريخ والوقت تلقائيًا: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا.</string>
     <string name="prayer_clock_region_morocco">المغرب</string>
     <string name="prayer_clock_region_british_columbia">كولومبيا البريطانية</string>
+    <string name="prayer_clock_region_alberta">ألبرتا</string>
+    <string name="prayer_clock_region_manitoba">مانيتوبا</string>
     <string name="prayer_clock_region_kazakhstan">كازاخستان</string>
     <string name="prayer_differ_before">يبدأ %2$s حسب %1$s الساعة %3$s</string>
     <string name="prayer_differ_after">دخل %2$s حسب %1$s · يعرضه تقوى من الساعة %3$s</string>

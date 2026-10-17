@@ -64,6 +64,85 @@ class ClockChangesTest {
         assertNull(ClockChanges.warningFor("America/Vancouver", before, -7 * hour, clockSetByHand = true))
     }
 
+    // Alberta: UTC−6 all year from 1 November 2026; old zone data says UTC−7 in winter.
+    private val edmontonWinter = Instant.parse("2027-01-15T19:00:00Z")
+
+    @Test
+    fun albertaOnStaleZoneDataIsAnHourEarly() {
+        val w = ClockChanges.warningFor("America/Edmonton", edmontonWinter, -7 * hour, clockSetByHand = false)!!
+        assertEquals("alberta", w.change.id)
+        assertEquals(ClockIssue.STALE_ZONE_DATA, w.issue)
+        assertEquals(true, w.timesEarly)
+    }
+
+    @Test
+    fun albertaWithCurrentZoneDataAndAutomaticTimeSaysNothing() {
+        assertNull(ClockChanges.warningFor("America/Edmonton", edmontonWinter, -6 * hour, clockSetByHand = false))
+    }
+
+    @Test
+    fun albertaBeforeItsChangeSaysNothing() {
+        // 31 October 2026: still summer time, which old and new data agree on.
+        val before = Instant.parse("2026-10-31T19:00:00Z")
+        assertNull(ClockChanges.warningFor("America/Edmonton", before, -6 * hour, clockSetByHand = true))
+    }
+
+    @Test
+    fun albertaOnStaleZoneDataWarnsFromTheHourItsOldDataGoesBack() {
+        // 02:00 on 1 November 2026 is 08:00 UTC: old zone data turns to UTC−7 there.
+        val w = ClockChanges.warningFor("America/Edmonton", Instant.parse("2026-11-01T08:00:00Z"), -7 * hour, clockSetByHand = false)
+        assertEquals(ClockIssue.STALE_ZONE_DATA, w?.issue)
+        assertEquals(true, w?.timesEarly)
+    }
+
+    @Test
+    fun theNorthwestTerritoriesOnStaleZoneDataAreAnHourEarlyToo() {
+        // America/Yellowknife is a link to America/Edmonton; America/Inuvik keeps UTC−6 from the same day.
+        for (zone in listOf("America/Yellowknife", "America/Inuvik")) {
+            val w = ClockChanges.warningFor(zone, edmontonWinter, -7 * hour, clockSetByHand = false)
+            assertEquals("alberta", w?.change?.id, zone)
+            assertEquals(true, w?.timesEarly, zone)
+            assertNull(ClockChanges.warningFor(zone, edmontonWinter, -6 * hour, clockSetByHand = false), zone)
+        }
+    }
+
+    // Manitoba: UTC−5 all year from 1 November 2026; old zone data says UTC−6 in winter.
+    private val winnipegWinter = Instant.parse("2027-01-15T18:00:00Z")
+
+    @Test
+    fun manitobaOnStaleZoneDataIsAnHourEarly() {
+        val w = ClockChanges.warningFor("America/Winnipeg", winnipegWinter, -6 * hour, clockSetByHand = false)!!
+        assertEquals("manitoba", w.change.id)
+        assertEquals(ClockIssue.STALE_ZONE_DATA, w.issue)
+        assertEquals(true, w.timesEarly)
+    }
+
+    @Test
+    fun manitobaWithCurrentZoneDataAndAutomaticTimeSaysNothing() {
+        assertNull(ClockChanges.warningFor("America/Winnipeg", winnipegWinter, -5 * hour, clockSetByHand = false))
+    }
+
+    @Test
+    fun manitobaBeforeItsChangeSaysNothing() {
+        // 31 October 2026: still summer time, which old and new data agree on.
+        val before = Instant.parse("2026-10-31T18:00:00Z")
+        assertNull(ClockChanges.warningFor("America/Winnipeg", before, -5 * hour, clockSetByHand = true))
+    }
+
+    @Test
+    fun northwesternOntarioOnStaleZoneDataIsAnHourEarlyToo() {
+        // America/Rainy_River is a link to America/Winnipeg.
+        val w = ClockChanges.warningFor("America/Rainy_River", winnipegWinter, -6 * hour, clockSetByHand = false)
+        assertEquals("manitoba", w?.change?.id)
+        assertEquals(true, w?.timesEarly)
+    }
+
+    @Test
+    fun saskatchewanWhichKeptItsClockSaysNothing() {
+        // America/Regina has kept UTC−6 all year for decades: no entry, whatever the data.
+        assertNull(ClockChanges.warningFor("America/Regina", edmontonWinter, -6 * hour, clockSetByHand = true))
+    }
+
     // Casablanca: UTC+0 from 20 September 2026; old zone data says UTC+1.
     private val casablanca = Instant.parse("2026-09-26T21:02:00Z")
 

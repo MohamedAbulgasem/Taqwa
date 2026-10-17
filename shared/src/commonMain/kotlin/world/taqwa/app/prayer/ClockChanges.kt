@@ -14,7 +14,7 @@ import kotlin.time.Instant
  * - [zones]: the IANA zones it applies to.
  * - [from]: the local date from which [trueOffsetSeconds] is the offset all year.
  * - [shiftHours]: which way the clocks moved: −1 when they went back (Morocco), +1 when they stayed
- *   forward (British Columbia).
+ *   forward (British Columbia, Alberta, Manitoba).
  * - [until]: when the stale-zone-data check stops; by then every phone still in use has the new
  *   zone data. A clock set by hand is flagged for a shorter time, [ClockChanges.HAND_SET_DAYS].
  */
@@ -41,8 +41,8 @@ enum class ClockIssue {
 
 /**
  * The clock line's reason: which [change], what is wrong, and which way the times on the phone may
- * be off. [timesEarly]: an hour early (British Columbia on old zone data) rather than late
- * (Morocco, Kazakhstan).
+ * be off. [timesEarly]: an hour early (British Columbia, Alberta and Manitoba on old zone data)
+ * rather than late (Morocco, Kazakhstan).
  */
 data class ClockWarning(val change: ClockChange, val issue: ClockIssue, val timesEarly: Boolean)
 
@@ -80,6 +80,29 @@ object ClockChanges {
             zones = setOf("America/Vancouver"),
             from = LocalDate(2026, 11, 1),
             trueOffsetSeconds = -7 * 3600,
+            shiftHours = 1,
+            until = LocalDate(2029, 11, 1),
+        ),
+        // Alberta keeps UTC−6 all year from 1 November 2026, when it would have gone back to
+        // UTC−7. America/Edmonton's clocks also keep the east of British Columbia (Cranbrook) and
+        // the Northwest Territories' Yellowknife, whose America/Yellowknife is a link to it; the
+        // territories' west, America/Inuvik, keeps UTC−6 from the same day.
+        ClockChange(
+            id = "alberta",
+            zones = setOf("America/Edmonton", "America/Yellowknife", "America/Inuvik"),
+            from = LocalDate(2026, 11, 1),
+            trueOffsetSeconds = -6 * 3600,
+            shiftHours = 1,
+            until = LocalDate(2029, 11, 1),
+        ),
+        // Manitoba keeps UTC−5 all year from 1 November 2026, when it would have gone back to
+        // UTC−6. America/Winnipeg's clocks also keep north-western Ontario (Kenora), whose
+        // America/Rainy_River is a link to it.
+        ClockChange(
+            id = "manitoba",
+            zones = setOf("America/Winnipeg", "America/Rainy_River"),
+            from = LocalDate(2026, 11, 1),
+            trueOffsetSeconds = -5 * 3600,
             shiftHours = 1,
             until = LocalDate(2029, 11, 1),
         ),

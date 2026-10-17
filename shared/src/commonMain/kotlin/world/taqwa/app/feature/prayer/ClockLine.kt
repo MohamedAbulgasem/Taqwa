@@ -46,8 +46,10 @@ import world.taqwa.app.resources.prayer_card_ok
 import world.taqwa.app.resources.prayer_clock_line
 import world.taqwa.app.resources.prayer_clock_manual_early
 import world.taqwa.app.resources.prayer_clock_manual_late
+import world.taqwa.app.resources.prayer_clock_region_alberta
 import world.taqwa.app.resources.prayer_clock_region_british_columbia
 import world.taqwa.app.resources.prayer_clock_region_kazakhstan
+import world.taqwa.app.resources.prayer_clock_region_manitoba
 import world.taqwa.app.resources.prayer_clock_region_morocco
 import world.taqwa.app.resources.prayer_clock_stale_early
 import world.taqwa.app.resources.prayer_clock_stale_late
@@ -111,11 +113,7 @@ internal fun ClockSheet(warning: ClockWarning, onDismiss: () -> Unit) {
         ClockIssue.SET_BY_HAND ->
             if (warning.timesEarly) Res.string.prayer_clock_manual_early else Res.string.prayer_clock_manual_late
     }
-    val region = when (warning.change.id) {
-        "morocco" -> Res.string.prayer_clock_region_morocco
-        "british_columbia" -> Res.string.prayer_clock_region_british_columbia
-        else -> Res.string.prayer_clock_region_kazakhstan
-    }
+    val region = clockRegionRes(warning.change.id)
     TaqwaBottomSheet(onDismissRequest = onDismiss) {
         Column(
             Modifier
@@ -145,4 +143,13 @@ internal fun ClockSheet(warning: ClockWarning, onDismiss: () -> Unit) {
             )
         }
     }
+}
+
+/** The place [ClockSheet] names for the [world.taqwa.app.prayer.ClockChanges.table] entry [changeId]. */
+internal fun clockRegionRes(changeId: String): StringResource = when (changeId) {
+    "morocco" -> Res.string.prayer_clock_region_morocco
+    "british_columbia" -> Res.string.prayer_clock_region_british_columbia
+    "alberta" -> Res.string.prayer_clock_region_alberta
+    "manitoba" -> Res.string.prayer_clock_region_manitoba
+    else -> Res.string.prayer_clock_region_kazakhstan
 }

@@ -88,6 +88,8 @@
     <string name="prayer_clock_manual_late">%1$s میں %2$s کو گھڑیوں کا وقت بدلا گیا۔ اگر آپ نے گھڑی خود ملائی ہے تو نماز کے اوقات ایک گھنٹہ بعد دکھائی دے سکتے ہیں۔ خودکار تاریخ اور وقت آن کریں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔</string>
     <string name="prayer_clock_region_morocco">مراکش</string>
     <string name="prayer_clock_region_british_columbia">برٹش کولمبیا</string>
+    <string name="prayer_clock_region_alberta">البرٹا</string>
+    <string name="prayer_clock_region_manitoba">مینیٹوبا</string>
     <string name="prayer_clock_region_kazakhstan">قازقستان</string>
     <string name="prayer_differ_before">%1$s کے مطابق %2$s کا وقت %3$s پر شروع ہوتا ہے</string>
     <string name="prayer_differ_after">%1$s کے مطابق %2$s کا وقت شروع ہو چکا ہے · تقویٰ اسے %3$s سے دکھاتا ہے</string>

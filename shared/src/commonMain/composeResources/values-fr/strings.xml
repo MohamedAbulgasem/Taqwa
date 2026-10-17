@@ -91,6 +91,8 @@
     <string name="prayer_clock_manual_late">%1$s a changé d’heure le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure de retard. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique.</string>
     <string name="prayer_clock_region_morocco">Le Maroc</string>
     <string name="prayer_clock_region_british_columbia">La Colombie-Britannique</string>
+    <string name="prayer_clock_region_alberta">L’Alberta</string>
+    <string name="prayer_clock_region_manitoba">Le Manitoba</string>
     <string name="prayer_clock_region_kazakhstan">Le Kazakhstan</string>
     <string name="prayer_differ_before">Selon %1$s, %2$s commence à %3$s</string>
     <string name="prayer_differ_after">Selon %1$s, %2$s a commencé · Taqwa l’affiche dès %3$s</string>

@@ -93,6 +93,8 @@
     <string name="prayer_clock_manual_late">%1$s, %2$s tarihinde resmî saatini değiştirdi. Saati elle ayarladıysanız namaz vakitleri bir saat geç görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır.</string>
     <string name="prayer_clock_region_morocco">Fas</string>
     <string name="prayer_clock_region_british_columbia">Britanya Kolumbiyası</string>
+    <string name="prayer_clock_region_alberta">Alberta</string>
+    <string name="prayer_clock_region_manitoba">Manitoba</string>
     <string name="prayer_clock_region_kazakhstan">Kazakistan</string>
     <string name="prayer_differ_before">%1$s takviminde %2$s %3$s itibarıyla başlıyor</string>
     <string name="prayer_differ_after">%1$s takviminde %2$s başladı · Taqwa %3$s itibarıyla gösteriyor</string>

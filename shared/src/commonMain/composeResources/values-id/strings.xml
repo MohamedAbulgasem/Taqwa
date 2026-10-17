@@ -86,6 +86,8 @@
     <string name="prayer_clock_manual_late">%1$s mengubah jamnya pada %2$s. Jika Anda mengatur jam secara manual, waktu salat bisa satu jam terlambat. Nyalakan tanggal dan waktu otomatis: pengingat hanya tepat jika jam diatur otomatis.</string>
     <string name="prayer_clock_region_morocco">Maroko</string>
     <string name="prayer_clock_region_british_columbia">British Columbia</string>
+    <string name="prayer_clock_region_alberta">Alberta</string>
+    <string name="prayer_clock_region_manitoba">Manitoba</string>
     <string name="prayer_clock_region_kazakhstan">Kazakhstan</string>
     <string name="prayer_differ_before">%2$s menurut %1$s mulai pukul %3$s</string>
     <string name="prayer_differ_after">%2$s menurut %1$s sudah masuk · Taqwa menampilkannya mulai %3$s</string>
