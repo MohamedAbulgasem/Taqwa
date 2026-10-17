@@ -308,7 +308,8 @@ running a build that carries it, so a new row is due in a store build that users
 rows too, for phones before Android 10 (Android 9 ships tzdata 2018e), which draw every winter an hour
 early and get newer zone data only from their maker: Yukon from 1 Nov 2020, Syria and Jordan from
 28 Oct 2022, Chihuahua from 30 Oct 2022 and Paraguay from 15 Oct 2024, all +1 h until 1 Nov 2029 with the
-2026 rows. Places whose true offset still changes in the year (Egypt, Palestine, Moldova, the Chihuahua
+2026 rows; such a row is due before old data next goes back (Chihuahua 25 Oct 2026, Syria and Jordan
+30 Oct 2026). Places whose true offset still changes in the year (Egypt, Palestine, Moldova, the Chihuahua
 border, Greenland, Norfolk Island) cannot be a row of one offset and have none. The clock line shows
 when the phone's offset under its own zone data differs from the true one, or when the clock was set
 by hand (Android's automatic-time setting; on both platforms the server's `Date` header when online).

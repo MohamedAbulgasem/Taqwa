@@ -5179,3 +5179,44 @@ orders, checked against the tz data only, as British Columbia's row was.
 Checked for this entry: the offsets again, with the JDK 21 (2026b) and the Mac's zoneinfo (2026e); the city
 counts from cities.csv; and that `build-37`'s `ClockChanges.kt` has no `alberta` or `manitoba` row. The
 tests are cada7ad6's (`scripts/test.sh` green on iOS and the Android host).
+
+## Five places that stopped going back an hour (17 October) — Chihuahua's phones go early from 25 October
+
+Branch `fix/clock-stale-zones`, off `release-1.1.0` (9e14db59): ae7b32c3, then this entry. Not pushed.
+
+A phone before Android 10 keeps the zone data it shipped with unless its maker updates it (Android 9 has
+2018e, Android 8 older). That data still goes back an hour every autumn in five places that stopped doing so
+years ago, so on such a phone every time there is drawn an hour early all winter, with no clock line on 1.1.0
+(37). ae7b32c3 gives them rows, +1 h until 1 November 2029: `yukon` (America/Whitehorse, America/Dawson),
+`syria` (Asia/Damascus), `jordan` (Asia/Amman), `chihuahua` (America/Chihuahua) and `paraguay`
+(America/Asuncion). cities.csv puts 89 cities on Damascus's clock, 34 on Amman's, 30 on Asunción's, 10 on
+Chihuahua's and 1 (Whitehorse) on Yukon's.
+
+When the old data next goes back, and so when each row starts to matter:
+
+| Row | Old data goes back | True offset | Old data back in step |
+|---|---|---|---|
+| chihuahua | 25 Oct 2026, 08:00 UTC (−6 to −7) | −6 | 4 Apr 2027, 09:00 UTC |
+| syria | 29 Oct 2026, 21:00 UTC (+3 to +2; midnight on 30 October there) | +3 | 25 Mar 2027, 22:00 UTC |
+| jordan | 29 Oct 2026, 22:00 UTC (+3 to +2) | +3 | 25 Mar 2027, 22:00 UTC |
+| yukon | 1 Nov 2026, 09:00 UTC (−7 to −8) | −7 | 14 Mar 2027, 10:00 UTC |
+| paraguay | 28 Mar 2027, 03:00 UTC (−3 to −4) | −3 | 3 Oct 2027, 04:00 UTC |
+
+**This moves build 38's deadline earlier than the 24 October in the entry above.** A row warns only on a
+phone running a build that carries it (§3.9). By that entry's reckoning (Play's review takes 1 to 7 days and
+Apple's 1 to 3, STORE-CHECKLIST §7, and phones then update the app on their own schedule), build 38 has to
+carry ae7b32c3 and be submitted to both stores **by 21 October** for Syria and Jordan. For Chihuahua the same
+reckoning gives today, 17 October, so its first days may go unwarned if Play takes its full week: the line
+then shows from the day the build reaches the phone, and the stretch runs to 4 April, so a late build loses
+the first days of the winter, not the winter. Yukon is due with Alberta and Manitoba (24 October), and
+Paraguay has until March.
+- Even with the line, the times on such a phone stay an hour early until its zone data is updated, which for
+  Android 8 and 9 usually means never. The line says which way and gives the fix, as for British Columbia.
+- The site needs nothing: its pages do not read the table (ae7b32c3's message has the byte-for-byte check).
+
+Checked for this entry: the old-data transitions above with 2018e's rules written as POSIX TZ strings
+(Syria last Friday of October 0:00, Jordan last Friday 0:00 standard time, Mexico last Sunday 2:00, Canada
+first Sunday of November 2:00, Paraguay fourth Sunday of March 0:00 and back on October's first), each
+against the Mac's zoneinfo (2026e) for the true offset; they agree with ae7b32c3's dates, measured on the
+API 28 image. The city counts from cities.csv, and that `build-37`'s `ClockChanges.kt` has only the `morocco`, `british_columbia` and
+`kazakhstan` rows. No Kotlin changed; the tests are ae7b32c3's.
