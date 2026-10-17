@@ -171,7 +171,8 @@ class ReturnsToFrontTest {
 
     /**
      * With a voice going, the recited ayah is opened each time the app is in front, once it is
-     * active: a URL or a notification response that comes with the activation is counted first.
+     * active: a URL or a notification response that comes with the activation is usually counted
+     * first.
      * Control Center opens nothing.
      */
     @Test

@@ -17,8 +17,9 @@ sealed interface Screen {
      * opened by a request.
      *
      * [followVoice] marks a reader opened at the voice (the bar's words, the media notification, an
-     * iOS return with a voice going): it follows the recitation at once. A reader opened any other
-     * way was opened by a touch and waits out the four seconds (FollowingState).
+     * iOS return with a voice going, the voice moving on to the next surah (followSurahSkip)): it
+     * follows the recitation at once. A reader opened any other way was opened by a touch and waits
+     * out the four seconds (FollowingState).
      */
     data class Reader(
         val surah: Int,

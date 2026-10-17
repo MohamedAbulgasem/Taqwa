@@ -41,8 +41,8 @@ enum class Follow {
  *
  * [armedOnEntry] is the start of the screen's life. The list reports that it is not moving as
  * soon as it is laid out, before anything has moved. A screen opened at the voice (the bar's words,
- * the media notification, an iOS return with a voice going) is armed: that report is not a touch,
- * and it follows at once. A screen opened any other way (a widget tap, a bookmark, Continue, the
+ * the media notification, an iOS return with a voice going, the voice moving on to the next surah
+ * (followSurahSkip)) is armed: that report is not a touch, and it follows at once. A screen opened any other way (a widget tap, a bookmark, Continue, the
  * lists, a search hit, the mode toggle) was opened by a touch, and the report counts as that touch:
  * armed, a Mushaf opened a page from the voice turned to the voice's page as it opened, leaving the
  * widget's ayah behind and the saved place overwritten. After that first report, a stop counts only

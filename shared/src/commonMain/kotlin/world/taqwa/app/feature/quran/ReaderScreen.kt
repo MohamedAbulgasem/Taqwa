@@ -288,8 +288,9 @@ fun ReaderScreen(
                 return@LaunchedEffect
             }
             // Not before the list's first layout: until then nothing is on screen and every ayah
-            // reads as zero screens away, so a reader just opened far from the voice would follow
-            // it there. Opening used to count as a touch, which hid this.
+            // reads as zero screens away, so a reader opened at the voice and far from it would
+            // follow it there. A reader opened any other way counts its opening as a touch and
+            // would not follow yet in any case.
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }.first { it }
             when (following.decide(screensAway(target))) {
                 Follow.SCROLL -> {

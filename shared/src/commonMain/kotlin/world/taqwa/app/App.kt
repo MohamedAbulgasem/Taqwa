@@ -146,9 +146,10 @@ fun App(container: AppContainer) {
     // notification's tap, or - on iOS, which has no such tap - the app in front again with a
     // voice going (jumpToPlaying). A screen already showing the surah is asked to scroll (the
     // token); any other is replaced or pushed with the reader the user reads in, at the ayah, and
-    // follows the voice from the moment it opens (recitationTarget marks it followVoice), where a
-    // screen opened any other way counts its opening as a touch. A return to the front passes the
-    // request count from when the app left, and the jump yields to any request counted since.
+    // follows the voice from the moment it opens (recitationTarget marks it followVoice, as
+    // followSurahSkip does the reader the voice moving on to the next surah opens), where a screen
+    // opened any other way counts its opening as a touch. A return to the front passes the request
+    // count from when the app left, and the jump yields to any request counted since.
     val jumpTokenState = remember { mutableStateOf(0) }
     var jumpToken by jumpTokenState
     // The reader's reading-settings sheet, held here so it outlives the voice's own move to the
@@ -194,8 +195,8 @@ fun App(container: AppContainer) {
         openPlaying = openPlaying,
         // The widgets with the plan: the return's location check can have moved the place, and
         // the Home and Lock Screen widgets would otherwise keep the old city until the Prayer
-        // screen opens. An unmoved return rewrites nothing (the mirror and the reload skip
-        // unchanged content).
+        // screen opens. Each return rewrites the mirror at the current minute and reloads the
+        // widgets, in the foreground; it does not skip an unmoved return.
         reschedule = { scope.launch { refreshForNewTimes(container, settings, RescheduleTrigger.APP_FOREGROUND) } },
     )
 

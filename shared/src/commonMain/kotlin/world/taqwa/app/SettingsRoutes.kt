@@ -195,8 +195,8 @@ internal fun NotificationSettingsRoute(
 
 /**
  * After anything that changes the prayer times outside the Prayer screen (ruling R53): a
- * prayer-settings write, a new location (a city picked, a GPS fix), or the one-time backfill of a
- * location's country or region. The armed
+ * prayer-settings write, a new location (a city picked, a GPS fix), the one-time backfill of a
+ * location's country or region, and each time the iPhone app is in front (APP_FOREGROUND). The armed
  * notifications and the widgets' mirror move to the new times at once, as a language change moves
  * them to the new words (`LanguageChangeReschedule`), instead of at the next foreground, alarm or
  * top-up.
