@@ -17,10 +17,13 @@ package world.taqwa.app.domain
  * the Prayer screen backfills it from the nearest city; [countryCode] likewise, and the engine
  * then reads the country from the zone.
  *
- * [timeZoneId] is the zone every time is drawn and scheduled in, always one this phone can parse;
- * [pickedTimeZoneId] is the zone the place was stored with, which the Location screen names and
- * which is stored again. They differ only where the phone's zone data is older than the place's
- * zone (`ZoneIds`): Kyiv on an Android 9 phone is drawn in Europe/Kiev and named Europe/Kyiv.
+ * [timeZoneId] is the zone every time is drawn and scheduled in. Read from
+ * `SettingsRepository.location` it is always one this phone can parse; a location built from a
+ * `City` carries the list's zone as is, so it is stored before it is used. [pickedTimeZoneId] is
+ * the zone the place was stored with, which is what is stored again. The two differ only where the
+ * phone's zone data is older than the place's zone (`ZoneIds`): Kyiv on an Android 9 phone is
+ * drawn in Europe/Kiev, its old name on the same clock, and Nuuk, which has no old name, in the
+ * phone's own zone. The Location screen names whichever the times are on (`ZoneIds.named`).
  */
 data class GeoLocation(
     val latitude: Double,

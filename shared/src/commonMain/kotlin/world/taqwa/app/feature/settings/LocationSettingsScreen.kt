@@ -30,6 +30,7 @@ import world.taqwa.app.resources.location_timezone
 import world.taqwa.app.resources.location_use_my_location
 import world.taqwa.app.resources.settings_location
 import world.taqwa.app.resources.prayer_current_location
+import world.taqwa.app.settings.ZoneIds
 
 /**
  * The timezone is on screen deliberately: when prayer times look wrong by a whole hour, a city
@@ -88,9 +89,13 @@ fun LocationSettingsScreen(
             CardDivider()
             TaqwaRow(stringResource(Res.string.location_country), value = location?.countryCode ?: "-")
             CardDivider()
-            // The zone as picked: Kyiv is named Europe/Kyiv even where an old phone draws its
-            // times in Europe/Kiev.
-            TaqwaRow(stringResource(Res.string.location_timezone), value = location?.pickedTimeZoneId ?: "-")
+            // The zone the times are on, under the name it was picked by: Kyiv is named
+            // Europe/Kyiv where an old phone draws it in Europe/Kiev, but a zone the phone has no
+            // name for at all is named as the phone's own, the clock its times are actually on.
+            TaqwaRow(
+                stringResource(Res.string.location_timezone),
+                value = location?.let { ZoneIds.named(inUse = it.timeZoneId, picked = it.pickedTimeZoneId) } ?: "-",
+            )
         }
 
         Spacer(Modifier.height(16.dp))

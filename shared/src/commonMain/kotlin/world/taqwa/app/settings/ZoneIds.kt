@@ -9,8 +9,10 @@ import kotlinx.datetime.TimeZone
  * included, so a city in such a zone crashed the app on every launch.
  *
  * The phones that lack zones are the old ones. Android 9 ships tzdata 2018e and Android 8 an older
- * release still, and before Android 10 the data is updated only by the phone's maker, never
- * through Google Play. The city list has five zones that 2018e does not: Kyiv (renamed from Kiev
+ * release still. Before Android 10 the data changes only when the phone's maker updates it: by a
+ * system update, or on 8.1 and 9 by a time zone data app the maker can publish through an app
+ * store. From Android 10 it comes as a Google Play system update. The city list has five zones
+ * that 2018e does not: Kyiv (renamed from Kiev
  * in 2022b), Qostanay (split off in 2018h), Nuuk (renamed from Godthab in 2020a), Ciudad Juárez
  * (split off in 2022g) and Coyhaique (split off in 2025b, so it is missing from newer phones too
  * until their data is updated).
@@ -24,9 +26,10 @@ import kotlinx.datetime.TimeZone
  * than 2018e), and any other id this phone cannot parse read as the phone's own zone, the clock the
  * phone itself is showing.
  *
- * The stored id is left as picked, and the Location screen names it
- * ([world.taqwa.app.domain.GeoLocation.pickedTimeZoneId]), so the stand-in is for the arithmetic
- * only and a phone whose data is updated later reads the real zone.
+ * The stored id is left as picked ([world.taqwa.app.domain.GeoLocation.pickedTimeZoneId]), so a
+ * phone whose data is updated later reads the real zone. The Location screen names the picked zone
+ * while its old name stands in for it, on the same clock, and the zone in use when the times have
+ * fallen back to the phone's own ([named]).
  */
 internal object ZoneIds {
 
@@ -47,6 +50,15 @@ internal object ZoneIds {
         val old = legacyNames[id]
         return if (old != null && known(old)) old else fallback()
     }
+
+    /**
+     * The zone the Location screen names for a location drawn in [inUse] and stored as [picked]:
+     * [picked] while [inUse] is it or its old name, which keep the same clock, and [inUse]
+     * otherwise. A zone read as the phone's own is on that zone's clock, and the row is the clue
+     * the screen offers when the times look hours wrong, so it names the clock they are on.
+     */
+    fun named(inUse: String, picked: String): String =
+        if (inUse == picked || inUse == legacyNames[picked]) picked else inUse
 
     private fun parses(id: String): Boolean = try {
         TimeZone.of(id)
