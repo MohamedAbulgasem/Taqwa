@@ -10,18 +10,24 @@ sealed interface Screen {
      * [selectAyah] opens the reader with [ayah] already selected — its card tinted and its copy,
      * share and bookmark row showing — rather than merely scrolled to. Set when the ayah is what
      * the user tapped (the widget), not when the surah is (the tab root, the continue card).
+     *
+     * [request] tells two requests for the same ayah apart (the widget's ayah is the same all
+     * day): a second tap over the reader the first one opened is a screen of its own, so it opens
+     * on its ayah again rather than being taken for the reader already open. 0 for any screen not
+     * opened by a request.
      */
-    data class Reader(val surah: Int, val ayah: Int, val selectAyah: Boolean = false) : Screen
+    data class Reader(val surah: Int, val ayah: Int, val selectAyah: Boolean = false, val request: Long = 0) : Screen
 
     /**
      * [highlightSurah] and [highlightAyah] open the page with that ayah already highlighted and
      * its reference bar showing, the state a tap on the page itself would produce. Both null when
-     * the page, not an ayah, is what was asked for.
+     * the page, not an ayah, is what was asked for. [request] is as on [Reader].
      */
     data class Mushaf(
         val page: Int,
         val highlightSurah: Int? = null,
         val highlightAyah: Int? = null,
+        val request: Long = 0,
     ) : Screen
     data object Settings : Screen
     data object PrayerTimesSettings : Screen

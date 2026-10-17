@@ -15,16 +15,20 @@ import world.taqwa.app.quran.ReadingMode
  * database lookup they will not use. It lives here, out of the composable, so both branches are
  * reachable from a test — the mode that decides between them is persisted, and flipping it on a
  * device means driving the reading-settings sheet by hand.
+ *
+ * [request] is the tap's own number (`LaunchRequests.count` once it is counted), so a second tap
+ * for the same ayah is a screen of its own ([Screen.Reader.request]).
  */
 suspend fun ayahWidgetTarget(
     mode: ReadingMode,
     surah: Int,
     ayah: Int,
+    request: Long = 0,
     pageOf: suspend (Int, Int) -> Int,
 ): Screen = if (mode == ReadingMode.MUSHAF) {
-    Screen.Mushaf(page = pageOf(surah, ayah), highlightSurah = surah, highlightAyah = ayah)
+    Screen.Mushaf(page = pageOf(surah, ayah), highlightSurah = surah, highlightAyah = ayah, request = request)
 } else {
-    Screen.Reader(surah, ayah, selectAyah = true)
+    Screen.Reader(surah, ayah, selectAyah = true, request = request)
 }
 
 /**

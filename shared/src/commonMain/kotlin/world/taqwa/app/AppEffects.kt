@@ -264,7 +264,9 @@ internal fun WidgetLaunchRequests(
                 // because `pageOf` is itself a database read that can fail and a failure must
                 // leave the back stack exactly as it found it rather than half-applying a push.
                 val reading = settings.readingSettings(platformFormat.languageTag()).first()
-                val target = ayahWidgetTarget(reading.mode, surah, ayah) { s, a ->
+                // Stamped with the tap's own number, so a second tap for the same ayah over the
+                // screen the first one opened lands on its ayah again.
+                val target = ayahWidgetTarget(reading.mode, surah, ayah, request = LaunchRequests.count) { s, a ->
                     container.quranRepository.pageOf(s, a)
                 }
                 // On the Quran tab, with the Quran root at the bottom of the stack: a tap from

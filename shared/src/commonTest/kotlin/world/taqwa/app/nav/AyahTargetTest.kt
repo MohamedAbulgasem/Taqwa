@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import world.taqwa.app.quran.ReadingMode
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class AyahTargetTest {
@@ -42,5 +43,23 @@ class AyahTargetTest {
             Screen.Mushaf(page = 42),
             recitationTarget(ReadingMode.MUSHAF, 2, 255) { s, a -> if (s == 2 && a == 255) 42 else 0 },
         )
+    }
+
+    /**
+     * The widget's ayah is the same all day, so a second tap can ask for the screen the first one
+     * opened, which the reader has since read on from. Each tap's own request number makes it a
+     * screen of its own, so it opens on its ayah again rather than being taken for the open one.
+     */
+    @Test fun aRepeatedWidgetTapIsAScreenOfItsOwnInEitherMode() = runTest {
+        for (mode in listOf(ReadingMode.TRANSLATION, ReadingMode.MUSHAF)) {
+            val first = ayahWidgetTarget(mode, 18, 10, request = 1) { _, _ -> 294 }
+            val again = ayahWidgetTarget(mode, 18, 10, request = 2) { _, _ -> 294 }
+            assertNotEquals(first, again, "$mode")
+        }
+        val navigator = Navigator(Screen.Quran)
+        navigator.openReading(ayahWidgetTarget(ReadingMode.MUSHAF, 18, 10, request = 1) { _, _ -> 294 })
+        val opened = navigator.backStack.value
+        navigator.openReading(ayahWidgetTarget(ReadingMode.MUSHAF, 18, 10, request = 2) { _, _ -> 294 })
+        assertNotEquals(opened, navigator.backStack.value)
     }
 }
