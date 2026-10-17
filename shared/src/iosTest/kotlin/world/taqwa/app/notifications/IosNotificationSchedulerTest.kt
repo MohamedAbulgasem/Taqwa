@@ -2,6 +2,7 @@ package world.taqwa.app.notifications
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSCalendar
+import platform.Foundation.NSCalendarIdentifierGregorian
 import platform.Foundation.NSCalendarIdentifierIslamicUmmAlQura
 import platform.Foundation.NSCalendarUnitDay
 import platform.Foundation.NSCalendarUnitHour
@@ -11,9 +12,9 @@ import platform.Foundation.NSCalendarUnitSecond
 import platform.Foundation.NSCalendarUnitYear
 import platform.Foundation.NSDate
 import platform.Foundation.NSTimeZone
+import platform.Foundation.dateByAddingTimeInterval
 import platform.Foundation.dateWithTimeIntervalSince1970
 import platform.Foundation.defaultTimeZone
-import platform.Foundation.secondsFromGMT
 import platform.Foundation.setDefaultTimeZone
 import platform.Foundation.timeIntervalSince1970
 import platform.Foundation.timeZoneWithName
@@ -21,6 +22,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
@@ -28,38 +30,28 @@ import kotlin.time.Instant
 /**
  * Covers the one part of [IosNotificationScheduler] that is testable without a real
  * notification centre: the calendar/timezone pinning on the trigger's date components.
+ *
+ * Each test sets the process's default zone, which stands in for the device's, to one where a
+ * wrong trigger cannot land on the right second by luck. CI's macOS runners are on UTC, and a
+ * London phone is on UTC's offset half the year, so neither can be the device here.
  */
 @OptIn(ExperimentalForeignApi::class)
 class IosNotificationSchedulerTest {
 
     /**
-     * The scenario the pinning exists for: the notification belongs to a city in `Asia/Dubai`
-     * while the process — standing in for the device — is on `Europe/London`. When the
-     * components were bare numbers the trigger re-read them in the device's zone and fired three
-     * hours late. `nextTriggerDate()` is the resolved fire date, so this asserts the whole round
-     * trip to the second.
+     * Bare date components are re-read by the trigger in the device's zone, so components that
+     * lost their zone fire off by the device's whole offset. Asia/Kolkata is +05:30 all year,
+     * never UTC's offset. `nextTriggerDate()` is the resolved fire date, so this asserts the whole
+     * round trip to the second.
      */
     @Test
-    fun triggerResolvesToTheEntrysInstantWhenTheDeviceIsInAnotherTimeZone() {
-        withDefaultTimeZone("Europe/London") {
+    fun triggerResolvesToTheEntrysInstantOnADeviceNeverAtUtcsOffset() {
+        withDefaultTimeZone("Asia/Kolkata") {
             val instant = futureInstant()
 
             val fireDate = IosNotificationScheduler.triggerFor(instant).nextTriggerDate()
 
             assertNotNull(fireDate, "trigger produced no fire date")
-            assertEquals(instant.epochSeconds, fireDate.timeIntervalSince1970.toLong())
-        }
-    }
-
-    /** The same instant with the entry's own zone as the device's zone must not move either. */
-    @Test
-    fun triggerResolvesToTheEntrysInstantWhenTheZonesAgree() {
-        withDefaultTimeZone("Asia/Dubai") {
-            val instant = futureInstant()
-
-            val fireDate = IosNotificationScheduler.triggerFor(instant).nextTriggerDate()
-
-            assertNotNull(fireDate)
             assertEquals(instant.epochSeconds, fireDate.timeIntervalSince1970.toLong())
         }
     }
@@ -75,9 +67,13 @@ class IosNotificationSchedulerTest {
      * UTC. The first two assertions are the control, showing the shape of the old failure — the
      * same instant read through an Umm al-Qura calendar yields a year around 1448, which the
      * trigger would then interpret as Gregorian 1448 and never fire.
+     *
+     * The zone is checked by its offset on a July day, with the device on London: a zone pinned
+     * from the device would be an hour ahead of UTC then, and UTC's own name comes back as "GMT",
+     * so the name is not what is compared.
      */
     @Test
-    fun triggerPinsItsOwnGregorianCalendarSoADeviceCalendarCannotReinterpretIt() {
+    fun triggerPinsItsOwnGregorianCalendarAndUtcSoTheDeviceCannotReinterpretIt() {
         val instant = futureInstant()
         val dubai = NSTimeZone.timeZoneWithName("Asia/Dubai")!!
         val date = NSDate.dateWithTimeIntervalSince1970(instant.epochSeconds.toDouble())
@@ -91,45 +87,71 @@ class IosNotificationSchedulerTest {
         )
         assertTrue(bare.year in 1400L..1500L, "expected a Hijri year, got ${bare.year}")
         assertTrue(bare.calendar == null, "control: bare components carry no calendar")
-
-        val pinned = IosNotificationScheduler.triggerFor(instant).dateComponents
-
         assertEquals(NSCalendarIdentifierIslamicUmmAlQura, islamic.calendarIdentifier)
-        assertTrue(pinned.year > 2000L, "expected a Gregorian year, got ${pinned.year}")
-        assertEquals(0L, pinned.timeZone?.secondsFromGMT, "expected the components pinned to UTC")
+
+        withDefaultTimeZone("Europe/London") {
+            val pinned = IosNotificationScheduler.triggerFor(instant).dateComponents
+            val july = NSDate.dateWithTimeIntervalSince1970(Instant.parse("2026-07-01T12:00:00Z").epochSeconds.toDouble())
+
+            assertEquals(NSCalendarIdentifierGregorian, pinned.calendar?.calendarIdentifier)
+            assertTrue(pinned.year > 2000L, "expected a Gregorian year, got ${pinned.year}")
+            assertEquals(0L, pinned.timeZone?.secondsFromGMTForDate(july), "expected the components pinned to UTC")
+        }
     }
 
     /**
-     * The night the clocks go back repeats an hour of wall-clock time, so a time of day in the
-     * city's own zone names two instants, and date components cannot say which one is meant.
-     * Foundation settles a repeated time on its first occurrence. An entry in the second pass
-     * (Tahajjud's "the last third of the night has begun" in Madrid, London or Toronto on that
-     * night) therefore fired an hour early if its trigger was built from wall-clock components.
+     * The night the clocks go back repeats an hour of wall-clock time, so a time of day in a zone
+     * that keeps summer time names two instants, and date components in that zone cannot say which
+     * one is meant. Foundation settles a repeated time on its first occurrence, so an entry in the
+     * second pass (Tahajjud's "the last third of the night has begun" in Madrid, London or Toronto
+     * on that night) fired an hour early when its trigger was built from that zone's components.
      *
-     * Each instant was checked against the tz database: Madrid's 00:30Z is the first pass of its
-     * repeated 02:xx and the control; the other three are second passes, whose first occurrence is
-     * an hour earlier. 2031, not this year's nights, because `nextTriggerDate()` is nil for a past
-     * date. The device is put in Dubai, which keeps no summer time, so its own zone cannot move
-     * anything either.
+     * Each zone's next fall-back is found at run time, so the instants are always ahead of
+     * `nextTriggerDate()`, which is nil for a past date, and a zone that stopped keeping summer
+     * time fails here instead of quietly testing nothing. 51 minutes before the transition and 9
+     * minutes after are the same minute of the wall clock, once on each pass. Each is checked on a
+     * device in Dubai, which keeps no summer time, and on a device in the city's own zone, where a
+     * trigger built in the device's zone has the same repeated hour to get wrong.
      */
     @Test
-    fun everyInstantAroundAFallBackNightFiresAtItsOwnSecond() {
-        val instants = listOf(
-            "Europe/Madrid" to "2031-10-26T00:30:00Z",
-            "Europe/Madrid" to "2031-10-26T01:09:00Z",
-            "Europe/London" to "2031-10-26T01:02:00Z",
-            "America/Toronto" to "2031-11-02T06:30:00Z",
-        )
-        withDefaultTimeZone("Asia/Dubai") {
-            instants.forEach { (zone, iso) ->
-                val instant = Instant.parse(iso)
+    fun aReminderOnEitherPassOfAFallBackNightFiresAtItsOwnSecond() {
+        for (city in listOf("Europe/Madrid", "Europe/London", "America/Toronto")) {
+            val zone = NSTimeZone.timeZoneWithName(city)!!
+            val transition = nextFallBack(zone, city)
+            val before = zone.secondsFromGMTForDate(transition.dateByAddingTimeInterval(-1.0))
+            val after = zone.secondsFromGMTForDate(transition)
+            assertEquals(3600L, before - after, "$city: the clocks go back an hour")
+            val passes = listOf(
+                "first pass" to transition.dateByAddingTimeInterval(-51.0 * 60),
+                "second pass" to transition.dateByAddingTimeInterval(9.0 * 60),
+            )
+            for (device in listOf("Asia/Dubai", city)) {
+                withDefaultTimeZone(device) {
+                    for ((pass, date) in passes) {
+                        val instant = Instant.fromEpochSeconds(date.timeIntervalSince1970.toLong())
+                        val label = "$city $pass ($instant), device on $device"
 
-                val fireDate = IosNotificationScheduler.triggerFor(instant).nextTriggerDate()
+                        val fireDate = IosNotificationScheduler.triggerFor(instant).nextTriggerDate()
 
-                assertNotNull(fireDate, "$zone $iso: no fire date")
-                assertEquals(instant.epochSeconds, fireDate.timeIntervalSince1970.toLong(), "$zone $iso")
+                        assertNotNull(fireDate, "$label: no fire date")
+                        assertEquals(instant.epochSeconds, fireDate.timeIntervalSince1970.toLong(), label)
+                    }
+                }
             }
         }
+    }
+
+    /** [zone]'s next transition that sets the clocks back, which is at most two transitions away. */
+    private fun nextFallBack(zone: NSTimeZone, name: String): NSDate {
+        var from = NSDate()
+        repeat(2) {
+            val transition = zone.nextDaylightSavingTimeTransitionAfterDate(from)
+                ?: fail("$name keeps no summer time any more")
+            val before = zone.secondsFromGMTForDate(transition.dateByAddingTimeInterval(-1.0))
+            if (before > zone.secondsFromGMTForDate(transition)) return transition
+            from = transition
+        }
+        fail("$name: neither of its next two transitions sets the clocks back")
     }
 
     /** Whole seconds, comfortably in the future: `nextTriggerDate()` is nil for a past date. */
