@@ -97,12 +97,18 @@
     <string name="prayer_card_sunni_body">In Shia (Ja’fari) practice, Maghrib and iftar are later.</string>
     <string name="prayer_match_my_mosque">Match my mosque</string>
     <string name="prayer_card_ok">OK</string>
-    <!-- The clock line above the ring (spec §3.9) and its sheet: %1$s the place whose clocks changed, %2$s the date of the change. -->
-    <string name="prayer_clock_line">Your phone’s clock may be an hour off</string>
-    <string name="prayer_clock_stale_early">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour early. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
-    <string name="prayer_clock_stale_late">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour late. Install the latest system update, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <!-- The clock line above the ring (spec §3.9) and its sheet: %1$s the place whose clocks changed, %2$s the date of the change.
+         "changed": a place that moved its clocks once (Morocco, Kazakhstan); "kept": one that stopped turning them back, so from
+         that date it keeps one time all year (British Columbia, Syria, Paraguay...). -->
+    <string name="prayer_clock_line">Prayer times may be an hour off</string>
+    <string name="prayer_clock_stale_early">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour early. Install the latest system update, if there is one, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_stale_late">%1$s changed its clocks on %2$s and your phone hasn’t caught up, so prayer times may be an hour late. Install the latest system update, if there is one, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
     <string name="prayer_clock_manual_early">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour early. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
     <string name="prayer_clock_manual_late">%1$s changed its clocks on %2$s. If you set the clock by hand, prayer times may be an hour late. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_kept_stale_early">%1$s has kept one time all year since %2$s and your phone hasn’t caught up, so prayer times may be an hour early. Install the latest system update, if there is one, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_kept_stale_late">%1$s has kept one time all year since %2$s and your phone hasn’t caught up, so prayer times may be an hour late. Install the latest system update, if there is one, and keep date and time on automatic: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_kept_manual_early">%1$s has kept one time all year since %2$s. If you set the clock by hand, prayer times may be an hour early. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
+    <string name="prayer_clock_kept_manual_late">%1$s has kept one time all year since %2$s. If you set the clock by hand, prayer times may be an hour late. Turn on automatic date and time: alerts are right only when the clock is automatic.</string>
     <string name="prayer_clock_region_morocco">Morocco</string>
     <string name="prayer_clock_region_british_columbia">British Columbia</string>
     <string name="prayer_clock_region_alberta">Alberta</string>

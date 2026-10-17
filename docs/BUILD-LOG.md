@@ -5234,3 +5234,82 @@ first Sunday of November 2:00, Paraguay fourth Sunday of March 0:00 and back on 
 against the Mac's zoneinfo (2026e) for the true offset; they agree with ae7b32c3's dates, measured on the
 API 28 image. The city counts from cities.csv, and that `build-37`'s `ClockChanges.kt` has only the `morocco`, `british_columbia` and
 `kazakhstan` rows. No Kotlin changed; the tests are ae7b32c3's.
+
+## The clock line's words, and the seasons old data draws early (18 October) — build 38
+
+Branch `fix/clock-seasonal`, off `release-1.1.0` (d7ccbda5), two commits. Not pushed. The Lead's rulings on
+the two items the 17 October entries left open: (A) the line's wording, (B) the places whose true offset still
+changes in the year, which "cannot be a row of one offset and have none" (§3.9) and which an Android 9 phone
+draws an hour early for whole seasons (stale-zones-2018e.md, 17 October).
+
+### A. Wording (commit 1)
+
+Three things the sheet said that were not true for every row and every way a user meets it:
+
+- **"Your phone's clock may be an hour off."** False for the phone the 17 October entry describes: kept on a
+  zone of the true offset (Baghdad for +03) with automatic time, Damascus picked from the list. Its clock is
+  right; it is the times, drawn at Asia/Damascus's stale +02, that are an hour early. The headline is now about
+  the times, which is what the sheet under it explains and what is off in every case: "Prayer times may be an
+  hour off". Smallest change; the sheet's fix text stays (the system update, if there is one, and automatic time:
+  harmless where already applied).
+- **"{Place} changed its clocks on {date}."** True for Morocco and Kazakhstan, whose clocks moved on their dates.
+  False for the eight +1 rows: British Columbia, Alberta and Manitoba on 1 November 2026, Yukon, Syria, Jordan
+  and Chihuahua did not move their clocks that day, they left them where they were; Paraguay's 15 October 2024 is
+  the date of its law. Those rows now say the place "has kept one time all year since {date}", in four new
+  strings (`prayer_clock_kept_stale_early/late`, `prayer_clock_kept_manual_early/late`); the −1 rows keep theirs.
+  `clockBodyRes` in `ClockLine.kt` picks the sentence from the row's `shiftHours`, and `ClockLineTest` pins every
+  row to its kind. French avoids "changer d'heure" for the places that did not: "garde la même heure toute l'année
+  depuis le …".
+- **"Install the latest system update"** gains "if there is one" in every language: an Android 8 or 9 phone
+  rarely has one (the entry above).
+- **Urdu's Syria** was شام alone, which also means "evening": now ملکِ شام.
+
+Every changed string, old → new, for the owner's native review (none of the seven translations has had a native
+reader; `values-in` is `values-id`'s copy):
+
+| Key | Language | Old | New |
+|---|---|---|---|
+| `prayer_clock_line` | en | Your phone’s clock may be an hour off | Prayer times may be an hour off |
+| | ar | قد يكون توقيت هاتفك مختلفًا بساعة | قد تكون مواقيت الصلاة مختلفة بساعة |
+| | bn | আপনার ফোনের ঘড়ি হয়তো এক ঘণ্টা ভুল | নামাজের সময় হয়তো এক ঘণ্টা ভুল |
+| | fr | L’horloge de votre téléphone a peut-être une heure d’écart | Les horaires de prière ont peut-être une heure d’écart |
+| | id | Jam ponsel Anda mungkin selisih satu jam | Waktu salat mungkin selisih satu jam |
+| | tr | Telefonunuzun saati bir saat farklı olabilir | Namaz vakitleri bir saat farklı olabilir |
+| | ur | ہو سکتا ہے آپ کے فون کی گھڑی ایک گھنٹہ آگے پیچھے ہو | ہو سکتا ہے نماز کے اوقات ایک گھنٹہ آگے پیچھے ہوں |
+| `prayer_clock_stale_early`, `_late` (only the fix sentence changed; the rest as before, "early" and "late" as before) | en | Install the latest system update, and keep date and time on automatic: … | Install the latest system update, if there is one, and keep date and time on automatic: … |
+| | ar | ثبّت آخر تحديث للنظام، واترك التاريخ والوقت على الضبط التلقائي: … | ثبّت آخر تحديث للنظام إن وُجد، واترك التاريخ والوقت على الضبط التلقائي: … |
+| | bn | সর্বশেষ সিস্টেম আপডেট ইনস্টল করুন এবং তারিখ ও সময় স্বয়ংক্রিয় রাখুন: … | সর্বশেষ সিস্টেম আপডেট থাকলে তা ইনস্টল করুন এবং তারিখ ও সময় স্বয়ংক্রিয় রাখুন: … |
+| | fr | Installez la dernière mise à jour du système et laissez la date et l’heure en automatique : … | Installez la dernière mise à jour du système, s’il y en a une, et laissez la date et l’heure en automatique : … |
+| | id | Pasang pembaruan sistem terbaru dan biarkan tanggal dan waktu diatur otomatis: … | Pasang pembaruan sistem terbaru, jika ada, dan biarkan tanggal dan waktu diatur otomatis: … |
+| | tr | En son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: … | Varsa en son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: … |
+| | ur | تازہ ترین سسٹم اپ ڈیٹ انسٹال کریں، اور تاریخ اور وقت کو خودکار رکھیں: … | تازہ ترین سسٹم اپ ڈیٹ، اگر کوئی ہو، انسٹال کریں، اور تاریخ اور وقت کو خودکار رکھیں: … |
+| `prayer_clock_kept_stale_early` (new; `_late` the same with the word for late, as in `prayer_clock_stale_late`) | en | — | %1$s has kept one time all year since %2$s and your phone hasn’t caught up, so prayer times may be an hour early. Install the latest system update, if there is one, and keep date and time on automatic: alerts are right only when the clock is automatic. |
+| | ar | — | التوقيت في %1$s ثابت طوال العام منذ %2$s ولم يُحدَّث هاتفك بعد، لذا قد تظهر مواقيت الصلاة مبكرة بساعة. ثبّت آخر تحديث للنظام إن وُجد، واترك التاريخ والوقت على الضبط التلقائي: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا. |
+| | bn | — | %1$s %2$s থেকে সারা বছর একই সময় রাখছে, কিন্তু আপনার ফোন এখনো তা জানে না, তাই নামাজের সময় এক ঘণ্টা আগে দেখাতে পারে। সর্বশেষ সিস্টেম আপডেট থাকলে তা ইনস্টল করুন এবং তারিখ ও সময় স্বয়ংক্রিয় রাখুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে। |
+| | fr | — | %1$s garde la même heure toute l’année depuis le %2$s et votre téléphone ne le sait pas encore : les horaires de prière peuvent avoir une heure d’avance. Installez la dernière mise à jour du système, s’il y en a une, et laissez la date et l’heure en automatique : les alertes ne sont justes qu’avec l’heure automatique. |
+| | id | — | %1$s memakai satu waktu sepanjang tahun sejak %2$s dan ponsel Anda belum mengikutinya, jadi waktu salat bisa satu jam terlalu awal. Pasang pembaruan sistem terbaru, jika ada, dan biarkan tanggal dan waktu diatur otomatis: pengingat hanya tepat jika jam diatur otomatis. |
+| | tr | — | %1$s, %2$s tarihinden beri yıl boyunca tek bir saat kullanıyor ve telefonunuz bunu henüz bilmiyor; bu yüzden namaz vakitleri bir saat erken görünebilir. Varsa en son sistem güncellemesini yükleyin ve tarih ile saati otomatik ayarda tutun: uyarılar yalnızca saat otomatikken doğru çalışır. |
+| | ur | — | %1$s میں %2$s سے سارا سال ایک ہی وقت رکھا جاتا ہے اور آپ کے فون کو ابھی اس کا علم نہیں، اس لیے نماز کے اوقات ایک گھنٹہ پہلے دکھائی دے سکتے ہیں۔ تازہ ترین سسٹم اپ ڈیٹ، اگر کوئی ہو، انسٹال کریں، اور تاریخ اور وقت کو خودکار رکھیں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔ |
+| `prayer_clock_kept_manual_early` (new; `_late` likewise) | en | — | %1$s has kept one time all year since %2$s. If you set the clock by hand, prayer times may be an hour early. Turn on automatic date and time: alerts are right only when the clock is automatic. |
+| | ar | — | التوقيت في %1$s ثابت طوال العام منذ %2$s. إن كنت ضبطت الساعة يدويًا فقد تظهر مواقيت الصلاة مبكرة بساعة. فعّل ضبط التاريخ والوقت تلقائيًا: لا تكون التنبيهات صحيحة إلا إذا كانت الساعة مضبوطة تلقائيًا. |
+| | bn | — | %1$s %2$s থেকে সারা বছর একই সময় রাখছে। আপনি হাতে ঘড়ি ঠিক করে থাকলে নামাজের সময় এক ঘণ্টা আগে দেখাতে পারে। স্বয়ংক্রিয় তারিখ ও সময় চালু করুন: ঘড়ি স্বয়ংক্রিয় থাকলেই কেবল সতর্কবার্তা ঠিক থাকে। |
+| | fr | — | %1$s garde la même heure toute l’année depuis le %2$s. Si vous avez réglé l’horloge à la main, les horaires de prière peuvent avoir une heure d’avance. Activez la date et l’heure automatiques : les alertes ne sont justes qu’avec l’heure automatique. |
+| | id | — | %1$s memakai satu waktu sepanjang tahun sejak %2$s. Jika Anda mengatur jam secara manual, waktu salat bisa satu jam terlalu awal. Nyalakan tanggal dan waktu otomatis: pengingat hanya tepat jika jam diatur otomatis. |
+| | tr | — | %1$s, %2$s tarihinden beri yıl boyunca tek bir saat kullanıyor. Saati elle ayarladıysanız namaz vakitleri bir saat erken görünebilir. Otomatik tarih ve saati açın: uyarılar yalnızca saat otomatikken doğru çalışır. |
+| | ur | — | %1$s میں %2$s سے سارا سال ایک ہی وقت رکھا جاتا ہے۔ اگر آپ نے گھڑی خود ملائی ہے تو نماز کے اوقات ایک گھنٹہ پہلے دکھائی دے سکتے ہیں۔ خودکار تاریخ اور وقت آن کریں: الرٹ صرف خودکار گھڑی پر درست ہوتے ہیں۔ |
+| `prayer_clock_region_syria` | ur | شام | ملکِ شام |
+
+Points for the reader:
+- **Arabic** avoids a verb that would have to agree with the place's gender (الأردن is masculine, سوريا
+  feminine): "التوقيت في … ثابت طوال العام منذ …", the time in the place is fixed all year since the date. The
+  seasonal sentences (B) use the passive for the same reason.
+- **Bengali** keeps the place first and the date after it, as the existing sentences do; "রাখছে" (keeps) with the
+  place as subject.
+- **French** regions carry their article with a capital ("La Syrie", "Le Yukon") because every sentence starts
+  with the place; the new ones do too.
+- **Turkish** "tarihinden beri … kullanıyor" (has used since the date), place first with the comma the existing
+  sentences use after it.
+- **Urdu** "… میں … سے سارا سال ایک ہی وقت رکھا جاتا ہے" (in the place, since the date, one time is kept all
+  year), passive, so no verb agrees with the place.
+- The `manual` strings ("Turn on automatic date and time") name no system update, so they did not gain "if there
+  is one".

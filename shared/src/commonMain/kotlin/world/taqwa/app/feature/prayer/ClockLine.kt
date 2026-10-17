@@ -39,10 +39,15 @@ import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.isolated
+import world.taqwa.app.prayer.ClockChange
 import world.taqwa.app.prayer.ClockIssue
 import world.taqwa.app.prayer.ClockWarning
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.prayer_card_ok
+import world.taqwa.app.resources.prayer_clock_kept_manual_early
+import world.taqwa.app.resources.prayer_clock_kept_manual_late
+import world.taqwa.app.resources.prayer_clock_kept_stale_early
+import world.taqwa.app.resources.prayer_clock_kept_stale_late
 import world.taqwa.app.resources.prayer_clock_line
 import world.taqwa.app.resources.prayer_clock_manual_early
 import world.taqwa.app.resources.prayer_clock_manual_late
@@ -67,8 +72,10 @@ import world.taqwa.app.resources.prayer_clock_stale_late
 expect fun clockSetByHand(): Boolean?
 
 /**
- * The clock line (spec §3.9, mockup §2): one tinted line above the ring, "Your phone's clock may
- * be an hour off ›", opening [ClockSheet]. Sideways it heads the right pane.
+ * The clock line (spec §3.9, mockup §2): one tinted line above the ring, "Prayer times may be an
+ * hour off ›", opening [ClockSheet]. Sideways it heads the right pane. It speaks of the times, not
+ * the phone's clock: a phone kept on a zone of the true offset with a city picked from the list has
+ * a right clock and times drawn an hour early (BUILD-LOG, 17 October).
  */
 @Composable
 internal fun ClockLine(onClick: () -> Unit, horizontalPadding: Dp) {
@@ -104,20 +111,15 @@ internal fun ClockLine(onClick: () -> Unit, horizontalPadding: Dp) {
 }
 
 /**
- * The fix, in the direction this phone is off: which place changed its clocks and when, whether
- * the times may be an hour early or late, and that alerts are right only when the clock is
- * automatic (spec §3.9).
+ * The fix, in the direction this phone is off: which place changed its clocks and when, or has
+ * kept one time all year since when, whether the times may be an hour early or late, and that
+ * alerts are right only when the clock is automatic (spec §3.9).
  */
 @Composable
 internal fun ClockSheet(warning: ClockWarning, onDismiss: () -> Unit) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
-    val body: StringResource = when (warning.issue) {
-        ClockIssue.STALE_ZONE_DATA ->
-            if (warning.timesEarly) Res.string.prayer_clock_stale_early else Res.string.prayer_clock_stale_late
-        ClockIssue.SET_BY_HAND ->
-            if (warning.timesEarly) Res.string.prayer_clock_manual_early else Res.string.prayer_clock_manual_late
-    }
+    val body = clockBodyRes(warning.change, warning.issue, warning.timesEarly)
     val region = clockRegionRes(warning.change.id)
     TaqwaBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -162,4 +164,26 @@ internal fun clockRegionRes(changeId: String): StringResource = when (changeId) 
     "chihuahua" -> Res.string.prayer_clock_region_chihuahua
     "paraguay" -> Res.string.prayer_clock_region_paraguay
     else -> Res.string.prayer_clock_region_kazakhstan
+}
+
+/**
+ * The sentence [ClockSheet] shows for [change], true to what the place did (spec §3.9): a place
+ * whose clocks went back once (Morocco, Kazakhstan; [ClockChange.shiftHours] −1) "changed its
+ * clocks on" the date; one that stopped turning them back (British Columbia, Syria, Paraguay; +1)
+ * "has kept one time all year since" it, as its date is no clock movement. Each in the direction
+ * the times are off ([timesEarly]) and for the fix the phone needs ([issue]).
+ */
+internal fun clockBodyRes(change: ClockChange, issue: ClockIssue, timesEarly: Boolean): StringResource = when {
+    change.shiftHours > 0 -> when (issue) {
+        ClockIssue.STALE_ZONE_DATA ->
+            if (timesEarly) Res.string.prayer_clock_kept_stale_early else Res.string.prayer_clock_kept_stale_late
+        ClockIssue.SET_BY_HAND ->
+            if (timesEarly) Res.string.prayer_clock_kept_manual_early else Res.string.prayer_clock_kept_manual_late
+    }
+    else -> when (issue) {
+        ClockIssue.STALE_ZONE_DATA ->
+            if (timesEarly) Res.string.prayer_clock_stale_early else Res.string.prayer_clock_stale_late
+        ClockIssue.SET_BY_HAND ->
+            if (timesEarly) Res.string.prayer_clock_manual_early else Res.string.prayer_clock_manual_late
+    }
 }

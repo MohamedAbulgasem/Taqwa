@@ -77,7 +77,7 @@ sealed interface PrayerUiState {
         val polar: Boolean = false,
         /** The one-time card below the list, when one is due this launch (spec §2.1). */
         val oneTimeCard: OneTimeCard? = null,
-        /** Why the phone's clock may be an hour off for this place, when it may (spec §3.9). */
+        /** Why the times may be an hour off for this place, when they may (spec §3.9). */
         val clockWarning: ClockWarning? = null,
         /** "Show both Asr times": the other school's Asr, under Asr (spec §2.1). */
         val otherAsr: OtherAsr? = null,

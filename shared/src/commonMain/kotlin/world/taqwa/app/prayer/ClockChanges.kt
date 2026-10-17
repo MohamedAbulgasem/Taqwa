@@ -14,7 +14,10 @@ import kotlin.time.Instant
  * - [zones]: the IANA zones it applies to.
  * - [from]: the local date from which [trueOffsetSeconds] is the offset all year.
  * - [shiftHours]: which way the clocks moved: −1 when they went back (Morocco), +1 when they stayed
- *   forward (British Columbia, Alberta, Manitoba, Yukon, Syria, Jordan, Chihuahua, Paraguay).
+ *   forward (British Columbia, Alberta, Manitoba, Yukon, Syria, Jordan, Chihuahua, Paraguay). It
+ *   picks the sheet's sentence too: a −1 place "changed its clocks on" [from]; a +1 place "has kept
+ *   one time all year since" it, because its [from] is the day the clocks did not go back, not a
+ *   clock movement.
  * - [until]: when the stale-zone-data check stops; by then few phones still in use lack the new
  *   zone data. A clock set by hand is flagged for a shorter time, [ClockChanges.HAND_SET_DAYS].
  */
