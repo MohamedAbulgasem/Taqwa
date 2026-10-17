@@ -18,18 +18,23 @@ import kotlin.time.Instant
  *
  * `PrayerViewModel` writes the mirror while the Prayer screen is open, and the mirror's two-day
  * schedule lets a widget count across prayers on its own after that. This is what pushes the
- * horizon forward when the app has not been opened: Android calls it from the prayer alarm and the
- * boot/time-change receiver, iOS from its daily background refresh. Cheap (three days of prayer
- * times) and quiet: no location fix is requested, and a missing location simply writes nothing.
+ * horizon forward when the app has not been opened, called from:
+ *  - Android's `PrayerAlarmReceiver`, as each prayer arrives;
+ *  - Android's `SystemEventReceiver`, on boot and the other system events it listens for;
+ *  - Android's `NotificationTopUpWorker`, twice a day: the one left when notifications are off;
+ *  - iOS's `BackgroundRefreshBridge`, from its daily background refresh.
+ *
+ * Cheap (three days of prayer times) and quiet: no location fix is requested, and a missing
+ * location simply writes nothing.
  */
 object WidgetMirrorRefresher {
 
     /**
      * [format] is the app's own, when a caller already holds one in the language it wants written.
      * Null builds one from the stored clock format, the device's default language and
-     * [settings] - what the alarm and boot receivers and iOS's background refresh pass, and what
-     * a caller that has just changed the clock format passes so the mirror is not written with
-     * the format the composition has yet to rebuild.
+     * [settings] - what a caller with no screen of its own passes, and what a caller that has
+     * just changed the clock format passes so the mirror is not written with the format the
+     * composition has yet to rebuild.
      */
     suspend fun refresh(
         settings: SettingsRepository,
