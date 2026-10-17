@@ -206,9 +206,13 @@ internal fun NotificationSettingsRoute(
  * change, are computed off the main thread (the coordinator plans on the default dispatcher, and
  * so does the mirror here).
  */
-internal suspend fun refreshForNewTimes(container: AppContainer, settings: SettingsRepository) {
+internal suspend fun refreshForNewTimes(
+    container: AppContainer,
+    settings: SettingsRepository,
+    trigger: RescheduleTrigger = RescheduleTrigger.SETTINGS_CHANGED,
+) {
     newTimesRefresh.withLock {
-        container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+        container.notificationCoordinator.reschedule(trigger)
         withContext(Dispatchers.Default) {
             // Null, not the composition's format: that is rebuilt on a new clock format only a
             // frame after the write that just happened, so it can still be the old one. Null

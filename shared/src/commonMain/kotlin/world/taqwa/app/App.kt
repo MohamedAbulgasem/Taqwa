@@ -17,7 +17,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.first
@@ -43,6 +42,7 @@ import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.design.components.TaqwaTabScaffold
 import world.taqwa.app.nav.LaunchRequests
+import world.taqwa.app.nav.ownLinkUriHandler
 import world.taqwa.app.nav.openReading
 import world.taqwa.app.nav.recitationTarget
 import world.taqwa.app.nav.Navigator
@@ -184,7 +184,11 @@ fun App(container: AppContainer) {
         refreshPermissions = ::refreshPermissions,
         recitation = recitation,
         openPlaying = openPlaying,
-        reschedule = { scope.launch { container.notificationCoordinator.reschedule(RescheduleTrigger.APP_FOREGROUND) } },
+        // The widgets with the plan: the return's location check can have moved the place, and
+        // the Home and Lock Screen widgets would otherwise keep the old city until the Prayer
+        // screen opens. An unmoved return rewrites nothing (the mirror and the reload skip
+        // unchanged content).
+        reschedule = { scope.launch { refreshForNewTimes(container, settings, RescheduleTrigger.APP_FOREGROUND) } },
     )
 
     // Onboarding's Continue on the notifications screen: the system ask has already happened by
@@ -215,7 +219,8 @@ fun App(container: AppContainer) {
         // On iOS the launch's plan is made the first time the app is in front (ForegroundEffect),
         // which is not always when it first composes: a scene composed in the background is
         // planned when the person opens it, and a background launch that never comes to the front
-        // relies on the refresh task's own plan. Android plans here, as it always has.
+        // (a refresh task or a download wake) keeps the plan already armed; the refresh task also
+        // makes its own. Android plans here, as it always has.
         if (!returnToFrontReschedules) {
             container.notificationCoordinator.reschedule(world.taqwa.app.notifications.RescheduleTrigger.APP_FOREGROUND)
         }
@@ -290,22 +295,9 @@ fun App(container: AppContainer) {
     }
 
     // Every link the app opens itself (a web page, a mail) goes through here, so the iOS return
-    // from it comes back to the screen it left from rather than to the recited ayah
-    // (LaunchRequests.openingLink). A link that throws is not a trip.
+    // from it comes back to the screen it left from rather than to the recited ayah.
     val platformUriHandler = LocalUriHandler.current
-    val uriHandler = remember(platformUriHandler) {
-        object : UriHandler {
-            override fun openUri(uri: String) {
-                LaunchRequests.openingLink()
-                try {
-                    platformUriHandler.openUri(uri)
-                } catch (e: Throwable) {
-                    LaunchRequests.linkDidNotOpen()
-                    throw e
-                }
-            }
-        }
-    }
+    val uriHandler = remember(platformUriHandler) { ownLinkUriHandler(platformUriHandler) }
 
     CompositionLocalProvider(
         LocalLayoutDirection provides layoutDirection,

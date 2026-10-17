@@ -3,7 +3,9 @@ package world.taqwa.app.nav
 import kotlinx.datetime.LocalDate
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.notifications.adhkarNotificationId
+import androidx.compose.ui.platform.UriHandler
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -164,5 +166,25 @@ class LaunchRequestsTest {
         } finally {
             LaunchRequests.clock = TimeSource.Monotonic
         }
+    }
+
+    /** A link opened through the app's own handler is the app's trip: the next leave is for it. */
+    @Test
+    fun `a link opened through the app's handler marks the next leave as its own`() {
+        val handler = ownLinkUriHandler(object : UriHandler {
+            override fun openUri(uri: String) = Unit
+        })
+        handler.openUri("https://taqwa.world/privacy")
+        assertTrue(LaunchRequests.leavingForOwnLink())
+    }
+
+    /** A link the platform cannot open throws: no trip is noted, and the caller still hears it. */
+    @Test
+    fun `a link that cannot open is no trip and its failure goes on to the caller`() {
+        val handler = ownLinkUriHandler(object : UriHandler {
+            override fun openUri(uri: String) = throw IllegalStateException("nothing opens mailto")
+        })
+        assertFailsWith<IllegalStateException> { handler.openUri("mailto:support@taqwa.world") }
+        assertFalse(LaunchRequests.leavingForOwnLink())
     }
 }

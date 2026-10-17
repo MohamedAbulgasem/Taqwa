@@ -1,7 +1,9 @@
 package world.taqwa.app.notifications
 
 /**
- * Whether the app coming back to the front re-plans the notifications, as a launch does.
+ * Whether the notifications are planned each time the app is in front, the first time included,
+ * in place of the plan made when App first composes. True also moves the launch's own plan there,
+ * so setting it false for iOS would leave iOS with no plan at launch at all.
  *
  * iOS says yes. A request added while notifications are not allowed is refused, and nothing
  * retries it: someone who turns notifications on in iOS Settings and comes back to the app had

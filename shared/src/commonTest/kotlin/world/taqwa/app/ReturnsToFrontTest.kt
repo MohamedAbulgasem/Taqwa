@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -144,6 +145,7 @@ class ReturnsToFrontTest {
         playing: () -> Boolean,
         requests: () -> Long = { 0L },
         leftForOwnLink: () -> Boolean = { false },
+        lastLeave: MutableStateFlow<Leave?> = MutableStateFlow(null),
     ) = suspend {
         eachTimeInFront(
             requestsMade = requests,
@@ -151,6 +153,7 @@ class ReturnsToFrontTest {
             reschedule = { effects.reschedules++ },
             playing = playing,
             openPlaying = { effects.jumps += it },
+            lastLeave = lastLeave,
         )
     }
 
@@ -221,5 +224,47 @@ class ReturnsToFrontTest {
         }
         assertEquals(listOf(0L), effects.jumps)
         assertEquals(2, effects.reschedules)
+    }
+
+    /**
+     * iOS can build the scene afresh while a recitation keeps the process alive, and a widget tap
+     * can be what rebuilt it, counted before the new composition starts watching. The new watcher
+     * starts from the process's last leave, not from its own start, so the jump still yields to it.
+     */
+    @Test
+    fun aCompositionBuiltAfreshStartsFromTheLastLeaveOfTheProcess() {
+        val lastLeave = MutableStateFlow<Leave?>(null)
+        var requests = 3L
+        val before = Effects()
+        runApp(watch = { watched(before, playing = { true }, requests = { requests }, lastLeave = lastLeave)() }) { app ->
+            goTo(app, Lifecycle.State.RESUMED)
+            goTo(app, Lifecycle.State.CREATED)
+        }
+        requests = 4L
+        val after = Effects()
+        runApp(watch = { watched(after, playing = { true }, requests = { requests }, lastLeave = lastLeave)() }) { app ->
+            goTo(app, Lifecycle.State.RESUMED)
+        }
+        assertEquals(listOf(3L), after.jumps)
+    }
+
+    /** The same for a link the app opened: the scene rebuilt on the way back still knows it. */
+    @Test
+    fun aCompositionBuiltAfreshKnowsTheProcessLeftForItsOwnLink() {
+        val lastLeave = MutableStateFlow<Leave?>(null)
+        var ownLink = false
+        val before = Effects()
+        runApp(watch = { watched(before, playing = { true }, leftForOwnLink = { ownLink }, lastLeave = lastLeave)() }) { app ->
+            goTo(app, Lifecycle.State.RESUMED)
+            ownLink = true
+            goTo(app, Lifecycle.State.CREATED)
+        }
+        ownLink = false
+        val after = Effects()
+        runApp(watch = { watched(after, playing = { true }, leftForOwnLink = { ownLink }, lastLeave = lastLeave)() }) { app ->
+            goTo(app, Lifecycle.State.RESUMED)
+        }
+        assertEquals(emptyList(), after.jumps)
+        assertEquals(1, after.reschedules)
     }
 }

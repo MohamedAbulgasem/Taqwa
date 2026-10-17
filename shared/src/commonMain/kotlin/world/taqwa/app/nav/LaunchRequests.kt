@@ -1,5 +1,6 @@
 package world.taqwa.app.nav
 
+import androidx.compose.ui.platform.UriHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.getAndUpdate
@@ -192,4 +193,22 @@ object LaunchRequests {
     private val LINK_LEAVE_WINDOW = 5.seconds
     private const val SURAH_COUNT = 114
     private const val LONGEST_SURAH = 286
+}
+
+/**
+ * [platform], with every link it opens noted as the app's own trip ([LaunchRequests.openingLink]),
+ * so the iOS return from it comes back to the screen it left from rather than to the recited ayah.
+ * A link the platform cannot open throws: that is no trip, so the note is cleared and the throw
+ * goes on to the caller, which already handles it.
+ */
+internal fun ownLinkUriHandler(platform: UriHandler): UriHandler = object : UriHandler {
+    override fun openUri(uri: String) {
+        LaunchRequests.openingLink()
+        try {
+            platform.openUri(uri)
+        } catch (e: Throwable) {
+            LaunchRequests.linkDidNotOpen()
+            throw e
+        }
+    }
 }
