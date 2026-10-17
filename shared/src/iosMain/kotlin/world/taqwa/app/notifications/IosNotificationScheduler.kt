@@ -14,7 +14,6 @@ import platform.Foundation.NSCalendarUnitYear
 import platform.Foundation.NSDate
 import platform.Foundation.NSTimeZone
 import platform.Foundation.dateWithTimeIntervalSince1970
-import platform.Foundation.localTimeZone
 import platform.Foundation.timeZoneWithName
 import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
@@ -78,7 +77,7 @@ class IosNotificationScheduler : NotificationScheduler {
 
         center.addNotificationRequest(
             UNNotificationRequest.requestWithIdentifier(
-                entry.id, content, triggerFor(entry.instant, entry.timeZoneId),
+                entry.id, content, triggerFor(entry.instant),
             ),
             withCompletionHandler = null,
         )
@@ -98,8 +97,8 @@ class IosNotificationScheduler : NotificationScheduler {
     internal companion object {
 
         /**
-         * The trigger for one entry, with its calendar and timezone **pinned onto the
-         * components** rather than merely used to derive them.
+         * The trigger for one entry: its instant as UTC date components, with the calendar and
+         * the timezone **pinned onto the components** rather than merely used to derive them.
          *
          * `NSDateComponents` produced by `components(unitFlags:fromDate:)` carry a `calendar` and
          * a `timeZone` only when [NSCalendarUnitCalendar] / [NSCalendarUnitTimeZone] are among
@@ -111,9 +110,16 @@ class IosNotificationScheduler : NotificationScheduler {
          * a date in the distant past, so the notification never fires at all. That is also why
          * the calendar here is built explicitly as Gregorian instead of taken from
          * `NSCalendar.currentCalendar`.
+         *
+         * The zone pinned is UTC, not the city's. The instant is already absolute, and a time of
+         * day in a zone that keeps summer time can name two instants: on the night the clocks go
+         * back an hour repeats, Foundation settles a repeated time on its first occurrence, and an
+         * entry in the second pass (Tahajjud's last third on that night in Europe or North
+         * America) fired an hour early. UTC repeats no hour and skips none, so its components name
+         * exactly one instant.
          */
-        internal fun triggerFor(instant: Instant, timeZoneId: String): UNCalendarNotificationTrigger {
-            val timeZone = NSTimeZone.timeZoneWithName(timeZoneId) ?: NSTimeZone.localTimeZone
+        internal fun triggerFor(instant: Instant): UNCalendarNotificationTrigger {
+            val timeZone = NSTimeZone.timeZoneWithName("UTC")!!
             val calendar = NSCalendar.calendarWithIdentifier(NSCalendarIdentifierGregorian)!!
                 .apply { this.timeZone = timeZone }
             val components = calendar.components(
