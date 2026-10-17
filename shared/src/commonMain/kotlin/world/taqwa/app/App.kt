@@ -16,6 +16,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.first
@@ -52,6 +54,7 @@ import world.taqwa.app.notifications.NotificationOnboarding
 import world.taqwa.app.notifications.canScheduleExactAlarms
 import world.taqwa.app.notifications.isNotificationPermissionGranted
 import world.taqwa.app.notifications.RescheduleTrigger
+import world.taqwa.app.notifications.returnToFrontReschedules
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.ui_language
 import world.taqwa.app.feature.quran.QuranRootScreen
@@ -137,40 +140,37 @@ fun App(container: AppContainer) {
     }
 
     // "Show me the ayah being recited" (spec §15.5), from the bar's words, the media
-    // notification's tap, or - on iOS, which has no such tap - the app coming to the front with
-    // a voice going. A screen already showing the surah is asked to scroll (the token); any other
-    // is replaced or pushed with the reader the user reads in, at the ayah, following armed.
-    // A return to the front passes the request count from when the app left, and the jump is
-    // dropped if any request has arrived since, before its reading settings load or after: the
-    // adhkar reminder or the widget tap that brought the app back wins.
+    // notification's tap, or - on iOS, which has no such tap - the app in front again with a
+    // voice going (jumpToPlaying). A screen already showing the surah is asked to scroll (the
+    // token); any other is replaced or pushed with the reader the user reads in, at the ayah,
+    // following armed. A return to the front passes the request count from when the app left, and
+    // the jump yields to any request counted since.
     val jumpTokenState = remember { mutableStateOf(0) }
     var jumpToken by jumpTokenState
     val jumpScope = rememberCoroutineScope()
     val openPlaying: (yieldToRequestsSince: Long?) -> Unit = { since ->
-        val playing = recitation.state.value.bar
-        fun yielded() = since != null && LaunchRequests.count != since
-        if (playing != null && !yielded()) {
-            jumpScope.launch {
-                val current = navigator.current
-                val onQuran = navigator.currentTab == Tab.QURAN
-                val showsIt = onQuran && ((current is Screen.Reader && current.surah == playing.surah) || current is Screen.Mushaf)
-                if (showsIt) {
-                    jumpToken++
-                } else {
-                    runCatching {
-                        val reading = settings.readingSettings(platformFormat.languageTag()).first()
-                        val target = recitationTarget(reading.mode, playing.surah, playing.ayah) { s, a ->
-                            container.quranRepository.pageOf(s, a)
-                        }
-                        if (!yielded()) navigator.openReading(target)
-                    }
-                }
-            }
+        jumpScope.launch {
+            jumpToPlaying(
+                playing = recitation.state.value.bar?.let { it.surah to it.ayah },
+                yieldToRequestsSince = since,
+                requestsMade = { LaunchRequests.count },
+                showsSurah = { surah ->
+                    val current = navigator.current
+                    navigator.currentTab == Tab.QURAN &&
+                        ((current is Screen.Reader && current.surah == surah) || current is Screen.Mushaf)
+                },
+                scroll = { jumpToken++ },
+                target = { surah, ayah ->
+                    val reading = settings.readingSettings(platformFormat.languageTag()).first()
+                    recitationTarget(reading.mode, surah, ayah) { s, a -> container.quranRepository.pageOf(s, a) }
+                },
+                open = navigator::openReading,
+            )
         }
     }
     PlayingLaunchRequests(
         settings = settings,
-        openPlaying = openPlaying,
+        openPlaying = { openPlaying(null) },
     )
     AdhkarLaunchRequests(
         settings = settings,
@@ -212,7 +212,13 @@ fun App(container: AppContainer) {
             navigator.replaceAll(Screen.Onboarding)
         }
         startResolved = true
-        container.notificationCoordinator.reschedule(world.taqwa.app.notifications.RescheduleTrigger.APP_FOREGROUND)
+        // On iOS the launch's plan is made the first time the app is in front (ForegroundEffect),
+        // which is not always when it first composes: a scene composed in the background is
+        // planned when the person opens it, and a background launch that never comes to the front
+        // relies on the refresh task's own plan. Android plans here, as it always has.
+        if (!returnToFrontReschedules) {
+            container.notificationCoordinator.reschedule(world.taqwa.app.notifications.RescheduleTrigger.APP_FOREGROUND)
+        }
     }
 
     RecitationLibraryStartUp(
@@ -283,9 +289,28 @@ fun App(container: AppContainer) {
         }
     }
 
+    // Every link the app opens itself (a web page, a mail) goes through here, so the iOS return
+    // from it comes back to the screen it left from rather than to the recited ayah
+    // (LaunchRequests.openingLink). A link that throws is not a trip.
+    val platformUriHandler = LocalUriHandler.current
+    val uriHandler = remember(platformUriHandler) {
+        object : UriHandler {
+            override fun openUri(uri: String) {
+                LaunchRequests.openingLink()
+                try {
+                    platformUriHandler.openUri(uri)
+                } catch (e: Throwable) {
+                    LaunchRequests.linkDidNotOpen()
+                    throw e
+                }
+            }
+        }
+    }
+
     CompositionLocalProvider(
         LocalLayoutDirection provides layoutDirection,
         LocalPlatformFormat provides platformFormat,
+        LocalUriHandler provides uriHandler,
     ) {
         TaqwaTheme(themeMode) {
             Box(Modifier.fillMaxSize().background(LocalTaqwaColors.current.background)) {

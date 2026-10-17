@@ -2,9 +2,13 @@ package world.taqwa.app.nav
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.notifications.adhkarSetOfNotificationId
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 /**
  * The one-shot channel a widget tap uses to ask the app to open an ayah (design spec §8): the
@@ -28,6 +32,38 @@ object LaunchRequests {
 
     private fun counted() {
         _count.update { it + 1 }
+    }
+
+    /** The clock [leavingForOwnLink] measures by; replaced only by tests. */
+    internal var clock: TimeSource = TimeSource.Monotonic
+
+    private val linkOpenedAt = MutableStateFlow<TimeMark?>(null)
+
+    /**
+     * The app is about to send the person elsewhere itself: a web page, a mail, iOS Settings. A
+     * leave of the front a moment later is that trip ([leavingForOwnLink]), and the return from it
+     * brings the person back to the screen they left from rather than to the recited ayah. Noted
+     * before the link opens rather than counted as a request: the return compares the count with
+     * what it was when the app left, and a count bumped before leaving would be part of that.
+     */
+    fun openingLink() {
+        linkOpenedAt.value = clock.markNow()
+    }
+
+    /** The link reported that it did not open: the app is not leaving for it after all. */
+    fun linkDidNotOpen() {
+        linkOpenedAt.value = null
+    }
+
+    /**
+     * Asked as the app leaves the front: whether it is leaving for a link it opened itself a
+     * moment ago. Answered once. A link that opened nothing without saying so (the platform's own
+     * link handler reports nothing) is forgotten after a few seconds, so a later leave that is the
+     * person's own is not taken for it.
+     */
+    fun leavingForOwnLink(): Boolean {
+        val opened = linkOpenedAt.getAndUpdate { null }
+        return opened != null && opened.elapsedNow() < LINK_LEAVE_WINDOW
     }
 
     private val _pendingAyah = MutableStateFlow<Pair<Int, Int>?>(null)
@@ -153,6 +189,7 @@ object LaunchRequests {
         _pendingSearch.value = null
     }
 
+    private val LINK_LEAVE_WINDOW = 5.seconds
     private const val SURAH_COUNT = 114
     private const val LONGEST_SURAH = 286
 }

@@ -35,13 +35,13 @@ import world.taqwa.app.widget.refreshWidgets
 @Composable
 internal fun PlayingLaunchRequests(
     settings: SettingsRepository,
-    openPlaying: (yieldToRequestsSince: Long?) -> Unit,
+    openPlaying: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         settings.onboardingComplete.filter { it }.first()
         LaunchRequests.pendingPlaying.collect { asked ->
             if (asked) {
-                openPlaying(null)
+                openPlaying()
                 LaunchRequests.consumePlaying()
             }
         }
@@ -97,17 +97,17 @@ internal fun DebugScreenRequests(
 }
 
 /**
- * What the app does each time it is active again, and each time it is back in front.
+ * What the app does each time it is active again, and each time it is in front.
  *
  * Active again, after Control Center or a system alert as much as after the background: the
  * permissions are read afresh, and a voice that was missing is asked about again.
  *
- * Back in front from the background, on iOS only (see [foregroundReturnsToRecitation] and
- * [returnToFrontReschedules]): with a recitation playing, the ayah being recited is opened, unless
- * a request has asked for another screen since the app left (an adhkar reminder or a widget tap,
- * which can arrive just before the return or just after it); and the notifications are planned
- * again. Neither happens for Control Center, Notification Center or an alert, which leave the app
- * in front: they used to move the reader to the recited ayah on every pull.
+ * In front, the first time included, on iOS only (see [foregroundReturnsToRecitation] and
+ * [returnToFrontReschedules]): the notifications are planned again, and with a recitation playing
+ * the ayah being recited is opened, unless the app left for a link of its own or a request has
+ * asked for another screen since it left ([eachTimeInFront], [jumpToPlaying]). Neither happens for
+ * Control Center, Notification Center or an alert, which leave the app in front: they used to
+ * move the reader to the recited ayah on every pull.
  */
 @Composable
 internal fun ForegroundEffect(
@@ -126,10 +126,13 @@ internal fun ForegroundEffect(
         }
     }
     LaunchedEffect(appLifecycle) {
-        appLifecycle.lifecycle.onEachReturnToFront(requestsMade = { LaunchRequests.count }) { requestsWhenItLeft ->
-            if (foregroundReturnsToRecitation && recitation.state.value.bar?.playing == true) openPlaying(requestsWhenItLeft)
-            if (returnToFrontReschedules) reschedule()
-        }
+        appLifecycle.lifecycle.eachTimeInFront(
+            requestsMade = { LaunchRequests.count },
+            leftForOwnLink = LaunchRequests::leavingForOwnLink,
+            reschedule = { if (returnToFrontReschedules) reschedule() },
+            playing = { foregroundReturnsToRecitation && recitation.state.value.bar?.playing == true },
+            openPlaying = openPlaying,
+        )
     }
 }
 

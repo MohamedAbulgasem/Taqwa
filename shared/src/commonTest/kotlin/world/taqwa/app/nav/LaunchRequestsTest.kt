@@ -5,6 +5,11 @@ import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.notifications.adhkarNotificationId
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TestTimeSource
+import kotlin.time.TimeSource
 import kotlin.test.assertNull
 
 class LaunchRequestsTest {
@@ -127,5 +132,37 @@ class LaunchRequestsTest {
         LaunchRequests.openAdhkarFromExtra("night")
         LaunchRequests.openAdhkarForNotification("FAJR-PRAYER-2026-10-17")
         assertEquals(before, LaunchRequests.count)
+    }
+
+    /**
+     * The app sending the person elsewhere itself (a link, a mail, iOS Settings) is the reason it
+     * leaves the front if it leaves a moment later, and only for that leave.
+     */
+    @Test
+    fun `a link the app opened is the reason for the next leave and only that one`() {
+        LaunchRequests.openingLink()
+        assertTrue(LaunchRequests.leavingForOwnLink())
+        assertFalse(LaunchRequests.leavingForOwnLink())
+    }
+
+    @Test
+    fun `a link that did not open is no reason to leave`() {
+        LaunchRequests.openingLink()
+        LaunchRequests.linkDidNotOpen()
+        assertFalse(LaunchRequests.leavingForOwnLink())
+    }
+
+    /** A link that opened nothing without saying so is forgotten: the next real leave is not its. */
+    @Test
+    fun `a leave long after the link was opened is not for it`() {
+        val clock = TestTimeSource()
+        LaunchRequests.clock = clock
+        try {
+            LaunchRequests.openingLink()
+            clock += 6.seconds
+            assertFalse(LaunchRequests.leavingForOwnLink())
+        } finally {
+            LaunchRequests.clock = TimeSource.Monotonic
+        }
     }
 }
