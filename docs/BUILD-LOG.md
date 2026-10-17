@@ -5214,6 +5214,20 @@ Paraguay has until March.
   Android 8 and 9 usually means never. The line says which way and gives the fix, as for British Columbia.
 - The site needs nothing: its pages do not read the table (ae7b32c3's message has the byte-for-byte check).
 
+Open for the Lead (review of ae7b32c3, reported only): the line's words for a phone whose own clock is
+right. Four years on, an owner of an old phone in Syria or Jordan has probably worked around the stale data,
+and a likely way (an inference, not measured) is a fixed zone with the true offset, Baghdad or Riyadh for
++03, with automatic time on: the phone's clock is right. A place picked from the city list keeps the city's
+own zone (`SettingsRepository.location`, `timeZoneId`), so Taqwa draws its times at Asia/Damascus's stale
++02, an hour early, and the line shows. Its headline, "Your phone's clock may be an hour off", is then false
+(the clock is right, Taqwa's times are off), and the sheet's fix (install the latest system update, keep date
+and time on automatic) is one the user has already applied or cannot (Android 8 and 9 rarely have an
+update). The alerts, set by instant, go off on time. A place found by GPS keeps the phone's own zone
+(`LocationRepository.resolveGpsLocation`), so no row matches and its times are right; a phone left on
+Asia/Damascus with its clock set by hand gets the stale sheet with "early", which is right for it. The
+date sentence reads correctly in all eight languages (past tense, the full date with its year). The
+headline and the fix text for this user need a decision; no rewrite in this round.
+
 Checked for this entry: the old-data transitions above with 2018e's rules written as POSIX TZ strings
 (Syria last Friday of October 0:00, Jordan last Friday 0:00 standard time, Mexico last Sunday 2:00, Canada
 first Sunday of November 2:00, Paraguay fourth Sunday of March 0:00 and back on October's first), each
