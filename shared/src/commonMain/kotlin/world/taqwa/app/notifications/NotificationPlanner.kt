@@ -129,7 +129,6 @@ object NotificationPlanner {
                         prayer = Prayer.FAJR,
                         kind = NotificationKind.TAHAJJUD,
                         instant = at,
-                        timeZoneId = location.timeZoneId,
                         sound = notifications.tahajjudSound,
                         voice = notifications.voice,
                         title = copy.title(Prayer.FAJR, NotificationKind.TAHAJJUD),
@@ -160,7 +159,6 @@ object NotificationPlanner {
                             prayer = prayer,
                             kind = kind,
                             instant = at,
-                            timeZoneId = location.timeZoneId,
                             sound = notifications.adhkarSound,
                             voice = notifications.voice,
                             title = copy.title(prayer, kind),
@@ -190,7 +188,6 @@ object NotificationPlanner {
                             prayer = prayer,
                             kind = NotificationKind.PRAYER,
                             instant = at,
-                            timeZoneId = location.timeZoneId,
                             sound = notifications.soundFor(prayer),
                             voice = notifications.voice,
                             title = copy.title(prayer, NotificationKind.PRAYER),
@@ -216,7 +213,6 @@ object NotificationPlanner {
                                 prayer = prayer,
                                 kind = NotificationKind.REMINDER,
                                 instant = remindAt,
-                                timeZoneId = location.timeZoneId,
                                 // A reminder is a nudge, not the call: it never plays the adhan.
                                 sound = PrayerSound.NOTIFICATION,
                                 // Stamped even though the chime ignores it, so every entry in a

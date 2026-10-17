@@ -50,7 +50,6 @@ data class ScheduledNotification(
     val prayer: Prayer,
     val kind: NotificationKind,
     val instant: Instant,
-    val timeZoneId: String,
     val sound: PrayerSound,
     /** Which recording [sound] plays, for the two levels that are a recording at all. It is
      * stamped here rather than read at fire time so the receiver stays free of settings. */

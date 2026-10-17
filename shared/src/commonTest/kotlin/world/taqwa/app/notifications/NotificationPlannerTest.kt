@@ -400,11 +400,6 @@ class NotificationPlannerTest {
     }
 
     @Test
-    fun everyEntryCarriesTheLocationsTimeZoneForTheCalendarTrigger() {
-        assertTrue(planFor().all { it.timeZoneId == "Europe/London" })
-    }
-
-    @Test
     fun copyNamesThePrayerAndItsClockTime() {
         val fajr = planFor().first { it.prayer == Prayer.FAJR }
         assertEquals("Fajr", fajr.title)
@@ -443,7 +438,6 @@ class NotificationPlannerTest {
         assertEquals(Prayer.ASR, evening.prayer)
         for (entry in listOf(morning, evening)) {
             assertEquals(PrayerSound.SILENT, entry.sound)
-            assertEquals("Europe/London", entry.timeZoneId)
         }
         // The one spelling of the id, which a finished set cancels by and a tap is read from.
         assertEquals(morning.id, adhkarNotificationId(AdhkarSet.MORNING, sixth))

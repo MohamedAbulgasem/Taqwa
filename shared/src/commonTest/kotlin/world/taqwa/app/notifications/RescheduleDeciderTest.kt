@@ -15,7 +15,7 @@ class RescheduleDeciderTest {
 
     private fun entryAt(instant: Instant) = ScheduledNotification(
         id = "x", prayer = Prayer.FAJR, kind = NotificationKind.PRAYER, instant = instant,
-        timeZoneId = "Europe/London", sound = PrayerSound.TAKBIR, title = "Fajr", body = "…",
+        sound = PrayerSound.TAKBIR, title = "Fajr", body = "…",
     )
 
     @Test
