@@ -2,7 +2,6 @@ package world.taqwa.app.design.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -12,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,18 +48,21 @@ fun TaqwaSegmented(options: List<String>, selectedIndex: Int, onSelect: (Int) ->
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(percent = 50))
             .background(colors.surface)
-            .border(1.dp, colors.hairline, RoundedCornerShape(percent = 50)),
+            .border(1.dp, colors.hairline, RoundedCornerShape(percent = 50))
+            .selectableGroup(),
     ) {
         options.forEachIndexed { index, label ->
             val selected = index == selectedIndex
-            // The clickable takes the full 44 dp; only the drawn pill is inset by 3 dp. Putting
+            // The selectable takes the full 44 dp; only the drawn pill is inset by 3 dp. Putting
             // the inset on the Row instead would leave each option a 38 dp target.
             Box(
                 Modifier
                     .fillMaxHeight()
-                    .clickable(
+                    .selectable(
+                        selected = selected,
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
+                        role = Role.Tab,
                         onClick = { onSelect(index) },
                     )
                     .padding(3.dp)

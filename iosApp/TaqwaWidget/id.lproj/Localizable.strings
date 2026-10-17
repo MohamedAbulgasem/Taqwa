@@ -5,6 +5,9 @@
 /* Shown on the card until the app has run once and written the pool mirror (design spec §2). */
 "ayah_widget_placeholder" = "Buka Taqwa sekali untuk memuat ayat hari ini";
 
+/* Spoken only: the ayah widget's reference for VoiceOver. %1$@ the surah, %2$@ the ayah number. */
+"ayah_widget_a11y_reference" = "%1$@, ayat %2$@";
+
 /* The two prayer widgets as they appear in the widget gallery. */
 "home_widget_name" = "Taqwa";
 "home_widget_description" = "Salat berikutnya, hitung mundur, dan waktu salat hari ini.";

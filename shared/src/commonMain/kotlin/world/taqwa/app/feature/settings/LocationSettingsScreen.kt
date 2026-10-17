@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.design.components.RowToggle
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.LocationSource
@@ -62,17 +63,15 @@ fun LocationSettingsScreen(
         SettingsCard {
             TaqwaRow(
                 stringResource(Res.string.location_use_my_location),
-                trailing = {
-                    // Read from the stored preference, not guessed from the location: a fix taken
-                    // near a bundled city carries that city's name too, which is why the old
-                    // guess ("no city name means GPS") read OFF for almost everyone who had it on.
-                    TaqwaToggle(locationSource == LocationSource.GPS) { wantsGps ->
-                        // There is always a location in force, so switching off is not "no
-                        // location" — it is "a city I pick myself", which is the same
-                        // destination as the row below. The source flips to MANUAL only when a
-                        // city is actually picked, so backing out of the search leaves this on.
-                        if (wantsGps) requestLocation() else onChooseCity()
-                    }
+                // Read from the stored preference, not guessed from the location: a fix taken
+                // near a bundled city carries that city's name too, which is why the old
+                // guess ("no city name means GPS") read OFF for almost everyone who had it on.
+                toggle = RowToggle(locationSource == LocationSource.GPS) { wantsGps ->
+                    // There is always a location in force, so switching off is not "no
+                    // location" — it is "a city I pick myself", which is the same
+                    // destination as the row below. The source flips to MANUAL only when a
+                    // city is actually picked, so backing out of the search leaves this on.
+                    if (wantsGps) requestLocation() else onChooseCity()
                 },
             )
         }

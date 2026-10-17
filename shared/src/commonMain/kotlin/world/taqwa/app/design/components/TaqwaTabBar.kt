@@ -2,7 +2,6 @@ package world.taqwa.app.design.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +23,8 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -147,7 +149,8 @@ fun TaqwaTabBar(current: Tab?, onSelect: (Tab) -> Unit, modifier: Modifier = Mod
                 .windowInsetsPadding(
                     BarInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
                 )
-                .height(BarHeight),
+                .height(BarHeight)
+                .selectableGroup(),
         ) {
             Tab.entries.forEach { tab ->
                 TabItem(tab, selected = tab == current, onSelect = { onSelect(tab) })
@@ -163,9 +166,11 @@ private fun RowScope.TabItem(tab: Tab, selected: Boolean, onSelect: () -> Unit) 
     Column(
         // No ripple: a tab switch repaints the whole screen, which is feedback enough, and a
         // grey rectangle flashing across a third of the bar is louder than anything else here.
-        Modifier.weight(1f).fillMaxHeight().clickable(
+        Modifier.weight(1f).fillMaxHeight().selectable(
+            selected = selected,
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
+            role = Role.Tab,
             onClick = onSelect,
         ),
         horizontalAlignment = Alignment.CenterHorizontally,

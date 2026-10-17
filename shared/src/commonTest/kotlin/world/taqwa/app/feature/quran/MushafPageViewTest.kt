@@ -1,6 +1,10 @@
 package world.taqwa.app.feature.quran
 
 import androidx.compose.ui.graphics.Color
+import world.taqwa.app.quran.LineType
+import world.taqwa.app.quran.LineWord
+import world.taqwa.app.quran.MushafLine
+import world.taqwa.app.quran.MushafPage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -203,7 +207,52 @@ class MushafPageViewTest {
         MUSHAF_PAGE_1.lines.forEach { assertFalse(isJustified(MUSHAF_PAGE_1, it)) }
         MUSHAF_PAGE_2.lines.forEach { assertFalse(isJustified(MUSHAF_PAGE_2, it)) }
 
-        val ordinary = MUSHAF_PAGE_3.lines.first { it.type == world.taqwa.app.quran.LineType.TEXT && !it.endsSurah }
+        val ordinary = MUSHAF_PAGE_3.lines.first { it.type == LineType.TEXT && !it.endsSurah }
         assertTrue(isJustified(MUSHAF_PAGE_3, ordinary))
+    }
+
+    // --- ayahStops ---
+
+    private fun word(surah: Int, ayah: Int, index: Int) = LineWord(index, surah, ayah, index, "w")
+    private fun textLine(line: Int, words: List<LineWord>) = MushafLine(
+        line, LineType.TEXT, words.first().surah, words.joinToString(" ") { it.text },
+        words.first().surah, words.first().ayah, words.last().surah, words.last().ayah, endsSurah = false, words = words,
+    )
+
+    @Test
+    fun `every ayah gets one stop over its first run and none over the lines it runs on to`() {
+        val page = MushafPage(
+            3, 2, 5, 1,
+            listOf(
+                textLine(1, listOf(word(2, 5, 0), word(2, 5, 1), word(2, 6, 2))),
+                textLine(2, listOf(word(2, 6, 0), word(2, 7, 1), word(2, 7, 2), word(2, 8, 3))),
+                textLine(3, listOf(word(2, 8, 0), word(2, 8, 1))),
+            ),
+        )
+        assertEquals(
+            listOf(
+                AyahStop(0, 0..1, 2, 5),
+                AyahStop(0, 2..2, 2, 6),
+                AyahStop(1, 1..2, 2, 7),
+                AyahStop(1, 3..3, 2, 8),
+            ),
+            ayahStops(page),
+        )
+    }
+
+    @Test
+    fun `surah bands and the basmala get no stop but a new surah's first ayah does`() {
+        val band = MushafLine(1, LineType.SURAH, 112, null, null, null, null, null, endsSurah = false, words = emptyList())
+        val basmala = MushafLine(2, LineType.BASMALA, 112, null, null, null, null, null, endsSurah = false, words = emptyList())
+        val page = MushafPage(604, 112, 1, 30, listOf(band, basmala, textLine(3, listOf(word(112, 1, 0), word(112, 2, 1)))))
+        assertEquals(listOf(AyahStop(2, 0..0, 112, 1), AyahStop(2, 1..1, 112, 2)), ayahStops(page))
+    }
+
+    @Test
+    fun `the fixture pages give one stop per distinct ayah in reading order`() {
+        for (page in listOf(MUSHAF_PAGE_1, MUSHAF_PAGE_2, MUSHAF_PAGE_3)) {
+            val ayahs = page.lines.filter { it.type == LineType.TEXT }.flatMap { it.words }.map { it.surah to it.ayah }.distinct()
+            assertEquals(ayahs, ayahStops(page).map { it.surah to it.ayah }, "page ${page.number}")
+        }
     }
 }

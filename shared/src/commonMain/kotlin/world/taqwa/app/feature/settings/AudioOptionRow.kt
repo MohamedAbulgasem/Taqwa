@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,8 +67,8 @@ internal fun AudioOptionRow(
     selected: Boolean,
     onSelect: () -> Unit,
     onPreview: (() -> Unit)? = null,
-    /** What a screen reader calls the preview triangle. The two prayer-sound sheets leave it
-     * unset and keep the label they have always had. */
+    /** What a screen reader calls the preview triangle. The two prayer-sound sheets name the
+     * option it plays ("Hear Takbir"); the reciter picker passes its own label. */
     previewDescription: String? = null,
     /** Drawn before the label, with 12 dp after it. The reciter picker passes a monogram disc
      * (spec 3a §5.5); the two prayer-sound sheets pass nothing and are unchanged. */
@@ -77,8 +78,12 @@ internal fun AudioOptionRow(
     Row(
         Modifier
             .fillMaxWidth()
-            // No ripple: the radio moving is the feedback, as on every option row.
-            .clickable(
+            // No ripple: the radio moving is the feedback, as on every option row. A selectable,
+            // so a screen reader hears which option is chosen — but no radio role: on Android a
+            // selected radio button offers no click, and re-picking the chosen reciter still acts
+            // (it offers the download again while the surah is missing).
+            .selectable(
+                selected = selected,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
             ) { onSelect() }

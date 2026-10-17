@@ -8,7 +8,8 @@ import androidx.compose.runtime.Composable
  * Compose Multiplatform 1.12 does expose a common `BackHandler`, but only on the non-Android
  * targets — `androidx.compose.ui.backhandler` is absent from the Android artifact, where the
  * hardware button belongs to `androidx.activity` instead. So this is one more small expect/actual
- * seam rather than a shared call.
+ * seam rather than a shared call: Android's activity BackHandler, and on iOS the common one, which
+ * VoiceOver's escape gesture reaches.
  */
 @Composable
 expect fun SystemBackHandler(enabled: Boolean, onBack: () -> Unit)

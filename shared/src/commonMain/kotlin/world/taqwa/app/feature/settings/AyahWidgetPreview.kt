@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -147,7 +148,8 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
                     style = ayahArabicStyle(entry.arabic),
                     fontFamily = mushafFamily(),
                     color = textColor,
-                    modifier = Modifier.fillMaxWidth(),
+                    // Quran text: not for a phone voice (design §5).
+                    modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
                 )
             }
             if (showsTranslation) {

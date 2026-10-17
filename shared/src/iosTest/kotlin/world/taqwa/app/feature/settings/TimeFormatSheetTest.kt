@@ -2,11 +2,20 @@ package world.taqwa.app.feature.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.filter
+import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -29,8 +38,9 @@ import kotlin.test.assertNull
 /**
  * Settings › Prayer times › Time format: the row says which format is in use, a tap opens a sheet
  * of the two, each shown with the same sample time the way it writes it, and a pick reports the
- * choice and closes the sheet. Expected texts come from the resources and the platform format, not
- * from literals: the simulator's language decides every word and digit on screen.
+ * choice and closes the sheet. To a screen reader the options also say which one is chosen.
+ * Expected texts come from the resources and the platform format, not from literals: the
+ * simulator's language decides every word and digit on screen.
  */
 @OptIn(ExperimentalTestApi::class)
 class TimeFormatSheetTest {
@@ -110,5 +120,49 @@ class TimeFormatSheetTest {
         // The pick closes the sheet: the 12-hour option is gone again.
         waitForIdle()
         onAllNodesWithText(h12).assertCountEquals(0)
+    }
+
+    /** The sheet's option for [format]: its name and the sample time it writes, one row. */
+    private suspend fun option(format: ClockFormat): SemanticsMatcher {
+        val name = when (format) {
+            ClockFormat.TWENTY_FOUR_HOUR -> getString(Res.string.time_format_24)
+            ClockFormat.TWELVE_HOUR -> getString(Res.string.time_format_12)
+        }
+        return hasText(name) and hasText(createPlatformFormat(format).clockTime(18, 32))
+    }
+
+    /**
+     * A screen reader hears which clock is in use, not only a sighted reader seeing the check mark:
+     * the stored option is selected and the other is not, the two are the only options of one
+     * selectable group (the divider between them is a node of its own, and no option), and a pick
+     * of the other still reaches the callback.
+     */
+    private suspend fun ComposeUiTest.theSheetSaysWhichClockIsChosen(stored: ClockFormat, other: ClockFormat) {
+        var picked: ClockFormat? = null
+        setContent { Screen(stored) { picked = it } }
+        onNodeWithText(getString(Res.string.prayer_times_time_format)).performScrollTo().performClick()
+
+        val chosen = option(stored)
+        val offered = option(other)
+        onNode(chosen).assertIsSelected()
+        onNode(offered).assertIsNotSelected()
+        val group = SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup)
+        onNode(group and hasAnyChild(chosen) and hasAnyChild(offered))
+            .onChildren()
+            .filter(isSelectable())
+            .assertCountEquals(2)
+
+        onNode(offered).performClick()
+        assertEquals(other, picked)
+    }
+
+    @Test
+    fun theSheetSaysTheTwentyFourHourClockIsChosen() = runComposeUiTest {
+        theSheetSaysWhichClockIsChosen(ClockFormat.TWENTY_FOUR_HOUR, ClockFormat.TWELVE_HOUR)
+    }
+
+    @Test
+    fun theSheetSaysTheTwelveHourClockIsChosen() = runComposeUiTest {
+        theSheetSaysWhichClockIsChosen(ClockFormat.TWELVE_HOUR, ClockFormat.TWENTY_FOUR_HOUR)
     }
 }

@@ -288,6 +288,9 @@ fun MushafScreen(
                                     }
                                 }
                             },
+                            onPlayAyah = { surah, ayah ->
+                                if (recitation.playing == surah to ayah) recitation.onToggle() else recitation.onPlayAyah(surah, ayah)
+                            },
                         )
                     }
                 }

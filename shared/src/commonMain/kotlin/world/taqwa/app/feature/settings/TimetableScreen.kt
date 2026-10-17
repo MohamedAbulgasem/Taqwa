@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -75,7 +76,7 @@ fun TimetableScreen(
             SettingsNote(stringResource(Res.string.timetable_out_of_scope, chosenName(status)))
             Spacer(Modifier.height(14.dp))
         }
-        SettingsCard {
+        SettingsCard(Modifier.selectableGroup()) {
             val explanation = when (automaticAbout) {
                 AboutTemplate.AUTHORITY_CHECKED, AboutTemplate.AUTHORITY_UNCHECKED -> stringResource(
                     // "London Unified, followed by most mosques here" (mockup section 3); an
@@ -97,7 +98,7 @@ fun TimetableScreen(
 
         Spacer(Modifier.height(28.dp))
         if (nearby.isNotEmpty()) SectionLabel(stringResource(Res.string.timetable_nearby_label))
-        SettingsCard {
+        SettingsCard(Modifier.selectableGroup()) {
             nearby.forEach { option ->
                 TimetableChoiceRow(
                     label = authorityShortName(option.nameKey),
@@ -163,7 +164,7 @@ fun OtherMethodsScreen(
 ) {
     val selected = status.selectedId
     SettingsScaffold(stringResource(Res.string.timetable_other_methods), onBack) {
-        SettingsCard {
+        SettingsCard(Modifier.selectableGroup()) {
             methods.forEachIndexed { i, option ->
                 if (i > 0) CardDivider()
                 TimetableChoiceRow(

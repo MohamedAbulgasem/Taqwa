@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
@@ -322,7 +323,8 @@ fun ReaderScreen(
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
                                 color = colors.textPrimary,
-                                modifier = Modifier.contentWidth().padding(horizontal = ReaderGutter),
+                                // Quran text: not for a phone voice (design §5).
+                                modifier = Modifier.contentWidth().padding(horizontal = ReaderGutter).clearAndSetSemantics {},
                             )
                         }
                     }
@@ -338,6 +340,7 @@ fun ReaderScreen(
                             sizeSp = ready.settings.arabicSizeSp,
                             selected = selectedAyah == ayah.number,
                             playing = playingAyah == ayah.number,
+                            live = recitation.live,
                             speaking = playingAyah == ayah.number && recitation.speaking,
                             bookmarked = ayah.number in ready.bookmarked,
                             // Built only for the selected card: every other card would otherwise pay
@@ -374,6 +377,12 @@ fun ReaderScreen(
                             // One ayah at a time: tapping another moves the selection, tapping the same
                             // one clears it, which is what the action row sits on.
                             onClick = { selectedAyah = if (selectedAyah == ayah.number) null else ayah.number },
+                            onPlay = {
+                                if (playingAyah == ayah.number) recitation.onToggle() else recitation.onPlayAyah(ready.surah.number, ayah.number)
+                            },
+                            onBookmark = { onToggleBookmark(ayah.number) },
+                            onCopy = { shareTextFor(ayah.number)?.let { clipboard.setText(AnnotatedString(it)) } },
+                            onShare = { shareTextFor(ayah.number)?.let(::shareText) },
                         )
                     }
                 }

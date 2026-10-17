@@ -8,4 +8,6 @@
     <string name="widget_small_description">La prochaine prière et un compte à rebours en direct.</string>
     <string name="widget_medium_description">La prochaine prière, le compte à rebours et les horaires du jour.</string>
     <string name="widget_ayah_description">Le verset du jour, avec sa traduction.</string>
+    <!-- Spoken only: the ayah widget's reference for a screen reader. %1$s the surah, %2$s the ayah number. -->
+    <string name="widget_ayah_a11y_reference">%1$s, verset %2$s</string>
 </resources>

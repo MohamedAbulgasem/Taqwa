@@ -4,6 +4,12 @@
 
     <string name="language_name">العربية</string>
 
+    <!-- Navigation: what a screen reader calls the drawn back chevron. -->
+    <string name="nav_a11y_back">رجوع</string>
+    <!-- The sound and adhan-voice sheets' preview buttons; %1$s is the option's own name. -->
+    <string name="sound_a11y_preview">استمع إلى %1$s</string>
+    <string name="sheet_a11y_drag_handle">مقبض السحب</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">تقوى</string>
     <string name="onboarding_welcome_body">مواقيت الصلاة والقبلة والقرآن. مجانًا إلى الأبد. بلا إعلانات ولا حساب، ويعمل دون اتصال.</string>
@@ -35,6 +41,28 @@
     <!-- Prayer screen -->
     <string name="prayer_current_location">الموقع الحالي</string>
     <string name="prayer_next_in">متبقٍّ على %1$s</string>
+    <string name="prayer_a11y_prayer_next">الصلاة التالية</string>
+    <string name="prayer_a11y_prayer_current">الصلاة الحالية</string>
+    <string name="prayer_a11y_prayer_passed">انقضت</string>
+    <string name="prayer_a11y_countdown">%1$s بعد %2$s، الساعة %3$s</string>
+    <string name="prayer_a11y_countdown_soon">%1$s بعد أقل من دقيقة، الساعة %2$s</string>
+    <string name="duration_hours_minutes">%1$s و%2$s</string>
+    <plurals name="a11y_hours">
+        <item quantity="zero">%1$s ساعة</item>
+        <item quantity="one">%1$s ساعة</item>
+        <item quantity="two">%1$s ساعتين</item>
+        <item quantity="few">%1$s ساعات</item>
+        <item quantity="many">%1$s ساعة</item>
+        <item quantity="other">%1$s ساعة</item>
+    </plurals>
+    <plurals name="a11y_minutes">
+        <item quantity="zero">%1$s دقيقة</item>
+        <item quantity="one">%1$s دقيقة</item>
+        <item quantity="two">%1$s دقيقتين</item>
+        <item quantity="few">%1$s دقائق</item>
+        <item quantity="many">%1$s دقيقة</item>
+        <item quantity="other">%1$s دقيقة</item>
+    </plurals>
     <string name="prayer_exact_alarms_label">المنبهات الدقيقة معطّلة</string>
     <string name="prayer_exact_alarms_body">قد يتأخر التنبيه حتى ساعة ما لم يُسمح لتقوى بـ«المنبهات والتذكيرات».</string>
     <string name="prayer_no_location_title">لا يوجد موقع بعد</string>
@@ -525,6 +553,16 @@
     <string name="quran_action_copied">تم النسخ</string>
     <string name="quran_action_share">مشاركة</string>
     <string name="quran_a11y_read_aloud">جارٍ القراءة صوتيًا</string>
+    <string name="quran_a11y_selected">محددة</string>
+    <string name="quran_a11y_page_n">صفحة %1$s</string>
+    <plurals name="quran_a11y_ayah_count">
+        <item quantity="zero">%1$s آية</item>
+        <item quantity="one">%1$s آية</item>
+        <item quantity="two">%1$s آيتان</item>
+        <item quantity="few">%1$s آيات</item>
+        <item quantity="many">%1$s آية</item>
+        <item quantity="other">%1$s آية</item>
+    </plurals>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">التسبيح</string>
     <string name="prayer_open_tasbeeh">التسبيح</string>

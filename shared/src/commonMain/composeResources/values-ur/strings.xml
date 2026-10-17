@@ -4,6 +4,12 @@
 
     <string name="language_name">اردو</string>
 
+    <!-- Navigation: what a screen reader calls the drawn back chevron. -->
+    <string name="nav_a11y_back">واپس</string>
+    <!-- The sound and adhan-voice sheets' preview buttons; %1$s is the option's own name. -->
+    <string name="sound_a11y_preview">%1$s سنیں</string>
+    <string name="sheet_a11y_drag_handle">گھسیٹنے کا ہینڈل</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">تقویٰ</string>
     <string name="onboarding_welcome_body">نماز کے اوقات، قبلہ اور قرآن۔ ہمیشہ کے لیے مفت۔ نہ اشتہار، نہ اکاؤنٹ، اور آف لائن بھی چلتا ہے۔</string>
@@ -35,6 +41,20 @@
     <!-- Prayer screen -->
     <string name="prayer_current_location">موجودہ مقام</string>
     <string name="prayer_next_in">%1$s میں باقی</string>
+    <string name="prayer_a11y_prayer_next">اگلی نماز</string>
+    <string name="prayer_a11y_prayer_current">موجودہ نماز</string>
+    <string name="prayer_a11y_prayer_passed">گزر چکی</string>
+    <string name="prayer_a11y_countdown">%2$s بعد %1$s، %3$s بجے</string>
+    <string name="prayer_a11y_countdown_soon">ایک منٹ سے کم میں %1$s، %2$s بجے</string>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <plurals name="a11y_hours">
+        <item quantity="one">%1$s گھنٹہ</item>
+        <item quantity="other">%1$s گھنٹے</item>
+    </plurals>
+    <plurals name="a11y_minutes">
+        <item quantity="one">%1$s منٹ</item>
+        <item quantity="other">%1$s منٹ</item>
+    </plurals>
     <string name="prayer_exact_alarms_label">عین وقت کے الارم بند</string>
     <string name="prayer_exact_alarms_body">جب تک تقویٰ کو ”الارم اور یاد دہانیاں“ کی اجازت نہ ہو، اینڈرائیڈ ایک گھنٹے تک دیر سے بجا سکتا ہے۔</string>
     <string name="prayer_no_location_title">ابھی کوئی مقام نہیں</string>
@@ -517,6 +537,12 @@
     <string name="quran_action_copied">نقل ہو گئی</string>
     <string name="quran_action_share">شیئر کریں</string>
     <string name="quran_a11y_read_aloud">سنایا جا رہا ہے</string>
+    <string name="quran_a11y_selected">منتخب</string>
+    <string name="quran_a11y_page_n">صفحہ %1$s</string>
+    <plurals name="quran_a11y_ayah_count">
+        <item quantity="one">%1$s آیت</item>
+        <item quantity="other">%1$s آیات</item>
+    </plurals>
     <!-- Tasbeeh -->
     <string name="tasbeeh_title">تسبیح</string>
     <string name="prayer_open_tasbeeh">تسبیح</string>

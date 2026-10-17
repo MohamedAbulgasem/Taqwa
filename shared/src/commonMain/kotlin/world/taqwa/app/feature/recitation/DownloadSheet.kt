@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -40,9 +43,9 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaPrimaryButton
+import world.taqwa.app.design.components.TaqwaToggle
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.design.mushafFamily
-import world.taqwa.app.feature.settings.TaqwaToggle
 import world.taqwa.app.i18n.isRtlLocale
 import world.taqwa.app.recitation.DownloadFailure
 import world.taqwa.app.resources.Res
@@ -200,10 +203,12 @@ private fun Ready(
         Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 44.dp)
-            .clickable(
+            .toggleable(
+                value = autoDownload,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = { onAutoDownload(!autoDownload) },
+                role = Role.Switch,
+                onValueChange = onAutoDownload,
             )
             .padding(top = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -214,7 +219,7 @@ private fun Ready(
             color = colors.textSecondary,
             modifier = Modifier.weight(1f).padding(end = 12.dp),
         )
-        TaqwaToggle(autoDownload, onAutoDownload)
+        Box(Modifier.clearAndSetSemantics {}) { TaqwaToggle(autoDownload, onAutoDownload) }
     }
     // The reader picked this voice from the bar while another was reciting the surah (spec
     // §14.3): say what happens in the meantime, because nothing else on the sheet does.

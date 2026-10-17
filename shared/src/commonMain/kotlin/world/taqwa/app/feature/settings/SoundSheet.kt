@@ -2,6 +2,7 @@ package world.taqwa.app.feature.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.soundDisplayName
 import world.taqwa.app.notifications.SoundAssets
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.sound_a11y_preview
 import world.taqwa.app.resources.sound_adhan_detail
 import world.taqwa.app.resources.sound_notification_detail
 import world.taqwa.app.resources.sound_sheet_footnote
@@ -89,7 +91,7 @@ fun SoundSheet(
             style = TaqwaText.screenTitle,
             color = colors.textPrimary,
         )
-        TaqwaCard(Modifier.padding(top = 16.dp)) {
+        TaqwaCard(Modifier.padding(top = 16.dp).selectableGroup()) {
             options.forEachIndexed { i, sound ->
                 if (i > 0) CardDivider()
                 AudioOptionRow(
@@ -98,6 +100,7 @@ fun SoundSheet(
                     selected = sound == current,
                     onSelect = { onPick(sound) },
                     onPreview = if (sound == PrayerSound.SILENT) null else ({ onPreview(sound) }),
+                    previewDescription = stringResource(Res.string.sound_a11y_preview, soundDisplayName(sound)),
                 )
             }
         }

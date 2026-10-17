@@ -6,4 +6,6 @@
     <string name="widget_small_description">Sonraki vakit ve canlı geri sayım.</string>
     <string name="widget_medium_description">Sonraki vakit, geri sayım ve bugünün vakitleri.</string>
     <string name="widget_ayah_description">Günün ayeti ve meali.</string>
+    <!-- Spoken only: the ayah widget's reference for a screen reader. %1$s the surah, %2$s the ayah number. -->
+    <string name="widget_ayah_a11y_reference">%1$s, %2$s. ayet</string>
 </resources>

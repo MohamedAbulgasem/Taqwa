@@ -323,6 +323,10 @@ struct TaqwaAyahWidgetView: View {
             footer(ayah)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // One element with one label: the Arabic, the translation and the footer are otherwise
+        // five separate stops, the Arabic read by whatever voice VoiceOver has (audit pl-ayah-widget-ios).
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel(ayah))
     }
 
     /// The ayah, its non-breaking separator and its number in Arabic-Indic digits, which the Hafs
@@ -428,6 +432,13 @@ struct TaqwaAyahWidgetView: View {
         .environment(\.layoutDirection, entry.arabicUi ? .rightToLeft : .leftToRight)
     }
 
+    /// A string from the extension's own table, or [fallback] when this file is running inside the
+    /// app (the `-taqwaWidgetPreview` route), where that table is absent.
+    private func localized(_ key: String, fallback: String) -> String {
+        let localized = Bundle.main.localizedString(forKey: key, value: key, table: nil)
+        return localized == key ? fallback : localized
+    }
+
     /// Spec §2's iOS-only placeholder: the mirror is written by the app, and until it has run once
     /// there is no pool to draw from.
     ///
@@ -436,11 +447,22 @@ struct TaqwaAyahWidgetView: View {
     /// the `-taqwaWidgetPreview` route would otherwise draw the raw key. The fallback is the same
     /// copy `Localizable.strings` carries.
     private var placeholderText: String {
-        let key = "ayah_widget_placeholder"
-        let localized = Bundle.main.localizedString(forKey: key, value: key, table: nil)
-        guard localized == key else { return localized }
         let arabic = Locale.current.language.languageCode?.identifier.hasPrefix("ar") ?? false
-        return arabic ? "افتح تقوى مرة لتحميل آية اليوم" : "Open Taqwa once to load today’s ayah"
+        return localized("ayah_widget_placeholder", fallback: arabic ? "افتح تقوى مرة لتحميل آية اليوم" : "Open Taqwa once to load today’s ayah")
+    }
+
+    /// The card as VoiceOver hears it (design §5): the widget's name, the reference in the
+    /// interface's script and digits, then the translation when the card shows one — never the
+    /// Arabic. The same sentence Android's card carries, built by `:widgetcore`.
+    private func accessibilityLabel(_ ayah: AyahPoolEntry) -> String {
+        let name = entry.arabicUi ? ayah.surahArabic : ayah.surahLatin
+        let number = WidgetDigits.shared.localize(text: "\(ayah.ayah)", nativeDigits: entry.arabicIndicDigits, languageTag: entry.languageTag)
+        let reference = String(format: localized("ayah_widget_a11y_reference", fallback: "%1$@, ayah %2$@"), name, number)
+        return AyahWidgetSpeech.shared.label(
+            widgetName: localized("ayah_widget_name", fallback: "Ayah of the day"),
+            reference: reference,
+            translation: showsTranslation ? ayah.translation : nil
+        )
     }
 
     private var placeholder: some View {

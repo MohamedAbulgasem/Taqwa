@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,7 +55,7 @@ fun ReciterPicker(
                 .padding(top = 16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-            TaqwaCard {
+            TaqwaCard(Modifier.selectableGroup()) {
                 reciters.forEachIndexed { index, reciter ->
                     if (index > 0) CardDivider()
                     AudioOptionRow(

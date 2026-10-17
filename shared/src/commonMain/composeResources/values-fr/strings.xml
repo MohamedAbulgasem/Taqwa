@@ -6,6 +6,12 @@
     <!-- The name of this file's own language, shown in Settings › Language. -->
     <string name="language_name">Français</string>
 
+    <!-- Navigation: what a screen reader calls the drawn back chevron. -->
+    <string name="nav_a11y_back">Retour</string>
+    <!-- The sound and adhan-voice sheets' preview buttons; %1$s is the option's own name. -->
+    <string name="sound_a11y_preview">Écouter %1$s</string>
+    <string name="sheet_a11y_drag_handle">Poignée de déplacement</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">Taqwa</string>
     <string name="onboarding_welcome_body">Les horaires de prière, la qibla et le Coran. Gratuit pour toujours. Sans publicité, sans compte, fonctionne hors ligne.</string>
@@ -38,6 +44,20 @@
     <!-- Prayer screen -->
     <string name="prayer_current_location">Position actuelle</string>
     <string name="prayer_next_in">%1$s dans</string>
+    <string name="prayer_a11y_prayer_next">Prochaine prière</string>
+    <string name="prayer_a11y_prayer_current">Prière en cours</string>
+    <string name="prayer_a11y_prayer_passed">Passée</string>
+    <string name="prayer_a11y_countdown">%1$s dans %2$s, à %3$s</string>
+    <string name="prayer_a11y_countdown_soon">%1$s dans moins d’une minute, à %2$s</string>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <plurals name="a11y_hours">
+        <item quantity="one">%1$s heure</item>
+        <item quantity="other">%1$s heures</item>
+    </plurals>
+    <plurals name="a11y_minutes">
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
+    </plurals>
     <string name="prayer_exact_alarms_label">ALARMES EXACTES DÉSACTIVÉES</string>
     <string name="prayer_exact_alarms_body">Android peut sonner jusqu’à une heure en retard tant que « Alarmes et rappels » n’est pas autorisé pour Taqwa.</string>
     <string name="prayer_no_location_title">Pas encore de position</string>
@@ -534,6 +554,12 @@
     <string name="quran_action_copied">Copié</string>
     <string name="quran_action_share">Partager</string>
     <string name="quran_a11y_read_aloud">Lecture à voix haute en cours</string>
+    <string name="quran_a11y_selected">Sélectionné</string>
+    <string name="quran_a11y_page_n">Page %1$s</string>
+    <plurals name="quran_a11y_ayah_count">
+        <item quantity="one">%1$s verset</item>
+        <item quantity="other">%1$s versets</item>
+    </plurals>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbih</string>
     <string name="prayer_open_tasbeeh">Tasbih</string>

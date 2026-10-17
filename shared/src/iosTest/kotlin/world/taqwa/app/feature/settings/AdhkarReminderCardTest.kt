@@ -4,15 +4,18 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.v2.runComposeUiTest
 import org.jetbrains.compose.resources.getString
 import world.taqwa.app.design.LightColors
@@ -58,12 +61,15 @@ class AdhkarReminderCardTest {
         // Off on a fresh install, Tahajjud too: no sound row anywhere.
         onAllNodesWithText(sound).assertCountEquals(0)
 
-        // The card is the last on the screen, and its switch the last thing on it to press.
-        onAllNodes(hasClickAction()).onLast().performScrollTo().performClick()
+        // The row is the switch, found by its name and activated as a screen reader's double-tap
+        // does: only the drawn switch at its end takes a touch.
+        val adhkar = onNode(isToggleable() and hasText(getString(Res.string.notifications_adhkar)))
+        adhkar.performScrollTo().assertIsOff().performSemanticsAction(SemanticsActions.OnClick)
         assertEquals(listOf(true), toggled)
 
         settings = settings.copy(adhkar = true)
         waitForIdle()
+        adhkar.assertIsOn()
         onNodeWithText(sound).performScrollTo().assertIsDisplayed()
     }
 }

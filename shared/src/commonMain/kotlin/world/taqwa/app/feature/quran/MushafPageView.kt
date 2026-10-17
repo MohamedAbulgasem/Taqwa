@@ -33,8 +33,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -46,10 +56,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.ContentMaxWidth
 import world.taqwa.app.design.LocalTaqwaColors
@@ -70,14 +83,20 @@ import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.Revelation
 import world.taqwa.app.quran.Surah
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.quran_a11y_ayah_count
+import world.taqwa.app.resources.quran_a11y_page_n
+import world.taqwa.app.resources.quran_a11y_selected
 import world.taqwa.app.resources.quran_action_bookmark
 import world.taqwa.app.resources.quran_action_bookmarked
 import world.taqwa.app.resources.quran_action_copy
 import world.taqwa.app.resources.quran_action_share
+import world.taqwa.app.resources.quran_ayah_n
 import world.taqwa.app.resources.quran_juz_n
 import world.taqwa.app.resources.quran_madani
 import world.taqwa.app.resources.quran_makki
+import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_play
+import kotlin.math.roundToInt
 
 /** The frame's own width at the reference 375 dp screen, from which the base size scales (spec §5.1). */
 private const val REFERENCE_FRAME_WIDTH_DP = 347f
@@ -131,11 +150,21 @@ fun MushafPageView(
     /** The reference pill's Play, which acts on the *tapped* ayah — the finger's ayah, not the
      * voice's. */
     onPlay: () -> Unit = {},
+    /** Play from *this* ayah, for the screen-reader action on each ayah's stop (design §5). */
+    onPlayAyah: (Int, Int) -> Unit = { _, _ -> },
 ) {
     val colors = LocalTaqwaColors.current
     val family = mushafFamily()
     val measurer = rememberTextMeasurer()
-    val density = LocalDensity.current
+    val phoneDensity = LocalDensity.current
+    // The printed page is sized by its frame, not by the phone's text setting: measured and drawn
+    // at font scale 1, so every sp→px step inside the frame is linear and fittedSize's
+    // one-measurement rule holds at every setting. At 100 % this is the phone's own density and
+    // nothing moves by a pixel; at 150 % and above it is what stops the words at the reading
+    // end of a justified line being cut, because Android scales large text less than small text
+    // and the linear fit was overshooting. The captions above and below the frame — juz, surah,
+    // page number — keep the phone's scale: they are interface text, not the page.
+    val density = remember(phoneDensity) { Density(phoneDensity.density, fontScale = 1f) }
     // The highlight belongs to whichever pages actually carry that ayah's words: the screen keeps
     // one selection across page turns, and a page the ayah is not on must show neither field nor
     // pill.
@@ -146,6 +175,9 @@ fun MushafPageView(
     val lit = playing?.takeIf { (surah, ayah) ->
         page.lines.any { line -> line.words.any { it.surah == surah && it.ayah == ayah } }
     }
+    // One invisible stop per ayah, over its first run of words (design §5): the page's own rule,
+    // computed once per page, then handed to each line for the runs that fall on it.
+    val stopsByLine = remember(page) { ayahStops(page).groupBy { it.lineIndex } }
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
             // Held sideways there is far more width than a page of fifteen lines can use, and the
@@ -160,6 +192,12 @@ fun MushafPageView(
             val frameWidth = columnWidth - 28.dp
             val base = (REFERENCE_BASE_SP * (frameWidth.value / REFERENCE_FRAME_WIDTH_DP))
                 .coerceIn(MIN_BASE_SP, MAX_BASE_SP)
+            // The size the phone itself would have drawn `base` at. A page with room to spare at
+            // the base size — the two opening pages — grew with the text setting before the frame
+            // was pinned to font scale 1, and still does, from the phone's own curve (Android grows
+            // large text less than small text); a page that has to shrink to its width shrinks
+            // exactly to it, because the measuring below is linear. At 100 % this is `base`.
+            val scaledBase = with(phoneDensity) { base.sp.toPx() } / phoneDensity.density
             val frameWidthPx = with(density) { frameWidth.toPx() }
             // Keyed on everything the measurements depend on; the highlight is deliberately not
             // among them, since it only changes what is drawn behind words already placed.
@@ -177,66 +215,75 @@ fun MushafPageView(
                     // Keyed on everything the measurements depend on; the highlight is
                     // deliberately not among them, since it only changes what is drawn behind
                     // words already placed.
-                    val layout = remember(page, base, frameWidthPx, innerHeightPx, family, colors.accent, density) {
-                        layoutPage(page, base, frameWidthPx, innerHeightPx, family, colors.accent, measurer, density)
+                    val layout = remember(page, scaledBase, frameWidthPx, innerHeightPx, family, colors.accent, density) {
+                        layoutPage(page, scaledBase, frameWidthPx, innerHeightPx, family, colors.accent, measurer, density)
                     }
                     val lineHeight: Dp = with(density) { (layout.sizeSp * layout.lineMultiple).sp.toDp() }
                     val scrolls = landscape || layout.scrolls
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .border(1.dp, colors.hairline, RoundedCornerShape(18.dp))
-                            .padding(4.dp)
-                            .background(colors.surface, RoundedCornerShape(15.dp))
-                            .border(1.dp, colors.hairline, RoundedCornerShape(15.dp))
-                            .padding(horizontal = 10.dp, vertical = 12.dp)
-                            // Sideways — or on a screen too short for a readable page — the
-                            // frame is shorter than fifteen lines at any size worth reading, so
-                            // the lines scroll instead of being squeezed.
-                            // The scroll sits inside the frame's own padding, so the two hairlines
-                            // stay put while the printed page moves under them. A vertical scroll
-                            // inside the horizontal pager is the ordinary nested-scroll case — the
-                            // sideways swipe still turns the page.
-                            .then(
-                                if (scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier,
-                            ),
-                        verticalArrangement = when {
-                            // Scrolling, so the column is as tall as its lines and there is no
-                            // slack left to spread: each line keeps its own fixed height and they
-                            // stack from the top.
-                            scrolls -> Arrangement.Top
-                            // Pages 1 and 2 hold eight lines where every other page holds fifteen,
-                            // so spreading them would leave the printed text floating (spec §2.4).
-                            page.number <= 2 -> Arrangement.spacedBy(OpeningPageGap, Alignment.CenterVertically)
-                            else -> Arrangement.SpaceEvenly
-                        },
-                    ) {
-                        page.lines.forEachIndexed { index, line ->
-                            when (line.type) {
-                                LineType.SURAH -> line.surah?.let(surahOf)?.let { SurahBand(it, layout.sizeSp, family) }
-                                LineType.BASMALA -> BasicText(
-                                    basmala,
-                                    modifier = Modifier.fillMaxWidth().height(lineHeight),
-                                    style = TextStyle(
-                                        fontFamily = family,
-                                        fontSize = layout.sizeSp.sp,
-                                        lineHeight = (layout.sizeSp * layout.lineMultiple).sp,
-                                        color = colors.textPrimary,
-                                        textAlign = TextAlign.Center,
-                                        textDirection = TextDirection.Rtl,
-                                    ),
-                                    maxLines = 1,
-                                    softWrap = false,
-                                )
-                                LineType.TEXT -> layout.lines[index]?.let { placed ->
-                                    MushafTextLine(
-                                        line = line,
-                                        placed = placed,
-                                        lineHeight = lineHeight,
-                                        highlighted = marked,
-                                        playing = lit,
-                                        onTapAyah = onTapAyah,
+                    CompositionLocalProvider(LocalDensity provides density) {
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .border(1.dp, colors.hairline, RoundedCornerShape(18.dp))
+                                .padding(4.dp)
+                                .background(colors.surface, RoundedCornerShape(15.dp))
+                                .border(1.dp, colors.hairline, RoundedCornerShape(15.dp))
+                                .padding(horizontal = 10.dp, vertical = 12.dp)
+                                // Sideways — or on a screen too short for a readable page — the
+                                // frame is shorter than fifteen lines at any size worth reading, so
+                                // the lines scroll instead of being squeezed.
+                                // The scroll sits inside the frame's own padding, so the two hairlines
+                                // stay put while the printed page moves under them. A vertical scroll
+                                // inside the horizontal pager is the ordinary nested-scroll case — the
+                                // sideways swipe still turns the page.
+                                .then(
+                                    if (scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier,
+                                ),
+                            verticalArrangement = when {
+                                // Scrolling, so the column is as tall as its lines and there is no
+                                // slack left to spread: each line keeps its own fixed height and they
+                                // stack from the top.
+                                scrolls -> Arrangement.Top
+                                // Pages 1 and 2 hold eight lines where every other page holds fifteen,
+                                // so spreading them would leave the printed text floating (spec §2.4).
+                                page.number <= 2 -> Arrangement.spacedBy(OpeningPageGap, Alignment.CenterVertically)
+                                else -> Arrangement.SpaceEvenly
+                            },
+                        ) {
+                            page.lines.forEachIndexed { index, line ->
+                                when (line.type) {
+                                    LineType.SURAH -> line.surah?.let(surahOf)?.let { SurahBand(it, layout.sizeSp, family) }
+                                    LineType.BASMALA -> BasicText(
+                                        basmala,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(lineHeight)
+                                            // Quran text: not for a phone voice (design §5).
+                                            .clearAndSetSemantics {},
+                                        style = TextStyle(
+                                            fontFamily = family,
+                                            fontSize = layout.sizeSp.sp,
+                                            lineHeight = (layout.sizeSp * layout.lineMultiple).sp,
+                                            color = colors.textPrimary,
+                                            textAlign = TextAlign.Center,
+                                            textDirection = TextDirection.Rtl,
+                                        ),
+                                        maxLines = 1,
+                                        softWrap = false,
                                     )
+                                    LineType.TEXT -> layout.lines[index]?.let { placed ->
+                                        MushafTextLine(
+                                            line = line,
+                                            placed = placed,
+                                            lineHeight = lineHeight,
+                                            highlighted = marked,
+                                            playing = lit,
+                                            playingLive = playingLive,
+                                            stops = stopsByLine[index].orEmpty(),
+                                            onTapAyah = onTapAyah,
+                                            onPlayAyah = onPlayAyah,
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -258,6 +305,9 @@ fun MushafPageView(
                         )
                     }
                 }
+                // A screen reader hears "Page 42" in the interface's digits, not the bare
+                // numeral the page prints.
+                val pageLabel = stringResource(Res.string.quran_a11y_page_n, LocalPlatformFormat.current.localizedDigits(page.number))
                 Text(
                     QuranText.arabicIndic(page.number),
                     style = TaqwaText.caption,
@@ -266,7 +316,10 @@ fun MushafPageView(
                     // hairline and its 44 dp buttons would otherwise crowd this number. The extra
                     // 6 dp is spent whether or not a pill is showing, so the page number sits at
                     // one height and does not jump when an ayah is tapped.
-                    modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 14.dp, bottom = 8.dp)
+                        .clearAndSetSemantics { contentDescription = pageLabel },
                     textAlign = TextAlign.Center,
                 )
             }
@@ -304,7 +357,7 @@ private fun layoutPage(
     family: FontFamily,
     accent: Color,
     measurer: TextMeasurer,
-    density: androidx.compose.ui.unit.Density,
+    density: Density,
 ): PageLayout {
     fun style(sizeSp: Float) = TextStyle(fontFamily = family, fontSize = sizeSp.sp, textDirection = TextDirection.Rtl)
     fun measure(text: AnnotatedString, sizeSp: Float): TextLayoutResult =
@@ -363,7 +416,9 @@ internal fun digitsStart(word: String): Int {
  * One printed line (spec §2.4), drawn word by word at the positions [placed] holds. The soft
  * accent field behind a highlighted ayah is one rounded rectangle per run of its words, spanning
  * the gaps between them; a tap resolves to a word by its horizontal span and reports that word's
- * ayah.
+ * ayah. Over the words of each of [stops] lies the ayah's one screen-reader stop (design §5),
+ * named by the ayah's number, which says when its ayah is selected; the recited ayah is told only
+ * by its action, Pause. The words themselves are drawn, so no voice ever reads them.
  */
 @Composable
 private fun MushafTextLine(
@@ -372,9 +427,16 @@ private fun MushafTextLine(
     lineHeight: Dp,
     highlighted: Pair<Int, Int>?,
     playing: Pair<Int, Int>?,
+    playingLive: Boolean,
+    stops: List<AyahStop>,
     onTapAyah: (Int, Int) -> Unit,
+    onPlayAyah: (Int, Int) -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
+    val format = LocalPlatformFormat.current
+    val playLabel = stringResource(Res.string.recitation_play)
+    val pauseLabel = stringResource(Res.string.recitation_a11y_pause)
+    val selectedLabel = stringResource(Res.string.quran_a11y_selected)
     val field = colors.accent.copy(alpha = 0.16f)
     // The voice's field is deeper than the finger's, and drawn over it, so an ayah that is both
     // tapped and playing reads as playing — the louder of the two claims, as in the reader.
@@ -397,36 +459,83 @@ private fun MushafTextLine(
             }
         }
     }
-    Canvas(
-        Modifier
-            .fillMaxWidth()
-            .height(lineHeight)
-            .pointerInput(line, placed) {
-                detectTapGestures { position ->
-                    val index = wordAtX(placed.positions, position.x, size.width.toFloat()) ?: return@detectTapGestures
-                    line.words[index].let { onTapAyah(it.surah, it.ayah) }
-                }
-            },
-    ) {
-        fun fields(of: List<IntRange>, colour: Color) = of.forEach { run ->
-            val right = placed.positions[run.first].right
-            val left = placed.positions[run.last].left
-            drawRoundRect(
-                color = colour,
-                topLeft = Offset(left - 2.dp.toPx(), 0f),
-                size = Size(right - left + 4.dp.toPx(), size.height),
-                cornerRadius = CornerRadius(6.dp.toPx()),
-            )
+    // The line is a traversal group and each stop carries its order, because Compose sorts a
+    // row's nodes left to right when the *root* view is LTR — an English interface — and this
+    // page reads right to left whatever the interface does.
+    Box(Modifier.fillMaxWidth().height(lineHeight).semantics { isTraversalGroup = true }) {
+        Canvas(
+            Modifier
+                .matchParentSize()
+                .pointerInput(line, placed) {
+                    detectTapGestures { position ->
+                        val index = wordAtX(placed.positions, position.x, size.width.toFloat()) ?: return@detectTapGestures
+                        line.words[index].let { onTapAyah(it.surah, it.ayah) }
+                    }
+                },
+        ) {
+            fun fields(of: List<IntRange>, colour: Color) = of.forEach { run ->
+                val right = placed.positions[run.first].right
+                val left = placed.positions[run.last].left
+                drawRoundRect(
+                    color = colour,
+                    topLeft = Offset(left - 2.dp.toPx(), 0f),
+                    size = Size(right - left + 4.dp.toPx(), size.height),
+                    cornerRadius = CornerRadius(6.dp.toPx()),
+                )
+            }
+            fields(runs, field)
+            fields(voiceRuns, voiceField)
+            placed.words.forEachIndexed { index, word ->
+                val position = placed.positions[index]
+                drawText(
+                    word,
+                    color = colors.textPrimary,
+                    topLeft = Offset(position.left, (size.height - word.size.height) / 2f),
+                )
+            }
         }
-        fields(runs, field)
-        fields(voiceRuns, voiceField)
-        placed.words.forEachIndexed { index, word ->
-            val position = placed.positions[index]
-            drawText(
-                word,
-                color = colors.textPrimary,
-                topLeft = Offset(position.left, (size.height - word.size.height) / 2f),
-            )
+        if (stops.isNotEmpty()) {
+            // Invisible, touch-transparent boxes over each stop's words, placed in absolute pixels
+            // (`place`, not `placeRelative`: the positions are already right-to-left). A screen
+            // reader's double-tap selects the ayah as a tap does; Play starts the reciter there.
+            Layout(
+                modifier = Modifier.matchParentSize(),
+                content = {
+                    stops.forEachIndexed { order, stop ->
+                        val label = stringResource(Res.string.quran_ayah_n, format.localizedDigits(stop.ayah))
+                        // Pause only while this ayah's voice is going: paused on it, the same call
+                        // resumes it, so it is Play — as on the ayah card (design §5). This label is
+                        // the recited ayah's one mark. No state says it: on the cards "Being read
+                        // aloud" is the phone's voice reading the translation, so here it would
+                        // claim a phone voice reads the Quran, and a state that moves from ayah to
+                        // ayah may be announced over the reciter.
+                        val action = if (playingLive && playing == stop.surah to stop.ayah) pauseLabel else playLabel
+                        // The selection, said in the stop's own words as the ayah card says it: a
+                        // double-tap toggles it, so a reader has to hear which way it went. Not the
+                        // semantic `selected`, which on Android makes every other stop say "Not
+                        // selected" (Task 9's ruling).
+                        val state = if (highlighted == stop.surah to stop.ayah) selectedLabel else null
+                        Box(
+                            Modifier.semantics {
+                                contentDescription = label
+                                if (state != null) stateDescription = state
+                                traversalIndex = order.toFloat()
+                                onClick { onTapAyah(stop.surah, stop.ayah); true }
+                                customActions = listOf(CustomAccessibilityAction(action) { onPlayAyah(stop.surah, stop.ayah); true })
+                            },
+                        )
+                    }
+                },
+            ) { measurables, constraints ->
+                fun span(stop: AyahStop) = placed.positions[stop.words.last].left to placed.positions[stop.words.first].right
+                val placeables = measurables.mapIndexed { i, measurable ->
+                    val (left, right) = span(stops[i])
+                    measurable.measure(Constraints.fixed((right - left).roundToInt().coerceAtLeast(1), constraints.maxHeight))
+                }
+                layout(constraints.maxWidth, constraints.maxHeight) {
+                    placeables.forEachIndexed { i, placeable -> placeable.place(span(stops[i]).first.roundToInt(), 0) }
+                }
+            }
         }
     }
 }
@@ -483,6 +592,12 @@ private fun PageCaptionSurahName(surah: Surah) {
 @Composable
 internal fun SurahBand(surah: Surah, sizeSp: Float, family: FontFamily) {
     val colors = LocalTaqwaColors.current
+    // "7 ayahs" for a screen reader, in the interface's digits: the band prints the bare numeral.
+    val ayahCount = pluralStringResource(
+        Res.plurals.quran_a11y_ayah_count,
+        surah.ayahCount,
+        LocalPlatformFormat.current.localizedDigits(surah.ayahCount),
+    )
     Row(
         Modifier
             .fillMaxWidth()
@@ -502,7 +617,7 @@ internal fun SurahBand(surah: Surah, sizeSp: Float, family: FontFamily) {
             color = colors.textSecondary,
             maxLines = 1,
             textAlign = TextAlign.Start,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).clearAndSetSemantics { contentDescription = ayahCount },
         )
         BasicText(
             surah.nameArabic,

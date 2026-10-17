@@ -21,6 +21,7 @@ import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
 import kotlinx.coroutines.flow.first
 import world.taqwa.app.MainActivity
+import world.taqwa.app.R
 import world.taqwa.app.di.appContainer
 import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.domain.WidgetBackground
@@ -237,9 +238,22 @@ private fun AyahWidgetContent(render: AyahWidgetRender) {
                 ),
             )
         }
+        // What TalkBack says for the card (design §5): the widget's name, the reference in the
+        // interface's script and digits, then the translation when the card shows one. The
+        // sentence is the description of the one Image that draws the card. The Arabic drawn in
+        // the bitmap is never spoken: no voice reads pixels, and the sentence leaves it out.
+        // Before this the image had no description and TalkBack had only the widget's name (audit
+        // pl-ayah-widget, a blocker).
+        val surahName = if (UiLanguage.of(render.languageTag).arabicScript) entry.surahArabic else entry.surahLatin
+        val ayahNumber = WidgetDigits.localize(entry.ayah.toString(), render.arabicIndicDigits, render.languageTag)
+        val label = AyahWidgetSpeech.label(
+            context.getString(R.string.widget_ayah_label),
+            context.getString(R.string.widget_ayah_a11y_reference, surahName, ayahNumber),
+            if (render.showTranslation) entry.translation else null,
+        )
         Image(
             provider = ImageProvider(bitmap),
-            contentDescription = null,
+            contentDescription = label,
             modifier = GlanceModifier.fillMaxSize(),
             // The bitmap is already the cell's size, so Fit is a no-op in the common case; it
             // only does work for the oversized cells the renderer draws at reduced scale.

@@ -9,6 +9,8 @@ import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.i18n.uppercaseIn
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -27,13 +29,20 @@ fun CountdownRing(
     clockTime: String,
     modifier: Modifier = Modifier,
     diameter: Dp = CountdownRingSize,
+    /** One sentence for a screen reader in place of the three fragments inside; null leaves the texts as they are. */
+    description: String? = null,
 ) {
     val colors = LocalTaqwaColors.current
     // [diameter] is only ever *smaller* than the default, when a sideways screen gives the ring
     // less than its own half-page to sit in; the stroke keeps its share of the diameter, so a
     // shrunken ring reads as the same ring rather than as a thicker one. The track, the arc and
     // its mirrored sweep live in [RingArc], which the tasbeeh's counter draws too.
-    Box(modifier.size(diameter), contentAlignment = Alignment.Center) {
+    Box(
+        modifier
+            .size(diameter)
+            .then(if (description == null) Modifier else Modifier.clearAndSetSemantics { contentDescription = description }),
+        contentAlignment = Alignment.Center,
+    ) {
         RingArc(progress = progress, diameter = diameter)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(

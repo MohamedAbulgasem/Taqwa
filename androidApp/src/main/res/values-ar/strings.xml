@@ -6,4 +6,6 @@
     <string name="widget_small_description">الصلاة القادمة وعد تنازلي مباشر.</string>
     <string name="widget_medium_description">الصلاة القادمة والعد التنازلي ومواقيت اليوم.</string>
     <string name="widget_ayah_description">آية اليوم مع ترجمتها.</string>
+    <!-- Spoken only: the ayah widget's reference for a screen reader. %1$s the surah, %2$s the ayah number. -->
+    <string name="widget_ayah_a11y_reference">%1$s، الآية %2$s</string>
 </resources>

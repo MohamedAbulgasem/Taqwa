@@ -4739,3 +4739,402 @@ and the end of eating up to two earlier); `checkStamps`, 71 fresh and green. Too
 (`LondonUnifiedTest`'s Dover and Southampton and `CityPointsEnvelopeTest`'s Rabita region and Fujairah are new). Not
 run here: the controller's integration test script, the iOS test compile (the new test names have no commas or
 parentheses), the site generation and the monitor's Python tests (no site or monitor code changed).
+
+## Accessibility round 1 (28 September – 17 October 2026), branch `a11y-round-1`
+
+The first five of the twelve items from the 27 September accessibility audit (80 findings, 3 blockers), which
+Mohamed approved on 28 September. Spec `docs/superpowers/specs/2026-09-28-taqwa-accessibility-round-1-design.md`,
+plan `docs/superpowers/plans/2026-09-28-taqwa-accessibility-round-1.md`, ledger
+`.superpowers/sdd/2026-09-28-taqwa-accessibility-round-1/progress.md`, with each task's brief and report beside it.
+Each task was a subagent with its own review.
+- Tasks 1–6 were built on 28–29 September on `worktree-a11y-round-1`, off main d5230081. Tasks 1 and 2 then
+  reached main by themselves (below). The rest was held for the first update after launch.
+- On 17 October the Lead copied the ledger into the site worktree and cherry-picked the other eleven commits
+  onto main a84c2334 as the new branch `a11y-round-1`. The conflicts were import lists only. Overnight the Lead
+  ran Tasks 7–11, a whole-branch review, an Android device check and one fix wave.
+- The branch is 28 commits on a84c2334 (seven of them docs, one a `fixup!`), plus this entry. Nothing is
+  pushed. It merges squashed, with Mohamed's OK, after the listening checklist below.
+
+**The owner's two rules** (28 September), binding on every task:
+1. **Nothing visible changes at default settings.** The work is semantics only, or it shows only through the
+   phone's own accessibility settings (the Mushaf's fix shows only at large text, where words were cut).
+2. **The Quran's Arabic is never given to a screen reader or a phone voice.** Only the app's reciters voice it.
+   An ayah is named by its number and its translation is spoken. The Arabic ayah text and the basmala are
+   hidden. Surah names and dhikr stay readable. The cost, told to him at the time: a braille reader loses the
+   Arabic too.
+
+Commits carry no Co-Authored-By trailer (his standing rule), and their subjects are "area: sentence".
+
+**What each task did.**
+- **Task 1, Compose Multiplatform 1.12.1** (d9928036 on the old branch). On main as 15d84d33, it shipped in
+  1.0.0 (34). It fixes the crash when iOS reads an accessibility element after its node is gone
+  (JetBrains/compose-multiplatform-core#3403). Only VoiceOver, Voice Control, Switch Control and Full Keyboard
+  Access users could hit it.
+- **Task 2, Compose UI tests on the iOS simulator target** (11ebc25f; on main as ee6f44a7, 11 October). The
+  harness ran on its first try. The rules it taught every later test:
+  - the v2 runner;
+  - expected labels from `getString`, never English literals;
+  - never compose `TaqwaTheme`, `SystemBarsAppearance` or `KeepScreenOn` under test (they segfault the test
+    process, which has no `UIApplication`);
+  - the `compose-ui-test` catalog dependency.
+- **Task 3, the Mushaf at any font scale** (11531ab6; docs 5f1a06fa). The frame now measures and draws under
+  a density pinned at font scale 1. From 150 %, Android's non-linear scaling had broken `fittedSize`, so
+  justified lines overflowed and words were cut at the reading end (vm-mushaf-scale, a blocker). The page
+  starts from the size the phone itself would draw the base at (`scaledBase`), so the two opening pages, which
+  have room to spare, still grow with the text setting. The captions and the page number keep the phone's
+  scale.
+- **Task 4, the back chevron and VoiceOver's escape** (2537b984, e08653c2; docs 12e51baa, 980429eb).
+  - The chevron on every pushed screen is a `Role.Button` named Back (`nav_a11y_back`). TalkBack had called it
+    Unlabelled.
+  - iOS `SystemBackHandler` had been a no-op. It is now CMP's `BackHandler`, which 1.12 feeds from
+    `accessibilityPerformEscape`, so VoiceOver's two-finger scrub walks the chevron's stack.
+  - The handler is enabled only while VoiceOver runs.
+- **Task 5, a switch row is one switch** (88dc26f7; docs 071ce555). `TaqwaRow(toggle = RowToggle(…))` is one
+  node with `Role.Switch`, its on/off state and a semantic click that flips it. The drawn switch is hidden from
+  semantics and keeps its own touch, so a touch on the label still does nothing.
+  - It covers twelve rows: location, prayer notifications, Tahajjud, the three recitation rows, Saudi Fajr,
+    both Asr, where they differ, sunrise, and the reading sheet's transliteration and read-aloud.
+  - `TaqwaToggle` moved to `design/components` and is a `toggleable` of its own for the download sheet's row.
+- **Task 6, pickers, segments and tabs say what is chosen** (48af09fd, after three fix rounds).
+  - The selected state, inside `selectableGroup()` cards, now covers: theme, widget background, the
+    calculation method, the high-latitude rule, remind-before, the translation list, the sound and
+    adhan-voice sheets, the reciter picker, the Asr and Hijri segments, Surah | Juz | Bookmarks,
+    Translation | Mushaf and the three tabs.
+  - The six preview buttons name what they play (`sound_a11y_preview`).
+  - `TaqwaRow` option rows are radio buttons; segments and tabs are tabs.
+  - The timetable rows and the audio rows have no role (rulings below).
+- **The integration, "Task 0"** (a996593f). Main had grown three switch rows since the plan: the adhkar
+  reminder and the adhkar reading sheet's transliteration and translation rows. They still called the moved
+  `TaqwaToggle`, so the rebased branch did not build. They now use `RowToggle`. Their iOS tests find the row by
+  its toggle semantics and activate it the way a screen reader does. 88dc26f7, 071ce555 and 48af09fd do not
+  build alone; a996593f repairs that, and the squash closes the gap.
+- **Task 7, the Prayer screen as sentences** (8345444b, 59c3ae73).
+  - Each prayer row is one node, "Asr, 4:45", with the state Next prayer, Current prayer or Passed. The Arabic
+    name beside the Latin one is not spoken.
+  - The ring is one sentence, "Fajr in 4 hours 10 minutes, at 5:10". It counts whole minutes, so it changes
+    once a minute, and it is not a live region.
+  - Every spoken time comes from the formatter the screen draws with, so under the 12-hour clock both say
+    "4:45 PM". The ring's time is `isolatedClock`.
+  - The fix round: the next row is matched by prayer and instant. Before today's Fajr in a high-latitude
+    summer the countdown can be yesterday's Isha, and today's Isha row had said Next prayer.
+- **Task 8, headings and two items from main** (38b2d822, f7dab062, 608ed871, `fixup!` 3b8b71b0).
+  - Every settings title and section label is a heading. That includes the Quran search's Surahs and Ayahs
+    labels, which share `SectionLabel`.
+  - The time-format sheet's two options say which clock is chosen.
+  - The Prayer header's Adhkar and Tasbeeh glyphs are buttons.
+- **Task 9, the ayah card** (3be12290, 807b7a04).
+  - The card's text is "Ayah 255. <translation>", the translation tagged with its own language.
+  - Its states are Selected (in its own words, `quran_a11y_selected`), Bookmarked, and Being read aloud (the
+    phone's voice on the translation).
+  - Every card offers four actions: Play or Pause, Bookmark or Remove bookmark, Copy, and Share.
+  - Only the drawn Arabic, the transliteration and the translation row are cleared. So the selected card's
+    row of buttons keeps its own nodes, for Voice Access and Voice Control.
+  - The basmala, the reading sheet's size preview, the Arabic of search hits and bookmark rows, and the
+    Appearance widget preview's Arabic are hidden.
+- **Task 10, the Mushaf's stops** (361a9b61, 82901ba7, f46d0452).
+  - Each ayah has one invisible, touch-transparent stop over its first run of words on the page (sr-mushaf,
+    a blocker). It is named "Ayah 255" in the interface's digits. Stops run right to left in each line,
+    through a traversal group and `traversalIndex`.
+  - A double-tap selects, as a tap does. The custom action is Play, or Pause while that ayah is the live
+    recitation.
+  - The basmala line is hidden.
+  - The stop's only state is Selected. 82901ba7's "Being read aloud" was removed by f46d0452.
+- **Task 11, the ayah widgets** (2d0ca7f1). The Android card was a bitmap marked decorative (pl-ayah-widget, a
+  blocker), and the iOS card read its raw Uthmani text. Both now carry one sentence, built by `:widgetcore`'s
+  `AyahWidgetSpeech`:
+  - the widget's name;
+  - "Ar-Ra’d, ayah 28" in the interface's script and digits;
+  - then the translation, when the card shows one.
+
+  On Android it is the `Image`'s description. On iOS the card is one element with that label.
+- **The closing review and its fix wave** (f46d0452, cf062880, 047680f9, 7d6d58b3, 85f35a37). The whole-branch
+  review of a84c2334..2d0ca7f1 said "ready with fixes". The fix wave:
+  - applied Task 10's ruling;
+  - corrected a KDoc, a widget comment and a test name;
+  - named every sheet's drag handle "Drag handle" (`sheet_a11y_drag_handle`, material3's own words and
+    translations);
+  - added a test that a finger on the drawn switch flips it and a finger mid-row does not;
+  - labelled the Mushaf's page number "Page 42" (`quran_a11y_page_n`) and a surah band's count "286 ayahs"
+    (`quran_a11y_ayah_count`);
+  - amended spec §3–§5 for the rulings, and added plan Task 12 Step 2b, the listening checklist.
+
+  The drag handle and the two numerals were already like that on main. They are separate commits (047680f9,
+  7d6d58b3) that can be dropped cleanly.
+
+**Rulings that changed the plan** (the ledger has each one's cost):
+- Task 1: the body cites compose-multiplatform-core#3403, not compose-multiplatform#3403.
+- Task 2: the v2 runner, `getString` for expected labels and the catalog dependency. Never `TaqwaTheme`,
+  `SystemBarsAppearance` or `KeepScreenOn` under test.
+- Task 3: the page starts from the phone's own scaled size, so the opening pages keep their growth.
+- Task 4: CMP 1.12 turns any enabled back handler into an edge swipe-back for everyone, so the iOS handler is
+  gated on assistive technology.
+  - First the gate was VoiceOver or Switch Control.
+  - Then it was VoiceOver alone, because Switch Control leaves direct touch working.
+- Task 5: the switch-row test activates the semantic click, because the row takes no touch at its centre.
+- Task 6: the calculation-method rows and the Asr and Hijri segments were brought in, since the commit body
+  had claimed them.
+- Task 6: `TimetableChoiceRow` and `AudioOptionRow` take no role. Android drops the click from a selected radio
+  button, and their chosen row still acts (it confirms a paused timetable, or offers the download again).
+  `TaqwaRow` option rows keep the radio role.
+- 17 October: the briefs, written against d5230081, apply to main's renamed code (`feature/prayer`,
+  `prayer_*` keys).
+- 17 October: every spoken clock time uses the `ClockFormat` formatter the screen draws with.
+- 17 October: the time-format sheet and the header glyphs ride with Task 8. The Quran list's surah-number
+  circles cut at 200 % are out of scope, as a visual fix.
+- 17 October: the Lead made the three-call-site integration fix itself. The branch merges squashed, so no
+  commit on main fails to build and the `fixup!` folds.
+- Task 7: the next row is matched by prayer and instant, and the ring splices `isolatedClock`.
+- Task 8: the time-format options keep the radio role. Choosing the clock in use again only closes the sheet.
+- Task 9: the action says Pause only while the ayah is playing and the voice is live. Paused there, it says
+  Play and resumes.
+- Task 9: the card never sets the semantic `selected`. It says Selected itself, and only the drawn pieces are
+  cleared. Design §5's "`selected` when selected" is superseded.
+- Task 10: the stop's action says Pause while it is live.
+- Task 10: the stop states Selected and never Being read aloud. On the Mushaf that phrase would read as a phone
+  voice reading the Quran, and TalkBack could speak it over the reciter.
+- Closing review: the merge waits for the listening checklist (spec, Verification).
+
+**Checked, and where.**
+- **The suite and builds.** On 85f35a37, `scripts/test.sh` exited 0 in 359 s: shared 1,818 tests on the iOS
+  simulator and 1,864 on the Android host, widgetcore 97 and 99, 0 failures. `scripts/check-strings.sh` was
+  clean, and `:androidApp:assembleDebug` built.
+  - At Task 11, `scripts/ios-build.sh` built, with the widget extension at 3 MB of its 15.
+  - Every task's new test went RED then GREEN. The semantics tests were mutation-checked (ControlSemanticsTest
+    9 cases, MushafPageSemanticsTest 15, AyahCardSemanticsTest 8, PrayerSpeechTest 6).
+  - These tests read Compose's semantics tree, not UIKit's or Android's mapping of it.
+- **29 September, Android emulator** (emulator-5558, Pixel_8_Pro, Android 16, 448×997 dp, the app in Arabic).
+  It covered Tasks 1–6 on the old base. Before was main 6dea49c4 (build 33's code); after was that main with the
+  branch merged on a detached HEAD.
+  - At 100 %, Settings, Notifications, the reader and Mushaf pages 1 and 4 were pixel-identical apart from
+    the status-bar clock. Prayer, Quran and Appearance differed only in live content.
+  - The chevron went from View to Button "رجوع". Switch rows were one checkable node with the label. Option
+    rows were checkable and checked, and tabs and segments were selected.
+  - Mushaf page 4 at 150 and 200 %: before, lines ran over the frame's left edge and words merged; after, it
+    was laid out as at 100 %.
+  - Al-Fatihah was identical before and after at 100, 150 and 200 %, so the opening page kept its growth.
+  - The iOS simulator pass did not run that day: `simctl boot` was refused.
+- **29 September, the S23** (R5CW219W15J, at Mohamed's request, with the peer sessions told). It ran debug
+  builds before and after, with Mushaf page 4 and Al-Fatihah at 100, 150 and 200 %.
+  - At 100 % both builds were identical.
+  - Before: page 4 overflowed and merged at 150 and 200 %. On this 384 dp phone Al-Fatihah overlapped the frame
+    at 150 % and was cut mid-word at 200 %.
+  - After: both pages stayed inside the frame at every size.
+  - The phone was left on the before build (6dea49c4, build 33's code) at font scale 1.0.
+- **17 October, Android emulator** (the closing workflow's device check, 05:30–06:00).
+  - Setup:
+    - One throwaway Pixel_8_Pro AVD, Android 16, 1344×2992 at 480 dpi, started with `-port 5558 -no-window
+      -gpu swiftshader_indirect -no-snapshot -read-only -no-audio`.
+    - adb was used only as `-s emulator-5558`, and the emulator was stopped with `emu kill`. No other emulator
+      or phone was touched.
+    - The read-only image already held Taqwa data (London, Mushaf mode, notifications off, the app locale
+      Arabic), so there was no onboarding. The app locale was switched to en-US.
+  - Builds: main.apk from a84c2334 and branch.apk from 2d0ca7f1, both versionCode 37. The branch build went on
+    with `install -r` over main's data. **The branch build predates the fix wave.**
+  - The emulator's own TalkBack 16 ran with verbose logging. Touches went in through `adb emu event mouse`, and
+    what TalkBack spoke was read from logcat's `ttsOutput` lines.
+  - **At default settings nothing moved.** Eleven screens on main and the branch were compared: Prayer,
+    Settings, Notifications, Appearance, Prayer times, the time-format sheet, the Quran root, the reader at
+    2:255, Mushaf pages 1 and 4, and the evening adhkar.
+    - All eleven were pixel-identical outside the status bar and two live regions: the countdown digits
+      (474,510)–(776,766) and the widget previews' countdown (302,2030)–(629,2096).
+    - The reader was identical even with no mask at all.
+    - The method: Pillow per-pixel luminance difference, threshold 8, with the top 140 px masked. No diff
+      image was written, because nothing differed.
+  - **Prayer.** Each row is one node, `View desc='Fajr, 5:52'` through 'Isha, 19:29'. On main these were
+    separate TextViews 'Fajr' / 'الفجر' / '5:52'.
+    - TalkBack said "Next prayer, Fajr, 5:52".
+    - The ring is `desc='Fajr in 1 hour 12 minutes, at 5:52'`, where main had 'FAJR IN', '1:18:43' and '5:52'.
+      Later TalkBack said "Fajr in 57 minutes, at 5:52".
+    - The glyphs are `Button desc='Adhkar'` and `'Tasbeeh'`, and TalkBack said "Adhkar, Button".
+  - **Switch rows.** Prayer notifications is one `View clickable,checkable checked=false` over the whole row.
+    Main's separate, unlabelled switch node at `[1080,427][1224,571]` is gone. TalkBack said "Off, Prayer
+    notifications, Switch", and "Off, Morning and evening adhkar, Half an hour after Fajr and Asr, Switch".
+    - Touch is main's. A tap on the drawn Show sunrise switch flipped the row to `checked`, and a second tap
+      restored it. A tap on the label at (300,2074) did nothing.
+    - The Back chevron is `Button desc='Back'`.
+  - **Choices.** Exactly one option per group is checked or selected: Theme, Widget background, the Asr and
+    Hijri segments, the time format, and Surah | Juz | Bookmarks. TalkBack said:
+    - "Selected, System, Radio button, 1 of 3, In list, 3 items";
+    - "Not selected, Light, Radio button, 2 of 3";
+    - "Selected, 24-hour, 18:32, Radio button, 1 of 2";
+    - "selected, Automatic, Tab, 1 of 3".
+
+    The settings title and section labels came through as headings.
+  - **The reader at 2:255.** The card is `TextView text='Ayah 255. Allah - there is no deity except Him…'`, and
+    TalkBack said "Selected, Ayah 255. …". In the Arabic interface it said "محددة", then "الآية 255." and the
+    translation.
+    - Ayah 254 and 256 are clickable but not checkable, and 256 is read with no "Not selected".
+    - The selected card keeps its Play, Bookmark, Copy and Share row.
+    - The branch dump has 0 Arabic nodes, where main's had 2 (the text of 2:255 and 2:256).
+    - At 2:1 the basmala is drawn but not in the tree, and a TalkBack touch on it spoke nothing.
+  - **The Mushaf.** Page 1 has stops 'Ayah 1' through 'Ayah 7' in order, and page 4 'Ayah 17' through
+    'Ayah 24'.
+    - There are no ayah-text nodes. The only Arabic left is the surah name, the band's count '٧' and the page
+      number '١'.
+    - On page 42 TalkBack said "Selected, Ayah 255, In horizontal pager". Ayah 254 said only "Ayah 254" and
+      "Actions available".
+    - As designed (§5), a stop covers only the ayah's first run of words. Exploring the ayah's later lines by
+      touch lands on no stop.
+  - **The Quran root.** A surah row reads "2, Al-Baqarah, The Cow · 286 ayahs · Madani, البقرة". The surah name
+    stays readable, as allowed.
+  - **The adhkar.** The Ayat al-Kursi card is `desc='Quran 2:255 · an-Nasa’i al-Kubra 10731 · al-Hakim 1/562'`,
+    with no Arabic node, the same as main. Its translation is spoken.
+  - **The Arabic grep** (U+0600–U+06FF, every dump on both builds, `arabic_hits.txt`). The branch's hits are
+    surah names, the widget preview's prayer labels ('Fajr · الفجر'), and Arabic-Indic digits. The only
+    TalkBack utterances in Arabic script were 'البقرة' and the page number '٤٢'.
+  - **Large text.** At font scale 2.0 the branch's Mushaf page 4 had all 15 lines, and no word was cut or merged
+    at either edge (full-resolution crops of both edges).
+    - Its glyphs are the size they are at 1.0. Only the header, the side labels and the page number grew, and
+      the page moved down about 55 px.
+    - The 2:17 action bar sat in the bottom margin.
+    - font_scale was put back to 1.0 and read back.
+  - **Found.** Nothing in what the round changes. Three things already on main were found:
+    - the page number spoken as bare "٤٢";
+    - the band's bare count;
+    - an unlabelled clickable node beside the time-format sheet's handle.
+
+    The fix wave labelled all three (7d6d58b3, 047680f9). **Those labels have not been on a device.**
+  - TalkBack was turned off again before the emulator was stopped, and the worktree was left clean.
+  - The artifacts are in the session's scratchpad, not in the repository:
+    `/private/tmp/claude-501/-Users-mohamedabulgasem-Desktop-Workspace-apps/d2f2d5b2-1f80-4ac1-b4d2-f0b36f6f4636/scratchpad/a11y-round1/android/`.
+    It holds both APKs and their build logs, `shots/` (the `m_`/`b_` pairs and the 200 % crops), and `dumps/`
+    (every uiautomator XML, plus the helper scripts and `diff.py`). It also holds `talkback/` (each probe's
+    verbose logcat, with `ttsOutput_summary.txt`).
+
+**What TalkBack said that the spec does not.** 85f35a37 amended spec §3 to say that TalkBack speaks no role
+word on a row, segment or tab with text children. That was inferred from the 29 September dumps' class names
+(`android.view.View`), and the rows are still `View` in the 17 October dumps. But TalkBack 16 said "Switch",
+"Radio button", "Tab" and "Button", and the position "2 of 3". It also speaks the state first ("Off, …",
+"Next prayer, Fajr, 5:52", "Selected, Ayah 255"), where the checklist expected the state after the label. The
+§3 paragraphs have since been corrected to what was heard, and the listening checklist is to confirm it on the
+owner's phone.
+
+**Not verified.**
+- **Nobody listened.** TalkBack ran only on the emulator, with no audio, and its speech was read as text. No
+  person heard TalkBack on a phone or VoiceOver anywhere. The simulator cannot run VoiceOver.
+- **No iOS device pass.** The plan's simulator tree dump (Task 12 Step 3) did not run in this round. The iOS
+  back gesture (Task 4), the VoiceOver phrasing ("selected, button") and the iOS widget as one element are
+  unobserved.
+- **Voice Access, Voice Control and Switch Access are untested.** That includes "tap Copy" on the selected
+  card and the closing review's check (b): iOS Voice Control "Tap <name>" on the eight switch rows with no
+  whole-row tap. If Voice Control taps the element's centre, nothing happens there.
+- **The S23 was not used on 17 October.**
+- **The fix wave on a device.** None of its five commits has been on one: "Page 42", "286 ayahs", "Drag
+  handle", and a recited stop with no state.
+- **Left unchecked by the emulator check:**
+  - the Current prayer and Passed states (the run was before Fajr);
+  - anything during recitation or read-aloud, including check (c), TalkBack's focus on a card while
+    read-aloud moves;
+  - the Mushaf's Play action and a second double-tap;
+  - TalkBack's double-tap on a switch row;
+  - the home-screen widget (none was placed);
+  - the dark theme, the Arabic interface beyond the reader card, and the other five languages;
+  - the 12-hour clock's FSI/PDI in speech and braille;
+  - heading navigation itself;
+  - main at 200 %;
+  - Notifications and Appearance below the first screen.
+- **The translation's language tag.** Compose passes it on as a LocaleSpan. Whether TalkBack switches voice
+  for it cannot be told from a text log.
+
+**Strings written without a native reviewer.** Nobody who speaks these languages has read any of them.
+- Most were the plan's (28 September).
+- `quran_a11y_selected` is the Task 9 implementer's.
+- `quran_a11y_page_n` and `quran_a11y_ayah_count` are the fix wave's, built from the app's own words for page
+  and ayah.
+- `sheet_a11y_drag_handle` is material3's own translation, copied byte for byte from its AAR.
+
+`values-in` is a copy of `values-id`. The Compose keys are in all eight folders, `widget_ayah_a11y_reference`
+is in the seven Android app folders, and `ayah_widget_a11y_reference` is in the seven iOS widget `.lproj`
+folders.
+
+| Key | ar | bn | fr | id, in | tr | ur |
+|---|---|---|---|---|---|---|
+| `nav_a11y_back` | رجوع | ফিরে যান | Retour | Kembali | Geri | واپس |
+| `sound_a11y_preview` | استمع إلى %1$s | %1$s শুনুন | Écouter %1$s | Dengarkan %1$s | Dinle: %1$s | %1$s سنیں |
+| `prayer_a11y_prayer_next` | الصلاة التالية | পরবর্তী নামাজ | Prochaine prière | Salat berikutnya | Sonraki namaz | اگلی نماز |
+| `prayer_a11y_prayer_current` | الصلاة الحالية | বর্তমান নামাজ | Prière en cours | Salat saat ini | Şu anki namaz | موجودہ نماز |
+| `prayer_a11y_prayer_passed` | انقضت | পার হয়ে গেছে | Passée | Sudah lewat | Geçti | گزر چکی |
+| `prayer_a11y_countdown` | %1$s بعد %2$s، الساعة %3$s | %2$s পরে %1$s, %3$s-এ | %1$s dans %2$s, à %3$s | %1$s dalam %2$s, pukul %3$s | %2$s sonra %1$s, saat %3$s | %2$s بعد %1$s، %3$s بجے |
+| `prayer_a11y_countdown_soon` | %1$s بعد أقل من دقيقة، الساعة %2$s | এক মিনিটেরও কম সময়ে %1$s, %2$s-এ | %1$s dans moins d’une minute, à %2$s | %1$s kurang dari satu menit lagi, pukul %2$s | Bir dakikadan az sonra %1$s, saat %2$s | ایک منٹ سے کم میں %1$s، %2$s بجے |
+| `duration_hours_minutes` | %1$s و%2$s | %1$s %2$s | %1$s %2$s | %1$s %2$s | %1$s %2$s | %1$s %2$s |
+| `a11y_hours` (plural) | ساعة; two ساعتين; few ساعات | ঘণ্টা | heure, heures | jam | saat | گھنٹہ, گھنٹے |
+| `a11y_minutes` (plural) | دقيقة; two دقيقتين; few دقائق | মিনিট | minute, minutes | menit | dakika | منٹ |
+| `quran_a11y_selected` | محددة | নির্বাচিত | Sélectionné | Dipilih | Seçili | منتخب |
+| `quran_a11y_page_n` | صفحة %1$s | পৃষ্ঠা %1$s | Page %1$s | Halaman %1$s | %1$s. sayfa | صفحہ %1$s |
+| `quran_a11y_ayah_count` (plural) | آية; two آيتان; few آيات | আয়াত | verset, versets | ayat | ayet | آیت, آیات |
+| `widget_ayah_a11y_reference`, `ayah_widget_a11y_reference` | %1$s، الآية %2$s | %1$s, আয়াত %2$s | %1$s, verset %2$s | %1$s, ayat %2$s | %1$s, %2$s. ayet | %1$s، آیت %2$s |
+| `sheet_a11y_drag_handle` (material3's) | مقبض السحب | টেনে আনার হ্যান্ডেল | Poignée de déplacement | Handel geser | Sürükleme tutamacı | گھسیٹنے کا ہینڈل |
+
+Points for the reader:
+- **Arabic.** The plurals take the CLDR forms, with the numeral always spliced in front, as every Arabic
+  plural in the app does. So the countdown says "بعد ١ ساعة" and "بعد ٢ ساعتين", where Arabic says بعد ساعة
+  and بعد ساعتين, with no numeral. The dual is in the genitive, because these plurals are only spoken after بعد
+  (ساعتين, دقيقتين, the form `timetable_minutes` already uses). They first had the nominative ساعتان and
+  دقيقتان. محددة is feminine, to agree with الآية.
+- **Bengali, Turkish and Urdu** put the duration before the prayer.
+- **Turkish** writes the page and the widget's ayah as ordinals ("%1$s. sayfa", "%2$s. ayet").
+- **Urdu** puts بجے after a time that, at 12-hour, already carries its own AM/PM.
+
+**What is left.**
+- **The listening checklist** (plan Task 12 Step 2b), with TalkBack on an Android phone and VoiceOver on an
+  iPhone, with Mohamed listening or with his OK. The merge waits for it.
+  - The emulator's TalkBack output already answers several items: the role words and the position are spoken,
+    the state comes first, unselected cards say no "Not selected", the selected stop says "Selected", and
+    "Adhkar, Button" and the time format's "Selected".
+  - Every iOS item, check (b) and check (c) are open, and so is everything the fix wave added.
+- **Check (b)'s remedy, if it fails, is the owner's.** Any whole-row tap would change touch.
+- **The strings above**, for review per language.
+- **Findings 10 and 12**, keep or drop. They are the page number and band count, and the drag handle. Both
+  were on main already, are semantics only, and are separate commits.
+- **The squash merge.** The draft message is at the end of the ledger folder's `final-fix-report.md`. The squash
+  also replaces 2537b984's "VoiceOver or Switch Control" and 82901ba7's "being read aloud".
+- **The deferred minors still open:**
+  - Task 4: a focused text field (Quran or city search) may take VoiceOver's escape before the handler.
+    Switch Control users get no scrub-back, as ruled.
+  - Task 5:
+    - `trailing` is silently dropped when `toggle` is set (`TaqwaCard.kt`); it wants a `require` or a KDoc
+      line.
+    - A future row's `onClick` and `toggle` could diverge.
+    - The first switch test's `checked` is a plain `var`.
+    - `onClick { }` inside the semantics block reads ambiguously.
+    - 88dc26f7's "touch stays on the drawn switch alone" is not literal for the rows already tappable as a
+      whole.
+  - Task 6: `TaqwaRow` option rows keep the radio role, so on Android the chosen remind-before, translation and
+    time-format rows lose their click; only a close is lost. No test exercises Android's dropped click.
+  - Task 0: positional `RowToggle` arguments at `NotificationSettingsScreen.kt:230`, beside the named form, and
+    a 119-column line in `AdhkarReadingSheet.kt`.
+  - Task 7:
+    - The row descriptions splice the bare time while the ring isolates it, so an Urdu 12-hour caption or
+      braille line could show it reversed.
+    - `prayerRowDescription` joins with a Latin ", " in Arabic and Urdu.
+    - `aPassedRowIsNeverNext…` does not pin that no row says Next.
+    - Two long lines in `CountdownRing.kt`.
+    - The ring's once-a-minute change is not announced, as designed, and has not been listened to.
+  - Task 8: the sheet titles (Time format, Remind me before) are not headings, and one KDoc line in
+    `AdhkarButtonTest` runs to 131 columns.
+  - Task 9:
+    - Copy and Share return true even when `shareTextFor` is null.
+    - A screen reader's Copy gives no "Copied".
+    - The default `{}` callbacks announce actions that do nothing.
+    - Latin separators in Arabic and Urdu.
+    - The Play lambda is duplicated in `ReaderScreen`.
+    - No tests for the basmala, search-hit, bookmark-row and widget-preview hides.
+    - The visible row's Play button still says Play while playing, as on main.
+  - Task 10: the play-or-toggle rule is written three times (pill, stop, the stop's label), `span(stop)` is
+    computed twice, and there are long lines.
+  - Task 11:
+    - The sentence rules are written twice, in Kotlin and Swift. Only the join is shared and tested.
+    - Latin separators in Arabic and Urdu.
+    - English-only iOS fallbacks on the debug preview route.
+    - The Swift method's name shadows `.accessibilityLabel`.
+    - The label carries the whole translation where the card may shorten it.
+    - One sentence can mix two languages until the mirror is rewritten after a language change.
+    - `scripts/check-strings.sh` does not scan `iosApp/TaqwaWidget/*.lproj`.
+  - Pre-existing and untouched: 13 Kotlin warnings and 222 test-compile warnings (`ExperimentalCoroutinesApi`
+    opt-ins), none in a changed file.
+- **Next round**: items 6–12 of the list (tasbeeh, Qibla, the player bar, phone-driven high contrast, small
+  labels, widget sentences, large-text clipping). The Quran list's surah-number circles, cut at 200 % text, are
+  parked for the owner as a visual fix.
+
+Checked for this entry: nothing run (docs only). The figures are the ledger's, the task reports', the fix
+wave's report and the 17 October device check's.

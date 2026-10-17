@@ -6,6 +6,14 @@
     <!-- The name of this file's own language, shown in Settings › Language. -->
     <string name="language_name">English</string>
 
+    <!-- Navigation: what a screen reader calls the drawn back chevron. -->
+    <string name="nav_a11y_back">Back</string>
+    <!-- The sound and adhan-voice sheets' preview buttons; %1$s is the option's own name. -->
+    <string name="sound_a11y_preview">Hear %1$s</string>
+    <!-- Spoken only. The grab handle at the top of every bottom sheet: material3's own words,
+         which its default handle says and the app's drawn one did not. -->
+    <string name="sheet_a11y_drag_handle">Drag handle</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">Taqwa</string>
     <string name="onboarding_welcome_body">Prayer times, qibla and the Quran. Free forever. No ads, no account, works offline.</string>
@@ -38,6 +46,24 @@
     <!-- Prayer screen -->
     <string name="prayer_current_location">Current location</string>
     <string name="prayer_next_in">%1$s in</string>
+    <!-- Spoken only. What a screen reader says after a prayer row's name and time. -->
+    <string name="prayer_a11y_prayer_next">Next prayer</string>
+    <string name="prayer_a11y_prayer_current">Current prayer</string>
+    <string name="prayer_a11y_prayer_passed">Passed</string>
+    <!-- Spoken only. The countdown ring as one sentence: %1$s the prayer, %2$s a duration built from
+         a11y_hours / a11y_minutes / duration_hours_minutes, %3$s the clock time. -->
+    <string name="prayer_a11y_countdown">%1$s in %2$s, at %3$s</string>
+    <string name="prayer_a11y_countdown_soon">%1$s in under a minute, at %2$s</string>
+    <!-- Joins the hours and the minutes of a spoken duration. -->
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <plurals name="a11y_hours">
+        <item quantity="one">%1$s hour</item>
+        <item quantity="other">%1$s hours</item>
+    </plurals>
+    <plurals name="a11y_minutes">
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
+    </plurals>
     <string name="prayer_exact_alarms_label">EXACT ALARMS OFF</string>
     <string name="prayer_exact_alarms_body">Android can ring up to an hour late until “Alarms &amp; reminders” is allowed for Taqwa.</string>
     <string name="prayer_no_location_title">No location yet</string>
@@ -555,6 +581,14 @@
     <string name="quran_action_copied">Copied</string>
     <string name="quran_action_share">Share</string>
     <string name="quran_a11y_read_aloud">Being read aloud</string>
+    <string name="quran_a11y_selected">Selected</string>
+    <!-- Spoken only. The Mushaf's page number under the frame and a surah band's ayah count,
+         both drawn as bare Arabic-Indic numerals. -->
+    <string name="quran_a11y_page_n">Page %1$s</string>
+    <plurals name="quran_a11y_ayah_count">
+        <item quantity="one">%1$s ayah</item>
+        <item quantity="other">%1$s ayahs</item>
+    </plurals>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbeeh</string>
     <string name="prayer_open_tasbeeh">Tasbeeh</string>

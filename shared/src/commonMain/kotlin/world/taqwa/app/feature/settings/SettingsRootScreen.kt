@@ -1,17 +1,14 @@
 package world.taqwa.app.feature.settings
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,8 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +30,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -78,6 +77,7 @@ import world.taqwa.app.resources.settings_version_value
 import world.taqwa.app.resources.language_name
 import world.taqwa.app.share.shareText
 import world.taqwa.app.widget.isIosPlatform
+import world.taqwa.app.resources.nav_a11y_back
 
 /** The horizontal inset every settings screen shares with the Prayer screen's cards. */
 internal val SettingsGutter = 24.dp
@@ -123,7 +123,11 @@ internal fun SettingsScaffold(
                 title,
                 style = TaqwaText.screenTitle,
                 color = colors.textPrimary,
-                modifier = Modifier.padding(start = SettingsGutter, end = SettingsGutter, top = 4.dp),
+                // Headings, so TalkBack's heading navigation and the VoiceOver rotor can jump from
+                // section to section instead of walking every row (audit sr-headings).
+                modifier = Modifier
+                    .padding(start = SettingsGutter, end = SettingsGutter, top = 4.dp)
+                    .semantics { heading() },
             )
             Spacer(Modifier.height(20.dp))
             content()
@@ -139,12 +143,16 @@ internal fun SettingsScaffold(
 @Composable
 internal fun BackChevron(onBack: () -> Unit) {
     val colors = LocalTaqwaColors.current
+    val back = stringResource(Res.string.nav_a11y_back)
     Box(
         Modifier
             .padding(start = 8.dp, top = 8.dp)
             .size(44.dp)
             .clip(CircleShape)
-            .clickable(onClick = onBack),
+            .clickable(role = Role.Button, onClick = onBack)
+            // A drawn chevron has no words of its own, and it is the first thing a screen reader
+            // meets on every pushed screen: "Back", not "Unlabelled".
+            .semantics { contentDescription = back },
         contentAlignment = Alignment.Center,
     ) {
         // Drawn from literal coordinates, so unlike every `Row` and `padding(start=)` on these
@@ -174,7 +182,7 @@ internal fun SectionLabel(text: String) {
         text,
         style = TaqwaText.sectionLabel,
         color = LocalTaqwaColors.current.textTertiary,
-        modifier = Modifier.padding(start = SettingsGutter + 4.dp, bottom = 8.dp),
+        modifier = Modifier.padding(start = SettingsGutter + 4.dp, bottom = 8.dp).semantics { heading() },
     )
 }
 
@@ -190,8 +198,8 @@ internal fun SettingsNote(text: String) {
 }
 
 @Composable
-internal fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
-    TaqwaCard(Modifier.padding(horizontal = SettingsGutter), content = content)
+internal fun SettingsCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    TaqwaCard(modifier.padding(horizontal = SettingsGutter), content = content)
 }
 
 /**
@@ -222,45 +230,6 @@ private fun UriHandler.openFirst(links: List<String>) {
 
 @Composable
 private fun GroupGap() = Spacer(Modifier.fillMaxWidth().height(28.dp))
-
-/**
- * A switch in the app's own palette. Material3's would arrive with its own colour scheme and a
- * different silhouette from everything else on these screens.
- */
-@Composable
-internal fun TaqwaToggle(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    val colors = LocalTaqwaColors.current
-    val knobStart by animateDpAsState(if (checked) 22.dp else 3.dp, label = "knob")
-    // Spec §92: 44 pt minimum. The switch is still drawn 48×28 — the outer box only widens what
-    // a finger has to hit, so nothing on the screen moves or changes shape.
-    Box(
-        Modifier
-            .defaultMinSize(minWidth = 48.dp, minHeight = 44.dp)
-            // The knob sliding is the feedback; a rectangular ripple around a pill looked like a
-            // box lighting up behind it.
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-            ) { onCheckedChange(!checked) },
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            Modifier
-                .size(width = 48.dp, height = 28.dp)
-                .clip(CircleShape)
-                .background(if (checked) colors.accent else colors.hairline),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            Box(
-                Modifier
-                    .padding(start = knobStart)
-                    .size(22.dp)
-                    .clip(CircleShape)
-                    .background(if (checked) colors.background else colors.surface),
-            )
-        }
-    }
-}
 
 @Composable
 fun SettingsRootScreen(

@@ -27,12 +27,13 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onFirst
-import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -467,8 +468,11 @@ class AdhkarScreenTest {
             translation.assertCountEquals(0)
         } else {
             translation.assertCountEquals(1)
-            // The translation switch is the last control on the sheet.
-            onAllNodes(hasClickAction()).onLast().performClick()
+            // The translation row is the switch, activated as a screen reader's double-tap does:
+            // only the drawn switch at its end takes a touch.
+            onNode(isToggleable() and hasText(getString(Res.string.adhkar_translation)))
+                .assertIsOn()
+                .performSemanticsAction(SemanticsActions.OnClick)
             assertEquals(listOf(false), switched)
         }
     }
@@ -505,8 +509,10 @@ class AdhkarScreenTest {
         assertEquals(listOf(reading.copy(arabicSizeSp = 32)), changes)
 
         if (UiLanguage.of(getString(Res.string.ui_language)).latinScript) {
-            // The transliteration switch is the first control after the slider.
-            onAllNodes(hasClickAction()).onFirst().performClick()
+            // The transliteration row is the switch, activated as a screen reader's double-tap does.
+            onNode(isToggleable() and hasText(getString(Res.string.quran_sheet_transliteration)))
+                .assertIsOff()
+                .performSemanticsAction(SemanticsActions.OnClick)
             assertEquals(reading.copy(transliteration = true), changes.last())
             assertEquals(2, changes.size)
         }

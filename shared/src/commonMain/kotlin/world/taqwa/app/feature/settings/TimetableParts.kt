@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -157,7 +158,12 @@ internal fun TimetableChoiceRow(
             .fillMaxWidth()
             .defaultMinSize(minHeight = 56.dp)
             // The radio filling is the acknowledgement; a ripple across the row would be a second one.
-            .clickable(
+            // A selectable, so a screen reader hears which timetable is chosen. No radio role: on
+            // Android a selected radio button offers no click, and the selected row here still
+            // acts — it confirms a paused timetable — so it keeps its click for TalkBack, Switch
+            // Access and Voice Access too.
+            .selectable(
+                selected = selected,
                 enabled = enabled,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,

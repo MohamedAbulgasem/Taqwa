@@ -2,7 +2,6 @@ package world.taqwa.app.feature.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
 import world.taqwa.app.design.components.TaqwaBottomSheet
 import world.taqwa.app.design.components.TaqwaCard
+import world.taqwa.app.design.components.RowToggle
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.Prayer
@@ -148,7 +151,7 @@ fun PrayerTimesSettingsScreen(
                 TaqwaRow(
                     stringResource(Res.string.saudi_fajr_later),
                     subtitle = stringResource(Res.string.saudi_fajr_later_detail),
-                    trailing = { TaqwaToggle(settings.saudiFajrLater, onSaudiFajrLater) },
+                    toggle = RowToggle(settings.saudiFajrLater, onSaudiFajrLater),
                 )
             }
             if (status?.highLatitude ?: (settings.timetable.startsWith("other."))) {
@@ -191,7 +194,7 @@ fun PrayerTimesSettingsScreen(
         SettingsCard {
             TaqwaRow(
                 stringResource(Res.string.show_both_asr),
-                trailing = { TaqwaToggle(settings.showBothAsr, onShowBothAsr) },
+                toggle = RowToggle(settings.showBothAsr, onShowBothAsr),
             )
             if (status?.whereDiffer == true) {
                 CardDivider()
@@ -202,7 +205,7 @@ fun PrayerTimesSettingsScreen(
                     } else {
                         stringResource(Res.string.show_where_differ_detail_here)
                     },
-                    trailing = { TaqwaToggle(settings.showWhereDiffer, onShowWhereDiffer) },
+                    toggle = RowToggle(settings.showWhereDiffer, onShowWhereDiffer),
                 )
             }
         }
@@ -239,7 +242,7 @@ fun PrayerTimesSettingsScreen(
         SettingsCard {
             TaqwaRow(
                 stringResource(Res.string.prayer_times_show_sunrise),
-                trailing = { TaqwaToggle(settings.showSunrise, onShowSunrise) },
+                toggle = RowToggle(settings.showSunrise, onShowSunrise),
             )
             CardDivider()
             // The screen's other display preference sits with "Show sunrise": both say how the
@@ -284,7 +287,10 @@ private fun TimeFormatSheet(current: ClockFormat, onPick: (ClockFormat) -> Unit)
     ) {
         Text(stringResource(Res.string.prayer_times_time_format), style = TaqwaText.screenTitle, color = colors.textPrimary)
         Spacer(Modifier.height(16.dp))
-        TaqwaCard {
+        // Radio buttons in one group, as the remind-before sheet's are, so a screen reader says
+        // which clock is chosen. Android takes the click off the chosen one, which costs nothing
+        // here: choosing it again only closes the sheet, as back and the scrim do.
+        TaqwaCard(Modifier.selectableGroup()) {
             ClockFormat.entries.forEachIndexed { index, option ->
                 if (index > 0) CardDivider()
                 val sample = remember(option) { createPlatformFormat(option).clockTime(18, 32) }
@@ -293,6 +299,7 @@ private fun TimeFormatSheet(current: ClockFormat, onPick: (ClockFormat) -> Unit)
                     subtitle = sample,
                     onClick = { onPick(option) },
                     selectable = true,
+                    selected = option == current,
                     trailing = { if (option == current) CheckMark() },
                 )
             }
@@ -370,7 +377,8 @@ private fun <T> SegmentedControl(
             .clip(RoundedCornerShape(18.dp))
             .background(colors.surface)
             .border(1.dp, colors.hairline, RoundedCornerShape(18.dp))
-            .padding(4.dp),
+            .padding(4.dp)
+            .selectableGroup(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         options.forEach { (value, label) ->
@@ -381,7 +389,7 @@ private fun <T> SegmentedControl(
                     .defaultMinSize(minHeight = 40.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .background(if (isSelected) colors.accent else colors.surface)
-                    .clickable { onSelect(value) }
+                    .selectable(selected = isSelected, role = Role.Tab) { onSelect(value) }
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -419,13 +427,14 @@ fun HighLatitudePickerScreen(
 ) {
     val colors = LocalTaqwaColors.current
     SettingsScaffold(stringResource(Res.string.prayer_times_high_latitude), onBack) {
-        SettingsCard {
+        SettingsCard(Modifier.selectableGroup()) {
             HighLatitudePreference.entries.forEachIndexed { i, preference ->
                 if (i > 0) CardDivider()
                 TaqwaRow(
                     label = highLatitudeDisplayName(preference),
                     onClick = { onPick(preference) },
                     selectable = true,
+                    selected = preference == current,
                     trailing = { if (preference == current) CheckMark() },
                 )
             }

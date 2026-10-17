@@ -33,6 +33,7 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.design.components.RowToggle
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.feature.recitation.ReciterMonogram
@@ -104,7 +105,7 @@ fun RecitationSettingsScreen(
                 stringResource(Res.string.recitation_settings_mobile_data),
                 onClick = { onSetMobileData(!state.downloadOnMobileData) },
                 ripple = false,
-                trailing = { TaqwaToggle(state.downloadOnMobileData, onSetMobileData) },
+                toggle = RowToggle(state.downloadOnMobileData, onSetMobileData),
             )
             CardDivider()
             // Spec §15.3: the sheet's switch, here so it can be turned off again.
@@ -112,7 +113,7 @@ fun RecitationSettingsScreen(
                 stringResource(Res.string.recitation_settings_auto_download),
                 onClick = { onSetAutoDownload(!state.autoDownload) },
                 ripple = false,
-                trailing = { TaqwaToggle(state.autoDownload, onSetAutoDownload) },
+                toggle = RowToggle(state.autoDownload, onSetAutoDownload),
             )
         }
 
@@ -130,7 +131,7 @@ fun RecitationSettingsScreen(
                     ),
                     onClick = { onSetReadAloud(!readAloud.enabled) },
                     ripple = false,
-                    trailing = { TaqwaToggle(readAloud.enabled, onSetReadAloud) },
+                    toggle = RowToggle(readAloud.enabled, onSetReadAloud),
                 )
                 // In-sentence casing (spec §6 fix round 1): both captions below read the language
                 // name mid-sentence, so French and Indonesian must keep their own lower case.

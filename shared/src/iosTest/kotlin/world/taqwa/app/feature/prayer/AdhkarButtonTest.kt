@@ -11,11 +11,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -61,8 +64,8 @@ import kotlin.time.Instant
 /**
  * The Prayer screen's header ends with two glyph buttons: the horizon, which opens the adhkar, and
  * the misbaha, which opens the tasbeeh and keeps the corner. Each is found by its content
- * description (the glyphs have no words), taps report only to its own callback, and both are the
- * 44 dp target. Run upright and sideways, and in both layout directions, because the landscape body
+ * description (the glyphs have no words), is a button to a screen reader, taps report only to its
+ * own callback, and both are the 44 dp target. Run upright and sideways, and in both layout directions, because the landscape body
  * shares the header row and "the misbaha keeps the corner" must hold under Arabic too.
  *
  * They sit on the city's line and nowhere else: the dates below run the block's whole width and
@@ -171,6 +174,17 @@ class AdhkarButtonTest {
     @Test
     fun theHorizonOpensTheAdhkarAndTheMisbahaStillOpensTheTasbeehSideways() = runComposeUiTest {
         bothButtonsReportToTheirOwnCallbackOnly(LayoutDirection.Ltr, sideways)
+    }
+
+    @Test
+    fun bothGlyphsAreButtonsToAScreenReader() = runComposeUiTest {
+        setContent { Screen(Taps(), LayoutDirection.Ltr, upright.first, upright.second) }
+        // The description is the name; the role is what lets TalkBack say "button" after it.
+        for (description in listOf(getString(Res.string.prayer_open_adhkar), getString(Res.string.prayer_open_tasbeeh))) {
+            onNodeWithContentDescription(description)
+                .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+                .assertHasClickAction()
+        }
     }
 
     @Test

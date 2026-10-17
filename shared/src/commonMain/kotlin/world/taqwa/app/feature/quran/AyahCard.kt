@@ -30,8 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -49,11 +53,20 @@ import world.taqwa.app.design.components.drawBookmark
 import world.taqwa.app.design.components.drawReadAloudMark
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
+import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.RTL_TRANSLATION_LANGUAGES
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_a11y_read_aloud
+import world.taqwa.app.resources.quran_a11y_selected
+import world.taqwa.app.resources.quran_action_bookmark
 import world.taqwa.app.resources.quran_action_bookmarked
+import world.taqwa.app.resources.quran_action_copy
+import world.taqwa.app.resources.quran_action_share
+import world.taqwa.app.resources.quran_ayah_n
+import world.taqwa.app.resources.quran_remove_bookmark
+import world.taqwa.app.resources.recitation_a11y_pause
+import world.taqwa.app.resources.recitation_play
 
 /**
  * One ayah's card (spec §2.3): the Uthmani Arabic with the ayah roundel inline, an optional
@@ -89,14 +102,51 @@ fun AyahCard(
      * the voice lights one ayah and the finger selects another, and the action row belongs to
      * the finger. */
     playing: Boolean = false,
+    /** True while the voice is going on the [playing] ayah, false while it is paused there (the
+     * recitation's own `live`): a paused ayah's Play resumes it, so the screen-reader action says
+     * Pause only when pausing is what it would do. */
+    live: Boolean = false,
     /** True while the phone's voice reads this card's translation (read-aloud spec §6). */
     speaking: Boolean = false,
     bookmarked: Boolean,
     actions: (@Composable () -> Unit)?,
     onClick: () -> Unit,
+    /**
+     * The four actions of the row, as screen-reader actions on every card (design §5): the row
+     * is drawn under the selected card only, and a blind reader should not have to select a card
+     * and then find a row to play, keep, copy or share an ayah. Play starts the chosen reciter
+     * from this ayah — the same call the visible button makes.
+     */
+    onPlay: () -> Unit = {},
+    onBookmark: () -> Unit = {},
+    onCopy: () -> Unit = {},
+    onShare: () -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     val bookmarkedLabel = stringResource(Res.string.quran_action_bookmarked)
+    val format = LocalPlatformFormat.current
+    val ayahLabel = stringResource(Res.string.quran_ayah_n, format.localizedDigits(ayahNumber))
+    val readAloudLabel = stringResource(Res.string.quran_a11y_read_aloud)
+    val selectedLabel = stringResource(Res.string.quran_a11y_selected)
+    val playLabel = stringResource(if (playing && live) Res.string.recitation_a11y_pause else Res.string.recitation_play)
+    val bookmarkLabel = stringResource(if (bookmarked) Res.string.quran_remove_bookmark else Res.string.quran_action_bookmark)
+    val copyLabel = stringResource(Res.string.quran_action_copy)
+    val shareLabel = stringResource(Res.string.quran_action_share)
+    // The card is one node and this is all of it: the ayah's number, then the translation in its
+    // own language (never the Arabic — design §5), its states, and the four actions. The pieces it
+    // draws are cleared one by one below, not the card as a whole, so the selected card's row
+    // keeps its buttons as nodes of their own: Voice Access and Voice Control users see the row and
+    // say "tap Copy", and neither service offers custom actions by name.
+    val spoken = remember(ayahLabel, translation, translationLanguage) { spokenAyah(ayahLabel, translation, translationLanguage) }
+    // Selection is spoken as a state in the card's own words, not through the semantic `selected`:
+    // on Android that key makes every unselected card say "Not selected" and each card a checkable
+    // toggle, and any state of the card's own takes the place of Android's "Selected". With both,
+    // VoiceOver would say the word twice.
+    val states = listOfNotNull(
+        if (selected) selectedLabel else null,
+        if (bookmarked) bookmarkedLabel else null,
+        if (speaking) readAloudLabel else null,
+    )
     // Selection is a state change, not a page change, so nothing about it snaps: the tint fades in
     // and the action row unfolds from under the translation, and both reverse on deselection.
     // Playing wins over selected: it is the louder claim on the ayah, and the two can be true of
@@ -117,11 +167,28 @@ fun AyahCard(
     var lastActions by remember { mutableStateOf(actions) }
     if (actions != null) lastActions = actions
     TaqwaCard(
-        Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = onClick,
-        ),
+        Modifier
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            )
+            // Not clearAndSetSemantics, which would drop the selected card's row as well.
+            // `clickable` merges what is drawn inside into this node, so every drawn piece that
+            // would say something is cleared below; each of the row's buttons is a clickable, so
+            // it stays a node of its own rather than merging into the card.
+            .semantics {
+                // `this.`: the card's own [text] parameter shadows the semantics property of the
+                // same name, so a bare `text =` would not compile.
+                this.text = spoken
+                if (states.isNotEmpty()) stateDescription = states.joinToString(", ")
+                customActions = listOf(
+                    CustomAccessibilityAction(playLabel) { onPlay(); true },
+                    CustomAccessibilityAction(bookmarkLabel) { onBookmark(); true },
+                    CustomAccessibilityAction(copyLabel) { onCopy(); true },
+                    CustomAccessibilityAction(shareLabel) { onShare(); true },
+                )
+            },
     ) {
         // The selected background belongs to the whole card, so it is this Box — not the padded
         // column inside it — that carries it.
@@ -144,7 +211,8 @@ fun AyahCard(
                         style = TaqwaText.quran(sizeSp),
                         fontFamily = mushafFamily(),
                         color = colors.textPrimary,
-                        modifier = Modifier.fillMaxWidth(),
+                        // Quran text: not for a phone voice (design §5).
+                        modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
                     )
                 }
                 if (transliteration != null) {
@@ -155,7 +223,9 @@ fun AyahCard(
                             style = TaqwaText.caption.copy(fontSize = 13.sp, fontStyle = FontStyle.Italic),
                             color = colors.textTertiary,
                             textAlign = TextAlign.Start,
-                            modifier = Modifier.fillMaxWidth(),
+                            // Not spoken either: a phone voice reading it would be a mangled
+                            // recitation.
+                            modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
                         )
                     }
                 }
@@ -164,17 +234,17 @@ fun AyahCard(
                     val translationDirection =
                         if (translationLanguage in RTL_TRANSLATION_LANGUAGES) LayoutDirection.Rtl else LayoutDirection.Ltr
                     CompositionLocalProvider(LocalLayoutDirection provides translationDirection) {
-                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                        // The card already speaks the translation, tagged with its language, and
+                        // Being read aloud is one of its states.
+                        Row(Modifier.fillMaxWidth().clearAndSetSemantics {}, verticalAlignment = Alignment.Top) {
                             if (speaking) {
-                                val readingLabel = stringResource(Res.string.quran_a11y_read_aloud)
                                 // Inside the provider above, so this is the translation's own
                                 // direction, not the app's: the wave faces the text it precedes.
                                 val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
                                 Canvas(
                                     Modifier
                                         .padding(top = 3.dp, end = 6.dp)
-                                        .size(14.dp)
-                                        .semantics { contentDescription = readingLabel },
+                                        .size(14.dp),
                                 ) { drawReadAloudMark(colors.accent, pointsForward = forward) }
                             }
                             Text(
@@ -206,12 +276,13 @@ fun AyahCard(
                 // so the badge costs the card no height at all and a bookmarked card sits exactly as
                 // tall as the same card unbookmarked. Top-*start*, so it follows the UI's direction
                 // (right under an Arabic UI) rather than the Arabic text's own.
+                // No description of its own: "Bookmarked" is one of the card's states, and a
+                // description merged into the card would be read in place of its text.
                 Canvas(
                     Modifier
                         .align(Alignment.TopStart)
                         .padding(start = 14.dp, top = 1.dp)
-                        .size(14.dp)
-                        .semantics { contentDescription = bookmarkedLabel },
+                        .size(14.dp),
                 ) { drawBookmark(colors.accent, filled = true) }
             }
         }

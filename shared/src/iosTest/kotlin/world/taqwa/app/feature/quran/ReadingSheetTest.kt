@@ -5,9 +5,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.v2.runComposeUiTest
@@ -25,9 +27,9 @@ import kotlin.test.assertEquals
 
 /**
  * The reader's sheet around its size slider, which the adhkar's sheet shares
- * ([ReadingSizeSlider]): a commit writes the size and keeps every other setting, and under the
- * Mushaf the slider is still and the note says why. Words come from the resources; digits from the
- * English format the scene is given.
+ * ([ReadingSizeSlider]): a commit writes the size and keeps every other setting, under the Mushaf
+ * the slider is still and the note says why, and the Arabic preview is drawn but never spoken.
+ * Words come from the resources; digits from the English format the scene is given.
  */
 @OptIn(ExperimentalTestApi::class)
 class ReadingSheetTest {
@@ -68,6 +70,13 @@ class ReadingSheetTest {
         assertEquals(listOf(settings.copy(arabicSizeSp = 32)), changes)
         // The row's number follows the slider before the store does.
         onNodeWithText("32").assertIsDisplayed()
+    }
+
+    /** The size preview is Quran text, and the Quran is for the reciters alone (design §5). */
+    @Test
+    fun thePreviewAyahIsNotGivenToAScreenReader() = runComposeUiTest {
+        setContent { Sheet(mushafMode = false, changes = mutableListOf()) }
+        onAllNodesWithText("ٱللَّهِ", substring = true).assertCountEquals(0)
     }
 
     @Test

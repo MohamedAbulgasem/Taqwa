@@ -22,11 +22,11 @@ import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.design.components.RowToggle
 import world.taqwa.app.design.components.TaqwaBottomSheet
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.feature.quran.ReadingSizeSlider
-import world.taqwa.app.feature.settings.TaqwaToggle
 import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.i18n.isLatinScriptUi
 import world.taqwa.app.i18n.uiLanguage
@@ -126,19 +126,14 @@ internal fun AdhkarReadingContent(
                 if (transliterationRow) {
                     TaqwaRow(
                         label = stringResource(Res.string.quran_sheet_transliteration),
-                        trailing = {
-                            TaqwaToggle(
-                                checked = settings.transliteration,
-                                onCheckedChange = { onChange(settings.copy(transliteration = it)) },
-                            )
-                        },
+                        toggle = RowToggle(settings.transliteration) { onChange(settings.copy(transliteration = it)) },
                     )
                 }
                 if (transliterationRow && translationRow) CardDivider()
                 if (translationRow) {
                     TaqwaRow(
                         label = stringResource(Res.string.adhkar_translation),
-                        trailing = { TaqwaToggle(checked = showTranslation, onCheckedChange = onTranslation) },
+                        toggle = RowToggle(showTranslation, onTranslation),
                     )
                 }
             }

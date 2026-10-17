@@ -28,6 +28,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -39,11 +42,15 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerStatus
+import world.taqwa.app.domain.PrayerTime
 import world.taqwa.app.domain.TimelineRow
 import world.taqwa.app.i18n.PrayerNaming
 import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.prayer_a11y_prayer_current
+import world.taqwa.app.resources.prayer_a11y_prayer_next
+import world.taqwa.app.resources.prayer_a11y_prayer_passed
 import world.taqwa.app.resources.prayer_jumuah
 import world.taqwa.app.resources.prayer_set_by_rule
 
@@ -81,6 +88,13 @@ fun PrayerTimeline(
     horizontalPadding: Dp = 24.dp,
     setByRule: Set<Prayer> = emptySet(),
     subLines: Map<Prayer, List<String>> = emptyMap(),
+    /**
+     * The countdown's start, so its row can say "Next prayer". Matched by prayer and instant, not
+     * prayer alone: before today's Fajr it can be yesterday's Isha or Maghrib (TimelineBuilder.build),
+     * which is no row of today's, while today's own Isha is still upcoming. Its instant is always
+     * ahead, so a passed or current row never matches.
+     */
+    next: PrayerTime? = null,
     formatTime: (TimelineRow) -> String,
 ) {
     val colors = LocalTaqwaColors.current
@@ -107,7 +121,13 @@ fun PrayerTimeline(
                     Modifier.fillMaxWidth().padding(vertical = 10.dp)
                         .alpha(if (row.status == PrayerStatus.PASSED) 0.44f else 1f),
                 ) {
-                    PrayerRow(row, arabicAlone, row.prayer in setByRule, formatTime)
+                    PrayerRow(
+                        row,
+                        arabicAlone,
+                        row.prayer in setByRule,
+                        formatTime,
+                        isNext = next != null && row.prayer == next.prayer && row.instant == next.instant,
+                    )
                     if (lines.isNotEmpty()) {
                         Column(
                             Modifier
@@ -137,10 +157,30 @@ private fun PrayerRow(
     arabicAlone: Boolean,
     setByRule: Boolean,
     formatTime: (TimelineRow) -> String,
+    isNext: Boolean,
 ) {
     val colors = LocalTaqwaColors.current
+    // One stop per prayer: name, pills, time, then its state — where a screen reader used to
+    // walk three nodes per prayer and hear which was next from nothing (audit sr-prayer-rows).
+    // The Arabic name beside the Latin one is decoration for the eye and is not spoken.
+    val pills = listOfNotNull(
+        if (row.isJumuah) stringResource(Res.string.prayer_jumuah) else null,
+        if (setByRule) stringResource(Res.string.prayer_set_by_rule) else null,
+    )
+    val description = prayerRowDescription(localizedPrayerName(row.prayer), pills, formatTime(row))
+    val state = when {
+        row.status == PrayerStatus.CURRENT -> stringResource(Res.string.prayer_a11y_prayer_current)
+        row.status == PrayerStatus.PASSED -> stringResource(Res.string.prayer_a11y_prayer_passed)
+        isNext -> stringResource(Res.string.prayer_a11y_prayer_next)
+        else -> null
+    }
     Row(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .clearAndSetSemantics {
+                contentDescription = description
+                if (state != null) stateDescription = state
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.width(GutterWidth), contentAlignment = Alignment.Center) {

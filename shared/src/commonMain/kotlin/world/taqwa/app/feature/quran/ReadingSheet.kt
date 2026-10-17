@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -42,13 +44,13 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
+import world.taqwa.app.design.components.RowToggle
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.design.components.TaqwaSegmented
 import world.taqwa.app.design.mushafFamily
 import world.taqwa.app.design.quran
 import world.taqwa.app.feature.recitation.ReadAloudState
-import world.taqwa.app.feature.settings.TaqwaToggle
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.quran.QuranText
 import world.taqwa.app.quran.ReadingMode
@@ -259,7 +261,8 @@ fun ReadingSheet(
                     fontFamily = mushafFamily(),
                     style = TaqwaText.quran(liveSize).copy(textAlign = TextAlign.Center),
                     color = colors.textPrimary,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                    // Quran text: not for a phone voice (design §5).
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp).clearAndSetSemantics {},
                 )
             }
             CardDivider()
@@ -267,12 +270,10 @@ fun ReadingSheet(
 
         TaqwaRow(
             label = stringResource(Res.string.quran_sheet_transliteration),
-            trailing = {
-                TaqwaToggle(
-                    checked = settings.transliteration,
-                    onCheckedChange = { onChange(settings.copy(transliteration = it)) },
-                )
-            },
+            toggle = RowToggle(
+                checked = settings.transliteration,
+                onCheckedChange = { onChange(settings.copy(transliteration = it)) },
+            ),
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -289,7 +290,7 @@ fun ReadingSheet(
                 ripple = false,
             )
             if (translationExpanded) {
-                TaqwaCard {
+                TaqwaCard(Modifier.selectableGroup()) {
                     // Translation off comes first: it is the one choice that is not a translation,
                     // and an Arabic reader who wants the cards without any text beneath should not
                     // have to scroll past seven languages to find it.
@@ -297,6 +298,7 @@ fun ReadingSheet(
                         label = stringResource(Res.string.quran_translation_off),
                         subtitle = stringResource(Res.string.quran_translation_off_detail),
                         selectable = true,
+                        selected = off,
                         onClick = {
                             onChange(settings.copy(translationId = ReadingSettings.NO_TRANSLATION))
                             translationExpanded = false
@@ -318,6 +320,7 @@ fun ReadingSheet(
                             // language is the only part of the row a reader can choose by.
                             value = format.languageName(info.language),
                             selectable = true,
+                            selected = info.id == effectiveId,
                             onClick = {
                                 onChange(settings.copy(translationId = info.id))
                                 translationExpanded = false
@@ -343,7 +346,7 @@ fun ReadingSheet(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 TaqwaRow(
                     label = stringResource(Res.string.quran_sheet_read_aloud),
-                    trailing = { TaqwaToggle(checked = readAloud.enabled, onCheckedChange = onReadAloud) },
+                    toggle = RowToggle(checked = readAloud.enabled, onCheckedChange = onReadAloud),
                 )
                 val missing = readAloud.missingEngine
                 if (missing != null) {

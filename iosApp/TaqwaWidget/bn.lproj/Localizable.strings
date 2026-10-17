@@ -5,6 +5,9 @@
 /* Shown on the card until the app has run once and written the pool mirror (design spec §2). */
 "ayah_widget_placeholder" = "আজকের আয়াত আনতে একবার তাকওয়া খুলুন";
 
+/* Spoken only: the ayah widget's reference for VoiceOver. %1$@ the surah, %2$@ the ayah number. */
+"ayah_widget_a11y_reference" = "%1$@, আয়াত %2$@";
+
 /* The two prayer widgets as they appear in the widget gallery. */
 "home_widget_name" = "তাকওয়া";
 "home_widget_description" = "পরবর্তী নামাজ, কাউন্টডাউন ও আজকের সময়সূচি।";

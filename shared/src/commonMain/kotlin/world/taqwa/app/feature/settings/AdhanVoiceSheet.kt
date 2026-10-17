@@ -2,6 +2,7 @@ package world.taqwa.app.feature.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,6 +21,7 @@ import world.taqwa.app.resources.adhan_voice_azeez_detail
 import world.taqwa.app.resources.adhan_voice_azemi_detail
 import world.taqwa.app.resources.adhan_voice_original_detail
 import world.taqwa.app.resources.adhan_voice_sheet_title
+import world.taqwa.app.resources.sound_a11y_preview
 
 /**
  * Who the recording is and how long it runs — the two things a listener needs before pressing
@@ -57,7 +59,7 @@ fun AdhanVoiceSheet(
             style = TaqwaText.screenTitle,
             color = colors.textPrimary,
         )
-        TaqwaCard(Modifier.padding(top = 16.dp, bottom = 24.dp)) {
+        TaqwaCard(Modifier.padding(top = 16.dp, bottom = 24.dp).selectableGroup()) {
             AdhanVoice.entries.forEachIndexed { i, voice ->
                 if (i > 0) CardDivider()
                 AudioOptionRow(
@@ -66,6 +68,7 @@ fun AdhanVoiceSheet(
                     selected = voice == current,
                     onSelect = { onPick(voice) },
                     onPreview = { onPreview(voice) },
+                    previewDescription = stringResource(Res.string.sound_a11y_preview, adhanVoiceDisplayName(voice)),
                 )
             }
         }

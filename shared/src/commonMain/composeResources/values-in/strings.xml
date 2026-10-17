@@ -4,6 +4,12 @@
 
     <string name="language_name">Bahasa Indonesia</string>
 
+    <!-- Navigation: what a screen reader calls the drawn back chevron. -->
+    <string name="nav_a11y_back">Kembali</string>
+    <!-- The sound and adhan-voice sheets' preview buttons; %1$s is the option's own name. -->
+    <string name="sound_a11y_preview">Dengarkan %1$s</string>
+    <string name="sheet_a11y_drag_handle">Handel geser</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">Taqwa</string>
     <string name="onboarding_welcome_body">Waktu salat, kiblat, dan Al-Qur’an. Gratis selamanya. Tanpa iklan, tanpa akun, berfungsi offline.</string>
@@ -35,6 +41,18 @@
     <!-- Prayer screen -->
     <string name="prayer_current_location">Lokasi saat ini</string>
     <string name="prayer_next_in">Menuju %1$s</string>
+    <string name="prayer_a11y_prayer_next">Salat berikutnya</string>
+    <string name="prayer_a11y_prayer_current">Salat saat ini</string>
+    <string name="prayer_a11y_prayer_passed">Sudah lewat</string>
+    <string name="prayer_a11y_countdown">%1$s dalam %2$s, pukul %3$s</string>
+    <string name="prayer_a11y_countdown_soon">%1$s kurang dari satu menit lagi, pukul %2$s</string>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <plurals name="a11y_hours">
+        <item quantity="other">%1$s jam</item>
+    </plurals>
+    <plurals name="a11y_minutes">
+        <item quantity="other">%1$s menit</item>
+    </plurals>
     <string name="prayer_exact_alarms_label">ALARM TEPAT WAKTU NONAKTIF</string>
     <string name="prayer_exact_alarms_body">Android bisa terlambat sampai satu jam selama izin “Alarm &amp; pengingat” belum diberikan untuk Taqwa.</string>
     <string name="prayer_no_location_title">Belum ada lokasi</string>
@@ -515,6 +533,11 @@
     <string name="quran_action_copied">Tersalin</string>
     <string name="quran_action_share">Bagikan</string>
     <string name="quran_a11y_read_aloud">Sedang dibacakan</string>
+    <string name="quran_a11y_selected">Dipilih</string>
+    <string name="quran_a11y_page_n">Halaman %1$s</string>
+    <plurals name="quran_a11y_ayah_count">
+        <item quantity="other">%1$s ayat</item>
+    </plurals>
     <!-- Tasbeeh (spec Tasbeeh §2 and §4) -->
     <string name="tasbeeh_title">Tasbih</string>
     <string name="prayer_open_tasbeeh">Tasbih</string>

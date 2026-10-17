@@ -4,6 +4,12 @@
 
     <string name="language_name">বাংলা</string>
 
+    <!-- Navigation: what a screen reader calls the drawn back chevron. -->
+    <string name="nav_a11y_back">ফিরে যান</string>
+    <!-- The sound and adhan-voice sheets' preview buttons; %1$s is the option's own name. -->
+    <string name="sound_a11y_preview">%1$s শুনুন</string>
+    <string name="sheet_a11y_drag_handle">টেনে আনার হ্যান্ডেল</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">তাকওয়া</string>
     <string name="onboarding_welcome_body">নামাজের সময়, কিবলা ও কুরআন। চিরকাল বিনামূল্যে। বিজ্ঞাপন নেই, অ্যাকাউন্ট নেই, ইন্টারনেট ছাড়াই চলে।</string>
@@ -35,6 +41,20 @@
     <!-- Prayer screen -->
     <string name="prayer_current_location">বর্তমান অবস্থান</string>
     <string name="prayer_next_in">%1$s পর্যন্ত বাকি</string>
+    <string name="prayer_a11y_prayer_next">পরবর্তী নামাজ</string>
+    <string name="prayer_a11y_prayer_current">বর্তমান নামাজ</string>
+    <string name="prayer_a11y_prayer_passed">পার হয়ে গেছে</string>
+    <string name="prayer_a11y_countdown">%2$s পরে %1$s, %3$s-এ</string>
+    <string name="prayer_a11y_countdown_soon">এক মিনিটেরও কম সময়ে %1$s, %2$s-এ</string>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <plurals name="a11y_hours">
+        <item quantity="one">%1$s ঘণ্টা</item>
+        <item quantity="other">%1$s ঘণ্টা</item>
+    </plurals>
+    <plurals name="a11y_minutes">
+        <item quantity="one">%1$s মিনিট</item>
+        <item quantity="other">%1$s মিনিট</item>
+    </plurals>
     <string name="prayer_exact_alarms_label">সুনির্দিষ্ট অ্যালার্ম বন্ধ</string>
     <string name="prayer_exact_alarms_body">তাকওয়াকে “অ্যালার্ম ও রিমাইন্ডার” অনুমতি না দেওয়া পর্যন্ত অ্যান্ড্রয়েড এক ঘণ্টা পর্যন্ত দেরিতে বাজতে পারে।</string>
     <string name="prayer_no_location_title">এখনো কোনো অবস্থান নেই</string>
@@ -521,6 +541,12 @@
     <string name="quran_action_copied">কপি হয়েছে</string>
     <string name="quran_action_share">শেয়ার</string>
     <string name="quran_a11y_read_aloud">পড়ে শোনানো হচ্ছে</string>
+    <string name="quran_a11y_selected">নির্বাচিত</string>
+    <string name="quran_a11y_page_n">পৃষ্ঠা %1$s</string>
+    <plurals name="quran_a11y_ayah_count">
+        <item quantity="one">%1$s আয়াত</item>
+        <item quantity="other">%1$s আয়াত</item>
+    </plurals>
     <!-- Tasbeeh -->
     <string name="tasbeeh_title">তাসবিহ</string>
     <string name="prayer_open_tasbeeh">তাসবিহ</string>

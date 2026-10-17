@@ -6,6 +6,12 @@
     <!-- Bu dosyanın kendi dilinin adı; Ayarlar › Dil altında görünür. -->
     <string name="language_name">Türkçe</string>
 
+    <!-- Navigation: what a screen reader calls the drawn back chevron. -->
+    <string name="nav_a11y_back">Geri</string>
+    <!-- The sound and adhan-voice sheets' preview buttons; %1$s is the option's own name. -->
+    <string name="sound_a11y_preview">Dinle: %1$s</string>
+    <string name="sheet_a11y_drag_handle">Sürükleme tutamacı</string>
+
     <!-- Tanıtım -->
     <string name="onboarding_welcome_title">Taqwa</string>
     <string name="onboarding_welcome_body">Namaz vakitleri, kıble ve Kur’an. Sonsuza dek ücretsiz. Reklam yok, hesap yok, çevrimdışı çalışır.</string>
@@ -40,6 +46,20 @@
     <!-- Geri sayım halkasının etiketi. Halka bu metni büyük harfe çevirir; Türkçedeki İ’lerin
          doğru kalması için burada zaten büyük harfle yazılmıştır. -->
     <string name="prayer_next_in">%1$s vaktine</string>
+    <string name="prayer_a11y_prayer_next">Sonraki namaz</string>
+    <string name="prayer_a11y_prayer_current">Şu anki namaz</string>
+    <string name="prayer_a11y_prayer_passed">Geçti</string>
+    <string name="prayer_a11y_countdown">%2$s sonra %1$s, saat %3$s</string>
+    <string name="prayer_a11y_countdown_soon">Bir dakikadan az sonra %1$s, saat %2$s</string>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <plurals name="a11y_hours">
+        <item quantity="one">%1$s saat</item>
+        <item quantity="other">%1$s saat</item>
+    </plurals>
+    <plurals name="a11y_minutes">
+        <item quantity="one">%1$s dakika</item>
+        <item quantity="other">%1$s dakika</item>
+    </plurals>
     <string name="prayer_exact_alarms_label">TAM ALARMLAR KAPALI</string>
     <string name="prayer_exact_alarms_body">Taqwa için “Alarmlar ve hatırlatıcılar” izni verilmediği sürece Android bir saate kadar geç çalabilir.</string>
     <string name="prayer_no_location_title">Henüz konum yok</string>
@@ -534,6 +554,12 @@
     <string name="quran_action_copied">Kopyalandı</string>
     <string name="quran_action_share">Paylaş</string>
     <string name="quran_a11y_read_aloud">Sesli okunuyor</string>
+    <string name="quran_a11y_selected">Seçili</string>
+    <string name="quran_a11y_page_n">%1$s. sayfa</string>
+    <plurals name="quran_a11y_ayah_count">
+        <item quantity="one">%1$s ayet</item>
+        <item quantity="other">%1$s ayet</item>
+    </plurals>
     <!-- Tesbih -->
     <string name="tasbeeh_title">Tesbih</string>
     <string name="prayer_open_tasbeeh">Tesbih</string>

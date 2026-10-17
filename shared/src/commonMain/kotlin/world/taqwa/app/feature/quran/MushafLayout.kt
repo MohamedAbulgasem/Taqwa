@@ -164,3 +164,29 @@ internal fun markedRuns(count: Int, marked: (Int) -> Boolean): List<IntRange> {
     if (start >= 0) runs += start until count
     return runs
 }
+
+/** One ayah's first run of words on a page: the one stop a screen reader gets for it. */
+internal data class AyahStop(val lineIndex: Int, val words: IntRange, val surah: Int, val ayah: Int)
+
+/**
+ * The first run of every ayah on the page, in reading order (accessibility round 1, design §5):
+ * a screen reader gets one stop per ayah, over the words it starts with on this page, and none
+ * over the lines it runs on to — so an ayah three lines long is one stop, not three. The stop
+ * carries the ayah's number, never its text; the Quran is for the reciters.
+ */
+internal fun ayahStops(page: MushafPage): List<AyahStop> {
+    val seen = HashSet<Pair<Int, Int>>()
+    val stops = mutableListOf<AyahStop>()
+    page.lines.forEachIndexed { lineIndex, line ->
+        if (line.type != LineType.TEXT) return@forEachIndexed
+        var start = 0
+        while (start < line.words.size) {
+            val first = line.words[start]
+            var end = start
+            while (end + 1 < line.words.size && line.words[end + 1].surah == first.surah && line.words[end + 1].ayah == first.ayah) end++
+            if (seen.add(first.surah to first.ayah)) stops += AyahStop(lineIndex, start..end, first.surah, first.ayah)
+            start = end + 1
+        }
+    }
+    return stops
+}

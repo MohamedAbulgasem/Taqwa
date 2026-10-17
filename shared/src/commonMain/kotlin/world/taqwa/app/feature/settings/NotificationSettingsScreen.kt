@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
+import world.taqwa.app.design.components.RowToggle
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.NotificationSettings
@@ -138,13 +140,8 @@ fun NotificationSettingsScreen(
         SettingsCard {
             TaqwaRow(
                 stringResource(Res.string.notifications_master_toggle),
-                trailing = {
-                    TaqwaToggle(
-                        checked = settings.enabled,
-                        onCheckedChange = { enabled ->
-                            if (enabled && !notificationsGranted) requestPermission() else onToggleEnabled(enabled)
-                        },
-                    )
+                toggle = RowToggle(settings.enabled) { enabled ->
+                    if (enabled && !notificationsGranted) requestPermission() else onToggleEnabled(enabled)
                 },
             )
         }
@@ -205,7 +202,7 @@ fun NotificationSettingsScreen(
             TaqwaRow(
                 stringResource(Res.string.notifications_tahajjud),
                 subtitle = stringResource(Res.string.notifications_tahajjud_subtitle),
-                trailing = { TaqwaToggle(checked = settings.tahajjud, onCheckedChange = onToggleTahajjud) },
+                toggle = RowToggle(checked = settings.tahajjud, onCheckedChange = onToggleTahajjud),
             )
             AnimatedVisibility(
                 visible = settings.tahajjud,
@@ -230,7 +227,7 @@ fun NotificationSettingsScreen(
             TaqwaRow(
                 stringResource(Res.string.notifications_adhkar),
                 subtitle = stringResource(Res.string.notifications_adhkar_subtitle),
-                trailing = { TaqwaToggle(checked = settings.adhkar, onCheckedChange = onToggleAdhkar) },
+                toggle = RowToggle(settings.adhkar, onToggleAdhkar),
             )
             AnimatedVisibility(
                 visible = settings.adhkar,
@@ -257,13 +254,14 @@ fun NotificationSettingsScreen(
                 modifier = Modifier.padding(horizontal = SettingsGutter),
             )
             Spacer(Modifier.height(16.dp))
-            SettingsCard {
+            SettingsCard(Modifier.selectableGroup()) {
                 NotificationSettings.LeadOptions.forEachIndexed { i, minutes ->
                     if (i > 0) CardDivider()
                     TaqwaRow(
                         label = leadLabel(minutes),
                         onClick = { onPickLead(minutes); remindSheetOpen = false },
                         selectable = true,
+                        selected = minutes == settings.remindBeforeMinutes,
                         trailing = { if (minutes == settings.remindBeforeMinutes) CheckMark() },
                     )
                 }

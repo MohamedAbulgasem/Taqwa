@@ -7,4 +7,6 @@
     <string name="widget_small_description">পরবর্তী নামাজ ও চলমান কাউন্টডাউন।</string>
     <string name="widget_medium_description">পরবর্তী নামাজ, কাউন্টডাউন ও আজকের সময়সূচি।</string>
     <string name="widget_ayah_description">আজকের আয়াত, তার অনুবাদসহ।</string>
+    <!-- Spoken only: the ayah widget's reference for a screen reader. %1$s the surah, %2$s the ayah number. -->
+    <string name="widget_ayah_a11y_reference">%1$s, আয়াত %2$s</string>
 </resources>

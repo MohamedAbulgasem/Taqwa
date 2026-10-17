@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -803,7 +804,8 @@ private fun SearchHitRow(
                 color = colors.textPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth(),
+                // Quran text: not for a phone voice (design §5).
+                modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
             )
         }
         hit.translation?.let { translation ->
@@ -901,7 +903,8 @@ private fun BookmarkRowView(row: BookmarkRow, onClick: () -> Unit, onRemove: () 
                     color = colors.textPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(),
+                    // Quran text: not for a phone voice (design §5).
+                    modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
                 )
             }
         }

@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TabRootTitleTop
@@ -87,8 +88,12 @@ import world.taqwa.app.i18n.CountdownFormatter
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.i18n.isolated
+import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.a11y_hours
+import world.taqwa.app.resources.a11y_minutes
+import world.taqwa.app.resources.duration_hours_minutes
 import world.taqwa.app.resources.notifications_allow_exact_alarms
 import world.taqwa.app.resources.onboarding_location_body
 import world.taqwa.app.resources.qibla_title
@@ -99,6 +104,8 @@ import world.taqwa.app.resources.prayer_exact_alarms_body
 import world.taqwa.app.resources.prayer_exact_alarms_label
 import world.taqwa.app.resources.madhab_hanafi
 import world.taqwa.app.resources.madhab_standard
+import world.taqwa.app.resources.prayer_a11y_countdown
+import world.taqwa.app.resources.prayer_a11y_countdown_soon
 import world.taqwa.app.resources.prayer_about_these_times
 import world.taqwa.app.resources.prayer_differ_after
 import world.taqwa.app.resources.prayer_differ_before
@@ -497,7 +504,8 @@ private fun UnderTheList(state: PrayerUiState.Ready, actions: ReadyActions) {
  * A glyph at the end of the city's line: [draw] at the tab bar's 22 dp, in a 44 dp target — the
  * misbaha that opens the tasbeeh, the horizon that opens the adhkar. No ripple, like the tab bar
  * and the Qibla card — the pushed screen is the feedback. It carries a content description
- * because it is a glyph with no words beside it.
+ * because it is a glyph with no words beside it, and the button role so that TalkBack says
+ * "button" after that name, as it does for the back chevron.
  *
  * Nudged up by [HeaderGlyphNudge], which puts the 22 dp glyph's centre 18 dp down the block rather
  * than 22, on the city's own line rather than low against it. The target then ends 40 dp down,
@@ -515,6 +523,7 @@ private fun HeaderGlyphButton(description: String, onOpen: () -> Unit, draw: Dra
             .clickable(
                 interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                 indication = null,
+                role = Role.Button,
                 onClick = onOpen,
             )
             .semantics { contentDescription = description },
@@ -531,19 +540,37 @@ private fun Countdown(
     format: PlatformFormat,
     diameter: Dp = CountdownRingSize,
 ) {
+    val name = localizedPrayerName(state.today.next.prayer)
+    val clock = formatClock(state.today.next.instant, zone, format)
+    // "FAJR IN", "4:10:02" and "5:10" read as three fragments, one of them like a clock time
+    // (audit sr-countdown); this is the same fact as one sentence, from whole minutes so it
+    // changes once a minute. Not a live region: the ring is read when reached, never announced.
+    // The time is the one drawn under the countdown, isolated as every sentence that splices a
+    // clock time is, so a 12-hour time stays one unit inside a sentence of the other direction.
+    val parts = countdownParts(state.today.countdown)
+    val description = if (parts.underAMinute) {
+        stringResource(Res.string.prayer_a11y_countdown_soon, name, isolatedClock(clock))
+    } else {
+        val hours = pluralStringResource(Res.plurals.a11y_hours, parts.hours, format.localizedDigits(parts.hours))
+        val minutes = pluralStringResource(Res.plurals.a11y_minutes, parts.minutes, format.localizedDigits(parts.minutes))
+        val duration = when {
+            parts.hours == 0 -> minutes
+            parts.minutes == 0 -> hours
+            else -> stringResource(Res.string.duration_hours_minutes, hours, minutes)
+        }
+        stringResource(Res.string.prayer_a11y_countdown, name, duration, isolatedClock(clock))
+    }
     CountdownRing(
         progress = state.today.ringProgress,
-        label = stringResource(
-            Res.string.prayer_next_in,
-            localizedPrayerName(state.today.next.prayer),
-        ),
+        label = stringResource(Res.string.prayer_next_in, name),
         countdown = CountdownFormatter.countdown(
             state.today.countdown,
             format,
             CountdownFormatter.ARABIC_INDIC_DIGITS_VERIFIED_TABULAR,
         ),
-        clockTime = formatClock(state.today.next.instant, zone, format),
+        clockTime = clock,
         diameter = diameter,
+        description = description,
     )
 }
 
@@ -556,6 +583,7 @@ private fun TimelineCard(state: PrayerUiState.Ready, zone: TimeZone, format: Pla
             horizontalPadding = 16.dp,
             setByRule = state.setByRule,
             subLines = subLines(state, zone, format),
+            next = state.today.next,
         ) { row: TimelineRow ->
             formatClock(row.instant, zone, format)
         }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -124,13 +125,14 @@ fun AppearanceSettingsScreen(
 
     SettingsScaffold(stringResource(Res.string.settings_appearance), onBack) {
         SectionLabel(stringResource(Res.string.appearance_theme_label))
-        SettingsCard {
+        SettingsCard(Modifier.selectableGroup()) {
             ThemeMode.entries.forEachIndexed { i, mode ->
                 if (i > 0) CardDivider()
                 TaqwaRow(
                     label = themeDisplayName(mode),
                     onClick = { onPick(mode) },
                     selectable = true,
+                    selected = mode == current,
                     trailing = { if (mode == current) CheckMark() },
                 )
             }
@@ -140,7 +142,7 @@ fun AppearanceSettingsScreen(
 
         Spacer(Modifier.height(28.dp))
         SectionLabel(stringResource(Res.string.appearance_widget_background_label))
-        SettingsCard {
+        SettingsCard(Modifier.selectableGroup()) {
             WidgetBackground.entries.forEachIndexed { i, value ->
                 if (i > 0) CardDivider()
                 TaqwaRow(
@@ -148,6 +150,7 @@ fun AppearanceSettingsScreen(
                     subtitle = widgetBackgroundSubtitle(value),
                     onClick = { onPickWidgetBackground(value) },
                     selectable = true,
+                    selected = value == widgetBackground,
                     trailing = { if (value == widgetBackground) CheckMark() },
                 )
             }

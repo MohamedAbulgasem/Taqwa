@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -101,9 +109,29 @@ fun TaqwaRow(
      */
     ripple: Boolean = true,
     trailing: @Composable (() -> Unit)? = null,
+    /**
+     * A switch at the row's end. Drawn and touched exactly as `trailing = { TaqwaToggle(…) }` was —
+     * only the switch itself takes a tap — but *spoken* as one thing: the row is a single switch
+     * node carrying the label, the on/off state and a double-tap that flips it, where a screen
+     * reader used to meet the label and then a nameless 48 dp button.
+     */
+    toggle: RowToggle? = null,
+    /**
+     * An option row's selected state. Set, the row is a radio button in the group its card declares
+     * with `Modifier.selectableGroup()`, so a screen reader says which option is chosen and how many
+     * there are; the drawn check mark is unchanged. Leave null for navigation rows.
+     */
+    selected: Boolean? = null,
 ) {
     val colors = LocalTaqwaColors.current
     val clickModifier = when {
+        selected != null -> Modifier.selectable(
+            selected = selected,
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            role = Role.RadioButton,
+            onClick = onClick ?: {},
+        )
         onClick == null -> Modifier
         selectable || !ripple -> Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
@@ -111,6 +139,28 @@ fun TaqwaRow(
             onClick = onClick,
         )
         else -> Modifier.clickable(onClick = onClick)
+    }
+    // Semantics only: the pointer input stays on the drawn switch, so nothing about touch changes.
+    val toggleSemantics = if (toggle == null) {
+        Modifier
+    } else {
+        Modifier.semantics(mergeDescendants = true) {
+            role = Role.Switch
+            toggleableState = ToggleableState(toggle.checked)
+            onClick {
+                toggle.onCheckedChange(!toggle.checked)
+                true
+            }
+        }
+    }
+    val trailingContent: (@Composable () -> Unit)? = if (toggle == null) {
+        trailing
+    } else {
+        {
+            // Hidden from semantics: the row speaks for it, and a second, nameless switch node
+            // would put a screen reader's focus on an empty box.
+            Box(Modifier.clearAndSetSemantics {}) { TaqwaToggle(toggle.checked, toggle.onCheckedChange) }
+        }
     }
     Layout(
         content = {
@@ -134,13 +184,14 @@ fun TaqwaRow(
                     modifier = Modifier.layoutId(VALUE_ID),
                 )
             }
-            if (trailing != null) {
-                Box(Modifier.layoutId(TRAILING_ID)) { trailing() }
+            if (trailingContent != null) {
+                Box(Modifier.layoutId(TRAILING_ID)) { trailingContent() }
             }
         },
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 48.dp)
+            .then(toggleSemantics)
             .then(clickModifier)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) { measurables, constraints ->
