@@ -302,7 +302,9 @@ before the real nightfall in summer; this ends that.
 
 The engine returns instants; the screen draws them in the phone's zone. A small table shared with the
 site lists each change with its direction (Morocco −1 h from 20 Sep 2026, British Columbia, Alberta and
-Manitoba +1 h from 1 Nov 2026, Kazakhstan −1 h from 1 Mar 2024) and expires. The clock line shows when the phone's offset
+Manitoba +1 h from 1 Nov 2026, Kazakhstan −1 h from 1 Mar 2024) and expires. A row warns only on a phone
+running a build that carries it, so a new row is due in a store build that users have before its date
+(Alberta's and Manitoba's came after 1.1.0 (37)). The clock line shows when the phone's offset
 under its own zone data differs from the true one, or when the clock was set by hand (Android's
 automatic-time setting; on both platforms the server's `Date` header when online). The sheet says which
 way the times are off ("may be an hour early" for British Columbia, "late" for Morocco) and how to fix

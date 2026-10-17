@@ -5138,3 +5138,44 @@ Points for the reader:
 
 Checked for this entry: nothing run (docs only). The figures are the ledger's, the task reports', the fix
 wave's report and the 17 October device check's.
+
+## Alberta and Manitoba keep summer time (17 October) — due on phones before 1 November
+
+Branch `fix/clock-alberta-manitoba`, off 67b21a23: cada7ad6, then this entry and a line in spec §3.9. Not
+pushed.
+
+The newest tz data (2026e, this Mac's) keeps America/Edmonton at UTC−6 and America/Winnipeg at UTC−5 all
+year from 1 November 2026. Zone data from before the change still goes back an hour that night: Edmonton to
+UTC−7 at 08:00 UTC, Winnipeg to UTC−6 at 07:00 UTC (the JDK 21 here, 2026b, does). On such a phone every
+time in those zones is drawn an hour early from then on, and the phone's own clock is an hour behind with
+it. cities.csv puts 35 cities on Edmonton's clock (33 in Alberta, plus Yellowknife and Cranbrook) and 6 on
+Winnipeg's (5 in Manitoba, plus Kenora).
+
+- `ClockChanges.table` has two rows in British Columbia's pattern, +1 h from 1 November 2026 until
+  1 November 2029: `alberta` (America/Edmonton, its link America/Yellowknife, and America/Inuvik, whose own
+  entry keeps UTC−6 from the same day) and `manitoba` (America/Winnipeg and its link America/Rainy_River).
+  A place found by GPS keeps the phone's own zone id, so the links are listed.
+- The clock line's sheet names Alberta or Manitoba in all seven languages (French "L’Alberta" and
+  "Le Manitoba", as its sentences start with the region). The mapping is `clockRegionRes`, and a test gives
+  every row a region of its own, because the fallback is Kazakhstan's name.
+
+**Due before 1 November.** A row warns only on a phone running a build that carries it. The store build,
+1.1.0 (37), has Morocco's, British Columbia's and Kazakhstan's rows and not these two. So on 37, a phone in
+those zones whose data predates the change shows every time an hour early from 1 November, with no clock
+line. The next store build (code 38) has to carry cada7ad6 and be on phones before then, which means
+submitted to both stores by 24 October at the latest: Play's review takes 1 to 7 days and Apple's 1 to 3
+(STORE-CHECKLIST §7), and phones then update the app on their own schedule. Only a build can bring the rows:
+the table is code, and the one file the app fetches, the reciters' manifest, has no clock rows.
+- Even with the line, the times on such a phone stay an hour early until its zone data is updated. The line
+  says so and gives the fix (the system update, date and time on automatic), as §3.9 has it for British
+  Columbia.
+- The site needs nothing: it draws its clocks from the newest tz data (fdeee008), holds Calgary and Edmonton,
+  and has no Winnipeg page.
+
+Open for the owner: Inuvik (kept in: a zone of its own, with the same change), the legacy `Canada/Mountain`
+and `Canada/Central` ids (left out, as `Canada/Pacific` is for British Columbia), and the provinces' own
+orders, checked against the tz data only, as British Columbia's row was.
+
+Checked for this entry: the offsets again, with the JDK 21 (2026b) and the Mac's zoneinfo (2026e); the city
+counts from cities.csv; and that `build-37`'s `ClockChanges.kt` has no `alberta` or `manitoba` row. The
+tests are cada7ad6's (`scripts/test.sh` green on iOS and the Android host).
