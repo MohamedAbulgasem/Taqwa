@@ -4,7 +4,12 @@ import world.taqwa.app.prayer.ClockChanges
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.prayer_clock_region_alberta
 import world.taqwa.app.resources.prayer_clock_region_british_columbia
+import world.taqwa.app.resources.prayer_clock_region_chihuahua
+import world.taqwa.app.resources.prayer_clock_region_jordan
 import world.taqwa.app.resources.prayer_clock_region_manitoba
+import world.taqwa.app.resources.prayer_clock_region_paraguay
+import world.taqwa.app.resources.prayer_clock_region_syria
+import world.taqwa.app.resources.prayer_clock_region_yukon
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -16,6 +21,15 @@ class ClockLineTest {
         assertEquals(Res.string.prayer_clock_region_british_columbia, clockRegionRes("british_columbia"))
         assertEquals(Res.string.prayer_clock_region_alberta, clockRegionRes("alberta"))
         assertEquals(Res.string.prayer_clock_region_manitoba, clockRegionRes("manitoba"))
+    }
+
+    @Test
+    fun theChangesYearsAgoNameTheirOwnPlaces() {
+        assertEquals(Res.string.prayer_clock_region_yukon, clockRegionRes("yukon"))
+        assertEquals(Res.string.prayer_clock_region_syria, clockRegionRes("syria"))
+        assertEquals(Res.string.prayer_clock_region_jordan, clockRegionRes("jordan"))
+        assertEquals(Res.string.prayer_clock_region_chihuahua, clockRegionRes("chihuahua"))
+        assertEquals(Res.string.prayer_clock_region_paraguay, clockRegionRes("paraguay"))
     }
 
     @Test

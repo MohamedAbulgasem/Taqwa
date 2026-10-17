@@ -304,11 +304,16 @@ The engine returns instants; the screen draws them in the phone's zone. A small 
 site lists each change with its direction (Morocco −1 h from 20 Sep 2026, British Columbia, Alberta and
 Manitoba +1 h from 1 Nov 2026, Kazakhstan −1 h from 1 Mar 2024) and expires. A row warns only on a phone
 running a build that carries it, so a new row is due in a store build that users have before its date
-(Alberta's and Manitoba's came after 1.1.0 (37)). The clock line shows when the phone's offset
-under its own zone data differs from the true one, or when the clock was set by hand (Android's
-automatic-time setting; on both platforms the server's `Date` header when online). The sheet says which
-way the times are off ("may be an hour early" for British Columbia, "late" for Morocco) and how to fix
-it, and says alerts are right only when the clock is automatic; when it cannot tell (iOS offline): "If
+(Alberta's and Manitoba's came after 1.1.0 (37)). Places that stopped going back an hour years ago have
+rows too, for phones before Android 10 (Android 9 ships tzdata 2018e), which draw every winter an hour
+early and get newer zone data only from their maker: Yukon from 1 Nov 2020, Syria and Jordan from
+28 Oct 2022, Chihuahua from 30 Oct 2022 and Paraguay from 15 Oct 2024, all +1 h until 1 Nov 2029 with the
+2026 rows. Places whose true offset still changes in the year (Egypt, Palestine, Moldova, the Chihuahua
+border, Greenland, Norfolk Island) cannot be a row of one offset and have none. The clock line shows
+when the phone's offset under its own zone data differs from the true one, or when the clock was set
+by hand (Android's automatic-time setting; on both platforms the server's `Date` header when online).
+The sheet says which way the times are off ("may be an hour early" for British Columbia, "late" for
+Morocco) and how to fix it, and says alerts are right only when the clock is automatic; when it cannot tell (iOS offline): "If
 you set the clock by hand, prayer times may be an hour {early/late}. Turn on automatic date and time."
 Tests: British Columbia and Casablanca, each with stale data plus a hand-set clock, and with automatic
 time.

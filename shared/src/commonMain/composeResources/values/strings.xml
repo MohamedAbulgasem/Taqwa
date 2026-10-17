@@ -108,6 +108,11 @@
     <string name="prayer_clock_region_alberta">Alberta</string>
     <string name="prayer_clock_region_manitoba">Manitoba</string>
     <string name="prayer_clock_region_kazakhstan">Kazakhstan</string>
+    <string name="prayer_clock_region_yukon">Yukon</string>
+    <string name="prayer_clock_region_syria">Syria</string>
+    <string name="prayer_clock_region_jordan">Jordan</string>
+    <string name="prayer_clock_region_chihuahua">Chihuahua</string>
+    <string name="prayer_clock_region_paraguay">Paraguay</string>
     <!-- "Show where timetables differ", under the current prayer (spec §2.1): %1$s a timetable's short name, %2$s the next prayer, %3$s a time. -->
     <string name="prayer_differ_before">%1$s’s %2$s begins at %3$s</string>
     <string name="prayer_differ_after">%1$s’s %2$s has begun · Taqwa shows it from %3$s</string>

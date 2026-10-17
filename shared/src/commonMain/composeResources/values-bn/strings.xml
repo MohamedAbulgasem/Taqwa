@@ -91,6 +91,11 @@
     <string name="prayer_clock_region_alberta">আলবার্টা</string>
     <string name="prayer_clock_region_manitoba">ম্যানিটোবা</string>
     <string name="prayer_clock_region_kazakhstan">কাজাখস্তান</string>
+    <string name="prayer_clock_region_yukon">ইউকন</string>
+    <string name="prayer_clock_region_syria">সিরিয়া</string>
+    <string name="prayer_clock_region_jordan">জর্ডান</string>
+    <string name="prayer_clock_region_chihuahua">চিহুয়াহুয়া</string>
+    <string name="prayer_clock_region_paraguay">প্যারাগুয়ে</string>
     <string name="prayer_differ_before">%1$s অনুযায়ী %2$s শুরু হয় %3$s-এ</string>
     <string name="prayer_differ_after">%1$s অনুযায়ী %2$s শুরু হয়ে গেছে · তাকওয়া দেখায় %3$s থেকে</string>
     <string name="prayer_other_asr">%1$s আসর %2$s</string>

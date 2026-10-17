@@ -48,9 +48,14 @@ import world.taqwa.app.resources.prayer_clock_manual_early
 import world.taqwa.app.resources.prayer_clock_manual_late
 import world.taqwa.app.resources.prayer_clock_region_alberta
 import world.taqwa.app.resources.prayer_clock_region_british_columbia
+import world.taqwa.app.resources.prayer_clock_region_chihuahua
+import world.taqwa.app.resources.prayer_clock_region_jordan
 import world.taqwa.app.resources.prayer_clock_region_kazakhstan
 import world.taqwa.app.resources.prayer_clock_region_manitoba
 import world.taqwa.app.resources.prayer_clock_region_morocco
+import world.taqwa.app.resources.prayer_clock_region_paraguay
+import world.taqwa.app.resources.prayer_clock_region_syria
+import world.taqwa.app.resources.prayer_clock_region_yukon
 import world.taqwa.app.resources.prayer_clock_stale_early
 import world.taqwa.app.resources.prayer_clock_stale_late
 
@@ -151,5 +156,10 @@ internal fun clockRegionRes(changeId: String): StringResource = when (changeId) 
     "british_columbia" -> Res.string.prayer_clock_region_british_columbia
     "alberta" -> Res.string.prayer_clock_region_alberta
     "manitoba" -> Res.string.prayer_clock_region_manitoba
+    "yukon" -> Res.string.prayer_clock_region_yukon
+    "syria" -> Res.string.prayer_clock_region_syria
+    "jordan" -> Res.string.prayer_clock_region_jordan
+    "chihuahua" -> Res.string.prayer_clock_region_chihuahua
+    "paraguay" -> Res.string.prayer_clock_region_paraguay
     else -> Res.string.prayer_clock_region_kazakhstan
 }

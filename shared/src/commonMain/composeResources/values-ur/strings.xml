@@ -91,6 +91,11 @@
     <string name="prayer_clock_region_alberta">البرٹا</string>
     <string name="prayer_clock_region_manitoba">مینیٹوبا</string>
     <string name="prayer_clock_region_kazakhstan">قازقستان</string>
+    <string name="prayer_clock_region_yukon">یوکون</string>
+    <string name="prayer_clock_region_syria">شام</string>
+    <string name="prayer_clock_region_jordan">اردن</string>
+    <string name="prayer_clock_region_chihuahua">چیواوا</string>
+    <string name="prayer_clock_region_paraguay">پیراگوئے</string>
     <string name="prayer_differ_before">%1$s کے مطابق %2$s کا وقت %3$s پر شروع ہوتا ہے</string>
     <string name="prayer_differ_after">%1$s کے مطابق %2$s کا وقت شروع ہو چکا ہے · تقویٰ اسے %3$s سے دکھاتا ہے</string>
     <string name="prayer_other_asr">عصرِ %1$s %2$s</string>

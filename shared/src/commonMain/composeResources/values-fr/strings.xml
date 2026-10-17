@@ -94,6 +94,11 @@
     <string name="prayer_clock_region_alberta">L’Alberta</string>
     <string name="prayer_clock_region_manitoba">Le Manitoba</string>
     <string name="prayer_clock_region_kazakhstan">Le Kazakhstan</string>
+    <string name="prayer_clock_region_yukon">Le Yukon</string>
+    <string name="prayer_clock_region_syria">La Syrie</string>
+    <string name="prayer_clock_region_jordan">La Jordanie</string>
+    <string name="prayer_clock_region_chihuahua">Le Chihuahua</string>
+    <string name="prayer_clock_region_paraguay">Le Paraguay</string>
     <string name="prayer_differ_before">Selon %1$s, %2$s commence à %3$s</string>
     <string name="prayer_differ_after">Selon %1$s, %2$s a commencé · Taqwa l’affiche dès %3$s</string>
     <string name="prayer_other_asr">%1$s %2$s</string>

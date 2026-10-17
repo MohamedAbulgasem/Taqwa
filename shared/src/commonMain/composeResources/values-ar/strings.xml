@@ -99,6 +99,11 @@
     <string name="prayer_clock_region_alberta">ألبرتا</string>
     <string name="prayer_clock_region_manitoba">مانيتوبا</string>
     <string name="prayer_clock_region_kazakhstan">كازاخستان</string>
+    <string name="prayer_clock_region_yukon">يوكون</string>
+    <string name="prayer_clock_region_syria">سوريا</string>
+    <string name="prayer_clock_region_jordan">الأردن</string>
+    <string name="prayer_clock_region_chihuahua">تشيواوا</string>
+    <string name="prayer_clock_region_paraguay">باراغواي</string>
     <string name="prayer_differ_before">يبدأ %2$s حسب %1$s الساعة %3$s</string>
     <string name="prayer_differ_after">دخل %2$s حسب %1$s · يعرضه تقوى من الساعة %3$s</string>
     <string name="prayer_other_asr">عصر %1$s %2$s</string>

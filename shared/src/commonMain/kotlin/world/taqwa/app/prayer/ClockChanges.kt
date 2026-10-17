@@ -14,8 +14,8 @@ import kotlin.time.Instant
  * - [zones]: the IANA zones it applies to.
  * - [from]: the local date from which [trueOffsetSeconds] is the offset all year.
  * - [shiftHours]: which way the clocks moved: −1 when they went back (Morocco), +1 when they stayed
- *   forward (British Columbia, Alberta, Manitoba).
- * - [until]: when the stale-zone-data check stops; by then every phone still in use has the new
+ *   forward (British Columbia, Alberta, Manitoba, Yukon, Syria, Jordan, Chihuahua, Paraguay).
+ * - [until]: when the stale-zone-data check stops; by then few phones still in use lack the new
  *   zone data. A clock set by hand is flagged for a shorter time, [ClockChanges.HAND_SET_DAYS].
  */
 data class ClockChange(
@@ -41,8 +41,8 @@ enum class ClockIssue {
 
 /**
  * The clock line's reason: which [change], what is wrong, and which way the times on the phone may
- * be off. [timesEarly]: an hour early (British Columbia, Alberta and Manitoba on old zone data)
- * rather than late (Morocco, Kazakhstan).
+ * be off. [timesEarly]: an hour early (the places that stayed forward, on old zone data) rather
+ * than late (Morocco, Kazakhstan).
  */
 data class ClockWarning(val change: ClockChange, val issue: ClockIssue, val timesEarly: Boolean)
 
@@ -114,6 +114,62 @@ object ClockChanges {
             trueOffsetSeconds = 5 * 3600,
             shiftHours = -1,
             until = LocalDate(2027, 3, 1),
+        ),
+        // The places below stopped going back an hour in winter years ago; old zone data still
+        // goes back every year, so on it every time is drawn an hour early each winter. Their rows
+        // run to 1 November 2029 with the 2026 ones, more than three years after the change,
+        // because a phone before Android 10 (Android 9 ships tzdata 2018e, Android 8 older) never
+        // gets newer zone data unless its maker updates it. A clock set by hand is flagged only in
+        // the first [HAND_SET_DAYS] days after a change, long past for these.
+        //
+        // Yukon has kept UTC−7 all year since 1 November 2020, when it would have gone back to
+        // UTC−8. America/Dawson (Dawson City) keeps Whitehorse's clock.
+        ClockChange(
+            id = "yukon",
+            zones = setOf("America/Whitehorse", "America/Dawson"),
+            from = LocalDate(2020, 11, 1),
+            trueOffsetSeconds = -7 * 3600,
+            shiftHours = 1,
+            until = LocalDate(2029, 11, 1),
+        ),
+        // Syria has kept UTC+3 all year since 28 October 2022, when it would have gone back to UTC+2.
+        ClockChange(
+            id = "syria",
+            zones = setOf("Asia/Damascus"),
+            from = LocalDate(2022, 10, 28),
+            trueOffsetSeconds = 3 * 3600,
+            shiftHours = 1,
+            until = LocalDate(2029, 11, 1),
+        ),
+        // Jordan has kept UTC+3 all year since 28 October 2022, when it would have gone back to UTC+2.
+        ClockChange(
+            id = "jordan",
+            zones = setOf("Asia/Amman"),
+            from = LocalDate(2022, 10, 28),
+            trueOffsetSeconds = 3 * 3600,
+            shiftHours = 1,
+            until = LocalDate(2029, 11, 1),
+        ),
+        // Chihuahua has kept UTC−6 all year since 30 October 2022, when Mexico dropped summer time
+        // and it would have gone back to UTC−7. Its border towns (America/Ojinaga,
+        // America/Ciudad_Juarez) still change their clocks with the United States, so no row fits.
+        ClockChange(
+            id = "chihuahua",
+            zones = setOf("America/Chihuahua"),
+            from = LocalDate(2022, 10, 30),
+            trueOffsetSeconds = -6 * 3600,
+            shiftHours = 1,
+            until = LocalDate(2029, 11, 1),
+        ),
+        // Paraguay has kept UTC−3 all year since 15 October 2024; old zone data goes back to UTC−4
+        // every March.
+        ClockChange(
+            id = "paraguay",
+            zones = setOf("America/Asuncion"),
+            from = LocalDate(2024, 10, 15),
+            trueOffsetSeconds = -3 * 3600,
+            shiftHours = 1,
+            until = LocalDate(2029, 11, 1),
         ),
     )
 

@@ -96,6 +96,11 @@
     <string name="prayer_clock_region_alberta">Alberta</string>
     <string name="prayer_clock_region_manitoba">Manitoba</string>
     <string name="prayer_clock_region_kazakhstan">Kazakistan</string>
+    <string name="prayer_clock_region_yukon">Yukon</string>
+    <string name="prayer_clock_region_syria">Suriye</string>
+    <string name="prayer_clock_region_jordan">Ürdün</string>
+    <string name="prayer_clock_region_chihuahua">Chihuahua</string>
+    <string name="prayer_clock_region_paraguay">Paraguay</string>
     <string name="prayer_differ_before">%1$s takviminde %2$s %3$s itibarıyla başlıyor</string>
     <string name="prayer_differ_after">%1$s takviminde %2$s başladı · Taqwa %3$s itibarıyla gösteriyor</string>
     <string name="prayer_other_asr">%1$s %2$s</string>
