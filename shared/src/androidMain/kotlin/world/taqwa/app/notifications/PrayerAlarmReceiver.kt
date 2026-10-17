@@ -26,6 +26,22 @@ import kotlin.time.Instant
 var notificationSmallIconResId: Int = android.R.drawable.ic_popup_reminder
 
 /**
+ * How a notification's tap starts `MainActivity`: in a task of its own when Taqwa is not running,
+ * and otherwise handed to the instance already there.
+ *
+ * SINGLE_TOP is the part that matters (B18). `MainActivity` has the default `standard` launch
+ * mode, and against it CLEAR_TOP alone finishes the running instance and creates a new one: a
+ * tap over an open Reader threw the reader's place away, and an adhkar reminder's tap could land
+ * on the Prayer screen instead of its set, because the dying instance's collector took the
+ * request before the new one had composed. With SINGLE_TOP the running instance is kept and gets
+ * the tap through `onNewIntent`, which reads the extras exactly as `onCreate` does. The ayah
+ * widget's tap (`TaqwaAyahGlanceWidget`) met the identical race first and settled on the same
+ * three flags, and the media notification's tap (`RecitationService`) is SINGLE_TOP too.
+ */
+internal const val NOTIFICATION_TAP_FLAGS: Int =
+    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+/**
  * Fires exactly once per scheduled alarm. It never re-derives content: title, body and which
  * channel to post into all travel in the intent extras baked in at schedule time, so this class
  * has no locale, no settings lookup and nothing to get wrong at 3am.
@@ -88,6 +104,8 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
      * Tapping the notification opens the app. The launcher intent rather than `MainActivity`
      * by name: `shared` cannot see androidApp's classes, and the launcher intent is what the
      * home screen icon fires, so the result is the same as opening the app by hand.
+     * [NOTIFICATION_TAP_FLAGS] keep that true when Taqwa is already open: the running activity
+     * is brought forward as it was, not recreated.
      *
      * An adhkar reminder's tap goes one step further, to that set's session (adhkar spec §5):
      * `MainActivity` reads [LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR] and strips it, as it does
@@ -96,7 +114,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
      */
     private fun openAppIntent(context: Context, requestCode: Int, adhkar: AdhkarSet?): PendingIntent? {
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return null
-        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        launch.addFlags(NOTIFICATION_TAP_FLAGS)
         if (adhkar != null) launch.putExtra(LaunchRequests.ANDROID_EXTRA_OPEN_ADHKAR, LaunchRequests.adhkarExtra(adhkar))
         return PendingIntent.getActivity(
             context,
