@@ -7,8 +7,10 @@ import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.FixedPointMode
 import world.taqwa.app.prayer.engine.method.GeoPoint
+import world.taqwa.app.prayer.engine.registry.authorities.Europe
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -72,27 +74,48 @@ class LondonUnifiedTest {
         assertEquals(point, method.fixedPoint)
         assertEquals(FixedPointMode.BOTH, method.fixedPointMode)
         assertTrue(method.endOfEatingMarginSeconds <= SAFE_END)
-        // Far from London (Manchester) the user's own point, with London's beside it for the starts and the ends.
-        val manchester = Registry.resolveEntry(Registry.byId("gb.london.lupt")!!, Place(53.48095, -2.23743, "Europe/London", "GB"))
-        assertNull(manchester.method!!.fixedPoint)
-        assertTrue(point in manchester.method!!.startPoints && point in manchester.method!!.endPoints)
     }
 
     @Test
-    fun `beyond a hundred kilometres a user who chooses the table is never before it and no end is after it`() {
-        // Round 2's review of the city-point round: Dover and Southampton, beyond R45's three reaches, had starts before
-        // LUPT's table and a sunrise and an end of eating after it.
+    fun `chosen it applies within R45's three reaches of its point and nowhere beyond`() {
+        // The owner's decision of 17 Oct 2026: beyond about 104 km London Unified is out of scope, as any timetable is
+        // outside its area, so Automatic applies there (round 2's fix had ridden London's point as far as Scotland).
         val entry = Registry.byId("gb.london.lupt")!!
-        val table = resolve(point.lat, point.lon)
-        for ((lat, lon) in listOf(51.12598 to 1.31257, 50.90395 to -1.40428)) {
-            val far = Registry.resolveEntry(entry, Place(lat, lon, "Europe/London", "GB"))
-            assertNull(far.method!!.fixedPoint)
-            for (date in dates) {
-                val atTable = day(table, date)
-                val shown = day(far, date)
-                shown.starts().zip(atTable.starts()).forEach { (s, printed) -> assertTrue(s >= printed, "$lat $date") }
-                assertTrue(shown.sunrise <= atTable.sunrise && shown.endOfEating <= atTable.endOfEating, "$lat $date")
-            }
+        assertEquals(point, Europe.londonArea.center)
+        assertEquals(lateReachKm(point.lat, entry.entryClass) * ENDS_REACH_FACTOR, Europe.londonArea.radiusKm)
+        assertEquals(Europe.londonArea, entry.area)
+        fun gb(lat: Double, lon: Double) = Place(lat, lon, "Europe/London", "GB")
+        // The app's Basildon, Sevenoaks, St Albans, Luton, Reading and Folkestone (101.7 km), and 102.6 km due north.
+        val within = listOf(
+            gb(51.56844, 0.45782), gb(51.27266, 0.18883), gb(51.75, -0.33333), gb(51.87967, -0.41748), gb(51.45625, -0.97113),
+            gb(51.08169, 1.16734), gb(52.43, -0.1278),
+        )
+        for (place in within) {
+            assertTrue(Registry.inScope(entry, place), "${place.lat}, ${place.lon}")
+            val method = Registry.resolveEntry(entry, place).method!!
+            assertEquals(point, method.fixedPoint)
+            assertEquals(FixedPointMode.BOTH, method.fixedPointMode)
         }
+        // 105.9 km due north; the app's Margate, Ipswich, Dover, Southampton, Birmingham, Manchester, Glasgow, Edinburgh,
+        // Belfast and Penzance.
+        val beyond = listOf(
+            gb(52.46, -0.1278), gb(51.38132, 1.38617), gb(52.05917, 1.15545), gb(51.12598, 1.31257), gb(50.90395, -1.40428),
+            gb(52.48142, -1.89983), gb(53.48095, -2.23743), gb(55.86515, -4.25763), gb(55.95206, -3.19648),
+            gb(54.59682, -5.92541), gb(50.11861, -5.53715),
+        )
+        for (place in beyond) assertFalse(Registry.inScope(entry, place), "${place.lat}, ${place.lon}")
+        // Inside the M25 it is Automatic itself.
+        assertTrue(Registry.inScope(entry, gb(point.lat, point.lon)))
+    }
+
+    @Test
+    fun `resolved beyond its area it is its own rule at the user's own sun`() {
+        // Not what the app shows there (Automatic applies, Registry.inScope), but what a direct resolution gives: R45's edge
+        // at the user's own point alone, with no table's point beside it.
+        val glasgow = Registry.resolveEntry(Registry.byId("gb.london.lupt")!!, Place(55.86515, -4.25763, "Europe/London", "GB"))
+        val method = glasgow.method!!
+        assertNull(method.fixedPoint)
+        assertTrue(method.startPoints.isEmpty() && method.endPoints.isEmpty() && method.envelopePoints.isEmpty())
+        assertFalse(glasgow.measured)
     }
 }

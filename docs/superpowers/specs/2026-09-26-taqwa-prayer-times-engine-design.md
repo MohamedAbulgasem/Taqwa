@@ -225,16 +225,40 @@ al-Qura's lag dates, MUIS's neighbours, and Kemenag's step at the March equinox 
   read at every latitude in play. Beyond every minute's reach but within a table's class reach, the
   nearest such table rides as the fixed point and the rest beside it, for the starts too (round 2: the
   review's probe had found Calgary's north-east, Delhi's edge and the Wifaqul towns a minute or two
-  before the nearest table); beyond every class reach the method stands at the user's own point as
-  before, with no edge minute. No figure is claimed beyond the minute's reach, but a cautious convention
-  member keeps its own measured reach. BIK's own town list (the Takvimi's "Diferenca e vendeve": Sharri
+  before the nearest table). *The owner's decision of 17 Oct 2026 (Q1):* beyond every class reach the
+  nearest such table still rides, out to five of its reaches (five minutes of longitude at the table's
+  latitude, 83 to 126 km; `TableEnvelope.rideKm`), as a day alongside (`TimetableMethod.alongside`):
+  the user's own day exactly as before, the table's own day at its own point, each read with its own
+  curves, variants and margins, and the day shown their safe side (each start the later, each end the
+  earlier), so nothing is later than the later of the two asks. Rabita's Helsinki calendar rides the
+  same way across its ride (69 km; its region's margins stay on the user's own day), Helsinki's own day
+  with its Asr a minute later past Diyanet's Helsinki unit. ISNA's Montréal and Ottawa mosques ride beside
+  Canada's cautious times wherever those are followed (`Units.crossRide`, `Resolution.alongside`): just
+  outside the two cities Automatic is the western families' cautious times, which no ISNA table had
+  bounded. Manchester Central's Wifaqul table rides where Wifaqul is chosen, but keeps its bound as the
+  UK's cautious most-followed member (`UnitSet.outsideAsMember`): its reach is the owner's question 2,
+  accepted at the bound for now, and Automatic there is already never before its printed days. Just past
+  the bound the times had run up to 4 to 5 min before the nearest table on some days (Winchester and
+  Martinsburg against ADAMS, Angren against Tashkent, Drummondville against CCML, Porvoo against Rabita).
+  Beyond the ride the method stands at the user's own point as before, with no edge minute. No figure is claimed beyond the minute's reach,
+  but a cautious convention member keeps its own measured reach. BIK's own town list (the Takvimi's "Diferenca e vendeve": Sharri
   T + 2, five towns T − 1, Presheva T − 2, every other town T) is carried as start and end points beside
   the base point, which rides everywhere in Kosovo (rulings R118 and R120's construction, beside the
   user's own point). A named table chosen outside its area rides its table's point: London Unified as the
-  fixed point within R45's three reaches and farther as a start point and an end point beside the user's own
-  (whose own curves are kept), IACAD its nearest table's anywhere, with Dubai's main table beside it; Rabita's
-  calendar is held across the Helsinki region (45 km) by wider margins (the fix round of 11 Oct 2026). The
-  envelope and these named claims are gated as promise-only rows (`official/gate/<group>-envelope.tsv`):
+  fixed point within R45's three reaches (103.81 km), IACAD its nearest table's anywhere, with Dubai's main
+  table beside it; Rabita's calendar is held across the Helsinki region (45 km) by wider margins (the fix
+  round of 11 Oct 2026). Those three reaches are also London Unified's area when chosen, a proposed ruling
+  (the owner's decision of 17 Oct 2026): an entry's own countries can be narrowed to an area
+  (`RegistryEntry.area`, read only by `Registry.inScope`'s own-countries branch, so where Automatic follows
+  or lists an entry it applies whatever its area), and beyond London Unified's it is out of scope (§2.2):
+  Automatic applies, with Settings' one line, the stored choice kept for the user's return. That ended
+  round 2's ride of London's point beside the user's own as far as Scotland. It is the one sanctioned
+  exception to "never earlier than before": a stored London Unified there now shows Automatic's own day,
+  whose starts can come before London's table and whose ends after it (the farther north and west, the
+  more), and whose cautious Fajr and Isha come later than the choice showed before, from just past the
+  area's edge (the south coast, Kent and Suffolk too); the comparison with the earlier engine holds those
+  cells to its Automatic instead. The envelope, the nearest table's ride and these named claims are
+  gated as promise-only rows (`official/gate/<group>-envelope.tsv`):
   an early start or a late end there breaks the gate, but their lateness is no unit's figure and no limit's. The app's own cities inside each new unit are gated at their own points, and the units
   that show a figure (ISNA's, BIK's) are gated across their reach as Umm al-Qura's and QMDB's are. Where
   such a table rides for the starts too, the ends shown are also never after those the same method shows

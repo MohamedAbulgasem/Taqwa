@@ -200,7 +200,10 @@ picks up (a city new to a fetcher, or an index line naming no entry) is reported
 added by hand once. Not in the recipes: the hand-read sources, the Mawaqit surveys, and
 members no fetcher reads (Cape Town's community calendar: masjids.co.za's relay is read by hand each
 month; until it is, za.cape's members for a new MJC month are left out by the gate, as they should
-be, and za.mjc's own row is added).
+be, and za.mjc's own row is added). Diyanet's Australian city tables (Sydney's and Melbourne's, read in
+`au-cautious.tsv` and `au-diyanet.tsv`) are research captures of 25 September to 25 October 2026 that no
+fetcher reads either, so those rows hold those 31 days until another season's capture is added by hand;
+a fetcher for the two pages is a proposal (the Q4 review of 17 October 2026).
 
 Umm al-Qura's and QMDB's units (since 9 October 2026, the review's "prove it across the unit") have a
 line each, one per measured unit (259 in all): each new year of a unit's own table is added at every
@@ -222,7 +225,8 @@ those tables is added by hand at its own point, and `generateReachRows` re-run, 
 (seconds, no archive needed). That one writes the envelope's promise-only rows (round 2's fix, 11 October 2026,
 `official/gate/<group>-envelope.tsv`): every table printed for its own point at every app city within its bound
 reach, whichever table the city follows, and the round's named claims (the Takvim in Kosovo, Kénitra's table at
-Sidi Taibi, Lakemba's at Sydney's west, LUPT and IACAD chosen outside their areas). The gate checks those rows for
+Sidi Taibi, Lakemba's at Sydney's west, LUPT and IACAD chosen outside their areas, and since 17 October 2026
+Diyanet's Sydney table where its preset is chosen around Sydney, `au-diyanet-envelope.tsv`). The gate checks those rows for
 the promise alone, so a recipe never targets an envelope file; it is regenerated from the group files instead. The app's own cities inside
 those units, and inside Canada's families', Chicago's 18° block's and the city tables' (Delhi, Tashkent,
 Karachi, Bishkek, Manchester Central, Gaza, Beirut, Damascus, Baghdad), are rows of the group files

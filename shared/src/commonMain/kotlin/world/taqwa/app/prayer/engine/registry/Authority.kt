@@ -1,5 +1,6 @@
 package world.taqwa.app.prayer.engine.registry
 
+import world.taqwa.app.prayer.engine.method.Alongside
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.GeoPoint
@@ -19,9 +20,9 @@ enum class AboutTemplate { AUTHORITY_CHECKED, AUTHORITY_UNCHECKED, CAUTIOUS, CAL
 /**
  * Where a chosen entry applies (spec §2.2), as [Registry.inScope] reads it (ruling R50): [GLOBAL]
  * anywhere for the old picker's Other methods (`other.*`), and for any other entry declared global
- * as for [COUNTRY]: in [RegistryEntry.countries] and wherever Automatic resolves to it or lists it;
- * [CITY] and [UNIT] only where Automatic resolves to it or lists it (a metro area, a province, "the
- * rest of" a country).
+ * as for [COUNTRY]: in [RegistryEntry.countries] (within its [RegistryEntry.area] there, where it
+ * has one) and wherever Automatic resolves to it or lists it; [CITY] and [UNIT] only where
+ * Automatic resolves to it or lists it (a metro area, a province, "the rest of" a country).
  */
 enum class Scope { UNIT, CITY, COUNTRY, GLOBAL }
 
@@ -81,6 +82,10 @@ data class Member(
  * - [nearby]: ids of the named timetables Settings › Timetable lists near its places.
  * - [countries]: where a [Scope.COUNTRY] entry applies; for other scopes, the countries it is
  *   resolved in, for reference.
+ * - [area]: where in its [countries] a chosen [Scope.COUNTRY] or [Scope.GLOBAL] entry applies, when
+ *   not the whole of them (London Unified: within R45's three reaches of its table's point, the
+ *   owner's decision of 17 Oct 2026); null for the whole. Where Automatic follows the entry or lists
+ *   it, it applies whatever its area.
  * - [measured]: for an entry without units, whether official days exist for its whole area, so an
  *   "at most" figure can be claimed; an entry with units takes it from the unit (see [Units]).
  * - [lateLimits]: its exceptions to the late limit, each for its own events (see [lateLimitFor]).
@@ -97,6 +102,7 @@ data class RegistryEntry(
     val nearby: List<String> = emptyList(),
     val scope: Scope,
     val countries: Set<String> = emptySet(),
+    val area: Area? = null,
     val measured: Boolean = false,
     val lateLimits: List<LateLimit> = emptyList(),
 ) {
@@ -163,6 +169,9 @@ internal fun requireEachEventOnce(limits: List<LateLimit>, owner: String) {
  *   the city in the reader's language.
  * - [unitCityId]: the app's own city whose table the unit is ([AuthorityUnit.cityId]), whose name
  *   About gives the place, in the reader's language; null for every other unit.
+ * - [alongside]: another entry's tables riding beside the place's day ([CrossRide], the owner's decision of
+ *   17 Oct 2026), each that table's own day at its own point: the day shown is the safe side of the place's own
+ *   day (a cautious one, its members combined) and theirs. Empty almost everywhere; no figure is claimed for them.
  */
 data class Resolution(
     val entry: RegistryEntry,
@@ -179,6 +188,7 @@ data class Resolution(
     val unitId: String? = null,
     val unitLabel: String? = unitName,
     val unitCityId: Int? = null,
+    val alongside: List<Alongside> = emptyList(),
 )
 
 /** The About template each class fills. */
@@ -202,9 +212,10 @@ internal fun single(
     measured: Boolean = false,
     nearby: List<String> = emptyList(),
     lateLimits: List<LateLimit> = emptyList(),
+    area: Area? = null,
 ): RegistryEntry = RegistryEntry(
     id = id, shortNameKey = nameKey, entryClass = entryClass, about = aboutFor(entryClass), method = method,
-    school = school, schoolKnown = schoolKnown, nearby = nearby, scope = scope, countries = countries,
+    school = school, schoolKnown = schoolKnown, nearby = nearby, scope = scope, countries = countries, area = area,
     measured = measured, lateLimits = lateLimits,
 )
 

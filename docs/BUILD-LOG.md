@@ -4533,6 +4533,8 @@ table's point too: starts up to 6 min later (review 1's figure, not re-measured)
   never before Diyanet's Sydney table at every plausible point of it, Maghrib aside (the cautious rule holds Maghrib at
   Lakemba's, the most-followed member's, 5 to 6 min before Diyanet's, as on main); Diyanet's preset chosen on its own in Sydney is
   not measured, and its own rule runs up to 16 min before Diyanet's Sydney Asr and 12 min before its Isha (as on main).
+  *Corrected 17 October (the owner's four answers, below):* those 16 and 12 min are against Lakemba Mosque's table;
+  against Diyanet's Sydney table the preset is never before it on the 31 days held.
 - **A named table chosen outside its area.** A user who chooses a table follows it (`followedBeyond`). London Unified
   outside the M25, within R45's three reaches (about 100 km: Basildon, Sevenoaks, St Albans, Luton, Reading), and
   IACAD in the other emirates, at any distance from its nearest table: the edge as before, now with the table's point
@@ -4646,7 +4648,9 @@ main) (the round's construction, now gated at Fairfield, Liverpool, Blacktown an
 preset (other.turkey) chosen on its own in Sydney is not measured. Its own rule runs up to 16 min before Diyanet's
 Sydney Asr (120 to 126 days) and 12 min before its Isha (264 to 272 days), as on main (the review's probe). Fitting the
 preset to that table would also make au.cautious's own Asr and Isha later wherever Diyanet's would then pass LMA's, so
-it is left as an owner's question.
+it is left as an owner's question. *Corrected 17 October (the owner's four answers, below):* the 16 and 12 min are
+Lakemba Mosque's table (on 126 and 272 of its 349 days); against Diyanet's own Sydney table the preset is never before
+it, nor any end after it, on the 31 days the archive holds.
 
 **The envelope in the gate.** Nothing in the gate had held a place against a table other than the one it follows.
 `generateEnvelopeRows` (new; seconds, no archive needed) writes `official/gate/<group>-envelope.tsv`:
@@ -4728,7 +4732,8 @@ this round).
   min later (near Dundee in late May, the re-verifier's sample) and sunrise and sunset up to 67 and 73 min earlier than the user's own sun. Keep that, or stop the ride at
   some distance, with the user's own sun and no figure beyond it?
 - Diyanet's preset chosen in Sydney: fit it to Diyanet's Sydney table (Asr about 16 min and Isha about 12 min later
-  there), or leave it a preset that claims no figure?
+  there), or leave it a preset that claims no figure? *Corrected 17 October:* those figures are Lakemba Mosque's table,
+  not Diyanet's (the owner's four answers, below).
 
 Checked: the whole gate writing stamps, after the last change (archive linked): 19,480 rows, 4,366,885 place-days and
 312,262 more held to the promise alone, 71 entries, 0 early, 0 late ends, none over its limit, nothing BROKEN, about 4
@@ -5313,3 +5318,302 @@ Points for the reader:
   year), passive, so no verb agrees with the place.
 - The `manual` strings ("Turn on automatic date and time") name no system update, so they did not gain "if there
   is one".
+
+## The owner's four answers (17 October)
+
+The four questions round 2's fix left open (11 October, above), answered by the owner on 17 October: "Go with your
+recommendations for the engine questions." His rule for each: rather late, never early. Q1, Q3 and Q4 were each built
+on a branch of main 7e9fc11a (`engine-q1-ride`, `engine-q3-lupt`, `engine-q4-diyanet`), reviewed twice and fixed once,
+then merged in that order on `engine-owner-decisions` and checked as one tree. Q2 is the owner's acceptance and changes
+no code. The generated files (stamps, envelope rows, `ProofStamps.kt`, the golden vector, the own points' worst) were
+regenerated after the merges, never merged by hand; the merges' only hand-resolved lines are the spec's §3.5 sentence
+and `GenerateEnvelopeRows.kt`, which keeps every track's claims.
+
+**Q1: the nearest table's ride past its bound.** Just past a table's bound (three minutes of longitude, 52 to 80 km) the
+times had come back to the user's own point and ran up to 4 to 5 min before the nearest table on some days
+(Winchester and Martinsburg against ADAMS, Angren against Tashkent, Thatta against Karachi, Drummondville against
+CCML, Porvoo against Rabita), where a user may still pray by that table. Now, past every bound reach, the nearest table
+printed for its own point (`tablesAtTheirPoints`) still rides, claiming no figure, out to five of its own reaches
+(`RIDE_REACHES`, `TableEnvelope.rideKm`: five minutes of longitude at its latitude, where the unit is one and the bound
+three):
+- ISNA's US mosques 102 to 121 km, Chicago's 18° block 103, ISNA's Montréal and Ottawa mosques 97.5, Canada's three
+  families 83 to 91;
+- the city tables: Delhi 122, Karachi 126, Tashkent 104, Bishkek 102, Gaza 119, Beirut 115, Damascus's two samples
+  116, Baghdad 116.
+
+It rides as a day alongside (`TimetableMethod.alongside`, `DayComputer`'s step 10): the user's own day exactly as main
+computes it, the table's own day at its own point with its own curves, regional variants and margins, and the day
+shown their safe side, each start the later and each end the earlier. So nothing is earlier than main, no start is
+before the nearest table nor any end after it, and nothing is later than the later of the two days asks. The first
+build carried the table's point beside the user's as a start and an end point, read on the method's one set of curves;
+the reviews found that where a curve is read at every latitude in play (the Canadian families' night fractions) or a
+rule changes with the season (Rabita's summer Isha) that came up to 10 and 23 min later than either point alone
+(Camrose, Porvoo, Lohja), and that it moved 351,621 Dhuhr and Maghrib window ends later. A day alongside moves none,
+and a ride costs two days, not three. Within any table's bound round 2's envelope stands, and inside every unit nothing
+changed (the reach rows' 5,210 points: below).
+- **Rabita Helsinki** (`Europe.rabitaRide`). The calendar's own day at Helsinki rides from a minute's reach of Helsinki
+  (13.8 km) out to five (69 km), the region's margins (45 km) kept on the user's own day, and Helsinki's Asr a minute
+  later past Diyanet's Helsinki unit (41.5 km), where the member alone must hold the calendar. On main, points between
+  the app's Finnish towns were early against the calendar from 14 km out (Isha) and from 38 km (Fajr, Asr, the end of
+  eating), though every town was clean; 288 ring points and 11 more towns are now promise-only rows
+  (`se-cautious-envelope.tsv`, new). On the calendar's rule-change days (22–23 April, 19–20 August) Helsinki's own Isha
+  runs up to 156 min after the calendar, and the ride carries that to towns whose own rule has already changed: up to
+  97 min later than main at Järvenpää.
+- **Canada's cautious times ride ISNA's Montréal and Ottawa mosques** (`Units.crossRide`, `Americas.canadaIsnaRide`,
+  `Resolution.alongside`), the decision's own example: "someone 60 km from Montréal may well pray by CCML's board".
+  ISNA is followed only inside the two cities' boxes, so just outside them Automatic is the western families'
+  cautious times, which no ISNA table bounded: Drummondville's Fajr came up to 5 min before CCML's table on 341 days
+  of 2026, Cornwall's 3 min before Ottawa Main Mosque's on 209, and the sunrise up to 2 min after CCML's at Les Coteaux
+  and Salaberry-de-Valleyfield. Now every ISNA table whose bound holds the place (58.5 km), and past them the nearest
+  within its ride (97.5 km), rides beside Canada's cautious day as a day alongside; 142 envelope rows hold it under
+  Automatic.
+- **Manchester Central's Wifaqul table** rides out to five reaches (83 km) where Wifaqul is chosen: on main a user who
+  chose it there saw Fajr, Hanafi Asr and Isha before the table on about 60 % of its printed days, at 86 towns 50 to
+  83 km out. As the UK's cautious times' most-followed member it keeps its bound (`UnitSet.outsideAsMember`): its reach
+  is Q2's, accepted at the bound, and Automatic there is already never before its printed days. Riding there too would
+  make Automatic's Maghrib up to 5 to 6 min later on most days at Leeds, Wakefield and Castleford and carry the
+  table's knife-edge summer nights into it (Isha up to 85 min later on five to seven nights).
+- **Kept at their bound**: Diyanet's Sydney points (Diyanet prints a table for every city, which its preset computes at
+  the user's own point; Q4 below), BIK's base point, which already rides all of Kosovo (100 km), and the authorities'
+  own point tables (R44, R45: Toronto's, Lakemba's, the PA's towns, Diyanet's European cities), which keep R45's edge.
+
+No figure is claimed in a ride (`measured` as before): About still says "Not measured" there. `generateEnvelopeRows`
+replays the nearest table's own rows at every app city of its entry's countries within its ride, Rabita's calendar at
+the Finnish towns and the rings, and ISNA's mosques under Canada's Automatic: 6,685 envelope rows on main, 7,628 on
+the branch. On main the new rows break the gate in every entry with a ride (us.isna's Fajr 13,381 cells early and its
+sunrise 9,581 late ends, lb.fatwa's Dhuhr 2,958, se.cautious's Isha 19,400 and Fajr 9,142 on the rings, ca.cautious's
+Fajr 1,643 under the cross ride, Wifaqul chosen's Isha 372 and Fajr 348); here none.
+
+At the edge towns (every day of 2026 against main, Automatic unless named; the branch's own comparison):
+- the US: New Haven's Fajr up to 8 min later every day (the Jamaica Muslim Center's table, 98 km), San Diego's Isha 6,
+  Trenton's end of eating 6 earlier, Winchester's, Front Royal's and Martinsburg's sunrise 4 earlier every day,
+  Hagerstown's Fajr up to 3 later;
+- Canada: Camrose's Isha up to 10 min later every day, Drummondville's Fajr 7 later (CCML's, 87 km), Joliette's and
+  Sorel-Tracy's 6, Cornwall's 5, Chambly's and Saint-Jean-sur-Richelieu's 3; Victoria's end of eating up to 8 earlier
+  (Surrey Jamea, 85 km) and Chilliwack's Dhuhr, Asr and Maghrib 4 later;
+- the city tables: Nablus's Fajr 7 later (Gaza's Awqaf table chosen, 109 km), El Hermel's 7, Angren's Isha 6,
+  Thatta's 5, Al Hillah's 5, Guliston's end of eating 8 earlier, Ramadi's sunrise 5, Tyre's end of eating 5, Panipat's
+  Fajr 3 later and its sunrise 3 earlier;
+- Rabita: Porvoo's Isha up to 34 min later, Lohja's 37 and its end of eating 6 earlier, Järvenpää's 97 on a rule-change
+  day;
+- Wifaqul chosen: Fajr up to 128 min later at Rotherham and 133 at Maltby, Leeds' Isha 112 and its end of eating 104
+  earlier, on the knife-edge summer nights.
+
+**Q2: Lancashire and West Yorkshire, accepted.** Automatic in Preston, Bolton, Blackburn, Burnley, Bradford and
+Huddersfield keeps the Isha round 2 gave it, up to 84 min later than before on the knife-edge nights around 28 May and
+15 July, because Manchester Central's Wifaqul table rides within its bound (about 50 km). It is the cautious rule
+working as designed, "each prayer once all the timetables followed here have begun it", on two short runs of summer
+nights, and About already calls these cautious times. Nothing was built. Whether Wifaqul's table really is followed
+in those towns is the open point: a spot-check of a few mosques' boards there would settle it, and if it is not,
+narrowing Wifaqul's bound to its minute's reach is the fix. Q1 does not widen it: the member keeps its bound, and only
+Wifaqul chosen rides past it.
+
+**Q3: London Unified only near London.** Round 2's fix left London Unified chosen far from London open: a user in
+Scotland who chose it got London's table wherever it was later, or its ends earlier, than their own sun (Fajr up to 104
+min later near Dundee in late May, sunrise and sunset up to 67 and 73 min earlier; in Glasgow London's winter sunrise,
+about an hour before Glasgow's). The owner's answer: stop it, with the mechanism the app already has. LUPT is London's
+table, the M25's.
+- A chosen timetable applies where `Registry.inScope` says (ruling R50); outside, Automatic applies, with the Timetable
+  screen's one line ("London Unified isn't used here, so Automatic applies until you return"). London Unified, declared
+  global, was in scope everywhere in Great Britain. An entry can now narrow its own countries to an area
+  (`RegistryEntry.area`, read by `inScope`'s own-countries branch only; where Automatic follows or lists an entry it
+  applies whatever its area). London Unified's is R45's three reaches of its table's point (`Europe.londonArea`: two
+  minutes of longitude, three times, 103.81 km), exactly where its point already rode as the fixed point, so within it
+  nothing changes: Basildon, Sevenoaks, St Albans, Luton, Reading and Folkestone (101.7 km) keep it. Margate (105.9 km),
+  Ipswich, Dover, Southampton and everything farther are out of scope. No new UI, no new string.
+- A user beyond it who chose LUPT sees the line, Automatic selected, no London Unified row, and Automatic's own day
+  (gb.cautious) everywhere it is shown, never paused, confirmed or not. Nothing is written to storage: within 103.81 km
+  the choice applies again, confirmed as before (its confirmation is bound to gb.cautious, ruling R70).
+- Resolved there directly (a tool; the app never asks): R45's edge at the user's own point alone. Round 2's start and
+  end points beside the user's own are gone; `DayComputer`'s point-7 bound for a method with no fixed point stays, with
+  no entry riding it now.
+- `generateEnvelopeRows`' LUPT claim keeps its six towns within the area (`gb-london-lupt-envelope.tsv`, 270 rows at 18
+  towns to 90 at 6), and a named claim of a chosen table now names its entry (`Named.chosen`): the generator refuses a
+  city where it is not in scope (London Unified's and IACAD's three claims).
+- It is the one sanctioned exception to "never earlier than before" (spec §3.5): a stored London Unified beyond its area
+  now shows Automatic's own day, whose starts can come before London's table and whose ends after it. Against main's
+  LUPT chosen there, at this round's points (every third day of 2026): starts earlier by up to Fajr 21 min, Asr 28,
+  Maghrib 31 and Isha 66 (Peterhead, June), sunrise later by up to 64 (the Isle of Lewis, December) and sunset 74;
+  England up to Fajr 20, Asr 14, Maghrib 16, sunrise 28 and sunset 34 (Whitehaven, Workington); Northern Ireland
+  sunrise 45, sunset 51 and the end of eating 16 (Londonderry); Wales 21 and 27 (Colwyn Bay, Bangor). The other side:
+  the UK's cautious Fajr and Isha there come later than the choice showed, from just past the edge (the south coast,
+  Kent and Suffolk too), Isha up to 173 min (Pontefract, late July), Fajr 61 (Aberystwyth, June) and the end of eating
+  136 earlier (120 km out, late July). The comparison with main holds those cells to main's own Automatic instead,
+  which they equal.
+
+**Q4: Diyanet's preset in Sydney.** The question was to fit Diyanet's preset (other.turkey), chosen on its own in
+Sydney, to Diyanet's Sydney table, which it was said to run up to 16 min before at Asr and 12 at Isha. Measured first,
+those figures are Lakemba Mosque's (LMA's 1448 table, on 126 and 272 of its 349 days: its seasonal Asr, up to 22 min
+after the Shafi'i, and its Maghrib + 90, against the preset's Shafi'i + 4 and 17°), so the decision moved no time.
+- Against Diyanet's Sydney table the preset is never before it and no end is after it on the 31 days the archive holds
+  (25 September to 25 October 2026), at the table's three plausible points (Lakemba, Sydney's centre, the Gallipoli
+  Mosque at Auburn) and at every app city where it rides them: round 2's points ride beside the user's for a chosen
+  preset exactly as for au.cautious's member. On those days every start is 1 to 3 min after the table and every end at
+  least a minute before it (Asr 2 to 3, at class D's limit on 26 of the 31 days).
+- No fetcher reads Diyanet's Australian pages, so the other months are inferred, not proven: the preset is Diyanet's
+  own rule, never before Diyanet's tables at its six published Turkish points on every day held (25 September to 11
+  November 2026 and all of 2027).
+- A user who chooses Diyanet does not follow LMA's table, so the preset is not fitted to it; that would be a cautious
+  preset, left for the owner. au.cautious is as before: the decision's accepted cost, Automatic later where Diyanet's
+  would pass LMA's, is nil.
+- Gated: `au-diyanet.tsv` checks the preset against the table at the three points, measured (a user who chooses Diyanet
+  there follows this table, so class D's limit holds it): 93 place-days, 0 early, 0 late ends.
+  `au-diyanet-envelope.tsv`, a named claim, replays it at the 68 app cities where the chosen preset rides those points
+  (class D's reach, 69 km: Wollongong to the Central Coast), promise-only, 2,108 place-days, all clean; without the
+  envelope those rows break the gate (178 late sunrises, 252 late ends of eating, 24 early Ishas). The places come from
+  the app's own resolution of where the preset rides the table (`EnvelopeRows.ridesAny`, which since the merge also
+  reads a method's days alongside), never a reach of the tools' own, and `EnvelopeCoverageTest` fails while the
+  committed rows miss a place the engine rides; it pins Newcastle and Canberra outside (with the reach widened fivefold
+  it names the 14 cities from Newcastle to Muswellbrook). Q1 leaves Sydney's Diyanet points at the bound on purpose.
+- Found, not built: Diyanet's Melbourne table is held at Melbourne's centre only. At the app's 119 cities within its
+  reach Automatic is up to 2 min before it at Fajr in the east (215 city-days; Berwick and Pakenham 52 of 62) and at
+  Dhuhr (41), and the sunrise up to 2 min after it in the west (141); the preset chosen more often (Fajr 591, Dhuhr 233,
+  Maghrib 188, Isha 102). Adding Melbourne's centre to the same envelope clears them all, at up to 3 min later at the
+  eastern cities and 5 at 60 km. It moves Automatic in a whole city and reverses round 2's "near Sydney only", so it is
+  the owner's, a round of its own.
+- Corrected above, in place: round 2's and its fix round's "Diyanet's Sydney table" and the last open question had
+  given LMA's 16 and 12 as Diyanet's.
+
+**Rulings** (the tracks' proposals, numbered here):
+- **R121**, the nearest table's ride: past every bound reach, the nearest table printed for its own point
+  (`tablesAtTheirPoints`) rides beside the user's own day as its own day alongside, at its own point with its own
+  curves, variants and margins, out to five of its own reaches (five minutes of longitude at its latitude); the day
+  shown is their safe side; no figure is claimed there; the envelope's promise-only rows replay the table at every app
+  city of its entry's countries within the ride. Within any bound round 2's envelope stands. Reason: the owner's Q1,
+  just past the bound the times ran up to 4 to 5 min before the nearest table. Cost: starts up to 7 to 11 min later
+  and ends up to 6 to 10 earlier in a ride (us.isna Fajr 9, ca.cautious Isha 10, kg.default Fajr 11), and a ride's day
+  two days' work instead of one.
+- **R122**, Rabita's ride: Rabita's Helsinki calendar rides the same way from a minute's reach of Helsinki out to five
+  (13.8 to 69 km), its Asr 60 s later past Diyanet's Helsinki unit; within 45 km the region's margins stay on the user's
+  own day. Reason: points between the towns were early from 14 km out. Cost: Isha later by up to 21 min at the
+  rings (every third day) and by up to 97 at the app's towns on the calendar's rule-change days (Järvenpää; Porvoo up
+  to 34, on 311 days moved); a year at Espoo and Porvoo about 1.5 to 2 times main's.
+- **R123**, a cross ride: another entry's tables printed for their own points may ride beside a cautious entry's day
+  wherever that entry is followed (`Units.crossRide`, `Resolution.alongside`); ISNA's Montréal and Ottawa mosques ride
+  beside Canada's cautious times, every table whose bound holds the place and past them the nearest within its ride. No
+  figure is claimed for them. Reason: the decision's own example (CCML's board 60 km out); outside the two cities'
+  boxes no ISNA table bounded Automatic. Cost: Fajr up to 7 min later at Drummondville, 3 to 6 in the towns round
+  Montréal and Ottawa, sunrise up to 5 earlier at Les Coteaux; a year at Chambly about four to five times main's.
+- **R124**, who keeps the bound: Manchester Central's Wifaqul table rides where Wifaqul is chosen (R121) but keeps its
+  bound as the UK's cautious member (`UnitSet.outsideAsMember`) while Q2 stands; Diyanet's Sydney points keep their
+  bound (Diyanet prints a table per city); BIK's base keeps its 100 km; the authorities' own point tables keep R45's
+  edge. Reason: Q2 accepted Wifaqul's reach at the bound, and widening the member would carry the knife-edge nights
+  into Automatic over 86 more towns. Cost: Wifaqul chosen up to 128 to 133 min later at Fajr and 112 at Isha on the
+  knife-edge nights 50 to 83 km out.
+- **R125**, a named table's area: an entry's own countries can be narrowed to an area (`RegistryEntry.area`, read only
+  by `Registry.inScope`'s own-countries branch); London Unified's is R45's three reaches of its point (103.81 km), and
+  beyond it a stored London Unified is out of scope: Automatic applies, with the Timetable screen's line, and the
+  choice is kept for the user's return. It is the one sanctioned exception to "never earlier than before": the
+  comparison with an earlier engine holds those cells to its Automatic. Reason: the owner's Q3, London's table is
+  simply wrong for the place far from the M25. Cost: such a user loses London's board (above, both sides).
+- **R126**, a table printed for a point its authority does not publish is gated two ways for the entry a user chooses
+  to follow it with: measured at each plausible point the engine rides it at, held to that entry's class limit; and
+  promise-only at every app city where the engine rides those points. Diyanet's Sydney table is the first. Reason: at
+  the plausible points the user follows the table, so the lateness is theirs; elsewhere it also holds the distance to
+  an unknown point. Cost: none in times; Asr sits at class D's limit, so a capture that comes out a minute later
+  breaks the gate and asks for a reason (R41) or a fix.
+- **R127**, where the envelope's named rows are read: from the app's own resolution of where the engine rides the
+  table (`EnvelopeRows.Named.rides`, `ridesAny`), never a reach the tools compute themselves; `EnvelopeCoverageTest`
+  fails while the committed files miss a place the generator would write. Reason: the Q4 review found the reach
+  copied, so a ride widened in the engine would have left the new area ungated. Cost: none.
+- **R128**, the evidence's days: "never before a table" is stated over the days of it the archive holds; a table held
+  for one season only is listed for another season's capture before the claim is called settled. Reason: Diyanet's
+  Sydney table is one spring month. Cost: none.
+- **R129**, a quoted figure: a figure an owner's question quotes is re-measured against the table it names before a
+  round builds on it. Reason: Q4's 16 and 12 were Lakemba Mosque's. Cost: none.
+
+Proposed and not numbered, the owner's: Diyanet's Melbourne table riding beside the user's point within class D's
+reach of Melbourne's centre, for the preset and au.cautious's member alike (Q4's finding above; not built).
+
+**Never earlier than main 7e9fc11a, the integrated tree.** 16,013 points: the three tracks' own seeds as they wrote
+them (Q1's fix: rings round all 72 own-point tables and Helsinki from 1 to 5.5 reaches, each ride's band, every app
+city within six reaches of a table, 1,597 app cities of 20 countries moved up to 20 km; Q3's: the app cities of Great
+Britain, the Isle of Man, Jersey and Guernsey, 300 moved, 23 rings round London's point from 60 to 600 km; Q4's: rings
+round Sydney's three points and Melbourne, the app cities within 150 km of Sydney, 60 moved; each with its controls),
+14,642 after duplicates, and this round's own (seed 20261018): rings at the decisions' edges (London Unified's area
+from 95 to 130 km, Wifaqul's ride from 45 to 90 km, Sydney's Diyanet bound from 60 to 75 km; 432 points), 899 app
+cities of the 20 affected countries moved up to 20 km, and one city in each of 40 countries none of the tracks had
+named. At each, Automatic and every entry the place may choose (the Other methods included, and London Unified anywhere
+in Great Britain, as main had it), as the app shows each when stored and confirmed, in Automatic's school, every third
+day of 2026: 210,023 point-entry pairs, 25.6 million point-entry-days, 384 million values.
+- 0 starts earlier. No sunrise, sunset, end of eating, imsak, or end of Fajr, Asr or Isha later, and no Dhuhr or
+  Maghrib window end later either. No class, measured flag or unit moved; nothing absent on one side.
+- Nothing moved at the 158 control points (1,929 pairs), nor anywhere in Australia (Q4 moves no time), nor under
+  Automatic anywhere in Great Britain.
+- London Unified within its area (813 pairs, 99,186 point-days): identical to main. Stored beyond it (1,434 pairs,
+  174,948 point-days): identical to main's own Automatic in every value and flag (the one sanctioned exception, R125,
+  whose cost is given under Q3).
+- 5,721 pairs moved, every one in a ride: us.isna 2,237, ca.cautious 2,076, se.cautious 424, gb.wifaqul (chosen) 292,
+  in.karachi 134, sy.awqaf 98, iq.sunni 90, us.chicago 79, pk.karachi 71, lb.fatwa 67, ps.gaza.awqaf 60, kg.default
+  49, uz.board 44. Of the cells that moved, a start later by 1 or 2 min 43 %, 3 or 4 min 47 %, 5 or more 10 %; an end
+  earlier 39, 48 and 12 %.
+- The worst added lateness (starts later, ends earlier; minutes): us.isna Fajr 9 (five reaches from MEC), Isha and the
+  end of eating 8; us.chicago Isha 7, the end of eating 8; ca.cautious Isha 10 (near Imam Malik), Fajr 9, the end of
+  eating 8; kg.default Fajr 11, the end of eating 10; every other city table 7 or 8; se.cautious Isha 21 and the end of
+  eating 8 on the rings; Wifaqul chosen Fajr 131 (Wombwell), Isha 114, and the end of Isha 112 and the end of eating 90
+  earlier, on the knife-edge summer nights.
+- Every day of 2026 at the seed's 4,227 app cities, moved cities and controls (54,859 pairs, 20.0 million
+  point-entry-days): the same, 0 earlier and 0 later ends. The worst there: Wifaqul chosen's Fajr 133 (Maltby) and Isha
+  113 (Castleford), se.cautious's Isha 97 (Järvenpää, a rule-change day), ca.cautious's Isha 10 (Camrose), and 8 at
+  most elsewhere (New Haven's Fajr, Guliston's and Somerton's end of eating, Victoria's).
+- The reach rows' 5,210 points, every entry each may choose, every third day: the rows' own entries (us.isna, ca.isna,
+  xk.bik, sa.ummalqura, kz.qmdb) are identical to main there, so `generateReachRows`' inputs did not change and it was
+  not run; 20 pairs of other entries chosen at those points moved later in their rides (ca.cautious by Montréal's ISNA
+  units, its cross ride; uz.board and kg.default by Kazakhstan's border).
+- The website: main's and the branch's generations at one moment (`-Pnow=2026-10-17T12:00:00Z`) differ in the proof's
+  counts alone (tables 19,793 to 20,627, place-days 4,395,481 to 4,395,574): no page's time moved, since a page shows
+  Automatic and no site city's Automatic rides a table past its bound.
+
+**App cost.** A year of `DayPipeline.day` on the JVM (365 days of 2026, warm, the median of 9 runs; main and the branch
+interleaved twice; the Mac shared with another session's emulator and simulator, load 16 to 18, so one code's two runs
+differ by up to half again), main → the branch, in ms, each side's two runs:
+- inside the bounds as before: Washington 87 → 86–129, Los Angeles 71–72 → 67–93, Leeds under Automatic 199–210 →
+  190–198, Sydney 22–24 → 21–41 (Ottawa 78–113 → 105–116: noise either way);
+- a ride, two days instead of one: Angren, Thatta and Panipat 6.3–15 → 13–24, Winchester, Hagerstown and New Haven
+  6.5–7.4 → 16–30 (the Q1 fix's quieter runs: 6.5 → 13–15), a fifth to a third of a US metro's;
+- the cross ride, each riding mosque's own day beside the four members': Chambly 22–34 → 119–167, Drummondville 21–24 →
+  30–94, Cornwall 20–33 → 29–39; Canada's families' own rides, Camrose 56–64 → 82–128, Victoria 53–58 → 78–82;
+- Rabita's ride: Espoo 86–96 → 152–196, Porvoo 100–110 → 155–221 (Helsinki itself, inside a minute's reach, 92–100 →
+  88–130);
+- Wifaqul chosen at Leeds 38–39 → 95–97;
+- London Unified within its area as before (Reading 37–46 → 45–50); stored beyond it the year is Automatic's there
+  (Dover 49 → 143–198, Manchester 54–58 → 339–345, Glasgow 85–92 → 214–306), what every user there on Automatic already
+  pays;
+- Diyanet's preset in Sydney as before (Sydney 6.1–6.6 → 6.2–8.7; Fairfield and Wollongong 9–22 on either side): its
+  code path is main's.
+
+Timing a year's Timetable on the iOS simulator and a low-end Android at Chambly, Porvoo and Glasgow is left for release
+testing.
+
+**For the owner**, after this round:
+- Q2's spot-check: whether Wifaqul's table is followed in Preston, Bolton, Blackburn, Burnley, Bradford and Huddersfield
+  (if not, narrow its bound), and whether Wifaqul chosen should ride to 83 km at the cost above.
+- Melbourne's Diyanet table, a round of its own (Q4's recommendation: yes).
+- Diyanet's preset and Lakemba Mosque's table: keep it Diyanet's (Q4's recommendation) or hold it to LMA's too.
+- Another season's capture of Diyanet's Sydney and Melbourne tables, or a monthly fetcher for them in the monitor
+  (the private repository's).
+- R121's cost lands on large towns with mosques of their own (New Haven's starts up to 8 min later every day, Camrose's
+  Isha 10, Victoria's end of eating 8 earlier): the decision's accepted cost, listed so it is seen.
+
+Checked on the integrated tree (`engine-owner-decisions`, the last code change the Q4 merge's):
+- the whole gate writing stamps (archive linked): 20,627 rows, 4,395,574 place-days and 501,987 more held to the
+  promise alone, 71 entries, 0 early, 0 late ends, none over its limit, nothing BROKEN, in 4 min 27 s (main: 19,793
+  rows, 4,395,481 place-days, 335,417; the tracks: Q1 20,736, Q3 19,614, Q4 19,865 rows). Every stamp's `engineHash`
+  moved; only se.cautious's (Q1's lateness shares, its worst figures unchanged) and other.turkey's (Q4's three measured
+  rows: 9 places, 2,571 place-days) moved in substance, each exactly as its track wrote it;
+- `generateEnvelopeRows`: 7,516 rows in 20 files (main 6,685 in 18), every file as the merges left it but
+  `au-diyanet-envelope.tsv`'s header; `generateProofStamps`: `ProofStamps.kt` differs from main in other.turkey's
+  places and place-days alone; `generateGoldenVector`: byte-identical to main, 0 of 2,071 rows moved;
+  `generateOwnPointWorst`: 2,344 rows, main's 2,324 and the 20 Diyanet Europe captures of 12 October that `prove` had
+  added to the gate without regenerating it (Q3 and Q4 had caught it up alike); `checkStamps`: 71 fresh and green.
+  `generateReachRows` not run (its inputs did not change: above);
+- tools `jvmTest` with the archive: 333 run, 0 failed (`EnvelopeCoverageTest` 2/2, `EnvelopeRowsTest` 4/4);
+- `scripts/test.sh` (`:shared:allTests :widgetcore:allTests` and both Android host test tasks): BUILD SUCCESSFUL in
+  23 min; shared 1,875 on the Android host and 1,827 on the iOS simulator, widgetcore 99 and 97, 0 failed (the tracks'
+  new test names compile on iOS: no commas or parentheses);
+- `scripts/check-strings.sh`: clean; the monitor's Python tests: 104, OK;
+- the website: `CI=true generate` 55 cities (2 held) and 129 pages, `build.py --check` 164 pages and every check good,
+  `test_timetables.py` 22, OK.
+
+Not run here: the app on a phone, an emulator or the iOS simulator's screens (the iOS tests ran on the simulator), and
+the year's Timetable timing on them. The engine change ships with the next update.

@@ -1108,7 +1108,9 @@ class RegistryTest {
         val istanbul = Place(41.0082, 28.9784, "Europe/Istanbul", "TR")
         val lupt = Registry.byId("gb.london.lupt")!!
         assertTrue(Registry.inScope(lupt, london))
-        assertTrue(Registry.inScope(lupt, manchester)) // declared global: its own country
+        // Declared global: its own country, within its area (R45's three reaches, the owner's decision of 17 Oct 2026).
+        assertTrue(Registry.inScope(lupt, Place(51.45625, -0.97113, "Europe/London", "GB"))) // Reading, 59 km
+        assertFalse(Registry.inScope(lupt, manchester)) // 262 km
         assertFalse(Registry.inScope(lupt, istanbul))
         assertFalse(Registry.inScope(Registry.byId("tr.diyanet.europe")!!, Place(-26.20227, 28.04363, "Africa/Johannesburg", "ZA")))
         assertFalse(Registry.inScope(Registry.byId("id.muhammadiyah")!!, london))

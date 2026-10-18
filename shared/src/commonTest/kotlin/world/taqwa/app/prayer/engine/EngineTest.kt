@@ -189,6 +189,33 @@ class EngineTest {
     }
 
     @Test
+    fun `london unified chosen far from london gives automatic there and is back within its area`() {
+        // The owner's decision of 17 Oct 2026: beyond R45's three reaches of its point (about 104 km) London Unified is out
+        // of scope. A Glasgow user who chose and confirmed it before the update sees Automatic's own day, never paused, and
+        // the choice applies again where it does (Reading, 59 km), as confirmed.
+        val glasgow = Place(55.86515, -4.25763, "Europe/London", "GB")
+        val reading = Place(51.45625, -0.97113, "Europe/London", "GB")
+        assertEquals("gb.cautious", PrayerEngine.automaticEntryId(glasgow))
+        assertEquals("gb.cautious", PrayerEngine.automaticEntryId(reading))
+        val lupt = EngineSettings(timetable = TimetableChoice.Entry("gb.london.lupt"), timetableConfirmed = true, timetableConfirmedUnder = "gb.cautious")
+        var differs = false
+        for (month in 1..12) {
+            val date = LocalDate(2026, month, 10)
+            val far = day(glasgow, date, lupt)
+            assertEquals("gb.cautious", far.effectiveEntry.id)
+            assertFalse(far.timetablePaused)
+            assertEquals(day(glasgow, date).day, far.day, "$date")
+            assertEquals(day(glasgow, date).day, day(glasgow, date, lupt.copy(timetableConfirmed = false)).day, "$date")
+            val back = day(reading, date, lupt)
+            assertEquals("gb.london.lupt", back.effectiveEntry.id)
+            assertFalse(back.timetablePaused)
+            if (back.day != day(reading, date).day) differs = true
+        }
+        assertTrue(differs, "London Unified's own days at Reading")
+        assertEquals(null, PrayerEngine.ownDay(glasgow, LocalDate(2026, 6, 1), TimetableChoice.Entry("gb.london.lupt"), lupt))
+    }
+
+    @Test
     fun `a global choice applies anywhere and automatic still names the place's own`() {
         val chosen = day(istanbul, settings = EngineSettings(timetable = TimetableChoice.Entry("other.mwl"), timetableConfirmed = true))
         assertEquals("other.mwl", chosen.effectiveEntry.id)

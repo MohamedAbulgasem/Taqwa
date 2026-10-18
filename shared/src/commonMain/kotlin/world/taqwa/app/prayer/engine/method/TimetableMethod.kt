@@ -134,6 +134,21 @@ sealed interface EndOfEating {
 data class RamadanRule(val maghribExtraSeconds: Int = 0, val ishaFloorMinutesAfterMaghrib: Int? = null)
 
 /**
+ * Another table's own day beside a method's (the owner's decision of 17 Oct 2026, question 1: past its bound the nearest
+ * table printed for its own point still rides, out to about five of its reaches): [method] at [point] alone, read there
+ * with its own curves, regional variants and margins, exactly as that table's own point shows it. The day shown is the
+ * safe side of the method's own day at the user's point and each such day (DayComputer's alongside step): every start
+ * the later, sunrise, sunset, the end of eating, imsak and every end the earlier. Unlike [TimetableMethod.envelopePoints],
+ * which read the method's one set of curves at every point, each day keeps its own: the user's own day is exactly what
+ * it was without the table, and the table's exactly its own, so nothing is later than the later of the two needs.
+ */
+data class Alongside(val point: GeoPoint, val method: TimetableMethod) {
+    init {
+        require(method.alongside.isEmpty()) { "${method.id}: a day alongside carries no day alongside of its own" }
+    }
+}
+
+/**
  * The authority's own rule where the twilight fails (applied by `HighLatitude` and `DayComputer`).
  * - [Standard]: the MWL Fiqh Council's proportion from 45°, only when the sign is missing.
  * - [DumRtSummer]: on the mornings whose Fajr dawn (18°) the sun does not reach at any of the
@@ -196,7 +211,9 @@ sealed interface HighLatRule {
  * 10–11 Oct 2026), never on an authority's own unit, whose ends follow its table (ruling R89); and, with
  * no fixed point, where a table's point rides beside the user's as a start and an end point (London Unified
  * chosen beyond R45's three reaches, round 2's fix of 11 Oct 2026), the ends never after those the method
- * shows at the user's point with no other point beside it.
+ * shows at the user's point with no other point beside it. [alongside]: other tables' own days, each computed apart at
+ * its own point ([Alongside]), whose safe side with this method's own day is the day shown (the nearest table's ride
+ * past its bound, the owner's decision of 17 Oct 2026).
  *
  * - [twilightDipDeg] deepens the Fajr and Isha angles (INM, JAKIM highland zones).
  * - [fajrDeclinationBias] (degrees, by day of year) is added to the sun's declination for Fajr, and
@@ -276,6 +293,7 @@ data class TimetableMethod(
     val declaresIshaBeforeMaghrib: Boolean = false,
     val fixedTableYear: Int? = null,
     val fixedTableOwnDawn: Boolean = false,
+    val alongside: List<Alongside> = emptyList(),
 ) {
     init {
         require(dayAroundDhuhrMinutes == null || dayAroundDhuhrMinutes in 1 until 12 * 60) {

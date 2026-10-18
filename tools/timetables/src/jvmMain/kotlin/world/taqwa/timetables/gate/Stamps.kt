@@ -99,7 +99,9 @@ object Stamps {
         },
     ).filterValues { it != null }
 
-    private fun events(events: Map<Event, EventStats>): Map<String, Any?> = events.entries.associate { (event, e) ->
+    // An event only promise-only rows read (GateRow.promiseOnly: a table the place may not follow, such as ISNA's West
+    // Island Hanafi Asr under Canada's cautious times) has no cell in the proof, so it is left out of the stamp.
+    private fun events(events: Map<Event, EventStats>): Map<String, Any?> = events.entries.filter { (_, e) -> e.checked > 0 || e.declared > 0 }.associate { (event, e) ->
         event.key to linkedMapOf(
             "checked" to e.checked,
             if (event.isStart) ("early" to e.early) else ("lateEnd" to e.lateEnd),
@@ -190,6 +192,8 @@ object Stamps {
         append(" unit ").append(Canonical.of(resolution.unitName)).append(' ').append(Canonical.of(resolution.unitPoint))
         resolution.method?.let { append(' ').append(fingerprint(it)) }
         resolution.members.forEach { append(" member ").append(it.id).append('#').append(it.shareRank).append(' ').append(fingerprint(it.method)) }
+        // Another entry's tables riding beside the place (Resolution.alongside, the owner's decision of 17 Oct 2026).
+        resolution.alongside.forEach { append(" alongside ").append(Canonical.of(it)) }
     }
 
     /**

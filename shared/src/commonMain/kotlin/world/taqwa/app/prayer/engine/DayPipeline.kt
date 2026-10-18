@@ -24,7 +24,10 @@ import world.taqwa.app.prayer.engine.registry.Resolution
  *    later of the two and sunrise, sunset and the end of eating the earlier (ruling R15, spec §3.5).
  * 2. A cautious entry computes each member with its own method, Ramadan calendar and the lag dates,
  *    at the user's point, and combines them ([Cautious.combine]; the most-followed member is the
- *    lowest share rank).
+ *    lowest share rank). Where another entry's tables ride beside the place ([Resolution.alongside],
+ *    the owner's decision of 17 Oct 2026: ISNA's Montréal and Ottawa mosques beside Canada's cautious
+ *    times outside those cities), each table's own day at its own point is computed too, and the day
+ *    is the safe side of them all ([DayComputer.safeSide]: each start the later, each end the earlier).
  * 3. The day is put in order on the safe side ([Invariants.repair]).
  * 4. Isha's end is the next day's end of eating, the next day computed the same way
  *    ([Ends.withNextDay]).
@@ -81,7 +84,22 @@ object DayPipeline {
             val mostFollowed = members.indices.minBy { members[it].shareRank }
             Cautious.combine(members(resolution, date, zone, school, hijriOffsetDays), mostFollowed)
         }
-        return Invariants.repair(day)
+        // Step 2b: another entry's tables riding beside the place (Resolution.alongside), each its own day at its own point.
+        val held = resolution.alongside.fold(day) { shown, other ->
+            DayComputer.safeSide(
+                shown,
+                DayComputer.compute(
+                    method = other.method,
+                    point = other.point,
+                    date = date,
+                    zone = zone,
+                    school = school,
+                    ramadan = Registry.ramadanCalendarFor(resolution.entry, hijriOffsetDays),
+                    lagDates = Registry.lagDates,
+                ),
+            )
+        }
+        return Invariants.repair(held)
     }
 
     /**

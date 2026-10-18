@@ -5,6 +5,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.prayer.engine.day.RamadanCalendar
+import world.taqwa.app.prayer.engine.method.Alongside
 import world.taqwa.app.prayer.engine.method.FixedPointMode
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.TimetableMethod
@@ -97,10 +98,14 @@ object Registry {
             // Review I3: a cautious entry is measured only where it is and where every member's own
             // placement at the place is measured (a unit's flag, false beyond every unit; an entry
             // without units, its own flag; a convention, near the tables that prove it).
-            val members = entry.members.map { it to placed(it.id, it.method, memberMeasured(it, user), place) }
+            val members = entry.members.map { it to placed(it.id, it.method, memberMeasured(it, user), place, asMember = true) }
+            // Another entry's tables riding beside this one (Units.crossRide, the owner's decision of 17 Oct 2026): ISNA's
+            // Montréal and Ottawa mosques beside Canada's cautious times outside those cities. No figure is claimed for them.
+            val alongside = Units.crossRide(entry.id)?.let { cross -> finishedAlongside(cross.tablesEntryId, cross.ride(user), place.zoneId) }
             return Resolution(
                 entry, user, null, shia, saudi, entry.measured && members.all { (_, here) -> here.measured }, method = null,
                 members = members.map { (member, here) -> member.copy(method = here.method) },
+                alongside = alongside.orEmpty(),
             )
         }
 
@@ -142,13 +147,16 @@ object Registry {
      * Entry [entryId]'s method [base] at [place]: its unit's own method, carrying the unit's point
      * as its fixed point (ruling R15: starts the later of that point and the user's, ends the
      * earlier; a method with a fixed point of its own keeps it), else the safe edge; then its
-     * regional variants and its curves for the fixed point's latitude.
+     * regional variants and its curves for the fixed point's latitude. [asMember]: placed as a cautious
+     * entry's member, which beyond every unit takes [UnitSet.outsideAsMember] where the set has one.
      */
-    private fun placed(entryId: String, base: TimetableMethod, measured: Boolean, place: Place): Placed {
+    private fun placed(entryId: String, base: TimetableMethod, measured: Boolean, place: Place, asMember: Boolean = false): Placed {
         val user = GeoPoint(place.lat, place.lon)
         val units = Units.of(entryId) ?: return Placed(methodAlone(entryId, base, user, place.zoneId), null, measured)
+        // A cautious member beyond every unit may ride less far than the entry chosen on its own (UnitSet.outsideAsMember).
+        val outside = units.outsideAsMember.takeIf { asMember } ?: units.outside
         val unit = units.unitFor(place)
-            ?: return Placed(finish(entryId, units.outside(user), user, place.zoneId), null, measured && units.measuredBeyond)
+            ?: return Placed(finish(entryId, outside(user), user, place.zoneId), null, measured && units.measuredBeyond)
         return Placed(methodInUnit(entryId, base, unit, user, place.zoneId), unit, unit.measured)
     }
 
@@ -175,12 +183,24 @@ object Registry {
         finish(entryId, base, user, zoneId)
 
     /**
+     * Entry [entryId]'s method at [user] beyond every unit of its, as [placed] gives it there: its units' own method
+     * outside them (a point table's edge, or the tables riding beside the user, [TableEnvelope.beyond]), else [base],
+     * then [finish]. For the tests that hold such a place to its own point alone ([methodAlone]).
+     */
+    internal fun methodBeyondUnits(entryId: String, base: TimetableMethod, user: GeoPoint, zoneId: String? = null): TimetableMethod =
+        finish(entryId, Units.of(entryId)?.outside?.invoke(user) ?: base, user, zoneId)
+
+    /**
      * [method] with entry [entryId]'s regional variants for [user] and its curves for the point the starts are
      * read at (an ends-only fixed point leaves them at the user's). A rule read at each place's own latitude
      * (QMDB's) holds for the user's latitude as well, so that a unit's point never makes the user's own start
      * earlier than it is without the unit (PlaceCurves.at). [zoneId], the user's zone, is where the Moonsighting
      * Committee's rule finds each civil date's own noon (T3 review, 11 Oct 2026: east of 180° in UTC+12 it is the solar
      * day before the UTC date's); null reads it at local mean time.
+     *
+     * Each of the method's days alongside ([TimetableMethod.alongside], the nearest table's ride past its bound) is
+     * finished the same way at its own point, as if the user stood there: that table's own variants and its curves at its
+     * own latitude, so its day is the one its own point shows.
      */
     private fun finish(entryId: String, method: TimetableMethod, user: GeoPoint, zoneId: String?): TimetableMethod {
         var m = method
@@ -188,19 +208,31 @@ object Registry {
             if (variant.entryId == entryId && variant.area.contains(user)) m = variant.change(m)
         }
         val curvesAt = if (m.fixedPointMode == FixedPointMode.ENDS_ONLY) user else m.fixedPoint ?: user
-        return PlaceCurves.at(m, curvesAt, also = user, others = m.envelopePoints, zoneId = zoneId)
+        val placed = PlaceCurves.at(m, curvesAt, also = user, others = m.envelopePoints, zoneId = zoneId)
+        if (placed.alongside.isEmpty()) return placed
+        return placed.copy(alongside = placed.alongside.map { it.copy(method = finish(entryId, it.method, it.point, zoneId)) })
     }
+
+    /**
+     * [alongside] (another entry's tables riding beside a cautious place, [Units.crossRide]) finished at each table's
+     * own point under its own entry [entryId], as [finish] finishes a method's own days alongside.
+     */
+    private fun finishedAlongside(entryId: String, alongside: List<Alongside>, zoneId: String?): List<Alongside> =
+        alongside.map { it.copy(method = finish(entryId, it.method, it.point, zoneId)) }
 
     /**
      * Whether a chosen [entry] applies at [place] (spec §2.2, ruling R50): an Other method anywhere;
      * any other entry where Automatic follows it or lists it (nearby or as a member), and a country
-     * one, or one declared global, also in its own countries. A named timetable is a place's own: a
-     * London table is no one's timetable in İstanbul.
+     * one, or one declared global, also in its own countries, within its [RegistryEntry.area] there
+     * where it has one. A named timetable is a place's own: a London table is no one's timetable in
+     * İstanbul, nor in Glasgow (the owner's decision of 17 Oct 2026: London Unified beyond R45's three
+     * reaches of its table's point). Elsewhere Automatic applies, and Settings says so in one line.
      */
     fun inScope(entry: RegistryEntry, place: Place): Boolean {
         if (entry.scope == Scope.GLOBAL && entry.id.startsWith(OTHER_METHOD_PREFIX)) return true
         val inItsCountries = (entry.scope == Scope.GLOBAL || entry.scope == Scope.COUNTRY) &&
-            place.countryCode.uppercase() in entry.countries
+            place.countryCode.uppercase() in entry.countries &&
+            entry.area?.contains(GeoPoint(place.lat, place.lon)) != false
         if (inItsCountries) return true
         val automatic = automaticEntry(place)
         return automatic.id == entry.id || entry.id in automatic.nearby || automatic.members.any { it.id == entry.id }

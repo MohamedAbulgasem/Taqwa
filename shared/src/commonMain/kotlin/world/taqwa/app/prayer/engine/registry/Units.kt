@@ -1,5 +1,6 @@
 package world.taqwa.app.prayer.engine.registry
 
+import world.taqwa.app.prayer.engine.method.Alongside
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.FixedPointMode
 import world.taqwa.app.prayer.engine.method.GeoPoint
@@ -76,6 +77,10 @@ data class AuthorityUnit(
  * is not measured there. [around], when given, adds what else bounds a user inside a unit, after the
  * unit's point is set as the fixed point: the other tables whose reach holds the user
  * ([tablesAtTheirPoints]' envelope), or an authority's printed town figures (BIK's, Balkans.kosovoUnits).
+ * [envelope], when set, is the [TableEnvelope] [around] and [outside] ride (the tools' envelope rows read from it which
+ * tables ride where). [outsideAsMember], when set, is [outside] for the entry placed as a cautious entry's member, where
+ * that differs from the entry chosen on its own (Manchester Central's Wifaqul table, whose ride past its bound holds the
+ * entry chosen but not the UK's cautious member: Europe.wifaqulUnits).
  */
 class UnitSet(
     val entryId: String,
@@ -83,6 +88,8 @@ class UnitSet(
     val choose: ((Place) -> AuthorityUnit?)? = null,
     val measuredBeyond: Boolean = false,
     val around: ((user: GeoPoint, unit: AuthorityUnit, method: TimetableMethod) -> TimetableMethod)? = null,
+    val envelope: TableEnvelope? = null,
+    val outsideAsMember: ((GeoPoint) -> TimetableMethod)? = null,
     val outside: (GeoPoint) -> TimetableMethod,
 ) {
     init {
@@ -176,6 +183,8 @@ object Units {
             .plus(listOf(Levant.gazaAwqafUnits, Levant.lebanonUnits, Levant.syriaUnits, Levant.iraqUnits))
             // The city-point round of 11 Oct 2026: Diyanet's Sydney table at every plausible point of its, near Sydney only.
             .plus(Americas.sydneyDiyanetUnits)
+            // The owner's decision of 17 Oct 2026: Rabita's Helsinki calendar rides past its region, as a nearest table past its bound.
+            .plus(Europe.rabitaRide)
             .associateBy { it.entryId }
     }
 
@@ -187,6 +196,14 @@ object Units {
 
     /** The units of entry [entryId], or null when it has none. */
     fun of(entryId: String): UnitSet? = sets[entryId] ?: built[entryId]?.value
+
+    /**
+     * Another entry's tables riding beside cautious entry [entryId]'s day ([CrossRide]), or null: ISNA's Montréal and
+     * Ottawa mosques beside Canada's cautious times outside those cities (the owner's decision of 17 Oct 2026).
+     */
+    fun crossRide(entryId: String): CrossRide? = crossRides[entryId]
+
+    private val crossRides: Map<String, CrossRide> by lazy { listOf(Americas.canadaIsnaRide).associateBy { it.entryId } }
 }
 
 /**
@@ -267,14 +284,18 @@ internal class OwnTable(
  * Wifaqul towns 17 to 20 km from Manchester Central). An authority that applies one table to a whole area by
  * whole-minute offsets (BIK) reaches as far as its entry's class.
  *
- * Beyond every minute's reach, the tables whose [bound] reach holds the user ride as there ([TableEnvelope.beyond]), and
- * beyond every bound reach the method at the user's own point exactly as before ([method]): unlike one point table's fit
- * ([pointTables], whose edge [beyondTable] widens), these margins hold every table at its own point and are meant for any
- * point, so ruling R44's edge minute and SAFE_END do not apply there (the same proposed ruling). As beyond every other
- * unit, no figure is claimed there, except that a cautious member
- * keeps its own measured reach ([measuredBeyond], [Member.measuredAt]). [measured] is false for an entry that claims no
- * figure anywhere (every city table's above). The units carry no name of their own ([AuthorityUnit.named]): About calls
- * the place by the app's own name for it, never a mosque's.
+ * Beyond every minute's reach, the tables whose [bound] reach holds the user ride as there ([TableEnvelope.beyond]);
+ * beyond every bound reach the nearest table's own day still rides beside the user's own, a day alongside, out to
+ * [RIDE_REACHES] of its reaches (the owner's decision of 17 Oct 2026), and beyond that the method at the user's own
+ * point exactly as before ([method]): unlike one point table's fit ([pointTables], whose edge [beyondTable] widens), these
+ * margins hold every table at its own point and are meant for any point, so ruling R44's edge minute and SAFE_END do not
+ * apply there (the same proposed ruling). As beyond every other unit, no figure is claimed there, except that a cautious
+ * member keeps its own measured reach ([measuredBeyond], [Member.measuredAt]). [measured] is false for an entry that
+ * claims no figure anywhere (every city table's above). The units carry no name of their own ([AuthorityUnit.named]):
+ * About calls the place by the app's own name for it, never a mosque's. [ride]: how many of its reaches the nearest
+ * table rides past every bound ([TableEnvelope]'s rideReaches; zero keeps the bound alone); [memberRide], where it
+ * differs, the same for the entry placed as a cautious entry's member (Manchester Central's Wifaqul table rides the
+ * entry chosen but not the UK's cautious member, whose reach is the owner's question 2 of 17 Oct 2026).
  */
 internal fun tablesAtTheirPoints(
     entryId: String,
@@ -284,6 +305,8 @@ internal fun tablesAtTheirPoints(
     measured: Boolean = true,
     measuredBeyond: Boolean = false,
     bound: EntryClass = EntryClass.D_AUTHORITY,
+    ride: Double = RIDE_REACHES,
+    memberRide: Double = ride,
 ): UnitSet {
     val units = tables.map { t ->
         AuthorityUnit(
@@ -291,10 +314,12 @@ internal fun tablesAtTheirPoints(
             lateLimits = t.lateLimits, named = false, endsBoundAtUserPoint = true,
         )
     }
-    val envelope = TableEnvelope(units, bound)
+    val envelope = TableEnvelope(units, bound, ride)
+    val asMember = if (memberRide == ride) null else TableEnvelope(units, bound, memberRide)
     return UnitSet(
         entryId, units, measuredBeyond = measuredBeyond,
-        around = { user, unit, placed -> envelope.around(user, unit, placed) },
+        around = { user, unit, placed -> envelope.around(user, unit, placed, method) }, envelope = envelope,
+        outsideAsMember = asMember?.let { e -> { user -> e.beyond(user, method) } },
     ) { user -> envelope.beyond(user, method) }
 }
 
@@ -308,34 +333,115 @@ internal fun tablesAtTheirPoints(
  * all of them and the user's own point, each end never after any of them alone. Beyond every unit but within a table's
  * bound reach, the nearest such table rides as the fixed point and the rest beside it, with no figure (the review's probe
  * found the times just beyond the minute's reach before the nearest table on some days: Calgary's north-east, Delhi's
- * edge, Faridabad). Beyond every bound reach, the method at the user's own point alone, as before.
+ * edge, Faridabad).
+ *
+ * [rideReaches] (the owner's decision of 17 Oct 2026, "rather late, never early"): beyond every bound reach the nearest
+ * table still rides, out to that many of its own reaches ([rideKm]: [RIDE_REACHES] minutes of longitude at the table's
+ * latitude, 83 km at Edmonton to 126 km at Karachi, where the bound is three). Just past the bound the times had come
+ * back to the user's own point and ran up to 4 to 5 min before the nearest table on some days, where a user may still
+ * pray by that table (the app's Winchester and Martinsburg ended sunrise and the fast after ADAMS's table, Angren began
+ * every prayer before Tashkent's, Thatta before Karachi's). There its own day rides beside the user's own as a day
+ * alongside ([TimetableMethod.alongside]): the user's own day exactly as before, the table's own day at its own point,
+ * each read with its own curves, regional variants and margins, and the day shown their safe side, every start the later
+ * of the two and every end the earlier. So nothing is earlier than before, no start is before the nearest table nor any
+ * end after it, and no time is later than the later of the two days asks: a fixed point, or the table's point beside the
+ * user's (round 2's envelope points, which read the method's one set of curves at both points), would read one point's
+ * curves at the other, and the Canadian families' night fractions and Rabita's summer Isha, read at both latitudes, had
+ * come up to 10 and 23 min later than either day (the reviews of 17 Oct 2026). No figure is claimed there
+ * ([measuredBeyond] as before). A [rideReaches] of zero keeps the bound alone: Diyanet's Sydney points (Diyanet prints a
+ * table for every city, which its preset computes at the user's own point) and Manchester Central's Wifaqul table placed as
+ * the UK's cautious member (Europe.wifaqulUnits: its reach is the owner's question 2, accepted at the bound for now).
+ * Beyond the ride, the method at the user's own point alone, as before.
  */
-internal class TableEnvelope(private val units: List<AuthorityUnit>, private val bound: EntryClass) {
+class TableEnvelope internal constructor(
+    private val units: List<AuthorityUnit>,
+    private val bound: EntryClass,
+    private val rideReaches: Double = 0.0,
+) {
     private val reachKm: Map<String, Double> = units.associate { it.id to lateReachKm(it.point.lat, bound) }
+
+    /** How far [unit]'s table rides as the nearest beyond its bound reach: [rideReaches] of its own reach. */
+    fun rideKm(unit: AuthorityUnit): Double = rideReaches * unit.radiusKm
 
     /** The tables whose bound reach holds [user], nearest first. */
     fun holding(user: GeoPoint): List<AuthorityUnit> =
         units.map { it to distanceKm(user, it.point) }.filter { (u, km) -> km <= reachKm.getValue(u.id) }
             .sortedBy { it.second }.map { it.first }
 
-    /** [placed] (the unit's method at its point) with every other table holding [user] beside it. */
-    fun around(user: GeoPoint, unit: AuthorityUnit, placed: TimetableMethod): TimetableMethod {
-        val others = holding(user).filter { it.id != unit.id }.map { it.point }
-        return if (others.isEmpty()) placed else placed.copy(envelopePoints = (placed.envelopePoints + others).distinct())
+    /** The nearest table whose ride ([rideKm]) holds [user], or null. */
+    fun nearestRiding(user: GeoPoint): AuthorityUnit? =
+        units.map { it to distanceKm(user, it.point) }.filter { (u, km) -> km <= rideKm(u) }.minByOrNull { it.second }?.first
+
+    /**
+     * The tables that ride beside [user]: every one whose bound reach holds it, nearest first, and the nearest within its
+     * ride ([nearestRiding]) after them where no bound holds it (a nearer table at a higher latitude, whose bound is the
+     * shorter, can be beyond its bound while a farther one holds the user).
+     */
+    fun riding(user: GeoPoint): List<AuthorityUnit> = riding(user, holding(user))
+
+    private fun riding(user: GeoPoint, held: List<AuthorityUnit>): List<AuthorityUnit> {
+        val nearest = nearestRiding(user) ?: return held
+        return if (nearest in held) held else held + nearest
     }
 
-    /** [method] beyond every unit: the nearest table holding [user] as its fixed point, the others beside it, else alone. */
+    /** The nearest table whose ride holds [user] where no bound in [held] holds it as well, or null. */
+    private fun ridingAlone(user: GeoPoint, held: List<AuthorityUnit>): AuthorityUnit? = nearestRiding(user)?.takeIf { it !in held }
+
+    /** [unit]'s own day at its own point, beside a user's ([Alongside]): its own method, else the set's [method]. */
+    private fun alongside(unit: AuthorityUnit, method: TimetableMethod) = Alongside(unit.point, unit.method ?: method)
+
+    /**
+     * [placed] (the unit's method at its point) with every other table holding [user] beside it, and the nearest within its
+     * ride, where no bound holds it, as a day alongside ([method] its own where it has none).
+     */
+    fun around(user: GeoPoint, unit: AuthorityUnit, placed: TimetableMethod, method: TimetableMethod): TimetableMethod {
+        val held = holding(user)
+        val others = held.filter { it.id != unit.id }.map { it.point }
+        val withOthers = if (others.isEmpty()) placed else placed.copy(envelopePoints = (placed.envelopePoints + others).distinct())
+        val ride = ridingAlone(user, held)?.takeIf { it.id != unit.id } ?: return withOthers
+        return withOthers.copy(alongside = withOthers.alongside + alongside(ride, method))
+    }
+
+    /**
+     * [method] beyond every unit: the nearest table holding [user] as its fixed point and the other tables holding it
+     * beside it (round 2's envelope); beyond every bound reach, [method] at the user's own point exactly as before, with
+     * the nearest table within its ride as a day alongside ([TimetableMethod.alongside]: its own day at its own point,
+     * read with its own curves); else [method] alone.
+     */
     fun beyond(user: GeoPoint, method: TimetableMethod): TimetableMethod {
         val held = holding(user)
-        val nearest = held.firstOrNull() ?: return method
-        val own = nearest.method ?: method
-        val others = held.drop(1).map { it.point }
-        return own.copy(
-            fixedPoint = nearest.point, endsBoundAtUserPoint = true,
-            envelopePoints = (own.envelopePoints + others).distinct(),
+        val ride = ridingAlone(user, held)
+        val first = held.firstOrNull() ?: return ride?.let { method.copy(alongside = method.alongside + alongside(it, method)) } ?: method
+        val own = first.method ?: method
+        val bounded = own.copy(
+            fixedPoint = first.point, endsBoundAtUserPoint = true,
+            envelopePoints = (own.envelopePoints + held.drop(1).map { it.point }).distinct(),
         )
+        return ride?.let { bounded.copy(alongside = bounded.alongside + alongside(it, method)) } ?: bounded
     }
+
+    /**
+     * Every table riding beside [user] ([riding]: each whose bound reach holds it, and the nearest within its ride) as a
+     * day alongside, each its own method's at its own point ([method] where it has none): another entry's tables held
+     * beside a cautious place ([CrossRide]).
+     */
+    fun alongside(user: GeoPoint, method: TimetableMethod): List<Alongside> = riding(user).map { alongside(it, method) }
 }
+
+/**
+ * Another entry's tables printed for their own points riding beside a cautious entry's day, wherever that entry is resolved
+ * (the owner's decision of 17 Oct 2026, question 1, its own example: "someone 60 km from Montréal may well pray by CCML's
+ * board"). [ride] gives the tables at a user's point, as days alongside (`Resolution.alongside`), each read as its own
+ * entry [tablesEntryId] reads it at its own point: the place's day is the safe side of its own cautious day and theirs.
+ */
+class CrossRide(val entryId: String, val tablesEntryId: String, val ride: (GeoPoint) -> List<Alongside>)
+
+/**
+ * How many of its own reaches (a minute of longitude each, class A's) a table printed for its own point rides as the
+ * nearest beyond its bound reach ([TableEnvelope]): the owner's decision of 17 Oct 2026, "about five reaches", where the
+ * bound is three.
+ */
+internal const val RIDE_REACHES = 5.0
 
 /**
  * Rulings R44 and R45: [this] beyond its table's reach ([reachKm] from [tablePoint]): starts at the

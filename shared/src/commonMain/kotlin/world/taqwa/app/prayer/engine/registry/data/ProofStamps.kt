@@ -1432,8 +1432,8 @@ object ProofStamps {
 
     private fun otherTurkey() = ProofStamp(
         entryId = "other.turkey",
-        places = 6,
-        placeDays = 2478,
+        places = 9,
+        placeDays = 2571,
         ramadanDays = 174,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),

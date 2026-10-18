@@ -2,6 +2,7 @@ package world.taqwa.app.prayer.engine.registry.authorities
 
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.day.Cautious
+import world.taqwa.app.prayer.engine.method.Alongside
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.EventOffsets
@@ -18,6 +19,7 @@ import world.taqwa.app.prayer.engine.registry.LateLimit
 import world.taqwa.app.prayer.engine.registry.MethodVariant
 import world.taqwa.app.prayer.engine.registry.OwnTable
 import world.taqwa.app.prayer.engine.registry.Regions
+import world.taqwa.app.prayer.engine.registry.RIDE_REACHES
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.SAFE_END
 import world.taqwa.app.prayer.engine.registry.SAFE_START
@@ -79,9 +81,24 @@ object Europe {
         ishaAngleByDayOfYear = LondonUnifiedCurve.isha,
     )
 
+    /** London Unified's table's point (the M25's one table, ruling R44). */
+    private val londonPoint = GeoPoint(LondonUnifiedCurve.LAT, LondonUnifiedCurve.LON)
+
+    /**
+     * Where London Unified applies when chosen (the owner's decision of 17 Oct 2026, the round 2 fix's open question):
+     * R45's three reaches of its table's point (class B's two minutes of longitude, about 35 km, three times: about 104 km,
+     * Basildon, Sevenoaks, St Albans, Luton, Reading and Folkestone), where its point still rides as the fixed point
+     * ([londonUnits]). Beyond, it is out of scope, as any timetable is outside its area (spec §2.2, ruling R50): Automatic
+     * applies, and the Timetable screen says so in its one line until the user returns. LUPT is London's table, the M25's;
+     * far from it London's own times (in Glasgow its winter sunrise, about an hour before Glasgow's) are simply wrong for
+     * the place, even where they were on the safe side.
+     */
+    val londonArea = Circle(londonPoint, lateReachKm(londonPoint.lat, EntryClass.B) * ENDS_REACH_FACTOR)
+
     val london: RegistryEntry = single(
         id = "gb.london.lupt", nameKey = "authority_london_unified", entryClass = EntryClass.B, method = londonMethod,
         school = AsrSchool.HANAFI, schoolKnown = false, scope = Scope.GLOBAL, countries = setOf("GB"), measured = true,
+        area = londonArea,
     )
 
     /**
@@ -89,10 +106,11 @@ object Europe {
      * that point rides as the fixed point with no R40 cut (like Brunei's districts and Algeria's
      * wilayas): starts are the later of the point's and the user's own, ends the earlier. Measured on
      * the 2026 table at the M25's edges and corners (Task 7g, rulings R49): the recorded exceptions
-     * below. Beyond the M25 the table's point bounds the ends ([beyondTable]).
+     * below. Chosen beyond the M25, within its [londonArea], the table's point rides for every start and end
+     * ([followedBeyond]).
      */
     val londonUnits: UnitSet = run {
-        val point = GeoPoint(LondonUnifiedCurve.LAT, LondonUnifiedCurve.LON)
+        val point = londonPoint
         val twilight = LateLimit(
             5,
             "The M25 follows one table computed at its point, and Fajr and Isha shown are the later of the " +
@@ -129,24 +147,16 @@ object Europe {
             choose = { place -> m25.takeIf { Regions.londonM25.contains(GeoPoint(place.lat, place.lon)) } },
         ) { user ->
             // Chosen outside the M25 (the city-point round of 11 Oct 2026, the owner's rule: a user who chooses a table
-            // follows it, wherever it is chosen): within R45's three reaches (about 100 km: Basildon, Sevenoaks, St Albans,
-            // Reading, Luton) the table's point rides as the fixed point for every start and end. Farther (Ipswich,
-            // Dover, Norwich, Southampton, Birmingham, Scotland: round 2's review) the user's own point with the edge's
-            // minute, and London's point rides beside it as a start point and an end point: read with the user's own
-            // curves, unlike a fixed point (whose dawn held the end of eating later in Scotland's summer), so every start
-            // is never before LUPT's table nor before the user's own, and every end never after either: each end is also
-            // held to the user's point alone (endsBoundAtUserPoint, DayComputer's point 7), where on the north's summer
-            // nights London's later Fajr would otherwise hold the end of eating later than before.
+            // follows it): within its area, R45's three reaches (about 104 km: Basildon, Sevenoaks, St Albans, Luton,
+            // Reading, Folkestone), the table's point rides as the fixed point for every start and end. Beyond, London
+            // Unified is out of scope (londonArea, Registry.inScope; the owner's decision of 17 Oct 2026), so the app
+            // never computes it there: Automatic applies. Resolved there directly (a tool), it is R45's edge at the
+            // user's own point alone, its own sun and no figure, as beyond any point table's three reaches.
             val reach = lateReachKm(point.lat, london.entryClass)
-            if (distanceKm(user, point) <= reach * ENDS_REACH_FACTOR) {
+            if (londonArea.contains(user)) {
                 londonMethod.followedBeyond("gb.london.lupt.edge", point)
             } else {
-                londonMethod.beyondTable("gb.london.lupt.edge", point, user, reach).let { m ->
-                    m.copy(
-                        startPoints = (m.startPoints + point).distinct(), endPoints = (m.endPoints + point).distinct(),
-                        endsBoundAtUserPoint = true,
-                    )
-                }
+                londonMethod.beyondTable("gb.london.lupt.edge", point, user, reach)
             }
         }
     }
@@ -184,11 +194,23 @@ object Europe {
      * any end after it (tablesAtTheirPoints). On main, at the app's own towns around Manchester, a start came a minute
      * before it or an end after it on some days (the city-point audit of 10–11 Oct 2026: Ashton-under-Lyne, Stockport,
      * Sale, Altrincham). No figure is claimed, there or elsewhere.
+     *
+     * Past its bound (about 50 km) the table's own day still rides beside the user's, a day alongside, out to five of its
+     * reaches (83 km: Leeds, Sheffield, Liverpool, Stoke, Derby, Blackpool), where Wifaqul is chosen on its own (the
+     * owner's decision of 17 Oct 2026, question 1): there, on main, a user who chose it saw Fajr, Hanafi Asr and Isha
+     * before Manchester Central's table on about 60 % of its printed days (Leeds' Fajr 5 min before it on all seven, Derby's
+     * Isha 6) and the end of eating up to 4 min after it (Liverpool). As the UK's cautious times' most-followed member it
+     * keeps its bound ([tablesAtTheirPoints]' memberRide of zero): its reach is the owner's question 2 of that day, accepted
+     * at the bound for now until a spot-check of the boards there says whether the table is followed even that far
+     * (Preston, Bradford, Huddersfield), and at those 86 towns the cautious times are already never before its table nor
+     * any end after it on its printed days (the reviews of 17 Oct 2026: 602 place-days). Riding there too would make
+     * Automatic's Maghrib up to 5 to 6 min later on most days of the year at Leeds, Wakefield and Castleford and carry the
+     * table's knife-edge summer nights into it (Isha up to 85 min later on five to seven nights): the owner's call.
      */
     val wifaqulUnits: UnitSet = tablesAtTheirPoints(
         wifaqul.id, EntryClass.A, wifaqul.method!!,
         listOf(OwnTable("manchester-central", "Manchester Central Mosque", GeoPoint(53.4631, -2.2285))),
-        measured = false,
+        measured = false, memberRide = 0.0,
     )
 
     /**
@@ -304,8 +326,8 @@ object Europe {
         // Rabita Helsinki's calendar across the Helsinki region (the city-point round 2 review, the owner's rule: rather
         // late, never early): within 45 km of Helsinki its Isha a minute later and its end of eating two minutes earlier,
         // so no town is before the calendar's Isha (Sipoo, Kerava, Järvenpää) or after its end of eating (Lauttasaari,
-        // Kaarela, Matinkylä, Olari, Espoonlahti, Nurmijärvi). A per-point method, the table's own day bounding the
-        // user's, is a later round's.
+        // Kaarela, Matinkylä, Olari, Espoonlahti, Nurmijärvi). From a minute's reach of Helsinki the calendar's own day at
+        // Helsinki also rides beside the user's (rabitaRide, the owner's decision of 17 Oct 2026).
         MethodVariant("se.rabita", Circle(GeoPoint(60.1699, 24.9384), RABITA_REGION_KM)) { method ->
             method.copy(
                 margins = method.margins.copy(isha = method.margins.isha + RABITA_REGION_ISHA_SECONDS),
@@ -1142,6 +1164,57 @@ object Europe {
     )
 
     /**
+     * Rabita's Helsinki calendar beyond Helsinki's own neighbourhood (the owner's decision of 17 Oct 2026, "rather late,
+     * never early"): from a minute's reach of Helsinki (13.8 km) out to [RIDE_REACHES] of them (69 km), the calendar's own
+     * day rides beside the user's, a day alongside ([world.taqwa.app.prayer.engine.method.Alongside]): the member's own day
+     * at the user's point exactly as before (inside the [variants]' 45 km region with its wider margins), and its day at
+     * Helsinki itself, read with Helsinki's own curves and the region's margins, as the calendar's own point shows it; the
+     * day shown is their safe side. Past Diyanet's Helsinki unit (class D's reach, 41.5 km) that day's Asr is also
+     * [RABITA_RIDE_ASR_SECONDS] later: at Helsinki the member's own Standard Asr comes up to a minute before the calendar's
+     * on some winter days, where Diyanet's later Asr, its Helsinki unit's, holds the cautious day; past that unit Diyanet's
+     * is the user's own, and the member alone must hold the calendar.
+     *
+     * On main, every one of the app's towns in the region was clean against the calendar, but points between them were not
+     * (rings of 24 points, every day of 2026): Isha up to 1 to 9 min before it from 14 km out (on land to the east from
+     * 30 km), and Fajr, Asr and the end of eating from 38 to 42 km; past the region, with Helsinki's point beside the
+     * user's (the first build of this decision, which read the user's curves and the member's own end-of-eating margin at
+     * Helsinki), 4 km north of Lohja the end of eating up to 4 min after the calendar's (the reviews of 17 Oct 2026). Within
+     * a minute's reach the region's margins hold every point on land (main's Isha a minute or two before the calendar at 8
+     * to 13.7 km lies on the sea to the south). Helsinki's own Isha runs up to 156 min after the calendar on the days its
+     * rule changes (22–23 April, 19–20 August), and the ride carries that to the towns whose own rule has already changed,
+     * up to 97 min later than main at Järvenpää. No figure is claimed past class C's reach of Helsinki (measured as
+     * before). Within a minute's reach, and beyond the ride, Rabita's method at the user's own point, as before.
+     */
+    val rabitaRide: UnitSet = UnitSet(rabita.id, emptyList(), measuredBeyond = true) { user ->
+        if (!rabitaRides(user)) {
+            rabita.method
+        } else {
+            val atHelsinki = if (distanceKm(user, RABITA_HELSINKI) > diyanetHelsinkiKm) rabitaHeldAlone else rabita.method
+            rabita.method.copy(alongside = listOf(Alongside(RABITA_HELSINKI, atHelsinki)))
+        }
+    }
+
+    /** Rabita's own day at Helsinki past Diyanet's Helsinki unit ([rabitaRide]): its Asr [RABITA_RIDE_ASR_SECONDS] later. */
+    private val rabitaHeldAlone: TimetableMethod =
+        rabita.method.copy(margins = rabita.method.margins.copy(asr = rabita.method.margins.asr + RABITA_RIDE_ASR_SECONDS))
+
+    /** How far Diyanet's Helsinki unit reaches, within which its Asr holds Rabita's calendar's in the cautious day. */
+    private val diyanetHelsinkiKm: Double by lazy { Diyanet.europeUnits.unit("tr.diyanet.europe.helsinki").radiusKm }
+
+    /** Rabita's Helsinki calendar's point (se-cautious.tsv's Helsinki rows). */
+    internal val RABITA_HELSINKI = GeoPoint(60.1699, 24.9384)
+
+    /** Where Rabita's calendar starts to ride ([rabitaRide]): a minute's reach of Helsinki. */
+    internal val RABITA_RIDE_FROM_KM: Double = lateReachKm(RABITA_HELSINKI.lat, EntryClass.A)
+
+    /** How far from Helsinki Rabita's calendar rides ([rabitaRide]): [RIDE_REACHES] of a minute's reach there. */
+    internal val RABITA_RIDE_KM: Double = RIDE_REACHES * RABITA_RIDE_FROM_KM
+
+    /** Whether Rabita's calendar rides beside [user] ([rabitaRide]): past a minute's reach of Helsinki, within [RABITA_RIDE_KM]. */
+    internal fun rabitaRides(user: GeoPoint): Boolean =
+        distanceKm(user, RABITA_HELSINKI).let { it > RABITA_RIDE_FROM_KM && it <= RABITA_RIDE_KM }
+
+    /**
      * Norway (ruling R64): no national authority. IRN's joint calendar (Oslo's largest mosques, the most
      * followed) and Diyanet's European method (the Turkish and Bosnian mosques). The school is not known:
      * the later Asr.
@@ -1298,6 +1371,9 @@ object Europe {
     private const val RABITA_REGION_KM = 45.0
     private const val RABITA_REGION_ISHA_SECONDS = 60
     private const val RABITA_REGION_EATING_SECONDS = 120
+
+    /** Rabita's own day at Helsinki past Diyanet's Helsinki unit ([rabitaRide]): its Asr this much later, so the member alone holds the calendar. */
+    private const val RABITA_RIDE_ASR_SECONDS = 60
 
     /** Why the ICCI's Fajr and Isha run late (Task 7g's gate, proof.md). */
     private const val ICCI_RULE = "The ICCI's code keeps Fajr no earlier than 18/60 of the night before sunrise and Isha no " +

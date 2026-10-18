@@ -8,6 +8,7 @@ import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.AuthorityUnit
+import world.taqwa.app.prayer.engine.registry.CrossRide
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
 import world.taqwa.app.prayer.engine.registry.OwnTable
@@ -282,6 +283,24 @@ object Americas {
     )
 
     /**
+     * Montréal's and Ottawa's ISNA mosques' tables beside Canada's cautious times ([canada]) wherever those are followed,
+     * which is everywhere in Canada outside Toronto, Montréal and Ottawa (the owner's decision of 17 Oct 2026, question
+     * 1, its own example: "someone 60 km from Montréal may well pray by CCML's board"). ISNA is followed only inside the
+     * two cities' boxes (Regions.montreal, Regions.ottawa), so just outside them Automatic is the western families'
+     * cautious times, which no ISNA table had bounded: at the app's Drummondville its Fajr came up to 5 min before CCML's
+     * table on 341 days of 2026 and its Asr on 119, at Cornwall up to 3 min before Ottawa Main Mosque's on 209, Sorel-Tracy,
+     * Granby, Joliette, Saint-Hyacinthe and Clarence-Rockland likewise, and the sunrise came up to 2 min after CCML's at
+     * Les Coteaux and Salaberry-de-Valleyfield (the reviews of 17 Oct 2026, the same on main). Now every one of these
+     * tables whose bound reach holds the place (class D's three minutes, 58.5 km), and past them the nearest within its
+     * ride (five reaches, 97.5 km), rides beside the cautious day as a day alongside, as [canadaIsnaUnits] ride ISNA's own:
+     * each mosque's own day at its own point, the place's day their safe side. No figure is claimed for them; the
+     * cautious day's own measured flag is as before.
+     */
+    val canadaIsnaRide: CrossRide = CrossRide("ca.cautious", "ca.isna") { user ->
+        requireNotNull(canadaIsnaUnits.envelope).alongside(user, canadaIsna.method!!)
+    }
+
+    /**
      * The Islamic Foundation of Toronto: "Fajr Dawn 15 dg / Isha Night 13.5° dg", Hanafi; Dhuhr and
      * Maghrib about a minute after transit and sunset. Margins fitted on its 2026 table (Task 7g:
      * January to June, widened by July to December's excess), its faults left out (proof.md).
@@ -540,6 +559,18 @@ object Americas {
     val lakembaUnits: UnitSet = pointTable(lakemba, "Lakemba Mosque", GeoPoint(-33.92, 151.0756))
 
     /**
+     * The plausible points of Diyanet's Sydney table ([sydneyDiyanetUnits]): Lakemba, where the gate first read it, Sydney's
+     * centre (the app's own Sydney) and the Gallipoli Mosque at Auburn. Shared with tools/timetables, whose envelope rows
+     * replay the table at every app city where the chosen preset rides one of them, as the app resolves it (today class
+     * D's reach of them, 69 km), never at a reach of the tools' own.
+     */
+    internal val sydneyDiyanetPoints: List<AuthorityUnit> = listOf(
+        AuthorityUnit("sydney-lakemba", "Lakemba", GeoPoint(-33.92, 151.0756), 0.0, named = false, endsBoundAtUserPoint = true),
+        AuthorityUnit("sydney-centre", "Sydney", GeoPoint(-33.86785, 151.20732), 0.0, named = false, endsBoundAtUserPoint = true),
+        AuthorityUnit("sydney-auburn", "Auburn", GeoPoint(-33.8494, 151.0331), 0.0, named = false, endsBoundAtUserPoint = true),
+    )
+
+    /**
      * Diyanet's Sydney table (au-cautious.tsv's "Diyanet Sydney", au.cautious's second member, the TURKEY preset) is
      * printed for a point Diyanet does not publish: read at Lakemba's in the gate, it could as well be the city's own
      * (Sydney's centre, where Diyanet's city tables usually sit) or the Turkish community's (the Gallipoli Mosque,
@@ -549,14 +580,25 @@ object Americas {
      * point is among them. The first round found the sunrise a minute after the table at Fairfield, Cabramatta,
      * Liverpool, Casula and Prestons, 13 to 19 km west of Lakemba, on 1 to 6 days. Beyond them, and everywhere else the
      * TURKEY preset is followed, the method at the user's own point as before, measured as before.
+     *
+     * The preset chosen on its own takes the same points: these are its units (Registry places a chosen entry and a
+     * cautious member alike). The owner's decision of 17 Oct 2026 (question 4: someone in Sydney who picks Diyanet means
+     * the Turkish mosques' timetable) holds it to Diyanet's Sydney table, so it is gated against that table at each
+     * plausible point (au-diyanet.tsv) and at every app city where it rides them (au-diyanet-envelope.tsv): never before
+     * it, nor any end after it, on the 31 days the archive holds (25 Sep to 25 Oct 2026; no fetcher reads Diyanet's
+     * Australian pages). The other months rest on the preset being Diyanet's own rule (7g), never before Diyanet's tables
+     * at its six published Turkish points on the days held from Sep 2026 through 2027 (tr-diyanet.tsv): inferred for
+     * Sydney, not proven. What it does run before is Lakemba Mosque's table, up to 16 min at Asr (on 126 of the table's
+     * 349 days) and 12 at Isha (on 272): LMA's own seasonal Asr and its Maghrib + 90, a table a user who chooses Diyanet
+     * does not follow, and the figures round 2's review had given as Diyanet's. Within that reach Automatic (au.cautious)
+     * is never before either table on the days held, Maghrib aside (the cautious rule holds it at LMA's).
+     *
+     * Diyanet's Melbourne table is not ridden so (near Sydney only): within class D's reach of its centre the preset, and
+     * au.cautious, run up to 2 min before it on some days at the app's eastern cities (the Q4 round of 17 Oct 2026, left
+     * for the owner).
      */
     val sydneyDiyanetUnits: UnitSet = run {
-        val points = listOf(
-            AuthorityUnit("sydney-lakemba", "Lakemba", GeoPoint(-33.92, 151.0756), 0.0, named = false, endsBoundAtUserPoint = true),
-            AuthorityUnit("sydney-centre", "Sydney", GeoPoint(-33.86785, 151.20732), 0.0, named = false, endsBoundAtUserPoint = true),
-            AuthorityUnit("sydney-auburn", "Auburn", GeoPoint(-33.8494, 151.0331), 0.0, named = false, endsBoundAtUserPoint = true),
-        )
-        val envelope = TableEnvelope(points, EntryClass.D_AUTHORITY)
+        val envelope = TableEnvelope(sydneyDiyanetPoints, EntryClass.D_AUTHORITY)
         UnitSet(Diyanet.other.id, emptyList(), measuredBeyond = true) { user -> envelope.beyond(user, Diyanet.other.method!!) }
     }
 

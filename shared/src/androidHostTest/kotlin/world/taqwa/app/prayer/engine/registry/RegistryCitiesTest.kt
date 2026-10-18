@@ -11,6 +11,7 @@ import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.registry.authorities.CentralAsia
+import world.taqwa.app.prayer.engine.registry.authorities.Europe
 import world.taqwa.app.prayer.engine.registry.authorities.Levant
 import world.taqwa.app.prayer.engine.registry.authorities.PlaceCurves
 import world.taqwa.app.prayer.engine.registry.data.AlgeriaWilayas
@@ -328,6 +329,115 @@ class RegistryCitiesTest {
         }
         // Every set holds some of the app's cities (the generator of the gate's app-point rows read the same).
         assertEquals(sets.toSet(), inUnits.keys, "sets holding an app city: $inUnits")
+    }
+
+    @Test
+    fun `where the nearest table rides past its bound a city's day is the safe side of its own day and the table's`() {
+        // The owner's decision of 17 Oct 2026: past every bound reach the nearest table printed for its own point still rides
+        // out to five of its reaches (TableEnvelope.rideKm), as Rabita's Helsinki calendar does from a minute's reach of
+        // Helsinki (Europe.rabitaRide): its own day at its own point, a day alongside the user's own. Every app city there,
+        // every ninth day, both Asr schools: no start earlier, and no sunrise, sunset, end of eating or imsak later, than the
+        // same method at the city's own point alone, which is what main showed there; none before the table's own day nor
+        // any end after it; and nothing later than the later of the two, nor any end earlier than the earlier (the reviews of
+        // 17 Oct 2026: with the table's point read on the user's curves, Camrose's Isha had come up to 10 min later than both).
+        val sets = listOf(
+            "us.isna", "ca.isna", "us.chicago.eighteen", "ca.eighteen", "ca.fifteen", "ca.isha90", "in.karachi", "uz.board",
+            "pk.karachi", "kg.default", "gb.wifaqul", "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni", "se.rabita",
+        )
+        val countries = setOf("US", "CA", "IN", "UZ", "PK", "KG", "GB", "PS", "LB", "SY", "IQ", "FI")
+        val methods = sets.associateWith { id ->
+            Registry.byId(id)?.method ?: Registry.entries.flatMap { it.members }.first { it.id == id }.method
+        }
+        val dates = generateSequence(LocalDate(2026, 1, 3)) { it.plus(9, DateTimeUnit.DAY) }.takeWhile { it.year == 2026 }.toList()
+        val riding = sortedMapOf<String, Int>()
+        for (city in cities.filter { it.countryCode in countries }) {
+            val p = GeoPoint(city.lat, city.lon)
+            for (id in sets) {
+                val set = Units.of(id)!!
+                if (set.unitFor(city.place) != null) continue
+                val envelope = set.envelope
+                val rides = if (envelope == null) {
+                    city.countryCode == "FI" && Europe.rabitaRides(p)
+                } else {
+                    envelope.holding(p).isEmpty() && envelope.nearestRiding(p) != null
+                }
+                if (!rides) continue
+                riding.merge(id, 1, Int::plus)
+                val base = methods.getValue(id)
+                val shownMethod = Registry.methodBeyondUnits(id, base, p)
+                val table = shownMethod.alongside.singleOrNull()
+                assertNotNull(table, "${city.name}: $id rides one table's own day alongside")
+                assertTrue(shownMethod.fixedPoint == null && shownMethod.envelopePoints.isEmpty(), "${city.name}: $id keeps its own point alone")
+                val alone = Registry.methodAlone(id, base, p)
+                val zone = TimeZone.of(city.zone)
+                for (school in world.taqwa.app.prayer.engine.method.AsrSchool.entries) {
+                    for (date in dates) {
+                        val shown = DayComputer.compute(shownMethod, p, date, zone, school, Registry.ramadanCalendar())
+                        val own = DayComputer.compute(alone, p, date, zone, school, Registry.ramadanCalendar())
+                        val theirs = DayComputer.compute(table.method, table.point, date, zone, school, Registry.ramadanCalendar())
+                        val where = "${city.name} past $id's bound on $date under $school"
+                        assertEquals(maxOf(own.fajr, theirs.fajr), shown.fajr, where)
+                        assertEquals(maxOf(own.dhuhr, theirs.dhuhr), shown.dhuhr, where)
+                        assertEquals(maxOf(own.asr, theirs.asr), shown.asr, where)
+                        assertEquals(maxOf(own.asrOther, theirs.asrOther), shown.asrOther, where)
+                        assertEquals(maxOf(own.maghrib, theirs.maghrib), shown.maghrib, where)
+                        assertEquals(maxOf(own.isha, theirs.isha), shown.isha, where)
+                        assertEquals(minOf(own.sunrise, theirs.sunrise), shown.sunrise, where)
+                        assertEquals(minOf(own.sunset, theirs.sunset), shown.sunset, where)
+                        assertEquals(minOf(own.endOfEating, theirs.endOfEating), shown.endOfEating, where)
+                        val imsakShown = shown.imsak
+                        val imsakOwn = own.imsak
+                        assertEquals(imsakOwn == null, imsakShown == null, "$where: imsak shown where it was, and only there")
+                        if (imsakShown != null && imsakOwn != null) assertTrue(imsakShown <= imsakOwn, where)
+                        for ((prayer, end) in shown.ends) {
+                            assertTrue(own.ends[prayer]?.let { end <= it } ?: true, "$where: $prayer's end after its own point's")
+                        }
+                    }
+                }
+            }
+        }
+        // The decision's own towns ride: Winchester and Martinsburg past ADAMS, Granby past CCML, Angren and Guliston past
+        // Tashkent, Leeds and Sheffield past Manchester Central (Wifaqul chosen), Porvoo, Lohja and Sipoo past a minute of
+        // Helsinki.
+        assertTrue(setOf("us.isna", "ca.isna", "uz.board", "gb.wifaqul", "se.rabita").all { it in riding.keys }, "sets riding an app city: $riding")
+    }
+
+    @Test
+    fun `canada's cautious times are never before an isna mosque's own day that rides beside them`() {
+        // The owner's decision of 17 Oct 2026, its own example: outside Montréal's and Ottawa's boxes Automatic is Canada's
+        // cautious times, which no ISNA table had bounded (Drummondville's Fajr up to 5 min before CCML's table). Every app
+        // city there that a mosque's bound or ride holds, every ninth day: the day shown never before each mosque's own day,
+        // no end after it, and never earlier, nor any end later, than the cautious day alone (main's).
+        val dates = generateSequence(LocalDate(2026, 1, 5)) { it.plus(9, DateTimeUnit.DAY) }.takeWhile { it.year == 2026 }.toList()
+        val held = sortedSetOf<String>()
+        for (city in cities.filter { it.countryCode == "CA" }) {
+            val r = Registry.resolve(city.place)
+            if (r.entry.id != "ca.cautious" || r.alongside.isEmpty()) continue
+            held += city.name
+            val zone = TimeZone.of(city.zone)
+            val alone = r.copy(alongside = emptyList())
+            for (date in dates) {
+                val shown = world.taqwa.app.prayer.engine.DayPipeline.unended(r, date, zone)
+                val own = world.taqwa.app.prayer.engine.DayPipeline.unended(alone, date, zone)
+                val where = "${city.name} on $date"
+                assertTrue(shown.fajr >= own.fajr && shown.dhuhr >= own.dhuhr && shown.asr >= own.asr && shown.asrOther >= own.asrOther, where)
+                assertTrue(shown.maghrib >= own.maghrib && shown.isha >= own.isha, where)
+                assertTrue(shown.sunrise <= own.sunrise && shown.endOfEating <= own.endOfEating && shown.sunset <= own.sunset, where)
+                for (table in r.alongside) {
+                    val theirs = DayComputer.compute(table.method, table.point, date, zone, r.entry.school, Registry.ramadanCalendar())
+                    val at = "$where beside ${table.point}"
+                    assertTrue(shown.fajr >= theirs.fajr && shown.dhuhr >= theirs.dhuhr && shown.asr >= theirs.asr, at)
+                    assertTrue(shown.asrOther >= theirs.asrOther && shown.maghrib >= theirs.maghrib && shown.isha >= theirs.isha, at)
+                    assertTrue(shown.sunrise <= theirs.sunrise && shown.endOfEating <= theirs.endOfEating, at)
+                }
+            }
+        }
+        assertTrue(setOf("Drummondville", "Granby", "Cornwall", "Sorel-Tracy", "Joliette", "Saint-Hyacinthe").all { it in held }, "held: $held")
+        // Toronto's and the Prairies' cities ride no ISNA table.
+        for (name in listOf("Calgary", "Edmonton", "Winnipeg", "Halifax")) {
+            val city = cities.first { it.countryCode == "CA" && it.name == name }
+            assertTrue(Registry.resolve(city.place).alongside.isEmpty(), name)
+        }
     }
 
     @Test

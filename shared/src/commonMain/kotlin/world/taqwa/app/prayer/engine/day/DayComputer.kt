@@ -89,6 +89,11 @@ import kotlin.time.Instant
  *    its Isha, counted from its own earlier Maghrib, falls before the real sunset the Maghrib shown
  *    never precedes: Diyanet's Nordic tables from Umeå north in June), Isha moves later to the minute
  *    after Maghrib and is declared in [PrayerDay.notFollowed]: no day in order can show it.
+ * 10. **The days alongside** ([TimetableMethod.alongside], the owner's decision of 17 Oct 2026): where another table's
+ *    own day rides beside the method's (the nearest table past its bound), the method's own day at the user's point,
+ *    every step above applied and nothing else beside it, and each table's own day at its own point, computed the same
+ *    way with its own method (its curves read at its own latitude), give the day shown as their safe side ([safeSide]):
+ *    each start the later, sunrise, sunset, the end of eating, imsak and each end the earlier.
  *
  * Ramadan, the month and the Isha minutes are always [date]'s, even when a day rule borrows a
  * neighbouring date's astronomy. Where [date] itself has no sunrise or no sunset the day is
@@ -127,6 +132,15 @@ object DayComputer {
         lagDates: Set<LocalDate> = UmmAlQuraDates.lagDates,
         lagDatesUntil: LocalDate = UmmAlQuraDates.lastDate,
     ): PrayerDay {
+        if (method.alongside.isNotEmpty()) {
+            // 10. The days alongside (the owner's decision of 17 Oct 2026): the method's own day at the user's point, as it
+            // is without them, and each other table's own day at its own point, each read with its own curves; the day
+            // shown is the safe side of them all.
+            val own = compute(method.copy(alongside = emptyList()), point, date, zone, school, ramadan, lagDates, lagDatesUntil)
+            return method.alongside.fold(own) { day, other ->
+                day.safest(compute(other.method, other.point, date, zone, school, ramadan, lagDates, lagDatesUntil))
+            }
+        }
         val place = Place(method, point, zone, school, ramadan, lagDates, lagDatesUntil)
         val year = method.fixedTableYear
         if (year == null || date.year == year) return place.day(date)
@@ -167,6 +181,15 @@ object DayComputer {
         earliestStart = earliestStart.mapValues { it.value + by },
         ends = ends.mapValues { it.value + by },
     )
+
+    /**
+     * [day] and [other], two days for one date, on their safe side ([safest]): a day alongside another (step 10, and a
+     * cautious place held to another entry's table, `Resolution.alongside`).
+     */
+    internal fun safeSide(day: PrayerDay, other: PrayerDay): PrayerDay {
+        require(day.date == other.date) { "days for different dates: ${day.date} and ${other.date}" }
+        return day.safest(other)
+    }
 
     /**
      * The safe side of two days that stand for one date: each start the later, sunrise, sunset, the
@@ -287,10 +310,11 @@ object DayComputer {
          * unit (DUM RT's, IRN's, EMB's, Umm al-Qura's …) the ends stay its table's, as they were before.
          *
          * And where no fixed point rides but a table's point rides beside the user's own as a start and an end point
-         * ([TimetableMethod.startPoints], [TimetableMethod.endPoints], with [TimetableMethod.endsBoundAtUserPoint]: London
-         * Unified chosen beyond R45's three reaches, round 2's fix of 11 Oct 2026), the same method at the user's point
-         * with no other point beside it: on the north's summer nights, where the user's own dawn is not reached, the
-         * table's point dropped the night rule's end of eating and its later Fajr held the end later than before.
+         * ([TimetableMethod.startPoints], [TimetableMethod.endPoints], with [TimetableMethod.endsBoundAtUserPoint]: built
+         * for London Unified chosen beyond R45's three reaches, round 2's fix of 11 Oct 2026; no entry rides it since the
+         * owner's decision of 17 Oct put LUPT out of scope there), the same method at the user's point with no other point
+         * beside it: on the north's summer nights, where the user's own dawn is not reached, the table's point dropped the
+         * night rule's end of eating and its later Fajr held the end later than before.
          */
         private val atUserAlone: Place? =
             if (here.size == 2 && !endsOnly && method.endsBoundAtUserPoint) {

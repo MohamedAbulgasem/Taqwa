@@ -48,6 +48,28 @@ class TimetableStatusTest {
     }
 
     @Test
+    fun londonUnifiedChosenFarFromLondonLeavesAutomaticWithItsLine() {
+        // The owner's decision of 17 Oct 2026: beyond R45's three reaches of its point London Unified is out of scope, so
+        // Glasgow's Timetable screen says "London Unified isn't used here, so Automatic applies until you return" and lists
+        // no London Unified row; at Reading, within its area, the stored choice is followed and has its row.
+        val glasgow = Place(55.86515, -4.25763, "Europe/London", "GB")
+        val reading = Place(51.45625, -0.97113, "Europe/London", "GB")
+        val chosen = PrayerSettings(timetable = "gb.london.lupt", timetableConfirmed = true, timetableConfirmedUnder = "gb.cautious")
+        val far = status(glasgow, chosen)
+        assertTrue(far.outOfScope)
+        assertFalse(far.paused)
+        assertEquals(AUTOMATIC_TIMETABLE, far.selectedId)
+        assertEquals("authority_london_unified", far.chosenNameKey)
+        assertEquals("gb.cautious", far.effectiveId)
+        assertFalse("gb.london.lupt" in timetableRowIds(Registry.automaticEntry(glasgow), glasgow, "gb.london.lupt"))
+        val near = status(reading, chosen)
+        assertFalse(near.outOfScope)
+        assertEquals("gb.london.lupt", near.selectedId)
+        assertEquals("gb.london.lupt", near.effectiveId)
+        assertTrue("gb.london.lupt" in timetableRowIds(Registry.automaticEntry(reading), reading, "gb.london.lupt"))
+    }
+
+    @Test
     fun anUnknownTimetableIsOutOfScopeToo() {
         val s = status(london, PrayerSettings(timetable = "xx.gone"))
         assertTrue(s.outOfScope)

@@ -1,0 +1,22 @@
+# Australia: Diyanet's Sydney table (diy-syd, 25 September to 25 October 2026, the TURKEY preset to within a minute:
+# 7g's proof) against Diyanet's preset chosen on its own (other.turkey). The owner's decision of 17 Oct 2026 (question
+# 4): someone in Sydney who picks Diyanet means the Turkish mosques' timetable, so the preset is never before it, nor
+# any end after it. Diyanet does not publish the table's point, so it is read at each plausible one, the points the
+# preset rides beside the user's own (Americas.sydneyDiyanetPoints, as au.cautious's member does): Lakemba, where
+# au-cautious.tsv reads it; Sydney's centre, the app's own Sydney, where Diyanet's city tables usually sit; and the
+# Gallipoli Mosque at Auburn, the Turkish community's. Measured: a user who chooses Diyanet here follows this table,
+# so its lateness is theirs, held to class D's limit (other.turkey claims no figure in About all the same). The app's
+# other cities where the chosen preset rides the three points are au-diyanet-envelope.tsv's promise-only rows. Maghrib
+# is checked: a preset chosen on its own is not capped. No imsak is printed: each Fajr is also the start of the fast.
+# Every row is held out.
+# These are the only days of the table the archive holds: no fetcher reads Diyanet's Australian pages, so prove never
+# grows these rows, and a capture from another season is added by hand. Until one is, "never before it" is proven for
+# these 31 days only; the other months rest on the preset being Diyanet's own rule, never before Diyanet's tables at its
+# six published points in tr-diyanet.tsv. On these days every start is at least a minute after the table and every end
+# at least a minute before it, the same at all three points, since each rides the other two. Asr is 2 to 3 min after
+# it, at class D's limit on 26 of the 31 days: a capture that comes out a minute later breaks the gate, which then asks
+# for a reason (R41) or a fix.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/africaoceania/diy-syd.txt	other.turkey	-33.92	151.0756	Australia/Sydney	F+E S D A M I	daily	standard	test	Diyanet Sydney at Lakemba, a plausible point of its
+archive/tables/moral-auth-world/africaoceania/diy-syd.txt	other.turkey	-33.86785	151.20732	Australia/Sydney	F+E S D A M I	daily	standard	test	Diyanet Sydney at Sydney's centre (the app's own Sydney), a plausible point of its
+archive/tables/moral-auth-world/africaoceania/diy-syd.txt	other.turkey	-33.8494	151.0331	Australia/Sydney	F+E S D A M I	daily	standard	test	Diyanet Sydney at the Gallipoli Mosque, Auburn, a plausible point of its
