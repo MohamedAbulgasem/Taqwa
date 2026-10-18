@@ -1,0 +1,63 @@
+<en-GB>
+What's new in 1.2.0:
+• Works with TalkBack and VoiceOver, and the Quran is voiced only by your reciter
+• Old phones warn when prayer times may be an hour off
+• iPhone: reminders keep their time when the clocks go back
+• Quran: Play starts where you are reading
+• Near North American and Finnish cities with a published timetable, prayer times never start before it
+• Fixes for older phones and notification taps
+</en-GB>
+<ar>
+الجديد في الإصدار 1.2.0:
+• يعمل مع TalkBack وVoiceOver، ولا يُتلى القرآن إلا بصوت قارئك
+• الهواتف القديمة تنبّهك حين قد تختلف المواقيت ساعة
+• آيفون: تبقى التذكيرات في وقتها حين تُؤخَّر الساعة
+• القرآن: يبدأ التشغيل من حيث تقرأ
+• قرب مدن أمريكا الشمالية وفنلندا التي تنشر جدولًا، لا تبدأ الصلاة قبله
+• إصلاحات للهواتف القديمة وللنقر على الإشعارات
+</ar>
+<fr-FR>
+Nouveautés de la 1.2.0 :
+• Compatible avec TalkBack et VoiceOver, et le Coran n’est récité que par votre récitateur
+• Les anciens téléphones préviennent quand les horaires peuvent être décalés d’une heure
+• iPhone : les rappels gardent leur heure au passage à l’heure d’hiver
+• Coran : la lecture démarre là où vous lisez
+• Près des villes d’Amérique du Nord et de Finlande qui publient un calendrier, les horaires ne commencent jamais avant lui
+• Corrections diverses
+</fr-FR>
+<tr-TR>
+1.2.0 sürümündeki yenilikler:
+• TalkBack ve VoiceOver ile çalışır; Kur’an yalnızca karinizin sesiyle okunur
+• Eski telefonlar, vakitler bir saat kaymış olabileceğinde uyarır
+• iPhone: saatler geri alındığında hatırlatmalar zamanında kalır
+• Kur’an: oynatma okuduğunuz yerden başlar
+• Kuzey Amerika ve Finlandiya’da takvim yayımlayan şehirlerin yakınında vakitler o takvimden önce başlamaz
+• Eski telefonlar ve bildirimler için düzeltmeler
+</tr-TR>
+<id>
+Yang baru di versi 1.2.0:
+• Bekerja dengan TalkBack dan VoiceOver, dan Al-Qur’an hanya dibacakan oleh qari Anda
+• Ponsel lama memberi peringatan bila waktu salat mungkin bergeser satu jam
+• iPhone: pengingat tetap tepat waktu saat jam dimundurkan
+• Al-Qur’an: pemutaran dimulai dari tempat Anda membaca
+• Di dekat kota Amerika Utara dan Finlandia yang menerbitkan jadwal, waktu salat tidak dimulai sebelum jadwal itu
+• Perbaikan untuk ponsel lama dan notifikasi
+</id>
+<ur>
+1.2.0 میں نیا کیا ہے:
+• TalkBack اور VoiceOver کے ساتھ کام کرتا ہے، اور قرآن صرف آپ کے قاری کی آواز میں
+• پرانے فون بتاتے ہیں جب اوقات ایک گھنٹہ آگے پیچھے ہو سکتے ہوں
+• آئی فون: گھڑیاں پیچھے ہونے پر یاد دہانیاں اپنے وقت پر رہتی ہیں
+• قرآن: تلاوت وہیں سے شروع ہوتی ہے جہاں آپ پڑھ رہے ہوں
+• شمالی امریکہ اور فن لینڈ کے جن شہروں کا نقشۂ اوقات شائع ہوتا ہے، ان کے قریب نماز اس سے پہلے شروع نہیں ہوتی
+• پرانے فونز اور اطلاعات کے لیے درستیاں
+</ur>
+<bn-BD>
+1.2.0 সংস্করণে যা নতুন:
+• TalkBack ও VoiceOver-এর সঙ্গে কাজ করে, আর কুরআন শুধু আপনার কারির কণ্ঠে
+• পুরোনো ফোনে সময় এক ঘণ্টা এদিক-ওদিক হতে পারলে সতর্ক করে
+• আইফোন: ঘড়ি পিছিয়ে দিলেও রিমাইন্ডার ঠিক সময়ে থাকে
+• কুরআন: আপনি যেখানে পড়ছেন সেখান থেকেই তিলাওয়াত শুরু হয়
+• উত্তর আমেরিকা ও ফিনল্যান্ডের যেসব শহর সময়সূচি প্রকাশ করে, তাদের কাছে নামাজের সময় তার আগে শুরু হয় না
+• পুরোনো ফোন ও নোটিফিকেশনের সংশোধন
+</bn-BD>
