@@ -103,7 +103,7 @@ body:
       label: Manual adjustments
       description: Settings › Prayer times › Manual adjustments
       options:
-        - None
+        - No adjustments
         - Some minutes added or removed
         - Not sure
   - type: dropdown
@@ -120,7 +120,7 @@ body:
     attributes:
       label: App version
       description: Settings › About Taqwa
-      placeholder: "1.1.0"
+      placeholder: "1.2.0"
     validations:
       required: true
   - type: textarea
