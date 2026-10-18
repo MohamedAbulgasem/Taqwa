@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import okio.FileSystem
 import okio.Path.Companion.toPath
@@ -261,15 +263,26 @@ actual class SurahDownloader actual constructor(
         runCatching { start(listOf(key.surah), key.reciterId, false) }
     }
 
-    private suspend fun start(surahs: List<Int>, reciterId: String, allowMobileOnce: Boolean) {
-        if (surahs.isEmpty()) return
+    /**
+     * One [start] at a time, so a surah asked for twice in quick succession — Next tapped again
+     * while the first request is still being answered — sees the first one's report and is skipped.
+     */
+    private val starting = Mutex()
+
+    private suspend fun start(surahs: List<Int>, reciterId: String, allowMobileOnce: Boolean) = starting.withLock {
+        if (surahs.isEmpty()) return@withLock
         val manifest = manifests.current()
-        val reciter = manifest.reciter(reciterId) ?: return
+        val reciter = manifest.reciter(reciterId) ?: return@withLock
         val allowCellular = allowMobileOnce || settings.recitationSettings.first().downloadOnMobileData
         val session = if (allowCellular) mobileSession else wifiSession
         for (surah in surahs) {
             val asset = reciter.surah(surah) ?: continue
             val key = DownloadKey(reciterId, surah)
+            // Already on its way: its task answers this request too, as Android's KEEP does. A second
+            // task for the same surah used to start on every re-ask (Next, the header, the whole
+            // Quran again), and on a slow connection the tasks shared the bandwidth, the bar jumped
+            // between their counts, and both appended to the same `.part`. Retry clears the key first.
+            if (reported.value[key].isOnItsWay) continue
             loop.precheck(asset, allowCellular)?.let {
                 report(key, DownloadState.Failed(it))
                 continue

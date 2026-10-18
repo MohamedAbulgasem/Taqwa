@@ -44,6 +44,16 @@ sealed interface DownloadState {
 }
 
 /**
+ * True while a download is on its way: accepted, transferring, or landed and being verified. A
+ * request for a surah in this state is already answered, as Android's unique work with `KEEP`
+ * answers it. On iOS a second task would split the bandwidth, report its own progress over the
+ * first one's (the bar jumping between them on a slow connection) and append its bytes to the
+ * same `.part`. A failed download is not on its way: asking again starts it again.
+ */
+val DownloadState?.isOnItsWay: Boolean
+    get() = this is DownloadState.Queued || this is DownloadState.Downloading || this is DownloadState.Verifying
+
+/**
  * Why a download stopped. Every one of these becomes a plain sentence in the download sheet
  * (spec §5.4), so they are reasons a reader could act on rather than error codes: three of them
  * are answered by the user (turn on Wi-Fi, allow mobile data, free some space), two are answered
