@@ -22,7 +22,9 @@ import kotlin.time.Instant
  *  - Android's `PrayerAlarmReceiver`, as each prayer arrives;
  *  - Android's `SystemEventReceiver`, on boot and the other system events it listens for;
  *  - Android's `NotificationTopUpWorker`, twice a day: the one left when notifications are off;
- *  - iOS's `BackgroundRefreshBridge`, from its daily background refresh.
+ *  - iOS's `BackgroundRefreshBridge`, from its daily background refresh;
+ *  - `refreshForNewTimes` (SettingsRoutes), after a settings change, a new location and, on iOS,
+ *    each time the app is in front (bug hunt B1).
  *
  * Cheap (three days of prayer times) and quiet: no location fix is requested, and a missing
  * location simply writes nothing.
