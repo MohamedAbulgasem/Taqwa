@@ -11,3 +11,5 @@ archive/tables/moral-auth-world/europe/verify/fids-zh.txt	ch.fids/ch.fids			Euro
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/zurich.txt	ch.fids/ch.fids			Europe/Zurich	F+E S D A M I	daily	standard	fit	Diyanet Zürich, which FIDS prints (Europe.kt), the monitor capture of 2 Oct 2026
 # prove, 2026-10-12: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-12/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
 archive/tables/pinned/tr-diyanet-europe/2026-10-12/zurich.txt	ch.fids/ch.fids			Europe/Zurich	F+E S D A M I	daily	standard	test	Diyanet Zürich, which FIDS prints (Europe.kt), the monitor capture of 12 Oct 2026
+# prove, 2026-10-19: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-19/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/tr-diyanet-europe/2026-10-19/zurich.txt	ch.fids/ch.fids			Europe/Zurich	F+E S D A M I	daily	standard	test	Diyanet Zürich, which FIDS prints (Europe.kt), the monitor capture of 19 Oct 2026
