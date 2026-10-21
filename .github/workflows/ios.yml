@@ -20,6 +20,7 @@ on:
       - "gradlew"
       - "scripts/test.sh"
       - "scripts/ios-build.sh"
+      - "scripts/xcode.sh"
       - ".github/workflows/ios.yml"
   pull_request:
     paths:
@@ -32,6 +33,7 @@ on:
       - "gradlew"
       - "scripts/test.sh"
       - "scripts/ios-build.sh"
+      - "scripts/xcode.sh"
       - ".github/workflows/ios.yml"
   workflow_dispatch:
 
@@ -58,8 +60,8 @@ jobs:
           java-version: "21"
           cache: gradle
       - name: Xcode
-        # The image's default Xcode. Without DEVELOPER_DIR the scripts fall back to the path on the
-        # development Mac, "/Applications/Xcode 26.app", which this machine does not have.
+        # The image's default Xcode, named in DEVELOPER_DIR so every step uses the same one;
+        # scripts/xcode.sh refuses anything older than Xcode 26.
         run: |
           echo "DEVELOPER_DIR=$(xcode-select -p)" >> "$GITHUB_ENV"
           xcodebuild -version

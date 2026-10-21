@@ -139,7 +139,7 @@ Deliberately out of scope: mosque finder, zakat calculator, hadith collections, 
 
 - JDK 21 (Android Studio's bundled JetBrains Runtime is fine)
 - Android Studio with the Android SDK, `compileSdk` 37
-- Xcode 26 for iOS builds and the iOS test targets
+- Xcode 26 or later for iOS builds and the iOS test targets; the scripts use the Xcode `xcode-select` chose, or `DEVELOPER_DIR` when it is set
 - macOS for anything iOS; Android builds work on any OS
 
 **Android**

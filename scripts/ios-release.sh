@@ -6,7 +6,7 @@
 #   scripts/ios-release.sh upload     upload the archive the last `archive` made
 #
 # Signing is automatic under the team named in iosApp/Configuration/Config.xcconfig (TEAM_ID),
-# through the Apple account signed into Xcode 26 › Settings › Accounts — no credentials pass
+# through the Apple account signed into Xcode › Settings › Accounts — no credentials pass
 # through this script. -allowProvisioningUpdates lets Xcode register world.taqwa.ios, its
 # widget and the app group under that team and create the certificates it needs the first time.
 # The script refuses an empty TEAM_ID and LOOPDL LIMITED's team (Mohamed's employer, never
@@ -16,7 +16,7 @@
 # release; the iOS build number is the Android versionCode of the same commit.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-export DEVELOPER_DIR="/Applications/Xcode 26.app/Contents/Developer"
+. scripts/xcode.sh
 
 XCCONFIG=iosApp/Configuration/Config.xcconfig
 TEAM_ID="$(sed -n 's/^TEAM_ID=//p' "$XCCONFIG" | tr -d '[:space:]')"

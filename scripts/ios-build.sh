@@ -1,12 +1,10 @@
 #!/bin/bash
-# xcode-select points at Xcode 16.0, which cannot drive simulators on macOS 26.
-# Xcode 26.2 is installed; this forces it without needing sudo.
-# Permanent fix (needs your password):
-#   sudo xcode-select -s "/Applications/Xcode 26.app/Contents/Developer"
-# An Xcode already chosen through DEVELOPER_DIR wins, as in scripts/test.sh; CI sets it.
+# Builds the iOS app and its widget extension for the simulator, then guards the extension's size.
+# The Xcode comes from scripts/xcode.sh: DEVELOPER_DIR when set (CI sets it), else the one
+# xcode-select chose, and never one older than Xcode 26.
 set -e
-export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode 26.app/Contents/Developer}"
 cd "$(dirname "$0")/.."
+. scripts/xcode.sh
 xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator \
   -destination "${IOS_DEST:-platform=iOS Simulator,name=iPhone 17 Pro}" \
   -configuration Debug -derivedDataPath build/ios-dd "${@:-build}"

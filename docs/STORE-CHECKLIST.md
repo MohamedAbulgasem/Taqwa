@@ -300,7 +300,7 @@ costs days.
    `scripts/ios-release.sh archive` (the archive lands in `build/ios-archive/`, and the script
    prints the built identifiers, team, app group and widget size back), the app record (step 3),
    then `scripts/ios-release.sh upload`. The script signs automatically through the Apple account
-   signed into Xcode 26 and refuses an empty or LOOPDL team. If the command-line upload is refused,
+   signed into Xcode and refuses an empty or LOOPDL team. If the command-line upload is refused,
    open the `.xcarchive` in Xcode (Window › Organizer) → Distribute App → App Store Connect →
    Upload, automatic signing, symbols included. The build appears under TestFlight after 10–30
    minutes of processing. Export compliance is answered by `ITSAppUsesNonExemptEncryption =
