@@ -1,5 +1,14 @@
 package world.taqwa.timetables
 
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaLocalDate
+import world.taqwa.app.prayer.ClockChange
+import world.taqwa.app.prayer.ClockChanges
+import java.time.ZoneId
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
+
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -161,5 +170,28 @@ class TimetableTest {
         assertEquals(Triple(1448, 3, 30), Triple(day.hijri.year, day.hijri.month, day.hijri.day))
         val next = timetable.day(tripoli, LocalDate(2026, 9, 14))
         assertEquals(Triple(1448, 4, 1), Triple(next.hijri.year, next.hijri.month, next.hijri.day))
+    }
+
+    @Test
+    fun aPageOnZoneDataThatPredatesAClockChangeStopsTheBuild() {
+        // A made-up change no tz database knows: Tripoli keeping UTC+05:00 from 1 January 2026.
+        val madeUp = ClockChange("made-up", setOf("Africa/Tripoli"), LocalDate(2026, 1, 1), 5 * 3600, 1, LocalDate(2030, 1, 1))
+        val e = assertFailsWith<IllegalStateException> { Timetable(clockChanges = listOf(madeUp)).day(tripoli, LocalDate(2026, 9, 13)) }
+        assertTrue("'made-up'" in e.message.orEmpty() && "UTC+05:00" in e.message.orEmpty(), e.message)
+        // Before the change, and with the app's own table, the same city builds.
+        Timetable(clockChanges = listOf(madeUp.copy(from = LocalDate(2026, 9, 14)))).day(tripoli, LocalDate(2026, 9, 13))
+        Timetable().day(tripoli, LocalDate(2026, 9, 13))
+    }
+
+    @Test
+    fun theClockChangeTableAgreesWithThisJvmsZoneData() {
+        // A month into each change this JVM gives the true offset (its tz database knows the change) or the
+        // old clock's (it predates it, which staleClock stops), never a third: that would be a mistake in the table.
+        for (change in ClockChanges.table) for (zone in change.zones) {
+            val date = change.from.plus(30, DateTimeUnit.DAY).toJavaLocalDate()
+            val offset = ZoneId.of(zone).rules.getOffset(date.atTime(12, 0)).totalSeconds
+            val old = change.trueOffsetSeconds - change.shiftHours * 3600
+            assertTrue(offset == change.trueOffsetSeconds || offset == old, "${change.id} $zone on $date: the table says ${change.trueOffsetSeconds} s, this JVM $offset s")
+        }
     }
 }

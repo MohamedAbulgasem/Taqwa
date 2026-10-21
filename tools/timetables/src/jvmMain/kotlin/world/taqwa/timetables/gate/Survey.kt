@@ -41,7 +41,8 @@ import kotlin.time.Instant
  * - `calendars.tsv`: `path` (under the official root, like a gate row's), `name`, `lat`, `lon`,
  *   `columns` (`F S D A M I` in order, `-` for a column not read), `use` (`yes`, or why the whole
  *   calendar is left out), and, where the survey's calendars are not all on one clock (Canada's),
- *   a last column `zone`, the mosque's own civil zone;
+ *   a column `zone`, the mosque's own civil zone, then optionally `clock`, the zone a calendar is
+ *   printed on where it is not its civil one (empty for that), as a gate row's `clock`;
  * - `faults.tsv`: `calendar` (its file's name without `.txt`), `from`, `to`, `columns` (letters as
  *   above; `F` also leaves the end of eating out), `reason`;
  * - `outliers.tsv`: `calendar` (or `*` for every one), `event` (an [Event] key, `maghribCap`,
@@ -66,6 +67,8 @@ class Survey(
         val use: String,
         /** The mosque's own civil zone where it is not the survey's ([Survey.zone]). */
         val zone: TimeZone? = null,
+        /** The zone its times are printed on, where it is not its civil [zone] (a gate row's `clock`). */
+        val clock: TimeZone? = null,
     ) {
         val used: Boolean get() = use == "yes"
     }
@@ -173,7 +176,7 @@ class Survey(
                         leftOut++
                         return@forEachIndexed
                     }
-                    printed[column] = Gate.officialInstant(date, minutes, event, zone, zone)
+                    printed[column] = Gate.officialInstant(date, minutes, event, calendar.clock ?: zone, zone)
                 }
                 fun check(event: Event, shown: Instant, official: Instant, kind: () -> String = { event.key }) {
                     checked[event] = (checked[event] ?: 0) + 1
@@ -240,7 +243,7 @@ class Survey(
         /** The survey in [dir] of [entryId], computed in [zoneId] for places in [countryCode]. */
         fun load(dir: File, entryId: String, zoneId: String, countryCode: String): Survey {
             val entry = requireNotNull(Registry.byId(entryId)) { "no registry entry $entryId" }
-            val calendars = rows(dir.resolve("calendars.tsv"), listOf("path", "name", "lat", "lon", "columns", "use"), optional = "zone").map { r ->
+            val calendars = rows(dir.resolve("calendars.tsv"), listOf("path", "name", "lat", "lon", "columns", "use"), optional = listOf("zone", "clock")).map { r ->
                 val columns = r.getValue("columns").split(' ').filter { it.isNotEmpty() }
                 require(columns.all { it == "-" || it in EVENTS }) { "${r.getValue("path")}: columns ${r.getValue("columns")}" }
                 val path = r.getValue("path")
@@ -248,6 +251,7 @@ class Survey(
                     id = path.substringAfterLast('/').removeSuffix(".txt"), path = path, name = r.getValue("name"),
                     lat = r.getValue("lat").toDouble(), lon = r.getValue("lon").toDouble(), columns = columns, use = r.getValue("use"),
                     zone = r["zone"]?.let { TimeZone.of(it) },
+                    clock = r["clock"]?.takeIf { it.isNotEmpty() }?.let { TimeZone.of(it) },
                 )
             }
             val ids = calendars.map { it.id }.toSet()
@@ -280,14 +284,14 @@ class Survey(
 
         /**
          * A tab-separated file: `#` lines are comments, the first other line the header naming [columns],
-         * with [optional] allowed as one more, last column.
+         * then as many of [optional] as it names, in that order, as its last columns.
          */
-        private fun rows(file: File, columns: List<String>, optional: String? = null): List<Map<String, String>> {
+        private fun rows(file: File, columns: List<String>, optional: List<String> = emptyList()): List<Map<String, String>> {
             val lines = file.readLines().filter { it.isNotBlank() && !it.startsWith("#") }
             val header = lines.first().split('\t')
-            val expected = if (optional != null && header == columns + optional) columns + optional else columns
+            val expected = (optional.size downTo 1).map { columns + optional.take(it) }.firstOrNull { it == header } ?: columns
             require(header == expected) {
-                val last = optional?.let { ", with an optional last column $it" }.orEmpty()
+                val last = if (optional.isEmpty()) "" else ", then optionally ${optional.joinToString(" ")} as its last columns, in that order"
                 "${file.name}: the header must be ${columns.joinToString(" ")}$last"
             }
             return lines.drop(1).map { line ->

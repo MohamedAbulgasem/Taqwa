@@ -8,6 +8,9 @@ import kotlinx.datetime.number
 import kotlinx.datetime.offsetAt
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.prayer.ClockChange
+import world.taqwa.app.prayer.ClockChanges
+import java.time.zone.ZoneRulesProvider
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
@@ -64,6 +67,8 @@ internal const val MEMBER_MAGHRIB = 4
 class Timetable(
     private val engine: PrayerTimesEngine = PrayerTimesEngine(),
     private val settings: PrayerSettings = PrayerSettings(),
+    /** The clock changes a page is checked against ([staleClock]); the app's own table. */
+    private val clockChanges: List<ClockChange> = ClockChanges.table,
 ) {
 
     fun location(city: City) = GeoLocation(
@@ -83,6 +88,8 @@ class Timetable(
         val source = source(city, date)
         val day = source.day
         val zone = TimeZone.of(city.timeZone)
+        val utcOffsetSeconds = zone.offsetAt(day.dhuhr).totalSeconds
+        staleClock(city, date, utcOffsetSeconds)?.let { error(it) }
         val times = mapOf(
             Prayer.FAJR to day.fajr, Prayer.SUNRISE to day.sunrise, Prayer.DHUHR to day.dhuhr,
             Prayer.ASR to day.asr, Prayer.MAGHRIB to day.maghrib, Prayer.ISHA to day.isha,
@@ -100,7 +107,7 @@ class Timetable(
             times = times,
             hijri = TabularHijriCalendar.fromGregorian(date),
             friday = date.dayOfWeek == DayOfWeek.FRIDAY,
-            utcOffsetSeconds = zone.offsetAt(day.dhuhr).totalSeconds,
+            utcOffsetSeconds = utcOffsetSeconds,
             asrOther = day.asrOther,
             endOfEating = day.endOfEating,
             imsak = day.imsak,
@@ -112,6 +119,24 @@ class Timetable(
             capped = members.any { it[MEMBER_MAGHRIB] > day.maghrib },
         )
     }
+
+    /**
+     * Why [city]'s page cannot be drawn on [date], or null. [utcOffsetSeconds] is the offset this JVM's tz
+     * database gives the city's zone that day; a [ClockChange] for the zone in force on [date] says what it
+     * is. Zone data that predates the change draws every time an hour off (an hour early where the clocks
+     * stayed forward), so the build stops and names the change rather than publish it.
+     */
+    internal fun staleClock(city: City, date: LocalDate, utcOffsetSeconds: Int): String? {
+        val change = clockChanges.filter { city.timeZone in it.zones && date >= it.from }.maxByOrNull { it.from } ?: return null
+        if (utcOffsetSeconds == change.trueOffsetSeconds) return null
+        val tzdb = runCatching { ZoneRulesProvider.getVersions(city.timeZone).lastKey() }.getOrDefault("unknown")
+        return "${city.slug}: ${city.timeZone} keeps ${utc(change.trueOffsetSeconds)} from ${change.from} (ClockChanges " +
+            "'${change.id}'), but this JVM's tz database ($tzdb) gives ${utc(utcOffsetSeconds)} on $date: build the " +
+            "pages on a JDK whose tz database knows the change."
+    }
+
+    private fun utc(seconds: Int): String =
+        "UTC%s%02d:%02d".format(if (seconds < 0) "-" else "+", kotlin.math.abs(seconds) / 3600, kotlin.math.abs(seconds) % 3600 / 60)
 
     /** Whether [date] is a Ramadan date on which [source]'s Isha counts its Ramadan minutes. */
     private fun ramadanIsha(source: EngineDay, date: LocalDate): Boolean {
