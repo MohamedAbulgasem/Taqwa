@@ -74,6 +74,7 @@
     <string name="prayer_whose_a11y">%1$s، %2$s۔ اوقات کا ماخذ کھولتا ہے</string>
     <string name="prayer_about_a11y">%1$s، %2$s۔ ”ان اوقات کے بارے میں“ کھولتا ہے</string>
     <string name="prayer_set_by_rule">تقدیری</string>
+    <string name="prayer_source_published_method">جاری کردہ طریقہ</string>
     <string name="prayer_polar_line">آج یہاں سورج نہ طلوع ہوتا ہے نہ غروب، اس لیے کچھ اوقات اُس قریب ترین عرض بلد کے مطابق ہیں جہاں سورج طلوع اور غروب ہوتا ہے۔</string>
     <string name="prayer_card_cautious_title">یہاں کی مساجد کے نقشۂ اوقات مختلف ہیں</string>
     <string name="prayer_card_cautious_body">تقویٰ ہر نماز تب دکھاتا ہے جب سب کے ہاں اس کا وقت شروع ہو چکا ہو۔</string>
@@ -320,6 +321,7 @@
 
     <!-- Prayer engine: About these times (Task 11) -->
     <string name="about_times_title">ان اوقات کے بارے میں</string>
+    <string name="about_prayer_times_settings">نماز کے اوقات کی ترتیبات</string>
     <string name="timetable_cautious">احتیاطی اوقات</string>
     <string name="timetable_calculated">تقویٰ کا حساب</string>
     <string name="about_who_publishes">انہیں کون جاری کرتا ہے</string>

@@ -82,6 +82,7 @@
     <string name="prayer_whose_a11y">%1$s، %2$s. يفتح مصدر هذه المواقيت</string>
     <string name="prayer_about_a11y">%1$s، %2$s. يفتح «عن هذه المواقيت»</string>
     <string name="prayer_set_by_rule">تقديري</string>
+    <string name="prayer_source_published_method">الطريقة المعتمدة</string>
     <string name="prayer_polar_line">لا تشرق الشمس ولا تغرب هنا اليوم، لذا تتبع بعض المواقيت أقرب خط عرض تشرق فيه وتغرب.</string>
     <string name="prayer_card_cautious_title">تتبع المساجد هنا جداول مختلفة</string>
     <string name="prayer_card_cautious_body">يعرض تقوى كل صلاة بعد دخول وقتها فيها جميعًا.</string>
@@ -336,6 +337,7 @@
 
     <!-- Prayer engine: About these times (Task 11) -->
     <string name="about_times_title">عن هذه المواقيت</string>
+    <string name="about_prayer_times_settings">إعدادات مواقيت الصلاة</string>
     <string name="timetable_cautious">الأوقات الأحوط</string>
     <string name="timetable_calculated">حساب تقوى</string>
     <string name="about_who_publishes">من يصدرها</string>

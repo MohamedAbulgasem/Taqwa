@@ -306,6 +306,8 @@ internal fun AboutTimesRoute(
         LaunchedEffect(Unit) { navigator.pop() }
         return
     }
+    // Read once, as the screen opens: the stack moves on when a link pushes the next screen.
+    val offersPrayerTimes = remember { aboutOffersPrayerTimesSettings(navigator.backStack.value) }
     val zone = remember(loc.timeZoneId) { TimeZone.of(loc.timeZoneId) }
     val place = remember(loc) { PrayerTimesEngine.placeOf(loc) }
     val engineDay = remember(loc, prayerSettings, today) {
@@ -330,8 +332,16 @@ internal fun AboutTimesRoute(
         zone = zone,
         onBack = { navigator.pop() },
         onMatchMyMosque = { navigator.push(Screen.MatchMyMosque) },
+        onOpenPrayerTimesSettings = if (offersPrayerTimes) ({ navigator.push(Screen.PrayerTimesSettings) }) else null,
     )
 }
+
+/**
+ * Whether About these times links to Prayer times settings: everywhere but when About was opened
+ * from that screen, where the link would only stack it a second time and Back is the way there.
+ */
+internal fun aboutOffersPrayerTimesSettings(backStack: List<Screen>): Boolean =
+    backStack.getOrNull(backStack.lastIndex - 1) != Screen.PrayerTimesSettings
 
 /**
  * The high-latitude rule of an Other method (spec §2.2). A confirmed one is checked again with the

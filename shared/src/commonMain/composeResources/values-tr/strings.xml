@@ -79,6 +79,7 @@
     <string name="prayer_whose_a11y">%1$s, %2$s. Vakitlerin kaynağını açar</string>
     <string name="prayer_about_a11y">%1$s, %2$s. “Bu vakitler hakkında” sayfasını açar</string>
     <string name="prayer_set_by_rule">Takdirî</string>
+    <string name="prayer_source_published_method">Yayımlanan yöntem</string>
     <string name="prayer_polar_line">Güneş bugün burada ne doğuyor ne batıyor; bu yüzden bazı vakitler, güneşin doğup battığı en yakın enleme göre belirlenir.</string>
     <string name="prayer_card_cautious_title">Buradaki camiler farklı takvimlere uyuyor</string>
     <string name="prayer_card_cautious_body">Taqwa her namazı, hepsinde vakit girdikten sonra gösterir.</string>
@@ -330,6 +331,7 @@
 
     <!-- Prayer engine: About these times (Task 11) -->
     <string name="about_times_title">Bu vakitler hakkında</string>
+    <string name="about_prayer_times_settings">Namaz vakitleri ayarları</string>
     <string name="timetable_cautious">İhtiyatlı vakitler</string>
     <string name="timetable_calculated">Taqwa hesabı</string>
     <string name="about_who_publishes">Vakitleri kim yayımlıyor</string>

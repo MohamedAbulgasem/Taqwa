@@ -176,7 +176,7 @@ private fun IstanbulPreview() = ScreenPreview(istanbul(now = "17:05", current = 
 @Composable
 private fun AfterSunrisePreview() = ScreenPreview(istanbul(now = "9:00", current = null))
 
-/** Cautious times: the source line, and the cautious card on its first launch. */
+/** Cautious times: the label on the times card's edge, and the cautious card on its first launch. */
 @Preview(widthDp = 411, heightDp = 891)
 @Composable
 private fun TorontoCautiousCardPreview() =

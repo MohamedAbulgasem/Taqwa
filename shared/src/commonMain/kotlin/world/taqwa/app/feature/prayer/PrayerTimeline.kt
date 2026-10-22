@@ -64,6 +64,9 @@ private val GutterWidth = 26.dp
  */
 private val PipNameGap = 4.dp
 
+/** Where the prayer names start, measured from the timeline's own start edge (inside its padding). */
+internal val TimelineNameInset = GutterWidth + PipNameGap
+
 /**
  * Half a row's height. Rows are a ~23dp text line plus 10dp of padding each side, so this puts
  * the rail's ends on the centres of the first and last pips rather than overshooting past them.

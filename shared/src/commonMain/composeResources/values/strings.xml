@@ -88,6 +88,8 @@
     <string name="prayer_about_a11y">%1$s, %2$s. Opens About these times</string>
     <!-- The pill after a prayer's name when a high-latitude rule set its time (spec §2.1, the Jumuʿah pill's style); approved terms in §2.4. -->
     <string name="prayer_set_by_rule">Set by rule</string>
+    <!-- The source label on the times card where an authority's published method is followed but not yet proven against its timetable (spec §2.1); approved by Mohamed 22 Oct 2026, beside "Cautious times" and "Calculated by Taqwa". -->
+    <string name="prayer_source_published_method">Published method</string>
     <!-- On a polar day, one line under the prayer list instead of the pills; it opens About these times. Some times, not all, follow the nearby latitude. -->
     <string name="prayer_polar_line">The sun does not rise or set here today, so some times follow the nearest latitude where it does.</string>
     <!-- One-time cards below the prayer list (spec §2.1): the cautious-times card, then the Sunni card on a later launch. -->
@@ -351,6 +353,8 @@
 
     <!-- Prayer engine: About these times (Task 11) -->
     <string name="about_times_title">About these times</string>
+    <!-- The link on About these times to Settings › Prayer times; hidden when About was opened from there. -->
+    <string name="about_prayer_times_settings">Prayer times settings</string>
     <string name="timetable_cautious">Cautious times</string>
     <string name="timetable_calculated">Calculated by Taqwa</string>
     <string name="about_who_publishes">Who publishes them</string>

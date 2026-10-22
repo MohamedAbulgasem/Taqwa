@@ -34,7 +34,7 @@ landscape, and the widgets and notifications (they show the new times). One time
 | Element | Shows | What it is |
 |---|---|---|
 | **ⓘ after the date** | Everywhere | A glyph at the end of the date text, adding no line; the city-and-date block is the 48 dp touch target. Opens a small card: "Diyanet timetable · Diyanet's times for İstanbul, reproduced and checked by Taqwa · About these times ›" (or "Cautious times", "{Authority} method, not yet fully checked", "Calculated by Taqwa"). |
-| **Source line** | Only in cautious-times places (§3.6) | One tertiary line below the prayer list, "Cautious times ›", 48 dp touch height; opens About. (Decision §10.1.) |
+| **Source label** | Wherever the times are not an authority's own checked timetable: cautious-times places (§3.6), an authority's method not yet proven against its timetable (class D with an authority), Taqwa's own calculation (no authority known) | Set into the prayer list card's top hairline, saying where the times come from: "CAUTIOUS TIMES ›", "PUBLISHED METHOD ›" or "CALCULATED BY TAQWA ›"; its words start where the prayer names start (under Arabic, at the right), 8 dp more air above Fajr and nothing else added; 48 dp touch height; opens About. No label means a checked timetable. Where it cannot fit that edge (a long language at a large text size on a narrow phone) it falls back to one tertiary line below the list. (Decision §10.1; on the edge since 22 Oct 2026 so the Qibla card keeps its place, and on the two D classes since the same day, the owner's call: people are told whenever the times are not a checked timetable.) |
 | **Set by rule** | Where a high-latitude rule set a time (§3.8) | The outlined pill Jumuʿah uses, inline after the prayer's name; no extra height. On a polar day, one line under the list instead: today's translated sentence ("The sun does not rise or set here today…"), opening About. (Decision §10.6.) |
 | **Sunni times card** | Once, in the registry's Shia-regions list (Iran, Iraq, Bahrain, Azerbaijan, Lebanon, Kuwait, Saudi Arabia's Eastern Province, northern Yemen, Gilgit-Baltistan, Kurram, Hazarajat) | "These are Sunni prayer times. In Shia (Ja'fari) practice, Maghrib and iftar are later." Below the prayer list, then gone. The site uses the same list. |
 | **Cautious-times card** | Once, in cautious-times places (§10.9) | "Mosques here follow different timetables. Taqwa shows each prayer once they have all begun it." Actions "Match my mosque" and "OK". Below the prayer list; if the Sunni card also applies, this one comes first and the other waits for the next launch. |
@@ -89,13 +89,15 @@ One screen, filled from the registry and the proof stamp:
   "check your mosque".
 
 Each has "If you are fasting: stop eating by {endOfEating}" (in İstanbul, Diyanet's imsak) and the
-Sunni note where it applies.
+Sunni note where it applies, and "Prayer times settings ›" after its own section (under Match my
+mosque where that shows), hidden when About was opened from Prayer times settings itself.
 
 ### 2.4 Words and access
 
 - French Standard Asr: "Majoritaire" becomes "Standard". Notes name the school by its shadow.
 - Terms Mohamed approves before translation: Cautious times (ar الأحوط, ur احتیاطی اوقات, tr İhtiyatlı
-  vakitler), Set by rule (ar تقديري, ur تقدیری, tr takdirî), Calculated by Taqwa. Other new strings go
+  vakitler), Set by rule (ar تقديري, ur تقدیری, tr takdirî), Calculated by Taqwa, Published method (ar
+  الطريقة المعتمدة, ur جاری کردہ طریقہ, tr Yayımlanan yöntem; approved 22 Oct 2026). Other new strings go
   through the usual native review.
 - The ⓘ and the source line have one screen-reader label ("Times by Diyanet, İstanbul. Opens whose
   times these are"), isolated segments for right-to-left, mirrored chevrons.

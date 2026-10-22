@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.TaqwaText
@@ -54,6 +55,7 @@ import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.timetable_calculated
 import world.taqwa.app.resources.timetable_cautious
+import world.taqwa.app.resources.prayer_source_published_method
 import world.taqwa.app.resources.prayer_about_a11y
 import world.taqwa.app.resources.prayer_about_these_times
 import world.taqwa.app.resources.prayer_times_by
@@ -73,7 +75,7 @@ import kotlin.math.max
  */
 data class WhoseTimes(val shortNameKey: String, val entryClass: EntryClass) {
 
-    /** Cautious times: the screen adds the "Cautious times ›" line and may show the cautious card. */
+    /** Cautious times: the screen may show the cautious card. */
     val cautious: Boolean get() = entryClass == EntryClass.C
 
     companion object {
@@ -103,6 +105,19 @@ private fun whoseSentence(whose: WhoseTimes, place: String): String {
         EntryClass.D_AUTHORITY -> stringResource(Res.string.prayer_whose_unchecked_body, name, isolated(place))
         EntryClass.D_NONE -> stringResource(Res.string.prayer_whose_calculated_body)
     }
+}
+
+/**
+ * The words of the Prayer screen's source label (spec §2.1), where the times are not an authority's
+ * own checked timetable: several timetables combined, an authority's published method not yet
+ * proven against its timetable, or Taqwa's own calculation where nothing official is known. Null
+ * for a checked authority, whose times need no label.
+ */
+internal fun sourceLabelRes(whose: WhoseTimes): StringResource? = when (whose.entryClass) {
+    EntryClass.A, EntryClass.B -> null
+    EntryClass.C -> Res.string.timetable_cautious
+    EntryClass.D_AUTHORITY -> Res.string.prayer_source_published_method
+    EntryClass.D_NONE -> Res.string.timetable_calculated
 }
 
 /** What a screen reader calls the times: "Times by Diyanet", "Cautious times", "Calculated by Taqwa". */

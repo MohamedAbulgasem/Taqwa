@@ -74,6 +74,7 @@
     <string name="prayer_whose_a11y">%1$s, %2$s। এই সময়গুলোর উৎস খোলে</string>
     <string name="prayer_about_a11y">%1$s, %2$s। “এই সময়গুলো সম্পর্কে” খোলে</string>
     <string name="prayer_set_by_rule">নিয়মে নির্ধারিত</string>
+    <string name="prayer_source_published_method">প্রকাশিত পদ্ধতি</string>
     <string name="prayer_polar_line">আজ এখানে সূর্য ওঠেও না, অস্তও যায় না, তাই কিছু সময় সেই নিকটতম অক্ষাংশ ধরে দেওয়া, যেখানে সূর্য ওঠে ও অস্ত যায়।</string>
     <string name="prayer_card_cautious_title">এখানকার মসজিদগুলো ভিন্ন ভিন্ন সময়সূচি মানে</string>
     <string name="prayer_card_cautious_body">সবগুলোতে ওয়াক্ত শুরু হওয়ার পরই তাকওয়া প্রতিটি নামাজ দেখায়।</string>
@@ -321,6 +322,7 @@
 
     <!-- Prayer engine: About these times (Task 11) -->
     <string name="about_times_title">এই সময়গুলো সম্পর্কে</string>
+    <string name="about_prayer_times_settings">নামাজের সময়ের সেটিংস</string>
     <string name="timetable_cautious">সতর্কতামূলক সময়</string>
     <string name="timetable_calculated">তাকওয়ার হিসাব</string>
     <string name="about_who_publishes">কে এগুলো প্রকাশ করে</string>

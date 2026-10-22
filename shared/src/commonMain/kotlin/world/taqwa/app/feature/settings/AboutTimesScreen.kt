@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -101,6 +102,7 @@ import world.taqwa.app.resources.about_stop_eating
 import world.taqwa.app.resources.about_sunni_body
 import world.taqwa.app.resources.about_sunni_heading
 import world.taqwa.app.resources.about_times_title
+import world.taqwa.app.resources.about_prayer_times_settings
 import world.taqwa.app.resources.about_which_decides
 import world.taqwa.app.resources.about_who_publishes
 import world.taqwa.app.resources.about_who_publishes_body
@@ -183,6 +185,8 @@ fun aboutTimesUiState(engineDay: EngineDay, place: Place, date: LocalDate, hijri
  * up for [lateLimitFor] (Resolution keeps just the unit's name and point, not the unit itself).
  * @param onMatchMyMosque Null hides the link (Task 12 owns the route; the caller passes a callback
  * once it exists, per ui-common.md's "Tasks 11 and 12 connect them ... if that is trivial").
+ * @param onOpenPrayerTimesSettings Null hides "Prayer times settings ›", which the route does when
+ * About was opened from that screen: there the way back is Back.
  */
 @Composable
 fun AboutTimesScreen(
@@ -193,6 +197,7 @@ fun AboutTimesScreen(
     zone: TimeZone,
     onBack: () -> Unit,
     onMatchMyMosque: (() -> Unit)? = null,
+    onOpenPrayerTimesSettings: (() -> Unit)? = null,
 ) {
     val format = LocalPlatformFormat.current
     SettingsScaffold(stringResource(Res.string.about_times_title), onBack) {
@@ -202,6 +207,16 @@ fun AboutTimesScreen(
                 is AboutTimesUiState.AuthorityUnchecked -> AuthorityUncheckedContent(state, cityLabel, format)
                 is AboutTimesUiState.Cautious -> CautiousContent(state, cityLabel, zone, format, onMatchMyMosque)
                 is AboutTimesUiState.Calculated -> CalculatedContent(state, cityLabel, format)
+            }
+            // Under "Match my mosque ›" where there is one, in the same place where there is not: the
+            // way from these times to the settings that change them.
+            if (onOpenPrayerTimesSettings != null) {
+                CardDivider()
+                AboutLink(
+                    stringResource(Res.string.about_prayer_times_settings),
+                    LocalTaqwaColors.current.textPrimary,
+                    onOpenPrayerTimesSettings,
+                )
             }
             NearbySection(state)
             AsrSection(state.resolution, engineDay.school, cityLabel)
@@ -557,19 +572,23 @@ private fun CheckMosqueSection() {
     SectionBody(stringResource(Res.string.about_check_mosque_body))
 }
 
-/** "Match my mosque ›" in the accent, the chevron drawn so it turns with the reading direction. */
+/** "Match my mosque ›" in the accent. */
 @Composable
-private fun MatchMyMosqueLink(onClick: () -> Unit) {
-    val accent = LocalTaqwaColors.current.accent
+private fun MatchMyMosqueLink(onClick: () -> Unit) =
+    AboutLink(stringResource(Res.string.timetable_match_mosque), LocalTaqwaColors.current.accent, onClick)
+
+/** A link row: its words in [tint], the chevron drawn so it turns with the reading direction. */
+@Composable
+private fun AboutLink(text: String, tint: Color, onClick: () -> Unit) {
     val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(stringResource(Res.string.timetable_match_mosque), style = TaqwaText.rowLabel, color = accent)
+        Text(text, style = TaqwaText.rowLabel, color = tint)
         Spacer(Modifier.width(4.dp))
         // Drawn, not typed: a typed › is not mirrored under Arabic on Android (spec §2.4).
-        Canvas(Modifier.size(12.dp)) { drawChevron(accent, pointsForward = forward) }
+        Canvas(Modifier.size(12.dp)) { drawChevron(tint, pointsForward = forward) }
     }
 }
 

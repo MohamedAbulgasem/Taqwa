@@ -1,6 +1,18 @@
 package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.unit.Constraints
+import world.taqwa.app.design.components.drawChevron
+import world.taqwa.app.i18n.uiLanguage
+import world.taqwa.app.i18n.uppercaseIn
+import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -17,7 +29,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.unit.em
-import world.taqwa.app.resources.timetable_cautious
+import world.taqwa.app.resources.prayer_about_a11y
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -237,8 +249,7 @@ private fun PortraitBody(
             }
             Spacer(Modifier.height(36.dp))
 
-            TimelineCard(state, zone, format)
-            UnderTheList(state, actions)
+            TimesAndNotes(state, zone, format, actions)
 
             QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, actions.onOpenQibla)
             if (exactAlarmsOff) {
@@ -290,8 +301,7 @@ private fun LandscapeBody(
                 ClockLine(onClick = onOpenClockSheet, horizontalPadding = Gutter)
                 Spacer(Modifier.height(12.dp))
             }
-            TimelineCard(state, zone, format)
-            UnderTheList(state, actions)
+            TimesAndNotes(state, zone, format, actions)
             QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, actions.onOpenQibla)
             if (exactAlarmsOff) {
                 Spacer(Modifier.height(14.dp))
@@ -448,22 +458,28 @@ private val HeaderGlyphGap = 2.dp
  */
 private val CityLineMinHeight = HeaderGlyphSize - HeaderGlyphNudge + HeaderGlyphGap
 
+/** The air added above Fajr while the source label sits on the card's top edge. */
+internal val SourceLabelAir = 8.dp
+
+/** The edge label's own inset either side of its words, where it breaks the hairline. */
+internal val SourceLabelPad = 6.dp
+
 /**
  * What sits between the prayer list and the Qibla card, each only where it applies (spec §2.1):
- * the "Cautious times ›" line and, on a polar day, the line that says some times follow a nearby
- * latitude (both open About these times), then the one-time card due this launch. The
- * exact-alarms card keeps its place under the Qibla card.
+ * the source line ("Cautious times ›", "Published method ›", "Calculated by Taqwa ›"), only when
+ * the source label could not fit the card's edge, and, on a polar day, the line that says some times
+ * follow a nearby latitude (both open About these times), then the one-time card due this launch.
+ * The exact-alarms card keeps its place under the Qibla card.
  */
 @Composable
-private fun UnderTheList(state: PrayerUiState.Ready, actions: ReadyActions) {
-    val place = state.cityDisplayName ?: stringResource(Res.string.prayer_current_location)
+private fun UnderTheList(state: PrayerUiState.Ready, actions: ReadyActions, sourceLine: SourceLabel?) {
     val about = stringResource(Res.string.prayer_about_these_times)
-    val anyLine = state.whose.cautious || state.polar
+    val anyLine = sourceLine != null || state.polar
     if (anyLine) Spacer(Modifier.height(2.dp))
-    if (state.whose.cautious) {
+    if (sourceLine != null) {
         TertiaryLine(
-            text = stringResource(Res.string.timetable_cautious),
-            label = aboutLabel(state.whose, place),
+            text = sourceLine.name,
+            label = sourceLine.label,
             onClick = actions.onOpenAboutTimes,
             horizontalPadding = Gutter + 6.dp,
             onClickLabel = about,
@@ -574,20 +590,152 @@ private fun Countdown(
     )
 }
 
+/**
+ * The times card and the lines under it. Where the times are not an authority's own checked
+ * timetable, a label set into the card's top hairline says where they come from (spec §2.1):
+ * "Cautious times", "Published method" or "Calculated by Taqwa" ([sourceLabelRes]). It takes no
+ * line of its own, so the Qibla card keeps its place, lower than for any other city only by
+ * [SourceLabelAir]. The label is measured first, as it will be drawn: when it cannot fit that edge
+ * (a long language at a large text size on a narrow phone) it becomes a line under the list.
+ */
 @Composable
-private fun TimelineCard(state: PrayerUiState.Ready, zone: TimeZone, format: PlatformFormat) {
-    TaqwaCard(Modifier.padding(horizontal = Gutter)) {
-        Spacer(Modifier.height(4.dp))
-        PrayerTimeline(
-            state.today.rows,
-            horizontalPadding = 16.dp,
-            setByRule = state.setByRule,
-            subLines = subLines(state, zone, format),
-            next = state.today.next,
-        ) { row: TimelineRow ->
-            formatClock(row.instant, zone, format)
+private fun TimesAndNotes(state: PrayerUiState.Ready, zone: TimeZone, format: PlatformFormat, actions: ReadyActions) {
+    val place = state.cityDisplayName ?: stringResource(Res.string.prayer_current_location)
+    val language = uiLanguage()
+    val source = sourceLabelRes(state.whose)?.let { res ->
+        val name = stringResource(res)
+        SourceLabel(
+            words = name.uppercaseIn(language),
+            name = name,
+            label = stringResource(Res.string.prayer_about_a11y, name, isolated(place)),
+        )
+    }
+    SubcomposeLayout { constraints ->
+        val onEdge = source != null && run {
+            // Measured but never placed, and silent: only its width is wanted.
+            val label = subcompose(SourceMeasureSlot) {
+                SourceLabelWords(source.words, Modifier.clearAndSetSemantics {})
+            }.first().measure(Constraints())
+            val cardWidth = constraints.maxWidth - (Gutter * 2).roundToPx()
+            SourceLabelStart.roundToPx() + label.width <= cardWidth - CardCornerClearance.roundToPx()
         }
-        Spacer(Modifier.height(4.dp))
+        val body = subcompose(SourceBodySlot) {
+            Column {
+                TimelineCard(state, zone, format, source = if (onEdge) source else null, onOpenAboutTimes = actions.onOpenAboutTimes)
+                UnderTheList(state, actions, sourceLine = if (onEdge) null else source)
+            }
+        }.first().measure(constraints)
+        layout(body.width, body.height) { body.place(0, 0) }
+    }
+}
+
+/** Where the times come from, in the three forms it is shown in. */
+private class SourceLabel(
+    /** On the card's edge: upper case where the script has one. */
+    val words: String,
+    /** On the line under the list, as written. */
+    val name: String,
+    /** For a screen reader, either way: "Cautious times, Cape Town. Opens About these times". */
+    val label: String,
+)
+
+private const val SourceMeasureSlot = "source-label"
+private const val SourceBodySlot = "times"
+
+/** The timeline's own inset inside the card, either side. */
+private val TimelineCardPadding = 16.dp
+
+/** Where the edge label begins: its words start where the prayer names start. */
+private val SourceLabelStart = TimelineCardPadding + TimelineNameInset - SourceLabelPad
+
+/**
+ * The inset after the chevron. Its 10 dp canvas leaves about 2.5 dp of air past the tip, and the
+ * first letter's side bearing about 0.5 dp before the words, so 4 dp here reads as the
+ * [SourceLabelPad] at the start: the hairline stops the same distance from the words and the tip.
+ */
+private val SourceChevronEndPad = 4.dp
+
+/** The card's corner radius ([TaqwaCard]): the label must end on the straight part of the edge. */
+private val CardCornerClearance = 18.dp
+
+@Composable
+private fun TimelineCard(
+    state: PrayerUiState.Ready,
+    zone: TimeZone,
+    format: PlatformFormat,
+    source: SourceLabel? = null,
+    onOpenAboutTimes: () -> Unit = {},
+) {
+    Box(Modifier.fillMaxWidth().padding(horizontal = Gutter)) {
+        TaqwaCard {
+            Spacer(Modifier.height(if (source != null) 4.dp + SourceLabelAir else 4.dp))
+            PrayerTimeline(
+                state.today.rows,
+                horizontalPadding = TimelineCardPadding,
+                setByRule = state.setByRule,
+                subLines = subLines(state, zone, format),
+                next = state.today.next,
+            ) { row: TimelineRow ->
+                formatClock(row.instant, zone, format)
+            }
+            Spacer(Modifier.height(4.dp))
+        }
+        if (source != null) SourceEdgeLabel(source.words, source.label, onOpenAboutTimes)
+    }
+}
+
+/**
+ * The source label ("Cautious times ›" …) on the card's top hairline. Its 48 dp target is centred
+ * on the hairline, half above the card and half inside it, and takes no height: it is laid over the
+ * card's top edge. The words carry a background split at the hairline, the screen's above and the
+ * card's below, which is what breaks the line around them. One stop for a screen reader, read like
+ * the line it becomes when it cannot fit.
+ */
+@Composable
+private fun SourceEdgeLabel(words: String, label: String, onClick: () -> Unit) {
+    val colors = LocalTaqwaColors.current
+    val about = stringResource(Res.string.prayer_about_these_times)
+    Box(
+        Modifier
+            .padding(start = SourceLabelStart)
+            // Centred on the 1 dp hairline the card draws inside its top edge.
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, (0.5.dp.toPx() - placeable.height / 2f).roundToInt())
+                }
+            }
+            .heightIn(min = 48.dp)
+            .clickable(
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                indication = null,
+                role = Role.Button,
+                onClickLabel = about,
+                onClick = onClick,
+            )
+            .clearAndSetSemantics { contentDescription = label },
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        SourceLabelWords(
+            words,
+            Modifier.drawBehind {
+                val edge = size.height / 2
+                drawRect(colors.background, size = Size(size.width, edge))
+                drawRect(colors.surface, topLeft = Offset(0f, edge), size = Size(size.width, size.height - edge))
+            },
+        )
+    }
+}
+
+/** The label's words and chevron with their inset either side: what is drawn, and what is measured. */
+@Composable
+private fun SourceLabelWords(words: String, modifier: Modifier = Modifier) {
+    val colors = LocalTaqwaColors.current
+    val pointsForward = LocalLayoutDirection.current == LayoutDirection.Ltr
+    Row(modifier.padding(start = SourceLabelPad, end = SourceChevronEndPad), verticalAlignment = Alignment.CenterVertically) {
+        Text(words, style = TaqwaText.sectionLabel, color = colors.textSecondary, maxLines = 1, softWrap = false)
+        Spacer(Modifier.width(4.dp))
+        Canvas(Modifier.size(10.dp)) { drawChevron(colors.textSecondary, pointsForward) }
     }
 }
 

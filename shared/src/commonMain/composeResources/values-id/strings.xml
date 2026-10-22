@@ -72,6 +72,7 @@
     <string name="prayer_whose_a11y">%1$s, %2$s. Membuka sumber waktu ini</string>
     <string name="prayer_about_a11y">%1$s, %2$s. Membuka Tentang waktu ini</string>
     <string name="prayer_set_by_rule">Menurut aturan</string>
+    <string name="prayer_source_published_method">Metode yang diterbitkan</string>
     <string name="prayer_polar_line">Hari ini matahari tidak terbit maupun terbenam di sini, jadi sebagian waktu mengikuti lintang terdekat tempat matahari masih terbit dan terbenam.</string>
     <string name="prayer_card_cautious_title">Masjid di sini mengikuti jadwal yang berbeda</string>
     <string name="prayer_card_cautious_body">Taqwa menampilkan setiap salat setelah waktunya masuk di semua jadwal itu.</string>
@@ -316,6 +317,7 @@
 
     <!-- Prayer engine: About these times (Task 11) -->
     <string name="about_times_title">Tentang waktu ini</string>
+    <string name="about_prayer_times_settings">Pengaturan waktu salat</string>
     <string name="timetable_cautious">Waktu ihtiyat</string>
     <string name="timetable_calculated">Dihitung oleh Taqwa</string>
     <string name="about_who_publishes">Siapa yang menerbitkannya</string>

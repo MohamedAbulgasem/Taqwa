@@ -77,6 +77,7 @@
     <string name="prayer_whose_a11y">%1$s, %2$s. Ouvre la provenance de ces horaires</string>
     <string name="prayer_about_a11y">%1$s, %2$s. Ouvre « À propos de ces horaires »</string>
     <string name="prayer_set_by_rule">Fixé par règle</string>
+    <string name="prayer_source_published_method">Méthode publiée</string>
     <string name="prayer_polar_line">Le soleil ne se lève ni ne se couche ici aujourd’hui : certains horaires suivent la latitude la plus proche où c’est le cas.</string>
     <string name="prayer_card_cautious_title">Les mosquées d’ici suivent des calendriers différents</string>
     <string name="prayer_card_cautious_body">Taqwa affiche chaque prière une fois qu’elles l’ont toutes commencée.</string>
@@ -329,6 +330,7 @@
 
     <!-- Prayer engine: About these times (Task 11) -->
     <string name="about_times_title">À propos de ces horaires</string>
+    <string name="about_prayer_times_settings">Paramètres des horaires de prière</string>
     <string name="timetable_cautious">Horaires par précaution</string>
     <string name="timetable_calculated">Calculé par Taqwa</string>
     <string name="about_who_publishes">Qui les publie</string>
