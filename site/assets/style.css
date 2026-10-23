@@ -640,6 +640,10 @@ html[lang="ar"] .checks-table thead th, html[lang="ur"] .checks-table thead th, 
 .checks-table tbody th small a { font-weight: 600; }
 .checks-table tbody td { color: var(--t2); white-space: nowrap; }
 .checks-table tbody td:nth-child(2) { white-space: normal; min-width: 9em; }
+.tt-wrap + p { margin-top: 16px; }
+.kinds-table tbody th { min-width: 8em; }
+.kinds-table tbody td { white-space: normal; color: var(--t1); }
+.kinds-table tbody td small { display: block; margin-top: 3px; font-size: 12px; color: var(--t2); }
 .checks-table tbody tr:last-child > * { border-bottom: 0; }
 /* The index's line under the lede, with the link to the checks page. */
 .index-checks { margin-top: 12px; font-size: 16px; line-height: 1.5; color: var(--t2); max-width: 52ch; text-wrap: pretty; }

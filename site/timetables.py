@@ -941,7 +941,7 @@ class Timetables:
     # ---------------------------------------------------------------- the checks page
 
     def checks_body(self, lang: str) -> str:
-        """Spec §5: the one rule, the gate's totals and the surveys' (read from the document,
+        """Spec §5: the one rule, the four kinds of times the app labels, the gate's totals and the surveys' (read from the document,
         which the generator computed from the stamps and the gate files — never typed), the
         proven rule in plain words with the table of the published timetables, and where to
         read the proof. Figures in the page's digits, ungrouped, as the app writes them (R107)."""
@@ -976,6 +976,18 @@ class Timetables:
             at_most = fill(t["checks_minutes"], n=n(row["atMost"])) if row["atMost"] is not None else "—"
             rows.append(f'<tr><th scope="row">{esc(row["names"][lang])}<small>{places(row["entry"])}</small></th><td>{esc(kind)}</td>'
                         f'<td>{n(row["placeDays"])}</td><td>{n(row["places"])}</td><td>{esc(row["throughText"][lang])}</td><td>{at_most}</td></tr>')
+        # The four kinds of times, in the app's own words (the label the Prayer screen sets into the
+        # prayer list's edge, or none), so the site never names them differently from the screen.
+        kinds = "".join(
+            f'<tr><th scope="row">{esc(label)}</th><td>{esc(t["checks_kinds_" + key + "_body"])}'
+            f'<small>{fill(t["checks_kinds_example"], places=t["checks_kinds_" + key + "_ex"])}</small></td></tr>'
+            for key, label in (
+                ("none", t["checks_kinds_none"]),
+                ("cautious", t["checks_kind_cautious"]),
+                ("published", t["checks_kinds_published"]),
+                ("calculated", t["checks_kinds_calculated"]),
+            )
+        )
         gate = fill(t["checks_gate_body"], tables=n(proof["tables"]), days=n(proof["placeDays"]), entries=n(proof["entries"]),
                     early=n(proof["earlyStarts"]), late=n(proof["lateEnds"]))
         return f'''<main class="wrap prose checks">
@@ -983,6 +995,13 @@ class Timetables:
   <p class="meta">{esc(t["checks_lede"])}</p>
   <h2>{esc(t["checks_rule_h"])}</h2>
   <p>{esc(t["checks_rule_body"])}</p>
+  <h2>{esc(t["checks_kinds_h"])}</h2>
+  <p>{esc(t["checks_kinds_body"])}</p>
+  <div class="tt-wrap"><table class="checks-table kinds-table">
+    <thead><tr><th scope="col">{esc(t["checks_kinds_head_shown"])}</th><th scope="col">{esc(t["checks_kinds_head_means"])}</th></tr></thead>
+    <tbody>{kinds}</tbody>
+  </table></div>
+  <p>{esc(t["checks_kinds_move"])}</p>
   <h2>{esc(t["checks_gate_h"])}</h2>
   <p>{gate} {esc(t["checks_gate_excused"])}</p>
   <h2>{esc(t["checks_survey_h"])}</h2>
@@ -1092,7 +1111,8 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
         for key in ("tables", "placeDays", "entries", "surveyCalendars"):
             if digits(proof[key], ds) not in doc:
                 problems.append(f"checks page: {rel_path} does not print the {key} total ({proof[key]})")
-        rows = doc.count('<tr><th scope="row">')
+        # The timetables' own table, not the four kinds of times above it.
+        rows = doc.split('class="checks-table">', 1)[-1].count('<tr><th scope="row">')
         if rows != len(proof["published"]):
             problems.append(f"checks page: {rel_path} lists {rows} timetables, not {len(proof['published'])}")
         return problems
