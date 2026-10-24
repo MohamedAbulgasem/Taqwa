@@ -88,7 +88,7 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
             Text(stringResource(Res.string.qibla_title), style = TaqwaText.screenTitle, color = colors.textPrimary)
             Spacer(Modifier.height(4.dp))
             when (state) {
-                QiblaUiState.NoSensor ->
+                is QiblaUiState.NoSensor ->
                     Subtitle(stringResource(Res.string.qibla_no_sensor_title), colors.textSecondary)
                 is QiblaUiState.Searching ->
                     Subtitle(stringResource(Res.string.qibla_hold_flat), colors.textSecondary)
@@ -117,13 +117,18 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
             // riding at the top of a mostly empty screen.
             Spacer(Modifier.weight(1f))
             when (state) {
-                QiblaUiState.NoSensor -> Text(
-                    stringResource(Res.string.qibla_no_sensor_body),
-                    style = TaqwaText.caption,
-                    color = colors.textSecondary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 36.dp),
-                )
+                is QiblaUiState.NoSensor -> {
+                    Text(
+                        stringResource(Res.string.qibla_no_sensor_body),
+                        style = TaqwaText.caption,
+                        color = colors.textSecondary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 36.dp),
+                    )
+                    // "The bearing below": both numbers are computed from the location and need
+                    // no sensor (spec §10, §12), so a phone without one still gets them.
+                    Readout(state.bearingDegrees, state.distanceKm)
+                }
 
                 is QiblaUiState.Searching -> {
                     QiblaDial(state.headingDegrees, state.bearingDegrees, aligned = false, dimmed = false, diameter = dialSize)
@@ -136,7 +141,18 @@ fun QiblaScreen(state: QiblaUiState, onBack: () -> Unit, modifier: Modifier = Mo
                 }
 
                 is QiblaUiState.LowAccuracy -> {
-                    QiblaDial(0.0, state.bearingDegrees, aligned = false, dimmed = true, diameter = dialSize)
+                    // No needle, as in best effort: a heading the gate does not trust is no
+                    // direction, and a dimmed needle still points somewhere — at the bearing as
+                    // measured from the top of the phone. The spec's low accuracy "does not point
+                    // anywhere" (§4.3).
+                    QiblaDial(
+                        0.0,
+                        state.bearingDegrees,
+                        aligned = false,
+                        dimmed = true,
+                        needle = false,
+                        diameter = dialSize,
+                    )
                     Spacer(Modifier.height(12.dp))
                     // The figure of eight is drawn only when it is the actual remedy. Under
                     // interference it would be an instruction that cannot work.

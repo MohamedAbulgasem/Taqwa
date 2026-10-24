@@ -31,6 +31,7 @@ import world.taqwa.app.feature.adhkar.AdhkarViewModel
 import world.taqwa.app.feature.adhkar.recited
 import world.taqwa.app.feature.qibla.QiblaScreen
 import world.taqwa.app.feature.qibla.QiblaViewModel
+import world.taqwa.app.feature.qibla.keepsScreenOn
 import world.taqwa.app.feature.recitation.rememberSurahName
 import world.taqwa.app.feature.tasbeeh.TasbeehScreen
 import world.taqwa.app.feature.tasbeeh.TasbeehViewModel
@@ -177,6 +178,11 @@ internal fun QiblaRoute(
             }
         }
         val qiblaState by vm.state.collectAsState()
+        // Awake only while the compass is being calibrated or has been given up on. One call
+        // site, so going from low accuracy to best effort keeps the one hold rather than releasing
+        // and retaking it; here rather than in the screen, as AdhkarRoute's, so QiblaScreen still
+        // composes under the iOS UI test, where this effect cannot run.
+        if (qiblaState.keepsScreenOn) KeepScreenOn()
         QiblaScreen(qiblaState, onBack = { navigator.pop() })
     }
 }
@@ -184,8 +190,8 @@ internal fun QiblaRoute(
 @Composable
 internal fun AdhkarRoute(container: AppContainer, navigator: Navigator, set: AdhkarSet?) {
     // A set read with the phone in the hand is minutes without a touch on some pages; the display
-    // staying on is what Tasbeeh and the compass do. Here rather than in the screen, so the screen
-    // composes under the iOS UI test, where this effect cannot run.
+    // staying on is what Tasbeeh does, and the compass while it calibrates. Here rather than in the
+    // screen, so the screen composes under the iOS UI test, where this effect cannot run.
     KeepScreenOn()
 
     val format = LocalPlatformFormat.current

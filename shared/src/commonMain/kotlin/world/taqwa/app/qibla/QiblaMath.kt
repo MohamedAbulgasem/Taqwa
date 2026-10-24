@@ -46,8 +46,31 @@ object QiblaMath {
         return delta
     }
 
-    /** True when [heading] is within [thresholdDegrees] of [bearing]. The spec's "aligned" is
-     * exactly this call with the default 5-degree threshold. */
-    fun isAligned(heading: Double, bearing: Double, thresholdDegrees: Double = 5.0): Boolean =
+    /** The spec's "aligned" (§4.3): a dial not yet aligned lights when the heading comes within
+     * this many degrees of the bearing. */
+    const val ALIGNED_ENTER_DEGREES = 5.0
+
+    /**
+     * An aligned dial goes out only when the heading is more than this many degrees off. The 2
+     * degrees between this and [ALIGNED_ENTER_DEGREES] are hysteresis: a phone resting near the
+     * 5-degree edge wanders across it with the sensor's noise, and with a single threshold the rim
+     * flickered and the tick repeated on every crossing — about 43 ticks in 10 s, modelled, against
+     * one with this gap.
+     */
+    const val ALIGNED_EXIT_DEGREES = 7.0
+
+    /** True when [heading] is within [thresholdDegrees] of [bearing]: one threshold, no memory.
+     * The spec's "aligned" (§4.3, amended 24 Oct 2026) is the three-argument call below, which
+     * enters at [ALIGNED_ENTER_DEGREES] and leaves beyond [ALIGNED_EXIT_DEGREES]. */
+    fun isAligned(heading: Double, bearing: Double, thresholdDegrees: Double = ALIGNED_ENTER_DEGREES): Boolean =
         abs(angleDelta(heading, bearing)) <= thresholdDegrees
+
+    /**
+     * The aligned decision with memory: entered within [ALIGNED_ENTER_DEGREES], left only beyond
+     * [ALIGNED_EXIT_DEGREES], [wasAligned] being the previous reading's answer. This is the rule
+     * the phone's view model and the Watch dial share, for the lit rim and the tick alike, so it
+     * lives here, pure and platform-free, rather than in either of them.
+     */
+    fun isAligned(heading: Double, bearing: Double, wasAligned: Boolean): Boolean =
+        isAligned(heading, bearing, if (wasAligned) ALIGNED_EXIT_DEGREES else ALIGNED_ENTER_DEGREES)
 }

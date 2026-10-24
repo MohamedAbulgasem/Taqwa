@@ -13,7 +13,12 @@ import world.taqwa.app.qibla.HeadingFilter
 import world.taqwa.app.qibla.QiblaMath
 
 sealed interface QiblaUiState {
-    data object NoSensor : QiblaUiState
+    /**
+     * There is no compass to read: a phone with no magnetometer, and every iOS simulator. The
+     * bearing and the distance are arithmetic on the location, exactly as right here as anywhere,
+     * and the copy sends the reader to them ("the bearing below"), so the state carries both.
+     */
+    data class NoSensor(val bearingDegrees: Double, val distanceKm: Double) : QiblaUiState
     data class Searching(val headingDegrees: Double, val bearingDegrees: Double, val distanceKm: Double) : QiblaUiState
     data class Aligned(val headingDegrees: Double, val bearingDegrees: Double, val distanceKm: Double) : QiblaUiState
 
@@ -36,6 +41,16 @@ sealed interface QiblaUiState {
     ) : QiblaUiState
 }
 
+/**
+ * Whether the display should stay awake on this state: only while the compass is being calibrated
+ * or has been given up on (the owner's decision, 17 October 2026). A figure of eight is seconds
+ * with the phone in the hand and no touch, and best effort only arrives 20 s in, past a 15 s screen
+ * timeout, so the screen slept before either could finish. A compass that points is glanced at,
+ * and keeps the phone's own timeout.
+ */
+internal val QiblaUiState.keepsScreenOn: Boolean
+    get() = this is QiblaUiState.LowAccuracy || this is QiblaUiState.BestEffort
+
 class QiblaViewModel(
     location: GeoLocation,
     private val compassSource: CompassSource,
@@ -47,7 +62,11 @@ class QiblaViewModel(
     private val distance = QiblaMath.distanceKm(location)
 
     private val _state = MutableStateFlow<QiblaUiState>(
-        if (compassSource.hasSensor()) QiblaUiState.Searching(0.0, bearing, distance) else QiblaUiState.NoSensor,
+        if (compassSource.hasSensor()) {
+            QiblaUiState.Searching(0.0, bearing, distance)
+        } else {
+            QiblaUiState.NoSensor(bearing, distance)
+        },
     )
     val state: StateFlow<QiblaUiState> = _state.asStateFlow()
 
@@ -91,7 +110,8 @@ class QiblaViewModel(
                 }
 
                 CompassAccuracyState.Good ->
-                    if (QiblaMath.isAligned(smoothed, bearing)) {
+                    // In within 5°, out only beyond 7° (QiblaMath decides; this only remembers).
+                    if (QiblaMath.isAligned(smoothed, bearing, wasAligned)) {
                         // One tick on entry, never once per frame while already aligned.
                         if (!wasAligned) haptics.tick()
                         wasAligned = true

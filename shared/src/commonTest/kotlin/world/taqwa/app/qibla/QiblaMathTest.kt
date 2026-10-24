@@ -3,6 +3,7 @@ package world.taqwa.app.qibla
 import world.taqwa.app.domain.GeoLocation
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class QiblaMathTest {
@@ -96,5 +97,46 @@ class QiblaMathTest {
     fun isAlignedWrapsCorrectlyAcrossTheZeroThreeSixtyDegreeSeam() {
         assertTrue(QiblaMath.isAligned(heading = 358.0, bearing = 2.0))
         assertTrue(!QiblaMath.isAligned(heading = 350.0, bearing = 2.0))
+    }
+
+    // --- Hysteresis: in at 5 degrees, out only beyond 7, so a phone resting on the edge neither
+    // flickers the rim nor buzzes again and again. The same rule the Watch dial will use.
+
+    @Test
+    fun aDialNotYetAlignedLightsWithinFiveDegreesAndNotJustBeyond() {
+        listOf(104.99, 105.0, 95.01, 95.0).forEach {
+            assertTrue(QiblaMath.isAligned(heading = it, bearing = 100.0, wasAligned = false), "heading $it")
+        }
+        listOf(105.01, 106.99, 107.0, 107.01, 94.99, 93.01, 93.0, 92.99).forEach {
+            assertFalse(QiblaMath.isAligned(heading = it, bearing = 100.0, wasAligned = false), "heading $it")
+        }
+    }
+
+    @Test
+    fun anAlignedDialStaysLitUpToSevenDegreesAndGoesOutJustBeyond() {
+        listOf(104.99, 105.0, 105.01, 106.99, 107.0, 93.01, 93.0).forEach {
+            assertTrue(QiblaMath.isAligned(heading = it, bearing = 100.0, wasAligned = true), "heading $it")
+        }
+        listOf(107.01, 92.99).forEach {
+            assertFalse(QiblaMath.isAligned(heading = it, bearing = 100.0, wasAligned = true), "heading $it")
+        }
+    }
+
+    @Test
+    fun theHysteresisHoldsAcrossTheZeroThreeSixtySeam() {
+        // The qibla just east of north, approached from the west of north...
+        assertTrue(QiblaMath.isAligned(heading = 357.01, bearing = 2.0, wasAligned = false))
+        assertTrue(QiblaMath.isAligned(heading = 357.0, bearing = 2.0, wasAligned = false))
+        assertFalse(QiblaMath.isAligned(heading = 356.99, bearing = 2.0, wasAligned = false))
+        assertTrue(QiblaMath.isAligned(heading = 355.01, bearing = 2.0, wasAligned = true))
+        assertTrue(QiblaMath.isAligned(heading = 355.0, bearing = 2.0, wasAligned = true))
+        assertFalse(QiblaMath.isAligned(heading = 354.99, bearing = 2.0, wasAligned = true))
+        // ...and just west of north, approached from the east.
+        assertTrue(QiblaMath.isAligned(heading = 2.99, bearing = 358.0, wasAligned = false))
+        assertTrue(QiblaMath.isAligned(heading = 3.0, bearing = 358.0, wasAligned = false))
+        assertFalse(QiblaMath.isAligned(heading = 3.01, bearing = 358.0, wasAligned = false))
+        assertTrue(QiblaMath.isAligned(heading = 4.99, bearing = 358.0, wasAligned = true))
+        assertTrue(QiblaMath.isAligned(heading = 5.0, bearing = 358.0, wasAligned = true))
+        assertFalse(QiblaMath.isAligned(heading = 5.01, bearing = 358.0, wasAligned = true))
     }
 }

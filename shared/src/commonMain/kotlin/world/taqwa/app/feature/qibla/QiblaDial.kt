@@ -58,14 +58,14 @@ private const val TickInkedFraction = 2f / 19.6f
 
 /**
  * The dial rotates under a needle that points at the Kaaba marker, with the marker fixed at
- * [bearingDegrees] on the rim. [aligned] lights the outer rim amber; [dimmed] is the low-accuracy
- * state, where the whole dial fades to 28% and drops the marker and the cardinals, because "I
- * don't know" is the correct behaviour there.
+ * [bearingDegrees] on the rim. [aligned] lights the outer rim amber; [dimmed] is for the two states
+ * the compass is not trusted in, low accuracy and best effort, where the whole dial fades to 28%
+ * and drops the marker and the cardinals, because "I don't know" is the correct behaviour there.
  *
- * [needle] false drops the needle and the centre pin as well, leaving the ring and its ticks: the
- * best-effort state, where the compass is known to be unusable and even a dimmed needle would be
- * a direction the app does not have. The numbers below the dial are still correct — they are
- * computed from the location, never measured — so the screen keeps them.
+ * [needle] false drops the needle and the centre pin as well, leaving the ring and its ticks. Both
+ * untrusted states pass it: with a heading the gate does not trust, even a dimmed needle would be
+ * a direction the app does not have. The numbers below the dial in best effort are still correct
+ * — they are computed from the location, never measured — so the screen keeps them.
  */
 @Composable
 fun QiblaDial(

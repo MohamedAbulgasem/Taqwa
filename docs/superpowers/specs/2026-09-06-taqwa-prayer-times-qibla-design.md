@@ -151,6 +151,8 @@ Reached from the compass icon. Three states:
 
 No state flips on a single sample: low is entered only after 1 000 ms of continuous low samples and left only after 1 500 ms of continuous good ones, the asymmetry being deliberate (pointing wrongly is worse than declining to point). Best effort returns to the dial under the same 1 500 ms rule.
 
+**Amended 24 October 2026:** aligned is entered within 5° and left only beyond 7° (`QiblaMath.isAligned(heading, bearing, wasAligned)`), for the rim and the tick alike, so a phone resting near the 5° edge neither flickers nor buzzes again and again.
+
 ### 4.4 Settings
 
 Root, in three groups:
