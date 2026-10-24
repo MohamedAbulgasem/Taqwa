@@ -50,6 +50,18 @@ object PrayerNaming {
     /** The name in the interface language [languageTag] resolves to; English for one the app does not speak. */
     fun name(prayer: Prayer, languageTag: String): String = NAMES.getValue(UiLanguage.of(languageTag)).getValue(prayer)
 
+    /**
+     * The next prayer's name on the iOS lock-screen ring, in the interface language [languageTag]
+     * resolves to. The ring's label slot is about 40 pt wide at 11 pt, so it carries the
+     * interface's own name alone, never the pair [display] makes. Measured, every language's whole
+     * name fits it: Maghrib, the widest at 45 pt, draws at 0.9 under the ring's minimum scale of
+     * 0.6, and the Arabic المغرب needs 34 pt. So it is the whole name everywhere, the Arabic one
+     * with its article as on every other screen (the owner's choice, 24 Oct 2026), and never a
+     * clipped stem: the four letters the ring used to keep cut every Arabic name (الفج) and left
+     * "Akşa" and "Yats" in Turkish (B37).
+     */
+    fun shortName(prayer: Prayer, languageTag: String): String = name(prayer, languageTag)
+
     fun countdownLabel(prayer: Prayer, languageTag: String): String {
         val language = UiLanguage.of(languageTag)
         return COUNTDOWN.getValue(language).replace("{prayer}", name(prayer, languageTag))

@@ -94,14 +94,18 @@ private fun readWidgetRender(
         ?: WidgetBackground.FOLLOW_THEME
     val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val systemIsDark = nightMode == Configuration.UI_MODE_NIGHT_YES
-    val nowEpochSeconds = System.currentTimeMillis() / 1_000L
+    // The middle of the current minute rather than the clock's own second: the prayer alarm
+    // lands exactly on a whole minute and the rolling refresh often in its first second, where
+    // "now" alone reads one minute too many, and goes on doing so until the next draw, up to five
+    // minutes later (B36). The same rule the iOS timeline works its entries out by.
+    val at = WidgetMinutes.evaluationInstant(System.currentTimeMillis() / 1_000L)
     return WidgetRender(
         // Worked out for *now* from the mirror's two-day schedule (next prayer, current prayer,
         // the rows), not read as it stood when the app last had the Prayer screen open: the render
         // runs on the half-hourly APPWIDGET_UPDATE, the rolling five-minute alarm, the prayer alarm
         // and the unlock receiver, and after Isha it has to say "Fajr in" without the app's help.
-        content = snapshot?.let { WidgetContentBuilder.build(it, nowEpochSeconds) },
-        remainingMinutes = snapshot?.let { WidgetCountdown.remainingMinutesAt(it, nowEpochSeconds) },
+        content = snapshot?.let { WidgetContentBuilder.build(it, at) },
+        remainingMinutes = snapshot?.let { WidgetCountdown.remainingMinutesAt(it, at) },
         colors = WidgetPalette.colorsFor(background, systemIsDark),
         // The app's answer, written into the mirror beside the clock times this countdown has to
         // agree with — not the CLDR default for the tag, which an `ar-LY` device disagrees with
@@ -335,11 +339,10 @@ private fun TinyCard(render: WidgetRender, size: DpSize) {
 // -- Shared pieces ------------------------------------------------------------------------------
 
 /** The already-localised "next prayer in" phrase, or the plain name when no honest countdown
- * exists so that "in" never dangles; "Taqwa" before the app has ever written a snapshot. */
-private fun labelText(render: WidgetRender): String {
-    val content = render.content ?: return "Taqwa"
-    return if (render.remainingMinutes == null) content.nextPrayerDisplayName else content.countdownLabel
-}
+ * exists so that "in" never dangles; "Taqwa" before the app has ever written a snapshot. The rule
+ * is [WidgetCountdown.headline], shared with the iOS widget. */
+private fun labelText(render: WidgetRender): String =
+    render.content?.let { WidgetCountdown.headline(it, render.remainingMinutes) } ?: "Taqwa"
 
 /** "Maghrib · المغرب" -> "Maghrib": the bilingual name is two words too many for one cell. */
 private fun shortName(render: WidgetRender): String =

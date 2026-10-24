@@ -16,10 +16,6 @@ import shared
 /// shows the placeholder state forever.
 let taqwaAppGroupId = "group.world.taqwa.ios"
 
-/// Written by the app (never by Kotlin) each time the mirror actually changes, so the widget can
-/// extrapolate the countdown forward instead of showing whatever minute the app last saw.
-/// `WidgetSnapshot` carries no timestamp of its own and Task 23 owns its wire format.
-let taqwaWrittenAtKey = "snapshot_written_at"
 let taqwaSnapshotKey = "snapshot"
 let taqwaBackgroundKey = "widget_background"
 
@@ -66,23 +62,15 @@ private enum TaqwaWidgetStrings {
 // MARK: - Reading the mirror
 
 enum TaqwaMirror {
-    /// The moment `content.countdownMinutes` reaches zero, derived from the write timestamp.
-    /// Nil when the app has never written one, in which case the countdown is shown as-is.
-    /// `languageTag` is `snapshot.languageTag` verbatim — kept alongside `content` (which does not
-    /// carry it) so the countdown built locally in [TaqwaEntry.countdownText] can use the same
-    /// digit set as `content.nextClockTime`, which `PlatformFormat` already localised before the
-    /// snapshot was written (I9).
-    static func read() -> (snapshot: WidgetSnapshot, deadline: Date?)? {
+    /// The mirror the app last wrote, or nil before it has written one. Everything an entry shows
+    /// is worked out from it at that entry's own moment, through the same `:widgetcore` rules the
+    /// Android widget uses; no timestamp of the write is needed, because every mirror since the
+    /// two-day schedule carries absolute prayer instants. Past that schedule there is no honest
+    /// countdown left, and the entry names the prayer without a number (B16) rather than
+    /// extrapolating one from the write.
+    static func read() -> WidgetSnapshot? {
         let store = KeyValueStore_iosKt.createWidgetKeyValueStore()
-        guard let snapshot = WidgetInputsMirror.shared.read(store: store) else { return nil }
-        // Only a mirror from before the two-day schedule existed needs this: with a schedule the
-        // countdown is derived from absolute prayer instants at each entry's own date instead.
-        let defaults = UserDefaults(suiteName: taqwaAppGroupId)
-        let writtenAt = defaults?.double(forKey: taqwaWrittenAtKey) ?? 0
-        let deadline = writtenAt > 0
-            ? Date(timeIntervalSince1970: writtenAt + Double(snapshot.countdownMinutes) * 60)
-            : nil
-        return (snapshot, deadline)
+        return WidgetInputsMirror.shared.read(store: store)
     }
 
     static func background() -> WidgetBackground {
@@ -99,8 +87,16 @@ enum TaqwaMirror {
 struct TaqwaEntry: TimelineEntry {
     let date: Date
     let content: WidgetContent?
-    /// Minutes remaining at `date`, already extrapolated forward from the mirror write.
-    let countdownMinutes: Int64
+    /// Minutes remaining at the moment this entry was worked out, from `WidgetCountdown`; nil
+    /// when the mirror has run past its schedule and no honest countdown exists, in which case
+    /// no number is drawn.
+    let countdownMinutes: Int64?
+    /// `WidgetCountdown.headline`: the "next prayer in" phrase, or the prayer's name alone when
+    /// `countdownMinutes` is nil, so "in" never dangles over a missing number.
+    let headline: String
+    /// `WidgetCountdown.ringProgress`: the ring's fill, empty when `countdownMinutes` is nil
+    /// rather than the fill frozen at the moment of writing.
+    let ringProgress: Float
     let background: WidgetBackground
     /// `WidgetSnapshot.languageTag`, or `""` for the placeholder entry. Kept alongside `content`,
     /// which does not carry it, for anything that has to know which language the mirror was
@@ -119,24 +115,28 @@ struct TaqwaEntry: TimelineEntry {
     /// countdown, the Android one and the app all agree (D2 — it used to ask `NumberFormatter` for
     /// the locale default instead, which is the guess the mirror now replaces). Minute-granular and
     /// redrawn at most once a minute, so the per-second tabular-jitter exception of the Prayer
-    /// screen's ring (spec §4.2) does not apply.
-    var countdownText: String {
-        let m = max(0, countdownMinutes)
-        let text = String(format: "%d:%02d", m / 60, m % 60)
-        return WidgetDigits.shared.localize(text: text, nativeDigits: arabicIndicDigits, languageTag: languageTag)
+    /// screen's ring (spec §4.2) does not apply. Nil with `countdownMinutes`.
+    var countdownText: String? {
+        countdownMinutes.map { minutes in
+            let m = max(0, minutes)
+            let text = String(format: "%d:%02d", m / 60, m % 60)
+            return WidgetDigits.shared.localize(text: text, nativeDigits: arabicIndicDigits, languageTag: languageTag)
+        }
     }
 }
 
 struct TaqwaTimelineProvider: TimelineProvider {
     /// Spec §4.5 asks for a countdown, so an entry a minute for the next hour: WidgetKit renders
-    /// entries the system already holds without waking the extension, which is the only way the
-    /// number on screen is never a minute stale.
+    /// entries the system already holds without waking the extension. Each entry starts on a whole
+    /// minute and is worked out half-way through it (`WidgetMinutes`), so it reads what the Prayer
+    /// screen reads for every second it is on screen bar the minute's first, and no entry goes on
+    /// counting to a prayer that has begun (B36).
     private static let entryCount = 60
 
     func placeholder(in context: Context) -> TaqwaEntry {
         TaqwaEntry(
-            date: Date(), content: nil, countdownMinutes: 0, background: .followTheme,
-            languageTag: "", arabicIndicDigits: false
+            date: Date(), content: nil, countdownMinutes: nil, headline: "", ringProgress: 0,
+            background: .followTheme, languageTag: "", arabicIndicDigits: false
         )
     }
 
@@ -177,11 +177,13 @@ struct TaqwaTimelineProvider: TimelineProvider {
             nextClockTime: "18:32",
             rows: rows,
             ringProgress: 0.86,
-            countdownLabel: PrayerNaming.shared.countdownLabel(prayer: .maghrib, languageTag: tag)
+            countdownLabel: PrayerNaming.shared.countdownLabel(prayer: .maghrib, languageTag: tag),
+            nextPrayerShortName: PrayerNaming.shared.shortName(prayer: .maghrib, languageTag: tag)
         )
         return TaqwaEntry(
-            date: Date(), content: content, countdownMinutes: 21, background: background,
-            languageTag: tag, arabicIndicDigits: WidgetDigits.shared.defaultsToArabicIndic(languageTag: tag)
+            date: Date(), content: content, countdownMinutes: 21, headline: content.countdownLabel,
+            ringProgress: 0.86, background: background, languageTag: tag,
+            arabicIndicDigits: WidgetDigits.shared.defaultsToArabicIndic(languageTag: tag)
         )
     }
 
@@ -193,15 +195,20 @@ struct TaqwaTimelineProvider: TimelineProvider {
 
     static func entries(from start: Date) -> [TaqwaEntry] {
         let background = TaqwaMirror.background()
-        guard let (snapshot, deadline) = TaqwaMirror.read() else {
+        guard let snapshot = TaqwaMirror.read() else {
             return [TaqwaEntry(
-                date: start, content: nil, countdownMinutes: 0, background: background,
-                languageTag: "", arabicIndicDigits: false
+                date: start, content: nil, countdownMinutes: nil, headline: "", ringProgress: 0,
+                background: background, languageTag: "", arabicIndicDigits: false
             )]
         }
-        return (0..<entryCount).map { minute in
-            let date = start.addingTimeInterval(Double(minute) * 60)
-            let epoch = Int64(date.timeIntervalSince1970)
+        let minutes = WidgetMinutes.shared.timeline(
+            nowEpochSeconds: Int64(start.timeIntervalSince1970), count: Int32(entryCount)
+        )
+        return minutes.map { minute in
+            // The first entry is dated at the start of the minute already under way, so the
+            // widget is right from the reload on rather than from the next whole minute.
+            let date = Date(timeIntervalSince1970: TimeInterval(minute.showAtEpochSeconds))
+            let epoch = minute.evaluateAtEpochSeconds
             // Each entry is the widget as it should read at that minute: past a prayer the next
             // one takes over, its row lights up and the label changes, with no reload needed.
             let content = WidgetContentBuilder.shared.build(snapshot: snapshot, nowEpochSeconds: epoch)
@@ -209,20 +216,14 @@ struct TaqwaTimelineProvider: TimelineProvider {
             return TaqwaEntry(
                 date: date,
                 content: content,
-                countdownMinutes: derived?.int64Value ?? remainingMinutes(content: content, deadline: deadline, at: date),
+                countdownMinutes: derived?.int64Value,
+                headline: WidgetCountdown.shared.headline(content: content, remainingMinutes: derived),
+                ringProgress: WidgetCountdown.shared.ringProgress(content: content, remainingMinutes: derived),
                 background: background,
                 languageTag: snapshot.languageTag,
                 arabicIndicDigits: snapshot.arabicIndicDigits
             )
         }
-    }
-
-    /// Fallback for a mirror written before the schedule existed.
-    static func remainingMinutes(content: WidgetContent, deadline: Date?, at date: Date) -> Int64 {
-        guard let deadline else { return content.countdownMinutes }
-        let seconds = deadline.timeIntervalSince(date)
-        if seconds <= 0 { return 0 }
-        return Int64((seconds / 60).rounded(.up))
     }
 }
 
@@ -326,18 +327,21 @@ struct TaqwaHomeWidgetView: View {
         VStack(alignment: .leading, spacing: 6) {
             // Already the fully-localised "next prayer in" phrase (e.g. "Dhuhr in" / "متبقٍّ على
             // الظهر") — never compose an "in" suffix here, or a hardcoded English word leaks into
-            // every non-English locale, which is exactly the bug this field exists to close.
-            Text(content.countdownLabel)
+            // every non-English locale, which is exactly the bug this field exists to close. With
+            // no honest countdown it is the name alone and the number below is left out (B16).
+            Text(entry.headline)
                 .font(.system(size: 15, weight: .semibold))
                 .minimumScaleFactor(0.7)
                 .lineLimit(2)
                 .foregroundColor(Color(argb: colors.accentArgb))
-            Text(entry.countdownText)
-                .font(.system(size: 34, weight: .medium, design: .rounded))
-                .monospacedDigit()
-                .minimumScaleFactor(0.6)
-                .lineLimit(1)
-                .foregroundColor(Color(argb: colors.textArgb))
+            if let countdown = entry.countdownText {
+                Text(countdown)
+                    .font(.system(size: 34, weight: .medium, design: .rounded))
+                    .monospacedDigit()
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                    .foregroundColor(Color(argb: colors.textArgb))
+            }
             Text(content.nextClockTime)
                 .font(.system(size: 15, weight: .regular))
                 .foregroundColor(Color(argb: colors.textArgb).opacity(0.7))
@@ -350,17 +354,19 @@ struct TaqwaHomeWidgetView: View {
         HStack(alignment: .center, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 // See `small(_:)` — same already-localised "next prayer in" phrase.
-                Text(content.countdownLabel)
+                Text(entry.headline)
                     .font(.system(size: 14, weight: .semibold))
                     .minimumScaleFactor(0.7)
                     .lineLimit(2)
                     .foregroundColor(Color(argb: colors.accentArgb))
-                Text(entry.countdownText)
-                    .font(.system(size: 36, weight: .medium, design: .rounded))
-                    .monospacedDigit()
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
-                    .foregroundColor(Color(argb: colors.textArgb))
+                if let countdown = entry.countdownText {
+                    Text(countdown)
+                        .font(.system(size: 36, weight: .medium, design: .rounded))
+                        .monospacedDigit()
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
+                        .foregroundColor(Color(argb: colors.textArgb))
+                }
                 Text(content.nextClockTime)
                     .font(.system(size: 13))
                     .foregroundColor(Color(argb: colors.textArgb).opacity(0.7))
@@ -417,15 +423,6 @@ struct TaqwaLockScreenWidgetView: View {
 
     private var family: WidgetFamily { familyOverride ?? environmentFamily }
 
-    /// The circular complication has room for about three glyphs. Arabic names have no
-    /// conventional Latin abbreviation, so take the first word of the display name (which is the
-    /// localised name outside Arabic locales, and the Arabic name inside them) and clip it.
-    private func abbreviation(_ name: String) -> String {
-        let first = name.split(separator: "·").first.map(String.init)?
-            .trimmingCharacters(in: .whitespaces) ?? name
-        return String(first.prefix(4))
-    }
-
     /// The one after the next — the "then …" line. `rows` is in prayer order and excludes
     /// Sunrise, so the row following the next prayer is the answer, wrapping past Isha to Fajr.
     static func prayerAfterNext(_ content: WidgetContent) -> WidgetPrayerRow? {
@@ -439,23 +436,31 @@ struct TaqwaLockScreenWidgetView: View {
         if let content = entry.content {
             switch family {
             case .accessoryCircular:
-                // Spec §4.5: ring + abbreviation + countdown — a real progress ring, the same
-                // motif CountdownRing uses on the Prayer screen, fed by the model's `ringProgress`.
+                // Spec §4.5: ring + name + countdown — a real progress ring, the same
+                // motif CountdownRing uses on the Prayer screen, fed by the entry's `ringProgress`
+                // (empty, with no number, once there is no honest countdown).
                 ZStack {
                     AccessoryWidgetBackground()
-                    Gauge(value: Double(content.ringProgress).clamped01()) {
+                    Gauge(value: Double(entry.ringProgress).clamped01()) {
                         EmptyView()
                     } currentValueLabel: {
                         VStack(spacing: -1) {
-                            Text(abbreviation(content.nextPrayerDisplayName))
+                            // The interface language's own name, whole (`PrayerNaming.shortName`),
+                            // the Arabic with its article. The gauge gives this label 40.6 × 29 pt
+                            // whatever the ring's size, and every name fits it at 11 pt: Maghrib,
+                            // the widest at 45 pt, draws at 0.9; المغرب needs 34. Clipping to four letters cut
+                            // every Arabic name and left "Akşa" in Turkish (B37).
+                            Text(content.nextPrayerShortName)
                                 .font(.system(size: 11, weight: .medium))
                                 .minimumScaleFactor(0.6)
                                 .lineLimit(1)
-                            Text(entry.countdownText)
-                                .font(.system(size: 12, weight: .bold))
-                                .monospacedDigit()
-                                .minimumScaleFactor(0.6)
-                                .lineLimit(1)
+                            if let countdown = entry.countdownText {
+                                Text(countdown)
+                                    .font(.system(size: 12, weight: .bold))
+                                    .monospacedDigit()
+                                    .minimumScaleFactor(0.6)
+                                    .lineLimit(1)
+                            }
                         }
                     }
                     .gaugeStyle(.accessoryCircularCapacity)
@@ -464,7 +469,7 @@ struct TaqwaLockScreenWidgetView: View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack {
                         // See `TaqwaHomeWidgetView.small(_:)` — same already-localised phrase.
-                        Text(content.countdownLabel)
+                        Text(entry.headline)
                             .font(.headline)
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)

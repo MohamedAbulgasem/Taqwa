@@ -135,6 +135,41 @@ class WidgetScheduleTest {
     }
 
     @Test
+    fun withACountdownTheHeadlineIsTheNextPrayerInPhrase() {
+        val at1400 = midnight + 14 * hour
+        val content = WidgetContentBuilder.build(snapshot, at1400)
+        val remaining = WidgetCountdown.remainingMinutesAt(snapshot, at1400)
+        assertEquals("Asr in", WidgetCountdown.headline(content, remaining))
+        assertEquals(content.ringProgress, WidgetCountdown.ringProgress(content, remaining))
+    }
+
+    // B16: an iPhone left alone for three days ran past the schedule and its widget read
+    // "Asr in 0:00" over a ring frozen at the moment of writing. With no honest countdown the
+    // widget names the prayer alone, so "in" does not dangle, and the ring is empty.
+    @Test
+    fun pastTheWholeHorizonTheHeadlineIsTheNameAloneAndTheRingIsEmpty() {
+        val day3 = midnight + 3 * 24 * hour
+        val remaining = WidgetCountdown.remainingMinutesAt(snapshot, day3)
+        assertNull(remaining)
+        val content = WidgetContentBuilder.build(snapshot, day3)
+        assertEquals("Asr · العصر", WidgetCountdown.headline(content, remaining))
+        assertEquals(0.33f, content.ringProgress)
+        assertEquals(0f, WidgetCountdown.ringProgress(content, remaining))
+    }
+
+    // B37: the lock-screen ring names the next prayer whole, in the interface language alone.
+    @Test
+    fun theRingsNameIsTheShortNameInTheMirrorsLanguage() {
+        val at1900 = midnight + 19 * hour
+        assertEquals("Isha", WidgetContentBuilder.build(snapshot, at1900).nextPrayerShortName)
+        assertEquals("العشاء", WidgetContentBuilder.build(snapshot.copy(languageTag = "ar"), at1900).nextPrayerShortName)
+        assertEquals("Yatsı", WidgetContentBuilder.build(snapshot.copy(languageTag = "tr-TR"), at1900).nextPrayerShortName)
+        // Past the horizon the write-time prayer is named, the same way.
+        val day3 = midnight + 3 * 24 * hour
+        assertEquals("العصر", WidgetContentBuilder.build(snapshot.copy(languageTag = "ar"), day3).nextPrayerShortName)
+    }
+
+    @Test
     fun theLabelFollowsTheMirrorsLanguage() {
         val arabic = snapshot.copy(languageTag = "ar")
         val content = WidgetContentBuilder.build(arabic, midnight + 19 * hour)

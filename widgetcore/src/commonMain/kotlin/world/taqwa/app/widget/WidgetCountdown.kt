@@ -12,7 +12,8 @@ package world.taqwa.app.widget
  * widget whose one job is to be right about how long is left cannot do that.
  *
  * Kept here in `:widgetcore` rather than in the Glance code so it is covered by the shared test
- * suite on both targets, and so iOS can use the same rule if its timeline ever wants it.
+ * suite on both targets: iOS works out every timeline entry with the same rule, and both widgets
+ * take what to show when there is no honest answer ([headline], [ringProgress]) from here too.
  */
 object WidgetCountdown {
 
@@ -44,4 +45,22 @@ object WidgetCountdown {
         if (remainingSeconds < 0L) return null
         return remainingSeconds / 60L
     }
+
+    /**
+     * The line over the countdown: the "next prayer in" phrase, or, when [remainingMinutes] is
+     * `null`, the prayer's name alone. With no honest countdown there is no number for "in" to
+     * lead into, and "Asr in" over nothing (or over "0:00", which is what iOS drew once its
+     * schedule ran out, B16) reads as a prayer about to begin.
+     */
+    fun headline(content: WidgetContent, remainingMinutes: Long?): String =
+        if (remainingMinutes == null) content.nextPrayerDisplayName else content.countdownLabel
+
+    /**
+     * The ring's fill, or an empty ring when [remainingMinutes] is `null`. That is exactly when
+     * [content] comes from `WidgetContentBuilder.build(snapshot)`, whose ring is the one frozen at
+     * the moment of writing: a ring that stands still at two-thirds for days says the same false
+     * thing a stale number would.
+     */
+    fun ringProgress(content: WidgetContent, remainingMinutes: Long?): Float =
+        if (remainingMinutes == null) 0f else content.ringProgress
 }

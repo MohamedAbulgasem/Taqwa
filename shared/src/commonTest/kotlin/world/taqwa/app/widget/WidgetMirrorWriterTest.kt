@@ -22,6 +22,7 @@ import kotlin.math.round
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -224,6 +225,30 @@ class WidgetMirrorWriterScheduleTest {
         entryClass = world.taqwa.app.prayer.engine.registry.EntryClass.D_NONE,
     )
 
+    /** A day whose [world.taqwa.app.domain.DayPrayerTimes.date] and instants agree (UTC), which
+     * the writer's midnight needs; [dayAt]'s fixed date sits beside 1970 instants. */
+    private fun dayOn(date: LocalDate): world.taqwa.app.domain.DayPrayerTimes {
+        val midnight = date.atStartOfDayIn(TimeZone.UTC)
+        fun at(hours: Int) = midnight + hours.hours
+        return world.taqwa.app.domain.DayPrayerTimes(
+            date = date,
+            times = listOf(
+                PrayerTime(Prayer.FAJR, at(5)),
+                PrayerTime(Prayer.SUNRISE, at(6)),
+                PrayerTime(Prayer.DHUHR, at(12)),
+                PrayerTime(Prayer.ASR, at(15)),
+                PrayerTime(Prayer.MAGHRIB, at(18)),
+                PrayerTime(Prayer.ISHA, at(20)),
+            ),
+            highLatitudeRuleApplied = null,
+            asrOther = at(16),
+            sunset = at(18) - 1.minutes,
+            endOfEating = at(5),
+            sourceEntryId = "test",
+            entryClass = world.taqwa.app.prayer.engine.registry.EntryClass.D_NONE,
+        )
+    }
+
     private val today = TodayState(
         rows = listOf(TimelineRow(Prayer.DHUHR, Instant.fromEpochSeconds(12 * 3600), PrayerStatus.CURRENT)),
         next = PrayerTime(Prayer.ASR, Instant.fromEpochSeconds(15 * 3600)),
@@ -251,11 +276,42 @@ class WidgetMirrorWriterScheduleTest {
     }
 
     @Test
+    fun aMirrorWrittenBetweenMidnightAndFajrFillsTheRingFromYesterdaysIsha() {
+        // B35: every night of Ramadan the app is opened for suhoor between midnight and Fajr. The
+        // interval the user is inside then began at yesterday's Isha, before the day of writing's
+        // midnight, so the mirror has to carry that start or the lock-screen ring sits empty until
+        // Fajr while the app's own ring is two-thirds full.
+        val yesterday = dayOn(LocalDate(2026, 9, 5))
+        val today = dayOn(LocalDate(2026, 9, 6))
+        val tomorrow = dayOn(LocalDate(2026, 9, 7))
+        val now = today.date.atStartOfDayIn(TimeZone.UTC) + 2.hours
+        val timeline = TimelineBuilder.buildForWidgets(yesterday, today, tomorrow, now, false, TimeZone.UTC)
+        val snapshot = WidgetMirrorWriter.snapshotOf(timeline, "UTC", FakePlatformFormat(), listOf(today, tomorrow), yesterday)
+
+        val isha = yesterday.time(Prayer.ISHA)
+        assertEquals(listOf(ScheduledPrayer(Prayer.ISHA, isha.epochSeconds, "20:00", -1)), snapshot.schedule.filter { it.dayIndex < 0 })
+
+        val content = WidgetContentBuilder.build(snapshot, now.epochSeconds)
+        assertEquals("Fajr in", content.countdownLabel)
+        assertEquals(ObligatoryPrayers, content.rows.map { it.prayer })
+        assertTrue(content.rows.none { it.isCurrent })
+        assertTrue(content.ringProgress > 0f)
+        // Six of the nine hours from Isha to Fajr, as the app's ring has it.
+        assertEquals(timeline.ringProgress, content.ringProgress, 0.01f)
+        assertEquals(6f / 9f, content.ringProgress, 0.01f)
+
+        val aMinuteBeforeFajr = today.time(Prayer.FAJR) - 1.minutes
+        assertTrue(WidgetContentBuilder.build(snapshot, aMinuteBeforeFajr.epochSeconds).ringProgress > 0.99f)
+    }
+
+    @Test
     fun yesterdaysIshaAfterMidnightIsTheWidgetsNextPrayer() {
         // Spec §3.3, ruling R8 amended: Helsinki on 21 June 2026 and Edmonton on 27 June give an
         // Isha after local midnight. Written just after midnight, the mirror carries it (day −1),
         // and the widget, at the moment of writing and a few minutes on, counts down to it; the
-        // rows are the new day's, none highlighted.
+        // rows are the new day's, none highlighted. Yesterday's Maghrib, the last start before
+        // midnight, is carried too: between midnight and the carried Isha the ring counts from
+        // it, as the app's does.
         val engine = PrayerTimesEngine()
         val helsinki = GeoLocation(60.1699, 24.9384, "Europe/Helsinki", "Helsinki", "FI")
         val edmonton = GeoLocation(53.5461, -113.4938, "America/Edmonton", "Edmonton", "CA")
@@ -276,8 +332,15 @@ class WidgetMirrorWriterScheduleTest {
             val snapshot = WidgetMirrorWriter.snapshotOf(
                 timeline, location.timeZoneId, FakePlatformFormat(), listOf(todays, tomorrow), yesterday,
             )
-            assertEquals(listOf(ScheduledPrayer(Prayer.ISHA, isha.epochSeconds, snapshot.schedule.first().clockTime, -1)), snapshot.schedule.filter { it.dayIndex < 0 })
-            assertEquals(11, snapshot.schedule.size)
+            val carried = snapshot.schedule.filter { it.dayIndex < 0 }
+            assertEquals(listOf(Prayer.MAGHRIB, Prayer.ISHA), carried.map { it.prayer }, "$date")
+            assertEquals(ScheduledPrayer(Prayer.ISHA, isha.epochSeconds, carried[1].clockTime, -1), carried[1])
+            assertEquals(yesterday.time(Prayer.MAGHRIB).epochSeconds, carried[0].epochSeconds)
+            assertTrue(carried[0].epochSeconds < day.atStartOfDayIn(zone).epochSeconds, "$date: Maghrib is not before midnight")
+            assertEquals(12, snapshot.schedule.size)
+            val atWriting = WidgetContentBuilder.build(snapshot, now.epochSeconds)
+            assertTrue(atWriting.ringProgress > 0f, "$date")
+            assertEquals(timeline.ringProgress, atWriting.ringProgress, 0.01f, "$date")
             for (later in listOf(now, now + 1.minutes)) {
                 val epoch = later.epochSeconds
                 val content = WidgetContentBuilder.build(snapshot, epoch)

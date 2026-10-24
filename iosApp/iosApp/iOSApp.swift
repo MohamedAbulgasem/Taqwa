@@ -255,9 +255,6 @@ struct iOSApp: App {
 				+ "|" + String(ayah.hashValue) + "|" + String(ayah.count)
 			guard key != lastMirrorKey else { return }
 			lastMirrorKey = key
-			// `WidgetSnapshot` carries no timestamp, so stamp the write here: the extension needs it to
-			// extrapolate the countdown forward between reloads instead of showing a frozen minute.
-			defaults?.set(Date().timeIntervalSince1970, forKey: taqwaWrittenAtKey)
 			WidgetCenter.shared.reloadAllTimelines()
 		}
 	}

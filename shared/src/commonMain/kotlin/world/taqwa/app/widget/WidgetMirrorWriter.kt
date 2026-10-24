@@ -61,7 +61,8 @@ object WidgetMirrorWriter {
      */
     private const val RING_STEPS = 120
 
-    /** [ScheduledPrayer.dayIndex] of a start of yesterday's carried past midnight. */
+    /** [ScheduledPrayer.dayIndex] of a start of yesterday's: the last before midnight, and any
+     * carried past it. */
     private const val YESTERDAY = -1
 
     private fun quantisedRing(progress: Float): Float =
@@ -75,6 +76,14 @@ object WidgetMirrorWriter {
      * Fajr, at [ScheduledPrayer.dayIndex] −1 (spec §3.3: a high-latitude Isha after midnight), so
      * every start of yesterday's still ahead is in the schedule and the widget's next prayer and
      * countdown look across it.
+     *
+     * Yesterday's last start before midnight is carried too, also at −1: it is where the interval
+     * a widget is inside from midnight to Fajr began (its Isha, or its Maghrib while a carried
+     * Isha is still ahead), the same start `TimelineBuilder.buildForWidgets` fills the app's ring
+     * from. Without it a mirror written after midnight had nothing behind its own moment, and the
+     * lock-screen ring sat empty until Fajr (B35) — every night of Ramadan, when the app is opened
+     * for suhoor. The snapshot's own [WidgetSnapshot.ringProgress] is no substitute: it is frozen
+     * at the moment of writing.
      */
     fun snapshotOf(
         today: TodayState,
@@ -91,8 +100,9 @@ object WidgetMirrorWriter {
         val first = days.firstOrNull()
         val carried = if (yesterday != null && first != null) {
             val midnight = first.date.atStartOfDayIn(zone)
-            TimelineBuilder.yesterdaysStarts(yesterday, first)
-                .filter { it.instant >= midnight }
+            val starts = TimelineBuilder.yesterdaysStarts(yesterday, first)
+            val lastBeforeMidnight = starts.filter { it.instant < midnight }.maxByOrNull { it.instant }
+            (listOfNotNull(lastBeforeMidnight) + starts.filter { it.instant >= midnight })
                 .map { ScheduledPrayer(it.prayer, it.instant.epochSeconds, clock(it.instant), YESTERDAY) }
         } else {
             emptyList()

@@ -147,9 +147,12 @@ struct TaqwaWidget_Previews: PreviewProvider {
                 WidgetPrayerRow(prayer: Prayer.isha, displayName: "Isha · العشاء", clockTime: "19:55", isCurrent: false),
             ],
             ringProgress: 0.42,
-            countdownLabel: "Dhuhr in"
+            countdownLabel: "Dhuhr in",
+            nextPrayerShortName: "Dhuhr"
         ),
         countdownMinutes: 209,
+        headline: "Dhuhr in",
+        ringProgress: 0.42,
         background: WidgetBackground.followTheme,
         languageTag: "en",
         arabicIndicDigits: false

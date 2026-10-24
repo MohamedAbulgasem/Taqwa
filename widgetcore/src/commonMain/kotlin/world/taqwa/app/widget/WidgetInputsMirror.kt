@@ -15,9 +15,9 @@ data class WidgetSnapshot(
     val nextPrayer: Prayer,
     /**
      * The countdown as it stood **when the mirror was written**. Kept for wire compatibility with
-     * mirrors written before [nextPrayerEpochSeconds] existed, and as the value iOS's timeline
-     * extrapolates from; it must never be rendered verbatim, because the mirror is only written
-     * while the Prayer screen is open and can be hours old by the time a widget draws (I8).
+     * mirrors written before [nextPrayerEpochSeconds] existed; it must never be rendered verbatim,
+     * because the mirror is only written while the Prayer screen is open and can be hours old by
+     * the time a widget draws (I8). Both widgets derive their number with [WidgetCountdown].
      */
     val countdownMinutes: Long,
     val nextClockTime: String,
@@ -41,12 +41,13 @@ data class WidgetSnapshot(
     val previousPrayerEpochSeconds: Long = 0L,
     /**
      * Every obligatory prayer of the day the mirror was written and the day after, each as an
-     * absolute instant with its clock string, and any start of the day before that falls after
-     * the day of writing's midnight (a high-latitude Isha, spec §3.3). This is what lets a widget
-     * keep counting *across* prayers without the app: the next prayer is whichever entry is first
-     * after the widget's own clock, not whichever one was next when the app last had the Prayer
-     * screen open. Empty on a mirror from a build before this field existed, in which case the
-     * older fields carry the render.
+     * absolute instant with its clock string; any start of the day before that falls after the
+     * day of writing's midnight (a high-latitude Isha, spec §3.3); and that day's last start
+     * before midnight, which is where the ring of a widget drawn between midnight and Fajr counts
+     * from. This is what lets a widget keep counting *across* prayers without the app: the next
+     * prayer is whichever entry is first after the widget's own clock, not whichever one was next
+     * when the app last had the Prayer screen open. Empty on a mirror from a build before this
+     * field existed, in which case the older fields carry the render.
      */
     val schedule: List<ScheduledPrayer> = emptyList(),
     /**
@@ -65,7 +66,8 @@ data class WidgetSnapshot(
 
 /** One entry of [WidgetSnapshot.schedule]. [dayIndex] is 0 for the day of writing, 1 for the
  * day after, so a renderer can pick the five rows that belong together without a time zone, and
- * −1 for a start of the day before carried past midnight, which has no rows of its own. */
+ * −1 for a start of the day before: its last before midnight, and any carried past it. Neither
+ * kind has rows of its own. */
 data class ScheduledPrayer(
     val prayer: Prayer,
     val epochSeconds: Long,

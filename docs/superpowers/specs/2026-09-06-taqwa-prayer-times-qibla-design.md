@@ -188,7 +188,9 @@ A footnote in the sheet states that notification sounds are capped at 30 seconds
 
 - **Small (2×2)** — next prayer name, countdown, clock time. One question answered.
 - **Medium (4×2)** — countdown on the left, all five times on the right, current prayer in accent.
-- **iOS lock screen** — circular complication (ring + abbreviation + countdown) and rectangular.
+- **iOS lock screen** — circular complication (ring + name + countdown — amended 24 October 2026: the next prayer's name whole in the interface language, the Arabic one with its article as on every other screen (الفجر … العشاء; المغرب needs 34 of the label's 40.6 pt), where it used to be clipped to four letters, which cut every Arabic name to a stem such as الفج and left Turkish "Akşa"; measured, the ring's label has room for every whole name, B37) and rectangular.
+
+**Amended 24 October 2026:** a widget counts down only to a prayer instant it holds. Once the two-day schedule the app last wrote has run out (past Isha on the day after it was written, with no newer one since), every widget names the next prayer without a number and the circular complication's ring is empty, rather than counting "0:00" for a prayer long past or holding the fill frozen at the moment of writing (B16).
 
 **Background is a user setting** with four values: Follow theme (default), Light, Dark, Translucent.
 

@@ -18,6 +18,10 @@ data class WidgetContent(
      * "متبقٍّ على الظهر"). Both widget targets show this verbatim instead of composing their own
      * suffix, so a hardcoded English "IN" never leaks into a non-English locale again. */
     val countdownLabel: String,
+    /** The next prayer's name alone, whole, for iOS's lock-screen ring, whose slot has no room for
+     * the bilingual pair ([world.taqwa.app.i18n.PrayerNaming.shortName]). A caller that draws no
+     * ring, such as the in-app sample card, can leave it as the display name. */
+    val nextPrayerShortName: String = nextPrayerDisplayName,
 )
 
 /** Turns a raw [WidgetSnapshot] into display strings, applying the same Arabic-alone naming
@@ -41,6 +45,7 @@ object WidgetContentBuilder {
             // An older mirror (written before countdownLabel existed) deserialises it as "" —
             // fall back to the plain name rather than showing an empty label.
             countdownLabel = snapshot.countdownLabel.ifBlank { nextPrayerDisplayName },
+            nextPrayerShortName = PrayerNaming.shortName(snapshot.nextPrayer, snapshot.languageTag),
         )
     }
 
@@ -48,9 +53,10 @@ object WidgetContentBuilder {
      * The content as it stands at [nowEpochSeconds], worked out from the snapshot's two-day
      * schedule: next is the first entry still ahead, current the last one behind, the rows the
      * five of the day the current prayer belongs to (or the next one's, before the day's first).
-     * A start of the day before the day of writing, carried past midnight (day −1: a
-     * high-latitude Isha), can be next or current but has no rows of its own: the rows are then
-     * the day of writing's, none of them highlighted, as the Prayer screen shows it.
+     * A start of the day before the day of writing (day −1) has no rows of its own: the rows are
+     * then the day of writing's, none of them highlighted, as the Prayer screen shows it. Its last
+     * start before midnight is current from midnight until the next start, so the ring counts from
+     * it; one carried past midnight (a high-latitude Isha) is next until it begins, then current.
      * A mirror with no schedule, or one so old that every entry is behind, falls back to
      * [build], whose fields describe the moment of writing.
      */
@@ -79,6 +85,7 @@ object WidgetContentBuilder {
             },
             ringProgress = progress,
             countdownLabel = PrayerNaming.countdownLabel(next.prayer, languageTag),
+            nextPrayerShortName = PrayerNaming.shortName(next.prayer, languageTag),
         )
     }
 
