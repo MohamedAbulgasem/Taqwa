@@ -301,7 +301,7 @@ class LocalizedNotificationCopyTest {
         "tr-TR" to ("Kamet hatırlatması · ezandan 10 dakika sonra" to "Kamet hatırlatması"),
         "id-ID" to ("Pengingat iqamah · 10 menit setelah azan" to "Pengingat iqamah"),
         "ur-PK" to ("اقامت کی یاد دہانی · اذان کے 10 منٹ بعد" to "اقامت کی یاد دہانی"),
-        "bn-BD" to ("ইকামতের রিমাইন্ডার · আজানের 10 মিনিট পর" to "ইকামতের রিমাইন্ডার"),
+        "bn-BD" to ("ইকামতের রিমাইন্ডার · আযানের 10 মিনিট পর" to "ইকামতের রিমাইন্ডার"),
     )
 
     @Test

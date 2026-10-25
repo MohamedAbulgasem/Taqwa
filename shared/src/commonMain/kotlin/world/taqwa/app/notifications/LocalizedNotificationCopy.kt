@@ -275,7 +275,7 @@ class LocalizedNotificationCopy(private val format: PlatformFormat) : Notificati
                 duha = "চাশত",
                 duhaBestBody = "চাশতের নামাজের উত্তম সময় · {time} পর্যন্ত",
                 duhaStartBody = "চাশতের সময় শুরু হয়েছে · {time} পর্যন্ত",
-                iqamaBody = "ইকামতের রিমাইন্ডার · আজানের {minutes} মিনিট পর",
+                iqamaBody = "ইকামতের রিমাইন্ডার · আযানের {minutes} মিনিট পর",
                 iqamaChannel = "ইকামতের রিমাইন্ডার",
                 silent = "নীরব", notification = "নোটিফিকেশন সুর", takbir = "তাকবীর", adhan = "আযান",
             ),

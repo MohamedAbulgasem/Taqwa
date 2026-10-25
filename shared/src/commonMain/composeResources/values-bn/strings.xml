@@ -714,11 +714,11 @@
     <string name="notifications_duha_start">সময় শুরু হলে</string>
     <string name="notifications_duha_start_detail">সূর্যোদয়ের %1$s মিনিট বা তার বেশি পরে</string>
     <string name="notifications_iqama">ইকামতের রিমাইন্ডার</string>
-    <string name="notifications_iqama_subtitle">আজানের কয়েক মিনিট পরে, আপনার মসজিদের নিজস্ব সময় নয়</string>
+    <string name="notifications_iqama_subtitle">আযানের কয়েক মিনিট পরে, আপনার মসজিদের নিজস্ব সময় নয়</string>
     <string name="notifications_iqama_note">প্রতিটি নামাজের মিনিট নামাজসমূহ অংশে তার সারিতে ঠিক করুন।</string>
     <plurals name="notifications_iqama_after">
-        <item quantity="one">আজানের %1$s মিনিট পরে ইকামত</item>
-        <item quantity="other">আজানের %1$s মিনিট পরে ইকামত</item>
+        <item quantity="one">আযানের %1$s মিনিট পরে ইকামত</item>
+        <item quantity="other">আযানের %1$s মিনিট পরে ইকামত</item>
     </plurals>
     <string name="notifications_iqama_off">বন্ধ</string>
     <string name="notifications_section_sound">শব্দ</string>

@@ -172,7 +172,7 @@ Channels:
 | tr* | Kuşluk | Kuşluk namazı için en faziletli vakit · bitiş {time} | Kuşluk vakti girdi · bitiş {time} | Kamet hatırlatması · ezandan {minutes} dakika sonra | Kamet hatırlatması |
 | id* | Dhuha | Waktu terbaik untuk salat Dhuha · hingga pukul {time} | Telah masuk waktu Dhuha · hingga pukul {time} | Pengingat iqamah · {minutes} menit setelah azan | Pengingat iqamah |
 | ur* | چاشت | نمازِ چاشت کا افضل وقت · {time} تک | چاشت کا وقت شروع ہو گیا · {time} تک | اقامت کی یاد دہانی · اذان کے {minutes} منٹ بعد | اقامت کی یاد دہانی |
-| bn* | চাশত | চাশতের নামাজের উত্তম সময় · {time} পর্যন্ত | চাশতের সময় শুরু হয়েছে · {time} পর্যন্ত | ইকামতের রিমাইন্ডার · আজানের {minutes} মিনিট পর | ইকামতের রিমাইন্ডার |
+| bn* | চাশত | চাশতের নামাজের উত্তম সময় · {time} পর্যন্ত | চাশতের সময় শুরু হয়েছে · {time} পর্যন্ত | ইকামতের রিমাইন্ডার · আযানের {minutes} মিনিট পর | ইকামতের রিমাইন্ডার |
 
 \* The Lead wrote these, in the app's existing style. They are **for translator review** before
 release. The Turkish "bitiş {time}" avoids a suffix that would depend on how the clock time is read
@@ -366,9 +366,9 @@ The other five languages, for translator review:
 | duha_start | Dès que son temps est arrivé | Vakti girince | Begitu waktunya masuk | وقت شروع ہوتے ہی | সময় শুরু হলে |
 | duha_start_detail | %1$s minutes ou plus après le lever du soleil | Güneş doğduktan %1$s dakika veya daha sonra | %1$s menit atau lebih setelah terbit | طلوعِ آفتاب کے %1$s منٹ یا زیادہ بعد | সূর্যোদয়ের %1$s মিনিট বা তার বেশি পরে |
 | iqama | Rappel de l’iqama | Kamet hatırlatması | Pengingat iqamah | اقامت کی یاد دہانی | ইকামতের রিমাইন্ডার |
-| iqama_subtitle | Quelques minutes après l’adhan, pas l’heure de votre mosquée | Ezandan belirlediğiniz dakika sonra, caminizin kendi vakti değil | Beberapa menit setelah azan, bukan jadwal masjid Anda | اذان کے چند منٹ بعد، آپ کی مسجد کا اپنا وقت نہیں | আজানের কয়েক মিনিট পরে, আপনার মসজিদের নিজস্ব সময় নয় |
+| iqama_subtitle | Quelques minutes après l’adhan, pas l’heure de votre mosquée | Ezandan belirlediğiniz dakika sonra, caminizin kendi vakti değil | Beberapa menit setelah azan, bukan jadwal masjid Anda | اذان کے چند منٹ بعد، آپ کی مسجد کا اپنا وقت نہیں | আযানের কয়েক মিনিট পরে, আপনার মসজিদের নিজস্ব সময় নয় |
 | iqama_note | Réglez les minutes de chaque prière dans sa ligne, sous Prières. | Her vaktin dakikasını Vakitler altındaki satırından ayarlayın. | Atur menit tiap salat di barisnya di bawah Salat. | ہر نماز کے منٹ نمازوں کے تحت اس کی قطار میں مقرر کریں۔ | প্রতিটি নামাজের মিনিট নামাজসমূহ অংশে তার সারিতে ঠিক করুন। |
-| iqama_after | Iqama %1$s min après l’adhan | Kamet ezandan %1$s dk sonra | Iqamah %1$s menit setelah azan | اقامت اذان کے %1$s منٹ بعد | আজানের %1$s মিনিট পরে ইকামত |
+| iqama_after | Iqama %1$s min après l’adhan | Kamet ezandan %1$s dk sonra | Iqamah %1$s menit setelah azan | اقامت اذان کے %1$s منٹ بعد | আযানের %1$s মিনিট পরে ইকামত |
 | iqama_off | Désactivé | Kapalı | Nonaktif | بند | বন্ধ |
 | section_sound | SON | SES | SUARA | آواز | শব্দ |
 | section_iqama | RAPPEL DE L’IQAMA | KAMET HATIRLATMASI | PENGINGAT IQAMAH | اقامت کی یاد دہانی | ইকামতের রিমাইন্ডার |
