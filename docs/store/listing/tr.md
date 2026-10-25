@@ -19,7 +19,7 @@ NAMAZ VAKİTLERİ
 • Yakınınızdaki camilerin uyduğu takvime göre vakitler. Taqwa bu takvime sahipse onu yeniden hesaplar ve yayımlanan tablolarla gün gün karşılaştırır: karşılaştırılan her günde hiçbir namaz yayımlanan vakitten önce başlamaz. Takvim henüz tam doğrulanmadıysa Taqwa bir güvenlik payı ekler; camiler farklı takvimlere uyuyorsa ihtiyatlı vakitler gösterir, yani her namaz hepsinde vakit girdikten sonra görünür; hiçbir takvim bilinmiyorsa vakitleri ihtiyatlı biçimde hesaplar.
 • Vakitlerin kime ait olduğunu görmek için Namaz ekranındaki (i) simgesine dokunun; nasıl hesaplanıp doğrulandıkları “Bu vakitler hakkında” ekranında anlatılır. “Camimle eşleştir”, caminizin panosundaki iki vakitten takvimini bulmaya çalışır; alışılmış hesaplama yöntemleri (Dünya İslam Birliği, Mısır, Karaçi, ISNA ve daha fazlası) ve her namaz için ayrı düzeltme de mevcuttur.
 • Gecenin alışılmış açılar için fazla kısa kaldığı yüksek enlemler için kurallar.
-• Her namaz için bir bildirim: net bir uyarı tonu, bir tekbir ya da farklı seslerden birinin okuduğu ezanın ilk saniyeleri; dilerseniz öncesinde bir hatırlatmayla.
+• Her namaz için bir bildirim: net bir uyarı tonu, bir tekbir ya da farklı seslerden birinin okuduğu ezanın ilk saniyeleri; dilerseniz öncesinde bir hatırlatma, ezandan belirlediğiniz dakika sonra bir kamet hatırlatması ve en faziletli vaktinde bir kuşluk namazı hatırlatmasıyla.
 • Cuma günleri öğle vaktinde Cuma etiketi, günün vakitlerini ve sonraki vakte geri sayımı gösteren ana ekran widget’ları, miladi tarihin yanında hicri tarih.
 • Tercihinize göre 24 saat ya da 12 saat biçimi.
 
@@ -100,7 +100,7 @@ kuran,vakitleri,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,islam,m�
 
 ## Screenshot captions (her biri tek kısa satır, çerçeveli ekran görüntüsünün üstünde)
 1. Bulunduğunuz yerin namaz vakti
-2. Ezan ve öncesinde hatırlatma
+2. Ezan, öncesinde ve kamet için hatırlatma
 3. Kur’an’ın tamamı, mealiyle
 4. Mushaf’tan okur gibi okuyun
 5. On kariyi çevrimdışı dinleyin

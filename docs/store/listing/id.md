@@ -16,9 +16,9 @@ WAKTU SALAT
 • Waktu menurut jadwal yang diikuti masjid di sekitar Anda. Jika Taqwa memiliki jadwal itu, Taqwa menghitungnya ulang dan mencocokkannya hari demi hari dengan jadwal terbitannya: pada setiap hari yang diperiksa, tidak ada salat yang dimulai sebelum waktu yang diterbitkan. Jika suatu jadwal belum diperiksa sepenuhnya, Taqwa menambahkan margin pengaman; jika masjid-masjid mengikuti jadwal yang berbeda, Taqwa menampilkan waktu ihtiyat, yaitu setiap salat setelah waktunya masuk di semua jadwal itu; dan jika tidak ada jadwal yang diketahui, Taqwa menghitung dengan memilih yang lebih aman.
 • Ketuk tombol (i) di layar Salat untuk melihat asal waktu ini, dan “Tentang waktu ini” untuk melihat cara waktu ini dihitung dan diperiksa. “Cocokkan dengan masjid saya” mencari jadwal masjid Anda dari dua waktu di papannya, dan metode perhitungan yang biasa (Liga Muslim Dunia, Mesir, Karachi, ISNA, dan lainnya) serta penyesuaian per salat juga tersedia.
 • Aturan untuk lintang tinggi, ketika malam terlalu pendek untuk sudut yang biasa.
-• Notifikasi untuk setiap salat: nada yang jelas, takbir, atau awal azan dalam beberapa pilihan suara, dengan pengingat sebelumnya bila Anda mau.
+• Notifikasi tiap salat: nada jelas, takbir, atau awal azan dengan pilihan suara, serta pengingat opsional sebelumnya, saat iqamah (menitnya Anda atur), dan saat Dhuha.
 • Tanda Jumat pada Dzuhur hari Jumat, widget layar utama dengan waktu salat hari ini dan hitung mundur ke salat berikutnya, serta tanggal Hijriah di samping tanggal Masehi.
-• Format waktu 24 jam atau 12 jam, sesuai pilihan Anda.
+• Format waktu 24 jam atau 12 jam.
 
 AL-QUR’AN
 • Teks Utsmani lengkap, dengan huruf yang sama seperti Mushaf Madinah, serta tata letak halaman tradisional ketika Anda ingin membaca seperti dari Mushaf cetak.
@@ -97,7 +97,7 @@ Yang baru di versi 1.1.0:
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Waktu salat di tempat Anda
-2. Azan, dan pengingat sebelumnya
+2. Azan, pengingat sebelumnya dan saat iqamah
 3. Al-Qur’an lengkap & terjemahan
 4. Baca seperti dari Mushaf
 5. Dengarkan sepuluh qari, offline

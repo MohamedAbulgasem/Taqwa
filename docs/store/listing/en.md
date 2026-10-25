@@ -21,7 +21,7 @@ PRAYER TIMES
 • Times from the timetable the mosques near you follow. Where Taqwa holds it, it reproduces it and checks it day by day against the published tables: on every day checked, no prayer starts before the published time. Where a timetable is not yet fully checked, Taqwa adds a safety margin; where mosques follow different timetables, it shows cautious times, each prayer once all have begun it; and where no timetable is known, it calculates on the safe side.
 • Tap the (i) on the Prayer screen to see whose times these are, and About these times for how they are made and checked. Match my mosque looks for your mosque's timetable from two times on its board, and the usual calculation methods (Muslim World League, Egyptian, Karachi, ISNA and more) and a per-prayer adjustment are there too.
 • Rules for high latitudes, where the night is too short for the usual angles.
-• A notification for each prayer: a clear tone, a takbir, or the opening of the adhan in a choice of voices, with an optional reminder before it.
+• A notification for each prayer: a clear tone, a takbir, or the opening of the adhan in a choice of voices, with an optional reminder before it, an Iqama reminder a chosen number of minutes after the adhan, and a Duha reminder at its best time.
 • A Jumu'ah pill on Friday's Dhuhr, home-screen widgets with today's times and the countdown to the next prayer, and the Hijri date alongside the Gregorian one.
 • A 24-hour or 12-hour clock, as you prefer.
 
@@ -102,7 +102,7 @@ What's new in 1.1.0:
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are
-2. The adhan, and a reminder before it
+2. The adhan, with reminders before it and for the iqama
 3. The whole Quran, with translation
 4. Read as from the Mushaf
 5. Listen to ten reciters, offline

@@ -19,9 +19,9 @@ HORAIRES DE PRIÈRE
 • Les horaires du calendrier que suivent les mosquées proches de chez vous. Là où Taqwa le détient, elle le reproduit et le vérifie jour après jour d’après les tableaux publiés : pour chaque jour vérifié, aucune prière ne commence avant l’heure publiée. Là où un calendrier n’est pas encore entièrement vérifié, Taqwa ajoute une marge de sécurité ; là où les mosquées suivent des calendriers différents, elle affiche des horaires par précaution, chaque prière une fois que tous l’ont commencée ; et là où aucun calendrier n’est connu, elle calcule avec prudence.
 • Le (i) de l’écran Prière indique de qui viennent ces horaires, et « À propos de ces horaires », comment ils sont établis et vérifiés. « Aligner sur ma mosquée » cherche le calendrier de votre mosquée d’après deux horaires de son tableau ; les méthodes de calcul habituelles (Ligue islamique mondiale, égyptienne, Karachi, ISNA…) et un ajustement par prière sont aussi proposés.
 • Des règles pour les hautes latitudes, où la nuit est trop courte pour les angles habituels.
-• Une notification pour chaque prière : une tonalité claire, un takbir ou le début de l’adhan, en plusieurs voix au choix, et un rappel facultatif avant.
+• Une notification par prière (tonalité claire, takbir ou début de l’adhan, en plusieurs voix) et des rappels facultatifs avant, à l’iqama (délai au choix) et à la Douha.
 • Une pastille Joumou’a sur le Dhuhr du vendredi, des widgets d’écran d’accueil avec les horaires du jour et le compte à rebours de la prochaine prière, et la date hégirienne à côté de la grégorienne.
-• Le format 24 ou 12 heures, au choix.
+• Le format 24 ou 12 heures.
 
 LE CORAN
 • Le texte othmanien complet, dans la graphie du Mushaf de Médine, avec la mise en page traditionnelle pour lire comme dans le Mushaf imprimé.
@@ -100,7 +100,7 @@ Nouveautés de la 1.1.0 :
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Les horaires là où vous êtes
-2. L’adhan, et un rappel avant
+2. L’adhan, son rappel, et celui de l’iqama
 3. Tout le Coran, avec traduction
 4. Lisez comme dans le Mushaf
 5. Dix récitateurs, hors ligne
