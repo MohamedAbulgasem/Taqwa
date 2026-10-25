@@ -1,7 +1,7 @@
 {
   "entry": "eg.esa",
   "class": "B",
-  "engineHash": "43f6c2fb22064d7c",
+  "engineHash": "cf7bb2ee37267bdd",
   "broken": 0,
   "places": 30,
   "first": "2025-01-08",
@@ -48,12 +48,12 @@
       "checked": 3538,
       "early": 0,
       "late": {
-        "0": 2098,
-        "1": 1396,
+        "0": 2085,
+        "1": 1409,
         "2": 44,
         "3+": 0
       },
-      "exactShare": 0.593,
+      "exactShare": 0.5893,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
@@ -158,12 +158,12 @@
         "checked": 2551,
         "early": 0,
         "late": {
-          "0": 1525,
-          "1": 999,
+          "0": 1518,
+          "1": 1006,
           "2": 27,
           "3+": 0
         },
-        "exactShare": 0.5978,
+        "exactShare": 0.5951,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
@@ -1820,12 +1820,12 @@
           "checked": 106,
           "early": 0,
           "late": {
-            "0": 104,
-            "1": 2,
+            "0": 91,
+            "1": 15,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.9811,
+          "exactShare": 0.8585,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",

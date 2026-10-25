@@ -455,9 +455,12 @@ Every held-out town is within 1 min, and so is Cairo on all its 402 days.
 
 **Towns printed from an off point** (fitted on their own days, nothing held out there). Kharga's ESA
 point runs about 70 s later than the town and Taba's about 2 min later: their starts are their own
-(Kharga +40..+46, Taba +96..+99), their sunrise and end of eating the national ones. Ras Gharib's runs
+(Kharga +42..+48, Taba +96..+99), their sunrise and end of eating the national ones. Ras Gharib's runs
 about 65 s earlier: its starts are the national ones, its sunrise −42 and end of eating −49 its own.
-Kharga and Ras Gharib stay within 2 min.
+Kharga and Ras Gharib stay within 2 min. Kharga's Dhuhr was +40 until 25 October 2026 (ruling R159), a
+minute before ESA's own printed Dhuhr on 2–4 November 2026. ESA's noon at its Kharga point runs 68 to 70
+s after the town's every day and its almanac sun up to 4 s after this core's in early November, so its
+rule asks up to 43 s over 2026–2028, on 2–4 November each year: +48.
 
 **Exception (unit Taba, 3 min, sunrise and end of eating).** ESA computes Taba's table about half a
 degree west of Taba, and Taqwa keeps Taba's own earlier sunrise and dawn (the §3.5 floor): 3 min

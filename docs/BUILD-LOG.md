@@ -5617,3 +5617,64 @@ Checked on the integrated tree (`engine-owner-decisions`, the last code change t
 
 Not run here: the app on a phone, an emulator or the iOS simulator's screens (the iOS tests ran on the simulator), and
 the year's Timetable timing on them. The engine change ships with the next update.
+
+## Kharga's Dhuhr (25 October) — ruling R159
+
+Branch `fix/kharga-dhuhr`, off main e874f221. Not pushed.
+
+The November round's scratch gate (ESA's own daily page for November 2026, read by hand on 25 October, not yet
+rows) found one red cell group: Kharga's Dhuhr a minute before ESA's printed Dhuhr on 2, 3 and 4 November 2026.
+Every other town and event was green.
+
+**Why.** ESA prints Kharga's table from a point about 0.29° west of the town (25.41 N 30.26 E, fitted). Noon
+follows longitude alone, so ESA's noon there runs 68 to 70 s after the town's on every day. ESA's own sun is an
+almanac formula (the one PrayTimes uses: mean anomaly 357.529° + 0.98560028° a day, mean longitude 280.459° +
+0.98564736° a day, the sun at local noon): with it every held Dhuhr of all 30 towns comes from one point per town,
+to within a second. Against this core's noon it runs −2.1 to +3.6 s, highest on 2–4 November each year. Kharga's
+own margins were fitted on its 45 held days (Wayback captures from 2024 to 2026 and Dar al-Ifta's September), none
+of them in early November, and gave Dhuhr +40. ESA's November asks 42 s.
+
+**R159** (not the owner's; the gate, as R26): Kharga's Dhuhr margin is +48. ESA's rule, its almanac noon at its
+Kharga point with that point at the latest the held days allow, asks up to 43 s over 2026–2028, on 2–4 November
+each year; +48 adds the Conventions' 5 s. Nothing else moves: Kharga's other starts and every other town keep
+their margins. The test (`GulfEgyptProofTest`, Kharga's Dhuhr against ESA's latest noon) checks every day of
+2026–2028 against the town's noon plus 74 s (70 + 4) to the nearest minute, with no printed time (R69). It is red
+at +40, first on 3 January 2026, and green from +44.
+
+**Other towns, months and years.**
+- Dhuhr, all 30 units, 2026–2028, ESA's rule against the engine: early only at Kharga. At the top of its allowed
+  offset that is 14 days, 2–4 November among them every year; none at +48.
+- ESA's page serves any day of the current year through its calendar (2027 is not served). Read for every day of
+  2026 at its 29 towns (scratch, not archived) and gated with this branch together with the November capture:
+  119 rows, 11,218 place-days. Kharga is green on every day. Three national cells are not:
+  - Rafah's Fajr: 2 days in June, 1 min early.
+  - Sidi Barrani's Isha: 14 days from mid-May to early August, 1 min early.
+  - Sidi Barrani's end of eating: 20 days from late April to late July, 1 min late.
+
+  Those towns were held out on September to November only, and their ESA points sit off the app's in latitude:
+  ESA's Isha at Sidi Barrani against the town's drifts 112 s through the year. They are the national margins'
+  business, not R159's, and are left for the Lead with the 2026 rows (below).
+- Where the Conventions' 5 s has run out on ESA's 2026 days, without anything early: Kharga's Maghrib (0 s spare),
+  Asr (1), Fajr and Isha (3), all in November (Asr also 29 December); Taba's Fajr (0), Maghrib and Isha (1),
+  Dhuhr (3) and Asr (4); Ras Gharib's sunrise (1); Aswan's sunrise (2) and Fajr (3).
+
+**Open for the owner and the Lead.** ESA's 2026 year as archive rows (re-read with the capture script, which keeps
+the raw pages), and with them the refits the Conventions ask:
+- Rafah's Fajr +11;
+- Sidi Barrani's Isha +15 and end of eating −20, as an off-point unit like Ras Gharib, or as new national margins;
+- Kharga's Fajr +47, Asr +46, Maghrib +51 and Isha +46;
+- Taba's Fajr +101, Dhuhr and Asr +99, Maghrib +103 and Isha +100, with the edge's 105 s checked against them.
+
+With this branch nothing is early or late on ESA's page from now to the end of 2026. The deadlines:
+- Rafah and Sidi Barrani before 28 April 2027. Their cells fell between 28 April and early August 2026, so the
+  same weeks of 2027 are the first that could repeat them.
+- Kharga before November 2027: its thin starts fall in November (Asr also 29 December). They cannot be projected
+  the way its Dhuhr was. The almanac formula gives ESA's noon, but not its angle-based times: at the builder's
+  Kharga point, ESA's printed Fajr, Asr, Maghrib and Isha on its 2026 page fall up to 5 s outside the half-minute
+  rounding of the formula (Dhuhr 2 s), and the review's own fit found no one point that gives all six within a
+  second (up to 8 s). So nothing shows November 2027 or 2028 green, and with Maghrib at 0 s spare, a Kharga
+  Maghrib a minute early in November 2027 is possible.
+- Taba as soon as the rows land: its thin days run through the year (Asr 3 January, Dhuhr 18 March and 25
+  October, Maghrib 13 October, Fajr and Isha in November 2026).
+
+The review of R159 (25 October) checked both lists and left them here as they stand.

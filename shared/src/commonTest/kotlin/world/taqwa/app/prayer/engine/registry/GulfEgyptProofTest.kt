@@ -3,14 +3,20 @@ package world.taqwa.app.prayer.engine.registry
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.offsetAt
 import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
 import world.taqwa.app.prayer.engine.DayPipeline
+import world.taqwa.app.prayer.engine.astro.SunClock
+import world.taqwa.app.prayer.engine.astro.SunModel
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.data.UmmAlQuraDates
+import kotlin.math.floor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -191,6 +197,24 @@ class GulfEgyptProofTest {
         assertTrue(edge.endOfEatingMarginSeconds <= rasGharib.endOfEatingMarginSeconds)
     }
 
+    @Test
+    fun `kharga's dhuhr is never before esa's noon west of the town at its latest rounding`() {
+        // ESA's Kharga noon runs 68 to 70 s after the town's every day (noon follows longitude alone) and its own sun
+        // puts noon up to 4 s after this engine's, in early November (ruling R159): its printed Dhuhr is at most the
+        // town's noon plus 74 s, to the nearest minute.
+        val kharga = place(25.45101, 30.54653, "Africa/Cairo", "EG")
+        val zone = TimeZone.of(kharga.zoneId)
+        var date = LocalDate(2026, 1, 1)
+        while (date.year <= 2028) {
+            val offset = zone.offsetAt(date.atTime(12, 0).toInstant(zone)).totalSeconds
+            val noon = SunClock(kharga.lat, kharga.lon, date, offset, SunModel.EXACT).transit()
+            val latest = floor((noon + ESA_KHARGA_NOON_LAG + 30) / 60).toLong() * 60
+            val shown = day("eg.esa", kharga, date).dhuhr.epochSeconds
+            assertTrue(shown >= latest, "Kharga's Dhuhr on $date is ${(latest - shown) / 60} min before ESA's latest")
+            date = date.plus(1, DateTimeUnit.DAY)
+        }
+    }
+
     // The principle every fitted margin keeps (spec §3.5).
 
     @Test
@@ -235,5 +259,10 @@ class GulfEgyptProofTest {
             assertEquals(withAllowance, Registry.byId(id)?.method?.margins, id)
             assertEquals(SAFE_END, Registry.byId(id)?.method?.endOfEatingMarginSeconds, id)
         }
+    }
+
+    private companion object {
+        /** ESA's Kharga noon after the town's, at most: its point's 70 s and its sun's 4 s (ruling R159). */
+        const val ESA_KHARGA_NOON_LAG = 74.0
     }
 }

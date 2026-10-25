@@ -40,10 +40,17 @@ import world.taqwa.app.prayer.engine.registry.widened
  * five above at their town centres). Three towns' tables come from points well off the town, fitted
  * on their own 2025–2026 days (nothing held out there), and the engine keeps the later start and the
  * earlier end of the table and the method at the town (spec §3.5): Kharga's ESA point runs about
- * 70 s later and Taba's about 2 min later, so their starts are their own (Kharga +40..+46, Taba
+ * 70 s later and Taba's about 2 min later, so their starts are their own (Kharga +42..+48, Taba
  * +96..+99) and their sunrise and end of eating the national ones; Ras Gharib's runs about 65 s
  * earlier, so its starts are the national ones and its sunrise (−42) and end of eating (−49) its
  * own; Taba's own sunrise and dawn run up to 3 min before its table's (a recorded exception).
+ *
+ * Kharga's Dhuhr (ruling R159): ESA's noon there runs 68 to 70 s after the town's, the same every
+ * day (noon follows longitude alone), and ESA's own sun (an almanac formula, which gives every held
+ * Dhuhr of all 30 towns from one point each, within a second) puts noon up to 4 s after this core's
+ * in the first days of November. Fitted on Kharga's 45 held days, none of them those, Dhuhr was
+ * +40 and a minute before ESA's printed one on 2–4 November 2026. ESA's rule asks up to 43 s over
+ * 2026–2028, on 2–4 November each year: +48 with the Conventions' 5 s.
  *
  * Beyond every unit ESA's own point is not known and may be that far off: starts
  * [EDGE_START_SECONDS] s later (Taba's own margins exceed the national ones by up to 103 s, their
@@ -88,7 +95,7 @@ object Egypt {
             town("Rafah", 31.28204, 34.23869),
             town("Sharm El Sheikh", 27.91582, 34.32995),
             town("Hurghada", 27.25738, 33.81291),
-            offPoint("Kharga", 25.45101, 30.54653, margins(start = 0, sunrise = 0, fajr = 45, dhuhr = 40, asr = 42, maghrib = 46, isha = 44), endOfEating = 5),
+            offPoint("Kharga", 25.45101, 30.54653, margins(start = 0, sunrise = 0, fajr = 45, dhuhr = 48, asr = 42, maghrib = 46, isha = 44), endOfEating = 5),
             town("Mut", 25.48742, 28.97918),
             town("Bawiti", 28.34827, 28.86936),
             town("Luxor", 25.69893, 32.6421),

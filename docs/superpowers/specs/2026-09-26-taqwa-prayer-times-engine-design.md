@@ -772,3 +772,11 @@ R155–R157 R130–R132.)
   where the gate found the rule, now ends at Diyanet's Isha), so no stamp carries the key yet.
   A future "ends by" line (when a prayer's time ends, if the app or the site shows one) shows, on a day with no
   Maghrib end, nothing for Maghrib, or "{the member}'s Isha has begun", never a later member's end.
+- **R159** (not the owner's; found by the November round's scratch gate of 25 Oct 2026): Kharga's Dhuhr
+  margin is +48 s, not +40. ESA prints Kharga's table from a point about 0.29° west of the town, so its noon there
+  runs 68 to 70 s after the town's every day, and ESA's own sun (an almanac formula) puts noon up to 4 s after this
+  core's on 2–4 November each year. Fitted on Kharga's 45 held days, none of them in early November, Dhuhr +40 was
+  a minute before ESA's printed Dhuhr on 2–4 November 2026. ESA's rule asks up to 43 s over 2026–2028; +48 adds the
+  Conventions' 5 s. Nothing else moves. `GulfEgyptProofTest` holds every day of 2026–2028 at or after the town's
+  noon plus 74 s to the nearest minute, with no printed time (R69). The follow-ups ESA's 2026 page leaves (Rafah's
+  Fajr, Sidi Barrani's Isha and end of eating, Kharga's other starts, Taba) and their deadlines are in the build log.
