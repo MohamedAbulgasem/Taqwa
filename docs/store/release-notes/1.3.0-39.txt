@@ -1,0 +1,77 @@
+<en-GB>
+What's new in 1.3.0:
+• Duha and Iqama reminders, if you want them
+• The times card says where its times come from
+• Qibla on phones without a compass
+• Widgets: full prayer names on the lock screen, and exact countdowns
+• The player no longer hides the end of the surah and juz lists
+• iPhone: downloading the whole Quran never fills the phone
+• Android: how to add a widget by hand where the app can't
+• A more careful Maghrib in cautious places
+</en-GB>
+<ar>
+الجديد في الإصدار 1.3.0:
+• تذكير بالضحى وتذكير بالإقامة، إن شئت
+• بطاقة المواقيت تبيّن مصدر أوقاتها
+• القبلة في الهواتف التي لا بوصلة فيها
+• الأدوات: اسم الصلاة كاملًا على شاشة القفل، وعدّ تنازلي دقيق
+• المشغّل لم يعد يحجب آخر قائمتَي السور والأجزاء
+• آيفون: تنزيل المصحف كاملًا لا يملأ الهاتف أبدًا
+• أندرويد: خطوات إضافة الأداة يدويًا حيث يتعذّر ذلك على التطبيق
+• مغرب أحوط في الأماكن ذات الأوقات الأحوط
+</ar>
+<fr-FR>
+Nouveautés de la 1.3.0 :
+• Rappels de Douha et de l’iqama, au choix
+• La carte des horaires indique leur source
+• La qibla même sans boussole
+• Widgets : nom complet de la prière sur l’écran verrouillé, comptes à rebours exacts
+• Le lecteur ne cache plus la fin des listes de sourates et de juz
+• iPhone : télécharger tout le Coran ne remplit jamais le téléphone
+• Android : ajouter un widget soi-même si l’application ne le peut pas
+• Un Maghrib plus prudent là où les horaires sont par précaution
+</fr-FR>
+<tr-TR>
+1.3.0 sürümündeki yenilikler:
+• İsteğe bağlı kuşluk ve kamet hatırlatmaları
+• Vakit kartı, vakitlerin nereden geldiğini gösterir
+• Pusulası olmayan telefonlarda da kıble
+• Widget’lar: kilit ekranında vaktin tam adı ve dakikası dakikasına geri sayım
+• Oynatıcı artık sure ve cüz listelerinin sonunu kapatmıyor
+• iPhone: Kur’an’ın tamamını indirmek telefonu asla doldurmaz
+• Android: uygulama widget ekleyemiyorsa elle ekleme adımları
+• İhtiyatlı vakitli yerlerde daha ihtiyatlı akşam vakti
+</tr-TR>
+<id>
+Yang baru di versi 1.3.0:
+• Pengingat Dhuha dan iqamah, kalau Anda mau
+• Kartu waktu salat menyebutkan asal waktunya
+• Kiblat di ponsel tanpa kompas
+• Widget: nama salat lengkap di layar kunci, dan hitung mundur yang tepat
+• Pemutar tidak lagi menutupi akhir daftar surah dan juz
+• iPhone: mengunduh seluruh Al-Qur’an tidak akan memenuhi ponsel
+• Android: cara menambahkan widget sendiri bila aplikasi tidak bisa
+• Waktu Maghrib lebih hati-hati di tempat dengan waktu ihtiyat
+</id>
+<ur>
+1.3.0 میں نیا کیا ہے:
+• چاہیں تو چاشت اور اقامت کی یاد دہانیاں
+• اوقات کا کارڈ بتاتا ہے کہ اس کے اوقات کہاں سے ہیں
+• بغیر قطب نما والے فونز پر بھی قبلہ
+• ویجٹ: لاک اسکرین پر نماز کا پورا نام، اور منٹ تک درست الٹی گنتی
+• پلیئر اب سورتوں اور پاروں کی فہرست کا آخر نہیں چھپاتا
+• آئی فون: پورا قرآن ڈاؤن لوڈ کرنے سے فون کبھی نہیں بھرتا
+• اینڈرائیڈ: جہاں ایپ ویجٹ نہ لگا سکے، وہاں اسے خود لگانے کا طریقہ
+• احتیاطی اوقات والی جگہوں میں زیادہ محتاط مغرب
+</ur>
+<bn-BD>
+1.3.0 সংস্করণে যা নতুন:
+• চাইলে চাশত ও ইকামতের রিমাইন্ডার
+• সময়ের কার্ড জানায় তার সময় কোথা থেকে আসে
+• কম্পাস নেই এমন ফোনেও কিবলা
+• উইজেট: লক স্ক্রিনে নামাজের পুরো নাম, আর মিনিট পর্যন্ত নির্ভুল কাউন্টডাউন
+• প্লেয়ার আর সূরা ও পারার তালিকার শেষটুকু ঢেকে রাখে না
+• আইফোন: পুরো কুরআন ডাউনলোড করলেও ফোন কখনো ভরে যায় না
+• অ্যান্ড্রয়েড: অ্যাপ উইজেট যোগ করতে না পারলে নিজে যোগ করার ধাপ
+• সতর্কতামূলক সময়ের জায়গায় আরও সাবধানী মাগরিব
+</bn-BD>
