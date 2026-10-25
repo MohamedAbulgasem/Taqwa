@@ -1,10 +1,20 @@
 package world.taqwa.app.recitation
 
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import okio.IOException
+import world.taqwa.app.crash.ReadOnlyFileSystem
+import kotlin.coroutines.cancellation.CancellationException
 import okio.Buffer
 import okio.Path.Companion.toPath
 import okio.Source
@@ -14,6 +24,7 @@ import kotlin.random.Random
 import kotlin.random.nextULong
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -245,8 +256,266 @@ class DownloadLoopTest {
         assertNull(loop().precheck(asset(), allowMetered = false))
     }
 
+    // ── B2: room for what accepted downloads still have to write ───────────────────────
+
+    private val manifestSizes = mutableMapOf<DownloadKey, Long>()
+
+    private fun sized(n: Int, mib: Long) = SurahAsset(n = n, bytes = mib * MIB, sha256 = "00".repeat(32))
+
+    /**
+     * What iOS's start() does with each surah of a request, in order: the decision is [admit],
+     * and an accepted surah is reported Queued (which is what reserves its bytes for the next
+     * check) and a refused one Failed, as start() reports them.
+     */
+    private suspend fun DownloadLoop.request(
+        batch: List<SurahAsset>,
+        states: MutableMap<DownloadKey, DownloadState> = mutableMapOf(),
+        reciterId: String = reciter,
+    ): List<DownloadFailure?> {
+        // The manifest knows every surah's size, those of earlier requests included.
+        manifestSizes += batch.associate { DownloadKey(reciterId, it.n) to it.bytes }
+        return batch.map { asset ->
+            val at = DownloadKey(reciterId, asset.n)
+            when (val admission = admit(at, asset, false, states) { manifestSizes[it] ?: OTHER_SIZES[it] }) {
+                Admission.OnItsWay -> null
+                is Admission.Refused -> admission.reason.also { states[at] = DownloadState.Failed(it) }
+                Admission.Start -> null.also { states[at] = DownloadState.Queued }
+            }
+        }
+    }
+
+    @Test
+    fun precheckCountsWhatAcceptedDownloadsStillHaveToWrite() = runTest {
+        val loop = loop(conditions = FakeConditions(free = HEADROOM + content.size + 1_000))
+        assertNull(loop.precheck(asset(), allowMetered = false, reservedBytes = 0L))
+        assertNull(loop.precheck(asset(), allowMetered = false, reservedBytes = 1_000L))
+        assertEquals(DownloadFailure.NOT_ENOUGH_SPACE, loop.precheck(asset(), allowMetered = false, reservedBytes = 1_001L))
+    }
+
+    @Test
+    fun theNetworkIsStillAskedBeforeTheReservation() = runTest {
+        val loop = loop(conditions = FakeConditions(kind = NetworkKind.NONE, free = 0L))
+        assertEquals(DownloadFailure.NO_NETWORK, loop.precheck(asset(), allowMetered = false, reservedBytes = 10L * 1024 * MIB))
+    }
+
+    /** iOS answers Long.MAX_VALUE when it cannot tell how full the volume is: nothing overflows. */
+    @Test
+    fun aVolumeThatCannotSayHowFullItIsIsNeverShortOfRoom() = runTest {
+        val loop = loop(conditions = FakeConditions(free = Long.MAX_VALUE))
+        assertNull(loop.precheck(asset(), allowMetered = false, reservedBytes = 5L * 1024 * MIB))
+    }
+
+    @Test
+    fun aQueuedSurahReservesTheWholeSurahAndADownloadingOneWhatIsLeft() {
+        val k1 = DownloadKey(reciter, 1)
+        val k2 = DownloadKey(reciter, 2)
+        val k3 = DownloadKey(reciter, 3)
+        val k4 = DownloadKey(reciter, 4)
+        val states = mapOf(
+            k1 to DownloadState.Queued,
+            k2 to DownloadState.Downloading(30, 100),
+            k3 to DownloadState.Verifying,
+            k4 to DownloadState.Failed(DownloadFailure.SERVER),
+        )
+        val sizes = mapOf(k1 to 50L, k2 to 100L, k3 to 100L, k4 to 999L)
+        assertEquals(120L, stillToLand(states) { sizes[it] })
+    }
+
+    @Test
+    fun aDownloadPastItsSizeGivesNoRoomBack() {
+        assertEquals(0L, stillToLand(mapOf(key to DownloadState.Downloading(120, 100))) { 100L })
+    }
+
+    /** The delegate's fallback total is wrong once the size map has lost its entry; the manifest is not. */
+    @Test
+    fun theManifestSizeBeatsAReportedTotalThatLostItsSize() {
+        val lost = mapOf(key to DownloadState.Downloading(10 * MIB, 10 * MIB - 1))
+        assertEquals(290 * MIB, stillToLand(lost) { 300 * MIB })
+        assertEquals(0L, stillToLand(lost) { null })
+        assertEquals(0L, stillToLand(mapOf(key to DownloadState.Queued)) { null })
+    }
+
+    @Test
+    fun aReciterLargerThanTheFreeSpaceIsAcceptedOnlyAsFarAsItFits() = runTest {
+        val loop = loop(conditions = FakeConditions(free = 600 * MIB))
+        val batch = listOf(sized(1, 100), sized(2, 250), sized(3, 120), sized(4, 40), sized(5, 20), sized(6, 10), sized(7, 200))
+        val states = mutableMapOf<DownloadKey, DownloadState>()
+
+        val answers = loop.request(batch, states)
+
+        val no = DownloadFailure.NOT_ENOUGH_SPACE
+        assertEquals(listOf(null, null, no, null, no, null, no), answers)
+        val accepted = batch.filter { states[DownloadKey(reciter, it.n)] == DownloadState.Queued }.sumOf { it.bytes }
+        assertEquals(400 * MIB, accepted)
+    }
+
+    /** A refusal never stops the batch: a smaller surah further on can still fit. */
+    @Test
+    fun aSmallerLaterSurahStillFitsAfterABigOneWasRefused() = runTest {
+        val loop = loop(conditions = FakeConditions(free = 600 * MIB))
+        val answers = loop.request(listOf(sized(1, 350), sized(2, 100), sized(3, 50)))
+        assertEquals(listOf(null, DownloadFailure.NOT_ENOUGH_SPACE, null), answers)
+    }
+
+    @Test
+    fun theHeadroomIsKeptOnceForTheWholeBatch() = runTest {
+        val loop = loop(conditions = FakeConditions(free = HEADROOM + 300 * MIB))
+        val states = mutableMapOf<DownloadKey, DownloadState>()
+        assertEquals(listOf(null, null, null), loop.request(listOf(sized(1, 100), sized(2, 100), sized(3, 100)), states))
+        val oneByte = SurahAsset(n = 4, bytes = 1L, sha256 = "00".repeat(32))
+        assertEquals(listOf(DownloadFailure.NOT_ENOUGH_SPACE), loop.request(listOf(oneByte), states))
+    }
+
+    /**
+     * Another reciter's downloads still in flight are counted too: 70 MiB left of one that is
+     * downloading and 50 MiB of one queued, while a failed one and one being verified hold nothing.
+     */
+    @Test
+    fun aSecondRequestCountsWhatTheFirstStillHasToFetch() = runTest {
+        val loop = loop(conditions = FakeConditions(free = 450 * MIB))
+        val states = OTHER_IN_FLIGHT.toMutableMap()
+        assertEquals(listOf(null), loop.request(listOf(sized(1, 130)), states))
+
+        val again = OTHER_IN_FLIGHT.toMutableMap()
+        assertEquals(listOf(DownloadFailure.NOT_ENOUGH_SPACE), loop.request(listOf(SurahAsset(n = 1, bytes = 131 * MIB, sha256 = "00".repeat(32))), again))
+    }
+
+    /**
+     * A surah already on its way is left to the task carrying it, room or not: asking again would
+     * book its room twice and write a refusal over a live task. A failed one is asked again.
+     */
+    @Test
+    fun aSurahAlreadyOnItsWayIsLeftToItsTask() = runTest {
+        val loop = loop(conditions = FakeConditions(free = 0L))
+        for (state in listOf(DownloadState.Queued, DownloadState.Downloading(1, 2), DownloadState.Verifying)) {
+            assertEquals(Admission.OnItsWay, loop.admit(key, asset(), false, mapOf(key to state)) { null }, "$state")
+        }
+        assertEquals(
+            Admission.Refused(DownloadFailure.NOT_ENOUGH_SPACE),
+            loop.admit(key, asset(), false, mapOf(key to DownloadState.Failed(DownloadFailure.NOT_ENOUGH_SPACE))) { null },
+        )
+    }
+
+    // ── B11: a commit that throws is a reason, never an exception ───────────────────────
+
+    private fun libraryOver(store: DataStore<Preferences>, files: okio.FileSystem = fs) = RecitationLibrary(paths, store, files)
+
+    private fun freshStore(): DataStore<Preferences> = PreferenceDataStoreFactory.createWithPath {
+        "/tmp/taqwa-download-${Random.nextULong()}.preferences_pb".toPath()
+    }
+
+    @Test
+    fun aCommitThatCannotMoveThePartOnAFullDiskIsNotEnoughSpace() = runTest {
+        writePart(content)
+        val loop = DownloadLoop(libraryOver(freshStore(), ReadOnlyFileSystem(fs)), FakeServer(content), FakeConditions(free = 0L), fs)
+
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.NOT_ENOUGH_SPACE), loop.finish(key, asset()))
+        assertTrue(fs.exists(part))
+        assertFalse(fs.exists(file))
+        fs.checkNoOpenFiles()
+    }
+
+    @Test
+    fun aCommitThatCannotMoveThePartWithRoomToSpareIsAServerFailure() = runTest {
+        writePart(content)
+        val loop = DownloadLoop(libraryOver(freshStore(), ReadOnlyFileSystem(fs)), FakeServer(content), FakeConditions(), fs)
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.SERVER), loop.finish(key, asset()))
+    }
+
+    /** The rule a lone Retry's precheck would apply, so the chip keeps its sentence when Retry is pressed. */
+    @Test
+    fun aFailedCommitIsJudgedByTheRuleARetryWouldBe() = runTest {
+        writePart(content)
+        val short = FakeConditions(free = HEADROOM + content.size - 1)
+        val enough = FakeConditions(free = HEADROOM + content.size)
+        val readOnly = libraryOver(freshStore(), ReadOnlyFileSystem(fs))
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.NOT_ENOUGH_SPACE), DownloadLoop(readOnly, FakeServer(content), short, fs).finish(key, asset()))
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.SERVER), DownloadLoop(readOnly, FakeServer(content), enough, fs).finish(key, asset()))
+    }
+
+    /**
+     * The registry write fails after the move: the surah is at its own name, unregistered, and the
+     * library's reconcile adopts it at the next start. Nothing is cleaned up by the catch.
+     */
+    @Test
+    fun aRegistryThatCannotBeWrittenIsReportedRatherThanThrown() = runTest {
+        writePart(content)
+        val full = FailingDataStore { throw IOException("No space left on device") }
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.SERVER), DownloadLoop(libraryOver(full), FakeServer(content), FakeConditions(), fs).finish(key, asset()))
+        assertTrue(fs.exists(file))
+        assertFalse(fs.exists(part))
+
+        fs.delete(file)
+        writePart(content)
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.NOT_ENOUGH_SPACE), DownloadLoop(libraryOver(full), FakeServer(content), FakeConditions(free = 0L), fs).finish(key, asset()))
+    }
+
+    @Test
+    fun freeSpaceThatCannotBeReadAfterAFailedCommitIsAServerFailure() = runTest {
+        writePart(content)
+        val conditions = FakeConditions(freeError = IOException("stat"))
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.SERVER), DownloadLoop(libraryOver(freshStore(), ReadOnlyFileSystem(fs)), FakeServer(content), conditions, fs).finish(key, asset()))
+    }
+
+    @Test
+    fun aCancellationExceptionFromTheCommitIsRethrown() = runTest {
+        writePart(content)
+        val stopped = FailingDataStore { throw CancellationException("stopped") }
+        assertFailsWith<CancellationException> { DownloadLoop(libraryOver(stopped), FakeServer(content), FakeConditions(), fs).finish(key, asset()) }
+    }
+
+    @Test
+    fun aCommitCancelledWhileItWaitsIsNotTurnedIntoAFailure() = runTest {
+        writePart(content)
+        val waiting = FailingDataStore { awaitCancellation() }
+        var outcome: DownloadOutcome? = null
+        val job = launch { outcome = DownloadLoop(libraryOver(waiting), FakeServer(content), FakeConditions(), fs).finish(key, asset()) }
+        runCurrent()
+        job.cancel()
+        job.join()
+        assertNull(outcome)
+        assertTrue(job.isCancelled)
+    }
+
+    /** Android's path, through run(): the disk fills while the surah arrives, and the commit cannot move it. */
+    @Test
+    fun aDiskThatFillsDuringTheDownloadIsNotEnoughSpaceAtTheCommit() = runTest {
+        val conditions = FakeConditions()
+        val server = FakeServer(content, onChunk = { conditions.free = 0L })
+        val states = mutableListOf<DownloadState>()
+        val outcome = DownloadLoop(libraryOver(freshStore(), ReadOnlyFileSystem(fs)), server, conditions, fs) { 0L }
+            .run(key, URL, asset(), allowMetered = false) { states += it }
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.NOT_ENOUGH_SPACE), outcome)
+        assertTrue(states.contains(DownloadState.Verifying))
+    }
+
+    /** iOS's append of a landed surah uses the same rule. */
+    @Test
+    fun aFailedWriteOnAFullDiskIsNotEnoughSpace() = runTest {
+        val size = content.size.toLong()
+        assertEquals(DownloadFailure.NOT_ENOUGH_SPACE, loop(conditions = FakeConditions(free = 0L)).reasonForFailedWrite(size))
+        assertEquals(DownloadFailure.SERVER, loop(conditions = FakeConditions()).reasonForFailedWrite(size))
+        assertEquals(DownloadFailure.SERVER, loop(conditions = FakeConditions(freeError = IOException("stat"))).reasonForFailedWrite(size))
+    }
+
     private companion object {
         const val URL = "https://example.test/ar.alafasy-112.taqa"
+        const val MIB = 1024L * 1024L
+        const val HEADROOM = 200L * MIB
+
+        /** Another reciter's downloads: 70 MiB still to come of one, 50 MiB of a queued one, nothing of the rest. */
+        val OTHER_IN_FLIGHT: Map<DownloadKey, DownloadState> = mapOf(
+            DownloadKey("ar.minshawi", 2) to DownloadState.Downloading(30 * MIB, 100 * MIB),
+            DownloadKey("ar.minshawi", 3) to DownloadState.Queued,
+            DownloadKey("ar.minshawi", 4) to DownloadState.Failed(DownloadFailure.SERVER),
+            DownloadKey("ar.minshawi", 5) to DownloadState.Verifying,
+        )
+        val OTHER_SIZES: Map<DownloadKey, Long> = mapOf(
+            DownloadKey("ar.minshawi", 2) to 100 * MIB,
+            DownloadKey("ar.minshawi", 3) to 50 * MIB,
+            DownloadKey("ar.minshawi", 4) to 999 * MIB,
+            DownloadKey("ar.minshawi", 5) to 120 * MIB,
+        )
     }
 }
 
@@ -303,8 +572,15 @@ private class ChunkedSource(
 
 private class FakeConditions(
     private val kind: NetworkKind = NetworkKind.UNMETERED,
-    private val free: Long = 4L * 1024 * 1024 * 1024,
+    var free: Long = 4L * 1024 * 1024 * 1024,
+    private val freeError: Exception? = null,
 ) : DownloadConditions {
     override suspend fun network(): NetworkKind = kind
-    override suspend fun freeBytes(): Long = free
+    override suspend fun freeBytes(): Long = freeError?.let { throw it } ?: free
+}
+
+/** A registry store whose every write does [onUpdate]: throws, as a full disk does, or never returns. */
+private class FailingDataStore(private val onUpdate: suspend () -> Nothing) : DataStore<Preferences> {
+    override val data: Flow<Preferences> = flowOf(emptyPreferences())
+    override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences = onUpdate()
 }

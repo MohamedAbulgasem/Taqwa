@@ -8,6 +8,7 @@ import okio.IOException
 import okio.Source
 import okio.buffer
 import okio.use
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
 /** What a [ByteSource] answered when asked for a surah. */
@@ -67,6 +68,38 @@ suspend fun DownloadConditions.refusal(allowMetered: Boolean): DownloadFailure? 
     NetworkKind.UNMETERED -> null
 }
 
+/**
+ * The bytes the downloads already accepted still have to write: room they will take that free
+ * space does not show yet (bug hunt B2).
+ *
+ * A queued surah counts whole, because iOS reports Queued only when no part of it is on disk. A
+ * downloading one counts only what is left: what has arrived, the part and the session's own
+ * temporary file, is already out of free space. The manifest's size ([sizeOf]) comes before the
+ * reported total, because the delegate falls back to a wrong total once it has lost the size it
+ * was given. A download that ran past its size gives no room back. A surah being verified has
+ * landed, and its commit is a rename within the same folder; a failed one has no task.
+ */
+internal fun stillToLand(states: Map<DownloadKey, DownloadState>, sizeOf: (DownloadKey) -> Long?): Long =
+    states.entries.sumOf { (key, state) ->
+        when (state) {
+            DownloadState.Queued -> sizeOf(key) ?: 0L
+            is DownloadState.Downloading -> ((sizeOf(key) ?: state.total) - state.bytes).coerceAtLeast(0L)
+            DownloadState.Verifying, is DownloadState.Failed -> 0L
+        }
+    }
+
+/** What iOS's start() does with one surah of a request ([admit]). */
+internal sealed interface Admission {
+    /** Already on its way: left to the task carrying it. */
+    data object OnItsWay : Admission
+
+    /** Not started, for [reason], which is reported as the surah's failure. */
+    data class Refused(val reason: DownloadFailure) : Admission
+
+    /** Start it, and report it before the next surah is asked about: that report reserves its bytes. */
+    data object Start : Admission
+}
+
 sealed interface DownloadOutcome {
     /** Verified, renamed, in the library. */
     data object Done : DownloadOutcome
@@ -97,27 +130,94 @@ class DownloadLoop(
      * The two refusals that must happen **before any bytes move**: a download that would run over
      * mobile data against the reader's wishes, and one that would fill the device.
      *
+     * A surah is refused for room exactly when free space is below the headroom, plus the surah,
+     * plus [reservedBytes]. The headroom is kept once, as the floor left after everything already
+     * promised has landed. Nothing is ever added to free space, because iOS answers
+     * `Long.MAX_VALUE` when it cannot tell.
+     *
      * @param allowMetered the setting or this download's own one-time override, already resolved.
+     * @param reservedBytes what other accepted downloads still have to write ([stillToLand]). iOS
+     * passes it: a background session starts its tasks when the system chooses, so free space has
+     * not moved by the time the next surah of a request asks, and a whole Quran used to be accepted
+     * surah by surah against the same figure until it filled the phone. Android passes nothing:
+     * each worker asks at its own transfer, two at a time, and the headroom is larger than any one
+     * surah.
      * @return the reason to refuse, or null to go ahead.
      */
-    suspend fun precheck(asset: SurahAsset, allowMetered: Boolean): DownloadFailure? {
+    suspend fun precheck(asset: SurahAsset, allowMetered: Boolean, reservedBytes: Long = 0L): DownloadFailure? {
         conditions.refusal(allowMetered)?.let { return it }
         // The whole asset, not what is left to fetch: spec §8's rule is about the device having
-        // room to hold the surah, and a part that is already there is room already spent.
-        if (conditions.freeBytes() < HEADROOM_BYTES + asset.bytes) {
+        // room to hold the surah, and a part that is already there is room already spent. What is
+        // reserved for the other downloads is only what they still have to fetch, because their
+        // parts are already gone from free space.
+        if (isShortOfRoom(conditions.freeBytes(), asset.bytes, reservedBytes)) {
             return DownloadFailure.NOT_ENOUGH_SPACE
         }
         return null
     }
 
     /**
+     * The rule iOS's start() applies to each surah of a request, in order: a surah already on its
+     * way ([isOnItsWay] in [states]: queued, downloading or being verified) is left to the task
+     * carrying it, as Android's unique work with `KEEP` leaves it, because asking again would start
+     * a second task on the same `.part`, book its room twice and write a refusal over a live task;
+     * any other is [precheck]ed against what the downloads in [states] still have to write. A
+     * failed surah is asked again, so tapping the offer again re-checks the ones refused for room.
+     */
+    internal suspend fun admit(
+        key: DownloadKey,
+        asset: SurahAsset,
+        allowMetered: Boolean,
+        states: Map<DownloadKey, DownloadState>,
+        sizeOf: (DownloadKey) -> Long?,
+    ): Admission {
+        if (states[key].isOnItsWay) return Admission.OnItsWay
+        precheck(asset, allowMetered, stillToLand(states, sizeOf))?.let { return Admission.Refused(it) }
+        return Admission.Start
+    }
+
+    /**
+     * Why a write of a surah of [bytes] failed: [DownloadFailure.NOT_ENOUGH_SPACE] by the rule a
+     * lone Retry's [precheck] will apply, so the chip keeps the same sentence when Retry is
+     * pressed, and [DownloadFailure.SERVER] otherwise. Deliberately not "free below the surah": by
+     * the time a write has failed, its bytes are either already freed or still on disk. Free space
+     * that cannot be read means SERVER.
+     */
+    internal suspend fun reasonForFailedWrite(bytes: Long): DownloadFailure {
+        val free = try {
+            conditions.freeBytes()
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (e: Exception) {
+            return DownloadFailure.SERVER
+        }
+        return if (isShortOfRoom(free, bytes)) DownloadFailure.NOT_ENOUGH_SPACE else DownloadFailure.SERVER
+    }
+
+    /**
      * Hashes the finished `.part` against the manifest and, if it matches, makes it the surah the
      * reader owns. A mismatch has already deleted the part (see `RecitationLibrary.commit`), which
      * is why [DownloadFailure.CHECKSUM] is the one failure a Retry starts over from zero.
+     *
+     * A commit that throws (a full disk refusing the move, the registry's write or a folder) is a
+     * reason, never an exception: on iOS an escaped throw left the Verifying chip on screen for
+     * good and wrote a crash report for a crash that never happened. Nothing is cleaned up here: a
+     * surah moved but not registered is adopted by the library's reconcile at the next start, and
+     * a verified part that could not be moved is fetched again by Retry. Cancellation goes on.
      */
-    suspend fun finish(key: DownloadKey, asset: SurahAsset): DownloadOutcome =
-        if (library.commit(key.reciterId, key.surah, asset.sha256)) DownloadOutcome.Done
-        else DownloadOutcome.Failed(DownloadFailure.CHECKSUM)
+    suspend fun finish(key: DownloadKey, asset: SurahAsset): DownloadOutcome {
+        val owned = try {
+            library.commit(key.reciterId, key.surah, asset.sha256)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (e: Exception) {
+            return DownloadOutcome.Failed(reasonForFailedWrite(asset.bytes))
+        }
+        return if (owned) DownloadOutcome.Done else DownloadOutcome.Failed(DownloadFailure.CHECKSUM)
+    }
+
+    private fun isShortOfRoom(free: Long, bytes: Long, reserved: Long = 0L): Boolean =
+        free < HEADROOM_BYTES + bytes + reserved
 
     /**
      * The whole download of one surah.
@@ -210,7 +310,12 @@ class DownloadLoop(
     }
 
     private companion object {
-        /** Spec §8: a device below this much free refuses a download, plus the surah's own size. */
+        /**
+         * Spec §8: a device below this much free refuses a download, plus the surah's own size.
+         * It must stay larger than the largest surah (127.2 MiB today, Hudhaify's Al-Baqarah):
+         * Android's two transfers at a time and iOS's copy of a landed temporary file both rely on
+         * that.
+         */
         const val HEADROOM_BYTES = 200L * 1024L * 1024L
         const val CHUNK_BYTES = 64L * 1024L
         const val PROGRESS_MILLIS = 500L

@@ -13,8 +13,10 @@ val crashLogStore: CrashLogStore by lazy { CrashLogStore(dataStoreDirectory().to
 
 /**
  * Installs the platform's uncaught-exception hook so a crash writes [store] before the process
- * dies (crash spec §2). Android chains to the handler that was there; Kotlin/Native terminates
- * after the hook returns. Safe to call more than once: only the first call installs.
+ * dies (crash spec §2). Android chains to the handler that was there. On Kotlin/Native an
+ * exception that leaves Kotlin ends the process after the hook returns, but an uncaught coroutine
+ * throw does not: the hook is called and the process carries on. Safe to call more than once: only
+ * the first call installs.
  */
 expect fun installCrashHandler(store: CrashLogStore)
 

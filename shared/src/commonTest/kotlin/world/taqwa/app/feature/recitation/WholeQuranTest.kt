@@ -152,4 +152,32 @@ class WholeQuranTest {
             wholeQuranOf(reciter, emptySet(), downloads, declared = false),
         )
     }
+
+    /**
+     * A whole Quran that fitted only in part (bug hunt B2): once nothing is moving, the row says
+     * there is not enough room on the phone, priced at what is still missing.
+     */
+    @Test
+    fun `a batch that fitted only in part ends on the room sentence priced at what is left`() {
+        val downloads = mapOf(
+            key(3) to DownloadState.Failed(DownloadFailure.NOT_ENOUGH_SPACE),
+            key(4) to DownloadState.Failed(DownloadFailure.NOT_ENOUGH_SPACE),
+        )
+        assertEquals(
+            WholeQuran.Failed(DownloadFailure.NOT_ENOUGH_SPACE, bytes = 7_000_000L),
+            wholeQuranOf(reciter, setOf(1, 2), downloads, declared = true),
+        )
+    }
+
+    /** While the surahs that fitted are still on their way, the row shows their progress. */
+    @Test
+    fun `the surahs that fitted still read as running beside the ones refused for room`() {
+        val downloads = mapOf(
+            key(1) to DownloadState.Queued,
+            key(2) to DownloadState.Downloading(0, 2_000_000L),
+            key(3) to DownloadState.Failed(DownloadFailure.NOT_ENOUGH_SPACE),
+            key(4) to DownloadState.Failed(DownloadFailure.NOT_ENOUGH_SPACE),
+        )
+        assertEquals(WholeQuran.Running(done = 0, total = 4), wholeQuranOf(reciter, emptySet(), downloads, declared = true))
+    }
 }

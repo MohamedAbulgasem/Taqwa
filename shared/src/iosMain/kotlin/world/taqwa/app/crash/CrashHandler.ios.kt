@@ -11,6 +11,9 @@ actual fun installCrashHandler(store: CrashLogStore) {
     installed = true
     setUnhandledExceptionHook { throwable ->
         recordCrash(store, throwable, "main", deviceInfoOrUnknown())
-        // Kotlin/Native terminates the process once the hook returns; nothing else to do here.
+        // An exception that leaves Kotlin into Objective-C or Swift ends the process once the hook
+        // returns. An uncaught coroutine throw does not: processUnhandledException calls the hook
+        // and returns, and the process carries on, so a scope that can throw needs a handler of its
+        // own, or the next launch reports a crash that never happened (SurahDownloader.ios.kt).
     }
 }

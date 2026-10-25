@@ -158,7 +158,8 @@ actual class SurahDownloader actual constructor(
         // here, where there is still a reader to answer it (spec §5.4), and both of its answers —
         // the Wi-Fi policy and no connection at all — become a sentence in the sheet.
         conditions.refusal(allowMetered)?.let { reason ->
-            refusals.value = refusals.value + keys.associateWith { DownloadState.Failed(reason) }
+            // Numbered afresh, so a surah refused again the same way is a change the controller sees.
+            refusals.value = refusals.value + keys.associateWith { freshFailure(reason) }
             return
         }
         forget(keys)

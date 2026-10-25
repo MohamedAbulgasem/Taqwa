@@ -921,6 +921,103 @@ class RecitationControllerTest {
             assertNull(controller.state.value.sheet)
         }
 
+    private fun noRoom(attempt: Long) = DownloadState.Failed(DownloadFailure.NOT_ENOUGH_SPACE, attempt)
+
+    /**
+     * A surah refused for room, asked for again with nothing freed, is refused again the same
+     * way. Each refusal the downloader reports is numbered afresh (DownloadState.Failed.attempt),
+     * so the second one is a change, and the sheet opens on it again rather than the play ending
+     * silently.
+     */
+    @Test
+    fun `a surah refused for room and asked for again opens the sheet again`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.settings.stored.value = RecitationSettings(autoDownload = true, autoDownloadAsked = true)
+            val controller = controller(harness, backgroundScope)
+            val key = DownloadKey("ar.alafasy", 112)
+            controller.requestPlay(112, 1)
+            harness.downloader.emit(mapOf(key to noRoom(1)))
+            assertEquals(SheetPhase.Failed(DownloadFailure.NOT_ENOUGH_SPACE), controller.state.value.sheet?.phase)
+            controller.dismissSheet()
+
+            controller.requestPlay(112, 1)
+            harness.downloader.emit(mapOf(key to noRoom(2)))
+
+            assertEquals(SheetPhase.Failed(DownloadFailure.NOT_ENOUGH_SPACE), controller.state.value.sheet?.phase)
+        }
+
+    /**
+     * The reader saw the refusal and closed the sheet: a later request that refuses the same
+     * surah again (a whole Quran asked for from Settings) does not bring the sheet back over
+     * whatever they are doing, whether or not the downloader passes through no state on the way.
+     */
+    @Test
+    fun `a refusal sheet the reader closed does not come back when the surah is refused again`() =
+        runTest(UnconfinedTestDispatcher()) {
+            for (momentWithNoState in listOf(false, true)) {
+                val harness = Harness()
+                harness.settings.stored.value = RecitationSettings(autoDownload = true, autoDownloadAsked = true)
+                val controller = controller(harness, backgroundScope)
+                val key = DownloadKey("ar.alafasy", 112)
+                controller.requestPlay(112, 1)
+                harness.downloader.emit(mapOf(key to noRoom(1)))
+                controller.dismissSheet()
+
+                controller.downloadWholeQuran()
+                if (momentWithNoState) harness.downloader.emit(emptyMap())
+                harness.downloader.emit(mapOf(key to noRoom(2)))
+
+                assertNull(controller.state.value.sheet, "moment with no state: $momentWithNoState")
+            }
+        }
+
+    /**
+     * A whole Quran that fitted only in part ends on the room sentence, and asking for it again
+     * keeps the sentence: a moment with no state on the way (a Retry clears its surah first) is not
+     * the batch being over.
+     */
+    @Test
+    fun `a whole Quran asked for again after it fitted only in part keeps its room sentence`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            val controller = controller(harness, backgroundScope)
+            val one = DownloadKey("ar.alafasy", 1)
+            val two = DownloadKey("ar.alafasy", 2)
+            val last = DownloadKey("ar.alafasy", 112)
+            controller.downloadWholeQuran()
+            harness.downloader.emit(mapOf(one to DownloadState.Queued, two to DownloadState.Queued, last to noRoom(1)))
+            harness.library.put("ar.alafasy", setOf(1, 2))
+            harness.downloader.emit(mapOf(last to noRoom(1)))
+            val sentence = WholeQuran.Failed(DownloadFailure.NOT_ENOUGH_SPACE, bytes = 112_778L)
+            assertEquals(sentence, controller.state.value.wholeQuran)
+
+            controller.downloadWholeQuran()
+            harness.downloader.emit(emptyMap())
+            harness.downloader.emit(mapOf(last to noRoom(2)))
+
+            assertEquals(sentence, controller.state.value.wholeQuran)
+        }
+
+    /** A voice whose copy of the surah was refused for room is asked for again when it is picked. */
+    @Test
+    fun `picking a voice whose copy was refused asks for it again`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = Harness()
+            harness.settings.stored.value = RecitationSettings(autoDownload = true, autoDownloadAsked = true)
+            harness.library.put("ar.alafasy", setOf(112))
+            val controller = controller(harness, backgroundScope)
+            controller.requestPlay(112, 1)
+            val husary = DownloadKey("ar.husary", 112)
+            harness.downloader.emit(mapOf(husary to noRoom(1)))
+
+            controller.pickReciter("ar.husary")
+
+            assertEquals(husary to false, harness.downloader.enqueued.last())
+            harness.downloader.emit(mapOf(husary to noRoom(2)))
+            assertEquals(SheetPhase.Failed(DownloadFailure.NOT_ENOUGH_SPACE), controller.state.value.sheet?.phase)
+        }
+
     @Test
     fun `picking a voice without the surah fetches it quietly when asking is off`() =
         runTest(UnconfinedTestDispatcher()) {

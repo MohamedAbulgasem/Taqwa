@@ -28,6 +28,12 @@ expect class SurahDownloader(
     /**
      * Accepts one surah. Returns at once — the answer arrives through [states].
      *
+     * A refusal of this request is reported numbered afresh ([freshFailure]), so it is a change
+     * [states] shows even when it is the very same failure as the one on record: the controller
+     * surfaces an automatic download's refusal only on a change (spec §15.3). That covers iOS's
+     * refusal for room (bug hunt B2, a whole Quran that fitted only in part, whose refused surahs are
+     * refused again the same way) and Android's refusals at the tap (no Wi-Fi, no network).
+     *
      * @param allowMobileOnce the download sheet's one-time override (spec §5.4). Not stored:
      * allowing this surah over mobile data is not a decision about the next one.
      */

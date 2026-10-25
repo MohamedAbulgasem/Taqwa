@@ -1,5 +1,8 @@
 package world.taqwa.app.recitation
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.updateAndGet
+
 /**
  * One surah of one reciter, as every part of the download machinery names it (spec 3a §7). A
  * value class would be one field short; the pair is what a work name, a session task description
@@ -40,8 +43,22 @@ sealed interface DownloadState {
     /** All bytes in, hashing against the manifest. Al-Baqarah takes a moment. */
     data object Verifying : DownloadState
 
-    data class Failed(val reason: DownloadFailure) : DownloadState
+    /**
+     * [attempt] tells two failures apart: a refusal the downloader reports itself is numbered
+     * afresh ([freshFailure]), so a new request refused the very same way is still a change that
+     * [SurahDownloader.states] shows and the controller surfaces (spec §15.3). Without it a surah
+     * refused for room and asked for again was refused by an equal state, which a StateFlow does
+     * not emit, and the tap did nothing. A failure derived again from the same record each time
+     * (Android's finished work) keeps 0: a new attempt there passes through Queued on its way.
+     */
+    data class Failed(val reason: DownloadFailure, val attempt: Long = 0L) : DownloadState
 }
+
+private val failureSerial = MutableStateFlow(0L)
+
+/** A failure for [reason] numbered afresh ([DownloadState.Failed.attempt]); safe from any thread. */
+fun freshFailure(reason: DownloadFailure): DownloadState.Failed =
+    DownloadState.Failed(reason, failureSerial.updateAndGet { it + 1 })
 
 /**
  * True while a download is on its way: accepted, transferring, or landed and being verified. A

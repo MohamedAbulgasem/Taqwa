@@ -4,6 +4,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlin.concurrent.AtomicReference
 import kotlin.concurrent.Volatile
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.coroutines.cancellation.CancellationException
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
@@ -77,7 +79,16 @@ actual class SurahDownloader actual constructor(
     private val quran: QuranSource,
 ) {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    /**
+     * The handler is the backstop, and it is empty on purpose. SupervisorJob does nothing about an
+     * uncaught throw. On iOS the crash hook records a report and returns, so the coroutine died,
+     * the process carried on, and the next launch offered "closed unexpectedly" for a crash that
+     * never happened; in a process iOS woke for the session alone, with no hook installed, the
+     * same throw ended the process before the session's completion handler was called. A download
+     * that fails is a chip with Retry, never a crash: [commit] and `DownloadLoop.finish` turn real
+     * failures into that chip, and this handler, which cannot know the key, only stands behind them.
+     */
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> })
     private val fs = FileSystem.SYSTEM
     private val reported = MutableStateFlow<Map<DownloadKey, DownloadState>>(emptyMap())
 
@@ -86,6 +97,14 @@ actual class SurahDownloader actual constructor(
     private val sizes = AtomicLongMap()
 
     actual val states: StateFlow<Map<DownloadKey, DownloadState>> = reported.asStateFlow()
+
+    /**
+     * One [start] at a time, so a surah asked for twice in quick succession — Next tapped again
+     * while the first request is still being answered — sees the first one's report and is skipped,
+     * and each surah's room is checked against what the ones before it, in this request or any
+     * other, have reported: two requests checking at once would each count without the other.
+     */
+    private val starting = Mutex()
 
     /** Held rather than built inline: an append that fails mid-write has to ask it for the space. */
     private val conditions = IosDownloadConditions()
@@ -135,7 +154,7 @@ actual class SurahDownloader actual constructor(
             if (status !in 200..299) {
                 startedAt.remove(wire)
                 sizes.remove(wire)
-                report(key, DownloadState.Failed(DownloadFailure.SERVER))
+                report(key, freshFailure(DownloadFailure.SERVER))
                 return
             }
             val part = library.partFor(key.reciterId, key.surah)
@@ -157,11 +176,10 @@ actual class SurahDownloader actual constructor(
                 val expected = sizes[wire]
                 sizes.remove(wire)
                 scope.launch {
-                    val free = runCatching { conditions.freeBytes() }.getOrDefault(Long.MAX_VALUE)
-                    val reason =
-                        if (expected != null && free < expected) DownloadFailure.NOT_ENOUGH_SPACE
-                        else DownloadFailure.SERVER
-                    report(key, DownloadState.Failed(reason))
+                    // The rule a Retry's precheck applies. Measured after the part and the
+                    // temporary file are gone, "free below the surah" read a real full disk as SERVER.
+                    val reason = if (expected == null) DownloadFailure.SERVER else loop.reasonForFailedWrite(expected)
+                    report(key, freshFailure(reason))
                 }
                 return
             }
@@ -179,10 +197,10 @@ actual class SurahDownloader actual constructor(
                 // The reader cancelled it; the sheet goes back to offering the download.
                 NSURL_ERROR_CANCELLED -> clear(key)
                 NSURL_ERROR_DATA_NOT_ALLOWED ->
-                    report(key, DownloadState.Failed(DownloadFailure.NEEDS_WIFI))
+                    report(key, freshFailure(DownloadFailure.NEEDS_WIFI))
                 NSURL_ERROR_NOT_CONNECTED, NSURL_ERROR_NETWORK_LOST ->
-                    report(key, DownloadState.Failed(DownloadFailure.NO_NETWORK))
-                else -> report(key, DownloadState.Failed(DownloadFailure.SERVER))
+                    report(key, freshFailure(DownloadFailure.NO_NETWORK))
+                else -> report(key, freshFailure(DownloadFailure.SERVER))
             }
         }
 
@@ -263,12 +281,6 @@ actual class SurahDownloader actual constructor(
         runCatching { start(listOf(key.surah), key.reciterId, false) }
     }
 
-    /**
-     * One [start] at a time, so a surah asked for twice in quick succession — Next tapped again
-     * while the first request is still being answered — sees the first one's report and is skipped.
-     */
-    private val starting = Mutex()
-
     private suspend fun start(surahs: List<Int>, reciterId: String, allowMobileOnce: Boolean) = starting.withLock {
         if (surahs.isEmpty()) return@withLock
         val manifest = manifests.current()
@@ -278,47 +290,94 @@ actual class SurahDownloader actual constructor(
         for (surah in surahs) {
             val asset = reciter.surah(surah) ?: continue
             val key = DownloadKey(reciterId, surah)
-            // Already on its way: its task answers this request too, as Android's KEEP does. A second
-            // task for the same surah used to start on every re-ask (Next, the header, the whole
-            // Quran again), and on a slow connection the tasks shared the bandwidth, the bar jumped
-            // between their counts, and both appended to the same `.part`. Retry clears the key first.
-            if (reported.value[key].isOnItsWay) continue
-            loop.precheck(asset, allowCellular)?.let {
-                report(key, DownloadState.Failed(it))
-                continue
+            // A part as large as the surah is not resumed but fetched again (startTask), so it
+            // goes before the check rather than after: left on disk it was counted once as
+            // space used and again as space needed, and a Retry after a commit that could not
+            // move a verified part was refused for room it would have had. Not while the surah
+            // is on its way: a part being verified is that size too.
+            if (!reported.value[key].isOnItsWay) dropWholePart(key, asset)
+            // Room is checked against what every accepted download, of any request, still has
+            // to write (bug hunt B2): a background session starts its tasks when the system
+            // chooses, so free space has not moved yet, and a whole Quran used to be accepted
+            // surah by surah against the same figure until it filled the phone. A refusal is
+            // reported and the loop goes on, so a smaller surah further on can still fit.
+            // What this process has seen is all it counts: after iOS relaunches the app, the
+            // tasks still running in the session are not in `reported` until they call back,
+            // so the reservation holds within one process until the sessions are re-read at
+            // launch (bug hunt B12, its own later fix).
+            val admission = loop.admit(key, asset, allowCellular, reported.value) { other ->
+                manifest.reciter(other.reciterId)?.surah(other.surah)?.bytes
             }
-            val part = library.partFor(reciterId, surah)
-            var have = fs.metadataOrNull(part)?.size ?: 0L
-            if (have >= asset.bytes) {
-                runCatching { fs.delete(part) }
-                have = 0L
+            when (admission) {
+                // Already on its way: its task answers this request too, as Android's KEEP does. A
+                // second task for the same surah used to start on every re-ask (Next, the header,
+                // the whole Quran again), and on a slow connection the tasks shared the bandwidth,
+                // the bar jumped between their counts, and both appended to the same `.part`.
+                // Retry clears the key first.
+                Admission.OnItsWay -> continue
+                is Admission.Refused -> {
+                    report(key, freshFailure(admission.reason))
+                    continue
+                }
+                Admission.Start -> Unit
             }
-            val url = NSURL.URLWithString(manifest.assetUrl(reciter, surah)) ?: continue
-            val request = (NSMutableURLRequest.requestWithURL(url) as NSMutableURLRequest).apply {
-                // A background session honours the headers a request carries, which is what makes
-                // resume possible without the session's own resume-data machinery — that only
-                // survives a cancellation we performed, not a process the system reclaimed.
-                if (have > 0L) setValue("bytes=$have-", forHTTPHeaderField = "Range")
-            }
-            val task = session.downloadTaskWithRequest(request)
-            task.taskDescription = key.wire
-            startedAt[key.wire] = have
-            sizes[key.wire] = asset.bytes
-            report(key, if (have > 0L) DownloadState.Downloading(have, asset.bytes) else DownloadState.Queued)
-            task.resume()
+            startTask(key, asset, reciter, manifest, session)
         }
     }
 
-    private suspend fun commit(key: DownloadKey) {
-        val asset = manifests.current().reciter(key.reciterId)?.surah(key.surah)
-        if (asset == null) {
-            report(key, DownloadState.Failed(DownloadFailure.SERVER))
-            return
+    /** Deletes [key]'s part when it is as large as the surah or larger (see [start]). */
+    private fun dropWholePart(key: DownloadKey, asset: SurahAsset) {
+        val part = library.partFor(key.reciterId, key.surah)
+        if ((fs.metadataOrNull(part)?.size ?: 0L) >= asset.bytes) runCatching { fs.delete(part) }
+    }
+
+    /**
+     * Creates and resumes one surah's task, and reports it before returning: that report is what
+     * reserves its bytes for the next surah's check, so it happens under [starting].
+     */
+    private fun startTask(key: DownloadKey, asset: SurahAsset, reciter: Reciter, manifest: RecitationManifest, session: NSURLSession) {
+        val reciterId = key.reciterId
+        val surah = key.surah
+        val part = library.partFor(reciterId, surah)
+        var have = fs.metadataOrNull(part)?.size ?: 0L
+        if (have >= asset.bytes) {
+            runCatching { fs.delete(part) }
+            have = 0L
         }
+        val url = NSURL.URLWithString(manifest.assetUrl(reciter, surah)) ?: return
+        val request = (NSMutableURLRequest.requestWithURL(url) as NSMutableURLRequest).apply {
+            // A background session honours the headers a request carries, which is what makes
+            // resume possible without the session's own resume-data machinery — that only
+            // survives a cancellation we performed, not a process the system reclaimed.
+            if (have > 0L) setValue("bytes=$have-", forHTTPHeaderField = "Range")
+        }
+        val task = session.downloadTaskWithRequest(request)
+        task.taskDescription = key.wire
+        startedAt[key.wire] = have
+        sizes[key.wire] = asset.bytes
+        // stillToLand counts a Queued surah whole: Queued means no part of it is on disk.
+        report(key, if (have > 0L) DownloadState.Downloading(have, asset.bytes) else DownloadState.Queued)
+        task.resume()
+    }
+
+    /**
+     * Always ends the Verifying chip, in Done or a failure with Retry: the manifest read that
+     * comes before `DownloadLoop.finish` can throw too, and the scope's handler cannot know which
+     * surah a throw belonged to.
+     */
+    private suspend fun commit(key: DownloadKey) {
         sizes.remove(key.wire)
-        when (val outcome = loop.finish(key, asset)) {
+        val outcome = try {
+            val asset = manifests.current().reciter(key.reciterId)?.surah(key.surah)
+            if (asset == null) DownloadOutcome.Failed(DownloadFailure.SERVER) else loop.finish(key, asset)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (e: Exception) {
+            DownloadOutcome.Failed(DownloadFailure.SERVER)
+        }
+        when (outcome) {
             DownloadOutcome.Done -> clear(key)
-            is DownloadOutcome.Failed -> report(key, DownloadState.Failed(outcome.reason))
+            is DownloadOutcome.Failed -> report(key, freshFailure(outcome.reason))
         }
     }
 

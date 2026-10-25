@@ -168,11 +168,21 @@ class RecitationController(
     private var nextAyahLabel = ""
 
     /**
-     * Downloads whose refusal has already been put in front of the reader (spec §15.3): with
+     * The refusal already put in front of the reader for each download (spec §15.3): with
      * auto-download on there is no sheet to show a refusal on, so the sheet opens itself the
      * first time a fetch the reader is waiting on fails — once per failure, not on every emission.
+     * Kept by value, because each failure the downloader reports is numbered afresh
+     * (DownloadState.Failed.attempt): a new request refused the same way is a new failure.
      */
-    private val surfacedFailures = mutableSetOf<DownloadKey>()
+    private val surfacedFailures = mutableMapOf<DownloadKey, DownloadState.Failed>()
+
+    /**
+     * The reciters a whole-Quran batch has been seen moving for since it was last asked for. A
+     * batch is over when a reciter seen moving has nothing left in the downloader; a reciter not
+     * yet seen moving since the last ask is kept, so the moment between a request and the
+     * downloader's answer (a Retry clears its surah first) is not taken for the batch ending.
+     */
+    private val batchSeen = mutableSetOf<String>()
 
     /**
      * The bar's progress line, held across emissions. Exactly one collector writes it — the
@@ -461,17 +471,16 @@ class RecitationController(
         // forgotten once it has actually been observed moving. A refusal is kept — the row has a
         // sentence to show for it, and the reader clears it by trying again or walking away.
         scope.launch {
-            val seen = mutableSetOf<String>()
             downloader.states.collect { states ->
                 if (batching.value.isEmpty()) {
-                    seen.clear()
+                    batchSeen.clear()
                     return@collect
                 }
                 val moving = states.filterValues { it !is DownloadState.Failed }.keys.map { it.reciterId }.toSet()
                 val known = states.keys.map { it.reciterId }.toSet()
-                seen += moving
-                batching.value = batching.value.filter { it !in seen || it in known }.toSet()
-                seen.retainAll(batching.value)
+                batchSeen += moving
+                batching.value = batching.value.filter { it !in batchSeen || it in known }.toSet()
+                batchSeen.retainAll(batching.value)
             }
         }
         // The lock screen's previous and next (spec §15.1): by surah, decided here like every
@@ -494,11 +503,12 @@ class RecitationController(
         // - the sheet opens on the failure face, once, with the sentence and its Retry.
         scope.launch {
             downloader.states.collect { states ->
-                surfacedFailures.retainAll { states[it] is DownloadState.Failed }
+                surfacedFailures.keys.retainAll { states[it] is DownloadState.Failed }
                 val waiting = pending ?: return@collect
                 val key = DownloadKey(waiting.reciterId, waiting.surah)
-                if (states[key] !is DownloadState.Failed || key in surfacedFailures) return@collect
-                surfacedFailures += key
+                val failed = states[key] as? DownloadState.Failed ?: return@collect
+                if (surfacedFailures[key] == failed) return@collect
+                surfacedFailures[key] = failed
                 if (sheetSurah.value == null) {
                     sheetAyah = waiting.ayah
                     sheetPassage = waiting.passage
@@ -823,8 +833,17 @@ class RecitationController(
     /** Closes the sheet without cancelling: spec §5.4 lets the reader go on reading while a
      * surah arrives, and the header button's ring is what keeps the download visible. */
     fun dismissSheet() {
+        // A confirmed passage waits in [pending], and a failure reopens the sheet from there. But
+        // a sheet closed on a refusal is the reader having seen it and walked away: the play no
+        // longer waits, so a later request that refuses the surah again (a whole Quran asked for
+        // from Settings) does not bring the sheet back, and a copy that lands later does not start.
+        val waiting = pending
+        if (waiting != null && waiting.surah == sheetSurah.value &&
+            downloader.states.value[DownloadKey(waiting.reciterId, waiting.surah)] is DownloadState.Failed
+        ) {
+            pending = null
+        }
         sheetSurah.value = null
-        // A confirmed passage waits in [pending], and a failure reopens the sheet from there.
         sheetPassage = null
     }
 
@@ -832,13 +851,17 @@ class RecitationController(
 
     /**
      * Every surah of the current reciter the reader does not already own, as one batch. The
-     * downloader decides the order, the two-at-a-time limit and the free-space refusal; all this
-     * does is say which voice, remember that a batch is running, and — as with a single surah —
-     * pass the sheet's one-time mobile-data override straight through.
+     * downloader decides the order and the free-space refusal (Android also runs two at a time;
+     * iOS's refusal counts what is already on its way); all this does is say which voice,
+     * remember that a batch is running, and — as with a single surah — pass the sheet's one-time
+     * mobile-data override straight through.
      */
     fun downloadWholeQuran(allowMobileOnce: Boolean = false) {
         engage()
         val voice = reciter.value ?: return
+        // Asked for again: not seen moving since this ask, so the moment before the downloader
+        // answers cannot end it.
+        batchSeen -= voice.id
         batching.value = batching.value + voice.id
         downloader.enqueueReciter(voice.id, allowMobileOnce)
     }
@@ -1021,7 +1044,10 @@ class RecitationController(
             // ring on the monogram shows the new one arriving, and no sheet comes up.
             if (settings.settings.first().autoDownload) {
                 if (pending == null) pending = PendingPlay(id, surah, playback.ayah ?: 1, follow = true)
-                if (downloader.states.value[key] == null) downloader.enqueue(key, allowMobileOnce = false)
+                // Asked again after a failure too: a copy refused for room (a whole Quran that fitted
+                // only in part) is checked afresh, and a refusal again opens the sheet.
+                val now = downloader.states.value[key]
+                if (now == null || now is DownloadState.Failed) downloader.enqueue(key, allowMobileOnce = false)
                 return@launch
             }
             sheetAyah = playback.ayah ?: 1
