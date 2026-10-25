@@ -69,8 +69,9 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         // to the same 32-bit hash used to overwrite each other's notification.
         val notificationId = intent.getIntExtra(EXTRA_REQUEST_CODE, id.hashCode())
 
-        // The adhkar reminder's window (it closes at sunrise or Maghrib), carried because its alarm
-        // is inexact and can arrive up to an hour late. Absent on every other kind.
+        // The window of the adhkar reminder (it closes at sunrise or Maghrib), of Duha (ten minutes
+        // before noon) and of the iqama (ten minutes after it was due), carried because each alarm
+        // can arrive late. Absent on the prayers, their reminders and Tahajjud.
         val windowEnd = intent.getLongExtra(EXTRA_WINDOW_END, 0L)
             .takeIf { it > 0L }
             ?.let { Instant.fromEpochMilliseconds(it) }

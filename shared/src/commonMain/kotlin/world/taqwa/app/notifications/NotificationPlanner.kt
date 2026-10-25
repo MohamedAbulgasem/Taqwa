@@ -1,17 +1,20 @@
 package world.taqwa.app.notifications
 
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.adhkar.AdhkarSet
 import world.taqwa.app.domain.DayPrayerTimes
+import world.taqwa.app.domain.DuhaTiming
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.domain.PrayerSound
+import world.taqwa.app.prayer.DuhaTimes
 import world.taqwa.app.prayer.NightThirds
 import world.taqwa.app.prayer.PrayerTimesEngine
 import kotlin.time.Duration.Companion.minutes
@@ -23,21 +26,34 @@ object NotificationPlanner {
     const val IOS_PENDING_LIMIT = 64
 
     /**
+     * The fewest days the window is cut to for the iqama's sake (Duha and Iqama spec §3.3). Every
+     * other entry of four days fits in 64 slots, at most 4 × 14 = 56, so at this floor only the
+     * iqama reminders on the furthest days are left out (see [FILL_ORDER]).
+     */
+    const val MIN_WINDOW_DAYS = 4
+
+    /**
      * How many whole days of prayers fit in [capacity]. Five obligatory prayers a day, doubled
      * when a reminder precedes each one — so 64 slots is twelve days, or six with reminders on —
-     * one more a day when Tahajjud is on, and two more when the adhkar reminder is.
+     * one more a day when Tahajjud is on, two more when the adhkar reminder is, and one more when
+     * Duha is. The iqama adds one a day for each prayer whose gap is not Off, but never cuts the
+     * window below [MIN_WINDOW_DAYS] (or below what fits without it, where that is fewer): there
+     * the iqama is the one left out, the furthest days first.
      */
     fun windowDaysFor(capacity: Int, notifications: NotificationSettings): Int {
-        val perDay = ObligatoryPrayers.size * (if (notifications.remindBeforeMinutes > 0) 2 else 1) +
+        val base = ObligatoryPrayers.size * (if (notifications.remindBeforeMinutes > 0) 2 else 1) +
             (if (notifications.tahajjud) 1 else 0) +
-            (if (notifications.adhkar) 2 else 0)
-        return (capacity / perDay).coerceAtLeast(1)
+            (if (notifications.adhkar) 2 else 0) +
+            (if (notifications.duha) 1 else 0)
+        val iqama = if (notifications.iqama) ObligatoryPrayers.count { notifications.iqamaMinutesFor(it) > 0 } else 0
+        return maxOf(capacity / (base + iqama), minOf(MIN_WINDOW_DAYS, capacity / base)).coerceAtLeast(1)
     }
 
     /**
      * The order the plan is filled in when [plan]'s capacity runs out (adhkar spec §5): every
      * prayer first, then the before-prayer reminders, then Tahajjud, then the adhkar reminder —
-     * morning and evening as one tier, since they are one setting. Within a tier the soonest win.
+     * morning and evening as one tier, since they are one setting — then Duha, both timings as one
+     * tier, and the iqama last (Duha and Iqama spec §3.3). Within a tier the soonest win.
      * A voluntary nudge therefore never takes the slot of an obligatory prayer's adhan on iOS's 64.
      * Every kind must have a tier, or it is never armed at all; a test holds it to that.
      */
@@ -46,6 +62,8 @@ object NotificationPlanner {
         setOf(NotificationKind.REMINDER),
         setOf(NotificationKind.TAHAJJUD),
         setOf(NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING),
+        setOf(NotificationKind.DUHA_BEST, NotificationKind.DUHA_START),
+        setOf(NotificationKind.IQAMA),
     )
 
     /** Half an hour after Fajr and after Asr is when the adhkar reminder is meant to land. */
@@ -53,6 +71,9 @@ object NotificationPlanner {
 
     /** It never lands later than this before sunrise or Maghrib, which close the two windows. */
     private val ADHKAR_BEFORE_END = 5.minutes
+
+    /** An iqama reminder later than this after it was due says nothing true any more (spec §3.4). */
+    private val IQAMA_WINDOW = 10.minutes
 
     fun plan(
         location: GeoLocation,
@@ -170,7 +191,34 @@ object NotificationPlanner {
                 }
             }
 
-            ObligatoryPrayers.forEach { prayer ->
+            if (notifications.duha) {
+                // Duha by one rule for everyone, at the user's own point (Duha and Iqama spec §2):
+                // none where the sun does not rise, never climbs to 6.5°, or where the reminder
+                // would not be before Duha's end.
+                val duha = DuhaTimes.forDay(location, date, times.time(Prayer.SUNRISE))
+                if (duha != null) {
+                    val best = notifications.duhaTiming == DuhaTiming.BEST
+                    val kind = if (best) NotificationKind.DUHA_BEST else NotificationKind.DUHA_START
+                    val at = if (best) duha.best else duha.start
+                    if (at > from) {
+                        out += ScheduledNotification(
+                            id = "DUHA-$date",
+                            // A stand-in: sunrise is never notified, so it cannot be taken for an adhan.
+                            prayer = Prayer.SUNRISE,
+                            kind = kind,
+                            instant = at,
+                            sound = notifications.duhaSound,
+                            voice = notifications.voice,
+                            title = copy.title(Prayer.SUNRISE, kind),
+                            // Where Duha ends, which is what the reader needs to know.
+                            body = copy.body(Prayer.SUNRISE, kind, formatClockTime(duha.end, location.timeZoneId), 0),
+                            windowEnd = duha.end,
+                        )
+                    }
+                }
+            }
+
+            ObligatoryPrayers.forEachIndexed { index, prayer ->
                 val at = times.time(prayer)
                 val clock = formatClockTime(at, location.timeZoneId)
 
@@ -220,6 +268,39 @@ object NotificationPlanner {
                                 voice = notifications.voice,
                                 title = copy.title(prayer, NotificationKind.REMINDER),
                                 body = copy.body(prayer, NotificationKind.REMINDER, clock, minutesLeft),
+                            )
+                        }
+                    }
+
+                    // The iqama some minutes after the adhan (Duha and Iqama spec §3.3). None on
+                    // a Friday's Dhuhr, where the khutbah comes first, and none where the gap
+                    // reaches the end of the prayer's time: sunrise for Fajr, since prayer is
+                    // forbidden while the sun rises; else the next obligatory prayer, or the next
+                    // day's Fajr if that comes first (R83: on a polar night Isha's start can be
+                    // past it, so Maghrib's time ends at that Fajr). Far north, Fajr can last
+                    // less than the default gap.
+                    val gap = if (notifications.iqama) notifications.iqamaMinutesFor(prayer) else 0
+                    val friday = prayer == Prayer.DHUHR && date.dayOfWeek == DayOfWeek.FRIDAY
+                    if (gap > 0 && !friday) {
+                        val iqamaAt = at + gap.minutes
+                        val next = if (prayer == Prayer.FAJR) {
+                            times.time(Prayer.SUNRISE)
+                        } else {
+                            val nextStart = ObligatoryPrayers.getOrNull(index + 1)?.let(times::time)
+                            if (nextStart == null) nextFajr else minOf(nextStart, nextFajr)
+                        }
+                        if (iqamaAt < next && iqamaAt > from) {
+                            out += ScheduledNotification(
+                                id = "${prayer.name}-IQAMA-$date",
+                                prayer = prayer,
+                                kind = NotificationKind.IQAMA,
+                                instant = iqamaAt,
+                                // Its own sound, never a second adhan.
+                                sound = notifications.iqamaSound,
+                                voice = notifications.voice,
+                                title = copy.title(prayer, NotificationKind.IQAMA),
+                                body = copy.body(prayer, NotificationKind.IQAMA, clock, gap),
+                                windowEnd = iqamaAt + IQAMA_WINDOW,
                             )
                         }
                     }

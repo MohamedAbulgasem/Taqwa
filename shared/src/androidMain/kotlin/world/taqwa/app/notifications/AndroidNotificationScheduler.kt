@@ -156,18 +156,21 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
      * on being told about. `setAndAllowWhileIdle` is the one inexact form the platform still
      * delivers in Doze.
      *
+     * Which entries ask for an exact alarm at all is [AlarmPrecision]'s (Duha and Iqama spec §3.4).
      * The adhkar reminder is always inexact (adhkar spec §5), granted or not: it is a nudge into a
      * window that stays open until sunrise or Maghrib, not the start of a prayer, and an exact
-     * alarm is a cost the platform asks apps to keep for what has to be on the minute. The price
-     * is the platform's own bound on an inexact alarm, which from Android 12 is "within an hour"
-     * of the time asked for. One that arrives after its window has closed is dropped by the
-     * receiver ([AdhkarReminderDelivery]), so lateness can cost a reminder but never post a wrong one.
+     * alarm is a cost the platform asks apps to keep for what has to be on the minute. Duha is
+     * inexact too while an hour or more of its window is left, and the iqama is exact, since an
+     * hour late is after the iqama. The price of inexact is the platform's own bound, which from
+     * Android 12 is "within an hour" of the time asked for. One that arrives after its window has
+     * closed is dropped by the receiver ([AdhkarReminderDelivery]), so lateness can cost a
+     * reminder but never post a wrong one.
      */
     private fun schedule(entry: ScheduledNotification) {
         val at = entry.instant.toEpochMilliseconds()
         val pendingIntent = pendingIntentFor(entry.id, entry)
         runCatching {
-            if (!entry.kind.isAdhkar && canScheduleExactAlarms()) {
+            if (AlarmPrecision.wantsExact(entry) && canScheduleExactAlarms()) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
             } else {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
@@ -190,7 +193,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
                 putExtra(EXTRA_KIND, entry.kind.name)
                 putExtra(EXTRA_TITLE, entry.title)
                 putExtra(EXTRA_BODY, entry.body)
-                // Only the adhkar reminder has a window that closes (sunrise, Maghrib).
+                // The adhkar reminder, Duha and the iqama have a window that closes.
                 entry.windowEnd?.let { putExtra(EXTRA_WINDOW_END, it.toEpochMilliseconds()) }
             }
         }
@@ -238,13 +241,14 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         val liveIds = live.map { (prayer, sound, voice, kind) ->
             NotificationChannels.channelId(prayer, sound, voice, kind)
         }.toSet()
-        // Tahajjud's and the adhkar reminder's channels are swept on every plan, in it or not: a
-        // prayer missing from a plan is a rarity to leave alone, but either of these missing means
-        // it is switched off, and someone who never asked for it, or has stopped, should not find
-        // its channel in system settings.
+        // Tahajjud's, the adhkar reminder's, Duha's and the iqama's channels are swept on every
+        // plan, in it or not: a prayer missing from a plan is a rarity to leave alone, but any of
+        // these missing means it is switched off, and someone who never asked for it, or has
+        // stopped, should not find its channel in system settings.
         val candidates = live.filter { it.kind == NotificationKind.PRAYER }
             .flatMap { NotificationChannels.allChannelIdsFor(it.prayer) }
-            .toSet() + NotificationChannels.allTahajjudChannelIds() + NotificationChannels.allAdhkarChannelIds()
+            .toSet() + NotificationChannels.allTahajjudChannelIds() + NotificationChannels.allAdhkarChannelIds() +
+            NotificationChannels.allDuhaChannelIds() + NotificationChannels.allIqamaChannelIds()
         candidates.filterNot { it in liveIds }
             .forEach { runCatching { notificationManager.deleteNotificationChannel(it) } }
     }
@@ -260,12 +264,16 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
     /**
      * A reminder shares its prayer's channels, so it folds into PRAYER. Both adhkar kinds share
      * one channel whatever prayer they follow, so they fold into one key too — two keys for one
-     * id would create the channel twice a plan.
+     * id would create the channel twice a plan. Both Duha timings fold into one key, and all five
+     * prayers' iqamas into one, for the same reason.
      */
     private fun channelKeyOf(entry: ScheduledNotification): ChannelKey = when (entry.kind) {
         NotificationKind.TAHAJJUD -> ChannelKey(entry.prayer, entry.sound, entry.voice, NotificationKind.TAHAJJUD)
         NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING ->
             ChannelKey(Prayer.FAJR, entry.sound, entry.voice, NotificationKind.ADHKAR_MORNING)
+        NotificationKind.DUHA_BEST, NotificationKind.DUHA_START ->
+            ChannelKey(Prayer.SUNRISE, entry.sound, entry.voice, NotificationKind.DUHA_BEST)
+        NotificationKind.IQAMA -> ChannelKey(Prayer.FAJR, entry.sound, entry.voice, NotificationKind.IQAMA)
         NotificationKind.PRAYER, NotificationKind.REMINDER ->
             ChannelKey(entry.prayer, entry.sound, entry.voice, NotificationKind.PRAYER)
     }

@@ -1,7 +1,12 @@
 package world.taqwa.app.feature.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,6 +79,14 @@ fun SoundSheet(
     onPreview: (PrayerSound) -> Unit,
     /** The levels on offer: all four for a prayer; Tahajjud leaves the adhan out (spec §17.6). */
     options: List<PrayerSound> = PrayerSound.entries,
+    /** The sheet's title. Null is "Notification sound"; a prayer's sheet names the prayer while
+     * Iqama is on, since the sheet then holds more than its sound (Duha and Iqama spec §4.2). */
+    title: String? = null,
+    /** A section label over the sound card, given when [extra] adds a second section. */
+    sectionLabel: String? = null,
+    /** A second section after the footnote: a prayer's iqama minutes. Given, the sheet scrolls,
+     * since the two together outgrow a short phone. */
+    extra: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val colors = LocalTaqwaColors.current
     // Asked while the sheet is open rather than once: the reader who hears nothing reaches for
@@ -85,13 +98,18 @@ fun SoundSheet(
             delay(MUTED_POLL_MS)
         }
     }
-    Column(Modifier.padding(horizontal = 24.dp)) {
+    val scroll = if (extra != null) Modifier.verticalScroll(rememberScrollState()) else Modifier
+    Column(scroll.padding(horizontal = 24.dp)) {
         Text(
-            stringResource(Res.string.sound_sheet_title),
+            title ?: stringResource(Res.string.sound_sheet_title),
             style = TaqwaText.screenTitle,
             color = colors.textPrimary,
         )
-        TaqwaCard(Modifier.padding(top = 16.dp).selectableGroup()) {
+        if (sectionLabel != null) {
+            Spacer(Modifier.height(16.dp))
+            SectionLabel(sectionLabel, gutter = 0.dp)
+        }
+        TaqwaCard(Modifier.padding(top = if (sectionLabel != null) 0.dp else 16.dp).selectableGroup()) {
             options.forEachIndexed { i, sound ->
                 if (i > 0) CardDivider()
                 AudioOptionRow(
@@ -121,5 +139,6 @@ fun SoundSheet(
             color = colors.textSecondary,
             modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
         )
+        extra?.invoke(this)
     }
 }

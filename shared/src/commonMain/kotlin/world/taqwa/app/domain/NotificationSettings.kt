@@ -10,6 +10,13 @@ enum class PrayerSound { SILENT, NOTIFICATION, TAKBIR, ADHAN }
  */
 enum class AdhanVoice { ORIGINAL, AZEEZ, AZEMI }
 
+/**
+ * When the Duha reminder rings (Duha and Iqama spec §2): at its best time, midway between sunrise
+ * and solar noon, or once its time is in, which is when every authority Taqwa knows agrees it has
+ * begun. [BEST] is the default.
+ */
+enum class DuhaTiming { BEST, START }
+
 data class NotificationSettings(
     val enabled: Boolean = true,
     val sounds: Map<Prayer, PrayerSound> = ObligatoryPrayers.associateWith { PrayerSound.TAKBIR },
@@ -29,9 +36,27 @@ data class NotificationSettings(
      */
     val adhkar: Boolean = false,
     val adhkarSound: PrayerSound = PrayerSound.NOTIFICATION,
+    /**
+     * A reminder for Duha, the forenoon prayer (Duha and Iqama spec §2): off until someone turns
+     * it on, like Tahajjud, and rung at [duhaTiming].
+     */
+    val duha: Boolean = false,
+    val duhaTiming: DuhaTiming = DuhaTiming.BEST,
+    val duhaSound: PrayerSound = PrayerSound.NOTIFICATION,
+    /**
+     * A reminder some minutes after each adhan, for the iqama (spec §3). Off by default. Each
+     * prayer's minutes stay stored while it is off, so turning it back on brings back the
+     * person's own; 0 is Off for that prayer.
+     */
+    val iqama: Boolean = false,
+    val iqamaMinutes: Map<Prayer, Int> = IqamaDefaults,
+    val iqamaSound: PrayerSound = PrayerSound.NOTIFICATION,
 ) {
     /** Takbir is the default for every prayer, including one the map has never held. */
     fun soundFor(prayer: Prayer): PrayerSound = sounds[prayer] ?: PrayerSound.TAKBIR
+
+    /** The minutes after [prayer]'s adhan its iqama reminder rings; a gap never set is its default. */
+    fun iqamaMinutesFor(prayer: Prayer): Int = iqamaMinutes[prayer] ?: IqamaDefaults[prayer] ?: 0
 
     companion object {
         /** "Remind me before" choices, in minutes. 0 is Never, and is the default. */
@@ -42,5 +67,23 @@ data class NotificationSettings(
 
         /** What the adhkar reminder may sound like: Tahajjud's levels, for the same reason. */
         val AdhkarSounds = TahajjudSounds
+
+        /** What the Duha reminder may sound like: Tahajjud's levels. No adhan is called for Duha. */
+        val DuhaSounds = TahajjudSounds
+
+        /** What the iqama reminder may sound like: Tahajjud's levels, never a second adhan. */
+        val IqamaSounds = TahajjudSounds
+
+        /** The iqama gaps on offer, in minutes after the adhan. 0 is Off for that prayer. */
+        val IqamaOptions = listOf(0, 5, 10, 15, 20, 25, 30)
+
+        /** Each prayer's gap until the person sets their own: a short one for Maghrib, a long one for Fajr. */
+        val IqamaDefaults: Map<Prayer, Int> = mapOf(
+            Prayer.FAJR to 15,
+            Prayer.DHUHR to 10,
+            Prayer.ASR to 10,
+            Prayer.MAGHRIB to 5,
+            Prayer.ISHA to 10,
+        )
     }
 }

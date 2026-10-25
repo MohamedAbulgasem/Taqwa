@@ -13,6 +13,7 @@ import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.AdhanVoice
+import world.taqwa.app.domain.DuhaTiming
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
@@ -25,6 +26,7 @@ import kotlin.random.Random
 import kotlin.random.nextULong
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -879,4 +881,148 @@ class NotificationSettingsStorageTest {
         assertEquals(0, NotificationSettings.LeadOptions.first())
     }
 
+    // Duha and Iqama (Duha and Iqama spec §3.1).
+
+    @Test
+    fun `Duha and Iqama are off by default with their own defaults`() {
+        val s = NotificationSettings()
+        assertEquals(false, s.duha)
+        assertEquals(DuhaTiming.BEST, s.duhaTiming)
+        assertEquals(PrayerSound.NOTIFICATION, s.duhaSound)
+        assertEquals(false, s.iqama)
+        assertEquals(PrayerSound.NOTIFICATION, s.iqamaSound)
+        assertEquals(
+            listOf(15, 10, 10, 5, 10),
+            ObligatoryPrayers.map { s.iqamaMinutesFor(it) },
+        )
+    }
+
+    @Test
+    fun `the iqama options run from Off to thirty minutes in fives`() {
+        assertEquals(listOf(0, 5, 10, 15, 20, 25, 30), NotificationSettings.IqamaOptions)
+        ObligatoryPrayers.forEach {
+            assertTrue(NotificationSettings.IqamaDefaults.getValue(it) in NotificationSettings.IqamaOptions, "$it")
+        }
+    }
+
+    @Test
+    fun `Duha and Iqama offer the sounds of Tahajjud and never the adhan`() {
+        assertEquals(NotificationSettings.TahajjudSounds, NotificationSettings.DuhaSounds)
+        assertEquals(NotificationSettings.TahajjudSounds, NotificationSettings.IqamaSounds)
+    }
+
+    @Test
+    fun `a gap never set reads as the default of its prayer`() {
+        val s = NotificationSettings(iqamaMinutes = mapOf(Prayer.FAJR to 20))
+        assertEquals(20, s.iqamaMinutesFor(Prayer.FAJR))
+        assertEquals(5, s.iqamaMinutesFor(Prayer.MAGHRIB))
+    }
+
+    @Test
+    fun `absent Duha and Iqama keys read as the defaults`() = runTest {
+        val s = repo("duha-iqama-default").notificationSettings.first()
+        assertEquals(NotificationSettings().duha, s.duha)
+        assertEquals(DuhaTiming.BEST, s.duhaTiming)
+        assertEquals(PrayerSound.NOTIFICATION, s.duhaSound)
+        assertEquals(false, s.iqama)
+        assertEquals(PrayerSound.NOTIFICATION, s.iqamaSound)
+        ObligatoryPrayers.forEach {
+            assertEquals(NotificationSettings.IqamaDefaults.getValue(it), s.iqamaMinutesFor(it), "$it")
+        }
+    }
+
+    @Test
+    fun `Duha and its timing and sound round trip`() = runTest {
+        val r = repo("duha-roundtrip")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(duha = true, duhaTiming = DuhaTiming.START, duhaSound = PrayerSound.TAKBIR),
+        )
+        val s = r.notificationSettings.first()
+        assertEquals(true, s.duha)
+        assertEquals(DuhaTiming.START, s.duhaTiming)
+        assertEquals(PrayerSound.TAKBIR, s.duhaSound)
+        // Its own keys: Tahajjud and the adhkar reminder are not touched by it.
+        assertEquals(false, s.tahajjud)
+        assertEquals(false, s.adhkar)
+        assertEquals(false, s.iqama)
+    }
+
+    @Test
+    fun `Iqama and the gap of each prayer and its sound round trip`() = runTest {
+        val r = repo("iqama-roundtrip")
+        val gaps = mapOf(Prayer.FAJR to 20, Prayer.DHUHR to 0, Prayer.ASR to 15, Prayer.MAGHRIB to 10, Prayer.ISHA to 30)
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(iqama = true, iqamaMinutes = gaps, iqamaSound = PrayerSound.SILENT),
+        )
+        val s = r.notificationSettings.first()
+        assertEquals(true, s.iqama)
+        assertEquals(PrayerSound.SILENT, s.iqamaSound)
+        ObligatoryPrayers.forEach { assertEquals(gaps.getValue(it), s.iqamaMinutesFor(it), "$it") }
+        assertEquals(false, s.duha)
+    }
+
+    @Test
+    fun `the gaps are kept while Iqama is off`() = runTest {
+        val r = repo("iqama-kept")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(iqama = true, iqamaMinutes = mapOf(Prayer.FAJR to 25, Prayer.ISHA to 0)),
+        )
+        r.setNotificationSettings(r.notificationSettings.first().copy(iqama = false))
+        r.setNotificationSettings(r.notificationSettings.first().copy(iqama = true))
+        val s = r.notificationSettings.first()
+        assertEquals(25, s.iqamaMinutesFor(Prayer.FAJR))
+        assertEquals(0, s.iqamaMinutesFor(Prayer.ISHA))
+        assertEquals(10, s.iqamaMinutesFor(Prayer.DHUHR))
+    }
+
+    @Test
+    fun `only the gaps that differ from their defaults are stored`() = runTest {
+        // Absent means its default, so a later change to IqamaDefaults reaches everyone who never
+        // chose a gap: a gap equal to its default is never written, and choosing it again removes it.
+        val store = freshStore("notif-iqama-sparse")
+        val r = SettingsRepository(store)
+        val fajr = SettingsKeys.iqamaMinutesKey(Prayer.FAJR)
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(iqama = true, iqamaMinutes = NotificationSettings.IqamaDefaults + (Prayer.FAJR to 25)),
+        )
+        var stored = store.data.first()
+        assertEquals(25, stored[fajr])
+        ObligatoryPrayers.filter { it != Prayer.FAJR }.forEach {
+            assertNull(stored[SettingsKeys.iqamaMinutesKey(it)], "$it")
+        }
+        r.setNotificationSettings(r.notificationSettings.first().copy(iqamaMinutes = NotificationSettings.IqamaDefaults))
+        stored = store.data.first()
+        ObligatoryPrayers.forEach { assertNull(stored[SettingsKeys.iqamaMinutesKey(it)], "$it") }
+        assertEquals(NotificationSettings.IqamaDefaults.getValue(Prayer.FAJR), r.notificationSettings.first().iqamaMinutesFor(Prayer.FAJR))
+    }
+
+    @Test
+    fun `a stored Duha or Iqama sound they do not offer falls back to the chime`() = runTest {
+        val r = repo("duha-iqama-adhan")
+        r.setNotificationSettings(
+            r.notificationSettings.first().copy(
+                duha = true, duhaSound = PrayerSound.ADHAN, iqama = true, iqamaSound = PrayerSound.ADHAN,
+            ),
+        )
+        val s = r.notificationSettings.first()
+        assertEquals(PrayerSound.NOTIFICATION, s.duhaSound)
+        assertEquals(PrayerSound.NOTIFICATION, s.iqamaSound)
+    }
+
+    @Test
+    fun `an unknown stored Duha timing reads as the best time`() = runTest {
+        val r = repo("duha-timing-corrupt")
+        r.writeRawDuhaTimingForTest("AT_DAWN")
+        assertEquals(DuhaTiming.BEST, r.notificationSettings.first().duhaTiming)
+    }
+
+    @Test
+    fun `a stored gap the setting does not offer reads as the default of that prayer`() = runTest {
+        val r = repo("iqama-gap-corrupt")
+        r.writeRawIqamaMinutesForTest(Prayer.ASR, 7)
+        r.writeRawIqamaMinutesForTest(Prayer.FAJR, -5)
+        val s = r.notificationSettings.first()
+        assertEquals(10, s.iqamaMinutesFor(Prayer.ASR))
+        assertEquals(15, s.iqamaMinutesFor(Prayer.FAJR))
+    }
 }

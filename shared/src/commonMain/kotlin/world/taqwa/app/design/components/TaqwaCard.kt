@@ -122,6 +122,11 @@ fun TaqwaRow(
      * there are; the drawn check mark is unchanged. Leave null for navigation rows.
      */
     selected: Boolean? = null,
+    /**
+     * Given, the [subtitle] sits in a [SettingsReveal] and shows only while this is true (and the
+     * subtitle is not null): a line that depends on a switch. Null, the row is as it always was.
+     */
+    revealSubtitle: Boolean? = null,
 ) {
     val colors = LocalTaqwaColors.current
     val clickModifier = when {
@@ -164,7 +169,17 @@ fun TaqwaRow(
     }
     Layout(
         content = {
-            if (subtitle == null) {
+            if (revealSubtitle != null) {
+                Column(Modifier.layoutId(LABEL_ID)) {
+                    Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary)
+                    SettingsReveal(visible = revealSubtitle && subtitle != null) {
+                        Column {
+                            Spacer(Modifier.height(RowSubtitleGap))
+                            Text(subtitle.orEmpty(), style = TaqwaText.caption, color = colors.textTertiary)
+                        }
+                    }
+                }
+            } else if (subtitle == null) {
                 Text(label, style = TaqwaText.rowLabel, color = colors.textPrimary, modifier = Modifier.layoutId(LABEL_ID))
             } else {
                 Column(Modifier.layoutId(LABEL_ID)) {

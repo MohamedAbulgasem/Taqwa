@@ -720,4 +720,22 @@
     <string name="credit_adhkar">Adhkar</string>
     <string name="credit_adhkar_detail">Adhkar du matin et du soir tirés de Hisn al-Muslim de Sa‘id ibn ‘Ali ibn Wahf al-Qahtani ; texte arabe et sa structure, traduction anglaise et translittération issus du jeu de données OpenDua (Human Development Fund), CC BY 4.0, avec de légères retouches consignées dans le dépôt.</string>
     <string name="adhkar_opens_at">À partir de l’Asr · %1$s</string>
+    <string name="notifications_duha">Douha</string>
+    <string name="notifications_duha_when">Quand</string>
+    <string name="notifications_section_when">QUAND</string>
+    <string name="notifications_duha_best">Au meilleur moment</string>
+    <string name="notifications_duha_best_detail">À mi-chemin entre le lever du soleil et le Dhuhr</string>
+    <string name="notifications_duha_start">Dès que son temps est arrivé</string>
+    <string name="notifications_duha_start_detail">%1$s minutes ou plus après le lever du soleil</string>
+    <string name="notifications_iqama">Rappel de l’iqama</string>
+    <string name="notifications_iqama_subtitle">Quelques minutes après l’adhan, pas l’heure de votre mosquée</string>
+    <string name="notifications_iqama_note">Réglez les minutes de chaque prière dans sa ligne, sous Prières.</string>
+    <plurals name="notifications_iqama_after">
+        <item quantity="one">Iqama %1$s min après l’adhan</item>
+        <item quantity="other">Iqama %1$s min après l’adhan</item>
+    </plurals>
+    <string name="notifications_iqama_off">Désactivé</string>
+    <string name="notifications_section_sound">SON</string>
+    <string name="notifications_section_iqama">RAPPEL DE L’IQAMA</string>
+    <string name="notifications_iqama_not_friday">Pas de rappel de l’iqama le vendredi : la khoutba vient d’abord.</string>
 </resources>

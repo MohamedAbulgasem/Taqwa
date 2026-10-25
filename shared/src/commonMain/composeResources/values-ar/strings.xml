@@ -725,4 +725,26 @@
     <string name="credit_adhkar">الأذكار</string>
     <string name="credit_adhkar_detail">أذكار الصباح والمساء من «حصن المسلم» لسعيد بن علي بن وهف القحطاني؛ النص العربي وترتيبه والترجمة الإنجليزية والنطق بالحروف اللاتينية من مجموعة بيانات OpenDua (Human Development Fund)، رخصة CC BY 4.0، مع تعديلات طفيفة مدوّنة في المستودع.</string>
     <string name="adhkar_opens_at">من العصر · %1$s</string>
+    <string name="notifications_duha">الضحى</string>
+    <string name="notifications_duha_when">وقت التذكير</string>
+    <string name="notifications_section_when">وقت التذكير</string>
+    <string name="notifications_duha_best">في أفضل وقتها</string>
+    <string name="notifications_duha_best_detail">منتصف ما بين الشروق والظهر</string>
+    <string name="notifications_duha_start">عند دخول وقتها</string>
+    <string name="notifications_duha_start_detail">بعد الشروق بـ%1$s دقيقة أو أكثر</string>
+    <string name="notifications_iqama">تذكير الإقامة</string>
+    <string name="notifications_iqama_subtitle">بعد الأذان بدقائق تحدّدها، لا بموعد إقامة مسجدك</string>
+    <string name="notifications_iqama_note">تُحدَّد دقائق كل صلاة في سطرها ضمن الصلوات.</string>
+    <plurals name="notifications_iqama_after">
+        <item quantity="zero">الإقامة بعد الأذان بـ%1$s دقيقة</item>
+        <item quantity="one">الإقامة بعد الأذان بـ%1$s دقيقة</item>
+        <item quantity="two">الإقامة بعد الأذان بـ%1$s دقيقتين</item>
+        <item quantity="few">الإقامة بعد الأذان بـ%1$s دقائق</item>
+        <item quantity="many">الإقامة بعد الأذان بـ%1$s دقيقة</item>
+        <item quantity="other">الإقامة بعد الأذان بـ%1$s دقيقة</item>
+    </plurals>
+    <string name="notifications_iqama_off">بدون تذكير</string>
+    <string name="notifications_section_sound">الصوت</string>
+    <string name="notifications_section_iqama">تذكير الإقامة</string>
+    <string name="notifications_iqama_not_friday">لا تذكير بالإقامة يوم الجمعة، فالخطبة قبلها.</string>
 </resources>

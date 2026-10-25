@@ -97,6 +97,19 @@ internal object SettingsKeys {
     val ADHKAR_REMINDER_ENABLED = booleanPreferencesKey("adhkar_reminder_enabled")
     val ADHKAR_REMINDER_SOUND = stringPreferencesKey("adhkar_reminder_sound")
 
+    /** The Duha reminder (Duha and Iqama spec §3.1), when it rings and its sound. Absent means off,
+     * at its best time, and the chime. */
+    val DUHA_ENABLED = booleanPreferencesKey("duha_enabled")
+    val DUHA_TIMING = stringPreferencesKey("duha_timing")
+    val DUHA_SOUND = stringPreferencesKey("duha_sound")
+
+    /** The iqama reminder and its sound; absent means off and the chime. */
+    val IQAMA_ENABLED = booleanPreferencesKey("iqama_enabled")
+    val IQAMA_SOUND = stringPreferencesKey("iqama_sound")
+
+    /** One prayer's iqama gap in minutes, a key per prayer as the sounds are; absent means its default. */
+    fun iqamaMinutesKey(prayer: Prayer) = intPreferencesKey("iqama_minutes_${prayer.name.lowercase()}")
+
     val QURAN_MODE = stringPreferencesKey("quran_mode")
     val QURAN_SIZE = intPreferencesKey("quran_size")
     val QURAN_TRANSLITERATION = booleanPreferencesKey("quran_transliteration")

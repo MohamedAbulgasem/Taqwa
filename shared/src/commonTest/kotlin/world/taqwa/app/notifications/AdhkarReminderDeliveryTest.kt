@@ -46,8 +46,27 @@ class AdhkarReminderDeliveryTest {
         assertEquals("ADHKAR-MORNING-2026-10-11", AdhkarReminderDelivery.tagFor(NotificationKind.ADHKAR_MORNING, "ADHKAR-MORNING-2026-10-11"))
         assertEquals("ADHKAR-EVENING-2026-10-11", AdhkarReminderDelivery.tagFor(NotificationKind.ADHKAR_EVENING, "ADHKAR-EVENING-2026-10-11"))
         // Every other kind posts exactly as it always has, untagged.
-        for (kind in listOf(NotificationKind.PRAYER, NotificationKind.REMINDER, NotificationKind.TAHAJJUD)) {
+        for (kind in NotificationKind.entries.filterNot { it.isAdhkar }) {
             assertNull(AdhkarReminderDelivery.tagFor(kind, "FAJR-PRAYER-2026-10-11"), "$kind")
         }
+    }
+
+    // Duha and Iqama spec §3.4: the receiver reads windowEnd for every kind, so the same rules drop
+    // a Duha delivered after its end (ten minutes before noon) and an iqama delivered more than
+    // ten minutes after it was due, and time out one that arrives in time.
+    @Test
+    fun `a late Duha or iqama reminder is dropped at its window end and times out there`() {
+        val duhaEnd = Instant.parse("2026-10-25T10:41:00Z")
+        assertEquals(35.minutes, AdhkarReminderDelivery.timeout(duhaEnd - 35.minutes, duhaEnd))
+        assertFalse(AdhkarReminderDelivery.shouldPost(duhaEnd, duhaEnd))
+        assertFalse(AdhkarReminderDelivery.shouldPost(duhaEnd + 20.minutes, duhaEnd))
+        assertNull(AdhkarReminderDelivery.timeout(duhaEnd + 20.minutes, duhaEnd))
+
+        val iqamaAt = Instant.parse("2026-10-25T15:25:00Z")
+        val iqamaEnd = iqamaAt + 10.minutes
+        assertEquals(10.minutes, AdhkarReminderDelivery.timeout(iqamaAt, iqamaEnd))
+        assertEquals(1.minutes, AdhkarReminderDelivery.timeout(iqamaAt + 9.minutes, iqamaEnd))
+        assertFalse(AdhkarReminderDelivery.shouldPost(iqamaAt + 10.minutes, iqamaEnd))
+        assertNull(AdhkarReminderDelivery.timeout(iqamaAt + 40.minutes, iqamaEnd))
     }
 }

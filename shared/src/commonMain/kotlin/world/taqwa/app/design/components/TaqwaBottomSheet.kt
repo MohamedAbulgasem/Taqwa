@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,10 +34,18 @@ import world.taqwa.app.resources.sheet_a11y_drag_handle
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaqwaBottomSheet(onDismissRequest: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+fun TaqwaBottomSheet(
+    onDismissRequest: () -> Unit,
+    /** True opens a tall sheet whole rather than half way, for a sheet whose second section would
+     * otherwise start below the fold (a prayer's sound sheet with its iqama minutes). A sheet
+     * shorter than half the screen opens whole either way. */
+    skipPartiallyExpanded: Boolean = false,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     val colors = LocalTaqwaColors.current
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded),
         containerColor = colors.background,
         contentColor = colors.textPrimary,
         tonalElevation = 0.dp,

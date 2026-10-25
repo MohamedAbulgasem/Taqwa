@@ -754,4 +754,23 @@
     <string name="credit_adhkar">Adhkar</string>
     <string name="credit_adhkar_detail">Morning and evening adhkar from Hisn al-Muslim by Sa‘id ibn ‘Ali ibn Wahf al-Qahtani; the Arabic text and its arrangement, the English translation and the transliteration from the OpenDua dataset (Human Development Fund), CC BY 4.0, with small edits recorded in the repository.</string>
     <string name="adhkar_opens_at">From Asr · %1$s</string>
+    <!-- Duha and Iqama reminders (Duha and Iqama spec §4.5). Sound reuses notifications_tahajjud_sound and the sheet's minutes minutes_count. -->
+    <string name="notifications_duha">Duha</string>
+    <string name="notifications_duha_when">When</string>
+    <string name="notifications_section_when">WHEN</string>
+    <string name="notifications_duha_best">At its best time</string>
+    <string name="notifications_duha_best_detail">Midway between sunrise and Dhuhr</string>
+    <string name="notifications_duha_start">Once its time is in</string>
+    <string name="notifications_duha_start_detail">%1$s minutes or more after sunrise</string>
+    <string name="notifications_iqama">Iqama reminder</string>
+    <string name="notifications_iqama_subtitle">Minutes after the adhan, not your mosque’s own time</string>
+    <string name="notifications_iqama_note">Set each prayer’s minutes in its row under Prayers.</string>
+    <plurals name="notifications_iqama_after">
+        <item quantity="one">Iqama %1$s min after the adhan</item>
+        <item quantity="other">Iqama %1$s min after the adhan</item>
+    </plurals>
+    <string name="notifications_iqama_off">Off</string>
+    <string name="notifications_section_sound">SOUND</string>
+    <string name="notifications_section_iqama">IQAMA REMINDER</string>
+    <string name="notifications_iqama_not_friday">No iqama reminder on Fridays: the khutbah comes first.</string>
 </resources>

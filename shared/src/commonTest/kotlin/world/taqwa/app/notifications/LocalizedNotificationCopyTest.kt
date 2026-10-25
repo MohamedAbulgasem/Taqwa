@@ -29,6 +29,9 @@ private class StubFormat(private val tag: String, private val arabicIndic: Boole
  */
 class LocalizedNotificationCopyTest {
 
+    /** Every kind but the iqama, whose body counts the minutes since the adhan and quotes no clock time. */
+    private val kindsQuotingATime = NotificationKind.entries - NotificationKind.IQAMA
+
     @Test
     fun channelNamesAreLocalisedAndDistinctPerSound() {
         val copy = LocalizedNotificationCopy(StubFormat("ar-LY", arabicIndic = false))
@@ -124,7 +127,7 @@ class LocalizedNotificationCopyTest {
         for (tag in listOf("en-GB", "ar-LY", "fr-FR", "tr-TR", "id-ID", "ur-PK", "bn-BD")) {
             val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
             for (time in listOf("5:10\u00A0PM", "٥:١٠\u00A0م", "ÖS\u00A05:10")) {
-                for (kind in NotificationKind.entries) {
+                for (kind in kindsQuotingATime) {
                     val body = copy.body(Prayer.FAJR, kind, time, 10)
                     assertTrue(body.contains(FSI + time + PDI), "$tag $kind: $body")
                     assertFalse(body.contains("{time}"), "$tag $kind: $body")
@@ -141,7 +144,7 @@ class LocalizedNotificationCopyTest {
         for (tag in listOf("en-GB", "ar-LY", "fr-FR", "tr-TR", "id-ID", "ur-PK", "bn-BD")) {
             val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
             for (time in listOf("05:35", "٢٠:١٥", "০৫:৩৫")) {
-                for (kind in NotificationKind.entries) {
+                for (kind in kindsQuotingATime) {
                     val body = copy.body(Prayer.FAJR, kind, time, 10)
                     assertTrue(body.contains(time), "$tag $kind: $body")
                     assertFalse(body.contains(FSI) || body.contains(PDI), "$tag $kind: $body")
@@ -273,5 +276,116 @@ class LocalizedNotificationCopyTest {
                 assertTrue(channel.startsWith("$name · "), "$tag: $channel")
             }
         }
+    }
+
+    // ── Duha and the iqama (Duha and Iqama spec §3.2) ──────────────────────────────────────
+
+    private class DuhaWords(val title: String, val best: String, val start: String)
+
+    /** The spec's table, with `{time}` where END goes. */
+    private val duhaCopy = mapOf(
+        "en-GB" to DuhaWords("Duha", "The best time for Duha · until {time}", "Duha time is in · until {time}"),
+        "ar-LY" to DuhaWords("الضحى", "أفضل وقت لصلاة الضحى · حتى {time}", "دخل وقت الضحى · حتى {time}"),
+        "fr-FR" to DuhaWords("Douha", "Le meilleur moment pour la Douha · jusqu’à {time}", "Le temps de la Douha est arrivé · jusqu’à {time}"),
+        "tr-TR" to DuhaWords("Kuşluk", "Kuşluk namazı için en faziletli vakit · bitiş {time}", "Kuşluk vakti girdi · bitiş {time}"),
+        "id-ID" to DuhaWords("Dhuha", "Waktu terbaik untuk salat Dhuha · hingga pukul {time}", "Telah masuk waktu Dhuha · hingga pukul {time}"),
+        "ur-PK" to DuhaWords("چاشت", "نمازِ چاشت کا افضل وقت · {time} تک", "چاشت کا وقت شروع ہو گیا · {time} تک"),
+        "bn-BD" to DuhaWords("চাশত", "চাশতের নামাজের উত্তম সময় · {time} পর্যন্ত", "চাশতের সময় শুরু হয়েছে · {time} পর্যন্ত"),
+    )
+
+    /** The iqama's body with a gap of 10, and its channel's name. */
+    private val iqamaCopy = mapOf(
+        "en-GB" to ("Iqama reminder · 10 minutes after the adhan" to "Iqama reminder"),
+        "ar-LY" to ("تذكير الإقامة · مضت 10 دقائق على الأذان" to "تذكير الإقامة"),
+        "fr-FR" to ("Rappel de l’iqama · 10 minutes après l’adhan" to "Rappel de l’iqama"),
+        "tr-TR" to ("Kamet hatırlatması · ezandan 10 dakika sonra" to "Kamet hatırlatması"),
+        "id-ID" to ("Pengingat iqamah · 10 menit setelah azan" to "Pengingat iqamah"),
+        "ur-PK" to ("اقامت کی یاد دہانی · اذان کے 10 منٹ بعد" to "اقامت کی یاد دہانی"),
+        "bn-BD" to ("ইকামতের রিমাইন্ডার · আজানের 10 মিনিট পর" to "ইকামতের রিমাইন্ডার"),
+    )
+
+    @Test
+    fun `every language titles Duha by its own name and quotes its end with the clock isolated`() {
+        for ((tag, words) in duhaCopy) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            for (kind in listOf(NotificationKind.DUHA_BEST, NotificationKind.DUHA_START)) {
+                assertEquals(words.title, copy.title(Prayer.SUNRISE, kind), "$tag $kind")
+                val template = if (kind == NotificationKind.DUHA_BEST) words.best else words.start
+                assertEquals(template.replace("{time}", FSI + "12:41 PM" + PDI), copy.body(Prayer.SUNRISE, kind, "12:41 PM", 0), "$tag $kind")
+                // A 24-hour time stays bare, as every other body's does.
+                assertEquals(template.replace("{time}", "12:41"), copy.body(Prayer.SUNRISE, kind, "12:41", 0), "$tag $kind")
+            }
+        }
+    }
+
+    @Test
+    fun `Urdu and Bengali call Duha by its own name and never Ishraq`() {
+        // In subcontinental usage Ishraq is some 15 to 20 minutes after sunrise, so naming it at
+        // 50 minutes or more would mislead: both reminders say چاشت / চাশত.
+        val urdu = LocalizedNotificationCopy(StubFormat("ur-PK", arabicIndic = false))
+        val bengali = LocalizedNotificationCopy(StubFormat("bn-BD", arabicIndic = false))
+        for (kind in listOf(NotificationKind.DUHA_BEST, NotificationKind.DUHA_START)) {
+            val u = urdu.body(Prayer.SUNRISE, kind, "08:10", 0)
+            val b = bengali.body(Prayer.SUNRISE, kind, "08:10", 0)
+            assertTrue("چاشت" in u && "اشراق" !in u, "$kind $u")
+            assertTrue("চাশত" in b && "ইশরাক" !in b, "$kind $b")
+        }
+    }
+
+    @Test
+    fun `every language says how long after the adhan the iqama reminder rings under the prayer's own title`() {
+        for ((tag, words) in iqamaCopy) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            for (prayer in listOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA)) {
+                assertEquals(words.first, copy.body(prayer, NotificationKind.IQAMA, "12:34", 10), "$tag $prayer")
+                assertEquals(copy.title(prayer, NotificationKind.PRAYER), copy.title(prayer, NotificationKind.IQAMA), "$tag $prayer")
+            }
+        }
+        val english = LocalizedNotificationCopy(StubFormat("en-GB", arabicIndic = false))
+        assertEquals("Isha · العشاء", english.title(Prayer.ISHA, NotificationKind.IQAMA))
+        assertEquals("Iqama reminder · 1 minute after the adhan", english.body(Prayer.ISHA, NotificationKind.IQAMA, "", 1))
+        val french = LocalizedNotificationCopy(StubFormat("fr-FR", arabicIndic = false))
+        assertEquals("Rappel de l’iqama · 1 minute après l’adhan", french.body(Prayer.ISHA, NotificationKind.IQAMA, "", 1))
+    }
+
+    @Test
+    fun `Arabic counts the minutes since the adhan in its own grammar`() {
+        val latin = LocalizedNotificationCopy(StubFormat("ar-LY", arabicIndic = false))
+        val expected = mapOf(
+            1 to "تذكير الإقامة · مضت دقيقة على الأذان",
+            2 to "تذكير الإقامة · مضت دقيقتان على الأذان",
+            5 to "تذكير الإقامة · مضت 5 دقائق على الأذان",
+            10 to "تذكير الإقامة · مضت 10 دقائق على الأذان",
+            15 to "تذكير الإقامة · مضت 15 دقيقة على الأذان",
+            30 to "تذكير الإقامة · مضت 30 دقيقة على الأذان",
+        )
+        for ((minutes, body) in expected) {
+            assertEquals(body, latin.body(Prayer.ASR, NotificationKind.IQAMA, "", minutes), "$minutes")
+        }
+        // And in the locale's own digits where it has them.
+        val indic = LocalizedNotificationCopy(StubFormat("ar-EG", arabicIndic = true))
+        assertEquals("تذكير الإقامة · مضت ١٥ دقيقة على الأذان", indic.body(Prayer.FAJR, NotificationKind.IQAMA, "", 15))
+    }
+
+    @Test
+    fun `Duha and the iqama post into channels named for them`() {
+        for (tag in duhaCopy.keys) {
+            val copy = LocalizedNotificationCopy(StubFormat(tag, arabicIndic = false))
+            val duha = copy.channelName(Prayer.SUNRISE, PrayerSound.NOTIFICATION, NotificationKind.DUHA_BEST)
+            assertEquals(duha, copy.channelName(Prayer.SUNRISE, PrayerSound.NOTIFICATION, NotificationKind.DUHA_START), tag)
+            assertTrue(duha.startsWith(duhaCopy.getValue(tag).title + " · "), "$tag: $duha")
+            val iqama = copy.channelName(Prayer.FAJR, PrayerSound.NOTIFICATION, NotificationKind.IQAMA)
+            assertTrue(iqama.startsWith(iqamaCopy.getValue(tag).second + " · "), "$tag: $iqama")
+            for (prayer in listOf(Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA)) {
+                assertEquals(iqama, copy.channelName(prayer, PrayerSound.NOTIFICATION, NotificationKind.IQAMA), "$tag $prayer")
+            }
+            assertTrue(iqama != copy.channelName(Prayer.FAJR, PrayerSound.NOTIFICATION), "$tag: $iqama")
+        }
+        val english = LocalizedNotificationCopy(StubFormat("en-GB", arabicIndic = false))
+        assertEquals("Duha · Notification", english.channelName(Prayer.SUNRISE, PrayerSound.NOTIFICATION, NotificationKind.DUHA_BEST))
+        assertEquals("Iqama reminder · Takbir", english.channelName(Prayer.MAGHRIB, PrayerSound.TAKBIR, NotificationKind.IQAMA))
+        // The planner's default copy names them the same way.
+        assertEquals("Duha · Silent", EnglishNotificationCopy.channelName(Prayer.SUNRISE, PrayerSound.SILENT, NotificationKind.DUHA_START))
+        assertEquals("Iqama reminder · Notification", EnglishNotificationCopy.channelName(Prayer.ASR, PrayerSound.NOTIFICATION, NotificationKind.IQAMA))
     }
 }

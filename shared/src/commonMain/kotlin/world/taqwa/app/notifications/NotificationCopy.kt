@@ -39,7 +39,8 @@ object EnglishNotificationCopy : NotificationCopy {
         NotificationKind.TAHAJJUD -> "Tahajjud"
         NotificationKind.ADHKAR_MORNING -> "Morning adhkar"
         NotificationKind.ADHKAR_EVENING -> "Evening adhkar"
-        NotificationKind.PRAYER, NotificationKind.REMINDER -> name(prayer)
+        NotificationKind.DUHA_BEST, NotificationKind.DUHA_START -> "Duha"
+        NotificationKind.PRAYER, NotificationKind.REMINDER, NotificationKind.IQAMA -> name(prayer)
     }
 
     override fun body(
@@ -54,6 +55,10 @@ object EnglishNotificationCopy : NotificationCopy {
         NotificationKind.TAHAJJUD -> "The last third of the night has begun · ${name(prayer)} at $clockTime"
         NotificationKind.ADHKAR_MORNING -> "Until sunrise · $clockTime"
         NotificationKind.ADHKAR_EVENING -> "Until Maghrib · $clockTime"
+        NotificationKind.DUHA_BEST -> "The best time for Duha · until $clockTime"
+        NotificationKind.DUHA_START -> "Duha time is in · until $clockTime"
+        NotificationKind.IQAMA ->
+            "Iqama reminder · $minutesBefore ${if (minutesBefore == 1) "minute" else "minutes"} after the adhan"
     }
 
     override fun channelName(prayer: Prayer, sound: PrayerSound, kind: NotificationKind): String {
@@ -63,8 +68,13 @@ object EnglishNotificationCopy : NotificationCopy {
             PrayerSound.TAKBIR -> "Takbir"
             PrayerSound.ADHAN -> "Adhan"
         }
-        // Both adhkar kinds post into one channel (NotificationChannels), so it is named for both.
-        val channel = if (kind.isAdhkar) "Morning and evening adhkar" else title(prayer, kind)
+        // Both adhkar kinds post into one channel (NotificationChannels), so it is named for both;
+        // all five iqamas post into one too, named for the reminder rather than a prayer.
+        val channel = when {
+            kind.isAdhkar -> "Morning and evening adhkar"
+            kind == NotificationKind.IQAMA -> "Iqama reminder"
+            else -> title(prayer, kind)
+        }
         return "$channel · $soundName"
     }
 }

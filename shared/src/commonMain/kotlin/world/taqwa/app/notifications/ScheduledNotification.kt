@@ -15,20 +15,31 @@ import kotlin.time.Instant
  * [ADHKAR_MORNING] and [ADHKAR_EVENING] are the same kind of stand-in (adhkar spec §5): they
  * carry FAJR and ASR, the prayers they follow by half an hour, and their bodies quote the time
  * their window ends (sunrise, Maghrib) rather than that prayer's own.
+ *
+ * [DUHA_BEST] and [DUHA_START] are the Duha reminder at its best time and once its time is in
+ * (Duha and Iqama spec §3.2): one setting, one channel and one tier, as the two adhkar kinds are.
+ * They carry [world.taqwa.app.domain.Prayer.SUNRISE], which is never notified and so can never be
+ * taken for an adhan, and their bodies quote the time Duha ends. [IQAMA] carries its own prayer
+ * and rings some minutes after that prayer's adhan.
  */
-enum class NotificationKind { PRAYER, REMINDER, TAHAJJUD, ADHKAR_MORNING, ADHKAR_EVENING }
+enum class NotificationKind { PRAYER, REMINDER, TAHAJJUD, ADHKAR_MORNING, ADHKAR_EVENING, DUHA_BEST, DUHA_START, IQAMA }
 
 /** The set an adhkar reminder is for, which a tap on it opens; null for every other kind. */
 val NotificationKind.adhkarSet: AdhkarSet?
     get() = when (this) {
         NotificationKind.ADHKAR_MORNING -> AdhkarSet.MORNING
         NotificationKind.ADHKAR_EVENING -> AdhkarSet.EVENING
-        NotificationKind.PRAYER, NotificationKind.REMINDER, NotificationKind.TAHAJJUD -> null
+        NotificationKind.PRAYER, NotificationKind.REMINDER, NotificationKind.TAHAJJUD,
+        NotificationKind.DUHA_BEST, NotificationKind.DUHA_START, NotificationKind.IQAMA -> null
     }
 
 /** Either half of the adhkar reminder: one setting, one channel, one tier of the plan. */
 val NotificationKind.isAdhkar: Boolean
     get() = adhkarSet != null
+
+/** Either timing of the Duha reminder: one setting, one channel, one tier of the plan. */
+val NotificationKind.isDuha: Boolean
+    get() = this == NotificationKind.DUHA_BEST || this == NotificationKind.DUHA_START
 
 /**
  * The id of [set]'s reminder on [date] — `ADHKAR-MORNING-2026-10-11` — the one spelling the plan
@@ -58,9 +69,11 @@ data class ScheduledNotification(
     val body: String,
     /**
      * When what this notification announces stops being true: the adhkar reminder's sunrise or
-     * Maghrib. Android delivers that reminder inexactly, up to an hour late, so its receiver drops
-     * one that arrives at or after this and lets an earlier one leave the shade here (see
-     * [AdhkarReminderDelivery]). Null for every other kind, which is never dropped for lateness.
+     * Maghrib, Duha's end ten minutes before noon, and ten minutes after an iqama reminder rings.
+     * Android can deliver these late (the adhkar reminder and most Duhas are inexact, up to an
+     * hour late), so its receiver drops one that arrives at or after this and lets an earlier one
+     * leave the shade here (see [AdhkarReminderDelivery]). Null for the prayers, their reminders
+     * and Tahajjud, which are never dropped for lateness.
      */
     val windowEnd: Instant? = null,
 )

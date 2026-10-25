@@ -35,6 +35,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.about.AboutLinks
@@ -177,23 +178,23 @@ internal fun BackChevron(onBack: () -> Unit) {
 }
 
 @Composable
-internal fun SectionLabel(text: String) {
+internal fun SectionLabel(text: String, gutter: Dp = SettingsGutter) {
     Text(
         text,
         style = TaqwaText.sectionLabel,
         color = LocalTaqwaColors.current.textTertiary,
-        modifier = Modifier.padding(start = SettingsGutter + 4.dp, bottom = 8.dp).semantics { heading() },
+        modifier = Modifier.padding(start = gutter + 4.dp, bottom = 8.dp).semantics { heading() },
     )
 }
 
 /** Body copy beneath a card — privacy notes, rule explanations, live previews. */
 @Composable
-internal fun SettingsNote(text: String) {
+internal fun SettingsNote(text: String, gutter: Dp = SettingsGutter) {
     Text(
         text,
         style = TaqwaText.caption,
         color = LocalTaqwaColors.current.textSecondary,
-        modifier = Modifier.padding(horizontal = SettingsGutter + 4.dp),
+        modifier = Modifier.padding(horizontal = gutter + 4.dp),
     )
 }
 

@@ -87,12 +87,33 @@ object NotificationChannels {
             .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.ADHKAR_MORNING) } }
             .distinct()
 
-    // A reminder rides its prayer's own Notification channel, as it always has; only Tahajjud and
-    // the adhkar reminder leave the prayer's namespace.
+    /**
+     * Every channel the Duha reminder could ever have had (Duha and Iqama spec §3.4). Both timings
+     * share one channel, as they share one setting, so whichever [NotificationKind] asks, the ids
+     * are the same.
+     */
+    fun allDuhaChannelIds(): List<String> =
+        PrayerSound.entries
+            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.SUNRISE, sound, voice, NotificationKind.DUHA_BEST) } }
+            .distinct()
+
+    /**
+     * Every channel the iqama reminder could ever have had. All five prayers' iqamas share one,
+     * so it can be silenced in the system's list without silencing any adhan.
+     */
+    fun allIqamaChannelIds(): List<String> =
+        PrayerSound.entries
+            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.IQAMA) } }
+            .distinct()
+
+    // A reminder rides its prayer's own Notification channel, as it always has; Tahajjud, the
+    // adhkar reminder, Duha and the iqama leave the prayer's namespace.
     private fun base(prayer: Prayer, sound: PrayerSound, kind: NotificationKind = NotificationKind.PRAYER): String =
         when (kind) {
             NotificationKind.TAHAJJUD -> "tahajjud_${sound.name.lowercase()}"
             NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING -> "adhkar_${sound.name.lowercase()}"
+            NotificationKind.DUHA_BEST, NotificationKind.DUHA_START -> "duha_${sound.name.lowercase()}"
+            NotificationKind.IQAMA -> "iqama_${sound.name.lowercase()}"
             NotificationKind.PRAYER, NotificationKind.REMINDER -> "prayer_${prayer.name.lowercase()}_${sound.name.lowercase()}"
         }
 }

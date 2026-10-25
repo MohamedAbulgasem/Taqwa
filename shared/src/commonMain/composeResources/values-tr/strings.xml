@@ -720,4 +720,22 @@
     <string name="credit_adhkar">Zikirler</string>
     <string name="credit_adhkar_detail">Sabah ve akşam zikirleri, Saîd b. Ali b. Vehf el-Kahtânî’nin Hısnü’l-Müslim’inden; Arapça metin ve yapısı, İngilizce çeviri ve okunuş OpenDua veri setinden (Human Development Fund), CC BY 4.0 lisansı; küçük düzeltmeler depoda kayıtlıdır.</string>
     <string name="adhkar_opens_at">İkindiden itibaren · %1$s</string>
+    <string name="notifications_duha">Kuşluk</string>
+    <string name="notifications_duha_when">Ne zaman</string>
+    <string name="notifications_section_when">NE ZAMAN</string>
+    <string name="notifications_duha_best">En faziletli vaktinde</string>
+    <string name="notifications_duha_best_detail">Güneşin doğuşu ile öğlenin ortasında</string>
+    <string name="notifications_duha_start">Vakti girince</string>
+    <string name="notifications_duha_start_detail">Güneş doğduktan %1$s dakika veya daha sonra</string>
+    <string name="notifications_iqama">Kamet hatırlatması</string>
+    <string name="notifications_iqama_subtitle">Ezandan belirlediğiniz dakika sonra, caminizin kendi vakti değil</string>
+    <string name="notifications_iqama_note">Her vaktin dakikasını Vakitler altındaki satırından ayarlayın.</string>
+    <plurals name="notifications_iqama_after">
+        <item quantity="one">Kamet ezandan %1$s dk sonra</item>
+        <item quantity="other">Kamet ezandan %1$s dk sonra</item>
+    </plurals>
+    <string name="notifications_iqama_off">Kapalı</string>
+    <string name="notifications_section_sound">SES</string>
+    <string name="notifications_section_iqama">KAMET HATIRLATMASI</string>
+    <string name="notifications_iqama_not_friday">Cuma günleri kamet hatırlatması yok: önce hutbe okunur.</string>
 </resources>

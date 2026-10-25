@@ -706,4 +706,22 @@
     <string name="credit_adhkar">আযকার</string>
     <string name="credit_adhkar_detail">সাঈদ ইবনে আলী ইবনে ওয়াহফ আল-কাহতানীর হিসনুল মুসলিম থেকে সকাল ও সন্ধ্যার আযকার; আরবি পাঠ ও তার বিন্যাস, ইংরেজি অনুবাদ ও উচ্চারণ OpenDua ডেটাসেট (Human Development Fund) থেকে, CC BY 4.0 লাইসেন্স; ছোটখাটো সম্পাদনার বিবরণ রিপোজিটরিতে লেখা আছে।</string>
     <string name="adhkar_opens_at">আসর থেকে · %1$s</string>
+    <string name="notifications_duha">চাশত</string>
+    <string name="notifications_duha_when">কখন</string>
+    <string name="notifications_section_when">কখন</string>
+    <string name="notifications_duha_best">উত্তম সময়ে</string>
+    <string name="notifications_duha_best_detail">সূর্যোদয় ও যোহরের মাঝামাঝি</string>
+    <string name="notifications_duha_start">সময় শুরু হলে</string>
+    <string name="notifications_duha_start_detail">সূর্যোদয়ের %1$s মিনিট বা তার বেশি পরে</string>
+    <string name="notifications_iqama">ইকামতের রিমাইন্ডার</string>
+    <string name="notifications_iqama_subtitle">আজানের কয়েক মিনিট পরে, আপনার মসজিদের নিজস্ব সময় নয়</string>
+    <string name="notifications_iqama_note">প্রতিটি নামাজের মিনিট নামাজসমূহ অংশে তার সারিতে ঠিক করুন।</string>
+    <plurals name="notifications_iqama_after">
+        <item quantity="one">আজানের %1$s মিনিট পরে ইকামত</item>
+        <item quantity="other">আজানের %1$s মিনিট পরে ইকামত</item>
+    </plurals>
+    <string name="notifications_iqama_off">বন্ধ</string>
+    <string name="notifications_section_sound">শব্দ</string>
+    <string name="notifications_section_iqama">ইকামতের রিমাইন্ডার</string>
+    <string name="notifications_iqama_not_friday">শুক্রবার ইকামতের রিমাইন্ডার নেই: আগে খুতবা হয়।</string>
 </resources>

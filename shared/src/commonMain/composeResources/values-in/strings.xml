@@ -695,4 +695,21 @@
     <string name="credit_adhkar">Zikir</string>
     <string name="credit_adhkar_detail">Zikir pagi dan petang dari Hisnul Muslim karya Sa‘id bin ‘Ali bin Wahf al-Qahthani; teks Arab beserta strukturnya, terjemahan bahasa Inggris, dan transliterasi dari dataset OpenDua (Human Development Fund), CC BY 4.0, dengan sedikit suntingan yang dicatat di repositori.</string>
     <string name="adhkar_opens_at">Mulai Asar · %1$s</string>
+    <string name="notifications_duha">Dhuha</string>
+    <string name="notifications_duha_when">Waktu</string>
+    <string name="notifications_section_when">WAKTU</string>
+    <string name="notifications_duha_best">Pada waktu terbaiknya</string>
+    <string name="notifications_duha_best_detail">Pertengahan antara terbit dan Dzuhur</string>
+    <string name="notifications_duha_start">Begitu waktunya masuk</string>
+    <string name="notifications_duha_start_detail">%1$s menit atau lebih setelah terbit</string>
+    <string name="notifications_iqama">Pengingat iqamah</string>
+    <string name="notifications_iqama_subtitle">Beberapa menit setelah azan, bukan jadwal masjid Anda</string>
+    <string name="notifications_iqama_note">Atur menit tiap salat di barisnya di bawah Salat.</string>
+    <plurals name="notifications_iqama_after">
+        <item quantity="other">Iqamah %1$s menit setelah azan</item>
+    </plurals>
+    <string name="notifications_iqama_off">Nonaktif</string>
+    <string name="notifications_section_sound">SUARA</string>
+    <string name="notifications_section_iqama">PENGINGAT IQAMAH</string>
+    <string name="notifications_iqama_not_friday">Tidak ada pengingat iqamah pada hari Jumat: khotbah lebih dulu.</string>
 </resources>

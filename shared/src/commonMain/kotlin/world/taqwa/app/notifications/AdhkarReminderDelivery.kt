@@ -7,6 +7,12 @@ import kotlin.time.Instant
  * What the Android receiver does with an adhkar reminder when its alarm fires (adhkar spec §5).
  * Kept out of the receiver, which has no host test, so the rules are pinned by one.
  *
+ * The receiver applies [shouldPost] and [timeout] to every entry that carries a
+ * [ScheduledNotification.windowEnd], whatever its kind (Duha and Iqama spec §3.4). So a late Duha
+ * is never posted after its end, ten minutes before noon, and a late iqama reminder, possible only
+ * where exact alarms are revoked, is never posted more than ten minutes after it was due. Only the
+ * adhkar reminder is tagged ([tagFor]).
+ *
  * The alarm is inexact by design, and from Android 12 the platform's bound on an inexact alarm is
  * "within an hour" of the time asked for. A morning reminder set near sunrise can therefore arrive
  * after sunrise, saying "Until sunrise" about a sunrise that has passed. It is dropped instead, and

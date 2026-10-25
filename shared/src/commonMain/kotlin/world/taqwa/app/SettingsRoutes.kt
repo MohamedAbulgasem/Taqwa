@@ -175,6 +175,45 @@ internal fun NotificationSettingsRoute(
                 container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
             }
         },
+        onToggleDuha = { on ->
+            scope.launch {
+                settings.setNotificationSettings(notificationSettings.copy(duha = on))
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
+        onPickDuhaTiming = { timing ->
+            scope.launch {
+                settings.setNotificationSettings(notificationSettings.copy(duhaTiming = timing))
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
+        onPickDuhaSound = { sound ->
+            scope.launch {
+                settings.setNotificationSettings(notificationSettings.copy(duhaSound = sound))
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
+        onToggleIqama = { on ->
+            scope.launch {
+                settings.setNotificationSettings(notificationSettings.copy(iqama = on))
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
+        onPickIqamaMinutes = { prayer, minutes ->
+            scope.launch {
+                val updated = notificationSettings.copy(
+                    iqamaMinutes = notificationSettings.iqamaMinutes + (prayer to minutes),
+                )
+                settings.setNotificationSettings(updated)
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
+        onPickIqamaSound = { sound ->
+            scope.launch {
+                settings.setNotificationSettings(notificationSettings.copy(iqamaSound = sound))
+                container.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+            }
+        },
         onPickVoice = { voice ->
             scope.launch {
                 settings.setNotificationSettings(notificationSettings.copy(voice = voice))

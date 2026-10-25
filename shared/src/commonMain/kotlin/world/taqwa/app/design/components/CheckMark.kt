@@ -31,9 +31,10 @@ fun CheckMark(modifier: Modifier = Modifier) {
 }
 
 /**
- * A radio dot: an empty ring when unselected, filled solid when selected. Used only by the sound
- * sheet — the one place the spec wants a radio rather than [CheckMark], because seeing the
- * unselected targets aids the choice among four mutually exclusive options.
+ * A radio dot: an empty ring when unselected, filled solid when selected. Used by the sound
+ * sheet — its sounds and, while Iqama is on, its iqama minutes, so the sheet has one selection
+ * style — and the timetable picker, where the spec wants a radio rather than [CheckMark], because
+ * seeing the unselected targets aids the choice among mutually exclusive options.
  */
 @Composable
 fun RadioMark(selected: Boolean, modifier: Modifier = Modifier) {

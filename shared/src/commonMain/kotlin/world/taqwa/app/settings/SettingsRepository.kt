@@ -13,6 +13,7 @@ import world.taqwa.app.domain.CalculationMethodId
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.HighLatitudePreference
 import world.taqwa.app.domain.LocationSource
+import world.taqwa.app.domain.DuhaTiming
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.Prayer
@@ -174,6 +175,18 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             // The same guard: a level the adhkar reminder does not offer is the default again.
             adhkarSound = p[SettingsKeys.ADHKAR_REMINDER_SOUND].toEnumOr(PrayerSound.NOTIFICATION)
                 .takeIf { it in NotificationSettings.AdhkarSounds } ?: PrayerSound.NOTIFICATION,
+            duha = p[SettingsKeys.DUHA_ENABLED] ?: false,
+            duhaTiming = p[SettingsKeys.DUHA_TIMING].toEnumOr(DuhaTiming.BEST),
+            // The same guards: a level, or a gap, the setting does not offer is the default again.
+            duhaSound = p[SettingsKeys.DUHA_SOUND].toEnumOr(PrayerSound.NOTIFICATION)
+                .takeIf { it in NotificationSettings.DuhaSounds } ?: PrayerSound.NOTIFICATION,
+            iqama = p[SettingsKeys.IQAMA_ENABLED] ?: false,
+            iqamaMinutes = ObligatoryPrayers.associateWith { prayer ->
+                p[SettingsKeys.iqamaMinutesKey(prayer)]?.takeIf { it in NotificationSettings.IqamaOptions }
+                    ?: NotificationSettings.IqamaDefaults.getValue(prayer)
+            },
+            iqamaSound = p[SettingsKeys.IQAMA_SOUND].toEnumOr(PrayerSound.NOTIFICATION)
+                .takeIf { it in NotificationSettings.IqamaSounds } ?: PrayerSound.NOTIFICATION,
         )
     }
 
@@ -554,6 +567,20 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             e[SettingsKeys.TAHAJJUD_SOUND] = settings.tahajjudSound.name
             e[SettingsKeys.ADHKAR_REMINDER_ENABLED] = settings.adhkar
             e[SettingsKeys.ADHKAR_REMINDER_SOUND] = settings.adhkarSound.name
+            e[SettingsKeys.DUHA_ENABLED] = settings.duha
+            e[SettingsKeys.DUHA_TIMING] = settings.duhaTiming.name
+            e[SettingsKeys.DUHA_SOUND] = settings.duhaSound.name
+            e[SettingsKeys.IQAMA_ENABLED] = settings.iqama
+            // A gap is kept whether Iqama is on or off, so turning it off keeps them. Only a gap
+            // that differs from its default is written, and one back at its default is removed:
+            // absent means its default, so a later change to IqamaDefaults reaches everyone who
+            // never chose a gap of their own.
+            ObligatoryPrayers.forEach { prayer ->
+                val key = SettingsKeys.iqamaMinutesKey(prayer)
+                val minutes = settings.iqamaMinutesFor(prayer)
+                if (minutes == NotificationSettings.IqamaDefaults.getValue(prayer)) e.remove(key) else e[key] = minutes
+            }
+            e[SettingsKeys.IQAMA_SOUND] = settings.iqamaSound.name
         }
     }
 
@@ -676,5 +703,15 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     /** Test-only hook for the forward-compatibility case, matching [writeRawThemeForTest]. */
     internal suspend fun writeRawAdhanVoiceForTest(raw: String) {
         store.edit { it[SettingsKeys.ADHAN_VOICE] = raw }
+    }
+
+    /** Test-only hook for the forward-compatibility case, matching [writeRawThemeForTest]. */
+    internal suspend fun writeRawDuhaTimingForTest(raw: String) {
+        store.edit { it[SettingsKeys.DUHA_TIMING] = raw }
+    }
+
+    /** Test-only hook for a gap the setting does not offer, matching [writeRawThemeForTest]. */
+    internal suspend fun writeRawIqamaMinutesForTest(prayer: Prayer, minutes: Int) {
+        store.edit { it[SettingsKeys.iqamaMinutesKey(prayer)] = minutes }
     }
 }

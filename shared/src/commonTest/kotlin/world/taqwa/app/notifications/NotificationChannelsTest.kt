@@ -177,4 +177,43 @@ class NotificationChannelsTest {
             }
         }
     }
+
+    // Duha and Iqama spec §3.4: each has channels of its own, so either can be silenced in the
+    // system's list without silencing an adhan; all five prayers' iqamas share one.
+    @Test
+    fun `Duha and the iqama have channels of their own`() {
+        val duha = NotificationChannels.channelId(Prayer.SUNRISE, PrayerSound.NOTIFICATION, kind = NotificationKind.DUHA_BEST)
+        assertEquals("duha_notification_chime3", duha)
+        assertEquals(duha, NotificationChannels.channelId(Prayer.SUNRISE, PrayerSound.NOTIFICATION, kind = NotificationKind.DUHA_START))
+        assertEquals("duha_silent", NotificationChannels.channelId(Prayer.SUNRISE, PrayerSound.SILENT, kind = NotificationKind.DUHA_START))
+        assertEquals("iqama_notification_chime3", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.NOTIFICATION, kind = NotificationKind.IQAMA))
+        assertEquals("iqama_takbir_azeez", NotificationChannels.channelId(Prayer.ISHA, PrayerSound.TAKBIR, AdhanVoice.AZEEZ, NotificationKind.IQAMA))
+        val iqamas = Prayer.entries.map { NotificationChannels.channelId(it, PrayerSound.NOTIFICATION, kind = NotificationKind.IQAMA) }
+        assertEquals(1, iqamas.toSet().size, "$iqamas")
+
+        val others = Prayer.entries.flatMap { NotificationChannels.allChannelIdsFor(it) } +
+            NotificationChannels.allTahajjudChannelIds() + NotificationChannels.allAdhkarChannelIds()
+        val allDuha = NotificationChannels.allDuhaChannelIds()
+        val allIqama = NotificationChannels.allIqamaChannelIds()
+        assertTrue(allDuha.none { it in others || it in allIqama }, "$allDuha")
+        assertTrue(allIqama.none { it in others }, "$allIqama")
+        assertEquals(allDuha.size, allDuha.toSet().size)
+        assertEquals(allIqama.size, allIqama.toSet().size)
+    }
+
+    @Test
+    fun `every Duha and iqama channel is one the sweep can delete`() {
+        val allDuha = NotificationChannels.allDuhaChannelIds()
+        val allIqama = NotificationChannels.allIqamaChannelIds()
+        for (kind in listOf(NotificationKind.DUHA_BEST, NotificationKind.DUHA_START, NotificationKind.IQAMA)) {
+            val all = if (kind == NotificationKind.IQAMA) allIqama else allDuha
+            for (prayer in Prayer.entries) {
+                PrayerSound.entries.forEach { sound ->
+                    AdhanVoice.entries.forEach { voice ->
+                        assertTrue(NotificationChannels.channelId(prayer, sound, voice, kind) in all, "$kind $prayer $sound $voice")
+                    }
+                }
+            }
+        }
+    }
 }

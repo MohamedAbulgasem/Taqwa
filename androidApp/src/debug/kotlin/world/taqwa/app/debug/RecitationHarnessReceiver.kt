@@ -21,6 +21,7 @@ import world.taqwa.app.di.appContainer
 import world.taqwa.app.notifications.NotificationKind
 import world.taqwa.app.notifications.RescheduleTrigger
 import world.taqwa.app.notifications.createNotificationScheduler
+import world.taqwa.app.notifications.isDuha
 import world.taqwa.app.notifications.setTahajjud
 import world.taqwa.app.recitation.NowPlayingText
 import world.taqwa.app.recitation.Reciter
@@ -152,6 +153,20 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                         "on" -> appContainer.setTahajjud(true)
                         "off" -> appContainer.setTahajjud(false)
                         else -> fireTahajjud()
+                    }
+                    // `--es name on|off` switches Duha or the iqama (Duha and Iqama spec §3), as
+                    // their Settings cards do, and logs what the new plan arms for it.
+                    "duha", "iqama" -> {
+                        val on = intent.getStringExtra("name") == "on"
+                        val repository = appContainer.settingsRepository
+                        val current = repository.notificationSettings.first()
+                        repository.setNotificationSettings(
+                            if (command == "duha") current.copy(duha = on) else current.copy(iqama = on),
+                        )
+                        val plan = appContainer.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+                        plan.filter { if (command == "duha") it.kind.isDuha else it.kind == NotificationKind.IQAMA }
+                            .forEach { Log.i(TAG, "$command: ${it.id} at ${it.instant} until ${it.windowEnd} ${it.sound} | ${it.title} | ${it.body}") }
+                        Log.i(TAG, "$command ${if (on) "on" else "off"}: plan of ${plan.size}")
                     }
                     else -> Log.w(TAG, "unknown command \"$command\"")
                 }
