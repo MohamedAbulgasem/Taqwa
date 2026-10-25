@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -224,11 +223,7 @@ fun AboutTimesScreen(
             // way from these times to the settings that change them.
             if (onOpenPrayerTimesSettings != null) {
                 CardDivider()
-                AboutLink(
-                    stringResource(Res.string.about_prayer_times_settings),
-                    LocalTaqwaColors.current.textPrimary,
-                    onOpenPrayerTimesSettings,
-                )
+                AboutLink(stringResource(Res.string.about_prayer_times_settings), onOpenPrayerTimesSettings)
             }
             NearbySection(state)
             AsrSection(state.resolution, engineDay.school, cityLabel)
@@ -620,14 +615,17 @@ private fun CheckMosqueSection() {
     SectionBody(stringResource(Res.string.about_check_mosque_body))
 }
 
-/** "Match my mosque ›" in the accent. */
 @Composable
 private fun MatchMyMosqueLink(onClick: () -> Unit) =
-    AboutLink(stringResource(Res.string.timetable_match_mosque), LocalTaqwaColors.current.accent, onClick)
+    AboutLink(stringResource(Res.string.timetable_match_mosque), onClick)
 
-/** A link row: its words in [tint], the chevron drawn so it turns with the reading direction. */
+/**
+ * A link row: its words in the accent, as every action on this screen is ("Match my mosque ›",
+ * "Prayer times settings ›"), the chevron drawn so it turns with the reading direction.
+ */
 @Composable
-private fun AboutLink(text: String, tint: Color, onClick: () -> Unit) {
+private fun AboutLink(text: String, onClick: () -> Unit) {
+    val tint = LocalTaqwaColors.current.accent
     val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),

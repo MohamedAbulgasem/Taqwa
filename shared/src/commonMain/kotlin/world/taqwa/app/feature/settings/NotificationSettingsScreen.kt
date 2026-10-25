@@ -296,13 +296,14 @@ fun NotificationSettingsScreen(
 
             // A card of its own, below the five and off until asked for (spec §17.6): a voluntary
             // prayer is offered, not assumed, and it is not one of the prayers the card above is
-            // about. Its sound row exists only while it is on, so the screen a person who never
-            // wants it sees has grown by exactly one quiet row.
+            // about. Its subtitle and sound row exist only while it is on, as Duha's and Iqama's do,
+            // so the screen a person who never wants it sees has grown by exactly one quiet row.
             Spacer(Modifier.height(28.dp))
             SettingsCard {
                 TaqwaRow(
                     stringResource(Res.string.notifications_tahajjud),
                     subtitle = stringResource(Res.string.notifications_tahajjud_subtitle),
+                    revealSubtitle = settings.tahajjud,
                     toggle = RowToggle(checked = settings.tahajjud, onCheckedChange = onToggleTahajjud),
                 )
                 SettingsReveal(settings.tahajjud) {
@@ -346,12 +347,13 @@ fun NotificationSettingsScreen(
             }
 
             // The adhkar reminder (adhkar spec §5), built as the Tahajjud card is and for the same
-            // reasons: off until asked for, and its sound row there only while it is on.
+            // reasons: off until asked for, and its subtitle and sound row there only while it is on.
             Spacer(Modifier.height(28.dp))
             SettingsCard {
                 TaqwaRow(
                     stringResource(Res.string.notifications_adhkar),
                     subtitle = stringResource(Res.string.notifications_adhkar_subtitle),
+                    revealSubtitle = settings.adhkar,
                     toggle = RowToggle(settings.adhkar, onToggleAdhkar),
                 )
                 SettingsReveal(settings.adhkar) {
