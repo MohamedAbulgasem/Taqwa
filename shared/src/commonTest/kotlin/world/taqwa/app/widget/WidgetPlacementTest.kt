@@ -69,6 +69,24 @@ class WidgetPlacementTest {
     }
 
     @Test
+    fun `a pin request the launcher refused turns the row into the steps`() {
+        for (widget in PinnableWidget.entries) {
+            assertEquals(
+                WidgetOffer.Instructions(WidgetAddPath.ANDROID_PIN),
+                widgetOffer(widget, placed = false, pinnable = true, addPath = WidgetAddPath.ANDROID_PIN, refused = true),
+            )
+        }
+    }
+
+    @Test
+    fun `a refused request says nothing once the widget is on the home screen`() {
+        assertEquals(
+            WidgetOffer.None,
+            widgetOffer(PinnableWidget.PRAYER, placed = true, pinnable = true, addPath = WidgetAddPath.ANDROID_PIN, refused = true),
+        )
+    }
+
+    @Test
     fun `all three add paths are covered so a new one cannot slip through untested`() {
         assertEquals(
             listOf(WidgetAddPath.ANDROID_PIN, WidgetAddPath.IOS_HOLD_ICON, WidgetAddPath.IOS_PLUS_BUTTON),

@@ -15,7 +15,6 @@ actual fun createWidgetPinRequester(): WidgetPinRequester = object : WidgetPinRe
         androidWidgetPinHook != null &&
             (AppWidgetManager.getInstance(appContext)?.isRequestPinAppWidgetSupported ?: false)
 
-    override fun requestPin(widget: PinnableWidget) {
-        runCatching { androidWidgetPinHook?.invoke(widget) }
-    }
+    override fun requestPin(widget: PinnableWidget): Boolean =
+        runCatching { androidWidgetPinHook?.invoke(widget) }.getOrNull() ?: false
 }

@@ -31,6 +31,7 @@
     <string name="onboarding_widget_cta_add">Widget ekle</string>
     <string name="onboarding_widget_cta_done">Tamam</string>
     <string name="onboarding_widget_secondary">Belki sonra</string>
+    <string name="onboarding_widget_steps_android">Ana ekranınız uygulamaların widget eklemesine izin vermiyor, bu yüzden kendiniz ekleyin: ana ekranda boş bir yere basılı tutun (veya iki parmağınızla sıkıştırın), Widget’lar bölümüne dokunun, Taqwa’yı bulun ve widget’ı yerine sürükleyin.</string>
 
     <!-- Vakit adları. Yanlarında duran Arapça ad hiçbir zaman bir kaynak dizesi değildir: her
          dilde aynı olduğu için PrayerNaming içinde yaşar. -->

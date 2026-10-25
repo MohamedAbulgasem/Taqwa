@@ -71,7 +71,8 @@ object TaqwaWidgets {
      * Asks the launcher to place one widget: the two-column prayer widget (what onboarding's
      * "Add widget" button offers, and the only prayer size worth pinning unasked) or the ayah
      * card. The launcher shows its own confirmation sheet; false means it declined to ask at all
-     * (no pin support, or a work profile that forbids it), and the caller treats that as "done".
+     * (no pin support, a work profile that forbids it, or a launcher that declines, as some vivo,
+     * OPPO and Xiaomi home screens do), and the caller then shows the steps by hand.
      */
     fun requestPin(context: Context, widget: PinnableWidget): Boolean {
         val manager = AppWidgetManager.getInstance(context) ?: return false

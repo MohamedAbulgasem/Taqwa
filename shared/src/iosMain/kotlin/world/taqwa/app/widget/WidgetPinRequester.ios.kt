@@ -4,5 +4,5 @@ package world.taqwa.app.widget
  * does it from the home screen, and the app tells them how. */
 actual fun createWidgetPinRequester(): WidgetPinRequester = object : WidgetPinRequester {
     override fun isSupported(widget: PinnableWidget): Boolean = false
-    override fun requestPin(widget: PinnableWidget) = Unit
+    override fun requestPin(widget: PinnableWidget): Boolean = false
 }

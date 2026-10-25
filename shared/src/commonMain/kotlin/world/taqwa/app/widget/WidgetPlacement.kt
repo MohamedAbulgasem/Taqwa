@@ -50,15 +50,19 @@ sealed interface WidgetOffer {
  * [placed] wins over everything: while placement is [WidgetPlacement.Unknown] both widgets read as
  * placed and the screen shows nothing at all, which is what makes the row fade in when the answer
  * arrives rather than flash away when it turns out to be unnecessary.
+ *
+ * [refused] is true once the launcher has turned down a request for this widget: the row did
+ * nothing, so the steps by hand take its place. It is never set by a request the launcher took.
  */
 fun widgetOffer(
     widget: PinnableWidget,
     placed: Boolean,
     pinnable: Boolean,
     addPath: WidgetAddPath,
+    refused: Boolean = false,
 ): WidgetOffer = when {
     placed -> WidgetOffer.None
-    pinnable -> WidgetOffer.Pin(widget)
+    pinnable && !refused -> WidgetOffer.Pin(widget)
     else -> WidgetOffer.Instructions(addPath)
 }
 

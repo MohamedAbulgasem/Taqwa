@@ -60,6 +60,19 @@ class ControlSemanticsTest {
     }
 
     @Test
+    fun aPrimaryButtonIsAButton() = runComposeUiTest {
+        var pressed = false
+        setContent { TaqwaPrimaryButton("Done", onClick = { pressed = true }) }
+        // The role is what makes TalkBack say "button" and gives VoiceOver its button trait; a
+        // bare clickable is read as "Done, double-tap to activate" and nothing more.
+        onNodeWithText("Done")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assertHasClickAction()
+            .performClick()
+        assertTrue(pressed)
+    }
+
+    @Test
     fun aSettingsTitleAndItsSectionLabelsAreHeadings() = runComposeUiTest {
         setContent {
             SettingsScaffold("Prayer times", onBack = {}) {

@@ -29,6 +29,7 @@
     <string name="onboarding_widget_cta_add">Tambahkan widget</string>
     <string name="onboarding_widget_cta_done">Selesai</string>
     <string name="onboarding_widget_secondary">Mungkin nanti</string>
+    <string name="onboarding_widget_steps_android">Layar utama Anda tidak mengizinkan aplikasi menambahkan widget, jadi tambahkan sendiri: sentuh dan tahan area kosong di layar utama (atau cubit layar), ketuk Widget, cari Taqwa, lalu seret widget ke tempatnya.</string>
 
     <!-- Prayer names -->
     <string name="prayer_fajr">Subuh</string>

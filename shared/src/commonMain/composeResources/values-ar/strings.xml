@@ -29,6 +29,7 @@
     <string name="onboarding_widget_cta_add">إضافة الأداة</string>
     <string name="onboarding_widget_cta_done">تم</string>
     <string name="onboarding_widget_secondary">لاحقًا</string>
+    <string name="onboarding_widget_steps_android">شاشتك الرئيسية لا تسمح للتطبيقات بإضافة الأدوات، فأضفها بنفسك: اضغط مطولًا على مكان فارغ في الشاشة الرئيسية (أو اضمم إصبعيك عليها)، ثم اضغط «الأدوات» أو «التطبيقات المصغّرة»، وابحث عن تقوى واسحب الأداة إلى مكانها.</string>
 
     <!-- Prayer names -->
     <string name="prayer_fajr">الفجر</string>

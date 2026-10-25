@@ -4,24 +4,40 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,16 +66,15 @@ import world.taqwa.app.resources.onboarding_notifications_title
 import world.taqwa.app.resources.onboarding_welcome_body
 import world.taqwa.app.resources.onboarding_welcome_cta
 import world.taqwa.app.resources.onboarding_welcome_title
-import world.taqwa.app.resources.onboarding_widget_body
-import world.taqwa.app.resources.onboarding_widget_body_ios
-import world.taqwa.app.resources.onboarding_widget_body_ios_legacy
 import world.taqwa.app.resources.onboarding_widget_cta_add
 import world.taqwa.app.resources.onboarding_widget_cta_done
 import world.taqwa.app.resources.onboarding_widget_secondary
+import world.taqwa.app.resources.onboarding_widget_steps_android
 import world.taqwa.app.resources.onboarding_widget_title
 import world.taqwa.app.widget.PinnableWidget
 import world.taqwa.app.widget.WidgetAddPath
 import world.taqwa.app.widget.WidgetPinRequester
+import world.taqwa.app.widget.askToPin
 import world.taqwa.app.widget.widgetAddPath
 
 /**
@@ -107,8 +122,6 @@ fun OnboardingScreen(
     /** Opens the system's "Alarms & reminders" page for this app. */
     onRequestExactAlarms: () -> Unit = {},
 ) {
-    val colors = LocalTaqwaColors.current
-
     val requestLocation = rememberLocationPermissionRequester(locationRepository) { permission ->
         onLocationPermission(permission)
         when (locationAnswer(permission)) {
@@ -136,11 +149,97 @@ fun OnboardingScreen(
     }
     val steps = OnboardingStep.entries.filter { it != OnboardingStep.EXACT_ALARMS || exactAlarmsNeeded }
 
-    val canPinWidget = widgetPinRequester.isSupported(PinnableWidget.PRAYER)
+    val dots: @Composable () -> Unit = { StepDots(step, steps) }
+    when (step) {
+        OnboardingStep.WELCOME -> OnboardingPage(
+            dots,
+            copy = {
+                MihrabMark()
+                Spacer(Modifier.height(28.dp))
+                Headline(stringResource(Res.string.onboarding_welcome_title))
+                Spacer(Modifier.height(12.dp))
+                Body(stringResource(Res.string.onboarding_welcome_body))
+            },
+        ) {
+            TaqwaPrimaryButton(
+                stringResource(Res.string.onboarding_welcome_cta),
+                onClick = { onStep(OnboardingStep.LOCATION) },
+            )
+            Spacer(Modifier.height(44.dp))
+        }
+        // The two screens before a system prompt: Continue, and nothing beside it (see the class
+        // comment). The spacer stands where a second link would be, so the button sits at the
+        // same height on every screen.
+        OnboardingStep.LOCATION -> OnboardingPage(
+            dots,
+            copy = {
+                PinMark()
+                Spacer(Modifier.height(28.dp))
+                Headline(stringResource(Res.string.onboarding_location_title))
+                Spacer(Modifier.height(12.dp))
+                Body(stringResource(Res.string.onboarding_location_body))
+            },
+        ) {
+            TaqwaPrimaryButton(stringResource(Res.string.onboarding_continue), requestLocation)
+            Spacer(Modifier.height(44.dp))
+        }
+        OnboardingStep.NOTIFICATIONS -> OnboardingPage(
+            dots,
+            copy = {
+                BellMark()
+                Spacer(Modifier.height(28.dp))
+                Headline(stringResource(Res.string.onboarding_notifications_title))
+                Spacer(Modifier.height(12.dp))
+                Body(stringResource(Res.string.onboarding_notifications_body))
+            },
+        ) {
+            TaqwaPrimaryButton(stringResource(Res.string.onboarding_continue), requestNotifications)
+            Spacer(Modifier.height(44.dp))
+        }
+        OnboardingStep.EXACT_ALARMS -> OnboardingPage(
+            dots,
+            copy = {
+                ClockMark()
+                Spacer(Modifier.height(28.dp))
+                Headline(stringResource(Res.string.onboarding_exact_title))
+                Spacer(Modifier.height(12.dp))
+                Body(stringResource(Res.string.onboarding_exact_body))
+            },
+        ) {
+            // The system page opens over the app; coming back with the grant advances the step
+            // (the LaunchedEffect above), coming back without it leaves the choice here.
+            TaqwaPrimaryButton(stringResource(Res.string.notifications_allow_exact_alarms), onRequestExactAlarms)
+            TaqwaTextLink(
+                stringResource(Res.string.onboarding_notifications_secondary),
+                onClick = { onStep(OnboardingStep.WIDGET) },
+            )
+        }
+        OnboardingStep.WIDGET -> OnboardingWidgetPage(widgetPinRequester, widgetAddPath, onComplete, dots)
+    }
+}
 
-    // The background is full-bleed; the mark, the copy and the buttons sit in a capped, centred
-    // column inside it, so a sideways screen does not stretch a single sentence across 900 dp.
-    // safeDrawing, not systemBars: sideways the navigation bar and the cutout are on the sides.
+/**
+ * One onboarding screen: the copy and the step dots in the middle, the buttons at the foot.
+ *
+ * The background is full-bleed; the copy and the buttons sit in a capped, centred column inside
+ * it, so a sideways screen does not stretch a single sentence across 900 dp. safeDrawing, not
+ * systemBars: sideways the navigation bar and the cutout are on the sides.
+ *
+ * The copy scrolls and the buttons do not, so the way on is always on screen. With the largest
+ * text on a short phone the words can be taller than the screen: the widget steps by hand at
+ * 200 % on a 408 x 760 dp phone pushed Done off the bottom, which left no way out. When the copy
+ * fits, as it does at every default setting, the two weighted spacers centre it exactly as they
+ * always did, and there is nothing to scroll.
+ */
+@Composable
+private fun OnboardingPage(
+    dots: @Composable () -> Unit,
+    copy: @Composable ColumnScope.() -> Unit,
+    /** Under the dots, where the button sits on the other screens; it scrolls with the copy. */
+    belowDots: @Composable ColumnScope.() -> Unit = {},
+    actions: @Composable ColumnScope.() -> Unit,
+) {
+    val colors = LocalTaqwaColors.current
     Box(
         Modifier
             .fillMaxSize()
@@ -154,109 +253,111 @@ fun OnboardingScreen(
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.weight(1f))
-
-            when (step) {
-                OnboardingStep.WELCOME -> {
-                    MihrabMark()
-                    Spacer(Modifier.height(28.dp))
-                    Headline(stringResource(Res.string.onboarding_welcome_title))
-                    Spacer(Modifier.height(12.dp))
-                    Body(stringResource(Res.string.onboarding_welcome_body))
-                }
-                OnboardingStep.LOCATION -> {
-                    PinMark()
-                    Spacer(Modifier.height(28.dp))
-                    Headline(stringResource(Res.string.onboarding_location_title))
-                    Spacer(Modifier.height(12.dp))
-                    Body(stringResource(Res.string.onboarding_location_body))
-                }
-                OnboardingStep.NOTIFICATIONS -> {
-                    BellMark()
-                    Spacer(Modifier.height(28.dp))
-                    Headline(stringResource(Res.string.onboarding_notifications_title))
-                    Spacer(Modifier.height(12.dp))
-                    Body(stringResource(Res.string.onboarding_notifications_body))
-                }
-                OnboardingStep.EXACT_ALARMS -> {
-                    ClockMark()
-                    Spacer(Modifier.height(28.dp))
-                    Headline(stringResource(Res.string.onboarding_exact_title))
-                    Spacer(Modifier.height(12.dp))
-                    Body(stringResource(Res.string.onboarding_exact_body))
-                }
-                OnboardingStep.WIDGET -> {
-                    // The widgets themselves stand in for a mark: the point of the screen is what
-                    // they look like. Drawn for the system appearance, since the widget will be.
-                    WidgetPreview(
-                        background = WidgetBackground.FOLLOW_THEME,
-                        systemIsDark = isSystemInDarkTheme(),
-                        content = null,
-                    )
-                    Spacer(Modifier.height(28.dp))
-                    Headline(stringResource(Res.string.onboarding_widget_title))
-                    Spacer(Modifier.height(12.dp))
-                    Body(
-                        stringResource(
-                            when {
-                                canPinWidget -> Res.string.onboarding_widget_body
-                                widgetAddPath == WidgetAddPath.IOS_HOLD_ICON -> Res.string.onboarding_widget_body_ios
-                                else -> Res.string.onboarding_widget_body_ios_legacy
-                            },
-                        ),
-                    )
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+                val scroll = rememberScrollState()
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        // Draggable only when there is something to scroll, so a page that fits
+                        // does not stretch under a finger.
+                        .verticalScroll(scroll, enabled = scroll.canScrollForward || scroll.canScrollBackward)
+                        // At least the height it is given, so the spacers have room to centre.
+                        .heightIn(min = maxHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    copy()
+                    Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.height(24.dp))
+                    dots()
+                    Spacer(Modifier.height(20.dp))
+                    belowDots()
                 }
             }
-
-            Spacer(Modifier.weight(1f))
-            Spacer(Modifier.height(24.dp))
-            StepDots(step, steps)
-            Spacer(Modifier.height(20.dp))
-
-            when (step) {
-                OnboardingStep.WELCOME -> {
-                    TaqwaPrimaryButton(
-                        stringResource(Res.string.onboarding_welcome_cta),
-                        onClick = { onStep(OnboardingStep.LOCATION) },
-                    )
-                    Spacer(Modifier.height(44.dp))
-                }
-                // The two screens before a system prompt: Continue, and nothing beside it (see
-                // the class comment). The spacer stands where a second link would be, so the
-                // button sits at the same height on every screen.
-                OnboardingStep.LOCATION -> {
-                    TaqwaPrimaryButton(stringResource(Res.string.onboarding_continue), requestLocation)
-                    Spacer(Modifier.height(44.dp))
-                }
-                OnboardingStep.NOTIFICATIONS -> {
-                    TaqwaPrimaryButton(stringResource(Res.string.onboarding_continue), requestNotifications)
-                    Spacer(Modifier.height(44.dp))
-                }
-                OnboardingStep.EXACT_ALARMS -> {
-                    // The system page opens over the app; coming back with the grant advances the
-                    // step (the LaunchedEffect above), coming back without it leaves the choice here.
-                    TaqwaPrimaryButton(stringResource(Res.string.notifications_allow_exact_alarms), onRequestExactAlarms)
-                    TaqwaTextLink(
-                        stringResource(Res.string.onboarding_notifications_secondary),
-                        onClick = { onStep(OnboardingStep.WIDGET) },
-                    )
-                }
-                OnboardingStep.WIDGET -> {
-                    if (canPinWidget) {
-                        // The launcher's own sheet appears over the app; onboarding finishes
-                        // underneath it either way, because the answer never comes back reliably.
-                        TaqwaPrimaryButton(
-                            stringResource(Res.string.onboarding_widget_cta_add),
-                            onClick = { widgetPinRequester.requestPin(PinnableWidget.PRAYER); onComplete() },
-                        )
-                        TaqwaTextLink(stringResource(Res.string.onboarding_widget_secondary), onClick = onComplete)
-                    } else {
-                        TaqwaPrimaryButton(stringResource(Res.string.onboarding_widget_cta_done), onClick = onComplete)
-                        Spacer(Modifier.height(44.dp))
-                    }
-                }
-            }
+            actions()
             Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+
+/**
+ * The widget screen, and the launcher's answer to "Add widget". A launcher that takes the request
+ * shows its own sheet over the app, and onboarding finishes underneath it, because the user's
+ * answer never comes back reliably. One that refuses (no pin support, a work profile that forbids
+ * it, or one that simply declines, as some vivo, OPPO and Xiaomi home screens do) would leave the
+ * tap doing nothing, so the steps by hand replace the button. [addPath] is a parameter so a test
+ * on either platform can drive the Android screen.
+ */
+@Composable
+internal fun OnboardingWidgetPage(
+    widgetPinRequester: WidgetPinRequester,
+    addPath: WidgetAddPath,
+    onComplete: () -> Unit,
+    dots: @Composable () -> Unit = {},
+) {
+    val canPin = widgetPinRequester.isSupported(PinnableWidget.PRAYER)
+    // Set only when the launcher turns "Add widget" down; a launcher that takes the request never
+    // sets it, so for that phone the screen is what it always was.
+    var pinRefused by rememberSaveable { mutableStateOf(false) }
+    val offer = widgetStepOffer(canPin, pinRefused, addPath)
+    // The steps sit under the dots, in the part that scrolls. When the copy above is too tall to
+    // leave them room (the largest text on a short phone), they are scrolled up into view the
+    // moment they replace the button, rather than appearing out of sight below it.
+    val stepsInView = remember { BringIntoViewRequester() }
+    LaunchedEffect(pinRefused) {
+        if (pinRefused) {
+            withFrameNanos {}
+            stepsInView.bringIntoView()
+        }
+    }
+    OnboardingPage(
+        dots,
+        copy = {
+            // The widgets themselves stand in for a mark: the point of the screen is what they
+            // look like. Drawn for the system appearance, since the widget will be.
+            WidgetPreview(
+                background = WidgetBackground.FOLLOW_THEME,
+                systemIsDark = isSystemInDarkTheme(),
+                content = null,
+            )
+            Spacer(Modifier.height(28.dp))
+            Headline(stringResource(Res.string.onboarding_widget_title))
+            Spacer(Modifier.height(12.dp))
+            Body(stringResource(widgetStepBodyKey(addPath)))
+        },
+        belowDots = {
+            if (offer == WidgetStepOffer.ANDROID_STEPS) {
+                // A polite live region only after a refused tap: the button TalkBack was on has
+                // just gone, and this is what took its place. On a phone that cannot pin at all
+                // the steps are there from the first frame and are read like the rest.
+                Body(
+                    stringResource(Res.string.onboarding_widget_steps_android),
+                    Modifier
+                        .bringIntoViewRequester(stepsInView)
+                        .then(if (pinRefused) Modifier.semantics { liveRegion = LiveRegionMode.Polite } else Modifier),
+                )
+                Spacer(Modifier.height(20.dp))
+            }
+        },
+    ) {
+        when (offer) {
+            WidgetStepOffer.PIN -> {
+                TaqwaPrimaryButton(
+                    stringResource(Res.string.onboarding_widget_cta_add),
+                    onClick = {
+                        widgetPinRequester.askToPin(
+                            PinnableWidget.PRAYER,
+                            onTaken = onComplete,
+                            onRefused = { pinRefused = true },
+                        )
+                    },
+                )
+                TaqwaTextLink(stringResource(Res.string.onboarding_widget_secondary), onClick = onComplete)
+            }
+            WidgetStepOffer.ANDROID_STEPS, WidgetStepOffer.DONE -> {
+                TaqwaPrimaryButton(stringResource(Res.string.onboarding_widget_cta_done), onClick = onComplete)
+                Spacer(Modifier.height(44.dp))
+            }
         }
     }
 }
@@ -272,9 +373,10 @@ private fun Headline(text: String) {
 }
 
 @Composable
-private fun Body(text: String) {
+private fun Body(text: String, modifier: Modifier = Modifier) {
     Text(
         text,
+        modifier = modifier,
         style = TaqwaText.caption.copy(fontSize = 16.sp),
         color = LocalTaqwaColors.current.textSecondary,
         textAlign = TextAlign.Center,

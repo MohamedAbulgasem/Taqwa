@@ -33,6 +33,7 @@
     <string name="onboarding_widget_cta_add">Add widget</string>
     <string name="onboarding_widget_cta_done">Done</string>
     <string name="onboarding_widget_secondary">Maybe later</string>
+    <string name="onboarding_widget_steps_android">Your home screen does not let apps add widgets, so add it yourself: touch and hold an empty spot on your home screen (or pinch it), tap Widgets, find Taqwa and drag the widget into place.</string>
 
     <!-- Prayer names. The Arabic name that sits beside these is never a resource: it is the
          same in every locale, so it lives in PrayerNaming. -->

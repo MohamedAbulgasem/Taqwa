@@ -2,6 +2,7 @@ package world.taqwa.app.feature.settings
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
@@ -19,6 +22,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -55,6 +61,7 @@ import world.taqwa.app.widget.WidgetOffer
 import world.taqwa.app.widget.WidgetPinRequester
 import world.taqwa.app.widget.WidgetPlacement
 import world.taqwa.app.widget.WidgetPlacementSource
+import world.taqwa.app.widget.askToPin
 import world.taqwa.app.widget.createWidgetKeyValueStore
 import world.taqwa.app.widget.isIosPlatform
 import world.taqwa.app.widget.translucentOrFrostedSubtitleKey
@@ -116,6 +123,11 @@ fun AppearanceSettingsScreen(
     val pinnable = remember(widgetPinRequester) {
         PinnableWidget.entries.associateWith(widgetPinRequester::isSupported)
     }
+    // The widgets whose "Add to home screen" the launcher has turned down while this screen is
+    // open: their row did nothing, so the steps by hand take its place. A request the launcher
+    // took never lands here, so on that phone the screen stays as it was. Saved, as onboarding's
+    // is, so a rotation or a process death does not bring back a row that does nothing.
+    var pinRefused by rememberSaveable(stateSaver = PinRefusedSaver) { mutableStateOf(emptySet<PinnableWidget>()) }
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(widgetPlacementSource, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -176,16 +188,20 @@ fun AppearanceSettingsScreen(
         // belongs under.
         val prayerOffer = widgetOffer(
             PinnableWidget.PRAYER, placement.prayer, pinnable[PinnableWidget.PRAYER] == true, widgetAddPath,
+            refused = PinnableWidget.PRAYER in pinRefused,
         )
         val ayahOffer = widgetOffer(
             PinnableWidget.AYAH, placement.ayah, pinnable[PinnableWidget.AYAH] == true, widgetAddPath,
+            refused = PinnableWidget.AYAH in pinRefused,
         )
+        val onPinRefused: (PinnableWidget) -> Unit = { pinRefused = pinRefused + it }
         // Where the steps go, when the platform cannot be asked and they have to be written out.
         // They are the platform's, not the widget's, so they are said once: under whichever
         // preview needs them when only one does, and after both when both do, where they read as
         // a note on the screen rather than on the ayah card they happen to follow.
         val bothNeedSteps = prayerOffer is WidgetOffer.Instructions && ayahOffer is WidgetOffer.Instructions
-        WidgetAddOffer(prayerOffer, widgetPinRequester, showInstructions = !bothNeedSteps)
+        WidgetAddOffer(prayerOffer, widgetPinRequester, onPinRefused, showInstructions = !bothNeedSteps,
+            announce = PinnableWidget.PRAYER in pinRefused)
 
         Spacer(Modifier.height(14.dp))
         SectionLabel(stringResource(Res.string.appearance_ayah_widget_preview_label))
@@ -198,11 +214,14 @@ fun AppearanceSettingsScreen(
         // at all — so they are said once, under the first preview that needs them, and suppressed
         // under the second. Said under both they read as a copy-paste; said only at the bottom
         // they would sit under the ayah preview while describing a missing prayer widget.
-        WidgetAddOffer(ayahOffer, widgetPinRequester, showInstructions = !bothNeedSteps)
+        WidgetAddOffer(ayahOffer, widgetPinRequester, onPinRefused, showInstructions = !bothNeedSteps,
+            announce = PinnableWidget.AYAH in pinRefused)
 
         if (bothNeedSteps) {
             Spacer(Modifier.height(10.dp))
-            SettingsNote(stringResource(widgetAddInstructionsKey((prayerOffer as WidgetOffer.Instructions).path)))
+            AnnouncedWhen(pinRefused.isNotEmpty()) {
+                SettingsNote(stringResource(widgetAddInstructionsKey((prayerOffer as WidgetOffer.Instructions).path)))
+            }
         }
     }
 }
@@ -214,31 +233,50 @@ fun AppearanceSettingsScreen(
  * those steps once for the whole screen instead, which it does when both widgets need them.
  */
 @Composable
-private fun WidgetAddOffer(
+internal fun WidgetAddOffer(
     offer: WidgetOffer,
     pinRequester: WidgetPinRequester,
+    onRefused: (PinnableWidget) -> Unit,
     showInstructions: Boolean,
+    /** True when these steps replace a row the launcher just refused, so TalkBack reads them. */
+    announce: Boolean,
 ) {
     when (offer) {
         WidgetOffer.None -> Unit
         is WidgetOffer.Pin -> {
             Spacer(Modifier.height(10.dp))
             SettingsCard {
-                // Fire and forget: the launcher's confirmation sheet is system UI and its answer
+                // A request the launcher took: its confirmation sheet is system UI and its answer
                 // never comes back, so the app does nothing further — the row simply is not there
-                // the next time placement is read, on the ON_START that follows.
+                // the next time placement is read, on the ON_START that follows. A request it
+                // refused would leave the tap doing nothing, so the steps replace the row.
                 TaqwaRow(
                     label = stringResource(Res.string.appearance_widget_add),
-                    onClick = { pinRequester.requestPin(offer.widget) },
+                    onClick = {
+                        pinRequester.askToPin(offer.widget, onTaken = {}, onRefused = { onRefused(offer.widget) })
+                    },
                     trailing = { ForwardChevron() },
                 )
             }
         }
         is WidgetOffer.Instructions -> if (showInstructions) {
             Spacer(Modifier.height(10.dp))
-            SettingsNote(stringResource(widgetAddInstructionsKey(offer.path)))
+            AnnouncedWhen(announce) { SettingsNote(stringResource(widgetAddInstructionsKey(offer.path))) }
         }
     }
+}
+
+/** The refused widgets by name, which any platform's saved state can hold. */
+private val PinRefusedSaver = listSaver<Set<PinnableWidget>, String>(
+    save = { refused -> refused.map { it.name } },
+    restore = { names -> names.mapTo(mutableSetOf(), PinnableWidget::valueOf) },
+)
+
+/** A polite live region only when [announce]: steps that replace a refused row are read out, and
+ * steps that were there from the start are not announced as the screen's placement arrives. */
+@Composable
+private fun AnnouncedWhen(announce: Boolean, content: @Composable () -> Unit) {
+    Box(if (announce) Modifier.semantics { liveRegion = LiveRegionMode.Polite } else Modifier) { content() }
 }
 
 /**

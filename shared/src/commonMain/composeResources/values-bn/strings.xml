@@ -29,6 +29,7 @@
     <string name="onboarding_widget_cta_add">উইজেট যোগ করুন</string>
     <string name="onboarding_widget_cta_done">হয়ে গেছে</string>
     <string name="onboarding_widget_secondary">পরে দেখা যাবে</string>
+    <string name="onboarding_widget_steps_android">আপনার হোম স্ক্রিন অ্যাপকে উইজেট যোগ করতে দেয় না, তাই নিজেই যোগ করুন: হোম স্ক্রিনের ফাঁকা জায়গায় চেপে ধরে রাখুন (অথবা দুই আঙুল দিয়ে চিমটি কাটুন), উইজেট অপশনে চাপ দিন, তাকওয়া খুঁজুন এবং উইজেটটি টেনে জায়গামতো রাখুন।</string>
 
     <!-- Prayer names -->
     <string name="prayer_fajr">ফজর</string>

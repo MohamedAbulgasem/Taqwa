@@ -31,6 +31,7 @@
     <string name="onboarding_widget_cta_add">Ajouter le widget</string>
     <string name="onboarding_widget_cta_done">Terminé</string>
     <string name="onboarding_widget_secondary">Plus tard</string>
+    <string name="onboarding_widget_steps_android">Votre écran d’accueil ne permet pas aux applications d’ajouter des widgets, ajoutez-le donc vous-même : appuyez longuement sur un espace vide de l’écran d’accueil (ou pincez-le), touchez Widgets, trouvez Taqwa et faites glisser le widget à sa place.</string>
 
     <!-- Prayer names. The Arabic name that sits beside these is never a resource: it is the
          same in every locale, so it lives in PrayerNaming. -->

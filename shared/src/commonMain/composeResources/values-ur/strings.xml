@@ -29,6 +29,7 @@
     <string name="onboarding_widget_cta_add">ویجٹ شامل کریں</string>
     <string name="onboarding_widget_cta_done">ہو گیا</string>
     <string name="onboarding_widget_secondary">شاید بعد میں</string>
+    <string name="onboarding_widget_steps_android">آپ کی ہوم اسکرین ایپس کو ویجٹ شامل کرنے نہیں دیتی، اس لیے اسے خود شامل کریں: ہوم اسکرین پر کسی خالی جگہ کو دبا کر رکھیں (یا دو انگلیاں اسکرین پر قریب لائیں)، ویجٹس پر ٹیپ کریں، تقویٰ تلاش کریں اور ویجٹ کو کھینچ کر اس کی جگہ پر رکھ دیں۔</string>
 
     <!-- Prayer names -->
     <string name="prayer_fajr">فجر</string>
